@@ -23,11 +23,11 @@ import generators.Generators
 import org.scalacheck.Gen.{listOf, nonEmptyListOf}
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import play.api.{Application, Configuration}
-import play.api.mvc.{RequestHeader, Result}
 import play.api.mvc.Results.Ok
-import play.api.test.{FakeRequest, Injecting}
+import play.api.mvc.{RequestHeader, Result}
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import play.api.{Application, Configuration}
 
 import scala.concurrent.Future
 import scala.util.Random
