@@ -1,3 +1,19 @@
+/*
+ * Copyright 2022 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package generators
 
 import java.time.{Instant, LocalDate, ZoneOffset}
@@ -8,7 +24,8 @@ import org.scalacheck.{Gen, Shrink}
 
 trait Generators extends UserAnswersGenerator with PageGenerators with ModelGenerators with UserAnswersEntryGenerators {
 
-  implicit val dontShrink: Shrink[String] = Shrink.shrinkAny
+  implicit val dontShrinkString: Shrink[String] = Shrink.shrinkAny
+  implicit def dontShrinkList[T]: Shrink[List[T]] = Shrink.shrinkAny
 
   def genIntersperseString(gen: Gen[String],
                            value: String,
@@ -84,12 +101,7 @@ trait Generators extends UserAnswersGenerator with PageGenerators with ModelGene
     nonEmptyString suchThat (!excluded.contains(_))
 
   def oneOf[T](xs: Seq[Gen[T]]): Gen[T] =
-    if (xs.isEmpty) {
-      throw new IllegalArgumentException("oneOf called on empty collection")
-    } else {
-      val vector = xs.toVector
-      choose(0, vector.size - 1).flatMap(vector(_))
-    }
+    Gen.oneOf(xs).flatMap(identity)
 
   def datesBetween(min: LocalDate, max: LocalDate): Gen[LocalDate] = {
 
@@ -101,4 +113,15 @@ trait Generators extends UserAnswersGenerator with PageGenerators with ModelGene
         Instant.ofEpochMilli(millis).atOffset(ZoneOffset.UTC).toLocalDate
     }
   }
+
+  val ipAddress: Gen[String] =
+    for {
+      a <- choose(1, 255)
+      b <- choose(0, 255)
+      c <- choose(0, 255)
+      d <- choose(0, 255)
+    } yield s"$a.$b.$c.$d"
+
+  val relativeUrl: Gen[String] =
+    nonEmptyListOf(nonEmptyString).map(_.mkString("/", "/", "/"))
 }
