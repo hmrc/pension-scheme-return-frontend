@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,26 +53,5 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
 
   object features {
     val welshTranslation: Boolean = configuration.get[Boolean]("features.welsh-translation")
-    val ipAllowlist: Boolean = configuration.get[Boolean]("features.ip-allowlist")
-  }
-
-  object filters {
-    object allowlist {
-
-      val ips: Seq[String] =
-        configuration
-          .get[Seq[String]]("filters.allowlist.ips")
-          .map(_.trim)
-          .filter(_.nonEmpty)
-
-      val destination: String = configuration.get[String]("filters.allowlist.destination")
-
-      val excluded: Seq[String] =
-        configuration
-          .get[Seq[String]]("filters.allowlist.excluded")
-          .map(_.trim)
-          .filter(_.nonEmpty)
-
-    }
   }
 }
