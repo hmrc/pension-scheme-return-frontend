@@ -44,7 +44,7 @@ package PensionSchemeReturnFront
           )
         )
 
-        Json.fromJson[PensionSchemeReturn](expectedJson)shouldBe(JsSuccess(pensionSchemeReturn))
+        Json.fromJson[PensionSchemeReturn](expectedJson) shouldBe JsSuccess(pensionSchemeReturn)
       }
     }
   }

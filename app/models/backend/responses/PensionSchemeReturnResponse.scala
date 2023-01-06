@@ -14,21 +14,6 @@
  * limitations under the License.
  */
 
-//package models.backend.responses
-//
-//import models.frontend.request.DataEntryRule
-//import play.api.libs.json.Json
-//
-//case class PensionSchemeReturnResponse(
-//                                      rule: DataEntryRule
-//                                      )
-//
-//object PensionSchemeReturnResponse {
-//
-//  implicit val dataEntryRuleReads= Json.reads[DataEntryRule]
-//  implicit val pensionSchemeReturnReads= Json.reads[PensionSchemeReturnResponse]
-//}
-
 package uk.gov.hmrc.pensionschemereturn.models
 
 import play.api.libs.json._
