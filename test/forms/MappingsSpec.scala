@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package forms.mappings
+package forms
 
+import forms.mappings.Mappings
 import org.scalatest.OptionValues
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
