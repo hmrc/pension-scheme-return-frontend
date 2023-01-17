@@ -31,13 +31,13 @@ import play.api.mvc.Call
 
 class PensionSchemeViewSpec extends SpecBase {
 
+  val application = applicationBuilder(userAnswers = None).build()
 
-  running(_ => applicationBuilder()) { implicit app =>
-
-    val view = app.injector.instanceOf[PensionSchemeView]
+  running(application) {
+    val view = application.injector.instanceOf[PensionSchemeView]
 
     implicit val request = FakeRequest()
-    implicit val mess = messages(app)
+    implicit val mess = messages(application)
 
     "PensionsSchemeView" - {
 
@@ -45,28 +45,28 @@ class PensionSchemeViewSpec extends SpecBase {
 
         val form = new PensionSchemeForm()
         val viewModel = PensionSchemeViewModel(
-          DisplayMessage("value 1"),
-          DisplayMessage("header"),
+          title = DisplayMessage("testTitle"),
+          heading = DisplayMessage("testHeading"),
           Call("GET", "/value")
         )
 
         val result = view(form("value"), viewModel)
-        Jsoup.parse(result.toString()).body().toString must include("header")
+        Jsoup.parse(result.toString()).body().toString must include("Continue")
       }
 
       "view should fail to render the error page" in {
 
         val form = new PensionSchemeForm()
         val viewModel = PensionSchemeViewModel(
-          DisplayMessage("value 1"),
-          DisplayMessage("header"),
+          title = DisplayMessage("testTitle"),
+          heading = DisplayMessage("testHeading"),
           Call("GET", "/value")
         )
 
         val failingForm = form("value").bind(Map("failing" -> "data"))
 
         val result = view(failingForm, viewModel)
-        Jsoup.parse(result.toString()).body().toString must include("header")
+        Jsoup.parse(result.toString()).body().getElementById("error-summary-title").text() mustBe "There is a problem"
       }
     }
   }

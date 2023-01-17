@@ -18,15 +18,14 @@ package viewmodels
 
 import play.api.i18n.Messages
 
-class DisplayMessage (key: String, args: List[Any]) {
+class DisplayMessage(key: String, args: List[Any]) {
 
-  def toMessage(implicit messages: Messages) = messages(key, args: _*)
-
+  def toMessage(implicit messages: Messages): String = messages(key, args: _*)
 }
 
 object DisplayMessage {
 
-  def apply(key: String): DisplayMessage = DisplayMessage(key, List())
-  def apply(key: String, args: Any*): DisplayMessage = DisplayMessage(key, args.toList)
+  def apply(key: String): DisplayMessage = new DisplayMessage(key, List())
 
+  def apply(key: String, args: Any*): DisplayMessage = new DisplayMessage(key, args.toList)
 }

@@ -18,35 +18,34 @@
 @import viewmodels.models.PensionSchemeViewModel
 
 @this(
-layout: templates.Layout,
-formHelper: FormWithCSRF,
-govukErrorSummary: GovukErrorSummary,
-govukInput: GovukInput,
-govukButton: GovukButton
+    layout: templates.Layout,
+    formHelper: FormWithCSRF,
+    govukErrorSummary: GovukErrorSummary,
+    govukInput: GovukInput,
+    govukButton: GovukButton
 )
 
 @(form: Form[Int], viewModel: PensionSchemeViewModel)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, viewModel.title.toMessage)) {
 
-@formHelper(action = viewModel.onSubmit, 'autoComplete -> "off") {
+    @formHelper(action = viewModel.onSubmit, 'autoComplete -> "off") {
 
-@if(form.errors.nonEmpty) {
-@govukErrorSummary(ErrorSummaryViewModel(form))
-}
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummaryViewModel(form))
+        }
 
-@govukInput (
-     InputViewModel(
-     field = form("value"),
-     label = LabelViewModel(viewModel.heading.toMessage).asPageHeading()
- )
-     .asNumeric()
-     .withWidth(Fixed10)
+        @govukInput (
+             InputViewModel(
+                 field = form("value"),
+                 label = LabelViewModel(viewModel.heading.toMessage).asPageHeading()
+             )
+             .asNumeric()
+             .withWidth(Fixed10)
+        )
 
-  )
-
-@govukButton(
-      ButtonViewModel(messages("site.continue"))
-  )
-}
+        @govukButton(
+            ButtonViewModel(messages("site.continue"))
+        )
+    }
 }
