@@ -39,20 +39,35 @@ class PensionSchemeViewSpec extends SpecBase {
     implicit val request = FakeRequest()
     implicit val mess = messages(app)
 
-    "views should run correctly" in {
+    "PensionsSchemeView" - {
 
-      val form = new PensionSchemeForm()
-      val viewModel = PensionSchemeViewModel(
-        DisplayMessage("value 1"),
-        DisplayMessage("header"),
-      Call("GET", "/value")
-      )
+      "view should render correctly" in {
 
-   val failingForm = form("value")
+        val form = new PensionSchemeForm()
+        val viewModel = PensionSchemeViewModel(
+          DisplayMessage("value 1"),
+          DisplayMessage("header"),
+          Call("GET", "/value")
+        )
 
-      val result = view(failingForm, viewModel)
-      Jsoup.parse(result.toString()).body().toString must include("header")
+        val result = view(form("value"), viewModel)
+        Jsoup.parse(result.toString()).body().toString must include("header")
+      }
+
+      "view should fail to render the error page" in {
+
+        val form = new PensionSchemeForm()
+        val viewModel = PensionSchemeViewModel(
+          DisplayMessage("value 1"),
+          DisplayMessage("header"),
+          Call("GET", "/value")
+        )
+
+        val failingForm = form("value").bind(Map("failing" -> "data"))
+
+        val result = view(failingForm, viewModel)
+        Jsoup.parse(result.toString()).body().toString must include("header")
+      }
     }
   }
-
 }
