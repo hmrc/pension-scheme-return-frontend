@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package forms.mappings
+package forms
+
+import forms.mappings.Mappings
 
 import java.time.LocalDate
-
 import generators.Generators
 import org.scalacheck.Gen
 import org.scalatest.OptionValues
