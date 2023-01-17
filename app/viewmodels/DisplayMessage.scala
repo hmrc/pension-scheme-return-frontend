@@ -14,23 +14,19 @@
  * limitations under the License.
  */
 
-package controllers
+package viewmodels
 
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AnyWordSpec
+import play.api.i18n.Messages
 
-class SampleTestSpec extends AnyWordSpec with Matchers{
-  "NumberCheck" should {
-    "check equality number" in {
-      val number = 25
-      number should be(25)
-      number shouldBe 25
-    }
+class DisplayMessage (key: String, args: List[Any]) {
 
-    "check if number not equal" in {
-      val number = 25
-      number should be(25)
-      number should not be 21
-    }
-  }
+  def toMessage(implicit messages: Messages) = messages(key, args: _*)
+
+}
+
+object DisplayMessage {
+
+  def apply(key: String): DisplayMessage = DisplayMessage(key, List())
+  def apply(key: String, args: Any*): DisplayMessage = DisplayMessage(key, args.toList)
+
 }

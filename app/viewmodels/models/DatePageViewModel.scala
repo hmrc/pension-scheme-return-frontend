@@ -16,18 +16,7 @@
 
 package viewmodels
 
-import play.api.i18n.Messages
 import play.api.mvc.Call
-
-case class DisplayMessage(key: String, args: List[Any]) {
-
-  def toMessage(implicit messages: Messages) = messages(key, args: _*)
-}
-
-object DisplayMessage {
-  def apply(key: String): DisplayMessage = DisplayMessage(key, List())
-  def apply(key: String, args: Any*): DisplayMessage = DisplayMessage(key, args.toList)
-}
 
 case class DatePageViewModel(
                               title: DisplayMessage,
