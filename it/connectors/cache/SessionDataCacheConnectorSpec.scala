@@ -22,6 +22,7 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import connectors.BaseConnectorSpec
 import models.cache.{PensionSchemeUser, SessionData}
 import models.cache.PensionSchemeUser.{Administrator, Practitioner}
+import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.running
 import uk.gov.hmrc.http.HeaderCarrier
@@ -32,7 +33,7 @@ class SessionDataCacheConnectorSpec extends BaseConnectorSpec {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  override lazy val applicationBuilder: GuiceApplicationBuilder =
+  implicit override lazy val applicationBuilder: GuiceApplicationBuilder =
     super.applicationBuilder.configure("microservice.services.pensionAdministrator.port" -> wireMockPort)
 
   val externalId = "test-id"
@@ -50,62 +51,59 @@ class SessionDataCacheConnectorSpec extends BaseConnectorSpec {
   def okResponse(pensionSchemeUser: PensionSchemeUser): ResponseDefinitionBuilder =
     ok(response(pensionSchemeUser)).withHeader("Content-Type", "application/json")
 
-  running(_ => applicationBuilder) { implicit app =>
+  def connector(implicit app: Application): SessionDataCacheConnector = injected[SessionDataCacheConnector]
 
-    lazy val connector: SessionDataCacheConnector = injected[SessionDataCacheConnector]
+  "fetch" should {
 
-    "fetch" should {
+    "return an administrator" in runningApp { implicit app =>
+      stubGet(okResponse(Administrator))
 
-      "return an administrator" in {
-        stubGet(okResponse(Administrator))
-
-        connector.fetch(externalId).futureValue mustBe Some(SessionData(Administrator))
-      }
-
-      "return a practitioner" in {
-        stubGet(okResponse(Practitioner))
-
-        connector.fetch(externalId).futureValue mustBe Some(SessionData(Practitioner))
-      }
-
-      "return none" in {
-        stubGet(notFound)
-
-        connector.fetch(externalId).futureValue mustBe None
-      }
-
-      "return none for wrong externalId" in {
-        stubGet(okResponse(Administrator))
-
-        connector.fetch("unknown-id").futureValue mustBe None
-      }
-
-      "return a failed future for bad request" in {
-        stubGet(badRequest)
-
-        connector.fetch(externalId).failed.futureValue
-      }
+      connector.fetch(externalId).futureValue mustBe Some(SessionData(Administrator))
     }
 
-    "delete" should {
+    "return a practitioner" in runningApp { implicit app =>
+      stubGet(okResponse(Practitioner))
 
-      "return unit for an ok response" in {
-        stubDelete(ok())
+      connector.fetch(externalId).futureValue mustBe Some(SessionData(Practitioner))
+    }
 
-        connector.remove(externalId).futureValue mustBe()
-      }
+    "return none" in runningApp { implicit app =>
+      stubGet(notFound)
 
-      "return unit for a not found response" in {
-        stubDelete(notFound)
+      connector.fetch(externalId).futureValue mustBe None
+    }
 
-        connector.remove(externalId).futureValue mustBe()
-      }
+    "return none for wrong externalId" in runningApp { implicit app =>
+      stubGet(okResponse(Administrator))
 
-      "return unit for external id that doesn't exist" in {
-        stubDelete(ok())
+      connector.fetch("unknown-id").futureValue mustBe None
+    }
 
-        connector.remove("unknown-id").futureValue mustBe()
-      }
+    "return a failed future for bad request" in runningApp { implicit app =>
+      stubGet(badRequest)
+
+      connector.fetch(externalId).failed.futureValue
+    }
+  }
+
+  "delete" should {
+
+    "return unit for an ok response" in runningApp { implicit app =>
+      stubDelete(ok())
+
+      connector.remove(externalId).futureValue mustBe()
+    }
+
+    "return unit for a not found response" in runningApp { implicit app =>
+      stubDelete(notFound)
+
+      connector.remove(externalId).futureValue mustBe()
+    }
+
+    "return unit for external id that doesn't exist" in runningApp { implicit app =>
+      stubDelete(ok())
+
+      connector.remove("unknown-id").futureValue mustBe()
     }
   }
 }

@@ -21,6 +21,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.{badRequest, equalTo, for
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import config.Constants
 import connectors.MinimalDetailsError.{DelimitedAdmin, DetailsNotFound}
+import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.test.Helpers.running
@@ -32,7 +33,7 @@ class MinimalDetailsConnectorSpec extends BaseConnectorSpec {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  override lazy val applicationBuilder: GuiceApplicationBuilder =
+  implicit override lazy val applicationBuilder: GuiceApplicationBuilder =
     super.applicationBuilder.configure("microservice.services.pensionAdministrator.port" -> wireMockPort)
 
   val url = "/pension-administrator/get-minimal-psa"
@@ -47,66 +48,63 @@ class MinimalDetailsConnectorSpec extends BaseConnectorSpec {
   val psaId = psaIdGen.sample.value
   val pspId = pspIdGen.sample.value
 
-  running(_ => applicationBuilder) { implicit app =>
+  def connector(implicit app: Application): MinimalDetailsConnector = injected[MinimalDetailsConnector]
 
-    lazy val connector: MinimalDetailsConnector = injected[MinimalDetailsConnector]
+  "fetch" should {
 
-    "fetch" should {
+    "return psa minimal details" in runningApp { implicit app =>
 
-      "return psa minimal details" in {
+      val md = minimalDetailsGen.sample.value
+      stubGet("psaId", psaId.value, ok(Json.stringify(Json.toJson(md))))
 
-        val md = minimalDetailsGen.sample.value
-        stubGet("psaId", psaId.value, ok(Json.stringify(Json.toJson(md))))
+      val result = connector.fetch(psaId).futureValue
 
-        val result = connector.fetch(psaId).futureValue
+      result mustBe Right(md)
+    }
 
-        result mustBe Right(md)
+    "return psp minimal details" in runningApp { implicit app =>
+
+      val md = minimalDetailsGen.sample.value
+      stubGet("pspId", pspId.value, ok(Json.stringify(Json.toJson(md))))
+
+      val result = connector.fetch(pspId).futureValue
+
+      result mustBe Right(md)
+    }
+
+    "return a details not found when 404 returned with message" in runningApp { implicit app =>
+
+      stubGet("psaId", psaId.value, notFound.withBody(Constants.detailsNotFound))
+
+      val result = connector.fetch(psaId).futureValue
+
+      result mustBe Left(DetailsNotFound)
+    }
+
+    "return a delimited admin error when forbidden with delimited admin error returned" in runningApp { implicit app =>
+
+      val body = stringContains(Constants.delimitedPSA).sample.value
+
+      stubGet("psaId", psaId.value, forbidden.withBody(body))
+
+      val result = connector.fetch(psaId).futureValue
+
+      result mustBe Left(DelimitedAdmin)
+    }
+
+    "fail future when a 404 returned" in runningApp { implicit app =>
+      stubGet("psaId", psaId.value, notFound)
+
+      assertThrows[Exception] {
+        connector.fetch(psaId).futureValue
       }
+    }
 
-      "return psp minimal details" in {
+    "fail future for any other http failure code" in runningApp { implicit app =>
+      stubGet("psaId", psaId.value, badRequest)
 
-        val md = minimalDetailsGen.sample.value
-        stubGet("pspId", pspId.value, ok(Json.stringify(Json.toJson(md))))
-
-        val result = connector.fetch(pspId).futureValue
-
-        result mustBe Right(md)
-      }
-
-      "return a details not found when 404 returned with message" in {
-
-        stubGet("psaId", psaId.value, notFound.withBody(Constants.detailsNotFound))
-
-        val result = connector.fetch(psaId).futureValue
-
-        result mustBe Left(DetailsNotFound)
-      }
-
-      "return a delimited admin error when forbidden with delimited admin error returned" in {
-
-        val body = stringContains(Constants.delimitedPSA).sample.value
-
-        stubGet("psaId", psaId.value, forbidden.withBody(body))
-
-        val result = connector.fetch(psaId).futureValue
-
-        result mustBe Left(DelimitedAdmin)
-      }
-
-      "fail future when a 404 returned" in {
-        stubGet("psaId", psaId.value, notFound)
-
-        assertThrows[Exception] {
-          connector.fetch(psaId).futureValue
-        }
-      }
-
-      "fail future for any other http failure code" in {
-        stubGet("psaId", psaId.value, badRequest)
-
-        assertThrows[Exception] {
-          connector.fetch(psaId).futureValue
-        }
+      assertThrows[Exception] {
+        connector.fetch(psaId).futureValue
       }
     }
   }

@@ -22,6 +22,7 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import models.PensionSchemeId.{PsaId, PspId}
 import models.{PensionSchemeId, SchemeId}
 import models.SchemeId.Srn
+import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.test.Helpers.running
@@ -33,7 +34,7 @@ class SchemeDetailsConnectorSpec extends BaseConnectorSpec {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  override lazy val applicationBuilder: GuiceApplicationBuilder =
+  implicit override lazy val applicationBuilder: GuiceApplicationBuilder =
     super.applicationBuilder.configure("microservice.services.pensionsScheme.port" -> wireMockPort)
 
   object PsaSchemeDetailsHelper {
@@ -87,187 +88,184 @@ class SchemeDetailsConnectorSpec extends BaseConnectorSpec {
       }
   }
 
-  running(_ => applicationBuilder) { implicit app =>
+  def connector(implicit app: Application): SchemeDetailsConnector = injected[SchemeDetailsConnector]
 
-    lazy val connector: SchemeDetailsConnector = injected[SchemeDetailsConnector]
+  ".details for psa" should {
 
-    ".details for psa" should {
+    val psaId = psaIdGen.sample.value
+    val schemeId = schemeIdGen.sample.value
+    val expectedResult = schemeDetailsGen.sample.value
 
-      val psaId = psaIdGen.sample.value
-      val schemeId = schemeIdGen.sample.value
-      val expectedResult = schemeDetailsGen.sample.value
+    "return scheme details" in runningApp { implicit app =>
 
-      "return scheme details" in {
+      PsaSchemeDetailsHelper.stubGet(psaId, schemeId, ok(Json.toJson(expectedResult).toString))
 
-        PsaSchemeDetailsHelper.stubGet(psaId, schemeId, ok(Json.toJson(expectedResult).toString))
+      val result = connector.details(psaId, schemeId).futureValue
 
-        val result = connector.details(psaId, schemeId).futureValue
+      result mustBe Some(expectedResult)
+    }
 
-        result mustBe Some(expectedResult)
-      }
+    "return none when 404 is sent" in runningApp { implicit app =>
 
-      "return none when 404 is sent" in {
+      PsaSchemeDetailsHelper.stubGet(psaId, schemeId, notFound)
 
-        PsaSchemeDetailsHelper.stubGet(psaId, schemeId, notFound)
+      val result = connector.details(psaId, schemeId).futureValue
 
-        val result = connector.details(psaId, schemeId).futureValue
+      result mustBe None
+    }
 
-        result mustBe None
-      }
+    "throw error" when {
 
-      "throw error" when {
+      "400 response is sent" in runningApp { implicit app =>
 
-        "400 response is sent" in {
+        PsaSchemeDetailsHelper.stubGet(psaId, schemeId, badRequest)
 
-          PsaSchemeDetailsHelper.stubGet(psaId, schemeId, badRequest)
-
-          assertThrows[Exception] {
-            connector.details(psaId, schemeId).futureValue
-          }
+        assertThrows[Exception] {
+          connector.details(psaId, schemeId).futureValue
         }
+      }
 
-        "500 response is sent" in {
+      "500 response is sent" in runningApp { implicit app =>
 
-          PsaSchemeDetailsHelper.stubGet(psaId, schemeId, serverError)
+        PsaSchemeDetailsHelper.stubGet(psaId, schemeId, serverError)
 
-          assertThrows[Exception] {
-            connector.details(psaId, schemeId).futureValue
-          }
+        assertThrows[Exception] {
+          connector.details(psaId, schemeId).futureValue
         }
       }
     }
+  }
 
-    ".details for psp" should {
-      val pspId = pspIdGen.sample.value
-      val srn = srnGen.sample.value
-      val expectedResult = schemeDetailsGen.sample.value
+  ".details for psp" should {
+    val pspId = pspIdGen.sample.value
+    val srn = srnGen.sample.value
+    val expectedResult = schemeDetailsGen.sample.value
 
-      "return scheme details" in {
+    "return scheme details" in runningApp { implicit app =>
 
-        PspSchemeDetailsHelper.stubGet(pspId, srn, ok(Json.toJson(expectedResult).toString()))
+      PspSchemeDetailsHelper.stubGet(pspId, srn, ok(Json.toJson(expectedResult).toString()))
 
-        val result = connector.details(pspId, srn).futureValue
+      val result = connector.details(pspId, srn).futureValue
 
-        result mustBe Some(expectedResult)
-      }
+      result mustBe Some(expectedResult)
+    }
 
-      "return none when 404 is sent" in {
+    "return none when 404 is sent" in runningApp { implicit app =>
 
-        PspSchemeDetailsHelper.stubGet(pspId, srn, notFound)
+      PspSchemeDetailsHelper.stubGet(pspId, srn, notFound)
 
-        val result = connector.details(pspId, srn).futureValue
+      val result = connector.details(pspId, srn).futureValue
 
-        result mustBe None
-      }
+      result mustBe None
+    }
 
-      "throw error" when {
+    "throw error" when {
 
-        "400 response is sent" in {
+      "400 response is sent" in runningApp { implicit app =>
 
-          PspSchemeDetailsHelper.stubGet(pspId, srn, badRequest)
+        PspSchemeDetailsHelper.stubGet(pspId, srn, badRequest)
 
-          assertThrows[Exception] {
-            connector.details(pspId, srn).futureValue
-          }
+        assertThrows[Exception] {
+          connector.details(pspId, srn).futureValue
         }
+      }
 
-        "500 response is sent" in {
+      "500 response is sent" in runningApp { implicit app =>
 
-          PspSchemeDetailsHelper.stubGet(pspId, srn, serverError)
+        PspSchemeDetailsHelper.stubGet(pspId, srn, serverError)
 
-          assertThrows[Exception] {
-            connector.details(pspId, srn).futureValue
-          }
+        assertThrows[Exception] {
+          connector.details(pspId, srn).futureValue
         }
       }
     }
+  }
 
-    ".checkAssociation for psa" should {
+  ".checkAssociation for psa" should {
 
-      val psaId = psaIdGen.sample.value
-      val srn = srnGen.sample.value
+    val psaId = psaIdGen.sample.value
+    val srn = srnGen.sample.value
 
-      "return true if psa is associated" in {
+    "return true if psa is associated" in runningApp { implicit app =>
 
-        CheckAssociationHelper.stubGet(psaId, srn, ok("true"))
+      CheckAssociationHelper.stubGet(psaId, srn, ok("true"))
 
-        val result = connector.checkAssociation(psaId, srn).futureValue
+      val result = connector.checkAssociation(psaId, srn).futureValue
 
-        result mustBe true
-      }
+      result mustBe true
+    }
 
-      "return false if psa is not associated" in {
+    "return false if psa is not associated" in runningApp { implicit app =>
 
-        CheckAssociationHelper.stubGet(psaId, srn, ok("false"))
+      CheckAssociationHelper.stubGet(psaId, srn, ok("false"))
 
-        val result = connector.checkAssociation(psaId, srn).futureValue
+      val result = connector.checkAssociation(psaId, srn).futureValue
 
-        result mustBe false
-      }
+      result mustBe false
+    }
 
-      "throw error" when {
+    "throw error" when {
 
-        "404 response is sent" in {
+      "404 response is sent" in runningApp { implicit app =>
 
-          CheckAssociationHelper.stubGet(psaId, srn, notFound)
+        CheckAssociationHelper.stubGet(psaId, srn, notFound)
 
-          assertThrows[Exception] {
-            connector.checkAssociation(psaId, srn).futureValue
-          }
+        assertThrows[Exception] {
+          connector.checkAssociation(psaId, srn).futureValue
         }
+      }
 
-        "500 response is sent" in {
+      "500 response is sent" in runningApp { implicit app =>
 
-          CheckAssociationHelper.stubGet(psaId, srn, serverError)
+        CheckAssociationHelper.stubGet(psaId, srn, serverError)
 
-          assertThrows[Exception] {
-            connector.checkAssociation(psaId, srn).futureValue
-          }
+        assertThrows[Exception] {
+          connector.checkAssociation(psaId, srn).futureValue
         }
       }
     }
+  }
 
-    ".checkAssociation for psp" should {
+  ".checkAssociation for psp" should {
 
-      val pspId = pspIdGen.sample.value
-      val srn = srnGen.sample.value
+    val pspId = pspIdGen.sample.value
+    val srn = srnGen.sample.value
 
-      "return true if psp is associated" in {
+    "return true if psp is associated" in runningApp { implicit app =>
 
-        CheckAssociationHelper.stubGet(pspId, srn, ok("true"))
+      CheckAssociationHelper.stubGet(pspId, srn, ok("true"))
 
-        val result = connector.checkAssociation(pspId, srn).futureValue
+      val result = connector.checkAssociation(pspId, srn).futureValue
 
-        result mustBe true
-      }
+      result mustBe true
+    }
 
-      "return false if psp is not associated" in {
+    "return false if psp is not associated" in runningApp { implicit app =>
 
-        CheckAssociationHelper.stubGet(pspId, srn, ok("false"))
+      CheckAssociationHelper.stubGet(pspId, srn, ok("false"))
 
-        val result = connector.checkAssociation(pspId, srn).futureValue
+      val result = connector.checkAssociation(pspId, srn).futureValue
 
-        result mustBe false
-      }
+      result mustBe false
+    }
 
-      "throw error" when {
+    "throw error" when {
 
-        "404 response is sent" in {
+      "404 response is sent" in runningApp { implicit app =>
 
-          CheckAssociationHelper.stubGet(pspId, srn, notFound)
+        CheckAssociationHelper.stubGet(pspId, srn, notFound)
 
-          assertThrows[Exception] {
-            connector.checkAssociation(pspId, srn).futureValue
-          }
+        assertThrows[Exception] {
+          connector.checkAssociation(pspId, srn).futureValue
         }
+      }
 
-        "500 response is sent" in {
+      "500 response is sent" in runningApp { implicit app =>
 
-          CheckAssociationHelper.stubGet(pspId, srn, serverError)
+        CheckAssociationHelper.stubGet(pspId, srn, serverError)
 
-          assertThrows[Exception] {
-            connector.checkAssociation(pspId, srn).futureValue
-          }
+        assertThrows[Exception] {
+          connector.checkAssociation(pspId, srn).futureValue
         }
       }
     }
