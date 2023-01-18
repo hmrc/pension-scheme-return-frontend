@@ -22,7 +22,11 @@ import models.SchemeStatus._
 import models._
 import models.cache.PensionSchemeUser
 import models.cache.PensionSchemeUser.{Administrator, Practitioner}
+import models.requests.{AllowedAccessRequest, IdentifierRequest}
+import models.requests.IdentifierRequest.{AdministratorRequest, PractitionerRequest}
 import org.scalacheck.Gen
+import play.api.mvc.AnyContent
+import play.api.test.FakeRequest
 
 trait ModelGenerators extends BasicGenerators {
   lazy val minimalDetailsGen: Gen[MinimalDetails] =
@@ -79,4 +83,27 @@ trait ModelGenerators extends BasicGenerators {
   val pstrGen: Gen[Pstr] = nonEmptyString.map(Pstr)
 
   val schemeIdGen: Gen[SchemeId] = Gen.oneOf(srnGen, pstrGen)
+
+  val practitionerRequestGen: Gen[PractitionerRequest[AnyContent]] =
+    for {
+      userId     <- nonEmptyString
+      externalId <- nonEmptyString
+      pspId      <- pspIdGen
+    } yield PractitionerRequest(userId, externalId, FakeRequest(), pspId)
+
+  val administratorRequestGen: Gen[AdministratorRequest[AnyContent]] =
+    for {
+      userId     <- nonEmptyString
+      externalId <- nonEmptyString
+      psaId      <- psaIdGen
+    } yield AdministratorRequest(userId, externalId, FakeRequest(), psaId)
+
+  val identifierRequestGen: Gen[IdentifierRequest[AnyContent]] =
+    Gen.oneOf(administratorRequestGen, practitionerRequestGen)
+
+  val allowedAccessRequestGen: Gen[AllowedAccessRequest[AnyContent]] =
+    for {
+      request       <- identifierRequestGen
+      schemeDetails <- schemeDetailsGen
+    } yield AllowedAccessRequest(request, schemeDetails)
 }

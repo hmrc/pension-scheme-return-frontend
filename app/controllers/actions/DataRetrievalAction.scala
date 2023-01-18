@@ -17,7 +17,7 @@
 package controllers.actions
 
 import javax.inject.Inject
-import models.requests.{IdentifierRequest, OptionalDataRequest}
+import models.requests.{AllowedAccessRequest, IdentifierRequest, OptionalDataRequest}
 import play.api.mvc.ActionTransformer
 import repositories.SessionRepository
 
@@ -27,12 +27,12 @@ class DataRetrievalActionImpl @Inject()(
                                          val sessionRepository: SessionRepository
                                        )(implicit val executionContext: ExecutionContext) extends DataRetrievalAction {
 
-  override protected def transform[A](request: IdentifierRequest[A]): Future[OptionalDataRequest[A]] = {
+  override protected def transform[A](request: AllowedAccessRequest[A]): Future[OptionalDataRequest[A]] = {
 
-    sessionRepository.get(request.getUserId).map {
+    sessionRepository.get(request.request.getUserId).map {
       OptionalDataRequest(request, _)
     }
   }
 }
 
-trait DataRetrievalAction extends ActionTransformer[IdentifierRequest, OptionalDataRequest]
+trait DataRetrievalAction extends ActionTransformer[AllowedAccessRequest, OptionalDataRequest]
