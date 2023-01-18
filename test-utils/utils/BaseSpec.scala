@@ -14,18 +14,22 @@
  * limitations under the License.
  */
 
-package controllers.actions
+package utils
 
-import models.UserAnswers
-import models.requests.{IdentifierRequest, OptionalDataRequest}
+import generators.Generators
+import models.ModelSerializers
+import org.mockito.MockitoSugar
+import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.matchers.must.Matchers
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.{BeforeAndAfterEach, OptionValues}
 
-import scala.concurrent.{ExecutionContext, Future}
-
-class FakeDataRetrievalAction(dataToReturn: Option[UserAnswers]) extends DataRetrievalAction {
-
-  override protected def transform[A](request: IdentifierRequest[A]): Future[OptionalDataRequest[A]] =
-    Future(OptionalDataRequest(request, dataToReturn))
-
-  override protected implicit val executionContext: ExecutionContext =
-    scala.concurrent.ExecutionContext.Implicits.global
-}
+abstract class BaseSpec extends
+  AnyWordSpec with
+  Matchers with
+  ScalaFutures with
+  MockitoSugar with
+  BeforeAndAfterEach with
+  OptionValues with
+  Generators with
+  ModelSerializers

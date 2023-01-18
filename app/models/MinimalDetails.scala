@@ -14,18 +14,31 @@
  * limitations under the License.
  */
 
-package controllers.actions
+package models
 
-import models.UserAnswers
-import models.requests.{IdentifierRequest, OptionalDataRequest}
+import play.api.libs.json.{Json, Reads}
 
-import scala.concurrent.{ExecutionContext, Future}
+case class MinimalDetails(
+  email: String,
+  isPsaSuspended: Boolean,
+  organisationName: Option[String],
+  individualDetails: Option[IndividualDetails],
+  rlsFlag: Boolean,
+  deceasedFlag: Boolean
+)
 
-class FakeDataRetrievalAction(dataToReturn: Option[UserAnswers]) extends DataRetrievalAction {
+object MinimalDetails {
 
-  override protected def transform[A](request: IdentifierRequest[A]): Future[OptionalDataRequest[A]] =
-    Future(OptionalDataRequest(request, dataToReturn))
+  implicit val reads: Reads[MinimalDetails] = Json.reads[MinimalDetails]
+}
 
-  override protected implicit val executionContext: ExecutionContext =
-    scala.concurrent.ExecutionContext.Implicits.global
+case class IndividualDetails(
+  firstName: String,
+  middleName: Option[String],
+  lastName: String
+)
+
+object IndividualDetails {
+
+  implicit val reads: Reads[IndividualDetails] = Json.reads[IndividualDetails]
 }

@@ -14,18 +14,30 @@
  * limitations under the License.
  */
 
-package controllers.actions
+package models.cache
 
-import models.UserAnswers
-import models.requests.{IdentifierRequest, OptionalDataRequest}
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import play.api.libs.json.{JsString, Json}
+import utils.BaseSpec
 
-import scala.concurrent.{ExecutionContext, Future}
+class SessionDataSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
-class FakeDataRetrievalAction(dataToReturn: Option[UserAnswers]) extends DataRetrievalAction {
+  "PensionSchemeUser" should {
 
-  override protected def transform[A](request: IdentifierRequest[A]): Future[OptionalDataRequest[A]] =
-    Future(OptionalDataRequest(request, dataToReturn))
+    "successfully read from json" in {
 
-  override protected implicit val executionContext: ExecutionContext =
-    scala.concurrent.ExecutionContext.Implicits.global
+      forAll(pensionSchemeUserGen) { user =>
+
+        Json.toJson(user).as[PensionSchemeUser] mustBe user
+      }
+    }
+
+    "fail to read unknown json" in {
+      forAll(nonEmptyString) { user =>
+
+        JsString(user).asOpt[PensionSchemeUser] mustBe None
+      }
+    }
+
+  }
 }

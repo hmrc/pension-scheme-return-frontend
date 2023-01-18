@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.pensionschemereturn.models
+package models.backend.responses
 
+import models.backend.responses.DataEntryRule.{Fixed, Updated}
 import play.api.libs.json._
+import utils.WithName
 
 case class PensionSchemeReturn(
                                 name: DataEntry[String]
@@ -36,19 +38,19 @@ case class DataEntryChanged[A](
 sealed trait DataEntryRule
 
 object DataEntryRule {
-  case object Updated extends DataEntryRule
+  case object Updated extends WithName("updated") with DataEntryRule
 
-  case object Fixed extends DataEntryRule
+  case object Fixed extends WithName("fixed") with DataEntryRule
 
-  case object None extends DataEntryRule
+  case object None extends WithName("none") with DataEntryRule
 }
 
 object PensionSchemeReturn {
   implicit val dataEntryRuleReads: Reads[DataEntryRule] = {
-    case JsString("updated") => JsSuccess(DataEntryRule.Updated)
-    case JsString("fixed") => JsSuccess(DataEntryRule.Fixed)
-    case JsString("none") => JsSuccess(DataEntryRule.None)
-    case _ => JsError ("Unexpected Rule")
+    case JsString(Updated.name) => JsSuccess(DataEntryRule.Updated)
+    case JsString(Fixed.name) => JsSuccess(DataEntryRule.Fixed)
+    case JsString(DataEntryRule.None.name) => JsSuccess(DataEntryRule.None)
+    case _ => JsError("Unexpected Rule")
   }
 
   implicit def dataEntryChangedWrites[A: Reads]: Reads[DataEntryChanged[A]] = Json.reads[DataEntryChanged[A]]

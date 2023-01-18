@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
-package controllers.actions
-
-import javax.inject.Inject
-import models.requests.IdentifierRequest
-import models.requests.IdentifierRequest.AdministratorRequest
-import play.api.mvc._
+package utils
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class FakeIdentifierAction @Inject()(bodyParsers: PlayBodyParsers) extends IdentifierAction {
+object FutureUtils {
 
-  override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] =
-    block(AdministratorRequest("id", "", request, ""))
+  implicit class FutureOps[A](val future: Future[A]) extends AnyVal {
 
-  override def parser: BodyParser[AnyContent] =
-    bodyParsers.default
+    def tap[B](f: A => Future[B])(implicit ec: ExecutionContext): Future[A] =
+      future.flatMap(a => f(a).as(a).recover(_ => a))
 
-  override protected def executionContext: ExecutionContext =
-    scala.concurrent.ExecutionContext.Implicits.global
+    def tapError[B](f: Throwable => Future[B])(implicit ec: ExecutionContext): Future[A] =
+      future.recoverWith {
+        case t => f(t).flatMap(_ => Future.failed(t)).recoverWith(_ => Future.failed(t))
+      }
+
+    def as[B](b: B)(implicit ec: ExecutionContext): Future[B] =
+      future.map(_ => b)
+  }
 }

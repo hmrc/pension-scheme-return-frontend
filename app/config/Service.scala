@@ -38,7 +38,7 @@ object Service {
         val service  = Configuration(config).get[Configuration](prefix)
         val host     = service.get[String]("host")
         val port     = service.get[String]("port")
-        val protocol = service.get[String]("protocol")
+        val protocol = service.get[Option[String]]("protocol").getOrElse("https")
 
         Service(host, port, protocol)
   }

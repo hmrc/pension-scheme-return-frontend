@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-package models
+package utils
 
-class WithName(string: String) {
-  override val toString: String = string
+abstract class WithName(val name: String) {
+  override val toString: String = name
 }

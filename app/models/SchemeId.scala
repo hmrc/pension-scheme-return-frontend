@@ -14,18 +14,15 @@
  * limitations under the License.
  */
 
-package controllers.actions
+package models
 
-import models.UserAnswers
-import models.requests.{IdentifierRequest, OptionalDataRequest}
+sealed abstract class SchemeId(val idType: String) {
+  val value: String
+}
 
-import scala.concurrent.{ExecutionContext, Future}
+object SchemeId {
 
-class FakeDataRetrievalAction(dataToReturn: Option[UserAnswers]) extends DataRetrievalAction {
+  case class Srn(value: String) extends SchemeId("srn")
+  case class Pstr(value: String) extends SchemeId("pstr")
 
-  override protected def transform[A](request: IdentifierRequest[A]): Future[OptionalDataRequest[A]] =
-    Future(OptionalDataRequest(request, dataToReturn))
-
-  override protected implicit val executionContext: ExecutionContext =
-    scala.concurrent.ExecutionContext.Implicits.global
 }
