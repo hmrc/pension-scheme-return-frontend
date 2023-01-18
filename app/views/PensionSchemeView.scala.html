@@ -35,7 +35,7 @@
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        @govukInput (
+        @govukInput(
              InputViewModel(
                  field = form("value"),
                  label = LabelViewModel(viewModel.heading.toMessage).asPageHeading()

@@ -45,21 +45,23 @@ class PensionSchemeViewSpec extends SpecBase {
 
         val form = new PensionSchemeForm()
         val viewModel = PensionSchemeViewModel(
-          title = DisplayMessage("testTitle"),
-          heading = DisplayMessage("testHeading"),
+          title = "testTitle",
+          heading = "testHeading",
           Call("GET", "/value")
         )
 
         val result = view(form("value"), viewModel)
-        Jsoup.parse(result.toString()).body().toString must include("Continue")
+        Jsoup.parse(result.toString()).body().select("form h1 label").text() mustBe "testHeading"
+        Jsoup.parse(result.toString()).body().select("form").attr("method") mustBe "GET"
+        Jsoup.parse(result.toString()).body().select("form").attr("action") mustBe "/value"
       }
 
       "view should fail to render the error page" in {
 
         val form = new PensionSchemeForm()
         val viewModel = PensionSchemeViewModel(
-          title = DisplayMessage("testTitle"),
-          heading = DisplayMessage("testHeading"),
+          title = "testTitle",
+          heading = "testHeading",
           Call("GET", "/value")
         )
 
@@ -67,6 +69,7 @@ class PensionSchemeViewSpec extends SpecBase {
 
         val result = view(failingForm, viewModel)
         Jsoup.parse(result.toString()).body().getElementById("error-summary-title").text() mustBe "There is a problem"
+        Jsoup.parse(result.toString()).body().getElementById("value-error").text() mustBe "Error: value"
       }
     }
   }

@@ -24,3 +24,12 @@ case class PensionSchemeViewModel(
                                    heading: DisplayMessage,
                                    onSubmit : Call
                                  )
+
+object PensionSchemeViewModel {
+  def apply(title: String, heading: String, onSubmit: Call): PensionSchemeViewModel =
+    apply(
+      DisplayMessage(title),
+      DisplayMessage(heading),
+      onSubmit
+    )
+}
