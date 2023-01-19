@@ -16,6 +16,7 @@
 
 package controllers.actions
 
+import com.google.inject.ImplementedBy
 import connectors.MinimalDetailsError.{DelimitedAdmin, DetailsNotFound}
 import connectors.{MinimalDetailsConnector, MinimalDetailsError, SchemeDetailsConnector}
 import models.SchemeId.Srn
@@ -88,13 +89,17 @@ class AllowAccessAction(
     )
 }
 
-class AllowAccessActionProvider @Inject()(
+@ImplementedBy(classOf[AllowAccessActionProviderImpl])
+trait AllowAccessActionProvider {
+  def apply(srn: Srn): ActionFunction[IdentifierRequest, AllowedAccessRequest]
+}
+
+class AllowAccessActionProviderImpl @Inject()(
   schemeDetailsConnector: SchemeDetailsConnector,
   minimalDetailsConnector: MinimalDetailsConnector
-)(implicit val ec: ExecutionContext) {
+)(implicit val ec: ExecutionContext) extends AllowAccessActionProvider {
 
   def apply(srn: Srn): ActionFunction[IdentifierRequest, AllowedAccessRequest] =
     new AllowAccessAction(srn, schemeDetailsConnector, minimalDetailsConnector)
-
 }
 

@@ -25,7 +25,7 @@ import models.cache.PensionSchemeUser.{Administrator, Practitioner}
 import models.requests.{AllowedAccessRequest, IdentifierRequest}
 import models.requests.IdentifierRequest.{AdministratorRequest, PractitionerRequest}
 import org.scalacheck.Gen
-import play.api.mvc.AnyContent
+import play.api.mvc.{AnyContent, Request}
 import play.api.test.FakeRequest
 
 trait ModelGenerators extends BasicGenerators {
@@ -84,26 +84,26 @@ trait ModelGenerators extends BasicGenerators {
 
   val schemeIdGen: Gen[SchemeId] = Gen.oneOf(srnGen, pstrGen)
 
-  val practitionerRequestGen: Gen[PractitionerRequest[AnyContent]] =
+  def practitionerRequestGen[A](request: Request[A]): Gen[PractitionerRequest[A]] =
     for {
       userId     <- nonEmptyString
       externalId <- nonEmptyString
       pspId      <- pspIdGen
-    } yield PractitionerRequest(userId, externalId, FakeRequest(), pspId)
+    } yield PractitionerRequest(userId, externalId, request, pspId)
 
-  val administratorRequestGen: Gen[AdministratorRequest[AnyContent]] =
+  def administratorRequestGen[A](request: Request[A]): Gen[AdministratorRequest[A]] =
     for {
       userId     <- nonEmptyString
       externalId <- nonEmptyString
       psaId      <- psaIdGen
-    } yield AdministratorRequest(userId, externalId, FakeRequest(), psaId)
+    } yield AdministratorRequest(userId, externalId, request, psaId)
 
-  val identifierRequestGen: Gen[IdentifierRequest[AnyContent]] =
-    Gen.oneOf(administratorRequestGen, practitionerRequestGen)
+  def identifierRequestGen[A](request: Request[A]): Gen[IdentifierRequest[A]] =
+    Gen.oneOf(administratorRequestGen[A](request), practitionerRequestGen[A](request))
 
-  val allowedAccessRequestGen: Gen[AllowedAccessRequest[AnyContent]] =
+  def allowedAccessRequestGen[A](request: Request[A]): Gen[AllowedAccessRequest[A]] =
     for {
-      request       <- identifierRequestGen
+      request       <- identifierRequestGen[A](request)
       schemeDetails <- schemeDetailsGen
     } yield AllowedAccessRequest(request, schemeDetails)
 }

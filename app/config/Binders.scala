@@ -14,30 +14,18 @@
  * limitations under the License.
  */
 
-package navigation
+package config
 
-import base.SpecBase
-import controllers.routes
-import pages._
-import models._
+import models.SchemeId.Srn
+import play.api.mvc.PathBindable
 
-class NavigatorSpec extends SpecBase {
+object Binders {
+  implicit val srnBinder: PathBindable[Srn] = new PathBindable[Srn] {
 
-  val navigator = new Navigator
-
-  "Navigator" - {
-
-    "in Normal mode" - {
-
-      "must go from a page that doesn't exist in the route map to Index" in {
-
-        case object UnknownPage extends Page
-        navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id")) mustBe routes.IndexController.onPageLoad
-      }
+    override def bind(key: String, value: String): Either[String, Srn] = {
+      Right(Srn(value))
     }
 
-    "in Check mode" - {
-
-    }
+    override def unbind(key: String, value: Srn): String = value.value
   }
 }

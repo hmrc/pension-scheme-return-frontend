@@ -19,7 +19,9 @@ lazy val root = (project in file("."))
     name := appName,
     RoutesKeys.routesImport ++= Seq(
       "models._",
-      "uk.gov.hmrc.play.bootstrap.binders.RedirectUrl"
+      "models.SchemeId._",
+      "uk.gov.hmrc.play.bootstrap.binders.RedirectUrl",
+      "config.Binders._"
     ),
     TwirlKeys.templateImports ++= Seq(
       "play.twirl.api.HtmlFormat",

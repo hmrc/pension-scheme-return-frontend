@@ -22,6 +22,7 @@ import models.requests.IdentifierRequest.AdministratorRequest
 import models.requests.{AllowedAccessRequest, IdentifierRequest, OptionalDataRequest}
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.mvc.{AnyContent, AnyContentAsEmpty}
 import play.api.test.FakeRequest
 import repositories.SessionRepository
 
@@ -31,11 +32,11 @@ import scala.concurrent.Future
 class DataRetrievalActionSpec extends SpecBase with MockitoSugar {
 
   class Harness(sessionRepository: SessionRepository) extends DataRetrievalActionImpl(sessionRepository) {
-    def callTransform[A](): Future[OptionalDataRequest[A]] =
+    def callTransform(): Future[OptionalDataRequest[AnyContentAsEmpty.type]] =
       transform(request)
   }
 
-  val request = allowedAccessRequestGen.sample.value
+  val request = allowedAccessRequestGen(FakeRequest()).sample.value
 
   "Data Retrieval Action" - {
 

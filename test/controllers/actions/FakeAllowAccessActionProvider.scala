@@ -17,21 +17,25 @@
 package controllers.actions
 
 import generators.Generators
-import models.requests.IdentifierRequest
+import models.SchemeId
+import models.requests.{AllowedAccessRequest, IdentifierRequest}
 import org.scalatest.OptionValues
 import play.api.mvc._
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class FakeIdentifierAction @Inject()(
-  val bodyParsers: PlayBodyParsers
-)(
-  implicit override val executionContext: ExecutionContext
-) extends IdentifierAction with Generators with OptionValues {
+class FakeAllowAccessActionProvider @Inject()()
+  extends AllowAccessActionProvider
+  with Generators
+  with OptionValues {
 
-  override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] =
-    block(administratorRequestGen(request).map(_.copy(userId = "id")).sample.value)
+  override def apply(srn: SchemeId.Srn): ActionFunction[IdentifierRequest, AllowedAccessRequest] =
+    new ActionFunction[IdentifierRequest, AllowedAccessRequest] {
+      override def invokeBlock[A](request: IdentifierRequest[A], block: AllowedAccessRequest[A] => Future[Result]): Future[Result] = {
+        block(AllowedAccessRequest(request, schemeDetailsGen.sample.value))
+      }
 
-  override def parser: BodyParser[AnyContent] = bodyParsers.default
+      override protected def executionContext: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
+    }
 }

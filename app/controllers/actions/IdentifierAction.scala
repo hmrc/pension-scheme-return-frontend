@@ -16,6 +16,7 @@
 
 package controllers.actions
 
+import com.google.inject.ImplementedBy
 import config.Constants
 import connectors.cache.SessionDataCacheConnector
 import models.cache.PensionSchemeUser.{Administrator, Practitioner}
@@ -33,11 +34,16 @@ import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class IdentifierAction @Inject()(
+@ImplementedBy(classOf[IdentifierActionImpl])
+trait IdentifierAction extends ActionBuilder[IdentifierRequest, AnyContent]
+
+class IdentifierActionImpl @Inject()(
   override val authConnector: AuthConnector,
   sessionDataCacheConnector: SessionDataCacheConnector,
-  override val parser: BodyParser[AnyContent]
-)(implicit override val executionContext: ExecutionContext) extends ActionBuilder[IdentifierRequest, AnyContent] with AuthorisedFunctions {
+  playBodyParsers: PlayBodyParsers
+)(implicit override val executionContext: ExecutionContext)
+  extends IdentifierAction
+    with AuthorisedFunctions {
 
   override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] = {
 
@@ -68,6 +74,8 @@ class IdentifierAction @Inject()(
         case _: AuthorisationException => Unauthorized
       }
   }
+
+  override def parser: BodyParser[AnyContent] = playBodyParsers.default
 
   case object IsPSA {
     def unapply(enrolments: Enrolments): Option[EnrolmentIdentifier] = {
