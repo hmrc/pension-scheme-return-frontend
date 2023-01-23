@@ -17,8 +17,9 @@
 package controllers.actions
 
 import com.google.inject.ImplementedBy
-import config.Constants
+import config.{Constants, FrontendAppConfig}
 import connectors.cache.SessionDataCacheConnector
+import controllers.routes
 import models.cache.PensionSchemeUser.{Administrator, Practitioner}
 import models.cache.SessionData
 import models.requests.IdentifierRequest
@@ -38,6 +39,7 @@ import scala.concurrent.{ExecutionContext, Future}
 trait IdentifierAction extends ActionBuilder[IdentifierRequest, AnyContent]
 
 class IdentifierActionImpl @Inject()(
+  appConfig: FrontendAppConfig,
   override val authConnector: AuthConnector,
   sessionDataCacheConnector: SessionDataCacheConnector,
   playBodyParsers: PlayBodyParsers
@@ -54,7 +56,8 @@ class IdentifierActionImpl @Inject()(
 
         case Some(internalId) ~ Some(externalId) ~ (IsPSA(psaId) && IsPSP(pspId)) =>
           sessionDataCacheConnector.fetch(externalId).flatMap {
-            case None => Future.successful(Unauthorized)
+            case None =>
+              Future.successful(Redirect(appConfig.urls.managePensionsSchemes.adminOrPractitionerUrl))
             case Some(SessionData(Administrator)) =>
               block(AdministratorRequest(internalId, externalId, request, psaId.value))
             case Some(SessionData(Practitioner)) =>
@@ -67,17 +70,22 @@ class IdentifierActionImpl @Inject()(
         case Some(internalId) ~ Some(externalId) ~ IsPSP(pspId) =>
           block(PractitionerRequest(internalId, externalId, request, pspId.value))
 
-        case _ => Future.successful(Unauthorized)
+        case Some(_) ~ Some(_) ~ _ =>
+          Future.successful(Redirect(appConfig.urls.managePensionsSchemes.registerUrl))
+
+        case _ => Future.successful(Redirect(routes.UnauthorisedController.onPageLoad))
       }
       .recover {
-        case _: NoActiveSession => Unauthorized
-        case _: AuthorisationException => Unauthorized
+        case _: NoActiveSession =>
+          Redirect(appConfig.urls.loginUrl, Map("continue" -> Seq(appConfig.urls.loginContinueUrl)))
+        case _: AuthorisationException =>
+          Redirect(appConfig.urls.managePensionsSchemes.registerUrl)
       }
   }
 
   override def parser: BodyParser[AnyContent] = playBodyParsers.default
 
-  case object IsPSA {
+  object IsPSA {
     def unapply(enrolments: Enrolments): Option[EnrolmentIdentifier] = {
       enrolments
         .enrolments
@@ -86,7 +94,7 @@ class IdentifierActionImpl @Inject()(
     }
   }
 
-  case object IsPSP {
+  object IsPSP {
     def unapply(enrolments: Enrolments): Option[EnrolmentIdentifier] = {
       enrolments
         .enrolments
@@ -95,7 +103,7 @@ class IdentifierActionImpl @Inject()(
     }
   }
 
-  case object && {
+  object && {
     def unapply[A](a: A): Some[(A, A)] = Some((a, a))
   }
 }

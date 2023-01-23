@@ -16,8 +16,10 @@
 
 package controllers.actions
 
+import config.FrontendAppConfig
 import connectors.MinimalDetailsError.{DelimitedAdmin, DetailsNotFound}
 import connectors.{MinimalDetailsConnector, MinimalDetailsError, SchemeDetailsConnector}
+import controllers.routes
 import models.PensionSchemeId.{PsaId, PspId}
 import models.{MinimalDetails, SchemeDetails}
 import models.SchemeId.Srn
@@ -25,19 +27,21 @@ import models.requests.IdentifierRequest
 import models.requests.IdentifierRequest.{AdministratorRequest, PractitionerRequest}
 import org.mockito.ArgumentMatchers.{any, eq => meq}
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import play.api.Application
 import play.api.http.Status.{OK, UNAUTHORIZED}
 import play.api.libs.json.Json
 import play.api.mvc.Results.Ok
 import play.api.mvc.{Action, AnyContent}
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{contentAsJson, defaultAwaitTimeout, status}
+import play.api.test.Helpers.{contentAsJson, defaultAwaitTimeout, redirectLocation, status}
 import utils.BaseSpec
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class AllowAccessActionSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
-  lazy val allowAccessAction = new AllowAccessActionProviderImpl(
+  def allowAccessAction(appConfig: FrontendAppConfig) = new AllowAccessActionProviderImpl(
+    appConfig,
     mockSchemeDetailsConnector,
     mockMinimalDetailsConnector
   )(ExecutionContext.global)
@@ -45,13 +49,17 @@ class AllowAccessActionSpec extends BaseSpec with ScalaCheckPropertyChecks {
   lazy val mockMinimalDetailsConnector: MinimalDetailsConnector = mock[MinimalDetailsConnector]
   lazy val mockSchemeDetailsConnector: SchemeDetailsConnector = mock[SchemeDetailsConnector]
 
-  class Handler[A](request: IdentifierRequest[A]) {
+  class Handler[A](appConfig: FrontendAppConfig, request: IdentifierRequest[A]) {
 
-    def run(srn: Srn): Action[AnyContent] = (new FakeActionBuilder(request) andThen allowAccessAction(srn)) {
+    def run(srn: Srn): Action[AnyContent] = (new FakeActionBuilder(request) andThen allowAccessAction(appConfig)(srn)) {
       request =>
         Ok(Json.toJson(request.schemeDetails))
     }
   }
+
+  def handler[A](request: IdentifierRequest[A])(implicit app: Application) = new Handler(appConfig, request)
+
+  def appConfig(implicit app: Application) = injected[FrontendAppConfig]
 
   def setupSchemeDetails(psaId: PsaId, srn: Srn, result: Future[Option[SchemeDetails]]): Unit =
     when(mockSchemeDetailsConnector.details(meq(psaId), meq(srn))(any(), any()))
@@ -102,155 +110,175 @@ class AllowAccessActionSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
     "return ok" when {
 
-      "psa is associated, no rls flag, no deceased flag, no DelimitedAdmin and a valid status" in {
-        val handler = new Handler(administratorRequest)
+      "psa is associated, no rls flag, no deceased flag, no DelimitedAdmin and a valid status" in runningApp {
+        implicit app =>
 
-        val result = handler.run(srn)(FakeRequest())
+          val result = handler(administratorRequest).run(srn)(FakeRequest())
 
-        status(result) mustBe OK
-        contentAsJson(result) mustBe Json.toJson(schemeDetails)
+          status(result) mustBe OK
+          contentAsJson(result) mustBe Json.toJson(schemeDetails)
       }
 
-      "psp is associated, no rls flag, no deceased flag, no DelimitedAdmin and a valid status" in {
-        val handler = new Handler(practitionerRequest)
+      "psp is associated, no rls flag, no deceased flag, no DelimitedAdmin and a valid status" in runningApp {
+        implicit app =>
 
-        val result = handler.run(srn)(FakeRequest())
+          val result = handler(practitionerRequest).run(srn)(FakeRequest())
 
-        status(result) mustBe OK
-        contentAsJson(result) mustBe Json.toJson(schemeDetails)
+          status(result) mustBe OK
+          contentAsJson(result) mustBe Json.toJson(schemeDetails)
       }
     }
 
-    "return unauthorized" when {
+    "redirect to unauthorized page" when {
 
-      "psa check association returns false" in {
+      "psa check association returns false" in runningApp { implicit app =>
+
         setupCheckAssociation(psaId, srn, Future.successful(false))
 
-        val handler = new Handler(administratorRequest)
-        val result = handler.run(srn)(FakeRequest())
+        val result = handler(administratorRequest).run(srn)(FakeRequest())
+        val expectedUrl = routes.UnauthorisedController.onPageLoad.url
 
-        status(result) mustBe UNAUTHORIZED
+        redirectLocation(result) mustBe Some(expectedUrl)
       }
 
-      "psp check association returns false" in {
-        setupCheckAssociation(pspId, srn, Future.successful(false))
+      "psp check association returns false" in runningApp { implicit app =>
 
-        val handler = new Handler(practitionerRequest)
-        val result = handler.run(srn)(FakeRequest())
+          setupCheckAssociation(pspId, srn, Future.successful(false))
 
-        status(result) mustBe UNAUTHORIZED
+          val result = handler(practitionerRequest).run(srn)(FakeRequest())
+          val expectedUrl = routes.UnauthorisedController.onPageLoad.url
+
+          redirectLocation(result) mustBe Some(expectedUrl)
       }
 
-      "psa rls flag is set" in {
-        setupMinimalDetails(psaId, Future.successful(Right(minimalDetails.copy(rlsFlag = true))))
+      "psa minimal details return not found" in runningApp { implicit app =>
 
-        val handler = new Handler(administratorRequest)
-        val result = handler.run(srn)(FakeRequest())
-
-        status(result) mustBe UNAUTHORIZED
-      }
-
-      "psp rls flag is set" in {
-        setupMinimalDetails(pspId, Future.successful(Right(minimalDetails.copy(rlsFlag = true))))
-
-        val handler = new Handler(practitionerRequest)
-        val result = handler.run(srn)(FakeRequest())
-
-        status(result) mustBe UNAUTHORIZED
-      }
-
-      "psa deceased flag is set" in {
-        setupMinimalDetails(psaId, Future.successful(Right(minimalDetails.copy(deceasedFlag = true))))
-
-        val handler = new Handler(administratorRequest)
-        val result = handler.run(srn)(FakeRequest())
-
-        status(result) mustBe UNAUTHORIZED
-      }
-
-      "psp deceased flag is set" in {
-        setupMinimalDetails(pspId, Future.successful(Right(minimalDetails.copy(deceasedFlag = true))))
-
-        val handler = new Handler(practitionerRequest)
-        val result = handler.run(srn)(FakeRequest())
-
-        status(result) mustBe UNAUTHORIZED
-      }
-
-      "psa minimal details return delimited admin" in {
-        setupMinimalDetails(psaId, Future.successful(Left(DelimitedAdmin)))
-
-        val handler = new Handler(administratorRequest)
-        val result = handler.run(srn)(FakeRequest())
-
-        status(result) mustBe UNAUTHORIZED
-      }
-
-      "psp minimal details return delimited admin" in {
-        setupMinimalDetails(pspId, Future.successful(Left(DelimitedAdmin)))
-
-        val handler = new Handler(practitionerRequest)
-        val result = handler.run(srn)(FakeRequest())
-
-        status(result) mustBe UNAUTHORIZED
-      }
-
-      "psa minimal details return not found" in {
         setupMinimalDetails(psaId, Future.successful(Left(DetailsNotFound)))
 
-        val handler = new Handler(administratorRequest)
-        val result = handler.run(srn)(FakeRequest())
+        val result = handler(administratorRequest).run(srn)(FakeRequest())
+        val expectedUrl = routes.UnauthorisedController.onPageLoad.url
 
-        status(result) mustBe UNAUTHORIZED
+        redirectLocation(result) mustBe Some(expectedUrl)
       }
 
-      "psp minimal details return not found" in {
+      "psp minimal details return not found" in runningApp { implicit app =>
+
         setupMinimalDetails(pspId, Future.successful(Left(DetailsNotFound)))
 
-        val handler = new Handler(practitionerRequest)
-        val result = handler.run(srn)(FakeRequest())
+        val result = handler(practitionerRequest).run(srn)(FakeRequest())
+        val expectedUrl = routes.UnauthorisedController.onPageLoad.url
 
-        status(result) mustBe UNAUTHORIZED
+        redirectLocation(result) mustBe Some(expectedUrl)
       }
 
-      "psa - scheme details not found" in {
+      "psa - scheme details not found" in runningApp { implicit app =>
+
         setupSchemeDetails(psaId, srn, Future.successful(None))
 
-        val handler = new Handler(administratorRequest)
-        val result = handler.run(srn)(FakeRequest())
+        val result = handler(administratorRequest).run(srn)(FakeRequest())
+        val expectedUrl = routes.UnauthorisedController.onPageLoad.url
 
-        status(result) mustBe UNAUTHORIZED
+        redirectLocation(result) mustBe Some(expectedUrl)
       }
 
-      "psp - scheme details not found" in {
+      "psp - scheme details not found" in runningApp { implicit app =>
         setupSchemeDetails(pspId, srn, Future.successful(None))
 
-        val handler = new Handler(practitionerRequest)
-        val result = handler.run(srn)(FakeRequest())
+        val result = handler(practitionerRequest).run(srn)(FakeRequest())
+        val expectedUrl = routes.UnauthorisedController.onPageLoad.url
 
-        status(result) mustBe UNAUTHORIZED
+        redirectLocation(result) mustBe Some(expectedUrl)
       }
 
-      "psa - scheme has an invalid status" in {
+      "psa - scheme has an invalid status" in runningApp { implicit app =>
         forAll(invalidSchemeStatusGen) { schemeStatus =>
           setupSchemeDetails(psaId, srn, Future.successful(Some(schemeDetails.copy(schemeStatus = schemeStatus))))
 
-          val handler = new Handler(administratorRequest)
-          val result = handler.run(srn)(FakeRequest())
+          val result = handler(administratorRequest).run(srn)(FakeRequest())
+          val expectedUrl = routes.UnauthorisedController.onPageLoad.url
 
-          status(result) mustBe UNAUTHORIZED
+          redirectLocation(result) mustBe Some(expectedUrl)
         }
       }
 
-      "psp - scheme has an invalid status" in {
+      "psp - scheme has an invalid status" in runningApp { implicit app =>
         forAll(invalidSchemeStatusGen) { schemeStatus =>
           setupSchemeDetails(pspId, srn, Future.successful(Some(schemeDetails.copy(schemeStatus = schemeStatus))))
 
-          val handler = new Handler(practitionerRequest)
-          val result = handler.run(srn)(FakeRequest())
+          val result = handler(practitionerRequest).run(srn)(FakeRequest())
+          val expectedUrl = routes.UnauthorisedController.onPageLoad.url
 
-          status(result) mustBe UNAUTHORIZED
+          redirectLocation(result) mustBe Some(expectedUrl)
         }
+      }
+    }
+
+    "redirect to update contact details page" when {
+
+      "psa rls flag is set" in runningApp { implicit app =>
+
+        setupMinimalDetails(psaId, Future.successful(Right(minimalDetails.copy(rlsFlag = true))))
+
+        val result = handler(administratorRequest).run(srn)(FakeRequest())
+        val expectedUrl = appConfig.urls.pensionAdministrator.updateContactDetails
+
+        redirectLocation(result) mustBe Some(expectedUrl)
+      }
+
+      "psp rls flag is set" in runningApp { implicit app =>
+
+        setupMinimalDetails(pspId, Future.successful(Right(minimalDetails.copy(rlsFlag = true))))
+
+        val result = handler(practitionerRequest).run(srn)(FakeRequest())
+        val expectedUrl = appConfig.urls.pensionPractitioner.updateContactDetails
+
+        redirectLocation(result) mustBe Some(expectedUrl)
+      }
+    }
+
+    "redirect to contact hmrc page" when {
+
+      "psa deceased flag is set" in runningApp { implicit app =>
+
+        setupMinimalDetails(psaId, Future.successful(Right(minimalDetails.copy(deceasedFlag = true))))
+
+        val result = handler(administratorRequest).run(srn)(FakeRequest())
+        val expectedUrl = appConfig.urls.managePensionsSchemes.contactHmrc
+
+        redirectLocation(result) mustBe Some(expectedUrl)
+      }
+
+      "psp deceased flag is set" in runningApp { implicit app =>
+
+        setupMinimalDetails(pspId, Future.successful(Right(minimalDetails.copy(deceasedFlag = true))))
+
+        val result = handler(practitionerRequest).run(srn)(FakeRequest())
+        val expectedUrl = appConfig.urls.managePensionsSchemes.contactHmrc
+
+        redirectLocation(result) mustBe Some(expectedUrl)
+      }
+    }
+
+    "redirect to cannot access deregistered page" when {
+
+      "psa minimal details return delimited admin" in runningApp { implicit app =>
+
+        setupMinimalDetails(psaId, Future.successful(Left(DelimitedAdmin)))
+
+        val result = handler(administratorRequest).run(srn)(FakeRequest())
+        val expectedUrl = appConfig.urls.managePensionsSchemes.cannotAccessDeregistered
+
+        redirectLocation(result) mustBe Some(expectedUrl)
+      }
+
+      "psp minimal details return delimited admin" in runningApp { implicit app =>
+
+        setupMinimalDetails(pspId, Future.successful(Left(DelimitedAdmin)))
+
+        val result = handler(practitionerRequest).run(srn)(FakeRequest())
+        val expectedUrl = appConfig.urls.managePensionsSchemes.cannotAccessDeregistered
+
+        redirectLocation(result) mustBe Some(expectedUrl)
       }
     }
   }

@@ -40,7 +40,7 @@ class AuthController @Inject()(
         .clear(request.getUserId)
         .map {
           _ =>
-            Redirect(config.signOutUrl, Map("continue" -> Seq(config.exitSurveyUrl)))
+            Redirect(config.urls.signOutUrl, Map("continue" -> Seq(config.exitSurveyUrl)))
       }
   }
 
@@ -50,7 +50,7 @@ class AuthController @Inject()(
       .clear(request.getUserId)
       .map {
         _ =>
-        Redirect(config.signOutUrl, Map("continue" -> Seq(routes.SignedOutController.onPageLoad.url)))
+        Redirect(config.urls.signOutUrl, Map("continue" -> Seq(routes.SignedOutController.onPageLoad.url)))
       }
   }
 }

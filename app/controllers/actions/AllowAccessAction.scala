@@ -17,13 +17,15 @@
 package controllers.actions
 
 import com.google.inject.ImplementedBy
+import config.FrontendAppConfig
 import connectors.MinimalDetailsError.{DelimitedAdmin, DetailsNotFound}
 import connectors.{MinimalDetailsConnector, MinimalDetailsError, SchemeDetailsConnector}
+import controllers.routes
 import models.SchemeId.Srn
 import models.SchemeStatus.{Deregistered, Open, WoundUp}
 import models.requests.{AllowedAccessRequest, IdentifierRequest}
 import models.{MinimalDetails, SchemeDetails, SchemeStatus}
-import play.api.mvc.Results.Unauthorized
+import play.api.mvc.Results.{Redirect, Unauthorized}
 import play.api.mvc.{ActionFunction, Result}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
@@ -33,6 +35,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class AllowAccessAction(
   srn: Srn,
+  appConfig: FrontendAppConfig,
   schemeDetailsConnector: SchemeDetailsConnector,
   minimalDetailsConnector: MinimalDetailsConnector,
 )(implicit override val executionContext: ExecutionContext) extends ActionFunction[IdentifierRequest, AllowedAccessRequest] {
@@ -49,22 +52,26 @@ class AllowAccessAction(
       minimalDetails <- fetchMinimalDetails(request)
     } yield {
 
-      schemeDetails match {
-        case Some(schemeDetails) =>
-          if (
-            isAssociated &&
-              !minimalDetails.exists(_.rlsFlag) &&
-              !minimalDetails.exists(_.deceasedFlag) &&
-              !minimalDetails.left.exists(_ == DelimitedAdmin) &&
-              !minimalDetails.left.exists(_ == DetailsNotFound) &&
-              validStatuses.contains(schemeDetails.schemeStatus)
-          ) {
-            block(AllowedAccessRequest(request, schemeDetails))
-          } else {
-            Future.successful(Unauthorized)
-          }
-        case None =>
-          Future.successful(Unauthorized)
+      (schemeDetails, isAssociated, minimalDetails) match {
+        case (Some(schemeDetails), true, Right(MinimalDetails(_, _, _, _, false, false)))
+          if validStatuses.contains(schemeDetails.schemeStatus) =>
+          
+          block(AllowedAccessRequest(request, schemeDetails))
+
+        case (_, _, Right(HasDeceasedFlag(_))) =>
+          Future.successful(Redirect(appConfig.urls.managePensionsSchemes.contactHmrc))
+
+        case (_, _, Right(HasRlsFlag(_))) =>
+          request.fold(
+            _ => Future.successful(Redirect(appConfig.urls.pensionAdministrator.updateContactDetails)),
+            _ => Future.successful(Redirect(appConfig.urls.pensionPractitioner.updateContactDetails)),
+          )
+
+        case (_, _, Left(DelimitedAdmin)) =>
+          Future.successful(Redirect(appConfig.urls.managePensionsSchemes.cannotAccessDeregistered))
+
+        case _ =>
+          Future.successful(Redirect(routes.UnauthorisedController.onPageLoad))
       }
     }).flatten
   }
@@ -87,6 +94,16 @@ class AllowAccessAction(
       a => minimalDetailsConnector.fetch(a.psaId),
       p => minimalDetailsConnector.fetch(p.pspId)
     )
+
+  object HasRlsFlag {
+    def unapply(minimalDetails: MinimalDetails): Option[MinimalDetails] =
+      if(minimalDetails.rlsFlag) Some(minimalDetails) else None
+  }
+
+  object HasDeceasedFlag {
+    def unapply(minimalDetails: MinimalDetails): Option[MinimalDetails] =
+      if(minimalDetails.deceasedFlag) Some(minimalDetails) else None
+  }
 }
 
 @ImplementedBy(classOf[AllowAccessActionProviderImpl])
@@ -95,11 +112,12 @@ trait AllowAccessActionProvider {
 }
 
 class AllowAccessActionProviderImpl @Inject()(
+  appConfig: FrontendAppConfig,
   schemeDetailsConnector: SchemeDetailsConnector,
   minimalDetailsConnector: MinimalDetailsConnector
 )(implicit val ec: ExecutionContext) extends AllowAccessActionProvider {
 
   def apply(srn: Srn): ActionFunction[IdentifierRequest, AllowedAccessRequest] =
-    new AllowAccessAction(srn, schemeDetailsConnector, minimalDetailsConnector)
+    new AllowAccessAction(srn, appConfig, schemeDetailsConnector, minimalDetailsConnector)
 }
 

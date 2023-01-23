@@ -16,35 +16,38 @@
 
 package controllers.actions
 
-import config.Constants
+import config.{Constants, FrontendAppConfig}
 import connectors.cache.SessionDataCacheConnector
+import controllers.routes
 import models.cache.PensionSchemeUser.{Administrator, Practitioner}
 import models.cache.SessionData
 import models.requests.IdentifierRequest.{AdministratorRequest, PractitionerRequest}
 import org.mockito.ArgumentMatchers._
-import play.api.http.Status.{OK, UNAUTHORIZED}
+import play.api.Application
+import play.api.http.Status.OK
 import play.api.libs.json.Json
 import play.api.mvc.Results.Ok
 import play.api.mvc.{Action, AnyContent}
-import play.api.test.Helpers.{contentAsJson, defaultAwaitTimeout, status}
-import play.api.test.{FakeRequest, StubBodyParserFactory}
+import play.api.test.Helpers.{contentAsJson, defaultAwaitTimeout, redirectLocation, status}
+import play.api.test.{FakeRequest, StubPlayBodyParsersFactory}
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve.~
 import utils.BaseSpec
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class IdentifierActionSpec extends BaseSpec with StubBodyParserFactory {
+class IdentifierActionSpec extends BaseSpec with StubPlayBodyParsersFactory {
 
-  lazy val authAction =
+  def authAction(appConfig: FrontendAppConfig) =
     new IdentifierActionImpl(
+      appConfig,
       mockAuthConnector,
       mockSessionDataCacheConnector,
-      stubBodyParser[AnyContent]()
+      stubPlayBodyParsers
     )(ExecutionContext.global)
 
-  class Handler {
-    def run: Action[AnyContent] = authAction { request =>
+  class Handler(appConfig: FrontendAppConfig) {
+    def run: Action[AnyContent] = authAction(appConfig) { request =>
       request match {
         case AdministratorRequest(userId, externalId, _, id) =>
           Ok(Json.obj("userId" -> userId, "externalId" -> externalId, "psaId" -> id.value))
@@ -54,10 +57,13 @@ class IdentifierActionSpec extends BaseSpec with StubBodyParserFactory {
     }
   }
 
-  val handler = new Handler()
+  def handler(implicit app: Application) = new Handler(appConfig)
+
+  def appConfig(implicit app: Application) = injected[FrontendAppConfig]
 
   val mockAuthConnector: AuthConnector = mock[AuthConnector]
   val mockSessionDataCacheConnector: SessionDataCacheConnector = mock[SessionDataCacheConnector]
+
   def authResult(internalId: Option[String], externalId: Option[String], enrolments: Enrolment*) =
     new ~(new ~(internalId, externalId), Enrolments(enrolments.toSet))
 
@@ -89,58 +95,78 @@ class IdentifierActionSpec extends BaseSpec with StubBodyParserFactory {
   "IdentifierAction" should {
     "return an unauthorised result" when {
 
-      "User is not signed in to GG" in {
+      "Redirect user to sign in page when user is not signed in to GG" in runningApp {
+        implicit app =>
 
-        setAuthValue(Future.failed(new NoActiveSession("No user signed in") {}))
+          setAuthValue(Future.failed(new NoActiveSession("No user signed in") {}))
 
-        val result = handler.run(FakeRequest())
-        status(result) mustBe UNAUTHORIZED
+          val result = handler.run(FakeRequest())
+          val continueUrl = urlEncode(appConfig.urls.loginContinueUrl)
+          val expectedUrl = s"${appConfig.urls.loginUrl}?continue=$continueUrl"
+
+          redirectLocation(result) mustBe Some(expectedUrl)
       }
 
-      "Authorise fails to match predicate" in {
+      "Redirect user to manage pension scheme when authorise fails to match predicate" in runningApp {
+        implicit app =>
 
-        setAuthValue(Future.failed(new AuthorisationException("Authorise predicate fails") {}))
+          setAuthValue(Future.failed(new AuthorisationException("Authorise predicate fails") {}))
 
-        val result = handler.run(FakeRequest())
-        status(result) mustBe UNAUTHORIZED
+          val result = handler.run(FakeRequest())
+          val expectedUrl = appConfig.urls.managePensionsSchemes.registerUrl
+
+          redirectLocation(result) mustBe Some(expectedUrl)
       }
 
-      "User does not have an external id" in {
+      "Redirect to unauthorised page when user does not have an external id" in runningApp {
+        implicit app =>
 
-        setAuthValue(authResult(Some("id"), None, psaEnrolment))
+          setAuthValue(authResult(Some("id"), None, psaEnrolment))
 
-        val result = handler.run(FakeRequest())
-        status(result) mustBe UNAUTHORIZED
+          val result = handler.run(FakeRequest())
+          val expectedUrl = routes.UnauthorisedController.onPageLoad.url
+
+          redirectLocation(result) mustBe Some(expectedUrl)
       }
 
-      "User does not have an internal id" in {
+      "Redirect to unauthorised page when user does not have an internal id" in runningApp {
+        implicit app =>
 
-        setAuthValue(authResult(None, Some("id"), psaEnrolment))
+          setAuthValue(authResult(None, Some("id"), psaEnrolment))
 
-        val result = handler.run(FakeRequest())
-        status(result) mustBe UNAUTHORIZED
+          val result = handler.run(FakeRequest())
+          val expectedUrl = routes.UnauthorisedController.onPageLoad.url
+
+          redirectLocation(result) mustBe Some(expectedUrl)
       }
 
-      "User does not have a psa or psp enrolment" in {
+      "Redirect user to manage pension scheme when user does not have a psa or psp enrolment" in runningApp {
+        implicit app =>
 
-        setAuthValue(authResult(Some("internalId"), Some("externalId")))
+          setAuthValue(authResult(Some("internalId"), Some("externalId")))
 
-        val result = handler.run(FakeRequest())
-        status(result) mustBe UNAUTHORIZED
+          val result = handler.run(FakeRequest())
+          val expectedUrl = appConfig.urls.managePensionsSchemes.registerUrl
+
+          redirectLocation(result) mustBe Some(expectedUrl)
       }
 
-      "User has both psa and psp enrolment but nothing is in the cache" in {
+      "Redirect user to admin or practitioner page" when {
+        "user has both psa and psp enrolment but nothing is in the cache" in runningApp { implicit app =>
 
-        setAuthValue(authResult(Some("internalId"), Some("externalId"), psaEnrolment, pspEnrolment))
-        setSessionValue(None)
+          setAuthValue(authResult(Some("internalId"), Some("externalId"), psaEnrolment, pspEnrolment))
+          setSessionValue(None)
 
-        val result = handler.run(FakeRequest())
-        status(result) mustBe UNAUTHORIZED
+          val result = handler.run(FakeRequest())
+          val expectedUrl = appConfig.urls.managePensionsSchemes.adminOrPractitionerUrl
+
+          redirectLocation(result) mustBe Some(expectedUrl)
+        }
       }
     }
 
     "return an IdentifierRequest" when {
-      "User has a psa enrolment" in {
+      "User has a psa enrolment" in runningApp { implicit app =>
 
         setAuthValue(authResult(Some("internalId"), Some("externalId"), psaEnrolment))
 
@@ -153,7 +179,7 @@ class IdentifierActionSpec extends BaseSpec with StubBodyParserFactory {
         (contentAsJson(result) \ "externalId").asOpt[String] mustBe Some("externalId")
       }
 
-      "User has a psp enrolment" in {
+      "User has a psp enrolment" in runningApp { implicit app =>
 
         setAuthValue(authResult(Some("internalId"), Some("externalId"), pspEnrolment))
 
@@ -166,7 +192,7 @@ class IdentifierActionSpec extends BaseSpec with StubBodyParserFactory {
         (contentAsJson(result) \ "externalId").asOpt[String] mustBe Some("externalId")
       }
 
-      "User has a both psa and psp enrolment with admin stored in cache" in {
+      "User has a both psa and psp enrolment with admin stored in cache" in runningApp { implicit app =>
 
         setAuthValue(authResult(Some("internalId"), Some("externalId"), psaEnrolment, pspEnrolment))
         setSessionValue(Some(SessionData(Administrator)))
@@ -180,7 +206,7 @@ class IdentifierActionSpec extends BaseSpec with StubBodyParserFactory {
         (contentAsJson(result) \ "externalId").asOpt[String] mustBe Some("externalId")
       }
 
-      "User has a both psa and psp enrolment with practitioner stored in cache" in {
+      "User has a both psa and psp enrolment with practitioner stored in cache" in runningApp { implicit app =>
 
         setAuthValue(authResult(Some("internalId"), Some("externalId"), psaEnrolment, pspEnrolment))
         setSessionValue(Some(SessionData(Practitioner)))

@@ -34,10 +34,6 @@ class FrontendAppConfig @Inject() (config: Configuration) {
   def feedbackUrl(implicit request: RequestHeader): String =
     s"$contactHost/contact/beta-feedback?service=$contactFormServiceIdentifier&backUrl=${SafeRedirectUrl(host + request.uri).encodedUrl}"
 
-  val loginUrl: String         = config.get[String]("urls.login")
-  val loginContinueUrl: String = config.get[String]("urls.loginContinue")
-  val signOutUrl: String       = config.get[String]("urls.signOut")
-
   private val exitSurveyBaseUrl: String = config.get[Service]("microservice.services.feedback-frontend").baseUrl
   val exitSurveyUrl: String             = s"$exitSurveyBaseUrl/feedback/pension-scheme-return-frontend"
 
@@ -56,5 +52,31 @@ class FrontendAppConfig @Inject() (config: Configuration) {
 
   object features {
     val welshTranslation: Boolean = config.get[Boolean]("features.welsh-translation")
+  }
+
+  object urls {
+    val loginUrl: String = config.get[String]("urls.login")
+    val loginContinueUrl: String = config.get[String]("urls.loginContinue")
+    val signOutUrl: String = config.get[String]("urls.signOut")
+
+    object managePensionsSchemes {
+      val baseUrl: String = config.get[String]("urls.manage-pension-schemes.baseUrl")
+      val registerUrl: String = baseUrl + config.get[String]("urls.manage-pension-schemes.register")
+      val adminOrPractitionerUrl: String =
+        baseUrl + config.get[String]("urls.manage-pension-schemes.adminOrPractitioner")
+      val contactHmrc: String = baseUrl + config.get[String]("urls.manage-pension-schemes.contactHmrc")
+      val cannotAccessDeregistered: String =
+        baseUrl + config.get[String]("urls.manage-pension-schemes.cannotAccessDeregistered")
+    }
+
+    object pensionAdministrator {
+      val baseUrl: String = config.get[String]("urls.pension-administrator.baseUrl")
+      val updateContactDetails: String = baseUrl + config.get[String]("urls.pension-administrator.updateContactDetails")
+    }
+
+    object pensionPractitioner {
+      val baseUrl: String = config.get[String]("urls.pension-practitioner.baseUrl")
+      val updateContactDetails: String = baseUrl + config.get[String]("urls.pension-administrator.updateContactDetails")
+    }
   }
 }

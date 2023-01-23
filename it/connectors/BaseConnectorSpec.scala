@@ -19,28 +19,10 @@ package connectors
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder
 import com.github.tomakehurst.wiremock.client.WireMock.{delete, get, urlEqualTo}
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import org.scalatest.time.{Millis, Span}
-import play.api.Application
-import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.test.Helpers.running
 import uk.gov.hmrc.http.test.WireMockSupport
 import utils.BaseSpec
 
-import scala.reflect.ClassTag
-
 abstract class BaseConnectorSpec extends BaseSpec with WireMockSupport {
-
-  implicit override val patienceConfig: PatienceConfig =
-    PatienceConfig(timeout = scaled(Span(500, Millis)), interval = scaled(Span(50, Millis)))
-
-  implicit protected def applicationBuilder: GuiceApplicationBuilder =
-    new GuiceApplicationBuilder()
-      .configure(
-        "auditing.enabled" -> false,
-        "metric.enabled" -> false
-      )
-
-  protected def injected[A: ClassTag](implicit app: Application): A = app.injector.instanceOf[A]
 
   def stubGet(url: String, response: ResponseDefinitionBuilder): StubMapping = {
     wireMockServer.stubFor(
@@ -55,7 +37,4 @@ abstract class BaseConnectorSpec extends BaseSpec with WireMockSupport {
         .willReturn(response)
     )
   }
-
-  def runningApp(block: Application => Unit)(implicit applicationBuilder: GuiceApplicationBuilder): Unit =
-    running(_ => applicationBuilder)(block)
 }
