@@ -16,7 +16,6 @@
 
 package controllers
 
-import base.SpecBase
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{never, times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -27,13 +26,12 @@ import repositories.SessionRepository
 
 import scala.concurrent.Future
 
-class KeepAliveControllerSpec extends SpecBase with MockitoSugar {
+class KeepAliveControllerSpec extends ControllerBaseSpec {
 
-  "keepAlive" - {
+  "keepAlive" should {
 
-    "when the user has answered some questions" - {
-
-      "must keep the answers alive and return OK" in {
+    "keep the answers alive and return OK" when {
+      "the user has answered some questions" in {
 
         val mockSessionRepository = mock[SessionRepository]
         when(mockSessionRepository.keepAlive(any())) thenReturn Future.successful(true)
@@ -55,9 +53,8 @@ class KeepAliveControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "when the user has not answered any questions" - {
-
-      "must return OK" in {
+    "return OK" when {
+      "the user has not answered any questions" in {
 
         val mockSessionRepository = mock[SessionRepository]
         when(mockSessionRepository.keepAlive(any())) thenReturn Future.successful(true)

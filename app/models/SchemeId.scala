@@ -23,6 +23,15 @@ sealed abstract class SchemeId(val idType: String) {
 object SchemeId {
 
   case class Srn(value: String) extends SchemeId("srn")
+
+  object Srn {
+    val srnRegex = "^S[0-9]{10}$"
+
+    def apply(value: String): Option[Srn] = {
+      if(value.matches(srnRegex)) Some(new Srn(value)) else None
+    }
+  }
+
   case class Pstr(value: String) extends SchemeId("pstr")
 
 }

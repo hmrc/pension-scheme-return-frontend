@@ -20,10 +20,11 @@ import models.SchemeId.Srn
 import play.api.mvc.PathBindable
 
 object Binders {
+
   implicit val srnBinder: PathBindable[Srn] = new PathBindable[Srn] {
 
     override def bind(key: String, value: String): Either[String, Srn] = {
-      Right(Srn(value))
+      Srn(value).toRight("Invalid scheme reference number")
     }
 
     override def unbind(key: String, value: Srn): String = value.value

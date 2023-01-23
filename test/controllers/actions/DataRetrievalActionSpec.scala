@@ -16,20 +16,17 @@
 
 package controllers.actions
 
-import base.SpecBase
 import models.UserAnswers
-import models.requests.IdentifierRequest.AdministratorRequest
-import models.requests.{AllowedAccessRequest, IdentifierRequest, OptionalDataRequest}
-import org.mockito.Mockito._
-import org.scalatestplus.mockito.MockitoSugar
-import play.api.mvc.{AnyContent, AnyContentAsEmpty}
+import models.requests.OptionalDataRequest
+import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import repositories.SessionRepository
+import utils.BaseSpec
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class DataRetrievalActionSpec extends SpecBase with MockitoSugar {
+class DataRetrievalActionSpec extends BaseSpec {
 
   class Harness(sessionRepository: SessionRepository) extends DataRetrievalActionImpl(sessionRepository) {
     def callTransform(): Future[OptionalDataRequest[AnyContentAsEmpty.type]] =
@@ -38,11 +35,10 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar {
 
   val request = allowedAccessRequestGen(FakeRequest()).sample.value
 
-  "Data Retrieval Action" - {
+  "Data Retrieval Action" should {
 
-    "when there is no data in the cache" - {
-
-      "must set userAnswers to 'None' in the request" in {
+    "set userAnswers to 'None' in the request" when {
+      "there is no data in the cache" in {
 
         val sessionRepository = mock[SessionRepository]
         when(sessionRepository.get(request.request.getUserId)) thenReturn Future(None)
@@ -54,9 +50,8 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "when there is data in the cache" - {
-
-      "must build a userAnswers object and add it to the request" in {
+    "build a userAnswers object and add it to the request" when {
+      "when there is data in the cache" in {
 
         val sessionRepository = mock[SessionRepository]
         when(sessionRepository.get(request.request.getUserId)) thenReturn Future(Some(UserAnswers("id")))

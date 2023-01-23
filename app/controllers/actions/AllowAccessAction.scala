@@ -18,14 +18,14 @@ package controllers.actions
 
 import com.google.inject.ImplementedBy
 import config.FrontendAppConfig
-import connectors.MinimalDetailsError.{DelimitedAdmin, DetailsNotFound}
+import connectors.MinimalDetailsError.DelimitedAdmin
 import connectors.{MinimalDetailsConnector, MinimalDetailsError, SchemeDetailsConnector}
 import controllers.routes
 import models.SchemeId.Srn
 import models.SchemeStatus.{Deregistered, Open, WoundUp}
 import models.requests.{AllowedAccessRequest, IdentifierRequest}
 import models.{MinimalDetails, SchemeDetails, SchemeStatus}
-import play.api.mvc.Results.{Redirect, Unauthorized}
+import play.api.mvc.Results.Redirect
 import play.api.mvc.{ActionFunction, Result}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
@@ -55,7 +55,7 @@ class AllowAccessAction(
       (schemeDetails, isAssociated, minimalDetails) match {
         case (Some(schemeDetails), true, Right(MinimalDetails(_, _, _, _, false, false)))
           if validStatuses.contains(schemeDetails.schemeStatus) =>
-          
+
           block(AllowedAccessRequest(request, schemeDetails))
 
         case (_, _, Right(HasDeceasedFlag(_))) =>

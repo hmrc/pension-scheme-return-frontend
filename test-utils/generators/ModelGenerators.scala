@@ -25,6 +25,7 @@ import models.cache.PensionSchemeUser.{Administrator, Practitioner}
 import models.requests.{AllowedAccessRequest, IdentifierRequest}
 import models.requests.IdentifierRequest.{AdministratorRequest, PractitionerRequest}
 import org.scalacheck.Gen
+import org.scalacheck.Gen.numChar
 import play.api.mvc.{AnyContent, Request}
 import play.api.test.FakeRequest
 
@@ -79,7 +80,13 @@ trait ModelGenerators extends BasicGenerators {
   val psaIdGen: Gen[PsaId] = nonEmptyString.map(PsaId)
   val pspIdGen: Gen[PspId] = nonEmptyString.map(PspId)
 
-  val srnGen: Gen[Srn] = nonEmptyString.map(Srn)
+  val srnGen: Gen[Srn] =
+    Gen.listOfN(10, numChar)
+       .flatMap { xs =>
+         Srn(s"S${xs.mkString}")
+           .fold[Gen[Srn]](Gen.fail)(x => Gen.const(x))
+       }
+
   val pstrGen: Gen[Pstr] = nonEmptyString.map(Pstr)
 
   val schemeIdGen: Gen[SchemeId] = Gen.oneOf(srnGen, pstrGen)

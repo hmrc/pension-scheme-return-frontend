@@ -14,24 +14,28 @@
  * limitations under the License.
  */
 
-package navigation
+package models
 
-import controllers.routes
-import models._
-import pages._
+import models.SchemeId.Srn
+import org.scalacheck.Gen.alphaNumStr
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import utils.BaseSpec
 
-class NavigatorSpec extends BaseSpec {
+class SchemeIdSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
-  val navigator = new Navigator
+  "Srn" should {
 
-  "Navigator" should {
+    "return Srn for valid value" in {
+      forAll(srnGen) { validSrn =>
+        Srn(validSrn.value) mustBe Some(validSrn)
+      }
+    }
 
-    "go from a page that doesn't exist in the route map to Index" when {
-      "in Normal mode" in {
-
-        case object UnknownPage extends Page
-        navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id")) mustBe routes.IndexController.onPageLoad
+    "return None for invalid value" in {
+      forAll(alphaNumStr) { invalidSrn =>
+        whenever(!invalidSrn.matches(Srn.srnRegex)) {
+          Srn(invalidSrn) mustBe None
+        }
       }
     }
   }
