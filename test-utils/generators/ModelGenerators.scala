@@ -16,9 +16,101 @@
 
 package generators
 
+import models.PensionSchemeId.{PsaId, PspId}
+import models.SchemeId.{Pstr, Srn}
+import models.SchemeStatus._
 import models._
-import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.{Arbitrary, Gen}
+import models.cache.PensionSchemeUser
+import models.cache.PensionSchemeUser.{Administrator, Practitioner}
+import models.requests.{AllowedAccessRequest, IdentifierRequest}
+import models.requests.IdentifierRequest.{AdministratorRequest, PractitionerRequest}
+import org.scalacheck.Gen
+import org.scalacheck.Gen.numChar
+import play.api.mvc.{AnyContent, Request}
+import play.api.test.FakeRequest
 
-trait ModelGenerators {
+trait ModelGenerators extends BasicGenerators {
+  lazy val minimalDetailsGen: Gen[MinimalDetails] =
+    for {
+      email <- email
+      isSuspended <- boolean
+      orgName <- Gen.option(nonEmptyString)
+      individual <- Gen.option(individualDetailsGen)
+      rlsFlag <- boolean
+      deceasedFlag <- boolean
+    } yield MinimalDetails(email, isSuspended, orgName, individual, rlsFlag, deceasedFlag)
+
+  lazy val individualDetailsGen: Gen[IndividualDetails] =
+    for {
+      firstName <- nonEmptyString
+      middleName <- Gen.option(nonEmptyString)
+      lastName <- nonEmptyString
+    } yield IndividualDetails(firstName, middleName, lastName)
+
+  val validSchemeStatusGen: Gen[SchemeStatus] =
+    Gen.oneOf(
+      Open,
+      WoundUp,
+      Deregistered
+    )
+
+  val invalidSchemeStatusGen: Gen[SchemeStatus] =
+    Gen.oneOf(
+      Pending,
+      PendingInfoRequired,
+      PendingInfoReceived,
+      Rejected,
+      RejectedUnderAppeal
+    )
+
+  val schemeStatusGen: Gen[SchemeStatus] =
+    Gen.oneOf(validSchemeStatusGen, invalidSchemeStatusGen)
+
+  val schemeDetailsGen: Gen[SchemeDetails] =
+    for {
+      name <- nonEmptyString
+      pstr <- nonEmptyString
+      status <- schemeStatusGen
+      authorisingPsa <- Gen.option(nonEmptyString)
+    } yield SchemeDetails(name, pstr, status, authorisingPsa)
+
+  val pensionSchemeUserGen: Gen[PensionSchemeUser] =
+    Gen.oneOf(Administrator, Practitioner)
+
+  val psaIdGen: Gen[PsaId] = nonEmptyString.map(PsaId)
+  val pspIdGen: Gen[PspId] = nonEmptyString.map(PspId)
+
+  val srnGen: Gen[Srn] =
+    Gen.listOfN(10, numChar)
+       .flatMap { xs =>
+         Srn(s"S${xs.mkString}")
+           .fold[Gen[Srn]](Gen.fail)(x => Gen.const(x))
+       }
+
+  val pstrGen: Gen[Pstr] = nonEmptyString.map(Pstr)
+
+  val schemeIdGen: Gen[SchemeId] = Gen.oneOf(srnGen, pstrGen)
+
+  def practitionerRequestGen[A](request: Request[A]): Gen[PractitionerRequest[A]] =
+    for {
+      userId     <- nonEmptyString
+      externalId <- nonEmptyString
+      pspId      <- pspIdGen
+    } yield PractitionerRequest(userId, externalId, request, pspId)
+
+  def administratorRequestGen[A](request: Request[A]): Gen[AdministratorRequest[A]] =
+    for {
+      userId     <- nonEmptyString
+      externalId <- nonEmptyString
+      psaId      <- psaIdGen
+    } yield AdministratorRequest(userId, externalId, request, psaId)
+
+  def identifierRequestGen[A](request: Request[A]): Gen[IdentifierRequest[A]] =
+    Gen.oneOf(administratorRequestGen[A](request), practitionerRequestGen[A](request))
+
+  def allowedAccessRequestGen[A](request: Request[A]): Gen[AllowedAccessRequest[A]] =
+    for {
+      request       <- identifierRequestGen[A](request)
+      schemeDetails <- schemeDetailsGen
+    } yield AllowedAccessRequest(request, schemeDetails)
 }

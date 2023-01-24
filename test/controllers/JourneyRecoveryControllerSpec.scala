@@ -16,19 +16,17 @@
 
 package controllers
 
-import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 import views.html.{JourneyRecoveryContinueView, JourneyRecoveryStartAgainView}
 
-class JourneyRecoveryControllerSpec extends SpecBase {
+class JourneyRecoveryControllerSpec extends ControllerBaseSpec {
 
-  "JourneyRecovery Controller" - {
+  "JourneyRecovery Controller" should {
 
-    "when a relative continue Url is supplied" - {
-
-      "must return OK and the continue view" in {
+    "return OK and the continue view" when {
+      "a relative continue Url is supplied" in {
 
         val application = applicationBuilder(userAnswers = None).build()
 
@@ -46,9 +44,8 @@ class JourneyRecoveryControllerSpec extends SpecBase {
       }
     }
 
-    "when an absolute continue Url is supplied" - {
-
-      "must return OK and the start again view" in {
+    "return OK and the start again view" when {
+      "an absolute continue Url is supplied" in {
 
         val application = applicationBuilder(userAnswers = None).build()
 
@@ -66,9 +63,8 @@ class JourneyRecoveryControllerSpec extends SpecBase {
       }
     }
 
-    "when no continue Url is supplied" - {
-
-      "must return OK and the start again view" in {
+    "return OK and the start again view" when {
+      "no continue Url is supplied" in {
 
         val application = applicationBuilder(userAnswers = None).build()
 

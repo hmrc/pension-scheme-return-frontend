@@ -14,8 +14,14 @@
  * limitations under the License.
  */
 
-package viewmodels
+package models
 
-abstract class WithName(name: String) {
-  override val toString: String = name
+sealed trait PensionSchemeId
+
+object PensionSchemeId {
+
+  case class PspId(value: String) extends PensionSchemeId
+
+  case class PsaId(value: String) extends PensionSchemeId
+
 }

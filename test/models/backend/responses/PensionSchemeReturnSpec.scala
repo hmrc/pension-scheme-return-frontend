@@ -14,21 +14,25 @@
  * limitations under the License.
  */
 
-package PensionSchemeReturnFront
+package models.backend.responses
 
-  import org.scalatest.matchers.should.Matchers
-  import org.scalatest.wordspec.AnyWordSpec
-  import play.api.libs.json.{JsSuccess, Json}
-  import uk.gov.hmrc.pensionschemereturn.models.{DataEntry, DataEntryChanged, DataEntryRule, PensionSchemeReturn}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
+import play.api.libs.json.Json
 
-  class PensionSchemeReturnSpec extends AnyWordSpec with Matchers {
+class PensionSchemeReturnSpec extends AnyWordSpec with Matchers {
 
-    "PensionSchemeReturn" should {
-      "serialise to json correctly" in {
+  "PensionSchemeReturn" should {
+    List(
+      (DataEntryRule.Fixed, "fixed"),
+      (DataEntryRule.Updated, "updated"),
+      (DataEntryRule.None, "none")
+    ).foreach { case (rule, ruleSerialised) =>
+      s"serialise to json correctly for rule $rule" in {
         val pensionSchemeReturn = PensionSchemeReturn(
           name = DataEntry(
             "testName",
-            DataEntryRule.Fixed,
+            rule,
             DataEntryChanged("v1", "testPreviousName")
           )
         )
@@ -36,7 +40,7 @@ package PensionSchemeReturnFront
         val expectedJson = Json.obj(
           "name" -> Json.obj(
             "value" -> "testName",
-            "rule" -> "fixed",
+            "rule" -> ruleSerialised,
             "changed" -> Json.obj(
               "version" -> "v1",
               "previousValue" -> "testPreviousName"
@@ -44,7 +48,8 @@ package PensionSchemeReturnFront
           )
         )
 
-        Json.fromJson[PensionSchemeReturn](expectedJson) shouldBe JsSuccess(pensionSchemeReturn)
+        expectedJson.as[PensionSchemeReturn] shouldBe pensionSchemeReturn
       }
     }
   }
+}

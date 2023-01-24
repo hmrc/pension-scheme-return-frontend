@@ -23,22 +23,18 @@ import play.api.mvc.RequestHeader
 import uk.gov.hmrc.play.bootstrap.binders.SafeRedirectUrl
 
 @Singleton
-class FrontendAppConfig @Inject() (configuration: Configuration) {
+class FrontendAppConfig @Inject() (config: Configuration) {
 
-  val host: String    = configuration.get[String]("host")
-  val appName: String = configuration.get[String]("appName")
+  val host: String    = config.get[String]("host")
+  val appName: String = config.get[String]("appName")
 
-  private val contactHost = configuration.get[String]("contact-frontend.host")
+  private val contactHost = config.get[String]("contact-frontend.host")
   private val contactFormServiceIdentifier = "pension-scheme-return-frontend"
 
   def feedbackUrl(implicit request: RequestHeader): String =
     s"$contactHost/contact/beta-feedback?service=$contactFormServiceIdentifier&backUrl=${SafeRedirectUrl(host + request.uri).encodedUrl}"
 
-  val loginUrl: String         = configuration.get[String]("urls.login")
-  val loginContinueUrl: String = configuration.get[String]("urls.loginContinue")
-  val signOutUrl: String       = configuration.get[String]("urls.signOut")
-
-  private val exitSurveyBaseUrl: String = configuration.get[Service]("microservice.services.feedback-frontend").baseUrl
+  private val exitSurveyBaseUrl: String = config.get[Service]("microservice.services.feedback-frontend").baseUrl
   val exitSurveyUrl: String             = s"$exitSurveyBaseUrl/feedback/pension-scheme-return-frontend"
 
   def languageMap: Map[String, Lang] = Map(
@@ -46,12 +42,41 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
     "cy" -> Lang("cy")
   )
 
-  val timeout: Int   = configuration.get[Int]("timeout-dialog.timeout")
-  val countdown: Int = configuration.get[Int]("timeout-dialog.countdown")
+  val timeout: Int   = config.get[Int]("timeout-dialog.timeout")
+  val countdown: Int = config.get[Int]("timeout-dialog.countdown")
 
-  val cacheTtl: Int = configuration.get[Int]("mongodb.timeToLiveInSeconds")
+  val cacheTtl: Int = config.get[Int]("mongodb.timeToLiveInSeconds")
+
+  val pensionsAdministrator: Service = config.get[Service]("microservice.services.pensionAdministrator")
+  val pensionsScheme: Service        = config.get[Service]("microservice.services.pensionsScheme")
 
   object features {
-    val welshTranslation: Boolean = configuration.get[Boolean]("features.welsh-translation")
+    val welshTranslation: Boolean = config.get[Boolean]("features.welsh-translation")
+  }
+
+  object urls {
+    val loginUrl: String = config.get[String]("urls.login")
+    val loginContinueUrl: String = config.get[String]("urls.loginContinue")
+    val signOutUrl: String = config.get[String]("urls.signOut")
+
+    object managePensionsSchemes {
+      val baseUrl: String = config.get[String]("urls.manage-pension-schemes.baseUrl")
+      val registerUrl: String = baseUrl + config.get[String]("urls.manage-pension-schemes.register")
+      val adminOrPractitionerUrl: String =
+        baseUrl + config.get[String]("urls.manage-pension-schemes.adminOrPractitioner")
+      val contactHmrc: String = baseUrl + config.get[String]("urls.manage-pension-schemes.contactHmrc")
+      val cannotAccessDeregistered: String =
+        baseUrl + config.get[String]("urls.manage-pension-schemes.cannotAccessDeregistered")
+    }
+
+    object pensionAdministrator {
+      val baseUrl: String = config.get[String]("urls.pension-administrator.baseUrl")
+      val updateContactDetails: String = baseUrl + config.get[String]("urls.pension-administrator.updateContactDetails")
+    }
+
+    object pensionPractitioner {
+      val baseUrl: String = config.get[String]("urls.pension-practitioner.baseUrl")
+      val updateContactDetails: String = baseUrl + config.get[String]("urls.pension-administrator.updateContactDetails")
+    }
   }
 }
