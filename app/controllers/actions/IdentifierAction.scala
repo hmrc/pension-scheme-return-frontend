@@ -49,7 +49,7 @@ class IdentifierActionImpl @Inject()(
 
   override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] = {
 
-    implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequest(request)
+    implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
     authorised(Enrolment(Constants.psaEnrolmentKey) or Enrolment(Constants.pspEnrolmentKey))
       .retrieve(Retrievals.internalId and Retrievals.externalId and Retrievals.allEnrolments) {
@@ -76,7 +76,7 @@ class IdentifierActionImpl @Inject()(
         case _ => Future.successful(Redirect(routes.UnauthorisedController.onPageLoad))
       }
       .recover {
-        case _: NoActiveSession =>
+        case e: NoActiveSession =>
           Redirect(appConfig.urls.loginUrl, Map("continue" -> Seq(appConfig.urls.loginContinueUrl)))
         case _: AuthorisationException =>
           Redirect(appConfig.urls.managePensionsSchemes.registerUrl)
