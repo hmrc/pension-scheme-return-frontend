@@ -25,7 +25,7 @@ import views.html.ContentPageView
 
 class ContentPageViewSpec extends BaseSpec with ScalaCheckPropertyChecks with HtmlHelper {
 
-  runningApp { implicit app =>
+  runningApplication { implicit app =>
     val view = injected[ContentPageView]
 
     implicit val request = FakeRequest()

@@ -21,7 +21,6 @@ import org.scalacheck.Gen
 import org.scalacheck.Gen.{alphaNumChar, alphaNumStr, alphaStr, choose, chooseNum, listOfN, nonEmptyListOf}
 import play.api.mvc.Call
 
-import java.text.DecimalFormat
 import java.time.{Instant, LocalDate, ZoneOffset}
 
 trait BasicGenerators {

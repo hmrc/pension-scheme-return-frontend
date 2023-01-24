@@ -20,11 +20,10 @@ import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder
 import com.github.tomakehurst.wiremock.client.WireMock.{badRequest, notFound, ok}
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import connectors.BaseConnectorSpec
-import models.cache.{PensionSchemeUser, SessionData}
 import models.cache.PensionSchemeUser.{Administrator, Practitioner}
+import models.cache.{PensionSchemeUser, SessionData}
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.test.Helpers.running
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -55,31 +54,31 @@ class SessionDataCacheConnectorSpec extends BaseConnectorSpec {
 
   "fetch" should {
 
-    "return an administrator" in runningApp { implicit app =>
+    "return an administrator" in runningApplication { implicit app =>
       stubGet(okResponse(Administrator))
 
       connector.fetch(externalId).futureValue mustBe Some(SessionData(Administrator))
     }
 
-    "return a practitioner" in runningApp { implicit app =>
+    "return a practitioner" in runningApplication { implicit app =>
       stubGet(okResponse(Practitioner))
 
       connector.fetch(externalId).futureValue mustBe Some(SessionData(Practitioner))
     }
 
-    "return none" in runningApp { implicit app =>
+    "return none" in runningApplication { implicit app =>
       stubGet(notFound)
 
       connector.fetch(externalId).futureValue mustBe None
     }
 
-    "return none for wrong externalId" in runningApp { implicit app =>
+    "return none for wrong externalId" in runningApplication { implicit app =>
       stubGet(okResponse(Administrator))
 
       connector.fetch("unknown-id").futureValue mustBe None
     }
 
-    "return a failed future for bad request" in runningApp { implicit app =>
+    "return a failed future for bad request" in runningApplication { implicit app =>
       stubGet(badRequest)
 
       connector.fetch(externalId).failed.futureValue
@@ -88,19 +87,19 @@ class SessionDataCacheConnectorSpec extends BaseConnectorSpec {
 
   "delete" should {
 
-    "return unit for an ok response" in runningApp { implicit app =>
+    "return unit for an ok response" in runningApplication { implicit app =>
       stubDelete(ok())
 
       connector.remove(externalId).futureValue mustBe()
     }
 
-    "return unit for a not found response" in runningApp { implicit app =>
+    "return unit for a not found response" in runningApplication { implicit app =>
       stubDelete(notFound)
 
       connector.remove(externalId).futureValue mustBe()
     }
 
-    "return unit for external id that doesn't exist" in runningApp { implicit app =>
+    "return unit for external id that doesn't exist" in runningApplication { implicit app =>
       stubDelete(ok())
 
       connector.remove("unknown-id").futureValue mustBe()

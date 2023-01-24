@@ -1,3 +1,19 @@
+/*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package controllers
 
 import models.NormalMode
@@ -15,40 +31,38 @@ class StartPageControllerSpec extends ControllerBaseSpec {
 
   def onwardRoute = Call("GET", "/foo")
 
-  lazy val onPageLoad = routes.StartPageController.onPageLoad(NormalMode)
-  lazy val onSubmit = routes.StartPageController.onSubmit(NormalMode)
+  val srn = srnGen.sample.value
 
-  def view[A](viewModel: ContentPageViewModel)(implicit app: Application, request: Request[A]) =
-    injected[ContentPageView](app)
+  lazy val onPageLoad = routes.StartPageController.onPageLoad(srn).url
+  lazy val onSubmit = routes.StartPageController.onSubmit(srn).url
 
   "StartPageController" should {
 
-    "return OK and the correct view for a GET" in runningApp { implicit app =>
+    "return OK and the correct view for a GET" in runningApplication { implicit app =>
 
-        val request = FakeRequest(GET, onPageLoad)
+      val view = injected[ContentPageView]
+      val request = FakeRequest(GET, onPageLoad)
 
-        val result = route(app, request).value
+      val result = route(app, request).value
+      val expectedView = view(StartPageController.viewModel(srn))(request, messages(app))
 
-        status(result) mustEqual OK
-
-        contentAsString(result) mustEqual view(StartPageController.viewModel(NormalMode))(app, request).toString
-      }
+      status(result) mustEqual OK
+      contentAsString(result) mustEqual expectedView.toString
     }
 
     "redirect to the next page" in {
 
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+      val fakeNavigatorApplication =
+        applicationBuilder()
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
           )
-          .build()
 
-      running(application) {
-        val request =
-          FakeRequest(GET, onSubmit)
+      running(_ => fakeNavigatorApplication) { app =>
 
-        val result = route(application, request).value
+        val request = FakeRequest(GET, onSubmit)
+
+        val result = route(app, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual onwardRoute.url

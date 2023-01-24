@@ -20,5 +20,5 @@ GET         /account/signed-out                          controllers.auth.Signed
 
 GET         /unauthorised                                controllers.UnauthorisedController.onPageLoad
 
-GET         /:srn/start                                  controllers.StartPageController.onPageLoad
-GET         /:srn/start-next-page                        controllers.StartPageController.onSubmit
+GET         /:srn/start                                  controllers.StartPageController.onPageLoad(srn: Srn)
+GET         /:srn/start-next-page                        controllers.StartPageController.onSubmit(srn: Srn)

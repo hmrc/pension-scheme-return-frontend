@@ -18,24 +18,24 @@ package controllers.actions
 
 import models.UserAnswers
 import models.requests.{DataRequest, OptionalDataRequest}
-import play.api.mvc.{ActionRefiner, Result}
+import play.api.mvc.ActionTransformer
 import repositories.SessionRepository
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class DataCreationActionImpl @Inject()(sessionRepository: SessionRepository)(implicit val executionContext: ExecutionContext) extends DataRequiredAction {
+class DataCreationActionImpl @Inject()(sessionRepository: SessionRepository)(implicit val executionContext: ExecutionContext) extends DataCreationAction {
 
-  override protected def refine[A](request: OptionalDataRequest[A]): Future[Either[Result, DataRequest[A]]] = {
+  override protected def transform[A](request: OptionalDataRequest[A]): Future[DataRequest[A]] = {
 
     request.userAnswers match {
       case None =>
         val userAnswers = UserAnswers(request.getUserId)
-        sessionRepository.set(userAnswers).map(_ => Right(DataRequest(request.request, userAnswers)))
+        sessionRepository.set(userAnswers).map(_ => DataRequest(request.request, userAnswers))
       case Some(data) =>
-        Future.successful(Right(DataRequest(request.request, data)))
+        Future.successful(DataRequest(request.request, data))
     }
   }
 }
 
-trait DataCreationAction extends ActionRefiner[OptionalDataRequest, DataRequest]
+trait DataCreationAction extends ActionTransformer[OptionalDataRequest, DataRequest]

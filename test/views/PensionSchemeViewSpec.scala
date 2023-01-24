@@ -28,7 +28,7 @@ import views.html.PensionSchemeView
 
 class PensionSchemeViewSpec extends BaseSpec with ScalaCheckPropertyChecks with HtmlHelper {
 
-  runningApp { implicit app =>
+  runningApplication { implicit app =>
 
     val view = injected[PensionSchemeView]
 
