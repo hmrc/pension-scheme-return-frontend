@@ -18,7 +18,7 @@ package viewmodels
 
 import play.api.i18n.Messages
 
-class DisplayMessage(key: String, args: List[Any]) {
+case class DisplayMessage(key: String, args: List[Any]) {
 
   def toMessage(implicit messages: Messages): String = messages(key, args: _*)
 }

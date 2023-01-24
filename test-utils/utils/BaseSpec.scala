@@ -27,7 +27,9 @@ import org.scalatest.time.{Millis, Span}
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.{BeforeAndAfterEach, OptionValues}
 import play.api.Application
+import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.test.FakeRequest
 import play.api.test.Helpers.running
 import play.utils.UriEncoding
 
@@ -57,6 +59,8 @@ abstract class BaseSpec extends
         "auditing.enabled" -> false,
         "metric.enabled" -> false
       )
+
+  def messages(app: Application): Messages = app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
 
   protected def injected[A: ClassTag](implicit app: Application): A = app.injector.instanceOf[A]
 

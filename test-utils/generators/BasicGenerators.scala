@@ -19,6 +19,7 @@ package generators
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
 import org.scalacheck.Gen.{alphaNumChar, alphaNumStr, alphaStr, choose, chooseNum, listOfN, nonEmptyListOf}
+import play.api.mvc.Call
 
 import java.time.{Instant, LocalDate, ZoneOffset}
 
@@ -62,7 +63,7 @@ trait BasicGenerators {
     arbitrary[BigDecimal]
       .suchThat(_.abs < Int.MaxValue)
       .suchThat(!_.isValidInt)
-      .map(s => String.format(s.toString, "%f"))
+      .map(_.bigDecimal.toPlainString)
 
   def intsBelowValue(value: Int): Gen[Int] =
     arbitrary[Int] suchThat (_ < value)
@@ -144,4 +145,6 @@ trait BasicGenerators {
 
   val relativeUrl: Gen[String] =
     nonEmptyListOf(nonEmptyString).map(_.mkString("/", "/", "/"))
+
+  val getCall: Gen[Call] = relativeUrl.map(Call("GET", _))
 }
