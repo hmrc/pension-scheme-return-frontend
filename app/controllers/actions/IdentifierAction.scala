@@ -76,7 +76,7 @@ class IdentifierActionImpl @Inject()(
         case _ => Future.successful(Redirect(routes.UnauthorisedController.onPageLoad))
       }
       .recover {
-        case e: NoActiveSession =>
+        case _: NoActiveSession =>
           Redirect(appConfig.urls.loginUrl, Map("continue" -> Seq(appConfig.urls.loginContinueUrl)))
         case _: AuthorisationException =>
           Redirect(appConfig.urls.managePensionsSchemes.registerUrl)

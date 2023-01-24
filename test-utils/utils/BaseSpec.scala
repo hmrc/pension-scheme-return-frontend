@@ -50,7 +50,7 @@ abstract class BaseSpec extends
 
   implicit override val patienceConfig: PatienceConfig =
     PatienceConfig(timeout = scaled(Span(500, Millis)), interval = scaled(Span(50, Millis)))
-  
+
   protected def applicationBuilder: GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
       .configure(

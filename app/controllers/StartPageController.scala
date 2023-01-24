@@ -33,7 +33,6 @@ import scala.concurrent.ExecutionContext
 
 class StartPageController @Inject()(
                                        override val messagesApi: MessagesApi,
-                                       sessionRepository: SessionRepository,
                                        navigator: Navigator,
                                        identify: IdentifierAction,
                                        allowAccess: AllowAccessActionProvider,
