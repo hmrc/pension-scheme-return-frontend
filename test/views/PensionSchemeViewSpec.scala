@@ -17,12 +17,9 @@
 package views
 
 import forms.PensionSchemeForm
-import org.jsoup.Jsoup
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import utils.BaseSpec
-import viewmodels.models.PensionSchemeViewModel
 import views.html.PensionSchemeView
 
 

@@ -50,15 +50,15 @@ abstract class BaseSpec extends
 
   implicit override val patienceConfig: PatienceConfig =
     PatienceConfig(timeout = scaled(Span(500, Millis)), interval = scaled(Span(50, Millis)))
-
-  def messages(app: Application): Messages = app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
-
+  
   protected def applicationBuilder: GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
       .configure(
         "auditing.enabled" -> false,
         "metric.enabled" -> false
       )
+
+  def messages(app: Application): Messages = app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
 
   protected def injected[A: ClassTag](implicit app: Application): A = app.injector.instanceOf[A]
 
