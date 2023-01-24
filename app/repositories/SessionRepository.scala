@@ -24,6 +24,7 @@ import play.api.libs.json.Format
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
+import utils.FutureUtils.FutureOps
 
 import java.time.{Clock, Instant}
 import java.util.concurrent.TimeUnit
@@ -54,14 +55,14 @@ class SessionRepository @Inject()(
 
   private def byId(id: String): Bson = Filters.equal("_id", id)
 
-  def keepAlive(id: String): Future[Boolean] =
+  def keepAlive(id: String): Future[Unit] =
     collection
       .updateOne(
         filter = byId(id),
         update = Updates.set("lastUpdated", Instant.now(clock)),
       )
       .toFuture
-      .map(_ => true)
+      .as(())
 
   def get(id: String): Future[Option[UserAnswers]] =
     keepAlive(id).flatMap {
@@ -71,7 +72,7 @@ class SessionRepository @Inject()(
           .headOption
     }
 
-  def set(answers: UserAnswers): Future[Boolean] = {
+  def set(answers: UserAnswers): Future[Unit] = {
 
     val updatedAnswers = answers copy (lastUpdated = Instant.now(clock))
 
@@ -82,12 +83,12 @@ class SessionRepository @Inject()(
         options     = ReplaceOptions().upsert(true)
       )
       .toFuture
-      .map(_ => true)
+      .as(())
   }
 
-  def clear(id: String): Future[Boolean] =
+  def clear(id: String): Future[Unit] =
     collection
       .deleteOne(byId(id))
       .toFuture
-      .map(_ => true)
+      .as(())
 }

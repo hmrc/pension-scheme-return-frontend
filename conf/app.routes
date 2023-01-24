@@ -19,3 +19,6 @@ GET         /account/sign-out                            controllers.auth.AuthCo
 GET         /account/signed-out                          controllers.auth.SignedOutController.onPageLoad
 
 GET         /unauthorised                                controllers.UnauthorisedController.onPageLoad
+
+GET         /:srn/start                                  controllers.StartPageController.onPageLoad
+GET         /:srn/start-next-page                        controllers.StartPageController.onSubmit
