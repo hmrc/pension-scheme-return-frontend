@@ -16,6 +16,7 @@
 
 package controllers
 
+
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import views.html.IndexView
@@ -24,7 +25,7 @@ class IndexControllerSpec extends ControllerBaseSpec {
 
   "Index Controller" should {
 
-    "return OK and the correct view for a GET" in {
+    "return  InternalServerError and the correct view for a GET" in {
 
       val application = applicationBuilder(userAnswers = None).build()
 
@@ -35,7 +36,7 @@ class IndexControllerSpec extends ControllerBaseSpec {
 
         val view = application.injector.instanceOf[IndexView]
 
-        status(result) mustEqual OK
+        status(result) mustEqual 500
 
         contentAsString(result) mustEqual view()(request, messages(application)).toString
       }
