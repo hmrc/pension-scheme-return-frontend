@@ -1,7 +1,7 @@
 package controllers
 
 import base.SpecBase
-import forms.$className$FormProvider
+import forms.$viewName$FormProvider
 import models.{NormalMode, $className$, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
@@ -13,6 +13,7 @@ import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
+import viewModel.$viewName$ViewModel
 import views.html.$className$View
 
 import scala.concurrent.Future
@@ -24,7 +25,7 @@ class $className$ControllerSpec extends ControllerBaseSpec with MockitoSugar {
   lazy val $className;format="decap"$Route = routes.$className$Controller.onPageLoad(NormalMode).url
 
   val formProvider = new $viewName$FormProvider()
-  val viewModel = ???
+  val viewModel: $viewName$ViewModel = ???
   val form = formProvider()
 
   "$className$ Controller" - {
@@ -55,7 +56,7 @@ class $className$ControllerSpec extends ControllerBaseSpec with MockitoSugar {
       running(application) {
         val request = FakeRequest(GET, $className;format="decap"$Route)
 
-        val view = application.injector.instanceOf[$className$View]
+        val view = application.injector.instanceOf[$viewName$View]
 
         val result = route(application, request).value
 
@@ -101,7 +102,7 @@ class $className$ControllerSpec extends ControllerBaseSpec with MockitoSugar {
 
         val boundForm = form.bind(Map("value" -> "invalid value"))
 
-        val view = application.injector.instanceOf[$className$View]
+        val view = application.injector.instanceOf[$viewName$View]
 
         val result = route(application, request).value
 

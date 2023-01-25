@@ -4,13 +4,16 @@ import controllers.actions._
 import forms.$className$FormProvider
 import javax.inject.Inject
 import models.Mode
+import models.SchemeId.Srn
 import navigation.Navigator
 import pages.$className$Page
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
+import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.$className$View
+import viewmodels.$viewName$ViewModel
+import views.html.$viewName$View
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -19,7 +22,7 @@ class $className$Controller @Inject()(
                                         saveService: SaveService,
                                         navigator: Navigator,
                                         identify: IdentifierAction,
-                                        allowAccessActionProvider: AllowAccessActionProvider,
+                                        allowAccess: AllowAccessActionProvider,
                                         getData: DataRetrievalAction,
                                         requireData: DataRequiredAction,
                                         formProvider: $viewName$FormProvider,
@@ -29,7 +32,7 @@ class $className$Controller @Inject()(
 
   val form = formProvider()
 
-  def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = (identify andThen AllowAccess(srn) andThen getData andThen requireData) {
+  def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = (identify andThen allowAccess(srn) andThen getData andThen requireData) {
     implicit request =>
 
       val preparedForm = request.userAnswers.get($className$Page) match {
