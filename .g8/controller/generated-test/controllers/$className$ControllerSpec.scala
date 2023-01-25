@@ -13,7 +13,7 @@ import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
-import viewModel.$viewName$ViewModel
+import viewModel.models.$viewName$ViewModel
 import views.html.$className$View
 
 import scala.concurrent.Future

@@ -12,7 +12,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.$viewName$ViewModel
+import viewmodels.models.$viewName$ViewModel
 import views.html.$viewName$View
 
 import scala.concurrent.{ExecutionContext, Future}
