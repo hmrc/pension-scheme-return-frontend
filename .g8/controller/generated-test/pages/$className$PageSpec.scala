@@ -1,6 +1,5 @@
 package pages
 
-import models.$className$
 import pages.behaviours.PageBehaviours
 
 class $className$PageSpec extends PageBehaviours {

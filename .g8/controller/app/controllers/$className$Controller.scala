@@ -1,7 +1,7 @@
 package controllers
 
 import controllers.actions._
-import forms.$className$FormProvider
+import forms.$viewName$FormProvider
 import javax.inject.Inject
 import models.Mode
 import models.SchemeId.Srn

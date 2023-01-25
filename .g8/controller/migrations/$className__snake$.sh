@@ -20,7 +20,7 @@ awk '/trait UserAnswersEntryGenerators/ {\
     print "    Arbitrary {";\
     print "      for {";\
     print "        page  <- arbitrary[$className$Page.type]";\
-    print "        value <- arbitrary[$className$].map(Json.toJson(_))";\
+    print "        value <- arbitrary[???].map(Json.toJson(_))";\
     print "      } yield (page, value)";\
     print "    }";\
     next }1' ../test-utils/generators/UserAnswersEntryGenerators.scala > tmp && mv tmp ../test-utils/generators/UserAnswersEntryGenerators.scala

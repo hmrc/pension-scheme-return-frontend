@@ -1,8 +1,7 @@
 package controllers
 
-import base.SpecBase
 import forms.$viewName$FormProvider
-import models.{NormalMode, $className$, UserAnswers}
+import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -12,9 +11,9 @@ import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import repositories.SessionRepository
 import viewModel.models.$viewName$ViewModel
-import views.html.$className$View
+import services.SaveService
+import views.html.$viewName$View
 
 import scala.concurrent.Future
 
