@@ -14,23 +14,22 @@
  * limitations under the License.
  */
 
-package viewmodels.models
+package viewmodels.govuk
 
-import play.api.mvc.Call
-import viewmodels.DisplayMessage._
+import play.twirl.api.Html
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{Content, HtmlContent}
+import uk.gov.hmrc.govukfrontend.views.viewmodels.insettext.InsetText
+import viewmodels.ErrorMessageAwareness
 
+object insettext extends InsetTextFluency
 
-case class PensionSchemeViewModel(
-                                   title: SimpleMessage,
-                                   heading: SimpleMessage,
-                                   onSubmit : Call
-                                 )
+trait InsetTextFluency {
 
-object PensionSchemeViewModel {
-  def apply(title: String, heading: String, onSubmit: Call): PensionSchemeViewModel =
-    apply(
-      SimpleMessage(title),
-      SimpleMessage(heading),
-      onSubmit
-    )
+  object InsetTextViewModel extends ErrorMessageAwareness {
+    def apply(content: Content): InsetText =
+      InsetText(content = content)
+
+    def apply(html: Html): InsetText =
+      apply(HtmlContent(html))
+  }
 }

@@ -14,23 +14,8 @@
  * limitations under the License.
  */
 
-package viewmodels.models
+package pages
 
-import play.api.mvc.Call
-import viewmodels.DisplayMessage._
+import models.SchemeId.Srn
 
-
-case class PensionSchemeViewModel(
-                                   title: SimpleMessage,
-                                   heading: SimpleMessage,
-                                   onSubmit : Call
-                                 )
-
-object PensionSchemeViewModel {
-  def apply(title: String, heading: String, onSubmit: Call): PensionSchemeViewModel =
-    apply(
-      SimpleMessage(title),
-      SimpleMessage(heading),
-      onSubmit
-    )
-}
+case class SchemeDetailsPage(srn: Srn) extends Page

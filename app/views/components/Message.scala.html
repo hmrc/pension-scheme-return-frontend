@@ -1,4 +1,4 @@
-/*
+@*
  * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,25 +12,24 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *@
 
-package viewmodels.models
+@import utils.ListUtils._
+@import ComplexMessageElement._
+@import DisplayMessage._
 
-import play.api.mvc.Call
-import viewmodels.DisplayMessage._
+@this()
 
+@(message: DisplayMessage)(implicit messages: Messages)
 
-case class PensionSchemeViewModel(
-                                   title: SimpleMessage,
-                                   heading: SimpleMessage,
-                                   onSubmit : Call
-                                 )
+@{message match {
+  case SimpleMessage(key, args) => HtmlFormat.raw(messages(key, args))
+  case ComplexMessage(elems, delim) => elems.map{
+    case Message(key, args) => HtmlFormat.raw(messages(key, args))
+    case LinkedMessage(key, url, args) => <a href={url}>{messages(key, args)}</a>
+  }.intersperse(delim match {
+      case Delimiter.SingleSpace => HtmlFormat.raw(" ")
+      case Delimiter.Newline => HtmlFormat.raw("<br>")
+  })
+}}
 
-object PensionSchemeViewModel {
-  def apply(title: String, heading: String, onSubmit: Call): PensionSchemeViewModel =
-    apply(
-      SimpleMessage(title),
-      SimpleMessage(heading),
-      onSubmit
-    )
-}

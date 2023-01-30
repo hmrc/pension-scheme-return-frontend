@@ -22,6 +22,7 @@ import models.PensionSchemeId.{PsaId, PspId}
 import models.SchemeId.Srn
 import models.{SchemeDetails, SchemeId}
 import play.api.Logger
+import play.api.libs.json.JsObject
 import uk.gov.hmrc.http.HttpReads.Implicits.{readFromJson, readOptionOfNotFound}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import utils.FutureUtils.FutureOps

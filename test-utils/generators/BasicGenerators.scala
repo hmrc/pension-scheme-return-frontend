@@ -20,6 +20,7 @@ import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
 import org.scalacheck.Gen.{alphaNumChar, alphaNumStr, alphaStr, choose, chooseNum, listOfN, nonEmptyListOf}
 import play.api.mvc.Call
+import viewmodels.DisplayMessage.SimpleMessage
 
 import java.time.{Instant, LocalDate, ZoneOffset}
 
@@ -121,6 +122,14 @@ trait BasicGenerators {
         Instant.ofEpochMilli(millis).atOffset(ZoneOffset.UTC).toLocalDate
     }
   }
+
+  val nonEmptySimpleMessage: Gen[SimpleMessage] = nonEmptyString.map(SimpleMessage(_))
+
+  def tupleOf[A, B](genA: Gen[A], genB: Gen[B]): Gen[(A, B)] =
+    for {
+      a <- genA
+      b <- genB
+    } yield a -> b
 
   val boolean: Gen[Boolean] =
     Gen.oneOf(true, false)

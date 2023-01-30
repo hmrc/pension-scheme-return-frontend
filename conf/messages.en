@@ -10,6 +10,7 @@ site.start = Start now
 site.startAgain = Start again
 site.signIn = Sign in
 site.govuk = GOV.UK
+site.saveAndContinue = Save and continue
 
 date.day = Day
 date.month = Month
@@ -63,4 +64,12 @@ startPage.paragraph2 = You should only use this service if you have received a n
 startPage.paragraph3 = You must submit the return by the deadline given on the notice to file. You will be charged a £100 penalty if it is not received by the deadline.
 startPage.paragraph4 = You do not have to complete the whole return at once. You can save your answers and come back to them later.
 
-
+schemeDetails.title = Check your scheme details
+schemeDetails.heading = Check your scheme details
+schemeDetails.inset = These are the details we have on record for this scheme. If you want to change anything or select another scheme, you can
+schemeDetails.inset.link = go back to your Managing Pension Schemes dashboard.
+schemeDetails.row1 = Pension Scheme Tax Reference (PSTR)
+schemeDetails.row2 = Scheme name
+schemeDetails.row3 = Scheme type
+schemeDetails.row4 = Scheme establisher name
+schemeDetails.row5 = Other scheme establisher name(s)

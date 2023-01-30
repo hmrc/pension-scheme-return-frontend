@@ -66,13 +66,21 @@ trait ModelGenerators extends BasicGenerators {
   val schemeStatusGen: Gen[SchemeStatus] =
     Gen.oneOf(validSchemeStatusGen, invalidSchemeStatusGen)
 
+  val establisherGen: Gen[Establisher] =
+    for {
+      name <- Gen.listOfN(3, nonEmptyString).map(_.mkString(" "))
+      kind <- Gen.oneOf(EstablisherKind.Company, EstablisherKind.Individual, EstablisherKind.Partnership)
+    } yield Establisher(name, kind)
+
   val schemeDetailsGen: Gen[SchemeDetails] =
     for {
       name <- nonEmptyString
       pstr <- nonEmptyString
       status <- schemeStatusGen
+      schemeType <- nonEmptyString
       authorisingPsa <- Gen.option(nonEmptyString)
-    } yield SchemeDetails(name, pstr, status, authorisingPsa)
+      establishers <- Gen.listOf(establisherGen)
+    } yield SchemeDetails(name, pstr, status, schemeType, authorisingPsa, establishers)
 
   val pensionSchemeUserGen: Gen[PensionSchemeUser] =
     Gen.oneOf(Administrator, Practitioner)
