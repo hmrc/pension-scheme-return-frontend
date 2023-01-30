@@ -69,12 +69,6 @@ class SchemeDetailsController @Inject()(
         Some(("schemeDetails.row5", ComplexMessage(others.map(other => Message(other.name)), Delimiter.Newline)))
     }
 
-    val schemeDetailsRows = List(
-      "schemeDetails.row1" -> schemeDetails.pstr,
-      "schemeDetails.row2" -> schemeDetails.schemeName,
-      "schemeDetails.row3" -> schemeDetails.schemeType.capitalize
-    )
-
     ContentTablePageViewModel(
       title = "schemeDetails.title",
       heading = "schemeDetails.heading",
