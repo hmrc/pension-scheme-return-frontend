@@ -35,7 +35,4 @@ trait ImplicitConversions {
 
   implicit def stringToSimpleMessage(string: String): SimpleMessage =
     SimpleMessage(string)
-
-  implicit def listStringToSimpleMessage(list: List[(String, String)]): List[(SimpleMessage, SimpleMessage)] =
-    list.map{ case (first, second) => SimpleMessage(first) -> SimpleMessage(second)}
 }
