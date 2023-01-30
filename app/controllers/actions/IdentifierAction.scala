@@ -36,7 +36,7 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 @ImplementedBy(classOf[IdentifierActionImpl])
-trait  IdentifierAction extends ActionBuilder[IdentifierRequest, AnyContent]
+trait IdentifierAction extends ActionBuilder[IdentifierRequest, AnyContent]
 
 class IdentifierActionImpl @Inject()(
   appConfig: FrontendAppConfig,

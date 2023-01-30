@@ -18,11 +18,9 @@ package viewmodels
 
 import play.api.i18n.Messages
 
-// todo rename this to DisplayMessage
 sealed trait DisplayMessage
 
 object DisplayMessage {
-  // todo rename to SimpleMessage
   case class SimpleMessage(key: String, args: List[Any]) extends DisplayMessage {
     def toMessage(implicit messages: Messages): String = messages(key, args: _*)
   }
