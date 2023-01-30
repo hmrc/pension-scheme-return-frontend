@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-package generators
+package controllers.actions
 
-import org.scalacheck.Shrink
+import models.UserAnswers
+import models.requests.{AllowedAccessRequest, DataRequest, OptionalDataRequest}
 
-trait Generators
-  extends UserAnswersGenerator
-    with PageGenerators
-    with ModelGenerators
-    with UserAnswersEntryGenerators
-    with ViewModelGenerators {
+import scala.concurrent.{ExecutionContext, Future}
 
-  implicit val dontShrinkString: Shrink[String] = Shrink.shrinkAny
-  implicit def dontShrinkList[T]: Shrink[List[T]] = Shrink.shrinkAny
+class FakeDataCreationAction(dataToReturn: UserAnswers) extends DataCreationAction {
+
+  override protected def transform[A](request: OptionalDataRequest[A]): Future[DataRequest[A]] =
+    Future(DataRequest(request.request, dataToReturn))
+
+  override protected implicit val executionContext: ExecutionContext =
+    scala.concurrent.ExecutionContext.Implicits.global
 }

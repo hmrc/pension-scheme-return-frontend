@@ -27,13 +27,11 @@ class PensionSchemeFormSpec extends IntFieldBehaviours {
 
   ".value" - {
 
-    val validData = datesBetween(
-      min = LocalDate.of(2000, 1, 1),
-      max = LocalDate.now(ZoneOffset.UTC)
+    behave like intField(
+      form,
+      "value",
+      FormError("value","pensionScheme.error.nonNumeric"),
+      FormError("value","pensionScheme.error.wholeNumber")
     )
-
-    behave like intField(form, "value", FormError("value","pensionScheme.error.nonNumeric"),FormError("value","pensionScheme.error.wholeNumber"))
-
-//    behave like mandatoryDateField(form, "value", "datePage.error.required.all")
   }
 }

@@ -95,7 +95,7 @@ class IdentifierActionSpec extends BaseSpec with StubPlayBodyParsersFactory {
   "IdentifierAction" should {
     "return an unauthorised result" when {
 
-      "Redirect user to sign in page when user is not signed in to GG" in runningApp {
+      "Redirect user to sign in page when user is not signed in to GG" in runningApplication {
         implicit app =>
 
           setAuthValue(Future.failed(new NoActiveSession("No user signed in") {}))
@@ -107,7 +107,7 @@ class IdentifierActionSpec extends BaseSpec with StubPlayBodyParsersFactory {
           redirectLocation(result) mustBe Some(expectedUrl)
       }
 
-      "Redirect user to manage pension scheme when authorise fails to match predicate" in runningApp {
+      "Redirect user to manage pension scheme when authorise fails to match predicate" in runningApplication {
         implicit app =>
 
           setAuthValue(Future.failed(new AuthorisationException("Authorise predicate fails") {}))
@@ -118,7 +118,7 @@ class IdentifierActionSpec extends BaseSpec with StubPlayBodyParsersFactory {
           redirectLocation(result) mustBe Some(expectedUrl)
       }
 
-      "Redirect to unauthorised page when user does not have an external id" in runningApp {
+      "Redirect to unauthorised page when user does not have an external id" in runningApplication {
         implicit app =>
 
           setAuthValue(authResult(Some("id"), None, psaEnrolment))
@@ -129,7 +129,7 @@ class IdentifierActionSpec extends BaseSpec with StubPlayBodyParsersFactory {
           redirectLocation(result) mustBe Some(expectedUrl)
       }
 
-      "Redirect to unauthorised page when user does not have an internal id" in runningApp {
+      "Redirect to unauthorised page when user does not have an internal id" in runningApplication {
         implicit app =>
 
           setAuthValue(authResult(None, Some("id"), psaEnrolment))
@@ -140,7 +140,7 @@ class IdentifierActionSpec extends BaseSpec with StubPlayBodyParsersFactory {
           redirectLocation(result) mustBe Some(expectedUrl)
       }
 
-      "Redirect user to manage pension scheme when user does not have a psa or psp enrolment" in runningApp {
+      "Redirect user to manage pension scheme when user does not have a psa or psp enrolment" in runningApplication {
         implicit app =>
 
           setAuthValue(authResult(Some("internalId"), Some("externalId")))
@@ -152,7 +152,7 @@ class IdentifierActionSpec extends BaseSpec with StubPlayBodyParsersFactory {
       }
 
       "Redirect user to admin or practitioner page" when {
-        "user has both psa and psp enrolment but nothing is in the cache" in runningApp { implicit app =>
+        "user has both psa and psp enrolment but nothing is in the cache" in runningApplication { implicit app =>
 
           setAuthValue(authResult(Some("internalId"), Some("externalId"), psaEnrolment, pspEnrolment))
           setSessionValue(None)
@@ -166,7 +166,7 @@ class IdentifierActionSpec extends BaseSpec with StubPlayBodyParsersFactory {
     }
 
     "return an IdentifierRequest" when {
-      "User has a psa enrolment" in runningApp { implicit app =>
+      "User has a psa enrolment" in runningApplication { implicit app =>
 
         setAuthValue(authResult(Some("internalId"), Some("externalId"), psaEnrolment))
 
@@ -179,7 +179,7 @@ class IdentifierActionSpec extends BaseSpec with StubPlayBodyParsersFactory {
         (contentAsJson(result) \ "externalId").asOpt[String] mustBe Some("externalId")
       }
 
-      "User has a psp enrolment" in runningApp { implicit app =>
+      "User has a psp enrolment" in runningApplication { implicit app =>
 
         setAuthValue(authResult(Some("internalId"), Some("externalId"), pspEnrolment))
 
@@ -192,7 +192,7 @@ class IdentifierActionSpec extends BaseSpec with StubPlayBodyParsersFactory {
         (contentAsJson(result) \ "externalId").asOpt[String] mustBe Some("externalId")
       }
 
-      "User has a both psa and psp enrolment with admin stored in cache" in runningApp { implicit app =>
+      "User has a both psa and psp enrolment with admin stored in cache" in runningApplication { implicit app =>
 
         setAuthValue(authResult(Some("internalId"), Some("externalId"), psaEnrolment, pspEnrolment))
         setSessionValue(Some(SessionData(Administrator)))
@@ -206,7 +206,7 @@ class IdentifierActionSpec extends BaseSpec with StubPlayBodyParsersFactory {
         (contentAsJson(result) \ "externalId").asOpt[String] mustBe Some("externalId")
       }
 
-      "User has a both psa and psp enrolment with practitioner stored in cache" in runningApp { implicit app =>
+      "User has a both psa and psp enrolment with practitioner stored in cache" in runningApplication { implicit app =>
 
         setAuthValue(authResult(Some("internalId"), Some("externalId"), psaEnrolment, pspEnrolment))
         setSessionValue(Some(SessionData(Practitioner)))

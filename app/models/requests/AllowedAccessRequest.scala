@@ -19,4 +19,7 @@ package models.requests
 import models.SchemeDetails
 import play.api.mvc.WrappedRequest
 
-case class AllowedAccessRequest[A](request: IdentifierRequest[A], schemeDetails: SchemeDetails) extends WrappedRequest[A](request)
+case class AllowedAccessRequest[A](request: IdentifierRequest[A], schemeDetails: SchemeDetails) extends WrappedRequest[A](request) {
+
+  def getUserId: String = request.getUserId
+}

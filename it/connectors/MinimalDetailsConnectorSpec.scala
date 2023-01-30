@@ -17,14 +17,13 @@
 package connectors
 
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder
-import com.github.tomakehurst.wiremock.client.WireMock.{badRequest, equalTo, forbidden, get, notFound, ok, urlEqualTo}
+import com.github.tomakehurst.wiremock.client.WireMock._
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import config.Constants
 import connectors.MinimalDetailsError.{DelimitedAdmin, DetailsNotFound}
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
-import play.api.test.Helpers.running
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -52,7 +51,7 @@ class MinimalDetailsConnectorSpec extends BaseConnectorSpec {
 
   "fetch" should {
 
-    "return psa minimal details" in runningApp { implicit app =>
+    "return psa minimal details" in runningApplication { implicit app =>
 
       val md = minimalDetailsGen.sample.value
       stubGet("psaId", psaId.value, ok(Json.stringify(Json.toJson(md))))
@@ -62,7 +61,7 @@ class MinimalDetailsConnectorSpec extends BaseConnectorSpec {
       result mustBe Right(md)
     }
 
-    "return psp minimal details" in runningApp { implicit app =>
+    "return psp minimal details" in runningApplication { implicit app =>
 
       val md = minimalDetailsGen.sample.value
       stubGet("pspId", pspId.value, ok(Json.stringify(Json.toJson(md))))
@@ -72,7 +71,7 @@ class MinimalDetailsConnectorSpec extends BaseConnectorSpec {
       result mustBe Right(md)
     }
 
-    "return a details not found when 404 returned with message" in runningApp { implicit app =>
+    "return a details not found when 404 returned with message" in runningApplication { implicit app =>
 
       stubGet("psaId", psaId.value, notFound.withBody(Constants.detailsNotFound))
 
@@ -81,7 +80,7 @@ class MinimalDetailsConnectorSpec extends BaseConnectorSpec {
       result mustBe Left(DetailsNotFound)
     }
 
-    "return a delimited admin error when forbidden with delimited admin error returned" in runningApp { implicit app =>
+    "return a delimited admin error when forbidden with delimited admin error returned" in runningApplication { implicit app =>
 
       val body = stringContains(Constants.delimitedPSA).sample.value
 
@@ -92,7 +91,7 @@ class MinimalDetailsConnectorSpec extends BaseConnectorSpec {
       result mustBe Left(DelimitedAdmin)
     }
 
-    "fail future when a 404 returned" in runningApp { implicit app =>
+    "fail future when a 404 returned" in runningApplication { implicit app =>
       stubGet("psaId", psaId.value, notFound)
 
       assertThrows[Exception] {
@@ -100,7 +99,7 @@ class MinimalDetailsConnectorSpec extends BaseConnectorSpec {
       }
     }
 
-    "fail future for any other http failure code" in runningApp { implicit app =>
+    "fail future for any other http failure code" in runningApplication { implicit app =>
       stubGet("psaId", psaId.value, badRequest)
 
       assertThrows[Exception] {

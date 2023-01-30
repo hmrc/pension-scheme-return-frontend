@@ -14,17 +14,20 @@
  * limitations under the License.
  */
 
-package generators
+package services
 
-import org.scalacheck.Shrink
+import models.UserAnswers
+import repositories.SessionRepository
+import uk.gov.hmrc.http.HeaderCarrier
 
-trait Generators
-  extends UserAnswersGenerator
-    with PageGenerators
-    with ModelGenerators
-    with UserAnswersEntryGenerators
-    with ViewModelGenerators {
+import javax.inject.Inject
+import scala.concurrent.{ExecutionContext, Future}
 
-  implicit val dontShrinkString: Shrink[String] = Shrink.shrinkAny
-  implicit def dontShrinkList[T]: Shrink[List[T]] = Shrink.shrinkAny
+class SaveServiceImpl @Inject()(sessionRepository: SessionRepository)(implicit ec: ExecutionContext) extends SaveService {
+  override def save(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[Unit] =
+    sessionRepository.set(userAnswers)
+}
+
+trait SaveService {
+  def save(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[Unit]
 }

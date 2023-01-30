@@ -14,17 +14,8 @@
  * limitations under the License.
  */
 
-package generators
+package pages
 
-import org.scalacheck.Shrink
+import models.SchemeId.Srn
 
-trait Generators
-  extends UserAnswersGenerator
-    with PageGenerators
-    with ModelGenerators
-    with UserAnswersEntryGenerators
-    with ViewModelGenerators {
-
-  implicit val dontShrinkString: Shrink[String] = Shrink.shrinkAny
-  implicit def dontShrinkList[T]: Shrink[List[T]] = Shrink.shrinkAny
-}
+case class StartPage(srn: Srn) extends Page

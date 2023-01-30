@@ -48,7 +48,7 @@ class SessionRepositorySpec
       val setResult     = repository.set(userAnswers).futureValue
       val updatedRecord = find(Filters.equal("_id", userAnswers.id)).futureValue.headOption.value
 
-      setResult mustEqual true
+      setResult mustEqual ()
       updatedRecord mustEqual expectedResult
     }
   }
@@ -85,14 +85,14 @@ class SessionRepositorySpec
 
       val result = repository.clear(userAnswers.id).futureValue
 
-      result mustEqual true
+      result mustEqual ()
       repository.get(userAnswers.id).futureValue must not be defined
     }
 
-    "must return true when there is no record to remove" in {
+    "must return unit when there is no record to remove" in {
       val result = repository.clear("id that does not exist").futureValue
 
-      result mustEqual true
+      result mustEqual ()
     }
   }
 
@@ -100,7 +100,7 @@ class SessionRepositorySpec
 
     "when there is a record for this id" - {
 
-      "must update its lastUpdated to `now` and return true" in {
+      "must update its lastUpdated to `now` and return unit" in {
 
         insert(userAnswers).futureValue
 
@@ -108,7 +108,7 @@ class SessionRepositorySpec
 
         val expectedUpdatedAnswers = userAnswers copy (lastUpdated = instant)
 
-        result mustEqual true
+        result mustEqual ()
         val updatedAnswers = find(Filters.equal("_id", userAnswers.id)).futureValue.headOption.value
         updatedAnswers mustEqual expectedUpdatedAnswers
       }
@@ -116,9 +116,9 @@ class SessionRepositorySpec
 
     "when there is no record for this id" - {
 
-      "must return true" in {
+      "must return unit" in {
 
-        repository.keepAlive("id that does not exist").futureValue mustEqual true
+        repository.keepAlive("id that does not exist").futureValue mustEqual ()
       }
     }
   }
