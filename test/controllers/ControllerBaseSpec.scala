@@ -53,12 +53,15 @@ trait ControllerBaseSpec
     List(Establisher("testFirstName testLastName", EstablisherKind.Individual))
   )
 
-  protected def applicationBuilder(userAnswers: Option[UserAnswers] = None): GuiceApplicationBuilder =
+  protected def applicationBuilder(
+                                    userAnswers: Option[UserAnswers] = None,
+                                    schemeDetails: SchemeDetails = defaultSchemeDetails
+                                  ): GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
       .overrides(
         bind[DataRequiredAction].to[DataRequiredActionImpl],
         bind[IdentifierAction].to[FakeIdentifierAction],
-        bind[AllowAccessActionProvider].toInstance(new FakeAllowAccessActionProvider(defaultSchemeDetails)),
+        bind[AllowAccessActionProvider].toInstance(new FakeAllowAccessActionProvider(schemeDetails)),
         bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers)),
         bind[DataCreationAction].toInstance(new FakeDataCreationAction(userAnswers.getOrElse(emptyUserAnswers)))
       )

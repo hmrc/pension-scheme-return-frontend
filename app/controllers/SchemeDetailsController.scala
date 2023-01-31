@@ -56,7 +56,7 @@ class SchemeDetailsController @Inject()(
       Redirect(navigator.nextPage(SchemeDetailsPage(srn), NormalMode, request.userAnswers))
   }
 
-  private val linkUrl = s"${config.managePensions.baseUrl}/manage-pension-schemes/overview"
+  private val linkUrl = s"${config.urls.managePensionsSchemes.baseUrl}/overview"
 
   protected[controllers] def viewModel(srn: Srn, schemeDetails: SchemeDetails): ContentTablePageViewModel = {
 

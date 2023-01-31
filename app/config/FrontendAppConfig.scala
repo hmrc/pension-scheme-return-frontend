@@ -49,7 +49,6 @@ class FrontendAppConfig @Inject() (config: Configuration) {
 
   val pensionsAdministrator: Service = config.get[Service]("microservice.services.pensionAdministrator")
   val pensionsScheme: Service        = config.get[Service]("microservice.services.pensionsScheme")
-  val managePensions: Service        = config.get[Service]("microservice.services.managePensions")
 
   object features {
     val welshTranslation: Boolean = config.get[Boolean]("features.welsh-translation")

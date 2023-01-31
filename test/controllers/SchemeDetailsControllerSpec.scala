@@ -16,6 +16,7 @@
 
 package controllers
 
+import models.{Establisher, EstablisherKind}
 import navigation.{FakeNavigator, Navigator}
 import play.api.inject.bind
 import play.api.mvc.Call
@@ -31,21 +32,49 @@ class SchemeDetailsControllerSpec extends ControllerBaseSpec {
   lazy val onPageLoad = routes.SchemeDetailsController.onPageLoad(srn).url
   lazy val onSubmit = routes.SchemeDetailsController.onSubmit(srn).url
 
-  lazy implicit val app = applicationBuilder(Some(userAnswers)).build()
+  lazy val app = applicationBuilder(Some(userAnswers))
+
+  private val schemeDetailsTwoEstablishers = defaultSchemeDetails.copy(establishers =
+    List(
+      Establisher("testFirstName testLastName", EstablisherKind.Partnership),
+      Establisher("testFirstName2 testLastName2", EstablisherKind.Partnership)
+    )
+  )
+
+  private val schemeDetailsThreeEstablishers = defaultSchemeDetails.copy(establishers =
+    List(
+      Establisher("testFirstName testLastName", EstablisherKind.Partnership),
+      Establisher("testFirstName2 testLastName2", EstablisherKind.Partnership),
+      Establisher("testFirstName3 testLastName3", EstablisherKind.Partnership)
+    )
+  )
 
   "SchemeDetailsController" should {
 
-    "return OK and the correct view for a GET" in running(app) {
+    "return OK and the correct view for a GET" when {
+      List(
+        ("a single establisher", defaultSchemeDetails),
+        ("two establishers", schemeDetailsTwoEstablishers),
+        ("three establishers", schemeDetailsThreeEstablishers)
+      ).foreach { case (testName, schemeDetails) =>
+        s"scheme details contains $testName" in {
 
-      val view = injected[ContentTablePageView]
-      val controller = injected[SchemeDetailsController]
-      val request = FakeRequest(GET, onPageLoad)
+          val app = applicationBuilder(Some(userAnswers), schemeDetails)
 
-      val result = route(app, request).value
-      val expectedView = view(controller.viewModel(srn, defaultSchemeDetails))(request, messages(app))
+          running(_ => app) { implicit app =>
 
-      status(result) mustEqual OK
-      contentAsString(result) mustEqual expectedView.toString
+            val view = injected[ContentTablePageView]
+            val controller = injected[SchemeDetailsController]
+            val request = FakeRequest(GET, onPageLoad)
+
+            val result = route(app, request).value
+            val expectedView = view(controller.viewModel(srn, schemeDetails))(request, messages(app))
+
+            status(result) mustEqual OK
+            contentAsString(result) mustEqual expectedView.toString
+          }
+        }
+      }
     }
 
     "redirect to the next page" in {
