@@ -146,5 +146,11 @@ trait BasicGenerators {
   val relativeUrl: Gen[String] =
     nonEmptyListOf(nonEmptyString).map(_.mkString("/", "/", "/"))
 
-  val getCall: Gen[Call] = relativeUrl.map(Call("GET", _))
+  val httpMethod: Gen[String] = Gen.oneOf("GET", "POST")
+  val call: Gen[Call] = {
+    for {
+      method <- httpMethod
+      url    <- relativeUrl
+    } yield Call(method, url)
+  }
 }

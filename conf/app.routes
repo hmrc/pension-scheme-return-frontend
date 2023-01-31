@@ -22,3 +22,9 @@ GET         /unauthorised                                controllers.Unauthorise
 
 GET         /:srn/start                                  controllers.StartPageController.onPageLoad(srn: Srn)
 GET         /:srn/start-next-page                        controllers.StartPageController.onSubmit(srn: Srn)
+
+GET         /checkReturnDates                            controllers.CheckReturnDatesController.onPageLoad(mode: Mode = NormalMode)
+POST        /checkReturnDates                            controllers.CheckReturnDatesController.onSubmit(mode: Mode = NormalMode)
+
+GET         /changeCheckReturnDates                      controllers.CheckReturnDatesController.onPageLoad(mode: Mode = CheckMode)
+POST        /changeCheckReturnDates                      controllers.CheckReturnDatesController.onSubmit(mode: Mode = CheckMode)

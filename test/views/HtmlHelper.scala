@@ -35,6 +35,15 @@ trait HtmlHelper {
   def p(html: Html): List[String] =
     mainContent(html).getElementsByTag("p").iterator().asScala.map(_.text()).toList
 
+  def legend(html: Html): List[String] =
+    mainContent(html).getElementsByTag("legend").iterator().asScala.map(_.text()).toList
+
+  def radios(html: Html): List[Element] =
+    mainContent(html).select("input[type=radio]").iterator().asScala.toList
+
+  def labels(html: Html): List[String] =
+    mainContent(html).getElementsByTag("label").iterator().asScala.map(_.text()).toList
+
   def button(html: Html): Element =
     mainContent(html).getElementsByTag("button").first()
 

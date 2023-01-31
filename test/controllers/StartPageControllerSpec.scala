@@ -44,7 +44,7 @@ class StartPageControllerSpec extends ControllerBaseSpec {
       val request = FakeRequest(GET, onPageLoad)
 
       val result = route(app, request).value
-      val expectedView = view(StartPageController.viewModel(srn))(request, messages(app))
+      val expectedView = view(StartPageController.viewModel(srn))(request, createMessages(app))
 
       status(result) mustEqual OK
       contentAsString(result) mustEqual expectedView.toString

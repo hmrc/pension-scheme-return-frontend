@@ -14,13 +14,32 @@
  * limitations under the License.
  */
 
-package generators
+package forms
 
-import org.scalacheck.Arbitrary
-import pages._
+import forms.behaviours.BooleanFieldBehaviours
+import play.api.data.FormError
 
-trait PageGenerators {
+class YesNoPageFormProviderSpec extends BooleanFieldBehaviours {
 
-  implicit lazy val arbitraryCheckReturnDatesPage: Arbitrary[CheckReturnDatesPage.type] =
-    Arbitrary(CheckReturnDatesPage)
+  val requiredKey = "yesNoPage.error.required"
+  val invalidKey = "yesNoPage.error.invalid"
+
+  val form = new YesNoPageFormProvider()(requiredKey, invalidKey)
+
+  ".value" - {
+
+    val fieldName = "value"
+
+    behave like booleanField(
+      form,
+      fieldName,
+      FormError(fieldName, invalidKey)
+    )
+
+    behave like mandatoryField(
+      form,
+      fieldName,
+      FormError(fieldName, requiredKey)
+    )
+  }
 }

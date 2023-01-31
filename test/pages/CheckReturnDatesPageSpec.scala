@@ -14,13 +14,18 @@
  * limitations under the License.
  */
 
-package generators
+package pages
 
-import org.scalacheck.Arbitrary
-import pages._
+import pages.behaviours.PageBehaviours
 
-trait PageGenerators {
+class CheckReturnDatesPageSpec extends PageBehaviours {
 
-  implicit lazy val arbitraryCheckReturnDatesPage: Arbitrary[CheckReturnDatesPage.type] =
-    Arbitrary(CheckReturnDatesPage)
+  "CheckReturnDatesPage" - {
+
+    beRetrievable[Set[???]](CheckReturnDatesPage)
+
+    beSettable[Set[???]](CheckReturnDatesPage)
+
+    beRemovable[Set[???]](CheckReturnDatesPage)
+  }
 }

@@ -14,13 +14,19 @@
  * limitations under the License.
  */
 
-package generators
+package forms
 
-import org.scalacheck.Arbitrary
-import pages._
+import forms.mappings.Mappings
+import play.api.data.Form
 
-trait PageGenerators {
+import javax.inject.Inject
 
-  implicit lazy val arbitraryCheckReturnDatesPage: Arbitrary[CheckReturnDatesPage.type] =
-    Arbitrary(CheckReturnDatesPage)
+class YesNoPageFormProvider @Inject() extends Mappings {
+
+  def apply(
+    requiredKey: String,
+    invalidKey: String
+  ): Form[Boolean] =
+    Form("value" -> boolean(requiredKey, invalidKey))
+
 }
