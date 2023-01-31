@@ -21,6 +21,9 @@ import navigation.{FakeNavigator, Navigator}
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
+import viewmodels.ComplexMessageElement.Message
+import viewmodels.Delimiter
+import viewmodels.DisplayMessage.{ComplexMessage, SimpleMessage}
 import views.html.ContentTablePageView
 
 class SchemeDetailsControllerSpec extends ControllerBaseSpec {
@@ -50,6 +53,30 @@ class SchemeDetailsControllerSpec extends ControllerBaseSpec {
   )
 
   "SchemeDetailsController" should {
+
+    List(
+      ("a single establisher", defaultSchemeDetails, 4),
+      ("two establishers", schemeDetailsTwoEstablishers, 5)
+    ).foreach { case (testName, schemeDetails, numRows) =>
+      s"build the correct view model with $testName" in running(_ => app) { implicit app =>
+
+        val controller = injected[SchemeDetailsController]
+        val viewModel = controller.viewModel(srn, schemeDetails)
+
+        viewModel.rows.size mustEqual numRows
+      }
+    }
+
+    "build the correct view model with three establishers" in running(_ => app){ implicit app =>
+
+      val controller = injected[SchemeDetailsController]
+      val viewModel = controller.viewModel(srn, schemeDetailsThreeEstablishers)
+
+      viewModel.rows.size mustEqual 5
+      viewModel.rows.last mustEqual
+        SimpleMessage("schemeDetails.row5") ->
+          ComplexMessage(List(Message("testFirstName2 testLastName2"), Message("testFirstName3 testLastName3")), Delimiter.Newline)
+    }
 
     "return OK and the correct view for a GET" when {
       List(
