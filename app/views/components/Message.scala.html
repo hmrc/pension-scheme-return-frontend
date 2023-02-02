@@ -26,7 +26,7 @@
   case SimpleMessage(key, args) => HtmlFormat.raw(messages(key, args))
   case ComplexMessage(elems, delim) => elems.map{
     case Message(key, args) => HtmlFormat.raw(messages(key, args))
-    case LinkedMessage(key, url, args) => <a href={url}>{messages(key, args)}</a>
+    case LinkedMessage(key, url, args) => <a href={url} class="govuk-link">{messages(key, args)}</a>
   }.intersperse(delim match {
       case Delimiter.SingleSpace => HtmlFormat.raw(" ")
       case Delimiter.Newline => HtmlFormat.raw("<br>")
