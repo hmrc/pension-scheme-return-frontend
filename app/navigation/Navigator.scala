@@ -27,8 +27,9 @@ import models._
 class Navigator @Inject()() {
 
   private val normalRoutes: Page => UserAnswers => Call = {
-    case StartPage(srn) => _ => routes.UnauthorisedController.onPageLoad
-    case _              => _ => routes.IndexController.onPageLoad
+    case StartPage(srn)         => _ => routes.UnauthorisedController.onPageLoad
+    case SchemeDetailsPage(srn) => _ => routes.UnauthorisedController.onPageLoad
+    case _                      => _ => routes.IndexController.onPageLoad
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {

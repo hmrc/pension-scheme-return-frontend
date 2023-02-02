@@ -17,20 +17,34 @@
 package viewmodels.models
 
 import play.api.mvc.Call
-import viewmodels.DisplayMessage._
+import viewmodels.DisplayMessage
+import viewmodels.DisplayMessage.SimpleMessage
 
+case class ContentTablePageViewModel(
+  title: SimpleMessage,
+  heading: DisplayMessage,
+  rows: List[(DisplayMessage, DisplayMessage)],
+  inset: DisplayMessage,
+  buttonText: DisplayMessage,
+  onSubmit: Call
+)
 
-case class PensionSchemeViewModel(
-                                   title: SimpleMessage,
-                                   heading: SimpleMessage,
-                                   onSubmit : Call
-                                 )
+object ContentTablePageViewModel {
 
-object PensionSchemeViewModel {
-  def apply(title: String, heading: String, onSubmit: Call): PensionSchemeViewModel =
-    apply(
+  def apply(
+     title: String,
+     heading: DisplayMessage,
+     inset: DisplayMessage,
+     buttonText: DisplayMessage,
+     onSubmit: Call,
+     rows: (DisplayMessage, DisplayMessage)*
+  ): ContentTablePageViewModel =
+    ContentTablePageViewModel(
       SimpleMessage(title),
-      SimpleMessage(heading),
+      heading,
+      rows.toList,
+      inset,
+      buttonText,
       onSubmit
     )
 }

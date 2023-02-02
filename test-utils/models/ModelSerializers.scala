@@ -26,14 +26,33 @@ trait ModelSerializers {
   implicit val writesPensionSchemeUser: Writes[PensionSchemeUser] = s => JsString(s.toString)
   implicit val writesSchemeStatus: Writes[SchemeStatus] = s => JsString(s.toString)
 
-  implicit val writeSchemeDetails: Writes[SchemeDetails] = { details =>
-    val props: List[(String, JsValue)] = List(
-      Some("schemeName" -> JsString(details.schemeName)),
-      Some("pstr" -> JsString(details.pstr)),
-      Some("schemeStatus" -> Json.toJson(details.schemeStatus)),
-      details.authorisingPSAID.map(psa => "pspDetails" -> Json.obj("authorisingPSAID" -> psa))
-    ).flatten
+  implicit val writesEstablisher: Writes[Establisher] = establisher => (establisher.kind match {
+    case EstablisherKind.Company =>
+      Json.obj("companyDetails" -> Json.obj("companyName" -> establisher.name))
+    case EstablisherKind.Partnership =>
+      Json.obj("partnershipDetails" -> Json.obj("name" -> establisher.name))
+    case EstablisherKind.Individual =>
+      val first :: rest = establisher.name.split(" ").toList
+      val last :: middles = rest.reverse
+      val middle = middles.iterator.reduceOption((a, b) => s"$a $b")
+      Json.obj("establisherDetails" -> Json.obj(
+        "firstName" -> first,
+        "lastName" -> last
+      ).++(middle.fold(Json.obj())(m => Json.obj("middleName" -> m))))
+  })++ Json.obj("establisherKind" -> establisher.kind.value)
 
-    JsObject(props)
+  implicit val writeSchemeDetails: Writes[SchemeDetails] = { details =>
+
+    val authorisingPSAID: JsObject = details.authorisingPSAID.fold(Json.obj())(psaId =>
+      Json.obj("pspDetails" -> Json.obj("authorisingPSAID" -> psaId))
+    )
+
+    Json.obj(
+      "schemeName" -> details.schemeName,
+      "pstr" -> details.pstr,
+      "schemeStatus" -> details.schemeStatus,
+      "schemeType" -> Json.obj("name" -> details.schemeType),
+      "establishers" -> details.establishers
+    ) ++ authorisingPSAID
   }
 }

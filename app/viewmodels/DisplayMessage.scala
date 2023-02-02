@@ -18,14 +18,36 @@ package viewmodels
 
 import play.api.i18n.Messages
 
-case class DisplayMessage(key: String, args: List[Any]) {
-
-  def toMessage(implicit messages: Messages): String = messages(key, args: _*)
-}
+sealed trait DisplayMessage
 
 object DisplayMessage {
+  case class SimpleMessage(key: String, args: List[Any]) extends DisplayMessage {
+    def toMessage(implicit messages: Messages): String = messages(key, args: _*)
+  }
 
-  def apply(key: String): DisplayMessage = new DisplayMessage(key, List())
+  object SimpleMessage {
+    def apply(key: String): SimpleMessage = new SimpleMessage(key, List())
 
-  def apply(key: String, args: Any*): DisplayMessage = new DisplayMessage(key, args.toList)
+    def apply(key: String, args: Any*): SimpleMessage = new SimpleMessage(key, args.toList)
+  }
+
+  case class ComplexMessage(elements: List[ComplexMessageElement], delimiter: Delimiter) extends DisplayMessage
+
+  object ComplexMessage {
+    def apply(elements: ComplexMessageElement*): ComplexMessage = ComplexMessage(elements.toList, Delimiter.SingleSpace)
+  }
+}
+
+sealed trait ComplexMessageElement
+
+object ComplexMessageElement {
+  case class Message(key: String, args: List[Any] = Nil) extends ComplexMessageElement
+  case class LinkedMessage(key: String, url: String, args: List[Any] = Nil) extends ComplexMessageElement
+}
+
+sealed trait Delimiter
+
+object Delimiter {
+  case object SingleSpace extends Delimiter
+  case object Newline extends Delimiter
 }

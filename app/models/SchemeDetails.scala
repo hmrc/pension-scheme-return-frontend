@@ -16,20 +16,80 @@
 
 package models
 
+import play.api.libs.functional.syntax._
 import play.api.libs.json._
 import utils.WithName
 
-case class SchemeDetails(schemeName: String, pstr: String, schemeStatus: SchemeStatus, authorisingPSAID: Option[String])
+case class SchemeDetails(
+  schemeName: String,
+  pstr: String,
+  schemeStatus: SchemeStatus,
+  schemeType: String,
+  authorisingPSAID: Option[String],
+  establishers: List[Establisher]
+)
+
+case class Establisher(
+  name: String,
+  kind: EstablisherKind
+)
+
+sealed class EstablisherKind(val value: String)
+
+object EstablisherKind {
+  case object Company extends EstablisherKind("company")
+  case object Partnership extends EstablisherKind("partnership")
+  case object Individual extends EstablisherKind("individual")
+
+  implicit val reads: Reads[EstablisherKind] = Reads.StringReads.map{
+    case Company.value     => Company
+    case Partnership.value => Partnership
+    case Individual.value  => Individual
+  }
+}
+
+object Establisher {
+
+  private val companyEstablisherReads: Reads[Establisher] =
+    (__ \ "companyDetails" \ "companyName").read[String].map(name =>
+      Establisher(name, EstablisherKind.Company)
+    )
+
+  private val partnershipEstablisherReads: Reads[Establisher] =
+    (__ \ "partnershipDetails" \ "name").read[String].map(name =>
+      Establisher(name, EstablisherKind.Partnership)
+    )
+
+  private val individualEstablisherReads: Reads[Establisher] = {
+    (
+      (__ \ "establisherDetails" \ "firstName").read[String] and
+      (__ \ "establisherDetails" \ "middleName").readNullable[String] and
+      (__ \ "establisherDetails" \ "lastName").read[String]
+    ){(first, middle, last) =>
+      val name = s"$first ${middle.fold("")(m => s"$m ")}$last"
+      Establisher(name, EstablisherKind.Individual)
+    }
+  }
+
+  implicit val reads: Reads[Establisher] =
+    (__ \ "establisherKind").read[EstablisherKind].flatMap{
+      case EstablisherKind.Company     => companyEstablisherReads
+      case EstablisherKind.Partnership => partnershipEstablisherReads
+      case EstablisherKind.Individual  => individualEstablisherReads
+    }
+}
 
 object SchemeDetails {
 
   implicit val reads: Reads[SchemeDetails] =
-    Json.reads[SchemeDetails].flatMap { details =>
-      (JsPath \ "pspDetails" \ "authorisingPSAID")
-        .readNullable[String]
-        .map(value => details.copy(authorisingPSAID = value))
-    }
-
+    (
+      (__ \ "schemeName").read[String] and
+      (__ \ "pstr").read[String] and
+      (__ \ "schemeStatus").read[SchemeStatus] and
+      (__ \ "schemeType" \ "name").read[String] and
+      (__ \ "pspDetails" \ "authorisingPSAID").readNullable[String] and
+      (__ \ "establishers").read[JsArray].map[List[Establisher]](l => if(l.value.isEmpty) Nil else l.as[List[Establisher]])
+    )(SchemeDetails.apply _)
 }
 
 sealed trait SchemeStatus

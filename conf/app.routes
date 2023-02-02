@@ -22,3 +22,6 @@ GET         /unauthorised                                controllers.Unauthorise
 
 GET         /:srn/start                                  controllers.StartPageController.onPageLoad(srn: Srn)
 GET         /:srn/start-next-page                        controllers.StartPageController.onSubmit(srn: Srn)
+
+GET         /:srn/scheme-details                         controllers.SchemeDetailsController.onPageLoad(srn: Srn)
+GET         /:srn/scheme-details-next-page               controllers.SchemeDetailsController.onSubmit(srn: Srn)

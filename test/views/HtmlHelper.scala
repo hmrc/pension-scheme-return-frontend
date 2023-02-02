@@ -20,6 +20,9 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
 import play.twirl.api.Html
+import viewmodels.ComplexMessageElement.{LinkedMessage, Message}
+import viewmodels.DisplayMessage
+import viewmodels.DisplayMessage.{ComplexMessage, SimpleMessage}
 
 import scala.jdk.CollectionConverters.IteratorHasAsScala
 
@@ -35,6 +38,14 @@ trait HtmlHelper {
   def p(html: Html): List[String] =
     mainContent(html).getElementsByTag("p").iterator().asScala.map(_.text()).toList
 
+  def tr(html: Html): List[List[String]] =
+    mainContent(html).getElementsByTag("tr").iterator().asScala.toList.map(
+      _.getElementsByTag("td").iterator().asScala.toList.map(_.text())
+    )
+
+  def insetText(html: Html): String =
+    mainContent(html).getElementsByClass("govuk-inset-text").first().text()
+
   def button(html: Html): Element =
     mainContent(html).getElementsByTag("button").first()
 
@@ -49,4 +60,12 @@ trait HtmlHelper {
 
   def errorMessage(html: Html): Elements =
     mainContent(html).getElementsByClass("govuk-error-message")
+
+  def messageKey(message: DisplayMessage): String = message match {
+    case SimpleMessage(key, _) => key
+    case ComplexMessage(elements, _) => elements.map{
+      case Message(key, _) => key
+      case LinkedMessage(key, _, _) => key
+    }.reduce(_ + _)
+  }
 }
