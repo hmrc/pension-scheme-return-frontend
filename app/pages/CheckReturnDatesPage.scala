@@ -16,9 +16,10 @@
 
 package pages
 
+import models.SchemeId.Srn
 import play.api.libs.json.JsPath
 
-case object CheckReturnDatesPage extends QuestionPage[Boolean] {
+case class CheckReturnDatesPage(srn: Srn) extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ toString
 

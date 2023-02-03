@@ -14,20 +14,16 @@
  * limitations under the License.
  */
 
-package pages
+package utils
 
-import pages.behaviours.PageBehaviours
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
-class CheckReturnDatesPageSpec extends PageBehaviours {
+object DateTimeUtils {
 
-  "CheckReturnDatesPage" - {
-
-    val srn = srnGen.sample.value
-
-    beRetrievable[Boolean](CheckReturnDatesPage(srn))
-
-    beSettable[Boolean](CheckReturnDatesPage(srn))
-
-    beRemovable[Boolean](CheckReturnDatesPage(srn))
+  def formatHtml(localDate: LocalDate) = {
+    val formatter = DateTimeFormatter.ofPattern("dd\u00A0MMMM\u00A0yyyy")
+    localDate.format(formatter)
   }
+
 }

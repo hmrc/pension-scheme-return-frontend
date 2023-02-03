@@ -122,6 +122,9 @@ trait BasicGenerators {
     }
   }
 
+  def date: Gen[LocalDate] =
+    datesBetween(LocalDate.of(1970, 1, 1), LocalDate.of(3000, 12, 31))
+
   val boolean: Gen[Boolean] =
     Gen.oneOf(true, false)
 

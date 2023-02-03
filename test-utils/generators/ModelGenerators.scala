@@ -113,4 +113,8 @@ trait ModelGenerators extends BasicGenerators {
       request       <- identifierRequestGen[A](request)
       schemeDetails <- schemeDetailsGen
     } yield AllowedAccessRequest(request, schemeDetails)
+
+  def modeGen: Gen[Mode] = Gen.oneOf(NormalMode, CheckMode)
 }
+
+object ModelGenerators extends ModelGenerators

@@ -16,20 +16,11 @@
 
 package services
 
-import com.google.inject.ImplementedBy
-import models.UserAnswers
-import repositories.SessionRepository
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.time.CurrentTaxYear
 
-import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import java.time
+import java.time.LocalDate
 
-class SaveServiceImpl @Inject()(sessionRepository: SessionRepository)(implicit ec: ExecutionContext) extends SaveService {
-  override def save(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[Unit] =
-    sessionRepository.set(userAnswers)
-}
-
-@ImplementedBy(classOf[SaveServiceImpl])
-trait SaveService {
-  def save(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[Unit]
+class FakeTaxYearService(date: LocalDate) extends TaxYearService with CurrentTaxYear {
+  override def now: () => time.LocalDate = () => date
 }

@@ -15,6 +15,7 @@
  *@
 
 @import viewmodels.models.YesNoPageViewModel
+@import viewmodels.LegendSize
 
 @this(
   layout: templates.Layout,
@@ -34,7 +35,7 @@
       @govukErrorSummary(ErrorSummaryViewModel(form))
     }
 
-    <h1 class="govuk-heading-xl">@viewmodel.heading.toMessage</h1>
+    <h1 class="govuk-heading-l">@viewmodel.heading.toMessage</h1>
 
     @viewmodel.description.map { content =>
       <p class="govuk-body">@content.toMessage</p>
@@ -43,7 +44,7 @@
     @govukRadios(
       RadiosViewModel.yesNo(
         field = form("value"),
-        legend = LegendViewModel(viewmodel.legend.toMessage)
+        legend = LegendViewModel(viewmodel.legend.toMessage).withSize(LegendSize.Medium)
       )
     )
 

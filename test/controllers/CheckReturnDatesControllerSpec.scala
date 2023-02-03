@@ -20,29 +20,96 @@ import forms.YesNoPageFormProvider
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
-import org.scalatestplus.mockito.MockitoSugar
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import pages.CheckReturnDatesPage
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import services.SaveService
+import services.{FakeTaxYearService, SaveService, TaxYearService}
+import utils.DateTimeUtils
+import viewmodels.DisplayMessage
 import viewmodels.models.YesNoPageViewModel
 import views.html.YesNoPageView
 
 import scala.concurrent.Future
 
-class CheckReturnDatesControllerSpec extends ControllerBaseSpec with MockitoSugar {
+class CheckReturnDatesControllerSpec extends ControllerBaseSpec with ScalaCheckPropertyChecks { self =>
 
   def onwardRoute = Call("GET", "/foo")
 
-  lazy val checkReturnDatesRoute = routes.CheckReturnDatesController.onPageLoad(NormalMode).url
+  val srn = srnGen.sample.value
+  lazy val checkReturnDatesRoute = routes.CheckReturnDatesController.onPageLoad(srn, NormalMode).url
 
-  val formProvider = new YesNoPageFormProvider()
-  val viewModel: YesNoPageViewModel = ???
-  val form = formProvider()
+  "CheckReturnDates.viewModel" should {
+
+    "contain correct title key" in {
+
+      forAll(srnGen, modeGen, date) { (srn, mode, dates) =>
+
+        val viewModel = CheckReturnDatesController.viewModel(srn, mode, dates, dates)
+        viewModel.title mustBe DisplayMessage("checkReturnDates.title")
+      }
+    }
+
+    "contain correct heading key" in {
+
+      forAll(srnGen, modeGen, date) { (srn, mode, dates) =>
+
+        val viewModel = CheckReturnDatesController.viewModel(srn, mode, dates, dates)
+        viewModel.heading mustBe DisplayMessage("checkReturnDates.heading")
+      }
+    }
+
+    "contain from date and to date in description" in {
+
+      forAll(date, date) { (fromDate, toDate) =>
+
+        val viewModel = CheckReturnDatesController.viewModel(srn, NormalMode, fromDate, toDate)
+        val formattedFromDate = DateTimeUtils.formatHtml(fromDate)
+        val formattedToDate = DateTimeUtils.formatHtml(toDate)
+
+        viewModel.description mustBe Some(DisplayMessage("checkReturnDates.description", formattedFromDate, formattedToDate))
+      }
+    }
+
+    "contain correct legend key" in {
+
+      forAll(srnGen, modeGen, date) { (srn, mode, dates) =>
+
+        val viewModel = CheckReturnDatesController.viewModel(srn, mode, dates, dates)
+        viewModel.legend mustBe DisplayMessage("checkReturnDates.legend")
+      }
+    }
+
+    "populate the onSubmit with srn and mode" in {
+
+      forAll(srnGen, modeGen, date) { (srn, mode, dates) =>
+
+        val viewModel = CheckReturnDatesController.viewModel(srn, mode, dates, dates)
+        viewModel.onSubmit mustBe routes.CheckReturnDatesController.onSubmit(srn, mode)
+      }
+    }
+  }
+
 
   "CheckReturnDates Controller" should {
+
+    val date = self.date.sample.value
+    val fakeTaxYearService = new FakeTaxYearService(date)
+    lazy val viewModel: YesNoPageViewModel =
+      CheckReturnDatesController.viewModel(
+        srn,
+        NormalMode,
+        fakeTaxYearService.current.starts,
+        fakeTaxYearService.current.finishes
+      )
+
+    val formProvider = new YesNoPageFormProvider()
+    val form = formProvider("checkReturnDates.error.required", "checkReturnDates.error.invalid")
+
+    def applicationBuilder(userAnswers: Option[UserAnswers]) =
+      self.applicationBuilder(userAnswers).overrides(bind[TaxYearService].toInstance(fakeTaxYearService))
 
     "must return OK and the correct view for a GET" in {
 
@@ -56,14 +123,13 @@ class CheckReturnDatesControllerSpec extends ControllerBaseSpec with MockitoSuga
         val view = application.injector.instanceOf[YesNoPageView]
 
         status(result) mustEqual OK
-
-        contentAsString(result) mustEqual view(form, viewModel)(request, createMessages(application)).toString
+        contentAsString(result) mustEqual view(form, viewModel)(request, createMessages(application)).body
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(CheckReturnDatesPage, ???).success.value
+      val userAnswers = UserAnswers(userAnswersId).set(CheckReturnDatesPage(srn), true).success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -75,7 +141,7 @@ class CheckReturnDatesControllerSpec extends ControllerBaseSpec with MockitoSuga
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(???), viewModel)(request, createMessages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(true), viewModel)(request, createMessages(application)).toString
       }
     }
 
@@ -96,7 +162,7 @@ class CheckReturnDatesControllerSpec extends ControllerBaseSpec with MockitoSuga
       running(application) {
         val request =
           FakeRequest(POST, checkReturnDatesRoute)
-            .withFormUrlEncodedBody(("value", ???))
+            .withFormUrlEncodedBody(("value", "true"))
 
         val result = route(application, request).value
 
@@ -144,8 +210,7 @@ class CheckReturnDatesControllerSpec extends ControllerBaseSpec with MockitoSuga
       val application = applicationBuilder(userAnswers = None).build()
 
       running(application) {
-        val request =
-          FakeRequest(POST, checkReturnDatesRoute)
+        val request = FakeRequest(POST, checkReturnDatesRoute)
 
         val result = route(application, request).value
 

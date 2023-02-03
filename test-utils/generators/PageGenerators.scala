@@ -21,6 +21,6 @@ import pages._
 
 trait PageGenerators {
 
-  implicit lazy val arbitraryCheckReturnDatesPage: Arbitrary[CheckReturnDatesPage.type] =
-    Arbitrary(CheckReturnDatesPage)
+  implicit lazy val arbitraryCheckReturnDatesPage: Arbitrary[CheckReturnDatesPage] =
+    Arbitrary(ModelGenerators.srnGen.map(CheckReturnDatesPage))
 }
