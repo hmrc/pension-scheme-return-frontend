@@ -41,7 +41,7 @@ class DataRetrievalActionSpec extends BaseSpec {
       "there is no data in the cache" in {
 
         val sessionRepository = mock[SessionRepository]
-        when(sessionRepository.get(request.request.getUserId)) thenReturn Future(None)
+        when(sessionRepository.get(request.request.getUserId + request.schemeDetails.srn)) thenReturn Future(None)
         val action = new Harness(sessionRepository)
 
         val result = action.callTransform().futureValue
@@ -54,7 +54,7 @@ class DataRetrievalActionSpec extends BaseSpec {
       "when there is data in the cache" in {
 
         val sessionRepository = mock[SessionRepository]
-        when(sessionRepository.get(request.request.getUserId)) thenReturn Future(Some(UserAnswers("id")))
+        when(sessionRepository.get(request.request.getUserId + request.schemeDetails.srn)) thenReturn Future(Some(UserAnswers("id")))
         val action = new Harness(sessionRepository)
 
         val result = action.callTransform().futureValue
