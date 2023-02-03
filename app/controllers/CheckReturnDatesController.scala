@@ -29,6 +29,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.time.CurrentTaxYear
 import utils.DateTimeUtils
 import viewmodels.DisplayMessage
+import viewmodels.DisplayMessage.SimpleMessage
 import viewmodels.models.YesNoPageViewModel
 import views.html.YesNoPageView
 
@@ -92,16 +93,16 @@ object CheckReturnDatesController {
     toDate: LocalDate
   ): YesNoPageViewModel = {
     YesNoPageViewModel(
-      DisplayMessage("checkReturnDates.title"),
-      DisplayMessage("checkReturnDates.heading"),
+      SimpleMessage("checkReturnDates.title"),
+      SimpleMessage("checkReturnDates.heading"),
       Some(
-        DisplayMessage(
+        SimpleMessage(
           "checkReturnDates.description",
           DateTimeUtils.formatHtml(fromDate),
           DateTimeUtils.formatHtml(toDate)
         )
       ),
-      DisplayMessage("checkReturnDates.legend"),
+      SimpleMessage("checkReturnDates.legend"),
       routes.CheckReturnDatesController.onSubmit(srn, mode)
     )
   }

@@ -18,12 +18,13 @@ package viewmodels.models
 
 import play.api.mvc.Call
 import viewmodels.DisplayMessage
+import viewmodels.DisplayMessage.SimpleMessage
 
 case class YesNoPageViewModel(
-  title: DisplayMessage,
-  heading: DisplayMessage,
-  description: Option[DisplayMessage],
-  legend: DisplayMessage,
+  title: SimpleMessage,
+  heading: SimpleMessage,
+  description: Option[SimpleMessage],
+  legend: SimpleMessage,
   onSubmit: Call
 )
 
@@ -31,28 +32,28 @@ object YesNoPageViewModel {
 
   def apply(title: String, heading: String, description: String, legend: String, onSubmit: Call): YesNoPageViewModel =
     YesNoPageViewModel(
-      DisplayMessage(title),
-      DisplayMessage(heading),
-      Some(DisplayMessage(description)),
-      DisplayMessage(legend),
+      SimpleMessage(title),
+      SimpleMessage(heading),
+      Some(SimpleMessage(description)),
+      SimpleMessage(legend),
       onSubmit
     )
 
   def apply(title: String, heading: String, legend: String, onSubmit: Call): YesNoPageViewModel =
     YesNoPageViewModel(
-      DisplayMessage(title),
-      DisplayMessage(heading),
+      SimpleMessage(title),
+      SimpleMessage(heading),
       None,
-      DisplayMessage(legend),
+      SimpleMessage(legend),
       onSubmit
     )
 
   def apply(title: String, heading: String, description: Option[String], legend: String, onSubmit: Call): YesNoPageViewModel =
     YesNoPageViewModel(
-      DisplayMessage(title),
-      DisplayMessage(heading),
-      description.map(d => DisplayMessage(d)),
-      DisplayMessage(legend),
+      SimpleMessage(title),
+      SimpleMessage(heading),
+      description.map(d => SimpleMessage(d)),
+      SimpleMessage(legend),
       onSubmit
     )
 }

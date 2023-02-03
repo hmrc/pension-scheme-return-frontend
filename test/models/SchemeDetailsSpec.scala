@@ -27,7 +27,6 @@ class SchemeDetailsSpec extends BaseSpec with ScalaCheckPropertyChecks {
     "successfully read from json" in {
 
       forAll(schemeDetailsGen) { details =>
-
         Json.toJson(details).as[SchemeDetails] mustBe details
       }
     }

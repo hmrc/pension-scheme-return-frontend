@@ -28,3 +28,6 @@ POST        /:srn/check-dates                            controllers.CheckReturn
 
 GET         /:srn/change-check-dates                     controllers.CheckReturnDatesController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST        /:srn/change-check-dates                     controllers.CheckReturnDatesController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET         /:srn/scheme-details                         controllers.SchemeDetailsController.onPageLoad(srn: Srn)
+GET         /:srn/scheme-details-next-page               controllers.SchemeDetailsController.onSubmit(srn: Srn)

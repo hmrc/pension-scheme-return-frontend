@@ -17,8 +17,7 @@
 package generators
 
 import org.scalacheck.Gen
-import viewmodels.DisplayMessage
-import viewmodels.models.{ContentPageViewModel, PensionSchemeViewModel, YesNoPageViewModel}
+import viewmodels.models.{ContentPageViewModel, ContentTablePageViewModel, PensionSchemeViewModel, YesNoPageViewModel}
 
 trait ViewModelGenerators extends BasicGenerators {
 
@@ -31,6 +30,18 @@ trait ViewModelGenerators extends BasicGenerators {
       onSubmit   <- call
     } yield {
       ContentPageViewModel(title, heading, paragraphs, buttonText, onSubmit)
+    }
+
+  val contentTablePageViewModelGen: Gen[ContentTablePageViewModel] =
+    for {
+      title <- nonEmptyString
+      heading <- nonEmptySimpleMessage
+      inset <- nonEmptySimpleMessage
+      buttonText <- nonEmptySimpleMessage
+      rows <- Gen.listOf(tupleOf(nonEmptySimpleMessage, nonEmptySimpleMessage))
+      onSubmit <- call
+    } yield {
+      ContentTablePageViewModel(title, heading, inset, buttonText, onSubmit, rows: _*)
     }
 
   val pensionSchemeViewModelGen: Gen[PensionSchemeViewModel] =

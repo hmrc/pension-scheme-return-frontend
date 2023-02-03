@@ -29,6 +29,7 @@ import play.api.test.Helpers._
 import services.{FakeTaxYearService, SaveService, TaxYearService}
 import utils.DateTimeUtils
 import viewmodels.DisplayMessage
+import viewmodels.DisplayMessage.SimpleMessage
 import viewmodels.models.YesNoPageViewModel
 import views.html.YesNoPageView
 
@@ -48,7 +49,7 @@ class CheckReturnDatesControllerSpec extends ControllerBaseSpec with ScalaCheckP
       forAll(srnGen, modeGen, date) { (srn, mode, dates) =>
 
         val viewModel = CheckReturnDatesController.viewModel(srn, mode, dates, dates)
-        viewModel.title mustBe DisplayMessage("checkReturnDates.title")
+        viewModel.title mustBe SimpleMessage("checkReturnDates.title")
       }
     }
 
@@ -57,7 +58,7 @@ class CheckReturnDatesControllerSpec extends ControllerBaseSpec with ScalaCheckP
       forAll(srnGen, modeGen, date) { (srn, mode, dates) =>
 
         val viewModel = CheckReturnDatesController.viewModel(srn, mode, dates, dates)
-        viewModel.heading mustBe DisplayMessage("checkReturnDates.heading")
+        viewModel.heading mustBe SimpleMessage("checkReturnDates.heading")
       }
     }
 
@@ -69,7 +70,7 @@ class CheckReturnDatesControllerSpec extends ControllerBaseSpec with ScalaCheckP
         val formattedFromDate = DateTimeUtils.formatHtml(fromDate)
         val formattedToDate = DateTimeUtils.formatHtml(toDate)
 
-        viewModel.description mustBe Some(DisplayMessage("checkReturnDates.description", formattedFromDate, formattedToDate))
+        viewModel.description mustBe Some(SimpleMessage("checkReturnDates.description", formattedFromDate, formattedToDate))
       }
     }
 
@@ -78,7 +79,7 @@ class CheckReturnDatesControllerSpec extends ControllerBaseSpec with ScalaCheckP
       forAll(srnGen, modeGen, date) { (srn, mode, dates) =>
 
         val viewModel = CheckReturnDatesController.viewModel(srn, mode, dates, dates)
-        viewModel.legend mustBe DisplayMessage("checkReturnDates.legend")
+        viewModel.legend mustBe SimpleMessage("checkReturnDates.legend")
       }
     }
 

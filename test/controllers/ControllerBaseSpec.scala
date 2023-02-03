@@ -17,28 +17,52 @@
 package controllers
 
 import controllers.actions._
-import models.UserAnswers
+import models.{Establisher, EstablisherKind, SchemeDetails, SchemeStatus, UserAnswers}
 import play.api.Application
-import play.api.i18n.{Messages, MessagesApi}
+import play.api.http._
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.test.FakeRequest
+import play.api.libs.json.Json
 import play.api.test.Helpers.running
+import play.api.test._
 import utils.BaseSpec
 
 trait ControllerBaseSpec
-  extends BaseSpec {
+  extends BaseSpec
+    with DefaultAwaitTimeout
+    with HttpVerbs
+    with Writeables
+    with HeaderNames
+    with Status
+    with PlayRunners
+    with RouteInvokers
+    with ResultExtractors {
 
   val userAnswersId: String = "id"
 
   def emptyUserAnswers: UserAnswers = UserAnswers(userAnswersId)
 
-  protected def applicationBuilder(userAnswers: Option[UserAnswers] = None): GuiceApplicationBuilder =
+  val userAnswers: UserAnswers = UserAnswers(userAnswersId, Json.obj("non" -> "empty"))
+
+  val defaultSchemeDetails: SchemeDetails = SchemeDetails(
+    "testSRN",
+    "testSchemeName",
+    "testPSTR",
+    SchemeStatus.Open,
+    "testSchemeType",
+    Some("testAuthorisingPSAID"),
+    List(Establisher("testFirstName testLastName", EstablisherKind.Individual))
+  )
+
+  protected def applicationBuilder(
+                                    userAnswers: Option[UserAnswers] = None,
+                                    schemeDetails: SchemeDetails = defaultSchemeDetails
+                                  ): GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
       .overrides(
         bind[DataRequiredAction].to[DataRequiredActionImpl],
         bind[IdentifierAction].to[FakeIdentifierAction],
-        bind[AllowAccessActionProvider].to[FakeAllowAccessActionProvider],
+        bind[AllowAccessActionProvider].toInstance(new FakeAllowAccessActionProvider(schemeDetails)),
         bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers)),
         bind[DataCreationAction].toInstance(new FakeDataCreationAction(userAnswers.getOrElse(emptyUserAnswers)))
       )

@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package viewmodels
+package viewmodels.models
 
 import play.api.mvc.Call
+import viewmodels.DisplayMessage._
 
 case class DatePageViewModel(
-                              title: DisplayMessage,
-                              legend: DisplayMessage,
-                              hint: DisplayMessage,
+                              title: SimpleMessage,
+                              legend: SimpleMessage,
+                              hint: SimpleMessage,
                               onSubmit: Call
                             )
