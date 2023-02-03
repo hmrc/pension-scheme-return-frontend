@@ -66,7 +66,7 @@ class DataCreationActionSpec extends BaseSpec {
 
 
         result.request mustBe request
-        result.userAnswers.id mustBe request.getUserId
+        result.userAnswers.id mustBe request.getUserId + request.schemeDetails.srn
         verify(sessionRepository, times(1)).set(any())
       }
     }

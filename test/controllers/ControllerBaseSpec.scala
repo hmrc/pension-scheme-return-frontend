@@ -45,6 +45,7 @@ trait ControllerBaseSpec
   val userAnswers: UserAnswers = UserAnswers(userAnswersId, Json.obj("non" -> "empty"))
 
   val defaultSchemeDetails: SchemeDetails = SchemeDetails(
+    "testSRN",
     "testSchemeName",
     "testPSTR",
     SchemeStatus.Open,

@@ -17,11 +17,13 @@
 package models.requests
 
 import play.api.mvc.{Request, WrappedRequest}
-import models.UserAnswers
+import models.{SchemeDetails, UserAnswers}
 
 case class OptionalDataRequest[A] (request: AllowedAccessRequest[A], userAnswers: Option[UserAnswers]) extends WrappedRequest[A](request) {
 
   def getUserId: String = request.getUserId
+
+  def schemeDetails: SchemeDetails = request.schemeDetails
 }
 
 case class DataRequest[A] (request: AllowedAccessRequest[A], userAnswers: UserAnswers) extends WrappedRequest[A](request) {

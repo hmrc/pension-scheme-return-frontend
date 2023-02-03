@@ -21,6 +21,7 @@ import play.api.libs.json._
 import utils.WithName
 
 case class SchemeDetails(
+  srn: String,
   schemeName: String,
   pstr: String,
   schemeStatus: SchemeStatus,
@@ -83,6 +84,7 @@ object SchemeDetails {
 
   implicit val reads: Reads[SchemeDetails] =
     (
+      (__ \ "srn").read[String] and
       (__ \ "schemeName").read[String] and
       (__ \ "pstr").read[String] and
       (__ \ "schemeStatus").read[SchemeStatus] and
