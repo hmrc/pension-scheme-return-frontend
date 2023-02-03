@@ -30,7 +30,7 @@ class DataCreationActionImpl @Inject()(sessionRepository: SessionRepository)(imp
 
     request.userAnswers match {
       case None =>
-        val userAnswersKey = request.getUserId + request.request.schemeDetails.srn
+        val userAnswersKey = request.getUserId + request.schemeDetails.srn
         val userAnswers = UserAnswers(userAnswersKey)
         sessionRepository.set(userAnswers).map(_ => DataRequest(request.request, userAnswers))
       case Some(data) =>
