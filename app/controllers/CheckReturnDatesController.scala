@@ -18,13 +18,14 @@ package controllers
 
 import controllers.actions._
 import forms.YesNoPageFormProvider
-import models.{Mode, SchemeDetails}
+import models.{MinimalSchemeDetails, Mode, PensionSchemeId, SchemeDetails}
 import models.SchemeId.Srn
 import navigation.Navigator
 import pages.CheckReturnDatesPage
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.{SaveService, TaxYearService}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import services.{SaveService, SchemeDetailsService, TaxYearService}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.time.CurrentTaxYear
 import utils.DateTimeUtils
@@ -48,39 +49,54 @@ class CheckReturnDatesController @Inject()(
   formProvider: YesNoPageFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: YesNoPageView,
-  taxYear: TaxYearService
+  taxYear: TaxYearService,
+  schemeDetailsService: SchemeDetailsService
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   val form = formProvider("checkReturnDates.error.required", "checkReturnDates.error.invalid")
 
-  def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = (identify andThen allowAccess(srn) andThen getData andThen requireData) {
-    implicit request =>
+  def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] =
+    (identify andThen allowAccess(srn) andThen getData andThen requireData).async {
+      implicit request =>
 
-      val preparedForm = request.userAnswers.get(CheckReturnDatesPage(srn)) match {
-        case None => form
-        case Some(value) => form.fill(value)
-      }
+        getMinimalSchemeDetails(request.pensionSchemeId, srn) { details =>
+          val preparedForm = request.userAnswers.get(CheckReturnDatesPage(srn)) match {
+            case None => form
+            case Some(value) => form.fill(value)
+          }
 
-      val viewModel = CheckReturnDatesController.viewModel(srn, mode, taxYear.current.starts, taxYear.current.finishes)
+          val viewModel =
+            CheckReturnDatesController.viewModel(srn, mode, taxYear.current.starts, taxYear.current.finishes, details)
 
-      Ok(view(preparedForm, viewModel))
-  }
+          Future.successful(Ok(view(preparedForm, viewModel)))
+        }
+    }
 
   def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = (identify andThen allowAccess(srn) andThen getData andThen requireData).async {
     implicit request =>
 
-      val viewModel = CheckReturnDatesController.viewModel(srn, mode, taxYear.current.starts, taxYear.current.finishes)
+      getMinimalSchemeDetails(request.pensionSchemeId, srn) { details =>
+        val viewModel =
+          CheckReturnDatesController.viewModel(srn, mode, taxYear.current.starts, taxYear.current.finishes, details)
 
-      form.bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, viewModel))),
+        form.bindFromRequest().fold(
+          formWithErrors =>
+            Future.successful(BadRequest(view(formWithErrors, viewModel))),
 
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(CheckReturnDatesPage(srn), value))
-            _              <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage(CheckReturnDatesPage(srn), mode, updatedAnswers))
-      )
+          value =>
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(CheckReturnDatesPage(srn), value))
+              _ <- saveService.save(updatedAnswers)
+            } yield Redirect(navigator.nextPage(CheckReturnDatesPage(srn), mode, updatedAnswers))
+        )
+      }
+  }
+
+  private def getMinimalSchemeDetails(id: PensionSchemeId, srn: Srn)(f: MinimalSchemeDetails => Future[Result])(implicit hc: HeaderCarrier): Future[Result] = {
+    schemeDetailsService.getMinimalSchemeDetails(id, srn).flatMap {
+      case Some(schemeDetails) => f(schemeDetails)
+      case None                => Future.successful(Redirect(routes.UnauthorisedController.onPageLoad))
+    }
   }
 }
 
@@ -90,7 +106,8 @@ object CheckReturnDatesController {
     srn: Srn,
     mode: Mode,
     fromDate: LocalDate,
-    toDate: LocalDate
+    toDate: LocalDate,
+    schemeDetails: MinimalSchemeDetails
   ): YesNoPageViewModel = {
     YesNoPageViewModel(
       SimpleMessage("checkReturnDates.title"),

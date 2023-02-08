@@ -20,7 +20,7 @@ import com.google.inject.ImplementedBy
 import config.FrontendAppConfig
 import models.PensionSchemeId.{PsaId, PspId}
 import models.SchemeId.Srn
-import models.{SchemeDetails, SchemeId}
+import models.{ListMinimalSchemeDetails, SchemeDetails, SchemeId}
 import play.api.Logger
 import uk.gov.hmrc.http.HttpReads.Implicits.{readFromJson, readOptionOfNotFound}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
@@ -83,6 +83,25 @@ class SchemeDetailsConnectorImpl @Inject()(appConfig: FrontendAppConfig, http: H
       }
   }
 
+  def listSchemeDetails(psaId: PsaId)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[ListMinimalSchemeDetails] =
+    listSchemeDetails(psaId.value, "psaId")
+
+  def listSchemeDetails(pspId: PspId)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[ListMinimalSchemeDetails] =
+    listSchemeDetails(pspId.value, "pspId")
+
+  private def listSchemeDetails(idValue: String, idType: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[ListMinimalSchemeDetails] = {
+
+    val headers = List(
+      "idValue" -> idValue,
+      "idType"  -> idType
+    )
+
+    http
+      .GET[ListMinimalSchemeDetails](url("/pensions-scheme/list-of-schemes"))(implicitly, hc.withExtraHeaders(headers: _*), implicitly)
+      .tapError { t =>
+        Future.successful(logger.error(s"Failed list scheme details for $idType $idValue with message ${t.getMessage}"))
+      }
+  }
 }
 
 @ImplementedBy(classOf[SchemeDetailsConnectorImpl])
@@ -92,6 +111,10 @@ trait SchemeDetailsConnector {
 
   def details(psaId: PsaId, schemeId: SchemeId)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[SchemeDetails]]
   def details(pspId: PspId, schemeId: Srn)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[SchemeDetails]]
+
   def checkAssociation(psaId: PsaId, schemeId: Srn)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Boolean]
   def checkAssociation(pspId: PspId, schemeId: Srn)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Boolean]
+
+  def listSchemeDetails(psaId: PsaId)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[ListMinimalSchemeDetails]
+  def listSchemeDetails(pspId: PspId)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[ListMinimalSchemeDetails]
 }

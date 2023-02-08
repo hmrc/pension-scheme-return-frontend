@@ -16,10 +16,12 @@
 
 package models.requests
 
-import models.SchemeDetails
+import models.{PensionSchemeId, SchemeDetails}
 import play.api.mvc.WrappedRequest
 
 case class AllowedAccessRequest[A](request: IdentifierRequest[A], schemeDetails: SchemeDetails) extends WrappedRequest[A](request) {
 
-  def getUserId: String = request.getUserId
+  val getUserId: String = request.getUserId
+
+  val pensionSchemeId: PensionSchemeId = request.pensionSchemeId
 }

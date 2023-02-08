@@ -1,4 +1,4 @@
-/*
+ /*
  * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +16,16 @@
 
 package models
 
-sealed trait PensionSchemeId
+import models.PensionSchemeId.{PsaId, PspId}
+
+sealed trait PensionSchemeId { self =>
+
+  def fold[B](f1: PsaId => B, f2: PspId => B): B =
+    self match {
+      case id@PsaId(_) => f1(id)
+      case id@PspId(_) => f2(id)
+    }
+}
 
 object PensionSchemeId {
 
