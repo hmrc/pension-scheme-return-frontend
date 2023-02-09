@@ -39,7 +39,6 @@ class CheckReturnDatesControllerSpec extends ControllerBaseSpec with ScalaCheckP
 
   def onwardRoute = Call("GET", "/foo")
 
-  val srn = srnGen.sample.value
   lazy val checkReturnDatesRoute = routes.CheckReturnDatesController.onPageLoad(srn, NormalMode).url
 
   "CheckReturnDates.viewModel" should {

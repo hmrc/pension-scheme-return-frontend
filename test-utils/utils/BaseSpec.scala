@@ -58,7 +58,9 @@ abstract class BaseSpec extends
         "metric.enabled" -> false
       )
 
-  def createMessages(app: Application): Messages = app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
+  implicit def createMessages(implicit app: Application): Messages = app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
+
+  protected def messages(key: String)(implicit m: Messages): String = m(key)
 
   protected def injected[A: ClassTag](implicit app: Application): A = app.injector.instanceOf[A]
 

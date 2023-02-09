@@ -29,7 +29,6 @@ class ContentPageViewSpec extends BaseSpec with ScalaCheckPropertyChecks with Ht
     val view = injected[ContentPageView]
 
     implicit val request = FakeRequest()
-    implicit val mess = createMessages(app)
 
     "ContentPageView" should {
 

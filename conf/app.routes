@@ -31,3 +31,9 @@ POST        /:srn/change-check-dates                     controllers.CheckReturn
 
 GET         /:srn/scheme-details                         controllers.SchemeDetailsController.onPageLoad(srn: Srn)
 GET         /:srn/scheme-details-next-page               controllers.SchemeDetailsController.onSubmit(srn: Srn)
+
+GET         /:srn/enter-bank-details                     controllers.SchemeBankAccountController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/enter-bank-details                     controllers.SchemeBankAccountController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+
+GET         /:srn/change-enter-bank-details              controllers.SchemeBankAccountController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-enter-bank-details              controllers.SchemeBankAccountController.onSubmit(srn: Srn, mode: Mode = CheckMode)

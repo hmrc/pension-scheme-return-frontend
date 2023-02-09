@@ -23,8 +23,6 @@ import views.html.CheckYourAnswersView
 
 class CheckYourAnswersControllerSpec extends ControllerBaseSpec with SummaryListFluency {
 
-  val srn = srnGen.sample.value
-
   "Check Your Answers Controller" should {
 
     "return OK and the correct view for a GET" in {

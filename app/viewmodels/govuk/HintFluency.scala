@@ -16,7 +16,8 @@
 
 package viewmodels.govuk
 
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Content
+import play.twirl.api.Html
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{Content, HtmlContent}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
 
 object hint extends HintFluency
@@ -27,6 +28,9 @@ trait HintFluency {
 
     def apply(content: Content): Hint =
       Hint(content = content)
+
+    def apply(html: Html): Hint =
+      apply(HtmlContent(html))
   }
 
   implicit class FluentHint(hint: Hint) {
