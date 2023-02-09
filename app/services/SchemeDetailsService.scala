@@ -34,7 +34,7 @@ class SchemeDetailsServiceImpl @Inject()(schemeDetailsConnector: SchemeDetailsCo
       schemeDetailsConnector.listSchemeDetails(_),
       schemeDetailsConnector.listSchemeDetails(_)
     ).map { allDetails =>
-      allDetails.schemeDetails.find(_.srn == srn.value)
+      allDetails.flatMap(_.schemeDetails.find(_.srn == srn.value))
     }
   }
 }

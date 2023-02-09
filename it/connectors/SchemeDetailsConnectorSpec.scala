@@ -298,14 +298,21 @@ class SchemeDetailsConnectorSpec extends BaseConnectorSpec {
 
       ListSchemesHelper.stubGet(psaId, ok(Json.toJson(expectedResult).toString()))
 
-      connector.listSchemeDetails(psaId).futureValue mustBe expectedResult
+      connector.listSchemeDetails(psaId).futureValue mustBe Some(expectedResult)
+    }
+
+    "return none 404 response is sent" in runningApplication { implicit app =>
+
+      ListSchemesHelper.stubGet(psaId, notFound)
+
+      connector.listSchemeDetails(psaId).futureValue mustBe None
     }
 
     "throw error" when {
 
-      "404 response is sent" in runningApplication { implicit app =>
+      "400 response is sent" in runningApplication { implicit app =>
 
-        ListSchemesHelper.stubGet(psaId, notFound)
+        ListSchemesHelper.stubGet(psaId, badRequest)
 
         assertThrows[Exception] {
           connector.listSchemeDetails(psaId).futureValue
@@ -332,14 +339,21 @@ class SchemeDetailsConnectorSpec extends BaseConnectorSpec {
 
       ListSchemesHelper.stubGet(pspId, ok(Json.toJson(expectedResult).toString()))
 
-      connector.listSchemeDetails(pspId).futureValue mustBe expectedResult
+      connector.listSchemeDetails(pspId).futureValue mustBe Some(expectedResult)
+    }
+
+    "return none 404 response is sent" in runningApplication { implicit app =>
+
+      ListSchemesHelper.stubGet(pspId, notFound)
+
+      connector.listSchemeDetails(pspId).futureValue mustBe None
     }
 
     "throw error" when {
 
-      "404 response is sent" in runningApplication { implicit app =>
+      "400 response is sent" in runningApplication { implicit app =>
 
-        ListSchemesHelper.stubGet(pspId, notFound)
+        ListSchemesHelper.stubGet(pspId, badRequest)
 
         assertThrows[Exception] {
           connector.listSchemeDetails(pspId).futureValue

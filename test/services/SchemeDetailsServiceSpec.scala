@@ -50,7 +50,7 @@ class SchemeDetailsServiceSpec extends BaseSpec with ScalaCheckPropertyChecks {
           val srn = Srn(expectedDetails.srn).value
 
           when(mockSchemeDetailsConnector.listSchemeDetails(meq(psaId))(any(), any()))
-            .thenReturn(Future.successful(details))
+            .thenReturn(Future.successful(Some(details)))
 
           service.getMinimalSchemeDetails(psaId, srn).futureValue mustBe Some(expectedDetails)
         }
@@ -66,7 +66,7 @@ class SchemeDetailsServiceSpec extends BaseSpec with ScalaCheckPropertyChecks {
           val srn = Srn(expectedDetails.srn).value
 
           when(mockSchemeDetailsConnector.listSchemeDetails(meq(pspId))(any(), any()))
-            .thenReturn(Future.successful(details))
+            .thenReturn(Future.successful(Some(details)))
 
           service.getMinimalSchemeDetails(pspId, srn).futureValue mustBe Some(expectedDetails)
         }
@@ -80,7 +80,7 @@ class SchemeDetailsServiceSpec extends BaseSpec with ScalaCheckPropertyChecks {
         whenever(!details.schemeDetails.exists(_.srn == srn.value)) {
 
           when(mockSchemeDetailsConnector.listSchemeDetails(meq(psaId))(any(), any()))
-            .thenReturn(Future.successful(details))
+            .thenReturn(Future.successful(Some(details)))
 
           service.getMinimalSchemeDetails(psaId, srn).futureValue mustBe None
         }
@@ -94,12 +94,33 @@ class SchemeDetailsServiceSpec extends BaseSpec with ScalaCheckPropertyChecks {
         whenever(!details.schemeDetails.exists(_.srn == srn.value)) {
 
           when(mockSchemeDetailsConnector.listSchemeDetails(meq(pspId))(any(), any()))
-            .thenReturn(Future.successful(details))
+            .thenReturn(Future.successful(Some(details)))
 
           service.getMinimalSchemeDetails(pspId, srn).futureValue mustBe None
         }
       }
     }
 
+    "return none when connector returns none for psa" in {
+
+      forAll(psaIdGen, srnGen) { (psaId, srn) =>
+
+        when(mockSchemeDetailsConnector.listSchemeDetails(meq(psaId))(any(), any()))
+          .thenReturn(Future.successful(None))
+
+        service.getMinimalSchemeDetails(psaId, srn).futureValue mustBe None
+      }
+    }
+
+    "return none when connector returns none for psp" in {
+
+      forAll(pspIdGen, srnGen) { (pspId, srn) =>
+
+        when(mockSchemeDetailsConnector.listSchemeDetails(meq(pspId))(any(), any()))
+          .thenReturn(Future.successful(None))
+
+        service.getMinimalSchemeDetails(pspId, srn).futureValue mustBe None
+      }
+    }
   }
 }

@@ -22,7 +22,9 @@ import models.PensionSchemeId.{PsaId, PspId}
 import models.SchemeId.Srn
 import models.{ListMinimalSchemeDetails, SchemeDetails, SchemeId}
 import play.api.Logger
+import play.api.http.Status.NOT_FOUND
 import uk.gov.hmrc.http.HttpReads.Implicits.{readFromJson, readOptionOfNotFound}
+import uk.gov.hmrc.http.UpstreamErrorResponse.WithStatusCode
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import utils.FutureUtils.FutureOps
 
@@ -83,13 +85,13 @@ class SchemeDetailsConnectorImpl @Inject()(appConfig: FrontendAppConfig, http: H
       }
   }
 
-  def listSchemeDetails(psaId: PsaId)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[ListMinimalSchemeDetails] =
+  def listSchemeDetails(psaId: PsaId)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[ListMinimalSchemeDetails]] =
     listSchemeDetails(psaId.value, "psaId")
 
-  def listSchemeDetails(pspId: PspId)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[ListMinimalSchemeDetails] =
+  def listSchemeDetails(pspId: PspId)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[ListMinimalSchemeDetails]] =
     listSchemeDetails(pspId.value, "pspId")
 
-  private def listSchemeDetails(idValue: String, idType: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[ListMinimalSchemeDetails] = {
+  private def listSchemeDetails(idValue: String, idType: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[ListMinimalSchemeDetails]] = {
 
     val headers = List(
       "idValue" -> idValue,
@@ -98,6 +100,10 @@ class SchemeDetailsConnectorImpl @Inject()(appConfig: FrontendAppConfig, http: H
 
     http
       .GET[ListMinimalSchemeDetails](url("/pensions-scheme/list-of-schemes"), headers = headers)
+      .map(Some(_))
+      .recover {
+        case WithStatusCode(NOT_FOUND) => None
+      }
       .tapError { t =>
         Future.successful(logger.error(s"Failed list scheme details for $idType $idValue with message ${t.getMessage}"))
       }
@@ -115,6 +121,6 @@ trait SchemeDetailsConnector {
   def checkAssociation(psaId: PsaId, schemeId: Srn)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Boolean]
   def checkAssociation(pspId: PspId, schemeId: Srn)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Boolean]
 
-  def listSchemeDetails(psaId: PsaId)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[ListMinimalSchemeDetails]
-  def listSchemeDetails(pspId: PspId)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[ListMinimalSchemeDetails]
+  def listSchemeDetails(psaId: PsaId)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[ListMinimalSchemeDetails]]
+  def listSchemeDetails(pspId: PspId)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[ListMinimalSchemeDetails]]
 }
