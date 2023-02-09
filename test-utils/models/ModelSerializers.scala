@@ -17,7 +17,11 @@
 package models
 
 import models.cache.PensionSchemeUser
+import play.api.libs.json.Json.JsValueWrapper
 import play.api.libs.json._
+
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 trait ModelSerializers {
 
@@ -56,4 +60,24 @@ trait ModelSerializers {
       "establishers" -> details.establishers
     ) ++ authorisingPSAID
   }
+
+  implicit val writeMinimalSchemeDetails: Writes[MinimalSchemeDetails] = { details =>
+
+    def formatDate(date: LocalDate): String = {
+      date.format(DateTimeFormatter.ofPattern("yyyy-M-d"))
+    }
+
+    val fields =
+      List[Option[(String, JsValueWrapper)]](
+        Some("name" -> details.name),
+        Some("referenceNumber" -> details.srn),
+        Some("schemeStatus" -> details.schemeStatus.toString),
+        details.openDate.map(d => "openDate" -> formatDate(d)),
+        details.windUpDate.map(d => "windUpDate" -> formatDate(d))
+      ).flatten
+
+    Json.obj(fields: _*)
+  }
+
+  implicit val writeListMinimalSchemeDetails: Writes[ListMinimalSchemeDetails] = Json.writes[ListMinimalSchemeDetails]
 }

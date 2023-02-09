@@ -18,6 +18,7 @@ package models
 
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
+import utils.Extractors.Int
 import utils.WithName
 
 import java.time.LocalDate
@@ -138,6 +139,13 @@ case class MinimalSchemeDetails(
 )
 
 object MinimalSchemeDetails {
+
+  private val dateRegex = "(\\d{4})-(\\d{1,2})-(\\d{1,2})".r
+  private implicit val readLocalDate: Reads[LocalDate] = Reads[LocalDate] {
+    case JsString(dateRegex(Int(year), Int(month), Int(day))) =>
+      JsSuccess(LocalDate.of(year, month, day))
+    case err => JsError(s"Unable to read local date from $err")
+  }
 
   implicit val reads: Reads[MinimalSchemeDetails] =
     (

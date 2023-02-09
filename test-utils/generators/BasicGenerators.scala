@@ -123,8 +123,11 @@ trait BasicGenerators {
     }
   }
 
+  val earliestDate: LocalDate = LocalDate.of(1970, 1, 1)
+  val latestDate: LocalDate = LocalDate.of(3000, 12, 31)
+
   def date: Gen[LocalDate] =
-    datesBetween(LocalDate.of(1970, 1, 1), LocalDate.of(3000, 12, 31))
+    datesBetween(earliestDate, latestDate)
 
   val nonEmptySimpleMessage: Gen[SimpleMessage] = nonEmptyString.map(SimpleMessage(_))
 

@@ -102,6 +102,12 @@ class CheckReturnDatesController @Inject()(
 
 object CheckReturnDatesController {
 
+  private def max(d1: LocalDate, d2: LocalDate): LocalDate =
+    if(d1.isAfter(d2)) d1 else d2
+
+  private def min(d1: LocalDate, d2: LocalDate): LocalDate =
+    if(d1.isAfter(d2)) d2 else d1
+
   def viewModel(
     srn: Srn,
     mode: Mode,
@@ -115,8 +121,12 @@ object CheckReturnDatesController {
       Some(
         SimpleMessage(
           "checkReturnDates.description",
-          DateTimeUtils.formatHtml(fromDate),
-          DateTimeUtils.formatHtml(toDate)
+          DateTimeUtils.formatHtml(
+            max(schemeDetails.openDate.getOrElse(fromDate), fromDate)
+          ),
+          DateTimeUtils.formatHtml(
+            min(schemeDetails.windUpDate.getOrElse(toDate), toDate)
+          )
         )
       ),
       SimpleMessage("checkReturnDates.legend"),

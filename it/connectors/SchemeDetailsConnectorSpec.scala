@@ -17,7 +17,7 @@
 package connectors
 
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder
-import com.github.tomakehurst.wiremock.client.WireMock.{badRequest, equalTo, get, notFound, ok, serverError, urlEqualTo}
+import com.github.tomakehurst.wiremock.client.WireMock.{badRequest, equalTo, get, notFound, ok, permanentRedirect, serverError, urlEqualTo}
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import models.PensionSchemeId.{PsaId, PspId}
 import models.{PensionSchemeId, SchemeId}
@@ -86,6 +86,24 @@ class SchemeDetailsConnectorSpec extends BaseConnectorSpec {
         case PsaId(value) => ("psaId", value)
         case PspId(value) => ("pspId", value)
       }
+  }
+
+  object ListSchemesHelper {
+    val url = "/pensions-scheme/list-of-schemes"
+
+    def stubGet(pensionSchemeId: PensionSchemeId, response: ResponseDefinitionBuilder): StubMapping = {
+
+      val idType = pensionSchemeId.fold(_ => "psaId", _ => "pspId")
+      val idValue = pensionSchemeId.fold(_.value, _.value)
+
+      wireMockServer
+        .stubFor(
+          get(urlEqualTo(url))
+            .withHeader("idType", equalTo(idType))
+            .withHeader("idValue", equalTo(idValue))
+            .willReturn(response)
+        )
+    }
   }
 
   def connector(implicit app: Application): SchemeDetailsConnector = injected[SchemeDetailsConnector]
@@ -266,6 +284,74 @@ class SchemeDetailsConnectorSpec extends BaseConnectorSpec {
 
         assertThrows[Exception] {
           connector.checkAssociation(pspId, srn).futureValue
+        }
+      }
+    }
+  }
+
+  ".listSchemeDetails for psa" should {
+
+    val psaId = psaIdGen.sample.value
+    val expectedResult = listMinimalSchemeDetailsGen.sample.value
+
+    "return scheme details" in runningApplication { implicit app =>
+
+      ListSchemesHelper.stubGet(psaId, ok(Json.toJson(expectedResult).toString()))
+
+      connector.listSchemeDetails(psaId).futureValue mustBe expectedResult
+    }
+
+    "throw error" when {
+
+      "404 response is sent" in runningApplication { implicit app =>
+
+        ListSchemesHelper.stubGet(psaId, notFound)
+
+        assertThrows[Exception] {
+          connector.listSchemeDetails(psaId).futureValue
+        }
+      }
+
+      "500 response is sent" in runningApplication { implicit app =>
+
+        ListSchemesHelper.stubGet(psaId, serverError)
+
+        assertThrows[Exception] {
+          connector.listSchemeDetails(psaId).futureValue
+        }
+      }
+    }
+  }
+
+  ".listSchemeDetails for psp" should {
+
+    val pspId = pspIdGen.sample.value
+    val expectedResult = listMinimalSchemeDetailsGen.sample.value
+
+    "return scheme details" in runningApplication { implicit app =>
+
+      ListSchemesHelper.stubGet(pspId, ok(Json.toJson(expectedResult).toString()))
+
+      connector.listSchemeDetails(pspId).futureValue mustBe expectedResult
+    }
+
+    "throw error" when {
+
+      "404 response is sent" in runningApplication { implicit app =>
+
+        ListSchemesHelper.stubGet(pspId, notFound)
+
+        assertThrows[Exception] {
+          connector.listSchemeDetails(pspId).futureValue
+        }
+      }
+
+      "500 response is sent" in runningApplication { implicit app =>
+
+        ListSchemesHelper.stubGet(pspId, serverError)
+
+        assertThrows[Exception] {
+          connector.listSchemeDetails(pspId).futureValue
         }
       }
     }

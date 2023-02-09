@@ -26,7 +26,7 @@ import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import services.{FakeTaxYearService, SaveService, TaxYearService}
+import services.{FakeTaxYearService, SaveService, SchemeDetailsService, TaxYearService}
 import utils.DateTimeUtils
 import viewmodels.DisplayMessage
 import viewmodels.DisplayMessage.SimpleMessage
@@ -44,11 +44,13 @@ class CheckReturnDatesControllerSpec extends ControllerBaseSpec with ScalaCheckP
 
   "CheckReturnDates.viewModel" should {
 
+    val minimalSchemeDetails = minimalSchemeDetailsGen.sample.value
+
     "contain correct title key" in {
 
       forAll(srnGen, modeGen, date) { (srn, mode, dates) =>
 
-        val viewModel = CheckReturnDatesController.viewModel(srn, mode, dates, dates)
+        val viewModel = CheckReturnDatesController.viewModel(srn, mode, dates, dates, minimalSchemeDetails)
         viewModel.title mustBe SimpleMessage("checkReturnDates.title")
       }
     }
@@ -57,18 +59,62 @@ class CheckReturnDatesControllerSpec extends ControllerBaseSpec with ScalaCheckP
 
       forAll(srnGen, modeGen, date) { (srn, mode, dates) =>
 
-        val viewModel = CheckReturnDatesController.viewModel(srn, mode, dates, dates)
+        val viewModel = CheckReturnDatesController.viewModel(srn, mode, dates, dates, minimalSchemeDetails)
         viewModel.heading mustBe SimpleMessage("checkReturnDates.heading")
       }
     }
 
-    "contain from date and to date in description" in {
+    "contain from date when it is after open date" in {
+
+      val updatedDetails = minimalSchemeDetails.copy(openDate = Some(earliestDate), windUpDate = None)
 
       forAll(date, date) { (fromDate, toDate) =>
 
-        val viewModel = CheckReturnDatesController.viewModel(srn, NormalMode, fromDate, toDate)
+        val viewModel = CheckReturnDatesController.viewModel(srn, NormalMode, fromDate, toDate, updatedDetails)
         val formattedFromDate = DateTimeUtils.formatHtml(fromDate)
         val formattedToDate = DateTimeUtils.formatHtml(toDate)
+
+        viewModel.description mustBe Some(SimpleMessage("checkReturnDates.description", formattedFromDate, formattedToDate))
+      }
+    }
+
+    "contain open date when it is after from date" in {
+
+      val detailsGen = minimalSchemeDetailsGen.map(_.copy(windUpDate = None))
+
+      forAll(detailsGen, date) { (details, toDate) =>
+
+        val viewModel = CheckReturnDatesController.viewModel(srn, NormalMode, earliestDate, toDate, details)
+        val formattedFromDate = DateTimeUtils.formatHtml(details.openDate.getOrElse(earliestDate))
+        val formattedToDate = DateTimeUtils.formatHtml(toDate)
+
+        viewModel.description mustBe Some(SimpleMessage("checkReturnDates.description", formattedFromDate, formattedToDate))
+      }
+    }
+
+    "contain to date when it is before wind up date" in {
+
+      val updatedDetails = minimalSchemeDetails.copy(openDate = None, windUpDate = Some(latestDate))
+
+      forAll(date, date) { (fromDate, toDate) =>
+
+        val viewModel = CheckReturnDatesController.viewModel(srn, NormalMode, fromDate, toDate, updatedDetails)
+        val formattedFromDate = DateTimeUtils.formatHtml(fromDate)
+        val formattedToDate = DateTimeUtils.formatHtml(toDate)
+
+        viewModel.description mustBe Some(SimpleMessage("checkReturnDates.description", formattedFromDate, formattedToDate))
+      }
+    }
+
+    "contain wind up date when it is before to date" in {
+
+      val detailsGen = minimalSchemeDetailsGen.map(_.copy(openDate = None))
+
+      forAll(detailsGen, date) { (details, fromDate) =>
+
+        val viewModel = CheckReturnDatesController.viewModel(srn, NormalMode, fromDate, latestDate, details)
+        val formattedFromDate = DateTimeUtils.formatHtml(fromDate)
+        val formattedToDate = DateTimeUtils.formatHtml(details.windUpDate.getOrElse(latestDate))
 
         viewModel.description mustBe Some(SimpleMessage("checkReturnDates.description", formattedFromDate, formattedToDate))
       }
@@ -78,7 +124,7 @@ class CheckReturnDatesControllerSpec extends ControllerBaseSpec with ScalaCheckP
 
       forAll(srnGen, modeGen, date) { (srn, mode, dates) =>
 
-        val viewModel = CheckReturnDatesController.viewModel(srn, mode, dates, dates)
+        val viewModel = CheckReturnDatesController.viewModel(srn, mode, dates, dates, minimalSchemeDetails)
         viewModel.legend mustBe SimpleMessage("checkReturnDates.legend")
       }
     }
@@ -87,7 +133,7 @@ class CheckReturnDatesControllerSpec extends ControllerBaseSpec with ScalaCheckP
 
       forAll(srnGen, modeGen, date) { (srn, mode, dates) =>
 
-        val viewModel = CheckReturnDatesController.viewModel(srn, mode, dates, dates)
+        val viewModel = CheckReturnDatesController.viewModel(srn, mode, dates, dates, minimalSchemeDetails)
         viewModel.onSubmit mustBe routes.CheckReturnDatesController.onSubmit(srn, mode)
       }
     }
@@ -98,19 +144,29 @@ class CheckReturnDatesControllerSpec extends ControllerBaseSpec with ScalaCheckP
 
     val date = self.date.sample.value
     val fakeTaxYearService = new FakeTaxYearService(date)
+    val minimalSchemeDetails = minimalSchemeDetailsGen.sample.value
     lazy val viewModel: YesNoPageViewModel =
       CheckReturnDatesController.viewModel(
         srn,
         NormalMode,
         fakeTaxYearService.current.starts,
-        fakeTaxYearService.current.finishes
+        fakeTaxYearService.current.finishes,
+        minimalSchemeDetails
       )
 
     val formProvider = new YesNoPageFormProvider()
     val form = formProvider("checkReturnDates.error.required", "checkReturnDates.error.invalid")
 
+    val mockSchemeDetailsService = mock[SchemeDetailsService]
+    when(mockSchemeDetailsService.getMinimalSchemeDetails(any(), any())(any(), any()))
+      .thenReturn(Future.successful(Some(minimalSchemeDetails)))
+
     def applicationBuilder(userAnswers: Option[UserAnswers]) =
-      self.applicationBuilder(userAnswers).overrides(bind[TaxYearService].toInstance(fakeTaxYearService))
+      self.applicationBuilder(userAnswers)
+        .overrides(
+          bind[TaxYearService].toInstance(fakeTaxYearService),
+          bind[SchemeDetailsService].toInstance(mockSchemeDetailsService)
+        )
 
     "must return OK and the correct view for a GET" in {
 
