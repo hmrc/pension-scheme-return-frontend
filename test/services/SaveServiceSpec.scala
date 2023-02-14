@@ -34,6 +34,7 @@ class SaveServiceSpec extends BaseSpec with ScalaCheckPropertyChecks {
   val service = new SaveServiceImpl(mockSessionRepository)
 
   override def beforeEach(): Unit = {
+    super.beforeEach()
     reset(mockSessionRepository)
   }
 

@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package models.requests
+package pages
 
-import models.{PensionSchemeId, SchemeDetails}
-import play.api.mvc.WrappedRequest
+import models.SchemeId.Srn
+import play.api.libs.json.JsPath
 
-case class AllowedAccessRequest[A](request: IdentifierRequest[A], schemeDetails: SchemeDetails) extends WrappedRequest[A](request) {
+case class CheckReturnDatesPage(srn: Srn) extends QuestionPage[Boolean] {
 
-  val getUserId: String = request.getUserId
+  override def path: JsPath = JsPath \ toString
 
-  val pensionSchemeId: PensionSchemeId = request.pensionSchemeId
+  override def toString: String = "checkReturnDates"
 }

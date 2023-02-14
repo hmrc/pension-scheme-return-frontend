@@ -64,7 +64,7 @@ class SchemeDetailsController @Inject()(
       schemeDetails.establishers.headOption.map(establisher => ("schemeDetails.row4",  establisher.name))
 
     val otherSchemeEstablisherNameRows: Option[(DisplayMessage, DisplayMessage)] = schemeDetails.establishers match {
-      case _ :: Nil => None
+      case _ :: Nil | Nil => None
       case _ :: others =>
         Some(("schemeDetails.row5", ComplexMessage(others.map(other => Message(other.name)), Delimiter.Newline)))
     }

@@ -18,7 +18,10 @@ package models
 
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
+import utils.Extractors.Int
 import utils.WithName
+
+import java.time.LocalDate
 
 case class SchemeDetails(
   srn: String,
@@ -118,4 +121,38 @@ object SchemeStatus {
     case JsString(RejectedUnderAppeal.name) => JsSuccess(RejectedUnderAppeal)
     case _                                  => JsError("Unrecognized scheme status")
   }
+}
+
+case class ListMinimalSchemeDetails(schemeDetails: List[MinimalSchemeDetails])
+
+object ListMinimalSchemeDetails {
+
+  implicit val reads: Reads[ListMinimalSchemeDetails] = Json.reads[ListMinimalSchemeDetails]
+}
+
+case class MinimalSchemeDetails(
+  name: String,
+  srn: String,
+  schemeStatus: SchemeStatus,
+  openDate: Option[LocalDate],
+  windUpDate: Option[LocalDate]
+)
+
+object MinimalSchemeDetails {
+
+  private val dateRegex = "(\\d{4})-(\\d{1,2})-(\\d{1,2})".r
+  private implicit val readLocalDate: Reads[LocalDate] = Reads[LocalDate] {
+    case JsString(dateRegex(Int(year), Int(month), Int(day))) =>
+      JsSuccess(LocalDate.of(year, month, day))
+    case err => JsError(s"Unable to read local date from $err")
+  }
+
+  implicit val reads: Reads[MinimalSchemeDetails] =
+    (
+      (__ \ "name").read[String] and
+       (__ \ "referenceNumber").read[String] and
+       (__ \ "schemeStatus").read[SchemeStatus] and
+       (__ \ "openDate").readNullable[LocalDate] and
+       (__ \ "windUpDate").readNullable[LocalDate]
+    )(MinimalSchemeDetails.apply _)
 }

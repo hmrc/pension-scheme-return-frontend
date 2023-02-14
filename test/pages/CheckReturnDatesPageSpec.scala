@@ -14,14 +14,20 @@
  * limitations under the License.
  */
 
-package models.requests
+package pages
 
-import models.{PensionSchemeId, SchemeDetails}
-import play.api.mvc.WrappedRequest
+import pages.behaviours.PageBehaviours
 
-case class AllowedAccessRequest[A](request: IdentifierRequest[A], schemeDetails: SchemeDetails) extends WrappedRequest[A](request) {
+class CheckReturnDatesPageSpec extends PageBehaviours {
 
-  val getUserId: String = request.getUserId
+  "CheckReturnDatesPage" - {
 
-  val pensionSchemeId: PensionSchemeId = request.pensionSchemeId
+    val srn = srnGen.sample.value
+
+    beRetrievable[Boolean](CheckReturnDatesPage(srn))
+
+    beSettable[Boolean](CheckReturnDatesPage(srn))
+
+    beRemovable[Boolean](CheckReturnDatesPage(srn))
+  }
 }

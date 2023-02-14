@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-package models.requests
+package utils
 
-import models.{PensionSchemeId, SchemeDetails}
-import play.api.mvc.WrappedRequest
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
-case class AllowedAccessRequest[A](request: IdentifierRequest[A], schemeDetails: SchemeDetails) extends WrappedRequest[A](request) {
+object DateTimeUtils {
 
-  val getUserId: String = request.getUserId
+  def formatHtml(localDate: LocalDate) = {
+    val formatter = DateTimeFormatter.ofPattern("dd\u00A0MMMM\u00A0yyyy")
+    localDate.format(formatter)
+  }
 
-  val pensionSchemeId: PensionSchemeId = request.pensionSchemeId
 }

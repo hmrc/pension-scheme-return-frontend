@@ -95,7 +95,7 @@ class SchemeDetailsControllerSpec extends ControllerBaseSpec {
             val request = FakeRequest(GET, onPageLoad)
 
             val result = route(app, request).value
-            val expectedView = view(controller.viewModel(srn, schemeDetails))(request, messages(app))
+            val expectedView = view(controller.viewModel(srn, schemeDetails))(request, createMessages(app))
 
             status(result) mustEqual OK
             contentAsString(result) mustEqual expectedView.toString

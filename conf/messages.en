@@ -1,16 +1,17 @@
 service.name = pension-scheme-return-frontend
 
 site.back = Back
+site.back.aria-label = Return to previous page
 site.remove = Remove
 site.change = Change
 site.no = No
 site.yes = Yes
 site.continue = Continue
+site.saveAndContinue = Save and continue
 site.start = Start now
 site.startAgain = Start again
 site.signIn = Sign in
 site.govuk = GOV.UK
-site.saveAndContinue = Save and continue
 
 date.day = Day
 date.month = Month
@@ -63,6 +64,13 @@ startPage.paragraph1 = Use this online service to submit a pension scheme return
 startPage.paragraph2 = You should only use this service if you have received a notice to file telling you to complete a pension scheme return.
 startPage.paragraph3 = You must submit the return by the deadline given on the notice to file. You will be charged a £100 penalty if it is not received by the deadline.
 startPage.paragraph4 = You do not have to complete the whole return at once. You can save your answers and come back to them later.
+
+checkReturnDates.title = Check the dates of your return
+checkReturnDates.heading = Check the dates of your return
+checkReturnDates.description = You are completing a pension scheme return for tax year {0} to {1}.
+checkReturnDates.legend = Are these dates correct?
+checkReturnDates.error.required = Select yes if these dates are correct
+checkReturnDates.error.invalid = Select yes if these dates are correct
 
 schemeDetails.title = Check your scheme details
 schemeDetails.heading = Check your scheme details

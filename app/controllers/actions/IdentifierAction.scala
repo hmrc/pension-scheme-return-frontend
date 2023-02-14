@@ -31,6 +31,7 @@ import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
+import utils.Extractors.&&
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -101,9 +102,5 @@ class IdentifierActionImpl @Inject()(
         .find(_.key == Constants.pspEnrolmentKey)
         .flatMap(_.getIdentifier(Constants.pspIdKey))
     }
-  }
-
-  object && {
-    def unapply[A](a: A): Some[(A, A)] = Some((a, a))
   }
 }

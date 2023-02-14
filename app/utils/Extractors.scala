@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-package models.requests
+package utils
 
-import models.{PensionSchemeId, SchemeDetails}
-import play.api.mvc.WrappedRequest
+object Extractors {
 
-case class AllowedAccessRequest[A](request: IdentifierRequest[A], schemeDetails: SchemeDetails) extends WrappedRequest[A](request) {
+  object && {
+    def unapply[A](a: A): Some[(A, A)] = Some((a, a))
+  }
 
-  val getUserId: String = request.getUserId
-
-  val pensionSchemeId: PensionSchemeId = request.pensionSchemeId
+  object Int {
+    def unapply(s: String): Option[Int] =
+      s.toIntOption
+  }
 }

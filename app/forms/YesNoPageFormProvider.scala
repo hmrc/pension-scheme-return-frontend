@@ -14,22 +14,19 @@
  * limitations under the License.
  */
 
-package services
+package forms
 
-import com.google.inject.ImplementedBy
-import models.UserAnswers
-import repositories.SessionRepository
-import uk.gov.hmrc.http.HeaderCarrier
+import forms.mappings.Mappings
+import play.api.data.Form
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
 
-class SaveServiceImpl @Inject()(sessionRepository: SessionRepository)(implicit ec: ExecutionContext) extends SaveService {
-  override def save(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[Unit] =
-    sessionRepository.set(userAnswers)
-}
+class YesNoPageFormProvider @Inject() extends Mappings {
 
-@ImplementedBy(classOf[SaveServiceImpl])
-trait SaveService {
-  def save(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[Unit]
+  def apply(
+    requiredKey: String,
+    invalidKey: String
+  ): Form[Boolean] =
+    Form("value" -> boolean(requiredKey, invalidKey))
+
 }

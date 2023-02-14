@@ -123,6 +123,12 @@ trait BasicGenerators {
     }
   }
 
+  val earliestDate: LocalDate = LocalDate.of(1970, 1, 1)
+  val latestDate: LocalDate = LocalDate.of(3000, 12, 31)
+
+  def date: Gen[LocalDate] =
+    datesBetween(earliestDate, latestDate)
+
   val nonEmptySimpleMessage: Gen[SimpleMessage] = nonEmptyString.map(SimpleMessage(_))
 
   def tupleOf[A, B](genA: Gen[A], genB: Gen[B]): Gen[(A, B)] =
@@ -155,5 +161,11 @@ trait BasicGenerators {
   val relativeUrl: Gen[String] =
     nonEmptyListOf(nonEmptyString).map(_.mkString("/", "/", "/"))
 
-  val getCall: Gen[Call] = relativeUrl.map(Call("GET", _))
+  val httpMethod: Gen[String] = Gen.oneOf("GET", "POST")
+  val call: Gen[Call] = {
+    for {
+      method <- httpMethod
+      url    <- relativeUrl
+    } yield Call(method, url)
+  }
 }

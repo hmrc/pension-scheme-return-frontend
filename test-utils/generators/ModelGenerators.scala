@@ -83,6 +83,20 @@ trait ModelGenerators extends BasicGenerators {
       establishers <- Gen.listOf(establisherGen)
     } yield SchemeDetails(srn, name, pstr, status, schemeType, authorisingPsa, establishers)
 
+  val minimalSchemeDetailsGen: Gen[MinimalSchemeDetails] =
+    for {
+      name         <- nonEmptyString
+      srn          <- srnGen.map(_.value)
+      schemeStatus <- schemeStatusGen
+      openDate     <- Gen.option(date)
+      windUpDate   <- Gen.option(date)
+    } yield MinimalSchemeDetails(name, srn, schemeStatus, openDate, windUpDate)
+
+  val listMinimalSchemeDetailsGen: Gen[ListMinimalSchemeDetails] =
+    Gen.listOf(minimalSchemeDetailsGen).map(xs => ListMinimalSchemeDetails(xs))
+
+
+
   val pensionSchemeUserGen: Gen[PensionSchemeUser] =
     Gen.oneOf(Administrator, Practitioner)
 
@@ -122,4 +136,8 @@ trait ModelGenerators extends BasicGenerators {
       request       <- identifierRequestGen[A](request)
       schemeDetails <- schemeDetailsGen
     } yield AllowedAccessRequest(request, schemeDetails)
+
+  def modeGen: Gen[Mode] = Gen.oneOf(NormalMode, CheckMode)
 }
+
+object ModelGenerators extends ModelGenerators

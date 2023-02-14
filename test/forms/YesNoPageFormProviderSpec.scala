@@ -14,14 +14,32 @@
  * limitations under the License.
  */
 
-package models.requests
+package forms
 
-import models.{PensionSchemeId, SchemeDetails}
-import play.api.mvc.WrappedRequest
+import forms.behaviours.BooleanFieldBehaviours
+import play.api.data.FormError
 
-case class AllowedAccessRequest[A](request: IdentifierRequest[A], schemeDetails: SchemeDetails) extends WrappedRequest[A](request) {
+class YesNoPageFormProviderSpec extends BooleanFieldBehaviours {
 
-  val getUserId: String = request.getUserId
+  val requiredKey = "yesNoPage.error.required"
+  val invalidKey = "yesNoPage.error.invalid"
 
-  val pensionSchemeId: PensionSchemeId = request.pensionSchemeId
+  val form = new YesNoPageFormProvider()(requiredKey, invalidKey)
+
+  ".value" - {
+
+    val fieldName = "value"
+
+    behave like booleanField(
+      form,
+      fieldName,
+      FormError(fieldName, invalidKey)
+    )
+
+    behave like mandatoryField(
+      form,
+      fieldName,
+      FormError(fieldName, requiredKey)
+    )
+  }
 }
