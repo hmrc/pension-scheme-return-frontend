@@ -1,6 +1,7 @@
 service.name = pension-scheme-return-frontend
 
 site.back = Back
+site.back.aria-label = Return to previous page
 site.remove = Remove
 site.change = Change
 site.no = No
@@ -11,7 +12,6 @@ site.start = Start now
 site.startAgain = Start again
 site.signIn = Sign in
 site.govuk = GOV.UK
-site.saveAndContinue = Save and continue
 
 date.day = Day
 date.month = Month
