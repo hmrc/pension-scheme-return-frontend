@@ -67,7 +67,7 @@ startPage.paragraph4 = You do not have to complete the whole return at once. You
 
 checkReturnDates.title = Check the dates of your return
 checkReturnDates.heading = Check the dates of your return
-checkReturnDates.description = You are completing a pension scheme return for tax year {0} to {1}.
+checkReturnDates.description = You are completing a pension scheme return for the tax year {0} to {1}.
 checkReturnDates.legend = Are these dates correct?
 checkReturnDates.error.required = Select yes if these dates are correct
 checkReturnDates.error.invalid = Select yes if these dates are correct
