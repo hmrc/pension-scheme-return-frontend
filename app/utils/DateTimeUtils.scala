@@ -22,7 +22,7 @@ import java.time.format.DateTimeFormatter
 object DateTimeUtils {
 
   def formatHtml(localDate: LocalDate) = {
-    val formatter = DateTimeFormatter.ofPattern("dd\u00A0MMMM\u00A0yyyy")
+    val formatter = DateTimeFormatter.ofPattern("d\u00A0MMMM\u00A0yyyy")
     localDate.format(formatter)
   }
 
