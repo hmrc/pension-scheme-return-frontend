@@ -21,6 +21,7 @@ import generators.Generators
 import org.scalacheck.Gen
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.data.{Form, FormError}
+import org.scalacheck.Gen._
 
 trait FieldBehaviours extends FormSpec with ScalaCheckPropertyChecks with Generators {
 
@@ -53,6 +54,29 @@ trait FieldBehaviours extends FormSpec with ScalaCheckPropertyChecks with Genera
 
       val result = form.bind(Map(fieldName -> "")).apply(fieldName)
       result.errors mustEqual Seq(requiredError)
+    }
+  }
+
+  def mandatoryField(form: Form[_], fieldName: String, message: String): Unit =
+    mandatoryField(form, fieldName, FormError(fieldName, message))
+
+  def invalidNumericField(form: Form[_], fieldName: String, errorMessage: String, args: Any*): Unit =
+    errorField("numeric value is invalid", form, fieldName, FormError(fieldName, errorMessage, args.toList), alphaStr.filter(_.nonEmpty))
+
+  def invalidAlphaField(form: Form[_], fieldName: String, errorMessage: String, args: List[Any] = Nil): Unit =
+    errorField("alpha value is invalid", form, fieldName, FormError(fieldName, errorMessage, args), numStr.filter(_.nonEmpty))
+
+  def fieldLengthError(form: Form[_], fieldName: String, error: FormError, min: Int, max: Int, charGen: Gen[Char]): Unit = {
+    val lengthGen = stringLengthBetween(min, max, charGen)
+    errorField(s"length is between $min and $max", form, fieldName, error, lengthGen)
+  }
+
+  def errorField(testName: String, form: Form[_], fieldName: String, error: FormError, gen: Gen[String]): Unit = {
+    s"not bind when $testName" in {
+      forAll(gen -> "validDataItem") { value: String =>
+        val result = form.bind(Map(fieldName -> value))(fieldName)
+        result.errors mustEqual Seq(error)
+      }
     }
   }
 }

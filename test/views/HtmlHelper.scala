@@ -47,6 +47,12 @@ trait HtmlHelper {
   def labels(html: Html): List[String] =
     mainContent(html).getElementsByTag("label").iterator().asScala.map(_.text()).toList
 
+  def inputLabel(html: Html)(name: String): Element =
+    mainContent(html).selectFirst(s"label[for=$name]")
+
+  def inputHint(html: Html)(name: String): Element =
+    mainContent(html).getElementById(s"$name-hint")
+
   def tr(html: Html): List[List[String]] =
     mainContent(html).getElementsByTag("tr").iterator().asScala.toList.map(
       _.getElementsByTag("td").iterator().asScala.toList.map(_.text())
@@ -69,6 +75,8 @@ trait HtmlHelper {
 
   def errorMessage(html: Html): Elements =
     mainContent(html).getElementsByClass("govuk-error-message")
+
+//  def errorInput(html: Html)(name: String): Element =
 
   def messageKey(message: DisplayMessage): String = message match {
     case SimpleMessage(key, _) => key

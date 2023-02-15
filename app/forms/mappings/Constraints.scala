@@ -31,6 +31,12 @@ trait Constraints {
           .getOrElse(Valid)
     }
 
+  protected def when[A](predicate: A => Boolean, constraint: Constraint[A]): Constraint[A] =
+    Constraint[A]((value: A) => if (predicate(value)) constraint(value) else Valid)
+
+  protected def failWhen[A](predicate: A => Boolean, errorKey: String, args: Any*): Constraint[A] =
+    Constraint[A]((value: A) => if (predicate(value)) Invalid(errorKey, args: _*) else Valid)
+
   protected def minimumValue[A](minimum: A, errorKey: String)(implicit ev: Ordering[A]): Constraint[A] =
     Constraint {
       input =>
@@ -76,6 +82,22 @@ trait Constraints {
         Valid
       case _ =>
         Invalid(errorKey, regex)
+    }
+
+  protected def length(length: Int, errorKey: String): Constraint[String] =
+    Constraint {
+      case str if str.length == length =>
+        Valid
+      case _ =>
+        Invalid(errorKey, length)
+    }
+
+  protected def lengthBetween(min: Int, max: Int, errorKey: String): Constraint[String] =
+    Constraint {
+      case str if str.length >= min && str.length <= max =>
+        Valid
+      case _ =>
+        Invalid(errorKey, min, max)
     }
 
   protected def maxLength(maximum: Int, errorKey: String): Constraint[String] =

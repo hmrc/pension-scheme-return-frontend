@@ -16,22 +16,15 @@
 
 package controllers
 
-import models.NormalMode
 import navigation.{FakeNavigator, Navigator}
-import play.api.Application
-import play.api.http.Status.{OK, SEE_OTHER}
 import play.api.inject.bind
-import play.api.mvc.{Call, Request}
+import play.api.mvc.Call
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import viewmodels.models.ContentPageViewModel
 import views.html.ContentPageView
 
 class StartPageControllerSpec extends ControllerBaseSpec {
 
   def onwardRoute = Call("GET", "/foo")
-
-  val srn = srnGen.sample.value
 
   lazy val onPageLoad = routes.StartPageController.onPageLoad(srn).url
   lazy val onSubmit = routes.StartPageController.onSubmit(srn).url

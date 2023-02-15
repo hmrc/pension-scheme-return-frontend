@@ -29,11 +29,13 @@ class Navigator @Inject()() {
     case StartPage(srn) => _ => routes.UnauthorisedController.onPageLoad
     case CheckReturnDatesPage(srn) => _ => routes.UnauthorisedController.onPageLoad
     case SchemeDetailsPage(srn) => _ => routes.UnauthorisedController.onPageLoad
+    case SchemeBankAccountPage(srn) => _ => routes.UnauthorisedController.onPageLoad
     case _              => _ => routes.IndexController.onPageLoad
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
     case CheckReturnDatesPage(srn) => _ => routes.UnauthorisedController.onPageLoad
+    case SchemeBankAccountPage(srn) => _ => routes.UnauthorisedController.onPageLoad
     case _ => _ => routes.IndexController.onPageLoad
   }
 

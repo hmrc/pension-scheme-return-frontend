@@ -27,7 +27,6 @@ class YesNoPageViewSpec extends BaseSpec with ScalaCheckPropertyChecks with Html
   runningApplication { implicit app =>
 
     implicit val request  = FakeRequest()
-    implicit val messages = createMessages(app)
 
     val view = injected[YesNoPageView]
 

@@ -19,7 +19,6 @@ package controllers
 import models.{Establisher, EstablisherKind}
 import navigation.{FakeNavigator, Navigator}
 import play.api.inject.bind
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import viewmodels.ComplexMessageElement.Message
 import viewmodels.Delimiter
@@ -27,10 +26,6 @@ import viewmodels.DisplayMessage.{ComplexMessage, SimpleMessage}
 import views.html.ContentTablePageView
 
 class SchemeDetailsControllerSpec extends ControllerBaseSpec {
-
-  def onwardRoute = Call("GET", "/foo")
-
-  val srn = srnGen.sample.value
 
   lazy val onPageLoad = routes.SchemeDetailsController.onPageLoad(srn).url
   lazy val onSubmit = routes.SchemeDetailsController.onSubmit(srn).url
@@ -109,7 +104,7 @@ class SchemeDetailsControllerSpec extends ControllerBaseSpec {
       val fakeNavigatorApplication =
         applicationBuilder(Some(userAnswers))
           .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
+            bind[Navigator].toInstance(new FakeNavigator(testOnwardRoute))
           )
 
       running(_ => fakeNavigatorApplication) { app =>
@@ -119,7 +114,7 @@ class SchemeDetailsControllerSpec extends ControllerBaseSpec {
         val result = route(app, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
+        redirectLocation(result).value mustEqual testOnwardRoute.url
       }
     }
   }
