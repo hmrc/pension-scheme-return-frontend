@@ -36,7 +36,7 @@ class Navigator @Inject()() {
         routes.SchemeBankAccountController.onPageLoad(srn, NormalMode)
       else
         routes.UnauthorisedController.onPageLoad
-        
+
     case SchemeBankAccountPage(srn) => _ => routes.UnauthorisedController.onPageLoad
     case _                          => _ => routes.IndexController.onPageLoad
   }
