@@ -14,23 +14,13 @@
  * limitations under the License.
  */
 
-package forms
+package config
 
-import forms.mappings.Mappings
-import play.api.data.Form
+import eu.timepit.refined.api.Refined
+import eu.timepit.refined.boolean.And
+import eu.timepit.refined.numeric.{Greater, LessEqual}
 
-import javax.inject.Inject
-
-class YesNoPageFormProvider @Inject() extends Mappings {
-
-  def apply(
-    requiredKey: String,
-    invalidKey: String
-  ): Form[Boolean] =
-    Form("value" -> boolean(requiredKey, invalidKey))
-
-  def apply(
-             requiredKey: String
-           ): Form[Boolean] =
-    Form("value" -> boolean(requiredKey, ""))
+object Refined {
+  type OneToTen = Greater[0] And LessEqual[10]
+  type Max10 = Int Refined OneToTen
 }

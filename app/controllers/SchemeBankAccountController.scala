@@ -17,11 +17,12 @@
 package controllers
 
 import com.google.inject.Inject
+import config.Refined.Max10
 import controllers.SchemeBankAccountController._
 import controllers.actions._
 import forms.BankAccountFormProvider
-import models.{BankAccount, Mode, NormalMode}
 import models.SchemeId.Srn
+import models.{BankAccount, Mode}
 import navigation.Navigator
 import pages.SchemeBankAccountPage
 import play.api.data.Form
@@ -29,7 +30,6 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.FormUtils._
 import viewmodels.implicits._
 import viewmodels.models.BankAccountViewModel
 import views.html.BankAccountView
@@ -51,22 +51,31 @@ class SchemeBankAccountController @Inject()(
 
   private val form = SchemeBankAccountController.form(formProvider)
 
-  def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = (identify andThen allowAccess(srn) andThen getData andThen requireData) {
-    implicit request =>
-      Ok(view(form.fromUserAnswers(SchemeBankAccountPage(srn)), viewModel(srn, mode)))
-  }
+  def onPageLoad(srn: Srn, index: Max10, mode: Mode): Action[AnyContent] =
+    (identify andThen allowAccess(srn) andThen getData andThen requireData) {
+      implicit request =>
+        val maybeBankAccount = request.userAnswers.schemeBankAccounts(srn).lift(index.value - 1)
+        val preparedForm = maybeBankAccount.fold(form)(form.fill)
+        Ok(view(preparedForm, viewModel(srn, index, mode)))
+    }
 
-  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = (identify andThen allowAccess(srn) andThen getData andThen requireData).async {
-    implicit request =>
-      form.bindFromRequest().fold(
-        formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, mode)))),
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(SchemeBankAccountPage(srn), value))
-            _ <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage(SchemeBankAccountPage(srn), mode, updatedAnswers))
-      )
-  }
+  def onSubmit(srn: Srn, index: Max10, mode: Mode): Action[AnyContent] =
+    (identify andThen allowAccess(srn) andThen getData andThen requireData).async {
+      implicit request =>
+        form.bindFromRequest().fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode)))),
+          value => {
+            val bankAccounts = request.userAnswers.schemeBankAccounts(srn) match {
+              case list if list.isDefinedAt(index.value - 1) => list.updated(index.value - 1, value)
+              case list => list :+ value
+            }
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(SchemeBankAccountPage(srn), bankAccounts))
+              _ <- saveService.save(updatedAnswers)
+            } yield Redirect(navigator.nextPage(SchemeBankAccountPage(srn), mode, updatedAnswers))
+          }
+        )
+    }
 }
 
 object SchemeBankAccountController {
@@ -84,7 +93,7 @@ object SchemeBankAccountController {
     "schemeBankDetails.sortCode.error.length"
   )
 
-  def viewModel(srn: Srn, mode: Mode): BankAccountViewModel = BankAccountViewModel(
+  def viewModel(srn: Srn, index: Max10, mode: Mode): BankAccountViewModel = BankAccountViewModel(
     "schemeBankDetails.title",
     "schemeBankDetails.heading",
     "schemeBankDetails.paragraph",
@@ -94,6 +103,6 @@ object SchemeBankAccountController {
     "schemeBankDetails.sortCode.heading",
     "schemeBankDetails.sortCode.hint",
     "site.saveAndContinue",
-    routes.SchemeBankAccountController.onSubmit(srn, mode)
+    routes.SchemeBankAccountController.onSubmit(srn, index, mode)
   )
 }

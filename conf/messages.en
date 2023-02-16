@@ -100,3 +100,12 @@ schemeBankDetails.sortCode.error.required = Enter a sort code
 schemeBankDetails.sortCode.error.invalid = Sort code must only include numbers 0 to 9
 schemeBankDetails.sortCode.error.format.invalid = Enter a valid sort code, like 309430
 schemeBankDetails.sortCode.error.length = Sort code must be 6 digits
+
+schemeBankDetailsSummary.title = You have added {0} bank account
+schemeBankDetailsSummary.title.plural = You have added {0} bank accounts
+schemeBankDetailsSummary.heading = You have added {0} bank account
+schemeBankDetailsSummary.heading.plural = You have added {0} bank accounts
+schemeBankDetailsSummary.accountNumber = (Account number: {0})
+schemeBankDetailsSummary.radio = Do you need to add another bank account?
+schemeBankDetailsSummary.inset = You cannot add another bank account as you have entered the maximum of 10.
+schemeBankDetailsSummary.error.required = Select yes if you need to add another bank account

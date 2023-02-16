@@ -16,16 +16,20 @@
 
 package navigation
 
-import javax.inject.{Inject, Singleton}
-import play.api.mvc.Call
+import config.Constants
+import config.Constants.MaxSchemeBankAccounts
+import config.Refined.OneToTen
 import controllers.routes
-import pages.{CheckReturnDatesPage, _}
+import eu.timepit.refined._
+import eu.timepit.refined.api.Refined
 import models._
+import pages._
+import play.api.mvc.Call
+
+import javax.inject.{Inject, Singleton}
 
 @Singleton
 class Navigator @Inject()() {
-
-
 
   private val normalRoutes: Page => UserAnswers => Call = {
     case StartPage(srn)             => _ => routes.SchemeDetailsController.onPageLoad(srn)
@@ -33,12 +37,22 @@ class Navigator @Inject()() {
 
     case page@CheckReturnDatesPage(srn)  => ua =>
       if(ua.get(page).contains(true))
-        routes.SchemeBankAccountController.onPageLoad(srn, NormalMode)
+        routes.SchemeBankAccountController.onPageLoad(srn, refineMV[OneToTen](1), NormalMode)
       else
         routes.UnauthorisedController.onPageLoad
-
-    case SchemeBankAccountPage(srn) => _ => routes.UnauthorisedController.onPageLoad
-    case _                          => _ => routes.IndexController.onPageLoad
+    case SchemeBankAccountPage(srn) => _ => routes.SchemeBankAccountSummaryController.onPageLoad(srn)
+    case SchemeBankAccountSummaryPage(srn, addBankAccount @ true) => userAnswers =>
+      val numBankAccounts = userAnswers.get(SchemeBankAccountPage(srn)).toList.flatten.length
+      refineV[OneToTen](numBankAccounts) match {
+        case Left(_)                               => routes.SchemeBankAccountSummaryController.onPageLoad(srn)
+        case Right(Refined(MaxSchemeBankAccounts)) => routes.UnauthorisedController.onPageLoad
+        case Right(index)                          => refineV[OneToTen](index.value + 1) match {
+          case Left(_)          => routes.UnauthorisedController.onPageLoad
+          case Right(nextIndex) => routes.SchemeBankAccountController.onPageLoad(srn, nextIndex, NormalMode)
+        }
+      }
+    case SchemeBankAccountSummaryPage(_, addBankAccount @ false) => _ => routes.UnauthorisedController.onPageLoad
+    case _              => _ => routes.IndexController.onPageLoad
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {

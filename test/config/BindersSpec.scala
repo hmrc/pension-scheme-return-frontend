@@ -20,8 +20,11 @@ import models.SchemeId.Srn
 import org.scalacheck.Gen.alphaNumStr
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import utils.BaseSpec
+import org.scalacheck.Gen
+import org.scalatest.EitherValues
+import eu.timepit.refined.api.Refined
 
-class BindersSpec extends BaseSpec with ScalaCheckPropertyChecks {
+class BindersSpec extends BaseSpec with ScalaCheckPropertyChecks with EitherValues {
 
   "SRN binder" should {
     "return a valid srn" when {
@@ -43,4 +46,23 @@ class BindersSpec extends BaseSpec with ScalaCheckPropertyChecks {
     }
   }
 
+  "1 to 10 refined binder" should {
+    "bind successfully when a number between 1 and 10 is supplied" in {
+      forAll(Gen.oneOf(1 to 10)) { i =>
+        Binders.max10PathBinder.bind("max", i.toString) mustBe Right(Refined.unsafeApply(i))
+      }
+    }
+
+    "fail to bind when a number is greater than 10" in {
+      forAll(Gen.oneOf(11 to 30)) { i =>
+        Binders.max10PathBinder.bind("max", i.toString).isLeft mustBe true
+      }
+    }
+
+    "fail to bind when a number is less than 1" in {
+      forAll(Gen.oneOf(-10 to 0)) { i =>
+        Binders.max10PathBinder.bind("max", i.toString).isLeft mustBe true
+      }
+    }
+  }
 }

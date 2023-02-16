@@ -16,6 +16,8 @@
 
 package models
 
+import models.SchemeId.Srn
+import pages.SchemeBankAccountPage
 import play.api.libs.json._
 import queries.{Gettable, Settable}
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
@@ -63,6 +65,9 @@ final case class UserAnswers(
         page.cleanup(None, updatedAnswers)
     }
   }
+
+  def schemeBankAccounts(srn: Srn): List[BankAccount] =
+    get(SchemeBankAccountPage(srn)).toList.flatten
 }
 
 object UserAnswers {

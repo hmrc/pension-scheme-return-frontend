@@ -42,17 +42,8 @@ class BankAccountViewSpec extends ViewSpec {
 
     "BankAccountView" should {
 
-      "render the title" in {
-        forAll(bankAccountViewModelGen) { viewModel =>
-          title(view(form, viewModel)) must startWith(viewModel.title.key)
-        }
-      }
-
-      "render the heading" in {
-        forAll(bankAccountViewModelGen) { viewModel =>
-          title(view(form, viewModel)) must startWith(viewModel.title.key)
-        }
-      }
+      behave like renderTitle(bankAccountViewModelGen)(view(form, _), _.title.key)
+      behave like renderHeading(bankAccountViewModelGen)(view(form, _), _.heading.key)
 
       "render the bank name heading" in {
         forAll(bankAccountViewModelGen) { viewModel =>
@@ -154,11 +145,7 @@ class BankAccountViewSpec extends ViewSpec {
         }
       }
 
-      "render the button text" in {
-        forAll(bankAccountViewModelGen) { viewModel =>
-          button(view(form, viewModel)).text() mustBe messageKey(viewModel.buttonText)
-        }
-      }
+      behave like renderButtonText(bankAccountViewModelGen)(view(form, _), _.buttonText)
     }
   }
 }

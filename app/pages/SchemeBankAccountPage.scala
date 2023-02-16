@@ -20,7 +20,7 @@ import models.BankAccount
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
 
-case class SchemeBankAccountPage(srn: Srn) extends QuestionPage[BankAccount] {
+case class SchemeBankAccountPage(srn: Srn) extends QuestionPage[List[BankAccount]] {
 
   override def path: JsPath = JsPath \ toString
 

@@ -26,7 +26,7 @@ object DisplayMessage {
   }
 
   object SimpleMessage {
-    def apply(key: String): SimpleMessage = new SimpleMessage(key, List())
+    def apply(key: String): SimpleMessage = new SimpleMessage(key, Nil)
 
     def apply(key: String, args: Any*): SimpleMessage = new SimpleMessage(key, args.toList)
   }
@@ -43,6 +43,10 @@ sealed trait ComplexMessageElement
 object ComplexMessageElement {
   case class Message(key: String, args: List[Any] = Nil) extends ComplexMessageElement
   case class LinkedMessage(key: String, url: String, args: List[Any] = Nil) extends ComplexMessageElement
+
+  object Message {
+    def apply(key: String, args: Any*): Message = Message(key, args.toList)
+  }
 }
 
 sealed trait Delimiter

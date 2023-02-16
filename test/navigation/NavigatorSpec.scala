@@ -16,11 +16,13 @@
 
 package navigation
 
+import config.Refined.OneToTen
 import controllers.routes
 import models._
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import pages._
 import utils.BaseSpec
+import eu.timepit.refined._
 
 class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
@@ -58,7 +60,8 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
       "yes is selected" in {
         forAll(srnGen) { srn =>
           val ua = userAnswers.set(CheckReturnDatesPage(srn), true).get
-          navigator.nextPage(CheckReturnDatesPage(srn), NormalMode, ua) mustBe routes.SchemeBankAccountController.onPageLoad(srn, NormalMode)
+          navigator.nextPage(CheckReturnDatesPage(srn), NormalMode, ua) mustBe
+            routes.SchemeBankAccountController.onPageLoad(srn, refineMV[OneToTen](1), NormalMode)
         }
       }
     }
@@ -70,6 +73,27 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
         forAll(srnGen) { srn =>
           val ua = userAnswers.set(CheckReturnDatesPage(srn), false).get
           navigator.nextPage(CheckReturnDatesPage(srn), NormalMode, ua) mustBe routes.UnauthorisedController.onPageLoad
+        }
+      }
+    }
+
+    "go from scheme bank account page to scheme bank account summary page" when {
+
+      "a valid bank account is entered" in {
+        forAll(srnGen) { srn =>
+          val ua = userAnswers.set(SchemeBankAccountPage(srn), List(BankAccount("test", "12345678", "123456"))).get
+          navigator.nextPage(SchemeBankAccountPage(srn), NormalMode, ua) mustBe routes.SchemeBankAccountSummaryController.onPageLoad(srn)
+        }
+      }
+    }
+
+    "go from scheme bank account summary page to scheme bank account page" when {
+
+      "yes is selected" in {
+        forAll(srnGen) { srn =>
+          val ua = userAnswers.set(SchemeBankAccountPage(srn), List(BankAccount("test", "12345678", "123456"))).get
+          navigator.nextPage(SchemeBankAccountSummaryPage(srn, addBankAccount = true), NormalMode, ua) mustBe
+            routes.SchemeBankAccountController.onPageLoad(srn, refineMV[OneToTen](2), NormalMode)
         }
       }
     }
