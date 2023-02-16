@@ -17,6 +17,7 @@
 package pages
 
 import models.SchemeId.Srn
+import models.UserAnswers
 import play.api.libs.json.JsPath
 
 case class CheckReturnDatesPage(srn: Srn) extends QuestionPage[Boolean] {
@@ -24,4 +25,8 @@ case class CheckReturnDatesPage(srn: Srn) extends QuestionPage[Boolean] {
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "checkReturnDates"
+
+  def unapply(userAnswers: UserAnswers): Option[Boolean] = {
+    userAnswers.get(this)
+  }
 }
