@@ -45,7 +45,7 @@ private[mappings] class LocalDateFormatter(
         case (Left(xs),        _) => Left(xs)
         case (_,        Left(xs)) => Left(xs)
         case (Right(x),        _) => Right(x) // Right will be always become a left as we have already checked for all rights
-      }.map(a => (a, a, a)) // map is unreachable
+      }.map(a => (a, a, a)) // map is unreachable but needed to compile
     }
 
   private def formatDate(key: String, data: Map[String, String]): Either[Seq[FormError], LocalDate] = {

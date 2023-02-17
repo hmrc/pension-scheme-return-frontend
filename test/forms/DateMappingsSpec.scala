@@ -100,7 +100,7 @@ class DateMappingsSpec extends AnyFreeSpec with Matchers with ScalaCheckProperty
 
         val result = form.bind(data)
 
-        result.errors must contain only FormError("value", "error.required.day")
+        result.errors must contain only FormError("value.day", "error.required.day")
     }
   }
 
@@ -118,7 +118,7 @@ class DateMappingsSpec extends AnyFreeSpec with Matchers with ScalaCheckProperty
         val result = form.bind(data)
 
         result.errors must contain(
-          FormError("value", "error.invalid.characters", List.empty)
+          FormError("value.day", "error.invalid.characters", List.empty)
         )
     }
   }
@@ -140,7 +140,7 @@ class DateMappingsSpec extends AnyFreeSpec with Matchers with ScalaCheckProperty
 
         val result = form.bind(data)
 
-        result.errors must contain only FormError("value", "error.required.month")
+        result.errors must contain only FormError("value.month", "error.required.month")
     }
   }
 
@@ -157,7 +157,7 @@ class DateMappingsSpec extends AnyFreeSpec with Matchers with ScalaCheckProperty
 
         val result = form.bind(data)
 
-        result.errors must contain only FormError("value", "error.invalid.characters")
+        result.errors must contain only FormError("value.month", "error.invalid.characters")
     }
   }
 
@@ -178,7 +178,7 @@ class DateMappingsSpec extends AnyFreeSpec with Matchers with ScalaCheckProperty
 
         val result = form.bind(data)
 
-        result.errors must contain only FormError("value", "error.required.year")
+        result.errors must contain only FormError("value.year", "error.required.year")
     }
   }
 
@@ -195,7 +195,7 @@ class DateMappingsSpec extends AnyFreeSpec with Matchers with ScalaCheckProperty
 
         val result = form.bind(data)
 
-        result.errors must contain only FormError("value", "error.invalid.characters")
+        result.errors must contain only FormError("value.year", "error.invalid.characters")
     }
   }
 
@@ -221,8 +221,8 @@ class DateMappingsSpec extends AnyFreeSpec with Matchers with ScalaCheckProperty
         val result = form.bind(data)
 
         result.errors must contain allElementsOf List(
-          FormError("value", "error.required.day"),
-          FormError("value", "error.required.month")
+          FormError("value.day", "error.required.day"),
+          FormError("value.month", "error.required.month")
         )
     }
   }
@@ -249,8 +249,8 @@ class DateMappingsSpec extends AnyFreeSpec with Matchers with ScalaCheckProperty
         val result = form.bind(data)
 
         result.errors must contain allElementsOf List(
-          FormError("value", "error.required.day"),
-          FormError("value", "error.required.year")
+          FormError("value.day", "error.required.day"),
+          FormError("value.year", "error.required.year")
         )
     }
   }
@@ -277,8 +277,8 @@ class DateMappingsSpec extends AnyFreeSpec with Matchers with ScalaCheckProperty
         val result = form.bind(data)
 
         result.errors must contain allElementsOf List(
-          FormError("value", "error.required.month"),
-          FormError("value", "error.required.year")
+          FormError("value.month", "error.required.month"),
+          FormError("value.year", "error.required.year")
         )
     }
   }
@@ -296,7 +296,10 @@ class DateMappingsSpec extends AnyFreeSpec with Matchers with ScalaCheckProperty
 
         val result = form.bind(data)
 
-        result.errors must contain only FormError("value", "error.invalid.characters", List.empty)
+        result.errors must contain allElementsOf List(
+          FormError("value.day", "error.invalid.characters"),
+          FormError("value.month", "error.invalid.characters")
+        )
     }
   }
 
@@ -313,7 +316,10 @@ class DateMappingsSpec extends AnyFreeSpec with Matchers with ScalaCheckProperty
 
         val result = form.bind(data)
 
-        result.errors must contain only FormError("value", "error.invalid.characters", List.empty)
+        result.errors must contain allElementsOf List(
+          FormError("value.day", "error.invalid.characters"),
+          FormError("value.year", "error.invalid.characters")
+        )
     }
   }
 
@@ -330,7 +336,10 @@ class DateMappingsSpec extends AnyFreeSpec with Matchers with ScalaCheckProperty
 
         val result = form.bind(data)
 
-        result.errors must contain only FormError("value", "error.invalid.characters", List.empty)
+        result.errors must contain allElementsOf List(
+          FormError("value.month", "error.invalid.characters"),
+          FormError("value.year", "error.invalid.characters")
+        )
     }
   }
 
@@ -347,7 +356,11 @@ class DateMappingsSpec extends AnyFreeSpec with Matchers with ScalaCheckProperty
 
         val result = form.bind(data)
 
-        result.errors must contain only FormError("value", "error.invalid.characters", List.empty)
+        result.errors must contain allElementsOf List(
+          FormError("value.day", "error.invalid.characters"),
+          FormError("value.month", "error.invalid.characters"),
+          FormError("value.year", "error.invalid.characters")
+        )
     }
   }
 
