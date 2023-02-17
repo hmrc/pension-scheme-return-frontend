@@ -14,16 +14,26 @@
  * limitations under the License.
  *@
 
+@import viewmodels.models.CheckYourAnswersViewModel
+
 @this(
     layout: templates.Layout,
-    govukSummaryList: GovukSummaryList
+    govukSummaryList: GovukSummaryList,
+    govukButton: GovukButton,
+    message: Message
 )
 
-@(list: SummaryList)(implicit request: Request[_], messages: Messages)
+@(viewmodel: CheckYourAnswersViewModel)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("checkYourAnswers.title"))) {
+    @layout(pageTitle = titleNoForm(viewmodel.title.toMessage)) {
 
-    <h1 class="govuk-heading-xl">@messages("checkYourAnswers.heading")</h1>
+        <h1 class="govuk-heading-xl">@viewmodel.heading.toMessage</h1>
 
-    @govukSummaryList(list)
-}
+        @govukSummaryList(
+            viewmodel.rows
+        )
+
+        @govukButton(
+            ButtonViewModel(messages("site.saveAndContinue")).asLink(viewmodel.onSubmit.url)
+        )
+    }

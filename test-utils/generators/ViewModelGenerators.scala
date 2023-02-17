@@ -16,8 +16,13 @@
 
 package generators
 
+import joptsimple.internal.Rows
 import org.scalacheck.Gen
-import viewmodels.models.{ContentPageViewModel, ContentTablePageViewModel, PensionSchemeViewModel}
+import play.api.mvc.Call
+import uk.gov.hmrc.govukfrontend.views.Aliases.SummaryList
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import uk.gov.hmrc.mongo.play.json.CollectionFactory.collection
+import viewmodels.models.{CheckYourAnswersViewModel, ContentPageViewModel, ContentTablePageViewModel, PensionSchemeViewModel}
 
 trait ViewModelGenerators extends BasicGenerators {
 
@@ -42,6 +47,17 @@ trait ViewModelGenerators extends BasicGenerators {
       onSubmit <- getCall
     } yield {
       ContentTablePageViewModel(title, heading, inset, buttonText, onSubmit, rows: _*)
+    }
+
+  val checkYourAnswersViewModelGen: Gen[CheckYourAnswersViewModel] =
+    for{
+      title <- nonEmptyString
+      heading <- nonEmptyString
+//      rows <- Gen.listOf(SummaryList)
+      onSubmit <- getCall
+
+    } yield {
+      CheckYourAnswersViewModel(title, heading, onSubmit, SummaryList.defaultObject)
     }
 
   val pensionSchemeViewModelGen: Gen[PensionSchemeViewModel] =

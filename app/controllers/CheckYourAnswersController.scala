@@ -18,15 +18,22 @@ package controllers
 
 import com.google.inject.Inject
 import controllers.actions.{AllowAccessActionProvider, DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import models.NormalMode
 import models.SchemeId.Srn
+import navigation.Navigator
+import pages.CheckYourAnswersPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import uk.gov.hmrc.govukfrontend.views.Aliases.SummaryListRow
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.govuk.summarylist._
 import views.html.CheckYourAnswersView
+import viewmodels.models.CheckYourAnswersViewModel
+import views.html
 
 class CheckYourAnswersController @Inject()(
                                             override val messagesApi: MessagesApi,
+                                            navigator: Navigator,
                                             identify: IdentifierAction,
                                             allowAccess: AllowAccessActionProvider,
                                             getData: DataRetrievalAction,
@@ -37,11 +44,26 @@ class CheckYourAnswersController @Inject()(
 
   def onPageLoad(srn: Srn): Action[AnyContent] = (identify andThen allowAccess(srn) andThen getData andThen requireData) {
     implicit request =>
+      Ok(view(CheckYourAnswersController.viewModel(srn)))
+  }
 
-      val list = SummaryListViewModel(
-        rows = Seq.empty
-      )
-
-      Ok(view(list))
+  def onSubmit(srn: Srn): Action[AnyContent] = (identify andThen allowAccess(srn) andThen getData andThen requireData) {
+    implicit request =>
+     Redirect(navigator.nextPage(CheckYourAnswersPage(srn), NormalMode, request.userAnswers))
   }
 }
+
+object CheckYourAnswersController {
+
+  val list = SummaryListViewModel(
+    rows = Seq(SummaryListRow.apply())
+  )
+  def viewModel(srn: Srn): CheckYourAnswersViewModel = CheckYourAnswersViewModel (
+    "title",
+    "heading",
+    routes.CheckYourAnswersController.onSubmit(srn),
+    list
+  )
+
+}
+

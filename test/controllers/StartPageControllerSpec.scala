@@ -16,15 +16,10 @@
 
 package controllers
 
-import models.NormalMode
 import navigation.{FakeNavigator, Navigator}
-import play.api.Application
-import play.api.http.Status.{OK, SEE_OTHER}
 import play.api.inject.bind
-import play.api.mvc.{Call, Request}
+import play.api.mvc.Call
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import viewmodels.models.ContentPageViewModel
 import views.html.ContentPageView
 
 class StartPageControllerSpec extends ControllerBaseSpec {

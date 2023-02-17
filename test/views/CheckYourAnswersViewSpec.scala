@@ -17,57 +17,50 @@
 package views
 
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import play.api.i18n.Messages
 import play.api.test.FakeRequest
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
 import utils.BaseSpec
-import views.html.ContentPageView
+import views.html.CheckYourAnswersView
 
+import scala.language.postfixOps
 
-class ContentPageViewSpec extends BaseSpec with ScalaCheckPropertyChecks with HtmlHelper {
+class CheckYourAnswersViewSpec extends BaseSpec with ScalaCheckPropertyChecks with HtmlHelper {
 
   runningApplication { implicit app =>
-    val view = injected[ContentPageView]
+      val view = injected[CheckYourAnswersView]
 
-    implicit val request = FakeRequest()
-    implicit val mess = messages(app)
+      implicit val request = FakeRequest()
+      implicit val mess = messages(app)
 
-    "ContentPageView" should {
+    "CheckYourAnswerView" should {
 
       "render the title" in {
 
-        forAll(contentPageViewModelGen) { viewModel =>
+        forAll(checkYourAnswersViewModelGen) { viewModel =>
           title(view(viewModel)) must startWith(viewModel.title.key)
         }
       }
 
       "render the heading" in {
 
-        forAll(contentPageViewModelGen) { viewModel =>
-          h1(view(viewModel)) mustBe viewModel.heading.key
+        forAll(checkYourAnswersViewModelGen) { viewModel =>
+          h1(view(viewModel)) mustBe messageKey(viewModel.heading)
         }
       }
 
-      "render all paragraphs" in {
-
-        forAll(contentPageViewModelGen) { viewModel =>
-          p(view(viewModel)) must contain allElementsOf viewModel.paragraphs.map(_.key)
-        }
-      }
-
-      "render the button text" in {
-
-        forAll(contentPageViewModelGen) { viewModel =>
-          anchorButton(view(viewModel)).text() mustBe viewModel.buttonText.key
-        }
-      }
+//      "render the table rows" in {
+//        forAll(checkYourAnswersViewModelGen) { viewModel =>
+//          tr(view(viewModel)) must contain allElementsOf viewModel.rows
+//        }
+//      }
 
       "render the button href" in {
 
-        forAll(contentPageViewModelGen) { viewModel =>
+        forAll(checkYourAnswersViewModelGen) { viewModel =>
           anchorButton(view(viewModel)).attr("href") mustBe viewModel.onSubmit.url
         }
       }
+
     }
   }
 }

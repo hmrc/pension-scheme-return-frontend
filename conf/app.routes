@@ -12,7 +12,8 @@ GET         /refresh-session                             controllers.KeepAliveCo
 
 GET         /there-is-a-problem                          controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 
-GET         /:srn/check-your-answers                     controllers.CheckYourAnswersController.onPageLoad(srn: Srn)
+GET         /:srn/check-your-bank-details                controllers.CheckYourAnswersController.onPageLoad(srn: Srn)
+GET         /:srn/check-your-bank-details-next-page      controllers.CheckYourAnswersController.onSubmit(srn: Srn)
 
 GET         /account/sign-out-survey                     controllers.auth.AuthController.signOut
 GET         /account/sign-out                            controllers.auth.AuthController.signOutNoSurvey

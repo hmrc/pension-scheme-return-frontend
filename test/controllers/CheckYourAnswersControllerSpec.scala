@@ -16,46 +16,86 @@
 
 package controllers
 
+import models.{SchemeDetails, UserAnswers}
+import navigation.{FakeNavigator, Navigator}
+import play.api.inject.bind
+import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.mvc.Call
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import viewmodels.govuk.SummaryListFluency
 import views.html.CheckYourAnswersView
 
-class CheckYourAnswersControllerSpec extends ControllerBaseSpec with SummaryListFluency {
+
+class CheckYourAnswersControllerSpec extends ControllerBaseSpec {
+
+  def onwardRoute = Call("GET", "/foo")
 
   val srn = srnGen.sample.value
 
-  "Check Your Answers Controller" should {
+  lazy val onPageLoad = routes.CheckYourAnswersController.onPageLoad(srn).url
+  lazy val onSubmit = routes.CheckYourAnswersController.onSubmit(srn).url
+
+
+  "CheckYourAnswersController" should {
 
     "return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      running(_ => applicationBuilder(userAnswers = Some (emptyUserAnswers)) ) { implicit app =>
 
-      running(application) {
-        val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad(srn).url)
+      val view = injected[CheckYourAnswersView]
+      val request = FakeRequest(GET, onPageLoad)
 
-        val result = route(application, request).value
+      val result = route(app, request).value
+      val expectedView = view(CheckYourAnswersController.viewModel(srn))(request, messages(app))
 
-        val view = application.injector.instanceOf[CheckYourAnswersView]
-        val list = SummaryListViewModel(Seq.empty)
-
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(list)(request, messages(application)).toString
-      }
+      status(result) mustEqual OK
+      contentAsString(result) mustEqual expectedView.toString }
     }
 
-    "redirect to Journey Recovery for a GET if no existing data is found" in {
+    "redirect to the next page" in {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      val fakeNavigatorApplication = applicationBuilder(userAnswers = Some (emptyUserAnswers))
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
+          )
 
-      running(application) {
-        val request = FakeRequest(GET, routes.CheckYourAnswersController.onPageLoad(srn).url)
+      running(_ => fakeNavigatorApplication) { app =>
 
-        val result = route(application, request).value
+        val request = FakeRequest(GET, onSubmit)
+
+        val result = route(app, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        redirectLocation(result).value mustEqual onwardRoute.url
       }
     }
   }
+
+"must redirect to Journey Recovery for a GET if no existing data is found" in {
+
+  val application = applicationBuilder (userAnswers = None).build()
+
+  running (application) {
+  val request = FakeRequest (GET,onPageLoad)
+
+  val result = route (application, request).value
+
+  status (result) mustEqual SEE_OTHER
+  redirectLocation (result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad ().url
 }
+}
+
+  "must redirect to Journey Recovery for a GET if no data is found" in {
+
+    val application = applicationBuilder(userAnswers = None).build()
+
+    running(application) {
+      val request = FakeRequest(GET, onSubmit)
+
+      val result = route(application, request).value
+
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+    }
+  }
+}
+
