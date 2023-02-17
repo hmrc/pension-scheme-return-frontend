@@ -12,6 +12,8 @@ site.start = Start now
 site.startAgain = Start again
 site.signIn = Sign in
 site.govuk = GOV.UK
+site.startDate = Start date
+site.endDate = End date
 
 date.day = Day
 date.month = Month

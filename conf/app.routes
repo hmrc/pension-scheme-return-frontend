@@ -37,3 +37,9 @@ POST        /:srn/enter-bank-details                     controllers.SchemeBankA
 
 GET         /:srn/change-enter-bank-details              controllers.SchemeBankAccountController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST        /:srn/change-enter-bank-details              controllers.SchemeBankAccountController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET         /:srn/accounting-period                      controllers.AccountingPeriodController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/accounting-period                      controllers.AccountingPeriodController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+
+GET         /:srn/change-accounting-period               controllers.AccountingPeriodController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-accounting-period               controllers.AccountingPeriodController.onSubmit(srn: Srn, mode: Mode = CheckMode)

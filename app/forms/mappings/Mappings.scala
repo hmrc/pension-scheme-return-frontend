@@ -18,7 +18,7 @@ package forms.mappings
 
 import models.Enumerable
 import play.api.data.FieldMapping
-import play.api.data.Forms.of
+import play.api.data.Forms.{date, of}
 
 import java.time.LocalDate
 
@@ -44,11 +44,7 @@ trait Mappings extends Formatters with Constraints {
                               args: Seq[String] = Seq.empty)(implicit ev: Enumerable[A]): FieldMapping[A] =
     of(enumerableFormatter[A](requiredKey, invalidKey, args))
 
-  protected def localDate(
-                           invalidKey: String,
-                           allRequiredKey: String,
-                           twoRequiredKey: String,
-                           requiredKey: String,
-                           args: Seq[String] = Seq.empty): FieldMapping[LocalDate] =
-    of(new LocalDateFormatter(invalidKey, allRequiredKey, twoRequiredKey, requiredKey, args))
+  protected def localDate(dateFormErrors: DateFormErrors,
+                          args: Seq[String] = Seq.empty): FieldMapping[LocalDate] =
+    of(new LocalDateFormatter(dateFormErrors, args))
 }

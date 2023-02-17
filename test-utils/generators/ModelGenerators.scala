@@ -24,7 +24,7 @@ import models.cache.PensionSchemeUser
 import models.cache.PensionSchemeUser.{Administrator, Practitioner}
 import models.requests.{AllowedAccessRequest, IdentifierRequest}
 import models.requests.IdentifierRequest.{AdministratorRequest, PractitionerRequest}
-import org.scalacheck.Gen
+import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Gen.numChar
 import play.api.mvc.{AnyContent, Request}
 import play.api.test.FakeRequest
@@ -138,6 +138,12 @@ trait ModelGenerators extends BasicGenerators {
     } yield AllowedAccessRequest(request, schemeDetails)
 
   def modeGen: Gen[Mode] = Gen.oneOf(NormalMode, CheckMode)
+
+  implicit val dateRangeGen: Gen[DateRange] =
+    for {
+      startDate <- date
+      endDate   <- date
+    } yield DateRange(startDate, endDate)
 }
 
 object ModelGenerators extends ModelGenerators

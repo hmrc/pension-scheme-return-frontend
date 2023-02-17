@@ -14,25 +14,21 @@
  * limitations under the License.
  */
 
-package forms
+package pages
 
-import forms.behaviours.DateBehaviours
+import models.DateRange
+import pages.behaviours.PageBehaviours
 
-import java.time.{LocalDate, ZoneOffset}
+class AccountingPeriodPageSpec extends PageBehaviours {
 
-class DatePageFormProviderSpec extends DateBehaviours {
+  "CheckReturnDatesPage" - {
 
-  val form = new DatePageFormProvider()()
+    val srn = srnGen.sample.value
 
-  ".value" - {
+    beRetrievable[DateRange](AccountingPeriodPage(srn))
 
-    val validData = datesBetween(
-      min = LocalDate.of(2000, 1, 1),
-      max = LocalDate.now(ZoneOffset.UTC)
-    )
+    beSettable[DateRange](AccountingPeriodPage(srn))
 
-    behave like dateField(form, "value", validData)
-
-    behave like mandatoryDateField(form, "value", "datePage.error.required.all")
+    beRemovable[DateRange](AccountingPeriodPage(srn))
   }
 }

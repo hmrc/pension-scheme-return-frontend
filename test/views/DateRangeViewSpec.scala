@@ -14,19 +14,12 @@
  * limitations under the License.
  */
 
-package generators
+package views
 
-import org.scalacheck.{Arbitrary, Gen, Shrink}
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import utils.BaseSpec
 
-trait Generators
-  extends UserAnswersGenerator
-    with PageGenerators
-    with ModelGenerators
-    with UserAnswersEntryGenerators
-    with ViewModelGenerators {
+class DateRangeViewSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
-  implicit val dontShrinkString: Shrink[String] = Shrink.shrinkAny
-  implicit def dontShrinkList[T]: Shrink[List[T]] = Shrink.shrinkAny
 
-  implicit def arbitraryGen[A](implicit g: Gen[A]): Arbitrary[A] = Arbitrary(g)
 }

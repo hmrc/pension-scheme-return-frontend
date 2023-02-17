@@ -14,19 +14,15 @@
  * limitations under the License.
  */
 
-package generators
+package pages
 
-import org.scalacheck.{Arbitrary, Gen, Shrink}
+import models.DateRange
+import models.SchemeId.Srn
+import play.api.libs.json.JsPath
 
-trait Generators
-  extends UserAnswersGenerator
-    with PageGenerators
-    with ModelGenerators
-    with UserAnswersEntryGenerators
-    with ViewModelGenerators {
+case class AccountingPeriodPage(srn: Srn) extends QuestionPage[DateRange] {
 
-  implicit val dontShrinkString: Shrink[String] = Shrink.shrinkAny
-  implicit def dontShrinkList[T]: Shrink[List[T]] = Shrink.shrinkAny
+  override def path: JsPath = JsPath \ toString
 
-  implicit def arbitraryGen[A](implicit g: Gen[A]): Arbitrary[A] = Arbitrary(g)
+  override def toString: String = "accountPeriod"
 }

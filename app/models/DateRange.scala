@@ -14,19 +14,15 @@
  * limitations under the License.
  */
 
-package generators
+package models
 
-import org.scalacheck.{Arbitrary, Gen, Shrink}
+import play.api.libs.json.{Format, Json}
 
-trait Generators
-  extends UserAnswersGenerator
-    with PageGenerators
-    with ModelGenerators
-    with UserAnswersEntryGenerators
-    with ViewModelGenerators {
+import java.time.LocalDate
 
-  implicit val dontShrinkString: Shrink[String] = Shrink.shrinkAny
-  implicit def dontShrinkList[T]: Shrink[List[T]] = Shrink.shrinkAny
+case class DateRange(from: LocalDate, to: LocalDate)
 
-  implicit def arbitraryGen[A](implicit g: Gen[A]): Arbitrary[A] = Arbitrary(g)
+object DateRange {
+
+  implicit val format: Format[DateRange] = Json.format[DateRange]
 }

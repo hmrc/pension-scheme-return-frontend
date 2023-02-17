@@ -31,4 +31,12 @@ trait UserAnswersEntryGenerators extends PageGenerators {
         value <- arbitrary[Boolean].map(Json.toJson(_))
       } yield (page, value)
     }
+
+  implicit lazy val arbitraryAccountingPeriodUserAnswersEntry: Arbitrary[(AccountingPeriodPage, JsValue)] =
+    Arbitrary {
+      for {
+        page <- arbitrary[AccountingPeriodPage]
+        value <- ModelGenerators.dateRangeGen.map(Json.toJson(_))
+      } yield (page, value)
+    }
 }

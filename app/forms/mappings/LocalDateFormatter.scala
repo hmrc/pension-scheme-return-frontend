@@ -23,10 +23,7 @@ import java.time.LocalDate
 import scala.util.{Failure, Success, Try}
 
 private[mappings] class LocalDateFormatter(
-                                            invalidKey: String,
-                                            allRequiredKey: String,
-                                            twoRequiredKey: String,
-                                            requiredKey: String,
+                                            dateFormErrors: DateFormErrors,
                                             args: Seq[String] = Seq.empty
                                           ) extends Formatter[LocalDate] with Formatters {
 
@@ -37,23 +34,44 @@ private[mappings] class LocalDateFormatter(
       case Success(date) =>
         Right(date)
       case Failure(_) =>
-        Left(Seq(FormError(key, invalidKey, args)))
+        Left(Seq(FormError(key, dateFormErrors.invalidDate, args)))
+    }
+
+  private def combine[A, B, C](day: Either[Seq[A], B], month: Either[Seq[A], B], year: Either[Seq[A], B]): Either[Seq[A], (B, B, B)] =
+    (day, month, year) match {
+      case (Right(d), Right(m), Right(y)) => Right((d, m, y))
+      case (a, b, c) => List(b, c).foldLeft(a) {
+        case (Left(xs), Left(ys)) => Left(xs ++ ys)
+        case (Left(xs),        _) => Left(xs)
+        case (_,        Left(xs)) => Left(xs)
+        case (Right(x),        _) => Right(x) // Right will be always become a left as we have already checked for all rights
+      }.map(a => (a, a, a)) // map is unreachable
     }
 
   private def formatDate(key: String, data: Map[String, String]): Either[Seq[FormError], LocalDate] = {
 
-    val int = intFormatter(
-      requiredKey = invalidKey,
-      wholeNumberKey = invalidKey,
-      nonNumericKey = invalidKey,
+    def int(required: String) = intFormatter(
+      requiredKey = required,
+      wholeNumberKey = dateFormErrors.invalidCharacters,
+      nonNumericKey = dateFormErrors.invalidCharacters,
       args
     )
 
+    def runValidators(input: List[Option[String]]): Either[Seq[FormError], Unit] =
+      input.flatten match {
+        case Nil => Right(())
+        case xs  => Left(xs.map(FormError(key, _)))
+      }
+
     for {
-      day   <- int.bind(s"$key.day", data).right
-      month <- int.bind(s"$key.month", data).right
-      year  <- int.bind(s"$key.year", data).right
-      date  <- toDate(key, day, month, year).right
+      // Validated type would be a better fit as it can handle parallel errors, either only handles errors sequentially
+      date  <- combine(
+        int(dateFormErrors.requiredDay).bind(s"$key.day", data),
+        int(dateFormErrors.requiredMonth).bind(s"$key.month", data),
+        int(dateFormErrors.requiredYear).bind(s"$key.year", data)
+      )
+      date  <- toDate(key, date._1, date._2, date._3)
+      _     <- runValidators(dateFormErrors.validators.map(f => f(date)))
     } yield date
   }
 
@@ -61,25 +79,16 @@ private[mappings] class LocalDateFormatter(
 
     val fields = fieldKeys.map {
       field =>
-        field -> data.get(s"$key.$field").filter(_.nonEmpty)
+        field -> data.get(s"$key.$field").filter(_.trim.nonEmpty)
     }.toMap
 
-    lazy val missingFields = fields
-      .withFilter(_._2.isEmpty)
-      .map(_._1)
-      .toList
-
     fields.count(_._2.isDefined) match {
-      case 3 =>
+      case 0 =>
+        Left(List(FormError(key, dateFormErrors.required, args)))
+      case _ =>
         formatDate(key, data).left.map {
           _.map(_.copy(key = key, args = args))
         }
-      case 2 =>
-        Left(List(FormError(key, requiredKey, missingFields ++ args)))
-      case 1 =>
-        Left(List(FormError(key, twoRequiredKey, missingFields ++ args)))
-      case _ =>
-        Left(List(FormError(key, allRequiredKey, args)))
     }
   }
 

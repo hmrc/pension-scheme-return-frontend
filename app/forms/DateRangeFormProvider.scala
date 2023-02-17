@@ -16,26 +16,19 @@
 
 package forms
 
-import forms.mappings.Mappings
+import com.google.inject.Inject
+import forms.mappings.{DateFormErrors, Mappings}
+import models.DateRange
 import play.api.data.Form
+import play.api.data.Forms.mapping
 
-import java.time.LocalDate
-import javax.inject.Inject
+class DateRangeFormProvider @Inject()() extends Mappings {
 
-class DatePageFormProvider @Inject() extends Mappings {
-
-  def apply(
-    invalidKey: String     = "datePage.error.invalid",
-    allRequiredKey: String = "datePage.error.required.all",
-    twoRequiredKey: String = "datePage.error.required.two",
-    requiredKey: String    = "datePage.error.required"
-  ): Form[LocalDate] =
+  def apply(startDateErrors: DateFormErrors, endDateErrors: DateFormErrors): Form[DateRange] =
     Form(
-      "value" -> localDate(
-        invalidKey,
-        allRequiredKey,
-        twoRequiredKey,
-        requiredKey
-      )
+      mapping(
+        "startDate" -> localDate(startDateErrors),
+        "endDate" -> localDate(endDateErrors)
+      )(DateRange.apply)(DateRange.unapply)
     )
 }

@@ -14,19 +14,16 @@
  * limitations under the License.
  */
 
-package generators
+package forms.mappings
 
-import org.scalacheck.{Arbitrary, Gen, Shrink}
+import java.time.LocalDate
 
-trait Generators
-  extends UserAnswersGenerator
-    with PageGenerators
-    with ModelGenerators
-    with UserAnswersEntryGenerators
-    with ViewModelGenerators {
-
-  implicit val dontShrinkString: Shrink[String] = Shrink.shrinkAny
-  implicit def dontShrinkList[T]: Shrink[List[T]] = Shrink.shrinkAny
-
-  implicit def arbitraryGen[A](implicit g: Gen[A]): Arbitrary[A] = Arbitrary(g)
-}
+case class DateFormErrors(
+  required: String,
+  requiredDay: String,
+  requiredMonth: String,
+  requiredYear: String,
+  invalidDate: String,
+  invalidCharacters: String,
+  validators: List[LocalDate => Option[String]] = List()
+)
