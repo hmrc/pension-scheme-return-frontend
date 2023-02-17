@@ -30,7 +30,6 @@ class PensionSchemeViewSpec extends BaseSpec with ScalaCheckPropertyChecks with 
     val view = injected[PensionSchemeView]
 
     implicit val request = FakeRequest()
-    implicit val mess = messages(app)
 
     "PensionsSchemeView" should {
 

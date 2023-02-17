@@ -30,34 +30,37 @@ class ContentPageViewSpec extends BaseSpec with ScalaCheckPropertyChecks with Ht
     val view = injected[ContentPageView]
 
     implicit val request = FakeRequest()
-    implicit val mess = messages(app)
 
     "ContentPageView" should {
 
       "render the title" in {
 
         forAll(contentPageViewModelGen) { viewModel =>
-          title(view(viewModel)) must startWith(viewModel.title.key)
+
+          title(view(viewModel)) must startWith(viewModel.title.toMessage)
         }
       }
 
       "render the heading" in {
 
         forAll(contentPageViewModelGen) { viewModel =>
-          h1(view(viewModel)) mustBe viewModel.heading.key
+
+          h1(view(viewModel)) mustBe viewModel.heading.toMessage
         }
       }
 
       "render all paragraphs" in {
 
         forAll(contentPageViewModelGen) { viewModel =>
-          p(view(viewModel)) must contain allElementsOf viewModel.paragraphs.map(_.key)
+
+          p(view(viewModel)) must contain allElementsOf viewModel.paragraphs.map(_.toMessage)
         }
       }
 
       "render the button text" in {
 
         forAll(contentPageViewModelGen) { viewModel =>
+
           anchorButton(view(viewModel)).content mustBe viewModel.buttonText.key
         }
       }
@@ -65,6 +68,7 @@ class ContentPageViewSpec extends BaseSpec with ScalaCheckPropertyChecks with Ht
       "render the button href" in {
 
         forAll(contentPageViewModelGen) { viewModel =>
+
           anchorButton(view(viewModel)).href mustBe viewModel.onSubmit.url
         }
       }

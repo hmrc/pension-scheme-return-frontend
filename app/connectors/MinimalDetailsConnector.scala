@@ -36,13 +36,13 @@ class MinimalDetailsConnectorImpl @Inject()(appConfig: FrontendAppConfig, http: 
   private val url = s"${appConfig.pensionsAdministrator}/pension-administrator/get-minimal-psa"
 
   override def fetch(psaId: PsaId)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[MinimalDetailsError, MinimalDetails]] =
-    fetch(hc.withExtraHeaders("psaId" -> psaId.value))
+    fetch("psaId", psaId.value)
 
   override def fetch(pspId: PspId)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[MinimalDetailsError, MinimalDetails]] =
-    fetch(hc.withExtraHeaders("pspId" -> pspId.value))
+    fetch("pspId", pspId.value)
 
-  private def fetch(hc: HeaderCarrier)(implicit ec: ExecutionContext): Future[Either[MinimalDetailsError, MinimalDetails]] = {
-    http.GET[MinimalDetails](url)(implicitly, hc, implicitly)
+  private def fetch(idType: String, idValue: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[MinimalDetailsError, MinimalDetails]] = {
+    http.GET[MinimalDetails](url, headers = Seq(idType -> idValue))
       .map(Right(_))
       .recover {
         case e@WithStatusCode(NOT_FOUND) if e.message.contains(Constants.detailsNotFound) =>

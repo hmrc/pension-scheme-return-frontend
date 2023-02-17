@@ -28,7 +28,6 @@ class ContentTablePageViewSpec extends BaseSpec with ScalaCheckPropertyChecks wi
     val view = injected[ContentTablePageView]
 
     implicit val request = FakeRequest()
-    implicit val mess = messages(app)
 
     "ContentTablePageView" should {
 

@@ -18,7 +18,7 @@ package generators
 
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
-import org.scalacheck.Gen.{alphaNumChar, alphaNumStr, alphaStr, choose, chooseNum, listOfN, nonEmptyListOf}
+import org.scalacheck.Gen.{alphaChar, alphaNumChar, alphaNumStr, alphaStr, choose, chooseNum, listOfN, nonEmptyListOf, numChar}
 import play.api.mvc.Call
 import viewmodels.DisplayMessage.SimpleMessage
 
@@ -87,11 +87,20 @@ trait BasicGenerators {
       s <- alphaNumStr
     } yield s"$c$s"
 
-  def stringsWithMaxLength(maxLength: Int): Gen[String] =
+  def stringLengthBetween(minLength: Int, maxLength: Int, charGen: Gen[Char]): Gen[String] =
     for {
-      length <- choose(1, maxLength)
-      chars <- listOfN(length, arbitrary[Char])
+      length <- choose(minLength, maxLength)
+      chars <- listOfN(length, charGen)
     } yield chars.mkString
+
+  def numericStringLength(length: Int): Gen[String] =
+    stringLengthBetween(length, length, numChar)
+
+  def numericStringLengthBetween(minLength: Int, maxLength: Int): Gen[String] =
+    stringLengthBetween(minLength, maxLength, numChar)
+
+  def stringsWithMaxLength(maxLength: Int): Gen[String] =
+    stringLengthBetween(1, maxLength, alphaChar)
 
   def stringsLongerThan(minLength: Int): Gen[String] = for {
     maxLength <- Gen.const((minLength * 2).max(100))
@@ -122,6 +131,12 @@ trait BasicGenerators {
         Instant.ofEpochMilli(millis).atOffset(ZoneOffset.UTC).toLocalDate
     }
   }
+
+  val earliestDate: LocalDate = LocalDate.of(1970, 1, 1)
+  val latestDate: LocalDate = LocalDate.of(3000, 12, 31)
+
+  def date: Gen[LocalDate] =
+    datesBetween(earliestDate, latestDate)
 
   val nonEmptySimpleMessage: Gen[SimpleMessage] = nonEmptyString.map(SimpleMessage(_))
 
@@ -155,5 +170,11 @@ trait BasicGenerators {
   val relativeUrl: Gen[String] =
     nonEmptyListOf(nonEmptyString).map(_.mkString("/", "/", "/"))
 
-  val getCall: Gen[Call] = relativeUrl.map(Call("GET", _))
+  val httpMethod: Gen[String] = Gen.oneOf("GET", "POST")
+  val call: Gen[Call] = {
+    for {
+      method <- httpMethod
+      url    <- relativeUrl
+    } yield Call(method, url)
+  }
 }

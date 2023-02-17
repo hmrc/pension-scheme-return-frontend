@@ -30,7 +30,7 @@ trait BackLinkFluency {
       BackLink(
         href    = href,
         content = Text(messages("site.back"))
-      )
+      ).withAttribute("aria-label" -> messages("site.back.aria-label"))
   }
 
   implicit class FluentBackLink(backLink: BackLink) {

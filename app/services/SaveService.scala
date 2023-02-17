@@ -16,6 +16,7 @@
 
 package services
 
+import com.google.inject.ImplementedBy
 import models.UserAnswers
 import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
@@ -28,6 +29,7 @@ class SaveServiceImpl @Inject()(sessionRepository: SessionRepository)(implicit e
     sessionRepository.set(userAnswers)
 }
 
+@ImplementedBy(classOf[SaveServiceImpl])
 trait SaveService {
   def save(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[Unit]
 }

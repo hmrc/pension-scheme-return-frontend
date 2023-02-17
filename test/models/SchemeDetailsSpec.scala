@@ -48,4 +48,13 @@ class SchemeDetailsSpec extends BaseSpec with ScalaCheckPropertyChecks {
       }
     }
   }
+
+  "ListSchemeDetails" should {
+
+    "successfully read from json" in {
+      forAll(listMinimalSchemeDetailsGen) { listMinimalSchemeDetails =>
+        Json.toJson(listMinimalSchemeDetails).as[ListMinimalSchemeDetails] mustBe listMinimalSchemeDetails
+      }
+    }
+  }
 }

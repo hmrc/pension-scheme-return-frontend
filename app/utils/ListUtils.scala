@@ -21,15 +21,16 @@ import viewmodels.DisplayMessage.SimpleMessage
 object ListUtils {
 
   implicit class ListOps[A](list: List[A]){
-    def intersperse(separator: A): List[A] = {
+    def intersperse(separator: A, step: Int = 1): List[A] = {
 
-      def go(xs: List[A]): List[A] = xs match {
+      def go(xs: List[A], iterator: Int): List[A] = xs match {
         case List(x) => List(x)
         case Nil     => Nil
-        case y :: ys => y +: separator +: go(ys)
+        case y :: ys if iterator == 1 => y +: separator +: go(ys, step)
+        case y :: ys => y +: go(ys, iterator - 1)
       }
 
-      go(list)
+      go(list, step)
     }
 
     def maybeAppend(maybeElem: Option[A]): List[A] =

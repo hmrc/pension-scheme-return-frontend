@@ -48,7 +48,8 @@ class SessionRepository @Inject()(
           .name("lastUpdatedIdx")
           .expireAfter(appConfig.cacheTtl, TimeUnit.SECONDS)
       )
-    )
+    ),
+    replaceIndexes = true
   ) {
 
   implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat

@@ -17,18 +17,21 @@
 package controllers
 
 import controllers.actions._
-import models.{Establisher, EstablisherKind, SchemeDetails, SchemeStatus, UserAnswers}
+import models.{Establisher, EstablisherKind, SchemeDetails, SchemeId, SchemeStatus, UserAnswers}
+import navigation.Navigator
 import play.api.Application
 import play.api.http._
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
+import play.api.mvc.Call
 import play.api.test.Helpers.running
 import play.api.test._
 import utils.BaseSpec
 
 trait ControllerBaseSpec
   extends BaseSpec
+    with ControllerBehaviours
     with DefaultAwaitTimeout
     with HttpVerbs
     with Writeables
@@ -38,7 +41,13 @@ trait ControllerBaseSpec
     with RouteInvokers
     with ResultExtractors {
 
+  val baseUrl = "/pension-scheme-return"
+
+  val srn: SchemeId.Srn = srnGen.sample.value
+
   val userAnswersId: String = "id"
+
+  val testOnwardRoute: Call = Call("GET", "/foo")
 
   def emptyUserAnswers: UserAnswers = UserAnswers(userAnswersId)
 
@@ -59,12 +68,15 @@ trait ControllerBaseSpec
                                     schemeDetails: SchemeDetails = defaultSchemeDetails
                                   ): GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
+      .bindings(
+        bind[Navigator].toInstance(new Navigator()).eagerly()
+      )
       .overrides(
         bind[DataRequiredAction].to[DataRequiredActionImpl],
         bind[IdentifierAction].to[FakeIdentifierAction],
         bind[AllowAccessActionProvider].toInstance(new FakeAllowAccessActionProvider(schemeDetails)),
         bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers)),
-        bind[DataCreationAction].toInstance(new FakeDataCreationAction(userAnswers.getOrElse(emptyUserAnswers)))
+        bind[DataCreationAction].toInstance(new FakeDataCreationAction(userAnswers.getOrElse(emptyUserAnswers))),
       )
 
   def runningApplication[T](block: Application => T): T = {

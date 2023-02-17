@@ -16,14 +16,11 @@
 
 package generators
 
-import joptsimple.internal.Rows
 import org.scalacheck.Gen
-import play.api.mvc.Call
 import uk.gov.hmrc.govukfrontend.views.Aliases.SummaryList
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{Content, Text}
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{ActionItem, Actions, Key, SummaryListRow, Value}
-import uk.gov.hmrc.mongo.play.json.CollectionFactory.collection
-import viewmodels.models.{CheckYourAnswersViewModel, ContentPageViewModel, ContentTablePageViewModel, PensionSchemeViewModel}
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist._
+import viewmodels.models._
 
 trait ViewModelGenerators extends BasicGenerators {
 
@@ -33,7 +30,7 @@ trait ViewModelGenerators extends BasicGenerators {
       heading    <- nonEmptyString
       paragraphs <- Gen.listOf(nonEmptyString)
       buttonText <- nonEmptyString
-      onSubmit   <- getCall
+      onSubmit   <- call
     } yield {
       ContentPageViewModel(title, heading, paragraphs, buttonText, onSubmit)
     }
@@ -45,7 +42,7 @@ trait ViewModelGenerators extends BasicGenerators {
       inset <- nonEmptySimpleMessage
       buttonText <- nonEmptySimpleMessage
       rows <- Gen.listOf(tupleOf(nonEmptySimpleMessage, nonEmptySimpleMessage))
-      onSubmit <- getCall
+      onSubmit <- call
     } yield {
       ContentTablePageViewModel(title, heading, inset, buttonText, onSubmit, rows: _*)
     }
@@ -76,18 +73,54 @@ trait ViewModelGenerators extends BasicGenerators {
       title    <- nonEmptyString
       heading  <- nonEmptyString
       rows     <- Gen.listOf(summaryListRowGen)
-      onSubmit <- getCall
+      onSubmit <- call
 
     } yield {
       CheckYourAnswersViewModel(title, heading, onSubmit, SummaryList(rows))
     }
 
+  val bankAccountViewModelGen: Gen[BankAccountViewModel] =
+    for {
+      title <- nonEmptySimpleMessage
+      heading <- nonEmptySimpleMessage
+      paragraph <- nonEmptySimpleMessage
+      bankNameHeading <- nonEmptySimpleMessage
+      accountNumberHeading <- nonEmptySimpleMessage
+      accountNumberHint <- nonEmptySimpleMessage
+      sortCodeHeading <- nonEmptySimpleMessage
+      sortCodeHint <- nonEmptySimpleMessage
+      buttonText <- nonEmptySimpleMessage
+      onSubmit <- call
+    } yield BankAccountViewModel(
+      title,
+      heading,
+      paragraph,
+      bankNameHeading,
+      accountNumberHeading,
+      accountNumberHint,
+      sortCodeHeading,
+      sortCodeHint,
+      buttonText,
+      onSubmit
+    )
+
   val pensionSchemeViewModelGen: Gen[PensionSchemeViewModel] =
     for {
-      title    <- nonEmptyString
-      heading  <- nonEmptyString
-      onSubmit <- getCall
+      title <- nonEmptyString
+      heading <- nonEmptyString
+      onSubmit <- call
     } yield {
       PensionSchemeViewModel(title, heading, onSubmit)
+    }
+
+  val yesNoPageViewModelGen: Gen[YesNoPageViewModel] =
+    for {
+      title       <- nonEmptyString
+      heading     <- nonEmptyString
+      description <- Gen.option(nonEmptyString)
+      legend      <- nonEmptyString
+      onSubmit    <- call
+    } yield {
+      YesNoPageViewModel(title, heading, description, legend, onSubmit)
     }
 }

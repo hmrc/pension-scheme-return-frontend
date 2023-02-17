@@ -1,16 +1,17 @@
 service.name = pension-scheme-return-frontend
 
 site.back = Back
+site.back.aria-label = Return to previous page
 site.remove = Remove
 site.change = Change
 site.no = No
 site.yes = Yes
 site.continue = Continue
+site.saveAndContinue = Save and continue
 site.start = Start now
 site.startAgain = Start again
 site.signIn = Sign in
 site.govuk = GOV.UK
-site.saveAndContinue = Save and continue
 
 date.day = Day
 date.month = Month
@@ -64,6 +65,13 @@ startPage.paragraph2 = You should only use this service if you have received a n
 startPage.paragraph3 = You must submit the return by the deadline given on the notice to file. You will be charged a £100 penalty if it is not received by the deadline.
 startPage.paragraph4 = You do not have to complete the whole return at once. You can save your answers and come back to them later.
 
+checkReturnDates.title = Check the dates of your return
+checkReturnDates.heading = Check the dates of your return
+checkReturnDates.description = You are completing a pension scheme return for the tax year {0} to {1}.
+checkReturnDates.legend = Are these dates correct?
+checkReturnDates.error.required = Select yes if these dates are correct
+checkReturnDates.error.invalid = Select yes if these dates are correct
+
 schemeDetails.title = Check your scheme details
 schemeDetails.heading = Check your scheme details
 schemeDetails.inset = These are the details we have on record for this scheme. If you want to change anything or select another scheme, you can
@@ -73,3 +81,22 @@ schemeDetails.row2 = Scheme name
 schemeDetails.row3 = Scheme type
 schemeDetails.row4 = Scheme establisher name
 schemeDetails.row5 = Other scheme establisher name(s)
+
+schemeBankDetails.title = Enter the scheme’s bank details
+schemeBankDetails.heading = Enter the scheme’s bank details
+schemeBankDetails.paragraph = Provide details of all bank accounts the scheme held during the period of this return. You can add up to 10 bank accounts.
+schemeBankDetails.bankName.heading = Name of the bank or building society
+schemeBankDetails.bankName.error.required = Enter the name of the bank or building society
+schemeBankDetails.bankName.error.invalid = Name of bank account or building society must only include letters a to z, and special characters such as hyphens, spaces and apostrophes
+schemeBankDetails.bankName.error.length = Bank account or building society name must be between 1 and 28 characters
+schemeBankDetails.accountNumber.heading = Account number
+schemeBankDetails.accountNumber.hint = Must be between 6 and 8 digits long
+schemeBankDetails.accountNumber.error.required = Enter an account number
+schemeBankDetails.accountNumber.error.invalid = Account number must only include numbers 0 to 9
+schemeBankDetails.accountNumber.error.length = Account number must be between 6 and 8 digits
+schemeBankDetails.sortCode.heading = Sort code
+schemeBankDetails.sortCode.hint = Must be 6 digits long
+schemeBankDetails.sortCode.error.required = Enter a sort code
+schemeBankDetails.sortCode.error.invalid = Sort code must only include numbers 0 to 9
+schemeBankDetails.sortCode.error.format.invalid = Enter a valid sort code, like 309430
+schemeBankDetails.sortCode.error.length = Sort code must be 6 digits

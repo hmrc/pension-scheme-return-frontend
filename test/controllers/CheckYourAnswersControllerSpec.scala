@@ -29,6 +29,7 @@ class CheckYourAnswersControllerSpec extends ControllerBaseSpec {
 
   def onwardRoute = Call("GET", "/foo")
 
+<<<<<<< HEAD
   val srn = srnGen.sample.value
 
   lazy val onPageLoad = routes.CheckYourAnswersController.onPageLoad(srn).url

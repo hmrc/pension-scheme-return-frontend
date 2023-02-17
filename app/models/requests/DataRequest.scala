@@ -17,16 +17,22 @@
 package models.requests
 
 import play.api.mvc.{Request, WrappedRequest}
-import models.{SchemeDetails, UserAnswers}
+import models.{PensionSchemeId, SchemeDetails, UserAnswers}
 
 case class OptionalDataRequest[A] (request: AllowedAccessRequest[A], userAnswers: Option[UserAnswers]) extends WrappedRequest[A](request) {
 
-  def getUserId: String = request.getUserId
+  val getUserId: String = request.getUserId
 
-  def schemeDetails: SchemeDetails = request.schemeDetails
+  val pensionSchemeId: PensionSchemeId = request.pensionSchemeId
+
+  val schemeDetails: SchemeDetails = request.schemeDetails
 }
 
 case class DataRequest[A] (request: AllowedAccessRequest[A], userAnswers: UserAnswers) extends WrappedRequest[A](request) {
 
-  def getUserId: String = request.getUserId
+  val pensionSchemeId: PensionSchemeId = request.pensionSchemeId
+
+  val getUserId: String = request.getUserId
+
+  val schemeDetails: SchemeDetails = request.schemeDetails
 }

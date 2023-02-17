@@ -39,6 +39,21 @@ trait HtmlHelper extends HtmlModels {
   def p(html: Html): List[String] =
     mainContent(html).getElementsByTag("p").iterator().asScala.map(_.text()).toList
 
+  def legend(html: Html): List[String] =
+    mainContent(html).getElementsByTag("legend").iterator().asScala.map(_.text()).toList
+
+  def radios(html: Html): List[Element] =
+    mainContent(html).select("input[type=radio]").iterator().asScala.toList
+
+  def labels(html: Html): List[String] =
+    mainContent(html).getElementsByTag("label").iterator().asScala.map(_.text()).toList
+
+  def inputLabel(html: Html)(name: String): Element =
+    mainContent(html).selectFirst(s"label[for=$name]")
+
+  def inputHint(html: Html)(name: String): Element =
+    mainContent(html).getElementById(s"$name-hint")
+
   def tr(html: Html): List[List[String]] =
     mainContent(html).getElementsByTag("tr").iterator().asScala.toList.map(
       _.getElementsByTag("td").iterator().asScala.toList.map(_.text())

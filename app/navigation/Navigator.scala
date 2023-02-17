@@ -17,23 +17,34 @@
 package navigation
 
 import javax.inject.{Inject, Singleton}
-
 import play.api.mvc.Call
 import controllers.routes
-import pages._
+import pages.{CheckReturnDatesPage, _}
 import models._
 
 @Singleton
 class Navigator @Inject()() {
 
+
+
   private val normalRoutes: Page => UserAnswers => Call = {
-    case StartPage(srn)         => _ => routes.UnauthorisedController.onPageLoad
-    case SchemeDetailsPage(srn) => _ => routes.UnauthorisedController.onPageLoad
-    case _                      => _ => routes.IndexController.onPageLoad
+    case StartPage(srn)             => _ => routes.SchemeDetailsController.onPageLoad(srn)
+    case SchemeDetailsPage(srn)     => _ => routes.CheckReturnDatesController.onPageLoad(srn, NormalMode)
+
+    case page@CheckReturnDatesPage(srn)  => ua =>
+      if(ua.get(page).contains(true))
+        routes.SchemeBankAccountController.onPageLoad(srn, NormalMode)
+      else
+        routes.UnauthorisedController.onPageLoad
+
+    case SchemeBankAccountPage(srn) => _ => routes.UnauthorisedController.onPageLoad
+    case _                          => _ => routes.IndexController.onPageLoad
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
-    case _ => _ => routes.IndexController.onPageLoad
+    case CheckReturnDatesPage(srn)  => _ => routes.UnauthorisedController.onPageLoad
+    case SchemeBankAccountPage(srn) => _ => routes.UnauthorisedController.onPageLoad
+    case _                          => _ => routes.IndexController.onPageLoad
   }
 
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = mode match {

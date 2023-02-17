@@ -20,4 +20,7 @@ import org.scalacheck.Arbitrary
 import pages._
 
 trait PageGenerators {
+
+  implicit lazy val arbitraryCheckReturnDatesPage: Arbitrary[CheckReturnDatesPage] =
+    Arbitrary(ModelGenerators.srnGen.map(CheckReturnDatesPage))
 }
