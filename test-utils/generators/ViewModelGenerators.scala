@@ -20,7 +20,8 @@ import joptsimple.internal.Rows
 import org.scalacheck.Gen
 import play.api.mvc.Call
 import uk.gov.hmrc.govukfrontend.views.Aliases.SummaryList
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{Content, Text}
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{ActionItem, Actions, Key, SummaryListRow, Value}
 import uk.gov.hmrc.mongo.play.json.CollectionFactory.collection
 import viewmodels.models.{CheckYourAnswersViewModel, ContentPageViewModel, ContentTablePageViewModel, PensionSchemeViewModel}
 
@@ -49,21 +50,42 @@ trait ViewModelGenerators extends BasicGenerators {
       ContentTablePageViewModel(title, heading, inset, buttonText, onSubmit, rows: _*)
     }
 
+  val contentGen: Gen[Content] = nonEmptyString.map(Text)
+
+  val actionItemGen: Gen[ActionItem] =
+    for {
+      href    <- relativeUrl
+      content <- nonEmptyString.map(Text)
+      hidden  <- Gen.option(nonEmptyString)
+    } yield {
+      ActionItem(href, content, hidden)
+    }
+
+  val summaryListRowGen: Gen[SummaryListRow] =
+    for {
+      key     <- contentGen.map(Key(_))
+      value   <- contentGen.map(Value(_))
+      items   <- Gen.listOf(actionItemGen)
+      actions <- Gen.option(Gen.const(Actions(items = items)))
+    } yield {
+      SummaryListRow(key, value, actions = actions)
+    }
+
   val checkYourAnswersViewModelGen: Gen[CheckYourAnswersViewModel] =
     for{
-      title <- nonEmptyString
-      heading <- nonEmptyString
-//      rows <- Gen.listOf(SummaryList)
+      title    <- nonEmptyString
+      heading  <- nonEmptyString
+      rows     <- Gen.listOf(summaryListRowGen)
       onSubmit <- getCall
 
     } yield {
-      CheckYourAnswersViewModel(title, heading, onSubmit, SummaryList.defaultObject)
+      CheckYourAnswersViewModel(title, heading, onSubmit, SummaryList(rows))
     }
 
   val pensionSchemeViewModelGen: Gen[PensionSchemeViewModel] =
     for {
-      title <- nonEmptyString
-      heading <- nonEmptyString
+      title    <- nonEmptyString
+      heading  <- nonEmptyString
       onSubmit <- getCall
     } yield {
       PensionSchemeViewModel(title, heading, onSubmit)

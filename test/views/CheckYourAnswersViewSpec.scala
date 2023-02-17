@@ -18,7 +18,7 @@ package views
 
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.test.FakeRequest
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{ActionItem, SummaryList}
 import utils.BaseSpec
 import views.html.CheckYourAnswersView
 
@@ -27,16 +27,18 @@ import scala.language.postfixOps
 class CheckYourAnswersViewSpec extends BaseSpec with ScalaCheckPropertyChecks with HtmlHelper {
 
   runningApplication { implicit app =>
-      val view = injected[CheckYourAnswersView]
 
-      implicit val request = FakeRequest()
-      implicit val mess = messages(app)
+    val view = injected[CheckYourAnswersView]
+
+    implicit val request = FakeRequest()
+    implicit val mess = messages(app)
 
     "CheckYourAnswerView" should {
 
       "render the title" in {
 
         forAll(checkYourAnswersViewModelGen) { viewModel =>
+
           title(view(viewModel)) must startWith(viewModel.title.key)
         }
       }
@@ -44,20 +46,47 @@ class CheckYourAnswersViewSpec extends BaseSpec with ScalaCheckPropertyChecks wi
       "render the heading" in {
 
         forAll(checkYourAnswersViewModelGen) { viewModel =>
+
           h1(view(viewModel)) mustBe messageKey(viewModel.heading)
         }
       }
 
-//      "render the table rows" in {
-//        forAll(checkYourAnswersViewModelGen) { viewModel =>
-//          tr(view(viewModel)) must contain allElementsOf viewModel.rows
-//        }
-//      }
+      "render the summary list keys" in {
+
+        forAll(checkYourAnswersViewModelGen) { viewModel =>
+
+          val keys = viewModel.rows.rows.map(_.key.content.asHtml.body)
+          summaryListKeys(view(viewModel)) must contain theSameElementsAs keys
+        }
+      }
+
+      "render the summary list values" in {
+
+        forAll(checkYourAnswersViewModelGen) { viewModel =>
+
+          val values = viewModel.rows.rows.map(_.value.content.asHtml.body)
+          summaryListValues(view(viewModel)) must contain theSameElementsAs values
+        }
+      }
+
+      "render the summary list actions" in {
+
+        forAll(checkYourAnswersViewModelGen) { viewModel =>
+
+          val actions =
+            viewModel.rows.rows
+              .flatMap(_.actions.map(_.items).getOrElse(Seq()))
+              .map(AnchorTag(_))
+
+          summaryListActions(view(viewModel)) must contain theSameElementsAs actions
+        }
+      }
 
       "render the button href" in {
 
         forAll(checkYourAnswersViewModelGen) { viewModel =>
-          anchorButton(view(viewModel)).attr("href") mustBe viewModel.onSubmit.url
+
+          anchorButton(view(viewModel)).href mustBe viewModel.onSubmit.url
         }
       }
 

@@ -61,14 +61,14 @@ class ContentTablePageViewSpec extends BaseSpec with ScalaCheckPropertyChecks wi
       "render the button text" in {
 
         forAll(contentTablePageViewModelGen) { viewModel =>
-          anchorButton(view(viewModel)).text() mustBe messageKey(viewModel.buttonText)
+          anchorButton(view(viewModel)).content mustBe messageKey(viewModel.buttonText)
         }
       }
 
       "render the button href" in {
 
         forAll(contentTablePageViewModelGen) { viewModel =>
-          anchorButton(view(viewModel)).attr("href") mustBe viewModel.onSubmit.url
+          anchorButton(view(viewModel)).href mustBe viewModel.onSubmit.url
         }
       }
     }

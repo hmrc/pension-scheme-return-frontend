@@ -31,20 +31,20 @@ import views.html.CheckYourAnswersView
 import viewmodels.models.CheckYourAnswersViewModel
 import views.html
 
-class CheckYourAnswersController @Inject()(
-                                            override val messagesApi: MessagesApi,
-                                            navigator: Navigator,
-                                            identify: IdentifierAction,
-                                            allowAccess: AllowAccessActionProvider,
-                                            getData: DataRetrievalAction,
-                                            requireData: DataRequiredAction,
-                                            val controllerComponents: MessagesControllerComponents,
-                                            view: CheckYourAnswersView
-                                          ) extends FrontendBaseController with I18nSupport {
+class SchemeBankAccountCheckYourAnswersController @Inject()(
+  override val messagesApi: MessagesApi,
+  navigator: Navigator,
+  identify: IdentifierAction,
+  allowAccess: AllowAccessActionProvider,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  val controllerComponents: MessagesControllerComponents,
+  view: CheckYourAnswersView
+) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(srn: Srn): Action[AnyContent] = (identify andThen allowAccess(srn) andThen getData andThen requireData) {
     implicit request =>
-      Ok(view(CheckYourAnswersController.viewModel(srn)))
+      Ok(view(SchemeBankAccountCheckYourAnswersController.viewModel(srn)))
   }
 
   def onSubmit(srn: Srn): Action[AnyContent] = (identify andThen allowAccess(srn) andThen getData andThen requireData) {
@@ -53,14 +53,14 @@ class CheckYourAnswersController @Inject()(
   }
 }
 
-object CheckYourAnswersController {
+object SchemeBankAccountCheckYourAnswersController {
 
   val list = SummaryListViewModel(
     rows = Seq(SummaryListRow.apply())
   )
-  def viewModel(srn: Srn): CheckYourAnswersViewModel = CheckYourAnswersViewModel (
-    "title",
-    "heading",
+  def viewModel(srn: Srn, bankAccount: BankAccount): CheckYourAnswersViewModel = CheckYourAnswersViewModel (
+    "schemeBankAccountCheckYourAnswers.title",
+    "schemeBankAccountCheckYourAnswers.heading",
     routes.CheckYourAnswersController.onSubmit(srn),
     list
   )

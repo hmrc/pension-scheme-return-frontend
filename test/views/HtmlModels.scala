@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,28 +12,28 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@import viewmodels.models.CheckYourAnswersViewModel
+package views
 
-@this(
-    layout: templates.Layout,
-    govukSummaryList: GovukSummaryList,
-    govukButton: GovukButton,
-    message: Message
-)
+import org.jsoup.nodes.Element
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.ActionItem
 
-@(viewmodel: CheckYourAnswersViewModel)(implicit request: Request[_], messages: Messages)
+trait HtmlModels {
 
-    @layout(pageTitle = titleNoForm(viewmodel.title.toMessage)) {
+  case class AnchorTag(href: String, content: String)
 
-        <h1 class="govuk-heading-l">@viewmodel.heading.toMessage</h1>
+  object AnchorTag {
 
-        @govukSummaryList(
-            viewmodel.rows
-        )
-
-        @govukButton(
-            ButtonViewModel(messages("site.saveAndContinue")).asLink(viewmodel.onSubmit.url)
-        )
+    def apply(element: Element): AnchorTag = {
+      AnchorTag(element.attr("href"), element.text())
     }
+
+    def apply(item: ActionItem): AnchorTag = {
+      AnchorTag(
+        item.href,
+        s"${item.content.asHtml}${item.visuallyHiddenText.fold("")(s => s" $s")}"
+      )
+    }
+  }
+}

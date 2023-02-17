@@ -35,28 +35,47 @@ class CheckYourAnswersControllerSpec extends ControllerBaseSpec {
   lazy val onSubmit = routes.CheckYourAnswersController.onSubmit(srn).url
 
 
-  "CheckYourAnswersController" should {
+  "SchemeBankAccountCheckYourAnswersController.onPageLoad" should {
 
     "return OK and the correct view for a GET" in {
 
-      running(_ => applicationBuilder(userAnswers = Some (emptyUserAnswers)) ) { implicit app =>
+      running(_ => applicationBuilder(userAnswers = Some(emptyUserAnswers))) { implicit app =>
 
-      val view = injected[CheckYourAnswersView]
-      val request = FakeRequest(GET, onPageLoad)
+        val view = injected[CheckYourAnswersView]
+        val request = FakeRequest(GET, onPageLoad)
 
-      val result = route(app, request).value
-      val expectedView = view(CheckYourAnswersController.viewModel(srn))(request, messages(app))
+        val result = route(app, request).value
+        val expectedView = view(SchemeBankAccountCheckYourAnswersController.viewModel(srn))(request, messages(app))
 
-      status(result) mustEqual OK
-      contentAsString(result) mustEqual expectedView.toString }
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual expectedView.toString
+      }
     }
+
+    "must redirect to Journey Recovery for a GET if no existing data is found" in {
+
+      val application = applicationBuilder(userAnswers = None).build()
+
+      running(application) {
+
+        val request = FakeRequest(GET, onPageLoad)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+  }
+
+  "SchemeBankAccountCheckYourAnswers.onSubmit" should {
 
     "redirect to the next page" in {
 
-      val fakeNavigatorApplication = applicationBuilder(userAnswers = Some (emptyUserAnswers))
-          .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
-          )
+      val fakeNavigatorApplication = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        .overrides(
+          bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
+        )
 
       running(_ => fakeNavigatorApplication) { app =>
 
@@ -68,34 +87,26 @@ class CheckYourAnswersControllerSpec extends ControllerBaseSpec {
         redirectLocation(result).value mustEqual onwardRoute.url
       }
     }
+
+    "must redirect to Journey Recovery for a GET if no existing data is found" in {
+
+      val application = applicationBuilder(userAnswers = None).build()
+
+      running(application) {
+
+        val request = FakeRequest(GET, onSubmit)
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
   }
 
-"must redirect to Journey Recovery for a GET if no existing data is found" in {
+  "SchemeBankAccountCheckYourAnswers.viewModel" should {
 
-  val application = applicationBuilder (userAnswers = None).build()
 
-  running (application) {
-  val request = FakeRequest (GET,onPageLoad)
-
-  val result = route (application, request).value
-
-  status (result) mustEqual SEE_OTHER
-  redirectLocation (result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad ().url
-}
-}
-
-  "must redirect to Journey Recovery for a GET if no data is found" in {
-
-    val application = applicationBuilder(userAnswers = None).build()
-
-    running(application) {
-      val request = FakeRequest(GET, onSubmit)
-
-      val result = route(application, request).value
-
-      status(result) mustEqual SEE_OTHER
-      redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
-    }
   }
 }
 
