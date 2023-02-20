@@ -22,9 +22,11 @@ import controllers.SchemeBankAccountController._
 import controllers.actions._
 import forms.BankAccountFormProvider
 import models.SchemeId.Srn
+import models.requests.DataRequest
 import models.{BankAccount, Mode}
 import navigation.Navigator
-import pages.SchemeBankAccountPage
+import pages.SchemeBankAccounts.SchemeBankAccountsOps
+import pages.{SchemeBankAccounts, SchemeBankAccountPage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -54,7 +56,7 @@ class SchemeBankAccountController @Inject()(
   def onPageLoad(srn: Srn, index: Max10, mode: Mode): Action[AnyContent] =
     (identify andThen allowAccess(srn) andThen getData andThen requireData) {
       implicit request =>
-        val maybeBankAccount = request.userAnswers.schemeBankAccounts(srn).lift(index.value - 1)
+        val maybeBankAccount = request.userAnswers.get(SchemeBankAccountPage(srn, index.value - 1))
         val preparedForm = maybeBankAccount.fold(form)(form.fill)
         Ok(view(preparedForm, viewModel(srn, index, mode)))
     }
@@ -65,17 +67,20 @@ class SchemeBankAccountController @Inject()(
         form.bindFromRequest().fold(
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode)))),
           value => {
-            val bankAccounts = request.userAnswers.schemeBankAccounts(srn) match {
-              case list if list.isDefinedAt(index.value - 1) => list.updated(index.value - 1, value)
-              case list => list :+ value
+            if (isDuplicateBankAccount(srn, value)) {
+              Future.successful(Redirect(navigator.nextPage(SchemeBankAccountPage(srn, index.value), mode, request.userAnswers)))
+            } else {
+              for {
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(SchemeBankAccountPage(srn, index.value - 1), value))
+                _              <- saveService.save(updatedAnswers)
+              } yield Redirect(navigator.nextPage(SchemeBankAccountPage(srn, index.value), mode, updatedAnswers))
             }
-            for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(SchemeBankAccountPage(srn), bankAccounts))
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(SchemeBankAccountPage(srn), mode, updatedAnswers))
           }
         )
     }
+
+  private def isDuplicateBankAccount(srn: Srn, bankAccount: BankAccount)(implicit request: DataRequest[_]): Boolean =
+    request.userAnswers.schemeBankAccounts(srn).exists(_.accountNumber == bankAccount.accountNumber)
 }
 
 object SchemeBankAccountController {

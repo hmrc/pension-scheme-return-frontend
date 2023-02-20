@@ -17,9 +17,9 @@
 package controllers
 
 import com.google.inject.Inject
-import config.Constants.MaxSchemeBankAccounts
+import config.Constants.maxSchemeBankAccounts
 import config.Refined.OneToTen
-import controllers.SchemeBankAccountSummaryController._
+import controllers.SchemeBankAccountListController._
 import controllers.actions._
 import eu.timepit.refined._
 import eu.timepit.refined.api.Refined
@@ -27,6 +27,7 @@ import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
 import models.{BankAccount, Mode}
 import navigation.Navigator
+import pages.SchemeBankAccounts.SchemeBankAccountsOps
 import pages.{SchemeBankAccountPage, SchemeBankAccountSummaryPage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -37,11 +38,11 @@ import viewmodels.Delimiter
 import viewmodels.DisplayMessage.{ComplexMessage, SimpleMessage}
 import viewmodels.implicits._
 import viewmodels.models.{SummaryRow, SummaryViewModel}
-import views.html.SummaryView
+import views.html.ListView
 
 import scala.concurrent.ExecutionContext
 
-class SchemeBankAccountSummaryController @Inject()(
+class SchemeBankAccountListController @Inject()(
                                                     override val messagesApi: MessagesApi,
                                                     navigator: Navigator,
                                                     identify: IdentifierAction,
@@ -49,11 +50,11 @@ class SchemeBankAccountSummaryController @Inject()(
                                                     getData: DataRetrievalAction,
                                                     requireData: DataRequiredAction,
                                                     val controllerComponents: MessagesControllerComponents,
-                                                    view: SummaryView,
+                                                    view: ListView,
                                                     formProvider: YesNoPageFormProvider
                                                   )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  private val form = SchemeBankAccountSummaryController.form(formProvider)
+  private val form = SchemeBankAccountListController.form(formProvider)
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = (identify andThen allowAccess(srn) andThen getData andThen requireData) {
     implicit request =>
@@ -68,7 +69,7 @@ class SchemeBankAccountSummaryController @Inject()(
   def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = (identify andThen allowAccess(srn) andThen getData andThen requireData) {
     implicit request =>
       val bankAccounts = request.userAnswers.schemeBankAccounts(srn)
-      if (bankAccounts.length == MaxSchemeBankAccounts) {
+      if (bankAccounts.length == maxSchemeBankAccounts) {
         Redirect(navigator.nextPage(SchemeBankAccountSummaryPage(srn, addBankAccount = false), mode, request.userAnswers))
       } else {
         form.bindFromRequest().fold(
@@ -79,7 +80,7 @@ class SchemeBankAccountSummaryController @Inject()(
   }
 }
 
-object SchemeBankAccountSummaryController {
+object SchemeBankAccountListController {
   def form(formProvider: YesNoPageFormProvider): Form[Boolean] = formProvider(
     "schemeBankDetailsSummary.error.required"
   )
@@ -103,9 +104,12 @@ object SchemeBankAccountSummaryController {
       }
     }
 
+    val titleKey = if(bankAccounts.length > 1) "schemeBankDetailsSummary.title.plural" else "schemeBankDetailsSummary.title"
+    val headingKey = if(bankAccounts.length > 1) "schemeBankDetailsSummary.heading.plural" else "schemeBankDetailsSummary.heading"
+
     SummaryViewModel(
-      SimpleMessage("schemeBankDetailsSummary.title", bankAccounts.length),
-      SimpleMessage("schemeBankDetailsSummary.heading", bankAccounts.length),
+      SimpleMessage(titleKey, bankAccounts.length),
+      SimpleMessage(headingKey, bankAccounts.length),
       rows,
       "site.saveAndContinue",
       "schemeBankDetailsSummary.radio",
@@ -113,7 +117,7 @@ object SchemeBankAccountSummaryController {
       showRadios = bankAccounts.length < 10,
       "site.change",
       "site.remove",
-      onSubmit = controllers.routes.SchemeBankAccountSummaryController.onSubmit(srn)
+      onSubmit = controllers.routes.SchemeBankAccountListController.onSubmit(srn)
     )
   }
 }

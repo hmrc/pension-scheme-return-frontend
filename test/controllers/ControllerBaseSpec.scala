@@ -28,7 +28,11 @@ import play.api.libs.json.Json
 import play.api.mvc.Call
 import play.api.test.Helpers.running
 import play.api.test._
+import services.{SaveService, SaveServiceImpl}
+import uk.gov.hmrc.http.HeaderCarrier
 import utils.BaseSpec
+
+import scala.concurrent.Future
 
 trait ControllerBaseSpec
   extends BaseSpec
@@ -66,7 +70,7 @@ trait ControllerBaseSpec
         bind[IdentifierAction].to[FakeIdentifierAction],
         bind[AllowAccessActionProvider].toInstance(new FakeAllowAccessActionProvider(schemeDetails)),
         bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers)),
-        bind[DataCreationAction].toInstance(new FakeDataCreationAction(userAnswers.getOrElse(emptyUserAnswers))),
+        bind[DataCreationAction].toInstance(new FakeDataCreationAction(userAnswers.getOrElse(emptyUserAnswers)))
       )
 
   def runningApplication[T](block: Application => T): T = {

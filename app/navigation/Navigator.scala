@@ -16,13 +16,11 @@
 
 package navigation
 
-import config.Constants
-import config.Constants.MaxSchemeBankAccounts
 import config.Refined.OneToTen
 import controllers.routes
 import eu.timepit.refined._
-import eu.timepit.refined.api.Refined
 import models._
+import pages.SchemeBankAccounts.SchemeBankAccountsOps
 import pages._
 import play.api.mvc.Call
 
@@ -34,31 +32,27 @@ class Navigator @Inject()() {
   private val normalRoutes: Page => UserAnswers => Call = {
     case StartPage(srn)             => _ => routes.SchemeDetailsController.onPageLoad(srn)
     case SchemeDetailsPage(srn)     => _ => routes.CheckReturnDatesController.onPageLoad(srn, NormalMode)
-
-    case page@CheckReturnDatesPage(srn)  => ua =>
-      if(ua.get(page).contains(true))
-        routes.SchemeBankAccountController.onPageLoad(srn, refineMV[OneToTen](1), NormalMode)
-      else
-        routes.UnauthorisedController.onPageLoad
-    case SchemeBankAccountPage(srn) => _ => routes.SchemeBankAccountSummaryController.onPageLoad(srn)
-    case SchemeBankAccountSummaryPage(srn, addBankAccount @ true) => userAnswers =>
-      val numBankAccounts = userAnswers.get(SchemeBankAccountPage(srn)).toList.flatten.length
-      refineV[OneToTen](numBankAccounts) match {
-        case Left(_)                               => routes.SchemeBankAccountSummaryController.onPageLoad(srn)
-        case Right(Refined(MaxSchemeBankAccounts)) => routes.UnauthorisedController.onPageLoad
-        case Right(index)                          => refineV[OneToTen](index.value + 1) match {
-          case Left(_)          => routes.UnauthorisedController.onPageLoad
-          case Right(nextIndex) => routes.SchemeBankAccountController.onPageLoad(srn, nextIndex, NormalMode)
-        }
+    case page @ CheckReturnDatesPage(srn) => {
+      case ua if ua.get(page).contains(true) => ua.schemeBankAccounts(srn) match {
+        case Nil => routes.SchemeBankAccountController.onPageLoad(srn, refineMV[OneToTen](1), NormalMode)
+        case _   => routes.SchemeBankAccountListController.onPageLoad(srn)
       }
-    case SchemeBankAccountSummaryPage(_, addBankAccount @ false) => _ => routes.UnauthorisedController.onPageLoad
+      case _ => routes.UnauthorisedController.onPageLoad
+    }
+    case SchemeBankAccountPage(srn, _) => _ => routes.SchemeBankAccountListController.onPageLoad(srn)
+    case SchemeBankAccountSummaryPage(srn, true) => ua =>
+      refineV[OneToTen](ua.schemeBankAccounts(srn).length + 1) match {
+        case Left(_)          => routes.SchemeBankAccountListController.onPageLoad(srn)
+        case Right(nextIndex) => routes.SchemeBankAccountController.onPageLoad(srn, nextIndex, NormalMode)
+      }
+    case SchemeBankAccountSummaryPage(_, false) => _ => routes.UnauthorisedController.onPageLoad
     case _              => _ => routes.IndexController.onPageLoad
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
-    case CheckReturnDatesPage(srn)  => _ => routes.UnauthorisedController.onPageLoad
-    case SchemeBankAccountPage(srn) => _ => routes.UnauthorisedController.onPageLoad
-    case _                          => _ => routes.IndexController.onPageLoad
+    case CheckReturnDatesPage(srn)     => _ => routes.UnauthorisedController.onPageLoad
+    case SchemeBankAccountPage(srn, _) => _ => routes.UnauthorisedController.onPageLoad
+    case _                             => _ => routes.IndexController.onPageLoad
   }
 
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = mode match {

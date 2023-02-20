@@ -16,19 +16,19 @@
 
 package controllers
 
-import controllers.SchemeBankAccountSummaryController._
+import controllers.SchemeBankAccountListController._
 import eu.timepit.refined.api.Refined
 import forms.YesNoPageFormProvider
 import models.{BankAccount, NormalMode, UserAnswers}
-import pages.SchemeBankAccountPage
+import pages.{SchemeBankAccounts, SchemeBankAccountPage}
 import play.api.Application
 import play.api.data.Form
 import views.html.SummaryView
 
-class SchemeBankAccountSummaryControllerTest extends ControllerBaseSpec {
+class SchemeBankAccountListControllerTest extends ControllerBaseSpec {
 
-  private val onPageLoad = routes.SchemeBankAccountSummaryController.onPageLoad(srn).url
-  private val onSubmit = routes.SchemeBankAccountSummaryController.onSubmit(srn).url
+  private val onPageLoad = routes.SchemeBankAccountListController.onPageLoad(srn).url
+  private val onSubmit = routes.SchemeBankAccountListController.onSubmit(srn).url
 
   private val redirectUrlFalse = controllers.routes.UnauthorisedController.onPageLoad.url
   private val redirectUrlNoBankAccounts = schemeBankAccountRedirectUrl(1)
@@ -63,13 +63,16 @@ class SchemeBankAccountSummaryControllerTest extends ControllerBaseSpec {
 
   private def view(implicit a: Application): SummaryView = injected[SummaryView]
 
-  private def form(implicit a: Application): Form[Boolean] = SchemeBankAccountSummaryController.form(injected[YesNoPageFormProvider])
+  private def form(implicit a: Application): Form[Boolean] = SchemeBankAccountListController.form(injected[YesNoPageFormProvider])
 
   private def schemeBankAccountRedirectUrl(bankAccountIndex: Int): String =
     controllers.routes.SchemeBankAccountController.onPageLoad(srn, Refined.unsafeApply(bankAccountIndex), NormalMode).url
 
   private def buildBankAccounts(num: Int): List[BankAccount] = (1 to num).map(i => BankAccount(i.toString, accountNumber, sortCode)).toList
 
-  private def buildUserAnswers(bankAccounts: List[BankAccount]): UserAnswers =
-    defaultUserAnswers.set(SchemeBankAccountPage(srn), bankAccounts).success.value
+  private def buildUserAnswers(bankAccounts: List[BankAccount]): UserAnswers = {
+    bankAccounts.zipWithIndex.foldLeft(defaultUserAnswers) { case (userAnswers, (bankAccount, index)) =>
+      userAnswers.set(SchemeBankAccountPage(srn, index), bankAccount).success.value
+    }
+  }
 }

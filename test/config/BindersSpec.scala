@@ -16,6 +16,7 @@
 
 package config
 
+import config.Refined.OneToTen
 import models.SchemeId.Srn
 import org.scalacheck.Gen.alphaNumStr
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
@@ -49,19 +50,19 @@ class BindersSpec extends BaseSpec with ScalaCheckPropertyChecks with EitherValu
   "1 to 10 refined binder" should {
     "bind successfully when a number between 1 and 10 is supplied" in {
       forAll(Gen.oneOf(1 to 10)) { i =>
-        Binders.max10PathBinder.bind("max", i.toString) mustBe Right(Refined.unsafeApply(i))
+        Binders.refinedIntPathBinder[OneToTen].bind("max", i.toString) mustBe Right(Refined.unsafeApply(i))
       }
     }
 
     "fail to bind when a number is greater than 10" in {
       forAll(Gen.oneOf(11 to 30)) { i =>
-        Binders.max10PathBinder.bind("max", i.toString).isLeft mustBe true
+        Binders.refinedIntPathBinder[OneToTen].bind("max", i.toString).isLeft mustBe true
       }
     }
 
     "fail to bind when a number is less than 1" in {
       forAll(Gen.oneOf(-10 to 0)) { i =>
-        Binders.max10PathBinder.bind("max", i.toString).isLeft mustBe true
+        Binders.refinedIntPathBinder[OneToTen].bind("max", i.toString).isLeft mustBe true
       }
     }
   }

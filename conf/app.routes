@@ -44,5 +44,5 @@ POST        /:srn/change-enter-bank-details                       controllers.Sc
 GET         /:srn/change-enter-bank-details/:index                controllers.SchemeBankAccountController.onPageLoad(srn: Srn, index: Max10, mode: Mode = CheckMode)
 POST        /:srn/change-enter-bank-details/:index                controllers.SchemeBankAccountController.onSubmit(srn: Srn, index: Max10, mode: Mode = CheckMode)
 
-GET         /:srn/bank-accounts                                   controllers.SchemeBankAccountSummaryController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST        /:srn/bank-accounts                                   controllers.SchemeBankAccountSummaryController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/bank-accounts                                   controllers.SchemeBankAccountListController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/bank-accounts                                   controllers.SchemeBankAccountListController.onSubmit(srn: Srn, mode: Mode = NormalMode)

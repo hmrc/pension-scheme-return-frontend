@@ -55,43 +55,55 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
       }
     }
 
-    "go from check return dates page to scheme bank account page" when {
+    "check returns page" should {
 
-      "yes is selected" in {
-        forAll(srnGen) { srn =>
-          val ua = userAnswers.set(CheckReturnDatesPage(srn), true).get
-          navigator.nextPage(CheckReturnDatesPage(srn), NormalMode, ua) mustBe
-            routes.SchemeBankAccountController.onPageLoad(srn, refineMV[OneToTen](1), NormalMode)
+      "navigate to scheme bank account page" when {
+        "yes is selected" in {
+          forAll(srnGen) { srn =>
+            val ua = userAnswers.set(CheckReturnDatesPage(srn), true).get
+            navigator.nextPage(CheckReturnDatesPage(srn), NormalMode, ua) mustBe
+              routes.SchemeBankAccountController.onPageLoad(srn, refineMV[OneToTen](1), NormalMode)
+          }
+        }
+      }
+
+      "navigate to scheme bank account list page" when {
+        "yes is selected and a bank account has previously been entered" in {
+          forAll(srnGen) { srn =>
+            val ua = userAnswers
+              .set(CheckReturnDatesPage(srn), true).get
+              .set(SchemeBankAccountPage(srn, 0), BankAccount("test", "11111111", "111111")).get
+            navigator.nextPage(CheckReturnDatesPage(srn), NormalMode, ua) mustBe
+              routes.SchemeBankAccountListController.onPageLoad(srn)
+          }
+        }
+      }
+
+      "navigate to to unauthorised page" when {
+        "no is selected" in {
+          forAll(srnGen) { srn =>
+            val ua = userAnswers.set(CheckReturnDatesPage(srn), false).get
+            navigator.nextPage(CheckReturnDatesPage(srn), NormalMode, ua) mustBe routes.UnauthorisedController.onPageLoad
+          }
         }
       }
     }
 
-    "go from check return dates page to unauthorised page" when {
-
-      "no is selected" in {
-
-        forAll(srnGen) { srn =>
-          val ua = userAnswers.set(CheckReturnDatesPage(srn), false).get
-          navigator.nextPage(CheckReturnDatesPage(srn), NormalMode, ua) mustBe routes.UnauthorisedController.onPageLoad
-        }
-      }
-    }
-
-    "go from scheme bank account page to scheme bank account summary page" when {
+    "go from scheme bank account page to scheme bank account list page" when {
 
       "a valid bank account is entered" in {
         forAll(srnGen) { srn =>
-          val ua = userAnswers.set(SchemeBankAccountPage(srn), List(BankAccount("test", "12345678", "123456"))).get
-          navigator.nextPage(SchemeBankAccountPage(srn), NormalMode, ua) mustBe routes.SchemeBankAccountSummaryController.onPageLoad(srn)
+          val ua = userAnswers.set(SchemeBankAccountPage(srn, 0), BankAccount("test", "11111111", "111111")).get
+          navigator.nextPage(SchemeBankAccountPage(srn, 0), NormalMode, ua) mustBe routes.SchemeBankAccountListController.onPageLoad(srn)
         }
       }
     }
 
-    "go from scheme bank account summary page to scheme bank account page" when {
+    "go from scheme bank account list page to scheme bank account page" when {
 
       "yes is selected" in {
         forAll(srnGen) { srn =>
-          val ua = userAnswers.set(SchemeBankAccountPage(srn), List(BankAccount("test", "12345678", "123456"))).get
+          val ua = userAnswers.set(SchemeBankAccountPage(srn, 0), BankAccount("test", "11111111", "111111")).get
           navigator.nextPage(SchemeBankAccountSummaryPage(srn, addBankAccount = true), NormalMode, ua) mustBe
             routes.SchemeBankAccountController.onPageLoad(srn, refineMV[OneToTen](2), NormalMode)
         }
