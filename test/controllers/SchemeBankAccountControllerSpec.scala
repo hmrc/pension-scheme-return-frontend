@@ -27,9 +27,7 @@ class SchemeBankAccountControllerSpec extends ControllerBaseSpec {
   private val onPageLoad = routes.SchemeBankAccountController.onPageLoad(srn, NormalMode).url
   private val onSubmit = routes.SchemeBankAccountController.onSubmit(srn, NormalMode).url
 
-  private val bankAccount = BankAccount("testBankName", "10273837", "027162")
-
-  private val redirectUrl = controllers.routes.UnauthorisedController.onPageLoad.url
+  private val bankAccount = bankAccountGen.sample.value
 
   private val validFormData = List("bankName" -> "testBankName", "accountNumber" -> "10273837", "sortCode" -> "027123")
   private val invalidFormData = List("bankName" -> "testBankName", "accountNumber" -> "10273837", "sortCode" -> "wrong")
@@ -40,7 +38,7 @@ class SchemeBankAccountControllerSpec extends ControllerBaseSpec {
       injected[BankAccountView].apply(form(injected[BankAccountFormProvider]), viewModel(srn, NormalMode))
     }
     behave like invalidForm(onSubmit, invalidFormData: _*)
-    behave like redirectNextPage(onSubmit, redirectUrl, validFormData: _*)
+    behave like redirectNextPage(onSubmit, validFormData: _*)
     
     behave like renderPrePopView(onPageLoad, SchemeBankAccountPage(srn), bankAccount) { implicit app => implicit request =>
       val preparedForm = form(injected[BankAccountFormProvider]).fill(bankAccount)

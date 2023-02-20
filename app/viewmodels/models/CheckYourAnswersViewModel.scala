@@ -33,17 +33,15 @@ case class CheckYourAnswersViewModel(
 object CheckYourAnswersViewModel {
 
   def apply(
-             title: String,
-             heading: String,
-             rows: Seq[CheckYourAnswersRowViewModel],
-             onSubmit: Call
-           ): CheckYourAnswersViewModel =
-              CheckYourAnswersViewModel(
-                SimpleMessage(title),
-                SimpleMessage(heading),
-                rows.toList,
-                onSubmit
-              )
+    rows: Seq[CheckYourAnswersRowViewModel],
+    onSubmit: Call
+  ): CheckYourAnswersViewModel =
+    CheckYourAnswersViewModel(
+      SimpleMessage("checkYourAnswers.title"),
+      SimpleMessage("checkYourAnswers.heading"),
+      rows.toList,
+      onSubmit
+    )
 }
 
 case class CheckYourAnswersRowViewModel(

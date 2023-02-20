@@ -67,14 +67,12 @@ object SchemeBankAccountCheckYourAnswersController {
 
   def bankAccountAnswers(srn: Srn, bankAccount: BankAccount) =
     Seq(
-      CheckYourAnswersRowViewModel("schemeBankAccountCheckYourAnswers.bankName", bankAccount.bankName).withAction(action(srn)),
-      CheckYourAnswersRowViewModel("schemeBankAccountCheckYourAnswers.accountNumber", bankAccount.accountNumber).withAction(action(srn)),
-      CheckYourAnswersRowViewModel("schemeBankAccountCheckYourAnswers.sortCode", bankAccount.sortCode).withAction(action(srn))
+      CheckYourAnswersRowViewModel("schemeBankDetails.bankName.heading", bankAccount.bankName).withAction(action(srn)),
+      CheckYourAnswersRowViewModel("schemeBankDetails.accountNumber.heading", bankAccount.accountNumber).withAction(action(srn)),
+      CheckYourAnswersRowViewModel("schemeBankDetails.sortCode.heading", bankAccount.sortCode).withAction(action(srn))
     )
 
   def viewModel(srn: Srn, bankAccount: BankAccount): CheckYourAnswersViewModel = CheckYourAnswersViewModel(
-    "schemeBankAccountCheckYourAnswers.title",
-    "schemeBankAccountCheckYourAnswers.heading",
     bankAccountAnswers(srn, bankAccount),
     routes.SchemeBankAccountCheckYourAnswersController.onSubmit(srn)
   )

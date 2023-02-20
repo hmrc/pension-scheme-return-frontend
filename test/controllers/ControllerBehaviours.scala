@@ -16,10 +16,13 @@
 
 package controllers
 
-import play.api.Application
+import navigation.{FakeNavigator, Navigator}
+import play.api
+import play.api.{Application, inject}
+import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Writes
-import play.api.mvc.Request
+import play.api.mvc.{Call, Request}
 import play.api.test.FakeRequest
 import play.twirl.api.Html
 import queries.Settable
@@ -60,15 +63,20 @@ trait ControllerBehaviours {
       }
     }
 
-  def redirectNextPage(onSubmitUrl: String, redirectUrl: String, form: (String, String)*): Unit =
+  def redirectNextPage(onSubmitUrl: String, form: (String, String)*): Unit =
     "redirect to the next page" in {
-      val appBuilder = applicationBuilder(Some(userAnswers))
+
+      val onwardsUrl = Call(GET, "/foo")
+      val appBuilder = applicationBuilder(Some(userAnswers)).overrides(
+        bind[Navigator].toInstance(new FakeNavigator(onwardsUrl))
+      )
+
       running(_ => appBuilder) { app =>
         val request = FakeRequest(POST, onSubmitUrl).withFormUrlEncodedBody(form: _*)
         val result = route(app, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual redirectUrl
+        redirectLocation(result).value mustEqual onwardsUrl.url
       }
     }
 }

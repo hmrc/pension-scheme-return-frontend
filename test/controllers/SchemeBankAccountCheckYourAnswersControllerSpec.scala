@@ -129,7 +129,7 @@ class SchemeBankAccountCheckYourAnswersControllerSpec extends ControllerBaseSpec
 
       forAll(srnGen, bankAccountGen) { (srn, bankAccount) =>
 
-        viewModel(srn, bankAccount).title.key mustBe "schemeBankAccountCheckYourAnswers.title"
+        viewModel(srn, bankAccount).title.key mustBe "checkYourAnswers.title"
       }
     }
 
@@ -137,7 +137,7 @@ class SchemeBankAccountCheckYourAnswersControllerSpec extends ControllerBaseSpec
 
       forAll(srnGen, bankAccountGen) { (srn, bankAccount) =>
 
-        viewModel(srn, bankAccount).heading.key mustBe "schemeBankAccountCheckYourAnswers.heading"
+        viewModel(srn, bankAccount).heading.key mustBe "checkYourAnswers.heading"
       }
     }
 
@@ -145,7 +145,7 @@ class SchemeBankAccountCheckYourAnswersControllerSpec extends ControllerBaseSpec
 
       forAll(srnGen, bankAccountGen) { (srn, bankAccount) =>
 
-        viewModel(srn, bankAccount).rows.map(_.key.key) must contain("schemeBankAccountCheckYourAnswers.bankName")
+        viewModel(srn, bankAccount).rows.map(_.key.key) must contain("schemeBankDetails.bankName.heading")
       }
     }
 
@@ -153,7 +153,7 @@ class SchemeBankAccountCheckYourAnswersControllerSpec extends ControllerBaseSpec
 
       forAll(srnGen, bankAccountGen) { (srn, bankAccount) =>
 
-        viewModel(srn, bankAccount).rows.map(_.key.key) must contain("schemeBankAccountCheckYourAnswers.accountNumber")
+        viewModel(srn, bankAccount).rows.map(_.key.key) must contain("schemeBankDetails.accountNumber.heading")
       }
     }
 
@@ -161,7 +161,7 @@ class SchemeBankAccountCheckYourAnswersControllerSpec extends ControllerBaseSpec
 
       forAll(srnGen, bankAccountGen) { (srn, bankAccount) =>
 
-        viewModel(srn, bankAccount).rows.map(_.key.key) must contain("schemeBankAccountCheckYourAnswers.sortCode")
+        viewModel(srn, bankAccount).rows.map(_.key.key) must contain("schemeBankDetails.sortCode.heading")
       }
     }
 

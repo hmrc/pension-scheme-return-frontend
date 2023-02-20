@@ -73,5 +73,12 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
         }
       }
     }
+
+    "go from scheme bank account page to check your answers page" in {
+
+      forAll(srnGen) { srn =>
+        navigator.nextPage(SchemeBankAccountPage(srn), NormalMode, userAnswers) mustBe routes.SchemeBankAccountCheckYourAnswersController.onPageLoad(srn)
+      }
+    }
   }
 }
