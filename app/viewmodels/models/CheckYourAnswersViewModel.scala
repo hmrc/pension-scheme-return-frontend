@@ -16,14 +16,17 @@
 
 package viewmodels.models
 
+import play.api.i18n.Messages
 import play.api.mvc.Call
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.DisplayMessage.SimpleMessage
+import viewmodels.govuk.summarylist._
 
 case class CheckYourAnswersViewModel(
                                       title: SimpleMessage,
                                       heading: SimpleMessage,
-                                      rows: SummaryList,
+                                      rows: List[CheckYourAnswersRowViewModel],
                                       onSubmit: Call
                                     )
 
@@ -32,13 +35,40 @@ object CheckYourAnswersViewModel {
   def apply(
              title: String,
              heading: String,
-             onSubmit: Call,
-             rows: SummaryList
+             rows: Seq[CheckYourAnswersRowViewModel],
+             onSubmit: Call
            ): CheckYourAnswersViewModel =
               CheckYourAnswersViewModel(
-             SimpleMessage(title),
+                SimpleMessage(title),
                 SimpleMessage(heading),
-             rows,
-             onSubmit
+                rows.toList,
+                onSubmit
+              )
+}
+
+case class CheckYourAnswersRowViewModel(
+  key: SimpleMessage,
+  value: SimpleMessage,
+  actions: Seq[(SimpleMessage, String)]
+) {
+
+  def toSummaryListRow(implicit messages: Messages): SummaryListRow = {
+    SummaryListRowViewModel(
+      key = key.toMessage,
+      value = value.toMessage,
+      actions = actions.map { case (content, href) => ActionItemViewModel(Text(content.toMessage), href) }
     )
+  }
+
+  def withAction(action: (SimpleMessage, String)): CheckYourAnswersRowViewModel =
+    copy(actions = actions :+ action)
+}
+
+object CheckYourAnswersRowViewModel {
+
+  def apply(
+    key: String,
+    value: String
+  ): CheckYourAnswersRowViewModel =
+    CheckYourAnswersRowViewModel(SimpleMessage(key), SimpleMessage(value), Seq())
 }

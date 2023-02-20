@@ -18,17 +18,19 @@ package controllers
 
 import com.google.inject.Inject
 import controllers.actions.{AllowAccessActionProvider, DataRequiredAction, DataRetrievalAction, IdentifierAction}
-import models.NormalMode
+import models.{BankAccount, CheckMode, NormalMode}
 import models.SchemeId.Srn
 import navigation.Navigator
-import pages.CheckYourAnswersPage
+import pages.{SchemeBankAccountCheckYourAnswersPage, SchemeBankAccountPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.govukfrontend.views.Aliases.SummaryListRow
+import uk.gov.hmrc.govukfrontend.views.Aliases.{SummaryListRow, Text, Value}
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{ActionItem, Actions, Key}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.DisplayMessage.SimpleMessage
 import viewmodels.govuk.summarylist._
 import views.html.CheckYourAnswersView
-import viewmodels.models.CheckYourAnswersViewModel
+import viewmodels.models.{CheckYourAnswersRowViewModel, CheckYourAnswersViewModel}
 import views.html
 
 class SchemeBankAccountCheckYourAnswersController @Inject()(
@@ -44,26 +46,37 @@ class SchemeBankAccountCheckYourAnswersController @Inject()(
 
   def onPageLoad(srn: Srn): Action[AnyContent] = (identify andThen allowAccess(srn) andThen getData andThen requireData) {
     implicit request =>
-      Ok(view(SchemeBankAccountCheckYourAnswersController.viewModel(srn)))
+
+      request.userAnswers.get(SchemeBankAccountPage(srn)) match {
+        case None =>
+          Redirect(routes.SchemeBankAccountController.onPageLoad(srn, NormalMode))
+        case Some(bankAccount) => Ok(view(SchemeBankAccountCheckYourAnswersController.viewModel(srn, bankAccount)))
+      }
   }
 
   def onSubmit(srn: Srn): Action[AnyContent] = (identify andThen allowAccess(srn) andThen getData andThen requireData) {
     implicit request =>
-     Redirect(navigator.nextPage(CheckYourAnswersPage(srn), NormalMode, request.userAnswers))
+      Redirect(navigator.nextPage(SchemeBankAccountCheckYourAnswersPage(srn), NormalMode, request.userAnswers))
   }
 }
 
 object SchemeBankAccountCheckYourAnswersController {
 
-  val list = SummaryListViewModel(
-    rows = Seq(SummaryListRow.apply())
-  )
-  def viewModel(srn: Srn, bankAccount: BankAccount): CheckYourAnswersViewModel = CheckYourAnswersViewModel (
+  private def action(srn: Srn): (SimpleMessage, String) =
+    SimpleMessage("site.change") -> routes.SchemeBankAccountController.onPageLoad(srn, NormalMode).url
+
+  def bankAccountAnswers(srn: Srn, bankAccount: BankAccount) =
+    Seq(
+      CheckYourAnswersRowViewModel("schemeBankAccountCheckYourAnswers.bankName", bankAccount.bankName).withAction(action(srn)),
+      CheckYourAnswersRowViewModel("schemeBankAccountCheckYourAnswers.accountNumber", bankAccount.accountNumber).withAction(action(srn)),
+      CheckYourAnswersRowViewModel("schemeBankAccountCheckYourAnswers.sortCode", bankAccount.sortCode).withAction(action(srn))
+    )
+
+  def viewModel(srn: Srn, bankAccount: BankAccount): CheckYourAnswersViewModel = CheckYourAnswersViewModel(
     "schemeBankAccountCheckYourAnswers.title",
     "schemeBankAccountCheckYourAnswers.heading",
-    routes.CheckYourAnswersController.onSubmit(srn),
-    list
+    bankAccountAnswers(srn, bankAccount),
+    routes.SchemeBankAccountCheckYourAnswersController.onSubmit(srn)
   )
-
 }
 

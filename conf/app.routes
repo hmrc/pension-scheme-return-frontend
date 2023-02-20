@@ -38,3 +38,12 @@ POST        /:srn/enter-bank-details                     controllers.SchemeBankA
 
 GET         /:srn/change-enter-bank-details              controllers.SchemeBankAccountController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST        /:srn/change-enter-bank-details              controllers.SchemeBankAccountController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET         /:srn/enter-bank-details                     controllers.SchemeBankAccountController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/enter-bank-details                     controllers.SchemeBankAccountController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+
+GET         /:srn/change-enter-bank-details              controllers.SchemeBankAccountController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-enter-bank-details              controllers.SchemeBankAccountController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET         /:srn/check-bank-account                     controllers.SchemeBankAccountCheckYourAnswersController.onPageLoad(srn: Srn)
+GET         /:srn/check-bank-account-next-page           controllers.SchemeBankAccountCheckYourAnswersController.onSubmit(srn: Srn)

@@ -18,4 +18,4 @@ package pages
 
 import models.SchemeId.Srn
 
-case class CheckYourAnswersPage(srn:Srn) extends Page
+case class SchemeBankAccountCheckYourAnswersPage(srn:Srn) extends Page

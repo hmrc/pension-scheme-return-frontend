@@ -30,7 +30,9 @@
         <h1 class="govuk-heading-l">@viewmodel.heading.toMessage</h1>
 
         @govukSummaryList(
-            viewmodel.rows
+          SummaryListViewModel(
+            viewmodel.rows.map(_.toSummaryListRow)
+          )
         )
 
         @govukButton(

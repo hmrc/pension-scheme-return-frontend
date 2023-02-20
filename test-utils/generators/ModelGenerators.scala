@@ -138,6 +138,17 @@ trait ModelGenerators extends BasicGenerators {
     } yield AllowedAccessRequest(request, schemeDetails)
 
   def modeGen: Gen[Mode] = Gen.oneOf(NormalMode, CheckMode)
+
+  val bankAccountGen: Gen[BankAccount] =
+    for {
+      bankName      <- nonEmptyString
+      accountNumber <- Gen.listOfN(8, numChar).map(_.mkString)
+      separator     <- Gen.oneOf("", " ", "-")
+      pairs          = Gen.listOf(2, numChar)
+      sortCode      <- Gen.listOfN(3, pairs).map(_.mkString(separator))
+    } yield {
+      BankAccount(bankName, accountNumber, sortCode)
+    }
 }
 
 object ModelGenerators extends ModelGenerators

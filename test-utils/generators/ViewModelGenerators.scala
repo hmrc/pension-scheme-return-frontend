@@ -20,6 +20,7 @@ import org.scalacheck.Gen
 import uk.gov.hmrc.govukfrontend.views.Aliases.SummaryList
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{Content, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist._
+import viewmodels.DisplayMessage.SimpleMessage
 import viewmodels.models._
 
 trait ViewModelGenerators extends BasicGenerators {
@@ -47,25 +48,21 @@ trait ViewModelGenerators extends BasicGenerators {
       ContentTablePageViewModel(title, heading, inset, buttonText, onSubmit, rows: _*)
     }
 
-  val contentGen: Gen[Content] = nonEmptyString.map(Text)
-
-  val actionItemGen: Gen[ActionItem] =
+  val actionItemGen: Gen[(SimpleMessage, String)] =
     for {
+      content <- nonEmptyString
       href    <- relativeUrl
-      content <- nonEmptyString.map(Text)
-      hidden  <- Gen.option(nonEmptyString)
     } yield {
-      ActionItem(href, content, hidden)
+      SimpleMessage(content) -> href
     }
 
-  val summaryListRowGen: Gen[SummaryListRow] =
+  val summaryListRowGen: Gen[CheckYourAnswersRowViewModel] =
     for {
-      key     <- contentGen.map(Key(_))
-      value   <- contentGen.map(Value(_))
+      key     <- nonEmptyString
+      value   <- nonEmptyString
       items   <- Gen.listOf(actionItemGen)
-      actions <- Gen.option(Gen.const(Actions(items = items)))
     } yield {
-      SummaryListRow(key, value, actions = actions)
+      CheckYourAnswersRowViewModel(SimpleMessage(key), SimpleMessage(value), items)
     }
 
   val checkYourAnswersViewModelGen: Gen[CheckYourAnswersViewModel] =
@@ -74,9 +71,8 @@ trait ViewModelGenerators extends BasicGenerators {
       heading  <- nonEmptyString
       rows     <- Gen.listOf(summaryListRowGen)
       onSubmit <- call
-
     } yield {
-      CheckYourAnswersViewModel(title, heading, onSubmit, SummaryList(rows))
+      CheckYourAnswersViewModel(title, heading, rows, onSubmit)
     }
 
   val bankAccountViewModelGen: Gen[BankAccountViewModel] =

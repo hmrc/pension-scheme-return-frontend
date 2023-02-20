@@ -31,7 +31,6 @@ class CheckYourAnswersViewSpec extends BaseSpec with ScalaCheckPropertyChecks wi
     val view = injected[CheckYourAnswersView]
 
     implicit val request = FakeRequest()
-    implicit val mess = messages(app)
 
     "CheckYourAnswerView" should {
 
@@ -55,7 +54,7 @@ class CheckYourAnswersViewSpec extends BaseSpec with ScalaCheckPropertyChecks wi
 
         forAll(checkYourAnswersViewModelGen) { viewModel =>
 
-          val keys = viewModel.rows.rows.map(_.key.content.asHtml.body)
+          val keys = viewModel.rows.map(_.key.key)
           summaryListKeys(view(viewModel)) must contain theSameElementsAs keys
         }
       }
@@ -64,7 +63,7 @@ class CheckYourAnswersViewSpec extends BaseSpec with ScalaCheckPropertyChecks wi
 
         forAll(checkYourAnswersViewModelGen) { viewModel =>
 
-          val values = viewModel.rows.rows.map(_.value.content.asHtml.body)
+          val values = viewModel.rows.map(_.value.key)
           summaryListValues(view(viewModel)) must contain theSameElementsAs values
         }
       }
@@ -74,9 +73,9 @@ class CheckYourAnswersViewSpec extends BaseSpec with ScalaCheckPropertyChecks wi
         forAll(checkYourAnswersViewModelGen) { viewModel =>
 
           val actions =
-            viewModel.rows.rows
-              .flatMap(_.actions.map(_.items).getOrElse(Seq()))
-              .map(AnchorTag(_))
+            viewModel.rows
+              .flatMap(_.actions)
+              .map { case (content, href) => AnchorTag(href, content.key) }
 
           summaryListActions(view(viewModel)) must contain theSameElementsAs actions
         }
