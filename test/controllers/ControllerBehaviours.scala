@@ -30,21 +30,50 @@ import queries.Settable
 trait ControllerBehaviours {
   _: ControllerBaseSpec =>
 
-  def renderView(onPageLoadUrl: String)(view: Application => Request[_] => Html): Unit =
-    "return OK and the correct view for a GET" in {
+  def renderView(call: => Call)(view: Application => Request[_] => Html): Unit =
+    s"return OK and the correct view" in {
       val appBuilder = applicationBuilder(Some(userAnswers))
-      render(appBuilder, onPageLoadUrl)(view)
+      render(appBuilder, call)(view)
     }
 
-  def renderPrePopView[A: Writes](onPageLoadUrl: String, page: Settable[A], value: A)(view: Application => Request[_] => Html): Unit =
-    "return OK and the correct pre-populated view for a GET" in {
-      val appBuilder = applicationBuilder(Some(userAnswers.set(page, value).success.value))
-      render(appBuilder, onPageLoadUrl)(view)
+  def renderPrePopView[A: Writes](call: => Call, page: Settable[A], value: A)(view: Application => Request[_] => Html): Unit =
+    s"return OK and the correct pre-populated view" when {
+      s"value is set for page $page" in {
+        val appBuilder = applicationBuilder(Some(userAnswers.set(page, value).success.value))
+        render(appBuilder, call)(view)
+      }
     }
 
-  private def render(appBuilder: GuiceApplicationBuilder, onPageLoadUrl: String)(view: Application => Request[_] => Html): Unit =
+  def redirectWhenCacheEmpty(call: => Call, nextPage: => Call): Unit = {
+    s"redirect to $nextPage when cache empty" in {
+      running(_ => applicationBuilder(userAnswers = Some(emptyUserAnswers))) { app =>
+        val request = FakeRequest(call)
+        val result = route(app, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe nextPage.url
+      }
+    }
+  }
+
+  def journeyRecoveryPage(name: String, call: => Call): Unit = {
+    s"$name must redirect to Journey Recovery if no existing data is found" in {
+
+      val application = applicationBuilder(userAnswers = None).build()
+
+      running(application) {
+
+        val result = route(application, FakeRequest(call)).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+    }
+  }
+
+  private def render(appBuilder: GuiceApplicationBuilder, call: => Call)(view: Application => Request[_] => Html): Unit =
     running(_ => appBuilder) { app =>
-      val request = FakeRequest(GET, onPageLoadUrl)
+      val request = FakeRequest(call)
       val result = route(app, request).value
       val expectedView = view(app)(request)
 
@@ -52,18 +81,18 @@ trait ControllerBehaviours {
       contentAsString(result) mustEqual expectedView.toString
     }
 
-  def invalidForm(onSubmitUrl: String, form: (String, String)*): Unit =
-    "return BAD_REQUEST for a POST with invalid form data" in {
+  def invalidForm(call: => Call, form: (String, String)*): Unit =
+    s"return BAD_REQUEST when invalid form data is provided" in {
       val appBuilder = applicationBuilder(Some(userAnswers))
       running(_ => appBuilder) { app =>
-        val request = FakeRequest(POST, onSubmitUrl).withFormUrlEncodedBody(form: _*)
+        val request = FakeRequest(call).withFormUrlEncodedBody(form: _*)
         val result = route(app, request).value
 
         status(result) mustEqual BAD_REQUEST
       }
     }
 
-  def redirectNextPage(onSubmitUrl: String, form: (String, String)*): Unit =
+  def redirectNextPage(call: => Call, form: (String, String)*): Unit =
     "redirect to the next page" in {
 
       val onwardsUrl = Call(GET, "/foo")
@@ -72,7 +101,7 @@ trait ControllerBehaviours {
       )
 
       running(_ => appBuilder) { app =>
-        val request = FakeRequest(POST, onSubmitUrl).withFormUrlEncodedBody(form: _*)
+        val request = FakeRequest(call).withFormUrlEncodedBody(form: _*)
         val result = route(app, request).value
 
         status(result) mustEqual SEE_OTHER

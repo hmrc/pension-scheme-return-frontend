@@ -20,12 +20,13 @@ import controllers.SchemeBankAccountController._
 import forms.BankAccountFormProvider
 import models.{BankAccount, NormalMode}
 import pages.SchemeBankAccountPage
+import play.api.mvc.Call
 import views.html.BankAccountView
 
 class SchemeBankAccountControllerSpec extends ControllerBaseSpec {
 
-  private val onPageLoad = routes.SchemeBankAccountController.onPageLoad(srn, NormalMode).url
-  private val onSubmit = routes.SchemeBankAccountController.onSubmit(srn, NormalMode).url
+  private val onPageLoad = routes.SchemeBankAccountController.onPageLoad(srn, NormalMode)
+  private val onSubmit = routes.SchemeBankAccountController.onSubmit(srn, NormalMode)
 
   private val bankAccount = bankAccountGen.sample.value
 
@@ -44,5 +45,8 @@ class SchemeBankAccountControllerSpec extends ControllerBaseSpec {
       val preparedForm = form(injected[BankAccountFormProvider]).fill(bankAccount)
       injected[BankAccountView].apply(preparedForm, viewModel(srn, NormalMode))
     }
+
+    behave like journeyRecoveryPage("onPageLoad", onPageLoad)
+    behave like journeyRecoveryPage("onSubmit", onSubmit)
   }
 }

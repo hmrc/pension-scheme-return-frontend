@@ -27,98 +27,31 @@ import viewmodels.DisplayMessage.SimpleMessage
 import views.html.CheckYourAnswersView
 
 
-class SchemeBankAccountCheckYourAnswersControllerSpec extends ControllerBaseSpec with ScalaCheckPropertyChecks {
+class SchemeBankAccountCheckYourAnswersControllerSpec extends ControllerBaseSpec with ControllerBehaviours with ScalaCheckPropertyChecks {
 
   def onwardRoute = Call("GET", "/foo")
 
   val bankAccount = bankAccountGen.sample.value
   override val userAnswers = emptyUserAnswers.set(SchemeBankAccountPage(srn), bankAccount).get
 
-  lazy val onPageLoad = routes.SchemeBankAccountCheckYourAnswersController.onPageLoad(srn).url
-  lazy val onSubmit = routes.SchemeBankAccountCheckYourAnswersController.onSubmit(srn).url
+  lazy val onPageLoad = routes.SchemeBankAccountCheckYourAnswersController.onPageLoad(srn)
+  lazy val onSubmit = routes.SchemeBankAccountCheckYourAnswersController.onSubmit(srn)
 
+  "SchemeBankAccountCheckYourAnswersController" should {
 
-  "SchemeBankAccountCheckYourAnswersController.onPageLoad" should {
+    lazy val viewModel = SchemeBankAccountCheckYourAnswersController.viewModel(srn, bankAccount)
 
-    "return OK and the correct view for a GET" in {
-
-      running(_ => applicationBuilder(userAnswers = Some(userAnswers))) { implicit app =>
-
-        val view = injected[CheckYourAnswersView]
-        val request = FakeRequest(GET, onPageLoad)
-
-        val result = route(app, request).value
-        val expectedView = view(SchemeBankAccountCheckYourAnswersController.viewModel(srn, bankAccount))(request, createMessages(app))
-
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual expectedView.toString
-      }
+    behave like renderPrePopView(onPageLoad, SchemeBankAccountPage(srn), bankAccount) { implicit app => implicit request =>
+      val view = injected[CheckYourAnswersView]
+      view(viewModel)
     }
 
-    "must redirect to scheme bank details page when bank account not in cache" in {
+    behave like redirectWhenCacheEmpty(onPageLoad, routes.SchemeBankAccountController.onPageLoad(srn, NormalMode))
 
-      running(_ => applicationBuilder(userAnswers = Some(emptyUserAnswers))) { implicit app =>
+    behave like journeyRecoveryPage("onPageLoad", onPageLoad)
+    behave like journeyRecoveryPage("onSubmit", onSubmit)
 
-        val view = injected[CheckYourAnswersView]
-        val request = FakeRequest(GET, onPageLoad)
-
-        val result = route(app, request).value
-
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result).value mustEqual routes.SchemeBankAccountController.onPageLoad(srn, NormalMode).url
-      }
-    }
-
-    "must redirect to Journey Recovery for a GET if no existing data is found" in {
-
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-
-        val request = FakeRequest(GET, onPageLoad)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-  }
-
-  "SchemeBankAccountCheckYourAnswers.onSubmit" should {
-
-    "redirect to the next page" in {
-
-      val fakeNavigatorApplication = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-        .overrides(
-          bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
-        )
-
-      running(_ => fakeNavigatorApplication) { app =>
-
-        val request = FakeRequest(GET, onSubmit)
-
-        val result = route(app, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
-      }
-    }
-
-    "must redirect to Journey Recovery for a GET if no existing data is found" in {
-
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-
-        val request = FakeRequest(GET, onSubmit)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
+    behave like redirectNextPage(onSubmit)
   }
 
   "SchemeBankAccountCheckYourAnswers.viewModel" should {
