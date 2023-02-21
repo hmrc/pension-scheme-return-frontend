@@ -16,9 +16,9 @@
 
 package viewmodels
 
-import play.api.data.Field
+import play.api.data.{Field, FormError}
 import play.api.i18n.Messages
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.errormessage.ErrorMessage
 
 trait ErrorMessageAwareness {
@@ -26,7 +26,16 @@ trait ErrorMessageAwareness {
   def errorMessage(field: Field)(implicit messages: Messages): Option[ErrorMessage] =
     field.error
       .map {
-        err =>
-          ErrorMessage(content = Text(messages(err.message, err.args: _*)))
+        _ =>
+          val errorMessages = field.errors.map(err => messages(err.message, err.args))
+          ErrorMessage(content = HtmlContent(errorMessages.mkString("<br>")))
+      }
+
+  def errorMessage(errors: Seq[FormError])(implicit messages: Messages): Option[ErrorMessage] =
+    errors.headOption
+      .map {
+        _ =>
+          val errorMessages = errors.map(err => messages(err.message, err.args))
+          ErrorMessage(content = HtmlContent(errorMessages.mkString("<br>")))
       }
 }

@@ -87,7 +87,7 @@ private[mappings] class LocalDateFormatter(
         Left(List(FormError(key, dateFormErrors.required, args)))
       case _ =>
         formatDate(key, data).left.map {
-          _.map(_.copy(key = key, args = args))
+          _.map(_.copy(args = args))
         }
     }
   }
