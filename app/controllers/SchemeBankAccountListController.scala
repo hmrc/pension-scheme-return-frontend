@@ -22,13 +22,12 @@ import config.Refined.OneToTen
 import controllers.SchemeBankAccountListController._
 import controllers.actions._
 import eu.timepit.refined._
-import eu.timepit.refined.api.Refined
 import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
 import models.{BankAccount, Mode}
 import navigation.Navigator
+import pages.SchemeBankAccountSummaryPage
 import pages.SchemeBankAccounts.SchemeBankAccountsOps
-import pages.{SchemeBankAccountPage, SchemeBankAccountSummaryPage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -37,7 +36,7 @@ import viewmodels.ComplexMessageElement.Message
 import viewmodels.Delimiter
 import viewmodels.DisplayMessage.{ComplexMessage, SimpleMessage}
 import viewmodels.implicits._
-import viewmodels.models.{SummaryRow, SummaryViewModel}
+import viewmodels.models.{ListRow, ListViewModel}
 import views.html.ListView
 
 import scala.concurrent.ExecutionContext
@@ -85,8 +84,8 @@ object SchemeBankAccountListController {
     "schemeBankDetailsSummary.error.required"
   )
 
-  def viewModel(srn: Srn, mode: Mode, bankAccounts: List[BankAccount]): SummaryViewModel = {
-    val rows: List[SummaryRow] = bankAccounts.zipWithIndex.flatMap { case (bankAccount, index) =>
+  def viewModel(srn: Srn, mode: Mode, bankAccounts: List[BankAccount]): ListViewModel = {
+    val rows: List[ListRow] = bankAccounts.zipWithIndex.flatMap { case (bankAccount, index) =>
       val text = ComplexMessage(List(
         Message(bankAccount.bankName),
         Message("schemeBankDetailsSummary.accountNumber", bankAccount.accountNumber)
@@ -95,10 +94,12 @@ object SchemeBankAccountListController {
       refineV[OneToTen](index + 1) match {
         case Left(_) => Nil
         case Right(nextIndex) => List(
-          SummaryRow(
+          ListRow(
             text,
             changeUrl = controllers.routes.SchemeBankAccountController.onPageLoad(srn, nextIndex, mode).url,
-            removeUrl = controllers.routes.UnauthorisedController.onPageLoad.url
+            changeHiddenText = SimpleMessage("schemeBankDetailsSummary.change.hidden", bankAccount.accountNumber),
+            removeUrl = controllers.routes.UnauthorisedController.onPageLoad.url,
+            removeHiddenText = SimpleMessage("schemeBankDetailsSummary.remove.hidden", bankAccount.accountNumber)
           )
         )
       }
@@ -107,7 +108,7 @@ object SchemeBankAccountListController {
     val titleKey = if(bankAccounts.length > 1) "schemeBankDetailsSummary.title.plural" else "schemeBankDetailsSummary.title"
     val headingKey = if(bankAccounts.length > 1) "schemeBankDetailsSummary.heading.plural" else "schemeBankDetailsSummary.heading"
 
-    SummaryViewModel(
+    ListViewModel(
       SimpleMessage(titleKey, bankAccounts.length),
       SimpleMessage(headingKey, bankAccounts.length),
       rows,
