@@ -23,7 +23,7 @@ import models.{BankAccount, NormalMode, UserAnswers}
 import pages.{SchemeBankAccounts, SchemeBankAccountPage}
 import play.api.Application
 import play.api.data.Form
-import views.html.SummaryView
+import views.html.ListView
 
 class SchemeBankAccountListControllerTest extends ControllerBaseSpec {
 
@@ -61,7 +61,7 @@ class SchemeBankAccountListControllerTest extends ControllerBaseSpec {
     }
   }
 
-  private def view(implicit a: Application): SummaryView = injected[SummaryView]
+  private def view(implicit a: Application): ListView = injected[ListView]
 
   private def form(implicit a: Application): Form[Boolean] = SchemeBankAccountListController.form(injected[YesNoPageFormProvider])
 

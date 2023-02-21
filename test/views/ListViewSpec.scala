@@ -18,12 +18,12 @@ package views
 
 import forms.YesNoPageFormProvider
 import play.api.test.FakeRequest
-import views.html.SummaryView
+import views.html.ListView
 
-class SummaryViewSpec extends ViewSpec {
+class ListViewSpec extends ViewSpec {
 
   runningApplication { implicit app =>
-    val view = injected[SummaryView]
+    val view = injected[ListView]
     val formProvider = injected[YesNoPageFormProvider]
     val form = formProvider("summaryView.required")
 
