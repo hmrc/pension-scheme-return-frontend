@@ -16,13 +16,27 @@
 
 package pages
 
-import models.BankAccount
 import models.SchemeId.Srn
+import models.{BankAccount, UserAnswers}
 import play.api.libs.json.JsPath
+import queries.Gettable
 
-case class SchemeBankAccountPage(srn: Srn) extends QuestionPage[BankAccount] {
+case class SchemeBankAccountPage(srn: Srn, index: Int) extends QuestionPage[BankAccount] {
+
+  override def path: JsPath = JsPath \ toString \ index
+
+  override def toString: String = "schemeBankAccount"
+}
+
+case class SchemeBankAccounts(srn: Srn) extends Gettable[List[BankAccount]] {
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "schemeBankAccount"
+}
+
+object SchemeBankAccounts {
+  implicit class SchemeBankAccountsOps(ua: UserAnswers){
+    def schemeBankAccounts(srn: Srn): List[BankAccount] = ua.get(SchemeBankAccounts(srn)).toList.flatten
+  }
 }

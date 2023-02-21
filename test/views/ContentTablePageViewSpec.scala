@@ -53,7 +53,7 @@ class ContentTablePageViewSpec extends BaseSpec with ScalaCheckPropertyChecks wi
 
       "render inset text" in {
         forAll(contentTablePageViewModelGen) { viewModel =>
-          insetText(view(viewModel)) mustBe viewModel.inset.asInstanceOf[SimpleMessage].key
+          inset(view(viewModel)).text() mustBe viewModel.inset.asInstanceOf[SimpleMessage].key
         }
       }
 

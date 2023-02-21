@@ -34,4 +34,5 @@ package object govuk {
       with SummaryListFluency
       with TagFluency
       with TableFluency
+      with ListWithActionsFluency
 }

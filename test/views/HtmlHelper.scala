@@ -58,8 +58,8 @@ trait HtmlHelper {
       _.getElementsByTag("td").iterator().asScala.toList.map(_.text())
     )
 
-  def insetText(html: Html): String =
-    mainContent(html).getElementsByClass("govuk-inset-text").first().text()
+  def inset(html: Html): Element =
+    mainContent(html).getElementsByClass("govuk-inset-text").first()
 
   def button(html: Html): Element =
     mainContent(html).getElementsByTag("button").first()
@@ -76,7 +76,8 @@ trait HtmlHelper {
   def errorMessage(html: Html): Elements =
     mainContent(html).getElementsByClass("govuk-error-message")
 
-//  def errorInput(html: Html)(name: String): Element =
+  def summaryListRows(html: Html): List[Element] =
+    mainContent(html).getElementsByClass("govuk-summary-list__row").iterator().asScala.toList
 
   def messageKey(message: DisplayMessage): String = message match {
     case SimpleMessage(key, _) => key

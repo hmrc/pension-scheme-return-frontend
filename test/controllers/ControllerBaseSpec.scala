@@ -17,6 +17,7 @@
 package controllers
 
 import controllers.actions._
+import generators.ModelGenerators
 import models.{Establisher, EstablisherKind, SchemeDetails, SchemeId, SchemeStatus, UserAnswers}
 import navigation.Navigator
 import play.api.Application
@@ -27,7 +28,11 @@ import play.api.libs.json.Json
 import play.api.mvc.Call
 import play.api.test.Helpers.running
 import play.api.test._
+import services.{SaveService, SaveServiceImpl}
+import uk.gov.hmrc.http.HeaderCarrier
 import utils.BaseSpec
+
+import scala.concurrent.Future
 
 trait ControllerBaseSpec
   extends BaseSpec
@@ -39,11 +44,10 @@ trait ControllerBaseSpec
     with Status
     with PlayRunners
     with RouteInvokers
-    with ResultExtractors {
+    with ResultExtractors
+    with TestValues {
 
   val baseUrl = "/pension-scheme-return"
-
-  val srn: SchemeId.Srn = srnGen.sample.value
 
   val userAnswersId: String = "id"
 
@@ -51,17 +55,7 @@ trait ControllerBaseSpec
 
   def emptyUserAnswers: UserAnswers = UserAnswers(userAnswersId)
 
-  val userAnswers: UserAnswers = UserAnswers(userAnswersId, Json.obj("non" -> "empty"))
-
-  val defaultSchemeDetails: SchemeDetails = SchemeDetails(
-    "testSRN",
-    "testSchemeName",
-    "testPSTR",
-    SchemeStatus.Open,
-    "testSchemeType",
-    Some("testAuthorisingPSAID"),
-    List(Establisher("testFirstName testLastName", EstablisherKind.Individual))
-  )
+  val defaultUserAnswers: UserAnswers = UserAnswers(userAnswersId, Json.obj("non" -> "empty"))
 
   protected def applicationBuilder(
                                     userAnswers: Option[UserAnswers] = None,
@@ -76,10 +70,26 @@ trait ControllerBaseSpec
         bind[IdentifierAction].to[FakeIdentifierAction],
         bind[AllowAccessActionProvider].toInstance(new FakeAllowAccessActionProvider(schemeDetails)),
         bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers)),
-        bind[DataCreationAction].toInstance(new FakeDataCreationAction(userAnswers.getOrElse(emptyUserAnswers))),
+        bind[DataCreationAction].toInstance(new FakeDataCreationAction(userAnswers.getOrElse(emptyUserAnswers)))
       )
 
   def runningApplication[T](block: Application => T): T = {
     running(_ => applicationBuilder())(block)
   }
+}
+
+trait TestValues { _ : BaseSpec =>
+  val accountNumber = "12345678"
+  val sortCode = "123456"
+  val srn: SchemeId.Srn = srnGen.sample.value
+
+  val defaultSchemeDetails: SchemeDetails = SchemeDetails(
+    "testSRN",
+    "testSchemeName",
+    "testPSTR",
+    SchemeStatus.Open,
+    "testSchemeType",
+    Some("testAuthorisingPSAID"),
+    List(Establisher("testFirstName testLastName", EstablisherKind.Individual))
+  )
 }

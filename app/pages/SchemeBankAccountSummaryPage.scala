@@ -14,23 +14,8 @@
  * limitations under the License.
  */
 
-package forms
+package pages
 
-import forms.mappings.Mappings
-import play.api.data.Form
+import models.SchemeId.Srn
 
-import javax.inject.Inject
-
-class YesNoPageFormProvider @Inject() extends Mappings {
-
-  def apply(
-    requiredKey: String,
-    invalidKey: String
-  ): Form[Boolean] =
-    Form("value" -> boolean(requiredKey, invalidKey))
-
-  def apply(
-             requiredKey: String
-           ): Form[Boolean] =
-    Form("value" -> boolean(requiredKey, ""))
-}
+case class SchemeBankAccountSummaryPage(srn: Srn, addBankAccount: Boolean) extends Page

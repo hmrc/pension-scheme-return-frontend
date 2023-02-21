@@ -16,6 +16,7 @@
 
 package controllers
 
+import models.UserAnswers
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Writes
@@ -27,7 +28,7 @@ import queries.Settable
 trait ControllerBehaviours {
   _: ControllerBaseSpec =>
 
-  def renderView(onPageLoadUrl: String)(view: Application => Request[_] => Html): Unit =
+  def renderView(onPageLoadUrl: String, userAnswers: UserAnswers = defaultUserAnswers)(view: Application => Request[_] => Html): Unit =
     "return OK and the correct view for a GET" in {
       val appBuilder = applicationBuilder(Some(userAnswers))
       render(appBuilder, onPageLoadUrl)(view)
@@ -35,7 +36,7 @@ trait ControllerBehaviours {
 
   def renderPrePopView[A: Writes](onPageLoadUrl: String, page: Settable[A], value: A)(view: Application => Request[_] => Html): Unit =
     "return OK and the correct pre-populated view for a GET" in {
-      val appBuilder = applicationBuilder(Some(userAnswers.set(page, value).success.value))
+      val appBuilder = applicationBuilder(Some(defaultUserAnswers.set(page, value).success.value))
       render(appBuilder, onPageLoadUrl)(view)
     }
 
@@ -51,7 +52,7 @@ trait ControllerBehaviours {
 
   def invalidForm(onSubmitUrl: String, form: (String, String)*): Unit =
     "return BAD_REQUEST for a POST with invalid form data" in {
-      val appBuilder = applicationBuilder(Some(userAnswers))
+      val appBuilder = applicationBuilder(Some(defaultUserAnswers))
       running(_ => appBuilder) { app =>
         val request = FakeRequest(POST, onSubmitUrl).withFormUrlEncodedBody(form: _*)
         val result = route(app, request).value
@@ -60,15 +61,24 @@ trait ControllerBehaviours {
       }
     }
 
-  def redirectNextPage(onSubmitUrl: String, redirectUrl: String, form: (String, String)*): Unit =
-    "redirect to the next page" in {
+  def redirectNextPage(onSubmitUrl: String, redirectUrl: String, httpVerb: String, userAnswers: UserAnswers, form: (String, String)*): Unit =
+    s"redirect to $redirectUrl on $httpVerb when submitting ${form.toList}" in {
       val appBuilder = applicationBuilder(Some(userAnswers))
       running(_ => appBuilder) { app =>
-        val request = FakeRequest(POST, onSubmitUrl).withFormUrlEncodedBody(form: _*)
+        val request = FakeRequest(httpVerb, onSubmitUrl).withFormUrlEncodedBody(form: _*)
         val result = route(app, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual redirectUrl
       }
     }
+
+  def redirectNextPage(onSubmitUrl: String, redirectUrl: String, userAnswers: UserAnswers, form: (String, String)*): Unit =
+    redirectNextPage(onSubmitUrl, redirectUrl, POST, userAnswers, form: _*)
+
+  def redirectNextPage(onSubmitUrl: String, redirectUrl: String, form: (String, String)*): Unit =
+    redirectNextPage(onSubmitUrl, redirectUrl, POST, defaultUserAnswers, form: _*)
+
+  def redirectOnPageLoad(onPageLoadUrl: String, redirectUrl: String): Unit =
+    redirectNextPage(onPageLoadUrl, redirectUrl, GET, defaultUserAnswers, Nil: _*)
 }
