@@ -16,10 +16,113 @@
 
 package views
 
-import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import utils.BaseSpec
+import forms.DateRangeFormProvider
+import forms.mappings.DateFormErrors
+import play.api.test.FakeRequest
+import views.html.DateRangeView
 
-class DateRangeViewSpec extends BaseSpec with ScalaCheckPropertyChecks {
+class DateRangeViewSpec extends ViewSpec {
+
+  runningApplication { implicit app =>
+    val view = injected[DateRangeView]
+
+    implicit val request = FakeRequest()
+
+    val dateErrors = DateFormErrors("required", "day", "month", "year", "invalid", "chars")
+    val dateRangeForm = new DateRangeFormProvider()(
+      dateErrors.copy(required = "startDate.required"),
+      dateErrors.copy(required = "endDate.required")
+    )
 
 
+    "DateRangeView" should {
+
+      "render the title" in {
+
+        forAll(dateRangeViewModelGen) { viewModel =>
+          title(view(dateRangeForm, viewModel)) must startWith(viewModel.title.key)
+        }
+      }
+
+      "render the heading" in {
+
+        forAll(dateRangeViewModelGen) { viewModel =>
+
+          h1(view(dateRangeForm, viewModel)) mustBe viewModel.heading.key
+        }
+      }
+
+      "render the description" in {
+
+        forAll(dateRangeViewModelGen) { viewModel =>
+
+          whenever(viewModel.description.nonEmpty) {
+
+            p(view(dateRangeForm, viewModel)) must contain(viewModel.description.value.key)
+          }
+        }
+      }
+
+      "render the start date label" in {
+
+        forAll(dateRangeViewModelGen) { viewModel =>
+
+          legend(view(dateRangeForm, viewModel)) must contain(viewModel.startDateLabel.key)
+        }
+      }
+
+      "render the end date label" in {
+
+        forAll(dateRangeViewModelGen) { viewModel =>
+
+          legend(view(dateRangeForm, viewModel)) must contain(viewModel.endDateLabel.key)
+        }
+      }
+
+      "have form" in {
+
+        forAll(dateRangeViewModelGen) { viewModel =>
+
+          form(view(dateRangeForm, viewModel)).method mustBe viewModel.onSubmit.method
+          form(view(dateRangeForm, viewModel)).action mustBe viewModel.onSubmit.url
+        }
+      }
+
+      "render the start date required error summary" in {
+
+        forAll(dateRangeViewModelGen) { viewModel =>
+
+          val invalidForm = dateRangeForm.bind(Map[String, String]())
+          errorSummary(view(invalidForm, viewModel)).text() must include("startDate.required")
+        }
+      }
+
+      "render the start date required error message" in {
+
+        forAll(dateRangeViewModelGen) { viewModel =>
+
+          val invalidForm = dateRangeForm.bind(Map[String, String]())
+          errorMessage(view(invalidForm, viewModel)).text() must include("startDate.required")
+        }
+      }
+
+      "render the end date required error summary" in {
+
+        forAll(dateRangeViewModelGen) { viewModel =>
+
+          val invalidForm = dateRangeForm.bind(Map[String, String]())
+          errorSummary(view(invalidForm, viewModel)).text() must include("endDate.required")
+        }
+      }
+
+      "render the end date required error message" in {
+
+        forAll(dateRangeViewModelGen) { viewModel =>
+
+          val invalidForm = dateRangeForm.bind(Map[String, String]())
+          errorMessage(view(invalidForm, viewModel)).text() must include("endDate.required")
+        }
+      }
+    }
+  }
 }

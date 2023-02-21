@@ -35,9 +35,9 @@ class Navigator @Inject()() {
       if(ua.get(page).contains(true))
         routes.SchemeBankAccountController.onPageLoad(srn, NormalMode)
       else
-        routes.UnauthorisedController.onPageLoad
+        routes.AccountingPeriodController.onPageLoad(srn, NormalMode)
 
-    case SchemeBankAccountPage(srn) => _ => routes.UnauthorisedController.onPageLoad
+    case SchemeBankAccountPage(srn) => _ => routes.SchemeBankAccountCheckYourAnswersController.onPageLoad(srn)
     case _                          => _ => routes.IndexController.onPageLoad
   }
 

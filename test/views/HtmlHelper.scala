@@ -20,13 +20,14 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
 import play.twirl.api.Html
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.ActionItem
 import viewmodels.ComplexMessageElement.{LinkedMessage, Message}
 import viewmodels.DisplayMessage
 import viewmodels.DisplayMessage.{ComplexMessage, SimpleMessage}
 
 import scala.jdk.CollectionConverters.IteratorHasAsScala
 
-trait HtmlHelper {
+trait HtmlHelper extends HtmlModels {
 
   def mainContent(html: Html): Element =
     Jsoup.parse(html.body).getElementsByAttributeValue("data-testid", "main-content").first()
@@ -64,11 +65,11 @@ trait HtmlHelper {
   def button(html: Html): Element =
     mainContent(html).getElementsByTag("button").first()
 
-  def anchorButton(html: Html): Element =
-    mainContent(html).select("a[role=button]").first()
+  def anchorButton(html: Html): AnchorTag =
+    AnchorTag(mainContent(html).select("a[role=button]").first())
 
-  def form(html: Html): Element =
-    mainContent(html).getElementsByTag("form").first()
+  def form(html: Html): Form =
+    Form(mainContent(html).getElementsByTag("form").first())
 
   def errorSummary(html: Html): Elements =
     mainContent(html).getElementsByClass("govuk-error-summary")
@@ -76,7 +77,14 @@ trait HtmlHelper {
   def errorMessage(html: Html): Elements =
     mainContent(html).getElementsByClass("govuk-error-message")
 
-//  def errorInput(html: Html)(name: String): Element =
+  def summaryListKeys(html: Html): List[String] =
+    mainContent(html).getElementsByClass("govuk-summary-list__key").iterator().asScala.toList.map(_.text())
+
+  def summaryListValues(html: Html): List[String] =
+    mainContent(html).getElementsByClass("govuk-summary-list__value").iterator().asScala.toList.map(_.text())
+
+  def summaryListActions(html: Html): List[AnchorTag] =
+    mainContent(html).select(".govuk-summary-list__actions a").iterator().asScala.toList.map(AnchorTag(_))
 
   def messageKey(message: DisplayMessage): String = message match {
     case SimpleMessage(key, _) => key

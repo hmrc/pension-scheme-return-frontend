@@ -16,19 +16,6 @@
 
 package pages
 
-import models.DateRange
-import pages.behaviours.PageBehaviours
+import models.SchemeId.Srn
 
-class AccountingPeriodPageSpec extends PageBehaviours {
-
-  "AccountingPeriodPage" - {
-
-    val srn = srnGen.sample.value
-
-    beRetrievable[DateRange](AccountingPeriodPage(srn))
-
-    beSettable[DateRange](AccountingPeriodPage(srn))
-
-    beRemovable[DateRange](AccountingPeriodPage(srn))
-  }
-}
+case class SchemeBankAccountCheckYourAnswersPage(srn:Srn) extends Page

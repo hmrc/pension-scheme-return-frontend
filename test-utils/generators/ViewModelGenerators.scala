@@ -17,7 +17,11 @@
 package generators
 
 import org.scalacheck.Gen
-import viewmodels.models.{BankAccountViewModel, ContentPageViewModel, ContentTablePageViewModel, PensionSchemeViewModel, YesNoPageViewModel}
+import uk.gov.hmrc.govukfrontend.views.Aliases.SummaryList
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{Content, Text}
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist._
+import viewmodels.DisplayMessage.SimpleMessage
+import viewmodels.models._
 
 trait ViewModelGenerators extends BasicGenerators {
 
@@ -42,6 +46,33 @@ trait ViewModelGenerators extends BasicGenerators {
       onSubmit <- call
     } yield {
       ContentTablePageViewModel(title, heading, inset, buttonText, onSubmit, rows: _*)
+    }
+
+  val actionItemGen: Gen[(SimpleMessage, String)] =
+    for {
+      content <- nonEmptyString
+      href    <- relativeUrl
+    } yield {
+      SimpleMessage(content) -> href
+    }
+
+  val summaryListRowGen: Gen[CheckYourAnswersRowViewModel] =
+    for {
+      key     <- nonEmptyString
+      value   <- nonEmptyString
+      items   <- Gen.listOf(actionItemGen)
+    } yield {
+      CheckYourAnswersRowViewModel(SimpleMessage(key), SimpleMessage(value), items)
+    }
+
+  val checkYourAnswersViewModelGen: Gen[CheckYourAnswersViewModel] =
+    for{
+      title    <- nonEmptyString
+      heading  <- nonEmptyString
+      rows     <- Gen.listOf(summaryListRowGen)
+      onSubmit <- call
+    } yield {
+      CheckYourAnswersViewModel(SimpleMessage(title), SimpleMessage(heading), rows, onSubmit)
     }
 
   val bankAccountViewModelGen: Gen[BankAccountViewModel] =
@@ -87,5 +118,24 @@ trait ViewModelGenerators extends BasicGenerators {
       onSubmit    <- call
     } yield {
       YesNoPageViewModel(title, heading, description, legend, onSubmit)
+    }
+
+  val dateRangeViewModelGen: Gen[DateRangeViewModel] =
+    for {
+      title          <- nonEmptyString
+      heading        <- nonEmptyString
+      description    <- Gen.option(nonEmptyString)
+      startDateLabel <- nonEmptyString
+      endDateLabel   <- nonEmptyString
+      onSubmit       <- call
+    } yield {
+      DateRangeViewModel(
+        SimpleMessage(title),
+        SimpleMessage(heading),
+        description.map(d => SimpleMessage(d)),
+        SimpleMessage(startDateLabel),
+        SimpleMessage(endDateLabel),
+        onSubmit
+      )
     }
 }

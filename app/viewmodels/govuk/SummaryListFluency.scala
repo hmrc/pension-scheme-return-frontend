@@ -16,7 +16,7 @@
 
 package viewmodels.govuk
 
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Content
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{Content, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist._
 
 object summarylist extends SummaryListFluency
@@ -48,7 +48,7 @@ trait SummaryListFluency {
                value: Value
              ): SummaryListRow =
       SummaryListRow(
-        key   = key,
+        key = key,
         value = value
       )
 
@@ -58,8 +58,19 @@ trait SummaryListFluency {
                actions: Seq[ActionItem]
              ): SummaryListRow =
       SummaryListRow(
-        key     = key,
-        value   = value,
+        key = key,
+        value = value,
+        actions = Some(Actions(items = actions))
+      )
+
+    def apply(
+               key: String,
+               value: String,
+               actions: Seq[ActionItem]
+             ): SummaryListRow =
+      SummaryListRow(
+        key = Key(Text(key)),
+        value = Value(Text(value)),
         actions = Some(Actions(items = actions))
       )
   }
@@ -68,6 +79,12 @@ trait SummaryListFluency {
 
     def withCssClass(className: String): SummaryListRow =
       row copy (classes = s"${row.classes} $className")
+
+    def withAction(item: ActionItem): SummaryListRow = {
+      val actions = row.actions.map(a => a.copy(items = a.items :+ item))
+
+      row.copy(actions = actions orElse Some(Actions(items = Seq(item))))
+    }
   }
 
   object ActionItemViewModel {

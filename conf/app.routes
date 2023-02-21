@@ -12,7 +12,8 @@ GET         /refresh-session                             controllers.KeepAliveCo
 
 GET         /there-is-a-problem                          controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 
-GET         /:srn/check-your-answers                     controllers.CheckYourAnswersController.onPageLoad(srn: Srn)
+GET         /:srn/check-your-bank-details                controllers.SchemeBankAccountCheckYourAnswersController.onPageLoad(srn: Srn)
+GET         /:srn/check-your-bank-details-next-page      controllers.SchemeBankAccountCheckYourAnswersController.onSubmit(srn: Srn)
 
 GET         /account/sign-out-survey                     controllers.auth.AuthController.signOut
 GET         /account/sign-out                            controllers.auth.AuthController.signOutNoSurvey
@@ -43,3 +44,12 @@ POST        /:srn/accounting-period                      controllers.AccountingP
 
 GET         /:srn/change-accounting-period               controllers.AccountingPeriodController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST        /:srn/change-accounting-period               controllers.AccountingPeriodController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET         /:srn/enter-bank-details                     controllers.SchemeBankAccountController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/enter-bank-details                     controllers.SchemeBankAccountController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+
+GET         /:srn/change-enter-bank-details              controllers.SchemeBankAccountController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-enter-bank-details              controllers.SchemeBankAccountController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET         /:srn/check-bank-account                     controllers.SchemeBankAccountCheckYourAnswersController.onPageLoad(srn: Srn)
+GET         /:srn/check-bank-account-next-page           controllers.SchemeBankAccountCheckYourAnswersController.onSubmit(srn: Srn)

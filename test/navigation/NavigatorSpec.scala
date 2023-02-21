@@ -69,8 +69,15 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
         forAll(srnGen) { srn =>
           val ua = userAnswers.set(CheckReturnDatesPage(srn), false).get
-          navigator.nextPage(CheckReturnDatesPage(srn), NormalMode, ua) mustBe routes.UnauthorisedController.onPageLoad
+          navigator.nextPage(CheckReturnDatesPage(srn), NormalMode, ua) mustBe routes.AccountingPeriodController.onPageLoad(srn, NormalMode)
         }
+      }
+    }
+
+    "go from scheme bank account page to check your answers page" in {
+
+      forAll(srnGen) { srn =>
+        navigator.nextPage(SchemeBankAccountPage(srn), NormalMode, userAnswers) mustBe routes.SchemeBankAccountCheckYourAnswersController.onPageLoad(srn)
       }
     }
   }

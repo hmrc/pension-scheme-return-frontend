@@ -36,17 +36,17 @@ import views.html.DateRangeView
 import scala.concurrent.{ExecutionContext, Future}
 
 class AccountingPeriodController @Inject()(
-                                            override val messagesApi: MessagesApi,
-                                            navigator: Navigator,
-                                            identify: IdentifierAction,
-                                            allowAccess: AllowAccessActionProvider,
-                                            getData: DataRetrievalAction,
-                                            requireData: DataRequiredAction,
-                                            val controllerComponents: MessagesControllerComponents,
-                                            view: DateRangeView,
-                                            formProvider: DateRangeFormProvider,
-                                            saveService: SaveService,
-                                           )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+  override val messagesApi: MessagesApi,
+  navigator: Navigator,
+  identify: IdentifierAction,
+  allowAccess: AllowAccessActionProvider,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  val controllerComponents: MessagesControllerComponents,
+  view: DateRangeView,
+  formProvider: DateRangeFormProvider,
+  saveService: SaveService,
+)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   private val form = AccountingPeriodController.form(formProvider)
   private val viewModel = AccountingPeriodController.viewModel _
@@ -63,7 +63,7 @@ class AccountingPeriodController @Inject()(
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(AccountingPeriodPage(srn), value))
-            _ <- saveService.save(updatedAnswers)
+            _              <- saveService.save(updatedAnswers)
           } yield Redirect(navigator.nextPage(AccountingPeriodPage(srn), mode, updatedAnswers))
       )
   }
