@@ -17,8 +17,11 @@ site.startDate = Start date
 site.endDate = End date
 
 date.day = Day
+date.day.lower = day
 date.month = Month
+date.month.lower = month
 date.year = Year
+date.year.lower = year
 
 timeout.title = You’re about to be signed out
 timeout.message = For security reasons, you will be signed out of this service in
@@ -103,3 +106,21 @@ schemeBankDetails.sortCode.error.required = Enter a sort code
 schemeBankDetails.sortCode.error.invalid = Sort code must only include numbers 0 to 9
 schemeBankDetails.sortCode.error.format.invalid = Enter a valid sort code, like 309430
 schemeBankDetails.sortCode.error.length = Sort code must be 6 digits
+
+accountingPeriod.title = What is the accounting period covered by this return?
+accountingPeriod.heading = What is the accounting period covered by this return?
+accountingPeriod.description = You can add up to 3 accounting periods.
+accountingPeriod.startDate.required.all = Enter the start date of the accounting period
+accountingPeriod.startDate.required.day = Start date must include a day
+accountingPeriod.startDate.required.month = Start date must include a month
+accountingPeriod.startDate.required.year = Start date must include a year
+accountingPeriod.startDate.required.two = Start date must include a {0} and a {1}
+accountingPeriod.startDate.invalid.date = Start date must be a real date
+accountingPeriod.startDate.invalid.characters = Start date must only include numbers 0 to 9
+accountingPeriod.endDate.required.all = Enter the end date of the accounting period
+accountingPeriod.endDate.required.day = End date must include a day
+accountingPeriod.endDate.required.month = End date must include a month
+accountingPeriod.endDate.required.year = End date must include a year
+accountingPeriod.endDate.required.two = End date must include a {0} and a {1}
+accountingPeriod.endDate.invalid.date = End date must be a real date
+accountingPeriod.endDate.invalid.characters = End date must only include numbers 0 to 9

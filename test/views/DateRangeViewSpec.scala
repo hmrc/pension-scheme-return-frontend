@@ -28,7 +28,7 @@ class DateRangeViewSpec extends ViewSpec {
 
     implicit val request = FakeRequest()
 
-    val dateErrors = DateFormErrors("required", "day", "month", "year", "invalid", "chars")
+    val dateErrors = DateFormErrors("required", "day", "month", "year", "two", "invalid", "chars")
     val dateRangeForm = new DateRangeFormProvider()(
       dateErrors.copy(required = "startDate.required"),
       dateErrors.copy(required = "endDate.required")

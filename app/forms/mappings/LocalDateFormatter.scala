@@ -16,6 +16,10 @@
 
 package forms.mappings
 
+import cats.data._
+import cats.data.Validated._
+import cats.syntax.all._
+
 import play.api.data.FormError
 import play.api.data.format.Formatter
 
@@ -37,17 +41,6 @@ private[mappings] class LocalDateFormatter(
         Left(Seq(FormError(key, dateFormErrors.invalidDate, args)))
     }
 
-  private def combine[A, B, C](day: Either[Seq[A], B], month: Either[Seq[A], B], year: Either[Seq[A], B]): Either[Seq[A], (B, B, B)] =
-    (day, month, year) match {
-      case (Right(d), Right(m), Right(y)) => Right((d, m, y))
-      case (a, b, c) => List(b, c).foldLeft(a) {
-        case (Left(xs), Left(ys)) => Left(xs ++ ys)
-        case (Left(xs),        _) => Left(xs)
-        case (_,        Left(xs)) => Left(xs)
-        case (Right(x),        _) => Right(x) // Right will be always become a left as we have already checked for all rights
-      }.map(a => (a, a, a)) // map is unreachable but needed to compile
-    }
-
   private def formatDate(key: String, data: Map[String, String]): Either[Seq[FormError], LocalDate] = {
 
     def int(required: String) = intFormatter(
@@ -63,28 +56,37 @@ private[mappings] class LocalDateFormatter(
         case xs  => Left(xs.map(FormError(key, _)))
       }
 
+    val validated = (
+      int(dateFormErrors.requiredDay).bind(s"$key.day", data).toValidated,
+      int(dateFormErrors.requiredMonth).bind(s"$key.month", data).toValidated,
+      int(dateFormErrors.requiredYear).bind(s"$key.year", data).toValidated
+    ).tupled.toEither
+
     for {
-      // Validated type would be a better fit as it can handle parallel errors, either only handles errors sequentially
-      date  <- combine(
-        int(dateFormErrors.requiredDay).bind(s"$key.day", data),
-        int(dateFormErrors.requiredMonth).bind(s"$key.month", data),
-        int(dateFormErrors.requiredYear).bind(s"$key.year", data)
-      )
-      date  <- toDate(key, date._1, date._2, date._3)
+      valid  <- validated
+      (day, month, year) = valid
+      date  <- toDate(key, day, month, year)
       _     <- runValidators(dateFormErrors.validators.map(f => f(date)))
     } yield date
   }
 
   override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], LocalDate] = {
 
-    val fields = fieldKeys.map {
+    val fields = fieldKeys.filterNot {
       field =>
-        field -> data.get(s"$key.$field").filter(_.trim.nonEmpty)
-    }.toMap
+        data.get(s"$key.$field").exists(_.trim.nonEmpty)
+    }
 
-    fields.count(_._2.isDefined) match {
-      case 0 =>
+    fields match {
+      case _ :: _ :: _ :: Nil =>
         Left(List(FormError(key, dateFormErrors.required, args)))
+      case f1 :: f2 :: Nil =>
+        Left(
+          List(
+            FormError(s"$key.$f1", dateFormErrors.requiredTwo, List(s"date.$f1.lower", s"date.$f2.lower") ++ args),
+            FormError(s"$key.$f2", dateFormErrors.requiredTwo, List(s"date.$f1.lower", s"date.$f2.lower") ++ args),
+          )
+        )
       case _ =>
         formatDate(key, data).left.map {
           _.map(_.copy(args = args))

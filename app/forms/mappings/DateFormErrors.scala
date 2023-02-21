@@ -23,6 +23,7 @@ case class DateFormErrors(
   requiredDay: String,
   requiredMonth: String,
   requiredYear: String,
+  requiredTwo: String,
   invalidDate: String,
   invalidCharacters: String,
   validators: List[LocalDate => Option[String]] = List()

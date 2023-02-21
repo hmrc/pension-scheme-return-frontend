@@ -73,27 +73,29 @@ object AccountingPeriodController {
 
   def form(formProvider: DateRangeFormProvider): Form[DateRange] = formProvider(
     DateFormErrors(
-      "accountPeriod.startDate.required.all",
-      "accountPeriod.startDate.required.day",
-      "accountPeriod.startDate.required.month",
-      "accountPeriod.startDate.required.year",
-      "accountPeriod.startDate.invalid.date",
-      "accountPeriod.startDate.invalid.characters"
+      "accountingPeriod.startDate.required.all",
+      "accountingPeriod.startDate.required.day",
+      "accountingPeriod.startDate.required.month",
+      "accountingPeriod.startDate.required.year",
+      "accountingPeriod.startDate.required.two",
+      "accountingPeriod.startDate.invalid.date",
+      "accountingPeriod.startDate.invalid.characters"
     ),
     DateFormErrors(
-      "accountPeriod.endDate.required.all",
-      "accountPeriod.endDate.required.day",
-      "accountPeriod.endDate.required.month",
-      "accountPeriod.endDate.required.year",
-      "accountPeriod.endDate.invalid.date",
-      "accountPeriod.endDate.invalid.characters"
+      "accountingPeriod.endDate.required.all",
+      "accountingPeriod.endDate.required.day",
+      "accountingPeriod.endDate.required.month",
+      "accountingPeriod.endDate.required.year",
+      "accountingPeriod.endDate.required.two",
+      "accountingPeriod.endDate.invalid.date",
+      "accountingPeriod.endDate.invalid.characters"
     )
   )
 
   def viewModel(srn: Srn, mode: Mode): DateRangeViewModel = DateRangeViewModel(
-    "accountPeriod.title",
-    "accountPeriod.heading",
-    Some("accountPeriod.description"),
+    "accountingPeriod.title",
+    "accountingPeriod.heading",
+    Some("accountingPeriod.description"),
     routes.AccountingPeriodController.onSubmit(srn, mode)
   )
 }
