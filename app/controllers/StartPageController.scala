@@ -63,7 +63,6 @@ object StartPageController {
     "startPage.paragraph1",
     "startPage.paragraph2",
     "startPage.paragraph3",
-    "startPage.paragraph4",
   )
 
 }
