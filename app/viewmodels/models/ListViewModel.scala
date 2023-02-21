@@ -20,16 +20,18 @@ import play.api.mvc.Call
 import viewmodels.DisplayMessage
 import viewmodels.DisplayMessage.SimpleMessage
 
-case class SummaryRow(
+case class ListRow(
   text: DisplayMessage,
   changeUrl: String,
-  removeUrl: String
+  changeHiddenText: SimpleMessage,
+  removeUrl: String,
+  removeHiddenText: SimpleMessage,
 )
 
-case class SummaryViewModel(
+case class ListViewModel(
   title: SimpleMessage,
   heading: SimpleMessage,
-  rows: List[SummaryRow],
+  rows: List[ListRow],
   buttonText: SimpleMessage,
   radioText: SimpleMessage,
   insetText: SimpleMessage,

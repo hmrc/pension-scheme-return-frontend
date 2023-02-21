@@ -25,7 +25,7 @@
     message: Message
 )
 
-@(form: Form[Boolean], viewmodel: SummaryViewModel)(implicit request: Request[_], messages: Messages)
+@(form: Form[Boolean], viewmodel: ListViewModel)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(viewmodel.title.toMessage)) {
 
@@ -41,8 +41,10 @@
             ListWithActionsItemViewModel(
                 message(value.text),
                 List(
-                    ListWithActionsActionViewModel(message(viewmodel.onChangeText), value.changeUrl),
-                    ListWithActionsActionViewModel(message(viewmodel.onRemoveText), value.removeUrl)
+                    ListWithActionsActionViewModel(viewmodel.onChangeText.toMessage, value.changeUrl)
+                        .withVisuallyHiddenText(value.changeHiddenText.toMessage),
+                    ListWithActionsActionViewModel(viewmodel.onRemoveText.toMessage, value.removeUrl)
+                        .withVisuallyHiddenText(value.removeHiddenText.toMessage),
                 )
             )
         )))

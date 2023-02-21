@@ -17,7 +17,7 @@
 package generators
 
 import org.scalacheck.Gen
-import viewmodels.models.{BankAccountViewModel, ContentPageViewModel, ContentTablePageViewModel, PensionSchemeViewModel, SummaryRow, SummaryViewModel, YesNoPageViewModel}
+import viewmodels.models._
 
 trait ViewModelGenerators extends BasicGenerators {
 
@@ -69,14 +69,16 @@ trait ViewModelGenerators extends BasicGenerators {
       onSubmit
     )
 
-  val summaryRowGen: Gen[SummaryRow] =
+  val summaryRowGen: Gen[ListRow] =
     for {
       text <- nonEmptySimpleMessage
       changeUrl <- relativeUrl
+      changeHiddenText <- nonEmptySimpleMessage
       removeUrl <- relativeUrl
-    } yield SummaryRow(text, changeUrl, removeUrl)
+      removeHiddenText <- nonEmptySimpleMessage
+    } yield ListRow(text, changeUrl, changeHiddenText, removeUrl, removeHiddenText)
 
-  def summaryViewModelGen(showRadios: Boolean = true): Gen[SummaryViewModel] =
+  def summaryViewModelGen(showRadios: Boolean = true): Gen[ListViewModel] =
     for {
       title <- nonEmptySimpleMessage
       heading <- nonEmptySimpleMessage
@@ -87,7 +89,7 @@ trait ViewModelGenerators extends BasicGenerators {
       onChangeText <- nonEmptySimpleMessage
       onRemoveText <- nonEmptySimpleMessage
       onSubmit <- call
-    } yield SummaryViewModel(
+    } yield ListViewModel(
       title,
       heading,
       rows,

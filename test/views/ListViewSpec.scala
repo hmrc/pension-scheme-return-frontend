@@ -42,6 +42,20 @@ class ListViewSpec extends ViewSpec {
         }
       }
 
+      "render hidden text" in {
+        forAll(summaryViewModelGen()) { viewModel =>
+          val renderedRows = summaryListRows(view(form, viewModel))
+          renderedRows.length mustEqual viewModel.rows.size
+          val links = renderedRows.map(_.select(".govuk-link"))
+          val changeLinks = links.map(_.get(0))
+          val removeLinks = links.map(_.get(1))
+          changeLinks.map(_.children().select(".govuk-visually-hidden").text()) mustEqual
+            viewModel.rows.map(row => messageKey(row.changeHiddenText))
+          removeLinks.map(_.children().select(".govuk-visually-hidden").text()) mustEqual
+            viewModel.rows.map(row => messageKey(row.removeHiddenText))
+        }
+      }
+
       "render radio button and not the inset text when showRadios is true" in {
         forAll(summaryViewModelGen()) { viewModel =>
           val radioElements = radios(view(form, viewModel))
