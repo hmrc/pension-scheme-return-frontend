@@ -24,7 +24,7 @@ case class YesNoPageViewModel(
   title: SimpleMessage,
   heading: SimpleMessage,
   description: Option[SimpleMessage],
-  legend: SimpleMessage,
+  legend: Option[SimpleMessage],
   onSubmit: Call
 )
 
@@ -35,7 +35,7 @@ object YesNoPageViewModel {
       SimpleMessage(title),
       SimpleMessage(heading),
       Some(SimpleMessage(description)),
-      SimpleMessage(legend),
+      Some(SimpleMessage(legend)),
       onSubmit
     )
 
@@ -44,7 +44,7 @@ object YesNoPageViewModel {
       SimpleMessage(title),
       SimpleMessage(heading),
       None,
-      SimpleMessage(legend),
+      Some(SimpleMessage(legend)),
       onSubmit
     )
 
@@ -53,7 +53,16 @@ object YesNoPageViewModel {
       SimpleMessage(title),
       SimpleMessage(heading),
       description.map(d => SimpleMessage(d)),
-      SimpleMessage(legend),
+      Some(SimpleMessage(legend)),
+      onSubmit
+    )
+
+  def apply(title: SimpleMessage, heading: SimpleMessage, onSubmit: Call): YesNoPageViewModel =
+    YesNoPageViewModel(
+      title,
+      heading,
+      None,
+      None,
       onSubmit
     )
 }
