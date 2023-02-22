@@ -101,7 +101,7 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
     "go from bank account check your answers page to list page" in {
 
       forAll(srnGen) { srn =>
-        val page = SchemeBankAccountCheckYourAnswersPage(srn, refineMV(1))
+        val page = SchemeBankAccountCheckYourAnswersPage(srn)
         navigator.nextPage(page, NormalMode, userAnswers) mustBe routes.SchemeBankAccountListController.onPageLoad(srn)
       }
     }

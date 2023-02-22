@@ -42,7 +42,7 @@ class Navigator @Inject()() {
     }
 
     case SchemeBankAccountPage(srn, index) => _ => routes.SchemeBankAccountCheckYourAnswersController.onPageLoad(srn, index)
-    case SchemeBankAccountCheckYourAnswersPage(srn, _) => _ =>
+    case SchemeBankAccountCheckYourAnswersPage(srn) => _ =>
       routes.SchemeBankAccountListController.onPageLoad(srn)
     case SchemeBankAccountListPage(srn, true) => ua =>
       refineV[OneToTen](ua.schemeBankAccounts(srn).length + 1) match {

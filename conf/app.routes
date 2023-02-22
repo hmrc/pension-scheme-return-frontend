@@ -43,7 +43,7 @@ GET         /:srn/change-enter-bank-details/:index                controllers.Sc
 POST        /:srn/change-enter-bank-details/:index                controllers.SchemeBankAccountController.onSubmit(srn: Srn, index: Max10, mode: Mode = CheckMode)
 
 GET         /:srn/check-bank-account/:index                       controllers.SchemeBankAccountCheckYourAnswersController.onPageLoad(srn: Srn, index: Max10)
-GET         /:srn/check-bank-account-next-page/:index             controllers.SchemeBankAccountCheckYourAnswersController.onSubmit(srn: Srn, index: Max10)
+GET         /:srn/check-bank-account-next-page                    controllers.SchemeBankAccountCheckYourAnswersController.onSubmit(srn: Srn)
 
 GET         /:srn/bank-accounts                                   controllers.SchemeBankAccountListController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST        /:srn/bank-accounts                                   controllers.SchemeBankAccountListController.onSubmit(srn: Srn, mode: Mode = NormalMode)

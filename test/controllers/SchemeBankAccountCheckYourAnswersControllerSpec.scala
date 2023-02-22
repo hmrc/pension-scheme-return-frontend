@@ -19,12 +19,9 @@ package controllers
 import config.Refined.OneToTen
 import eu.timepit.refined.refineMV
 import models.NormalMode
-import navigation.{FakeNavigator, Navigator}
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import pages.SchemeBankAccountPage
-import play.api.inject.bind
 import play.api.mvc.Call
-import play.api.test.FakeRequest
 import viewmodels.DisplayMessage.SimpleMessage
 import viewmodels.models.SummaryAction
 import views.html.CheckYourAnswersView
@@ -39,7 +36,7 @@ class SchemeBankAccountCheckYourAnswersControllerSpec extends ControllerBaseSpec
   val userAnswers = emptyUserAnswers.set(SchemeBankAccountPage(srn, indexOne), bankAccount).get
 
   lazy val onPageLoad = routes.SchemeBankAccountCheckYourAnswersController.onPageLoad(srn, indexOne)
-  lazy val onSubmit = routes.SchemeBankAccountCheckYourAnswersController.onSubmit(srn, indexOne)
+  lazy val onSubmit = routes.SchemeBankAccountCheckYourAnswersController.onSubmit(srn)
 
   "SchemeBankAccountCheckYourAnswersController" should {
 
@@ -148,7 +145,7 @@ class SchemeBankAccountCheckYourAnswersControllerSpec extends ControllerBaseSpec
       forAll(srnGen, bankAccountGen) { (srn, bankAccount) =>
 
         viewModel(srn, indexOne, bankAccount).onSubmit mustBe
-          routes.SchemeBankAccountCheckYourAnswersController.onSubmit(srn, indexOne)
+          routes.SchemeBankAccountCheckYourAnswersController.onSubmit(srn)
       }
     }
   }

@@ -57,10 +57,10 @@ class SchemeBankAccountCheckYourAnswersController @Inject()(
         }
     }
 
-  def onSubmit(srn: Srn, index: Max10): Action[AnyContent] =
+  def onSubmit(srn: Srn): Action[AnyContent] =
     (identify andThen allowAccess(srn) andThen getData andThen requireData) {
       implicit request =>
-        Redirect(navigator.nextPage(SchemeBankAccountCheckYourAnswersPage(srn, index), NormalMode, request.userAnswers))
+        Redirect(navigator.nextPage(SchemeBankAccountCheckYourAnswersPage(srn), NormalMode, request.userAnswers))
     }
 }
 
@@ -82,7 +82,7 @@ object SchemeBankAccountCheckYourAnswersController {
 
   def viewModel(srn: Srn, index: Max10, bankAccount: BankAccount): CheckYourAnswersViewModel = CheckYourAnswersViewModel(
     bankAccountAnswers(srn, index, bankAccount),
-    routes.SchemeBankAccountCheckYourAnswersController.onSubmit(srn, index)
+    routes.SchemeBankAccountCheckYourAnswersController.onSubmit(srn)
   )
 }
 
