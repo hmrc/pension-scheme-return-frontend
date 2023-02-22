@@ -16,6 +16,7 @@
 
 package pages
 
+import config.Refined.Max10
 import models.SchemeId.Srn
 
-case class SchemeBankAccountCheckYourAnswersPage(srn:Srn) extends Page
+case class SchemeBankAccountCheckYourAnswersPage(srn:Srn, index: Max10) extends Page

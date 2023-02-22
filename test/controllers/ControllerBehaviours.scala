@@ -20,6 +20,8 @@ import navigation.{FakeNavigator, Navigator}
 import play.api
 import play.api.{Application, inject}
 import play.api.inject.bind
+import models.UserAnswers
+import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Writes
 import play.api.mvc.{Call, Request}
@@ -30,18 +32,16 @@ import queries.Settable
 trait ControllerBehaviours {
   _: ControllerBaseSpec =>
 
-  def renderView(call: => Call)(view: Application => Request[_] => Html): Unit =
-    s"return OK and the correct view" in {
+  def renderView(call: => Call, userAnswers: UserAnswers = defaultUserAnswers)(view: Application => Request[_] => Html): Unit =
+    "return OK and the correct view" in {
       val appBuilder = applicationBuilder(Some(userAnswers))
       render(appBuilder, call)(view)
     }
 
   def renderPrePopView[A: Writes](call: => Call, page: Settable[A], value: A)(view: Application => Request[_] => Html): Unit =
-    s"return OK and the correct pre-populated view" when {
-      s"value is set for page $page" in {
-        val appBuilder = applicationBuilder(Some(userAnswers.set(page, value).success.value))
-        render(appBuilder, call)(view)
-      }
+    "return OK and the correct pre-populated view for a GET" in {
+      val appBuilder = applicationBuilder(Some(defaultUserAnswers.set(page, value).success.value))
+      render(appBuilder, call)(view)
     }
 
   def redirectWhenCacheEmpty(call: => Call, nextPage: => Call): Unit = {
@@ -82,8 +82,9 @@ trait ControllerBehaviours {
     }
 
   def invalidForm(call: => Call, form: (String, String)*): Unit =
-    s"return BAD_REQUEST when invalid form data is provided" in {
-      val appBuilder = applicationBuilder(Some(userAnswers))
+    "return BAD_REQUEST for a POST with invalid form data" in {
+      val appBuilder = applicationBuilder(Some(defaultUserAnswers))
+
       running(_ => appBuilder) { app =>
         val request = FakeRequest(call).withFormUrlEncodedBody(form: _*)
         val result = route(app, request).value
@@ -92,7 +93,7 @@ trait ControllerBehaviours {
       }
     }
 
-  def redirectNextPage(call: => Call, form: (String, String)*): Unit =
+  def redirectNextPage(call: => Call, userAnswers: UserAnswers, form: (String, String)*): Unit =
     "redirect to the next page" in {
 
       val onwardsUrl = Call(GET, "/foo")
@@ -102,10 +103,28 @@ trait ControllerBehaviours {
 
       running(_ => appBuilder) { app =>
         val request = FakeRequest(call).withFormUrlEncodedBody(form: _*)
+
         val result = route(app, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual onwardsUrl.url
+      }
+    }
+
+  def redirectNextPage(call: => Call, form: (String, String)*): Unit =
+    redirectNextPage(call, defaultUserAnswers, form: _*)
+
+  def redirectToPage(call: => Call, page: => Call, form: (String, String)*): Unit =
+    s"redirect to page" in {
+      val appBuilder = applicationBuilder(Some(defaultUserAnswers))
+
+      running(_ => appBuilder) { app =>
+        val request = FakeRequest(call).withFormUrlEncodedBody(form: _*)
+
+        val result = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual page.url
       }
     }
 }

@@ -16,7 +16,8 @@
 
 package viewmodels.govuk
 
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{Content, Text}
+import play.twirl.api.Html
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{Content, HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist._
 
 object summarylist extends SummaryListFluency
@@ -51,6 +52,12 @@ trait SummaryListFluency {
         key = key,
         value = value
       )
+
+    def apply(
+               key: Html,
+               actions: Seq[ActionItem]
+             ): SummaryListRow =
+      apply(Key(HtmlContent(key)), Value(), actions)
 
     def apply(
                key: Key,
@@ -97,6 +104,8 @@ trait SummaryListFluency {
         content = content,
         href    = href
       )
+
+    def apply(html: Html, href: String): ActionItem = apply(HtmlContent(html), href)
   }
 
   implicit class FluentActionItem(actionItem: ActionItem) {
@@ -115,12 +124,18 @@ trait SummaryListFluency {
 
     def apply(content: Content): Key =
       Key(content = content)
+
+    def apply(html: Html): Key =
+      apply(HtmlContent(html))
   }
 
   implicit class FluentKey(key: Key) {
 
     def withCssClass(className: String): Key =
       key copy (classes = s"${key.classes} $className")
+
+    def withRegularFont: Key =
+      withCssClass("govuk-!-font-weight-regular")
   }
 
   object ValueViewModel {

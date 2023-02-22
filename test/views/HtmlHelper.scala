@@ -59,8 +59,8 @@ trait HtmlHelper extends HtmlModels {
       _.getElementsByTag("td").iterator().asScala.toList.map(_.text())
     )
 
-  def insetText(html: Html): String =
-    mainContent(html).getElementsByClass("govuk-inset-text").first().text()
+  def inset(html: Html): Element =
+    mainContent(html).getElementsByClass("govuk-inset-text").first()
 
   def button(html: Html): Element =
     mainContent(html).getElementsByTag("button").first()
@@ -85,6 +85,9 @@ trait HtmlHelper extends HtmlModels {
 
   def summaryListActions(html: Html): List[AnchorTag] =
     mainContent(html).select(".govuk-summary-list__actions a").iterator().asScala.toList.map(AnchorTag(_))
+
+  def summaryListRows(html: Html): List[Element] =
+    mainContent(html).getElementsByClass("govuk-summary-list__row").iterator().asScala.toList
 
   def messageKey(message: DisplayMessage): String = message match {
     case SimpleMessage(key, _) => key

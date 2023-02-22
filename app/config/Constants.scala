@@ -26,4 +26,6 @@ object Constants {
 
   val delimitedPSA = "DELIMITED_PSAID"
   val detailsNotFound = "no match found"
+
+  val maxSchemeBankAccounts = 10
 }

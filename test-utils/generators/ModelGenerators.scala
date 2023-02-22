@@ -144,7 +144,7 @@ trait ModelGenerators extends BasicGenerators {
       bankName      <- nonEmptyString
       accountNumber <- Gen.listOfN(8, numChar).map(_.mkString)
       separator     <- Gen.oneOf("", " ", "-")
-      pairs          = Gen.listOf(2, numChar)
+      pairs          = Gen.listOf(2, numChar).map(_.mkString)
       sortCode      <- Gen.listOfN(3, pairs).map(_.mkString(separator))
     } yield {
       BankAccount(bankName, accountNumber, sortCode)

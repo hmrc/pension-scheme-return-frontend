@@ -14,23 +14,29 @@
  * limitations under the License.
  */
 
-package forms
+package viewmodels.models
 
-import forms.mappings.Mappings
-import play.api.data.Form
+import play.api.mvc.Call
+import viewmodels.DisplayMessage
+import viewmodels.DisplayMessage.SimpleMessage
 
-import javax.inject.Inject
+case class ListRow(
+  text: DisplayMessage,
+  changeUrl: String,
+  changeHiddenText: SimpleMessage,
+  removeUrl: String,
+  removeHiddenText: SimpleMessage,
+)
 
-class YesNoPageFormProvider @Inject() extends Mappings {
-
-  def apply(
-    requiredKey: String,
-    invalidKey: String
-  ): Form[Boolean] =
-    Form("value" -> boolean(requiredKey, invalidKey))
-
-  def apply(
-             requiredKey: String
-           ): Form[Boolean] =
-    Form("value" -> boolean(requiredKey, ""))
-}
+case class ListViewModel(
+  title: SimpleMessage,
+  heading: SimpleMessage,
+  rows: List[ListRow],
+  buttonText: SimpleMessage,
+  radioText: SimpleMessage,
+  insetText: SimpleMessage,
+  showRadios: Boolean = true,
+  onChangeText: SimpleMessage,
+  onRemoveText: SimpleMessage,
+  onSubmit: Call
+)

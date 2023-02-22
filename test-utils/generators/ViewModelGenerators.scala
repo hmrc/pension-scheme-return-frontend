@@ -17,9 +17,6 @@
 package generators
 
 import org.scalacheck.Gen
-import uk.gov.hmrc.govukfrontend.views.Aliases.SummaryList
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{Content, Text}
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist._
 import viewmodels.DisplayMessage.SimpleMessage
 import viewmodels.models._
 
@@ -48,12 +45,13 @@ trait ViewModelGenerators extends BasicGenerators {
       ContentTablePageViewModel(title, heading, inset, buttonText, onSubmit, rows: _*)
     }
 
-  val actionItemGen: Gen[(SimpleMessage, String)] =
+  val actionItemGen: Gen[SummaryAction] =
     for {
-      content <- nonEmptyString
+      content <- nonEmptyString.map(SimpleMessage(_))
       href    <- relativeUrl
+      hidden  <- nonEmptyString.map(SimpleMessage(_))
     } yield {
-      SimpleMessage(content) -> href
+      SummaryAction(content, href, hidden)
     }
 
   val summaryListRowGen: Gen[CheckYourAnswersRowViewModel] =
@@ -97,6 +95,39 @@ trait ViewModelGenerators extends BasicGenerators {
       sortCodeHeading,
       sortCodeHint,
       buttonText,
+      onSubmit
+    )
+
+  val summaryRowGen: Gen[ListRow] =
+    for {
+      text <- nonEmptySimpleMessage
+      changeUrl <- relativeUrl
+      changeHiddenText <- nonEmptySimpleMessage
+      removeUrl <- relativeUrl
+      removeHiddenText <- nonEmptySimpleMessage
+    } yield ListRow(text, changeUrl, changeHiddenText, removeUrl, removeHiddenText)
+
+  def summaryViewModelGen(showRadios: Boolean = true): Gen[ListViewModel] =
+    for {
+      title <- nonEmptySimpleMessage
+      heading <- nonEmptySimpleMessage
+      rows <- Gen.choose(1, 10).flatMap(Gen.listOfN(_, summaryRowGen))
+      buttonText <- nonEmptySimpleMessage
+      radioText <- nonEmptySimpleMessage
+      insetText <- nonEmptySimpleMessage
+      onChangeText <- nonEmptySimpleMessage
+      onRemoveText <- nonEmptySimpleMessage
+      onSubmit <- call
+    } yield ListViewModel(
+      title,
+      heading,
+      rows,
+      buttonText,
+      radioText,
+      insetText,
+      showRadios,
+      onChangeText,
+      onRemoveText,
       onSubmit
     )
 
