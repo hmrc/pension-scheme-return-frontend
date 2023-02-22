@@ -145,6 +145,15 @@ trait ModelGenerators extends BasicGenerators {
       endDate   <- date
     } yield DateRange(startDate, endDate)
 
+  def dateRangeWithinRangeGen(range: DateRange): Gen[DateRange] =
+    for {
+      date1 <- datesBetween(range.from, range.to)
+      date2 <- datesBetween(range.from, range.to)
+    } yield {
+      if(date1.isBefore(date2)) DateRange(date1, date2)
+      else DateRange(date2, date1)
+    }
+
   val bankAccountGen: Gen[BankAccount] =
     for {
       bankName      <- nonEmptyString

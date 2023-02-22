@@ -40,14 +40,14 @@
 
     @govukDateInput(
       DateViewModel(
-        field  = form("startDate"),
+        field  = form("dates.startDate"),
         legend = LegendViewModel(viewmodel.startDateLabel.toMessage)
       )
     )
 
     @govukDateInput(
       DateViewModel(
-        field  = form("endDate"),
+        field  = form("dates.endDate"),
         legend = LegendViewModel(viewmodel.endDateLabel.toMessage)
       )
     )

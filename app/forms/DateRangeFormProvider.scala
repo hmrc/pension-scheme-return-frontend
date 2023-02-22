@@ -24,11 +24,24 @@ import play.api.data.Forms.mapping
 
 class DateRangeFormProvider @Inject()() extends Mappings {
 
-  def apply(startDateErrors: DateFormErrors, endDateErrors: DateFormErrors): Form[DateRange] =
+  def apply(
+    startDateErrors: DateFormErrors,
+    endDateErrors: DateFormErrors,
+    invalidRangeError: String,
+    allowedRange: Option[DateRange],
+    startDateAllowedDateRangeError: Option[String],
+    endDateAllowedDateRangeError: Option[String]
+  ): Form[DateRange] =
     Form(
       mapping(
-        "startDate" -> localDate(startDateErrors),
-        "endDate" -> localDate(endDateErrors)
-      )(DateRange.apply)(DateRange.unapply)
+        "dates" -> dateRange(
+          startDateErrors,
+          endDateErrors,
+          invalidRangeError,
+          allowedRange,
+          startDateAllowedDateRangeError,
+          endDateAllowedDateRangeError
+        )
+      )(identity)(Some(_))
     )
 }

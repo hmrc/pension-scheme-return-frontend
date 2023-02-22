@@ -16,11 +16,15 @@
 
 package forms.mappings
 
+import cats.Show
+import cats.implicits.toShow
 import play.api.data.validation.{Constraint, Invalid, Valid}
 
 import java.time.LocalDate
 
 trait Constraints {
+
+  protected def success[A]: Constraint[A] = Constraint(_ => Valid)
 
   protected def firstError[A](constraints: Constraint[A]*): Constraint[A] =
     Constraint {
@@ -63,7 +67,7 @@ trait Constraints {
         }
     }
 
-  protected def inRange[A](minimum: A, maximum: A, errorKey: String)(implicit ev: Ordering[A]): Constraint[A] =
+  protected def inRange[A: Show](minimum: A, maximum: A, errorKey: String)(implicit ev: Ordering[A]): Constraint[A] =
     Constraint {
       input =>
 
@@ -72,7 +76,7 @@ trait Constraints {
         if (input >= minimum && input <= maximum) {
           Valid
         } else {
-          Invalid(errorKey, minimum, maximum)
+          Invalid(errorKey, minimum.show, maximum.show)
         }
     }
 

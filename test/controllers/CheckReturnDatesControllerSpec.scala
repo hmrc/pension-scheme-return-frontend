@@ -28,6 +28,7 @@ import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.{FakeTaxYearService, SaveService, SchemeDetailsService, TaxYearService}
+import uk.gov.hmrc.time.TaxYear
 import utils.DateTimeUtils
 import viewmodels.DisplayMessage
 import viewmodels.DisplayMessage.SimpleMessage
@@ -143,14 +144,14 @@ class CheckReturnDatesControllerSpec extends ControllerBaseSpec with ScalaCheckP
   "CheckReturnDates Controller" should {
 
     val date = self.date.sample.value
-    val fakeTaxYearService = new FakeTaxYearService(date)
+    val taxYear = TaxYear(date.getYear)
     val minimalSchemeDetails = minimalSchemeDetailsGen.sample.value
     lazy val viewModel: YesNoPageViewModel =
       CheckReturnDatesController.viewModel(
         srn,
         NormalMode,
-        fakeTaxYearService.current.starts,
-        fakeTaxYearService.current.finishes,
+        taxYear.starts,
+        taxYear.finishes,
         minimalSchemeDetails
       )
 
@@ -162,9 +163,8 @@ class CheckReturnDatesControllerSpec extends ControllerBaseSpec with ScalaCheckP
       .thenReturn(Future.successful(Some(minimalSchemeDetails)))
 
     def applicationBuilder(userAnswers: Option[UserAnswers]) =
-      self.applicationBuilder(userAnswers)
+      self.applicationBuilder(userAnswers, taxYear = taxYear)
         .overrides(
-          bind[TaxYearService].toInstance(fakeTaxYearService),
           bind[SchemeDetailsService].toInstance(mockSchemeDetailsService)
         )
 

@@ -16,6 +16,8 @@
 
 package forms.mappings
 
+import viewmodels.DisplayMessage.SimpleMessage
+
 import java.time.LocalDate
 
 case class DateFormErrors(

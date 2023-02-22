@@ -31,7 +31,11 @@ class DateRangeViewSpec extends ViewSpec {
     val dateErrors = DateFormErrors("required", "day", "month", "year", "two", "invalid", "chars")
     val dateRangeForm = new DateRangeFormProvider()(
       dateErrors.copy(required = "startDate.required"),
-      dateErrors.copy(required = "endDate.required")
+      dateErrors.copy(required = "endDate.required"),
+      "error.invalid.range",
+      None,
+      None,
+      None
     )
 
 

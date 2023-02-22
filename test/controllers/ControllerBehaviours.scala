@@ -17,8 +17,7 @@
 package controllers
 
 import navigation.{FakeNavigator, Navigator}
-import play.api
-import play.api.{Application, inject}
+import play.api.Application
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Writes
@@ -105,6 +104,7 @@ trait ControllerBehaviours {
         val result = route(app, request).value
 
         status(result) mustEqual SEE_OTHER
+
         redirectLocation(result).value mustEqual onwardsUrl.url
       }
     }

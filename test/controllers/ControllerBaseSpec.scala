@@ -27,7 +27,11 @@ import play.api.libs.json.Json
 import play.api.mvc.Call
 import play.api.test.Helpers.running
 import play.api.test._
+import services.{FakeTaxYearService, TaxYearService}
+import uk.gov.hmrc.time.TaxYear
 import utils.BaseSpec
+
+import java.time.LocalDate
 
 trait ControllerBaseSpec
   extends BaseSpec
@@ -49,6 +53,8 @@ trait ControllerBaseSpec
 
   val testOnwardRoute: Call = Call("GET", "/foo")
 
+  val defaultTaxYear = TaxYear(2022)
+
   def emptyUserAnswers: UserAnswers = UserAnswers(userAnswersId)
 
   val userAnswers: UserAnswers = UserAnswers(userAnswersId, Json.obj("non" -> "empty"))
@@ -65,7 +71,8 @@ trait ControllerBaseSpec
 
   protected def applicationBuilder(
                                     userAnswers: Option[UserAnswers] = None,
-                                    schemeDetails: SchemeDetails = defaultSchemeDetails
+                                    schemeDetails: SchemeDetails = defaultSchemeDetails,
+                                    taxYear: TaxYear = defaultTaxYear
                                   ): GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
       .bindings(
@@ -77,6 +84,7 @@ trait ControllerBaseSpec
         bind[AllowAccessActionProvider].toInstance(new FakeAllowAccessActionProvider(schemeDetails)),
         bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers)),
         bind[DataCreationAction].toInstance(new FakeDataCreationAction(userAnswers.getOrElse(emptyUserAnswers))),
+        bind[TaxYearService].toInstance(new FakeTaxYearService(taxYear.starts))
       )
 
   def runningApplication[T](block: Application => T): T = {

@@ -16,6 +16,8 @@
 
 package utils
 
+import cats.Show
+
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -26,4 +28,5 @@ object DateTimeUtils {
     localDate.format(formatter)
   }
 
+  implicit val localDateShow: Show[LocalDate] = formatHtml
 }

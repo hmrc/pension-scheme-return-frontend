@@ -17,20 +17,19 @@
 package controllers
 
 import forms.DateRangeFormProvider
-import models.NormalMode
+import models.{DateRange, NormalMode}
 import pages.AccountingPeriodPage
+import uk.gov.hmrc.time.TaxYear
 import views.html.DateRangeView
 
 class AccountingPeriodControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
 
-
-
   "AccountingPeriodController" should {
 
-    val form = AccountingPeriodController.form(new DateRangeFormProvider())
+    val form = AccountingPeriodController.form(new DateRangeFormProvider(), defaultTaxYear)
     lazy val viewModel = AccountingPeriodController.viewModel(srn, NormalMode)
 
-    val data = dateRangeGen.sample.value
+    val data = dateRangeWithinRangeGen(DateRange(defaultTaxYear.starts, defaultTaxYear.finishes)).sample.value
 
     lazy val onPageLoad = routes.AccountingPeriodController.onPageLoad(srn, NormalMode)
     lazy val onSubmit = routes.AccountingPeriodController.onSubmit(srn, NormalMode)

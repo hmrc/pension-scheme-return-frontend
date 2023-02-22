@@ -27,12 +27,16 @@ import pages.AccountingPeriodPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
+import services.{SaveService, TaxYearService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import uk.gov.hmrc.time.TaxYear
+import utils.DateTimeUtils
 import utils.FormUtils._
+import viewmodels.DisplayMessage.SimpleMessage
 import viewmodels.models.DateRangeViewModel
 import views.html.DateRangeView
 
+import java.time.LocalDate
 import scala.concurrent.{ExecutionContext, Future}
 
 class AccountingPeriodController @Inject()(
@@ -46,9 +50,10 @@ class AccountingPeriodController @Inject()(
   view: DateRangeView,
   formProvider: DateRangeFormProvider,
   saveService: SaveService,
+  taxYearService: TaxYearService
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  private val form = AccountingPeriodController.form(formProvider)
+  private val form = AccountingPeriodController.form(formProvider, taxYearService.current)
   private val viewModel = AccountingPeriodController.viewModel _
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = (identify andThen allowAccess(srn) andThen getData andThen requireData) {
@@ -71,7 +76,7 @@ class AccountingPeriodController @Inject()(
 
 object AccountingPeriodController {
 
-  def form(formProvider: DateRangeFormProvider): Form[DateRange] = formProvider(
+  def form(formProvider: DateRangeFormProvider, taxYear: TaxYear): Form[DateRange] = formProvider(
     DateFormErrors(
       "accountingPeriod.startDate.required.all",
       "accountingPeriod.startDate.required.day",
@@ -79,7 +84,7 @@ object AccountingPeriodController {
       "accountingPeriod.startDate.required.year",
       "accountingPeriod.startDate.required.two",
       "accountingPeriod.startDate.invalid.date",
-      "accountingPeriod.startDate.invalid.characters"
+      "accountingPeriod.startDate.invalid.characters",
     ),
     DateFormErrors(
       "accountingPeriod.endDate.required.all",
@@ -89,7 +94,11 @@ object AccountingPeriodController {
       "accountingPeriod.endDate.required.two",
       "accountingPeriod.endDate.invalid.date",
       "accountingPeriod.endDate.invalid.characters"
-    )
+    ),
+    "accountingPeriod.range.invalid",
+    Some(DateRange(taxYear.starts, taxYear.finishes)),
+    Some("accountingPeriod.startDate.outsideTaxYear"),
+    Some("accountingPeriod.endDate.outsideTaxYear")
   )
 
   def viewModel(srn: Srn, mode: Mode): DateRangeViewModel = DateRangeViewModel(
