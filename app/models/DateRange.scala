@@ -26,7 +26,7 @@ case class DateRange(from: LocalDate, to: LocalDate) {
     contains(range.from) || contains(range.to)
 
   def contains(date: LocalDate): Boolean =
-    date.isAfter(from) && date.isBefore(to)
+    !date.isBefore(from) && !date.isAfter(to)
 }
 
 object DateRange {

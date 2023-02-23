@@ -30,7 +30,7 @@ class SchemeDetailsControllerSpec extends ControllerBaseSpec {
   lazy val onPageLoad = routes.SchemeDetailsController.onPageLoad(srn).url
   lazy val onSubmit = routes.SchemeDetailsController.onSubmit(srn).url
 
-  lazy val app = applicationBuilder(Some(userAnswers))
+  lazy val app = applicationBuilder(Some(defaultUserAnswers))
 
   private val schemeDetailsTwoEstablishers = defaultSchemeDetails.copy(establishers =
     List(
@@ -81,7 +81,7 @@ class SchemeDetailsControllerSpec extends ControllerBaseSpec {
       ).foreach { case (testName, schemeDetails) =>
         s"scheme details contains $testName" in {
 
-          val app = applicationBuilder(Some(userAnswers), schemeDetails)
+          val app = applicationBuilder(Some(defaultUserAnswers), schemeDetails)
 
           running(_ => app) { implicit app =>
 
@@ -102,7 +102,7 @@ class SchemeDetailsControllerSpec extends ControllerBaseSpec {
     "redirect to the next page" in {
 
       val fakeNavigatorApplication =
-        applicationBuilder(Some(userAnswers))
+        applicationBuilder(Some(defaultUserAnswers))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(testOnwardRoute))
           )

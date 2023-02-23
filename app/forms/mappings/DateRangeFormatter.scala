@@ -24,7 +24,6 @@ import play.api.data.format.Formatter
 import utils.DateTimeUtils.localDateShow
 
 import java.time.LocalDate
-import scala.util.{Failure, Success, Try}
 
 private[mappings] class DateRangeFormatter(
                                             startDateErrors: DateFormErrors,
@@ -42,7 +41,7 @@ private[mappings] class DateRangeFormatter(
 
   private def verifyValidRange(key: String, range: DateRange): Either[Seq[FormError], DateRange] = {
     if(range.from.isBefore(range.to)) Right(range)
-    else Left(List(FormError(s"$key.startDate", invalidRangeError, List(range.from.show, range.to.show))))
+    else Left(List(FormError(s"$key.endDate", invalidRangeError, List(range.from.show, range.to.show))))
   }
 
   private def verifyRangeBounds(key: String, date: LocalDate, error: Option[String]): Either[Seq[FormError], LocalDate] = {
@@ -53,9 +52,12 @@ private[mappings] class DateRangeFormatter(
   }
 
   private def verifyUniqueRange(key: String, range: DateRange): Either[Seq[FormError], DateRange] = {
-    duplicateRangeError.map { error =>
-      Either.cond(!duplicateRanges.exists(_.intersects(range)), range, Seq(FormError(s"$key.startDate", error)))
-    }.getOrElse(Right(range))
+    duplicateRangeError.flatMap { error =>
+      duplicateRanges.find(d => d.intersects(range))
+        .map { i =>
+          Seq(FormError(s"$key.startDate", error, List(i.from.show, i.to.show)))
+        }
+    }.toLeft(range)
   }
 
   override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], DateRange] = {

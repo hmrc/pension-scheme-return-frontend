@@ -132,7 +132,7 @@ class DateRangeMappingsSpec extends AnyFreeSpec with Matchers with ScalaCheckPro
       val result = form.bind(data)
 
       result.errors must contain only
-        FormError("value.startDate", "error.invalid.range", List(range.to.show, range.from.show))
+        FormError("value.endDate", "error.invalid.range", List(range.to.show, range.from.show))
     }
   }
 
@@ -208,7 +208,8 @@ class DateRangeMappingsSpec extends AnyFreeSpec with Matchers with ScalaCheckPro
 
       val result = formWithDuplicates(excludedRanges).bind(data)
 
-      result.errors must contain only FormError("value.startDate", "error.duplicate")
+      result.errors must contain only
+        FormError("value.startDate", "error.duplicate", List(allowedRange.from.show, allowedRange.to.show))
     }
   }
 

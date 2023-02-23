@@ -17,6 +17,7 @@
 package navigation
 
 import controllers.routes
+import eu.timepit.refined._
 import models._
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import pages._
@@ -53,23 +54,36 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
       }
     }
 
-    "go from check return dates page to scheme bank account page" when {
+    "check returns page" should {
 
-      "yes is selected" in {
-        forAll(srnGen) { srn =>
-          val ua = userAnswers.set(CheckReturnDatesPage(srn), true).get
-          navigator.nextPage(CheckReturnDatesPage(srn), NormalMode, ua) mustBe routes.SchemeBankAccountController.onPageLoad(srn, NormalMode)
+      "navigate to scheme bank account page" when {
+        "yes is selected" in {
+          forAll(srnGen) { srn =>
+            val ua = userAnswers.set(CheckReturnDatesPage(srn), true).get
+            navigator.nextPage(CheckReturnDatesPage(srn), NormalMode, ua) mustBe
+              routes.SchemeBankAccountController.onPageLoad(srn, refineMV(1), NormalMode)
+          }
         }
       }
-    }
 
-    "go from check return dates page to unauthorised page" when {
+      "navigate to scheme bank account list page" when {
+        "yes is selected and a bank account has previously been entered" in {
+          forAll(srnGen) { srn =>
+            val ua = userAnswers
+              .set(CheckReturnDatesPage(srn), true).get
+              .set(SchemeBankAccountPage(srn, refineMV(1)), BankAccount("test", "11111111", "111111")).get
+            navigator.nextPage(CheckReturnDatesPage(srn), NormalMode, ua) mustBe
+              routes.SchemeBankAccountListController.onPageLoad(srn)
+          }
+        }
+      }
 
       "no is selected" in {
 
         forAll(srnGen) { srn =>
           val ua = userAnswers.set(CheckReturnDatesPage(srn), false).get
-          navigator.nextPage(CheckReturnDatesPage(srn), NormalMode, ua) mustBe routes.AccountingPeriodController.onPageLoad(srn, NormalMode)
+          navigator.nextPage(CheckReturnDatesPage(srn), NormalMode, ua) mustBe
+            routes.AccountingPeriodController.onPageLoad(srn, refineMV(1), NormalMode)
         }
       }
     }
@@ -77,7 +91,29 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
     "go from scheme bank account page to check your answers page" in {
 
       forAll(srnGen) { srn =>
-        navigator.nextPage(SchemeBankAccountPage(srn), NormalMode, userAnswers) mustBe routes.SchemeBankAccountCheckYourAnswersController.onPageLoad(srn)
+        val page = SchemeBankAccountPage(srn, refineMV(1))
+        navigator.nextPage(page, NormalMode, userAnswers) mustBe
+          routes.SchemeBankAccountCheckYourAnswersController.onPageLoad(srn, refineMV(1))
+      }
+    }
+
+    "go from bank account check your answers page to list page" in {
+
+      forAll(srnGen) { srn =>
+        val page = SchemeBankAccountCheckYourAnswersPage(srn)
+        navigator.nextPage(page, NormalMode, userAnswers) mustBe routes.SchemeBankAccountListController.onPageLoad(srn)
+      }
+    }
+
+    "go from scheme bank account list page to scheme bank account page" when {
+
+      "yes is selected" in {
+        forAll(srnGen) { srn =>
+          val ua = userAnswers.set(SchemeBankAccountPage(srn, refineMV(1)), BankAccount("test", "11111111", "111111")).get
+          val page = SchemeBankAccountListPage(srn, addBankAccount = true)
+          navigator.nextPage(page, NormalMode, ua) mustBe
+            routes.SchemeBankAccountController.onPageLoad(srn, refineMV(2), NormalMode)
+        }
       }
     }
   }

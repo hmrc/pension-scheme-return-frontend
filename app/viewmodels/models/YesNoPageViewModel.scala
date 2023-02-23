@@ -17,7 +17,6 @@
 package viewmodels.models
 
 import play.api.mvc.Call
-import viewmodels.DisplayMessage
 import viewmodels.DisplayMessage.SimpleMessage
 
 case class YesNoPageViewModel(

@@ -18,7 +18,7 @@ package forms.mappings
 
 import models.{DateRange, Enumerable}
 import play.api.data.FieldMapping
-import play.api.data.Forms.{date, of}
+import play.api.data.Forms.of
 
 import java.time.LocalDate
 

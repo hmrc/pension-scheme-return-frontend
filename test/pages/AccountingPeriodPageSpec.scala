@@ -16,6 +16,7 @@
 
 package pages
 
+import eu.timepit.refined.refineMV
 import models.DateRange
 import pages.behaviours.PageBehaviours
 
@@ -25,10 +26,10 @@ class AccountingPeriodPageSpec extends PageBehaviours {
 
     val srn = srnGen.sample.value
 
-    beRetrievable[DateRange](AccountingPeriodPage(srn))
+    beRetrievable[DateRange](AccountingPeriodPage(srn, refineMV(1)))
 
-    beSettable[DateRange](AccountingPeriodPage(srn))
+    beSettable[DateRange](AccountingPeriodPage(srn, refineMV(1)))
 
-    beRemovable[DateRange](AccountingPeriodPage(srn))
+    beRemovable[DateRange](AccountingPeriodPage(srn, refineMV(1)))
   }
 }

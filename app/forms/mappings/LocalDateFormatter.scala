@@ -16,10 +16,8 @@
 
 package forms.mappings
 
-import cats.data._
 import cats.data.Validated._
 import cats.syntax.all._
-
 import play.api.data.FormError
 import play.api.data.format.Formatter
 

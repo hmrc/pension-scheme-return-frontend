@@ -14,25 +14,29 @@
  * limitations under the License.
  */
 
-package pages
+package viewmodels.models
 
-import config.Refined.Max3
-import models.DateRange
-import models.SchemeId.Srn
-import play.api.libs.json.JsPath
-import queries.Gettable
-import utils.RefinedUtils.RefinedIntOps
+import play.api.mvc.Call
+import viewmodels.DisplayMessage
+import viewmodels.DisplayMessage.SimpleMessage
 
-case class AccountingPeriodPage(srn: Srn, index: Max3) extends QuestionPage[DateRange] {
+case class ListRow(
+  text: DisplayMessage,
+  changeUrl: String,
+  changeHiddenText: SimpleMessage,
+  removeUrl: String,
+  removeHiddenText: SimpleMessage,
+)
 
-  override def path: JsPath = JsPath \ toString \ index.arrayIndex
-
-  override def toString: String = "accountPeriod"
-}
-
-case class AccountingPeriods(srn: Srn) extends Gettable[List[DateRange]] {
-
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "accountPeriod"
-}
+case class ListViewModel(
+  title: SimpleMessage,
+  heading: SimpleMessage,
+  rows: List[ListRow],
+  buttonText: SimpleMessage,
+  radioText: SimpleMessage,
+  insetText: SimpleMessage,
+  showRadios: Boolean = true,
+  onChangeText: SimpleMessage,
+  onRemoveText: SimpleMessage,
+  onSubmit: Call
+)

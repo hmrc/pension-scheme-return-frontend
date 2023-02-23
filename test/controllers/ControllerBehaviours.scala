@@ -34,18 +34,16 @@ import scala.concurrent.Future
 trait ControllerBehaviours {
   _: ControllerBaseSpec =>
 
-  def renderView(call: => Call)(view: Application => Request[_] => Html): Unit =
-    s"return OK and the correct view" in {
+  def renderView(call: => Call, userAnswers: UserAnswers = defaultUserAnswers)(view: Application => Request[_] => Html): Unit =
+    "return OK and the correct view" in {
       val appBuilder = applicationBuilder(Some(userAnswers))
       render(appBuilder, call)(view)
     }
 
   def renderPrePopView[A: Writes](call: => Call, page: Settable[A], value: A)(view: Application => Request[_] => Html): Unit =
-    s"return OK and the correct pre-populated view" when {
-      s"value is set for page $page" in {
-        val appBuilder = applicationBuilder(Some(userAnswers.set(page, value).success.value))
-        render(appBuilder, call)(view)
-      }
+    "return OK and the correct pre-populated view for a GET" in {
+      val appBuilder = applicationBuilder(Some(defaultUserAnswers.set(page, value).success.value))
+      render(appBuilder, call)(view)
     }
 
   def redirectWhenCacheEmpty(call: => Call, nextPage: => Call): Unit = {
@@ -85,9 +83,10 @@ trait ControllerBehaviours {
       contentAsString(result) mustEqual expectedView.toString
     }
 
-  def invalidForm(call: => Call, form: (String, String)*): Unit =
-    s"return BAD_REQUEST when invalid form data is provided" in {
+  def invalidForm(call: => Call, userAnswers: UserAnswers, form: (String, String)*): Unit =
+    "return BAD_REQUEST for a POST with invalid form data" in {
       val appBuilder = applicationBuilder(Some(userAnswers))
+
       running(_ => appBuilder) { app =>
         val request = FakeRequest(call).withFormUrlEncodedBody(form: _*)
         val result = route(app, request).value
@@ -96,21 +95,40 @@ trait ControllerBehaviours {
       }
     }
 
-  def redirectNextPage(call: => Call, form: (String, String)*): Unit =
+  def invalidForm(call: => Call, form: (String, String)*): Unit =
+    invalidForm(call, defaultUserAnswers, form: _*)
+
+  def redirectNextPage(call: => Call, userAnswers: UserAnswers, form: (String, String)*): Unit =
     "redirect to the next page" in {
 
-      val onwardsUrl = Call(GET, "/foo")
       val appBuilder = applicationBuilder(Some(userAnswers)).overrides(
-        bind[Navigator].toInstance(new FakeNavigator(onwardsUrl))
+        bind[Navigator].toInstance(new FakeNavigator(testOnwardRoute))
       )
 
       running(_ => appBuilder) { app =>
         val request = FakeRequest(call).withFormUrlEncodedBody(form: _*)
+
         val result = route(app, request).value
 
         status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual testOnwardRoute.url
+      }
+    }
 
-        redirectLocation(result).value mustEqual onwardsUrl.url
+  def redirectNextPage(call: => Call, form: (String, String)*): Unit =
+    redirectNextPage(call, defaultUserAnswers, form: _*)
+
+  def redirectToPage(call: => Call, page: => Call, form: (String, String)*): Unit =
+    s"redirect to page" in {
+      val appBuilder = applicationBuilder(Some(defaultUserAnswers))
+
+      running(_ => appBuilder) { app =>
+        val request = FakeRequest(call).withFormUrlEncodedBody(form: _*)
+
+        val result = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual page.url
       }
     }
 
@@ -118,7 +136,7 @@ trait ControllerBehaviours {
     "save data and continue to next page" in {
 
       val saveService = mock[SaveService]
-      when(saveService.save(any())(any())).thenReturn(Future.successful(()))
+      when(saveService.save(any())(any(), any())).thenReturn(Future.successful(()))
 
       val appBuilder = applicationBuilder(Some(userAnswers))
         .overrides(
@@ -134,10 +152,10 @@ trait ControllerBehaviours {
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual testOnwardRoute.url
 
-        verify(saveService, times(1)).save(any())(any())
+        verify(saveService, times(1)).save(any())(any(), any())
       }
     }
 
   def saveAndContinue(call: => Call, form: (String, String)*): Unit =
-    saveAndContinue(call, emptyUserAnswers, form: _*)
+    saveAndContinue(call, defaultUserAnswers, form: _*)
 }

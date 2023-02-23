@@ -16,7 +16,9 @@
 
 package views
 
-import forms.BankAccountFormProvider
+import models.BankAccount
+import play.api.data
+import play.api.data.Forms.{mapping, text}
 import play.api.test.FakeRequest
 import views.html.BankAccountView
 
@@ -24,35 +26,21 @@ class BankAccountViewSpec extends ViewSpec {
 
   runningApplication { implicit app =>
     val view = injected[BankAccountView]
-    val formProvider = injected[BankAccountFormProvider]
-    val bankAccountForm = formProvider(
-      "bankName.required",
-      "bankName.invalid",
-      "bankName.length",
-      "accountNumber.required",
-      "accountNumber.invalid",
-      "accountNumber.length",
-      "sortCode.required",
-      "sortCode.invalid",
-      "sortCode.format.invalid",
-      "sortCode.length"
+
+    val bankAccountForm = data.Form(
+      mapping(
+        "bankName" -> text.verifying("bankName.required", _.nonEmpty),
+        "accountNumber" -> text.verifying("accountNumber.required", _.nonEmpty),
+        "sortCode" -> text.verifying("sortCode.required", _.nonEmpty)
+      )(BankAccount.apply)(BankAccount.unapply)
     )
 
     implicit val request = FakeRequest()
 
     "BankAccountView" should {
 
-      "render the title" in {
-        forAll(bankAccountViewModelGen) { viewModel =>
-          title(view(bankAccountForm, viewModel)) must startWith(viewModel.title.key)
-        }
-      }
-
-      "render the heading" in {
-        forAll(bankAccountViewModelGen) { viewModel =>
-          h1(view(bankAccountForm, viewModel)) mustBe viewModel.heading.key
-        }
-      }
+      behave like renderTitle(bankAccountViewModelGen)(view(bankAccountForm, _), _.title.key)
+      behave like renderHeading(bankAccountViewModelGen)(view(bankAccountForm, _), _.heading.key)
 
       "render the bank name heading" in {
         forAll(bankAccountViewModelGen) { viewModel =>
@@ -114,11 +102,7 @@ class BankAccountViewSpec extends ViewSpec {
         }
       }
 
-      "render the button text" in {
-        forAll(bankAccountViewModelGen) { viewModel =>
-          button(view(bankAccountForm, viewModel)).text() mustBe messageKey(viewModel.buttonText)
-        }
-      }
+      behave like renderButtonText(bankAccountViewModelGen)(view(bankAccountForm, _), _.buttonText)
     }
   }
 }

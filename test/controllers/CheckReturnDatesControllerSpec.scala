@@ -21,16 +21,13 @@ import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import pages.{CheckReturnDatesPage, QuestionPage}
+import pages.CheckReturnDatesPage
 import play.api.inject.bind
-import play.api.libs.json.JsPath
 import play.api.mvc.Call
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import services.{FakeTaxYearService, SaveService, SchemeDetailsService, TaxYearService}
+import services.{SaveService, SchemeDetailsService}
 import uk.gov.hmrc.time.TaxYear
 import utils.DateTimeUtils
-import viewmodels.DisplayMessage
 import viewmodels.DisplayMessage.SimpleMessage
 import viewmodels.models.YesNoPageViewModel
 import views.html.YesNoPageView
@@ -206,7 +203,7 @@ class CheckReturnDatesControllerSpec extends ControllerBaseSpec with ScalaCheckP
 
       val mockSaveService = mock[SaveService]
 
-      when(mockSaveService.save(any())(any())) thenReturn Future.successful(())
+      when(mockSaveService.save(any())(any(), any())) thenReturn Future.successful(())
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))

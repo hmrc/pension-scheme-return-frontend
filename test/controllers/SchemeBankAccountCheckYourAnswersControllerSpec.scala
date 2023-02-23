@@ -16,14 +16,14 @@
 
 package controllers
 
+import config.Refined.OneToTen
+import eu.timepit.refined.refineMV
 import models.NormalMode
-import navigation.{FakeNavigator, Navigator}
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import pages.SchemeBankAccountPage
-import play.api.inject.bind
 import play.api.mvc.Call
-import play.api.test.FakeRequest
 import viewmodels.DisplayMessage.SimpleMessage
+import viewmodels.models.SummaryAction
 import views.html.CheckYourAnswersView
 
 
@@ -31,22 +31,23 @@ class SchemeBankAccountCheckYourAnswersControllerSpec extends ControllerBaseSpec
 
   def onwardRoute = Call("GET", "/foo")
 
+  val indexOne = refineMV[OneToTen](1)
   val bankAccount = bankAccountGen.sample.value
-  override val userAnswers = emptyUserAnswers.set(SchemeBankAccountPage(srn), bankAccount).get
+  val userAnswers = emptyUserAnswers.set(SchemeBankAccountPage(srn, indexOne), bankAccount).get
 
-  lazy val onPageLoad = routes.SchemeBankAccountCheckYourAnswersController.onPageLoad(srn)
+  lazy val onPageLoad = routes.SchemeBankAccountCheckYourAnswersController.onPageLoad(srn, indexOne)
   lazy val onSubmit = routes.SchemeBankAccountCheckYourAnswersController.onSubmit(srn)
 
   "SchemeBankAccountCheckYourAnswersController" should {
 
-    lazy val viewModel = SchemeBankAccountCheckYourAnswersController.viewModel(srn, bankAccount)
+    lazy val viewModel = SchemeBankAccountCheckYourAnswersController.viewModel(srn, indexOne, bankAccount)
 
-    behave like renderPrePopView(onPageLoad, SchemeBankAccountPage(srn), bankAccount) { implicit app => implicit request =>
+    behave like renderPrePopView(onPageLoad, SchemeBankAccountPage(srn, indexOne), bankAccount) { implicit app => implicit request =>
       val view = injected[CheckYourAnswersView]
       view(viewModel)
     }
 
-    behave like redirectWhenCacheEmpty(onPageLoad, routes.SchemeBankAccountController.onPageLoad(srn, NormalMode))
+    behave like redirectWhenCacheEmpty(onPageLoad, routes.SchemeBankAccountController.onPageLoad(srn, indexOne, NormalMode))
 
     behave like journeyRecoveryPage("onPageLoad", onPageLoad)
     behave like journeyRecoveryPage("onSubmit", onSubmit)
@@ -62,7 +63,7 @@ class SchemeBankAccountCheckYourAnswersControllerSpec extends ControllerBaseSpec
 
       forAll(srnGen, bankAccountGen) { (srn, bankAccount) =>
 
-        viewModel(srn, bankAccount).title.key mustBe "checkYourAnswers.title"
+        viewModel(srn, indexOne, bankAccount).title.key mustBe "checkYourAnswers.title"
       }
     }
 
@@ -70,7 +71,7 @@ class SchemeBankAccountCheckYourAnswersControllerSpec extends ControllerBaseSpec
 
       forAll(srnGen, bankAccountGen) { (srn, bankAccount) =>
 
-        viewModel(srn, bankAccount).heading.key mustBe "checkYourAnswers.heading"
+        viewModel(srn, indexOne, bankAccount).heading.key mustBe "checkYourAnswers.heading"
       }
     }
 
@@ -78,7 +79,7 @@ class SchemeBankAccountCheckYourAnswersControllerSpec extends ControllerBaseSpec
 
       forAll(srnGen, bankAccountGen) { (srn, bankAccount) =>
 
-        viewModel(srn, bankAccount).rows.map(_.key.key) must contain("schemeBankDetails.bankName.heading")
+        viewModel(srn, indexOne, bankAccount).rows.map(_.key.key) must contain("schemeBankDetails.bankName.heading")
       }
     }
 
@@ -86,7 +87,7 @@ class SchemeBankAccountCheckYourAnswersControllerSpec extends ControllerBaseSpec
 
       forAll(srnGen, bankAccountGen) { (srn, bankAccount) =>
 
-        viewModel(srn, bankAccount).rows.map(_.key.key) must contain("schemeBankDetails.accountNumber.heading")
+        viewModel(srn, indexOne, bankAccount).rows.map(_.key.key) must contain("schemeBankDetails.accountNumber.heading")
       }
     }
 
@@ -94,7 +95,7 @@ class SchemeBankAccountCheckYourAnswersControllerSpec extends ControllerBaseSpec
 
       forAll(srnGen, bankAccountGen) { (srn, bankAccount) =>
 
-        viewModel(srn, bankAccount).rows.map(_.key.key) must contain("schemeBankDetails.sortCode.heading")
+        viewModel(srn, indexOne, bankAccount).rows.map(_.key.key) must contain("schemeBankDetails.sortCode.heading")
       }
     }
 
@@ -102,7 +103,7 @@ class SchemeBankAccountCheckYourAnswersControllerSpec extends ControllerBaseSpec
 
       forAll(srnGen, bankAccountGen) { (srn, bankAccount) =>
 
-        viewModel(srn, bankAccount).rows.map(_.value.key) must contain(bankAccount.bankName)
+        viewModel(srn, indexOne, bankAccount).rows.map(_.value.key) must contain(bankAccount.bankName)
       }
     }
 
@@ -110,7 +111,7 @@ class SchemeBankAccountCheckYourAnswersControllerSpec extends ControllerBaseSpec
 
       forAll(srnGen, bankAccountGen) { (srn, bankAccount) =>
 
-        viewModel(srn, bankAccount).rows.map(_.value.key) must contain(bankAccount.accountNumber)
+        viewModel(srn, indexOne, bankAccount).rows.map(_.value.key) must contain(bankAccount.accountNumber)
       }
     }
 
@@ -118,7 +119,7 @@ class SchemeBankAccountCheckYourAnswersControllerSpec extends ControllerBaseSpec
 
       forAll(srnGen, bankAccountGen) { (srn, bankAccount) =>
 
-        viewModel(srn, bankAccount).rows.map(_.value.key) must contain(bankAccount.sortCode)
+        viewModel(srn, indexOne, bankAccount).rows.map(_.value.key) must contain(bankAccount.sortCode)
       }
     }
 
@@ -127,9 +128,15 @@ class SchemeBankAccountCheckYourAnswersControllerSpec extends ControllerBaseSpec
       forAll(srnGen, bankAccountGen) { (srn, bankAccount) =>
 
         val content = SimpleMessage("site.change")
-        val href = routes.SchemeBankAccountController.onPageLoad(srn, NormalMode).url
+        val href = routes.SchemeBankAccountController.onPageLoad(srn, indexOne, NormalMode).url
 
-        viewModel(srn, bankAccount).rows.flatMap(_.actions) must contain allElementsOf List.fill(3)(content -> href)
+        val actions = List(
+          SummaryAction(content, href, SimpleMessage("schemeBankDetails.bankName.heading.vh")),
+          SummaryAction(content, href, SimpleMessage("schemeBankDetails.accountNumber.heading.vh")),
+          SummaryAction(content, href, SimpleMessage("schemeBankDetails.sortCode.heading.vh"))
+        )
+
+        viewModel(srn, indexOne, bankAccount).rows.flatMap(_.actions) must contain allElementsOf actions
       }
     }
 
@@ -137,7 +144,8 @@ class SchemeBankAccountCheckYourAnswersControllerSpec extends ControllerBaseSpec
 
       forAll(srnGen, bankAccountGen) { (srn, bankAccount) =>
 
-        viewModel(srn, bankAccount).onSubmit mustBe routes.SchemeBankAccountCheckYourAnswersController.onSubmit(srn)
+        viewModel(srn, indexOne, bankAccount).onSubmit mustBe
+          routes.SchemeBankAccountCheckYourAnswersController.onSubmit(srn)
       }
     }
   }

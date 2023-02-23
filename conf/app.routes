@@ -1,55 +1,56 @@
 # microservice specific routes
 
-->          /hmrc-frontend                               hmrcfrontend.Routes
+->          /hmrc-frontend                                        hmrcfrontend.Routes
 
-GET         /                                            controllers.IndexController.onPageLoad
+GET         /                                                     controllers.IndexController.onPageLoad
 
-GET         /assets/*file                                controllers.Assets.versioned(path="/public", file: Asset)
+GET         /assets/*file                                         controllers.Assets.versioned(path="/public", file: Asset)
 
-GET         /language/:lang                              controllers.LanguageSwitchController.switchToLanguage(lang: String)
+GET         /language/:lang                                       controllers.LanguageSwitchController.switchToLanguage(lang: String)
 
-GET         /refresh-session                             controllers.KeepAliveController.keepAlive
+GET         /refresh-session                                      controllers.KeepAliveController.keepAlive
 
-GET         /there-is-a-problem                          controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
+GET         /there-is-a-problem                                   controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 
-GET         /:srn/check-your-bank-details                controllers.SchemeBankAccountCheckYourAnswersController.onPageLoad(srn: Srn)
-GET         /:srn/check-your-bank-details-next-page      controllers.SchemeBankAccountCheckYourAnswersController.onSubmit(srn: Srn)
+GET         /account/sign-out-survey                              controllers.auth.AuthController.signOut
+GET         /account/sign-out                                     controllers.auth.AuthController.signOutNoSurvey
+GET         /account/signed-out                                   controllers.auth.SignedOutController.onPageLoad
 
-GET         /account/sign-out-survey                     controllers.auth.AuthController.signOut
-GET         /account/sign-out                            controllers.auth.AuthController.signOutNoSurvey
-GET         /account/signed-out                          controllers.auth.SignedOutController.onPageLoad
+GET         /unauthorised                                         controllers.UnauthorisedController.onPageLoad
 
-GET         /unauthorised                                controllers.UnauthorisedController.onPageLoad
+GET         /:srn/start                                           controllers.StartPageController.onPageLoad(srn: Srn)
+GET         /:srn/start-next-page                                 controllers.StartPageController.onSubmit(srn: Srn)
 
-GET         /:srn/start                                  controllers.StartPageController.onPageLoad(srn: Srn)
-GET         /:srn/start-next-page                        controllers.StartPageController.onSubmit(srn: Srn)
+GET         /:srn/check-dates                                     controllers.CheckReturnDatesController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/check-dates                                     controllers.CheckReturnDatesController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 
-GET         /:srn/check-dates                            controllers.CheckReturnDatesController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST        /:srn/check-dates                            controllers.CheckReturnDatesController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/change-check-dates                              controllers.CheckReturnDatesController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-check-dates                              controllers.CheckReturnDatesController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
-GET         /:srn/change-check-dates                     controllers.CheckReturnDatesController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST        /:srn/change-check-dates                     controllers.CheckReturnDatesController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+GET         /:srn/scheme-details                                  controllers.SchemeDetailsController.onPageLoad(srn: Srn)
+GET         /:srn/scheme-details-next-page                        controllers.SchemeDetailsController.onSubmit(srn: Srn)
 
-GET         /:srn/scheme-details                         controllers.SchemeDetailsController.onPageLoad(srn: Srn)
-GET         /:srn/scheme-details-next-page               controllers.SchemeDetailsController.onSubmit(srn: Srn)
+GET         /:srn/enter-bank-details                              controllers.SchemeBankAccountController.onPageLoad(srn: Srn, index: Max10 = 1, mode: Mode = NormalMode)
+POST        /:srn/enter-bank-details                              controllers.SchemeBankAccountController.onSubmit(srn: Srn, index: Max10 = 1, mode: Mode = NormalMode)
 
-GET         /:srn/enter-bank-details                     controllers.SchemeBankAccountController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST        /:srn/enter-bank-details                     controllers.SchemeBankAccountController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/enter-bank-details/:index                       controllers.SchemeBankAccountController.onPageLoad(srn: Srn, index: Max10, mode: Mode = NormalMode)
+POST        /:srn/enter-bank-details/:index                       controllers.SchemeBankAccountController.onSubmit(srn: Srn, index: Max10, mode: Mode = NormalMode)
 
-GET         /:srn/change-enter-bank-details              controllers.SchemeBankAccountController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST        /:srn/change-enter-bank-details              controllers.SchemeBankAccountController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+GET         /:srn/change-enter-bank-details                       controllers.SchemeBankAccountController.onPageLoad(srn: Srn, index: Max10 = 1, mode: Mode = CheckMode)
+POST        /:srn/change-enter-bank-details                       controllers.SchemeBankAccountController.onSubmit(srn: Srn, index: Max10 = 1, mode: Mode = CheckMode)
 
-GET         /:srn/accounting-period                      controllers.AccountingPeriodController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST        /:srn/accounting-period                      controllers.AccountingPeriodController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/change-enter-bank-details/:index                controllers.SchemeBankAccountController.onPageLoad(srn: Srn, index: Max10, mode: Mode = CheckMode)
+POST        /:srn/change-enter-bank-details/:index                controllers.SchemeBankAccountController.onSubmit(srn: Srn, index: Max10, mode: Mode = CheckMode)
 
-GET         /:srn/change-accounting-period               controllers.AccountingPeriodController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST        /:srn/change-accounting-period               controllers.AccountingPeriodController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+GET         /:srn/check-bank-account/:index                       controllers.SchemeBankAccountCheckYourAnswersController.onPageLoad(srn: Srn, index: Max10)
+GET         /:srn/check-bank-account-next-page                    controllers.SchemeBankAccountCheckYourAnswersController.onSubmit(srn: Srn)
 
-GET         /:srn/enter-bank-details                     controllers.SchemeBankAccountController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST        /:srn/enter-bank-details                     controllers.SchemeBankAccountController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/bank-accounts                                   controllers.SchemeBankAccountListController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/bank-accounts                                   controllers.SchemeBankAccountListController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 
-GET         /:srn/change-enter-bank-details              controllers.SchemeBankAccountController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST        /:srn/change-enter-bank-details              controllers.SchemeBankAccountController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+GET         /:srn/accounting-period                               controllers.AccountingPeriodController.onPageLoad(srn: Srn, index: Max3 = 1, mode: Mode = NormalMode)
+GET         /:srn/accounting-period/:index                        controllers.AccountingPeriodController.onPageLoad(srn: Srn, index: Max3, mode: Mode = NormalMode)
+POST        /:srn/accounting-period/:index                        controllers.AccountingPeriodController.onSubmit(srn: Srn, index: Max3, mode: Mode = NormalMode)
 
-GET         /:srn/check-bank-account                     controllers.SchemeBankAccountCheckYourAnswersController.onPageLoad(srn: Srn)
-GET         /:srn/check-bank-account-next-page           controllers.SchemeBankAccountCheckYourAnswersController.onSubmit(srn: Srn)
+GET         /:srn/change-accounting-period/:index                 controllers.AccountingPeriodController.onPageLoad(srn: Srn, index: Max3, mode: Mode = CheckMode)
+POST        /:srn/change-accounting-period/:index                 controllers.AccountingPeriodController.onSubmit(srn: Srn, index: Max3, mode: Mode = CheckMode)

@@ -17,7 +17,6 @@
 package controllers
 
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
 import views.html.UnauthorisedView
 
 class UnauthorisedControllerSpec extends ControllerBaseSpec {

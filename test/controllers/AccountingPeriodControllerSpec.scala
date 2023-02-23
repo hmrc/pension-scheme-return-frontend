@@ -16,18 +16,18 @@
 
 package controllers
 
+import eu.timepit.refined.refineMV
 import forms.DateRangeFormProvider
 import models.{DateRange, NormalMode}
 import pages.AccountingPeriodPage
-import uk.gov.hmrc.time.TaxYear
 import views.html.DateRangeView
 
 class AccountingPeriodControllerSpec extends ControllerBaseSpec {
 
   "AccountingPeriodController" should {
 
-    val form = AccountingPeriodController.form(new DateRangeFormProvider(), defaultTaxYear)
-    lazy val viewModel = AccountingPeriodController.viewModel(srn, NormalMode)
+    val form = AccountingPeriodController.form(new DateRangeFormProvider(), defaultTaxYear, List())
+    lazy val viewModel = AccountingPeriodController.viewModel(srn, refineMV(1), NormalMode)
 
     val rangeGen = dateRangeWithinRangeGen(DateRange(defaultTaxYear.starts, defaultTaxYear.finishes))
     val dateRangeData = rangeGen.sample.value
@@ -35,15 +35,15 @@ class AccountingPeriodControllerSpec extends ControllerBaseSpec {
 
     def formData(range: DateRange) = form.fill(range).data.toList
 
-    lazy val onPageLoad = routes.AccountingPeriodController.onPageLoad(srn, NormalMode)
-    lazy val onSubmit = routes.AccountingPeriodController.onSubmit(srn, NormalMode)
+    lazy val onPageLoad = routes.AccountingPeriodController.onPageLoad(srn, refineMV(1), NormalMode)
+    lazy val onSubmit = routes.AccountingPeriodController.onSubmit(srn, refineMV(1), NormalMode)
 
     behave like renderView(onPageLoad) { implicit app => implicit request =>
       val view = injected[DateRangeView]
       view(form, viewModel)
     }
 
-    behave like renderPrePopView(onPageLoad, AccountingPeriodPage(srn), dateRangeData) { implicit app => implicit request =>
+    behave like renderPrePopView(onPageLoad, AccountingPeriodPage(srn, refineMV(1)), dateRangeData) { implicit app => implicit request =>
       val view = injected[DateRangeView]
       view(form.fill(dateRangeData), viewModel)
     }
@@ -57,13 +57,17 @@ class AccountingPeriodControllerSpec extends ControllerBaseSpec {
     behave like journeyRecoveryPage("onSubmit", onSubmit)
 
     "allow accounting period to be updated" when {
-      val userAnswers = emptyUserAnswers.set(AccountingPeriodPage(srn), dateRangeData).get
+      val userAnswers = emptyUserAnswers.set(AccountingPeriodPage(srn, refineMV(1)), dateRangeData).get
       behave like saveAndContinue(onSubmit, userAnswers, formData(dateRangeData): _*)
     }
 
     "return a 400 if range intersects" when {
-      //val userAnswers = emp
+      val userAnswers =
+        emptyUserAnswers
+          .set(AccountingPeriodPage(srn, refineMV(1)), otherDateRangeData).get
+          .set(AccountingPeriodPage(srn, refineMV(2)), dateRangeData).get
 
+      behave like invalidForm(onSubmit, userAnswers, formData(dateRangeData): _*)
     }
   }
 }

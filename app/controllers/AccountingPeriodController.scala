@@ -17,26 +17,26 @@
 package controllers
 
 import com.google.inject.Inject
+import config.Refined.Max3
 import controllers.actions._
 import forms.DateRangeFormProvider
 import forms.mappings.DateFormErrors
 import models.SchemeId.Srn
+import models.requests.DataRequest
 import models.{DateRange, Mode}
 import navigation.Navigator
-import pages.AccountingPeriodPage
+import pages.{AccountingPeriodPage, AccountingPeriods}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{SaveService, TaxYearService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.time.TaxYear
-import utils.DateTimeUtils
 import utils.FormUtils._
-import viewmodels.DisplayMessage.SimpleMessage
+import utils.RefinedUtils.RefinedIntOps
 import viewmodels.models.DateRangeViewModel
 import views.html.DateRangeView
 
-import java.time.LocalDate
 import scala.concurrent.{ExecutionContext, Future}
 
 class AccountingPeriodController @Inject()(
@@ -53,60 +53,67 @@ class AccountingPeriodController @Inject()(
   taxYearService: TaxYearService
 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  private val form = AccountingPeriodController.form(formProvider, taxYearService.current)
+  private def form(usedAccountingPeriods: List[DateRange] = List()) =
+    AccountingPeriodController.form(formProvider, taxYearService.current, usedAccountingPeriods)
   private val viewModel = AccountingPeriodController.viewModel _
 
-  def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = (identify andThen allowAccess(srn) andThen getData andThen requireData) {
+  def onPageLoad(srn: Srn, index: Max3, mode: Mode): Action[AnyContent] = (identify andThen allowAccess(srn) andThen getData andThen requireData) {
     implicit request =>
-      Ok(view(form.fromUserAnswers(AccountingPeriodPage(srn)), viewModel(srn, mode)))
+      Ok(view(form().fromUserAnswers(AccountingPeriodPage(srn, index)), viewModel(srn, index, mode)))
   }
 
-  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = (identify andThen allowAccess(srn) andThen getData andThen requireData).async {
+  def onSubmit(srn: Srn, index: Max3, mode: Mode): Action[AnyContent] = (identify andThen allowAccess(srn) andThen getData andThen requireData).async {
     implicit request =>
-      form.bindFromRequest().fold(
-        formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, mode)))),
+
+      val usedAccountingPeriods = duplicateAccountingPeriods(srn, index)
+
+      form(usedAccountingPeriods).bindFromRequest().fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode)))),
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(AccountingPeriodPage(srn), value))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(AccountingPeriodPage(srn, index), value))
             _              <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage(AccountingPeriodPage(srn), mode, updatedAnswers))
+          } yield Redirect(navigator.nextPage(AccountingPeriodPage(srn, index), mode, updatedAnswers))
       )
   }
+
+  def duplicateAccountingPeriods(srn: Srn, index: Max3)(implicit request: DataRequest[_]): List[DateRange] =
+    request.userAnswers.list(AccountingPeriods(srn)).patch(index.arrayIndex, Nil, 1)
 }
 
 object AccountingPeriodController {
 
-  def form(formProvider: DateRangeFormProvider, taxYear: TaxYear): Form[DateRange] = formProvider(
+  def form(formProvider: DateRangeFormProvider, taxYear: TaxYear, usedAccountingPeriods: List[DateRange]): Form[DateRange] = formProvider(
     DateFormErrors(
-      "accountingPeriod.startDate.required.all",
-      "accountingPeriod.startDate.required.day",
-      "accountingPeriod.startDate.required.month",
-      "accountingPeriod.startDate.required.year",
-      "accountingPeriod.startDate.required.two",
-      "accountingPeriod.startDate.invalid.date",
-      "accountingPeriod.startDate.invalid.characters",
+      "accountingPeriod.startDate.error.required.all",
+      "accountingPeriod.startDate.error.required.day",
+      "accountingPeriod.startDate.error.required.month",
+      "accountingPeriod.startDate.error.required.year",
+      "accountingPeriod.startDate.error.required.two",
+      "accountingPeriod.startDate.error.invalid.date",
+      "accountingPeriod.startDate.error.invalid.characters",
     ),
     DateFormErrors(
-      "accountingPeriod.endDate.required.all",
-      "accountingPeriod.endDate.required.day",
-      "accountingPeriod.endDate.required.month",
-      "accountingPeriod.endDate.required.year",
-      "accountingPeriod.endDate.required.two",
-      "accountingPeriod.endDate.invalid.date",
-      "accountingPeriod.endDate.invalid.characters"
+      "accountingPeriod.endDate.error.required.all",
+      "accountingPeriod.endDate.error.required.day",
+      "accountingPeriod.endDate.error.required.month",
+      "accountingPeriod.endDate.error.required.year",
+      "accountingPeriod.endDate.error.required.two",
+      "accountingPeriod.endDate.error.invalid.date",
+      "accountingPeriod.endDate.error.invalid.characters"
     ),
-    "accountingPeriod.range.invalid",
+    "accountingPeriod.endDate.error.range.invalid",
     Some(DateRange(taxYear.starts, taxYear.finishes)),
-    Some("accountingPeriod.startDate.outsideTaxYear"),
-    Some("accountingPeriod.endDate.outsideTaxYear"),
-    Some("accountingPeriod.startDate.duplicate"),
-    List()
+    Some("accountingPeriod.startDate.error.outsideTaxYear"),
+    Some("accountingPeriod.endDate.error.outsideTaxYear"),
+    Some("accountingPeriod.startDate.error.duplicate"),
+    usedAccountingPeriods
   )
 
-  def viewModel(srn: Srn, mode: Mode): DateRangeViewModel = DateRangeViewModel(
+  def viewModel(srn: Srn, index: Max3, mode: Mode): DateRangeViewModel = DateRangeViewModel(
     "accountingPeriod.title",
     "accountingPeriod.heading",
     Some("accountingPeriod.description"),
-    routes.AccountingPeriodController.onSubmit(srn, mode)
+    routes.AccountingPeriodController.onSubmit(srn, index, mode)
   )
 }

@@ -16,23 +16,6 @@
 
 package pages
 
-import config.Refined.Max3
-import models.DateRange
 import models.SchemeId.Srn
-import play.api.libs.json.JsPath
-import queries.Gettable
-import utils.RefinedUtils.RefinedIntOps
 
-case class AccountingPeriodPage(srn: Srn, index: Max3) extends QuestionPage[DateRange] {
-
-  override def path: JsPath = JsPath \ toString \ index.arrayIndex
-
-  override def toString: String = "accountPeriod"
-}
-
-case class AccountingPeriods(srn: Srn) extends Gettable[List[DateRange]] {
-
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "accountPeriod"
-}
+case class SchemeBankAccountListPage(srn: Srn, addBankAccount: Boolean) extends Page

@@ -28,5 +28,5 @@ object DateTimeUtils {
     localDate.format(formatter)
   }
 
-  implicit val localDateShow: Show[LocalDate] = formatHtml
+  implicit val localDateShow: Show[LocalDate] = d => formatHtml(d)
 }

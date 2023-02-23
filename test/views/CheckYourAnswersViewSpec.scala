@@ -18,11 +18,9 @@ package views
 
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.test.FakeRequest
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{ActionItem, SummaryList}
 import utils.BaseSpec
+import viewmodels.models.SummaryAction
 import views.html.CheckYourAnswersView
-
-import scala.language.postfixOps
 
 class CheckYourAnswersViewSpec extends BaseSpec with ScalaCheckPropertyChecks with HtmlHelper {
 
@@ -75,7 +73,7 @@ class CheckYourAnswersViewSpec extends BaseSpec with ScalaCheckPropertyChecks wi
           val actions =
             viewModel.rows
               .flatMap(_.actions)
-              .map { case (content, href) => AnchorTag(href, content.key) }
+              .map { case SummaryAction(content, href, vh) => AnchorTag(href, s"${content.key} ${vh.key}") }
 
           summaryListActions(view(viewModel)) must contain theSameElementsAs actions
         }

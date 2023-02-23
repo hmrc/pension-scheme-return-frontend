@@ -14,25 +14,14 @@
  * limitations under the License.
  */
 
-package pages
+package utils
 
-import config.Refined.Max3
-import models.DateRange
-import models.SchemeId.Srn
-import play.api.libs.json.JsPath
-import queries.Gettable
-import utils.RefinedUtils.RefinedIntOps
+import eu.timepit.refined.api.Refined
 
-case class AccountingPeriodPage(srn: Srn, index: Max3) extends QuestionPage[DateRange] {
+object RefinedUtils {
 
-  override def path: JsPath = JsPath \ toString \ index.arrayIndex
+  implicit class RefinedIntOps[T](val refined: Int Refined T) {
 
-  override def toString: String = "accountPeriod"
-}
-
-case class AccountingPeriods(srn: Srn) extends Gettable[List[DateRange]] {
-
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "accountPeriod"
+    def arrayIndex: Int = refined.value - 1
+  }
 }

@@ -47,18 +47,21 @@ object CheckYourAnswersViewModel {
 case class CheckYourAnswersRowViewModel(
   key: SimpleMessage,
   value: SimpleMessage,
-  actions: Seq[(SimpleMessage, String)]
+  actions: Seq[SummaryAction]
 ) {
 
   def toSummaryListRow(implicit messages: Messages): SummaryListRow = {
     SummaryListRowViewModel(
       key = key.toMessage,
       value = value.toMessage,
-      actions = actions.map { case (content, href) => ActionItemViewModel(Text(content.toMessage), href) }
+      actions = actions.map { a =>
+        ActionItemViewModel(Text(a.content.toMessage), a.href)
+          .withVisuallyHiddenText(a.visuallyHiddenContent.toMessage)
+      }
     )
   }
 
-  def withAction(action: (SimpleMessage, String)): CheckYourAnswersRowViewModel =
+  def withAction(action: SummaryAction): CheckYourAnswersRowViewModel =
     copy(actions = actions :+ action)
 }
 
@@ -69,4 +72,16 @@ object CheckYourAnswersRowViewModel {
     value: String
   ): CheckYourAnswersRowViewModel =
     CheckYourAnswersRowViewModel(SimpleMessage(key), SimpleMessage(value), Seq())
+}
+
+case class SummaryAction(content: SimpleMessage, href: String, visuallyHiddenContent: SimpleMessage) {
+
+  def withVisuallyHiddenContent(content: SimpleMessage): SummaryAction = copy(visuallyHiddenContent = content)
+  def withVisuallyHiddenContent(content: String): SummaryAction = withVisuallyHiddenContent(SimpleMessage(content))
+}
+
+object SummaryAction {
+
+  def apply(content: String, href: String): SummaryAction =
+    SummaryAction(SimpleMessage(content), href, SimpleMessage(""))
 }

@@ -21,14 +21,14 @@ import connectors.MinimalDetailsError.{DelimitedAdmin, DetailsNotFound}
 import connectors.{MinimalDetailsConnector, MinimalDetailsError, SchemeDetailsConnector}
 import controllers.routes
 import models.PensionSchemeId.{PsaId, PspId}
-import models.{MinimalDetails, SchemeDetails}
 import models.SchemeId.Srn
 import models.requests.IdentifierRequest
 import models.requests.IdentifierRequest.{AdministratorRequest, PractitionerRequest}
+import models.{MinimalDetails, SchemeDetails}
 import org.mockito.ArgumentMatchers.{any, eq => meq}
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.Application
-import play.api.http.Status.{OK, UNAUTHORIZED}
+import play.api.http.Status.OK
 import play.api.libs.json.Json
 import play.api.mvc.Results.Ok
 import play.api.mvc.{Action, AnyContent}

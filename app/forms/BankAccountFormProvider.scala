@@ -45,10 +45,12 @@ class BankAccountFormProvider @Inject()() extends Mappings {
     accountNumberRequired: String,
     accountNumberInvalid: String,
     accountNumberWrongLength: String,
+    accountNumberDuplicate: String,
     sortCodeRequired: String,
     sortCodeInvalid: String,
     sortCodeInvalidFormat: String,
-    sortCodeWrongLength: String
+    sortCodeWrongLength: String,
+    usedAccountNumbers: List[String]
   ): Form[BankAccount] = Form(
     mapping(
       "bankName" -> text(bankNameRequired).verifying(firstError(
@@ -57,7 +59,8 @@ class BankAccountFormProvider @Inject()() extends Mappings {
       )),
       "accountNumber" -> text(accountNumberRequired).verifying(firstError(
         regexp(accountNumberRegex, accountNumberInvalid),
-        lengthBetween(accountNumberMinLength, accountNumberMaxLength, accountNumberWrongLength)
+        lengthBetween(accountNumberMinLength, accountNumberMaxLength, accountNumberWrongLength),
+        failWhen[String](usedAccountNumbers.contains, accountNumberDuplicate)
       )),
       "sortCode" -> text(sortCodeRequired).verifying(firstError[String](
         regexp(sortCodeValidRegex, sortCodeInvalid),
