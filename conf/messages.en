@@ -60,10 +60,9 @@ unauthorised.heading = You can’t access this service with this account
 
 startPage.title = Submit a pension scheme return
 startPage.heading = Submit a pension scheme return
-startPage.paragraph1 = Use this online service to submit a pension scheme return. This is a compliance report which asks you questions about your scheme and its members. You will need to provide information about member contributions, loans and assets held by the scheme, and any transfers in or out.
-startPage.paragraph2 = You should only use this service if you have received a notice to file telling you to complete a pension scheme return.
-startPage.paragraph3 = You must submit the return by the deadline given on the notice to file. You will be charged a £100 penalty if it is not received by the deadline.
-startPage.paragraph4 = You do not have to complete the whole return at once. You can save your answers and come back to them later.
+startPage.paragraph1 = Use this online service to submit a pension scheme return.
+startPage.paragraph2 = You must submit the return by the deadline. You may be charged penalties if it is not received by the deadline.
+startPage.paragraph3 = You do not have to complete the whole return at once. You can save your answers and come back to them later.
 
 checkReturnDates.title = Check the dates of your return
 checkReturnDates.heading = Check the dates of your return
