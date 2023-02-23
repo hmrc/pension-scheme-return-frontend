@@ -16,10 +16,13 @@
 
 package views
 
-import forms.DateRangeFormProvider
-import forms.mappings.DateFormErrors
+import models.DateRange
+import play.api.data
+import play.api.data.Forms.{mapping, text}
 import play.api.test.FakeRequest
 import views.html.DateRangeView
+
+import java.time.LocalDate
 
 class DateRangeViewSpec extends ViewSpec {
 
@@ -28,15 +31,18 @@ class DateRangeViewSpec extends ViewSpec {
 
     implicit val request = FakeRequest()
 
-    val dateErrors = DateFormErrors("required", "day", "month", "year", "two", "invalid", "chars")
-    val dateRangeForm = new DateRangeFormProvider()(
-      dateErrors.copy(required = "startDate.required"),
-      dateErrors.copy(required = "endDate.required"),
-      "error.invalid.range",
-      None,
-      None,
-      None
-    )
+    def localDateMapping(error: String) =
+      text.verifying(error, _.nonEmpty).transform[LocalDate](LocalDate.parse, _.toString)
+
+    val dateRangeForm =
+      data.Form(
+        mapping(
+          "dates" -> mapping(
+            "startDate" -> localDateMapping("startDate.required"),
+            "endDate"   -> localDateMapping("endDate.required")
+          )(DateRange.apply)(DateRange.unapply)
+        )(identity)(Some(_))
+      )
 
 
     "DateRangeView" should {
@@ -96,7 +102,7 @@ class DateRangeViewSpec extends ViewSpec {
 
         forAll(dateRangeViewModelGen) { viewModel =>
 
-          val invalidForm = dateRangeForm.bind(Map[String, String]())
+          val invalidForm = dateRangeForm.bind(Map[String, String]("dates.startDate" -> ""))
           errorSummary(view(invalidForm, viewModel)).text() must include("startDate.required")
         }
       }
@@ -105,7 +111,7 @@ class DateRangeViewSpec extends ViewSpec {
 
         forAll(dateRangeViewModelGen) { viewModel =>
 
-          val invalidForm = dateRangeForm.bind(Map[String, String]())
+          val invalidForm = dateRangeForm.bind(Map[String, String]("dates.startDate" -> ""))
           errorMessage(view(invalidForm, viewModel)).text() must include("startDate.required")
         }
       }
@@ -114,7 +120,7 @@ class DateRangeViewSpec extends ViewSpec {
 
         forAll(dateRangeViewModelGen) { viewModel =>
 
-          val invalidForm = dateRangeForm.bind(Map[String, String]())
+          val invalidForm = dateRangeForm.bind(Map[String, String]("dates.endDate" -> ""))
           errorSummary(view(invalidForm, viewModel)).text() must include("endDate.required")
         }
       }
@@ -123,7 +129,7 @@ class DateRangeViewSpec extends ViewSpec {
 
         forAll(dateRangeViewModelGen) { viewModel =>
 
-          val invalidForm = dateRangeForm.bind(Map[String, String]())
+          val invalidForm = dateRangeForm.bind(Map[String, String]("dates.endDate" -> ""))
           errorMessage(view(invalidForm, viewModel)).text() must include("endDate.required")
         }
       }

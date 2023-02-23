@@ -22,14 +22,18 @@ import pages.AccountingPeriodPage
 import uk.gov.hmrc.time.TaxYear
 import views.html.DateRangeView
 
-class AccountingPeriodControllerSpec extends ControllerBaseSpec with ControllerBehaviours {
+class AccountingPeriodControllerSpec extends ControllerBaseSpec {
 
   "AccountingPeriodController" should {
 
     val form = AccountingPeriodController.form(new DateRangeFormProvider(), defaultTaxYear)
     lazy val viewModel = AccountingPeriodController.viewModel(srn, NormalMode)
 
-    val data = dateRangeWithinRangeGen(DateRange(defaultTaxYear.starts, defaultTaxYear.finishes)).sample.value
+    val rangeGen = dateRangeWithinRangeGen(DateRange(defaultTaxYear.starts, defaultTaxYear.finishes))
+    val dateRangeData = rangeGen.sample.value
+    val otherDateRangeData = rangeGen.sample.value
+
+    def formData(range: DateRange) = form.fill(range).data.toList
 
     lazy val onPageLoad = routes.AccountingPeriodController.onPageLoad(srn, NormalMode)
     lazy val onSubmit = routes.AccountingPeriodController.onSubmit(srn, NormalMode)
@@ -39,17 +43,27 @@ class AccountingPeriodControllerSpec extends ControllerBaseSpec with ControllerB
       view(form, viewModel)
     }
 
-    behave like renderPrePopView(onPageLoad, AccountingPeriodPage(srn), data) { implicit app => implicit request =>
+    behave like renderPrePopView(onPageLoad, AccountingPeriodPage(srn), dateRangeData) { implicit app => implicit request =>
       val view = injected[DateRangeView]
-      view(form.fill(data), viewModel)
+      view(form.fill(dateRangeData), viewModel)
     }
 
     behave like journeyRecoveryPage("onPageLoad", onPageLoad)
 
-    behave like redirectNextPage(onSubmit, form.fill(data).data.toList: _*)
+    behave like saveAndContinue(onSubmit, formData(dateRangeData): _*)
     
     behave like invalidForm(onSubmit)
 
     behave like journeyRecoveryPage("onSubmit", onSubmit)
+
+    "allow accounting period to be updated" when {
+      val userAnswers = emptyUserAnswers.set(AccountingPeriodPage(srn), dateRangeData).get
+      behave like saveAndContinue(onSubmit, userAnswers, formData(dateRangeData): _*)
+    }
+
+    "return a 400 if range intersects" when {
+      //val userAnswers = emp
+
+    }
   }
 }

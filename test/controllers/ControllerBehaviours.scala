@@ -16,7 +16,9 @@
 
 package controllers
 
+import models.UserAnswers
 import navigation.{FakeNavigator, Navigator}
+import org.mockito.ArgumentMatchers.any
 import play.api.Application
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -25,6 +27,9 @@ import play.api.mvc.{Call, Request}
 import play.api.test.FakeRequest
 import play.twirl.api.Html
 import queries.Settable
+import services.SaveService
+
+import scala.concurrent.Future
 
 trait ControllerBehaviours {
   _: ControllerBaseSpec =>
@@ -108,4 +113,31 @@ trait ControllerBehaviours {
         redirectLocation(result).value mustEqual onwardsUrl.url
       }
     }
+
+  def saveAndContinue(call: => Call, userAnswers: UserAnswers, form: (String, String)*): Unit =
+    "save data and continue to next page" in {
+
+      val saveService = mock[SaveService]
+      when(saveService.save(any())(any())).thenReturn(Future.successful(()))
+
+      val appBuilder = applicationBuilder(Some(userAnswers))
+        .overrides(
+          bind[SaveService].toInstance(saveService),
+          bind[Navigator].toInstance(new FakeNavigator(testOnwardRoute))
+        )
+
+      running(_ => appBuilder) { app =>
+        val request = FakeRequest(call).withFormUrlEncodedBody(form: _*)
+
+        val result = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual testOnwardRoute.url
+
+        verify(saveService, times(1)).save(any())(any())
+      }
+    }
+
+  def saveAndContinue(call: => Call, form: (String, String)*): Unit =
+    saveAndContinue(call, emptyUserAnswers, form: _*)
 }

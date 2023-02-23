@@ -48,7 +48,9 @@ class DateRangeMappingsSpec extends AnyFreeSpec with Matchers with ScalaCheckPro
     invalidCharacters = "error.invalid.characters"
   )
 
-  val form = Form(
+  val form = formWithDuplicates(Nil)
+
+  def formWithDuplicates(duplicateRanges: List[DateRange]) = Form(
     "value" -> dateRange(
       startDateErrors = dateFormErrors,
       endDateErrors = dateFormErrors,
@@ -56,6 +58,8 @@ class DateRangeMappingsSpec extends AnyFreeSpec with Matchers with ScalaCheckPro
       allowedRange = Some(allowedRange),
       startDateAllowedDateRangeError = Some("error.startDate.outsideRange"),
       endDateAllowedDateRangeError = Some("error.endDate.outsideRange"),
+      duplicateRangeError = Some("error.duplicate"),
+      duplicateRanges = duplicateRanges
     )
   )
 
@@ -192,6 +196,19 @@ class DateRangeMappingsSpec extends AnyFreeSpec with Matchers with ScalaCheckPro
         expectedEndDateError
       )
 
+    }
+  }
+
+  "must fail to bind if date range intersects another date range" in {
+
+    forAll(range(validDate)) { range =>
+
+      val data = makeData(range)
+      val excludedRanges = List(allowedRange)
+
+      val result = formWithDuplicates(excludedRanges).bind(data)
+
+      result.errors must contain only FormError("value.startDate", "error.duplicate")
     }
   }
 

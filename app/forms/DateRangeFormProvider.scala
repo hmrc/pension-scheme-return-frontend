@@ -30,7 +30,9 @@ class DateRangeFormProvider @Inject()() extends Mappings {
     invalidRangeError: String,
     allowedRange: Option[DateRange],
     startDateAllowedDateRangeError: Option[String],
-    endDateAllowedDateRangeError: Option[String]
+    endDateAllowedDateRangeError: Option[String],
+    duplicateRangeError: Option[String],
+    duplicateRanges: List[DateRange]
   ): Form[DateRange] =
     Form(
       mapping(
@@ -40,7 +42,9 @@ class DateRangeFormProvider @Inject()() extends Mappings {
           invalidRangeError,
           allowedRange,
           startDateAllowedDateRangeError,
-          endDateAllowedDateRangeError
+          endDateAllowedDateRangeError,
+          duplicateRangeError,
+          duplicateRanges
         )
       )(identity)(Some(_))
     )

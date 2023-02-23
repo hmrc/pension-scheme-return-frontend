@@ -98,7 +98,9 @@ object AccountingPeriodController {
     "accountingPeriod.range.invalid",
     Some(DateRange(taxYear.starts, taxYear.finishes)),
     Some("accountingPeriod.startDate.outsideTaxYear"),
-    Some("accountingPeriod.endDate.outsideTaxYear")
+    Some("accountingPeriod.endDate.outsideTaxYear"),
+    Some("accountingPeriod.startDate.duplicate"),
+    List()
   )
 
   def viewModel(srn: Srn, mode: Mode): DateRangeViewModel = DateRangeViewModel(

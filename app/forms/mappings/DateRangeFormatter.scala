@@ -32,7 +32,9 @@ private[mappings] class DateRangeFormatter(
                                             invalidRangeError: String,
                                             allowedRange: Option[DateRange],
                                             startDateAllowedDateRangeError: Option[String],
-                                            endDateAllowedDateRangeError: Option[String]
+                                            endDateAllowedDateRangeError: Option[String],
+                                            duplicateRangeError: Option[String],
+                                            duplicateRanges: List[DateRange]
                                           ) extends Formatter[DateRange] with Formatters {
 
   val startDateFormatter = new LocalDateFormatter(startDateErrors)
@@ -45,10 +47,17 @@ private[mappings] class DateRangeFormatter(
 
   private def verifyRangeBounds(key: String, date: LocalDate, error: Option[String]): Either[Seq[FormError], LocalDate] = {
     allowedRange.zip(error).map { case (range, error) =>
-      if(date.isAfter(range.from) && date.isBefore(range.to)) Right(date)
+      if(range.contains(date)) Right(date)
       else Left(List(FormError(key, error, List(date.show, range.from.show, range.to.show))))
     }.getOrElse(Right(date))
   }
+
+  private def verifyUniqueRange(key: String, range: DateRange): Either[Seq[FormError], DateRange] = {
+    duplicateRangeError.map { error =>
+      Either.cond(!duplicateRanges.exists(_.intersects(range)), range, Seq(FormError(s"$key.startDate", error)))
+    }.getOrElse(Right(range))
+  }
+
   override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], DateRange] = {
 
     for {
@@ -61,6 +70,7 @@ private[mappings] class DateRangeFormatter(
         verifyRangeBounds(s"$key.startDate", dateRange.from, startDateAllowedDateRangeError).toValidated,
         verifyRangeBounds(s"$key.endDate", dateRange.to, endDateAllowedDateRangeError).toValidated
       ).mapN(DateRange(_, _)).toEither
+      _         <- verifyUniqueRange(key, dateRange)
     } yield {
       dateRange
     }

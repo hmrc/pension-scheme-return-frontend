@@ -20,7 +20,14 @@ import play.api.libs.json.{Format, Json}
 
 import java.time.LocalDate
 
-case class DateRange(from: LocalDate, to: LocalDate)
+case class DateRange(from: LocalDate, to: LocalDate) {
+
+  def intersects(range: DateRange): Boolean =
+    contains(range.from) || contains(range.to)
+
+  def contains(date: LocalDate): Boolean =
+    date.isAfter(from) && date.isBefore(to)
+}
 
 object DateRange {
 

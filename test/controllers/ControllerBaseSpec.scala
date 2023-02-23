@@ -25,13 +25,10 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.mvc.Call
-import play.api.test.Helpers.running
 import play.api.test._
 import services.{FakeTaxYearService, TaxYearService}
 import uk.gov.hmrc.time.TaxYear
 import utils.BaseSpec
-
-import java.time.LocalDate
 
 trait ControllerBaseSpec
   extends BaseSpec

@@ -53,6 +53,8 @@ trait Mappings extends Formatters with Constraints {
                           invalidRangeError: String,
                           allowedRange: Option[DateRange],
                           startDateAllowedDateRangeError: Option[String],
-                          endDateAllowedDateRangeError: Option[String]): FieldMapping[DateRange] =
-    of(new DateRangeFormatter(startDateErrors, endDateErrors, invalidRangeError, allowedRange, startDateAllowedDateRangeError, endDateAllowedDateRangeError))
+                          endDateAllowedDateRangeError: Option[String],
+                          duplicateRangeError: Option[String],
+                          duplicateRanges: List[DateRange]): FieldMapping[DateRange] =
+    of(new DateRangeFormatter(startDateErrors, endDateErrors, invalidRangeError, allowedRange, startDateAllowedDateRangeError, endDateAllowedDateRangeError, duplicateRangeError, duplicateRanges))
 }
