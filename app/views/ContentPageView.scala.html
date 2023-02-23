@@ -34,7 +34,7 @@
     <p class="govuk-body">
         @govukButton(
             ButtonViewModel(viewmodel.buttonText.toMessage)
-                    .asLink(viewmodel.onSubmit.url)
+                    .asLink(viewmodel.onSubmit.url).asStartButton()
         )
     </p>
 }
