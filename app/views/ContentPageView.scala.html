@@ -33,8 +33,11 @@
 
     <p class="govuk-body">
         @govukButton(
-            ButtonViewModel(viewmodel.buttonText.toMessage)
-                    .asLink(viewmodel.onSubmit.url)
+            if(viewmodel.isStartButton)
+                ButtonViewModel(viewmodel.buttonText.toMessage).asLink(viewmodel.onSubmit.url).asStartButton()
+            else {
+                ButtonViewModel(viewmodel.buttonText.toMessage).asLink(viewmodel.onSubmit.url)
+            }
         )
     </p>
 }
