@@ -17,8 +17,7 @@
 package generators
 
 import org.scalacheck.Gen
-import org.scalacheck.Prop.True
-import viewmodels.models.{BankAccountViewModel, ContentPageViewModel, ContentTablePageViewModel, PensionSchemeViewModel, YesNoPageViewModel}
+import viewmodels.models._
 
 trait ViewModelGenerators extends BasicGenerators {
 
