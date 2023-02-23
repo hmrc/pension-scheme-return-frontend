@@ -21,6 +21,8 @@ import play.api
 import play.api.{Application, inject}
 import play.api.inject.bind
 import models.UserAnswers
+import org.mockito.ArgumentMatchers.any
+import org.mockito.IdiomaticMockito.once
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Writes
@@ -28,6 +30,9 @@ import play.api.mvc.{Call, Request}
 import play.api.test.FakeRequest
 import play.twirl.api.Html
 import queries.Settable
+import services.SaveService
+
+import scala.concurrent.Future
 
 trait ControllerBehaviours {
   _: ControllerBaseSpec =>
@@ -81,9 +86,9 @@ trait ControllerBehaviours {
       contentAsString(result) mustEqual expectedView.toString
     }
 
-  def invalidForm(call: => Call, form: (String, String)*): Unit =
+  def invalidForm(call: => Call, userAnswers: UserAnswers, form: (String, String)*): Unit =
     "return BAD_REQUEST for a POST with invalid form data" in {
-      val appBuilder = applicationBuilder(Some(defaultUserAnswers))
+      val appBuilder = applicationBuilder(Some(userAnswers))
 
       running(_ => appBuilder) { app =>
         val request = FakeRequest(call).withFormUrlEncodedBody(form: _*)
@@ -93,12 +98,14 @@ trait ControllerBehaviours {
       }
     }
 
+  def invalidForm(call: => Call, form: (String, String)*): Unit =
+    invalidForm(call, defaultUserAnswers, form: _*)
+
   def redirectNextPage(call: => Call, userAnswers: UserAnswers, form: (String, String)*): Unit =
     "redirect to the next page" in {
 
-      val onwardsUrl = Call(GET, "/foo")
       val appBuilder = applicationBuilder(Some(userAnswers)).overrides(
-        bind[Navigator].toInstance(new FakeNavigator(onwardsUrl))
+        bind[Navigator].toInstance(new FakeNavigator(testOnwardRoute))
       )
 
       running(_ => appBuilder) { app =>
@@ -107,7 +114,7 @@ trait ControllerBehaviours {
         val result = route(app, request).value
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardsUrl.url
+        redirectLocation(result).value mustEqual testOnwardRoute.url
       }
     }
 
@@ -127,4 +134,31 @@ trait ControllerBehaviours {
         redirectLocation(result).value mustEqual page.url
       }
     }
+
+  def saveAndContinue(call: => Call, userAnswers: UserAnswers, form: (String, String)*): Unit =
+    "save data and continue to next page" in {
+
+      val saveService = mock[SaveService]
+      when(saveService.save(any())(any())).thenReturn(Future.successful(()))
+
+      val appBuilder = applicationBuilder(Some(userAnswers))
+        .overrides(
+          bind[SaveService].toInstance(saveService),
+          bind[Navigator].toInstance(new FakeNavigator(testOnwardRoute))
+        )
+
+      running(_ => appBuilder) { app =>
+        val request = FakeRequest(call).withFormUrlEncodedBody(form: _*)
+
+        val result = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual testOnwardRoute.url
+
+        verify(saveService, times(1)).save(any())(any())
+      }
+    }
+
+  def saveAndContinue(call: => Call, form: (String, String)*): Unit =
+    saveAndContinue(call, defaultUserAnswers, form: _*)
 }

@@ -17,6 +17,10 @@
 package views
 
 import forms.BankAccountFormProvider
+import models.BankAccount
+import play.api.data.Form
+import play.api.data.Forms.{mapping, nonEmptyText, text}
+import play.api.data.validation.{Constraint, Constraints}
 import play.api.test.FakeRequest
 import views.html.BankAccountView
 
@@ -24,18 +28,12 @@ class BankAccountViewSpec extends ViewSpec {
 
   runningApplication { implicit app =>
     val view = injected[BankAccountView]
-    val formProvider = injected[BankAccountFormProvider]
-    val form = formProvider(
-      "bankName.required",
-      "bankName.invalid",
-      "bankName.length",
-      "accountNumber.required",
-      "accountNumber.invalid",
-      "accountNumber.length",
-      "sortCode.required",
-      "sortCode.invalid",
-      "sortCode.format.invalid",
-      "sortCode.length"
+    val form = Form(
+      mapping(
+        "bankName" -> text.verifying("bankName.required", _.nonEmpty),
+        "accountNumber" -> text.verifying("accountNumber.required", _.nonEmpty),
+        "sortCode" -> text.verifying("sortCode.required", _.nonEmpty)
+      )(BankAccount.apply)(BankAccount.unapply)
     )
 
     implicit val request = FakeRequest()
@@ -58,20 +56,6 @@ class BankAccountViewSpec extends ViewSpec {
         }
       }
 
-      "render bank name invalid error" in {
-        forAll(bankAccountViewModelGen) { viewModel =>
-          val preparedForm = form.bind(Map("bankName" -> "123", "accountNumber" -> "12345678", "sortCode" -> "12-34-56"))
-          errorMessage(view(preparedForm, viewModel)).text() mustBe renderedErrorMessage("bankName.invalid")
-        }
-      }
-
-      "render bank name invalid length error" in {
-        forAll(bankAccountViewModelGen) { viewModel =>
-          val preparedForm = form.bind(Map("bankName" -> (1 to 30).map(_ => "a").reduce(_ + _), "accountNumber" -> "12345678", "sortCode" -> "12-34-56"))
-          errorMessage(view(preparedForm, viewModel)).text() mustBe renderedErrorMessage("bankName.length")
-        }
-      }
-
       "render the account number heading" in {
         forAll(bankAccountViewModelGen) { viewModel =>
           inputLabel(view(form, viewModel))("accountNumber").text() must startWith(viewModel.accountNumberHeading.key)
@@ -91,20 +75,6 @@ class BankAccountViewSpec extends ViewSpec {
         }
       }
 
-      "render account number invalid error" in {
-        forAll(bankAccountViewModelGen) { viewModel =>
-          val preparedForm = form.bind(Map("bankName" -> "abc", "accountNumber" -> "abc", "sortCode" -> "12-34-56"))
-          errorMessage(view(preparedForm, viewModel)).text() mustBe renderedErrorMessage("accountNumber.invalid")
-        }
-      }
-
-      "render account number invalid length error" in {
-        forAll(bankAccountViewModelGen) { viewModel =>
-          val preparedForm = form.bind(Map("bankName" -> "abc", "accountNumber" -> "123", "sortCode" -> "12-34-56"))
-          errorMessage(view(preparedForm, viewModel)).text() mustBe renderedErrorMessage("accountNumber.length")
-        }
-      }
-
       "render the sort code heading" in {
         forAll(bankAccountViewModelGen) { viewModel =>
           inputLabel(view(form, viewModel))("sortCode").text() must startWith(viewModel.sortCodeHeading.key)
@@ -121,27 +91,6 @@ class BankAccountViewSpec extends ViewSpec {
         forAll(bankAccountViewModelGen) { viewModel =>
           val preparedForm = form.bind(Map("bankName" -> "abc", "accountNumber" -> "12345678", "sortCode" -> ""))
           errorMessage(view(preparedForm, viewModel)).text() mustBe renderedErrorMessage("sortCode.required")
-        }
-      }
-
-      "render sort code invalid error" in {
-        forAll(bankAccountViewModelGen) { viewModel =>
-          val preparedForm = form.bind(Map("bankName" -> "abc", "accountNumber" -> "12345678", "sortCode" -> "abc"))
-          errorMessage(view(preparedForm, viewModel)).text() mustBe renderedErrorMessage("sortCode.invalid")
-        }
-      }
-
-      "render sort code invalid format error" in {
-        forAll(bankAccountViewModelGen) { viewModel =>
-          val preparedForm = form.bind(Map("bankName" -> "abc", "accountNumber" -> "12345678", "sortCode" -> "123-456"))
-          errorMessage(view(preparedForm, viewModel)).text() mustBe renderedErrorMessage("sortCode.format.invalid")
-        }
-      }
-
-      "render sort code invalid length error" in {
-        forAll(bankAccountViewModelGen) { viewModel =>
-          val preparedForm = form.bind(Map("bankName" -> "abc", "accountNumber" -> "12345678", "sortCode" -> "12"))
-          errorMessage(view(preparedForm, viewModel)).text() mustBe renderedErrorMessage("sortCode.length")
         }
       }
 

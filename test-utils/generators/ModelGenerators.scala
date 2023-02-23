@@ -25,7 +25,7 @@ import models.cache.PensionSchemeUser.{Administrator, Practitioner}
 import models.requests.{AllowedAccessRequest, IdentifierRequest}
 import models.requests.IdentifierRequest.{AdministratorRequest, PractitionerRequest}
 import org.scalacheck.Gen
-import org.scalacheck.Gen.numChar
+import org.scalacheck.Gen.{alphaStr, numChar}
 import play.api.mvc.{AnyContent, Request}
 import play.api.test.FakeRequest
 
@@ -141,10 +141,10 @@ trait ModelGenerators extends BasicGenerators {
 
   val bankAccountGen: Gen[BankAccount] =
     for {
-      bankName      <- nonEmptyString
+      bankName      <- nonEmptyAlphaString.map(_.take(28))
       accountNumber <- Gen.listOfN(8, numChar).map(_.mkString)
       separator     <- Gen.oneOf("", " ", "-")
-      pairs          = Gen.listOf(2, numChar).map(_.mkString)
+      pairs          = Gen.listOfN(2, numChar).map(_.mkString)
       sortCode      <- Gen.listOfN(3, pairs).map(_.mkString(separator))
     } yield {
       BankAccount(bankName, accountNumber, sortCode)
