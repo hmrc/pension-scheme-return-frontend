@@ -24,20 +24,22 @@ case class ContentPageViewModel(
   heading: SimpleMessage,
   paragraphs: List[SimpleMessage],
   buttonText: SimpleMessage,
+  isStartButton: Boolean,
   onSubmit: Call
 )
 
 object ContentPageViewModel {
 
-  def apply(title: String, heading: String, buttonText: String, onSubmit: Call, paragraphs: String*): ContentPageViewModel =
-    ContentPageViewModel(title, heading, paragraphs.toList, buttonText, onSubmit)
+  def apply(title: String, heading: String, buttonText: String, isStartButton: Boolean, onSubmit: Call, paragraphs: String*): ContentPageViewModel =
+    ContentPageViewModel(title, heading, paragraphs.toList, buttonText, isStartButton, onSubmit)
 
-  def apply(title: String, heading: String, paragraphs: List[String], buttonText: String, onSubmit: Call): ContentPageViewModel =
+  def apply(title: String, heading: String, paragraphs: List[String], buttonText: String, isStartButton: Boolean, onSubmit: Call): ContentPageViewModel =
     ContentPageViewModel(
       SimpleMessage(title),
       SimpleMessage(heading),
       paragraphs.map(SimpleMessage(_)),
       SimpleMessage(buttonText),
+      isStartButton,
       onSubmit
     )
 }

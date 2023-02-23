@@ -59,6 +59,7 @@ object StartPageController {
     "startPage.title",
     "startPage.heading",
     "site.start",
+    isStartButton = true,
     routes.StartPageController.onSubmit(srn),
     "startPage.paragraph1",
     "startPage.paragraph2",
