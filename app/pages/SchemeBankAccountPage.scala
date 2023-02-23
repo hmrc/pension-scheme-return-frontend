@@ -21,10 +21,11 @@ import models.SchemeId.Srn
 import models.{BankAccount, UserAnswers}
 import play.api.libs.json.JsPath
 import queries.Gettable
+import utils.RefinedUtils.RefinedIntOps
 
 case class SchemeBankAccountPage(srn: Srn, index: Max10) extends QuestionPage[BankAccount] {
 
-  override def path: JsPath = JsPath \ toString \ (index.value - 1)
+  override def path: JsPath = JsPath \ toString \ (index.arrayIndex)
 
   override def toString: String = "schemeBankAccount"
 }
