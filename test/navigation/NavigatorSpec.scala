@@ -72,7 +72,7 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
           forAll(srnGen) { srn =>
             val ua = userAnswers
               .set(CheckReturnDatesPage(srn), true).get
-              .set(SchemeBankAccountPage(srn, 0), BankAccount("test", "11111111", "111111")).get
+              .set(SchemeBankAccountPage(srn, refineMV(1)), BankAccount("test", "11111111", "111111")).get
             navigator.nextPage(CheckReturnDatesPage(srn), NormalMode, ua) mustBe
               routes.SchemeBankAccountListController.onPageLoad(srn)
           }
@@ -89,13 +89,20 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
       }
     }
 
-    "go from scheme bank account page to scheme bank account list page" when {
+    "go from scheme bank account page to check your answers page" in {
 
-      "a valid bank account is entered" in {
-        forAll(srnGen) { srn =>
-          val ua = userAnswers.set(SchemeBankAccountPage(srn, 0), BankAccount("test", "11111111", "111111")).get
-          navigator.nextPage(SchemeBankAccountPage(srn, 0), NormalMode, ua) mustBe routes.SchemeBankAccountListController.onPageLoad(srn)
-        }
+      forAll(srnGen) { srn =>
+        val page = SchemeBankAccountPage(srn, refineMV(1))
+        navigator.nextPage(page, NormalMode, userAnswers) mustBe
+          routes.SchemeBankAccountCheckYourAnswersController.onPageLoad(srn, refineMV(1))
+      }
+    }
+
+    "go from bank account check your answers page to list page" in {
+
+      forAll(srnGen) { srn =>
+        val page = SchemeBankAccountCheckYourAnswersPage(srn)
+        navigator.nextPage(page, NormalMode, userAnswers) mustBe routes.SchemeBankAccountListController.onPageLoad(srn)
       }
     }
 
@@ -103,9 +110,10 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
       "yes is selected" in {
         forAll(srnGen) { srn =>
-          val ua = userAnswers.set(SchemeBankAccountPage(srn, 0), BankAccount("test", "11111111", "111111")).get
-          navigator.nextPage(SchemeBankAccountSummaryPage(srn, addBankAccount = true), NormalMode, ua) mustBe
-            routes.SchemeBankAccountController.onPageLoad(srn, refineMV[OneToTen](2), NormalMode)
+          val ua = userAnswers.set(SchemeBankAccountPage(srn, refineMV(1)), BankAccount("test", "11111111", "111111")).get
+          val page = SchemeBankAccountListPage(srn, addBankAccount = true)
+          navigator.nextPage(page, NormalMode, ua) mustBe
+            routes.SchemeBankAccountController.onPageLoad(srn, refineMV(2), NormalMode)
         }
       }
     }

@@ -64,8 +64,7 @@ trait ControllerBaseSpec
     new GuiceApplicationBuilder()
       .bindings(
         bind[Navigator].toInstance(new Navigator()).eagerly()
-      )
-      .overrides(
+      ).overrides(
         bind[DataRequiredAction].to[DataRequiredActionImpl],
         bind[IdentifierAction].to[FakeIdentifierAction],
         bind[AllowAccessActionProvider].toInstance(new FakeAllowAccessActionProvider(schemeDetails)),

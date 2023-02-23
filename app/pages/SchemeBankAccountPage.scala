@@ -16,14 +16,16 @@
 
 package pages
 
+import config.Refined.Max10
 import models.SchemeId.Srn
 import models.{BankAccount, UserAnswers}
 import play.api.libs.json.JsPath
 import queries.Gettable
+import utils.RefinedUtils.RefinedIntOps
 
-case class SchemeBankAccountPage(srn: Srn, index: Int) extends QuestionPage[BankAccount] {
+case class SchemeBankAccountPage(srn: Srn, index: Max10) extends QuestionPage[BankAccount] {
 
-  override def path: JsPath = JsPath \ toString \ index
+  override def path: JsPath = JsPath \ toString \ (index.arrayIndex)
 
   override def toString: String = "schemeBankAccount"
 }

@@ -18,7 +18,7 @@ package navigation
 
 import config.Refined.OneToTen
 import controllers.routes
-import eu.timepit.refined._
+import eu.timepit.refined.{refineMV, refineV}
 import models._
 import pages.SchemeBankAccounts.SchemeBankAccountsOps
 import pages._
@@ -32,6 +32,7 @@ class Navigator @Inject()() {
   private val normalRoutes: Page => UserAnswers => Call = {
     case StartPage(srn)             => _ => routes.SchemeDetailsController.onPageLoad(srn)
     case SchemeDetailsPage(srn)     => _ => routes.CheckReturnDatesController.onPageLoad(srn, NormalMode)
+
     case page @ CheckReturnDatesPage(srn) => {
       case ua if ua.get(page).contains(true) => ua.schemeBankAccounts(srn) match {
         case Nil => routes.SchemeBankAccountController.onPageLoad(srn, refineMV[OneToTen](1), NormalMode)
@@ -39,13 +40,17 @@ class Navigator @Inject()() {
       }
       case _ => routes.UnauthorisedController.onPageLoad
     }
-    case SchemeBankAccountPage(srn, _) => _ => routes.SchemeBankAccountListController.onPageLoad(srn)
-    case SchemeBankAccountSummaryPage(srn, true) => ua =>
+
+    case SchemeBankAccountPage(srn, index) => _ => routes.SchemeBankAccountCheckYourAnswersController.onPageLoad(srn, index)
+    case SchemeBankAccountCheckYourAnswersPage(srn) => _ =>
+      routes.SchemeBankAccountListController.onPageLoad(srn)
+    case SchemeBankAccountListPage(srn, true) => ua =>
       refineV[OneToTen](ua.schemeBankAccounts(srn).length + 1) match {
         case Left(_)          => routes.SchemeBankAccountListController.onPageLoad(srn)
         case Right(nextIndex) => routes.SchemeBankAccountController.onPageLoad(srn, nextIndex, NormalMode)
       }
-    case SchemeBankAccountSummaryPage(_, false) => _ => routes.UnauthorisedController.onPageLoad
+    case SchemeBankAccountListPage(_, false) => _ => routes.UnauthorisedController.onPageLoad
+
     case _              => _ => routes.IndexController.onPageLoad
   }
 

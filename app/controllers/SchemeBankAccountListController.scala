@@ -26,7 +26,7 @@ import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
 import models.{BankAccount, Mode}
 import navigation.Navigator
-import pages.SchemeBankAccountSummaryPage
+import pages.SchemeBankAccountListPage
 import pages.SchemeBankAccounts.SchemeBankAccountsOps
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -69,11 +69,11 @@ class SchemeBankAccountListController @Inject()(
     implicit request =>
       val bankAccounts = request.userAnswers.schemeBankAccounts(srn)
       if (bankAccounts.length == maxSchemeBankAccounts) {
-        Redirect(navigator.nextPage(SchemeBankAccountSummaryPage(srn, addBankAccount = false), mode, request.userAnswers))
+        Redirect(navigator.nextPage(SchemeBankAccountListPage(srn, addBankAccount = false), mode, request.userAnswers))
       } else {
         form.bindFromRequest().fold(
           formWithErrors => BadRequest(view(formWithErrors, viewModel(srn, mode, bankAccounts))),
-          value => Redirect(navigator.nextPage(SchemeBankAccountSummaryPage(srn, value), mode, request.userAnswers))
+          value => Redirect(navigator.nextPage(SchemeBankAccountListPage(srn, value), mode, request.userAnswers))
         )
       }
   }

@@ -16,38 +16,35 @@
 
 package controllers
 
+import config.Refined.OneToTen
 import controllers.SchemeBankAccountListController._
 import eu.timepit.refined.api.Refined
+import eu.timepit.refined.refineV
 import forms.YesNoPageFormProvider
 import models.{BankAccount, NormalMode, UserAnswers}
-import pages.{SchemeBankAccounts, SchemeBankAccountPage}
+import pages.SchemeBankAccountPage
 import play.api.Application
 import play.api.data.Form
+import play.api.mvc.Call
 import views.html.ListView
 
 class SchemeBankAccountListControllerTest extends ControllerBaseSpec {
 
-  private val onPageLoad = routes.SchemeBankAccountListController.onPageLoad(srn).url
-  private val onSubmit = routes.SchemeBankAccountListController.onSubmit(srn).url
+  private lazy val onPageLoad = routes.SchemeBankAccountListController.onPageLoad(srn)
+  private lazy val onSubmit = routes.SchemeBankAccountListController.onSubmit(srn)
 
-  private val redirectUrlFalse = controllers.routes.UnauthorisedController.onPageLoad.url
-  private val redirectUrlNoBankAccounts = schemeBankAccountRedirectUrl(1)
-  private val redirectNextPage = controllers.routes.UnauthorisedController.onPageLoad.url
+  private lazy val redirectUrlNoBankAccounts = schemeBankAccountRedirectUrl(1)
 
   "SchemeBankAccountSummaryController" should {
 
-    behave like redirectNextPage(onSubmit, redirectUrlFalse, "value" -> "false")
+    behave like redirectNextPage(onSubmit, "value" -> "false")
 
     "with 0 bank accounts" must {
-      behave like redirectOnPageLoad(onPageLoad, redirectUrlNoBankAccounts)
+      behave like redirectToPage(onPageLoad, redirectUrlNoBankAccounts)
     }
 
-    List(
-      (1, schemeBankAccountRedirectUrl(2)),
-      (9, schemeBankAccountRedirectUrl(10)),
-      (10, redirectNextPage)
-    ).foreach { case (numBankAccount, redirectOnSubmitUrl) =>
-      s"with $numBankAccount bank account" should {
+    List(1, 9, 10).foreach { case numBankAccount =>
+      s"with $numBankAccount bank account" must {
         val bankAccounts = buildBankAccounts(numBankAccount)
         val userAnswers = buildUserAnswers(bankAccounts)
 
@@ -55,8 +52,7 @@ class SchemeBankAccountListControllerTest extends ControllerBaseSpec {
           implicit request =>
             view.apply(form, viewModel(srn, NormalMode, bankAccounts))
         }
-        behave like redirectNextPage(onSubmit, redirectOnSubmitUrl, userAnswers, "value" -> "true")
-        behave like redirectNextPage(onSubmit, redirectNextPage, userAnswers, "value" -> "false")
+        behave like redirectNextPage(onSubmit, userAnswers, "value" -> "true")
       }
     }
   }
@@ -65,14 +61,14 @@ class SchemeBankAccountListControllerTest extends ControllerBaseSpec {
 
   private def form(implicit a: Application): Form[Boolean] = SchemeBankAccountListController.form(injected[YesNoPageFormProvider])
 
-  private def schemeBankAccountRedirectUrl(bankAccountIndex: Int): String =
-    controllers.routes.SchemeBankAccountController.onPageLoad(srn, Refined.unsafeApply(bankAccountIndex), NormalMode).url
+  private def schemeBankAccountRedirectUrl(bankAccountIndex: Int): Call =
+    controllers.routes.SchemeBankAccountController.onPageLoad(srn, Refined.unsafeApply(bankAccountIndex), NormalMode)
 
   private def buildBankAccounts(num: Int): List[BankAccount] = (1 to num).map(i => BankAccount(i.toString, accountNumber, sortCode)).toList
 
   private def buildUserAnswers(bankAccounts: List[BankAccount]): UserAnswers = {
     bankAccounts.zipWithIndex.foldLeft(defaultUserAnswers) { case (userAnswers, (bankAccount, index)) =>
-      userAnswers.set(SchemeBankAccountPage(srn, index), bankAccount).success.value
+      userAnswers.set(SchemeBankAccountPage(srn, refineV[OneToTen](index + 1).toOption.value), bankAccount).success.value
     }
   }
 }

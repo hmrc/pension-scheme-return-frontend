@@ -14,8 +14,14 @@
  * limitations under the License.
  */
 
-package pages
+package utils
 
-import models.SchemeId.Srn
+import eu.timepit.refined.api.Refined
 
-case class SchemeBankAccountSummaryPage(srn: Srn, addBankAccount: Boolean) extends Page
+object RefinedUtils {
+
+  implicit class RefinedIntOps[T](val refined: Int Refined T) {
+
+    def arrayIndex: Int = refined.value - 1
+  }
+}

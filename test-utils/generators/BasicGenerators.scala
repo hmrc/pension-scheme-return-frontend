@@ -87,6 +87,14 @@ trait BasicGenerators {
       s <- alphaNumStr
     } yield s"$c$s"
 
+  def nonEmptyAlphaString: Gen[String] =
+    for {
+      c <- alphaChar
+      s <- alphaStr
+    } yield {
+      s"$c$s"
+    }
+
   def stringLengthBetween(minLength: Int, maxLength: Int, charGen: Gen[Char]): Gen[String] =
     for {
       length <- choose(minLength, maxLength)

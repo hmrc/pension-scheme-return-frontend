@@ -12,8 +12,6 @@ GET         /refresh-session                                      controllers.Ke
 
 GET         /there-is-a-problem                                   controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 
-GET         /:srn/check-your-answers                              controllers.CheckYourAnswersController.onPageLoad(srn: Srn)
-
 GET         /account/sign-out-survey                              controllers.auth.AuthController.signOut
 GET         /account/sign-out                                     controllers.auth.AuthController.signOutNoSurvey
 GET         /account/signed-out                                   controllers.auth.SignedOutController.onPageLoad
@@ -43,6 +41,9 @@ POST        /:srn/change-enter-bank-details                       controllers.Sc
 
 GET         /:srn/change-enter-bank-details/:index                controllers.SchemeBankAccountController.onPageLoad(srn: Srn, index: Max10, mode: Mode = CheckMode)
 POST        /:srn/change-enter-bank-details/:index                controllers.SchemeBankAccountController.onSubmit(srn: Srn, index: Max10, mode: Mode = CheckMode)
+
+GET         /:srn/check-bank-account/:index                       controllers.SchemeBankAccountCheckYourAnswersController.onPageLoad(srn: Srn, index: Max10)
+GET         /:srn/check-bank-account-next-page                    controllers.SchemeBankAccountCheckYourAnswersController.onSubmit(srn: Srn)
 
 GET         /:srn/bank-accounts                                   controllers.SchemeBankAccountListController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST        /:srn/bank-accounts                                   controllers.SchemeBankAccountListController.onSubmit(srn: Srn, mode: Mode = NormalMode)

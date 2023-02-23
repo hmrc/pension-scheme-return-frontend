@@ -17,6 +17,7 @@
 package generators
 
 import org.scalacheck.Gen
+import viewmodels.DisplayMessage.SimpleMessage
 import viewmodels.models._
 
 trait ViewModelGenerators extends BasicGenerators {
@@ -42,6 +43,34 @@ trait ViewModelGenerators extends BasicGenerators {
       onSubmit <- call
     } yield {
       ContentTablePageViewModel(title, heading, inset, buttonText, onSubmit, rows: _*)
+    }
+
+  val actionItemGen: Gen[SummaryAction] =
+    for {
+      content <- nonEmptyString.map(SimpleMessage(_))
+      href    <- relativeUrl
+      hidden  <- nonEmptyString.map(SimpleMessage(_))
+    } yield {
+      SummaryAction(content, href, hidden)
+    }
+
+  val summaryListRowGen: Gen[CheckYourAnswersRowViewModel] =
+    for {
+      key     <- nonEmptyString
+      value   <- nonEmptyString
+      items   <- Gen.listOf(actionItemGen)
+    } yield {
+      CheckYourAnswersRowViewModel(SimpleMessage(key), SimpleMessage(value), items)
+    }
+
+  val checkYourAnswersViewModelGen: Gen[CheckYourAnswersViewModel] =
+    for{
+      title    <- nonEmptyString
+      heading  <- nonEmptyString
+      rows     <- Gen.listOf(summaryListRowGen)
+      onSubmit <- call
+    } yield {
+      CheckYourAnswersViewModel(SimpleMessage(title), SimpleMessage(heading), rows, onSubmit)
     }
 
   val bankAccountViewModelGen: Gen[BankAccountViewModel] =

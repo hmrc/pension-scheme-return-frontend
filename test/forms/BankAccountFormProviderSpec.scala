@@ -28,6 +28,12 @@ class BankAccountFormProviderSpec extends FieldBehaviours {
 
   import formProvider._
 
+  val usedAccountNumbers = List(
+    "12345678",
+    "23456789",
+    "34567890"
+  )
+
   private val form = formProvider(
     "schemeBankDetails.bankName.error.required",
     "schemeBankDetails.bankName.error.invalid",
@@ -35,10 +41,12 @@ class BankAccountFormProviderSpec extends FieldBehaviours {
     "schemeBankDetails.accountNumber.error.required",
     "schemeBankDetails.accountNumber.error.invalid",
     "schemeBankDetails.accountNumber.error.length",
+    "schemeBankDetails.accountNumber.error.duplicate",
     "schemeBankDetails.sortCode.error.required",
     "schemeBankDetails.sortCode.error.invalid",
     "schemeBankDetails.sortCode.error.format.invalid",
-    "schemeBankDetails.sortCode.error.length"
+    "schemeBankDetails.sortCode.error.length",
+    usedAccountNumbers
   )
 
   ".bankName" - {
@@ -67,6 +75,7 @@ class BankAccountFormProviderSpec extends FieldBehaviours {
     behave like fieldLengthError(form, "accountNumber", lengthFormError, accountNumberMaxLength + 1, lengthUpperLimit, numChar)
 
     behave like invalidNumericField(form, "accountNumber", "schemeBankDetails.accountNumber.error.invalid", accountNumberRegex)
+    behave like fieldRejectDuplicates(form, "accountNumber", "schemeBankDetails.accountNumber.error.duplicate", usedAccountNumbers)
   }
 
   ".sortCode" - {

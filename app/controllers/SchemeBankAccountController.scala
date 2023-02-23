@@ -26,12 +26,13 @@ import models.requests.DataRequest
 import models.{BankAccount, Mode}
 import navigation.Navigator
 import pages.SchemeBankAccounts.SchemeBankAccountsOps
-import pages.{SchemeBankAccounts, SchemeBankAccountPage}
+import pages.{SchemeBankAccountPage, SchemeBankAccounts}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.RefinedUtils.RefinedIntOps
 import viewmodels.implicits._
 import viewmodels.models.BankAccountViewModel
 import views.html.BankAccountView
@@ -51,51 +52,61 @@ class SchemeBankAccountController @Inject()(
                                              saveService: SaveService,
                                            )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  private val form = SchemeBankAccountController.form(formProvider)
+  private def form(usedAccountNumbers: List[String] = List()) =
+    SchemeBankAccountController.form(formProvider, usedAccountNumbers)
 
   def onPageLoad(srn: Srn, index: Max10, mode: Mode): Action[AnyContent] =
     (identify andThen allowAccess(srn) andThen getData andThen requireData) {
       implicit request =>
-        val maybeBankAccount = request.userAnswers.get(SchemeBankAccountPage(srn, index.value - 1))
-        val preparedForm = maybeBankAccount.fold(form)(form.fill)
+        val maybeBankAccount = request.userAnswers.get(SchemeBankAccountPage(srn, index))
+        val preparedForm = maybeBankAccount.fold(form())(form().fill)
         Ok(view(preparedForm, viewModel(srn, index, mode)))
     }
 
   def onSubmit(srn: Srn, index: Max10, mode: Mode): Action[AnyContent] =
     (identify andThen allowAccess(srn) andThen getData andThen requireData).async {
       implicit request =>
-        form.bindFromRequest().fold(
+
+        val usedAccountNumbers = duplicateAccountNumbers(srn, index)
+
+        form(usedAccountNumbers).bindFromRequest().fold(
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode)))),
           value => {
-            if (isDuplicateBankAccount(srn, value)) {
-              Future.successful(Redirect(navigator.nextPage(SchemeBankAccountPage(srn, index.value), mode, request.userAnswers)))
-            } else {
-              for {
-                updatedAnswers <- Future.fromTry(request.userAnswers.set(SchemeBankAccountPage(srn, index.value - 1), value))
-                _              <- saveService.save(updatedAnswers)
-              } yield Redirect(navigator.nextPage(SchemeBankAccountPage(srn, index.value), mode, updatedAnswers))
-            }
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(SchemeBankAccountPage(srn, index), value))
+              _              <- saveService.save(updatedAnswers)
+            } yield Redirect(navigator.nextPage(SchemeBankAccountPage(srn, index), mode, updatedAnswers))
           }
         )
     }
 
-  private def isDuplicateBankAccount(srn: Srn, bankAccount: BankAccount)(implicit request: DataRequest[_]): Boolean =
-    request.userAnswers.schemeBankAccounts(srn).exists(_.accountNumber == bankAccount.accountNumber)
+  private def duplicateAccountNumbers(
+    srn: Srn,
+    index: Max10
+  )(implicit request: DataRequest[_]): List[String] =
+    request
+      .userAnswers
+      .schemeBankAccounts(srn)
+      .patch(index.arrayIndex, Nil, 1)
+      .map(_.accountNumber)
+
 }
 
 object SchemeBankAccountController {
 
-  def form(formProvider: BankAccountFormProvider): Form[BankAccount] = formProvider(
+  def form(formProvider: BankAccountFormProvider, usedAccountNumbers: List[String]): Form[BankAccount] = formProvider(
     "schemeBankDetails.bankName.error.required",
     "schemeBankDetails.bankName.error.invalid",
     "schemeBankDetails.bankName.error.length",
     "schemeBankDetails.accountNumber.error.required",
     "schemeBankDetails.accountNumber.error.invalid",
     "schemeBankDetails.accountNumber.error.length",
+    "schemeBankDetails.accountNumber.error.duplicate",
     "schemeBankDetails.sortCode.error.required",
     "schemeBankDetails.sortCode.error.invalid",
     "schemeBankDetails.sortCode.error.format.invalid",
-    "schemeBankDetails.sortCode.error.length"
+    "schemeBankDetails.sortCode.error.length",
+    usedAccountNumbers
   )
 
   def viewModel(srn: Srn, index: Max10, mode: Mode): BankAccountViewModel = BankAccountViewModel(
