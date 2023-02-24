@@ -47,3 +47,9 @@ GET         /:srn/check-bank-account-next-page                    controllers.Sc
 
 GET         /:srn/bank-accounts                                   controllers.SchemeBankAccountListController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST        /:srn/bank-accounts                                   controllers.SchemeBankAccountListController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+
+GET        /:srn/remove-bank-account/:index                       controllers.RemoveSchemeBankAccountController.onPageLoad(srn: Srn, index: Max10, mode: Mode = NormalMode)
+POST       /:srn/remove-bank-account/:index                       controllers.RemoveSchemeBankAccountController.onSubmit(srn: Srn, index: Max10, mode: Mode = NormalMode)
+
+GET        /:srn/change-remove-bank-account/:index                controllers.RemoveSchemeBankAccountController.onPageLoad(srn: Srn, index: Max10, mode: Mode = CheckMode)
+POST       /:srn/change-remove-bank-account/:index                controllers.RemoveSchemeBankAccountController.onSubmit(srn: Srn, index: Max10, mode: Mode = CheckMode)

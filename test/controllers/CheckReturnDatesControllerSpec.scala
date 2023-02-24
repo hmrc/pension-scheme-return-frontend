@@ -124,7 +124,7 @@ class CheckReturnDatesControllerSpec extends ControllerBaseSpec with ScalaCheckP
       forAll(srnGen, modeGen, date) { (srn, mode, dates) =>
 
         val viewModel = CheckReturnDatesController.viewModel(srn, mode, dates, dates, minimalSchemeDetails)
-        viewModel.legend mustBe SimpleMessage("checkReturnDates.legend")
+        viewModel.legend.value mustBe SimpleMessage("checkReturnDates.legend")
       }
     }
 

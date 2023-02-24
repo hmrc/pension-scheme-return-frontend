@@ -121,9 +121,9 @@ trait ControllerBehaviours {
   def redirectNextPage(call: => Call, form: (String, String)*): Unit =
     redirectNextPage(call, defaultUserAnswers, form: _*)
 
-  def redirectToPage(call: => Call, page: => Call, form: (String, String)*): Unit =
-    s"redirect to page" in {
-      val appBuilder = applicationBuilder(Some(defaultUserAnswers))
+  def redirectToPage(call: => Call, page: => Call, userAnswers: UserAnswers, form: (String, String)*): Unit =
+    s"redirect to page with form $form" in {
+      val appBuilder = applicationBuilder(Some(userAnswers))
 
       running(_ => appBuilder) { app =>
         val request = FakeRequest(call).withFormUrlEncodedBody(form: _*)
@@ -134,6 +134,9 @@ trait ControllerBehaviours {
         redirectLocation(result).value mustEqual page.url
       }
     }
+
+  def redirectToPage(call: => Call, page: => Call, form: (String, String)*): Unit =
+    redirectToPage(call, page, defaultUserAnswers, form: _*)
 
   def saveAndContinue(call: => Call, userAnswers: UserAnswers, form: (String, String)*): Unit =
     "save data and continue to next page" in {

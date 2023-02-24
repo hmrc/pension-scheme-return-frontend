@@ -6,10 +6,10 @@ class $className$PageSpec extends PageBehaviours {
 
   "$className$Page" - {
 
-    beRetrievable[Boolean]($className$Page)
+    beRetrievable[Boolean]($className$Page(srnGen.sample.value))
 
-    beSettable[Boolean]($className$Page)
+    beSettable[Boolean]($className$Page(srnGen.sample.value))
 
-    beRemovable[Boolean]($className$Page)
+    beRemovable[Boolean]($className$Page(srnGen.sample.value))
   }
 }
