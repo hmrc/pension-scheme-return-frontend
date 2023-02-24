@@ -26,7 +26,6 @@ import org.mockito.ArgumentMatchers.any
 import pages.SchemeBankAccountPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
-//import play.api.test.FakeRequest
 import services.SaveService
 import views.html.YesNoPageView
 
@@ -53,6 +52,7 @@ class RemoveSchemeBankAccountControllerSpec extends ControllerBaseSpec {
     }
 
     behave like redirectToPage(onSubmit, redirectUrl, userAnswersWithBankAccounts, "value" -> "false")
+    behave like redirectToPage(onPageLoad, controllers.routes.JourneyRecoveryController.onPageLoad())
 
     "remove the correct bank account on submit when yes is selected" in {
       val mockSaveService = mock[SaveService]

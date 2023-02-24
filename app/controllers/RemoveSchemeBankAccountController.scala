@@ -79,7 +79,7 @@ class RemoveSchemeBankAccountController @Inject()(
   private def withBankAccountAtIndex(srn: Srn, index: Max10)(f: BankAccount => Result)(implicit request: DataRequest[_]): Result =
     request.userAnswers.get(SchemeBankAccountPage(srn, index)) match {
       case Some(bankAccount) => f(bankAccount)
-      case None => NotFound(s"Bank account at index ${index.value} not found")
+      case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
     }
 
 }
