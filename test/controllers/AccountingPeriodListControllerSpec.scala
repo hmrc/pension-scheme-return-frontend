@@ -16,6 +16,7 @@
 
 package controllers
 
+import config.Constants.maxAccountingPeriods
 import config.Refined.OneToThree
 import eu.timepit.refined.refineV
 import forms.YesNoPageFormProvider
@@ -64,7 +65,7 @@ class AccountingPeriodListControllerSpec extends ControllerBaseSpec {
 
     "contain the correct number of rows" in {
 
-      val rowsGen = Gen.choose(0, 3).flatMap(Gen.listOfN(_, dateRangeGen))
+      val rowsGen = Gen.choose(0, maxAccountingPeriods).flatMap(Gen.listOfN(_, dateRangeGen))
 
       forAll(srnGen, rowsGen, modeGen) { (srn, rows, mode) =>
 
