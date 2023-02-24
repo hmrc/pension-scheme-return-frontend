@@ -32,7 +32,6 @@ class ListViewSpec extends ViewSpec {
     "SummaryView" should {
       behave like renderTitle(summaryViewModelGen())(view(form, _), _.title.key)
       behave like renderHeading(summaryViewModelGen())(view(form, _), _.heading.key)
-      behave like renderButtonText(summaryViewModelGen())(view(form, _), _.buttonText)
 
       "render rows" in {
         forAll(summaryViewModelGen()) { viewModel =>

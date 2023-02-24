@@ -32,11 +32,8 @@ case class ListViewModel(
   title: SimpleMessage,
   heading: SimpleMessage,
   rows: List[ListRow],
-  buttonText: SimpleMessage,
   radioText: SimpleMessage,
   insetText: SimpleMessage,
   showRadios: Boolean = true,
-  onChangeText: SimpleMessage,
-  onRemoveText: SimpleMessage,
   onSubmit: Call
 )

@@ -116,5 +116,59 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
         }
       }
     }
+
+    "go from accounting periods list page to the next accounting periods page" when {
+
+      "yes is selected and 1 period exists" in {
+
+        forAll(srnGen) { srn =>
+
+          val answers = userAnswers.set(AccountingPeriodPage(srn, refineMV(1)), dateRangeGen.sample.value).get
+          val page = AccountingPeriodListPage(srn, addPeriod = true)
+          navigator.nextPage(page, NormalMode, answers) mustBe
+            routes.AccountingPeriodController.onPageLoad(srn, refineMV(2), NormalMode)
+        }
+      }
+
+      "yes is selected and 2 periods exists" in {
+
+        forAll(srnGen) { srn =>
+
+          val answers = userAnswers
+            .set(AccountingPeriodPage(srn, refineMV(1)), dateRangeGen.sample.value).get
+            .set(AccountingPeriodPage(srn, refineMV(2)), dateRangeGen.sample.value).get
+
+          val page = AccountingPeriodListPage(srn, addPeriod = true)
+          navigator.nextPage(page, NormalMode, answers) mustBe
+            routes.AccountingPeriodController.onPageLoad(srn, refineMV(3), NormalMode)
+        }
+      }
+    }
+
+    "got from accounting periods list page to unauthorised page" when {
+
+      "no is selected" in {
+
+        forAll(srnGen) { srn =>
+
+          val page = AccountingPeriodListPage(srn, addPeriod = false)
+          navigator.nextPage(page, NormalMode, userAnswers) mustBe routes.UnauthorisedController.onPageLoad
+        }
+      }
+
+      "3 periods already exist" in {
+
+        forAll(srnGen) { srn =>
+
+          val answers = userAnswers
+            .set(AccountingPeriodPage(srn, refineMV(1)), dateRangeGen.sample.value).get
+            .set(AccountingPeriodPage(srn, refineMV(2)), dateRangeGen.sample.value).get
+            .set(AccountingPeriodPage(srn, refineMV(3)), dateRangeGen.sample.value).get
+
+          val page = AccountingPeriodListPage(srn, addPeriod = true)
+          navigator.nextPage(page, NormalMode, answers) mustBe routes.UnauthorisedController.onPageLoad
+        }
+      }
+    }
   }
 }

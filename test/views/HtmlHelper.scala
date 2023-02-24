@@ -90,7 +90,7 @@ trait HtmlHelper extends HtmlModels {
 
   def messageKey(message: DisplayMessage): String = message match {
     case SimpleMessage(key, _) => key
-    case ComplexMessage(elements, _) => elements.map{
+    case ComplexMessage(elements, _) => elements.map {
       case Message(key, _) => key
       case LinkedMessage(key, _, _) => key
     }.reduce(_ + _)

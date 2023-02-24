@@ -41,9 +41,9 @@
             ListWithActionsItemViewModel(
                 message(value.text),
                 List(
-                    ListWithActionsActionViewModel(viewmodel.onChangeText.toMessage, value.changeUrl)
+                    ListWithActionsActionViewModel(messages("site.change"), value.changeUrl)
                         .withVisuallyHiddenText(value.changeHiddenText.toMessage),
-                    ListWithActionsActionViewModel(viewmodel.onRemoveText.toMessage, value.removeUrl)
+                    ListWithActionsActionViewModel(messages("site.remove"), value.removeUrl)
                         .withVisuallyHiddenText(value.removeHiddenText.toMessage),
                 )
             )
@@ -61,7 +61,7 @@
         }
 
         @govukButton(
-            ButtonViewModel(message(viewmodel.buttonText))
+            ButtonViewModel(messages("site.saveAndContinue"))
         )
     }
 }

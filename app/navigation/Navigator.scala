@@ -17,6 +17,7 @@
 package navigation
 
 import config.Refined.OneToTen
+import config.Refined.OneToThree
 import controllers.routes
 import eu.timepit.refined.{refineMV, refineV}
 import models._
@@ -50,6 +51,14 @@ class Navigator @Inject()() {
         case Right(nextIndex) => routes.SchemeBankAccountController.onPageLoad(srn, nextIndex, NormalMode)
       }
     case SchemeBankAccountListPage(_, false) => _ => routes.UnauthorisedController.onPageLoad
+
+    case AccountingPeriodListPage(_, false) => _ => routes.UnauthorisedController.onPageLoad
+    case AccountingPeriodListPage(srn, true) => ua =>
+      val count = ua.list(AccountingPeriods(srn)).length
+      refineV[OneToThree](count + 1).fold(
+        _     => routes.UnauthorisedController.onPageLoad,
+        index => routes.AccountingPeriodController.onPageLoad(srn, index, NormalMode)
+      )
 
     case _              => _ => routes.IndexController.onPageLoad
   }
