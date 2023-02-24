@@ -37,6 +37,9 @@ object ListUtils {
       maybeElem.fold(list)(elem => list :+ elem)
 
     def :?+(maybeElem: Option[A]): List[A] = maybeAppend(maybeElem)
+
+    def removeAt(index: Int): List[A] =
+      list.patch(index, Nil, 1)
   }
 
   implicit class ListTupStringOps(list: List[(String, String)]){

@@ -33,6 +33,7 @@ import services.{SaveService, TaxYearService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.time.TaxYear
 import utils.FormUtils._
+import utils.ListUtils.ListOps
 import utils.RefinedUtils.RefinedIntOps
 import viewmodels.models.DateRangeViewModel
 import views.html.DateRangeView
@@ -78,7 +79,7 @@ class AccountingPeriodController @Inject()(
   }
 
   def duplicateAccountingPeriods(srn: Srn, index: Max3)(implicit request: DataRequest[_]): List[DateRange] =
-    request.userAnswers.list(AccountingPeriods(srn)).patch(index.arrayIndex, Nil, 1)
+    request.userAnswers.list(AccountingPeriods(srn)).removeAt(index.arrayIndex)
 }
 
 object AccountingPeriodController {
