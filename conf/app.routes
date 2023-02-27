@@ -37,3 +37,6 @@ POST        /:srn/enter-bank-details                     controllers.SchemeBankA
 
 GET         /:srn/change-enter-bank-details              controllers.SchemeBankAccountController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST        /:srn/change-enter-bank-details              controllers.SchemeBankAccountController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET         /:srn/ttt             controllers.RadioListController.onPageLoad(srn: Srn)
+POST        /:srn/test             controllers.RadioListController.onSubmit(srn: Srn)

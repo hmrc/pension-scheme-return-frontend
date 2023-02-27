@@ -17,6 +17,7 @@
 package controllers
 
 import controllers.actions.{AllowAccessActionProvider, DataCreationAction, DataRetrievalAction, IdentifierAction}
+import forms.RadioListFormProvider
 import models.NormalMode
 import models.SchemeId.Srn
 import navigation.Navigator
@@ -33,20 +34,24 @@ import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 import scala.reflect.internal.util.NoSourceFile.content
 
-class RadioListController {class StartPageController @Inject()(
-                                                                override val messagesApi: MessagesApi,
-                                                                navigator: Navigator,
-                                                                identify: IdentifierAction,
-                                                                allowAccess: AllowAccessActionProvider,
-                                                                getData: DataRetrievalAction,
-                                                                createData: DataCreationAction,
-                                                                val controllerComponents: MessagesControllerComponents,
-                                                                view: RadioListView
-                                                              )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+class RadioListController @Inject()(
+                                     override val messagesApi: MessagesApi,
+                                     navigator: Navigator,
+                                     identify: IdentifierAction,
+                                     allowAccess: AllowAccessActionProvider,
+                                     getData: DataRetrievalAction,
+                                     createData: DataCreationAction,
+                                     val controllerComponents: MessagesControllerComponents,
+                                     view: RadioListView,
+                                     formProvider: RadioListFormProvider
+                                   )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(srn: Srn): Action[AnyContent] = (identify andThen allowAccess(srn)) {
+  private val form = formProvider("asdsds")
+
+  def onPageLoad(srn: Srn): Action[AnyContent] = (identify andThen allowAccess(srn) andThen getData) {
     implicit request =>
-      Ok(view(RadioListController.viewModel(srn)))
+      Ok(view(form, RadioListController.viewModel(srn)))
+//      Ok("hi")
   }
 
   def onSubmit(srn: Srn): Action[AnyContent] = (identify andThen allowAccess(srn) andThen getData andThen createData) {
@@ -55,20 +60,14 @@ class RadioListController {class StartPageController @Inject()(
   }
 }
 
-  object RadioListController {
+object RadioListController {
 
-    def viewModel(srn: Srn): RadioListViewModel = RadioListViewModel(
-      "startPage.title",
-      "startPage.heading",
-      "site.saveAndContinue",
-        routes.RadioListController.onSubmit(srn),
-      List(
-        RadioItem(content = Text("yea1"))
-    )
-
-
-    )
-
-  }
-
+  def viewModel(srn: Srn): RadioListViewModel = RadioListViewModel(
+    "startPage.title",
+    "startPage.heading",
+    List(
+      RadioItem(content = Text("yea1"), value = Some("value"))
+    ),
+    controllers.routes.RadioListController.onSubmit(srn)
+  )
 }

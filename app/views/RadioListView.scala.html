@@ -18,33 +18,34 @@
 @import viewmodels.LegendSize
 
 @this(
-layout: templates.Layout,
-formHelper: FormWithCSRF,
-govukErrorSummary: GovukErrorSummary,
-govukRadios: GovukRadios,
-govukButton: GovukButton,
+    layout: templates.Layout,
+    formHelper: FormWithCSRF,
+    govukErrorSummary: GovukErrorSummary,
+    govukRadios: GovukRadios,
+    govukButton: GovukButton,
 )
 
-@(form: Form[_], viewModel: RadioListViewModel)(implicit request: Request[_], messages: Messages)
+@(form: Form[String], viewModel: RadioListViewModel)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, viewModel.title.toMessage)) {
 
-@formHelper(action = viewModel.onSubmit, Symbol("autocomplete") -> "off") {
+    @formHelper(action = viewModel.onSubmit, Symbol("autocomplete") -> "off") {
 
-@if(form.hasErrors) {
-  @govukErrorSummary(ErrorSummaryViewModel(form))
- }
+        @if(form.hasErrors) {
+          @govukErrorSummary(ErrorSummaryViewModel(form))
+         }
 
-<h1 class="govuk-heading-l">@viewModel.heading.toMessage</h1>
+        <h1 class="govuk-heading-l">@viewModel.heading.toMessage</h1>
 
-@govukRadios(
-    RadiosViewModel.apply(
-        field = form ("value"), viewModel.items)
-    )
-)
+        @govukRadios(
+            RadiosViewModel(
+                field = form("value"),
+                viewModel.items
+            )
+        )
 
-@govukButton(
-    ButtonViewModel(messages("site.saveAndContinue"))
-    )
+        @govukButton(
+            ButtonViewModel(messages("site.saveAndContinue"))
+        )
     }
 }

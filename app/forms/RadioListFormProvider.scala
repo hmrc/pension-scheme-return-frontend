@@ -27,7 +27,8 @@ class RadioListFormProvider @Inject() extends Mappings {
 
   def apply(
              requiredKey: String
-           ): (String, Iterable[String]) =
-    ("value" -> single(requiredKey))
+           ): Form[String] = {
+    Form("value" -> text(requiredKey))
+  }
 
 }
