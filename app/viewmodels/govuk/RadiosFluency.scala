@@ -44,6 +44,15 @@ trait RadiosFluency {
     def apply(
                field: Field,
                items: Seq[RadioItem],
+             )(implicit messages: Messages): Radios =
+      apply(
+        field = field,
+        items = items,
+      )
+
+    def apply(
+               field: Field,
+               items: Seq[RadioItem],
                fieldset: Fieldset
              )(implicit messages: Messages): Radios =
       Radios(
@@ -86,6 +95,58 @@ trait RadiosFluency {
         items    = items
       ).inline()
     }
+//
+//    def radioItems(
+//               field: Field,
+//               legend: Legend
+//             )(implicit messages: Messages): Radios =
+//      radioItems(
+//        field = field,
+//        fieldset = FieldsetViewModel(legend)
+//      )
+//
+//    def radioItems(
+//               field: Field,
+//               fieldset: Fieldset
+//             )(implicit messages: Messages): Radios = {
+//
+//      val items = List(
+//        RadioItem(
+//          value = Some("false"),
+//          content = Text(messages("site.year"))
+//        ),
+//        RadioItem(
+//          value = Some("false"),
+//          content = Text(messages("site.year"))
+//        ),
+//        RadioItem(
+//          value = Some("false"),
+//          content = Text(messages("site.year"))
+//        ),
+//        RadioItem(
+//          value = Some("false"),
+//          content = Text(messages("site.year"))
+//        ),
+//        RadioItem(
+//          value = Some("false"),
+//          content = Text(messages("site.year"))
+//        ),
+//        RadioItem(
+//          value = Some("false"),
+//          content = Text(messages("site.year"))
+//        ),
+//        RadioItem(
+//          value = Some("false"),
+//          content = Text(messages("site.year"))
+//        )
+//      )
+//
+//      apply(
+//        field = field,
+//        fieldset = fieldset,
+//        items = items
+//      )
+//    }
   }
 
   implicit class FluentRadios(radios: Radios) {
