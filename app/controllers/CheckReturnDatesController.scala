@@ -127,7 +127,7 @@ object CheckReturnDatesController {
           )
         )
       ),
-      SimpleMessage("checkReturnDates.legend"),
+      Some(SimpleMessage("checkReturnDates.legend")),
       routes.CheckReturnDatesController.onSubmit(srn, mode)
     )
   }

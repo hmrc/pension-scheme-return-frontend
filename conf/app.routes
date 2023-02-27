@@ -54,3 +54,9 @@ POST        /:srn/accounting-period/:index                        controllers.Ac
 
 GET         /:srn/change-accounting-period/:index                 controllers.AccountingPeriodController.onPageLoad(srn: Srn, index: Max3, mode: Mode = CheckMode)
 POST        /:srn/change-accounting-period/:index                 controllers.AccountingPeriodController.onSubmit(srn: Srn, index: Max3, mode: Mode = CheckMode)
+
+GET        /:srn/remove-bank-account/:index                       controllers.RemoveSchemeBankAccountController.onPageLoad(srn: Srn, index: Max10, mode: Mode = NormalMode)
+POST       /:srn/remove-bank-account/:index                       controllers.RemoveSchemeBankAccountController.onSubmit(srn: Srn, index: Max10, mode: Mode = NormalMode)
+
+GET        /:srn/change-remove-bank-account/:index                controllers.RemoveSchemeBankAccountController.onPageLoad(srn: Srn, index: Max10, mode: Mode = CheckMode)
+POST       /:srn/change-remove-bank-account/:index                controllers.RemoveSchemeBankAccountController.onSubmit(srn: Srn, index: Max10, mode: Mode = CheckMode)
