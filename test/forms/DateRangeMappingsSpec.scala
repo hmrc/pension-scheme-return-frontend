@@ -149,7 +149,7 @@ class DateRangeMappingsSpec extends AnyFreeSpec with Matchers with ScalaCheckPro
         FormError(
           "value.startDate",
           "error.startDate.outsideRange",
-          List(startDate.show, allowedRange.from.show, allowedRange.to.show)
+          List(allowedRange.from.show, allowedRange.to.show)
         )
     }
   }
@@ -166,12 +166,12 @@ class DateRangeMappingsSpec extends AnyFreeSpec with Matchers with ScalaCheckPro
         FormError(
           "value.endDate",
           "error.endDate.outsideRange",
-          List(endDate.show, allowedRange.from.show, allowedRange.to.show)
+          List(allowedRange.from.show, allowedRange.to.show)
         )
     }
   }
 
-  "must fail to bind if start and end date are outide range" in {
+  "must fail to bind if start and end date are outside range" in {
 
     forAll(range(invalidDate) -> "invalid range") { range =>
 
@@ -182,13 +182,13 @@ class DateRangeMappingsSpec extends AnyFreeSpec with Matchers with ScalaCheckPro
       val expectedStartDateError = FormError(
         "value.startDate",
         "error.startDate.outsideRange",
-        List(range.from.show, allowedRange.from.show, allowedRange.to.show)
+        List(allowedRange.from.show, allowedRange.to.show)
       )
 
       val expectedEndDateError = FormError(
         "value.endDate",
         "error.endDate.outsideRange",
-        List(range.to.show, allowedRange.from.show, allowedRange.to.show)
+        List(allowedRange.from.show, allowedRange.to.show)
       )
 
       result.errors must contain allElementsOf List(
