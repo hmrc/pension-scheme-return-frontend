@@ -60,7 +60,7 @@ class RemoveSchemeBankAccountControllerSpec extends ControllerBaseSpec {
       val appBuilder = applicationBuilder(Some(userAnswersWithBankAccounts))
         .bindings(bind[SaveService].toInstance(mockSaveService))
 
-      when(mockSaveService.save(any())(any())).thenReturn(Future.successful(()))
+      when(mockSaveService.save(any())(any(), any())).thenReturn(Future.successful(()))
 
       val captor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
 
@@ -70,7 +70,7 @@ class RemoveSchemeBankAccountControllerSpec extends ControllerBaseSpec {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual redirectUrl.url
-        verify(mockSaveService).save(captor.capture())(any())
+        verify(mockSaveService).save(captor.capture())(any(), any())
 
         captor.getValue mustBe defaultUserAnswers.set(SchemeBankAccountPage(srn, refineMV[OneToTen](1)), otherBankAccount).success.value
       }
@@ -82,7 +82,7 @@ class RemoveSchemeBankAccountControllerSpec extends ControllerBaseSpec {
       val appBuilder = applicationBuilder(Some(userAnswersWithBankAccounts))
         .bindings(bind[SaveService].toInstance(mockSaveService))
 
-      when(mockSaveService.save(any())(any())).thenReturn(Future.successful(()))
+      when(mockSaveService.save(any())(any(), any())).thenReturn(Future.successful(()))
 
       running(_ => appBuilder) { app =>
         val request = FakeRequest(POST, onSubmit.url).withFormUrlEncodedBody("value" -> "false")
@@ -90,7 +90,7 @@ class RemoveSchemeBankAccountControllerSpec extends ControllerBaseSpec {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual redirectUrl.url
-        verify(mockSaveService, never).save(any())(any())
+        verify(mockSaveService, never).save(any())(any(), any())
       }
     }
   }

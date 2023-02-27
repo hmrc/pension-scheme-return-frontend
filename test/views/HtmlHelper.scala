@@ -20,7 +20,6 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
 import play.twirl.api.Html
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.ActionItem
 import viewmodels.ComplexMessageElement.{LinkedMessage, Message}
 import viewmodels.DisplayMessage
 import viewmodels.DisplayMessage.{ComplexMessage, SimpleMessage}
@@ -68,8 +67,8 @@ trait HtmlHelper extends HtmlModels {
   def anchorButton(html: Html): AnchorTag =
     AnchorTag(mainContent(html).select("a[role=button]").first())
 
-  def form(html: Html): Element =
-    mainContent(html).getElementsByTag("form").first()
+  def form(html: Html): Form =
+    Form(mainContent(html).getElementsByTag("form").first())
 
   def errorSummary(html: Html): Elements =
     mainContent(html).getElementsByClass("govuk-error-summary")

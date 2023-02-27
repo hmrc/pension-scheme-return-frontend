@@ -17,7 +17,7 @@
 package controllers.actions
 
 import models.UserAnswers
-import models.requests.{AllowedAccessRequest, IdentifierRequest, OptionalDataRequest}
+import models.requests.{AllowedAccessRequest, OptionalDataRequest}
 
 import scala.concurrent.{ExecutionContext, Future}
 

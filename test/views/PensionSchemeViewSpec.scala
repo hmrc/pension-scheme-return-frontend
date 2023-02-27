@@ -55,8 +55,8 @@ class PensionSchemeViewSpec extends BaseSpec with ScalaCheckPropertyChecks with 
 
         forAll(pensionSchemeViewModelGen) { viewModel =>
 
-          form(view(pensionSchemeForm, viewModel)).attr("method") mustBe viewModel.onSubmit.method
-          form(view(pensionSchemeForm, viewModel)).attr("action") mustBe viewModel.onSubmit.url
+          form(view(pensionSchemeForm, viewModel)).method mustBe viewModel.onSubmit.method
+          form(view(pensionSchemeForm, viewModel)).action mustBe viewModel.onSubmit.url
         }
       }
 

@@ -35,10 +35,10 @@ class Navigator @Inject()() {
 
     case page @ CheckReturnDatesPage(srn) => {
       case ua if ua.get(page).contains(true) => ua.schemeBankAccounts(srn) match {
-        case Nil => routes.SchemeBankAccountController.onPageLoad(srn, refineMV[OneToTen](1), NormalMode)
+        case Nil => routes.SchemeBankAccountController.onPageLoad(srn, refineMV(1), NormalMode)
         case _   => routes.SchemeBankAccountListController.onPageLoad(srn)
       }
-      case _ => routes.UnauthorisedController.onPageLoad
+      case _ => routes.AccountingPeriodController.onPageLoad(srn, refineMV(1), NormalMode)
     }
 
     case SchemeBankAccountPage(srn, index) => _ => routes.SchemeBankAccountCheckYourAnswersController.onPageLoad(srn, index)

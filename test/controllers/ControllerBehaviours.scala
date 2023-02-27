@@ -16,14 +16,11 @@
 
 package controllers
 
-import navigation.{FakeNavigator, Navigator}
-import play.api
-import play.api.{Application, inject}
-import play.api.inject.bind
 import models.UserAnswers
+import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.IdiomaticMockito.once
 import play.api.Application
+import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Writes
 import play.api.mvc.{Call, Request}
@@ -142,7 +139,7 @@ trait ControllerBehaviours {
     "save data and continue to next page" in {
 
       val saveService = mock[SaveService]
-      when(saveService.save(any())(any())).thenReturn(Future.successful(()))
+      when(saveService.save(any())(any(), any())).thenReturn(Future.successful(()))
 
       val appBuilder = applicationBuilder(Some(userAnswers))
         .overrides(
@@ -158,7 +155,7 @@ trait ControllerBehaviours {
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual testOnwardRoute.url
 
-        verify(saveService, times(1)).save(any())(any())
+        verify(saveService, times(1)).save(any())(any(), any())
       }
     }
 

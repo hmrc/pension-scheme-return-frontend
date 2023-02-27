@@ -36,4 +36,13 @@ trait HtmlModels {
       )
     }
   }
+
+  case class Form(method: String, action: String)
+
+  object Form {
+
+    def apply(element: Element): Form = {
+      Form(element.attr("method"), element.attr("action"))
+    }
+  }
 }

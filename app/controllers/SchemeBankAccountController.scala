@@ -25,13 +25,14 @@ import models.SchemeId.Srn
 import models.requests.DataRequest
 import models.{BankAccount, Mode}
 import navigation.Navigator
+import pages.SchemeBankAccountPage
 import pages.SchemeBankAccounts.SchemeBankAccountsOps
-import pages.{SchemeBankAccountPage, SchemeBankAccounts}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.ListUtils.ListOps
 import utils.RefinedUtils.RefinedIntOps
 import viewmodels.implicits._
 import viewmodels.models.BankAccountViewModel
@@ -87,7 +88,7 @@ class SchemeBankAccountController @Inject()(
     request
       .userAnswers
       .schemeBankAccounts(srn)
-      .patch(index.arrayIndex, Nil, 1)
+      .removeAt(index.arrayIndex)
       .map(_.accountNumber)
 
 }

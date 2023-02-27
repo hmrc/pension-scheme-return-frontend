@@ -18,12 +18,9 @@ package views
 
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.test.FakeRequest
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{ActionItem, SummaryList}
 import utils.BaseSpec
 import viewmodels.models.SummaryAction
 import views.html.CheckYourAnswersView
-
-import scala.language.postfixOps
 
 class CheckYourAnswersViewSpec extends BaseSpec with ScalaCheckPropertyChecks with HtmlHelper {
 

@@ -17,7 +17,6 @@
 package controllers
 
 import controllers.actions._
-import generators.ModelGenerators
 import models.{Establisher, EstablisherKind, SchemeDetails, SchemeId, SchemeStatus, UserAnswers}
 import navigation.Navigator
 import play.api.Application
@@ -26,13 +25,10 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.mvc.Call
-import play.api.test.Helpers.running
 import play.api.test._
-import services.{SaveService, SaveServiceImpl}
-import uk.gov.hmrc.http.HeaderCarrier
+import services.{FakeTaxYearService, TaxYearService}
+import uk.gov.hmrc.time.TaxYear
 import utils.BaseSpec
-
-import scala.concurrent.Future
 
 trait ControllerBaseSpec
   extends BaseSpec
@@ -53,13 +49,16 @@ trait ControllerBaseSpec
 
   val testOnwardRoute: Call = Call("GET", "/foo")
 
+  val defaultTaxYear = TaxYear(2022)
+
   def emptyUserAnswers: UserAnswers = UserAnswers(userAnswersId)
 
   val defaultUserAnswers: UserAnswers = UserAnswers(userAnswersId, Json.obj("non" -> "empty"))
 
   protected def applicationBuilder(
                                     userAnswers: Option[UserAnswers] = None,
-                                    schemeDetails: SchemeDetails = defaultSchemeDetails
+                                    schemeDetails: SchemeDetails = defaultSchemeDetails,
+                                    taxYear: TaxYear = defaultTaxYear
                                   ): GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
       .bindings(
@@ -69,7 +68,8 @@ trait ControllerBaseSpec
         bind[IdentifierAction].to[FakeIdentifierAction],
         bind[AllowAccessActionProvider].toInstance(new FakeAllowAccessActionProvider(schemeDetails)),
         bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers)),
-        bind[DataCreationAction].toInstance(new FakeDataCreationAction(userAnswers.getOrElse(emptyUserAnswers)))
+        bind[DataCreationAction].toInstance(new FakeDataCreationAction(userAnswers.getOrElse(emptyUserAnswers))),
+        bind[TaxYearService].toInstance(new FakeTaxYearService(taxYear.starts))
       )
 
   def runningApplication[T](block: Application => T): T = {

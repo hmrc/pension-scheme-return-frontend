@@ -24,12 +24,12 @@ import uk.gov.hmrc.http.HeaderCarrier
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class SaveServiceImpl @Inject()(sessionRepository: SessionRepository)(implicit ec: ExecutionContext) extends SaveService {
-  override def save(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[Unit] =
+class SaveServiceImpl @Inject()(sessionRepository: SessionRepository) extends SaveService {
+  override def save(userAnswers: UserAnswers)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
     sessionRepository.set(userAnswers)
 }
 
 @ImplementedBy(classOf[SaveServiceImpl])
 trait SaveService {
-  def save(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[Unit]
+  def save(userAnswers: UserAnswers)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit]
 }

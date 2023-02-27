@@ -19,20 +19,15 @@ package controllers
 import com.google.inject.Inject
 import config.Refined.Max10
 import controllers.actions.{AllowAccessActionProvider, DataRequiredAction, DataRetrievalAction, IdentifierAction}
-import models.{BankAccount, CheckMode, NormalMode}
 import models.SchemeId.Srn
+import models.{BankAccount, NormalMode}
 import navigation.Navigator
 import pages.{SchemeBankAccountCheckYourAnswersPage, SchemeBankAccountPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.govukfrontend.views.Aliases.{SummaryListRow, Text, Value}
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{ActionItem, Actions, Key}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.DisplayMessage.SimpleMessage
-import viewmodels.govuk.summarylist._
-import views.html.CheckYourAnswersView
 import viewmodels.models.{CheckYourAnswersRowViewModel, CheckYourAnswersViewModel, SummaryAction}
-import views.html
+import views.html.CheckYourAnswersView
 
 class SchemeBankAccountCheckYourAnswersController @Inject()(
   override val messagesApi: MessagesApi,

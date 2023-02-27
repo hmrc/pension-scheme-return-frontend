@@ -16,7 +16,6 @@
 
 package generators
 
-import models._
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
 import pages._
@@ -29,6 +28,14 @@ trait UserAnswersEntryGenerators extends PageGenerators {
       for {
         page  <- arbitrary[CheckReturnDatesPage]
         value <- arbitrary[Boolean].map(Json.toJson(_))
+      } yield (page, value)
+    }
+
+  implicit lazy val arbitraryAccountingPeriodUserAnswersEntry: Arbitrary[(AccountingPeriodPage, JsValue)] =
+    Arbitrary {
+      for {
+        page <- arbitrary[AccountingPeriodPage]
+        value <- ModelGenerators.dateRangeGen.map(Json.toJson(_))
       } yield (page, value)
     }
 }

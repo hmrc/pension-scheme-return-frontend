@@ -17,7 +17,6 @@
 package pages
 
 import models.SchemeId.Srn
-import models.UserAnswers
 import play.api.libs.json.JsPath
 
 case class CheckReturnDatesPage(srn: Srn) extends QuestionPage[Boolean] {

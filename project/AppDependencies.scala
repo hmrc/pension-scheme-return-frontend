@@ -13,6 +13,7 @@ object AppDependencies {
     "uk.gov.hmrc"       %% "bootstrap-frontend-play-28"     % bootstrapVersion,
     "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-28"             % hmrcMongoVersion,
     "uk.gov.hmrc"       %% "tax-year"                       % "3.0.0",
+    "org.typelevel"     %% "cats-core"                      % "2.9.0",
     "eu.timepit"        %% "refined"                        % "0.10.1"
   )
 

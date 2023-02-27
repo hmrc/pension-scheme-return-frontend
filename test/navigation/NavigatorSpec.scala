@@ -16,13 +16,12 @@
 
 package navigation
 
-import config.Refined.OneToTen
 import controllers.routes
+import eu.timepit.refined._
 import models._
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import pages._
 import utils.BaseSpec
-import eu.timepit.refined._
 
 class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
@@ -62,7 +61,7 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
           forAll(srnGen) { srn =>
             val ua = userAnswers.set(CheckReturnDatesPage(srn), true).get
             navigator.nextPage(CheckReturnDatesPage(srn), NormalMode, ua) mustBe
-              routes.SchemeBankAccountController.onPageLoad(srn, refineMV[OneToTen](1), NormalMode)
+              routes.SchemeBankAccountController.onPageLoad(srn, refineMV(1), NormalMode)
           }
         }
       }
@@ -79,12 +78,12 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
         }
       }
 
-      "navigate to to unauthorised page" when {
-        "no is selected" in {
-          forAll(srnGen) { srn =>
-            val ua = userAnswers.set(CheckReturnDatesPage(srn), false).get
-            navigator.nextPage(CheckReturnDatesPage(srn), NormalMode, ua) mustBe routes.UnauthorisedController.onPageLoad
-          }
+      "no is selected" in {
+
+        forAll(srnGen) { srn =>
+          val ua = userAnswers.set(CheckReturnDatesPage(srn), false).get
+          navigator.nextPage(CheckReturnDatesPage(srn), NormalMode, ua) mustBe
+            routes.AccountingPeriodController.onPageLoad(srn, refineMV(1), NormalMode)
         }
       }
     }

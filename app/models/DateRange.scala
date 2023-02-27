@@ -14,16 +14,22 @@
  * limitations under the License.
  */
 
-package views
+package models
 
-import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import utils.BaseSpec
+import play.api.libs.json.{Format, Json}
 
-trait ViewSpec
-  extends BaseSpec
-    with ScalaCheckPropertyChecks
-    with HtmlHelper
-    with ViewBehaviours {
+import java.time.LocalDate
 
-  def renderedErrorMessage(key: String) = s"Error: $key"
+case class DateRange(from: LocalDate, to: LocalDate) {
+
+  def intersects(range: DateRange): Boolean =
+    contains(range.from) || contains(range.to)
+
+  def contains(date: LocalDate): Boolean =
+    !date.isBefore(from) && !date.isAfter(to)
+}
+
+object DateRange {
+
+  implicit val format: Format[DateRange] = Json.format[DateRange]
 }

@@ -1,4 +1,5 @@
-service.name = pension-scheme-return-frontend
+service.name = Pension Scheme Return
+service.title = Managing Pension Schemes
 
 site.back = Back
 site.back.aria-label = Return to previous page
@@ -12,10 +13,15 @@ site.start = Start now
 site.startAgain = Start again
 site.signIn = Sign in
 site.govuk = GOV.UK
+site.startDate = Start date
+site.endDate = End date
 
 date.day = Day
+date.day.lower = day
 date.month = Month
+date.month.lower = month
 date.year = Year
+date.year.lower = year
 
 timeout.title = You’re about to be signed out
 timeout.message = For security reasons, you will be signed out of this service in
@@ -103,6 +109,28 @@ schemeBankDetails.sortCode.error.required = Enter a sort code
 schemeBankDetails.sortCode.error.invalid = Sort code must only include numbers 0 to 9
 schemeBankDetails.sortCode.error.format.invalid = Enter a valid sort code, like 309430
 schemeBankDetails.sortCode.error.length = Sort code must be 6 digits
+
+accountingPeriod.title = What is the accounting period covered by this return?
+accountingPeriod.heading = What is the accounting period covered by this return?
+accountingPeriod.description = You can add up to 3 accounting periods.
+accountingPeriod.startDate.error.required.all = Enter the start date of the accounting period
+accountingPeriod.startDate.error.required.day = Start date must include a day
+accountingPeriod.startDate.error.required.month = Start date must include a month
+accountingPeriod.startDate.error.required.year = Start date must include a year
+accountingPeriod.startDate.error.required.two = Start date must include a {0} and {1}
+accountingPeriod.startDate.error.invalid.date = Start date must be a real date
+accountingPeriod.startDate.error.invalid.characters = Start date must only include numbers 0 to 9
+accountingPeriod.startDate.error.outsideTaxYear = Start date must be between {0} and {1}
+accountingPeriod.startDate.error.duplicate = Start date must not overlap with the accounting period you have already entered, {0} to {1}
+accountingPeriod.endDate.error.required.all = Enter the end date of the accounting period
+accountingPeriod.endDate.error.required.day = End date must include a day
+accountingPeriod.endDate.error.required.month = End date must include a month
+accountingPeriod.endDate.error.required.year = End date must include a year
+accountingPeriod.endDate.error.required.two = End date must include a {0} and {1}
+accountingPeriod.endDate.error.invalid.date = End date must be a real date
+accountingPeriod.endDate.error.invalid.characters = End date must only include numbers 0 to 9
+accountingPeriod.endDate.error.outsideTaxYear = End date must be between {0} and {1}
+accountingPeriod.endDate.error.range.invalid = End date must be after {0}
 
 schemeBankDetailsSummary.title = You have added {0} bank account
 schemeBankDetailsSummary.title.plural = You have added {0} bank accounts

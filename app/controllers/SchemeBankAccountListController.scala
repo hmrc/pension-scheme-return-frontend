@@ -39,19 +39,17 @@ import viewmodels.implicits._
 import viewmodels.models.{ListRow, ListViewModel}
 import views.html.ListView
 
-import scala.concurrent.ExecutionContext
-
 class SchemeBankAccountListController @Inject()(
-                                                    override val messagesApi: MessagesApi,
-                                                    navigator: Navigator,
-                                                    identify: IdentifierAction,
-                                                    allowAccess: AllowAccessActionProvider,
-                                                    getData: DataRetrievalAction,
-                                                    requireData: DataRequiredAction,
-                                                    val controllerComponents: MessagesControllerComponents,
-                                                    view: ListView,
-                                                    formProvider: YesNoPageFormProvider
-                                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+  override val messagesApi: MessagesApi,
+  navigator: Navigator,
+  identify: IdentifierAction,
+  allowAccess: AllowAccessActionProvider,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  val controllerComponents: MessagesControllerComponents,
+  view: ListView,
+  formProvider: YesNoPageFormProvider
+) extends FrontendBaseController with I18nSupport {
 
   private val form = SchemeBankAccountListController.form(formProvider)
 

@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package views
+package forms.mappings
 
-import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import utils.BaseSpec
+import java.time.LocalDate
 
-trait ViewSpec
-  extends BaseSpec
-    with ScalaCheckPropertyChecks
-    with HtmlHelper
-    with ViewBehaviours {
-
-  def renderedErrorMessage(key: String) = s"Error: $key"
-}
+case class DateFormErrors(
+  required: String,
+  requiredDay: String,
+  requiredMonth: String,
+  requiredYear: String,
+  requiredTwo: String,
+  invalidDate: String,
+  invalidCharacters: String,
+  validators: List[LocalDate => Option[String]] = List()
+)

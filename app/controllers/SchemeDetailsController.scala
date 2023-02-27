@@ -19,8 +19,8 @@ package controllers
 import com.google.inject.Inject
 import config.FrontendAppConfig
 import controllers.actions._
-import models.{Establisher, EstablisherKind, NormalMode, SchemeDetails}
 import models.SchemeId.Srn
+import models.{NormalMode, SchemeDetails}
 import navigation.Navigator
 import pages.SchemeDetailsPage
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -28,11 +28,11 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.ListUtils._
 import viewmodels.ComplexMessageElement.{LinkedMessage, Message}
-import viewmodels.{Delimiter, DisplayMessage}
 import viewmodels.DisplayMessage.{ComplexMessage, SimpleMessage}
-import viewmodels.models.ContentTablePageViewModel
-import views.html.ContentTablePageView
 import viewmodels.implicits._
+import viewmodels.models.ContentTablePageViewModel
+import viewmodels.{Delimiter, DisplayMessage}
+import views.html.ContentTablePageView
 
 class SchemeDetailsController @Inject()(
                                          override val messagesApi: MessagesApi,

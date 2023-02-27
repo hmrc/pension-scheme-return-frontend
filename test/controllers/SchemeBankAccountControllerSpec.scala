@@ -21,13 +21,7 @@ import controllers.SchemeBankAccountController._
 import eu.timepit.refined.refineMV
 import forms.BankAccountFormProvider
 import models.NormalMode
-import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers.any
 import pages.SchemeBankAccountPage
-import play.api.inject.bind
-import play.api.mvc.Call
-import play.api.test.FakeRequest
-import services.SaveService
 import views.html.BankAccountView
 
 class SchemeBankAccountControllerSpec extends ControllerBaseSpec {

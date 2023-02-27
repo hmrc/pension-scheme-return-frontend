@@ -152,4 +152,23 @@ trait ViewModelGenerators extends BasicGenerators {
     } yield {
       YesNoPageViewModel(title, heading, description, legend, onSubmit)
     }
+
+  val dateRangeViewModelGen: Gen[DateRangeViewModel] =
+    for {
+      title          <- nonEmptyString
+      heading        <- nonEmptyString
+      description    <- Gen.option(nonEmptyString)
+      startDateLabel <- nonEmptyString
+      endDateLabel   <- nonEmptyString
+      onSubmit       <- call
+    } yield {
+      DateRangeViewModel(
+        SimpleMessage(title),
+        SimpleMessage(heading),
+        description.map(d => SimpleMessage(d)),
+        SimpleMessage(startDateLabel),
+        SimpleMessage(endDateLabel),
+        onSubmit
+      )
+    }
 }
