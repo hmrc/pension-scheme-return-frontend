@@ -60,3 +60,6 @@ POST       /:srn/remove-bank-account/:index                       controllers.Re
 
 GET        /:srn/change-remove-bank-account/:index                controllers.RemoveSchemeBankAccountController.onPageLoad(srn: Srn, index: Max10, mode: Mode = CheckMode)
 POST       /:srn/change-remove-bank-account/:index                controllers.RemoveSchemeBankAccountController.onSubmit(srn: Srn, index: Max10, mode: Mode = CheckMode)
+
+GET         /:srn/check-accounting-period/:index                  controllers.AccountingPeriodCheckYourAnswersController.onPageLoad(srn: Srn, index: Max3)
+POST        /:srn/check-accounting-period                         controllers.AccountingPeriodCheckYourAnswersController.onSubmit(srn: Srn)

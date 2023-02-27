@@ -51,6 +51,8 @@ class Navigator @Inject()() {
       }
     case SchemeBankAccountListPage(_, false) => _ => routes.UnauthorisedController.onPageLoad
     case RemoveSchemeBankAccountPage(srn) => _ => routes.SchemeBankAccountListController.onPageLoad(srn)
+    case AccountingPeriodPage(srn, index) => _ => routes.AccountingPeriodCheckYourAnswersController.onPageLoad(srn, index)
+    case AccountingPeriodCheckYourAnswersPage(srn) => _ => routes.UnauthorisedController.onPageLoad
     case _              => _ => routes.IndexController.onPageLoad
   }
 
