@@ -114,22 +114,16 @@ trait ViewModelGenerators extends BasicGenerators {
       title <- nonEmptySimpleMessage
       heading <- nonEmptySimpleMessage
       rows <- Gen.choose(1, 10).flatMap(Gen.listOfN(_, summaryRowGen))
-      buttonText <- nonEmptySimpleMessage
       radioText <- nonEmptySimpleMessage
       insetText <- nonEmptySimpleMessage
-      onChangeText <- nonEmptySimpleMessage
-      onRemoveText <- nonEmptySimpleMessage
       onSubmit <- call
     } yield ListViewModel(
       title,
       heading,
       rows,
-      buttonText,
       radioText,
       insetText,
       showRadios,
-      onChangeText,
-      onRemoveText,
       onSubmit
     )
 

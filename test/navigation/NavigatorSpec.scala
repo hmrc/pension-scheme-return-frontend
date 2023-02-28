@@ -116,5 +116,81 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
         }
       }
     }
+
+    "go from accounting period page to check your answers page" in {
+
+      forAll(srnGen) { srn =>
+
+        val page = AccountingPeriodPage(srn, refineMV(1))
+        navigator.nextPage(page, NormalMode, userAnswers) mustBe
+          routes.AccountingPeriodCheckYourAnswersController.onPageLoad(srn, refineMV(1))
+      }
+    }
+
+    "go from accounting period check your answers page to list page" in {
+
+      forAll(srnGen) { srn =>
+
+        val page = AccountingPeriodCheckYourAnswersPage(srn)
+        navigator.nextPage(page, NormalMode, userAnswers) mustBe
+          routes.AccountingPeriodListController.onPageLoad(srn, NormalMode)
+      }
+    }
+
+    "go from accounting periods list page to the next accounting periods page" when {
+
+      "yes is selected and 1 period exists" in {
+
+        forAll(srnGen) { srn =>
+
+          val answers = userAnswers.set(AccountingPeriodPage(srn, refineMV(1)), dateRangeGen.sample.value).get
+          val page = AccountingPeriodListPage(srn, addPeriod = true)
+          navigator.nextPage(page, NormalMode, answers) mustBe
+            routes.AccountingPeriodController.onPageLoad(srn, refineMV(2), NormalMode)
+        }
+      }
+
+      "yes is selected and 2 periods exists" in {
+
+        forAll(srnGen) { srn =>
+
+          val answers = userAnswers
+            .set(AccountingPeriodPage(srn, refineMV(1)), dateRangeGen.sample.value).get
+            .set(AccountingPeriodPage(srn, refineMV(2)), dateRangeGen.sample.value).get
+
+          val page = AccountingPeriodListPage(srn, addPeriod = true)
+          navigator.nextPage(page, NormalMode, answers) mustBe
+            routes.AccountingPeriodController.onPageLoad(srn, refineMV(3), NormalMode)
+        }
+      }
+    }
+
+    "go from accounting periods list page to scheme bank details page" when {
+
+      "no is selected" in {
+
+        forAll(srnGen) { srn =>
+
+          val page = AccountingPeriodListPage(srn, addPeriod = false)
+          navigator.nextPage(page, NormalMode, userAnswers) mustBe
+            routes.SchemeBankAccountController.onPageLoad(srn, refineMV(1), NormalMode)
+        }
+      }
+
+      "3 periods already exist" in {
+
+        forAll(srnGen) { srn =>
+
+          val answers = userAnswers
+            .set(AccountingPeriodPage(srn, refineMV(1)), dateRangeGen.sample.value).get
+            .set(AccountingPeriodPage(srn, refineMV(2)), dateRangeGen.sample.value).get
+            .set(AccountingPeriodPage(srn, refineMV(3)), dateRangeGen.sample.value).get
+
+          val page = AccountingPeriodListPage(srn, addPeriod = true)
+          navigator.nextPage(page, NormalMode, answers) mustBe
+            routes.SchemeBankAccountController.onPageLoad(srn, refineMV(1), NormalMode)
+        }
+      }
+    }
   }
 }

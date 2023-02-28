@@ -14,19 +14,8 @@
  * limitations under the License.
  */
 
-package config
+package pages
 
-object Constants {
+import models.SchemeId.Srn
 
-  val psaEnrolmentKey = "HMRC-PODS-ORG"
-  val pspEnrolmentKey = "HMRC-PODSPP-ORG"
-
-  val psaIdKey = "PSAID"
-  val pspIdKey = "PSPID"
-
-  val delimitedPSA = "DELIMITED_PSAID"
-  val detailsNotFound = "no match found"
-
-  val maxSchemeBankAccounts = 10
-  val maxAccountingPeriods = 3
-}
+case class AccountingPeriodListPage(srn: Srn, addPeriod: Boolean) extends Page

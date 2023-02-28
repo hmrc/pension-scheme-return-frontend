@@ -110,12 +110,9 @@ object SchemeBankAccountListController {
       SimpleMessage(titleKey, bankAccounts.length),
       SimpleMessage(headingKey, bankAccounts.length),
       rows,
-      "site.saveAndContinue",
       "schemeBankDetailsSummary.radio",
       "schemeBankDetailsSummary.inset",
       showRadios = bankAccounts.length < 10,
-      "site.change",
-      "site.remove",
       onSubmit = controllers.routes.SchemeBankAccountListController.onSubmit(srn)
     )
   }
