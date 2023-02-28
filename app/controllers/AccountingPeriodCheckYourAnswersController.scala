@@ -16,6 +16,7 @@
 
 package controllers
 
+import cats.implicits.toShow
 import com.google.inject.Inject
 import config.Refined.Max3
 import controllers.AccountingPeriodCheckYourAnswersController.viewModel
@@ -27,6 +28,7 @@ import pages.{AccountingPeriodCheckYourAnswersPage, AccountingPeriodPage, Scheme
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.DateTimeUtils.localDateShow
 import viewmodels.models.{CheckYourAnswersRowViewModel, CheckYourAnswersViewModel, SummaryAction}
 import views.html.CheckYourAnswersView
 
@@ -62,12 +64,12 @@ class AccountingPeriodCheckYourAnswersController @Inject()(
 object AccountingPeriodCheckYourAnswersController {
 
   private def rows(srn: Srn, index: Max3, dateRange: DateRange): List[CheckYourAnswersRowViewModel] = List(
-    CheckYourAnswersRowViewModel("site.startDate", dateRange.from.toString)
+    CheckYourAnswersRowViewModel("site.startDate", dateRange.from.show)
       .withAction(
         SummaryAction("site.change", routes.AccountingPeriodController.onPageLoad(srn, index, NormalMode).url)
           .withVisuallyHiddenContent("site.startDate")
       ),
-    CheckYourAnswersRowViewModel("site.endDate", dateRange.to.toString)
+    CheckYourAnswersRowViewModel("site.endDate", dateRange.to.show)
       .withAction(
         SummaryAction("site.change", routes.AccountingPeriodController.onPageLoad(srn, index, NormalMode).url)
           .withVisuallyHiddenContent("site.endDate")

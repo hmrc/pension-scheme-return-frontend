@@ -16,11 +16,13 @@
 
 package controllers
 
+import cats.implicits.toShow
 import config.Refined.OneToThree
 import eu.timepit.refined._
 import models.{DateRange, NormalMode}
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
 import pages.AccountingPeriodPage
+import utils.DateTimeUtils.localDateShow
 import viewmodels.DisplayMessage.SimpleMessage
 import viewmodels.models.SummaryAction
 import views.html.CheckYourAnswersView
@@ -90,7 +92,7 @@ class AccountingPeriodCheckYourAnswersControllerSpec extends ControllerBaseSpec 
 
         forAll(srnGen, dateRangeWithinRangeGen(dateRange)) { (srn, dateRange) =>
 
-          viewModel(srn, refineMV[OneToThree](1), dateRange).rows.map(_.value.key) must contain(dateRange.from.toString)
+          viewModel(srn, refineMV[OneToThree](1), dateRange).rows.map(_.value.key) must contain(dateRange.from.show)
         }
       }
 
@@ -98,7 +100,7 @@ class AccountingPeriodCheckYourAnswersControllerSpec extends ControllerBaseSpec 
 
         forAll(srnGen, dateRangeWithinRangeGen(dateRange)) { (srn, dateRange) =>
 
-          viewModel(srn, refineMV[OneToThree](1), dateRange).rows.map(_.value.key) must contain(dateRange.to.toString)
+          viewModel(srn, refineMV[OneToThree](1), dateRange).rows.map(_.value.key) must contain(dateRange.to.show)
         }
       }
 
