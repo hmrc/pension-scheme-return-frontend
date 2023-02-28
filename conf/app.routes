@@ -62,7 +62,7 @@ GET         /:srn/change-accounting-period/:index                 controllers.Ac
 POST        /:srn/change-accounting-period/:index                 controllers.AccountingPeriodController.onSubmit(srn: Srn, index: Max3, mode: Mode = CheckMode)
 
 GET         /:srn/check-accounting-period/:index                  controllers.AccountingPeriodCheckYourAnswersController.onPageLoad(srn: Srn, index: Max3)
-POST        /:srn/check-accounting-period                         controllers.AccountingPeriodCheckYourAnswersController.onSubmit(srn: Srn)
+GET         /:srn/check-accounting-period                         controllers.AccountingPeriodCheckYourAnswersController.onSubmit(srn: Srn)
 
 GET         /:srn/accounting-periods                              controllers.AccountingPeriodListController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST        /:srn/accounting-periods                              controllers.AccountingPeriodListController.onSubmit(srn: Srn, mode: Mode = NormalMode)
