@@ -145,14 +145,15 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
       }
     }
 
-    "got from accounting periods list page to unauthorised page" when {
+    "got from accounting periods list page to scheme bank details page" when {
 
       "no is selected" in {
 
         forAll(srnGen) { srn =>
 
           val page = AccountingPeriodListPage(srn, addPeriod = false)
-          navigator.nextPage(page, NormalMode, userAnswers) mustBe routes.UnauthorisedController.onPageLoad
+          navigator.nextPage(page, NormalMode, userAnswers) mustBe
+            routes.SchemeBankAccountController.onPageLoad(srn, refineMV(1), NormalMode)
         }
       }
 
@@ -166,7 +167,8 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
             .set(AccountingPeriodPage(srn, refineMV(3)), dateRangeGen.sample.value).get
 
           val page = AccountingPeriodListPage(srn, addPeriod = true)
-          navigator.nextPage(page, NormalMode, answers) mustBe routes.UnauthorisedController.onPageLoad
+          navigator.nextPage(page, NormalMode, answers) mustBe
+            routes.SchemeBankAccountController.onPageLoad(srn, refineMV(1), NormalMode)
         }
       }
     }

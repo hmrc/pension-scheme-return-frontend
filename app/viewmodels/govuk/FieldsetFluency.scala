@@ -29,6 +29,9 @@ trait FieldsetFluency {
 
     def apply(legend: Legend): Fieldset =
       Fieldset(legend = Some(legend))
+
+    def apply(legend: Option[Legend]): Fieldset =
+      Fieldset(legend = legend)
   }
 
   implicit class FluentFieldset(fieldset: Fieldset) {

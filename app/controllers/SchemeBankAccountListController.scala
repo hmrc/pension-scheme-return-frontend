@@ -96,7 +96,7 @@ object SchemeBankAccountListController {
             text,
             changeUrl = controllers.routes.SchemeBankAccountController.onPageLoad(srn, nextIndex, mode).url,
             changeHiddenText = SimpleMessage("schemeBankDetailsSummary.change.hidden", bankAccount.accountNumber),
-            removeUrl = controllers.routes.UnauthorisedController.onPageLoad.url,
+            removeUrl = controllers.routes.RemoveSchemeBankAccountController.onPageLoad(srn, nextIndex, mode).url,
             removeHiddenText = SimpleMessage("schemeBankDetailsSummary.remove.hidden", bankAccount.accountNumber)
           )
         )

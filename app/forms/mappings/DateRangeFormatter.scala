@@ -47,7 +47,7 @@ private[mappings] class DateRangeFormatter(
   private def verifyRangeBounds(key: String, date: LocalDate, error: Option[String]): Either[Seq[FormError], LocalDate] = {
     allowedRange.zip(error).map { case (range, error) =>
       if(range.contains(date)) Right(date)
-      else Left(List(FormError(key, error, List(date.show, range.from.show, range.to.show))))
+      else Left(List(FormError(key, error, List(range.from.show, range.to.show))))
     }.getOrElse(Right(date))
   }
 

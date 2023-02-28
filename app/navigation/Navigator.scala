@@ -62,12 +62,15 @@ class Navigator @Inject()() {
         index => routes.AccountingPeriodController.onPageLoad(srn, index, NormalMode)
       )
 
+    case RemoveSchemeBankAccountPage(srn) => _ => routes.SchemeBankAccountListController.onPageLoad(srn)
+
     case _              => _ => routes.IndexController.onPageLoad
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
     case CheckReturnDatesPage(srn)     => _ => routes.UnauthorisedController.onPageLoad
     case SchemeBankAccountPage(srn, _) => _ => routes.UnauthorisedController.onPageLoad
+    case RemoveSchemeBankAccountPage(srn) => _ => routes.SchemeBankAccountListController.onPageLoad(srn)
     case _                             => _ => routes.IndexController.onPageLoad
   }
 

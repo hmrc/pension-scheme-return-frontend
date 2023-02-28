@@ -76,7 +76,10 @@ class YesNoPageViewSpec extends BaseSpec with ScalaCheckPropertyChecks with Html
 
         forAll(yesNoPageViewModelGen) { viewmodel =>
 
-          legend(view(yesNoForm, viewmodel)) must contain(viewmodel.legend.toMessage)
+          whenever(viewmodel.legend.nonEmpty) {
+
+            legend(view(yesNoForm, viewmodel)) must contain(viewmodel.legend.map(_.toMessage).value)
+          }
         }
       }
 
