@@ -51,18 +51,20 @@ class Navigator @Inject()() {
         case Right(nextIndex) => routes.SchemeBankAccountController.onPageLoad(srn, nextIndex, NormalMode)
       }
     case SchemeBankAccountListPage(_, false) => _ => routes.UnauthorisedController.onPageLoad
+    case RemoveSchemeBankAccountPage(srn) => _ => routes.SchemeBankAccountListController.onPageLoad(srn)
 
-    case AccountingPeriodPage(srn, _) => _ => routes.AccountingPeriodListController.onPageLoad(srn, NormalMode)
+    case AccountingPeriodPage(srn, index) => _ => routes.AccountingPeriodCheckYourAnswersController.onPageLoad(srn, index)
+    case AccountingPeriodCheckYourAnswersPage(srn) => _ => routes.AccountingPeriodListController.onPageLoad(srn, NormalMode)
+
     case AccountingPeriodListPage(srn, false) => _ =>
       routes.SchemeBankAccountController.onPageLoad(srn, refineMV(1), NormalMode)
+
     case AccountingPeriodListPage(srn, true) => ua =>
       val count = ua.list(AccountingPeriods(srn)).length
       refineV[OneToThree](count + 1).fold(
         _     => routes.SchemeBankAccountController.onPageLoad(srn, refineMV(1), NormalMode),
         index => routes.AccountingPeriodController.onPageLoad(srn, index, NormalMode)
       )
-
-    case RemoveSchemeBankAccountPage(srn) => _ => routes.SchemeBankAccountListController.onPageLoad(srn)
 
     case _              => _ => routes.IndexController.onPageLoad
   }
