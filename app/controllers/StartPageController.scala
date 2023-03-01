@@ -17,30 +17,28 @@
 package controllers
 
 import controllers.actions._
+import models.NormalMode
 import models.SchemeId.Srn
-import models.{Mode, NormalMode, UserAnswers}
 import navigation.Navigator
 import pages.StartPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.models.ContentPageViewModel
 import views.html.ContentPageView
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
 
 class StartPageController @Inject()(
-                                       override val messagesApi: MessagesApi,
-                                       navigator: Navigator,
-                                       identify: IdentifierAction,
-                                       allowAccess: AllowAccessActionProvider,
-                                       getData: DataRetrievalAction,
-                                       createData: DataCreationAction,
-                                       val controllerComponents: MessagesControllerComponents,
-                                       view: ContentPageView
-                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+  override val messagesApi: MessagesApi,
+  navigator: Navigator,
+  identify: IdentifierAction,
+  allowAccess: AllowAccessActionProvider,
+  getData: DataRetrievalAction,
+  createData: DataCreationAction,
+  val controllerComponents: MessagesControllerComponents,
+  view: ContentPageView
+) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(srn: Srn): Action[AnyContent] = (identify andThen allowAccess(srn)) {
     implicit request =>

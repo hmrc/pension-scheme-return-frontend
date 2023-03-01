@@ -32,11 +32,14 @@ trait ErrorSummaryFluency {
                errorLinkOverrides: Map[String, String] = Map.empty
              )(implicit messages: Messages): ErrorSummary = {
 
-      val errors = form.errors.map {
+      val errors = form.errors.distinctBy(_.message).map {
         error =>
           ErrorLink(
             href    = Some(s"#${errorLinkOverrides.getOrElse(error.key, error.key)}"),
-            content = Text(messages(error.message, error.args: _*))
+            content = Text(messages(error.message, error.args.map {
+              case s: String => messages(s)
+              case any       => any
+            }: _*))
           )
       }
 

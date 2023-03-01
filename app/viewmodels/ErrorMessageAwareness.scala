@@ -16,7 +16,7 @@
 
 package viewmodels
 
-import play.api.data.Field
+import play.api.data.{Field, FormError}
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.errormessage.ErrorMessage
@@ -24,9 +24,18 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.errormessage.ErrorMessage
 trait ErrorMessageAwareness {
 
   def errorMessage(field: Field)(implicit messages: Messages): Option[ErrorMessage] =
-    field.error
+    errorMessage(field.error)
+
+  def errorMessage(errors: Seq[FormError])(implicit messages: Messages): Option[ErrorMessage] =
+    errorMessage(errors.headOption)
+
+  def errorMessage(error: Option[FormError])(implicit messages: Messages): Option[ErrorMessage] =
+    error
       .map {
         err =>
-          ErrorMessage(content = Text(messages(err.message, err.args: _*)))
+          ErrorMessage(content = Text(messages(err.message, err.args.map {
+            case s: String => messages(s)
+            case any       => any
+          }: _*)))
       }
 }

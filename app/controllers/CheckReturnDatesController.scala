@@ -18,8 +18,8 @@ package controllers
 
 import controllers.actions._
 import forms.YesNoPageFormProvider
-import models.{MinimalSchemeDetails, Mode, PensionSchemeId, SchemeDetails}
 import models.SchemeId.Srn
+import models.{MinimalSchemeDetails, Mode, PensionSchemeId}
 import navigation.Navigator
 import pages.CheckReturnDatesPage
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -27,9 +27,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.{SaveService, SchemeDetailsService, TaxYearService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import uk.gov.hmrc.time.CurrentTaxYear
 import utils.DateTimeUtils
-import viewmodels.DisplayMessage
 import viewmodels.DisplayMessage.SimpleMessage
 import viewmodels.models.YesNoPageViewModel
 import views.html.YesNoPageView
@@ -129,7 +127,7 @@ object CheckReturnDatesController {
           )
         )
       ),
-      SimpleMessage("checkReturnDates.legend"),
+      Some(SimpleMessage("checkReturnDates.legend")),
       routes.CheckReturnDatesController.onSubmit(srn, mode)
     )
   }

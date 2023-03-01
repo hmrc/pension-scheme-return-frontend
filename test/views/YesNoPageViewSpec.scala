@@ -76,7 +76,10 @@ class YesNoPageViewSpec extends BaseSpec with ScalaCheckPropertyChecks with Html
 
         forAll(yesNoPageViewModelGen) { viewmodel =>
 
-          legend(view(yesNoForm, viewmodel)) must contain(viewmodel.legend.toMessage)
+          whenever(viewmodel.legend.nonEmpty) {
+
+            legend(view(yesNoForm, viewmodel)) must contain(viewmodel.legend.map(_.toMessage).value)
+          }
         }
       }
 
@@ -100,8 +103,8 @@ class YesNoPageViewSpec extends BaseSpec with ScalaCheckPropertyChecks with Html
 
         forAll(yesNoPageViewModelGen) { viewmodel =>
 
-          form(view(yesNoForm, viewmodel)).attr("method") mustBe viewmodel.onSubmit.method
-          form(view(yesNoForm, viewmodel)).attr("action") mustBe viewmodel.onSubmit.url
+          form(view(yesNoForm, viewmodel)).method mustBe viewmodel.onSubmit.method
+          form(view(yesNoForm, viewmodel)).action mustBe viewmodel.onSubmit.url
         }
       }
 

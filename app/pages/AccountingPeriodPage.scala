@@ -14,25 +14,25 @@
  * limitations under the License.
  */
 
-package forms
+package pages
 
-import forms.behaviours.DateBehaviours
+import config.Refined.Max3
+import models.DateRange
+import models.SchemeId.Srn
+import play.api.libs.json.JsPath
+import queries.Gettable
+import utils.RefinedUtils.RefinedIntOps
 
-import java.time.{LocalDate, ZoneOffset}
+case class AccountingPeriodPage(srn: Srn, index: Max3) extends QuestionPage[DateRange] {
 
-class DatePageFormProviderSpec extends DateBehaviours {
+  override def path: JsPath = JsPath \ toString \ index.arrayIndex
 
-  val form = new DatePageFormProvider()()
+  override def toString: String = "accountPeriod"
+}
 
-  ".value" - {
+case class AccountingPeriods(srn: Srn) extends Gettable[List[DateRange]] {
 
-    val validData = datesBetween(
-      min = LocalDate.of(2000, 1, 1),
-      max = LocalDate.now(ZoneOffset.UTC)
-    )
+  override def path: JsPath = JsPath \ toString
 
-    behave like dateField(form, "value", validData)
-
-    behave like mandatoryDateField(form, "value", "datePage.error.required.all")
-  }
+  override def toString: String = "accountPeriod"
 }

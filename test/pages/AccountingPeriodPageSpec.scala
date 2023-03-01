@@ -14,28 +14,22 @@
  * limitations under the License.
  */
 
-package forms
+package pages
 
-import forms.mappings.Mappings
-import play.api.data.Form
+import eu.timepit.refined.refineMV
+import models.DateRange
+import pages.behaviours.PageBehaviours
 
-import java.time.LocalDate
-import javax.inject.Inject
+class AccountingPeriodPageSpec extends PageBehaviours {
 
-class DatePageFormProvider @Inject() extends Mappings {
+  "AccountingPeriodPage" - {
 
-  def apply(
-    invalidKey: String     = "datePage.error.invalid",
-    allRequiredKey: String = "datePage.error.required.all",
-    twoRequiredKey: String = "datePage.error.required.two",
-    requiredKey: String    = "datePage.error.required"
-  ): Form[LocalDate] =
-    Form(
-      "value" -> localDate(
-        invalidKey,
-        allRequiredKey,
-        twoRequiredKey,
-        requiredKey
-      )
-    )
+    val srn = srnGen.sample.value
+
+    beRetrievable[DateRange](AccountingPeriodPage(srn, refineMV(1)))
+
+    beSettable[DateRange](AccountingPeriodPage(srn, refineMV(1)))
+
+    beRemovable[DateRange](AccountingPeriodPage(srn, refineMV(1)))
+  }
 }

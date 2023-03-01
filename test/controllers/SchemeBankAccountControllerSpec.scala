@@ -16,35 +16,54 @@
 
 package controllers
 
+import config.Refined.OneToTen
 import controllers.SchemeBankAccountController._
+import eu.timepit.refined.refineMV
 import forms.BankAccountFormProvider
-import models.{BankAccount, NormalMode}
+import models.NormalMode
 import pages.SchemeBankAccountPage
 import views.html.BankAccountView
 
 class SchemeBankAccountControllerSpec extends ControllerBaseSpec {
 
-  private val onPageLoad = routes.SchemeBankAccountController.onPageLoad(srn, NormalMode).url
-  private val onSubmit = routes.SchemeBankAccountController.onSubmit(srn, NormalMode).url
+  private lazy val onPageLoad = routes.SchemeBankAccountController.onPageLoad(srn, refineMV[OneToTen](1), NormalMode)
+  private lazy val onSubmit = routes.SchemeBankAccountController.onSubmit(srn, refineMV[OneToTen](1), NormalMode)
 
-  private val bankAccount = BankAccount("testBankName", "10273837", "027162")
+  private val bankAccount = bankAccountGen.sample.value
+  private val otherBankAccount = bankAccountGen.sample.value
 
-  private val redirectUrl = controllers.routes.UnauthorisedController.onPageLoad.url
-
-  private val validFormData = List("bankName" -> "testBankName", "accountNumber" -> "10273837", "sortCode" -> "027123")
+  private val validFormData = List("bankName" -> bankAccount.bankName, "accountNumber" -> bankAccount.accountNumber, "sortCode" -> bankAccount.sortCode)
   private val invalidFormData = List("bankName" -> "testBankName", "accountNumber" -> "10273837", "sortCode" -> "wrong")
 
   "SchemeBankAccountController" should {
 
     behave like renderView(onPageLoad) { implicit app => implicit request =>
-      injected[BankAccountView].apply(form(injected[BankAccountFormProvider]), viewModel(srn, NormalMode))
+      injected[BankAccountView].apply(form(injected[BankAccountFormProvider], List()), viewModel(srn, refineMV[OneToTen](1), NormalMode))
     }
+
+    behave like renderPrePopView(onPageLoad, SchemeBankAccountPage(srn, refineMV(1)), bankAccount) { implicit app =>
+      implicit request =>
+        val preparedForm = form(injected[BankAccountFormProvider], List()).fill(bankAccount)
+        injected[BankAccountView].apply(preparedForm, viewModel(srn, refineMV[OneToTen](1), NormalMode))
+    }
+
     behave like invalidForm(onSubmit, invalidFormData: _*)
-    behave like redirectNextPage(onSubmit, redirectUrl, validFormData: _*)
-    
-    behave like renderPrePopView(onPageLoad, SchemeBankAccountPage(srn), bankAccount) { implicit app => implicit request =>
-      val preparedForm = form(injected[BankAccountFormProvider]).fill(bankAccount)
-      injected[BankAccountView].apply(preparedForm, viewModel(srn, NormalMode))
+    behave like saveAndContinue(onSubmit, validFormData: _*)
+
+    "persist data when updating" when {
+      val ua = defaultUserAnswers.set(SchemeBankAccountPage(srn, refineMV(1)), bankAccount).get
+      behave like saveAndContinue(onSubmit, ua, validFormData: _*)
     }
+
+    "return a 400 when data exists in user answers" when {
+      val userAnswers = defaultUserAnswers
+        .set(SchemeBankAccountPage(srn, refineMV(1)), otherBankAccount).get
+        .set(SchemeBankAccountPage(srn, refineMV(2)), bankAccount).get
+
+      behave like invalidForm(onSubmit, userAnswers, validFormData: _*)
+    }
+
+    behave like journeyRecoveryPage("onPageLoad", onPageLoad)
+    behave like journeyRecoveryPage("onSubmit", onSubmit)
   }
 }

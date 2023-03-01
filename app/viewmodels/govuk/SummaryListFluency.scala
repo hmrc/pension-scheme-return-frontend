@@ -16,7 +16,8 @@
 
 package viewmodels.govuk
 
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Content
+import play.twirl.api.Html
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{Content, HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist._
 
 object summarylist extends SummaryListFluency
@@ -48,9 +49,15 @@ trait SummaryListFluency {
                value: Value
              ): SummaryListRow =
       SummaryListRow(
-        key   = key,
+        key = key,
         value = value
       )
+
+    def apply(
+               key: Html,
+               actions: Seq[ActionItem]
+             ): SummaryListRow =
+      apply(Key(HtmlContent(key)), Value(), actions)
 
     def apply(
                key: Key,
@@ -58,8 +65,19 @@ trait SummaryListFluency {
                actions: Seq[ActionItem]
              ): SummaryListRow =
       SummaryListRow(
-        key     = key,
-        value   = value,
+        key = key,
+        value = value,
+        actions = Some(Actions(items = actions))
+      )
+
+    def apply(
+               key: String,
+               value: String,
+               actions: Seq[ActionItem]
+             ): SummaryListRow =
+      SummaryListRow(
+        key = Key(Text(key)),
+        value = Value(Text(value)),
         actions = Some(Actions(items = actions))
       )
   }
@@ -68,6 +86,12 @@ trait SummaryListFluency {
 
     def withCssClass(className: String): SummaryListRow =
       row copy (classes = s"${row.classes} $className")
+
+    def withAction(item: ActionItem): SummaryListRow = {
+      val actions = row.actions.map(a => a.copy(items = a.items :+ item))
+
+      row.copy(actions = actions orElse Some(Actions(items = Seq(item))))
+    }
   }
 
   object ActionItemViewModel {
@@ -80,6 +104,8 @@ trait SummaryListFluency {
         content = content,
         href    = href
       )
+
+    def apply(html: Html, href: String): ActionItem = apply(HtmlContent(html), href)
   }
 
   implicit class FluentActionItem(actionItem: ActionItem) {
@@ -98,12 +124,18 @@ trait SummaryListFluency {
 
     def apply(content: Content): Key =
       Key(content = content)
+
+    def apply(html: Html): Key =
+      apply(HtmlContent(html))
   }
 
   implicit class FluentKey(key: Key) {
 
     def withCssClass(className: String): Key =
       key copy (classes = s"${key.classes} $className")
+
+    def withRegularFont: Key =
+      withCssClass("govuk-!-font-weight-regular")
   }
 
   object ValueViewModel {

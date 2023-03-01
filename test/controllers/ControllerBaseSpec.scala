@@ -25,8 +25,9 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.mvc.Call
-import play.api.test.Helpers.running
 import play.api.test._
+import services.{FakeTaxYearService, TaxYearService}
+import uk.gov.hmrc.time.TaxYear
 import utils.BaseSpec
 
 trait ControllerBaseSpec
@@ -39,19 +40,47 @@ trait ControllerBaseSpec
     with Status
     with PlayRunners
     with RouteInvokers
-    with ResultExtractors {
+    with ResultExtractors
+    with TestValues {
 
   val baseUrl = "/pension-scheme-return"
-
-  val srn: SchemeId.Srn = srnGen.sample.value
 
   val userAnswersId: String = "id"
 
   val testOnwardRoute: Call = Call("GET", "/foo")
 
+  val defaultTaxYear = TaxYear(2022)
+
   def emptyUserAnswers: UserAnswers = UserAnswers(userAnswersId)
 
-  val userAnswers: UserAnswers = UserAnswers(userAnswersId, Json.obj("non" -> "empty"))
+  val defaultUserAnswers: UserAnswers = UserAnswers(userAnswersId, Json.obj("non" -> "empty"))
+
+  protected def applicationBuilder(
+                                    userAnswers: Option[UserAnswers] = None,
+                                    schemeDetails: SchemeDetails = defaultSchemeDetails,
+                                    taxYear: TaxYear = defaultTaxYear
+                                  ): GuiceApplicationBuilder =
+    new GuiceApplicationBuilder()
+      .bindings(
+        bind[Navigator].toInstance(new Navigator()).eagerly()
+      ).overrides(
+        bind[DataRequiredAction].to[DataRequiredActionImpl],
+        bind[IdentifierAction].to[FakeIdentifierAction],
+        bind[AllowAccessActionProvider].toInstance(new FakeAllowAccessActionProvider(schemeDetails)),
+        bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers)),
+        bind[DataCreationAction].toInstance(new FakeDataCreationAction(userAnswers.getOrElse(emptyUserAnswers))),
+        bind[TaxYearService].toInstance(new FakeTaxYearService(taxYear.starts))
+      )
+
+  def runningApplication[T](block: Application => T): T = {
+    running(_ => applicationBuilder())(block)
+  }
+}
+
+trait TestValues { _ : BaseSpec =>
+  val accountNumber = "12345678"
+  val sortCode = "123456"
+  val srn: SchemeId.Srn = srnGen.sample.value
 
   val defaultSchemeDetails: SchemeDetails = SchemeDetails(
     "testSRN",
@@ -62,24 +91,4 @@ trait ControllerBaseSpec
     Some("testAuthorisingPSAID"),
     List(Establisher("testFirstName testLastName", EstablisherKind.Individual))
   )
-
-  protected def applicationBuilder(
-                                    userAnswers: Option[UserAnswers] = None,
-                                    schemeDetails: SchemeDetails = defaultSchemeDetails
-                                  ): GuiceApplicationBuilder =
-    new GuiceApplicationBuilder()
-      .bindings(
-        bind[Navigator].toInstance(new Navigator()).eagerly()
-      )
-      .overrides(
-        bind[DataRequiredAction].to[DataRequiredActionImpl],
-        bind[IdentifierAction].to[FakeIdentifierAction],
-        bind[AllowAccessActionProvider].toInstance(new FakeAllowAccessActionProvider(schemeDetails)),
-        bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers)),
-        bind[DataCreationAction].toInstance(new FakeDataCreationAction(userAnswers.getOrElse(emptyUserAnswers))),
-      )
-
-  def runningApplication[T](block: Application => T): T = {
-    running(_ => applicationBuilder())(block)
-  }
 }

@@ -22,12 +22,11 @@ import models.SchemeStatus._
 import models._
 import models.cache.PensionSchemeUser
 import models.cache.PensionSchemeUser.{Administrator, Practitioner}
-import models.requests.{AllowedAccessRequest, IdentifierRequest}
 import models.requests.IdentifierRequest.{AdministratorRequest, PractitionerRequest}
+import models.requests.{AllowedAccessRequest, IdentifierRequest}
 import org.scalacheck.Gen
 import org.scalacheck.Gen.numChar
-import play.api.mvc.{AnyContent, Request}
-import play.api.test.FakeRequest
+import play.api.mvc.Request
 
 trait ModelGenerators extends BasicGenerators {
   lazy val minimalDetailsGen: Gen[MinimalDetails] =
@@ -138,6 +137,32 @@ trait ModelGenerators extends BasicGenerators {
     } yield AllowedAccessRequest(request, schemeDetails)
 
   def modeGen: Gen[Mode] = Gen.oneOf(NormalMode, CheckMode)
+
+  implicit val dateRangeGen: Gen[DateRange] =
+    for {
+      startDate <- date
+      endDate   <- date
+    } yield DateRange(startDate, endDate)
+
+  def dateRangeWithinRangeGen(range: DateRange): Gen[DateRange] =
+    for {
+      date1 <- datesBetween(range.from, range.to)
+      date2 <- datesBetween(range.from, range.to)
+    } yield {
+      if(date1.isBefore(date2)) DateRange(date1, date2)
+      else DateRange(date2, date1)
+    }
+
+  val bankAccountGen: Gen[BankAccount] =
+    for {
+      bankName      <- nonEmptyAlphaString.map(_.take(28))
+      accountNumber <- Gen.listOfN(8, numChar).map(_.mkString)
+      separator     <- Gen.oneOf("", " ", "-")
+      pairs          = Gen.listOfN(2, numChar).map(_.mkString)
+      sortCode      <- Gen.listOfN(3, pairs).map(_.mkString(separator))
+    } yield {
+      BankAccount(bankName, accountNumber, sortCode)
+    }
 }
 
 object ModelGenerators extends ModelGenerators

@@ -17,6 +17,7 @@
 package navigation
 
 import controllers.routes
+import eu.timepit.refined._
 import models._
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import pages._
@@ -53,23 +54,141 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
       }
     }
 
-    "go from check return dates page to scheme bank account page" when {
+    "check returns page" should {
 
-      "yes is selected" in {
-        forAll(srnGen) { srn =>
-          val ua = userAnswers.set(CheckReturnDatesPage(srn), true).get
-          navigator.nextPage(CheckReturnDatesPage(srn), NormalMode, ua) mustBe routes.SchemeBankAccountController.onPageLoad(srn, NormalMode)
+      "navigate to scheme bank account page" when {
+        "yes is selected" in {
+          forAll(srnGen) { srn =>
+            val ua = userAnswers.set(CheckReturnDatesPage(srn), true).get
+            navigator.nextPage(CheckReturnDatesPage(srn), NormalMode, ua) mustBe
+              routes.SchemeBankAccountController.onPageLoad(srn, refineMV(1), NormalMode)
+          }
         }
       }
-    }
 
-    "go from check return dates page to unauthorised page" when {
+      "navigate to scheme bank account list page" when {
+        "yes is selected and a bank account has previously been entered" in {
+          forAll(srnGen) { srn =>
+            val ua = userAnswers
+              .set(CheckReturnDatesPage(srn), true).get
+              .set(SchemeBankAccountPage(srn, refineMV(1)), BankAccount("test", "11111111", "111111")).get
+            navigator.nextPage(CheckReturnDatesPage(srn), NormalMode, ua) mustBe
+              routes.SchemeBankAccountListController.onPageLoad(srn)
+          }
+        }
+      }
 
       "no is selected" in {
 
         forAll(srnGen) { srn =>
           val ua = userAnswers.set(CheckReturnDatesPage(srn), false).get
-          navigator.nextPage(CheckReturnDatesPage(srn), NormalMode, ua) mustBe routes.UnauthorisedController.onPageLoad
+          navigator.nextPage(CheckReturnDatesPage(srn), NormalMode, ua) mustBe
+            routes.AccountingPeriodController.onPageLoad(srn, refineMV(1), NormalMode)
+        }
+      }
+    }
+
+    "go from scheme bank account page to check your answers page" in {
+
+      forAll(srnGen) { srn =>
+        val page = SchemeBankAccountPage(srn, refineMV(1))
+        navigator.nextPage(page, NormalMode, userAnswers) mustBe
+          routes.SchemeBankAccountCheckYourAnswersController.onPageLoad(srn, refineMV(1))
+      }
+    }
+
+    "go from bank account check your answers page to list page" in {
+
+      forAll(srnGen) { srn =>
+        val page = SchemeBankAccountCheckYourAnswersPage(srn)
+        navigator.nextPage(page, NormalMode, userAnswers) mustBe routes.SchemeBankAccountListController.onPageLoad(srn)
+      }
+    }
+
+    "go from scheme bank account list page to scheme bank account page" when {
+
+      "yes is selected" in {
+        forAll(srnGen) { srn =>
+          val ua = userAnswers.set(SchemeBankAccountPage(srn, refineMV(1)), BankAccount("test", "11111111", "111111")).get
+          val page = SchemeBankAccountListPage(srn, addBankAccount = true)
+          navigator.nextPage(page, NormalMode, ua) mustBe
+            routes.SchemeBankAccountController.onPageLoad(srn, refineMV(2), NormalMode)
+        }
+      }
+    }
+
+    "go from accounting period page to check your answers page" in {
+
+      forAll(srnGen) { srn =>
+
+        val page = AccountingPeriodPage(srn, refineMV(1))
+        navigator.nextPage(page, NormalMode, userAnswers) mustBe
+          routes.AccountingPeriodCheckYourAnswersController.onPageLoad(srn, refineMV(1))
+      }
+    }
+
+    "go from accounting period check your answers page to list page" in {
+
+      forAll(srnGen) { srn =>
+
+        val page = AccountingPeriodCheckYourAnswersPage(srn)
+        navigator.nextPage(page, NormalMode, userAnswers) mustBe
+          routes.AccountingPeriodListController.onPageLoad(srn, NormalMode)
+      }
+    }
+
+    "go from accounting periods list page to the next accounting periods page" when {
+
+      "yes is selected and 1 period exists" in {
+
+        forAll(srnGen) { srn =>
+
+          val answers = userAnswers.set(AccountingPeriodPage(srn, refineMV(1)), dateRangeGen.sample.value).get
+          val page = AccountingPeriodListPage(srn, addPeriod = true)
+          navigator.nextPage(page, NormalMode, answers) mustBe
+            routes.AccountingPeriodController.onPageLoad(srn, refineMV(2), NormalMode)
+        }
+      }
+
+      "yes is selected and 2 periods exists" in {
+
+        forAll(srnGen) { srn =>
+
+          val answers = userAnswers
+            .set(AccountingPeriodPage(srn, refineMV(1)), dateRangeGen.sample.value).get
+            .set(AccountingPeriodPage(srn, refineMV(2)), dateRangeGen.sample.value).get
+
+          val page = AccountingPeriodListPage(srn, addPeriod = true)
+          navigator.nextPage(page, NormalMode, answers) mustBe
+            routes.AccountingPeriodController.onPageLoad(srn, refineMV(3), NormalMode)
+        }
+      }
+    }
+
+    "go from accounting periods list page to scheme bank details page" when {
+
+      "no is selected" in {
+
+        forAll(srnGen) { srn =>
+
+          val page = AccountingPeriodListPage(srn, addPeriod = false)
+          navigator.nextPage(page, NormalMode, userAnswers) mustBe
+            routes.SchemeBankAccountController.onPageLoad(srn, refineMV(1), NormalMode)
+        }
+      }
+
+      "3 periods already exist" in {
+
+        forAll(srnGen) { srn =>
+
+          val answers = userAnswers
+            .set(AccountingPeriodPage(srn, refineMV(1)), dateRangeGen.sample.value).get
+            .set(AccountingPeriodPage(srn, refineMV(2)), dateRangeGen.sample.value).get
+            .set(AccountingPeriodPage(srn, refineMV(3)), dateRangeGen.sample.value).get
+
+          val page = AccountingPeriodListPage(srn, addPeriod = true)
+          navigator.nextPage(page, NormalMode, answers) mustBe
+            routes.SchemeBankAccountController.onPageLoad(srn, refineMV(1), NormalMode)
         }
       }
     }

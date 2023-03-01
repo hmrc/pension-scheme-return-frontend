@@ -17,7 +17,6 @@
 package views
 
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import utils.BaseSpec
 import views.html.ContentPageView
@@ -35,6 +34,7 @@ class ContentPageViewSpec extends BaseSpec with ScalaCheckPropertyChecks with Ht
       "render the title" in {
 
         forAll(contentPageViewModelGen) { viewModel =>
+
           title(view(viewModel)) must startWith(viewModel.title.toMessage)
         }
       }
@@ -42,6 +42,7 @@ class ContentPageViewSpec extends BaseSpec with ScalaCheckPropertyChecks with Ht
       "render the heading" in {
 
         forAll(contentPageViewModelGen) { viewModel =>
+
           h1(view(viewModel)) mustBe viewModel.heading.toMessage
         }
       }
@@ -49,6 +50,7 @@ class ContentPageViewSpec extends BaseSpec with ScalaCheckPropertyChecks with Ht
       "render all paragraphs" in {
 
         forAll(contentPageViewModelGen) { viewModel =>
+
           p(view(viewModel)) must contain allElementsOf viewModel.paragraphs.map(_.toMessage)
         }
       }
@@ -56,14 +58,16 @@ class ContentPageViewSpec extends BaseSpec with ScalaCheckPropertyChecks with Ht
       "render the button text" in {
 
         forAll(contentPageViewModelGen) { viewModel =>
-          anchorButton(view(viewModel)).text() mustBe viewModel.buttonText.toMessage
+
+          anchorButton(view(viewModel)).content mustBe viewModel.buttonText.key
         }
       }
 
       "render the button href" in {
 
         forAll(contentPageViewModelGen) { viewModel =>
-          anchorButton(view(viewModel)).attr("href") mustBe viewModel.onSubmit.url
+
+          anchorButton(view(viewModel)).href mustBe viewModel.onSubmit.url
         }
       }
     }

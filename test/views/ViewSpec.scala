@@ -17,10 +17,13 @@
 package views
 
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import play.api.i18n.Messages
 import utils.BaseSpec
 
-trait ViewSpec extends BaseSpec with ScalaCheckPropertyChecks with HtmlHelper {
+trait ViewSpec
+  extends BaseSpec
+    with ScalaCheckPropertyChecks
+    with HtmlHelper
+    with ViewBehaviours {
 
   def renderedErrorMessage(key: String) = s"Error: $key"
 }

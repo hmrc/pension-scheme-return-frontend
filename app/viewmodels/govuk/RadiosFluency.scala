@@ -74,6 +74,15 @@ trait RadiosFluency {
 
     def yesNo(
                field: Field,
+               legend: Option[Legend]
+             )(implicit messages: Messages): Radios =
+      yesNo(
+        field = field,
+        fieldset = FieldsetViewModel(legend)
+      )
+
+    def yesNo(
+               field: Field,
                fieldset: Fieldset
              )(implicit messages: Messages): Radios = {
 

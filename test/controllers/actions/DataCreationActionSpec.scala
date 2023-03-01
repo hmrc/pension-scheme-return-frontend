@@ -16,9 +16,8 @@
 
 package controllers.actions
 
-import models.UserAnswers
 import models.requests.{DataRequest, OptionalDataRequest}
-import org.mockito.ArgumentMatchers.{any, eq=>meq}
+import org.mockito.ArgumentMatchers.any
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import repositories.SessionRepository

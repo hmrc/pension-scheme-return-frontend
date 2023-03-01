@@ -16,8 +16,8 @@
 
 package models.requests
 
-import play.api.mvc.{Request, WrappedRequest}
 import models.{PensionSchemeId, SchemeDetails, UserAnswers}
+import play.api.mvc.WrappedRequest
 
 case class OptionalDataRequest[A] (request: AllowedAccessRequest[A], userAnswers: Option[UserAnswers]) extends WrappedRequest[A](request) {
 

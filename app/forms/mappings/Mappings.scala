@@ -16,7 +16,7 @@
 
 package forms.mappings
 
-import models.Enumerable
+import models.{DateRange, Enumerable}
 import play.api.data.FieldMapping
 import play.api.data.Forms.of
 
@@ -44,11 +44,17 @@ trait Mappings extends Formatters with Constraints {
                               args: Seq[String] = Seq.empty)(implicit ev: Enumerable[A]): FieldMapping[A] =
     of(enumerableFormatter[A](requiredKey, invalidKey, args))
 
-  protected def localDate(
-                           invalidKey: String,
-                           allRequiredKey: String,
-                           twoRequiredKey: String,
-                           requiredKey: String,
-                           args: Seq[String] = Seq.empty): FieldMapping[LocalDate] =
-    of(new LocalDateFormatter(invalidKey, allRequiredKey, twoRequiredKey, requiredKey, args))
+  protected def localDate(dateFormErrors: DateFormErrors,
+                          args: Seq[String] = Seq.empty): FieldMapping[LocalDate] =
+    of(new LocalDateFormatter(dateFormErrors, args))
+
+  protected def dateRange(startDateErrors: DateFormErrors,
+                          endDateErrors: DateFormErrors,
+                          invalidRangeError: String,
+                          allowedRange: Option[DateRange],
+                          startDateAllowedDateRangeError: Option[String],
+                          endDateAllowedDateRangeError: Option[String],
+                          duplicateRangeError: Option[String],
+                          duplicateRanges: List[DateRange]): FieldMapping[DateRange] =
+    of(new DateRangeFormatter(startDateErrors, endDateErrors, invalidRangeError, allowedRange, startDateAllowedDateRangeError, endDateAllowedDateRangeError, duplicateRangeError, duplicateRanges))
 }
