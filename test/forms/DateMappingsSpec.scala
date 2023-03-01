@@ -382,7 +382,7 @@ class DateMappingsSpec extends AnyFreeSpec with Matchers with ScalaCheckProperty
 
   "must fail to bind a date before start date" in {
 
-    val invalidDate = datesBetween(earliestDate, startDate)
+    val invalidDate = datesBetween(earliestDate, startDate.minusDays(1))
 
     forAll(invalidDate -> "invalid date") { date =>
 
@@ -400,7 +400,7 @@ class DateMappingsSpec extends AnyFreeSpec with Matchers with ScalaCheckProperty
 
   "must fail to bind a date after end date" in {
 
-    val invalidDate = datesBetween(endDate, latestDate)
+    val invalidDate = datesBetween(endDate.plusDays(1), latestDate)
 
     forAll(invalidDate -> "invalid date") { date =>
 
