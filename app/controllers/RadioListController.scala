@@ -66,7 +66,13 @@ object RadioListController {
     "startPage.title",
     "startPage.heading",
     List(
-      RadioItem(content = Text("yea1"), value = Some("value"))
+      RadioItem(content = Text("6 April 2021 to 5 April 2022"), value = Some("value")),
+      RadioItem(content = Text("6 April 2020 to 5 April 2021"), value = Some("value")),
+      RadioItem(content = Text("6 April 2019 to 5 April 2020"), value = Some("value")),
+      RadioItem(content = Text("6 April 2018 to 5 April 2019"), value = Some("value")),
+      RadioItem(content = Text("6 April 2017 to 5 April 2018"), value = Some("value")),
+      RadioItem(content = Text("6 April 2016 to 5 April 2017"), value = Some("value")),
+      RadioItem(content = Text("6 April 2015 to 5 April 2016"), value = Some("value"))
     ),
     controllers.routes.RadioListController.onSubmit(srn)
   )

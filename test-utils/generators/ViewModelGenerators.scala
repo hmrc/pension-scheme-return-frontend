@@ -17,6 +17,7 @@
 package generators
 
 import org.scalacheck.Gen
+import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
 import viewmodels.models._
 
 trait ViewModelGenerators extends BasicGenerators {
@@ -88,5 +89,15 @@ trait ViewModelGenerators extends BasicGenerators {
       onSubmit    <- call
     } yield {
       YesNoPageViewModel(title, heading, description, legend, onSubmit)
+    }
+
+  val radioListViewModelGen: Gen[RadioListViewModel] =
+    for {
+      title <- nonEmptyString
+      heading <- nonEmptyString
+      items <- Gen.listOf(radioList(nonEmptyString))
+      onSubmit <- call
+    } yield {
+      RadioListViewModel(title, heading, items, onSubmit)
     }
 }

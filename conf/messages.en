@@ -101,3 +101,6 @@ schemeBankDetails.sortCode.error.required = Enter a sort code
 schemeBankDetails.sortCode.error.invalid = Sort code must only include numbers 0 to 9
 schemeBankDetails.sortCode.error.format.invalid = Enter a valid sort code, like 309430
 schemeBankDetails.sortCode.error.length = Sort code must be 6 digits
+
+radioList.title = Which tax year are you submitting a return for?
+radioList.heading = Which tax year are you submitting a return for?
