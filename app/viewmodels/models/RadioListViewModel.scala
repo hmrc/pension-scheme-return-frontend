@@ -18,6 +18,7 @@ package viewmodels.models
 
 import play.api.i18n.Messages
 import play.api.mvc.Call
+import uk.gov.hmrc.govukfrontend.views.Aliases.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
 import viewmodels.DisplayMessage.SimpleMessage
 
@@ -30,7 +31,7 @@ case class RadioListViewModel(
 
 object RadioListViewModel {
 
-  def apply(title: String, heading: String, items: List[RadioListRowViewModel], onSubmit: Call): RadioListViewModel =
+  def apply[A](title: String, heading: String, items: List[RadioListRowViewModel], onSubmit: Call): RadioListViewModel =
     RadioListViewModel(
       SimpleMessage(title),
       SimpleMessage(heading),
@@ -39,31 +40,15 @@ object RadioListViewModel {
     )
 }
 
-class  Sample[A](value: A) {
-  def getValue: A = value
-}
 case class RadioListRowViewModel(
-                                         content : SimpleMessage,
-                                         value   : A
-                                       ) {
+  content : SimpleMessage,
+  value   : String
+) {
 
   def radioListRow(implicit messages: Messages): RadioItem = {
     RadioItem(
-      content = content.toMessage,
-      value = value
-
+      content = Text(content.toMessage),
+      value = Some(value)
     )
   }
-
-  def withAction(action: RadioList): RadioListRowViewModel =
-    copy(actions = actions :+ action)
-}
-
-object RadioListRowViewModel {
-
-  def apply(
-             content: String,
-             value: String
-           ): RadioListRowViewModel =
-    RadioListRowViewModel(SimpleMessage(content), SimpleMessage(value), Seq())
 }

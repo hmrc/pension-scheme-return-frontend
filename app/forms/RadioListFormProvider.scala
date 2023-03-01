@@ -17,6 +17,7 @@
 package forms
 
 import forms.mappings.Mappings
+import models.Enumerable
 import play.api.data.Form
 
 import javax.inject.Inject
@@ -25,10 +26,9 @@ import scala.collection.Iterable.single
 
 class RadioListFormProvider @Inject() extends Mappings {
 
-  def apply(
+  def apply[A: Enumerable](
              requiredKey: String
-           ): Form[String] = {
-    Form("value" -> text(requiredKey))
+           ): Form[A] = {
+    Form("value" -> enumerable(requiredKey, requiredKey))
   }
-
 }

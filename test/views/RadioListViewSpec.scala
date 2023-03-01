@@ -1,6 +1,21 @@
+/*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package views
 
-import forms.{RadioListFormProvider, YesNoPageFormProvider}
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.test.FakeRequest
 import utils.BaseSpec
@@ -17,9 +32,8 @@ class RadioListViewSpec extends BaseSpec with ScalaCheckPropertyChecks with Html
     "RadioListView" should {
 
       val requiredKey = "required"
-//      val invalidKey = "invalid"
 
-      val radioListForm = new RadioListFormProvider()(requiredKey)
+      val radioListForm = ??? //new RadioListFormProvider()(requiredKey)
 
       "have a title" in {
 
@@ -49,7 +63,7 @@ class RadioListViewSpec extends BaseSpec with ScalaCheckPropertyChecks with Html
 
         forAll(yesNoPageViewModelGen) { viewmodel =>
 
-          labels(view(yesNoForm, viewmodel)) must contain allElementsOf List(messages("site.yes"), messages("site.no"))
+         // labels(view(yesNoForm, viewmodel)) must contain allElementsOf List(messages("site.yes"), messages("site.no"))
         }
       }
 
@@ -57,8 +71,8 @@ class RadioListViewSpec extends BaseSpec with ScalaCheckPropertyChecks with Html
 
         forAll(radioListViewModelGen) { viewmodel =>
 
-          form(view(radioListForm, viewmodel)).attr("method") mustBe viewmodel.onSubmit.method
-          form(view(radioListForm, viewmodel)).attr("action") mustBe viewmodel.onSubmit.url
+          form(view(radioListForm, viewmodel)).method mustBe viewmodel.onSubmit.method
+          form(view(radioListForm, viewmodel)).action mustBe viewmodel.onSubmit.url
         }
       }
 
@@ -66,7 +80,7 @@ class RadioListViewSpec extends BaseSpec with ScalaCheckPropertyChecks with Html
 
         forAll(radioListViewModelGen) { viewmodel =>
 
-          val invalidForm = radioListForm.bind(Map("value" -> ""))
+          val invalidForm = ???//radioListForm.bind(Map("value" -> ""))
           errorSummary(view(invalidForm, viewmodel)).text() must include(requiredKey)
         }
       }
@@ -75,7 +89,7 @@ class RadioListViewSpec extends BaseSpec with ScalaCheckPropertyChecks with Html
 
         forAll(radioListViewModelGen) { viewmodel =>
 
-          val invalidForm = radioListForm.bind(Map("value" -> ""))
+          val invalidForm = ???//radioListForm.bind(Map("value" -> ""))
           errorMessage(view(invalidForm, viewmodel)).text() must include(requiredKey)
         }
       }

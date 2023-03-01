@@ -21,8 +21,8 @@ GET         /unauthorised                                         controllers.Un
 GET         /:srn/start                                           controllers.StartPageController.onPageLoad(srn: Srn)
 GET         /:srn/start-next-page                                 controllers.StartPageController.onSubmit(srn: Srn)
 
-GET         /:srn/which-tax-year                                  controllers.RadioListController.onPageLoad(srn: Srn)
-POST        /:srn/which-tax-year                                  controllers.RadioListController.onSubmit(srn: Srn)
+GET         /:srn/which-tax-year                                  controllers.WhichTaxYearController.onPageLoad(srn: Srn)
+POST        /:srn/which-tax-year                                  controllers.WhichTaxYearController.onSubmit(srn: Srn)
 
 GET         /:srn/check-dates                                     controllers.CheckReturnDatesController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST        /:srn/check-dates                                     controllers.CheckReturnDatesController.onSubmit(srn: Srn, mode: Mode = NormalMode)

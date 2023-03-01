@@ -25,7 +25,7 @@
     govukButton: GovukButton,
 )
 
-@(form: Form[String], viewModel: RadioListViewModel)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], viewModel: RadioListViewModel)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, viewModel.title.toMessage)) {
 
@@ -40,7 +40,7 @@
         @govukRadios(
             RadiosViewModel(
                 field = form("value"),
-                viewModel.items
+                viewModel.items.toList.map(_.radioListRow)
             )
         )
 

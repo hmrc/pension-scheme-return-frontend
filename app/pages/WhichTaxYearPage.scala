@@ -16,7 +16,11 @@
 
 package pages
 
+import models.DateRange
 import models.SchemeId.Srn
+import play.api.libs.json.JsPath
 
-case class RadioListPage (srn: Srn) extends Page
+case class WhichTaxYearPage(srn: Srn) extends QuestionPage[DateRange] {
+  override def path: JsPath = JsPath \ "whichTaxYear"
+}
 

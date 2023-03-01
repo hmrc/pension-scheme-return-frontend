@@ -31,7 +31,7 @@ import services.SaveService
 
 import scala.concurrent.Future
 
-trait ControllerBehaviours {
+trait   ControllerBehaviours {
   _: ControllerBaseSpec =>
 
   def renderView(call: => Call, userAnswers: UserAnswers = defaultUserAnswers)(view: Application => Request[_] => Html): Unit =
@@ -80,7 +80,7 @@ trait ControllerBehaviours {
       val expectedView = view(app)(request)
 
       status(result) mustEqual OK
-      contentAsString(result) mustEqual expectedView.toString
+      contentAsString(result) mustEqual expectedView.body
     }
 
   def invalidForm(call: => Call, userAnswers: UserAnswers, form: (String, String)*): Unit =
