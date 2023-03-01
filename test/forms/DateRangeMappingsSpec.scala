@@ -35,7 +35,7 @@ class DateRangeMappingsSpec extends AnyFreeSpec with Matchers with ScalaCheckPro
 
   val allowedRange = DateRange(
     LocalDate.of(2000, 1, 1),
-    LocalDate.of(3000, 1, 1)
+    LocalDate.of(2400, 1, 1)
   )
 
   val dateFormErrors = DateFormErrors(
@@ -68,8 +68,8 @@ class DateRangeMappingsSpec extends AnyFreeSpec with Matchers with ScalaCheckPro
     max = allowedRange.to
   )
 
-  val invalidStartDate = datesBetween(earliestDate, allowedRange.from)
-  val invalidEndDate = datesBetween(allowedRange.to, latestDate)
+  val invalidStartDate = datesBetween(earliestDate, allowedRange.from.minusDays(1))
+  val invalidEndDate = datesBetween(allowedRange.to.plusDays(1), latestDate)
   val invalidDate = Gen.oneOf(invalidStartDate, invalidEndDate)
 
   def range(date: Gen[LocalDate]) =
