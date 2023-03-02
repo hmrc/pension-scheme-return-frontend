@@ -42,10 +42,10 @@
     }
 
     @govukRadios(
-      RadiosViewModel.yesNo(
-        field = form("value"),
-        legend = viewmodel.legend.map(legend => LegendViewModel(legend.toMessage).withSize(LegendSize.Medium))
-      )
+        RadiosViewModel.yesNo(
+            field = form("value"),
+            legend = viewmodel.legend.map(legend => LegendViewModel(legend.toMessage).withSize(LegendSize.Medium))
+        ).inline()
     )
 
     @govukButton(

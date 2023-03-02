@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-package models
+package pages
 
-import play.api.libs.json.{Format, Json}
+import play.api.libs.json.JsPath
+import models.SchemeId.Srn
 
-import java.time.LocalDate
+case class NationalInsuranceNumberPage(snr: Srn) extends QuestionPage[Boolean] {
 
-case class NameDOB(firstName: String, lastName: String, dob: LocalDate){
-  val fullName = s"$firstName $lastName"
-}
+  override def path: JsPath = JsPath \ toString
 
-object NameDOB {
-  implicit val format: Format[NameDOB] = Json.format[NameDOB]
+  override def toString: String = "nationalInsuranceNumber"
 }
