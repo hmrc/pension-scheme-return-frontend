@@ -42,10 +42,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class RemoveAccountingPeriodController @Inject()(
                                          override val messagesApi: MessagesApi,
                                          navigator: Navigator,
-                                         identify: IdentifierAction,
-                                         allowAccess: AllowAccessActionProvider,
-                                         getData: DataRetrievalAction,
-                                         requireData: DataRequiredAction,
+                                         identifyAndRequireData: IdentifyAndRequireData,
                                          formProvider: YesNoPageFormProvider,
                                          saveService: SaveService,
                                          val controllerComponents: MessagesControllerComponents,
@@ -54,13 +51,13 @@ class RemoveAccountingPeriodController @Inject()(
 
   private val form = RemoveSchemeBankAccountController.form(formProvider)
 
-  def onPageLoad(srn:Srn, index: Max3, mode: Mode): Action[AnyContent] = (identify andThen allowAccess(srn) andThen getData andThen requireData) {
+  def onPageLoad(srn:Srn, index: Max3, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request => withAccountingPeriodAtIndex(srn, index) { period =>
       Ok(view(form, viewModel(srn, index, period, mode)))
     }
   }
 
-  def onSubmit(srn: Srn, index: Max3, mode: Mode): Action[AnyContent] = (identify andThen allowAccess(srn) andThen getData andThen requireData).async {
+  def onSubmit(srn: Srn, index: Max3, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form.bindFromRequest().fold(
         formWithErrors => Future.successful(
