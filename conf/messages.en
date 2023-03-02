@@ -168,3 +168,7 @@ accountingPeriods.row.remove.hiddenText = {0} to {1} from the list
 accountingPeriods.radios = Do you need to add another accounting period?
 accountingPeriods.radios.error.required = Select yes if you need to add another accounting period
 accountingPeriods.inset = You cannot add another accounting period as you have entered the maximum of 3.
+
+removeAccountingPeriod.title = Are you sure you want to remove {0} to {1}?
+removeAccountingPeriod.heading = Are you sure you want to remove {0} to {1}?
+removeAccountingPeriod.error.required = Select yes if you are sure you want to remove this accounting period

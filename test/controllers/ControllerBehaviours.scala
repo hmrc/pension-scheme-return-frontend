@@ -161,4 +161,30 @@ trait ControllerBehaviours {
 
   def saveAndContinue(call: => Call, form: (String, String)*): Unit =
     saveAndContinue(call, defaultUserAnswers, form: _*)
+
+  def continueNoSave(call: => Call, userAnswers: UserAnswers, form: (String, String)*): Unit =
+    "continue to the next page without saving" in {
+      val saveService = mock[SaveService]
+      when(saveService.save(any())(any(), any())).thenReturn(Future.failed(new Exception("Unreachable code")))
+
+      val appBuilder = applicationBuilder(Some(userAnswers))
+        .overrides(
+          bind[SaveService].toInstance(saveService),
+          bind[Navigator].toInstance(new FakeNavigator(testOnwardRoute))
+        )
+
+      running(_ => appBuilder) { app =>
+        val request = FakeRequest(call).withFormUrlEncodedBody(form: _*)
+
+        val result = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual testOnwardRoute.url
+
+        verify(saveService, never).save(any())(any(), any())
+      }
+    }
+
+  def continueNoSave(call: => Call, form: (String, String)*): Unit =
+    continueNoSave(call, defaultUserAnswers, form: _*)
 }
