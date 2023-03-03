@@ -16,8 +16,7 @@
 
 package navigation
 
-import config.Refined.OneToTen
-import config.Refined.OneToThree
+import config.Refined.{OneToTen, OneToThree}
 import controllers.routes
 import eu.timepit.refined.{refineMV, refineV}
 import models._
@@ -31,7 +30,8 @@ import javax.inject.{Inject, Singleton}
 class Navigator @Inject()() {
 
   private val normalRoutes: Page => UserAnswers => Call = {
-    case StartPage(srn)             => _ => routes.SchemeDetailsController.onPageLoad(srn)
+    case StartPage(srn)             => _ => routes.WhichTaxYearController.onPageLoad(srn, NormalMode)
+    case WhichTaxYearPage(srn)      => _ => routes.SchemeDetailsController.onPageLoad(srn)
     case SchemeDetailsPage(srn)     => _ => routes.CheckReturnDatesController.onPageLoad(srn, NormalMode)
 
     case page @ CheckReturnDatesPage(srn) => {
@@ -65,6 +65,8 @@ class Navigator @Inject()() {
         _     => routes.SchemeBankAccountController.onPageLoad(srn, refineMV(1), NormalMode),
         index => routes.AccountingPeriodController.onPageLoad(srn, index, NormalMode)
       )
+
+    case RemoveAccountingPeriodPage(srn) => _ => routes.AccountingPeriodListController.onPageLoad(srn, NormalMode)
 
     case _              => _ => routes.IndexController.onPageLoad
   }

@@ -20,7 +20,7 @@ import cats.implicits.toShow
 import controllers.actions.{AllowAccessActionProvider, DataCreationAction, DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import forms.RadioListFormProvider
 import models.SchemeId.Srn
-import models.{DateRange, Enumerable, NormalMode}
+import models.{DateRange, Enumerable, Mode, NormalMode}
 import navigation.Navigator
 import pages.WhichTaxYearPage
 import play.api.data.Form
@@ -55,22 +55,22 @@ class WhichTaxYearController @Inject()(
   implicit val allDates = WhichTaxYearController.options(taxYearService.current)
   val form = WhichTaxYearController.form(formProvider, allDates)
 
-  def onPageLoad(srn: Srn): Action[AnyContent] = (identify andThen allowAccess(srn) andThen getData andThen requireData) {
+  def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = (identify andThen allowAccess(srn) andThen getData andThen requireData) {
     implicit request =>
       Ok(
         view(
           form.fromUserAnswers(WhichTaxYearPage(srn)),
-          WhichTaxYearController.viewModel(srn, taxYearService.current)
+          WhichTaxYearController.viewModel(srn, mode, taxYearService.current)
         )
       )
   }
 
-  def onSubmit(srn: Srn): Action[AnyContent] = (identify andThen allowAccess(srn) andThen getData andThen requireData).async {
+  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = (identify andThen allowAccess(srn) andThen getData andThen requireData).async {
     implicit request =>
       form.bindFromRequest()
         .fold(
           errors  =>
-            Future.successful(BadRequest(view(errors, WhichTaxYearController.viewModel(srn, taxYearService.current)))),
+            Future.successful(BadRequest(view(errors, WhichTaxYearController.viewModel(srn, mode, taxYearService.current)))),
           success =>
             for {
               userAnswers <- Future.fromTry(request.userAnswers.set(WhichTaxYearPage(srn), success))
@@ -96,13 +96,13 @@ object WhichTaxYearController {
     Enumerable(taxYearRanges: _*)
   }
 
-  def viewModel(srn: Srn, taxYear: TaxYear): RadioListViewModel = RadioListViewModel(
+  def viewModel(srn: Srn, mode: Mode, taxYear: TaxYear): RadioListViewModel = RadioListViewModel(
     "whichTaxYear.title",
     "whichTaxYear.heading",
     options(taxYear).toList.map { case (value, range) =>
       val displayText = SimpleMessage("whichTaxYear.radioOption", range.from.show, range.to.show)
       RadioListRowViewModel(displayText, value)
     },
-    controllers.routes.WhichTaxYearController.onSubmit(srn)
+    controllers.routes.WhichTaxYearController.onSubmit(srn, mode)
   )
 }

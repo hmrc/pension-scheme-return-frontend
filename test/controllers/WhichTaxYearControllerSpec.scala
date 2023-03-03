@@ -17,7 +17,7 @@
 package controllers
 
 import forms.RadioListFormProvider
-import models.{DateRange, Enumerable}
+import models.{DateRange, Enumerable, NormalMode}
 import org.scalacheck.Gen
 import pages.WhichTaxYearPage
 import views.html.RadioListView
@@ -26,12 +26,12 @@ class WhichTaxYearControllerSpec extends ControllerBaseSpec {
 
   "WhichTaxYearController" should {
 
-    lazy val onPageLoad = routes.WhichTaxYearController.onPageLoad(srn)
-    lazy val onSubmit = routes.WhichTaxYearController.onSubmit(srn)
+    lazy val onPageLoad = routes.WhichTaxYearController.onPageLoad(srn, NormalMode)
+    lazy val onSubmit = routes.WhichTaxYearController.onSubmit(srn, NormalMode)
 
     implicit val allDates: Enumerable[DateRange] = WhichTaxYearController.options(defaultTaxYear)
     val radioListForm = new RadioListFormProvider().apply[DateRange]("whichTaxYear.error.required")
-    lazy val viewModel = WhichTaxYearController.viewModel(srn, defaultTaxYear)
+    lazy val viewModel = WhichTaxYearController.viewModel(srn, NormalMode, defaultTaxYear)
 
     val testDate = Gen.oneOf(allDates.toList).sample.value._2
 

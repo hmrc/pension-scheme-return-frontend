@@ -38,11 +38,19 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
       }
     }
 
-    "go from start page to details page" in {
+    "go from start page to which tax year page" in {
 
       forAll(srnGen) { srn =>
 
-        navigator.nextPage(StartPage(srn), NormalMode, userAnswers) mustBe routes.SchemeDetailsController.onPageLoad(srn)
+        navigator.nextPage(StartPage(srn), NormalMode, userAnswers) mustBe routes.WhichTaxYearController.onPageLoad(srn, NormalMode)
+      }
+    }
+
+    "go from which tax year page to scheme details page" in {
+
+      forAll(srnGen) { srn =>
+
+        navigator.nextPage(WhichTaxYearPage(srn), NormalMode, userAnswers) mustBe routes.SchemeDetailsController.onPageLoad(srn)
       }
     }
 
@@ -190,6 +198,16 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
           navigator.nextPage(page, NormalMode, answers) mustBe
             routes.SchemeBankAccountController.onPageLoad(srn, refineMV(1), NormalMode)
         }
+      }
+    }
+
+    "go from remove accounting period page to accounting list page" in {
+
+      forAll(srnGen) { srn =>
+
+        val page = RemoveAccountingPeriodPage(srn)
+        navigator.nextPage(page, NormalMode, userAnswers) mustBe
+          routes.AccountingPeriodListController.onPageLoad(srn, NormalMode)
       }
     }
   }

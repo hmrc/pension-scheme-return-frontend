@@ -72,8 +72,10 @@ startPage.paragraph1 = Use this online service to submit a pension scheme return
 startPage.paragraph2 = You must submit the return by the deadline. You may be charged penalties if it is not received by the deadline.
 startPage.paragraph3 = You do not have to complete the whole return at once. You can save your answers and come back to them later.
 
-radioList.title = Which tax year are you submitting a return for?
-radioList.heading = Which tax year are you submitting a return for?
+whichTaxYear.title = Which tax year are you submitting a return for?
+whichTaxYear.heading = Which tax year are you submitting a return for?
+whichTaxYear.radioOption = {0} to {1}
+whichTaxYear.error.required = Select the tax year you are submitting a return for
 
 checkReturnDates.title = Check the dates of your return
 checkReturnDates.heading = Check the dates of your return
@@ -173,3 +175,7 @@ accountingPeriods.row.remove.hiddenText = {0} to {1} from the list
 accountingPeriods.radios = Do you need to add another accounting period?
 accountingPeriods.radios.error.required = Select yes if you need to add another accounting period
 accountingPeriods.inset = You cannot add another accounting period as you have entered the maximum of 3.
+
+removeAccountingPeriod.title = Are you sure you want to remove {0} to {1}?
+removeAccountingPeriod.heading = Are you sure you want to remove {0} to {1}?
+removeAccountingPeriod.error.required = Select yes if you are sure you want to remove this accounting period

@@ -18,7 +18,7 @@ package controllers
 
 import config.Constants.maxAccountingPeriods
 import config.Refined.OneToThree
-import eu.timepit.refined.refineV
+import eu.timepit.refined.{refineMV, refineV}
 import forms.YesNoPageFormProvider
 import models.NormalMode
 import org.scalacheck.Gen
@@ -47,10 +47,14 @@ class AccountingPeriodListControllerSpec extends ControllerBaseSpec {
     lazy val onPageLoad = routes.AccountingPeriodListController.onPageLoad(srn, NormalMode)
     lazy val onSubmit = routes.AccountingPeriodListController.onSubmit(srn, NormalMode)
 
+    lazy val accountingPeriodPage = routes.AccountingPeriodController.onPageLoad(srn, refineMV(1), NormalMode)
+
     behave like renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
       val view = injected[ListView]
       view(form, viewModel)
     }
+
+    behave like redirectToPage(onPageLoad, accountingPeriodPage)
 
     behave like journeyRecoveryPage("onPageLoad", onPageLoad)
 

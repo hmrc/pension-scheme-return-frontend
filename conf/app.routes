@@ -21,8 +21,11 @@ GET         /unauthorised                                         controllers.Un
 GET         /:srn/start                                           controllers.StartPageController.onPageLoad(srn: Srn)
 GET         /:srn/start-next-page                                 controllers.StartPageController.onSubmit(srn: Srn)
 
-GET         /:srn/which-tax-year                                  controllers.WhichTaxYearController.onPageLoad(srn: Srn)
-POST        /:srn/which-tax-year                                  controllers.WhichTaxYearController.onSubmit(srn: Srn)
+GET         /:srn/which-tax-year                                  controllers.WhichTaxYearController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/which-tax-year                                  controllers.WhichTaxYearController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+
+GET         /:srn/change-which-tax-year                           controllers.WhichTaxYearController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-which-tax-year                           controllers.WhichTaxYearController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
 GET         /:srn/check-dates                                     controllers.CheckReturnDatesController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST        /:srn/check-dates                                     controllers.CheckReturnDatesController.onSubmit(srn: Srn, mode: Mode = NormalMode)
@@ -72,3 +75,10 @@ POST        /:srn/accounting-periods                              controllers.Ac
 
 GET         /:srn/change-accounting-periods                       controllers.AccountingPeriodListController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST        /:srn/change-accounting-periods                       controllers.AccountingPeriodListController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET         /:srn/remove-accounting-period/:index                 controllers.RemoveAccountingPeriodController.onPageLoad(srn: Srn, index: Max3, mode: Mode = NormalMode)
+POST        /:srn/remove-accounting-period/:index                 controllers.RemoveAccountingPeriodController.onSubmit(srn: Srn, index: Max3, mode: Mode = NormalMode)
+
+GET         /:srn/change-remove-accounting-period/:index          controllers.RemoveAccountingPeriodController.onPageLoad(srn: Srn, index: Max3, mode: Mode = CheckMode)
+POST        /:srn/change-remove-accounting-period/:index          controllers.RemoveAccountingPeriodController.onSubmit(srn: Srn, index: Max3, mode: Mode = CheckMode)
+
