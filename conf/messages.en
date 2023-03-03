@@ -7,7 +7,6 @@ site.remove = Remove
 site.change = Change
 site.no = No
 site.yes = Yes
-site.year={0} _
 
 site.continue = Continue
 site.saveAndContinue = Save and continue

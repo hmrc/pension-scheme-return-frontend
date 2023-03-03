@@ -31,7 +31,7 @@ import services.SaveService
 
 import scala.concurrent.Future
 
-trait   ControllerBehaviours {
+trait ControllerBehaviours {
   _: ControllerBaseSpec =>
 
   def renderView(call: => Call, userAnswers: UserAnswers = defaultUserAnswers)(view: Application => Request[_] => Html): Unit =
