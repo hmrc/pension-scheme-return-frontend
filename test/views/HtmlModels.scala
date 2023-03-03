@@ -45,4 +45,18 @@ trait HtmlModels {
       Form(element.attr("method"), element.attr("action"))
     }
   }
+
+  case class RadioItem(id: String, value: String, label: String)
+
+  object RadioItem {
+
+    def apply(element: Element): RadioItem = {
+
+      val id = element.id()
+      val value = element.`val`()
+      val label = element.siblingElements().select(s"[for=\"$id\"]")
+
+      RadioItem(id, value, label.text())
+    }
+  }
 }

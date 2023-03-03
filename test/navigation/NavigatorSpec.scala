@@ -38,11 +38,19 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
       }
     }
 
-    "go from start page to details page" in {
+    "go from start page to which tax year page" in {
 
       forAll(srnGen) { srn =>
 
-        navigator.nextPage(StartPage(srn), NormalMode, userAnswers) mustBe routes.SchemeDetailsController.onPageLoad(srn)
+        navigator.nextPage(StartPage(srn), NormalMode, userAnswers) mustBe routes.WhichTaxYearController.onPageLoad(srn, NormalMode)
+      }
+    }
+
+    "go from which tax year page to scheme details page" in {
+
+      forAll(srnGen) { srn =>
+
+        navigator.nextPage(WhichTaxYearPage(srn), NormalMode, userAnswers) mustBe routes.SchemeDetailsController.onPageLoad(srn)
       }
     }
 

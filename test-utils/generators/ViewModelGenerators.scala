@@ -16,10 +16,10 @@
 
 package generators
 
-import org.scalacheck.Gen
+import org.scalacheck.Arbitrary.arbitrary
+import org.scalacheck.{Arbitrary, Gen}
 import viewmodels.DisplayMessage.SimpleMessage
 import viewmodels.models._
-import org.scalacheck.Prop.True
 
 trait ViewModelGenerators extends BasicGenerators {
 
@@ -145,6 +145,24 @@ trait ViewModelGenerators extends BasicGenerators {
       onSubmit    <- call
     } yield {
       YesNoPageViewModel(title, heading, description, legend, onSubmit)
+    }
+
+  def radioListRowViewModelGen: Gen[RadioListRowViewModel] =
+    for {
+      content <- nonEmptySimpleMessage
+      value   <- nonEmptyString
+    } yield {
+      RadioListRowViewModel(content, value)
+    }
+
+  def radioListViewModelGen: Gen[RadioListViewModel] =
+    for {
+      title    <- nonEmptySimpleMessage
+      heading  <- nonEmptySimpleMessage
+      items    <- Gen.listOf(radioListRowViewModelGen)
+      onSubmit <- call
+    } yield {
+      RadioListViewModel(title, heading, items, onSubmit)
     }
 
   val dateRangeViewModelGen: Gen[DateRangeViewModel] =
