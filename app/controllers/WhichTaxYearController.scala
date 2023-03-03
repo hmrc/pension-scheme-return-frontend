@@ -23,6 +23,7 @@ import models.SchemeId.Srn
 import models.{DateRange, Enumerable, NormalMode}
 import navigation.Navigator
 import pages.WhichTaxYearPage
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{SaveService, TaxYearService}
@@ -52,7 +53,7 @@ class WhichTaxYearController @Inject()(
                                    )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   implicit val allDates = WhichTaxYearController.options(taxYearService.current)
-  private val form = formProvider[DateRange]("whichTaxYear.error.required")
+  val form = WhichTaxYearController.form(formProvider, allDates)
 
   def onPageLoad(srn: Srn): Action[AnyContent] = (identify andThen allowAccess(srn) andThen getData andThen requireData) {
     implicit request =>
@@ -83,10 +84,16 @@ class WhichTaxYearController @Inject()(
 
 object WhichTaxYearController {
 
-  def options(startingTaxYear: TaxYear): Enumerable[DateRange] = {
-    val startingDate = DateRange.from(startingTaxYear)
+  def form(formProvider: RadioListFormProvider, values: Enumerable[DateRange]): Form[DateRange] =
+    formProvider[DateRange]("whichTaxYear.error.required")(values)
 
-    Enumerable((startingDate.toString, startingDate))
+  def options(startingTaxYear: TaxYear): Enumerable[DateRange] = {
+
+    val taxYears = List.iterate(startingTaxYear, 7)(_.previous)
+
+    val taxYearRanges = taxYears.map(DateRange.from).map(r => (r.toString, r))
+
+    Enumerable(taxYearRanges: _*)
   }
 
   def viewModel(srn: Srn, taxYear: TaxYear): RadioListViewModel = RadioListViewModel(

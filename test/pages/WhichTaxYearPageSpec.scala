@@ -16,13 +16,20 @@
 
 package pages
 
+import eu.timepit.refined.refineMV
 import models.DateRange
-import models.SchemeId.Srn
-import play.api.libs.json.JsPath
+import pages.behaviours.PageBehaviours
 
-case class WhichTaxYearPage(srn: Srn) extends QuestionPage[DateRange] {
-  override def path: JsPath = JsPath \ toString
+class WhichTaxYearPageSpec extends PageBehaviours {
 
-  override def toString: String = "whichTaxYear"
+  "WhichTaxYearPage" - {
+
+    val srn = srnGen.sample.value
+
+    beRetrievable[DateRange](WhichTaxYearPage(srn))
+
+    beSettable[DateRange](WhichTaxYearPage(srn))
+
+    beRemovable[DateRange](WhichTaxYearPage(srn))
+  }
 }
-

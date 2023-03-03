@@ -66,5 +66,15 @@ class WhichTaxYearControllerSpec extends ControllerBaseSpec {
 
       WhichTaxYearController.options(defaultTaxYear).toList.length mustBe 7
     }
+
+    "start date should always be a day after previous end date" in {
+
+      val ranges = WhichTaxYearController.options(defaultTaxYear).toList.map(_._2)
+
+      ranges.foldLeft(DateRange.from(defaultTaxYear.next)) { (previous, current) =>
+        previous.from mustBe current.to.plusDays(1)
+        current
+      }
+    }
   }
 }
