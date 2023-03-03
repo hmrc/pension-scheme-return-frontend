@@ -70,6 +70,12 @@ POST        /:srn/accounting-periods                              controllers.Ac
 GET         /:srn/change-accounting-periods                       controllers.AccountingPeriodListController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST        /:srn/change-accounting-periods                       controllers.AccountingPeriodListController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
+GET         /:srn/remove-accounting-period/:index                 controllers.RemoveAccountingPeriodController.onPageLoad(srn: Srn, index: Max3, mode: Mode = NormalMode)
+POST        /:srn/remove-accounting-period/:index                 controllers.RemoveAccountingPeriodController.onSubmit(srn: Srn, index: Max3, mode: Mode = NormalMode)
+
+GET         /:srn/change-remove-accounting-period/:index          controllers.RemoveAccountingPeriodController.onPageLoad(srn: Srn, index: Max3, mode: Mode = CheckMode)
+POST        /:srn/change-remove-accounting-period/:index          controllers.RemoveAccountingPeriodController.onSubmit(srn: Srn, index: Max3, mode: Mode = CheckMode)
+
 GET         /:srn/how-much-cash                                   controllers.HowMuchCashController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST        /:srn/how-much-cash                                   controllers.HowMuchCashController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 

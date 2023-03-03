@@ -193,6 +193,16 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
       }
     }
 
+    "go from remove accounting period page to accounting list page" in {
+
+      forAll(srnGen) { srn =>
+
+        val page = RemoveAccountingPeriodPage(srn)
+        navigator.nextPage(page, NormalMode, userAnswers) mustBe
+          routes.AccountingPeriodListController.onPageLoad(srn, NormalMode)
+      }
+    }
+
     "go from how much cash page to unauthorised" in {
 
       forAll(srnGen) { srn =>
