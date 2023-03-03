@@ -192,5 +192,14 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
         }
       }
     }
+
+    "go from how much cash page to unauthorised" in {
+
+      forAll(srnGen) { srn =>
+
+        val page = HowMuchCashPage(srn)
+        navigator.nextPage(page, NormalMode, userAnswers) mustBe routes.UnauthorisedController.onPageLoad
+      }
+    }
   }
 }

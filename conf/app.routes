@@ -70,3 +70,8 @@ POST        /:srn/accounting-periods                              controllers.Ac
 GET         /:srn/change-accounting-periods                       controllers.AccountingPeriodListController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST        /:srn/change-accounting-periods                       controllers.AccountingPeriodListController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
+GET         /:srn/how-much-cash                                   controllers.HowMuchCashController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/how-much-cash                                   controllers.HowMuchCashController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+
+GET         /:srn/change-how-much-cash                            controllers.HowMuchCashController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-how-much-cash                            controllers.HowMuchCashController.onSubmit(srn: Srn, mode: Mode = CheckMode)

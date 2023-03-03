@@ -78,10 +78,11 @@ trait Formatters {
         baseFormatter.unbind(key, value.toString)
     }
 
-  private[mappings] def doubleFormatter(requiredKey: String, nonNumericKey: String, args: Seq[String] = Seq.empty): Formatter[Double] =
+  private[mappings] def doubleFormatter(requiredKey: String, nonNumericKey: String, max: (Double, String), args: Seq[String] = Seq.empty): Formatter[Double] =
     new Formatter[Double] {
 
       private val baseFormatter = stringFormatter(requiredKey, args)
+      private val (maxSize, maxError) = max
 
       override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Double] =
         baseFormatter
@@ -90,6 +91,10 @@ trait Formatters {
           .flatMap { s =>
             s.toDoubleOption
              .toRight(Seq(FormError(key, nonNumericKey, args)))
+              .flatMap { double =>
+                if(double > maxSize) Left(Seq(FormError(key, maxError, args)))
+                else Right(double)
+              }
           }
 
       override def unbind(key: String, value: Double): Map[String, String] =

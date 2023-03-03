@@ -163,6 +163,9 @@ trait ModelGenerators extends BasicGenerators {
     } yield {
       BankAccount(bankName, accountNumber, sortCode)
     }
+
+  implicit val moneyGen: Gen[Money] =
+    Gen.double.map(Money(_))
 }
 
 object ModelGenerators extends ModelGenerators

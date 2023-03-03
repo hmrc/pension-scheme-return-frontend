@@ -14,21 +14,14 @@
  * limitations under the License.
  */
 
-package config
+package controllers.actions
 
-object Constants {
+import com.google.inject.Inject
+import models.SchemeId.Srn
+import models.requests.DataRequest
+import play.api.mvc.{ActionBuilder, AnyContent}
 
-  val psaEnrolmentKey = "HMRC-PODS-ORG"
-  val pspEnrolmentKey = "HMRC-PODSPP-ORG"
+class IdentifyAndRequireData @Inject()(identify: IdentifierAction, allowAccess: AllowAccessActionProvider, getData: DataRetrievalAction, requireData: DataRequiredAction) {
 
-  val psaIdKey = "PSAID"
-  val pspIdKey = "PSPID"
-
-  val delimitedPSA = "DELIMITED_PSAID"
-  val detailsNotFound = "no match found"
-
-  val maxSchemeBankAccounts = 10
-  val maxAccountingPeriods = 3
-
-  val maxCashInBank = 999999999.99
+  def apply(srn: Srn): ActionBuilder[DataRequest, AnyContent] = identify andThen allowAccess(srn) andThen getData andThen requireData
 }

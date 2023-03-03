@@ -35,8 +35,9 @@ trait Mappings extends Formatters with Constraints {
 
   protected def double(requiredKey: String = "error.required",
                        nonNumericKey: String = "error.nonNumeric",
+                       max: (Double, String) = (Double.MaxValue, "error.tooLarge"),
                        args: Seq[String] = Seq.empty): FieldMapping[Double] =
-    of(doubleFormatter(requiredKey, nonNumericKey, args))
+    of(doubleFormatter(requiredKey, nonNumericKey, max, args))
 
   protected def boolean(requiredKey: String = "error.required",
                         invalidKey: String = "error.boolean",

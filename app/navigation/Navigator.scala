@@ -66,6 +66,8 @@ class Navigator @Inject()() {
         index => routes.AccountingPeriodController.onPageLoad(srn, index, NormalMode)
       )
 
+    case HowMuchCashPage(srn) => _ => routes.UnauthorisedController.onPageLoad
+
     case _              => _ => routes.IndexController.onPageLoad
   }
 
