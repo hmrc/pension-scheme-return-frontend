@@ -21,7 +21,7 @@ import com.google.inject.Inject
 import config.Constants.maxAccountingPeriods
 import config.Refined.OneToThree
 import controllers.actions._
-import eu.timepit.refined.refineV
+import eu.timepit.refined.{refineMV, refineV}
 import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
 import models.{DateRange, Mode}
@@ -39,10 +39,7 @@ import views.html.ListView
 class AccountingPeriodListController @Inject()(
                                             override val messagesApi: MessagesApi,
                                             navigator: Navigator,
-                                            identify: IdentifierAction,
-                                            allowAccess: AllowAccessActionProvider,
-                                            getData: DataRetrievalAction,
-                                            requireData: DataRequiredAction,
+                                            identifyAndRequireData: IdentifyAndRequireData,
                                             val controllerComponents: MessagesControllerComponents,
                                             view: ListView,
                                             formProvider: YesNoPageFormProvider
@@ -50,15 +47,22 @@ class AccountingPeriodListController @Inject()(
 
   val form = AccountingPeriodListController.form(formProvider)
 
-  def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = (identify andThen allowAccess(srn) andThen getData andThen requireData) {
+  def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
 
       val periods = request.userAnswers.list(AccountingPeriods(srn))
-      val viewModel = AccountingPeriodListController.viewModel(srn, mode, periods)
-      Ok(view(form, viewModel))
+
+      if(periods.nonEmpty) {
+
+        val viewModel = AccountingPeriodListController.viewModel(srn, mode, periods)
+        Ok(view(form, viewModel))
+      } else {
+
+        Redirect(routes.AccountingPeriodController.onPageLoad(srn, refineMV(1), mode))
+      }
   }
 
-  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = (identify andThen allowAccess(srn) andThen getData andThen requireData) {
+  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
 
       val periods = request.userAnswers.list(AccountingPeriods(srn))
@@ -93,7 +97,7 @@ object AccountingPeriodListController {
             SimpleMessage("accountingPeriods.row", range.from.show, range.to.show),
             routes.AccountingPeriodController.onPageLoad(srn, index, mode).url,
             SimpleMessage("accountingPeriods.row.change.hiddenText", range.from.show, range.to.show),
-            routes.UnauthorisedController.onPageLoad.url,
+            routes.RemoveAccountingPeriodController.onPageLoad(srn, index, mode).url,
             SimpleMessage("accountingPeriods.row.remove.hiddenText", range.from.show, range.to.show),
           )
         )
