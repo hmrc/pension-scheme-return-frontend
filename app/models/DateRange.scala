@@ -17,8 +17,11 @@
 package models
 
 import play.api.libs.json.{Format, Json}
+import play.shaded.ahc.io.netty.handler.codec.DateFormatter
+import uk.gov.hmrc.time.TaxYear
 
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 case class DateRange(from: LocalDate, to: LocalDate) {
 
@@ -27,9 +30,15 @@ case class DateRange(from: LocalDate, to: LocalDate) {
 
   def contains(date: LocalDate): Boolean =
     !date.isBefore(from) && !date.isAfter(to)
+
+  private val formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd")
+  override def toString: String =
+    s"${from.format(formatter)}-${to.format(formatter)}"
 }
 
 object DateRange {
+
+  def from(taxYear: TaxYear): DateRange = DateRange(taxYear.starts, taxYear.finishes)
 
   implicit val format: Format[DateRange] = Json.format[DateRange]
 }

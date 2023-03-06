@@ -59,7 +59,7 @@ class ListViewSpec extends ViewSpec {
         forAll(summaryViewModelGen()) { viewModel =>
           val radioElements = radios(view(form, viewModel))
           radioElements.size mustEqual 2
-          radioElements.map(_.id()) mustEqual List("value", "value-no")
+          radioElements.map(_.id) mustEqual List("value", "value-no")
           Option(inset(view(form, viewModel))) mustBe None
         }
       }
