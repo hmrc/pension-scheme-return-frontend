@@ -21,7 +21,7 @@ import org.scalatest.OptionValues
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import play.api.data.{Form, FormError}
-import models.Enumerable
+import models.{Enumerable, Money}
 
 object MappingsSpec {
 
@@ -187,6 +187,64 @@ class MappingsSpec extends AnyFreeSpec with Matchers with OptionValues with Mapp
     "must unbind a valid value" in {
       val result = testForm.fill(123.2)
       result.apply("value").value.value mustEqual "123.2"
+    }
+  }
+
+  "money" - {
+    val testForm: Form[Money] =
+      Form(
+        "value" -> money(max = 100d -> "error.tooLarge")
+      )
+
+    "must bind a valid int" in {
+      val result = testForm.bind(Map("value" -> "1"))
+      result.get mustEqual Money(1, "1")
+    }
+
+    "must bind a valid double" in {
+      val result = testForm.bind(Map("value" -> "10.1"))
+      result.get mustEqual Money(10.1)
+    }
+
+    "must bind a double with a £ symbol" in {
+      val result = testForm.bind(Map("value" -> "£10.01"))
+      result.errors.foreach(println)
+      result.get mustEqual Money(10.01)
+    }
+
+    "must not bind an empty value" in {
+      val result = testForm.bind(Map("value" -> ""))
+      result.errors must contain(FormError("value", "error.required"))
+    }
+
+    "must not bind an empty map" in {
+      val result = testForm.bind(Map.empty[String, String])
+      result.errors must contain(FormError("value", "error.required"))
+    }
+
+    "must not bind a string" in {
+      val result = testForm.bind(Map("value" -> "error"))
+      result.errors must contain(FormError("value", "error.nonMoney"))
+    }
+
+    "must not bind a double with more than 2 decimal places" in {
+      val result = testForm.bind(Map("value" -> "10.001"))
+      result.errors must contain(FormError("value", "error.nonMoney"))
+    }
+
+    "must not bind double that is too large" in {
+      val result = testForm.bind(Map("value" -> "100.01"))
+      result.errors must contain(FormError("value", "error.tooLarge"))
+    }
+
+    "must unbind a valid value" in {
+      val result = testForm.fill(Money(123.4))
+      result.apply("value").value.value mustEqual "123.4"
+    }
+
+    "must unbind using displayAs" in {
+      val result = testForm.fill(Money(123, "123"))
+      result.apply("value").value.value mustEqual "123"
     }
   }
 

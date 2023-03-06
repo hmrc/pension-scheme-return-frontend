@@ -18,9 +18,12 @@ package models
 
 import play.api.libs.json.{Format, Json}
 
-case class Money(value: Double)
+case class Money(value: Double, displayAs: String)
 
 object Money {
+
+  def apply(value: Double): Money =
+    Money(value, value.toString)
 
   implicit val formats: Format[Money] = Json.format[Money]
 }

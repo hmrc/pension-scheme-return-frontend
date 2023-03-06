@@ -16,7 +16,7 @@
 
 package forms.mappings
 
-import models.Enumerable
+import models.{Enumerable, Money}
 import play.api.data.FormError
 import play.api.data.format.Formatter
 
@@ -99,6 +99,26 @@ trait Formatters {
 
       override def unbind(key: String, value: Double): Map[String, String] =
         baseFormatter.unbind(key, value.toString)
+    }
+
+  private[mappings] def moneyFormatter(requiredKey: String, nonMoneyKey: String, max: (Double, String), args: Seq[String] = Seq.empty): Formatter[Money] =
+    new Formatter[Money] {
+
+      private val baseFormatter = doubleFormatter(requiredKey, nonMoneyKey, max, args)
+      private val decimalRegex = "^-?\\d+(\\.\\d{1,2})?$"
+
+      override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Money] =
+        baseFormatter
+          .bind(key, data.view.mapValues(_.replace("£", "")).toMap)
+          .flatMap { double =>
+            if(double.toString.matches(decimalRegex))
+              Right(Money(double, data(key).replace("£", "")))
+            else
+              Left(Seq(FormError(key, nonMoneyKey, args)))
+          }
+
+      override def unbind(key: String, value: Money): Map[String, String] =
+        Map(key -> value.displayAs)
     }
 
   private[mappings] def enumerableFormatter[A](requiredKey: String, invalidKey: String, args: Seq[String] = Seq.empty)(implicit ev: Enumerable[A]): Formatter[A] =

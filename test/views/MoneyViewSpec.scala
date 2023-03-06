@@ -31,7 +31,7 @@ class MoneyViewSpec extends ViewSpec with Mappings {
     implicit val request = FakeRequest()
 
     val moneyForm: data.Form[Money] =
-      data.Form(mapping("value" -> double("money.error.required"))(Money.apply)(Money.unapply))
+      data.Form("value" -> money("money.error.required"))
 
     "MoneyView" should {
 

@@ -31,13 +31,11 @@ class MoneyFormProvider @Inject()() extends Mappings {
     args: Seq[String] = Seq.empty
   ): Form[Money] =
     Form(
-      mapping(
-        "value" -> double(
-          requiredKey,
-          nonNumericKey,
-          max,
-          args
-        )
-      )(Money.apply)(Money.unapply)
+      "value" -> money(
+        requiredKey,
+        nonNumericKey,
+        max,
+        args
+      )
     )
 }
