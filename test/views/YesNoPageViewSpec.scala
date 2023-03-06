@@ -87,7 +87,7 @@ class YesNoPageViewSpec extends BaseSpec with ScalaCheckPropertyChecks with Html
 
         forAll(yesNoPageViewModelGen) { viewmodel =>
 
-          radios(view(yesNoForm, viewmodel)).map(_.`val`()) mustBe List("true", "false")
+          radios(view(yesNoForm, viewmodel)).map(_.value) mustBe List("true", "false")
         }
       }
 
@@ -95,7 +95,7 @@ class YesNoPageViewSpec extends BaseSpec with ScalaCheckPropertyChecks with Html
 
         forAll(yesNoPageViewModelGen) { viewmodel =>
 
-          labels(view(yesNoForm, viewmodel)) must contain allElementsOf List(messages("site.yes"), messages("site.no"))
+          radios(view(yesNoForm, viewmodel)).map(_.label) mustBe List(messages("site.yes"), messages("site.no"))
         }
       }
 

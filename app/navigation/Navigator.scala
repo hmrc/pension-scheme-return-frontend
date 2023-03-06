@@ -30,7 +30,8 @@ import javax.inject.{Inject, Singleton}
 class Navigator @Inject()() {
 
   private val normalRoutes: Page => UserAnswers => Call = {
-    case StartPage(srn)             => _ => routes.SchemeDetailsController.onPageLoad(srn)
+    case StartPage(srn)             => _ => routes.WhichTaxYearController.onPageLoad(srn, NormalMode)
+    case WhichTaxYearPage(srn)      => _ => routes.SchemeDetailsController.onPageLoad(srn)
     case SchemeDetailsPage(srn)     => _ => routes.CheckReturnDatesController.onPageLoad(srn, NormalMode)
 
     case page @ CheckReturnDatesPage(srn) => {

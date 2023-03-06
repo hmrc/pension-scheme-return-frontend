@@ -44,6 +44,16 @@ trait RadiosFluency {
     def apply(
                field: Field,
                items: Seq[RadioItem],
+             )(implicit messages: Messages): Radios =
+      Radios(
+        name = field.name,
+        items = items map (item => item copy (checked = field.value.isDefined && field.value == item.value)),
+        errorMessage = errorMessage(field)
+      )
+
+    def apply(
+               field: Field,
+               items: Seq[RadioItem],
                fieldset: Fieldset
              )(implicit messages: Messages): Radios =
       Radios(
