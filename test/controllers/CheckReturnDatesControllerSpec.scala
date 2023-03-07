@@ -72,7 +72,7 @@ class CheckReturnDatesControllerSpec extends ControllerBaseSpec with ScalaCheckP
         val formattedFromDate = DateTimeUtils.formatHtml(fromDate)
         val formattedToDate = DateTimeUtils.formatHtml(toDate)
 
-        viewModel.description mustBe Some(SimpleMessage("checkReturnDates.description", formattedFromDate, formattedToDate))
+        viewModel.description mustBe List(SimpleMessage("checkReturnDates.description", formattedFromDate, formattedToDate))
       }
     }
 
@@ -86,7 +86,7 @@ class CheckReturnDatesControllerSpec extends ControllerBaseSpec with ScalaCheckP
         val formattedFromDate = DateTimeUtils.formatHtml(details.openDate.getOrElse(earliestDate))
         val formattedToDate = DateTimeUtils.formatHtml(toDate)
 
-        viewModel.description mustBe Some(SimpleMessage("checkReturnDates.description", formattedFromDate, formattedToDate))
+        viewModel.description mustBe List(SimpleMessage("checkReturnDates.description", formattedFromDate, formattedToDate))
       }
     }
 
@@ -100,7 +100,7 @@ class CheckReturnDatesControllerSpec extends ControllerBaseSpec with ScalaCheckP
         val formattedFromDate = DateTimeUtils.formatHtml(fromDate)
         val formattedToDate = DateTimeUtils.formatHtml(toDate)
 
-        viewModel.description mustBe Some(SimpleMessage("checkReturnDates.description", formattedFromDate, formattedToDate))
+        viewModel.description mustBe List(SimpleMessage("checkReturnDates.description", formattedFromDate, formattedToDate))
       }
     }
 
@@ -114,7 +114,7 @@ class CheckReturnDatesControllerSpec extends ControllerBaseSpec with ScalaCheckP
         val formattedFromDate = DateTimeUtils.formatHtml(fromDate)
         val formattedToDate = DateTimeUtils.formatHtml(details.windUpDate.getOrElse(latestDate))
 
-        viewModel.description mustBe Some(SimpleMessage("checkReturnDates.description", formattedFromDate, formattedToDate))
+        viewModel.description mustBe List(SimpleMessage("checkReturnDates.description", formattedFromDate, formattedToDate))
       }
     }
 

@@ -138,13 +138,14 @@ trait ViewModelGenerators extends BasicGenerators {
 
   val yesNoPageViewModelGen: Gen[YesNoPageViewModel] =
     for {
-      title       <- nonEmptyString
-      heading     <- nonEmptyString
-      description <- Gen.option(nonEmptyString)
-      legend      <- nonEmptyString
+      title       <- nonEmptySimpleMessage
+      heading     <- nonEmptySimpleMessage
+      description <- Gen.listOf(nonEmptySimpleMessage)
+      listItems   <- Gen.listOf(nonEmptySimpleMessage)
+      legend      <- Gen.option(nonEmptySimpleMessage)
       onSubmit    <- call
     } yield {
-      YesNoPageViewModel(title, heading, description, legend, onSubmit)
+      YesNoPageViewModel(title, heading, description, listItems, legend, onSubmit)
     }
 
   def radioListRowViewModelGen: Gen[RadioListRowViewModel] =
