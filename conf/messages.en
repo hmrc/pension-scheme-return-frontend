@@ -174,4 +174,22 @@ howMuchCash.error.required = Enter total cash the scheme held in all bank accoun
 howMuchCash.error.nonNumeric = Total cash held in all bank accounts must be an amount of money, like 123 or 123.45
 howMuchCash.error.tooLarge = Total cash held in all bank accounts must be 999999999.99 or less
 
-
+memberDetails.title = Member’s details
+memberDetails.heading = Member’s details
+memberDetails.firstName = First name
+memberDetails.firstName.error.required = Enter the member’s first name
+memberDetails.firstName.error.invalid = Member’s first name must only include letters a to z, and special characters such as hyphens, spaces and apostrophes
+memberDetails.firstName.error.length = Member’s first name must be 35 characters or fewer
+memberDetails.lastName = Last name
+memberDetails.lastName.error.required = Enter the member’s last name
+memberDetails.lastName.error.invalid = Member’s last name must only include letters a to z, and special characters such as hyphens, spaces and apostrophes
+memberDetails.lastName.error.length = Member’s last name must be 35 characters or fewer
+memberDetails.dateOfBirth = Date of birth
+memberDetails.dateOfBirth.hint = For example, 31 3 1980
+memberDetails.dateOfBirth.error.required.all = Enter the member’s date of birth
+memberDetails.dateOfBirth.error.required.day = Date of birth must include a day
+memberDetails.dateOfBirth.error.required.month = Date of birth must include a month
+memberDetails.dateOfBirth.error.required.year = Date of birth must include a year
+memberDetails.dateOfBirth.error.required.two = Date of birth must include a {0} and {1}
+memberDetails.dateOfBirth.error.invalid.date = Date of birth must be a real date
+memberDetails.dateOfBirth.error.invalid.characters = Date of birth must only include numbers 0 to 9

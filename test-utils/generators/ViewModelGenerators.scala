@@ -100,6 +100,25 @@ trait ViewModelGenerators extends BasicGenerators {
       onSubmit
     )
 
+  val nameDOBViewModelGen: Gen[NameDOBViewModel] =
+    for {
+      title <- nonEmptySimpleMessage
+      heading <- nonEmptySimpleMessage
+      firstName <- nonEmptySimpleMessage
+      lastName <- nonEmptySimpleMessage
+      dateOfBirth <- nonEmptySimpleMessage
+      dateOfBirthHint <- nonEmptySimpleMessage
+      onSubmit <- call
+    } yield NameDOBViewModel(
+      title,
+      heading,
+      firstName,
+      lastName,
+      dateOfBirth,
+      dateOfBirthHint,
+      onSubmit
+    )
+
   val summaryRowGen: Gen[ListRow] =
     for {
       text <- nonEmptySimpleMessage
