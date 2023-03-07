@@ -125,7 +125,6 @@ object CheckReturnDatesController {
           min(schemeDetails.windUpDate.getOrElse(toDate), toDate).show
         )
       ),
-      List(),
       Some(SimpleMessage("checkReturnDates.legend")),
       routes.CheckReturnDatesController.onSubmit(srn, mode)
     )

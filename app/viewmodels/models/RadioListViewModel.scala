@@ -25,16 +25,22 @@ import viewmodels.DisplayMessage.SimpleMessage
 case class RadioListViewModel(
                                title: SimpleMessage,
                                heading: SimpleMessage,
+                               description: List[SimpleMessage],
+                               listedContent: List[SimpleMessage],
+                               legend: Option[SimpleMessage],
                                items: List[RadioListRowViewModel],
                                onSubmit: Call
                              )
 
 object RadioListViewModel {
 
-  def apply[A](title: String, heading: String, items: List[RadioListRowViewModel], onSubmit: Call): RadioListViewModel =
+  def apply(title: String, heading: String, items: List[RadioListRowViewModel], onSubmit: Call): RadioListViewModel =
     RadioListViewModel(
       SimpleMessage(title),
       SimpleMessage(heading),
+      List(),
+      List(),
+      None,
       items,
       onSubmit
     )

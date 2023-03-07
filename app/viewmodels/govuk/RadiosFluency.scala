@@ -44,6 +44,17 @@ trait RadiosFluency {
     def apply(
                field: Field,
                items: Seq[RadioItem],
+               legend: Option[Legend]
+             )(implicit messages: Messages): Radios =
+      apply(
+        field = field,
+        items = items,
+        fieldset = FieldsetViewModel(legend)
+      )
+
+    def apply(
+               field: Field,
+               items: Seq[RadioItem],
              )(implicit messages: Messages): Radios =
       Radios(
         name = field.name,

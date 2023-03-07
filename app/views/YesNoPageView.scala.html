@@ -41,14 +41,6 @@
       <p class="govuk-body">@content.toMessage</p>
     }
 
-    @if(viewmodel.listItems.nonEmpty) {
-      <ul>
-        @viewmodel.listItems.map { content =>
-          <li>@content.toMessage</li>
-        }
-      </ul>
-    }
-
     @govukRadios(
       RadiosViewModel.yesNo(
         field = form("value"),

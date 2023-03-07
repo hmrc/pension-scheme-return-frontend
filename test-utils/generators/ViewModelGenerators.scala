@@ -141,11 +141,10 @@ trait ViewModelGenerators extends BasicGenerators {
       title       <- nonEmptySimpleMessage
       heading     <- nonEmptySimpleMessage
       description <- Gen.listOf(nonEmptySimpleMessage)
-      listItems   <- Gen.listOf(nonEmptySimpleMessage)
       legend      <- Gen.option(nonEmptySimpleMessage)
       onSubmit    <- call
     } yield {
-      YesNoPageViewModel(title, heading, description, listItems, legend, onSubmit)
+      YesNoPageViewModel(title, heading, description, legend, onSubmit)
     }
 
   def radioListRowViewModelGen: Gen[RadioListRowViewModel] =
@@ -158,12 +157,15 @@ trait ViewModelGenerators extends BasicGenerators {
 
   def radioListViewModelGen: Gen[RadioListViewModel] =
     for {
-      title    <- nonEmptySimpleMessage
-      heading  <- nonEmptySimpleMessage
-      items    <- Gen.listOf(radioListRowViewModelGen)
-      onSubmit <- call
+      title         <- nonEmptySimpleMessage
+      heading       <- nonEmptySimpleMessage
+      description   <- Gen.listOf(nonEmptySimpleMessage)
+      listedContent <- Gen.listOf(nonEmptySimpleMessage)
+      legend        <- Gen.option(nonEmptySimpleMessage)
+      items         <- Gen.listOf(radioListRowViewModelGen)
+      onSubmit      <- call
     } yield {
-      RadioListViewModel(title, heading, items, onSubmit)
+      RadioListViewModel(title, heading, description, listedContent, legend, items, onSubmit)
     }
 
   val dateRangeViewModelGen: Gen[DateRangeViewModel] =

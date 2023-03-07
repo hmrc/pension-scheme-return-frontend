@@ -23,7 +23,6 @@ case class YesNoPageViewModel(
   title: SimpleMessage,
   heading: SimpleMessage,
   description: List[SimpleMessage],
-  listItems: List[SimpleMessage],
   legend: Option[SimpleMessage],
   onSubmit: Call
 )
@@ -35,7 +34,6 @@ object YesNoPageViewModel {
       SimpleMessage(title),
       SimpleMessage(heading),
       List(SimpleMessage(description)),
-      List(),
       Some(SimpleMessage(legend)),
       onSubmit
     )
@@ -44,7 +42,6 @@ object YesNoPageViewModel {
     YesNoPageViewModel(
       SimpleMessage(title),
       SimpleMessage(heading),
-      List(),
       List(),
       Some(SimpleMessage(legend)),
       onSubmit
@@ -55,7 +52,6 @@ object YesNoPageViewModel {
       SimpleMessage(title),
       SimpleMessage(heading),
       description.toList.map(d => SimpleMessage(d)),
-      List(),
       Some(SimpleMessage(legend)),
       onSubmit
     )
@@ -64,7 +60,6 @@ object YesNoPageViewModel {
     YesNoPageViewModel(
       title,
       heading,
-      List(),
       List(),
       None,
       onSubmit

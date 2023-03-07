@@ -69,22 +69,6 @@ class YesNoPageViewSpec extends BaseSpec with ScalaCheckPropertyChecks with Html
         }
       }
 
-      "have list items when present" in {
-
-        forAll(yesNoPageViewModelGen) { viewmodel =>
-
-          li(view(yesNoForm, viewmodel)) must contain allElementsOf viewmodel.listItems.map(_.toMessage)
-        }
-      }
-
-      "does not have list items when no present" in {
-
-        forAll(yesNoPageViewModelGen) { viewmodel =>
-
-          li(view(yesNoForm, viewmodel.copy(listItems =  Nil))) mustBe Nil
-        }
-      }
-
       "have a legend" in {
 
         forAll(yesNoPageViewModelGen) { viewmodel =>
