@@ -163,6 +163,8 @@ trait ModelGenerators extends BasicGenerators {
     } yield {
       BankAccount(bankName, accountNumber, sortCode)
     }
+
+  val manualOrUploadGen: Gen[ManualOrUpload] = Gen.oneOf(ManualOrUpload.values)
 }
 
 object ModelGenerators extends ModelGenerators

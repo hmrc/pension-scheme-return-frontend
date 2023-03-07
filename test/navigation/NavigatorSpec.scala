@@ -210,5 +210,14 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
           routes.AccountingPeriodListController.onPageLoad(srn, NormalMode)
       }
     }
+
+    "go from pension scheme members page to unauthorised" in {
+
+      forAll(srnGen, manualOrUploadGen) { (srn, manualOrUpload) =>
+
+        val page = PensionSchemeMembersPage(srn, manualOrUpload)
+        navigator.nextPage(page, NormalMode, userAnswers) mustBe routes.UnauthorisedController.onPageLoad
+      }
+    }
   }
 }

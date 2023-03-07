@@ -82,3 +82,5 @@ POST        /:srn/remove-accounting-period/:index                 controllers.Re
 GET         /:srn/change-remove-accounting-period/:index          controllers.RemoveAccountingPeriodController.onPageLoad(srn: Srn, index: Max3, mode: Mode = CheckMode)
 POST        /:srn/change-remove-accounting-period/:index          controllers.RemoveAccountingPeriodController.onSubmit(srn: Srn, index: Max3, mode: Mode = CheckMode)
 
+GET         /:srn/pension-scheme-members                          controllers.PensionSchemeMembersController.onPageLoad(srn: Srn)
+POST        /:srn/pension-scheme-members                          controllers.PensionSchemeMembersController.onSubmit(srn: Srn)

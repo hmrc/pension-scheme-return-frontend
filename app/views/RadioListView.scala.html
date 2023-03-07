@@ -42,7 +42,7 @@
         }
 
         @if(viewmodel.listedContent.nonEmpty) {
-          <ul>
+          <ul class="govuk-list govuk-list--bullet">
             @viewmodel.listedContent.map { content =>
               <li>@content.toMessage</li>
             }

@@ -14,10 +14,18 @@
  * limitations under the License.
  */
 
-package pages
+package models
 
-import models.ManualOrUpload
-import models.SchemeId.Srn
-import play.api.libs.json.JsPath
+import utils.WithName
 
-case class PensionSchemeMembersPage(srn: Srn, action: ManualOrUpload) extends Page
+sealed trait ManualOrUpload
+
+object ManualOrUpload {
+
+  case object Manual extends WithName("manual") with ManualOrUpload
+  case object Upload extends WithName("upload") with ManualOrUpload
+
+  val values: List[ManualOrUpload] = List(Manual, Upload)
+
+  implicit val enum: Enumerable[ManualOrUpload] = Enumerable(values.map(v => (v.toString, v)): _*)
+}

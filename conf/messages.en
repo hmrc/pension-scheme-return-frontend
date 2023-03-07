@@ -178,3 +178,15 @@ accountingPeriods.inset = You cannot add another accounting period as you have e
 removeAccountingPeriod.title = Are you sure you want to remove {0} to {1}?
 removeAccountingPeriod.heading = Are you sure you want to remove {0} to {1}?
 removeAccountingPeriod.error.required = Select yes if you are sure you want to remove this accounting period
+
+pensionSchemeMembers.title = Tell us about the scheme’s members
+pensionSchemeMembers.heading = Tell us about {0}’s members
+pensionSchemeMembers.description = For everyone who was a member of the scheme during the period of this return, you need to tell us each member’s:
+pensionSchemeMembers.description.name = name
+pensionSchemeMembers.description.dob = date of birth
+pensionSchemeMembers.description.nino = National Insurance number, or reason why they do not have one
+pensionSchemeMembers.legend = How do you want to add member details?
+pensionSchemeMembers.manualEntry = Manually enter the details
+pensionSchemeMembers.upload = Upload a file
+pensionSchemeMembers.upload.hint = Uploading a file will overwrite any details you have previously added about scheme members
+pensionSchemeMembers.error.required = Select how you want to add member details
