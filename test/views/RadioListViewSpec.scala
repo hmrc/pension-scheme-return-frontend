@@ -59,6 +59,40 @@ class RadioListViewSpec extends BaseSpec with ScalaCheckPropertyChecks with Html
         }
       }
 
+      "have descriptions" in {
+
+        forAll(radioListViewModelGen) { viewmodel =>
+
+          p(view(radioListForm, viewmodel)) mustBe viewmodel.description.map(_.toMessage)
+        }
+      }
+
+      "have listed content" in {
+
+        forAll(radioListViewModelGen) { viewmodel =>
+
+          li(view(radioListForm, viewmodel)) mustBe viewmodel.listedContent.map(_.toMessage)
+        }
+      }
+
+      "have legend when present" in {
+
+        forAll(radioListViewModelGen) { viewmodel =>
+
+          whenever(viewmodel.legend.nonEmpty) {
+            legend(view(radioListForm, viewmodel)) mustBe List(viewmodel.legend.value.toMessage)
+          }
+        }
+      }
+
+      "no have a legend when not present" in {
+
+        forAll(radioListViewModelGen) { viewmodel =>
+
+          legend(view(radioListForm, viewmodel.copy(legend = None))) mustBe Nil
+        }
+      }
+
       "have radio list values" in {
 
         forAll(radioListViewModelGen) { viewmodel =>

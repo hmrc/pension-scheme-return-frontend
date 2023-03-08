@@ -25,22 +25,35 @@
     govukButton: GovukButton,
 )
 
-@(form: Form[_], viewModel: RadioListViewModel)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], viewmodel: RadioListViewModel)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, viewModel.title.toMessage)) {
+@layout(pageTitle = title(form, viewmodel.title.toMessage)) {
 
-    @formHelper(action = viewModel.onSubmit, Symbol("autocomplete") -> "off") {
+    @formHelper(action = viewmodel.onSubmit, Symbol("autocomplete") -> "off") {
 
         @if(form.hasErrors) {
           @govukErrorSummary(ErrorSummaryViewModel(form))
          }
 
-        <h1 class="govuk-heading-l">@viewModel.heading.toMessage</h1>
+        <h1 class="govuk-heading-l">@viewmodel.heading.toMessage</h1>
+
+        @viewmodel.description.map { content =>
+          <p class="govuk-body">@content.toMessage</p>
+        }
+
+        @if(viewmodel.listedContent.nonEmpty) {
+          <ul class="govuk-list govuk-list--bullet">
+            @viewmodel.listedContent.map { content =>
+              <li>@content.toMessage</li>
+            }
+          </ul>
+        }
 
         @govukRadios(
             RadiosViewModel(
                 field = form("value"),
-                viewModel.items.toList.map(_.radioListRow)
+                viewmodel.items.map(_.radioListRow),
+                legend = viewmodel.legend.map(legend => LegendViewModel(legend.toMessage).withSize(LegendSize.Medium))
             )
         )
 

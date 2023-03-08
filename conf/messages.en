@@ -174,6 +174,18 @@ howMuchCash.error.required = Enter total cash the scheme held in all bank accoun
 howMuchCash.error.nonNumeric = Total cash held in all bank accounts must be an amount of money, like 123 or 123.45
 howMuchCash.error.tooLarge = Total cash held in all bank accounts must be 999999999.99 or less
 
+pensionSchemeMembers.title = Tell us about the scheme’s members
+pensionSchemeMembers.heading = Tell us about {0}’s members
+pensionSchemeMembers.description = For everyone who was a member of the scheme during the period of this return, you need to tell us each member’s:
+pensionSchemeMembers.description.name = name
+pensionSchemeMembers.description.dob = date of birth
+pensionSchemeMembers.description.nino = National Insurance number, or reason why they do not have one
+pensionSchemeMembers.legend = How do you want to add member details?
+pensionSchemeMembers.manualEntry = Manually enter the details
+pensionSchemeMembers.upload = Upload a file
+pensionSchemeMembers.upload.hint = Uploading a file will overwrite any details you have previously added about scheme members
+pensionSchemeMembers.error.required = Select how you want to add member details
+
 memberDetails.title = Member’s details
 memberDetails.heading = Member’s details
 memberDetails.firstName = First name

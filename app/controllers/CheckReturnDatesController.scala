@@ -16,6 +16,7 @@
 
 package controllers
 
+import cats.implicits.toShow
 import controllers.actions._
 import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
@@ -28,6 +29,7 @@ import services.{SaveService, SchemeDetailsService, TaxYearService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.DateTimeUtils
+import utils.DateTimeUtils.localDateShow
 import viewmodels.DisplayMessage.SimpleMessage
 import viewmodels.models.YesNoPageViewModel
 import views.html.YesNoPageView
@@ -116,15 +118,11 @@ object CheckReturnDatesController {
     YesNoPageViewModel(
       SimpleMessage("checkReturnDates.title"),
       SimpleMessage("checkReturnDates.heading"),
-      Some(
+      List(
         SimpleMessage(
           "checkReturnDates.description",
-          DateTimeUtils.formatHtml(
-            max(schemeDetails.openDate.getOrElse(fromDate), fromDate)
-          ),
-          DateTimeUtils.formatHtml(
-            min(schemeDetails.windUpDate.getOrElse(toDate), toDate)
-          )
+          max(schemeDetails.openDate.getOrElse(fromDate), fromDate).show,
+          min(schemeDetails.windUpDate.getOrElse(toDate), toDate).show
         )
       ),
       Some(SimpleMessage("checkReturnDates.legend")),

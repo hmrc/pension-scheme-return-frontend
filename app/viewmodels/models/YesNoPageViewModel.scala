@@ -22,7 +22,7 @@ import viewmodels.DisplayMessage.SimpleMessage
 case class YesNoPageViewModel(
   title: SimpleMessage,
   heading: SimpleMessage,
-  description: Option[SimpleMessage],
+  description: List[SimpleMessage],
   legend: Option[SimpleMessage],
   onSubmit: Call
 )
@@ -33,7 +33,7 @@ object YesNoPageViewModel {
     YesNoPageViewModel(
       SimpleMessage(title),
       SimpleMessage(heading),
-      Some(SimpleMessage(description)),
+      List(SimpleMessage(description)),
       Some(SimpleMessage(legend)),
       onSubmit
     )
@@ -42,7 +42,7 @@ object YesNoPageViewModel {
     YesNoPageViewModel(
       SimpleMessage(title),
       SimpleMessage(heading),
-      None,
+      List(),
       Some(SimpleMessage(legend)),
       onSubmit
     )
@@ -51,7 +51,7 @@ object YesNoPageViewModel {
     YesNoPageViewModel(
       SimpleMessage(title),
       SimpleMessage(heading),
-      description.map(d => SimpleMessage(d)),
+      description.toList.map(d => SimpleMessage(d)),
       Some(SimpleMessage(legend)),
       onSubmit
     )
@@ -60,7 +60,7 @@ object YesNoPageViewModel {
     YesNoPageViewModel(
       title,
       heading,
-      None,
+      List(),
       None,
       onSubmit
     )

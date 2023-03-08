@@ -38,6 +38,9 @@ trait HtmlHelper extends HtmlModels {
   def p(html: Html): List[String] =
     mainContent(html).getElementsByTag("p").iterator().asScala.map(_.text()).toList
 
+  def li(html: Html): List[String] =
+    mainContent(html).getElementsByTag("li").iterator().asScala.map(_.text()).toList
+
   def legend(html: Html): List[String] =
     mainContent(html).getElementsByTag("legend").iterator().asScala.map(_.text()).toList
 

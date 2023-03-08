@@ -70,7 +70,10 @@ class Navigator @Inject()() {
 
     case HowMuchCashPage(srn) => _ => routes.UnauthorisedController.onPageLoad
 
+    case PensionSchemeMembersPage(srn, _) => _ => routes.UnauthorisedController.onPageLoad
+
     case MemberDetailsPage(srn) => _ => routes.UnauthorisedController.onPageLoad
+
     case _              => _ => routes.IndexController.onPageLoad
   }
 
