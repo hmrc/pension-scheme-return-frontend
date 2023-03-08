@@ -16,12 +16,16 @@
 
 package forms.behaviours
 
+import cats.implicits.toShow
 import forms.FormSpec
 import generators.Generators
 import org.scalacheck.Gen
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.data.{Form, FormError}
 import org.scalacheck.Gen._
+import utils.DateTimeUtils.localDateShow
+
+import java.time.LocalDate
 
 trait FieldBehaviours extends FormSpec with ScalaCheckPropertyChecks with Generators {
 
@@ -79,6 +83,25 @@ trait FieldBehaviours extends FormSpec with ScalaCheckPropertyChecks with Genera
       forAll(gen -> "validDataItem") { value: String =>
         val result = form.bind(Map(fieldName -> value))(fieldName)
         result.errors mustEqual Seq(error)
+      }
+    }
+  }
+
+  def fieldThatBindsValidDate(form: Form[_], fieldName: String): Unit = {
+
+    "bind valid date" in {
+
+      forAll(date -> "valid date") {
+        localDate: LocalDate =>
+          val result = form.bind(
+            Map(
+              s"$fieldName.day" -> localDate.getDayOfMonth.toString,
+              s"$fieldName.month" -> localDate.getMonthValue.toString,
+              s"$fieldName.year" -> localDate.getYear.toString,
+            )
+          ).apply(fieldName)
+
+          result.errors mustBe empty
       }
     }
   }

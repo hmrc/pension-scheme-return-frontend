@@ -87,3 +87,9 @@ POST        /:srn/how-much-cash                                   controllers.Ho
 
 GET         /:srn/change-how-much-cash                            controllers.HowMuchCashController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST        /:srn/change-how-much-cash                            controllers.HowMuchCashController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET         /:srn/member-details                                  controllers.MemberDetailsController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/member-details                                  controllers.MemberDetailsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+
+GET         /:srn/change-member-details                           controllers.MemberDetailsController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-member-details                           controllers.MemberDetailsController.onSubmit(srn: Srn, mode: Mode = CheckMode)
