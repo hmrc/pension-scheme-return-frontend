@@ -100,6 +100,25 @@ trait ViewModelGenerators extends BasicGenerators {
       onSubmit
     )
 
+  val nameDOBViewModelGen: Gen[NameDOBViewModel] =
+    for {
+      title <- nonEmptySimpleMessage
+      heading <- nonEmptySimpleMessage
+      firstName <- nonEmptySimpleMessage
+      lastName <- nonEmptySimpleMessage
+      dateOfBirth <- nonEmptySimpleMessage
+      dateOfBirthHint <- nonEmptySimpleMessage
+      onSubmit <- call
+    } yield NameDOBViewModel(
+      title,
+      heading,
+      firstName,
+      lastName,
+      dateOfBirth,
+      dateOfBirthHint,
+      onSubmit
+    )
+
   val summaryRowGen: Gen[ListRow] =
     for {
       text <- nonEmptySimpleMessage
@@ -170,20 +189,29 @@ trait ViewModelGenerators extends BasicGenerators {
 
   val dateRangeViewModelGen: Gen[DateRangeViewModel] =
     for {
-      title          <- nonEmptyString
-      heading        <- nonEmptyString
-      description    <- Gen.option(nonEmptyString)
-      startDateLabel <- nonEmptyString
-      endDateLabel   <- nonEmptyString
+      title          <- nonEmptySimpleMessage
+      heading        <- nonEmptySimpleMessage
+      description    <- Gen.option(nonEmptySimpleMessage)
+      startDateLabel <- nonEmptySimpleMessage
+      endDateLabel   <- nonEmptySimpleMessage
       onSubmit       <- call
     } yield {
       DateRangeViewModel(
-        SimpleMessage(title),
-        SimpleMessage(heading),
-        description.map(d => SimpleMessage(d)),
-        SimpleMessage(startDateLabel),
-        SimpleMessage(endDateLabel),
+        title,
+        heading,
+        description,
+        startDateLabel,
+        endDateLabel,
         onSubmit
       )
+    }
+
+  val moneyViewModelGen: Gen[MoneyViewModel] =
+    for {
+      title <- nonEmptySimpleMessage
+      heading <- nonEmptySimpleMessage
+      onSubmit <- call
+    } yield {
+      MoneyViewModel(title, heading, onSubmit)
     }
 }

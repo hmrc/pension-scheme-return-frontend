@@ -82,5 +82,18 @@ POST        /:srn/remove-accounting-period/:index                 controllers.Re
 GET         /:srn/change-remove-accounting-period/:index          controllers.RemoveAccountingPeriodController.onPageLoad(srn: Srn, index: Max3, mode: Mode = CheckMode)
 POST        /:srn/change-remove-accounting-period/:index          controllers.RemoveAccountingPeriodController.onSubmit(srn: Srn, index: Max3, mode: Mode = CheckMode)
 
+GET         /:srn/how-much-cash                                   controllers.HowMuchCashController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/how-much-cash                                   controllers.HowMuchCashController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+
+GET         /:srn/change-how-much-cash                            controllers.HowMuchCashController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-how-much-cash                            controllers.HowMuchCashController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
 GET         /:srn/pension-scheme-members                          controllers.PensionSchemeMembersController.onPageLoad(srn: Srn)
 POST        /:srn/pension-scheme-members                          controllers.PensionSchemeMembersController.onSubmit(srn: Srn)
+
+GET         /:srn/member-details                                  controllers.MemberDetailsController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/member-details                                  controllers.MemberDetailsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+
+GET         /:srn/change-member-details                           controllers.MemberDetailsController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-member-details                           controllers.MemberDetailsController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+

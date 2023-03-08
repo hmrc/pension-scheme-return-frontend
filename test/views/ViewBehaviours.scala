@@ -17,6 +17,7 @@
 package views
 
 import org.scalacheck.Gen
+import play.api.mvc.Call
 import play.twirl.api.Html
 import viewmodels.DisplayMessage
 
@@ -37,10 +38,43 @@ trait ViewBehaviours {
       }
     }
 
+  def renderInputWithLabel[A](gen: Gen[A])(name: String, view: A => Html, key: A => String): Unit =
+    s"render the input for $name with label" in {
+      forAll(gen) { viewModel =>
+        inputLabel(view(viewModel))(name).text() must startWith(key(viewModel))
+        input(view(viewModel))(name).isEmpty mustEqual false
+      }
+    }
+
   def renderButtonText[A](gen: Gen[A])(view: A => Html, key: A => DisplayMessage): Unit =
     "render the button text" in {
       forAll(gen) { viewModel =>
         button(view(viewModel)).text() mustBe messageKey(key(viewModel))
+      }
+    }
+
+  def renderSaveAndContinueButton[A](gen: Gen[A])(view: A => Html): Unit =
+    "render the button text" in {
+      forAll(gen) { viewModel =>
+        buttons(view(viewModel)).last().text() mustBe "Save and continue"
+      }
+    }
+
+  def renderForm[A](gen: Gen[A])(view: A => Html, call: A => Call): Unit =
+    "has form" in {
+      forAll(gen) { viewModel =>
+        form(view(viewModel)).method mustBe call(viewModel).method
+        form(view(viewModel)).action mustBe call(viewModel).url
+      }
+    }
+
+  def renderDateInput[A](gen: Gen[A])(name: String, view: A => Html): Unit =
+    s"render date input for $name" in {
+      forAll(gen) { viewModel =>
+        val elements = date(view(viewModel))(name)
+        elements.day.text() mustEqual "Day"
+        elements.month.text() mustEqual "Month"
+        elements.year.text() mustEqual "Year"
       }
     }
 }

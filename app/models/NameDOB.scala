@@ -14,21 +14,14 @@
  * limitations under the License.
  */
 
-package config
+package models
 
-object Constants {
+import play.api.libs.json.{Format, Json}
 
-  val psaEnrolmentKey = "HMRC-PODS-ORG"
-  val pspEnrolmentKey = "HMRC-PODSPP-ORG"
+import java.time.LocalDate
 
-  val psaIdKey = "PSAID"
-  val pspIdKey = "PSPID"
+case class NameDOB(firstName: String, lastName: String, dob: LocalDate)
 
-  val delimitedPSA = "DELIMITED_PSAID"
-  val detailsNotFound = "no match found"
-
-  val maxSchemeBankAccounts = 10
-  val maxAccountingPeriods = 3
-
-  val maxCashInBank = 999999999.99
+object NameDOB {
+  implicit val format: Format[NameDOB] = Json.format[NameDOB]
 }

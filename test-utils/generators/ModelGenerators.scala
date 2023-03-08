@@ -165,6 +165,15 @@ trait ModelGenerators extends BasicGenerators {
     }
 
   val manualOrUploadGen: Gen[ManualOrUpload] = Gen.oneOf(ManualOrUpload.values)
+
+  implicit val moneyGen: Gen[Money] = for {
+    whole <- Gen.choose(-100000, 100000)
+    decimals <- Gen.option(Gen.choose(0, 99))
+  } yield {
+    val decimalString = decimals.map(d => s".$d").getOrElse("")
+    val result = s"$whole$decimalString".toDouble
+    Money(result)
+  }
 }
 
 object ModelGenerators extends ModelGenerators

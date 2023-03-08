@@ -68,7 +68,11 @@ class Navigator @Inject()() {
 
     case RemoveAccountingPeriodPage(srn) => _ => routes.AccountingPeriodListController.onPageLoad(srn, NormalMode)
 
+    case HowMuchCashPage(srn) => _ => routes.UnauthorisedController.onPageLoad
+
     case PensionSchemeMembersPage(srn, _) => _ => routes.UnauthorisedController.onPageLoad
+
+    case MemberDetailsPage(srn) => _ => routes.UnauthorisedController.onPageLoad
 
     case _              => _ => routes.IndexController.onPageLoad
   }

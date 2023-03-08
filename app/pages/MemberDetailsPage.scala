@@ -14,21 +14,15 @@
  * limitations under the License.
  */
 
-package config
+package pages
 
-object Constants {
+import models.NameDOB
+import models.SchemeId.Srn
+import play.api.libs.json.JsPath
 
-  val psaEnrolmentKey = "HMRC-PODS-ORG"
-  val pspEnrolmentKey = "HMRC-PODSPP-ORG"
+case class MemberDetailsPage(srn: Srn) extends QuestionPage[NameDOB] {
 
-  val psaIdKey = "PSAID"
-  val pspIdKey = "PSPID"
+  override def path: JsPath = JsPath \ toString
 
-  val delimitedPSA = "DELIMITED_PSAID"
-  val detailsNotFound = "no match found"
-
-  val maxSchemeBankAccounts = 10
-  val maxAccountingPeriods = 3
-
-  val maxCashInBank = 999999999.99
+  override def toString: String = "memberDetailsPage"
 }

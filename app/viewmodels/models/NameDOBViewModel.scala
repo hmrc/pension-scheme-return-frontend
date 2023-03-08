@@ -14,21 +14,17 @@
  * limitations under the License.
  */
 
-package config
+package viewmodels.models
 
-object Constants {
+import play.api.mvc.Call
+import viewmodels.DisplayMessage.SimpleMessage
 
-  val psaEnrolmentKey = "HMRC-PODS-ORG"
-  val pspEnrolmentKey = "HMRC-PODSPP-ORG"
-
-  val psaIdKey = "PSAID"
-  val pspIdKey = "PSPID"
-
-  val delimitedPSA = "DELIMITED_PSAID"
-  val detailsNotFound = "no match found"
-
-  val maxSchemeBankAccounts = 10
-  val maxAccountingPeriods = 3
-
-  val maxCashInBank = 999999999.99
-}
+case class NameDOBViewModel(
+                             title: SimpleMessage,
+                             heading: SimpleMessage,
+                             firstName: SimpleMessage,
+                             lastName: SimpleMessage,
+                             dateOfBirth: SimpleMessage,
+                             dateOfBirthHint: SimpleMessage,
+                             onSubmit: Call
+                           )

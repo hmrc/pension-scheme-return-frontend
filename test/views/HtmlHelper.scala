@@ -53,6 +53,9 @@ trait HtmlHelper extends HtmlModels {
   def inputLabel(html: Html)(name: String): Element =
     mainContent(html).selectFirst(s"label[for=$name]")
 
+  def input(html: Html)(name: String): Elements =
+    mainContent(html).select(s"input[name=$name]")
+
   def inputHint(html: Html)(name: String): Element =
     mainContent(html).getElementById(s"$name-hint")
 
@@ -64,8 +67,10 @@ trait HtmlHelper extends HtmlModels {
   def inset(html: Html): Element =
     mainContent(html).getElementsByClass("govuk-inset-text").first()
 
-  def button(html: Html): Element =
-    mainContent(html).getElementsByTag("button").first()
+  def buttons(html: Html): Elements =
+    mainContent(html).getElementsByTag("button")
+
+  def button(html: Html): Element = buttons(html).first()
 
   def anchorButton(html: Html): AnchorTag =
     AnchorTag(mainContent(html).select("a[role=button]").first())
@@ -91,6 +96,15 @@ trait HtmlHelper extends HtmlModels {
   def summaryListRows(html: Html): List[Element] =
     mainContent(html).getElementsByClass("govuk-summary-list__row").iterator().asScala.toList
 
+  def date(html: Html)(id: String): DateElements = {
+    val elements = mainContent(html).selectFirst(s"div.govuk-date-input")
+    DateElements(
+      elements.selectFirst(s"label[for=$id.day]"),
+      elements.selectFirst(s"label[for=$id.month]"),
+      elements.selectFirst(s"label[for=$id.year]")
+    )
+  }
+
   def messageKey(message: DisplayMessage): String = message match {
     case SimpleMessage(key, _) => key
     case ComplexMessage(elements, _) => elements.map {
@@ -98,4 +112,6 @@ trait HtmlHelper extends HtmlModels {
       case LinkedMessage(key, _, _) => key
     }.reduce(_ + _)
   }
+
+  case class DateElements(day: Element, month: Element, year: Element)
 }

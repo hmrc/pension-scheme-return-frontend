@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-package config
+package pages
 
-object Constants {
+import models.Money
+import pages.behaviours.PageBehaviours
 
-  val psaEnrolmentKey = "HMRC-PODS-ORG"
-  val pspEnrolmentKey = "HMRC-PODSPP-ORG"
+class HowMuchCashPageSpec extends PageBehaviours {
 
-  val psaIdKey = "PSAID"
-  val pspIdKey = "PSPID"
+  "HowMuchCashPage" - {
 
-  val delimitedPSA = "DELIMITED_PSAID"
-  val detailsNotFound = "no match found"
+    val srn = srnGen.sample.value
 
-  val maxSchemeBankAccounts = 10
-  val maxAccountingPeriods = 3
+    beRetrievable[Money](HowMuchCashPage(srn))
 
-  val maxCashInBank = 999999999.99
+    beSettable[Money](HowMuchCashPage(srn))
+
+    beRemovable[Money](HowMuchCashPage(srn))
+  }
 }
