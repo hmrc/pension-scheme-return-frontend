@@ -16,7 +16,7 @@
 
 package forms.mappings
 
-import models.{DateRange, Enumerable}
+import models.{DateRange, Enumerable, Money}
 import play.api.data.FieldMapping
 import play.api.data.Forms.of
 
@@ -32,6 +32,18 @@ trait Mappings extends Formatters with Constraints {
                     nonNumericKey: String = "error.nonNumeric",
                     args: Seq[String] = Seq.empty): FieldMapping[Int] =
     of(intFormatter(requiredKey, wholeNumberKey, nonNumericKey, args))
+
+  protected def double(requiredKey: String = "error.required",
+                       nonNumericKey: String = "error.nonNumeric",
+                       max: (Double, String) = (Double.MaxValue, "error.tooLarge"),
+                       args: Seq[String] = Seq.empty): FieldMapping[Double] =
+    of(doubleFormatter(requiredKey, nonNumericKey, max, args))
+
+  protected def money(requiredKey: String = "error.required",
+                       nonNumericKey: String = "error.nonMoney",
+                       max: (Double, String) = (Double.MaxValue, "error.tooLarge"),
+                       args: Seq[String] = Seq.empty): FieldMapping[Money] =
+    of(moneyFormatter(requiredKey, nonNumericKey, max, args))
 
   protected def boolean(requiredKey: String = "error.required",
                         invalidKey: String = "error.boolean",

@@ -14,21 +14,28 @@
  * limitations under the License.
  */
 
-package config
+package forms
 
-object Constants {
+import com.google.inject.Inject
+import forms.mappings.Mappings
+import models.Money
+import play.api.data.Form
+import play.api.data.Forms.mapping
 
-  val psaEnrolmentKey = "HMRC-PODS-ORG"
-  val pspEnrolmentKey = "HMRC-PODSPP-ORG"
+class MoneyFormProvider @Inject()() extends Mappings {
 
-  val psaIdKey = "PSAID"
-  val pspIdKey = "PSPID"
-
-  val delimitedPSA = "DELIMITED_PSAID"
-  val detailsNotFound = "no match found"
-
-  val maxSchemeBankAccounts = 10
-  val maxAccountingPeriods = 3
-
-  val maxCashInBank = 999999999.99
+  def apply(
+    requiredKey: String,
+    nonNumericKey: String,
+    max: (Double, String),
+    args: Seq[String] = Seq.empty
+  ): Form[Money] =
+    Form(
+      "value" -> money(
+        requiredKey,
+        nonNumericKey,
+        max,
+        args
+      )
+    )
 }

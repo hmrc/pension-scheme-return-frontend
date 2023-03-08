@@ -167,20 +167,29 @@ trait ViewModelGenerators extends BasicGenerators {
 
   val dateRangeViewModelGen: Gen[DateRangeViewModel] =
     for {
-      title          <- nonEmptyString
-      heading        <- nonEmptyString
-      description    <- Gen.option(nonEmptyString)
-      startDateLabel <- nonEmptyString
-      endDateLabel   <- nonEmptyString
+      title          <- nonEmptySimpleMessage
+      heading        <- nonEmptySimpleMessage
+      description    <- Gen.option(nonEmptySimpleMessage)
+      startDateLabel <- nonEmptySimpleMessage
+      endDateLabel   <- nonEmptySimpleMessage
       onSubmit       <- call
     } yield {
       DateRangeViewModel(
-        SimpleMessage(title),
-        SimpleMessage(heading),
-        description.map(d => SimpleMessage(d)),
-        SimpleMessage(startDateLabel),
-        SimpleMessage(endDateLabel),
+        title,
+        heading,
+        description,
+        startDateLabel,
+        endDateLabel,
         onSubmit
       )
+    }
+
+  val moneyViewModelGen: Gen[MoneyViewModel] =
+    for {
+      title <- nonEmptySimpleMessage
+      heading <- nonEmptySimpleMessage
+      onSubmit <- call
+    } yield {
+      MoneyViewModel(title, heading, onSubmit)
     }
 }

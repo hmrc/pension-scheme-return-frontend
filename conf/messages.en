@@ -167,3 +167,11 @@ accountingPeriods.inset = You cannot add another accounting period as you have e
 removeAccountingPeriod.title = Are you sure you want to remove {0} to {1}?
 removeAccountingPeriod.heading = Are you sure you want to remove {0} to {1}?
 removeAccountingPeriod.error.required = Select yes if you are sure you want to remove this accounting period
+
+howMuchCash.title = How much cash did {0} hold in all bank accounts on {1}, in pounds?
+howMuchCash.heading = How much cash did {0} hold in all bank accounts on {1}, in pounds?
+howMuchCash.error.required = Enter total cash the scheme held in all bank accounts on {1}, in pounds
+howMuchCash.error.nonNumeric = Total cash held in all bank accounts must be an amount of money, like 123 or 123.45
+howMuchCash.error.tooLarge = Total cash held in all bank accounts must be 999999999.99 or less
+
+
