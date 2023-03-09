@@ -14,19 +14,25 @@
  * limitations under the License.
  */
 
-package config
+package pages
 
-import eu.timepit.refined.api.Refined
-import eu.timepit.refined.boolean.And
-import eu.timepit.refined.numeric.{Greater, LessEqual}
+import config.Refined.Max99
+import models.SchemeId.Srn
+import play.api.libs.json.JsPath
+import queries.Gettable
+import uk.gov.hmrc.domain.Nino
+import utils.RefinedUtils.RefinedIntOps
 
-object Refined {
-  type OneToTen = Greater[0] And LessEqual[10]
-  type Max10 = Int Refined OneToTen
+case class MemberDetailsNinoPage(srn: Srn, index: Max99) extends QuestionPage[Nino] {
 
-  type OneToThree = Greater[0] And LessEqual[3]
-  type Max3 = Int Refined OneToThree
+  override def path: JsPath = JsPath \ toString \ index.arrayIndex
 
-  type OneTo99 = Greater[0] And LessEqual[99]
-  type Max99 = Int Refined OneTo99
+  override def toString: String = "memberDetailsNinoPage"
+}
+
+case class MemberDetailsNinos(srn: Srn) extends Gettable[List[Nino]] {
+
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "memberDetailsNinoPage"
 }

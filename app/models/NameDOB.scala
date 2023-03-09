@@ -20,7 +20,8 @@ import play.api.libs.json.{Format, Json}
 
 import java.time.LocalDate
 
-case class NameDOB(firstName: String, lastName: String, dob: LocalDate){
+case class NameDOB(firstName: String, lastName: String, dob: LocalDate) {
+
   val fullName = s"$firstName $lastName"
 }
 

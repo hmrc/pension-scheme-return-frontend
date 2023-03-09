@@ -17,6 +17,7 @@
 package controllers
 
 import controllers.MemberDetailsController._
+import eu.timepit.refined.refineMV
 import forms.NameDOBFormProvider
 import models.{NameDOB, NormalMode}
 import pages.MemberDetailsPage
@@ -26,8 +27,8 @@ import java.time.LocalDate
 
 class MemberDetailsControllerSpec extends ControllerBaseSpec {
 
-  private lazy val onPageLoad = controllers.routes.MemberDetailsController.onPageLoad(srn, NormalMode)
-  private lazy val onSubmit = controllers.routes.MemberDetailsController.onSubmit(srn, NormalMode)
+  private lazy val onPageLoad = controllers.routes.MemberDetailsController.onPageLoad(srn, refineMV(1), NormalMode)
+  private lazy val onSubmit = controllers.routes.MemberDetailsController.onSubmit(srn, refineMV(1), NormalMode)
 
   private val validForm = List(
     "firstName" -> "testFirstName",
@@ -47,13 +48,13 @@ class MemberDetailsControllerSpec extends ControllerBaseSpec {
 
     behave like renderView(onPageLoad) { implicit app =>
       implicit request =>
-        injected[NameDOBView].apply(form(injected[NameDOBFormProvider]), viewModel(srn, NormalMode))
+        injected[NameDOBView].apply(form(injected[NameDOBFormProvider]), viewModel(srn, refineMV(1), NormalMode))
     }
 
-    behave like renderPrePopView(onPageLoad, MemberDetailsPage(srn), nameDOB) { implicit app =>
+    behave like renderPrePopView(onPageLoad, MemberDetailsPage(srn, refineMV(1)), nameDOB) { implicit app =>
       implicit request =>
         val preparedForm = form(injected[NameDOBFormProvider]).fill(nameDOB)
-        injected[NameDOBView].apply(preparedForm, viewModel(srn, NormalMode))
+        injected[NameDOBView].apply(preparedForm, viewModel(srn, refineMV(1), NormalMode))
     }
 
     behave like journeyRecoveryPage("onPageLoad", onPageLoad)

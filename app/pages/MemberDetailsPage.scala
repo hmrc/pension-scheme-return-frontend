@@ -16,11 +16,21 @@
 
 package pages
 
+import config.Refined.Max99
 import models.NameDOB
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
+import queries.Gettable
+import utils.RefinedUtils.RefinedIntOps
 
-case class MemberDetailsPage(srn: Srn) extends QuestionPage[NameDOB] {
+case class MemberDetailsPage(srn: Srn, index: Max99) extends QuestionPage[NameDOB] {
+
+  override def path: JsPath = JsPath \ toString \ index.arrayIndex
+
+  override def toString: String = "memberDetailsPage"
+}
+
+case class MemberDetails(srn: Srn) extends Gettable[List[NameDOB]] {
 
   override def path: JsPath = JsPath \ toString
 

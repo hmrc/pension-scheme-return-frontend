@@ -185,15 +185,23 @@ trait ModelGenerators extends BasicGenerators {
       snd <- Gen.oneOf('A' to 'Z')
     } yield {
       s"$fst$snd"
-    }).suchThat(s => Nino.isValid(s"${s}000000A"))
+    }).retryUntil(s => Nino.isValid(s"${s}000000A"))
   }
 
-  val ninoGen: Gen[Nino] = for {
+  implicit val ninoGen: Gen[Nino] = for {
     prefix <- ninoPrefix
     numbers <- Gen.listOfN(6, Gen.numChar).map(_.mkString)
     suffix  <- Gen.oneOf("A", "B", "C", "D")
   } yield {
     Nino(s"$prefix$numbers$suffix")
+  }
+
+  implicit val nameDobGen: Gen[NameDOB] = for {
+    firstName <- nonEmptyString
+    lastName  <- nonEmptyString
+    dob       <- date
+  } yield {
+    NameDOB(firstName, lastName, dob)
   }
 }
 
