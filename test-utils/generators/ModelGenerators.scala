@@ -176,8 +176,6 @@ trait ModelGenerators extends BasicGenerators {
     Money(result)
   }
 
-
-
   val ninoPrefix: Gen[String] = {
 
     (for {
