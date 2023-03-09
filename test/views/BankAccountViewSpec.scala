@@ -40,7 +40,7 @@ class BankAccountViewSpec extends ViewSpec {
     "BankAccountView" should {
 
       behave like renderTitle(bankAccountViewModelGen)(view(bankAccountForm, _), _.title.key)
-      behave like renderHeading(bankAccountViewModelGen)(view(bankAccountForm, _), _.heading.key)
+      behave like renderHeading(bankAccountViewModelGen)(view(bankAccountForm, _), _.heading)
 
       "render the bank name heading" in {
         forAll(bankAccountViewModelGen) { viewModel =>

@@ -17,6 +17,7 @@
 package views
 
 import org.scalacheck.Gen
+import play.api.data
 import play.api.mvc.Call
 import play.twirl.api.Html
 import viewmodels.DisplayMessage
@@ -31,18 +32,33 @@ trait ViewBehaviours {
       }
     }
 
-  def renderHeading[A](gen: Gen[A])(view: A => Html, key: A => String): Unit =
+  def renderHeading[A](gen: Gen[A])(view: A => Html, key: A => DisplayMessage): Unit =
     "render the heading" in {
       forAll(gen) { viewModel =>
-        h1(view(viewModel)) must startWith(key(viewModel))
+        h1(view(viewModel)) must startWith(messageKey(key(viewModel)))
       }
     }
 
-  def renderInputWithLabel[A](gen: Gen[A])(name: String, view: A => Html, key: A => String): Unit =
+  def renderInputWithLabel[A](gen: Gen[A])(name: String, view: A => Html, key: A => DisplayMessage): Unit =
+    s"render the input for $name  with label" in {
+
+      forAll(gen) { viewModel =>
+        inputLabel(view(viewModel))(name).text() must startWith(messageKey(key(viewModel)))
+        input(view(viewModel))(name).isEmpty mustEqual false
+      }
+    }
+
+  def renderInputWithH1Label[A](gen: Gen[A])(name: String, view: A => Html, heading: A => DisplayMessage, label: A => Option[DisplayMessage]): Unit =
     s"render the input for $name with label" in {
       forAll(gen) { viewModel =>
-        inputLabel(view(viewModel))(name).text() must startWith(key(viewModel))
-        input(view(viewModel))(name).isEmpty mustEqual false
+        label(viewModel) match {
+          case None      =>
+            inputLabel(view(viewModel))(name).text() mustBe messageKey(heading(viewModel))
+            input(view(viewModel))(name).isEmpty mustEqual false
+          case Some(label) =>
+            inputLabel(view(viewModel))(name).text() mustBe messageKey(label)
+            input(view(viewModel))(name).isEmpty mustEqual false
+        }
       }
     }
 
@@ -77,4 +93,21 @@ trait ViewBehaviours {
         elements.year.text() mustEqual "Year"
       }
     }
+
+  def renderErrors[A](gen: Gen[A])(view: A => Html, error: String): Unit = {
+    "render required error summary" in {
+
+      forAll(gen) { viewModel =>
+
+        errorSummary(view(viewModel)).text() must include(error)
+      }
+    }
+
+    "render required error message" in {
+      forAll(gen) { viewModel =>
+
+        errorMessage(view(viewModel)).text() must include(error)
+      }
+    }
+  }
 }

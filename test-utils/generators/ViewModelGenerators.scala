@@ -214,4 +214,14 @@ trait ViewModelGenerators extends BasicGenerators {
     } yield {
       MoneyViewModel(title, heading, onSubmit)
     }
+
+  val textInputViewModelGen: Gen[TextInputViewModel] =
+    for {
+      title    <- nonEmptySimpleMessage
+      heading  <- nonEmptySimpleMessage
+      label    <- Gen.option(nonEmptySimpleMessage)
+      onSubmit <- call
+    } yield {
+      TextInputViewModel(title, heading, label, onSubmit)
+    }
 }
