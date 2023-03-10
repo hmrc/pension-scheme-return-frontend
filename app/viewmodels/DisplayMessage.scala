@@ -17,6 +17,10 @@
 package viewmodels
 
 import play.api.i18n.Messages
+import viewmodels.ComplexMessageElement.Message
+
+import scala.Int.{int2double, int2long}
+
 
 sealed trait DisplayMessage
 
@@ -29,6 +33,7 @@ object DisplayMessage {
     def apply(key: String): SimpleMessage = new SimpleMessage(key, Nil)
 
     def apply(key: String, args: Any*): SimpleMessage = new SimpleMessage(key, args.toList)
+
   }
 
   case class ComplexMessage(elements: List[ComplexMessageElement], delimiter: Delimiter) extends DisplayMessage

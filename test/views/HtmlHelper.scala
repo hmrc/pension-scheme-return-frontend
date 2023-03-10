@@ -88,6 +88,10 @@ trait HtmlHelper extends HtmlModels {
   def summaryListRows(html: Html): List[Element] =
     mainContent(html).getElementsByClass("govuk-summary-list__row").iterator().asScala.toList
 
+  def li(html: Html): List[Element] =
+    mainContent(html).select("govuk-list govuk-list--bullet li").iterator().asScala.toList
+
+
   def messageKey(message: DisplayMessage): String = message match {
     case SimpleMessage(key, _) => key
     case ComplexMessage(elements, _) => elements.map {

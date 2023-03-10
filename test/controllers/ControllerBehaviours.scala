@@ -161,4 +161,8 @@ trait   ControllerBehaviours {
 
   def saveAndContinue(call: => Call, form: (String, String)*): Unit =
     saveAndContinue(call, defaultUserAnswers, form: _*)
+
+
+  def agreeAndContinue(call: => Call): Unit =
+    agreeAndContinue(call)
 }

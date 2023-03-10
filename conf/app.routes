@@ -72,3 +72,9 @@ POST        /:srn/accounting-periods                              controllers.Ac
 
 GET         /:srn/change-accounting-periods                       controllers.AccountingPeriodListController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST        /:srn/change-accounting-periods                       controllers.AccountingPeriodListController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET         /:srn/psa-declaration                                 controllers.PsaDeclarationController.onPageLoad(srn: Srn)
+GET         /:srn/psa-declaration                                 controllers.PsaDeclarationController.onSubmit(srn: Srn)
+
+GET         /:srn/psp-declaration                                 controllers.PspDeclarationController.onPageLoad(srn: Srn)
+GET         /:srn/psp-declaration                                 controllers.PspDeclarationController.onSubmit(srn: Srn)

@@ -28,6 +28,7 @@ trait ViewModelGenerators extends BasicGenerators {
       title      <- nonEmptyString
       heading    <- nonEmptyString
       paragraphs <- Gen.listOf(nonEmptyString)
+      listItems  <- Gen.listOf(nonEmptyString)
       buttonText <- nonEmptyString
       isStartButton <-boolean
       onSubmit   <- call

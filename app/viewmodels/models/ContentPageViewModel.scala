@@ -20,17 +20,17 @@ import play.api.mvc.Call
 import viewmodels.DisplayMessage._
 
 case class ContentPageViewModel(
-  title: SimpleMessage,
-  heading: SimpleMessage,
-  paragraphs: List[SimpleMessage],
-  buttonText: SimpleMessage,
-  isStartButton: Boolean,
-  onSubmit: Call
-)
+                                 title: SimpleMessage,
+                                 heading: SimpleMessage,
+                                 paragraphs: List[SimpleMessage],
+                                 listItems: List[SimpleMessage],
+                                 buttonText: SimpleMessage,
+                                 isStartButton: Boolean,
+                                 onSubmit: Call
+                               )
 
 object ContentPageViewModel {
-
-  def apply(title: String, heading: String, buttonText: String, isStartButton: Boolean, onSubmit: Call, paragraphs: String*): ContentPageViewModel =
+  def apply(title: String, heading: String, buttonText: String, isStartButton: Boolean,  onSubmit: Call, paragraphs: String*): ContentPageViewModel =
     ContentPageViewModel(title, heading, paragraphs.toList, buttonText, isStartButton, onSubmit)
 
   def apply(title: String, heading: String, paragraphs: List[String], buttonText: String, isStartButton: Boolean, onSubmit: Call): ContentPageViewModel =
@@ -38,6 +38,7 @@ object ContentPageViewModel {
       SimpleMessage(title),
       SimpleMessage(heading),
       paragraphs.map(SimpleMessage(_)),
+      List(),
       SimpleMessage(buttonText),
       isStartButton,
       onSubmit
