@@ -14,16 +14,18 @@
  * limitations under the License.
  */
 
-package models
+package pages
 
-import play.api.libs.json.{Format, Json}
+import pages.behaviours.PageBehaviours
 
-import java.time.LocalDate
+class NationalInsuranceNumberPageSpec extends PageBehaviours {
 
-case class NameDOB(firstName: String, lastName: String, dob: LocalDate){
-  val fullName = s"$firstName $lastName"
-}
+  "NationalInsuranceNumberPage" - {
 
-object NameDOB {
-  implicit val format: Format[NameDOB] = Json.format[NameDOB]
+    beRetrievable[Boolean](NationalInsuranceNumberPage(srnGen.sample.value))
+
+    beSettable[Boolean](NationalInsuranceNumberPage(srnGen.sample.value))
+
+    beRemovable[Boolean](NationalInsuranceNumberPage(srnGen.sample.value))
+  }
 }

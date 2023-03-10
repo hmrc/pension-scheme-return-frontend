@@ -22,7 +22,7 @@ import play.api.test.FakeRequest
 import utils.BaseSpec
 import views.html.YesNoPageView
 
-class YesNoPageViewSpec extends BaseSpec with ScalaCheckPropertyChecks with HtmlHelper {
+class YesNoPageViewSpec extends ViewSpec {
 
   runningApplication { implicit app =>
 
@@ -37,21 +37,10 @@ class YesNoPageViewSpec extends BaseSpec with ScalaCheckPropertyChecks with Html
 
       val yesNoForm = new YesNoPageFormProvider()(requiredKey, invalidKey)
 
-      "have a title" in {
-
-        forAll(yesNoPageViewModelGen) { viewmodel =>
-
-          title(view(yesNoForm, viewmodel)) must startWith(viewmodel.title.toMessage)
-        }
-      }
-
-      "have a heading" in {
-
-        forAll(yesNoPageViewModelGen) { viewmodel =>
-
-          h1(view(yesNoForm, viewmodel)) mustBe viewmodel.heading.toMessage
-        }
-      }
+      behave like renderTitle(yesNoPageViewModelGen)(view(yesNoForm, _), _.title.key)
+      behave like renderHeading(yesNoPageViewModelGen)(view(yesNoForm, _), _.heading.key)
+      behave like renderSaveAndContinueButton(yesNoPageViewModelGen)(view(yesNoForm, _))
+      behave like renderForm(yesNoPageViewModelGen)(view(yesNoForm, _), _.onSubmit)
 
       "have a description when present" in {
 
@@ -93,15 +82,6 @@ class YesNoPageViewSpec extends BaseSpec with ScalaCheckPropertyChecks with Html
         forAll(yesNoPageViewModelGen) { viewmodel =>
 
           radios(view(yesNoForm, viewmodel)).map(_.label) mustBe List(messages("site.yes"), messages("site.no"))
-        }
-      }
-
-      "have form" in {
-
-        forAll(yesNoPageViewModelGen) { viewmodel =>
-
-          form(view(yesNoForm, viewmodel)).method mustBe viewmodel.onSubmit.method
-          form(view(yesNoForm, viewmodel)).action mustBe viewmodel.onSubmit.url
         }
       }
 

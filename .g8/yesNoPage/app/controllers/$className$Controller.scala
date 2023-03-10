@@ -11,16 +11,16 @@ import play.api.data.Form
 import viewmodels.models.YesNoPageViewModel
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.YesNoPageView
+import services.SaveService
 import $className;format="cap"$Controller._
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class $className;format="cap"$Controller @Inject()(
                                          override val messagesApi: MessagesApi,
-                                         sessionRepository: SessionRepository,
+                                         saveService: SaveService,
                                          navigator: Navigator,
                                          identify: IdentifierAction,
                                          allowAccess: AllowAccessActionProvider,
@@ -46,7 +46,7 @@ class $className;format="cap"$Controller @Inject()(
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set($className$Page(srn), value))
-            _              <- sessionRepository.set(updatedAnswers)
+            _              <- saveService.save(updatedAnswers)
           } yield Redirect(navigator.nextPage($className$Page(srn), mode, updatedAnswers))
       )
   }

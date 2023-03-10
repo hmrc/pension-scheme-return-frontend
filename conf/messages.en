@@ -205,3 +205,7 @@ memberDetails.dateOfBirth.error.required.year = Date of birth must include a yea
 memberDetails.dateOfBirth.error.required.two = Date of birth must include a {0} and {1}
 memberDetails.dateOfBirth.error.invalid.date = Date of birth must be a real date
 memberDetails.dateOfBirth.error.invalid.characters = Date of birth must only include numbers 0 to 9
+
+nationalInsuranceNumber.title = Does {0} have a National Insurance number?
+nationalInsuranceNumber.heading = Does {0} have a National Insurance number?
+nationalInsuranceNumber.error.required = Select yes if {0} has a National Insurance number
