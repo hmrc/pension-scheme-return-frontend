@@ -10,6 +10,7 @@ site.yes = Yes
 
 site.continue = Continue
 site.saveAndContinue = Save and continue
+site.agreeAndContinue = Agree and continue
 site.start = Start now
 site.startAgain = Start again
 site.signIn = Sign in
@@ -205,3 +206,19 @@ memberDetails.dateOfBirth.error.required.year = Date of birth must include a yea
 memberDetails.dateOfBirth.error.required.two = Date of birth must include a {0} and {1}
 memberDetails.dateOfBirth.error.invalid.date = Date of birth must be a real date
 memberDetails.dateOfBirth.error.invalid.characters = Date of birth must only include numbers 0 to 9
+
+psaDeclaration.title = Declaration
+psaDeclaration.heading = Declaration
+psaDeclaration.paragraph = By continuing you declare that:
+psaDeclaration.listItem1 = you are submitting this tax return in your capacity as scheme administrator
+psaDeclaration.listItem2 = the information you have provided in this tax return is correct and complete to the best of your knowledge and belief
+psaDeclaration.listItem3 = you understand that if you have made a false statement in this tax return, you may be liable to a penalty, and that false statements may also lead to prosecution
+
+pspDeclaration.title = Declaration
+pspDeclaration.heading = Declaration
+pspDeclaration.paragraph = By continuing you declare that:
+pspDeclaration.listItem1 = you are submitting this return in your capacity as pension scheme practitioner, acting on behalf of the pension scheme administrator
+pspDeclaration.listItem2 = the content of this return has been approved by the scheme administrator
+pspDeclaration.listItem3 = the scheme administrator has authorised you to submit this return
+pspDeclaration.listItem4 = the information you have provided in this return is correct and complete to the best of your knowledge and belief
+pspDeclaration.listItem5 = you understand that if you have made a false statement in this return, the pension scheme administrator may be liable to a penalty, and that false statements may also lead to prosecution
