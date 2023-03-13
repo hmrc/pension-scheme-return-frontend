@@ -43,7 +43,7 @@ class PsaDeclarationController @Inject()(
                                         ) extends FrontendBaseController with I18nSupport {
 
 
-  def onPageLoad(srn: Srn): Action[AnyContent] = (identify andThen allowAccess(srn)) {
+  def onPageLoad(srn: Srn): Action[AnyContent] = (identify andThen allowAccess(srn) andThen getData andThen requireData) {
     implicit request =>
       Ok(view(PsaDeclarationController.viewModel(srn)))
   }

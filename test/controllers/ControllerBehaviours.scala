@@ -27,7 +27,7 @@ import play.api.mvc.{Call, Request}
 import play.api.test.FakeRequest
 import play.twirl.api.Html
 import queries.Settable
-import services.SaveService
+import services.{AgreeService, SaveService}
 
 import scala.concurrent.Future
 
@@ -186,9 +186,28 @@ trait ControllerBehaviours {
     }
 
   def continueNoSave(call: => Call, form: (String, String)*): Unit =
-    continueNoSave(call, defaultUserAnswers, form: _*)
+    continueNoSave(call, defaultUserAnswers)
+
+  def agreeAndContinue(call: => Call,userAnswers: UserAnswers): Unit =
+    "agree and continue to next page" in {
+
+      val appBuilder = applicationBuilder(Some(userAnswers))
+        .overrides(
+//          bind[AgreeService].toInstance(agreeService),
+          bind[Navigator].toInstance(new FakeNavigator(testOnwardRoute))
+        )
+
+      running(_ => appBuilder) { app =>
+
+        val result = route(app, FakeRequest(call)).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual testOnwardRoute.url
+
+//        verify(agreeService,times(1)).agree(any())(any(), any())
+      }
+    }
 
   def agreeAndContinue(call: => Call): Unit =
-    agreeAndContinue(call)
-
+    agreeAndContinue(call, defaultUserAnswers)
 }
