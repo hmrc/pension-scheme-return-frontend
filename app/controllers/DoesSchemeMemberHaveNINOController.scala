@@ -31,6 +31,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.YesNoPageView
 import DoesSchemeMemberHaveNINOController._
+import config.Refined.Max99
 import models.requests.DataRequest
 import services.SaveService
 import viewmodels.DisplayMessage.SimpleMessage
@@ -50,19 +51,19 @@ class DoesSchemeMemberHaveNINOController @Inject()(
 
   private def form(memberName: String): Form[Boolean] = DoesSchemeMemberHaveNINOController.form(formProvider, memberName)
 
-  def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onPageLoad(srn: Srn, index: Max99, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
-      withMemberDetails(srn)(memberDetails => Future.successful(
-        Ok(view(form(memberDetails.fullName).fromUserAnswers(NationalInsuranceNumberPage(srn)), viewModel(memberDetails.fullName, srn, mode)))
+      withMemberDetails(srn, index)(memberDetails => Future.successful(
+        Ok(view(form(memberDetails.fullName).fromUserAnswers(NationalInsuranceNumberPage(srn)), viewModel(index, memberDetails.fullName, srn, mode)))
       ))
   }
 
-  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Max99, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
-      withMemberDetails(srn)(memberDetails =>
+      withMemberDetails(srn, index)(memberDetails =>
         form(memberDetails.fullName).bindFromRequest().fold(
           formWithErrors => Future.successful(
-            BadRequest(view(formWithErrors, viewModel(memberDetails.fullName, srn, mode)))
+            BadRequest(view(formWithErrors, viewModel(index, memberDetails.fullName, srn, mode)))
           ),
           value =>
             for {
@@ -73,8 +74,8 @@ class DoesSchemeMemberHaveNINOController @Inject()(
       )
   }
 
-  private def withMemberDetails(srn: Srn)(f: NameDOB => Future[Result])(implicit request: DataRequest[_]): Future[Result] =
-    request.userAnswers.get(MemberDetailsPage(srn)) match {
+  private def withMemberDetails(srn: Srn, index: Max99)(f: NameDOB => Future[Result])(implicit request: DataRequest[_]): Future[Result] =
+    request.userAnswers.get(MemberDetailsPage(srn, index)) match {
       case None => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
       case Some(memberDetails) => f(memberDetails)
     }
@@ -85,9 +86,9 @@ object DoesSchemeMemberHaveNINOController {
     "nationalInsuranceNumber.error.required", List(memberName)
   )
 
-  def viewModel(memberName: String, srn: Srn, mode: Mode): YesNoPageViewModel = YesNoPageViewModel(
+  def viewModel(index: Max99, memberName: String, srn: Srn, mode: Mode): YesNoPageViewModel = YesNoPageViewModel(
     SimpleMessage("nationalInsuranceNumber.title", memberName),
     SimpleMessage("nationalInsuranceNumber.heading", memberName),
-    controllers.routes.DoesSchemeMemberHaveNINOController.onSubmit(srn, mode)
+    controllers.routes.DoesSchemeMemberHaveNINOController.onSubmit(srn, index, mode)
   )
 }
