@@ -49,7 +49,7 @@ class AccountingPeriodControllerSpec extends ControllerBaseSpec {
     behave like journeyRecoveryPage("onPageLoad", onPageLoad)
 
     behave like saveAndContinue(onSubmit, formData(form, dateRangeData): _*)
-    
+
     behave like invalidForm(onSubmit)
 
     behave like journeyRecoveryPage("onSubmit", onSubmit)

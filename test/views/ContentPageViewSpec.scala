@@ -55,6 +55,14 @@ class ContentPageViewSpec extends BaseSpec with ScalaCheckPropertyChecks with Ht
         }
       }
 
+      "render all listItems" in {
+
+        forAll(contentPageViewModelGen) { viewModel =>
+
+          li(view(viewModel)) must contain allElementsOf viewModel.listItems.map(_.toMessage)
+        }
+      }
+
       "render the button text" in {
 
         forAll(contentPageViewModelGen) { viewModel =>

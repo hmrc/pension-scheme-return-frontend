@@ -23,6 +23,7 @@ case class ContentPageViewModel(
   title: SimpleMessage,
   heading: SimpleMessage,
   paragraphs: List[SimpleMessage],
+  listItems: List[SimpleMessage],
   buttonText: SimpleMessage,
   isStartButton: Boolean,
   onSubmit: Call
@@ -38,6 +39,7 @@ object ContentPageViewModel {
       SimpleMessage(title),
       SimpleMessage(heading),
       paragraphs.map(SimpleMessage(_)),
+      List(),
       SimpleMessage(buttonText),
       isStartButton,
       onSubmit

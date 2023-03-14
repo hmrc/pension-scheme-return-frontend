@@ -190,5 +190,25 @@ trait ControllerBehaviours {
     }
 
   def continueNoSave(call: => Call, form: (String, String)*): Unit =
-    continueNoSave(call, defaultUserAnswers, form: _*)
+    continueNoSave(call, defaultUserAnswers,form:_*)
+
+  def agreeAndContinue(call: => Call,userAnswers: UserAnswers): Unit =
+    "agree and continue to next page" in {
+
+      val appBuilder = applicationBuilder(Some(userAnswers))
+        .overrides(
+          bind[Navigator].toInstance(new FakeNavigator(testOnwardRoute))
+        )
+
+      running(_ => appBuilder) { app =>
+
+        val result = route(app, FakeRequest(call)).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual testOnwardRoute.url
+
+      }
+    }
+  def agreeAndContinue(call: => Call): Unit =
+    agreeAndContinue(call, defaultUserAnswers)
 }

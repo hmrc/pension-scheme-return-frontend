@@ -21,7 +21,7 @@ import controllers.routes
 import eu.timepit.refined.{refineMV, refineV}
 import models._
 import pages.SchemeBankAccounts.SchemeBankAccountsOps
-import pages._
+import pages.{HowMuchCashPage, _}
 import play.api.mvc.Call
 
 import javax.inject.{Inject, Singleton}
@@ -69,13 +69,25 @@ class Navigator @Inject()() {
     case RemoveAccountingPeriodPage(srn) => _ => routes.AccountingPeriodListController.onPageLoad(srn, NormalMode)
     case HowMuchCashPage(srn) => _ => routes.UnauthorisedController.onPageLoad
     case PensionSchemeMembersPage(srn, _) => _ => routes.UnauthorisedController.onPageLoad
+
+
+    case MemberDetailsPage(srn) => _ => routes.UnauthorisedController.onPageLoad
+
+    case PsaDeclarationPage(srn) => _ => routes.UnauthorisedController.onPageLoad
+
+    case PspDeclarationPage(srn) => _ => routes.UnauthorisedController.onPageLoad
+
+
     case MemberDetailsPage(srn, _) => _ => routes.UnauthorisedController.onPageLoad
     case page @ NationalInsuranceNumberPage(srn) => {
       case ua if ua.get(page).contains(true) => routes.UnauthorisedController.onPageLoad
       case _ => routes.UnauthorisedController.onPageLoad
     }
     case MemberDetailsNinoPage(srn, _) => _ => routes.UnauthorisedController.onPageLoad
+
     case _              => _ => routes.IndexController.onPageLoad
+
+
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
