@@ -227,5 +227,14 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
         navigator.nextPage(page, NormalMode, userAnswers) mustBe routes.UnauthorisedController.onPageLoad
       }
     }
+
+    "go from member details nino page to unauthorised" in {
+
+      forAll(srnGen) { srn =>
+
+        val page = MemberDetailsNinoPage(srn, refineMV(1))
+        navigator.nextPage(page, NormalMode, userAnswers) mustBe routes.UnauthorisedController.onPageLoad
+      }
+    }
   }
 }

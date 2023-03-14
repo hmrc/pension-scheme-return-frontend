@@ -91,14 +91,23 @@ POST        /:srn/change-how-much-cash                            controllers.Ho
 GET         /:srn/pension-scheme-members                          controllers.PensionSchemeMembersController.onPageLoad(srn: Srn)
 POST        /:srn/pension-scheme-members                          controllers.PensionSchemeMembersController.onSubmit(srn: Srn)
 
-GET         /:srn/member-details                                  controllers.MemberDetailsController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST        /:srn/member-details                                  controllers.MemberDetailsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/member-details                                  controllers.MemberDetailsController.onPageLoad(srn: Srn, index: Max99 = 1, mode: Mode = NormalMode)
+GET         /:srn/member-details/:index                           controllers.MemberDetailsController.onPageLoad(srn: Srn, index: Max99, mode: Mode = NormalMode)
+POST        /:srn/member-details/:index                           controllers.MemberDetailsController.onSubmit(srn: Srn, index: Max99, mode: Mode = NormalMode)
 
-GET         /:srn/change-member-details                           controllers.MemberDetailsController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST        /:srn/change-member-details                           controllers.MemberDetailsController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+GET         /:srn/change-member-details/:index                    controllers.MemberDetailsController.onPageLoad(srn: Srn, index: Max99, mode: Mode = CheckMode)
+POST        /:srn/change-member-details/:index                    controllers.MemberDetailsController.onSubmit(srn: Srn, index: Max99, mode: Mode = CheckMode)
 
-GET        /:srn/national-insurance-number                        controllers.DoesSchemeMemberHaveNINOController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST       /:srn/national-insurance-number                        controllers.DoesSchemeMemberHaveNINOController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/member-ni-number                                controllers.MemberDetailsNinoController.onPageLoad(srn: Srn, index: Max99 = 1, mode: Mode = NormalMode)
+GET         /:srn/member-ni-number/:index                         controllers.MemberDetailsNinoController.onPageLoad(srn: Srn, index: Max99, mode: Mode = NormalMode)
+POST        /:srn/member-ni-number/:index                         controllers.MemberDetailsNinoController.onSubmit(srn: Srn, index: Max99, mode: Mode = NormalMode)
 
-GET        /:srn/change-national-insurance-number                 controllers.DoesSchemeMemberHaveNINOController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST       /:srn/change-national-insurance-number                 controllers.DoesSchemeMemberHaveNINOController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+GET         /:srn/change-member-ni-number/:index                  controllers.MemberDetailsNinoController.onPageLoad(srn: Srn, index: Max99, mode: Mode = CheckMode)
+POST        /:srn/change-member-ni-number/:index                  controllers.MemberDetailsNinoController.onSubmit(srn: Srn, index: Max99, mode: Mode = CheckMode)
+
+GET        /:srn/national-insurance-number                        controllers.DoesSchemeMemberHaveNINOController.onPageLoad(srn: Srn, index: Max99 = 1, mode: Mode = NormalMode)
+GET        /:srn/national-insurance-number/:index                 controllers.DoesSchemeMemberHaveNINOController.onPageLoad(srn: Srn, index: Max99, mode: Mode = NormalMode)
+POST       /:srn/national-insurance-number/:index                 controllers.DoesSchemeMemberHaveNINOController.onSubmit(srn: Srn, index: Max99, mode: Mode = NormalMode)
+
+GET        /:srn/change-national-insurance-number/:index          controllers.DoesSchemeMemberHaveNINOController.onPageLoad(srn: Srn, index: Max99, mode: Mode = CheckMode)
+POST       /:srn/change-national-insurance-number/:index          controllers.DoesSchemeMemberHaveNINOController.onSubmit(srn: Srn, index: Max99, mode: Mode = CheckMode)

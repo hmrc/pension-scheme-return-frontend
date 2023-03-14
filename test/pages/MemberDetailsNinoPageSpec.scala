@@ -14,19 +14,23 @@
  * limitations under the License.
  */
 
-package config
+package pages
 
-import eu.timepit.refined.api.Refined
-import eu.timepit.refined.boolean.And
-import eu.timepit.refined.numeric.{Greater, LessEqual}
+import eu.timepit.refined.refineMV
+import models.DateRange
+import pages.behaviours.PageBehaviours
+import uk.gov.hmrc.domain.Nino
 
-object Refined {
-  type OneToTen = Greater[0] And LessEqual[10]
-  type Max10 = Int Refined OneToTen
+class MemberDetailsNinoPageSpec extends PageBehaviours {
 
-  type OneToThree = Greater[0] And LessEqual[3]
-  type Max3 = Int Refined OneToThree
+  "MemberDetailsNinoPage" - {
 
-  type OneTo99 = Greater[0] And LessEqual[99]
-  type Max99 = Int Refined OneTo99
+    val srn = srnGen.sample.value
+
+    beRetrievable[Nino](MemberDetailsNinoPage(srn, refineMV(1)))
+
+    beSettable[Nino](MemberDetailsNinoPage(srn, refineMV(1)))
+
+    beRemovable[Nino](MemberDetailsNinoPage(srn, refineMV(1)))
+  }
 }

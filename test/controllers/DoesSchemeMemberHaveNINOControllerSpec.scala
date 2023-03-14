@@ -17,6 +17,7 @@
 package controllers
 
 import controllers.DoesSchemeMemberHaveNINOController._
+import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.{NameDOB, NormalMode}
 import pages.{MemberDetailsPage, NationalInsuranceNumberPage}
@@ -26,25 +27,25 @@ import java.time.LocalDate
 
 class DoesSchemeMemberHaveNINOControllerSpec extends ControllerBaseSpec {
 
-  private lazy val onPageLoad = routes.DoesSchemeMemberHaveNINOController.onPageLoad(srn, NormalMode)
-  private lazy val onSubmit = routes.DoesSchemeMemberHaveNINOController.onSubmit(srn, NormalMode)
+  private lazy val onPageLoad = routes.DoesSchemeMemberHaveNINOController.onPageLoad(srn, refineMV(1), NormalMode)
+  private lazy val onSubmit = routes.DoesSchemeMemberHaveNINOController.onSubmit(srn, refineMV(1), NormalMode)
 
   private val memberDetails = NameDOB("testFirstname", "testLastName", LocalDate.of(2020, 12, 12))
 
-  private val userAnswersWithMemberDetails = defaultUserAnswers.set(MemberDetailsPage(srn), memberDetails).success.value
+  private val userAnswersWithMemberDetails = defaultUserAnswers.set(MemberDetailsPage(srn, refineMV(1)), memberDetails).success.value
 
   "NationalInsuranceNumberController" should {
 
     behave like renderView(onPageLoad, userAnswersWithMemberDetails) {
       implicit app => implicit request =>
         val preparedForm = form(injected[YesNoPageFormProvider], memberDetails.fullName)
-        injected[YesNoPageView].apply(preparedForm, viewModel(memberDetails.fullName, srn, NormalMode))
+        injected[YesNoPageView].apply(preparedForm, viewModel(refineMV(1), memberDetails.fullName, srn, NormalMode))
     }
 
     behave like renderPrePopView(onPageLoad, NationalInsuranceNumberPage(srn), true, userAnswersWithMemberDetails) {
       implicit app => implicit request =>
         val preparedForm = form(injected[YesNoPageFormProvider], memberDetails.fullName).fill(true)
-        injected[YesNoPageView].apply(preparedForm, viewModel(memberDetails.fullName, srn, NormalMode))
+        injected[YesNoPageView].apply(preparedForm, viewModel(refineMV(1), memberDetails.fullName, srn, NormalMode))
     }
 
     behave like redirectWhenCacheEmpty(onPageLoad, controllers.routes.JourneyRecoveryController.onPageLoad())

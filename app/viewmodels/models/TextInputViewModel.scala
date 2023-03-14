@@ -14,19 +14,15 @@
  * limitations under the License.
  */
 
-package config
+package viewmodels.models
 
-import eu.timepit.refined.api.Refined
-import eu.timepit.refined.boolean.And
-import eu.timepit.refined.numeric.{Greater, LessEqual}
+import play.api.mvc.Call
+import viewmodels.DisplayMessage
+import viewmodels.DisplayMessage.SimpleMessage
 
-object Refined {
-  type OneToTen = Greater[0] And LessEqual[10]
-  type Max10 = Int Refined OneToTen
-
-  type OneToThree = Greater[0] And LessEqual[3]
-  type Max3 = Int Refined OneToThree
-
-  type OneTo99 = Greater[0] And LessEqual[99]
-  type Max99 = Int Refined OneTo99
-}
+case class TextInputViewModel(
+  title: SimpleMessage,
+  heading: DisplayMessage,
+  label: Option[DisplayMessage],
+  onSubmit: Call
+)

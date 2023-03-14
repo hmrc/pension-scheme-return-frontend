@@ -69,11 +69,12 @@ class Navigator @Inject()() {
     case RemoveAccountingPeriodPage(srn) => _ => routes.AccountingPeriodListController.onPageLoad(srn, NormalMode)
     case HowMuchCashPage(srn) => _ => routes.UnauthorisedController.onPageLoad
     case PensionSchemeMembersPage(srn, _) => _ => routes.UnauthorisedController.onPageLoad
-    case MemberDetailsPage(srn) => _ => routes.UnauthorisedController.onPageLoad
+    case MemberDetailsPage(srn, _) => _ => routes.UnauthorisedController.onPageLoad
     case page @ NationalInsuranceNumberPage(srn) => {
       case ua if ua.get(page).contains(true) => routes.UnauthorisedController.onPageLoad
       case _ => routes.UnauthorisedController.onPageLoad
     }
+    case MemberDetailsNinoPage(srn, _) => _ => routes.UnauthorisedController.onPageLoad
     case _              => _ => routes.IndexController.onPageLoad
   }
 

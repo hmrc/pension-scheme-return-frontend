@@ -38,7 +38,7 @@ class YesNoPageViewSpec extends ViewSpec {
       val yesNoForm = new YesNoPageFormProvider()(requiredKey, invalidKey)
 
       behave like renderTitle(yesNoPageViewModelGen)(view(yesNoForm, _), _.title.key)
-      behave like renderHeading(yesNoPageViewModelGen)(view(yesNoForm, _), _.heading.key)
+      behave like renderHeading(yesNoPageViewModelGen)(view(yesNoForm, _), _.heading)
       behave like renderSaveAndContinueButton(yesNoPageViewModelGen)(view(yesNoForm, _))
       behave like renderForm(yesNoPageViewModelGen)(view(yesNoForm, _), _.onSubmit)
 
