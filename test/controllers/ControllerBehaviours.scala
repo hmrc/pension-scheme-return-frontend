@@ -123,7 +123,7 @@ trait ControllerBehaviours {
     redirectNextPage(call, defaultUserAnswers, form: _*)
 
   def redirectToPage(call: => Call, page: => Call, userAnswers: UserAnswers, form: (String, String)*): Unit =
-    s"redirect to page with form $form" in {
+    s"redirect to page ${page.url} with form $form" in {
       val appBuilder = applicationBuilder(Some(userAnswers))
 
       running(_ => appBuilder) { app =>

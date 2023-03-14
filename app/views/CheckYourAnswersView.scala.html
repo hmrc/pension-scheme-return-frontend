@@ -18,6 +18,7 @@
 
 @this(
     layout: templates.Layout,
+    formHelper: FormWithCSRF,
     govukSummaryList: GovukSummaryList,
     govukButton: GovukButton,
     message: Message
@@ -35,7 +36,9 @@
           )
         )
 
-        @govukButton(
-            ButtonViewModel(messages("site.saveAndContinue")).asLink(viewmodel.onSubmit.url)
-        )
+        @formHelper(action = viewmodel.onSubmit, Symbol("autocomplete") -> "off") {
+            @govukButton(
+                ButtonViewModel(messages("site.saveAndContinue"))
+            )
+        }
     }

@@ -42,7 +42,7 @@ class DoesSchemeMemberHaveNINOControllerSpec extends ControllerBaseSpec {
         injected[YesNoPageView].apply(preparedForm, viewModel(refineMV(1), memberDetails.fullName, srn, NormalMode))
     }
 
-    behave like renderPrePopView(onPageLoad, NationalInsuranceNumberPage(srn), true, userAnswersWithMemberDetails) {
+    behave like renderPrePopView(onPageLoad, NationalInsuranceNumberPage(srn, refineMV(1)), true, userAnswersWithMemberDetails) {
       implicit app => implicit request =>
         val preparedForm = form(injected[YesNoPageFormProvider], memberDetails.fullName).fill(true)
         injected[YesNoPageView].apply(preparedForm, viewModel(refineMV(1), memberDetails.fullName, srn, NormalMode))
