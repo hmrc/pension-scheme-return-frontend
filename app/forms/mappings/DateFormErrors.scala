@@ -28,3 +28,7 @@ case class DateFormErrors(
   invalidCharacters: String,
   validators: List[LocalDate => Option[String]] = List()
 )
+
+object DateFormErrors {
+  def failIfFutureDate(errorMsg: String): LocalDate => Option[String] = date => Option.when(date.isAfter(LocalDate.now()))(errorMsg)
+}

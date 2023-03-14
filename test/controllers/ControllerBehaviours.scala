@@ -88,7 +88,7 @@ trait ControllerBehaviours {
     }
 
   def invalidForm(call: => Call, userAnswers: UserAnswers, form: (String, String)*): Unit =
-    "return BAD_REQUEST for a POST with invalid form data" in {
+    s"return BAD_REQUEST for a POST with invalid form data ${form.toString()}" in {
       val appBuilder = applicationBuilder(Some(userAnswers))
 
       running(_ => appBuilder) { app =>
