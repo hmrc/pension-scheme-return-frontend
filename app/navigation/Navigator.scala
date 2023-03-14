@@ -74,11 +74,13 @@ class Navigator @Inject()() {
 
     case MemberDetailsPage(srn) => _ => routes.UnauthorisedController.onPageLoad
 
-    case _              => _ => routes.IndexController.onPageLoad
-
-    case PsaDeclarationPage (srn) => _ => routes.UnauthorisedController.onPageLoad
+    case PsaDeclarationPage(srn) => _ => routes.UnauthorisedController.onPageLoad
 
     case PspDeclarationPage(srn) => _ => routes.UnauthorisedController.onPageLoad
+
+    case _              => _ => routes.IndexController.onPageLoad
+
+
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
