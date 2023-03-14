@@ -111,3 +111,7 @@ POST       /:srn/national-insurance-number/:index                 controllers.Do
 
 GET        /:srn/change-national-insurance-number/:index          controllers.DoesSchemeMemberHaveNINOController.onPageLoad(srn: Srn, index: Max99, mode: Mode = CheckMode)
 POST       /:srn/change-national-insurance-number/:index          controllers.DoesSchemeMemberHaveNINOController.onSubmit(srn: Srn, index: Max99, mode: Mode = CheckMode)
+
+GET         /:srn/check-member-details                            controllers.SchemeMemberDetailsCYAController.onPageLoad(srn: Srn, index: Max99 = 1, mode: Mode = NormalMode)
+GET         /:srn/check-member-details/:index                     controllers.SchemeMemberDetailsCYAController.onPageLoad(srn: Srn, index: Max99, mode: Mode = NormalMode)
+POST        /:srn/check-member-details/:index                     controllers.SchemeMemberDetailsCYAController.onSubmit(srn: Srn, index: Max99, mode: Mode = NormalMode)

@@ -14,15 +14,9 @@
  * limitations under the License.
  */
 
-package pages
+package utils
 
-import config.Refined.Max99
-import play.api.libs.json.JsPath
-import models.SchemeId.Srn
+object MessageUtils {
 
-case class NationalInsuranceNumberPage(srn: Srn, index: Max99) extends QuestionPage[Boolean] {
-
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "nationalInsuranceNumber"
+  def booleanToMessage(bool: Boolean): String = if(bool) "site.yes" else "site.no"
 }

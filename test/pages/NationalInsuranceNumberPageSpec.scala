@@ -16,16 +16,17 @@
 
 package pages
 
+import eu.timepit.refined.refineMV
 import pages.behaviours.PageBehaviours
 
 class NationalInsuranceNumberPageSpec extends PageBehaviours {
 
   "NationalInsuranceNumberPage" - {
 
-    beRetrievable[Boolean](NationalInsuranceNumberPage(srnGen.sample.value))
+    beRetrievable[Boolean](NationalInsuranceNumberPage(srnGen.sample.value, refineMV(1)))
 
-    beSettable[Boolean](NationalInsuranceNumberPage(srnGen.sample.value))
+    beSettable[Boolean](NationalInsuranceNumberPage(srnGen.sample.value, refineMV(1)))
 
-    beRemovable[Boolean](NationalInsuranceNumberPage(srnGen.sample.value))
+    beRemovable[Boolean](NationalInsuranceNumberPage(srnGen.sample.value, refineMV(1)))
   }
 }

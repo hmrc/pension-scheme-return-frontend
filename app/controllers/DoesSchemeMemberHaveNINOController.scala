@@ -54,7 +54,10 @@ class DoesSchemeMemberHaveNINOController @Inject()(
   def onPageLoad(srn: Srn, index: Max99, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       withMemberDetails(srn, index)(memberDetails => Future.successful(
-        Ok(view(form(memberDetails.fullName).fromUserAnswers(NationalInsuranceNumberPage(srn)), viewModel(index, memberDetails.fullName, srn, mode)))
+        Ok(view(
+          form(memberDetails.fullName).fromUserAnswers(NationalInsuranceNumberPage(srn, index)),
+          viewModel(index, memberDetails.fullName, srn, mode)
+        ))
       ))
   }
 
@@ -67,9 +70,9 @@ class DoesSchemeMemberHaveNINOController @Inject()(
           ),
           value =>
             for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(NationalInsuranceNumberPage(srn), value))
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(NationalInsuranceNumberPage(srn, index), value))
               _ <- saveService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(NationalInsuranceNumberPage(srn), mode, updatedAnswers))
+            } yield Redirect(navigator.nextPage(NationalInsuranceNumberPage(srn, index), mode, updatedAnswers))
         )
       )
   }

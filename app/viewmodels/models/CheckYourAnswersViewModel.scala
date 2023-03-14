@@ -72,6 +72,12 @@ object CheckYourAnswersRowViewModel {
     value: String
   ): CheckYourAnswersRowViewModel =
     CheckYourAnswersRowViewModel(SimpleMessage(key), SimpleMessage(value), Seq())
+
+  def apply(
+             key: SimpleMessage,
+             value: String
+           ): CheckYourAnswersRowViewModel =
+    CheckYourAnswersRowViewModel(key, SimpleMessage(value), Seq())
 }
 
 case class SummaryAction(content: SimpleMessage, href: String, visuallyHiddenContent: SimpleMessage) {

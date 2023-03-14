@@ -16,13 +16,6 @@
 
 package pages
 
-import config.Refined.Max99
-import play.api.libs.json.JsPath
 import models.SchemeId.Srn
 
-case class NationalInsuranceNumberPage(srn: Srn, index: Max99) extends QuestionPage[Boolean] {
-
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "nationalInsuranceNumber"
-}
+case class SchemeMemberDetailsCYAPage(srn: Srn) extends Page
