@@ -16,6 +16,7 @@
 
 package controllers
 
+import config.Refined.Max99
 import controllers.MemberDetailsController._
 import controllers.actions._
 import forms.NameDOBFormProvider
@@ -49,22 +50,22 @@ class MemberDetailsController @Inject()(
 
   private val form = MemberDetailsController.form(formProvider)
 
-  def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Max99, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      Ok(view(form.fromUserAnswers(MemberDetailsPage(srn)), viewModel(srn, mode)))
+      Ok(view(form.fromUserAnswers(MemberDetailsPage(srn, index)), viewModel(srn, index, mode)))
   }
 
-  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Max99, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form.bindFromRequest().fold(
         formWithErrors => Future.successful(
-          BadRequest(view(formWithErrors, viewModel(srn, mode)))
+          BadRequest(view(formWithErrors, viewModel(srn, index, mode)))
         ),
         answer => {
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(MemberDetailsPage(srn), answer))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(MemberDetailsPage(srn, index), answer))
             _ <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage(MemberDetailsPage(srn), mode, updatedAnswers))
+          } yield Redirect(navigator.nextPage(MemberDetailsPage(srn, index), mode, updatedAnswers))
         }
       )
   }
@@ -89,13 +90,13 @@ object MemberDetailsController {
     )
   )
 
-  def viewModel(srn: Srn, mode: Mode): NameDOBViewModel = NameDOBViewModel(
+  def viewModel(srn: Srn, index: Max99, mode: Mode): NameDOBViewModel = NameDOBViewModel(
     SimpleMessage("memberDetails.title"),
     SimpleMessage("memberDetails.heading"),
     SimpleMessage("memberDetails.firstName"),
     SimpleMessage("memberDetails.lastName"),
     SimpleMessage("memberDetails.dateOfBirth"),
     SimpleMessage("memberDetails.dateOfBirth.hint"),
-    controllers.routes.MemberDetailsController.onSubmit(srn, mode)
+    controllers.routes.MemberDetailsController.onSubmit(srn, index, mode)
   )
 }

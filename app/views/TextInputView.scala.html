@@ -14,20 +14,18 @@
  * limitations under the License.
  *@
 
-@import viewmodels.models.YesNoPageViewModel
-@import viewmodels.LegendSize
-
 @this(
-  layout: templates.Layout,
-  formHelper: FormWithCSRF,
-  govukErrorSummary: GovukErrorSummary,
-  govukRadios: GovukRadios,
-  govukButton: GovukButton,
+        layout: templates.Layout,
+        formHelper: FormWithCSRF,
+        govukErrorSummary: GovukErrorSummary,
+        govukButton: GovukButton,
+        govukInput: GovukInput,
+        message: Message
 )
 
-@(form: Form[Boolean], viewmodel: YesNoPageViewModel)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], viewmodel: TextInputViewModel)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, viewmodel.title.toMessage)) {
+@layout(pageTitle = titleNoForm(viewmodel.title.toMessage)) {
 
   @formHelper(action = viewmodel.onSubmit, Symbol("autocomplete") -> "off") {
 
@@ -35,17 +33,17 @@
       @govukErrorSummary(ErrorSummaryViewModel(form))
     }
 
-    <h1 class="govuk-heading-l">@viewmodel.heading.toMessage</h1>
-
-    @viewmodel.description.map { content =>
-      <p class="govuk-body">@content.toMessage</p>
+    @if(viewmodel.label.nonEmpty) {
+      <h1 class="govuk-heading-l">@message(viewmodel.heading)</h1>
     }
 
-    @govukRadios(
-        RadiosViewModel.yesNo(
-            field = form("value"),
-            legend = viewmodel.legend.map(legend => LegendViewModel(legend.toMessage).withSize(LegendSize.Medium))
-        ).inline()
+    @govukInput(
+      InputViewModel(
+        field = form("value"),
+        label = viewmodel.label
+                .map(label => LabelViewModel(message(label)))
+                .getOrElse(LabelViewModel(message(viewmodel.heading)).asPageHeading())
+      )
     )
 
     @govukButton(

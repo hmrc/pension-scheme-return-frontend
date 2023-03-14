@@ -35,7 +35,7 @@ object YesNoPageViewModel {
       SimpleMessage(heading),
       List(SimpleMessage(description)),
       Some(SimpleMessage(legend)),
-      onSubmit
+      onSubmit = onSubmit
     )
 
   def apply(title: String, heading: String, legend: String, onSubmit: Call): YesNoPageViewModel =
@@ -44,7 +44,7 @@ object YesNoPageViewModel {
       SimpleMessage(heading),
       List(),
       Some(SimpleMessage(legend)),
-      onSubmit
+      onSubmit = onSubmit
     )
 
   def apply(title: String, heading: String, description: Option[String], legend: String, onSubmit: Call): YesNoPageViewModel =
@@ -53,7 +53,7 @@ object YesNoPageViewModel {
       SimpleMessage(heading),
       description.toList.map(d => SimpleMessage(d)),
       Some(SimpleMessage(legend)),
-      onSubmit
+      onSubmit = onSubmit
     )
 
   def apply(title: SimpleMessage, heading: SimpleMessage, onSubmit: Call): YesNoPageViewModel =
@@ -62,6 +62,6 @@ object YesNoPageViewModel {
       heading,
       List(),
       None,
-      onSubmit
+      onSubmit = onSubmit
     )
 }

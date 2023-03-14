@@ -18,25 +18,23 @@ package forms
 
 import forms.mappings.Mappings
 import play.api.data.Form
+import play.api.data.validation.{Constraint, Invalid, Valid}
+import uk.gov.hmrc.domain.Nino
 
 import javax.inject.Inject
 
-class YesNoPageFormProvider @Inject() extends Mappings {
+class TextFormProvider @Inject()() extends Mappings {
 
-  def apply(
-    requiredKey: String,
-    invalidKey: String
-  ): Form[Boolean] =
-    Form("value" -> boolean(requiredKey, invalidKey))
+  def apply(requiredKey: String): Form[String] =
+    Form(
+      "value" -> text(requiredKey)
+    )
 
-  def apply(
-             requiredKey: String
-           ): Form[Boolean] =
-    Form("value" -> boolean(requiredKey, ""))
-
-  def apply(
-             requiredKey: String,
-             args: List[String]
-           ): Form[Boolean] =
-    Form("value" -> boolean(requiredKey, "", args))
+  def nino(requiredKey: String, invalidKey: String, duplicates: List[Nino], duplicateKey: String, args: Any*): Form[Nino] =
+    Form(
+      "value" -> text(requiredKey, args.toList)
+        .verifying(verify(invalidKey, Nino.isValid, args: _*))
+        .verifying(verify[String](duplicateKey, !duplicates.map(_.nino).contains(_), args: _*))
+        .transform[Nino](Nino, _.nino)
+    )
 }

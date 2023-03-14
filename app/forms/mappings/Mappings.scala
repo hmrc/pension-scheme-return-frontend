@@ -19,12 +19,13 @@ package forms.mappings
 import models.{DateRange, Enumerable, Money}
 import play.api.data.FieldMapping
 import play.api.data.Forms.of
+import play.api.data.validation.{Constraint, Invalid, Valid}
 
 import java.time.LocalDate
 
 trait Mappings extends Formatters with Constraints {
 
-  protected def text(errorKey: String = "error.required", args: Seq[String] = Seq.empty): FieldMapping[String] =
+  protected def text(errorKey: String = "error.required", args: Seq[Any] = Seq.empty): FieldMapping[String] =
     of(stringFormatter(errorKey, args))
 
   protected def int(requiredKey: String = "error.required",
@@ -69,4 +70,10 @@ trait Mappings extends Formatters with Constraints {
                           duplicateRangeError: Option[String],
                           duplicateRanges: List[DateRange]): FieldMapping[DateRange] =
     of(new DateRangeFormatter(startDateErrors, endDateErrors, invalidRangeError, allowedRange, startDateAllowedDateRangeError, endDateAllowedDateRangeError, duplicateRangeError, duplicateRanges))
+
+  protected def verify[A](errorKey: String, pred: A => Boolean, args: Any*): Constraint[A] =
+    Constraint[A] { (a: A) =>
+      if (pred(a)) Valid
+      else Invalid(errorKey, args: _*)
+    }
 }

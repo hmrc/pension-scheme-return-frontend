@@ -78,6 +78,9 @@ trait FieldBehaviours extends FormSpec with ScalaCheckPropertyChecks with Genera
   def fieldRejectDuplicates(form: Form[_], fieldName: String, errorMessage: String, duplicates: List[String], args: Any*): Unit =
     errorField("duplicate values", form, fieldName, FormError(fieldName, errorMessage, args.toList), Gen.oneOf(duplicates))
 
+  def invalidField(form: Form[_], fieldName: String, errorMessage: String, invalidData: Gen[String], args: Any*): Unit =
+    errorField("invalid field", form, fieldName, FormError(fieldName, errorMessage, args.toList), invalidData)
+
   def errorField(testName: String, form: Form[_], fieldName: String, error: FormError, gen: Gen[String]): Unit = {
     s"not bind when $testName" in {
       forAll(gen -> "validDataItem") { value: String =>

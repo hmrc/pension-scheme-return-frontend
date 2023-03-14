@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-package config
+package pages
 
-import eu.timepit.refined.api.Refined
-import eu.timepit.refined.boolean.And
-import eu.timepit.refined.numeric.{Greater, LessEqual}
+import pages.behaviours.PageBehaviours
 
-object Refined {
-  type OneToTen = Greater[0] And LessEqual[10]
-  type Max10 = Int Refined OneToTen
+class NationalInsuranceNumberPageSpec extends PageBehaviours {
 
-  type OneToThree = Greater[0] And LessEqual[3]
-  type Max3 = Int Refined OneToThree
+  "NationalInsuranceNumberPage" - {
 
-  type OneTo99 = Greater[0] And LessEqual[99]
-  type Max99 = Int Refined OneTo99
+    beRetrievable[Boolean](NationalInsuranceNumberPage(srnGen.sample.value))
+
+    beSettable[Boolean](NationalInsuranceNumberPage(srnGen.sample.value))
+
+    beRemovable[Boolean](NationalInsuranceNumberPage(srnGen.sample.value))
+  }
 }

@@ -27,6 +27,7 @@ import models.requests.{AllowedAccessRequest, IdentifierRequest}
 import org.scalacheck.Gen
 import org.scalacheck.Gen.numChar
 import play.api.mvc.Request
+import uk.gov.hmrc.domain.Nino
 
 trait ModelGenerators extends BasicGenerators {
   lazy val minimalDetailsGen: Gen[MinimalDetails] =
@@ -173,6 +174,32 @@ trait ModelGenerators extends BasicGenerators {
     val decimalString = decimals.map(d => s".$d").getOrElse("")
     val result = s"$whole$decimalString".toDouble
     Money(result)
+  }
+
+  val ninoPrefix: Gen[String] = {
+
+    (for {
+      fst <- Gen.oneOf('A' to 'Z')
+      snd <- Gen.oneOf('A' to 'Z')
+    } yield {
+      s"$fst$snd"
+    }).retryUntil(s => Nino.isValid(s"${s}000000A"))
+  }
+
+  implicit val ninoGen: Gen[Nino] = for {
+    prefix <- ninoPrefix
+    numbers <- Gen.listOfN(6, Gen.numChar).map(_.mkString)
+    suffix  <- Gen.oneOf("A", "B", "C", "D")
+  } yield {
+    Nino(s"$prefix$numbers$suffix")
+  }
+
+  implicit val nameDobGen: Gen[NameDOB] = for {
+    firstName <- nonEmptyString
+    lastName  <- nonEmptyString
+    dob       <- date
+  } yield {
+    NameDOB(firstName, lastName, dob)
   }
 }
 

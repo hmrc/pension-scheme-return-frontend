@@ -16,19 +16,26 @@ import scala.concurrent.Future
 
 class $className;format="cap"$ControllerSpec extends ControllerBaseSpec {
 
-  private val onPageLoad = routes.$className;format="cap"$Controller.onPageLoad(srn, NormalMode).url
-  private val onSubmit = routes.$className;format="cap"$Controller.onSubmit(srn, NormalMode).url
-
-  private val redirectUrlYes = routes.UnauthorisedController.onPageLoad.url
-  private val redirectUrlNo = routes.UnauthorisedController.onPageLoad.url
+  private lazy val onPageLoad = routes.$className;format="cap"$Controller.onPageLoad(srn, NormalMode)
+  private lazy val onSubmit = routes.$className;format="cap"$Controller.onSubmit(srn, NormalMode)
 
   "$className;format="cap"$Controller" should {
 
     behave like renderView(onPageLoad) { implicit app => implicit request =>
-      injected[YesNoPageView].apply(form(injected[YesNoPageFormProvider]), viewModel())
+      injected[YesNoPageView].apply(form(injected[YesNoPageFormProvider]), viewModel(srn, NormalMode))
     }
 
-    behave like redirectNextPage(onSubmit, redirectUrlYes, "value" -> "true")
-    behave like redirectNextPage(onSubmit, redirectUrlNo, "value" -> "false")
+    behave like renderPrePopView(onPageLoad, $className;format="cap"$Page(srn), true) { implicit app => implicit request =>
+      injected[YesNoPageView].apply(form(injected[YesNoPageFormProvider]).fill(true), viewModel(srn, NormalMode))
+    }
+
+    behave like redirectNextPage(onSubmit, "value" -> "true")
+    behave like redirectNextPage(onSubmit, "value" -> "false")
+
+    behave like journeyRecoveryPage("onPageLoad", onPageLoad)
+
+    behave like saveAndContinue(onSubmit, "value" -> "true")
+
+    behave like invalidForm(onSubmit)
   }
 }

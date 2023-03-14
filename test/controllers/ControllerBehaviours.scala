@@ -41,8 +41,12 @@ trait ControllerBehaviours {
     }
 
   def renderPrePopView[A: Writes](call: => Call, page: Settable[A], value: A)(view: Application => Request[_] => Html): Unit =
+    renderPrePopView(call, page, value, defaultUserAnswers)(view)
+
+  def renderPrePopView[A: Writes](call: => Call, page: Settable[A], value: A, userAnswers: UserAnswers)
+                                 (view: Application => Request[_] => Html): Unit =
     "return OK and the correct pre-populated view for a GET" in {
-      val appBuilder = applicationBuilder(Some(defaultUserAnswers.set(page, value).success.value))
+      val appBuilder = applicationBuilder(Some(userAnswers.set(page, value).success.value))
       render(appBuilder, call)(view)
     }
 
@@ -99,7 +103,7 @@ trait ControllerBehaviours {
     invalidForm(call, defaultUserAnswers, form: _*)
 
   def redirectNextPage(call: => Call, userAnswers: UserAnswers, form: (String, String)*): Unit =
-    "redirect to the next page" in {
+    s"redirect to the next page with form ${form.toList}" in {
 
       val appBuilder = applicationBuilder(Some(userAnswers)).overrides(
         bind[Navigator].toInstance(new FakeNavigator(testOnwardRoute))
