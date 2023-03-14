@@ -37,6 +37,14 @@ class MemberDetailsControllerSpec extends ControllerBaseSpec {
     "dateOfBirth.year" -> "2020",
   )
 
+  private val dobInFutureForm = List(
+    "firstName" -> "testFirstName",
+    "lastName" -> "testLastName",
+    "dateOfBirth.day" -> "12",
+    "dateOfBirth.month" -> "12",
+    "dateOfBirth.year" -> (LocalDate.now().getYear + 1).toString,
+  )
+
   private val nameDOB = NameDOB(
     "testFirstName",
     "testLastName",
@@ -60,6 +68,7 @@ class MemberDetailsControllerSpec extends ControllerBaseSpec {
     
     behave like saveAndContinue(onSubmit, validForm: _*)
     behave like invalidForm(onSubmit)
+    behave like invalidForm(onSubmit, dobInFutureForm: _*)
     behave like journeyRecoveryPage("onSubmit", onSubmit)
   }
 }

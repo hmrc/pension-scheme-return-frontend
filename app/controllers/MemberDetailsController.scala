@@ -34,6 +34,7 @@ import viewmodels.DisplayMessage.SimpleMessage
 import viewmodels.models.NameDOBViewModel
 import views.html.NameDOBView
 
+import java.time.LocalDate
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -86,6 +87,7 @@ object MemberDetailsController {
       "memberDetails.dateOfBirth.error.required.two",
       "memberDetails.dateOfBirth.error.invalid.date",
       "memberDetails.dateOfBirth.error.invalid.characters",
+      List(DateFormErrors.failIfFutureDate("memberDetails.dateOfBirth.error.future"))
     )
   )
 
