@@ -102,9 +102,3 @@ POST        /:srn/psa-declaration                                 controllers.Ps
 
 GET         /:srn/psp-declaration                                 controllers.PspDeclarationController.onPageLoad(srn: Srn)
 POST        /:srn/psp-declaration                                 controllers.PspDeclarationController.onSubmit(srn: Srn)
-
-GET        /:srn/national-insurance-number                        controllers.DoesSchemeMemberHaveNINOController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST       /:srn/national-insurance-number                        controllers.DoesSchemeMemberHaveNINOController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-
-GET        /:srn/change-national-insurance-number                 controllers.DoesSchemeMemberHaveNINOController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST       /:srn/change-national-insurance-number                 controllers.DoesSchemeMemberHaveNINOController.onSubmit(srn: Srn, mode: Mode = CheckMode)

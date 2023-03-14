@@ -21,7 +21,7 @@ import controllers.routes
 import eu.timepit.refined.{refineMV, refineV}
 import models._
 import pages.SchemeBankAccounts.SchemeBankAccountsOps
-import pages._
+import pages.{HowMuchCashPage, _}
 import play.api.mvc.Call
 
 import javax.inject.{Inject, Singleton}
@@ -75,6 +75,10 @@ class Navigator @Inject()() {
     case MemberDetailsPage(srn) => _ => routes.UnauthorisedController.onPageLoad
 
     case _              => _ => routes.IndexController.onPageLoad
+
+    case PsaDeclarationPage (srn) => _ => routes.UnauthorisedController.onPageLoad
+
+    case PspDeclarationPage(srn) => _ => routes.UnauthorisedController.onPageLoad
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {

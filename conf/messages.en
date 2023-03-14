@@ -222,7 +222,3 @@ pspDeclaration.listItem2 = the content of this return has been approved by the s
 pspDeclaration.listItem3 = the scheme administrator has authorised you to submit this return
 pspDeclaration.listItem4 = the information you have provided in this return is correct and complete to the best of your knowledge and belief
 pspDeclaration.listItem5 = you understand that if you have made a false statement in this return, the pension scheme administrator may be liable to a penalty, and that false statements may also lead to prosecution
-
-nationalInsuranceNumber.title = Does {0} have a National Insurance number?
-nationalInsuranceNumber.heading = Does {0} have a National Insurance number?
-nationalInsuranceNumber.error.required = Select yes if {0} has a National Insurance number
