@@ -245,6 +245,18 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
       }
     }
 
+    "go from member details page to does member have nino page" in {
+
+      forAll(srnGen) { srn =>
+        val page = MemberDetailsPage(srn, refineMV(1))
+        navigator.nextPage(page, NormalMode, userAnswers) mustBe routes.DoesSchemeMemberHaveNINOController.onPageLoad(
+          srn,
+          refineMV(1),
+          NormalMode
+        )
+      }
+    }
+
     "go from member details nino page to member details check your answers page" in {
 
       forAll(srnGen) { srn =>
@@ -253,6 +265,5 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
           .onPageLoad(srn, refineMV(1))
       }
     }
-
   }
 }
