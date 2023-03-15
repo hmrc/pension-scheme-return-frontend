@@ -98,6 +98,13 @@ POST        /:srn/member-details/:index                           controllers.Me
 GET         /:srn/change-member-details/:index                    controllers.MemberDetailsController.onPageLoad(srn: Srn, index: Max99, mode: Mode = CheckMode)
 POST        /:srn/change-member-details/:index                    controllers.MemberDetailsController.onSubmit(srn: Srn, index: Max99, mode: Mode = CheckMode)
 
+
+GET         /:srn/psa-declaration                                 controllers.PsaDeclarationController.onPageLoad(srn: Srn)
+POST        /:srn/psa-declaration                                 controllers.PsaDeclarationController.onSubmit(srn: Srn)
+
+GET         /:srn/psp-declaration                                 controllers.PspDeclarationController.onPageLoad(srn: Srn)
+POST        /:srn/psp-declaration                                 controllers.PspDeclarationController.onSubmit(srn: Srn)
+
 GET         /:srn/member-ni-number                                controllers.MemberDetailsNinoController.onPageLoad(srn: Srn, index: Max99 = 1, mode: Mode = NormalMode)
 GET         /:srn/member-ni-number/:index                         controllers.MemberDetailsNinoController.onPageLoad(srn: Srn, index: Max99, mode: Mode = NormalMode)
 POST        /:srn/member-ni-number/:index                         controllers.MemberDetailsNinoController.onSubmit(srn: Srn, index: Max99, mode: Mode = NormalMode)

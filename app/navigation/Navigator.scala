@@ -21,7 +21,7 @@ import controllers.routes
 import eu.timepit.refined.{refineMV, refineV}
 import models._
 import pages.SchemeBankAccounts.SchemeBankAccountsOps
-import pages._
+import pages.{HowMuchCashPage, _}
 import play.api.mvc.Call
 
 import javax.inject.{Inject, Singleton}
@@ -69,6 +69,15 @@ class Navigator @Inject()() {
     case RemoveAccountingPeriodPage(srn) => _ => routes.AccountingPeriodListController.onPageLoad(srn, NormalMode)
     case HowMuchCashPage(srn) => _ => routes.UnauthorisedController.onPageLoad
     case PensionSchemeMembersPage(srn, _) => _ => routes.UnauthorisedController.onPageLoad
+
+
+    case MemberDetailsPage(srn, index) => _ => routes.UnauthorisedController.onPageLoad
+
+    case PsaDeclarationPage(srn) => _ => routes.UnauthorisedController.onPageLoad
+
+    case PspDeclarationPage(srn) => _ => routes.UnauthorisedController.onPageLoad
+
+
     case MemberDetailsPage(srn, index) => _ => routes.DoesSchemeMemberHaveNINOController.onPageLoad(srn, index, NormalMode)
     case page @ NationalInsuranceNumberPage(srn, index) => {
       case ua if ua.get(page).contains(true) => routes.MemberDetailsNinoController.onPageLoad(srn, index, NormalMode)
@@ -76,7 +85,14 @@ class Navigator @Inject()() {
     }
     case MemberDetailsNinoPage(srn, index) => _ => routes.SchemeMemberDetailsCYAController.onPageLoad(srn, index)
     case SchemeMemberDetailsCYAPage(srn) => _ => routes.UnauthorisedController.onPageLoad
+
+    case PsaDeclarationPage(srn) => _ => routes.UnauthorisedController.onPageLoad
+
+    case PspDeclarationPage(srn) => _ => routes.UnauthorisedController.onPageLoad
+
     case _              => _ => routes.IndexController.onPageLoad
+
+
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
