@@ -18,6 +18,7 @@ package navigation
 
 import controllers.routes
 import eu.timepit.refined._
+import models.ManualOrUpload.{Manual, Upload}
 import models._
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import pages._
@@ -214,9 +215,21 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
     "go from pension scheme members page to unauthorised" in {
 
-      forAll(srnGen, manualOrUploadGen) { (srn, manualOrUpload) =>
-        val page = PensionSchemeMembersPage(srn, manualOrUpload)
+      forAll(srnGen) { srn =>
+        val page = PensionSchemeMembersPage(srn, Upload)
         navigator.nextPage(page, NormalMode, userAnswers) mustBe routes.UnauthorisedController.onPageLoad
+      }
+    }
+
+    "go from pension scheme members page to members page" in {
+
+      forAll(srnGen) { srn =>
+        val page = PensionSchemeMembersPage(srn, Manual)
+        navigator.nextPage(page, NormalMode, userAnswers) mustBe routes.MemberDetailsController.onPageLoad(
+          srn,
+          refineMV(1),
+          NormalMode
+        )
       }
     }
 
@@ -224,7 +237,7 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
       forAll(srnGen) { srn =>
         val page = HowMuchCashPage(srn)
-        navigator.nextPage(page, NormalMode, userAnswers) mustBe routes.UnauthorisedController.onPageLoad
+        navigator.nextPage(page, NormalMode, userAnswers) mustBe routes.PensionSchemeMembersController.onPageLoad(srn)
       }
     }
 

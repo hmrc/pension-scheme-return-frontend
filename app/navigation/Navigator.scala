@@ -19,6 +19,7 @@ package navigation
 import config.Refined.{OneToTen, OneToThree}
 import controllers.routes
 import eu.timepit.refined.{refineMV, refineV}
+import models.ManualOrUpload.{Manual, Upload}
 import models._
 import pages.SchemeBankAccounts.SchemeBankAccountsOps
 import pages.{HowMuchCashPage, _}
@@ -73,7 +74,10 @@ class Navigator @Inject()() {
 
     case RemoveAccountingPeriodPage(srn) => _ => routes.AccountingPeriodListController.onPageLoad(srn, NormalMode)
     case HowMuchCashPage(srn) => _ => routes.PensionSchemeMembersController.onPageLoad(srn)
-    case PensionSchemeMembersPage(srn, _) => _ => routes.MemberDetailsController.onPageLoad(srn, refineMV(1), NormalMode)
+    case PensionSchemeMembersPage(srn, Manual) =>
+      _ => routes.MemberDetailsController.onPageLoad(srn, refineMV(1), NormalMode)
+    case PensionSchemeMembersPage(_, Upload) =>
+      _ => routes.UnauthorisedController.onPageLoad
     case MemberDetailsPage(srn, index) =>
       _ => routes.DoesSchemeMemberHaveNINOController.onPageLoad(srn, index, NormalMode)
     case page @ NationalInsuranceNumberPage(srn, index) => {
