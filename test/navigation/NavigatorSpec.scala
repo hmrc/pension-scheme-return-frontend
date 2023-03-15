@@ -244,6 +244,9 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
         val page = PspDeclarationPage(srn)
         navigator.nextPage(page, NormalMode, userAnswers) mustBe routes.UnauthorisedController.onPageLoad
 
+      }
+    }
+
 
         "go from member details nino page to member details check your answers page" in {
 
@@ -252,7 +255,6 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
             navigator.nextPage(page, NormalMode, userAnswers) mustBe routes.SchemeMemberDetailsCYAController.onPageLoad(srn, refineMV(1))
           }
         }
-      }
-    }
+
   }
 }
