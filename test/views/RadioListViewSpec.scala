@@ -28,11 +28,10 @@ class RadioListViewSpec extends BaseSpec with ScalaCheckPropertyChecks with Html
   implicit val enum = Enumerable(
     ("1", 1),
     ("2", 2),
-    ("3", 3),
+    ("3", 3)
   )
 
   runningApplication { implicit app =>
-
     implicit val request = FakeRequest()
 
     val view = injected[RadioListView]
@@ -46,7 +45,6 @@ class RadioListViewSpec extends BaseSpec with ScalaCheckPropertyChecks with Html
       "have a title" in {
 
         forAll(radioListViewModelGen) { viewmodel =>
-
           title(view(radioListForm, viewmodel)) must startWith(viewmodel.title.toMessage)
         }
       }
@@ -54,7 +52,6 @@ class RadioListViewSpec extends BaseSpec with ScalaCheckPropertyChecks with Html
       "have a heading" in {
 
         forAll(radioListViewModelGen) { viewmodel =>
-
           h1(view(radioListForm, viewmodel)) mustBe viewmodel.heading.toMessage
         }
       }
@@ -62,7 +59,6 @@ class RadioListViewSpec extends BaseSpec with ScalaCheckPropertyChecks with Html
       "have descriptions" in {
 
         forAll(radioListViewModelGen) { viewmodel =>
-
           p(view(radioListForm, viewmodel)) mustBe viewmodel.description.map(_.toMessage)
         }
       }
@@ -70,7 +66,6 @@ class RadioListViewSpec extends BaseSpec with ScalaCheckPropertyChecks with Html
       "have listed content" in {
 
         forAll(radioListViewModelGen) { viewmodel =>
-
           li(view(radioListForm, viewmodel)) mustBe viewmodel.listedContent.map(_.toMessage)
         }
       }
@@ -78,7 +73,6 @@ class RadioListViewSpec extends BaseSpec with ScalaCheckPropertyChecks with Html
       "have legend when present" in {
 
         forAll(radioListViewModelGen) { viewmodel =>
-
           whenever(viewmodel.legend.nonEmpty) {
             legend(view(radioListForm, viewmodel)) mustBe List(viewmodel.legend.value.toMessage)
           }
@@ -88,7 +82,6 @@ class RadioListViewSpec extends BaseSpec with ScalaCheckPropertyChecks with Html
       "no have a legend when not present" in {
 
         forAll(radioListViewModelGen) { viewmodel =>
-
           legend(view(radioListForm, viewmodel.copy(legend = None))) mustBe Nil
         }
       }
@@ -96,7 +89,6 @@ class RadioListViewSpec extends BaseSpec with ScalaCheckPropertyChecks with Html
       "have radio list values" in {
 
         forAll(radioListViewModelGen) { viewmodel =>
-
           radios(view(radioListForm, viewmodel)).map(_.value) mustBe viewmodel.items.map(_.value)
         }
       }
@@ -104,7 +96,6 @@ class RadioListViewSpec extends BaseSpec with ScalaCheckPropertyChecks with Html
       "have radio button labels" in {
 
         forAll(radioListViewModelGen) { viewmodel =>
-
           radios(view(radioListForm, viewmodel)).map(_.label) mustBe viewmodel.items.map(_.content.key)
         }
       }
@@ -112,7 +103,6 @@ class RadioListViewSpec extends BaseSpec with ScalaCheckPropertyChecks with Html
       "have form" in {
 
         forAll(radioListViewModelGen) { viewmodel =>
-
           form(view(radioListForm, viewmodel)).method mustBe viewmodel.onSubmit.method
           form(view(radioListForm, viewmodel)).action mustBe viewmodel.onSubmit.url
         }
@@ -121,7 +111,6 @@ class RadioListViewSpec extends BaseSpec with ScalaCheckPropertyChecks with Html
       "have error summary" in {
 
         forAll(radioListViewModelGen) { viewmodel =>
-
           val invalidForm = radioListForm.bind(Map("value" -> "4"))
           errorSummary(view(invalidForm, viewmodel)).text() must include(requiredKey)
         }
@@ -130,7 +119,6 @@ class RadioListViewSpec extends BaseSpec with ScalaCheckPropertyChecks with Html
       "have error message" in {
 
         forAll(radioListViewModelGen) { viewmodel =>
-
           val invalidForm = radioListForm.bind(Map("value" -> "4"))
           errorMessage(view(invalidForm, viewmodel)).text() must include(requiredKey)
         }

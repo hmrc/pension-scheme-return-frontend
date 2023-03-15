@@ -31,27 +31,35 @@ import utils.FutureUtils.FutureOps
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class MinimalDetailsConnectorImpl @Inject()(appConfig: FrontendAppConfig, http: HttpClient) extends MinimalDetailsConnector {
+class MinimalDetailsConnectorImpl @Inject()(appConfig: FrontendAppConfig, http: HttpClient)
+    extends MinimalDetailsConnector {
 
   private val url = s"${appConfig.pensionsAdministrator}/pension-administrator/get-minimal-psa"
 
-  override def fetch(psaId: PsaId)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[MinimalDetailsError, MinimalDetails]] =
+  override def fetch(
+    psaId: PsaId
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[MinimalDetailsError, MinimalDetails]] =
     fetch("psaId", psaId.value)
 
-  override def fetch(pspId: PspId)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[MinimalDetailsError, MinimalDetails]] =
+  override def fetch(
+    pspId: PspId
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[MinimalDetailsError, MinimalDetails]] =
     fetch("pspId", pspId.value)
 
-  private def fetch(idType: String, idValue: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[MinimalDetailsError, MinimalDetails]] = {
-    http.GET[MinimalDetails](url, headers = Seq(idType -> idValue))
+  private def fetch(
+    idType: String,
+    idValue: String
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[MinimalDetailsError, MinimalDetails]] =
+    http
+      .GET[MinimalDetails](url, headers = Seq(idType -> idValue))
       .map(Right(_))
       .recover {
-        case e@WithStatusCode(NOT_FOUND) if e.message.contains(Constants.detailsNotFound) =>
+        case e @ WithStatusCode(NOT_FOUND) if e.message.contains(Constants.detailsNotFound) =>
           Left(DetailsNotFound)
-        case e@WithStatusCode(FORBIDDEN) if e.message.contains(Constants.delimitedPSA) =>
+        case e @ WithStatusCode(FORBIDDEN) if e.message.contains(Constants.delimitedPSA) =>
           Left(DelimitedAdmin)
       }
       .tapError(t => Future.successful(logger.error(s"Failed to fetch minimal details with message ${t.getMessage}")))
-  }
 }
 
 @ImplementedBy(classOf[MinimalDetailsConnectorImpl])
@@ -59,9 +67,13 @@ trait MinimalDetailsConnector {
 
   protected val logger: Logger = Logger(classOf[MinimalDetailsConnector])
 
-  def fetch(psaId: PsaId)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[MinimalDetailsError, MinimalDetails]]
+  def fetch(
+    psaId: PsaId
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[MinimalDetailsError, MinimalDetails]]
 
-  def fetch(pspId: PspId)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[MinimalDetailsError, MinimalDetails]]
+  def fetch(
+    pspId: PspId
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[MinimalDetailsError, MinimalDetails]]
 }
 
 sealed trait MinimalDetailsError

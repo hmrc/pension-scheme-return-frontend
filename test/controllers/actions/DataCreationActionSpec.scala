@@ -28,11 +28,11 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class DataCreationActionSpec extends BaseSpec {
 
-  class Harness(request: OptionalDataRequest[AnyContentAsEmpty.type], sessionRepository: SessionRepository)(implicit ec: ExecutionContext)
-    extends DataCreationActionImpl(sessionRepository)(ec) {
-      def callTransform(): Future[DataRequest[AnyContentAsEmpty.type]] = {
-        transform(request)
-      }
+  class Harness(request: OptionalDataRequest[AnyContentAsEmpty.type], sessionRepository: SessionRepository)(
+    implicit ec: ExecutionContext
+  ) extends DataCreationActionImpl(sessionRepository)(ec) {
+    def callTransform(): Future[DataRequest[AnyContentAsEmpty.type]] =
+      transform(request)
   }
 
   val request = allowedAccessRequestGen(FakeRequest()).sample.value
@@ -62,7 +62,6 @@ class DataCreationActionSpec extends BaseSpec {
         val action = new Harness(optionalDataRequest, sessionRepository)
 
         val result = action.callTransform().futureValue
-
 
         result.request mustBe request
         result.userAnswers.id mustBe request.getUserId + request.schemeDetails.srn

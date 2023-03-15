@@ -33,31 +33,30 @@ import viewmodels.models.{CheckYourAnswersRowViewModel, CheckYourAnswersViewMode
 import views.html.CheckYourAnswersView
 
 class AccountingPeriodCheckYourAnswersController @Inject()(
-                                                            override val messagesApi: MessagesApi,
-                                                            navigator: Navigator,
-                                                            identify: IdentifierAction,
-                                                            allowAccess: AllowAccessActionProvider,
-                                                            getData: DataRetrievalAction,
-                                                            requireData: DataRequiredAction,
-                                                            val controllerComponents: MessagesControllerComponents,
-                                                            view: CheckYourAnswersView
-                                                          ) extends FrontendBaseController with I18nSupport {
+  override val messagesApi: MessagesApi,
+  navigator: Navigator,
+  identify: IdentifierAction,
+  allowAccess: AllowAccessActionProvider,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  val controllerComponents: MessagesControllerComponents,
+  view: CheckYourAnswersView
+) extends FrontendBaseController
+    with I18nSupport {
 
   def onPageLoad(srn: Srn, index: Max3): Action[AnyContent] =
-    (identify andThen allowAccess(srn) andThen getData andThen requireData) {
-      implicit request =>
-        request.userAnswers.get(AccountingPeriodPage(srn, index)) match {
-          case None =>
-            Redirect(routes.AccountingPeriodController.onPageLoad(srn, index, NormalMode))
-          case Some(accountingPeriod) =>
-            Ok(view(viewModel(srn, index, accountingPeriod)))
-        }
+    identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData) { implicit request =>
+      request.userAnswers.get(AccountingPeriodPage(srn, index)) match {
+        case None =>
+          Redirect(routes.AccountingPeriodController.onPageLoad(srn, index, NormalMode))
+        case Some(accountingPeriod) =>
+          Ok(view(viewModel(srn, index, accountingPeriod)))
+      }
     }
 
   def onSubmit(srn: Srn): Action[AnyContent] =
-    (identify andThen allowAccess(srn) andThen getData andThen requireData) {
-      implicit request =>
-        Redirect(navigator.nextPage(AccountingPeriodCheckYourAnswersPage(srn), NormalMode, request.userAnswers))
+    identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData) { implicit request =>
+      Redirect(navigator.nextPage(AccountingPeriodCheckYourAnswersPage(srn), NormalMode, request.userAnswers))
     }
 }
 

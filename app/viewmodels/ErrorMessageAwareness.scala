@@ -31,11 +31,10 @@ trait ErrorMessageAwareness {
 
   def errorMessage(error: Option[FormError])(implicit messages: Messages): Option[ErrorMessage] =
     error
-      .map {
-        err =>
-          ErrorMessage(content = Text(messages(err.message, err.args.map {
-            case s: String => messages(s)
-            case any       => any
-          }: _*)))
+      .map { err =>
+        ErrorMessage(content = Text(messages(err.message, err.args.map {
+          case s: String => messages(s)
+          case any => any
+        }: _*)))
       }
 }

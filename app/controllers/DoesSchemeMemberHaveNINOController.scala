@@ -40,44 +40,59 @@ import scala.concurrent.{ExecutionContext, Future}
 import utils.FormUtils._
 
 class DoesSchemeMemberHaveNINOController @Inject()(
-                                                   override val messagesApi: MessagesApi,
-                                                   saveService: SaveService,
-                                                   navigator: Navigator,
-                                                   identifyAndRequireData: IdentifyAndRequireData,
-                                                   formProvider: YesNoPageFormProvider,
-                                                   val controllerComponents: MessagesControllerComponents,
-                                                   view: YesNoPageView
-                                                 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+  override val messagesApi: MessagesApi,
+  saveService: SaveService,
+  navigator: Navigator,
+  identifyAndRequireData: IdentifyAndRequireData,
+  formProvider: YesNoPageFormProvider,
+  val controllerComponents: MessagesControllerComponents,
+  view: YesNoPageView
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport {
 
-  private def form(memberName: String): Form[Boolean] = DoesSchemeMemberHaveNINOController.form(formProvider, memberName)
+  private def form(memberName: String): Form[Boolean] =
+    DoesSchemeMemberHaveNINOController.form(formProvider, memberName)
 
   def onPageLoad(srn: Srn, index: Max99, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
-      withMemberDetails(srn, index)(memberDetails => Future.successful(
-        Ok(view(
-          form(memberDetails.fullName).fromUserAnswers(NationalInsuranceNumberPage(srn, index)),
-          viewModel(index, memberDetails.fullName, srn, mode)
-        ))
-      ))
+      withMemberDetails(srn, index)(
+        memberDetails =>
+          Future.successful(
+            Ok(
+              view(
+                form(memberDetails.fullName).fromUserAnswers(NationalInsuranceNumberPage(srn, index)),
+                viewModel(index, memberDetails.fullName, srn, mode)
+              )
+            )
+          )
+      )
   }
 
   def onSubmit(srn: Srn, index: Max99, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
-      withMemberDetails(srn, index)(memberDetails =>
-        form(memberDetails.fullName).bindFromRequest().fold(
-          formWithErrors => Future.successful(
-            BadRequest(view(formWithErrors, viewModel(index, memberDetails.fullName, srn, mode)))
-          ),
-          value =>
-            for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(NationalInsuranceNumberPage(srn, index), value))
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(NationalInsuranceNumberPage(srn, index), mode, updatedAnswers))
-        )
+      withMemberDetails(srn, index)(
+        memberDetails =>
+          form(memberDetails.fullName)
+            .bindFromRequest()
+            .fold(
+              formWithErrors =>
+                Future.successful(
+                  BadRequest(view(formWithErrors, viewModel(index, memberDetails.fullName, srn, mode)))
+                ),
+              value =>
+                for {
+                  updatedAnswers <- Future
+                    .fromTry(request.userAnswers.set(NationalInsuranceNumberPage(srn, index), value))
+                  _ <- saveService.save(updatedAnswers)
+                } yield Redirect(navigator.nextPage(NationalInsuranceNumberPage(srn, index), mode, updatedAnswers))
+            )
       )
   }
 
-  private def withMemberDetails(srn: Srn, index: Max99)(f: NameDOB => Future[Result])(implicit request: DataRequest[_]): Future[Result] =
+  private def withMemberDetails(srn: Srn, index: Max99)(
+    f: NameDOB => Future[Result]
+  )(implicit request: DataRequest[_]): Future[Result] =
     request.userAnswers.get(MemberDetailsPage(srn, index)) match {
       case None => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
       case Some(memberDetails) => f(memberDetails)
@@ -86,7 +101,8 @@ class DoesSchemeMemberHaveNINOController @Inject()(
 
 object DoesSchemeMemberHaveNINOController {
   def form(formProvider: YesNoPageFormProvider, memberName: String): Form[Boolean] = formProvider(
-    "nationalInsuranceNumber.error.required", List(memberName)
+    "nationalInsuranceNumber.error.required",
+    List(memberName)
   )
 
   def viewModel(index: Max99, memberName: String, srn: Srn, mode: Mode): YesNoPageViewModel = YesNoPageViewModel(

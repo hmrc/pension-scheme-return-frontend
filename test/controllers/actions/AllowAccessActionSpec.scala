@@ -40,18 +40,19 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class AllowAccessActionSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
-  def allowAccessAction(appConfig: FrontendAppConfig) = new AllowAccessActionProviderImpl(
-    appConfig,
-    mockSchemeDetailsConnector,
-    mockMinimalDetailsConnector
-  )(ExecutionContext.global)
+  def allowAccessAction(appConfig: FrontendAppConfig) =
+    new AllowAccessActionProviderImpl(
+      appConfig,
+      mockSchemeDetailsConnector,
+      mockMinimalDetailsConnector
+    )(ExecutionContext.global)
 
   lazy val mockMinimalDetailsConnector: MinimalDetailsConnector = mock[MinimalDetailsConnector]
   lazy val mockSchemeDetailsConnector: SchemeDetailsConnector = mock[SchemeDetailsConnector]
 
   class Handler[A](appConfig: FrontendAppConfig, request: IdentifierRequest[A]) {
 
-    def run(srn: Srn): Action[AnyContent] = (new FakeActionBuilder(request) andThen allowAccessAction(appConfig)(srn)) {
+    def run(srn: Srn): Action[AnyContent] = new FakeActionBuilder(request).andThen(allowAccessAction(appConfig)(srn)) {
       request =>
         Ok(Json.toJson(request.schemeDetails))
     }
@@ -112,7 +113,6 @@ class AllowAccessActionSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
       "psa is associated, no rls flag, no deceased flag, no DelimitedAdmin and a valid status" in runningApplication {
         implicit app =>
-
           val result = handler(administratorRequest).run(srn)(FakeRequest())
 
           status(result) mustBe OK
@@ -121,7 +121,6 @@ class AllowAccessActionSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
       "psp is associated, no rls flag, no deceased flag, no DelimitedAdmin and a valid status" in runningApplication {
         implicit app =>
-
           val result = handler(practitionerRequest).run(srn)(FakeRequest())
 
           status(result) mustBe OK
@@ -132,7 +131,6 @@ class AllowAccessActionSpec extends BaseSpec with ScalaCheckPropertyChecks {
     "redirect to unauthorized page" when {
 
       "psa check association returns false" in runningApplication { implicit app =>
-
         setupCheckAssociation(psaId, srn, Future.successful(false))
 
         val result = handler(administratorRequest).run(srn)(FakeRequest())
@@ -142,17 +140,15 @@ class AllowAccessActionSpec extends BaseSpec with ScalaCheckPropertyChecks {
       }
 
       "psp check association returns false" in runningApplication { implicit app =>
+        setupCheckAssociation(pspId, srn, Future.successful(false))
 
-          setupCheckAssociation(pspId, srn, Future.successful(false))
+        val result = handler(practitionerRequest).run(srn)(FakeRequest())
+        val expectedUrl = routes.UnauthorisedController.onPageLoad.url
 
-          val result = handler(practitionerRequest).run(srn)(FakeRequest())
-          val expectedUrl = routes.UnauthorisedController.onPageLoad.url
-
-          redirectLocation(result) mustBe Some(expectedUrl)
+        redirectLocation(result) mustBe Some(expectedUrl)
       }
 
       "psa minimal details return not found" in runningApplication { implicit app =>
-
         setupMinimalDetails(psaId, Future.successful(Left(DetailsNotFound)))
 
         val result = handler(administratorRequest).run(srn)(FakeRequest())
@@ -162,7 +158,6 @@ class AllowAccessActionSpec extends BaseSpec with ScalaCheckPropertyChecks {
       }
 
       "psp minimal details return not found" in runningApplication { implicit app =>
-
         setupMinimalDetails(pspId, Future.successful(Left(DetailsNotFound)))
 
         val result = handler(practitionerRequest).run(srn)(FakeRequest())
@@ -172,7 +167,6 @@ class AllowAccessActionSpec extends BaseSpec with ScalaCheckPropertyChecks {
       }
 
       "psa - scheme details not found" in runningApplication { implicit app =>
-
         setupSchemeDetails(psaId, srn, Future.successful(None))
 
         val result = handler(administratorRequest).run(srn)(FakeRequest())
@@ -216,7 +210,6 @@ class AllowAccessActionSpec extends BaseSpec with ScalaCheckPropertyChecks {
     "redirect to update contact details page" when {
 
       "psa rls flag is set" in runningApplication { implicit app =>
-
         setupMinimalDetails(psaId, Future.successful(Right(minimalDetails.copy(rlsFlag = true))))
 
         val result = handler(administratorRequest).run(srn)(FakeRequest())
@@ -226,7 +219,6 @@ class AllowAccessActionSpec extends BaseSpec with ScalaCheckPropertyChecks {
       }
 
       "psp rls flag is set" in runningApplication { implicit app =>
-
         setupMinimalDetails(pspId, Future.successful(Right(minimalDetails.copy(rlsFlag = true))))
 
         val result = handler(practitionerRequest).run(srn)(FakeRequest())
@@ -239,7 +231,6 @@ class AllowAccessActionSpec extends BaseSpec with ScalaCheckPropertyChecks {
     "redirect to contact hmrc page" when {
 
       "psa deceased flag is set" in runningApplication { implicit app =>
-
         setupMinimalDetails(psaId, Future.successful(Right(minimalDetails.copy(deceasedFlag = true))))
 
         val result = handler(administratorRequest).run(srn)(FakeRequest())
@@ -249,7 +240,6 @@ class AllowAccessActionSpec extends BaseSpec with ScalaCheckPropertyChecks {
       }
 
       "psp deceased flag is set" in runningApplication { implicit app =>
-
         setupMinimalDetails(pspId, Future.successful(Right(minimalDetails.copy(deceasedFlag = true))))
 
         val result = handler(practitionerRequest).run(srn)(FakeRequest())
@@ -262,7 +252,6 @@ class AllowAccessActionSpec extends BaseSpec with ScalaCheckPropertyChecks {
     "redirect to cannot access deregistered page" when {
 
       "psa minimal details return delimited admin" in runningApplication { implicit app =>
-
         setupMinimalDetails(psaId, Future.successful(Left(DelimitedAdmin)))
 
         val result = handler(administratorRequest).run(srn)(FakeRequest())
@@ -272,7 +261,6 @@ class AllowAccessActionSpec extends BaseSpec with ScalaCheckPropertyChecks {
       }
 
       "psp minimal details return delimited admin" in runningApplication { implicit app =>
-
         setupMinimalDetails(pspId, Future.successful(Left(DelimitedAdmin)))
 
         val result = handler(practitionerRequest).run(srn)(FakeRequest())

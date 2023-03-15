@@ -26,7 +26,7 @@ sealed abstract class IdentifierRequest[A](request: Request[A]) extends WrappedR
   def fold[B](admin: AdministratorRequest[A] => B, practitioner: PractitionerRequest[A] => B): B =
     self match {
       case a: AdministratorRequest[A] => admin(a)
-      case p: PractitionerRequest[A]  => practitioner(p)
+      case p: PractitionerRequest[A] => practitioner(p)
     }
 
   def getExternalId: String = fold(_.externalId, _.externalId)

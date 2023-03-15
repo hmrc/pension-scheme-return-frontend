@@ -32,29 +32,31 @@ class DoesSchemeMemberHaveNINOControllerSpec extends ControllerBaseSpec {
 
   private val memberDetails = NameDOB("testFirstname", "testLastName", LocalDate.of(2020, 12, 12))
 
-  private val userAnswersWithMemberDetails = defaultUserAnswers.set(MemberDetailsPage(srn, refineMV(1)), memberDetails).success.value
+  private val userAnswersWithMemberDetails =
+    defaultUserAnswers.set(MemberDetailsPage(srn, refineMV(1)), memberDetails).success.value
 
   "NationalInsuranceNumberController" should {
 
-    behave like renderView(onPageLoad, userAnswersWithMemberDetails) {
-      implicit app => implicit request =>
-        val preparedForm = form(injected[YesNoPageFormProvider], memberDetails.fullName)
-        injected[YesNoPageView].apply(preparedForm, viewModel(refineMV(1), memberDetails.fullName, srn, NormalMode))
-    }
+    behave.like(renderView(onPageLoad, userAnswersWithMemberDetails) { implicit app => implicit request =>
+      val preparedForm = form(injected[YesNoPageFormProvider], memberDetails.fullName)
+      injected[YesNoPageView].apply(preparedForm, viewModel(refineMV(1), memberDetails.fullName, srn, NormalMode))
+    })
 
-    behave like renderPrePopView(onPageLoad, NationalInsuranceNumberPage(srn, refineMV(1)), true, userAnswersWithMemberDetails) {
-      implicit app => implicit request =>
-        val preparedForm = form(injected[YesNoPageFormProvider], memberDetails.fullName).fill(true)
-        injected[YesNoPageView].apply(preparedForm, viewModel(refineMV(1), memberDetails.fullName, srn, NormalMode))
-    }
+    behave.like(
+      renderPrePopView(onPageLoad, NationalInsuranceNumberPage(srn, refineMV(1)), true, userAnswersWithMemberDetails) {
+        implicit app => implicit request =>
+          val preparedForm = form(injected[YesNoPageFormProvider], memberDetails.fullName).fill(true)
+          injected[YesNoPageView].apply(preparedForm, viewModel(refineMV(1), memberDetails.fullName, srn, NormalMode))
+      }
+    )
 
-    behave like redirectWhenCacheEmpty(onPageLoad, controllers.routes.JourneyRecoveryController.onPageLoad())
-    behave like journeyRecoveryPage("onPageLoad", onPageLoad)
+    behave.like(redirectWhenCacheEmpty(onPageLoad, controllers.routes.JourneyRecoveryController.onPageLoad()))
+    behave.like(journeyRecoveryPage("onPageLoad", onPageLoad))
 
-    behave like redirectNextPage(onSubmit, userAnswersWithMemberDetails, "value" -> "true")
-    behave like redirectNextPage(onSubmit, userAnswersWithMemberDetails, "value" -> "false")
-    behave like saveAndContinue(onSubmit, userAnswersWithMemberDetails, "value" -> "true")
-    behave like invalidForm(onSubmit, userAnswersWithMemberDetails)
-    behave like journeyRecoveryPage("onSubmit", onSubmit)
+    behave.like(redirectNextPage(onSubmit, userAnswersWithMemberDetails, "value" -> "true"))
+    behave.like(redirectNextPage(onSubmit, userAnswersWithMemberDetails, "value" -> "false"))
+    behave.like(saveAndContinue(onSubmit, userAnswersWithMemberDetails, "value" -> "true"))
+    behave.like(invalidForm(onSubmit, userAnswersWithMemberDetails))
+    behave.like(journeyRecoveryPage("onSubmit", onSubmit))
   }
 }

@@ -38,7 +38,7 @@ case class SchemeBankAccounts(srn: Srn) extends Gettable[List[BankAccount]] {
 }
 
 object SchemeBankAccounts {
-  implicit class SchemeBankAccountsOps(ua: UserAnswers){
+  implicit class SchemeBankAccountsOps(ua: UserAnswers) {
     def schemeBankAccounts(srn: Srn): List[BankAccount] = ua.get(SchemeBankAccounts(srn)).toList.flatten
   }
 }

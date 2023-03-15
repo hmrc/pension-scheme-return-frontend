@@ -27,29 +27,30 @@ class PensionSchemeReturnSpec extends AnyWordSpec with Matchers {
       (DataEntryRule.Fixed, "fixed"),
       (DataEntryRule.Updated, "updated"),
       (DataEntryRule.None, "none")
-    ).foreach { case (rule, ruleSerialised) =>
-      s"serialise to json correctly for rule $rule" in {
-        val pensionSchemeReturn = PensionSchemeReturn(
-          name = DataEntry(
-            "testName",
-            rule,
-            DataEntryChanged("v1", "testPreviousName")
-          )
-        )
-
-        val expectedJson = Json.obj(
-          "name" -> Json.obj(
-            "value" -> "testName",
-            "rule" -> ruleSerialised,
-            "changed" -> Json.obj(
-              "version" -> "v1",
-              "previousValue" -> "testPreviousName"
+    ).foreach {
+      case (rule, ruleSerialised) =>
+        s"serialise to json correctly for rule $rule" in {
+          val pensionSchemeReturn = PensionSchemeReturn(
+            name = DataEntry(
+              "testName",
+              rule,
+              DataEntryChanged("v1", "testPreviousName")
             )
           )
-        )
 
-        expectedJson.as[PensionSchemeReturn] shouldBe pensionSchemeReturn
-      }
+          val expectedJson = Json.obj(
+            "name" -> Json.obj(
+              "value" -> "testName",
+              "rule" -> ruleSerialised,
+              "changed" -> Json.obj(
+                "version" -> "v1",
+                "previousValue" -> "testPreviousName"
+              )
+            )
+          )
+
+          expectedJson.as[PensionSchemeReturn] shouldBe pensionSchemeReturn
+        }
     }
   }
 }

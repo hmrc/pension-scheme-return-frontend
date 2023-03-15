@@ -36,23 +36,23 @@ object Enumerable {
         entriesMap.get(str)
 
       override def toList: List[(String, A)] = entries.toList
-     }
+    }
 
   trait Implicits {
 
-    implicit def reads[A](implicit ev: Enumerable[A]): Reads[A] = {
+    implicit def reads[A](implicit ev: Enumerable[A]): Reads[A] =
       Reads {
         case JsString(str) =>
-          ev.get(str).map {
-            s => JsSuccess(s)
-          }.getOrElse(JsError("error.invalid"))
+          ev.get(str)
+            .map { s =>
+              JsSuccess(s)
+            }
+            .getOrElse(JsError("error.invalid"))
         case _ =>
           JsError("error.invalid")
-       }
-    }
+      }
 
-    implicit def writes[A : Enumerable]: Writes[A] = {
+    implicit def writes[A: Enumerable]: Writes[A] =
       Writes(value => JsString(value.toString))
-    }
   }
 }

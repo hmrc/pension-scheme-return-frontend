@@ -20,12 +20,12 @@ import viewmodels.DisplayMessage.SimpleMessage
 
 object ListUtils {
 
-  implicit class ListOps[A](list: List[A]){
+  implicit class ListOps[A](list: List[A]) {
     def intersperse(separator: A, step: Int = 1): List[A] = {
 
       def go(xs: List[A], iterator: Int): List[A] = xs match {
         case List(x) => List(x)
-        case Nil     => Nil
+        case Nil => Nil
         case y :: ys if iterator == 1 => y +: separator +: go(ys, step)
         case y :: ys => y +: go(ys, iterator - 1)
       }
@@ -42,8 +42,8 @@ object ListUtils {
       list.patch(index, Nil, 1)
   }
 
-  implicit class ListTupStringOps(list: List[(String, String)]){
+  implicit class ListTupStringOps(list: List[(String, String)]) {
     def toSimpleMessages: List[(SimpleMessage, SimpleMessage)] =
-      list.map{ case (first, second) => SimpleMessage(first) -> SimpleMessage(second)}
+      list.map { case (first, second) => SimpleMessage(first) -> SimpleMessage(second) }
   }
 }

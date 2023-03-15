@@ -33,7 +33,8 @@ import scala.concurrent.Future
 
 class RemoveSchemeBankAccountControllerSpec extends ControllerBaseSpec {
 
-  private lazy val onPageLoad = routes.RemoveSchemeBankAccountController.onPageLoad(srn, refineMV[OneToTen](1), NormalMode)
+  private lazy val onPageLoad =
+    routes.RemoveSchemeBankAccountController.onPageLoad(srn, refineMV[OneToTen](1), NormalMode)
   private lazy val onSubmit = routes.RemoveSchemeBankAccountController.onSubmit(srn, refineMV[OneToTen](1), NormalMode)
 
   private lazy val redirectUrl = routes.SchemeBankAccountListController.onPageLoad(srn)
@@ -42,17 +43,22 @@ class RemoveSchemeBankAccountControllerSpec extends ControllerBaseSpec {
   private val otherBankAccount = BankAccount("otherTestBankName", "11112222", "111222")
 
   private val userAnswersWithBankAccounts = defaultUserAnswers
-    .set(SchemeBankAccountPage(srn, refineMV[OneToTen](1)), bankAccount).success.value
-    .set(SchemeBankAccountPage(srn, refineMV[OneToTen](2)), otherBankAccount).success.value
+    .set(SchemeBankAccountPage(srn, refineMV[OneToTen](1)), bankAccount)
+    .success
+    .value
+    .set(SchemeBankAccountPage(srn, refineMV[OneToTen](2)), otherBankAccount)
+    .success
+    .value
 
   "RemoveSchemeBankAccountController" should {
 
-    behave like renderView(onPageLoad, userAnswersWithBankAccounts) { implicit app => implicit request =>
-      injected[YesNoPageView].apply(form(injected[YesNoPageFormProvider]), viewModel(srn, refineMV[OneToTen](1), bankAccount, NormalMode))
-    }
+    behave.like(renderView(onPageLoad, userAnswersWithBankAccounts) { implicit app => implicit request =>
+      injected[YesNoPageView]
+        .apply(form(injected[YesNoPageFormProvider]), viewModel(srn, refineMV[OneToTen](1), bankAccount, NormalMode))
+    })
 
-    behave like redirectToPage(onSubmit, redirectUrl, userAnswersWithBankAccounts, "value" -> "false")
-    behave like redirectToPage(onPageLoad, controllers.routes.JourneyRecoveryController.onPageLoad())
+    behave.like(redirectToPage(onSubmit, redirectUrl, userAnswersWithBankAccounts, "value" -> "false"))
+    behave.like(redirectToPage(onPageLoad, controllers.routes.JourneyRecoveryController.onPageLoad()))
 
     "remove the correct bank account on submit when yes is selected" in {
       val mockSaveService = mock[SaveService]
@@ -72,7 +78,10 @@ class RemoveSchemeBankAccountControllerSpec extends ControllerBaseSpec {
         redirectLocation(result).value mustEqual redirectUrl.url
         verify(mockSaveService).save(captor.capture())(any(), any())
 
-        captor.getValue mustBe defaultUserAnswers.set(SchemeBankAccountPage(srn, refineMV[OneToTen](1)), otherBankAccount).success.value
+        captor.getValue mustBe defaultUserAnswers
+          .set(SchemeBankAccountPage(srn, refineMV[OneToTen](1)), otherBankAccount)
+          .success
+          .value
       }
     }
 

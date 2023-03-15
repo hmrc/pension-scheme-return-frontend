@@ -25,4 +25,3 @@ case class WhichTaxYearPage(srn: Srn) extends QuestionPage[DateRange] {
 
   override def toString: String = "whichTaxYear"
 }
-

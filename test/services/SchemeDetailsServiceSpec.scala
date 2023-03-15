@@ -18,7 +18,7 @@ package services
 
 import connectors.SchemeDetailsConnector
 import models.SchemeId.Srn
-import org.mockito.ArgumentMatchers.{any, eq=>meq}
+import org.mockito.ArgumentMatchers.{any, eq => meq}
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.BaseSpec
@@ -76,7 +76,6 @@ class SchemeDetailsServiceSpec extends BaseSpec with ScalaCheckPropertyChecks {
     "return none when srn not found for psa" in {
 
       forAll(listMinimalSchemeDetailsGen, psaIdGen, srnGen) { (details, psaId, srn) =>
-
         whenever(!details.schemeDetails.exists(_.srn == srn.value)) {
 
           when(mockSchemeDetailsConnector.listSchemeDetails(meq(psaId))(any(), any()))
@@ -90,7 +89,6 @@ class SchemeDetailsServiceSpec extends BaseSpec with ScalaCheckPropertyChecks {
     "return none when srn not found for psp" in {
 
       forAll(listMinimalSchemeDetailsGen, pspIdGen, srnGen) { (details, pspId, srn) =>
-
         whenever(!details.schemeDetails.exists(_.srn == srn.value)) {
 
           when(mockSchemeDetailsConnector.listSchemeDetails(meq(pspId))(any(), any()))
@@ -104,7 +102,6 @@ class SchemeDetailsServiceSpec extends BaseSpec with ScalaCheckPropertyChecks {
     "return none when connector returns none for psa" in {
 
       forAll(psaIdGen, srnGen) { (psaId, srn) =>
-
         when(mockSchemeDetailsConnector.listSchemeDetails(meq(psaId))(any(), any()))
           .thenReturn(Future.successful(None))
 
@@ -115,7 +112,6 @@ class SchemeDetailsServiceSpec extends BaseSpec with ScalaCheckPropertyChecks {
     "return none when connector returns none for psp" in {
 
       forAll(pspIdGen, srnGen) { (pspId, srn) =>
-
         when(mockSchemeDetailsConnector.listSchemeDetails(meq(pspId))(any(), any()))
           .thenReturn(Future.successful(None))
 

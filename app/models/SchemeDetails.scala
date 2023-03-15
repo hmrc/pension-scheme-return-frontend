@@ -45,56 +45,59 @@ object EstablisherKind {
   case object Partnership extends EstablisherKind("partnership")
   case object Individual extends EstablisherKind("individual")
 
-  implicit val reads: Reads[EstablisherKind] = Reads.StringReads.map{
-    case Company.value     => Company
+  implicit val reads: Reads[EstablisherKind] = Reads.StringReads.map {
+    case Company.value => Company
     case Partnership.value => Partnership
-    case Individual.value  => Individual
+    case Individual.value => Individual
   }
 }
 
 object Establisher {
 
   private val companyEstablisherReads: Reads[Establisher] =
-    (__ \ "companyDetails" \ "companyName").read[String].map(name =>
-      Establisher(name, EstablisherKind.Company)
-    )
+    (__ \ "companyDetails" \ "companyName").read[String].map(name => Establisher(name, EstablisherKind.Company))
 
   private val partnershipEstablisherReads: Reads[Establisher] =
-    (__ \ "partnershipDetails" \ "name").read[String].map(name =>
-      Establisher(name, EstablisherKind.Partnership)
-    )
+    (__ \ "partnershipDetails" \ "name").read[String].map(name => Establisher(name, EstablisherKind.Partnership))
 
   private val individualEstablisherReads: Reads[Establisher] = {
-    (
-      (__ \ "establisherDetails" \ "firstName").read[String] and
-      (__ \ "establisherDetails" \ "middleName").readNullable[String] and
-      (__ \ "establisherDetails" \ "lastName").read[String]
-    ){(first, middle, last) =>
-      val name = s"$first ${middle.fold("")(m => s"$m ")}$last"
-      Establisher(name, EstablisherKind.Individual)
-    }
+
+    (__ \ "establisherDetails" \ "firstName")
+      .read[String]
+      .and((__ \ "establisherDetails" \ "middleName").readNullable[String])
+      .and((__ \ "establisherDetails" \ "lastName").read[String]) { (first, middle, last) =>
+        val name = s"$first ${middle.fold("")(m => s"$m ")}$last"
+        Establisher(name, EstablisherKind.Individual)
+      }
   }
 
   implicit val reads: Reads[Establisher] =
-    (__ \ "establisherKind").read[EstablisherKind].flatMap{
-      case EstablisherKind.Company     => companyEstablisherReads
+    (__ \ "establisherKind").read[EstablisherKind].flatMap {
+      case EstablisherKind.Company => companyEstablisherReads
       case EstablisherKind.Partnership => partnershipEstablisherReads
-      case EstablisherKind.Individual  => individualEstablisherReads
+      case EstablisherKind.Individual => individualEstablisherReads
     }
 }
 
 object SchemeDetails {
 
   implicit val reads: Reads[SchemeDetails] =
-    (
-      (__ \ "srn").read[String] and
-      (__ \ "schemeName").read[String] and
-      (__ \ "pstr").read[String] and
-      (__ \ "schemeStatus").read[SchemeStatus] and
-      (__ \ "schemeType" \ "name").read[String] and
-      (__ \ "pspDetails" \ "authorisingPSAID").readNullable[String] and
-      (__ \ "establishers").read[JsArray].map[List[Establisher]](l => if(l.value.isEmpty) Nil else l.as[List[Establisher]])
-    )(SchemeDetails.apply _)
+    ((__ \ "srn")
+      .read[String]
+      .and((__ \ "schemeName").read[String])
+      .and((__ \ "pstr").read[String])
+      .and((__ \ "schemeStatus").read[SchemeStatus])
+      .and((__ \ "schemeType" \ "name").read[String])
+      .and((__ \ "pspDetails" \ "authorisingPSAID").readNullable[String])
+      .and(
+        (__ \ "establishers")
+          .read[JsArray]
+          .map[List[Establisher]](
+            l =>
+              if (l.value.isEmpty) Nil
+              else l.as[List[Establisher]]
+          )
+      ))(SchemeDetails.apply _)
 }
 
 sealed trait SchemeStatus
@@ -111,15 +114,15 @@ object SchemeStatus {
   case object RejectedUnderAppeal extends WithName("Rejected Under Appeal") with SchemeStatus
 
   implicit val reads: Reads[SchemeStatus] = {
-    case JsString(Pending.name)             => JsSuccess(Pending)
+    case JsString(Pending.name) => JsSuccess(Pending)
     case JsString(PendingInfoRequired.name) => JsSuccess(PendingInfoRequired)
     case JsString(PendingInfoReceived.name) => JsSuccess(PendingInfoReceived)
-    case JsString(Rejected.name)            => JsSuccess(Rejected)
-    case JsString(Open.name)                => JsSuccess(Open)
-    case JsString(Deregistered.name)        => JsSuccess(Deregistered)
-    case JsString(WoundUp.name)             => JsSuccess(WoundUp)
+    case JsString(Rejected.name) => JsSuccess(Rejected)
+    case JsString(Open.name) => JsSuccess(Open)
+    case JsString(Deregistered.name) => JsSuccess(Deregistered)
+    case JsString(WoundUp.name) => JsSuccess(WoundUp)
     case JsString(RejectedUnderAppeal.name) => JsSuccess(RejectedUnderAppeal)
-    case _                                  => JsError("Unrecognized scheme status")
+    case _ => JsError("Unrecognized scheme status")
   }
 }
 
@@ -148,11 +151,10 @@ object MinimalSchemeDetails {
   }
 
   implicit val reads: Reads[MinimalSchemeDetails] =
-    (
-      (__ \ "name").read[String] and
-       (__ \ "referenceNumber").read[String] and
-       (__ \ "schemeStatus").read[SchemeStatus] and
-       (__ \ "openDate").readNullable[LocalDate] and
-       (__ \ "windUpDate").readNullable[LocalDate]
-    )(MinimalSchemeDetails.apply _)
+    ((__ \ "name")
+      .read[String]
+      .and((__ \ "referenceNumber").read[String])
+      .and((__ \ "schemeStatus").read[SchemeStatus])
+      .and((__ \ "openDate").readNullable[LocalDate])
+      .and((__ \ "windUpDate").readNullable[LocalDate]))(MinimalSchemeDetails.apply _)
 }

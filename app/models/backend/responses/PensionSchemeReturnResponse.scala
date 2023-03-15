@@ -21,19 +21,19 @@ import play.api.libs.json._
 import utils.WithName
 
 case class PensionSchemeReturn(
-                                name: DataEntry[String]
-                              )
+  name: DataEntry[String]
+)
 
 case class DataEntry[A](
-                         value: A,
-                         rule: DataEntryRule,
-                         changed: DataEntryChanged[A]
-                       )
+  value: A,
+  rule: DataEntryRule,
+  changed: DataEntryChanged[A]
+)
 
 case class DataEntryChanged[A](
-                                version: String,
-                                previousValue: A
-                              )
+  version: String,
+  previousValue: A
+)
 
 sealed trait DataEntryRule
 

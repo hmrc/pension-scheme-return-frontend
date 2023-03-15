@@ -20,8 +20,8 @@ import play.api.mvc.Call
 import viewmodels.DisplayMessage._
 
 case class DatePageViewModel(
-                              title: SimpleMessage,
-                              legend: SimpleMessage,
-                              hint: SimpleMessage,
-                              onSubmit: Call
-                            )
+  title: SimpleMessage,
+  legend: SimpleMessage,
+  hint: SimpleMessage,
+  onSubmit: Call
+)

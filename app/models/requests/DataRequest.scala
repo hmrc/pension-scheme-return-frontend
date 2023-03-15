@@ -25,7 +25,8 @@ import queries.Gettable
 
 import scala.concurrent.Future
 
-case class OptionalDataRequest[A] (request: AllowedAccessRequest[A], userAnswers: Option[UserAnswers]) extends WrappedRequest[A](request) {
+case class OptionalDataRequest[A](request: AllowedAccessRequest[A], userAnswers: Option[UserAnswers])
+    extends WrappedRequest[A](request) {
 
   val getUserId: String = request.getUserId
 
@@ -34,7 +35,8 @@ case class OptionalDataRequest[A] (request: AllowedAccessRequest[A], userAnswers
   val schemeDetails: SchemeDetails = request.schemeDetails
 }
 
-case class DataRequest[A] (request: AllowedAccessRequest[A], userAnswers: UserAnswers) extends WrappedRequest[A](request) {
+case class DataRequest[A](request: AllowedAccessRequest[A], userAnswers: UserAnswers)
+    extends WrappedRequest[A](request) {
 
   val pensionSchemeId: PensionSchemeId = request.pensionSchemeId
 
@@ -51,7 +53,9 @@ class UsingAnswer[A: Reads](page: Gettable[A], userAnswers: UserAnswers) {
     userAnswers.get(page).fold(Redirect(routes.JourneyRecoveryController.onPageLoad()))(block)
 
   def async(block: A => Future[Result]): Future[Result] =
-    userAnswers.get(page).fold(
-      Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
-    )(block)
+    userAnswers
+      .get(page)
+      .fold(
+        Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+      )(block)
 }

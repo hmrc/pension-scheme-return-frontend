@@ -40,45 +40,54 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class RemoveAccountingPeriodController @Inject()(
-                                         override val messagesApi: MessagesApi,
-                                         navigator: Navigator,
-                                         identifyAndRequireData: IdentifyAndRequireData,
-                                         formProvider: YesNoPageFormProvider,
-                                         saveService: SaveService,
-                                         val controllerComponents: MessagesControllerComponents,
-                                         view: YesNoPageView
-                                 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+  override val messagesApi: MessagesApi,
+  navigator: Navigator,
+  identifyAndRequireData: IdentifyAndRequireData,
+  formProvider: YesNoPageFormProvider,
+  saveService: SaveService,
+  val controllerComponents: MessagesControllerComponents,
+  view: YesNoPageView
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport {
 
   private val form = RemoveSchemeBankAccountController.form(formProvider)
 
-  def onPageLoad(srn:Srn, index: Max3, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
-    implicit request => withAccountingPeriodAtIndex(srn, index) { period =>
-      Ok(view(form, viewModel(srn, index, period, mode)))
-    }
+  def onPageLoad(srn: Srn, index: Max3, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+    implicit request =>
+      withAccountingPeriodAtIndex(srn, index) { period =>
+        Ok(view(form, viewModel(srn, index, period, mode)))
+      }
   }
 
   def onSubmit(srn: Srn, index: Max3, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
-      form.bindFromRequest().fold(
-        formWithErrors => Future.successful(
-          withAccountingPeriodAtIndex(srn, index) { period =>
-            BadRequest(view(formWithErrors, viewModel(srn, index, period, mode)))
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors =>
+            Future.successful(
+              withAccountingPeriodAtIndex(srn, index) { period =>
+                BadRequest(view(formWithErrors, viewModel(srn, index, period, mode)))
+              }
+            ),
+          answer => {
+            if (answer) {
+              for {
+                updatedAnswers <- Future.fromTry(request.userAnswers.remove(AccountingPeriodPage(srn, index)))
+                _ <- saveService.save(updatedAnswers)
+              } yield Redirect(navigator.nextPage(RemoveAccountingPeriodPage(srn), mode, updatedAnswers))
+            } else {
+              Future
+                .successful(Redirect(navigator.nextPage(RemoveAccountingPeriodPage(srn), mode, request.userAnswers)))
+            }
           }
-        ),
-        answer => {
-          if(answer){
-            for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.remove(AccountingPeriodPage(srn, index)))
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(RemoveAccountingPeriodPage(srn), mode, updatedAnswers))
-          } else {
-            Future.successful(Redirect(navigator.nextPage(RemoveAccountingPeriodPage(srn), mode, request.userAnswers)))
-          }
-        }
-      )
+        )
   }
 
-  private def withAccountingPeriodAtIndex(srn: Srn, index: Max3)(f: DateRange => Result)(implicit request: DataRequest[_]): Result =
+  private def withAccountingPeriodAtIndex(srn: Srn, index: Max3)(
+    f: DateRange => Result
+  )(implicit request: DataRequest[_]): Result =
     request.userAnswers.get(AccountingPeriodPage(srn, index)) match {
       case Some(bankAccount) => f(bankAccount)
       case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())

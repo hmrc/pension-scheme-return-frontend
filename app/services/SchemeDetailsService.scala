@@ -27,20 +27,24 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class SchemeDetailsServiceImpl @Inject()(schemeDetailsConnector: SchemeDetailsConnector) extends SchemeDetailsService {
 
-
-  def getMinimalSchemeDetails(id: PensionSchemeId, srn: Srn)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[MinimalSchemeDetails]] = {
-
+  def getMinimalSchemeDetails(
+    id: PensionSchemeId,
+    srn: Srn
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[MinimalSchemeDetails]] =
     id.fold(
-      schemeDetailsConnector.listSchemeDetails(_),
-      schemeDetailsConnector.listSchemeDetails(_)
-    ).map { allDetails =>
-      allDetails.flatMap(_.schemeDetails.find(_.srn == srn.value))
-    }
-  }
+        schemeDetailsConnector.listSchemeDetails(_),
+        schemeDetailsConnector.listSchemeDetails(_)
+      )
+      .map { allDetails =>
+        allDetails.flatMap(_.schemeDetails.find(_.srn == srn.value))
+      }
 }
 
 @ImplementedBy(classOf[SchemeDetailsServiceImpl])
 trait SchemeDetailsService {
 
-  def getMinimalSchemeDetails(id: PensionSchemeId, srn: Srn)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[MinimalSchemeDetails]]
+  def getMinimalSchemeDetails(id: PensionSchemeId, srn: Srn)(
+    implicit hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[Option[MinimalSchemeDetails]]
 }

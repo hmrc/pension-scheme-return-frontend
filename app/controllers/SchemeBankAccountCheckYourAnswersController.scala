@@ -38,32 +38,29 @@ class SchemeBankAccountCheckYourAnswersController @Inject()(
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   view: CheckYourAnswersView
-) extends FrontendBaseController with I18nSupport {
+) extends FrontendBaseController
+    with I18nSupport {
 
   def onPageLoad(srn: Srn, index: Max10): Action[AnyContent] =
-    (identify andThen allowAccess(srn) andThen getData andThen requireData) {
-      implicit request =>
-
-        request.userAnswers.get(SchemeBankAccountPage(srn, index)) match {
-          case None =>
-            Redirect(routes.SchemeBankAccountController.onPageLoad(srn, index, NormalMode))
-          case Some(bankAccount) =>
-            Ok(view(SchemeBankAccountCheckYourAnswersController.viewModel(srn, index, bankAccount)))
-        }
+    identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData) { implicit request =>
+      request.userAnswers.get(SchemeBankAccountPage(srn, index)) match {
+        case None =>
+          Redirect(routes.SchemeBankAccountController.onPageLoad(srn, index, NormalMode))
+        case Some(bankAccount) =>
+          Ok(view(SchemeBankAccountCheckYourAnswersController.viewModel(srn, index, bankAccount)))
+      }
     }
 
   def onSubmit(srn: Srn): Action[AnyContent] =
-    (identify andThen allowAccess(srn) andThen getData andThen requireData) {
-      implicit request =>
-        Redirect(navigator.nextPage(SchemeBankAccountCheckYourAnswersPage(srn), NormalMode, request.userAnswers))
+    identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData) { implicit request =>
+      Redirect(navigator.nextPage(SchemeBankAccountCheckYourAnswersPage(srn), NormalMode, request.userAnswers))
     }
 }
 
 object SchemeBankAccountCheckYourAnswersController {
 
-  private def action(srn: Srn, index: Max10): SummaryAction = {
+  private def action(srn: Srn, index: Max10): SummaryAction =
     SummaryAction("site.change", routes.SchemeBankAccountController.onPageLoad(srn, index, NormalMode).url)
-  }
 
   def bankAccountAnswers(srn: Srn, index: Max10, bankAccount: BankAccount) =
     Seq(
@@ -75,9 +72,9 @@ object SchemeBankAccountCheckYourAnswersController {
         .withAction(action(srn, index).withVisuallyHiddenContent("schemeBankDetails.sortCode.heading.vh"))
     )
 
-  def viewModel(srn: Srn, index: Max10, bankAccount: BankAccount): CheckYourAnswersViewModel = CheckYourAnswersViewModel(
-    bankAccountAnswers(srn, index, bankAccount),
-    routes.SchemeBankAccountCheckYourAnswersController.onSubmit(srn)
-  )
+  def viewModel(srn: Srn, index: Max10, bankAccount: BankAccount): CheckYourAnswersViewModel =
+    CheckYourAnswersViewModel(
+      bankAccountAnswers(srn, index, bankAccount),
+      routes.SchemeBankAccountCheckYourAnswersController.onSubmit(srn)
+    )
 }
-

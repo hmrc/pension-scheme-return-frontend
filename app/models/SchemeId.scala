@@ -27,9 +27,8 @@ object SchemeId {
   object Srn {
     val srnRegex = "^S[0-9]{10}$"
 
-    def apply(value: String): Option[Srn] = {
-      if(value.matches(srnRegex)) Some(new Srn(value)) else None
-    }
+    def apply(value: String): Option[Srn] =
+      if (value.matches(srnRegex)) Some(new Srn(value)) else None
   }
 
   case class Pstr(value: String) extends SchemeId("pstr")

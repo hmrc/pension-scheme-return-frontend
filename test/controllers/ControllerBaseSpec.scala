@@ -25,13 +25,13 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.mvc.Call
 import play.api.test._
-import play.api.{Application, data}
+import play.api.{data, Application}
 import services.{FakeTaxYearService, TaxYearService}
 import uk.gov.hmrc.time.TaxYear
 import utils.BaseSpec
 
 trait ControllerBaseSpec
-  extends BaseSpec
+    extends BaseSpec
     with ControllerBehaviours
     with DefaultAwaitTimeout
     with HttpVerbs
@@ -56,14 +56,15 @@ trait ControllerBaseSpec
   val defaultUserAnswers: UserAnswers = UserAnswers(userAnswersId, Json.obj("non" -> "empty"))
 
   protected def applicationBuilder(
-                                    userAnswers: Option[UserAnswers] = None,
-                                    schemeDetails: SchemeDetails = defaultSchemeDetails,
-                                    taxYear: TaxYear = defaultTaxYear
-                                  ): GuiceApplicationBuilder =
+    userAnswers: Option[UserAnswers] = None,
+    schemeDetails: SchemeDetails = defaultSchemeDetails,
+    taxYear: TaxYear = defaultTaxYear
+  ): GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
       .bindings(
         bind[Navigator].toInstance(new Navigator()).eagerly()
-      ).overrides(
+      )
+      .overrides(
         bind[DataRequiredAction].to[DataRequiredActionImpl],
         bind[IdentifierAction].to[FakeIdentifierAction],
         bind[AllowAccessActionProvider].toInstance(new FakeAllowAccessActionProvider(schemeDetails)),
@@ -72,14 +73,13 @@ trait ControllerBaseSpec
         bind[TaxYearService].toInstance(new FakeTaxYearService(taxYear.starts))
       )
 
-  def runningApplication[T](block: Application => T): T = {
+  def runningApplication[T](block: Application => T): T =
     running(_ => applicationBuilder())(block)
-  }
 
   def formData[A](form: data.Form[A], range: A) = form.fill(range).data.toList
 }
 
-trait TestValues { _ : BaseSpec =>
+trait TestValues { _: BaseSpec =>
   val accountNumber = "12345678"
   val sortCode = "123456"
   val srn: SchemeId.Srn = srnGen.sample.value

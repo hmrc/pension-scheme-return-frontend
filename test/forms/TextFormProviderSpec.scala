@@ -38,9 +38,9 @@ class TextFormProviderSpec extends FieldBehaviours {
       "nino.error.duplicate"
     )
 
-    behave like fieldThatBindsValidData(ninoForm, "value", validNinoGen)
-    behave like mandatoryField(ninoForm, "value", "nino.error.required")
-    behave like invalidField(ninoForm, "value", "nino.error.invalid", invalidNinoGen)
-    behave like fieldRejectDuplicates(ninoForm, "value", "nino.error.duplicate", duplicates.map(_.nino))
+    behave.like(fieldThatBindsValidData(ninoForm, "value", validNinoGen))
+    behave.like(mandatoryField(ninoForm, "value", "nino.error.required"))
+    behave.like(invalidField(ninoForm, "value", "nino.error.invalid", invalidNinoGen))
+    behave.like(fieldRejectDuplicates(ninoForm, "value", "nino.error.duplicate", duplicates.map(_.nino)))
   }
 }

@@ -37,25 +37,28 @@ class AllowAccessAction(
   srn: Srn,
   appConfig: FrontendAppConfig,
   schemeDetailsConnector: SchemeDetailsConnector,
-  minimalDetailsConnector: MinimalDetailsConnector,
-)(implicit override val executionContext: ExecutionContext) extends ActionFunction[IdentifierRequest, AllowedAccessRequest] {
+  minimalDetailsConnector: MinimalDetailsConnector
+)(implicit override val executionContext: ExecutionContext)
+    extends ActionFunction[IdentifierRequest, AllowedAccessRequest] {
 
   val validStatuses: List[SchemeStatus] = List(Open, WoundUp, Deregistered)
 
-  override def invokeBlock[A](request: IdentifierRequest[A], block: AllowedAccessRequest[A] => Future[Result]): Future[Result] = {
+  override def invokeBlock[A](
+    request: IdentifierRequest[A],
+    block: AllowedAccessRequest[A] => Future[Result]
+  ): Future[Result] = {
 
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
     (for {
-      schemeDetails  <- fetchSchemeDetails(request, srn)
-      isAssociated   <- fetchIsAssociated(request, srn)
+      schemeDetails <- fetchSchemeDetails(request, srn)
+      isAssociated <- fetchIsAssociated(request, srn)
       minimalDetails <- fetchMinimalDetails(request)
     } yield {
 
       (schemeDetails, isAssociated, minimalDetails) match {
         case (Some(schemeDetails), true, Right(MinimalDetails(_, _, _, _, false, false)))
-          if validStatuses.contains(schemeDetails.schemeStatus) =>
-
+            if validStatuses.contains(schemeDetails.schemeStatus) =>
           block(AllowedAccessRequest(request, schemeDetails))
 
         case (_, _, Right(HasDeceasedFlag(_))) =>
@@ -64,7 +67,7 @@ class AllowAccessAction(
         case (_, _, Right(HasRlsFlag(_))) =>
           request.fold(
             _ => Future.successful(Redirect(appConfig.urls.pensionAdministrator.updateContactDetails)),
-            _ => Future.successful(Redirect(appConfig.urls.pensionPractitioner.updateContactDetails)),
+            _ => Future.successful(Redirect(appConfig.urls.pensionPractitioner.updateContactDetails))
           )
 
         case (_, _, Left(DelimitedAdmin)) =>
@@ -76,20 +79,25 @@ class AllowAccessAction(
     }).flatten
   }
 
-  private def fetchSchemeDetails[A](request: IdentifierRequest[A], srn: Srn)(implicit hc: HeaderCarrier): Future[Option[SchemeDetails]] =
+  private def fetchSchemeDetails[A](request: IdentifierRequest[A], srn: Srn)(
+    implicit hc: HeaderCarrier
+  ): Future[Option[SchemeDetails]] =
     request.fold(
       a => schemeDetailsConnector.details(a.psaId, srn),
       p => schemeDetailsConnector.details(p.pspId, srn)
     )
 
-  private def fetchIsAssociated[A](request: IdentifierRequest[A], srn: Srn)(implicit hc: HeaderCarrier): Future[Boolean] =
+  private def fetchIsAssociated[A](request: IdentifierRequest[A], srn: Srn)(
+    implicit hc: HeaderCarrier
+  ): Future[Boolean] =
     request.fold(
       a => schemeDetailsConnector.checkAssociation(a.psaId, srn),
       p => schemeDetailsConnector.checkAssociation(p.pspId, srn)
     )
 
-  private def fetchMinimalDetails[A](request: IdentifierRequest[A])(implicit hc: HeaderCarrier)
-  : Future[Either[MinimalDetailsError, MinimalDetails]] =
+  private def fetchMinimalDetails[A](
+    request: IdentifierRequest[A]
+  )(implicit hc: HeaderCarrier): Future[Either[MinimalDetailsError, MinimalDetails]] =
     request.fold(
       a => minimalDetailsConnector.fetch(a.psaId),
       p => minimalDetailsConnector.fetch(p.pspId)
@@ -97,12 +105,12 @@ class AllowAccessAction(
 
   object HasRlsFlag {
     def unapply(minimalDetails: MinimalDetails): Option[MinimalDetails] =
-      if(minimalDetails.rlsFlag) Some(minimalDetails) else None
+      if (minimalDetails.rlsFlag) Some(minimalDetails) else None
   }
 
   object HasDeceasedFlag {
     def unapply(minimalDetails: MinimalDetails): Option[MinimalDetails] =
-      if(minimalDetails.deceasedFlag) Some(minimalDetails) else None
+      if (minimalDetails.deceasedFlag) Some(minimalDetails) else None
   }
 }
 
@@ -115,9 +123,9 @@ class AllowAccessActionProviderImpl @Inject()(
   appConfig: FrontendAppConfig,
   schemeDetailsConnector: SchemeDetailsConnector,
   minimalDetailsConnector: MinimalDetailsConnector
-)(implicit val ec: ExecutionContext) extends AllowAccessActionProvider {
+)(implicit val ec: ExecutionContext)
+    extends AllowAccessActionProvider {
 
   def apply(srn: Srn): ActionFunction[IdentifierRequest, AllowedAccessRequest] =
     new AllowAccessAction(srn, appConfig, schemeDetailsConnector, minimalDetailsConnector)
 }
-

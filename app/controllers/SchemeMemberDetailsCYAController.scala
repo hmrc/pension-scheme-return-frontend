@@ -37,82 +37,95 @@ import utils.MessageUtils.booleanToMessage
 import viewmodels.DisplayMessage.SimpleMessage
 
 class SchemeMemberDetailsCYAController @Inject()(
-                                                  override val messagesApi: MessagesApi,
-                                                  navigator: Navigator,
-                                                  identify: IdentifierAction,
-                                                  allowAccess: AllowAccessActionProvider,
-                                                  getData: DataRetrievalAction,
-                                                  requireData: DataRequiredAction,
-                                                  val controllerComponents: MessagesControllerComponents,
-                                                  view: CheckYourAnswersView
-                                                ) extends FrontendBaseController with I18nSupport {
+  override val messagesApi: MessagesApi,
+  navigator: Navigator,
+  identify: IdentifierAction,
+  allowAccess: AllowAccessActionProvider,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  val controllerComponents: MessagesControllerComponents,
+  view: CheckYourAnswersView
+) extends FrontendBaseController
+    with I18nSupport {
 
   def onPageLoad(srn: Srn, index: Max99, mode: Mode): Action[AnyContent] =
-    (identify andThen allowAccess(srn) andThen getData andThen requireData) {
-      implicit request =>
-        val result = for {
-          memberDetails <- request.userAnswers.get(MemberDetailsPage(srn, index))
-          hasNINO       <- request.userAnswers.get(NationalInsuranceNumberPage(srn, index))
-          maybeNino     <- Option.when(hasNINO)(request.userAnswers.get(MemberDetailsNinoPage(srn, index))).sequence
-        } yield Ok(view(viewModel(index, srn, mode, memberDetails, hasNINO, maybeNino)))
+    identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData) { implicit request =>
+      val result = for {
+        memberDetails <- request.userAnswers.get(MemberDetailsPage(srn, index))
+        hasNINO <- request.userAnswers.get(NationalInsuranceNumberPage(srn, index))
+        maybeNino <- Option.when(hasNINO)(request.userAnswers.get(MemberDetailsNinoPage(srn, index))).sequence
+      } yield Ok(view(viewModel(index, srn, mode, memberDetails, hasNINO, maybeNino)))
 
-        result.getOrElse(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+      result.getOrElse(Redirect(routes.JourneyRecoveryController.onPageLoad()))
     }
 
   def onSubmit(srn: Srn, index: Max99, mode: Mode): Action[AnyContent] =
-    (identify andThen allowAccess(srn) andThen getData andThen requireData) {
-      implicit request =>
-        Redirect(navigator.nextPage(SchemeMemberDetailsCYAPage(srn), NormalMode, request.userAnswers))
+    identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData) { implicit request =>
+      Redirect(navigator.nextPage(SchemeMemberDetailsCYAPage(srn), NormalMode, request.userAnswers))
     }
 }
 
 object SchemeMemberDetailsCYAController {
 
   private def rows(
-                    index: Max99,
-                    srn: Srn,
-                    mode: Mode,
-                    memberDetails: NameDOB,
-                    hasNINO: Boolean,
-                    maybeNino: Option[Nino]): List[CheckYourAnswersRowViewModel] = List(
-    CheckYourAnswersRowViewModel("memberDetails.firstName", memberDetails.firstName)
-      .withAction(
-        SummaryAction("site.change", routes.MemberDetailsController.onPageLoad(srn, index, mode).url)
-          .withVisuallyHiddenContent("memberDetails.firstName")
-      ),
-    CheckYourAnswersRowViewModel("memberDetails.lastName", memberDetails.lastName)
-      .withAction(
-        SummaryAction("site.change", routes.MemberDetailsController.onPageLoad(srn, index, mode).url)
-          .withVisuallyHiddenContent("memberDetails.lastName")
-      ),
-    CheckYourAnswersRowViewModel("memberDetails.dateOfBirth", memberDetails.dob.show)
-      .withAction(
-        SummaryAction("site.change", routes.MemberDetailsController.onPageLoad(srn, index, mode).url)
-          .withVisuallyHiddenContent("memberDetails.dateOfBirth")
-      ),
-    CheckYourAnswersRowViewModel(SimpleMessage("nationalInsuranceNumber.heading", memberDetails.fullName), booleanToMessage(hasNINO))
-      .withAction(
-        SummaryAction("site.change", routes.DoesSchemeMemberHaveNINOController.onPageLoad(srn, index, mode).url)
-          .withVisuallyHiddenContent("nationalInsuranceNumber.heading")
-      )
-  ) ++ ninoRow(maybeNino, memberDetails.fullName, srn, index, mode)
-
-  private def ninoRow(maybeNino: Option[Nino], memberName: String, srn: Srn, index: Max99, mode: Mode): List[CheckYourAnswersRowViewModel] =
-    maybeNino.fold(List.empty[CheckYourAnswersRowViewModel])(nino => List(
-      CheckYourAnswersRowViewModel(SimpleMessage("memberDetailsNino.heading", memberName), nino.value)
+    index: Max99,
+    srn: Srn,
+    mode: Mode,
+    memberDetails: NameDOB,
+    hasNINO: Boolean,
+    maybeNino: Option[Nino]
+  ): List[CheckYourAnswersRowViewModel] =
+    List(
+      CheckYourAnswersRowViewModel("memberDetails.firstName", memberDetails.firstName)
         .withAction(
-          SummaryAction("site.change", routes.MemberDetailsNinoController.onPageLoad(srn, index, mode).url)
-            .withVisuallyHiddenContent("site.endDate")
+          SummaryAction("site.change", routes.MemberDetailsController.onPageLoad(srn, index, mode).url)
+            .withVisuallyHiddenContent("memberDetails.firstName")
+        ),
+      CheckYourAnswersRowViewModel("memberDetails.lastName", memberDetails.lastName)
+        .withAction(
+          SummaryAction("site.change", routes.MemberDetailsController.onPageLoad(srn, index, mode).url)
+            .withVisuallyHiddenContent("memberDetails.lastName")
+        ),
+      CheckYourAnswersRowViewModel("memberDetails.dateOfBirth", memberDetails.dob.show)
+        .withAction(
+          SummaryAction("site.change", routes.MemberDetailsController.onPageLoad(srn, index, mode).url)
+            .withVisuallyHiddenContent("memberDetails.dateOfBirth")
+        ),
+      CheckYourAnswersRowViewModel(
+        SimpleMessage("nationalInsuranceNumber.heading", memberDetails.fullName),
+        booleanToMessage(hasNINO)
+      ).withAction(
+          SummaryAction("site.change", routes.DoesSchemeMemberHaveNINOController.onPageLoad(srn, index, mode).url)
+            .withVisuallyHiddenContent("nationalInsuranceNumber.heading")
         )
-    ))
+    ) ++ ninoRow(maybeNino, memberDetails.fullName, srn, index, mode)
+
+  private def ninoRow(
+    maybeNino: Option[Nino],
+    memberName: String,
+    srn: Srn,
+    index: Max99,
+    mode: Mode
+  ): List[CheckYourAnswersRowViewModel] =
+    maybeNino.fold(List.empty[CheckYourAnswersRowViewModel])(
+      nino =>
+        List(
+          CheckYourAnswersRowViewModel(SimpleMessage("memberDetailsNino.heading", memberName), nino.value)
+            .withAction(
+              SummaryAction("site.change", routes.MemberDetailsNinoController.onPageLoad(srn, index, mode).url)
+                .withVisuallyHiddenContent("site.endDate")
+            )
+        )
+    )
 
   def viewModel(
-     index: Max99,
-     srn: Srn, mode: Mode,
-     memberDetails: NameDOB,
-     hasNINO: Boolean,
-     maybeNino: Option[Nino]
-   ): CheckYourAnswersViewModel = CheckYourAnswersViewModel(
+    index: Max99,
+    srn: Srn,
+    mode: Mode,
+    memberDetails: NameDOB,
+    hasNINO: Boolean,
+    maybeNino: Option[Nino]
+  ): CheckYourAnswersViewModel = CheckYourAnswersViewModel(
     rows(index, srn, mode, memberDetails, hasNINO, maybeNino),
     controllers.routes.SchemeMemberDetailsCYAController.onSubmit(srn, index)
   )

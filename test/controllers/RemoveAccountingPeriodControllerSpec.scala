@@ -33,29 +33,32 @@ class RemoveAccountingPeriodControllerSpec extends ControllerBaseSpec {
   private val otherPeriod = dateRangeGen.sample.value
 
   private val userAnswers = defaultUserAnswers
-    .set(AccountingPeriodPage(srn, refineMV(1)), period).success.value
-    .set(AccountingPeriodPage(srn, refineMV(2)), otherPeriod).success.value
+    .set(AccountingPeriodPage(srn, refineMV(1)), period)
+    .success
+    .value
+    .set(AccountingPeriodPage(srn, refineMV(2)), otherPeriod)
+    .success
+    .value
 
   "RemoveSchemeBankAccountController" should {
 
-    behave like renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
+    behave.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
       val view = injected[YesNoPageView]
 
       view(
         form(injected[YesNoPageFormProvider]),
         viewModel(srn, refineMV(1), period, NormalMode)
       )
-    }
+    })
 
-    behave like redirectToPage(onPageLoad, controllers.routes.JourneyRecoveryController.onPageLoad())
+    behave.like(redirectToPage(onPageLoad, controllers.routes.JourneyRecoveryController.onPageLoad()))
 
-    behave like journeyRecoveryPage("onPageLoad", onPageLoad)
+    behave.like(journeyRecoveryPage("onPageLoad", onPageLoad))
 
-    behave like continueNoSave(onSubmit, userAnswers, "value" -> "false")
-    behave like saveAndContinue(onSubmit, userAnswers, "value" -> "true")
+    behave.like(continueNoSave(onSubmit, userAnswers, "value" -> "false"))
+    behave.like(saveAndContinue(onSubmit, userAnswers, "value" -> "true"))
 
-    behave like journeyRecoveryPage("onSubmit", onSubmit)
-
+    behave.like(journeyRecoveryPage("onSubmit", onSubmit))
 
   }
 }

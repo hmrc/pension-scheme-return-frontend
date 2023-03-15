@@ -24,11 +24,11 @@ import viewmodels.DisplayMessage.SimpleMessage
 import viewmodels.govuk.summarylist._
 
 case class CheckYourAnswersViewModel(
-                                      title: SimpleMessage,
-                                      heading: SimpleMessage,
-                                      rows: List[CheckYourAnswersRowViewModel],
-                                      onSubmit: Call
-                                    )
+  title: SimpleMessage,
+  heading: SimpleMessage,
+  rows: List[CheckYourAnswersRowViewModel],
+  onSubmit: Call
+)
 
 object CheckYourAnswersViewModel {
 
@@ -50,7 +50,7 @@ case class CheckYourAnswersRowViewModel(
   actions: Seq[SummaryAction]
 ) {
 
-  def toSummaryListRow(implicit messages: Messages): SummaryListRow = {
+  def toSummaryListRow(implicit messages: Messages): SummaryListRow =
     SummaryListRowViewModel(
       key = key.toMessage,
       value = value.toMessage,
@@ -59,7 +59,6 @@ case class CheckYourAnswersRowViewModel(
           .withVisuallyHiddenText(a.visuallyHiddenContent.toMessage)
       }
     )
-  }
 
   def withAction(action: SummaryAction): CheckYourAnswersRowViewModel =
     copy(actions = actions :+ action)
@@ -74,9 +73,9 @@ object CheckYourAnswersRowViewModel {
     CheckYourAnswersRowViewModel(SimpleMessage(key), SimpleMessage(value), Seq())
 
   def apply(
-             key: SimpleMessage,
-             value: String
-           ): CheckYourAnswersRowViewModel =
+    key: SimpleMessage,
+    value: String
+  ): CheckYourAnswersRowViewModel =
     CheckYourAnswersRowViewModel(key, SimpleMessage(value), Seq())
 }
 

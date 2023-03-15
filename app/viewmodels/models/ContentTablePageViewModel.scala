@@ -32,12 +32,12 @@ case class ContentTablePageViewModel(
 object ContentTablePageViewModel {
 
   def apply(
-     title: String,
-     heading: DisplayMessage,
-     inset: DisplayMessage,
-     buttonText: DisplayMessage,
-     onSubmit: Call,
-     rows: (DisplayMessage, DisplayMessage)*
+    title: String,
+    heading: DisplayMessage,
+    inset: DisplayMessage,
+    buttonText: DisplayMessage,
+    onSubmit: Call,
+    rows: (DisplayMessage, DisplayMessage)*
   ): ContentTablePageViewModel =
     ContentTablePageViewModel(
       SimpleMessage(title),

@@ -25,11 +25,13 @@ class PensionSchemeFormSpec extends IntFieldBehaviours {
 
   ".value" - {
 
-    behave like intField(
-      form,
-      "value",
-      FormError("value","pensionScheme.error.nonNumeric"),
-      FormError("value","pensionScheme.error.wholeNumber")
+    behave.like(
+      intField(
+        form,
+        "value",
+        FormError("value", "pensionScheme.error.nonNumeric"),
+        FormError("value", "pensionScheme.error.wholeNumber")
+      )
     )
   }
 }

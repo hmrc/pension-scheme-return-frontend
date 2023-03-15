@@ -37,48 +37,45 @@ import viewmodels.models.{ListRow, ListViewModel}
 import views.html.ListView
 
 class AccountingPeriodListController @Inject()(
-                                            override val messagesApi: MessagesApi,
-                                            navigator: Navigator,
-                                            identifyAndRequireData: IdentifyAndRequireData,
-                                            val controllerComponents: MessagesControllerComponents,
-                                            view: ListView,
-                                            formProvider: YesNoPageFormProvider
-                                          ) extends FrontendBaseController with I18nSupport {
+  override val messagesApi: MessagesApi,
+  navigator: Navigator,
+  identifyAndRequireData: IdentifyAndRequireData,
+  val controllerComponents: MessagesControllerComponents,
+  view: ListView,
+  formProvider: YesNoPageFormProvider
+) extends FrontendBaseController
+    with I18nSupport {
 
   val form = AccountingPeriodListController.form(formProvider)
 
-  def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
-    implicit request =>
+  def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
+    val periods = request.userAnswers.list(AccountingPeriods(srn))
 
-      val periods = request.userAnswers.list(AccountingPeriods(srn))
+    if (periods.nonEmpty) {
 
-      if(periods.nonEmpty) {
+      val viewModel = AccountingPeriodListController.viewModel(srn, mode, periods)
+      Ok(view(form, viewModel))
+    } else {
 
-        val viewModel = AccountingPeriodListController.viewModel(srn, mode, periods)
-        Ok(view(form, viewModel))
-      } else {
-
-        Redirect(routes.AccountingPeriodController.onPageLoad(srn, refineMV(1), mode))
-      }
+      Redirect(routes.AccountingPeriodController.onPageLoad(srn, refineMV(1), mode))
+    }
   }
 
-  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
-    implicit request =>
+  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
+    val periods = request.userAnswers.list(AccountingPeriods(srn))
 
-      val periods = request.userAnswers.list(AccountingPeriods(srn))
+    if (periods.length == maxAccountingPeriods) {
 
-      if(periods.length == maxAccountingPeriods) {
+      Redirect(navigator.nextPage(AccountingPeriodListPage(srn, addPeriod = false), mode, request.userAnswers))
+    } else {
 
-        Redirect(navigator.nextPage(AccountingPeriodListPage(srn, addPeriod = false), mode, request.userAnswers))
-      } else {
+      val viewModel = AccountingPeriodListController.viewModel(srn, mode, periods)
 
-        val viewModel = AccountingPeriodListController.viewModel(srn, mode, periods)
-
-        form.bindFromRequest.fold(
-          errors => BadRequest(view(errors, viewModel)),
-          answer => Redirect(navigator.nextPage(AccountingPeriodListPage(srn, answer), mode, request.userAnswers))
-        )
-      }
+      form.bindFromRequest.fold(
+        errors => BadRequest(view(errors, viewModel)),
+        answer => Redirect(navigator.nextPage(AccountingPeriodListPage(srn, answer), mode, request.userAnswers))
+      )
+    }
   }
 }
 
@@ -89,24 +86,26 @@ object AccountingPeriodListController {
     )
 
   private def rows(srn: Srn, mode: Mode, periods: List[DateRange]): List[ListRow] =
-    periods.zipWithIndex.flatMap { case (range, index) =>
-      refineV[OneToThree](index + 1).fold(
-        _ => Nil,
-        index => List(
-          ListRow(
-            SimpleMessage("accountingPeriods.row", range.from.show, range.to.show),
-            routes.AccountingPeriodController.onPageLoad(srn, index, mode).url,
-            SimpleMessage("accountingPeriods.row.change.hiddenText", range.from.show, range.to.show),
-            routes.RemoveAccountingPeriodController.onPageLoad(srn, index, mode).url,
-            SimpleMessage("accountingPeriods.row.remove.hiddenText", range.from.show, range.to.show),
-          )
+    periods.zipWithIndex.flatMap {
+      case (range, index) =>
+        refineV[OneToThree](index + 1).fold(
+          _ => Nil,
+          index =>
+            List(
+              ListRow(
+                SimpleMessage("accountingPeriods.row", range.from.show, range.to.show),
+                routes.AccountingPeriodController.onPageLoad(srn, index, mode).url,
+                SimpleMessage("accountingPeriods.row.change.hiddenText", range.from.show, range.to.show),
+                routes.RemoveAccountingPeriodController.onPageLoad(srn, index, mode).url,
+                SimpleMessage("accountingPeriods.row.remove.hiddenText", range.from.show, range.to.show)
+              )
+            )
         )
-      )
     }
   def viewModel(srn: Srn, mode: Mode, periods: List[DateRange]): ListViewModel = {
 
-    val title = if(periods.length == 1) "accountingPeriods.title" else "accountingPeriods.title.plural"
-    val heading = if(periods.length == 1) "accountingPeriods.heading" else "accountingPeriods.heading.plural"
+    val title = if (periods.length == 1) "accountingPeriods.title" else "accountingPeriods.title.plural"
+    val heading = if (periods.length == 1) "accountingPeriods.heading" else "accountingPeriods.heading.plural"
 
     ListViewModel(
       SimpleMessage(title, periods.length),

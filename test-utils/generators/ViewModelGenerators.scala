@@ -25,12 +25,12 @@ trait ViewModelGenerators extends BasicGenerators {
 
   val contentPageViewModelGen: Gen[ContentPageViewModel] =
     for {
-      title      <- nonEmptyString
-      heading    <- nonEmptyString
+      title <- nonEmptyString
+      heading <- nonEmptyString
       paragraphs <- Gen.listOf(nonEmptyString)
       buttonText <- nonEmptyString
-      isStartButton <-boolean
-      onSubmit   <- call
+      isStartButton <- boolean
+      onSubmit <- call
     } yield {
       ContentPageViewModel(title, heading, paragraphs, buttonText, isStartButton, onSubmit)
     }
@@ -50,26 +50,26 @@ trait ViewModelGenerators extends BasicGenerators {
   val actionItemGen: Gen[SummaryAction] =
     for {
       content <- nonEmptyString.map(SimpleMessage(_))
-      href    <- relativeUrl
-      hidden  <- nonEmptyString.map(SimpleMessage(_))
+      href <- relativeUrl
+      hidden <- nonEmptyString.map(SimpleMessage(_))
     } yield {
       SummaryAction(content, href, hidden)
     }
 
   val summaryListRowGen: Gen[CheckYourAnswersRowViewModel] =
     for {
-      key     <- nonEmptyString
-      value   <- nonEmptyString
-      items   <- Gen.listOf(actionItemGen)
+      key <- nonEmptyString
+      value <- nonEmptyString
+      items <- Gen.listOf(actionItemGen)
     } yield {
       CheckYourAnswersRowViewModel(SimpleMessage(key), SimpleMessage(value), items)
     }
 
   val checkYourAnswersViewModelGen: Gen[CheckYourAnswersViewModel] =
-    for{
-      title    <- nonEmptyString
-      heading  <- nonEmptyString
-      rows     <- Gen.listOf(summaryListRowGen)
+    for {
+      title <- nonEmptyString
+      heading <- nonEmptyString
+      rows <- Gen.listOf(summaryListRowGen)
       onSubmit <- call
     } yield {
       CheckYourAnswersViewModel(SimpleMessage(title), SimpleMessage(heading), rows, onSubmit)
@@ -157,11 +157,11 @@ trait ViewModelGenerators extends BasicGenerators {
 
   val yesNoPageViewModelGen: Gen[YesNoPageViewModel] =
     for {
-      title       <- nonEmptySimpleMessage
-      heading     <- nonEmptySimpleMessage
+      title <- nonEmptySimpleMessage
+      heading <- nonEmptySimpleMessage
       description <- Gen.listOf(nonEmptySimpleMessage)
-      legend      <- Gen.option(nonEmptySimpleMessage)
-      onSubmit    <- call
+      legend <- Gen.option(nonEmptySimpleMessage)
+      onSubmit <- call
     } yield {
       YesNoPageViewModel(title, heading, description, legend, onSubmit)
     }
@@ -169,32 +169,32 @@ trait ViewModelGenerators extends BasicGenerators {
   def radioListRowViewModelGen: Gen[RadioListRowViewModel] =
     for {
       content <- nonEmptySimpleMessage
-      value   <- nonEmptyString
+      value <- nonEmptyString
     } yield {
       RadioListRowViewModel(content, value)
     }
 
   def radioListViewModelGen: Gen[RadioListViewModel] =
     for {
-      title         <- nonEmptySimpleMessage
-      heading       <- nonEmptySimpleMessage
-      description   <- Gen.listOf(nonEmptySimpleMessage)
+      title <- nonEmptySimpleMessage
+      heading <- nonEmptySimpleMessage
+      description <- Gen.listOf(nonEmptySimpleMessage)
       listedContent <- Gen.listOf(nonEmptySimpleMessage)
-      legend        <- Gen.option(nonEmptySimpleMessage)
-      items         <- Gen.listOf(radioListRowViewModelGen)
-      onSubmit      <- call
+      legend <- Gen.option(nonEmptySimpleMessage)
+      items <- Gen.listOf(radioListRowViewModelGen)
+      onSubmit <- call
     } yield {
       RadioListViewModel(title, heading, description, listedContent, legend, items, onSubmit)
     }
 
   val dateRangeViewModelGen: Gen[DateRangeViewModel] =
     for {
-      title          <- nonEmptySimpleMessage
-      heading        <- nonEmptySimpleMessage
-      description    <- Gen.option(nonEmptySimpleMessage)
+      title <- nonEmptySimpleMessage
+      heading <- nonEmptySimpleMessage
+      description <- Gen.option(nonEmptySimpleMessage)
       startDateLabel <- nonEmptySimpleMessage
-      endDateLabel   <- nonEmptySimpleMessage
-      onSubmit       <- call
+      endDateLabel <- nonEmptySimpleMessage
+      onSubmit <- call
     } yield {
       DateRangeViewModel(
         title,
@@ -217,9 +217,9 @@ trait ViewModelGenerators extends BasicGenerators {
 
   val textInputViewModelGen: Gen[TextInputViewModel] =
     for {
-      title    <- nonEmptySimpleMessage
-      heading  <- nonEmptySimpleMessage
-      label    <- Gen.option(nonEmptySimpleMessage)
+      title <- nonEmptySimpleMessage
+      heading <- nonEmptySimpleMessage
+      label <- Gen.option(nonEmptySimpleMessage)
       onSubmit <- call
     } yield {
       TextInputViewModel(title, heading, label, onSubmit)

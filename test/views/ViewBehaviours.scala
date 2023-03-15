@@ -48,11 +48,13 @@ trait ViewBehaviours {
       }
     }
 
-  def renderInputWithH1Label[A](gen: Gen[A])(name: String, view: A => Html, heading: A => DisplayMessage, label: A => Option[DisplayMessage]): Unit =
+  def renderInputWithH1Label[A](
+    gen: Gen[A]
+  )(name: String, view: A => Html, heading: A => DisplayMessage, label: A => Option[DisplayMessage]): Unit =
     s"render the input for $name with label" in {
       forAll(gen) { viewModel =>
         label(viewModel) match {
-          case None      =>
+          case None =>
             inputLabel(view(viewModel))(name).text() mustBe messageKey(heading(viewModel))
             input(view(viewModel))(name).isEmpty mustEqual false
           case Some(label) =>
@@ -98,14 +100,12 @@ trait ViewBehaviours {
     "render required error summary" in {
 
       forAll(gen) { viewModel =>
-
         errorSummary(view(viewModel)).text() must include(error)
       }
     }
 
     "render required error message" in {
       forAll(gen) { viewModel =>
-
         errorMessage(view(viewModel)).text() must include(error)
       }
     }

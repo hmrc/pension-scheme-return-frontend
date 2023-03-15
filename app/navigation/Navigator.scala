@@ -30,46 +30,50 @@ import javax.inject.{Inject, Singleton}
 class Navigator @Inject()() {
 
   private val normalRoutes: Page => UserAnswers => Call = {
-    case StartPage(srn)             => _ => routes.WhichTaxYearController.onPageLoad(srn, NormalMode)
-    case WhichTaxYearPage(srn)      => _ => routes.SchemeDetailsController.onPageLoad(srn)
-    case SchemeDetailsPage(srn)     => _ => routes.CheckReturnDatesController.onPageLoad(srn, NormalMode)
+    case StartPage(srn) => _ => routes.WhichTaxYearController.onPageLoad(srn, NormalMode)
+    case WhichTaxYearPage(srn) => _ => routes.SchemeDetailsController.onPageLoad(srn)
+    case SchemeDetailsPage(srn) => _ => routes.CheckReturnDatesController.onPageLoad(srn, NormalMode)
 
     case page @ CheckReturnDatesPage(srn) => {
-      case ua if ua.get(page).contains(true) => ua.schemeBankAccounts(srn) match {
-        case Nil => routes.SchemeBankAccountController.onPageLoad(srn, refineMV(1), NormalMode)
-        case _   => routes.SchemeBankAccountListController.onPageLoad(srn)
-      }
+      case ua if ua.get(page).contains(true) =>
+        ua.schemeBankAccounts(srn) match {
+          case Nil => routes.SchemeBankAccountController.onPageLoad(srn, refineMV(1), NormalMode)
+          case _ => routes.SchemeBankAccountListController.onPageLoad(srn)
+        }
       case _ => routes.AccountingPeriodController.onPageLoad(srn, refineMV(1), NormalMode)
     }
 
-    case SchemeBankAccountPage(srn, index) => _ => routes.SchemeBankAccountCheckYourAnswersController.onPageLoad(srn, index)
-    case SchemeBankAccountCheckYourAnswersPage(srn) => _ =>
-      routes.SchemeBankAccountListController.onPageLoad(srn)
-    case SchemeBankAccountListPage(srn, true) => ua =>
-      refineV[OneToTen](ua.schemeBankAccounts(srn).length + 1) match {
-        case Left(_)          => routes.SchemeBankAccountListController.onPageLoad(srn)
-        case Right(nextIndex) => routes.SchemeBankAccountController.onPageLoad(srn, nextIndex, NormalMode)
-      }
+    case SchemeBankAccountPage(srn, index) =>
+      _ => routes.SchemeBankAccountCheckYourAnswersController.onPageLoad(srn, index)
+    case SchemeBankAccountCheckYourAnswersPage(srn) => _ => routes.SchemeBankAccountListController.onPageLoad(srn)
+    case SchemeBankAccountListPage(srn, true) =>
+      ua =>
+        refineV[OneToTen](ua.schemeBankAccounts(srn).length + 1) match {
+          case Left(_) => routes.SchemeBankAccountListController.onPageLoad(srn)
+          case Right(nextIndex) => routes.SchemeBankAccountController.onPageLoad(srn, nextIndex, NormalMode)
+        }
     case SchemeBankAccountListPage(_, false) => _ => routes.UnauthorisedController.onPageLoad
     case RemoveSchemeBankAccountPage(srn) => _ => routes.SchemeBankAccountListController.onPageLoad(srn)
 
-    case AccountingPeriodPage(srn, index) => _ => routes.AccountingPeriodCheckYourAnswersController.onPageLoad(srn, index)
-    case AccountingPeriodCheckYourAnswersPage(srn) => _ => routes.AccountingPeriodListController.onPageLoad(srn, NormalMode)
+    case AccountingPeriodPage(srn, index) =>
+      _ => routes.AccountingPeriodCheckYourAnswersController.onPageLoad(srn, index)
+    case AccountingPeriodCheckYourAnswersPage(srn) =>
+      _ => routes.AccountingPeriodListController.onPageLoad(srn, NormalMode)
 
-    case AccountingPeriodListPage(srn, false) => _ =>
-      routes.SchemeBankAccountController.onPageLoad(srn, refineMV(1), NormalMode)
+    case AccountingPeriodListPage(srn, false) =>
+      _ => routes.SchemeBankAccountController.onPageLoad(srn, refineMV(1), NormalMode)
 
-    case AccountingPeriodListPage(srn, true) => ua =>
-      val count = ua.list(AccountingPeriods(srn)).length
-      refineV[OneToThree](count + 1).fold(
-        _     => routes.SchemeBankAccountController.onPageLoad(srn, refineMV(1), NormalMode),
-        index => routes.AccountingPeriodController.onPageLoad(srn, index, NormalMode)
-      )
+    case AccountingPeriodListPage(srn, true) =>
+      ua =>
+        val count = ua.list(AccountingPeriods(srn)).length
+        refineV[OneToThree](count + 1).fold(
+          _ => routes.SchemeBankAccountController.onPageLoad(srn, refineMV(1), NormalMode),
+          index => routes.AccountingPeriodController.onPageLoad(srn, index, NormalMode)
+        )
 
     case RemoveAccountingPeriodPage(srn) => _ => routes.AccountingPeriodListController.onPageLoad(srn, NormalMode)
     case HowMuchCashPage(srn) => _ => routes.UnauthorisedController.onPageLoad
     case PensionSchemeMembersPage(srn, _) => _ => routes.UnauthorisedController.onPageLoad
-
 
     case MemberDetailsPage(srn, index) => _ => routes.UnauthorisedController.onPageLoad
 
@@ -77,8 +81,8 @@ class Navigator @Inject()() {
 
     case PspDeclarationPage(srn) => _ => routes.UnauthorisedController.onPageLoad
 
-
-    case MemberDetailsPage(srn, index) => _ => routes.DoesSchemeMemberHaveNINOController.onPageLoad(srn, index, NormalMode)
+    case MemberDetailsPage(srn, index) =>
+      _ => routes.DoesSchemeMemberHaveNINOController.onPageLoad(srn, index, NormalMode)
     case page @ NationalInsuranceNumberPage(srn, index) => {
       case ua if ua.get(page).contains(true) => routes.MemberDetailsNinoController.onPageLoad(srn, index, NormalMode)
       case _ => routes.UnauthorisedController.onPageLoad
@@ -90,16 +94,15 @@ class Navigator @Inject()() {
 
     case PspDeclarationPage(srn) => _ => routes.UnauthorisedController.onPageLoad
 
-    case _              => _ => routes.IndexController.onPageLoad
-
+    case _ => _ => routes.IndexController.onPageLoad
 
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
-    case CheckReturnDatesPage(srn)     => _ => routes.UnauthorisedController.onPageLoad
+    case CheckReturnDatesPage(srn) => _ => routes.UnauthorisedController.onPageLoad
     case SchemeBankAccountPage(srn, _) => _ => routes.UnauthorisedController.onPageLoad
     case RemoveSchemeBankAccountPage(srn) => _ => routes.SchemeBankAccountListController.onPageLoad(srn)
-    case _                             => _ => routes.IndexController.onPageLoad
+    case _ => _ => routes.IndexController.onPageLoad
   }
 
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = mode match {

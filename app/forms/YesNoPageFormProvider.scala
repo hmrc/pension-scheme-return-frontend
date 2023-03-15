@@ -30,13 +30,13 @@ class YesNoPageFormProvider @Inject() extends Mappings {
     Form("value" -> boolean(requiredKey, invalidKey))
 
   def apply(
-             requiredKey: String
-           ): Form[Boolean] =
+    requiredKey: String
+  ): Form[Boolean] =
     Form("value" -> boolean(requiredKey, ""))
 
   def apply(
-             requiredKey: String,
-             args: List[String]
-           ): Form[Boolean] =
+    requiredKey: String,
+    args: List[String]
+  ): Form[Boolean] =
     Form("value" -> boolean(requiredKey, "", args))
 }

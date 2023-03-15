@@ -42,44 +42,48 @@ class NameDOBFormProviderSpec extends FieldBehaviours {
       "dateOfBirth.error.required.year",
       "dateOfBirth.error.required.two",
       "dateOfBirth.error.invalid.date",
-      "dateOfBirth.error.invalid.characters",
+      "dateOfBirth.error.invalid.characters"
     )
   )
 
   ".firstName" - {
-    behave like fieldThatBindsValidData(form, "firstName", stringsWithMaxLength(nameMaxLength))
-    behave like mandatoryField(form, "firstName", "firstName.error.required")
+    behave.like(fieldThatBindsValidData(form, "firstName", stringsWithMaxLength(nameMaxLength)))
+    behave.like(mandatoryField(form, "firstName", "firstName.error.required"))
 
     val lengthUpperLimit = 50
     val lengthFormError = FormError("firstName", "firstName.error.length", List(nameMaxLength))
-    behave like fieldLengthError(form, "firstName", lengthFormError, nameMaxLength + 1, lengthUpperLimit, alphaChar)
+    behave.like(fieldLengthError(form, "firstName", lengthFormError, nameMaxLength + 1, lengthUpperLimit, alphaChar))
 
-    behave like invalidAlphaField(
-      form,
-      fieldName = "firstName",
-      errorMessage = "firstName.error.invalid",
-      args = List(nameRegex)
+    behave.like(
+      invalidAlphaField(
+        form,
+        fieldName = "firstName",
+        errorMessage = "firstName.error.invalid",
+        args = List(nameRegex)
+      )
     )
   }
 
   ".lastName" - {
-    behave like fieldThatBindsValidData(form, "lastName", stringsWithMaxLength(nameMaxLength))
-    behave like mandatoryField(form, "lastName", "lastName.error.required")
+    behave.like(fieldThatBindsValidData(form, "lastName", stringsWithMaxLength(nameMaxLength)))
+    behave.like(mandatoryField(form, "lastName", "lastName.error.required"))
 
     val lengthUpperLimit = 50
     val lengthFormError = FormError("lastName", "lastName.error.length", List(nameMaxLength))
-    behave like fieldLengthError(form, "lastName", lengthFormError, nameMaxLength + 1, lengthUpperLimit, alphaChar)
+    behave.like(fieldLengthError(form, "lastName", lengthFormError, nameMaxLength + 1, lengthUpperLimit, alphaChar))
 
-    behave like invalidAlphaField(
-      form,
-      fieldName = "lastName",
-      errorMessage = "lastName.error.invalid",
-      args = List(nameRegex)
+    behave.like(
+      invalidAlphaField(
+        form,
+        fieldName = "lastName",
+        errorMessage = "lastName.error.invalid",
+        args = List(nameRegex)
+      )
     )
   }
 
   ".dateOfBirth" - {
-    behave like fieldThatBindsValidDate(form, "dateOfBirth")
-    behave like mandatoryField(form, "dateOfBirth", "dateOfBirth.error.required.all")
+    behave.like(fieldThatBindsValidDate(form, "dateOfBirth"))
+    behave.like(mandatoryField(form, "dateOfBirth", "dateOfBirth.error.required.all"))
   }
 }

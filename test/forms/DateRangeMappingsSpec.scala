@@ -30,8 +30,13 @@ import utils.DateTimeUtils.localDateShow
 
 import java.time.LocalDate
 
-class DateRangeMappingsSpec extends AnyFreeSpec with Matchers with ScalaCheckPropertyChecks with Generators with OptionValues
-  with Mappings {
+class DateRangeMappingsSpec
+    extends AnyFreeSpec
+    with Matchers
+    with ScalaCheckPropertyChecks
+    with Generators
+    with OptionValues
+    with Mappings {
 
   val allowedRange = DateRange(
     LocalDate.of(2000, 1, 1),
@@ -75,9 +80,9 @@ class DateRangeMappingsSpec extends AnyFreeSpec with Matchers with ScalaCheckPro
   def range(date: Gen[LocalDate]) =
     for {
       startDate <- date
-      endDate   <- date
+      endDate <- date
     } yield {
-      if(startDate.isBefore(endDate)) DateRange(startDate, endDate)
+      if (startDate.isBefore(endDate)) DateRange(startDate, endDate)
       else DateRange(endDate, startDate)
     }
 
@@ -85,31 +90,27 @@ class DateRangeMappingsSpec extends AnyFreeSpec with Matchers with ScalaCheckPro
 
   val missingField: Gen[Option[String]] = Gen.option(Gen.const(""))
 
-  def makeData(key: String, date: LocalDate): Map[String, String] = {
+  def makeData(key: String, date: LocalDate): Map[String, String] =
     Map(
       s"value.$key.day" -> date.getDayOfMonth.toString,
       s"value.$key.month" -> date.getMonthValue.toString,
-      s"value.$key.year" -> date.getYear.toString,
+      s"value.$key.year" -> date.getYear.toString
     )
-  }
 
-  def makeData(startDate: LocalDate, endDate: LocalDate): Map[String, String] = {
+  def makeData(startDate: LocalDate, endDate: LocalDate): Map[String, String] =
     makeData("startDate", startDate) ++ makeData("endDate", endDate)
-  }
 
   def makeData(range: DateRange): Map[String, String] =
     makeData(range.from, range.to)
 
   "must bind valid data" in {
 
-    forAll(range(validDate) -> "valid date") {
-      range =>
+    forAll(range(validDate) -> "valid date") { range =>
+      val data = makeData(range)
 
-        val data = makeData(range)
+      val result = form.bind(data)
 
-        val result = form.bind(data)
-
-        result.value.value mustEqual range
+      result.value.value mustEqual range
     }
   }
 
@@ -126,7 +127,6 @@ class DateRangeMappingsSpec extends AnyFreeSpec with Matchers with ScalaCheckPro
   "must fail to bind if end date is before start date" in {
 
     forAll(range(validDate) -> "valid range") { range =>
-
       val data = makeData(range.to, range.from)
 
       val result = form.bind(data)
@@ -139,8 +139,6 @@ class DateRangeMappingsSpec extends AnyFreeSpec with Matchers with ScalaCheckPro
   "must fail to bind if start date is outside date range" in {
 
     forAll(invalidStartDate -> "invalid start date", validDate -> "valid end date") { (startDate, endDate) =>
-
-
       val data = makeData(startDate, endDate)
 
       val result = form.bind(data)
@@ -157,7 +155,6 @@ class DateRangeMappingsSpec extends AnyFreeSpec with Matchers with ScalaCheckPro
   "must fail to bind if end date is outside date range" in {
 
     forAll(validDate -> "valid start date", invalidEndDate -> "invalid end date") { (startDate, endDate) =>
-
       val data = makeData(startDate, endDate)
 
       val result = form.bind(data)
@@ -174,7 +171,6 @@ class DateRangeMappingsSpec extends AnyFreeSpec with Matchers with ScalaCheckPro
   "must fail to bind if start and end date are outside range" in {
 
     forAll(range(invalidDate) -> "invalid range") { range =>
-
       val data = makeData(range)
 
       val result = form.bind(data)
@@ -202,7 +198,6 @@ class DateRangeMappingsSpec extends AnyFreeSpec with Matchers with ScalaCheckPro
   "must fail to bind if date range intersects another date range" in {
 
     forAll(range(validDate)) { range =>
-
       val data = makeData(range)
       val excludedRanges = List(allowedRange)
 
@@ -215,17 +210,15 @@ class DateRangeMappingsSpec extends AnyFreeSpec with Matchers with ScalaCheckPro
 
   "must unbind a date" in {
 
-    forAll(range(validDate) -> "valid date") {
-      date =>
+    forAll(range(validDate) -> "valid date") { date =>
+      val filledForm = form.fill(date)
 
-        val filledForm = form.fill(date)
-
-        filledForm("value.startDate.day").value.value mustEqual date.from.getDayOfMonth.toString
-        filledForm("value.startDate.month").value.value mustEqual date.from.getMonthValue.toString
-        filledForm("value.startDate.year").value.value mustEqual date.from.getYear.toString
-        filledForm("value.endDate.day").value.value mustEqual date.to.getDayOfMonth.toString
-        filledForm("value.endDate.month").value.value mustEqual date.to.getMonthValue.toString
-        filledForm("value.endDate.year").value.value mustEqual date.to.getYear.toString
+      filledForm("value.startDate.day").value.value mustEqual date.from.getDayOfMonth.toString
+      filledForm("value.startDate.month").value.value mustEqual date.from.getMonthValue.toString
+      filledForm("value.startDate.year").value.value mustEqual date.from.getYear.toString
+      filledForm("value.endDate.day").value.value mustEqual date.to.getDayOfMonth.toString
+      filledForm("value.endDate.month").value.value mustEqual date.to.getMonthValue.toString
+      filledForm("value.endDate.year").value.value mustEqual date.to.getYear.toString
     }
   }
 }

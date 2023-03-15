@@ -18,4 +18,4 @@ package pages
 
 import models.SchemeId.Srn
 
-case class PspDeclarationPage (srn: Srn) extends Page
+case class PspDeclarationPage(srn: Srn) extends Page

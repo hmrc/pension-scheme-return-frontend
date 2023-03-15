@@ -23,9 +23,9 @@ import play.api.mvc.RequestHeader
 import uk.gov.hmrc.play.bootstrap.binders.SafeRedirectUrl
 
 @Singleton
-class FrontendAppConfig @Inject() (config: Configuration) {
+class FrontendAppConfig @Inject()(config: Configuration) {
 
-  val host: String    = config.get[String]("host")
+  val host: String = config.get[String]("host")
   val appName: String = config.get[String]("appName")
 
   private val contactHost = config.get[String]("contact-frontend.host")
@@ -35,20 +35,20 @@ class FrontendAppConfig @Inject() (config: Configuration) {
     s"$contactHost/contact/beta-feedback?service=$contactFormServiceIdentifier&backUrl=${SafeRedirectUrl(host + request.uri).encodedUrl}"
 
   private val exitSurveyBaseUrl: String = config.get[Service]("microservice.services.feedback-frontend").baseUrl
-  val exitSurveyUrl: String             = s"$exitSurveyBaseUrl/feedback/pension-scheme-return-frontend"
+  val exitSurveyUrl: String = s"$exitSurveyBaseUrl/feedback/pension-scheme-return-frontend"
 
   def languageMap: Map[String, Lang] = Map(
     "en" -> Lang("en"),
     "cy" -> Lang("cy")
   )
 
-  val timeout: Int   = config.get[Int]("timeout-dialog.timeout")
+  val timeout: Int = config.get[Int]("timeout-dialog.timeout")
   val countdown: Int = config.get[Int]("timeout-dialog.countdown")
 
   val cacheTtl: Int = config.get[Int]("mongodb.timeToLiveInSeconds")
 
   val pensionsAdministrator: Service = config.get[Service]("microservice.services.pensionAdministrator")
-  val pensionsScheme: Service        = config.get[Service]("microservice.services.pensionsScheme")
+  val pensionsScheme: Service = config.get[Service]("microservice.services.pensionsScheme")
 
   object features {
     val welshTranslation: Boolean = config.get[Boolean]("features.welsh-translation")

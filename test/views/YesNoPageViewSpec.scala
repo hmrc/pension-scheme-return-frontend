@@ -25,8 +25,7 @@ import views.html.YesNoPageView
 class YesNoPageViewSpec extends ViewSpec {
 
   runningApplication { implicit app =>
-
-    implicit val request  = FakeRequest()
+    implicit val request = FakeRequest()
 
     val view = injected[YesNoPageView]
 
@@ -37,15 +36,14 @@ class YesNoPageViewSpec extends ViewSpec {
 
       val yesNoForm = new YesNoPageFormProvider()(requiredKey, invalidKey)
 
-      behave like renderTitle(yesNoPageViewModelGen)(view(yesNoForm, _), _.title.key)
-      behave like renderHeading(yesNoPageViewModelGen)(view(yesNoForm, _), _.heading)
-      behave like renderSaveAndContinueButton(yesNoPageViewModelGen)(view(yesNoForm, _))
-      behave like renderForm(yesNoPageViewModelGen)(view(yesNoForm, _), _.onSubmit)
+      behave.like(renderTitle(yesNoPageViewModelGen)(view(yesNoForm, _), _.title.key))
+      behave.like(renderHeading(yesNoPageViewModelGen)(view(yesNoForm, _), _.heading))
+      behave.like(renderSaveAndContinueButton(yesNoPageViewModelGen)(view(yesNoForm, _)))
+      behave.like(renderForm(yesNoPageViewModelGen)(view(yesNoForm, _), _.onSubmit))
 
       "have a description when present" in {
 
         forAll(yesNoPageViewModelGen) { viewmodel =>
-
           p(view(yesNoForm, viewmodel)) must contain allElementsOf viewmodel.description.map(_.toMessage)
         }
       }
@@ -53,7 +51,6 @@ class YesNoPageViewSpec extends ViewSpec {
       "does not have a description when not present" in {
 
         forAll(yesNoPageViewModelGen) { viewmodel =>
-
           p(view(yesNoForm, viewmodel.copy(description = Nil))) mustBe Nil
         }
       }
@@ -61,7 +58,6 @@ class YesNoPageViewSpec extends ViewSpec {
       "have a legend" in {
 
         forAll(yesNoPageViewModelGen) { viewmodel =>
-
           whenever(viewmodel.legend.nonEmpty) {
 
             legend(view(yesNoForm, viewmodel)) must contain(viewmodel.legend.map(_.toMessage).value)
@@ -72,7 +68,6 @@ class YesNoPageViewSpec extends ViewSpec {
       "have radio button values" in {
 
         forAll(yesNoPageViewModelGen) { viewmodel =>
-
           radios(view(yesNoForm, viewmodel)).map(_.value) mustBe List("true", "false")
         }
       }
@@ -80,7 +75,6 @@ class YesNoPageViewSpec extends ViewSpec {
       "have radio button labels" in {
 
         forAll(yesNoPageViewModelGen) { viewmodel =>
-
           radios(view(yesNoForm, viewmodel)).map(_.label) mustBe List(messages("site.yes"), messages("site.no"))
         }
       }
@@ -88,7 +82,6 @@ class YesNoPageViewSpec extends ViewSpec {
       "have error summary" in {
 
         forAll(yesNoPageViewModelGen) { viewmodel =>
-
           val invalidForm = yesNoForm.bind(Map("value" -> ""))
           errorSummary(view(invalidForm, viewmodel)).text() must include(requiredKey)
         }
@@ -97,7 +90,6 @@ class YesNoPageViewSpec extends ViewSpec {
       "have error message" in {
 
         forAll(yesNoPageViewModelGen) { viewmodel =>
-
           val invalidForm = yesNoForm.bind(Map("value" -> ""))
           errorMessage(view(invalidForm, viewmodel)).text() must include(requiredKey)
         }

@@ -23,14 +23,13 @@ object ViewUtils {
 
   def title(form: Form[_], title: String, section: Option[String] = None)(implicit messages: Messages): String =
     titleNoForm(
-      title   = s"${errorPrefix(form)} ${messages(title)}",
+      title = s"${errorPrefix(form)} ${messages(title)}",
       section = section
     )
 
   def titleNoForm(title: String, section: Option[String] = None)(implicit messages: Messages): String =
     s"${messages(title)} - ${section.fold("")(messages(_) + " - ")}${messages("service.title")} - ${messages("site.govuk")}"
 
-  def errorPrefix(form: Form[_])(implicit messages: Messages): String = {
+  def errorPrefix(form: Form[_])(implicit messages: Messages): String =
     if (form.hasErrors || form.hasGlobalErrors) messages("error.browser.title.prefix") else ""
-  }
 }

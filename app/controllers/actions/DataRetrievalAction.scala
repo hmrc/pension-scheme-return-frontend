@@ -24,8 +24,9 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class DataRetrievalActionImpl @Inject()(
-                                         val sessionRepository: SessionRepository
-                                       )(implicit val executionContext: ExecutionContext) extends DataRetrievalAction {
+  val sessionRepository: SessionRepository
+)(implicit val executionContext: ExecutionContext)
+    extends DataRetrievalAction {
 
   override protected def transform[A](request: AllowedAccessRequest[A]): Future[OptionalDataRequest[A]] = {
     val userAnswersKey = request.getUserId + request.schemeDetails.srn

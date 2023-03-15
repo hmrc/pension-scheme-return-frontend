@@ -16,9 +16,7 @@
 
 package controllers
 
-
 import views.html.ContentPageView
-
 
 class PsaDeclarationControllerSpec extends ControllerBaseSpec {
 
@@ -26,21 +24,19 @@ class PsaDeclarationControllerSpec extends ControllerBaseSpec {
 
     lazy val viewModel = PsaDeclarationController.viewModel(srn)
 
-
     lazy val onPageLoad = routes.PsaDeclarationController.onPageLoad(srn)
     lazy val onSubmit = routes.PsaDeclarationController.onSubmit(srn)
 
-    behave like renderView(onPageLoad) { implicit app =>
-      implicit request =>
-        val view = injected[ContentPageView]
-        view(viewModel)
-    }
+    behave.like(renderView(onPageLoad) { implicit app => implicit request =>
+      val view = injected[ContentPageView]
+      view(viewModel)
+    })
 
-    behave like journeyRecoveryPage("onPageLoad", onPageLoad)
+    behave.like(journeyRecoveryPage("onPageLoad", onPageLoad))
 
-    behave like agreeAndContinue(onSubmit)
+    behave.like(agreeAndContinue(onSubmit))
 
-    behave like journeyRecoveryPage("onSubmit", onSubmit)
+    behave.like(journeyRecoveryPage("onSubmit", onSubmit))
 
   }
 }

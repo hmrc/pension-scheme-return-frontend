@@ -39,44 +39,55 @@ import viewmodels.DisplayMessage.SimpleMessage
 import scala.concurrent.{ExecutionContext, Future}
 
 class RemoveSchemeBankAccountController @Inject()(
-                                         override val messagesApi: MessagesApi,
-                                         navigator: Navigator,
-                                         identify: IdentifierAction,
-                                         allowAccess: AllowAccessActionProvider,
-                                         getData: DataRetrievalAction,
-                                         requireData: DataRequiredAction,
-                                         formProvider: YesNoPageFormProvider,
-                                         saveService: SaveService,
-                                         val controllerComponents: MessagesControllerComponents,
-                                         view: YesNoPageView
-                                 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+  override val messagesApi: MessagesApi,
+  navigator: Navigator,
+  identify: IdentifierAction,
+  allowAccess: AllowAccessActionProvider,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  formProvider: YesNoPageFormProvider,
+  saveService: SaveService,
+  val controllerComponents: MessagesControllerComponents,
+  view: YesNoPageView
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport {
 
   private val form = RemoveSchemeBankAccountController.form(formProvider)
 
-  def onPageLoad(srn:Srn, index: Max10, mode: Mode): Action[AnyContent] = (identify andThen allowAccess(srn) andThen getData andThen requireData) {
-    implicit request => withBankAccountAtIndex(srn, index)(bankAccount => Ok(view(form, viewModel(srn, index, bankAccount, mode))))
-  }
+  def onPageLoad(srn: Srn, index: Max10, mode: Mode): Action[AnyContent] =
+    identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData) { implicit request =>
+      withBankAccountAtIndex(srn, index)(bankAccount => Ok(view(form, viewModel(srn, index, bankAccount, mode))))
+    }
 
-  def onSubmit(srn: Srn, index: Max10, mode: Mode): Action[AnyContent] = (identify andThen allowAccess(srn) andThen getData andThen requireData).async {
-    implicit request =>
-      form.bindFromRequest().fold(
-        formWithErrors => Future.successful(
-          withBankAccountAtIndex(srn, index)(bankAccount => BadRequest(view(formWithErrors, viewModel(srn, index, bankAccount, mode))))
-        ),
-        removeBankAccount => {
-          if(removeBankAccount){
-            for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.remove(SchemeBankAccountPage(srn, index)))
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(RemoveSchemeBankAccountPage(srn), mode, updatedAnswers))
-          } else {
-            Future.successful(Redirect(navigator.nextPage(RemoveSchemeBankAccountPage(srn), mode, request.userAnswers)))
+  def onSubmit(srn: Srn, index: Max10, mode: Mode): Action[AnyContent] =
+    identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData).async { implicit request =>
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors =>
+            Future.successful(
+              withBankAccountAtIndex(srn, index)(
+                bankAccount => BadRequest(view(formWithErrors, viewModel(srn, index, bankAccount, mode)))
+              )
+            ),
+          removeBankAccount => {
+            if (removeBankAccount) {
+              for {
+                updatedAnswers <- Future.fromTry(request.userAnswers.remove(SchemeBankAccountPage(srn, index)))
+                _ <- saveService.save(updatedAnswers)
+              } yield Redirect(navigator.nextPage(RemoveSchemeBankAccountPage(srn), mode, updatedAnswers))
+            } else {
+              Future
+                .successful(Redirect(navigator.nextPage(RemoveSchemeBankAccountPage(srn), mode, request.userAnswers)))
+            }
           }
-        }
-      )
-  }
+        )
+    }
 
-  private def withBankAccountAtIndex(srn: Srn, index: Max10)(f: BankAccount => Result)(implicit request: DataRequest[_]): Result =
+  private def withBankAccountAtIndex(srn: Srn, index: Max10)(
+    f: BankAccount => Result
+  )(implicit request: DataRequest[_]): Result =
     request.userAnswers.get(SchemeBankAccountPage(srn, index)) match {
       case Some(bankAccount) => f(bankAccount)
       case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())

@@ -17,7 +17,13 @@
 package controllers
 
 import config.Refined.Max3
-import controllers.actions.{AllowAccessActionProvider, DataCreationAction, DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import controllers.actions.{
+  AllowAccessActionProvider,
+  DataCreationAction,
+  DataRequiredAction,
+  DataRetrievalAction,
+  IdentifierAction
+}
 import models.{Mode, NormalMode}
 import models.SchemeId.Srn
 import navigation.Navigator
@@ -32,26 +38,26 @@ import views.html.ContentPageView
 import javax.inject.Inject
 
 class PsaDeclarationController @Inject()(
-                                          override val messagesApi: MessagesApi,
-                                          navigator: Navigator,
-                                          identify: IdentifierAction,
-                                          allowAccess: AllowAccessActionProvider,
-                                          getData: DataRetrievalAction,
-                                          requireData: DataRequiredAction,
-                                          val controllerComponents: MessagesControllerComponents,
-                                          view: ContentPageView
-                                        ) extends FrontendBaseController with I18nSupport {
+  override val messagesApi: MessagesApi,
+  navigator: Navigator,
+  identify: IdentifierAction,
+  allowAccess: AllowAccessActionProvider,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  val controllerComponents: MessagesControllerComponents,
+  view: ContentPageView
+) extends FrontendBaseController
+    with I18nSupport {
 
-
-  def onPageLoad(srn: Srn): Action[AnyContent] = (identify andThen allowAccess(srn) andThen getData andThen requireData) {
-    implicit request =>
+  def onPageLoad(srn: Srn): Action[AnyContent] =
+    identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData) { implicit request =>
       Ok(view(PsaDeclarationController.viewModel(srn)))
-  }
+    }
 
-  def onSubmit(srn: Srn): Action[AnyContent] = (identify andThen allowAccess(srn) andThen getData andThen requireData) {
-    implicit request =>
+  def onSubmit(srn: Srn): Action[AnyContent] =
+    identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData) { implicit request =>
       Redirect(navigator.nextPage(PsaDeclarationPage(srn), NormalMode, request.userAnswers))
-  }
+    }
 }
 
 object PsaDeclarationController {
@@ -60,7 +66,11 @@ object PsaDeclarationController {
     SimpleMessage("psaDeclaration.title"),
     SimpleMessage("psaDeclaration.heading"),
     List(SimpleMessage("psaDeclaration.paragraph")),
-    List(SimpleMessage("psaDeclaration.listItem1"), SimpleMessage("psaDeclaration.listItem2"), SimpleMessage("psaDeclaration.listItem3")),
+    List(
+      SimpleMessage("psaDeclaration.listItem1"),
+      SimpleMessage("psaDeclaration.listItem2"),
+      SimpleMessage("psaDeclaration.listItem3")
+    ),
     SimpleMessage("site.agreeAndContinue"),
     isStartButton = false,
     routes.PsaDeclarationController.onSubmit(srn)

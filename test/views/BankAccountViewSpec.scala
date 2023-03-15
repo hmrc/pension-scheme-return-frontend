@@ -39,8 +39,8 @@ class BankAccountViewSpec extends ViewSpec {
 
     "BankAccountView" should {
 
-      behave like renderTitle(bankAccountViewModelGen)(view(bankAccountForm, _), _.title.key)
-      behave like renderHeading(bankAccountViewModelGen)(view(bankAccountForm, _), _.heading)
+      behave.like(renderTitle(bankAccountViewModelGen)(view(bankAccountForm, _), _.title.key))
+      behave.like(renderHeading(bankAccountViewModelGen)(view(bankAccountForm, _), _.heading))
 
       "render the bank name heading" in {
         forAll(bankAccountViewModelGen) { viewModel =>
@@ -50,26 +50,32 @@ class BankAccountViewSpec extends ViewSpec {
 
       "render bank name required error" in {
         forAll(bankAccountViewModelGen) { viewModel =>
-          val preparedForm = bankAccountForm.bind(Map("bankName" -> "", "accountNumber" -> "12345678", "sortCode" -> "12-34-56"))
+          val preparedForm =
+            bankAccountForm.bind(Map("bankName" -> "", "accountNumber" -> "12345678", "sortCode" -> "12-34-56"))
           errorMessage(view(preparedForm, viewModel)).text() mustBe renderedErrorMessage("bankName.required")
         }
       }
 
       "render the account number heading" in {
         forAll(bankAccountViewModelGen) { viewModel =>
-          inputLabel(view(bankAccountForm, viewModel))("accountNumber").text() must startWith(viewModel.accountNumberHeading.key)
+          inputLabel(view(bankAccountForm, viewModel))("accountNumber").text() must startWith(
+            viewModel.accountNumberHeading.key
+          )
         }
       }
 
       "render the account number hint" in {
         forAll(bankAccountViewModelGen) { viewModel =>
-          inputHint(view(bankAccountForm, viewModel))("accountNumber").text() must startWith(viewModel.accountNumberHint.key)
+          inputHint(view(bankAccountForm, viewModel))("accountNumber").text() must startWith(
+            viewModel.accountNumberHint.key
+          )
         }
       }
 
       "render account number required error" in {
         forAll(bankAccountViewModelGen) { viewModel =>
-          val preparedForm = bankAccountForm.bind(Map("bankName" -> "abc", "accountNumber" -> "", "sortCode" -> "12-34-56"))
+          val preparedForm =
+            bankAccountForm.bind(Map("bankName" -> "abc", "accountNumber" -> "", "sortCode" -> "12-34-56"))
           errorMessage(view(preparedForm, viewModel)).text() mustBe renderedErrorMessage("accountNumber.required")
         }
       }
@@ -88,7 +94,8 @@ class BankAccountViewSpec extends ViewSpec {
 
       "render sort code required error" in {
         forAll(bankAccountViewModelGen) { viewModel =>
-          val preparedForm = bankAccountForm.bind(Map("bankName" -> "abc", "accountNumber" -> "12345678", "sortCode" -> ""))
+          val preparedForm =
+            bankAccountForm.bind(Map("bankName" -> "abc", "accountNumber" -> "12345678", "sortCode" -> ""))
           errorMessage(view(preparedForm, viewModel)).text() mustBe renderedErrorMessage("sortCode.required")
         }
       }
@@ -96,13 +103,12 @@ class BankAccountViewSpec extends ViewSpec {
       "render the form" in {
 
         forAll(bankAccountViewModelGen) { viewModel =>
-
           form(view(bankAccountForm, viewModel)).method mustBe viewModel.onSubmit.method
           form(view(bankAccountForm, viewModel)).action mustBe viewModel.onSubmit.url
         }
       }
 
-      behave like renderButtonText(bankAccountViewModelGen)(view(bankAccountForm, _), _.buttonText)
+      behave.like(renderButtonText(bankAccountViewModelGen)(view(bankAccountForm, _), _.buttonText))
     }
   }
 }

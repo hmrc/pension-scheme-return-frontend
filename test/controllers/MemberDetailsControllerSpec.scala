@@ -35,7 +35,7 @@ class MemberDetailsControllerSpec extends ControllerBaseSpec {
     "lastName" -> "testLastName",
     "dateOfBirth.day" -> "12",
     "dateOfBirth.month" -> "12",
-    "dateOfBirth.year" -> "2020",
+    "dateOfBirth.year" -> "2020"
   )
 
   private val dobInFutureForm = List(
@@ -43,7 +43,7 @@ class MemberDetailsControllerSpec extends ControllerBaseSpec {
     "lastName" -> "testLastName",
     "dateOfBirth.day" -> "12",
     "dateOfBirth.month" -> "12",
-    "dateOfBirth.year" -> (LocalDate.now().getYear + 1).toString,
+    "dateOfBirth.year" -> (LocalDate.now().getYear + 1).toString
   )
 
   private val nameDOB = NameDOB(
@@ -54,22 +54,21 @@ class MemberDetailsControllerSpec extends ControllerBaseSpec {
 
   "MemberDetailsController" should {
 
-    behave like renderView(onPageLoad) { implicit app =>
-      implicit request =>
-        injected[NameDOBView].apply(form(injected[NameDOBFormProvider]), viewModel(srn, refineMV(1), NormalMode))
-    }
+    behave.like(renderView(onPageLoad) { implicit app => implicit request =>
+      injected[NameDOBView].apply(form(injected[NameDOBFormProvider]), viewModel(srn, refineMV(1), NormalMode))
+    })
 
-    behave like renderPrePopView(onPageLoad, MemberDetailsPage(srn, refineMV(1)), nameDOB) { implicit app =>
-      implicit request =>
+    behave.like(renderPrePopView(onPageLoad, MemberDetailsPage(srn, refineMV(1)), nameDOB) {
+      implicit app => implicit request =>
         val preparedForm = form(injected[NameDOBFormProvider]).fill(nameDOB)
         injected[NameDOBView].apply(preparedForm, viewModel(srn, refineMV(1), NormalMode))
-    }
+    })
 
-    behave like journeyRecoveryPage("onPageLoad", onPageLoad)
-    
-    behave like saveAndContinue(onSubmit, validForm: _*)
-    behave like invalidForm(onSubmit)
-    behave like invalidForm(onSubmit, dobInFutureForm: _*)
-    behave like journeyRecoveryPage("onSubmit", onSubmit)
+    behave.like(journeyRecoveryPage("onPageLoad", onPageLoad))
+
+    behave.like(saveAndContinue(onSubmit, validForm: _*))
+    behave.like(invalidForm(onSubmit))
+    behave.like(invalidForm(onSubmit, dobInFutureForm: _*))
+    behave.like(journeyRecoveryPage("onSubmit", onSubmit))
   }
 }

@@ -60,9 +60,14 @@ trait HtmlHelper extends HtmlModels {
     mainContent(html).getElementById(s"$name-hint")
 
   def tr(html: Html): List[List[String]] =
-    mainContent(html).getElementsByTag("tr").iterator().asScala.toList.map(
-      _.getElementsByTag("td").iterator().asScala.toList.map(_.text())
-    )
+    mainContent(html)
+      .getElementsByTag("tr")
+      .iterator()
+      .asScala
+      .toList
+      .map(
+        _.getElementsByTag("td").iterator().asScala.toList.map(_.text())
+      )
 
   def inset(html: Html): Element =
     mainContent(html).getElementsByClass("govuk-inset-text").first()
@@ -107,10 +112,13 @@ trait HtmlHelper extends HtmlModels {
 
   def messageKey(message: DisplayMessage): String = message match {
     case SimpleMessage(key, _) => key
-    case ComplexMessage(elements, _) => elements.map {
-      case Message(key, _) => key
-      case LinkedMessage(key, _, _) => key
-    }.reduce(_ + _)
+    case ComplexMessage(elements, _) =>
+      elements
+        .map {
+          case Message(key, _) => key
+          case LinkedMessage(key, _, _) => key
+        }
+        .reduce(_ + _)
   }
 
   case class DateElements(day: Element, month: Element, year: Element)

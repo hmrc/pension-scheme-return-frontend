@@ -23,7 +23,7 @@ import queries.Gettable
 
 object FormUtils {
 
-  implicit class FormOps[A](form: Form[A]){
+  implicit class FormOps[A](form: Form[A]) {
     def fromUserAnswers(page: Gettable[A])(implicit rds: Reads[A], request: DataRequest[_]): Form[A] =
       request.userAnswers.get(page).fold(form)(form.fill)
   }

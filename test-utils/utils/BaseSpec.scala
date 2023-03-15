@@ -35,20 +35,20 @@ import play.api.test.Helpers.running
 import java.net.URLEncoder
 import scala.reflect.ClassTag
 
-abstract class BaseSpec extends
-  AnyWordSpec with
-  Matchers with
-  ScalaFutures with
-  MockitoSugar with
-  BeforeAndAfterEach with
-  OptionValues with
-  Generators with
-  ModelSerializers {
+abstract class BaseSpec
+    extends AnyWordSpec
+    with Matchers
+    with ScalaFutures
+    with MockitoSugar
+    with BeforeAndAfterEach
+    with OptionValues
+    with Generators
+    with ModelSerializers {
 
   implicit val actorSystem: ActorSystem = ActorSystem("unit-tests")
   implicit val mat: Materializer = Materializer.createMaterializer(actorSystem)
 
-  implicit override val patienceConfig: PatienceConfig =
+  override implicit val patienceConfig: PatienceConfig =
     PatienceConfig(timeout = scaled(Span(500, Millis)), interval = scaled(Span(50, Millis)))
 
   protected def applicationBuilder: GuiceApplicationBuilder =
@@ -58,7 +58,8 @@ abstract class BaseSpec extends
         "metric.enabled" -> false
       )
 
-  implicit def createMessages(implicit app: Application): Messages = app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
+  implicit def createMessages(implicit app: Application): Messages =
+    app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
 
   protected def messages(key: String)(implicit m: Messages): String = m(key)
 

@@ -49,32 +49,35 @@ class SchemeBankAccountListController @Inject()(
   val controllerComponents: MessagesControllerComponents,
   view: ListView,
   formProvider: YesNoPageFormProvider
-) extends FrontendBaseController with I18nSupport {
+) extends FrontendBaseController
+    with I18nSupport {
 
   private val form = SchemeBankAccountListController.form(formProvider)
 
-  def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = (identify andThen allowAccess(srn) andThen getData andThen requireData) {
-    implicit request =>
+  def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] =
+    identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData) { implicit request =>
       val bankAccounts = request.userAnswers.schemeBankAccounts(srn)
       if (bankAccounts.isEmpty) {
         Redirect(controllers.routes.SchemeBankAccountController.onPageLoad(srn, refineMV[OneToTen](1), mode))
       } else {
         Ok(view(form, viewModel(srn, mode, bankAccounts)))
       }
-  }
+    }
 
-  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = (identify andThen allowAccess(srn) andThen getData andThen requireData) {
-    implicit request =>
+  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] =
+    identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData) { implicit request =>
       val bankAccounts = request.userAnswers.schemeBankAccounts(srn)
       if (bankAccounts.length == maxSchemeBankAccounts) {
         Redirect(navigator.nextPage(SchemeBankAccountListPage(srn, addBankAccount = false), mode, request.userAnswers))
       } else {
-        form.bindFromRequest().fold(
-          formWithErrors => BadRequest(view(formWithErrors, viewModel(srn, mode, bankAccounts))),
-          value => Redirect(navigator.nextPage(SchemeBankAccountListPage(srn, value), mode, request.userAnswers))
-        )
+        form
+          .bindFromRequest()
+          .fold(
+            formWithErrors => BadRequest(view(formWithErrors, viewModel(srn, mode, bankAccounts))),
+            value => Redirect(navigator.nextPage(SchemeBankAccountListPage(srn, value), mode, request.userAnswers))
+          )
       }
-  }
+    }
 }
 
 object SchemeBankAccountListController {
@@ -83,28 +86,35 @@ object SchemeBankAccountListController {
   )
 
   def viewModel(srn: Srn, mode: Mode, bankAccounts: List[BankAccount]): ListViewModel = {
-    val rows: List[ListRow] = bankAccounts.zipWithIndex.flatMap { case (bankAccount, index) =>
-      val text = ComplexMessage(List(
-        Message(bankAccount.bankName),
-        Message("schemeBankDetailsSummary.accountNumber", bankAccount.accountNumber)
-      ), Delimiter.Newline)
-
-      refineV[OneToTen](index + 1) match {
-        case Left(_) => Nil
-        case Right(nextIndex) => List(
-          ListRow(
-            text,
-            changeUrl = controllers.routes.SchemeBankAccountController.onPageLoad(srn, nextIndex, mode).url,
-            changeHiddenText = SimpleMessage("schemeBankDetailsSummary.change.hidden", bankAccount.accountNumber),
-            removeUrl = controllers.routes.RemoveSchemeBankAccountController.onPageLoad(srn, nextIndex, mode).url,
-            removeHiddenText = SimpleMessage("schemeBankDetailsSummary.remove.hidden", bankAccount.accountNumber)
-          )
+    val rows: List[ListRow] = bankAccounts.zipWithIndex.flatMap {
+      case (bankAccount, index) =>
+        val text = ComplexMessage(
+          List(
+            Message(bankAccount.bankName),
+            Message("schemeBankDetailsSummary.accountNumber", bankAccount.accountNumber)
+          ),
+          Delimiter.Newline
         )
-      }
+
+        refineV[OneToTen](index + 1) match {
+          case Left(_) => Nil
+          case Right(nextIndex) =>
+            List(
+              ListRow(
+                text,
+                changeUrl = controllers.routes.SchemeBankAccountController.onPageLoad(srn, nextIndex, mode).url,
+                changeHiddenText = SimpleMessage("schemeBankDetailsSummary.change.hidden", bankAccount.accountNumber),
+                removeUrl = controllers.routes.RemoveSchemeBankAccountController.onPageLoad(srn, nextIndex, mode).url,
+                removeHiddenText = SimpleMessage("schemeBankDetailsSummary.remove.hidden", bankAccount.accountNumber)
+              )
+            )
+        }
     }
 
-    val titleKey = if(bankAccounts.length > 1) "schemeBankDetailsSummary.title.plural" else "schemeBankDetailsSummary.title"
-    val headingKey = if(bankAccounts.length > 1) "schemeBankDetailsSummary.heading.plural" else "schemeBankDetailsSummary.heading"
+    val titleKey =
+      if (bankAccounts.length > 1) "schemeBankDetailsSummary.title.plural" else "schemeBankDetailsSummary.title"
+    val headingKey =
+      if (bankAccounts.length > 1) "schemeBankDetailsSummary.heading.plural" else "schemeBankDetailsSummary.heading"
 
     ListViewModel(
       SimpleMessage(titleKey, bankAccounts.length),

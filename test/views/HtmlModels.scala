@@ -25,25 +25,22 @@ trait HtmlModels {
 
   object AnchorTag {
 
-    def apply(element: Element): AnchorTag = {
+    def apply(element: Element): AnchorTag =
       AnchorTag(element.attr("href"), element.text())
-    }
 
-    def apply(item: ActionItem): AnchorTag = {
+    def apply(item: ActionItem): AnchorTag =
       AnchorTag(
         item.href,
         s"${item.content.asHtml}${item.visuallyHiddenText.fold("")(s => s" $s")}"
       )
-    }
   }
 
   case class Form(method: String, action: String)
 
   object Form {
 
-    def apply(element: Element): Form = {
+    def apply(element: Element): Form =
       Form(element.attr("method"), element.attr("action"))
-    }
   }
 
   case class RadioItem(id: String, value: String, label: String)
@@ -54,7 +51,7 @@ trait HtmlModels {
 
       val id = element.id()
       val value = element.`val`()
-      val label = element.siblingElements().select(s"[for=\"$id\"]")
+      val label = element.siblingElements().select("[for=\"" + id + "\"]")
 
       RadioItem(id, value, label.text())
     }

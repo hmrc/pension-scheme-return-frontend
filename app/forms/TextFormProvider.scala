@@ -30,7 +30,13 @@ class TextFormProvider @Inject()() extends Mappings {
       "value" -> text(requiredKey)
     )
 
-  def nino(requiredKey: String, invalidKey: String, duplicates: List[Nino], duplicateKey: String, args: Any*): Form[Nino] =
+  def nino(
+    requiredKey: String,
+    invalidKey: String,
+    duplicates: List[Nino],
+    duplicateKey: String,
+    args: Any*
+  ): Form[Nino] =
     Form(
       "value" -> text(requiredKey, args.toList)
         .verifying(verify(invalidKey, Nino.isValid, args: _*))

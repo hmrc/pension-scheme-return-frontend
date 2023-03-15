@@ -30,16 +30,20 @@ class YesNoPageFormProviderSpec extends BooleanFieldBehaviours {
 
     val fieldName = "value"
 
-    behave like booleanField(
-      form,
-      fieldName,
-      FormError(fieldName, invalidKey)
+    behave.like(
+      booleanField(
+        form,
+        fieldName,
+        FormError(fieldName, invalidKey)
+      )
     )
 
-    behave like mandatoryField(
-      form,
-      fieldName,
-      FormError(fieldName, requiredKey)
+    behave.like(
+      mandatoryField(
+        form,
+        fieldName,
+        FormError(fieldName, requiredKey)
+      )
     )
   }
 }

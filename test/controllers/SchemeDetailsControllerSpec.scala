@@ -32,15 +32,15 @@ class SchemeDetailsControllerSpec extends ControllerBaseSpec {
 
   lazy val app = applicationBuilder(Some(defaultUserAnswers))
 
-  private val schemeDetailsTwoEstablishers = defaultSchemeDetails.copy(establishers =
-    List(
+  private val schemeDetailsTwoEstablishers = defaultSchemeDetails.copy(
+    establishers = List(
       Establisher("testFirstName testLastName", EstablisherKind.Partnership),
       Establisher("testFirstName2 testLastName2", EstablisherKind.Partnership)
     )
   )
 
-  private val schemeDetailsThreeEstablishers = defaultSchemeDetails.copy(establishers =
-    List(
+  private val schemeDetailsThreeEstablishers = defaultSchemeDetails.copy(
+    establishers = List(
       Establisher("testFirstName testLastName", EstablisherKind.Partnership),
       Establisher("testFirstName2 testLastName2", EstablisherKind.Partnership),
       Establisher("testFirstName3 testLastName3", EstablisherKind.Partnership)
@@ -52,25 +52,27 @@ class SchemeDetailsControllerSpec extends ControllerBaseSpec {
     List(
       ("a single establisher", defaultSchemeDetails, 4),
       ("two establishers", schemeDetailsTwoEstablishers, 5)
-    ).foreach { case (testName, schemeDetails, numRows) =>
-      s"build the correct view model with $testName" in running(_ => app) { implicit app =>
+    ).foreach {
+      case (testName, schemeDetails, numRows) =>
+        s"build the correct view model with $testName" in running(_ => app) { implicit app =>
+          val controller = injected[SchemeDetailsController]
+          val viewModel = controller.viewModel(srn, schemeDetails)
 
-        val controller = injected[SchemeDetailsController]
-        val viewModel = controller.viewModel(srn, schemeDetails)
-
-        viewModel.rows.size mustEqual numRows
-      }
+          viewModel.rows.size mustEqual numRows
+        }
     }
 
-    "build the correct view model with three establishers" in running(_ => app){ implicit app =>
-
+    "build the correct view model with three establishers" in running(_ => app) { implicit app =>
       val controller = injected[SchemeDetailsController]
       val viewModel = controller.viewModel(srn, schemeDetailsThreeEstablishers)
 
       viewModel.rows.size mustEqual 5
       viewModel.rows.last mustEqual
         SimpleMessage("schemeDetails.row5") ->
-          ComplexMessage(List(Message("testFirstName2 testLastName2"), Message("testFirstName3 testLastName3")), Delimiter.Newline)
+          ComplexMessage(
+            List(Message("testFirstName2 testLastName2"), Message("testFirstName3 testLastName3")),
+            Delimiter.Newline
+          )
     }
 
     "return OK and the correct view for a GET" when {
@@ -78,24 +80,24 @@ class SchemeDetailsControllerSpec extends ControllerBaseSpec {
         ("a single establisher", defaultSchemeDetails),
         ("two establishers", schemeDetailsTwoEstablishers),
         ("three establishers", schemeDetailsThreeEstablishers)
-      ).foreach { case (testName, schemeDetails) =>
-        s"scheme details contains $testName" in {
+      ).foreach {
+        case (testName, schemeDetails) =>
+          s"scheme details contains $testName" in {
 
-          val app = applicationBuilder(Some(defaultUserAnswers), schemeDetails)
+            val app = applicationBuilder(Some(defaultUserAnswers), schemeDetails)
 
-          running(_ => app) { implicit app =>
+            running(_ => app) { implicit app =>
+              val view = injected[ContentTablePageView]
+              val controller = injected[SchemeDetailsController]
+              val request = FakeRequest(GET, onPageLoad)
 
-            val view = injected[ContentTablePageView]
-            val controller = injected[SchemeDetailsController]
-            val request = FakeRequest(GET, onPageLoad)
+              val result = route(app, request).value
+              val expectedView = view(controller.viewModel(srn, schemeDetails))(request, createMessages(app))
 
-            val result = route(app, request).value
-            val expectedView = view(controller.viewModel(srn, schemeDetails))(request, createMessages(app))
-
-            status(result) mustEqual OK
-            contentAsString(result) mustEqual expectedView.toString
+              status(result) mustEqual OK
+              contentAsString(result) mustEqual expectedView.toString
+            }
           }
-        }
       }
     }
 
@@ -108,7 +110,6 @@ class SchemeDetailsControllerSpec extends ControllerBaseSpec {
           )
 
       running(_ => fakeNavigatorApplication) { app =>
-
         val request = FakeRequest(GET, onSubmit)
 
         val result = route(app, request).value

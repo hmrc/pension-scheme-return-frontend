@@ -29,24 +29,17 @@ import java.time.LocalDate
 
 trait FieldBehaviours extends FormSpec with ScalaCheckPropertyChecks with Generators {
 
-  def fieldThatBindsValidData(form: Form[_],
-                              fieldName: String,
-                              validDataGenerator: Gen[String]): Unit = {
-
+  def fieldThatBindsValidData(form: Form[_], fieldName: String, validDataGenerator: Gen[String]): Unit =
     "bind valid data" in {
 
-      forAll(validDataGenerator -> "validDataItem") {
-        dataItem: String =>
-          val result = form.bind(Map(fieldName -> dataItem)).apply(fieldName)
-          result.value.value mustBe dataItem
-          result.errors mustBe empty
+      forAll(validDataGenerator -> "validDataItem") { dataItem: String =>
+        val result = form.bind(Map(fieldName -> dataItem)).apply(fieldName)
+        result.value.value mustBe dataItem
+        result.errors mustBe empty
       }
     }
-  }
 
-  def mandatoryField(form: Form[_],
-                     fieldName: String,
-                     requiredError: FormError): Unit = {
+  def mandatoryField(form: Form[_], fieldName: String, requiredError: FormError): Unit = {
 
     "not bind when key is not present at all" in {
 
@@ -65,47 +58,76 @@ trait FieldBehaviours extends FormSpec with ScalaCheckPropertyChecks with Genera
     mandatoryField(form, fieldName, FormError(fieldName, message))
 
   def invalidNumericField(form: Form[_], fieldName: String, errorMessage: String, args: Any*): Unit =
-    errorField("numeric value is invalid", form, fieldName, FormError(fieldName, errorMessage, args.toList), alphaStr.filter(_.nonEmpty))
+    errorField(
+      "numeric value is invalid",
+      form,
+      fieldName,
+      FormError(fieldName, errorMessage, args.toList),
+      alphaStr.filter(_.nonEmpty)
+    )
 
   def invalidAlphaField(form: Form[_], fieldName: String, errorMessage: String, args: List[Any] = Nil): Unit =
-    errorField("alpha value is invalid", form, fieldName, FormError(fieldName, errorMessage, args), numStr.filter(_.nonEmpty))
+    errorField(
+      "alpha value is invalid",
+      form,
+      fieldName,
+      FormError(fieldName, errorMessage, args),
+      numStr.filter(_.nonEmpty)
+    )
 
-  def fieldLengthError(form: Form[_], fieldName: String, error: FormError, min: Int, max: Int, charGen: Gen[Char]): Unit = {
+  def fieldLengthError(
+    form: Form[_],
+    fieldName: String,
+    error: FormError,
+    min: Int,
+    max: Int,
+    charGen: Gen[Char]
+  ): Unit = {
     val lengthGen = stringLengthBetween(min, max, charGen)
     errorField(s"length is between $min and $max", form, fieldName, error, lengthGen)
   }
 
-  def fieldRejectDuplicates(form: Form[_], fieldName: String, errorMessage: String, duplicates: List[String], args: Any*): Unit =
-    errorField("duplicate values", form, fieldName, FormError(fieldName, errorMessage, args.toList), Gen.oneOf(duplicates))
+  def fieldRejectDuplicates(
+    form: Form[_],
+    fieldName: String,
+    errorMessage: String,
+    duplicates: List[String],
+    args: Any*
+  ): Unit =
+    errorField(
+      "duplicate values",
+      form,
+      fieldName,
+      FormError(fieldName, errorMessage, args.toList),
+      Gen.oneOf(duplicates)
+    )
 
   def invalidField(form: Form[_], fieldName: String, errorMessage: String, invalidData: Gen[String], args: Any*): Unit =
     errorField("invalid field", form, fieldName, FormError(fieldName, errorMessage, args.toList), invalidData)
 
-  def errorField(testName: String, form: Form[_], fieldName: String, error: FormError, gen: Gen[String]): Unit = {
+  def errorField(testName: String, form: Form[_], fieldName: String, error: FormError, gen: Gen[String]): Unit =
     s"not bind when $testName" in {
       forAll(gen -> "validDataItem") { value: String =>
         val result = form.bind(Map(fieldName -> value))(fieldName)
         result.errors mustEqual Seq(error)
       }
     }
-  }
 
-  def fieldThatBindsValidDate(form: Form[_], fieldName: String): Unit = {
-
+  def fieldThatBindsValidDate(form: Form[_], fieldName: String): Unit =
     "bind valid date" in {
 
-      forAll(date -> "valid date") {
-        localDate: LocalDate =>
-          val result = form.bind(
+      forAll(date -> "valid date") { localDate: LocalDate =>
+        val result = form
+          .bind(
             Map(
               s"$fieldName.day" -> localDate.getDayOfMonth.toString,
               s"$fieldName.month" -> localDate.getMonthValue.toString,
-              s"$fieldName.year" -> localDate.getYear.toString,
+              s"$fieldName.year" -> localDate.getYear.toString
             )
-          ).apply(fieldName)
+          )
+          .apply(fieldName)
 
-          result.errors mustBe empty
+        result.errors mustBe empty
       }
     }
-  }
 }

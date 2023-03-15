@@ -45,7 +45,7 @@ trait ListWithActionsFluency {
       apply(HtmlContent(html), href)
   }
 
-  implicit class FluentListWithActionsAction(actionList: ListWithActionsAction){
+  implicit class FluentListWithActionsAction(actionList: ListWithActionsAction) {
     def withVisuallyHiddenText(text: String): ListWithActionsAction =
       actionList.copy(visuallyHiddenText = Some(text))
   }

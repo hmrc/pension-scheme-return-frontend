@@ -28,7 +28,9 @@ class FakeIdentifierAction @Inject()(
   val bodyParsers: PlayBodyParsers
 )(
   implicit override val executionContext: ExecutionContext
-) extends IdentifierAction with Generators with OptionValues {
+) extends IdentifierAction
+    with Generators
+    with OptionValues {
 
   override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] =
     block(administratorRequestGen(request).map(_.copy(userId = "id")).sample.value)

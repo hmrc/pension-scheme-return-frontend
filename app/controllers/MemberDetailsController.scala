@@ -40,14 +40,16 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class MemberDetailsController @Inject()(
-                                         override val messagesApi: MessagesApi,
-                                         navigator: Navigator,
-                                         identifyAndRequireData: IdentifyAndRequireData,
-                                         saveService: SaveService,
-                                         formProvider: NameDOBFormProvider,
-                                         view: NameDOBView,
-                                         val controllerComponents: MessagesControllerComponents
-                                       )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+  override val messagesApi: MessagesApi,
+  navigator: Navigator,
+  identifyAndRequireData: IdentifyAndRequireData,
+  saveService: SaveService,
+  formProvider: NameDOBFormProvider,
+  view: NameDOBView,
+  val controllerComponents: MessagesControllerComponents
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport {
 
   private val form = MemberDetailsController.form(formProvider)
 
@@ -58,17 +60,20 @@ class MemberDetailsController @Inject()(
 
   def onSubmit(srn: Srn, index: Max99, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
-      form.bindFromRequest().fold(
-        formWithErrors => Future.successful(
-          BadRequest(view(formWithErrors, viewModel(srn, index, mode)))
-        ),
-        answer => {
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(MemberDetailsPage(srn, index), answer))
-            _ <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage(MemberDetailsPage(srn, index), mode, updatedAnswers))
-        }
-      )
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors =>
+            Future.successful(
+              BadRequest(view(formWithErrors, viewModel(srn, index, mode)))
+            ),
+          answer => {
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(MemberDetailsPage(srn, index), answer))
+              _ <- saveService.save(updatedAnswers)
+            } yield Redirect(navigator.nextPage(MemberDetailsPage(srn, index), mode, updatedAnswers))
+          }
+        )
   }
 }
 
