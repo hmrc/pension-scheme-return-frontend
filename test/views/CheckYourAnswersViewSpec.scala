@@ -22,7 +22,7 @@ import utils.BaseSpec
 import viewmodels.models.SummaryAction
 import views.html.CheckYourAnswersView
 
-class CheckYourAnswersViewSpec extends BaseSpec with ScalaCheckPropertyChecks with HtmlHelper {
+class CheckYourAnswersViewSpec extends ViewSpec {
 
   runningApplication { implicit app =>
 
@@ -32,21 +32,9 @@ class CheckYourAnswersViewSpec extends BaseSpec with ScalaCheckPropertyChecks wi
 
     "CheckYourAnswerView" should {
 
-      "render the title" in {
-
-        forAll(checkYourAnswersViewModelGen) { viewModel =>
-
-          title(view(viewModel)) must startWith(viewModel.title.key)
-        }
-      }
-
-      "render the heading" in {
-
-        forAll(checkYourAnswersViewModelGen) { viewModel =>
-
-          h1(view(viewModel)) mustBe messageKey(viewModel.heading)
-        }
-      }
+      behave like renderTitle(checkYourAnswersViewModelGen)(view(_), _.title.key)
+      behave like renderHeading(checkYourAnswersViewModelGen)(view(_), _.heading)
+      behave like renderSaveAndContinueButton(checkYourAnswersViewModelGen)(view(_))
 
       "render the summary list keys" in {
 
@@ -78,15 +66,6 @@ class CheckYourAnswersViewSpec extends BaseSpec with ScalaCheckPropertyChecks wi
           summaryListActions(view(viewModel)) must contain theSameElementsAs actions
         }
       }
-
-      "render the button href" in {
-
-        forAll(checkYourAnswersViewModelGen) { viewModel =>
-
-          anchorButton(view(viewModel)).href mustBe viewModel.onSubmit.url
-        }
-      }
-
     }
   }
 }
