@@ -33,11 +33,11 @@ trait CheckboxFluency {
   object CheckboxesViewModel extends ErrorMessageAwareness with FieldsetFluency {
 
     def apply(
-               form: Form[_],
-               name: String,
-               items: Seq[CheckboxItem],
-               legend: Legend
-             )(implicit messages: Messages): Checkboxes =
+      form: Form[_],
+      name: String,
+      items: Seq[CheckboxItem],
+      legend: Legend
+    )(implicit messages: Messages): Checkboxes =
       apply(
         form = form,
         name = name,
@@ -46,18 +46,17 @@ trait CheckboxFluency {
       )
 
     def apply(
-               form: Form[_],
-               name: String,
-               items: Seq[CheckboxItem],
-               fieldset: Fieldset
-             )(implicit messages: Messages): Checkboxes =
+      form: Form[_],
+      name: String,
+      items: Seq[CheckboxItem],
+      fieldset: Fieldset
+    )(implicit messages: Messages): Checkboxes =
       Checkboxes(
-        fieldset     = Some(fieldset),
-        name         = name,
+        fieldset = Some(fieldset),
+        name = name,
         errorMessage = errorMessage(form(name)),
-        items        = items.map {
-          item =>
-            item copy (checked = form.data.exists(data => data._2 == item.value))
+        items = items.map { item =>
+          item.copy(checked = form.data.exists(data => data._2 == item.value))
         }
       )
   }
@@ -65,40 +64,40 @@ trait CheckboxFluency {
   implicit class FluentCheckboxes(checkboxes: Checkboxes) {
 
     def describedBy(value: String): Checkboxes =
-      checkboxes copy (describedBy = Some(value))
+      checkboxes.copy(describedBy = Some(value))
   }
 
   object CheckboxItemViewModel {
 
     def apply(
-               content: Content,
-               fieldId: String,
-               index: Int,
-               value: String
-             ): CheckboxItem =
+      content: Content,
+      fieldId: String,
+      index: Int,
+      value: String
+    ): CheckboxItem =
       CheckboxItem(
         content = content,
-        id      = Some(s"${fieldId}_$index"),
-        name    = Some(s"$fieldId[$index]"),
-        value   = value
+        id = Some(s"${fieldId}_$index"),
+        name = Some(s"$fieldId[$index]"),
+        value = value
       )
   }
 
   implicit class FluentCheckboxItem(item: CheckboxItem) {
 
     def withLabel(label: Label): CheckboxItem =
-      item copy (label = Some(label))
+      item.copy(label = Some(label))
 
     def withHint(hint: Hint): CheckboxItem =
-      item copy (hint = Some(hint))
+      item.copy(hint = Some(hint))
 
     def withConditionalHtml(html: Html): CheckboxItem =
-      item copy (conditionalHtml = Some(html))
+      item.copy(conditionalHtml = Some(html))
 
     def disabled(): CheckboxItem =
-      item copy (disabled = true)
+      item.copy(disabled = true)
 
     def withAttribute(attribute: (String, String)): CheckboxItem =
-      item copy (attributes = item.attributes + attribute)
+      item.copy(attributes = item.attributes + attribute)
   }
 }

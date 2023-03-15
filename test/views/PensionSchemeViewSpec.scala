@@ -22,11 +22,9 @@ import play.api.test.FakeRequest
 import utils.BaseSpec
 import views.html.PensionSchemeView
 
-
 class PensionSchemeViewSpec extends BaseSpec with ScalaCheckPropertyChecks with HtmlHelper {
 
   runningApplication { implicit app =>
-
     val view = injected[PensionSchemeView]
 
     implicit val request = FakeRequest()
@@ -38,7 +36,6 @@ class PensionSchemeViewSpec extends BaseSpec with ScalaCheckPropertyChecks with 
       "render the title" in {
 
         forAll(pensionSchemeViewModelGen) { viewModel =>
-
           title(view(pensionSchemeForm, viewModel)) must startWith(viewModel.title.key)
         }
       }
@@ -46,7 +43,6 @@ class PensionSchemeViewSpec extends BaseSpec with ScalaCheckPropertyChecks with 
       "render the header" in {
 
         forAll(pensionSchemeViewModelGen) { viewModel =>
-
           h1(view(pensionSchemeForm, viewModel)) mustBe viewModel.heading.key
         }
       }
@@ -54,7 +50,6 @@ class PensionSchemeViewSpec extends BaseSpec with ScalaCheckPropertyChecks with 
       "render the form" in {
 
         forAll(pensionSchemeViewModelGen) { viewModel =>
-
           form(view(pensionSchemeForm, viewModel)).method mustBe viewModel.onSubmit.method
           form(view(pensionSchemeForm, viewModel)).action mustBe viewModel.onSubmit.url
         }
@@ -63,7 +58,6 @@ class PensionSchemeViewSpec extends BaseSpec with ScalaCheckPropertyChecks with 
       "render the correct error summary" in {
 
         forAll(pensionSchemeViewModelGen) { viewModel =>
-
           val errorForm = pensionSchemeForm.bind(Map("value" -> ""))
           errorSummary(view(errorForm, viewModel)).text() must include("required")
         }
@@ -72,7 +66,6 @@ class PensionSchemeViewSpec extends BaseSpec with ScalaCheckPropertyChecks with 
       "render the correct error message" in {
 
         forAll(pensionSchemeViewModelGen) { viewModel =>
-
           val errorForm = pensionSchemeForm.bind(Map("value" -> ""))
           errorMessage(view(errorForm, viewModel)).text() must include("required")
         }

@@ -39,11 +39,10 @@ class DateRangeViewSpec extends ViewSpec {
         mapping(
           "dates" -> mapping(
             "startDate" -> localDateMapping("startDate.required"),
-            "endDate"   -> localDateMapping("endDate.required")
+            "endDate" -> localDateMapping("endDate.required")
           )(DateRange.apply)(DateRange.unapply)
         )(identity)(Some(_))
       )
-
 
     "DateRangeView" should {
 
@@ -57,7 +56,6 @@ class DateRangeViewSpec extends ViewSpec {
       "render the heading" in {
 
         forAll(dateRangeViewModelGen) { viewModel =>
-
           h1(view(dateRangeForm, viewModel)) mustBe viewModel.heading.key
         }
       }
@@ -65,7 +63,6 @@ class DateRangeViewSpec extends ViewSpec {
       "render the description" in {
 
         forAll(dateRangeViewModelGen) { viewModel =>
-
           whenever(viewModel.description.nonEmpty) {
 
             p(view(dateRangeForm, viewModel)) must contain(viewModel.description.value.key)
@@ -76,7 +73,6 @@ class DateRangeViewSpec extends ViewSpec {
       "render the start date label" in {
 
         forAll(dateRangeViewModelGen) { viewModel =>
-
           legend(view(dateRangeForm, viewModel)) must contain(viewModel.startDateLabel.key)
         }
       }
@@ -84,7 +80,6 @@ class DateRangeViewSpec extends ViewSpec {
       "render the end date label" in {
 
         forAll(dateRangeViewModelGen) { viewModel =>
-
           legend(view(dateRangeForm, viewModel)) must contain(viewModel.endDateLabel.key)
         }
       }
@@ -92,7 +87,6 @@ class DateRangeViewSpec extends ViewSpec {
       "have form" in {
 
         forAll(dateRangeViewModelGen) { viewModel =>
-
           form(view(dateRangeForm, viewModel)).method mustBe viewModel.onSubmit.method
           form(view(dateRangeForm, viewModel)).action mustBe viewModel.onSubmit.url
         }
@@ -101,7 +95,6 @@ class DateRangeViewSpec extends ViewSpec {
       "render the start date required error summary" in {
 
         forAll(dateRangeViewModelGen) { viewModel =>
-
           val invalidForm = dateRangeForm.bind(Map[String, String]("dates.startDate" -> ""))
           errorSummary(view(invalidForm, viewModel)).text() must include("startDate.required")
         }
@@ -110,7 +103,6 @@ class DateRangeViewSpec extends ViewSpec {
       "render the start date required error message" in {
 
         forAll(dateRangeViewModelGen) { viewModel =>
-
           val invalidForm = dateRangeForm.bind(Map[String, String]("dates.startDate" -> ""))
           errorMessage(view(invalidForm, viewModel)).text() must include("startDate.required")
         }
@@ -119,7 +111,6 @@ class DateRangeViewSpec extends ViewSpec {
       "render the end date required error summary" in {
 
         forAll(dateRangeViewModelGen) { viewModel =>
-
           val invalidForm = dateRangeForm.bind(Map[String, String]("dates.endDate" -> ""))
           errorSummary(view(invalidForm, viewModel)).text() must include("endDate.required")
         }
@@ -128,7 +119,6 @@ class DateRangeViewSpec extends ViewSpec {
       "render the end date required error message" in {
 
         forAll(dateRangeViewModelGen) { viewModel =>
-
           val invalidForm = dateRangeForm.bind(Map[String, String]("dates.endDate" -> ""))
           errorMessage(view(invalidForm, viewModel)).text() must include("endDate.required")
         }

@@ -18,28 +18,25 @@ package controllers
 
 import views.html.ContentPageView
 
-
 class PspDeclarationControllerSpec extends ControllerBaseSpec {
 
   "PspDeclarationController" should {
 
     lazy val viewModel = PspDeclarationController.viewModel(srn)
 
-
     lazy val onPageLoad = routes.PspDeclarationController.onPageLoad(srn)
     lazy val onSubmit = routes.PspDeclarationController.onSubmit(srn)
 
-    behave like renderView(onPageLoad) { implicit app =>
-      implicit request =>
-        val view = injected[ContentPageView]
-        view(viewModel)
-    }
+    behave.like(renderView(onPageLoad) { implicit app => implicit request =>
+      val view = injected[ContentPageView]
+      view(viewModel)
+    })
 
-    behave like journeyRecoveryPage("onPageLoad", onPageLoad)
+    behave.like(journeyRecoveryPage("onPageLoad", onPageLoad))
 
-    behave like agreeAndContinue(onSubmit)
+    behave.like(agreeAndContinue(onSubmit))
 
-    behave like journeyRecoveryPage("onSubmit", onSubmit)
+    behave.like(journeyRecoveryPage("onSubmit", onSubmit))
 
   }
 }

@@ -33,10 +33,10 @@ trait TableFluency {
   implicit class FluentTable(list: Table) {
 
     def withCssClass(className: String): Table =
-      list copy (classes = s"${list.classes} $className")
+      list.copy(classes = s"${list.classes} $className")
 
     def withAttribute(attribute: (String, String)): Table =
-      list copy (attributes = list.attributes + attribute)
+      list.copy(attributes = list.attributes + attribute)
   }
 
   object TableRowViewModel {
@@ -51,7 +51,7 @@ trait TableFluency {
   implicit class FluentTableRow(row: TableRow) {
 
     def withCssClass(className: String): TableRow =
-      row copy (classes = s"${row.classes} $className")
+      row.copy(classes = s"${row.classes} $className")
 
     def bold: TableRow =
       withCssClass("govuk-!-font-weight-bold")

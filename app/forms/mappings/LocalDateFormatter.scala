@@ -25,9 +25,10 @@ import java.time.LocalDate
 import scala.util.{Failure, Success, Try}
 
 private[mappings] class LocalDateFormatter(
-                                            dateFormErrors: DateFormErrors,
-                                            args: Seq[String] = Seq.empty
-                                          ) extends Formatter[LocalDate] with Formatters {
+  dateFormErrors: DateFormErrors,
+  args: Seq[String] = Seq.empty
+) extends Formatter[LocalDate]
+    with Formatters {
 
   private val fieldKeys: List[String] = List("day", "month", "year")
 
@@ -51,7 +52,7 @@ private[mappings] class LocalDateFormatter(
     def runValidators(input: List[Option[String]]): Either[Seq[FormError], Unit] =
       input.flatten match {
         case Nil => Right(())
-        case xs  => Left(xs.map(FormError(key, _)))
+        case xs => Left(xs.map(FormError(key, _)))
       }
 
     val validated = (
@@ -61,18 +62,17 @@ private[mappings] class LocalDateFormatter(
     ).tupled.toEither
 
     for {
-      valid  <- validated
+      valid <- validated
       (day, month, year) = valid
-      date  <- toDate(key, day, month, year)
-      _     <- runValidators(dateFormErrors.validators.map(f => f(date)))
+      date <- toDate(key, day, month, year)
+      _ <- runValidators(dateFormErrors.validators.map(f => f(date)))
     } yield date
   }
 
   override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], LocalDate] = {
 
-    val fields = fieldKeys.filterNot {
-      field =>
-        data.get(s"$key.$field").exists(_.trim.nonEmpty)
+    val fields = fieldKeys.filterNot { field =>
+      data.get(s"$key.$field").exists(_.trim.nonEmpty)
     }
 
     fields match {
@@ -82,7 +82,7 @@ private[mappings] class LocalDateFormatter(
         Left(
           List(
             FormError(s"$key.$f1", dateFormErrors.requiredTwo, List(s"date.$f1.lower", s"date.$f2.lower") ++ args),
-            FormError(s"$key.$f2", dateFormErrors.requiredTwo, List(s"date.$f1.lower", s"date.$f2.lower") ++ args),
+            FormError(s"$key.$f2", dateFormErrors.requiredTwo, List(s"date.$f1.lower", s"date.$f2.lower") ++ args)
           )
         )
       case _ =>

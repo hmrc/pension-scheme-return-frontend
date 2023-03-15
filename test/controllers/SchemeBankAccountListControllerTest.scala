@@ -37,38 +37,43 @@ class SchemeBankAccountListControllerTest extends ControllerBaseSpec {
 
   "SchemeBankAccountSummaryController" should {
 
-    behave like redirectNextPage(onSubmit, "value" -> "false")
+    behave.like(redirectNextPage(onSubmit, "value" -> "false"))
 
     "with 0 bank accounts" must {
-      behave like redirectToPage(onPageLoad, redirectUrlNoBankAccounts)
+      behave.like(redirectToPage(onPageLoad, redirectUrlNoBankAccounts))
     }
 
-    List(1, 9, 10).foreach { case numBankAccount =>
-      s"with $numBankAccount bank account" must {
-        val bankAccounts = buildBankAccounts(numBankAccount)
-        val userAnswers = buildUserAnswers(bankAccounts)
+    List(1, 9, 10).foreach {
+      case numBankAccount =>
+        s"with $numBankAccount bank account" must {
+          val bankAccounts = buildBankAccounts(numBankAccount)
+          val userAnswers = buildUserAnswers(bankAccounts)
 
-        behave like renderView(onPageLoad, userAnswers) { implicit app =>
-          implicit request =>
+          behave.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
             view.apply(form, viewModel(srn, NormalMode, bankAccounts))
+          })
+          behave.like(redirectNextPage(onSubmit, userAnswers, "value" -> "true"))
         }
-        behave like redirectNextPage(onSubmit, userAnswers, "value" -> "true")
-      }
     }
   }
 
   private def view(implicit a: Application): ListView = injected[ListView]
 
-  private def form(implicit a: Application): Form[Boolean] = SchemeBankAccountListController.form(injected[YesNoPageFormProvider])
+  private def form(implicit a: Application): Form[Boolean] =
+    SchemeBankAccountListController.form(injected[YesNoPageFormProvider])
 
   private def schemeBankAccountRedirectUrl(bankAccountIndex: Int): Call =
     controllers.routes.SchemeBankAccountController.onPageLoad(srn, Refined.unsafeApply(bankAccountIndex), NormalMode)
 
-  private def buildBankAccounts(num: Int): List[BankAccount] = (1 to num).map(i => BankAccount(i.toString, accountNumber, sortCode)).toList
+  private def buildBankAccounts(num: Int): List[BankAccount] =
+    (1 to num).map(i => BankAccount(i.toString, accountNumber, sortCode)).toList
 
-  private def buildUserAnswers(bankAccounts: List[BankAccount]): UserAnswers = {
-    bankAccounts.zipWithIndex.foldLeft(defaultUserAnswers) { case (userAnswers, (bankAccount, index)) =>
-      userAnswers.set(SchemeBankAccountPage(srn, refineV[OneToTen](index + 1).toOption.value), bankAccount).success.value
+  private def buildUserAnswers(bankAccounts: List[BankAccount]): UserAnswers =
+    bankAccounts.zipWithIndex.foldLeft(defaultUserAnswers) {
+      case (userAnswers, (bankAccount, index)) =>
+        userAnswers
+          .set(SchemeBankAccountPage(srn, refineV[OneToTen](index + 1).toOption.value), bankAccount)
+          .success
+          .value
     }
-  }
 }

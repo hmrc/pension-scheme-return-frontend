@@ -23,14 +23,14 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
 import viewmodels.DisplayMessage.SimpleMessage
 
 case class RadioListViewModel(
-                               title: SimpleMessage,
-                               heading: SimpleMessage,
-                               description: List[SimpleMessage],
-                               listedContent: List[SimpleMessage],
-                               legend: Option[SimpleMessage],
-                               items: List[RadioListRowViewModel],
-                               onSubmit: Call
-                             )
+  title: SimpleMessage,
+  heading: SimpleMessage,
+  description: List[SimpleMessage],
+  listedContent: List[SimpleMessage],
+  legend: Option[SimpleMessage],
+  items: List[RadioListRowViewModel],
+  onSubmit: Call
+)
 
 object RadioListViewModel {
 
@@ -47,18 +47,17 @@ object RadioListViewModel {
 }
 
 case class RadioListRowViewModel(
-  content : SimpleMessage,
-  value   : String,
-  hint    : Option[SimpleMessage]
+  content: SimpleMessage,
+  value: String,
+  hint: Option[SimpleMessage]
 ) {
 
-  def radioListRow(implicit messages: Messages): RadioItem = {
+  def radioListRow(implicit messages: Messages): RadioItem =
     RadioItem(
       content = Text(content.toMessage),
       value = Some(value),
       hint = hint.map(h => Hint(content = Text(h.toMessage)))
     )
-  }
 }
 
 object RadioListRowViewModel {

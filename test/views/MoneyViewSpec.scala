@@ -45,7 +45,6 @@ class MoneyViewSpec extends ViewSpec with Mappings {
       "render the heading" in {
 
         forAll(moneyViewModelGen) { viewModel =>
-
           h1(view(moneyForm, viewModel)) mustBe viewModel.heading.key
         }
       }
@@ -53,7 +52,6 @@ class MoneyViewSpec extends ViewSpec with Mappings {
       "have form" in {
 
         forAll(moneyViewModelGen) { viewModel =>
-
           form(view(moneyForm, viewModel)).method mustBe viewModel.onSubmit.method
           form(view(moneyForm, viewModel)).action mustBe viewModel.onSubmit.url
         }
@@ -62,7 +60,6 @@ class MoneyViewSpec extends ViewSpec with Mappings {
       "render the required error summary" in {
 
         forAll(moneyViewModelGen) { viewModel =>
-
           val invalidForm = moneyForm.bind(Map("value" -> ""))
           errorSummary(view(invalidForm, viewModel)).text() must include("money.error.required")
         }
@@ -71,7 +68,6 @@ class MoneyViewSpec extends ViewSpec with Mappings {
       "render the start date required error message" in {
 
         forAll(moneyViewModelGen) { viewModel =>
-
           val invalidForm = moneyForm.bind(Map("value" -> ""))
           errorMessage(view(invalidForm, viewModel)).text() must include("money.error.required")
         }

@@ -21,7 +21,13 @@ import models.SchemeId.Srn
 import models.requests.DataRequest
 import play.api.mvc.{ActionBuilder, AnyContent}
 
-class IdentifyAndRequireData @Inject()(identify: IdentifierAction, allowAccess: AllowAccessActionProvider, getData: DataRetrievalAction, requireData: DataRequiredAction) {
+class IdentifyAndRequireData @Inject()(
+  identify: IdentifierAction,
+  allowAccess: AllowAccessActionProvider,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction
+) {
 
-  def apply(srn: Srn): ActionBuilder[DataRequest, AnyContent] = identify andThen allowAccess(srn) andThen getData andThen requireData
+  def apply(srn: Srn): ActionBuilder[DataRequest, AnyContent] =
+    identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData)
 }

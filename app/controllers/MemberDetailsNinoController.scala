@@ -42,45 +42,46 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class MemberDetailsNinoController @Inject()(
-                                         override val messagesApi: MessagesApi,
-                                         navigator: Navigator,
-                                         identifyAndRequireData: IdentifyAndRequireData,
-                                         saveService: SaveService,
-                                         formProvider: TextFormProvider,
-                                         view: TextInputView,
-                                         val controllerComponents: MessagesControllerComponents
-                                       )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+  override val messagesApi: MessagesApi,
+  navigator: Navigator,
+  identifyAndRequireData: IdentifyAndRequireData,
+  saveService: SaveService,
+  formProvider: TextFormProvider,
+  view: TextInputView,
+  val controllerComponents: MessagesControllerComponents
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport {
 
   private def form(details: NameDOB, duplicates: List[Nino] = List()) =
     MemberDetailsNinoController.form(formProvider, details, duplicates)
 
   def onPageLoad(srn: Srn, index: Max99, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-
       request.usingAnswer(MemberDetailsPage(srn, index)).sync { details =>
-
         Ok(view(form(details).fromUserAnswers(MemberDetailsNinoPage(srn, index)), viewModel(srn, index, mode, details)))
       }
   }
 
   def onSubmit(srn: Srn, index: Max99, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
-
       request.usingAnswer(MemberDetailsPage(srn, index)).async { details =>
-
         val duplicates = duplicateNinos(srn, index)
 
-        form(details, duplicates).bindFromRequest().fold(
-          formWithErrors => Future.successful(
-            BadRequest(view(formWithErrors, viewModel(srn, index, mode, details)))
-          ),
-          answer => {
-            for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(MemberDetailsNinoPage(srn, index), answer))
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(MemberDetailsNinoPage(srn, index), mode, updatedAnswers))
-          }
-        )
+        form(details, duplicates)
+          .bindFromRequest()
+          .fold(
+            formWithErrors =>
+              Future.successful(
+                BadRequest(view(formWithErrors, viewModel(srn, index, mode, details)))
+              ),
+            answer => {
+              for {
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(MemberDetailsNinoPage(srn, index), answer))
+                _ <- saveService.save(updatedAnswers)
+              } yield Redirect(navigator.nextPage(MemberDetailsNinoPage(srn, index), mode, updatedAnswers))
+            }
+          )
       }
   }
 
@@ -89,13 +90,14 @@ class MemberDetailsNinoController @Inject()(
 }
 
 object MemberDetailsNinoController {
-  def form(formProvider: TextFormProvider, memberDetails: NameDOB, duplicates: List[Nino]): Form[Nino] = formProvider.nino(
-    "memberDetailsNino.error.required",
-    "memberDetailsNino.error.invalid",
-    duplicates,
-    "memberDetailsNino.error.duplicate",
-    memberDetails.fullName
-  )
+  def form(formProvider: TextFormProvider, memberDetails: NameDOB, duplicates: List[Nino]): Form[Nino] =
+    formProvider.nino(
+      "memberDetailsNino.error.required",
+      "memberDetailsNino.error.invalid",
+      duplicates,
+      "memberDetailsNino.error.duplicate",
+      memberDetails.fullName
+    )
 
   def viewModel(srn: Srn, index: Max99, mode: Mode, memberDetails: NameDOB): TextInputViewModel = TextInputViewModel(
     SimpleMessage("memberDetailsNino.title"),

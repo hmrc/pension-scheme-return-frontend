@@ -41,41 +41,42 @@ import views.html.BankAccountView
 import scala.concurrent.{ExecutionContext, Future}
 
 class SchemeBankAccountController @Inject()(
-                                             override val messagesApi: MessagesApi,
-                                             navigator: Navigator,
-                                             identify: IdentifierAction,
-                                             allowAccess: AllowAccessActionProvider,
-                                             getData: DataRetrievalAction,
-                                             requireData: DataRequiredAction,
-                                             val controllerComponents: MessagesControllerComponents,
-                                             view: BankAccountView,
-                                             formProvider: BankAccountFormProvider,
-                                             saveService: SaveService,
-                                           )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+  override val messagesApi: MessagesApi,
+  navigator: Navigator,
+  identify: IdentifierAction,
+  allowAccess: AllowAccessActionProvider,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  val controllerComponents: MessagesControllerComponents,
+  view: BankAccountView,
+  formProvider: BankAccountFormProvider,
+  saveService: SaveService
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport {
 
   private def form(usedAccountNumbers: List[String] = List()) =
     SchemeBankAccountController.form(formProvider, usedAccountNumbers)
 
   def onPageLoad(srn: Srn, index: Max10, mode: Mode): Action[AnyContent] =
-    (identify andThen allowAccess(srn) andThen getData andThen requireData) {
-      implicit request =>
-        val maybeBankAccount = request.userAnswers.get(SchemeBankAccountPage(srn, index))
-        val preparedForm = maybeBankAccount.fold(form())(form().fill)
-        Ok(view(preparedForm, viewModel(srn, index, mode)))
+    identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData) { implicit request =>
+      val maybeBankAccount = request.userAnswers.get(SchemeBankAccountPage(srn, index))
+      val preparedForm = maybeBankAccount.fold(form())(form().fill)
+      Ok(view(preparedForm, viewModel(srn, index, mode)))
     }
 
   def onSubmit(srn: Srn, index: Max10, mode: Mode): Action[AnyContent] =
-    (identify andThen allowAccess(srn) andThen getData andThen requireData).async {
-      implicit request =>
+    identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData).async { implicit request =>
+      val usedAccountNumbers = duplicateAccountNumbers(srn, index)
 
-        val usedAccountNumbers = duplicateAccountNumbers(srn, index)
-
-        form(usedAccountNumbers).bindFromRequest().fold(
+      form(usedAccountNumbers)
+        .bindFromRequest()
+        .fold(
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode)))),
           value => {
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(SchemeBankAccountPage(srn, index), value))
-              _              <- saveService.save(updatedAnswers)
+              _ <- saveService.save(updatedAnswers)
             } yield Redirect(navigator.nextPage(SchemeBankAccountPage(srn, index), mode, updatedAnswers))
           }
         )
@@ -85,8 +86,7 @@ class SchemeBankAccountController @Inject()(
     srn: Srn,
     index: Max10
   )(implicit request: DataRequest[_]): List[String] =
-    request
-      .userAnswers
+    request.userAnswers
       .schemeBankAccounts(srn)
       .removeAt(index.arrayIndex)
       .map(_.accountNumber)

@@ -28,48 +28,69 @@ trait Mappings extends Formatters with Constraints {
   protected def text(errorKey: String = "error.required", args: Seq[Any] = Seq.empty): FieldMapping[String] =
     of(stringFormatter(errorKey, args))
 
-  protected def int(requiredKey: String = "error.required",
-                    wholeNumberKey: String = "error.wholeNumber",
-                    nonNumericKey: String = "error.nonNumeric",
-                    args: Seq[String] = Seq.empty): FieldMapping[Int] =
+  protected def int(
+    requiredKey: String = "error.required",
+    wholeNumberKey: String = "error.wholeNumber",
+    nonNumericKey: String = "error.nonNumeric",
+    args: Seq[String] = Seq.empty
+  ): FieldMapping[Int] =
     of(intFormatter(requiredKey, wholeNumberKey, nonNumericKey, args))
 
-  protected def double(requiredKey: String = "error.required",
-                       nonNumericKey: String = "error.nonNumeric",
-                       max: (Double, String) = (Double.MaxValue, "error.tooLarge"),
-                       args: Seq[String] = Seq.empty): FieldMapping[Double] =
+  protected def double(
+    requiredKey: String = "error.required",
+    nonNumericKey: String = "error.nonNumeric",
+    max: (Double, String) = (Double.MaxValue, "error.tooLarge"),
+    args: Seq[String] = Seq.empty
+  ): FieldMapping[Double] =
     of(doubleFormatter(requiredKey, nonNumericKey, max, args))
 
-  protected def money(requiredKey: String = "error.required",
-                       nonNumericKey: String = "error.nonMoney",
-                       max: (Double, String) = (Double.MaxValue, "error.tooLarge"),
-                       args: Seq[String] = Seq.empty): FieldMapping[Money] =
+  protected def money(
+    requiredKey: String = "error.required",
+    nonNumericKey: String = "error.nonMoney",
+    max: (Double, String) = (Double.MaxValue, "error.tooLarge"),
+    args: Seq[String] = Seq.empty
+  ): FieldMapping[Money] =
     of(moneyFormatter(requiredKey, nonNumericKey, max, args))
 
-  protected def boolean(requiredKey: String = "error.required",
-                        invalidKey: String = "error.boolean",
-                        args: Seq[String] = Seq.empty): FieldMapping[Boolean] =
+  protected def boolean(
+    requiredKey: String = "error.required",
+    invalidKey: String = "error.boolean",
+    args: Seq[String] = Seq.empty
+  ): FieldMapping[Boolean] =
     of(booleanFormatter(requiredKey, invalidKey, args))
 
-
-  protected def enumerable[A](requiredKey: String = "error.required",
-                              invalidKey: String = "error.invalid",
-                              args: Seq[String] = Seq.empty)(implicit ev: Enumerable[A]): FieldMapping[A] =
+  protected def enumerable[A](
+    requiredKey: String = "error.required",
+    invalidKey: String = "error.invalid",
+    args: Seq[String] = Seq.empty
+  )(implicit ev: Enumerable[A]): FieldMapping[A] =
     of(enumerableFormatter[A](requiredKey, invalidKey, args))
 
-  protected def localDate(dateFormErrors: DateFormErrors,
-                          args: Seq[String] = Seq.empty): FieldMapping[LocalDate] =
+  protected def localDate(dateFormErrors: DateFormErrors, args: Seq[String] = Seq.empty): FieldMapping[LocalDate] =
     of(new LocalDateFormatter(dateFormErrors, args))
 
-  protected def dateRange(startDateErrors: DateFormErrors,
-                          endDateErrors: DateFormErrors,
-                          invalidRangeError: String,
-                          allowedRange: Option[DateRange],
-                          startDateAllowedDateRangeError: Option[String],
-                          endDateAllowedDateRangeError: Option[String],
-                          duplicateRangeError: Option[String],
-                          duplicateRanges: List[DateRange]): FieldMapping[DateRange] =
-    of(new DateRangeFormatter(startDateErrors, endDateErrors, invalidRangeError, allowedRange, startDateAllowedDateRangeError, endDateAllowedDateRangeError, duplicateRangeError, duplicateRanges))
+  protected def dateRange(
+    startDateErrors: DateFormErrors,
+    endDateErrors: DateFormErrors,
+    invalidRangeError: String,
+    allowedRange: Option[DateRange],
+    startDateAllowedDateRangeError: Option[String],
+    endDateAllowedDateRangeError: Option[String],
+    duplicateRangeError: Option[String],
+    duplicateRanges: List[DateRange]
+  ): FieldMapping[DateRange] =
+    of(
+      new DateRangeFormatter(
+        startDateErrors,
+        endDateErrors,
+        invalidRangeError,
+        allowedRange,
+        startDateAllowedDateRangeError,
+        endDateAllowedDateRangeError,
+        duplicateRangeError,
+        duplicateRanges
+      )
+    )
 
   protected def verify[A](errorKey: String, pred: A => Boolean, args: Any*): Constraint[A] =
     Constraint[A] { (a: A) =>

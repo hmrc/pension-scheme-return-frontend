@@ -38,47 +38,49 @@ class MemberDetailsNinoControllerSpec extends ControllerBaseSpec {
     lazy val onPageLoad = routes.MemberDetailsNinoController.onPageLoad(srn, refineMV(1), NormalMode)
     lazy val onSubmit = routes.MemberDetailsNinoController.onSubmit(srn, refineMV(1), NormalMode)
 
-    behave like renderView(onPageLoad, populatedUserAnswers) { implicit app => implicit request =>
+    behave.like(renderView(onPageLoad, populatedUserAnswers) { implicit app => implicit request =>
       val view = injected[TextInputView]
       view(form, viewModel)
-    }
+    })
 
-    behave like renderPrePopView(onPageLoad, MemberDetailsNinoPage(srn, refineMV(1)), validNino, populatedUserAnswers) {
+    behave.like(renderPrePopView(onPageLoad, MemberDetailsNinoPage(srn, refineMV(1)), validNino, populatedUserAnswers) {
       implicit app => implicit request =>
         val view = injected[TextInputView]
         view(form.fill(validNino), viewModel)
-    }
+    })
 
-    behave like journeyRecoveryPage("onPageLoad", onPageLoad)
+    behave.like(journeyRecoveryPage("onPageLoad", onPageLoad))
 
     "when no member details exists for onPageLoad" when {
 
-      behave like redirectWhenCacheEmpty(onPageLoad, routes.JourneyRecoveryController.onPageLoad())
+      behave.like(redirectWhenCacheEmpty(onPageLoad, routes.JourneyRecoveryController.onPageLoad()))
     }
 
     "when no member details exists for onSubmit" when {
 
-      behave like redirectWhenCacheEmpty(onSubmit, routes.JourneyRecoveryController.onPageLoad())
+      behave.like(redirectWhenCacheEmpty(onSubmit, routes.JourneyRecoveryController.onPageLoad()))
     }
 
-    behave like saveAndContinue(onSubmit, populatedUserAnswers, formData(form, validNino): _*)
-    
-    behave like invalidForm(onSubmit, populatedUserAnswers)
+    behave.like(saveAndContinue(onSubmit, populatedUserAnswers, formData(form, validNino): _*))
 
-    behave like journeyRecoveryPage("onSubmit", onSubmit)
+    behave.like(invalidForm(onSubmit, populatedUserAnswers))
+
+    behave.like(journeyRecoveryPage("onSubmit", onSubmit))
 
     "allow nino to be updated" when {
       val userAnswers = populatedUserAnswers.set(MemberDetailsNinoPage(srn, refineMV(1)), validNino).get
-      behave like saveAndContinue(onSubmit, userAnswers, formData(form, validNino): _*)
+      behave.like(saveAndContinue(onSubmit, userAnswers, formData(form, validNino): _*))
     }
 
     "return a 400 if nino has already been entered" when {
       val userAnswers =
         populatedUserAnswers
-          .set(MemberDetailsNinoPage(srn, refineMV(1)), otherValidNino).get
-          .set(MemberDetailsNinoPage(srn, refineMV(2)), validNino).get
+          .set(MemberDetailsNinoPage(srn, refineMV(1)), otherValidNino)
+          .get
+          .set(MemberDetailsNinoPage(srn, refineMV(2)), validNino)
+          .get
 
-      behave like invalidForm(onSubmit, userAnswers, formData(form, validNino): _*)
+      behave.like(invalidForm(onSubmit, userAnswers, formData(form, validNino): _*))
     }
   }
 }

@@ -27,14 +27,12 @@ class SessionDataSpec extends BaseSpec with ScalaCheckPropertyChecks {
     "successfully read from json" in {
 
       forAll(pensionSchemeUserGen) { user =>
-
         Json.toJson(user).as[PensionSchemeUser] mustBe user
       }
     }
 
     "fail to read unknown json" in {
       forAll(nonEmptyString) { user =>
-
         JsString(user).asOpt[PensionSchemeUser] mustBe None
       }
     }

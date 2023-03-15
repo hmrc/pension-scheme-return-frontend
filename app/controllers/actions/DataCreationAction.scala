@@ -24,10 +24,11 @@ import repositories.SessionRepository
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class DataCreationActionImpl @Inject()(sessionRepository: SessionRepository)(implicit val executionContext: ExecutionContext) extends DataCreationAction {
+class DataCreationActionImpl @Inject()(sessionRepository: SessionRepository)(
+  implicit val executionContext: ExecutionContext
+) extends DataCreationAction {
 
-  override protected def transform[A](request: OptionalDataRequest[A]): Future[DataRequest[A]] = {
-
+  override protected def transform[A](request: OptionalDataRequest[A]): Future[DataRequest[A]] =
     request.userAnswers match {
       case None =>
         val userAnswersKey = request.getUserId + request.schemeDetails.srn
@@ -36,7 +37,6 @@ class DataCreationActionImpl @Inject()(sessionRepository: SessionRepository)(imp
       case Some(data) =>
         Future.successful(DataRequest(request.request, data))
     }
-  }
 }
 
 trait DataCreationAction extends ActionTransformer[OptionalDataRequest, DataRequest]

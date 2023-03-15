@@ -79,7 +79,8 @@ lazy val root = (project in file("."))
       streams.value.log.info("Running migrate script")
       val scriptPath = baseDirectory.value.getCanonicalPath + "/migrate.sh"
       s"bash -c $scriptPath".!
-    }
+    },
+    scalafmtOnCompile := true
   )
 
 lazy val testSettings: Seq[Def.Setting[_]] = Seq(

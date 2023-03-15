@@ -72,44 +72,38 @@ class IdentifierActionSpec extends BaseSpec with StubPlayBodyParsersFactory {
   val pspEnrolment: Enrolment =
     Enrolment(Constants.pspEnrolmentKey, Seq(EnrolmentIdentifier(Constants.pspIdKey, "A000001")), "Activated")
 
-  override def beforeEach(): Unit = {
+  override def beforeEach(): Unit =
     reset(mockAuthConnector, mockSessionDataCacheConnector)
-  }
 
   def setAuthValue(value: Option[String] ~ Option[String] ~ Enrolments): Unit =
     setAuthValue(Future.successful(value))
 
-  def setAuthValue[A](value: Future[A]): Unit = {
+  def setAuthValue[A](value: Future[A]): Unit =
     when(mockAuthConnector.authorise[A](any(), any())(any(), any()))
       .thenReturn(value)
-  }
 
   def setSessionValue(value: Option[SessionData]): Unit =
     setSessionValue(Future.successful(value))
 
-  def setSessionValue(value: Future[Option[SessionData]]): Unit = {
+  def setSessionValue(value: Future[Option[SessionData]]): Unit =
     when(mockSessionDataCacheConnector.fetch(any())(any(), any()))
       .thenReturn(value)
-  }
 
   "IdentifierAction" should {
     "return an unauthorised result" when {
 
-      "Redirect user to sign in page when user is not signed in to GG" in runningApplication {
-        implicit app =>
+      "Redirect user to sign in page when user is not signed in to GG" in runningApplication { implicit app =>
+        setAuthValue(Future.failed(new NoActiveSession("No user signed in") {}))
 
-          setAuthValue(Future.failed(new NoActiveSession("No user signed in") {}))
+        val result = handler.run(FakeRequest())
+        val continueUrl = urlEncode(appConfig.urls.loginContinueUrl)
+        val expectedUrl = s"${appConfig.urls.loginUrl}?continue=$continueUrl"
 
-          val result = handler.run(FakeRequest())
-          val continueUrl = urlEncode(appConfig.urls.loginContinueUrl)
-          val expectedUrl = s"${appConfig.urls.loginUrl}?continue=$continueUrl"
-
-          redirectLocation(result) mustBe Some(expectedUrl)
+        redirectLocation(result) mustBe Some(expectedUrl)
       }
 
       "Redirect user to manage pension scheme when authorise fails to match predicate" in runningApplication {
         implicit app =>
-
           setAuthValue(Future.failed(new AuthorisationException("Authorise predicate fails") {}))
 
           val result = handler.run(FakeRequest())
@@ -118,31 +112,26 @@ class IdentifierActionSpec extends BaseSpec with StubPlayBodyParsersFactory {
           redirectLocation(result) mustBe Some(expectedUrl)
       }
 
-      "Redirect to unauthorised page when user does not have an external id" in runningApplication {
-        implicit app =>
+      "Redirect to unauthorised page when user does not have an external id" in runningApplication { implicit app =>
+        setAuthValue(authResult(Some("id"), None, psaEnrolment))
 
-          setAuthValue(authResult(Some("id"), None, psaEnrolment))
+        val result = handler.run(FakeRequest())
+        val expectedUrl = routes.UnauthorisedController.onPageLoad.url
 
-          val result = handler.run(FakeRequest())
-          val expectedUrl = routes.UnauthorisedController.onPageLoad.url
-
-          redirectLocation(result) mustBe Some(expectedUrl)
+        redirectLocation(result) mustBe Some(expectedUrl)
       }
 
-      "Redirect to unauthorised page when user does not have an internal id" in runningApplication {
-        implicit app =>
+      "Redirect to unauthorised page when user does not have an internal id" in runningApplication { implicit app =>
+        setAuthValue(authResult(None, Some("id"), psaEnrolment))
 
-          setAuthValue(authResult(None, Some("id"), psaEnrolment))
+        val result = handler.run(FakeRequest())
+        val expectedUrl = routes.UnauthorisedController.onPageLoad.url
 
-          val result = handler.run(FakeRequest())
-          val expectedUrl = routes.UnauthorisedController.onPageLoad.url
-
-          redirectLocation(result) mustBe Some(expectedUrl)
+        redirectLocation(result) mustBe Some(expectedUrl)
       }
 
       "Redirect user to manage pension scheme when user does not have a psa or psp enrolment" in runningApplication {
         implicit app =>
-
           setAuthValue(authResult(Some("internalId"), Some("externalId")))
 
           val result = handler.run(FakeRequest())
@@ -153,7 +142,6 @@ class IdentifierActionSpec extends BaseSpec with StubPlayBodyParsersFactory {
 
       "Redirect user to admin or practitioner page" when {
         "user has both psa and psp enrolment but nothing is in the cache" in runningApplication { implicit app =>
-
           setAuthValue(authResult(Some("internalId"), Some("externalId"), psaEnrolment, pspEnrolment))
           setSessionValue(None)
 
@@ -167,7 +155,6 @@ class IdentifierActionSpec extends BaseSpec with StubPlayBodyParsersFactory {
 
     "return an IdentifierRequest" when {
       "User has a psa enrolment" in runningApplication { implicit app =>
-
         setAuthValue(authResult(Some("internalId"), Some("externalId"), psaEnrolment))
 
         val result = handler.run(FakeRequest())
@@ -180,7 +167,6 @@ class IdentifierActionSpec extends BaseSpec with StubPlayBodyParsersFactory {
       }
 
       "User has a psp enrolment" in runningApplication { implicit app =>
-
         setAuthValue(authResult(Some("internalId"), Some("externalId"), pspEnrolment))
 
         val result = handler.run(FakeRequest())
@@ -193,7 +179,6 @@ class IdentifierActionSpec extends BaseSpec with StubPlayBodyParsersFactory {
       }
 
       "User has a both psa and psp enrolment with admin stored in cache" in runningApplication { implicit app =>
-
         setAuthValue(authResult(Some("internalId"), Some("externalId"), psaEnrolment, pspEnrolment))
         setSessionValue(Some(SessionData(Administrator)))
 
@@ -207,7 +192,6 @@ class IdentifierActionSpec extends BaseSpec with StubPlayBodyParsersFactory {
       }
 
       "User has a both psa and psp enrolment with practitioner stored in cache" in runningApplication { implicit app =>
-
         setAuthValue(authResult(Some("internalId"), Some("externalId"), psaEnrolment, pspEnrolment))
         setSessionValue(Some(SessionData(Practitioner)))
 

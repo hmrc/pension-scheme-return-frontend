@@ -35,23 +35,23 @@ class WhichTaxYearControllerSpec extends ControllerBaseSpec {
 
     val testDate = Gen.oneOf(allDates.toList).sample.value._2
 
-    behave like renderView(onPageLoad) { implicit app => implicit request =>
+    behave.like(renderView(onPageLoad) { implicit app => implicit request =>
       val view = injected[RadioListView]
       view(radioListForm, viewModel)
-    }
+    })
 
-    behave like renderPrePopView(onPageLoad, WhichTaxYearPage(srn), testDate) { implicit app => implicit request =>
+    behave.like(renderPrePopView(onPageLoad, WhichTaxYearPage(srn), testDate) { implicit app => implicit request =>
       val view = injected[RadioListView]
       view(radioListForm.fill(testDate), viewModel)
-    }
+    })
 
-    behave like journeyRecoveryPage("onPageLoad", onPageLoad)
+    behave.like(journeyRecoveryPage("onPageLoad", onPageLoad))
 
-    behave like invalidForm(onSubmit, "value" -> "invalid data")
+    behave.like(invalidForm(onSubmit, "value" -> "invalid data"))
 
-    behave like saveAndContinue(onSubmit, "value" -> testDate.toString)
+    behave.like(saveAndContinue(onSubmit, "value" -> testDate.toString))
 
-    behave like journeyRecoveryPage("onSubmit", onSubmit)
+    behave.like(journeyRecoveryPage("onSubmit", onSubmit))
   }
 
   "WhichTaxYearController.options" should {

@@ -48,31 +48,31 @@ class HowMuchCashController @Inject()(
   formProvider: MoneyFormProvider,
   saveService: SaveService,
   taxYearService: TaxYearService
-)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport {
 
   def taxYear = taxYearService.current
 
-  def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
-    implicit request =>
+  def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
+    val form = HowMuchCashController.form(formProvider, request.schemeDetails.schemeName, taxYear)
+    val viewModel = HowMuchCashController.viewModel(srn, mode, request.schemeDetails.schemeName, taxYear)
 
-      val form = HowMuchCashController.form(formProvider, request.schemeDetails.schemeName, taxYear)
-      val viewModel = HowMuchCashController.viewModel(srn, mode, request.schemeDetails.schemeName, taxYear)
-
-      Ok(view(form.fromUserAnswers(HowMuchCashPage(srn)), viewModel))
+    Ok(view(form.fromUserAnswers(HowMuchCashPage(srn)), viewModel))
   }
 
-  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
-    implicit request =>
+  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
+    val form = HowMuchCashController.form(formProvider, request.schemeDetails.schemeName, taxYear)
+    val viewModel = HowMuchCashController.viewModel(srn, mode, request.schemeDetails.schemeName, taxYear)
 
-      val form = HowMuchCashController.form(formProvider, request.schemeDetails.schemeName, taxYear)
-      val viewModel = HowMuchCashController.viewModel(srn, mode, request.schemeDetails.schemeName, taxYear)
-
-      form.bindFromRequest().fold(
+    form
+      .bindFromRequest()
+      .fold(
         formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel))),
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(HowMuchCashPage(srn), value))
-            _              <- saveService.save(updatedAnswers)
+            _ <- saveService.save(updatedAnswers)
           } yield Redirect(navigator.nextPage(HowMuchCashPage(srn), mode, updatedAnswers))
       )
   }

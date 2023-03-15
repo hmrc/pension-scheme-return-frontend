@@ -19,12 +19,11 @@ package viewmodels.models
 import play.api.mvc.Call
 import viewmodels.DisplayMessage._
 
-
 case class PensionSchemeViewModel(
-                                   title: SimpleMessage,
-                                   heading: SimpleMessage,
-                                   onSubmit : Call
-                                 )
+  title: SimpleMessage,
+  heading: SimpleMessage,
+  onSubmit: Call
+)
 
 object PensionSchemeViewModel {
   def apply(title: String, heading: String, onSubmit: Call): PensionSchemeViewModel =

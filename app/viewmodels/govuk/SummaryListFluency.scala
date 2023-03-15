@@ -33,37 +33,37 @@ trait SummaryListFluency {
   implicit class FluentSummaryList(list: SummaryList) {
 
     def withoutBorders(): SummaryList =
-      list copy (classes = s"${list.classes} govuk-summary-list--no-border")
+      list.copy(classes = s"${list.classes} govuk-summary-list--no-border")
 
     def withCssClass(className: String): SummaryList =
-      list copy (classes = s"${list.classes} $className")
+      list.copy(classes = s"${list.classes} $className")
 
     def withAttribute(attribute: (String, String)): SummaryList =
-      list copy (attributes = list.attributes + attribute)
+      list.copy(attributes = list.attributes + attribute)
   }
 
   object SummaryListRowViewModel {
 
     def apply(
-               key: Key,
-               value: Value
-             ): SummaryListRow =
+      key: Key,
+      value: Value
+    ): SummaryListRow =
       SummaryListRow(
         key = key,
         value = value
       )
 
     def apply(
-               key: Html,
-               actions: Seq[ActionItem]
-             ): SummaryListRow =
+      key: Html,
+      actions: Seq[ActionItem]
+    ): SummaryListRow =
       apply(Key(HtmlContent(key)), Value(), actions)
 
     def apply(
-               key: Key,
-               value: Value,
-               actions: Seq[ActionItem]
-             ): SummaryListRow =
+      key: Key,
+      value: Value,
+      actions: Seq[ActionItem]
+    ): SummaryListRow =
       SummaryListRow(
         key = key,
         value = value,
@@ -71,10 +71,10 @@ trait SummaryListFluency {
       )
 
     def apply(
-               key: String,
-               value: String,
-               actions: Seq[ActionItem]
-             ): SummaryListRow =
+      key: String,
+      value: String,
+      actions: Seq[ActionItem]
+    ): SummaryListRow =
       SummaryListRow(
         key = Key(Text(key)),
         value = Value(Text(value)),
@@ -85,24 +85,24 @@ trait SummaryListFluency {
   implicit class FluentSummaryListRow(row: SummaryListRow) {
 
     def withCssClass(className: String): SummaryListRow =
-      row copy (classes = s"${row.classes} $className")
+      row.copy(classes = s"${row.classes} $className")
 
     def withAction(item: ActionItem): SummaryListRow = {
       val actions = row.actions.map(a => a.copy(items = a.items :+ item))
 
-      row.copy(actions = actions orElse Some(Actions(items = Seq(item))))
+      row.copy(actions = actions.orElse(Some(Actions(items = Seq(item)))))
     }
   }
 
   object ActionItemViewModel {
 
     def apply(
-               content: Content,
-               href: String
-             ): ActionItem =
+      content: Content,
+      href: String
+    ): ActionItem =
       ActionItem(
         content = content,
-        href    = href
+        href = href
       )
 
     def apply(html: Html, href: String): ActionItem = apply(HtmlContent(html), href)
@@ -111,13 +111,13 @@ trait SummaryListFluency {
   implicit class FluentActionItem(actionItem: ActionItem) {
 
     def withVisuallyHiddenText(text: String): ActionItem =
-      actionItem copy (visuallyHiddenText = Some(text))
+      actionItem.copy(visuallyHiddenText = Some(text))
 
     def withCssClass(className: String): ActionItem =
-      actionItem copy (classes = s"${actionItem.classes} $className")
+      actionItem.copy(classes = s"${actionItem.classes} $className")
 
     def withAttribute(attribute: (String, String)): ActionItem =
-      actionItem copy (attributes = actionItem.attributes + attribute)
+      actionItem.copy(attributes = actionItem.attributes + attribute)
   }
 
   object KeyViewModel {
@@ -132,7 +132,7 @@ trait SummaryListFluency {
   implicit class FluentKey(key: Key) {
 
     def withCssClass(className: String): Key =
-      key copy (classes = s"${key.classes} $className")
+      key.copy(classes = s"${key.classes} $className")
 
     def withRegularFont: Key =
       withCssClass("govuk-!-font-weight-regular")
@@ -147,6 +147,6 @@ trait SummaryListFluency {
   implicit class FluentValue(value: Value) {
 
     def withCssClass(className: String): Value =
-      value copy (classes = s"${value.classes} $className")
+      value.copy(classes = s"${value.classes} $className")
   }
 }

@@ -18,7 +18,17 @@ package generators
 
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
-import org.scalacheck.Gen.{alphaChar, alphaNumChar, alphaNumStr, alphaStr, choose, chooseNum, listOfN, nonEmptyListOf, numChar}
+import org.scalacheck.Gen.{
+  alphaChar,
+  alphaNumChar,
+  alphaNumStr,
+  alphaStr,
+  choose,
+  chooseNum,
+  listOfN,
+  nonEmptyListOf,
+  numChar
+}
 import play.api.mvc.Call
 import viewmodels.DisplayMessage.SimpleMessage
 
@@ -26,10 +36,7 @@ import java.time.{Instant, LocalDate, ZoneOffset}
 
 trait BasicGenerators {
 
-  def genIntersperseString(gen: Gen[String],
-                           value: String,
-                           frequencyV: Int = 1,
-                           frequencyN: Int = 10): Gen[String] = {
+  def genIntersperseString(gen: Gen[String], value: String, frequencyV: Int = 1, frequencyN: Int = 10): Gen[String] = {
 
     val genValue: Gen[Option[String]] = Gen.frequency(frequencyN -> None, frequencyV -> Gen.const(Some(value)))
 
@@ -52,13 +59,13 @@ trait BasicGenerators {
   }
 
   def intsLargerThanMaxValue: Gen[BigInt] =
-    arbitrary[BigInt] suchThat (x => x > Int.MaxValue)
+    arbitrary[BigInt].suchThat(x => x > Int.MaxValue)
 
   def intsSmallerThanMinValue: Gen[BigInt] =
-    arbitrary[BigInt] suchThat (x => x < Int.MinValue)
+    arbitrary[BigInt].suchThat(x => x < Int.MinValue)
 
   def nonNumerics: Gen[String] =
-    alphaStr suchThat (_.nonEmpty)
+    alphaStr.suchThat(_.nonEmpty)
 
   def decimals: Gen[String] =
     arbitrary[BigDecimal]
@@ -67,13 +74,13 @@ trait BasicGenerators {
       .map(_.bigDecimal.toPlainString)
 
   def intsBelowValue(value: Int): Gen[Int] =
-    arbitrary[Int] suchThat (_ < value)
+    arbitrary[Int].suchThat(_ < value)
 
   def intsAboveValue(value: Int): Gen[Int] =
-    arbitrary[Int] suchThat (_ > value)
+    arbitrary[Int].suchThat(_ > value)
 
   def intsOutsideRange(min: Int, max: Int): Gen[Int] =
-    arbitrary[Int] suchThat (x => x < min || x > max)
+    arbitrary[Int].suchThat(x => x < min || x > max)
 
   def nonBooleans: Gen[String] =
     arbitrary[String]
@@ -110,19 +117,20 @@ trait BasicGenerators {
   def stringsWithMaxLength(maxLength: Int): Gen[String] =
     stringLengthBetween(1, maxLength, alphaChar)
 
-  def stringsLongerThan(minLength: Int): Gen[String] = for {
-    maxLength <- Gen.const((minLength * 2).max(100))
-    length    <- Gen.chooseNum(minLength + 1, maxLength)
-    chars     <- listOfN(length, arbitrary[Char])
-  } yield chars.mkString
+  def stringsLongerThan(minLength: Int): Gen[String] =
+    for {
+      maxLength <- Gen.const((minLength * 2).max(100))
+      length <- Gen.chooseNum(minLength + 1, maxLength)
+      chars <- listOfN(length, arbitrary[Char])
+    } yield chars.mkString
 
   def stringsExceptSpecificValues(excluded: Seq[String]): Gen[String] =
-    nonEmptyString suchThat (!excluded.contains(_))
+    nonEmptyString.suchThat(!excluded.contains(_))
 
   def stringContains(value: String): Gen[String] =
     for {
-      s      <- nonEmptyString
-      i      <- chooseNum(0, s.length)
+      s <- nonEmptyString
+      i <- chooseNum(0, s.length)
       (l, r) = s.splitAt(i)
     } yield s"$l$value$r"
 
@@ -134,9 +142,8 @@ trait BasicGenerators {
     def toMillis(date: LocalDate): Long =
       date.atStartOfDay.atZone(ZoneOffset.UTC).toInstant.toEpochMilli
 
-    Gen.choose(toMillis(min), toMillis(max)).map {
-      millis =>
-        Instant.ofEpochMilli(millis).atOffset(ZoneOffset.UTC).toLocalDate
+    Gen.choose(toMillis(min), toMillis(max)).map { millis =>
+      Instant.ofEpochMilli(millis).atOffset(ZoneOffset.UTC).toLocalDate
     }
   }
 
@@ -162,8 +169,8 @@ trait BasicGenerators {
 
   val email: Gen[String] =
     for {
-      username  <- nonEmptyString
-      domain    <- nonEmptyString
+      username <- nonEmptyString
+      domain <- nonEmptyString
       topDomain <- topLevelDomain
     } yield s"$username@$domain.$topDomain"
 
@@ -182,7 +189,7 @@ trait BasicGenerators {
   val call: Gen[Call] = {
     for {
       method <- httpMethod
-      url    <- relativeUrl
+      url <- relativeUrl
     } yield Call(method, url)
   }
 }

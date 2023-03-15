@@ -42,18 +42,18 @@ class NameDOBViewSpec extends ViewSpec {
         "memberDetails.dateOfBirth.error.required.year",
         "memberDetails.dateOfBirth.error.required.two",
         "memberDetails.dateOfBirth.error.invalid.date",
-        "memberDetails.dateOfBirth.error.invalid.characters",
+        "memberDetails.dateOfBirth.error.invalid.characters"
       )
     )
 
     "NameDOBView" should {
-      behave like renderTitle(nameDOBViewModelGen)(view(form, _), _.title.key)
-      behave like renderHeading(nameDOBViewModelGen)(view(form, _), _.heading)
-      behave like renderInputWithLabel(nameDOBViewModelGen)("firstName", view(form, _), _.firstName)
-      behave like renderInputWithLabel(nameDOBViewModelGen)("lastName", view(form, _), _.lastName)
-      behave like renderForm(nameDOBViewModelGen)(view(form, _), _.onSubmit)
-      behave like renderDateInput(nameDOBViewModelGen)("dateOfBirth", view(form, _))
-      behave like renderSaveAndContinueButton(nameDOBViewModelGen)(view(form, _))
+      behave.like(renderTitle(nameDOBViewModelGen)(view(form, _), _.title.key))
+      behave.like(renderHeading(nameDOBViewModelGen)(view(form, _), _.heading))
+      behave.like(renderInputWithLabel(nameDOBViewModelGen)("firstName", view(form, _), _.firstName))
+      behave.like(renderInputWithLabel(nameDOBViewModelGen)("lastName", view(form, _), _.lastName))
+      behave.like(renderForm(nameDOBViewModelGen)(view(form, _), _.onSubmit))
+      behave.like(renderDateInput(nameDOBViewModelGen)("dateOfBirth", view(form, _)))
+      behave.like(renderSaveAndContinueButton(nameDOBViewModelGen)(view(form, _)))
     }
   }
 }

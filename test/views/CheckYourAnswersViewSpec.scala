@@ -25,21 +25,19 @@ import views.html.CheckYourAnswersView
 class CheckYourAnswersViewSpec extends ViewSpec {
 
   runningApplication { implicit app =>
-
     val view = injected[CheckYourAnswersView]
 
     implicit val request = FakeRequest()
 
     "CheckYourAnswerView" should {
 
-      behave like renderTitle(checkYourAnswersViewModelGen)(view(_), _.title.key)
-      behave like renderHeading(checkYourAnswersViewModelGen)(view(_), _.heading)
-      behave like renderSaveAndContinueButton(checkYourAnswersViewModelGen)(view(_))
+      behave.like(renderTitle(checkYourAnswersViewModelGen)(view(_), _.title.key))
+      behave.like(renderHeading(checkYourAnswersViewModelGen)(view(_), _.heading))
+      behave.like(renderSaveAndContinueButton(checkYourAnswersViewModelGen)(view(_)))
 
       "render the summary list keys" in {
 
         forAll(checkYourAnswersViewModelGen) { viewModel =>
-
           val keys = viewModel.rows.map(_.key.key)
           summaryListKeys(view(viewModel)) must contain theSameElementsAs keys
         }
@@ -48,7 +46,6 @@ class CheckYourAnswersViewSpec extends ViewSpec {
       "render the summary list values" in {
 
         forAll(checkYourAnswersViewModelGen) { viewModel =>
-
           val values = viewModel.rows.map(_.value.key)
           summaryListValues(view(viewModel)) must contain theSameElementsAs values
         }
@@ -57,7 +54,6 @@ class CheckYourAnswersViewSpec extends ViewSpec {
       "render the summary list actions" in {
 
         forAll(checkYourAnswersViewModelGen) { viewModel =>
-
           val actions =
             viewModel.rows
               .flatMap(_.actions)

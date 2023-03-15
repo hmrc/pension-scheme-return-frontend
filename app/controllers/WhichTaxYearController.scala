@@ -17,7 +17,13 @@
 package controllers
 
 import cats.implicits.toShow
-import controllers.actions.{AllowAccessActionProvider, DataCreationAction, DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import controllers.actions.{
+  AllowAccessActionProvider,
+  DataCreationAction,
+  DataRequiredAction,
+  DataRetrievalAction,
+  IdentifierAction
+}
 import forms.RadioListFormProvider
 import models.SchemeId.Srn
 import models.{DateRange, Enumerable, Mode, NormalMode}
@@ -39,47 +45,52 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class WhichTaxYearController @Inject()(
-                                        override val messagesApi: MessagesApi,
-                                        navigator: Navigator,
-                                        identify: IdentifierAction,
-                                        allowAccess: AllowAccessActionProvider,
-                                        getData: DataRetrievalAction,
-                                        requireData: DataRequiredAction,
-                                        val controllerComponents: MessagesControllerComponents,
-                                        view: RadioListView,
-                                        formProvider: RadioListFormProvider,
-                                        taxYearService: TaxYearService,
-                                        saveService: SaveService
-                                   )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+  override val messagesApi: MessagesApi,
+  navigator: Navigator,
+  identify: IdentifierAction,
+  allowAccess: AllowAccessActionProvider,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  val controllerComponents: MessagesControllerComponents,
+  view: RadioListView,
+  formProvider: RadioListFormProvider,
+  taxYearService: TaxYearService,
+  saveService: SaveService
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport {
 
   implicit val allDates = WhichTaxYearController.options(taxYearService.current)
   val form = WhichTaxYearController.form(formProvider, allDates)
 
-  def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = (identify andThen allowAccess(srn) andThen getData andThen requireData) {
-    implicit request =>
+  def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] =
+    identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData) { implicit request =>
       Ok(
         view(
           form.fromUserAnswers(WhichTaxYearPage(srn)),
           WhichTaxYearController.viewModel(srn, mode, taxYearService.current)
         )
       )
-  }
+    }
 
-  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = (identify andThen allowAccess(srn) andThen getData andThen requireData).async {
-    implicit request =>
-      form.bindFromRequest()
+  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] =
+    identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData).async { implicit request =>
+      form
+        .bindFromRequest()
         .fold(
-          errors  =>
-            Future.successful(BadRequest(view(errors, WhichTaxYearController.viewModel(srn, mode, taxYearService.current)))),
+          errors =>
+            Future.successful(
+              BadRequest(view(errors, WhichTaxYearController.viewModel(srn, mode, taxYearService.current)))
+            ),
           success =>
             for {
               userAnswers <- Future.fromTry(request.userAnswers.set(WhichTaxYearPage(srn), success))
-              _           <- saveService.save(userAnswers)
+              _ <- saveService.save(userAnswers)
             } yield {
               Redirect(navigator.nextPage(WhichTaxYearPage(srn), NormalMode, userAnswers))
             }
         )
-  }
+    }
 }
 
 object WhichTaxYearController {
@@ -99,9 +110,10 @@ object WhichTaxYearController {
   def viewModel(srn: Srn, mode: Mode, taxYear: TaxYear): RadioListViewModel = RadioListViewModel(
     "whichTaxYear.title",
     "whichTaxYear.heading",
-    options(taxYear).toList.map { case (value, range) =>
-      val displayText = SimpleMessage("whichTaxYear.radioOption", range.from.show, range.to.show)
-      RadioListRowViewModel(displayText, value)
+    options(taxYear).toList.map {
+      case (value, range) =>
+        val displayText = SimpleMessage("whichTaxYear.radioOption", range.from.show, range.to.show)
+        RadioListRowViewModel(displayText, value)
     },
     controllers.routes.WhichTaxYearController.onSubmit(srn, mode)
   )

@@ -17,7 +17,7 @@
 package services
 
 import models.UserAnswers
-import org.mockito.ArgumentMatchers.{any, eq=>meq}
+import org.mockito.ArgumentMatchers.{any, eq => meq}
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
@@ -45,7 +45,6 @@ class SaveServiceSpec extends BaseSpec with ScalaCheckPropertyChecks {
       when(mockSessionRepository.set(any())).thenReturn(Future.successful(()))
 
       forAll { (userAnswers: UserAnswers) =>
-
         service.save(userAnswers).futureValue
         verify(mockSessionRepository, times(1)).set(meq(userAnswers))
       }

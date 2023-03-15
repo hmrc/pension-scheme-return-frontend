@@ -38,14 +38,14 @@ class StartPageController @Inject()(
   createData: DataCreationAction,
   val controllerComponents: MessagesControllerComponents,
   view: ContentPageView
-) extends FrontendBaseController with I18nSupport {
+) extends FrontendBaseController
+    with I18nSupport {
 
-  def onPageLoad(srn: Srn): Action[AnyContent] = (identify andThen allowAccess(srn)) {
-    implicit request =>
-      Ok(view(StartPageController.viewModel(srn)))
+  def onPageLoad(srn: Srn): Action[AnyContent] = identify.andThen(allowAccess(srn)) { implicit request =>
+    Ok(view(StartPageController.viewModel(srn)))
   }
 
-  def onSubmit(srn: Srn): Action[AnyContent] = (identify andThen allowAccess(srn) andThen getData andThen createData) {
+  def onSubmit(srn: Srn): Action[AnyContent] = identify.andThen(allowAccess(srn)).andThen(getData).andThen(createData) {
     implicit request =>
       Redirect(navigator.nextPage(StartPage(srn), NormalMode, request.userAnswers))
   }
@@ -61,7 +61,7 @@ object StartPageController {
     routes.StartPageController.onSubmit(srn),
     "startPage.paragraph1",
     "startPage.paragraph2",
-    "startPage.paragraph3",
+    "startPage.paragraph3"
   )
 
 }

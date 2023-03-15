@@ -33,8 +33,7 @@ class AccountingPeriodListControllerSpec extends ControllerBaseSpec {
     val dateRanges = Gen.listOfN(3, dateRangeGen).sample.value
 
     val userAnswers =
-      dateRanges
-        .zipWithIndex
+      dateRanges.zipWithIndex
         .foldLeft(defaultUserAnswers) {
           case (userAnswers, (range, index)) =>
             val refinedIndex = refineV[OneToThree](index + 1).toOption.value
@@ -49,20 +48,20 @@ class AccountingPeriodListControllerSpec extends ControllerBaseSpec {
 
     lazy val accountingPeriodPage = routes.AccountingPeriodController.onPageLoad(srn, refineMV(1), NormalMode)
 
-    behave like renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
+    behave.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
       val view = injected[ListView]
       view(form, viewModel)
-    }
+    })
 
-    behave like redirectToPage(onPageLoad, accountingPeriodPage)
+    behave.like(redirectToPage(onPageLoad, accountingPeriodPage))
 
-    behave like journeyRecoveryPage("onPageLoad", onPageLoad)
+    behave.like(journeyRecoveryPage("onPageLoad", onPageLoad))
 
-    behave like redirectNextPage(onSubmit, "value" -> "true")
-    
-    behave like invalidForm(onSubmit)
+    behave.like(redirectNextPage(onSubmit, "value" -> "true"))
 
-    behave like journeyRecoveryPage("onSubmit", onSubmit)
+    behave.like(invalidForm(onSubmit))
+
+    behave.like(journeyRecoveryPage("onSubmit", onSubmit))
   }
 
   "AccountingPeriodListController.viewModel" should {
@@ -72,7 +71,6 @@ class AccountingPeriodListControllerSpec extends ControllerBaseSpec {
       val rowsGen = Gen.choose(0, maxAccountingPeriods).flatMap(Gen.listOfN(_, dateRangeGen))
 
       forAll(srnGen, rowsGen, modeGen) { (srn, rows, mode) =>
-
         val viewModel = AccountingPeriodListController.viewModel(srn, mode, rows)
         viewModel.rows.length mustBe rows.length
       }
@@ -82,7 +80,6 @@ class AccountingPeriodListControllerSpec extends ControllerBaseSpec {
       val rowsGen = Gen.listOf(dateRangeGen)
 
       forAll(srnGen, rowsGen, modeGen) { (srn, rows, mode) =>
-
         val viewModel = AccountingPeriodListController.viewModel(srn, mode, rows)
         viewModel.rows.length must be <= 3
       }

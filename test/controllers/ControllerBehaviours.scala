@@ -34,23 +34,28 @@ import scala.concurrent.Future
 trait ControllerBehaviours {
   _: ControllerBaseSpec =>
 
-  def renderView(call: => Call, userAnswers: UserAnswers = defaultUserAnswers)(view: Application => Request[_] => Html): Unit =
+  def renderView(call: => Call, userAnswers: UserAnswers = defaultUserAnswers)(
+    view: Application => Request[_] => Html
+  ): Unit =
     "return OK and the correct view" in {
       val appBuilder = applicationBuilder(Some(userAnswers))
       render(appBuilder, call)(view)
     }
 
-  def renderPrePopView[A: Writes](call: => Call, page: Settable[A], value: A)(view: Application => Request[_] => Html): Unit =
+  def renderPrePopView[A: Writes](call: => Call, page: Settable[A], value: A)(
+    view: Application => Request[_] => Html
+  ): Unit =
     renderPrePopView(call, page, value, defaultUserAnswers)(view)
 
-  def renderPrePopView[A: Writes](call: => Call, page: Settable[A], value: A, userAnswers: UserAnswers)
-                                 (view: Application => Request[_] => Html): Unit =
+  def renderPrePopView[A: Writes](call: => Call, page: Settable[A], value: A, userAnswers: UserAnswers)(
+    view: Application => Request[_] => Html
+  ): Unit =
     "return OK and the correct pre-populated view for a GET" in {
       val appBuilder = applicationBuilder(Some(userAnswers.set(page, value).success.value))
       render(appBuilder, call)(view)
     }
 
-  def redirectWhenCacheEmpty(call: => Call, nextPage: => Call): Unit = {
+  def redirectWhenCacheEmpty(call: => Call, nextPage: => Call): Unit =
     s"redirect to $nextPage when cache empty" in {
       running(_ => applicationBuilder(userAnswers = Some(emptyUserAnswers))) { app =>
         val request = FakeRequest(call)
@@ -60,9 +65,8 @@ trait ControllerBehaviours {
         redirectLocation(result).value mustBe nextPage.url
       }
     }
-  }
 
-  def journeyRecoveryPage(name: String, call: => Call): Unit = {
+  def journeyRecoveryPage(name: String, call: => Call): Unit =
     s"$name must redirect to Journey Recovery if no existing data is found" in {
 
       val application = applicationBuilder(userAnswers = None).build()
@@ -75,9 +79,10 @@ trait ControllerBehaviours {
         redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
-  }
 
-  private def render(appBuilder: GuiceApplicationBuilder, call: => Call)(view: Application => Request[_] => Html): Unit =
+  private def render(appBuilder: GuiceApplicationBuilder, call: => Call)(
+    view: Application => Request[_] => Html
+  ): Unit =
     running(_ => appBuilder) { app =>
       val request = FakeRequest(call)
       val result = route(app, request).value
@@ -190,9 +195,9 @@ trait ControllerBehaviours {
     }
 
   def continueNoSave(call: => Call, form: (String, String)*): Unit =
-    continueNoSave(call, defaultUserAnswers,form:_*)
+    continueNoSave(call, defaultUserAnswers, form: _*)
 
-  def agreeAndContinue(call: => Call,userAnswers: UserAnswers): Unit =
+  def agreeAndContinue(call: => Call, userAnswers: UserAnswers): Unit =
     "agree and continue to next page" in {
 
       val appBuilder = applicationBuilder(Some(userAnswers))
@@ -201,7 +206,6 @@ trait ControllerBehaviours {
         )
 
       running(_ => appBuilder) { app =>
-
         val result = route(app, FakeRequest(call)).value
 
         status(result) mustEqual SEE_OTHER

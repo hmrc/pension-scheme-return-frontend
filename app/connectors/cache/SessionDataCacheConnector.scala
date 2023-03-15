@@ -27,9 +27,11 @@ import utils.FutureUtils.FutureOps
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class SessionDataCacheConnectorImpl @Inject()(config: FrontendAppConfig, http: HttpClient) extends SessionDataCacheConnector {
+class SessionDataCacheConnectorImpl @Inject()(config: FrontendAppConfig, http: HttpClient)
+    extends SessionDataCacheConnector {
 
-  private def url(cacheId: String): String = s"${config.pensionsAdministrator}/pension-administrator/journey-cache/session-data/$cacheId"
+  private def url(cacheId: String): String =
+    s"${config.pensionsAdministrator}/pension-administrator/journey-cache/session-data/$cacheId"
 
   override def fetch(cacheId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[SessionData]] =
     http

@@ -26,7 +26,7 @@ trait UserAnswersEntryGenerators extends PageGenerators {
   implicit lazy val arbitraryCheckReturnDatesUserAnswersEntry: Arbitrary[(CheckReturnDatesPage, JsValue)] =
     Arbitrary {
       for {
-        page  <- arbitrary[CheckReturnDatesPage]
+        page <- arbitrary[CheckReturnDatesPage]
         value <- arbitrary[Boolean].map(Json.toJson(_))
       } yield (page, value)
     }

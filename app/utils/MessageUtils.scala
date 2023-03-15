@@ -18,5 +18,5 @@ package utils
 
 object MessageUtils {
 
-  def booleanToMessage(bool: Boolean): String = if(bool) "site.yes" else "site.no"
+  def booleanToMessage(bool: Boolean): String = if (bool) "site.yes" else "site.no"
 }

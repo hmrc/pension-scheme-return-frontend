@@ -28,24 +28,23 @@ trait ErrorSummaryFluency {
   object ErrorSummaryViewModel {
 
     def apply(
-               form: Form[_],
-               errorLinkOverrides: Map[String, String] = Map.empty
-             )(implicit messages: Messages): ErrorSummary = {
+      form: Form[_],
+      errorLinkOverrides: Map[String, String] = Map.empty
+    )(implicit messages: Messages): ErrorSummary = {
 
-      val errors = form.errors.distinctBy(_.message).map {
-        error =>
-          ErrorLink(
-            href    = Some(s"#${errorLinkOverrides.getOrElse(error.key, error.key)}"),
-            content = Text(messages(error.message, error.args.map {
-              case s: String => messages(s)
-              case any       => any
-            }: _*))
-          )
+      val errors = form.errors.distinctBy(_.message).map { error =>
+        ErrorLink(
+          href = Some(s"#${errorLinkOverrides.getOrElse(error.key, error.key)}"),
+          content = Text(messages(error.message, error.args.map {
+            case s: String => messages(s)
+            case any => any
+          }: _*))
+        )
       }
 
       ErrorSummary(
         errorList = errors,
-        title     = Text(messages("error.summary.title"))
+        title = Text(messages("error.summary.title"))
       )
     }
   }
@@ -53,12 +52,12 @@ trait ErrorSummaryFluency {
   implicit class FluentErrorSummary(errorSummary: ErrorSummary) {
 
     def withDescription(description: Content): ErrorSummary =
-      errorSummary copy (description = description)
+      errorSummary.copy(description = description)
 
     def withCssClass(newClass: String): ErrorSummary =
-      errorSummary copy (classes = s"${errorSummary.classes} $newClass")
+      errorSummary.copy(classes = s"${errorSummary.classes} $newClass")
 
     def withAttribute(attribute: (String, String)): ErrorSummary =
-      errorSummary copy (attributes = errorSummary.attributes + attribute)
+      errorSummary.copy(attributes = errorSummary.attributes + attribute)
   }
 }

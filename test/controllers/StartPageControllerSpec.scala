@@ -32,7 +32,6 @@ class StartPageControllerSpec extends ControllerBaseSpec {
   "StartPageController" should {
 
     "return OK and the correct view for a GET" in runningApplication { implicit app =>
-
       val view = injected[ContentPageView]
       val request = FakeRequest(GET, onPageLoad)
 
@@ -52,7 +51,6 @@ class StartPageControllerSpec extends ControllerBaseSpec {
           )
 
       running(_ => fakeNavigatorApplication) { app =>
-
         val request = FakeRequest(GET, onSubmit)
 
         val result = route(app, request).value

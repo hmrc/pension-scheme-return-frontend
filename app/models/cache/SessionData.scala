@@ -35,7 +35,7 @@ object PensionSchemeUser {
 
   implicit val reads: Reads[PensionSchemeUser] = {
     case JsString(Administrator.name) => JsSuccess(Administrator)
-    case JsString(Practitioner.name)  => JsSuccess(Practitioner)
-    case _                            => JsError("unknown value")
+    case JsString(Practitioner.name) => JsSuccess(Practitioner)
+    case _ => JsError("unknown value")
   }
 }

@@ -47,7 +47,13 @@ object YesNoPageViewModel {
       onSubmit = onSubmit
     )
 
-  def apply(title: String, heading: String, description: Option[String], legend: String, onSubmit: Call): YesNoPageViewModel =
+  def apply(
+    title: String,
+    heading: String,
+    description: Option[String],
+    legend: String,
+    onSubmit: Call
+  ): YesNoPageViewModel =
     YesNoPageViewModel(
       SimpleMessage(title),
       SimpleMessage(heading),

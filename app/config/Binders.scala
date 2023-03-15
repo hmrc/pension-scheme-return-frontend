@@ -25,19 +25,18 @@ object Binders {
 
   implicit val srnBinder: PathBindable[Srn] = new PathBindable[Srn] {
 
-    override def bind(key: String, value: String): Either[String, Srn] = {
+    override def bind(key: String, value: String): Either[String, Srn] =
       Srn(value).toRight("Invalid scheme reference number")
-    }
 
     override def unbind(key: String, value: Srn): String = value.value
   }
 
   implicit def refinedIntPathBinder[T](implicit ev: Validate[Int, T]): PathBindable[Refined[Int, T]] =
     new PathBindable[Refined[Int, T]] {
-      override def bind(key: String, value: String): Either[String, Refined[Int, T]] = value
-        .toIntOption
-        .toRight(s"value for key $key was not an Integer")
-        .flatMap(refineV[T](_))
+      override def bind(key: String, value: String): Either[String, Refined[Int, T]] =
+        value.toIntOption
+          .toRight(s"value for key $key was not an Integer")
+          .flatMap(refineV[T](_))
 
       override def unbind(key: String, value: Refined[Int, T]): String = value.value.toString
     }

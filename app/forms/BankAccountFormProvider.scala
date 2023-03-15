@@ -53,20 +53,26 @@ class BankAccountFormProvider @Inject()() extends Mappings {
     usedAccountNumbers: List[String]
   ): Form[BankAccount] = Form(
     mapping(
-      "bankName" -> text(bankNameRequired).verifying(firstError(
-        regexp(bankNameRegex, bankNameInvalid),
-        maxLength(bankNameMaxLength, bankNameWrongLength)
-      )),
-      "accountNumber" -> text(accountNumberRequired).verifying(firstError(
-        regexp(accountNumberRegex, accountNumberInvalid),
-        lengthBetween(accountNumberMinLength, accountNumberMaxLength, accountNumberWrongLength),
-        failWhen[String](usedAccountNumbers.contains, accountNumberDuplicate)
-      )),
-      "sortCode" -> text(sortCodeRequired).verifying(firstError[String](
-        regexp(sortCodeValidRegex, sortCodeInvalid),
-        failWhen(_.count(_.isDigit) != sortCodeLength, sortCodeWrongLength, sortCodeLength),
-        regexp(sortCodeSimpleRegex, sortCodeInvalidFormat).or(regexp(sortCodeFullRegex, sortCodeInvalidFormat))
-      ))
+      "bankName" -> text(bankNameRequired).verifying(
+        firstError(
+          regexp(bankNameRegex, bankNameInvalid),
+          maxLength(bankNameMaxLength, bankNameWrongLength)
+        )
+      ),
+      "accountNumber" -> text(accountNumberRequired).verifying(
+        firstError(
+          regexp(accountNumberRegex, accountNumberInvalid),
+          lengthBetween(accountNumberMinLength, accountNumberMaxLength, accountNumberWrongLength),
+          failWhen[String](usedAccountNumbers.contains, accountNumberDuplicate)
+        )
+      ),
+      "sortCode" -> text(sortCodeRequired).verifying(
+        firstError[String](
+          regexp(sortCodeValidRegex, sortCodeInvalid),
+          failWhen(_.count(_.isDigit) != sortCodeLength, sortCodeWrongLength, sortCodeLength),
+          regexp(sortCodeSimpleRegex, sortCodeInvalidFormat).or(regexp(sortCodeFullRegex, sortCodeInvalidFormat))
+        )
+      )
     )(BankAccount.apply)(BankAccount.unapply)
   )
 }

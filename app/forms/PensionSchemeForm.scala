@@ -25,11 +25,11 @@ import javax.inject.Inject
 class PensionSchemeForm @Inject() extends Mappings {
 
   def apply(
-             requiredKey: String = "pensionScheme.error.required",
-             wholeNumberKey: String = "pensionScheme.error.wholeNumber",
-             nonNumericKey: String = "pensionScheme.error.nonNumeric",
-             constraint: Constraint[Int] = inRange(0, Int.MaxValue, "pensionScheme.error.outOfRange")
-           ): Form[Int] =
+    requiredKey: String = "pensionScheme.error.required",
+    wholeNumberKey: String = "pensionScheme.error.wholeNumber",
+    nonNumericKey: String = "pensionScheme.error.nonNumeric",
+    constraint: Constraint[Int] = inRange(0, Int.MaxValue, "pensionScheme.error.outOfRange")
+  ): Form[Int] =
     Form(
       "value" -> int(
         requiredKey,

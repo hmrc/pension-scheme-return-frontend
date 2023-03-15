@@ -52,31 +52,34 @@ class AccountingPeriodController @Inject()(
   formProvider: DateRangeFormProvider,
   saveService: SaveService,
   taxYearService: TaxYearService
-)(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport {
 
   private def form(usedAccountingPeriods: List[DateRange] = List()) =
     AccountingPeriodController.form(formProvider, taxYearService.current, usedAccountingPeriods)
   private val viewModel = AccountingPeriodController.viewModel _
 
-  def onPageLoad(srn: Srn, index: Max3, mode: Mode): Action[AnyContent] = (identify andThen allowAccess(srn) andThen getData andThen requireData) {
-    implicit request =>
+  def onPageLoad(srn: Srn, index: Max3, mode: Mode): Action[AnyContent] =
+    identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData) { implicit request =>
       Ok(view(form().fromUserAnswers(AccountingPeriodPage(srn, index)), viewModel(srn, index, mode)))
-  }
+    }
 
-  def onSubmit(srn: Srn, index: Max3, mode: Mode): Action[AnyContent] = (identify andThen allowAccess(srn) andThen getData andThen requireData).async {
-    implicit request =>
-
+  def onSubmit(srn: Srn, index: Max3, mode: Mode): Action[AnyContent] =
+    identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData).async { implicit request =>
       val usedAccountingPeriods = duplicateAccountingPeriods(srn, index)
 
-      form(usedAccountingPeriods).bindFromRequest().fold(
-        formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode)))),
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(AccountingPeriodPage(srn, index), value))
-            _              <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage(AccountingPeriodPage(srn, index), mode, updatedAnswers))
-      )
-  }
+      form(usedAccountingPeriods)
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode)))),
+          value =>
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(AccountingPeriodPage(srn, index), value))
+              _ <- saveService.save(updatedAnswers)
+            } yield Redirect(navigator.nextPage(AccountingPeriodPage(srn, index), mode, updatedAnswers))
+        )
+    }
 
   def duplicateAccountingPeriods(srn: Srn, index: Max3)(implicit request: DataRequest[_]): List[DateRange] =
     request.userAnswers.list(AccountingPeriods(srn)).removeAt(index.arrayIndex)
@@ -84,7 +87,11 @@ class AccountingPeriodController @Inject()(
 
 object AccountingPeriodController {
 
-  def form(formProvider: DateRangeFormProvider, taxYear: TaxYear, usedAccountingPeriods: List[DateRange]): Form[DateRange] = formProvider(
+  def form(
+    formProvider: DateRangeFormProvider,
+    taxYear: TaxYear,
+    usedAccountingPeriods: List[DateRange]
+  ): Form[DateRange] = formProvider(
     DateFormErrors(
       "accountingPeriod.startDate.error.required.all",
       "accountingPeriod.startDate.error.required.day",
@@ -92,7 +99,7 @@ object AccountingPeriodController {
       "accountingPeriod.startDate.error.required.year",
       "accountingPeriod.startDate.error.required.two",
       "accountingPeriod.startDate.error.invalid.date",
-      "accountingPeriod.startDate.error.invalid.characters",
+      "accountingPeriod.startDate.error.invalid.characters"
     ),
     DateFormErrors(
       "accountingPeriod.endDate.error.required.all",

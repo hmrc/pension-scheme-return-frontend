@@ -35,41 +35,58 @@ class SchemeMemberDetailsCYAControllerSpec extends ControllerBaseSpec {
   private val nino = Nino("AB123456A")
 
   private val fullUserAnswers = defaultUserAnswers
-    .set(MemberDetailsPage(srn, refineMV(1)), memberDetails).success.value
-    .set(NationalInsuranceNumberPage(srn, refineMV(1)), true).success.value
-    .set(MemberDetailsNinoPage(srn, refineMV(1)), nino).success.value
+    .set(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+    .success
+    .value
+    .set(NationalInsuranceNumberPage(srn, refineMV(1)), true)
+    .success
+    .value
+    .set(MemberDetailsNinoPage(srn, refineMV(1)), nino)
+    .success
+    .value
 
   "SchemeMemberDetailsCYAController" should {
-    behave like renderView(onPageLoad, fullUserAnswers)(implicit app => implicit request =>
-      injected[CheckYourAnswersView].apply(viewModel(refineMV(1), srn, NormalMode, memberDetails, hasNINO = true, Some(nino)))
+    behave.like(
+      renderView(onPageLoad, fullUserAnswers)(
+        implicit app =>
+          implicit request =>
+            injected[CheckYourAnswersView]
+              .apply(viewModel(refineMV(1), srn, NormalMode, memberDetails, hasNINO = true, Some(nino)))
+      )
     )
 
     "when member details is missing" should {
-      behave like redirectToPage(
-        onPageLoad,
-        routes.JourneyRecoveryController.onPageLoad(),
-        fullUserAnswers.remove(MemberDetailsPage(srn, refineMV(1))).success.value
+      behave.like(
+        redirectToPage(
+          onPageLoad,
+          routes.JourneyRecoveryController.onPageLoad(),
+          fullUserAnswers.remove(MemberDetailsPage(srn, refineMV(1))).success.value
+        )
       )
     }
 
     "when dose member have NINO is missing" should {
-      behave like redirectToPage(
-        onPageLoad,
-        routes.JourneyRecoveryController.onPageLoad(),
-        fullUserAnswers.remove(NationalInsuranceNumberPage(srn, refineMV(1))).success.value
+      behave.like(
+        redirectToPage(
+          onPageLoad,
+          routes.JourneyRecoveryController.onPageLoad(),
+          fullUserAnswers.remove(NationalInsuranceNumberPage(srn, refineMV(1))).success.value
+        )
       )
     }
 
     "when NINO is missing" should {
-      behave like redirectToPage(
-        onPageLoad,
-        routes.JourneyRecoveryController.onPageLoad(),
-        fullUserAnswers.remove(MemberDetailsNinoPage(srn, refineMV(1))).success.value
+      behave.like(
+        redirectToPage(
+          onPageLoad,
+          routes.JourneyRecoveryController.onPageLoad(),
+          fullUserAnswers.remove(MemberDetailsNinoPage(srn, refineMV(1))).success.value
+        )
       )
     }
 
-    behave like journeyRecoveryPage("onPageLoad", onPageLoad)
-    behave like journeyRecoveryPage("onSubmit", onSubmit)
+    behave.like(journeyRecoveryPage("onPageLoad", onPageLoad))
+    behave.like(journeyRecoveryPage("onSubmit", onSubmit))
 
     "viewModel" should {
       "contain all rows if nino is present" in {

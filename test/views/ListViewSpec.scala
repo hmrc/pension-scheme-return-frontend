@@ -30,14 +30,16 @@ class ListViewSpec extends ViewSpec {
     implicit val request: FakeRequest[_] = FakeRequest()
 
     "SummaryView" should {
-      behave like renderTitle(summaryViewModelGen())(view(form, _), _.title.key)
-      behave like renderHeading(summaryViewModelGen())(view(form, _), _.heading)
+      behave.like(renderTitle(summaryViewModelGen())(view(form, _), _.title.key))
+      behave.like(renderHeading(summaryViewModelGen())(view(form, _), _.heading))
 
       "render rows" in {
         forAll(summaryViewModelGen()) { viewModel =>
           val renderedRows = summaryListRows(view(form, viewModel))
           renderedRows.length mustEqual viewModel.rows.size
-          renderedRows.map(_.selectFirst(".govuk-summary-list__key").text()) mustEqual viewModel.rows.map(row => messageKey(row.text))
+          renderedRows.map(_.selectFirst(".govuk-summary-list__key").text()) mustEqual viewModel.rows.map(
+            row => messageKey(row.text)
+          )
         }
       }
 

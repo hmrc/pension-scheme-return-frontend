@@ -32,38 +32,45 @@ class SchemeBankAccountControllerSpec extends ControllerBaseSpec {
   private val bankAccount = bankAccountGen.sample.value
   private val otherBankAccount = bankAccountGen.sample.value
 
-  private val validFormData = List("bankName" -> bankAccount.bankName, "accountNumber" -> bankAccount.accountNumber, "sortCode" -> bankAccount.sortCode)
+  private val validFormData = List(
+    "bankName" -> bankAccount.bankName,
+    "accountNumber" -> bankAccount.accountNumber,
+    "sortCode" -> bankAccount.sortCode
+  )
   private val invalidFormData = List("bankName" -> "testBankName", "accountNumber" -> "10273837", "sortCode" -> "wrong")
 
   "SchemeBankAccountController" should {
 
-    behave like renderView(onPageLoad) { implicit app => implicit request =>
-      injected[BankAccountView].apply(form(injected[BankAccountFormProvider], List()), viewModel(srn, refineMV[OneToTen](1), NormalMode))
-    }
+    behave.like(renderView(onPageLoad) { implicit app => implicit request =>
+      injected[BankAccountView]
+        .apply(form(injected[BankAccountFormProvider], List()), viewModel(srn, refineMV[OneToTen](1), NormalMode))
+    })
 
-    behave like renderPrePopView(onPageLoad, SchemeBankAccountPage(srn, refineMV(1)), bankAccount) { implicit app =>
-      implicit request =>
+    behave.like(renderPrePopView(onPageLoad, SchemeBankAccountPage(srn, refineMV(1)), bankAccount) {
+      implicit app => implicit request =>
         val preparedForm = form(injected[BankAccountFormProvider], List()).fill(bankAccount)
         injected[BankAccountView].apply(preparedForm, viewModel(srn, refineMV[OneToTen](1), NormalMode))
-    }
+    })
 
-    behave like invalidForm(onSubmit, invalidFormData: _*)
-    behave like saveAndContinue(onSubmit, validFormData: _*)
+    behave.like(invalidForm(onSubmit, invalidFormData: _*))
+    behave.like(saveAndContinue(onSubmit, validFormData: _*))
 
     "persist data when updating" when {
       val ua = defaultUserAnswers.set(SchemeBankAccountPage(srn, refineMV(1)), bankAccount).get
-      behave like saveAndContinue(onSubmit, ua, validFormData: _*)
+      behave.like(saveAndContinue(onSubmit, ua, validFormData: _*))
     }
 
     "return a 400 when data exists in user answers" when {
       val userAnswers = defaultUserAnswers
-        .set(SchemeBankAccountPage(srn, refineMV(1)), otherBankAccount).get
-        .set(SchemeBankAccountPage(srn, refineMV(2)), bankAccount).get
+        .set(SchemeBankAccountPage(srn, refineMV(1)), otherBankAccount)
+        .get
+        .set(SchemeBankAccountPage(srn, refineMV(2)), bankAccount)
+        .get
 
-      behave like invalidForm(onSubmit, userAnswers, validFormData: _*)
+      behave.like(invalidForm(onSubmit, userAnswers, validFormData: _*))
     }
 
-    behave like journeyRecoveryPage("onPageLoad", onPageLoad)
-    behave like journeyRecoveryPage("onSubmit", onSubmit)
+    behave.like(journeyRecoveryPage("onPageLoad", onPageLoad))
+    behave.like(journeyRecoveryPage("onSubmit", onSubmit))
   }
 }

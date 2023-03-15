@@ -26,15 +26,17 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class FakeAllowAccessActionProvider @Inject()(schemeDetails: SchemeDetails)
-  extends AllowAccessActionProvider
-  with Generators
-  with OptionValues {
+    extends AllowAccessActionProvider
+    with Generators
+    with OptionValues {
 
   override def apply(srn: SchemeId.Srn): ActionFunction[IdentifierRequest, AllowedAccessRequest] =
     new ActionFunction[IdentifierRequest, AllowedAccessRequest] {
-      override def invokeBlock[A](request: IdentifierRequest[A], block: AllowedAccessRequest[A] => Future[Result]): Future[Result] = {
+      override def invokeBlock[A](
+        request: IdentifierRequest[A],
+        block: AllowedAccessRequest[A] => Future[Result]
+      ): Future[Result] =
         block(AllowedAccessRequest(request, schemeDetails))
-      }
 
       override protected def executionContext: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
     }

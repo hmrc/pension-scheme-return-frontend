@@ -50,46 +50,70 @@ class BankAccountFormProviderSpec extends FieldBehaviours {
   )
 
   ".bankName" - {
-    behave like fieldThatBindsValidData(form, "bankName", stringsWithMaxLength(bankNameMaxLength))
-    behave like mandatoryField(form, "bankName", "schemeBankDetails.bankName.error.required")
+    behave.like(fieldThatBindsValidData(form, "bankName", stringsWithMaxLength(bankNameMaxLength)))
+    behave.like(mandatoryField(form, "bankName", "schemeBankDetails.bankName.error.required"))
 
     val lengthUpperLimit = 50
     val lengthFormError = FormError("bankName", "schemeBankDetails.bankName.error.length", List(bankNameMaxLength))
-    behave like fieldLengthError(form, "bankName", lengthFormError, bankNameMaxLength + 1, lengthUpperLimit, alphaChar)
+    behave.like(fieldLengthError(form, "bankName", lengthFormError, bankNameMaxLength + 1, lengthUpperLimit, alphaChar))
 
-    behave like invalidAlphaField(
-      form,
-      fieldName = "bankName",
-      errorMessage = "schemeBankDetails.bankName.error.invalid",
-      args = List(bankNameRegex)
+    behave.like(
+      invalidAlphaField(
+        form,
+        fieldName = "bankName",
+        errorMessage = "schemeBankDetails.bankName.error.invalid",
+        args = List(bankNameRegex)
+      )
     )
   }
 
   ".accountNumber" - {
-    behave like fieldThatBindsValidData(form, "accountNumber", numericStringLengthBetween(accountNumberMinLength, accountNumberMaxLength))
-    behave like mandatoryField(form, "accountNumber", "schemeBankDetails.accountNumber.error.required")
+    behave.like(
+      fieldThatBindsValidData(
+        form,
+        "accountNumber",
+        numericStringLengthBetween(accountNumberMinLength, accountNumberMaxLength)
+      )
+    )
+    behave.like(mandatoryField(form, "accountNumber", "schemeBankDetails.accountNumber.error.required"))
 
     val lengthUpperLimit = 20
-    val lengthFormError = FormError("accountNumber", "schemeBankDetails.accountNumber.error.length", List(accountNumberMinLength, accountNumberMaxLength))
-    behave like fieldLengthError(form, "accountNumber", lengthFormError, 1, accountNumberMinLength - 1 , numChar)
-    behave like fieldLengthError(form, "accountNumber", lengthFormError, accountNumberMaxLength + 1, lengthUpperLimit, numChar)
+    val lengthFormError = FormError(
+      "accountNumber",
+      "schemeBankDetails.accountNumber.error.length",
+      List(accountNumberMinLength, accountNumberMaxLength)
+    )
+    behave.like(fieldLengthError(form, "accountNumber", lengthFormError, 1, accountNumberMinLength - 1, numChar))
+    behave.like(
+      fieldLengthError(form, "accountNumber", lengthFormError, accountNumberMaxLength + 1, lengthUpperLimit, numChar)
+    )
 
-    behave like invalidNumericField(form, "accountNumber", "schemeBankDetails.accountNumber.error.invalid", accountNumberRegex)
-    behave like fieldRejectDuplicates(form, "accountNumber", "schemeBankDetails.accountNumber.error.duplicate", usedAccountNumbers)
+    behave.like(
+      invalidNumericField(form, "accountNumber", "schemeBankDetails.accountNumber.error.invalid", accountNumberRegex)
+    )
+    behave.like(
+      fieldRejectDuplicates(
+        form,
+        "accountNumber",
+        "schemeBankDetails.accountNumber.error.duplicate",
+        usedAccountNumbers
+      )
+    )
   }
 
   ".sortCode" - {
-    "numerical format" - (behave like fieldThatBindsValidData(form, "sortCode", numericStringLength(sortCodeLength)))
-    "standard format" - (behave like fieldThatBindsValidData(form, "sortCode", genSortCode()))
+    "numerical format" - (behave.like(fieldThatBindsValidData(form, "sortCode", numericStringLength(sortCodeLength))))
+    "standard format" - (behave.like(fieldThatBindsValidData(form, "sortCode", genSortCode())))
 
-    behave like mandatoryField(form, "sortCode", "schemeBankDetails.sortCode.error.required")
+    behave.like(mandatoryField(form, "sortCode", "schemeBankDetails.sortCode.error.required"))
 
     val lengthUpperLimit = 10
     val lengthFormError = FormError("sortCode", "schemeBankDetails.sortCode.error.length", List(sortCodeLength))
-    behave like fieldLengthError(form, "sortCode", lengthFormError, 1, sortCodeLength - 1, numChar)
-    behave like fieldLengthError(form, "sortCode", lengthFormError, sortCodeLength + 1, lengthUpperLimit, numChar)
-    behave like invalidNumericField(form, "sortCode", "schemeBankDetails.sortCode.error.invalid", sortCodeValidRegex)
+    behave.like(fieldLengthError(form, "sortCode", lengthFormError, 1, sortCodeLength - 1, numChar))
+    behave.like(fieldLengthError(form, "sortCode", lengthFormError, sortCodeLength + 1, lengthUpperLimit, numChar))
+    behave.like(invalidNumericField(form, "sortCode", "schemeBankDetails.sortCode.error.invalid", sortCodeValidRegex))
   }
 
-  private def genSortCode(): Gen[String] = numericStringLength(sortCodeLength).map(_.toList.intersperse('-', 2).mkString)
+  private def genSortCode(): Gen[String] =
+    numericStringLength(sortCodeLength).map(_.toList.intersperse('-', 2).mkString)
 }

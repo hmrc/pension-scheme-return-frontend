@@ -20,11 +20,11 @@ import play.api.mvc.Call
 import viewmodels.DisplayMessage.SimpleMessage
 
 case class NameDOBViewModel(
-                             title: SimpleMessage,
-                             heading: SimpleMessage,
-                             firstName: SimpleMessage,
-                             lastName: SimpleMessage,
-                             dateOfBirth: SimpleMessage,
-                             dateOfBirthHint: SimpleMessage,
-                             onSubmit: Call
-                           )
+  title: SimpleMessage,
+  heading: SimpleMessage,
+  firstName: SimpleMessage,
+  lastName: SimpleMessage,
+  dateOfBirth: SimpleMessage,
+  dateOfBirthHint: SimpleMessage,
+  onSubmit: Call
+)

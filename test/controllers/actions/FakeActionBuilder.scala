@@ -24,9 +24,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class FakeActionBuilder[F[_]](fa: F[_]) extends ActionBuilder[F, AnyContent] {
   override def parser: BodyParser[AnyContent] = stubBodyParser[AnyContent]()
 
-  override def invokeBlock[A](request: Request[A], block: F[A] => Future[Result]): Future[Result] = {
+  override def invokeBlock[A](request: Request[A], block: F[A] => Future[Result]): Future[Result] =
     block(fa.asInstanceOf[F[A]])
-  }
 
   override protected def executionContext: ExecutionContext = ExecutionContext.global
 }

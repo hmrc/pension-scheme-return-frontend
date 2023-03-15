@@ -19,11 +19,7 @@ package views
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import utils.BaseSpec
 
-trait ViewSpec
-  extends BaseSpec
-    with ScalaCheckPropertyChecks
-    with HtmlHelper
-    with ViewBehaviours {
+trait ViewSpec extends BaseSpec with ScalaCheckPropertyChecks with HtmlHelper with ViewBehaviours {
 
   def renderedErrorMessage(key: String) = s"Error: $key"
 }

@@ -57,18 +57,19 @@ class PensionSchemeMembersController @Inject()(
   formProvider: RadioListFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: RadioListView
-) extends FrontendBaseController with I18nSupport {
+) extends FrontendBaseController
+    with I18nSupport {
 
   private val form = PensionSchemeMembersController.form(formProvider)
 
-  def onPageLoad(srn: Srn): Action[AnyContent] = identifyAndRequireData(srn) {
-    implicit request =>
-      Ok(view(form, viewModel(srn, request.schemeDetails.schemeName)))
+  def onPageLoad(srn: Srn): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
+    Ok(view(form, viewModel(srn, request.schemeDetails.schemeName)))
   }
 
-  def onSubmit(srn: Srn): Action[AnyContent] = identifyAndRequireData(srn) {
-    implicit request =>
-      form.bindFromRequest().fold(
+  def onSubmit(srn: Srn): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
+    form
+      .bindFromRequest()
+      .fold(
         formWithErrors => BadRequest(view(formWithErrors, viewModel(srn, request.schemeDetails.schemeName))),
         answer => Redirect(navigator.nextPage(PensionSchemeMembersPage(srn, answer), NormalMode, request.userAnswers))
       )

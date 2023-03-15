@@ -19,7 +19,7 @@ package generators
 import org.scalacheck.{Arbitrary, Gen, Shrink}
 
 trait Generators
-  extends UserAnswersGenerator
+    extends UserAnswersGenerator
     with PageGenerators
     with ModelGenerators
     with UserAnswersEntryGenerators

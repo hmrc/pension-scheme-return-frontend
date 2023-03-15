@@ -47,7 +47,9 @@ class ContentTablePageViewSpec extends BaseSpec with ScalaCheckPropertyChecks wi
 
       "render the table rows" in {
         forAll(contentTablePageViewModelGen) { viewModel =>
-          tr(view(viewModel)) must contain allElementsOf viewModel.rows.map{ case (k, v) => List(messageKey(k), messageKey(v)) }
+          tr(view(viewModel)) must contain allElementsOf viewModel.rows.map {
+            case (k, v) => List(messageKey(k), messageKey(v))
+          }
         }
       }
 

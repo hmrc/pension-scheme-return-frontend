@@ -25,7 +25,7 @@ case class ListRow(
   changeUrl: String,
   changeHiddenText: SimpleMessage,
   removeUrl: String,
-  removeHiddenText: SimpleMessage,
+  removeHiddenText: SimpleMessage
 )
 
 case class ListViewModel(

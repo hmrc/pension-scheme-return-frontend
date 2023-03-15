@@ -45,15 +45,15 @@ class IdentifierActionImpl @Inject()(
   sessionDataCacheConnector: SessionDataCacheConnector,
   playBodyParsers: PlayBodyParsers
 )(implicit override val executionContext: ExecutionContext)
-  extends IdentifierAction
+    extends IdentifierAction
     with AuthorisedFunctions {
 
   override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] = {
 
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-    authorised(Enrolment(Constants.psaEnrolmentKey) or Enrolment(Constants.pspEnrolmentKey))
-      .retrieve(Retrievals.internalId and Retrievals.externalId and Retrievals.allEnrolments) {
+    authorised(Enrolment(Constants.psaEnrolmentKey).or(Enrolment(Constants.pspEnrolmentKey)))
+      .retrieve(Retrievals.internalId.and(Retrievals.externalId).and(Retrievals.allEnrolments)) {
 
         case Some(internalId) ~ Some(externalId) ~ (IsPSA(psaId) && IsPSP(pspId)) =>
           sessionDataCacheConnector.fetch(externalId).flatMap {
@@ -87,20 +87,16 @@ class IdentifierActionImpl @Inject()(
   override def parser: BodyParser[AnyContent] = playBodyParsers.default
 
   object IsPSA {
-    def unapply(enrolments: Enrolments): Option[EnrolmentIdentifier] = {
-      enrolments
-        .enrolments
+    def unapply(enrolments: Enrolments): Option[EnrolmentIdentifier] =
+      enrolments.enrolments
         .find(_.key == Constants.psaEnrolmentKey)
         .flatMap(_.getIdentifier(Constants.psaIdKey))
-    }
   }
 
   object IsPSP {
-    def unapply(enrolments: Enrolments): Option[EnrolmentIdentifier] = {
-      enrolments
-        .enrolments
+    def unapply(enrolments: Enrolments): Option[EnrolmentIdentifier] =
+      enrolments.enrolments
         .find(_.key == Constants.pspEnrolmentKey)
         .flatMap(_.getIdentifier(Constants.pspIdKey))
-    }
   }
 }

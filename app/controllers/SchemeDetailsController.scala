@@ -35,23 +35,25 @@ import viewmodels.{Delimiter, DisplayMessage}
 import views.html.ContentTablePageView
 
 class SchemeDetailsController @Inject()(
-                                         override val messagesApi: MessagesApi,
-                                         navigator: Navigator,
-                                         identify: IdentifierAction,
-                                         allowAccess: AllowAccessActionProvider,
-                                         getData: DataRetrievalAction,
-                                         requireData: DataRequiredAction,
-                                         createData: DataCreationAction,
-                                         val controllerComponents: MessagesControllerComponents,
-                                         view: ContentTablePageView,
-                                         config: FrontendAppConfig
-                                       ) extends FrontendBaseController with I18nSupport {
+  override val messagesApi: MessagesApi,
+  navigator: Navigator,
+  identify: IdentifierAction,
+  allowAccess: AllowAccessActionProvider,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  createData: DataCreationAction,
+  val controllerComponents: MessagesControllerComponents,
+  view: ContentTablePageView,
+  config: FrontendAppConfig
+) extends FrontendBaseController
+    with I18nSupport {
 
-  def onPageLoad(srn: Srn): Action[AnyContent] = (identify andThen allowAccess(srn) andThen getData andThen requireData) {
-    implicit request => Ok(view(viewModel(srn, request.request.schemeDetails)))
-  }
+  def onPageLoad(srn: Srn): Action[AnyContent] =
+    identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData) { implicit request =>
+      Ok(view(viewModel(srn, request.request.schemeDetails)))
+    }
 
-  def onSubmit(srn: Srn): Action[AnyContent] = (identify andThen allowAccess(srn) andThen getData andThen createData) {
+  def onSubmit(srn: Srn): Action[AnyContent] = identify.andThen(allowAccess(srn)).andThen(getData).andThen(createData) {
     implicit request =>
       Redirect(navigator.nextPage(SchemeDetailsPage(srn), NormalMode, request.userAnswers))
   }
@@ -61,7 +63,7 @@ class SchemeDetailsController @Inject()(
   protected[controllers] def viewModel(srn: Srn, schemeDetails: SchemeDetails): ContentTablePageViewModel = {
 
     val schemeEstablisherNameRow: Option[(SimpleMessage, SimpleMessage)] =
-      schemeDetails.establishers.headOption.map(establisher => ("schemeDetails.row4",  establisher.name))
+      schemeDetails.establishers.headOption.map(establisher => ("schemeDetails.row4", establisher.name))
 
     val otherSchemeEstablisherNameRows: Option[(DisplayMessage, DisplayMessage)] = schemeDetails.establishers match {
       case _ :: Nil | Nil => None
