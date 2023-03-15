@@ -17,14 +17,14 @@
 package viewmodels.models
 
 import play.api.mvc.Call
-import viewmodels.DisplayMessage.SimpleMessage
+import viewmodels.DisplayMessage.Message
 
 case class DateRangeViewModel(
-  title: SimpleMessage,
-  heading: SimpleMessage,
-  description: Option[SimpleMessage],
-  startDateLabel: SimpleMessage,
-  endDateLabel: SimpleMessage,
+  title: Message,
+  heading: Message,
+  description: Option[Message],
+  startDateLabel: Message,
+  endDateLabel: Message,
   onSubmit: Call
 )
 
@@ -37,11 +37,11 @@ object DateRangeViewModel {
     onSubmit: Call
   ): DateRangeViewModel =
     DateRangeViewModel(
-      SimpleMessage(title),
-      SimpleMessage(heading),
-      description.map(SimpleMessage(_)),
-      SimpleMessage("site.startDate"),
-      SimpleMessage("site.endDate"),
+      Message(title),
+      Message(heading),
+      description.map(Message(_)),
+      Message("site.startDate"),
+      Message("site.endDate"),
       onSubmit
     )
 }

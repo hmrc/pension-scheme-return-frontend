@@ -34,7 +34,8 @@ import RemoveSchemeBankAccountController._
 import config.Refined.Max10
 import models.requests.DataRequest
 import services.SaveService
-import viewmodels.DisplayMessage.SimpleMessage
+import viewmodels.DisplayMessage.Message
+import viewmodels.implicits._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -101,8 +102,8 @@ object RemoveSchemeBankAccountController {
   )
 
   def viewModel(srn: Srn, index: Max10, bankAccount: BankAccount, mode: Mode): YesNoPageViewModel = YesNoPageViewModel(
-    SimpleMessage("removeSchemeBankAccount.title", bankAccount.bankName, bankAccount.accountNumber),
-    SimpleMessage("removeSchemeBankAccount.heading", bankAccount.bankName, bankAccount.accountNumber),
+    Message("removeSchemeBankAccount.title", bankAccount.bankName, bankAccount.accountNumber),
+    Message("removeSchemeBankAccount.heading", bankAccount.bankName, bankAccount.accountNumber),
     controllers.routes.RemoveSchemeBankAccountController.onSubmit(srn, index, mode)
   )
 }

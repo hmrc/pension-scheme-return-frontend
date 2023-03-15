@@ -20,14 +20,14 @@ import play.api.i18n.Messages
 import play.api.mvc.Call
 import uk.gov.hmrc.govukfrontend.views.Aliases.{Hint, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
-import viewmodels.DisplayMessage.SimpleMessage
+import viewmodels.DisplayMessage.Message
 
 case class RadioListViewModel(
-  title: SimpleMessage,
-  heading: SimpleMessage,
-  description: List[SimpleMessage],
-  listedContent: List[SimpleMessage],
-  legend: Option[SimpleMessage],
+  title: Message,
+  heading: Message,
+  description: List[Message],
+  listedContent: List[Message],
+  legend: Option[Message],
   items: List[RadioListRowViewModel],
   onSubmit: Call
 )
@@ -36,8 +36,8 @@ object RadioListViewModel {
 
   def apply(title: String, heading: String, items: List[RadioListRowViewModel], onSubmit: Call): RadioListViewModel =
     RadioListViewModel(
-      SimpleMessage(title),
-      SimpleMessage(heading),
+      Message(title),
+      Message(heading),
       List(),
       List(),
       None,
@@ -47,9 +47,9 @@ object RadioListViewModel {
 }
 
 case class RadioListRowViewModel(
-  content: SimpleMessage,
+  content: Message,
   value: String,
-  hint: Option[SimpleMessage]
+  hint: Option[Message]
 ) {
 
   def radioListRow(implicit messages: Messages): RadioItem =
@@ -62,9 +62,9 @@ case class RadioListRowViewModel(
 
 object RadioListRowViewModel {
 
-  def apply(content: SimpleMessage, value: String): RadioListRowViewModel =
+  def apply(content: Message, value: String): RadioListRowViewModel =
     RadioListRowViewModel(content, value, None)
 
-  def apply(content: SimpleMessage, value: String, hint: SimpleMessage): RadioListRowViewModel =
+  def apply(content: Message, value: String, hint: Message): RadioListRowViewModel =
     RadioListRowViewModel(content, value, Some(hint))
 }

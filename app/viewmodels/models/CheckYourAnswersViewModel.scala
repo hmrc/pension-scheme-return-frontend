@@ -20,12 +20,12 @@ import play.api.i18n.Messages
 import play.api.mvc.Call
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
-import viewmodels.DisplayMessage.SimpleMessage
+import viewmodels.DisplayMessage.Message
 import viewmodels.govuk.summarylist._
 
 case class CheckYourAnswersViewModel(
-  title: SimpleMessage,
-  heading: SimpleMessage,
+  title: Message,
+  heading: Message,
   rows: List[CheckYourAnswersRowViewModel],
   onSubmit: Call
 )
@@ -37,16 +37,16 @@ object CheckYourAnswersViewModel {
     onSubmit: Call
   ): CheckYourAnswersViewModel =
     CheckYourAnswersViewModel(
-      SimpleMessage("checkYourAnswers.title"),
-      SimpleMessage("checkYourAnswers.heading"),
+      Message("checkYourAnswers.title"),
+      Message("checkYourAnswers.heading"),
       rows.toList,
       onSubmit
     )
 }
 
 case class CheckYourAnswersRowViewModel(
-  key: SimpleMessage,
-  value: SimpleMessage,
+  key: Message,
+  value: Message,
   actions: Seq[SummaryAction]
 ) {
 
@@ -70,23 +70,23 @@ object CheckYourAnswersRowViewModel {
     key: String,
     value: String
   ): CheckYourAnswersRowViewModel =
-    CheckYourAnswersRowViewModel(SimpleMessage(key), SimpleMessage(value), Seq())
+    CheckYourAnswersRowViewModel(Message(key), Message(value), Seq())
 
   def apply(
-    key: SimpleMessage,
+    key: Message,
     value: String
   ): CheckYourAnswersRowViewModel =
-    CheckYourAnswersRowViewModel(key, SimpleMessage(value), Seq())
+    CheckYourAnswersRowViewModel(key, Message(value), Seq())
 }
 
-case class SummaryAction(content: SimpleMessage, href: String, visuallyHiddenContent: SimpleMessage) {
+case class SummaryAction(content: Message, href: String, visuallyHiddenContent: Message) {
 
-  def withVisuallyHiddenContent(content: SimpleMessage): SummaryAction = copy(visuallyHiddenContent = content)
-  def withVisuallyHiddenContent(content: String): SummaryAction = withVisuallyHiddenContent(SimpleMessage(content))
+  def withVisuallyHiddenContent(content: Message): SummaryAction = copy(visuallyHiddenContent = content)
+  def withVisuallyHiddenContent(content: String): SummaryAction = withVisuallyHiddenContent(Message(content))
 }
 
 object SummaryAction {
 
   def apply(content: String, href: String): SummaryAction =
-    SummaryAction(SimpleMessage(content), href, SimpleMessage(""))
+    SummaryAction(Message(content), href, Message(""))
 }

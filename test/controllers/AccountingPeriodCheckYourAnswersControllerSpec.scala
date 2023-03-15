@@ -23,7 +23,7 @@ import models.{DateRange, NormalMode}
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
 import pages.AccountingPeriodPage
 import utils.DateTimeUtils.localDateShow
-import viewmodels.DisplayMessage.SimpleMessage
+import viewmodels.DisplayMessage.Message
 import viewmodels.models.SummaryAction
 import views.html.CheckYourAnswersView
 
@@ -109,12 +109,12 @@ class AccountingPeriodCheckYourAnswersControllerSpec extends ControllerBaseSpec 
       "have the correct actions" in {
 
         forAll(srnGen, dateRangeWithinRangeGen(dateRange)) { (srn, dateRange) =>
-          val content = SimpleMessage("site.change")
+          val content = Message("site.change")
           val href = routes.AccountingPeriodController.onPageLoad(srn, refineMV[OneToThree](1), NormalMode).url
 
           val actions = List(
-            SummaryAction(content, href, SimpleMessage("site.startDate")),
-            SummaryAction(content, href, SimpleMessage("site.endDate"))
+            SummaryAction(content, href, Message("site.startDate")),
+            SummaryAction(content, href, Message("site.endDate"))
           )
 
           viewModel(srn, refineMV[OneToThree](1), dateRange).rows.flatMap(_.actions) must contain allElementsOf actions

@@ -30,7 +30,7 @@ import org.scalacheck.Gen.{
   numChar
 }
 import play.api.mvc.Call
-import viewmodels.DisplayMessage.SimpleMessage
+import viewmodels.DisplayMessage.Message
 
 import java.time.{Instant, LocalDate, ZoneOffset}
 
@@ -153,7 +153,7 @@ trait BasicGenerators {
   def date: Gen[LocalDate] =
     datesBetween(earliestDate, latestDate)
 
-  val nonEmptySimpleMessage: Gen[SimpleMessage] = nonEmptyString.map(SimpleMessage(_))
+  val nonEmptyMessage: Gen[Message] = nonEmptyString.map(Message(_))
 
   def tupleOf[A, B](genA: Gen[A], genB: Gen[B]): Gen[(A, B)] =
     for {

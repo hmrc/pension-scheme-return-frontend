@@ -30,7 +30,7 @@ import pages.PspDeclarationPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.DisplayMessage.SimpleMessage
+import viewmodels.DisplayMessage.Message
 import viewmodels.models.ContentPageViewModel
 import views.html.ContentPageView
 
@@ -62,17 +62,17 @@ class PspDeclarationController @Inject()(
 object PspDeclarationController {
 
   def viewModel(srn: Srn): ContentPageViewModel = ContentPageViewModel(
-    SimpleMessage("pspDeclaration.title"),
-    SimpleMessage("pspDeclaration.heading"),
-    List(SimpleMessage("pspDeclaration.paragraph")),
+    Message("pspDeclaration.title"),
+    Message("pspDeclaration.heading"),
+    List(Message("pspDeclaration.paragraph")),
     List(
-      SimpleMessage("pspDeclaration.listItem1"),
-      SimpleMessage("pspDeclaration.listItem2"),
-      SimpleMessage("pspDeclaration.listItem3"),
-      SimpleMessage("pspDeclaration.listItem4"),
-      SimpleMessage("pspDeclaration.listItem5")
+      Message("pspDeclaration.listItem1"),
+      Message("pspDeclaration.listItem2"),
+      Message("pspDeclaration.listItem3"),
+      Message("pspDeclaration.listItem4"),
+      Message("pspDeclaration.listItem5")
     ),
-    SimpleMessage("site.agreeAndContinue"),
+    Message("site.agreeAndContinue"),
     isStartButton = false,
     routes.PspDeclarationController.onSubmit(srn)
   )

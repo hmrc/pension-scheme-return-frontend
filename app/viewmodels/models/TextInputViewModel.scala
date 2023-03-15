@@ -18,10 +18,10 @@ package viewmodels.models
 
 import play.api.mvc.Call
 import viewmodels.DisplayMessage
-import viewmodels.DisplayMessage.SimpleMessage
+import viewmodels.DisplayMessage.Message
 
 case class TextInputViewModel(
-  title: SimpleMessage,
+  title: Message,
   heading: DisplayMessage,
   label: Option[DisplayMessage],
   onSubmit: Call

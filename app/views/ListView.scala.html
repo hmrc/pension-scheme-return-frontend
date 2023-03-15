@@ -22,7 +22,7 @@
     govukRadios: GovukRadios,
     hmrcListWithActions: HmrcListWithActions,
     govukInsetText: GovukInsetText,
-    message: Message
+    renderMessage: RenderMessage
 )
 
 @(form: Form[Boolean], viewmodel: ListViewModel)(implicit request: Request[_], messages: Messages)
@@ -35,11 +35,11 @@
           @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        <h1 class="govuk-heading-l">@message(viewmodel.heading)</h1>
+        <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
 
         @hmrcListWithActions(ListWithActionsViewModel(viewmodel.rows.map( value =>
             ListWithActionsItemViewModel(
-                message(value.text),
+              renderMessage(value.text),
                 List(
                     ListWithActionsActionViewModel(messages("site.change"), value.changeUrl)
                         .withVisuallyHiddenText(value.changeHiddenText.toMessage),
@@ -53,11 +53,11 @@
             @govukRadios(
               RadiosViewModel.yesNo(
                 field = form("value"),
-                legend = LegendViewModel(message(viewmodel.radioText)).withSize(LegendSize.Medium)
+                legend = LegendViewModel(renderMessage(viewmodel.radioText)).withSize(LegendSize.Medium)
               )
             )
         } else {
-            @govukInsetText(InsetTextViewModel(message(viewmodel.insetText)))
+            @govukInsetText(InsetTextViewModel(renderMessage(viewmodel.insetText)))
         }
 
         @govukButton(

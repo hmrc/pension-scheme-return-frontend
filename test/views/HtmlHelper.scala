@@ -22,7 +22,7 @@ import org.jsoup.select.Elements
 import play.twirl.api.Html
 import viewmodels.ComplexMessageElement.{LinkedMessage, Message}
 import viewmodels.DisplayMessage
-import viewmodels.DisplayMessage.{ComplexMessage, SimpleMessage}
+import viewmodels.DisplayMessage.{ComplexMessage, Message}
 
 import scala.jdk.CollectionConverters.IteratorHasAsScala
 
@@ -111,7 +111,7 @@ trait HtmlHelper extends HtmlModels {
   }
 
   def messageKey(message: DisplayMessage): String = message match {
-    case SimpleMessage(key, _) => key
+    case Message(key, _) => key
     case ComplexMessage(elements, _) =>
       elements
         .map {

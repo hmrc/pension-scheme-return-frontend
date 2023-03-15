@@ -31,7 +31,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.FormUtils._
-import viewmodels.DisplayMessage.SimpleMessage
+import viewmodels.DisplayMessage.Message
 import viewmodels.models.NameDOBViewModel
 import views.html.NameDOBView
 
@@ -98,12 +98,12 @@ object MemberDetailsController {
   )
 
   def viewModel(srn: Srn, index: Max99, mode: Mode): NameDOBViewModel = NameDOBViewModel(
-    SimpleMessage("memberDetails.title"),
-    SimpleMessage("memberDetails.heading"),
-    SimpleMessage("memberDetails.firstName"),
-    SimpleMessage("memberDetails.lastName"),
-    SimpleMessage("memberDetails.dateOfBirth"),
-    SimpleMessage("memberDetails.dateOfBirth.hint"),
+    Message("memberDetails.title"),
+    Message("memberDetails.heading"),
+    Message("memberDetails.firstName"),
+    Message("memberDetails.lastName"),
+    Message("memberDetails.dateOfBirth"),
+    Message("memberDetails.dateOfBirth.hint"),
     controllers.routes.MemberDetailsController.onSubmit(srn, index, mode)
   )
 }

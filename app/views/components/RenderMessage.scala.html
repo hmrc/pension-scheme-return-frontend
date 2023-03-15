@@ -14,22 +14,21 @@
  * limitations under the License.
  *@
 
-@import utils.ListUtils._
-@import ComplexMessageElement._
 @import DisplayMessage._
+@import viewmodels.DisplayMessage.ListType._
 
-@this()
+@this(
+  renderMessage: RenderMessage
+)
 
 @(message: DisplayMessage)(implicit messages: Messages)
 
 @{message match {
-  case SimpleMessage(key, args) => HtmlFormat.raw(messages(key, args: _*))
-  case ComplexMessage(elems, delim) => elems.map{
-    case Message(key, args) => HtmlFormat.raw(messages(key, args: _*))
-    case LinkedMessage(key, url, args) => <a href={url} class="govuk-link">{messages(key, args: _*)}</a>
-  }.intersperse(delim match {
-      case Delimiter.SingleSpace => HtmlFormat.raw(" ")
-      case Delimiter.Newline => HtmlFormat.raw("<br>")
-  })
+  case m @ Message(_, _)             => m.toMessage
+  case LinkMessage(content, url)     => <a href={url} class="govuk-link">{renderMessage(content)}</a>
+  case ParagraphMessage(content)     => <p class="govuk-body">{content.map(renderMessage(_))}</p>
+  case ListMessage(content, Bullet)  =>
+    <ul class="govuk-list govuk-list--bullet">{content.map(c => <li>{renderMessage(c)}</li>)}</ul>
+  case ListMessage(content, NewLine) => content.map(renderMessage(_)).mkString("<br>")
 }}
 

@@ -37,7 +37,8 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.time.TaxYear
 import utils.DateTimeUtils.localDateShow
 import utils.FormUtils.FormOps
-import viewmodels.DisplayMessage.SimpleMessage
+import viewmodels.DisplayMessage.Message
+import viewmodels.implicits._
 import viewmodels.models.{RadioListRowViewModel, RadioListViewModel}
 import views.html.RadioListView
 
@@ -112,7 +113,7 @@ object WhichTaxYearController {
     "whichTaxYear.heading",
     options(taxYear).toList.map {
       case (value, range) =>
-        val displayText = SimpleMessage("whichTaxYear.radioOption", range.from.show, range.to.show)
+        val displayText = Message("whichTaxYear.radioOption", range.from.show, range.to.show)
         RadioListRowViewModel(displayText, value)
     },
     controllers.routes.WhichTaxYearController.onSubmit(srn, mode)

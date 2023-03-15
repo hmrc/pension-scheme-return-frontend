@@ -28,9 +28,9 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.{SaveService, SchemeDetailsService, TaxYearService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.DateTimeUtils
 import utils.DateTimeUtils.localDateShow
-import viewmodels.DisplayMessage.SimpleMessage
+import viewmodels.DisplayMessage.Message
+import viewmodels.implicits._
 import viewmodels.models.YesNoPageViewModel
 import views.html.YesNoPageView
 
@@ -116,16 +116,16 @@ object CheckReturnDatesController {
     schemeDetails: MinimalSchemeDetails
   ): YesNoPageViewModel =
     YesNoPageViewModel(
-      SimpleMessage("checkReturnDates.title"),
-      SimpleMessage("checkReturnDates.heading"),
+      Message("checkReturnDates.title"),
+      Message("checkReturnDates.heading"),
       List(
-        SimpleMessage(
+        Message(
           "checkReturnDates.description",
           max(schemeDetails.openDate.getOrElse(fromDate), fromDate).show,
           min(schemeDetails.windUpDate.getOrElse(toDate), toDate).show
         )
       ),
-      Some(SimpleMessage("checkReturnDates.legend")),
+      Some(Message("checkReturnDates.legend")),
       onSubmit = routes.CheckReturnDatesController.onSubmit(srn, mode)
     )
 }

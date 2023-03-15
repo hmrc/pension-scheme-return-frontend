@@ -28,7 +28,7 @@ import play.api.test.FakeRequest
 import services.{SaveService, SchemeDetailsService}
 import uk.gov.hmrc.time.TaxYear
 import utils.DateTimeUtils
-import viewmodels.DisplayMessage.SimpleMessage
+import viewmodels.DisplayMessage.Message
 import viewmodels.models.YesNoPageViewModel
 import views.html.YesNoPageView
 
@@ -48,7 +48,7 @@ class CheckReturnDatesControllerSpec extends ControllerBaseSpec with ScalaCheckP
 
       forAll(srnGen, modeGen, date) { (srn, mode, dates) =>
         val viewModel = CheckReturnDatesController.viewModel(srn, mode, dates, dates, minimalSchemeDetails)
-        viewModel.title mustBe SimpleMessage("checkReturnDates.title")
+        viewModel.title mustBe Message("checkReturnDates.title")
       }
     }
 
@@ -56,7 +56,7 @@ class CheckReturnDatesControllerSpec extends ControllerBaseSpec with ScalaCheckP
 
       forAll(srnGen, modeGen, date) { (srn, mode, dates) =>
         val viewModel = CheckReturnDatesController.viewModel(srn, mode, dates, dates, minimalSchemeDetails)
-        viewModel.heading mustBe SimpleMessage("checkReturnDates.heading")
+        viewModel.heading mustBe Message("checkReturnDates.heading")
       }
     }
 
@@ -70,7 +70,7 @@ class CheckReturnDatesControllerSpec extends ControllerBaseSpec with ScalaCheckP
         val formattedToDate = DateTimeUtils.formatHtml(toDate)
 
         viewModel.description mustBe List(
-          SimpleMessage("checkReturnDates.description", formattedFromDate, formattedToDate)
+          Message("checkReturnDates.description", formattedFromDate, formattedToDate)
         )
       }
     }
@@ -85,7 +85,7 @@ class CheckReturnDatesControllerSpec extends ControllerBaseSpec with ScalaCheckP
         val formattedToDate = DateTimeUtils.formatHtml(toDate)
 
         viewModel.description mustBe List(
-          SimpleMessage("checkReturnDates.description", formattedFromDate, formattedToDate)
+          Message("checkReturnDates.description", formattedFromDate, formattedToDate)
         )
       }
     }
@@ -100,7 +100,7 @@ class CheckReturnDatesControllerSpec extends ControllerBaseSpec with ScalaCheckP
         val formattedToDate = DateTimeUtils.formatHtml(toDate)
 
         viewModel.description mustBe List(
-          SimpleMessage("checkReturnDates.description", formattedFromDate, formattedToDate)
+          Message("checkReturnDates.description", formattedFromDate, formattedToDate)
         )
       }
     }
@@ -115,7 +115,7 @@ class CheckReturnDatesControllerSpec extends ControllerBaseSpec with ScalaCheckP
         val formattedToDate = DateTimeUtils.formatHtml(details.windUpDate.getOrElse(latestDate))
 
         viewModel.description mustBe List(
-          SimpleMessage("checkReturnDates.description", formattedFromDate, formattedToDate)
+          Message("checkReturnDates.description", formattedFromDate, formattedToDate)
         )
       }
     }
@@ -124,7 +124,7 @@ class CheckReturnDatesControllerSpec extends ControllerBaseSpec with ScalaCheckP
 
       forAll(srnGen, modeGen, date) { (srn, mode, dates) =>
         val viewModel = CheckReturnDatesController.viewModel(srn, mode, dates, dates, minimalSchemeDetails)
-        viewModel.legend.value mustBe SimpleMessage("checkReturnDates.legend")
+        viewModel.legend.value mustBe Message("checkReturnDates.legend")
       }
     }
 

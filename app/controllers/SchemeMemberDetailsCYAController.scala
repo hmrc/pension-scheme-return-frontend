@@ -34,7 +34,8 @@ import cats.syntax.either._
 import config.Refined.Max99
 import uk.gov.hmrc.domain.Nino
 import utils.MessageUtils.booleanToMessage
-import viewmodels.DisplayMessage.SimpleMessage
+import viewmodels.DisplayMessage.Message
+import viewmodels.implicits._
 
 class SchemeMemberDetailsCYAController @Inject()(
   override val messagesApi: MessagesApi,
@@ -92,12 +93,12 @@ object SchemeMemberDetailsCYAController {
             .withVisuallyHiddenContent("memberDetails.dateOfBirth")
         ),
       CheckYourAnswersRowViewModel(
-        SimpleMessage("nationalInsuranceNumber.heading", memberDetails.fullName),
+        Message("nationalInsuranceNumber.heading", memberDetails.fullName),
         booleanToMessage(hasNINO)
       ).withAction(
-          SummaryAction("site.change", routes.DoesSchemeMemberHaveNINOController.onPageLoad(srn, index, mode).url)
-            .withVisuallyHiddenContent("nationalInsuranceNumber.heading")
-        )
+        SummaryAction("site.change", routes.DoesSchemeMemberHaveNINOController.onPageLoad(srn, index, mode).url)
+          .withVisuallyHiddenContent("nationalInsuranceNumber.heading")
+      )
     ) ++ ninoRow(maybeNino, memberDetails.fullName, srn, index, mode)
 
   private def ninoRow(
@@ -110,7 +111,7 @@ object SchemeMemberDetailsCYAController {
     maybeNino.fold(List.empty[CheckYourAnswersRowViewModel])(
       nino =>
         List(
-          CheckYourAnswersRowViewModel(SimpleMessage("memberDetailsNino.heading", memberName), nino.value)
+          CheckYourAnswersRowViewModel(Message("memberDetailsNino.heading", memberName), nino.value)
             .withAction(
               SummaryAction("site.change", routes.MemberDetailsNinoController.onPageLoad(srn, index, mode).url)
                 .withVisuallyHiddenContent("site.endDate")

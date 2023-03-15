@@ -33,7 +33,8 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.time.TaxYear
 import utils.DateTimeUtils.localDateShow
 import utils.FormUtils._
-import viewmodels.DisplayMessage.SimpleMessage
+import viewmodels.DisplayMessage.Message
+import viewmodels.implicits._
 import viewmodels.models.MoneyViewModel
 import views.html.MoneyView
 
@@ -88,8 +89,8 @@ object HowMuchCashController {
   )
 
   def viewModel(srn: Srn, mode: Mode, schemeName: String, taxYear: TaxYear): MoneyViewModel = MoneyViewModel(
-    SimpleMessage("howMuchCash.title", schemeName, taxYear.starts.show),
-    SimpleMessage("howMuchCash.heading", schemeName, taxYear.starts.show),
+    Message("howMuchCash.title", schemeName, taxYear.starts.show),
+    Message("howMuchCash.heading", schemeName, taxYear.starts.show),
     routes.HowMuchCashController.onSubmit(srn, mode)
   )
 }

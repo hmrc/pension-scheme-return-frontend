@@ -18,10 +18,10 @@ package viewmodels.models
 
 import play.api.mvc.Call
 import viewmodels.DisplayMessage
-import viewmodels.DisplayMessage.SimpleMessage
+import viewmodels.DisplayMessage.Message
 
 case class ContentTablePageViewModel(
-  title: SimpleMessage,
+  title: Message,
   heading: DisplayMessage,
   rows: List[(DisplayMessage, DisplayMessage)],
   inset: DisplayMessage,
@@ -40,7 +40,7 @@ object ContentTablePageViewModel {
     rows: (DisplayMessage, DisplayMessage)*
   ): ContentTablePageViewModel =
     ContentTablePageViewModel(
-      SimpleMessage(title),
+      Message(title),
       heading,
       rows.toList,
       inset,

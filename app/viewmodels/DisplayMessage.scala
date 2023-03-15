@@ -21,37 +21,45 @@ import play.api.i18n.Messages
 sealed trait DisplayMessage
 
 object DisplayMessage {
-  case class SimpleMessage(key: String, args: List[Any]) extends DisplayMessage {
-    def toMessage(implicit messages: Messages): String = messages(key, args: _*)
+
+  sealed trait InlineMessage extends DisplayMessage
+
+  sealed trait BlockMessage extends DisplayMessage
+
+  case class Message(key: String, args: List[Message]) extends InlineMessage {
+
+    def toMessage(implicit messages: Messages): String =
+      messages(key, args.map(_.toMessage))
   }
-
-  object SimpleMessage {
-    def apply(key: String): SimpleMessage = new SimpleMessage(key, Nil)
-
-    def apply(key: String, args: Any*): SimpleMessage = new SimpleMessage(key, args.toList)
-  }
-
-  case class ComplexMessage(elements: List[ComplexMessageElement], delimiter: Delimiter) extends DisplayMessage
-
-  object ComplexMessage {
-    def apply(elements: ComplexMessageElement*): ComplexMessage = ComplexMessage(elements.toList, Delimiter.SingleSpace)
-  }
-}
-
-sealed trait ComplexMessageElement
-
-object ComplexMessageElement {
-  case class Message(key: String, args: List[Any] = Nil) extends ComplexMessageElement
-  case class LinkedMessage(key: String, url: String, args: List[Any] = Nil) extends ComplexMessageElement
 
   object Message {
-    def apply(key: String, args: Any*): Message = Message(key, args.toList)
+
+    def apply(key: String, args: Message*): Message =
+      Message(key, args.toList)
   }
-}
 
-sealed trait Delimiter
+  case class LinkMessage(content: Message, url: String) extends InlineMessage
 
-object Delimiter {
-  case object SingleSpace extends Delimiter
-  case object Newline extends Delimiter
+  case class ParagraphMessage(content: List[InlineMessage]) extends BlockMessage
+
+  object ParagraphMessage {
+
+    def apply(content: InlineMessage*): ParagraphMessage =
+      ParagraphMessage(content.toList)
+  }
+
+  case class ListMessage(content: List[InlineMessage], listType: ListType) extends BlockMessage
+
+  object ListMessage {
+
+    def apply(listType: ListType, content: InlineMessage*): ListMessage =
+      ListMessage(content.toList, listType)
+  }
+
+  sealed trait ListType
+
+  object ListType {
+    case object Bullet extends ListType
+    case object NewLine extends ListType
+  }
 }

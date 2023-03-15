@@ -21,7 +21,7 @@ import models.BankAccount
 import play.api.data
 import play.api.data.Forms.{mapping, text}
 import play.api.test.FakeRequest
-import viewmodels.DisplayMessage.SimpleMessage
+import viewmodels.DisplayMessage.Message
 import viewmodels.models.TextInputViewModel
 import views.html.{BankAccountView, TextInputView}
 

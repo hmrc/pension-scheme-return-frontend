@@ -34,10 +34,11 @@ import DoesSchemeMemberHaveNINOController._
 import config.Refined.Max99
 import models.requests.DataRequest
 import services.SaveService
-import viewmodels.DisplayMessage.SimpleMessage
+import viewmodels.implicits._
 
 import scala.concurrent.{ExecutionContext, Future}
 import utils.FormUtils._
+import viewmodels.DisplayMessage.Message
 
 class DoesSchemeMemberHaveNINOController @Inject()(
   override val messagesApi: MessagesApi,
@@ -106,8 +107,8 @@ object DoesSchemeMemberHaveNINOController {
   )
 
   def viewModel(index: Max99, memberName: String, srn: Srn, mode: Mode): YesNoPageViewModel = YesNoPageViewModel(
-    SimpleMessage("nationalInsuranceNumber.title", memberName),
-    SimpleMessage("nationalInsuranceNumber.heading", memberName),
+    Message("nationalInsuranceNumber.title", memberName),
+    Message("nationalInsuranceNumber.heading", memberName),
     controllers.routes.DoesSchemeMemberHaveNINOController.onSubmit(srn, index, mode)
   )
 }

@@ -34,7 +34,8 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.FormUtils._
 import utils.ListUtils.ListOps
 import utils.RefinedUtils.RefinedIntOps
-import viewmodels.DisplayMessage.SimpleMessage
+import viewmodels.DisplayMessage.Message
+import viewmodels.implicits._
 import viewmodels.models.TextInputViewModel
 import views.html.TextInputView
 
@@ -100,8 +101,8 @@ object MemberDetailsNinoController {
     )
 
   def viewModel(srn: Srn, index: Max99, mode: Mode, memberDetails: NameDOB): TextInputViewModel = TextInputViewModel(
-    SimpleMessage("memberDetailsNino.title"),
-    SimpleMessage("memberDetailsNino.heading", memberDetails.fullName),
+    Message("memberDetailsNino.title"),
+    Message("memberDetailsNino.heading", memberDetails.fullName),
     None,
     controllers.routes.MemberDetailsNinoController.onSubmit(srn, index, mode)
   )

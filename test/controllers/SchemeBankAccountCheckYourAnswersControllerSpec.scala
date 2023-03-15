@@ -22,7 +22,7 @@ import models.NormalMode
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import pages.SchemeBankAccountPage
 import play.api.mvc.Call
-import viewmodels.DisplayMessage.SimpleMessage
+import viewmodels.DisplayMessage.Message
 import viewmodels.models.SummaryAction
 import views.html.CheckYourAnswersView
 
@@ -125,13 +125,13 @@ class SchemeBankAccountCheckYourAnswersControllerSpec
     "have the correct actions" in {
 
       forAll(srnGen, bankAccountGen) { (srn, bankAccount) =>
-        val content = SimpleMessage("site.change")
+        val content = Message("site.change")
         val href = routes.SchemeBankAccountController.onPageLoad(srn, indexOne, NormalMode).url
 
         val actions = List(
-          SummaryAction(content, href, SimpleMessage("schemeBankDetails.bankName.heading.vh")),
-          SummaryAction(content, href, SimpleMessage("schemeBankDetails.accountNumber.heading.vh")),
-          SummaryAction(content, href, SimpleMessage("schemeBankDetails.sortCode.heading.vh"))
+          SummaryAction(content, href, Message("schemeBankDetails.bankName.heading.vh")),
+          SummaryAction(content, href, Message("schemeBankDetails.accountNumber.heading.vh")),
+          SummaryAction(content, href, Message("schemeBankDetails.sortCode.heading.vh"))
         )
 
         viewModel(srn, indexOne, bankAccount).rows.flatMap(_.actions) must contain allElementsOf actions
