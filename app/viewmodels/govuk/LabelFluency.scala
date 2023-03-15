@@ -36,7 +36,7 @@ trait LabelFluency {
 
   implicit class FluentLabel(label: Label) {
 
-    def asPageHeading(size: LabelSize = LabelSize.ExtraLarge): Label =
+    def asPageHeading(size: LabelSize = LabelSize.Large): Label =
       label
         .copy(isPageHeading = true)
         .withCssClass(size.toString)
