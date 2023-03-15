@@ -95,9 +95,9 @@ object SchemeMemberDetailsCYAController {
         SimpleMessage("nationalInsuranceNumber.heading", memberDetails.fullName),
         booleanToMessage(hasNINO)
       ).withAction(
-          SummaryAction("site.change", routes.DoesSchemeMemberHaveNINOController.onPageLoad(srn, index, mode).url)
-            .withVisuallyHiddenContent("nationalInsuranceNumber.heading")
-        )
+        SummaryAction("site.change", routes.DoesSchemeMemberHaveNINOController.onPageLoad(srn, index, mode).url)
+          .withVisuallyHiddenContent("nationalInsuranceNumber.heading")
+      )
     ) ++ ninoRow(maybeNino, memberDetails.fullName, srn, index, mode)
 
   private def ninoRow(
