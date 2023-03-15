@@ -93,7 +93,7 @@ object SchemeMemberDetailsCYAController {
     CheckYourAnswersRowViewModel(SimpleMessage("nationalInsuranceNumber.heading", memberDetails.fullName), booleanToMessage(hasNINO))
       .withAction(
         SummaryAction("site.change", routes.DoesSchemeMemberHaveNINOController.onPageLoad(srn, index, mode).url)
-          .withVisuallyHiddenContent("site.endDate")
+          .withVisuallyHiddenContent("nationalInsuranceNumber.heading")
       )
   ) ++ ninoRow(maybeNino, memberDetails.fullName, srn, index, mode)
 
