@@ -21,7 +21,6 @@ import models.Enumerable
 import play.api.data.Form
 
 import javax.inject.Inject
-import scala.collection.Iterable.single
 
 class RadioListFormProvider @Inject() extends Mappings {
 

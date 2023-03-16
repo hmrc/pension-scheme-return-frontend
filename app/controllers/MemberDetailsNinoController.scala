@@ -20,9 +20,9 @@ import config.Refined.Max99
 import controllers.MemberDetailsNinoController._
 import controllers.actions._
 import forms.TextFormProvider
-import models.{Mode, NameDOB}
 import models.SchemeId.Srn
 import models.requests.DataRequest
+import models.{Mode, NameDOB}
 import navigation.Navigator
 import pages.{MemberDetailsNinoPage, MemberDetailsNinos, MemberDetailsPage}
 import play.api.data.Form

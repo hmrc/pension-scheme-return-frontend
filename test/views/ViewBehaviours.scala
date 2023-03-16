@@ -17,7 +17,6 @@
 package views
 
 import org.scalacheck.Gen
-import play.api.data
 import play.api.mvc.Call
 import play.twirl.api.Html
 import viewmodels.DisplayMessage

@@ -16,7 +16,6 @@
 
 package controllers
 
-import config.Refined.OneToThree
 import controllers.RemoveAccountingPeriodController._
 import eu.timepit.refined._
 import forms.YesNoPageFormProvider

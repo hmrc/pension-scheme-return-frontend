@@ -16,8 +16,7 @@
 
 package generators
 
-import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.{Arbitrary, Gen}
+import org.scalacheck.Gen
 import viewmodels.DisplayMessage.Message
 import viewmodels.models._
 

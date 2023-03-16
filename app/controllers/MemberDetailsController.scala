@@ -35,7 +35,6 @@ import viewmodels.DisplayMessage.Message
 import viewmodels.models.NameDOBViewModel
 import views.html.NameDOBView
 
-import java.time.LocalDate
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 

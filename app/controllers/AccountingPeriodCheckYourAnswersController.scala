@@ -21,10 +21,10 @@ import com.google.inject.Inject
 import config.Refined.Max3
 import controllers.AccountingPeriodCheckYourAnswersController.viewModel
 import controllers.actions.{AllowAccessActionProvider, DataRequiredAction, DataRetrievalAction, IdentifierAction}
-import models.{DateRange, NormalMode}
 import models.SchemeId.Srn
+import models.{DateRange, NormalMode}
 import navigation.Navigator
-import pages.{AccountingPeriodCheckYourAnswersPage, AccountingPeriodPage, SchemeBankAccountCheckYourAnswersPage}
+import pages.{AccountingPeriodCheckYourAnswersPage, AccountingPeriodPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController

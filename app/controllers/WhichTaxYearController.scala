@@ -17,13 +17,7 @@
 package controllers
 
 import cats.implicits.toShow
-import controllers.actions.{
-  AllowAccessActionProvider,
-  DataCreationAction,
-  DataRequiredAction,
-  DataRetrievalAction,
-  IdentifierAction
-}
+import controllers.actions.{AllowAccessActionProvider, DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import forms.RadioListFormProvider
 import models.SchemeId.Srn
 import models.{DateRange, Enumerable, Mode, NormalMode}

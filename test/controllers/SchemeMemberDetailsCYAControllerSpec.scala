@@ -16,7 +16,6 @@
 
 package controllers
 
-import config.Refined.OneToThree
 import controllers.SchemeMemberDetailsCYAController._
 import eu.timepit.refined.refineMV
 import models.{NameDOB, NormalMode}

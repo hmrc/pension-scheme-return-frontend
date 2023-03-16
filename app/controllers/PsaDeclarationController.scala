@@ -16,20 +16,13 @@
 
 package controllers
 
-import config.Refined.Max3
-import controllers.actions.{
-  AllowAccessActionProvider,
-  DataCreationAction,
-  DataRequiredAction,
-  DataRetrievalAction,
-  IdentifierAction
-}
-import models.{Mode, NormalMode}
+import controllers.actions.{AllowAccessActionProvider, DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import models.NormalMode
 import models.SchemeId.Srn
 import navigation.Navigator
 import pages.PsaDeclarationPage
-import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents}
+import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.ContentPageViewModel

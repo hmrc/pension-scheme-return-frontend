@@ -16,9 +16,7 @@
 
 package views
 
-import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.test.FakeRequest
-import utils.BaseSpec
 import viewmodels.models.SummaryAction
 import views.html.CheckYourAnswersView
 

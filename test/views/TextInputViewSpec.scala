@@ -17,13 +17,9 @@
 package views
 
 import forms.mappings.Mappings
-import models.BankAccount
 import play.api.data
-import play.api.data.Forms.{mapping, text}
 import play.api.test.FakeRequest
-import viewmodels.DisplayMessage.Message
-import viewmodels.models.TextInputViewModel
-import views.html.{BankAccountView, TextInputView}
+import views.html.TextInputView
 
 class TextInputViewSpec extends ViewSpec with Mappings {
 

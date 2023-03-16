@@ -32,7 +32,7 @@ import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.DisplayMessage.{LinkMessage, ListMessage, ListType, Message}
+import viewmodels.DisplayMessage.{ListMessage, ListType, Message}
 import viewmodels.implicits._
 import viewmodels.models.{ListRow, ListViewModel}
 import views.html.ListView

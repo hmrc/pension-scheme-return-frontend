@@ -16,13 +16,7 @@
 
 package controllers
 
-import controllers.actions.{
-  AllowAccessActionProvider,
-  DataCreationAction,
-  DataRequiredAction,
-  DataRetrievalAction,
-  IdentifierAction
-}
+import controllers.actions.{AllowAccessActionProvider, DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import models.NormalMode
 import models.SchemeId.Srn
 import navigation.Navigator

@@ -18,7 +18,6 @@ package forms
 
 import forms.mappings.Mappings
 import play.api.data.Form
-import play.api.data.validation.{Constraint, Invalid, Valid}
 import uk.gov.hmrc.domain.Nino
 
 import javax.inject.Inject
