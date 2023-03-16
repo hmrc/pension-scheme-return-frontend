@@ -17,6 +17,8 @@
 package viewmodels
 
 import play.api.i18n.Messages
+import play.twirl.api.{Html, HtmlFormat}
+import viewmodels.DisplayMessage.ListType.Bullet
 
 sealed trait DisplayMessage
 

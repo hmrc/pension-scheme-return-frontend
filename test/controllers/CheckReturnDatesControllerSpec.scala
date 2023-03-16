@@ -29,6 +29,7 @@ import services.{SaveService, SchemeDetailsService}
 import uk.gov.hmrc.time.TaxYear
 import utils.DateTimeUtils
 import viewmodels.DisplayMessage.Message
+import viewmodels.implicits._
 import viewmodels.models.YesNoPageViewModel
 import views.html.YesNoPageView
 
