@@ -54,7 +54,8 @@ class SchemeMemberDetailsCYAController @Inject()(
         memberDetails <- request.userAnswers.get(MemberDetailsPage(srn, index))
         hasNINO <- request.userAnswers.get(NationalInsuranceNumberPage(srn, index))
         maybeNino <- Option.when(hasNINO)(request.userAnswers.get(MemberDetailsNinoPage(srn, index))).sequence
-      } yield Ok(view(viewModel(index, srn, mode, memberDetails, hasNINO, maybeNino)))
+        maybeNoNinoReason <- Option.when(!hasNINO)(request.userAnswers.get(NoNINOPage(srn, index))).sequence
+      } yield Ok(view(viewModel(index, srn, mode, memberDetails, hasNINO, maybeNino, maybeNoNinoReason)))
 
       result.getOrElse(Redirect(routes.JourneyRecoveryController.onPageLoad()))
     }
@@ -73,7 +74,8 @@ object SchemeMemberDetailsCYAController {
     mode: Mode,
     memberDetails: NameDOB,
     hasNINO: Boolean,
-    maybeNino: Option[Nino]
+    maybeNino: Option[Nino],
+    maybeNoNinoReason: Option[String]
   ): List[CheckYourAnswersRowViewModel] =
     List(
       CheckYourAnswersRowViewModel("memberDetails.firstName", memberDetails.firstName)
@@ -98,7 +100,9 @@ object SchemeMemberDetailsCYAController {
         SummaryAction("site.change", routes.DoesSchemeMemberHaveNINOController.onPageLoad(srn, index, mode).url)
           .withVisuallyHiddenContent("nationalInsuranceNumber.heading")
       )
-    ) ++ ninoRow(maybeNino, memberDetails.fullName, srn, index, mode)
+    ) ++
+      ninoRow(maybeNino, memberDetails.fullName, srn, index, mode) ++
+      noNinoReasonRow(maybeNoNinoReason, memberDetails.fullName, srn, index, mode)
 
   private def ninoRow(
     maybeNino: Option[Nino],
@@ -113,7 +117,25 @@ object SchemeMemberDetailsCYAController {
           CheckYourAnswersRowViewModel(Message("memberDetailsNino.heading", memberName), nino.value)
             .withAction(
               SummaryAction("site.change", routes.MemberDetailsNinoController.onPageLoad(srn, index, mode).url)
-                .withVisuallyHiddenContent("site.endDate")
+                .withVisuallyHiddenContent("memberDetailsNino.heading")
+            )
+        )
+    )
+
+  private def noNinoReasonRow(
+    maybeNoNinoReason: Option[String],
+    memberName: String,
+    srn: Srn,
+    index: Max99,
+    mode: Mode
+  ): List[CheckYourAnswersRowViewModel] =
+    maybeNoNinoReason.fold(List.empty[CheckYourAnswersRowViewModel])(
+      noNinoReason =>
+        List(
+          CheckYourAnswersRowViewModel(Message("noNINO.heading", memberName), noNinoReason)
+            .withAction(
+              SummaryAction("site.change", routes.NoNINOController.onPageLoad(srn, index, mode).url)
+                .withVisuallyHiddenContent("noNINO.heading")
             )
         )
     )
@@ -124,9 +146,10 @@ object SchemeMemberDetailsCYAController {
     mode: Mode,
     memberDetails: NameDOB,
     hasNINO: Boolean,
-    maybeNino: Option[Nino]
+    maybeNino: Option[Nino],
+    maybeNoNinoReason: Option[String]
   ): CheckYourAnswersViewModel = CheckYourAnswersViewModel(
-    rows(index, srn, mode, memberDetails, hasNINO, maybeNino),
+    rows(index, srn, mode, memberDetails, hasNINO, maybeNino, maybeNoNinoReason),
     controllers.routes.SchemeMemberDetailsCYAController.onSubmit(srn, index)
   )
 }

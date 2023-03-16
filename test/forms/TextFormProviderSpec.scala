@@ -25,6 +25,22 @@ class TextFormProviderSpec extends FieldBehaviours {
 
   private val formProvider = new TextFormProvider()
 
+  ".textarea" - {
+    val form: Form[String] = formProvider.textArea(
+      "required",
+      "tooLong",
+      "invalid"
+    )
+
+    val invalidTextGen = nonEmptyString.suchThat(!_.matches(formProvider.textAreaRegex))
+
+    behave.like(fieldThatBindsValidData(form, "value", nonEmptyAlphaString))
+    behave.like(mandatoryField(form, "value", "required"))
+    behave.like(invalidField(form, "value", "invalid", invalidTextGen))
+    behave.like(textTooLongField(form, "value", "tooLong", formProvider.textAreaMaxLength))
+    behave.like((form, "value", "invalid", invalidTextGen))
+  }
+
   ".nino" - {
 
     val duplicates = Gen.listOfN(8, ninoGen).sample.value

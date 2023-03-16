@@ -234,3 +234,9 @@ memberDetailsNino.heading = What is {0}’s National Insurance number?
 memberDetailsNino.error.required = Enter {0}’s National Insurance number
 memberDetailsNino.error.invalid = Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C
 memberDetailsNino.error.duplicate = National Insurance number is already in use and cannot be duplicated
+
+noNINO.title = Why does the member not have a National Insurance number?
+noNINO.heading = Why does {0} not have a National Insurance number?
+noNINO.error.required = Enter the reason {0} does not have a National Insurance number
+noNINO.error.length = The reason {0} does not have a National Insurance number must be 160 characters or fewer
+noNINO.error.invalid = The reason {0} does not have a National Insurance number must only include letters a to z, numbers 0 to 9, and special characters such as hyphens, spaces and apostrophes
