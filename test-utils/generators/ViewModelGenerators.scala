@@ -24,14 +24,14 @@ trait ViewModelGenerators extends BasicGenerators {
 
   val contentPageViewModelGen: Gen[ContentPageViewModel] =
     for {
-      title <- nonEmptyString
-      heading <- nonEmptyString
-      paragraphs <- Gen.listOf(nonEmptyString)
-      buttonText <- nonEmptyString
+      title <- nonEmptyMessage
+      heading <- nonEmptyMessage
+      contents <- Gen.listOf(nonEmptyBlockMessage)
+      buttonText <- nonEmptyMessage
       isStartButton <- boolean
       onSubmit <- call
     } yield {
-      ContentPageViewModel(title, heading, paragraphs, buttonText, isStartButton, onSubmit)
+      ContentPageViewModel(title, heading, contents, buttonText, isStartButton, onSubmit)
     }
 
   val contentTablePageViewModelGen: Gen[ContentTablePageViewModel] =
@@ -177,13 +177,12 @@ trait ViewModelGenerators extends BasicGenerators {
     for {
       title <- nonEmptyMessage
       heading <- nonEmptyMessage
-      description <- Gen.listOf(nonEmptyMessage)
-      listedContent <- Gen.listOf(nonEmptyMessage)
+      contents <- Gen.listOf(nonEmptyBlockMessage)
       legend <- Gen.option(nonEmptyMessage)
       items <- Gen.listOf(radioListRowViewModelGen)
       onSubmit <- call
     } yield {
-      RadioListViewModel(title, heading, description, listedContent, legend, items, onSubmit)
+      RadioListViewModel(title, heading, contents, legend, items, onSubmit)
     }
 
   val dateRangeViewModelGen: Gen[DateRangeViewModel] =

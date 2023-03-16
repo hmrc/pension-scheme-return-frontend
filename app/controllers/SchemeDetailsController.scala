@@ -66,8 +66,8 @@ class SchemeDetailsController @Inject()(
 
     val otherSchemeEstablisherNameRows: Option[(DisplayMessage, DisplayMessage)] = schemeDetails.establishers match {
       case _ :: Nil | Nil => None
-      case _ :: others =>
-        Some(("schemeDetails.row5", ListMessage(others.map[Message](_.name), ListType.NewLine)))
+      case _ :: next :: rest =>
+        Some(("schemeDetails.row5", ListMessage(ListType.NewLine, next.name, rest.map[Message](_.name): _*)))
     }
 
     ContentTablePageViewModel(

@@ -19,6 +19,7 @@ package views
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.test.FakeRequest
 import utils.BaseSpec
+import viewmodels.DisplayMessage.{ListMessage, ParagraphMessage}
 import views.html.ContentPageView
 
 class ContentPageViewSpec extends BaseSpec with ScalaCheckPropertyChecks with HtmlHelper {
@@ -47,14 +48,16 @@ class ContentPageViewSpec extends BaseSpec with ScalaCheckPropertyChecks with Ht
       "render all paragraphs" in {
 
         forAll(contentPageViewModelGen) { viewModel =>
-          p(view(viewModel)) must contain allElementsOf viewModel.paragraphs.map(_.toMessage)
+          p(view(viewModel)) must contain allElementsOf
+            viewModel.contents.collect { case p: ParagraphMessage => p }.map(messageKey)
         }
       }
 
-      "render all listItems" in {
+      "render all list items" in {
 
         forAll(contentPageViewModelGen) { viewModel =>
-          li(view(viewModel)) must contain allElementsOf viewModel.listItems.map(_.toMessage)
+          li(view(viewModel)) must contain allElementsOf
+            viewModel.contents.collect { case l: ListMessage => l }.flatMap(_.content.map(messageKey).toList)
         }
       }
 

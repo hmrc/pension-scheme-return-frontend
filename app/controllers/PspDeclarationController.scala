@@ -24,7 +24,8 @@ import pages.PspDeclarationPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.DisplayMessage.Message
+import viewmodels.DisplayMessage.{ListMessage, ListType, Message, ParagraphMessage}
+import viewmodels.implicits._
 import viewmodels.models.ContentPageViewModel
 import views.html.ContentPageView
 
@@ -58,13 +59,16 @@ object PspDeclarationController {
   def viewModel(srn: Srn): ContentPageViewModel = ContentPageViewModel(
     Message("pspDeclaration.title"),
     Message("pspDeclaration.heading"),
-    List(Message("pspDeclaration.paragraph")),
     List(
-      Message("pspDeclaration.listItem1"),
-      Message("pspDeclaration.listItem2"),
-      Message("pspDeclaration.listItem3"),
-      Message("pspDeclaration.listItem4"),
-      Message("pspDeclaration.listItem5")
+      ParagraphMessage("pspDeclaration.paragraph"),
+      ListMessage(
+        ListType.Bullet,
+        "pspDeclaration.listItem1",
+        "pspDeclaration.listItem2",
+        "pspDeclaration.listItem3",
+        "pspDeclaration.listItem4",
+        "pspDeclaration.listItem5"
+      )
     ),
     Message("site.agreeAndContinue"),
     isStartButton = false,

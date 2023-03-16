@@ -16,6 +16,7 @@
 
 package viewmodels
 
+import cats.data.NonEmptyList
 import play.api.i18n.Messages
 
 sealed trait DisplayMessage
@@ -29,7 +30,7 @@ object DisplayMessage {
   case class Message(key: String, args: List[Message]) extends InlineMessage {
 
     def toMessage(implicit messages: Messages): String =
-      messages(key, args.map(_.toMessage))
+      messages(key, args.map(_.toMessage): _*)
   }
 
   object Message {
@@ -40,20 +41,20 @@ object DisplayMessage {
 
   case class LinkMessage(content: Message, url: String) extends InlineMessage
 
-  case class ParagraphMessage(content: List[InlineMessage]) extends BlockMessage
+  case class ParagraphMessage(content: NonEmptyList[InlineMessage]) extends BlockMessage
 
   object ParagraphMessage {
 
-    def apply(content: InlineMessage*): ParagraphMessage =
-      ParagraphMessage(content.toList)
+    def apply(headContent: InlineMessage, tailContents: InlineMessage*): ParagraphMessage =
+      ParagraphMessage(NonEmptyList(headContent, tailContents.toList))
   }
 
-  case class ListMessage(content: List[InlineMessage], listType: ListType) extends BlockMessage
+  case class ListMessage(content: NonEmptyList[InlineMessage], listType: ListType) extends BlockMessage
 
   object ListMessage {
 
-    def apply(listType: ListType, content: InlineMessage*): ListMessage =
-      ListMessage(content.toList, listType)
+    def apply(listType: ListType, headContent: InlineMessage, tailContents: InlineMessage*): ListMessage =
+      ListMessage(NonEmptyList(headContent, tailContents.toList), listType)
   }
 
   sealed trait ListType

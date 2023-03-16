@@ -16,6 +16,7 @@
 
 package generators
 
+import cats.data.NonEmptyList
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
 import org.scalacheck.Gen.{
@@ -30,7 +31,17 @@ import org.scalacheck.Gen.{
   numChar
 }
 import play.api.mvc.Call
-import viewmodels.DisplayMessage.Message
+import viewmodels.DisplayMessage
+import viewmodels.DisplayMessage.ListType.Bullet
+import viewmodels.DisplayMessage.{
+  BlockMessage,
+  InlineMessage,
+  LinkMessage,
+  ListMessage,
+  ListType,
+  Message,
+  ParagraphMessage
+}
 
 import java.time.{Instant, LocalDate, ZoneOffset}
 
@@ -102,6 +113,11 @@ trait BasicGenerators {
       s"$c$s"
     }
 
+  def nonEmptyListOf[A](gen: Gen[A]): Gen[NonEmptyList[A]] =
+    Gen.nonEmptyListOf(gen).map {
+      case head :: tail => NonEmptyList(head, tail)
+    }
+
   def stringLengthBetween(minLength: Int, maxLength: Int, charGen: Gen[Char]): Gen[String] =
     for {
       length <- choose(minLength, maxLength)
@@ -154,6 +170,22 @@ trait BasicGenerators {
     datesBetween(earliestDate, latestDate)
 
   val nonEmptyMessage: Gen[Message] = nonEmptyString.map(Message(_))
+  val nonEmptyLinkMessage: Gen[LinkMessage] =
+    for {
+      message <- nonEmptyMessage
+      url <- relativeUrl
+    } yield {
+      LinkMessage(message, url)
+    }
+
+  val nonEmptyInlineMessage: Gen[InlineMessage] = Gen.oneOf(nonEmptyMessage, nonEmptyLinkMessage)
+
+  val nonEmptyParagraphMessage: Gen[ParagraphMessage] = nonEmptyListOf(nonEmptyInlineMessage).map(ParagraphMessage(_))
+  val nonEmptyListMessage: Gen[ListMessage] =
+    nonEmptyListOf(nonEmptyInlineMessage).map(ListMessage(_, Bullet))
+
+  val nonEmptyBlockMessage: Gen[BlockMessage] = Gen.oneOf(nonEmptyParagraphMessage, nonEmptyListMessage)
+  val nonEmptyDisplayMessage: Gen[DisplayMessage] = Gen.oneOf(nonEmptyInlineMessage, nonEmptyBlockMessage)
 
   def tupleOf[A, B](genA: Gen[A], genB: Gen[B]): Gen[(A, B)] =
     for {
@@ -183,7 +215,7 @@ trait BasicGenerators {
     } yield s"$a.$b.$c.$d"
 
   val relativeUrl: Gen[String] =
-    nonEmptyListOf(nonEmptyString).map(_.mkString("/", "/", "/"))
+    nonEmptyListOf(nonEmptyString).map(_.toList.mkString("/", "/", "/"))
 
   val httpMethod: Gen[String] = Gen.oneOf("GET", "POST")
   val call: Gen[Call] = {

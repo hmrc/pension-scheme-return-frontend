@@ -33,16 +33,13 @@ class SchemeMemberDetailsCYAControllerSpec extends ControllerBaseSpec {
   private val memberDetails = NameDOB("testFirstName", "testLastName", LocalDate.of(2020, 12, 12))
   private val nino = Nino("AB123456A")
 
-  private val fullUserAnswers = defaultUserAnswers
-    .set(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-    .success
-    .value
-    .set(NationalInsuranceNumberPage(srn, refineMV(1)), true)
-    .success
-    .value
-    .set(MemberDetailsNinoPage(srn, refineMV(1)), nino)
-    .success
-    .value
+  private val fullUserAnswers =
+    defaultUserAnswers
+      .set(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+      .flatMap(_.set(NationalInsuranceNumberPage(srn, refineMV(1)), true))
+      .flatMap(_.set(MemberDetailsNinoPage(srn, refineMV(1)), nino))
+      .success
+      .value
 
   "SchemeMemberDetailsCYAController" should {
     behave.like(

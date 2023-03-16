@@ -69,8 +69,9 @@ class SchemeDetailsControllerSpec extends ControllerBaseSpec {
       viewModel.rows.last mustEqual
         Message("schemeDetails.row5") ->
           ListMessage(
-            List[Message]("testFirstName2 testLastName2", "testFirstName3 testLastName3"),
-            ListType.NewLine
+            ListType.NewLine,
+            "testFirstName2 testLastName2",
+            "testFirstName3 testLastName3"
           )
     }
 

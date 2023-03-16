@@ -37,17 +37,7 @@
 
         <h1 class="govuk-heading-l">@viewmodel.heading.toMessage</h1>
 
-        @viewmodel.description.map { content =>
-          <p class="govuk-body">@content.toMessage</p>
-        }
-
-        @if(viewmodel.listedContent.nonEmpty) {
-          <ul class="govuk-list govuk-list--bullet">
-            @viewmodel.listedContent.map { content =>
-              <li>@content.toMessage</li>
-            }
-          </ul>
-        }
+        @viewmodel.contents.map(renderMessage)
 
         @govukRadios(
             RadiosViewModel(

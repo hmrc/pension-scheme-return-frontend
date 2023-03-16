@@ -16,6 +16,7 @@
 
 package views.components
 
+import cats.data.NonEmptyList
 import play.api.i18n.Messages
 import play.twirl.api.{Html, HtmlFormat}
 import viewmodels.DisplayMessage
@@ -27,23 +28,26 @@ object Components {
   private def anchor(content: Html, url: String): Html =
     HtmlFormat.raw(s"""<a href="$url" class="govuk-link">$content</a>""")
 
-  private def paragraph(elements: List[Html]): Html =
-    HtmlFormat.raw(elements.map(content => s"""<p class="govuk-body">$content</p>""").mkString)
+  private def paragraph(content: Html): Html =
+    HtmlFormat.raw(s"""<p class="govuk-body">$content</p>""")
 
-  private def unorderedList(elements: List[Html]): Html =
-    HtmlFormat.raw(s"""<ul class="govuk-list govuk-list--bullet">${elements.map(listItem).mkString}</ul>""")
+  private def unorderedList(elements: NonEmptyList[Html]): Html =
+    HtmlFormat.raw(s"""<ul class="govuk-list govuk-list--bullet">${elements.map(listItem).toList.mkString}</ul>""")
 
   private def listItem(content: Html): Html =
     HtmlFormat.raw(s"<li>$content</li>")
 
-  private def simpleList(elements: List[Html]): Html =
-    HtmlFormat.raw(elements.mkString("<br>"))
+  private def simpleList(elements: NonEmptyList[Html]): Html =
+    HtmlFormat.raw(elements.toList.mkString("<br>"))
+
+  private def combine(left: Html, right: Html): Html =
+    HtmlFormat.raw(left.body + " " + right.body)
 
   def renderMessage(message: DisplayMessage)(implicit messages: Messages): Html =
     message match {
       case m @ Message(_, _) => HtmlFormat.escape(m.toMessage)
       case LinkMessage(content, url) => anchor(renderMessage(content), url)
-      case ParagraphMessage(content) => paragraph(content.map(renderMessage))
+      case ParagraphMessage(content) => paragraph(content.map(renderMessage).reduce(combine))
       case ListMessage(content, Bullet) => unorderedList(content.map(renderMessage))
       case ListMessage(content, NewLine) => simpleList(content.map(renderMessage))
     }

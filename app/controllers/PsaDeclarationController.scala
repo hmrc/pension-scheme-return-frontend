@@ -24,7 +24,8 @@ import pages.PsaDeclarationPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.DisplayMessage.Message
+import viewmodels.DisplayMessage.{ListMessage, ListType, Message, ParagraphMessage}
+import viewmodels.implicits._
 import viewmodels.models.ContentPageViewModel
 import views.html.ContentPageView
 
@@ -58,11 +59,14 @@ object PsaDeclarationController {
   def viewModel(srn: Srn): ContentPageViewModel = ContentPageViewModel(
     Message("psaDeclaration.title"),
     Message("psaDeclaration.heading"),
-    List(Message("psaDeclaration.paragraph")),
     List(
-      Message("psaDeclaration.listItem1"),
-      Message("psaDeclaration.listItem2"),
-      Message("psaDeclaration.listItem3")
+      ParagraphMessage("psaDeclaration.paragraph"),
+      ListMessage(
+        ListType.Bullet,
+        "psaDeclaration.listItem1",
+        "psaDeclaration.listItem2",
+        "psaDeclaration.listItem3"
+      )
     ),
     Message("site.agreeAndContinue"),
     isStartButton = false,

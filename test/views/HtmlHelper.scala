@@ -112,8 +112,8 @@ trait HtmlHelper extends HtmlModels {
   def messageKey(message: DisplayMessage): String = message match {
     case Message(key, _) => key
     case LinkMessage(message, _) => messageKey(message)
-    case ListMessage(elements, _) => elements.map(messageKey).foldLeft("")(_ + _)
-    case ParagraphMessage(elements) => elements.map(messageKey).foldLeft("")(_ + _)
+    case ListMessage(elements, _) => elements.map(messageKey).reduce[String](_ + _)
+    case ParagraphMessage(elements) => elements.map(messageKey).reduce[String](_ + " " + _)
   }
 
   case class DateElements(day: Element, month: Element, year: Element)

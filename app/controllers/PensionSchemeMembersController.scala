@@ -44,7 +44,7 @@ import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.DisplayMessage.Message
+import viewmodels.DisplayMessage.{ListMessage, ListType, Message, ParagraphMessage}
 import viewmodels.implicits._
 import viewmodels.models.{RadioListRowViewModel, RadioListViewModel}
 import views.html.RadioListView
@@ -96,11 +96,14 @@ object PensionSchemeMembersController {
   def viewModel(srn: Srn, schemeName: String): RadioListViewModel = RadioListViewModel(
     Message("pensionSchemeMembers.title", schemeName),
     Message("pensionSchemeMembers.heading", schemeName),
-    List(Message("pensionSchemeMembers.description")),
     List(
-      Message("pensionSchemeMembers.description.name"),
-      Message("pensionSchemeMembers.description.dob"),
-      Message("pensionSchemeMembers.description.nino")
+      ParagraphMessage("pensionSchemeMembers.description"),
+      ListMessage(
+        ListType.Bullet,
+        "pensionSchemeMembers.description.name",
+        "pensionSchemeMembers.description.dob",
+        "pensionSchemeMembers.description.nino"
+      )
     ),
     Some(Message("pensionSchemeMembers.legend")),
     radioListItems,

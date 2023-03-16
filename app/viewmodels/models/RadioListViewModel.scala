@@ -20,13 +20,12 @@ import play.api.i18n.Messages
 import play.api.mvc.Call
 import uk.gov.hmrc.govukfrontend.views.Aliases.{Hint, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
-import viewmodels.DisplayMessage.Message
+import viewmodels.DisplayMessage.{BlockMessage, Message}
 
 case class RadioListViewModel(
   title: Message,
   heading: Message,
-  description: List[Message],
-  listedContent: List[Message],
+  contents: List[BlockMessage],
   legend: Option[Message],
   items: List[RadioListRowViewModel],
   onSubmit: Call
@@ -38,7 +37,6 @@ object RadioListViewModel {
     RadioListViewModel(
       Message(title),
       Message(heading),
-      List(),
       List(),
       None,
       items,

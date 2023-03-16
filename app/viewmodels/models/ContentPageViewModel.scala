@@ -18,12 +18,12 @@ package viewmodels.models
 
 import play.api.mvc.Call
 import viewmodels.DisplayMessage._
+import viewmodels.implicits._
 
 case class ContentPageViewModel(
   title: Message,
   heading: Message,
-  paragraphs: List[Message],
-  listItems: List[Message],
+  contents: List[BlockMessage],
   buttonText: Message,
   isStartButton: Boolean,
   onSubmit: Call
@@ -39,22 +39,11 @@ object ContentPageViewModel {
     onSubmit: Call,
     paragraphs: String*
   ): ContentPageViewModel =
-    ContentPageViewModel(title, heading, paragraphs.toList, buttonText, isStartButton, onSubmit)
-
-  def apply(
-    title: String,
-    heading: String,
-    paragraphs: List[String],
-    buttonText: String,
-    isStartButton: Boolean,
-    onSubmit: Call
-  ): ContentPageViewModel =
     ContentPageViewModel(
-      Message(title),
-      Message(heading),
-      paragraphs.map(Message(_)),
-      List(),
-      Message(buttonText),
+      title,
+      heading,
+      paragraphs.map(ParagraphMessage(_)).toList,
+      buttonText,
       isStartButton,
       onSubmit
     )
