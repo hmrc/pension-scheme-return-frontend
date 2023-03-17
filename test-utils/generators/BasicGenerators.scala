@@ -133,6 +133,9 @@ trait BasicGenerators {
   def stringsWithMaxLength(maxLength: Int): Gen[String] =
     stringLengthBetween(1, maxLength, alphaChar)
 
+  def stringsWithMinLength(minLength: Int): Gen[String] =
+    stringLengthBetween(minLength, 999999, alphaChar)
+
   def stringsLongerThan(minLength: Int): Gen[String] =
     for {
       maxLength <- Gen.const((minLength * 2).max(100))

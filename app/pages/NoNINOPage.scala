@@ -14,26 +14,15 @@
  * limitations under the License.
  */
 
-package viewmodels
+package pages
 
-package object govuk {
+import config.Refined.Max99
+import play.api.libs.json.JsPath
+import models.SchemeId.Srn
 
-  object all
-      extends ImplicitConversions
-      with BackLinkFluency
-      with ButtonFluency
-      with CheckboxFluency
-      with DateFluency
-      with ErrorSummaryFluency
-      with FieldsetFluency
-      with HintFluency
-      with InputFluency
-      with InsetTextFluency
-      with LabelFluency
-      with RadiosFluency
-      with SummaryListFluency
-      with TagFluency
-      with TableFluency
-      with ListWithActionsFluency
-      with TextAreaFluency
+case class NoNINOPage(srn: Srn, index: Max99) extends QuestionPage[String] {
+
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "noNINO"
 }
