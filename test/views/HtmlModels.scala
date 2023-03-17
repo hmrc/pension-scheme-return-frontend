@@ -56,4 +56,19 @@ trait HtmlModels {
       RadioItem(id, value, label.text())
     }
   }
+
+  case class Input(id: String, name: String, value: String, label: String)
+
+  object Input {
+
+    def apply(element: Element): Input = {
+
+      val id = element.id()
+      val name = element.attr("name")
+      val value = element.`val`()
+      val label = element.siblingElements().select("[for=\"" + id + "\"]")
+
+      Input(id, name, value, label.text())
+    }
+  }
 }

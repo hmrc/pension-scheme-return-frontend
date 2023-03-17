@@ -52,8 +52,8 @@ trait HtmlHelper extends HtmlModels {
   def inputLabel(html: Html)(name: String): Element =
     mainContent(html).selectFirst(s"label[for=$name]")
 
-  def input(html: Html)(name: String): Elements =
-    mainContent(html).select(s"input[name=$name]")
+  def input(html: Html)(name: String): Option[Input] =
+    mainContent(html).select(s"input[name=$name]").iterator().asScala.map(Input(_)).toList.headOption
 
   def inputHint(html: Html)(name: String): Element =
     mainContent(html).getElementById(s"$name-hint")

@@ -39,11 +39,13 @@ trait ViewBehaviours {
     }
 
   def renderInputWithLabel[A](gen: Gen[A])(name: String, view: A => Html, key: A => DisplayMessage): Unit =
-    s"render the input for $name  with label" in {
+    s"render the input for $name with label" in {
 
       forAll(gen) { viewModel =>
-        inputLabel(view(viewModel))(name).text() must startWith(messageKey(key(viewModel)))
-        input(view(viewModel))(name).isEmpty mustEqual false
+        val foundInput = input(view(viewModel))(name)
+
+        assert(foundInput.nonEmpty)
+        foundInput.map(_.label must startWith(messageKey(key(viewModel))))
       }
     }
 
