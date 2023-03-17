@@ -46,6 +46,7 @@ private[mappings] class LocalDateFormatter(
       requiredKey = required,
       wholeNumberKey = dateFormErrors.invalidCharacters,
       nonNumericKey = dateFormErrors.invalidCharacters,
+      None,
       args
     )
 

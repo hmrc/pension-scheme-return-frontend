@@ -64,6 +64,7 @@ trait Formatters {
     requiredKey: String,
     wholeNumberKey: String,
     nonNumericKey: String,
+    max: Option[(Int, String)],
     args: Seq[String] = Seq.empty
   ): Formatter[Int] =
     new Formatter[Int] {
@@ -84,6 +85,14 @@ trait Formatters {
                 .either(s.toInt)
                 .left
                 .map(_ => Seq(FormError(key, nonNumericKey, args)))
+          }
+          .flatMap { int =>
+            max match {
+              case Some((max, error)) if int > max =>
+                Left(Seq(FormError(key, error, args)))
+              case _ =>
+                Right(int)
+            }
           }
 
       override def unbind(key: String, value: Int) =
