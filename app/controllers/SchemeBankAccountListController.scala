@@ -32,9 +32,7 @@ import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.ComplexMessageElement.Message
-import viewmodels.Delimiter
-import viewmodels.DisplayMessage.{ComplexMessage, SimpleMessage}
+import viewmodels.DisplayMessage.{ListMessage, ListType, Message}
 import viewmodels.implicits._
 import viewmodels.models.{ListRow, ListViewModel}
 import views.html.ListView
@@ -88,12 +86,10 @@ object SchemeBankAccountListController {
   def viewModel(srn: Srn, mode: Mode, bankAccounts: List[BankAccount]): ListViewModel = {
     val rows: List[ListRow] = bankAccounts.zipWithIndex.flatMap {
       case (bankAccount, index) =>
-        val text = ComplexMessage(
-          List(
-            Message(bankAccount.bankName),
-            Message("schemeBankDetailsSummary.accountNumber", bankAccount.accountNumber)
-          ),
-          Delimiter.Newline
+        val text = ListMessage(
+          ListType.NewLine,
+          bankAccount.bankName,
+          Message("schemeBankDetailsSummary.accountNumber", bankAccount.accountNumber)
         )
 
         refineV[OneToTen](index + 1) match {
@@ -103,9 +99,9 @@ object SchemeBankAccountListController {
               ListRow(
                 text,
                 changeUrl = controllers.routes.SchemeBankAccountController.onPageLoad(srn, nextIndex, mode).url,
-                changeHiddenText = SimpleMessage("schemeBankDetailsSummary.change.hidden", bankAccount.accountNumber),
+                changeHiddenText = Message("schemeBankDetailsSummary.change.hidden", bankAccount.accountNumber),
                 removeUrl = controllers.routes.RemoveSchemeBankAccountController.onPageLoad(srn, nextIndex, mode).url,
-                removeHiddenText = SimpleMessage("schemeBankDetailsSummary.remove.hidden", bankAccount.accountNumber)
+                removeHiddenText = Message("schemeBankDetailsSummary.remove.hidden", bankAccount.accountNumber)
               )
             )
         }
@@ -117,8 +113,8 @@ object SchemeBankAccountListController {
       if (bankAccounts.length > 1) "schemeBankDetailsSummary.heading.plural" else "schemeBankDetailsSummary.heading"
 
     ListViewModel(
-      SimpleMessage(titleKey, bankAccounts.length),
-      SimpleMessage(headingKey, bankAccounts.length),
+      Message(titleKey, bankAccounts.length),
+      Message(headingKey, bankAccounts.length),
       rows,
       "schemeBankDetailsSummary.radio",
       "schemeBankDetailsSummary.inset",

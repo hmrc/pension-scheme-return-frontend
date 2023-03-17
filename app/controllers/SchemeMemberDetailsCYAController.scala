@@ -18,6 +18,7 @@ package controllers
 
 import cats.implicits.{toShow, toTraverseOps}
 import com.google.inject.Inject
+import config.Refined.Max99
 import controllers.SchemeMemberDetailsCYAController._
 import controllers.actions._
 import models.SchemeId.Srn
@@ -26,15 +27,14 @@ import navigation.Navigator
 import pages._
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.DateTimeUtils.localDateShow
+import utils.MessageUtils.booleanToMessage
+import viewmodels.DisplayMessage.Message
+import viewmodels.implicits._
 import viewmodels.models._
 import views.html.CheckYourAnswersView
-import cats.syntax.either._
-import config.Refined.Max99
-import uk.gov.hmrc.domain.Nino
-import utils.MessageUtils.booleanToMessage
-import viewmodels.DisplayMessage.SimpleMessage
 
 class SchemeMemberDetailsCYAController @Inject()(
   override val messagesApi: MessagesApi,
@@ -92,7 +92,7 @@ object SchemeMemberDetailsCYAController {
             .withVisuallyHiddenContent("memberDetails.dateOfBirth")
         ),
       CheckYourAnswersRowViewModel(
-        SimpleMessage("nationalInsuranceNumber.heading", memberDetails.fullName),
+        Message("nationalInsuranceNumber.heading", memberDetails.fullName),
         booleanToMessage(hasNINO)
       ).withAction(
         SummaryAction("site.change", routes.DoesSchemeMemberHaveNINOController.onPageLoad(srn, index, mode).url)
@@ -110,7 +110,7 @@ object SchemeMemberDetailsCYAController {
     maybeNino.fold(List.empty[CheckYourAnswersRowViewModel])(
       nino =>
         List(
-          CheckYourAnswersRowViewModel(SimpleMessage("memberDetailsNino.heading", memberName), nino.value)
+          CheckYourAnswersRowViewModel(Message("memberDetailsNino.heading", memberName), nino.value)
             .withAction(
               SummaryAction("site.change", routes.MemberDetailsNinoController.onPageLoad(srn, index, mode).url)
                 .withVisuallyHiddenContent("site.endDate")

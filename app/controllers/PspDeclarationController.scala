@@ -16,13 +16,7 @@
 
 package controllers
 
-import controllers.actions.{
-  AllowAccessActionProvider,
-  DataCreationAction,
-  DataRequiredAction,
-  DataRetrievalAction,
-  IdentifierAction
-}
+import controllers.actions.{AllowAccessActionProvider, DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import models.NormalMode
 import models.SchemeId.Srn
 import navigation.Navigator
@@ -30,7 +24,8 @@ import pages.PspDeclarationPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.DisplayMessage.SimpleMessage
+import viewmodels.DisplayMessage.{ListMessage, ListType, Message, ParagraphMessage}
+import viewmodels.implicits._
 import viewmodels.models.ContentPageViewModel
 import views.html.ContentPageView
 
@@ -62,17 +57,20 @@ class PspDeclarationController @Inject()(
 object PspDeclarationController {
 
   def viewModel(srn: Srn): ContentPageViewModel = ContentPageViewModel(
-    SimpleMessage("pspDeclaration.title"),
-    SimpleMessage("pspDeclaration.heading"),
-    List(SimpleMessage("pspDeclaration.paragraph")),
+    Message("pspDeclaration.title"),
+    Message("pspDeclaration.heading"),
     List(
-      SimpleMessage("pspDeclaration.listItem1"),
-      SimpleMessage("pspDeclaration.listItem2"),
-      SimpleMessage("pspDeclaration.listItem3"),
-      SimpleMessage("pspDeclaration.listItem4"),
-      SimpleMessage("pspDeclaration.listItem5")
+      ParagraphMessage("pspDeclaration.paragraph"),
+      ListMessage(
+        ListType.Bullet,
+        "pspDeclaration.listItem1",
+        "pspDeclaration.listItem2",
+        "pspDeclaration.listItem3",
+        "pspDeclaration.listItem4",
+        "pspDeclaration.listItem5"
+      )
     ),
-    SimpleMessage("site.agreeAndContinue"),
+    Message("site.agreeAndContinue"),
     isStartButton = false,
     routes.PspDeclarationController.onSubmit(srn)
   )

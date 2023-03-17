@@ -17,10 +17,10 @@
 package controllers
 
 import eu.timepit.refined.refineMV
-import forms.{DateRangeFormProvider, TextFormProvider}
-import models.{DateRange, NormalMode}
-import pages.{AccountingPeriodPage, MemberDetailsNinoPage, MemberDetailsPage}
-import views.html.{DateRangeView, TextInputView}
+import forms.TextFormProvider
+import models.NormalMode
+import pages.{MemberDetailsNinoPage, MemberDetailsPage}
+import views.html.TextInputView
 
 class MemberDetailsNinoControllerSpec extends ControllerBaseSpec {
 

@@ -20,15 +20,14 @@
     layout: templates.Layout,
     formHelper: FormWithCSRF,
     govukSummaryList: GovukSummaryList,
-    govukButton: GovukButton,
-    message: Message
+    govukButton: GovukButton
 )
 
 @(viewmodel: CheckYourAnswersViewModel)(implicit request: Request[_], messages: Messages)
 
     @layout(pageTitle = titleNoForm(viewmodel.title.toMessage)) {
 
-        <h1 class="govuk-heading-l">@viewmodel.heading.toMessage</h1>
+        <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
 
         @govukSummaryList(
           SummaryListViewModel(

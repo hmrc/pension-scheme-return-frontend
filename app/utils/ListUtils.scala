@@ -16,7 +16,7 @@
 
 package utils
 
-import viewmodels.DisplayMessage.SimpleMessage
+import viewmodels.DisplayMessage.Message
 
 object ListUtils {
 
@@ -43,7 +43,7 @@ object ListUtils {
   }
 
   implicit class ListTupStringOps(list: List[(String, String)]) {
-    def toSimpleMessages: List[(SimpleMessage, SimpleMessage)] =
-      list.map { case (first, second) => SimpleMessage(first) -> SimpleMessage(second) }
+    def toMessages: List[(Message, Message)] =
+      list.map { case (first, second) => Message(first) -> Message(second) }
   }
 }

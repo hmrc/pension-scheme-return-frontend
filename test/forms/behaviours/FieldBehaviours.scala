@@ -16,14 +16,12 @@
 
 package forms.behaviours
 
-import cats.implicits.toShow
 import forms.FormSpec
 import generators.Generators
 import org.scalacheck.Gen
+import org.scalacheck.Gen._
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.data.{Form, FormError}
-import org.scalacheck.Gen._
-import utils.DateTimeUtils.localDateShow
 
 import java.time.LocalDate
 

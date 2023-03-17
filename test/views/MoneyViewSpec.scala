@@ -19,7 +19,6 @@ package views
 import forms.mappings.Mappings
 import models.Money
 import play.api.data
-import play.api.data.Forms.mapping
 import play.api.test.FakeRequest
 import views.html.MoneyView
 

@@ -21,8 +21,7 @@
         formHelper: FormWithCSRF,
         govukErrorSummary: GovukErrorSummary,
         govukButton: GovukButton,
-        govukInput: GovukInput,
-        message: Message
+        govukInput: GovukInput
 )
 
 @(form: Form[Money], viewmodel: MoneyViewModel)(implicit request: Request[_], messages: Messages)
@@ -38,7 +37,7 @@
     @govukInput(
       InputViewModel(
         field = form("value"),
-        label = LabelViewModel(viewmodel.heading.toMessage).asPageHeading()
+        label = LabelViewModel(renderMessage(viewmodel.heading)).asPageHeading()
       )
       .asNumeric()
       .withWidth(Fixed10)

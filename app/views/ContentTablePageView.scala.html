@@ -20,30 +20,29 @@
     layout: templates.Layout,
     govukInsetText: GovukInsetText,
     govukButton: GovukButton,
-    govukTable: GovukTable,
-    message: Message
+    govukTable: GovukTable
 )
 
 @(viewmodel: ContentTablePageViewModel)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(viewmodel.title.toMessage)) {
 
-    <h1 class="govuk-heading-l">@message(viewmodel.heading)</h1>
+    <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
 
     @govukTable(TableViewModel(
         viewmodel.rows.map { case (key, value) =>
             Seq(
-                TableRowViewModel(message(key)).bold.widthOneThird,
-                TableRowViewModel(message(value))
+                TableRowViewModel(renderMessage(key)).bold.widthOneThird,
+                TableRowViewModel(renderMessage(value))
             )
         }
     ))
 
-    @govukInsetText(InsetTextViewModel(message(viewmodel.inset)))
+    @govukInsetText(InsetTextViewModel(renderMessage(viewmodel.inset)))
 
     <p class="govuk-body">
         @govukButton(
-            ButtonViewModel(message(viewmodel.buttonText))
+            ButtonViewModel(renderMessage(viewmodel.buttonText))
                     .asLink(viewmodel.onSubmit.url)
         )
     </p>

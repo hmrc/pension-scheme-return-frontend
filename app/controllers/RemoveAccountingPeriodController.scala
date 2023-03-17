@@ -32,7 +32,8 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.DateTimeUtils.localDateShow
-import viewmodels.DisplayMessage.SimpleMessage
+import viewmodels.DisplayMessage.Message
+import viewmodels.implicits._
 import viewmodels.models.YesNoPageViewModel
 import views.html.YesNoPageView
 
@@ -101,8 +102,8 @@ object RemoveAccountingPeriodController {
   )
 
   def viewModel(srn: Srn, index: Max3, dateRange: DateRange, mode: Mode): YesNoPageViewModel = YesNoPageViewModel(
-    SimpleMessage("removeAccountingPeriod.title", dateRange.from.show, dateRange.to.show),
-    SimpleMessage("removeAccountingPeriod.heading", dateRange.from.show, dateRange.to.show),
+    Message("removeAccountingPeriod.title", dateRange.from.show, dateRange.to.show),
+    Message("removeAccountingPeriod.heading", dateRange.from.show, dateRange.to.show),
     controllers.routes.RemoveAccountingPeriodController.onSubmit(srn, index, mode)
   )
 }

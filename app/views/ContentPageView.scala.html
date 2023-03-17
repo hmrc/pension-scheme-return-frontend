@@ -27,17 +27,7 @@
 
     <h1 class="govuk-heading-xl">@viewmodel.heading.toMessage</h1>
 
-    @viewmodel.paragraphs.map { content =>
-      <p class="govuk-body">@content.toMessage</p>
-    }
-
-    @if(viewmodel.listItems.nonEmpty) {
-    <ul class="govuk-list govuk-list--bullet">
-        @viewmodel.listItems.map { content =>
-        <li class="govuk-list govuk-list--bullet">@content.toMessage</li>
-        }
-    </ul>
-    }
+    @viewmodel.contents.map(renderMessage)
 
     <p class="govuk-body">
         @govukButton(

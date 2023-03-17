@@ -22,8 +22,7 @@
     govukErrorSummary: GovukErrorSummary,
     govukInput: GovukInput,
     govukDateInput: GovukDateInput,
-    govukButton: GovukButton,
-    message: Message
+    govukButton: GovukButton
 )
 
 @(form: Form[NameDOB], viewModel: NameDOBViewModel)(implicit request: Request[_], messages: Messages)
@@ -36,12 +35,12 @@
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        <h1 class="govuk-heading-l">@viewModel.heading.toMessage</h1>
+        <h1 class="govuk-heading-l">@renderMessage(viewModel.heading)</h1>
 
         @govukInput(
             InputViewModel(
                 field = form("firstName"),
-                label = LabelViewModel(viewModel.firstName.toMessage)
+                label = LabelViewModel(renderMessage(viewModel.firstName))
             )
             .asNumeric()
             .withWidth(Fixed20)
@@ -50,7 +49,7 @@
         @govukInput(
             InputViewModel(
                 field = form("lastName"),
-                label = LabelViewModel(viewModel.lastName.toMessage)
+                label = LabelViewModel(renderMessage(viewModel.lastName))
             )
             .asNumeric()
             .withWidth(Fixed20)
@@ -59,9 +58,9 @@
         @govukDateInput(
             DateViewModel(
                 field  = form("dateOfBirth"),
-                legend = LegendViewModel(message(viewModel.dateOfBirth))
+                legend = LegendViewModel(renderMessage(viewModel.dateOfBirth))
             )
-            .withHint(HintViewModel(message(viewModel.dateOfBirthHint)))
+            .withHint(HintViewModel(renderMessage(viewModel.dateOfBirthHint)))
         )
 
         @govukButton(

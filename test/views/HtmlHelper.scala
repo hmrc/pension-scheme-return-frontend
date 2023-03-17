@@ -20,9 +20,8 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
 import play.twirl.api.Html
-import viewmodels.ComplexMessageElement.{LinkedMessage, Message}
 import viewmodels.DisplayMessage
-import viewmodels.DisplayMessage.{ComplexMessage, SimpleMessage}
+import viewmodels.DisplayMessage.{LinkMessage, ListMessage, Message, ParagraphMessage}
 
 import scala.jdk.CollectionConverters.IteratorHasAsScala
 
@@ -111,14 +110,10 @@ trait HtmlHelper extends HtmlModels {
   }
 
   def messageKey(message: DisplayMessage): String = message match {
-    case SimpleMessage(key, _) => key
-    case ComplexMessage(elements, _) =>
-      elements
-        .map {
-          case Message(key, _) => key
-          case LinkedMessage(key, _, _) => key
-        }
-        .reduce(_ + _)
+    case Message(key, _) => key
+    case LinkMessage(message, _) => messageKey(message)
+    case ListMessage(elements, _) => elements.map(messageKey).reduce[String](_ + _)
+    case ParagraphMessage(elements) => elements.map(messageKey).reduce[String](_ + " " + _)
   }
 
   case class DateElements(day: Element, month: Element, year: Element)

@@ -17,9 +17,7 @@
 package views
 
 import forms.YesNoPageFormProvider
-import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.test.FakeRequest
-import utils.BaseSpec
 import views.html.YesNoPageView
 
 class YesNoPageViewSpec extends ViewSpec {

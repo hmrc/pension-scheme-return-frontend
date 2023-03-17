@@ -32,7 +32,8 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.DateTimeUtils.localDateShow
-import viewmodels.DisplayMessage.SimpleMessage
+import viewmodels.DisplayMessage.Message
+import viewmodels.implicits._
 import viewmodels.models.{ListRow, ListViewModel}
 import views.html.ListView
 
@@ -93,11 +94,11 @@ object AccountingPeriodListController {
           index =>
             List(
               ListRow(
-                SimpleMessage("accountingPeriods.row", range.from.show, range.to.show),
+                Message("accountingPeriods.row", range.from.show, range.to.show),
                 routes.AccountingPeriodController.onPageLoad(srn, index, mode).url,
-                SimpleMessage("accountingPeriods.row.change.hiddenText", range.from.show, range.to.show),
+                Message("accountingPeriods.row.change.hiddenText", range.from.show, range.to.show),
                 routes.RemoveAccountingPeriodController.onPageLoad(srn, index, mode).url,
-                SimpleMessage("accountingPeriods.row.remove.hiddenText", range.from.show, range.to.show)
+                Message("accountingPeriods.row.remove.hiddenText", range.from.show, range.to.show)
               )
             )
         )
@@ -108,11 +109,11 @@ object AccountingPeriodListController {
     val heading = if (periods.length == 1) "accountingPeriods.heading" else "accountingPeriods.heading.plural"
 
     ListViewModel(
-      SimpleMessage(title, periods.length),
-      SimpleMessage(heading, periods.length),
+      Message(title, periods.length),
+      Message(heading, periods.length),
       rows(srn, mode, periods),
-      SimpleMessage("accountingPeriods.radios"),
-      SimpleMessage("accountingPeriods.inset"),
+      Message("accountingPeriods.radios"),
+      Message("accountingPeriods.inset"),
       showRadios = periods.length < 3,
       routes.AccountingPeriodListController.onSubmit(srn, mode)
     )

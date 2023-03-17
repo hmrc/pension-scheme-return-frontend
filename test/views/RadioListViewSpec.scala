@@ -21,6 +21,7 @@ import models.Enumerable
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.test.FakeRequest
 import utils.BaseSpec
+import viewmodels.DisplayMessage.{ListMessage, ParagraphMessage}
 import views.html.RadioListView
 
 class RadioListViewSpec extends BaseSpec with ScalaCheckPropertyChecks with HtmlHelper {
@@ -56,17 +57,19 @@ class RadioListViewSpec extends BaseSpec with ScalaCheckPropertyChecks with Html
         }
       }
 
-      "have descriptions" in {
+      "have paragraphs" in {
 
         forAll(radioListViewModelGen) { viewmodel =>
-          p(view(radioListForm, viewmodel)) mustBe viewmodel.description.map(_.toMessage)
+          p(view(radioListForm, viewmodel)) must contain allElementsOf
+            viewmodel.contents.collect { case p: ParagraphMessage => p }.map(messageKey)
         }
       }
 
       "have listed content" in {
 
         forAll(radioListViewModelGen) { viewmodel =>
-          li(view(radioListForm, viewmodel)) mustBe viewmodel.listedContent.map(_.toMessage)
+          li(view(radioListForm, viewmodel)) mustBe
+            viewmodel.contents.collect { case l: ListMessage => l }.flatMap(_.content.map(messageKey).toList)
         }
       }
 

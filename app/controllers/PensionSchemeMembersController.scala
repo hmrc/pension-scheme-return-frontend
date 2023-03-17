@@ -44,7 +44,8 @@ import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.DisplayMessage.SimpleMessage
+import viewmodels.DisplayMessage.{ListMessage, ListType, Message, ParagraphMessage}
+import viewmodels.implicits._
 import viewmodels.models.{RadioListRowViewModel, RadioListViewModel}
 import views.html.RadioListView
 
@@ -84,24 +85,27 @@ object PensionSchemeMembersController {
 
   private val radioListItems: List[RadioListRowViewModel] =
     List(
-      RadioListRowViewModel(SimpleMessage("pensionSchemeMembers.manualEntry"), Manual.name),
+      RadioListRowViewModel(Message("pensionSchemeMembers.manualEntry"), Manual.name),
       RadioListRowViewModel(
-        SimpleMessage("pensionSchemeMembers.upload"),
+        Message("pensionSchemeMembers.upload"),
         Upload.name,
-        SimpleMessage("pensionSchemeMembers.upload.hint")
+        Message("pensionSchemeMembers.upload.hint")
       )
     )
 
   def viewModel(srn: Srn, schemeName: String): RadioListViewModel = RadioListViewModel(
-    SimpleMessage("pensionSchemeMembers.title", schemeName),
-    SimpleMessage("pensionSchemeMembers.heading", schemeName),
-    List(SimpleMessage("pensionSchemeMembers.description")),
+    Message("pensionSchemeMembers.title", schemeName),
+    Message("pensionSchemeMembers.heading", schemeName),
     List(
-      SimpleMessage("pensionSchemeMembers.description.name"),
-      SimpleMessage("pensionSchemeMembers.description.dob"),
-      SimpleMessage("pensionSchemeMembers.description.nino")
+      ParagraphMessage("pensionSchemeMembers.description"),
+      ListMessage(
+        ListType.Bullet,
+        "pensionSchemeMembers.description.name",
+        "pensionSchemeMembers.description.dob",
+        "pensionSchemeMembers.description.nino"
+      )
     ),
-    Some(SimpleMessage("pensionSchemeMembers.legend")),
+    Some(Message("pensionSchemeMembers.legend")),
     radioListItems,
     controllers.routes.PensionSchemeMembersController.onSubmit(srn)
   )

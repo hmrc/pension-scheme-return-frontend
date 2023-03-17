@@ -19,8 +19,7 @@
     formHelper: FormWithCSRF,
     govukErrorSummary: GovukErrorSummary,
     govukButton: GovukButton,
-    govukInput: GovukInput,
-    message: Message
+    govukInput: GovukInput
 )
 
 @(form: Form[BankAccount], viewmodel: BankAccountViewModel)(implicit request: Request[_], messages: Messages)
@@ -33,39 +32,39 @@
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        <h1 class="govuk-heading-l">@message(viewmodel.heading)</h1>
+        <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
 
-        <p class="govuk-body">@message(viewmodel.paragraph)</p>
+        <p class="govuk-body">@renderMessage(viewmodel.paragraph)</p>
 
         @govukInput(
             InputViewModel(
                 field = form("bankName"),
-                label = LabelViewModel(message(viewmodel.bankNameHeading))
+                label = LabelViewModel(renderMessage(viewmodel.bankNameHeading))
             )
         )
 
         @govukInput(
             InputViewModel(
                 field = form("accountNumber"),
-                label = LabelViewModel(message(viewmodel.accountNumberHeading))
+                label = LabelViewModel(renderMessage(viewmodel.accountNumberHeading))
             )
             .asNumeric()
             .withWidth(InputWidth.Fixed10)
-            .withHint(HintViewModel(message(viewmodel.accountNumberHint)))
+            .withHint(HintViewModel(renderMessage(viewmodel.accountNumberHint)))
         )
 
         @govukInput(
             InputViewModel(
                 field = form("sortCode"),
-                label = LabelViewModel(message(viewmodel.sortCodeHeading))
+                label = LabelViewModel(renderMessage(viewmodel.sortCodeHeading))
             )
             .asNumeric()
             .withWidth(InputWidth.Fixed5)
-            .withHint(HintViewModel(message(viewmodel.sortCodeHint)))
+            .withHint(HintViewModel(renderMessage(viewmodel.sortCodeHint)))
         )
 
         @govukButton(
-            ButtonViewModel(message(viewmodel.buttonText))
+            ButtonViewModel(viewmodel.buttonText.toMessage)
         )
     }
 }

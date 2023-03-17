@@ -19,7 +19,7 @@ package views
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.test.FakeRequest
 import utils.BaseSpec
-import viewmodels.DisplayMessage.SimpleMessage
+import viewmodels.DisplayMessage.Message
 import views.html.ContentTablePageView
 
 class ContentTablePageViewSpec extends BaseSpec with ScalaCheckPropertyChecks with HtmlHelper {
@@ -55,7 +55,7 @@ class ContentTablePageViewSpec extends BaseSpec with ScalaCheckPropertyChecks wi
 
       "render inset text" in {
         forAll(contentTablePageViewModelGen) { viewModel =>
-          inset(view(viewModel)).text() mustBe viewModel.inset.asInstanceOf[SimpleMessage].key
+          inset(view(viewModel)).text() mustBe viewModel.inset.asInstanceOf[Message].key
         }
       }
 

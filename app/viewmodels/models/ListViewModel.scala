@@ -18,22 +18,22 @@ package viewmodels.models
 
 import play.api.mvc.Call
 import viewmodels.DisplayMessage
-import viewmodels.DisplayMessage.SimpleMessage
+import viewmodels.DisplayMessage.Message
 
 case class ListRow(
   text: DisplayMessage,
   changeUrl: String,
-  changeHiddenText: SimpleMessage,
+  changeHiddenText: Message,
   removeUrl: String,
-  removeHiddenText: SimpleMessage
+  removeHiddenText: Message
 )
 
 case class ListViewModel(
-  title: SimpleMessage,
-  heading: SimpleMessage,
+  title: Message,
+  heading: Message,
   rows: List[ListRow],
-  radioText: SimpleMessage,
-  insetText: SimpleMessage,
+  radioText: Message,
+  insetText: Message,
   showRadios: Boolean = true,
   onSubmit: Call
 )

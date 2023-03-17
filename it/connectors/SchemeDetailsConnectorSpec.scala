@@ -17,15 +17,14 @@
 package connectors
 
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder
-import com.github.tomakehurst.wiremock.client.WireMock.{badRequest, equalTo, get, notFound, ok, permanentRedirect, serverError, urlEqualTo}
+import com.github.tomakehurst.wiremock.client.WireMock._
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import models.PensionSchemeId.{PsaId, PspId}
-import models.{PensionSchemeId, SchemeId}
 import models.SchemeId.Srn
+import models.{PensionSchemeId, SchemeId}
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
-import play.api.test.Helpers.running
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global

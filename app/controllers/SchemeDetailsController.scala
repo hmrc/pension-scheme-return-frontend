@@ -27,11 +27,10 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.ListUtils._
-import viewmodels.ComplexMessageElement.{LinkedMessage, Message}
-import viewmodels.DisplayMessage.{ComplexMessage, SimpleMessage}
+import viewmodels.DisplayMessage
+import viewmodels.DisplayMessage.{LinkMessage, ListMessage, ListType, Message, ParagraphMessage}
 import viewmodels.implicits._
 import viewmodels.models.ContentTablePageViewModel
-import viewmodels.{Delimiter, DisplayMessage}
 import views.html.ContentTablePageView
 
 class SchemeDetailsController @Inject()(
@@ -62,26 +61,26 @@ class SchemeDetailsController @Inject()(
 
   protected[controllers] def viewModel(srn: Srn, schemeDetails: SchemeDetails): ContentTablePageViewModel = {
 
-    val schemeEstablisherNameRow: Option[(SimpleMessage, SimpleMessage)] =
+    val schemeEstablisherNameRow: Option[(Message, Message)] =
       schemeDetails.establishers.headOption.map(establisher => ("schemeDetails.row4", establisher.name))
 
     val otherSchemeEstablisherNameRows: Option[(DisplayMessage, DisplayMessage)] = schemeDetails.establishers match {
       case _ :: Nil | Nil => None
-      case _ :: others =>
-        Some(("schemeDetails.row5", ComplexMessage(others.map(other => Message(other.name)), Delimiter.Newline)))
+      case _ :: next :: rest =>
+        Some(("schemeDetails.row5", ListMessage(ListType.NewLine, next.name, rest.map[Message](_.name): _*)))
     }
 
     ContentTablePageViewModel(
       title = "schemeDetails.title",
       heading = "schemeDetails.heading",
-      inset = ComplexMessage(Message("schemeDetails.inset"), LinkedMessage("schemeDetails.inset.link", linkUrl)),
+      inset = ParagraphMessage("schemeDetails.inset", LinkMessage("schemeDetails.inset.link", linkUrl)),
       buttonText = "site.saveAndContinue",
       routes.SchemeDetailsController.onSubmit(srn),
       List(
         "schemeDetails.row1" -> schemeDetails.pstr,
         "schemeDetails.row2" -> schemeDetails.schemeName,
         "schemeDetails.row3" -> schemeDetails.schemeType.capitalize
-      ).toSimpleMessages :?+ schemeEstablisherNameRow :++ otherSchemeEstablisherNameRows: _*
+      ).toMessages :?+ schemeEstablisherNameRow :++ otherSchemeEstablisherNameRows: _*
     )
   }
 }

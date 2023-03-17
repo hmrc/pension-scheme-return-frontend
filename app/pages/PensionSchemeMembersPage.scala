@@ -18,6 +18,5 @@ package pages
 
 import models.ManualOrUpload
 import models.SchemeId.Srn
-import play.api.libs.json.JsPath
 
 case class PensionSchemeMembersPage(srn: Srn, action: ManualOrUpload) extends Page

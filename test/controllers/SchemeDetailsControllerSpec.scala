@@ -20,9 +20,8 @@ import models.{Establisher, EstablisherKind}
 import navigation.{FakeNavigator, Navigator}
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import viewmodels.ComplexMessageElement.Message
-import viewmodels.Delimiter
-import viewmodels.DisplayMessage.{ComplexMessage, SimpleMessage}
+import viewmodels.DisplayMessage.{ListMessage, ListType, Message}
+import viewmodels.implicits._
 import views.html.ContentTablePageView
 
 class SchemeDetailsControllerSpec extends ControllerBaseSpec {
@@ -68,10 +67,11 @@ class SchemeDetailsControllerSpec extends ControllerBaseSpec {
 
       viewModel.rows.size mustEqual 5
       viewModel.rows.last mustEqual
-        SimpleMessage("schemeDetails.row5") ->
-          ComplexMessage(
-            List(Message("testFirstName2 testLastName2"), Message("testFirstName3 testLastName3")),
-            Delimiter.Newline
+        Message("schemeDetails.row5") ->
+          ListMessage(
+            ListType.NewLine,
+            "testFirstName2 testLastName2",
+            "testFirstName3 testLastName3"
           )
     }
 

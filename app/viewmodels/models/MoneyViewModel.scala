@@ -17,11 +17,11 @@
 package viewmodels.models
 
 import play.api.mvc.Call
-import viewmodels.DisplayMessage.SimpleMessage
+import viewmodels.DisplayMessage.Message
 
 case class MoneyViewModel(
-  title: SimpleMessage,
-  heading: SimpleMessage,
+  title: Message,
+  heading: Message,
   onSubmit: Call
 )
 
@@ -32,5 +32,5 @@ object MoneyViewModel {
     heading: String,
     onSubmit: Call
   ): MoneyViewModel =
-    MoneyViewModel(SimpleMessage(title), SimpleMessage(heading), onSubmit)
+    MoneyViewModel(Message(title), Message(heading), onSubmit)
 }

@@ -17,7 +17,6 @@
 package models
 
 import play.api.libs.json.{Format, Json}
-import play.shaded.ahc.io.netty.handler.codec.DateFormatter
 import uk.gov.hmrc.time.TaxYear
 
 import java.time.LocalDate

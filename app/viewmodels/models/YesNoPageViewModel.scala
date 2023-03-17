@@ -17,13 +17,13 @@
 package viewmodels.models
 
 import play.api.mvc.Call
-import viewmodels.DisplayMessage.SimpleMessage
+import viewmodels.DisplayMessage.Message
 
 case class YesNoPageViewModel(
-  title: SimpleMessage,
-  heading: SimpleMessage,
-  description: List[SimpleMessage],
-  legend: Option[SimpleMessage],
+  title: Message,
+  heading: Message,
+  description: List[Message],
+  legend: Option[Message],
   onSubmit: Call
 )
 
@@ -31,19 +31,19 @@ object YesNoPageViewModel {
 
   def apply(title: String, heading: String, description: String, legend: String, onSubmit: Call): YesNoPageViewModel =
     YesNoPageViewModel(
-      SimpleMessage(title),
-      SimpleMessage(heading),
-      List(SimpleMessage(description)),
-      Some(SimpleMessage(legend)),
+      Message(title),
+      Message(heading),
+      List(Message(description)),
+      Some(Message(legend)),
       onSubmit = onSubmit
     )
 
   def apply(title: String, heading: String, legend: String, onSubmit: Call): YesNoPageViewModel =
     YesNoPageViewModel(
-      SimpleMessage(title),
-      SimpleMessage(heading),
+      Message(title),
+      Message(heading),
       List(),
-      Some(SimpleMessage(legend)),
+      Some(Message(legend)),
       onSubmit = onSubmit
     )
 
@@ -55,14 +55,14 @@ object YesNoPageViewModel {
     onSubmit: Call
   ): YesNoPageViewModel =
     YesNoPageViewModel(
-      SimpleMessage(title),
-      SimpleMessage(heading),
-      description.toList.map(d => SimpleMessage(d)),
-      Some(SimpleMessage(legend)),
+      Message(title),
+      Message(heading),
+      description.toList.map(d => Message(d)),
+      Some(Message(legend)),
       onSubmit = onSubmit
     )
 
-  def apply(title: SimpleMessage, heading: SimpleMessage, onSubmit: Call): YesNoPageViewModel =
+  def apply(title: Message, heading: Message, onSubmit: Call): YesNoPageViewModel =
     YesNoPageViewModel(
       title,
       heading,
