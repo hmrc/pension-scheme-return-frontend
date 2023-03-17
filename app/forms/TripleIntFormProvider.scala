@@ -17,7 +17,25 @@
 package forms
 
 import forms.mappings.Mappings
+import forms.mappings.errors.IntFormErrors
+import play.api.data.Form
+import play.api.data.Forms.mapping
 
 import javax.inject.Inject
 
-class TripleIntFormProvider @Inject() extends Mappings {}
+class TripleIntFormProvider @Inject() extends Mappings {
+
+  def apply(
+    field1Errors: IntFormErrors,
+    field2Errors: IntFormErrors,
+    field3Errors: IntFormErrors,
+    args: Seq[String] = Seq.empty
+  ): Form[(Int, Int, Int)] =
+    Form(
+      mapping(
+        "value.1" -> int(field1Errors, args),
+        "value.2" -> int(field2Errors, args),
+        "value.3" -> int(field3Errors, args)
+      )((a, b, c) => (a, b, c))(Some(_))
+    )
+}
