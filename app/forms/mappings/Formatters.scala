@@ -64,7 +64,7 @@ trait Formatters {
     requiredKey: String,
     wholeNumberKey: String,
     nonNumericKey: String,
-    max: Option[(Int, String)],
+    max: (Int, String),
     args: Seq[String] = Seq.empty
   ): Formatter[Int] =
     new Formatter[Int] {
@@ -88,7 +88,7 @@ trait Formatters {
           }
           .flatMap { int =>
             max match {
-              case Some((max, error)) if int > max =>
+              case (max, error) if int > max =>
                 Left(Seq(FormError(key, error, args)))
               case _ =>
                 Right(int)

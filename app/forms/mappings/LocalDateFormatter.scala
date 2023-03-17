@@ -42,11 +42,11 @@ private[mappings] class LocalDateFormatter(
 
   private def formatDate(key: String, data: Map[String, String]): Either[Seq[FormError], LocalDate] = {
 
-    def int(required: String) = intFormatter(
+    def int(required: String, max: Int) = intFormatter(
       requiredKey = required,
       wholeNumberKey = dateFormErrors.invalidCharacters,
       nonNumericKey = dateFormErrors.invalidCharacters,
-      None,
+      (max, dateFormErrors.invalidDate),
       args
     )
 
@@ -57,9 +57,9 @@ private[mappings] class LocalDateFormatter(
       }
 
     val validated = (
-      int(dateFormErrors.requiredDay).bind(s"$key.day", data).toValidated,
-      int(dateFormErrors.requiredMonth).bind(s"$key.month", data).toValidated,
-      int(dateFormErrors.requiredYear).bind(s"$key.year", data).toValidated
+      int(dateFormErrors.requiredDay, 31).bind(s"$key.day", data).toValidated,
+      int(dateFormErrors.requiredMonth, 12).bind(s"$key.month", data).toValidated,
+      int(dateFormErrors.requiredYear, 9999).bind(s"$key.year", data).toValidated
     ).tupled.toEither
 
     for {

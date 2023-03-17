@@ -32,7 +32,7 @@ trait Mappings extends Formatters with Constraints {
     requiredKey: String = "error.required",
     wholeNumberKey: String = "error.wholeNumber",
     nonNumericKey: String = "error.nonNumeric",
-    max: Option[(Int, String)] = None,
+    max: (Int, String) = (Int.MaxValue, "error.tooLarge"),
     args: Seq[String] = Seq.empty
   ): FieldMapping[Int] =
     of(intFormatter(requiredKey, wholeNumberKey, nonNumericKey, max, args))

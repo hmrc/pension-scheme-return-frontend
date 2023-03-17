@@ -123,7 +123,7 @@ class MappingsSpec extends AnyFreeSpec with Matchers with OptionValues with Mapp
 
     val testForm: Form[Int] =
       Form(
-        "value" -> int(max = Some((99, "error.tooLarge")))
+        "value" -> int(max = (99, "error.tooLarge"))
       )
 
     "must bind a valid integer" in {
