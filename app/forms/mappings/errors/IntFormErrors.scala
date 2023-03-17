@@ -14,22 +14,11 @@
  * limitations under the License.
  */
 
-package forms.mappings
+package forms.mappings.errors
 
-import java.time.LocalDate
-
-case class DateFormErrors(
-  required: String,
-  requiredDay: String,
-  requiredMonth: String,
-  requiredYear: String,
-  requiredTwo: String,
-  invalidDate: String,
-  invalidCharacters: String,
-  validators: List[LocalDate => Option[String]] = List()
+case class IntFormErrors(
+  requiredKey: String,
+  wholeNumberKey: String,
+  nonNumericKey: String,
+  max: (Int, String)
 )
-
-object DateFormErrors {
-  def failIfFutureDate(errorMsg: String): LocalDate => Option[String] =
-    date => Option.when(date.isAfter(LocalDate.now()))(errorMsg)
-}

@@ -18,6 +18,7 @@ package forms.mappings
 
 import cats.data.Validated._
 import cats.syntax.all._
+import forms.mappings.errors.{DateFormErrors, IntFormErrors}
 import play.api.data.FormError
 import play.api.data.format.Formatter
 
@@ -43,10 +44,12 @@ private[mappings] class LocalDateFormatter(
   private def formatDate(key: String, data: Map[String, String]): Either[Seq[FormError], LocalDate] = {
 
     def int(required: String, max: Int) = intFormatter(
-      requiredKey = required,
-      wholeNumberKey = dateFormErrors.invalidCharacters,
-      nonNumericKey = dateFormErrors.invalidCharacters,
-      (max, dateFormErrors.invalidDate),
+      IntFormErrors(
+        requiredKey = required,
+        wholeNumberKey = dateFormErrors.invalidCharacters,
+        nonNumericKey = dateFormErrors.invalidCharacters,
+        max = (max, dateFormErrors.invalidDate)
+      ),
       args
     )
 

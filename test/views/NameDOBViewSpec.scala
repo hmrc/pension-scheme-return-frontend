@@ -17,7 +17,7 @@
 package views
 
 import forms.NameDOBFormProvider
-import forms.mappings.DateFormErrors
+import forms.mappings.errors.DateFormErrors
 import play.api.test.FakeRequest
 import views.html.NameDOBView
 

@@ -16,6 +16,7 @@
 
 package forms.mappings
 
+import forms.mappings.errors.IntFormErrors
 import models.{Enumerable, Money}
 import play.api.data.FormError
 import play.api.data.format.Formatter
@@ -61,17 +62,14 @@ trait Formatters {
     }
 
   private[mappings] def intFormatter(
-    requiredKey: String,
-    wholeNumberKey: String,
-    nonNumericKey: String,
-    max: (Int, String),
+    errors: IntFormErrors,
     args: Seq[String] = Seq.empty
   ): Formatter[Int] =
     new Formatter[Int] {
 
       val decimalRegexp = """^-?(\d*\.\d*)$"""
 
-      private val baseFormatter = stringFormatter(requiredKey, args)
+      private val baseFormatter = stringFormatter(errors.requiredKey, args)
 
       override def bind(key: String, data: Map[String, String]) =
         baseFormatter
@@ -79,15 +77,15 @@ trait Formatters {
           .map(_.replace(",", ""))
           .flatMap {
             case s if s.matches(decimalRegexp) =>
-              Left(Seq(FormError(key, wholeNumberKey, args)))
+              Left(Seq(FormError(key, errors.wholeNumberKey, args)))
             case s =>
               nonFatalCatch
                 .either(s.toInt)
                 .left
-                .map(_ => Seq(FormError(key, nonNumericKey, args)))
+                .map(_ => Seq(FormError(key, errors.nonNumericKey, args)))
           }
           .flatMap { int =>
-            max match {
+            errors.max match {
               case (max, error) if int > max =>
                 Left(Seq(FormError(key, error, args)))
               case _ =>

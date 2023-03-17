@@ -16,6 +16,7 @@
 
 package forms.mappings
 
+import forms.mappings.errors.{DateFormErrors, IntFormErrors}
 import models.{DateRange, Enumerable, Money}
 import play.api.data.FieldMapping
 import play.api.data.Forms.of
@@ -35,7 +36,13 @@ trait Mappings extends Formatters with Constraints {
     max: (Int, String) = (Int.MaxValue, "error.tooLarge"),
     args: Seq[String] = Seq.empty
   ): FieldMapping[Int] =
-    of(intFormatter(requiredKey, wholeNumberKey, nonNumericKey, max, args))
+    int(IntFormErrors(requiredKey, wholeNumberKey, nonNumericKey, max), args)
+
+  protected def int(
+    intFormErrors: IntFormErrors,
+    args: Seq[String]
+  ): FieldMapping[Int] =
+    of(intFormatter(intFormErrors, args))
 
   protected def double(
     requiredKey: String = "error.required",

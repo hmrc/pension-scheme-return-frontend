@@ -16,7 +16,8 @@
 
 package forms
 
-import forms.mappings.{DateFormErrors, Mappings}
+import forms.mappings.Mappings
+import forms.mappings.errors.DateFormErrors
 
 import java.time.LocalDate
 import generators.Generators

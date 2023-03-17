@@ -20,7 +20,7 @@ import com.google.inject.Inject
 import config.Refined.Max3
 import controllers.actions._
 import forms.DateRangeFormProvider
-import forms.mappings.DateFormErrors
+import forms.mappings.errors.DateFormErrors
 import models.SchemeId.Srn
 import models.requests.DataRequest
 import models.{DateRange, Mode}
