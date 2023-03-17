@@ -22,7 +22,7 @@
   govukInput: GovukInput
 )
 
-@(form: Form[(Int, Int, Int)], viewmodel: TripleIntViewModel)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], viewmodel: TripleIntViewModel)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(viewmodel.title.toMessage)) {
 

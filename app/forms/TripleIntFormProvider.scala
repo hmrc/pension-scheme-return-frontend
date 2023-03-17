@@ -18,7 +18,8 @@ package forms
 
 import forms.mappings.Mappings
 import forms.mappings.errors.IntFormErrors
-import play.api.data.Form
+import models.SchemeMemberNumbers
+import play.api.data.{Form, Mapping}
 import play.api.data.Forms.mapping
 
 import javax.inject.Inject
@@ -32,10 +33,38 @@ class TripleIntFormProvider @Inject() extends Mappings {
     args: Seq[String] = Seq.empty
   ): Form[(Int, Int, Int)] =
     Form(
-      mapping(
-        "value.1" -> int(field1Errors, args),
-        "value.2" -> int(field2Errors, args),
-        "value.3" -> int(field3Errors, args)
-      )((a, b, c) => (a, b, c))(Some(_))
+      formMapping[(Int, Int, Int)](
+        field1Errors,
+        field2Errors,
+        field3Errors,
+        args
+      )(Tuple3.apply)(Some(_))
     )
+
+  def schemeMembers(
+    activeMembersErrors: IntFormErrors,
+    deferredMembersErrors: IntFormErrors,
+    pensionerMemberErrors: IntFormErrors,
+    args: Seq[String] = Seq.empty
+  ): Form[SchemeMemberNumbers] =
+    Form(
+      formMapping(
+        activeMembersErrors,
+        deferredMembersErrors,
+        pensionerMemberErrors,
+        args
+      )(SchemeMemberNumbers.apply)(SchemeMemberNumbers.unapply)
+    )
+
+  private def formMapping[T](
+    field1Errors: IntFormErrors,
+    field2Errors: IntFormErrors,
+    field3Errors: IntFormErrors,
+    args: Seq[String] = Seq.empty
+  )(apply: (Int, Int, Int) => T)(unapply: T => Option[(Int, Int, Int)]): Mapping[T] =
+    mapping[T, Int, Int, Int](
+      "value.1" -> int(field1Errors, args),
+      "value.2" -> int(field2Errors, args),
+      "value.3" -> int(field3Errors, args)
+    )(apply)(unapply)
 }
