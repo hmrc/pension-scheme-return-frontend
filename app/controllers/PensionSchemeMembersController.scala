@@ -43,36 +43,53 @@ import pages.PensionSchemeMembersPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.FormUtils.FormOps
 import viewmodels.DisplayMessage.{ListMessage, ListType, Message, ParagraphMessage}
 import viewmodels.implicits._
 import viewmodels.models.{RadioListRowViewModel, RadioListViewModel}
 import views.html.RadioListView
 
 import javax.inject.Inject
+import scala.concurrent.{ExecutionContext, Future}
 
 class PensionSchemeMembersController @Inject()(
   override val messagesApi: MessagesApi,
   navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   formProvider: RadioListFormProvider,
+  saveService: SaveService,
   val controllerComponents: MessagesControllerComponents,
   view: RadioListView
-) extends FrontendBaseController
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport {
 
   private val form = PensionSchemeMembersController.form(formProvider)
 
   def onPageLoad(srn: Srn): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    Ok(view(form, viewModel(srn, request.schemeDetails.schemeName)))
+    Ok(
+      view(
+        form.fromUserAnswers(PensionSchemeMembersPage(srn, Manual)),
+        viewModel(srn, request.schemeDetails.schemeName)
+      )
+    )
   }
 
-  def onSubmit(srn: Srn): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
+  def onSubmit(srn: Srn): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
     form
       .bindFromRequest()
       .fold(
-        formWithErrors => BadRequest(view(formWithErrors, viewModel(srn, request.schemeDetails.schemeName))),
-        answer => Redirect(navigator.nextPage(PensionSchemeMembersPage(srn, answer), NormalMode, request.userAnswers))
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, viewModel(srn, request.schemeDetails.schemeName)))),
+        answer => {
+          for {
+            updatedAnswers <- Future
+              .fromTry(request.userAnswers.set(PensionSchemeMembersPage(srn, answer), answer))
+            _ <- saveService.save(updatedAnswers)
+          } yield Redirect(navigator.nextPage(PensionSchemeMembersPage(srn, answer), NormalMode, request.userAnswers))
+        }
       )
   }
 }

@@ -19,8 +19,7 @@ package models
 import utils.WithName
 
 sealed trait ManualOrUpload
-
-object ManualOrUpload {
+object ManualOrUpload extends Enumerable.Implicits {
 
   case object Manual extends WithName("manual") with ManualOrUpload
   case object Upload extends WithName("upload") with ManualOrUpload
