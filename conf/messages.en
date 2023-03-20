@@ -234,3 +234,19 @@ memberDetailsNino.heading = What is {0}’s National Insurance number?
 memberDetailsNino.error.required = Enter {0}’s National Insurance number
 memberDetailsNino.error.invalid = Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C
 memberDetailsNino.error.duplicate = National Insurance number is already in use and cannot be duplicated
+
+
+howManyMembers.title = How many members did the scheme have on {0}?
+howManyMembers.heading = How many members did {0} have on {1}?
+howManyMembers.field1 = Number of active members
+howManyMembers.field1.error.required = Enter the number of active members. If there were none, enter 0.
+howManyMembers.field1.error.invalid = Number of active members must only include numbers 0 to 9
+howManyMembers.field1.error.max = Number of active members must be 999,999 or fewer
+howManyMembers.field2 = Number of deferred members
+howManyMembers.field2.error.required = Enter the number of deferred members. If there were none, enter 0.
+howManyMembers.field2.error.invalid = Number of deferred members must only include numbers 0 to 9
+howManyMembers.field2.error.max = Number of deferred members must be 999,999 or fewer
+howManyMembers.field3 = Number of pensioner members
+howManyMembers.field3.error.required = Enter the number of pensioner members. If there were none, enter 0.
+howManyMembers.field3.error.invalid = Number of pensioner members must only include numbers 0 to 9
+howManyMembers.field3.error.max = Number of pensioner members must only include numbers 0 to 9

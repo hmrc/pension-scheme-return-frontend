@@ -84,6 +84,9 @@ class Navigator @Inject()() {
     case SchemeMemberDetailsCYAPage(srn) => _ => routes.UnauthorisedController.onPageLoad
     case PsaDeclarationPage(srn) => _ => routes.UnauthorisedController.onPageLoad
     case PspDeclarationPage(srn) => _ => routes.UnauthorisedController.onPageLoad
+    case page @ HowManyMembersPage(srn) => {
+      case _ => routes.UnauthorisedController.onPageLoad
+    }
     case _ => _ => routes.IndexController.onPageLoad
   }
 
@@ -91,6 +94,9 @@ class Navigator @Inject()() {
     case CheckReturnDatesPage(srn) => _ => routes.UnauthorisedController.onPageLoad
     case SchemeBankAccountPage(srn, _) => _ => routes.UnauthorisedController.onPageLoad
     case RemoveSchemeBankAccountPage(srn) => _ => routes.SchemeBankAccountListController.onPageLoad(srn)
+    case page @ HowManyMembersPage(srn) => {
+      case _ => routes.UnauthorisedController.onPageLoad
+    }
     case _ => _ => routes.IndexController.onPageLoad
   }
 

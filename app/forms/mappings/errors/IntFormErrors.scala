@@ -22,3 +22,13 @@ case class IntFormErrors(
   nonNumericKey: String,
   max: (Int, String)
 )
+
+object IntFormErrors {
+
+  def apply(
+    requiredKey: String,
+    invalidKey: String,
+    max: (Int, String)
+  ): IntFormErrors =
+    IntFormErrors(requiredKey, invalidKey, invalidKey, max)
+}

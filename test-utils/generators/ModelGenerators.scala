@@ -27,6 +27,7 @@ import models.requests.{AllowedAccessRequest, IdentifierRequest}
 import org.scalacheck.Gen
 import org.scalacheck.Gen.numChar
 import play.api.mvc.Request
+import play.api.test.FakeRequest
 import uk.gov.hmrc.domain.Nino
 
 trait ModelGenerators extends BasicGenerators {

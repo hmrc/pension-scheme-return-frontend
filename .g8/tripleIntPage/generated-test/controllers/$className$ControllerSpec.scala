@@ -35,7 +35,7 @@ class $className;format="cap"$ControllerSpec extends ControllerBaseSpec {
 
     behave like journeyRecoveryPage("onPageLoad", onPageLoad)
 
-    behave like saveAndContinue(onSubmit, "value.1" -> "1", "value.2" -> 2, "value.3" -> 3)
+    behave like saveAndContinue(onSubmit, "value.1" -> "1", "value.2" -> "2", "value.3" -> "3")
 
     behave like invalidForm(onSubmit)
   }
