@@ -59,7 +59,7 @@ object $className;format="cap"$Controller {
       "$className;format="decap"$.field1.error.required",
       "$className;format="decap"$.field1.error.wholeNumber",
       "$className;format="decap"$.field1.error.nonNumber",
-      ($field2MaxValue, "$className;format="decap"$.field1.error.max")
+      ($field2MaxValue$, "$className;format="decap"$.field1.error.max")
     )
 
   private val field2Errors: IntFormErrors =
@@ -67,7 +67,7 @@ object $className;format="cap"$Controller {
       "$className;format="decap"$.field2.error.required",
       "$className;format="decap"$.field2.error.wholeNumber",
       "$className;format="decap"$.field2.error.nonNumber",
-      ($field1MaxValue, "$className;format="decap"$.field2.error.max")
+      ($field1MaxValue$, "$className;format="decap"$.field2.error.max")
     )
 
   private val field3Errors: IntFormErrors =
@@ -75,7 +75,7 @@ object $className;format="cap"$Controller {
       "$className;format="decap"$.field3.error.required",
       "$className;format="decap"$.field3.error.wholeNumber",
       "$className;format="decap"$.field3.error.nonNumber",
-      ($field3MaxValue, "$className;format="decap"$.field3.error.max")
+      ($field3MaxValue$, "$className;format="decap"$.field3.error.max")
     )
 
   def form(formProvider: TripleIntFormProvider): Form[(Int, Int, Int)] = formProvider(
