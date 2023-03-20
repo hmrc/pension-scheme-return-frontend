@@ -20,7 +20,7 @@ import models.ManualOrUpload
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
 
-case class PensionSchemeMembersPage(srn: Srn, action: ManualOrUpload) extends QuestionPage[ManualOrUpload] {
+case class PensionSchemeMembersPage(srn: Srn) extends QuestionPage[ManualOrUpload] {
   override def path: JsPath = JsPath \ toString
   override def toString: String = "pensionSchemeMembers"
 }

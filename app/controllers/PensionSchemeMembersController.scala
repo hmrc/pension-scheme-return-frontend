@@ -71,7 +71,7 @@ class PensionSchemeMembersController @Inject()(
   def onPageLoad(srn: Srn): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     Ok(
       view(
-        form.fromUserAnswers(PensionSchemeMembersPage(srn, Manual)),
+        form.fromUserAnswers(PensionSchemeMembersPage(srn)),
         viewModel(srn, request.schemeDetails.schemeName)
       )
     )
@@ -86,9 +86,9 @@ class PensionSchemeMembersController @Inject()(
         answer => {
           for {
             updatedAnswers <- Future
-              .fromTry(request.userAnswers.set(PensionSchemeMembersPage(srn, answer), answer))
+              .fromTry(request.userAnswers.set(PensionSchemeMembersPage(srn), answer))
             _ <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage(PensionSchemeMembersPage(srn, answer), NormalMode, request.userAnswers))
+          } yield Redirect(navigator.nextPage(PensionSchemeMembersPage(srn), NormalMode, request.userAnswers))
         }
       )
   }
