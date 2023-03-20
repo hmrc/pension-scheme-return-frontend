@@ -22,7 +22,7 @@ class $className;format="cap"$ControllerSpec extends ControllerBaseSpec {
   "$className;format="cap"$Controller" should {
 
     behave like renderView(onPageLoad) { implicit app => implicit request =>
-      val view injected[TripleIntView]
+      val view = injected[TripleIntView]
 
       view(form(injected[TripleIntFormProvider]), viewModel(srn, NormalMode))
     }
