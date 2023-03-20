@@ -22,9 +22,9 @@ class $className;format="cap"$ControllerSpec extends ControllerBaseSpec {
   "$className;format="cap"$Controller" should {
 
     behave like renderView(onPageLoad) { implicit app => implicit request =>
-      val view injected[YesNoPageView]
+      val view injected[TripleIntView]
 
-      view(form(injected[TripleIntView]), viewModel(srn, NormalMode))
+      view(form(injected[TripleIntFormProvider]), viewModel(srn, NormalMode))
     }
 
     behave like renderPrePopView(onPageLoad, $className;format="cap"$Page(srn), (1, 2, 3)) { implicit app => implicit request =>
