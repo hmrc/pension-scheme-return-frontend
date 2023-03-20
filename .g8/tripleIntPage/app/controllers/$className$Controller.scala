@@ -3,6 +3,7 @@ package controllers
 import $className;format="cap"$Controller._
 import controllers.actions._
 import forms.TripleIntFormProvider
+import forms.mappings.errors.IntFormErrors
 import javax.inject.Inject
 import models.Mode
 import models.SchemeId.Srn
@@ -58,7 +59,7 @@ object $className;format="cap"$Controller {
       "$className;format="decap"$.field1.error.required",
       "$className;format="decap"$.field1.error.wholeNumber",
       "$className;format="decap"$.field1.error.nonNumber",
-      ($field1MaxValue, "$className;format="decap"$.field1.error.max")
+      ($field2MaxValue, "$className;format="decap"$.field1.error.max")
     )
 
   private val field2Errors: IntFormErrors =
@@ -66,7 +67,7 @@ object $className;format="cap"$Controller {
       "$className;format="decap"$.field2.error.required",
       "$className;format="decap"$.field2.error.wholeNumber",
       "$className;format="decap"$.field2.error.nonNumber",
-      ($field2MaxValue, "$className;format="decap"$.field2.error.max")
+      ($field1MaxValue, "$className;format="decap"$.field2.error.max")
     )
 
   private val field3Errors: IntFormErrors =
