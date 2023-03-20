@@ -24,7 +24,7 @@ import javax.inject.Inject
 
 class TextFormProvider @Inject()() extends Mappings {
 
-  val textAreaRegex = "^[a-zA-Z\\-' ]+$"
+  val textAreaRegex = """^[a-zA-Z0-9\-'" \t\r\n,.@/]+$"""
   val textAreaMaxLength = 160
 
   def apply(requiredKey: String): Form[String] =
