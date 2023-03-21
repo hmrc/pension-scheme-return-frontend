@@ -14,26 +14,19 @@
  * limitations under the License.
  */
 
-package viewmodels
+package pages
 
-package object govuk {
+import eu.timepit.refined.refineMV
+import pages.behaviours.PageBehaviours
 
-  object all
-      extends ImplicitConversions
-      with BackLinkFluency
-      with ButtonFluency
-      with CheckboxFluency
-      with DateFluency
-      with ErrorSummaryFluency
-      with FieldsetFluency
-      with HintFluency
-      with InputFluency
-      with InsetTextFluency
-      with LabelFluency
-      with RadiosFluency
-      with SummaryListFluency
-      with TagFluency
-      with TableFluency
-      with ListWithActionsFluency
-      with TextAreaFluency
+class NoNINOPageSpec extends PageBehaviours {
+
+  "NoNINOPage" - {
+
+    beRetrievable[String](NoNINOPage(srnGen.sample.value, refineMV(1)))
+
+    beSettable[String](NoNINOPage(srnGen.sample.value, refineMV(1)))
+
+    beRemovable[String](NoNINOPage(srnGen.sample.value, refineMV(1)))
+  }
 }

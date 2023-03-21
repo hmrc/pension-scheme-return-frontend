@@ -109,6 +109,9 @@ trait HtmlHelper extends HtmlModels {
     )
   }
 
+  def textAreas(html: Html)(name: String): Elements =
+    mainContent(html).select(s"textarea[name=$name]")
+
   def messageKey(message: DisplayMessage): String = message match {
     case Message(key, _) => key
     case LinkMessage(message, _) => messageKey(message)

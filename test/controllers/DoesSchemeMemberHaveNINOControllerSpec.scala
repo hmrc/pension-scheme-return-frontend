@@ -19,18 +19,14 @@ package controllers
 import controllers.DoesSchemeMemberHaveNINOController._
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
-import models.{NameDOB, NormalMode}
+import models.NormalMode
 import pages.{MemberDetailsPage, NationalInsuranceNumberPage}
 import views.html.YesNoPageView
-
-import java.time.LocalDate
 
 class DoesSchemeMemberHaveNINOControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoad = routes.DoesSchemeMemberHaveNINOController.onPageLoad(srn, refineMV(1), NormalMode)
   private lazy val onSubmit = routes.DoesSchemeMemberHaveNINOController.onSubmit(srn, refineMV(1), NormalMode)
-
-  private val memberDetails = NameDOB("testFirstname", "testLastName", LocalDate.of(2020, 12, 12))
 
   private val userAnswersWithMemberDetails =
     defaultUserAnswers.set(MemberDetailsPage(srn, refineMV(1)), memberDetails).success.value

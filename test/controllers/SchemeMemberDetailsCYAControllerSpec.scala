@@ -18,37 +18,49 @@ package controllers
 
 import controllers.SchemeMemberDetailsCYAController._
 import eu.timepit.refined.refineMV
-import models.{NameDOB, NormalMode}
-import pages.{MemberDetailsNinoPage, MemberDetailsPage, NationalInsuranceNumberPage}
+import models.NormalMode
+import pages.{MemberDetailsNinoPage, MemberDetailsPage, NationalInsuranceNumberPage, NoNINOPage}
 import uk.gov.hmrc.domain.Nino
 import views.html.CheckYourAnswersView
-
-import java.time.LocalDate
 
 class SchemeMemberDetailsCYAControllerSpec extends ControllerBaseSpec {
 
   lazy val onPageLoad = controllers.routes.SchemeMemberDetailsCYAController.onPageLoad(srn, refineMV(1))
   lazy val onSubmit = controllers.routes.SchemeMemberDetailsCYAController.onSubmit(srn, refineMV(1))
 
-  private val memberDetails = NameDOB("testFirstName", "testLastName", LocalDate.of(2020, 12, 12))
   private val nino = Nino("AB123456A")
+  private val noNinoReason = "test reason"
 
-  private val fullUserAnswers =
-    defaultUserAnswers
-      .set(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-      .flatMap(_.set(NationalInsuranceNumberPage(srn, refineMV(1)), true))
-      .flatMap(_.set(MemberDetailsNinoPage(srn, refineMV(1)), nino))
-      .success
-      .value
+  private val userAnswersWithNino = defaultUserAnswers
+    .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+    .unsafeSet(NationalInsuranceNumberPage(srn, refineMV(1)), true)
+    .unsafeSet(MemberDetailsNinoPage(srn, refineMV(1)), nino)
+
+  private val userAnswersWithoutNino = defaultUserAnswers
+    .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+    .unsafeSet(NationalInsuranceNumberPage(srn, refineMV(1)), false)
+    .unsafeSet(NoNINOPage(srn, refineMV(1)), noNinoReason)
 
   "SchemeMemberDetailsCYAController" should {
+
     act.like(
-      renderView(onPageLoad, fullUserAnswers)(
+      renderView(onPageLoad, userAnswersWithNino)(
         implicit app =>
           implicit request =>
-            injected[CheckYourAnswersView]
-              .apply(viewModel(refineMV(1), srn, NormalMode, memberDetails, hasNINO = true, Some(nino)))
-      )
+            injected[CheckYourAnswersView].apply(
+              viewModel(refineMV(1), srn, NormalMode, memberDetails, hasNINO = true, Some(nino), None)
+            )
+      ).withName("render correct view when nino provided")
+    )
+
+    act.like(
+      renderView(onPageLoad, userAnswersWithoutNino)(
+        implicit app =>
+          implicit request =>
+            injected[CheckYourAnswersView].apply(
+              viewModel(refineMV(1), srn, NormalMode, memberDetails, hasNINO = false, None, Some(noNinoReason))
+            )
+      ).withName("render the correct view when no nino provided")
     )
 
     "when member details is missing" should {
@@ -56,7 +68,7 @@ class SchemeMemberDetailsCYAControllerSpec extends ControllerBaseSpec {
         redirectToPage(
           onPageLoad,
           routes.JourneyRecoveryController.onPageLoad(),
-          fullUserAnswers.remove(MemberDetailsPage(srn, refineMV(1))).success.value
+          userAnswersWithNino.remove(MemberDetailsPage(srn, refineMV(1))).success.value
         )
       )
     }
@@ -66,7 +78,7 @@ class SchemeMemberDetailsCYAControllerSpec extends ControllerBaseSpec {
         redirectToPage(
           onPageLoad,
           routes.JourneyRecoveryController.onPageLoad(),
-          fullUserAnswers.remove(NationalInsuranceNumberPage(srn, refineMV(1))).success.value
+          userAnswersWithNino.remove(NationalInsuranceNumberPage(srn, refineMV(1))).success.value
         )
       )
     }
@@ -76,7 +88,17 @@ class SchemeMemberDetailsCYAControllerSpec extends ControllerBaseSpec {
         redirectToPage(
           onPageLoad,
           routes.JourneyRecoveryController.onPageLoad(),
-          fullUserAnswers.remove(MemberDetailsNinoPage(srn, refineMV(1))).success.value
+          userAnswersWithNino.remove(MemberDetailsNinoPage(srn, refineMV(1))).success.value
+        )
+      )
+    }
+
+    "when no NINO reason is missing" should {
+      act.like(
+        redirectToPage(
+          onPageLoad,
+          routes.JourneyRecoveryController.onPageLoad(),
+          userAnswersWithoutNino.remove(NoNINOPage(srn, refineMV(1))).success.value
         )
       )
     }
@@ -85,14 +107,14 @@ class SchemeMemberDetailsCYAControllerSpec extends ControllerBaseSpec {
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
 
     "viewModel" should {
-      "contain all rows if nino is present" in {
-        val vm = viewModel(refineMV(1), srn, NormalMode, memberDetails, hasNINO = true, Some(nino))
+      "contain all rows if has nino is true and nino is present" in {
+        val vm = viewModel(refineMV(1), srn, NormalMode, memberDetails, hasNINO = true, Some(nino), None)
         vm.rows.size mustBe 5
       }
 
-      "contain 4 rows if nino is not present" in {
-        val vm = viewModel(refineMV(1), srn, NormalMode, memberDetails, hasNINO = true, None)
-        vm.rows.size mustBe 4
+      "contain all rows if has nino is false and no nino reason is present" in {
+        val vm = viewModel(refineMV(1), srn, NormalMode, memberDetails, hasNINO = false, None, Some("test reason"))
+        vm.rows.size mustBe 5
       }
     }
   }

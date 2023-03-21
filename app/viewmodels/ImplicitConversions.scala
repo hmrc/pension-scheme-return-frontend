@@ -38,4 +38,7 @@ trait ImplicitConversions {
 
   implicit def intToMessage(int: Int): Message =
     Message(int.toString)
+
+  implicit def tuple2ToSimpleMessage(tuple: (String, String)): Message =
+    Message(tuple._1, Message(tuple._2))
 }

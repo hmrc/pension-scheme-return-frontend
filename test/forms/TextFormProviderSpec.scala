@@ -18,12 +18,38 @@ package forms
 
 import forms.behaviours.FieldBehaviours
 import org.scalacheck.Gen
+import org.scalacheck.Gen.asciiStr
 import play.api.data.Form
 import uk.gov.hmrc.domain.Nino
 
 class TextFormProviderSpec extends FieldBehaviours {
 
   private val formProvider = new TextFormProvider()
+
+  ".textarea" - {
+    val form: Form[String] = formProvider.textArea(
+      "required",
+      "tooLong",
+      "invalid"
+    )
+
+    val invalidTextGen = asciiStr.suchThat(_.nonEmpty).suchThat(!_.matches(formProvider.textAreaRegex))
+
+    behave.like(fieldThatBindsValidData(form, "value", nonEmptyAlphaString))
+    behave.like(mandatoryField(form, "value", "required"))
+    behave.like(invalidField(form, "value", "invalid", invalidTextGen))
+    behave.like(textTooLongField(form, "value", "tooLong", formProvider.textAreaMaxLength))
+
+    "allow punctuation" - {
+      behave.like(
+        fieldThatBindsValidData(
+          form,
+          "value",
+          "Hi, I'm a test on date 10-12-2010 with email test@email.com \n with a newline and \ttab"
+        )
+      )
+    }
+  }
 
   ".nino" - {
 

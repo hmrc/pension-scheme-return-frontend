@@ -20,7 +20,7 @@ import forms.mappings.Mappings
 import play.api.data
 import play.api.data.Forms.mapping
 import play.api.test.FakeRequest
-import views.html.{TextInputView, TripleIntView}
+import views.html.TripleIntView
 
 class TripleIntViewSpec extends ViewSpec with Mappings {
 

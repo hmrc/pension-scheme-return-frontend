@@ -79,7 +79,7 @@ class Navigator @Inject()() {
       _ => routes.DoesSchemeMemberHaveNINOController.onPageLoad(srn, index, NormalMode)
     case page @ NationalInsuranceNumberPage(srn, index) => {
       case ua if ua.get(page).contains(true) => routes.MemberDetailsNinoController.onPageLoad(srn, index, NormalMode)
-      case _ => routes.UnauthorisedController.onPageLoad
+      case _ => routes.NoNINOController.onPageLoad(srn, index, NormalMode)
     }
     case MemberDetailsNinoPage(srn, index) => _ => routes.SchemeMemberDetailsCYAController.onPageLoad(srn, index)
     case SchemeMemberDetailsCYAPage(srn) => _ => routes.UnauthorisedController.onPageLoad
@@ -96,6 +96,8 @@ class Navigator @Inject()() {
       case _ => routes.HowMuchCashController.onPageLoad(srn, NormalMode)
     }
 
+    case NoNINOPage(srn, index) => _ => routes.SchemeMemberDetailsCYAController.onPageLoad(srn, index)
+
     case _ => _ => routes.IndexController.onPageLoad
   }
 
@@ -103,9 +105,13 @@ class Navigator @Inject()() {
     case CheckReturnDatesPage(srn) => _ => routes.UnauthorisedController.onPageLoad
     case SchemeBankAccountPage(srn, _) => _ => routes.UnauthorisedController.onPageLoad
     case RemoveSchemeBankAccountPage(srn) => _ => routes.SchemeBankAccountListController.onPageLoad(srn)
+
     case page @ HowManyMembersPage(srn, _) => {
       case _ => routes.UnauthorisedController.onPageLoad
     }
+
+    case NoNINOPage(srn, _) => _ => routes.UnauthorisedController.onPageLoad
+
     case _ => _ => routes.IndexController.onPageLoad
   }
 

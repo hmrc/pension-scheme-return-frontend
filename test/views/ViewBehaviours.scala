@@ -97,6 +97,13 @@ trait ViewBehaviours {
       }
     }
 
+  def renderTextArea[A](gen: Gen[A])(view: A => Html, name: String): Unit =
+    s"render text area for $name" in {
+      forAll(gen) { viewModel =>
+        textAreas(view(viewModel))(name).size() mustBe 1
+      }
+    }
+
   def renderErrors[A](gen: Gen[A])(view: A => Html, error: String): Unit = {
     "render required error summary" in {
 

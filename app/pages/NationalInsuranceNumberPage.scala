@@ -19,10 +19,23 @@ package pages
 import config.Refined.Max99
 import play.api.libs.json.JsPath
 import models.SchemeId.Srn
+import models.UserAnswers
+
+import scala.util.Try
 
 case class NationalInsuranceNumberPage(srn: Srn, index: Max99) extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "nationalInsuranceNumber"
+
+  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
+    value match {
+      case Some(true) => userAnswers.remove(NoNINOPage(srn, index))
+      case Some(false) => userAnswers.remove(MemberDetailsNinoPage(srn, index))
+      case None =>
+        userAnswers
+          .remove(NoNINOPage(srn, index))
+          .flatMap(_.remove(MemberDetailsNinoPage(srn, index)))
+    }
 }

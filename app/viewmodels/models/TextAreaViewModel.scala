@@ -14,26 +14,14 @@
  * limitations under the License.
  */
 
-package viewmodels
+package viewmodels.models
 
-package object govuk {
+import play.api.mvc.Call
+import viewmodels.DisplayMessage
+import viewmodels.DisplayMessage.Message
 
-  object all
-      extends ImplicitConversions
-      with BackLinkFluency
-      with ButtonFluency
-      with CheckboxFluency
-      with DateFluency
-      with ErrorSummaryFluency
-      with FieldsetFluency
-      with HintFluency
-      with InputFluency
-      with InsetTextFluency
-      with LabelFluency
-      with RadiosFluency
-      with SummaryListFluency
-      with TagFluency
-      with TableFluency
-      with ListWithActionsFluency
-      with TextAreaFluency
-}
+case class TextAreaViewModel(
+  title: Message,
+  heading: DisplayMessage,
+  onSubmit: Call
+)

@@ -19,29 +19,11 @@ package generators
 import cats.data.NonEmptyList
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
-import org.scalacheck.Gen.{
-  alphaChar,
-  alphaNumChar,
-  alphaNumStr,
-  alphaStr,
-  choose,
-  chooseNum,
-  listOfN,
-  nonEmptyListOf,
-  numChar
-}
+import org.scalacheck.Gen.{alphaChar, alphaNumChar, alphaNumStr, alphaStr, choose, chooseNum, listOfN, numChar}
 import play.api.mvc.Call
 import viewmodels.DisplayMessage
 import viewmodels.DisplayMessage.ListType.Bullet
-import viewmodels.DisplayMessage.{
-  BlockMessage,
-  InlineMessage,
-  LinkMessage,
-  ListMessage,
-  ListType,
-  Message,
-  ParagraphMessage
-}
+import viewmodels.DisplayMessage._
 
 import java.time.{Instant, LocalDate, ZoneOffset}
 
@@ -132,6 +114,9 @@ trait BasicGenerators {
 
   def stringsWithMaxLength(maxLength: Int): Gen[String] =
     stringLengthBetween(1, maxLength, alphaChar)
+
+  def stringsWithMinLength(minLength: Int): Gen[String] =
+    stringLengthBetween(minLength, 999999, alphaChar)
 
   def stringsLongerThan(minLength: Int): Gen[String] =
     for {

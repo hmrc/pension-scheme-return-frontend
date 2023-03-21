@@ -18,7 +18,6 @@ package navigation
 
 import controllers.routes
 import eu.timepit.refined._
-import models.PensionSchemeId.PsaId
 import models._
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import pages._

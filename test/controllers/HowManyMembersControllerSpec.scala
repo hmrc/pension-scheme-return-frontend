@@ -20,7 +20,6 @@ import controllers.HowManyMembersController._
 import forms.TripleIntFormProvider
 import models.{NormalMode, SchemeMemberNumbers}
 import org.mockito.ArgumentMatchers.any
-import org.scalatest.verbs.BehaveWord
 import pages.HowManyMembersPage
 import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
