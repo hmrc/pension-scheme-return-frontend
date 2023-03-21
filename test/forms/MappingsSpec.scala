@@ -146,6 +146,11 @@ class MappingsSpec extends AnyFreeSpec with Matchers with OptionValues with Mapp
       result.errors must contain(FormError("value", "error.tooLarge"))
     }
 
+    "must not bind when larger than max int" in {
+      val result = testForm.bind(Map("value" -> (Int.MaxValue.toLong + 1).toString))
+      result.errors must contain(FormError("value", "error.tooLarge"))
+    }
+
     "must unbind a valid value" in {
       val result = testForm.fill(123)
       result.apply("value").value.value mustEqual "123"

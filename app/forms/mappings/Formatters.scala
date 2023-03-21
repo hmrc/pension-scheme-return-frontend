@@ -68,6 +68,7 @@ trait Formatters {
     new Formatter[Int] {
 
       val decimalRegexp = """^-?(\d*\.\d*)$"""
+      val intRegex = """^[0-9]+$"""
 
       private val baseFormatter = stringFormatter(errors.requiredKey, args)
 
@@ -82,7 +83,10 @@ trait Formatters {
               nonFatalCatch
                 .either(s.toInt)
                 .left
-                .map(_ => Seq(FormError(key, errors.nonNumericKey, args)))
+                .map { _ =>
+                  if (s.matches(intRegex)) Seq(FormError(key, errors.max._2, args))
+                  else Seq(FormError(key, errors.nonNumericKey, args))
+                }
           }
           .flatMap { int =>
             errors.max match {

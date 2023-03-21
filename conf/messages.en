@@ -249,4 +249,4 @@ howManyMembers.field2.error.max = Number of deferred members must be 999,999 or 
 howManyMembers.field3 = Number of pensioner members
 howManyMembers.field3.error.required = Enter the number of pensioner members. If there were none, enter 0.
 howManyMembers.field3.error.invalid = Number of pensioner members must only include numbers 0 to 9
-howManyMembers.field3.error.max = Number of pensioner members must only include numbers 0 to 9
+howManyMembers.field3.error.max = Number of pensioner members must be 999,999 or fewer
