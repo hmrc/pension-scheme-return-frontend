@@ -40,11 +40,11 @@ class PensionSchemeMembersControllerSpec extends ControllerBaseSpec {
     behave.like(journeyRecoveryPage("onPageLoad", onPageLoad))
 
     "manual data is submitted" when {
-      behave.like(continueNoSave(onSubmit, "value" -> Manual.name))
+      behave.like(saveAndContinue(onSubmit, "value" -> Manual.name))
     }
 
     "upload data is submitted" when {
-      behave.like(continueNoSave(onSubmit, "value" -> Upload.name))
+      behave.like(saveAndContinue(onSubmit, "value" -> Upload.name))
     }
 
     behave.like(journeyRecoveryPage("onSubmit", onSubmit))
