@@ -16,16 +16,17 @@
 
 package pages
 
+import models.SchemeMemberNumbers
 import pages.behaviours.PageBehaviours
 
 class HowManyMembersPageSpec extends PageBehaviours {
 
   "howManyMembersPage" - {
 
-    beRetrievable[(Int, Int, Int)](HowManyMembersPage(srnGen.sample.value))
+    beRetrievable[SchemeMemberNumbers](HowManyMembersPage(srnGen.sample.value, pensionSchemeIdGen.sample.value))
 
-    beSettable[(Int, Int, Int)](HowManyMembersPage(srnGen.sample.value))
+    beSettable[SchemeMemberNumbers](HowManyMembersPage(srnGen.sample.value, pensionSchemeIdGen.sample.value))
 
-    beRemovable[(Int, Int, Int)](HowManyMembersPage(srnGen.sample.value))
+    beRemovable[SchemeMemberNumbers](HowManyMembersPage(srnGen.sample.value, pensionSchemeIdGen.sample.value))
   }
 }

@@ -38,21 +38,21 @@
       InputViewModel(
         field = form("value.1"),
         label = LabelViewModel(renderMessage(viewmodel.field1Label))
-      )
+      ).withWidth(InputWidth.Fixed10)
     )
 
     @govukInput(
       InputViewModel(
         field = form("value.2"),
         label = LabelViewModel(renderMessage(viewmodel.field2Label))
-      )
+      ).withWidth(InputWidth.Fixed10)
     )
 
     @govukInput(
       InputViewModel(
         field = form("value.3"),
         label = LabelViewModel(renderMessage(viewmodel.field3Label))
-      )
+      ).withWidth(InputWidth.Fixed10)
     )
 
     @govukButton(

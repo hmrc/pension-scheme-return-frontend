@@ -16,4 +16,14 @@
 
 package models
 
-case class SchemeMemberNumbers(active: Int, deferred: Int, pensioner: Int)
+import play.api.libs.json.{Format, Json}
+
+case class SchemeMemberNumbers(active: Int, deferred: Int, pensioner: Int) {
+
+  val total: Int = active + deferred + pensioner
+}
+
+object SchemeMemberNumbers {
+
+  implicit val format: Format[SchemeMemberNumbers] = Json.format[SchemeMemberNumbers]
+}

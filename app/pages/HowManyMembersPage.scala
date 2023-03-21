@@ -16,10 +16,11 @@
 
 package pages
 
+import models.{PensionSchemeId, SchemeMemberNumbers}
 import play.api.libs.json.JsPath
 import models.SchemeId.Srn
 
-case class HowManyMembersPage(srn: Srn) extends QuestionPage[(Int, Int, Int)] {
+case class HowManyMembersPage(srn: Srn, request: PensionSchemeId) extends QuestionPage[SchemeMemberNumbers] {
 
   override def path: JsPath = JsPath \ toString
 

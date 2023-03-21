@@ -22,7 +22,7 @@ import controllers.HowManyMembersController._
 import controllers.actions._
 import forms.TripleIntFormProvider
 import forms.mappings.errors.IntFormErrors
-import models.Mode
+import models.{Mode, SchemeMemberNumbers}
 import models.SchemeId.Srn
 import models.requests.DataRequest
 import navigation.Navigator
@@ -60,7 +60,7 @@ class HowManyMembersController @Inject()(
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
     usingSubmissionEndDate(srn) { submissionEndDate =>
-      val preparedForm = form.fromUserAnswers(HowManyMembersPage(srn))
+      val preparedForm = form.fromUserAnswers(HowManyMembersPage(srn, request.pensionSchemeId))
       val schemeName = request.schemeDetails.schemeName
 
       Future.successful(Ok(view(preparedForm, viewModel(srn, schemeName, submissionEndDate, mode))))
@@ -70,6 +70,7 @@ class HowManyMembersController @Inject()(
   def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
     usingSubmissionEndDate(srn) { submissionEndDate =>
       val schemeName = request.schemeDetails.schemeName
+      val page = HowManyMembersPage(srn, request.pensionSchemeId)
 
       form
         .bindFromRequest()
@@ -78,9 +79,9 @@ class HowManyMembersController @Inject()(
             Future.successful(BadRequest(view(formWithErrors, viewModel(srn, schemeName, submissionEndDate, mode)))),
           value =>
             for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(HowManyMembersPage(srn), value))
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(page, value))
               _ <- saveService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(HowManyMembersPage(srn), mode, updatedAnswers))
+            } yield Redirect(navigator.nextPage(page, mode, updatedAnswers))
         )
     }
   }
@@ -116,7 +117,7 @@ object HowManyMembersController {
       (maxMembers, "howManyMembers.field3.error.max")
     )
 
-  def form(formProvider: TripleIntFormProvider): Form[(Int, Int, Int)] = formProvider(
+  def form(formProvider: TripleIntFormProvider): Form[SchemeMemberNumbers] = formProvider.schemeMembers(
     field1Errors,
     field2Errors,
     field3Errors

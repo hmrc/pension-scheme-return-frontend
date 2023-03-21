@@ -18,8 +18,9 @@ package controllers
 
 import controllers.HowManyMembersController._
 import forms.TripleIntFormProvider
-import models.NormalMode
+import models.{NormalMode, SchemeMemberNumbers}
 import org.mockito.ArgumentMatchers.any
+import org.scalatest.verbs.BehaveWord
 import pages.HowManyMembersPage
 import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
@@ -34,6 +35,7 @@ class HowManyMembersControllerSpec extends ControllerBaseSpec {
   private lazy val onSubmit = routes.HowManyMembersController.onSubmit(srn, NormalMode)
 
   private val submissionEndDate = date.sample.value
+  private val pensionSchemeId = pensionSchemeIdGen.sample.value
   private val mockSchemeDateService = mock[SchemeDateService]
 
   override val additionalBindings: List[GuiceableModule] =
@@ -57,13 +59,14 @@ class HowManyMembersControllerSpec extends ControllerBaseSpec {
       )
     })
 
-    act.like(renderPrePopView(onPageLoad, HowManyMembersPage(srn), (1, 2, 3)) { implicit app => implicit request =>
-      val view = injected[TripleIntView]
+    act.like(renderPrePopView(onPageLoad, HowManyMembersPage(srn, pensionSchemeId), SchemeMemberNumbers(1, 2, 3)) {
+      implicit app => implicit request =>
+        val view = injected[TripleIntView]
 
-      view(
-        form(injected[TripleIntFormProvider]).fill((1, 2, 3)),
-        viewModel(srn, defaultSchemeDetails.schemeName, submissionEndDate, NormalMode)
-      )
+        view(
+          form(injected[TripleIntFormProvider]).fill(SchemeMemberNumbers(1, 2, 3)),
+          viewModel(srn, defaultSchemeDetails.schemeName, submissionEndDate, NormalMode)
+        )
     })
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
