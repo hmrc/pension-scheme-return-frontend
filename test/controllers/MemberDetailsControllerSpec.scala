@@ -64,11 +64,11 @@ class MemberDetailsControllerSpec extends ControllerBaseSpec {
         injected[NameDOBView].apply(preparedForm, viewModel(srn, refineMV(1), NormalMode))
     })
 
-    act.like(journeyRecoveryPage("onPageLoad", onPageLoad))
+    act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
     act.like(saveAndContinue(onSubmit, validForm: _*))
     act.like(invalidForm(onSubmit))
     act.like(invalidForm(onSubmit, dobInFutureForm: _*))
-    act.like(journeyRecoveryPage("onSubmit", onSubmit))
+    act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }
 }

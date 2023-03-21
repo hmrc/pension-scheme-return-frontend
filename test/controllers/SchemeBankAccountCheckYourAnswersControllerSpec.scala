@@ -54,8 +54,8 @@ class SchemeBankAccountCheckYourAnswersControllerSpec
       redirectWhenCacheEmpty(onPageLoad, routes.SchemeBankAccountController.onPageLoad(srn, indexOne, NormalMode))
     )
 
-    act.like(journeyRecoveryPage("onPageLoad", onPageLoad))
-    act.like(journeyRecoveryPage("onSubmit", onSubmit))
+    act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
+    act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
 
     act.like(redirectNextPage(onSubmit))
   }

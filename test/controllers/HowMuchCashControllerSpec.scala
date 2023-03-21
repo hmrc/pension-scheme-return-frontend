@@ -45,7 +45,7 @@ class HowMuchCashControllerSpec extends ControllerBaseSpec {
       view(form.fill(moneyData), viewModel)
     })
 
-    act.like(journeyRecoveryPage("onPageLoad", onPageLoad))
+    act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
     act.like(saveAndContinue(onSubmit, formData(form, moneyData): _*))
 
@@ -56,6 +56,6 @@ class HowMuchCashControllerSpec extends ControllerBaseSpec {
       act.like(invalidForm(onSubmit, "value" -> (maxAllowedAmount + 0.001).toString))
     }
 
-    act.like(journeyRecoveryPage("onSubmit", onSubmit))
+    act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }
 }

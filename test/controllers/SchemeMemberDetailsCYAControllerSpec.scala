@@ -81,8 +81,8 @@ class SchemeMemberDetailsCYAControllerSpec extends ControllerBaseSpec {
       )
     }
 
-    act.like(journeyRecoveryPage("onPageLoad", onPageLoad))
-    act.like(journeyRecoveryPage("onSubmit", onSubmit))
+    act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
+    act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
 
     "viewModel" should {
       "contain all rows if nino is present" in {

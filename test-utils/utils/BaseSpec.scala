@@ -97,9 +97,9 @@ abstract class BaseSpec
     afterTest: () => Unit = () => ()
   ) extends {
 
-    def @@(name: String): BehaviourTest = withName(name)
-
     def withName(name: String): BehaviourTest = copy(name = name)
+
+    def updateName(update: String => String): BehaviourTest = copy(name = update(name))
 
     def before(f: => Unit): BehaviourTest = copy(beforeTest = () => f)
 

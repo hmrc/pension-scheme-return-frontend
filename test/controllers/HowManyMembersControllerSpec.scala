@@ -66,10 +66,10 @@ class HowManyMembersControllerSpec extends ControllerBaseSpec {
       )
     })
 
-    act.like(journeyRecoveryPage("onPageLoad", onPageLoad).run())
+    act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
     act.like(
-      journeyRecoveryPage("onPageLoad", Some(defaultUserAnswers), onPageLoad)
+      journeyRecoveryPage(onPageLoad, Some(defaultUserAnswers))
         .before(setEndDate(None))
         .withName("onPageLoad redirect to journey recovery page when no end date found")
     )
@@ -78,10 +78,10 @@ class HowManyMembersControllerSpec extends ControllerBaseSpec {
 
     act.like(invalidForm(onSubmit))
 
-    act.like(journeyRecoveryPage("onSubmit", onSubmit).run())
+    act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
 
     act.like(
-      journeyRecoveryPage("onSubmit", Some(defaultUserAnswers), onSubmit)
+      journeyRecoveryPage(onSubmit, Some(defaultUserAnswers))
         .before(setEndDate(None))
         .withName("onSubmit redirect to journey recovery page when no end date found")
     )

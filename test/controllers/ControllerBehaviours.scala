@@ -75,9 +75,9 @@ trait ControllerBehaviours {
       }
     )
 
-  def journeyRecoveryPage(name: String, userAnswers: Option[UserAnswers], call: => Call): BehaviourTest =
+  def journeyRecoveryPage(call: => Call, userAnswers: Option[UserAnswers]): BehaviourTest =
     BehaviourTest(
-      s"$name must redirect to Journey Recovery if no existing data is found",
+      s"must redirect to Journey Recovery if no existing data is found",
       () => {
         val application = applicationBuilder(userAnswers = userAnswers).build()
 
@@ -91,8 +91,8 @@ trait ControllerBehaviours {
       }
     )
 
-  def journeyRecoveryPage(name: String, call: => Call): BehaviourTest =
-    journeyRecoveryPage(name, None, call)
+  def journeyRecoveryPage(call: => Call): BehaviourTest =
+    journeyRecoveryPage(call, None)
 
   private def render(appBuilder: GuiceApplicationBuilder, call: => Call)(
     view: Application => Request[_] => Html

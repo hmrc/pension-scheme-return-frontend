@@ -62,15 +62,13 @@ class SchemeBankAccountControllerSpec extends ControllerBaseSpec {
 
     "return a 400 when data exists in user answers" when {
       val userAnswers = defaultUserAnswers
-        .set(SchemeBankAccountPage(srn, refineMV(1)), otherBankAccount)
-        .get
-        .set(SchemeBankAccountPage(srn, refineMV(2)), bankAccount)
-        .get
+        .unsafeSet(SchemeBankAccountPage(srn, refineMV(1)), otherBankAccount)
+        .unsafeSet(SchemeBankAccountPage(srn, refineMV(2)), bankAccount)
 
       act.like(invalidForm(onSubmit, userAnswers, validFormData: _*))
     }
 
-    act.like(journeyRecoveryPage("onPageLoad", onPageLoad))
-    act.like(journeyRecoveryPage("onSubmit", onSubmit))
+    act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
+    act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }
 }

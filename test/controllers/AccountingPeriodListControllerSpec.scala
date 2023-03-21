@@ -55,13 +55,13 @@ class AccountingPeriodListControllerSpec extends ControllerBaseSpec {
 
     act.like(redirectToPage(onPageLoad, accountingPeriodPage))
 
-    act.like(journeyRecoveryPage("onPageLoad", onPageLoad))
+    act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
     act.like(redirectNextPage(onSubmit, "value" -> "true"))
 
     act.like(invalidForm(onSubmit))
 
-    act.like(journeyRecoveryPage("onSubmit", onSubmit))
+    act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }
 
   "AccountingPeriodListController.viewModel" should {

@@ -32,11 +32,11 @@ class PsaDeclarationControllerSpec extends ControllerBaseSpec {
       view(viewModel)
     })
 
-    act.like(journeyRecoveryPage("onPageLoad", onPageLoad))
+    act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
     act.like(agreeAndContinue(onSubmit))
 
-    act.like(journeyRecoveryPage("onSubmit", onSubmit))
+    act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
 
   }
 }

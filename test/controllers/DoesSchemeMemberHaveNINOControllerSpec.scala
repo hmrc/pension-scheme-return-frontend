@@ -51,12 +51,12 @@ class DoesSchemeMemberHaveNINOControllerSpec extends ControllerBaseSpec {
     )
 
     act.like(redirectWhenCacheEmpty(onPageLoad, controllers.routes.JourneyRecoveryController.onPageLoad()))
-    act.like(journeyRecoveryPage("onPageLoad", onPageLoad))
+    act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
     act.like(redirectNextPage(onSubmit, userAnswersWithMemberDetails, "value" -> "true"))
     act.like(redirectNextPage(onSubmit, userAnswersWithMemberDetails, "value" -> "false"))
     act.like(saveAndContinue(onSubmit, userAnswersWithMemberDetails, "value" -> "true"))
     act.like(invalidForm(onSubmit, userAnswersWithMemberDetails))
-    act.like(journeyRecoveryPage("onSubmit", onSubmit))
+    act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }
 }

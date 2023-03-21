@@ -37,7 +37,7 @@ class PensionSchemeMembersControllerSpec extends ControllerBaseSpec {
       )
     })
 
-    act.like(journeyRecoveryPage("onPageLoad", onPageLoad))
+    act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
     "manual data is submitted" when {
       act.like(continueNoSave(onSubmit, "value" -> Manual.name))
@@ -47,6 +47,6 @@ class PensionSchemeMembersControllerSpec extends ControllerBaseSpec {
       act.like(continueNoSave(onSubmit, "value" -> Upload.name))
     }
 
-    act.like(journeyRecoveryPage("onSubmit", onSubmit))
+    act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }
 }

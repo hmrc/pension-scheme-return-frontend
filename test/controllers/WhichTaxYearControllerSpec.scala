@@ -45,13 +45,13 @@ class WhichTaxYearControllerSpec extends ControllerBaseSpec {
       view(radioListForm.fill(testDate), viewModel)
     })
 
-    act.like(journeyRecoveryPage("onPageLoad", onPageLoad))
+    act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
     act.like(invalidForm(onSubmit, "value" -> "invalid data"))
 
     act.like(saveAndContinue(onSubmit, "value" -> testDate.toString))
 
-    act.like(journeyRecoveryPage("onSubmit", onSubmit))
+    act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }
 
   "WhichTaxYearController.options" should {

@@ -32,12 +32,8 @@ class RemoveAccountingPeriodControllerSpec extends ControllerBaseSpec {
   private val otherPeriod = dateRangeGen.sample.value
 
   private val userAnswers = defaultUserAnswers
-    .set(AccountingPeriodPage(srn, refineMV(1)), period)
-    .success
-    .value
-    .set(AccountingPeriodPage(srn, refineMV(2)), otherPeriod)
-    .success
-    .value
+    .unsafeSet(AccountingPeriodPage(srn, refineMV(1)), period)
+    .unsafeSet(AccountingPeriodPage(srn, refineMV(2)), otherPeriod)
 
   "RemoveSchemeBankAccountController" should {
 
@@ -52,12 +48,12 @@ class RemoveAccountingPeriodControllerSpec extends ControllerBaseSpec {
 
     act.like(redirectToPage(onPageLoad, controllers.routes.JourneyRecoveryController.onPageLoad()))
 
-    act.like(journeyRecoveryPage("onPageLoad", onPageLoad))
+    act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
     act.like(continueNoSave(onSubmit, userAnswers, "value" -> "false"))
     act.like(saveAndContinue(onSubmit, userAnswers, "value" -> "true"))
 
-    act.like(journeyRecoveryPage("onSubmit", onSubmit))
+    act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
 
   }
 }

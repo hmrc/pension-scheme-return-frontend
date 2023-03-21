@@ -47,13 +47,13 @@ class AccountingPeriodControllerSpec extends ControllerBaseSpec {
         view(form.fill(dateRangeData), viewModel)
     })
 
-    act.like(journeyRecoveryPage("onPageLoad", onPageLoad))
+    act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
     act.like(saveAndContinue(onSubmit, formData(form, dateRangeData): _*))
 
     act.like(invalidForm(onSubmit))
 
-    act.like(journeyRecoveryPage("onSubmit", onSubmit))
+    act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
 
     "allow accounting period to be updated" when {
       val userAnswers = emptyUserAnswers.set(AccountingPeriodPage(srn, refineMV(1)), dateRangeData).get

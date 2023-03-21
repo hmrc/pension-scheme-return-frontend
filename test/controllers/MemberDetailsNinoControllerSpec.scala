@@ -49,23 +49,23 @@ class MemberDetailsNinoControllerSpec extends ControllerBaseSpec {
         view(form.fill(validNino), viewModel)
     })
 
-    act.like(journeyRecoveryPage("onPageLoad", onPageLoad))
+    act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
-    "when no member details exists for onPageLoad" when {
+    act.like(
+      journeyRecoveryPage(onPageLoad, Some(emptyUserAnswers))
+        .withName("onPageLoad should redirect to journey recovery page when no member details exist")
+    )
 
-      act.like(redirectWhenCacheEmpty(onPageLoad, routes.JourneyRecoveryController.onPageLoad()))
-    }
-
-    "when no member details exists for onSubmit" when {
-
-      act.like(redirectWhenCacheEmpty(onSubmit, routes.JourneyRecoveryController.onPageLoad()))
-    }
+    act.like(
+      journeyRecoveryPage(onSubmit, Some(emptyUserAnswers))
+        .withName("onSubmit should redirect to journey recovery page when no member details exist")
+    )
 
     act.like(saveAndContinue(onSubmit, populatedUserAnswers, formData(form, validNino): _*))
 
     act.like(invalidForm(onSubmit, populatedUserAnswers))
 
-    act.like(journeyRecoveryPage("onSubmit", onSubmit))
+    act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
 
     "allow nino to be updated" when {
       val userAnswers = populatedUserAnswers.set(MemberDetailsNinoPage(srn, refineMV(1)), validNino).get
@@ -75,10 +75,8 @@ class MemberDetailsNinoControllerSpec extends ControllerBaseSpec {
     "return a 400 if nino has already been entered" when {
       val userAnswers =
         populatedUserAnswers
-          .set(MemberDetailsNinoPage(srn, refineMV(1)), otherValidNino)
-          .get
-          .set(MemberDetailsNinoPage(srn, refineMV(2)), validNino)
-          .get
+          .unsafeSet(MemberDetailsNinoPage(srn, refineMV(1)), otherValidNino)
+          .unsafeSet(MemberDetailsNinoPage(srn, refineMV(2)), validNino)
 
       act.like(invalidForm(onSubmit, userAnswers, formData(form, validNino): _*))
     }
