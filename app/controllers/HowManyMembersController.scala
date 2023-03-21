@@ -17,17 +17,19 @@
 package controllers
 
 import cats.implicits.toShow
+import config.Constants.maxMembers
 import controllers.HowManyMembersController._
 import controllers.actions._
 import forms.TripleIntFormProvider
 import forms.mappings.errors.IntFormErrors
 import models.Mode
 import models.SchemeId.Srn
+import models.requests.DataRequest
 import navigation.Navigator
 import pages.HowManyMembersPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.{SaveService, SchemeDateService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.DateTimeUtils.localDateShow
@@ -56,35 +58,39 @@ class HowManyMembersController @Inject()(
 
   private val form = HowManyMembersController.form(formProvider)
 
-  def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    val preparedForm = form.fromUserAnswers(HowManyMembersPage(srn))
-    val schemeName = request.schemeDetails.schemeName
+  def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
+    usingSubmissionEndDate(srn) { submissionEndDate =>
+      val preparedForm = form.fromUserAnswers(HowManyMembersPage(srn))
+      val schemeName = request.schemeDetails.schemeName
 
-    dateService
-      .schemeEndDate(srn)
-      .fold(
-        Redirect(routes.JourneyRecoveryController.onPageLoad())
-      ) { submissionEndDate =>
-        Ok(view(preparedForm, viewModel(srn, schemeName, submissionEndDate, mode)))
-      }
+      Future.successful(Ok(view(preparedForm, viewModel(srn, schemeName, submissionEndDate, mode))))
+    }
   }
 
   def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
-    val schemeName = request.schemeDetails.schemeName
-    val submissionEndDate = dateService.schemeEndDate(srn).get
+    usingSubmissionEndDate(srn) { submissionEndDate =>
+      val schemeName = request.schemeDetails.schemeName
 
-    form
-      .bindFromRequest()
-      .fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, viewModel(srn, schemeName, submissionEndDate, mode)))),
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(HowManyMembersPage(srn), value))
-            _ <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage(HowManyMembersPage(srn), mode, updatedAnswers))
-      )
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors =>
+            Future.successful(BadRequest(view(formWithErrors, viewModel(srn, schemeName, submissionEndDate, mode)))),
+          value =>
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(HowManyMembersPage(srn), value))
+              _ <- saveService.save(updatedAnswers)
+            } yield Redirect(navigator.nextPage(HowManyMembersPage(srn), mode, updatedAnswers))
+        )
+    }
   }
+
+  private def usingSubmissionEndDate(srn: Srn)(body: LocalDate => Future[Result])(implicit request: DataRequest[_]) =
+    dateService
+      .schemeEndDate(srn)
+      .fold(
+        Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+      )(body)
 }
 
 object HowManyMembersController {
@@ -93,21 +99,21 @@ object HowManyMembersController {
     IntFormErrors(
       "howManyMembers.field1.error.required",
       "howManyMembers.field1.error.invalid",
-      (999999, "howManyMembers.field1.error.max")
+      (maxMembers, "howManyMembers.field1.error.max")
     )
 
   private val field2Errors: IntFormErrors =
     IntFormErrors(
       "howManyMembers.field2.error.required",
       "howManyMembers.field2.error.invalid",
-      (999999, "howManyMembers.field2.error.max")
+      (maxMembers, "howManyMembers.field2.error.max")
     )
 
   private val field3Errors: IntFormErrors =
     IntFormErrors(
       "howManyMembers.field3.error.required",
       "howManyMembers.field3.error.invalid",
-      (999999, "howManyMembers.field3.error.max")
+      (maxMembers, "howManyMembers.field3.error.max")
     )
 
   def form(formProvider: TripleIntFormProvider): Form[(Int, Int, Int)] = formProvider(
