@@ -17,6 +17,7 @@
 package controllers
 
 import com.google.inject.Inject
+import config.Constants
 import config.Constants.maxSchemeBankAccounts
 import config.Refined.OneToTen
 import controllers.SchemeBankAccountListController._
@@ -118,7 +119,7 @@ object SchemeBankAccountListController {
       rows,
       "schemeBankDetailsSummary.radio",
       "schemeBankDetailsSummary.inset",
-      showRadios = bankAccounts.length < 10,
+      showRadios = bankAccounts.length < Constants.maxSchemeBankAccounts,
       onSubmit = controllers.routes.SchemeBankAccountListController.onSubmit(srn)
     )
   }

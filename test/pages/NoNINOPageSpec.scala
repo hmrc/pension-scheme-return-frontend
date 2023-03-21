@@ -16,6 +16,7 @@
 
 package pages
 
+import config.Refined.Max99
 import eu.timepit.refined.refineMV
 import pages.behaviours.PageBehaviours
 
@@ -26,6 +27,8 @@ class NoNINOPageSpec extends PageBehaviours {
     beRetrievable[String](NoNINOPage(srnGen.sample.value, refineMV(1)))
 
     beSettable[String](NoNINOPage(srnGen.sample.value, refineMV(1)))
+
+    beSettableWithIndex[String, Max99](i => NoNINOPage(srnGen.sample.value, i))
 
     beRemovable[String](NoNINOPage(srnGen.sample.value, refineMV(1)))
   }

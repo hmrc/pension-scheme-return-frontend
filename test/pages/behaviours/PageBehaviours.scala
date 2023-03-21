@@ -92,6 +92,27 @@ trait PageBehaviours
       }
   }
 
+  class BeSettableWithIndex[A, Index] {
+    def apply[P <: QuestionPage[A]](
+      genP: Index => Gen[P]
+    )(implicit ev1: Arbitrary[A], ev2: Arbitrary[Index], ev3: Format[A]): Unit =
+      "must be able to be set on UserAnswers at any index" in {
+
+        val gen = for {
+          index <- arbitrary[Index]
+          page <- genP(index)
+          newValue <- arbitrary[A]
+          userAnswers <- arbitrary[UserAnswers]
+        } yield (page, newValue, userAnswers)
+
+        forAll(gen) {
+          case (page, newValue, userAnswers) =>
+            val updatedAnswers = userAnswers.set(page, newValue).success.value
+            updatedAnswers.get(page).value mustEqual newValue
+        }
+      }
+  }
+
   class BeRemovable[A] {
     def apply[P <: QuestionPage[A]](genP: Gen[P])(implicit ev1: Arbitrary[A], ev2: Format[A]): Unit =
       "must be able to be removed from UserAnswers" in {
@@ -113,6 +134,8 @@ trait PageBehaviours
   def beRetrievable[A]: BeRetrievable[A] = new BeRetrievable[A]
 
   def beSettable[A]: BeSettable[A] = new BeSettable[A]
+
+  def beSettableWithIndex[A, Index]: BeSettableWithIndex[A, Index] = new BeSettableWithIndex[A, Index]
 
   def beRemovable[A]: BeRemovable[A] = new BeRemovable[A]
 }

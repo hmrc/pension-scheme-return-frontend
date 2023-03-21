@@ -20,6 +20,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
 import play.twirl.api.Html
+import utils.ListUtils.ListOps
 import viewmodels.DisplayMessage
 import viewmodels.DisplayMessage.{LinkMessage, ListMessage, Message, ParagraphMessage}
 
@@ -99,6 +100,14 @@ trait HtmlHelper extends HtmlModels {
 
   def summaryListRows(html: Html): List[Element] =
     mainContent(html).getElementsByClass("govuk-summary-list__row").iterator().asScala.toList
+
+  def paginationElements(html: Html): List[PaginationElement] =
+    mainContent(html)
+      .getElementsByClass("govuk-pagination__link")
+      .iterator()
+      .asScala
+      .toList
+      .map(elem => PaginationElement(elem.text(), elem.parent.hasClass("govuk-pagination__item--current")))
 
   def date(html: Html)(id: String): DateElements = {
     val elements = mainContent(html).selectFirst(s"div.govuk-date-input")
