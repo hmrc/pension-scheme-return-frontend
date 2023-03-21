@@ -66,19 +66,24 @@ trait ControllerBehaviours {
       }
     }
 
-  def journeyRecoveryPage(name: String, call: => Call): Unit =
-    s"$name must redirect to Journey Recovery if no existing data is found" in {
+  def journeyRecoveryPage(name: String, userAnswers: Option[UserAnswers], call: => Call): BehaviourTest =
+    BehaviourTest(
+      s"$name must redirect to Journey Recovery if no existing data is found",
+      () => {
+        val application = applicationBuilder(userAnswers = userAnswers).build()
 
-      val application = applicationBuilder(userAnswers = None).build()
+        running(application) {
 
-      running(application) {
+          val result = route(application, FakeRequest(call)).value
 
-        val result = route(application, FakeRequest(call)).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        }
       }
-    }
+    )
+
+  def journeyRecoveryPage(name: String, call: => Call): BehaviourTest =
+    journeyRecoveryPage(name, None, call)
 
   private def render(appBuilder: GuiceApplicationBuilder, call: => Call)(
     view: Application => Request[_] => Html

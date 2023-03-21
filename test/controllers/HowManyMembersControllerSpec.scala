@@ -16,43 +16,74 @@
 
 package controllers
 
-import models.{NormalMode, UserAnswers}
-import navigation.{FakeNavigator, Navigator}
+import controllers.HowManyMembersController._
+import forms.TripleIntFormProvider
+import models.NormalMode
+import org.mockito.ArgumentMatchers.any
 import pages.HowManyMembersPage
 import play.api.inject.bind
-import play.api.mvc.Call
-import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import repositories.SessionRepository
-import forms.TripleIntFormProvider
+import play.api.inject.guice.GuiceableModule
+import services.SchemeDateService
 import views.html.TripleIntView
-import HowManyMembersController._
 
-import scala.concurrent.Future
+import java.time.LocalDate
 
 class HowManyMembersControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoad = routes.HowManyMembersController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.HowManyMembersController.onSubmit(srn, NormalMode)
 
+  private val submissionEndDate = date.sample.value
+  private val mockSchemeDateService = mock[SchemeDateService]
+
+  override val additionalBindings: List[GuiceableModule] =
+    List(bind[SchemeDateService].toInstance(mockSchemeDateService))
+
+  def setEndDate(date: Option[LocalDate]): Unit =
+    when(mockSchemeDateService.schemeEndDate(any())(any())).thenReturn(date)
+
+  override def beforeAll(): Unit = setEndDate(Some(submissionEndDate))
+
+  override def afterEach(): Unit = setEndDate(Some(submissionEndDate))
+
   "HowManyMembersController" should {
 
-    behave.like(renderView(onPageLoad) { implicit app => implicit request =>
+    act.like(renderView(onPageLoad) { implicit app => implicit request =>
       val view = injected[TripleIntView]
 
-      view(form(injected[TripleIntFormProvider]), viewModel(srn, ???, ???, NormalMode))
+      view(
+        form(injected[TripleIntFormProvider]),
+        viewModel(srn, defaultSchemeDetails.schemeName, submissionEndDate, NormalMode)
+      )
     })
 
-    behave.like(renderPrePopView(onPageLoad, HowManyMembersPage(srn), (1, 2, 3)) { implicit app => implicit request =>
+    act.like(renderPrePopView(onPageLoad, HowManyMembersPage(srn), (1, 2, 3)) { implicit app => implicit request =>
       val view = injected[TripleIntView]
 
-      view(form(injected[TripleIntFormProvider]).fill((1, 2, 3)), viewModel(srn, ???, ???, NormalMode))
+      view(
+        form(injected[TripleIntFormProvider]).fill((1, 2, 3)),
+        viewModel(srn, defaultSchemeDetails.schemeName, submissionEndDate, NormalMode)
+      )
     })
 
-    behave.like(journeyRecoveryPage("onPageLoad", onPageLoad))
+    act.like(journeyRecoveryPage("onPageLoad", onPageLoad).run())
 
-    behave.like(saveAndContinue(onSubmit, "value.1" -> "1", "value.2" -> "2", "value.3" -> "3"))
+    act.like(
+      journeyRecoveryPage("onPageLoad", Some(defaultUserAnswers), onPageLoad)
+        .before(setEndDate(None))
+        .withName("onPageLoad redirect to journey recovery page when no end date found")
+    )
 
-    behave.like(invalidForm(onSubmit))
+    act.like(saveAndContinue(onSubmit, "value.1" -> "1", "value.2" -> "2", "value.3" -> "3"))
+
+    act.like(invalidForm(onSubmit))
+
+    act.like(journeyRecoveryPage("onSubmit", onSubmit).run())
+
+    act.like(
+      journeyRecoveryPage("onSubmit", Some(defaultUserAnswers), onSubmit)
+        .before(setEndDate(None))
+        .withName("onSubmit redirect to journey recovery page when no end date found")
+    )
   }
 }

@@ -28,7 +28,7 @@ import pages.HowManyMembersPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
+import services.{SaveService, SchemeDateService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.DateTimeUtils.localDateShow
 import utils.FormUtils._
@@ -48,7 +48,8 @@ class HowManyMembersController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   formProvider: TripleIntFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: TripleIntView
+  view: TripleIntView,
+  dateService: SchemeDateService
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
@@ -57,14 +58,26 @@ class HowManyMembersController @Inject()(
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     val preparedForm = form.fromUserAnswers(HowManyMembersPage(srn))
-    Ok(view(preparedForm, viewModel(srn, ???, ???, mode)))
+    val schemeName = request.schemeDetails.schemeName
+
+    dateService
+      .schemeEndDate(srn)
+      .fold(
+        Redirect(routes.JourneyRecoveryController.onPageLoad())
+      ) { submissionEndDate =>
+        Ok(view(preparedForm, viewModel(srn, schemeName, submissionEndDate, mode)))
+      }
   }
 
   def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
+    val schemeName = request.schemeDetails.schemeName
+    val submissionEndDate = dateService.schemeEndDate(srn).get
+
     form
       .bindFromRequest()
       .fold(
-        formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, ???, ???, mode)))),
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, viewModel(srn, schemeName, submissionEndDate, mode)))),
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(HowManyMembersPage(srn), value))

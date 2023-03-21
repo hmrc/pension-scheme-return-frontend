@@ -21,7 +21,7 @@ import models.{Establisher, EstablisherKind, SchemeDetails, SchemeId, SchemeStat
 import navigation.Navigator
 import play.api.http._
 import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
 import play.api.libs.json.Json
 import play.api.mvc.Call
 import play.api.test._
@@ -57,21 +57,23 @@ trait ControllerBaseSpec
 
   protected def applicationBuilder(
     userAnswers: Option[UserAnswers] = None,
-    schemeDetails: SchemeDetails = defaultSchemeDetails,
-    taxYear: TaxYear = defaultTaxYear
+    schemeDetails: SchemeDetails = defaultSchemeDetails
   ): GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
       .bindings(
         bind[Navigator].toInstance(new Navigator()).eagerly()
       )
       .overrides(
-        bind[DataRequiredAction].to[DataRequiredActionImpl],
-        bind[IdentifierAction].to[FakeIdentifierAction],
-        bind[AllowAccessActionProvider].toInstance(new FakeAllowAccessActionProvider(schemeDetails)),
-        bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers)),
-        bind[DataCreationAction].toInstance(new FakeDataCreationAction(userAnswers.getOrElse(emptyUserAnswers))),
-        bind[TaxYearService].toInstance(new FakeTaxYearService(taxYear.starts))
+        List[GuiceableModule](
+          bind[DataRequiredAction].to[DataRequiredActionImpl],
+          bind[IdentifierAction].to[FakeIdentifierAction],
+          bind[AllowAccessActionProvider].toInstance(new FakeAllowAccessActionProvider(schemeDetails)),
+          bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers)),
+          bind[DataCreationAction].toInstance(new FakeDataCreationAction(userAnswers.getOrElse(emptyUserAnswers)))
+        ) ++ additionalBindings: _*
       )
+
+  protected val additionalBindings: List[GuiceableModule] = List()
 
   def runningApplication[T](block: Application => T): T =
     running(_ => applicationBuilder())(block)

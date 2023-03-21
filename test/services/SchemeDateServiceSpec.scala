@@ -28,7 +28,7 @@ import java.time.LocalDate
 
 class SchemeDateServiceSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
-  val service = new SchemeDateService()
+  val service = new SchemeDateServiceImpl()
 
   val defaultUserAnswers = UserAnswers("id")
   val srn = srnGen.sample.value

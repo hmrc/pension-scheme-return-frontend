@@ -28,7 +28,7 @@ class PensionSchemeMembersControllerSpec extends ControllerBaseSpec {
 
   "PensionSchemeMembersController" should {
 
-    behave.like(renderView(onPageLoad) { implicit app => implicit request =>
+    act.like(renderView(onPageLoad) { implicit app => implicit request =>
       val view = injected[RadioListView]
 
       view(
@@ -37,16 +37,16 @@ class PensionSchemeMembersControllerSpec extends ControllerBaseSpec {
       )
     })
 
-    behave.like(journeyRecoveryPage("onPageLoad", onPageLoad))
+    act.like(journeyRecoveryPage("onPageLoad", onPageLoad))
 
     "manual data is submitted" when {
-      behave.like(continueNoSave(onSubmit, "value" -> Manual.name))
+      act.like(continueNoSave(onSubmit, "value" -> Manual.name))
     }
 
     "upload data is submitted" when {
-      behave.like(continueNoSave(onSubmit, "value" -> Upload.name))
+      act.like(continueNoSave(onSubmit, "value" -> Upload.name))
     }
 
-    behave.like(journeyRecoveryPage("onSubmit", onSubmit))
+    act.like(journeyRecoveryPage("onSubmit", onSubmit))
   }
 }

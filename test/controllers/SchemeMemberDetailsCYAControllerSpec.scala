@@ -42,7 +42,7 @@ class SchemeMemberDetailsCYAControllerSpec extends ControllerBaseSpec {
       .value
 
   "SchemeMemberDetailsCYAController" should {
-    behave.like(
+    act.like(
       renderView(onPageLoad, fullUserAnswers)(
         implicit app =>
           implicit request =>
@@ -52,7 +52,7 @@ class SchemeMemberDetailsCYAControllerSpec extends ControllerBaseSpec {
     )
 
     "when member details is missing" should {
-      behave.like(
+      act.like(
         redirectToPage(
           onPageLoad,
           routes.JourneyRecoveryController.onPageLoad(),
@@ -62,7 +62,7 @@ class SchemeMemberDetailsCYAControllerSpec extends ControllerBaseSpec {
     }
 
     "when dose member have NINO is missing" should {
-      behave.like(
+      act.like(
         redirectToPage(
           onPageLoad,
           routes.JourneyRecoveryController.onPageLoad(),
@@ -72,7 +72,7 @@ class SchemeMemberDetailsCYAControllerSpec extends ControllerBaseSpec {
     }
 
     "when NINO is missing" should {
-      behave.like(
+      act.like(
         redirectToPage(
           onPageLoad,
           routes.JourneyRecoveryController.onPageLoad(),
@@ -81,8 +81,8 @@ class SchemeMemberDetailsCYAControllerSpec extends ControllerBaseSpec {
       )
     }
 
-    behave.like(journeyRecoveryPage("onPageLoad", onPageLoad))
-    behave.like(journeyRecoveryPage("onSubmit", onSubmit))
+    act.like(journeyRecoveryPage("onPageLoad", onPageLoad))
+    act.like(journeyRecoveryPage("onSubmit", onSubmit))
 
     "viewModel" should {
       "contain all rows if nino is present" in {

@@ -41,7 +41,7 @@ class RemoveAccountingPeriodControllerSpec extends ControllerBaseSpec {
 
   "RemoveSchemeBankAccountController" should {
 
-    behave.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
+    act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
       val view = injected[YesNoPageView]
 
       view(
@@ -50,14 +50,14 @@ class RemoveAccountingPeriodControllerSpec extends ControllerBaseSpec {
       )
     })
 
-    behave.like(redirectToPage(onPageLoad, controllers.routes.JourneyRecoveryController.onPageLoad()))
+    act.like(redirectToPage(onPageLoad, controllers.routes.JourneyRecoveryController.onPageLoad()))
 
-    behave.like(journeyRecoveryPage("onPageLoad", onPageLoad))
+    act.like(journeyRecoveryPage("onPageLoad", onPageLoad))
 
-    behave.like(continueNoSave(onSubmit, userAnswers, "value" -> "false"))
-    behave.like(saveAndContinue(onSubmit, userAnswers, "value" -> "true"))
+    act.like(continueNoSave(onSubmit, userAnswers, "value" -> "false"))
+    act.like(saveAndContinue(onSubmit, userAnswers, "value" -> "true"))
 
-    behave.like(journeyRecoveryPage("onSubmit", onSubmit))
+    act.like(journeyRecoveryPage("onSubmit", onSubmit))
 
   }
 }

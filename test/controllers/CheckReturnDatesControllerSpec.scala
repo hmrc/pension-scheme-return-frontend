@@ -25,7 +25,7 @@ import pages.CheckReturnDatesPage
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
-import services.{SaveService, SchemeDetailsService}
+import services.{FakeTaxYearService, SaveService, SchemeDetailsService, TaxYearService}
 import uk.gov.hmrc.time.TaxYear
 import utils.DateTimeUtils
 import viewmodels.DisplayMessage.Message
@@ -161,8 +161,9 @@ class CheckReturnDatesControllerSpec extends ControllerBaseSpec with ScalaCheckP
 
     def applicationBuilder(userAnswers: Option[UserAnswers]) =
       self
-        .applicationBuilder(userAnswers, taxYear = taxYear)
+        .applicationBuilder(userAnswers)
         .overrides(
+          bind[TaxYearService].toInstance(new FakeTaxYearService(taxYear.starts)),
           bind[SchemeDetailsService].toInstance(mockSchemeDetailsService)
         )
 

@@ -16,6 +16,7 @@
 
 package services
 
+import com.google.inject.ImplementedBy
 import models.DateRange
 import models.SchemeId.Srn
 import models.requests.DataRequest
@@ -24,7 +25,7 @@ import pages.{AccountingPeriods, WhichTaxYearPage}
 import java.time.LocalDate
 import javax.inject.Inject
 
-class SchemeDateService @Inject()() {
+class SchemeDateServiceImpl @Inject()() extends SchemeDateService {
 
   def schemeStartDate(srn: Srn)(implicit request: DataRequest[_]): Option[LocalDate] =
     schemeDate(srn).map(_.from)
@@ -40,4 +41,12 @@ class SchemeDateService @Inject()() {
 
   private def whichTaxYear(srn: Srn)(implicit request: DataRequest[_]): Option[DateRange] =
     request.userAnswers.get(WhichTaxYearPage(srn))
+}
+
+@ImplementedBy(classOf[SchemeDateServiceImpl])
+trait SchemeDateService {
+
+  def schemeStartDate(srn: Srn)(implicit request: DataRequest[_]): Option[LocalDate]
+
+  def schemeEndDate(srn: Srn)(implicit request: DataRequest[_]): Option[LocalDate]
 }

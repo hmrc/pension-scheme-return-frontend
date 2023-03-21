@@ -41,14 +41,14 @@ class TripleIntViewSpec extends ViewSpec with Mappings {
 
     "TextInputView" should {
 
-      behave.like(renderTitle(tripleIntViewModelGen)(view(tripleIntForm, _), _.title.key))
-      behave.like(renderHeading(tripleIntViewModelGen)(view(tripleIntForm, _), _.heading))
-      behave.like(renderInputWithLabel(tripleIntViewModelGen)("value.1", view(tripleIntForm, _), _.field1Label))
-      behave.like(renderInputWithLabel(tripleIntViewModelGen)("value.2", view(tripleIntForm, _), _.field2Label))
-      behave.like(renderInputWithLabel(tripleIntViewModelGen)("value.3", view(tripleIntForm, _), _.field3Label))
-      behave.like(renderErrors(tripleIntViewModelGen)(view(invalidForm, _), "value.1.error.required"))
-      behave.like(renderForm(tripleIntViewModelGen)(view(tripleIntForm, _), _.onSubmit))
-      behave.like(renderSaveAndContinueButton(tripleIntViewModelGen)(view(tripleIntForm, _)))
+      act.like(renderTitle(tripleIntViewModelGen)(view(tripleIntForm, _), _.title.key))
+      act.like(renderHeading(tripleIntViewModelGen)(view(tripleIntForm, _), _.heading))
+      act.like(renderInputWithLabel(tripleIntViewModelGen)("value.1", view(tripleIntForm, _), _.field1Label))
+      act.like(renderInputWithLabel(tripleIntViewModelGen)("value.2", view(tripleIntForm, _), _.field2Label))
+      act.like(renderInputWithLabel(tripleIntViewModelGen)("value.3", view(tripleIntForm, _), _.field3Label))
+      act.like(renderErrors(tripleIntViewModelGen)(view(invalidForm, _), "value.1.error.required"))
+      act.like(renderForm(tripleIntViewModelGen)(view(tripleIntForm, _), _.onSubmit))
+      act.like(renderSaveAndContinueButton(tripleIntViewModelGen)(view(tripleIntForm, _)))
     }
   }
 }

@@ -21,22 +21,22 @@ class $className;format="cap"$ControllerSpec extends ControllerBaseSpec {
 
   "$className;format="cap"$Controller" should {
 
-    behave like renderView(onPageLoad) { implicit app => implicit request =>
+    act.like renderView(onPageLoad) { implicit app => implicit request =>
       val view = injected[TripleIntView]
 
       view(form(injected[TripleIntFormProvider]), viewModel(srn, NormalMode))
     }
 
-    behave like renderPrePopView(onPageLoad, $className;format="cap"$Page(srn), (1, 2, 3)) { implicit app => implicit request =>
+    act.like renderPrePopView(onPageLoad, $className;format="cap"$Page(srn), (1, 2, 3)) { implicit app => implicit request =>
       val view = injected[TripleIntView]
 
       view(form(injected[TripleIntFormProvider]).fill((1, 2, 3)), viewModel(srn, NormalMode))
     }
 
-    behave like journeyRecoveryPage("onPageLoad", onPageLoad)
+    act.like journeyRecoveryPage("onPageLoad", onPageLoad)
 
-    behave like saveAndContinue(onSubmit, "value.1" -> "1", "value.2" -> "2", "value.3" -> "3")
+    act.like saveAndContinue(onSubmit, "value.1" -> "1", "value.2" -> "2", "value.3" -> "3")
 
-    behave like invalidForm(onSubmit)
+    act.like invalidForm(onSubmit)
   }
 }

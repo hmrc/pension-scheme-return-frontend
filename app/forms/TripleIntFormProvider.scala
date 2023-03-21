@@ -38,7 +38,7 @@ class TripleIntFormProvider @Inject() extends Mappings {
         field2Errors,
         field3Errors,
         args
-      )(Tuple3.apply)(Some(_))
+      )(Tuple3.apply)(Tuple3.unapply)
     )
 
   def schemeMembers(

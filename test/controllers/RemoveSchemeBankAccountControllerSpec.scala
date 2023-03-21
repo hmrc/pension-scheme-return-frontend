@@ -52,13 +52,13 @@ class RemoveSchemeBankAccountControllerSpec extends ControllerBaseSpec {
 
   "RemoveSchemeBankAccountController" should {
 
-    behave.like(renderView(onPageLoad, userAnswersWithBankAccounts) { implicit app => implicit request =>
+    act.like(renderView(onPageLoad, userAnswersWithBankAccounts) { implicit app => implicit request =>
       injected[YesNoPageView]
         .apply(form(injected[YesNoPageFormProvider]), viewModel(srn, refineMV[OneToTen](1), bankAccount, NormalMode))
     })
 
-    behave.like(redirectToPage(onSubmit, redirectUrl, userAnswersWithBankAccounts, "value" -> "false"))
-    behave.like(redirectToPage(onPageLoad, controllers.routes.JourneyRecoveryController.onPageLoad()))
+    act.like(redirectToPage(onSubmit, redirectUrl, userAnswersWithBankAccounts, "value" -> "false"))
+    act.like(redirectToPage(onPageLoad, controllers.routes.JourneyRecoveryController.onPageLoad()))
 
     "remove the correct bank account on submit when yes is selected" in {
       val mockSaveService = mock[SaveService]
