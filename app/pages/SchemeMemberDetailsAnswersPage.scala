@@ -18,4 +18,4 @@ package pages
 
 import models.SchemeId.Srn
 
-case class SchemeMemberDetailsCYAPage(srn: Srn) extends Page
+case class SchemeMemberDetailsAnswersPage(srn: Srn) extends Page

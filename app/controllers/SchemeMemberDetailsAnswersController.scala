@@ -19,10 +19,10 @@ package controllers
 import cats.implicits.{toShow, toTraverseOps}
 import com.google.inject.Inject
 import config.Refined.Max99
-import controllers.SchemeMemberDetailsCYAController._
+import controllers.SchemeMemberDetailsAnswersController._
 import controllers.actions._
 import models.SchemeId.Srn
-import models.{Mode, NameDOB, NormalMode}
+import models.{CheckOrChange, Mode, NameDOB, NormalMode}
 import navigation.Navigator
 import pages._
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -36,7 +36,7 @@ import viewmodels.implicits._
 import viewmodels.models._
 import views.html.CheckYourAnswersView
 
-class SchemeMemberDetailsCYAController @Inject()(
+class SchemeMemberDetailsAnswersController @Inject()(
   override val messagesApi: MessagesApi,
   navigator: Navigator,
   identify: IdentifierAction,
@@ -48,25 +48,25 @@ class SchemeMemberDetailsCYAController @Inject()(
 ) extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(srn: Srn, index: Max99, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Max99, checkOrChange: CheckOrChange, mode: Mode): Action[AnyContent] =
     identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData) { implicit request =>
       val result = for {
         memberDetails <- request.userAnswers.get(MemberDetailsPage(srn, index))
         hasNINO <- request.userAnswers.get(NationalInsuranceNumberPage(srn, index))
         maybeNino <- Option.when(hasNINO)(request.userAnswers.get(MemberDetailsNinoPage(srn, index))).sequence
         maybeNoNinoReason <- Option.when(!hasNINO)(request.userAnswers.get(NoNINOPage(srn, index))).sequence
-      } yield Ok(view(viewModel(index, srn, mode, memberDetails, hasNINO, maybeNino, maybeNoNinoReason)))
+      } yield Ok(view(viewModel(index, srn, mode, checkOrChange, memberDetails, hasNINO, maybeNino, maybeNoNinoReason)))
 
       result.getOrElse(Redirect(routes.JourneyRecoveryController.onPageLoad()))
     }
 
-  def onSubmit(srn: Srn, index: Max99, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Max99, checkOrChange: CheckOrChange, mode: Mode): Action[AnyContent] =
     identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData) { implicit request =>
-      Redirect(navigator.nextPage(SchemeMemberDetailsCYAPage(srn), NormalMode, request.userAnswers))
+      Redirect(navigator.nextPage(SchemeMemberDetailsAnswersPage(srn), NormalMode, request.userAnswers))
     }
 }
 
-object SchemeMemberDetailsCYAController {
+object SchemeMemberDetailsAnswersController {
 
   private def rows(
     index: Max99,
@@ -80,17 +80,17 @@ object SchemeMemberDetailsCYAController {
     List(
       CheckYourAnswersRowViewModel("memberDetails.firstName", memberDetails.firstName)
         .withAction(
-          SummaryAction("site.change", routes.MemberDetailsController.onPageLoad(srn, index, mode).url)
+          SummaryAction("site.change", routes.MemberDetailsController.onPageLoad(srn, index).url)
             .withVisuallyHiddenContent("memberDetails.firstName")
         ),
       CheckYourAnswersRowViewModel("memberDetails.lastName", memberDetails.lastName)
         .withAction(
-          SummaryAction("site.change", routes.MemberDetailsController.onPageLoad(srn, index, mode).url)
+          SummaryAction("site.change", routes.MemberDetailsController.onPageLoad(srn, index).url)
             .withVisuallyHiddenContent("memberDetails.lastName")
         ),
       CheckYourAnswersRowViewModel("memberDetails.dateOfBirth", memberDetails.dob.show)
         .withAction(
-          SummaryAction("site.change", routes.MemberDetailsController.onPageLoad(srn, index, mode).url)
+          SummaryAction("site.change", routes.MemberDetailsController.onPageLoad(srn, index).url)
             .withVisuallyHiddenContent("memberDetails.dateOfBirth")
         ),
       CheckYourAnswersRowViewModel(
@@ -144,12 +144,18 @@ object SchemeMemberDetailsCYAController {
     index: Max99,
     srn: Srn,
     mode: Mode,
+    checkOrChange: CheckOrChange,
     memberDetails: NameDOB,
     hasNINO: Boolean,
     maybeNino: Option[Nino],
     maybeNoNinoReason: Option[String]
   ): CheckYourAnswersViewModel = CheckYourAnswersViewModel(
+    title = checkOrChange.fold(check = "checkYourAnswers.title", change = "changeMemberDetails.title"),
+    heading = checkOrChange.fold(
+      check = "checkYourAnswers.heading",
+      change = Message("changeMemberDetails.heading", memberDetails.fullName)
+    ),
     rows(index, srn, mode, memberDetails, hasNINO, maybeNino, maybeNoNinoReason),
-    controllers.routes.SchemeMemberDetailsCYAController.onSubmit(srn, index)
+    controllers.routes.SchemeMemberDetailsAnswersController.onSubmit(srn, index, checkOrChange)
   )
 }
