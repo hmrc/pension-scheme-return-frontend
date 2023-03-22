@@ -22,6 +22,7 @@ import models._
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import pages._
 import utils.BaseSpec
+import utils.UserAnswersUtils._
 
 class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
 

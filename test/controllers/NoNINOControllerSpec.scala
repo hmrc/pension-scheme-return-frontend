@@ -16,12 +16,13 @@
 
 package controllers
 
-import models.NormalMode
-import forms.TextFormProvider
-import views.html.TextAreaView
-import pages.{MemberDetailsPage, NoNINOPage}
-import NoNINOController._
+import controllers.NoNINOController._
 import eu.timepit.refined.refineMV
+import forms.TextFormProvider
+import models.NormalMode
+import pages.{MemberDetailsPage, NoNINOPage}
+import utils.UserAnswersUtils._
+import views.html.TextAreaView
 
 class NoNINOControllerSpec extends ControllerBaseSpec {
 

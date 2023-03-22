@@ -50,9 +50,6 @@ final case class UserAnswers(
     }
   }
 
-  def unsafeSet[A](page: Settable[A], value: A)(implicit writes: Writes[A]): UserAnswers =
-    set(page, value).get
-
   def remove[A](page: Settable[A]): Try[UserAnswers] = {
 
     val updatedData = data.removeObject(page.path) match {

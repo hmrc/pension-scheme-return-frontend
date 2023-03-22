@@ -21,6 +21,7 @@ import eu.timepit.refined.refineMV
 import models.NormalMode
 import pages.{MemberDetailsNinoPage, MemberDetailsPage, NationalInsuranceNumberPage, NoNINOPage}
 import uk.gov.hmrc.domain.Nino
+import utils.UserAnswersUtils._
 import views.html.CheckYourAnswersView
 
 class SchemeMemberDetailsCYAControllerSpec extends ControllerBaseSpec {

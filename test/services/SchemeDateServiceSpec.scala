@@ -23,6 +23,7 @@ import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import pages.{AccountingPeriodPage, WhichTaxYearPage}
 import play.api.test.FakeRequest
 import utils.BaseSpec
+import utils.UserAnswersUtils._
 
 import java.time.LocalDate
 
