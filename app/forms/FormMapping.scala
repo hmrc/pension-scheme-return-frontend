@@ -16,32 +16,72 @@
 
 package forms
 
-import play.api.data.{Form, FormBinding, Mapping}
+import forms.FormMapping.{BoundFormMapping, FilledFormMapping}
+import play.api.data._
 import play.api.mvc.Request
+import utils.Transform
 
-case class FormMapping[A, B](
-  mapping: Mapping[A],
-  filledValue: Option[B],
-  apply: A => B,
-  unapply: B => A
-) { self =>
+sealed trait FormMapping[A] { self =>
 
-  val form: Form[B] = Form(mapping.transform(apply, unapply))
+  def apply(field: String): Field = form(field)
 
-  val filledForm: Form[B] =
-    filledValue.fold(form)(form.fill)
+  val mapping: Mapping[A]
+  protected val form: Form[A]
 
-  def fill(value: Option[B]): FormMapping[A, B] = copy(filledValue = value)
+  def fill[B](value: Option[B])(implicit transform: Transform[A, B]): FilledFormMapping[A] =
+    FilledFormMapping(mapping, value.map(transform.from))
 
-  def bind(data: Map[String, String]): Form[B] = form.bind(data)
+  def bind(data: Map[String, String]): FormMapping[A] =
+    BoundFormMapping(mapping, data)
 
-  def bindFromRequest(implicit request: Request[_], formBinding: FormBinding): Form[B] = form.bindFromRequest()
-
-  def transform[C](apply: B => C, unapply: C => B): FormMapping[A, C] =
-    FormMapping[A, C](
+  def bindFromRequest()(implicit request: Request[_], formBinding: FormBinding): FormMapping[A] =
+    BoundFormMapping(
       mapping,
-      filledValue.map(apply),
-      self.apply.andThen(apply),
-      unapply.andThen(self.unapply)
+      Form(mapping).bindFromRequest().data
     )
+
+  def fold[B, R](error: FormMapping[A] => R, success: B => R)(implicit transform: Transform[A, B]): R =
+    form.fold(_ => error(self), a => success(transform.to(a)))
+
+  def fold[R](error: FormMapping[A] => R)(success: A => R): R =
+    form.fold(_ => error(self), success)
+
+  lazy val hasErrors: Boolean = form.hasErrors
+
+  lazy val errors: Seq[FormError] = form.errors
+
+  lazy val data: Map[String, String] = form.data
+}
+
+object FormMapping {
+
+  def apply[A](mapping: Mapping[A]): FormMapping[A] =
+    InitialFormMapping(mapping)
+
+  case class InitialFormMapping[A](
+    mapping: Mapping[A]
+  ) extends FormMapping[A] {
+
+    protected val form: Form[A] = Form(mapping)
+  }
+
+  case class FilledFormMapping[A](
+    mapping: Mapping[A],
+    filledValue: Option[A]
+  ) extends FormMapping[A] {
+
+    protected val form: Form[A] = {
+      val f = Form(mapping)
+      filledValue.fold(f)(f.fill)
+    }
+  }
+
+  case class BoundFormMapping[A](
+    mapping: Mapping[A],
+    boundData: Map[String, String]
+  ) extends FormMapping[A] {
+
+    protected val form: Form[A] = Form(mapping).bind(boundData)
+  }
+
 }

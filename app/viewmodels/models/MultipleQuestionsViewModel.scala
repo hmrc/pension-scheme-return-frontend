@@ -19,9 +19,9 @@ package viewmodels.models
 import forms.FormMapping
 import viewmodels.DisplayMessage.InlineMessage
 
-sealed trait MultipleQuestionsViewModel[A, B] {
+sealed trait MultipleQuestionsViewModel[A] {
 
-  val mapping: FormMapping[A, B]
+  val form: FormMapping[A]
 
   def fields: List[Field]
 }
@@ -29,30 +29,30 @@ sealed trait MultipleQuestionsViewModel[A, B] {
 object MultipleQuestionsViewModel {
 
   case class SingleQuestion[A](
-    mapping: FormMapping[A, A]
-  ) extends MultipleQuestionsViewModel[A, A] {
+    form: FormMapping[A]
+  ) extends MultipleQuestionsViewModel[A] {
 
     override val fields: List[Field] = List()
   }
 
-  case class DoubleQuestion[A, B](
-    mapping: FormMapping[(A, A), B],
+  case class DoubleQuestion[A](
+    form: FormMapping[(A, A)],
     field1: Field,
     field2: Field
-  ) extends MultipleQuestionsViewModel[(A, A), B] {
+  ) extends MultipleQuestionsViewModel[(A, A)] {
 
     override val fields: List[Field] = List(field1, field2)
   }
 
-  case class TripleQuestion[A, B](
-    mapping: FormMapping[(A, A, A), B],
+  case class TripleQuestion[A](
+    form: FormMapping[(A, A, A)],
     field1: Field,
     field2: Field,
     field3: Field
-  ) extends MultipleQuestionsViewModel[(A, A, A), B] {
+  ) extends MultipleQuestionsViewModel[(A, A, A)] {
 
-    override val fields: List[Field] = List(field1, field2)
+    override val fields: List[Field] = List(field1, field2, field3)
   }
 }
 
-case class Field(label: InlineMessage, hint: Option[InlineMessage])
+case class Field(label: InlineMessage, hint: Option[InlineMessage] = None)

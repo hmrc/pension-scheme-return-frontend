@@ -16,6 +16,7 @@
 
 package forms
 
+import forms.FormMapping.InitialFormMapping
 import play.api.data.FieldMapping
 import play.api.data.Forms.mapping
 
@@ -24,24 +25,41 @@ abstract class FormProvider[E, A](fieldMapping: (E, Seq[String]) => FieldMapping
   def apply(
     errors: E,
     args: Seq[String]
-  ): FormMapping[A, A] =
-    FormMapping(
-      mapping("value" -> fieldMapping(errors, args))(identity)(a => Some(identity(a))),
-      identity,
-      identity
+  ): FormMapping[A] =
+    InitialFormMapping(
+      mapping("value" -> fieldMapping(errors, args))(identity)(a => Some(identity(a)))
     )
+
+  def apply(errors: E): FormMapping[A] =
+    apply(errors, Seq())
 
   def apply(
     errors1: E,
     errors2: E,
     args: Seq[String]
-  ): FormMapping[(A, A), (A, A)] =
-    FormMapping(
+  ): FormMapping[(A, A)] =
+    InitialFormMapping(
       mapping[(A, A), A, A](
         "value.1" -> fieldMapping(errors1, args),
         "value.2" -> fieldMapping(errors2, args)
-      )(Tuple2.apply)(Tuple2.unapply),
-      identity,
-      identity
+      )(Tuple2.apply)(Tuple2.unapply)
     )
+
+  def apply(errors1: E, errors2: E): FormMapping[(A, A)] = apply(errors1, errors2, Seq())
+
+  def apply(
+    errors1: E,
+    errors2: E,
+    errors3: E,
+    args: Seq[String]
+  ): FormMapping[(A, A, A)] =
+    InitialFormMapping(
+      mapping[(A, A, A), A, A, A](
+        "value.1" -> fieldMapping(errors1, args),
+        "value.2" -> fieldMapping(errors2, args),
+        "value.3" -> fieldMapping(errors3, args)
+      )(Tuple3.apply)(Tuple3.unapply)
+    )
+
+  def apply(errors1: E, errors2: E, errors3: E): FormMapping[(A, A, A)] = apply(errors1, errors2, errors3, Seq())
 }

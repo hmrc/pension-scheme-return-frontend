@@ -14,16 +14,20 @@
  * limitations under the License.
  */
 
-package viewmodels.models
+package utils
 
-import play.api.mvc.Call
-import viewmodels.DisplayMessage.Message
+/* Typeclass for transforming type A into B and type B into type A */
+trait Transform[A, B] {
+  def to(a: A): B
 
-case class TripleIntViewModel(
-  title: Message,
-  heading: Message,
-  field1Label: Message,
-  field2Label: Message,
-  field3Label: Message,
-  onSubmit: Call
-)
+  def from(b: B): A
+}
+
+object Transform {
+
+  implicit def identity[A]: Transform[A, A] = new Transform[A, A] {
+    override def to(a: A): A = a
+
+    override def from(a: A): A = a
+  }
+}

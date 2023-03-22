@@ -17,6 +17,7 @@
 package controllers
 
 import controllers.actions._
+import forms.FormMapping
 import models.{Establisher, EstablisherKind, NameDOB, SchemeDetails, SchemeId, SchemeStatus, UserAnswers}
 import navigation.Navigator
 import play.api.http._
@@ -80,7 +81,9 @@ trait ControllerBaseSpec
   def runningApplication[T](block: Application => T): T =
     running(_ => applicationBuilder())(block)
 
-  def formData[A](form: data.Form[A], range: A) = form.fill(range).data.toList
+  def formData[A](form: data.Form[A], data: A) = form.fill(data).data.toList
+
+  def formData[A](form: FormMapping[A], data: A) = form.fill(Some(data)).data.toList
 
   implicit class UserAnswersOps(ua: UserAnswers) {
     def unsafeSet[A: Writes](page: Settable[A], value: A): UserAnswers = ua.set(page, value).success.value

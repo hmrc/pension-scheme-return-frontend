@@ -16,8 +16,12 @@
 
 package generators
 
+import forms.FormMapping
 import org.scalacheck.Gen
+import play.api.data.FieldMapping
+import play.api.data.Forms.mapping
 import viewmodels.DisplayMessage.Message
+import viewmodels.models.MultipleQuestionsViewModel.{DoubleQuestion, SingleQuestion, TripleQuestion}
 import viewmodels.models._
 
 trait ViewModelGenerators extends BasicGenerators {
@@ -204,13 +208,66 @@ trait ViewModelGenerators extends BasicGenerators {
       )
     }
 
-  val moneyViewModelGen: Gen[MoneyViewModel] =
+  def fieldGen: Gen[Field] =
+    for {
+      label <- nonEmptyInlineMessage
+      hint <- Gen.option(nonEmptyInlineMessage)
+    } yield {
+      Field(label, hint)
+    }
+
+  def singleQuestionGen[A](fieldMapping: FieldMapping[A]): Gen[SingleQuestion[A]] =
+    Gen.const(SingleQuestion(FormMapping(mapping("value" -> fieldMapping)(identity)(Some(_)))))
+
+  def doubleQuestionGen[A](fieldMapping: FieldMapping[A]): Gen[DoubleQuestion[A]] =
+    for {
+      field1 <- fieldGen
+      field2 <- fieldGen
+    } yield {
+      DoubleQuestion(
+        FormMapping(
+          mapping(
+            "value.1" -> fieldMapping,
+            "value.2" -> fieldMapping
+          )(Tuple2.apply)(Tuple2.unapply)
+        ),
+        field1,
+        field2
+      )
+    }
+
+  def tripleQuestionGen[A](fieldMapping: FieldMapping[A]): Gen[TripleQuestion[A]] =
+    for {
+      field1 <- fieldGen
+      field2 <- fieldGen
+      field3 <- fieldGen
+    } yield {
+      TripleQuestion(
+        FormMapping(
+          mapping(
+            "value.1" -> fieldMapping,
+            "value.2" -> fieldMapping,
+            "value.3" -> fieldMapping
+          )(Tuple3.apply)(Tuple3.unapply)
+        ),
+        field1,
+        field2,
+        field3
+      )
+    }
+
+  def multipleQuestionsViewModelGen[A](fieldMapping: FieldMapping[A]): Gen[MultipleQuestionsViewModel[_]] =
+    Gen.oneOf(singleQuestionGen(fieldMapping), doubleQuestionGen(fieldMapping), tripleQuestionGen(fieldMapping))
+
+  def moneyViewModelGen[A](fieldMapping: FieldMapping[A]): Gen[MoneyViewModel[_]] =
     for {
       title <- nonEmptyMessage
       heading <- nonEmptyMessage
+      description <- Gen.option(nonEmptyBlockMessage)
+      questions <- multipleQuestionsViewModelGen(fieldMapping)
       onSubmit <- call
     } yield {
-      MoneyViewModel(title, heading, onSubmit)
+      MoneyViewModel(title, heading, description, questions, onSubmit)
     }
 
   val textInputViewModelGen: Gen[TextInputViewModel] =
@@ -223,16 +280,14 @@ trait ViewModelGenerators extends BasicGenerators {
       TextInputViewModel(title, heading, label, onSubmit)
     }
 
-  val tripleIntViewModelGen: Gen[TripleIntViewModel] =
+  def tripleIntViewModelGen[A](fieldMapping: FieldMapping[A]): Gen[IntViewModel[_]] =
     for {
       title <- nonEmptyMessage
       heading <- nonEmptyMessage
-      field1Label <- nonEmptyMessage
-      field2Label <- nonEmptyMessage
-      field3Label <- nonEmptyMessage
+      questions <- multipleQuestionsViewModelGen(fieldMapping)
       onSubmit <- call
     } yield {
-      TripleIntViewModel(title, heading, field1Label, field2Label, field3Label, onSubmit)
+      IntViewModel(title, heading, questions, onSubmit)
     }
 
   val textAreaViewModelGen: Gen[TextAreaViewModel] =
