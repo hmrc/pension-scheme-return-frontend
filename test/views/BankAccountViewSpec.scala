@@ -39,8 +39,8 @@ class BankAccountViewSpec extends ViewSpec {
 
     "BankAccountView" should {
 
-      behave.like(renderTitle(bankAccountViewModelGen)(view(bankAccountForm, _), _.title.key))
-      behave.like(renderHeading(bankAccountViewModelGen)(view(bankAccountForm, _), _.heading))
+      act.like(renderTitle(bankAccountViewModelGen)(view(bankAccountForm, _), _.title.key))
+      act.like(renderHeading(bankAccountViewModelGen)(view(bankAccountForm, _), _.heading))
 
       "render the bank name heading" in {
         forAll(bankAccountViewModelGen) { viewModel =>
@@ -108,7 +108,7 @@ class BankAccountViewSpec extends ViewSpec {
         }
       }
 
-      behave.like(renderButtonText(bankAccountViewModelGen)(view(bankAccountForm, _), _.buttonText))
+      act.like(renderButtonText(bankAccountViewModelGen)(view(bankAccountForm, _), _.buttonText))
     }
   }
 }

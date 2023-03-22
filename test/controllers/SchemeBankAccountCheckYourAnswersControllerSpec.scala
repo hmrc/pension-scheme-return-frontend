@@ -44,20 +44,20 @@ class SchemeBankAccountCheckYourAnswersControllerSpec
 
     lazy val viewModel = SchemeBankAccountCheckYourAnswersController.viewModel(srn, indexOne, bankAccount)
 
-    behave.like(renderPrePopView(onPageLoad, SchemeBankAccountPage(srn, indexOne), bankAccount) {
+    act.like(renderPrePopView(onPageLoad, SchemeBankAccountPage(srn, indexOne), bankAccount) {
       implicit app => implicit request =>
         val view = injected[CheckYourAnswersView]
         view(viewModel)
     })
 
-    behave.like(
+    act.like(
       redirectWhenCacheEmpty(onPageLoad, routes.SchemeBankAccountController.onPageLoad(srn, indexOne, NormalMode))
     )
 
-    behave.like(journeyRecoveryPage("onPageLoad", onPageLoad))
-    behave.like(journeyRecoveryPage("onSubmit", onSubmit))
+    act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
+    act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
 
-    behave.like(redirectNextPage(onSubmit))
+    act.like(redirectNextPage(onSubmit))
   }
 
   "SchemeBankAccountCheckYourAnswers.viewModel" should {

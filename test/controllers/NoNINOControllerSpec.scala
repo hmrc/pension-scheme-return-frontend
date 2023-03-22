@@ -16,12 +16,13 @@
 
 package controllers
 
-import models.NormalMode
-import forms.TextFormProvider
-import views.html.TextAreaView
-import pages.{MemberDetailsPage, NoNINOPage}
-import NoNINOController._
+import controllers.NoNINOController._
 import eu.timepit.refined.refineMV
+import forms.TextFormProvider
+import models.NormalMode
+import pages.{MemberDetailsPage, NoNINOPage}
+import utils.UserAnswersUtils._
+import views.html.TextAreaView
 
 class NoNINOControllerSpec extends ControllerBaseSpec {
 
@@ -33,14 +34,14 @@ class NoNINOControllerSpec extends ControllerBaseSpec {
 
   "NoNINOController" should {
 
-    behave.like(renderView(onPageLoad, userAnswersWithMembersDetails) { implicit app => implicit request =>
+    act.like(renderView(onPageLoad, userAnswersWithMembersDetails) { implicit app => implicit request =>
       injected[TextAreaView].apply(
         form(injected[TextFormProvider], memberDetails.fullName),
         viewModel(srn, memberDetails.fullName, refineMV(1), NormalMode)
       )
     })
 
-    behave.like(renderPrePopView(onPageLoad, NoNINOPage(srn, refineMV(1)), "test text", userAnswersWithMembersDetails) {
+    act.like(renderPrePopView(onPageLoad, NoNINOPage(srn, refineMV(1)), "test text", userAnswersWithMembersDetails) {
       implicit app => implicit request =>
         injected[TextAreaView].apply(
           form(injected[TextFormProvider], memberDetails.fullName).fill("test text"),
@@ -48,14 +49,14 @@ class NoNINOControllerSpec extends ControllerBaseSpec {
         )
     })
 
-    behave.like(redirectNextPage(onSubmit, userAnswersWithMembersDetails, "value" -> "test text"))
+    act.like(redirectNextPage(onSubmit, userAnswersWithMembersDetails, "value" -> "test text"))
 
-    behave.like(journeyRecoveryPage("onPageLoad", onPageLoad))
+    act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
-    behave.like(saveAndContinue(onSubmit, userAnswersWithMembersDetails, "value" -> "test text"))
+    act.like(saveAndContinue(onSubmit, userAnswersWithMembersDetails, "value" -> "test text"))
 
-    behave.like(journeyRecoveryPage("onSubmit", onSubmit))
+    act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit " + _))
 
-    behave.like(invalidForm(onSubmit, userAnswersWithMembersDetails))
+    act.like(invalidForm(onSubmit, userAnswersWithMembersDetails))
   }
 }

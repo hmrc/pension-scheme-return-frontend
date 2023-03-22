@@ -22,6 +22,7 @@ import models._
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import pages._
 import utils.BaseSpec
+import utils.UserAnswersUtils._
 
 class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
@@ -120,10 +121,22 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
       "yes is selected" in {
         forAll(srnGen) { srn =>
           val ua =
-            userAnswers.set(SchemeBankAccountPage(srn, refineMV(1)), BankAccount("test", "11111111", "111111")).get
+            userAnswers.unsafeSet(SchemeBankAccountPage(srn, refineMV(1)), BankAccount("test", "11111111", "111111"))
           val page = SchemeBankAccountListPage(srn, addBankAccount = true)
           navigator.nextPage(page, NormalMode, ua) mustBe
             routes.SchemeBankAccountController.onPageLoad(srn, refineMV(2), NormalMode)
+        }
+      }
+    }
+
+    "got from scheme bank account list page to how many members page" when {
+
+      "no is selected" in {
+
+        forAll(srnGen) { srn =>
+          val page = SchemeBankAccountListPage(srn, addBankAccount = false)
+          navigator.nextPage(page, NormalMode, userAnswers) mustBe
+            routes.HowManyMembersController.onPageLoad(srn, NormalMode)
         }
       }
     }
@@ -189,12 +202,9 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
         forAll(srnGen) { srn =>
           val answers = userAnswers
-            .set(AccountingPeriodPage(srn, refineMV(1)), dateRangeGen.sample.value)
-            .get
-            .set(AccountingPeriodPage(srn, refineMV(2)), dateRangeGen.sample.value)
-            .get
-            .set(AccountingPeriodPage(srn, refineMV(3)), dateRangeGen.sample.value)
-            .get
+            .unsafeSet(AccountingPeriodPage(srn, refineMV(1)), dateRangeGen.sample.value)
+            .unsafeSet(AccountingPeriodPage(srn, refineMV(2)), dateRangeGen.sample.value)
+            .unsafeSet(AccountingPeriodPage(srn, refineMV(3)), dateRangeGen.sample.value)
 
           val page = AccountingPeriodListPage(srn, addPeriod = true)
           navigator.nextPage(page, NormalMode, answers) mustBe
@@ -228,7 +238,7 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
       }
     }
 
-    "go from  psa declaration page to unauthorised" in {
+    "go from psa declaration page to unauthorised" in {
 
       forAll(srnGen) { srn =>
         val page = PsaDeclarationPage(srn)
@@ -236,7 +246,7 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
       }
     }
 
-    "go from  psp declaration page to unauthorised" in {
+    "go from psp declaration page to unauthorised" in {
 
       forAll(srnGen) { srn =>
         val page = PspDeclarationPage(srn)
@@ -263,6 +273,45 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
         val page = MemberDetailsNinoPage(srn, refineMV(1))
         navigator.nextPage(page, NormalMode, userAnswers) mustBe routes.SchemeMemberDetailsCYAController
           .onPageLoad(srn, refineMV(1))
+      }
+    }
+
+    "go from how many members page to how much cash page" when {
+
+      "total number of members is less than 100" in {
+
+        forAll(srnGen, pensionSchemeIdGen) { (srn, id) =>
+          val page = HowManyMembersPage(srn, id)
+          val ua = userAnswers.unsafeSet(page, SchemeMemberNumbers(50, 30, 19))
+
+          navigator.nextPage(page, NormalMode, ua) mustBe
+            routes.HowMuchCashController.onPageLoad(srn, NormalMode)
+        }
+      }
+    }
+
+    "go from how many members page to declaration" when {
+
+      "psa is signed in" in {
+
+        forAll(srnGen, psaIdGen) { (srn, id) =>
+          val page = HowManyMembersPage(srn, id)
+          val ua = userAnswers.unsafeSet(page, SchemeMemberNumbers(50, 30, 20))
+
+          navigator.nextPage(page, NormalMode, ua) mustBe
+            routes.PsaDeclarationController.onPageLoad(srn)
+        }
+      }
+
+      "psp is signed in" in {
+
+        forAll(srnGen, pspIdGen) { (srn, id) =>
+          val page = HowManyMembersPage(srn, id)
+          val ua = userAnswers.unsafeSet(page, SchemeMemberNumbers(50, 30, 20))
+
+          navigator.nextPage(page, NormalMode, ua) mustBe
+            routes.PspDeclarationController.onPageLoad(srn)
+        }
       }
     }
   }

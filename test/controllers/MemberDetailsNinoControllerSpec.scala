@@ -20,6 +20,7 @@ import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import models.NormalMode
 import pages.{MemberDetailsNinoPage, MemberDetailsPage}
+import utils.UserAnswersUtils._
 import views.html.TextInputView
 
 class MemberDetailsNinoControllerSpec extends ControllerBaseSpec {
@@ -38,49 +39,47 @@ class MemberDetailsNinoControllerSpec extends ControllerBaseSpec {
     lazy val onPageLoad = routes.MemberDetailsNinoController.onPageLoad(srn, refineMV(1), NormalMode)
     lazy val onSubmit = routes.MemberDetailsNinoController.onSubmit(srn, refineMV(1), NormalMode)
 
-    behave.like(renderView(onPageLoad, populatedUserAnswers) { implicit app => implicit request =>
+    act.like(renderView(onPageLoad, populatedUserAnswers) { implicit app => implicit request =>
       val view = injected[TextInputView]
       view(form, viewModel)
     })
 
-    behave.like(renderPrePopView(onPageLoad, MemberDetailsNinoPage(srn, refineMV(1)), validNino, populatedUserAnswers) {
+    act.like(renderPrePopView(onPageLoad, MemberDetailsNinoPage(srn, refineMV(1)), validNino, populatedUserAnswers) {
       implicit app => implicit request =>
         val view = injected[TextInputView]
         view(form.fill(validNino), viewModel)
     })
 
-    behave.like(journeyRecoveryPage("onPageLoad", onPageLoad))
+    act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
-    "when no member details exists for onPageLoad" when {
+    act.like(
+      journeyRecoveryPage(onPageLoad, Some(emptyUserAnswers))
+        .withName("onPageLoad should redirect to journey recovery page when no member details exist")
+    )
 
-      behave.like(redirectWhenCacheEmpty(onPageLoad, routes.JourneyRecoveryController.onPageLoad()))
-    }
+    act.like(
+      journeyRecoveryPage(onSubmit, Some(emptyUserAnswers))
+        .withName("onSubmit should redirect to journey recovery page when no member details exist")
+    )
 
-    "when no member details exists for onSubmit" when {
+    act.like(saveAndContinue(onSubmit, populatedUserAnswers, formData(form, validNino): _*))
 
-      behave.like(redirectWhenCacheEmpty(onSubmit, routes.JourneyRecoveryController.onPageLoad()))
-    }
+    act.like(invalidForm(onSubmit, populatedUserAnswers))
 
-    behave.like(saveAndContinue(onSubmit, populatedUserAnswers, formData(form, validNino): _*))
-
-    behave.like(invalidForm(onSubmit, populatedUserAnswers))
-
-    behave.like(journeyRecoveryPage("onSubmit", onSubmit))
+    act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
 
     "allow nino to be updated" when {
       val userAnswers = populatedUserAnswers.set(MemberDetailsNinoPage(srn, refineMV(1)), validNino).get
-      behave.like(saveAndContinue(onSubmit, userAnswers, formData(form, validNino): _*))
+      act.like(saveAndContinue(onSubmit, userAnswers, formData(form, validNino): _*))
     }
 
     "return a 400 if nino has already been entered" when {
       val userAnswers =
         populatedUserAnswers
-          .set(MemberDetailsNinoPage(srn, refineMV(1)), otherValidNino)
-          .get
-          .set(MemberDetailsNinoPage(srn, refineMV(2)), validNino)
-          .get
+          .unsafeSet(MemberDetailsNinoPage(srn, refineMV(1)), otherValidNino)
+          .unsafeSet(MemberDetailsNinoPage(srn, refineMV(2)), validNino)
 
-      behave.like(invalidForm(onSubmit, userAnswers, formData(form, validNino): _*))
+      act.like(invalidForm(onSubmit, userAnswers, formData(form, validNino): _*))
     }
   }
 }

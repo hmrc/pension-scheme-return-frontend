@@ -48,20 +48,20 @@ class AccountingPeriodListControllerSpec extends ControllerBaseSpec {
 
     lazy val accountingPeriodPage = routes.AccountingPeriodController.onPageLoad(srn, refineMV(1), NormalMode)
 
-    behave.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
+    act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
       val view = injected[ListView]
       view(form, viewModel)
     })
 
-    behave.like(redirectToPage(onPageLoad, accountingPeriodPage))
+    act.like(redirectToPage(onPageLoad, accountingPeriodPage))
 
-    behave.like(journeyRecoveryPage("onPageLoad", onPageLoad))
+    act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
-    behave.like(redirectNextPage(onSubmit, "value" -> "true"))
+    act.like(redirectNextPage(onSubmit, "value" -> "true"))
 
-    behave.like(invalidForm(onSubmit))
+    act.like(invalidForm(onSubmit))
 
-    behave.like(journeyRecoveryPage("onSubmit", onSubmit))
+    act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }
 
   "AccountingPeriodListController.viewModel" should {

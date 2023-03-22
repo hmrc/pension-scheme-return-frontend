@@ -19,11 +19,9 @@ package controllers
 import controllers.DoesSchemeMemberHaveNINOController._
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
-import models.{NameDOB, NormalMode}
+import models.NormalMode
 import pages.{MemberDetailsPage, NationalInsuranceNumberPage}
 import views.html.YesNoPageView
-
-import java.time.LocalDate
 
 class DoesSchemeMemberHaveNINOControllerSpec extends ControllerBaseSpec {
 
@@ -35,12 +33,12 @@ class DoesSchemeMemberHaveNINOControllerSpec extends ControllerBaseSpec {
 
   "NationalInsuranceNumberController" should {
 
-    behave.like(renderView(onPageLoad, userAnswersWithMemberDetails) { implicit app => implicit request =>
+    act.like(renderView(onPageLoad, userAnswersWithMemberDetails) { implicit app => implicit request =>
       val preparedForm = form(injected[YesNoPageFormProvider], memberDetails.fullName)
       injected[YesNoPageView].apply(preparedForm, viewModel(refineMV(1), memberDetails.fullName, srn, NormalMode))
     })
 
-    behave.like(
+    act.like(
       renderPrePopView(onPageLoad, NationalInsuranceNumberPage(srn, refineMV(1)), true, userAnswersWithMemberDetails) {
         implicit app => implicit request =>
           val preparedForm = form(injected[YesNoPageFormProvider], memberDetails.fullName).fill(true)
@@ -48,13 +46,13 @@ class DoesSchemeMemberHaveNINOControllerSpec extends ControllerBaseSpec {
       }
     )
 
-    behave.like(redirectWhenCacheEmpty(onPageLoad, controllers.routes.JourneyRecoveryController.onPageLoad()))
-    behave.like(journeyRecoveryPage("onPageLoad", onPageLoad))
+    act.like(redirectWhenCacheEmpty(onPageLoad, controllers.routes.JourneyRecoveryController.onPageLoad()))
+    act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
-    behave.like(redirectNextPage(onSubmit, userAnswersWithMemberDetails, "value" -> "true"))
-    behave.like(redirectNextPage(onSubmit, userAnswersWithMemberDetails, "value" -> "false"))
-    behave.like(saveAndContinue(onSubmit, userAnswersWithMemberDetails, "value" -> "true"))
-    behave.like(invalidForm(onSubmit, userAnswersWithMemberDetails))
-    behave.like(journeyRecoveryPage("onSubmit", onSubmit))
+    act.like(redirectNextPage(onSubmit, userAnswersWithMemberDetails, "value" -> "true"))
+    act.like(redirectNextPage(onSubmit, userAnswersWithMemberDetails, "value" -> "false"))
+    act.like(saveAndContinue(onSubmit, userAnswersWithMemberDetails, "value" -> "true"))
+    act.like(invalidForm(onSubmit, userAnswersWithMemberDetails))
+    act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }
 }

@@ -14,24 +14,17 @@
  * limitations under the License.
  */
 
-package forms
+package utils
 
-import forms.behaviours.IntFieldBehaviours
-import play.api.data.FormError
+import models.UserAnswers
+import play.api.libs.json.Writes
+import queries.Settable
 
-class PensionSchemeFormSpec extends IntFieldBehaviours {
+object UserAnswersUtils {
 
-  val form = new PensionSchemeForm()()
+  implicit class UserAnswersOps(val userAnswers: UserAnswers) extends AnyVal {
 
-  ".value" - {
-
-    behave.like(
-      intField(
-        form,
-        "value",
-        FormError("value", "pensionScheme.error.nonNumeric"),
-        FormError("value", "pensionScheme.error.wholeNumber")
-      )
-    )
+    def unsafeSet[A](page: Settable[A], value: A)(implicit writes: Writes[A]): UserAnswers =
+      userAnswers.set(page, value).get
   }
 }

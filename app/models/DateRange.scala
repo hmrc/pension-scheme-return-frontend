@@ -40,4 +40,8 @@ object DateRange {
   def from(taxYear: TaxYear): DateRange = DateRange(taxYear.starts, taxYear.finishes)
 
   implicit val format: Format[DateRange] = Json.format[DateRange]
+
+  implicit val ordering: Ordering[DateRange] = (x: DateRange, y: DateRange) => {
+    Ordering[LocalDate].compare(x.to, y.to)
+  }
 }

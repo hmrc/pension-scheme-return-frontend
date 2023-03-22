@@ -27,6 +27,7 @@ import models.requests.{AllowedAccessRequest, IdentifierRequest}
 import org.scalacheck.Gen
 import org.scalacheck.Gen.numChar
 import play.api.mvc.Request
+import play.api.test.FakeRequest
 import uk.gov.hmrc.domain.Nino
 
 trait ModelGenerators extends BasicGenerators {
@@ -100,6 +101,7 @@ trait ModelGenerators extends BasicGenerators {
 
   val psaIdGen: Gen[PsaId] = nonEmptyString.map(PsaId)
   val pspIdGen: Gen[PspId] = nonEmptyString.map(PspId)
+  val pensionSchemeIdGen: Gen[PensionSchemeId] = Gen.oneOf(psaIdGen, pspIdGen)
 
   val srnGen: Gen[Srn] =
     Gen
@@ -199,6 +201,14 @@ trait ModelGenerators extends BasicGenerators {
     dob <- date
   } yield {
     NameDOB(firstName, lastName, dob)
+  }
+
+  implicit val schemeMemberNumbers: Gen[SchemeMemberNumbers] = for {
+    active <- Gen.chooseNum(0, 99999)
+    deferred <- Gen.chooseNum(0, 99999)
+    pensioners <- Gen.chooseNum(0, 99999)
+  } yield {
+    SchemeMemberNumbers(active, deferred, pensioners)
   }
 }
 

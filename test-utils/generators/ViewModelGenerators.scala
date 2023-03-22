@@ -223,6 +223,18 @@ trait ViewModelGenerators extends BasicGenerators {
       TextInputViewModel(title, heading, label, onSubmit)
     }
 
+  val tripleIntViewModelGen: Gen[TripleIntViewModel] =
+    for {
+      title <- nonEmptyMessage
+      heading <- nonEmptyMessage
+      field1Label <- nonEmptyMessage
+      field2Label <- nonEmptyMessage
+      field3Label <- nonEmptyMessage
+      onSubmit <- call
+    } yield {
+      TripleIntViewModel(title, heading, field1Label, field2Label, field3Label, onSubmit)
+    }
+
   val textAreaViewModelGen: Gen[TextAreaViewModel] =
     for {
       title <- nonEmptyMessage

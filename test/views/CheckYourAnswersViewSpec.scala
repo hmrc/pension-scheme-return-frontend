@@ -29,9 +29,9 @@ class CheckYourAnswersViewSpec extends ViewSpec {
 
     "CheckYourAnswerView" should {
 
-      behave.like(renderTitle(checkYourAnswersViewModelGen)(view(_), _.title.key))
-      behave.like(renderHeading(checkYourAnswersViewModelGen)(view(_), _.heading))
-      behave.like(renderSaveAndContinueButton(checkYourAnswersViewModelGen)(view(_)))
+      act.like(renderTitle(checkYourAnswersViewModelGen)(view(_), _.title.key))
+      act.like(renderHeading(checkYourAnswersViewModelGen)(view(_), _.heading))
+      act.like(renderSaveAndContinueButton(checkYourAnswersViewModelGen)(view(_)))
 
       "render the summary list keys" in {
 

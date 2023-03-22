@@ -21,6 +21,7 @@ import eu.timepit.refined._
 import forms.YesNoPageFormProvider
 import models.NormalMode
 import pages.AccountingPeriodPage
+import utils.UserAnswersUtils._
 import views.html.YesNoPageView
 
 class RemoveAccountingPeriodControllerSpec extends ControllerBaseSpec {
@@ -32,16 +33,12 @@ class RemoveAccountingPeriodControllerSpec extends ControllerBaseSpec {
   private val otherPeriod = dateRangeGen.sample.value
 
   private val userAnswers = defaultUserAnswers
-    .set(AccountingPeriodPage(srn, refineMV(1)), period)
-    .success
-    .value
-    .set(AccountingPeriodPage(srn, refineMV(2)), otherPeriod)
-    .success
-    .value
+    .unsafeSet(AccountingPeriodPage(srn, refineMV(1)), period)
+    .unsafeSet(AccountingPeriodPage(srn, refineMV(2)), otherPeriod)
 
   "RemoveSchemeBankAccountController" should {
 
-    behave.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
+    act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
       val view = injected[YesNoPageView]
 
       view(
@@ -50,14 +47,14 @@ class RemoveAccountingPeriodControllerSpec extends ControllerBaseSpec {
       )
     })
 
-    behave.like(redirectToPage(onPageLoad, controllers.routes.JourneyRecoveryController.onPageLoad()))
+    act.like(redirectToPage(onPageLoad, controllers.routes.JourneyRecoveryController.onPageLoad()))
 
-    behave.like(journeyRecoveryPage("onPageLoad", onPageLoad))
+    act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
-    behave.like(continueNoSave(onSubmit, userAnswers, "value" -> "false"))
-    behave.like(saveAndContinue(onSubmit, userAnswers, "value" -> "true"))
+    act.like(continueNoSave(onSubmit, userAnswers, "value" -> "false"))
+    act.like(saveAndContinue(onSubmit, userAnswers, "value" -> "true"))
 
-    behave.like(journeyRecoveryPage("onSubmit", onSubmit))
+    act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
 
   }
 }

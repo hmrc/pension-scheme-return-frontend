@@ -36,12 +36,12 @@ class TextInputViewSpec extends ViewSpec with Mappings {
 
     "TextInputView" should {
 
-      behave.like(renderTitle(textInputViewModelGen)(view(textInputForm, _), _.title.key))
-      behave.like(renderHeading(textInputViewModelGen)(view(textInputForm, _), _.heading))
-      behave.like(renderInputWithH1Label(textInputViewModelGen)("value", view(textInputForm, _), _.heading, _.label))
-      behave.like(renderErrors(textInputViewModelGen)(view(invalidForm, _), "text.error.required"))
-      behave.like(renderForm(textInputViewModelGen)(view(textInputForm, _), _.onSubmit))
-      behave.like(renderSaveAndContinueButton(textInputViewModelGen)(view(textInputForm, _)))
+      act.like(renderTitle(textInputViewModelGen)(view(textInputForm, _), _.title.key))
+      act.like(renderHeading(textInputViewModelGen)(view(textInputForm, _), _.heading))
+      act.like(renderInputWithH1Label(textInputViewModelGen)("value", view(textInputForm, _), _.heading, _.label))
+      act.like(renderErrors(textInputViewModelGen)(view(invalidForm, _), "text.error.required"))
+      act.like(renderForm(textInputViewModelGen)(view(textInputForm, _), _.onSubmit))
+      act.like(renderSaveAndContinueButton(textInputViewModelGen)(view(textInputForm, _)))
     }
   }
 }

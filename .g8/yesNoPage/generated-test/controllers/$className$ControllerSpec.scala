@@ -21,21 +21,21 @@ class $className;format="cap"$ControllerSpec extends ControllerBaseSpec {
 
   "$className;format="cap"$Controller" should {
 
-    behave like renderView(onPageLoad) { implicit app => implicit request =>
+    act.like renderView(onPageLoad) { implicit app => implicit request =>
       injected[YesNoPageView].apply(form(injected[YesNoPageFormProvider]), viewModel(srn, NormalMode))
     }
 
-    behave like renderPrePopView(onPageLoad, $className;format="cap"$Page(srn), true) { implicit app => implicit request =>
+    act.like renderPrePopView(onPageLoad, $className;format="cap"$Page(srn), true) { implicit app => implicit request =>
       injected[YesNoPageView].apply(form(injected[YesNoPageFormProvider]).fill(true), viewModel(srn, NormalMode))
     }
 
-    behave like redirectNextPage(onSubmit, "value" -> "true")
-    behave like redirectNextPage(onSubmit, "value" -> "false")
+    act.like redirectNextPage(onSubmit, "value" -> "true")
+    act.like redirectNextPage(onSubmit, "value" -> "false")
 
-    behave like journeyRecoveryPage("onPageLoad", onPageLoad)
+    act.like journeyRecoveryPage("onPageLoad", onPageLoad)
 
-    behave like saveAndContinue(onSubmit, "value" -> "true")
+    act.like saveAndContinue(onSubmit, "value" -> "true")
 
-    behave like invalidForm(onSubmit)
+    act.like invalidForm(onSubmit)
   }
 }

@@ -37,10 +37,10 @@ class SchemeBankAccountListControllerTest extends ControllerBaseSpec {
 
   "SchemeBankAccountSummaryController" should {
 
-    behave.like(redirectNextPage(onSubmit, "value" -> "false"))
+    act.like(redirectNextPage(onSubmit, "value" -> "false"))
 
     "with 0 bank accounts" must {
-      behave.like(redirectToPage(onPageLoad, redirectUrlNoBankAccounts))
+      act.like(redirectToPage(onPageLoad, redirectUrlNoBankAccounts))
     }
 
     List(1, 9, 10).foreach {
@@ -49,10 +49,10 @@ class SchemeBankAccountListControllerTest extends ControllerBaseSpec {
           val bankAccounts = buildBankAccounts(numBankAccount)
           val userAnswers = buildUserAnswers(bankAccounts)
 
-          behave.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
+          act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
             view.apply(form, viewModel(srn, NormalMode, bankAccounts))
           })
-          behave.like(redirectNextPage(onSubmit, userAnswers, "value" -> "true"))
+          act.like(redirectNextPage(onSubmit, userAnswers, "value" -> "true"))
         }
     }
   }
