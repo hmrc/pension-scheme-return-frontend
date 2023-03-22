@@ -18,23 +18,7 @@ package forms
 
 import com.google.inject.Inject
 import forms.mappings.Mappings
+import forms.mappings.errors.MoneyFormErrors
 import models.Money
-import play.api.data.Form
 
-class MoneyFormProvider @Inject()() extends Mappings {
-
-  def apply(
-    requiredKey: String,
-    nonNumericKey: String,
-    max: (Double, String),
-    args: Seq[String] = Seq.empty
-  ): Form[Money] =
-    Form(
-      "value" -> money(
-        requiredKey,
-        nonNumericKey,
-        max,
-        args
-      )
-    )
-}
+class MoneyFormProvider @Inject()() extends FormProvider[MoneyFormErrors, Money](Mappings.money)

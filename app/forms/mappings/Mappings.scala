@@ -16,7 +16,7 @@
 
 package forms.mappings
 
-import forms.mappings.errors.{DateFormErrors, IntFormErrors}
+import forms.mappings.errors.{DateFormErrors, IntFormErrors, MoneyFormErrors}
 import models.{DateRange, Enumerable, Money}
 import play.api.data.FieldMapping
 import play.api.data.Forms.of
@@ -26,10 +26,10 @@ import java.time.LocalDate
 
 trait Mappings extends Formatters with Constraints {
 
-  protected def text(errorKey: String = "error.required", args: Seq[Any] = Seq.empty): FieldMapping[String] =
+  def text(errorKey: String = "error.required", args: Seq[Any] = Seq.empty): FieldMapping[String] =
     of(stringFormatter(errorKey, args))
 
-  protected def int(
+  def int(
     requiredKey: String = "error.required",
     wholeNumberKey: String = "error.wholeNumber",
     nonNumericKey: String = "error.nonNumeric",
@@ -38,13 +38,13 @@ trait Mappings extends Formatters with Constraints {
   ): FieldMapping[Int] =
     int(IntFormErrors(requiredKey, wholeNumberKey, nonNumericKey, max), args)
 
-  protected def int(
+  def int(
     intFormErrors: IntFormErrors,
     args: Seq[String]
   ): FieldMapping[Int] =
     of(intFormatter(intFormErrors, args))
 
-  protected def double(
+  def double(
     requiredKey: String = "error.required",
     nonNumericKey: String = "error.nonNumeric",
     max: (Double, String) = (Double.MaxValue, "error.tooLarge"),
@@ -52,32 +52,30 @@ trait Mappings extends Formatters with Constraints {
   ): FieldMapping[Double] =
     of(doubleFormatter(requiredKey, nonNumericKey, max, args))
 
-  protected def money(
-    requiredKey: String = "error.required",
-    nonNumericKey: String = "error.nonMoney",
-    max: (Double, String) = (Double.MaxValue, "error.tooLarge"),
+  def money(
+    moneyFormErrors: MoneyFormErrors,
     args: Seq[String] = Seq.empty
   ): FieldMapping[Money] =
-    of(moneyFormatter(requiredKey, nonNumericKey, max, args))
+    of(moneyFormatter(moneyFormErrors, args))
 
-  protected def boolean(
+  def boolean(
     requiredKey: String = "error.required",
     invalidKey: String = "error.boolean",
     args: Seq[String] = Seq.empty
   ): FieldMapping[Boolean] =
     of(booleanFormatter(requiredKey, invalidKey, args))
 
-  protected def enumerable[A](
+  def enumerable[A](
     requiredKey: String = "error.required",
     invalidKey: String = "error.invalid",
     args: Seq[String] = Seq.empty
   )(implicit ev: Enumerable[A]): FieldMapping[A] =
     of(enumerableFormatter[A](requiredKey, invalidKey, args))
 
-  protected def localDate(dateFormErrors: DateFormErrors, args: Seq[String] = Seq.empty): FieldMapping[LocalDate] =
+  def localDate(dateFormErrors: DateFormErrors, args: Seq[String] = Seq.empty): FieldMapping[LocalDate] =
     of(new LocalDateFormatter(dateFormErrors, args))
 
-  protected def dateRange(
+  def dateRange(
     startDateErrors: DateFormErrors,
     endDateErrors: DateFormErrors,
     invalidRangeError: String,
@@ -100,9 +98,11 @@ trait Mappings extends Formatters with Constraints {
       )
     )
 
-  protected def verify[A](errorKey: String, pred: A => Boolean, args: Any*): Constraint[A] =
+  def verify[A](errorKey: String, pred: A => Boolean, args: Any*): Constraint[A] =
     Constraint[A] { (a: A) =>
       if (pred(a)) Valid
       else Invalid(errorKey, args: _*)
     }
 }
+
+object Mappings extends Mappings

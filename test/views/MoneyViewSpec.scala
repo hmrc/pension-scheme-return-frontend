@@ -17,6 +17,7 @@
 package views
 
 import forms.mappings.Mappings
+import forms.mappings.errors.MoneyFormErrors
 import models.Money
 import play.api.data
 import play.api.test.FakeRequest
@@ -30,7 +31,7 @@ class MoneyViewSpec extends ViewSpec with Mappings {
     implicit val request = FakeRequest()
 
     val moneyForm: data.Form[Money] =
-      data.Form("value" -> money("money.error.required"))
+      data.Form("value" -> money(MoneyFormErrors.default(requiredKey = "money.error.required")))
 
     "MoneyView" should {
 
