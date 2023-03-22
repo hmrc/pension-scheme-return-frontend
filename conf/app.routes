@@ -129,3 +129,6 @@ POST       /:srn/no-ni-number/:index                              controllers.No
 
 GET        /:srn/change-no-ni-number/:index                       controllers.NoNINOController.onPageLoad(srn: Srn, index: Max99, mode: Mode = CheckMode)
 POST       /:srn/change-no-ni-number/:index                       controllers.NoNINOController.onSubmit(srn: Srn, index: Max99, mode: Mode = CheckMode)
+
+GET        /:srn/remove-member-details/:index                     controllers.RemoveMemberDetailsController.onPageLoad(srn: Srn, index: Max99, mode: Mode = CheckMode)
+POST       /:srn/remove-member-details/:index                     controllers.RemoveMemberDetailsController.onSubmit(srn: Srn, index: Max99, mode: Mode = CheckMode)
