@@ -36,28 +36,28 @@ class AccountingPeriodControllerSpec extends ControllerBaseSpec {
     lazy val onPageLoad = routes.AccountingPeriodController.onPageLoad(srn, refineMV(1), NormalMode)
     lazy val onSubmit = routes.AccountingPeriodController.onSubmit(srn, refineMV(1), NormalMode)
 
-    behave.like(renderView(onPageLoad) { implicit app => implicit request =>
+    act.like(renderView(onPageLoad) { implicit app => implicit request =>
       val view = injected[DateRangeView]
       view(form, viewModel)
     })
 
-    behave.like(renderPrePopView(onPageLoad, AccountingPeriodPage(srn, refineMV(1)), dateRangeData) {
+    act.like(renderPrePopView(onPageLoad, AccountingPeriodPage(srn, refineMV(1)), dateRangeData) {
       implicit app => implicit request =>
         val view = injected[DateRangeView]
         view(form.fill(dateRangeData), viewModel)
     })
 
-    behave.like(journeyRecoveryPage("onPageLoad", onPageLoad))
+    act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
-    behave.like(saveAndContinue(onSubmit, formData(form, dateRangeData): _*))
+    act.like(saveAndContinue(onSubmit, formData(form, dateRangeData): _*))
 
-    behave.like(invalidForm(onSubmit))
+    act.like(invalidForm(onSubmit))
 
-    behave.like(journeyRecoveryPage("onSubmit", onSubmit))
+    act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
 
     "allow accounting period to be updated" when {
       val userAnswers = emptyUserAnswers.set(AccountingPeriodPage(srn, refineMV(1)), dateRangeData).get
-      behave.like(saveAndContinue(onSubmit, userAnswers, formData(form, dateRangeData): _*))
+      act.like(saveAndContinue(onSubmit, userAnswers, formData(form, dateRangeData): _*))
     }
 
     "return a 400 if range intersects" when {
@@ -68,7 +68,7 @@ class AccountingPeriodControllerSpec extends ControllerBaseSpec {
           .set(AccountingPeriodPage(srn, refineMV(2)), dateRangeData)
           .get
 
-      behave.like(invalidForm(onSubmit, userAnswers, formData(form, dateRangeData): _*))
+      act.like(invalidForm(onSubmit, userAnswers, formData(form, dateRangeData): _*))
     }
   }
 }

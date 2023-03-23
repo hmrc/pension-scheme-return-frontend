@@ -41,36 +41,34 @@ class SchemeBankAccountControllerSpec extends ControllerBaseSpec {
 
   "SchemeBankAccountController" should {
 
-    behave.like(renderView(onPageLoad) { implicit app => implicit request =>
+    act.like(renderView(onPageLoad) { implicit app => implicit request =>
       injected[BankAccountView]
         .apply(form(injected[BankAccountFormProvider], List()), viewModel(srn, refineMV[OneToTen](1), NormalMode))
     })
 
-    behave.like(renderPrePopView(onPageLoad, SchemeBankAccountPage(srn, refineMV(1)), bankAccount) {
+    act.like(renderPrePopView(onPageLoad, SchemeBankAccountPage(srn, refineMV(1)), bankAccount) {
       implicit app => implicit request =>
         val preparedForm = form(injected[BankAccountFormProvider], List()).fill(bankAccount)
         injected[BankAccountView].apply(preparedForm, viewModel(srn, refineMV[OneToTen](1), NormalMode))
     })
 
-    behave.like(invalidForm(onSubmit, invalidFormData: _*))
-    behave.like(saveAndContinue(onSubmit, validFormData: _*))
+    act.like(invalidForm(onSubmit, invalidFormData: _*))
+    act.like(saveAndContinue(onSubmit, validFormData: _*))
 
     "persist data when updating" when {
       val ua = defaultUserAnswers.set(SchemeBankAccountPage(srn, refineMV(1)), bankAccount).get
-      behave.like(saveAndContinue(onSubmit, ua, validFormData: _*))
+      act.like(saveAndContinue(onSubmit, ua, validFormData: _*))
     }
 
     "return a 400 when data exists in user answers" when {
       val userAnswers = defaultUserAnswers
-        .set(SchemeBankAccountPage(srn, refineMV(1)), otherBankAccount)
-        .get
-        .set(SchemeBankAccountPage(srn, refineMV(2)), bankAccount)
-        .get
+        .unsafeSet(SchemeBankAccountPage(srn, refineMV(1)), otherBankAccount)
+        .unsafeSet(SchemeBankAccountPage(srn, refineMV(2)), bankAccount)
 
-      behave.like(invalidForm(onSubmit, userAnswers, validFormData: _*))
+      act.like(invalidForm(onSubmit, userAnswers, validFormData: _*))
     }
 
-    behave.like(journeyRecoveryPage("onPageLoad", onPageLoad))
-    behave.like(journeyRecoveryPage("onSubmit", onSubmit))
+    act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
+    act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }
 }

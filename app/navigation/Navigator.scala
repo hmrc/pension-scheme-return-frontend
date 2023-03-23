@@ -19,6 +19,7 @@ package navigation
 import config.Refined.{OneToTen, OneToThree}
 import controllers.routes
 import eu.timepit.refined.{refineMV, refineV}
+import models.PensionSchemeId.{PsaId, PspId}
 import models._
 import pages.SchemeBankAccounts.SchemeBankAccountsOps
 import pages.{HowMuchCashPage, _}
@@ -52,7 +53,7 @@ class Navigator @Inject()() {
           case Left(_) => routes.SchemeBankAccountListController.onPageLoad(srn)
           case Right(nextIndex) => routes.SchemeBankAccountController.onPageLoad(srn, nextIndex, NormalMode)
         }
-    case SchemeBankAccountListPage(_, false) => _ => routes.UnauthorisedController.onPageLoad
+    case SchemeBankAccountListPage(srn, false) => _ => routes.HowManyMembersController.onPageLoad(srn, NormalMode)
     case RemoveSchemeBankAccountPage(srn) => _ => routes.SchemeBankAccountListController.onPageLoad(srn)
 
     case AccountingPeriodPage(srn, index) =>
@@ -84,7 +85,19 @@ class Navigator @Inject()() {
     case SchemeMemberDetailsCYAPage(srn) => _ => routes.UnauthorisedController.onPageLoad
     case PsaDeclarationPage(srn) => _ => routes.UnauthorisedController.onPageLoad
     case PspDeclarationPage(srn) => _ => routes.UnauthorisedController.onPageLoad
+
+    case page @ HowManyMembersPage(srn, PsaId(_)) => {
+      case ua if ua.get(page).exists(_.total > 99) => routes.PsaDeclarationController.onPageLoad(srn)
+      case _ => routes.HowMuchCashController.onPageLoad(srn, NormalMode)
+    }
+
+    case page @ HowManyMembersPage(srn, PspId(_)) => {
+      case ua if ua.get(page).exists(_.total > 99) => routes.PspDeclarationController.onPageLoad(srn)
+      case _ => routes.HowMuchCashController.onPageLoad(srn, NormalMode)
+    }
+
     case NoNINOPage(srn, index) => _ => routes.SchemeMemberDetailsCYAController.onPageLoad(srn, index)
+
     case _ => _ => routes.IndexController.onPageLoad
   }
 
@@ -92,7 +105,13 @@ class Navigator @Inject()() {
     case CheckReturnDatesPage(srn) => _ => routes.UnauthorisedController.onPageLoad
     case SchemeBankAccountPage(srn, _) => _ => routes.UnauthorisedController.onPageLoad
     case RemoveSchemeBankAccountPage(srn) => _ => routes.SchemeBankAccountListController.onPageLoad(srn)
+
+    case page @ HowManyMembersPage(srn, _) => {
+      case _ => routes.UnauthorisedController.onPageLoad
+    }
+
     case NoNINOPage(srn, _) => _ => routes.UnauthorisedController.onPageLoad
+
     case _ => _ => routes.IndexController.onPageLoad
   }
 

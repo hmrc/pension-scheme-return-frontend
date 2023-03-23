@@ -17,7 +17,8 @@
 package forms
 
 import com.google.inject.Inject
-import forms.mappings.{DateFormErrors, Mappings}
+import forms.mappings.Mappings
+import forms.mappings.errors.DateFormErrors
 import models.DateRange
 import play.api.data.Form
 import play.api.data.Forms.mapping

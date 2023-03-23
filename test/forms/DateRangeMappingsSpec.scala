@@ -17,7 +17,8 @@
 package forms
 
 import cats.implicits._
-import forms.mappings.{DateFormErrors, Mappings}
+import forms.mappings.Mappings
+import forms.mappings.errors.DateFormErrors
 import generators.Generators
 import models.DateRange
 import org.scalacheck.Gen

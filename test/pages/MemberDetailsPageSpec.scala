@@ -19,7 +19,6 @@ package pages
 import eu.timepit.refined.refineMV
 import models.NameDOB
 import pages.behaviours.PageBehaviours
-import uk.gov.hmrc.domain.Nino
 
 class MemberDetailsPageSpec extends PageBehaviours {
 

@@ -20,7 +20,7 @@ import config.Refined.Max99
 import controllers.MemberDetailsController._
 import controllers.actions._
 import forms.NameDOBFormProvider
-import forms.mappings.DateFormErrors
+import forms.mappings.errors.DateFormErrors
 import models.SchemeId.Srn
 import models.{Mode, NameDOB}
 import navigation.Navigator

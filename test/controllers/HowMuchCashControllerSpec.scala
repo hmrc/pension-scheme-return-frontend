@@ -35,27 +35,27 @@ class HowMuchCashControllerSpec extends ControllerBaseSpec {
     lazy val onPageLoad = routes.HowMuchCashController.onPageLoad(srn, NormalMode)
     lazy val onSubmit = routes.HowMuchCashController.onSubmit(srn, NormalMode)
 
-    behave.like(renderView(onPageLoad) { implicit app => implicit request =>
+    act.like(renderView(onPageLoad) { implicit app => implicit request =>
       val view = injected[MoneyView]
       view(form, viewModel)
     })
 
-    behave.like(renderPrePopView(onPageLoad, HowMuchCashPage(srn), moneyData) { implicit app => implicit request =>
+    act.like(renderPrePopView(onPageLoad, HowMuchCashPage(srn), moneyData) { implicit app => implicit request =>
       val view = injected[MoneyView]
       view(form.fill(moneyData), viewModel)
     })
 
-    behave.like(journeyRecoveryPage("onPageLoad", onPageLoad))
+    act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
-    behave.like(saveAndContinue(onSubmit, formData(form, moneyData): _*))
+    act.like(saveAndContinue(onSubmit, formData(form, moneyData): _*))
 
-    behave.like(invalidForm(onSubmit))
+    act.like(invalidForm(onSubmit))
 
     "fail to submit when amount entered is greater than maximum allowed amount" when {
       val maxAllowedAmount = 999999999.99
-      behave.like(invalidForm(onSubmit, "value" -> (maxAllowedAmount + 0.001).toString))
+      act.like(invalidForm(onSubmit, "value" -> (maxAllowedAmount + 0.001).toString))
     }
 
-    behave.like(journeyRecoveryPage("onSubmit", onSubmit))
+    act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }
 }

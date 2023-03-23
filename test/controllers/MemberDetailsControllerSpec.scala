@@ -54,21 +54,21 @@ class MemberDetailsControllerSpec extends ControllerBaseSpec {
 
   "MemberDetailsController" should {
 
-    behave.like(renderView(onPageLoad) { implicit app => implicit request =>
+    act.like(renderView(onPageLoad) { implicit app => implicit request =>
       injected[NameDOBView].apply(form(injected[NameDOBFormProvider]), viewModel(srn, refineMV(1), NormalMode))
     })
 
-    behave.like(renderPrePopView(onPageLoad, MemberDetailsPage(srn, refineMV(1)), nameDOB) {
+    act.like(renderPrePopView(onPageLoad, MemberDetailsPage(srn, refineMV(1)), nameDOB) {
       implicit app => implicit request =>
         val preparedForm = form(injected[NameDOBFormProvider]).fill(nameDOB)
         injected[NameDOBView].apply(preparedForm, viewModel(srn, refineMV(1), NormalMode))
     })
 
-    behave.like(journeyRecoveryPage("onPageLoad", onPageLoad))
+    act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
-    behave.like(saveAndContinue(onSubmit, validForm: _*))
-    behave.like(invalidForm(onSubmit))
-    behave.like(invalidForm(onSubmit, dobInFutureForm: _*))
-    behave.like(journeyRecoveryPage("onSubmit", onSubmit))
+    act.like(saveAndContinue(onSubmit, validForm: _*))
+    act.like(invalidForm(onSubmit))
+    act.like(invalidForm(onSubmit, dobInFutureForm: _*))
+    act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }
 }

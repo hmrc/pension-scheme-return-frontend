@@ -21,6 +21,7 @@ import eu.timepit.refined.refineMV
 import models.NormalMode
 import pages.{MemberDetailsNinoPage, MemberDetailsPage, NationalInsuranceNumberPage, NoNINOPage}
 import uk.gov.hmrc.domain.Nino
+import utils.UserAnswersUtils._
 import views.html.CheckYourAnswersView
 
 class SchemeMemberDetailsCYAControllerSpec extends ControllerBaseSpec {
@@ -42,32 +43,29 @@ class SchemeMemberDetailsCYAControllerSpec extends ControllerBaseSpec {
     .unsafeSet(NoNINOPage(srn, refineMV(1)), noNinoReason)
 
   "SchemeMemberDetailsCYAController" should {
-    "with nino" should {
-      behave.like(
-        renderView(onPageLoad, userAnswersWithNino)(
-          implicit app =>
-            implicit request =>
-              injected[CheckYourAnswersView].apply(
-                viewModel(refineMV(1), srn, NormalMode, memberDetails, hasNINO = true, Some(nino), None)
-              )
-        )
-      )
-    }
 
-    "without nino" should {
-      behave.like(
-        renderView(onPageLoad, userAnswersWithoutNino)(
-          implicit app =>
-            implicit request =>
-              injected[CheckYourAnswersView].apply(
-                viewModel(refineMV(1), srn, NormalMode, memberDetails, hasNINO = false, None, Some(noNinoReason))
-              )
-        )
-      )
-    }
+    act.like(
+      renderView(onPageLoad, userAnswersWithNino)(
+        implicit app =>
+          implicit request =>
+            injected[CheckYourAnswersView].apply(
+              viewModel(refineMV(1), srn, NormalMode, memberDetails, hasNINO = true, Some(nino), None)
+            )
+      ).withName("render correct view when nino provided")
+    )
+
+    act.like(
+      renderView(onPageLoad, userAnswersWithoutNino)(
+        implicit app =>
+          implicit request =>
+            injected[CheckYourAnswersView].apply(
+              viewModel(refineMV(1), srn, NormalMode, memberDetails, hasNINO = false, None, Some(noNinoReason))
+            )
+      ).withName("render the correct view when no nino provided")
+    )
 
     "when member details is missing" should {
-      behave.like(
+      act.like(
         redirectToPage(
           onPageLoad,
           routes.JourneyRecoveryController.onPageLoad(),
@@ -77,7 +75,7 @@ class SchemeMemberDetailsCYAControllerSpec extends ControllerBaseSpec {
     }
 
     "when dose member have NINO is missing" should {
-      behave.like(
+      act.like(
         redirectToPage(
           onPageLoad,
           routes.JourneyRecoveryController.onPageLoad(),
@@ -87,7 +85,7 @@ class SchemeMemberDetailsCYAControllerSpec extends ControllerBaseSpec {
     }
 
     "when NINO is missing" should {
-      behave.like(
+      act.like(
         redirectToPage(
           onPageLoad,
           routes.JourneyRecoveryController.onPageLoad(),
@@ -97,7 +95,7 @@ class SchemeMemberDetailsCYAControllerSpec extends ControllerBaseSpec {
     }
 
     "when no NINO reason is missing" should {
-      behave.like(
+      act.like(
         redirectToPage(
           onPageLoad,
           routes.JourneyRecoveryController.onPageLoad(),
@@ -106,8 +104,8 @@ class SchemeMemberDetailsCYAControllerSpec extends ControllerBaseSpec {
       )
     }
 
-    behave.like(journeyRecoveryPage("onPageLoad", onPageLoad))
-    behave.like(journeyRecoveryPage("onSubmit", onSubmit))
+    act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
+    act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
 
     "viewModel" should {
       "contain all rows if has nino is true and nino is present" in {

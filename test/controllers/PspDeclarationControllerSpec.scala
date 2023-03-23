@@ -27,16 +27,16 @@ class PspDeclarationControllerSpec extends ControllerBaseSpec {
     lazy val onPageLoad = routes.PspDeclarationController.onPageLoad(srn)
     lazy val onSubmit = routes.PspDeclarationController.onSubmit(srn)
 
-    behave.like(renderView(onPageLoad) { implicit app => implicit request =>
+    act.like(renderView(onPageLoad) { implicit app => implicit request =>
       val view = injected[ContentPageView]
       view(viewModel)
     })
 
-    behave.like(journeyRecoveryPage("onPageLoad", onPageLoad))
+    act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
-    behave.like(agreeAndContinue(onSubmit))
+    act.like(agreeAndContinue(onSubmit))
 
-    behave.like(journeyRecoveryPage("onSubmit", onSubmit))
+    act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
 
   }
 }

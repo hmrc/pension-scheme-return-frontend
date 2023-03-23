@@ -17,7 +17,7 @@
 package forms
 
 import forms.behaviours.FieldBehaviours
-import forms.mappings.DateFormErrors
+import forms.mappings.errors.DateFormErrors
 import models.NameDOB
 import org.scalacheck.Gen.alphaChar
 import play.api.data.{Form, FormError}

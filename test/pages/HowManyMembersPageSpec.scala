@@ -14,22 +14,19 @@
  * limitations under the License.
  */
 
-package forms.mappings
+package pages
 
-import java.time.LocalDate
+import models.SchemeMemberNumbers
+import pages.behaviours.PageBehaviours
 
-case class DateFormErrors(
-  required: String,
-  requiredDay: String,
-  requiredMonth: String,
-  requiredYear: String,
-  requiredTwo: String,
-  invalidDate: String,
-  invalidCharacters: String,
-  validators: List[LocalDate => Option[String]] = List()
-)
+class HowManyMembersPageSpec extends PageBehaviours {
 
-object DateFormErrors {
-  def failIfFutureDate(errorMsg: String): LocalDate => Option[String] =
-    date => Option.when(date.isAfter(LocalDate.now()))(errorMsg)
+  "howManyMembersPage" - {
+
+    beRetrievable[SchemeMemberNumbers](HowManyMembersPage(srnGen.sample.value, pensionSchemeIdGen.sample.value))
+
+    beSettable[SchemeMemberNumbers](HowManyMembersPage(srnGen.sample.value, pensionSchemeIdGen.sample.value))
+
+    beRemovable[SchemeMemberNumbers](HowManyMembersPage(srnGen.sample.value, pensionSchemeIdGen.sample.value))
+  }
 }

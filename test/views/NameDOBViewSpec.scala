@@ -17,7 +17,7 @@
 package views
 
 import forms.NameDOBFormProvider
-import forms.mappings.DateFormErrors
+import forms.mappings.errors.DateFormErrors
 import play.api.test.FakeRequest
 import views.html.NameDOBView
 
@@ -47,13 +47,13 @@ class NameDOBViewSpec extends ViewSpec {
     )
 
     "NameDOBView" should {
-      behave.like(renderTitle(nameDOBViewModelGen)(view(form, _), _.title.key))
-      behave.like(renderHeading(nameDOBViewModelGen)(view(form, _), _.heading))
-      behave.like(renderInputWithLabel(nameDOBViewModelGen)("firstName", view(form, _), _.firstName))
-      behave.like(renderInputWithLabel(nameDOBViewModelGen)("lastName", view(form, _), _.lastName))
-      behave.like(renderForm(nameDOBViewModelGen)(view(form, _), _.onSubmit))
-      behave.like(renderDateInput(nameDOBViewModelGen)("dateOfBirth", view(form, _)))
-      behave.like(renderSaveAndContinueButton(nameDOBViewModelGen)(view(form, _)))
+      act.like(renderTitle(nameDOBViewModelGen)(view(form, _), _.title.key))
+      act.like(renderHeading(nameDOBViewModelGen)(view(form, _), _.heading))
+      act.like(renderInputWithLabel(nameDOBViewModelGen)("firstName", view(form, _), _.firstName))
+      act.like(renderInputWithLabel(nameDOBViewModelGen)("lastName", view(form, _), _.lastName))
+      act.like(renderForm(nameDOBViewModelGen)(view(form, _), _.onSubmit))
+      act.like(renderDateInput(nameDOBViewModelGen)("dateOfBirth", view(form, _)))
+      act.like(renderSaveAndContinueButton(nameDOBViewModelGen)(view(form, _)))
     }
   }
 }

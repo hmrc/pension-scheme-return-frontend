@@ -32,10 +32,10 @@
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
-
         @defining(
-            TextareaViewModel("value", form("value").value).withRows(5)
+            TextareaViewModel("value", form("value").value)
+                .withLabelAsHeading(renderMessage(viewmodel.heading))
+                .withRows(5)
         ) { component =>
             @govukTextarea(
                 form("value").errors.headOption.fold(component)(error =>

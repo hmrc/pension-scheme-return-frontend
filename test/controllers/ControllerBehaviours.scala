@@ -36,49 +36,63 @@ trait ControllerBehaviours {
 
   def renderView(call: => Call, userAnswers: UserAnswers = defaultUserAnswers)(
     view: Application => Request[_] => Html
-  ): Unit =
-    "return OK and the correct view" in {
-      val appBuilder = applicationBuilder(Some(userAnswers))
-      render(appBuilder, call)(view)
-    }
+  ): BehaviourTest =
+    BehaviourTest(
+      "return OK and the correct view",
+      () => {
+        val appBuilder = applicationBuilder(Some(userAnswers))
+        render(appBuilder, call)(view)
+      }
+    )
 
   def renderPrePopView[A: Writes](call: => Call, page: Settable[A], value: A)(
     view: Application => Request[_] => Html
-  ): Unit =
+  ): BehaviourTest =
     renderPrePopView(call, page, value, defaultUserAnswers)(view)
 
   def renderPrePopView[A: Writes](call: => Call, page: Settable[A], value: A, userAnswers: UserAnswers)(
     view: Application => Request[_] => Html
-  ): Unit =
-    "return OK and the correct pre-populated view for a GET" in {
-      val appBuilder = applicationBuilder(Some(userAnswers.set(page, value).success.value))
-      render(appBuilder, call)(view)
-    }
-
-  def redirectWhenCacheEmpty(call: => Call, nextPage: => Call): Unit =
-    s"redirect to $nextPage when cache empty" in {
-      running(_ => applicationBuilder(userAnswers = Some(emptyUserAnswers))) { app =>
-        val request = FakeRequest(call)
-        val result = route(app, request).value
-
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result).value mustBe nextPage.url
+  ): BehaviourTest =
+    BehaviourTest(
+      "return OK and the correct pre-populated view for a GET",
+      () => {
+        val appBuilder = applicationBuilder(Some(userAnswers.set(page, value).success.value))
+        render(appBuilder, call)(view)
       }
-    }
+    )
 
-  def journeyRecoveryPage(name: String, call: => Call): Unit =
-    s"$name must redirect to Journey Recovery if no existing data is found" in {
+  def redirectWhenCacheEmpty(call: => Call, nextPage: => Call): BehaviourTest =
+    BehaviourTest(
+      s"redirect to $nextPage when cache empty",
+      () => {
+        running(_ => applicationBuilder(userAnswers = Some(emptyUserAnswers))) { app =>
+          val request = FakeRequest(call)
+          val result = route(app, request).value
 
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-
-        val result = route(application, FakeRequest(call)).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result).value mustBe nextPage.url
+        }
       }
-    }
+    )
+
+  def journeyRecoveryPage(call: => Call, userAnswers: Option[UserAnswers]): BehaviourTest =
+    BehaviourTest(
+      s"must redirect to Journey Recovery if no existing data is found",
+      () => {
+        val application = applicationBuilder(userAnswers = userAnswers).build()
+
+        running(application) {
+
+          val result = route(application, FakeRequest(call)).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
+    )
+
+  def journeyRecoveryPage(call: => Call): BehaviourTest =
+    journeyRecoveryPage(call, None)
 
   private def render(appBuilder: GuiceApplicationBuilder, call: => Call)(
     view: Application => Request[_] => Html
@@ -92,127 +106,145 @@ trait ControllerBehaviours {
       contentAsString(result) mustEqual expectedView.body
     }
 
-  def invalidForm(call: => Call, userAnswers: UserAnswers, form: (String, String)*): Unit =
-    s"return BAD_REQUEST for a POST with invalid form data ${form.toString()}" in {
-      val appBuilder = applicationBuilder(Some(userAnswers))
+  def invalidForm(call: => Call, userAnswers: UserAnswers, form: (String, String)*): BehaviourTest =
+    BehaviourTest(
+      s"return BAD_REQUEST for a POST with invalid form data ${form.toString()}",
+      () => {
+        val appBuilder = applicationBuilder(Some(userAnswers))
 
-      running(_ => appBuilder) { app =>
-        val request = FakeRequest(call).withFormUrlEncodedBody(form: _*)
-        val result = route(app, request).value
+        running(_ => appBuilder) { app =>
+          val request = FakeRequest(call).withFormUrlEncodedBody(form: _*)
+          val result = route(app, request).value
 
-        status(result) mustEqual BAD_REQUEST
+          status(result) mustEqual BAD_REQUEST
+        }
       }
-    }
+    )
 
-  def invalidForm(call: => Call, form: (String, String)*): Unit =
+  def invalidForm(call: => Call, form: (String, String)*): BehaviourTest =
     invalidForm(call, defaultUserAnswers, form: _*)
 
-  def redirectNextPage(call: => Call, userAnswers: UserAnswers, form: (String, String)*): Unit =
-    s"redirect to the next page with form ${form.toList}" in {
+  def redirectNextPage(call: => Call, userAnswers: UserAnswers, form: (String, String)*): BehaviourTest =
+    BehaviourTest(
+      s"redirect to the next page with form ${form.toList}",
+      () => {
+        val appBuilder = applicationBuilder(Some(userAnswers)).overrides(
+          bind[Navigator].toInstance(new FakeNavigator(testOnwardRoute))
+        )
 
-      val appBuilder = applicationBuilder(Some(userAnswers)).overrides(
-        bind[Navigator].toInstance(new FakeNavigator(testOnwardRoute))
-      )
+        running(_ => appBuilder) { app =>
+          val request = FakeRequest(call).withFormUrlEncodedBody(form: _*)
 
-      running(_ => appBuilder) { app =>
-        val request = FakeRequest(call).withFormUrlEncodedBody(form: _*)
+          val result = route(app, request).value
 
-        val result = route(app, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual testOnwardRoute.url
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual testOnwardRoute.url
+        }
       }
-    }
+    )
 
-  def redirectNextPage(call: => Call, form: (String, String)*): Unit =
+  def redirectNextPage(call: => Call, form: (String, String)*): BehaviourTest =
     redirectNextPage(call, defaultUserAnswers, form: _*)
 
-  def redirectToPage(call: => Call, page: => Call, userAnswers: UserAnswers, form: (String, String)*): Unit =
-    s"redirect to page with form $form" in {
-      val appBuilder = applicationBuilder(Some(userAnswers))
+  def redirectToPage(call: => Call, page: => Call, userAnswers: UserAnswers, form: (String, String)*): BehaviourTest =
+    BehaviourTest(
+      s"redirect to page with form $form",
+      () => {
+        val appBuilder = applicationBuilder(Some(userAnswers))
 
-      running(_ => appBuilder) { app =>
-        val request = FakeRequest(call).withFormUrlEncodedBody(form: _*)
+        running(_ => appBuilder) { app =>
+          val request = FakeRequest(call).withFormUrlEncodedBody(form: _*)
 
-        val result = route(app, request).value
+          val result = route(app, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual page.url
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual page.url
+        }
       }
-    }
+    )
 
-  def redirectToPage(call: => Call, page: => Call, form: (String, String)*): Unit =
+  def redirectToPage(call: => Call, page: => Call, form: (String, String)*): BehaviourTest =
     redirectToPage(call, page, defaultUserAnswers, form: _*)
 
-  def saveAndContinue(call: => Call, userAnswers: UserAnswers, form: (String, String)*): Unit =
-    "save data and continue to next page" in {
+  def saveAndContinue(call: => Call, userAnswers: UserAnswers, form: (String, String)*): BehaviourTest =
+    BehaviourTest(
+      "save data and continue to next page",
+      () => {
 
-      val saveService = mock[SaveService]
-      when(saveService.save(any())(any(), any())).thenReturn(Future.successful(()))
+        val saveService = mock[SaveService]
+        when(saveService.save(any())(any(), any())).thenReturn(Future.successful(()))
 
-      val appBuilder = applicationBuilder(Some(userAnswers))
-        .overrides(
-          bind[SaveService].toInstance(saveService),
-          bind[Navigator].toInstance(new FakeNavigator(testOnwardRoute))
-        )
+        val appBuilder = applicationBuilder(Some(userAnswers))
+          .overrides(
+            bind[SaveService].toInstance(saveService),
+            bind[Navigator].toInstance(new FakeNavigator(testOnwardRoute))
+          )
 
-      running(_ => appBuilder) { app =>
-        val request = FakeRequest(call).withFormUrlEncodedBody(form: _*)
+        running(_ => appBuilder) { app =>
+          val request = FakeRequest(call).withFormUrlEncodedBody(form: _*)
 
-        val result = route(app, request).value
+          val result = route(app, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual testOnwardRoute.url
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual testOnwardRoute.url
 
-        verify(saveService, times(1)).save(any())(any(), any())
+          verify(saveService, times(1)).save(any())(any(), any())
+        }
       }
-    }
+    )
 
-  def saveAndContinue(call: => Call, form: (String, String)*): Unit =
+  def saveAndContinue(call: => Call, form: (String, String)*): BehaviourTest =
     saveAndContinue(call, defaultUserAnswers, form: _*)
 
-  def continueNoSave(call: => Call, userAnswers: UserAnswers, form: (String, String)*): Unit =
-    "continue to the next page without saving" in {
-      val saveService = mock[SaveService]
-      when(saveService.save(any())(any(), any())).thenReturn(Future.failed(new Exception("Unreachable code")))
+  def continueNoSave(call: => Call, userAnswers: UserAnswers, form: (String, String)*): BehaviourTest =
+    BehaviourTest(
+      "continue to the next page without saving",
+      () => {
+        val saveService = mock[SaveService]
+        when(saveService.save(any())(any(), any())).thenReturn(Future.failed(new Exception("Unreachable code")))
 
-      val appBuilder = applicationBuilder(Some(userAnswers))
-        .overrides(
-          bind[SaveService].toInstance(saveService),
-          bind[Navigator].toInstance(new FakeNavigator(testOnwardRoute))
-        )
+        val appBuilder = applicationBuilder(Some(userAnswers))
+          .overrides(
+            bind[SaveService].toInstance(saveService),
+            bind[Navigator].toInstance(new FakeNavigator(testOnwardRoute))
+          )
 
-      running(_ => appBuilder) { app =>
-        val request = FakeRequest(call).withFormUrlEncodedBody(form: _*)
+        running(_ => appBuilder) { app =>
+          val request = FakeRequest(call).withFormUrlEncodedBody(form: _*)
 
-        val result = route(app, request).value
+          val result = route(app, request).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual testOnwardRoute.url
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual testOnwardRoute.url
 
-        verify(saveService, never).save(any())(any(), any())
+          verify(saveService, never).save(any())(any(), any())
+        }
       }
-    }
+    )
 
-  def continueNoSave(call: => Call, form: (String, String)*): Unit =
+  def continueNoSave(call: => Call, form: (String, String)*): BehaviourTest =
     continueNoSave(call, defaultUserAnswers, form: _*)
 
-  def agreeAndContinue(call: => Call, userAnswers: UserAnswers): Unit =
-    "agree and continue to next page" in {
+  def agreeAndContinue(call: => Call, userAnswers: UserAnswers): BehaviourTest =
+    BehaviourTest(
+      "agree and continue to next page",
+      () => {
 
-      val appBuilder = applicationBuilder(Some(userAnswers))
-        .overrides(
-          bind[Navigator].toInstance(new FakeNavigator(testOnwardRoute))
-        )
+        val appBuilder = applicationBuilder(Some(userAnswers))
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(testOnwardRoute))
+          )
 
-      running(_ => appBuilder) { app =>
-        val result = route(app, FakeRequest(call)).value
+        running(_ => appBuilder) { app =>
+          val result = route(app, FakeRequest(call)).value
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual testOnwardRoute.url
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual testOnwardRoute.url
 
+        }
       }
-    }
-  def agreeAndContinue(call: => Call): Unit =
+    )
+
+  def agreeAndContinue(call: => Call): BehaviourTest =
     agreeAndContinue(call, defaultUserAnswers)
 }
