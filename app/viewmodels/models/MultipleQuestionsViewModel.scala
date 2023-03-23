@@ -16,12 +16,12 @@
 
 package viewmodels.models
 
-import forms.FormMapping
+import play.api.data.Form
 import viewmodels.DisplayMessage.InlineMessage
 
 sealed trait MultipleQuestionsViewModel[A] {
 
-  val form: FormMapping[A]
+  val form: Form[A]
 
   def fields: List[Field]
 }
@@ -29,14 +29,14 @@ sealed trait MultipleQuestionsViewModel[A] {
 object MultipleQuestionsViewModel {
 
   case class SingleQuestion[A](
-    form: FormMapping[A]
+    form: Form[A]
   ) extends MultipleQuestionsViewModel[A] {
 
     override val fields: List[Field] = List()
   }
 
   case class DoubleQuestion[A](
-    form: FormMapping[(A, A)],
+    form: Form[(A, A)],
     field1: Field,
     field2: Field
   ) extends MultipleQuestionsViewModel[(A, A)] {
@@ -45,7 +45,7 @@ object MultipleQuestionsViewModel {
   }
 
   case class TripleQuestion[A](
-    form: FormMapping[(A, A, A)],
+    form: Form[(A, A, A)],
     field1: Field,
     field2: Field,
     field3: Field

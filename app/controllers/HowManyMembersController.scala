@@ -20,13 +20,14 @@ import cats.implicits.toShow
 import config.Constants.maxMembers
 import controllers.HowManyMembersController._
 import controllers.actions._
+import forms.IntFormProvider
 import forms.mappings.errors.IntFormErrors
-import forms.{FormMapping, IntFormProvider}
+import models.Mode
 import models.SchemeId.Srn
 import models.requests.DataRequest
-import models.{Mode, SchemeMemberNumbers}
 import navigation.Navigator
 import pages.HowManyMembersPage
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.{SaveService, SchemeDateService}
@@ -59,10 +60,10 @@ class HowManyMembersController @Inject()(
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     usingSubmissionEndDate(srn) { submissionEndDate =>
-      val answer = request.userAnswers.get(HowManyMembersPage(srn, request.pensionSchemeId))
+      val page = HowManyMembersPage(srn, request.pensionSchemeId)
       val schemeName = request.schemeDetails.schemeName
 
-      Ok(view(viewModel(srn, schemeName, submissionEndDate, mode, form.fill(answer))))
+      Ok(view(viewModel(srn, schemeName, submissionEndDate, mode, request.userAnswers.fillForm(page, form))))
     }
   }
 
@@ -79,9 +80,9 @@ class HowManyMembersController @Inject()(
               BadRequest(view(viewModel(srn, schemeName, submissionEndDate, mode, formWithErrors)))
             }
           },
-        (value: SchemeMemberNumbers) =>
+        value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(page, value))
+            updatedAnswers <- Future.fromTry(request.userAnswers.transformAndSet(page, value))
             _ <- saveService.save(updatedAnswers)
           } yield Redirect(navigator.nextPage(page, mode, updatedAnswers))
       )
@@ -118,7 +119,7 @@ object HowManyMembersController {
       (maxMembers, "howManyMembers.field3.error.max")
     )
 
-  def form(formProvider: IntFormProvider): FormMapping[(Int, Int, Int)] = formProvider(
+  def form(formProvider: IntFormProvider): Form[(Int, Int, Int)] = formProvider(
     field1Errors,
     field2Errors,
     field3Errors
@@ -129,7 +130,7 @@ object HowManyMembersController {
     schemeName: String,
     endDate: LocalDate,
     mode: Mode,
-    form: FormMapping[(Int, Int, Int)]
+    form: Form[(Int, Int, Int)]
   ): IntViewModel[(Int, Int, Int)] = IntViewModel(
     Message("howManyMembers.title", endDate.show),
     Message("howManyMembers.heading", schemeName, endDate.show),

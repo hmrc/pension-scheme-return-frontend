@@ -16,9 +16,11 @@
 
 package models
 
+import play.api.data.Form
 import play.api.libs.json._
 import queries.{Gettable, Settable}
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
+import utils.Transform
 
 import java.time.Instant
 import scala.util.{Failure, Success, Try}
@@ -35,6 +37,12 @@ final case class UserAnswers(
   def list[A](page: Gettable[List[A]])(implicit rds: Reads[A]): List[A] =
     get(page).getOrElse(Nil)
 
+  def transformAndSet[A, B](
+    page: Settable[B],
+    value: A
+  )(implicit writes: Writes[B], transform: Transform[A, B]): Try[UserAnswers] =
+    set(page, transform.to(value))
+
   def set[A](page: Settable[A], value: A)(implicit writes: Writes[A]): Try[UserAnswers] = {
 
     val updatedData = data.setObject(page.path, Json.toJson(value)) match {
@@ -49,6 +57,9 @@ final case class UserAnswers(
       page.cleanup(Some(value), updatedAnswers)
     }
   }
+
+  def fillForm[A, B](page: Gettable[B], form: Form[A])(implicit reads: Reads[B], transform: Transform[A, B]): Form[A] =
+    get(page).fold(form)(b => form.fill(transform.from(b)))
 
   def remove[A](page: Settable[A]): Try[UserAnswers] = {
 

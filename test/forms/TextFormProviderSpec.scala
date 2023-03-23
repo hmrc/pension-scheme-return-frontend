@@ -33,7 +33,7 @@ class TextFormProviderSpec extends FieldBehaviours {
       "invalid"
     )
 
-    val invalidTextGen = asciiStr.suchThat(_.nonEmpty).suchThat(!_.matches(formProvider.textAreaRegex))
+    val invalidTextGen = asciiStr.suchThat(_.trim.nonEmpty).suchThat(!_.matches(formProvider.textAreaRegex))
 
     behave.like(fieldThatBindsValidData(form, "value", nonEmptyAlphaString))
     behave.like(mandatoryField(form, "value", "required"))

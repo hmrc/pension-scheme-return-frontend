@@ -51,17 +51,17 @@ class HowManyMembersControllerSpec extends ControllerBaseSpec {
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       val view = injected[IntView]
-      val form = form(injected[IntFormProvider])
+      val viewForm = form(injected[IntFormProvider])
 
       view(
-        viewModel(srn, defaultSchemeDetails.schemeName, submissionEndDate, NormalMode, form)
+        viewModel(srn, defaultSchemeDetails.schemeName, submissionEndDate, NormalMode, viewForm)
       )
     })
 
     act.like(renderPrePopView(onPageLoad, HowManyMembersPage(srn, pensionSchemeId), SchemeMemberNumbers(1, 2, 3)) {
       implicit app => implicit request =>
         val view = injected[IntView]
-        val populatedForm = form(injected[IntFormProvider]).fill(Some(SchemeMemberNumbers(1, 2, 3)))
+        val populatedForm = form(injected[IntFormProvider]).fill((1, 2, 3))
 
         view(
           viewModel(srn, defaultSchemeDetails.schemeName, submissionEndDate, NormalMode, populatedForm)

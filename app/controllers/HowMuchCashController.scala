@@ -20,12 +20,13 @@ import cats.implicits.toShow
 import com.google.inject.Inject
 import config.Constants.maxCashInBank
 import controllers.actions._
+import forms.MoneyFormProvider
 import forms.mappings.errors.MoneyFormErrors
-import forms.{FormMapping, MoneyFormProvider}
 import models.SchemeId.Srn
 import models.{Mode, Money}
 import navigation.Navigator
 import pages.HowMuchCashPage
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{SaveService, TaxYearService}
@@ -63,7 +64,7 @@ class HowMuchCashController @Inject()(
       mode,
       request.schemeDetails.schemeName,
       taxYear,
-      form.fill(request.userAnswers.get(HowMuchCashPage(srn)))
+      request.userAnswers.fillForm(HowMuchCashPage(srn), form)
     )
 
     Ok(view(viewModel))
@@ -74,23 +75,25 @@ class HowMuchCashController @Inject()(
 
     form
       .bindFromRequest()
-      .fold { formWithErrors =>
-        val viewModel =
-          HowMuchCashController.viewModel(srn, mode, request.schemeDetails.schemeName, taxYear, formWithErrors)
+      .fold(
+        formWithErrors => {
+          val viewModel =
+            HowMuchCashController.viewModel(srn, mode, request.schemeDetails.schemeName, taxYear, formWithErrors)
 
-        Future.successful(BadRequest(view(viewModel)))
-      } { value =>
-        for {
-          updatedAnswers <- Future.fromTry(request.userAnswers.set(HowMuchCashPage(srn), value))
-          _ <- saveService.save(updatedAnswers)
-        } yield Redirect(navigator.nextPage(HowMuchCashPage(srn), mode, updatedAnswers))
-      }
+          Future.successful(BadRequest(view(viewModel)))
+        },
+        value =>
+          for {
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(HowMuchCashPage(srn), value))
+            _ <- saveService.save(updatedAnswers)
+          } yield Redirect(navigator.nextPage(HowMuchCashPage(srn), mode, updatedAnswers))
+      )
   }
 }
 
 object HowMuchCashController {
 
-  def form(formProvider: MoneyFormProvider, schemeName: String, taxYear: TaxYear): FormMapping[Money] =
+  def form(formProvider: MoneyFormProvider, schemeName: String, taxYear: TaxYear): Form[Money] =
     formProvider(
       MoneyFormErrors(
         "howMuchCash.error.required",
@@ -105,7 +108,7 @@ object HowMuchCashController {
     mode: Mode,
     schemeName: String,
     taxYear: TaxYear,
-    form: FormMapping[Money]
+    form: Form[Money]
   ): MoneyViewModel[Money] = MoneyViewModel(
     Message("howMuchCash.title", schemeName, taxYear.starts.show),
     Message("howMuchCash.heading", schemeName, taxYear.starts.show),

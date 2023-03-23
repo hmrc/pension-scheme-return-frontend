@@ -26,7 +26,7 @@ object MoneyFormErrors {
 
   def default(
     requiredKey: String = "error.required",
-    nonNumericKey: String = "error.nonNumeric",
+    nonNumericKey: String = "error.nonMoney",
     max: (Double, String) = (Double.MaxValue, "error.tooLarge")
   ): MoneyFormErrors =
     MoneyFormErrors(requiredKey, nonNumericKey, max)

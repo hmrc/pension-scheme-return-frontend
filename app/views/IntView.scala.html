@@ -29,7 +29,7 @@
   @formHelper(action = viewmodel.onSubmit, Symbol("autocomplete") -> "off") {
 
     @if(viewmodel.questions.form.hasErrors) {
-      @govukErrorSummary(ErrorSummaryViewModel(viewmodel.questions.form.errors))
+      @govukErrorSummary(ErrorSummaryViewModel(viewmodel.questions.form))
     }
 
     @if(viewmodel.questions.fields.length > 1) {

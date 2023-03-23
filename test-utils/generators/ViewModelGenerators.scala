@@ -16,10 +16,8 @@
 
 package generators
 
-import forms.FormMapping
 import org.scalacheck.Gen
-import play.api.data.FieldMapping
-import play.api.data.Forms.mapping
+import play.api.data.Form
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.MultipleQuestionsViewModel.{DoubleQuestion, SingleQuestion, TripleQuestion}
 import viewmodels.models._
@@ -216,55 +214,41 @@ trait ViewModelGenerators extends BasicGenerators {
       Field(label, hint)
     }
 
-  def singleQuestionGen[A](fieldMapping: FieldMapping[A]): Gen[SingleQuestion[A]] =
-    Gen.const(SingleQuestion(FormMapping(mapping("value" -> fieldMapping)(identity)(Some(_)))))
+  def singleQuestionGen[A](form: Form[A]): Gen[SingleQuestion[A]] =
+    Gen.const(SingleQuestion(form))
 
-  def doubleQuestionGen[A](fieldMapping: FieldMapping[A]): Gen[DoubleQuestion[A]] =
+  def doubleQuestionGen[A](form: Form[(A, A)]): Gen[DoubleQuestion[A]] =
     for {
       field1 <- fieldGen
       field2 <- fieldGen
     } yield {
       DoubleQuestion(
-        FormMapping(
-          mapping(
-            "value.1" -> fieldMapping,
-            "value.2" -> fieldMapping
-          )(Tuple2.apply)(Tuple2.unapply)
-        ),
+        form,
         field1,
         field2
       )
     }
 
-  def tripleQuestionGen[A](fieldMapping: FieldMapping[A]): Gen[TripleQuestion[A]] =
+  def tripleQuestionGen[A](form: Form[(A, A, A)]): Gen[TripleQuestion[A]] =
     for {
       field1 <- fieldGen
       field2 <- fieldGen
       field3 <- fieldGen
     } yield {
       TripleQuestion(
-        FormMapping(
-          mapping(
-            "value.1" -> fieldMapping,
-            "value.2" -> fieldMapping,
-            "value.3" -> fieldMapping
-          )(Tuple3.apply)(Tuple3.unapply)
-        ),
+        form,
         field1,
         field2,
         field3
       )
     }
 
-  def multipleQuestionsViewModelGen[A](fieldMapping: FieldMapping[A]): Gen[MultipleQuestionsViewModel[_]] =
-    Gen.oneOf(singleQuestionGen(fieldMapping), doubleQuestionGen(fieldMapping), tripleQuestionGen(fieldMapping))
-
-  def moneyViewModelGen[A](fieldMapping: FieldMapping[A]): Gen[MoneyViewModel[_]] =
+  def moneyViewModelGen[A](questionsGen: Gen[MultipleQuestionsViewModel[A]]): Gen[MoneyViewModel[_]] =
     for {
       title <- nonEmptyMessage
       heading <- nonEmptyMessage
       description <- Gen.option(nonEmptyBlockMessage)
-      questions <- multipleQuestionsViewModelGen(fieldMapping)
+      questions <- questionsGen
       onSubmit <- call
     } yield {
       MoneyViewModel(title, heading, description, questions, onSubmit)
@@ -280,11 +264,11 @@ trait ViewModelGenerators extends BasicGenerators {
       TextInputViewModel(title, heading, label, onSubmit)
     }
 
-  def tripleIntViewModelGen[A](fieldMapping: FieldMapping[A]): Gen[IntViewModel[_]] =
+  def intViewModelGen[A](questions: Gen[MultipleQuestionsViewModel[A]]): Gen[IntViewModel[_]] =
     for {
       title <- nonEmptyMessage
       heading <- nonEmptyMessage
-      questions <- multipleQuestionsViewModelGen(fieldMapping)
+      questions <- questions
       onSubmit <- call
     } yield {
       IntViewModel(title, heading, questions, onSubmit)
