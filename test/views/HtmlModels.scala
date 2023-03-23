@@ -35,6 +35,8 @@ trait HtmlModels {
       )
   }
 
+  case class PaginationElement(text: String, isCurrentPage: Boolean)
+
   case class Form(method: String, action: String)
 
   object Form {

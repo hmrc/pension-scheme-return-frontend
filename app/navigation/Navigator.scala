@@ -16,7 +16,7 @@
 
 package navigation
 
-import config.Refined.{OneToTen, OneToThree}
+import config.Refined.{OneTo99, OneToTen, OneToThree}
 import controllers.routes
 import eu.timepit.refined.{refineMV, refineV}
 import models.PensionSchemeId.{PsaId, PspId}
@@ -24,6 +24,7 @@ import models._
 import pages.SchemeBankAccounts.SchemeBankAccountsOps
 import pages.{HowMuchCashPage, _}
 import play.api.mvc.Call
+import MembersDetails._
 
 import javax.inject.{Inject, Singleton}
 
@@ -82,7 +83,7 @@ class Navigator @Inject()() {
       case _ => routes.NoNINOController.onPageLoad(srn, index, NormalMode)
     }
     case MemberDetailsNinoPage(srn, index) => _ => routes.SchemeMemberDetailsCYAController.onPageLoad(srn, index)
-    case SchemeMemberDetailsCYAPage(srn) => _ => routes.UnauthorisedController.onPageLoad
+    case SchemeMemberDetailsCYAPage(srn) => _ => routes.SchemeMembersListController.onPageLoad(srn, page = 1)
     case PsaDeclarationPage(srn) => _ => routes.UnauthorisedController.onPageLoad
     case PspDeclarationPage(srn) => _ => routes.UnauthorisedController.onPageLoad
 
@@ -97,7 +98,13 @@ class Navigator @Inject()() {
     }
 
     case NoNINOPage(srn, index) => _ => routes.SchemeMemberDetailsCYAController.onPageLoad(srn, index)
-
+    case SchemeMembersListPage(srn, false) => _ => routes.UnauthorisedController.onPageLoad
+    case SchemeMembersListPage(srn, true) =>
+      ua =>
+        refineV[OneTo99](ua.membersDetails(srn).length + 1).fold(
+          _ => routes.JourneyRecoveryController.onPageLoad(),
+          index => routes.MemberDetailsController.onPageLoad(srn, index, NormalMode)
+        )
     case _ => _ => routes.IndexController.onPageLoad
   }
 

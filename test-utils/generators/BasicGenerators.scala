@@ -17,17 +17,20 @@
 package generators
 
 import cats.data.NonEmptyList
+import config.Refined.{Max99, OneTo99}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
 import org.scalacheck.Gen.{alphaChar, alphaNumChar, alphaNumStr, alphaStr, choose, chooseNum, listOfN, numChar}
 import play.api.mvc.Call
-import viewmodels.DisplayMessage
+import viewmodels.{DisplayMessage, Pagination}
 import viewmodels.DisplayMessage.ListType.Bullet
 import viewmodels.DisplayMessage._
 
 import java.time.{Instant, LocalDate, ZoneOffset}
+import eu.timepit.refined._
+import org.scalatest.EitherValues
 
-trait BasicGenerators {
+trait BasicGenerators extends EitherValues {
 
   def genIntersperseString(gen: Gen[String], value: String, frequencyV: Int = 1, frequencyN: Int = 10): Gen[String] = {
 
@@ -67,7 +70,7 @@ trait BasicGenerators {
       .map(_.bigDecimal.toPlainString)
 
   def intsBelowValue(value: Int): Gen[Int] =
-    arbitrary[Int].suchThat(_ < value)
+    Gen.choose(0, value)
 
   def intsAboveValue(value: Int): Gen[Int] =
     arbitrary[Int].suchThat(_ > value)
@@ -209,4 +212,15 @@ trait BasicGenerators {
       url <- relativeUrl
     } yield Call(method, url)
   }
+
+  val paginationGen: Gen[Pagination] = {
+    for {
+      currentPage <- intsBelowValue(5)
+      pageSize <- intsBelowValue(5)
+      totalSize <- intsBelowValue(10).suchThat(_ > (currentPage * pageSize))
+      call <- call
+    } yield Pagination(currentPage, pageSize, totalSize, _ => call)
+  }
+
+  implicit val max99: Gen[Max99] = chooseNum(1, 99).map(refineV[OneTo99](_).value)
 }

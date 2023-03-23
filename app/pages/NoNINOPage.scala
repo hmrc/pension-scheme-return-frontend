@@ -19,10 +19,11 @@ package pages
 import config.Refined.Max99
 import play.api.libs.json.JsPath
 import models.SchemeId.Srn
+import utils.RefinedUtils.RefinedIntOps
 
 case class NoNINOPage(srn: Srn, index: Max99) extends QuestionPage[String] {
 
-  override def path: JsPath = JsPath \ toString
+  override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString
 
   override def toString: String = "noNINO"
 }

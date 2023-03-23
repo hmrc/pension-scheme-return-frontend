@@ -115,6 +115,7 @@ object AccountingPeriodListController {
       Message("accountingPeriods.radios"),
       Message("accountingPeriods.inset"),
       showRadios = periods.length < 3,
+      pagination = None,
       routes.AccountingPeriodListController.onSubmit(srn, mode)
     )
   }

@@ -21,9 +21,9 @@
     govukButton: GovukButton,
     govukRadios: GovukRadios,
     hmrcListWithActions: HmrcListWithActions,
-    govukInsetText: GovukInsetText
+    govukInsetText: GovukInsetText,
+    govukPagination: GovukPagination
 )
-
 @(form: Form[Boolean], viewmodel: ListViewModel)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(viewmodel.title.toMessage)) {
@@ -36,17 +36,27 @@
 
         <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
 
-        @hmrcListWithActions(ListWithActionsViewModel(viewmodel.rows.map( value =>
-            ListWithActionsItemViewModel(
-              renderMessage(value.text),
-                List(
-                    ListWithActionsActionViewModel(messages("site.change"), value.changeUrl)
-                        .withVisuallyHiddenText(value.changeHiddenText.toMessage),
-                    ListWithActionsActionViewModel(messages("site.remove"), value.removeUrl)
-                        .withVisuallyHiddenText(value.removeHiddenText.toMessage),
+        @defining(viewmodel.pagination.fold(viewmodel.rows)(pagination =>
+            viewmodel.rows.paginate(pagination.currentPage, pagination.pageSize))
+        ){ rows =>
+            @hmrcListWithActions(ListWithActionsViewModel(
+                rows.map( value =>
+                    ListWithActionsItemViewModel(
+                        renderMessage(value.text),
+                        List(
+                            ListWithActionsActionViewModel(messages("site.change"), value.changeUrl)
+                                    .withVisuallyHiddenText(value.changeHiddenText.toMessage),
+                            ListWithActionsActionViewModel(messages("site.remove"), value.removeUrl)
+                                    .withVisuallyHiddenText(value.removeHiddenText.toMessage),
+                        )
+                    )
                 )
-            )
-        )))
+            ))
+        }
+
+        @viewmodel.pagination.map{ pagination =>
+            @govukPagination(PaginationViewModel(pagination))
+        }
 
         @if(viewmodel.showRadios){
             @govukRadios(

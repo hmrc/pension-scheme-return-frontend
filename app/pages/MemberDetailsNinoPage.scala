@@ -25,12 +25,12 @@ import utils.RefinedUtils.RefinedIntOps
 
 case class MemberDetailsNinoPage(srn: Srn, index: Max99) extends QuestionPage[Nino] {
 
-  override def path: JsPath = JsPath \ toString \ index.arrayIndex
+  override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString
 
   override def toString: String = "memberDetailsNinoPage"
 }
 
-case class MemberDetailsNinos(srn: Srn) extends Gettable[List[Nino]] {
+case class MemberDetailsNinos(srn: Srn) extends Gettable[Map[String, Nino]] {
 
   override def path: JsPath = JsPath \ toString
 

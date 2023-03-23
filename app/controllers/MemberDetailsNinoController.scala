@@ -32,7 +32,6 @@ import services.SaveService
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.FormUtils._
-import utils.ListUtils.ListOps
 import utils.RefinedUtils.RefinedIntOps
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
@@ -87,7 +86,7 @@ class MemberDetailsNinoController @Inject()(
   }
 
   private def duplicateNinos(srn: Srn, index: Max99)(implicit request: DataRequest[_]): List[Nino] =
-    request.userAnswers.list(MemberDetailsNinos(srn)).removeAt(index.arrayIndex)
+    request.userAnswers.map(MemberDetailsNinos(srn)).removed(index.arrayIndex.toString).values.toList
 }
 
 object MemberDetailsNinoController {
