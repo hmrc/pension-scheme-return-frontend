@@ -17,12 +17,11 @@
 package viewmodels.models
 
 import play.api.mvc.Call
-import viewmodels.DisplayMessage.{BlockMessage, Message}
+import viewmodels.DisplayMessage.Message
 
-case class MoneyViewModel[A](
+case class IntViewModel[A](
   title: Message,
   heading: Message,
-  description: Option[BlockMessage],
   questions: MultipleQuestionsViewModel[A],
   onSubmit: Call
 )

@@ -70,6 +70,9 @@ trait InputFluency {
     def withHint(hint: Hint): Input =
       input.copy(hint = Some(hint))
 
+    def withHint(hint: Option[Hint]): Input =
+      input.copy(hint = hint)
+
     def withFormGroupClasses(classes: String): Input =
       input.copy(formGroupClasses = classes)
 
