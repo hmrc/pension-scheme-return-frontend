@@ -240,3 +240,7 @@ noNINO.heading = Why does {0} not have a National Insurance number?
 noNINO.error.required = Enter the reason {0} does not have a National Insurance number
 noNINO.error.length = The reason {0} does not have a National Insurance number must be 160 characters or fewer
 noNINO.error.invalid = The reason {0} does not have a National Insurance number must only include letters a to z, numbers 0 to 9, and special characters such as hyphens, spaces and apostrophes
+
+removeMemberDetails.title = Are you sure you want to remove {0}?
+removeMemberDetails.heading = Are you sure you want to remove {0}?
+removeMemberDetails.error.required = Select yes if you are sure you want to remove
