@@ -22,7 +22,7 @@ import config.Refined.OneTo99
 import controllers.actions._
 import eu.timepit.refined._
 import forms.YesNoPageFormProvider
-import models.Mode
+import models.{Mode, Pagination}
 import models.SchemeId.Srn
 import navigation.Navigator
 import pages.{SchemeBankAccountListPage, SchemeMembersListPage}
@@ -32,12 +32,11 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
-import viewmodels.models.{ListRow, ListViewModel}
+import viewmodels.models.{ListRow, ListViewModel, PaginatedViewModel}
 import views.html.ListView
 import SchemeMembersListController._
 import config.Constants
 import pages.MembersDetails._
-import viewmodels.Pagination
 import viewmodels.govuk.pagination.PaginationViewModel
 
 class SchemeMembersListController @Inject()(
@@ -107,6 +106,13 @@ object SchemeMembersListController {
     val headingKey =
       if (memberNames.length > 1) "schemeMembersList.heading.plural" else "schemeMembersList.heading"
 
+    val pagination = Pagination(
+      currentPage = page,
+      pageSize = Constants.schemeMembersPageSize,
+      rows.size,
+      routes.SchemeMembersListController.onPageLoad(srn, _)
+    )
+
     ListViewModel(
       Message(titleKey, memberNames.length),
       Message(headingKey, memberNames.length),
@@ -114,12 +120,10 @@ object SchemeMembersListController {
       "schemeMembersList.radio",
       "schemeMembersList.inset",
       showRadios = memberNames.length < Constants.maxSchemeMembers,
-      pagination = Some(
-        Pagination(
-          currentPage = page,
-          pageSize = Constants.schemeMembersPageSize,
-          rows.size,
-          routes.SchemeMembersListController.onPageLoad(srn, _)
+      paginatedViewModel = Some(
+        PaginatedViewModel(
+          Message("schemeMembersList.pagination.label", pagination.pageStart, pagination.pageEnd, pagination.totalSize),
+          pagination
         )
       ),
       onSubmit = controllers.routes.SchemeMembersListController.onSubmit(srn, page)

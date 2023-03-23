@@ -81,7 +81,8 @@ lazy val root = (project in file("."))
       val scriptPath = baseDirectory.value.getCanonicalPath + "/migrate.sh"
       s"bash -c $scriptPath".!
     },
-    scalafmtOnCompile := true
+    scalafmtOnCompile := true,
+    addCommandAlias("runLocal", "run -Dapplication.router=testOnlyDoNotUseInAppConf.Routes")
   )
 
 lazy val testSettings: Seq[Def.Setting[_]] = Seq(

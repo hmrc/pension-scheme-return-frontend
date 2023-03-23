@@ -36,8 +36,8 @@
 
         <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
 
-        @defining(viewmodel.pagination.fold(viewmodel.rows)(pagination =>
-            viewmodel.rows.paginate(pagination.currentPage, pagination.pageSize))
+        @defining(viewmodel.paginatedViewModel.fold(viewmodel.rows)(paginatedViewModel =>
+            viewmodel.rows.paginate(paginatedViewModel.pagination.currentPage, paginatedViewModel.pagination.pageSize))
         ){ rows =>
             @hmrcListWithActions(ListWithActionsViewModel(
                 rows.map( value =>
@@ -54,8 +54,11 @@
             ))
         }
 
-        @viewmodel.pagination.map{ pagination =>
-            @govukPagination(PaginationViewModel(pagination))
+        @viewmodel.paginatedViewModel.map{ paginatedViewModel =>
+            @if(paginatedViewModel.pagination.totalPages > 1) {
+                <p id="pagination-label" class="govuk-body">@{renderMessage(paginatedViewModel.label)}</p>
+            }
+            @govukPagination(PaginationViewModel(paginatedViewModel.pagination))
         }
 
         @if(viewmodel.showRadios){

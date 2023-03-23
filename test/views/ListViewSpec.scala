@@ -17,11 +17,13 @@
 package views
 
 import forms.YesNoPageFormProvider
+import models.Pagination
 import org.scalatest.Assertion
 import play.api.Application
 import play.api.test.FakeRequest
 import play.twirl.api.Html
-import viewmodels.Pagination
+import viewmodels.DisplayMessage.Message
+import viewmodels.models.PaginatedViewModel
 import views.html.ListView
 
 class ListViewSpec extends ViewSpec {
@@ -123,8 +125,8 @@ class ListViewSpec extends ViewSpec {
             paginationTest(7, 2, 3) { html =>
               summaryListRows(html).size mustEqual 3
               val elems = paginationElements(html)
-              elems(1).isCurrentPage mustEqual true
-              elems.map(_.text) mustEqual List("1", "2", "3", "Next")
+              elems(2).isCurrentPage mustEqual true
+              elems.map(_.text) mustEqual List("Previous", "1", "2", "3", "Next")
             }
           }
 
@@ -132,8 +134,8 @@ class ListViewSpec extends ViewSpec {
             paginationTest(4, 2, 3) { html =>
               summaryListRows(html).size mustEqual 1
               val elems = paginationElements(html)
-              elems(1).isCurrentPage mustEqual true
-              elems.map(_.text) mustEqual List("1", "2")
+              elems(2).isCurrentPage mustEqual true
+              elems.map(_.text) mustEqual List("Previous", "1", "2")
             }
           }
         }
@@ -143,7 +145,8 @@ class ListViewSpec extends ViewSpec {
     def paginationTest(rows: Int, currentPage: Int, pageSize: Int)(f: Html => Unit): Unit =
       forAll(summaryViewModelGen(rows)) { viewModel =>
         val pagination = Pagination(currentPage, pageSize, viewModel.rows.size, _ => viewModel.onSubmit)
-        val paginatedViewModel = viewModel.copy(pagination = Some(pagination))
+        val paginatedViewModel =
+          viewModel.copy(paginatedViewModel = Some(PaginatedViewModel(Message("test label"), pagination)))
         val html = view(form, paginatedViewModel)
 
         f(html)

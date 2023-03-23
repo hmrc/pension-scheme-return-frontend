@@ -14,29 +14,17 @@
  * limitations under the License.
  */
 
-package viewmodels.models
+package models
 
-import models.Pagination
 import play.api.mvc.Call
-import viewmodels.DisplayMessage
-import viewmodels.DisplayMessage.Message
 
-case class ListRow(
-  text: DisplayMessage,
-  changeUrl: String,
-  changeHiddenText: Message,
-  removeUrl: String,
-  removeHiddenText: Message
-)
-
-case class ListViewModel(
-  title: Message,
-  heading: Message,
-  rows: List[ListRow],
-  radioText: Message,
-  insetText: Message,
-  // whether to render the radio buttons to add another entity to the list or continue
-  showRadios: Boolean = true,
-  paginatedViewModel: Option[PaginatedViewModel] = None,
-  onSubmit: Call
-)
+case class Pagination(
+  currentPage: Int,
+  pageSize: Int,
+  totalSize: Int,
+  call: Int => Call
+) {
+  val totalPages: Int = Math.ceil(totalSize.toDouble / pageSize.toDouble).toInt
+  val pageStart: Int = if (currentPage == 1) 1 else (currentPage * pageSize) - pageSize
+  val pageEnd: Int = if (currentPage == totalPages) totalSize else currentPage * pageSize
+}
