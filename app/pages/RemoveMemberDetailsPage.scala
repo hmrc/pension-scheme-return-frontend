@@ -25,6 +25,4 @@ case class RemoveMemberDetailsPage(srn: Srn) extends QuestionPage[Boolean] {
 
   override def toString: String = "removeMemberDetails"
 
-  //implicit val formats: Format[MemberDetails] = Json.format[MemberDetails]
-
 }
