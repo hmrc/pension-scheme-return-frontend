@@ -72,7 +72,7 @@ abstract class BaseSpec
 
   def urlEncode(input: String): String = URLEncoder.encode(input, "utf-8")
 
-  @deprecated("behave word has been replace with act word - behave.like becomes act.like")
+  @deprecated("behave word has been replace with act word - behave.like becomes act.like", since = "0.44.0")
   override val behave: BehaveWord = new BehaveWord
 
   /* ActWord has the same functionality as BehaveWord except it supports BehaviourTest
@@ -83,33 +83,64 @@ abstract class BaseSpec
 
     def like(unit: Unit): Unit = ()
 
-    def like(test: BehaviourTest): Unit = test.run()
+    def like(test: Behaviours): Unit = test.run()
 
     override def toString: String = "act"
   }
 
   val act = new ActWord
 
-  case class BehaviourTest(
-    name: String,
-    test: () => Unit,
-    beforeTest: () => Unit = () => (),
-    afterTest: () => Unit = () => ()
-  ) {
+  sealed trait Behaviours {
 
-    def withName(name: String): BehaviourTest = copy(name = name)
+    def run(): Unit
+  }
 
-    def updateName(update: String => String): BehaviourTest = copy(name = update(name))
+  object Behaviours {
 
-    def before(f: => Unit): BehaviourTest = copy(beforeTest = () => f)
+    case class BehaviourTest(
+      name: String,
+      test: () => Unit,
+      beforeTest: () => Unit = () => (),
+      afterTest: () => Unit = () => ()
+    ) extends Behaviours {
+      def withName(name: String): BehaviourTest = copy(name = name)
 
-    def after(f: => Unit): BehaviourTest = copy(afterTest = () => f)
+      def updateName(update: String => String): BehaviourTest = copy(name = update(name))
 
-    def run(): Unit =
-      name in {
-        beforeTest()
-        test()
-        afterTest()
-      }
+      def before(f: => Unit): BehaviourTest = copy(beforeTest = () => f)
+
+      def after(f: => Unit): BehaviourTest = copy(afterTest = () => f)
+
+      def run(): Unit =
+        name in {
+          beforeTest()
+          test()
+          afterTest()
+        }
+    }
+
+    case class MultipleBehaviourTests(
+      name: String,
+      behaviours: List[BehaviourTest],
+      beforeAllTests: () => Unit = () => (),
+      afterAllTests: () => Unit = () => ()
+    ) extends Behaviours {
+
+      def withName(name: String): MultipleBehaviourTests = copy(name = name)
+
+      def beforeAll(f: => Unit): MultipleBehaviourTests = copy(beforeAllTests = () => f)
+
+      def afterAll(f: => Unit): MultipleBehaviourTests = copy(afterAllTests = () => f)
+
+      def map(f: BehaviourTest => BehaviourTest): MultipleBehaviourTests =
+        copy(behaviours = behaviours.map(f))
+
+      def run(): Unit =
+        name should {
+          beforeAllTests()
+          behaviours.foreach(_.run())
+          afterAllTests()
+        }
+    }
   }
 }

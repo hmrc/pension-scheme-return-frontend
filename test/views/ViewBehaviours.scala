@@ -44,8 +44,6 @@ trait ViewBehaviours {
       forAll(gen) { viewModel =>
         val foundInput = input(view(viewModel))(name)
 
-        println(foundInput)
-
         assert(foundInput.nonEmpty)
         foundInput.map(_.label must startWith(messageKey(key(viewModel))))
       }

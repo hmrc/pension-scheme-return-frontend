@@ -14,29 +14,21 @@
  * limitations under the License.
  */
 
-package utils
+package pages
 
-/* Typeclass for transforming type A into B and type B into type A */
-trait Transform[A, B] {
-  def to(a: A): B
+import models.MoneyInPeriod
+import pages.behaviours.PageBehaviours
 
-  def from(b: B): A
-}
+class ValueOfAssetsPageSpec extends PageBehaviours {
 
-object Transform {
+  "ValueOfAssetsPage" - {
 
-  def apply[A, B](implicit ev: Transform[A, B]): Transform[A, B] = ev
+    val srn = srnGen.sample.value
 
-  implicit def identity[A]: Transform[A, A] = new Transform[A, A] {
-    override def to(a: A): A = a
+    beRetrievable[MoneyInPeriod](ValueOfAssetsPage(srn))
 
-    override def from(a: A): A = a
-  }
+    beSettable[MoneyInPeriod](ValueOfAssetsPage(srn))
 
-  implicit class TransformOps[A](val a: A) extends AnyVal {
-
-    def to[B](implicit ev: Transform[A, B]): B = ev.to(a)
-
-    def from[B](implicit ev: Transform[B, A]): B = ev.from(a)
+    beRemovable[MoneyInPeriod](ValueOfAssetsPage(srn))
   }
 }

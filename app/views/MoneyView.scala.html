@@ -34,10 +34,10 @@
       @govukErrorSummary(ErrorSummaryViewModel(viewmodel.questions.form))
     }
 
-    @viewmodel.description.map(renderMessage)
-
     @if(viewmodel.questions.fields.length > 1) {
       <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
+
+      @viewmodel.description.map(renderMessage)
 
       @viewmodel.questions.fields.zipWithIndex.map { case (field, index) =>
         @govukInput(

@@ -27,7 +27,6 @@ import models.requests.{AllowedAccessRequest, IdentifierRequest}
 import org.scalacheck.Gen
 import org.scalacheck.Gen.numChar
 import play.api.mvc.Request
-import play.api.test.FakeRequest
 import uk.gov.hmrc.domain.Nino
 
 trait ModelGenerators extends BasicGenerators {
@@ -175,6 +174,13 @@ trait ModelGenerators extends BasicGenerators {
     val decimalString = decimals.map(d => s".$d").getOrElse("")
     val result = s"$whole$decimalString".toDouble
     Money(result)
+  }
+
+  implicit val moneyInPeriodGen: Gen[MoneyInPeriod] = for {
+    moneyAtStart <- moneyGen
+    moneyAtEnd <- moneyGen
+  } yield {
+    MoneyInPeriod(moneyAtStart, moneyAtEnd)
   }
 
   val ninoPrefix: Gen[String] = {

@@ -34,6 +34,8 @@ import scala.concurrent.Future
 trait ControllerBehaviours {
   _: ControllerBaseSpec =>
 
+  import Behaviours._
+
   def renderView(call: => Call, userAnswers: UserAnswers = defaultUserAnswers)(
     view: Application => Request[_] => Html
   ): BehaviourTest =

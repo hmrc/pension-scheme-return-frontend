@@ -219,7 +219,6 @@ class MappingsSpec extends AnyFreeSpec with Matchers with OptionValues with Mapp
 
     "must bind a double with a £ symbol" in {
       val result = testForm.bind(Map("value" -> "£10.01"))
-      result.errors.foreach(println)
       result.get mustEqual Money(10.01)
     }
 

@@ -14,29 +14,14 @@
  * limitations under the License.
  */
 
-package utils
+package pages
 
-/* Typeclass for transforming type A into B and type B into type A */
-trait Transform[A, B] {
-  def to(a: A): B
+import models.MoneyInPeriod
+import models.SchemeId.Srn
+import play.api.libs.json.JsPath
 
-  def from(b: B): A
-}
+case class ValueOfAssetsPage(srn: Srn) extends QuestionPage[MoneyInPeriod] {
+  override def path: JsPath = JsPath \ toString
 
-object Transform {
-
-  def apply[A, B](implicit ev: Transform[A, B]): Transform[A, B] = ev
-
-  implicit def identity[A]: Transform[A, A] = new Transform[A, A] {
-    override def to(a: A): A = a
-
-    override def from(a: A): A = a
-  }
-
-  implicit class TransformOps[A](val a: A) extends AnyVal {
-
-    def to[B](implicit ev: Transform[A, B]): B = ev.to(a)
-
-    def from[B](implicit ev: Transform[B, A]): B = ev.from(a)
-  }
+  override def toString: String = "valueOfAssets"
 }

@@ -98,7 +98,6 @@ POST        /:srn/member-details/:index                           controllers.Me
 GET         /:srn/change-member-details/:index                    controllers.MemberDetailsController.onPageLoad(srn: Srn, index: Max99, mode: Mode = CheckMode)
 POST        /:srn/change-member-details/:index                    controllers.MemberDetailsController.onSubmit(srn: Srn, index: Max99, mode: Mode = CheckMode)
 
-
 GET         /:srn/psa-declaration                                 controllers.PsaDeclarationController.onPageLoad(srn: Srn)
 POST        /:srn/psa-declaration                                 controllers.PsaDeclarationController.onSubmit(srn: Srn)
 
@@ -134,3 +133,9 @@ POST       /:srn/no-ni-number/:index                              controllers.No
 
 GET        /:srn/change-no-ni-number/:index                       controllers.NoNINOController.onPageLoad(srn: Srn, index: Max99, mode: Mode = CheckMode)
 POST       /:srn/change-no-ni-number/:index                       controllers.NoNINOController.onSubmit(srn: Srn, index: Max99, mode: Mode = CheckMode)
+
+GET         /:srn/value-of-assets-and-cash                        controllers.ValueOfAssetsController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/value-of-assets-and-cash                        controllers.ValueOfAssetsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+
+GET         /:srn/change-value-of-assets-and-cash                 controllers.ValueOfAssetsController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-value-of-assets-and-cash                 controllers.ValueOfAssetsController.onSubmit(srn: Srn, mode: Mode = CheckMode)
