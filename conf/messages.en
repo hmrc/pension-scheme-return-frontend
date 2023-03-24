@@ -7,6 +7,7 @@ site.remove = Remove
 site.change = Change
 site.no = No
 site.yes = Yes
+site.next = Next
 
 site.continue = Continue
 site.saveAndContinue = Save and continue
@@ -267,3 +268,14 @@ valueOfAssets.end.label = Total value of assets and cash on {0}, in pounds and p
 valueOfAssets.end.error.required = Enter the total value of the scheme’s assets and cash on {1}, in pounds and pence
 valueOfAssets.end.error.nonNumeric = Total value of assets and cash on {1} must be an amount of money, like 123.45 or 156
 valueOfAssets.end.error.tooLarge = Total value of assets and cash on {1} must be 999999999.99 or less
+
+schemeMembersList.title = You have added {0} member
+schemeMembersList.title.plural = You have added {0} members
+schemeMembersList.heading = You have added {0} member
+schemeMembersList.heading.plural = You have added {0} members
+schemeMembersList.radio = Do you need to add another member?
+schemeMembersList.inset = You cannot add another member as you have entered the maximum of 99.
+schemeMembersList.change.hidden = {0}
+schemeMembersList.remove.hidden = {0} from the list
+schemeMembersList.error.required = Select yes if you need to add another member
+

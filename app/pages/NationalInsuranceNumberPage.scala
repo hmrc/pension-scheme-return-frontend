@@ -20,12 +20,13 @@ import config.Refined.Max99
 import play.api.libs.json.JsPath
 import models.SchemeId.Srn
 import models.UserAnswers
+import utils.RefinedUtils.RefinedIntOps
 
 import scala.util.Try
 
 case class NationalInsuranceNumberPage(srn: Srn, index: Max99) extends QuestionPage[Boolean] {
 
-  override def path: JsPath = JsPath \ toString
+  override def path: JsPath = JsPath \ toString \ index.arrayIndex
 
   override def toString: String = "nationalInsuranceNumber"
 

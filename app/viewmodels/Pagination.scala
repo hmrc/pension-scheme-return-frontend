@@ -14,25 +14,13 @@
  * limitations under the License.
  */
 
-package pages
+package viewmodels
 
-import config.Refined.Max99
-import eu.timepit.refined.refineMV
-import pages.behaviours.PageBehaviours
-import uk.gov.hmrc.domain.Nino
+import play.api.mvc.Call
 
-class MemberDetailsNinoPageSpec extends PageBehaviours {
-
-  "MemberDetailsNinoPage" - {
-
-    val srn = srnGen.sample.value
-
-    beRetrievable[Nino](MemberDetailsNinoPage(srn, refineMV(1)))
-
-    beSettable[Nino](MemberDetailsNinoPage(srn, refineMV(1)))
-
-    beSettableWithIndex[Nino, Max99](i => MemberDetailsNinoPage(srn, i))
-
-    beRemovable[Nino](MemberDetailsNinoPage(srn, refineMV(1)))
-  }
-}
+case class Pagination(
+  currentPage: Int,
+  pageSize: Int,
+  totalSize: Int,
+  call: Int => Call
+)

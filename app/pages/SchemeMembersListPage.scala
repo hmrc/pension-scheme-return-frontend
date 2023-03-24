@@ -16,23 +16,6 @@
 
 package pages
 
-import config.Refined.Max99
-import eu.timepit.refined.refineMV
-import pages.behaviours.PageBehaviours
-import uk.gov.hmrc.domain.Nino
+import models.SchemeId.Srn
 
-class MemberDetailsNinoPageSpec extends PageBehaviours {
-
-  "MemberDetailsNinoPage" - {
-
-    val srn = srnGen.sample.value
-
-    beRetrievable[Nino](MemberDetailsNinoPage(srn, refineMV(1)))
-
-    beSettable[Nino](MemberDetailsNinoPage(srn, refineMV(1)))
-
-    beSettableWithIndex[Nino, Max99](i => MemberDetailsNinoPage(srn, i))
-
-    beRemovable[Nino](MemberDetailsNinoPage(srn, refineMV(1)))
-  }
-}
+case class SchemeMembersListPage(srn: Srn, addMember: Boolean) extends Page

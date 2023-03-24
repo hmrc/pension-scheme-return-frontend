@@ -16,9 +16,12 @@
 
 package viewmodels.govuk
 
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+import play.twirl.api.Html
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.errormessage.ErrorMessage
+import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
 import uk.gov.hmrc.govukfrontend.views.viewmodels.textarea.Textarea
+import viewmodels.govuk.label._
 
 object textarea extends TextAreaFluency
 
@@ -34,6 +37,10 @@ trait TextAreaFluency {
   }
 
   implicit class FluentTextArea(textArea: Textarea) {
+
+    def withLabelAsHeading(label: Html): Textarea =
+      textArea.copy(label = LabelViewModel(HtmlContent(label)).asPageHeading())
+
     def withRows(rows: Int): Textarea = textArea.copy(rows = rows)
 
     def withError(message: String): Textarea =

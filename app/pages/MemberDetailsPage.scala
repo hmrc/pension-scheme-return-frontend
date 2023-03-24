@@ -17,7 +17,7 @@
 package pages
 
 import config.Refined.Max99
-import models.NameDOB
+import models.{NameDOB, UserAnswers}
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
 import queries.Gettable
@@ -30,9 +30,15 @@ case class MemberDetailsPage(srn: Srn, index: Max99) extends QuestionPage[NameDO
   override def toString: String = "memberDetailsPage"
 }
 
-case class MemberDetails(srn: Srn) extends Gettable[List[NameDOB]] {
+case class MembersDetails(srn: Srn) extends Gettable[List[NameDOB]] {
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "memberDetailsPage"
+}
+
+object MembersDetails {
+  implicit class MembersDetailsOps(ua: UserAnswers) {
+    def membersDetails(srn: Srn): List[NameDOB] = ua.get(MembersDetails(srn)).toList.flatten
+  }
 }

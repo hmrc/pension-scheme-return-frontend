@@ -1,0 +1,128 @@
+/*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package controllers
+
+import com.google.inject.Inject
+import config.Constants.{maxSchemeBankAccounts, maxSchemeMembers}
+import config.Refined.OneTo99
+import controllers.actions._
+import eu.timepit.refined._
+import forms.YesNoPageFormProvider
+import models.Mode
+import models.SchemeId.Srn
+import navigation.Navigator
+import pages.{SchemeBankAccountListPage, SchemeMembersListPage}
+import play.api.data.Form
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.DisplayMessage.Message
+import viewmodels.implicits._
+import viewmodels.models.{ListRow, ListViewModel}
+import views.html.ListView
+import SchemeMembersListController._
+import config.Constants
+import pages.MembersDetails._
+import viewmodels.Pagination
+import viewmodels.govuk.pagination.PaginationViewModel
+
+class SchemeMembersListController @Inject()(
+  override val messagesApi: MessagesApi,
+  navigator: Navigator,
+  identifyAndRequireData: IdentifyAndRequireData,
+  val controllerComponents: MessagesControllerComponents,
+  view: ListView,
+  formProvider: YesNoPageFormProvider
+) extends FrontendBaseController
+    with I18nSupport {
+
+  private val form = SchemeMembersListController.form(formProvider)
+
+  def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] =
+    identifyAndRequireData(srn) { implicit request =>
+      val membersDetails = request.userAnswers.membersDetails(srn)
+      if (membersDetails.isEmpty) {
+        Redirect(controllers.routes.MemberDetailsController.onPageLoad(srn, refineMV[OneTo99](1), mode))
+      } else {
+        Ok(view(form, viewModel(srn, page, mode, membersDetails.map(_.fullName))))
+      }
+    }
+
+  def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] =
+    identifyAndRequireData(srn) { implicit request =>
+      val membersDetails = request.userAnswers.membersDetails(srn)
+      if (membersDetails.length == maxSchemeMembers) {
+        Redirect(navigator.nextPage(SchemeMembersListPage(srn, addMember = false), mode, request.userAnswers))
+      } else {
+        form
+          .bindFromRequest()
+          .fold(
+            formWithErrors =>
+              BadRequest(view(formWithErrors, viewModel(srn, page, mode, membersDetails.map(_.fullName)))),
+            value => Redirect(navigator.nextPage(SchemeMembersListPage(srn, value), mode, request.userAnswers))
+          )
+      }
+    }
+}
+
+object SchemeMembersListController {
+  def form(formProvider: YesNoPageFormProvider): Form[Boolean] = formProvider(
+    "schemeMembersList.error.required"
+  )
+
+  def viewModel(srn: Srn, page: Int, mode: Mode, memberNames: List[String]): ListViewModel = {
+    val rows: List[ListRow] = memberNames.zipWithIndex.flatMap {
+      case (memberName, index) =>
+        refineV[OneTo99](index + 1) match {
+          case Left(_) => Nil
+          case Right(nextIndex) =>
+            List(
+              ListRow(
+                memberName,
+                changeUrl = controllers.routes.MemberDetailsController.onPageLoad(srn, nextIndex, mode).url,
+                changeHiddenText = Message("schemeMembersList.change.hidden", memberName),
+                removeUrl = controllers.routes.UnauthorisedController.onPageLoad.url,
+                removeHiddenText = Message("schemeMembersList.remove.hidden", memberName)
+              )
+            )
+        }
+    }
+
+    val titleKey =
+      if (memberNames.length > 1) "schemeMembersList.title.plural" else "schemeMembersList.title"
+    val headingKey =
+      if (memberNames.length > 1) "schemeMembersList.heading.plural" else "schemeMembersList.heading"
+
+    ListViewModel(
+      Message(titleKey, memberNames.length),
+      Message(headingKey, memberNames.length),
+      rows,
+      "schemeMembersList.radio",
+      "schemeMembersList.inset",
+      showRadios = memberNames.length < Constants.maxSchemeMembers,
+      pagination = Some(
+        Pagination(
+          currentPage = page,
+          pageSize = Constants.schemeMembersPageSize,
+          rows.size,
+          routes.SchemeMembersListController.onPageLoad(srn, _)
+        )
+      ),
+      onSubmit = controllers.routes.SchemeMembersListController.onSubmit(srn, page)
+    )
+  }
+}

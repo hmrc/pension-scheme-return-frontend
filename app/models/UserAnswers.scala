@@ -43,6 +43,9 @@ final case class UserAnswers(
   )(implicit writes: Writes[B], transform: Transform[A, B]): Try[UserAnswers] =
     set(page, transform.to(value))
 
+  def map[A](page: Gettable[Map[String, A]])(implicit rds: Reads[A]): Map[String, A] =
+    get(page).getOrElse(Map.empty)
+
   def set[A](page: Settable[A], value: A)(implicit writes: Writes[A]): Try[UserAnswers] = {
 
     val updatedData = data.setObject(page.path, Json.toJson(value)) match {

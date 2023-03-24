@@ -129,13 +129,21 @@ trait ViewModelGenerators extends BasicGenerators {
       removeHiddenText <- nonEmptyMessage
     } yield ListRow(text, changeUrl, changeHiddenText, removeUrl, removeHiddenText)
 
-  def summaryViewModelGen(showRadios: Boolean = true): Gen[ListViewModel] =
+  def summaryViewModelGen(rows: Int): Gen[ListViewModel] =
+    summaryViewModelGen(rows = Some(rows))
+
+  def summaryViewModelGen(
+    showRadios: Boolean = true,
+    rows: Option[Int] = None,
+    paginate: Boolean = false
+  ): Gen[ListViewModel] =
     for {
       title <- nonEmptyMessage
       heading <- nonEmptyMessage
-      rows <- Gen.choose(1, 10).flatMap(Gen.listOfN(_, summaryRowGen))
+      rows <- rows.fold(Gen.choose(1, 10))(Gen.const).flatMap(Gen.listOfN(_, summaryRowGen))
       radioText <- nonEmptyMessage
       insetText <- nonEmptyMessage
+      pagination <- if (paginate) Gen.option(paginationGen) else Gen.const(None)
       onSubmit <- call
     } yield ListViewModel(
       title,
@@ -144,6 +152,7 @@ trait ViewModelGenerators extends BasicGenerators {
       radioText,
       insetText,
       showRadios,
+      pagination,
       onSubmit
     )
 

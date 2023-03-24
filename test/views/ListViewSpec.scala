@@ -17,13 +17,17 @@
 package views
 
 import forms.YesNoPageFormProvider
+import org.scalatest.Assertion
+import play.api.Application
 import play.api.test.FakeRequest
+import play.twirl.api.Html
+import viewmodels.Pagination
 import views.html.ListView
 
 class ListViewSpec extends ViewSpec {
 
   runningApplication { implicit app =>
-    val view = injected[ListView]
+    implicit val view: ListView = injected[ListView]
     val formProvider = injected[YesNoPageFormProvider]
     val form = formProvider("summaryView.required")
 
@@ -67,11 +71,82 @@ class ListViewSpec extends ViewSpec {
       }
 
       "renders the inset text and not the radio button whenShowRadios is false" in {
-        forAll(summaryViewModelGen(false)) { viewModel =>
+        forAll(summaryViewModelGen(showRadios = false)) { viewModel =>
           radios(view(form, viewModel)).size mustEqual 0
           inset(view(form, viewModel)).text() mustEqual viewModel.insetText.key
         }
       }
+
+      "rendering pagination elements" should {
+
+        "show no pagination elements" when {
+          "there is only 1 row and page size is 3" in {
+            paginationTest(1, 1, 3) { html =>
+              summaryListRows(html).size mustEqual 1
+              paginationElements(html).size mustEqual 0
+            }
+          }
+
+          "there are 3 rows and page size is 3" in {
+            paginationTest(3, 1, 3) { html =>
+              summaryListRows(html).size mustEqual 3
+              paginationElements(html).size mustEqual 0
+            }
+          }
+        }
+
+        "show pagination elements" when {
+          "there are 4 rows and page size is 3" in {
+            paginationTest(4, 1, 3) { html =>
+              summaryListRows(html).size mustEqual 3
+              val elems = paginationElements(html)
+              elems.head.isCurrentPage mustEqual true
+              elems.map(_.text) mustEqual List("1", "2", "Next")
+            }
+          }
+
+          "there are 6 rows and page size is 3" in {
+            paginationTest(6, 1, 3) { html =>
+              summaryListRows(html).size mustEqual 3
+              paginationElements(html).map(_.text) mustEqual List("1", "2", "Next")
+            }
+          }
+
+          "there are 7 rows and page size is 3" in {
+            paginationTest(7, 1, 3) { html =>
+              summaryListRows(html).size mustEqual 3
+              paginationElements(html).map(_.text) mustEqual List("1", "2", "3", "Next")
+            }
+          }
+
+          "current page is 2, there are 7 rows and page size is 3" in {
+            paginationTest(7, 2, 3) { html =>
+              summaryListRows(html).size mustEqual 3
+              val elems = paginationElements(html)
+              elems(1).isCurrentPage mustEqual true
+              elems.map(_.text) mustEqual List("1", "2", "3", "Next")
+            }
+          }
+
+          "current page is 2 (final page), there are 4 rows and page size is 3" in {
+            paginationTest(4, 2, 3) { html =>
+              summaryListRows(html).size mustEqual 1
+              val elems = paginationElements(html)
+              elems(1).isCurrentPage mustEqual true
+              elems.map(_.text) mustEqual List("1", "2")
+            }
+          }
+        }
+      }
     }
+
+    def paginationTest(rows: Int, currentPage: Int, pageSize: Int)(f: Html => Unit): Unit =
+      forAll(summaryViewModelGen(rows)) { viewModel =>
+        val pagination = Pagination(currentPage, pageSize, viewModel.rows.size, _ => viewModel.onSubmit)
+        val paginatedViewModel = viewModel.copy(pagination = Some(pagination))
+        val html = view(form, paginatedViewModel)
+
+        f(html)
+      }
   }
 }
