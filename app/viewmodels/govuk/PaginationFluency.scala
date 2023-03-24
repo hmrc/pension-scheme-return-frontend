@@ -24,15 +24,15 @@ object pagination extends PaginationFluency
 trait PaginationFluency {
 
   object PaginationViewModel {
-    def apply(pagination: viewmodels.Pagination)(
+    def apply(pagination: models.Pagination)(
       implicit messages: Messages
     ): Pagination = {
       import pagination._
 
+      val showPreviousPageLink: Boolean = currentPage > 1
       val showNextPageLink: Boolean = (currentPage * pageSize) < totalSize
-      val maxPages = Math.ceil(totalSize.toDouble / pageSize.toDouble)
       val pageItems: List[PaginationItem] =
-        List.tabulate(maxPages.toInt)(
+        List.tabulate(totalPages)(
           i => {
             val arrayIndex = i + 1
             PaginationItem(
@@ -45,7 +45,9 @@ trait PaginationFluency {
 
       Pagination(
         items = Option.when(totalSize > pageSize)(pageItems),
-        next = Option.when(showNextPageLink)(PaginationLink(call(currentPage + 1).url, Some(messages("site.next"))))
+        next = Option.when(showNextPageLink)(PaginationLink(call(currentPage + 1).url, Some(messages("site.next")))),
+        previous =
+          Option.when(showPreviousPageLink)(PaginationLink(call(currentPage - 1).url, Some(messages("site.previous"))))
       )
     }
   }

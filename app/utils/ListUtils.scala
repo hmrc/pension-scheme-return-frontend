@@ -16,8 +16,8 @@
 
 package utils
 
+import models.Pagination
 import viewmodels.DisplayMessage.Message
-import viewmodels.Pagination
 
 object ListUtils {
 
