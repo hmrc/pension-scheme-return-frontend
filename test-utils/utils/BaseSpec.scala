@@ -38,6 +38,7 @@ import scala.reflect.ClassTag
 
 abstract class BaseSpec
     extends AnyWordSpec
+    with ActsLikeSpec
     with Matchers
     with ScalaFutures
     with MockitoSugar
@@ -74,73 +75,4 @@ abstract class BaseSpec
 
   @deprecated("behave word has been replace with act word - behave.like becomes act.like", since = "0.44.0")
   override val behave: BehaveWord = new BehaveWord
-
-  /* ActWord has the same functionality as BehaveWord except it supports BehaviourTest
-     for automatically running the test when passed to it, extending BehaveWord
-     is not possible as it is a final class
-   */
-  class ActWord {
-
-    def like(unit: Unit): Unit = ()
-
-    def like(test: Behaviours): Unit = test.run()
-
-    override def toString: String = "act"
-  }
-
-  val act = new ActWord
-
-  sealed trait Behaviours {
-
-    def run(): Unit
-  }
-
-  object Behaviours {
-
-    case class BehaviourTest(
-      name: String,
-      test: () => Unit,
-      beforeTest: () => Unit = () => (),
-      afterTest: () => Unit = () => ()
-    ) extends Behaviours {
-      def withName(name: String): BehaviourTest = copy(name = name)
-
-      def updateName(update: String => String): BehaviourTest = copy(name = update(name))
-
-      def before(f: => Unit): BehaviourTest = copy(beforeTest = () => f)
-
-      def after(f: => Unit): BehaviourTest = copy(afterTest = () => f)
-
-      def run(): Unit =
-        name in {
-          beforeTest()
-          test()
-          afterTest()
-        }
-    }
-
-    case class MultipleBehaviourTests(
-      name: String,
-      behaviours: List[BehaviourTest],
-      beforeAllTests: () => Unit = () => (),
-      afterAllTests: () => Unit = () => ()
-    ) extends Behaviours {
-
-      def withName(name: String): MultipleBehaviourTests = copy(name = name)
-
-      def beforeAll(f: => Unit): MultipleBehaviourTests = copy(beforeAllTests = () => f)
-
-      def afterAll(f: => Unit): MultipleBehaviourTests = copy(afterAllTests = () => f)
-
-      def map(f: BehaviourTest => BehaviourTest): MultipleBehaviourTests =
-        copy(behaviours = behaviours.map(f))
-
-      def run(): Unit =
-        name should {
-          beforeAllTests()
-          behaviours.foreach(_.run())
-          afterAllTests()
-        }
-    }
-  }
 }

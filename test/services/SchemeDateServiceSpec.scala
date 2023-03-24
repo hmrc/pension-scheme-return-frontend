@@ -51,56 +51,47 @@ class SchemeDateServiceSpec extends BaseSpec with ScalaCheckPropertyChecks {
     MultipleBehaviourTests(
       s"SchemeDateService.$name",
       List(
-        BehaviourTest("return None when nothing is in cache", () => {
+        "return None when nothing is in cache".hasBehaviour {
 
           val request = DataRequest(allowedAccessRequest, defaultUserAnswers)
           action(request) mustBe None
-        }),
-        BehaviourTest(
-          s"choose the date from WhichTaxYearPage answer when no accounting periods exist",
-          () => {
+        },
+        s"choose the date from WhichTaxYearPage answer when no accounting periods exist".hasBehaviour {
 
-            forAll(dateRangeGen) { range =>
-              val userAnswers = defaultUserAnswers.unsafeSet(WhichTaxYearPage(srn), range)
-              val request = DataRequest(allowedAccessRequest, userAnswers)
+          forAll(dateRangeGen) { range =>
+            val userAnswers = defaultUserAnswers.unsafeSet(WhichTaxYearPage(srn), range)
+            val request = DataRequest(allowedAccessRequest, userAnswers)
 
-              action(request) mustBe Some(expected(range))
-            }
+            action(request) mustBe Some(expected(range))
           }
-        ),
-        BehaviourTest(
-          s"choose $name from AccountingPeriodPage answer when 1 period present",
-          () => {
+        },
+        s"choose $name from AccountingPeriodPage answer when 1 period present".hasBehaviour {
 
-            forAll(dateRangeGen, dateRangeGen) { (whichTaxYearPage, accountingPeriod) =>
+          forAll(dateRangeGen, dateRangeGen) { (whichTaxYearPage, accountingPeriod) =>
+            val userAnswers = defaultUserAnswers
+              .unsafeSet(WhichTaxYearPage(srn), whichTaxYearPage)
+              .unsafeSet(AccountingPeriodPage(srn, refineMV(1)), accountingPeriod)
+
+            val request = DataRequest(allowedAccessRequest, userAnswers)
+
+            action(request) mustBe Some(expected(accountingPeriod))
+          }
+        },
+        s"choose $name from AccountingPeriodPage answer when multiple exist".hasBehaviour {
+
+          forAll(dateRangeGen, oldestDateRange, newestDateRange) {
+
+            (whichTaxYearPage, oldestAccountingPeriod, newestAccountingPeriod) =>
               val userAnswers = defaultUserAnswers
                 .unsafeSet(WhichTaxYearPage(srn), whichTaxYearPage)
-                .unsafeSet(AccountingPeriodPage(srn, refineMV(1)), accountingPeriod)
+                .unsafeSet(AccountingPeriodPage(srn, refineMV(1)), oldestAccountingPeriod)
+                .unsafeSet(AccountingPeriodPage(srn, refineMV(1)), newestAccountingPeriod)
 
               val request = DataRequest(allowedAccessRequest, userAnswers)
 
-              action(request) mustBe Some(expected(accountingPeriod))
-            }
+              action(request) mustBe Some(expected(newestAccountingPeriod))
           }
-        ),
-        BehaviourTest(
-          s"choose $name from AccountingPeriodPage answer when multiple exist",
-          () => {
-
-            forAll(dateRangeGen, oldestDateRange, newestDateRange) {
-
-              (whichTaxYearPage, oldestAccountingPeriod, newestAccountingPeriod) =>
-                val userAnswers = defaultUserAnswers
-                  .unsafeSet(WhichTaxYearPage(srn), whichTaxYearPage)
-                  .unsafeSet(AccountingPeriodPage(srn, refineMV(1)), oldestAccountingPeriod)
-                  .unsafeSet(AccountingPeriodPage(srn, refineMV(1)), newestAccountingPeriod)
-
-                val request = DataRequest(allowedAccessRequest, userAnswers)
-
-                action(request) mustBe Some(expected(newestAccountingPeriod))
-            }
-          }
-        )
+        }
       )
     )
 
