@@ -226,7 +226,7 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
       forAll(srnGen, manualOrUploadGen) { (srn, manualOrUpload) =>
         val page = PensionSchemeMembersPage(srn)
-        navigator.nextPage(page, NormalMode, userAnswers) mustBe routes.UnauthorisedController.onPageLoad
+        navigator.nextPage(page, NormalMode, userAnswers) mustBe routes.PensionSchemeMembersController.onPageLoad(srn)
       }
     }
 

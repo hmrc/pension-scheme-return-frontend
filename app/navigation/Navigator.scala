@@ -57,6 +57,9 @@ class Navigator @Inject()() {
     case SchemeBankAccountListPage(srn, false) => _ => routes.HowManyMembersController.onPageLoad(srn, NormalMode)
     case RemoveSchemeBankAccountPage(srn) => _ => routes.SchemeBankAccountListController.onPageLoad(srn)
 
+    case RemoveSchemeBankAccountPage(srn) => _ => routes.SchemeBankAccountListController.onPageLoad(srn)
+    case RemoveMemberDetailsPage(srn) => _ => routes.SchemeMembersListController.onPageLoad(srn, page = 1)
+
     case AccountingPeriodPage(srn, index) =>
       _ => routes.AccountingPeriodCheckYourAnswersController.onPageLoad(srn, index)
     case AccountingPeriodCheckYourAnswersPage(srn) =>
@@ -75,7 +78,7 @@ class Navigator @Inject()() {
 
     case RemoveAccountingPeriodPage(srn) => _ => routes.AccountingPeriodListController.onPageLoad(srn, NormalMode)
     case HowMuchCashPage(srn) => _ => routes.UnauthorisedController.onPageLoad
-    case PensionSchemeMembersPage(srn) => _ => routes.UnauthorisedController.onPageLoad
+    case PensionSchemeMembersPage(srn) => _ => routes.PensionSchemeMembersController.onPageLoad(srn)
     case MemberDetailsPage(srn, index) =>
       _ => routes.DoesSchemeMemberHaveNINOController.onPageLoad(srn, index, NormalMode)
     case page @ NationalInsuranceNumberPage(srn, index) => {
@@ -112,6 +115,7 @@ class Navigator @Inject()() {
     case CheckReturnDatesPage(srn) => _ => routes.UnauthorisedController.onPageLoad
     case SchemeBankAccountPage(srn, _) => _ => routes.UnauthorisedController.onPageLoad
     case RemoveSchemeBankAccountPage(srn) => _ => routes.SchemeBankAccountListController.onPageLoad(srn)
+    case RemoveMemberDetailsPage(srn) => _ => routes.SchemeMembersListController.onPageLoad(srn, page = 1)
 
     case page @ HowManyMembersPage(srn, _) => {
       case _ => routes.UnauthorisedController.onPageLoad
