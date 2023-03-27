@@ -14,15 +14,20 @@
  * limitations under the License.
  */
 
-package viewmodels.models
+package forms.mappings.errors
 
-import play.api.mvc.Call
-import viewmodels.DisplayMessage.{BlockMessage, Message}
-
-case class MoneyViewModel[A](
-  title: Message,
-  heading: Message,
-  description: Option[BlockMessage],
-  questions: MultipleQuestionsViewModel[A],
-  onSubmit: Call
+case class MoneyFormErrors(
+  requiredKey: String,
+  nonNumericKey: String,
+  max: (Double, String)
 )
+
+object MoneyFormErrors {
+
+  def default(
+    requiredKey: String = "error.required",
+    nonNumericKey: String = "error.nonMoney",
+    max: (Double, String) = (Double.MaxValue, "error.tooLarge")
+  ): MoneyFormErrors =
+    MoneyFormErrors(requiredKey, nonNumericKey, max)
+}

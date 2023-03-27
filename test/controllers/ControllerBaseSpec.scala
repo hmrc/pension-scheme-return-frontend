@@ -19,13 +19,14 @@ package controllers
 import controllers.actions._
 import models.{Establisher, EstablisherKind, NameDOB, SchemeDetails, SchemeId, SchemeStatus, UserAnswers}
 import navigation.Navigator
+import play.api.Application
+import play.api.data.Form
 import play.api.http._
 import play.api.inject.bind
 import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
 import play.api.libs.json.{Json, Writes}
 import play.api.mvc.Call
 import play.api.test._
-import play.api.{data, Application}
 import queries.Settable
 import uk.gov.hmrc.time.TaxYear
 import utils.BaseSpec
@@ -80,7 +81,7 @@ trait ControllerBaseSpec
   def runningApplication[T](block: Application => T): T =
     running(_ => applicationBuilder())(block)
 
-  def formData[A](form: data.Form[A], range: A) = form.fill(range).data.toList
+  def formData[A](form: Form[A], data: A): List[(String, String)] = form.fill(data).data.toList
 
   implicit class UserAnswersOps(ua: UserAnswers) {
     def unsafeSet[A: Writes](page: Settable[A], value: A): UserAnswers = ua.set(page, value).success.value

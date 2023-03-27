@@ -17,6 +17,7 @@
 package forms
 
 import forms.mappings.Mappings
+import forms.mappings.errors.MoneyFormErrors
 import org.scalatest.OptionValues
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
@@ -203,7 +204,7 @@ class MappingsSpec extends AnyFreeSpec with Matchers with OptionValues with Mapp
   "money" - {
     val testForm: Form[Money] =
       Form(
-        "value" -> money(max = 100d -> "error.tooLarge")
+        "value" -> money(MoneyFormErrors.default(max = 100d -> "error.tooLarge"))
       )
 
     "must bind a valid int" in {
@@ -218,7 +219,6 @@ class MappingsSpec extends AnyFreeSpec with Matchers with OptionValues with Mapp
 
     "must bind a double with a £ symbol" in {
       val result = testForm.bind(Map("value" -> "£10.01"))
-      result.errors.foreach(println)
       result.get mustEqual Money(10.01)
     }
 

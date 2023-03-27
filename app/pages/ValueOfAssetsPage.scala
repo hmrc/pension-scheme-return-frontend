@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package viewmodels.models
+package pages
 
-import play.api.mvc.Call
-import viewmodels.DisplayMessage.{BlockMessage, Message}
+import models.MoneyInPeriod
+import models.SchemeId.Srn
+import play.api.libs.json.JsPath
 
-case class MoneyViewModel[A](
-  title: Message,
-  heading: Message,
-  description: Option[BlockMessage],
-  questions: MultipleQuestionsViewModel[A],
-  onSubmit: Call
-)
+case class ValueOfAssetsPage(srn: Srn) extends QuestionPage[MoneyInPeriod] {
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "valueOfAssets"
+}

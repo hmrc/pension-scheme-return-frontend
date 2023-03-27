@@ -123,18 +123,24 @@ GET         /:srn/change-member-details                            controllers.S
 GET         /:srn/change-member-details/:index                     controllers.SchemeMemberDetailsAnswersController.onPageLoad(srn: Srn, index: Max99, checkOrChange: CheckOrChange = Change, mode: Mode = NormalMode)
 POST        /:srn/change-member-details/:index                     controllers.SchemeMemberDetailsAnswersController.onSubmit(srn: Srn, index: Max99, checkOrChange: CheckOrChange = Change, mode: Mode = NormalMode)
 
-GET        /:srn/how-many-members                                 controllers.HowManyMembersController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST       /:srn/how-many-members                                 controllers.HowManyMembersController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-GET        /:srn/change-how-many-members                          controllers.HowManyMembersController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST       /:srn/change-how-many-members                          controllers.HowManyMembersController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+GET         /:srn/how-many-members                                controllers.HowManyMembersController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/how-many-members                                controllers.HowManyMembersController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/change-how-many-members                         controllers.HowManyMembersController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-how-many-members                         controllers.HowManyMembersController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
-GET        /:srn/no-ni-number                                     controllers.NoNINOController.onPageLoad(srn: Srn, index: Max99 = 1, mode: Mode = NormalMode)
-GET        /:srn/no-ni-number/:index                              controllers.NoNINOController.onPageLoad(srn: Srn, index: Max99, mode: Mode = NormalMode)
-POST       /:srn/no-ni-number/:index                              controllers.NoNINOController.onSubmit(srn: Srn, index: Max99, mode: Mode = NormalMode)
+GET         /:srn/no-ni-number                                    controllers.NoNINOController.onPageLoad(srn: Srn, index: Max99 = 1, mode: Mode = NormalMode)
+GET         /:srn/no-ni-number/:index                             controllers.NoNINOController.onPageLoad(srn: Srn, index: Max99, mode: Mode = NormalMode)
+POST        /:srn/no-ni-number/:index                             controllers.NoNINOController.onSubmit(srn: Srn, index: Max99, mode: Mode = NormalMode)
 
-GET         /:srn/change-no-ni-number/:index                       controllers.NoNINOController.onPageLoad(srn: Srn, index: Max99, mode: Mode = CheckMode)
-POST        /:srn/change-no-ni-number/:index                       controllers.NoNINOController.onSubmit(srn: Srn, index: Max99, mode: Mode = CheckMode)
+GET         /:srn/change-no-ni-number/:index                      controllers.NoNINOController.onPageLoad(srn: Srn, index: Max99, mode: Mode = CheckMode)
+POST        /:srn/change-no-ni-number/:index                      controllers.NoNINOController.onSubmit(srn: Srn, index: Max99, mode: Mode = CheckMode)
 
-GET         /:srn/members                                          controllers.SchemeMembersListController.onPageLoad(srn: Srn, page: Int = 1, mode: Mode = NormalMode)
-GET         /:srn/members/:page                                    controllers.SchemeMembersListController.onPageLoad(srn: Srn, page: Int, mode: Mode = NormalMode)
-POST        /:srn/members/:page                                    controllers.SchemeMembersListController.onSubmit(srn: Srn, page: Int, mode: Mode = NormalMode)
+GET         /:srn/value-of-assets-and-cash                        controllers.ValueOfAssetsController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/value-of-assets-and-cash                        controllers.ValueOfAssetsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+
+GET         /:srn/change-value-of-assets-and-cash                 controllers.ValueOfAssetsController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-value-of-assets-and-cash                 controllers.ValueOfAssetsController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET         /:srn/members                                         controllers.SchemeMembersListController.onPageLoad(srn: Srn, page: Int = 1, mode: Mode = NormalMode)
+GET         /:srn/members/:page                                   controllers.SchemeMembersListController.onPageLoad(srn: Srn, page: Int, mode: Mode = NormalMode)
+POST        /:srn/members/:page                                   controllers.SchemeMembersListController.onSubmit(srn: Srn, page: Int, mode: Mode = NormalMode)

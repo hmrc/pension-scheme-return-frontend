@@ -21,7 +21,6 @@ import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import models.NormalMode
 import pages.{MemberDetailsPage, NoNINOPage}
-import utils.UserAnswersUtils._
 import views.html.TextAreaView
 
 class NoNINOControllerSpec extends ControllerBaseSpec {

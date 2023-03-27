@@ -17,7 +17,9 @@
 package generators
 
 import org.scalacheck.Gen
+import play.api.data.Form
 import viewmodels.DisplayMessage.Message
+import viewmodels.models.MultipleQuestionsViewModel.{DoubleQuestion, SingleQuestion, TripleQuestion}
 import viewmodels.models._
 
 trait ViewModelGenerators extends BasicGenerators {
@@ -213,13 +215,52 @@ trait ViewModelGenerators extends BasicGenerators {
       )
     }
 
-  val moneyViewModelGen: Gen[MoneyViewModel] =
+  def fieldGen: Gen[Field] =
+    for {
+      label <- nonEmptyInlineMessage
+      hint <- Gen.option(nonEmptyInlineMessage)
+    } yield {
+      Field(label, hint)
+    }
+
+  def singleQuestionGen[A](form: Form[A]): Gen[SingleQuestion[A]] =
+    Gen.const(SingleQuestion(form))
+
+  def doubleQuestionGen[A](form: Form[(A, A)]): Gen[DoubleQuestion[A]] =
+    for {
+      field1 <- fieldGen
+      field2 <- fieldGen
+    } yield {
+      DoubleQuestion(
+        form,
+        field1,
+        field2
+      )
+    }
+
+  def tripleQuestionGen[A](form: Form[(A, A, A)]): Gen[TripleQuestion[A]] =
+    for {
+      field1 <- fieldGen
+      field2 <- fieldGen
+      field3 <- fieldGen
+    } yield {
+      TripleQuestion(
+        form,
+        field1,
+        field2,
+        field3
+      )
+    }
+
+  def moneyViewModelGen[A](questionsGen: Gen[MultipleQuestionsViewModel[A]]): Gen[MoneyViewModel[_]] =
     for {
       title <- nonEmptyMessage
       heading <- nonEmptyMessage
+      description <- Gen.option(nonEmptyBlockMessage)
+      questions <- questionsGen
       onSubmit <- call
     } yield {
-      MoneyViewModel(title, heading, onSubmit)
+      MoneyViewModel(title, heading, description, questions, onSubmit)
     }
 
   val textInputViewModelGen: Gen[TextInputViewModel] =
@@ -232,16 +273,14 @@ trait ViewModelGenerators extends BasicGenerators {
       TextInputViewModel(title, heading, label, onSubmit)
     }
 
-  val tripleIntViewModelGen: Gen[TripleIntViewModel] =
+  def intViewModelGen[A](questions: Gen[MultipleQuestionsViewModel[A]]): Gen[IntViewModel[_]] =
     for {
       title <- nonEmptyMessage
       heading <- nonEmptyMessage
-      field1Label <- nonEmptyMessage
-      field2Label <- nonEmptyMessage
-      field3Label <- nonEmptyMessage
+      questions <- questions
       onSubmit <- call
     } yield {
-      TripleIntViewModel(title, heading, field1Label, field2Label, field3Label, onSubmit)
+      IntViewModel(title, heading, questions, onSubmit)
     }
 
   val textAreaViewModelGen: Gen[TextAreaViewModel] =
