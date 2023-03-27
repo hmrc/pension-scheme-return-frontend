@@ -8,6 +8,7 @@ site.change = Change
 site.no = No
 site.yes = Yes
 site.next = Next
+site.previous = Previous
 
 site.continue = Continue
 site.saveAndContinue = Save and continue
@@ -275,7 +276,7 @@ schemeMembersList.heading = You have added {0} member
 schemeMembersList.heading.plural = You have added {0} members
 schemeMembersList.radio = Do you need to add another member?
 schemeMembersList.inset = You cannot add another member as you have entered the maximum of 99.
-schemeMembersList.change.hidden = {0}
-schemeMembersList.remove.hidden = {0} from the list
+schemeMembersList.change.hidden = Change {0}
+schemeMembersList.remove.hidden = Remove {0} from the list
 schemeMembersList.error.required = Select yes if you need to add another member
-
+schemeMembersList.pagination.label = Showing {0} - {1} of {2} members

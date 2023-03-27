@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package viewmodels
+package viewmodels.models
 
-import play.api.mvc.Call
+import models.Pagination
+import viewmodels.DisplayMessage.Message
 
-case class Pagination(
-  currentPage: Int,
-  pageSize: Int,
-  totalSize: Int,
-  call: Int => Call
+case class PaginatedViewModel(
+  label: Message,
+  pagination: Pagination
 )

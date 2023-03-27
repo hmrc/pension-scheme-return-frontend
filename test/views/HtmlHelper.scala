@@ -101,6 +101,9 @@ trait HtmlHelper extends HtmlModels {
   def summaryListRows(html: Html): List[Element] =
     mainContent(html).getElementsByClass("govuk-summary-list__row").iterator().asScala.toList
 
+  def paginationLabel(html: Html): Option[String] =
+    Option(mainContent(html).getElementById("pagination-label")).map(_.text())
+
   def paginationElements(html: Html): List[PaginationElement] =
     mainContent(html)
       .getElementsByClass("govuk-pagination__link")

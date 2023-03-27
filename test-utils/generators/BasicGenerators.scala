@@ -22,13 +22,15 @@ import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
 import org.scalacheck.Gen.{alphaChar, alphaNumChar, alphaNumStr, alphaStr, choose, chooseNum, listOfN, numChar}
 import play.api.mvc.Call
-import viewmodels.{DisplayMessage, Pagination}
+import viewmodels.DisplayMessage
 import viewmodels.DisplayMessage.ListType.Bullet
 import viewmodels.DisplayMessage._
 
 import java.time.{Instant, LocalDate, ZoneOffset}
 import eu.timepit.refined._
+import models.Pagination
 import org.scalatest.EitherValues
+import viewmodels.models.PaginatedViewModel
 
 trait BasicGenerators extends EitherValues {
 
@@ -213,13 +215,15 @@ trait BasicGenerators extends EitherValues {
     } yield Call(method, url)
   }
 
-  val paginationGen: Gen[Pagination] = {
+  val paginationGen: Gen[PaginatedViewModel] = {
     for {
-      currentPage <- intsBelowValue(5)
-      pageSize <- intsBelowValue(5)
-      totalSize <- intsBelowValue(10).suchThat(_ > (currentPage * pageSize))
+      label <- nonEmptyMessage
+      totalSize <- Gen.chooseNum(0, 100)
+      pageSize <- Gen.chooseNum(1, 10)
+      maxPages = Math.ceil(Math.max(1, totalSize).toDouble / pageSize).toInt
+      currentPage <- Gen.chooseNum(1, maxPages)
       call <- call
-    } yield Pagination(currentPage, pageSize, totalSize, _ => call)
+    } yield PaginatedViewModel(label, Pagination(currentPage, pageSize, totalSize, _ => call))
   }
 
   implicit val max99: Gen[Max99] = chooseNum(1, 99).map(refineV[OneTo99](_).value)
