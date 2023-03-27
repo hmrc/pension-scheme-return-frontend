@@ -32,7 +32,7 @@ class NoNINOControllerSpec extends ControllerBaseSpec {
   private val userAnswersWithMembersDetails = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
 
-  "NoNINOController" should {
+  "NoNINOController" - {
 
     act.like(renderView(onPageLoad, userAnswersWithMembersDetails) { implicit app => implicit request =>
       injected[TextAreaView].apply(

@@ -27,8 +27,8 @@ import eu.timepit.refined.api.Refined
 
 class BindersSpec extends BaseSpec with ScalaCheckPropertyChecks with EitherValues {
 
-  "SRN binder" should {
-    "return a valid srn" when {
+  "SRN binder" - {
+    "return a valid srn" - {
       "srn is valid" in {
         forAll(srnGen) { validSrn =>
           Binders.srnBinder.bind("srn", validSrn.value) mustBe Right(validSrn)
@@ -36,7 +36,7 @@ class BindersSpec extends BaseSpec with ScalaCheckPropertyChecks with EitherValu
       }
     }
 
-    "return an error message" when {
+    "return an error message" - {
       "srn is invalid" in {
         forAll(alphaNumStr) { invalidSrn =>
           whenever(!invalidSrn.matches(Srn.srnRegex)) {
@@ -47,7 +47,7 @@ class BindersSpec extends BaseSpec with ScalaCheckPropertyChecks with EitherValu
     }
   }
 
-  "1 to 10 refined binder" should {
+  "1 to 10 refined binder" - {
     "bind successfully when a number between 1 and 10 is supplied" in {
       forAll(Gen.oneOf(1 to 10)) { i =>
         Binders.refinedIntPathBinder[OneToTen].bind("max", i.toString) mustBe Right(Refined.unsafeApply(i))

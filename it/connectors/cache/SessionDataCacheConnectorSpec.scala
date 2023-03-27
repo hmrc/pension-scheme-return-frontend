@@ -52,7 +52,7 @@ class SessionDataCacheConnectorSpec extends BaseConnectorSpec {
 
   def connector(implicit app: Application): SessionDataCacheConnector = injected[SessionDataCacheConnector]
 
-  "fetch" should {
+  "fetch" - {
 
     "return an administrator" in runningApplication { implicit app =>
       stubGet(okResponse(Administrator))
@@ -85,7 +85,7 @@ class SessionDataCacheConnectorSpec extends BaseConnectorSpec {
     }
   }
 
-  "delete" should {
+  "delete" - {
 
     "return unit for an ok response" in runningApplication { implicit app =>
       stubDelete(ok())

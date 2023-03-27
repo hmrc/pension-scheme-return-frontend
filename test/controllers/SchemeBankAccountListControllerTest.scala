@@ -35,23 +35,24 @@ class SchemeBankAccountListControllerTest extends ControllerBaseSpec {
 
   private lazy val redirectUrlNoBankAccounts = schemeBankAccountRedirectUrl(1)
 
-  "SchemeBankAccountSummaryController" should {
+  "SchemeBankAccountSummaryController" - {
 
     act.like(redirectNextPage(onSubmit, "value" -> "false"))
 
-    "with 0 bank accounts" must {
+    "with 0 bank accounts" - {
       act.like(redirectToPage(onPageLoad, redirectUrlNoBankAccounts))
     }
 
     List(1, 9, 10).foreach {
       case numBankAccount =>
-        s"with $numBankAccount bank account" must {
+        s"with $numBankAccount bank account" - {
           val bankAccounts = buildBankAccounts(numBankAccount)
           val userAnswers = buildUserAnswers(bankAccounts)
 
           act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
             view.apply(form, viewModel(srn, NormalMode, bankAccounts))
           })
+
           act.like(redirectNextPage(onSubmit, userAnswers, "value" -> "true"))
         }
     }

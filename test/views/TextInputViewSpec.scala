@@ -34,7 +34,7 @@ class TextInputViewSpec extends ViewSpec with Mappings {
 
     implicit val request = FakeRequest()
 
-    "TextInputView" should {
+    "TextInputView" - {
 
       act.like(renderTitle(textInputViewModelGen)(view(textInputForm, _), _.title.key))
       act.like(renderHeading(textInputViewModelGen)(view(textInputForm, _), _.heading))

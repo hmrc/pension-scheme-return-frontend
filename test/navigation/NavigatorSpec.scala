@@ -29,13 +29,13 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
   val navigator = new Navigator
   val userAnswers = UserAnswers("id")
 
-  "Navigator" should {
+  "Navigator" - {
 
-    "go from a page that doesn't exist in the route map to Index" when {
+    "go from a page that doesn't exist in the route map to Index" - {
       "in Normal mode" in {
 
         case object UnknownPage extends Page
-        navigator.nextPage(UnknownPage, NormalMode, userAnswers) mustBe routes.IndexController.onPageLoad
+        navigator.nextPage(UnknownPage, NormalMode, userAnswers) mustBe routes.IndexController.onPageLoad()
       }
     }
 
@@ -63,9 +63,9 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
       }
     }
 
-    "check returns page" should {
+    "check returns page" - {
 
-      "navigate to scheme bank account page" when {
+      "navigate to scheme bank account page" - {
         "yes is selected" in {
           forAll(srnGen) { srn =>
             val ua = userAnswers.set(CheckReturnDatesPage(srn), true).get
@@ -75,14 +75,13 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
         }
       }
 
-      "navigate to scheme bank account list page" when {
+      "navigate to scheme bank account list page" - {
         "yes is selected and a bank account has previously been entered" in {
           forAll(srnGen) { srn =>
             val ua = userAnswers
-              .set(CheckReturnDatesPage(srn), true)
-              .get
-              .set(SchemeBankAccountPage(srn, refineMV(1)), BankAccount("test", "11111111", "111111"))
-              .get
+              .unsafeSet(CheckReturnDatesPage(srn), true)
+              .unsafeSet(SchemeBankAccountPage(srn, refineMV(1)), BankAccount("test", "11111111", "111111"))
+
             navigator.nextPage(CheckReturnDatesPage(srn), NormalMode, ua) mustBe
               routes.SchemeBankAccountListController.onPageLoad(srn)
           }
@@ -116,7 +115,7 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
       }
     }
 
-    "go from scheme bank account list page to scheme bank account page" when {
+    "go from scheme bank account list page to scheme bank account page" - {
 
       "yes is selected" in {
         forAll(srnGen) { srn =>
@@ -129,7 +128,7 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
       }
     }
 
-    "got from scheme bank account list page to how many members page" when {
+    "got from scheme bank account list page to how many members page" - {
 
       "no is selected" in {
 
@@ -159,7 +158,7 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
       }
     }
 
-    "go from accounting periods list page to the next accounting periods page" when {
+    "go from accounting periods list page to the next accounting periods page" - {
 
       "yes is selected and 1 period exists" in {
 
@@ -175,10 +174,8 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
         forAll(srnGen) { srn =>
           val answers = userAnswers
-            .set(AccountingPeriodPage(srn, refineMV(1)), dateRangeGen.sample.value)
-            .get
-            .set(AccountingPeriodPage(srn, refineMV(2)), dateRangeGen.sample.value)
-            .get
+            .unsafeSet(AccountingPeriodPage(srn, refineMV(1)), dateRangeGen.sample.value)
+            .unsafeSet(AccountingPeriodPage(srn, refineMV(2)), dateRangeGen.sample.value)
 
           val page = AccountingPeriodListPage(srn, addPeriod = true)
           navigator.nextPage(page, NormalMode, answers) mustBe
@@ -187,7 +184,7 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
       }
     }
 
-    "go from accounting periods list page to scheme bank details page" when {
+    "go from accounting periods list page to scheme bank details page" - {
 
       "no is selected" in {
 
@@ -226,7 +223,7 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
       forAll(srnGen, manualOrUploadGen) { (srn, manualOrUpload) =>
         val page = PensionSchemeMembersPage(srn)
-        navigator.nextPage(page, NormalMode, userAnswers) mustBe routes.UnauthorisedController.onPageLoad
+        navigator.nextPage(page, NormalMode, userAnswers) mustBe routes.UnauthorisedController.onPageLoad()
       }
     }
 
@@ -234,7 +231,7 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
       forAll(srnGen) { srn =>
         val page = HowMuchCashPage(srn)
-        navigator.nextPage(page, NormalMode, userAnswers) mustBe routes.UnauthorisedController.onPageLoad
+        navigator.nextPage(page, NormalMode, userAnswers) mustBe routes.UnauthorisedController.onPageLoad()
       }
     }
 
@@ -242,7 +239,7 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
       forAll(srnGen) { srn =>
         val page = PsaDeclarationPage(srn)
-        navigator.nextPage(page, NormalMode, userAnswers) mustBe routes.UnauthorisedController.onPageLoad
+        navigator.nextPage(page, NormalMode, userAnswers) mustBe routes.UnauthorisedController.onPageLoad()
       }
     }
 
@@ -250,7 +247,7 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
       forAll(srnGen) { srn =>
         val page = PspDeclarationPage(srn)
-        navigator.nextPage(page, NormalMode, userAnswers) mustBe routes.UnauthorisedController.onPageLoad
+        navigator.nextPage(page, NormalMode, userAnswers) mustBe routes.UnauthorisedController.onPageLoad()
 
       }
     }
@@ -276,7 +273,7 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
       }
     }
 
-    "go from how many members page to how much cash page" when {
+    "go from how many members page to how much cash page" - {
 
       "total number of members is less than 100" in {
 
@@ -290,7 +287,7 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
       }
     }
 
-    "go from how many members page to declaration" when {
+    "go from how many members page to declaration" - {
 
       "psa is signed in" in {
 

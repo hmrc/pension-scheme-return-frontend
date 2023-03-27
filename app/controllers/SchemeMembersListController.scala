@@ -17,27 +17,26 @@
 package controllers
 
 import com.google.inject.Inject
-import config.Constants.{maxSchemeBankAccounts, maxSchemeMembers}
+import config.Constants
+import config.Constants.maxSchemeMembers
 import config.Refined.OneTo99
+import controllers.SchemeMembersListController._
 import controllers.actions._
 import eu.timepit.refined._
 import forms.YesNoPageFormProvider
-import models.{Mode, Pagination}
 import models.SchemeId.Srn
+import models.{Mode, Pagination}
 import navigation.Navigator
-import pages.{SchemeBankAccountListPage, SchemeMembersListPage}
+import pages.MembersDetails._
+import pages.SchemeMembersListPage
 import play.api.data.Form
-import play.api.i18n.{I18nSupport, Messages, MessagesApi}
+import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
 import viewmodels.models.{ListRow, ListViewModel, PaginatedViewModel}
 import views.html.ListView
-import SchemeMembersListController._
-import config.Constants
-import pages.MembersDetails._
-import viewmodels.govuk.pagination.PaginationViewModel
 
 class SchemeMembersListController @Inject()(
   override val messagesApi: MessagesApi,
@@ -94,7 +93,7 @@ object SchemeMembersListController {
                 memberName,
                 changeUrl = controllers.routes.MemberDetailsController.onPageLoad(srn, nextIndex, mode).url,
                 changeHiddenText = Message("schemeMembersList.change.hidden", memberName),
-                removeUrl = controllers.routes.UnauthorisedController.onPageLoad.url,
+                removeUrl = controllers.routes.UnauthorisedController.onPageLoad().url,
                 removeHiddenText = Message("schemeMembersList.remove.hidden", memberName)
               )
             )

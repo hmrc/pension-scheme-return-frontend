@@ -38,7 +38,7 @@ class SaveServiceSpec extends BaseSpec with ScalaCheckPropertyChecks {
     reset(mockSessionRepository)
   }
 
-  "save" should {
+  "save" - {
 
     "save user answers to sessionRepository" in {
 

@@ -47,7 +47,7 @@ class HowManyMembersControllerSpec extends ControllerBaseSpec {
 
   override def afterEach(): Unit = setEndDate(Some(submissionEndDate))
 
-  "HowManyMembersController" should {
+  "HowManyMembersController" - {
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       val view = injected[TripleIntView]

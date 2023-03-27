@@ -39,7 +39,7 @@ class TripleIntViewSpec extends ViewSpec with Mappings {
 
     implicit val request = FakeRequest()
 
-    "TextInputView" should {
+    "TextInputView" - {
 
       act.like(renderTitle(tripleIntViewModelGen)(view(tripleIntForm, _), _.title.key))
       act.like(renderHeading(tripleIntViewModelGen)(view(tripleIntForm, _), _.heading))

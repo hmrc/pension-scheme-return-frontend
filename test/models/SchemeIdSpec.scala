@@ -23,7 +23,7 @@ import utils.BaseSpec
 
 class SchemeIdSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
-  "Srn" should {
+  "Srn" - {
 
     "return Srn for valid value" in {
       forAll(srnGen) { validSrn =>

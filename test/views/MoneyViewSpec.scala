@@ -32,7 +32,7 @@ class MoneyViewSpec extends ViewSpec with Mappings {
     val moneyForm: data.Form[Money] =
       data.Form("value" -> money("money.error.required"))
 
-    "MoneyView" should {
+    "MoneyView" - {
 
       "render the title" in {
 

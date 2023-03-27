@@ -107,7 +107,7 @@ class SchemeDetailsConnectorSpec extends BaseConnectorSpec {
 
   def connector(implicit app: Application): SchemeDetailsConnector = injected[SchemeDetailsConnector]
 
-  ".details for psa" should {
+  ".details for psa" - {
 
     val psaId = psaIdGen.sample.value
     val schemeId = schemeIdGen.sample.value
@@ -131,7 +131,7 @@ class SchemeDetailsConnectorSpec extends BaseConnectorSpec {
       result mustBe None
     }
 
-    "throw error" when {
+    "throw error" - {
 
       "400 response is sent" in runningApplication { implicit app =>
 
@@ -153,7 +153,7 @@ class SchemeDetailsConnectorSpec extends BaseConnectorSpec {
     }
   }
 
-  ".details for psp" should {
+  ".details for psp" - {
     val pspId = pspIdGen.sample.value
     val srn = srnGen.sample.value
     val expectedResult = schemeDetailsGen.sample.value
@@ -176,7 +176,7 @@ class SchemeDetailsConnectorSpec extends BaseConnectorSpec {
       result mustBe None
     }
 
-    "throw error" when {
+    "throw error" - {
 
       "400 response is sent" in runningApplication { implicit app =>
 
@@ -198,7 +198,7 @@ class SchemeDetailsConnectorSpec extends BaseConnectorSpec {
     }
   }
 
-  ".checkAssociation for psa" should {
+  ".checkAssociation for psa" - {
 
     val psaId = psaIdGen.sample.value
     val srn = srnGen.sample.value
@@ -221,7 +221,7 @@ class SchemeDetailsConnectorSpec extends BaseConnectorSpec {
       result mustBe false
     }
 
-    "throw error" when {
+    "throw error" - {
 
       "404 response is sent" in runningApplication { implicit app =>
 
@@ -243,7 +243,7 @@ class SchemeDetailsConnectorSpec extends BaseConnectorSpec {
     }
   }
 
-  ".checkAssociation for psp" should {
+  ".checkAssociation for psp" - {
 
     val pspId = pspIdGen.sample.value
     val srn = srnGen.sample.value
@@ -266,7 +266,7 @@ class SchemeDetailsConnectorSpec extends BaseConnectorSpec {
       result mustBe false
     }
 
-    "throw error" when {
+    "throw error" - {
 
       "404 response is sent" in runningApplication { implicit app =>
 
@@ -288,7 +288,7 @@ class SchemeDetailsConnectorSpec extends BaseConnectorSpec {
     }
   }
 
-  ".listSchemeDetails for psa" should {
+  ".listSchemeDetails for psa" - {
 
     val psaId = psaIdGen.sample.value
     val expectedResult = listMinimalSchemeDetailsGen.sample.value
@@ -307,7 +307,7 @@ class SchemeDetailsConnectorSpec extends BaseConnectorSpec {
       connector.listSchemeDetails(psaId).futureValue mustBe None
     }
 
-    "throw error" when {
+    "throw error" - {
 
       "400 response is sent" in runningApplication { implicit app =>
 
@@ -329,7 +329,7 @@ class SchemeDetailsConnectorSpec extends BaseConnectorSpec {
     }
   }
 
-  ".listSchemeDetails for psp" should {
+  ".listSchemeDetails for psp" - {
 
     val pspId = pspIdGen.sample.value
     val expectedResult = listMinimalSchemeDetailsGen.sample.value
@@ -348,7 +348,7 @@ class SchemeDetailsConnectorSpec extends BaseConnectorSpec {
       connector.listSchemeDetails(pspId).futureValue mustBe None
     }
 
-    "throw error" when {
+    "throw error" - {
 
       "400 response is sent" in runningApplication { implicit app =>
 

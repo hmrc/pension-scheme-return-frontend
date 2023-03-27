@@ -42,7 +42,7 @@ class SchemeMemberDetailsCYAControllerSpec extends ControllerBaseSpec {
     .unsafeSet(NationalInsuranceNumberPage(srn, refineMV(1)), false)
     .unsafeSet(NoNINOPage(srn, refineMV(1)), noNinoReason)
 
-  "SchemeMemberDetailsCYAController" should {
+  "SchemeMemberDetailsCYAController" - {
 
     act.like(
       renderView(onPageLoad, userAnswersWithNino)(
@@ -64,7 +64,7 @@ class SchemeMemberDetailsCYAControllerSpec extends ControllerBaseSpec {
       ).withName("render the correct view when no nino provided")
     )
 
-    "when member details is missing" should {
+    "when member details is missing" - {
       act.like(
         redirectToPage(
           onPageLoad,
@@ -74,7 +74,7 @@ class SchemeMemberDetailsCYAControllerSpec extends ControllerBaseSpec {
       )
     }
 
-    "when dose member have NINO is missing" should {
+    "when dose member have NINO is missing" - {
       act.like(
         redirectToPage(
           onPageLoad,
@@ -84,7 +84,7 @@ class SchemeMemberDetailsCYAControllerSpec extends ControllerBaseSpec {
       )
     }
 
-    "when NINO is missing" should {
+    "when NINO is missing" - {
       act.like(
         redirectToPage(
           onPageLoad,
@@ -94,7 +94,7 @@ class SchemeMemberDetailsCYAControllerSpec extends ControllerBaseSpec {
       )
     }
 
-    "when no NINO reason is missing" should {
+    "when no NINO reason is missing" - {
       act.like(
         redirectToPage(
           onPageLoad,
@@ -107,7 +107,7 @@ class SchemeMemberDetailsCYAControllerSpec extends ControllerBaseSpec {
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
 
-    "viewModel" should {
+    "viewModel" - {
       "contain all rows if has nino is true and nino is present" in {
         val vm = viewModel(refineMV(1), srn, NormalMode, memberDetails, hasNINO = true, Some(nino), None)
         vm.rows.size mustBe 5

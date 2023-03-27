@@ -29,7 +29,7 @@ class PensionSchemeViewSpec extends BaseSpec with ScalaCheckPropertyChecks with 
 
     implicit val request = FakeRequest()
 
-    "PensionsSchemeView" should {
+    "PensionsSchemeView" - {
 
       val pensionSchemeForm = new PensionSchemeForm().apply(requiredKey = "required")
 

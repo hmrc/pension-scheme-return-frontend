@@ -28,7 +28,7 @@ import scala.concurrent.Future
 
 class AuthControllerSpec extends ControllerBaseSpec {
 
-  "signOut" should {
+  "signOut" - {
 
     "clear user answers and redirect to sign out, specifying the exit survey as the continue URL" in {
 
@@ -43,7 +43,7 @@ class AuthControllerSpec extends ControllerBaseSpec {
       running(application) {
 
         val appConfig = application.injector.instanceOf[FrontendAppConfig]
-        val request = FakeRequest(GET, routes.AuthController.signOut.url)
+        val request = FakeRequest(GET, routes.AuthController.signOut().url)
 
         val result = route(application, request).value
 
@@ -57,7 +57,7 @@ class AuthControllerSpec extends ControllerBaseSpec {
     }
   }
 
-  "signOutNoSurvey" should {
+  "signOutNoSurvey" - {
 
     "clear users answers and redirect to sign out, specifying SignedOut as the continue URL" in {
 
@@ -72,11 +72,11 @@ class AuthControllerSpec extends ControllerBaseSpec {
       running(application) {
 
         val appConfig = application.injector.instanceOf[FrontendAppConfig]
-        val request = FakeRequest(GET, routes.AuthController.signOutNoSurvey.url)
+        val request = FakeRequest(GET, routes.AuthController.signOutNoSurvey().url)
 
         val result = route(application, request).value
 
-        val encodedContinueUrl = URLEncoder.encode(routes.SignedOutController.onPageLoad.url, "UTF-8")
+        val encodedContinueUrl = URLEncoder.encode(routes.SignedOutController.onPageLoad().url, "UTF-8")
         val expectedRedirectUrl = s"${appConfig.urls.signOutUrl}?continue=$encodedContinueUrl"
 
         status(result) mustEqual SEE_OTHER

@@ -43,7 +43,7 @@ class AccountingPeriodCheckYourAnswersControllerSpec extends ControllerBaseSpec 
 
   val userAnswers = defaultUserAnswers.set(AccountingPeriodPage(srn, refineMV[OneToThree](1)), dateRange).success.value
 
-  "AccountingPeriodCheckYourAnswersController" should {
+  "AccountingPeriodCheckYourAnswersController" - {
     act.like(
       renderView(onPageLoad, userAnswers)(
         implicit app => implicit request => injected[CheckYourAnswersView].apply(viewModel)
@@ -60,7 +60,7 @@ class AccountingPeriodCheckYourAnswersControllerSpec extends ControllerBaseSpec 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
 
-    "viewModel" should {
+    "viewModel" - {
 
       val viewModel = AccountingPeriodCheckYourAnswersController.viewModel _
 

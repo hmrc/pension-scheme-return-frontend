@@ -41,7 +41,7 @@ class CheckReturnDatesControllerSpec extends ControllerBaseSpec with ScalaCheckP
 
   lazy val checkReturnDatesRoute = routes.CheckReturnDatesController.onPageLoad(srn, NormalMode).url
 
-  "CheckReturnDates.viewModel" should {
+  "CheckReturnDates.viewModel" - {
 
     val minimalSchemeDetails = minimalSchemeDetailsGen.sample.value
 
@@ -138,7 +138,7 @@ class CheckReturnDatesControllerSpec extends ControllerBaseSpec with ScalaCheckP
     }
   }
 
-  "CheckReturnDates Controller" should {
+  "CheckReturnDates Controller" - {
 
     val date = self.date.sample.value
     val taxYear = TaxYear(date.getYear)

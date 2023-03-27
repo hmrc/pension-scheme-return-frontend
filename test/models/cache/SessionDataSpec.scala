@@ -22,7 +22,7 @@ import utils.BaseSpec
 
 class SessionDataSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
-  "PensionSchemeUser" should {
+  "PensionSchemeUser" - {
 
     "successfully read from json" in {
 

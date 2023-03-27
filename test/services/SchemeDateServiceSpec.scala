@@ -50,7 +50,7 @@ class SchemeDateServiceSpec extends BaseSpec with ScalaCheckPropertyChecks {
     ("schemeEndDate", service.schemeEndDate(srn)(_), _.to)
   ).foreach {
     case (name, action, expected) =>
-      s"SchemeDateService.$name" should {
+      s"SchemeDateService.$name" - {
 
         "return None when nothing is in cache" in {
 
@@ -58,7 +58,7 @@ class SchemeDateServiceSpec extends BaseSpec with ScalaCheckPropertyChecks {
           action(request) mustBe None
         }
 
-        s"choose the $name from WhichTaxYearPage answer" when {
+        s"choose the $name from WhichTaxYearPage answer" - {
 
           "no accounting periods found" in {
 
@@ -71,7 +71,7 @@ class SchemeDateServiceSpec extends BaseSpec with ScalaCheckPropertyChecks {
           }
         }
 
-        s"choose $name from AccountingPeriodPage answer" when {
+        s"choose $name from AccountingPeriodPage answer" - {
 
           "only 1 is present" in {
 

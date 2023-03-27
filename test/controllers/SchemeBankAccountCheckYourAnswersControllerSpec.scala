@@ -40,7 +40,7 @@ class SchemeBankAccountCheckYourAnswersControllerSpec
   lazy val onPageLoad = routes.SchemeBankAccountCheckYourAnswersController.onPageLoad(srn, indexOne)
   lazy val onSubmit = routes.SchemeBankAccountCheckYourAnswersController.onSubmit(srn)
 
-  "SchemeBankAccountCheckYourAnswersController" should {
+  "SchemeBankAccountCheckYourAnswersController" - {
 
     lazy val viewModel = SchemeBankAccountCheckYourAnswersController.viewModel(srn, indexOne, bankAccount)
 
@@ -60,7 +60,7 @@ class SchemeBankAccountCheckYourAnswersControllerSpec
     act.like(redirectNextPage(onSubmit))
   }
 
-  "SchemeBankAccountCheckYourAnswers.viewModel" should {
+  "SchemeBankAccountCheckYourAnswers.viewModel" - {
 
     val viewModel = SchemeBankAccountCheckYourAnswersController.viewModel _
 
