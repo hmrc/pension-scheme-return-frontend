@@ -258,6 +258,18 @@ noNINO.error.required = Enter the reason {0} does not have a National Insurance 
 noNINO.error.length = The reason {0} does not have a National Insurance number must be 160 characters or fewer
 noNINO.error.invalid = The reason {0} does not have a National Insurance number must only include letters a to z, numbers 0 to 9, and special characters such as hyphens, spaces and apostrophes
 
+valueOfAssets.title = What was the total value of the scheme’s assets, including cash?
+valueOfAssets.heading = What was the total value of {0}’s assets, including cash?
+valueOfAssets.description = If the scheme had no assets or cash on one or both of these dates, enter 0.
+valueOfAssets.start.label = Total value of assets and cash on {0}, in pounds and pence
+valueOfAssets.start.error.required = Enter the total value of the scheme’s assets and cash on {0}, in pounds and pence
+valueOfAssets.start.error.nonNumeric = Total value of assets and cash on {0} must be an amount of money, like 123.45 or 156
+valueOfAssets.start.error.tooLarge = Total value of assets and cash on {0} must be 999999999.99 or less
+valueOfAssets.end.label = Total value of assets and cash on {0}, in pounds and pence
+valueOfAssets.end.error.required = Enter the total value of the scheme’s assets and cash on {1}, in pounds and pence
+valueOfAssets.end.error.nonNumeric = Total value of assets and cash on {1} must be an amount of money, like 123.45 or 156
+valueOfAssets.end.error.tooLarge = Total value of assets and cash on {1} must be 999999999.99 or less
+
 schemeMembersList.title = You have added {0} member
 schemeMembersList.title.plural = You have added {0} members
 schemeMembersList.heading = You have added {0} member

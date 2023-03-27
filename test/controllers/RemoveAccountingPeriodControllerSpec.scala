@@ -21,7 +21,6 @@ import eu.timepit.refined._
 import forms.YesNoPageFormProvider
 import models.NormalMode
 import pages.AccountingPeriodPage
-import utils.UserAnswersUtils._
 import views.html.YesNoPageView
 
 class RemoveAccountingPeriodControllerSpec extends ControllerBaseSpec {

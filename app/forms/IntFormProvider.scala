@@ -14,15 +14,11 @@
  * limitations under the License.
  */
 
-package viewmodels.models
+package forms
 
-import play.api.mvc.Call
-import viewmodels.DisplayMessage.{BlockMessage, Message}
+import forms.mappings.Mappings
+import forms.mappings.errors.IntFormErrors
 
-case class MoneyViewModel[A](
-  title: Message,
-  heading: Message,
-  description: Option[BlockMessage],
-  questions: MultipleQuestionsViewModel[A],
-  onSubmit: Call
-)
+import javax.inject.Inject
+
+class IntFormProvider @Inject() extends FormProvider[IntFormErrors, Int](Mappings.int)

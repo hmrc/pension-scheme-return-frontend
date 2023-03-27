@@ -16,7 +16,7 @@
 
 package forms.mappings
 
-import forms.mappings.errors.IntFormErrors
+import forms.mappings.errors.{IntFormErrors, MoneyFormErrors}
 import models.{Enumerable, Money}
 import play.api.data.FormError
 import play.api.data.format.Formatter
@@ -129,14 +129,12 @@ trait Formatters {
     }
 
   private[mappings] def moneyFormatter(
-    requiredKey: String,
-    nonMoneyKey: String,
-    max: (Double, String),
+    errors: MoneyFormErrors,
     args: Seq[String] = Seq.empty
   ): Formatter[Money] =
     new Formatter[Money] {
 
-      private val baseFormatter = doubleFormatter(requiredKey, nonMoneyKey, max, args)
+      private val baseFormatter = doubleFormatter(errors.requiredKey, errors.nonNumericKey, errors.max, args)
       private val decimalRegex = "^-?\\d+(\\.\\d{1,2})?$"
 
       override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Money] =
@@ -146,7 +144,7 @@ trait Formatters {
             if (double.toString.matches(decimalRegex))
               Right(Money(double, data(key).replace("£", "")))
             else
-              Left(Seq(FormError(key, nonMoneyKey, args)))
+              Left(Seq(FormError(key, errors.nonNumericKey, args)))
           }
 
       override def unbind(key: String, value: Money): Map[String, String] =

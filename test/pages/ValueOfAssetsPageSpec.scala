@@ -14,15 +14,21 @@
  * limitations under the License.
  */
 
-package viewmodels.models
+package pages
 
-import play.api.mvc.Call
-import viewmodels.DisplayMessage.{BlockMessage, Message}
+import models.MoneyInPeriod
+import pages.behaviours.PageBehaviours
 
-case class MoneyViewModel[A](
-  title: Message,
-  heading: Message,
-  description: Option[BlockMessage],
-  questions: MultipleQuestionsViewModel[A],
-  onSubmit: Call
-)
+class ValueOfAssetsPageSpec extends PageBehaviours {
+
+  "ValueOfAssetsPage" - {
+
+    val srn = srnGen.sample.value
+
+    beRetrievable[MoneyInPeriod](ValueOfAssetsPage(srn))
+
+    beSettable[MoneyInPeriod](ValueOfAssetsPage(srn))
+
+    beRemovable[MoneyInPeriod](ValueOfAssetsPage(srn))
+  }
+}

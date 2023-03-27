@@ -17,8 +17,11 @@
 package views
 
 import forms.mappings.Mappings
+import forms.mappings.errors.MoneyFormErrors
 import models.Money
+import org.scalacheck.Gen
 import play.api.data
+import play.api.data.Forms.mapping
 import play.api.test.FakeRequest
 import views.html.MoneyView
 
@@ -29,48 +32,35 @@ class MoneyViewSpec extends ViewSpec with Mappings {
 
     implicit val request = FakeRequest()
 
+    val moneyMapping = money(MoneyFormErrors.default(requiredKey = "money.error.required"))
     val moneyForm: data.Form[Money] =
-      data.Form("value" -> money("money.error.required"))
+      data.Form("value" -> moneyMapping)
+    val tripleMoneyForm = data.Form(
+      mapping(
+        "value.1" -> moneyMapping,
+        "value.2" -> moneyMapping,
+        "value.3" -> moneyMapping
+      )(Tuple3.apply)(Tuple3.unapply)
+    )
+
+    val invalidMoneyForm = moneyForm.bind(Map("value" -> ""))
+
+    val singleMoneyQuestion = moneyViewModelGen(singleQuestionGen(moneyForm))
+    val tripleMoneyQuestion = moneyViewModelGen(tripleQuestionGen(tripleMoneyForm))
+    val invalidSingleMoneyQuestion = moneyViewModelGen(singleQuestionGen(invalidMoneyForm))
+    val viewModelGen = Gen.oneOf(singleMoneyQuestion, tripleMoneyQuestion, invalidSingleMoneyQuestion)
 
     "MoneyView" - {
 
-      "render the title" in {
-
-        forAll(moneyViewModelGen) { viewModel =>
-          title(view(moneyForm, viewModel)) must startWith(viewModel.title.key)
-        }
-      }
-
-      "render the heading" in {
-
-        forAll(moneyViewModelGen) { viewModel =>
-          h1(view(moneyForm, viewModel)) mustBe viewModel.heading.key
-        }
-      }
-
-      "have form" in {
-
-        forAll(moneyViewModelGen) { viewModel =>
-          form(view(moneyForm, viewModel)).method mustBe viewModel.onSubmit.method
-          form(view(moneyForm, viewModel)).action mustBe viewModel.onSubmit.url
-        }
-      }
-
-      "render the required error summary" in {
-
-        forAll(moneyViewModelGen) { viewModel =>
-          val invalidForm = moneyForm.bind(Map("value" -> ""))
-          errorSummary(view(invalidForm, viewModel)).text() must include("money.error.required")
-        }
-      }
-
-      "render the start date required error message" in {
-
-        forAll(moneyViewModelGen) { viewModel =>
-          val invalidForm = moneyForm.bind(Map("value" -> ""))
-          errorMessage(view(invalidForm, viewModel)).text() must include("money.error.required")
-        }
-      }
+      act.like(renderTitle(viewModelGen)(view(_), _.title.key))
+      act.like(renderHeading(viewModelGen)(view(_), _.heading))
+      act.like(renderInputWithLabel(singleMoneyQuestion)("value", view(_), _.heading))
+      act.like(renderInputWithLabel(tripleMoneyQuestion)("value.1", view(_), _.questions.fields.head.label))
+      act.like(renderInputWithLabel(tripleMoneyQuestion)("value.2", view(_), _.questions.fields(1).label))
+      act.like(renderInputWithLabel(tripleMoneyQuestion)("value.3", view(_), _.questions.fields(2).label))
+      act.like(renderErrors(invalidSingleMoneyQuestion)(view(_), "money.error.required"))
+      act.like(renderForm(viewModelGen)(view(_), _.onSubmit))
+      act.like(renderSaveAndContinueButton(viewModelGen)(view(_)))
     }
   }
 }

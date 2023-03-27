@@ -24,25 +24,46 @@
         govukInput: GovukInput
 )
 
-@(form: Form[Money], viewmodel: MoneyViewModel)(implicit request: Request[_], messages: Messages)
+@(viewmodel: MoneyViewModel[_])(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(viewmodel.title.toMessage)) {
 
   @formHelper(action = viewmodel.onSubmit, Symbol("autocomplete") -> "off") {
 
-    @if(form.hasErrors) {
-      @govukErrorSummary(ErrorSummaryViewModel(form))
+    @if(viewmodel.questions.form.hasErrors) {
+      @govukErrorSummary(ErrorSummaryViewModel(viewmodel.questions.form))
     }
 
-    @govukInput(
-      InputViewModel(
-        field = form("value"),
-        label = LabelViewModel(renderMessage(viewmodel.heading)).asPageHeading()
+    @if(viewmodel.questions.fields.length > 1) {
+      <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
+
+      @viewmodel.description.map(renderMessage)
+
+      @viewmodel.questions.fields.zipWithIndex.map { case (field, index) =>
+        @govukInput(
+          InputViewModel(
+            field = viewmodel.questions.form(s"value.${index + 1}"),
+            label = LabelViewModel(renderMessage(field.label))
+          )
+          .withHint(field.hint.map(h => Hint(content = HtmlContent(renderMessage(h)))))
+          .asNumeric()
+          .withWidth(Fixed10)
+          .withPrefix(PrefixOrSuffix(content = Text("£")))
+        )
+      }
+
+    } else {
+      @govukInput(
+        InputViewModel(
+          field = viewmodel.questions.form("value"),
+          label = LabelViewModel(renderMessage(viewmodel.heading)).asPageHeading()
+        )
+        .asNumeric()
+        .withWidth(Fixed10)
+        .withPrefix(PrefixOrSuffix(content = Text("£")))
       )
-      .asNumeric()
-      .withWidth(Fixed10)
-      .withPrefix(PrefixOrSuffix(content = Text("£")))
-    )
+    }
+
 
     @govukButton(
       ButtonViewModel(messages("site.saveAndContinue"))

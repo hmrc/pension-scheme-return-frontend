@@ -17,6 +17,7 @@
 package models
 
 import play.api.libs.json.{Format, Json}
+import utils.Transform
 
 case class SchemeMemberNumbers(active: Int, deferred: Int, pensioner: Int) {
 
@@ -26,4 +27,14 @@ case class SchemeMemberNumbers(active: Int, deferred: Int, pensioner: Int) {
 object SchemeMemberNumbers {
 
   implicit val format: Format[SchemeMemberNumbers] = Json.format[SchemeMemberNumbers]
+
+  implicit val transform: Transform[(Int, Int, Int), SchemeMemberNumbers] =
+    new Transform[(Int, Int, Int), SchemeMemberNumbers] {
+
+      override def to(a: (Int, Int, Int)): SchemeMemberNumbers =
+        SchemeMemberNumbers(a._1, a._2, a._3)
+
+      override def from(b: SchemeMemberNumbers): (Int, Int, Int) =
+        (b.active, b.deferred, b.pensioner)
+    }
 }

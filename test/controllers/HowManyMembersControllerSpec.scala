@@ -16,15 +16,15 @@
 
 package controllers
 
-import controllers.HowManyMembersController._
-import forms.TripleIntFormProvider
+import controllers.HowManyMembersController.{form, _}
+import forms.IntFormProvider
 import models.{NormalMode, SchemeMemberNumbers}
 import org.mockito.ArgumentMatchers.any
 import pages.HowManyMembersPage
 import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
 import services.SchemeDateService
-import views.html.TripleIntView
+import views.html.IntView
 
 import java.time.LocalDate
 
@@ -50,21 +50,21 @@ class HowManyMembersControllerSpec extends ControllerBaseSpec {
   "HowManyMembersController" - {
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
-      val view = injected[TripleIntView]
+      val view = injected[IntView]
+      val viewForm = form(injected[IntFormProvider])
 
       view(
-        form(injected[TripleIntFormProvider]),
-        viewModel(srn, defaultSchemeDetails.schemeName, submissionEndDate, NormalMode)
+        viewModel(srn, defaultSchemeDetails.schemeName, submissionEndDate, NormalMode, viewForm)
       )
     })
 
     act.like(renderPrePopView(onPageLoad, HowManyMembersPage(srn, pensionSchemeId), SchemeMemberNumbers(1, 2, 3)) {
       implicit app => implicit request =>
-        val view = injected[TripleIntView]
+        val view = injected[IntView]
+        val populatedForm = form(injected[IntFormProvider]).fill((1, 2, 3))
 
         view(
-          form(injected[TripleIntFormProvider]).fill(SchemeMemberNumbers(1, 2, 3)),
-          viewModel(srn, defaultSchemeDetails.schemeName, submissionEndDate, NormalMode)
+          viewModel(srn, defaultSchemeDetails.schemeName, submissionEndDate, NormalMode, populatedForm)
         )
     })
 

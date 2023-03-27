@@ -28,7 +28,7 @@ class HowMuchCashControllerSpec extends ControllerBaseSpec {
     val schemeName = defaultSchemeDetails.schemeName
 
     val form = HowMuchCashController.form(new MoneyFormProvider(), schemeName, defaultTaxYear)
-    lazy val viewModel = HowMuchCashController.viewModel(srn, NormalMode, schemeName, defaultTaxYear)
+    lazy val viewModel = HowMuchCashController.viewModel(srn, NormalMode, schemeName, defaultTaxYear, _)
 
     val moneyData = moneyGen.sample.value
 
@@ -37,12 +37,12 @@ class HowMuchCashControllerSpec extends ControllerBaseSpec {
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       val view = injected[MoneyView]
-      view(form, viewModel)
+      view(viewModel(form))
     })
 
     act.like(renderPrePopView(onPageLoad, HowMuchCashPage(srn), moneyData) { implicit app => implicit request =>
       val view = injected[MoneyView]
-      view(form.fill(moneyData), viewModel)
+      view(viewModel(form.fill(moneyData)))
     })
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
