@@ -271,8 +271,11 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
       forAll(srnGen) { srn =>
         val page = MemberDetailsNinoPage(srn, refineMV(1))
-        navigator.nextPage(page, NormalMode, userAnswers) mustBe routes.SchemeMemberDetailsCYAController
-          .onPageLoad(srn, refineMV(1))
+        navigator.nextPage(page, NormalMode, userAnswers) mustBe routes.SchemeMemberDetailsAnswersController.onPageLoad(
+          srn,
+          refineMV(1),
+          CheckOrChange.Check
+        )
       }
     }
 

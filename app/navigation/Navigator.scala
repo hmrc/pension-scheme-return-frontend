@@ -21,10 +21,10 @@ import controllers.routes
 import eu.timepit.refined.{refineMV, refineV}
 import models.PensionSchemeId.{PsaId, PspId}
 import models._
+import pages.MembersDetails._
 import pages.SchemeBankAccounts.SchemeBankAccountsOps
-import pages.{HowMuchCashPage, _}
+import pages._
 import play.api.mvc.Call
-import MembersDetails._
 
 import javax.inject.{Inject, Singleton}
 
@@ -82,8 +82,9 @@ class Navigator @Inject()() {
       case ua if ua.get(page).contains(true) => routes.MemberDetailsNinoController.onPageLoad(srn, index, NormalMode)
       case _ => routes.NoNINOController.onPageLoad(srn, index, NormalMode)
     }
-    case MemberDetailsNinoPage(srn, index) => _ => routes.SchemeMemberDetailsCYAController.onPageLoad(srn, index)
-    case SchemeMemberDetailsCYAPage(srn) => _ => routes.SchemeMembersListController.onPageLoad(srn, page = 1)
+    case MemberDetailsNinoPage(srn, index) =>
+      _ => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, CheckOrChange.Check)
+    case SchemeMemberDetailsAnswersPage(srn) => _ => routes.SchemeMembersListController.onPageLoad(srn, page = 1)
     case PsaDeclarationPage(srn) => _ => routes.UnauthorisedController.onPageLoad
     case PspDeclarationPage(srn) => _ => routes.UnauthorisedController.onPageLoad
 
@@ -97,13 +98,14 @@ class Navigator @Inject()() {
       case _ => routes.HowMuchCashController.onPageLoad(srn, NormalMode)
     }
 
-    case NoNINOPage(srn, index) => _ => routes.SchemeMemberDetailsCYAController.onPageLoad(srn, index)
+    case NoNINOPage(srn, index) =>
+      _ => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, CheckOrChange.Check)
     case SchemeMembersListPage(srn, false) => _ => routes.UnauthorisedController.onPageLoad
     case SchemeMembersListPage(srn, true) =>
       ua =>
         refineV[OneTo99](ua.membersDetails(srn).length + 1).fold(
           _ => routes.JourneyRecoveryController.onPageLoad(),
-          index => routes.MemberDetailsController.onPageLoad(srn, index, NormalMode)
+          index => routes.MemberDetailsController.onPageLoad(srn, index)
         )
     case _ => _ => routes.IndexController.onPageLoad
   }

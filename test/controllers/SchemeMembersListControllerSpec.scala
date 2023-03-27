@@ -52,7 +52,7 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
     act.like(
       redirectToPage(
         onPageLoad,
-        routes.MemberDetailsController.onPageLoad(srn, refineMV(1), NormalMode),
+        routes.MemberDetailsController.onPageLoad(srn, refineMV(1)),
         defaultUserAnswers
       )
     )
@@ -62,7 +62,7 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
     act.like(
       redirectToPage(
         onSubmit,
-        routes.MemberDetailsController.onPageLoad(srn, refineMV(2), NormalMode),
+        routes.MemberDetailsController.onPageLoad(srn, refineMV(2)),
         userAnswersWithMembersDetails,
         "value" -> "true"
       )
