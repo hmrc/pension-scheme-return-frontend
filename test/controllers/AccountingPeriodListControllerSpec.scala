@@ -28,7 +28,7 @@ import views.html.ListView
 
 class AccountingPeriodListControllerSpec extends ControllerBaseSpec {
 
-  "AccountingPeriodListController" should {
+  "AccountingPeriodListController" - {
 
     val dateRanges = Gen.listOfN(3, dateRangeGen).sample.value
 
@@ -64,7 +64,7 @@ class AccountingPeriodListControllerSpec extends ControllerBaseSpec {
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }
 
-  "AccountingPeriodListController.viewModel" should {
+  "AccountingPeriodListController.viewModel" - {
 
     "contain the correct number of rows" in {
 

@@ -23,7 +23,7 @@ import views.html.MoneyView
 
 class HowMuchCashControllerSpec extends ControllerBaseSpec {
 
-  "HowMuchCashController" should {
+  "HowMuchCashController" - {
 
     val schemeName = defaultSchemeDetails.schemeName
 
@@ -51,7 +51,7 @@ class HowMuchCashControllerSpec extends ControllerBaseSpec {
 
     act.like(invalidForm(onSubmit))
 
-    "fail to submit when amount entered is greater than maximum allowed amount" when {
+    "fail to submit when amount entered is greater than maximum allowed amount" - {
       val maxAllowedAmount = 999999999.99
       act.like(invalidForm(onSubmit, "value" -> (maxAllowedAmount + 0.001).toString))
     }

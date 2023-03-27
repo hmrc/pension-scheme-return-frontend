@@ -35,9 +35,9 @@ class DataRetrievalActionSpec extends BaseSpec {
 
   val request = allowedAccessRequestGen(FakeRequest()).sample.value
 
-  "Data Retrieval Action" should {
+  "Data Retrieval Action" - {
 
-    "set userAnswers to 'None' in the request" when {
+    "set userAnswers to 'None' in the request" - {
       "there is no data in the cache" in {
 
         val sessionRepository = mock[SessionRepository]
@@ -50,7 +50,7 @@ class DataRetrievalActionSpec extends BaseSpec {
       }
     }
 
-    "build a userAnswers object and add it to the request" when {
+    "build a userAnswers object and add it to the request" - {
       "when there is data in the cache" in {
 
         val sessionRepository = mock[SessionRepository]

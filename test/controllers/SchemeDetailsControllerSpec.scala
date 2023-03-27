@@ -46,7 +46,7 @@ class SchemeDetailsControllerSpec extends ControllerBaseSpec {
     )
   )
 
-  "SchemeDetailsController" should {
+  "SchemeDetailsController" - {
 
     List(
       ("a single establisher", defaultSchemeDetails, 4),
@@ -75,7 +75,7 @@ class SchemeDetailsControllerSpec extends ControllerBaseSpec {
           )
     }
 
-    "return OK and the correct view for a GET" when {
+    "return OK and the correct view for a GET" - {
       List(
         ("a single establisher", defaultSchemeDetails),
         ("two establishers", schemeDetailsTwoEstablishers),

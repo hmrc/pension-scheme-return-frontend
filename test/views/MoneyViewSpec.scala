@@ -50,7 +50,7 @@ class MoneyViewSpec extends ViewSpec with Mappings {
     val invalidSingleMoneyQuestion = moneyViewModelGen(singleQuestionGen(invalidMoneyForm))
     val viewModelGen = Gen.oneOf(singleMoneyQuestion, tripleMoneyQuestion, invalidSingleMoneyQuestion)
 
-    "MoneyView" should {
+    "MoneyView" - {
 
       act.like(renderTitle(viewModelGen)(view(_), _.title.key))
       act.like(renderHeading(viewModelGen)(view(_), _.heading))

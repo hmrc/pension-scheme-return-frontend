@@ -35,7 +35,7 @@ class RemoveAccountingPeriodControllerSpec extends ControllerBaseSpec {
     .unsafeSet(AccountingPeriodPage(srn, refineMV(1)), period)
     .unsafeSet(AccountingPeriodPage(srn, refineMV(2)), otherPeriod)
 
-  "RemoveSchemeBankAccountController" should {
+  "RemoveSchemeBankAccountController" - {
 
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
       val view = injected[YesNoPageView]

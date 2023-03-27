@@ -29,7 +29,7 @@ class ContentTablePageViewSpec extends BaseSpec with ScalaCheckPropertyChecks wi
 
     implicit val request = FakeRequest()
 
-    "ContentTablePageView" should {
+    "ContentTablePageView" - {
 
       "render the title" in {
 

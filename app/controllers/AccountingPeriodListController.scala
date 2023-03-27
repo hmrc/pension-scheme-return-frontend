@@ -72,10 +72,12 @@ class AccountingPeriodListController @Inject()(
 
       val viewModel = AccountingPeriodListController.viewModel(srn, mode, periods)
 
-      form.bindFromRequest.fold(
-        errors => BadRequest(view(errors, viewModel)),
-        answer => Redirect(navigator.nextPage(AccountingPeriodListPage(srn, answer), mode, request.userAnswers))
-      )
+      form
+        .bindFromRequest()
+        .fold(
+          errors => BadRequest(view(errors, viewModel)),
+          answer => Redirect(navigator.nextPage(AccountingPeriodListPage(srn, answer), mode, request.userAnswers))
+        )
     }
   }
 }

@@ -89,8 +89,8 @@ class IdentifierActionSpec extends BaseSpec with StubPlayBodyParsersFactory {
     when(mockSessionDataCacheConnector.fetch(any())(any(), any()))
       .thenReturn(value)
 
-  "IdentifierAction" should {
-    "return an unauthorised result" when {
+  "IdentifierAction" - {
+    "return an unauthorised result" - {
 
       "Redirect user to sign in page when user is not signed in to GG" in runningApplication { implicit app =>
         setAuthValue(Future.failed(new NoActiveSession("No user signed in") {}))
@@ -116,7 +116,7 @@ class IdentifierActionSpec extends BaseSpec with StubPlayBodyParsersFactory {
         setAuthValue(authResult(Some("id"), None, psaEnrolment))
 
         val result = handler.run(FakeRequest())
-        val expectedUrl = routes.UnauthorisedController.onPageLoad.url
+        val expectedUrl = routes.UnauthorisedController.onPageLoad().url
 
         redirectLocation(result) mustBe Some(expectedUrl)
       }
@@ -125,7 +125,7 @@ class IdentifierActionSpec extends BaseSpec with StubPlayBodyParsersFactory {
         setAuthValue(authResult(None, Some("id"), psaEnrolment))
 
         val result = handler.run(FakeRequest())
-        val expectedUrl = routes.UnauthorisedController.onPageLoad.url
+        val expectedUrl = routes.UnauthorisedController.onPageLoad().url
 
         redirectLocation(result) mustBe Some(expectedUrl)
       }
@@ -140,7 +140,7 @@ class IdentifierActionSpec extends BaseSpec with StubPlayBodyParsersFactory {
           redirectLocation(result) mustBe Some(expectedUrl)
       }
 
-      "Redirect user to admin or practitioner page" when {
+      "Redirect user to admin or practitioner page" - {
         "user has both psa and psp enrolment but nothing is in the cache" in runningApplication { implicit app =>
           setAuthValue(authResult(Some("internalId"), Some("externalId"), psaEnrolment, pspEnrolment))
           setSessionValue(None)
@@ -153,7 +153,7 @@ class IdentifierActionSpec extends BaseSpec with StubPlayBodyParsersFactory {
       }
     }
 
-    "return an IdentifierRequest" when {
+    "return an IdentifierRequest" - {
       "User has a psa enrolment" in runningApplication { implicit app =>
         setAuthValue(authResult(Some("internalId"), Some("externalId"), psaEnrolment))
 

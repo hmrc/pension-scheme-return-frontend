@@ -24,7 +24,7 @@ import views.html.TextInputView
 
 class MemberDetailsNinoControllerSpec extends ControllerBaseSpec {
 
-  "MemberDetailsNinoController" should {
+  "MemberDetailsNinoController" - {
 
     val memberDetails = nameDobGen.sample.value
     val populatedUserAnswers = defaultUserAnswers.set(MemberDetailsPage(srn, refineMV(1)), memberDetails).get
@@ -67,12 +67,12 @@ class MemberDetailsNinoControllerSpec extends ControllerBaseSpec {
 
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
 
-    "allow nino to be updated" when {
+    "allow nino to be updated" - {
       val userAnswers = populatedUserAnswers.set(MemberDetailsNinoPage(srn, refineMV(1)), validNino).get
       act.like(saveAndContinue(onSubmit, userAnswers, formData(form, validNino): _*))
     }
 
-    "return a 400 if nino has already been entered" when {
+    "return a 400 if nino has already been entered" - {
       val userAnswers =
         populatedUserAnswers
           .unsafeSet(MemberDetailsNinoPage(srn, refineMV(1)), otherValidNino)

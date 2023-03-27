@@ -24,7 +24,7 @@ import views.html.RadioListView
 
 class WhichTaxYearControllerSpec extends ControllerBaseSpec {
 
-  "WhichTaxYearController" should {
+  "WhichTaxYearController" - {
 
     lazy val onPageLoad = routes.WhichTaxYearController.onPageLoad(srn, NormalMode)
     lazy val onSubmit = routes.WhichTaxYearController.onSubmit(srn, NormalMode)
@@ -54,7 +54,7 @@ class WhichTaxYearControllerSpec extends ControllerBaseSpec {
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }
 
-  "WhichTaxYearController.options" should {
+  "WhichTaxYearController.options" - {
 
     "return the current tax year" in {
 

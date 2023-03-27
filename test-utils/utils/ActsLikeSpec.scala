@@ -16,9 +16,9 @@
 
 package utils
 
-import org.scalatest.wordspec.AnyWordSpecLike
+import org.scalatest.freespec.AnyFreeSpecLike
 
-trait ActsLikeSpec { _: AnyWordSpecLike =>
+trait ActsLikeSpec { _: AnyFreeSpecLike =>
 
   import Behaviours._
 
@@ -83,7 +83,7 @@ trait ActsLikeSpec { _: AnyWordSpecLike =>
         copy(behaviours = behaviours.map(f))
 
       def run(): Unit =
-        name should {
+        name - {
           beforeAllTests()
           behaviours.foreach(_.run())
           afterAllTests()

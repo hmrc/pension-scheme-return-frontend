@@ -27,7 +27,7 @@ class YesNoPageViewSpec extends ViewSpec {
 
     val view = injected[YesNoPageView]
 
-    "YesNoPageView" should {
+    "YesNoPageView" - {
 
       val requiredKey = "required"
       val invalidKey = "invalid"

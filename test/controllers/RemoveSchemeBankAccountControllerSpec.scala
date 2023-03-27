@@ -50,7 +50,7 @@ class RemoveSchemeBankAccountControllerSpec extends ControllerBaseSpec {
     .success
     .value
 
-  "RemoveSchemeBankAccountController" should {
+  "RemoveSchemeBankAccountController" - {
 
     act.like(renderView(onPageLoad, userAnswersWithBankAccounts) { implicit app => implicit request =>
       injected[YesNoPageView]

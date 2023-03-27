@@ -44,7 +44,7 @@ class ValueOfAssetsControllerSpec extends ControllerBaseSpec {
   def setSchemeDate(date: Option[DateRange]): Unit =
     when(mockSchemeDateService.schemeDate(any())(any())).thenReturn(date)
 
-  "ValueOfAssetsController" should {
+  "ValueOfAssetsController" - {
 
     val form = ValueOfAssetsController.form(new MoneyFormProvider(), schemeDatePeriod)
     lazy val viewModel = ValueOfAssetsController.viewModel(srn, NormalMode, schemeName, schemeDatePeriod, _)

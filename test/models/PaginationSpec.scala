@@ -21,7 +21,7 @@ import org.scalatest.matchers.must.Matchers
 
 class PaginationSpec extends AnyFreeSpec with Matchers {
 
-  private val call = controllers.routes.UnauthorisedController.onPageLoad
+  private val call = controllers.routes.UnauthorisedController.onPageLoad()
 
   "Pagination" - {
     "current page is 1, there is only 1 element and page size is 3" in {

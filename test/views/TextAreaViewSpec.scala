@@ -29,19 +29,19 @@ class TextAreaViewSpec extends ViewSpec with Mappings {
 
     implicit val request = FakeRequest()
 
-    "TextInputView" should {
+    "TextInputView" - {
 
       val form = data.Form(
         "value" -> text("text.error.required")
       )
       val invalidForm = form.withError(FormError("value", "error reason"))
 
-      behave.like(renderTitle(textAreaViewModelGen)(view(form, _), _.title.key))
-      behave.like(renderHeading(textAreaViewModelGen)(view(form, _), _.heading))
-      behave.like(renderErrors(textAreaViewModelGen)(view(invalidForm, _), "error reason"))
-      behave.like(renderTextArea(textAreaViewModelGen)(view(form, _), "value"))
-      behave.like(renderForm(textAreaViewModelGen)(view(form, _), _.onSubmit))
-      behave.like(renderSaveAndContinueButton(textAreaViewModelGen)(view(form, _)))
+      act.like(renderTitle(textAreaViewModelGen)(view(form, _), _.title.key))
+      act.like(renderHeading(textAreaViewModelGen)(view(form, _), _.heading))
+      act.like(renderErrors(textAreaViewModelGen)(view(invalidForm, _), "error reason"))
+      act.like(renderTextArea(textAreaViewModelGen)(view(form, _), "value"))
+      act.like(renderForm(textAreaViewModelGen)(view(form, _), _.onSubmit))
+      act.like(renderSaveAndContinueButton(textAreaViewModelGen)(view(form, _)))
     }
   }
 }

@@ -37,7 +37,7 @@ class BankAccountViewSpec extends ViewSpec {
 
     implicit val request = FakeRequest()
 
-    "BankAccountView" should {
+    "BankAccountView" - {
 
       act.like(renderTitle(bankAccountViewModelGen)(view(bankAccountForm, _), _.title.key))
       act.like(renderHeading(bankAccountViewModelGen)(view(bankAccountForm, _), _.heading))

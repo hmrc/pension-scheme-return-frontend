@@ -44,7 +44,7 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
     .unsafeSet(NationalInsuranceNumberPage(srn, refineMV(1)), false)
     .unsafeSet(NoNINOPage(srn, refineMV(1)), noNinoReason)
 
-  "SchemeMemberDetailsCYAController" should {
+  "SchemeMemberDetailsCYAController" - {
 
     List(CheckOrChange.Check, CheckOrChange.Change).foreach { checkOrChange =>
       act.like(
@@ -112,7 +112,7 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
       act.like(journeyRecoveryPage(onSubmit(checkOrChange)).updateName(s"onSubmit on ${checkOrChange.name}" + _))
     }
 
-    "viewModel" should {
+    "viewModel" - {
 
       def buildViewModel(checkOrChange: CheckOrChange) =
         viewModel(
@@ -126,7 +126,7 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
           None
         )
 
-      "contain the correct title" when {
+      "contain the correct title" - {
         "CheckOrChange is Check" in {
           buildViewModel(CheckOrChange.Check).title mustBe Message("checkYourAnswers.title")
         }
@@ -135,7 +135,7 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
         }
       }
 
-      "contain the correct heading" when {
+      "contain the correct heading" - {
         "CheckOrChange is Check" in {
           buildViewModel(CheckOrChange.Check).heading mustBe Message("checkYourAnswers.heading")
         }

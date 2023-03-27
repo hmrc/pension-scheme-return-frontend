@@ -46,7 +46,7 @@ class NameDOBViewSpec extends ViewSpec {
       )
     )
 
-    "NameDOBView" should {
+    "NameDOBView" - {
       act.like(renderTitle(nameDOBViewModelGen)(view(form, _), _.title.key))
       act.like(renderHeading(nameDOBViewModelGen)(view(form, _), _.heading))
       act.like(renderInputWithLabel(nameDOBViewModelGen)("firstName", view(form, _), _.firstName))

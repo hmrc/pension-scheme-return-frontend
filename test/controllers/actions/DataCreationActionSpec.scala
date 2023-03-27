@@ -38,9 +38,9 @@ class DataCreationActionSpec extends BaseSpec {
   val request = allowedAccessRequestGen(FakeRequest()).sample.value
   val userAnswers = arbitraryUserData.arbitrary.sample.value
 
-  "Data Creation Action" should {
+  "Data Creation Action" - {
 
-    "return user answers" when {
+    "return user answers" - {
       "there is data in the cache" in {
 
         val optionalDataRequest = OptionalDataRequest(request, Some(userAnswers))
@@ -52,7 +52,7 @@ class DataCreationActionSpec extends BaseSpec {
       }
     }
 
-    "add user answers to repository" when {
+    "add user answers to repository" - {
       "when there is no data in the cache" in {
 
         val sessionRepository = mock[SessionRepository]

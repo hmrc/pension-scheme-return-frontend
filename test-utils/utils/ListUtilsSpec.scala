@@ -18,7 +18,7 @@ package utils
 
 class ListUtilsSpec extends BaseSpec {
 
-  "intersperse" should {
+  "intersperse" - {
     "insert a separator between each element" in {
       val list = List("a", "b", "c")
       val expected = List("a", "-", "b", "-", "c")

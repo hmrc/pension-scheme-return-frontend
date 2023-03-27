@@ -48,7 +48,7 @@ class IntViewSpec extends ViewSpec with Mappings {
 
     implicit val request = FakeRequest()
 
-    "IntView" should {
+    "IntView" - {
 
       act.like(renderTitle(viewModelGen)(view(_), _.title.key))
       act.like(renderHeading(viewModelGen)(view(_), _.heading))

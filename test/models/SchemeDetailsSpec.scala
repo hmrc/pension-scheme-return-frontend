@@ -22,7 +22,7 @@ import utils.BaseSpec
 
 class SchemeDetailsSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
-  "SchemeDetails" should {
+  "SchemeDetails" - {
 
     "successfully read from json" in {
 
@@ -32,7 +32,7 @@ class SchemeDetailsSpec extends BaseSpec with ScalaCheckPropertyChecks {
     }
   }
 
-  "SchemeStatus" should {
+  "SchemeStatus" - {
 
     "successfully read from json" in {
       forAll(schemeStatusGen) { status =>
@@ -40,7 +40,7 @@ class SchemeDetailsSpec extends BaseSpec with ScalaCheckPropertyChecks {
       }
     }
 
-    "return a JsError" when {
+    "return a JsError" - {
       "Scheme status is unknown" in {
         forAll(nonEmptyString) { status =>
           JsString(status).asOpt[SchemeStatus] mustBe None
@@ -49,7 +49,7 @@ class SchemeDetailsSpec extends BaseSpec with ScalaCheckPropertyChecks {
     }
   }
 
-  "ListSchemeDetails" should {
+  "ListSchemeDetails" - {
 
     "successfully read from json" in {
       forAll(listMinimalSchemeDetailsGen) { listMinimalSchemeDetails =>

@@ -18,8 +18,6 @@ package views
 
 import forms.YesNoPageFormProvider
 import models.Pagination
-import org.scalatest.Assertion
-import play.api.Application
 import play.api.test.FakeRequest
 import play.twirl.api.Html
 import viewmodels.DisplayMessage.Message
@@ -35,7 +33,7 @@ class ListViewSpec extends ViewSpec {
 
     implicit val request: FakeRequest[_] = FakeRequest()
 
-    "SummaryView" should {
+    "SummaryView" - {
       act.like(renderTitle(summaryViewModelGen())(view(form, _), _.title.key))
       act.like(renderHeading(summaryViewModelGen())(view(form, _), _.heading))
 
@@ -79,9 +77,9 @@ class ListViewSpec extends ViewSpec {
         }
       }
 
-      "rendering pagination elements" should {
+      "rendering pagination elements" - {
 
-        "show no pagination elements" when {
+        "show no pagination elements" - {
           "there is only 1 row and page size is 3" in {
             paginationTest(1, 1, 3) { html =>
               summaryListRows(html).size mustEqual 1
@@ -97,7 +95,7 @@ class ListViewSpec extends ViewSpec {
           }
         }
 
-        "show pagination elements" when {
+        "show pagination elements" - {
           "there are 4 rows and page size is 3" in {
             paginationTest(4, 1, 3) { html =>
               summaryListRows(html).size mustEqual 3

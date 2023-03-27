@@ -22,10 +22,10 @@ import generators.Generators
 import models.ModelSerializers
 import org.mockito.MockitoSugar
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.time.{Millis, Span}
 import org.scalatest.verbs.BehaveWord
-import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, OptionValues}
 import play.api.Application
 import play.api.i18n.{Messages, MessagesApi}
@@ -34,10 +34,11 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.running
 
 import java.net.URLEncoder
+import scala.annotation.nowarn
 import scala.reflect.ClassTag
 
 abstract class BaseSpec
-    extends AnyWordSpec
+    extends AnyFreeSpec
     with ActsLikeSpec
     with Matchers
     with ScalaFutures
@@ -73,6 +74,7 @@ abstract class BaseSpec
 
   def urlEncode(input: String): String = URLEncoder.encode(input, "utf-8")
 
-  @deprecated("behave word has been replace with act word - behave.like becomes act.like", since = "0.44.0")
+  @nowarn
+  @deprecated("behave word has been replace with act word - behave.like becomes act.like", "0.44.0")
   override val behave: BehaveWord = new BehaveWord
 }

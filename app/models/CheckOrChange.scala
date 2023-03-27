@@ -36,7 +36,7 @@ object CheckOrChange extends Enumerable.Implicits {
 
   val values: List[CheckOrChange] = List(Check, Change)
 
-  implicit val enum: Enumerable[CheckOrChange] = Enumerable(values.map(v => (v.toString, v)): _*)
+  implicit val enumerable: Enumerable[CheckOrChange] = Enumerable(values.map(v => (v.toString, v)): _*)
 
   implicit val jsLiteral: JavascriptLiteral[CheckOrChange] = (value: CheckOrChange) => value.name
 }

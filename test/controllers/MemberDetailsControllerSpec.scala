@@ -52,7 +52,7 @@ class MemberDetailsControllerSpec extends ControllerBaseSpec {
     LocalDate.of(2020, 12, 12)
   )
 
-  "MemberDetailsController" should {
+  "MemberDetailsController" - {
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       injected[NameDOBView].apply(form(injected[NameDOBFormProvider]), viewModel(srn, refineMV(1), NormalMode))

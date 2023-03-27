@@ -20,7 +20,7 @@ import views.html.ContentPageView
 
 class PspDeclarationControllerSpec extends ControllerBaseSpec {
 
-  "PspDeclarationController" should {
+  "PspDeclarationController" - {
 
     lazy val viewModel = PspDeclarationController.viewModel(srn)
 

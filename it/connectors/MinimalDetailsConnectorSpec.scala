@@ -49,7 +49,7 @@ class MinimalDetailsConnectorSpec extends BaseConnectorSpec {
 
   def connector(implicit app: Application): MinimalDetailsConnector = injected[MinimalDetailsConnector]
 
-  "fetch" should {
+  "fetch" - {
 
     "return psa minimal details" in runningApplication { implicit app =>
 

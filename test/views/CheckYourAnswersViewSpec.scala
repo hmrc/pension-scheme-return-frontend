@@ -27,7 +27,7 @@ class CheckYourAnswersViewSpec extends ViewSpec {
 
     implicit val request = FakeRequest()
 
-    "CheckYourAnswerView" should {
+    "CheckYourAnswerView" - {
 
       act.like(renderTitle(checkYourAnswersViewModelGen)(view(_), _.title.key))
       act.like(renderHeading(checkYourAnswersViewModelGen)(view(_), _.heading))
