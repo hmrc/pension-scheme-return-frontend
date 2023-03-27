@@ -103,6 +103,6 @@ object MemberDetailsController {
     Message("memberDetails.lastName"),
     Message("memberDetails.dateOfBirth"),
     Message("memberDetails.dateOfBirth.hint"),
-    controllers.routes.MemberDetailsController.onSubmit(srn, index, mode)
+    controllers.routes.MemberDetailsController.onSubmit(srn, index)
   )
 }

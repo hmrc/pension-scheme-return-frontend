@@ -95,9 +95,6 @@ GET         /:srn/member-details                                  controllers.Me
 GET         /:srn/member-details/:index                           controllers.MemberDetailsController.onPageLoad(srn: Srn, index: Max99, mode: Mode = NormalMode)
 POST        /:srn/member-details/:index                           controllers.MemberDetailsController.onSubmit(srn: Srn, index: Max99, mode: Mode = NormalMode)
 
-GET         /:srn/change-member-details/:index                    controllers.MemberDetailsController.onPageLoad(srn: Srn, index: Max99, mode: Mode = CheckMode)
-POST        /:srn/change-member-details/:index                    controllers.MemberDetailsController.onSubmit(srn: Srn, index: Max99, mode: Mode = CheckMode)
-
 GET         /:srn/psa-declaration                                 controllers.PsaDeclarationController.onPageLoad(srn: Srn)
 POST        /:srn/psa-declaration                                 controllers.PsaDeclarationController.onSubmit(srn: Srn)
 
@@ -118,9 +115,13 @@ POST        /:srn/national-insurance-number/:index                controllers.Do
 GET         /:srn/change-national-insurance-number/:index         controllers.DoesSchemeMemberHaveNINOController.onPageLoad(srn: Srn, index: Max99, mode: Mode = CheckMode)
 POST        /:srn/change-national-insurance-number/:index         controllers.DoesSchemeMemberHaveNINOController.onSubmit(srn: Srn, index: Max99, mode: Mode = CheckMode)
 
-GET         /:srn/check-member-details                            controllers.SchemeMemberDetailsCYAController.onPageLoad(srn: Srn, index: Max99 = 1, mode: Mode = NormalMode)
-GET         /:srn/check-member-details/:index                     controllers.SchemeMemberDetailsCYAController.onPageLoad(srn: Srn, index: Max99, mode: Mode = NormalMode)
-POST        /:srn/check-member-details/:index                     controllers.SchemeMemberDetailsCYAController.onSubmit(srn: Srn, index: Max99, mode: Mode = NormalMode)
+GET         /:srn/check-member-details                            controllers.SchemeMemberDetailsAnswersController.onPageLoad(srn: Srn, index: Max99 = 1, checkOrChange: CheckOrChange = Check, mode: Mode = NormalMode)
+GET         /:srn/check-member-details/:index                     controllers.SchemeMemberDetailsAnswersController.onPageLoad(srn: Srn, index: Max99, checkOrChange: CheckOrChange = Check, mode: Mode = NormalMode)
+POST        /:srn/check-member-details/:index                     controllers.SchemeMemberDetailsAnswersController.onSubmit(srn: Srn, index: Max99, checkOrChange: CheckOrChange = Check, mode: Mode = NormalMode)
+
+GET         /:srn/change-member-details                            controllers.SchemeMemberDetailsAnswersController.onPageLoad(srn: Srn, index: Max99 = 1, checkOrChange: CheckOrChange = Change, mode: Mode = NormalMode)
+GET         /:srn/change-member-details/:index                     controllers.SchemeMemberDetailsAnswersController.onPageLoad(srn: Srn, index: Max99, checkOrChange: CheckOrChange = Change, mode: Mode = NormalMode)
+POST        /:srn/change-member-details/:index                     controllers.SchemeMemberDetailsAnswersController.onSubmit(srn: Srn, index: Max99, checkOrChange: CheckOrChange = Change, mode: Mode = NormalMode)
 
 GET         /:srn/how-many-members                                controllers.HowManyMembersController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST        /:srn/how-many-members                                controllers.HowManyMembersController.onSubmit(srn: Srn, mode: Mode = NormalMode)
