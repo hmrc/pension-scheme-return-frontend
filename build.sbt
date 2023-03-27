@@ -20,6 +20,7 @@ lazy val root = (project in file("."))
     name := appName,
     RoutesKeys.routesImport ++= Seq(
       "models._",
+      "models.CheckOrChange._",
       "models.SchemeId._",
       "uk.gov.hmrc.play.bootstrap.binders.RedirectUrl",
       "config.Binders._",

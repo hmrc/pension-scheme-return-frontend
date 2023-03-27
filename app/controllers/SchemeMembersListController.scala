@@ -54,7 +54,7 @@ class SchemeMembersListController @Inject()(
     identifyAndRequireData(srn) { implicit request =>
       val membersDetails = request.userAnswers.membersDetails(srn)
       if (membersDetails.isEmpty) {
-        Redirect(controllers.routes.MemberDetailsController.onPageLoad(srn, refineMV[OneTo99](1), mode))
+        Redirect(controllers.routes.MemberDetailsController.onPageLoad(srn, refineMV[OneTo99](1)))
       } else {
         Ok(view(form, viewModel(srn, page, mode, membersDetails.map(_.fullName))))
       }
@@ -91,7 +91,7 @@ object SchemeMembersListController {
             List(
               ListRow(
                 memberName,
-                changeUrl = controllers.routes.MemberDetailsController.onPageLoad(srn, nextIndex, mode).url,
+                changeUrl = controllers.routes.MemberDetailsController.onPageLoad(srn, nextIndex).url,
                 changeHiddenText = Message("schemeMembersList.change.hidden", memberName),
                 removeUrl = controllers.routes.UnauthorisedController.onPageLoad().url,
                 removeHiddenText = Message("schemeMembersList.remove.hidden", memberName)
