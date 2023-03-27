@@ -103,6 +103,15 @@ trait FieldBehaviours extends FormSpec with ScalaCheckPropertyChecks with Genera
   def invalidField(form: Form[_], fieldName: String, errorMessage: String, invalidData: Gen[String], args: Any*): Unit =
     errorField("invalid field", form, fieldName, FormError(fieldName, errorMessage, args.toList), invalidData)
 
+  def trimmedField(form: Form[_], fieldName: String, gen: Gen[String]): Unit =
+    "trim field value when bound" in {
+      forAll(gen -> "validDataItem") { value: String =>
+        val result = form.bind(Map(fieldName -> value))
+        result.errors mustBe empty
+        result.value mustBe Some(value.trim)
+      }
+    }
+
   def textTooLongField(form: Form[_], fieldName: String, errorMessage: String, maxLength: Int, args: Any*): Unit =
     errorField(
       "field value is too long",

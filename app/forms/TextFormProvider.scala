@@ -37,10 +37,10 @@ class TextFormProvider @Inject()() extends Mappings {
     tooLongKey: String,
     invalidCharactersKey: String,
     args: Any*
-  ): Form[String] = validated(
-    requiredKey -> args,
-    _.verifying(verify[String](invalidCharactersKey, _.matches(textAreaRegex), args: _*)),
-    _.verifying(verify[String](tooLongKey, _.length <= textAreaMaxLength, args: _*))
+  ): Form[String] = Form(
+    "value" -> text(requiredKey, args.toList)
+      .verifying(verify[String](invalidCharactersKey, _.matches(textAreaRegex), args: _*))
+      .verifying(verify[String](tooLongKey, _.length <= textAreaMaxLength, args: _*))
   )
 
   def nino(
@@ -55,15 +55,5 @@ class TextFormProvider @Inject()() extends Mappings {
         .verifying(verify(invalidKey, Nino.isValid, args: _*))
         .verifying(verify[String](duplicateKey, !duplicates.map(_.nino).contains(_), args: _*))
         .transform[Nino](Nino, _.nino)
-    )
-
-  private def validated(
-    requiredKey: (String, Seq[Any]),
-    mappings: (Mapping[String] => Mapping[String])*
-  ): Form[String] =
-    Form(
-      "value" -> mappings.foldLeft[Mapping[String]](text(requiredKey._1, requiredKey._2))(
-        (previousMapping, mapping) => mapping(previousMapping)
-      )
     )
 }

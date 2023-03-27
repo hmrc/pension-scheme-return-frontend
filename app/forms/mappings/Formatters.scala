@@ -76,6 +76,7 @@ trait Formatters {
         baseFormatter
           .bind(key, data)
           .map(_.replace(",", ""))
+          .map(_.replaceAll(" ", ""))
           .flatMap {
             case s if s.matches(decimalRegexp) =>
               Left(Seq(FormError(key, errors.wholeNumberKey, args)))
