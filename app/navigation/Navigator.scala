@@ -127,9 +127,6 @@ class Navigator @Inject()() {
 
   private val checkRouteMap: Page => UserAnswers => Call = {
     case CheckReturnDatesPage(srn) => _ => routes.UnauthorisedController.onPageLoad()
-    case SchemeBankAccountPage(srn, _) => _ => routes.UnauthorisedController.onPageLoad()
-    case RemoveSchemeBankAccountPage(srn) => _ => routes.SchemeBankAccountListController.onPageLoad(srn)
-    case RemoveMemberDetailsPage(srn) => _ => routes.SchemeMembersListController.onPageLoad(srn, page = 1)
 
     case page @ HowManyMembersPage(srn, _) => {
       case _ => routes.UnauthorisedController.onPageLoad()
