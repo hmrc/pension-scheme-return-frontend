@@ -23,9 +23,14 @@ import play.api.libs.json.JsPath
 import queries.Gettable
 import utils.RefinedUtils.RefinedIntOps
 
+import scala.util.Try
+
 case class MemberDetailsPage(srn: Srn, index: Max99) extends QuestionPage[NameDOB] {
 
   override def path: JsPath = JsPath \ toString \ index.arrayIndex
+
+  override def cleanup(value: Option[NameDOB], userAnswers: UserAnswers): Try[UserAnswers] =
+    userAnswers.remove(NationalInsuranceNumberPage(srn, index))
 
   override def toString: String = "memberDetailsPage"
 }
@@ -41,4 +46,11 @@ object MembersDetails {
   implicit class MembersDetailsOps(ua: UserAnswers) {
     def membersDetails(srn: Srn): List[NameDOB] = ua.get(MembersDetails(srn)).toList.flatten
   }
+}
+
+case class MemberDetails(srn: Srn) extends Gettable[Map[String, NameDOB]] {
+
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "memberDetailsPage"
 }

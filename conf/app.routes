@@ -144,3 +144,9 @@ POST        /:srn/change-value-of-assets-and-cash                 controllers.Va
 GET         /:srn/members                                         controllers.SchemeMembersListController.onPageLoad(srn: Srn, page: Int = 1, mode: Mode = NormalMode)
 GET         /:srn/members/:page                                   controllers.SchemeMembersListController.onPageLoad(srn: Srn, page: Int, mode: Mode = NormalMode)
 POST        /:srn/members/:page                                   controllers.SchemeMembersListController.onSubmit(srn: Srn, page: Int, mode: Mode = NormalMode)
+
+GET        /:srn/remove-member-details/:index                     controllers.RemoveMemberDetailsController.onPageLoad(srn: Srn, index: Max99, mode: Mode = NormalMode)
+POST       /:srn/remove-member-details/:index                     controllers.RemoveMemberDetailsController.onSubmit(srn: Srn, index: Max99, mode: Mode = NormalMode)
+
+GET        /:srn/change-remove-member-details/:index              controllers.RemoveMemberDetailsController.onPageLoad(srn: Srn, index: Max99, mode: Mode = CheckMode)
+POST       /:srn/change-remove-member-details/:index              controllers.RemoveMemberDetailsController.onSubmit(srn: Srn, index: Max99, mode: Mode = CheckMode)

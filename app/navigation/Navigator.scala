@@ -25,6 +25,9 @@ import pages.MembersDetails._
 import pages.SchemeBankAccounts.SchemeBankAccountsOps
 import pages._
 import play.api.mvc.Call
+import MembersDetails._
+import models.SchemeId.Srn
+import models.requests.DataRequest
 
 import javax.inject.{Inject, Singleton}
 
@@ -56,6 +59,7 @@ class Navigator @Inject()() {
         }
     case SchemeBankAccountListPage(srn, false) => _ => routes.HowManyMembersController.onPageLoad(srn, NormalMode)
     case RemoveSchemeBankAccountPage(srn) => _ => routes.SchemeBankAccountListController.onPageLoad(srn)
+    case RemoveMemberDetailsPage(srn) => _ => routes.SchemeMembersListController.onPageLoad(srn, page = 1)
 
     case AccountingPeriodPage(srn, index) =>
       _ => routes.AccountingPeriodCheckYourAnswersController.onPageLoad(srn, index)
@@ -92,7 +96,6 @@ class Navigator @Inject()() {
       case ua if ua.get(page).contains(true) => routes.MemberDetailsNinoController.onPageLoad(srn, index, NormalMode)
       case _ => routes.NoNINOController.onPageLoad(srn, index, NormalMode)
     }
-
     case MemberDetailsNinoPage(srn, index) =>
       _ => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, CheckOrChange.Check)
     case SchemeMemberDetailsAnswersPage(srn) => _ => routes.SchemeMembersListController.onPageLoad(srn, page = 1)
@@ -124,8 +127,6 @@ class Navigator @Inject()() {
 
   private val checkRouteMap: Page => UserAnswers => Call = {
     case CheckReturnDatesPage(srn) => _ => routes.UnauthorisedController.onPageLoad()
-    case SchemeBankAccountPage(srn, _) => _ => routes.UnauthorisedController.onPageLoad()
-    case RemoveSchemeBankAccountPage(srn) => _ => routes.SchemeBankAccountListController.onPageLoad(srn)
 
     case page @ HowManyMembersPage(srn, _) => {
       case _ => routes.UnauthorisedController.onPageLoad()

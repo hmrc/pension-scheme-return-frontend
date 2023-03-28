@@ -16,20 +16,39 @@
 
 package pages
 
+import config.Refined.Max99
 import eu.timepit.refined.refineMV
-import models.NameDOB
+import models.{NameDOB, UserAnswers}
 import pages.behaviours.PageBehaviours
+import uk.gov.hmrc.domain.Nino
+import utils.UserAnswersUtils.UserAnswersOps
+
+import java.time.LocalDate
 
 class MemberDetailsPageSpec extends PageBehaviours {
 
-  "MemberDetailsNinoPage" - {
+  private val memberDetails: NameDOB = nameDobGen.sample.value
+
+  val srn = srnGen.sample.value
+
+  beRetrievable[NameDOB](MemberDetailsPage(srn, refineMV(1)))
+  beSettable[NameDOB](MemberDetailsPage(srn, refineMV(1)))
+  beRemovable[NameDOB](MemberDetailsPage(srn, refineMV(1)))
+
+  "Add member details page with any data" in {
 
     val srn = srnGen.sample.value
+    val nino = Nino("AB123456A")
+    val userAnswers = UserAnswers("test")
+      .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+      .unsafeSet(MemberDetailsNinoPage(srn, refineMV(1)), nino)
+      .unsafeSet(NoNINOPage(srn, refineMV(1)), "test reason")
+      .unsafeSet(NationalInsuranceNumberPage(srn, refineMV(1)), true)
 
-    beRetrievable[NameDOB](MemberDetailsPage(srn, refineMV(1)))
-
-    beSettable[NameDOB](MemberDetailsPage(srn, refineMV(1)))
-
-    beRemovable[NameDOB](MemberDetailsPage(srn, refineMV(1)))
+    val result = userAnswers.remove(MemberDetailsPage(srn, refineMV(1))).success.value
+    result.get(MemberDetailsPage(srn, refineMV(1))) must be(empty)
+    result.get(NationalInsuranceNumberPage(srn, refineMV(1))) must be(empty)
+    result.get(MemberDetailsNinoPage(srn, refineMV(1))) must be(empty)
+    result.get(NoNINOPage(srn, refineMV(1))) must be(empty)
   }
 }

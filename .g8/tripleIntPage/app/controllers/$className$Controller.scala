@@ -2,7 +2,6 @@ package controllers
 
 import $className;format="cap"$Controller._
 import controllers.actions._
-import forms.TripleIntFormProvider
 import forms.mappings.errors.IntFormErrors
 import javax.inject.Inject
 import models.Mode
@@ -10,12 +9,10 @@ import models.SchemeId.Srn
 import navigation.Navigator
 import pages.$className$Page
 import play.api.data.Form
-import viewmodels.models.TripleIntViewModel
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.FormUtils._
-import viewmodels.models.TripleIntViewModel
 import views.html.TripleIntView
 import services.SaveService
 

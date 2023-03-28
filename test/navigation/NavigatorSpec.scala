@@ -219,6 +219,15 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
       }
     }
 
+    "go from remove member details page to scheme members list" in {
+
+      forAll(srnGen) { srn =>
+        val page = RemoveMemberDetailsPage(srn)
+        navigator.nextPage(page, NormalMode, userAnswers) mustBe
+          routes.SchemeMembersListController.onPageLoad(srn, page = 1)
+      }
+    }
+
     "go from pension scheme members page to Enter member details page on Manual" in {
 
       forAll(srnGen) { srn =>
