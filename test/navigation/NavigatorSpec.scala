@@ -228,11 +228,21 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
       }
     }
 
-    "go from pension scheme members page to unauthorised" in {
+    "go from pension scheme members page to Enter member details page on Manual" in {
 
-      forAll(srnGen, manualOrUploadGen) { (srn, manualOrUpload) =>
+      forAll(srnGen) { srn =>
         val page = PensionSchemeMembersPage(srn)
-        navigator.nextPage(page, NormalMode, userAnswers) mustBe routes.UnauthorisedController.onPageLoad()
+        val answers = userAnswers.unsafeSet(page, ManualOrUpload.Manual)
+        navigator.nextPage(page, NormalMode, answers) mustBe routes.MemberDetailsController.onPageLoad(srn, refineMV(1))
+      }
+    }
+
+    "go from pension scheme members page to unauthorised on Upload" in {
+
+      forAll(srnGen) { srn =>
+        val page = PensionSchemeMembersPage(srn)
+        val answers = userAnswers.unsafeSet(page, ManualOrUpload.Upload)
+        navigator.nextPage(page, NormalMode, answers) mustBe routes.UnauthorisedController.onPageLoad()
       }
     }
 
@@ -246,11 +256,11 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
       }
     }
 
-    "go from value of assets page to unauthorised" in {
+    "go from value of assets page to scheme members manual or upload page" in {
 
       forAll(srnGen) { srn =>
         val page = ValueOfAssetsPage(srn)
-        navigator.nextPage(page, NormalMode, userAnswers) mustBe routes.UnauthorisedController.onPageLoad()
+        navigator.nextPage(page, NormalMode, userAnswers) mustBe routes.PensionSchemeMembersController.onPageLoad(srn)
       }
     }
 

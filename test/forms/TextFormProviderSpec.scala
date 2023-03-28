@@ -18,13 +18,21 @@ package forms
 
 import forms.behaviours.FieldBehaviours
 import org.scalacheck.Gen
-import org.scalacheck.Gen.asciiStr
+import org.scalacheck.Gen._
 import play.api.data.Form
 import uk.gov.hmrc.domain.Nino
 
 class TextFormProviderSpec extends FieldBehaviours {
 
   private val formProvider = new TextFormProvider()
+
+  ".apply" - {
+    val form: Form[String] = formProvider("required")
+
+    behave.like(fieldThatBindsValidData(form, "value", nonEmptyAlphaString))
+    behave.like(mandatoryField(form, "value", "required"))
+    behave.like(trimmedField(form, "value", "     untrimmed value  "))
+  }
 
   ".textarea" - {
     val form: Form[String] = formProvider.textArea(
@@ -33,12 +41,13 @@ class TextFormProviderSpec extends FieldBehaviours {
       "invalid"
     )
 
-    val invalidTextGen = asciiStr.suchThat(_.trim.nonEmpty).suchThat(!_.matches(formProvider.textAreaRegex))
+    val invalidTextGen = asciiPrintableStr.suchThat(_.trim.nonEmpty).suchThat(!_.matches(formProvider.textAreaRegex))
 
     behave.like(fieldThatBindsValidData(form, "value", nonEmptyAlphaString))
     behave.like(mandatoryField(form, "value", "required"))
     behave.like(invalidField(form, "value", "invalid", invalidTextGen))
     behave.like(textTooLongField(form, "value", "tooLong", formProvider.textAreaMaxLength))
+    behave.like(trimmedField(form, "value", "     untrimmed value  "))
 
     "allow punctuation" - {
       behave.like(
