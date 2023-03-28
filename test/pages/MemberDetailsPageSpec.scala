@@ -29,6 +29,12 @@ class MemberDetailsPageSpec extends PageBehaviours {
 
   private val memberDetails: NameDOB = nameDobGen.sample.value
 
+  val srn = srnGen.sample.value
+
+  beRetrievable[NameDOB](MemberDetailsPage(srn, refineMV(1)))
+  beSettable[NameDOB](MemberDetailsPage(srn, refineMV(1)))
+  beRemovable[NameDOB](MemberDetailsPage(srn, refineMV(1)))
+
   "Add member details page with any data" in {
 
     val srn = srnGen.sample.value

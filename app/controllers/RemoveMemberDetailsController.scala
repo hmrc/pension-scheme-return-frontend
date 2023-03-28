@@ -76,7 +76,7 @@ class RemoveMemberDetailsController @Inject()(
                 _ <- saveService.save(updatedAnswers)
               } yield Redirect(
                 navigator
-                  .nextPage(navigator.balanceMembersList(srn, PensionSchemeMembersPage(srn)), mode, updatedAnswers)
+                  .nextPage(RemoveMemberDetailsPage(srn), mode, updatedAnswers)
               )
             } else {
               Future

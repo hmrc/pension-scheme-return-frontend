@@ -19,12 +19,10 @@ package controllers
 import controllers.RemoveMemberDetailsController.{form, viewModel}
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
-import models.{CheckMode, NameDOB, NormalMode}
+import models.{NameDOB, NormalMode}
 import pages.MemberDetailsPage
+import pages.behaviours.PageBehaviours
 import views.html.YesNoPageView
-
-import java.time.LocalDate
-import scala.concurrent.{ExecutionContext, Future}
 
 class RemoveMemberDetailsControllerSpec extends ControllerBaseSpec {
 

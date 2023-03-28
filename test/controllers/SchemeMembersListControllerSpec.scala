@@ -52,7 +52,7 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
     act.like(
       redirectToPage(
         onPageLoad,
-        routes.MemberDetailsController.onPageLoad(srn, refineMV(1), NormalMode),
+        routes.PensionSchemeMembersController.onPageLoad(srn),
         defaultUserAnswers
       )
     )

@@ -16,7 +16,7 @@
 
 package navigation
 
-import config.Refined.{Max99, OneTo99, OneToTen, OneToThree}
+import config.Refined.{OneTo99, OneToTen, OneToThree}
 import controllers.routes
 import eu.timepit.refined.{refineMV, refineV}
 import models.PensionSchemeId.{PsaId, PspId}
@@ -27,8 +27,6 @@ import play.api.mvc.Call
 import MembersDetails._
 import models.SchemeId.Srn
 import models.requests.DataRequest
-
-import java.lang.ProcessBuilder.Redirect
 import javax.inject.{Inject, Singleton}
 
 @Singleton
@@ -78,8 +76,8 @@ class Navigator @Inject()() {
         )
 
     case RemoveAccountingPeriodPage(srn) => _ => routes.AccountingPeriodListController.onPageLoad(srn, NormalMode)
-    case HowMuchCashPage(srn) => _ => routes.UnauthorisedController.onPageLoad
-    case PensionSchemeMembersPage(srn) => _ => routes.PensionSchemeMembersController.onPageLoad(srn)
+    case HowMuchCashPage(srn) => _ => routes.UnauthorisedController.onPageLoad()
+    case PensionSchemeMembersPage(srn) => _ => routes.UnauthorisedController.onPageLoad()
     case MemberDetailsPage(srn, index) =>
       _ => routes.DoesSchemeMemberHaveNINOController.onPageLoad(srn, index, NormalMode)
     case page @ NationalInsuranceNumberPage(srn, index) => {
@@ -88,8 +86,8 @@ class Navigator @Inject()() {
     }
     case MemberDetailsNinoPage(srn, index) => _ => routes.SchemeMemberDetailsCYAController.onPageLoad(srn, index)
     case SchemeMemberDetailsCYAPage(srn) => _ => routes.SchemeMembersListController.onPageLoad(srn, page = 1)
-    case PsaDeclarationPage(srn) => _ => routes.UnauthorisedController.onPageLoad
-    case PspDeclarationPage(srn) => _ => routes.UnauthorisedController.onPageLoad
+    case PsaDeclarationPage(srn) => _ => routes.UnauthorisedController.onPageLoad()
+    case PspDeclarationPage(srn) => _ => routes.UnauthorisedController.onPageLoad()
 
     case page @ HowManyMembersPage(srn, PsaId(_)) => {
       case ua if ua.get(page).exists(_.total > 99) => routes.PsaDeclarationController.onPageLoad(srn)
@@ -133,12 +131,5 @@ class Navigator @Inject()() {
     case CheckMode =>
       checkRouteMap(page)(userAnswers)
   }
-
-  def balanceMembersList(srn: Srn, redirectPage: Page)(implicit request: DataRequest[_]): Page =
-    if ((request.userAnswers.membersDetails(srn).init).isEmpty) {
-      redirectPage
-    } else {
-      RemoveMemberDetailsPage(srn)
-    }
 
 }

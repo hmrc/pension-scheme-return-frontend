@@ -17,11 +17,8 @@
 package pages
 
 import models.SchemeId.Srn
-import play.api.libs.json.JsPath
 
-case class RemoveMemberDetailsPage(srn: Srn) extends QuestionPage[Boolean] {
-
-  override def path: JsPath = JsPath \ toString
+case class RemoveMemberDetailsPage(srn: Srn) extends Page {
 
   override def toString: String = "removeMemberDetailsPage"
 }
