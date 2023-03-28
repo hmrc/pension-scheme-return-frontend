@@ -76,9 +76,15 @@ class Navigator @Inject()() {
     case RemoveAccountingPeriodPage(srn) => _ => routes.AccountingPeriodListController.onPageLoad(srn, NormalMode)
 
     case HowMuchCashPage(srn) => _ => routes.ValueOfAssetsController.onPageLoad(srn, NormalMode)
-    case ValueOfAssetsPage(srn) => _ => routes.UnauthorisedController.onPageLoad()
+    case ValueOfAssetsPage(srn) => _ => routes.PensionSchemeMembersController.onPageLoad(srn)
 
-    case PensionSchemeMembersPage(srn) => _ => routes.UnauthorisedController.onPageLoad()
+    case PensionSchemeMembersPage(srn) =>
+      ua =>
+        if (ua.get(PensionSchemeMembersPage(srn)).contains(ManualOrUpload.Manual)) {
+          routes.MemberDetailsController.onPageLoad(srn, refineMV(1))
+        } else {
+          routes.UnauthorisedController.onPageLoad()
+        }
 
     case MemberDetailsPage(srn, index) =>
       _ => routes.DoesSchemeMemberHaveNINOController.onPageLoad(srn, index, NormalMode)

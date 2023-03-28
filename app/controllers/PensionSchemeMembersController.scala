@@ -85,10 +85,9 @@ class PensionSchemeMembersController @Inject()(
           Future.successful(BadRequest(view(formWithErrors, viewModel(srn, request.schemeDetails.schemeName)))),
         answer => {
           for {
-            updatedAnswers <- Future
-              .fromTry(request.userAnswers.set(PensionSchemeMembersPage(srn), answer))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(PensionSchemeMembersPage(srn), answer))
             _ <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage(PensionSchemeMembersPage(srn), NormalMode, request.userAnswers))
+          } yield Redirect(navigator.nextPage(PensionSchemeMembersPage(srn), NormalMode, updatedAnswers))
         }
       )
   }
