@@ -16,6 +16,7 @@
 
 package forms
 
+import forms.behaviours.FieldBehaviours
 import forms.mappings.Mappings
 import forms.mappings.errors.DateFormErrors
 
@@ -34,6 +35,7 @@ class DateMappingsSpec
     with ScalaCheckPropertyChecks
     with Generators
     with OptionValues
+    with FieldBehaviours
     with Mappings {
 
   val startDate = LocalDate.of(2000, 1, 1)
@@ -73,6 +75,21 @@ class DateMappingsSpec
         "value.day" -> date.getDayOfMonth.toString,
         "value.month" -> date.getMonthValue.toString,
         "value.year" -> date.getYear.toString
+      )
+
+      val result = form.bind(data)
+
+      result.value.value mustEqual date
+    }
+  }
+
+  "must bind valid data with spaces either side of the date" in {
+
+    forAll(validData -> "valid date") { date =>
+      val data = Map(
+        "value.day" -> s"   ${date.getDayOfMonth.toString}   ",
+        "value.month" -> s"   ${date.getMonthValue.toString}   ",
+        "value.year" -> s"   ${date.getYear.toString}   "
       )
 
       val result = form.bind(data)
