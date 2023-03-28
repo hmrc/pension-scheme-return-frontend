@@ -24,7 +24,7 @@ import views.html.DateRangeView
 
 class AccountingPeriodControllerSpec extends ControllerBaseSpec {
 
-  "AccountingPeriodController" should {
+  "AccountingPeriodController" - {
 
     val form = AccountingPeriodController.form(new DateRangeFormProvider(), defaultTaxYear, List())
     lazy val viewModel = AccountingPeriodController.viewModel(srn, refineMV(1), NormalMode)
@@ -55,12 +55,12 @@ class AccountingPeriodControllerSpec extends ControllerBaseSpec {
 
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
 
-    "allow accounting period to be updated" when {
+    "allow accounting period to be updated" - {
       val userAnswers = emptyUserAnswers.set(AccountingPeriodPage(srn, refineMV(1)), dateRangeData).get
       act.like(saveAndContinue(onSubmit, userAnswers, formData(form, dateRangeData): _*))
     }
 
-    "return a 400 if range intersects" when {
+    "return a 400 if range intersects" - {
       val userAnswers =
         emptyUserAnswers
           .set(AccountingPeriodPage(srn, refineMV(1)), otherDateRangeData)

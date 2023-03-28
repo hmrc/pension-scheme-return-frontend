@@ -62,14 +62,14 @@ class SessionRepository @Inject()(
         filter = byId(id),
         update = Updates.set("lastUpdated", Instant.now(clock))
       )
-      .toFuture
+      .toFuture()
       .as(())
 
   def get(id: String): Future[Option[UserAnswers]] =
     keepAlive(id).flatMap { _ =>
       collection
         .find(byId(id))
-        .headOption
+        .headOption()
     }
 
   def set(answers: UserAnswers): Future[Unit] = {
@@ -82,13 +82,13 @@ class SessionRepository @Inject()(
         replacement = updatedAnswers,
         options = ReplaceOptions().upsert(true)
       )
-      .toFuture
+      .toFuture()
       .as(())
   }
 
   def clear(id: String): Future[Unit] =
     collection
       .deleteOne(byId(id))
-      .toFuture
+      .toFuture()
       .as(())
 }

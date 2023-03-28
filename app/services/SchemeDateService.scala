@@ -27,13 +27,7 @@ import javax.inject.Inject
 
 class SchemeDateServiceImpl @Inject()() extends SchemeDateService {
 
-  def schemeStartDate(srn: Srn)(implicit request: DataRequest[_]): Option[LocalDate] =
-    schemeDate(srn).map(_.from)
-
-  def schemeEndDate(srn: Srn)(implicit request: DataRequest[_]): Option[LocalDate] =
-    schemeDate(srn).map(_.to)
-
-  private def schemeDate(srn: Srn)(implicit request: DataRequest[_]): Option[DateRange] =
+  def schemeDate(srn: Srn)(implicit request: DataRequest[_]): Option[DateRange] =
     accountingPeriod(srn).orElse(whichTaxYear(srn))
 
   private def accountingPeriod(srn: Srn)(implicit request: DataRequest[_]): Option[DateRange] =
@@ -46,7 +40,11 @@ class SchemeDateServiceImpl @Inject()() extends SchemeDateService {
 @ImplementedBy(classOf[SchemeDateServiceImpl])
 trait SchemeDateService {
 
-  def schemeStartDate(srn: Srn)(implicit request: DataRequest[_]): Option[LocalDate]
+  def schemeStartDate(srn: Srn)(implicit request: DataRequest[_]): Option[LocalDate] =
+    schemeDate(srn).map(_.from)
 
-  def schemeEndDate(srn: Srn)(implicit request: DataRequest[_]): Option[LocalDate]
+  def schemeEndDate(srn: Srn)(implicit request: DataRequest[_]): Option[LocalDate] =
+    schemeDate(srn).map(_.to)
+
+  def schemeDate(srn: Srn)(implicit request: DataRequest[_]): Option[DateRange]
 }

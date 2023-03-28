@@ -53,7 +53,7 @@ trait HtmlModels {
 
       val id = element.id()
       val value = element.`val`()
-      val label = element.siblingElements().select("[for=\"" + id + "\"]")
+      val label = element.root().select("[for=\"" + id + "\"]")
 
       RadioItem(id, value, label.text())
     }
@@ -68,7 +68,7 @@ trait HtmlModels {
       val id = element.id()
       val name = element.attr("name")
       val value = element.`val`()
-      val label = element.siblingElements().select("[for=\"" + id + "\"]")
+      val label = element.root().select("[for=\"" + id + "\"]")
 
       Input(id, name, value, label.text())
     }

@@ -17,20 +17,12 @@
 package viewmodels.models
 
 import play.api.mvc.Call
-import viewmodels.DisplayMessage.Message
+import viewmodels.DisplayMessage.{BlockMessage, Message}
 
-case class MoneyViewModel(
+case class MoneyViewModel[A](
   title: Message,
   heading: Message,
+  description: Option[BlockMessage],
+  questions: MultipleQuestionsViewModel[A],
   onSubmit: Call
 )
-
-object MoneyViewModel {
-
-  def apply(
-    title: String,
-    heading: String,
-    onSubmit: Call
-  ): MoneyViewModel =
-    MoneyViewModel(Message(title), Message(heading), onSubmit)
-}

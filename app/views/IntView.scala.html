@@ -22,38 +22,38 @@
   govukInput: GovukInput
 )
 
-@(form: Form[_], viewmodel: TripleIntViewModel)(implicit request: Request[_], messages: Messages)
+@(viewmodel: IntViewModel[_])(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(viewmodel.title.toMessage)) {
 
   @formHelper(action = viewmodel.onSubmit, Symbol("autocomplete") -> "off") {
 
-    @if(form.hasErrors) {
-      @govukErrorSummary(ErrorSummaryViewModel(form))
+    @if(viewmodel.questions.form.hasErrors) {
+      @govukErrorSummary(ErrorSummaryViewModel(viewmodel.questions.form))
     }
 
-    <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
+    @if(viewmodel.questions.fields.length > 1) {
+      <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
 
-    @govukInput(
-      InputViewModel(
-        field = form("value.1"),
-        label = LabelViewModel(renderMessage(viewmodel.field1Label))
-      ).withWidth(InputWidth.Fixed10)
-    )
+      @viewmodel.questions.fields.zipWithIndex.map { case (field, index) =>
 
-    @govukInput(
-      InputViewModel(
-        field = form("value.2"),
-        label = LabelViewModel(renderMessage(viewmodel.field2Label))
-      ).withWidth(InputWidth.Fixed10)
-    )
-
-    @govukInput(
-      InputViewModel(
-        field = form("value.3"),
-        label = LabelViewModel(renderMessage(viewmodel.field3Label))
-      ).withWidth(InputWidth.Fixed10)
-    )
+        @govukInput(
+          InputViewModel(
+            field = viewmodel.questions.form(s"value.${index + 1}"),
+            label = LabelViewModel(renderMessage(field.label))
+          )
+                  .withHint(field.hint.map(h => Hint(content = HtmlContent(renderMessage(h)))))
+                  .withWidth(InputWidth.Fixed10)
+        )
+      }
+    } else {
+      @govukInput(
+        InputViewModel(
+          field = viewmodel.questions.form("value"),
+          label = LabelViewModel(renderMessage(viewmodel.heading)).asPageHeading()
+        ).withWidth(InputWidth.Fixed10)
+      )
+    }
 
     @govukButton(
       ButtonViewModel(messages("site.saveAndContinue"))

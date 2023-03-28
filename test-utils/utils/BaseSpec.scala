@@ -22,10 +22,10 @@ import generators.Generators
 import models.ModelSerializers
 import org.mockito.MockitoSugar
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.time.{Millis, Span}
 import org.scalatest.verbs.BehaveWord
-import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, OptionValues}
 import play.api.Application
 import play.api.i18n.{Messages, MessagesApi}
@@ -34,10 +34,12 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.running
 
 import java.net.URLEncoder
+import scala.annotation.nowarn
 import scala.reflect.ClassTag
 
 abstract class BaseSpec
-    extends AnyWordSpec
+    extends AnyFreeSpec
+    with ActsLikeSpec
     with Matchers
     with ScalaFutures
     with MockitoSugar
@@ -72,44 +74,7 @@ abstract class BaseSpec
 
   def urlEncode(input: String): String = URLEncoder.encode(input, "utf-8")
 
-  @deprecated("behave word has been replace with act word - behave.like becomes act.like")
+  @nowarn
+  @deprecated("behave word has been replace with act word - behave.like becomes act.like", "0.44.0")
   override val behave: BehaveWord = new BehaveWord
-
-  /* ActWord has the same functionality as BehaveWord except it supports BehaviourTest
-     for automatically running the test when passed to it, extending BehaveWord
-     is not possible as it is a final class
-   */
-  class ActWord {
-
-    def like(unit: Unit): Unit = ()
-
-    def like(test: BehaviourTest): Unit = test.run()
-
-    override def toString: String = "act"
-  }
-
-  val act = new ActWord
-
-  case class BehaviourTest(
-    name: String,
-    test: () => Unit,
-    beforeTest: () => Unit = () => (),
-    afterTest: () => Unit = () => ()
-  ) {
-
-    def withName(name: String): BehaviourTest = copy(name = name)
-
-    def updateName(update: String => String): BehaviourTest = copy(name = update(name))
-
-    def before(f: => Unit): BehaviourTest = copy(beforeTest = () => f)
-
-    def after(f: => Unit): BehaviourTest = copy(afterTest = () => f)
-
-    def run(): Unit =
-      name in {
-        beforeTest()
-        test()
-        afterTest()
-      }
-  }
 }

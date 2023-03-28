@@ -107,9 +107,9 @@ class AllowAccessActionSpec extends BaseSpec with ScalaCheckPropertyChecks {
   val administratorRequest = AdministratorRequest("", "", FakeRequest(), psaId)
   val practitionerRequest = PractitionerRequest("", "", FakeRequest(), pspId)
 
-  "AllowAccessAction" should {
+  "AllowAccessAction" - {
 
-    "return ok" when {
+    "return ok" - {
 
       "psa is associated, no rls flag, no deceased flag, no DelimitedAdmin and a valid status" in runningApplication {
         implicit app =>
@@ -128,13 +128,13 @@ class AllowAccessActionSpec extends BaseSpec with ScalaCheckPropertyChecks {
       }
     }
 
-    "redirect to unauthorized page" when {
+    "redirect to unauthorized page" - {
 
       "psa check association returns false" in runningApplication { implicit app =>
         setupCheckAssociation(psaId, srn, Future.successful(false))
 
         val result = handler(administratorRequest).run(srn)(FakeRequest())
-        val expectedUrl = routes.UnauthorisedController.onPageLoad.url
+        val expectedUrl = routes.UnauthorisedController.onPageLoad().url
 
         redirectLocation(result) mustBe Some(expectedUrl)
       }
@@ -143,7 +143,7 @@ class AllowAccessActionSpec extends BaseSpec with ScalaCheckPropertyChecks {
         setupCheckAssociation(pspId, srn, Future.successful(false))
 
         val result = handler(practitionerRequest).run(srn)(FakeRequest())
-        val expectedUrl = routes.UnauthorisedController.onPageLoad.url
+        val expectedUrl = routes.UnauthorisedController.onPageLoad().url
 
         redirectLocation(result) mustBe Some(expectedUrl)
       }
@@ -152,7 +152,7 @@ class AllowAccessActionSpec extends BaseSpec with ScalaCheckPropertyChecks {
         setupMinimalDetails(psaId, Future.successful(Left(DetailsNotFound)))
 
         val result = handler(administratorRequest).run(srn)(FakeRequest())
-        val expectedUrl = routes.UnauthorisedController.onPageLoad.url
+        val expectedUrl = routes.UnauthorisedController.onPageLoad().url
 
         redirectLocation(result) mustBe Some(expectedUrl)
       }
@@ -161,7 +161,7 @@ class AllowAccessActionSpec extends BaseSpec with ScalaCheckPropertyChecks {
         setupMinimalDetails(pspId, Future.successful(Left(DetailsNotFound)))
 
         val result = handler(practitionerRequest).run(srn)(FakeRequest())
-        val expectedUrl = routes.UnauthorisedController.onPageLoad.url
+        val expectedUrl = routes.UnauthorisedController.onPageLoad().url
 
         redirectLocation(result) mustBe Some(expectedUrl)
       }
@@ -170,7 +170,7 @@ class AllowAccessActionSpec extends BaseSpec with ScalaCheckPropertyChecks {
         setupSchemeDetails(psaId, srn, Future.successful(None))
 
         val result = handler(administratorRequest).run(srn)(FakeRequest())
-        val expectedUrl = routes.UnauthorisedController.onPageLoad.url
+        val expectedUrl = routes.UnauthorisedController.onPageLoad().url
 
         redirectLocation(result) mustBe Some(expectedUrl)
       }
@@ -179,7 +179,7 @@ class AllowAccessActionSpec extends BaseSpec with ScalaCheckPropertyChecks {
         setupSchemeDetails(pspId, srn, Future.successful(None))
 
         val result = handler(practitionerRequest).run(srn)(FakeRequest())
-        val expectedUrl = routes.UnauthorisedController.onPageLoad.url
+        val expectedUrl = routes.UnauthorisedController.onPageLoad().url
 
         redirectLocation(result) mustBe Some(expectedUrl)
       }
@@ -189,7 +189,7 @@ class AllowAccessActionSpec extends BaseSpec with ScalaCheckPropertyChecks {
           setupSchemeDetails(psaId, srn, Future.successful(Some(schemeDetails.copy(schemeStatus = schemeStatus))))
 
           val result = handler(administratorRequest).run(srn)(FakeRequest())
-          val expectedUrl = routes.UnauthorisedController.onPageLoad.url
+          val expectedUrl = routes.UnauthorisedController.onPageLoad().url
 
           redirectLocation(result) mustBe Some(expectedUrl)
         }
@@ -200,14 +200,14 @@ class AllowAccessActionSpec extends BaseSpec with ScalaCheckPropertyChecks {
           setupSchemeDetails(pspId, srn, Future.successful(Some(schemeDetails.copy(schemeStatus = schemeStatus))))
 
           val result = handler(practitionerRequest).run(srn)(FakeRequest())
-          val expectedUrl = routes.UnauthorisedController.onPageLoad.url
+          val expectedUrl = routes.UnauthorisedController.onPageLoad().url
 
           redirectLocation(result) mustBe Some(expectedUrl)
         }
       }
     }
 
-    "redirect to update contact details page" when {
+    "redirect to update contact details page" - {
 
       "psa rls flag is set" in runningApplication { implicit app =>
         setupMinimalDetails(psaId, Future.successful(Right(minimalDetails.copy(rlsFlag = true))))
@@ -228,7 +228,7 @@ class AllowAccessActionSpec extends BaseSpec with ScalaCheckPropertyChecks {
       }
     }
 
-    "redirect to contact hmrc page" when {
+    "redirect to contact hmrc page" - {
 
       "psa deceased flag is set" in runningApplication { implicit app =>
         setupMinimalDetails(psaId, Future.successful(Right(minimalDetails.copy(deceasedFlag = true))))
@@ -249,7 +249,7 @@ class AllowAccessActionSpec extends BaseSpec with ScalaCheckPropertyChecks {
       }
     }
 
-    "redirect to cannot access deregistered page" when {
+    "redirect to cannot access deregistered page" - {
 
       "psa minimal details return delimited admin" in runningApplication { implicit app =>
         setupMinimalDetails(psaId, Future.successful(Left(DelimitedAdmin)))

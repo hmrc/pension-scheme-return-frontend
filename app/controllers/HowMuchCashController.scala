@@ -21,6 +21,7 @@ import com.google.inject.Inject
 import config.Constants.maxCashInBank
 import controllers.actions._
 import forms.MoneyFormProvider
+import forms.mappings.errors.MoneyFormErrors
 import models.SchemeId.Srn
 import models.{Mode, Money}
 import navigation.Navigator
@@ -32,10 +33,10 @@ import services.{SaveService, TaxYearService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.time.TaxYear
 import utils.DateTimeUtils.localDateShow
-import utils.FormUtils._
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
 import viewmodels.models.MoneyViewModel
+import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import views.html.MoneyView
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -57,19 +58,29 @@ class HowMuchCashController @Inject()(
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     val form = HowMuchCashController.form(formProvider, request.schemeDetails.schemeName, taxYear)
-    val viewModel = HowMuchCashController.viewModel(srn, mode, request.schemeDetails.schemeName, taxYear)
+    val viewModel = HowMuchCashController.viewModel(
+      srn,
+      mode,
+      request.schemeDetails.schemeName,
+      taxYear,
+      request.userAnswers.fillForm(HowMuchCashPage(srn), form)
+    )
 
-    Ok(view(form.fromUserAnswers(HowMuchCashPage(srn)), viewModel))
+    Ok(view(viewModel))
   }
 
   def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
     val form = HowMuchCashController.form(formProvider, request.schemeDetails.schemeName, taxYear)
-    val viewModel = HowMuchCashController.viewModel(srn, mode, request.schemeDetails.schemeName, taxYear)
 
     form
       .bindFromRequest()
       .fold(
-        formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel))),
+        formWithErrors => {
+          val viewModel =
+            HowMuchCashController.viewModel(srn, mode, request.schemeDetails.schemeName, taxYear, formWithErrors)
+
+          Future.successful(BadRequest(view(viewModel)))
+        },
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(HowMuchCashPage(srn), value))
@@ -81,16 +92,27 @@ class HowMuchCashController @Inject()(
 
 object HowMuchCashController {
 
-  def form(formProvider: MoneyFormProvider, schemeName: String, taxYear: TaxYear): Form[Money] = formProvider(
-    "howMuchCash.error.required",
-    "howMuchCash.error.nonNumeric",
-    maxCashInBank -> "howMuchCash.error.tooLarge",
-    Seq(schemeName, taxYear.starts.show)
-  )
+  def form(formProvider: MoneyFormProvider, schemeName: String, taxYear: TaxYear): Form[Money] =
+    formProvider(
+      MoneyFormErrors(
+        "howMuchCash.error.required",
+        "howMuchCash.error.nonNumeric",
+        maxCashInBank -> "howMuchCash.error.tooLarge"
+      ),
+      Seq(schemeName, taxYear.starts.show)
+    )
 
-  def viewModel(srn: Srn, mode: Mode, schemeName: String, taxYear: TaxYear): MoneyViewModel = MoneyViewModel(
+  def viewModel(
+    srn: Srn,
+    mode: Mode,
+    schemeName: String,
+    taxYear: TaxYear,
+    form: Form[Money]
+  ): MoneyViewModel[Money] = MoneyViewModel(
     Message("howMuchCash.title", schemeName, taxYear.starts.show),
     Message("howMuchCash.heading", schemeName, taxYear.starts.show),
+    None,
+    questions = SingleQuestion(form),
     routes.HowMuchCashController.onSubmit(srn, mode)
   )
 }

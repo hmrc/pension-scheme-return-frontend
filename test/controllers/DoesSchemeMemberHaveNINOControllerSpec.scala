@@ -31,7 +31,7 @@ class DoesSchemeMemberHaveNINOControllerSpec extends ControllerBaseSpec {
   private val userAnswersWithMemberDetails =
     defaultUserAnswers.set(MemberDetailsPage(srn, refineMV(1)), memberDetails).success.value
 
-  "NationalInsuranceNumberController" should {
+  "NationalInsuranceNumberController" - {
 
     act.like(renderView(onPageLoad, userAnswersWithMemberDetails) { implicit app => implicit request =>
       val preparedForm = form(injected[YesNoPageFormProvider], memberDetails.fullName)

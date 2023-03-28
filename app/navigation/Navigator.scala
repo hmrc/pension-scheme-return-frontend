@@ -21,12 +21,14 @@ import controllers.routes
 import eu.timepit.refined.{refineMV, refineV}
 import models.PensionSchemeId.{PsaId, PspId}
 import models._
+import pages.MembersDetails._
 import pages.SchemeBankAccounts.SchemeBankAccountsOps
-import pages.{HowMuchCashPage, _}
+import pages._
 import play.api.mvc.Call
 import MembersDetails._
 import models.SchemeId.Srn
 import models.requests.DataRequest
+
 import javax.inject.{Inject, Singleton}
 
 @Singleton
@@ -78,6 +80,12 @@ class Navigator @Inject()() {
     case RemoveAccountingPeriodPage(srn) => _ => routes.AccountingPeriodListController.onPageLoad(srn, NormalMode)
     case HowMuchCashPage(srn) => _ => routes.UnauthorisedController.onPageLoad()
     case PensionSchemeMembersPage(srn) => _ => routes.UnauthorisedController.onPageLoad()
+
+    case HowMuchCashPage(srn) => _ => routes.ValueOfAssetsController.onPageLoad(srn, NormalMode)
+    case ValueOfAssetsPage(srn) => _ => routes.UnauthorisedController.onPageLoad()
+
+    case PensionSchemeMembersPage(srn) => _ => routes.UnauthorisedController.onPageLoad()
+
     case MemberDetailsPage(srn, index) =>
       _ => routes.DoesSchemeMemberHaveNINOController.onPageLoad(srn, index, NormalMode)
     case page @ NationalInsuranceNumberPage(srn, index) => {
@@ -99,30 +107,32 @@ class Navigator @Inject()() {
       case _ => routes.HowMuchCashController.onPageLoad(srn, NormalMode)
     }
 
-    case NoNINOPage(srn, index) => _ => routes.SchemeMemberDetailsCYAController.onPageLoad(srn, index)
-    case SchemeMembersListPage(srn, false) => _ => routes.UnauthorisedController.onPageLoad
+    case NoNINOPage(srn, index) =>
+      _ => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, CheckOrChange.Check)
+    case SchemeMembersListPage(srn, false) => _ => routes.UnauthorisedController.onPageLoad()
+
     case SchemeMembersListPage(srn, true) =>
       ua =>
         refineV[OneTo99](ua.membersDetails(srn).length + 1).fold(
           _ => routes.JourneyRecoveryController.onPageLoad(),
-          index => routes.MemberDetailsController.onPageLoad(srn, index, NormalMode)
+          index => routes.MemberDetailsController.onPageLoad(srn, index)
         )
-    case _ => _ => routes.IndexController.onPageLoad
+    case _ => _ => routes.IndexController.onPageLoad()
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
-    case CheckReturnDatesPage(srn) => _ => routes.UnauthorisedController.onPageLoad
-    case SchemeBankAccountPage(srn, _) => _ => routes.UnauthorisedController.onPageLoad
+    case CheckReturnDatesPage(srn) => _ => routes.UnauthorisedController.onPageLoad()
+    case SchemeBankAccountPage(srn, _) => _ => routes.UnauthorisedController.onPageLoad()
     case RemoveSchemeBankAccountPage(srn) => _ => routes.SchemeBankAccountListController.onPageLoad(srn)
     case RemoveMemberDetailsPage(srn) => _ => routes.SchemeMembersListController.onPageLoad(srn, page = 1)
 
     case page @ HowManyMembersPage(srn, _) => {
-      case _ => routes.UnauthorisedController.onPageLoad
+      case _ => routes.UnauthorisedController.onPageLoad()
     }
 
-    case NoNINOPage(srn, _) => _ => routes.UnauthorisedController.onPageLoad
+    case NoNINOPage(srn, _) => _ => routes.UnauthorisedController.onPageLoad()
 
-    case _ => _ => routes.IndexController.onPageLoad
+    case _ => _ => routes.IndexController.onPageLoad()
   }
 
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = mode match {
@@ -131,5 +141,4 @@ class Navigator @Inject()() {
     case CheckMode =>
       checkRouteMap(page)(userAnswers)
   }
-
 }

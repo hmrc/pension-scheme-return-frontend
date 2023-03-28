@@ -37,7 +37,7 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
       (ua, i) => ua.unsafeSet(MemberDetailsPage(srn, refineV[OneTo99](i).value), memberDetails)
     )
 
-  "SchemeMembersListController" should {
+  "SchemeMembersListController" - {
     act.like(
       renderView(onPageLoad, userAnswersWithMembersDetails)(
         implicit app =>
@@ -62,17 +62,17 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
     act.like(
       redirectToPage(
         onSubmit,
-        routes.MemberDetailsController.onPageLoad(srn, refineMV(2), NormalMode),
+        routes.MemberDetailsController.onPageLoad(srn, refineMV(2)),
         userAnswersWithMembersDetails,
         "value" -> "true"
       )
     )
 
-    "when user answers has 99 members" should {
+    "when user answers has 99 members" - {
       act.like(
         redirectToPage(
           onSubmit,
-          routes.UnauthorisedController.onPageLoad,
+          routes.UnauthorisedController.onPageLoad(),
           userAnswersWith99MembersDetails
         )
       )

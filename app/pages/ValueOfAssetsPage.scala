@@ -16,6 +16,12 @@
 
 package pages
 
+import models.MoneyInPeriod
 import models.SchemeId.Srn
+import play.api.libs.json.JsPath
 
-case class SchemeMemberDetailsCYAPage(srn: Srn) extends Page
+case class ValueOfAssetsPage(srn: Srn) extends QuestionPage[MoneyInPeriod] {
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "valueOfAssets"
+}

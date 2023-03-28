@@ -39,7 +39,7 @@ class SchemeBankAccountControllerSpec extends ControllerBaseSpec {
   )
   private val invalidFormData = List("bankName" -> "testBankName", "accountNumber" -> "10273837", "sortCode" -> "wrong")
 
-  "SchemeBankAccountController" should {
+  "SchemeBankAccountController" - {
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       injected[BankAccountView]
@@ -55,12 +55,12 @@ class SchemeBankAccountControllerSpec extends ControllerBaseSpec {
     act.like(invalidForm(onSubmit, invalidFormData: _*))
     act.like(saveAndContinue(onSubmit, validFormData: _*))
 
-    "persist data when updating" when {
+    "persist data when updating" - {
       val ua = defaultUserAnswers.set(SchemeBankAccountPage(srn, refineMV(1)), bankAccount).get
       act.like(saveAndContinue(onSubmit, ua, validFormData: _*))
     }
 
-    "return a 400 when data exists in user answers" when {
+    "return a 400 when data exists in user answers" - {
       val userAnswers = defaultUserAnswers
         .unsafeSet(SchemeBankAccountPage(srn, refineMV(1)), otherBankAccount)
         .unsafeSet(SchemeBankAccountPage(srn, refineMV(2)), bankAccount)

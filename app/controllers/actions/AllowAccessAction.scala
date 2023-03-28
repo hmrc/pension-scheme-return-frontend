@@ -74,7 +74,7 @@ class AllowAccessAction(
           Future.successful(Redirect(appConfig.urls.managePensionsSchemes.cannotAccessDeregistered))
 
         case _ =>
-          Future.successful(Redirect(routes.UnauthorisedController.onPageLoad))
+          Future.successful(Redirect(routes.UnauthorisedController.onPageLoad()))
       }
     }).flatten
   }

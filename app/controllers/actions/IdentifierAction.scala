@@ -74,7 +74,7 @@ class IdentifierActionImpl @Inject()(
         case Some(_) ~ Some(_) ~ _ =>
           Future.successful(Redirect(appConfig.urls.managePensionsSchemes.registerUrl))
 
-        case _ => Future.successful(Redirect(routes.UnauthorisedController.onPageLoad))
+        case _ => Future.successful(Redirect(routes.UnauthorisedController.onPageLoad()))
       }
       .recover {
         case _: NoActiveSession =>

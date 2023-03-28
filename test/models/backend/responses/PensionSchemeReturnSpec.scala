@@ -16,13 +16,12 @@
 
 package models.backend.responses
 
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.Json
+import utils.BaseSpec
 
-class PensionSchemeReturnSpec extends AnyWordSpec with Matchers {
+class PensionSchemeReturnSpec extends BaseSpec {
 
-  "PensionSchemeReturn" should {
+  "PensionSchemeReturn" - {
     List(
       (DataEntryRule.Fixed, "fixed"),
       (DataEntryRule.Updated, "updated"),
@@ -49,7 +48,7 @@ class PensionSchemeReturnSpec extends AnyWordSpec with Matchers {
             )
           )
 
-          expectedJson.as[PensionSchemeReturn] shouldBe pensionSchemeReturn
+          expectedJson.as[PensionSchemeReturn] mustBe pensionSchemeReturn
         }
     }
   }

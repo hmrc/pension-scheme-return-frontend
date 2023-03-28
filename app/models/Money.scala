@@ -17,6 +17,7 @@
 package models
 
 import play.api.libs.json.{Format, Json}
+import utils.Transform
 
 case class Money(value: Double, displayAs: String)
 
@@ -26,4 +27,19 @@ object Money {
     Money(value, value.toString)
 
   implicit val formats: Format[Money] = Json.format[Money]
+}
+
+case class MoneyInPeriod(moneyAtStart: Money, moneyAtEnd: Money)
+
+object MoneyInPeriod {
+
+  implicit val formats: Format[MoneyInPeriod] = Json.format[MoneyInPeriod]
+
+  implicit val transform: Transform[(Money, Money), MoneyInPeriod] = new Transform[(Money, Money), MoneyInPeriod] {
+
+    override def to(a: (Money, Money)): MoneyInPeriod = MoneyInPeriod(a._1, a._2)
+
+    override def from(b: MoneyInPeriod): (Money, Money) = (b.moneyAtStart, b.moneyAtEnd)
+  }
+
 }

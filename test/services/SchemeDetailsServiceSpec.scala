@@ -39,7 +39,7 @@ class SchemeDetailsServiceSpec extends BaseSpec with ScalaCheckPropertyChecks {
     reset(mockSchemeDetailsConnector)
   }
 
-  "getMinimalDetails" should {
+  "getMinimalDetails" - {
 
     "return correct minimal scheme details for psa" in {
 

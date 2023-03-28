@@ -27,8 +27,8 @@ import java.time.LocalDate
 
 class MemberDetailsControllerSpec extends ControllerBaseSpec {
 
-  private lazy val onPageLoad = controllers.routes.MemberDetailsController.onPageLoad(srn, refineMV(1), NormalMode)
-  private lazy val onSubmit = controllers.routes.MemberDetailsController.onSubmit(srn, refineMV(1), NormalMode)
+  private lazy val onPageLoad = controllers.routes.MemberDetailsController.onPageLoad(srn, refineMV(1))
+  private lazy val onSubmit = controllers.routes.MemberDetailsController.onSubmit(srn, refineMV(1))
 
   private val validForm = List(
     "firstName" -> "testFirstName",
@@ -52,7 +52,7 @@ class MemberDetailsControllerSpec extends ControllerBaseSpec {
     LocalDate.of(2020, 12, 12)
   )
 
-  "MemberDetailsController" should {
+  "MemberDetailsController" - {
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       injected[NameDOBView].apply(form(injected[NameDOBFormProvider]), viewModel(srn, refineMV(1), NormalMode))

@@ -17,17 +17,22 @@
 package controllers
 
 import com.google.inject.Inject
+import config.Constants
+import config.Constants.maxSchemeMembers
 import config.Constants.maxSchemeMembers
 import config.Refined.OneTo99
+import controllers.SchemeMembersListController._
 import controllers.actions._
 import eu.timepit.refined._
 import forms.YesNoPageFormProvider
-import models.{Mode, Pagination}
 import models.SchemeId.Srn
+import models.{Mode, Pagination}
 import navigation.Navigator
+import pages.MembersDetails._
+import pages.SchemeMembersListPage
 import pages.SchemeMembersListPage
 import play.api.data.Form
-import play.api.i18n.{I18nSupport, Messages, MessagesApi}
+import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
@@ -54,6 +59,7 @@ class SchemeMembersListController @Inject()(
     identifyAndRequireData(srn) { implicit request =>
       val membersDetails = request.userAnswers.membersDetails(srn)
       if (membersDetails.isEmpty) {
+        Redirect(controllers.routes.MemberDetailsController.onPageLoad(srn, refineMV[OneTo99](1)))
         Redirect(controllers.routes.PensionSchemeMembersController.onPageLoad(srn))
       } else {
         Ok(view(form, viewModel(srn, page, mode, membersDetails.map(_.fullName))))
@@ -91,7 +97,7 @@ object SchemeMembersListController {
             List(
               ListRow(
                 memberName,
-                changeUrl = controllers.routes.MemberDetailsController.onPageLoad(srn, nextIndex, mode).url,
+                changeUrl = controllers.routes.MemberDetailsController.onPageLoad(srn, nextIndex).url,
                 changeHiddenText = Message("schemeMembersList.change.hidden", memberName),
                 removeUrl = controllers.routes.RemoveMemberDetailsController.onPageLoad(srn, nextIndex, mode).url,
                 removeHiddenText = Message("schemeMembersList.remove.hidden", memberName)

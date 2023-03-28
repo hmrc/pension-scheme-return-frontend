@@ -26,7 +26,7 @@ class PensionSchemeMembersControllerSpec extends ControllerBaseSpec {
   private lazy val onPageLoad = routes.PensionSchemeMembersController.onPageLoad(srn)
   private lazy val onSubmit = routes.PensionSchemeMembersController.onSubmit(srn)
 
-  "PensionSchemeMembersController" should {
+  "PensionSchemeMembersController" - {
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       val view = injected[RadioListView]
@@ -39,11 +39,11 @@ class PensionSchemeMembersControllerSpec extends ControllerBaseSpec {
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
-    "manual data is submitted" when {
+    "manual data is submitted" - {
       act.like(saveAndContinue(onSubmit, "value" -> Manual.name))
     }
 
-    "upload data is submitted" when {
+    "upload data is submitted" - {
       act.like(saveAndContinue(onSubmit, "value" -> Upload.name))
     }
 

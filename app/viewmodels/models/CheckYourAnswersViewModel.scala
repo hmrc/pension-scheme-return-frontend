@@ -42,6 +42,19 @@ object CheckYourAnswersViewModel {
       rows.toList,
       onSubmit
     )
+
+  def apply(
+    title: String,
+    heading: Message,
+    rows: Seq[CheckYourAnswersRowViewModel],
+    onSubmit: Call
+  ): CheckYourAnswersViewModel =
+    CheckYourAnswersViewModel(
+      Message(title),
+      heading,
+      rows.toList,
+      onSubmit
+    )
 }
 
 case class CheckYourAnswersRowViewModel(

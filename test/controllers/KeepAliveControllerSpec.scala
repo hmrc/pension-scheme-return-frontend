@@ -25,9 +25,9 @@ import scala.concurrent.Future
 
 class KeepAliveControllerSpec extends ControllerBaseSpec {
 
-  "keepAlive" should {
+  "keepAlive" - {
 
-    "keep the answers alive and return OK" when {
+    "keep the answers alive and return OK" - {
       "the user has answered some questions" in {
 
         val mockSessionRepository = mock[SessionRepository]
@@ -40,7 +40,7 @@ class KeepAliveControllerSpec extends ControllerBaseSpec {
 
         running(application) {
 
-          val request = FakeRequest(GET, routes.KeepAliveController.keepAlive.url)
+          val request = FakeRequest(GET, routes.KeepAliveController.keepAlive().url)
 
           val result = route(application, request).value
 
@@ -50,7 +50,7 @@ class KeepAliveControllerSpec extends ControllerBaseSpec {
       }
     }
 
-    "return OK" when {
+    "return OK" - {
       "the user has not answered any questions" in {
 
         val mockSessionRepository = mock[SessionRepository]
@@ -63,7 +63,7 @@ class KeepAliveControllerSpec extends ControllerBaseSpec {
 
         running(application) {
 
-          val request = FakeRequest(GET, routes.KeepAliveController.keepAlive.url)
+          val request = FakeRequest(GET, routes.KeepAliveController.keepAlive().url)
 
           val result = route(application, request).value
 

@@ -29,7 +29,7 @@ class StartPageControllerSpec extends ControllerBaseSpec {
   lazy val onPageLoad = routes.StartPageController.onPageLoad(srn).url
   lazy val onSubmit = routes.StartPageController.onSubmit(srn).url
 
-  "StartPageController" should {
+  "StartPageController" - {
 
     "return OK and the correct view for a GET" in runningApplication { implicit app =>
       val view = injected[ContentPageView]

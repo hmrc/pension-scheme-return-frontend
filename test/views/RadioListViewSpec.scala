@@ -26,7 +26,7 @@ import views.html.RadioListView
 
 class RadioListViewSpec extends BaseSpec with ScalaCheckPropertyChecks with HtmlHelper {
 
-  implicit val enum = Enumerable(
+  implicit val enumerable = Enumerable(
     ("1", 1),
     ("2", 2),
     ("3", 3)
@@ -37,7 +37,7 @@ class RadioListViewSpec extends BaseSpec with ScalaCheckPropertyChecks with Html
 
     val view = injected[RadioListView]
 
-    "RadioListView" should {
+    "RadioListView" - {
 
       val requiredKey = "radio.error.required"
 

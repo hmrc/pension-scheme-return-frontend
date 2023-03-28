@@ -44,7 +44,7 @@ class DateRangeViewSpec extends ViewSpec {
         )(identity)(Some(_))
       )
 
-    "DateRangeView" should {
+    "DateRangeView" - {
 
       "render the title" in {
 
