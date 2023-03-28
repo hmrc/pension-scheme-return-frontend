@@ -16,60 +16,32 @@
 
 package pages
 
+import config.Refined.Max99
 import eu.timepit.refined.refineMV
 import models.{NameDOB, UserAnswers}
 import pages.behaviours.PageBehaviours
 import uk.gov.hmrc.domain.Nino
+import utils.UserAnswersUtils.UserAnswersOps
+
+import java.time.LocalDate
 
 class MemberDetailsPageSpec extends PageBehaviours {
 
-  "MemberDetailsNinoPage" - {
+  private val memberDetails: NameDOB = nameDobGen.sample.value
 
-    val srn = srnGen.sample.value
-
-    beRetrievable[NameDOB](MemberDetailsPage(srn, refineMV(1)))
-
-    beSettable[NameDOB](MemberDetailsPage(srn, refineMV(1)))
-
-    beRemovable[NameDOB](MemberDetailsPage(srn, refineMV(1)))
-  }
-
-  "cleanup no NINO page if page value is true" in {
-
-    val srn = srnGen.sample.value
-    val userAnswers = UserAnswers("test").set(NoNINOPage(srn, refineMV(1)), "test purpose").success.value
-    userAnswers.get(NoNINOPage(srn, refineMV(1))) must be(Some("test purpose"))
-
-    val result = userAnswers.set(NationalInsuranceNumberPage(srn, refineMV(1)), true).success.value
-    result.get(NoNINOPage(srn, refineMV(1))) must be(empty)
-  }
-
-  "cleanup enter NINO page if page value is false" in {
+  "Add member details page with any data" in {
 
     val srn = srnGen.sample.value
     val nino = Nino("AB123456A")
-    val userAnswers = UserAnswers("test").set(MemberDetailsNinoPage(srn, refineMV(1)), nino).success.value
-    userAnswers.get(MemberDetailsNinoPage(srn, refineMV(1))) must be(Some(nino))
-
-    val result = userAnswers.set(NationalInsuranceNumberPage(srn, refineMV(1)), false).success.value
-    result.get(MemberDetailsNinoPage(srn, refineMV(1))) must be(empty)
-  }
-
-  "cleanup both enter NINO page and no NINO page if page value is missing" in {
-
-    val srn = srnGen.sample.value
-    val nino = Nino("SS768923C")
     val userAnswers = UserAnswers("test")
-      .set(MemberDetailsNinoPage(srn, refineMV(1)), nino)
-      .success
-      .value
-      .set(NoNINOPage(srn, refineMV(1)), "test purpose")
-      .success
-      .value
-    userAnswers.get(MemberDetailsNinoPage(srn, refineMV(1))) must be(Some(nino))
-    userAnswers.get(NoNINOPage(srn, refineMV(1))) must be(Some("test purpose"))
+      .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+      .unsafeSet(MemberDetailsNinoPage(srn, refineMV(1)), nino)
+      .unsafeSet(NoNINOPage(srn, refineMV(1)), "test reason")
+      .unsafeSet(NationalInsuranceNumberPage(srn, refineMV(1)), true)
 
-    val result = userAnswers.remove(NationalInsuranceNumberPage(srn, refineMV(1))).success.value
+    val result = userAnswers.remove(MemberDetailsPage(srn, refineMV(1))).success.value
+    result.get(MemberDetailsPage(srn, refineMV(1))) must be(empty)
+    result.get(NationalInsuranceNumberPage(srn, refineMV(1))) must be(empty)
     result.get(MemberDetailsNinoPage(srn, refineMV(1))) must be(empty)
     result.get(NoNINOPage(srn, refineMV(1))) must be(empty)
   }

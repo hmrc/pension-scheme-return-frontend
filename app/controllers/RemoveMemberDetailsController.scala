@@ -33,7 +33,6 @@ import RemoveMemberDetailsController._
 import config.Refined.Max99
 import models.{Mode, NameDOB}
 import models.requests.DataRequest
-import play.api.libs.json.JsArray
 import services.SaveService
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
@@ -53,10 +52,12 @@ class RemoveMemberDetailsController @Inject()(
     with I18nSupport {
 
   private val form = RemoveMemberDetailsController.form(formProvider)
+
   def onPageLoad(srn: Srn, index: Max99, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       withMemberDetails(srn, index)(nameDOB => Ok(view(form, viewModel(srn, index, nameDOB, mode))))
     }
+
   def onSubmit(srn: Srn, index: Max99, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
@@ -73,14 +74,10 @@ class RemoveMemberDetailsController @Inject()(
               for {
                 updatedAnswers <- Future.fromTry(request.userAnswers.remove(MemberDetailsPage(srn, index)))
                 _ <- saveService.save(updatedAnswers)
-              } yield {
-                val balanceMembersList = (updatedAnswers.data \ "memberDetailsPage").as[JsArray]
-                if (balanceMembersList.value.isEmpty) {
-                  Redirect(navigator.nextPage(PensionSchemeMembersPage(srn), mode, updatedAnswers))
-                } else {
-                  Redirect(navigator.nextPage(RemoveMemberDetailsPage(srn), mode, updatedAnswers))
-                }
-              }
+              } yield Redirect(
+                navigator
+                  .nextPage(navigator.balanceMembersList(srn, PensionSchemeMembersPage(srn)), mode, updatedAnswers)
+              )
             } else {
               Future
                 .successful(Redirect(navigator.nextPage(RemoveMemberDetailsPage(srn), mode, request.userAnswers)))
@@ -97,7 +94,6 @@ class RemoveMemberDetailsController @Inject()(
       case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
     }
 }
-
 object RemoveMemberDetailsController {
   def form(formProvider: YesNoPageFormProvider): Form[Boolean] = formProvider(
     "removeMemberDetails.error.required"

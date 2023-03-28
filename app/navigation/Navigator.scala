@@ -16,7 +16,7 @@
 
 package navigation
 
-import config.Refined.{OneTo99, OneToTen, OneToThree}
+import config.Refined.{Max99, OneTo99, OneToTen, OneToThree}
 import controllers.routes
 import eu.timepit.refined.{refineMV, refineV}
 import models.PensionSchemeId.{PsaId, PspId}
@@ -25,7 +25,10 @@ import pages.SchemeBankAccounts.SchemeBankAccountsOps
 import pages.{HowMuchCashPage, _}
 import play.api.mvc.Call
 import MembersDetails._
+import models.SchemeId.Srn
+import models.requests.DataRequest
 
+import java.lang.ProcessBuilder.Redirect
 import javax.inject.{Inject, Singleton}
 
 @Singleton
@@ -130,4 +133,12 @@ class Navigator @Inject()() {
     case CheckMode =>
       checkRouteMap(page)(userAnswers)
   }
+
+  def balanceMembersList(srn: Srn, redirectPage: Page)(implicit request: DataRequest[_]): Page =
+    if ((request.userAnswers.membersDetails(srn).init).isEmpty) {
+      redirectPage
+    } else {
+      RemoveMemberDetailsPage(srn)
+    }
+
 }

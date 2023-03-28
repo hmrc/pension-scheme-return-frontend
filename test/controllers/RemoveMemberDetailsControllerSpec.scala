@@ -17,14 +17,10 @@
 package controllers
 
 import controllers.RemoveMemberDetailsController.{form, viewModel}
-import controllers.actions.DataCreationActionImpl
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
-import models.requests.{DataRequest, OptionalDataRequest}
 import models.{CheckMode, NameDOB, NormalMode}
 import pages.MemberDetailsPage
-import play.api.mvc.AnyContentAsEmpty
-import repositories.SessionRepository
 import views.html.YesNoPageView
 
 import java.time.LocalDate
@@ -36,13 +32,6 @@ class RemoveMemberDetailsControllerSpec extends ControllerBaseSpec {
   private lazy val onSubmit = routes.RemoveMemberDetailsController.onSubmit(srn, refineMV(1), NormalMode)
 
   override val memberDetails: NameDOB = nameDobGen.sample.value
-
-  class Harness(request: OptionalDataRequest[AnyContentAsEmpty.type], sessionRepository: SessionRepository)(
-    implicit ec: ExecutionContext
-  ) extends DataCreationActionImpl(sessionRepository)(ec) {
-    def callTransform(): Future[DataRequest[AnyContentAsEmpty.type]] =
-      transform(request)
-  }
 
   private val userAnswers = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
