@@ -17,8 +17,8 @@
 package pages
 
 import config.Refined.Max99
-import models.{NameDOB, UserAnswers}
 import models.SchemeId.Srn
+import models.{NameDOB, UserAnswers}
 import play.api.libs.json.JsPath
 import queries.Gettable
 import utils.RefinedUtils.RefinedIntOps
@@ -30,7 +30,7 @@ case class MemberDetailsPage(srn: Srn, index: Max99) extends QuestionPage[NameDO
   override def path: JsPath = JsPath \ toString \ index.arrayIndex
 
   override def cleanup(value: Option[NameDOB], userAnswers: UserAnswers): Try[UserAnswers] =
-    userAnswers.remove(NationalInsuranceNumberPage(srn, index))
+    value.fold(userAnswers.remove(NationalInsuranceNumberPage(srn, index)))(_ => Try(userAnswers))
 
   override def toString: String = "memberDetailsPage"
 }
