@@ -16,30 +16,26 @@
 
 package pages
 
-import config.Refined.Max99
 import eu.timepit.refined.refineMV
 import models.{NameDOB, UserAnswers}
 import pages.behaviours.PageBehaviours
-import uk.gov.hmrc.domain.Nino
 import utils.UserAnswersUtils.UserAnswersOps
-
-import java.time.LocalDate
 
 class MemberDetailsPageSpec extends PageBehaviours {
 
   private val memberDetails: NameDOB = nameDobGen.sample.value
 
   val srn = srnGen.sample.value
+  val nino = ninoGen.sample.value
+  val defaultUserAnswers = UserAnswers("test")
 
   beRetrievable[NameDOB](MemberDetailsPage(srn, refineMV(1)))
   beSettable[NameDOB](MemberDetailsPage(srn, refineMV(1)))
   beRemovable[NameDOB](MemberDetailsPage(srn, refineMV(1)))
 
-  "Add member details page with any data" in {
+  "Remove data when member details page is removed" in {
 
-    val srn = srnGen.sample.value
-    val nino = Nino("AB123456A")
-    val userAnswers = UserAnswers("test")
+    val userAnswers = defaultUserAnswers
       .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
       .unsafeSet(MemberDetailsNinoPage(srn, refineMV(1)), nino)
       .unsafeSet(NoNINOPage(srn, refineMV(1)), "test reason")
@@ -50,5 +46,22 @@ class MemberDetailsPageSpec extends PageBehaviours {
     result.get(NationalInsuranceNumberPage(srn, refineMV(1))) must be(empty)
     result.get(MemberDetailsNinoPage(srn, refineMV(1))) must be(empty)
     result.get(NoNINOPage(srn, refineMV(1))) must be(empty)
+  }
+
+  "Retain data when member details page is modified" in {
+    val srn = srnGen.sample.value
+    val nino = ninoGen.sample.value
+
+    val userAnswers = defaultUserAnswers
+      .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+      .unsafeSet(NationalInsuranceNumberPage(srn, refineMV(1)), true)
+      .unsafeSet(MemberDetailsNinoPage(srn, refineMV(1)), nino)
+      .unsafeSet(NoNINOPage(srn, refineMV(1)), "test reason")
+
+    val result = userAnswers.set(MemberDetailsPage(srn, refineMV(1)), memberDetails).success.value
+    result.get(MemberDetailsPage(srn, refineMV(1))) mustBe Some(memberDetails)
+    result.get(NationalInsuranceNumberPage(srn, refineMV(1))) mustBe Some(true)
+    result.get(MemberDetailsNinoPage(srn, refineMV(1))) mustBe Some(nino)
+    result.get(NoNINOPage(srn, refineMV(1))) mustBe Some("test reason")
   }
 }
