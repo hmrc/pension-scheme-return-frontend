@@ -59,7 +59,6 @@ class SchemeMembersListController @Inject()(
     identifyAndRequireData(srn) { implicit request =>
       val membersDetails = request.userAnswers.membersDetails(srn)
       if (membersDetails.isEmpty) {
-        Redirect(controllers.routes.MemberDetailsController.onPageLoad(srn, refineMV[OneTo99](1)))
         Redirect(controllers.routes.PensionSchemeMembersController.onPageLoad(srn))
       } else {
         Ok(view(form, viewModel(srn, page, mode, membersDetails.map(_.fullName))))

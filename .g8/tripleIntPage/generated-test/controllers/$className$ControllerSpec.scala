@@ -8,7 +8,6 @@ import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
-import forms.TripleIntFormProvider
 import views.html.TripleIntView
 import $className;format="cap"$Controller._
 

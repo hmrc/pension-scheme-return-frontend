@@ -78,8 +78,6 @@ class Navigator @Inject()() {
         )
 
     case RemoveAccountingPeriodPage(srn) => _ => routes.AccountingPeriodListController.onPageLoad(srn, NormalMode)
-    case HowMuchCashPage(srn) => _ => routes.UnauthorisedController.onPageLoad()
-    case PensionSchemeMembersPage(srn) => _ => routes.UnauthorisedController.onPageLoad()
 
     case HowMuchCashPage(srn) => _ => routes.ValueOfAssetsController.onPageLoad(srn, NormalMode)
     case ValueOfAssetsPage(srn) => _ => routes.UnauthorisedController.onPageLoad()
@@ -92,8 +90,9 @@ class Navigator @Inject()() {
       case ua if ua.get(page).contains(true) => routes.MemberDetailsNinoController.onPageLoad(srn, index, NormalMode)
       case _ => routes.NoNINOController.onPageLoad(srn, index, NormalMode)
     }
-    case MemberDetailsNinoPage(srn, index) => _ => routes.SchemeMemberDetailsCYAController.onPageLoad(srn, index)
-    case SchemeMemberDetailsCYAPage(srn) => _ => routes.SchemeMembersListController.onPageLoad(srn, page = 1)
+    case MemberDetailsNinoPage(srn, index) =>
+      _ => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, CheckOrChange.Check)
+    case SchemeMemberDetailsAnswersPage(srn) => _ => routes.SchemeMembersListController.onPageLoad(srn, page = 1)
     case PsaDeclarationPage(srn) => _ => routes.UnauthorisedController.onPageLoad()
     case PspDeclarationPage(srn) => _ => routes.UnauthorisedController.onPageLoad()
 

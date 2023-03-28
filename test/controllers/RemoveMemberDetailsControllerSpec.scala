@@ -35,7 +35,7 @@ class RemoveMemberDetailsControllerSpec extends ControllerBaseSpec {
     .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
     .unsafeSet(MemberDetailsPage(srn, refineMV(2)), memberDetails)
 
-  "RemoveMemberDetailsController" should {
+  "RemoveMemberDetailsController" - {
 
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
       val view = injected[YesNoPageView]
