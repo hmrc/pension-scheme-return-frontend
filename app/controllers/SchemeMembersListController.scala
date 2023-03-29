@@ -41,6 +41,7 @@ import viewmodels.models.{ListRow, ListViewModel, PaginatedViewModel}
 import views.html.ListView
 import SchemeMembersListController._
 import config.Constants
+import models.CheckOrChange.Change
 import pages.MembersDetails.MembersDetailsOps
 
 class SchemeMembersListController @Inject()(
@@ -96,7 +97,8 @@ object SchemeMembersListController {
             List(
               ListRow(
                 memberName,
-                changeUrl = controllers.routes.MemberDetailsController.onPageLoad(srn, nextIndex).url,
+                changeUrl =
+                  controllers.routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, nextIndex, Change).url,
                 changeHiddenText = Message("schemeMembersList.change.hidden", memberName),
                 removeUrl = controllers.routes.RemoveMemberDetailsController.onPageLoad(srn, nextIndex, mode).url,
                 removeHiddenText = Message("schemeMembersList.remove.hidden", memberName)
