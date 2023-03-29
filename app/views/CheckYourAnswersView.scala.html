@@ -20,7 +20,7 @@
     layout: templates.Layout,
     formHelper: FormWithCSRF,
     govukSummaryList: GovukSummaryList,
-    govukButton: GovukButton
+    govukButton: GovukButton,
 )
 
 @(viewmodel: CheckYourAnswersViewModel)(implicit request: Request[_], messages: Messages)
@@ -37,7 +37,7 @@
 
         @formHelper(action = viewmodel.onSubmit, Symbol("autocomplete") -> "off") {
             @govukButton(
-                ButtonViewModel(messages("site.saveAndContinue"))
+                ButtonViewModel(renderMessage(viewmodel.buttonText))
             )
         }
     }

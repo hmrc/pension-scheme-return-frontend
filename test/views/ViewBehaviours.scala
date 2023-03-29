@@ -72,6 +72,13 @@ trait ViewBehaviours {
       }
     }
 
+  def renderContinueButtonWithText[A](gen: Gen[A])(view: A => Html, expectedText: A => String): Unit =
+    "render the button text" in {
+      forAll(gen) { viewModel =>
+        buttons(view(viewModel)).last().text() mustBe expectedText(viewModel)
+      }
+    }
+
   def renderSaveAndContinueButton[A](gen: Gen[A])(view: A => Html): Unit =
     "render the button text" in {
       forAll(gen) { viewModel =>

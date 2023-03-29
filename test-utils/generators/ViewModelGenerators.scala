@@ -71,9 +71,10 @@ trait ViewModelGenerators extends BasicGenerators {
       title <- nonEmptyString
       heading <- nonEmptyString
       rows <- Gen.listOf(summaryListRowGen)
+      buttonText <- nonEmptyMessage
       onSubmit <- call
     } yield {
-      CheckYourAnswersViewModel(Message(title), Message(heading), rows, onSubmit)
+      CheckYourAnswersViewModel(Message(title), Message(heading), rows, buttonText, onSubmit)
     }
 
   val bankAccountViewModelGen: Gen[BankAccountViewModel] =

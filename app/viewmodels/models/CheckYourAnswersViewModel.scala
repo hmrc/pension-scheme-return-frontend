@@ -27,6 +27,7 @@ case class CheckYourAnswersViewModel(
   title: Message,
   heading: Message,
   rows: List[CheckYourAnswersRowViewModel],
+  buttonText: Message,
   onSubmit: Call
 )
 
@@ -40,6 +41,7 @@ object CheckYourAnswersViewModel {
       Message("checkYourAnswers.title"),
       Message("checkYourAnswers.heading"),
       rows.toList,
+      Message("site.saveAndContinue"),
       onSubmit
     )
 
@@ -47,12 +49,14 @@ object CheckYourAnswersViewModel {
     title: String,
     heading: Message,
     rows: Seq[CheckYourAnswersRowViewModel],
+    buttonText: String,
     onSubmit: Call
   ): CheckYourAnswersViewModel =
     CheckYourAnswersViewModel(
       Message(title),
       heading,
       rows.toList,
+      Message(buttonText),
       onSubmit
     )
 }
