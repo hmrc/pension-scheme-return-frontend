@@ -156,6 +156,7 @@ object SchemeMemberDetailsAnswersController {
       change = Message("changeMemberDetails.heading", memberDetails.fullName)
     ),
     rows(index, srn, mode, memberDetails, hasNINO, maybeNino, maybeNoNinoReason),
+    Message("site.continue"),
     controllers.routes.SchemeMemberDetailsAnswersController.onSubmit(srn, index, checkOrChange)
   )
 }

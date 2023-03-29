@@ -31,7 +31,7 @@ class CheckYourAnswersViewSpec extends ViewSpec {
 
       act.like(renderTitle(checkYourAnswersViewModelGen)(view(_), _.title.key))
       act.like(renderHeading(checkYourAnswersViewModelGen)(view(_), _.heading))
-      act.like(renderSaveAndContinueButton(checkYourAnswersViewModelGen)(view(_)))
+      act.like(renderContinueButtonWithText(checkYourAnswersViewModelGen)(view(_), _.buttonText.key))
 
       "render the summary list keys" in {
 
