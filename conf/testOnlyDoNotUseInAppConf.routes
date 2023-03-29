@@ -10,6 +10,6 @@
 # Failing to follow this rule may result in test routes deployed in production.
 
 # Add all the application routes to the prod.routes file
-->  /                                           prod.Routes
+->  /                                                                 prod.Routes
 
-GET /test-only/:srn/add-member-details/:num     controllers.testonly.MongoController.addMemberDetails(srn: Srn, num: Max99)
+GET /pension-scheme-return/test-only/:srn/add-member-details/:num     controllers.testonly.MongoController.addMemberDetails(srn: Srn, num: Max99)
