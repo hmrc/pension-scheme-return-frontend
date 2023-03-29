@@ -84,8 +84,8 @@ class SchemeDateServiceSpec extends BaseSpec with ScalaCheckPropertyChecks {
             (whichTaxYearPage, oldestAccountingPeriod, newestAccountingPeriod) =>
               val userAnswers = defaultUserAnswers
                 .unsafeSet(WhichTaxYearPage(srn), whichTaxYearPage)
-                .unsafeSet(AccountingPeriodPage(srn, refineMV(1)), oldestAccountingPeriod)
                 .unsafeSet(AccountingPeriodPage(srn, refineMV(1)), newestAccountingPeriod)
+                .unsafeSet(AccountingPeriodPage(srn, refineMV(2)), oldestAccountingPeriod)
 
               val request = DataRequest(allowedAccessRequest, userAnswers)
 
