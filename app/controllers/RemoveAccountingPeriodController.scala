@@ -52,7 +52,7 @@ class RemoveAccountingPeriodController @Inject()(
     extends FrontendBaseController
     with I18nSupport {
 
-  private val form = RemoveSchemeBankAccountController.form(formProvider)
+  private val form = RemoveAccountingPeriodController.form(formProvider)
 
   def onPageLoad(srn: Srn, index: Max3, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>

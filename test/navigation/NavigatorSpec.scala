@@ -65,25 +65,12 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
     "check returns page" - {
 
-      "navigate to scheme bank account page" - {
+      "navigate to how many memebers" - {
         "yes is selected" in {
           forAll(srnGen) { srn =>
             val ua = userAnswers.set(CheckReturnDatesPage(srn), true).get
             navigator.nextPage(CheckReturnDatesPage(srn), NormalMode, ua) mustBe
-              routes.SchemeBankAccountController.onPageLoad(srn, refineMV(1), NormalMode)
-          }
-        }
-      }
-
-      "navigate to scheme bank account list page" - {
-        "yes is selected and a bank account has previously been entered" in {
-          forAll(srnGen) { srn =>
-            val ua = userAnswers
-              .unsafeSet(CheckReturnDatesPage(srn), true)
-              .unsafeSet(SchemeBankAccountPage(srn, refineMV(1)), BankAccount("test", "11111111", "111111"))
-
-            navigator.nextPage(CheckReturnDatesPage(srn), NormalMode, ua) mustBe
-              routes.SchemeBankAccountListController.onPageLoad(srn)
+              routes.HowManyMembersController.onPageLoad(srn, NormalMode)
           }
         }
       }
@@ -94,48 +81,6 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
           val ua = userAnswers.set(CheckReturnDatesPage(srn), false).get
           navigator.nextPage(CheckReturnDatesPage(srn), NormalMode, ua) mustBe
             routes.AccountingPeriodController.onPageLoad(srn, refineMV(1), NormalMode)
-        }
-      }
-    }
-
-    "go from scheme bank account page to check your answers page" in {
-
-      forAll(srnGen) { srn =>
-        val page = SchemeBankAccountPage(srn, refineMV(1))
-        navigator.nextPage(page, NormalMode, userAnswers) mustBe
-          routes.SchemeBankAccountCheckYourAnswersController.onPageLoad(srn, refineMV(1))
-      }
-    }
-
-    "go from bank account check your answers page to list page" in {
-
-      forAll(srnGen) { srn =>
-        val page = SchemeBankAccountCheckYourAnswersPage(srn)
-        navigator.nextPage(page, NormalMode, userAnswers) mustBe routes.SchemeBankAccountListController.onPageLoad(srn)
-      }
-    }
-
-    "go from scheme bank account list page to scheme bank account page" - {
-
-      "yes is selected" in {
-        forAll(srnGen) { srn =>
-          val ua =
-            userAnswers.unsafeSet(SchemeBankAccountPage(srn, refineMV(1)), BankAccount("test", "11111111", "111111"))
-          val page = SchemeBankAccountListPage(srn, addBankAccount = true)
-          navigator.nextPage(page, NormalMode, ua) mustBe
-            routes.SchemeBankAccountController.onPageLoad(srn, refineMV(2), NormalMode)
-        }
-      }
-    }
-
-    "got from scheme bank account list page to how many members page" - {
-
-      "no is selected" in {
-
-        forAll(srnGen) { srn =>
-          val page = SchemeBankAccountListPage(srn, addBankAccount = false)
-          navigator.nextPage(page, NormalMode, userAnswers) mustBe
-            routes.HowManyMembersController.onPageLoad(srn, NormalMode)
         }
       }
     }
@@ -184,14 +129,14 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
       }
     }
 
-    "go from accounting periods list page to scheme bank details page" - {
+    "go from accounting periods list page to how many members page" - {
 
       "no is selected" in {
 
         forAll(srnGen) { srn =>
           val page = AccountingPeriodListPage(srn, addPeriod = false)
           navigator.nextPage(page, NormalMode, userAnswers) mustBe
-            routes.SchemeBankAccountController.onPageLoad(srn, refineMV(1), NormalMode)
+            routes.HowManyMembersController.onPageLoad(srn, NormalMode)
         }
       }
 
@@ -205,7 +150,7 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
           val page = AccountingPeriodListPage(srn, addPeriod = true)
           navigator.nextPage(page, NormalMode, answers) mustBe
-            routes.SchemeBankAccountController.onPageLoad(srn, refineMV(1), NormalMode)
+            routes.HowManyMembersController.onPageLoad(srn, NormalMode)
         }
       }
     }
