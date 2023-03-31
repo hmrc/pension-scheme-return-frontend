@@ -92,7 +92,7 @@ class Navigator @Inject()() {
 
     case MemberDetailsPage(srn, index) =>
       _ => routes.DoesSchemeMemberHaveNINOController.onPageLoad(srn, index, NormalMode)
-    case page @ NationalInsuranceNumberPage(srn, index) => {
+    case page @ DoesMemberHaveNinoPage(srn, index) => {
       case ua if ua.get(page).contains(true) => routes.MemberDetailsNinoController.onPageLoad(srn, index, NormalMode)
       case _ => routes.NoNINOController.onPageLoad(srn, index, NormalMode)
     }

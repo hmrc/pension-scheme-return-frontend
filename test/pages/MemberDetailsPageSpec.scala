@@ -39,11 +39,11 @@ class MemberDetailsPageSpec extends PageBehaviours {
       .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
       .unsafeSet(MemberDetailsNinoPage(srn, refineMV(1)), nino)
       .unsafeSet(NoNINOPage(srn, refineMV(1)), "test reason")
-      .unsafeSet(NationalInsuranceNumberPage(srn, refineMV(1)), true)
+      .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), true)
 
     val result = userAnswers.remove(MemberDetailsPage(srn, refineMV(1))).success.value
     result.get(MemberDetailsPage(srn, refineMV(1))) must be(empty)
-    result.get(NationalInsuranceNumberPage(srn, refineMV(1))) must be(empty)
+    result.get(DoesMemberHaveNinoPage(srn, refineMV(1))) must be(empty)
     result.get(MemberDetailsNinoPage(srn, refineMV(1))) must be(empty)
     result.get(NoNINOPage(srn, refineMV(1))) must be(empty)
   }
@@ -54,13 +54,13 @@ class MemberDetailsPageSpec extends PageBehaviours {
 
     val userAnswers = defaultUserAnswers
       .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-      .unsafeSet(NationalInsuranceNumberPage(srn, refineMV(1)), true)
+      .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), true)
       .unsafeSet(MemberDetailsNinoPage(srn, refineMV(1)), nino)
       .unsafeSet(NoNINOPage(srn, refineMV(1)), "test reason")
 
     val result = userAnswers.set(MemberDetailsPage(srn, refineMV(1)), memberDetails).success.value
     result.get(MemberDetailsPage(srn, refineMV(1))) mustBe Some(memberDetails)
-    result.get(NationalInsuranceNumberPage(srn, refineMV(1))) mustBe Some(true)
+    result.get(DoesMemberHaveNinoPage(srn, refineMV(1))) mustBe Some(true)
     result.get(MemberDetailsNinoPage(srn, refineMV(1))) mustBe Some(nino)
     result.get(NoNINOPage(srn, refineMV(1))) mustBe Some("test reason")
   }

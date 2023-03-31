@@ -52,7 +52,7 @@ class SchemeMemberDetailsAnswersController @Inject()(
     identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData) { implicit request =>
       val result = for {
         memberDetails <- request.userAnswers.get(MemberDetailsPage(srn, index))
-        hasNINO <- request.userAnswers.get(NationalInsuranceNumberPage(srn, index))
+        hasNINO <- request.userAnswers.get(DoesMemberHaveNinoPage(srn, index))
         maybeNino <- Option.when(hasNINO)(request.userAnswers.get(MemberDetailsNinoPage(srn, index))).sequence
         maybeNoNinoReason <- Option.when(!hasNINO)(request.userAnswers.get(NoNINOPage(srn, index))).sequence
       } yield Ok(view(viewModel(index, srn, mode, checkOrChange, memberDetails, hasNINO, maybeNino, maybeNoNinoReason)))

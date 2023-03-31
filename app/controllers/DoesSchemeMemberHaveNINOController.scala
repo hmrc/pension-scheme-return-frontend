@@ -23,7 +23,7 @@ import javax.inject.Inject
 import models.{Mode, NameDOB}
 import models.SchemeId.Srn
 import navigation.Navigator
-import pages.{MemberDetailsPage, NationalInsuranceNumberPage}
+import pages.{DoesMemberHaveNinoPage, MemberDetailsPage}
 import play.api.data.Form
 import viewmodels.models.YesNoPageViewModel
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -62,7 +62,7 @@ class DoesSchemeMemberHaveNINOController @Inject()(
           Future.successful(
             Ok(
               view(
-                form(memberDetails.fullName).fromUserAnswers(NationalInsuranceNumberPage(srn, index)),
+                form(memberDetails.fullName).fromUserAnswers(DoesMemberHaveNinoPage(srn, index)),
                 viewModel(index, memberDetails.fullName, srn, mode)
               )
             )
@@ -84,9 +84,9 @@ class DoesSchemeMemberHaveNINOController @Inject()(
               value =>
                 for {
                   updatedAnswers <- Future
-                    .fromTry(request.userAnswers.set(NationalInsuranceNumberPage(srn, index), value))
+                    .fromTry(request.userAnswers.set(DoesMemberHaveNinoPage(srn, index), value))
                   _ <- saveService.save(updatedAnswers)
-                } yield Redirect(navigator.nextPage(NationalInsuranceNumberPage(srn, index), mode, updatedAnswers))
+                } yield Redirect(navigator.nextPage(DoesMemberHaveNinoPage(srn, index), mode, updatedAnswers))
             )
       )
   }
@@ -107,7 +107,7 @@ object DoesSchemeMemberHaveNINOController {
   )
 
   def viewModel(index: Max99, memberName: String, srn: Srn, mode: Mode): YesNoPageViewModel = YesNoPageViewModel(
-    Message("nationalInsuranceNumber.title", memberName),
+    Message("nationalInsuranceNumber.title"),
     Message("nationalInsuranceNumber.heading", memberName),
     controllers.routes.DoesSchemeMemberHaveNINOController.onSubmit(srn, index, mode)
   )

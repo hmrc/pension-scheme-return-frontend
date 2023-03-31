@@ -19,7 +19,7 @@ package controllers
 import controllers.SchemeMemberDetailsAnswersController._
 import eu.timepit.refined.refineMV
 import models.{CheckOrChange, NormalMode}
-import pages.{MemberDetailsNinoPage, MemberDetailsPage, NationalInsuranceNumberPage, NoNINOPage}
+import pages.{DoesMemberHaveNinoPage, MemberDetailsNinoPage, MemberDetailsPage, NoNINOPage}
 import uk.gov.hmrc.domain.Nino
 import viewmodels.DisplayMessage.Message
 import views.html.CheckYourAnswersView
@@ -36,12 +36,12 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
 
   private val userAnswersWithNino = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-    .unsafeSet(NationalInsuranceNumberPage(srn, refineMV(1)), true)
+    .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), true)
     .unsafeSet(MemberDetailsNinoPage(srn, refineMV(1)), nino)
 
   private val userAnswersWithoutNino = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-    .unsafeSet(NationalInsuranceNumberPage(srn, refineMV(1)), false)
+    .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), false)
     .unsafeSet(NoNINOPage(srn, refineMV(1)), noNinoReason)
 
   "SchemeMemberDetailsCYAController" - {
@@ -88,7 +88,7 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
         redirectToPage(
           onPageLoad(checkOrChange),
           routes.JourneyRecoveryController.onPageLoad(),
-          userAnswersWithNino.remove(NationalInsuranceNumberPage(srn, refineMV(1))).success.value
+          userAnswersWithNino.remove(DoesMemberHaveNinoPage(srn, refineMV(1))).success.value
         ).withName(s"when does member have NINO is missing on ${checkOrChange.name}")
       )
 
