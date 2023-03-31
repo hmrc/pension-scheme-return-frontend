@@ -16,18 +16,14 @@
 
 package navigation
 
-import config.Refined.{OneTo99, OneToTen, OneToThree}
+import config.Refined.{OneTo99, OneToThree}
 import controllers.routes
 import eu.timepit.refined.{refineMV, refineV}
 import models.PensionSchemeId.{PsaId, PspId}
 import models._
 import pages.MembersDetails._
-import pages.SchemeBankAccounts.SchemeBankAccountsOps
 import pages._
 import play.api.mvc.Call
-import MembersDetails._
-import models.SchemeId.Srn
-import models.requests.DataRequest
 
 import javax.inject.{Inject, Singleton}
 
@@ -41,24 +37,10 @@ class Navigator @Inject()() {
 
     case page @ CheckReturnDatesPage(srn) => {
       case ua if ua.get(page).contains(true) =>
-        ua.schemeBankAccounts(srn) match {
-          case Nil => routes.SchemeBankAccountController.onPageLoad(srn, refineMV(1), NormalMode)
-          case _ => routes.SchemeBankAccountListController.onPageLoad(srn)
-        }
+        routes.HowManyMembersController.onPageLoad(srn, NormalMode)
       case _ => routes.AccountingPeriodController.onPageLoad(srn, refineMV(1), NormalMode)
     }
 
-    case SchemeBankAccountPage(srn, index) =>
-      _ => routes.SchemeBankAccountCheckYourAnswersController.onPageLoad(srn, index)
-    case SchemeBankAccountCheckYourAnswersPage(srn) => _ => routes.SchemeBankAccountListController.onPageLoad(srn)
-    case SchemeBankAccountListPage(srn, true) =>
-      ua =>
-        refineV[OneToTen](ua.schemeBankAccounts(srn).length + 1) match {
-          case Left(_) => routes.SchemeBankAccountListController.onPageLoad(srn)
-          case Right(nextIndex) => routes.SchemeBankAccountController.onPageLoad(srn, nextIndex, NormalMode)
-        }
-    case SchemeBankAccountListPage(srn, false) => _ => routes.HowManyMembersController.onPageLoad(srn, NormalMode)
-    case RemoveSchemeBankAccountPage(srn) => _ => routes.SchemeBankAccountListController.onPageLoad(srn)
     case RemoveMemberDetailsPage(srn) => _ => routes.SchemeMembersListController.onPageLoad(srn, page = 1)
 
     case AccountingPeriodPage(srn, index) =>
@@ -67,13 +49,13 @@ class Navigator @Inject()() {
       _ => routes.AccountingPeriodListController.onPageLoad(srn, NormalMode)
 
     case AccountingPeriodListPage(srn, false) =>
-      _ => routes.SchemeBankAccountController.onPageLoad(srn, refineMV(1), NormalMode)
+      _ => routes.HowManyMembersController.onPageLoad(srn, NormalMode)
 
     case AccountingPeriodListPage(srn, true) =>
       ua =>
         val count = ua.list(AccountingPeriods(srn)).length
         refineV[OneToThree](count + 1).fold(
-          _ => routes.SchemeBankAccountController.onPageLoad(srn, refineMV(1), NormalMode),
+          _ => routes.HowManyMembersController.onPageLoad(srn, NormalMode),
           index => routes.AccountingPeriodController.onPageLoad(srn, index, NormalMode)
         )
 
