@@ -63,7 +63,7 @@ class TextFormProviderSpec extends FieldBehaviours {
   ".nino" - {
 
     val duplicates = Gen.listOfN(8, ninoGen).sample.value
-    val validNinoGen = ninoGen.suchThat(n => !duplicates.contains(n)).map(_.nino)
+    val validNinoGen = ninoGen.suchThat(n => !duplicates.contains(n)).map(_.nino.toLowerCase)
     val invalidNinoGen = nonEmptyString.suchThat(!Nino.isValid(_))
 
     val ninoForm: Form[Nino] = formProvider.nino(
