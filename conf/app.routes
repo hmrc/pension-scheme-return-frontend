@@ -33,9 +33,6 @@ POST        /:srn/check-dates                                     controllers.Ch
 GET         /:srn/change-check-dates                              controllers.CheckReturnDatesController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST        /:srn/change-check-dates                              controllers.CheckReturnDatesController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
-GET         /:srn/scheme-details                                  controllers.SchemeDetailsController.onPageLoad(srn: Srn)
-GET         /:srn/scheme-details-next-page                        controllers.SchemeDetailsController.onSubmit(srn: Srn)
-
 GET         /:srn/accounting-period                               controllers.AccountingPeriodController.onPageLoad(srn: Srn, index: Max3 = 1, mode: Mode = NormalMode)
 GET         /:srn/accounting-period/:index                        controllers.AccountingPeriodController.onPageLoad(srn: Srn, index: Max3, mode: Mode = NormalMode)
 POST        /:srn/accounting-period/:index                        controllers.AccountingPeriodController.onSubmit(srn: Srn, index: Max3, mode: Mode = NormalMode)
