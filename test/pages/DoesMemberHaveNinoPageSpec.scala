@@ -22,15 +22,15 @@ import pages.behaviours.PageBehaviours
 import play.api.libs.json.Writes._
 import uk.gov.hmrc.domain.Nino
 
-class NationalInsuranceNumberPageSpec extends PageBehaviours {
+class DoesMemberHaveNinoPageSpec extends PageBehaviours {
 
-  "NationalInsuranceNumberPage" - {
+  "DoesMemberHaveNinoPage" - {
 
-    beRetrievable[Boolean](NationalInsuranceNumberPage(srnGen.sample.value, refineMV(1)))
+    beRetrievable[Boolean](DoesMemberHaveNinoPage(srnGen.sample.value, refineMV(1)))
 
-    beSettable[Boolean](NationalInsuranceNumberPage(srnGen.sample.value, refineMV(1)))
+    beSettable[Boolean](DoesMemberHaveNinoPage(srnGen.sample.value, refineMV(1)))
 
-    beRemovable[Boolean](NationalInsuranceNumberPage(srnGen.sample.value, refineMV(1)))
+    beRemovable[Boolean](DoesMemberHaveNinoPage(srnGen.sample.value, refineMV(1)))
 
     "cleanup no NINO page if page value is true" in {
 
@@ -38,7 +38,7 @@ class NationalInsuranceNumberPageSpec extends PageBehaviours {
       val userAnswers = UserAnswers("test").set(NoNINOPage(srn, refineMV(1)), "test reason").success.value
       userAnswers.get(NoNINOPage(srn, refineMV(1))) must be(Some("test reason"))
 
-      val result = userAnswers.set(NationalInsuranceNumberPage(srn, refineMV(1)), true).success.value
+      val result = userAnswers.set(DoesMemberHaveNinoPage(srn, refineMV(1)), true).success.value
       result.get(NoNINOPage(srn, refineMV(1))) must be(empty)
     }
 
@@ -49,7 +49,7 @@ class NationalInsuranceNumberPageSpec extends PageBehaviours {
       val userAnswers = UserAnswers("test").set(MemberDetailsNinoPage(srn, refineMV(1)), nino).success.value
       userAnswers.get(MemberDetailsNinoPage(srn, refineMV(1))) must be(Some(nino))
 
-      val result = userAnswers.set(NationalInsuranceNumberPage(srn, refineMV(1)), false).success.value
+      val result = userAnswers.set(DoesMemberHaveNinoPage(srn, refineMV(1)), false).success.value
       result.get(MemberDetailsNinoPage(srn, refineMV(1))) must be(empty)
     }
 
@@ -67,7 +67,7 @@ class NationalInsuranceNumberPageSpec extends PageBehaviours {
       userAnswers.get(MemberDetailsNinoPage(srn, refineMV(1))) must be(Some(nino))
       userAnswers.get(NoNINOPage(srn, refineMV(1))) must be(Some("test reason"))
 
-      val result = userAnswers.remove(NationalInsuranceNumberPage(srn, refineMV(1))).success.value
+      val result = userAnswers.remove(DoesMemberHaveNinoPage(srn, refineMV(1))).success.value
       result.get(MemberDetailsNinoPage(srn, refineMV(1))) must be(empty)
       result.get(NoNINOPage(srn, refineMV(1))) must be(empty)
     }

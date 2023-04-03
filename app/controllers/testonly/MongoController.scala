@@ -25,7 +25,7 @@ import eu.timepit.refined._
 import eu.timepit.refined.api.Refined
 import models.SchemeId.Srn
 import models.{NameDOB, UserAnswers}
-import pages.{MemberDetailsNinoPage, MemberDetailsPage, NationalInsuranceNumberPage, NoNINOPage}
+import pages.{DoesMemberHaveNinoPage, MemberDetailsNinoPage, MemberDetailsPage, NoNINOPage}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -64,7 +64,7 @@ class MongoController @Inject()(
       updatedUserAnswers <- indexes.foldLeft(Try(userAnswers)) {
         case (ua, index) =>
           ua.flatMap(_.remove(MemberDetailsPage(srn, index)))
-            .flatMap(_.remove(NationalInsuranceNumberPage(srn, index)))
+            .flatMap(_.remove(DoesMemberHaveNinoPage(srn, index)))
             .flatMap(_.remove(MemberDetailsNinoPage(srn, index)))
             .flatMap(_.remove(NoNINOPage(srn, index)))
       }
@@ -76,7 +76,7 @@ class MongoController @Inject()(
       memberDetails = indexes.map { index =>
         MemberDetailsPage(srn, index) -> buildRandomNameDOB()
       }
-      hasNinoPages = indexes.map(index => NationalInsuranceNumberPage(srn, index) -> false)
+      hasNinoPages = indexes.map(index => DoesMemberHaveNinoPage(srn, index) -> false)
       noNinoReasonPages = indexes.map(index => NoNINOPage(srn, index) -> "test reason")
       ua1 <- memberDetails.foldLeft(Try(userAnswers)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
       ua2 <- hasNinoPages.foldLeft(Try(ua1)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }

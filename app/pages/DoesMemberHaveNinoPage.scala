@@ -24,7 +24,7 @@ import utils.RefinedUtils.RefinedIntOps
 
 import scala.util.Try
 
-case class NationalInsuranceNumberPage(srn: Srn, index: Max99) extends QuestionPage[Boolean] {
+case class DoesMemberHaveNinoPage(srn: Srn, index: Max99) extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ toString \ index.arrayIndex
 

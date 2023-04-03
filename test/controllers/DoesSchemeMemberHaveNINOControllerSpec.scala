@@ -20,7 +20,7 @@ import controllers.DoesSchemeMemberHaveNINOController._
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import pages.{MemberDetailsPage, NationalInsuranceNumberPage}
+import pages.{DoesMemberHaveNinoPage, MemberDetailsPage}
 import views.html.YesNoPageView
 
 class DoesSchemeMemberHaveNINOControllerSpec extends ControllerBaseSpec {
@@ -39,7 +39,7 @@ class DoesSchemeMemberHaveNINOControllerSpec extends ControllerBaseSpec {
     })
 
     act.like(
-      renderPrePopView(onPageLoad, NationalInsuranceNumberPage(srn, refineMV(1)), true, userAnswersWithMemberDetails) {
+      renderPrePopView(onPageLoad, DoesMemberHaveNinoPage(srn, refineMV(1)), true, userAnswersWithMemberDetails) {
         implicit app => implicit request =>
           val preparedForm = form(injected[YesNoPageFormProvider], memberDetails.fullName).fill(true)
           injected[YesNoPageView].apply(preparedForm, viewModel(refineMV(1), memberDetails.fullName, srn, NormalMode))

@@ -30,7 +30,7 @@ case class MemberDetailsPage(srn: Srn, index: Max99) extends QuestionPage[NameDO
   override def path: JsPath = JsPath \ toString \ index.arrayIndex
 
   override def cleanup(value: Option[NameDOB], userAnswers: UserAnswers): Try[UserAnswers] =
-    value.fold(userAnswers.remove(NationalInsuranceNumberPage(srn, index)))(_ => Try(userAnswers))
+    value.fold(userAnswers.remove(DoesMemberHaveNinoPage(srn, index)))(_ => Try(userAnswers))
 
   override def toString: String = "memberDetailsPage"
 }
