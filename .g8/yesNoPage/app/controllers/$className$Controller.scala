@@ -15,6 +15,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.YesNoPageView
 import services.SaveService
 import $className;format="cap"$Controller._
+import viewmodels.implicits._
 
 import scala.concurrent.{ExecutionContext, Future}
 

@@ -103,6 +103,10 @@ class Navigator @Inject()() {
           _ => routes.JourneyRecoveryController.onPageLoad(),
           index => routes.MemberDetailsController.onPageLoad(srn, index)
         )
+    case page @ PersonalContributionsPage(srn) => {
+      case ua if ua.get(page).contains(true) => routes.UnauthorisedController.onPageLoad()
+      case _ => routes.UnauthorisedController.onPageLoad()
+    }
     case _ => _ => routes.IndexController.onPageLoad()
   }
 
@@ -115,6 +119,10 @@ class Navigator @Inject()() {
 
     case NoNINOPage(srn, _) => _ => routes.UnauthorisedController.onPageLoad()
 
+    case page @ PersonalContributionsPage(srn) => {
+      case ua if ua.get(page).contains(true) => routes.UnauthorisedController.onPageLoad()
+      case _ => routes.UnauthorisedController.onPageLoad()
+    }
     case _ => _ => routes.IndexController.onPageLoad()
   }
 
