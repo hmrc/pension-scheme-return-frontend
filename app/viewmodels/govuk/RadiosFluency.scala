@@ -123,6 +123,9 @@ trait RadiosFluency {
     def withHint(hint: Hint): Radios =
       radios.copy(hint = Some(hint))
 
+    def withHint(hint: Option[Hint]): Radios =
+      radios.copy(hint = hint)
+
     def withFormGroupClasses(classes: String): Radios =
       radios.copy(formGroupClasses = classes)
 

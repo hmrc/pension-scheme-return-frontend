@@ -29,7 +29,7 @@ import services.{SaveService, SchemeDetailsService, TaxYearService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.DateTimeUtils.localDateShow
-import viewmodels.DisplayMessage.Message
+import viewmodels.DisplayMessage.{Message, ParagraphMessage}
 import viewmodels.implicits._
 import viewmodels.models.YesNoPageViewModel
 import views.html.YesNoPageView
@@ -119,7 +119,7 @@ object CheckReturnDatesController {
       Message("checkReturnDates.title"),
       Message("checkReturnDates.heading"),
       List(
-        Message(
+        ParagraphMessage(
           "checkReturnDates.description",
           max(schemeDetails.openDate.getOrElse(fromDate), fromDate).show,
           min(schemeDetails.windUpDate.getOrElse(toDate), toDate).show

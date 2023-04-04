@@ -170,7 +170,7 @@ trait ViewModelGenerators extends BasicGenerators {
     for {
       title <- nonEmptyMessage
       heading <- nonEmptyMessage
-      description <- Gen.listOf(nonEmptyMessage)
+      description <- Gen.listOf(nonEmptyBlockMessage)
       legend <- Gen.option(nonEmptyMessage)
       onSubmit <- call
     } yield {

@@ -16,7 +16,6 @@
 
 package utils
 
-import models.Pagination
 import viewmodels.DisplayMessage.Message
 
 object ListUtils {
@@ -44,6 +43,10 @@ object ListUtils {
 
     def paginate(currentPage: Int, pageSize: Int): List[A] =
       list.slice((currentPage - 1) * pageSize, ((currentPage - 1) * pageSize) + pageSize)
+
+    def toOption: Option[List[A]] =
+      if (list.isEmpty) None
+      else Some(list)
   }
 
   implicit class ListTupStringOps(list: List[(String, String)]) {

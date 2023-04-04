@@ -18,6 +18,7 @@ package controllers
 
 import controllers.actions._
 import forms.YesNoPageFormProvider
+
 import javax.inject.Inject
 import models.Mode
 import models.SchemeId.Srn
@@ -31,6 +32,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.YesNoPageView
 import services.SaveService
 import PersonalContributionsController._
+import viewmodels.DisplayMessage.{ListMessage, ListType, ParagraphMessage}
 import viewmodels.implicits._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -73,9 +75,13 @@ object PersonalContributionsController {
     "personalContributions.error.required"
   )
 
-  def viewModel(srn: Srn, mode: Mode): YesNoPageViewModel = YesNoPageViewModel(
-    "personalContributions.title",
-    "personalContributions.heading",
-    controllers.routes.PersonalContributionsController.onSubmit(srn, mode)
-  )
+  def viewModel(srn: Srn, mode: Mode): YesNoPageViewModel =
+    YesNoPageViewModel(
+      "personalContributions.title",
+      "personalContributions.heading",
+      controllers.routes.PersonalContributionsController.onSubmit(srn, mode)
+    ).withDescription(
+      ParagraphMessage("personalContributions.paragraph"),
+      ListMessage(ListType.Bullet, "personalContributions.listItem1", "personalContributions.listItem2")
+    )
 }
