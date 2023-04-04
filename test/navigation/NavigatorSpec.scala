@@ -57,12 +57,12 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
     "check returns page" - {
 
-      "navigate to how many memebers" - {
+      "navigate to how active bank account" - {
         "yes is selected" in {
           forAll(srnGen) { srn =>
             val ua = userAnswers.set(CheckReturnDatesPage(srn), true).get
             navigator.nextPage(CheckReturnDatesPage(srn), NormalMode, ua) mustBe
-              routes.HowManyMembersController.onPageLoad(srn, NormalMode)
+              routes.ActiveBankAccountController.onPageLoad(srn, NormalMode)
           }
         }
       }
