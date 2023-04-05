@@ -314,4 +314,5 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
       }
     }
   }
+ }
 }
