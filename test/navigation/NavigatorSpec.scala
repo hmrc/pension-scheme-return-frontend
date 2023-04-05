@@ -29,6 +29,7 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
   val navigator = new Navigator
   val userAnswers = UserAnswers("id")
+  private val pensionSchemeId = pensionSchemeIdGen.sample.value
 
   "Navigator" - {
 
@@ -58,16 +59,15 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
     "check returns page" - {
 
-      "navigate to how many memebers" - {
+      "navigate to active bank account" - {
         "yes is selected" in {
           forAll(srnGen) { srn =>
             val ua = userAnswers.set(CheckReturnDatesPage(srn), true).get
             navigator.nextPage(CheckReturnDatesPage(srn), NormalMode, ua) mustBe
-              routes.HowManyMembersController.onPageLoad(srn, NormalMode)
+              routes.ActiveBankAccountController.onPageLoad(srn, NormalMode)
           }
         }
       }
-
       "no is selected" in {
 
         forAll(srnGen) { srn =>
@@ -75,6 +75,27 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
           navigator.nextPage(CheckReturnDatesPage(srn), NormalMode, ua) mustBe
             routes.AccountingPeriodController.onPageLoad(srn, refineMV(1), NormalMode)
         }
+      }
+    }
+    "active bank account page" - {
+
+      "navigate to how many members" - {
+        "yes is selected" in {
+          forAll(srnGen) { srn =>
+            val ua = userAnswers.set(ActiveBankAccountPage(srn), true).get
+            navigator.nextPage(ActiveBankAccountPage(srn), NormalMode, ua) mustBe
+              routes.HowManyMembersController.onPageLoad(srn, NormalMode)
+          }
+        }
+      }
+    }
+
+    "no is selected" in {
+
+      forAll(srnGen) { srn =>
+        val ua = userAnswers.set(ActiveBankAccountPage(srn), false).get
+        navigator.nextPage(ActiveBankAccountPage(srn), NormalMode, ua) mustBe
+          routes.HowManyMembersController.onPageLoad(srn, NormalMode)
       }
     }
 

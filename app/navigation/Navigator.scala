@@ -36,10 +36,9 @@ class Navigator @Inject()() {
 
     case page @ CheckReturnDatesPage(srn) => {
       case ua if ua.get(page).contains(true) =>
-        routes.HowManyMembersController.onPageLoad(srn, NormalMode)
+        routes.ActiveBankAccountController.onPageLoad(srn, NormalMode)
       case _ => routes.AccountingPeriodController.onPageLoad(srn, refineMV(1), NormalMode)
     }
-
     case RemoveMemberDetailsPage(srn) => _ => routes.SchemeMembersListController.onPageLoad(srn, page = 1)
 
     case AccountingPeriodPage(srn, index) =>
@@ -88,6 +87,11 @@ class Navigator @Inject()() {
       case _ => routes.HowMuchCashController.onPageLoad(srn, NormalMode)
     }
 
+    case page @ ActiveBankAccountPage(srn) => {
+      case ua if ua.get(page).contains(true) =>
+        routes.HowManyMembersController.onPageLoad(srn, NormalMode)
+      case _ => routes.HowManyMembersController.onPageLoad(srn, NormalMode)
+    }
     case page @ HowManyMembersPage(srn, PspId(_)) => {
       case ua if ua.get(page).exists(_.total > 99) => routes.PspDeclarationController.onPageLoad(srn)
       case _ => routes.HowMuchCashController.onPageLoad(srn, NormalMode)

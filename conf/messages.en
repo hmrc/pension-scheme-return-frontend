@@ -294,6 +294,10 @@ removeMemberDetails.title = Are you sure you want to remove this member?
 removeMemberDetails.heading = Are you sure you want to remove {0}?
 removeMemberDetails.error.required = Select yes if you are sure you want to remove
 
+activeAccountDetails.title = Did the scheme have at least 1 active bank account during the period of this return? ?
+activeAccountDetails.heading = Did {0} have at least 1 active bank account during the period of this return?
+activeAccountDetails.error.required = Select yes if the scheme had at least 1 active bank account during the period of this return
+
 personalContributions.title = Were personal contributions made by or for any member during the period of this return?
 personalContributions.heading = Were personal contributions made by or for any member during the period of this return?
 personalContributions.paragraph = This includes:
