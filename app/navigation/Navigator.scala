@@ -86,7 +86,12 @@ class Navigator @Inject()() {
       case ua if ua.get(page).exists(_.total > 99) => routes.PsaDeclarationController.onPageLoad(srn)
       case _ => routes.HowMuchCashController.onPageLoad(srn, NormalMode)
     }
-    case ActiveBankAccountPage(srn) => _ => routes.HowManyMembersController.onPageLoad(srn, NormalMode)
+
+    case page @ ActiveBankAccountPage(srn) => {
+      case ua if ua.get(page).contains(true) =>
+        routes.HowManyMembersController.onPageLoad(srn, NormalMode)
+      case _ => routes.HowManyMembersController.onPageLoad(srn, NormalMode)
+    }
     case page @ HowManyMembersPage(srn, PspId(_)) => {
       case ua if ua.get(page).exists(_.total > 99) => routes.PspDeclarationController.onPageLoad(srn)
       case _ => routes.HowMuchCashController.onPageLoad(srn, NormalMode)
