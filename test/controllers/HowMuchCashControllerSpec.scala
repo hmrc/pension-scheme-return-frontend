@@ -17,20 +17,40 @@
 package controllers
 
 import forms.MoneyFormProvider
-import models.NormalMode
+import models.{DateRange, Money, NormalMode}
+import org.mockito.ArgumentMatchers.any
 import pages.HowMuchCashPage
+import play.api.inject.bind
+import services.SchemeDateService
 import views.html.MoneyView
+import utils.Transform._
 
 class HowMuchCashControllerSpec extends ControllerBaseSpec {
+
+  val schemeDatePeriod = dateRangeGen.sample.value
+  val mockSchemeDateService = mock[SchemeDateService]
+  val maxAllowedAmount = 999999999.99
+
+  override val additionalBindings = List(
+    bind[SchemeDateService].toInstance(mockSchemeDateService)
+  )
+
+  override def beforeEach(): Unit = {
+    reset(mockSchemeDateService)
+    setSchemeDate(Some(schemeDatePeriod))
+  }
+
+  def setSchemeDate(date: Option[DateRange]): Unit =
+    when(mockSchemeDateService.schemeDate(any())(any())).thenReturn(date)
 
   "HowMuchCashController" - {
 
     val schemeName = defaultSchemeDetails.schemeName
 
-    val form = HowMuchCashController.form(new MoneyFormProvider(), schemeName, defaultTaxYear)
-    lazy val viewModel = HowMuchCashController.viewModel(srn, NormalMode, schemeName, defaultTaxYear, _)
+    val form = HowMuchCashController.form(new MoneyFormProvider(), schemeName, schemeDatePeriod)
+    lazy val viewModel = HowMuchCashController.viewModel(srn, NormalMode, schemeName, schemeDatePeriod, _)
 
-    val moneyData = moneyGen.sample.value
+    val moneyInPeriodData = moneyInPeriodGen.sample.value
 
     lazy val onPageLoad = routes.HowMuchCashController.onPageLoad(srn, NormalMode)
     lazy val onSubmit = routes.HowMuchCashController.onSubmit(srn, NormalMode)
@@ -40,22 +60,34 @@ class HowMuchCashControllerSpec extends ControllerBaseSpec {
       view(viewModel(form))
     })
 
-    act.like(renderPrePopView(onPageLoad, HowMuchCashPage(srn), moneyData) { implicit app => implicit request =>
+    act.like(renderPrePopView(onPageLoad, HowMuchCashPage(srn), moneyInPeriodData) { implicit app => implicit request =>
       val view = injected[MoneyView]
-      view(viewModel(form.fill(moneyData)))
+      view(viewModel(form.fill(moneyInPeriodData.from[(Money, Money)])))
     })
 
-    act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
+    act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
-    act.like(saveAndContinue(onSubmit, formData(form, moneyData): _*))
+    act.like(
+      journeyRecoveryPage(onPageLoad)
+        .withName("onPageLoad redirect to journey recovery page when scheme date not found")
+        .before(setSchemeDate(None))
+    )
+
+    act.like(saveAndContinue(onSubmit, formData(form, moneyInPeriodData.from[(Money, Money)]): _*))
 
     act.like(invalidForm(onSubmit))
 
-    "fail to submit when amount entered is greater than maximum allowed amount" - {
-      val maxAllowedAmount = 999999999.99
-      act.like(invalidForm(onSubmit, "value" -> (maxAllowedAmount + 0.001).toString))
-    }
+    act.like(
+      invalidForm(onSubmit, "value" -> (maxAllowedAmount + 0.001).toString)
+        .withName("fail to submit when amount entered is greater than maximum allowed amount")
+    )
 
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
+
+    act.like(
+      journeyRecoveryPage(onSubmit)
+        .withName("onSubmit redirect to journey recovery page when scheme date not found")
+        .before(setSchemeDate(None))
+    )
   }
 }

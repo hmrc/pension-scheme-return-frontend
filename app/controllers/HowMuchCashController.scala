@@ -16,6 +16,7 @@
 
 package controllers
 
+import cats.{Id, Monad}
 import cats.implicits.toShow
 import com.google.inject.Inject
 import config.Constants.maxCashInBank
@@ -23,20 +24,21 @@ import controllers.actions._
 import forms.MoneyFormProvider
 import forms.mappings.errors.MoneyFormErrors
 import models.SchemeId.Srn
-import models.{Mode, Money}
+import models.requests.DataRequest
+import models.{DateRange, Mode, Money}
 import navigation.Navigator
 import pages.HowMuchCashPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.{SaveService, TaxYearService}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import services.{SaveService, SchemeDateService, TaxYearService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.time.TaxYear
 import utils.DateTimeUtils.localDateShow
-import viewmodels.DisplayMessage.Message
+import viewmodels.DisplayMessage.{Message, ParagraphMessage}
 import viewmodels.implicits._
-import viewmodels.models.MoneyViewModel
-import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
+import viewmodels.models.{Field, MoneyViewModel}
+import viewmodels.models.MultipleQuestionsViewModel.{DoubleQuestion, SingleQuestion}
 import views.html.MoneyView
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -49,70 +51,89 @@ class HowMuchCashController @Inject()(
   view: MoneyView,
   formProvider: MoneyFormProvider,
   saveService: SaveService,
-  taxYearService: TaxYearService
+  schemeDateService: SchemeDateService
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
 
-  def taxYear = taxYearService.current
-
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    val form = HowMuchCashController.form(formProvider, request.schemeDetails.schemeName, taxYear)
-    val viewModel = HowMuchCashController.viewModel(
-      srn,
-      mode,
-      request.schemeDetails.schemeName,
-      taxYear,
-      request.userAnswers.fillForm(HowMuchCashPage(srn), form)
-    )
+    usingSchemeDate[Id](srn) { period =>
+      val form = HowMuchCashController.form(formProvider, request.schemeDetails.schemeName, period)
+      val viewModel = HowMuchCashController.viewModel(
+        srn,
+        mode,
+        request.schemeDetails.schemeName,
+        period,
+        request.userAnswers.fillForm(HowMuchCashPage(srn), form)
+      )
 
-    Ok(view(viewModel))
+      Ok(view(viewModel))
+    }
   }
 
   def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
-    val form = HowMuchCashController.form(formProvider, request.schemeDetails.schemeName, taxYear)
+    usingSchemeDate(srn) { period =>
+      val form = HowMuchCashController.form(formProvider, request.schemeDetails.schemeName, period)
 
-    form
-      .bindFromRequest()
-      .fold(
-        formWithErrors => {
-          val viewModel =
-            HowMuchCashController.viewModel(srn, mode, request.schemeDetails.schemeName, taxYear, formWithErrors)
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => {
+            val viewModel =
+              HowMuchCashController.viewModel(srn, mode, request.schemeDetails.schemeName, period, formWithErrors)
 
-          Future.successful(BadRequest(view(viewModel)))
-        },
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(HowMuchCashPage(srn), value))
-            _ <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage(HowMuchCashPage(srn), mode, updatedAnswers))
-      )
+            Future.successful(BadRequest(view(viewModel)))
+          },
+          value =>
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.transformAndSet(HowMuchCashPage(srn), value))
+              _ <- saveService.save(updatedAnswers)
+            } yield Redirect(navigator.nextPage(HowMuchCashPage(srn), mode, updatedAnswers))
+        )
+    }
   }
+
+  private def usingSchemeDate[F[_]: Monad](
+    srn: Srn
+  )(body: DateRange => F[Result])(implicit request: DataRequest[_]): F[Result] =
+    schemeDateService.schemeDate(srn) match {
+      case Some(period) => body(period)
+      case None => Monad[F].pure(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+    }
 }
 
 object HowMuchCashController {
 
-  def form(formProvider: MoneyFormProvider, schemeName: String, taxYear: TaxYear): Form[Money] =
+  def form(formProvider: MoneyFormProvider, schemeName: String, period: DateRange): Form[(Money, Money)] =
     formProvider(
       MoneyFormErrors(
-        "howMuchCash.error.required",
-        "howMuchCash.error.nonNumeric",
-        maxCashInBank -> "howMuchCash.error.tooLarge"
+        "howMuchCash.start.error.required",
+        "howMuchCash.start.error.nonNumeric",
+        maxCashInBank -> "howMuchCash.start.error.tooLarge"
       ),
-      Seq(schemeName, taxYear.starts.show)
+      MoneyFormErrors(
+        "howMuchCash.end.error.required",
+        "howMuchCash.end.error.nonNumeric",
+        maxCashInBank -> "howMuchCash.end.error.tooLarge"
+      ),
+      Seq(period.from.show, period.to.show)
     )
 
   def viewModel(
     srn: Srn,
     mode: Mode,
     schemeName: String,
-    taxYear: TaxYear,
-    form: Form[Money]
-  ): MoneyViewModel[Money] = MoneyViewModel(
-    Message("howMuchCash.title", schemeName, taxYear.starts.show),
-    Message("howMuchCash.heading", schemeName, taxYear.starts.show),
-    None,
-    questions = SingleQuestion(form),
+    period: DateRange,
+    form: Form[(Money, Money)]
+  ): MoneyViewModel[(Money, Money)] = MoneyViewModel(
+    "howMuchCash.title",
+    Message("howMuchCash.heading", schemeName),
+    Some(ParagraphMessage("howMuchCash.paragraph")),
+    questions = DoubleQuestion[Money](
+      form,
+      Field(Message("howMuchCash.start.label", period.from.show)),
+      Field(Message("howMuchCash.end.label", period.to.show))
+    ),
     routes.HowMuchCashController.onSubmit(srn, mode)
   )
 }

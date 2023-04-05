@@ -171,11 +171,17 @@ removeAccountingPeriod.title = Are you sure you want to remove {0} to {1}?
 removeAccountingPeriod.heading = Are you sure you want to remove {0} to {1}?
 removeAccountingPeriod.error.required = Select yes if you are sure you want to remove this accounting period
 
-howMuchCash.title = How much cash did {0} hold in all bank accounts on {1}, in pounds?
-howMuchCash.heading = How much cash did {0} hold in all bank accounts on {1}, in pounds?
-howMuchCash.error.required = Enter total cash the scheme held in all bank accounts on {1}, in pounds
-howMuchCash.error.nonNumeric = Total cash held in all bank accounts must be an amount of money, like 123 or 123.45
-howMuchCash.error.tooLarge = Total cash held in all bank accounts must be 999999999.99 or less
+howMuchCash.title = How much cash did the scheme hold in all bank accounts?
+howMuchCash.heading = How much cash did {0} hold in all bank accounts?
+howMuchCash.paragraph = If the scheme had no cash on one or both of these dates, or did not have a bank account, enter 0.
+howMuchCash.start.label = Total cash in all bank accounts on {0}, in pounds and pence
+howMuchCash.start.error.required = Enter total cash the scheme held in all bank accounts on {0}, in pounds and pence
+howMuchCash.start.error.nonNumeric = Total cash held in all bank accounts on {0} must be an amount of money, like 123 or 123.45
+howMuchCash.start.error.tooLarge = Total cash held in all bank accounts on {0} must be 999999999.99 or less
+howMuchCash.end.label = Total cash in all bank accounts on {0}, in pounds and pence
+howMuchCash.end.error.required = Enter total cash the scheme held in all bank accounts on {1}, in pounds and pence
+howMuchCash.end.error.nonNumeric = Total cash held in all bank accounts on {1} must be an amount of money, like 123 or 123.45
+howMuchCash.end.error.tooLarge = Total cash held in all bank accounts on {1} must be 999999999.99 or less
 
 pensionSchemeMembers.title = Tell us about the scheme’s members
 pensionSchemeMembers.heading = Tell us about {0}’s members

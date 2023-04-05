@@ -16,11 +16,11 @@
 
 package pages
 
-import models.Money
+import models.MoneyInPeriod
 import models.SchemeId.Srn
 import play.api.libs.json.JsPath
 
-case class HowMuchCashPage(srn: Srn) extends QuestionPage[Money] {
+case class HowMuchCashPage(srn: Srn) extends QuestionPage[MoneyInPeriod] {
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "howMuchCash"
