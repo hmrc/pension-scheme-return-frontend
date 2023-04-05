@@ -99,8 +99,13 @@ class Navigator @Inject()() {
 
     case NoNINOPage(srn, index) =>
       _ => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, CheckOrChange.Check)
-    case SchemeMembersListPage(srn, false) => _ => routes.UnauthorisedController.onPageLoad()
+    case SchemeMembersListPage(srn, false) => _ => routes.EmployerContributionsController.onPageLoad(srn, NormalMode)
 
+    case page @ EmployerContributionsPage(_) => {
+      case ua if ua.get(page).contains(true) =>
+        routes.UnauthorisedController.onPageLoad()
+      case _ => routes.UnauthorisedController.onPageLoad()
+    }
     case SchemeMembersListPage(srn, true) =>
       ua =>
         refineV[OneTo99](ua.membersDetails(srn).length + 1).fold(

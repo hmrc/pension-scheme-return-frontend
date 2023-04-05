@@ -304,3 +304,7 @@ personalContributions.paragraph = This includes:
 personalContributions.listItem1 = contributions made by a member to their own pension
 personalContributions.listItem2 = contributions made on behalf of a member by another person, for example a relative
 personalContributions.error.required = Select yes if personal contributions were made by or for any member during the period of this return
+
+employerContributions.title = Were employer contributions made for any member during the period of this return?
+employerContributions.heading = Were employer contributions made for any member during the period of this return?
+employerContributions.error.required = Select yes if employer contributions were made for any member during the period of this return

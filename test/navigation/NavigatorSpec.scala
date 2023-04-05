@@ -58,7 +58,6 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
     }
 
     "check returns page" - {
-
       "navigate to active bank account" - {
         "yes is selected" in {
           forAll(srnGen) { srn =>
@@ -196,12 +195,12 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
       }
     }
 
-    "go from pension scheme members page to unauthorised on Upload" in {
+    "go from Employee contribution page to unauthorised" in {
 
       forAll(srnGen) { srn =>
-        val page = PensionSchemeMembersPage(srn)
-        val answers = userAnswers.unsafeSet(page, ManualOrUpload.Upload)
-        navigator.nextPage(page, NormalMode, answers) mustBe routes.UnauthorisedController.onPageLoad()
+        val page = EmployerContributionsPage(srn)
+        navigator.nextPage(page, NormalMode, userAnswers) mustBe routes.UnauthorisedController
+          .onPageLoad()
       }
     }
 
