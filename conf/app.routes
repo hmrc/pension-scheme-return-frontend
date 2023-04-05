@@ -125,8 +125,7 @@ GET        /:srn/change-remove-member-details/:index              controllers.Re
 POST       /:srn/change-remove-member-details/:index              controllers.RemoveMemberDetailsController.onSubmit(srn: Srn, index: Max99, mode: Mode = CheckMode)
 
 GET         /:srn/did-scheme-have-bank-account                    controllers.ActiveBankAccountController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-GET         /:srn/did-scheme-have-bank-account/                   controllers.ActiveBankAccountController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST        /:srn/did-scheme-have-bank-account/                   controllers.ActiveBankAccountController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/did-scheme-have-bank-account                    controllers.ActiveBankAccountController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 
-GET         /:srn/change-did-scheme-have-bank-account/            controllers.ActiveBankAccountController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST        /:srn/change-did-scheme-have-bank-account/            controllers.ActiveBankAccountController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+GET         /:srn/change-did-scheme-have-bank-account             controllers.ActiveBankAccountController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-did-scheme-have-bank-account             controllers.ActiveBankAccountController.onSubmit(srn: Srn, mode: Mode = CheckMode)

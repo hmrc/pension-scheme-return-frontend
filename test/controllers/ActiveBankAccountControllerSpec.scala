@@ -19,6 +19,7 @@ package controllers
 import controllers.ActiveBankAccountController._
 import forms.YesNoPageFormProvider
 import models.NormalMode
+import pages.ActiveBankAccountPage
 import views.html.YesNoPageView
 
 class ActiveBankAccountControllerSpec extends ControllerBaseSpec {
@@ -26,19 +27,30 @@ class ActiveBankAccountControllerSpec extends ControllerBaseSpec {
   private lazy val onPageLoad = routes.ActiveBankAccountController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.ActiveBankAccountController.onSubmit(srn, NormalMode)
 
-  "ActiveBankAccountController" - {
+  "PersonalContributionsController" - {
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
-      val preparedForm = form(injected[YesNoPageFormProvider], defaultSchemeDetails.schemeName)
-      injected[YesNoPageView]
-        .apply(preparedForm, viewModel(srn, defaultSchemeDetails.schemeName, NormalMode))
-
+      injected[YesNoPageView].apply(
+        form(injected[YesNoPageFormProvider], defaultSchemeDetails.schemeName),
+        viewModel(srn, defaultSchemeDetails.schemeName, NormalMode)
+      )
     })
+
+    act.like(renderPrePopView(onPageLoad, ActiveBankAccountPage(srn), true) { implicit app => implicit request =>
+      val preparedForm = form(injected[YesNoPageFormProvider], defaultSchemeDetails.schemeName).fill(true)
+      injected[YesNoPageView].apply(preparedForm, viewModel(srn, defaultSchemeDetails.schemeName, NormalMode))
+    })
+
+    act.like(redirectNextPage(onSubmit, "value" -> "true"))
+
+    act.like(redirectNextPage(onSubmit, "value" -> "false"))
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
     act.like(saveAndContinue(onSubmit, "value" -> "true"))
+
     act.like(invalidForm(onSubmit))
-    act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
+
+    act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit " + _))
   }
 }

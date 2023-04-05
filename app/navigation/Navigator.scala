@@ -39,11 +39,6 @@ class Navigator @Inject()() {
         routes.ActiveBankAccountController.onPageLoad(srn, NormalMode)
       case _ => routes.AccountingPeriodController.onPageLoad(srn, refineMV(1), NormalMode)
     }
-    case page @ ActiveBankAccountPage(srn) => {
-      case ua if ua.get(page).contains(true) =>
-        routes.HowManyMembersController.onPageLoad(srn, NormalMode)
-      case _ => routes.AccountingPeriodController.onPageLoad(srn, refineMV(1), NormalMode)
-    }
     case RemoveMemberDetailsPage(srn) => _ => routes.SchemeMembersListController.onPageLoad(srn, page = 1)
 
     case AccountingPeriodPage(srn, index) =>

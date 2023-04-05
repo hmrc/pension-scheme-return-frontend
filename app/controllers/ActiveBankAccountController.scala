@@ -24,18 +24,17 @@ import javax.inject.Inject
 import models.Mode
 import models.SchemeId.Srn
 import navigation.Navigator
-import pages.{ActiveBankAccountPage, HowManyMembersPage}
+import pages.ActiveBankAccountPage
 import play.api.data.Form
 import viewmodels.models.YesNoPageViewModel
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.YesNoPageView
 import services.{SaveService, SchemeDateService}
 import viewmodels.implicits._
 
 import scala.concurrent.{ExecutionContext, Future}
-import utils.FormUtils._
 import viewmodels.DisplayMessage.Message
 
 class ActiveBankAccountController @Inject()(
@@ -56,9 +55,9 @@ class ActiveBankAccountController @Inject()(
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     val schemeName = request.schemeDetails.schemeName
-    Ok(view(form(schemeName), viewModel(srn, schemeName, mode)))
+    val preparedForm = request.userAnswers.fillForm(ActiveBankAccountPage(srn), form(schemeName))
+    Ok(view(preparedForm, viewModel(srn, schemeName, mode)))
   }
-
   def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
     val schemeName = request.schemeDetails.schemeName
     form(request.schemeDetails.schemeName)
@@ -73,7 +72,6 @@ class ActiveBankAccountController @Inject()(
       )
   }
 }
-
 object ActiveBankAccountController {
   def form(formProvider: YesNoPageFormProvider, memberName: String): Form[Boolean] = formProvider(
     "activeAccountDetails.error.required",
