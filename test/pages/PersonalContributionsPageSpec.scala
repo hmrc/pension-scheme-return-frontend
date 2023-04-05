@@ -16,12 +16,16 @@
 
 package pages
 
-import models.MoneyInPeriod
-import models.SchemeId.Srn
-import play.api.libs.json.JsPath
+import pages.behaviours.PageBehaviours
 
-case class HowMuchCashPage(srn: Srn) extends QuestionPage[MoneyInPeriod] {
-  override def path: JsPath = JsPath \ toString
+class PersonalContributionsPageSpec extends PageBehaviours {
 
-  override def toString: String = "howMuchCash"
+  "PersonalContributionsPage" - {
+
+    beRetrievable[Boolean](PersonalContributionsPage(srnGen.sample.value))
+
+    beSettable[Boolean](PersonalContributionsPage(srnGen.sample.value))
+
+    beRemovable[Boolean](PersonalContributionsPage(srnGen.sample.value))
+  }
 }

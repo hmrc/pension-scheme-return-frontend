@@ -19,23 +19,23 @@ class $className;format="cap"$ControllerSpec extends ControllerBaseSpec {
   private lazy val onPageLoad = routes.$className;format="cap"$Controller.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.$className;format="cap"$Controller.onSubmit(srn, NormalMode)
 
-  "$className;format="cap"$Controller" should {
+  "$className;format="cap"$Controller" - {
 
-    act.like renderView(onPageLoad) { implicit app => implicit request =>
+    act like renderView(onPageLoad) { implicit app => implicit request =>
       injected[YesNoPageView].apply(form(injected[YesNoPageFormProvider]), viewModel(srn, NormalMode))
     }
 
-    act.like renderPrePopView(onPageLoad, $className;format="cap"$Page(srn), true) { implicit app => implicit request =>
+    act like renderPrePopView(onPageLoad, $className;format="cap"$Page(srn), true) { implicit app => implicit request =>
       injected[YesNoPageView].apply(form(injected[YesNoPageFormProvider]).fill(true), viewModel(srn, NormalMode))
     }
 
-    act.like redirectNextPage(onSubmit, "value" -> "true")
-    act.like redirectNextPage(onSubmit, "value" -> "false")
+    act like redirectNextPage(onSubmit, "value" -> "true")
+    act like redirectNextPage(onSubmit, "value" -> "false")
 
-    act.like journeyRecoveryPage("onPageLoad", onPageLoad)
+    act like journeyRecoveryPage("onPageLoad", onPageLoad)
 
-    act.like saveAndContinue(onSubmit, "value" -> "true")
+    act like saveAndContinue(onSubmit, "value" -> "true")
 
-    act.like invalidForm(onSubmit)
+    act like invalidForm(onSubmit)
   }
 }

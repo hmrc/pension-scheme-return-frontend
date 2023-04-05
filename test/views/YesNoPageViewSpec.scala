@@ -18,6 +18,7 @@ package views
 
 import forms.YesNoPageFormProvider
 import play.api.test.FakeRequest
+import viewmodels.DisplayMessage.{ListMessage, ParagraphMessage}
 import views.html.YesNoPageView
 
 class YesNoPageViewSpec extends ViewSpec {
@@ -39,10 +40,26 @@ class YesNoPageViewSpec extends ViewSpec {
       act.like(renderSaveAndContinueButton(yesNoPageViewModelGen)(view(yesNoForm, _)))
       act.like(renderForm(yesNoPageViewModelGen)(view(yesNoForm, _), _.onSubmit))
 
-      "have a description when present" in {
+      "have a paragraph description when present" in {
 
         forAll(yesNoPageViewModelGen) { viewmodel =>
-          p(view(yesNoForm, viewmodel)) must contain allElementsOf viewmodel.description.map(_.toMessage)
+          p(view(yesNoForm, viewmodel)) must contain allElementsOf viewmodel.description
+            .collect {
+              case p: ParagraphMessage => p
+            }
+            .map(renderText)
+        }
+      }
+
+      "have a list description when present" in {
+
+        forAll(yesNoPageViewModelGen) { viewModel =>
+          li(view(yesNoForm, viewModel)) must contain allElementsOf viewModel.description
+            .collect {
+              case l: ListMessage => l
+            }
+            .flatMap(_.content.toList)
+            .map(renderText)
         }
       }
 

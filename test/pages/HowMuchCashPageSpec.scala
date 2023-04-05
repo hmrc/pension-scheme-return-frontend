@@ -16,7 +16,7 @@
 
 package pages
 
-import models.Money
+import models.{Money, MoneyInPeriod}
 import pages.behaviours.PageBehaviours
 
 class HowMuchCashPageSpec extends PageBehaviours {
@@ -25,10 +25,10 @@ class HowMuchCashPageSpec extends PageBehaviours {
 
     val srn = srnGen.sample.value
 
-    beRetrievable[Money](HowMuchCashPage(srn))
+    beRetrievable[MoneyInPeriod](HowMuchCashPage(srn))
 
-    beSettable[Money](HowMuchCashPage(srn))
+    beSettable[MoneyInPeriod](HowMuchCashPage(srn))
 
-    beRemovable[Money](HowMuchCashPage(srn))
+    beRemovable[MoneyInPeriod](HowMuchCashPage(srn))
   }
 }

@@ -19,6 +19,7 @@ package navigation
 import controllers.routes
 import eu.timepit.refined._
 import models._
+import org.scalacheck.Gen
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import pages._
 import utils.BaseSpec
@@ -299,6 +300,18 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
           navigator.nextPage(page, NormalMode, ua) mustBe
             routes.PspDeclarationController.onPageLoad(srn)
         }
+      }
+    }
+
+    "go from personal contributions pages to unauthorised" in {
+
+      forAll(srnGen, Gen.oneOf(true, false)) { (srn, answer) =>
+        val page = PersonalContributionsPage(srn)
+        val ua = userAnswers.unsafeSet(page, answer)
+
+        navigator.nextPage(page, NormalMode, ua) mustBe
+          routes.UnauthorisedController.onPageLoad()
+
       }
     }
   }

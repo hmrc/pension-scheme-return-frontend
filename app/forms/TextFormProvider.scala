@@ -52,8 +52,8 @@ class TextFormProvider @Inject()() extends Mappings {
   ): Form[Nino] =
     Form(
       "value" -> text(requiredKey, args.toList)
-        .verifying(verify(invalidKey, Nino.isValid, args: _*))
+        .verifying(verify[String](invalidKey, s => Nino.isValid(s.toUpperCase), args: _*))
         .verifying(verify[String](duplicateKey, !duplicates.map(_.nino).contains(_), args: _*))
-        .transform[Nino](Nino, _.nino)
+        .transform[Nino](s => Nino(s.toUpperCase), _.nino.toUpperCase)
     )
 }
