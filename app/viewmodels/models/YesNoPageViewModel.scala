@@ -17,15 +17,20 @@
 package viewmodels.models
 
 import play.api.mvc.Call
-import viewmodels.DisplayMessage.Message
+import viewmodels.DisplayMessage.{BlockMessage, Message, ParagraphMessage}
+import viewmodels.implicits._
 
 case class YesNoPageViewModel(
   title: Message,
   heading: Message,
-  description: List[Message],
+  description: List[BlockMessage],
   legend: Option[Message],
   onSubmit: Call
-)
+) {
+
+  def withDescription(message: BlockMessage, messages: BlockMessage*): YesNoPageViewModel =
+    copy(description = description ++ (message :: messages.toList))
+}
 
 object YesNoPageViewModel {
 
@@ -33,7 +38,7 @@ object YesNoPageViewModel {
     YesNoPageViewModel(
       Message(title),
       Message(heading),
-      List(Message(description)),
+      List(ParagraphMessage(description)),
       Some(Message(legend)),
       onSubmit = onSubmit
     )
@@ -57,7 +62,7 @@ object YesNoPageViewModel {
     YesNoPageViewModel(
       Message(title),
       Message(heading),
-      description.toList.map(d => Message(d)),
+      description.toList.map(d => ParagraphMessage(d)),
       Some(Message(legend)),
       onSubmit = onSubmit
     )

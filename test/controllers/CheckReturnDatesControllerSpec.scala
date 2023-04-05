@@ -28,7 +28,7 @@ import play.api.test.FakeRequest
 import services.{FakeTaxYearService, SaveService, SchemeDetailsService, TaxYearService}
 import uk.gov.hmrc.time.TaxYear
 import utils.DateTimeUtils
-import viewmodels.DisplayMessage.Message
+import viewmodels.DisplayMessage.{Message, ParagraphMessage}
 import viewmodels.implicits._
 import viewmodels.models.YesNoPageViewModel
 import views.html.YesNoPageView
@@ -71,7 +71,7 @@ class CheckReturnDatesControllerSpec extends ControllerBaseSpec with ScalaCheckP
         val formattedToDate = DateTimeUtils.formatHtml(toDate)
 
         viewModel.description mustBe List(
-          Message("checkReturnDates.description", formattedFromDate, formattedToDate)
+          ParagraphMessage("checkReturnDates.description", formattedFromDate, formattedToDate)
         )
       }
     }
@@ -86,7 +86,7 @@ class CheckReturnDatesControllerSpec extends ControllerBaseSpec with ScalaCheckP
         val formattedToDate = DateTimeUtils.formatHtml(toDate)
 
         viewModel.description mustBe List(
-          Message("checkReturnDates.description", formattedFromDate, formattedToDate)
+          ParagraphMessage("checkReturnDates.description", formattedFromDate, formattedToDate)
         )
       }
     }
@@ -101,7 +101,7 @@ class CheckReturnDatesControllerSpec extends ControllerBaseSpec with ScalaCheckP
         val formattedToDate = DateTimeUtils.formatHtml(toDate)
 
         viewModel.description mustBe List(
-          Message("checkReturnDates.description", formattedFromDate, formattedToDate)
+          ParagraphMessage("checkReturnDates.description", formattedFromDate, formattedToDate)
         )
       }
     }
@@ -116,7 +116,7 @@ class CheckReturnDatesControllerSpec extends ControllerBaseSpec with ScalaCheckP
         val formattedToDate = DateTimeUtils.formatHtml(details.windUpDate.getOrElse(latestDate))
 
         viewModel.description mustBe List(
-          Message("checkReturnDates.description", formattedFromDate, formattedToDate)
+          ParagraphMessage("checkReturnDates.description", formattedFromDate, formattedToDate)
         )
       }
     }

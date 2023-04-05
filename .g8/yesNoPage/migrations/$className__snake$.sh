@@ -23,8 +23,8 @@ echo "$className;format="decap"$.error.required = $errorRequired$"  >> ../conf/m
 echo "Add to navigator"
 # prepend before final pattern in navigator match statement
 sed -i.bu \$'/[ ]*case _[ ]*=> _ => routes.IndexController.onPageLoad/i\\\\\n    case page @ $className;format="cap"$Page(srn) => {\
-      case ua if ua.get(page).contains(true) => routes.UnauthorisedController.onPageLoad\
-      case _ => routes.UnauthorisedController.onPageLoad\
+      case ua if ua.get(page).contains(true) => routes.UnauthorisedController.onPageLoad()\
+      case _ => routes.UnauthorisedController.onPageLoad()\
     }\\\\\n' ../app/navigation/Navigator.scala
 rm ../app/navigation/Navigator.scala.bu
 

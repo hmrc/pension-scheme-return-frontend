@@ -293,3 +293,10 @@ changeMemberDetails.heading = Change {0}’s details
 removeMemberDetails.title = Are you sure you want to remove this member?
 removeMemberDetails.heading = Are you sure you want to remove {0}?
 removeMemberDetails.error.required = Select yes if you are sure you want to remove
+
+personalContributions.title = Were personal contributions made by or for any member during the period of this return?
+personalContributions.heading = Were personal contributions made by or for any member during the period of this return?
+personalContributions.paragraph = This includes:
+personalContributions.listItem1 = contributions made by a member to their own pension
+personalContributions.listItem2 = contributions made on behalf of a member by another person, for example a relative
+personalContributions.error.required = Select yes if personal contributions were made by or for any member during the period of this return
