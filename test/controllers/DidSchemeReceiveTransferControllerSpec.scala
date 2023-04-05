@@ -34,7 +34,6 @@ class DidSchemeReceiveTransferControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoad = routes.DidSchemeReceiveTransferController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.DidSchemeReceiveTransferController.onSubmit(srn, NormalMode)
-  val schemeName = defaultSchemeDetails.schemeName
 
   "DidSchemeReceiveTransferController" - {
 

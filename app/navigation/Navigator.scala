@@ -90,7 +90,7 @@ class Navigator @Inject()() {
     case page @ ActiveBankAccountPage(srn) => {
       case ua if ua.get(page).contains(true) =>
         routes.HowManyMembersController.onPageLoad(srn, NormalMode)
-      case _ => routes.HowManyMembersController.onPageLoad(srn, NormalMode)
+      case _ => routes.WhyNoBankAccountController.onPageLoad(srn, NormalMode)
     }
     case page @ HowManyMembersPage(srn, PspId(_)) => {
       case ua if ua.get(page).exists(_.total > 99) => routes.PspDeclarationController.onPageLoad(srn)
@@ -116,14 +116,19 @@ class Navigator @Inject()() {
       case ua if ua.get(page).contains(true) => routes.UnauthorisedController.onPageLoad()
       case _ => routes.UnauthorisedController.onPageLoad()
     }
+
     case page @ DidSchemeReceiveTransferPage(srn) => {
       case ua if ua.get(page).contains(true) => routes.UnauthorisedController.onPageLoad()
       case _ => routes.UnauthorisedController.onPageLoad()
     }
+
     case page @ SchemeTransferOutPage(srn) => {
       case ua if ua.get(page).contains(true) => routes.UnauthorisedController.onPageLoad()
       case _ => routes.UnauthorisedController.onPageLoad()
     }
+
+    case WhyNoBankAccountPage(srn) => _ => routes.HowManyMembersController.onPageLoad(srn, NormalMode)
+
     case _ => _ => routes.IndexController.onPageLoad()
   }
 
@@ -140,14 +145,19 @@ class Navigator @Inject()() {
       case ua if ua.get(page).contains(true) => routes.UnauthorisedController.onPageLoad()
       case _ => routes.UnauthorisedController.onPageLoad()
     }
+
     case page @ DidSchemeReceiveTransferPage(srn) => {
       case ua if ua.get(page).contains(true) => routes.UnauthorisedController.onPageLoad()
       case _ => routes.UnauthorisedController.onPageLoad()
     }
+
     case page @ SchemeTransferOutPage(srn) => {
       case ua if ua.get(page).contains(true) => routes.UnauthorisedController.onPageLoad()
       case _ => routes.UnauthorisedController.onPageLoad()
     }
+
+    case WhyNoBankAccountPage(srn) => _ => routes.HowManyMembersController.onPageLoad(srn, CheckMode)
+    
     case _ => _ => routes.IndexController.onPageLoad()
   }
 

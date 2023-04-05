@@ -87,13 +87,21 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
           }
         }
       }
+
+      "navigate to why no bank account when no is selected" in {
+
+        forAll(srnGen) { srn =>
+          val ua = userAnswers.set(ActiveBankAccountPage(srn), false).get
+          navigator.nextPage(ActiveBankAccountPage(srn), NormalMode, ua) mustBe
+            routes.WhyNoBankAccountController.onPageLoad(srn, NormalMode)
+        }
+      }
     }
 
-    "no is selected" in {
+    "why no bank account page should navigate to how many member pages" in {
 
       forAll(srnGen) { srn =>
-        val ua = userAnswers.set(ActiveBankAccountPage(srn), false).get
-        navigator.nextPage(ActiveBankAccountPage(srn), NormalMode, ua) mustBe
+        navigator.nextPage(WhyNoBankAccountPage(srn), NormalMode, userAnswers) mustBe
           routes.HowManyMembersController.onPageLoad(srn, NormalMode)
       }
     }
