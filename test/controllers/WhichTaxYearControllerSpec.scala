@@ -20,9 +20,24 @@ import forms.RadioListFormProvider
 import models.{DateRange, Enumerable, NormalMode}
 import org.scalacheck.Gen
 import pages.WhichTaxYearPage
+import play.api.inject.bind
+import play.api.inject.guice.GuiceableModule
+import services.{SchemeDateService, TaxYearService}
+import uk.gov.hmrc.time.TaxYear
 import views.html.RadioListView
 
 class WhichTaxYearControllerSpec extends ControllerBaseSpec {
+
+  private val mockTaxYearService = mock[TaxYearService]
+
+  override val additionalBindings: List[GuiceableModule] = List(
+    bind[TaxYearService].toInstance(mockTaxYearService)
+  )
+
+  override def beforeEach(): Unit = {
+    reset(mockTaxYearService)
+    when(mockTaxYearService.current).thenReturn(defaultTaxYear)
+  }
 
   "WhichTaxYearController" - {
 
