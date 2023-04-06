@@ -308,3 +308,7 @@ personalContributions.error.required = Select yes if personal contributions were
 employerContributions.title = Were employer contributions made for any member during the period of this return?
 employerContributions.heading = Were employer contributions made for any member during the period of this return?
 employerContributions.error.required = Select yes if employer contributions were made for any member during the period of this return
+
+didSchemeReceiveTransfer.title = Did the scheme receive a transfer for any member during the period of this return?
+didSchemeReceiveTransfer.heading = Did {0} receive a transfer for any member during the period of this return?
+didSchemeReceiveTransfer.error.required = Select yes if the scheme received a transfer for any member during the period of this return
