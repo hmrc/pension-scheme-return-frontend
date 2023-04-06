@@ -134,3 +134,9 @@ GET        /:srn/personal-contributions                           controllers.Pe
 POST       /:srn/personal-contributions                           controllers.PersonalContributionsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 GET        /:srn/change-personal-contributions                    controllers.PersonalContributionsController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST       /:srn/change-personal-contributions                    controllers.PersonalContributionsController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+
+GET        /:srn/transfer-received                        controllers.DidSchemeReceiveTransferController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST       /:srn/transfer-received                        controllers.DidSchemeReceiveTransferController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/change-transfer-received                 controllers.DidSchemeReceiveTransferController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST       /:srn/change-transfer-received                 controllers.DidSchemeReceiveTransferController.onSubmit(srn: Srn, mode: Mode = CheckMode)
