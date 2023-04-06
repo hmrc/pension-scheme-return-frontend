@@ -72,7 +72,7 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
       act.like(
         redirectToPage(
           onSubmit,
-          routes.UnauthorisedController.onPageLoad(),
+          routes.EmployerContributionsController.onPageLoad(srn, NormalMode),
           userAnswersWith99MembersDetails
         )
       )
