@@ -20,9 +20,23 @@ import eu.timepit.refined.refineMV
 import forms.DateRangeFormProvider
 import models.{DateRange, NormalMode}
 import pages.AccountingPeriodPage
+import play.api.inject.bind
+import play.api.inject.guice.GuiceableModule
+import services.TaxYearService
 import views.html.DateRangeView
 
 class AccountingPeriodControllerSpec extends ControllerBaseSpec {
+
+  private val mockTaxYearService = mock[TaxYearService]
+
+  override val additionalBindings: List[GuiceableModule] = List(
+    bind[TaxYearService].toInstance(mockTaxYearService)
+  )
+
+  override def beforeEach(): Unit = {
+    reset(mockTaxYearService)
+    when(mockTaxYearService.current).thenReturn(defaultTaxYear)
+  }
 
   "AccountingPeriodController" - {
 
