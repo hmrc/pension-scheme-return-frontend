@@ -120,9 +120,9 @@ object CheckReturnDatesController {
       Message("checkReturnDates.heading"),
       List(
         ParagraphMessage(
-          "checkReturnDates.description",
+          Message ("checkReturnDates.description",
           max(schemeDetails.openDate.getOrElse(fromDate), fromDate).show,
-          min(schemeDetails.windUpDate.getOrElse(toDate), toDate).show
+          min(schemeDetails.windUpDate.getOrElse(toDate), toDate).show)
         )
       ),
       Some(Message("checkReturnDates.legend")),
