@@ -312,3 +312,7 @@ employerContributions.error.required = Select yes if employer contributions were
 didSchemeReceiveTransfer.title = Did the scheme receive a transfer for any member during the period of this return?
 didSchemeReceiveTransfer.heading = Did {0} receive a transfer for any member during the period of this return?
 didSchemeReceiveTransfer.error.required = Select yes if the scheme received a transfer for any member during the period of this return
+
+schemeTransferOut.title = Did the scheme make a transfer out for any member during the period of this return?
+schemeTransferOut.heading = Did {0} make a transfer out for any member during the period of this return?
+schemeTransferOut.error.required = Select yes if the scheme made a transfer out for any member during the period of this return
