@@ -157,7 +157,7 @@ class Navigator @Inject()() {
     }
 
     case WhyNoBankAccountPage(srn) => _ => routes.HowManyMembersController.onPageLoad(srn, CheckMode)
-    
+
     case _ => _ => routes.IndexController.onPageLoad()
   }
 

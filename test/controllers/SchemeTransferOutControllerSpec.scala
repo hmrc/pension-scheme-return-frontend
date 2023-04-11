@@ -34,7 +34,6 @@ class SchemeTransferOutControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoad = routes.SchemeTransferOutController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.SchemeTransferOutController.onSubmit(srn, NormalMode)
-  val schemeName = defaultSchemeDetails.schemeName
 
   "SchemeTransferoutController" - {
 
