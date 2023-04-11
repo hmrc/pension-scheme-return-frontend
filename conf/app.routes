@@ -145,3 +145,9 @@ GET        /:srn/transfer-received                                controllers.Di
 POST       /:srn/transfer-received                                controllers.DidSchemeReceiveTransferController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 GET        /:srn/change-transfer-received                         controllers.DidSchemeReceiveTransferController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST       /:srn/change-transfer-received                         controllers.DidSchemeReceiveTransferController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+
+GET        /:srn/transfer-out                        controllers.SchemeTransferOutController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST       /:srn/transfer-out                        controllers.SchemeTransferOutController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/change-transfer-out                 controllers.SchemeTransferOutController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST       /:srn/change-transfer-out                 controllers.SchemeTransferOutController.onSubmit(srn: Srn, mode: Mode = CheckMode)
