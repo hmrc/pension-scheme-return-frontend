@@ -24,7 +24,7 @@ echo "$className;format="decap"$.error.invalid = $errorInvalid$"  >> ../conf/mes
 
 echo "Add to navigator"
 # prepend before final pattern in navigator match statement
-sed -i.bu \$'/[ ]*case _[ ]*=> _ => routes.IndexController.onPageLoad/i\\\\\n    case $className;format="cap"$Page(srn) => _ => routes.UnauthorisedController.onPageLoad\\\\\n' ../app/navigation/Navigator.scala
+sed -i.bu \$'/[ ]*case _[ ]*=> _ => routes.IndexController.onPageLoad/i\\\\\n    case $className;format="cap"$Page(srn) => _ => routes.UnauthorisedController.onPageLoad()\\\\\n' ../app/navigation/Navigator.scala
 rm ../app/navigation/Navigator.scala.bu
 
 echo "Migration $className;format="snake"$ completed"

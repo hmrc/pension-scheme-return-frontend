@@ -28,7 +28,6 @@ import views.html.MoneyView
 class ValueOfAssetsControllerSpec extends ControllerBaseSpec {
 
   val schemeDatePeriod = dateRangeGen.sample.value
-  val schemeName = defaultSchemeDetails.schemeName
   val mockSchemeDateService = mock[SchemeDateService]
   val maxAllowedAmount = 999999999.99
 

@@ -316,3 +316,9 @@ didSchemeReceiveTransfer.error.required = Select yes if the scheme received a tr
 schemeTransferOut.title = Did the scheme make a transfer out for any member during the period of this return?
 schemeTransferOut.heading = Did {0} make a transfer out for any member during the period of this return?
 schemeTransferOut.error.required = Select yes if the scheme made a transfer out for any member during the period of this return
+
+whyNoBankAccount.title = Why did the scheme not have a bank account during the period of this return?
+whyNoBankAccount.heading = Why did {0} not have a bank account during the period of this return?
+whyNoBankAccount.error.required = Enter the reason the scheme did not have a bank account during the period of this return
+whyNoBankAccount.error.length = Reason the scheme did not have a bank account must be 160 characters or fewer
+whyNoBankAccount.error.invalid = Reason the scheme did not have a bank account must only include letters a to z, numbers 0 to 9, and special characters such as hyphens, spaces and apostrophes

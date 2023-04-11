@@ -92,10 +92,11 @@ trait TestValues { _: BaseSpec =>
   val accountNumber = "12345678"
   val sortCode = "123456"
   val srn: SchemeId.Srn = srnGen.sample.value
+  val schemeName = "testSchemeName"
 
   val defaultSchemeDetails: SchemeDetails = SchemeDetails(
     "testSRN",
-    "testSchemeName",
+    schemeName,
     "testPSTR",
     SchemeStatus.Open,
     "testSchemeType",
