@@ -17,6 +17,7 @@
 package pages
 
 import pages.behaviours.PageBehaviours
+import pages.nonsipp.personalcontributions.PersonalContributionsPage
 
 class PersonalContributionsPageSpec extends PageBehaviours {
 

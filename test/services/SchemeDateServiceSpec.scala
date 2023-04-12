@@ -20,7 +20,8 @@ import eu.timepit.refined.refineMV
 import models.requests.DataRequest
 import models.{DateRange, UserAnswers}
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import pages.{AccountingPeriodPage, WhichTaxYearPage}
+import pages.nonsipp.WhichTaxYearPage
+import pages.nonsipp.accountingperiod.AccountingPeriodPage
 import play.api.test.FakeRequest
 import utils.BaseSpec
 import utils.UserAnswersUtils._

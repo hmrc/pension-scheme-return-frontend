@@ -19,6 +19,7 @@ package pages
 import eu.timepit.refined.refineMV
 import models.{NameDOB, UserAnswers}
 import pages.behaviours.PageBehaviours
+import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsNinoPage, MemberDetailsPage, NoNINOPage}
 import utils.UserAnswersUtils.UserAnswersOps
 
 class MemberDetailsPageSpec extends PageBehaviours {

@@ -18,14 +18,14 @@ package controllers.testonly
 
 import cats.implicits._
 import config.Refined.{Max99, OneTo99}
-import controllers.DoesSchemeMemberHaveNINOController
 import controllers.actions.{DataRetrievalAction, IdentifyAndRequireData}
+import controllers.nonsipp.memberdetails.DoesSchemeMemberHaveNINOController
 import controllers.testonly.MongoController.buildRandomNameDOB
 import eu.timepit.refined._
 import eu.timepit.refined.api.Refined
 import models.SchemeId.Srn
 import models.{NameDOB, UserAnswers}
-import pages.{DoesMemberHaveNinoPage, MemberDetailsNinoPage, MemberDetailsPage, NoNINOPage}
+import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsNinoPage, MemberDetailsPage, NoNINOPage}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository

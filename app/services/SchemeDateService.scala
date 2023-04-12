@@ -20,7 +20,8 @@ import com.google.inject.ImplementedBy
 import models.DateRange
 import models.SchemeId.Srn
 import models.requests.DataRequest
-import pages.{AccountingPeriods, WhichTaxYearPage}
+import pages.nonsipp.WhichTaxYearPage
+import pages.nonsipp.accountingperiod.AccountingPeriods
 
 import java.time.LocalDate
 import javax.inject.Inject
