@@ -14,29 +14,27 @@
  * limitations under the License.
  */
 
-package navigation
+package navigation.nonsipp
 
-import controllers.nonsipp.routes
-import pages._
+import controllers.routes
+import navigation.{Navigator, NavigatorBehaviours}
+import pages.nonsipp.employercontributions.EmployerContributionsPage
 import utils.BaseSpec
 
-class NavigatorSpec extends BaseSpec with NavigatorBehaviours {
+class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
-  val navigator = new Navigator
+  val navigator: Navigator = new Navigator
 
-  "Navigator" - {
-    case object UnknownPage extends Page
-
-    act.like(
-      normalmode
-        .navigateTo(_ => UnknownPage, (_, _) => controllers.routes.IndexController.onPageLoad())
-        .withName("redirect any unknown pages to index page")
-    )
+  "EmployerContributionsNavigator" - {
 
     act.like(
       normalmode
-        .navigateTo(StartPage, routes.WhichTaxYearController.onPageLoad)
-        .withName("go from start page to which tax year page")
+        .navigateTo(
+          EmployerContributionsPage,
+          (_, _) => routes.UnauthorisedController.onPageLoad()
+        )
+        .withName("go from employer contribution page to unauthorised")
     )
+
   }
 }
