@@ -22,7 +22,7 @@ import forms.RadioListFormProvider
 import models.SchemeId.Srn
 import models.{DateRange, Enumerable, Mode, NormalMode}
 import navigation.Navigator
-import pages.WhichTaxYearPage
+import pages.nonsipp.WhichTaxYearPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}

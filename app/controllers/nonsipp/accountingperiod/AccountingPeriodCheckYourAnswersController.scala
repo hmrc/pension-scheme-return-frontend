@@ -24,7 +24,7 @@ import controllers.nonsipp.accountingperiod.AccountingPeriodCheckYourAnswersCont
 import models.SchemeId.Srn
 import models.{DateRange, NormalMode}
 import navigation.Navigator
-import pages.{AccountingPeriodCheckYourAnswersPage, AccountingPeriodPage}
+import pages.nonsipp.accountingperiod.{AccountingPeriodCheckYourAnswersPage, AccountingPeriodPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController

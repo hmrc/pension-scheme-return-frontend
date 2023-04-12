@@ -19,6 +19,7 @@ package pages
 import eu.timepit.refined.refineMV
 import models.UserAnswers
 import pages.behaviours.PageBehaviours
+import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsNinoPage, NoNINOPage}
 import play.api.libs.json.Writes._
 import uk.gov.hmrc.domain.Nino
 

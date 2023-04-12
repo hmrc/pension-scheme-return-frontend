@@ -26,7 +26,7 @@ import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
 import models.{DateRange, Mode}
 import navigation.Navigator
-import pages.{AccountingPeriodListPage, AccountingPeriods}
+import pages.nonsipp.accountingperiod.{AccountingPeriodListPage, AccountingPeriods}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}

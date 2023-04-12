@@ -14,14 +14,9 @@
  * limitations under the License.
  */
 
-package pages
+package pages.nonsipp.accountingperiod
 
-import models.DateRange
 import models.SchemeId.Srn
-import play.api.libs.json.JsPath
+import pages.Page
 
-case class WhichTaxYearPage(srn: Srn) extends QuestionPage[DateRange] {
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "whichTaxYear"
-}
+case class AccountingPeriodCheckYourAnswersPage(srn: Srn) extends Page

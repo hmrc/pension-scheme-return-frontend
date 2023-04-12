@@ -39,7 +39,7 @@ import models.ManualOrUpload.{Manual, Upload}
 import models.SchemeId.Srn
 import models.{ManualOrUpload, NormalMode}
 import navigation.Navigator
-import pages.PensionSchemeMembersPage
+import pages.nonsipp.memberdetails.PensionSchemeMembersPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}

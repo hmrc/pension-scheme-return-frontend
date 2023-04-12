@@ -22,7 +22,7 @@ import controllers.nonsipp.accountingperiod.routes
 import eu.timepit.refined._
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import pages.AccountingPeriodPage
+import pages.nonsipp.accountingperiod.AccountingPeriodPage
 import views.html.YesNoPageView
 
 class RemoveAccountingPeriodControllerSpec extends ControllerBaseSpec {

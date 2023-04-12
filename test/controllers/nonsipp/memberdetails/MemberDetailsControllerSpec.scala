@@ -22,7 +22,7 @@ import MemberDetailsController._
 import eu.timepit.refined.refineMV
 import forms.NameDOBFormProvider
 import models.{NameDOB, NormalMode}
-import pages.MemberDetailsPage
+import pages.nonsipp.memberdetails.MemberDetailsPage
 import views.html.NameDOBView
 
 import java.time.LocalDate

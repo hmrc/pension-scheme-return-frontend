@@ -20,7 +20,7 @@ import controllers.ControllerBaseSpec
 import forms.RadioListFormProvider
 import models.{DateRange, Enumerable, NormalMode}
 import org.scalacheck.Gen
-import pages.WhichTaxYearPage
+import pages.nonsipp.WhichTaxYearPage
 import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
 import services.TaxYearService

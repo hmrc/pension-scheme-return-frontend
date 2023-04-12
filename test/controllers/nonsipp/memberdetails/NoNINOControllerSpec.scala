@@ -22,7 +22,7 @@ import controllers.nonsipp.memberdetails.routes
 import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import models.NormalMode
-import pages.{MemberDetailsPage, NoNINOPage}
+import pages.nonsipp.memberdetails.{MemberDetailsPage, NoNINOPage}
 import views.html.TextAreaView
 
 class NoNINOControllerSpec extends ControllerBaseSpec {

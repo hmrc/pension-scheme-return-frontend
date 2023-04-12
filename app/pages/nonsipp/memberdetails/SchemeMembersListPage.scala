@@ -14,14 +14,9 @@
  * limitations under the License.
  */
 
-package pages
+package pages.nonsipp.memberdetails
 
-import play.api.libs.json.JsPath
 import models.SchemeId.Srn
+import pages.Page
 
-case class DidSchemeReceiveTransferPage(srn: Srn) extends QuestionPage[Boolean] {
-
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "didSchemeReceiveTransfer"
-}
+case class SchemeMembersListPage(srn: Srn, addMember: Boolean) extends Page

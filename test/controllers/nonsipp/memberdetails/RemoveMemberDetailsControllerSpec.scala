@@ -22,7 +22,7 @@ import controllers.nonsipp.memberdetails.routes
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.{NameDOB, NormalMode}
-import pages.MemberDetailsPage
+import pages.nonsipp.memberdetails.MemberDetailsPage
 import views.html.YesNoPageView
 
 class RemoveMemberDetailsControllerSpec extends ControllerBaseSpec {

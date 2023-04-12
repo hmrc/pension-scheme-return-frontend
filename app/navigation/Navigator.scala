@@ -22,8 +22,32 @@ import controllers.nonsipp.routes
 import eu.timepit.refined.{refineMV, refineV}
 import models.PensionSchemeId.{PsaId, PspId}
 import models._
-import pages.MembersDetails._
+import pages.nonsipp.memberdetails.MembersDetails._
 import pages._
+import pages.nonsipp.{CheckReturnDatesPage, HowManyMembersPage, HowMuchCashPage, ValueOfAssetsPage, WhichTaxYearPage}
+import pages.nonsipp.accountingperiod.{
+  AccountingPeriodCheckYourAnswersPage,
+  AccountingPeriodListPage,
+  AccountingPeriodPage,
+  AccountingPeriods,
+  RemoveAccountingPeriodPage
+}
+import pages.nonsipp.bankaccount.{ActiveBankAccountPage, WhyNoBankAccountPage}
+import pages.nonsipp.declaration.{PsaDeclarationPage, PspDeclarationPage}
+import pages.nonsipp.employercontributions.EmployerContributionsPage
+import pages.nonsipp.memberdetails.{
+  DoesMemberHaveNinoPage,
+  MemberDetailsNinoPage,
+  MemberDetailsPage,
+  NoNINOPage,
+  PensionSchemeMembersPage,
+  RemoveMemberDetailsPage,
+  SchemeMemberDetailsAnswersPage,
+  SchemeMembersListPage
+}
+import pages.nonsipp.personalcontributions.PersonalContributionsPage
+import pages.nonsipp.receivetransfer.DidSchemeReceiveTransferPage
+import pages.nonsipp.transferout.SchemeTransferOutPage
 import play.api.mvc.Call
 
 import javax.inject.{Inject, Singleton}

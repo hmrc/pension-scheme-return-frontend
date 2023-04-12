@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package pages
+package pages.nonsipp.transferout
 
-import play.api.libs.json.JsPath
 import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-case class WhyNoBankAccountPage(srn: Srn) extends QuestionPage[String] {
+case class SchemeTransferOutPage(srn: Srn) extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "whyNoBankAccount"
+  override def toString: String = "schemeTransferOut"
 }

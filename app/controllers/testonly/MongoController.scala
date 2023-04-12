@@ -25,7 +25,7 @@ import eu.timepit.refined._
 import eu.timepit.refined.api.Refined
 import models.SchemeId.Srn
 import models.{NameDOB, UserAnswers}
-import pages.{DoesMemberHaveNinoPage, MemberDetailsNinoPage, MemberDetailsPage, NoNINOPage}
+import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsNinoPage, MemberDetailsPage, NoNINOPage}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository

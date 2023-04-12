@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package pages
+package pages.nonsipp.declaration
 
 import models.SchemeId.Srn
+import pages.Page
 
-case class SchemeMembersListPage(srn: Srn, addMember: Boolean) extends Page
+case class PspDeclarationPage(srn: Srn) extends Page

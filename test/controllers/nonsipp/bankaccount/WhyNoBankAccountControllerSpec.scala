@@ -21,7 +21,7 @@ import controllers.ControllerBaseSpec
 import controllers.nonsipp.bankaccount.routes
 import forms.TextFormProvider
 import models.NormalMode
-import pages.WhyNoBankAccountPage
+import pages.nonsipp.bankaccount.WhyNoBankAccountPage
 import views.html.TextAreaView
 
 class WhyNoBankAccountControllerSpec extends ControllerBaseSpec {

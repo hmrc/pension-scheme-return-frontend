@@ -14,8 +14,15 @@
  * limitations under the License.
  */
 
-package pages
+package pages.nonsipp.receivetransfer
 
 import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-case class AccountingPeriodCheckYourAnswersPage(srn: Srn) extends Page
+case class DidSchemeReceiveTransferPage(srn: Srn) extends QuestionPage[Boolean] {
+
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "didSchemeReceiveTransfer"
+}

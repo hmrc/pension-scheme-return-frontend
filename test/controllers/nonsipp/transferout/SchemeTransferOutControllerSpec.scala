@@ -21,7 +21,7 @@ import controllers.ControllerBaseSpec
 import controllers.nonsipp.transferout.routes
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import pages.SchemeTransferOutPage
+import pages.nonsipp.transferout.SchemeTransferOutPage
 import views.html.YesNoPageView
 
 class SchemeTransferOutControllerSpec extends ControllerBaseSpec {

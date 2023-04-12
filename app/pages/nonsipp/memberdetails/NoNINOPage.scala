@@ -14,8 +14,17 @@
  * limitations under the License.
  */
 
-package pages
+package pages.nonsipp.memberdetails
 
+import config.Refined.Max99
 import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
+import utils.RefinedUtils.RefinedIntOps
 
-case class RemoveAccountingPeriodPage(srn: Srn) extends Page
+case class NoNINOPage(srn: Srn, index: Max99) extends QuestionPage[String] {
+
+  override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString
+
+  override def toString: String = "noNINO"
+}

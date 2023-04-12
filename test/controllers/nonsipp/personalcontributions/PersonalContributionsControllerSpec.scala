@@ -21,7 +21,7 @@ import controllers.ControllerBaseSpec
 import controllers.nonsipp.personalcontributions.routes
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import pages.PersonalContributionsPage
+import pages.nonsipp.personalcontributions.PersonalContributionsPage
 import views.html.YesNoPageView
 
 class PersonalContributionsControllerSpec extends ControllerBaseSpec {

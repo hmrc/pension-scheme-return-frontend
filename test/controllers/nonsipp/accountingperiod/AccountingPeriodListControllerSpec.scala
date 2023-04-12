@@ -25,7 +25,7 @@ import forms.YesNoPageFormProvider
 import models.NormalMode
 import org.scalacheck.Gen
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
-import pages.AccountingPeriodPage
+import pages.nonsipp.accountingperiod.AccountingPeriodPage
 import views.html.ListView
 
 class AccountingPeriodListControllerSpec extends ControllerBaseSpec {

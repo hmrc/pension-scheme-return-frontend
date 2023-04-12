@@ -24,7 +24,7 @@ import models.SchemeId.Srn
 import models.requests.DataRequest
 import models.{Mode, NameDOB}
 import navigation.Navigator
-import pages.{DoesMemberHaveNinoPage, MemberDetailsPage}
+import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsPage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}

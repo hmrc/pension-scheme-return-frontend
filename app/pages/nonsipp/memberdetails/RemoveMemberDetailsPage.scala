@@ -14,25 +14,12 @@
  * limitations under the License.
  */
 
-package pages
+package pages.nonsipp.memberdetails
 
-import config.Refined.Max99
 import models.SchemeId.Srn
-import play.api.libs.json.JsPath
-import queries.Gettable
-import uk.gov.hmrc.domain.Nino
-import utils.RefinedUtils.RefinedIntOps
+import pages.Page
 
-case class MemberDetailsNinoPage(srn: Srn, index: Max99) extends QuestionPage[Nino] {
+case class RemoveMemberDetailsPage(srn: Srn) extends Page {
 
-  override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString
-
-  override def toString: String = "memberDetailsNinoPage"
-}
-
-case class MemberDetailsNinos(srn: Srn) extends Gettable[Map[String, Nino]] {
-
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "memberDetailsNinoPage"
+  override def toString: String = "removeMemberDetailsPage"
 }

@@ -20,7 +20,7 @@ import controllers.ControllerBaseSpec
 import controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController._
 import eu.timepit.refined.refineMV
 import models.{CheckOrChange, NormalMode}
-import pages.{DoesMemberHaveNinoPage, MemberDetailsNinoPage, MemberDetailsPage, NoNINOPage}
+import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsNinoPage, MemberDetailsPage, NoNINOPage}
 import uk.gov.hmrc.domain.Nino
 import viewmodels.DisplayMessage.Message
 import views.html.CheckYourAnswersView

@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package pages
+package pages.nonsipp.accountingperiod
 
 import models.SchemeId.Srn
+import pages.Page
 
 case class AccountingPeriodListPage(srn: Srn, addPeriod: Boolean) extends Page

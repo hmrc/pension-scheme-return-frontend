@@ -22,7 +22,7 @@ import controllers.ControllerBaseSpec
 import eu.timepit.refined._
 import models.{DateRange, NormalMode}
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
-import pages.AccountingPeriodPage
+import pages.nonsipp.accountingperiod.AccountingPeriodPage
 import utils.DateTimeUtils.localDateShow
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.SummaryAction

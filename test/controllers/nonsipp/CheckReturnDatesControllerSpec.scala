@@ -22,7 +22,7 @@ import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import pages.CheckReturnDatesPage
+import pages.nonsipp.CheckReturnDatesPage
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest

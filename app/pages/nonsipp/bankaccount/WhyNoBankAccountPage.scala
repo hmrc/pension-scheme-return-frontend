@@ -14,11 +14,15 @@
  * limitations under the License.
  */
 
-package pages
+package pages.nonsipp.bankaccount
 
 import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-case class RemoveMemberDetailsPage(srn: Srn) extends Page {
+case class WhyNoBankAccountPage(srn: Srn) extends QuestionPage[String] {
 
-  override def toString: String = "removeMemberDetailsPage"
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "whyNoBankAccount"
 }

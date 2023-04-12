@@ -22,7 +22,7 @@ import controllers.nonsipp.memberdetails.routes
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import pages.{DoesMemberHaveNinoPage, MemberDetailsPage}
+import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsPage}
 import views.html.YesNoPageView
 
 class DoesSchemeMemberHaveNINOControllerSpec extends ControllerBaseSpec {

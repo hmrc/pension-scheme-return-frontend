@@ -22,7 +22,7 @@ import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
 import models.{MinimalSchemeDetails, Mode, PensionSchemeId}
 import navigation.Navigator
-import pages.CheckReturnDatesPage
+import pages.nonsipp.CheckReturnDatesPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.{SaveService, SchemeDetailsService, TaxYearService}

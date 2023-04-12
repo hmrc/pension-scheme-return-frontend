@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package pages
+package pages.nonsipp.memberdetails
 
-import play.api.libs.json.JsPath
+import models.ManualOrUpload
 import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-case class SchemeTransferOutPage(srn: Srn) extends QuestionPage[Boolean] {
-
+case class PensionSchemeMembersPage(srn: Srn) extends QuestionPage[ManualOrUpload] {
   override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "schemeTransferOut"
+  override def toString: String = "pensionSchemeMembers"
 }

@@ -14,29 +14,26 @@
  * limitations under the License.
  */
 
-package pages
+package pages.nonsipp.accountingperiod
 
-import config.Refined.Max99
-import play.api.libs.json.JsPath
+import config.Refined.Max3
+import models.DateRange
 import models.SchemeId.Srn
-import models.UserAnswers
+import pages.QuestionPage
+import play.api.libs.json.JsPath
+import queries.Gettable
 import utils.RefinedUtils.RefinedIntOps
 
-import scala.util.Try
-
-case class DoesMemberHaveNinoPage(srn: Srn, index: Max99) extends QuestionPage[Boolean] {
+case class AccountingPeriodPage(srn: Srn, index: Max3) extends QuestionPage[DateRange] {
 
   override def path: JsPath = JsPath \ toString \ index.arrayIndex
 
-  override def toString: String = "nationalInsuranceNumber"
+  override def toString: String = "accountPeriod"
+}
 
-  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
-    value match {
-      case Some(true) => userAnswers.remove(NoNINOPage(srn, index))
-      case Some(false) => userAnswers.remove(MemberDetailsNinoPage(srn, index))
-      case None =>
-        userAnswers
-          .remove(NoNINOPage(srn, index))
-          .flatMap(_.remove(MemberDetailsNinoPage(srn, index)))
-    }
+case class AccountingPeriods(srn: Srn) extends Gettable[List[DateRange]] {
+
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "accountPeriod"
 }

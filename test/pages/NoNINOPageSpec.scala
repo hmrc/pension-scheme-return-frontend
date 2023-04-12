@@ -19,6 +19,7 @@ package pages
 import config.Refined.Max99
 import eu.timepit.refined.refineMV
 import pages.behaviours.PageBehaviours
+import pages.nonsipp.memberdetails.NoNINOPage
 
 class NoNINOPageSpec extends PageBehaviours {
 

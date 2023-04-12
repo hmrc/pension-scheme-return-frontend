@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package pages
+package pages.nonsipp.memberdetails
 
 import config.Refined.Max99
 import models.SchemeId.Srn
 import models.{NameDOB, UserAnswers}
+import pages.QuestionPage
 import play.api.libs.json.JsPath
 import queries.Gettable
 import utils.RefinedUtils.RefinedIntOps

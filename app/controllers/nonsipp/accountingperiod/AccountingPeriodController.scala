@@ -25,7 +25,7 @@ import models.SchemeId.Srn
 import models.requests.DataRequest
 import models.{DateRange, Mode}
 import navigation.Navigator
-import pages.{AccountingPeriodPage, AccountingPeriods}
+import pages.nonsipp.accountingperiod.{AccountingPeriodPage, AccountingPeriods}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}

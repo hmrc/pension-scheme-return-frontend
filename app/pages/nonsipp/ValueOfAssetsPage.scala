@@ -14,8 +14,15 @@
  * limitations under the License.
  */
 
-package pages
+package pages.nonsipp
 
+import models.MoneyInPeriod
 import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-case class PspDeclarationPage(srn: Srn) extends Page
+case class ValueOfAssetsPage(srn: Srn) extends QuestionPage[MoneyInPeriod] {
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "valueOfAssets"
+}

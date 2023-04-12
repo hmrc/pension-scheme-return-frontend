@@ -23,6 +23,23 @@ import models._
 import org.scalacheck.Gen
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import pages._
+import pages.nonsipp.{CheckReturnDatesPage, HowManyMembersPage, HowMuchCashPage, ValueOfAssetsPage, WhichTaxYearPage}
+import pages.nonsipp.accountingperiod.{
+  AccountingPeriodCheckYourAnswersPage,
+  AccountingPeriodListPage,
+  AccountingPeriodPage,
+  RemoveAccountingPeriodPage
+}
+import pages.nonsipp.bankaccount.{ActiveBankAccountPage, WhyNoBankAccountPage}
+import pages.nonsipp.declaration.{PsaDeclarationPage, PspDeclarationPage}
+import pages.nonsipp.employercontributions.EmployerContributionsPage
+import pages.nonsipp.memberdetails.{
+  MemberDetailsNinoPage,
+  MemberDetailsPage,
+  PensionSchemeMembersPage,
+  RemoveMemberDetailsPage
+}
+import pages.nonsipp.personalcontributions.PersonalContributionsPage
 import utils.BaseSpec
 import utils.UserAnswersUtils._
 

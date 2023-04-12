@@ -14,16 +14,9 @@
  * limitations under the License.
  */
 
-package pages
+package pages.nonsipp.memberdetails
 
-import config.Refined.Max99
-import play.api.libs.json.JsPath
 import models.SchemeId.Srn
-import utils.RefinedUtils.RefinedIntOps
+import pages.Page
 
-case class NoNINOPage(srn: Srn, index: Max99) extends QuestionPage[String] {
-
-  override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString
-
-  override def toString: String = "noNINO"
-}
+case class SchemeMemberDetailsAnswersPage(srn: Srn) extends Page

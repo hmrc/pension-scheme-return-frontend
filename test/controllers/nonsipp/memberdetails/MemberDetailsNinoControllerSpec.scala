@@ -21,7 +21,7 @@ import controllers.nonsipp.memberdetails.routes
 import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import models.NormalMode
-import pages.{MemberDetailsNinoPage, MemberDetailsPage}
+import pages.nonsipp.memberdetails.{MemberDetailsNinoPage, MemberDetailsPage}
 import views.html.TextInputView
 
 class MemberDetailsNinoControllerSpec extends ControllerBaseSpec {

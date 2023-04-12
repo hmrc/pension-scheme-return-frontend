@@ -21,7 +21,7 @@ import controllers.nonsipp.accountingperiod.routes
 import eu.timepit.refined.refineMV
 import forms.DateRangeFormProvider
 import models.{DateRange, NormalMode}
-import pages.AccountingPeriodPage
+import pages.nonsipp.accountingperiod.AccountingPeriodPage
 import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
 import services.TaxYearService

@@ -21,7 +21,7 @@ import controllers.ControllerBaseSpec
 import controllers.nonsipp.employercontributions.routes
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import pages.EmployerContributionsPage
+import pages.nonsipp.employercontributions.EmployerContributionsPage
 import views.html.YesNoPageView
 
 class EmployerContributionsControllerSpec extends ControllerBaseSpec {

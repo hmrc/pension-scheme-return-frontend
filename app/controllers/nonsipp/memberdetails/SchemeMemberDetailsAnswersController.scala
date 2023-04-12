@@ -25,6 +25,13 @@ import models.SchemeId.Srn
 import models.{CheckOrChange, Mode, NameDOB, NormalMode}
 import navigation.Navigator
 import pages._
+import pages.nonsipp.memberdetails.{
+  DoesMemberHaveNinoPage,
+  MemberDetailsNinoPage,
+  MemberDetailsPage,
+  NoNINOPage,
+  SchemeMemberDetailsAnswersPage
+}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.domain.Nino

@@ -21,7 +21,7 @@ import controllers.ControllerBaseSpec
 import controllers.nonsipp.bankaccount.routes
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import pages.ActiveBankAccountPage
+import pages.nonsipp.bankaccount.ActiveBankAccountPage
 import views.html.YesNoPageView
 
 class ActiveBankAccountControllerSpec extends ControllerBaseSpec {

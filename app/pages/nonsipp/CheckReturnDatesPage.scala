@@ -14,8 +14,15 @@
  * limitations under the License.
  */
 
-package pages
+package pages.nonsipp
 
 import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-case class SchemeDetailsPage(srn: Srn) extends Page
+case class CheckReturnDatesPage(srn: Srn) extends QuestionPage[Boolean] {
+
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "checkReturnDates"
+}

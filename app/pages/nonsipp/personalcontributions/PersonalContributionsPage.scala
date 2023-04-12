@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package pages
+package pages.nonsipp.personalcontributions
 
-import play.api.libs.json.JsPath
 import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
 case class PersonalContributionsPage(srn: Srn) extends QuestionPage[Boolean] {
 

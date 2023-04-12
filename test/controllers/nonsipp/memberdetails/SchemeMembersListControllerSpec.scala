@@ -23,7 +23,7 @@ import controllers.nonsipp.employercontributions
 import eu.timepit.refined._
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import pages.MemberDetailsPage
+import pages.nonsipp.memberdetails.MemberDetailsPage
 import views.html.ListView
 
 class SchemeMembersListControllerSpec extends ControllerBaseSpec {
