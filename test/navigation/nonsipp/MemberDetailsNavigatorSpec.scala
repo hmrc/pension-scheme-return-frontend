@@ -81,15 +81,6 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         )
         .withName("go from nino page to check answers page")
     )
-
-    // Navigation tests missing for
-    // has nino page to enter nino page for yes
-    // has nino page to reason no nino page for no
-    // no nino page to cya page
-    // cya page to list page
-    // list page onwards when no selected
-    // list page when yes selected - various tests depending on state
-    // remove page to list page
   }
 
 }
