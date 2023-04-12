@@ -17,7 +17,8 @@
 package navigation
 
 import config.Refined.{OneTo99, OneToThree}
-import controllers.routes
+import controllers.nonsipp
+import controllers.nonsipp.routes
 import eu.timepit.refined.{refineMV, refineV}
 import models.PensionSchemeId.{PsaId, PspId}
 import models._
@@ -36,15 +37,16 @@ class Navigator @Inject()() {
 
     case page @ CheckReturnDatesPage(srn) => {
       case ua if ua.get(page).contains(true) =>
-        routes.ActiveBankAccountController.onPageLoad(srn, NormalMode)
-      case _ => routes.AccountingPeriodController.onPageLoad(srn, refineMV(1), NormalMode)
+        nonsipp.bankaccount.routes.ActiveBankAccountController.onPageLoad(srn, NormalMode)
+      case _ => nonsipp.accountingperiod.routes.AccountingPeriodController.onPageLoad(srn, refineMV(1), NormalMode)
     }
-    case RemoveMemberDetailsPage(srn) => _ => routes.SchemeMembersListController.onPageLoad(srn, page = 1)
+    case RemoveMemberDetailsPage(srn) =>
+      _ => nonsipp.memberdetails.routes.SchemeMembersListController.onPageLoad(srn, page = 1)
 
     case AccountingPeriodPage(srn, index) =>
-      _ => routes.AccountingPeriodCheckYourAnswersController.onPageLoad(srn, index)
+      _ => nonsipp.accountingperiod.routes.AccountingPeriodCheckYourAnswersController.onPageLoad(srn, index)
     case AccountingPeriodCheckYourAnswersPage(srn) =>
-      _ => routes.AccountingPeriodListController.onPageLoad(srn, NormalMode)
+      _ => nonsipp.accountingperiod.routes.AccountingPeriodListController.onPageLoad(srn, NormalMode)
 
     case AccountingPeriodListPage(srn, false) =>
       _ => routes.HowManyMembersController.onPageLoad(srn, NormalMode)
@@ -54,111 +56,117 @@ class Navigator @Inject()() {
         val count = ua.list(AccountingPeriods(srn)).length
         refineV[OneToThree](count + 1).fold(
           _ => routes.HowManyMembersController.onPageLoad(srn, NormalMode),
-          index => routes.AccountingPeriodController.onPageLoad(srn, index, NormalMode)
+          index => nonsipp.accountingperiod.routes.AccountingPeriodController.onPageLoad(srn, index, NormalMode)
         )
 
-    case RemoveAccountingPeriodPage(srn) => _ => routes.AccountingPeriodListController.onPageLoad(srn, NormalMode)
+    case RemoveAccountingPeriodPage(srn) =>
+      _ => nonsipp.accountingperiod.routes.AccountingPeriodListController.onPageLoad(srn, NormalMode)
 
     case HowMuchCashPage(srn) => _ => routes.ValueOfAssetsController.onPageLoad(srn, NormalMode)
-    case ValueOfAssetsPage(srn) => _ => routes.PensionSchemeMembersController.onPageLoad(srn)
+    case ValueOfAssetsPage(srn) => _ => nonsipp.memberdetails.routes.PensionSchemeMembersController.onPageLoad(srn)
 
     case PensionSchemeMembersPage(srn) =>
       ua =>
         if (ua.get(PensionSchemeMembersPage(srn)).contains(ManualOrUpload.Manual)) {
-          routes.MemberDetailsController.onPageLoad(srn, refineMV(1))
+          nonsipp.memberdetails.routes.MemberDetailsController.onPageLoad(srn, refineMV(1))
         } else {
-          routes.UnauthorisedController.onPageLoad()
+          controllers.routes.UnauthorisedController.onPageLoad()
         }
 
     case MemberDetailsPage(srn, index) =>
-      _ => routes.DoesSchemeMemberHaveNINOController.onPageLoad(srn, index, NormalMode)
+      _ => nonsipp.memberdetails.routes.DoesSchemeMemberHaveNINOController.onPageLoad(srn, index, NormalMode)
     case page @ DoesMemberHaveNinoPage(srn, index) => {
-      case ua if ua.get(page).contains(true) => routes.MemberDetailsNinoController.onPageLoad(srn, index, NormalMode)
-      case _ => routes.NoNINOController.onPageLoad(srn, index, NormalMode)
+      case ua if ua.get(page).contains(true) =>
+        nonsipp.memberdetails.routes.MemberDetailsNinoController.onPageLoad(srn, index, NormalMode)
+      case _ => nonsipp.memberdetails.routes.NoNINOController.onPageLoad(srn, index, NormalMode)
     }
     case MemberDetailsNinoPage(srn, index) =>
-      _ => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, CheckOrChange.Check)
-    case SchemeMemberDetailsAnswersPage(srn) => _ => routes.SchemeMembersListController.onPageLoad(srn, page = 1)
-    case PsaDeclarationPage(srn) => _ => routes.UnauthorisedController.onPageLoad()
-    case PspDeclarationPage(srn) => _ => routes.UnauthorisedController.onPageLoad()
+      _ => nonsipp.memberdetails.routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, CheckOrChange.Check)
+    case SchemeMemberDetailsAnswersPage(srn) =>
+      _ => nonsipp.memberdetails.routes.SchemeMembersListController.onPageLoad(srn, page = 1)
+    case PsaDeclarationPage(srn) => _ => controllers.routes.UnauthorisedController.onPageLoad()
+    case PspDeclarationPage(srn) => _ => controllers.routes.UnauthorisedController.onPageLoad()
 
     case page @ HowManyMembersPage(srn, PsaId(_)) => {
-      case ua if ua.get(page).exists(_.total > 99) => routes.PsaDeclarationController.onPageLoad(srn)
+      case ua if ua.get(page).exists(_.total > 99) =>
+        nonsipp.declaration.routes.PsaDeclarationController.onPageLoad(srn)
       case _ => routes.HowMuchCashController.onPageLoad(srn, NormalMode)
     }
 
     case page @ ActiveBankAccountPage(srn) => {
       case ua if ua.get(page).contains(true) =>
         routes.HowManyMembersController.onPageLoad(srn, NormalMode)
-      case _ => routes.WhyNoBankAccountController.onPageLoad(srn, NormalMode)
+      case _ => nonsipp.bankaccount.routes.WhyNoBankAccountController.onPageLoad(srn, NormalMode)
     }
     case page @ HowManyMembersPage(srn, PspId(_)) => {
-      case ua if ua.get(page).exists(_.total > 99) => routes.PspDeclarationController.onPageLoad(srn)
+      case ua if ua.get(page).exists(_.total > 99) =>
+        nonsipp.declaration.routes.PspDeclarationController.onPageLoad(srn)
       case _ => routes.HowMuchCashController.onPageLoad(srn, NormalMode)
     }
 
     case NoNINOPage(srn, index) =>
-      _ => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, CheckOrChange.Check)
-    case SchemeMembersListPage(srn, false) => _ => routes.EmployerContributionsController.onPageLoad(srn, NormalMode)
+      _ => nonsipp.memberdetails.routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, CheckOrChange.Check)
+    case SchemeMembersListPage(srn, false) =>
+      _ => nonsipp.employercontributions.routes.EmployerContributionsController.onPageLoad(srn, NormalMode)
 
     case page @ EmployerContributionsPage(_) => {
       case ua if ua.get(page).contains(true) =>
-        routes.UnauthorisedController.onPageLoad()
-      case _ => routes.UnauthorisedController.onPageLoad()
+        controllers.routes.UnauthorisedController.onPageLoad()
+      case _ => controllers.routes.UnauthorisedController.onPageLoad()
     }
     case SchemeMembersListPage(srn, true) =>
       ua =>
         refineV[OneTo99](ua.membersDetails(srn).length + 1).fold(
-          _ => routes.JourneyRecoveryController.onPageLoad(),
-          index => routes.MemberDetailsController.onPageLoad(srn, index)
+          _ => controllers.routes.JourneyRecoveryController.onPageLoad(),
+          index => nonsipp.memberdetails.routes.MemberDetailsController.onPageLoad(srn, index)
         )
     case page @ PersonalContributionsPage(srn) => {
-      case ua if ua.get(page).contains(true) => routes.UnauthorisedController.onPageLoad()
-      case _ => routes.UnauthorisedController.onPageLoad()
+      case ua if ua.get(page).contains(true) => controllers.routes.UnauthorisedController.onPageLoad()
+      case _ => controllers.routes.UnauthorisedController.onPageLoad()
     }
 
     case page @ DidSchemeReceiveTransferPage(srn) => {
-      case ua if ua.get(page).contains(true) => routes.UnauthorisedController.onPageLoad()
-      case _ => routes.UnauthorisedController.onPageLoad()
+      case ua if ua.get(page).contains(true) => controllers.routes.UnauthorisedController.onPageLoad()
+      case _ => controllers.routes.UnauthorisedController.onPageLoad()
     }
 
     case page @ SchemeTransferOutPage(srn) => {
-      case ua if ua.get(page).contains(true) => routes.UnauthorisedController.onPageLoad()
-      case _ => routes.UnauthorisedController.onPageLoad()
+      case ua if ua.get(page).contains(true) => controllers.routes.UnauthorisedController.onPageLoad()
+      case _ => controllers.routes.UnauthorisedController.onPageLoad()
     }
 
     case WhyNoBankAccountPage(srn) => _ => routes.HowManyMembersController.onPageLoad(srn, NormalMode)
 
-    case _ => _ => routes.IndexController.onPageLoad()
+    case _ => _ => controllers.routes.IndexController.onPageLoad()
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
-    case CheckReturnDatesPage(srn) => _ => routes.UnauthorisedController.onPageLoad()
+    case CheckReturnDatesPage(srn) => _ => controllers.routes.UnauthorisedController.onPageLoad()
 
     case page @ HowManyMembersPage(srn, _) => {
-      case _ => routes.UnauthorisedController.onPageLoad()
+      case _ => controllers.routes.UnauthorisedController.onPageLoad()
     }
 
-    case NoNINOPage(srn, _) => _ => routes.UnauthorisedController.onPageLoad()
+    case NoNINOPage(srn, _) => _ => controllers.routes.UnauthorisedController.onPageLoad()
 
     case page @ PersonalContributionsPage(srn) => {
-      case ua if ua.get(page).contains(true) => routes.UnauthorisedController.onPageLoad()
-      case _ => routes.UnauthorisedController.onPageLoad()
+      case ua if ua.get(page).contains(true) => controllers.routes.UnauthorisedController.onPageLoad()
+      case _ => controllers.routes.UnauthorisedController.onPageLoad()
     }
 
     case page @ DidSchemeReceiveTransferPage(srn) => {
-      case ua if ua.get(page).contains(true) => routes.UnauthorisedController.onPageLoad()
-      case _ => routes.UnauthorisedController.onPageLoad()
+      case ua if ua.get(page).contains(true) => controllers.routes.UnauthorisedController.onPageLoad()
+      case _ => controllers.routes.UnauthorisedController.onPageLoad()
     }
 
     case page @ SchemeTransferOutPage(srn) => {
-      case ua if ua.get(page).contains(true) => routes.UnauthorisedController.onPageLoad()
-      case _ => routes.UnauthorisedController.onPageLoad()
+      case ua if ua.get(page).contains(true) => controllers.routes.UnauthorisedController.onPageLoad()
+      case _ => controllers.routes.UnauthorisedController.onPageLoad()
     }
 
     case WhyNoBankAccountPage(srn) => _ => routes.HowManyMembersController.onPageLoad(srn, CheckMode)
 
-    case _ => _ => routes.IndexController.onPageLoad()
+    case _ => _ => controllers.routes.IndexController.onPageLoad()
   }
 
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = mode match {

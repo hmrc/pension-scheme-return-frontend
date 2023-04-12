@@ -16,7 +16,8 @@
 
 package navigation
 
-import controllers.routes
+import controllers.nonsipp
+import controllers.nonsipp.routes
 import eu.timepit.refined._
 import models._
 import org.scalacheck.Gen
@@ -37,7 +38,7 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
       "in Normal mode" in {
 
         case object UnknownPage extends Page
-        navigator.nextPage(UnknownPage, NormalMode, userAnswers) mustBe routes.IndexController.onPageLoad()
+        navigator.nextPage(UnknownPage, NormalMode, userAnswers) mustBe controllers.routes.IndexController.onPageLoad()
       }
     }
 
@@ -63,7 +64,7 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
           forAll(srnGen) { srn =>
             val ua = userAnswers.set(CheckReturnDatesPage(srn), true).get
             navigator.nextPage(CheckReturnDatesPage(srn), NormalMode, ua) mustBe
-              routes.ActiveBankAccountController.onPageLoad(srn, NormalMode)
+              nonsipp.bankaccount.routes.ActiveBankAccountController.onPageLoad(srn, NormalMode)
           }
         }
       }
@@ -72,7 +73,7 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
         forAll(srnGen) { srn =>
           val ua = userAnswers.set(CheckReturnDatesPage(srn), false).get
           navigator.nextPage(CheckReturnDatesPage(srn), NormalMode, ua) mustBe
-            routes.AccountingPeriodController.onPageLoad(srn, refineMV(1), NormalMode)
+            nonsipp.accountingperiod.routes.AccountingPeriodController.onPageLoad(srn, refineMV(1), NormalMode)
         }
       }
     }
@@ -93,7 +94,7 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
         forAll(srnGen) { srn =>
           val ua = userAnswers.set(ActiveBankAccountPage(srn), false).get
           navigator.nextPage(ActiveBankAccountPage(srn), NormalMode, ua) mustBe
-            routes.WhyNoBankAccountController.onPageLoad(srn, NormalMode)
+            nonsipp.bankaccount.routes.WhyNoBankAccountController.onPageLoad(srn, NormalMode)
         }
       }
     }
@@ -111,7 +112,7 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
       forAll(srnGen) { srn =>
         val page = AccountingPeriodPage(srn, refineMV(1))
         navigator.nextPage(page, NormalMode, userAnswers) mustBe
-          routes.AccountingPeriodCheckYourAnswersController.onPageLoad(srn, refineMV(1))
+          nonsipp.accountingperiod.routes.AccountingPeriodCheckYourAnswersController.onPageLoad(srn, refineMV(1))
       }
     }
 
@@ -120,7 +121,7 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
       forAll(srnGen) { srn =>
         val page = AccountingPeriodCheckYourAnswersPage(srn)
         navigator.nextPage(page, NormalMode, userAnswers) mustBe
-          routes.AccountingPeriodListController.onPageLoad(srn, NormalMode)
+          nonsipp.accountingperiod.routes.AccountingPeriodListController.onPageLoad(srn, NormalMode)
       }
     }
 
@@ -132,7 +133,7 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
           val answers = userAnswers.set(AccountingPeriodPage(srn, refineMV(1)), dateRangeGen.sample.value).get
           val page = AccountingPeriodListPage(srn, addPeriod = true)
           navigator.nextPage(page, NormalMode, answers) mustBe
-            routes.AccountingPeriodController.onPageLoad(srn, refineMV(2), NormalMode)
+            nonsipp.accountingperiod.routes.AccountingPeriodController.onPageLoad(srn, refineMV(2), NormalMode)
         }
       }
 
@@ -145,7 +146,7 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
           val page = AccountingPeriodListPage(srn, addPeriod = true)
           navigator.nextPage(page, NormalMode, answers) mustBe
-            routes.AccountingPeriodController.onPageLoad(srn, refineMV(3), NormalMode)
+            nonsipp.accountingperiod.routes.AccountingPeriodController.onPageLoad(srn, refineMV(3), NormalMode)
         }
       }
     }
@@ -181,7 +182,7 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
       forAll(srnGen) { srn =>
         val page = RemoveAccountingPeriodPage(srn)
         navigator.nextPage(page, NormalMode, userAnswers) mustBe
-          routes.AccountingPeriodListController.onPageLoad(srn, NormalMode)
+          nonsipp.accountingperiod.routes.AccountingPeriodListController.onPageLoad(srn, NormalMode)
       }
     }
 
@@ -190,7 +191,7 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
       forAll(srnGen) { srn =>
         val page = RemoveMemberDetailsPage(srn)
         navigator.nextPage(page, NormalMode, userAnswers) mustBe
-          routes.SchemeMembersListController.onPageLoad(srn, page = 1)
+          nonsipp.memberdetails.routes.SchemeMembersListController.onPageLoad(srn, page = 1)
       }
     }
 
@@ -199,7 +200,8 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
       forAll(srnGen) { srn =>
         val page = PensionSchemeMembersPage(srn)
         val answers = userAnswers.unsafeSet(page, ManualOrUpload.Manual)
-        navigator.nextPage(page, NormalMode, answers) mustBe routes.MemberDetailsController.onPageLoad(srn, refineMV(1))
+        navigator.nextPage(page, NormalMode, answers) mustBe nonsipp.memberdetails.routes.MemberDetailsController
+          .onPageLoad(srn, refineMV(1))
       }
     }
 
@@ -207,7 +209,7 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
       forAll(srnGen) { srn =>
         val page = PensionSchemeMembersPage(srn)
         val answers = userAnswers.unsafeSet(page, ManualOrUpload.Upload)
-        navigator.nextPage(page, NormalMode, answers) mustBe routes.UnauthorisedController.onPageLoad()
+        navigator.nextPage(page, NormalMode, answers) mustBe controllers.routes.UnauthorisedController.onPageLoad()
       }
     }
 
@@ -215,7 +217,7 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
       forAll(srnGen) { srn =>
         val page = EmployerContributionsPage(srn)
-        navigator.nextPage(page, NormalMode, userAnswers) mustBe routes.UnauthorisedController
+        navigator.nextPage(page, NormalMode, userAnswers) mustBe controllers.routes.UnauthorisedController
           .onPageLoad()
       }
     }
@@ -234,7 +236,8 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
       forAll(srnGen) { srn =>
         val page = ValueOfAssetsPage(srn)
-        navigator.nextPage(page, NormalMode, userAnswers) mustBe routes.PensionSchemeMembersController.onPageLoad(srn)
+        navigator.nextPage(page, NormalMode, userAnswers) mustBe nonsipp.memberdetails.routes.PensionSchemeMembersController
+          .onPageLoad(srn)
       }
     }
 
@@ -242,7 +245,7 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
       forAll(srnGen) { srn =>
         val page = PsaDeclarationPage(srn)
-        navigator.nextPage(page, NormalMode, userAnswers) mustBe routes.UnauthorisedController.onPageLoad()
+        navigator.nextPage(page, NormalMode, userAnswers) mustBe controllers.routes.UnauthorisedController.onPageLoad()
       }
     }
 
@@ -250,7 +253,7 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
       forAll(srnGen) { srn =>
         val page = PspDeclarationPage(srn)
-        navigator.nextPage(page, NormalMode, userAnswers) mustBe routes.UnauthorisedController.onPageLoad()
+        navigator.nextPage(page, NormalMode, userAnswers) mustBe controllers.routes.UnauthorisedController.onPageLoad()
 
       }
     }
@@ -259,11 +262,12 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
       forAll(srnGen) { srn =>
         val page = MemberDetailsPage(srn, refineMV(1))
-        navigator.nextPage(page, NormalMode, userAnswers) mustBe routes.DoesSchemeMemberHaveNINOController.onPageLoad(
-          srn,
-          refineMV(1),
-          NormalMode
-        )
+        navigator.nextPage(page, NormalMode, userAnswers) mustBe nonsipp.memberdetails.routes.DoesSchemeMemberHaveNINOController
+          .onPageLoad(
+            srn,
+            refineMV(1),
+            NormalMode
+          )
       }
     }
 
@@ -271,11 +275,12 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
       forAll(srnGen) { srn =>
         val page = MemberDetailsNinoPage(srn, refineMV(1))
-        navigator.nextPage(page, NormalMode, userAnswers) mustBe routes.SchemeMemberDetailsAnswersController.onPageLoad(
-          srn,
-          refineMV(1),
-          CheckOrChange.Check
-        )
+        navigator.nextPage(page, NormalMode, userAnswers) mustBe nonsipp.memberdetails.routes.SchemeMemberDetailsAnswersController
+          .onPageLoad(
+            srn,
+            refineMV(1),
+            CheckOrChange.Check
+          )
       }
     }
 
@@ -302,7 +307,7 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
           val ua = userAnswers.unsafeSet(page, SchemeMemberNumbers(50, 30, 20))
 
           navigator.nextPage(page, NormalMode, ua) mustBe
-            routes.PsaDeclarationController.onPageLoad(srn)
+            nonsipp.declaration.routes.PsaDeclarationController.onPageLoad(srn)
         }
       }
 
@@ -313,7 +318,7 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
           val ua = userAnswers.unsafeSet(page, SchemeMemberNumbers(50, 30, 20))
 
           navigator.nextPage(page, NormalMode, ua) mustBe
-            routes.PspDeclarationController.onPageLoad(srn)
+            nonsipp.declaration.routes.PspDeclarationController.onPageLoad(srn)
         }
       }
     }
@@ -325,7 +330,7 @@ class NavigatorSpec extends BaseSpec with ScalaCheckPropertyChecks {
         val ua = userAnswers.unsafeSet(page, answer)
 
         navigator.nextPage(page, NormalMode, ua) mustBe
-          routes.UnauthorisedController.onPageLoad()
+          controllers.routes.UnauthorisedController.onPageLoad()
 
       }
     }

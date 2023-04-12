@@ -18,8 +18,8 @@ package controllers.testonly
 
 import cats.implicits._
 import config.Refined.{Max99, OneTo99}
-import controllers.DoesSchemeMemberHaveNINOController
 import controllers.actions.{DataRetrievalAction, IdentifyAndRequireData}
+import controllers.nonsipp.memberdetails.DoesSchemeMemberHaveNINOController
 import controllers.testonly.MongoController.buildRandomNameDOB
 import eu.timepit.refined._
 import eu.timepit.refined.api.Refined
