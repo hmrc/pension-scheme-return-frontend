@@ -16,7 +16,7 @@
 
 package navigation.nonsipp
 
-import controllers.routes
+import controllers.nonsipp.receivetransfer
 import navigation.{Navigator, NavigatorBehaviours}
 import pages.nonsipp.personalcontributions.PersonalContributionsPage
 import utils.BaseSpec
@@ -31,9 +31,9 @@ class PersonalContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
       normalmode
         .navigateTo(
           PersonalContributionsPage,
-          (_, _) => routes.UnauthorisedController.onPageLoad()
+          receivetransfer.routes.DidSchemeReceiveTransferController.onPageLoad
         )
-        .withName("go from personal contributions page to unauthorised")
+        .withName("go from personal contributions page to receive transfer page")
     )
   }
 }

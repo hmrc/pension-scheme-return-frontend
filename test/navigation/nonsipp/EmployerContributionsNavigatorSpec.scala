@@ -17,7 +17,9 @@
 package navigation.nonsipp
 
 import controllers.routes
+import controllers.nonsipp.personalcontributions
 import navigation.{Navigator, NavigatorBehaviours}
+import org.scalacheck.Gen
 import pages.nonsipp.employercontributions.EmployerContributionsPage
 import utils.BaseSpec
 
@@ -29,11 +31,22 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
 
     act.like(
       normalmode
-        .navigateTo(
+        .navigateToWithData(
           EmployerContributionsPage,
+          Gen.const(true),
           (_, _) => routes.UnauthorisedController.onPageLoad()
         )
-        .withName("go from employer contribution page to unauthorised")
+        .withName("go from employer contribution page to unauthorised when yes selected")
+    )
+
+    act.like(
+      normalmode
+        .navigateToWithData(
+          EmployerContributionsPage,
+          Gen.const(false),
+          personalcontributions.routes.PersonalContributionsController.onPageLoad
+        )
+        .withName("go from employer contribution page to personal contributions when no selected")
     )
 
   }
