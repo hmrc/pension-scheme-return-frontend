@@ -47,7 +47,7 @@ class StartPageControllerSpec extends ControllerBaseSpec {
       val fakeNavigatorApplication =
         applicationBuilder()
           .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
+            bind[Navigator].qualifiedWith("root").toInstance(new FakeNavigator(onwardRoute))
           )
 
       running(_ => fakeNavigatorApplication) { app =>

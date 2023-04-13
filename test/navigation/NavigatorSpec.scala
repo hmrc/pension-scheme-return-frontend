@@ -22,21 +22,32 @@ import utils.BaseSpec
 
 class NavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
-  val navigator = new Navigator
+  val navigator = new RootNavigator
 
   "Navigator" - {
-    case object UnknownPage extends Page
 
-    act.like(
-      normalmode
-        .navigateTo(_ => UnknownPage, (_, _) => controllers.routes.IndexController.onPageLoad())
-        .withName("redirect any unknown pages to index page")
-    )
+    "NormalMode" - {
 
-    act.like(
-      normalmode
-        .navigateTo(StartPage, routes.WhichTaxYearController.onPageLoad)
-        .withName("go from start page to which tax year page")
-    )
+      act.like(
+        normalmode
+          .navigateTo(_ => UnknownPage, (_, _) => controllers.routes.IndexController.onPageLoad())
+          .withName("redirect any unknown pages to index page")
+      )
+
+      act.like(
+        normalmode
+          .navigateTo(StartPage, routes.WhichTaxYearController.onPageLoad)
+          .withName("go from start page to which tax year page")
+      )
+    }
+
+    "CheckMode" - {
+
+      act.like(
+        normalmode
+          .navigateTo(_ => UnknownPage, (_, _) => controllers.routes.IndexController.onPageLoad())
+          .withName("redirect any unknown pages to index page")
+      )
+    }
   }
 }

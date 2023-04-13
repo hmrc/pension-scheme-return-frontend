@@ -18,36 +18,45 @@ package navigation
 
 import controllers.nonsipp.routes
 import models._
-import navigation.nonsipp.NonSippNavigator
 import pages._
 import play.api.mvc.Call
 
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class Navigator @Inject()() {
+class RootNavigator @Inject()() extends Navigator {
 
-  val journeyNavigators: List[JourneyNavigator] =
-    new JourneyNavigator {
+  val journeys: List[JourneyNavigator] =
+    List(new JourneyNavigator {
       override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = _ => {
         case StartPage(srn) => routes.WhichTaxYearController.onPageLoad(srn, NormalMode)
       }
 
       override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty
-    } :: NonSippNavigator.journeyNavigators
+    })
+
+  override def defaultNormalMode: Call = controllers.routes.IndexController.onPageLoad()
+
+  override def defaultCheckMode: Call = controllers.routes.IndexController.onPageLoad()
+}
+
+trait Navigator {
+  def journeys: List[JourneyNavigator]
+  def defaultNormalMode: Call
+  def defaultCheckMode: Call
 
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = mode match {
 
     case NormalMode =>
-      journeyNavigators
+      journeys
         .foldLeft(PartialFunction.empty[Page, Call])((acc, curr) => acc.orElse(curr.normalRoutes(userAnswers)))
         .lift(page)
-        .getOrElse(controllers.routes.IndexController.onPageLoad())
+        .getOrElse(defaultNormalMode)
 
     case CheckMode =>
-      journeyNavigators
+      journeys
         .foldLeft(PartialFunction.empty[Page, Call])((acc, curr) => acc.orElse(curr.checkRoutes(userAnswers)))
         .lift(page)
-        .getOrElse(controllers.routes.IndexController.onPageLoad())
+        .getOrElse(defaultCheckMode)
   }
 }

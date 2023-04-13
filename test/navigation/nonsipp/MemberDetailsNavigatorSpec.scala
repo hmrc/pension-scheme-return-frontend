@@ -31,7 +31,7 @@ import utils.BaseSpec
 
 class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
-  val navigator: Navigator = new Navigator
+  val navigator: Navigator = new NonSippNavigator
 
   "MemberDetailsNavigator" - {
 

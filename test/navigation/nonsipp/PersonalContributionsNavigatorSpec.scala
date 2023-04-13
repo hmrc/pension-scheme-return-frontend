@@ -23,7 +23,7 @@ import utils.BaseSpec
 
 class PersonalContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
-  val navigator: Navigator = new Navigator
+  val navigator: Navigator = new NonSippNavigator
 
   "PersonalContributionsNavigator" - {
 

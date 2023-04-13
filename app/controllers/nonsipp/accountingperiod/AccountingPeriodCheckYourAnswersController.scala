@@ -32,9 +32,11 @@ import utils.DateTimeUtils.localDateShow
 import viewmodels.models.{CheckYourAnswersRowViewModel, CheckYourAnswersViewModel, SummaryAction}
 import views.html.CheckYourAnswersView
 
+import javax.inject.Named
+
 class AccountingPeriodCheckYourAnswersController @Inject()(
   override val messagesApi: MessagesApi,
-  navigator: Navigator,
+  @Named("non-sipp") navigator: Navigator,
   identify: IdentifierAction,
   allowAccess: AllowAccessActionProvider,
   getData: DataRetrievalAction,

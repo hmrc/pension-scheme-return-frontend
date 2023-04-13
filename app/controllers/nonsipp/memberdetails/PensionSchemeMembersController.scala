@@ -51,12 +51,12 @@ import viewmodels.implicits._
 import viewmodels.models.{RadioListRowViewModel, RadioListViewModel}
 import views.html.RadioListView
 
-import javax.inject.Inject
+import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
 class PensionSchemeMembersController @Inject()(
   override val messagesApi: MessagesApi,
-  navigator: Navigator,
+  @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   formProvider: RadioListFormProvider,
   saveService: SaveService,

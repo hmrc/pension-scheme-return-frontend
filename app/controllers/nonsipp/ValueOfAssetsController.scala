@@ -40,11 +40,12 @@ import viewmodels.models.MultipleQuestionsViewModel.DoubleQuestion
 import viewmodels.models.{Field, MoneyViewModel}
 import views.html.MoneyView
 
+import javax.inject.Named
 import scala.concurrent.{ExecutionContext, Future}
 
 class ValueOfAssetsController @Inject()(
   override val messagesApi: MessagesApi,
-  navigator: Navigator,
+  @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   view: MoneyView,

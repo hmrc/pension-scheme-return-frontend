@@ -39,9 +39,11 @@ import viewmodels.implicits._
 import viewmodels.models.{ListRow, ListViewModel, PaginatedViewModel}
 import views.html.ListView
 
+import javax.inject.Named
+
 class SchemeMembersListController @Inject()(
   override val messagesApi: MessagesApi,
-  navigator: Navigator,
+  @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   view: ListView,

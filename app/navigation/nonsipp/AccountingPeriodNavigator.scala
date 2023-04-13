@@ -56,5 +56,5 @@ object AccountingPeriodNavigator extends JourneyNavigator {
       routes.AccountingPeriodListController.onPageLoad(srn, NormalMode)
   }
 
-  val checkRoutes: UserAnswers => PartialFunction[Page, Call] = PartialFunction.empty
+  val checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty
 }

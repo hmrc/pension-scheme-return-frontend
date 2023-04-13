@@ -32,7 +32,7 @@ import utils.BaseSpec
 
 class AccountingPeriodNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
-  val navigator: Navigator = new Navigator
+  val navigator: Navigator = new NonSippNavigator
 
   "AccountPeriodNavigator" - {
 

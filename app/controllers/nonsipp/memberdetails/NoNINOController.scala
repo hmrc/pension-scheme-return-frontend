@@ -34,13 +34,13 @@ import viewmodels.implicits._
 import viewmodels.models.TextAreaViewModel
 import views.html.TextAreaView
 
-import javax.inject.Inject
+import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
 class NoNINOController @Inject()(
   override val messagesApi: MessagesApi,
   saveService: SaveService,
-  navigator: Navigator,
+  @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   formProvider: TextFormProvider,
   val controllerComponents: MessagesControllerComponents,

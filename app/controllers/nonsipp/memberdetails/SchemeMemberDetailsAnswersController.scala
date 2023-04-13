@@ -25,13 +25,7 @@ import models.SchemeId.Srn
 import models.{CheckOrChange, Mode, NameDOB, NormalMode}
 import navigation.Navigator
 import pages._
-import pages.nonsipp.memberdetails.{
-  DoesMemberHaveNinoPage,
-  MemberDetailsNinoPage,
-  MemberDetailsPage,
-  NoNINOPage,
-  SchemeMemberDetailsAnswersPage
-}
+import pages.nonsipp.memberdetails._
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.domain.Nino
@@ -43,9 +37,11 @@ import viewmodels.implicits._
 import viewmodels.models._
 import views.html.CheckYourAnswersView
 
+import javax.inject.Named
+
 class SchemeMemberDetailsAnswersController @Inject()(
   override val messagesApi: MessagesApi,
-  navigator: Navigator,
+  @Named("non-sipp") navigator: Navigator,
   identify: IdentifierAction,
   allowAccess: AllowAccessActionProvider,
   getData: DataRetrievalAction,

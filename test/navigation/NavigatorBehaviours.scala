@@ -48,7 +48,7 @@ trait NavigatorBehaviours extends ScalaCheckPropertyChecks with EitherValues { s
     protected def navigateToWithData[A: Writes](
       mode: Mode
     )(page: Srn => QuestionPage[A], data: Gen[A], nextPage: (Srn, Mode) => Call): BehaviourTest =
-      s"go from page to nextPage with data data".hasBehaviour {
+      s"go from page to nextPage with data".hasBehaviour {
         forAll(srnGen, data) { (srn, data) =>
           val userAnswers = UserAnswers("id").unsafeSet(page(srn), data)
           navigator.nextPage(page(srn), mode, userAnswers) mustBe nextPage(srn, mode)

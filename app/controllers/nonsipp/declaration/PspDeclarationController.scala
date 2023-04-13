@@ -29,11 +29,11 @@ import viewmodels.implicits._
 import viewmodels.models.ContentPageViewModel
 import views.html.ContentPageView
 
-import javax.inject.Inject
+import javax.inject.{Inject, Named}
 
 class PspDeclarationController @Inject()(
   override val messagesApi: MessagesApi,
-  navigator: Navigator,
+  @Named("non-sipp") navigator: Navigator,
   identify: IdentifierAction,
   allowAccess: AllowAccessActionProvider,
   getData: DataRetrievalAction,

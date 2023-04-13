@@ -27,11 +27,11 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.models.ContentPageViewModel
 import views.html.ContentPageView
 
-import javax.inject.Inject
+import javax.inject.{Inject, Named}
 
 class StartPageController @Inject()(
   override val messagesApi: MessagesApi,
-  navigator: Navigator,
+  @Named("root") navigator: Navigator,
   identify: IdentifierAction,
   allowAccess: AllowAccessActionProvider,
   getData: DataRetrievalAction,
