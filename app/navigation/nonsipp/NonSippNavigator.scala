@@ -78,7 +78,8 @@ class NonSippNavigator @Inject()() extends Navigator {
       nonSippNavigator,
       PersonalContributionsNavigator,
       ReceiveTransferNavigator,
-      TransferOutNavigator
+      TransferOutNavigator,
+      PensionCommencementLumpSumNavigator
     )
 
   override val defaultNormalMode: Call = controllers.routes.IndexController.onPageLoad()
