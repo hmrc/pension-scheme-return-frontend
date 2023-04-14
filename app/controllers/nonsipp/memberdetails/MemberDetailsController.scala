@@ -35,12 +35,12 @@ import viewmodels.DisplayMessage.Message
 import viewmodels.models.NameDOBViewModel
 import views.html.NameDOBView
 
-import javax.inject.Inject
+import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
 class MemberDetailsController @Inject()(
   override val messagesApi: MessagesApi,
-  navigator: Navigator,
+  @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   saveService: SaveService,
   formProvider: NameDOBFormProvider,

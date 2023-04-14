@@ -36,13 +36,13 @@ import viewmodels.implicits._
 import viewmodels.models.YesNoPageViewModel
 import views.html.YesNoPageView
 
-import javax.inject.Inject
+import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
 class DoesSchemeMemberHaveNINOController @Inject()(
   override val messagesApi: MessagesApi,
   saveService: SaveService,
-  navigator: Navigator,
+  @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   formProvider: YesNoPageFormProvider,
   val controllerComponents: MessagesControllerComponents,

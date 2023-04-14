@@ -17,7 +17,8 @@
 package navigation.nonsipp
 
 import controllers.routes
-import models.UserAnswers
+import controllers.nonsipp.personalcontributions
+import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.employercontributions.EmployerContributionsPage
@@ -26,11 +27,11 @@ import play.api.mvc.Call
 object EmployerContributionsNavigator extends JourneyNavigator {
 
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
-    case page @ EmployerContributionsPage(_) =>
+    case page @ EmployerContributionsPage(srn) =>
       if (userAnswers.get(page).contains(true)) {
         routes.UnauthorisedController.onPageLoad()
       } else {
-        routes.UnauthorisedController.onPageLoad()
+        personalcontributions.routes.PersonalContributionsController.onPageLoad(srn, NormalMode)
       }
   }
 

@@ -35,13 +35,13 @@ import viewmodels.models.YesNoPageViewModel
 import views.html.YesNoPageView
 
 import java.time.LocalDate
-import javax.inject.Inject
+import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
 class CheckReturnDatesController @Inject()(
   override val messagesApi: MessagesApi,
   saveService: SaveService,
-  navigator: Navigator,
+  @Named("non-sipp") navigator: Navigator,
   identify: IdentifierAction,
   allowAccess: AllowAccessActionProvider,
   getData: DataRetrievalAction,

@@ -211,7 +211,7 @@ class CheckReturnDatesControllerSpec extends ControllerBaseSpec with ScalaCheckP
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[Navigator].qualifiedWith("non-sipp").toInstance(new FakeNavigator(onwardRoute)),
             bind[SaveService].toInstance(mockSaveService)
           )
           .build()

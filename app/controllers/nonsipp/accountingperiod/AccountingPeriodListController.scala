@@ -37,9 +37,11 @@ import viewmodels.implicits._
 import viewmodels.models.{ListRow, ListViewModel}
 import views.html.ListView
 
+import javax.inject.Named
+
 class AccountingPeriodListController @Inject()(
   override val messagesApi: MessagesApi,
-  navigator: Navigator,
+  @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   view: ListView,

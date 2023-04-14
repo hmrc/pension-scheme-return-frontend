@@ -17,7 +17,10 @@
 package config
 
 import com.google.inject.AbstractModule
+import com.google.inject.name.Names
 import controllers.actions._
+import navigation.{Navigator, RootNavigator}
+import navigation.nonsipp.NonSippNavigator
 
 import java.time.{Clock, ZoneOffset}
 
@@ -29,5 +32,7 @@ class Module extends AbstractModule {
     bind(classOf[DataRequiredAction]).to(classOf[DataRequiredActionImpl]).asEagerSingleton()
     bind(classOf[DataCreationAction]).to(classOf[DataCreationActionImpl]).asEagerSingleton()
     bind(classOf[Clock]).toInstance(Clock.systemDefaultZone.withZone(ZoneOffset.UTC))
+    bind(classOf[Navigator]).annotatedWith(Names.named("root")).to(classOf[RootNavigator]).asEagerSingleton()
+    bind(classOf[Navigator]).annotatedWith(Names.named("non-sipp")).to(classOf[NonSippNavigator]).asEagerSingleton()
   }
 }

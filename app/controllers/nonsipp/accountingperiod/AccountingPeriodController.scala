@@ -38,11 +38,12 @@ import utils.RefinedUtils.RefinedIntOps
 import viewmodels.models.DateRangeViewModel
 import views.html.DateRangeView
 
+import javax.inject.Named
 import scala.concurrent.{ExecutionContext, Future}
 
 class AccountingPeriodController @Inject()(
   override val messagesApi: MessagesApi,
-  navigator: Navigator,
+  @Named("non-sipp") navigator: Navigator,
   identify: IdentifierAction,
   allowAccess: AllowAccessActionProvider,
   getData: DataRetrievalAction,

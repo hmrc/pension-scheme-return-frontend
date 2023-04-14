@@ -17,8 +17,8 @@
 package navigation.nonsipp
 
 import config.Refined.OneToThree
-import controllers.nonsipp
 import controllers.nonsipp.accountingperiod.routes
+import controllers.nonsipp.bankaccount
 import eu.timepit.refined.refineMV
 import generators.IndexGen
 import navigation.{Navigator, NavigatorBehaviours}
@@ -32,7 +32,7 @@ import utils.BaseSpec
 
 class AccountingPeriodNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
-  val navigator: Navigator = new Navigator
+  val navigator: Navigator = new NonSippNavigator
 
   "AccountPeriodNavigator" - {
 
@@ -62,7 +62,7 @@ class AccountingPeriodNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           dateRangeGen,
           IndexGen[OneToThree](1, 3),
           routes.AccountingPeriodController.onPageLoad,
-          nonsipp.routes.HowManyMembersController.onPageLoad
+          bankaccount.routes.ActiveBankAccountController.onPageLoad
         )
         .withName("go from list page")
     )
@@ -71,9 +71,9 @@ class AccountingPeriodNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       normalmode
         .navigateTo(
           AccountingPeriodListPage(_, addPeriod = false),
-          nonsipp.routes.HowManyMembersController.onPageLoad
+          bankaccount.routes.ActiveBankAccountController.onPageLoad
         )
-        .withName("go from list page to how many members when no selected")
+        .withName("go from list page to bank account page when no selected")
     )
 
     act.like(

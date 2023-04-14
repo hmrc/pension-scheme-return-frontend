@@ -43,12 +43,12 @@ object AccountingPeriodNavigator extends JourneyNavigator {
       routes.AccountingPeriodListController.onPageLoad(srn, NormalMode)
 
     case AccountingPeriodListPage(srn, false) =>
-      nonsipp.routes.HowManyMembersController.onPageLoad(srn, NormalMode)
+      nonsipp.bankaccount.routes.ActiveBankAccountController.onPageLoad(srn, NormalMode)
 
     case AccountingPeriodListPage(srn, true) =>
       val count = userAnswers.list(AccountingPeriods(srn)).length
       refineV[OneToThree](count + 1).fold(
-        _ => nonsipp.routes.HowManyMembersController.onPageLoad(srn, NormalMode),
+        _ => nonsipp.bankaccount.routes.ActiveBankAccountController.onPageLoad(srn, NormalMode),
         index => routes.AccountingPeriodController.onPageLoad(srn, index, NormalMode)
       )
 
@@ -56,5 +56,5 @@ object AccountingPeriodNavigator extends JourneyNavigator {
       routes.AccountingPeriodListController.onPageLoad(srn, NormalMode)
   }
 
-  val checkRoutes: UserAnswers => PartialFunction[Page, Call] = PartialFunction.empty
+  val checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty
 }

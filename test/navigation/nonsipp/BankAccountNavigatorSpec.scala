@@ -25,7 +25,7 @@ import utils.BaseSpec
 
 class BankAccountNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
-  val navigator: Navigator = new Navigator
+  val navigator: Navigator = new NonSippNavigator
 
   "BankAccountNavigator" - {
 

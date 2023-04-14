@@ -16,7 +16,8 @@
 
 package navigation.nonsipp
 
-import models.UserAnswers
+import controllers.nonsipp.receivetransfer
+import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.personalcontributions.PersonalContributionsPage
@@ -30,7 +31,7 @@ object PersonalContributionsNavigator extends JourneyNavigator {
       if (userAnswers.get(page).contains(true)) {
         controllers.routes.UnauthorisedController.onPageLoad()
       } else {
-        controllers.routes.UnauthorisedController.onPageLoad()
+        receivetransfer.routes.DidSchemeReceiveTransferController.onPageLoad(srn, NormalMode)
       }
   }
 
@@ -39,7 +40,7 @@ object PersonalContributionsNavigator extends JourneyNavigator {
       if (userAnswers.get(page).contains(true)) {
         controllers.routes.UnauthorisedController.onPageLoad()
       } else {
-        controllers.routes.UnauthorisedController.onPageLoad()
+        receivetransfer.routes.DidSchemeReceiveTransferController.onPageLoad(srn, NormalMode)
       }
   }
 }

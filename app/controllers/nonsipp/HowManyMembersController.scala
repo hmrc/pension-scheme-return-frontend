@@ -40,13 +40,13 @@ import viewmodels.models.{Field, IntViewModel}
 import views.html.IntView
 
 import java.time.LocalDate
-import javax.inject.Inject
+import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
 class HowManyMembersController @Inject()(
   override val messagesApi: MessagesApi,
   saveService: SaveService,
-  navigator: Navigator,
+  @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   formProvider: IntFormProvider,
   val controllerComponents: MessagesControllerComponents,

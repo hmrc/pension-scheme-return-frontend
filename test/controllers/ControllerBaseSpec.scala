@@ -18,7 +18,6 @@ package controllers
 
 import controllers.actions._
 import models.{Establisher, EstablisherKind, NameDOB, SchemeDetails, SchemeId, SchemeStatus, UserAnswers}
-import navigation.Navigator
 import play.api.Application
 import play.api.data.Form
 import play.api.http._
@@ -63,9 +62,6 @@ trait ControllerBaseSpec
     schemeDetails: SchemeDetails = defaultSchemeDetails
   ): GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
-      .bindings(
-        bind[Navigator].toInstance(new Navigator()).eagerly()
-      )
       .overrides(
         List[GuiceableModule](
           bind[DataRequiredAction].to[DataRequiredActionImpl],

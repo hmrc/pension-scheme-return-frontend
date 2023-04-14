@@ -21,7 +21,7 @@ import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import play.api.Application
 import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
 import play.api.libs.json.Writes
 import play.api.mvc.{Call, Request}
 import play.api.test.FakeRequest
@@ -35,6 +35,12 @@ trait ControllerBehaviours {
   _: ControllerBaseSpec =>
 
   import Behaviours._
+
+  private def navigatorBindings(onwardRoute: Call): List[GuiceableModule] =
+    List(
+      bind[Navigator].qualifiedWith("root").toInstance(new FakeNavigator(onwardRoute)),
+      bind[Navigator].qualifiedWith("non-sipp").toInstance(new FakeNavigator(onwardRoute))
+    )
 
   def renderView(call: => Call, userAnswers: UserAnswers = defaultUserAnswers)(
     view: Application => Request[_] => Html
@@ -114,7 +120,7 @@ trait ControllerBehaviours {
   def redirectNextPage(call: => Call, userAnswers: UserAnswers, form: (String, String)*): BehaviourTest =
     s"redirect to the next page with form ${form.toList}".hasBehaviour {
       val appBuilder = applicationBuilder(Some(userAnswers)).overrides(
-        bind[Navigator].toInstance(new FakeNavigator(testOnwardRoute))
+        navigatorBindings(testOnwardRoute): _*
       )
 
       running(_ => appBuilder) { app =>
@@ -155,8 +161,10 @@ trait ControllerBehaviours {
 
       val appBuilder = applicationBuilder(Some(userAnswers))
         .overrides(
-          bind[SaveService].toInstance(saveService),
-          bind[Navigator].toInstance(new FakeNavigator(testOnwardRoute))
+          bind[SaveService].toInstance(saveService)
+        )
+        .overrides(
+          navigatorBindings(testOnwardRoute): _*
         )
 
       running(_ => appBuilder) { app =>
@@ -182,8 +190,10 @@ trait ControllerBehaviours {
 
       val appBuilder = applicationBuilder(Some(userAnswers))
         .overrides(
-          bind[SaveService].toInstance(saveService),
-          bind[Navigator].toInstance(new FakeNavigator(testOnwardRoute))
+          bind[SaveService].toInstance(saveService)
+        )
+        .overrides(
+          navigatorBindings(testOnwardRoute): _*
         )
 
       running(_ => appBuilder) { app =>
@@ -206,7 +216,7 @@ trait ControllerBehaviours {
 
       val appBuilder = applicationBuilder(Some(userAnswers))
         .overrides(
-          bind[Navigator].toInstance(new FakeNavigator(testOnwardRoute))
+          navigatorBindings(testOnwardRoute): _*
         )
 
       running(_ => appBuilder) { app =>
