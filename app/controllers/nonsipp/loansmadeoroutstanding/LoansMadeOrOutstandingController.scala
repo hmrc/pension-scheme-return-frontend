@@ -49,7 +49,7 @@ class LoansMadeOrOutstandingController @Inject()(
     with I18nSupport {
 
   private def form(memberName: String): Form[Boolean] =
-    LoansMadeOrOutstandingController.form(formProvider, memberName)
+    LoansMadeOrOutstandingController.form(formProvider)
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     val schemeName = request.schemeDetails.schemeName
@@ -71,7 +71,7 @@ class LoansMadeOrOutstandingController @Inject()(
   }
 }
 object LoansMadeOrOutstandingController {
-  def form(formProvider: YesNoPageFormProvider, memberName: String): Form[Boolean] = formProvider(
+  def form(formProvider: YesNoPageFormProvider): Form[Boolean] = formProvider(
     "loansMadeOrOutstanding.error.required"
   )
 
