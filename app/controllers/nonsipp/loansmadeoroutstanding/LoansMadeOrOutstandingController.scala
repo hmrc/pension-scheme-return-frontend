@@ -72,8 +72,7 @@ class LoansMadeOrOutstandingController @Inject()(
 }
 object LoansMadeOrOutstandingController {
   def form(formProvider: YesNoPageFormProvider, memberName: String): Form[Boolean] = formProvider(
-    "loansMadeOrOutstanding.error.required",
-    List(memberName)
+    "loansMadeOrOutstanding.error.required"
   )
 
   def viewModel(srn: Srn, memberName: String, mode: Mode): YesNoPageViewModel =
