@@ -32,13 +32,13 @@ class LoansMadeOrOutstandingControllerSpec extends ControllerBaseSpec {
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       injected[YesNoPageView].apply(
-        form(injected[YesNoPageFormProvider], defaultSchemeDetails.schemeName),
+        form(injected[YesNoPageFormProvider]),
         viewModel(srn, defaultSchemeDetails.schemeName, NormalMode)
       )
     })
 
     act.like(renderPrePopView(onPageLoad, LoansMadeOrOutstandingPage(srn), true) { implicit app => implicit request =>
-      val preparedForm = form(injected[YesNoPageFormProvider], defaultSchemeDetails.schemeName).fill(true)
+      val preparedForm = form(injected[YesNoPageFormProvider]).fill(true)
       injected[YesNoPageView].apply(preparedForm, viewModel(srn, defaultSchemeDetails.schemeName, NormalMode))
     })
 
