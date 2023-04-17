@@ -58,7 +58,7 @@ class LoansMadeOrOutstandingController @Inject()(
   }
   def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
     val schemeName = request.schemeDetails.schemeName
-    form(request.schemeDetails.schemeName)
+    form(schemeName)
       .bindFromRequest()
       .fold(
         formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, schemeName, mode)))),
