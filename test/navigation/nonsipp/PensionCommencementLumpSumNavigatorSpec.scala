@@ -35,7 +35,7 @@ class PensionCommencementLumpSumNavigatorSpec extends BaseSpec with NavigatorBeh
           Gen.const(true),
           (_, _) => routes.UnauthorisedController.onPageLoad()
         )
-        .withName("go from employer contribution page to unauthorised when yes selected")
+        .withName("go from pension commencement lump sum page to unauthorised when yes selected")
     )
 
     act.like(
