@@ -14,22 +14,21 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.bankaccount
+package controllers.nonsipp.loansmadeoroutstanding
 
-import ActiveBankAccountController._
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.bankaccount.routes
+import controllers.nonsipp.loansmadeoroutstanding.LoansMadeOrOutstandingController._
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import pages.nonsipp.bankaccount.ActiveBankAccountPage
+import pages.nonsipp.loansmadeoroutstanding.LoansMadeOrOutstandingPage
 import views.html.YesNoPageView
 
-class ActiveBankAccountControllerSpec extends ControllerBaseSpec {
+class LoansMadeOrOutstandingControllerSpec extends ControllerBaseSpec {
 
-  private lazy val onPageLoad = routes.ActiveBankAccountController.onPageLoad(srn, NormalMode)
-  private lazy val onSubmit = routes.ActiveBankAccountController.onSubmit(srn, NormalMode)
+  private lazy val onPageLoad = routes.LoansMadeOrOutstandingController.onPageLoad(srn, NormalMode)
+  private lazy val onSubmit = routes.LoansMadeOrOutstandingController.onSubmit(srn, NormalMode)
 
-  "activeBankAccountController" - {
+  "loansMadeOrOutstandingController" - {
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       injected[YesNoPageView].apply(
@@ -38,7 +37,7 @@ class ActiveBankAccountControllerSpec extends ControllerBaseSpec {
       )
     })
 
-    act.like(renderPrePopView(onPageLoad, ActiveBankAccountPage(srn), true) { implicit app => implicit request =>
+    act.like(renderPrePopView(onPageLoad, LoansMadeOrOutstandingPage(srn), true) { implicit app => implicit request =>
       val preparedForm = form(injected[YesNoPageFormProvider], defaultSchemeDetails.schemeName).fill(true)
       injected[YesNoPageView].apply(preparedForm, viewModel(srn, defaultSchemeDetails.schemeName, NormalMode))
     })
