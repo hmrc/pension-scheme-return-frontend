@@ -323,6 +323,10 @@ whyNoBankAccount.error.required = Enter the reason the scheme did not have a ban
 whyNoBankAccount.error.length = Reason the scheme did not have a bank account must be 160 characters or fewer
 whyNoBankAccount.error.invalid = Reason the scheme did not have a bank account must only include letters a to z, numbers 0 to 9, and special characters such as hyphens, spaces and apostrophes
 
+didSchemeHoldSharesInSponsoringEmployer.title = Did the scheme hold any shares in a sponsoring employer during the period of this return?
+didSchemeHoldSharesInSponsoringEmployer.heading = Did {0} hold any shares in a sponsoring employer during the period of this return?
+didSchemeHoldSharesInSponsoringEmployer.error.required = Select yes if the scheme held any shares in a sponsoring employer during the period of this return
+
 pensionCommencementLumpSum.title = Did any member receive a Pension Commencement Lump Sum (PCLS) during the period of this return?
 pensionCommencementLumpSum.heading = Did any member receive a Pension Commencement Lump Sum (PCLS) during the period of this return?
 pensionCommencementLumpSum.error.required = Select yes if any member received a Pension Commencement Lump Sum during the period of this return
@@ -330,3 +334,4 @@ pensionCommencementLumpSum.error.required = Select yes if any member received a 
 pensionPaymentsReceived.title = Did any member receive pension payments from the scheme during the period of this return?
 pensionPaymentsReceived.heading = Did any member receive pension payments from {0} during the period of this return?
 pensionPaymentsReceived.error.required = Select yes if any member received pension payments from the scheme during the period of this return
+
