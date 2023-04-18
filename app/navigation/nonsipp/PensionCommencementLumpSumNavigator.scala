@@ -16,31 +16,23 @@
 
 package navigation.nonsipp
 
-import controllers.nonsipp.pensioncommencementlumpsum
-import models.{NormalMode, UserAnswers}
+import controllers.routes
+import models.UserAnswers
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.transferout.SchemeTransferOutPage
+import pages.nonsipp.pensioncommencementlumpsum.PensionCommencementLumpSumPage
 import play.api.mvc.Call
 
-object TransferOutNavigator extends JourneyNavigator {
+object PensionCommencementLumpSumNavigator extends JourneyNavigator {
 
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
-
-    case page @ SchemeTransferOutPage(srn) =>
+    case page @ PensionCommencementLumpSumPage(srn) =>
       if (userAnswers.get(page).contains(true)) {
-        controllers.routes.UnauthorisedController.onPageLoad()
+        routes.UnauthorisedController.onPageLoad()
       } else {
-        pensioncommencementlumpsum.routes.PensionCommencementLumpSumController.onPageLoad(srn, NormalMode)
+        routes.UnauthorisedController.onPageLoad()
       }
   }
 
-  override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
-    case page @ SchemeTransferOutPage(srn) =>
-      if (userAnswers.get(page).contains(true)) {
-        controllers.routes.UnauthorisedController.onPageLoad()
-      } else {
-        pensioncommencementlumpsum.routes.PensionCommencementLumpSumController.onPageLoad(srn, NormalMode)
-      }
-  }
+  override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty
 }
