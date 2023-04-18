@@ -330,3 +330,7 @@ pensionCommencementLumpSum.error.required = Select yes if any member received a 
 moneyBorrowed.title = Did the scheme borrow any money during the period of this return?
 moneyBorrowed.heading = Did {0} borrow any money during the period of this return?
 moneyBorrowed.error.required = Select yes if the scheme borrowed any money during the period of this return
+
+pensionPaymentsReceived.title = Did any member receive pension payments from the scheme during the period of this return?
+pensionPaymentsReceived.heading = Did any member receive pension payments from {0} during the period of this return?
+pensionPaymentsReceived.error.required = Select yes if any member received pension payments from the scheme during the period of this return
