@@ -16,6 +16,7 @@
 
 package controllers.nonsipp.otherassets
 
+import config.Constants.maxMoneyValue
 import controllers.actions._
 import controllers.nonsipp.otherassets.FeesCommissionsWagesSalariesController._
 import forms.MoneyFormProvider
@@ -77,7 +78,7 @@ object FeesCommissionsWagesSalariesController {
     MoneyFormErrors(
       "feesCommissionsWagesSalaries.error.required",
       "feesCommissionsWagesSalaries.error.invalid",
-      (999999999.99, "feesCommissionsWagesSalaries.error.tooLarge")
+      (maxMoneyValue, "feesCommissionsWagesSalaries.error.tooLarge")
     )
   )
 
