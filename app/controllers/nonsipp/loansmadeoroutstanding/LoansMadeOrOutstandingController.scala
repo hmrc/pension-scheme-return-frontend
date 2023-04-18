@@ -78,7 +78,7 @@ object LoansMadeOrOutstandingController {
   def viewModel(srn: Srn, schemeName: String, mode: Mode): YesNoPageViewModel =
     YesNoPageViewModel(
       Message("loansMadeOrOutstanding.title"),
-      Message("loansMadeOrOutstanding.heading", memberName),
+      Message("loansMadeOrOutstanding.heading", schemeName),
       routes.LoansMadeOrOutstandingController.onSubmit(srn, mode)
     )
 }
