@@ -339,3 +339,6 @@ pensionPaymentsReceived.title = Did any member receive pension payments from the
 pensionPaymentsReceived.heading = Did any member receive pension payments from {0} during the period of this return?
 pensionPaymentsReceived.error.required = Select yes if any member received pension payments from the scheme during the period of this return
 
+benefitsSurrendered.title = Did any member surrender benefits within the scheme during the period of this return?
+benefitsSurrendered.heading = Did any member surrender benefits within {0} during the period of this return?
+benefitsSurrendered.error.required = Select yes if any member surrendered benefits within the scheme during the period of this return
