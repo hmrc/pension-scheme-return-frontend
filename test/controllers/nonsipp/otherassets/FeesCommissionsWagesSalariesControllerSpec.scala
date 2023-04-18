@@ -33,7 +33,7 @@ class FeesCommissionsWagesSalariesControllerSpec extends ControllerBaseSpec {
   private val validMoney = moneyGen.sample.value
   private def moneyForm(implicit app: Application) = form(injected[MoneyFormProvider])
 
-  "PersonalContributionsController" - {
+  "FeesCommissionsWagesSalariesController" - {
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       injected[MoneyView].apply(viewModel(srn, schemeName, moneyForm, NormalMode))
