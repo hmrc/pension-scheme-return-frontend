@@ -322,3 +322,7 @@ whyNoBankAccount.heading = Why did {0} not have a bank account during the period
 whyNoBankAccount.error.required = Enter the reason the scheme did not have a bank account during the period of this return
 whyNoBankAccount.error.length = Reason the scheme did not have a bank account must be 160 characters or fewer
 whyNoBankAccount.error.invalid = Reason the scheme did not have a bank account must only include letters a to z, numbers 0 to 9, and special characters such as hyphens, spaces and apostrophes
+
+landOrPropertyHeld.title = Did the scheme hold any land or property during the period of this return?
+landOrPropertyHeld.heading = Did {0} hold any land or property during the period of this return?
+landOrPropertyHeld.error.required = Select yes if the scheme held any land or property at any point during the period of this return

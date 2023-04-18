@@ -155,3 +155,8 @@ GET        /:srn/reason-for-no-bank-account               controllers.nonsipp.ba
 POST       /:srn/reason-for-no-bank-account               controllers.nonsipp.bankaccount.WhyNoBankAccountController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 GET        /:srn/change-reason-for-no-bank-account        controllers.nonsipp.bankaccount.WhyNoBankAccountController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST       /:srn/change-reason-for-no-bank-account        controllers.nonsipp.bankaccount.WhyNoBankAccountController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET        /:srn/land-or-property-held               controllers.nonsipp.landorproperty.LandOrPropertyHeldController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST       /:srn/land-or-property-held               controllers.nonsipp.landorproperty.LandOrPropertyHeldController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/change-land-or-property-held        controllers.nonsipp.landorproperty.LandOrPropertyHeldController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST       /:srn/change-land-or-property-held        controllers.nonsipp.landorproperty.LandOrPropertyHeldController.onSubmit(srn: Srn, mode: Mode = CheckMode)
