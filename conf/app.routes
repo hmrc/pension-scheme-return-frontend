@@ -158,6 +158,10 @@ POST       /:srn/change-reason-for-no-bank-account        controllers.nonsipp.ba
 
 GET        /:srn/pension-commencement-lump-sum               controllers.nonsipp.pensioncommencementlumpsum.PensionCommencementLumpSumController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST       /:srn/pension-commencement-lump-sum               controllers.nonsipp.pensioncommencementlumpsum.PensionCommencementLumpSumController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-
 GET        /:srn/change-pension-commencement-lump-sum        controllers.nonsipp.pensioncommencementlumpsum.PensionCommencementLumpSumController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST       /:srn/change-pension-commencement-lump-sum        controllers.nonsipp.pensioncommencementlumpsum.PensionCommencementLumpSumController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET        /:srn/unregulated-connected-party-bonds-held               controllers.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST       /:srn/unregulated-connected-party-bonds-held               controllers.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/change-unregulated-connected-party-bonds-held        controllers.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST       /:srn/change-unregulated-connected-party-bonds-held        controllers.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldController.onSubmit(srn: Srn, mode: Mode = CheckMode)
