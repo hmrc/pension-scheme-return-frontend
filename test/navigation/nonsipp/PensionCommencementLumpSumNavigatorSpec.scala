@@ -17,6 +17,7 @@
 package navigation.nonsipp
 
 import controllers.routes
+import models.NormalMode
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.pensioncommencementlumpsum.PensionCommencementLumpSumPage
@@ -33,9 +34,9 @@ class PensionCommencementLumpSumNavigatorSpec extends BaseSpec with NavigatorBeh
         .navigateToWithData(
           PensionCommencementLumpSumPage,
           Gen.const(true),
-          (_, _) => routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.routes.PensionPaymentsReceivedController.onPageLoad
         )
-        .withName("go from pension commencement lump sum page to unauthorised when yes selected")
+        .withName("go from pension commencement lump sum page to pension payments received page when yes selected")
     )
 
     act.like(
