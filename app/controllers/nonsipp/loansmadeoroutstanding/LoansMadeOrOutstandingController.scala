@@ -48,7 +48,7 @@ class LoansMadeOrOutstandingController @Inject()(
     extends FrontendBaseController
     with I18nSupport {
 
-  private def form(memberName: String): Form[Boolean] =
+  private def form: Form[Boolean] =
     LoansMadeOrOutstandingController.form(formProvider)
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
