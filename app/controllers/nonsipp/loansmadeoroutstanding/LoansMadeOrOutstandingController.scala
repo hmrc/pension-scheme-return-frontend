@@ -53,12 +53,12 @@ class LoansMadeOrOutstandingController @Inject()(
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     val schemeName = request.schemeDetails.schemeName
-    val preparedForm = request.userAnswers.fillForm(LoansMadeOrOutstandingPage(srn), form(schemeName))
+    val preparedForm = request.userAnswers.fillForm(LoansMadeOrOutstandingPage(srn), form)
     Ok(view(preparedForm, viewModel(srn, schemeName, mode)))
   }
   def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
     val schemeName = request.schemeDetails.schemeName
-    form(schemeName)
+    form
       .bindFromRequest()
       .fold(
         formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, schemeName, mode)))),
