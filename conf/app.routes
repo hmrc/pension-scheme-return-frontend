@@ -161,3 +161,9 @@ POST       /:srn/pension-commencement-lump-sum               controllers.nonsipp
 
 GET        /:srn/change-pension-commencement-lump-sum        controllers.nonsipp.pensioncommencementlumpsum.PensionCommencementLumpSumController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST       /:srn/change-pension-commencement-lump-sum        controllers.nonsipp.pensioncommencementlumpsum.PensionCommencementLumpSumController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET         /:srn/money-borrowed                             controllers.nonsipp.moneyborrowed.MoneyBorrowedController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/money-borrowed                             controllers.nonsipp.moneyborrowed.MoneyBorrowedController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+
+GET         /:srn/change-money-borrowed                      controllers.nonsipp.moneyborrowed.MoneyBorrowedController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-money-borrowed                      controllers.nonsipp.moneyborrowed.MoneyBorrowedController.onSubmit(srn: Srn, mode: Mode = CheckMode)

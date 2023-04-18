@@ -326,3 +326,7 @@ whyNoBankAccount.error.invalid = Reason the scheme did not have a bank account m
 pensionCommencementLumpSum.title = Did any member receive a Pension Commencement Lump Sum (PCLS) during the period of this return?
 pensionCommencementLumpSum.heading = Did any member receive a Pension Commencement Lump Sum (PCLS) during the period of this return?
 pensionCommencementLumpSum.error.required = Select yes if any member received a Pension Commencement Lump Sum during the period of this return
+
+moneyBorrowed.title = Did the scheme borrow any money during the period of this return?
+moneyBorrowed.heading = Did {0} borrow any money during the period of this return?
+moneyBorrowed.error.required = Select yes if the scheme borrowed any money during the period of this return
