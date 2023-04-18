@@ -24,6 +24,6 @@ case class LoansMadeOrOutstandingPage(srn: Srn) extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "loanMadeOrOutstanding"
+  override def toString: String = "loansMadeOrOutstanding"
 
 }
