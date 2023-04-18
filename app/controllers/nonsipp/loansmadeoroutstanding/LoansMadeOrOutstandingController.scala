@@ -75,7 +75,7 @@ object LoansMadeOrOutstandingController {
     "loansMadeOrOutstanding.error.required"
   )
 
-  def viewModel(srn: Srn, memberName: String, mode: Mode): YesNoPageViewModel =
+  def viewModel(srn: Srn, schemeName: String, mode: Mode): YesNoPageViewModel =
     YesNoPageViewModel(
       Message("loansMadeOrOutstanding.title"),
       Message("loansMadeOrOutstanding.heading", memberName),
