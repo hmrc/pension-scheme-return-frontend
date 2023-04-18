@@ -160,3 +160,8 @@ GET        /:srn/land-or-property-held               controllers.nonsipp.landorp
 POST       /:srn/land-or-property-held               controllers.nonsipp.landorproperty.LandOrPropertyHeldController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 GET        /:srn/change-land-or-property-held        controllers.nonsipp.landorproperty.LandOrPropertyHeldController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST       /:srn/change-land-or-property-held        controllers.nonsipp.landorproperty.LandOrPropertyHeldController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET        /:srn/pension-commencement-lump-sum               controllers.nonsipp.pensioncommencementlumpsum.PensionCommencementLumpSumController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST       /:srn/pension-commencement-lump-sum               controllers.nonsipp.pensioncommencementlumpsum.PensionCommencementLumpSumController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/change-pension-commencement-lump-sum        controllers.nonsipp.pensioncommencementlumpsum.PensionCommencementLumpSumController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST       /:srn/change-pension-commencement-lump-sum        controllers.nonsipp.pensioncommencementlumpsum.PensionCommencementLumpSumController.onSubmit(srn: Srn, mode: Mode = CheckMode)
