@@ -14,37 +14,32 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.bankaccount
+package controllers.nonsipp.landorproperty
 
-import ActiveBankAccountController._
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.bankaccount.routes
+import controllers.nonsipp.landorproperty.LandOrPropertyHeldController._
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import pages.nonsipp.bankaccount.ActiveBankAccountPage
+import pages.nonsipp.landorproperty.LandOrPropertyHeldPage
 import views.html.YesNoPageView
 
-class ActiveBankAccountControllerSpec extends ControllerBaseSpec {
+class LandOrPropertyHeldControllerSpec extends ControllerBaseSpec {
 
-  private lazy val onPageLoad = routes.ActiveBankAccountController.onPageLoad(srn, NormalMode)
-  private lazy val onSubmit = routes.ActiveBankAccountController.onSubmit(srn, NormalMode)
+  private lazy val onPageLoad = routes.LandOrPropertyHeldController.onPageLoad(srn, NormalMode)
+  private lazy val onSubmit = routes.LandOrPropertyHeldController.onSubmit(srn, NormalMode)
 
-  "activeBankAccountController" - {
+  "LandOrPropertyHeldController" - {
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
-      injected[YesNoPageView].apply(
-        form(injected[YesNoPageFormProvider], defaultSchemeDetails.schemeName),
-        viewModel(srn, defaultSchemeDetails.schemeName, NormalMode)
-      )
+      injected[YesNoPageView].apply(form(injected[YesNoPageFormProvider]), viewModel(srn, NormalMode, schemeName))
     })
 
-    act.like(renderPrePopView(onPageLoad, ActiveBankAccountPage(srn), true) { implicit app => implicit request =>
-      val preparedForm = form(injected[YesNoPageFormProvider], defaultSchemeDetails.schemeName).fill(true)
-      injected[YesNoPageView].apply(preparedForm, viewModel(srn, defaultSchemeDetails.schemeName, NormalMode))
+    act.like(renderPrePopView(onPageLoad, LandOrPropertyHeldPage(srn), true) { implicit app => implicit request =>
+      injected[YesNoPageView]
+        .apply(form(injected[YesNoPageFormProvider]).fill(true), viewModel(srn, NormalMode, schemeName))
     })
 
     act.like(redirectNextPage(onSubmit, "value" -> "true"))
-
     act.like(redirectNextPage(onSubmit, "value" -> "false"))
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
