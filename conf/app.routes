@@ -182,3 +182,8 @@ GET        /:srn/pension-payments-received               controllers.nonsipp.Pen
 POST       /:srn/pension-payments-received               controllers.nonsipp.PensionPaymentsReceivedController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 GET        /:srn/change-pension-payments-received        controllers.nonsipp.PensionPaymentsReceivedController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST       /:srn/change-pension-payments-received        controllers.nonsipp.PensionPaymentsReceivedController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET        /:srn/benefits-surrendered               controllers.nonsipp.benefitssurrendered.BenefitsSurrenderedController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST       /:srn/benefits-surrendered               controllers.nonsipp.benefitssurrendered.BenefitsSurrenderedController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/change-benefits-surrendered        controllers.nonsipp.benefitssurrendered.BenefitsSurrenderedController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST       /:srn/change-benefits-surrendered        controllers.nonsipp.benefitssurrendered.BenefitsSurrenderedController.onSubmit(srn: Srn, mode: Mode = CheckMode)

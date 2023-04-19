@@ -24,14 +24,7 @@ import models.PensionSchemeId.{PsaId, PspId}
 import models.{NormalMode, UserAnswers}
 import navigation.{JourneyNavigator, Navigator}
 import pages.Page
-import pages.nonsipp.{
-  CheckReturnDatesPage,
-  HowManyMembersPage,
-  HowMuchCashPage,
-  PensionPaymentsReceivedPage,
-  ValueOfAssetsPage,
-  WhichTaxYearPage
-}
+import pages.nonsipp._
 import play.api.mvc.Call
 
 import javax.inject.Inject
@@ -91,7 +84,8 @@ class NonSippNavigator @Inject()() extends Navigator {
       SharesInSponsoringEmployerNavigator,
       PensionCommencementLumpSumNavigator,
       MoneyBorrowedNavigator,
-      PensionPaymentsReceivedNavigator
+      PensionPaymentsReceivedNavigator,
+      BenefitsSurrenderedNavigator
     )
 
   override val defaultNormalMode: Call = controllers.routes.IndexController.onPageLoad()

@@ -19,19 +19,19 @@ package navigation.nonsipp
 import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.PensionPaymentsReceivedPage
+import pages.nonsipp.BenefitsSurrenderedPage
 import play.api.mvc.Call
 
-object PensionPaymentsReceivedNavigator extends JourneyNavigator {
+object BenefitsSurrenderedNavigator extends JourneyNavigator {
 
-  val normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
-    case page @ PensionPaymentsReceivedPage(srn) =>
+  override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
+    case page @ BenefitsSurrenderedPage(srn) =>
       if (userAnswers.get(page).contains(true)) {
-        controllers.nonsipp.benefitssurrendered.routes.BenefitsSurrenderedController.onPageLoad(srn, NormalMode)
+        controllers.routes.UnauthorisedController.onPageLoad()
       } else {
         controllers.routes.UnauthorisedController.onPageLoad()
       }
   }
 
-  val checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty
+  override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty
 }
