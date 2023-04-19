@@ -68,6 +68,10 @@ GET         /:srn/member-details               controllers.nonsipp.memberdetails
 GET         /:srn/member-details/:index        controllers.nonsipp.memberdetails.MemberDetailsController.onPageLoad(srn: Srn, index: Max99, mode: Mode = NormalMode)
 POST        /:srn/member-details/:index        controllers.nonsipp.memberdetails.MemberDetailsController.onSubmit(srn: Srn, index: Max99, mode: Mode = NormalMode)
 
+GET         /:srn/member-details/change               controllers.nonsipp.memberdetails.MemberDetailsController.onPageLoad(srn: Srn, index: Max99 = 1, mode: Mode = CheckMode)
+GET         /:srn/member-details/:index/change        controllers.nonsipp.memberdetails.MemberDetailsController.onPageLoad(srn: Srn, index: Max99, mode: Mode = CheckMode)
+POST        /:srn/member-details/:index/change        controllers.nonsipp.memberdetails.MemberDetailsController.onSubmit(srn: Srn, index: Max99, mode: Mode = CheckMode)
+
 GET         /:srn/psa-declaration        controllers.nonsipp.declaration.PsaDeclarationController.onPageLoad(srn: Srn)
 POST        /:srn/psa-declaration        controllers.nonsipp.declaration.PsaDeclarationController.onSubmit(srn: Srn)
 

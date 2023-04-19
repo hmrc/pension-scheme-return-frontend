@@ -17,8 +17,7 @@
 package controllers.nonsipp.memberdetails
 
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.memberdetails.routes
-import MemberDetailsController._
+import controllers.nonsipp.memberdetails.MemberDetailsController._
 import eu.timepit.refined.refineMV
 import forms.NameDOBFormProvider
 import models.{NameDOB, NormalMode}
@@ -29,8 +28,8 @@ import java.time.LocalDate
 
 class MemberDetailsControllerSpec extends ControllerBaseSpec {
 
-  private lazy val onPageLoad = routes.MemberDetailsController.onPageLoad(srn, refineMV(1))
-  private lazy val onSubmit = routes.MemberDetailsController.onSubmit(srn, refineMV(1))
+  private lazy val onPageLoad = routes.MemberDetailsController.onPageLoad(srn, refineMV(1), NormalMode)
+  private lazy val onSubmit = routes.MemberDetailsController.onSubmit(srn, refineMV(1), NormalMode)
 
   private val validForm = List(
     "firstName" -> "testFirstName",

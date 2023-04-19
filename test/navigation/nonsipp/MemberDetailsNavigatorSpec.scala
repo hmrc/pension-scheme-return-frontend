@@ -47,7 +47,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           .navigateToWithData(
             PensionSchemeMembersPage,
             Gen.const(ManualOrUpload.Manual),
-            (srn, _) => routes.MemberDetailsController.onPageLoad(srn, refineMV(1))
+            routes.MemberDetailsController.onPageLoad(_, refineMV(1), _)
           )
           .withName("go from manual or upload to details page when manual is chosen")
       )

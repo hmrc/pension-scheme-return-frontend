@@ -34,7 +34,7 @@ object MemberDetailsNavigator extends JourneyNavigator {
 
     case PensionSchemeMembersPage(srn) =>
       if (userAnswers.get(PensionSchemeMembersPage(srn)).contains(ManualOrUpload.Manual)) {
-        routes.MemberDetailsController.onPageLoad(srn, refineMV(1))
+        routes.MemberDetailsController.onPageLoad(srn, refineMV(1), NormalMode)
       } else {
         controllers.routes.UnauthorisedController.onPageLoad()
       }
@@ -62,7 +62,7 @@ object MemberDetailsNavigator extends JourneyNavigator {
     case SchemeMembersListPage(srn, true) =>
       refineV[OneTo99](userAnswers.membersDetails(srn).length + 1).fold(
         _ => controllers.routes.JourneyRecoveryController.onPageLoad(),
-        index => routes.MemberDetailsController.onPageLoad(srn, index)
+        index => routes.MemberDetailsController.onPageLoad(srn, index, NormalMode)
       )
 
     case RemoveMemberDetailsPage(srn) => routes.SchemeMembersListController.onPageLoad(srn, page = 1)
@@ -81,7 +81,6 @@ object MemberDetailsNavigator extends JourneyNavigator {
         case None =>
           routes.DoesSchemeMemberHaveNINOController.onPageLoad(srn, index, CheckMode)
       }
-    }
     case MemberDetailsNinoPage(srn, index) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, Check)
     case NoNINOPage(srn, index) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, Check)
   }

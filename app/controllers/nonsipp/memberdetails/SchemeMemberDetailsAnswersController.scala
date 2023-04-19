@@ -22,7 +22,7 @@ import config.Refined.Max99
 import controllers.actions._
 import controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController._
 import models.SchemeId.Srn
-import models.{CheckOrChange, Mode, NameDOB, NormalMode}
+import models.{CheckMode, CheckOrChange, Mode, NameDOB, NormalMode}
 import navigation.Navigator
 import pages._
 import pages.nonsipp.memberdetails._
@@ -83,43 +83,42 @@ object SchemeMemberDetailsAnswersController {
     List(
       CheckYourAnswersRowViewModel("memberDetails.firstName", memberDetails.firstName)
         .withAction(
-          SummaryAction("site.change", routes.MemberDetailsController.onPageLoad(srn, index).url)
+          SummaryAction("site.change", routes.MemberDetailsController.onPageLoad(srn, index, CheckMode).url)
             .withVisuallyHiddenContent("memberDetails.firstName")
         ),
       CheckYourAnswersRowViewModel("memberDetails.lastName", memberDetails.lastName)
         .withAction(
-          SummaryAction("site.change", routes.MemberDetailsController.onPageLoad(srn, index).url)
+          SummaryAction("site.change", routes.MemberDetailsController.onPageLoad(srn, index, CheckMode).url)
             .withVisuallyHiddenContent("memberDetails.lastName")
         ),
       CheckYourAnswersRowViewModel("memberDetails.dateOfBirth", memberDetails.dob.show)
         .withAction(
-          SummaryAction("site.change", routes.MemberDetailsController.onPageLoad(srn, index).url)
+          SummaryAction("site.change", routes.MemberDetailsController.onPageLoad(srn, index, CheckMode).url)
             .withVisuallyHiddenContent("memberDetails.dateOfBirth")
         ),
       CheckYourAnswersRowViewModel(
         Message("nationalInsuranceNumber.heading", memberDetails.fullName),
         booleanToMessage(hasNINO)
       ).withAction(
-        SummaryAction("site.change", routes.DoesSchemeMemberHaveNINOController.onPageLoad(srn, index, mode).url)
+        SummaryAction("site.change", routes.DoesSchemeMemberHaveNINOController.onPageLoad(srn, index, CheckMode).url)
           .withVisuallyHiddenContent("nationalInsuranceNumber.heading")
       )
     ) ++
-      ninoRow(maybeNino, memberDetails.fullName, srn, index, mode) ++
-      noNinoReasonRow(maybeNoNinoReason, memberDetails.fullName, srn, index, mode)
+      ninoRow(maybeNino, memberDetails.fullName, srn, index) ++
+      noNinoReasonRow(maybeNoNinoReason, memberDetails.fullName, srn, index)
 
   private def ninoRow(
     maybeNino: Option[Nino],
     memberName: String,
     srn: Srn,
-    index: Max99,
-    mode: Mode
+    index: Max99
   ): List[CheckYourAnswersRowViewModel] =
     maybeNino.fold(List.empty[CheckYourAnswersRowViewModel])(
       nino =>
         List(
           CheckYourAnswersRowViewModel(Message("memberDetailsNino.heading", memberName), nino.value)
             .withAction(
-              SummaryAction("site.change", routes.MemberDetailsNinoController.onPageLoad(srn, index, mode).url)
+              SummaryAction("site.change", routes.MemberDetailsNinoController.onPageLoad(srn, index, CheckMode).url)
                 .withVisuallyHiddenContent("memberDetailsNino.heading")
             )
         )
@@ -129,15 +128,14 @@ object SchemeMemberDetailsAnswersController {
     maybeNoNinoReason: Option[String],
     memberName: String,
     srn: Srn,
-    index: Max99,
-    mode: Mode
+    index: Max99
   ): List[CheckYourAnswersRowViewModel] =
     maybeNoNinoReason.fold(List.empty[CheckYourAnswersRowViewModel])(
       noNinoReason =>
         List(
           CheckYourAnswersRowViewModel(Message("noNINO.heading", memberName), noNinoReason)
             .withAction(
-              SummaryAction("site.change", routes.NoNINOController.onPageLoad(srn, index, mode).url)
+              SummaryAction("site.change", routes.NoNINOController.onPageLoad(srn, index, CheckMode).url)
                 .withVisuallyHiddenContent("noNINO.heading")
             )
         )
