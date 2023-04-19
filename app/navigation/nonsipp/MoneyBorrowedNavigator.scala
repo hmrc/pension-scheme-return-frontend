@@ -17,18 +17,18 @@
 package navigation.nonsipp
 
 import controllers.routes
-import models.{NormalMode, UserAnswers}
+import models.UserAnswers
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.pensioncommencementlumpsum.PensionCommencementLumpSumPage
+import pages.nonsipp.moneyborrowed.MoneyBorrowedPage
 import play.api.mvc.Call
 
-object PensionCommencementLumpSumNavigator extends JourneyNavigator {
+object MoneyBorrowedNavigator extends JourneyNavigator {
 
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
-    case page @ PensionCommencementLumpSumPage(srn) =>
+    case page @ MoneyBorrowedPage(srn) =>
       if (userAnswers.get(page).contains(true)) {
-        controllers.nonsipp.routes.PensionPaymentsReceivedController.onPageLoad(srn, NormalMode)
+        routes.UnauthorisedController.onPageLoad()
       } else {
         routes.UnauthorisedController.onPageLoad()
       }
