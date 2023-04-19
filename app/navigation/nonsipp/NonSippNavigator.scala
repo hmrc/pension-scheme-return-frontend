@@ -88,6 +88,7 @@ class NonSippNavigator @Inject()() extends Navigator {
       TransferOutNavigator,
       SharesInSponsoringEmployerNavigator,
       PensionCommencementLumpSumNavigator,
+      MoneyBorrowedNavigator,
       PensionPaymentsReceivedNavigator
     )
 
