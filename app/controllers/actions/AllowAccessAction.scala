@@ -57,9 +57,9 @@ class AllowAccessAction(
     } yield {
 
       (schemeDetails, isAssociated, minimalDetails) match {
-        case (Some(schemeDetails), true, Right(MinimalDetails(_, _, _, _, false, false)))
+        case (Some(schemeDetails), true, Right(minimalDetails @ MinimalDetails(_, _, _, _, false, false)))
             if validStatuses.contains(schemeDetails.schemeStatus) =>
-          block(AllowedAccessRequest(request, schemeDetails))
+          block(AllowedAccessRequest(request, schemeDetails, minimalDetails))
 
         case (_, _, Right(HasDeceasedFlag(_))) =>
           Future.successful(Redirect(appConfig.urls.managePensionsSchemes.contactHmrc))

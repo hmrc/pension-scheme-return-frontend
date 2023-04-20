@@ -41,6 +41,12 @@ object DisplayMessage {
       Message(key, args.toList)
   }
 
+  case class CompoundMessage(message: DisplayMessage, next: DisplayMessage) extends InlineMessage
+
+  implicit class DisplayMessageOps(message: DisplayMessage) {
+    def +(other: DisplayMessage): CompoundMessage = CompoundMessage(message, other)
+  }
+
   case class LinkMessage(content: Message, url: String) extends InlineMessage
 
   case class ParagraphMessage(content: NonEmptyList[InlineMessage]) extends BlockMessage
@@ -51,12 +57,19 @@ object DisplayMessage {
       ParagraphMessage(NonEmptyList(headContent, tailContents.toList))
   }
 
+  case class TableMessage(content: NonEmptyList[(InlineMessage, DisplayMessage)]) extends BlockMessage
+
   case class ListMessage(content: NonEmptyList[InlineMessage], listType: ListType) extends BlockMessage
 
   object ListMessage {
 
     def apply(listType: ListType, headContent: InlineMessage, tailContents: InlineMessage*): ListMessage =
       ListMessage(NonEmptyList(headContent, tailContents.toList), listType)
+
+    object Bullet {
+      def apply(headContent: InlineMessage, tailContents: InlineMessage*): ListMessage =
+        ListMessage(NonEmptyList(headContent, tailContents.toList), ListType.Bullet)
+    }
   }
 
   sealed trait ListType

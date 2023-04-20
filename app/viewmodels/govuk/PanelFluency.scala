@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package models.requests
+package viewmodels.govuk
 
-import models.{MinimalDetails, PensionSchemeId, SchemeDetails}
-import play.api.mvc.WrappedRequest
+import play.twirl.api.Html
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
+import uk.gov.hmrc.govukfrontend.views.viewmodels.panel.Panel
 
-case class AllowedAccessRequest[A](
-  request: IdentifierRequest[A],
-  schemeDetails: SchemeDetails,
-  minimalDetails: MinimalDetails
-) extends WrappedRequest[A](request) {
+object panel extends PanelFluency
 
-  val getUserId: String = request.getUserId
+trait PanelFluency {
 
-  val pensionSchemeId: PensionSchemeId = request.pensionSchemeId
+  object PanelViewModel {
+    def apply(title: Html, content: Html): Panel =
+      Panel(title = HtmlContent(title), content = HtmlContent(content))
+  }
 }

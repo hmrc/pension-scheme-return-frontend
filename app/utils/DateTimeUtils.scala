@@ -18,7 +18,7 @@ package utils
 
 import cats.Show
 
-import java.time.LocalDate
+import java.time.{LocalDate, LocalDateTime}
 import java.time.format.DateTimeFormatter
 
 object DateTimeUtils {
@@ -28,5 +28,11 @@ object DateTimeUtils {
     localDate.format(formatter)
   }
 
+  def formatHtml(localDateTime: LocalDateTime) = {
+    val formatter = DateTimeFormatter.ofPattern("d\u00A0MMMM\u00A0yyyy")
+    localDateTime.format(formatter)
+  }
+
   implicit val localDateShow: Show[LocalDate] = d => formatHtml(d)
+  implicit val localDateTimeShow: Show[LocalDateTime] = d => formatHtml(d)
 }

@@ -37,4 +37,5 @@ package object govuk {
       with ListWithActionsFluency
       with TextAreaFluency
       with PaginationFluency
+      with PanelFluency
 }

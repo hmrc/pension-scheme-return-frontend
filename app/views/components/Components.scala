@@ -40,6 +40,24 @@ object Components {
   private def simpleList(elements: NonEmptyList[Html]): Html =
     HtmlFormat.raw(elements.toList.mkString("<br>"))
 
+  private def tableElement(element: (Html, Html)): Html = {
+    val (key, value) = element
+    HtmlFormat.raw(
+      s"""<tr class="govuk-table__row">
+         |<td class="govuk-table__cell">$key</td>
+         |<td class="govuk-table__cell">$value</td>
+         |</tr>""".stripMargin
+    )
+  }
+
+  private def table(elements: NonEmptyList[(Html, Html)]): Html =
+    HtmlFormat.raw(
+      s"""<table class="govuk-table"><tbody class="govuk-table__body">${elements
+        .map(tableElement)
+        .toList
+        .mkString}</tbody></table>"""
+    )
+
   private def combine(left: Html, right: Html): Html =
     HtmlFormat.raw(left.body + " " + right.body)
 
@@ -51,5 +69,8 @@ object Components {
       case ParagraphMessage(content) => paragraph(content.map(renderMessage).reduce(combine))
       case ListMessage(content, Bullet) => unorderedList(content.map(renderMessage))
       case ListMessage(content, NewLine) => simpleList(content.map(renderMessage))
+      case TableMessage(content) =>
+        table(content.map { case (key, value) => renderMessage(key) -> renderMessage(value) })
+      case CompoundMessage(first, second) => combine(renderMessage(first), renderMessage(second))
     }
 }

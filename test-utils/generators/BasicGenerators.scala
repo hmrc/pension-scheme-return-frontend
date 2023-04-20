@@ -190,7 +190,7 @@ trait BasicGenerators extends EitherValues {
   val topLevelDomain: Gen[String] =
     Gen.oneOf("com", "gov.uk", "co.uk", "net", "org", "io")
 
-  val email: Gen[String] =
+  val emailGen: Gen[String] =
     for {
       username <- nonEmptyString
       domain <- nonEmptyString

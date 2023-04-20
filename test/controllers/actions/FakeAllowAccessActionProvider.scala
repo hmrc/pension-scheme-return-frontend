@@ -17,7 +17,7 @@
 package controllers.actions
 
 import generators.Generators
-import models.{SchemeDetails, SchemeId}
+import models.{MinimalDetails, SchemeDetails, SchemeId}
 import models.requests.{AllowedAccessRequest, IdentifierRequest}
 import org.scalatest.OptionValues
 import play.api.mvc._
@@ -25,7 +25,7 @@ import play.api.mvc._
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class FakeAllowAccessActionProvider @Inject()(schemeDetails: SchemeDetails)
+class FakeAllowAccessActionProvider @Inject()(schemeDetails: SchemeDetails, minimalDetails: MinimalDetails)
     extends AllowAccessActionProvider
     with Generators
     with OptionValues {
@@ -36,7 +36,7 @@ class FakeAllowAccessActionProvider @Inject()(schemeDetails: SchemeDetails)
         request: IdentifierRequest[A],
         block: AllowedAccessRequest[A] => Future[Result]
       ): Future[Result] =
-        block(AllowedAccessRequest(request, schemeDetails))
+        block(AllowedAccessRequest(request, schemeDetails, minimalDetails))
 
       override protected def executionContext: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
     }

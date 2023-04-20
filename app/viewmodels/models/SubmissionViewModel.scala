@@ -14,18 +14,15 @@
  * limitations under the License.
  */
 
-package models.requests
+package viewmodels.models
 
-import models.{MinimalDetails, PensionSchemeId, SchemeDetails}
-import play.api.mvc.WrappedRequest
+import viewmodels.DisplayMessage
+import viewmodels.DisplayMessage.Message
 
-case class AllowedAccessRequest[A](
-  request: IdentifierRequest[A],
-  schemeDetails: SchemeDetails,
-  minimalDetails: MinimalDetails
-) extends WrappedRequest[A](request) {
-
-  val getUserId: String = request.getUserId
-
-  val pensionSchemeId: PensionSchemeId = request.pensionSchemeId
-}
+case class SubmissionViewModel(
+  title: Message,
+  panelHeading: Message,
+  panelContent: Message,
+  content: DisplayMessage,
+  whatHappensNextContent: DisplayMessage
+)
