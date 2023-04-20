@@ -13,3 +13,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package navigation.nonsipp
+
+import controllers.nonsipp.transferout
+import controllers.routes
+import navigation.{Navigator, NavigatorBehaviours}
+import org.scalacheck.Gen
+import pages.nonsipp.receivetransfer.DidSchemeReceiveTransferPage
+import utils.BaseSpec
+
+class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
+
+  val navigator: Navigator = new NonSippNavigator
+
+  "ReceiveTransferNavigator" - {
+
+    act.like(
+      normalmode
+        .navigateToWithData(
+          DidSchemeReceiveTransferPage,
+          Gen.const(true),
+          (_, _) => routes.UnauthorisedController.onPageLoad()
+        )
+        .withName("go from did scheme receive transfer page to unauthorised page when yes selected")
+    )
+
+    act.like(
+      normalmode
+        .navigateToWithData(
+          DidSchemeReceiveTransferPage,
+          Gen.const(false),
+          transferout.routes.SchemeTransferOutController.onPageLoad
+        )
+        .withName("go from did scheme receive transfer page to scheme transfer out page when no selected")
+    )
+  }
+}
