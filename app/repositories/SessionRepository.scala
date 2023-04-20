@@ -16,7 +16,7 @@
 
 package repositories
 
-import config.FrontendAppConfig
+import config.{Crypto, FrontendAppConfig}
 import models.UserAnswers
 import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.model._
@@ -35,12 +35,13 @@ import scala.concurrent.{ExecutionContext, Future}
 class SessionRepository @Inject()(
   mongoComponent: MongoComponent,
   appConfig: FrontendAppConfig,
-  clock: Clock
+  clock: Clock,
+  crypto: Crypto
 )(implicit ec: ExecutionContext)
     extends PlayMongoRepository[UserAnswers](
       collectionName = "user-answers",
       mongoComponent = mongoComponent,
-      domainFormat = UserAnswers.format,
+      domainFormat = UserAnswers.format(crypto.getCrypto),
       indexes = Seq(
         IndexModel(
           Indexes.ascending("lastUpdated"),
