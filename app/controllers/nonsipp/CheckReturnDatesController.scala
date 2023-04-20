@@ -20,9 +20,10 @@ import cats.implicits.toShow
 import controllers.actions._
 import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
-import models.{MinimalSchemeDetails, Mode, PensionSchemeId}
+import models.requests.DataRequest
+import models.{DateRange, MinimalSchemeDetails, Mode, PensionSchemeId}
 import navigation.Navigator
-import pages.nonsipp.CheckReturnDatesPage
+import pages.nonsipp._
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -66,29 +67,31 @@ class CheckReturnDatesController @Inject()(
           case Some(value) => form.fill(value)
         }
 
-        val viewModel =
-          CheckReturnDatesController.viewModel(srn, mode, taxYear.current.starts, taxYear.current.finishes, details)
-
-        Future.successful(Ok(view(preparedForm, viewModel)))
+        getWhichTaxYear(srn) { taxYear =>
+          val viewModel = CheckReturnDatesController.viewModel(srn, mode, taxYear.from, taxYear.to, details)
+          Future.successful(Ok(view(preparedForm, viewModel)))
+        }
       }
     }
 
   def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] =
     identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData).async { implicit request =>
       getMinimalSchemeDetails(request.pensionSchemeId, srn) { details =>
-        val viewModel =
-          CheckReturnDatesController.viewModel(srn, mode, taxYear.current.starts, taxYear.current.finishes, details)
+        getWhichTaxYear(srn) { taxYear =>
+          val viewModel =
+            CheckReturnDatesController.viewModel(srn, mode, taxYear.from, taxYear.to, details)
 
-        form
-          .bindFromRequest()
-          .fold(
-            formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel))),
-            value =>
-              for {
-                updatedAnswers <- Future.fromTry(request.userAnswers.set(CheckReturnDatesPage(srn), value))
-                _ <- saveService.save(updatedAnswers)
-              } yield Redirect(navigator.nextPage(CheckReturnDatesPage(srn), mode, updatedAnswers))
-          )
+          form
+            .bindFromRequest()
+            .fold(
+              formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel))),
+              value =>
+                for {
+                  updatedAnswers <- Future.fromTry(request.userAnswers.set(CheckReturnDatesPage(srn), value))
+                  _ <- saveService.save(updatedAnswers)
+                } yield Redirect(navigator.nextPage(CheckReturnDatesPage(srn), mode, updatedAnswers))
+            )
+        }
       }
     }
 
@@ -98,6 +101,14 @@ class CheckReturnDatesController @Inject()(
     schemeDetailsService.getMinimalSchemeDetails(id, srn).flatMap {
       case Some(schemeDetails) => f(schemeDetails)
       case None => Future.successful(Redirect(controllers.routes.UnauthorisedController.onPageLoad()))
+    }
+
+  private def getWhichTaxYear(
+    srn: Srn
+  )(f: DateRange => Future[Result])(implicit request: DataRequest[_]): Future[Result] =
+    request.userAnswers.get(WhichTaxYearPage(srn)) match {
+      case Some(taxYear) => f(taxYear)
+      case None => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
     }
 }
 
