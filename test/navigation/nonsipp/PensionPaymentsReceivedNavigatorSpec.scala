@@ -16,37 +16,35 @@
 
 package navigation.nonsipp
 
-import controllers.nonsipp.transferout
-import controllers.routes
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.receivetransfer.DidSchemeReceiveTransferPage
+import pages.nonsipp.PensionPaymentsReceivedPage
 import utils.BaseSpec
 
-class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
+class PensionPaymentsReceivedNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
   val navigator: Navigator = new NonSippNavigator
 
-  "ReceiveTransferNavigator" - {
+  "PensionPaymentsReceivedNavigator" - {
 
     act.like(
       normalmode
         .navigateToWithData(
-          DidSchemeReceiveTransferPage,
+          PensionPaymentsReceivedPage,
           Gen.const(true),
-          (_, _) => routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.benefitssurrendered.routes.BenefitsSurrenderedController.onPageLoad
         )
-        .withName("go from did scheme receive transfer page to unauthorised page when yes selected")
+        .withName("go from pension payments received page to benefits surrendered page on yes")
     )
 
     act.like(
       normalmode
         .navigateToWithData(
-          DidSchemeReceiveTransferPage,
+          PensionPaymentsReceivedPage,
           Gen.const(false),
-          transferout.routes.SchemeTransferOutController.onPageLoad
+          (_, _) => controllers.routes.UnauthorisedController.onPageLoad()
         )
-        .withName("go from did scheme receive transfer page to scheme transfer out page when no selected")
+        .withName("go from pension payments received page to unauthorised page on no")
     )
   }
 }

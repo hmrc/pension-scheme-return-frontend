@@ -16,16 +16,23 @@
 
 package navigation.nonsipp
 
+import config.Refined.OneTo99
+import controllers.nonsipp.employercontributions
 import controllers.nonsipp.memberdetails.routes
 import eu.timepit.refined.refineMV
+import generators.IndexGen
 import models.{CheckOrChange, ManualOrUpload}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.memberdetails.{
+  DoesMemberHaveNinoPage,
   MemberDetailsNinoPage,
   MemberDetailsPage,
+  NoNINOPage,
   PensionSchemeMembersPage,
-  RemoveMemberDetailsPage
+  RemoveMemberDetailsPage,
+  SchemeMemberDetailsAnswersPage,
+  SchemeMembersListPage
 }
 import utils.BaseSpec
 
@@ -34,15 +41,6 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
   val navigator: Navigator = new NonSippNavigator
 
   "MemberDetailsNavigator" - {
-
-    act.like(
-      normalmode
-        .navigateTo(
-          RemoveMemberDetailsPage,
-          (srn, _) => routes.SchemeMembersListController.onPageLoad(srn, page = 1)
-        )
-        .withName("go from remove page to list page")
-    )
 
     act.like(
       normalmode
@@ -70,7 +68,27 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           MemberDetailsPage(_, refineMV(1)),
           routes.DoesSchemeMemberHaveNINOController.onPageLoad(_, refineMV(1), _)
         )
-        .withName("go from details to have a nino page")
+        .withName("go from member details page to does member have nino page")
+    )
+
+    act.like(
+      normalmode
+        .navigateToWithData(
+          DoesMemberHaveNinoPage(_, refineMV(1)),
+          Gen.const(true),
+          routes.MemberDetailsNinoController.onPageLoad(_, refineMV(1), _)
+        )
+        .withName("go from does member have nino Page to member details nino page when yes selected")
+    )
+
+    act.like(
+      normalmode
+        .navigateToWithData(
+          DoesMemberHaveNinoPage(_, refineMV(1)),
+          Gen.const(false),
+          routes.NoNINOController.onPageLoad(_, refineMV(1), _)
+        )
+        .withName("go from does member have nino Page to no nino page when no selected")
     )
 
     act.like(
@@ -79,8 +97,58 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           MemberDetailsNinoPage(_, refineMV(1)),
           (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, refineMV(1), CheckOrChange.Check)
         )
-        .withName("go from nino page to check answers page")
+        .withName("go from member details nino page to scheme member details answers page")
     )
+
+    act.like(
+      normalmode
+        .navigateTo(
+          NoNINOPage(_, refineMV(1)),
+          (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, refineMV(1), CheckOrChange.Check)
+        )
+        .withName("go from no nino page to scheme member details answers page")
+    )
+
+    act.like(
+      normalmode
+        .navigateTo(
+          SchemeMemberDetailsAnswersPage,
+          (srn, _) => routes.SchemeMembersListController.onPageLoad(srn, page = 1)
+        )
+        .withName("go from scheme member details answers page to scheme members list Page")
+    )
+
+    act.like(
+      normalmode
+        .navigateFromListPage(
+          SchemeMembersListPage(_, addMember = true),
+          MemberDetailsPage,
+          nameDobGen,
+          IndexGen[OneTo99](min = 1, max = 99),
+          (srn, index, _) => routes.MemberDetailsController.onPageLoad(srn, index),
+          employercontributions.routes.EmployerContributionsController.onPageLoad
+        )
+        .withName("go from scheme members list page to member details page when yes selected")
+    )
+
+    act.like(
+      normalmode
+        .navigateTo(
+          SchemeMembersListPage(_, addMember = false),
+          employercontributions.routes.EmployerContributionsController.onPageLoad
+        )
+        .withName("go from scheme members list page to employer contributions page when no selected")
+    )
+
+    act.like(
+      normalmode
+        .navigateTo(
+          RemoveMemberDetailsPage,
+          (srn, _) => routes.SchemeMembersListController.onPageLoad(srn, page = 1)
+        )
+        .withName("go from remove page to list page")
+    )
+
   }
 
 }

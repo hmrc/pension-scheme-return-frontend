@@ -2,7 +2,6 @@ package controllers
 
 import controllers.actions._
 import forms.YesNoPageFormProvider
-import javax.inject.Inject
 import models.Mode
 import models.SchemeId.Srn
 import navigation.Navigator
@@ -17,12 +16,13 @@ import services.SaveService
 import $className;format="cap"$Controller._
 import viewmodels.implicits._
 
+import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
 class $className;format="cap"$Controller @Inject()(
                                          override val messagesApi: MessagesApi,
                                          saveService: SaveService,
-                                         navigator: Navigator,
+                                         @Named("non-sipp") navigator: Navigator,
                                          identifyAndRequireData: IdentifyAndRequireData,
                                          formProvider: YesNoPageFormProvider,
                                          val controllerComponents: MessagesControllerComponents,
@@ -33,7 +33,7 @@ class $className;format="cap"$Controller @Inject()(
 
   def onPageLoad(srn:Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      val preparedForm = request.userAnswers.get($className$Page(srn)).fold(form)(form.fill)
+      val preparedForm = request.userAnswers.fillForm($className$Page(srn), form)
       Ok(view(preparedForm, viewModel(srn, mode)))
   }
 
