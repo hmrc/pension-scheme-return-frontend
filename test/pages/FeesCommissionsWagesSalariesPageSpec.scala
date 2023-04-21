@@ -14,28 +14,22 @@
  * limitations under the License.
  */
 
-package config
+package pages
 
-object Constants {
+import models.Money
+import pages.behaviours.PageBehaviours
+import pages.nonsipp.otherassets.FeesCommissionsWagesSalariesPage
 
-  val psaEnrolmentKey = "HMRC-PODS-ORG"
-  val pspEnrolmentKey = "HMRC-PODSPP-ORG"
+class FeesCommissionsWagesSalariesPageSpec extends PageBehaviours {
 
-  val psaIdKey = "PSAID"
-  val pspIdKey = "PSPID"
+  "FeesCommissionsWagesSalariesPage" - {
 
-  val delimitedPSA = "DELIMITED_PSAID"
-  val detailsNotFound = "no match found"
+    val srn = srnGen.sample.value
 
-  val maxSchemeBankAccounts = 10
-  val maxAccountingPeriods = 3
+    beRetrievable[Money](FeesCommissionsWagesSalariesPage(srn))
 
-  val schemeMembersPageSize = 25
-  val maxSchemeMembers = 99
+    beSettable[Money](FeesCommissionsWagesSalariesPage(srn))
 
-  val maxCashInBank = 999999999.99
-  val maxAssetValue = 999999999.99
-  val maxMoneyValue = 999999999.99
-
-  val maxMembers = 999999
+    beRemovable[Money](FeesCommissionsWagesSalariesPage(srn))
+  }
 }

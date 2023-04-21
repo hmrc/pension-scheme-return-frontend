@@ -225,7 +225,7 @@ trait ViewModelGenerators extends BasicGenerators {
     }
 
   def singleQuestionGen[A](form: Form[A]): Gen[SingleQuestion[A]] =
-    Gen.const(SingleQuestion(form))
+    fieldGen.map(SingleQuestion(form, _))
 
   def doubleQuestionGen[A](form: Form[(A, A)]): Gen[DoubleQuestion[A]] =
     for {

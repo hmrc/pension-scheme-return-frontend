@@ -79,6 +79,7 @@ class NonSippNavigator @Inject()() extends Navigator {
       PersonalContributionsNavigator,
       ReceiveTransferNavigator,
       TransferOutNavigator,
+      OtherAssetsNavigator,
       UnregulatedOrConnectedBondsNavigator,
       LandOrPropertyNavigator,
       LoanMadeOrOutstandingNavigator,

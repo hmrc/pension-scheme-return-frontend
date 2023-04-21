@@ -58,6 +58,7 @@
           field = viewmodel.questions.form("value"),
           label = LabelViewModel(renderMessage(viewmodel.heading)).asPageHeading()
         )
+        .withHint(viewmodel.questions.firstField.hint.map(h => Hint(content = HtmlContent(renderMessage(h)))))
         .asNumeric()
         .withWidth(Fixed10)
         .withPrefix(PrefixOrSuffix(content = Text("£")))

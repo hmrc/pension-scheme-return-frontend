@@ -27,6 +27,8 @@ object DisplayMessage {
 
   sealed trait BlockMessage extends DisplayMessage
 
+  case object Empty extends InlineMessage
+
   case class Message(key: String, args: List[Message]) extends InlineMessage {
 
     def toMessage(implicit messages: Messages): String =

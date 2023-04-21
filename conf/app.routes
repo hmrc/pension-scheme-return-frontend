@@ -177,6 +177,11 @@ POST       /:srn/pension-commencement-lump-sum               controllers.nonsipp
 GET        /:srn/change-pension-commencement-lump-sum        controllers.nonsipp.pensioncommencementlumpsum.PensionCommencementLumpSumController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST       /:srn/change-pension-commencement-lump-sum        controllers.nonsipp.pensioncommencementlumpsum.PensionCommencementLumpSumController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
+GET        /:srn/fees-commissions-wages-salaries               controllers.nonsipp.otherassets.FeesCommissionsWagesSalariesController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST       /:srn/fees-commissions-wages-salaries               controllers.nonsipp.otherassets.FeesCommissionsWagesSalariesController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/change-fees-commissions-wages-salaries        controllers.nonsipp.otherassets.FeesCommissionsWagesSalariesController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST       /:srn/change-fees-commissions-wages-salaries        controllers.nonsipp.otherassets.FeesCommissionsWagesSalariesController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
 GET        /:srn/unregulated-connected-party-bonds-held               controllers.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST       /:srn/unregulated-connected-party-bonds-held               controllers.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 GET        /:srn/change-unregulated-connected-party-bonds-held        controllers.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
@@ -196,4 +201,3 @@ GET        /:srn/benefits-surrendered               controllers.nonsipp.benefits
 POST       /:srn/benefits-surrendered               controllers.nonsipp.benefitssurrendered.BenefitsSurrenderedController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 GET        /:srn/change-benefits-surrendered        controllers.nonsipp.benefitssurrendered.BenefitsSurrenderedController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST       /:srn/change-benefits-surrendered        controllers.nonsipp.benefitssurrendered.BenefitsSurrenderedController.onSubmit(srn: Srn, mode: Mode = CheckMode)
-
