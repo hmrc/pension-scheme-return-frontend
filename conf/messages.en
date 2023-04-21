@@ -339,6 +339,10 @@ pensionCommencementLumpSum.title = Did any member receive a Pension Commencement
 pensionCommencementLumpSum.heading = Did any member receive a Pension Commencement Lump Sum (PCLS) during the period of this return?
 pensionCommencementLumpSum.error.required = Select yes if any member received a Pension Commencement Lump Sum during the period of this return
 
+unregulatedOrConnectedBondsHeld.title = Did the scheme hold any unregulated bonds, or bonds acquired from a connected party, during the period of this return?
+unregulatedOrConnectedBondsHeld.heading = Did {0} hold any unregulated bonds, or bonds acquired from a connected party,  during the period of this return?
+unregulatedOrConnectedBondsHeld.error.required = Select yes if the scheme held any hold any unregulated bonds, or bonds acquired from a connected party, during the period of this return
+
 moneyBorrowed.title = Did the scheme borrow any money during the period of this return?
 moneyBorrowed.heading = Did {0} borrow any money during the period of this return?
 moneyBorrowed.error.required = Select yes if the scheme borrowed any money during the period of this return
@@ -350,3 +354,4 @@ pensionPaymentsReceived.error.required = Select yes if any member received pensi
 benefitsSurrendered.title = Did any member surrender benefits within the scheme during the period of this return?
 benefitsSurrendered.heading = Did any member surrender benefits within {0} during the period of this return?
 benefitsSurrendered.error.required = Select yes if any member surrendered benefits within the scheme during the period of this return
+
