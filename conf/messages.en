@@ -361,3 +361,8 @@ pensionPaymentsReceived.error.required = Select yes if any member received pensi
 benefitsSurrendered.title = Did any member surrender benefits within the scheme during the period of this return?
 benefitsSurrendered.heading = Did any member surrender benefits within {0} during the period of this return?
 benefitsSurrendered.error.required = Select yes if any member surrendered benefits within the scheme during the period of this return
+
+otherAssetsHeld.title = Did the scheme hold any other assets during the period of this return?
+otherAssetsHeld.heading = Did {0} hold any other assets during the period of this return?
+otherAssetsHeld.error.required = Select yes if the scheme held any other assets during the period of this return
+otherAssetsHeld.hint = This should not include shares, land or property, or bonds. If your scheme holds any of these assets, report them in the relevant section of this pension scheme return.

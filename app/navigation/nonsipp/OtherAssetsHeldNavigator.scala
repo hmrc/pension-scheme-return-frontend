@@ -20,17 +20,17 @@ import controllers.routes
 import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldPage
+import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
 import play.api.mvc.Call
 
-object UnregulatedOrConnectedBondsNavigator extends JourneyNavigator {
+object OtherAssetsHeldNavigator extends JourneyNavigator {
 
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
-    case page @ UnregulatedOrConnectedBondsHeldPage(srn) =>
+    case page @ OtherAssetsHeldPage(srn) =>
       if (userAnswers.get(page).contains(true)) {
         routes.UnauthorisedController.onPageLoad()
       } else {
-        controllers.nonsipp.otherassetsheld.routes.OtherAssetsHeldController.onPageLoad(srn, NormalMode)
+        controllers.nonsipp.otherassets.routes.FeesCommissionsWagesSalariesController.onPageLoad(srn, NormalMode)
       }
   }
 

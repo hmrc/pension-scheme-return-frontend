@@ -25,11 +25,15 @@ case class YesNoPageViewModel(
   heading: Message,
   description: List[BlockMessage],
   legend: Option[Message],
+  hint: Option[Message],
   onSubmit: Call
 ) {
 
   def withDescription(message: BlockMessage, messages: BlockMessage*): YesNoPageViewModel =
     copy(description = description ++ (message :: messages.toList))
+
+  def withHint(message: Message): YesNoPageViewModel =
+    copy(hint = Some(message))
 }
 
 object YesNoPageViewModel {
@@ -40,6 +44,7 @@ object YesNoPageViewModel {
       Message(heading),
       List(ParagraphMessage(description)),
       Some(Message(legend)),
+      None,
       onSubmit = onSubmit
     )
 
@@ -49,6 +54,7 @@ object YesNoPageViewModel {
       Message(heading),
       List(),
       Some(Message(legend)),
+      None,
       onSubmit = onSubmit
     )
 
@@ -64,6 +70,7 @@ object YesNoPageViewModel {
       Message(heading),
       description.toList.map(d => ParagraphMessage(d)),
       Some(Message(legend)),
+      None,
       onSubmit = onSubmit
     )
 
@@ -72,6 +79,7 @@ object YesNoPageViewModel {
       title,
       heading,
       List(),
+      None,
       None,
       onSubmit = onSubmit
     )
