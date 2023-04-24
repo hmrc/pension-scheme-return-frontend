@@ -17,6 +17,7 @@
 package generators
 
 import models.UserAnswers
+import models.UserAnswers.SensitiveJsObject
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.TryValues
@@ -44,9 +45,9 @@ trait UserAnswersGenerator extends TryValues {
         }
       } yield UserAnswers(
         id = id,
-        data = data.foldLeft(Json.obj()) {
+        data = data.foldLeft(SensitiveJsObject(Json.obj())) {
           case (obj, (path, value)) =>
-            obj.setObject(path.path, value).get
+            obj.copy(decryptedValue = obj.decryptedValue.setObject(path.path, value).get)
         }
       )
     }
