@@ -14,28 +14,21 @@
  * limitations under the License.
  */
 
-package config
+package pages
 
-object Constants {
+import pages.behaviours.PageBehaviours
+import pages.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldPage
 
-  val psaEnrolmentKey = "HMRC-PODS-ORG"
-  val pspEnrolmentKey = "HMRC-PODSPP-ORG"
+class UnregulatedOrConnectedBondsHeldPageSpec extends PageBehaviours {
 
-  val psaIdKey = "PSAID"
-  val pspIdKey = "PSPID"
+  "UnregulatedOrConnectedBondsHeldPage" - {
 
-  val delimitedPSA = "DELIMITED_PSAID"
-  val detailsNotFound = "no match found"
+    val srn = srnGen.sample.value
 
-  val maxSchemeBankAccounts = 10
-  val maxAccountingPeriods = 3
+    beRetrievable[Boolean](UnregulatedOrConnectedBondsHeldPage(srn))
 
-  val schemeMembersPageSize = 25
-  val maxSchemeMembers = 99
+    beSettable[Boolean](UnregulatedOrConnectedBondsHeldPage(srn))
 
-  val maxCashInBank = 999999999.99
-  val maxAssetValue = 999999999.99
-  val maxMoneyValue = 999999999.99
-
-  val maxMembers = 999999
+    beRemovable[Boolean](UnregulatedOrConnectedBondsHeldPage(srn))
+  }
 }

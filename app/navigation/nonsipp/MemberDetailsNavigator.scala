@@ -61,7 +61,7 @@ object MemberDetailsNavigator extends JourneyNavigator {
 
     case SchemeMembersListPage(srn, true) =>
       refineV[OneTo99](userAnswers.membersDetails(srn).length + 1).fold(
-        _ => controllers.routes.JourneyRecoveryController.onPageLoad(),
+        _ => employercontributions.routes.EmployerContributionsController.onPageLoad(srn, NormalMode),
         index => routes.MemberDetailsController.onPageLoad(srn, index, NormalMode)
       )
 

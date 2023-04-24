@@ -18,15 +18,15 @@ package controllers.nonsipp
 
 import controllers.ControllerBaseSpec
 import forms.YesNoPageFormProvider
-import models.{NormalMode, UserAnswers}
-import navigation.{FakeNavigator, Navigator}
+import models.{MinimalSchemeDetails, NormalMode}
 import org.mockito.ArgumentMatchers.any
+import org.mockito.stubbing.ScalaOngoingStubbing
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import pages.nonsipp.CheckReturnDatesPage
+import pages.nonsipp.{CheckReturnDatesPage, WhichTaxYearPage}
 import play.api.inject.bind
+import play.api.inject.guice.GuiceableModule
 import play.api.mvc.Call
-import play.api.test.FakeRequest
-import services.{FakeTaxYearService, SaveService, SchemeDetailsService, TaxYearService}
+import services.{FakeTaxYearService, SchemeDetailsService, TaxYearService}
 import uk.gov.hmrc.time.TaxYear
 import utils.DateTimeUtils
 import viewmodels.DisplayMessage.{Message, ParagraphMessage}
@@ -38,9 +38,23 @@ import scala.concurrent.Future
 
 class CheckReturnDatesControllerSpec extends ControllerBaseSpec with ScalaCheckPropertyChecks { self =>
 
+  private val mockSchemeDetailsService = mock[SchemeDetailsService]
+  private val taxYear = TaxYear(date.sample.value.getYear)
+
+  override val additionalBindings: List[GuiceableModule] =
+    List(
+      bind[SchemeDetailsService].toInstance(mockSchemeDetailsService),
+      bind[TaxYearService].toInstance(new FakeTaxYearService(taxYear.starts))
+    )
+
+  val dateRange = dateRangeGen.sample.get
+  private val userAnswers = defaultUserAnswers.unsafeSet(WhichTaxYearPage(srn), dateRange)
+
   def onwardRoute = Call("GET", "/foo")
 
   lazy val checkReturnDatesRoute = routes.CheckReturnDatesController.onPageLoad(srn, NormalMode).url
+  lazy val onPageLoad = routes.CheckReturnDatesController.onPageLoad(srn, NormalMode)
+  lazy val onSubmit = routes.CheckReturnDatesController.onSubmit(srn, NormalMode)
 
   "CheckReturnDates.viewModel" - {
 
@@ -141,139 +155,64 @@ class CheckReturnDatesControllerSpec extends ControllerBaseSpec with ScalaCheckP
 
   "CheckReturnDates Controller" - {
 
-    val date = self.date.sample.value
-    val taxYear = TaxYear(date.getYear)
     val minimalSchemeDetails = minimalSchemeDetailsGen.sample.value
     lazy val viewModel: YesNoPageViewModel =
       CheckReturnDatesController.viewModel(
         srn,
         NormalMode,
-        taxYear.starts,
-        taxYear.finishes,
+        dateRange.from,
+        dateRange.to,
         minimalSchemeDetails
       )
 
-    val formProvider = new YesNoPageFormProvider()
-    val form = formProvider("checkReturnDates.error.required", "checkReturnDates.error.invalid")
+    val form = CheckReturnDatesController.form(new YesNoPageFormProvider())
 
-    val mockSchemeDetailsService = mock[SchemeDetailsService]
-    when(mockSchemeDetailsService.getMinimalSchemeDetails(any(), any())(any(), any()))
-      .thenReturn(Future.successful(Some(minimalSchemeDetails)))
+    act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
+      val view = injected[YesNoPageView]
+      view(form, viewModel)
+    }.before(setSchemeDetails(Some(minimalSchemeDetails))))
 
-    def applicationBuilder(userAnswers: Option[UserAnswers]) =
-      self
-        .applicationBuilder(userAnswers)
-        .overrides(
-          bind[TaxYearService].toInstance(new FakeTaxYearService(taxYear.starts)),
-          bind[SchemeDetailsService].toInstance(mockSchemeDetailsService)
-        )
+    act.like(renderPrePopView(onPageLoad, CheckReturnDatesPage(srn), true, userAnswers) {
+      implicit app => implicit request =>
+        val view = injected[YesNoPageView]
+        view(form.fill(true), viewModel)
+    }.before(setSchemeDetails(Some(minimalSchemeDetails))))
 
-    "must return OK and the correct view for a GET" in {
+    act.like(
+      journeyRecoveryPage(onPageLoad)
+        .before(setSchemeDetails(Some(minimalSchemeDetails)))
+        .updateName("onPageLoad" + _)
+    )
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+    act.like(
+      journeyRecoveryPage(onPageLoad)
+        .before(setSchemeDetails(None))
+        .updateName(_ => "onPageLoad redirect to journey recovery page when scheme date not found")
+    )
 
-      running(application) {
-        val request = FakeRequest(GET, checkReturnDatesRoute)
+    act.like(
+      saveAndContinue(onSubmit, userAnswers, formData(form, true): _*)
+        .before(setSchemeDetails(Some(minimalSchemeDetails)))
+    )
 
-        val result = route(application, request).value
+    act.like(invalidForm(onSubmit, userAnswers).before(setSchemeDetails(Some(minimalSchemeDetails))))
 
-        val view = application.injector.instanceOf[YesNoPageView]
+    act.like(
+      journeyRecoveryPage(onSubmit)
+        .before(setSchemeDetails(Some(minimalSchemeDetails)))
+        .updateName("onSubmit" + _)
+    )
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, viewModel)(request, createMessages(application)).body
-      }
-    }
-
-    "must populate the view correctly on a GET when the question has previously been answered" in {
-
-      val userAnswers = UserAnswers(userAnswersId).set(CheckReturnDatesPage(srn), true).success.value
-
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
-
-      running(application) {
-        val request = FakeRequest(GET, checkReturnDatesRoute)
-
-        val view = application.injector.instanceOf[YesNoPageView]
-
-        val result = route(application, request).value
-
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), viewModel)(request, createMessages(application)).toString
-      }
-    }
-
-    "must redirect to the next page when valid data is submitted" in {
-
-      val mockSaveService = mock[SaveService]
-
-      when(mockSaveService.save(any())(any(), any())).thenReturn(Future.successful(()))
-
-      val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
-          .overrides(
-            bind[Navigator].qualifiedWith("non-sipp").toInstance(new FakeNavigator(onwardRoute)),
-            bind[SaveService].toInstance(mockSaveService)
-          )
-          .build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, checkReturnDatesRoute)
-            .withFormUrlEncodedBody(("value", "true"))
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual onwardRoute.url
-      }
-    }
-
-    "must return a Bad Request and errors when invalid data is submitted" in {
-
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-
-      running(application) {
-        val request =
-          FakeRequest(POST, checkReturnDatesRoute)
-            .withFormUrlEncodedBody(("value", "invalid value"))
-
-        val boundForm = form.bind(Map("value" -> "invalid value"))
-
-        val view = application.injector.instanceOf[YesNoPageView]
-
-        val result = route(application, request).value
-
-        status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, viewModel)(request, createMessages(application)).toString
-      }
-    }
-
-    "must redirect to Journey Recovery for a GET if no existing data is found" in {
-
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-        val request = FakeRequest(GET, checkReturnDatesRoute)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
-
-    "must redirect to Journey Recovery for a POST if no existing data is found" in {
-
-      val application = applicationBuilder(userAnswers = None).build()
-
-      running(application) {
-        val request = FakeRequest(POST, checkReturnDatesRoute)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
-      }
-    }
+    act.like(
+      journeyRecoveryPage(onSubmit)
+        .before(setSchemeDetails(None))
+        .updateName(_ => "onSubmit redirect to journey recovery page when scheme date not found")
+    )
   }
+
+  def setSchemeDetails(
+    schemeDetails: Option[MinimalSchemeDetails]
+  ): ScalaOngoingStubbing[Future[Option[MinimalSchemeDetails]]] =
+    when(mockSchemeDetailsService.getMinimalSchemeDetails(any(), any())(any(), any()))
+      .thenReturn(Future.successful(schemeDetails))
 }

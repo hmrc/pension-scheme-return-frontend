@@ -14,28 +14,21 @@
  * limitations under the License.
  */
 
-package config
+package navigation.nonsipp
 
-object Constants {
+import models.UserAnswers
+import navigation.JourneyNavigator
+import pages.Page
+import pages.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldPage
+import play.api.mvc.Call
 
-  val psaEnrolmentKey = "HMRC-PODS-ORG"
-  val pspEnrolmentKey = "HMRC-PODSPP-ORG"
+object UnregulatedOrConnectedBondsNavigator extends JourneyNavigator {
 
-  val psaIdKey = "PSAID"
-  val pspIdKey = "PSPID"
+  override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
 
-  val delimitedPSA = "DELIMITED_PSAID"
-  val detailsNotFound = "no match found"
+    case page @ UnregulatedOrConnectedBondsHeldPage(srn) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
+  }
 
-  val maxSchemeBankAccounts = 10
-  val maxAccountingPeriods = 3
-
-  val schemeMembersPageSize = 25
-  val maxSchemeMembers = 99
-
-  val maxCashInBank = 999999999.99
-  val maxAssetValue = 999999999.99
-  val maxMoneyValue = 999999999.99
-
-  val maxMembers = 999999
+  override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty
 }

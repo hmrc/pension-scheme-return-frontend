@@ -339,6 +339,17 @@ pensionCommencementLumpSum.title = Did any member receive a Pension Commencement
 pensionCommencementLumpSum.heading = Did any member receive a Pension Commencement Lump Sum (PCLS) during the period of this return?
 pensionCommencementLumpSum.error.required = Select yes if any member received a Pension Commencement Lump Sum during the period of this return
 
+feesCommissionsWagesSalaries.title = How much did the scheme pay in fees, commissions, wages and salaries during the period of this return, in pounds and pence?
+feesCommissionsWagesSalaries.heading = How much did {0} pay in fees, commissions, wages and salaries during the period of this return, in pounds and pence?
+feesCommissionsWagesSalaries.hint = If there were none, enter 0.
+feesCommissionsWagesSalaries.error.required = Enter the amount the scheme paid in fees, commissions, wages and salaries during the period of this return, in pounds and pence
+feesCommissionsWagesSalaries.error.invalid = Total of fees, commissions, wages and salaries must be an amount of money, like 123.45 or 156
+feesCommissionsWagesSalaries.error.tooLarge = Total of fees, commissions, wages and salaries must be 999999999.99 or less
+
+unregulatedOrConnectedBondsHeld.title = Did the scheme hold any unregulated bonds, or bonds acquired from a connected party, during the period of this return?
+unregulatedOrConnectedBondsHeld.heading = Did {0} hold any unregulated bonds, or bonds acquired from a connected party,  during the period of this return?
+unregulatedOrConnectedBondsHeld.error.required = Select yes if the scheme held any hold any unregulated bonds, or bonds acquired from a connected party, during the period of this return
+
 moneyBorrowed.title = Did the scheme borrow any money during the period of this return?
 moneyBorrowed.heading = Did {0} borrow any money during the period of this return?
 moneyBorrowed.error.required = Select yes if the scheme borrowed any money during the period of this return

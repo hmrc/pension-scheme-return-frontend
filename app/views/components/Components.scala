@@ -45,6 +45,7 @@ object Components {
 
   def renderMessage(message: DisplayMessage)(implicit messages: Messages): Html =
     message match {
+      case Empty => Html("")
       case m @ Message(_, _) => HtmlFormat.escape(m.toMessage)
       case LinkMessage(content, url) => anchor(renderMessage(content), url)
       case ParagraphMessage(content) => paragraph(content.map(renderMessage).reduce(combine))
