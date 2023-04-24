@@ -28,8 +28,11 @@ sealed trait Query {
 
 trait Gettable[A] extends Query
 
-trait Settable[A] extends Query {
+trait Removable[A] extends Query with Cleanup[A]
 
+trait Settable[A] extends Query with Removable[A] with Cleanup[A]
+
+trait Cleanup[A] {
   def cleanup(value: Option[A], userAnswers: UserAnswers): Try[UserAnswers] =
     Success(userAnswers)
 }

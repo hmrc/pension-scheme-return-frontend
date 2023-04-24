@@ -21,7 +21,7 @@ import models.DateRange
 import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
-import queries.Gettable
+import queries.{Gettable, Removable}
 import utils.RefinedUtils.RefinedIntOps
 
 case class AccountingPeriodPage(srn: Srn, index: Max3) extends QuestionPage[DateRange] {
@@ -31,7 +31,7 @@ case class AccountingPeriodPage(srn: Srn, index: Max3) extends QuestionPage[Date
   override def toString: String = "accountPeriod"
 }
 
-case class AccountingPeriods(srn: Srn) extends Gettable[List[DateRange]] {
+case class AccountingPeriods(srn: Srn) extends Gettable[List[DateRange]] with Removable[List[DateRange]] {
 
   override def path: JsPath = JsPath \ toString
 

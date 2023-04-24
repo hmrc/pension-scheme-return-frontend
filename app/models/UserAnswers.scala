@@ -18,7 +18,7 @@ package models
 
 import play.api.data.Form
 import play.api.libs.json._
-import queries.{Gettable, Settable}
+import queries.{Gettable, Removable, Settable}
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 import utils.Transform
 
@@ -64,7 +64,7 @@ final case class UserAnswers(
   def fillForm[A, B](page: Gettable[B], form: Form[A])(implicit reads: Reads[B], transform: Transform[A, B]): Form[A] =
     get(page).fold(form)(b => form.fill(transform.from(b)))
 
-  def remove[A](page: Settable[A]): Try[UserAnswers] = {
+  def remove[A](page: Removable[A]): Try[UserAnswers] = {
 
     val updatedData = data.removeObject(page.path) match {
       case JsSuccess(jsValue, _) =>
