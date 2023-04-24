@@ -64,7 +64,7 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
     act.like(
       redirectToPage(
         onSubmit,
-        routes.MemberDetailsController.onPageLoad(srn, refineMV(2)),
+        routes.MemberDetailsController.onPageLoad(srn, refineMV(2), NormalMode),
         userAnswersWithMembersDetails,
         "value" -> "true"
       )

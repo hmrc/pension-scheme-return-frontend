@@ -34,24 +34,35 @@ trait NavigatorBehaviours extends ScalaCheckPropertyChecks with EitherValues { s
 
   val navigator: Navigator
 
+  val defaultUserAnswers = UserAnswers("id")
+
   protected trait AllModes {
 
     import Behaviours._
 
-    protected def navigateTo(mode: Mode)(page: Srn => Page, nextPage: (Srn, Mode) => Call): BehaviourTest =
+    protected def navigateTo(mode: Mode)(
+      page: Srn => Page,
+      nextPage: (Srn, Mode) => Call,
+      userAnswers: Srn => UserAnswers
+    ): BehaviourTest =
       s"go from page to nextPage".hasBehaviour {
         forAll(srnGen) { srn =>
-          navigator.nextPage(page(srn), mode, UserAnswers("id")) mustBe nextPage(srn, mode)
+          navigator.nextPage(page(srn), mode, userAnswers(srn)) mustBe nextPage(srn, mode)
         }
       }
 
     protected def navigateToWithData[A: Writes](
       mode: Mode
-    )(page: Srn => QuestionPage[A], data: Gen[A], nextPage: (Srn, Mode) => Call): BehaviourTest =
+    )(
+      page: Srn => QuestionPage[A],
+      data: Gen[A],
+      nextPage: (Srn, Mode) => Call,
+      userAnswers: Srn => UserAnswers
+    ): BehaviourTest =
       s"go from page to nextPage with data".hasBehaviour {
         forAll(srnGen, data) { (srn, data) =>
-          val userAnswers = UserAnswers("id").unsafeSet(page(srn), data)
-          navigator.nextPage(page(srn), mode, userAnswers) mustBe nextPage(srn, mode)
+          val ua = userAnswers(srn).unsafeSet(page(srn), data)
+          navigator.nextPage(page(srn), mode, ua) mustBe nextPage(srn, mode)
         }
       }
 
@@ -61,14 +72,15 @@ trait NavigatorBehaviours extends ScalaCheckPropertyChecks with EitherValues { s
       data: Gen[A],
       indexes: IndexGen[Validator],
       nextPage: (Srn, Refined[Int, Validator], Mode) => Call,
-      maxDataNextPage: (Srn, Mode) => Call
+      maxDataNextPage: (Srn, Mode) => Call,
+      userAnswers: Srn => UserAnswers
     )(implicit ev: Validate[Int, Validator]): MultipleBehaviourTests =
       MultipleBehaviourTests(
         "go from list page to next page",
         List(
           "when no data is added".hasBehaviour {
             forAll(srnGen, indexes.empty) { (srn, index) =>
-              navigator.nextPage(listPage(srn), mode, UserAnswers("id")) mustBe nextPage(srn, index, mode)
+              navigator.nextPage(listPage(srn), mode, userAnswers(srn)) mustBe nextPage(srn, index, mode)
             }
           },
           "when data is added".hasBehaviour {
@@ -80,13 +92,13 @@ trait NavigatorBehaviours extends ScalaCheckPropertyChecks with EitherValues { s
             forAll(srnGen, dataGen) {
               case (srn, (index, data)) =>
                 val nextIndex = refineV(index.value + 1).value
-                val userAnswers =
-                  data.zipWithIndex.foldLeft(UserAnswers("id")) {
+                val ua =
+                  data.zipWithIndex.foldLeft(userAnswers(srn)) {
                     case (acc, (curr, index)) =>
                       acc.unsafeSet(dataPage(srn, refineV(index + 1).value), curr)
                   }
 
-                navigator.nextPage(listPage(srn), mode, userAnswers) mustBe nextPage(srn, nextIndex, mode)
+                navigator.nextPage(listPage(srn), mode, ua) mustBe nextPage(srn, nextIndex, mode)
             }
           },
           "when maximum amount of data has been added".hasBehaviour {
@@ -97,13 +109,13 @@ trait NavigatorBehaviours extends ScalaCheckPropertyChecks with EitherValues { s
 
             forAll(srnGen, dataGen) {
               case (srn, data) =>
-                val userAnswers =
-                  data.zipWithIndex.foldLeft(UserAnswers("id")) {
+                val ua =
+                  data.zipWithIndex.foldLeft(userAnswers(srn)) {
                     case (acc, (curr, index)) =>
                       acc.unsafeSet(dataPage(srn, refineV(index + 1).value), curr)
                   }
 
-                navigator.nextPage(listPage(srn), mode, userAnswers) mustBe maxDataNextPage(srn, mode)
+                navigator.nextPage(listPage(srn), mode, ua) mustBe maxDataNextPage(srn, mode)
             }
           }
         )
@@ -111,15 +123,21 @@ trait NavigatorBehaviours extends ScalaCheckPropertyChecks with EitherValues { s
   }
 
   object normalmode extends AllModes {
-    def navigateTo(page: Srn => Page, nextPage: (Srn, Mode) => Call): Behaviours.BehaviourTest =
-      super.navigateTo(NormalMode)(page, nextPage)
+
+    def navigateTo(
+      page: Srn => Page,
+      nextPage: (Srn, Mode) => Call,
+      userAnswers: Srn => UserAnswers = _ => defaultUserAnswers
+    ): Behaviours.BehaviourTest =
+      super.navigateTo(NormalMode)(page, nextPage, userAnswers)
 
     def navigateToWithData[A: Writes](
       page: Srn => QuestionPage[A],
       data: Gen[A],
-      nextPage: (Srn, Mode) => Call
+      nextPage: (Srn, Mode) => Call,
+      userAnswers: Srn => UserAnswers = _ => defaultUserAnswers
     ): Behaviours.BehaviourTest =
-      super.navigateToWithData(NormalMode)(page, data, nextPage)
+      super.navigateToWithData(NormalMode)(page, data, nextPage, userAnswers)
 
     def navigateFromListPage[A: Writes, Validator](
       listPage: Srn => Page,
@@ -127,7 +145,8 @@ trait NavigatorBehaviours extends ScalaCheckPropertyChecks with EitherValues { s
       data: Gen[A],
       indexes: IndexGen[Validator],
       nextPage: (Srn, Refined[Int, Validator], Mode) => Call,
-      maxDataNextPage: (Srn, Mode) => Call
+      maxDataNextPage: (Srn, Mode) => Call,
+      userAnswers: Srn => UserAnswers = _ => defaultUserAnswers
     )(implicit ev: Validate[Int, Validator]): Behaviours.MultipleBehaviourTests =
       super.navigateFromListPage[A, Validator](NormalMode)(
         listPage,
@@ -135,20 +154,26 @@ trait NavigatorBehaviours extends ScalaCheckPropertyChecks with EitherValues { s
         data,
         indexes,
         nextPage,
-        maxDataNextPage
+        maxDataNextPage,
+        userAnswers
       )
   }
 
   object checkmode extends AllModes {
-    def navigateTo(page: Srn => Page, nextPage: (Srn, Mode) => Call): Behaviours.BehaviourTest =
-      super.navigateTo(CheckMode)(page, nextPage)
+    def navigateTo(
+      page: Srn => Page,
+      nextPage: (Srn, Mode) => Call,
+      userAnswers: Srn => UserAnswers = _ => defaultUserAnswers
+    ): Behaviours.BehaviourTest =
+      super.navigateTo(CheckMode)(page, nextPage, userAnswers)
 
     def navigateToWithData[A: Writes](
       page: Srn => QuestionPage[A],
       data: Gen[A],
-      nextPage: (Srn, Mode) => Call
+      nextPage: (Srn, Mode) => Call,
+      userAnswers: Srn => UserAnswers = _ => defaultUserAnswers
     ): Behaviours.BehaviourTest =
-      super.navigateToWithData(CheckMode)(page, data, nextPage)
+      super.navigateToWithData(CheckMode)(page, data, nextPage, userAnswers)
 
     def navigateFromListPage[A: Writes, Validator](
       listPage: Srn => Page,
@@ -156,7 +181,8 @@ trait NavigatorBehaviours extends ScalaCheckPropertyChecks with EitherValues { s
       data: Gen[A],
       indexes: IndexGen[Validator],
       nextPage: (Srn, Refined[Int, Validator], Mode) => Call,
-      maxDataNextPage: (Srn, Mode) => Call
+      maxDataNextPage: (Srn, Mode) => Call,
+      userAnswers: Srn => UserAnswers = _ => defaultUserAnswers
     )(implicit ev: Validate[Int, Validator]): Behaviours.MultipleBehaviourTests =
       super.navigateFromListPage[A, Validator](CheckMode)(
         listPage,
@@ -164,7 +190,8 @@ trait NavigatorBehaviours extends ScalaCheckPropertyChecks with EitherValues { s
         data,
         indexes,
         nextPage,
-        maxDataNextPage
+        maxDataNextPage,
+        userAnswers
       )
   }
 
