@@ -132,7 +132,7 @@ object CheckReturnDatesController {
         )
       ),
       Some(Message("checkReturnDates.legend")),
-      Some(Message("")),
+      None,
       onSubmit = routes.CheckReturnDatesController.onSubmit(srn, mode)
     )
 }
