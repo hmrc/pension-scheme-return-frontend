@@ -36,15 +36,17 @@ class AccountingPeriodPageSpec extends PageBehaviours {
 
   "AccountingPeriods" - {
 
-    beRetrievableList[DateRange](
-      getter = AccountingPeriods(srn),
-      setter = AccountingPeriodPage(srn, refineMV(1))
-    )
+    beRetrievable[DateRange]
+      .list(
+        getter = AccountingPeriods(srn),
+        setter = AccountingPeriodPage(srn, refineMV(1))
+      )
 
-    beRemovableList[DateRange](
-      getter = AccountingPeriods(srn),
-      setter = AccountingPeriodPage(srn, refineMV(1)),
-      remover = AccountingPeriods(srn)
-    )
+    beRemovable[DateRange]
+      .list(
+        getter = AccountingPeriods(srn),
+        setter = AccountingPeriodPage(srn, refineMV(1)),
+        remover = AccountingPeriods(srn)
+      )
   }
 }

@@ -73,10 +73,8 @@ trait PageBehaviours
           }
         }
       }
-  }
 
-  class BeRetrievableList[A] {
-    def apply(
+    def list(
       getter: Gen[Gettable[List[A]]],
       setter: Gen[Settable[A]]
     )(implicit ev1: Arbitrary[A], ev2: Format[A]): Unit =
@@ -174,10 +172,8 @@ trait PageBehaviours
             updatedAnswers.get(page) must be(empty)
         }
       }
-  }
 
-  class BeRemovableList[A] {
-    def apply(
+    def list(
       getter: Gen[Gettable[List[A]]],
       setter: Gen[Settable[A]],
       remover: Gen[Removable[List[A]]]
@@ -202,13 +198,9 @@ trait PageBehaviours
 
   def beRetrievable[A]: BeRetrievable[A] = new BeRetrievable[A]
 
-  def beRetrievableList[A]: BeRetrievableList[A] = new BeRetrievableList[A]
-
   def beSettable[A]: BeSettable[A] = new BeSettable[A]
 
   def beSettableWithIndex[A, Index]: BeSettableWithIndex[A, Index] = new BeSettableWithIndex[A, Index]
 
   def beRemovable[A]: BeRemovable[A] = new BeRemovable[A]
-
-  def beRemovableList[A]: BeRemovableList[A] = new BeRemovableList[A]
 }
