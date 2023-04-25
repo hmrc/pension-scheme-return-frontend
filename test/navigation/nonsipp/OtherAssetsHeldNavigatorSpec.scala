@@ -17,36 +17,35 @@
 package navigation.nonsipp
 
 import controllers.routes
-import controllers.nonsipp.receivetransfer
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldPage
+import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
 import utils.BaseSpec
 
-class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
+class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
   val navigator: Navigator = new NonSippNavigator
 
-  "UnregulatedOrConnectedBondsNavigator" - {
+  "OtherAssetsHeldNavigator" - {
 
     act.like(
       normalmode
         .navigateToWithData(
-          UnregulatedOrConnectedBondsHeldPage,
+          OtherAssetsHeldPage,
           Gen.const(true),
           (_, _) => routes.UnauthorisedController.onPageLoad()
         )
-        .withName("go from unregulated Or connected bonds held page to Unauthorised page when yes selected")
+        .withName("go from other assets held page to unauthorised page when yes selected")
     )
 
     act.like(
       normalmode
         .navigateToWithData(
-          UnregulatedOrConnectedBondsHeldPage,
+          OtherAssetsHeldPage,
           Gen.const(false),
-          controllers.nonsipp.otherassetsheld.routes.OtherAssetsHeldController.onPageLoad
+          controllers.nonsipp.otherassets.routes.FeesCommissionsWagesSalariesController.onPageLoad
         )
-        .withName("go from unregulated Or connected bonds held page to other assets held page when no selected")
+        .withName("go from other assets held page to fees commissions wages salaries page when no selected")
     )
   }
 }

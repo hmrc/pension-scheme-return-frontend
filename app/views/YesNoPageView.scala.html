@@ -38,6 +38,8 @@
 
     <h1 class="govuk-heading-l">@viewmodel.heading.toMessage</h1>
 
+    <div class="govuk-hint">@viewmodel.hint.map(renderMessage)</div>
+
     @viewmodel.description.map(renderMessage)
 
     @govukRadios(

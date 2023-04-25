@@ -205,3 +205,8 @@ GET        /:srn/benefits-surrendered               controllers.nonsipp.benefits
 POST       /:srn/benefits-surrendered               controllers.nonsipp.benefitssurrendered.BenefitsSurrenderedController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 GET        /:srn/change-benefits-surrendered        controllers.nonsipp.benefitssurrendered.BenefitsSurrenderedController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST       /:srn/change-benefits-surrendered        controllers.nonsipp.benefitssurrendered.BenefitsSurrenderedController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET        /:srn/other-assets-held                      controllers.nonsipp.otherassetsheld.OtherAssetsHeldController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST       /:srn/other-assets-held                      controllers.nonsipp.otherassetsheld.OtherAssetsHeldController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/change-other-assets-held               controllers.nonsipp.otherassetsheld.OtherAssetsHeldController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST       /:srn/change-other-assets-held               controllers.nonsipp.otherassetsheld.OtherAssetsHeldController.onSubmit(srn: Srn, mode: Mode = CheckMode)
