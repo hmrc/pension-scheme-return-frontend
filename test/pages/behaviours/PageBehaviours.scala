@@ -20,12 +20,13 @@ import generators.Generators
 import models.UserAnswers
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Arbitrary, Gen}
-import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import org.scalatest.{OptionValues, TryValues}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
+import org.scalatest.{OptionValues, TryValues}
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import pages.QuestionPage
 import play.api.libs.json._
+import queries.{Gettable, Removable, Settable}
 
 trait PageBehaviours
     extends AnyFreeSpec
@@ -68,6 +69,48 @@ trait PageBehaviours
             forAll(gen) {
               case (page, savedValue, userAnswers) =>
                 userAnswers.get(page).value mustEqual savedValue
+            }
+          }
+        }
+      }
+
+    def list(
+      getter: Gen[Gettable[List[A]]],
+      setter: Gen[Settable[A]]
+    )(implicit ev1: Arbitrary[A], ev2: Format[A]): Unit =
+      "when being retrieved from UserAnswers" - {
+
+        "and the question has not been answered" - {
+
+          "must return None" in {
+
+            val gen = for {
+              getter <- getter
+              setter <- setter
+              userAnswers <- arbitrary[UserAnswers]
+            } yield (getter, userAnswers.remove(setter).success.value)
+
+            forAll(gen) {
+              case (page, userAnswers) =>
+                userAnswers.get(page) must be(empty)
+            }
+          }
+        }
+
+        "and the question has been answered" - {
+
+          "must return the saved value" in {
+
+            val gen = for {
+              getter <- getter
+              setter <- setter
+              savedValue <- arbitrary[A]
+              userAnswers <- arbitrary[UserAnswers]
+            } yield (getter, savedValue, userAnswers.set(setter, savedValue).success.value)
+
+            forAll(gen) {
+              case (page, savedValue, userAnswers) =>
+                userAnswers.get(page).value mustEqual List(savedValue)
             }
           }
         }
@@ -127,6 +170,28 @@ trait PageBehaviours
           case (page, userAnswers) =>
             val updatedAnswers = userAnswers.remove(page).success.value
             updatedAnswers.get(page) must be(empty)
+        }
+      }
+
+    def list(
+      getter: Gen[Gettable[List[A]]],
+      setter: Gen[Settable[A]],
+      remover: Gen[Removable[List[A]]]
+    )(implicit ev1: Arbitrary[A], ev2: Format[A]): Unit =
+      "must be able to be removed from UserAnswers" in {
+
+        val gen = for {
+          getter <- getter
+          setter <- setter
+          remover <- remover
+          savedValue <- arbitrary[A]
+          userAnswers <- arbitrary[UserAnswers]
+        } yield (getter, remover, userAnswers.set(setter, savedValue).success.value)
+
+        forAll(gen) {
+          case (getter, remover, userAnswers) =>
+            val updatedAnswers = userAnswers.remove(remover).success.value
+            updatedAnswers.get(getter) must be(empty)
         }
       }
   }

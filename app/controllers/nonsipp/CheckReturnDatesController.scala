@@ -62,10 +62,7 @@ class CheckReturnDatesController @Inject()(
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] =
     identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData).async { implicit request =>
       getMinimalSchemeDetails(request.pensionSchemeId, srn) { details =>
-        val preparedForm = request.userAnswers.get(CheckReturnDatesPage(srn)) match {
-          case None => form
-          case Some(value) => form.fill(value)
-        }
+        val preparedForm = request.userAnswers.fillForm(CheckReturnDatesPage(srn), form)
 
         getWhichTaxYear(srn) { taxYear =>
           val viewModel = CheckReturnDatesController.viewModel(srn, mode, taxYear.from, taxYear.to, details)

@@ -16,19 +16,50 @@
 
 package pages
 
+import eu.timepit.refined.refineMV
+import models.UserAnswers
 import pages.behaviours.PageBehaviours
 import pages.nonsipp.CheckReturnDatesPage
+import pages.nonsipp.accountingperiod.{AccountingPeriodPage, AccountingPeriods}
+import utils.UserAnswersUtils.UserAnswersOps
 
 class CheckReturnDatesPageSpec extends PageBehaviours {
 
-  "CheckReturnDatesPage" - {
+  val srn = srnGen.sample.value
 
-    val srn = srnGen.sample.value
+  "CheckReturnDatesPage" - {
 
     beRetrievable[Boolean](CheckReturnDatesPage(srn))
 
     beSettable[Boolean](CheckReturnDatesPage(srn))
 
     beRemovable[Boolean](CheckReturnDatesPage(srn))
+
+    "cleanup" - {
+
+      val userAnswers =
+        UserAnswers("id")
+          .unsafeSet(AccountingPeriodPage(srn, refineMV(1)), dateRangeGen.sample.value)
+          .unsafeSet(AccountingPeriodPage(srn, refineMV(2)), dateRangeGen.sample.value)
+          .unsafeSet(AccountingPeriodPage(srn, refineMV(3)), dateRangeGen.sample.value)
+
+      List(Some(true), None).foreach { answer =>
+        s"remove accounting periods when answer is $answer" in {
+
+          val result = CheckReturnDatesPage(srn).cleanup(answer, userAnswers).toOption.value
+
+          result.get(AccountingPeriods(srn)) mustBe None
+        }
+      }
+
+      "retain accounting periods when answer is Some(false)" in {
+
+        val expected = userAnswers.get(AccountingPeriods(srn))
+
+        val result = CheckReturnDatesPage(srn).cleanup(Some(false), userAnswers).toOption.value
+
+        result.get(AccountingPeriods(srn)) mustBe expected
+      }
+    }
   }
 }

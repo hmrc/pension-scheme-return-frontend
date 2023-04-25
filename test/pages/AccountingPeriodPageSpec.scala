@@ -19,18 +19,34 @@ package pages
 import eu.timepit.refined.refineMV
 import models.DateRange
 import pages.behaviours.PageBehaviours
-import pages.nonsipp.accountingperiod.AccountingPeriodPage
+import pages.nonsipp.accountingperiod.{AccountingPeriodPage, AccountingPeriods}
 
 class AccountingPeriodPageSpec extends PageBehaviours {
 
-  "AccountingPeriodPage" - {
+  val srn = srnGen.sample.value
 
-    val srn = srnGen.sample.value
+  "AccountingPeriodPage" - {
 
     beRetrievable[DateRange](AccountingPeriodPage(srn, refineMV(1)))
 
     beSettable[DateRange](AccountingPeriodPage(srn, refineMV(1)))
 
     beRemovable[DateRange](AccountingPeriodPage(srn, refineMV(1)))
+  }
+
+  "AccountingPeriods" - {
+
+    beRetrievable[DateRange]
+      .list(
+        getter = AccountingPeriods(srn),
+        setter = AccountingPeriodPage(srn, refineMV(1))
+      )
+
+    beRemovable[DateRange]
+      .list(
+        getter = AccountingPeriods(srn),
+        setter = AccountingPeriodPage(srn, refineMV(1)),
+        remover = AccountingPeriods(srn)
+      )
   }
 }

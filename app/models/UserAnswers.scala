@@ -19,7 +19,7 @@ package models
 import models.UserAnswers.SensitiveJsObject
 import play.api.data.Form
 import play.api.libs.json._
-import queries.{Gettable, Settable}
+import queries.{Gettable, Removable, Settable}
 import uk.gov.hmrc.crypto.json.JsonEncryption
 import uk.gov.hmrc.crypto.{Decrypter, Encrypter, Sensitive}
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
@@ -32,7 +32,7 @@ final case class UserAnswers(
   id: String,
   data: SensitiveJsObject = SensitiveJsObject(Json.obj()),
   lastUpdated: Instant = Instant.now
-) {
+) { self =>
 
   def get[A](page: Gettable[A])(implicit rds: Reads[A]): Option[A] =
     Reads.optionNoError(Reads.at(page.path)).reads(data.decryptedValue).getOrElse(None)
@@ -49,38 +49,46 @@ final case class UserAnswers(
   def map[A](page: Gettable[Map[String, A]])(implicit rds: Reads[A]): Map[String, A] =
     get(page).getOrElse(Map.empty)
 
-  def set[A](page: Settable[A], value: A)(implicit writes: Writes[A]): Try[UserAnswers] = {
-
-    val updatedData =
-      data.decryptedValue.setObject(page.path, Json.toJson(value)) match {
-        case JsSuccess(jsValue, _) =>
-          Success(jsValue)
-        case JsError(errors) =>
-          Failure(JsResultException(errors))
-      }
-
-    updatedData.flatMap { d =>
-      val updatedAnswers = copy(data = SensitiveJsObject(d))
-      page.cleanup(Some(value), updatedAnswers)
-    }
-  }
-
   def fillForm[A, B](page: Gettable[B], form: Form[A])(implicit reads: Reads[B], transform: Transform[A, B]): Form[A] =
     get(page).fold(form)(b => form.fill(transform.from(b)))
 
-  def remove[A](page: Settable[A]): Try[UserAnswers] = {
+  def set[A](page: Settable[A], value: A)(implicit writes: Writes[A]): Try[UserAnswers] =
+    page
+      .cleanup(Some(value), self)
+      .transform(
+        _.setOnly(page, value),
+        _ => setOnly(page, value)
+      )
 
-    val updatedData = data.decryptedValue.removeObject(page.path) match {
+  def remove[A](page: Removable[A]): Try[UserAnswers] =
+    page
+      .cleanup(None, self)
+      .transform(
+        _.removeOnly(page),
+        _ => removeOnly(page)
+      )
+
+  private def setOnly[A](page: Settable[A], value: A)(implicit writes: Writes[A]): Try[UserAnswers] = {
+    val updatedData = data.decryptedValue.setObject(page.path, Json.toJson(value)) match {
       case JsSuccess(jsValue, _) =>
         Success(jsValue)
-      case JsError(_) =>
-        Success(data.decryptedValue)
+      case JsError(errors) =>
+        Failure(JsResultException(errors))
     }
 
-    updatedData.flatMap { d =>
-      val updatedAnswers = copy(data = SensitiveJsObject(d))
-      page.cleanup(None, updatedAnswers)
-    }
+    updatedData.map(d => copy(data = SensitiveJsObject(d)))
+  }
+
+  private def removeOnly[A](page: Removable[A]): Try[UserAnswers] = {
+    val updatedData =
+      data.decryptedValue.removeObject(page.path) match {
+        case JsSuccess(jsValue, _) =>
+          Success(jsValue)
+        case JsError(_) =>
+          Success(data.decryptedValue)
+      }
+
+    updatedData.map(d => copy(data = SensitiveJsObject(d)))
   }
 }
 
