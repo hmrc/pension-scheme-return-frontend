@@ -29,7 +29,7 @@ final case class UserAnswers(
   id: String,
   data: JsObject = Json.obj(),
   lastUpdated: Instant = Instant.now
-) {
+) { self =>
 
   def get[A](page: Gettable[A])(implicit rds: Reads[A]): Option[A] =
     Reads.optionNoError(Reads.at(page.path)).reads(data).getOrElse(None)
@@ -46,8 +46,26 @@ final case class UserAnswers(
   def map[A](page: Gettable[Map[String, A]])(implicit rds: Reads[A]): Map[String, A] =
     get(page).getOrElse(Map.empty)
 
-  def set[A](page: Settable[A], value: A)(implicit writes: Writes[A]): Try[UserAnswers] = {
+  def set[A](page: Settable[A], value: A)(implicit writes: Writes[A]): Try[UserAnswers] =
+    page
+      .cleanup(Some(value), self)
+      .transform(
+        _.setOnly(page, value),
+        _ => setOnly(page, value)
+      )
 
+  def fillForm[A, B](page: Gettable[B], form: Form[A])(implicit reads: Reads[B], transform: Transform[A, B]): Form[A] =
+    get(page).fold(form)(b => form.fill(transform.from(b)))
+
+  def remove[A](page: Removable[A]): Try[UserAnswers] =
+    page
+      .cleanup(None, self)
+      .transform(
+        _.removeOnly(page),
+        _ => removeOnly(page)
+      )
+
+  private def setOnly[A](page: Settable[A], value: A)(implicit writes: Writes[A]): Try[UserAnswers] = {
     val updatedData = data.setObject(page.path, Json.toJson(value)) match {
       case JsSuccess(jsValue, _) =>
         Success(jsValue)
@@ -55,17 +73,10 @@ final case class UserAnswers(
         Failure(JsResultException(errors))
     }
 
-    updatedData.flatMap { d =>
-      val updatedAnswers = copy(data = d)
-      page.cleanup(Some(value), updatedAnswers)
-    }
+    updatedData.map(d => copy(data = d))
   }
 
-  def fillForm[A, B](page: Gettable[B], form: Form[A])(implicit reads: Reads[B], transform: Transform[A, B]): Form[A] =
-    get(page).fold(form)(b => form.fill(transform.from(b)))
-
-  def remove[A](page: Removable[A]): Try[UserAnswers] = {
-
+  private def removeOnly[A](page: Removable[A]): Try[UserAnswers] = {
     val updatedData = data.removeObject(page.path) match {
       case JsSuccess(jsValue, _) =>
         Success(jsValue)
@@ -73,10 +84,7 @@ final case class UserAnswers(
         Success(data)
     }
 
-    updatedData.flatMap { d =>
-      val updatedAnswers = copy(data = d)
-      page.cleanup(None, updatedAnswers)
-    }
+    updatedData.map(d => copy(data = d))
   }
 }
 

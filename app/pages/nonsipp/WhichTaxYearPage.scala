@@ -16,13 +16,19 @@
 
 package pages.nonsipp
 
-import models.DateRange
+import models.{DateRange, UserAnswers}
 import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case class WhichTaxYearPage(srn: Srn) extends QuestionPage[DateRange] {
+import scala.util.{Success, Try}
+
+case class WhichTaxYearPage(srn: Srn) extends QuestionPage[DateRange] { self =>
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "whichTaxYear"
+
+  override def cleanup(value: Option[DateRange], userAnswers: UserAnswers): Try[UserAnswers] =
+    if (value != userAnswers.get(self)) userAnswers.remove(CheckReturnDatesPage(srn))
+    else Success(userAnswers)
 }

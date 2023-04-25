@@ -16,20 +16,42 @@
 
 package pages
 
-import models.DateRange
+import models.{DateRange, UserAnswers}
 import pages.behaviours.PageBehaviours
-import pages.nonsipp.WhichTaxYearPage
+import pages.nonsipp.{CheckReturnDatesPage, WhichTaxYearPage}
+import utils.UserAnswersUtils.UserAnswersOps
 
 class WhichTaxYearPageSpec extends PageBehaviours {
 
-  "WhichTaxYearPage" - {
+  val srn = srnGen.sample.value
 
-    val srn = srnGen.sample.value
+  "WhichTaxYearPage" - {
 
     beRetrievable[DateRange](WhichTaxYearPage(srn))
 
     beSettable[DateRange](WhichTaxYearPage(srn))
 
     beRemovable[DateRange](WhichTaxYearPage(srn))
+
+    "cleanup" - {
+
+      val dateRange1 = dateRangeGen.sample.value
+      val dateRange2 = dateRangeGen.retryUntil(_ != dateRange1).sample.value
+      val checkDates = boolean.sample.value
+      val userAnswers =
+        UserAnswers("id")
+          .unsafeSet(WhichTaxYearPage(srn), dateRange1)
+          .unsafeSet(CheckReturnDatesPage(srn), checkDates)
+
+      "remove check return dates value when tax year changes" - {
+        val updatedAnswers = userAnswers.set(WhichTaxYearPage(srn), dateRange2).toOption.value
+        updatedAnswers.get(CheckReturnDatesPage(srn)) mustBe None
+      }
+
+      "do not remove check return dates value when tax year remains the same" - {
+        val updatedAnswers = userAnswers.set(WhichTaxYearPage(srn), dateRange1).toOption.value
+        updatedAnswers.get(CheckReturnDatesPage(srn)) mustBe Some(checkDates)
+      }
+    }
   }
 }

@@ -43,7 +43,7 @@ class CheckReturnDatesPageSpec extends PageBehaviours {
           .unsafeSet(AccountingPeriodPage(srn, refineMV(2)), dateRangeGen.sample.value)
           .unsafeSet(AccountingPeriodPage(srn, refineMV(3)), dateRangeGen.sample.value)
 
-      List(Some(false), None).foreach { answer =>
+      List(Some(true), None).foreach { answer =>
         s"remove accounting periods when answer is $answer" in {
 
           val result = CheckReturnDatesPage(srn).cleanup(answer, userAnswers).toOption.value
@@ -52,11 +52,11 @@ class CheckReturnDatesPageSpec extends PageBehaviours {
         }
       }
 
-      "retain accounting periods when answer is Some(true)" in {
+      "retain accounting periods when answer is Some(false)" in {
 
         val expected = userAnswers.get(AccountingPeriods(srn))
 
-        val result = CheckReturnDatesPage(srn).cleanup(Some(true), userAnswers).toOption.value
+        val result = CheckReturnDatesPage(srn).cleanup(Some(false), userAnswers).toOption.value
 
         result.get(AccountingPeriods(srn)) mustBe expected
       }

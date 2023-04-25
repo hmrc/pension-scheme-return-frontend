@@ -32,7 +32,7 @@ case class CheckReturnDatesPage(srn: Srn) extends QuestionPage[Boolean] {
 
   override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
     value match {
-      case Some(false) | None => userAnswers.remove(AccountingPeriods(srn))
-      case Some(true) => Success(userAnswers)
+      case Some(true) | None => userAnswers.remove(AccountingPeriods(srn))
+      case Some(false) => Success(userAnswers)
     }
 }
