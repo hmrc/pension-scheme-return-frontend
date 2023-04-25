@@ -16,9 +16,12 @@
 
 package models
 
+import models.UserAnswers.SensitiveJsObject
 import play.api.data.Form
 import play.api.libs.json._
 import queries.{Gettable, Removable, Settable}
+import uk.gov.hmrc.crypto.json.JsonEncryption
+import uk.gov.hmrc.crypto.{Decrypter, Encrypter, Sensitive}
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 import utils.Transform
 
@@ -27,12 +30,12 @@ import scala.util.{Failure, Success, Try}
 
 final case class UserAnswers(
   id: String,
-  data: JsObject = Json.obj(),
+  data: SensitiveJsObject = SensitiveJsObject(Json.obj()),
   lastUpdated: Instant = Instant.now
 ) { self =>
 
   def get[A](page: Gettable[A])(implicit rds: Reads[A]): Option[A] =
-    Reads.optionNoError(Reads.at(page.path)).reads(data).getOrElse(None)
+    Reads.optionNoError(Reads.at(page.path)).reads(data.decryptedValue).getOrElse(None)
 
   def list[A](page: Gettable[List[A]])(implicit rds: Reads[A]): List[A] =
     get(page).getOrElse(Nil)
@@ -46,6 +49,9 @@ final case class UserAnswers(
   def map[A](page: Gettable[Map[String, A]])(implicit rds: Reads[A]): Map[String, A] =
     get(page).getOrElse(Map.empty)
 
+  def fillForm[A, B](page: Gettable[B], form: Form[A])(implicit reads: Reads[B], transform: Transform[A, B]): Form[A] =
+    get(page).fold(form)(b => form.fill(transform.from(b)))
+
   def set[A](page: Settable[A], value: A)(implicit writes: Writes[A]): Try[UserAnswers] =
     page
       .cleanup(Some(value), self)
@@ -53,9 +59,6 @@ final case class UserAnswers(
         _.setOnly(page, value),
         _ => setOnly(page, value)
       )
-
-  def fillForm[A, B](page: Gettable[B], form: Form[A])(implicit reads: Reads[B], transform: Transform[A, B]): Form[A] =
-    get(page).fold(form)(b => form.fill(transform.from(b)))
 
   def remove[A](page: Removable[A]): Try[UserAnswers] =
     page
@@ -66,55 +69,61 @@ final case class UserAnswers(
       )
 
   private def setOnly[A](page: Settable[A], value: A)(implicit writes: Writes[A]): Try[UserAnswers] = {
-    val updatedData = data.setObject(page.path, Json.toJson(value)) match {
+    val updatedData = data.decryptedValue.setObject(page.path, Json.toJson(value)) match {
       case JsSuccess(jsValue, _) =>
         Success(jsValue)
       case JsError(errors) =>
         Failure(JsResultException(errors))
     }
 
-    updatedData.map(d => copy(data = d))
+    updatedData.map(d => copy(data = SensitiveJsObject(d)))
   }
 
   private def removeOnly[A](page: Removable[A]): Try[UserAnswers] = {
-    val updatedData = data.removeObject(page.path) match {
-      case JsSuccess(jsValue, _) =>
-        Success(jsValue)
-      case JsError(_) =>
-        Success(data)
-    }
+    val updatedData =
+      data.decryptedValue.removeObject(page.path) match {
+        case JsSuccess(jsValue, _) =>
+          Success(jsValue)
+        case JsError(_) =>
+          Success(data.decryptedValue)
+      }
 
-    updatedData.map(d => copy(data = d))
+    updatedData.map(d => copy(data = SensitiveJsObject(d)))
   }
 }
 
 object UserAnswers {
 
-  val reads: Reads[UserAnswers] = {
+  case class SensitiveJsObject(override val decryptedValue: JsObject) extends Sensitive[JsObject]
+
+  implicit def sensitiveJsObjectFormat(implicit crypto: Encrypter with Decrypter): Format[SensitiveJsObject] =
+    JsonEncryption.sensitiveEncrypterDecrypter(SensitiveJsObject.apply)
+
+  def reads(implicit crypto: Encrypter with Decrypter): Reads[UserAnswers] = {
 
     import play.api.libs.functional.syntax._
 
-    ((__ \ "_id")
+    (__ \ "_id")
       .read[String]
-      .and((__ \ "data").read[JsObject])
+      .and((__ \ "data").read[SensitiveJsObject])
       .and(
         (__ \ "lastUpdated")
           .read(MongoJavatimeFormats.instantFormat)
-      ))(UserAnswers.apply _)
+      )(UserAnswers.apply _)
   }
 
-  val writes: OWrites[UserAnswers] = {
+  def writes(implicit crypto: Encrypter with Decrypter): OWrites[UserAnswers] = {
 
     import play.api.libs.functional.syntax._
 
-    ((__ \ "_id")
+    (__ \ "_id")
       .write[String]
-      .and((__ \ "data").write[JsObject])
+      .and((__ \ "data").write[SensitiveJsObject])
       .and(
         (__ \ "lastUpdated")
           .write(MongoJavatimeFormats.instantFormat)
-      ))(unlift(UserAnswers.unapply))
+      )(unlift(UserAnswers.unapply))
   }
 
-  implicit val format: OFormat[UserAnswers] = OFormat(reads, writes)
+  implicit def format(implicit crypto: Encrypter with Decrypter): OFormat[UserAnswers] = OFormat(reads, writes)
 }

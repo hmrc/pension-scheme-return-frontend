@@ -17,6 +17,7 @@
 package controllers
 
 import controllers.actions._
+import models.UserAnswers.SensitiveJsObject
 import models.{Establisher, EstablisherKind, NameDOB, SchemeDetails, SchemeId, SchemeStatus, UserAnswers}
 import play.api.Application
 import play.api.data.Form
@@ -55,7 +56,8 @@ trait ControllerBaseSpec
 
   def emptyUserAnswers: UserAnswers = UserAnswers(userAnswersId)
 
-  val defaultUserAnswers: UserAnswers = UserAnswers(userAnswersId, Json.obj("non" -> "empty"))
+  val defaultUserAnswers: UserAnswers =
+    UserAnswers(userAnswersId, SensitiveJsObject(Json.obj("non" -> "empty")))
 
   protected def applicationBuilder(
     userAnswers: Option[UserAnswers] = None,

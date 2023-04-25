@@ -1,19 +1,21 @@
 package repositories
 
-import config.FrontendAppConfig
+import config.{FakeCrypto, FrontendAppConfig}
+import generators.Generators
 import models.UserAnswers
+import models.UserAnswers.SensitiveJsObject
 import org.mockito.Mockito.when
+import org.mongodb.scala.bson.BsonDocument
 import org.mongodb.scala.model.Filters
 import org.scalatest.OptionValues
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.libs.json.Json
 import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
 
-import java.time.{Clock, Instant, ZoneId}
 import java.time.temporal.ChronoUnit
+import java.time.{Clock, Instant, ZoneId}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class SessionRepositorySpec
@@ -23,12 +25,14 @@ class SessionRepositorySpec
     with ScalaFutures
     with IntegrationPatience
     with OptionValues
-    with MockitoSugar {
+    with MockitoSugar
+    with Generators {
 
   private val instant = Instant.now.truncatedTo(ChronoUnit.MILLIS)
   private val stubClock: Clock = Clock.fixed(instant, ZoneId.systemDefault)
 
-  private val userAnswers = UserAnswers("id", Json.obj("foo" -> "bar"), Instant.ofEpochSecond(1))
+  private val savedAnswers = jsObjectGen(maxDepth = 5).sample.value
+  private val userAnswers = UserAnswers("id", SensitiveJsObject(savedAnswers), Instant.ofEpochSecond(1))
 
   private val mockAppConfig = mock[FrontendAppConfig]
   when(mockAppConfig.cacheTtl) thenReturn 1
@@ -36,7 +40,8 @@ class SessionRepositorySpec
   protected override val repository = new SessionRepository(
     mongoComponent = mongoComponent,
     appConfig      = mockAppConfig,
-    clock          = stubClock
+    clock          = stubClock,
+    crypto         = FakeCrypto
   )
 
   ".set" - {
@@ -121,5 +126,20 @@ class SessionRepositorySpec
         repository.keepAlive("id that does not exist").futureValue mustEqual ()
       }
     }
+  }
+
+  "encrypt data at rest" in {
+
+    insert(userAnswers).futureValue
+    val rawData =
+      repository
+        .collection
+        .find[BsonDocument](Filters.equal("_id", userAnswers.id))
+        .toFuture()
+        .futureValue
+        .headOption
+
+    assert(rawData.nonEmpty)
+    rawData.map(_.get("data").asString().getValue must fullyMatch.regex("^[A-Za-z0-9+/=]+$"))
   }
 }

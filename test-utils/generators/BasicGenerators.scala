@@ -30,6 +30,7 @@ import java.time.{Instant, LocalDate, ZoneOffset}
 import eu.timepit.refined._
 import models.Pagination
 import org.scalatest.EitherValues
+import play.api.libs.json.{JsArray, JsBoolean, JsNull, JsNumber, JsObject, JsString, JsValue, Json}
 import viewmodels.models.PaginatedViewModel
 
 trait BasicGenerators extends EitherValues {
@@ -227,4 +228,54 @@ trait BasicGenerators extends EitherValues {
   }
 
   implicit val max99: Gen[Max99] = chooseNum(1, 99).map(refineV[OneTo99](_).value)
+
+  val jsStringGen: Gen[JsString] =
+    Gen.alphaStr.map(JsString)
+
+  val jsBooleanGen: Gen[JsBoolean] =
+    Gen.oneOf(true, false).map(JsBoolean)
+
+  val jsNumberGen: Gen[JsNumber] =
+    Gen.oneOf(
+      Gen.chooseNum(Int.MinValue, Int.MaxValue).map(JsNumber(_)),
+      Gen.chooseNum(Double.MinValue, Double.MaxValue).map(JsNumber(_)),
+      Gen.chooseNum(Long.MinValue, Long.MaxValue).map(JsNumber(_))
+    )
+
+  val jsNullGen: Gen[JsNull.type] = Gen.const(JsNull)
+
+  def jsObjectGen(maxDepth: Int): Gen[JsObject] =
+    for {
+      size <- Gen.chooseNum(1, 10)
+      obj <- Gen.listOfN(size, tupleOf(nonEmptyString, jsValueGen(maxDepth - 1)))
+    } yield {
+      obj.foldLeft(Json.obj())(_ + _)
+    }
+
+  def jsArrayGen(maxDepth: Int): Gen[JsArray] =
+    for {
+      size <- Gen.chooseNum(1, 10)
+      array <- Gen.listOfN(size, jsValueGen(maxDepth - 1)).map(JsArray(_))
+    } yield {
+      array
+    }
+
+  def jsValueGen(maxDepth: Int): Gen[JsValue] =
+    if (maxDepth <= 0) {
+      Gen.oneOf(
+        jsStringGen,
+        jsBooleanGen,
+        jsNumberGen,
+        jsNullGen
+      )
+    } else {
+      Gen.oneOf(
+        jsStringGen,
+        jsBooleanGen,
+        jsNumberGen,
+        jsNullGen,
+        jsObjectGen(maxDepth),
+        jsArrayGen(maxDepth)
+      )
+    }
 }

@@ -20,20 +20,12 @@ import config.Refined.OneTo99
 import controllers.nonsipp.employercontributions
 import controllers.nonsipp.memberdetails.routes
 import eu.timepit.refined.{refineMV, refineV}
-import models.{CheckOrChange, ManualOrUpload, NormalMode, UserAnswers}
+import models.CheckOrChange.Check
+import models.{CheckMode, CheckOrChange, ManualOrUpload, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.memberdetails.MembersDetails.MembersDetailsOps
-import pages.nonsipp.memberdetails.{
-  DoesMemberHaveNinoPage,
-  MemberDetailsNinoPage,
-  MemberDetailsPage,
-  NoNINOPage,
-  PensionSchemeMembersPage,
-  RemoveMemberDetailsPage,
-  SchemeMemberDetailsAnswersPage,
-  SchemeMembersListPage
-}
+import pages.nonsipp.memberdetails._
 import play.api.mvc.Call
 
 object MemberDetailsNavigator extends JourneyNavigator {
@@ -42,7 +34,7 @@ object MemberDetailsNavigator extends JourneyNavigator {
 
     case PensionSchemeMembersPage(srn) =>
       if (userAnswers.get(PensionSchemeMembersPage(srn)).contains(ManualOrUpload.Manual)) {
-        routes.MemberDetailsController.onPageLoad(srn, refineMV(1))
+        routes.MemberDetailsController.onPageLoad(srn, refineMV(1), NormalMode)
       } else {
         controllers.routes.UnauthorisedController.onPageLoad()
       }
@@ -70,13 +62,26 @@ object MemberDetailsNavigator extends JourneyNavigator {
     case SchemeMembersListPage(srn, true) =>
       refineV[OneTo99](userAnswers.membersDetails(srn).length + 1).fold(
         _ => employercontributions.routes.EmployerContributionsController.onPageLoad(srn, NormalMode),
-        index => routes.MemberDetailsController.onPageLoad(srn, index)
+        index => routes.MemberDetailsController.onPageLoad(srn, index, NormalMode)
       )
 
     case RemoveMemberDetailsPage(srn) => routes.SchemeMembersListController.onPageLoad(srn, page = 1)
   }
 
-  override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => {
-    case NoNINOPage(srn, _) => controllers.routes.UnauthorisedController.onPageLoad()
+  override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
+    case MemberDetailsPage(srn, index) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, Check)
+    case page @ DoesMemberHaveNinoPage(srn, index) =>
+      userAnswers.get(page) match {
+        case Some(true) if userAnswers.get(MemberDetailsNinoPage(srn, index)).isEmpty =>
+          routes.MemberDetailsNinoController.onPageLoad(srn, index, CheckMode)
+        case Some(false) if userAnswers.get(NoNINOPage(srn, index)).isEmpty =>
+          routes.NoNINOController.onPageLoad(srn, index, CheckMode)
+        case Some(_) =>
+          routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, Check)
+        case None =>
+          routes.DoesSchemeMemberHaveNINOController.onPageLoad(srn, index, CheckMode)
+      }
+    case MemberDetailsNinoPage(srn, index) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, Check)
+    case NoNINOPage(srn, index) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, Check)
   }
 }
