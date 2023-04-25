@@ -14,18 +14,21 @@
  * limitations under the License.
  */
 
-package models.requests
+package pages
 
-import models.{MinimalDetails, PensionSchemeId, SchemeDetails}
-import play.api.mvc.WrappedRequest
+import pages.behaviours.PageBehaviours
+import pages.nonsipp.ReturnSubmittedPage
 
-case class AllowedAccessRequest[A](
-  request: IdentifierRequest[A],
-  schemeDetails: SchemeDetails,
-  minimalDetails: MinimalDetails
-) extends WrappedRequest[A](request) {
+import java.time.LocalDateTime
 
-  val getUserId: String = request.getUserId
+class ReturnSubmittedPageSpec extends PageBehaviours {
 
-  val pensionSchemeId: PensionSchemeId = request.pensionSchemeId
+  "ReturnSubmittedPage" - {
+
+    beRetrievable[LocalDateTime](ReturnSubmittedPage(srnGen.sample.value))
+
+    beSettable[LocalDateTime](ReturnSubmittedPage(srnGen.sample.value))
+
+    beRemovable[LocalDateTime](ReturnSubmittedPage(srnGen.sample.value))
+  }
 }

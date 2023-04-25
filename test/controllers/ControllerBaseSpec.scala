@@ -18,7 +18,7 @@ package controllers
 
 import controllers.actions._
 import models.UserAnswers.SensitiveJsObject
-import models.{Establisher, EstablisherKind, NameDOB, SchemeDetails, SchemeId, SchemeStatus, UserAnswers}
+import models._
 import play.api.Application
 import play.api.data.Form
 import play.api.http._
@@ -31,7 +31,7 @@ import queries.Settable
 import uk.gov.hmrc.time.TaxYear
 import utils.BaseSpec
 
-import java.time.LocalDate
+import java.time.{LocalDate, LocalDateTime}
 
 trait ControllerBaseSpec
     extends BaseSpec
@@ -61,14 +61,15 @@ trait ControllerBaseSpec
 
   protected def applicationBuilder(
     userAnswers: Option[UserAnswers] = None,
-    schemeDetails: SchemeDetails = defaultSchemeDetails
+    schemeDetails: SchemeDetails = defaultSchemeDetails,
+    minimalDetails: MinimalDetails = defaultMinimalDetails
   ): GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
       .overrides(
         List[GuiceableModule](
           bind[DataRequiredAction].to[DataRequiredActionImpl],
           bind[IdentifierAction].to[FakeIdentifierAction],
-          bind[AllowAccessActionProvider].toInstance(new FakeAllowAccessActionProvider(schemeDetails)),
+          bind[AllowAccessActionProvider].toInstance(new FakeAllowAccessActionProvider(schemeDetails, minimalDetails)),
           bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers)),
           bind[DataCreationAction].toInstance(new FakeDataCreationAction(userAnswers.getOrElse(emptyUserAnswers)))
         ) ++ additionalBindings: _*
@@ -91,6 +92,10 @@ trait TestValues { _: BaseSpec =>
   val sortCode = "123456"
   val srn: SchemeId.Srn = srnGen.sample.value
   val schemeName = "testSchemeName"
+  val email = "testEmail"
+
+  val localDateTime: LocalDateTime =
+    LocalDateTime.of(2020, 12, 12, 10, 30, 15)
 
   val defaultSchemeDetails: SchemeDetails = SchemeDetails(
     "testSRN",
@@ -100,6 +105,15 @@ trait TestValues { _: BaseSpec =>
     "testSchemeType",
     Some("testAuthorisingPSAID"),
     List(Establisher("testFirstName testLastName", EstablisherKind.Individual))
+  )
+
+  val defaultMinimalDetails: MinimalDetails = MinimalDetails(
+    email,
+    isPsaSuspended = false,
+    Some("testOrganisation"),
+    Some(IndividualDetails("testFirstName", Some("testMiddleName"), "testLastName")),
+    rlsFlag = false,
+    deceasedFlag = false
   )
 
   val memberDetails: NameDOB = NameDOB(

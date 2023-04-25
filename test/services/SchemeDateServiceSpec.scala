@@ -16,6 +16,7 @@
 
 package services
 
+import cats.data.NonEmptyList
 import eu.timepit.refined.refineMV
 import models.requests.DataRequest
 import models.{DateRange, UserAnswers}
@@ -48,7 +49,7 @@ class SchemeDateServiceSpec extends BaseSpec with ScalaCheckPropertyChecks {
       DateRange(LocalDate.of(2011, 1, 1), LocalDate.of(2020, 1, 1))
     )
 
-  def schemeDateTest[A](name: String, action: DataRequest[_] => A, expected: DateRange => A): Behaviours =
+  def schemeDateTest[A](name: String, action: DataRequest[_] => A, expected: NonEmptyList[DateRange] => A): Behaviours =
     MultipleBehaviourTests(
       s"SchemeDateService.$name",
       List(
@@ -63,7 +64,7 @@ class SchemeDateServiceSpec extends BaseSpec with ScalaCheckPropertyChecks {
             val userAnswers = defaultUserAnswers.unsafeSet(WhichTaxYearPage(srn), range)
             val request = DataRequest(allowedAccessRequest, userAnswers)
 
-            action(request) mustBe Some(expected(range))
+            action(request) mustBe Some(expected(NonEmptyList.one(range)))
           }
         },
         s"choose $name from AccountingPeriodPage answer when 1 period present".hasBehaviour {
@@ -75,7 +76,7 @@ class SchemeDateServiceSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
             val request = DataRequest(allowedAccessRequest, userAnswers)
 
-            action(request) mustBe Some(expected(accountingPeriod))
+            action(request) mustBe Some(expected(NonEmptyList.one(accountingPeriod)))
           }
         },
         s"choose $name from AccountingPeriodPage answer when multiple exist".hasBehaviour {
@@ -90,14 +91,14 @@ class SchemeDateServiceSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
               val request = DataRequest(allowedAccessRequest, userAnswers)
 
-              action(request) mustBe Some(expected(newestAccountingPeriod))
+              action(request) mustBe Some(expected(NonEmptyList.of(newestAccountingPeriod, oldestAccountingPeriod)))
           }
         }
       )
     )
 
-  act.like(schemeDateTest("schemeDate", service.schemeDate(srn)(_), identity))
-  act.like(schemeDateTest("schemeStartDate", service.schemeStartDate(srn)(_), _.from))
-  act.like(schemeDateTest("schemeEndDate", service.schemeEndDate(srn)(_), _.to))
-
+  act.like(schemeDateTest("schemeDate", service.schemeDate(srn)(_), _.head))
+  act.like(schemeDateTest("schemeStartDate", service.schemeStartDate(srn)(_), _.head.from))
+  act.like(schemeDateTest("schemeEndDate", service.schemeEndDate(srn)(_), _.head.to))
+  act.like(schemeDateTest("returnPeriods", service.returnPeriods(srn)(_), identity))
 }

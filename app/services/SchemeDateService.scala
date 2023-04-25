@@ -16,6 +16,7 @@
 
 package services
 
+import cats.data.NonEmptyList
 import com.google.inject.ImplementedBy
 import models.DateRange
 import models.SchemeId.Srn
@@ -23,13 +24,25 @@ import models.requests.DataRequest
 import pages.nonsipp.WhichTaxYearPage
 import pages.nonsipp.accountingperiod.AccountingPeriods
 
-import java.time.LocalDate
+import java.time.{LocalDate, LocalDateTime, ZoneId}
 import javax.inject.Inject
 
 class SchemeDateServiceImpl @Inject()() extends SchemeDateService {
 
+  def now(): LocalDateTime = LocalDateTime.now(ZoneId.of("UTC"))
+
   def schemeDate(srn: Srn)(implicit request: DataRequest[_]): Option[DateRange] =
     accountingPeriod(srn).orElse(whichTaxYear(srn))
+
+  def returnPeriods(srn: Srn)(implicit request: DataRequest[_]): Option[NonEmptyList[DateRange]] = {
+    val accountingPeriods = request.userAnswers.list(AccountingPeriods(srn))
+
+    if (accountingPeriods.isEmpty) {
+      request.userAnswers.get(WhichTaxYearPage(srn)).map(NonEmptyList.one)
+    } else {
+      NonEmptyList.fromList(accountingPeriods)
+    }
+  }
 
   private def accountingPeriod(srn: Srn)(implicit request: DataRequest[_]): Option[DateRange] =
     request.userAnswers.get(AccountingPeriods(srn)).flatMap(_.sorted.headOption)
@@ -41,6 +54,8 @@ class SchemeDateServiceImpl @Inject()() extends SchemeDateService {
 @ImplementedBy(classOf[SchemeDateServiceImpl])
 trait SchemeDateService {
 
+  def now(): LocalDateTime
+
   def schemeStartDate(srn: Srn)(implicit request: DataRequest[_]): Option[LocalDate] =
     schemeDate(srn).map(_.from)
 
@@ -48,4 +63,6 @@ trait SchemeDateService {
     schemeDate(srn).map(_.to)
 
   def schemeDate(srn: Srn)(implicit request: DataRequest[_]): Option[DateRange]
+
+  def returnPeriods(srn: Srn)(implicit request: DataRequest[_]): Option[NonEmptyList[DateRange]]
 }

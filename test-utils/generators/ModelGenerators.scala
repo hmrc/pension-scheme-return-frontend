@@ -29,10 +29,12 @@ import org.scalacheck.Gen.numChar
 import play.api.mvc.Request
 import uk.gov.hmrc.domain.Nino
 
+import java.time.{LocalDateTime, ZoneOffset}
+
 trait ModelGenerators extends BasicGenerators {
   lazy val minimalDetailsGen: Gen[MinimalDetails] =
     for {
-      email <- email
+      email <- emailGen
       isSuspended <- boolean
       orgName <- Gen.option(nonEmptyString)
       individual <- Gen.option(individualDetailsGen)
@@ -135,7 +137,8 @@ trait ModelGenerators extends BasicGenerators {
     for {
       request <- identifierRequestGen[A](request)
       schemeDetails <- schemeDetailsGen
-    } yield AllowedAccessRequest(request, schemeDetails)
+      minimalDetails <- minimalDetailsGen
+    } yield AllowedAccessRequest(request, schemeDetails, minimalDetails)
 
   def modeGen: Gen[Mode] = Gen.oneOf(NormalMode, CheckMode)
 
@@ -164,6 +167,15 @@ trait ModelGenerators extends BasicGenerators {
     } yield {
       BankAccount(bankName, accountNumber, sortCode)
     }
+
+  val localDateTimeGen: Gen[LocalDateTime] =
+    for {
+      seconds <- Gen.chooseNum(
+        LocalDateTime.MIN.toEpochSecond(ZoneOffset.UTC),
+        LocalDateTime.MAX.toEpochSecond(ZoneOffset.UTC)
+      )
+      nanos <- Gen.chooseNum(LocalDateTime.MIN.getNano, LocalDateTime.MAX.getNano)
+    } yield LocalDateTime.ofEpochSecond(seconds, nanos, ZoneOffset.UTC)
 
   val manualOrUploadGen: Gen[ManualOrUpload] = Gen.oneOf(ManualOrUpload.values)
 

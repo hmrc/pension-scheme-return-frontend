@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
-package models.requests
+package pages.nonsipp
 
-import models.{MinimalDetails, PensionSchemeId, SchemeDetails}
-import play.api.mvc.WrappedRequest
+import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-case class AllowedAccessRequest[A](
-  request: IdentifierRequest[A],
-  schemeDetails: SchemeDetails,
-  minimalDetails: MinimalDetails
-) extends WrappedRequest[A](request) {
+import java.time.LocalDateTime
 
-  val getUserId: String = request.getUserId
+case class ReturnSubmittedPage(srn: Srn) extends QuestionPage[LocalDateTime] {
 
-  val pensionSchemeId: PensionSchemeId = request.pensionSchemeId
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "returnSubmitted"
 }

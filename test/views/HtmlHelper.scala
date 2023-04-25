@@ -34,6 +34,7 @@ trait HtmlHelper extends HtmlModels {
   def title(html: Html): String = Jsoup.parse(html.body).title()
 
   def h1(html: Html): String = mainContent(html).getElementsByTag("h1").first().text()
+  def h2(html: Html): String = mainContent(html).getElementsByTag("h2").first().text()
 
   def p(html: Html): List[String] =
     mainContent(html).getElementsByTag("p").iterator().asScala.map(_.text()).toList
@@ -43,6 +44,13 @@ trait HtmlHelper extends HtmlModels {
 
   def legend(html: Html): List[String] =
     mainContent(html).getElementsByTag("legend").iterator().asScala.map(_.text()).toList
+
+  def panel(html: Html): Panel = {
+    val parent = mainContent(html).getElementsByClass("govuk-panel").first()
+    val title = parent.getElementsByClass("govuk-panel__title").first()
+    val maybeBody = parent.getElementsByClass("govuk-panel__body").iterator().asScala.toList.headOption
+    Panel(title, maybeBody)
+  }
 
   def radios(html: Html): List[RadioItem] =
     mainContent(html).select("input[type=radio]").iterator().asScala.toList.map(RadioItem(_))
@@ -132,4 +140,5 @@ trait HtmlHelper extends HtmlModels {
   }
 
   case class DateElements(day: Element, month: Element, year: Element)
+  case class Panel(title: Element, body: Option[Element])
 }

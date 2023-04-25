@@ -102,6 +102,21 @@ trait ViewModelGenerators extends BasicGenerators {
       onSubmit
     )
 
+  val submissionViewModelGen: Gen[SubmissionViewModel] =
+    for {
+      title <- nonEmptyMessage
+      panelHeading <- nonEmptyMessage
+      panelContent <- nonEmptyMessage
+      content <- nonEmptyMessage
+      whatHappensNextContent <- nonEmptyMessage
+    } yield SubmissionViewModel(
+      title,
+      panelHeading,
+      panelContent,
+      content,
+      whatHappensNextContent
+    )
+
   val nameDOBViewModelGen: Gen[NameDOBViewModel] =
     for {
       title <- nonEmptyMessage

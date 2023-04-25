@@ -58,6 +58,7 @@ class FrontendAppConfig @Inject()(config: Configuration) {
     val loginUrl: String = config.get[String]("urls.login")
     val loginContinueUrl: String = config.get[String]("urls.loginContinue")
     val signOutUrl: String = config.get[String]("urls.signOut")
+    val pensionSchemeEnquiry: String = config.get[String]("urls.pensionSchemeEnquiry")
 
     object managePensionsSchemes {
       val baseUrl: String = config.get[String]("urls.manage-pension-schemes.baseUrl")
@@ -67,6 +68,7 @@ class FrontendAppConfig @Inject()(config: Configuration) {
       val contactHmrc: String = baseUrl + config.get[String]("urls.manage-pension-schemes.contactHmrc")
       val cannotAccessDeregistered: String =
         baseUrl + config.get[String]("urls.manage-pension-schemes.cannotAccessDeregistered")
+      val dashboard = baseUrl + config.get[String]("urls.manage-pension-schemes.overview")
     }
 
     object pensionAdministrator {

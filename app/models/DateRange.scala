@@ -44,4 +44,6 @@ object DateRange {
   implicit val ordering: Ordering[DateRange] = (x: DateRange, y: DateRange) => {
     Ordering[LocalDate].compare(y.to, x.to)
   }
+
+  val readableTimeFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("h:mma")
 }
