@@ -35,7 +35,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           Gen.const(true),
           (_, _) => routes.UnauthorisedController.onPageLoad()
         )
-        .withName("go from pension commencement lump sum page to pension payments received page when yes selected")
+        .withName("go from other assets held page to unauthorised page when yes selected")
     )
 
     act.like(
@@ -45,7 +45,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           Gen.const(false),
           controllers.nonsipp.otherassets.routes.FeesCommissionsWagesSalariesController.onPageLoad
         )
-        .withName("go from pension commencement lump sum page to unauthorised when no selected")
+        .withName("go from other assets held page to fees commissions wages salaries page when no selected")
     )
   }
 }
