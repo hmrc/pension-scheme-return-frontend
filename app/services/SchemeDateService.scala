@@ -29,7 +29,7 @@ import javax.inject.Inject
 
 class SchemeDateServiceImpl @Inject()() extends SchemeDateService {
 
-  def now(): LocalDateTime = LocalDateTime.now()
+  def now(): LocalDateTime = LocalDateTime.now(ZoneId.of("Europe/London"))
 
   def schemeDate(srn: Srn)(implicit request: DataRequest[_]): Option[DateRange] =
     accountingPeriod(srn).orElse(whichTaxYear(srn))
