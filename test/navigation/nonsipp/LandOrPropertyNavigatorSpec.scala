@@ -17,7 +17,9 @@
 package navigation.nonsipp
 
 import controllers.nonsipp.receivetransfer
+import controllers.routes
 import navigation.{Navigator, NavigatorBehaviours}
+import org.scalacheck.Gen
 import pages.nonsipp.landorproperty.LandOrPropertyHeldPage
 import utils.BaseSpec
 
@@ -29,11 +31,22 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
     act.like(
       normalmode
-        .navigateTo(
+        .navigateToWithData(
           LandOrPropertyHeldPage,
-          (_, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          Gen.const(true),
+          (_, _) => routes.UnauthorisedController.onPageLoad()
         )
-        .withName("go from land or property held page to unauthorised page")
+        .withName("go from land or property held page to unauthorised yes selected")
+    )
+
+    act.like(
+      normalmode
+        .navigateToWithData(
+          LandOrPropertyHeldPage,
+          Gen.const(false),
+          controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedController.onPageLoad
+        )
+        .withName("go from land or property held page to money borrowed page when no selected")
     )
   }
 }

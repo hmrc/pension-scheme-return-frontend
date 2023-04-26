@@ -16,7 +16,8 @@
 
 package navigation.nonsipp
 
-import models.UserAnswers
+import controllers.routes
+import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.landorproperty.LandOrPropertyHeldPage
@@ -26,8 +27,12 @@ object LandOrPropertyNavigator extends JourneyNavigator {
 
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
 
-    case LandOrPropertyHeldPage(srn) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+    case page @ LandOrPropertyHeldPage(srn) =>
+      if (userAnswers.get(page).contains(true)) {
+        routes.UnauthorisedController.onPageLoad()
+      } else {
+        controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedController.onPageLoad(srn, NormalMode)
+      }
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty

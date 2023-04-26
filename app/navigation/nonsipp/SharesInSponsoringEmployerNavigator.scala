@@ -16,7 +16,7 @@
 
 package navigation.nonsipp
 
-import models.UserAnswers
+import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.sharesinsponsoringemployer.DidSchemeHoldSharesInSponsoringEmployerPage
@@ -24,10 +24,14 @@ import play.api.mvc.Call
 
 object SharesInSponsoringEmployerNavigator extends JourneyNavigator {
 
-  val normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
+  override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
 
-    case DidSchemeHoldSharesInSponsoringEmployerPage(srn) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+    case page @ DidSchemeHoldSharesInSponsoringEmployerPage(srn) =>
+      if (userAnswers.get(page).contains(true)) {
+        controllers.routes.UnauthorisedController.onPageLoad()
+      } else {
+        controllers.nonsipp.landorproperty.routes.LandOrPropertyHeldController.onPageLoad(srn, NormalMode)
+      }
   }
 
   val checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty

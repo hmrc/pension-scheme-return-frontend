@@ -17,6 +17,7 @@
 package navigation.nonsipp
 
 import controllers.routes
+import models.NormalMode
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.BenefitsSurrenderedPage
@@ -35,7 +36,7 @@ class BenefitsSurrenderedNavigatorSpec extends BaseSpec with NavigatorBehaviours
           Gen.const(true),
           (_, _) => routes.UnauthorisedController.onPageLoad()
         )
-        .withName("go from benefits surrendered page to unauthorised when yes selected")
+        .withName("go from benefits surrendered page to unauthorised page when yes selected")
     )
 
     act.like(
@@ -43,9 +44,9 @@ class BenefitsSurrenderedNavigatorSpec extends BaseSpec with NavigatorBehaviours
         .navigateToWithData(
           BenefitsSurrenderedPage,
           Gen.const(false),
-          (_, _) => routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.loansmadeoroutstanding.routes.LoansMadeOrOutstandingController.onPageLoad
         )
-        .withName("go from benefits surrendered page to personal contributions when no selected")
+        .withName("go from benefits surrendered page to loans made or outstanding when no selected")
     )
 
   }
