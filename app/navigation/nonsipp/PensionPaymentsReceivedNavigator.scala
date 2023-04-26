@@ -27,7 +27,7 @@ object PensionPaymentsReceivedNavigator extends JourneyNavigator {
   val normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
     case page @ PensionPaymentsReceivedPage(srn) =>
       if (userAnswers.get(page).contains(true)) {
-        controllers.nonsipp.benefitssurrendered.routes.BenefitsSurrenderedController.onPageLoad(srn, NormalMode)
+        controllers.routes.UnauthorisedController.onPageLoad()
       } else {
         controllers.nonsipp.benefitssurrendered.routes.BenefitsSurrenderedController.onPageLoad(srn, NormalMode)
       }

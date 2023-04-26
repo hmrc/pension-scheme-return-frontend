@@ -34,9 +34,9 @@ class PensionCommencementLumpSumNavigatorSpec extends BaseSpec with NavigatorBeh
         .navigateToWithData(
           PensionCommencementLumpSumPage,
           Gen.const(true),
-          controllers.nonsipp.routes.PensionPaymentsReceivedController.onPageLoad
+          (_, _) => routes.UnauthorisedController.onPageLoad()
         )
-        .withName("go from pension commencement lump sum page to pension payments received page when yes selected")
+        .withName("go from pension commencement lump sum page to unauthorised page when yes selected")
     )
 
     act.like(

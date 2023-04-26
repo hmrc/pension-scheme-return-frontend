@@ -27,7 +27,7 @@ object PensionCommencementLumpSumNavigator extends JourneyNavigator {
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
     case page @ PensionCommencementLumpSumPage(srn) =>
       if (userAnswers.get(page).contains(true)) {
-        controllers.nonsipp.routes.PensionPaymentsReceivedController.onPageLoad(srn, NormalMode)
+        controllers.routes.UnauthorisedController.onPageLoad()
       } else {
         controllers.nonsipp.routes.PensionPaymentsReceivedController.onPageLoad(srn, NormalMode)
       }

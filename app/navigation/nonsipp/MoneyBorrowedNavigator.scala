@@ -28,8 +28,7 @@ object MoneyBorrowedNavigator extends JourneyNavigator {
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
     case page @ MoneyBorrowedPage(srn) =>
       if (userAnswers.get(page).contains(true)) {
-        controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldController
-          .onPageLoad(srn, NormalMode)
+        controllers.routes.UnauthorisedController.onPageLoad()
       } else {
         controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldController
           .onPageLoad(srn, NormalMode)
