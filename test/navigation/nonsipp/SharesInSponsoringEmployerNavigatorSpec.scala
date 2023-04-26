@@ -43,9 +43,11 @@ class SharesInSponsoringEmployerNavigatorSpec extends BaseSpec with NavigatorBeh
         .navigateToWithData(
           DidSchemeHoldSharesInSponsoringEmployerPage,
           Gen.const(false),
-          (_, _) => routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.landorproperty.routes.LandOrPropertyHeldController.onPageLoad
         )
-        .withName("go from id scheme hold shares in sponsoring employer page to unauthorised page when no selected")
+        .withName(
+          "go from id scheme hold shares in sponsoring employer page to land or property held page when no selected"
+        )
     )
   }
 }

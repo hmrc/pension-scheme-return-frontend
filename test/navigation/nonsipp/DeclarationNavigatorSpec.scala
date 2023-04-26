@@ -17,6 +17,7 @@
 package navigation.nonsipp
 
 import controllers.routes
+import models.NormalMode
 import navigation.{Navigator, NavigatorBehaviours}
 import pages.nonsipp.declaration.{PsaDeclarationPage, PspDeclarationPage}
 import utils.BaseSpec
@@ -31,18 +32,18 @@ class DeclarationNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       normalmode
         .navigateTo(
           PsaDeclarationPage,
-          (_, _) => routes.UnauthorisedController.onPageLoad()
+          (srn, _) => controllers.nonsipp.routes.ReturnSubmittedController.onPageLoad(srn)
         )
-        .withName("go from psa declaration page to unauthorised")
+        .withName("go from psa declaration page to return submitted")
     )
 
     act.like(
       normalmode
         .navigateTo(
           PspDeclarationPage,
-          (_, _) => routes.UnauthorisedController.onPageLoad()
+          (srn, _) => controllers.nonsipp.routes.ReturnSubmittedController.onPageLoad(srn)
         )
-        .withName("go from psp declaration page to unauthorised")
+        .withName("go from psp declaration page to return submitted")
     )
   }
 }

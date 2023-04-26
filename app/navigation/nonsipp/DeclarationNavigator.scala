@@ -17,17 +17,21 @@
 package navigation.nonsipp
 
 import controllers.routes
-import models.UserAnswers
+import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
+import pages.nonsipp.BenefitsSurrenderedPage
+import pages.nonsipp.bankaccount.ActiveBankAccountPage
 import pages.nonsipp.declaration.{PsaDeclarationPage, PspDeclarationPage}
 import play.api.mvc.Call
 
 object DeclarationNavigator extends JourneyNavigator {
 
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = _ => {
-    case PsaDeclarationPage(srn) => routes.UnauthorisedController.onPageLoad()
-    case PspDeclarationPage(srn) => routes.UnauthorisedController.onPageLoad()
+    case PsaDeclarationPage(srn) =>
+      controllers.nonsipp.routes.ReturnSubmittedController.onPageLoad(srn)
+    case PspDeclarationPage(srn) =>
+      controllers.nonsipp.routes.ReturnSubmittedController.onPageLoad(srn)
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty
