@@ -16,7 +16,6 @@
 
 package navigation.nonsipp
 
-import controllers.routes
 import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
@@ -30,7 +29,7 @@ object PensionCommencementLumpSumNavigator extends JourneyNavigator {
       if (userAnswers.get(page).contains(true)) {
         controllers.nonsipp.routes.PensionPaymentsReceivedController.onPageLoad(srn, NormalMode)
       } else {
-        routes.UnauthorisedController.onPageLoad()
+        controllers.nonsipp.routes.PensionPaymentsReceivedController.onPageLoad(srn, NormalMode)
       }
   }
 

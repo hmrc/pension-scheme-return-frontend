@@ -16,7 +16,9 @@
 
 package navigation.nonsipp
 
+import controllers.routes
 import navigation.{Navigator, NavigatorBehaviours}
+import org.scalacheck.Gen
 import pages.nonsipp.sharesinsponsoringemployer.DidSchemeHoldSharesInSponsoringEmployerPage
 import utils.BaseSpec
 
@@ -28,11 +30,22 @@ class SharesInSponsoringEmployerNavigatorSpec extends BaseSpec with NavigatorBeh
 
     act.like(
       normalmode
-        .navigateTo(
+        .navigateToWithData(
           DidSchemeHoldSharesInSponsoringEmployerPage,
-          (_, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          Gen.const(true),
+          (_, _) => routes.UnauthorisedController.onPageLoad()
         )
-        .withName("go from did scheme hold shares in sponsoring employer page to unauthorised page")
+        .withName("go from did scheme hold shares in sponsoring employer page to unauthorised page when yes selected")
+    )
+
+    act.like(
+      normalmode
+        .navigateToWithData(
+          DidSchemeHoldSharesInSponsoringEmployerPage,
+          Gen.const(false),
+          (_, _) => routes.UnauthorisedController.onPageLoad()
+        )
+        .withName("go from id scheme hold shares in sponsoring employer page to unauthorised page when no selected")
     )
   }
 }

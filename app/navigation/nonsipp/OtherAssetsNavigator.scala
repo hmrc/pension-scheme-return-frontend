@@ -16,7 +16,7 @@
 
 package navigation.nonsipp
 
-import models.UserAnswers
+import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.otherassets.FeesCommissionsWagesSalariesPage

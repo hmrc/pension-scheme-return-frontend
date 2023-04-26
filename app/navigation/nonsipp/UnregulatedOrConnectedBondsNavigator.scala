@@ -28,7 +28,7 @@ object UnregulatedOrConnectedBondsNavigator extends JourneyNavigator {
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
     case page @ UnregulatedOrConnectedBondsHeldPage(srn) =>
       if (userAnswers.get(page).contains(true)) {
-        routes.UnauthorisedController.onPageLoad()
+        controllers.nonsipp.otherassetsheld.routes.OtherAssetsHeldController.onPageLoad(srn, NormalMode)
       } else {
         controllers.nonsipp.otherassetsheld.routes.OtherAssetsHeldController.onPageLoad(srn, NormalMode)
       }

@@ -17,7 +17,7 @@
 package navigation.nonsipp
 
 import controllers.routes
-import models.UserAnswers
+import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.loansmadeoroutstanding.LoansMadeOrOutstandingPage
@@ -28,9 +28,10 @@ object LoanMadeOrOutstandingNavigator extends JourneyNavigator {
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
     case page @ LoansMadeOrOutstandingPage(srn) =>
       if (userAnswers.get(page).contains(true)) {
-        routes.UnauthorisedController.onPageLoad()
+        controllers.routes.UnauthorisedController.onPageLoad()
       } else {
-        routes.UnauthorisedController.onPageLoad()
+        controllers.nonsipp.sharesinsponsoringemployer.routes.DidSchemeHoldSharesInSponsoringEmployerController
+          .onPageLoad(srn, NormalMode)
       }
   }
 

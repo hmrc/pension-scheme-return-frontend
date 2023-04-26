@@ -27,9 +27,9 @@ object BenefitsSurrenderedNavigator extends JourneyNavigator {
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
     case page @ BenefitsSurrenderedPage(srn) =>
       if (userAnswers.get(page).contains(true)) {
-        controllers.routes.UnauthorisedController.onPageLoad()
+        controllers.nonsipp.loansmadeoroutstanding.routes.LoansMadeOrOutstandingController.onPageLoad(srn, NormalMode)
       } else {
-        controllers.routes.UnauthorisedController.onPageLoad()
+        controllers.nonsipp.loansmadeoroutstanding.routes.LoansMadeOrOutstandingController.onPageLoad(srn, NormalMode)
       }
   }
 

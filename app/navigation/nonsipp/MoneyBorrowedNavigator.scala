@@ -17,7 +17,7 @@
 package navigation.nonsipp
 
 import controllers.routes
-import models.UserAnswers
+import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.moneyborrowed.MoneyBorrowedPage
@@ -28,9 +28,11 @@ object MoneyBorrowedNavigator extends JourneyNavigator {
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
     case page @ MoneyBorrowedPage(srn) =>
       if (userAnswers.get(page).contains(true)) {
-        routes.UnauthorisedController.onPageLoad()
+        controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldController
+          .onPageLoad(srn, NormalMode)
       } else {
-        routes.UnauthorisedController.onPageLoad()
+        controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldController
+          .onPageLoad(srn, NormalMode)
       }
   }
 

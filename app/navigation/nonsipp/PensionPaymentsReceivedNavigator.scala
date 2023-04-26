@@ -29,7 +29,7 @@ object PensionPaymentsReceivedNavigator extends JourneyNavigator {
       if (userAnswers.get(page).contains(true)) {
         controllers.nonsipp.benefitssurrendered.routes.BenefitsSurrenderedController.onPageLoad(srn, NormalMode)
       } else {
-        controllers.routes.UnauthorisedController.onPageLoad()
+        controllers.nonsipp.benefitssurrendered.routes.BenefitsSurrenderedController.onPageLoad(srn, NormalMode)
       }
   }
 

@@ -33,9 +33,9 @@ class MoneyBorrowedNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateToWithData(
           MoneyBorrowedPage,
           Gen.const(true),
-          (_, _) => routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldController.onPageLoad
         )
-        .withName("go from money borrowed page to unauthorised when yes selected")
+        .withName("go from money borrowed page to unregulated or connected bonds held page when yes selected")
     )
 
     act.like(
@@ -43,9 +43,9 @@ class MoneyBorrowedNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateToWithData(
           MoneyBorrowedPage,
           Gen.const(false),
-          (_, _) => routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldController.onPageLoad
         )
-        .withName("go from money borrowed page to unauthorised when no selected")
+        .withName("go from money borrowed page to unregulated or connected bonds held page when no selected")
     )
   }
 }
