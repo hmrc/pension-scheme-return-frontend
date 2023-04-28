@@ -21,16 +21,15 @@ import controllers.nonsipp.personalcontributions
 import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.employercontributions.EmployerContributionsPage
+import pages.nonsipp.unallocatedemployercontributions.UnallocatedEmployerContributionsPage
 import play.api.mvc.Call
 
-object EmployerContributionsNavigator extends JourneyNavigator {
+object UnallocatedEmployerContributionsNavigator extends JourneyNavigator {
 
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
-    case page @ EmployerContributionsPage(srn) =>
+    case page @ UnallocatedEmployerContributionsPage(srn) =>
       if (userAnswers.get(page).contains(true)) {
-        controllers.nonsipp.unallocatedemployercontributions.routes.UnallocatedEmployerContributionsController
-          .onPageLoad(srn, NormalMode)
+        routes.UnauthorisedController.onPageLoad()
       } else {
         personalcontributions.routes.PersonalContributionsController.onPageLoad(srn, NormalMode)
       }
