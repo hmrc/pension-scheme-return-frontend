@@ -38,4 +38,6 @@ package object govuk {
       with TextAreaFluency
       with PaginationFluency
       with PanelFluency
+      with DetailsFluency
+      with FileUploadFluency
 }

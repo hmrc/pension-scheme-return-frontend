@@ -23,12 +23,14 @@ import play.api.Application
 import play.api.inject.bind
 import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
 import play.api.libs.json.Writes
-import play.api.mvc.{Call, Request}
+import play.api.mvc.{AnyContentAsEmpty, Call, Request}
 import play.api.test.FakeRequest
 import play.twirl.api.Html
 import queries.Settable
 import services.SaveService
 
+import java.nio.charset.StandardCharsets
+import java.nio.file.{Files, Paths}
 import scala.concurrent.Future
 
 trait ControllerBehaviours {

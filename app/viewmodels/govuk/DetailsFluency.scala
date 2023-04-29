@@ -17,22 +17,17 @@
 package viewmodels.govuk
 
 import play.twirl.api.Html
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{Content, HtmlContent}
-import uk.gov.hmrc.govukfrontend.views.viewmodels.insettext.InsetText
-import viewmodels.ErrorMessageAwareness
+import uk.gov.hmrc.govukfrontend.views.Aliases.Details
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 
-object insettext extends InsetTextFluency
+object details extends DetailsFluency
 
-trait InsetTextFluency {
+trait DetailsFluency {
 
-  object InsetTextViewModel extends ErrorMessageAwareness {
-    def apply(content: Content): InsetText =
-      InsetText(content = content)
-
-    def apply(html: Html): InsetText =
-      apply(HtmlContent(html))
-
-    def apply(elem: scala.xml.Elem): InsetText =
-      apply(Html(elem.toString()))
+  object DetailsViewModel {
+    def apply(summary: Html, content: Html): Details = Details(
+      summary = HtmlContent(summary),
+      content = HtmlContent(content)
+    )
   }
 }

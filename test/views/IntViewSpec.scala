@@ -56,7 +56,7 @@ class IntViewSpec extends ViewSpec with Mappings {
       act.like(renderInputWithLabel(tripleIntViewModel)("value.1", view(_), _.questions.fields.head.label))
       act.like(renderInputWithLabel(tripleIntViewModel)("value.2", view(_), _.questions.fields(1).label))
       act.like(renderInputWithLabel(tripleIntViewModel)("value.3", view(_), _.questions.fields(2).label))
-      act.like(renderErrors(invalidViewModel)(view(_), "int.error.required"))
+      act.like(renderErrors(invalidViewModel)(view(_), _ => "int.error.required"))
       act.like(renderForm(viewModelGen)(view(_), _.onSubmit))
       act.like(renderSaveAndContinueButton(viewModelGen)(view(_)))
     }

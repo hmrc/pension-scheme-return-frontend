@@ -23,7 +23,7 @@ import play.api.mvc.RequestHeader
 import uk.gov.hmrc.play.bootstrap.binders.SafeRedirectUrl
 
 @Singleton
-class FrontendAppConfig @Inject()(config: Configuration) {
+class FrontendAppConfig @Inject()(config: Configuration) { self =>
 
   val host: String = config.get[String]("host")
   val appName: String = config.get[String]("appName")
@@ -49,6 +49,8 @@ class FrontendAppConfig @Inject()(config: Configuration) {
 
   val pensionsAdministrator: Service = config.get[Service]("microservice.services.pensionAdministrator")
   val pensionsScheme: Service = config.get[Service]("microservice.services.pensionsScheme")
+
+  val upscan: Service = config.get[Service]("microservice.services.upscan")
 
   object features {
     val welshTranslation: Boolean = config.get[Boolean]("features.welsh-translation")
@@ -79,6 +81,10 @@ class FrontendAppConfig @Inject()(config: Configuration) {
     object pensionPractitioner {
       val baseUrl: String = config.get[String]("urls.pension-practitioner.baseUrl")
       val updateContactDetails: String = baseUrl + config.get[String]("urls.pension-administrator.updateContactDetails")
+    }
+
+    object upscan {
+      val initiate: String = self.upscan.baseUrl + config.get[String]("urls.upscan.initiate")
     }
   }
 }

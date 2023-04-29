@@ -100,7 +100,7 @@ object ReturnSubmittedController {
       "returnSubmitted.title",
       "returnSubmitted.panel.heading",
       "returnSubmitted.panel.content",
-      content = ParagraphMessage(Message("returnSubmitted.paragraph", email)) +
+      content = ParagraphMessage(Message("returnSubmitted.paragraph", email)) ++
         TableMessage(
           NonEmptyList.of(
             Message("returnSubmitted.table.field1") -> Message(schemeName),
@@ -113,14 +113,14 @@ object ReturnSubmittedController {
           )
         ),
       whatHappensNextContent =
-        ParagraphMessage("returnSubmitted.whatHappensNext.paragraph1") +
+        ParagraphMessage("returnSubmitted.whatHappensNext.paragraph1") ++
           ParagraphMessage(
             "returnSubmitted.whatHappensNext.paragraph2",
             LinkMessage("returnSubmitted.whatHappensNext.paragraph2.link", pensionSchemeEnquiriesUrl)
-          ) +
-          ParagraphMessage("returnSubmitted.whatHappensNext.paragraph3") +
+          ) ++
+          ParagraphMessage("returnSubmitted.whatHappensNext.paragraph3") ++
           ListMessage.Bullet(
-            Message("returnSubmitted.whatHappensNext.list1") + LinkMessage(
+            Message("returnSubmitted.whatHappensNext.list1") ++ LinkMessage(
               Message("returnSubmitted.whatHappensNext.list1.link", schemeName),
               managePensionSchemeDashboardUrl
             ),

@@ -4,6 +4,10 @@
 
 GET         /                                                     controllers.IndexController.onPageLoad()
 
+# upload file notification callback
+#NOCSRF
+POST        /fileupload/upscan-callback                           controllers.UploadCallbackController.callback
+
 GET         /assets/*file                                         controllers.Assets.versioned(path="/public", file: Asset)
 
 GET         /language/:lang                                       controllers.LanguageSwitchController.switchToLanguage(lang: String)
@@ -127,6 +131,9 @@ POST       /:srn/remove-member-details/:index               controllers.nonsipp.
 
 GET        /:srn/change-remove-member-details/:index        controllers.nonsipp.memberdetails.RemoveMemberDetailsController.onPageLoad(srn: Srn, index: Max99, mode: Mode = CheckMode)
 POST       /:srn/change-remove-member-details/:index        controllers.nonsipp.memberdetails.RemoveMemberDetailsController.onSubmit(srn: Srn, index: Max99, mode: Mode = CheckMode)
+
+GET        /:srn/upload-member-details-file                  controllers.nonsipp.memberdetails.UploadMemberDetailsController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/submit-upload-member-details-file           controllers.nonsipp.memberdetails.UploadMemberDetailsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 
 GET         /:srn/did-scheme-have-bank-account               controllers.nonsipp.bankaccount.ActiveBankAccountController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST        /:srn/did-scheme-have-bank-account               controllers.nonsipp.bankaccount.ActiveBankAccountController.onSubmit(srn: Srn, mode: Mode = NormalMode)

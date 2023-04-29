@@ -44,7 +44,7 @@ object DisplayMessage {
   case class CompoundMessage(message: DisplayMessage, next: DisplayMessage) extends InlineMessage
 
   implicit class DisplayMessageOps(message: DisplayMessage) {
-    def +(other: DisplayMessage): CompoundMessage = CompoundMessage(message, other)
+    def ++(other: DisplayMessage): CompoundMessage = CompoundMessage(message, other)
   }
 
   case class LinkMessage(content: Message, url: String) extends InlineMessage

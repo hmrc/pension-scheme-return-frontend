@@ -290,6 +290,30 @@ trait ViewModelGenerators extends BasicGenerators {
       TextInputViewModel(title, heading, label, onSubmit)
     }
 
+  def uploadViewModelGen(error: Boolean): Gen[UploadViewModel] =
+    for {
+      title <- nonEmptyMessage
+      heading <- nonEmptyMessage
+      content <- nonEmptyMessage
+      displayContent <- nonEmptyMessage
+      fileSize <- Gen.chooseNum(1, 100)
+      formFields <- mapOf(Gen.alphaStr, Gen.alphaStr, 10)
+      error <- if (error) Gen.some(Gen.alphaStr) else Gen.const(None)
+      onSubmit <- postCall
+    } yield {
+      UploadViewModel(
+        title,
+        heading,
+        content,
+        displayContent,
+        ".csv",
+        fileSize.toString,
+        formFields,
+        error,
+        onSubmit
+      )
+    }
+
   def intViewModelGen[A](questions: Gen[MultipleQuestionsViewModel[A]]): Gen[IntViewModel[_]] =
     for {
       title <- nonEmptyMessage

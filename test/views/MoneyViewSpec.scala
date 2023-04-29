@@ -58,7 +58,7 @@ class MoneyViewSpec extends ViewSpec with Mappings {
       act.like(renderInputWithLabel(tripleMoneyQuestion)("value.1", view(_), _.questions.fields.head.label))
       act.like(renderInputWithLabel(tripleMoneyQuestion)("value.2", view(_), _.questions.fields(1).label))
       act.like(renderInputWithLabel(tripleMoneyQuestion)("value.3", view(_), _.questions.fields(2).label))
-      act.like(renderErrors(invalidSingleMoneyQuestion)(view(_), "money.error.required"))
+      act.like(renderErrors(invalidSingleMoneyQuestion)(view(_), _ => "money.error.required"))
       act.like(renderForm(viewModelGen)(view(_), _.onSubmit))
       act.like(renderSaveAndContinueButton(viewModelGen)(view(_)))
     }

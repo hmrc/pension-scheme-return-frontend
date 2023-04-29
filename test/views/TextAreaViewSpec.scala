@@ -38,7 +38,7 @@ class TextAreaViewSpec extends ViewSpec with Mappings {
 
       act.like(renderTitle(textAreaViewModelGen)(view(form, _), _.title.key))
       act.like(renderHeading(textAreaViewModelGen)(view(form, _), _.heading))
-      act.like(renderErrors(textAreaViewModelGen)(view(invalidForm, _), "error reason"))
+      act.like(renderErrors(textAreaViewModelGen)(view(invalidForm, _), _ => "error reason"))
       act.like(renderTextArea(textAreaViewModelGen)(view(form, _), "value"))
       act.like(renderForm(textAreaViewModelGen)(view(form, _), _.onSubmit))
       act.like(renderSaveAndContinueButton(textAreaViewModelGen)(view(form, _)))

@@ -216,6 +216,11 @@ trait BasicGenerators extends EitherValues {
     } yield Call(method, url)
   }
 
+  val postCall: Gen[Call] =
+    for {
+      url <- relativeUrl
+    } yield Call("POST", url)
+
   val paginationGen: Gen[PaginatedViewModel] = {
     for {
       label <- nonEmptyMessage
@@ -278,4 +283,10 @@ trait BasicGenerators extends EitherValues {
         jsArrayGen(maxDepth)
       )
     }
+
+  def mapOf[A, B](genA: Gen[A], genB: Gen[B], num: Int): Gen[Map[A, B]] =
+    for {
+      a <- Gen.listOfN(num, genA)
+      b <- Gen.listOfN(num, genB)
+    } yield a.zip(b).toMap
 }

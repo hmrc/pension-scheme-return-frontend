@@ -94,6 +94,12 @@ trait ViewBehaviours {
       }
     }
 
+  def renderUpload[A](gen: Gen[A])(view: A => Html): Unit =
+    "render upload" in {
+      forAll(gen) { viewmodel =>
+        upload(view(viewmodel)).text() mustBe ""
+      }
+    }
   def renderDateInput[A](gen: Gen[A])(name: String, view: A => Html): Unit =
     s"render date input for $name" in {
       forAll(gen) { viewModel =>
@@ -111,17 +117,30 @@ trait ViewBehaviours {
       }
     }
 
-  def renderErrors[A](gen: Gen[A])(view: A => Html, error: String): Unit = {
-    "render required error summary" in {
-
+  def renderInset[A](gen: Gen[A])(view: A => Html, text: A => String): Behaviours.BehaviourTest =
+    "render inset text".hasBehaviour {
       forAll(gen) { viewModel =>
-        errorSummary(view(viewModel)).text() must include(error)
+        inset(view(viewModel)).text() must include(text(viewModel))
+      }
+    }
+
+  def renderDetails[A](gen: Gen[A])(view: A => Html, text: A => String): Behaviours.BehaviourTest =
+    "render details".hasBehaviour {
+      forAll(gen) { viewModel =>
+        details(view(viewModel)).text() must include(text(viewModel))
+      }
+    }
+
+  def renderErrors[A](gen: Gen[A])(view: A => Html, error: A => String): Unit = {
+    "render required error summary" in {
+      forAll(gen) { viewModel =>
+        errorSummary(view(viewModel)).text() must include(error(viewModel))
       }
     }
 
     "render required error message" in {
       forAll(gen) { viewModel =>
-        errorMessage(view(viewModel)).text() must include(error)
+        errorMessage(view(viewModel)).text() must include(error(viewModel))
       }
     }
   }
