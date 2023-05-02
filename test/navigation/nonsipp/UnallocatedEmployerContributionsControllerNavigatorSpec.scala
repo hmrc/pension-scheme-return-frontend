@@ -16,36 +16,37 @@
 
 package navigation.nonsipp
 
+import controllers.routes
 import controllers.nonsipp.personalcontributions
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.employercontributions.EmployerContributionsPage
+import pages.nonsipp.unallocatedemployercontributions.UnallocatedEmployerContributionsPage
 import utils.BaseSpec
 
-class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
+class UnallocatedEmployerContributionsControllerNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
   val navigator: Navigator = new NonSippNavigator
 
-  "EmployerContributionsNavigator" - {
+  "UnallocatedEmployerContributionsControllerNavigator" - {
 
     act.like(
       normalmode
         .navigateToWithData(
-          EmployerContributionsPage,
+          UnallocatedEmployerContributionsPage,
           Gen.const(true),
-          controllers.nonsipp.unallocatedemployercontributions.routes.UnallocatedEmployerContributionsController.onPageLoad
+          (_, _) => routes.UnauthorisedController.onPageLoad()
         )
-        .withName("go from employer contribution page to unallocated employer contributions page when yes selected")
+        .withName("go from unallocated employer contributions page to unauthorised page when yes selected")
     )
 
     act.like(
       normalmode
         .navigateToWithData(
-          EmployerContributionsPage,
+          UnallocatedEmployerContributionsPage,
           Gen.const(false),
           personalcontributions.routes.PersonalContributionsController.onPageLoad
         )
-        .withName("go from employer contribution page to personal contributions when no selected")
+        .withName("go from unallocated employer contributions page to personal contributions when no selected")
     )
 
   }

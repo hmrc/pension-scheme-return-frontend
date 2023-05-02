@@ -212,3 +212,8 @@ GET        /:srn/change-other-assets-held               controllers.nonsipp.othe
 POST       /:srn/change-other-assets-held               controllers.nonsipp.otherassetsheld.OtherAssetsHeldController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
 GET        /:srn/return-submitted                  controllers.nonsipp.ReturnSubmittedController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+
+GET        /:srn/unallocated-employer-contributions                      controllers.nonsipp.unallocatedemployercontributions.UnallocatedEmployerContributionsController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST       /:srn/unallocated-employer-contributions                      controllers.nonsipp.unallocatedemployercontributions.UnallocatedEmployerContributionsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/change-unallocated-employer-contributions               controllers.nonsipp.unallocatedemployercontributions.UnallocatedEmployerContributionsController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST       /:srn/change-unallocated-employer-contributions               controllers.nonsipp.unallocatedemployercontributions.UnallocatedEmployerContributionsController.onSubmit(srn: Srn, mode: Mode = CheckMode)
