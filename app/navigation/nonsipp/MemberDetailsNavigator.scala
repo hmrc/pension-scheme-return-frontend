@@ -70,7 +70,14 @@ object MemberDetailsNavigator extends JourneyNavigator {
     case HowToUploadPage(srn) =>
       controllers.nonsipp.memberdetails.routes.UploadMemberDetailsController.onPageLoad(srn)
 
-    case UploadMemberDetailsPage(srn) => controllers.routes.UnauthorisedController.onPageLoad()
+    case UploadMemberDetailsPage(srn) => routes.CheckMemberDetailsFileController.onPageLoad(srn, NormalMode)
+
+    case page @ CheckMemberDetailsFilePage(srn) =>
+      if (userAnswers.get(page).contains(true)) {
+        controllers.routes.UnauthorisedController.onPageLoad()
+      } else {
+        routes.UploadMemberDetailsController.onPageLoad(srn)
+      }
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
@@ -88,6 +95,12 @@ object MemberDetailsNavigator extends JourneyNavigator {
       }
     case MemberDetailsNinoPage(srn, index) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, Check)
     case NoNINOPage(srn, index) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, Check)
-    case UploadMemberDetailsPage(srn) => controllers.routes.UnauthorisedController.onPageLoad()
+    case UploadMemberDetailsPage(srn) => routes.CheckMemberDetailsFileController.onPageLoad(srn, CheckMode)
+    case page @ CheckMemberDetailsFilePage(srn) =>
+      if (userAnswers.get(page).contains(true)) {
+        controllers.routes.UnauthorisedController.onPageLoad()
+      } else {
+        routes.UploadMemberDetailsController.onPageLoad(srn)
+      }
   }
 }

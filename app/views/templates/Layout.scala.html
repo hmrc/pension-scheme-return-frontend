@@ -33,7 +33,7 @@
     alphaBanner: StandardAlphaBanner
 )
 
-@(pageTitle: String, showBackLink: Boolean = true, timeout: Boolean = true, showSignOut: Boolean = true)(contentBlock: Html)(implicit request: Request[_], messages: Messages)
+@(pageTitle: String, showBackLink: Boolean = true, timeout: Boolean = true, showSignOut: Boolean = true, refresh: Option[Int] = None)(contentBlock: Html)(implicit request: Request[_], messages: Messages)
 
 @head = {
 
@@ -54,6 +54,7 @@
     )
 
     <link href="@routes.Assets.versioned("stylesheets/application.css")" media="all" rel="stylesheet" type="text/css"@CSPNonce.get.map {n=> nonce="@n"} />
+    @refresh.map{i => <meta http-equiv="refresh" content="@i">}
 }
 
 @additionalScripts = {

@@ -166,9 +166,9 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         normalmode
           .navigateTo(
             UploadMemberDetailsPage,
-            (_, _) => controllers.routes.UnauthorisedController.onPageLoad()
+            routes.CheckMemberDetailsFileController.onPageLoad
           )
-          .withName("go from upload member details page to unauthorised")
+          .withName("go from upload member details page to check member details file page")
       )
     }
 
@@ -254,9 +254,9 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           checkmode
             .navigateTo(
               UploadMemberDetailsPage,
-              (_, _) => controllers.routes.UnauthorisedController.onPageLoad()
+              routes.CheckMemberDetailsFileController.onPageLoad
             )
-            .withName("go from upload member details page to unauthorised")
+            .withName("go from upload member details page to check member details file page")
         )
       }
     }

@@ -18,8 +18,8 @@ package controllers.nonsipp.memberdetails
 
 import controllers.actions._
 import controllers.nonsipp.memberdetails.UploadMemberDetailsController._
-import models.Mode
 import models.SchemeId.Srn
+import models.{Mode, Reference, UploadKey}
 import navigation.Navigator
 import pages.nonsipp.memberdetails.UploadMemberDetailsPage
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -32,7 +32,7 @@ import viewmodels.models.UploadViewModel
 import views.html.UploadView
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 class UploadMemberDetailsController @Inject()(
   override val messagesApi: MessagesApi,
@@ -54,19 +54,22 @@ class UploadMemberDetailsController @Inject()(
     val failureRedirectUrl =
       controllers.nonsipp.memberdetails.routes.UploadMemberDetailsController.onPageLoad(srn).absoluteURL()
 
+    val uploadKey = UploadKey.fromRequest(srn)
+
     for {
       initiateResponse <- uploadService.initiateUpscan(callBackUrl, successRedirectUrl, failureRedirectUrl)
+      _ <- uploadService.registerUploadRequest(uploadKey, Reference(initiateResponse.fileReference.reference))
     } yield Ok(view(viewModel(initiateResponse.postTarget, initiateResponse.formFields, collectErrors)))
   }
 
-  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
-    Future.successful(Redirect(navigator.nextPage(UploadMemberDetailsPage(srn), mode, request.userAnswers)))
+  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
+    Redirect(navigator.nextPage(UploadMemberDetailsPage(srn), mode, request.userAnswers))
   }
 
   private def collectErrors(implicit request: Request[_]): Option[String] =
-    request.queryString.get("errorCode").zip(request.queryString.get("errorMessage")).flatMap {
-      case (List("EntityTooLarge"), _) => Some("uploadMemberDetails.error.size")
-      case (List("InvalidArgument"), List("'file' field not found")) => Some("uploadMemberDetails.error.required")
+    request.getQueryString("errorCode").zip(request.getQueryString("errorMessage")).flatMap {
+      case ("EntityTooLarge", _) => Some("uploadMemberDetails.error.size")
+      case ("InvalidArgument", "'file' field not found") => Some("uploadMemberDetails.error.required")
       case _ => None
     }
 }

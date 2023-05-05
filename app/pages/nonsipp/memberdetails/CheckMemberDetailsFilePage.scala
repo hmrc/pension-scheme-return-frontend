@@ -14,29 +14,15 @@
  * limitations under the License.
  */
 
-package models
+package pages.nonsipp.memberdetails
 
-import play.api.libs.json.Json
+import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-sealed abstract class SchemeId(val idType: String) {
-  val value: String
-}
+case class CheckMemberDetailsFilePage(srn: Srn) extends QuestionPage[Boolean] {
 
-object SchemeId {
+  override def path: JsPath = JsPath \ toString
 
-  case class Srn(value: String) extends SchemeId("srn")
-
-  object Srn {
-    val srnRegex = "^S[0-9]{10}$"
-
-    def apply(value: String): Option[Srn] =
-      if (value.matches(srnRegex)) Some(new Srn(value)) else None
-  }
-
-  object asSrn {
-    def unapply(arg: String): Option[Srn] = Srn(arg)
-  }
-
-  case class Pstr(value: String) extends SchemeId("pstr")
-
+  override def toString: String = "checkMemberDetailsFile"
 }

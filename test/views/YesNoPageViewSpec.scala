@@ -35,14 +35,14 @@ class YesNoPageViewSpec extends ViewSpec {
 
       val yesNoForm = new YesNoPageFormProvider()(requiredKey, invalidKey)
 
-      act.like(renderTitle(yesNoPageViewModelGen)(view(yesNoForm, _), _.title.key))
-      act.like(renderHeading(yesNoPageViewModelGen)(view(yesNoForm, _), _.heading))
-      act.like(renderSaveAndContinueButton(yesNoPageViewModelGen)(view(yesNoForm, _)))
-      act.like(renderForm(yesNoPageViewModelGen)(view(yesNoForm, _), _.onSubmit))
+      act.like(renderTitle(yesNoPageViewModelGen())(view(yesNoForm, _), _.title.key))
+      act.like(renderHeading(yesNoPageViewModelGen())(view(yesNoForm, _), _.heading))
+      act.like(renderSaveAndContinueButton(yesNoPageViewModelGen())(view(yesNoForm, _)))
+      act.like(renderForm(yesNoPageViewModelGen())(view(yesNoForm, _), _.onSubmit))
 
       "have a paragraph description when present" in {
 
-        forAll(yesNoPageViewModelGen) { viewmodel =>
+        forAll(yesNoPageViewModelGen()) { viewmodel =>
           p(view(yesNoForm, viewmodel)) must contain allElementsOf viewmodel.description
             .collect {
               case p: ParagraphMessage => p
@@ -53,7 +53,7 @@ class YesNoPageViewSpec extends ViewSpec {
 
       "have a list description when present" in {
 
-        forAll(yesNoPageViewModelGen) { viewModel =>
+        forAll(yesNoPageViewModelGen()) { viewModel =>
           li(view(yesNoForm, viewModel)) must contain allElementsOf viewModel.description
             .collect {
               case l: ListMessage => l
@@ -65,14 +65,14 @@ class YesNoPageViewSpec extends ViewSpec {
 
       "does not have a description when not present" in {
 
-        forAll(yesNoPageViewModelGen) { viewmodel =>
+        forAll(yesNoPageViewModelGen()) { viewmodel =>
           p(view(yesNoForm, viewmodel.copy(description = Nil))) mustBe Nil
         }
       }
 
       "have a legend" in {
 
-        forAll(yesNoPageViewModelGen) { viewmodel =>
+        forAll(yesNoPageViewModelGen()) { viewmodel =>
           whenever(viewmodel.legend.nonEmpty) {
 
             legend(view(yesNoForm, viewmodel)) must contain(viewmodel.legend.map(_.toMessage).value)
@@ -82,21 +82,30 @@ class YesNoPageViewSpec extends ViewSpec {
 
       "have radio button values" in {
 
-        forAll(yesNoPageViewModelGen) { viewmodel =>
+        forAll(yesNoPageViewModelGen()) { viewmodel =>
           radios(view(yesNoForm, viewmodel)).map(_.value) mustBe List("true", "false")
         }
       }
 
-      "have radio button labels" in {
+      "have radio button labels" - {
 
-        forAll(yesNoPageViewModelGen) { viewmodel =>
-          radios(view(yesNoForm, viewmodel)).map(_.label) mustBe List(messages("site.yes"), messages("site.no"))
+        "for static labels" in {
+          forAll(yesNoPageViewModelGen(false)) { viewmodel =>
+            radios(view(yesNoForm, viewmodel)).map(_.label) mustBe List(messages("site.yes"), messages("site.no"))
+          }
+        }
+
+        "for generated labels" in {
+          forAll(yesNoPageViewModelGen(true)) { viewmodel =>
+            radios(view(yesNoForm, viewmodel))
+              .map(_.label) mustBe List(viewmodel.yes.value.toMessage, viewmodel.no.value.toMessage)
+          }
         }
       }
 
       "have error summary" in {
 
-        forAll(yesNoPageViewModelGen) { viewmodel =>
+        forAll(yesNoPageViewModelGen()) { viewmodel =>
           val invalidForm = yesNoForm.bind(Map("value" -> ""))
           errorSummary(view(invalidForm, viewmodel)).text() must include(requiredKey)
         }
@@ -104,7 +113,7 @@ class YesNoPageViewSpec extends ViewSpec {
 
       "have error message" in {
 
-        forAll(yesNoPageViewModelGen) { viewmodel =>
+        forAll(yesNoPageViewModelGen()) { viewmodel =>
           val invalidForm = yesNoForm.bind(Map("value" -> ""))
           errorMessage(view(invalidForm, viewmodel)).text() must include(requiredKey)
         }

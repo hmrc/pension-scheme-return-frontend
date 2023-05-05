@@ -17,14 +17,14 @@
 package controllers.nonsipp.memberdetails
 
 import controllers.ControllerBaseSpec
-import views.html.UploadView
-import UploadMemberDetailsController.viewModel
+import controllers.nonsipp.memberdetails.UploadMemberDetailsController.viewModel
 import models.{UpscanFileReference, UpscanInitiateResponse}
 import org.mockito.ArgumentMatchers.any
 import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
 import play.api.mvc.Call
-import services.{TaxYearService, UploadService}
+import services.UploadService
+import views.html.UploadView
 
 import scala.concurrent.Future
 
@@ -33,6 +33,7 @@ class UploadMemberDetailsControllerSpec extends ControllerBaseSpec {
   private lazy val onPageLoad = routes.UploadMemberDetailsController.onPageLoad(srn)
   private def onPageLoad(errorCode: String, errorMessage: String): Call =
     onPageLoad.copy(url = onPageLoad.url + s"?errorCode=$errorCode&errorMessage=$errorMessage")
+
   private lazy val onSubmit = routes.UploadMemberDetailsController.onSubmit(srn)
 
   private val postTarget = "test-post-target"
@@ -46,8 +47,11 @@ class UploadMemberDetailsControllerSpec extends ControllerBaseSpec {
     bind[UploadService].toInstance(mockUploadService)
   )
 
-  override def beforeEach(): Unit =
+  override def beforeEach(): Unit = {
     reset(mockUploadService)
+    when(mockUploadService.registerUploadRequest(any(), any()))
+      .thenReturn(Future.successful((): Unit))
+  }
 
   "UploadMemberDetailsController" - {
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
@@ -70,7 +74,7 @@ class UploadMemberDetailsControllerSpec extends ControllerBaseSpec {
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }
 
-  private def mockInitiateUpscan() =
+  private def mockInitiateUpscan(): Unit =
     when(mockUploadService.initiateUpscan(any(), any(), any())(any()))
       .thenReturn(Future.successful(upscanInitiateResponse))
 }

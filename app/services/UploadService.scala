@@ -16,18 +16,39 @@
 
 package services
 
+import akka.stream.Materializer
+import akka.stream.scaladsl.Source
+import akka.util.ByteString
 import connectors.UpscanConnector
-import models.UpscanInitiateResponse
+import models.{InProgress, Reference, UploadDetails, UploadKey, UploadStatus, UpscanInitiateResponse}
+import repositories.UploadRepository
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class UploadService @Inject()(
-  upscanConnector: UpscanConnector
-) {
+  upscanConnector: UpscanConnector,
+  repository: UploadRepository
+)(implicit ec: ExecutionContext) {
+
   def initiateUpscan(callBackUrl: String, successRedirectUrl: String, failureRedirectUrl: String)(
     implicit hc: HeaderCarrier
   ): Future[UpscanInitiateResponse] =
     upscanConnector.initiate(callBackUrl, successRedirectUrl, failureRedirectUrl)
+
+  def registerUploadRequest(key: UploadKey, fileReference: Reference): Future[Unit] =
+    for {
+      _ <- repository.remove(key)
+      _ <- repository.insert(UploadDetails(key, fileReference, InProgress))
+    } yield ()
+
+  def registerUploadResult(reference: Reference, uploadStatus: UploadStatus): Future[Unit] =
+    repository.updateStatus(reference, uploadStatus).map(_ => ())
+
+  def getUploadResult(key: UploadKey): Future[Option[UploadStatus]] =
+    repository.find(key).map(_.map(_.status))
+
+  def stream(downloadUrl: String)(implicit hc: HeaderCarrier): Future[Source[ByteString, _]] =
+    upscanConnector.download(downloadUrl).map(_.bodyAsSource)
 }

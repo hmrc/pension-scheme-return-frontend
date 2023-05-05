@@ -16,6 +16,9 @@
 
 package models
 
+import models.SchemeId.{asSrn, Srn}
+import models.requests.DataRequest
+import org.bson.types.ObjectId
 import play.api.libs.json.{
   Format,
   JsDefined,
@@ -36,7 +39,7 @@ import java.net.URL
 import java.time.{Instant, LocalDateTime}
 import java.util.UUID
 
-case class Reference(reference: String) extends AnyVal
+case class Reference(reference: String)
 
 object Reference {
   implicit val referenceReader: Reads[Reference] = Reads.StringReads.map(Reference(_))
@@ -66,6 +69,24 @@ object UpscanInitiateRequest {
   implicit val format: OFormat[UpscanInitiateRequest] = Json.format[UpscanInitiateRequest]
 }
 
+case class UploadKey private (userId: String, srn: Srn) {
+  val value: String = userId + UploadKey.separator + srn.value
+}
+
+object UploadKey {
+  def fromRequest(srn: Srn)(implicit req: DataRequest[_]): UploadKey =
+    UploadKey(req.getUserId, srn)
+
+  val separator = "&&"
+
+  implicit val reads: Reads[UploadKey] = Reads.StringReads.flatMap(_.split(separator).toList match {
+    case List(userId, asSrn(srn)) => Reads.pure(UploadKey(userId, srn))
+    case key => Reads.failed(s"Upload key $key is in wrong format. It should be userId${separator}srn")
+  })
+
+  implicit val writes: Writes[UploadKey] = Writes.StringWrites.contramap(_.value)
+}
+
 case class UpscanInitiateError(e: Throwable) extends RuntimeException(e)
 
 case class UpscanFileReference(reference: String)
@@ -85,11 +106,7 @@ sealed trait UploadStatus
 
 case object InProgress extends UploadStatus
 
-case class Failed(failureReason: String, message: String) extends UploadStatus
-
-object Failed {
-  implicit val failedFormat: OFormat[Failed] = Json.format[Failed]
-}
+case object Failed extends UploadStatus
 
 case class UploadedSuccessfully(name: String, mimeType: String, downloadUrl: String, size: Option[Long])
     extends UploadStatus
@@ -141,7 +158,7 @@ sealed trait CallbackBody {
 case class ReadyCallbackBody(
   reference: Reference,
   downloadUrl: URL,
-  uploadDetails: UploadDetails
+  uploadDetails: UploadCallbackDetails
 ) extends CallbackBody
 
 case class FailedCallbackBody(
@@ -149,7 +166,7 @@ case class FailedCallbackBody(
   failureDetails: ErrorDetails
 ) extends CallbackBody
 
-case class UploadDetails(
+case class UploadCallbackDetails(
   uploadTimestamp: Instant,
   checksum: String,
   fileMimeType: String,
@@ -157,13 +174,15 @@ case class UploadDetails(
   size: Long
 )
 
+case class UploadDetails(key: UploadKey, reference: Reference, status: UploadStatus)
+
 case class ErrorDetails(failureReason: String, message: String)
 
 object CallbackBody {
   // must be in scope to create Reads for ReadyCallbackBody
   private implicit val urlFormat: Format[URL] = HttpUrlFormat.format
 
-  implicit val uploadDetailsReads: Reads[UploadDetails] = Json.reads[UploadDetails]
+  implicit val uploadDetailsReads: Reads[UploadCallbackDetails] = Json.reads[UploadCallbackDetails]
 
   implicit val errorDetailsReads: Reads[ErrorDetails] = Json.reads[ErrorDetails]
 

@@ -29,6 +29,10 @@ class NameDOBFormProvider @Inject()() extends Mappings {
   val nameMaxLength = 35
   val nameRegex = "^[a-zA-Z\\-' ]+$"
 
+  val firstName = "firstName"
+  val lastName = "lastName"
+  val dateOfBirth = "dateOfBirth"
+
   def apply(
     firstNameRequired: String,
     firstNameInvalid: String,
@@ -40,19 +44,19 @@ class NameDOBFormProvider @Inject()() extends Mappings {
   ): Form[NameDOB] =
     Form(
       mapping(
-        "firstName" -> text(firstNameRequired).verifying(
+        firstName -> text(firstNameRequired).verifying(
           firstError(
             regexp(nameRegex, firstNameInvalid),
             maxLength(nameMaxLength, firstNameLength)
           )
         ),
-        "lastName" -> text(lastNameRequired).verifying(
+        lastName -> text(lastNameRequired).verifying(
           firstError(
             regexp(nameRegex, lastNameInvalid),
             maxLength(nameMaxLength, lastNameLength)
           )
         ),
-        "dateOfBirth" -> localDate(dateFormErrors)
+        dateOfBirth -> localDate(dateFormErrors)
       )(NameDOB.apply)(NameDOB.unapply)
     )
 }

@@ -18,7 +18,8 @@ package viewmodels.govuk
 
 import play.api.data.Field
 import play.api.i18n.Messages
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+import play.twirl.api.Html
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{Content, HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.fieldset.{Fieldset, Legend}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
 import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.{RadioItem, Radios}
@@ -80,33 +81,41 @@ trait RadiosFluency {
     )(implicit messages: Messages): Radios =
       yesNo(
         field = field,
-        fieldset = FieldsetViewModel(legend)
+        fieldset = FieldsetViewModel(legend),
+        None,
+        None
       )
 
     def yesNo(
       field: Field,
-      legend: Option[Legend]
+      legend: Option[Legend],
+      yes: Option[Html] = None,
+      no: Option[Html] = None
     )(implicit messages: Messages): Radios =
       yesNo(
         field = field,
-        fieldset = FieldsetViewModel(legend)
+        fieldset = FieldsetViewModel(legend),
+        yes,
+        no
       )
 
     def yesNo(
       field: Field,
-      fieldset: Fieldset
+      fieldset: Fieldset,
+      yes: Option[Html],
+      no: Option[Html]
     )(implicit messages: Messages): Radios = {
 
       val items = Seq(
         RadioItem(
           id = Some(field.id),
           value = Some("true"),
-          content = Text(messages("site.yes"))
+          content = yes.fold[Content](Text(messages("site.yes")))(msg => HtmlContent(msg))
         ),
         RadioItem(
           id = Some(s"${field.id}-no"),
           value = Some("false"),
-          content = Text(messages("site.no"))
+          content = no.fold[Content](Text(messages("site.no")))(msg => HtmlContent(msg))
         )
       )
 
