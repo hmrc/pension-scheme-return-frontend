@@ -27,6 +27,8 @@ object Components {
 
   private def anchor(content: Html, url: String): Html =
     HtmlFormat.raw(s"""<a href="$url" class="govuk-link">$content</a>""")
+  private def anchorDownload(content: Html, url: String): Html =
+    HtmlFormat.raw(s"""<a href="$url" class="govuk-link" download>$content</a>""")
 
   private def paragraph(content: Html): Html =
     HtmlFormat.raw(s"""<p class="govuk-body">$content</p>""")
@@ -66,6 +68,7 @@ object Components {
       case Empty => Html("")
       case m @ Message(_, _) => HtmlFormat.escape(m.toMessage)
       case LinkMessage(content, url) => anchor(renderMessage(content), url)
+      case DownloadLinkMessage(content, url) => anchorDownload(renderMessage(content), url)
       case ParagraphMessage(content) => paragraph(content.map(renderMessage).reduce(combine))
       case ListMessage(content, Bullet) => unorderedList(content.map(renderMessage))
       case ListMessage(content, NewLine) => simpleList(content.map(renderMessage))

@@ -232,4 +232,24 @@ trait ControllerBehaviours {
 
   def agreeAndContinue(call: => Call): BehaviourTest =
     agreeAndContinue(call, defaultUserAnswers)
+
+  def continue(call: => Call, userAnswers: UserAnswers): BehaviourTest =
+    "continue to next page".hasBehaviour {
+
+      val appBuilder = applicationBuilder(Some(userAnswers))
+        .overrides(
+          navigatorBindings(testOnwardRoute): _*
+        )
+
+      running(_ => appBuilder) { app =>
+        val result = route(app, FakeRequest(call)).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual testOnwardRoute.url
+
+      }
+    }
+
+  def continue(call: => Call): BehaviourTest =
+    continue(call, defaultUserAnswers)
 }

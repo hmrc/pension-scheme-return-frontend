@@ -49,6 +49,8 @@ object DisplayMessage {
 
   case class LinkMessage(content: Message, url: String) extends InlineMessage
 
+  case class DownloadLinkMessage(content: Message, url: String) extends InlineMessage
+
   case class ParagraphMessage(content: NonEmptyList[InlineMessage]) extends BlockMessage
 
   object ParagraphMessage {
