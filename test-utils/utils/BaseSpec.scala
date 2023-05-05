@@ -66,6 +66,7 @@ abstract class BaseSpec
     app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
 
   protected def messages(key: String)(implicit m: Messages): String = m(key)
+  protected def messages(key: String, args: String*)(implicit m: Messages): String = m(key, args: _*)
 
   protected def injected[A: ClassTag](implicit app: Application): A = app.injector.instanceOf[A]
 

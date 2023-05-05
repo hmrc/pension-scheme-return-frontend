@@ -64,6 +64,11 @@ trait HtmlHelper extends HtmlModels {
   def input(html: Html)(name: String): Option[Input] =
     mainContent(html).select(s"input[name=$name]").iterator().asScala.map(Input(_)).toList.headOption
 
+  def inputByClass(html: Html)(cssClass: String): Element =
+    mainContent(html).select(s"input.$cssClass").first()
+
+  def upload(html: Html): Element = inputByClass(html)("govuk-file-upload")
+
   def inputHint(html: Html)(name: String): Element =
     mainContent(html).getElementById(s"$name-hint")
 
@@ -80,6 +85,8 @@ trait HtmlHelper extends HtmlModels {
   def inset(html: Html): Element =
     mainContent(html).getElementsByClass("govuk-inset-text").first()
 
+  def details(html: Html): Element =
+    mainContent(html).selectFirst("details.govuk-details")
   def buttons(html: Html): Elements =
     mainContent(html).getElementsByTag("button")
 

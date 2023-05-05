@@ -14,25 +14,28 @@
  * limitations under the License.
  */
 
-package viewmodels.govuk
+package utils
 
-import play.twirl.api.Html
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{Content, HtmlContent}
-import uk.gov.hmrc.govukfrontend.views.viewmodels.insettext.InsetText
-import viewmodels.ErrorMessageAwareness
+import play.api.libs.json._
 
-object insettext extends InsetTextFluency
+import java.net.URL
+import scala.util.Try
 
-trait InsetTextFluency {
+object HttpUrlFormat {
 
-  object InsetTextViewModel extends ErrorMessageAwareness {
-    def apply(content: Content): InsetText =
-      InsetText(content = content)
+  implicit val format = new Format[URL] {
 
-    def apply(html: Html): InsetText =
-      apply(HtmlContent(html))
+    override def reads(json: JsValue): JsResult[URL] =
+      json match {
+        case JsString(s) => parseUrl(s).map(JsSuccess(_)).getOrElse(invalidUrlError)
+        case _ => invalidUrlError
+      }
 
-    def apply(elem: scala.xml.Elem): InsetText =
-      apply(Html(elem.toString()))
+    private def parseUrl(s: String): Option[URL] = Try(new URL(s)).toOption
+
+    private def invalidUrlError: JsError =
+      JsError(Seq(JsPath() -> Seq(JsonValidationError("error.expected.url"))))
+
+    override def writes(o: URL): JsValue = JsString(o.toString)
   }
 }

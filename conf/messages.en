@@ -71,6 +71,11 @@ signedOut.guidance = We did not save your answers.
 unauthorised.title = You can’t access this service with this account
 unauthorised.heading = You can’t access this service with this account
 
+upload.whatDoINeedToInclude = What information do I need to include in this file?
+upload.acceptedFileType = Accepted file type: {0}
+upload.maxFileSize = Maximum file size: {0}
+upload.uploadAFile = Upload a file
+
 startPage.title = Submit a pension scheme return
 startPage.heading = Submit a pension scheme return
 startPage.paragraph1 = Use this online service to submit a pension scheme return.
@@ -388,3 +393,13 @@ returnSubmitted.whatHappensNext.list2 = print this page
 unallocatedEmployerContributions.title = Were any unallocated employer contributions received by the scheme during the period of this return?
 unallocatedEmployerContributions.heading = Were any unallocated employer contributions received by {0} during the period of this return?
 unallocatedEmployerContributions.error.required = Select yes if any unallocated employer contributions were received by the scheme during the period of this return
+
+uploadMemberDetails.title = Upload your member details file
+uploadMemberDetails.heading = Upload your member details file
+uploadMemberDetails.paragraph = Uploading a file will overwrite any details you have previously added about scheme members.
+uploadMemberDetails.details.paragraph = Include the following information for each member of the scheme:
+uploadMemberDetails.list1 = their first and last name
+uploadMemberDetails.list2 = their National Insurance number, in the format QQ123456C, or the reason they do not have one
+uploadMemberDetails.list3 = their date of birth, in the format DD/MM/YYYY
+uploadMemberDetails.error.required = Select a file
+uploadMemberDetails.error.size = The selected file must be smaller than 100MB

@@ -152,6 +152,15 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           )
           .withName("go from remove page to list page")
       )
+
+      act.like(
+        normalmode
+          .navigateTo(
+            UploadMemberDetailsPage,
+            (_, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          )
+          .withName("go from upload member details page to unauthorised")
+      )
     }
 
     "CheckMode" - {
@@ -230,6 +239,15 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               userAnswersWithNoNinoReason
             )
             .withName("check answers page when no selected and no nino reason exists")
+        )
+
+        act.like(
+          checkmode
+            .navigateTo(
+              UploadMemberDetailsPage,
+              (_, _) => controllers.routes.UnauthorisedController.onPageLoad()
+            )
+            .withName("go from upload member details page to unauthorised")
         )
       }
     }
