@@ -19,13 +19,13 @@ package controllers.nonsipp.memberdetails
 import models.SchemeId.Srn
 import play.api.Configuration
 import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
-
 import scala.concurrent.ExecutionContext
-import ExecutionContext.Implicits.global
+
 import javax.inject.Inject
 
-class DownloadPensionSchemeTemplateController @Inject()(config: Configuration, cc: ControllerComponents)
-    extends AbstractController(cc) {
+class DownloadPensionSchemeTemplateController @Inject()(config: Configuration, cc: ControllerComponents)(
+  implicit ec: ExecutionContext
+) extends AbstractController(cc) {
 
   def downloadFile(srn: Srn): Action[AnyContent] = Action {
     Ok.sendFile(
