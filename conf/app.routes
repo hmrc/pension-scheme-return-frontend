@@ -224,3 +224,7 @@ GET        /:srn/unallocated-employer-contributions                      control
 POST       /:srn/unallocated-employer-contributions                      controllers.nonsipp.unallocatedemployercontributions.UnallocatedEmployerContributionsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 GET        /:srn/change-unallocated-employer-contributions               controllers.nonsipp.unallocatedemployercontributions.UnallocatedEmployerContributionsController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST       /:srn/change-unallocated-employer-contributions               controllers.nonsipp.unallocatedemployercontributions.UnallocatedEmployerContributionsController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET         /:srn/how-to-upload                                   controllers.nonsipp.memberdetails.HowToUploadController.onPageLoad(srn: Srn)
+GET         /:srn/submit-how-to-upload                            controllers.nonsipp.memberdetails.HowToUploadController.onSubmit(srn: Srn)
+GET         /download-file                                        controllers.nonsipp.memberdetails.DownloadPensionSchemeTemplateController.downloadFile

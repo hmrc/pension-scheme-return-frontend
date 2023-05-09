@@ -22,7 +22,7 @@ import controllers.nonsipp.memberdetails.routes
 import eu.timepit.refined.refineMV
 import generators.IndexGen
 import models.SchemeId.Srn
-import models.{CheckOrChange, ManualOrUpload}
+import models.{CheckOrChange, ManualOrUpload, NormalMode}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.memberdetails._
@@ -52,9 +52,9 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           .navigateToWithData(
             PensionSchemeMembersPage,
             Gen.const(ManualOrUpload.Upload),
-            (_, _) => controllers.routes.UnauthorisedController.onPageLoad()
+            (srn, _) => controllers.nonsipp.memberdetails.routes.HowToUploadController.onPageLoad(srn)
           )
-          .withName("go from manual or upload to unauthorised page when upload is chosen")
+          .withName("go from manual or upload to how to upload page when upload is chosen")
       )
 
       act.like(
@@ -151,6 +151,15 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             (srn, _) => routes.SchemeMembersListController.onPageLoad(srn, page = 1)
           )
           .withName("go from remove page to list page")
+      )
+
+      act.like(
+        normalmode
+          .navigateTo(
+            HowToUploadPage,
+            (srn, _) => controllers.nonsipp.memberdetails.routes.UploadMemberDetailsController.onPageLoad(srn)
+          )
+          .withName("go from how to upload page  to upload member details page")
       )
 
       act.like(

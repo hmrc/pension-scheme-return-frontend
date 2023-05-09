@@ -36,7 +36,7 @@ object MemberDetailsNavigator extends JourneyNavigator {
       if (userAnswers.get(PensionSchemeMembersPage(srn)).contains(ManualOrUpload.Manual)) {
         routes.MemberDetailsController.onPageLoad(srn, refineMV(1), NormalMode)
       } else {
-        controllers.routes.UnauthorisedController.onPageLoad()
+        controllers.nonsipp.memberdetails.routes.HowToUploadController.onPageLoad(srn)
       }
 
     case MemberDetailsPage(srn, index) => routes.DoesSchemeMemberHaveNINOController.onPageLoad(srn, index, NormalMode)
@@ -66,6 +66,9 @@ object MemberDetailsNavigator extends JourneyNavigator {
       )
 
     case RemoveMemberDetailsPage(srn) => routes.SchemeMembersListController.onPageLoad(srn, page = 1)
+
+    case HowToUploadPage(srn) =>
+      controllers.nonsipp.memberdetails.routes.UploadMemberDetailsController.onPageLoad(srn)
 
     case UploadMemberDetailsPage(srn) => controllers.routes.UnauthorisedController.onPageLoad()
   }
