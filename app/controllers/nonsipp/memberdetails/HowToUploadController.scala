@@ -70,7 +70,7 @@ object HowToUploadController {
       ParagraphMessage(
         DownloadLinkMessage(
           "howToUpload.linkMessage",
-          "download-file"
+          routes.DownloadPensionSchemeTemplateController.downloadFile.url
         ),
         "howToUpload.linkMessage1"
       )

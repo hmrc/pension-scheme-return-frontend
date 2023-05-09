@@ -16,7 +16,6 @@
 
 package controllers.nonsipp.memberdetails
 
-import models.SchemeId.Srn
 import play.api.Configuration
 import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
 import scala.concurrent.ExecutionContext
@@ -27,7 +26,7 @@ class DownloadPensionSchemeTemplateController @Inject()(config: Configuration, c
   implicit ec: ExecutionContext
 ) extends AbstractController(cc) {
 
-  def downloadFile(srn: Srn): Action[AnyContent] = Action {
+  def downloadFile: Action[AnyContent] = Action {
     Ok.sendFile(
       content = new java.io.File("conf/pension-scheme-return-member-details-template.csv"),
       fileName = _ => Option("pension-scheme-return-member-details-template.csv")

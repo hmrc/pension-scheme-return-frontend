@@ -227,4 +227,4 @@ POST       /:srn/change-unallocated-employer-contributions               control
 
 GET         /:srn/how-to-upload                                   controllers.nonsipp.memberdetails.HowToUploadController.onPageLoad(srn: Srn)
 GET         /:srn/submit-how-to-upload                            controllers.nonsipp.memberdetails.HowToUploadController.onSubmit(srn: Srn)
-GET         /:srn/download-file                                   controllers.nonsipp.memberdetails.DownloadPensionSchemeTemplateController.downloadFile(srn: Srn)
+GET         /download-file                                        controllers.nonsipp.memberdetails.DownloadPensionSchemeTemplateController.downloadFile
