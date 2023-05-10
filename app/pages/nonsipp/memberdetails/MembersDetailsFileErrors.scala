@@ -14,29 +14,15 @@
  * limitations under the License.
  */
 
-package models
+package pages.nonsipp.memberdetails
 
-import play.api.libs.json.Json
+import models.SchemeId.Srn
+import models.UploadFailure
+import play.api.libs.json.JsPath
+import queries.{Gettable, Settable}
 
-sealed abstract class SchemeId(val idType: String) {
-  val value: String
-}
+case class MembersDetailsFileErrors(srn: Srn) extends Gettable[UploadFailure] with Settable[UploadFailure] {
+  override def path: JsPath = JsPath \ toString
 
-object SchemeId {
-
-  case class Srn(value: String) extends SchemeId("srn")
-
-  object Srn {
-    val srnRegex = "^S[0-9]{10}$"
-
-    def apply(value: String): Option[Srn] =
-      if (value.matches(srnRegex)) Some(new Srn(value)) else None
-  }
-
-  object asSrn {
-    def unapply(arg: String): Option[Srn] = Srn(arg)
-  }
-
-  case class Pstr(value: String) extends SchemeId("pstr")
-
+  override def toString: String = "membersDetailsFileErrors"
 }

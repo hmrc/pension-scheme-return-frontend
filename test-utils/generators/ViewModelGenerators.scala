@@ -181,16 +181,18 @@ trait ViewModelGenerators extends BasicGenerators {
       PensionSchemeViewModel(title, heading, onSubmit)
     }
 
-  val yesNoPageViewModelGen: Gen[YesNoPageViewModel] =
+  def yesNoPageViewModelGen(genLabels: Boolean = false): Gen[YesNoPageViewModel] =
     for {
       title <- nonEmptyMessage
       heading <- nonEmptyMessage
       description <- Gen.listOf(nonEmptyBlockMessage)
       legend <- Gen.option(nonEmptyMessage)
       hint <- Gen.option(nonEmptyMessage)
+      yes <- if (genLabels) Gen.some(nonEmptyMessage) else Gen.const(None)
+      no <- if (genLabels) Gen.some(nonEmptyMessage) else Gen.const(None)
       onSubmit <- call
     } yield {
-      YesNoPageViewModel(title, heading, description, legend, hint, onSubmit)
+      YesNoPageViewModel(title, heading, description, legend, hint, yes, no, None, onSubmit)
     }
 
   def radioListRowViewModelGen: Gen[RadioListRowViewModel] =

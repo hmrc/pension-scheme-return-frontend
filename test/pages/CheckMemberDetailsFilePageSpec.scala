@@ -14,29 +14,19 @@
  * limitations under the License.
  */
 
-package models
+package pages
 
-import play.api.libs.json.Json
+import pages.behaviours.PageBehaviours
+import pages.nonsipp.memberdetails.CheckMemberDetailsFilePage
 
-sealed abstract class SchemeId(val idType: String) {
-  val value: String
-}
+class CheckMemberDetailsFilePageSpec extends PageBehaviours {
 
-object SchemeId {
+  "CheckMemberDetailsFilePage" - {
 
-  case class Srn(value: String) extends SchemeId("srn")
+    beRetrievable[Boolean](CheckMemberDetailsFilePage(srnGen.sample.value))
 
-  object Srn {
-    val srnRegex = "^S[0-9]{10}$"
+    beSettable[Boolean](CheckMemberDetailsFilePage(srnGen.sample.value))
 
-    def apply(value: String): Option[Srn] =
-      if (value.matches(srnRegex)) Some(new Srn(value)) else None
+    beRemovable[Boolean](CheckMemberDetailsFilePage(srnGen.sample.value))
   }
-
-  object asSrn {
-    def unapply(arg: String): Option[Srn] = Srn(arg)
-  }
-
-  case class Pstr(value: String) extends SchemeId("pstr")
-
 }

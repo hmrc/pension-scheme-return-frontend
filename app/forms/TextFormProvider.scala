@@ -27,9 +27,11 @@ class TextFormProvider @Inject()() extends Mappings {
   val textAreaRegex = """^[a-zA-Z0-9\-'" \t\r\n,.@/]+$"""
   val textAreaMaxLength = 160
 
+  val formKey = "value"
+
   def apply(requiredKey: String): Form[String] =
     Form(
-      "value" -> text(requiredKey)
+      formKey -> text(requiredKey)
     )
 
   def textArea(
@@ -38,7 +40,7 @@ class TextFormProvider @Inject()() extends Mappings {
     invalidCharactersKey: String,
     args: Any*
   ): Form[String] = Form(
-    "value" -> text(requiredKey, args.toList)
+    formKey -> text(requiredKey, args.toList)
       .verifying(verify[String](invalidCharactersKey, _.matches(textAreaRegex), args: _*))
       .verifying(verify[String](tooLongKey, _.length <= textAreaMaxLength, args: _*))
   )
@@ -51,7 +53,7 @@ class TextFormProvider @Inject()() extends Mappings {
     args: Any*
   ): Form[Nino] =
     Form(
-      "value" -> text(requiredKey, args.toList)
+      formKey -> text(requiredKey, args.toList)
         .verifying(verify[String](invalidKey, s => Nino.isValid(s.toUpperCase), args: _*))
         .verifying(verify[String](duplicateKey, !duplicates.map(_.nino).contains(_), args: _*))
         .transform[Nino](s => Nino(s.toUpperCase), _.nino.toUpperCase)

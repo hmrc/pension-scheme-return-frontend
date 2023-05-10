@@ -28,7 +28,7 @@
 
 @(form: Form[Boolean], viewmodel: YesNoPageViewModel)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, viewmodel.title.toMessage)) {
+@layout(pageTitle = title(form, viewmodel.title.toMessage), refresh = viewmodel.refresh) {
 
   @formHelper(action = viewmodel.onSubmit, Symbol("autocomplete") -> "off") {
 
@@ -45,7 +45,9 @@
     @govukRadios(
         RadiosViewModel.yesNo(
             field = form("value"),
-            legend = viewmodel.legend.map(legend => LegendViewModel(legend.toMessage).withSize(LegendSize.Medium))
+            legend = viewmodel.legend.map(legend => LegendViewModel(legend.toMessage).withSize(LegendSize.Medium)),
+            yes = viewmodel.yes.map(renderMessage(_)),
+            no = viewmodel.no.map(renderMessage(_))
         )
     )
 

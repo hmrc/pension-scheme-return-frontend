@@ -16,27 +16,10 @@
 
 package models
 
-import play.api.libs.json.Json
-
-sealed abstract class SchemeId(val idType: String) {
-  val value: String
-}
-
-object SchemeId {
-
-  case class Srn(value: String) extends SchemeId("srn")
-
-  object Srn {
-    val srnRegex = "^S[0-9]{10}$"
-
-    def apply(value: String): Option[Srn] =
-      if (value.matches(srnRegex)) Some(new Srn(value)) else None
-  }
-
-  object asSrn {
-    def unapply(arg: String): Option[Srn] = Srn(arg)
-  }
-
-  case class Pstr(value: String) extends SchemeId("pstr")
-
+object UploadKeys {
+  val firstName = "First name"
+  val lastName = "Last name"
+  val dateOfBirth = "Date of birth"
+  val nino = "National Insurance number"
+  val reasonForNoNino = "Reason for no National Insurance number"
 }
