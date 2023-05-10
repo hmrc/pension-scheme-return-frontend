@@ -32,8 +32,9 @@ trait ViewModelGenerators extends BasicGenerators {
       buttonText <- nonEmptyMessage
       isStartButton <- boolean
       onSubmit <- call
+      isLargeHeading <- boolean
     } yield {
-      ContentPageViewModel(title, heading, contents, buttonText, isStartButton, onSubmit)
+      ContentPageViewModel(title, heading, contents, buttonText, isStartButton, onSubmit, isLargeHeading)
     }
 
   val contentTablePageViewModelGen: Gen[ContentTablePageViewModel] =
