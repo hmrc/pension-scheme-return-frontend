@@ -77,6 +77,7 @@ object HowToUploadController {
     ),
     Message("site.continue"),
     isStartButton = false,
-    routes.HowToUploadController.onSubmit(srn)
+    routes.HowToUploadController.onSubmit(srn),
+    isLargeHeading = true
   )
 }

@@ -72,7 +72,8 @@ object PspDeclarationController {
     ),
     Message("site.agreeAndContinue"),
     isStartButton = false,
-    routes.PspDeclarationController.onSubmit(srn)
+    routes.PspDeclarationController.onSubmit(srn),
+    isLargeHeading = false
   )
 
 }

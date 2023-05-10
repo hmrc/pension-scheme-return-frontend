@@ -25,7 +25,11 @@
 
 @layout(pageTitle = titleNoForm(viewmodel.title.toMessage)) {
 
-    <h1 class="govuk-heading-xl">@viewmodel.heading.toMessage</h1>
+            @if(viewmodel.isLargeHeading) {
+                <h1 class="govuk-heading-l">@viewmodel.heading.toMessage</h1>
+            } else {
+                <h1 class="govuk-heading-xl">@viewmodel.heading.toMessage</h1>
+            }
 
     @viewmodel.contents.map(renderMessage)
 
