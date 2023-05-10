@@ -93,6 +93,7 @@ trait TestValues { _: BaseSpec =>
   val srn: SchemeId.Srn = srnGen.sample.value
   val schemeName = "testSchemeName"
   val email = "testEmail"
+  val uploadKey: UploadKey = UploadKey("test-userid", srn)
 
   val localDateTime: LocalDateTime =
     LocalDateTime.of(2020, 12, 12, 10, 30, 15)
