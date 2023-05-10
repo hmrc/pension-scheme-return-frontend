@@ -70,6 +70,7 @@ object PsaDeclarationController {
     ),
     Message("site.agreeAndContinue"),
     isStartButton = false,
-    routes.PsaDeclarationController.onSubmit(srn)
+    routes.PsaDeclarationController.onSubmit(srn),
+    isLargeHeading = false
   )
 }

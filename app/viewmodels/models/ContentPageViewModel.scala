@@ -26,10 +26,30 @@ case class ContentPageViewModel(
   contents: List[BlockMessage],
   buttonText: Message,
   isStartButton: Boolean,
-  onSubmit: Call
+  onSubmit: Call,
+  isLargeHeading: Boolean
 )
 
 object ContentPageViewModel {
+
+  def apply(
+    title: String,
+    heading: String,
+    buttonText: String,
+    isStartButton: Boolean,
+    onSubmit: Call,
+    isLargeHeading: Boolean,
+    paragraphs: String*
+  ): ContentPageViewModel =
+    ContentPageViewModel(
+      title,
+      heading,
+      paragraphs.map(ParagraphMessage(_)).toList,
+      buttonText,
+      isStartButton,
+      onSubmit,
+      isLargeHeading
+    )
 
   def apply(
     title: String,
@@ -45,6 +65,8 @@ object ContentPageViewModel {
       paragraphs.map(ParagraphMessage(_)).toList,
       buttonText,
       isStartButton,
-      onSubmit
+      onSubmit,
+      isLargeHeading = false
     )
+
 }
