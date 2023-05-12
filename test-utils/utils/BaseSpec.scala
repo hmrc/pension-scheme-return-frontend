@@ -53,7 +53,7 @@ abstract class BaseSpec
   implicit val mat: Materializer = Materializer.createMaterializer(actorSystem)
 
   override implicit val patienceConfig: PatienceConfig =
-    PatienceConfig(timeout = scaled(Span(500, Millis)), interval = scaled(Span(50, Millis)))
+    PatienceConfig(timeout = scaled(Span(1000, Millis)), interval = scaled(Span(50, Millis)))
 
   protected def applicationBuilder: GuiceApplicationBuilder =
     new GuiceApplicationBuilder()

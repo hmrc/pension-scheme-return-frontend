@@ -16,12 +16,11 @@
 
 package services
 
-import akka.stream.scaladsl.{Sink, Source}
+import akka.stream.scaladsl.Sink
 import akka.util.ByteString
 import connectors.UpscanConnector
 import controllers.TestValues
-import models.SchemeId.Srn
-import models.{Failed, Reference, UploadDetails, UploadKey, UpscanFileReference, UpscanInitiateResponse}
+import models.{Failed, Reference, UploadDetails, UpscanFileReference, UpscanInitiateResponse}
 import org.mockito.ArgumentMatchers.any
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.http.Status.OK

@@ -48,16 +48,9 @@ trait ControllerBaseSpec
 
   val baseUrl = "/pension-scheme-return"
 
-  val userAnswersId: String = "id"
-
   val testOnwardRoute: Call = Call("GET", "/foo")
 
   val defaultTaxYear = TaxYear(2022)
-
-  def emptyUserAnswers: UserAnswers = UserAnswers(userAnswersId)
-
-  val defaultUserAnswers: UserAnswers =
-    UserAnswers(userAnswersId, SensitiveJsObject(Json.obj("non" -> "empty")))
 
   protected def applicationBuilder(
     userAnswers: Option[UserAnswers] = None,
@@ -94,6 +87,12 @@ trait TestValues { _: BaseSpec =>
   val schemeName = "testSchemeName"
   val email = "testEmail"
   val uploadKey: UploadKey = UploadKey("test-userid", srn)
+
+  val userAnswersId: String = "id"
+  def emptyUserAnswers: UserAnswers = UserAnswers(userAnswersId)
+
+  val defaultUserAnswers: UserAnswers =
+    UserAnswers(userAnswersId, SensitiveJsObject(Json.obj("non" -> "empty")))
 
   val localDateTime: LocalDateTime =
     LocalDateTime.of(2020, 12, 12, 10, 30, 15)
