@@ -57,9 +57,6 @@ class CheckMemberDetailsFileController @Inject()(
     val preparedForm = request.userAnswers.fillForm(CheckMemberDetailsFilePage(srn), form)
     val uploadKey = UploadKey.fromRequest(srn)
 
-    // todo: This can be None while we wait for the callback where we don't display the file name
-    //       but still requires content for that scenario.
-    //       Meta-equiv refresh is in place if None
     uploadService.getUploadResult(uploadKey).map {
       case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
       case Some(upload: UploadedSuccessfully) => Ok(view(preparedForm, viewModel(srn, Some(upload.name), mode)))

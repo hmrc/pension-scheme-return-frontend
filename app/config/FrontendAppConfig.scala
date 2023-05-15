@@ -28,6 +28,8 @@ class FrontendAppConfig @Inject()(config: Configuration) { self =>
   val host: String = config.get[String]("host")
   val appName: String = config.get[String]("appName")
 
+  val isLocal: Boolean = config.getOptional[Boolean]("local").getOrElse(false)
+
   private val contactHost = config.get[String]("contact-frontend.host")
   private val contactFormServiceIdentifier = "pension-scheme-return-frontend"
 

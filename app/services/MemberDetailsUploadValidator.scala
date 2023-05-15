@@ -94,8 +94,6 @@ class MemberDetailsUploadValidator @Inject()(
         }, inclusive = true)
         .runFold[Either[UploadFailure, List[UploadMemberDetails]]](Left(UploadInitial)) {
           // initial
-          case (Left(UploadInitial), UploadFormatError) => Left(UploadFormatError)
-          case (Left(UploadInitial), UploadErrors(errs)) => Left(UploadErrors(errs))
           case (Left(UploadInitial), UploadSuccess(memberDetails)) => Right(List(memberDetails))
           // format error
           case (_, UploadFormatError) => Left(UploadFormatError)
