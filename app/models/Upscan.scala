@@ -78,16 +78,7 @@ object UploadKey {
     UploadKey(req.getUserId, srn)
 
   val separator = "&&"
-
-  implicit val reads: Reads[UploadKey] = Reads.StringReads.flatMap(_.split(separator).toList match {
-    case List(userId, asSrn(srn)) => Reads.pure(UploadKey(userId, srn))
-    case key => Reads.failed(s"Upload key $key is in wrong format. It should be userId${separator}srn")
-  })
-
-  implicit val writes: Writes[UploadKey] = Writes.StringWrites.contramap(_.value)
 }
-
-case class UpscanInitiateError(e: Throwable) extends RuntimeException(e)
 
 case class UpscanFileReference(reference: String)
 
@@ -102,50 +93,26 @@ object UpscanInitiateResponse {
   implicit val format: OFormat[UpscanInitiateResponse] = Json.format[UpscanInitiateResponse]
 }
 
-sealed trait UploadStatus
+object UploadStatus {
 
-case object InProgress extends UploadStatus
+  sealed trait UploadStatus // needs to be in the same closure as it's subtypes for Json.format to work
 
-case object Failed extends UploadStatus
+  case object InProgress extends UploadStatus
 
-case class UploadedSuccessfully(name: String, mimeType: String, downloadUrl: String, size: Option[Long])
-    extends UploadStatus
+  case object Failed extends UploadStatus
+
+  case class UploadedSuccessfully(name: String, mimeType: String, downloadUrl: String, size: Option[Long])
+      extends UploadStatus
+}
 
 object UploadedSuccessfully {
-  implicit val uploadedSuccessfullyFormat: OFormat[UploadedSuccessfully] = Json.format[UploadedSuccessfully]
-}
-
-case class FileUploadStatus(
-  _type: String,
-  failureReason: Option[String] = None,
-  message: Option[String] = None,
-  downloadUrl: Option[String] = None,
-  mimeType: Option[String] = None,
-  name: Option[String] = None,
-  size: Option[Long] = None
-)
-
-object FileUploadStatus {
-  implicit val reads: OFormat[FileUploadStatus] = Json.format[FileUploadStatus]
-}
-
-case class FileUploadDataCache(
-  uploadId: String,
-  reference: String,
-  status: FileUploadStatus,
-  created: LocalDateTime,
-  lastUpdated: LocalDateTime,
-  expireAt: LocalDateTime
-)
-
-object FileUploadDataCache {
-  implicit val reads: OFormat[FileUploadDataCache] = Json.format[FileUploadDataCache]
+  implicit val uploadedSuccessfullyFormat: OFormat[UploadStatus.UploadedSuccessfully] =
+    Json.format[UploadStatus.UploadedSuccessfully]
 }
 
 case class UploadId(value: String) extends AnyVal
 
 object UploadId {
-  def generate: UploadId = UploadId(UUID.randomUUID().toString)
 
   implicit def queryBinder(implicit stringBinder: QueryStringBindable[String]): QueryStringBindable[UploadId] =
     stringBinder.transform(UploadId(_), _.value)
@@ -174,7 +141,12 @@ case class UploadCallbackDetails(
   size: Long
 )
 
-case class UploadDetails(key: UploadKey, reference: Reference, status: UploadStatus)
+case class UploadDetails(
+  key: UploadKey,
+  reference: Reference,
+  status: UploadStatus.UploadStatus,
+  lastUpdated: Instant
+)
 
 case class ErrorDetails(failureReason: String, message: String)
 

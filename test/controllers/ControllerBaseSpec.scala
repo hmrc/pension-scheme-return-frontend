@@ -17,8 +17,10 @@
 package controllers
 
 import controllers.actions._
+import generators.ModelGenerators.srnGen
 import models.UserAnswers.SensitiveJsObject
 import models._
+import org.scalatest.OptionValues
 import play.api.Application
 import play.api.data.Form
 import play.api.http._
@@ -81,13 +83,14 @@ trait ControllerBaseSpec
   }
 }
 
-trait TestValues { _: BaseSpec =>
+trait TestValues { _: OptionValues =>
   val accountNumber = "12345678"
   val sortCode = "123456"
   val srn: SchemeId.Srn = srnGen.sample.value
   val schemeName = "testSchemeName"
   val email = "testEmail"
   val uploadKey: UploadKey = UploadKey("test-userid", srn)
+  val reference: Reference = Reference("test-ref")
 
   val userAnswersId: String = "id"
   def emptyUserAnswers: UserAnswers = UserAnswers(userAnswersId)

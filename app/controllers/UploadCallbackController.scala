@@ -16,14 +16,14 @@
 
 package controllers
 
-import models.{CallbackBody, Failed, FailedCallbackBody, ReadyCallbackBody, UploadedSuccessfully}
+import models._
 import play.api.libs.json.JsValue
 import play.api.mvc.{Action, MessagesControllerComponents}
 import services.UploadService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 class UploadCallbackController @Inject()(
   uploadService: UploadService,
@@ -35,13 +35,13 @@ class UploadCallbackController @Inject()(
     withJsonBody[CallbackBody] { callback: CallbackBody =>
       val uploadStatus = callback match {
         case s: ReadyCallbackBody =>
-          UploadedSuccessfully(
+          UploadStatus.UploadedSuccessfully(
             s.uploadDetails.fileName,
             s.uploadDetails.fileMimeType,
             s.downloadUrl.getFile,
             Some(s.uploadDetails.size)
           )
-        case _: FailedCallbackBody => Failed
+        case _: FailedCallbackBody => UploadStatus.Failed
       }
       uploadService.registerUploadResult(callback.reference, uploadStatus).map(_ => Ok)
     }

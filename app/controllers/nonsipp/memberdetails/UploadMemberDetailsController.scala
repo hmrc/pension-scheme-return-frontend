@@ -48,7 +48,7 @@ class UploadMemberDetailsController @Inject()(
     with I18nSupport {
 
   private def callBackUrl(implicit req: Request[_]): String =
-    controllers.routes.UploadCallbackController.callback.absoluteURL(secure = !config.isLocal)
+    controllers.routes.UploadCallbackController.callback.absoluteURL(secure = config.secureUpscanCallBack)
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
     val successRedirectUrl =

@@ -20,7 +20,7 @@ import akka.stream.Materializer
 import controllers.actions._
 import controllers.nonsipp.memberdetails.CheckMemberDetailsFileController._
 import forms.YesNoPageFormProvider
-import models.{Mode, UploadKey, UploadedSuccessfully}
+import models.{Mode, UploadKey, UploadStatus, UploadedSuccessfully}
 import models.SchemeId.Srn
 import navigation.Navigator
 import pages.nonsipp.memberdetails.CheckMemberDetailsFilePage
@@ -59,7 +59,8 @@ class CheckMemberDetailsFileController @Inject()(
 
     uploadService.getUploadResult(uploadKey).map {
       case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-      case Some(upload: UploadedSuccessfully) => Ok(view(preparedForm, viewModel(srn, Some(upload.name), mode)))
+      case Some(upload: UploadStatus.UploadedSuccessfully) =>
+        Ok(view(preparedForm, viewModel(srn, Some(upload.name), mode)))
       case Some(_) => Ok(view(preparedForm, viewModel(srn, None, mode)))
     }
   }
@@ -79,10 +80,10 @@ class CheckMemberDetailsFileController @Inject()(
             case Some(file) =>
               for {
                 source <- uploadService.stream(file.downloadUrl)
+                validated <- uploadValidator.validateCSV(source)
+                _ <- uploadService.saveValidatedUpload(uploadKey, validated)
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(CheckMemberDetailsFilePage(srn), value))
                 _ <- saveService.save(updatedAnswers)
-                _ <- uploadValidator
-                  .validateCSV(srn, updatedAnswers, source) // todo should we detach this process from stack?
               } yield Redirect(navigator.nextPage(CheckMemberDetailsFilePage(srn), mode, updatedAnswers))
           }
       )
@@ -90,11 +91,11 @@ class CheckMemberDetailsFileController @Inject()(
 
   // todo: handle all Upscan upload states
   //       None is an error case as the initial state set on the previous page should be InProgress
-  private def getUploadedFile(uploadKey: UploadKey): Future[Option[UploadedSuccessfully]] =
+  private def getUploadedFile(uploadKey: UploadKey): Future[Option[UploadStatus.UploadedSuccessfully]] =
     uploadService
       .getUploadResult(uploadKey)
       .map {
-        case Some(upload: UploadedSuccessfully) => Some(upload)
+        case Some(upload: UploadStatus.UploadedSuccessfully) => Some(upload)
         case _ => None
       }
 }

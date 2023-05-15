@@ -42,7 +42,6 @@ import scala.util.Try
 
 class MemberDetailsUploadValidator @Inject()(
   nameDOBFormProvider: NameDOBFormProvider,
-  saveService: SaveService,
   textFormProvider: TextFormProvider
 )(implicit ec: ExecutionContext) {
 
@@ -62,10 +61,8 @@ class MemberDetailsUploadValidator @Inject()(
   private val aToZ: List[Char] = ('a' to 'z').toList.map(_.toUpper)
 
   def validateCSV(
-    srn: Srn,
-    userAnswers: UserAnswers,
     source: Source[ByteString, _]
-  )(implicit mat: Materializer, hc: HeaderCarrier): Future[Unit] = {
+  )(implicit mat: Materializer): Future[Upload] = {
     val csvFrames = source.via(csvFrame)
     for {
       csvHeader <- csvFrames.runWith(firstRowSink)
@@ -74,7 +71,7 @@ class MemberDetailsUploadValidator @Inject()(
         .zipWithIndex
         .map { case (key, index) => CsvHeaderKey(key, indexToCsvKey(index), index) }
         .toList
-      ua <- csvFrames
+      validated <- csvFrames
         .drop(1) // drop csv header and process rows
         .statefulMap[UploadState, Upload](() => UploadState.init)(
           (state, bs) => {
@@ -82,7 +79,7 @@ class MemberDetailsUploadValidator @Inject()(
             validateMemberDetails(header, parts, state.previousNinos, state.row) match {
               case None => state.next() -> UploadFormatError
               case Some(Valid(memberDetails)) =>
-                state.next(memberDetails.ninoOrNoNinoReason.toOption) -> UploadSuccess(memberDetails)
+                state.next(memberDetails.ninoOrNoNinoReason.toOption) -> UploadSuccess(List(memberDetails))
               case Some(Invalid(errs)) => state.next() -> UploadErrors(errs)
             }
           },
@@ -92,42 +89,20 @@ class MemberDetailsUploadValidator @Inject()(
           case UploadFormatError => false
           case _ => true
         }, inclusive = true)
-        .runFold[Either[UploadFailure, List[UploadMemberDetails]]](Left(UploadInitial)) {
-          // initial
-          case (Left(UploadInitial), UploadSuccess(memberDetails)) => Right(List(memberDetails))
+        .runReduce[Upload] {
           // format error
-          case (_, UploadFormatError) => Left(UploadFormatError)
-          case (Left(UploadFormatError), _) => Left(UploadFormatError)
+          case (_, UploadFormatError) => UploadFormatError
+          case (UploadFormatError, _) => UploadFormatError
           // errors
-          case (Left(UploadErrors(previousErrs)), UploadErrors(errs)) => Left(UploadErrors(previousErrs ++ errs))
-          case (Left(errs: UploadErrors), _) => Left(errs)
-          case (_, errs: UploadErrors) => Left(errs)
+          case (UploadErrors(previous), UploadErrors(errs)) => UploadErrors(previous ++ errs)
+          case (errs: UploadErrors, _) => errs
+          case (_, errs: UploadErrors) => errs
           // success
-          case (Right(previousMemberDetails), UploadSuccess(memberDetails)) =>
-            Right(previousMemberDetails :+ memberDetails)
-          case (_, UploadSuccess(memberDetails)) => Right(List(memberDetails))
+          case (previous: UploadSuccess, current: UploadSuccess) =>
+            UploadSuccess(previous.memberDetails ++ current.memberDetails)
+          case (_, memberDetails: UploadSuccess) => memberDetails
         }
-        .flatMap { result =>
-          val updatedUserAnswers: Try[UserAnswers] = result match {
-            case Left(uploadFailure) => userAnswers.set(MembersDetailsFileErrors(srn), uploadFailure)
-            case Right(memberDetails) =>
-              memberDetails.foldLeft(Try(userAnswers)) { (initialUA, next) =>
-                for {
-                  index <- refineV[OneTo99](next.row).leftMap(new RuntimeException(_)).toTry
-                  ua <- initialUA
-                  ua1 <- ua.set(MemberDetailsPage(srn, index), next.nameDOB)
-                  ua2 <- ua1.set(DoesMemberHaveNinoPage(srn, index), next.ninoOrNoNinoReason.isRight)
-                  ua3 <- next.ninoOrNoNinoReason match {
-                    case Left(noNinoReason) => ua2.set(NoNINOPage(srn, index), noNinoReason)
-                    case Right(nino) => ua2.set(MemberDetailsNinoPage(srn, index), nino)
-                  }
-                } yield ua3
-              }
-          }
-          Future.fromTry(updatedUserAnswers)
-        }
-      _ <- saveService.save(ua)
-    } yield ()
+    } yield validated
   }
 
   private def validateMemberDetails(
