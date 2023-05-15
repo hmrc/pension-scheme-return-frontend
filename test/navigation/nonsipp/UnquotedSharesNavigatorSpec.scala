@@ -19,37 +19,34 @@ package navigation.nonsipp
 import controllers.routes
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.sharesinsponsoringemployer.DidSchemeHoldSharesInSponsoringEmployerPage
+import pages.nonsipp.unquotedshares.UnquotedSharesPage
 import utils.BaseSpec
 
-class SharesInSponsoringEmployerNavigatorSpec extends BaseSpec with NavigatorBehaviours {
+class UnquotedSharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
   val navigator: Navigator = new NonSippNavigator
 
-  "SharesInSponsoringEmployerNavigator" - {
+  "UnquotedSharesNavigator" - {
 
     act.like(
       normalmode
         .navigateToWithData(
-          DidSchemeHoldSharesInSponsoringEmployerPage,
+          UnquotedSharesPage,
           Gen.const(true),
-          controllers.nonsipp.unquotedshares.routes.UnquotedSharesController.onPageLoad
+          (_, _) => routes.UnauthorisedController.onPageLoad()
         )
-        .withName(
-          "go from did scheme hold shares in sponsoring employer page to unquoted shares page when yes selected"
-        )
+        .withName("go from unquoted shares page to unauthorised page when yes selected")
     )
 
     act.like(
       normalmode
         .navigateToWithData(
-          DidSchemeHoldSharesInSponsoringEmployerPage,
+          UnquotedSharesPage,
           Gen.const(false),
-          controllers.nonsipp.landorproperty.routes.LandOrPropertyHeldController.onPageLoad
+          (_, _) => routes.UnauthorisedController.onPageLoad()
         )
-        .withName(
-          "go from id scheme hold shares in sponsoring employer page to land or property held page when no selected"
-        )
+        .withName("go from unquoted shares page to unauthorised page when no selected")
     )
+
   }
 }
