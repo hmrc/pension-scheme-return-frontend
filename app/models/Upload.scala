@@ -16,7 +16,7 @@
 
 package models
 
-import play.api.libs.json.{Format, Json, Writes}
+import play.api.libs.json._
 import uk.gov.hmrc.domain.Nino
 import utils.ListUtils.ListOps
 
@@ -32,14 +32,14 @@ case class UploadState(row: Int, previousNinos: List[Nino]) {
 }
 
 object UploadState {
-  val init: UploadState = UploadState(0, Nil)
+  val init: UploadState = UploadState(1, Nil)
 }
 
 sealed trait Upload
 
 case object UploadInitial extends UploadFailure
 
-case class UploadSuccess(memberDetails: MemberDetails) extends Upload
+case class UploadSuccess(memberDetails: UploadMemberDetails) extends Upload
 
 sealed trait UploadFailure extends Upload
 
@@ -48,12 +48,29 @@ object UploadFailure {
     case UploadErrors(errs) => Json.obj("_type" -> "UploadErrors", "errors" -> Json.toJson(errs))
     case UploadFormatError => Json.obj("_type" -> "UploadFormatError")
   }
+
+  implicit val read: Reads[UploadFailure] =
+    (__ \ "_type").read[String].flatMap {
+      case "UploadFormatError" => Reads.pure(UploadFormatError)
+      case "UploadErrors" => (__ \ "errors").read[List[ValidationError]].map(UploadErrors)
+    }
 }
 
 object UploadFormatError extends UploadFailure
 
 case class UploadErrors(errors: List[ValidationError]) extends UploadFailure
 
-case class MemberDetails(index: Int, nameDOB: NameDOB, ninoOrNoNinoReason: Either[String, Nino])
+case class UploadMemberDetails(row: Int, nameDOB: NameDOB, ninoOrNoNinoReason: Either[String, Nino])
 
+/**
+ * @param key = csv header key e.g. First name
+ * @param cell = letter identifying column e.g A,B,C ... BA,BB ...
+ * @param index = column number
+ */
 case class CsvHeaderKey(key: String, cell: String, index: Int)
+
+case class CsvValue[A](key: CsvHeaderKey, value: A) {
+  def map[B](f: A => B): CsvValue[B] = CsvValue[B](key, f(value))
+
+  def as[B](b: B): CsvValue[B] = map(_ => b)
+}
