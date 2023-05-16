@@ -419,3 +419,7 @@ checkMemberDetailsFile.legend = Is this file correct?
 checkMemberDetailsFile.yes = Yes, add this file to my return
 checkMemberDetailsFile.no = No, I want to select a different file
 checkMemberDetailsFile.error.required = Select yes if you want to add this file to your return
+
+unquotedShares.title = Did the scheme hold any unquoted shares during the period of this return?
+unquotedShares.heading = Did {0} hold any unquoted shares during the period of this return?
+unquotedShares.error.required = Select yes if the scheme held any unquoted shares during the period of this return
