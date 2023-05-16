@@ -67,6 +67,7 @@ trait ControllerBaseSpec
           bind[DataCreationAction].toInstance(new FakeDataCreationAction(userAnswers.getOrElse(emptyUserAnswers)))
         ) ++ additionalBindings: _*
       )
+      .configure("play.filters.csp.nonce.enabled" -> false)
 
   protected val additionalBindings: List[GuiceableModule] = List()
 
