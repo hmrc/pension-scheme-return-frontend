@@ -16,6 +16,7 @@
 
 package controllers
 
+import cats.data.NonEmptyList
 import controllers.actions.{DataRetrievalAction, IdentifierAction}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -31,6 +32,8 @@ class KeepAliveController @Inject()(
   sessionRepository: SessionRepository
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController {
+
+  NonEmptyList.fromList(List())
 
   def keepAlive: Action[AnyContent] = identify.async { implicit request =>
     sessionRepository.keepAlive(request.getUserId).map(_ => Ok)
