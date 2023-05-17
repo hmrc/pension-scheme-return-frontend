@@ -29,6 +29,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{MemberDetailsUploadValidator, SaveService, UploadService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.DisplayMessage
 import viewmodels.DisplayMessage.{BreakPoint, Message, ParagraphMessage}
 import viewmodels.implicits._
 import viewmodels.models.YesNoPageViewModel
@@ -117,6 +118,7 @@ object CheckMemberDetailsFileController {
       yes = Some("checkMemberDetailsFile.yes"),
       no = Some("checkMemberDetailsFile.no"),
       refresh = refresh,
+      details = None,
       onSubmit = routes.CheckMemberDetailsFileController.onSubmit(srn, mode)
     )
   }

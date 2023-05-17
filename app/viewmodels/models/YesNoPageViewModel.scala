@@ -18,7 +18,7 @@ package viewmodels.models
 
 import play.api.mvc.Call
 import viewmodels.DisplayMessage
-import viewmodels.DisplayMessage.{BlockMessage, Message, ParagraphMessage}
+import viewmodels.DisplayMessage.{BlockMessage, CompoundMessage, LinkMessage, ListMessage, Message, ParagraphMessage}
 import viewmodels.implicits._
 
 case class YesNoPageViewModel(
@@ -30,6 +30,7 @@ case class YesNoPageViewModel(
   yes: Option[Message] = None,
   no: Option[Message] = None,
   refresh: Option[Int] = None,
+  details: Option[DisplayMessage] = None,
   onSubmit: Call
 ) {
 
@@ -42,11 +43,27 @@ case class YesNoPageViewModel(
 
 object YesNoPageViewModel {
 
+  def apply(title: Message, heading: Message, onSubmit: Call, details: Option[DisplayMessage]): YesNoPageViewModel =
+    YesNoPageViewModel(
+      title,
+      heading,
+      List(),
+      None,
+      None,
+      None,
+      None,
+      None,
+      details,
+      onSubmit = onSubmit
+    )
+
   def apply(title: Message, heading: Message, onSubmit: Call): YesNoPageViewModel =
     YesNoPageViewModel(
       title,
       heading,
       List(),
+      None,
+      None,
       None,
       None,
       None,

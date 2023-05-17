@@ -419,3 +419,13 @@ checkMemberDetailsFile.legend = Is this file correct?
 checkMemberDetailsFile.yes = Yes, add this file to my return
 checkMemberDetailsFile.no = No, I want to select a different file
 checkMemberDetailsFile.error.required = Select yes if you want to add this file to your return
+
+sharesAcquiredFromConnectedParty.title = Did the scheme hold any shares acquired from a connected party during the period of this return?
+sharesAcquiredFromConnectedParty.heading = Did {0} hold any shares acquired from a connected party during the period of this return?
+sharesAcquiredFromConnectedParty.error.required = Select yes if the scheme held any shares acquired from a connected party during the period of this return
+sharesAcquiredFromConnectedParty.hint = This should not include any shares in a sponsoring employer or unquoted shares. If your scheme holds any of these shares, report them in the relevant section of this pension scheme return.
+sharesAcquiredFromConnectedParty.details.paragraph1 = A connected party is an individual, company or partnership that is connected to either a member of the scheme or the sponsoring employer of the scheme.
+sharesAcquiredFromConnectedParty.details.paragraph2 = A connected party of a member is usually their spouse, civil partner or close relative (for example their parent, sibling, child or grandchild). A connected party of a sponsoring employer can be someone who has control over the company; it can also be another company, where the same person has control of both.
+sharesAcquiredFromConnectedParty.details.paragraph3 = There are other circumstances where an individual, company or partnership might be a connected party. You can read a full list in
+detailsComponent = What is a connected party?
+sharesAcquired.linkMessage = Section 993 of the Income Tax Act 2007.

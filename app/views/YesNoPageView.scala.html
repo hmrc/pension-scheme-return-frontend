@@ -23,6 +23,7 @@
   formHelper: FormWithCSRF,
   govukErrorSummary: GovukErrorSummary,
   govukRadios: GovukRadios,
+  govukDetails: GovukDetails,
   govukButton: GovukButton,
 )
 
@@ -50,6 +51,15 @@
             no = viewmodel.no.map(renderMessage(_))
         )
     )
+
+    @viewmodel.details.map { details =>
+        @govukDetails(
+            DetailsViewModel(
+                renderMessage("detailsComponent"),
+                renderMessage(details)
+            )
+        )
+    }
 
     @govukButton(
       ButtonViewModel(messages("site.saveAndContinue"))

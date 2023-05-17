@@ -191,9 +191,10 @@ trait ViewModelGenerators extends BasicGenerators {
       hint <- Gen.option(nonEmptyMessage)
       yes <- if (genLabels) Gen.some(nonEmptyMessage) else Gen.const(None)
       no <- if (genLabels) Gen.some(nonEmptyMessage) else Gen.const(None)
+      details <- Gen.option(nonEmptyBlockMessage)
       onSubmit <- call
     } yield {
-      YesNoPageViewModel(title, heading, description, legend, hint, yes, no, None, onSubmit)
+      YesNoPageViewModel(title, heading, description, legend, hint, yes, no, None, details, onSubmit)
     }
 
   def radioListRowViewModelGen: Gen[RadioListRowViewModel] =
