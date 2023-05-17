@@ -429,3 +429,7 @@ sharesAcquiredFromConnectedParty.details.paragraph2 = A connected party of a mem
 sharesAcquiredFromConnectedParty.details.paragraph3 = There are other circumstances where an individual, company or partnership might be a connected party. You can read a full list in
 detailsComponent = What is a connected party?
 sharesAcquired.linkMessage = Section 993 of the Income Tax Act 2007.
+
+unquotedShares.title = Did the scheme hold any unquoted shares during the period of this return?
+unquotedShares.heading = Did {0} hold any unquoted shares during the period of this return?
+unquotedShares.error.required = Select yes if the scheme held any unquoted shares during the period of this return

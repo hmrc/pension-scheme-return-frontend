@@ -38,7 +38,6 @@
 @head = {
 
     @hmrcHead(
-        nonce     = CSPNonce.get,
         headBlock = if(timeout) { Some(
             hmrcTimeoutDialog(TimeoutDialog(
                 timeout             = Some(appConfig.timeout),
@@ -53,12 +52,12 @@
         } else None
     )
 
-    <link href="@routes.Assets.versioned("stylesheets/application.css")" media="all" rel="stylesheet" type="text/css"@CSPNonce.get.map {n=> nonce="@n"} />
+    <link href="@routes.Assets.versioned("stylesheets/application.css")" media="all" rel="stylesheet" type="text/css" @CSPNonce.attr />
     @refresh.map{i => <meta http-equiv="refresh" content="@i">}
 }
 
 @additionalScripts = {
-    <script src='@controllers.routes.Assets.versioned("javascripts/application.min.js")'></script>
+    <script src='@controllers.routes.Assets.versioned("javascripts/application.min.js")' @CSPNonce.attr></script>
 }
 
 @beforeContent = {
@@ -97,7 +96,6 @@
     beforeContentBlock = Some(beforeContent),
     footerBlock        = Some(hmrcStandardFooter()),
     scriptsBlock       = Some(hmrcScripts(
-        nonce        = CSPNonce.get,
-        scriptsBlock = Some(additionalScripts)
+      scriptsBlock = Some(additionalScripts)
     ))
 )(content)
