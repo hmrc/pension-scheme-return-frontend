@@ -14,10 +14,10 @@ class UpscanConnectorSpec extends BaseConnectorSpec {
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
   implicit override lazy val applicationBuilder: GuiceApplicationBuilder =
-    super.applicationBuilder.configure("urls.upscan.baseUrl" -> wireMockUrl)
+    super.applicationBuilder.configure("microservice.services.upscan.port" -> wireMockServer.port())
 
   private val callBackUrl = "http://localhost:9000/test-callback-url"
-  private val successRedirectUrl = "/test-successful-redirect-url"
+  private val successRedirectUrl = "/test-successful-redxirect-url"
   private val failureRedirectUrl = "/test-failure-redirect-url"
 
   private val reference = "test-ref"

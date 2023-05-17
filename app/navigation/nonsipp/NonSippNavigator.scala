@@ -91,7 +91,8 @@ class NonSippNavigator @Inject()() extends Navigator {
       BenefitsSurrenderedNavigator,
       OtherAssetsHeldNavigator,
       UnallocatedEmployerContributionsNavigator,
-      SharesAcquiredFromConnectedPartyNavigator
+      SharesAcquiredFromConnectedPartyNavigator,
+      UnquotedSharesNavigator
     )
 
   override val defaultNormalMode: Call = controllers.routes.IndexController.onPageLoad()

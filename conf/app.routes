@@ -238,3 +238,8 @@ GET        /:srn/shares-acquired-from-connected-party                      contr
 POST       /:srn/shares-acquired-from-connected-party                      controllers.nonsipp.sharesacquiredfromconnectedparty.SharesAcquiredFromConnectedPartyController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 GET        /:srn/change-shares-acquired-from-connected-party               controllers.nonsipp.sharesacquiredfromconnectedparty.SharesAcquiredFromConnectedPartyController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST       /:srn/change-shares-acquired-from-connected-party               controllers.nonsipp.sharesacquiredfromconnectedparty.SharesAcquiredFromConnectedPartyController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET        /:srn/unquoted-shares                      controllers.nonsipp.unquotedshares.UnquotedSharesController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST       /:srn/unquoted-shares                      controllers.nonsipp.unquotedshares.UnquotedSharesController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/change-unquoted-shares               controllers.nonsipp.unquotedshares.UnquotedSharesController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST       /:srn/change-unquoted-shares               controllers.nonsipp.unquotedshares.UnquotedSharesController.onSubmit(srn: Srn, mode: Mode = CheckMode)
