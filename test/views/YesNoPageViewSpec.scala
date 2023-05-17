@@ -66,7 +66,7 @@ class YesNoPageViewSpec extends ViewSpec {
       "does not have a description when not present" in {
 
         forAll(yesNoPageViewModelGen()) { viewmodel =>
-          p(view(yesNoForm, viewmodel.copy(description = Nil))) mustBe Nil
+          p(view(yesNoForm, viewmodel.copy(description = Nil, details = Option.empty))) mustBe Nil
         }
       }
 
