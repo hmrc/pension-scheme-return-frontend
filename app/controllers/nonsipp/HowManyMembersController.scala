@@ -36,7 +36,7 @@ import utils.DateTimeUtils.localDateShow
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
 import viewmodels.models.MultipleQuestionsViewModel.TripleQuestion
-import viewmodels.models.{Field, IntViewModel}
+import viewmodels.models.Field
 import views.html.IntView
 
 import java.time.LocalDate

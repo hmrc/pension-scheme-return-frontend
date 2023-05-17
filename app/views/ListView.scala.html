@@ -24,7 +24,7 @@
     govukInsetText: GovukInsetText,
     govukPagination: GovukPagination
 )
-@(form: Form[Boolean], viewmodel: ListViewModel)(implicit request: Request[_], messages: Messages)
+@(form: Form[Boolean], viewmodel: PageViewModel[ListViewModel])(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(viewmodel.title.toMessage)) {
 
@@ -36,8 +36,8 @@
 
         <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
 
-        @defining(viewmodel.paginatedViewModel.fold(viewmodel.rows)(paginatedViewModel =>
-            viewmodel.rows.paginate(paginatedViewModel.pagination.currentPage, paginatedViewModel.pagination.pageSize))
+        @defining(viewmodel.page.paginatedViewModel.fold(viewmodel.page.rows)(paginatedViewModel =>
+            viewmodel.page.rows.paginate(paginatedViewModel.pagination.currentPage, paginatedViewModel.pagination.pageSize))
         ){ rows =>
             @hmrcListWithActions(ListWithActionsViewModel(
                 rows.map( value =>
@@ -54,26 +54,26 @@
             ))
         }
 
-        @viewmodel.paginatedViewModel.map{ paginatedViewModel =>
+        @viewmodel.page.paginatedViewModel.map{ paginatedViewModel =>
             @if(paginatedViewModel.pagination.totalPages > 1) {
                 <p id="pagination-label" class="govuk-body">@{renderMessage(paginatedViewModel.label)}</p>
             }
             @govukPagination(PaginationViewModel(paginatedViewModel.pagination))
         }
 
-        @if(viewmodel.showRadios){
+        @if(viewmodel.page.showRadios){
             @govukRadios(
               RadiosViewModel.yesNo(
                 field = form("value"),
-                legend = LegendViewModel(renderMessage(viewmodel.radioText)).withSize(LegendSize.Medium)
+                legend = LegendViewModel(renderMessage(viewmodel.page.radioText)).withSize(LegendSize.Medium)
               )
             )
         } else {
-            @govukInsetText(InsetTextViewModel(renderMessage(viewmodel.insetText)))
+          @viewmodel.inset.map(i => govukInsetText(InsetTextViewModel(renderMessage(i))))
         }
 
         @govukButton(
-            ButtonViewModel(messages("site.saveAndContinue"))
+            ButtonViewModel(renderMessage(viewmodel.buttonText))
         )
     }
 }

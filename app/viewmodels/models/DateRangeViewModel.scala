@@ -17,31 +17,28 @@
 package viewmodels.models
 
 import play.api.mvc.Call
-import viewmodels.DisplayMessage.Message
+import viewmodels.DisplayMessage.{BlockMessage, InlineMessage, Message}
 
 case class DateRangeViewModel(
-  title: Message,
-  heading: Message,
-  description: Option[Message],
   startDateLabel: Message,
-  endDateLabel: Message,
-  onSubmit: Call
+  endDateLabel: Message
 )
 
 object DateRangeViewModel {
 
   def apply(
-    title: String,
-    heading: String,
-    description: Option[String],
+    title: Message,
+    heading: InlineMessage,
+    description: Option[BlockMessage],
     onSubmit: Call
-  ): DateRangeViewModel =
-    DateRangeViewModel(
-      Message(title),
-      Message(heading),
-      description.map(Message(_)),
-      Message("site.startDate"),
-      Message("site.endDate"),
+  ): PageViewModel[DateRangeViewModel] =
+    PageViewModel(
+      title,
+      heading,
+      DateRangeViewModel(
+        Message("site.startDate"),
+        Message("site.endDate")
+      ),
       onSubmit
-    )
+    ).withDescription(description)
 }

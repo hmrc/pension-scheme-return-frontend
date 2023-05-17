@@ -22,19 +22,11 @@ import viewmodels.DisplayMessage.{BlockMessage, Message, ParagraphMessage}
 import viewmodels.implicits._
 
 case class YesNoPageViewModel(
-  title: Message,
-  heading: Message,
-  description: List[DisplayMessage],
   legend: Option[Message] = None,
   hint: Option[Message] = None,
   yes: Option[Message] = None,
   no: Option[Message] = None,
-  refresh: Option[Int] = None,
-  onSubmit: Call
 ) {
-
-  def withDescription(message: BlockMessage, messages: BlockMessage*): YesNoPageViewModel =
-    copy(description = description ++ (message :: messages.toList))
 
   def withHint(message: Message): YesNoPageViewModel =
     copy(hint = Some(message))
@@ -42,15 +34,11 @@ case class YesNoPageViewModel(
 
 object YesNoPageViewModel {
 
-  def apply(title: Message, heading: Message, onSubmit: Call): YesNoPageViewModel =
-    YesNoPageViewModel(
+  def apply(title: Message, heading: Message, onSubmit: Call): PageViewModel[YesNoPageViewModel] =
+    PageViewModel(
       title,
       heading,
-      List(),
-      None,
-      None,
-      None,
-      None,
-      onSubmit = onSubmit
+      YesNoPageViewModel(),
+      onSubmit
     )
 }

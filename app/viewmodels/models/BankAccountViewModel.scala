@@ -16,18 +16,12 @@
 
 package viewmodels.models
 
-import play.api.mvc.Call
 import viewmodels.DisplayMessage.Message
 
 case class BankAccountViewModel(
-  title: Message,
-  heading: Message,
-  paragraph: Message,
   bankNameHeading: Message,
   accountNumberHeading: Message,
   accountNumberHint: Message,
   sortCodeHeading: Message,
   sortCodeHint: Message,
-  buttonText: Message,
-  onSubmit: Call
 )

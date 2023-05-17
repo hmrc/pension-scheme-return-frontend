@@ -16,12 +16,6 @@
 
 package viewmodels.models
 
-import play.api.mvc.Call
-import viewmodels.DisplayMessage
-import viewmodels.DisplayMessage.Message
-
 case class TextAreaViewModel(
-  title: Message,
-  heading: DisplayMessage,
-  onSubmit: Call
+  rows: Int
 )

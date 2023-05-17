@@ -23,14 +23,14 @@
     govukTable: GovukTable
 )
 
-@(viewmodel: ContentTablePageViewModel)(implicit request: Request[_], messages: Messages)
+@(viewmodel: PageViewModel[ContentTablePageViewModel])(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(viewmodel.title.toMessage)) {
 
     <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
 
     @govukTable(TableViewModel(
-        viewmodel.rows.map { case (key, value) =>
+        viewmodel.page.rows.map { case (key, value) =>
             Seq(
                 TableRowViewModel(renderMessage(key)).bold.widthOneThird,
                 TableRowViewModel(renderMessage(value))
@@ -38,7 +38,7 @@
         }
     ))
 
-    @govukInsetText(InsetTextViewModel(renderMessage(viewmodel.inset)))
+    @viewmodel.inset.map(i => govukInsetText(InsetTextViewModel(renderMessage(i))))
 
     <p class="govuk-body">
         @govukButton(

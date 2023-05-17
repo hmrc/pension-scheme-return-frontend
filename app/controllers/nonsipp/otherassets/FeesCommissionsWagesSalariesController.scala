@@ -33,7 +33,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.{Empty, Message}
 import viewmodels.implicits._
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
-import viewmodels.models.{Field, MoneyViewModel}
+import viewmodels.models.Field
 import views.html.MoneyView
 
 import javax.inject.{Inject, Named}

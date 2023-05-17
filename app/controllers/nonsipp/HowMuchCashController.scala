@@ -37,7 +37,7 @@ import utils.DateTimeUtils.localDateShow
 import viewmodels.DisplayMessage.{Message, ParagraphMessage}
 import viewmodels.implicits._
 import viewmodels.models.MultipleQuestionsViewModel.DoubleQuestion
-import viewmodels.models.{Field, MoneyViewModel}
+import viewmodels.models.Field
 import views.html.MoneyView
 
 import javax.inject.Named

@@ -24,25 +24,25 @@
         govukInput: GovukInput
 )
 
-@(viewmodel: MoneyViewModel[_])(implicit request: Request[_], messages: Messages)
+@(viewmodel: PageViewModel[MultipleQuestionsViewModel[Money]])(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(viewmodel.title.toMessage)) {
 
   @formHelper(action = viewmodel.onSubmit, Symbol("autocomplete") -> "off") {
 
-    @if(viewmodel.questions.form.hasErrors) {
-      @govukErrorSummary(ErrorSummaryViewModel(viewmodel.questions.form))
+    @if(viewmodel.page.form.hasErrors) {
+      @govukErrorSummary(ErrorSummaryViewModel(viewmodel.page.form))
     }
 
-    @if(viewmodel.questions.fields.length > 1) {
+    @if(viewmodel.page.fields.length > 1) {
       <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
 
       @viewmodel.description.map(renderMessage)
 
-      @viewmodel.questions.fields.zipWithIndex.map { case (field, index) =>
+      @viewmodel.page.fields.zipWithIndex.map { case (field, index) =>
         @govukInput(
           InputViewModel(
-            field = viewmodel.questions.form(s"value.${index + 1}"),
+            field = viewmodel.page.form(s"value.${index + 1}"),
             label = LabelViewModel(renderMessage(field.label))
           )
           .withHint(field.hint.map(h => Hint(content = HtmlContent(renderMessage(h)))))
@@ -55,10 +55,10 @@
     } else {
       @govukInput(
         InputViewModel(
-          field = viewmodel.questions.form("value"),
+          field = viewmodel.page.form("value"),
           label = LabelViewModel(renderMessage(viewmodel.heading)).asPageHeading()
         )
-        .withHint(viewmodel.questions.firstField.hint.map(h => Hint(content = HtmlContent(renderMessage(h)))))
+        .withHint(viewmodel.page.firstField.hint.map(h => Hint(content = HtmlContent(renderMessage(h)))))
         .asNumeric()
         .withWidth(Fixed10)
         .withPrefix(PrefixOrSuffix(content = Text("£")))
@@ -67,7 +67,7 @@
 
 
     @govukButton(
-      ButtonViewModel(messages("site.saveAndContinue"))
+      ButtonViewModel(renderMessage(viewmodel.buttonText))
     )
   }
 }

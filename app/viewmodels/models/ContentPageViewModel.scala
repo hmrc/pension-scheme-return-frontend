@@ -21,52 +21,24 @@ import viewmodels.DisplayMessage._
 import viewmodels.implicits._
 
 case class ContentPageViewModel(
-  title: Message,
-  heading: Message,
   contents: List[BlockMessage],
-  buttonText: Message,
   isStartButton: Boolean,
-  onSubmit: Call,
   isLargeHeading: Boolean
 )
 
 object ContentPageViewModel {
 
-  def apply(
+  def startPage(
     title: String,
     heading: String,
-    buttonText: String,
-    isStartButton: Boolean,
-    onSubmit: Call,
-    isLargeHeading: Boolean,
-    paragraphs: String*
-  ): ContentPageViewModel =
-    ContentPageViewModel(
+    contents: List[String],
+    onSubmit: Call
+  ): PageViewModel[ContentPageViewModel] =
+    PageViewModel(
       title,
       heading,
-      paragraphs.map(ParagraphMessage(_)).toList,
-      buttonText,
-      isStartButton,
-      onSubmit,
-      isLargeHeading
-    )
-
-  def apply(
-    title: String,
-    heading: String,
-    buttonText: String,
-    isStartButton: Boolean,
-    onSubmit: Call,
-    paragraphs: String*
-  ): ContentPageViewModel =
-    ContentPageViewModel(
-      title,
-      heading,
-      paragraphs.map(ParagraphMessage(_)).toList,
-      buttonText,
-      isStartButton,
-      onSubmit,
-      isLargeHeading = false
-    )
+      ContentPageViewModel(contents.map(ParagraphMessage(_)), isStartButton = true, isLargeHeading = false),
+      onSubmit
+    ).withButtonText("site.start")
 
 }

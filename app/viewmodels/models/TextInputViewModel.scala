@@ -16,13 +16,8 @@
 
 package viewmodels.models
 
-import play.api.mvc.Call
 import viewmodels.DisplayMessage
-import viewmodels.DisplayMessage.Message
 
 case class TextInputViewModel(
-  title: Message,
-  heading: DisplayMessage,
-  label: Option[DisplayMessage],
-  onSubmit: Call
+  label: Option[DisplayMessage]
 )
