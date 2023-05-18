@@ -91,7 +91,8 @@ object SharesAcquiredFromConnectedPartyController {
               "https://www.legislation.gov.uk/ukpga/2007/3/section/993"
             )
           )
-      )
+      ),
+      display = Message("sharesAcquiredFromConnectedParty.detailsComponentTitle")
     ).withHint(
       Message("sharesAcquiredFromConnectedParty.hint")
     )

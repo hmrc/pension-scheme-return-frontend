@@ -55,7 +55,7 @@
     @viewmodel.details.map { details =>
         @govukDetails(
             DetailsViewModel(
-                renderMessage("detailsComponent"),
+                renderMessage(viewmodel.display),
                 renderMessage(details)
             )
         )

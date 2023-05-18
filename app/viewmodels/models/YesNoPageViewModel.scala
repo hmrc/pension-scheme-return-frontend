@@ -31,6 +31,7 @@ case class YesNoPageViewModel(
   no: Option[Message] = None,
   refresh: Option[Int] = None,
   details: Option[DisplayMessage] = None,
+  display: Message,
   onSubmit: Call
 ) {
 
@@ -43,7 +44,13 @@ case class YesNoPageViewModel(
 
 object YesNoPageViewModel {
 
-  def apply(title: Message, heading: Message, onSubmit: Call, details: Option[DisplayMessage]): YesNoPageViewModel =
+  def apply(
+    title: Message,
+    heading: Message,
+    onSubmit: Call,
+    details: Option[DisplayMessage],
+    display: Message
+  ): YesNoPageViewModel =
     YesNoPageViewModel(
       title,
       heading,
@@ -54,6 +61,22 @@ object YesNoPageViewModel {
       None,
       None,
       details,
+      display,
+      onSubmit = onSubmit
+    )
+
+  def apply(title: Message, heading: Message, display: Message, onSubmit: Call): YesNoPageViewModel =
+    YesNoPageViewModel(
+      title,
+      heading,
+      List(),
+      None,
+      None,
+      None,
+      None,
+      None,
+      None,
+      display,
       onSubmit = onSubmit
     )
 
@@ -68,6 +91,7 @@ object YesNoPageViewModel {
       None,
       None,
       None,
+      Message(""),
       onSubmit = onSubmit
     )
 }
