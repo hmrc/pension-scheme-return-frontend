@@ -16,6 +16,7 @@
 
 package controllers.nonsipp.memberdetails
 
+import config.FrontendAppConfig
 import controllers.actions._
 import controllers.nonsipp.memberdetails.UploadMemberDetailsController._
 import models.SchemeId.Srn
@@ -40,13 +41,14 @@ class UploadMemberDetailsController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   view: UploadView,
   uploadService: UploadService,
+  config: FrontendAppConfig,
   val controllerComponents: MessagesControllerComponents
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
 
   private def callBackUrl(implicit req: Request[_]): String =
-    controllers.routes.UploadCallbackController.callback.absoluteURL()
+    controllers.routes.UploadCallbackController.callback.absoluteURL(secure = config.secureUpscanCallBack)
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
     val successRedirectUrl =

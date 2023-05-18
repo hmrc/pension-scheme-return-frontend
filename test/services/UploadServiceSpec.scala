@@ -20,7 +20,7 @@ import akka.stream.scaladsl.Sink
 import akka.util.ByteString
 import connectors.UpscanConnector
 import controllers.TestValues
-import models.{Failed, Reference, UploadDetails, UpscanFileReference, UpscanInitiateResponse}
+import models._
 import org.mockito.ArgumentMatchers.any
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.http.Status.OK
@@ -28,6 +28,8 @@ import repositories.UploadRepository
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import utils.BaseSpec
 
+import java.time.temporal.ChronoUnit
+import java.time.{Clock, Instant, ZoneId}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -38,8 +40,9 @@ class UploadServiceSpec extends BaseSpec with ScalaCheckPropertyChecks with Test
   private val mockUpscanConnector = mock[UpscanConnector]
   private val mockUploadRepository = mock[UploadRepository]
 
-  private val reference = Reference("test-ref")
-  private val uploadDetails = UploadDetails(uploadKey, reference, Failed)
+  val instant: Instant = Instant.now.truncatedTo(ChronoUnit.MILLIS)
+  private val uploadDetails = UploadDetails(uploadKey, reference, UploadStatus.Failed, instant)
+  private val stubClock: Clock = Clock.fixed(instant, ZoneId.systemDefault)
 
   override def beforeEach(): Unit = {
     super.beforeEach()
@@ -47,7 +50,7 @@ class UploadServiceSpec extends BaseSpec with ScalaCheckPropertyChecks with Test
     reset(mockUploadRepository)
   }
 
-  val service = new UploadService(mockUpscanConnector, mockUploadRepository)
+  val service = new UploadService(mockUpscanConnector, mockUploadRepository, stubClock)
 
   "UploadService" - {
     "initiateUpscan should return what the connector returns" in {
@@ -67,15 +70,15 @@ class UploadServiceSpec extends BaseSpec with ScalaCheckPropertyChecks with Test
     }
 
     "registerUploadResult should call updateStatus and return unit" in {
-      when(mockUploadRepository.updateStatus(any(), any())).thenReturn(Future.successful(Failed))
-      val result = service.registerUploadResult(reference, Failed)
+      when(mockUploadRepository.updateStatus(any(), any())).thenReturn(Future.successful(UploadStatus.Failed))
+      val result = service.registerUploadResult(reference, UploadStatus.Failed)
       result.futureValue mustBe (())
     }
 
     "getUploadResult return the status from the connector" in {
-      when(mockUploadRepository.find(any())).thenReturn(Future.successful(Some(uploadDetails)))
+      when(mockUploadRepository.getUploadDetails(any())).thenReturn(Future.successful(Some(uploadDetails)))
       val result = service.getUploadResult(uploadKey)
-      result.futureValue mustBe Some(Failed)
+      result.futureValue mustBe Some(UploadStatus.Failed)
     }
 
     "stream should return the upscan download http response body as a stream" in {
