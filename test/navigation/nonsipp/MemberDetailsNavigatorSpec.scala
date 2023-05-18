@@ -25,6 +25,7 @@ import models.SchemeId.Srn
 import models.{CheckOrChange, ManualOrUpload, NormalMode}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
+import pages.CheckingMemberDetailsFilePage
 import pages.nonsipp.memberdetails._
 import utils.BaseSpec
 import utils.UserAnswersUtils.UserAnswersOps
@@ -169,6 +170,25 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             routes.CheckMemberDetailsFileController.onPageLoad
           )
           .withName("go from upload member details page to check member details file page")
+      )
+
+      act.like(
+        normalmode
+          .navigateToWithData(
+            CheckMemberDetailsFilePage,
+            Gen.const(true),
+            controllers.nonsipp.memberdetails.upload.routes.CheckingMemberDetailsFileController.onPageLoad
+          )
+          .withName("go from check member details file page to checking member details file page")
+      )
+
+      act.like(
+        normalmode
+          .navigateTo(
+            CheckingMemberDetailsFilePage,
+            (_, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          )
+          .withName("go from checking member details file page to unauthorised page")
       )
     }
 
