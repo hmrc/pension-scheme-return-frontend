@@ -59,7 +59,7 @@ class CheckMemberDetailsFileController @Inject()(
 
     uploadService.getUploadResult(uploadKey).map {
       case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-      case Some(upload: UploadStatus.UploadedSuccessfully) =>
+      case Some(upload: UploadStatus.Success) =>
         Ok(view(preparedForm, viewModel(srn, Some(upload.name), mode)))
       case Some(_) => Ok(view(preparedForm, viewModel(srn, None, mode)))
     }
@@ -91,11 +91,11 @@ class CheckMemberDetailsFileController @Inject()(
 
   // todo: handle all Upscan upload states
   //       None is an error case as the initial state set on the previous page should be InProgress
-  private def getUploadedFile(uploadKey: UploadKey): Future[Option[UploadStatus.UploadedSuccessfully]] =
+  private def getUploadedFile(uploadKey: UploadKey): Future[Option[UploadStatus.Success]] =
     uploadService
       .getUploadResult(uploadKey)
       .map {
-        case Some(upload: UploadStatus.UploadedSuccessfully) => Some(upload)
+        case Some(upload: UploadStatus.Success) => Some(upload)
         case _ => None
       }
 }

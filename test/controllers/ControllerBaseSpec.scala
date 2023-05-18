@@ -91,6 +91,7 @@ trait TestValues { _: OptionValues =>
   val email = "testEmail"
   val uploadKey: UploadKey = UploadKey("test-userid", srn)
   val reference: Reference = Reference("test-ref")
+  val uploadFileName = "test-file-name"
 
   val userAnswersId: String = "id"
   def emptyUserAnswers: UserAnswers = UserAnswers(userAnswersId)
@@ -125,4 +126,6 @@ trait TestValues { _: OptionValues =>
     "testLastName",
     LocalDate.of(1990, 12, 12)
   )
+
+  val uploadSuccessful: UploadStatus.Success = UploadStatus.Success(uploadFileName, "text/csv", "test-url", None)
 }

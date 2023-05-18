@@ -57,7 +57,7 @@ class UploadRepositorySpec extends BaseRepositorySpec[MongoUpload] {
     "successfully update the ttl and status to success" in {
       insertInitialUploadDetails()
 
-      val uploadSuccessful = UploadStatus.UploadedSuccessfully("test-name", "text/csv", "/test-url", None)
+      val uploadSuccessful = UploadStatus.Success("test-name", "text/csv", "/test-url", None)
       val updateResult: Unit = repository.updateStatus(reference, uploadSuccessful).futureValue
       val findAfterUpdateResult = find(Filters.equal("id", uploadKey.value)).futureValue.headOption.value
 

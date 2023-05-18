@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.memberdetails.upload
 
-import controllers.nonsipp.memberdetails.upload.CheckingMemberDetailsFileController._
+import controllers.nonsipp.memberdetails.upload.FileUploadSuccessController._
 import controllers.ControllerBaseSpec
 import models.NormalMode
 import models.UploadStatus.UploadStatus
@@ -28,10 +28,10 @@ import views.html.ContentPageView
 
 import scala.concurrent.Future
 
-class CheckingMemberDetailsFileControllerSpec extends ControllerBaseSpec {
+class FileUploadSuccessControllerSpec extends ControllerBaseSpec {
 
-  private lazy val onPageLoad = routes.CheckingMemberDetailsFileController.onPageLoad(srn, NormalMode)
-  private lazy val onSubmit = routes.CheckingMemberDetailsFileController.onSubmit(srn, NormalMode)
+  private lazy val onPageLoad = routes.FileUploadSuccessController.onPageLoad(srn, NormalMode)
+  private lazy val onSubmit = routes.FileUploadSuccessController.onSubmit(srn, NormalMode)
 
   private val mockUploadService = mock[UploadService]
 
@@ -42,16 +42,18 @@ class CheckingMemberDetailsFileControllerSpec extends ControllerBaseSpec {
   override def beforeEach(): Unit =
     reset(mockUploadService)
 
-  "CheckingMemberDetailsFileController" - {
+  "FileUploadSuccessController" - {
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
-      injected[ContentPageView].apply(viewModel(srn, NormalMode))
-    })
+      injected[ContentPageView].apply(viewModel(srn, uploadFileName, NormalMode))
+    }.before(mockGetUploadResult(Some(uploadSuccessful))))
 
     act.like(
-      redirectToPage(onSubmit, routes.FileUploadSuccessController.onPageLoad(srn, NormalMode))
-        .before(mockGetUploadResult(Some(uploadSuccessful)))
+      redirectToPage(onPageLoad, controllers.routes.JourneyRecoveryController.onPageLoad())
+        .before(mockGetUploadResult(None))
     )
+
+    act.like(redirectNextPage(onSubmit))
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 

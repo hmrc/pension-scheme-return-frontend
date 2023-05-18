@@ -35,7 +35,7 @@ class UploadCallbackController @Inject()(
     withJsonBody[CallbackBody] { callback: CallbackBody =>
       val uploadStatus = callback match {
         case s: ReadyCallbackBody =>
-          UploadStatus.UploadedSuccessfully(
+          UploadStatus.Success(
             s.uploadDetails.fileName,
             s.uploadDetails.fileMimeType,
             s.downloadUrl.getFile,
