@@ -21,6 +21,8 @@ import viewmodels.DisplayMessage
 import viewmodels.DisplayMessage.{BlockMessage, CompoundMessage, LinkMessage, ListMessage, Message, ParagraphMessage}
 import viewmodels.implicits._
 
+case class FurtherDetailsViewModel(title: Message, contents: DisplayMessage)
+
 case class YesNoPageViewModel(
   title: Message,
   heading: Message,
@@ -30,8 +32,7 @@ case class YesNoPageViewModel(
   yes: Option[Message] = None,
   no: Option[Message] = None,
   refresh: Option[Int] = None,
-  details: Option[DisplayMessage] = None,
-  display: Message,
+  details: Option[FurtherDetailsViewModel] = None,
   onSubmit: Call
 ) {
 
@@ -48,8 +49,7 @@ object YesNoPageViewModel {
     title: Message,
     heading: Message,
     onSubmit: Call,
-    details: Option[DisplayMessage],
-    display: Message
+    details: Option[FurtherDetailsViewModel]
   ): YesNoPageViewModel =
     YesNoPageViewModel(
       title,
@@ -61,22 +61,6 @@ object YesNoPageViewModel {
       None,
       None,
       details,
-      display,
-      onSubmit = onSubmit
-    )
-
-  def apply(title: Message, heading: Message, display: Message, onSubmit: Call): YesNoPageViewModel =
-    YesNoPageViewModel(
-      title,
-      heading,
-      List(),
-      None,
-      None,
-      None,
-      None,
-      None,
-      None,
-      display,
       onSubmit = onSubmit
     )
 
@@ -91,7 +75,6 @@ object YesNoPageViewModel {
       None,
       None,
       None,
-      Message(""),
       onSubmit = onSubmit
     )
 }

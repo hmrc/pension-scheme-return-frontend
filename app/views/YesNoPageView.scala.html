@@ -52,13 +52,13 @@
         )
     )
 
-    @viewmodel.details.map { details =>
-        @govukDetails(
-            DetailsViewModel(
-                renderMessage(viewmodel.display),
-                renderMessage(details)
+    @viewmodel.details.map { detail =>
+            @govukDetails(
+                DetailsViewModel(
+                    renderMessage(detail.title),
+                    renderMessage(detail.contents)
+                )
             )
-        )
     }
 
     @govukButton(

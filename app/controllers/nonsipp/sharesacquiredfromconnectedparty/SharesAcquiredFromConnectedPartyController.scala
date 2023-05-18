@@ -30,7 +30,7 @@ import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
 import viewmodels.implicits._
-import viewmodels.models.YesNoPageViewModel
+import viewmodels.models.{FurtherDetailsViewModel, YesNoPageViewModel}
 import views.html.YesNoPageView
 
 import javax.inject.{Inject, Named}
@@ -80,19 +80,21 @@ object SharesAcquiredFromConnectedPartyController {
       Message("sharesAcquiredFromConnectedParty.heading", schemeName),
       routes.SharesAcquiredFromConnectedPartyController.onSubmit(srn, mode),
       details = Option(
-        ParagraphMessage(
-          "sharesAcquiredFromConnectedParty.details.paragraph1"
-        )
-          ++ ParagraphMessage("sharesAcquiredFromConnectedParty.details.paragraph2")
-          ++ ParagraphMessage(
-            "sharesAcquiredFromConnectedParty.details.paragraph3",
-            LinkMessage(
-              "sharesAcquired.linkMessage",
-              "https://www.legislation.gov.uk/ukpga/2007/3/section/993"
-            )
+        FurtherDetailsViewModel(
+          Message("sharesAcquiredFromConnectedParty.detailsComponentTitle"),
+          ParagraphMessage(
+            "sharesAcquiredFromConnectedParty.details.paragraph1"
           )
-      ),
-      display = Message("sharesAcquiredFromConnectedParty.detailsComponentTitle")
+            ++ ParagraphMessage("sharesAcquiredFromConnectedParty.details.paragraph2")
+            ++ ParagraphMessage(
+              "sharesAcquiredFromConnectedParty.details.paragraph3",
+              LinkMessage(
+                "sharesAcquired.linkMessage",
+                "https://www.legislation.gov.uk/ukpga/2007/3/section/993"
+              )
+            )
+        )
+      )
     ).withHint(
       Message("sharesAcquiredFromConnectedParty.hint")
     )

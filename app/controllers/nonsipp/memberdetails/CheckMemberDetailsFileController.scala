@@ -119,7 +119,6 @@ object CheckMemberDetailsFileController {
       no = Some("checkMemberDetailsFile.no"),
       refresh = refresh,
       details = None,
-      display = Message(""),
       onSubmit = routes.CheckMemberDetailsFileController.onSubmit(srn, mode)
     )
   }
