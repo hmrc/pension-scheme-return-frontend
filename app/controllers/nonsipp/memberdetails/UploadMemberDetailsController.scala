@@ -28,7 +28,7 @@ import services.UploadService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.{ListMessage, ListType, ParagraphMessage}
 import viewmodels.implicits._
-import viewmodels.models.UploadViewModel
+import viewmodels.models.{PageViewModel, UploadViewModel}
 import views.html.UploadView
 
 import javax.inject.{Inject, Named}
@@ -76,21 +76,28 @@ class UploadMemberDetailsController @Inject()(
 
 object UploadMemberDetailsController {
 
-  def viewModel(postTarget: String, formFields: Map[String, String], error: Option[String]): UploadViewModel =
-    UploadViewModel(
+  def viewModel(
+    postTarget: String,
+    formFields: Map[String, String],
+    error: Option[String]
+  ): PageViewModel[UploadViewModel] =
+    PageViewModel(
       "uploadMemberDetails.title",
       "uploadMemberDetails.heading",
-      ParagraphMessage("uploadMemberDetails.paragraph"),
-      detailsContent = ParagraphMessage("uploadMemberDetails.details.paragraph") ++ ListMessage(
-        ListType.Bullet,
-        "uploadMemberDetails.list1",
-        "uploadMemberDetails.list2",
-        "uploadMemberDetails.list3"
+      UploadViewModel(
+        detailsContent =
+          ParagraphMessage("uploadMemberDetails.details.paragraph") ++
+            ListMessage(
+              ListType.Bullet,
+              "uploadMemberDetails.list1",
+              "uploadMemberDetails.list2",
+              "uploadMemberDetails.list3"
+            ),
+        acceptedFileType = ".csv",
+        maxFileSize = "100MB",
+        formFields,
+        error
       ),
-      acceptedFileType = ".csv",
-      maxFileSize = "100MB",
-      formFields,
-      error,
       Call("POST", postTarget)
-    )
+    ).withDescription(ParagraphMessage("uploadMemberDetails.paragraph"))
 }

@@ -23,5 +23,5 @@ case class UploadViewModel(
   acceptedFileType: String,
   maxFileSize: String,
   formFields: Map[String, String],
-  error: Option[String],
+  error: Option[String]
 )

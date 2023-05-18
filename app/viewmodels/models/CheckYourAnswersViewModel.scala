@@ -24,7 +24,7 @@ import viewmodels.DisplayMessage.Message
 import viewmodels.govuk.summarylist._
 
 case class CheckYourAnswersViewModel(
-  rows: List[CheckYourAnswersRowViewModel],
+  rows: List[CheckYourAnswersRowViewModel]
 )
 
 object CheckYourAnswersViewModel {

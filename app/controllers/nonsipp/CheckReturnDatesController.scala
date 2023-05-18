@@ -33,7 +33,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.DateTimeUtils.localDateShow
 import viewmodels.DisplayMessage.{Message, ParagraphMessage}
 import viewmodels.implicits._
-import viewmodels.models.YesNoPageViewModel
+import viewmodels.models.{PageViewModel, YesNoPageViewModel}
 import views.html.YesNoPageView
 
 import java.time.LocalDate
@@ -126,20 +126,21 @@ object CheckReturnDatesController {
     fromDate: LocalDate,
     toDate: LocalDate,
     schemeDetails: MinimalSchemeDetails
-  ): YesNoPageViewModel =
-    YesNoPageViewModel(
+  ): PageViewModel[YesNoPageViewModel] =
+    PageViewModel(
       Message("checkReturnDates.title"),
       Message("checkReturnDates.heading"),
-      List(
-        ParagraphMessage(
-          Message(
-            "checkReturnDates.description",
-            max(schemeDetails.openDate.getOrElse(fromDate), fromDate).show,
-            min(schemeDetails.windUpDate.getOrElse(toDate), toDate).show
-          )
-        )
+      YesNoPageViewModel(
+        legend = Some(Message("checkReturnDates.legend"))
       ),
-      Some(Message("checkReturnDates.legend")),
       onSubmit = routes.CheckReturnDatesController.onSubmit(srn, mode)
+    ).withDescription(
+      ParagraphMessage(
+        Message(
+          "checkReturnDates.description",
+          max(schemeDetails.openDate.getOrElse(fromDate), fromDate).show,
+          min(schemeDetails.windUpDate.getOrElse(toDate), toDate).show
+        )
+      )
     )
 }

@@ -32,7 +32,7 @@ import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.FormUtils._
 import viewmodels.DisplayMessage.Message
-import viewmodels.models.NameDOBViewModel
+import viewmodels.models.{NameDOBViewModel, PageViewModel}
 import views.html.NameDOBView
 
 import javax.inject.{Inject, Named}
@@ -96,13 +96,15 @@ object MemberDetailsController {
     )
   )
 
-  def viewModel(srn: Srn, index: Max99, mode: Mode): NameDOBViewModel = NameDOBViewModel(
+  def viewModel(srn: Srn, index: Max99, mode: Mode): PageViewModel[NameDOBViewModel] = PageViewModel(
     Message("memberDetails.title"),
     Message("memberDetails.heading"),
-    Message("memberDetails.firstName"),
-    Message("memberDetails.lastName"),
-    Message("memberDetails.dateOfBirth"),
-    Message("memberDetails.dateOfBirth.hint"),
+    NameDOBViewModel(
+      Message("memberDetails.firstName"),
+      Message("memberDetails.lastName"),
+      Message("memberDetails.dateOfBirth"),
+      Message("memberDetails.dateOfBirth.hint")
+    ),
     routes.MemberDetailsController.onSubmit(srn, index, mode)
   )
 }

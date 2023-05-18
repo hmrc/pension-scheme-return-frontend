@@ -26,7 +26,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.{DownloadLinkMessage, ListMessage, ListType, Message, ParagraphMessage}
 import viewmodels.implicits._
-import viewmodels.models.ContentPageViewModel
+import viewmodels.models.{ContentPageViewModel, PageViewModel}
 import views.html.ContentPageView
 
 import javax.inject.{Inject, Named}
@@ -56,28 +56,30 @@ class HowToUploadController @Inject()(
 
 object HowToUploadController {
 
-  def viewModel(srn: Srn): ContentPageViewModel = ContentPageViewModel(
-    Message("howToUpload.title"),
-    Message("howToUpload.heading"),
-    List(
-      ParagraphMessage("howToUpload.paragraph"),
-      ListMessage(
-        ListType.Bullet,
-        "howToUpload.name",
-        "howToUpload.nino",
-        "howToUpload.dob"
-      ),
-      ParagraphMessage(
-        DownloadLinkMessage(
-          "howToUpload.linkMessage",
-          routes.DownloadPensionSchemeTemplateController.downloadFile.url
+  def viewModel(srn: Srn): PageViewModel[ContentPageViewModel] =
+    PageViewModel(
+      Message("howToUpload.title"),
+      Message("howToUpload.heading"),
+      ContentPageViewModel(
+        List(
+          ParagraphMessage("howToUpload.paragraph"),
+          ListMessage(
+            ListType.Bullet,
+            "howToUpload.name",
+            "howToUpload.nino",
+            "howToUpload.dob"
+          ),
+          ParagraphMessage(
+            DownloadLinkMessage(
+              "howToUpload.linkMessage",
+              routes.DownloadPensionSchemeTemplateController.downloadFile.url
+            ),
+            "howToUpload.linkMessage1"
+          )
         ),
-        "howToUpload.linkMessage1"
-      )
-    ),
-    Message("site.continue"),
-    isStartButton = false,
-    routes.HowToUploadController.onSubmit(srn),
-    isLargeHeading = true
-  )
+        isStartButton = false,
+        isLargeHeading = true
+      ),
+      routes.HowToUploadController.onSubmit(srn)
+    ).withButtonText(Message("site.continue"))
 }

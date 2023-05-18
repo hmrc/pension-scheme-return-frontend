@@ -36,7 +36,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
-import viewmodels.models.{ListRow, ListViewModel, PaginatedViewModel}
+import viewmodels.models.{ListRow, ListViewModel, PageViewModel, PaginatedViewModel}
 import views.html.ListView
 
 import javax.inject.Named
@@ -85,7 +85,7 @@ object SchemeMembersListController {
     "schemeMembersList.error.required"
   )
 
-  def viewModel(srn: Srn, page: Int, mode: Mode, memberNames: List[String]): ListViewModel = {
+  def viewModel(srn: Srn, page: Int, mode: Mode, memberNames: List[String]): PageViewModel[ListViewModel] = {
     val rows: List[ListRow] = memberNames.zipWithIndex.flatMap {
       case (memberName, index) =>
         refineV[OneTo99](index + 1) match {
@@ -115,20 +115,26 @@ object SchemeMembersListController {
       routes.SchemeMembersListController.onPageLoad(srn, _)
     )
 
-    ListViewModel(
+    PageViewModel(
       Message(titleKey, memberNames.length),
       Message(headingKey, memberNames.length),
-      rows,
-      "schemeMembersList.radio",
-      "schemeMembersList.inset",
-      showRadios = memberNames.length < Constants.maxSchemeMembers,
-      paginatedViewModel = Some(
-        PaginatedViewModel(
-          Message("schemeMembersList.pagination.label", pagination.pageStart, pagination.pageEnd, pagination.totalSize),
-          pagination
+      ListViewModel(
+        rows,
+        "schemeMembersList.radio",
+        showRadios = memberNames.length < Constants.maxSchemeMembers,
+        paginatedViewModel = Some(
+          PaginatedViewModel(
+            Message(
+              "schemeMembersList.pagination.label",
+              pagination.pageStart,
+              pagination.pageEnd,
+              pagination.totalSize
+            ),
+            pagination
+          )
         )
       ),
       onSubmit = routes.SchemeMembersListController.onSubmit(srn, page)
-    )
+    ).withInset("schemeMembersList.inset")
   }
 }

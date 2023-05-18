@@ -24,7 +24,7 @@
         govukInput: GovukInput
 )
 
-@(viewmodel: PageViewModel[MultipleQuestionsViewModel[Money]])(implicit request: Request[_], messages: Messages)
+@(viewmodel: PageViewModel[MultipleQuestionsViewModel[_]])(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(viewmodel.title.toMessage)) {
 

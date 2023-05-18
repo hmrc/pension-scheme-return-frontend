@@ -16,61 +16,35 @@
 
 package views
 
-import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.test.FakeRequest
-import utils.BaseSpec
-import viewmodels.DisplayMessage.{ListMessage, ParagraphMessage}
+import viewmodels.models.ContentPageViewModel
 import views.html.ContentPageView
 
-class ContentPageViewSpec extends BaseSpec with ScalaCheckPropertyChecks with HtmlHelper {
+class ContentPageViewSpec extends ViewSpec {
 
   runningApplication { implicit app =>
     val view = injected[ContentPageView]
 
     implicit val request = FakeRequest()
 
+    val viewModelGen = pageViewModelGen[ContentPageViewModel]
+
     "ContentPageView" - {
 
-      "render the title" in {
-
-        forAll(contentPageViewModelGen) { viewModel =>
-          title(view(viewModel)) must startWith(viewModel.title.toMessage)
-        }
-      }
-
-      "render the heading" in {
-
-        forAll(contentPageViewModelGen) { viewModel =>
-          h1(view(viewModel)) mustBe viewModel.heading.toMessage
-        }
-      }
-
-      "render all paragraphs" in {
-
-        forAll(contentPageViewModelGen) { viewModel =>
-          p(view(viewModel)) must contain allElementsOf
-            viewModel.contents.collect { case p: ParagraphMessage => p }.map(messageKey)
-        }
-      }
-
-      "render all list items" in {
-
-        forAll(contentPageViewModelGen) { viewModel =>
-          li(view(viewModel)) must contain allElementsOf
-            viewModel.contents.collect { case l: ListMessage => l }.flatMap(_.content.map(messageKey).toList)
-        }
-      }
+      act.like(renderTitle(viewModelGen)(view(_), _.title.key))
+      act.like(renderHeading(viewModelGen)(view(_), _.heading))
+      act.like(renderDescription(viewModelGen)(view(_), _.description))
 
       "render the button text" in {
 
-        forAll(contentPageViewModelGen) { viewModel =>
+        forAll(viewModelGen) { viewModel =>
           anchorButton(view(viewModel)).content mustBe viewModel.buttonText.key
         }
       }
 
       "render the button href" in {
 
-        forAll(contentPageViewModelGen) { viewModel =>
+        forAll(viewModelGen) { viewModel =>
           anchorButton(view(viewModel)).href mustBe viewModel.onSubmit.url
         }
       }

@@ -150,14 +150,14 @@ object SchemeMemberDetailsAnswersController {
     hasNINO: Boolean,
     maybeNino: Option[Nino],
     maybeNoNinoReason: Option[String]
-  ): CheckYourAnswersViewModel = CheckYourAnswersViewModel(
-    title = checkOrChange.fold(check = "checkYourAnswers.title", change = "changeMemberDetails.title"),
-    heading = checkOrChange.fold(
-      check = "checkYourAnswers.heading",
-      change = Message("changeMemberDetails.heading", memberDetails.fullName)
-    ),
-    rows(index, srn, mode, memberDetails, hasNINO, maybeNino, maybeNoNinoReason),
-    Message("site.continue"),
-    routes.SchemeMemberDetailsAnswersController.onSubmit(srn, index, checkOrChange)
-  )
+  ): PageViewModel[CheckYourAnswersViewModel] =
+    PageViewModel(
+      title = checkOrChange.fold(check = "checkYourAnswers.title", change = "changeMemberDetails.title"),
+      heading = checkOrChange.fold(
+        check = "checkYourAnswers.heading",
+        change = Message("changeMemberDetails.heading", memberDetails.fullName)
+      ),
+      CheckYourAnswersViewModel(rows(index, srn, mode, memberDetails, hasNINO, maybeNino, maybeNoNinoReason)),
+      routes.SchemeMemberDetailsAnswersController.onSubmit(srn, index, checkOrChange)
+    ).withButtonText(Message("site.continue"))
 }

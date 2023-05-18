@@ -30,7 +30,7 @@ import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
-import viewmodels.models.YesNoPageViewModel
+import viewmodels.models.{PageViewModel, YesNoPageViewModel}
 import views.html.YesNoPageView
 
 import javax.inject.{Inject, Named}
@@ -74,12 +74,13 @@ object OtherAssetsHeldController {
     "otherAssetsHeld.error.required"
   )
 
-  def viewModel(srn: Srn, schemeName: String, mode: Mode): YesNoPageViewModel =
-    YesNoPageViewModel(
+  def viewModel(srn: Srn, schemeName: String, mode: Mode): PageViewModel[YesNoPageViewModel] =
+    PageViewModel(
       "otherAssetsHeld.title",
       Message("otherAssetsHeld.heading", schemeName),
+      YesNoPageViewModel(
+        hint = Some(Message("otherAssetsHeld.hint"))
+      ),
       routes.OtherAssetsHeldController.onSubmit(srn, mode)
-    ).withHint(
-      Message("otherAssetsHeld.hint")
     )
 }

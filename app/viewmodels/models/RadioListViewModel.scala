@@ -24,12 +24,17 @@ import viewmodels.DisplayMessage.{InlineMessage, Message}
 
 case class RadioListViewModel(
   legend: Option[Message],
-  items: List[RadioListRowViewModel],
+  items: List[RadioListRowViewModel]
 )
 
 object RadioListViewModel {
 
-  def apply(title: Message, heading: InlineMessage, items: List[RadioListRowViewModel], onSubmit: Call): PageViewModel[RadioListViewModel] =
+  def apply(
+    title: Message,
+    heading: InlineMessage,
+    items: List[RadioListRowViewModel],
+    onSubmit: Call
+  ): PageViewModel[RadioListViewModel] =
     PageViewModel(
       title,
       heading,

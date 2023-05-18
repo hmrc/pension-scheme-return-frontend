@@ -29,7 +29,7 @@ import play.api.mvc.Call
 import play.api.test._
 import queries.Settable
 import uk.gov.hmrc.time.TaxYear
-import utils.BaseSpec
+import utils.{BaseSpec, DisplayMessageUtils}
 
 import java.time.{LocalDate, LocalDateTime}
 
@@ -44,7 +44,8 @@ trait ControllerBaseSpec
     with PlayRunners
     with RouteInvokers
     with ResultExtractors
-    with TestValues {
+    with TestValues
+    with DisplayMessageUtils {
 
   val baseUrl = "/pension-scheme-return"
 

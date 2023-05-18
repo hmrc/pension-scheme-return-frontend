@@ -26,7 +26,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.{ListMessage, ListType, Message, ParagraphMessage}
 import viewmodels.implicits._
-import viewmodels.models.ContentPageViewModel
+import viewmodels.models.{ContentPageViewModel, PageViewModel}
 import views.html.ContentPageView
 
 import javax.inject.{Inject, Named}
@@ -56,24 +56,26 @@ class PspDeclarationController @Inject()(
 
 object PspDeclarationController {
 
-  def viewModel(srn: Srn): ContentPageViewModel = ContentPageViewModel(
-    Message("pspDeclaration.title"),
-    Message("pspDeclaration.heading"),
-    List(
-      ParagraphMessage("pspDeclaration.paragraph"),
-      ListMessage(
-        ListType.Bullet,
-        "pspDeclaration.listItem1",
-        "pspDeclaration.listItem2",
-        "pspDeclaration.listItem3",
-        "pspDeclaration.listItem4",
-        "pspDeclaration.listItem5"
-      )
-    ),
-    Message("site.agreeAndContinue"),
-    isStartButton = false,
-    routes.PspDeclarationController.onSubmit(srn),
-    isLargeHeading = false
-  )
+  def viewModel(srn: Srn): PageViewModel[ContentPageViewModel] =
+    PageViewModel(
+      Message("pspDeclaration.title"),
+      Message("pspDeclaration.heading"),
+      ContentPageViewModel(
+        List(
+          ParagraphMessage("pspDeclaration.paragraph"),
+          ListMessage(
+            ListType.Bullet,
+            "pspDeclaration.listItem1",
+            "pspDeclaration.listItem2",
+            "pspDeclaration.listItem3",
+            "pspDeclaration.listItem4",
+            "pspDeclaration.listItem5"
+          )
+        ),
+        isStartButton = false,
+        isLargeHeading = false
+      ),
+      routes.PspDeclarationController.onSubmit(srn)
+    ).withButtonText(Message("site.agreeAndContinue"))
 
 }

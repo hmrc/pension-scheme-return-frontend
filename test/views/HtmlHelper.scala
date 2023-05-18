@@ -20,9 +20,6 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
 import play.twirl.api.Html
-import utils.ListUtils.ListOps
-import viewmodels.DisplayMessage
-import viewmodels.DisplayMessage.{LinkMessage, ListMessage, Message, ParagraphMessage}
 
 import scala.jdk.CollectionConverters.IteratorHasAsScala
 
@@ -35,6 +32,9 @@ trait HtmlHelper extends HtmlModels {
 
   def h1(html: Html): String = mainContent(html).getElementsByTag("h1").first().text()
   def h2(html: Html): String = mainContent(html).getElementsByTag("h2").first().text()
+
+  def elementText(html: Html): List[String] =
+    p(html) ++ li(html) ++ labels(html) ++ legend(html)
 
   def p(html: Html): List[String] =
     mainContent(html).getElementsByTag("p").iterator().asScala.map(_.text()).toList
@@ -87,6 +87,7 @@ trait HtmlHelper extends HtmlModels {
 
   def details(html: Html): Element =
     mainContent(html).selectFirst("details.govuk-details")
+
   def buttons(html: Html): Elements =
     mainContent(html).getElementsByTag("button")
 
@@ -138,13 +139,6 @@ trait HtmlHelper extends HtmlModels {
 
   def textAreas(html: Html)(name: String): Elements =
     mainContent(html).select(s"textarea[name=$name]")
-
-  def messageKey(message: DisplayMessage): String = message match {
-    case Message(key, _) => key
-    case LinkMessage(message, _) => messageKey(message)
-    case ListMessage(elements, _) => elements.map(messageKey).reduce[String](_ + _)
-    case ParagraphMessage(elements) => elements.map(messageKey).reduce[String](_ + " " + _)
-  }
 
   case class DateElements(day: Element, month: Element, year: Element)
   case class Panel(title: Element, body: Option[Element])

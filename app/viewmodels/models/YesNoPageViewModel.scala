@@ -17,15 +17,14 @@
 package viewmodels.models
 
 import play.api.mvc.Call
-import viewmodels.DisplayMessage
-import viewmodels.DisplayMessage.{BlockMessage, Message, ParagraphMessage}
+import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
 
 case class YesNoPageViewModel(
   legend: Option[Message] = None,
   hint: Option[Message] = None,
   yes: Option[Message] = None,
-  no: Option[Message] = None,
+  no: Option[Message] = None
 ) {
 
   def withHint(message: Message): YesNoPageViewModel =

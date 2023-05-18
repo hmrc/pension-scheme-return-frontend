@@ -16,59 +16,61 @@
 
 package views
 
-import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.test.FakeRequest
-import utils.BaseSpec
-import viewmodels.DisplayMessage.Message
+import viewmodels.models.ContentTablePageViewModel
 import views.html.ContentTablePageView
 
-class ContentTablePageViewSpec extends BaseSpec with ScalaCheckPropertyChecks with HtmlHelper {
+class ContentTablePageViewSpec extends ViewSpec {
 
   runningApplication { implicit app =>
     val view = injected[ContentTablePageView]
 
     implicit val request = FakeRequest()
 
+    val viewModelGen = pageViewModelGen[ContentTablePageViewModel]
+
     "ContentTablePageView" - {
 
       "render the title" in {
 
-        forAll(contentTablePageViewModelGen) { viewModel =>
+        forAll(viewModelGen) { viewModel =>
           title(view(viewModel)) must startWith(viewModel.title.key)
         }
       }
 
       "render the heading" in {
 
-        forAll(contentTablePageViewModelGen) { viewModel =>
+        forAll(viewModelGen) { viewModel =>
           h1(view(viewModel)) mustBe messageKey(viewModel.heading)
         }
       }
 
       "render the table rows" in {
-        forAll(contentTablePageViewModelGen) { viewModel =>
-          tr(view(viewModel)) must contain allElementsOf viewModel.rows.map {
+        forAll(viewModelGen) { viewModel =>
+          tr(view(viewModel)) must contain allElementsOf viewModel.page.rows.map {
             case (k, v) => List(messageKey(k), messageKey(v))
           }
         }
       }
 
       "render inset text" in {
-        forAll(contentTablePageViewModelGen) { viewModel =>
-          inset(view(viewModel)).text() mustBe viewModel.inset.asInstanceOf[Message].key
+        forAll(viewModelGen) { viewModel =>
+          whenever(viewModel.inset.nonEmpty) {
+            inset(view(viewModel)).text() mustBe viewModel.inset.map(messageKey).value
+          }
         }
       }
 
       "render the button text" in {
 
-        forAll(contentTablePageViewModelGen) { viewModel =>
+        forAll(viewModelGen) { viewModel =>
           anchorButton(view(viewModel)).content mustBe messageKey(viewModel.buttonText)
         }
       }
 
       "render the button href" in {
 
-        forAll(contentTablePageViewModelGen) { viewModel =>
+        forAll(viewModelGen) { viewModel =>
           anchorButton(view(viewModel)).href mustBe viewModel.onSubmit.url
         }
       }

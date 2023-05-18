@@ -23,5 +23,5 @@ case class BankAccountViewModel(
   accountNumberHeading: Message,
   accountNumberHint: Message,
   sortCodeHeading: Message,
-  sortCodeHint: Message,
+  sortCodeHint: Message
 )

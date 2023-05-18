@@ -20,8 +20,8 @@ import akka.stream.Materializer
 import controllers.actions._
 import controllers.nonsipp.memberdetails.CheckMemberDetailsFileController._
 import forms.YesNoPageFormProvider
-import models.{Mode, UploadKey, UploadedSuccessfully}
 import models.SchemeId.Srn
+import models.{Mode, UploadKey, UploadedSuccessfully}
 import navigation.Navigator
 import pages.nonsipp.memberdetails.CheckMemberDetailsFilePage
 import play.api.data.Form
@@ -29,9 +29,9 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{MemberDetailsUploadValidator, SaveService, UploadService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.DisplayMessage.{BreakPoint, Message, ParagraphMessage}
+import viewmodels.DisplayMessage.ParagraphMessage
 import viewmodels.implicits._
-import viewmodels.models.YesNoPageViewModel
+import viewmodels.models.{PageViewModel, YesNoPageViewModel}
 import views.html.YesNoPageView
 
 import javax.inject.{Inject, Named}
@@ -107,17 +107,20 @@ object CheckMemberDetailsFileController {
     "checkMemberDetailsFile.error.required"
   )
 
-  def viewModel(srn: Srn, fileName: Option[String], mode: Mode): YesNoPageViewModel = {
+  def viewModel(srn: Srn, fileName: Option[String], mode: Mode): PageViewModel[YesNoPageViewModel] = {
     val refresh = if (fileName.isEmpty) Some(1) else None
-    YesNoPageViewModel(
+    PageViewModel(
       "checkMemberDetailsFile.title",
       "checkMemberDetailsFile.heading",
-      fileName.map(name => ParagraphMessage(name) ++ BreakPoint).toList,
-      legend = Some("checkMemberDetailsFile.legend"),
-      yes = Some("checkMemberDetailsFile.yes"),
-      no = Some("checkMemberDetailsFile.no"),
-      refresh = refresh,
+      YesNoPageViewModel(
+        legend = Some("checkMemberDetailsFile.legend"),
+        yes = Some("checkMemberDetailsFile.yes"),
+        no = Some("checkMemberDetailsFile.no")
+      ),
       onSubmit = routes.CheckMemberDetailsFileController.onSubmit(srn, mode)
-    )
+    ).refreshPage(refresh)
+      .withDescription(
+        fileName.map(name => ParagraphMessage(name))
+      )
   }
 }

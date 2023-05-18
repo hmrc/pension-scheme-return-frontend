@@ -21,3 +21,8 @@ import viewmodels.DisplayMessage
 case class TextInputViewModel(
   label: Option[DisplayMessage]
 )
+
+object TextInputViewModel {
+
+  def apply(): TextInputViewModel = TextInputViewModel(None)
+}

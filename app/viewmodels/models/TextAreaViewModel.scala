@@ -17,5 +17,5 @@
 package viewmodels.models
 
 case class TextAreaViewModel(
-  rows: Int
+  rows: Int = 5
 )

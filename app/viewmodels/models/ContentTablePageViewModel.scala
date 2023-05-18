@@ -39,7 +39,6 @@ object ContentTablePageViewModel {
       heading,
       ContentTablePageViewModel(rows.toList),
       onSubmit
-    )
-      .withInset(inset)
+    ).withInset(inset)
       .withButtonText(buttonText)
 }

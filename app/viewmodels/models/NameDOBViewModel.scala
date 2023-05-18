@@ -24,5 +24,3 @@ case class NameDOBViewModel(
   dateOfBirth: Message,
   dateOfBirthHint: Message
 )
-
-

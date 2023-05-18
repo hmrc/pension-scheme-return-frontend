@@ -34,7 +34,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.DateTimeUtils.localDateShow
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
-import viewmodels.models.{ListRow, ListViewModel}
+import viewmodels.models.{ListRow, ListViewModel, PageViewModel}
 import views.html.ListView
 
 import javax.inject.Named
@@ -107,20 +107,21 @@ object AccountingPeriodListController {
             )
         )
     }
-  def viewModel(srn: Srn, mode: Mode, periods: List[DateRange]): ListViewModel = {
+  def viewModel(srn: Srn, mode: Mode, periods: List[DateRange]): PageViewModel[ListViewModel] = {
 
     val title = if (periods.length == 1) "accountingPeriods.title" else "accountingPeriods.title.plural"
     val heading = if (periods.length == 1) "accountingPeriods.heading" else "accountingPeriods.heading.plural"
 
-    ListViewModel(
+    PageViewModel(
       Message(title, periods.length),
       Message(heading, periods.length),
-      rows(srn, mode, periods),
-      Message("accountingPeriods.radios"),
-      Message("accountingPeriods.inset"),
-      showRadios = periods.length < 3,
-      paginatedViewModel = None,
+      ListViewModel(
+        rows(srn, mode, periods),
+        Message("accountingPeriods.radios"),
+        showRadios = periods.length < 3,
+        paginatedViewModel = None
+      ),
       routes.AccountingPeriodListController.onSubmit(srn, mode)
-    )
+    ).withInset(Message("accountingPeriods.inset"))
   }
 }
