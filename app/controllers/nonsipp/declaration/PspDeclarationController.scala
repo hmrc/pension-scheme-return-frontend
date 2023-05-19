@@ -60,9 +60,11 @@ object PspDeclarationController {
     PageViewModel(
       Message("pspDeclaration.title"),
       Message("pspDeclaration.heading"),
-      ContentPageViewModel(
-        List(
-          ParagraphMessage("pspDeclaration.paragraph"),
+      ContentPageViewModel(),
+      routes.PspDeclarationController.onSubmit(srn)
+    ).withButtonText(Message("site.agreeAndContinue"))
+      .withDescription(
+        ParagraphMessage("pspDeclaration.paragraph") ++
           ListMessage(
             ListType.Bullet,
             "pspDeclaration.listItem1",
@@ -71,11 +73,6 @@ object PspDeclarationController {
             "pspDeclaration.listItem4",
             "pspDeclaration.listItem5"
           )
-        ),
-        isStartButton = false,
-        isLargeHeading = false
-      ),
-      routes.PspDeclarationController.onSubmit(srn)
-    ).withButtonText(Message("site.agreeAndContinue"))
+      )
 
 }

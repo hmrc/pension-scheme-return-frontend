@@ -17,13 +17,13 @@
 package viewmodels.models
 
 import play.api.mvc.Call
+import viewmodels.DisplayMessage
 import viewmodels.DisplayMessage._
 import viewmodels.implicits._
 
 case class ContentPageViewModel(
-  contents: List[BlockMessage],
-  isStartButton: Boolean,
-  isLargeHeading: Boolean
+  isStartButton: Boolean = false,
+  isLargeHeading: Boolean = false
 )
 
 object ContentPageViewModel {
@@ -37,8 +37,9 @@ object ContentPageViewModel {
     PageViewModel(
       title,
       heading,
-      ContentPageViewModel(contents.map(ParagraphMessage(_)), isStartButton = true, isLargeHeading = false),
+      ContentPageViewModel(isStartButton = true, isLargeHeading = false),
       onSubmit
     ).withButtonText("site.start")
+      .withDescription(contents.map(ParagraphMessage(_)).fold[DisplayMessage](Empty)(_ ++ _))
 
 }

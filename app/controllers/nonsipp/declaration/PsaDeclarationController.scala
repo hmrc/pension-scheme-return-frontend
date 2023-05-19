@@ -60,19 +60,16 @@ object PsaDeclarationController {
     PageViewModel(
       Message("psaDeclaration.title"),
       Message("psaDeclaration.heading"),
-      ContentPageViewModel(
-        List(
-          ParagraphMessage("psaDeclaration.paragraph"),
+      ContentPageViewModel(),
+      routes.PsaDeclarationController.onSubmit(srn)
+    ).withButtonText(Message("site.agreeAndContinue"))
+      .withDescription(
+        ParagraphMessage("psaDeclaration.paragraph") ++
           ListMessage(
             ListType.Bullet,
             "psaDeclaration.listItem1",
             "psaDeclaration.listItem2",
             "psaDeclaration.listItem3"
           )
-        ),
-        isStartButton = false,
-        isLargeHeading = false
-      ),
-      routes.PsaDeclarationController.onSubmit(srn)
-    ).withButtonText(Message("site.agreeAndContinue"))
+      )
 }

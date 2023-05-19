@@ -60,15 +60,17 @@ object HowToUploadController {
     PageViewModel(
       Message("howToUpload.title"),
       Message("howToUpload.heading"),
-      ContentPageViewModel(
-        List(
-          ParagraphMessage("howToUpload.paragraph"),
+      ContentPageViewModel(isLargeHeading = true),
+      routes.HowToUploadController.onSubmit(srn)
+    ).withButtonText(Message("site.continue"))
+      .withDescription(
+        ParagraphMessage("howToUpload.paragraph") ++
           ListMessage(
             ListType.Bullet,
             "howToUpload.name",
             "howToUpload.nino",
             "howToUpload.dob"
-          ),
+          ) ++
           ParagraphMessage(
             DownloadLinkMessage(
               "howToUpload.linkMessage",
@@ -76,10 +78,5 @@ object HowToUploadController {
             ),
             "howToUpload.linkMessage1"
           )
-        ),
-        isStartButton = false,
-        isLargeHeading = true
-      ),
-      routes.HowToUploadController.onSubmit(srn)
-    ).withButtonText(Message("site.continue"))
+      )
 }
