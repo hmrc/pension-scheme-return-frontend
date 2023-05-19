@@ -1,28 +1,24 @@
 package controllers
 
-import base.SpecBase
-import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import views.html.$className$View
+import models.NormalMode
+import views.html.ContentPageView
+import $className;format="cap"$Controller._
 
-class $className$ControllerSpec extends SpecBase {
+class $className;format="cap"$ControllerSpec extends ControllerBaseSpec {
 
-  "$className$ Controller" - {
+  private lazy val onPageLoad = routes.$className;format="cap"$Controller.onPageLoad(srn, NormalMode)
+  private lazy val onSubmit = routes.$className;format="cap"$Controller.onSubmit(srn, NormalMode)
 
-    "must return OK and the correct view for a GET" in {
+  "$className;format="cap"$Controller" - {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-
-      running(application) {
-        val request = FakeRequest(GET, routes.$className$Controller.onPageLoad().url)
-
-        val result = route(application, request).value
-
-        val view = application.injector.instanceOf[$className$View]
-
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view()(request, messages(application)).toString
-      }
+    act like renderView(onPageLoad) { implicit app => implicit request =>
+      injected[ContentPageView].apply(viewModel(srn, NormalMode))
     }
+
+    act like redirectNextPage(onSubmit)
+
+    act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
+
+    act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }
 }

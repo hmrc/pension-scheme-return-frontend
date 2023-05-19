@@ -1,23 +1,46 @@
 package controllers
 
 import controllers.actions._
-import javax.inject.Inject
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.i18n._
+import play.api.mvc._
+import navigation.Navigator
+import models.Mode
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.$className$View
+import viewmodels.models.ContentPageViewModel
+import viewmodels.implicits._
+import viewmodels.DisplayMessage._
+import views.html.ContentPageView
+import $className$Controller._
+import pages.$className;format="cap"$Page
+import models.SchemeId.Srn
 
-class $className$Controller @Inject()(
-                                       override val messagesApi: MessagesApi,
-                                       identify: IdentifierAction,
-                                       getData: DataRetrievalAction,
-                                       requireData: DataRequiredAction,
-                                       val controllerComponents: MessagesControllerComponents,
-                                       view: $className$View
-                                     ) extends FrontendBaseController with I18nSupport {
+import javax.inject.{Inject, Named}
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) {
-    implicit request =>
-      Ok(view())
+class $className;format="cap"$Controller @Inject()(
+   override val messagesApi: MessagesApi,
+   @Named("non-sipp") navigator: Navigator,
+   identifyAndRequireData: IdentifyAndRequireData,
+   val controllerComponents: MessagesControllerComponents,
+   view: ContentPageView
+) extends FrontendBaseController with I18nSupport {
+
+  def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
+      Ok(view(viewModel(srn, mode)))
   }
+
+  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
+      Redirect(navigator.nextPage($className;format="cap"$Page(srn), mode, request.userAnswers))
+  }
+}
+
+object $className;format="cap"$Controller {
+  def viewModel(srn: Srn, mode: Mode): ContentPageViewModel = ContentPageViewModel(
+    title = "$className;format="decap"$.title",
+    heading = "$className;format="decap"$.heading",
+    contents = List(ParagraphMessage("$className;format="decap"$.paragraph")),
+    isStartButton = false,
+    buttonText = "site.continue",
+    isLargeHeading = true,
+    onSubmit = routes.$className$Controller.onSubmit(srn, mode)
+  )
 }

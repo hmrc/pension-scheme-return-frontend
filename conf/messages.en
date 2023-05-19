@@ -423,3 +423,7 @@ checkMemberDetailsFile.error.required = Select yes if you want to add this file 
 unquotedShares.title = Did the scheme hold any unquoted shares during the period of this return?
 unquotedShares.heading = Did {0} hold any unquoted shares during the period of this return?
 unquotedShares.error.required = Select yes if the scheme held any unquoted shares during the period of this return
+
+checkingMemberDetailsFile.title = We are checking your member details file
+checkingMemberDetailsFile.heading = We are checking your member details file
+checkingMemberDetailsFile.paragraph = Do not close this page or leave the service.
