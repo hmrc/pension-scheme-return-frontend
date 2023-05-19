@@ -18,10 +18,11 @@ package controllers.nonsipp.memberdetails
 
 import akka.stream.scaladsl.Source
 import akka.util.ByteString
-import controllers.nonsipp.memberdetails.CheckMemberDetailsFileController._
 import controllers.ControllerBaseSpec
+import controllers.nonsipp.memberdetails.CheckMemberDetailsFileController._
 import forms.YesNoPageFormProvider
-import models.{NormalMode, UploadStatus, UploadedSuccessfully}
+import models.UploadStatus.UploadStatus
+import models._
 import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.memberdetails.CheckMemberDetailsFilePage
 import play.api.inject.bind
@@ -39,7 +40,7 @@ class CheckMemberDetailsFileControllerSpec extends ControllerBaseSpec {
   private val fileName = "test-file-name"
   private val byteString = ByteString("test-content")
 
-  private val uploadedSuccessfully = UploadedSuccessfully(
+  private val uploadedSuccessfully = UploadStatus.Success(
     fileName,
     "text/csv",
     "/test-download-url",
@@ -58,7 +59,8 @@ class CheckMemberDetailsFileControllerSpec extends ControllerBaseSpec {
     reset(mockUploadService)
     reset(mockMemberDetailsUploadValidator)
     mockStream()
-    mockValidateCSV()
+    mockSaveValidatedUpload()
+    mockValidateCSV(UploadFormatError)
   }
 
   "CheckMemberDetailsFileController" - {
@@ -86,7 +88,10 @@ class CheckMemberDetailsFileControllerSpec extends ControllerBaseSpec {
   private def mockStream(): Unit =
     when(mockUploadService.stream(any())(any())).thenReturn(Future.successful(Source.single(byteString)))
 
-  private def mockValidateCSV(): Unit =
-    when(mockMemberDetailsUploadValidator.validateCSV(any(), any(), any())(any(), any()))
-      .thenReturn(Future.successful((): Unit))
+  private def mockValidateCSV(result: Upload): Unit =
+    when(mockMemberDetailsUploadValidator.validateCSV(any())(any()))
+      .thenReturn(Future.successful(result))
+
+  private def mockSaveValidatedUpload(): Unit =
+    when(mockUploadService.saveValidatedUpload(any(), any())).thenReturn(Future.successful(()))
 }

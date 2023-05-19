@@ -40,11 +40,10 @@ trait ViewModelGenerators extends BasicGenerators {
 
   implicit val contentPageViewModelGen: Gen[ContentPageViewModel] =
     for {
-      contents <- Gen.listOf(nonEmptyBlockMessage)
       isStartButton <- boolean
       isLargeHeading <- boolean
     } yield {
-      ContentPageViewModel(contents, isStartButton, isLargeHeading)
+      ContentPageViewModel(isStartButton, isLargeHeading)
     }
 
   implicit val contentTablePageViewModelGen: Gen[ContentTablePageViewModel] =

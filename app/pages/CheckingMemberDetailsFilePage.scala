@@ -14,15 +14,8 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.memberdetails
+package pages
 
 import models.SchemeId.Srn
-import models.UploadFailure
-import play.api.libs.json.JsPath
-import queries.{Gettable, Settable}
 
-case class MembersDetailsFileErrors(srn: Srn) extends Gettable[UploadFailure] with Settable[UploadFailure] {
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "membersDetailsFileErrors"
-}
+case class CheckingMemberDetailsFilePage(srn: Srn, uploadSuccessful: Boolean) extends Page

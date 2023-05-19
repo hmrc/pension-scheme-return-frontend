@@ -25,7 +25,9 @@ import models.SchemeId.Srn
 import models.{CheckOrChange, ManualOrUpload, NormalMode}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
+import pages.CheckingMemberDetailsFilePage
 import pages.nonsipp.memberdetails._
+import pages.nonsipp.memberdetails.upload.FileUploadSuccessPage
 import utils.BaseSpec
 import utils.UserAnswersUtils.UserAnswersOps
 
@@ -169,6 +171,43 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             routes.CheckMemberDetailsFileController.onPageLoad
           )
           .withName("go from upload member details page to check member details file page")
+      )
+
+      act.like(
+        normalmode
+          .navigateToWithData(
+            CheckMemberDetailsFilePage,
+            Gen.const(true),
+            controllers.nonsipp.memberdetails.upload.routes.CheckingMemberDetailsFileController.onPageLoad
+          )
+          .withName("go from check member details file page to checking member details file page")
+      )
+
+      act.like(
+        normalmode
+          .navigateTo(
+            CheckingMemberDetailsFilePage(_, uploadSuccessful = false),
+            (_, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          )
+          .withName("go from checking member details file page to unauthorised page when upload failed")
+      )
+
+      act.like(
+        normalmode
+          .navigateTo(
+            CheckingMemberDetailsFilePage(_, uploadSuccessful = true),
+            controllers.nonsipp.memberdetails.upload.routes.FileUploadSuccessController.onPageLoad
+          )
+          .withName("go from checking member details file page to upload successful page when upload successful")
+      )
+
+      act.like(
+        normalmode
+          .navigateTo(
+            FileUploadSuccessPage,
+            (srn, _) => controllers.nonsipp.memberdetails.routes.SchemeMembersListController.onPageLoad(srn, 1)
+          )
+          .withName("go from file upload success page to scheme members list page")
       )
     }
 

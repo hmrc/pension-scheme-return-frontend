@@ -16,6 +16,7 @@
 
 package models
 
+import play.api.libs.functional.syntax._
 import play.api.libs.json._
 import uk.gov.hmrc.domain.Nino
 import utils.ListUtils.ListOps
@@ -37,30 +38,29 @@ object UploadState {
 
 sealed trait Upload
 
-case object UploadInitial extends UploadFailure
+case class UploadSuccess(memberDetails: List[UploadMemberDetails]) extends Upload
 
-case class UploadSuccess(memberDetails: UploadMemberDetails) extends Upload
+case object UploadFormatError extends Upload
 
-sealed trait UploadFailure extends Upload
-
-object UploadFailure {
-  implicit val writes: Writes[UploadFailure] = {
-    case UploadErrors(errs) => Json.obj("_type" -> "UploadErrors", "errors" -> Json.toJson(errs))
-    case UploadFormatError => Json.obj("_type" -> "UploadFormatError")
-  }
-
-  implicit val read: Reads[UploadFailure] =
-    (__ \ "_type").read[String].flatMap {
-      case "UploadFormatError" => Reads.pure(UploadFormatError)
-      case "UploadErrors" => (__ \ "errors").read[List[ValidationError]].map(UploadErrors)
-    }
-}
-
-object UploadFormatError extends UploadFailure
-
-case class UploadErrors(errors: List[ValidationError]) extends UploadFailure
+case class UploadErrors(errors: List[ValidationError]) extends Upload
 
 case class UploadMemberDetails(row: Int, nameDOB: NameDOB, ninoOrNoNinoReason: Either[String, Nino])
+
+object UploadMemberDetails {
+  implicit val eitherWrites: Writes[Either[String, Nino]] = e =>
+    Json.obj(
+      e.fold(
+        noNinoReason => "noNinoReason" -> Json.toJson(noNinoReason),
+        nino => "nino" -> Json.toJson(nino)
+      )
+    )
+
+  implicit val eitherReads: Reads[Either[String, Nino]] =
+    (__ \ "noNinoReason").read[String].map(noNinoReason => Left(noNinoReason)) |
+      (__ \ "nino").read[Nino].map(nino => Right(nino))
+
+  implicit val format: Format[UploadMemberDetails] = Json.format[UploadMemberDetails]
+}
 
 /**
  * @param key = csv header key e.g. First name
