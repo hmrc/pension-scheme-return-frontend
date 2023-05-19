@@ -38,7 +38,7 @@
         }
     ))
 
-    @viewmodel.inset.map(i => govukInsetText(InsetTextViewModel(renderMessage(i))))
+    @govukInsetText(InsetTextViewModel(renderMessage(viewmodel.page.inset))))
 
     <p class="govuk-body">
         @govukButton(

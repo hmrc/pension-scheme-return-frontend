@@ -69,7 +69,7 @@
               )
             )
         } else {
-          @viewmodel.inset.map(i => govukInsetText(InsetTextViewModel(renderMessage(i))))
+          @govukInsetText(InsetTextViewModel(renderMessage(viewmodel.page.inset))))
         }
 
         @govukButton(

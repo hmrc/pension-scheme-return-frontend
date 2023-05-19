@@ -24,15 +24,11 @@ case class PageViewModel[+A](
   title: Message,
   heading: InlineMessage,
   description: Option[DisplayMessage],
-  inset: Option[DisplayMessage],
   page: A,
   refresh: Option[Int],
   buttonText: Message,
   onSubmit: Call
 ) {
-
-  def withInset(message: DisplayMessage): PageViewModel[A] =
-    copy(inset = Some(message))
 
   def withDescription(message: Option[DisplayMessage]): PageViewModel[A] =
     copy(description = message)
@@ -58,7 +54,6 @@ object PageViewModel {
     PageViewModel(
       title,
       heading,
-      None,
       None,
       page,
       refresh = None,

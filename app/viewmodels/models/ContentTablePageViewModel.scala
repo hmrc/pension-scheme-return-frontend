@@ -21,6 +21,7 @@ import viewmodels.DisplayMessage
 import viewmodels.DisplayMessage.{InlineMessage, Message}
 
 case class ContentTablePageViewModel(
+  inset: DisplayMessage,
   rows: List[(DisplayMessage, DisplayMessage)]
 )
 
@@ -37,8 +38,7 @@ object ContentTablePageViewModel {
     PageViewModel(
       title,
       heading,
-      ContentTablePageViewModel(rows.toList),
+      ContentTablePageViewModel(inset, rows.toList),
       onSubmit
-    ).withInset(inset)
-      .withButtonText(buttonText)
+    ).withButtonText(buttonText)
 }

@@ -116,12 +116,13 @@ object AccountingPeriodListController {
       Message(title, periods.length),
       Message(heading, periods.length),
       ListViewModel(
+        inset = "accountingPeriods.inset",
         rows(srn, mode, periods),
         Message("accountingPeriods.radios"),
         showRadios = periods.length < 3,
         paginatedViewModel = None
       ),
       routes.AccountingPeriodListController.onSubmit(srn, mode)
-    ).withInset(Message("accountingPeriods.inset"))
+    )
   }
 }

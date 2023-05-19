@@ -29,13 +29,12 @@ trait ViewModelGenerators extends BasicGenerators {
       title <- nonEmptyMessage
       heading <- nonEmptyMessage
       description <- Gen.option(nonEmptyBlockMessage)
-      inset <- Gen.option(nonEmptyMessage)
       page <- gen
       refresh <- Gen.option(Gen.const(1))
       buttonText <- nonEmptyMessage
       onSubmit <- call
     } yield {
-      PageViewModel(title, heading, description, inset, page, refresh, buttonText, onSubmit)
+      PageViewModel(title, heading, description, page, refresh, buttonText, onSubmit)
     }
 
   implicit val contentPageViewModelGen: Gen[ContentPageViewModel] =
@@ -48,9 +47,10 @@ trait ViewModelGenerators extends BasicGenerators {
 
   implicit val contentTablePageViewModelGen: Gen[ContentTablePageViewModel] =
     for {
+      inset <- nonEmptyDisplayMessage
       rows <- Gen.listOf(tupleOf(nonEmptyMessage, nonEmptyMessage))
     } yield {
-      ContentTablePageViewModel(rows)
+      ContentTablePageViewModel(inset, rows)
     }
 
   val actionItemGen: Gen[SummaryAction] =
@@ -139,10 +139,12 @@ trait ViewModelGenerators extends BasicGenerators {
     paginate: Boolean = false
   ): Gen[ListViewModel] =
     for {
+      inset <- nonEmptyDisplayMessage
       rows <- rows.fold(Gen.choose(1, 10))(Gen.const).flatMap(Gen.listOfN(_, summaryRowGen))
       radioText <- nonEmptyMessage
       pagination <- if (paginate) Gen.option(paginationGen) else Gen.const(None)
     } yield ListViewModel(
+      inset,
       rows,
       radioText,
       showRadios,

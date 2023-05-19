@@ -28,6 +28,7 @@ case class ListRow(
 )
 
 case class ListViewModel(
+  inset: DisplayMessage,
   rows: List[ListRow],
   radioText: Message,
   // whether to render the radio buttons to add another entity to the list or continue

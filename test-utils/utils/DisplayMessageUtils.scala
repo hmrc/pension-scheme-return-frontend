@@ -30,8 +30,8 @@ import viewmodels.DisplayMessage.{
 
 trait DisplayMessageUtils {
 
-  def messageKey(message: DisplayMessage): String =
-    allMessages(message).foldLeft("")(_ + _.key)
+  def messageKey(message: DisplayMessage, separator: String = ""): String =
+    allMessages(message).foldLeft("")(_ + separator + _.key).trim
 
   def allMessages(message: DisplayMessage): List[Message] = message match {
     case Empty => List()

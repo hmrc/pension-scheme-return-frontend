@@ -119,6 +119,7 @@ object SchemeMembersListController {
       Message(titleKey, memberNames.length),
       Message(headingKey, memberNames.length),
       ListViewModel(
+        inset = "schemeMembersList.inset",
         rows,
         "schemeMembersList.radio",
         showRadios = memberNames.length < Constants.maxSchemeMembers,
@@ -135,6 +136,6 @@ object SchemeMembersListController {
         )
       ),
       onSubmit = routes.SchemeMembersListController.onSubmit(srn, page)
-    ).withInset("schemeMembersList.inset")
+    )
   }
 }

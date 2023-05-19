@@ -75,10 +75,8 @@ class ListViewSpec extends ViewSpec {
 
       "renders the inset text and not the radio button whenShowRadios is false" in {
         forAll(viewModelGen(showRadios = false)) { viewModel =>
-          whenever(viewModel.inset.nonEmpty) {
-            radios(view(form, viewModel)).size mustEqual 0
-            inset(view(form, viewModel)).text() mustEqual viewModel.inset.map(messageKey).value
-          }
+          radios(view(form, viewModel)).size mustEqual 0
+          inset(view(form, viewModel)).text() mustEqual messageKey(viewModel.page.inset, " ")
         }
       }
 

@@ -55,9 +55,7 @@ class ContentTablePageViewSpec extends ViewSpec {
 
       "render inset text" in {
         forAll(viewModelGen) { viewModel =>
-          whenever(viewModel.inset.nonEmpty) {
-            inset(view(viewModel)).text() mustBe viewModel.inset.map(messageKey).value
-          }
+          inset(view(viewModel)).text() mustBe messageKey(viewModel.page.inset, " ")
         }
       }
 
