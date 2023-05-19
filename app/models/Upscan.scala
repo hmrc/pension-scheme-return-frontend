@@ -101,13 +101,12 @@ object UploadStatus {
 
   case object Failed extends UploadStatus
 
-  case class UploadedSuccessfully(name: String, mimeType: String, downloadUrl: String, size: Option[Long])
-      extends UploadStatus
+  case class Success(name: String, mimeType: String, downloadUrl: String, size: Option[Long]) extends UploadStatus
 }
 
 object UploadedSuccessfully {
-  implicit val uploadedSuccessfullyFormat: OFormat[UploadStatus.UploadedSuccessfully] =
-    Json.format[UploadStatus.UploadedSuccessfully]
+  implicit val uploadedSuccessfullyFormat: OFormat[UploadStatus.Success] =
+    Json.format[UploadStatus.Success]
 }
 
 case class UploadId(value: String) extends AnyVal

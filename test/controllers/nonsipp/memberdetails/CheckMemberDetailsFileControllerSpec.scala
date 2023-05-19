@@ -40,7 +40,7 @@ class CheckMemberDetailsFileControllerSpec extends ControllerBaseSpec {
   private val fileName = "test-file-name"
   private val byteString = ByteString("test-content")
 
-  private val uploadedSuccessfully = UploadStatus.UploadedSuccessfully(
+  private val uploadedSuccessfully = UploadStatus.Success(
     fileName,
     "text/csv",
     "/test-download-url",

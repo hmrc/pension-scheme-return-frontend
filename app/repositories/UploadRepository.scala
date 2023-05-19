@@ -138,8 +138,8 @@ object UploadRepository {
 
   implicit val uploadKeyWrites: Writes[UploadKey] = Writes.StringWrites.contramap(_.value)
 
-  implicit val uploadedSuccessfullyFormat: OFormat[UploadStatus.UploadedSuccessfully] =
-    Json.format[UploadStatus.UploadedSuccessfully]
+  implicit val uploadedSuccessfullyFormat: OFormat[UploadStatus.Success] =
+    Json.format[UploadStatus.Success]
   implicit val uploadedFailedFormat: OFormat[UploadStatus.Failed.type] = Json.format[UploadStatus.Failed.type]
   implicit val uploadedInProgressFormat: OFormat[UploadStatus.InProgress.type] =
     Json.format[UploadStatus.InProgress.type]

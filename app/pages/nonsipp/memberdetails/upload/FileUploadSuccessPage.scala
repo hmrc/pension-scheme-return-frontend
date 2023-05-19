@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package pages
+package pages.nonsipp.memberdetails.upload
 
 import models.SchemeId.Srn
+import pages.Page
 
-case class CheckingMemberDetailsFilePage(srn: Srn, uploadSuccessful: Boolean) extends Page
+case class FileUploadSuccessPage(srn: Srn) extends Page
