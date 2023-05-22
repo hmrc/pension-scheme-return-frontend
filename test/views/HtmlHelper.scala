@@ -31,7 +31,8 @@ trait HtmlHelper extends HtmlModels {
   def title(html: Html): String = Jsoup.parse(html.body).title()
 
   def h1(html: Html): String = mainContent(html).getElementsByTag("h1").first().text()
-  def h2(html: Html): String = mainContent(html).getElementsByTag("h2").first().text()
+  def h2(html: Html): List[String] =
+    mainContent(html).getElementsByTag("h2").iterator().asScala.map(_.text()).toList
 
   def elementText(html: Html): List[String] =
     p(html) ++ li(html) ++ labels(html) ++ legend(html)
@@ -44,6 +45,9 @@ trait HtmlHelper extends HtmlModels {
 
   def legend(html: Html): List[String] =
     mainContent(html).getElementsByTag("legend").iterator().asScala.map(_.text()).toList
+
+  def span(html: Html): List[String] =
+    mainContent(html).getElementsByTag("span").iterator().asScala.map(_.text()).toList
 
   def panel(html: Html): Panel = {
     val parent = mainContent(html).getElementsByClass("govuk-panel").first()
@@ -95,6 +99,9 @@ trait HtmlHelper extends HtmlModels {
 
   def anchorButton(html: Html): AnchorTag =
     AnchorTag(mainContent(html).select("a[role=button]").first())
+
+  def anchors(html: Html): List[AnchorTag] =
+    mainContent(html).getElementsByTag("a").iterator().asScala.map(e => AnchorTag(e)).toList
 
   def form(html: Html): Form =
     Form(mainContent(html).getElementsByTag("form").first())

@@ -45,7 +45,7 @@ class SubmissionViewSpec extends ViewSpec with Mappings {
 
       "render h2" in {
         forAll(submissionViewModelGen) { viewModel =>
-          h2(view(viewModel)) mustBe messages("site.whatHappensNext")
+          h2(view(viewModel)) must contain(messages("site.whatHappensNext"))
         }
       }
 

@@ -18,6 +18,7 @@ package views
 
 import org.jsoup.nodes.Element
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.ActionItem
+import viewmodels.DisplayMessage.LinkMessage
 
 trait HtmlModels {
 
@@ -32,6 +33,12 @@ trait HtmlModels {
       AnchorTag(
         item.href,
         s"${item.content.asHtml}${item.visuallyHiddenText.fold("")(s => s" $s")}"
+      )
+
+    def apply(item: LinkMessage): AnchorTag =
+      AnchorTag(
+        item.url,
+        item.content.key
       )
   }
 
