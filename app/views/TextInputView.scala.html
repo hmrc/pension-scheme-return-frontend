@@ -22,7 +22,7 @@
         govukInput: GovukInput
 )
 
-@(form: Form[_], viewmodel: TextInputViewModel)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], viewmodel: PageViewModel[TextInputViewModel])(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(viewmodel.title.toMessage)) {
 
@@ -32,21 +32,21 @@
       @govukErrorSummary(ErrorSummaryViewModel(form))
     }
 
-    @if(viewmodel.label.nonEmpty) {
+    @if(viewmodel.page.label.nonEmpty) {
       <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
     }
 
     @govukInput(
       InputViewModel(
         field = form("value"),
-        label = viewmodel.label
+        label = viewmodel.page.label
                 .map(label => LabelViewModel(renderMessage(label)))
                 .getOrElse(LabelViewModel(renderMessage(viewmodel.heading)).asPageHeading())
       )
     )
 
     @govukButton(
-      ButtonViewModel(messages("site.saveAndContinue"))
+      ButtonViewModel(renderMessage(viewmodel.buttonText))
     )
   }
 }

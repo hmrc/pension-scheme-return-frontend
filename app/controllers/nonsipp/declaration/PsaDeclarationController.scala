@@ -26,7 +26,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.{ListMessage, ListType, Message, ParagraphMessage}
 import viewmodels.implicits._
-import viewmodels.models.ContentPageViewModel
+import viewmodels.models.{ContentPageViewModel, PageViewModel}
 import views.html.ContentPageView
 
 import javax.inject.{Inject, Named}
@@ -56,21 +56,20 @@ class PsaDeclarationController @Inject()(
 
 object PsaDeclarationController {
 
-  def viewModel(srn: Srn): ContentPageViewModel = ContentPageViewModel(
-    Message("psaDeclaration.title"),
-    Message("psaDeclaration.heading"),
-    List(
-      ParagraphMessage("psaDeclaration.paragraph"),
-      ListMessage(
-        ListType.Bullet,
-        "psaDeclaration.listItem1",
-        "psaDeclaration.listItem2",
-        "psaDeclaration.listItem3"
+  def viewModel(srn: Srn): PageViewModel[ContentPageViewModel] =
+    PageViewModel(
+      Message("psaDeclaration.title"),
+      Message("psaDeclaration.heading"),
+      ContentPageViewModel(),
+      routes.PsaDeclarationController.onSubmit(srn)
+    ).withButtonText(Message("site.agreeAndContinue"))
+      .withDescription(
+        ParagraphMessage("psaDeclaration.paragraph") ++
+          ListMessage(
+            ListType.Bullet,
+            "psaDeclaration.listItem1",
+            "psaDeclaration.listItem2",
+            "psaDeclaration.listItem3"
+          )
       )
-    ),
-    Message("site.agreeAndContinue"),
-    isStartButton = false,
-    routes.PsaDeclarationController.onSubmit(srn),
-    isLargeHeading = false
-  )
 }

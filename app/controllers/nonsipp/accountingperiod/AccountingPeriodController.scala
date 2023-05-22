@@ -35,7 +35,9 @@ import uk.gov.hmrc.time.TaxYear
 import utils.FormUtils._
 import utils.ListUtils.ListOps
 import utils.RefinedUtils.RefinedIntOps
-import viewmodels.models.DateRangeViewModel
+import viewmodels.DisplayMessage.ParagraphMessage
+import viewmodels.implicits._
+import viewmodels.models.{DateRangeViewModel, PageViewModel}
 import views.html.DateRangeView
 
 import javax.inject.Named
@@ -119,10 +121,10 @@ object AccountingPeriodController {
     usedAccountingPeriods
   )
 
-  def viewModel(srn: Srn, index: Max3, mode: Mode): DateRangeViewModel = DateRangeViewModel(
+  def viewModel(srn: Srn, index: Max3, mode: Mode): PageViewModel[DateRangeViewModel] = DateRangeViewModel(
     "accountingPeriod.title",
     "accountingPeriod.heading",
-    Some("accountingPeriod.description"),
+    Some(ParagraphMessage("accountingPeriod.description")),
     routes.AccountingPeriodController.onSubmit(srn, index, mode)
   )
 }

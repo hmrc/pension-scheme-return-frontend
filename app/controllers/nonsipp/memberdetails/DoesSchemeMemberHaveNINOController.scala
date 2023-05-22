@@ -33,7 +33,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.FormUtils._
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
-import viewmodels.models.YesNoPageViewModel
+import viewmodels.models.{PageViewModel, YesNoPageViewModel}
 import views.html.YesNoPageView
 
 import javax.inject.{Inject, Named}
@@ -105,9 +105,10 @@ object DoesSchemeMemberHaveNINOController {
     List(memberName)
   )
 
-  def viewModel(index: Max99, memberName: String, srn: Srn, mode: Mode): YesNoPageViewModel = YesNoPageViewModel(
-    Message("nationalInsuranceNumber.title"),
-    Message("nationalInsuranceNumber.heading", memberName),
-    routes.DoesSchemeMemberHaveNINOController.onSubmit(srn, index, mode)
-  )
+  def viewModel(index: Max99, memberName: String, srn: Srn, mode: Mode): PageViewModel[YesNoPageViewModel] =
+    YesNoPageViewModel(
+      Message("nationalInsuranceNumber.title"),
+      Message("nationalInsuranceNumber.heading", memberName),
+      routes.DoesSchemeMemberHaveNINOController.onSubmit(srn, index, mode)
+    )
 }

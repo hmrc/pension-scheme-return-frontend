@@ -18,13 +18,11 @@ package views
 
 import forms.RadioListFormProvider
 import models.Enumerable
-import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.test.FakeRequest
-import utils.BaseSpec
-import viewmodels.DisplayMessage.{ListMessage, ParagraphMessage}
+import viewmodels.models.RadioListViewModel
 import views.html.RadioListView
 
-class RadioListViewSpec extends BaseSpec with ScalaCheckPropertyChecks with HtmlHelper {
+class RadioListViewSpec extends ViewSpec {
 
   implicit val enumerable = Enumerable(
     ("1", 1),
@@ -37,93 +35,49 @@ class RadioListViewSpec extends BaseSpec with ScalaCheckPropertyChecks with Html
 
     val view = injected[RadioListView]
 
+    val viewModelGen = pageViewModelGen[RadioListViewModel]
+
     "RadioListView" - {
 
       val requiredKey = "radio.error.required"
 
       val radioListForm = new RadioListFormProvider().apply[Int](requiredKey)
+      val invalidForm = radioListForm.bind(Map("value" -> "4"))
 
-      "have a title" in {
-
-        forAll(radioListViewModelGen) { viewmodel =>
-          title(view(radioListForm, viewmodel)) must startWith(viewmodel.title.toMessage)
-        }
-      }
-
-      "have a heading" in {
-
-        forAll(radioListViewModelGen) { viewmodel =>
-          h1(view(radioListForm, viewmodel)) mustBe viewmodel.heading.toMessage
-        }
-      }
-
-      "have paragraphs" in {
-
-        forAll(radioListViewModelGen) { viewmodel =>
-          p(view(radioListForm, viewmodel)) must contain allElementsOf
-            viewmodel.contents.collect { case p: ParagraphMessage => p }.map(messageKey)
-        }
-      }
-
-      "have listed content" in {
-
-        forAll(radioListViewModelGen) { viewmodel =>
-          li(view(radioListForm, viewmodel)) mustBe
-            viewmodel.contents.collect { case l: ListMessage => l }.flatMap(_.content.map(messageKey).toList)
-        }
-      }
+      act.like(renderTitle(viewModelGen)(view(radioListForm, _), _.title.key))
+      act.like(renderHeading(viewModelGen)(view(radioListForm, _), _.heading))
+      act.like(renderDescription(viewModelGen)(view(radioListForm, _), _.description))
+      act.like(renderButtonText(viewModelGen)(view(radioListForm, _), _.buttonText))
+      act.like(renderForm(viewModelGen)(view(radioListForm, _), _.onSubmit))
+      act.like(renderErrors(viewModelGen)(view(invalidForm, _), _ => requiredKey))
 
       "have legend when present" in {
 
-        forAll(radioListViewModelGen) { viewmodel =>
-          whenever(viewmodel.legend.nonEmpty) {
-            legend(view(radioListForm, viewmodel)) mustBe List(viewmodel.legend.value.toMessage)
+        forAll(viewModelGen) { viewmodel =>
+          whenever(viewmodel.page.legend.nonEmpty) {
+            legend(view(radioListForm, viewmodel)) mustBe List(viewmodel.page.legend.value.toMessage)
           }
         }
       }
 
       "no have a legend when not present" in {
 
-        forAll(radioListViewModelGen) { viewmodel =>
-          legend(view(radioListForm, viewmodel.copy(legend = None))) mustBe Nil
+        forAll(viewModelGen) { viewmodel =>
+          legend(view(radioListForm, viewmodel.copy(page = viewmodel.page.copy(legend = None)))) mustBe Nil
         }
       }
 
       "have radio list values" in {
 
-        forAll(radioListViewModelGen) { viewmodel =>
-          radios(view(radioListForm, viewmodel)).map(_.value) mustBe viewmodel.items.map(_.value)
+        forAll(viewModelGen) { viewmodel =>
+          radios(view(radioListForm, viewmodel)).map(_.value) mustBe viewmodel.page.items.map(_.value)
         }
       }
 
       "have radio button labels" in {
 
-        forAll(radioListViewModelGen) { viewmodel =>
-          radios(view(radioListForm, viewmodel)).map(_.label) mustBe viewmodel.items.map(_.content.key)
-        }
-      }
-
-      "have form" in {
-
-        forAll(radioListViewModelGen) { viewmodel =>
-          form(view(radioListForm, viewmodel)).method mustBe viewmodel.onSubmit.method
-          form(view(radioListForm, viewmodel)).action mustBe viewmodel.onSubmit.url
-        }
-      }
-
-      "have error summary" in {
-
-        forAll(radioListViewModelGen) { viewmodel =>
-          val invalidForm = radioListForm.bind(Map("value" -> "4"))
-          errorSummary(view(invalidForm, viewmodel)).text() must include(requiredKey)
-        }
-      }
-
-      "have error message" in {
-
-        forAll(radioListViewModelGen) { viewmodel =>
-          val invalidForm = radioListForm.bind(Map("value" -> "4"))
-          errorMessage(view(invalidForm, viewmodel)).text() must include(requiredKey)
+        forAll(viewModelGen) { viewmodel =>
+          radios(view(radioListForm, viewmodel)).map(_.label) mustBe viewmodel.page.items.map(_.content.key)
         }
       }
     }

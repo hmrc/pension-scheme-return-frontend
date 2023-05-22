@@ -22,7 +22,7 @@
   govukButton: GovukButton,
 )
 
-@(form: Form[DateRange], viewmodel: DateRangeViewModel)(implicit request: Request[_], messages: Messages)
+@(form: Form[DateRange], viewmodel: PageViewModel[DateRangeViewModel])(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, viewmodel.title.toMessage)) {
 
@@ -32,28 +32,26 @@
       @govukErrorSummary(ErrorSummaryViewModel(form))
     }
 
-    <h1 class="govuk-heading-l">@viewmodel.heading.toMessage</h1>
+    <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
 
-    @viewmodel.description.map { content =>
-      <p class="govuk-body">@content.toMessage</p>
-    }
+    @viewmodel.description.map(renderMessage)
 
     @govukDateInput(
       DateViewModel(
         field  = form("dates.startDate"),
-        legend = LegendViewModel(viewmodel.startDateLabel.toMessage)
+        legend = LegendViewModel(viewmodel.page.startDateLabel.toMessage)
       )
     )
 
     @govukDateInput(
       DateViewModel(
         field  = form("dates.endDate"),
-        legend = LegendViewModel(viewmodel.endDateLabel.toMessage)
+        legend = LegendViewModel(viewmodel.page.endDateLabel.toMessage)
       )
     )
 
     @govukButton(
-      ButtonViewModel(messages("site.saveAndContinue"))
+      ButtonViewModel(renderMessage(viewmodel.buttonText))
     )
   }
 }

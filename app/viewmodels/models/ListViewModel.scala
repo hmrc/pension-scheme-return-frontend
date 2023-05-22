@@ -16,8 +16,6 @@
 
 package viewmodels.models
 
-import models.Pagination
-import play.api.mvc.Call
 import viewmodels.DisplayMessage
 import viewmodels.DisplayMessage.Message
 
@@ -30,13 +28,10 @@ case class ListRow(
 )
 
 case class ListViewModel(
-  title: Message,
-  heading: Message,
+  inset: DisplayMessage,
   rows: List[ListRow],
   radioText: Message,
-  insetText: Message,
   // whether to render the radio buttons to add another entity to the list or continue
   showRadios: Boolean = true,
-  paginatedViewModel: Option[PaginatedViewModel] = None,
-  onSubmit: Call
+  paginatedViewModel: Option[PaginatedViewModel] = None
 )

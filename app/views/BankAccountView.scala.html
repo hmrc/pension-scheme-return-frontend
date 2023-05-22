@@ -22,7 +22,7 @@
     govukInput: GovukInput
 )
 
-@(form: Form[BankAccount], viewmodel: BankAccountViewModel)(implicit request: Request[_], messages: Messages)
+@(form: Form[BankAccount], viewmodel: PageViewModel[BankAccountViewModel])(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(viewmodel.title.toMessage)) {
 
@@ -34,37 +34,37 @@
 
         <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
 
-        <p class="govuk-body">@renderMessage(viewmodel.paragraph)</p>
+        viewmodel.description.map(renderMessage)
 
         @govukInput(
             InputViewModel(
                 field = form("bankName"),
-                label = LabelViewModel(renderMessage(viewmodel.bankNameHeading))
+                label = LabelViewModel(renderMessage(viewmodel.page.bankNameHeading))
             )
         )
 
         @govukInput(
             InputViewModel(
                 field = form("accountNumber"),
-                label = LabelViewModel(renderMessage(viewmodel.accountNumberHeading))
+                label = LabelViewModel(renderMessage(viewmodel.page.accountNumberHeading))
             )
             .asNumeric()
             .withWidth(InputWidth.Fixed10)
-            .withHint(HintViewModel(renderMessage(viewmodel.accountNumberHint)))
+            .withHint(HintViewModel(renderMessage(viewmodel.page.accountNumberHint)))
         )
 
         @govukInput(
             InputViewModel(
                 field = form("sortCode"),
-                label = LabelViewModel(renderMessage(viewmodel.sortCodeHeading))
+                label = LabelViewModel(renderMessage(viewmodel.page.sortCodeHeading))
             )
             .asNumeric()
             .withWidth(InputWidth.Fixed5)
-            .withHint(HintViewModel(renderMessage(viewmodel.sortCodeHint)))
+            .withHint(HintViewModel(renderMessage(viewmodel.page.sortCodeHint)))
         )
 
         @govukButton(
-            ButtonViewModel(viewmodel.buttonText.toMessage)
+            ButtonViewModel(renderMessage(viewmodel.buttonText))
         )
     }
 }

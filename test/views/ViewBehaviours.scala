@@ -49,6 +49,17 @@ trait ViewBehaviours {
       }
     }
 
+  def renderDescription[A](gen: Gen[A])(view: A => Html, key: A => Option[DisplayMessage]): Behaviours.BehaviourTest =
+    Behaviours.BehaviourTest(
+      "render the description",
+      () => {
+        forAll(gen) { viewmodel =>
+          elementText(view(viewmodel)).flatMap(_.split(" ")) must contain allElementsOf
+            key(viewmodel).toList.flatMap(allMessages).map(_.key)
+        }
+      }
+    )
+
   def renderInputWithH1Label[A](
     gen: Gen[A]
   )(name: String, view: A => Html, heading: A => DisplayMessage, label: A => Option[DisplayMessage]): Unit =
@@ -131,17 +142,20 @@ trait ViewBehaviours {
       }
     }
 
-  def renderErrors[A](gen: Gen[A])(view: A => Html, error: A => String): Unit = {
-    "render required error summary" in {
-      forAll(gen) { viewModel =>
-        errorSummary(view(viewModel)).text() must include(error(viewModel))
-      }
-    }
-
-    "render required error message" in {
-      forAll(gen) { viewModel =>
-        errorMessage(view(viewModel)).text() must include(error(viewModel))
-      }
-    }
-  }
+  def renderErrors[A](gen: Gen[A])(view: A => Html, error: A => String): Behaviours.MultipleBehaviourTests =
+    Behaviours.MultipleBehaviourTests(
+      "render all errors",
+      List(
+        "render required error summary".hasBehaviour {
+          forAll(gen) { viewModel =>
+            errorSummary(view(viewModel)).text() must include(error(viewModel))
+          }
+        },
+        "render required error message".hasBehaviour {
+          forAll(gen) { viewModel =>
+            errorMessage(view(viewModel)).text() must include(error(viewModel))
+          }
+        }
+      )
+    )
 }
