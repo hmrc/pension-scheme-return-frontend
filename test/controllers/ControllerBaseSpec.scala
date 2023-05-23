@@ -17,8 +17,10 @@
 package controllers
 
 import controllers.actions._
+import generators.ModelGenerators.srnGen
 import models.UserAnswers.SensitiveJsObject
 import models._
+import org.scalatest.OptionValues
 import play.api.Application
 import play.api.data.Form
 import play.api.http._
@@ -29,7 +31,7 @@ import play.api.mvc.Call
 import play.api.test._
 import queries.Settable
 import uk.gov.hmrc.time.TaxYear
-import utils.BaseSpec
+import utils.{BaseSpec, DisplayMessageUtils}
 
 import java.time.{LocalDate, LocalDateTime}
 
@@ -44,7 +46,8 @@ trait ControllerBaseSpec
     with PlayRunners
     with RouteInvokers
     with ResultExtractors
-    with TestValues {
+    with TestValues
+    with DisplayMessageUtils {
 
   val baseUrl = "/pension-scheme-return"
 
@@ -81,13 +84,15 @@ trait ControllerBaseSpec
   }
 }
 
-trait TestValues { _: BaseSpec =>
+trait TestValues { _: OptionValues =>
   val accountNumber = "12345678"
   val sortCode = "123456"
   val srn: SchemeId.Srn = srnGen.sample.value
   val schemeName = "testSchemeName"
   val email = "testEmail"
   val uploadKey: UploadKey = UploadKey("test-userid", srn)
+  val reference: Reference = Reference("test-ref")
+  val uploadFileName = "test-file-name"
 
   val userAnswersId: String = "id"
   def emptyUserAnswers: UserAnswers = UserAnswers(userAnswersId)
@@ -122,4 +127,6 @@ trait TestValues { _: BaseSpec =>
     "testLastName",
     LocalDate.of(1990, 12, 12)
   )
+
+  val uploadSuccessful: UploadStatus.Success = UploadStatus.Success(uploadFileName, "text/csv", "test-url", None)
 }

@@ -19,25 +19,18 @@ package viewmodels.models
 import play.api.mvc.Call
 import viewmodels.DisplayMessage
 import viewmodels.DisplayMessage.{BlockMessage, CompoundMessage, LinkMessage, ListMessage, Message, ParagraphMessage}
+import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
 
 case class FurtherDetailsViewModel(title: Message, contents: DisplayMessage)
 
 case class YesNoPageViewModel(
-  title: Message,
-  heading: Message,
-  description: List[DisplayMessage],
   legend: Option[Message] = None,
   hint: Option[Message] = None,
   yes: Option[Message] = None,
   no: Option[Message] = None,
-  refresh: Option[Int] = None,
-  details: Option[FurtherDetailsViewModel] = None,
-  onSubmit: Call
+  details: Option[FurtherDetailsViewModel] = None
 ) {
-
-  def withDescription(message: BlockMessage, messages: BlockMessage*): YesNoPageViewModel =
-    copy(description = description ++ (message :: messages.toList))
 
   def withHint(message: Message): YesNoPageViewModel =
     copy(hint = Some(message))
@@ -45,36 +38,11 @@ case class YesNoPageViewModel(
 
 object YesNoPageViewModel {
 
-  def apply(
-    title: Message,
-    heading: Message,
-    onSubmit: Call,
-    details: Option[FurtherDetailsViewModel]
-  ): YesNoPageViewModel =
-    YesNoPageViewModel(
+  def apply(title: Message, heading: Message, onSubmit: Call): PageViewModel[YesNoPageViewModel] =
+    PageViewModel(
       title,
       heading,
-      List(),
-      None,
-      None,
-      None,
-      None,
-      None,
-      details,
-      onSubmit = onSubmit
-    )
-
-  def apply(title: Message, heading: Message, onSubmit: Call): YesNoPageViewModel =
-    YesNoPageViewModel(
-      title,
-      heading,
-      List(),
-      None,
-      None,
-      None,
-      None,
-      None,
-      None,
-      onSubmit = onSubmit
+      YesNoPageViewModel(),
+      onSubmit
     )
 }

@@ -46,10 +46,13 @@ class FrontendAppConfig @Inject()(config: Configuration) { self =>
   val countdown: Int = config.get[Int]("timeout-dialog.countdown")
 
   val cacheTtl: Int = config.get[Int]("mongodb.timeToLiveInSeconds")
+  val uploadTtl: Int = config.get[Int]("mongodb.upload.timeToLiveInSeconds")
 
   val pensionsAdministrator: Service = config.get[Service]("microservice.services.pensionAdministrator")
   val pensionsScheme: Service = config.get[Service]("microservice.services.pensionsScheme")
+
   val upscan: Service = config.get[Service]("microservice.services.upscan")
+  val secureUpscanCallBack: Boolean = config.getOptional[Boolean]("microservice.services.upscan.secure").getOrElse(true)
 
   object features {
     val welshTranslation: Boolean = config.get[Boolean]("features.welsh-translation")

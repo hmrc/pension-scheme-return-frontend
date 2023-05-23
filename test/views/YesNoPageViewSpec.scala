@@ -18,7 +18,7 @@ package views
 
 import forms.YesNoPageFormProvider
 import play.api.test.FakeRequest
-import viewmodels.DisplayMessage.{ListMessage, ParagraphMessage}
+import viewmodels.models.YesNoPageViewModel
 import views.html.YesNoPageView
 
 class YesNoPageViewSpec extends ViewSpec {
@@ -28,84 +28,64 @@ class YesNoPageViewSpec extends ViewSpec {
 
     val view = injected[YesNoPageView]
 
+    val viewModelGen = pageViewModelGen[YesNoPageViewModel]
+
     "YesNoPageView" - {
 
       val requiredKey = "required"
       val invalidKey = "invalid"
 
       val yesNoForm = new YesNoPageFormProvider()(requiredKey, invalidKey)
+      val invalidForm = yesNoForm.bind(Map("value" -> ""))
 
-      act.like(renderTitle(yesNoPageViewModelGen())(view(yesNoForm, _), _.title.key))
-      act.like(renderHeading(yesNoPageViewModelGen())(view(yesNoForm, _), _.heading))
-      act.like(renderSaveAndContinueButton(yesNoPageViewModelGen())(view(yesNoForm, _)))
-      act.like(renderForm(yesNoPageViewModelGen())(view(yesNoForm, _), _.onSubmit))
-
-      "have a paragraph description when present" in {
-
-        forAll(yesNoPageViewModelGen()) { viewmodel =>
-          p(view(yesNoForm, viewmodel)) must contain allElementsOf viewmodel.description
-            .collect {
-              case p: ParagraphMessage => p
-            }
-            .map(renderText)
-        }
-      }
-
-      "have a list description when present" in {
-
-        forAll(yesNoPageViewModelGen()) { viewModel =>
-          li(view(yesNoForm, viewModel)) must contain allElementsOf viewModel.description
-            .collect {
-              case l: ListMessage => l
-            }
-            .flatMap(_.content.toList)
-            .map(renderText)
-        }
-      }
-
-      "does not have a description when not present" in {
-
-        forAll(yesNoPageViewModelGen()) { viewmodel =>
-          p(view(yesNoForm, viewmodel.copy(description = Nil, details = Option.empty))) mustBe Nil
-        }
-      }
+      act.like(renderTitle(viewModelGen)(view(yesNoForm, _), _.title.key))
+      act.like(renderHeading(viewModelGen)(view(yesNoForm, _), _.heading))
+      act.like(renderDescription(viewModelGen)(view(yesNoForm, _), _.description))
+      act.like(renderButtonText(viewModelGen)(view(yesNoForm, _), _.buttonText))
+      act.like(renderForm(viewModelGen)(view(yesNoForm, _), _.onSubmit))
+      act.like(renderErrors(viewModelGen)(view(invalidForm, _), _ => requiredKey))
 
       "have a legend" in {
 
-        forAll(yesNoPageViewModelGen()) { viewmodel =>
-          whenever(viewmodel.legend.nonEmpty) {
+        forAll(viewModelGen) { viewmodel =>
+          whenever(viewmodel.page.legend.nonEmpty) {
 
-            legend(view(yesNoForm, viewmodel)) must contain(viewmodel.legend.map(_.toMessage).value)
+            legend(view(yesNoForm, viewmodel)) must contain(viewmodel.page.legend.map(_.toMessage).value)
           }
         }
       }
 
       "have radio button values" in {
 
-        forAll(yesNoPageViewModelGen()) { viewmodel =>
+        forAll(viewModelGen) { viewmodel =>
           radios(view(yesNoForm, viewmodel)).map(_.value) mustBe List("true", "false")
         }
       }
 
       "have radio button labels" - {
 
-        "for static labels" in {
-          forAll(yesNoPageViewModelGen(false)) { viewmodel =>
-            radios(view(yesNoForm, viewmodel)).map(_.label) mustBe List(messages("site.yes"), messages("site.no"))
+        "yes" in {
+          forAll(viewModelGen) { viewmodel =>
+            whenever(viewmodel.page.yes.nonEmpty) {
+              radios(view(yesNoForm, viewmodel))
+                .map(_.label) must contain(viewmodel.page.yes.value.toMessage)
+            }
           }
         }
 
-        "for generated labels" in {
-          forAll(yesNoPageViewModelGen(true)) { viewmodel =>
-            radios(view(yesNoForm, viewmodel))
-              .map(_.label) mustBe List(viewmodel.yes.value.toMessage, viewmodel.no.value.toMessage)
+        "no" in {
+          forAll(viewModelGen) { viewmodel =>
+            whenever(viewmodel.page.no.nonEmpty) {
+              radios(view(yesNoForm, viewmodel))
+                .map(_.label) must contain(viewmodel.page.no.value.toMessage)
+            }
           }
         }
       }
 
       "have error summary" in {
 
-        forAll(yesNoPageViewModelGen()) { viewmodel =>
+        forAll(viewModelGen) { viewmodel =>
           val invalidForm = yesNoForm.bind(Map("value" -> ""))
           errorSummary(view(invalidForm, viewmodel)).text() must include(requiredKey)
         }
@@ -113,7 +93,7 @@ class YesNoPageViewSpec extends ViewSpec {
 
       "have error message" in {
 
-        forAll(yesNoPageViewModelGen()) { viewmodel =>
+        forAll(viewModelGen) { viewmodel =>
           val invalidForm = yesNoForm.bind(Map("value" -> ""))
           errorMessage(view(invalidForm, viewmodel)).text() must include(requiredKey)
         }

@@ -25,7 +25,7 @@
     govukButton: GovukButton,
 )
 
-@(form: Form[_], viewmodel: RadioListViewModel)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], viewmodel: PageViewModel[RadioListViewModel])(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, viewmodel.title.toMessage)) {
 
@@ -35,20 +35,20 @@
           @govukErrorSummary(ErrorSummaryViewModel(form))
          }
 
-        <h1 class="govuk-heading-l">@viewmodel.heading.toMessage</h1>
+        <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
 
-        @viewmodel.contents.map(renderMessage)
+        @viewmodel.description.map(renderMessage)
 
         @govukRadios(
             RadiosViewModel(
                 field = form("value"),
-                viewmodel.items.map(_.radioListRow),
-                legend = viewmodel.legend.map(legend => LegendViewModel(legend.toMessage).withSize(LegendSize.Medium))
+                viewmodel.page.items.map(_.radioListRow),
+                legend = viewmodel.page.legend.map(legend => LegendViewModel(legend.toMessage).withSize(LegendSize.Medium))
             )
         )
 
         @govukButton(
-            ButtonViewModel(messages("site.saveAndContinue"))
+            ButtonViewModel(renderMessage(viewmodel.buttonText))
         )
     }
 }

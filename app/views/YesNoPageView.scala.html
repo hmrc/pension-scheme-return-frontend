@@ -14,9 +14,8 @@
  * limitations under the License.
  *@
 
-@import viewmodels.models.YesNoPageViewModel
 @import viewmodels.LegendSize
-@import utils.ListUtils._
+@import viewmodels.models.YesNoPageViewModel
 
 @this(
   layout: templates.Layout,
@@ -27,7 +26,7 @@
   govukButton: GovukButton,
 )
 
-@(form: Form[Boolean], viewmodel: YesNoPageViewModel)(implicit request: Request[_], messages: Messages)
+@(form: Form[Boolean], viewmodel: PageViewModel[YesNoPageViewModel])(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, viewmodel.title.toMessage), refresh = viewmodel.refresh) {
 
@@ -37,22 +36,22 @@
       @govukErrorSummary(ErrorSummaryViewModel(form))
     }
 
-    <h1 class="govuk-heading-l">@viewmodel.heading.toMessage</h1>
+    <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
 
-    <div class="govuk-hint">@viewmodel.hint.map(renderMessage)</div>
+    <div class="govuk-hint">@viewmodel.page.hint.map(renderMessage)</div>
 
     @viewmodel.description.map(renderMessage)
 
     @govukRadios(
         RadiosViewModel.yesNo(
             field = form("value"),
-            legend = viewmodel.legend.map(legend => LegendViewModel(legend.toMessage).withSize(LegendSize.Medium)),
-            yes = viewmodel.yes.map(renderMessage(_)),
-            no = viewmodel.no.map(renderMessage(_))
+            legend = viewmodel.page.legend.map(legend => LegendViewModel(legend.toMessage).withSize(LegendSize.Medium)),
+            yes = viewmodel.page.yes.map(renderMessage(_)),
+            no = viewmodel.page.no.map(renderMessage(_))
         )
     )
 
-    @viewmodel.details.map { detail =>
+    @viewmodel.page.details.map { detail =>
             @govukDetails(
                 DetailsViewModel(
                     renderMessage(detail.title),
@@ -62,7 +61,7 @@
     }
 
     @govukButton(
-      ButtonViewModel(messages("site.saveAndContinue"))
+      ButtonViewModel(renderMessage(viewmodel.buttonText))
     )
   }
 }

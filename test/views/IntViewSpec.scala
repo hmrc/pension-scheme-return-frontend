@@ -41,9 +41,9 @@ class IntViewSpec extends ViewSpec with Mappings {
 
     val invalidForm = intForm.bind(Map("value" -> ""))
 
-    val singleIntViewModel = intViewModelGen(singleQuestionGen(intForm))
-    val invalidViewModel = intViewModelGen(singleQuestionGen(invalidForm))
-    val tripleIntViewModel = intViewModelGen(tripleQuestionGen(tripleIntForm))
+    val singleIntViewModel = pageViewModelGen(singleQuestionGen(intForm))
+    val invalidViewModel = pageViewModelGen(singleQuestionGen(invalidForm))
+    val tripleIntViewModel = pageViewModelGen(tripleQuestionGen(tripleIntForm))
     val viewModelGen = Gen.oneOf(singleIntViewModel, tripleIntViewModel, invalidViewModel)
 
     implicit val request = FakeRequest()
@@ -53,12 +53,12 @@ class IntViewSpec extends ViewSpec with Mappings {
       act.like(renderTitle(viewModelGen)(view(_), _.title.key))
       act.like(renderHeading(viewModelGen)(view(_), _.heading))
       act.like(renderInputWithLabel(singleIntViewModel)("value", view(_), _.heading))
-      act.like(renderInputWithLabel(tripleIntViewModel)("value.1", view(_), _.questions.fields.head.label))
-      act.like(renderInputWithLabel(tripleIntViewModel)("value.2", view(_), _.questions.fields(1).label))
-      act.like(renderInputWithLabel(tripleIntViewModel)("value.3", view(_), _.questions.fields(2).label))
+      act.like(renderInputWithLabel(tripleIntViewModel)("value.1", view(_), _.page.fields.head.label))
+      act.like(renderInputWithLabel(tripleIntViewModel)("value.2", view(_), _.page.fields(1).label))
+      act.like(renderInputWithLabel(tripleIntViewModel)("value.3", view(_), _.page.fields(2).label))
       act.like(renderErrors(invalidViewModel)(view(_), _ => "int.error.required"))
       act.like(renderForm(viewModelGen)(view(_), _.onSubmit))
-      act.like(renderSaveAndContinueButton(viewModelGen)(view(_)))
+      act.like(renderButtonText(viewModelGen)(view(_), _.buttonText))
     }
   }
 }

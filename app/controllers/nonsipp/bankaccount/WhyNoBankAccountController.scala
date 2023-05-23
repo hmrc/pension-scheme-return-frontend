@@ -30,7 +30,7 @@ import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
-import viewmodels.models.TextAreaViewModel
+import viewmodels.models.{PageViewModel, TextAreaViewModel}
 import views.html.TextAreaView
 
 import javax.inject.{Inject, Named}
@@ -77,9 +77,10 @@ object WhyNoBankAccountController {
     "whyNoBankAccount.error.invalid"
   )
 
-  def viewModel(srn: Srn, schemeName: String, mode: Mode): TextAreaViewModel = TextAreaViewModel(
+  def viewModel(srn: Srn, schemeName: String, mode: Mode): PageViewModel[TextAreaViewModel] = PageViewModel(
     "whyNoBankAccount.title",
     Message("whyNoBankAccount.heading", schemeName),
+    TextAreaViewModel(),
     routes.WhyNoBankAccountController.onSubmit(srn, mode)
   )
 }

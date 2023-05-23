@@ -61,8 +61,6 @@ object DisplayMessage {
 
   case class TableMessage(content: NonEmptyList[(InlineMessage, DisplayMessage)]) extends BlockMessage
 
-  case object BreakPoint extends BlockMessage
-
   case class ListMessage(content: NonEmptyList[InlineMessage], listType: ListType) extends BlockMessage
 
   object ListMessage {

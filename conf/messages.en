@@ -433,3 +433,11 @@ sharesAcquired.linkMessage = Section 993 of the Income Tax Act 2007.
 unquotedShares.title = Did the scheme hold any unquoted shares during the period of this return?
 unquotedShares.heading = Did {0} hold any unquoted shares during the period of this return?
 unquotedShares.error.required = Select yes if the scheme held any unquoted shares during the period of this return
+
+checkingMemberDetailsFile.title = We are checking your member details file
+checkingMemberDetailsFile.heading = We are checking your member details file
+checkingMemberDetailsFile.paragraph = Do not close this page or leave the service.
+
+fileUploadSuccess.title = Your file upload was successful
+fileUploadSuccess.heading = Your file upload was successful
+fileUploadSuccess.paragraph = {0} was uploaded successfully.

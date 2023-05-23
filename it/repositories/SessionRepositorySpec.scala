@@ -1,35 +1,15 @@
 package repositories
 
 import config.{FakeCrypto, FrontendAppConfig}
-import generators.Generators
 import models.UserAnswers
 import models.UserAnswers.SensitiveJsObject
-import org.mockito.Mockito.when
 import org.mongodb.scala.bson.BsonDocument
 import org.mongodb.scala.model.Filters
-import org.scalatest.OptionValues
-import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
-import org.scalatestplus.mockito.MockitoSugar
-import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
 
-import java.time.temporal.ChronoUnit
-import java.time.{Clock, Instant, ZoneId}
+import java.time.Instant
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class SessionRepositorySpec
-  extends AnyFreeSpec
-    with Matchers
-    with DefaultPlayMongoRepositorySupport[UserAnswers]
-    with ScalaFutures
-    with IntegrationPatience
-    with OptionValues
-    with MockitoSugar
-    with Generators {
-
-  private val instant = Instant.now.truncatedTo(ChronoUnit.MILLIS)
-  private val stubClock: Clock = Clock.fixed(instant, ZoneId.systemDefault)
+class SessionRepositorySpec extends BaseRepositorySpec[UserAnswers] {
 
   private val savedAnswers = jsObjectGen(maxDepth = 5).sample.value
   private val userAnswers = UserAnswers("id", SensitiveJsObject(savedAnswers), Instant.ofEpochSecond(1))

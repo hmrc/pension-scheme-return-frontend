@@ -22,7 +22,7 @@
         govukTextarea: GovukTextarea
 )
 
-@(form: Form[String], viewmodel: TextAreaViewModel)(implicit request: Request[_], messages: Messages)
+@(form: Form[String], viewmodel: PageViewModel[TextAreaViewModel])(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(viewmodel.title.toMessage)) {
 
@@ -35,7 +35,7 @@
         @defining(
             TextareaViewModel("value", form("value").value)
                 .withLabelAsHeading(renderMessage(viewmodel.heading))
-                .withRows(5)
+                .withRows(viewmodel.page.rows)
         ) { component =>
             @govukTextarea(
                 form("value").errors.headOption.fold(component)(error =>
@@ -45,7 +45,7 @@
         }
 
         @govukButton(
-            ButtonViewModel(messages("site.saveAndContinue"))
+            ButtonViewModel(renderMessage(viewmodel.buttonText))
         )
     }
 }

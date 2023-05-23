@@ -16,19 +16,12 @@
 
 package viewmodels.models
 
-import play.api.mvc.Call
-import uk.gov.hmrc.play.bootstrap.graphite.DisabledMetrics
 import viewmodels.DisplayMessage
-import viewmodels.DisplayMessage.Message
 
 case class UploadViewModel(
-  title: Message,
-  heading: DisplayMessage,
-  content: DisplayMessage,
   detailsContent: DisplayMessage,
   acceptedFileType: String,
   maxFileSize: String,
   formFields: Map[String, String],
-  error: Option[String],
-  onSubmit: Call
+  error: Option[String]
 )

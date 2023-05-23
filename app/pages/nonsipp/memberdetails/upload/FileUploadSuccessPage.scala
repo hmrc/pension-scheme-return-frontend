@@ -14,15 +14,9 @@
  * limitations under the License.
  */
 
-package viewmodels.models
+package pages.nonsipp.memberdetails.upload
 
-import play.api.mvc.Call
-import viewmodels.DisplayMessage.{BlockMessage, Message}
+import models.SchemeId.Srn
+import pages.Page
 
-case class MoneyViewModel[A](
-  title: Message,
-  heading: Message,
-  description: Option[BlockMessage],
-  questions: MultipleQuestionsViewModel[A],
-  onSubmit: Call
-)
+case class FileUploadSuccessPage(srn: Srn) extends Page

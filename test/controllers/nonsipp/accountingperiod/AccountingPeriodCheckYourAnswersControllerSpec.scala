@@ -75,35 +75,37 @@ class AccountingPeriodCheckYourAnswersControllerSpec extends ControllerBaseSpec 
       "have the correct message key for heading" in {
 
         forAll(srnGen, dateRangeWithinRangeGen(dateRange)) { (srn, dateRange) =>
-          viewModel(srn, refineMV[OneToThree](1), dateRange).heading.key mustBe "checkYourAnswers.heading"
+          messageKey(viewModel(srn, refineMV[OneToThree](1), dateRange).heading) mustBe "checkYourAnswers.heading"
         }
       }
 
       "have the correct message key for start date" in {
 
         forAll(srnGen, dateRangeWithinRangeGen(dateRange)) { (srn, dateRange) =>
-          viewModel(srn, refineMV[OneToThree](1), dateRange).rows.map(_.key.key) must contain("site.startDate")
+          viewModel(srn, refineMV[OneToThree](1), dateRange).page.rows.map(_.key.key) must contain("site.startDate")
         }
       }
 
       "have the correct message key for end date" in {
 
         forAll(srnGen, dateRangeWithinRangeGen(dateRange)) { (srn, dateRange) =>
-          viewModel(srn, refineMV[OneToThree](1), dateRange).rows.map(_.key.key) must contain("site.endDate")
+          viewModel(srn, refineMV[OneToThree](1), dateRange).page.rows.map(_.key.key) must contain("site.endDate")
         }
       }
 
       "have the correct start date" in {
 
         forAll(srnGen, dateRangeWithinRangeGen(dateRange)) { (srn, dateRange) =>
-          viewModel(srn, refineMV[OneToThree](1), dateRange).rows.map(_.value.key) must contain(dateRange.from.show)
+          viewModel(srn, refineMV[OneToThree](1), dateRange).page.rows.map(_.value.key) must contain(
+            dateRange.from.show
+          )
         }
       }
 
       "have the correct end date" in {
 
         forAll(srnGen, dateRangeWithinRangeGen(dateRange)) { (srn, dateRange) =>
-          viewModel(srn, refineMV[OneToThree](1), dateRange).rows.map(_.value.key) must contain(dateRange.to.show)
+          viewModel(srn, refineMV[OneToThree](1), dateRange).page.rows.map(_.value.key) must contain(dateRange.to.show)
         }
       }
 
@@ -118,7 +120,8 @@ class AccountingPeriodCheckYourAnswersControllerSpec extends ControllerBaseSpec 
             SummaryAction(content, href, Message("site.endDate"))
           )
 
-          viewModel(srn, refineMV[OneToThree](1), dateRange).rows.flatMap(_.actions) must contain allElementsOf actions
+          viewModel(srn, refineMV[OneToThree](1), dateRange).page.rows
+            .flatMap(_.actions) must contain allElementsOf actions
         }
       }
 

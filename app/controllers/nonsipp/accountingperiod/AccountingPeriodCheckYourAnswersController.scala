@@ -29,7 +29,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.DateTimeUtils.localDateShow
-import viewmodels.models.{CheckYourAnswersRowViewModel, CheckYourAnswersViewModel, SummaryAction}
+import viewmodels.models.{CheckYourAnswersRowViewModel, CheckYourAnswersViewModel, PageViewModel, SummaryAction}
 import views.html.CheckYourAnswersView
 
 import javax.inject.Named
@@ -77,8 +77,9 @@ object AccountingPeriodCheckYourAnswersController {
       )
   )
 
-  def viewModel(srn: Srn, index: Max3, dateRange: DateRange): CheckYourAnswersViewModel = CheckYourAnswersViewModel(
-    rows(srn, index, dateRange),
-    routes.AccountingPeriodCheckYourAnswersController.onSubmit(srn)
-  )
+  def viewModel(srn: Srn, index: Max3, dateRange: DateRange): PageViewModel[CheckYourAnswersViewModel] =
+    CheckYourAnswersViewModel(
+      rows(srn, index, dateRange),
+      routes.AccountingPeriodCheckYourAnswersController.onSubmit(srn)
+    )
 }

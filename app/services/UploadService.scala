@@ -16,20 +16,22 @@
 
 package services
 
-import akka.stream.Materializer
 import akka.stream.scaladsl.Source
 import akka.util.ByteString
 import connectors.UpscanConnector
-import models.{InProgress, Reference, UploadDetails, UploadKey, UploadStatus, UpscanInitiateResponse}
+import models.UploadStatus.UploadStatus
+import models._
 import repositories.UploadRepository
 import uk.gov.hmrc.http.HeaderCarrier
 
+import java.time.{Clock, Instant}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class UploadService @Inject()(
   upscanConnector: UpscanConnector,
-  repository: UploadRepository
+  repository: UploadRepository,
+  clock: Clock
 )(implicit ec: ExecutionContext) {
 
   def initiateUpscan(callBackUrl: String, successRedirectUrl: String, failureRedirectUrl: String)(
@@ -40,15 +42,18 @@ class UploadService @Inject()(
   def registerUploadRequest(key: UploadKey, fileReference: Reference): Future[Unit] =
     for {
       _ <- repository.remove(key)
-      _ <- repository.insert(UploadDetails(key, fileReference, InProgress))
+      _ <- repository.insert(UploadDetails(key, fileReference, UploadStatus.InProgress, Instant.now(clock)))
     } yield ()
 
   def registerUploadResult(reference: Reference, uploadStatus: UploadStatus): Future[Unit] =
-    repository.updateStatus(reference, uploadStatus).map(_ => ())
+    repository.updateStatus(reference, uploadStatus)
 
   def getUploadResult(key: UploadKey): Future[Option[UploadStatus]] =
-    repository.find(key).map(_.map(_.status))
+    repository.getUploadDetails(key).map(_.map(_.status))
 
   def stream(downloadUrl: String)(implicit hc: HeaderCarrier): Future[Source[ByteString, _]] =
     upscanConnector.download(downloadUrl).map(_.bodyAsSource)
+
+  def saveValidatedUpload(uploadKey: UploadKey, uploadResult: Upload): Future[Unit] =
+    repository.setUploadResult(uploadKey, uploadResult)
 }

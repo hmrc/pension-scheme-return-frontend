@@ -19,6 +19,7 @@ package views
 import forms.mappings.Mappings
 import play.api.data
 import play.api.test.FakeRequest
+import viewmodels.models.TextInputViewModel
 import views.html.TextInputView
 
 class TextInputViewSpec extends ViewSpec with Mappings {
@@ -34,14 +35,16 @@ class TextInputViewSpec extends ViewSpec with Mappings {
 
     implicit val request = FakeRequest()
 
+    val viewModelGen = pageViewModelGen[TextInputViewModel]
+
     "TextInputView" - {
 
-      act.like(renderTitle(textInputViewModelGen)(view(textInputForm, _), _.title.key))
-      act.like(renderHeading(textInputViewModelGen)(view(textInputForm, _), _.heading))
-      act.like(renderInputWithH1Label(textInputViewModelGen)("value", view(textInputForm, _), _.heading, _.label))
-      act.like(renderErrors(textInputViewModelGen)(view(invalidForm, _), _ => "text.error.required"))
-      act.like(renderForm(textInputViewModelGen)(view(textInputForm, _), _.onSubmit))
-      act.like(renderSaveAndContinueButton(textInputViewModelGen)(view(textInputForm, _)))
+      act.like(renderTitle(viewModelGen)(view(textInputForm, _), _.title.key))
+      act.like(renderHeading(viewModelGen)(view(textInputForm, _), _.heading))
+      act.like(renderInputWithH1Label(viewModelGen)("value", view(textInputForm, _), _.heading, _.page.label))
+      act.like(renderErrors(viewModelGen)(view(invalidForm, _), _ => "text.error.required"))
+      act.like(renderForm(viewModelGen)(view(textInputForm, _), _.onSubmit))
+      act.like(renderButtonText(viewModelGen)(view(textInputForm, _), _.buttonText))
     }
   }
 }

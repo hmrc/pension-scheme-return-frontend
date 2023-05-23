@@ -18,6 +18,7 @@ package views
 
 import forms.mappings.Mappings
 import play.api.test.FakeRequest
+import viewmodels.models.UploadViewModel
 import views.html.UploadView
 
 class UploadViewSpec extends ViewSpec with Mappings {
@@ -27,16 +28,21 @@ class UploadViewSpec extends ViewSpec with Mappings {
 
     implicit val request = FakeRequest()
 
+    val viewModelGen = pageViewModelGen[UploadViewModel]
+
+    val successViewModelGen = viewModelGen.retryUntil(_.page.error.isEmpty)
+    val errorViewModelGen = viewModelGen.retryUntil(_.page.error.nonEmpty)
+
     "UploadView" - {
-      act.like(renderTitle(uploadViewModelGen(false))(view(_), _.title.key))
-      act.like(renderHeading(uploadViewModelGen(false))(view(_), _.heading))
-      act.like(renderForm(uploadViewModelGen(false))(view(_), _.onSubmit))
-      act.like(renderUpload(uploadViewModelGen(false))(view(_)))
-      act.like(renderErrors(uploadViewModelGen(true))(view(_), _.error.value))
-      act.like(renderInset(uploadViewModelGen(true))(view(_), _.acceptedFileType).updateName(_ + " AcceptedFileType"))
-      act.like(renderInset(uploadViewModelGen(true))(view(_), _.maxFileSize).updateName(_ + " MaxFileSize"))
-      act.like(renderDetails(uploadViewModelGen(false))(view(_), vm => messageKey(vm.detailsContent)))
-      act.like(renderSaveAndContinueButton(uploadViewModelGen(false))(view(_)))
+      act.like(renderTitle(successViewModelGen)(view(_), _.title.key))
+      act.like(renderHeading(successViewModelGen)(view(_), _.heading))
+      act.like(renderForm(successViewModelGen)(view(_), _.onSubmit))
+      act.like(renderUpload(successViewModelGen)(view(_)))
+      act.like(renderErrors(errorViewModelGen)(view(_), _.page.error.value))
+      act.like(renderInset(errorViewModelGen)(view(_), _.page.acceptedFileType).updateName(_ + " AcceptedFileType"))
+      act.like(renderInset(errorViewModelGen)(view(_), _.page.maxFileSize).updateName(_ + " MaxFileSize"))
+      act.like(renderDetails(successViewModelGen)(view(_), vm => messageKey(vm.page.detailsContent)))
+      act.like(renderButtonText(successViewModelGen)(view(_), _.buttonText))
     }
   }
 }

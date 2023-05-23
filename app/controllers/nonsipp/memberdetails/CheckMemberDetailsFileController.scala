@@ -20,8 +20,8 @@ import akka.stream.Materializer
 import controllers.actions._
 import controllers.nonsipp.memberdetails.CheckMemberDetailsFileController._
 import forms.YesNoPageFormProvider
-import models.{Mode, UploadKey, UploadedSuccessfully}
 import models.SchemeId.Srn
+import models.{Mode, UploadKey, UploadStatus}
 import navigation.Navigator
 import pages.nonsipp.memberdetails.CheckMemberDetailsFilePage
 import play.api.data.Form
@@ -30,9 +30,10 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{MemberDetailsUploadValidator, SaveService, UploadService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage
-import viewmodels.DisplayMessage.{BreakPoint, Message, ParagraphMessage}
+import viewmodels.DisplayMessage.{Message, ParagraphMessage}
+import viewmodels.DisplayMessage.ParagraphMessage
 import viewmodels.implicits._
-import viewmodels.models.YesNoPageViewModel
+import viewmodels.models.{PageViewModel, YesNoPageViewModel}
 import views.html.YesNoPageView
 
 import javax.inject.{Inject, Named}
@@ -58,12 +59,10 @@ class CheckMemberDetailsFileController @Inject()(
     val preparedForm = request.userAnswers.fillForm(CheckMemberDetailsFilePage(srn), form)
     val uploadKey = UploadKey.fromRequest(srn)
 
-    // todo: This can be None while we wait for the callback where we don't display the file name
-    //       but still requires content for that scenario.
-    //       Meta-equiv refresh is in place if None
     uploadService.getUploadResult(uploadKey).map {
       case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-      case Some(upload: UploadedSuccessfully) => Ok(view(preparedForm, viewModel(srn, Some(upload.name), mode)))
+      case Some(upload: UploadStatus.Success) =>
+        Ok(view(preparedForm, viewModel(srn, Some(upload.name), mode)))
       case Some(_) => Ok(view(preparedForm, viewModel(srn, None, mode)))
     }
   }
@@ -83,10 +82,10 @@ class CheckMemberDetailsFileController @Inject()(
             case Some(file) =>
               for {
                 source <- uploadService.stream(file.downloadUrl)
+                validated <- uploadValidator.validateCSV(source)
+                _ <- uploadService.saveValidatedUpload(uploadKey, validated)
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(CheckMemberDetailsFilePage(srn), value))
                 _ <- saveService.save(updatedAnswers)
-                _ <- uploadValidator
-                  .validateCSV(srn, updatedAnswers, source) // todo should we detach this process from stack?
               } yield Redirect(navigator.nextPage(CheckMemberDetailsFilePage(srn), mode, updatedAnswers))
           }
       )
@@ -94,11 +93,11 @@ class CheckMemberDetailsFileController @Inject()(
 
   // todo: handle all Upscan upload states
   //       None is an error case as the initial state set on the previous page should be InProgress
-  private def getUploadedFile(uploadKey: UploadKey): Future[Option[UploadedSuccessfully]] =
+  private def getUploadedFile(uploadKey: UploadKey): Future[Option[UploadStatus.Success]] =
     uploadService
       .getUploadResult(uploadKey)
       .map {
-        case Some(upload: UploadedSuccessfully) => Some(upload)
+        case Some(upload: UploadStatus.Success) => Some(upload)
         case _ => None
       }
 }
@@ -108,18 +107,20 @@ object CheckMemberDetailsFileController {
     "checkMemberDetailsFile.error.required"
   )
 
-  def viewModel(srn: Srn, fileName: Option[String], mode: Mode): YesNoPageViewModel = {
+  def viewModel(srn: Srn, fileName: Option[String], mode: Mode): PageViewModel[YesNoPageViewModel] = {
     val refresh = if (fileName.isEmpty) Some(1) else None
-    YesNoPageViewModel(
+    PageViewModel(
       "checkMemberDetailsFile.title",
       "checkMemberDetailsFile.heading",
-      fileName.map(name => ParagraphMessage(name) ++ BreakPoint).toList,
-      legend = Some("checkMemberDetailsFile.legend"),
-      yes = Some("checkMemberDetailsFile.yes"),
-      no = Some("checkMemberDetailsFile.no"),
-      refresh = refresh,
-      details = None,
+      YesNoPageViewModel(
+        legend = Some("checkMemberDetailsFile.legend"),
+        yes = Some("checkMemberDetailsFile.yes"),
+        no = Some("checkMemberDetailsFile.no")
+      ),
       onSubmit = routes.CheckMemberDetailsFileController.onSubmit(srn, mode)
-    )
+    ).refreshPage(refresh)
+      .withDescription(
+        fileName.map(name => ParagraphMessage(name))
+      )
   }
 }

@@ -20,11 +20,16 @@ import org.jsoup.Jsoup
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.i18n.Messages
 import play.twirl.api.Html
-import utils.BaseSpec
+import utils.{BaseSpec, DisplayMessageUtils}
 import viewmodels.DisplayMessage
 import views.components.Components
 
-trait ViewSpec extends BaseSpec with ScalaCheckPropertyChecks with HtmlHelper with ViewBehaviours {
+trait ViewSpec
+    extends BaseSpec
+    with ScalaCheckPropertyChecks
+    with HtmlHelper
+    with ViewBehaviours
+    with DisplayMessageUtils {
 
   def renderedErrorMessage(key: String) = s"Error: $key"
 

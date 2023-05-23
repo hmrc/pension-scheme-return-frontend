@@ -18,33 +18,27 @@ package viewmodels.models
 
 import play.api.mvc.Call
 import viewmodels.DisplayMessage
-import viewmodels.DisplayMessage.Message
+import viewmodels.DisplayMessage.{InlineMessage, Message}
 
 case class ContentTablePageViewModel(
-  title: Message,
-  heading: DisplayMessage,
-  rows: List[(DisplayMessage, DisplayMessage)],
   inset: DisplayMessage,
-  buttonText: DisplayMessage,
-  onSubmit: Call
+  rows: List[(DisplayMessage, DisplayMessage)]
 )
 
 object ContentTablePageViewModel {
 
   def apply(
-    title: String,
-    heading: DisplayMessage,
+    title: Message,
+    heading: InlineMessage,
     inset: DisplayMessage,
-    buttonText: DisplayMessage,
+    buttonText: Message,
     onSubmit: Call,
     rows: (DisplayMessage, DisplayMessage)*
-  ): ContentTablePageViewModel =
-    ContentTablePageViewModel(
-      Message(title),
+  ): PageViewModel[ContentTablePageViewModel] =
+    PageViewModel(
+      title,
       heading,
-      rows.toList,
-      inset,
-      buttonText,
+      ContentTablePageViewModel(inset, rows.toList),
       onSubmit
-    )
+    ).withButtonText(buttonText)
 }
