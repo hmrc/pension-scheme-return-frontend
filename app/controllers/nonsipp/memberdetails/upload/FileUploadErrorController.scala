@@ -19,7 +19,7 @@ package controllers.nonsipp.memberdetails.upload
 import controllers.actions._
 import controllers.nonsipp.memberdetails.upload.FileUploadErrorController._
 import models.SchemeId.Srn
-import models.{Mode, UploadFormatError, UploadKey, UploadStatus}
+import models.{Mode, UploadErrors, UploadFormatError, UploadKey, UploadStatus}
 import navigation.Navigator
 import pages.nonsipp.memberdetails.upload.FileUploadErrorPage
 import play.api.i18n._
@@ -47,7 +47,7 @@ class FileUploadErrorController @Inject()(
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
     uploadService.getUploadResult(UploadKey.fromRequest(srn)).map {
-      case Some(UploadFormatError) => Ok(view(viewModel(srn, mode)))
+      case Some(UploadFormatError) | Some(_: UploadErrors) => Ok(view(viewModel(srn, mode)))
       case _ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
     }
   }
