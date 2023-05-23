@@ -65,7 +65,8 @@
             @govukRadios(
               RadiosViewModel.yesNo(
                 field = form("value"),
-                legend = LegendViewModel(renderMessage(viewmodel.page.radioText)).withSize(LegendSize.Medium)
+                fieldset = FieldsetViewModel(LegendViewModel(renderMessage(viewmodel.page.radioText)).withSize(LegendSize.Medium)),
+                yesHint = viewmodel.page.yesHintText.map(renderMessage)
               )
             )
         } else {

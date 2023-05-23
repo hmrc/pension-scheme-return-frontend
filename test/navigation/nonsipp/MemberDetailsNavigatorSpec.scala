@@ -19,8 +19,10 @@ package navigation.nonsipp
 import config.Refined.OneTo99
 import controllers.nonsipp.employercontributions
 import controllers.nonsipp.memberdetails.routes
+import eu.timepit.refined.api.Refined
 import eu.timepit.refined.refineMV
 import generators.IndexGen
+import models.ManualOrUpload.{Manual, Upload}
 import models.SchemeId.Srn
 import models.{CheckOrChange, ManualOrUpload, NormalMode}
 import navigation.{Navigator, NavigatorBehaviours}
@@ -119,7 +121,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         normalmode
           .navigateTo(
             SchemeMemberDetailsAnswersPage,
-            (srn, _) => routes.SchemeMembersListController.onPageLoad(srn, page = 1)
+            (srn, _) => routes.SchemeMembersListController.onPageLoad(srn, page = 1, Manual)
           )
           .withName("go from scheme member details answers page to scheme members list Page")
       )
@@ -127,30 +129,60 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       act.like(
         normalmode
           .navigateFromListPage(
-            SchemeMembersListPage(_, addMember = true),
+            SchemeMembersListPage(_, addMember = true, Manual),
             MemberDetailsPage,
             nameDobGen,
             IndexGen[OneTo99](min = 1, max = 99),
             routes.MemberDetailsController.onPageLoad,
             employercontributions.routes.EmployerContributionsController.onPageLoad
           )
-          .withName("go from scheme members list page to member details page when yes selected")
+          .withName(
+            "go from scheme members list page to member details page when yes selected during the manual journey"
+          )
+      )
+
+      act.like(
+        normalmode
+          .navigateFromListPage(
+            SchemeMembersListPage(_, addMember = true, Upload),
+            MemberDetailsPage,
+            nameDobGen,
+            IndexGen[OneTo99](min = 1, max = 99),
+            (srn, _: Refined[Int, OneTo99], _) => routes.PensionSchemeMembersController.onPageLoad(srn),
+            (srn, _) => routes.PensionSchemeMembersController.onPageLoad(srn)
+          )
+          .withName(
+            "go from scheme members list page to member details page when yes selected during the upload journey"
+          )
       )
 
       act.like(
         normalmode
           .navigateTo(
-            SchemeMembersListPage(_, addMember = false),
+            SchemeMembersListPage(_, addMember = false, Manual),
             employercontributions.routes.EmployerContributionsController.onPageLoad
           )
-          .withName("go from scheme members list page to employer contributions page when no selected")
+          .withName(
+            "go from scheme members list page to employer contributions page when no selected during the manual journey"
+          )
+      )
+
+      act.like(
+        normalmode
+          .navigateTo(
+            SchemeMembersListPage(_, addMember = false, Upload),
+            employercontributions.routes.EmployerContributionsController.onPageLoad
+          )
+          .withName(
+            "go from scheme members list page to employer contributions page when no selected during the upload journey"
+          )
       )
 
       act.like(
         normalmode
           .navigateTo(
             RemoveMemberDetailsPage,
-            (srn, _) => routes.SchemeMembersListController.onPageLoad(srn, page = 1)
+            (srn, _) => routes.SchemeMembersListController.onPageLoad(srn, page = 1, Manual)
           )
           .withName("go from remove page to list page")
       )
@@ -205,7 +237,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         normalmode
           .navigateTo(
             FileUploadSuccessPage,
-            (srn, _) => controllers.nonsipp.memberdetails.routes.SchemeMembersListController.onPageLoad(srn, 1)
+            (srn, _) => controllers.nonsipp.memberdetails.routes.SchemeMembersListController.onPageLoad(srn, 1, Upload)
           )
           .withName("go from file upload success page to scheme members list page")
       )
