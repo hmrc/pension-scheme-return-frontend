@@ -30,7 +30,7 @@ import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.{ListMessage, ListType, ParagraphMessage}
 import viewmodels.implicits._
-import viewmodels.models.YesNoPageViewModel
+import viewmodels.models.{PageViewModel, YesNoPageViewModel}
 import views.html.YesNoPageView
 
 import javax.inject.{Inject, Named}
@@ -74,13 +74,13 @@ object PersonalContributionsController {
     "personalContributions.error.required"
   )
 
-  def viewModel(srn: Srn, mode: Mode): YesNoPageViewModel =
+  def viewModel(srn: Srn, mode: Mode): PageViewModel[YesNoPageViewModel] =
     YesNoPageViewModel(
       "personalContributions.title",
       "personalContributions.heading",
       routes.PersonalContributionsController.onSubmit(srn, mode)
     ).withDescription(
-      ParagraphMessage("personalContributions.paragraph"),
-      ListMessage(ListType.Bullet, "personalContributions.listItem1", "personalContributions.listItem2")
+      ParagraphMessage("personalContributions.paragraph") ++
+        ListMessage(ListType.Bullet, "personalContributions.listItem1", "personalContributions.listItem2")
     )
 }

@@ -23,9 +23,10 @@ import eu.timepit.refined.{refineMV, refineV}
 import models.CheckOrChange.Check
 import models.{CheckMode, CheckOrChange, ManualOrUpload, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
-import pages.Page
+import pages.{CheckingMemberDetailsFilePage, Page}
 import pages.nonsipp.memberdetails.MembersDetails.MembersDetailsOps
 import pages.nonsipp.memberdetails._
+import pages.nonsipp.memberdetails.upload.FileUploadSuccessPage
 import play.api.mvc.Call
 
 object MemberDetailsNavigator extends JourneyNavigator {
@@ -74,10 +75,20 @@ object MemberDetailsNavigator extends JourneyNavigator {
 
     case page @ CheckMemberDetailsFilePage(srn) =>
       if (userAnswers.get(page).contains(true)) {
-        controllers.routes.UnauthorisedController.onPageLoad()
+        controllers.nonsipp.memberdetails.upload.routes.CheckingMemberDetailsFileController.onPageLoad(srn, NormalMode)
       } else {
         routes.UploadMemberDetailsController.onPageLoad(srn)
       }
+
+    case CheckingMemberDetailsFilePage(srn, uploadSuccessful) =>
+      if (uploadSuccessful) {
+        controllers.nonsipp.memberdetails.upload.routes.FileUploadSuccessController.onPageLoad(srn, NormalMode)
+      } else {
+        controllers.routes.UnauthorisedController.onPageLoad()
+      }
+
+    case FileUploadSuccessPage(srn) =>
+      controllers.nonsipp.memberdetails.routes.SchemeMembersListController.onPageLoad(srn, 1)
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {

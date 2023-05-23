@@ -48,7 +48,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.FormUtils.FormOps
 import viewmodels.DisplayMessage.{ListMessage, ListType, Message, ParagraphMessage}
 import viewmodels.implicits._
-import viewmodels.models.{RadioListRowViewModel, RadioListViewModel}
+import viewmodels.models.{PageViewModel, RadioListRowViewModel, RadioListViewModel}
 import views.html.RadioListView
 
 import javax.inject.{Inject, Named}
@@ -109,20 +109,22 @@ object PensionSchemeMembersController {
       )
     )
 
-  def viewModel(srn: Srn, schemeName: String): RadioListViewModel = RadioListViewModel(
-    Message("pensionSchemeMembers.title", schemeName),
-    Message("pensionSchemeMembers.heading", schemeName),
-    List(
-      ParagraphMessage("pensionSchemeMembers.description"),
-      ListMessage(
-        ListType.Bullet,
-        "pensionSchemeMembers.description.name",
-        "pensionSchemeMembers.description.dob",
-        "pensionSchemeMembers.description.nino"
-      )
-    ),
-    Some(Message("pensionSchemeMembers.legend")),
-    radioListItems,
-    routes.PensionSchemeMembersController.onSubmit(srn)
-  )
+  def viewModel(srn: Srn, schemeName: String): PageViewModel[RadioListViewModel] =
+    PageViewModel(
+      Message("pensionSchemeMembers.title", schemeName),
+      Message("pensionSchemeMembers.heading", schemeName),
+      RadioListViewModel(
+        Some(Message("pensionSchemeMembers.legend")),
+        radioListItems
+      ),
+      routes.PensionSchemeMembersController.onSubmit(srn)
+    ).withDescription(
+      ParagraphMessage("pensionSchemeMembers.description") ++
+        ListMessage(
+          ListType.Bullet,
+          "pensionSchemeMembers.description.name",
+          "pensionSchemeMembers.description.dob",
+          "pensionSchemeMembers.description.nino"
+        )
+    )
 }

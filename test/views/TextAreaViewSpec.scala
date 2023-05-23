@@ -20,6 +20,7 @@ import forms.mappings.Mappings
 import play.api.data
 import play.api.data.FormError
 import play.api.test.FakeRequest
+import viewmodels.models.TextAreaViewModel
 import views.html.TextAreaView
 
 class TextAreaViewSpec extends ViewSpec with Mappings {
@@ -29,6 +30,8 @@ class TextAreaViewSpec extends ViewSpec with Mappings {
 
     implicit val request = FakeRequest()
 
+    val viewModelGen = pageViewModelGen[TextAreaViewModel]
+
     "TextInputView" - {
 
       val form = data.Form(
@@ -36,12 +39,12 @@ class TextAreaViewSpec extends ViewSpec with Mappings {
       )
       val invalidForm = form.withError(FormError("value", "error reason"))
 
-      act.like(renderTitle(textAreaViewModelGen)(view(form, _), _.title.key))
-      act.like(renderHeading(textAreaViewModelGen)(view(form, _), _.heading))
-      act.like(renderErrors(textAreaViewModelGen)(view(invalidForm, _), _ => "error reason"))
-      act.like(renderTextArea(textAreaViewModelGen)(view(form, _), "value"))
-      act.like(renderForm(textAreaViewModelGen)(view(form, _), _.onSubmit))
-      act.like(renderSaveAndContinueButton(textAreaViewModelGen)(view(form, _)))
+      act.like(renderTitle(viewModelGen)(view(form, _), _.title.key))
+      act.like(renderHeading(viewModelGen)(view(form, _), _.heading))
+      act.like(renderErrors(viewModelGen)(view(invalidForm, _), _ => "error reason"))
+      act.like(renderTextArea(viewModelGen)(view(form, _), "value"))
+      act.like(renderForm(viewModelGen)(view(form, _), _.onSubmit))
+      act.like(renderButtonText(viewModelGen)(view(form, _), _.buttonText))
     }
   }
 }

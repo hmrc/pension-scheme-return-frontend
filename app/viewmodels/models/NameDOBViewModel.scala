@@ -16,15 +16,11 @@
 
 package viewmodels.models
 
-import play.api.mvc.Call
 import viewmodels.DisplayMessage.Message
 
 case class NameDOBViewModel(
-  title: Message,
-  heading: Message,
   firstName: Message,
   lastName: Message,
   dateOfBirth: Message,
-  dateOfBirthHint: Message,
-  onSubmit: Call
+  dateOfBirthHint: Message
 )

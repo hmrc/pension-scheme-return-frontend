@@ -33,36 +33,39 @@ class ListViewSpec extends ViewSpec {
 
     implicit val request: FakeRequest[_] = FakeRequest()
 
+    def viewModelGen(showRadios: Boolean = true, rows: Option[Int] = None) =
+      pageViewModelGen(summaryViewModelGen(showRadios = showRadios, rows = rows))
+
     "SummaryView" - {
-      act.like(renderTitle(summaryViewModelGen())(view(form, _), _.title.key))
-      act.like(renderHeading(summaryViewModelGen())(view(form, _), _.heading))
+      act.like(renderTitle(viewModelGen())(view(form, _), _.title.key))
+      act.like(renderHeading(viewModelGen())(view(form, _), _.heading))
 
       "render rows" in {
-        forAll(summaryViewModelGen()) { viewModel =>
+        forAll(viewModelGen()) { viewModel =>
           val renderedRows = summaryListRows(view(form, viewModel))
-          renderedRows.length mustEqual viewModel.rows.size
-          renderedRows.map(_.selectFirst(".govuk-summary-list__key").text()) mustEqual viewModel.rows.map(
+          renderedRows.length mustEqual viewModel.page.rows.size
+          renderedRows.map(_.selectFirst(".govuk-summary-list__key").text()) mustEqual viewModel.page.rows.map(
             row => messageKey(row.text)
           )
         }
       }
 
       "render hidden text" in {
-        forAll(summaryViewModelGen()) { viewModel =>
+        forAll(viewModelGen()) { viewModel =>
           val renderedRows = summaryListRows(view(form, viewModel))
-          renderedRows.length mustEqual viewModel.rows.size
+          renderedRows.length mustEqual viewModel.page.rows.size
           val links = renderedRows.map(_.select(".govuk-link"))
           val changeLinks = links.map(_.get(0))
           val removeLinks = links.map(_.get(1))
           changeLinks.map(_.children().select(".govuk-visually-hidden").text()) mustEqual
-            viewModel.rows.map(row => messageKey(row.changeHiddenText))
+            viewModel.page.rows.map(row => messageKey(row.changeHiddenText))
           removeLinks.map(_.children().select(".govuk-visually-hidden").text()) mustEqual
-            viewModel.rows.map(row => messageKey(row.removeHiddenText))
+            viewModel.page.rows.map(row => messageKey(row.removeHiddenText))
         }
       }
 
       "render radio button and not the inset text when showRadios is true" in {
-        forAll(summaryViewModelGen()) { viewModel =>
+        forAll(viewModelGen()) { viewModel =>
           val radioElements = radios(view(form, viewModel))
           radioElements.size mustEqual 2
           radioElements.map(_.id) mustEqual List("value", "value-no")
@@ -71,9 +74,9 @@ class ListViewSpec extends ViewSpec {
       }
 
       "renders the inset text and not the radio button whenShowRadios is false" in {
-        forAll(summaryViewModelGen(showRadios = false)) { viewModel =>
+        forAll(viewModelGen(showRadios = false)) { viewModel =>
           radios(view(form, viewModel)).size mustEqual 0
-          inset(view(form, viewModel)).text() mustEqual viewModel.insetText.key
+          inset(view(form, viewModel)).text() mustEqual messageKey(viewModel.page.inset, " ")
         }
       }
 
@@ -141,10 +144,12 @@ class ListViewSpec extends ViewSpec {
     }
 
     def paginationTest(rows: Int, currentPage: Int, pageSize: Int)(f: Html => Unit): Unit =
-      forAll(summaryViewModelGen(rows)) { viewModel =>
-        val pagination = Pagination(currentPage, pageSize, viewModel.rows.size, _ => viewModel.onSubmit)
+      forAll(viewModelGen(rows = Some(rows))) { viewModel =>
+        val pagination = Pagination(currentPage, pageSize, viewModel.page.rows.size, _ => viewModel.onSubmit)
         val paginatedViewModel =
-          viewModel.copy(paginatedViewModel = Some(PaginatedViewModel(Message("test label"), pagination)))
+          viewModel.copy(
+            page = viewModel.page.copy(paginatedViewModel = Some(PaginatedViewModel(Message("test label"), pagination)))
+          )
         val html = view(form, paginatedViewModel)
 
         f(html)

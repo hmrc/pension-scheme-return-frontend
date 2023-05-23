@@ -20,6 +20,7 @@ import models.DateRange
 import play.api.data
 import play.api.data.Forms.{mapping, text}
 import play.api.test.FakeRequest
+import viewmodels.models.DateRangeViewModel
 import views.html.DateRangeView
 
 import java.time.LocalDate
@@ -43,84 +44,39 @@ class DateRangeViewSpec extends ViewSpec {
           )(DateRange.apply)(DateRange.unapply)
         )(identity)(Some(_))
       )
+    val invalidForm = dateRangeForm.bind(Map("dates.startDate" -> "", "dates.endDate" -> ""))
+
+    val viewModelGen = pageViewModelGen[DateRangeViewModel]
 
     "DateRangeView" - {
 
-      "render the title" in {
+      act.like(renderTitle(viewModelGen)(view(dateRangeForm, _), _.title.key))
+      act.like(renderHeading(viewModelGen)(view(dateRangeForm, _), _.heading))
+      act.like(renderDescription(viewModelGen)(view(dateRangeForm, _), _.description))
+      act.like(renderButtonText(viewModelGen)(view(dateRangeForm, _), _.buttonText))
+      act.like(renderForm(viewModelGen)(view(dateRangeForm, _), _.onSubmit))
 
-        forAll(dateRangeViewModelGen) { viewModel =>
-          title(view(dateRangeForm, viewModel)) must startWith(viewModel.title.key)
-        }
+      act.like {
+        renderErrors(viewModelGen)(view(invalidForm, _), _ => "startDate.required")
+          .withName("render startDate errors")
       }
 
-      "render the heading" in {
-
-        forAll(dateRangeViewModelGen) { viewModel =>
-          h1(view(dateRangeForm, viewModel)) mustBe viewModel.heading.key
-        }
-      }
-
-      "render the description" in {
-
-        forAll(dateRangeViewModelGen) { viewModel =>
-          whenever(viewModel.description.nonEmpty) {
-
-            p(view(dateRangeForm, viewModel)) must contain(viewModel.description.value.key)
-          }
-        }
+      act.like {
+        renderErrors(viewModelGen)(view(invalidForm, _), _ => "endDate.required")
+          .withName("render endDate errors")
       }
 
       "render the start date label" in {
 
-        forAll(dateRangeViewModelGen) { viewModel =>
-          legend(view(dateRangeForm, viewModel)) must contain(viewModel.startDateLabel.key)
+        forAll(viewModelGen) { viewModel =>
+          legend(view(dateRangeForm, viewModel)) must contain(viewModel.page.startDateLabel.key)
         }
       }
 
       "render the end date label" in {
 
-        forAll(dateRangeViewModelGen) { viewModel =>
-          legend(view(dateRangeForm, viewModel)) must contain(viewModel.endDateLabel.key)
-        }
-      }
-
-      "have form" in {
-
-        forAll(dateRangeViewModelGen) { viewModel =>
-          form(view(dateRangeForm, viewModel)).method mustBe viewModel.onSubmit.method
-          form(view(dateRangeForm, viewModel)).action mustBe viewModel.onSubmit.url
-        }
-      }
-
-      "render the start date required error summary" in {
-
-        forAll(dateRangeViewModelGen) { viewModel =>
-          val invalidForm = dateRangeForm.bind(Map[String, String]("dates.startDate" -> ""))
-          errorSummary(view(invalidForm, viewModel)).text() must include("startDate.required")
-        }
-      }
-
-      "render the start date required error message" in {
-
-        forAll(dateRangeViewModelGen) { viewModel =>
-          val invalidForm = dateRangeForm.bind(Map[String, String]("dates.startDate" -> ""))
-          errorMessage(view(invalidForm, viewModel)).text() must include("startDate.required")
-        }
-      }
-
-      "render the end date required error summary" in {
-
-        forAll(dateRangeViewModelGen) { viewModel =>
-          val invalidForm = dateRangeForm.bind(Map[String, String]("dates.endDate" -> ""))
-          errorSummary(view(invalidForm, viewModel)).text() must include("endDate.required")
-        }
-      }
-
-      "render the end date required error message" in {
-
-        forAll(dateRangeViewModelGen) { viewModel =>
-          val invalidForm = dateRangeForm.bind(Map[String, String]("dates.endDate" -> ""))
-          errorMessage(view(invalidForm, viewModel)).text() must include("endDate.required")
+        forAll(viewModelGen) { viewModel =>
+          legend(view(dateRangeForm, viewModel)) must contain(viewModel.page.endDateLabel.key)
         }
       }
     }

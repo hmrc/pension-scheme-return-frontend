@@ -34,7 +34,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.DateTimeUtils.localDateShow
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
-import viewmodels.models.YesNoPageViewModel
+import viewmodels.models.{PageViewModel, YesNoPageViewModel}
 import views.html.YesNoPageView
 
 import javax.inject.{Inject, Named}
@@ -101,9 +101,10 @@ object RemoveAccountingPeriodController {
     "removeAccountingPeriod.error.required"
   )
 
-  def viewModel(srn: Srn, index: Max3, dateRange: DateRange, mode: Mode): YesNoPageViewModel = YesNoPageViewModel(
-    Message("removeAccountingPeriod.title", dateRange.from.show, dateRange.to.show),
-    Message("removeAccountingPeriod.heading", dateRange.from.show, dateRange.to.show),
-    routes.RemoveAccountingPeriodController.onSubmit(srn, index, mode)
-  )
+  def viewModel(srn: Srn, index: Max3, dateRange: DateRange, mode: Mode): PageViewModel[YesNoPageViewModel] =
+    YesNoPageViewModel(
+      Message("removeAccountingPeriod.title", dateRange.from.show, dateRange.to.show),
+      Message("removeAccountingPeriod.heading", dateRange.from.show, dateRange.to.show),
+      routes.RemoveAccountingPeriodController.onSubmit(srn, index, mode)
+    )
 }

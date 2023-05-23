@@ -14,14 +14,8 @@
  * limitations under the License.
  */
 
-package viewmodels.models
+package pages
 
-import play.api.mvc.Call
-import viewmodels.DisplayMessage._
+import models.SchemeId.Srn
 
-case class DatePageViewModel(
-  title: Message,
-  legend: Message,
-  hint: Message,
-  onSubmit: Call
-)
+case class CheckingMemberDetailsFilePage(srn: Srn, uploadSuccessful: Boolean) extends Page

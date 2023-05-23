@@ -16,6 +16,7 @@
 
 package controllers.nonsipp.memberdetails
 
+import config.FrontendAppConfig
 import controllers.actions._
 import controllers.nonsipp.memberdetails.UploadMemberDetailsController._
 import models.SchemeId.Srn
@@ -28,7 +29,7 @@ import services.UploadService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.{ListMessage, ListType, ParagraphMessage}
 import viewmodels.implicits._
-import viewmodels.models.UploadViewModel
+import viewmodels.models.{PageViewModel, UploadViewModel}
 import views.html.UploadView
 
 import javax.inject.{Inject, Named}
@@ -40,13 +41,14 @@ class UploadMemberDetailsController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   view: UploadView,
   uploadService: UploadService,
+  config: FrontendAppConfig,
   val controllerComponents: MessagesControllerComponents
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
 
   private def callBackUrl(implicit req: Request[_]): String =
-    controllers.routes.UploadCallbackController.callback.absoluteURL()
+    controllers.routes.UploadCallbackController.callback.absoluteURL(secure = config.secureUpscanCallBack)
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
     val successRedirectUrl =
@@ -76,21 +78,28 @@ class UploadMemberDetailsController @Inject()(
 
 object UploadMemberDetailsController {
 
-  def viewModel(postTarget: String, formFields: Map[String, String], error: Option[String]): UploadViewModel =
-    UploadViewModel(
+  def viewModel(
+    postTarget: String,
+    formFields: Map[String, String],
+    error: Option[String]
+  ): PageViewModel[UploadViewModel] =
+    PageViewModel(
       "uploadMemberDetails.title",
       "uploadMemberDetails.heading",
-      ParagraphMessage("uploadMemberDetails.paragraph"),
-      detailsContent = ParagraphMessage("uploadMemberDetails.details.paragraph") ++ ListMessage(
-        ListType.Bullet,
-        "uploadMemberDetails.list1",
-        "uploadMemberDetails.list2",
-        "uploadMemberDetails.list3"
+      UploadViewModel(
+        detailsContent =
+          ParagraphMessage("uploadMemberDetails.details.paragraph") ++
+            ListMessage(
+              ListType.Bullet,
+              "uploadMemberDetails.list1",
+              "uploadMemberDetails.list2",
+              "uploadMemberDetails.list3"
+            ),
+        acceptedFileType = ".csv",
+        maxFileSize = "100MB",
+        formFields,
+        error
       ),
-      acceptedFileType = ".csv",
-      maxFileSize = "100MB",
-      formFields,
-      error,
       Call("POST", postTarget)
-    )
+    ).withDescription(ParagraphMessage("uploadMemberDetails.paragraph"))
 }

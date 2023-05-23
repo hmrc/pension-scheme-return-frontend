@@ -75,6 +75,5 @@ object Components {
       case TableMessage(content) =>
         table(content.map { case (key, value) => renderMessage(key) -> renderMessage(value) })
       case CompoundMessage(first, second) => combine(renderMessage(first), renderMessage(second))
-      case BreakPoint => Html("<br>")
     }
 }
