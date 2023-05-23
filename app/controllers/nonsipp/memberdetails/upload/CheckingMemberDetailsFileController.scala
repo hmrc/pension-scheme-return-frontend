@@ -21,6 +21,7 @@ import controllers.nonsipp.memberdetails.upload.CheckingMemberDetailsFileControl
 import models.{Mode, NormalMode, UploadErrors, UploadFormatError, UploadKey, UploadStatus, UploadSuccess}
 import models.SchemeId.Srn
 import models.requests.DataRequest
+import models.{Mode, UploadKey, UploadStatus}
 import navigation.Navigator
 import pages.CheckingMemberDetailsFilePage
 import play.api.i18n._
@@ -29,7 +30,7 @@ import services.UploadService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage._
 import viewmodels.implicits._
-import viewmodels.models.ContentPageViewModel
+import viewmodels.models.{ContentPageViewModel, PageViewModel}
 import views.html.ContentPageView
 
 import javax.inject.{Inject, Named}
@@ -63,13 +64,12 @@ class CheckingMemberDetailsFileController @Inject()(
 }
 
 object CheckingMemberDetailsFileController {
-  def viewModel(srn: Srn, mode: Mode): ContentPageViewModel = ContentPageViewModel(
-    title = "checkingMemberDetailsFile.title",
-    heading = "checkingMemberDetailsFile.heading",
-    contents = List(ParagraphMessage("checkingMemberDetailsFile.paragraph")),
-    isStartButton = false,
-    buttonText = "site.continue",
-    isLargeHeading = true,
-    onSubmit = routes.CheckingMemberDetailsFileController.onSubmit(srn, mode)
-  )
+  def viewModel(srn: Srn, mode: Mode): PageViewModel[ContentPageViewModel] =
+    PageViewModel(
+      title = "checkingMemberDetailsFile.title",
+      heading = "checkingMemberDetailsFile.heading",
+      ContentPageViewModel(isLargeHeading = true),
+      onSubmit = routes.CheckingMemberDetailsFileController.onSubmit(srn, mode)
+    ).withButtonText("site.continue")
+      .withDescription(ParagraphMessage("checkingMemberDetailsFile.paragraph"))
 }

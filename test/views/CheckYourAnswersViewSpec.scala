@@ -17,7 +17,7 @@
 package views
 
 import play.api.test.FakeRequest
-import viewmodels.models.SummaryAction
+import viewmodels.models.{CheckYourAnswersViewModel, SummaryAction}
 import views.html.CheckYourAnswersView
 
 class CheckYourAnswersViewSpec extends ViewSpec {
@@ -27,33 +27,35 @@ class CheckYourAnswersViewSpec extends ViewSpec {
 
     implicit val request = FakeRequest()
 
+    val viewModelGen = pageViewModelGen[CheckYourAnswersViewModel]
+
     "CheckYourAnswerView" - {
 
-      act.like(renderTitle(checkYourAnswersViewModelGen)(view(_), _.title.key))
-      act.like(renderHeading(checkYourAnswersViewModelGen)(view(_), _.heading))
-      act.like(renderContinueButtonWithText(checkYourAnswersViewModelGen)(view(_), _.buttonText.key))
+      act.like(renderTitle(viewModelGen)(view(_), _.title.key))
+      act.like(renderHeading(viewModelGen)(view(_), _.heading))
+      act.like(renderContinueButtonWithText(viewModelGen)(view(_), _.buttonText.key))
 
       "render the summary list keys" in {
 
-        forAll(checkYourAnswersViewModelGen) { viewModel =>
-          val keys = viewModel.rows.map(_.key.key)
+        forAll(viewModelGen) { viewModel =>
+          val keys = viewModel.page.rows.map(_.key.key)
           summaryListKeys(view(viewModel)) must contain theSameElementsAs keys
         }
       }
 
       "render the summary list values" in {
 
-        forAll(checkYourAnswersViewModelGen) { viewModel =>
-          val values = viewModel.rows.map(_.value.key)
+        forAll(viewModelGen) { viewModel =>
+          val values = viewModel.page.rows.map(_.value.key)
           summaryListValues(view(viewModel)) must contain theSameElementsAs values
         }
       }
 
       "render the summary list actions" in {
 
-        forAll(checkYourAnswersViewModelGen) { viewModel =>
+        forAll(viewModelGen) { viewModel =>
           val actions =
-            viewModel.rows
+            viewModel.page.rows
               .flatMap(_.actions)
               .map { case SummaryAction(content, href, vh) => AnchorTag(href, s"${content.key} ${vh.key}") }
 

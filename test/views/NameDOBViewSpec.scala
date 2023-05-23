@@ -19,6 +19,7 @@ package views
 import forms.NameDOBFormProvider
 import forms.mappings.errors.DateFormErrors
 import play.api.test.FakeRequest
+import viewmodels.models.NameDOBViewModel
 import views.html.NameDOBView
 
 class NameDOBViewSpec extends ViewSpec {
@@ -46,14 +47,16 @@ class NameDOBViewSpec extends ViewSpec {
       )
     )
 
+    val viewModelGen = pageViewModelGen[NameDOBViewModel]
+
     "NameDOBView" - {
-      act.like(renderTitle(nameDOBViewModelGen)(view(form, _), _.title.key))
-      act.like(renderHeading(nameDOBViewModelGen)(view(form, _), _.heading))
-      act.like(renderInputWithLabel(nameDOBViewModelGen)("firstName", view(form, _), _.firstName))
-      act.like(renderInputWithLabel(nameDOBViewModelGen)("lastName", view(form, _), _.lastName))
-      act.like(renderForm(nameDOBViewModelGen)(view(form, _), _.onSubmit))
-      act.like(renderDateInput(nameDOBViewModelGen)("dateOfBirth", view(form, _)))
-      act.like(renderSaveAndContinueButton(nameDOBViewModelGen)(view(form, _)))
+      act.like(renderTitle(viewModelGen)(view(form, _), _.title.key))
+      act.like(renderHeading(viewModelGen)(view(form, _), _.heading))
+      act.like(renderInputWithLabel(viewModelGen)("firstName", view(form, _), _.page.firstName))
+      act.like(renderInputWithLabel(viewModelGen)("lastName", view(form, _), _.page.lastName))
+      act.like(renderForm(viewModelGen)(view(form, _), _.onSubmit))
+      act.like(renderDateInput(viewModelGen)("dateOfBirth", view(form, _)))
+      act.like(renderButtonText(viewModelGen)(view(form, _), _.buttonText))
     }
   }
 }

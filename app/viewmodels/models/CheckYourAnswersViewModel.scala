@@ -24,11 +24,7 @@ import viewmodels.DisplayMessage.Message
 import viewmodels.govuk.summarylist._
 
 case class CheckYourAnswersViewModel(
-  title: Message,
-  heading: Message,
-  rows: List[CheckYourAnswersRowViewModel],
-  buttonText: Message,
-  onSubmit: Call
+  rows: List[CheckYourAnswersRowViewModel]
 )
 
 object CheckYourAnswersViewModel {
@@ -36,27 +32,11 @@ object CheckYourAnswersViewModel {
   def apply(
     rows: Seq[CheckYourAnswersRowViewModel],
     onSubmit: Call
-  ): CheckYourAnswersViewModel =
-    CheckYourAnswersViewModel(
+  ): PageViewModel[CheckYourAnswersViewModel] =
+    PageViewModel(
       Message("checkYourAnswers.title"),
       Message("checkYourAnswers.heading"),
-      rows.toList,
-      Message("site.saveAndContinue"),
-      onSubmit
-    )
-
-  def apply(
-    title: String,
-    heading: Message,
-    rows: Seq[CheckYourAnswersRowViewModel],
-    buttonText: String,
-    onSubmit: Call
-  ): CheckYourAnswersViewModel =
-    CheckYourAnswersViewModel(
-      Message(title),
-      heading,
-      rows.toList,
-      Message(buttonText),
+      CheckYourAnswersViewModel(rows.toList),
       onSubmit
     )
 }

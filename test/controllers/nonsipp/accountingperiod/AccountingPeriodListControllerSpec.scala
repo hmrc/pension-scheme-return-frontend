@@ -19,7 +19,6 @@ package controllers.nonsipp.accountingperiod
 import config.Constants.maxAccountingPeriods
 import config.Refined.OneToThree
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.accountingperiod.routes
 import eu.timepit.refined.{refineMV, refineV}
 import forms.YesNoPageFormProvider
 import models.NormalMode
@@ -74,7 +73,7 @@ class AccountingPeriodListControllerSpec extends ControllerBaseSpec {
 
       forAll(srnGen, rowsGen, modeGen) { (srn, rows, mode) =>
         val viewModel = AccountingPeriodListController.viewModel(srn, mode, rows)
-        viewModel.rows.length mustBe rows.length
+        viewModel.page.rows.length mustBe rows.length
       }
     }
 
@@ -83,7 +82,7 @@ class AccountingPeriodListControllerSpec extends ControllerBaseSpec {
 
       forAll(srnGen, rowsGen, modeGen) { (srn, rows, mode) =>
         val viewModel = AccountingPeriodListController.viewModel(srn, mode, rows)
-        viewModel.rows.length must be <= 3
+        viewModel.page.rows.length must be <= 3
       }
     }
   }

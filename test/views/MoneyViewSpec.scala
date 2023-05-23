@@ -45,9 +45,9 @@ class MoneyViewSpec extends ViewSpec with Mappings {
 
     val invalidMoneyForm = moneyForm.bind(Map("value" -> ""))
 
-    val singleMoneyQuestion = moneyViewModelGen(singleQuestionGen(moneyForm))
-    val tripleMoneyQuestion = moneyViewModelGen(tripleQuestionGen(tripleMoneyForm))
-    val invalidSingleMoneyQuestion = moneyViewModelGen(singleQuestionGen(invalidMoneyForm))
+    val singleMoneyQuestion = pageViewModelGen(singleQuestionGen(moneyForm))
+    val tripleMoneyQuestion = pageViewModelGen(tripleQuestionGen(tripleMoneyForm))
+    val invalidSingleMoneyQuestion = pageViewModelGen(singleQuestionGen(invalidMoneyForm))
     val viewModelGen = Gen.oneOf(singleMoneyQuestion, tripleMoneyQuestion, invalidSingleMoneyQuestion)
 
     "MoneyView" - {
@@ -55,12 +55,12 @@ class MoneyViewSpec extends ViewSpec with Mappings {
       act.like(renderTitle(viewModelGen)(view(_), _.title.key))
       act.like(renderHeading(viewModelGen)(view(_), _.heading))
       act.like(renderInputWithLabel(singleMoneyQuestion)("value", view(_), _.heading))
-      act.like(renderInputWithLabel(tripleMoneyQuestion)("value.1", view(_), _.questions.fields.head.label))
-      act.like(renderInputWithLabel(tripleMoneyQuestion)("value.2", view(_), _.questions.fields(1).label))
-      act.like(renderInputWithLabel(tripleMoneyQuestion)("value.3", view(_), _.questions.fields(2).label))
+      act.like(renderInputWithLabel(tripleMoneyQuestion)("value.1", view(_), _.page.fields.head.label))
+      act.like(renderInputWithLabel(tripleMoneyQuestion)("value.2", view(_), _.page.fields(1).label))
+      act.like(renderInputWithLabel(tripleMoneyQuestion)("value.3", view(_), _.page.fields(2).label))
       act.like(renderErrors(invalidSingleMoneyQuestion)(view(_), _ => "money.error.required"))
       act.like(renderForm(viewModelGen)(view(_), _.onSubmit))
-      act.like(renderSaveAndContinueButton(viewModelGen)(view(_)))
+      act.like(renderButtonText(viewModelGen)(view(_), _.buttonText))
     }
   }
 }

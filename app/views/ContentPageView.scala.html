@@ -21,21 +21,21 @@
     govukButton: GovukButton
 )
 
-@(viewmodel: ContentPageViewModel)(implicit request: Request[_], messages: Messages)
+@(viewmodel: PageViewModel[ContentPageViewModel])(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(viewmodel.title.toMessage)) {
 
-            @if(viewmodel.isLargeHeading) {
-                <h1 class="govuk-heading-l">@viewmodel.heading.toMessage</h1>
+            @if(viewmodel.page.isLargeHeading) {
+                <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
             } else {
-                <h1 class="govuk-heading-xl">@viewmodel.heading.toMessage</h1>
+                <h1 class="govuk-heading-xl">@renderMessage(viewmodel.heading)</h1>
             }
 
-    @viewmodel.contents.map(renderMessage)
+    @viewmodel.description.map(renderMessage)
 
     <p class="govuk-body">
         @govukButton(
-            if(viewmodel.isStartButton)
+            if(viewmodel.page.isStartButton)
                 ButtonViewModel(viewmodel.buttonText.toMessage).asLink(viewmodel.onSubmit.url).asStartButton()
             else {
                 ButtonViewModel(viewmodel.buttonText.toMessage).asLink(viewmodel.onSubmit.url)

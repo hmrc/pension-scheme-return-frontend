@@ -151,7 +151,7 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
       "contain all rows if has nino is true and nino is present" in {
         val vm =
           viewModel(refineMV(1), srn, NormalMode, CheckOrChange.Check, memberDetails, hasNINO = true, Some(nino), None)
-        vm.rows.size mustBe 5
+        vm.page.rows.size mustBe 5
       }
 
       "contain all rows if has nino is false and no nino reason is present" in {
@@ -166,7 +166,7 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
             None,
             Some("test reason")
           )
-        vm.rows.size mustBe 5
+        vm.page.rows.size mustBe 5
       }
     }
   }

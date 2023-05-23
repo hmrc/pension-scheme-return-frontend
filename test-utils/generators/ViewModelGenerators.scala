@@ -24,29 +24,33 @@ import viewmodels.models._
 
 trait ViewModelGenerators extends BasicGenerators {
 
-  val contentPageViewModelGen: Gen[ContentPageViewModel] =
+  def pageViewModelGen[A](implicit gen: Gen[A]): Gen[PageViewModel[A]] =
     for {
       title <- nonEmptyMessage
       heading <- nonEmptyMessage
-      contents <- Gen.listOf(nonEmptyBlockMessage)
+      description <- Gen.option(nonEmptyBlockMessage)
+      page <- gen
+      refresh <- Gen.option(Gen.const(1))
       buttonText <- nonEmptyMessage
-      isStartButton <- boolean
       onSubmit <- call
-      isLargeHeading <- boolean
     } yield {
-      ContentPageViewModel(title, heading, contents, buttonText, isStartButton, onSubmit, isLargeHeading)
+      PageViewModel(title, heading, description, page, refresh, buttonText, onSubmit)
     }
 
-  val contentTablePageViewModelGen: Gen[ContentTablePageViewModel] =
+  implicit val contentPageViewModelGen: Gen[ContentPageViewModel] =
     for {
-      title <- nonEmptyString
-      heading <- nonEmptyMessage
-      inset <- nonEmptyMessage
-      buttonText <- nonEmptyMessage
-      rows <- Gen.listOf(tupleOf(nonEmptyMessage, nonEmptyMessage))
-      onSubmit <- call
+      isStartButton <- boolean
+      isLargeHeading <- boolean
     } yield {
-      ContentTablePageViewModel(title, heading, inset, buttonText, onSubmit, rows: _*)
+      ContentPageViewModel(isStartButton, isLargeHeading)
+    }
+
+  implicit val contentTablePageViewModelGen: Gen[ContentTablePageViewModel] =
+    for {
+      inset <- nonEmptyDisplayMessage
+      rows <- Gen.listOf(tupleOf(nonEmptyMessage, nonEmptyMessage))
+    } yield {
+      ContentTablePageViewModel(inset, rows)
     }
 
   val actionItemGen: Gen[SummaryAction] =
@@ -67,43 +71,29 @@ trait ViewModelGenerators extends BasicGenerators {
       CheckYourAnswersRowViewModel(Message(key), Message(value), items)
     }
 
-  val checkYourAnswersViewModelGen: Gen[CheckYourAnswersViewModel] =
+  implicit val checkYourAnswersViewModelGen: Gen[CheckYourAnswersViewModel] =
     for {
-      title <- nonEmptyString
-      heading <- nonEmptyString
       rows <- Gen.listOf(summaryListRowGen)
-      buttonText <- nonEmptyMessage
-      onSubmit <- call
     } yield {
-      CheckYourAnswersViewModel(Message(title), Message(heading), rows, buttonText, onSubmit)
+      CheckYourAnswersViewModel(rows)
     }
 
-  val bankAccountViewModelGen: Gen[BankAccountViewModel] =
+  implicit val bankAccountViewModelGen: Gen[BankAccountViewModel] =
     for {
-      title <- nonEmptyMessage
-      heading <- nonEmptyMessage
-      paragraph <- nonEmptyMessage
       bankNameHeading <- nonEmptyMessage
       accountNumberHeading <- nonEmptyMessage
       accountNumberHint <- nonEmptyMessage
       sortCodeHeading <- nonEmptyMessage
       sortCodeHint <- nonEmptyMessage
-      buttonText <- nonEmptyMessage
-      onSubmit <- call
     } yield BankAccountViewModel(
-      title,
-      heading,
-      paragraph,
       bankNameHeading,
       accountNumberHeading,
       accountNumberHint,
       sortCodeHeading,
-      sortCodeHint,
-      buttonText,
-      onSubmit
+      sortCodeHint
     )
 
-  val submissionViewModelGen: Gen[SubmissionViewModel] =
+  implicit val submissionViewModelGen: Gen[SubmissionViewModel] =
     for {
       title <- nonEmptyMessage
       panelHeading <- nonEmptyMessage
@@ -118,23 +108,17 @@ trait ViewModelGenerators extends BasicGenerators {
       whatHappensNextContent
     )
 
-  val nameDOBViewModelGen: Gen[NameDOBViewModel] =
+  implicit val nameDOBViewModelGen: Gen[NameDOBViewModel] =
     for {
-      title <- nonEmptyMessage
-      heading <- nonEmptyMessage
       firstName <- nonEmptyMessage
       lastName <- nonEmptyMessage
       dateOfBirth <- nonEmptyMessage
       dateOfBirthHint <- nonEmptyMessage
-      onSubmit <- call
     } yield NameDOBViewModel(
-      title,
-      heading,
       firstName,
       lastName,
       dateOfBirth,
-      dateOfBirthHint,
-      onSubmit
+      dateOfBirthHint
     )
 
   val summaryRowGen: Gen[ListRow] =
@@ -155,45 +139,26 @@ trait ViewModelGenerators extends BasicGenerators {
     paginate: Boolean = false
   ): Gen[ListViewModel] =
     for {
-      title <- nonEmptyMessage
-      heading <- nonEmptyMessage
+      inset <- nonEmptyDisplayMessage
       rows <- rows.fold(Gen.choose(1, 10))(Gen.const).flatMap(Gen.listOfN(_, summaryRowGen))
       radioText <- nonEmptyMessage
-      insetText <- nonEmptyMessage
       pagination <- if (paginate) Gen.option(paginationGen) else Gen.const(None)
-      onSubmit <- call
     } yield ListViewModel(
-      title,
-      heading,
+      inset,
       rows,
       radioText,
-      insetText,
       showRadios,
-      pagination,
-      onSubmit
+      pagination
     )
 
-  val pensionSchemeViewModelGen: Gen[PensionSchemeViewModel] =
+  implicit val yesNoPageViewModelGen: Gen[YesNoPageViewModel] =
     for {
-      title <- nonEmptyString
-      heading <- nonEmptyString
-      onSubmit <- call
-    } yield {
-      PensionSchemeViewModel(title, heading, onSubmit)
-    }
-
-  def yesNoPageViewModelGen(genLabels: Boolean = false): Gen[YesNoPageViewModel] =
-    for {
-      title <- nonEmptyMessage
-      heading <- nonEmptyMessage
-      description <- Gen.listOf(nonEmptyBlockMessage)
       legend <- Gen.option(nonEmptyMessage)
       hint <- Gen.option(nonEmptyMessage)
-      yes <- if (genLabels) Gen.some(nonEmptyMessage) else Gen.const(None)
-      no <- if (genLabels) Gen.some(nonEmptyMessage) else Gen.const(None)
-      onSubmit <- call
+      yes <- Gen.option(nonEmptyMessage)
+      no <- Gen.option(nonEmptyMessage)
     } yield {
-      YesNoPageViewModel(title, heading, description, legend, hint, yes, no, None, onSubmit)
+      YesNoPageViewModel(legend, hint, yes, no)
     }
 
   def radioListRowViewModelGen: Gen[RadioListRowViewModel] =
@@ -204,34 +169,22 @@ trait ViewModelGenerators extends BasicGenerators {
       RadioListRowViewModel(content, value)
     }
 
-  def radioListViewModelGen: Gen[RadioListViewModel] =
+  implicit val radioListViewModelGen: Gen[RadioListViewModel] =
     for {
-      title <- nonEmptyMessage
-      heading <- nonEmptyMessage
-      contents <- Gen.listOf(nonEmptyBlockMessage)
       legend <- Gen.option(nonEmptyMessage)
       items <- Gen.listOf(radioListRowViewModelGen)
-      onSubmit <- call
     } yield {
-      RadioListViewModel(title, heading, contents, legend, items, onSubmit)
+      RadioListViewModel(legend, items)
     }
 
-  val dateRangeViewModelGen: Gen[DateRangeViewModel] =
+  implicit val dateRangeViewModelGen: Gen[DateRangeViewModel] =
     for {
-      title <- nonEmptyMessage
-      heading <- nonEmptyMessage
-      description <- Gen.option(nonEmptyMessage)
       startDateLabel <- nonEmptyMessage
       endDateLabel <- nonEmptyMessage
-      onSubmit <- call
     } yield {
       DateRangeViewModel(
-        title,
-        heading,
-        description,
         startDateLabel,
-        endDateLabel,
-        onSubmit
+        endDateLabel
       )
     }
 
@@ -272,67 +225,33 @@ trait ViewModelGenerators extends BasicGenerators {
       )
     }
 
-  def moneyViewModelGen[A](questionsGen: Gen[MultipleQuestionsViewModel[A]]): Gen[MoneyViewModel[_]] =
+  implicit val textInputViewModelGen: Gen[TextInputViewModel] =
     for {
-      title <- nonEmptyMessage
-      heading <- nonEmptyMessage
-      description <- Gen.option(nonEmptyBlockMessage)
-      questions <- questionsGen
-      onSubmit <- call
-    } yield {
-      MoneyViewModel(title, heading, description, questions, onSubmit)
-    }
-
-  val textInputViewModelGen: Gen[TextInputViewModel] =
-    for {
-      title <- nonEmptyMessage
-      heading <- nonEmptyMessage
       label <- Gen.option(nonEmptyMessage)
-      onSubmit <- call
     } yield {
-      TextInputViewModel(title, heading, label, onSubmit)
+      TextInputViewModel(label)
     }
 
-  def uploadViewModelGen(error: Boolean): Gen[UploadViewModel] =
+  implicit val uploadViewModelGen: Gen[UploadViewModel] =
     for {
-      title <- nonEmptyMessage
-      heading <- nonEmptyMessage
-      content <- nonEmptyMessage
       displayContent <- nonEmptyMessage
       fileSize <- Gen.chooseNum(1, 100)
       formFields <- mapOf(Gen.alphaStr, Gen.alphaStr, 10)
-      error <- if (error) Gen.some(Gen.alphaStr) else Gen.const(None)
-      onSubmit <- postCall
+      error <- Gen.option(Gen.alphaStr)
     } yield {
       UploadViewModel(
-        title,
-        heading,
-        content,
         displayContent,
         ".csv",
         fileSize.toString,
         formFields,
-        error,
-        onSubmit
+        error
       )
     }
 
-  def intViewModelGen[A](questions: Gen[MultipleQuestionsViewModel[A]]): Gen[IntViewModel[_]] =
+  implicit val textAreaViewModelGen: Gen[TextAreaViewModel] =
     for {
-      title <- nonEmptyMessage
-      heading <- nonEmptyMessage
-      questions <- questions
-      onSubmit <- call
+      rows <- Gen.chooseNum(1, 100)
     } yield {
-      IntViewModel(title, heading, questions, onSubmit)
-    }
-
-  val textAreaViewModelGen: Gen[TextAreaViewModel] =
-    for {
-      title <- nonEmptyMessage
-      heading <- nonEmptyMessage
-      onSubmit <- call
-    } yield {
-      TextAreaViewModel(title, heading, onSubmit)
+      TextAreaViewModel(rows)
     }
 }

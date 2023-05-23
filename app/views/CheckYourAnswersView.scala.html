@@ -23,7 +23,7 @@
     govukButton: GovukButton,
 )
 
-@(viewmodel: CheckYourAnswersViewModel)(implicit request: Request[_], messages: Messages)
+@(viewmodel: PageViewModel[CheckYourAnswersViewModel])(implicit request: Request[_], messages: Messages)
 
     @layout(pageTitle = titleNoForm(viewmodel.title.toMessage)) {
 
@@ -31,7 +31,7 @@
 
         @govukSummaryList(
           SummaryListViewModel(
-            viewmodel.rows.map(_.toSummaryListRow)
+            viewmodel.page.rows.map(_.toSummaryListRow)
           )
         )
 

@@ -20,25 +20,44 @@ import play.api.mvc.Call
 import viewmodels.DisplayMessage
 import viewmodels.DisplayMessage.{InlineMessage, Message}
 
-case class ContentTablePageViewModel(
-  inset: DisplayMessage,
-  rows: List[(DisplayMessage, DisplayMessage)]
-)
+case class PageViewModel[+A](
+  title: Message,
+  heading: InlineMessage,
+  description: Option[DisplayMessage],
+  page: A,
+  refresh: Option[Int],
+  buttonText: Message,
+  onSubmit: Call
+) {
 
-object ContentTablePageViewModel {
+  def withDescription(message: Option[DisplayMessage]): PageViewModel[A] =
+    copy(description = message)
 
-  def apply(
+  def withDescription(message: DisplayMessage): PageViewModel[A] =
+    withDescription(Some(message))
+
+  def refreshPage(refresh: Option[Int]): PageViewModel[A] =
+    copy(refresh = refresh)
+
+  def withButtonText(message: Message): PageViewModel[A] =
+    copy(buttonText = message)
+}
+
+object PageViewModel {
+
+  def apply[A](
     title: Message,
     heading: InlineMessage,
-    inset: DisplayMessage,
-    buttonText: Message,
-    onSubmit: Call,
-    rows: (DisplayMessage, DisplayMessage)*
-  ): PageViewModel[ContentTablePageViewModel] =
+    page: A,
+    onSubmit: Call
+  ): PageViewModel[A] =
     PageViewModel(
       title,
       heading,
-      ContentTablePageViewModel(inset, rows.toList),
+      None,
+      page,
+      refresh = None,
+      Message("site.saveAndContinue"),
       onSubmit
-    ).withButtonText(buttonText)
+    )
 }
