@@ -16,9 +16,17 @@
 
 package models
 
+import play.api.mvc.JavascriptLiteral
 import utils.WithName
 
-sealed trait ManualOrUpload
+sealed trait ManualOrUpload {
+  val name: String
+
+  def fold[A](manual: => A, upload: => A): A = this match {
+    case ManualOrUpload.Manual => manual
+    case ManualOrUpload.Upload => upload
+  }
+}
 object ManualOrUpload extends Enumerable.Implicits {
 
   case object Manual extends WithName("manual") with ManualOrUpload
@@ -27,4 +35,6 @@ object ManualOrUpload extends Enumerable.Implicits {
   val values: List[ManualOrUpload] = List(Manual, Upload)
 
   implicit val enumerable: Enumerable[ManualOrUpload] = Enumerable(values.map(v => (v.toString, v)): _*)
+
+  implicit val jsLiteral: JavascriptLiteral[ManualOrUpload] = (value: ManualOrUpload) => value.name
 }

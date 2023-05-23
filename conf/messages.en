@@ -445,3 +445,7 @@ fileUploadSuccess.paragraph = {0} was uploaded successfully.
 fileUploadError.title = There was a problem
 fileUploadError.heading = There was a problem
 fileUploadError.paragraph = Select continue to find out more.
+
+membersUploaded.radio = Do you want to upload another member details file?
+membersUploaded.radio.yes.hint = Uploading a file will overwrite any details you have previously added about scheme members.
+membersUploaded.error.required = Select yes if you want to upload another member details file

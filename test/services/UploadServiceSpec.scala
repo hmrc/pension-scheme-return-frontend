@@ -83,8 +83,9 @@ class UploadServiceSpec extends BaseSpec with ScalaCheckPropertyChecks with Test
     }
 
     "getUploadResult return the status from the connector" in {
-      when(mockUploadRepository.getUploadDetails(any())).thenReturn(Future.successful(Some(uploadDetails)))
+      when(mockUploadRepository.getUploadResult(any())).thenReturn(Future.successful(Some(uploadResultSuccess)))
       val result = service.getUploadResult(uploadKey)
+      result.futureValue mustBe Some(uploadResultSuccess)
     }
 
     "stream should return the upscan download http response body as a stream" in {

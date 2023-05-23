@@ -21,6 +21,7 @@ import controllers.nonsipp.employercontributions
 import controllers.nonsipp.memberdetails.routes
 import eu.timepit.refined.{refineMV, refineV}
 import models.CheckOrChange.Check
+import models.ManualOrUpload.{Manual, Upload}
 import models.{CheckMode, CheckOrChange, ManualOrUpload, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.{CheckingMemberDetailsFilePage, Page}
@@ -52,21 +53,23 @@ object MemberDetailsNavigator extends JourneyNavigator {
     case MemberDetailsNinoPage(srn, index) =>
       routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, CheckOrChange.Check)
 
-    case SchemeMemberDetailsAnswersPage(srn) => routes.SchemeMembersListController.onPageLoad(srn, page = 1)
+    case SchemeMemberDetailsAnswersPage(srn) => routes.SchemeMembersListController.onPageLoad(srn, page = 1, Manual)
 
     case NoNINOPage(srn, index) =>
       routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, CheckOrChange.Check)
 
-    case SchemeMembersListPage(srn, false) =>
+    case SchemeMembersListPage(srn, false, _) =>
       employercontributions.routes.EmployerContributionsController.onPageLoad(srn, NormalMode)
 
-    case SchemeMembersListPage(srn, true) =>
+    case SchemeMembersListPage(srn, true, Manual) =>
       refineV[OneTo99](userAnswers.membersDetails(srn).length + 1).fold(
         _ => employercontributions.routes.EmployerContributionsController.onPageLoad(srn, NormalMode),
         index => routes.MemberDetailsController.onPageLoad(srn, index, NormalMode)
       )
 
-    case RemoveMemberDetailsPage(srn) => routes.SchemeMembersListController.onPageLoad(srn, page = 1)
+    case SchemeMembersListPage(srn, true, Upload) => routes.PensionSchemeMembersController.onPageLoad(srn)
+
+    case RemoveMemberDetailsPage(srn) => routes.SchemeMembersListController.onPageLoad(srn, page = 1, Manual)
 
     case HowToUploadPage(srn) =>
       controllers.nonsipp.memberdetails.routes.UploadMemberDetailsController.onPageLoad(srn)
@@ -88,7 +91,7 @@ object MemberDetailsNavigator extends JourneyNavigator {
       }
 
     case FileUploadSuccessPage(srn) =>
-      controllers.nonsipp.memberdetails.routes.SchemeMembersListController.onPageLoad(srn, 1)
+      controllers.nonsipp.memberdetails.routes.SchemeMembersListController.onPageLoad(srn, 1, Upload)
 
     case FileUploadErrorPage(srn) =>
       controllers.routes.UnauthorisedController.onPageLoad()
