@@ -27,7 +27,7 @@ import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.CheckingMemberDetailsFilePage
 import pages.nonsipp.memberdetails._
-import pages.nonsipp.memberdetails.upload.FileUploadSuccessPage
+import pages.nonsipp.memberdetails.upload.{FileUploadErrorPage, FileUploadSuccessPage}
 import utils.BaseSpec
 import utils.UserAnswersUtils.UserAnswersOps
 
@@ -187,9 +187,9 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         normalmode
           .navigateTo(
             CheckingMemberDetailsFilePage(_, uploadSuccessful = false),
-            (_, _) => controllers.routes.UnauthorisedController.onPageLoad()
+            controllers.nonsipp.memberdetails.upload.routes.FileUploadErrorController.onPageLoad
           )
-          .withName("go from checking member details file page to unauthorised page when upload failed")
+          .withName("go from checking member details file page to file upload error page when upload failed")
       )
 
       act.like(
@@ -210,6 +210,15 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           .withName("go from file upload success page to scheme members list page")
       )
     }
+
+    act.like(
+      normalmode
+        .navigateTo(
+          FileUploadErrorPage,
+          (_, _) => controllers.routes.UnauthorisedController.onPageLoad()
+        )
+        .withName("go from file upload error page  to unauthorised page")
+    )
 
     "CheckMode" - {
 

@@ -46,7 +46,7 @@ class FileUploadSuccessController @Inject()(
     with I18nSupport {
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
-    uploadService.getUploadResult(UploadKey.fromRequest(srn)).map {
+    uploadService.getUploadStatus(UploadKey.fromRequest(srn)).map {
       case Some(upload: UploadStatus.Success) => Ok(view(viewModel(srn, upload.name, mode)))
       case _ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
     }

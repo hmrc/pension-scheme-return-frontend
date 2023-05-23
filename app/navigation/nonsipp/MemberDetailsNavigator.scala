@@ -26,7 +26,7 @@ import navigation.JourneyNavigator
 import pages.{CheckingMemberDetailsFilePage, Page}
 import pages.nonsipp.memberdetails.MembersDetails.MembersDetailsOps
 import pages.nonsipp.memberdetails._
-import pages.nonsipp.memberdetails.upload.FileUploadSuccessPage
+import pages.nonsipp.memberdetails.upload.{FileUploadErrorPage, FileUploadSuccessPage}
 import play.api.mvc.Call
 
 object MemberDetailsNavigator extends JourneyNavigator {
@@ -84,11 +84,14 @@ object MemberDetailsNavigator extends JourneyNavigator {
       if (uploadSuccessful) {
         controllers.nonsipp.memberdetails.upload.routes.FileUploadSuccessController.onPageLoad(srn, NormalMode)
       } else {
-        controllers.routes.UnauthorisedController.onPageLoad()
+        controllers.nonsipp.memberdetails.upload.routes.FileUploadErrorController.onPageLoad(srn, NormalMode)
       }
 
     case FileUploadSuccessPage(srn) =>
       controllers.nonsipp.memberdetails.routes.SchemeMembersListController.onPageLoad(srn, 1)
+
+    case FileUploadErrorPage(srn) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {

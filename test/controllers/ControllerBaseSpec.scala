@@ -30,6 +30,7 @@ import play.api.libs.json.{Json, Writes}
 import play.api.mvc.Call
 import play.api.test._
 import queries.Settable
+import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.time.TaxYear
 import utils.BaseSpec
 
@@ -128,4 +129,13 @@ trait TestValues { _: OptionValues =>
   )
 
   val uploadSuccessful: UploadStatus.Success = UploadStatus.Success(uploadFileName, "text/csv", "test-url", None)
+  val uploadFailure: UploadStatus.Failed.type = UploadStatus.Failed
+
+  val uploadResultSuccess: UploadSuccess = UploadSuccess(
+    List(
+      UploadMemberDetails(1, NameDOB("Jason", "Lawrence", LocalDate.of(1989, 10, 6)), Right(Nino("AB123456A"))),
+      UploadMemberDetails(2, NameDOB("Pearl", "Parsons", LocalDate.of(1990, 4, 12)), Left("reason")),
+      UploadMemberDetails(3, NameDOB("Katherine", "Kennedy", LocalDate.of(1985, 1, 30)), Left("reason"))
+    )
+  )
 }
