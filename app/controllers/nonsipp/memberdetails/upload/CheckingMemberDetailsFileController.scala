@@ -18,6 +18,7 @@ package controllers.nonsipp.memberdetails.upload
 
 import controllers.actions._
 import controllers.nonsipp.memberdetails.upload.CheckingMemberDetailsFileController._
+import models.{Mode, NormalMode, UploadErrors, UploadFormatError, UploadKey, UploadStatus, UploadSuccess}
 import models.SchemeId.Srn
 import models.requests.DataRequest
 import models.{Mode, UploadKey, UploadStatus}
@@ -52,9 +53,9 @@ class CheckingMemberDetailsFileController @Inject()(
 
   def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
     uploadService.getUploadResult(UploadKey.fromRequest(srn)).map {
-      case None | Some(UploadStatus.InProgress) => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-      case Some(UploadStatus.Failed) => redirectNextPage(srn, uploadSuccessful = false, mode)
-      case Some(_: UploadStatus.Success) => redirectNextPage(srn, uploadSuccessful = true, mode)
+      case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      case Some(_: UploadErrors) | Some(UploadFormatError) => redirectNextPage(srn, uploadSuccessful = false, mode)
+      case Some(_: UploadSuccess) => redirectNextPage(srn, uploadSuccessful = true, mode)
     }
   }
 

@@ -46,11 +46,11 @@ class FileUploadSuccessControllerSpec extends ControllerBaseSpec {
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       injected[ContentPageView].apply(viewModel(srn, uploadFileName, NormalMode))
-    }.before(mockGetUploadResult(Some(uploadSuccessful))))
+    }.before(mockGetUploadStatus(Some(uploadSuccessful))))
 
     act.like(
       redirectToPage(onPageLoad, controllers.routes.JourneyRecoveryController.onPageLoad())
-        .before(mockGetUploadResult(None))
+        .before(mockGetUploadStatus(None))
     )
 
     act.like(redirectNextPage(onSubmit))
@@ -60,6 +60,6 @@ class FileUploadSuccessControllerSpec extends ControllerBaseSpec {
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }
 
-  private def mockGetUploadResult(uploadStatus: Option[UploadStatus]): Unit =
-    when(mockUploadService.getUploadResult(any())).thenReturn(Future.successful(uploadStatus))
+  private def mockGetUploadStatus(uploadStatus: Option[UploadStatus]): Unit =
+    when(mockUploadService.getUploadStatus(any())).thenReturn(Future.successful(uploadStatus))
 }

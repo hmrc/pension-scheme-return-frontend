@@ -16,9 +16,9 @@
 
 package controllers.nonsipp.memberdetails.upload
 
-import controllers.nonsipp.memberdetails.upload.CheckingMemberDetailsFileController._
+import controllers.nonsipp.memberdetails.upload.FileUploadErrorController._
 import controllers.ControllerBaseSpec
-import models.{NormalMode, Upload}
+import models.{NormalMode, Upload, UploadFormatError}
 import models.UploadStatus.UploadStatus
 import org.mockito.ArgumentMatchers.any
 import play.api.inject
@@ -28,10 +28,10 @@ import views.html.ContentPageView
 
 import scala.concurrent.Future
 
-class CheckingMemberDetailsFileControllerSpec extends ControllerBaseSpec {
+class FileUploadErrorControllerSpec extends ControllerBaseSpec {
 
-  private lazy val onPageLoad = routes.CheckingMemberDetailsFileController.onPageLoad(srn, NormalMode)
-  private lazy val onSubmit = routes.CheckingMemberDetailsFileController.onSubmit(srn, NormalMode)
+  private lazy val onPageLoad = routes.FileUploadErrorController.onPageLoad(srn, NormalMode)
+  private lazy val onSubmit = routes.FileUploadErrorController.onSubmit(srn, NormalMode)
 
   private val mockUploadService = mock[UploadService]
 
@@ -42,16 +42,18 @@ class CheckingMemberDetailsFileControllerSpec extends ControllerBaseSpec {
   override def beforeEach(): Unit =
     reset(mockUploadService)
 
-  "CheckingMemberDetailsFileController" - {
+  "FileUploadErrorController" - {
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       injected[ContentPageView].apply(viewModel(srn, NormalMode))
-    })
+    }.before(mockGetUploadResult(Some(UploadFormatError))))
 
     act.like(
-      redirectToPage(onSubmit, routes.FileUploadSuccessController.onPageLoad(srn, NormalMode))
-        .before(mockGetUploadResult(Some(uploadResultSuccess)))
+      redirectToPage(onPageLoad, controllers.routes.JourneyRecoveryController.onPageLoad())
+        .before(mockGetUploadResult(None))
     )
+
+    act.like(redirectNextPage(onSubmit))
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 

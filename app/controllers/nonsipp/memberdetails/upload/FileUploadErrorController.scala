@@ -17,11 +17,11 @@
 package controllers.nonsipp.memberdetails.upload
 
 import controllers.actions._
-import controllers.nonsipp.memberdetails.upload.FileUploadSuccessController._
-import models.{Mode, UploadKey, UploadStatus}
+import controllers.nonsipp.memberdetails.upload.FileUploadErrorController._
 import models.SchemeId.Srn
+import models.{Mode, UploadErrors, UploadFormatError, UploadKey, UploadStatus}
 import navigation.Navigator
-import pages.nonsipp.memberdetails.upload.FileUploadSuccessPage
+import pages.nonsipp.memberdetails.upload.FileUploadErrorPage
 import play.api.i18n._
 import play.api.mvc._
 import services.UploadService
@@ -34,7 +34,7 @@ import views.html.ContentPageView
 import javax.inject.{Inject, Named}
 import scala.concurrent.ExecutionContext
 
-class FileUploadSuccessController @Inject()(
+class FileUploadErrorController @Inject()(
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   uploadService: UploadService,
@@ -46,24 +46,26 @@ class FileUploadSuccessController @Inject()(
     with I18nSupport {
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
-    uploadService.getUploadStatus(UploadKey.fromRequest(srn)).map {
-      case Some(upload: UploadStatus.Success) => Ok(view(viewModel(srn, upload.name, mode)))
+    uploadService.getUploadResult(UploadKey.fromRequest(srn)).map {
+      case Some(UploadFormatError) | Some(_: UploadErrors) => Ok(view(viewModel(srn, mode)))
       case _ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
     }
   }
 
   def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    Redirect(navigator.nextPage(FileUploadSuccessPage(srn), mode, request.userAnswers))
+    Redirect(navigator.nextPage(FileUploadErrorPage(srn), mode, request.userAnswers))
   }
 }
 
-object FileUploadSuccessController {
-  def viewModel(srn: Srn, fileName: String, mode: Mode): PageViewModel[ContentPageViewModel] =
+object FileUploadErrorController {
+  def viewModel(srn: Srn, mode: Mode): PageViewModel[ContentPageViewModel] =
     PageViewModel(
-      title = "fileUploadSuccess.title",
-      heading = "fileUploadSuccess.heading",
-      ContentPageViewModel(isLargeHeading = true),
-      onSubmit = routes.FileUploadSuccessController.onSubmit(srn, mode)
-    ).withButtonText("site.continue")
-      .withDescription(ParagraphMessage(Message("fileUploadSuccess.paragraph", fileName)))
+      title = "fileUploadError.title",
+      heading = "fileUploadError.heading",
+      description = Some(ParagraphMessage(Message("fileUploadError.paragraph"))),
+      page = ContentPageViewModel(isLargeHeading = true),
+      refresh = None,
+      buttonText = "site.continue",
+      onSubmit = routes.FileUploadErrorController.onSubmit(srn, mode)
+    )
 }
