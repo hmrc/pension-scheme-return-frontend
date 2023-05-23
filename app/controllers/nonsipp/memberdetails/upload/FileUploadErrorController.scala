@@ -28,7 +28,7 @@ import services.UploadService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage._
 import viewmodels.implicits._
-import viewmodels.models.ContentPageViewModel
+import viewmodels.models.{ContentPageViewModel, PageViewModel}
 import views.html.ContentPageView
 
 import javax.inject.{Inject, Named}
@@ -58,13 +58,14 @@ class FileUploadErrorController @Inject()(
 }
 
 object FileUploadErrorController {
-  def viewModel(srn: Srn, mode: Mode): ContentPageViewModel = ContentPageViewModel(
-    title = "fileUploadError.title",
-    heading = "fileUploadError.heading",
-    contents = List(ParagraphMessage(Message("fileUploadError.paragraph"))),
-    isStartButton = false,
-    buttonText = "site.continue",
-    isLargeHeading = true,
-    onSubmit = routes.FileUploadErrorController.onSubmit(srn, mode)
-  )
+  def viewModel(srn: Srn, mode: Mode): PageViewModel[ContentPageViewModel] =
+    PageViewModel(
+      title = "fileUploadError.title",
+      heading = "fileUploadError.heading",
+      description = Some(ParagraphMessage(Message("fileUploadError.paragraph"))),
+      page = ContentPageViewModel(isLargeHeading = true),
+      refresh = None,
+      buttonText = "site.continue",
+      onSubmit = routes.FileUploadErrorController.onSubmit(srn, mode)
+    )
 }
