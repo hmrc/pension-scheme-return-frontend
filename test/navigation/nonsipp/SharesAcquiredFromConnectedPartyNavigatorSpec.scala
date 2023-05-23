@@ -16,37 +16,38 @@
 
 package navigation.nonsipp
 
-import controllers.nonsipp.personalcontributions
+import controllers.routes
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.employercontributions.EmployerContributionsPage
+import pages.nonsipp.sharesacquiredfromconnectedparty.SharesAcquiredFromConnectedPartyPage
 import utils.BaseSpec
 
-class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
+class SharesAcquiredFromConnectedPartyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
   val navigator: Navigator = new NonSippNavigator
 
-  "EmployerContributionsNavigator" - {
+  "SharesAcquiredFromConnectedPartyNavigator" - {
 
     act.like(
       normalmode
         .navigateToWithData(
-          EmployerContributionsPage,
+          SharesAcquiredFromConnectedPartyPage,
           Gen.const(true),
-          controllers.nonsipp.unallocatedemployercontributions.routes.UnallocatedEmployerContributionsController.onPageLoad
+          (_, _) => routes.UnauthorisedController.onPageLoad()
         )
-        .withName("go from employer contribution page to unallocated employer contributions page when yes selected")
+        .withName("go from shares acquired from connected party page to unauthorised page when yes selected")
     )
 
     act.like(
       normalmode
         .navigateToWithData(
-          EmployerContributionsPage,
+          SharesAcquiredFromConnectedPartyPage,
           Gen.const(false),
-          controllers.nonsipp.unallocatedemployercontributions.routes.UnallocatedEmployerContributionsController.onPageLoad
+          (_, _) => routes.UnauthorisedController.onPageLoad()
         )
-        .withName("go from employer contribution page to unallocated employer contributions page when no selected")
+        .withName(
+          "go from shares acquired from connected party page to unauthorised page when no selected"
+        )
     )
-
   }
 }

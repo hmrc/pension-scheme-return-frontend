@@ -29,6 +29,8 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{MemberDetailsUploadValidator, SaveService, UploadService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.DisplayMessage
+import viewmodels.DisplayMessage.{Message, ParagraphMessage}
 import viewmodels.DisplayMessage.ParagraphMessage
 import viewmodels.implicits._
 import viewmodels.models.{PageViewModel, YesNoPageViewModel}
