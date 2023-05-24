@@ -32,7 +32,7 @@ import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
-import viewmodels.models.{PageViewModel, YesNoPageViewModel}
+import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 import views.html.YesNoPageView
 
 import javax.inject.{Inject, Named}
@@ -98,7 +98,7 @@ object RemoveMemberDetailsController {
     "removeMemberDetails.error.required"
   )
 
-  def viewModel(srn: Srn, index: Max99, nameDOB: NameDOB, mode: Mode): PageViewModel[YesNoPageViewModel] =
+  def viewModel(srn: Srn, index: Max99, nameDOB: NameDOB, mode: Mode): FormPageViewModel[YesNoPageViewModel] =
     YesNoPageViewModel(
       Message("removeMemberDetails.title", nameDOB.fullName),
       Message("removeMemberDetails.heading", nameDOB.fullName),

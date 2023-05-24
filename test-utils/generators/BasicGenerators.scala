@@ -18,20 +18,20 @@ package generators
 
 import cats.data.NonEmptyList
 import config.Refined.{Max99, OneTo99}
+import eu.timepit.refined._
+import models.Pagination
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
 import org.scalacheck.Gen.{alphaChar, alphaNumChar, alphaNumStr, alphaStr, choose, chooseNum, listOfN, numChar}
+import org.scalatest.EitherValues
+import play.api.libs.json._
 import play.api.mvc.Call
 import viewmodels.DisplayMessage
 import viewmodels.DisplayMessage.ListType.Bullet
 import viewmodels.DisplayMessage._
+import viewmodels.models.PaginatedViewModel
 
 import java.time.{Instant, LocalDate, ZoneOffset}
-import eu.timepit.refined._
-import models.Pagination
-import org.scalatest.EitherValues
-import play.api.libs.json.{JsArray, JsBoolean, JsNull, JsNumber, JsObject, JsString, JsValue, Json}
-import viewmodels.models.PaginatedViewModel
 
 trait BasicGenerators extends EitherValues {
 
@@ -172,10 +172,12 @@ trait BasicGenerators extends EitherValues {
   val nonEmptyInlineMessage: Gen[InlineMessage] = Gen.oneOf(nonEmptyMessage, nonEmptyLinkMessage)
 
   val nonEmptyParagraphMessage: Gen[ParagraphMessage] = nonEmptyListOf(nonEmptyInlineMessage).map(ParagraphMessage(_))
+  val nonEmptyHeading2Message: Gen[Heading2] = nonEmptyInlineMessage.map(Heading2(_))
   val nonEmptyListMessage: Gen[ListMessage] =
     nonEmptyListOf(nonEmptyInlineMessage).map(ListMessage(_, Bullet))
 
-  val nonEmptyBlockMessage: Gen[BlockMessage] = Gen.oneOf(nonEmptyParagraphMessage, nonEmptyListMessage)
+  val nonEmptyBlockMessage: Gen[BlockMessage] =
+    Gen.oneOf(nonEmptyParagraphMessage, nonEmptyListMessage, nonEmptyHeading2Message)
   val nonEmptyDisplayMessage: Gen[DisplayMessage] = Gen.oneOf(nonEmptyInlineMessage, nonEmptyBlockMessage)
 
   def tupleOf[A, B](genA: Gen[A], genB: Gen[B]): Gen[(A, B)] =

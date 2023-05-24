@@ -47,9 +47,21 @@ object DisplayMessage {
     def ++(other: DisplayMessage): CompoundMessage = CompoundMessage(message, other)
   }
 
-  case class LinkMessage(content: Message, url: String) extends InlineMessage
+  case class LinkMessage(content: Message, url: String, attrs: Map[String, String]) extends InlineMessage {
+
+    def withAttr(key: String, value: String): LinkMessage =
+      copy(attrs = attrs + (key -> value))
+  }
+
+  object LinkMessage {
+
+    def apply(content: Message, url: String): LinkMessage =
+      LinkMessage(content, url, Map())
+  }
 
   case class DownloadLinkMessage(content: Message, url: String) extends InlineMessage
+
+  case class Heading2(content: InlineMessage, headingSize: LabelSize = LabelSize.Small) extends BlockMessage
 
   case class ParagraphMessage(content: NonEmptyList[InlineMessage]) extends BlockMessage
 

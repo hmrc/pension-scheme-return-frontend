@@ -30,7 +30,7 @@ import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
-import viewmodels.models.{PageViewModel, YesNoPageViewModel}
+import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 import views.html.YesNoPageView
 
 import javax.inject.{Inject, Named}
@@ -75,7 +75,7 @@ object LandOrPropertyHeldController {
     "landOrPropertyHeld.error.required"
   )
 
-  def viewModel(srn: Srn, mode: Mode, schemeName: String): PageViewModel[YesNoPageViewModel] =
+  def viewModel(srn: Srn, mode: Mode, schemeName: String): FormPageViewModel[YesNoPageViewModel] =
     YesNoPageViewModel(
       "landOrPropertyHeld.title",
       Message("landOrPropertyHeld.heading", schemeName),

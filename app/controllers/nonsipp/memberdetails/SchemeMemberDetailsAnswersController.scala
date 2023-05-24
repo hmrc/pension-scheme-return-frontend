@@ -150,8 +150,8 @@ object SchemeMemberDetailsAnswersController {
     hasNINO: Boolean,
     maybeNino: Option[Nino],
     maybeNoNinoReason: Option[String]
-  ): PageViewModel[CheckYourAnswersViewModel] =
-    PageViewModel(
+  ): FormPageViewModel[CheckYourAnswersViewModel] =
+    FormPageViewModel(
       title = checkOrChange.fold(check = "checkYourAnswers.title", change = "changeMemberDetails.title"),
       heading = checkOrChange.fold(
         check = "checkYourAnswers.heading",

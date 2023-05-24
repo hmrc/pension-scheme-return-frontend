@@ -47,7 +47,7 @@ class NameDOBViewSpec extends ViewSpec {
       )
     )
 
-    val viewModelGen = pageViewModelGen[NameDOBViewModel]
+    val viewModelGen = formPageViewModelGen[NameDOBViewModel]
 
     "NameDOBView" - {
       act.like(renderTitle(viewModelGen)(view(form, _), _.title.key))

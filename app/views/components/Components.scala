@@ -25,8 +25,12 @@ import viewmodels.DisplayMessage._
 
 object Components {
 
-  private def anchor(content: Html, url: String): Html =
-    HtmlFormat.raw(s"""<a href="$url" class="govuk-link">$content</a>""")
+  private def anchor(content: Html, url: String, attrs: Map[String, String]): Html = {
+    val attributes = attrs.toList.map { case (key, value) => s"""$key="$value"""" }.mkString(" ")
+
+    HtmlFormat.raw(s"""<a href="$url" class="govuk-link" $attributes>$content</a>""")
+  }
+
   private def anchorDownload(content: Html, url: String): Html =
     HtmlFormat.raw(s"""<a href="$url" class="govuk-link" download>$content</a>""")
 
@@ -63,11 +67,16 @@ object Components {
   private def combine(left: Html, right: Html): Html =
     HtmlFormat.raw(left.body + " " + right.body)
 
+  private def h2(content: Html, cssClass: String): Html =
+    HtmlFormat.raw(
+      s"""<h2 class="$cssClass">${content.body}</h2>"""
+    )
+
   def renderMessage(message: DisplayMessage)(implicit messages: Messages): Html =
     message match {
       case Empty => Html("")
       case m @ Message(_, _) => HtmlFormat.escape(m.toMessage)
-      case LinkMessage(content, url) => anchor(renderMessage(content), url)
+      case LinkMessage(content, url, attrs) => anchor(renderMessage(content), url, attrs)
       case DownloadLinkMessage(content, url) => anchorDownload(renderMessage(content), url)
       case ParagraphMessage(content) => paragraph(content.map(renderMessage).reduce(combine))
       case ListMessage(content, Bullet) => unorderedList(content.map(renderMessage))
@@ -75,5 +84,6 @@ object Components {
       case TableMessage(content) =>
         table(content.map { case (key, value) => renderMessage(key) -> renderMessage(value) })
       case CompoundMessage(first, second) => combine(renderMessage(first), renderMessage(second))
+      case Heading2(content, labelSize) => h2(renderMessage(content), labelSize.toString)
     }
 }

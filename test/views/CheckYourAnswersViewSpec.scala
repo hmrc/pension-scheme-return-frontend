@@ -27,7 +27,7 @@ class CheckYourAnswersViewSpec extends ViewSpec {
 
     implicit val request = FakeRequest()
 
-    val viewModelGen = pageViewModelGen[CheckYourAnswersViewModel]
+    val viewModelGen = formPageViewModelGen[CheckYourAnswersViewModel]
 
     "CheckYourAnswerView" - {
 

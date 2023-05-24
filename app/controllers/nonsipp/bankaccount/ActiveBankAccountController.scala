@@ -30,7 +30,7 @@ import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
-import viewmodels.models.{PageViewModel, YesNoPageViewModel}
+import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 import views.html.YesNoPageView
 
 import javax.inject.{Inject, Named}
@@ -76,7 +76,7 @@ object ActiveBankAccountController {
     List(memberName)
   )
 
-  def viewModel(srn: Srn, memberName: String, mode: Mode): PageViewModel[YesNoPageViewModel] =
+  def viewModel(srn: Srn, memberName: String, mode: Mode): FormPageViewModel[YesNoPageViewModel] =
     YesNoPageViewModel(
       Message("activeAccountDetails.title"),
       Message("activeAccountDetails.heading", memberName),

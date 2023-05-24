@@ -16,25 +16,37 @@
 
 package generators
 
+import cats.data.NonEmptyList
 import org.scalacheck.Gen
 import play.api.data.Form
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.MultipleQuestionsViewModel.{DoubleQuestion, SingleQuestion, TripleQuestion}
+import viewmodels.models.TaskListStatus.TaskListStatus
 import viewmodels.models._
 
 trait ViewModelGenerators extends BasicGenerators {
 
-  def pageViewModelGen[A](implicit gen: Gen[A]): Gen[PageViewModel[A]] =
+  def formPageViewModelGen[A](implicit gen: Gen[A]): Gen[FormPageViewModel[A]] =
     for {
       title <- nonEmptyMessage
-      heading <- nonEmptyMessage
+      heading <- nonEmptyInlineMessage
       description <- Gen.option(nonEmptyBlockMessage)
       page <- gen
       refresh <- Gen.option(Gen.const(1))
       buttonText <- nonEmptyMessage
       onSubmit <- call
     } yield {
-      PageViewModel(title, heading, description, page, refresh, buttonText, onSubmit)
+      FormPageViewModel(title, heading, description, page, refresh, buttonText, onSubmit)
+    }
+
+  def pageViewModelGen[A](implicit gen: Gen[A]): Gen[PageViewModel[A]] =
+    for {
+      title <- nonEmptyMessage
+      heading <- nonEmptyInlineMessage
+      description <- Gen.option(nonEmptyBlockMessage)
+      page <- gen
+    } yield {
+      PageViewModel(title, heading, description, page)
     }
 
   implicit val contentPageViewModelGen: Gen[ContentPageViewModel] =
@@ -265,4 +277,38 @@ trait ViewModelGenerators extends BasicGenerators {
     } yield {
       TextAreaViewModel(rows)
     }
+
+  val taskListStatusGen: Gen[TaskListStatus] =
+    Gen.oneOf(
+      TaskListStatus.UnableToStart,
+      TaskListStatus.NotStarted,
+      TaskListStatus.InProgress,
+      TaskListStatus.Completed
+    )
+
+  val taskListItemViewModelGen: Gen[TaskListItemViewModel] =
+    for {
+      link <- nonEmptyLinkMessage
+      status <- taskListStatusGen
+    } yield {
+      TaskListItemViewModel(link, status)
+    }
+
+  val taskListSectionViewModelGen: Gen[TaskListSectionViewModel] = {
+    val itemsGen = Gen.nonEmptyListOf(taskListItemViewModelGen).map(NonEmptyList.fromList(_).get)
+
+    for {
+      sectionTitle <- nonEmptyMessage
+      items <- Gen.either(nonEmptyInlineMessage, itemsGen)
+      postActionLink <- Gen.option(nonEmptyLinkMessage)
+    } yield {
+      TaskListSectionViewModel(sectionTitle, items, postActionLink)
+    }
+  }
+
+  implicit val taskListViewModel: Gen[TaskListViewModel] =
+    Gen
+      .nonEmptyListOf(taskListSectionViewModelGen)
+      .map(NonEmptyList.fromList(_).get)
+      .map(TaskListViewModel(_))
 }

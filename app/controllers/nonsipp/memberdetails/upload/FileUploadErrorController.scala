@@ -19,7 +19,7 @@ package controllers.nonsipp.memberdetails.upload
 import controllers.actions._
 import controllers.nonsipp.memberdetails.upload.FileUploadErrorController._
 import models.SchemeId.Srn
-import models.{Mode, UploadErrors, UploadFormatError, UploadKey, UploadStatus}
+import models.{Mode, UploadErrors, UploadFormatError, UploadKey}
 import navigation.Navigator
 import pages.nonsipp.memberdetails.upload.FileUploadErrorPage
 import play.api.i18n._
@@ -28,7 +28,7 @@ import services.UploadService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage._
 import viewmodels.implicits._
-import viewmodels.models.{ContentPageViewModel, PageViewModel}
+import viewmodels.models.{ContentPageViewModel, FormPageViewModel}
 import views.html.ContentPageView
 
 import javax.inject.{Inject, Named}
@@ -58,8 +58,8 @@ class FileUploadErrorController @Inject()(
 }
 
 object FileUploadErrorController {
-  def viewModel(srn: Srn, mode: Mode): PageViewModel[ContentPageViewModel] =
-    PageViewModel(
+  def viewModel(srn: Srn, mode: Mode): FormPageViewModel[ContentPageViewModel] =
+    FormPageViewModel(
       title = "fileUploadError.title",
       heading = "fileUploadError.heading",
       description = Some(ParagraphMessage(Message("fileUploadError.paragraph"))),

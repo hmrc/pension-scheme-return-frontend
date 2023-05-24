@@ -31,7 +31,7 @@ import uk.gov.hmrc.time.TaxYear
 import utils.DateTimeUtils
 import viewmodels.DisplayMessage.{Message, ParagraphMessage}
 import viewmodels.implicits._
-import viewmodels.models.{PageViewModel, YesNoPageViewModel}
+import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 import views.html.YesNoPageView
 
 import scala.concurrent.Future
@@ -156,7 +156,7 @@ class CheckReturnDatesControllerSpec extends ControllerBaseSpec with ScalaCheckP
   "CheckReturnDates Controller" - {
 
     val minimalSchemeDetails = minimalSchemeDetailsGen.sample.value
-    lazy val viewModel: PageViewModel[YesNoPageViewModel] =
+    lazy val viewModel: FormPageViewModel[YesNoPageViewModel] =
       CheckReturnDatesController.viewModel(
         srn,
         NormalMode,

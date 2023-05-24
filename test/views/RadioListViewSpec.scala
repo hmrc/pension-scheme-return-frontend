@@ -35,7 +35,7 @@ class RadioListViewSpec extends ViewSpec {
 
     val view = injected[RadioListView]
 
-    val viewModelGen = pageViewModelGen[RadioListViewModel]
+    val viewModelGen = formPageViewModelGen[RadioListViewModel]
 
     "RadioListView" - {
 

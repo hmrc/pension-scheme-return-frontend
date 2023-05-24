@@ -31,7 +31,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.implicits._
-import viewmodels.models.{PageViewModel, TextAreaViewModel}
+import viewmodels.models.{FormPageViewModel, TextAreaViewModel}
 import views.html.TextAreaView
 
 import javax.inject.{Inject, Named}
@@ -96,8 +96,8 @@ object NoNINOController {
     memberFullName
   )
 
-  def viewModel(srn: Srn, memberFullName: String, index: Max99, mode: Mode): PageViewModel[TextAreaViewModel] =
-    PageViewModel(
+  def viewModel(srn: Srn, memberFullName: String, index: Max99, mode: Mode): FormPageViewModel[TextAreaViewModel] =
+    FormPageViewModel(
       "noNINO.title",
       "noNINO.heading" -> memberFullName,
       TextAreaViewModel(),

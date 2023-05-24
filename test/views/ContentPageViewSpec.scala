@@ -27,7 +27,7 @@ class ContentPageViewSpec extends ViewSpec {
 
     implicit val request = FakeRequest()
 
-    val viewModelGen = pageViewModelGen[ContentPageViewModel]
+    val viewModelGen = formPageViewModelGen[ContentPageViewModel]
 
     "ContentPageView" - {
 

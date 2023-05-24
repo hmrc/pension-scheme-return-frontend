@@ -31,8 +31,8 @@ object DateRangeViewModel {
     heading: InlineMessage,
     description: Option[BlockMessage],
     onSubmit: Call
-  ): PageViewModel[DateRangeViewModel] =
-    PageViewModel(
+  ): FormPageViewModel[DateRangeViewModel] =
+    FormPageViewModel(
       title,
       heading,
       DateRangeViewModel(

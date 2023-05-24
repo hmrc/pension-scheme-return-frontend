@@ -32,8 +32,8 @@ object CheckYourAnswersViewModel {
   def apply(
     rows: Seq[CheckYourAnswersRowViewModel],
     onSubmit: Call
-  ): PageViewModel[CheckYourAnswersViewModel] =
-    PageViewModel(
+  ): FormPageViewModel[CheckYourAnswersViewModel] =
+    FormPageViewModel(
       Message("checkYourAnswers.title"),
       Message("checkYourAnswers.heading"),
       CheckYourAnswersViewModel(rows.toList),

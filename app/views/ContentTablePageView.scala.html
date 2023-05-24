@@ -23,7 +23,7 @@
     govukTable: GovukTable
 )
 
-@(viewmodel: PageViewModel[ContentTablePageViewModel])(implicit request: Request[_], messages: Messages)
+@(viewmodel: FormPageViewModel[ContentTablePageViewModel])(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(viewmodel.title.toMessage)) {
 

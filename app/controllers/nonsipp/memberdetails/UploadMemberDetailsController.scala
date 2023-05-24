@@ -29,7 +29,7 @@ import services.UploadService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.{ListMessage, ListType, ParagraphMessage}
 import viewmodels.implicits._
-import viewmodels.models.{PageViewModel, UploadViewModel}
+import viewmodels.models.{FormPageViewModel, UploadViewModel}
 import views.html.UploadView
 
 import javax.inject.{Inject, Named}
@@ -82,8 +82,8 @@ object UploadMemberDetailsController {
     postTarget: String,
     formFields: Map[String, String],
     error: Option[String]
-  ): PageViewModel[UploadViewModel] =
-    PageViewModel(
+  ): FormPageViewModel[UploadViewModel] =
+    FormPageViewModel(
       "uploadMemberDetails.title",
       "uploadMemberDetails.heading",
       UploadViewModel(

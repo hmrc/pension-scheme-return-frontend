@@ -33,7 +33,7 @@ import viewmodels.DisplayMessage
 import viewmodels.DisplayMessage.{Message, ParagraphMessage}
 import viewmodels.DisplayMessage.ParagraphMessage
 import viewmodels.implicits._
-import viewmodels.models.{PageViewModel, YesNoPageViewModel}
+import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 import views.html.YesNoPageView
 
 import javax.inject.{Inject, Named}
@@ -107,9 +107,9 @@ object CheckMemberDetailsFileController {
     "checkMemberDetailsFile.error.required"
   )
 
-  def viewModel(srn: Srn, fileName: Option[String], mode: Mode): PageViewModel[YesNoPageViewModel] = {
+  def viewModel(srn: Srn, fileName: Option[String], mode: Mode): FormPageViewModel[YesNoPageViewModel] = {
     val refresh = if (fileName.isEmpty) Some(1) else None
-    PageViewModel(
+    FormPageViewModel(
       "checkMemberDetailsFile.title",
       "checkMemberDetailsFile.heading",
       YesNoPageViewModel(

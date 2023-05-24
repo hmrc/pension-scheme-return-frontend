@@ -18,11 +18,11 @@ package controllers.nonsipp.sharesacquiredfromconnectedparty
 
 import controllers.actions._
 import controllers.nonsipp.sharesacquiredfromconnectedparty.SharesAcquiredFromConnectedPartyController.viewModel
-import pages.nonsipp.sharesacquiredfromconnectedparty.SharesAcquiredFromConnectedPartyPage
 import forms.YesNoPageFormProvider
 import models.Mode
 import models.SchemeId.Srn
 import navigation.Navigator
+import pages.nonsipp.sharesacquiredfromconnectedparty.SharesAcquiredFromConnectedPartyPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -30,7 +30,7 @@ import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
 import viewmodels.implicits._
-import viewmodels.models.{FurtherDetailsViewModel, PageViewModel, YesNoPageViewModel}
+import viewmodels.models.{FormPageViewModel, FurtherDetailsViewModel, YesNoPageViewModel}
 import views.html.YesNoPageView
 
 import javax.inject.{Inject, Named}
@@ -74,8 +74,8 @@ object SharesAcquiredFromConnectedPartyController {
     "sharesAcquiredFromConnectedParty.error.required"
   )
 
-  def viewModel(srn: Srn, schemeName: String, mode: Mode): PageViewModel[YesNoPageViewModel] =
-    PageViewModel(
+  def viewModel(srn: Srn, schemeName: String, mode: Mode): FormPageViewModel[YesNoPageViewModel] =
+    FormPageViewModel(
       "sharesAcquiredFromConnectedParty.title",
       Message("sharesAcquiredFromConnectedParty.heading", schemeName),
       YesNoPageViewModel(

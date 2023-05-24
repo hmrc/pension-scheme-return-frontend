@@ -41,9 +41,9 @@ class IntViewSpec extends ViewSpec with Mappings {
 
     val invalidForm = intForm.bind(Map("value" -> ""))
 
-    val singleIntViewModel = pageViewModelGen(singleQuestionGen(intForm))
-    val invalidViewModel = pageViewModelGen(singleQuestionGen(invalidForm))
-    val tripleIntViewModel = pageViewModelGen(tripleQuestionGen(tripleIntForm))
+    val singleIntViewModel = formPageViewModelGen(singleQuestionGen(intForm))
+    val invalidViewModel = formPageViewModelGen(singleQuestionGen(invalidForm))
+    val tripleIntViewModel = formPageViewModelGen(tripleQuestionGen(tripleIntForm))
     val viewModelGen = Gen.oneOf(singleIntViewModel, tripleIntViewModel, invalidViewModel)
 
     implicit val request = FakeRequest()

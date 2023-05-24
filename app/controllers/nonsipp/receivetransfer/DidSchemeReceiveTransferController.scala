@@ -30,7 +30,7 @@ import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
-import viewmodels.models.{PageViewModel, YesNoPageViewModel}
+import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 import views.html.YesNoPageView
 
 import javax.inject.{Inject, Named}
@@ -80,7 +80,7 @@ object DidSchemeReceiveTransferController {
     "didSchemeReceiveTransfer.error.required"
   )
 
-  def viewModel(srn: Srn, schemeName: String, mode: Mode): PageViewModel[YesNoPageViewModel] = YesNoPageViewModel(
+  def viewModel(srn: Srn, schemeName: String, mode: Mode): FormPageViewModel[YesNoPageViewModel] = YesNoPageViewModel(
     "didSchemeReceiveTransfer.title",
     Message("didSchemeReceiveTransfer.heading", schemeName),
     routes.DidSchemeReceiveTransferController.onSubmit(srn, mode)

@@ -21,6 +21,7 @@ import viewmodels.DisplayMessage.{
   CompoundMessage,
   DownloadLinkMessage,
   Empty,
+  Heading2,
   LinkMessage,
   ListMessage,
   Message,
@@ -37,7 +38,7 @@ trait DisplayMessageUtils {
     case Empty => List()
     case m: Message => List(m)
     case CompoundMessage(left, right) => allMessages(left) ++ allMessages(right)
-    case LinkMessage(message, _) => List(message)
+    case LinkMessage(message, _, _) => List(message)
     case DownloadLinkMessage(message, _) => List(message)
     case ParagraphMessage(messages) => messages.toList.flatMap(allMessages)
     case TableMessage(contents) =>
@@ -46,5 +47,6 @@ trait DisplayMessageUtils {
           allMessages(headers) ++ allMessages(contents) ++ acc
       }
     case ListMessage(messages, _) => messages.toList.flatMap(allMessages)
+    case Heading2(content, _) => allMessages(content)
   }
 }

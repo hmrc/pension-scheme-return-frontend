@@ -35,7 +35,7 @@ import utils.FormUtils._
 import utils.RefinedUtils.RefinedIntOps
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
-import viewmodels.models.{PageViewModel, TextInputViewModel}
+import viewmodels.models.{FormPageViewModel, TextInputViewModel}
 import views.html.TextInputView
 
 import javax.inject.{Inject, Named}
@@ -99,8 +99,8 @@ object MemberDetailsNinoController {
       memberDetails.fullName
     )
 
-  def viewModel(srn: Srn, index: Max99, mode: Mode, memberDetails: NameDOB): PageViewModel[TextInputViewModel] =
-    PageViewModel(
+  def viewModel(srn: Srn, index: Max99, mode: Mode, memberDetails: NameDOB): FormPageViewModel[TextInputViewModel] =
+    FormPageViewModel(
       Message("memberDetailsNino.title"),
       Message("memberDetailsNino.heading", memberDetails.fullName),
       TextInputViewModel(),

@@ -24,7 +24,7 @@
         govukFileUpload: GovukFileUpload
 )
 
-@(viewmodel: PageViewModel[UploadViewModel])(implicit request: Request[_], messages: Messages)
+@(viewmodel: FormPageViewModel[UploadViewModel])(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(viewmodel.title.toMessage)) {
 

@@ -30,7 +30,8 @@ object UnquotedSharesNavigator extends JourneyNavigator {
       if (userAnswers.get(page).contains(true)) {
         routes.UnauthorisedController.onPageLoad()
       } else {
-        controllers.nonsipp.sharesacquiredfromconnectedparty.routes.SharesAcquiredFromConnectedPartyController.onPageLoad(srn, NormalMode)
+        controllers.nonsipp.sharesacquiredfromconnectedparty.routes.SharesAcquiredFromConnectedPartyController
+          .onPageLoad(srn, NormalMode)
       }
   }
 

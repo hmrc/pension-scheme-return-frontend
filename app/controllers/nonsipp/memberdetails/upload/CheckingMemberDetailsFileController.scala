@@ -30,7 +30,7 @@ import services.UploadService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage._
 import viewmodels.implicits._
-import viewmodels.models.{ContentPageViewModel, PageViewModel}
+import viewmodels.models.{ContentPageViewModel, FormPageViewModel}
 import views.html.ContentPageView
 
 import javax.inject.{Inject, Named}
@@ -64,8 +64,8 @@ class CheckingMemberDetailsFileController @Inject()(
 }
 
 object CheckingMemberDetailsFileController {
-  def viewModel(srn: Srn, mode: Mode): PageViewModel[ContentPageViewModel] =
-    PageViewModel(
+  def viewModel(srn: Srn, mode: Mode): FormPageViewModel[ContentPageViewModel] =
+    FormPageViewModel(
       title = "checkingMemberDetailsFile.title",
       heading = "checkingMemberDetailsFile.heading",
       ContentPageViewModel(isLargeHeading = true),

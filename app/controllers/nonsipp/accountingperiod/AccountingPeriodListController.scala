@@ -34,7 +34,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.DateTimeUtils.localDateShow
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
-import viewmodels.models.{ListRow, ListViewModel, PageViewModel}
+import viewmodels.models.{FormPageViewModel, ListRow, ListViewModel}
 import views.html.ListView
 
 import javax.inject.Named
@@ -107,12 +107,12 @@ object AccountingPeriodListController {
             )
         )
     }
-  def viewModel(srn: Srn, mode: Mode, periods: List[DateRange]): PageViewModel[ListViewModel] = {
+  def viewModel(srn: Srn, mode: Mode, periods: List[DateRange]): FormPageViewModel[ListViewModel] = {
 
     val title = if (periods.length == 1) "accountingPeriods.title" else "accountingPeriods.title.plural"
     val heading = if (periods.length == 1) "accountingPeriods.heading" else "accountingPeriods.heading.plural"
 
-    PageViewModel(
+    FormPageViewModel(
       Message(title, periods.length),
       Message(heading, periods.length),
       ListViewModel(

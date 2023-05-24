@@ -48,7 +48,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.FormUtils.FormOps
 import viewmodels.DisplayMessage.{ListMessage, ListType, Message, ParagraphMessage}
 import viewmodels.implicits._
-import viewmodels.models.{PageViewModel, RadioListRowViewModel, RadioListViewModel}
+import viewmodels.models.{FormPageViewModel, RadioListRowViewModel, RadioListViewModel}
 import views.html.RadioListView
 
 import javax.inject.{Inject, Named}
@@ -109,8 +109,8 @@ object PensionSchemeMembersController {
       )
     )
 
-  def viewModel(srn: Srn, schemeName: String): PageViewModel[RadioListViewModel] =
-    PageViewModel(
+  def viewModel(srn: Srn, schemeName: String): FormPageViewModel[RadioListViewModel] =
+    FormPageViewModel(
       Message("pensionSchemeMembers.title", schemeName),
       Message("pensionSchemeMembers.heading", schemeName),
       RadioListViewModel(

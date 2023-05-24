@@ -26,7 +26,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.{ListMessage, ListType, Message, ParagraphMessage}
 import viewmodels.implicits._
-import viewmodels.models.{ContentPageViewModel, PageViewModel}
+import viewmodels.models.{ContentPageViewModel, FormPageViewModel}
 import views.html.ContentPageView
 
 import javax.inject.{Inject, Named}
@@ -56,8 +56,8 @@ class PspDeclarationController @Inject()(
 
 object PspDeclarationController {
 
-  def viewModel(srn: Srn): PageViewModel[ContentPageViewModel] =
-    PageViewModel(
+  def viewModel(srn: Srn): FormPageViewModel[ContentPageViewModel] =
+    FormPageViewModel(
       Message("pspDeclaration.title"),
       Message("pspDeclaration.heading"),
       ContentPageViewModel(),

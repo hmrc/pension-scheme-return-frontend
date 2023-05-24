@@ -30,7 +30,7 @@ import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.{ListMessage, ListType, ParagraphMessage}
 import viewmodels.implicits._
-import viewmodels.models.{PageViewModel, YesNoPageViewModel}
+import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 import views.html.YesNoPageView
 
 import javax.inject.{Inject, Named}
@@ -74,7 +74,7 @@ object PersonalContributionsController {
     "personalContributions.error.required"
   )
 
-  def viewModel(srn: Srn, mode: Mode): PageViewModel[YesNoPageViewModel] =
+  def viewModel(srn: Srn, mode: Mode): FormPageViewModel[YesNoPageViewModel] =
     YesNoPageViewModel(
       "personalContributions.title",
       "personalContributions.heading",
