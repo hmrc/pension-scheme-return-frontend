@@ -33,7 +33,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.{Empty, Message}
 import viewmodels.implicits._
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
-import viewmodels.models.{Field, PageViewModel}
+import viewmodels.models.{Field, FormPageViewModel}
 import views.html.MoneyView
 
 import javax.inject.{Inject, Named}
@@ -82,8 +82,8 @@ object FeesCommissionsWagesSalariesController {
     )
   )
 
-  def viewModel(srn: Srn, schemeName: String, form: Form[Money], mode: Mode): PageViewModel[SingleQuestion[Money]] =
-    PageViewModel(
+  def viewModel(srn: Srn, schemeName: String, form: Form[Money], mode: Mode): FormPageViewModel[SingleQuestion[Money]] =
+    FormPageViewModel(
       "feesCommissionsWagesSalaries.title",
       Message("feesCommissionsWagesSalaries.heading", schemeName),
       SingleQuestion(

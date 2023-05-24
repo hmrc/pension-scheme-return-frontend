@@ -37,7 +37,7 @@ import utils.DateTimeUtils.localDateShow
 import viewmodels.DisplayMessage.{Message, ParagraphMessage}
 import viewmodels.implicits._
 import viewmodels.models.MultipleQuestionsViewModel.DoubleQuestion
-import viewmodels.models.{Field, PageViewModel}
+import viewmodels.models.{Field, FormPageViewModel}
 import views.html.MoneyView
 
 import javax.inject.Named
@@ -125,8 +125,8 @@ object HowMuchCashController {
     schemeName: String,
     period: DateRange,
     form: Form[(Money, Money)]
-  ): PageViewModel[DoubleQuestion[Money]] =
-    PageViewModel(
+  ): FormPageViewModel[DoubleQuestion[Money]] =
+    FormPageViewModel(
       "howMuchCash.title",
       Message("howMuchCash.heading", schemeName),
       page = DoubleQuestion(

@@ -22,7 +22,7 @@
     govukInput: GovukInput
 )
 
-@(form: Form[BankAccount], viewmodel: PageViewModel[BankAccountViewModel])(implicit request: Request[_], messages: Messages)
+@(form: Form[BankAccount], viewmodel: FormPageViewModel[BankAccountViewModel])(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(viewmodel.title.toMessage)) {
 

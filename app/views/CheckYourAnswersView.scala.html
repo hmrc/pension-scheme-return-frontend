@@ -23,7 +23,7 @@
     govukButton: GovukButton,
 )
 
-@(viewmodel: PageViewModel[CheckYourAnswersViewModel])(implicit request: Request[_], messages: Messages)
+@(viewmodel: FormPageViewModel[CheckYourAnswersViewModel])(implicit request: Request[_], messages: Messages)
 
     @layout(pageTitle = titleNoForm(viewmodel.title.toMessage)) {
 

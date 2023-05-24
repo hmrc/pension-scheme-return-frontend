@@ -34,8 +34,8 @@ object RadioListViewModel {
     heading: InlineMessage,
     items: List[RadioListRowViewModel],
     onSubmit: Call
-  ): PageViewModel[RadioListViewModel] =
-    PageViewModel(
+  ): FormPageViewModel[RadioListViewModel] =
+    FormPageViewModel(
       title,
       heading,
       RadioListViewModel(None, items),

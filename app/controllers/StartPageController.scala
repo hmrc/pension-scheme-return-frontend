@@ -24,7 +24,7 @@ import pages.StartPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.models.{ContentPageViewModel, PageViewModel}
+import viewmodels.models.{ContentPageViewModel, FormPageViewModel}
 import views.html.ContentPageView
 
 import javax.inject.{Inject, Named}
@@ -53,7 +53,7 @@ class StartPageController @Inject()(
 
 object StartPageController {
 
-  def viewModel(srn: Srn): PageViewModel[ContentPageViewModel] = ContentPageViewModel.startPage(
+  def viewModel(srn: Srn): FormPageViewModel[ContentPageViewModel] = ContentPageViewModel.startPage(
     "startPage.title",
     "startPage.heading",
     List(

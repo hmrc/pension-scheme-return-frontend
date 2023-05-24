@@ -22,7 +22,7 @@
         govukTextarea: GovukTextarea
 )
 
-@(form: Form[String], viewmodel: PageViewModel[TextAreaViewModel])(implicit request: Request[_], messages: Messages)
+@(form: Form[String], viewmodel: FormPageViewModel[TextAreaViewModel])(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(viewmodel.title.toMessage)) {
 

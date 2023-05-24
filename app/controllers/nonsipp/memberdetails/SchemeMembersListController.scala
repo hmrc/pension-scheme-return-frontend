@@ -36,7 +36,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
-import viewmodels.models.{ListRow, ListViewModel, PageViewModel, PaginatedViewModel}
+import viewmodels.models.{FormPageViewModel, ListRow, ListViewModel, PaginatedViewModel}
 import views.html.ListView
 
 import javax.inject.Named
@@ -85,7 +85,7 @@ object SchemeMembersListController {
     "schemeMembersList.error.required"
   )
 
-  def viewModel(srn: Srn, page: Int, mode: Mode, memberNames: List[String]): PageViewModel[ListViewModel] = {
+  def viewModel(srn: Srn, page: Int, mode: Mode, memberNames: List[String]): FormPageViewModel[ListViewModel] = {
     val rows: List[ListRow] = memberNames.zipWithIndex.flatMap {
       case (memberName, index) =>
         refineV[OneTo99](index + 1) match {
@@ -115,7 +115,7 @@ object SchemeMembersListController {
       routes.SchemeMembersListController.onPageLoad(srn, _)
     )
 
-    PageViewModel(
+    FormPageViewModel(
       Message(titleKey, memberNames.length),
       Message(headingKey, memberNames.length),
       ListViewModel(

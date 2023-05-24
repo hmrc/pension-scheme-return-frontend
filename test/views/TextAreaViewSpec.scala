@@ -30,7 +30,7 @@ class TextAreaViewSpec extends ViewSpec with Mappings {
 
     implicit val request = FakeRequest()
 
-    val viewModelGen = pageViewModelGen[TextAreaViewModel]
+    val viewModelGen = formPageViewModelGen[TextAreaViewModel]
 
     "TextInputView" - {
 

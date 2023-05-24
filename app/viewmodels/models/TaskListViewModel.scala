@@ -28,20 +28,47 @@ case class TaskListItemViewModel(
 
 case class TaskListSectionViewModel(
   title: Message,
-  items: NonEmptyList[TaskListItemViewModel]
+  items: Either[InlineMessage, NonEmptyList[TaskListItemViewModel]],
+  postActionLink: Option[LinkMessage]
 )
 
+object TaskListSectionViewModel {
+
+  def apply(
+    title: Message,
+    headItem: TaskListItemViewModel,
+    tailItems: TaskListItemViewModel*
+  ): TaskListSectionViewModel =
+    TaskListSectionViewModel(title, Right(NonEmptyList(headItem, tailItems.toList)), None)
+
+  def apply(
+    title: Message,
+    item: InlineMessage,
+    postActionLink: LinkMessage
+  ): TaskListSectionViewModel =
+    TaskListSectionViewModel(title, Left(item), Some(postActionLink))
+}
+
 case class TaskListViewModel(sections: NonEmptyList[TaskListSectionViewModel])
+
+object TaskListViewModel {
+
+  def apply(
+    headItem: TaskListSectionViewModel,
+    tailItems: TaskListSectionViewModel*
+  ): TaskListViewModel =
+    TaskListViewModel(NonEmptyList(headItem, tailItems.toList))
+}
 
 object TaskListStatus {
 
   sealed abstract class TaskListStatus(val description: Message)
 
-  case object UnableToStart extends TaskListStatus("task-list.unableToStart")
+  case object UnableToStart extends TaskListStatus("tasklist.unableToStart")
 
-  case object NotStarted extends TaskListStatus("task-list.notStarted")
+  case object NotStarted extends TaskListStatus("tasklist.notStarted")
 
-  case object InProgress extends TaskListStatus("task-list.inProgress")
+  case object InProgress extends TaskListStatus("tasklist.inProgress")
 
-  case object Completed extends TaskListStatus("task-list.completed")
+  case object Completed extends TaskListStatus("tasklist.completed")
 }

@@ -32,7 +32,7 @@ import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.FormUtils._
 import viewmodels.DisplayMessage.Message
-import viewmodels.models.{NameDOBViewModel, PageViewModel}
+import viewmodels.models.{FormPageViewModel, NameDOBViewModel}
 import views.html.NameDOBView
 
 import javax.inject.{Inject, Named}
@@ -96,7 +96,7 @@ object MemberDetailsController {
     )
   )
 
-  def viewModel(srn: Srn, index: Max99, mode: Mode): PageViewModel[NameDOBViewModel] = PageViewModel(
+  def viewModel(srn: Srn, index: Max99, mode: Mode): FormPageViewModel[NameDOBViewModel] = FormPageViewModel(
     Message("memberDetails.title"),
     Message("memberDetails.heading"),
     NameDOBViewModel(

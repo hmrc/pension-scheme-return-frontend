@@ -28,7 +28,7 @@ class YesNoPageViewSpec extends ViewSpec {
 
     val view = injected[YesNoPageView]
 
-    val viewModelGen = pageViewModelGen[YesNoPageViewModel]
+    val viewModelGen = formPageViewModelGen[YesNoPageViewModel]
 
     "YesNoPageView" - {
 

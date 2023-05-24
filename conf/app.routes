@@ -248,3 +248,5 @@ GET        /:srn/file-upload-success               controllers.nonsipp.memberdet
 POST       /:srn/file-upload-success               controllers.nonsipp.memberdetails.upload.FileUploadSuccessController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 GET        /:srn/change-file-upload-success        controllers.nonsipp.memberdetails.upload.FileUploadSuccessController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST       /:srn/change-file-upload-success        controllers.nonsipp.memberdetails.upload.FileUploadSuccessController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET        /:srn/pension-scheme-return-task-list   controllers.nonsipp.TaskListController.onPageLoad(srn: Srn)

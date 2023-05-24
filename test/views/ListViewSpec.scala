@@ -34,7 +34,7 @@ class ListViewSpec extends ViewSpec {
     implicit val request: FakeRequest[_] = FakeRequest()
 
     def viewModelGen(showRadios: Boolean = true, rows: Option[Int] = None) =
-      pageViewModelGen(summaryViewModelGen(showRadios = showRadios, rows = rows))
+      formPageViewModelGen(summaryViewModelGen(showRadios = showRadios, rows = rows))
 
     "SummaryView" - {
       act.like(renderTitle(viewModelGen())(view(form, _), _.title.key))

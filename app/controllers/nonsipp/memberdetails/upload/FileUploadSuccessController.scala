@@ -28,7 +28,7 @@ import services.UploadService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage._
 import viewmodels.implicits._
-import viewmodels.models.{ContentPageViewModel, PageViewModel}
+import viewmodels.models.{ContentPageViewModel, FormPageViewModel}
 import views.html.ContentPageView
 
 import javax.inject.{Inject, Named}
@@ -58,8 +58,8 @@ class FileUploadSuccessController @Inject()(
 }
 
 object FileUploadSuccessController {
-  def viewModel(srn: Srn, fileName: String, mode: Mode): PageViewModel[ContentPageViewModel] =
-    PageViewModel(
+  def viewModel(srn: Srn, fileName: String, mode: Mode): FormPageViewModel[ContentPageViewModel] =
+    FormPageViewModel(
       title = "fileUploadSuccess.title",
       heading = "fileUploadSuccess.heading",
       ContentPageViewModel(isLargeHeading = true),

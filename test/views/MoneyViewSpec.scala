@@ -45,9 +45,9 @@ class MoneyViewSpec extends ViewSpec with Mappings {
 
     val invalidMoneyForm = moneyForm.bind(Map("value" -> ""))
 
-    val singleMoneyQuestion = pageViewModelGen(singleQuestionGen(moneyForm))
-    val tripleMoneyQuestion = pageViewModelGen(tripleQuestionGen(tripleMoneyForm))
-    val invalidSingleMoneyQuestion = pageViewModelGen(singleQuestionGen(invalidMoneyForm))
+    val singleMoneyQuestion = formPageViewModelGen(singleQuestionGen(moneyForm))
+    val tripleMoneyQuestion = formPageViewModelGen(tripleQuestionGen(tripleMoneyForm))
+    val invalidSingleMoneyQuestion = formPageViewModelGen(singleQuestionGen(invalidMoneyForm))
     val viewModelGen = Gen.oneOf(singleMoneyQuestion, tripleMoneyQuestion, invalidSingleMoneyQuestion)
 
     "MoneyView" - {

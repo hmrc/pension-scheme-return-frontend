@@ -34,8 +34,8 @@ object ContentTablePageViewModel {
     buttonText: Message,
     onSubmit: Call,
     rows: (DisplayMessage, DisplayMessage)*
-  ): PageViewModel[ContentTablePageViewModel] =
-    PageViewModel(
+  ): FormPageViewModel[ContentTablePageViewModel] =
+    FormPageViewModel(
       title,
       heading,
       ContentTablePageViewModel(inset, rows.toList),

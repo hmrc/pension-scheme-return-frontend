@@ -36,7 +36,7 @@ import utils.DateTimeUtils.localDateShow
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
 import viewmodels.models.MultipleQuestionsViewModel.TripleQuestion
-import viewmodels.models.{Field, PageViewModel}
+import viewmodels.models.{Field, FormPageViewModel}
 import views.html.IntView
 
 import java.time.LocalDate
@@ -131,7 +131,7 @@ object HowManyMembersController {
     endDate: LocalDate,
     mode: Mode,
     form: Form[(Int, Int, Int)]
-  ): PageViewModel[TripleQuestion[Int]] = PageViewModel(
+  ): FormPageViewModel[TripleQuestion[Int]] = FormPageViewModel(
     Message("howManyMembers.title", endDate.show),
     Message("howManyMembers.heading", schemeName, endDate.show),
     TripleQuestion(

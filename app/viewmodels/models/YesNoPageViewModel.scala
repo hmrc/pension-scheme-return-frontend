@@ -33,8 +33,8 @@ case class YesNoPageViewModel(
 
 object YesNoPageViewModel {
 
-  def apply(title: Message, heading: Message, onSubmit: Call): PageViewModel[YesNoPageViewModel] =
-    PageViewModel(
+  def apply(title: Message, heading: Message, onSubmit: Call): FormPageViewModel[YesNoPageViewModel] =
+    FormPageViewModel(
       title,
       heading,
       YesNoPageViewModel(),

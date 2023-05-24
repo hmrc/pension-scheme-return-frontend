@@ -33,7 +33,7 @@ import utils.DateTimeUtils.localDateShow
 import utils.FormUtils.FormOps
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
-import viewmodels.models.{PageViewModel, RadioListRowViewModel, RadioListViewModel}
+import viewmodels.models.{FormPageViewModel, RadioListRowViewModel, RadioListViewModel}
 import views.html.RadioListView
 
 import javax.inject.{Inject, Named}
@@ -102,7 +102,7 @@ object WhichTaxYearController {
     Enumerable(taxYearRanges: _*)
   }
 
-  def viewModel(srn: Srn, mode: Mode, taxYear: TaxYear): PageViewModel[RadioListViewModel] = RadioListViewModel(
+  def viewModel(srn: Srn, mode: Mode, taxYear: TaxYear): FormPageViewModel[RadioListViewModel] = RadioListViewModel(
     "whichTaxYear.title",
     "whichTaxYear.heading",
     options(taxYear).toList.map {

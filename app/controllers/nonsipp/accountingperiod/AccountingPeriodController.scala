@@ -37,7 +37,7 @@ import utils.ListUtils.ListOps
 import utils.RefinedUtils.RefinedIntOps
 import viewmodels.DisplayMessage.ParagraphMessage
 import viewmodels.implicits._
-import viewmodels.models.{DateRangeViewModel, PageViewModel}
+import viewmodels.models.{DateRangeViewModel, FormPageViewModel}
 import views.html.DateRangeView
 
 import javax.inject.Named
@@ -121,7 +121,7 @@ object AccountingPeriodController {
     usedAccountingPeriods
   )
 
-  def viewModel(srn: Srn, index: Max3, mode: Mode): PageViewModel[DateRangeViewModel] = DateRangeViewModel(
+  def viewModel(srn: Srn, index: Max3, mode: Mode): FormPageViewModel[DateRangeViewModel] = DateRangeViewModel(
     "accountingPeriod.title",
     "accountingPeriod.heading",
     Some(ParagraphMessage("accountingPeriod.description")),

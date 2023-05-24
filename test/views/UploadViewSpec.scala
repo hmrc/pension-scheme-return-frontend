@@ -28,7 +28,7 @@ class UploadViewSpec extends ViewSpec with Mappings {
 
     implicit val request = FakeRequest()
 
-    val viewModelGen = pageViewModelGen[UploadViewModel]
+    val viewModelGen = formPageViewModelGen[UploadViewModel]
 
     val successViewModelGen = viewModelGen.retryUntil(_.page.error.isEmpty)
     val errorViewModelGen = viewModelGen.retryUntil(_.page.error.nonEmpty)

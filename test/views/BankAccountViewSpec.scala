@@ -38,7 +38,7 @@ class BankAccountViewSpec extends ViewSpec {
 
     implicit val request = FakeRequest()
 
-    val viewModelGen = pageViewModelGen[BankAccountViewModel]
+    val viewModelGen = formPageViewModelGen[BankAccountViewModel]
 
     "BankAccountView" - {
 

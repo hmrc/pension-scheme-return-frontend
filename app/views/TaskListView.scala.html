@@ -14,15 +14,26 @@
  * limitations under the License.
  *@
 
+@import views.html.components.TaskListItemsView
+
 @this(
-    layout: templates.Layout
+ layout: templates.Layout,
+ taskListItemsView: TaskListItemsView
 )
 
 @(viewmodel: PageViewModel[TaskListViewModel])(implicit request: Request[_], messages: Messages)
 
+@item(content: Html) = {
+  <li class="app-task-list__item">
+    <span class="app-task-list__task-name">
+      @content
+    </span>
+  </li>
+}
+
 @layout(pageTitle = titleNoForm(viewmodel.title.toMessage)) {
 
-  <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
+  <h1 class="govuk-heading-xl">@renderMessage(viewmodel.heading)</h1>
 
   @viewmodel.description.map(renderMessage)
 
@@ -30,21 +41,18 @@
    @viewmodel.page.sections.toList.zipWithIndex.map { case (section, index) =>
     <li>
      <h2 class="app-task-list__section">
-      <span class="app-task-list__section-number">@{index + 1}. </span>
-      @renderMessage(section.title)
+       <span class="app-task-list__section-number">@{index + 1}. </span>
+       @renderMessage(section.title)
      </h2>
      <ul class="app-task-list__items">
-      @section.items.toList.zipWithIndex.map { case (item, itemIndex) =>
-       @defining(s"task-list-item-$index-$itemIndex") { id =>
-        <li class="app-task-list__item">
-         <span class="app-task-list__task-name">
-          @renderMessage(item.link.withAttr("aria-describedby", id))
-         </span>
-         <span class="hmrc-status-tag" id="@id">
-          @renderMessage(item.status.description)
-         </span>
-        </li>
-       }
+      @section.items.fold(
+        msg => item(renderMessage(msg)),
+        items => taskListItemsView(items, index)
+      )
+      @section.postActionLink.map { link =>
+        <p class="govuk-body govuk-!-padding-top-5">
+          @renderMessage(link)
+        </p>
       }
      </ul>
     </li>

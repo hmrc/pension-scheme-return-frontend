@@ -67,6 +67,11 @@ object Components {
   private def combine(left: Html, right: Html): Html =
     HtmlFormat.raw(left.body + " " + right.body)
 
+  private def h2(content: Html, cssClass: String): Html =
+    HtmlFormat.raw(
+      s"""<h2 class="$cssClass">${content.body}</h2>"""
+    )
+
   def renderMessage(message: DisplayMessage)(implicit messages: Messages): Html =
     message match {
       case Empty => Html("")
@@ -79,5 +84,6 @@ object Components {
       case TableMessage(content) =>
         table(content.map { case (key, value) => renderMessage(key) -> renderMessage(value) })
       case CompoundMessage(first, second) => combine(renderMessage(first), renderMessage(second))
+      case Heading2(content, labelSize) => h2(renderMessage(content), labelSize.toString)
     }
 }

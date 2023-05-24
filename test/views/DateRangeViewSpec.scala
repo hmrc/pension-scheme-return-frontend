@@ -46,7 +46,7 @@ class DateRangeViewSpec extends ViewSpec {
       )
     val invalidForm = dateRangeForm.bind(Map("dates.startDate" -> "", "dates.endDate" -> ""))
 
-    val viewModelGen = pageViewModelGen[DateRangeViewModel]
+    val viewModelGen = formPageViewModelGen[DateRangeViewModel]
 
     "DateRangeView" - {
 

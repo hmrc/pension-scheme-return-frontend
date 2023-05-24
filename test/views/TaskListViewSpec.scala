@@ -17,7 +17,8 @@
 package views
 
 import play.api.test.FakeRequest
-import viewmodels.models.TaskListViewModel
+import viewmodels.models.TaskListStatus.UnableToStart
+import viewmodels.models.{TaskListItemViewModel, TaskListViewModel}
 import views.html.TaskListView
 
 class TaskListViewSpec extends ViewSpec {
@@ -28,6 +29,9 @@ class TaskListViewSpec extends ViewSpec {
     implicit val request = FakeRequest()
 
     val viewModelGen = pageViewModelGen[TaskListViewModel]
+
+    def items(viewmodel: TaskListViewModel): List[TaskListItemViewModel] =
+      viewmodel.sections.toList.flatMap(_.items.fold(_ => Nil, _.toList))
 
     "TaskListView" - {
 
@@ -51,19 +55,53 @@ class TaskListViewSpec extends ViewSpec {
 
         forAll(viewModelGen) { viewmodel =>
           val expected =
-            viewmodel.page.sections.flatMap(_.items.map(i => AnchorTag(i.link))).toList
+            items(viewmodel.page).filterNot(_.status == UnableToStart).map(i => AnchorTag(i.link))
 
           anchors(view(viewmodel)) must contain allElementsOf expected
+        }
+      }
+
+      "render all task list spans" in {
+
+        forAll(viewModelGen) { viewmodel =>
+          val expected =
+            items(viewmodel.page).filter(_.status == UnableToStart).map(i => renderMessage(i.link.content).body)
+
+          span(view(viewmodel)) must contain allElementsOf expected
         }
       }
 
       "render all task list statuses" in {
 
         forAll(viewModelGen) { viewmodel =>
-          val expected =
-            viewmodel.page.sections.flatMap(_.items.map(i => renderMessage(i.status.description).body)).toList
+          val expected = {
+            items(viewmodel.page).map(i => renderMessage(i.status.description).body)
+          }
 
           span(view(viewmodel)) must contain allElementsOf expected
+        }
+      }
+
+      "render all task list messages" in {
+
+        forAll(viewModelGen) { viewmodel =>
+          val expected =
+            viewmodel.page.sections.toList
+              .flatMap(_.items.fold(List(_), _ => Nil))
+              .flatMap(allMessages)
+              .map(_.key)
+
+          span(view(viewmodel)) must contain allElementsOf expected
+        }
+      }
+
+      "render all post action links" in {
+
+        forAll(viewModelGen) { viewmodel =>
+          val expected =
+            viewmodel.page.sections.toList.flatMap(_.postActionLink).map(AnchorTag(_))
+
+          anchors(view(viewmodel)) must contain allElementsOf expected
         }
       }
     }

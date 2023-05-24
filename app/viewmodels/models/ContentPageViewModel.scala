@@ -33,8 +33,8 @@ object ContentPageViewModel {
     heading: String,
     contents: List[String],
     onSubmit: Call
-  ): PageViewModel[ContentPageViewModel] =
-    PageViewModel(
+  ): FormPageViewModel[ContentPageViewModel] =
+    FormPageViewModel(
       title,
       heading,
       ContentPageViewModel(isStartButton = true, isLargeHeading = false),
