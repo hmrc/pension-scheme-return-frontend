@@ -17,7 +17,7 @@
 package navigation.nonsipp
 
 import controllers.routes
-import models.UserAnswers
+import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.unquotedshares.UnquotedSharesPage
@@ -30,7 +30,7 @@ object UnquotedSharesNavigator extends JourneyNavigator {
       if (userAnswers.get(page).contains(true)) {
         routes.UnauthorisedController.onPageLoad()
       } else {
-        routes.UnauthorisedController.onPageLoad()
+        controllers.nonsipp.sharesacquiredfromconnectedparty.routes.SharesAcquiredFromConnectedPartyController.onPageLoad(srn, NormalMode)
       }
   }
 
