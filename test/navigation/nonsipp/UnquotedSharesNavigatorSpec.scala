@@ -43,9 +43,9 @@ class UnquotedSharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateToWithData(
           UnquotedSharesPage,
           Gen.const(false),
-          (_, _) => routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.sharesacquiredfromconnectedparty.routes.SharesAcquiredFromConnectedPartyController.onPageLoad
         )
-        .withName("go from unquoted shares page to unauthorised page when no selected")
+        .withName("go from unquoted shares page to sharesAcquired from connected party page when no selected")
     )
 
   }

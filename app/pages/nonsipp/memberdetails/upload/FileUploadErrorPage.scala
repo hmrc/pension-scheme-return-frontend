@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.memberdetails
+package pages.nonsipp.memberdetails.upload
 
-import models.ManualOrUpload
 import models.SchemeId.Srn
 import pages.Page
 
-case class SchemeMembersListPage(srn: Srn, addMember: Boolean, manualOrUpload: ManualOrUpload) extends Page
+case class FileUploadErrorPage(srn: Srn) extends Page

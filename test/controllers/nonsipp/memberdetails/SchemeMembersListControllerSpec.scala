@@ -22,14 +22,17 @@ import controllers.nonsipp.memberdetails.SchemeMembersListController._
 import controllers.nonsipp.employercontributions
 import eu.timepit.refined._
 import forms.YesNoPageFormProvider
+import models.ManualOrUpload.{Manual, Upload}
 import models.NormalMode
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import views.html.ListView
 
 class SchemeMembersListControllerSpec extends ControllerBaseSpec {
 
-  lazy val onPageLoad = routes.SchemeMembersListController.onPageLoad(srn, 1)
-  lazy val onSubmit = routes.SchemeMembersListController.onSubmit(srn, 1)
+  lazy val onPageLoadManual = routes.SchemeMembersListController.onPageLoad(srn, 1, Manual)
+  lazy val onPageLoadUpload = routes.SchemeMembersListController.onPageLoad(srn, 1, Upload)
+  lazy val onSubmitManual = routes.SchemeMembersListController.onSubmit(srn, 1, Manual)
+  lazy val onSubmitUpload = routes.SchemeMembersListController.onSubmit(srn, 1, Upload)
 
   private val userAnswersWithMembersDetails = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
@@ -40,48 +43,96 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
     )
 
   "SchemeMembersListController" - {
-    act.like(
-      renderView(onPageLoad, userAnswersWithMembersDetails)(
-        implicit app =>
-          implicit request =>
-            injected[ListView].apply(
-              form(injected[YesNoPageFormProvider]),
-              viewModel(srn, 1, NormalMode, List(memberDetails.fullName))
-            )
-      )
-    )
-
-    act.like(
-      redirectToPage(
-        onPageLoad,
-        routes.PensionSchemeMembersController.onPageLoad(srn),
-        defaultUserAnswers
-      )
-    )
-
-    act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
-
-    act.like(
-      redirectToPage(
-        onSubmit,
-        routes.MemberDetailsController.onPageLoad(srn, refineMV(2), NormalMode),
-        userAnswersWithMembersDetails,
-        "value" -> "true"
-      )
-    )
-
-    "when user answers has 99 members" - {
+    "on Manual" - {
       act.like(
-        redirectToPage(
-          onSubmit,
-          employercontributions.routes.EmployerContributionsController.onPageLoad(srn, NormalMode),
-          userAnswersWith99MembersDetails
+        renderView(onPageLoadManual, userAnswersWithMembersDetails)(
+          implicit app =>
+            implicit request =>
+              injected[ListView].apply(
+                form(injected[YesNoPageFormProvider], Manual),
+                viewModel(srn, 1, Manual, NormalMode, List(memberDetails.fullName))
+              )
         )
       )
+
+      act.like(
+        redirectToPage(
+          onPageLoadManual,
+          routes.PensionSchemeMembersController.onPageLoad(srn),
+          defaultUserAnswers
+        )
+      )
+
+      act.like(journeyRecoveryPage(onPageLoadManual).updateName("onPageLoad" + _))
+
+      act.like(
+        redirectToPage(
+          onSubmitManual,
+          routes.MemberDetailsController.onPageLoad(srn, refineMV(2), NormalMode),
+          userAnswersWithMembersDetails,
+          "value" -> "true"
+        )
+      )
+
+      "when user answers has 99 members" - {
+        act.like(
+          redirectToPage(
+            onSubmitManual,
+            employercontributions.routes.EmployerContributionsController.onPageLoad(srn, NormalMode),
+            userAnswersWith99MembersDetails
+          )
+        )
+      }
+
+      act.like(redirectNextPage(onSubmitManual, "value" -> "false"))
+      act.like(invalidForm(onSubmitManual))
+      act.like(journeyRecoveryPage(onSubmitManual).updateName("onSubmit" + _))
     }
 
-    act.like(redirectNextPage(onSubmit, "value" -> "false"))
-    act.like(invalidForm(onSubmit))
-    act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
+    "on Upload" - {
+      act.like(
+        renderView(onPageLoadUpload, userAnswersWithMembersDetails)(
+          implicit app =>
+            implicit request =>
+              injected[ListView].apply(
+                form(injected[YesNoPageFormProvider], Upload),
+                viewModel(srn, 1, Upload, NormalMode, List(memberDetails.fullName))
+              )
+        )
+      )
+
+      act.like(
+        redirectToPage(
+          onPageLoadUpload,
+          routes.PensionSchemeMembersController.onPageLoad(srn),
+          defaultUserAnswers
+        )
+      )
+
+      act.like(journeyRecoveryPage(onPageLoadUpload).updateName("onPageLoad" + _))
+
+      act.like(
+        redirectToPage(
+          onSubmitUpload,
+          routes.PensionSchemeMembersController.onPageLoad(srn),
+          userAnswersWithMembersDetails,
+          "value" -> "true"
+        )
+      )
+
+      "when user answers has 99 members" - {
+        act.like(
+          redirectToPage(
+            onSubmitUpload,
+            employercontributions.routes.EmployerContributionsController.onPageLoad(srn, NormalMode),
+            userAnswersWith99MembersDetails
+          )
+        )
+      }
+
+      act.like(redirectNextPage(onSubmitUpload, "value" -> "false"))
+      act.like(invalidForm(onSubmitUpload))
+      act.like(journeyRecoveryPage(onSubmitUpload).updateName("onSubmit" + _))
+    }
   }
 }

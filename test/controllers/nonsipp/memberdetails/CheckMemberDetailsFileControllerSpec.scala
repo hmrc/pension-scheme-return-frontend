@@ -67,23 +67,23 @@ class CheckMemberDetailsFileControllerSpec extends ControllerBaseSpec {
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       injected[YesNoPageView].apply(form(injected[YesNoPageFormProvider]), viewModel(srn, Some(fileName), NormalMode))
-    }.before(mockGetUploadResult(Some(uploadedSuccessfully))))
+    }.before(mockGetUploadStatus(Some(uploadedSuccessfully))))
 
     act.like(renderPrePopView(onPageLoad, CheckMemberDetailsFilePage(srn), true) { implicit app => implicit request =>
       injected[YesNoPageView]
         .apply(form(injected[YesNoPageFormProvider]).fill(true), viewModel(srn, Some(fileName), NormalMode))
-    }.before(mockGetUploadResult(Some(uploadedSuccessfully))))
+    }.before(mockGetUploadStatus(Some(uploadedSuccessfully))))
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
-    act.like(saveAndContinue(onSubmit, "value" -> "true").before(mockGetUploadResult(Some(uploadedSuccessfully))))
+    act.like(saveAndContinue(onSubmit, "value" -> "true").before(mockGetUploadStatus(Some(uploadedSuccessfully))))
 
-    act.like(invalidForm(onSubmit, "invalid" -> "form").before(mockGetUploadResult(Some(uploadedSuccessfully))))
+    act.like(invalidForm(onSubmit, "invalid" -> "form").before(mockGetUploadStatus(Some(uploadedSuccessfully))))
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }
 
-  private def mockGetUploadResult(uploadStatus: Option[UploadStatus]): Unit =
-    when(mockUploadService.getUploadResult(any())).thenReturn(Future.successful(uploadStatus))
+  private def mockGetUploadStatus(uploadStatus: Option[UploadStatus]): Unit =
+    when(mockUploadService.getUploadStatus(any())).thenReturn(Future.successful(uploadStatus))
 
   private def mockStream(): Unit =
     when(mockUploadService.stream(any())(any())).thenReturn(Future.successful(Source.single(byteString)))

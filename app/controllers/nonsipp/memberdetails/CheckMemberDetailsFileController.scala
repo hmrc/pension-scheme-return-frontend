@@ -29,6 +29,8 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{MemberDetailsUploadValidator, SaveService, UploadService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.DisplayMessage
+import viewmodels.DisplayMessage.{Message, ParagraphMessage}
 import viewmodels.DisplayMessage.ParagraphMessage
 import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
@@ -57,7 +59,7 @@ class CheckMemberDetailsFileController @Inject()(
     val preparedForm = request.userAnswers.fillForm(CheckMemberDetailsFilePage(srn), form)
     val uploadKey = UploadKey.fromRequest(srn)
 
-    uploadService.getUploadResult(uploadKey).map {
+    uploadService.getUploadStatus(uploadKey).map {
       case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
       case Some(upload: UploadStatus.Success) =>
         Ok(view(preparedForm, viewModel(srn, Some(upload.name), mode)))
@@ -93,7 +95,7 @@ class CheckMemberDetailsFileController @Inject()(
   //       None is an error case as the initial state set on the previous page should be InProgress
   private def getUploadedFile(uploadKey: UploadKey): Future[Option[UploadStatus.Success]] =
     uploadService
-      .getUploadResult(uploadKey)
+      .getUploadStatus(uploadKey)
       .map {
         case Some(upload: UploadStatus.Success) => Some(upload)
         case _ => None

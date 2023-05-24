@@ -17,13 +17,11 @@
 package controllers.nonsipp.memberdetails.upload
 
 import controllers.actions._
-import controllers.nonsipp.memberdetails.upload.CheckingMemberDetailsFileController._
-import models.{Mode, NormalMode, UploadErrors, UploadFormatError, UploadKey, UploadStatus, UploadSuccess}
+import controllers.nonsipp.memberdetails.upload.FileUploadErrorController._
 import models.SchemeId.Srn
-import models.requests.DataRequest
-import models.{Mode, UploadKey, UploadStatus}
+import models.{Mode, UploadErrors, UploadFormatError, UploadKey}
 import navigation.Navigator
-import pages.CheckingMemberDetailsFilePage
+import pages.nonsipp.memberdetails.upload.FileUploadErrorPage
 import play.api.i18n._
 import play.api.mvc._
 import services.UploadService
@@ -36,40 +34,38 @@ import views.html.ContentPageView
 import javax.inject.{Inject, Named}
 import scala.concurrent.ExecutionContext
 
-class CheckingMemberDetailsFileController @Inject()(
+class FileUploadErrorController @Inject()(
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
-  identifyAndRequireData: IdentifyAndRequireData,
   uploadService: UploadService,
+  identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   view: ContentPageView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    Ok(view(viewModel(srn, mode)))
-  }
-
-  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
+  def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
     uploadService.getUploadResult(UploadKey.fromRequest(srn)).map {
-      case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-      case Some(_: UploadErrors) | Some(UploadFormatError) => redirectNextPage(srn, uploadSuccessful = false, mode)
-      case Some(_: UploadSuccess) => redirectNextPage(srn, uploadSuccessful = true, mode)
+      case Some(UploadFormatError) | Some(_: UploadErrors) => Ok(view(viewModel(srn, mode)))
+      case _ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
     }
   }
 
-  private def redirectNextPage(srn: Srn, uploadSuccessful: Boolean, mode: Mode)(implicit req: DataRequest[_]): Result =
-    Redirect(navigator.nextPage(CheckingMemberDetailsFilePage(srn, uploadSuccessful), mode, req.userAnswers))
+  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
+    Redirect(navigator.nextPage(FileUploadErrorPage(srn), mode, request.userAnswers))
+  }
 }
 
-object CheckingMemberDetailsFileController {
+object FileUploadErrorController {
   def viewModel(srn: Srn, mode: Mode): FormPageViewModel[ContentPageViewModel] =
     FormPageViewModel(
-      title = "checkingMemberDetailsFile.title",
-      heading = "checkingMemberDetailsFile.heading",
-      ContentPageViewModel(isLargeHeading = true),
-      onSubmit = routes.CheckingMemberDetailsFileController.onSubmit(srn, mode)
-    ).withButtonText("site.continue")
-      .withDescription(ParagraphMessage("checkingMemberDetailsFile.paragraph"))
+      title = "fileUploadError.title",
+      heading = "fileUploadError.heading",
+      description = Some(ParagraphMessage(Message("fileUploadError.paragraph"))),
+      page = ContentPageViewModel(isLargeHeading = true),
+      refresh = None,
+      buttonText = "site.continue",
+      onSubmit = routes.FileUploadErrorController.onSubmit(srn, mode)
+    )
 }

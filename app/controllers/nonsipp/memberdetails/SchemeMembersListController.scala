@@ -26,7 +26,7 @@ import eu.timepit.refined._
 import forms.YesNoPageFormProvider
 import models.CheckOrChange.Change
 import models.SchemeId.Srn
-import models.{Mode, Pagination}
+import models.{ManualOrUpload, Mode, Pagination}
 import navigation.Navigator
 import pages.nonsipp.memberdetails.MembersDetails.MembersDetailsOps
 import pages.nonsipp.memberdetails.SchemeMembersListPage
@@ -51,41 +51,54 @@ class SchemeMembersListController @Inject()(
 ) extends FrontendBaseController
     with I18nSupport {
 
-  private val form = SchemeMembersListController.form(formProvider)
+  private def form(manualOrUpload: ManualOrUpload): Form[Boolean] =
+    SchemeMembersListController.form(formProvider, manualOrUpload)
 
-  def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, page: Int, manualOrUpload: ManualOrUpload, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val membersDetails = request.userAnswers.membersDetails(srn)
       if (membersDetails.isEmpty) {
         Redirect(routes.PensionSchemeMembersController.onPageLoad(srn))
       } else {
-        Ok(view(form, viewModel(srn, page, mode, membersDetails.map(_.fullName))))
+        Ok(view(form(manualOrUpload), viewModel(srn, page, manualOrUpload, mode, membersDetails.map(_.fullName))))
       }
     }
 
-  def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, page: Int, manualOrUpload: ManualOrUpload, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val membersDetails = request.userAnswers.membersDetails(srn)
       if (membersDetails.length == maxSchemeMembers) {
-        Redirect(navigator.nextPage(SchemeMembersListPage(srn, addMember = false), mode, request.userAnswers))
+        Redirect(
+          navigator.nextPage(SchemeMembersListPage(srn, addMember = false, manualOrUpload), mode, request.userAnswers)
+        )
       } else {
-        form
+        form(manualOrUpload)
           .bindFromRequest()
           .fold(
             formWithErrors =>
-              BadRequest(view(formWithErrors, viewModel(srn, page, mode, membersDetails.map(_.fullName)))),
-            value => Redirect(navigator.nextPage(SchemeMembersListPage(srn, value), mode, request.userAnswers))
+              BadRequest(
+                view(formWithErrors, viewModel(srn, page, manualOrUpload, mode, membersDetails.map(_.fullName)))
+              ),
+            value =>
+              Redirect(navigator.nextPage(SchemeMembersListPage(srn, value, manualOrUpload), mode, request.userAnswers))
           )
       }
     }
 }
 
 object SchemeMembersListController {
-  def form(formProvider: YesNoPageFormProvider): Form[Boolean] = formProvider(
-    "schemeMembersList.error.required"
+  def form(formProvider: YesNoPageFormProvider, manualOrUpload: ManualOrUpload): Form[Boolean] = formProvider(
+    manualOrUpload.fold(manual = "schemeMembersList.error.required", upload = "membersUploaded.error.required")
   )
 
-  def viewModel(srn: Srn, page: Int, mode: Mode, memberNames: List[String]): FormPageViewModel[ListViewModel] = {
+  def viewModel(
+    srn: Srn,
+    page: Int,
+    manualOrUpload: ManualOrUpload,
+    mode: Mode,
+    memberNames: List[String]
+  ): FormPageViewModel[ListViewModel] = {
+
     val rows: List[ListRow] = memberNames.zipWithIndex.flatMap {
       case (memberName, index) =>
         refineV[OneTo99](index + 1) match {
@@ -112,7 +125,7 @@ object SchemeMembersListController {
       currentPage = page,
       pageSize = Constants.schemeMembersPageSize,
       rows.size,
-      routes.SchemeMembersListController.onPageLoad(srn, _)
+      routes.SchemeMembersListController.onPageLoad(srn, _, manualOrUpload)
     )
 
     FormPageViewModel(
@@ -121,7 +134,7 @@ object SchemeMembersListController {
       ListViewModel(
         inset = "schemeMembersList.inset",
         rows,
-        "schemeMembersList.radio",
+        manualOrUpload.fold(manual = "schemeMembersList.radio", upload = "membersUploaded.radio"),
         showRadios = memberNames.length < Constants.maxSchemeMembers,
         paginatedViewModel = Some(
           PaginatedViewModel(
@@ -133,9 +146,10 @@ object SchemeMembersListController {
             ),
             pagination
           )
-        )
+        ),
+        yesHintText = manualOrUpload.fold(manual = None, upload = Some("membersUploaded.radio.yes.hint"))
       ),
-      onSubmit = routes.SchemeMembersListController.onSubmit(srn, page)
+      onSubmit = routes.SchemeMembersListController.onSubmit(srn, page, manualOrUpload)
     )
   }
 }

@@ -22,6 +22,7 @@
   formHelper: FormWithCSRF,
   govukErrorSummary: GovukErrorSummary,
   govukRadios: GovukRadios,
+  govukDetails: GovukDetails,
   govukButton: GovukButton,
 )
 
@@ -49,6 +50,15 @@
             no = viewmodel.page.no.map(renderMessage(_))
         )
     )
+
+    @viewmodel.page.details.map { detail =>
+            @govukDetails(
+                DetailsViewModel(
+                    renderMessage(detail.title),
+                    renderMessage(detail.contents)
+                )
+            )
+    }
 
     @govukButton(
       ButtonViewModel(renderMessage(viewmodel.buttonText))

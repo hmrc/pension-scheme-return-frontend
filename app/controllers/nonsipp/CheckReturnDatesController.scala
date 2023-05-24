@@ -31,6 +31,7 @@ import services.{SaveService, SchemeDetailsService, TaxYearService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.DateTimeUtils.localDateShow
+import viewmodels.DisplayMessage
 import viewmodels.DisplayMessage.{Message, ParagraphMessage}
 import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}

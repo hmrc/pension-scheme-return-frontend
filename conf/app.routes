@@ -122,9 +122,13 @@ POST        /:srn/value-of-assets-and-cash               controllers.nonsipp.Val
 GET         /:srn/change-value-of-assets-and-cash        controllers.nonsipp.ValueOfAssetsController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST        /:srn/change-value-of-assets-and-cash        controllers.nonsipp.ValueOfAssetsController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
-GET         /:srn/members                             controllers.nonsipp.memberdetails.SchemeMembersListController.onPageLoad(srn: Srn, page: Int = 1, mode: Mode = NormalMode)
-GET         /:srn/members/:page                       controllers.nonsipp.memberdetails.SchemeMembersListController.onPageLoad(srn: Srn, page: Int, mode: Mode = NormalMode)
-POST        /:srn/members/:page                       controllers.nonsipp.memberdetails.SchemeMembersListController.onSubmit(srn: Srn, page: Int, mode: Mode = NormalMode)
+GET         /:srn/members                             controllers.nonsipp.memberdetails.SchemeMembersListController.onPageLoad(srn: Srn, page: Int = 1, manualOrUpload: ManualOrUpload = Manual, mode: Mode = NormalMode)
+GET         /:srn/members/:page                       controllers.nonsipp.memberdetails.SchemeMembersListController.onPageLoad(srn: Srn, page: Int, manualOrUpload: ManualOrUpload = Manual, mode: Mode = NormalMode)
+POST        /:srn/members/:page                       controllers.nonsipp.memberdetails.SchemeMembersListController.onSubmit(srn: Srn, page: Int, manualOrUpload: ManualOrUpload = Manual, mode: Mode = NormalMode)
+
+GET         /:srn/members-uploaded                    controllers.nonsipp.memberdetails.SchemeMembersListController.onPageLoad(srn: Srn, page: Int = 1, manualOrUpload: ManualOrUpload = Upload, mode: Mode = NormalMode)
+GET         /:srn/members-uploaded/:page              controllers.nonsipp.memberdetails.SchemeMembersListController.onPageLoad(srn: Srn, page: Int, manualOrUpload: ManualOrUpload = Upload, mode: Mode = NormalMode)
+POST        /:srn/members-uploaded/:page              controllers.nonsipp.memberdetails.SchemeMembersListController.onSubmit(srn: Srn, page: Int, manualOrUpload: ManualOrUpload = Upload, mode: Mode = NormalMode)
 
 GET        /:srn/remove-member-details/:index               controllers.nonsipp.memberdetails.RemoveMemberDetailsController.onPageLoad(srn: Srn, index: Max99, mode: Mode = NormalMode)
 POST       /:srn/remove-member-details/:index               controllers.nonsipp.memberdetails.RemoveMemberDetailsController.onSubmit(srn: Srn, index: Max99, mode: Mode = NormalMode)
@@ -234,6 +238,11 @@ POST       /:srn/check-member-details-file                        controllers.no
 GET        /:srn/change-check-member-details-file                 controllers.nonsipp.memberdetails.CheckMemberDetailsFileController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST       /:srn/change-check-member-details-file                 controllers.nonsipp.memberdetails.CheckMemberDetailsFileController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
+GET        /:srn/shares-acquired-from-connected-party                      controllers.nonsipp.sharesacquiredfromconnectedparty.SharesAcquiredFromConnectedPartyController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST       /:srn/shares-acquired-from-connected-party                      controllers.nonsipp.sharesacquiredfromconnectedparty.SharesAcquiredFromConnectedPartyController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/change-shares-acquired-from-connected-party               controllers.nonsipp.sharesacquiredfromconnectedparty.SharesAcquiredFromConnectedPartyController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST       /:srn/change-shares-acquired-from-connected-party               controllers.nonsipp.sharesacquiredfromconnectedparty.SharesAcquiredFromConnectedPartyController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
 GET        /:srn/unquoted-shares                      controllers.nonsipp.unquotedshares.UnquotedSharesController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST       /:srn/unquoted-shares                      controllers.nonsipp.unquotedshares.UnquotedSharesController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 GET        /:srn/change-unquoted-shares               controllers.nonsipp.unquotedshares.UnquotedSharesController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
@@ -244,9 +253,20 @@ GET        /:srn/submit-checking-member-details-file        controllers.nonsipp.
 GET        /:srn/change-checking-member-details-file        controllers.nonsipp.memberdetails.upload.CheckingMemberDetailsFileController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST       /:srn/change-checking-member-details-file        controllers.nonsipp.memberdetails.upload.CheckingMemberDetailsFileController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
+
 GET        /:srn/file-upload-success               controllers.nonsipp.memberdetails.upload.FileUploadSuccessController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST       /:srn/file-upload-success               controllers.nonsipp.memberdetails.upload.FileUploadSuccessController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 GET        /:srn/change-file-upload-success        controllers.nonsipp.memberdetails.upload.FileUploadSuccessController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST       /:srn/change-file-upload-success        controllers.nonsipp.memberdetails.upload.FileUploadSuccessController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET        /:srn/file-upload-error                 controllers.nonsipp.memberdetails.upload.FileUploadErrorController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/submit-file-upload-error          controllers.nonsipp.memberdetails.upload.FileUploadErrorController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/change-file-upload-error          controllers.nonsipp.memberdetails.upload.FileUploadErrorController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST       /:srn/change-file-upload-error          controllers.nonsipp.memberdetails.upload.FileUploadErrorController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET        /:srn/file-upload-success                  controllers.nonsipp.memberdetails.upload.FileUploadSuccessController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/submit-file-upload-success           controllers.nonsipp.memberdetails.upload.FileUploadSuccessController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/change-file-upload-success           controllers.nonsipp.memberdetails.upload.FileUploadSuccessController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+GET        /:srn/submit-change-file-upload-success    controllers.nonsipp.memberdetails.upload.FileUploadSuccessController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
 GET        /:srn/pension-scheme-return-task-list   controllers.nonsipp.TaskListController.onPageLoad(srn: Srn)

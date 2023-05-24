@@ -14,10 +14,19 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.memberdetails
+package pages
 
-import models.ManualOrUpload
-import models.SchemeId.Srn
-import pages.Page
+import pages.behaviours.PageBehaviours
+import pages.nonsipp.sharesacquiredfromconnectedparty.SharesAcquiredFromConnectedPartyPage
 
-case class SchemeMembersListPage(srn: Srn, addMember: Boolean, manualOrUpload: ManualOrUpload) extends Page
+class SharesAcquiredFromConnectedPartyPageSpec extends PageBehaviours {
+
+  "SharesAcquiredFromConnectedPartyPage" - {
+
+    beRetrievable[Boolean](SharesAcquiredFromConnectedPartyPage(srnGen.sample.value))
+
+    beSettable[Boolean](SharesAcquiredFromConnectedPartyPage(srnGen.sample.value))
+
+    beRemovable[Boolean](SharesAcquiredFromConnectedPartyPage(srnGen.sample.value))
+  }
+}

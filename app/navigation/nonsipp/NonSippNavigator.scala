@@ -91,6 +91,7 @@ class NonSippNavigator @Inject()() extends Navigator {
       BenefitsSurrenderedNavigator,
       OtherAssetsHeldNavigator,
       UnallocatedEmployerContributionsNavigator,
+      SharesAcquiredFromConnectedPartyNavigator,
       UnquotedSharesNavigator
     )
 

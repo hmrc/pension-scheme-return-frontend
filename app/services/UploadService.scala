@@ -48,8 +48,11 @@ class UploadService @Inject()(
   def registerUploadResult(reference: Reference, uploadStatus: UploadStatus): Future[Unit] =
     repository.updateStatus(reference, uploadStatus)
 
-  def getUploadResult(key: UploadKey): Future[Option[UploadStatus]] =
+  def getUploadStatus(key: UploadKey): Future[Option[UploadStatus]] =
     repository.getUploadDetails(key).map(_.map(_.status))
+
+  def getUploadResult(key: UploadKey): Future[Option[Upload]] =
+    repository.getUploadResult(key)
 
   def stream(downloadUrl: String)(implicit hc: HeaderCarrier): Future[Source[ByteString, _]] =
     upscanConnector.download(downloadUrl).map(_.bodyAsSource)

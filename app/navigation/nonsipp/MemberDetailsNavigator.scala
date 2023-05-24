@@ -21,12 +21,13 @@ import controllers.nonsipp.employercontributions
 import controllers.nonsipp.memberdetails.routes
 import eu.timepit.refined.{refineMV, refineV}
 import models.CheckOrChange.Check
+import models.ManualOrUpload.{Manual, Upload}
 import models.{CheckMode, CheckOrChange, ManualOrUpload, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.{CheckingMemberDetailsFilePage, Page}
 import pages.nonsipp.memberdetails.MembersDetails.MembersDetailsOps
 import pages.nonsipp.memberdetails._
-import pages.nonsipp.memberdetails.upload.FileUploadSuccessPage
+import pages.nonsipp.memberdetails.upload.{FileUploadErrorPage, FileUploadSuccessPage}
 import play.api.mvc.Call
 
 object MemberDetailsNavigator extends JourneyNavigator {
@@ -52,21 +53,23 @@ object MemberDetailsNavigator extends JourneyNavigator {
     case MemberDetailsNinoPage(srn, index) =>
       routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, CheckOrChange.Check)
 
-    case SchemeMemberDetailsAnswersPage(srn) => routes.SchemeMembersListController.onPageLoad(srn, page = 1)
+    case SchemeMemberDetailsAnswersPage(srn) => routes.SchemeMembersListController.onPageLoad(srn, page = 1, Manual)
 
     case NoNINOPage(srn, index) =>
       routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, CheckOrChange.Check)
 
-    case SchemeMembersListPage(srn, false) =>
+    case SchemeMembersListPage(srn, false, _) =>
       employercontributions.routes.EmployerContributionsController.onPageLoad(srn, NormalMode)
 
-    case SchemeMembersListPage(srn, true) =>
+    case SchemeMembersListPage(srn, true, Manual) =>
       refineV[OneTo99](userAnswers.membersDetails(srn).length + 1).fold(
         _ => employercontributions.routes.EmployerContributionsController.onPageLoad(srn, NormalMode),
         index => routes.MemberDetailsController.onPageLoad(srn, index, NormalMode)
       )
 
-    case RemoveMemberDetailsPage(srn) => routes.SchemeMembersListController.onPageLoad(srn, page = 1)
+    case SchemeMembersListPage(srn, true, Upload) => routes.PensionSchemeMembersController.onPageLoad(srn)
+
+    case RemoveMemberDetailsPage(srn) => routes.SchemeMembersListController.onPageLoad(srn, page = 1, Manual)
 
     case HowToUploadPage(srn) =>
       controllers.nonsipp.memberdetails.routes.UploadMemberDetailsController.onPageLoad(srn)
@@ -84,11 +87,14 @@ object MemberDetailsNavigator extends JourneyNavigator {
       if (uploadSuccessful) {
         controllers.nonsipp.memberdetails.upload.routes.FileUploadSuccessController.onPageLoad(srn, NormalMode)
       } else {
-        controllers.routes.UnauthorisedController.onPageLoad()
+        controllers.nonsipp.memberdetails.upload.routes.FileUploadErrorController.onPageLoad(srn, NormalMode)
       }
 
     case FileUploadSuccessPage(srn) =>
-      controllers.nonsipp.memberdetails.routes.SchemeMembersListController.onPageLoad(srn, 1)
+      controllers.nonsipp.memberdetails.routes.SchemeMembersListController.onPageLoad(srn, 1, Upload)
+
+    case FileUploadErrorPage(srn) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {

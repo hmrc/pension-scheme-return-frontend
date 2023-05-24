@@ -19,7 +19,7 @@ package controllers
 import controllers.actions._
 import generators.ModelGenerators.srnGen
 import models.UserAnswers.SensitiveJsObject
-import models._
+import models.{NameDOB, _}
 import org.scalatest.OptionValues
 import play.api.Application
 import play.api.data.Form
@@ -30,6 +30,7 @@ import play.api.libs.json.{Json, Writes}
 import play.api.mvc.Call
 import play.api.test._
 import queries.Settable
+import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.time.TaxYear
 import utils.{BaseSpec, DisplayMessageUtils}
 
@@ -103,6 +104,8 @@ trait TestValues { _: OptionValues =>
   val localDateTime: LocalDateTime =
     LocalDateTime.of(2020, 12, 12, 10, 30, 15)
 
+  val localDate: LocalDate = LocalDate.of(1989, 10, 6)
+
   val defaultSchemeDetails: SchemeDetails = SchemeDetails(
     "testSRN",
     schemeName,
@@ -129,4 +132,21 @@ trait TestValues { _: OptionValues =>
   )
 
   val uploadSuccessful: UploadStatus.Success = UploadStatus.Success(uploadFileName, "text/csv", "test-url", None)
+  val uploadFailure: UploadStatus.Failed.type = UploadStatus.Failed
+
+  val uploadResultSuccess: UploadSuccess = UploadSuccess(
+    List(
+      UploadMemberDetails(1, NameDOB("Jason", "Lawrence", LocalDate.of(1989, 10, 6)), Right(Nino("AB123456A"))),
+      UploadMemberDetails(2, NameDOB("Pearl", "Parsons", LocalDate.of(1990, 4, 12)), Left("reason")),
+      UploadMemberDetails(3, NameDOB("Katherine", "Kennedy", LocalDate.of(1985, 1, 30)), Left("reason"))
+    )
+  )
+
+  val uploadResultErrors: UploadErrors = UploadErrors(
+    List(
+      ValidationError("A1", "error A1"),
+      ValidationError("C3", "error C3"),
+      ValidationError("F2", "error F2")
+    )
+  )
 }

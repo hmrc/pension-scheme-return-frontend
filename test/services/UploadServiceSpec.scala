@@ -20,6 +20,7 @@ import akka.stream.scaladsl.Sink
 import akka.util.ByteString
 import connectors.UpscanConnector
 import controllers.TestValues
+import models.UploadStatus.UploadStatus
 import models._
 import org.mockito.ArgumentMatchers.any
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
@@ -75,10 +76,16 @@ class UploadServiceSpec extends BaseSpec with ScalaCheckPropertyChecks with Test
       result.futureValue mustBe (())
     }
 
-    "getUploadResult return the status from the connector" in {
+    "getUploadStatus return the status from the connector" in {
       when(mockUploadRepository.getUploadDetails(any())).thenReturn(Future.successful(Some(uploadDetails)))
-      val result = service.getUploadResult(uploadKey)
+      val result = service.getUploadStatus(uploadKey)
       result.futureValue mustBe Some(UploadStatus.Failed)
+    }
+
+    "getUploadResult return the status from the connector" in {
+      when(mockUploadRepository.getUploadResult(any())).thenReturn(Future.successful(Some(uploadResultSuccess)))
+      val result = service.getUploadResult(uploadKey)
+      result.futureValue mustBe Some(uploadResultSuccess)
     }
 
     "stream should return the upscan download http response body as a stream" in {
