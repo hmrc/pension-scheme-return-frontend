@@ -509,3 +509,14 @@ nonsipp.tasklist.otherassets.change.title = Change other assets
 nonsipp.tasklist.declaration.title = Declaration
 nonsipp.tasklist.declaration.incomplete = You must complete every section before you can declare.
 nonsipp.tasklist.declaration.saveandreturn = Save and return to Managing Pension Schemes
+
+fileUploadWrongFormat.title = Your member details file is missing information or in the wrong format
+fileUploadWrongFormat.heading = Your member details file is missing information or in the wrong format
+fileUploadWrongFormat.paragraph1 = Your file might be empty, or has a header row (row 1) that is:
+fileUploadWrongFormat.bullet1 = missing
+fileUploadWrongFormat.bullet2 = missing a field name
+fileUploadWrongFormat.bullet3 = in the wrong order
+fileUploadWrongFormat.bullet4 = different to the header row in
+fileUploadWrongFormat.bullet4.link = the template file
+fileUploadWrongFormat.paragraph2 = Correct the errors and upload it again, or upload a different file.
+fileUploadWrongFormat.button = Return to file upload
