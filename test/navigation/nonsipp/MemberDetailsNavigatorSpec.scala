@@ -24,7 +24,7 @@ import eu.timepit.refined.refineMV
 import generators.IndexGen
 import models.ManualOrUpload.{Manual, Upload}
 import models.SchemeId.Srn
-import models.{CheckOrChange, ManualOrUpload, NormalMode}
+import models.{CheckOrChange, ManualOrUpload, NormalMode, UploadErrors, UploadFormatError}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.CheckingMemberDetailsFilePage
@@ -246,10 +246,19 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
     act.like(
       normalmode
         .navigateTo(
-          FileUploadErrorPage,
+          FileUploadErrorPage(_, Left(UploadFormatError)),
+          controllers.nonsipp.memberdetails.upload.routes.FileUploadWrongFormatController.onPageLoad
+        )
+        .withName("go from file upload error page to file upload format error page on file upload format error")
+    )
+
+    act.like(
+      normalmode
+        .navigateTo(
+          FileUploadErrorPage(_, Right(UploadErrors(Nil))),
           (_, _) => controllers.routes.UnauthorisedController.onPageLoad()
         )
-        .withName("go from file upload error page  to unauthorised page")
+        .withName("go from file upload error page to unauthorised page on file upload errors")
     )
 
     "CheckMode" - {

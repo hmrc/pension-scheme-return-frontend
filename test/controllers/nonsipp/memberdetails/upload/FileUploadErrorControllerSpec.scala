@@ -53,7 +53,7 @@ class FileUploadErrorControllerSpec extends ControllerBaseSpec {
         .before(mockGetUploadResult(None))
     )
 
-    act.like(redirectNextPage(onSubmit))
+    act.like(redirectNextPage(onSubmit).before(mockGetUploadResult(Some(UploadFormatError))))
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
