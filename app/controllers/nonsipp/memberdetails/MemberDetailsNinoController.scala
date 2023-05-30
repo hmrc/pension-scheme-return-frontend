@@ -24,7 +24,7 @@ import models.SchemeId.Srn
 import models.requests.DataRequest
 import models.{Mode, NameDOB}
 import navigation.Navigator
-import pages.nonsipp.memberdetails.{MemberDetailsNinoPage, MemberDetailsNinos, MemberDetailsPage}
+import pages.nonsipp.memberdetails.{MemberDetailsNinoPage, MemberDetailsNinoPages, MemberDetailsPage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -86,7 +86,7 @@ class MemberDetailsNinoController @Inject()(
   }
 
   private def duplicateNinos(srn: Srn, index: Max99)(implicit request: DataRequest[_]): List[Nino] =
-    request.userAnswers.map(MemberDetailsNinos(srn)).removed(index.arrayIndex.toString).values.toList
+    request.userAnswers.map(MemberDetailsNinoPages(srn)).removed(index.arrayIndex.toString).values.toList
 }
 
 object MemberDetailsNinoController {

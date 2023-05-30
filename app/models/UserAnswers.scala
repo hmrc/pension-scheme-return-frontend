@@ -94,6 +94,22 @@ final case class UserAnswers(
 
 object UserAnswers {
 
+  def compose(
+    fs: (UserAnswers => Try[UserAnswers])*
+  ): UserAnswers => Try[UserAnswers] = ua => {
+    fs.toList match {
+      case Nil => Try(ua)
+      case head :: tail =>
+        tail.foldLeft(head(ua)) { (acc, curr) =>
+          acc.flatMap(curr)
+        }
+    }
+  }
+
+  def set[A: Writes](page: Settable[A], value: A): UserAnswers => Try[UserAnswers] = _.set(page, value)
+
+  def remove[A](page: Removable[A]): UserAnswers => Try[UserAnswers] = _.remove(page)
+
   case class SensitiveJsObject(override val decryptedValue: JsObject) extends Sensitive[JsObject]
 
   implicit def sensitiveJsObjectFormat(implicit crypto: Encrypter with Decrypter): Format[SensitiveJsObject] =

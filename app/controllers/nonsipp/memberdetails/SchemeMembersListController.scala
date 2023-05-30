@@ -28,7 +28,7 @@ import models.CheckOrChange.Change
 import models.SchemeId.Srn
 import models.{ManualOrUpload, Mode, Pagination}
 import navigation.Navigator
-import pages.nonsipp.memberdetails.MembersDetails.MembersDetailsOps
+import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
 import pages.nonsipp.memberdetails.SchemeMembersListPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}

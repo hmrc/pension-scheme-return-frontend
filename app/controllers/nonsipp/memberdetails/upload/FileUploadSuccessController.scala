@@ -24,8 +24,8 @@ import models.SchemeId.Srn
 import models.requests.DataRequest
 import models.{Mode, UploadKey, UploadMemberDetails, UploadStatus, UploadSuccess, UserAnswers}
 import navigation.Navigator
+import pages.nonsipp.memberdetails._
 import pages.nonsipp.memberdetails.upload.FileUploadSuccessPage
-import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsNinoPage, MemberDetailsPage, NoNINOPage}
 import play.api.i18n._
 import play.api.mvc._
 import services.{SaveService, UploadService}
@@ -76,19 +76,30 @@ class FileUploadSuccessController @Inject()(
 
   private def memberDetailsToUserAnswers(srn: Srn, memberDetails: List[UploadMemberDetails])(
     implicit request: DataRequest[_]
-  ): Try[UserAnswers] =
-    memberDetails.foldLeft[Try[UserAnswers]](Try(request.userAnswers)) { (ua, details) =>
-      for {
-        index <- refineV[OneTo99](details.row).left.map(new RuntimeException(_)).toTry
-        ua1 <- ua
-        ua2 <- ua1.set(MemberDetailsPage(srn, index), details.nameDOB)
-        ua3 <- ua2.set(DoesMemberHaveNinoPage(srn, index), details.ninoOrNoNinoReason.isRight)
-        ua4 <- details.ninoOrNoNinoReason match {
-          case Left(noNinoReason) => ua3.set(NoNINOPage(srn, index), noNinoReason)
-          case Right(nino) => ua3.set(MemberDetailsNinoPage(srn, index), nino)
-        }
-      } yield ua4
-    }
+  ): Try[UserAnswers] = {
+
+    val removals = List(
+      UserAnswers.remove(MembersDetailsPages(srn)),
+      UserAnswers.remove(DoesMemberHaveNinoPages(srn)),
+      UserAnswers.remove(MemberDetailsNinoPages(srn)),
+      UserAnswers.remove(NoNinoPages(srn))
+    )
+
+    val insertions = memberDetails.flatMap { details =>
+      refineV[OneTo99](details.row).toOption.map { index =>
+        List(
+          UserAnswers.set(MemberDetailsPage(srn, index), details.nameDOB),
+          UserAnswers.set(DoesMemberHaveNinoPage(srn, index), details.ninoOrNoNinoReason.isRight),
+          details.ninoOrNoNinoReason.fold(
+            UserAnswers.set(NoNINOPage(srn, index), _),
+            UserAnswers.set(MemberDetailsNinoPage(srn, index), _)
+          )
+        )
+      }
+    }.flatten
+
+    UserAnswers.compose(removals ++ insertions: _*)(request.userAnswers)
+  }
 }
 
 object FileUploadSuccessController {

@@ -228,6 +228,16 @@ trait ModelGenerators extends BasicGenerators {
   } yield {
     SchemeMemberNumbers(active, deferred, pensioners)
   }
+
+  val wrappedMemberDetailsGen: Gen[WrappedMemberDetails] =
+    for {
+      nameDob <- nameDobGen
+      nino <- Gen.either(nonEmptyString, ninoGen)
+    } yield {
+      WrappedMemberDetails(nameDob, nino)
+    }
 }
 
 object ModelGenerators extends ModelGenerators
+
+case class WrappedMemberDetails(nameDob: NameDOB, nino: Either[String, Nino])

@@ -25,7 +25,7 @@ import models.ManualOrUpload.{Manual, Upload}
 import models.{CheckMode, CheckOrChange, ManualOrUpload, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.{CheckingMemberDetailsFilePage, Page}
-import pages.nonsipp.memberdetails.MembersDetails.MembersDetailsOps
+import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
 import pages.nonsipp.memberdetails._
 import pages.nonsipp.memberdetails.upload.{FileUploadErrorPage, FileUploadSuccessPage}
 import play.api.mvc.Call

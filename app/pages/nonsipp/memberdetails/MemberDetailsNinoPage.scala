@@ -20,7 +20,7 @@ import config.Refined.Max99
 import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
-import queries.Gettable
+import queries.{Gettable, Removable}
 import uk.gov.hmrc.domain.Nino
 import utils.RefinedUtils.RefinedIntOps
 
@@ -31,7 +31,7 @@ case class MemberDetailsNinoPage(srn: Srn, index: Max99) extends QuestionPage[Ni
   override def toString: String = "memberDetailsNinoPage"
 }
 
-case class MemberDetailsNinos(srn: Srn) extends Gettable[Map[String, Nino]] {
+case class MemberDetailsNinoPages(srn: Srn) extends Gettable[Map[String, Nino]] with Removable[Map[String, Nino]] {
 
   override def path: JsPath = JsPath \ toString
 

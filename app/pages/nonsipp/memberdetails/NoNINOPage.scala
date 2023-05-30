@@ -20,6 +20,7 @@ import config.Refined.Max99
 import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
+import queries.Removable
 import utils.RefinedUtils.RefinedIntOps
 
 case class NoNINOPage(srn: Srn, index: Max99) extends QuestionPage[String] {
@@ -27,4 +28,9 @@ case class NoNINOPage(srn: Srn, index: Max99) extends QuestionPage[String] {
   override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString
 
   override def toString: String = "noNINO"
+}
+
+case class NoNinoPages(srn: Srn) extends Removable[List[String]] {
+
+  override def path: JsPath = JsPath \ "noNINO"
 }
