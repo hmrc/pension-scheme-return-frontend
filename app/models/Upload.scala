@@ -16,6 +16,7 @@
 
 package models
 
+import cats.data.NonEmptyList
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 import uk.gov.hmrc.domain.Nino
@@ -25,6 +26,9 @@ case class ValidationError(key: String, message: String)
 
 object ValidationError {
   implicit val format: Format[ValidationError] = Json.format[ValidationError]
+
+  def fromCell(cell: String, row: Int, errorMessage: String): ValidationError =
+    ValidationError(cell + row, errorMessage)
 }
 
 case class UploadState(row: Int, previousNinos: List[Nino]) {
@@ -40,9 +44,12 @@ sealed trait Upload
 
 case class UploadSuccess(memberDetails: List[UploadMemberDetails]) extends Upload
 
-case object UploadFormatError extends Upload
+// UploadError should not extend Upload as the nested inheritance causes issues with the play Json macros
+sealed trait UploadError
 
-case class UploadErrors(errors: List[ValidationError]) extends Upload
+case object UploadFormatError extends Upload with UploadError
+
+case class UploadErrors(errors: NonEmptyList[ValidationError]) extends Upload with UploadError
 
 case class UploadMemberDetails(row: Int, nameDOB: NameDOB, ninoOrNoNinoReason: Either[String, Nino])
 

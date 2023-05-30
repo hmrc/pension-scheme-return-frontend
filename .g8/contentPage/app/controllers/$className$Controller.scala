@@ -6,7 +6,7 @@ import play.api.mvc._
 import navigation.Navigator
 import models.Mode
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.models.ContentPageViewModel
+import viewmodels.models.{ContentPageViewModel, FormPageViewModel}
 import viewmodels.implicits._
 import viewmodels.DisplayMessage._
 import views.html.ContentPageView

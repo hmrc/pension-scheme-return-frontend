@@ -54,12 +54,17 @@ class MemberDetailsNinoController @Inject()(
     with I18nSupport {
 
   private def form(details: NameDOB, duplicates: List[Nino] = List()) =
-    MemberDetailsNinoController.form(formProvider, details, duplicates)
+    MemberDetailsNinoController.form(formProvider, details.fullName, duplicates)
 
   def onPageLoad(srn: Srn, index: Max99, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       request.usingAnswer(MemberDetailsPage(srn, index)).sync { details =>
-        Ok(view(form(details).fromUserAnswers(MemberDetailsNinoPage(srn, index)), viewModel(srn, index, mode, details)))
+        Ok(
+          view(
+            form(details).fromUserAnswers(MemberDetailsNinoPage(srn, index)),
+            viewModel(srn, index, mode, details.fullName)
+          )
+        )
       }
   }
 
@@ -73,7 +78,7 @@ class MemberDetailsNinoController @Inject()(
           .fold(
             formWithErrors =>
               Future.successful(
-                BadRequest(view(formWithErrors, viewModel(srn, index, mode, details)))
+                BadRequest(view(formWithErrors, viewModel(srn, index, mode, details.fullName)))
               ),
             answer => {
               for {
@@ -90,19 +95,19 @@ class MemberDetailsNinoController @Inject()(
 }
 
 object MemberDetailsNinoController {
-  def form(formProvider: TextFormProvider, memberDetails: NameDOB, duplicates: List[Nino]): Form[Nino] =
+  def form(formProvider: TextFormProvider, memberFullName: String, duplicates: List[Nino]): Form[Nino] =
     formProvider.nino(
       "memberDetailsNino.error.required",
       "memberDetailsNino.error.invalid",
       duplicates,
       "memberDetailsNino.error.duplicate",
-      memberDetails.fullName
+      memberFullName
     )
 
-  def viewModel(srn: Srn, index: Max99, mode: Mode, memberDetails: NameDOB): FormPageViewModel[TextInputViewModel] =
+  def viewModel(srn: Srn, index: Max99, mode: Mode, memberFullName: String): FormPageViewModel[TextInputViewModel] =
     FormPageViewModel(
       Message("memberDetailsNino.title"),
-      Message("memberDetailsNino.heading", memberDetails.fullName),
+      Message("memberDetailsNino.heading", memberFullName),
       TextInputViewModel(),
       routes.MemberDetailsNinoController.onSubmit(srn, index, mode)
     )

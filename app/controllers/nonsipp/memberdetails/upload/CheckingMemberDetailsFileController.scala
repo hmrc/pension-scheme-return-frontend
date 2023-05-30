@@ -18,10 +18,9 @@ package controllers.nonsipp.memberdetails.upload
 
 import controllers.actions._
 import controllers.nonsipp.memberdetails.upload.CheckingMemberDetailsFileController._
-import models.{Mode, NormalMode, UploadErrors, UploadFormatError, UploadKey, UploadStatus, UploadSuccess}
+import models.{Mode, NormalMode, UploadError, UploadErrors, UploadFormatError, UploadKey, UploadStatus, UploadSuccess}
 import models.SchemeId.Srn
 import models.requests.DataRequest
-import models.{Mode, UploadKey, UploadStatus}
 import navigation.Navigator
 import pages.CheckingMemberDetailsFilePage
 import play.api.i18n._
@@ -54,7 +53,7 @@ class CheckingMemberDetailsFileController @Inject()(
   def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
     uploadService.getUploadResult(UploadKey.fromRequest(srn)).map {
       case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-      case Some(_: UploadErrors) | Some(UploadFormatError) => redirectNextPage(srn, uploadSuccessful = false, mode)
+      case Some(_: UploadError) => redirectNextPage(srn, uploadSuccessful = false, mode)
       case Some(_: UploadSuccess) => redirectNextPage(srn, uploadSuccessful = true, mode)
     }
   }

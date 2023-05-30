@@ -16,6 +16,7 @@
 
 package navigation
 
+import controllers.TestValues
 import eu.timepit.refined.api.{Refined, Validate}
 import eu.timepit.refined.refineV
 import generators.IndexGen
@@ -30,11 +31,9 @@ import play.api.mvc.Call
 import utils.BaseSpec
 import utils.UserAnswersUtils.UserAnswersOps
 
-trait NavigatorBehaviours extends ScalaCheckPropertyChecks with EitherValues { self: BaseSpec =>
+trait NavigatorBehaviours extends ScalaCheckPropertyChecks with EitherValues with TestValues { self: BaseSpec =>
 
   val navigator: Navigator
-
-  val defaultUserAnswers = UserAnswers("id")
 
   protected trait AllModes {
 
