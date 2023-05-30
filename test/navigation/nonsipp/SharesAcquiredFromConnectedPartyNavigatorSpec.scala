@@ -43,10 +43,10 @@ class SharesAcquiredFromConnectedPartyNavigatorSpec extends BaseSpec with Naviga
         .navigateToWithData(
           SharesAcquiredFromConnectedPartyPage,
           Gen.const(false),
-          (_, _) => routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.totalvaluequotedshares.routes.TotalValueQuotedSharesController.onPageLoad
         )
         .withName(
-          "go from shares acquired from connected party page to unauthorised page when no selected"
+          "go from shares acquired from connected party page to total value quoted shares page when no selected"
         )
     )
   }
