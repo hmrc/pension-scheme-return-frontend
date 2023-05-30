@@ -264,3 +264,8 @@ GET        /:srn/change-file-upload-success           controllers.nonsipp.member
 GET        /:srn/submit-change-file-upload-success    controllers.nonsipp.memberdetails.upload.FileUploadSuccessController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
 GET        /:srn/pension-scheme-return-task-list   controllers.nonsipp.TaskListController.onPageLoad(srn: Srn)
+
+GET        /:srn/file-upload-error-wrong-format                      controllers.nonsipp.memberdetails.upload.FileUploadWrongFormatController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/submit-file-upload-error-wrong-format               controllers.nonsipp.memberdetails.upload.FileUploadWrongFormatController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/change-file-upload-error-wrong-format               controllers.nonsipp.memberdetails.upload.FileUploadWrongFormatController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+GET        /:srn/change-submit-file-upload-error-wrong-format        controllers.nonsipp.memberdetails.upload.FileUploadWrongFormatController.onSubmit(srn: Srn, mode: Mode = CheckMode)
