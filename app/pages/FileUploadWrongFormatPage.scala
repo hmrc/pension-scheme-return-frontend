@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.memberdetails.upload
+package pages
 
+import play.api.libs.json.JsPath
 import models.SchemeId.Srn
-import models.{UploadErrors, UploadFormatError}
 import pages.Page
 
-case class FileUploadErrorPage(srn: Srn, error: Either[UploadFormatError.type, UploadErrors]) extends Page
+case class FileUploadWrongFormatPage(srn: Srn) extends Page

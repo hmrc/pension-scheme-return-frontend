@@ -34,13 +34,13 @@ class $className;format="cap"$Controller @Inject()(
 }
 
 object $className;format="cap"$Controller {
-  def viewModel(srn: Srn, mode: Mode): ContentPageViewModel = ContentPageViewModel(
+  def viewModel(srn: Srn, mode: Mode): FormPageViewModel[ContentPageViewModel] = FormPageViewModel[ContentPageViewModel](
     title = "$className;format="decap"$.title",
     heading = "$className;format="decap"$.heading",
-    contents = List(ParagraphMessage("$className;format="decap"$.paragraph")),
-    isStartButton = false,
+    description = Some(ParagraphMessage("$className;format="decap"$.paragraph")),
+    page = ContentPageViewModel(isLargeHeading = true),
+    refresh = None,
     buttonText = "site.continue",
-    isLargeHeading = true,
     onSubmit = routes.$className$Controller.onSubmit(srn, mode)
   )
 }

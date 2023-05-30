@@ -232,7 +232,9 @@ object TaskListController {
       TaskListItemViewModel(
         LinkMessage(
           messageKey(prefix, "connectedparty.title", UnableToStart),
-          controllers.nonsipp.sharesacquiredfromconnectedparty.routes.SharesAcquiredFromConnectedPartyController.onPageLoad(srn, NormalMode).url
+          controllers.nonsipp.sharesacquiredfromconnectedparty.routes.SharesAcquiredFromConnectedPartyController
+            .onPageLoad(srn, NormalMode)
+            .url
         ),
         NotStarted
       ),

@@ -19,6 +19,7 @@ package controllers.nonsipp.memberdetails.upload
 import controllers.actions._
 import controllers.nonsipp.memberdetails.upload.FileUploadErrorController._
 import models.SchemeId.Srn
+import models.requests.DataRequest
 import models.{Mode, UploadErrors, UploadFormatError, UploadKey}
 import navigation.Navigator
 import pages.nonsipp.memberdetails.upload.FileUploadErrorPage
@@ -52,9 +53,18 @@ class FileUploadErrorController @Inject()(
     }
   }
 
-  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    Redirect(navigator.nextPage(FileUploadErrorPage(srn), mode, request.userAnswers))
+  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
+    uploadService.getUploadResult(UploadKey.fromRequest(srn)).map {
+      case Some(UploadFormatError) => navToNextPage(srn, mode, Left(UploadFormatError))
+      case Some(uploadErrors: UploadErrors) => navToNextPage(srn, mode, Right(uploadErrors))
+      case _ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+    }
   }
+
+  private def navToNextPage(srn: Srn, mode: Mode, error: Either[UploadFormatError.type, UploadErrors])(
+    implicit request: DataRequest[_]
+  ): Result =
+    Redirect(navigator.nextPage(FileUploadErrorPage(srn, error), mode, request.userAnswers))
 }
 
 object FileUploadErrorController {

@@ -22,9 +22,9 @@ import controllers.nonsipp.memberdetails.routes
 import eu.timepit.refined.{refineMV, refineV}
 import models.CheckOrChange.Check
 import models.ManualOrUpload.{Manual, Upload}
-import models.{CheckMode, CheckOrChange, ManualOrUpload, NormalMode, UserAnswers}
+import models.{CheckMode, CheckOrChange, ManualOrUpload, NormalMode, UploadErrors, UploadFormatError, UserAnswers}
 import navigation.JourneyNavigator
-import pages.{CheckingMemberDetailsFilePage, Page}
+import pages.{CheckingMemberDetailsFilePage, FileUploadWrongFormatPage, Page}
 import pages.nonsipp.memberdetails.MembersDetails.MembersDetailsOps
 import pages.nonsipp.memberdetails._
 import pages.nonsipp.memberdetails.upload.{FileUploadErrorPage, FileUploadSuccessPage}
@@ -93,8 +93,15 @@ object MemberDetailsNavigator extends JourneyNavigator {
     case FileUploadSuccessPage(srn) =>
       controllers.nonsipp.memberdetails.routes.SchemeMembersListController.onPageLoad(srn, 1, Upload)
 
-    case FileUploadErrorPage(srn) =>
+    case FileUploadErrorPage(srn, Left(_: UploadFormatError.type)) =>
+      controllers.nonsipp.memberdetails.upload.routes.FileUploadWrongFormatController.onPageLoad(srn, NormalMode)
+
+    case FileUploadErrorPage(srn, Right(_: UploadErrors)) =>
       controllers.routes.UnauthorisedController.onPageLoad()
+
+    case FileUploadWrongFormatPage(srn) =>
+      controllers.nonsipp.memberdetails.routes.UploadMemberDetailsController.onPageLoad(srn)
+
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
