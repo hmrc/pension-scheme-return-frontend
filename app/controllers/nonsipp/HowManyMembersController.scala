@@ -33,10 +33,10 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.{SaveService, SchemeDateService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.DateTimeUtils.localDateShow
-import viewmodels.DisplayMessage.Message
+import viewmodels.DisplayMessage.{ListMessage, ListType, Message}
 import viewmodels.implicits._
 import viewmodels.models.MultipleQuestionsViewModel.TripleQuestion
-import viewmodels.models.{Field, FormPageViewModel}
+import viewmodels.models.{Field, FormPageViewModel, FurtherDetailsViewModel}
 import views.html.IntView
 
 import java.time.LocalDate
@@ -138,7 +138,18 @@ object HowManyMembersController {
       form,
       Field("howManyMembers.field1"),
       Field("howManyMembers.field2"),
-      Field("howManyMembers.field3")
+      Field("howManyMembers.field3"),
+      Option(
+        FurtherDetailsViewModel(
+          Message("howManyMembers.detailsComponentTitle"),
+          ListMessage(
+            ListType.Bullet,
+            "howManyMembers.List1",
+            "howManyMembers.List2",
+            "howManyMembers.List3"
+          )
+        )
+      )
     ),
     routes.HowManyMembersController.onSubmit(srn, mode)
   )

@@ -258,6 +258,10 @@ memberDetailsNino.error.duplicate = National Insurance number is already in use 
 
 howManyMembers.title = How many members did the scheme have on {0}?
 howManyMembers.heading = How many members did {0} have on {1}?
+howManyMembers.detailsComponentTitle = What are active, deferred and pensioner members?
+howManyMembers.List1 = An active member is someone who has benefits building up in the pension scheme
+howManyMembers.List2 = A deferred member is someone who has rights under the scheme, and is neither an active member nor a pensioner member
+howManyMembers.List3 = A pensioner member is someone who is entitled to be paid benefits under the scheme, and is not an active member of that scheme
 howManyMembers.field1 = Number of active members
 howManyMembers.field1.error.required = Enter the number of active members. If there were none, enter 0.
 howManyMembers.field1.error.invalid = Number of active members must only include numbers 0 to 9
