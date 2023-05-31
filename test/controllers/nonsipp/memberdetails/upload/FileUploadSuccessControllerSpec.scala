@@ -16,9 +16,13 @@
 
 package controllers.nonsipp.memberdetails.upload
 
-import controllers.nonsipp.memberdetails.upload.FileUploadSuccessController._
+import cats.implicits.catsSyntaxOptionId
+import config.Refined.OneTo99
 import controllers.ControllerBaseSpec
-import eu.timepit.refined.refineMV
+import controllers.nonsipp.memberdetails.upload.FileUploadSuccessController._
+import eu.timepit.refined.{refineMV, refineV}
+import models.SchemeId.Srn
+import models.UploadStatus.UploadStatus
 import models.{
   NameDOB,
   NormalMode,
@@ -29,17 +33,18 @@ import models.{
   UploadSuccess,
   UserAnswers
 }
-import models.UploadStatus.UploadStatus
 import org.mockito.ArgumentCaptor
-import org.mockito.ArgumentMatchers.{any, anyInt}
+import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsNinoPage, MemberDetailsPage, NoNINOPage}
 import play.api.inject
 import play.api.inject.guice.GuiceableModule
+import play.api.test.FakeRequest
 import services.{SaveService, UploadService}
 import uk.gov.hmrc.domain.Nino
 import views.html.ContentPageView
 
 import scala.concurrent.Future
+import scala.util.Try
 
 class FileUploadSuccessControllerSpec extends ControllerBaseSpec {
 
@@ -53,6 +58,24 @@ class FileUploadSuccessControllerSpec extends ControllerBaseSpec {
     inject.bind[UploadService].toInstance(mockUploadService),
     inject.bind[SaveService].toInstance(mockSaveService)
   )
+
+  def addMemberDetails(userAnswers: UserAnswers, srn: Srn, total: Int): UserAnswers = {
+    def addMemberDetails(userAnswers: UserAnswers, index: Int): Try[UserAnswers] = {
+      val memberDetails = wrappedMemberDetailsGen.sample.value
+      val refinedIndex = refineV[OneTo99](index).toOption.value
+
+      UserAnswers.compose(
+        UserAnswers.set(MemberDetailsPage(srn, refinedIndex), memberDetails.nameDob),
+        UserAnswers.set(DoesMemberHaveNinoPage(srn, refinedIndex), memberDetails.nino.isRight),
+        memberDetails.nino.fold(
+          UserAnswers.set(NoNINOPage(srn, refinedIndex), _),
+          UserAnswers.set(MemberDetailsNinoPage(srn, refinedIndex), _)
+        )
+      )(userAnswers)
+    }
+
+    (1 to total).foldLeft(userAnswers)((acc, curr) => addMemberDetails(acc, curr).get)
+  }
 
   override def beforeEach(): Unit = {
     reset(mockUploadService)
@@ -107,6 +130,37 @@ class FileUploadSuccessControllerSpec extends ControllerBaseSpec {
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
+
+    "onSubmit should replace all records" in {
+
+      val userAnswers = addMemberDetails(emptyUserAnswers, srn, 20)
+      val captor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
+
+      val upload: UploadSuccess = UploadSuccess(
+        List(
+          UploadMemberDetails(1, NameDOB("A", "A", localDate), Right(Nino("AB123456A")))
+        )
+      )
+
+      mockGetUploadResult(upload.some)
+
+      running(_ => applicationBuilder(userAnswers = Some(userAnswers))) { implicit app =>
+        route(app, FakeRequest(onSubmit)).value.futureValue
+
+        verify(mockSaveService).save(captor.capture())(any(), any())
+
+        val userAnswers = captor.getValue
+
+        userAnswers.get(MemberDetailsPage(srn, refineMV(1))) mustBe Some(NameDOB("A", "A", localDate))
+        userAnswers.get(DoesMemberHaveNinoPage(srn, refineMV(1))) mustBe Some(true)
+        userAnswers.get(MemberDetailsNinoPage(srn, refineMV(1))) mustBe Some(Nino("AB123456A"))
+
+        userAnswers.get(MemberDetailsPage(srn, refineMV(2))) mustBe None
+        userAnswers.get(DoesMemberHaveNinoPage(srn, refineMV(2))) mustBe None
+        userAnswers.get(NoNINOPage(srn, refineMV(2))) mustBe None
+        userAnswers.get(MemberDetailsNinoPage(srn, refineMV(2))) mustBe None
+      }
+    }
 
     "onSubmit should persist the member details in user services in alphabetical order" - {
       val captor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])

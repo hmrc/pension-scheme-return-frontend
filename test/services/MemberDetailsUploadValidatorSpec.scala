@@ -39,9 +39,9 @@ class MemberDetailsUploadValidatorSpec extends BaseSpec with TestValues {
 
       val csv =
         "First name,Last name,Date of birth,National Insurance number,Reason for no National Insurance number\r\n" +
-          "Jason,Lawrence,1989-10-06,AB123456A,\r\n" +
-          "Pearl,Parsons,1990-04-12,,reason\r\n" +
-          "Katherine,Kennedy,1985-01-30,,reason\r\n"
+          "Jason,Lawrence,6/10/1989,AB123456A,\r\n" +
+          "Pearl,Parsons,12/4/1990,,reason\r\n" +
+          "Katherine,Kennedy,30/01/1985,,reason\r\n"
 
       val source = Source.single(ByteString(csv))
 
@@ -58,11 +58,11 @@ class MemberDetailsUploadValidatorSpec extends BaseSpec with TestValues {
 
       val csv =
         "First name,Last name,Date of birth,National Insurance number,Reason for no National Insurance number\r\n" +
-          "Jason,Lawrence,1989-10-06,AB123456A,\r\n" +
-          "123,Parsons,1990-04-12,,reason\r\n" +
-          "Katherine,123,1985-01-30,,reason\r\n" +
-          "Ron,Phelps,1972-11-04,,Invalid@|^reason\r\n" +
-          "Micheal,Beasley,1990-04-15,InvalidNino,\r\n"
+          "Jason,Lawrence,06/10/1989,AB123456A,\r\n" +
+          "123,Parsons,12/04/1990,,reason\r\n" +
+          "Katherine,123,30/1/1985,,reason\r\n" +
+          "Ron,Phelps,4/11/1972,,Invalid@|^reason\r\n" +
+          "Micheal,Beasley,15/04/1990,InvalidNino,\r\n"
 
       val source = Source.single(ByteString(csv))
 
@@ -80,9 +80,9 @@ class MemberDetailsUploadValidatorSpec extends BaseSpec with TestValues {
 
       val csv =
         "First name,Last name,Date of birth,National Insurance number,Reason for no National Insurance number\r\n" +
-          "Jason,Lawrence,1989-10-06,AB123456A,\r\n" +
-          "Pearl,Parsons,1990-04-12,AB123456A,\r\n" +
-          "Katherine,Kennedy,1985-01-30,,reason\r\n"
+          "Jason,Lawrence,06/10/1989,AB123456A,\r\n" +
+          "Pearl,Parsons,12/04/1990,AB123456A,\r\n" +
+          "Katherine,Kennedy,30/01/1985,,reason\r\n"
 
       val source = Source.single(ByteString(csv))
 
@@ -97,9 +97,9 @@ class MemberDetailsUploadValidatorSpec extends BaseSpec with TestValues {
 
       val csv =
         "First name,Last name,Date of birth,National Insurance number,Reason for no National Insurance number\r\n" +
-          "Jason,Lawrence,1989-10-06,AB123456A,\r\n" +
-          "Pearl,Parsons,1990-04-12,AB123789A,reason\r\n" +
-          "Katherine,Kennedy,1985-01-30,,reason\r\n"
+          "Jason,Lawrence,06/10/1989,AB123456A,\r\n" +
+          "Pearl,Parsons,12/04/1990,AB123789A,reason\r\n" +
+          "Katherine,Kennedy,30/01/1985,,reason\r\n"
 
       val source = Source.single(ByteString(csv))
 

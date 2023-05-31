@@ -21,6 +21,7 @@ import models.SchemeId.Srn
 import models.UserAnswers
 import pages.QuestionPage
 import play.api.libs.json.JsPath
+import queries.Removable
 import utils.RefinedUtils.RefinedIntOps
 
 import scala.util.Try
@@ -40,4 +41,9 @@ case class DoesMemberHaveNinoPage(srn: Srn, index: Max99) extends QuestionPage[B
           .remove(NoNINOPage(srn, index))
           .flatMap(_.remove(MemberDetailsNinoPage(srn, index)))
     }
+}
+
+case class DoesMemberHaveNinoPages(srn: Srn) extends Removable[List[Boolean]] {
+
+  override def path: JsPath = JsPath \ "nationalInsuranceNumber"
 }

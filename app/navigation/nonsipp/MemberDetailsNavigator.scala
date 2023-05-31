@@ -24,10 +24,10 @@ import models.CheckOrChange.Check
 import models.ManualOrUpload.{Manual, Upload}
 import models.{CheckMode, CheckOrChange, ManualOrUpload, NormalMode, UploadErrors, UploadFormatError, UserAnswers}
 import navigation.JourneyNavigator
-import pages.{CheckingMemberDetailsFilePage, FileUploadWrongFormatPage, Page}
-import pages.nonsipp.memberdetails.MembersDetails.MembersDetailsOps
+import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
 import pages.nonsipp.memberdetails._
 import pages.nonsipp.memberdetails.upload.{FileUploadErrorPage, FileUploadSuccessPage}
+import pages.{CheckingMemberDetailsFilePage, FileUploadWrongFormatPage, Page}
 import play.api.mvc.Call
 
 object MemberDetailsNavigator extends JourneyNavigator {

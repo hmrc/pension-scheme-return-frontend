@@ -23,18 +23,15 @@ import akka.util.ByteString
 import cats.data.Validated
 import cats.data.Validated.{Invalid, Valid}
 import cats.implicits._
-import config.Refined.OneTo99
 import controllers.nonsipp.memberdetails.{MemberDetailsController, MemberDetailsNinoController, NoNINOController}
-import eu.timepit.refined.refineV
 import forms.{NameDOBFormProvider, TextFormProvider}
 import models._
-import models.SchemeId.Srn
 import pages.nonsipp.memberdetails._
 import play.api.data.Form
 import uk.gov.hmrc.domain.Nino
-import uk.gov.hmrc.http.HeaderCarrier
 
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.math.Integral.Implicits.infixIntegralOps
@@ -110,12 +107,15 @@ class MemberDetailsUploadValidator @Inject()(
     csvData: List[String],
     previousNinos: List[Nino],
     row: Int
-  ): Option[Validated[List[ValidationError], UploadMemberDetails]] =
+  ): Option[Validated[List[ValidationError], UploadMemberDetails]] = {
+    val dateTimeFormatter = DateTimeFormatter.ofPattern("d/M/yyyy")
+
     for {
       firstName <- getCSVValue(UploadKeys.firstName, headerKeys, csvData)
       lastName <- getCSVValue(UploadKeys.lastName, headerKeys, csvData)
       dob <- getCSVValue(UploadKeys.dateOfBirth, headerKeys, csvData)
-      parsedDOB <- Try(LocalDate.parse(dob.value)).toOption.map(localDate => CsvValue(dob.key, localDate))
+      parsedDOB <- Try(LocalDate.parse(dob.value, dateTimeFormatter)).toOption
+        .map(localDate => CsvValue(dob.key, localDate))
       maybeNino <- getOptionalCSVValue(UploadKeys.nino, headerKeys, csvData)
       maybeNoNinoReason <- getOptionalCSVValue(UploadKeys.reasonForNoNino, headerKeys, csvData)
       validatedNameDOB = validateNameDOB(firstName, lastName, parsedDOB, row)
@@ -135,6 +135,7 @@ class MemberDetailsUploadValidator @Inject()(
       validatedNameDOB,
       validatedNinoOrNoNinoReason.bisequence
     ).mapN((nameDob, ninoOrNoNinoReason) => UploadMemberDetails(row, nameDob, ninoOrNoNinoReason))
+  }
 
   private def validateNameDOB(
     firstName: CsvValue[String],
