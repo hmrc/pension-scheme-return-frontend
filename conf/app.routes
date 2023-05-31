@@ -265,6 +265,11 @@ GET        /:srn/submit-change-file-upload-success    controllers.nonsipp.member
 
 GET        /:srn/pension-scheme-return-task-list   controllers.nonsipp.TaskListController.onPageLoad(srn: Srn)
 
+GET        /:srn/total-value-quoted-shares                      controllers.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST       /:srn/total-value-quoted-shares                      controllers.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/change-total-value-quoted-shares               controllers.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST       /:srn/change-total-value-quoted-shares               controllers.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
 GET        /:srn/file-upload-error-wrong-format                      controllers.nonsipp.memberdetails.upload.FileUploadWrongFormatController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 GET        /:srn/submit-file-upload-error-wrong-format               controllers.nonsipp.memberdetails.upload.FileUploadWrongFormatController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 GET        /:srn/change-file-upload-error-wrong-format               controllers.nonsipp.memberdetails.upload.FileUploadWrongFormatController.onPageLoad(srn: Srn, mode: Mode = CheckMode)

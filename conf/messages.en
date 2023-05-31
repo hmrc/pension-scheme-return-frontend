@@ -510,6 +510,13 @@ nonsipp.tasklist.declaration.title = Declaration
 nonsipp.tasklist.declaration.incomplete = You must complete every section before you can declare.
 nonsipp.tasklist.declaration.saveandreturn = Save and return to Managing Pension Schemes
 
+totalValueQuotedShares.title = What was the total value of all quoted shares held by the scheme on {0}, in pounds and pence?
+totalValueQuotedShares.heading = What was the total value of all quoted shares held by {0} on {1}, in pounds and pence?
+totalValueQuotedShares.hint = If there were none, enter 0.
+totalValueQuotedShares.error.required = Enter the total value of all quoted shares held by the scheme on {0}, in pounds and pence
+totalValueQuotedShares.error.invalid = Total value of all quoted shares must be an amount of money, like 123.45 or 156
+totalValueQuotedShares.error.tooLarge = Total value of all quoted shares must be 999999999.99 or less
+
 fileUploadWrongFormat.title = Your member details file is missing information or in the wrong format
 fileUploadWrongFormat.heading = Your member details file is missing information or in the wrong format
 fileUploadWrongFormat.paragraph1 = Your file might be empty, or has a header row (row 1) that is:
