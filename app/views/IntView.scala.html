@@ -36,7 +36,7 @@
     @if(viewmodel.page.fields.length > 1) {
       <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
 
-      @viewmodel.page.details.map { detail =>
+      @viewmodel.details.map { detail =>
         @govukDetails(
             DetailsViewModel(
                 renderMessage(detail.title),

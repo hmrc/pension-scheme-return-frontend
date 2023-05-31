@@ -27,6 +27,7 @@ case class FormPageViewModel[+A](
   page: A,
   refresh: Option[Int],
   buttonText: Message,
+  details: Option[FurtherDetailsViewModel] = None,
   onSubmit: Call
 ) {
 
@@ -58,6 +59,25 @@ object FormPageViewModel {
       page,
       refresh = None,
       Message("site.saveAndContinue"),
+      None,
+      onSubmit
+    )
+
+  def apply[A](
+    title: Message,
+    heading: InlineMessage,
+    page: A,
+    details: Option[FurtherDetailsViewModel],
+    onSubmit: Call
+  ): FormPageViewModel[A] =
+    FormPageViewModel(
+      title,
+      heading,
+      None,
+      page,
+      refresh = None,
+      Message("site.saveAndContinue"),
+      details,
       onSubmit
     )
 }
