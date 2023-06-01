@@ -56,12 +56,27 @@ object Components {
     )
   }
 
-  private def table(elements: NonEmptyList[(Html, Html)]): Html =
+  private def tableHeading(element: (Html, Html)): Html = {
+    val (key, value) = element
     HtmlFormat.raw(
-      s"""<table class="govuk-table"><tbody class="govuk-table__body">${elements
-        .map(tableElement)
-        .toList
-        .mkString}</tbody></table>"""
+      s"""<thead class="govuk-table__head">
+         |  <tr class="govuk-table__row">
+         |    <th scope="col" class="govuk-table__header">$key</th>
+         |    <th scope="col" class="govuk-table__header">$value</th>
+         |  </tr>
+         |</thead>""".stripMargin
+    )
+  }
+
+  private def table(elements: NonEmptyList[(Html, Html)], heading: Option[(Html, Html)]): Html =
+    HtmlFormat.raw(
+      s"""
+        <table class="govuk-table">
+          ${heading.map(tableHeading).getOrElse(HtmlFormat.empty)}
+          <tbody class="govuk-table__body">
+            ${elements.map(tableElement).toList.mkString}
+          </tbody>
+        </table>"""
     )
 
   private def combine(left: Html, right: Html): Html =
@@ -81,8 +96,11 @@ object Components {
       case ParagraphMessage(content) => paragraph(content.map(renderMessage).reduce(combine))
       case ListMessage(content, Bullet) => unorderedList(content.map(renderMessage))
       case ListMessage(content, NewLine) => simpleList(content.map(renderMessage))
-      case TableMessage(content) =>
-        table(content.map { case (key, value) => renderMessage(key) -> renderMessage(value) })
+      case TableMessage(content, heading) =>
+        table(
+          content.map { case (key, value) => renderMessage(key) -> renderMessage(value) },
+          heading.map { case (key, value) => renderMessage(key) -> renderMessage(value) }
+        )
       case CompoundMessage(first, second) => combine(renderMessage(first), renderMessage(second))
       case Heading2(content, labelSize) => h2(renderMessage(content), labelSize.toString)
     }

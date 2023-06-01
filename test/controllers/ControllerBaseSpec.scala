@@ -16,6 +16,7 @@
 
 package controllers
 
+import cats.data.NonEmptyList
 import controllers.actions._
 import generators.ModelGenerators.srnGen
 import models.UserAnswers.SensitiveJsObject
@@ -143,7 +144,7 @@ trait TestValues { _: OptionValues =>
   )
 
   val uploadResultErrors: UploadErrors = UploadErrors(
-    List(
+    NonEmptyList.of(
       ValidationError("A1", "error A1"),
       ValidationError("C3", "error C3"),
       ValidationError("F2", "error F2")

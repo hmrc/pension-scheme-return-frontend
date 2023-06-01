@@ -16,6 +16,7 @@
 
 package repositories
 
+import cats.data.NonEmptyList
 import config.FrontendAppConfig
 import models.SchemeId.asSrn
 import models.UploadKey.separator
@@ -97,7 +98,7 @@ class UploadRepository @Inject()(
       .map(_ => ())
 
   def getUploadResult(key: UploadKey): Future[Option[Upload]] =
-    collection.find(equal("id", key.toBson())).headOption().map(_.flatMap(_.result))
+    collection.find(equal("id", key.value.toBson())).headOption().map(_.flatMap(_.result))
 
   def remove(key: UploadKey): Future[Unit] =
     collection
@@ -149,8 +150,11 @@ object UploadRepository {
     stringFormat[Reference](Reference(_), _.reference)
 
   implicit val uploadSuccessFormat: OFormat[UploadSuccess] = Json.format[UploadSuccess]
+  implicit val validationErrorsFormat: OFormat[NonEmptyList[ValidationError]] =
+    Json.format[NonEmptyList[ValidationError]]
   implicit val uploadErrorsFormat: OFormat[UploadErrors] = Json.format[UploadErrors]
   implicit val uploadFormatErrorFormat: OFormat[UploadFormatError.type] = Json.format[UploadFormatError.type]
+
   implicit val uploadFormat: OFormat[Upload] = Json.format[Upload]
 
   private[repositories] val mongoFormat: OFormat[MongoUpload] =

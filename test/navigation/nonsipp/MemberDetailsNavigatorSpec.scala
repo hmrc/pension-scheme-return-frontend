@@ -17,6 +17,7 @@
 package navigation.nonsipp
 
 import config.Refined.OneTo99
+import controllers.TestValues
 import controllers.nonsipp.employercontributions
 import controllers.nonsipp.memberdetails.routes
 import eu.timepit.refined.api.Refined
@@ -27,7 +28,7 @@ import models.SchemeId.Srn
 import models.{CheckOrChange, ManualOrUpload, NormalMode, UploadErrors, UploadFormatError}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.CheckingMemberDetailsFilePage
+import pages.{CheckingMemberDetailsFilePage, FileUploadErrorSummaryPage}
 import pages.nonsipp.memberdetails._
 import pages.nonsipp.memberdetails.upload.{FileUploadErrorPage, FileUploadSuccessPage}
 import utils.BaseSpec
@@ -246,7 +247,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
     act.like(
       normalmode
         .navigateTo(
-          FileUploadErrorPage(_, Left(UploadFormatError)),
+          FileUploadErrorPage(_, UploadFormatError),
           controllers.nonsipp.memberdetails.upload.routes.FileUploadWrongFormatController.onPageLoad
         )
         .withName("go from file upload error page to file upload format error page on file upload format error")
@@ -255,10 +256,19 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
     act.like(
       normalmode
         .navigateTo(
-          FileUploadErrorPage(_, Right(UploadErrors(Nil))),
-          (_, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          FileUploadErrorPage(_, uploadResultErrors),
+          controllers.nonsipp.memberdetails.upload.routes.FileUploadErrorSummaryController.onPageLoad
         )
-        .withName("go from file upload error page to unauthorised page on file upload errors")
+        .withName("go from file upload error page to file upload error summary page on file upload errors")
+    )
+
+    act.like(
+      normalmode
+        .navigateTo(
+          FileUploadErrorSummaryPage,
+          (srn, _) => controllers.nonsipp.memberdetails.routes.UploadMemberDetailsController.onPageLoad(srn)
+        )
+        .withName("go from file upload error summary page to upload a file page")
     )
 
     "CheckMode" - {

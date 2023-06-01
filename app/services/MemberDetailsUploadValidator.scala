@@ -20,14 +20,16 @@ import akka.NotUsed
 import akka.stream.Materializer
 import akka.stream.scaladsl.{Flow, Framing, Sink, Source}
 import akka.util.ByteString
-import cats.data.Validated
 import cats.data.Validated.{Invalid, Valid}
+import cats.data.{NonEmptyList, Validated, ValidatedNel}
 import cats.implicits._
 import controllers.nonsipp.memberdetails.{MemberDetailsController, MemberDetailsNinoController, NoNINOController}
 import forms.{NameDOBFormProvider, TextFormProvider}
 import models._
 import pages.nonsipp.memberdetails._
 import play.api.data.Form
+import play.api.data.{Form, FormError}
+import play.api.i18n.Messages
 import uk.gov.hmrc.domain.Nino
 
 import java.time.LocalDate
@@ -43,11 +45,11 @@ class MemberDetailsUploadValidator @Inject()(
 )(implicit ec: ExecutionContext) {
 
   private val memberDetailsForm = MemberDetailsController.form(nameDOBFormProvider)
-  private def ninoForm(memberDetails: NameDOB, previousNinos: List[Nino]) =
-    MemberDetailsNinoController.form(textFormProvider, memberDetails, previousNinos)
+  private def ninoForm(memberFullName: String, previousNinos: List[Nino]): Form[Nino] =
+    MemberDetailsNinoController.form(textFormProvider, memberFullName, previousNinos)
 
-  private def noNinoForm(memberDetails: NameDOB) =
-    NoNINOController.form(textFormProvider, memberDetails.fullName)
+  private def noNinoForm(memberFullName: String): Form[String] =
+    NoNINOController.form(textFormProvider, memberFullName)
 
   private val firstRowSink: Sink[ByteString, Future[String]] =
     Sink.head[ByteString].mapMaterializedValue(_.map(_.utf8String))
@@ -59,7 +61,7 @@ class MemberDetailsUploadValidator @Inject()(
 
   def validateCSV(
     source: Source[ByteString, _]
-  )(implicit mat: Materializer): Future[Upload] = {
+  )(implicit mat: Materializer, messages: Messages): Future[Upload] = {
     val csvFrames = source.via(csvFrame)
     for {
       csvHeader <- csvFrames.runWith(firstRowSink)
@@ -91,7 +93,7 @@ class MemberDetailsUploadValidator @Inject()(
           case (_, UploadFormatError) => UploadFormatError
           case (UploadFormatError, _) => UploadFormatError
           // errors
-          case (UploadErrors(previous), UploadErrors(errs)) => UploadErrors(previous ++ errs)
+          case (UploadErrors(previous), UploadErrors(errs)) => UploadErrors(previous ++ errs.toList)
           case (errs: UploadErrors, _) => errs
           case (_, errs: UploadErrors) => errs
           // success
@@ -107,24 +109,20 @@ class MemberDetailsUploadValidator @Inject()(
     csvData: List[String],
     previousNinos: List[Nino],
     row: Int
-  ): Option[Validated[List[ValidationError], UploadMemberDetails]] = {
-    val dateTimeFormatter = DateTimeFormatter.ofPattern("d/M/yyyy")
-
+  )(implicit messages: Messages): Option[ValidatedNel[ValidationError, UploadMemberDetails]] =
     for {
       firstName <- getCSVValue(UploadKeys.firstName, headerKeys, csvData)
       lastName <- getCSVValue(UploadKeys.lastName, headerKeys, csvData)
       dob <- getCSVValue(UploadKeys.dateOfBirth, headerKeys, csvData)
-      parsedDOB <- Try(LocalDate.parse(dob.value, dateTimeFormatter)).toOption
-        .map(localDate => CsvValue(dob.key, localDate))
       maybeNino <- getOptionalCSVValue(UploadKeys.nino, headerKeys, csvData)
       maybeNoNinoReason <- getOptionalCSVValue(UploadKeys.reasonForNoNino, headerKeys, csvData)
-      validatedNameDOB = validateNameDOB(firstName, lastName, parsedDOB, row)
-      nameDob = NameDOB(firstName.value, lastName.value, parsedDOB.value)
-      maybeValidatedNino = maybeNino.value.map(
-        nino => validateNino(maybeNino.as(nino), nameDob, previousNinos, row)
-      )
-      maybeValidatedNoNinoReason = maybeNoNinoReason.value.map(
-        reason => validateNoNino(maybeNoNinoReason.as(reason), nameDob, row)
+      validatedNameDOB <- validateNameDOB(firstName, lastName, dob, row)
+      memberFullName = s"${firstName.value} ${lastName.value}"
+      maybeValidatedNino = maybeNino.value.flatMap { nino =>
+        validateNino(maybeNino.as(nino), memberFullName, previousNinos, row)
+      }
+      maybeValidatedNoNinoReason = maybeNoNinoReason.value.flatMap(
+        reason => validateNoNino(maybeNoNinoReason.as(reason), memberFullName, row)
       )
       validatedNinoOrNoNinoReason <- (maybeValidatedNino, maybeValidatedNoNinoReason) match {
         case (Some(validatedNino), None) => Some(Right(validatedNino))
@@ -135,77 +133,78 @@ class MemberDetailsUploadValidator @Inject()(
       validatedNameDOB,
       validatedNinoOrNoNinoReason.bisequence
     ).mapN((nameDob, ninoOrNoNinoReason) => UploadMemberDetails(row, nameDob, ninoOrNoNinoReason))
-  }
 
   private def validateNameDOB(
     firstName: CsvValue[String],
     lastName: CsvValue[String],
-    dob: CsvValue[LocalDate],
+    dob: CsvValue[String],
     row: Int
-  ): Validated[List[ValidationError], NameDOB] = {
+  )(implicit messages: Messages): Option[ValidatedNel[ValidationError, NameDOB]] = {
     val dobDayKey = s"${nameDOBFormProvider.dateOfBirth}.day"
     val dobMonthKey = s"${nameDOBFormProvider.dateOfBirth}.month"
     val dobYearKey = s"${nameDOBFormProvider.dateOfBirth}.year"
 
-    val boundForm = memberDetailsForm
-      .bind(
-        Map(
-          nameDOBFormProvider.firstName -> firstName.value,
-          nameDOBFormProvider.lastName -> lastName.value,
-          dobDayKey -> dob.value.getDayOfMonth.toString,
-          dobMonthKey -> dob.value.getMonthValue.toString,
-          dobYearKey -> dob.value.getYear.toString
-        )
-      )
+    dob.value.split("/").toList match {
+      case day :: month :: year :: Nil =>
+        val boundForm = memberDetailsForm
+          .bind(
+            Map(
+              nameDOBFormProvider.firstName -> firstName.value,
+              nameDOBFormProvider.lastName -> lastName.value,
+              dobDayKey -> day,
+              dobMonthKey -> month,
+              dobYearKey -> year
+            )
+          )
 
-    val keys = List(
-      nameDOBFormProvider.firstName -> firstName.key,
-      nameDOBFormProvider.lastName -> lastName.key,
-      nameDOBFormProvider.dateOfBirth -> dob.key
-    )
+        val cellMapping: FormError => Option[String] = {
+          case err if err.key == nameDOBFormProvider.firstName => Some(firstName.key.cell)
+          case err if err.key == nameDOBFormProvider.lastName => Some(lastName.key.cell)
+          case err if err.key == nameDOBFormProvider.dateOfBirth => Some(dob.key.cell)
+          case err if err.key == dobDayKey => Some(dob.key.cell)
+          case err if err.key == dobMonthKey => Some(dob.key.cell)
+          case err if err.key == dobYearKey => Some(dob.key.cell)
+          case _ => None
+        }
 
-    formToResult(boundForm, keys, row)
+        formToResult(boundForm, row, cellMapping)
+      case _ =>
+        Some(ValidationError.fromCell(dob.key.cell, row, messages("memberDetails.dateOfBirth.error.format")).invalidNel)
+    }
   }
 
   private def validateNino(
     nino: CsvValue[String],
-    nameDob: NameDOB,
+    memberFullName: String,
     previousNinos: List[Nino],
     row: Int
-  ): Validated[List[ValidationError], Nino] = {
-    val boundForm = ninoForm(nameDob, previousNinos)
+  ): Option[ValidatedNel[ValidationError, Nino]] = {
+    val boundForm = ninoForm(memberFullName, previousNinos)
       .bind(
         Map(
           textFormProvider.formKey -> nino.value
         )
       )
 
-    val keys = List(
-      textFormProvider.formKey -> nino.key
-    )
-
-    formToResult(boundForm, keys, row)
+    formToResult(boundForm, row, _ => Some(nino.key.cell))
   }
 
   private def validateNoNino(
     noNinoReason: CsvValue[String],
-    nameDob: NameDOB,
+    memberFullName: String,
     row: Int
-  ): Validated[List[ValidationError], String] = {
-    val boundForm = noNinoForm(nameDob)
+  ): Option[ValidatedNel[ValidationError, String]] = {
+    val boundForm = noNinoForm(memberFullName)
       .bind(
         Map(
           textFormProvider.formKey -> noNinoReason.value
         )
       )
 
-    val keys = List(
-      textFormProvider.formKey -> noNinoReason.key
-    )
-
-    formToResult(boundForm, keys, row)
+    formToResult(boundForm, row, _ => Some(noNinoReason.key.cell))
   }
 
+  // Replace missing csv value with blank string so form validation can return a `value required` instead of returning a format error
   private def getCSVValue(
     key: String,
     headerKeys: List[CsvHeaderKey],
@@ -213,6 +212,7 @@ class MemberDetailsUploadValidator @Inject()(
   ): Option[CsvValue[String]] =
     getOptionalCSVValue(key, headerKeys, csvData) match {
       case Some(CsvValue(key, Some(value))) => Some(CsvValue(key, value))
+      case Some(CsvValue(key, None)) => Some(CsvValue(key, ""))
       case _ => None
     }
 
@@ -227,23 +227,21 @@ class MemberDetailsUploadValidator @Inject()(
 
   private def formToResult[A](
     form: Form[A],
-    keys: List[(String, CsvHeaderKey)],
-    row: Int
-  ): Validated[List[ValidationError], A] =
+    row: Int,
+    cellMapping: FormError => Option[String]
+  ): Option[Validated[NonEmptyList[ValidationError], A]] =
     form.fold(
-      hasErrors = _.errors
-        .flatMap { err =>
-          keys
-            .find { case (formKey, _) => formKey == err.key }
-            .map {
-              case (_, hk) =>
-                ValidationError(hk.cell + row, err.message)
-            }
-            .toList
-        }
-        .toList
-        .invalid,
-      success = _.valid
+      // unchecked is used as there will always be errors here and theres no need to exhaustively pattern match and throw an unreachable exception
+      hasErrors = form =>
+        (form.errors: @unchecked) match {
+          case head :: rest =>
+            NonEmptyList
+              .of[FormError](head, rest: _*)
+              .map(err => cellMapping(err).map(cell => ValidationError.fromCell(cell, row, err.message)))
+              .sequence
+              .map(_.invalid)
+        },
+      success = _.valid.some
     )
 
   private def indexToCsvKey(index: Int): String =

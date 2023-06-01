@@ -25,6 +25,7 @@ import models.ManualOrUpload.{Manual, Upload}
 import models.{CheckMode, CheckOrChange, ManualOrUpload, NormalMode, UploadErrors, UploadFormatError, UserAnswers}
 import navigation.JourneyNavigator
 import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
+import pages.{CheckingMemberDetailsFilePage, FileUploadErrorSummaryPage, FileUploadWrongFormatPage, Page}
 import pages.nonsipp.memberdetails._
 import pages.nonsipp.memberdetails.upload.{FileUploadErrorPage, FileUploadSuccessPage}
 import pages.{CheckingMemberDetailsFilePage, FileUploadWrongFormatPage, Page}
@@ -93,13 +94,16 @@ object MemberDetailsNavigator extends JourneyNavigator {
     case FileUploadSuccessPage(srn) =>
       controllers.nonsipp.memberdetails.routes.SchemeMembersListController.onPageLoad(srn, 1, Upload)
 
-    case FileUploadErrorPage(srn, Left(_: UploadFormatError.type)) =>
+    case FileUploadErrorPage(srn, UploadFormatError) =>
       controllers.nonsipp.memberdetails.upload.routes.FileUploadWrongFormatController.onPageLoad(srn, NormalMode)
 
-    case FileUploadErrorPage(srn, Right(_: UploadErrors)) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+    case FileUploadErrorPage(srn, _: UploadErrors) =>
+      controllers.nonsipp.memberdetails.upload.routes.FileUploadErrorSummaryController.onPageLoad(srn, NormalMode)
 
     case FileUploadWrongFormatPage(srn) =>
+      controllers.nonsipp.memberdetails.routes.UploadMemberDetailsController.onPageLoad(srn)
+
+    case FileUploadErrorSummaryPage(srn) =>
       controllers.nonsipp.memberdetails.routes.UploadMemberDetailsController.onPageLoad(srn)
 
   }
