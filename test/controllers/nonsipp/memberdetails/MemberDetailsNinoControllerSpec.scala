@@ -31,8 +31,8 @@ class MemberDetailsNinoControllerSpec extends ControllerBaseSpec {
     val memberDetails = nameDobGen.sample.value
     val populatedUserAnswers = defaultUserAnswers.set(MemberDetailsPage(srn, refineMV(1)), memberDetails).get
 
-    val form = MemberDetailsNinoController.form(new TextFormProvider(), memberDetails, List())
-    lazy val viewModel = MemberDetailsNinoController.viewModel(srn, refineMV(1), NormalMode, memberDetails)
+    val form = MemberDetailsNinoController.form(new TextFormProvider(), memberDetails.fullName, List())
+    lazy val viewModel = MemberDetailsNinoController.viewModel(srn, refineMV(1), NormalMode, memberDetails.fullName)
 
     val validNino = ninoGen.sample.value
     val otherValidNino = ninoGen.sample.value

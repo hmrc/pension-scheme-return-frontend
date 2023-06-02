@@ -16,6 +16,7 @@
 
 package utils
 
+import utils.ListUtils.ListOps
 import viewmodels.DisplayMessage
 import viewmodels.DisplayMessage.{
   CompoundMessage,
@@ -41,11 +42,11 @@ trait DisplayMessageUtils {
     case LinkMessage(message, _, _) => List(message)
     case DownloadLinkMessage(message, _) => List(message)
     case ParagraphMessage(messages) => messages.toList.flatMap(allMessages)
-    case TableMessage(contents) =>
+    case TableMessage(contents, heading) =>
       contents.foldLeft(List[Message]()) {
         case (acc, (headers, contents)) =>
           allMessages(headers) ++ allMessages(contents) ++ acc
-      }
+      } ++ heading.toList.flatMap { case (k, v) => allMessages(k) ++ allMessages(v) }
     case ListMessage(messages, _) => messages.toList.flatMap(allMessages)
     case Heading2(content, _) => allMessages(content)
   }

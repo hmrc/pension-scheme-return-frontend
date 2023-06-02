@@ -31,7 +31,7 @@ import play.api.Application
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.FakeRequest
-import play.api.test.Helpers.running
+import play.api.test.Helpers.{running, stubMessagesApi}
 
 import java.net.URLEncoder
 import scala.annotation.nowarn

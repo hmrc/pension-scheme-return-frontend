@@ -277,3 +277,8 @@ GET        /:srn/change-submit-file-upload-error-wrong-format        controllers
 
 GET         /:srn/who-received-loan                controllers.nonsipp.whoreceivedloan.WhoReceivedLoanController.onPageLoad(srn: Srn)
 POST        /:srn/who-received-loan                controllers.nonsipp.whoreceivedloan.WhoReceivedLoanController.onSubmit(srn: Srn)
+
+GET        /:srn/file-upload-error-some                      controllers.nonsipp.memberdetails.upload.FileUploadErrorSummaryController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/submit-file-upload-error-some               controllers.nonsipp.memberdetails.upload.FileUploadErrorSummaryController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/change-file-upload-error-some               controllers.nonsipp.memberdetails.upload.FileUploadErrorSummaryController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+GET        /:srn/change-submit-file-upload-error-some        controllers.nonsipp.memberdetails.upload.FileUploadErrorSummaryController.onSubmit(srn: Srn, mode: Mode = CheckMode)
