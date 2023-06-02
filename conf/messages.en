@@ -527,3 +527,12 @@ fileUploadWrongFormat.bullet4 = different to the header row in
 fileUploadWrongFormat.bullet4.link = the template file
 fileUploadWrongFormat.paragraph2 = Correct the errors and upload it again, or upload a different file.
 fileUploadWrongFormat.button = Return to file upload
+
+whoReceivedLoan.title = Who received the loan?
+whoReceivedLoan.heading = Who received the loan?
+whoReceivedLoan.pageContent = An individual
+whoReceivedLoan.pageContent1 = A UK company
+whoReceivedLoan.pageContent2 = A UK partnership
+whoReceivedLoan.pageContent3 = Other
+whoReceivedLoan.error.required = Select who received the loan
+
