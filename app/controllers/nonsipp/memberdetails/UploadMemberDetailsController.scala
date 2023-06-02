@@ -61,7 +61,9 @@ class UploadMemberDetailsController @Inject()(
     for {
       initiateResponse <- uploadService.initiateUpscan(callBackUrl, successRedirectUrl, failureRedirectUrl)
       _ <- uploadService.registerUploadRequest(uploadKey, Reference(initiateResponse.fileReference.reference))
-    } yield Ok(view(viewModel(initiateResponse.postTarget, initiateResponse.formFields, collectErrors)))
+    } yield Ok(
+      view(viewModel(initiateResponse.postTarget, initiateResponse.formFields, collectErrors, config.upscanMaxFileSize))
+    )
   }
 
   def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
@@ -81,7 +83,8 @@ object UploadMemberDetailsController {
   def viewModel(
     postTarget: String,
     formFields: Map[String, String],
-    error: Option[String]
+    error: Option[String],
+    maxFileSize: String
   ): FormPageViewModel[UploadViewModel] =
     FormPageViewModel(
       "uploadMemberDetails.title",
@@ -96,7 +99,7 @@ object UploadMemberDetailsController {
               "uploadMemberDetails.list3"
             ),
         acceptedFileType = ".csv",
-        maxFileSize = "100MB",
+        maxFileSize = maxFileSize,
         formFields,
         error
       ),

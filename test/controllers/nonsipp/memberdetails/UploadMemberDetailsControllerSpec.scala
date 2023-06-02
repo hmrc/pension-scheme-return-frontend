@@ -55,16 +55,18 @@ class UploadMemberDetailsControllerSpec extends ControllerBaseSpec {
 
   "UploadMemberDetailsController" - {
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
-      injected[UploadView].apply(viewModel(postTarget, formFields, None))
+      injected[UploadView].apply(viewModel(postTarget, formFields, None, "50MB"))
     }.before(mockInitiateUpscan()))
 
     act.like(renderView(onPageLoad("EntityTooLarge", "file too large")) { implicit app => implicit request =>
-      injected[UploadView].apply(viewModel(postTarget, formFields, Some(messages("uploadMemberDetails.error.size"))))
+      injected[UploadView].apply(
+        viewModel(postTarget, formFields, Some(messages("uploadMemberDetails.error.size")), "50MB")
+      )
     }.updateName(_ + " with error EntityTooLarge").before(mockInitiateUpscan()))
 
     act.like(renderView(onPageLoad("InvalidArgument", "'file' field not found")) { implicit app => implicit request =>
       injected[UploadView].apply(
-        viewModel(postTarget, formFields, Some(messages("uploadMemberDetails.error.required")))
+        viewModel(postTarget, formFields, Some(messages("uploadMemberDetails.error.required")), "50MB")
       )
     }.updateName(_ + " with error InvalidArgument").before(mockInitiateUpscan()))
 
