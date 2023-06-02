@@ -23,9 +23,9 @@ sealed trait ReceivedLoanType {
   val name: String
 
   def fold[A](anIndividual: => A, aUKCompany: => A, aUKPartnership: => A, other: => A): A = this match {
-    case ReceivedLoanType.AnIndividual => anIndividual
-    case ReceivedLoanType.AUKCompany => aUKCompany
-    case ReceivedLoanType.AUKPartnership => aUKPartnership
+    case ReceivedLoanType.Individual => anIndividual
+    case ReceivedLoanType.UKCompany => aUKCompany
+    case ReceivedLoanType.UKPartnership => aUKPartnership
     case ReceivedLoanType.Other => other
 
   }
@@ -33,12 +33,12 @@ sealed trait ReceivedLoanType {
 
 object ReceivedLoanType extends Enumerable.Implicits {
 
-  case object AnIndividual extends WithName("anIndividual") with ReceivedLoanType
-  case object AUKCompany extends WithName("aUKCompany") with ReceivedLoanType
-  case object AUKPartnership extends WithName("aUKPartnership") with ReceivedLoanType
+  case object Individual extends WithName("individual") with ReceivedLoanType
+  case object UKCompany extends WithName("ukCompany") with ReceivedLoanType
+  case object UKPartnership extends WithName("ukPartnership") with ReceivedLoanType
   case object Other extends WithName("other") with ReceivedLoanType
 
-  val values: List[ReceivedLoanType] = List(AnIndividual, AUKCompany, AUKPartnership, Other)
+  val values: List[ReceivedLoanType] = List(Individual, UKCompany, UKPartnership, Other)
 
   implicit val enumerable: Enumerable[ReceivedLoanType] = Enumerable(values.map(v => (v.toString, v)): _*)
 

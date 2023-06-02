@@ -35,6 +35,7 @@ package controllers.nonsipp.whoreceivedloan
 import controllers.actions._
 import controllers.nonsipp.whoreceivedloan.WhoReceivedLoanController._
 import forms.RadioListFormProvider
+import models.ReceivedLoanType.{Individual, Other, UKCompany, UKPartnership}
 import models.SchemeId.Srn
 import models.{NormalMode, ReceivedLoanType}
 import navigation.Navigator
@@ -71,7 +72,7 @@ class WhoReceivedLoanController @Inject()(
     Ok(
       view(
         form.fromUserAnswers(WhoReceivedLoanPage(srn)),
-        viewModel(srn, request.schemeDetails.schemeName)
+        viewModel(srn)
       )
     )
   }
@@ -80,8 +81,7 @@ class WhoReceivedLoanController @Inject()(
     form
       .bindFromRequest()
       .fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, viewModel(srn, request.schemeDetails.schemeName)))),
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn)))),
         answer => {
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(WhoReceivedLoanPage(srn), answer))
@@ -100,16 +100,16 @@ object WhoReceivedLoanController {
 
   private val radioListItems: List[RadioListRowViewModel] =
     List(
-      RadioListRowViewModel(Message("whoReceivedLoan.pageContent")),
-      RadioListRowViewModel(Message("whoReceivedLoan.pageContent1")),
-      RadioListRowViewModel(Message("whoReceivedLoan.pageContent2")),
-      RadioListRowViewModel(Message("whoReceivedLoan.pageContent3"))
+      RadioListRowViewModel(Message("whoReceivedLoan.pageContent"), Individual.name),
+      RadioListRowViewModel(Message("whoReceivedLoan.pageContent1"), UKCompany.name),
+      RadioListRowViewModel(Message("whoReceivedLoan.pageContent2"), UKPartnership.name),
+      RadioListRowViewModel(Message("whoReceivedLoan.pageContent3"), Other.name)
     )
 
-  def viewModel(srn: Srn, schemeName: String): FormPageViewModel[RadioListViewModel] =
+  def viewModel(srn: Srn): FormPageViewModel[RadioListViewModel] =
     FormPageViewModel(
-      Message("whoReceivedLoan.title", schemeName),
-      Message("whoReceivedLoan.heading", schemeName),
+      Message("whoReceivedLoan.title"),
+      Message("whoReceivedLoan.heading"),
       RadioListViewModel(
         None,
         radioListItems

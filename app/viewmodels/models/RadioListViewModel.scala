@@ -64,7 +64,4 @@ object RadioListRowViewModel {
 
   def apply(content: Message, value: String, hint: Message): RadioListRowViewModel =
     RadioListRowViewModel(content, value, Some(hint))
-
-  def apply(content: Message): RadioListRowViewModel =
-    RadioListRowViewModel(content, "")
 }

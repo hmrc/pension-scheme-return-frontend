@@ -19,7 +19,7 @@ package controllers.nonsipp.whoreceivedloan
 import WhoReceivedLoanController._
 import controllers.ControllerBaseSpec
 import forms.RadioListFormProvider
-import models.ReceivedLoanType.{AUKCompany, AUKPartnership, AnIndividual, Other}
+import models.ReceivedLoanType.{Individual, Other, UKCompany, UKPartnership}
 import views.html.RadioListView
 
 class WhoReceivedLoanControllerSpec extends ControllerBaseSpec {
@@ -34,22 +34,22 @@ class WhoReceivedLoanControllerSpec extends ControllerBaseSpec {
 
       view(
         form(injected[RadioListFormProvider]),
-        viewModel(srn, defaultSchemeDetails.schemeName)
+        viewModel(srn)
       )
     })
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
     "anIndividual data is submitted" - {
-      act.like(saveAndContinue(onSubmit, "value" -> AnIndividual.name))
+      act.like(saveAndContinue(onSubmit, "value" -> Individual.name))
     }
 
     "aUKCompany data is submitted" - {
-      act.like(saveAndContinue(onSubmit, "value" -> AUKCompany.name))
+      act.like(saveAndContinue(onSubmit, "value" -> UKCompany.name))
     }
 
     "aUKPartnership data is submitted" - {
-      act.like(saveAndContinue(onSubmit, "value" -> AUKPartnership.name))
+      act.like(saveAndContinue(onSubmit, "value" -> UKPartnership.name))
     }
 
     "other data is submitted" - {
