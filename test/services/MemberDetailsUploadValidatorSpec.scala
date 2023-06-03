@@ -41,23 +41,29 @@ class MemberDetailsUploadValidatorSpec extends BaseSpec with TestValues {
   val validator = new MemberDetailsUploadValidator(nameDOBFormProvider, textFormProvider)
 
   "validateCSV" - {
-    "successfully validates and saves the correct user answers" in {
+    List(
+      ("windows", "\r\n"),
+      ("*nix", "\n")
+    ).foreach {
+      case (name, lineEndings) =>
+        s"$name line endings: successfully validates and saves the correct user answers" in {
 
-      val csv =
-        "First name,Last name,Date of birth,National Insurance number,Reason for no National Insurance number\r\n" +
-          "Jason,Lawrence,6/10/1989,AB123456A,\r\n" +
-          "Pearl,Parsons,12/4/1990,,reason\r\n" +
-          "Katherine,Kennedy,30/01/1985,,reason\r\n"
+          val csv =
+            s"First name,Last name,Date of birth,National Insurance number,Reason for no National Insurance number$lineEndings" +
+              s"Jason,Lawrence,6/10/1989,AB123456A,,$lineEndings" +
+              s"Pearl,Parsons,12/4/1990,,reason$lineEndings" +
+              s"Katherine,Kennedy,30/01/1985,,reason$lineEndings"
 
-      val source = Source.single(ByteString(csv))
+          val source = Source.single(ByteString(csv))
 
-      validator.validateCSV(source).futureValue mustBe UploadSuccess(
-        List(
-          UploadMemberDetails(1, NameDOB("Jason", "Lawrence", LocalDate.of(1989, 10, 6)), Right(Nino("AB123456A"))),
-          UploadMemberDetails(2, NameDOB("Pearl", "Parsons", LocalDate.of(1990, 4, 12)), Left("reason")),
-          UploadMemberDetails(3, NameDOB("Katherine", "Kennedy", LocalDate.of(1985, 1, 30)), Left("reason"))
-        )
-      )
+          validator.validateCSV(source).futureValue mustBe UploadSuccess(
+            List(
+              UploadMemberDetails(1, NameDOB("Jason", "Lawrence", LocalDate.of(1989, 10, 6)), Right(Nino("AB123456A"))),
+              UploadMemberDetails(2, NameDOB("Pearl", "Parsons", LocalDate.of(1990, 4, 12)), Left("reason")),
+              UploadMemberDetails(3, NameDOB("Katherine", "Kennedy", LocalDate.of(1985, 1, 30)), Left("reason"))
+            )
+          )
+        }
     }
 
     "successfully collect date errors" in {
@@ -138,6 +144,24 @@ class MemberDetailsUploadValidatorSpec extends BaseSpec with TestValues {
           "Jason,Lawrence,06/10/1989,AB123456A,\r\n" +
           "Pearl,Parsons,12/04/1990,AB123789A,reason\r\n" +
           "Katherine,Kennedy,30/01/1985,,reason\r\n"
+
+      val source = Source.single(ByteString(csv))
+
+      validator.validateCSV(source).futureValue mustBe UploadFormatError
+    }
+
+    "fails when no rows provided" in {
+
+      val csv = "First name,Last name,Date of birth,National Insurance number,Reason for no National Insurance number"
+
+      val source = Source.single(ByteString(csv))
+
+      validator.validateCSV(source).futureValue mustBe UploadFormatError
+    }
+
+    "fails when empty file sent" in {
+
+      val csv = ""
 
       val source = Source.single(ByteString(csv))
 
