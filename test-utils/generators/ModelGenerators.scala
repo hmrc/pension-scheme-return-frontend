@@ -29,7 +29,7 @@ import org.scalacheck.Gen.numChar
 import play.api.mvc.Request
 import uk.gov.hmrc.domain.Nino
 
-import java.time.{LocalDateTime, ZoneOffset}
+import java.time.{LocalDate, LocalDateTime, ZoneOffset}
 
 trait ModelGenerators extends BasicGenerators {
   lazy val minimalDetailsGen: Gen[MinimalDetails] =
@@ -214,9 +214,9 @@ trait ModelGenerators extends BasicGenerators {
   }
 
   implicit val nameDobGen: Gen[NameDOB] = for {
-    firstName <- nonEmptyString
-    lastName <- nonEmptyString
-    dob <- date
+    firstName <- nonEmptyAlphaString.map(_.take(10))
+    lastName <- nonEmptyAlphaString.map(_.take(10))
+    dob <- datesBetween(earliestDate, LocalDate.now())
   } yield {
     NameDOB(firstName, lastName, dob)
   }

@@ -24,6 +24,7 @@ import akka.util.ByteString
 import cats.data.Validated.{Invalid, Valid}
 import cats.data.{NonEmptyList, Validated, ValidatedNel}
 import cats.implicits._
+import config.Constants
 import controllers.nonsipp.memberdetails.{MemberDetailsController, MemberDetailsNinoController, NoNINOController}
 import forms.{NameDOBFormProvider, TextFormProvider}
 import models._
@@ -69,12 +70,15 @@ class MemberDetailsUploadValidator @Inject()(
         .drop(1) // drop csv header and process rows
         .statefulMap[UploadState, Upload](() => UploadState.init)(
           (state, bs) => {
-            val parts = bs.map(_.utf8String)
-            validateMemberDetails(header, parts, state.previousNinos, state.row) match {
-              case None => state.next() -> UploadFormatError
-              case Some(Valid(memberDetails)) =>
-                state.next(memberDetails.ninoOrNoNinoReason.toOption) -> UploadSuccess(List(memberDetails))
-              case Some(Invalid(errs)) => state.next() -> UploadErrors(errs)
+            if (state.row > Constants.maxSchemeMembers) state.next() -> UploadFormatError
+            else {
+              val parts = bs.map(_.utf8String)
+              validateMemberDetails(header, parts, state.previousNinos, state.row) match {
+                case None => state.next() -> UploadFormatError
+                case Some(Valid(memberDetails)) =>
+                  state.next(memberDetails.ninoOrNoNinoReason.toOption) -> UploadSuccess(List(memberDetails))
+                case Some(Invalid(errs)) => state.next() -> UploadErrors(errs)
+              }
             }
           },
           _ => None

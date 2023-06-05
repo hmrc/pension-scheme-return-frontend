@@ -21,6 +21,7 @@ import akka.util.ByteString
 import cats.data.NonEmptyList
 import controllers.TestValues
 import forms.{NameDOBFormProvider, TextFormProvider}
+import generators.WrappedMemberDetails
 import models.{NameDOB, UploadErrors, UploadFormatError, UploadMemberDetails, UploadSuccess, ValidationError}
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
@@ -29,6 +30,7 @@ import uk.gov.hmrc.domain.Nino
 import utils.BaseSpec
 
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class MemberDetailsUploadValidatorSpec extends BaseSpec with TestValues {
@@ -39,6 +41,26 @@ class MemberDetailsUploadValidatorSpec extends BaseSpec with TestValues {
   implicit val messages: Messages = stubMessagesApi().preferred(FakeRequest())
 
   val validator = new MemberDetailsUploadValidator(nameDOBFormProvider, textFormProvider)
+
+  def formatDate(d: LocalDate): String = {
+    val df = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+    df.format(d)
+  }
+
+  def formatNino(e: Either[String, Nino]): String =
+    e match {
+      case Right(v) => s"$v,"
+      case Left(v) => s",$v"
+    }
+
+  val validHeaders =
+    "First name,Last name,Date of birth,National Insurance number,Reason for no National Insurance number"
+
+  def validRow =
+    detailsToRow(wrappedMemberDetailsGen.sample.get)
+
+  def detailsToRow(details: WrappedMemberDetails): String =
+    s"${details.nameDob.firstName},${details.nameDob.lastName},${formatDate(details.nameDob.dob)},${formatNino(details.nino)}"
 
   "validateCSV" - {
     List(
@@ -152,7 +174,7 @@ class MemberDetailsUploadValidatorSpec extends BaseSpec with TestValues {
 
     "fails when no rows provided" in {
 
-      val csv = "First name,Last name,Date of birth,National Insurance number,Reason for no National Insurance number"
+      val csv = validHeaders
 
       val source = Source.single(ByteString(csv))
 
@@ -162,6 +184,18 @@ class MemberDetailsUploadValidatorSpec extends BaseSpec with TestValues {
     "fails when empty file sent" in {
 
       val csv = ""
+
+      val source = Source.single(ByteString(csv))
+
+      validator.validateCSV(source).futureValue mustBe UploadFormatError
+    }
+
+    "fail when there are more than 99 entries" in {
+
+      val csv =
+        (validHeaders :: List.fill(100)(validRow)).mkString("\n")
+
+      print(csv)
 
       val source = Source.single(ByteString(csv))
 
