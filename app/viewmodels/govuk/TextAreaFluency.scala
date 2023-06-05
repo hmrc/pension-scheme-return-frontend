@@ -49,5 +49,12 @@ trait TextAreaFluency {
           ErrorMessage(content = Text(message))
         )
       )
+
+    def withLabel(label: Html): Textarea =
+      textArea.copy(
+        label = LabelViewModel(
+          HtmlContent(label)
+        )
+      )
   }
 }

@@ -16,7 +16,7 @@
 
 package navigation.nonsipp
 
-import models.{ReceivedLoanType, UserAnswers}
+import models.{NormalMode, ReceivedLoanType, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.whoreceivedloan.WhoReceivedLoanPage
@@ -27,7 +27,12 @@ object WhoReceivedLoanNavigator extends JourneyNavigator {
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
 
     case WhoReceivedLoanPage(srn) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+      if (userAnswers.get(WhoReceivedLoanPage(srn)).contains(ReceivedLoanType.UKPartnership)) {
+        controllers.nonsipp.otherrecipientdetails.routes.OtherRecipientDetailsController.onPageLoad(srn, NormalMode)
+      } else {
+        controllers.routes.UnauthorisedController.onPageLoad()
+      }
+
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty

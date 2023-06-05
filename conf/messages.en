@@ -544,3 +544,14 @@ fileUploadErrorSummary.title = There is a problem with your member details file
 fileUploadErrorSummary.heading = There is a problem with your member details file
 fileUploadErrorSummary.paragraph = Correct the errors and upload it again, or upload a different file.
 fileUploadErrorSummary.heading2 = Problems with your file
+
+otherRecipientDetails.title = Recipient’s details
+otherRecipientDetails.heading = Recipient’s details
+otherRecipientDetails.name = Recipient’s name
+otherRecipientDetails.description = Brief description of recipient
+otherRecipientDetails.name.error.required = Enter the recipient’s name
+otherRecipientDetails.name.error.invalid = Recipient’s name must only include letters, numbers, and special characters such as hyphens, spaces and apostrophes
+otherRecipientDetails.name.error.length =  Recipient’s name must be 160 characters or fewer
+otherRecipientDetails.description.error.required = Enter a brief description of the recipient
+otherRecipientDetails.description.error.invalid = Description of recipient must only include letters, numbers, and special characters such as hyphens, spaces and apostrophes
+otherRecipientDetails.description.error.length = Description of recipient must be 160 characters or fewer
