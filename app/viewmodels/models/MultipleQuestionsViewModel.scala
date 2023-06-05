@@ -29,10 +29,7 @@ sealed trait MultipleQuestionsViewModel[A] {
 
 object MultipleQuestionsViewModel {
 
-  case class SingleQuestion[A](
-    form: Form[A],
-    field1: Field
-  ) extends MultipleQuestionsViewModel[A] {
+  case class SingleQuestion[A](form: Form[A], field1: Field) extends MultipleQuestionsViewModel[A] {
 
     override def firstField: Field = field1
     override val fields: List[Field] = List(field1)

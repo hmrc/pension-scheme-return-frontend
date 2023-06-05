@@ -19,6 +19,7 @@
   formHelper: FormWithCSRF,
   govukErrorSummary: GovukErrorSummary,
   govukButton: GovukButton,
+  govukDetails: GovukDetails,
   govukInput: GovukInput
 )
 
@@ -34,6 +35,15 @@
 
     @if(viewmodel.page.fields.length > 1) {
       <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
+
+      @viewmodel.details.map { detail =>
+        @govukDetails(
+            DetailsViewModel(
+                renderMessage(detail.title),
+                renderMessage(detail.contents)
+            )
+        )
+      }
 
       @viewmodel.page.fields.zipWithIndex.map { case (field, index) =>
 
