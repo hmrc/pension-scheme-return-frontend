@@ -61,7 +61,7 @@ class MemberDetailsUploadValidator @Inject()(
     source: Source[ByteString, _]
   )(implicit mat: Materializer, messages: Messages): Future[Upload] = {
     val csvFrames = source.via(csvFrame)
-    for {
+    (for {
       csvHeader <- csvFrames.runWith(firstRowSink)
       header = csvHeader.zipWithIndex
         .map { case (key, index) => CsvHeaderKey(key, indexToCsvKey(index), index) }
@@ -96,10 +96,10 @@ class MemberDetailsUploadValidator @Inject()(
             UploadSuccess(previous.memberDetails ++ current.memberDetails)
           case (_, memberDetails: UploadSuccess) => memberDetails
         }
-        .recover {
-          case _: NoSuchElementException => UploadFormatError
-        }
-    } yield validated
+    } yield validated)
+      .recover {
+        case _: NoSuchElementException => UploadFormatError
+      }
   }
 
   private def validateMemberDetails(
