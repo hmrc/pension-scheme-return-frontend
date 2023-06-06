@@ -48,7 +48,7 @@ govukButton: GovukButton
       )
 
       @defining(
-           TextareaViewModel("value", form("description").value)
+           TextareaViewModel("description", form("description").value)
                 .withLabel(renderMessage(viewModel.page.description))
       ) { component =>
          @govukTextarea(

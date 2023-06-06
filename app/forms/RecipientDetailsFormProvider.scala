@@ -20,6 +20,8 @@ import models.RecipientDetails
 import play.api.data.Form
 import play.api.data.Forms._
 import forms.mappings.Mappings
+import jdk.jfr.Description
+import uk.gov.hmrc.domain.Nino
 
 import javax.inject.Inject
 
@@ -28,6 +30,9 @@ class RecipientDetailsFormProvider @Inject()() extends Mappings {
   val nameMaxLength = 160
   val nameRegex = "^[a-zA-Z\\-' ]+$"
 
+  val textAreaRegex = """^[a-zA-Z0-9\-'" \t\r\n,.@/]+$"""
+  val textAreaMaxLength = 160
+
   val firstName = "name"
   val description = "description"
 
@@ -35,9 +40,9 @@ class RecipientDetailsFormProvider @Inject()() extends Mappings {
     firstNameRequired: String,
     firstNameInvalid: String,
     firstNameLength: String,
-    lastNameRequired: String,
-    lastNameInvalid: String,
-    lastNameLength: String
+    descriptionRequired: String,
+    descriptionInvalid: String,
+    descriptionLength: String
   ): Form[RecipientDetails] =
     Form(
       mapping(
@@ -47,10 +52,10 @@ class RecipientDetailsFormProvider @Inject()() extends Mappings {
             maxLength(nameMaxLength, firstNameLength)
           )
         ),
-        description -> text(lastNameRequired).verifying(
+        description -> text(descriptionRequired).verifying(
           firstError(
-            regexp(nameRegex, lastNameInvalid),
-            maxLength(nameMaxLength, lastNameLength)
+            regexp(textAreaRegex, descriptionInvalid),
+            maxLength(textAreaMaxLength, descriptionLength)
           )
         )
       )(RecipientDetails.apply)(RecipientDetails.unapply)

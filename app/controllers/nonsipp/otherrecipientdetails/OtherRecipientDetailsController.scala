@@ -32,7 +32,6 @@ import utils.FormUtils._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, RecipientDetailsViewModel}
 import views.html.RecipientDetailsView
-import views.html.NameDOBView
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
