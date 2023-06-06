@@ -52,7 +52,8 @@ class FrontendAppConfig @Inject()(config: Configuration) { self =>
   val pensionsScheme: Service = config.get[Service]("microservice.services.pensionsScheme")
 
   val upscan: Service = config.get[Service]("microservice.services.upscan")
-  val upscanMaxFileSize: String = config.get[String]("microservice.services.upscan.maxFileSize")
+  val upscanMaxFileSize: Int = config.get[Int]("microservice.services.upscan.maxFileSize")
+  val upscanMaxFileSizeMB: String = s"${upscanMaxFileSize}MB"
   val secureUpscanCallBack: Boolean = config.getOptional[Boolean]("microservice.services.upscan.secure").getOrElse(true)
 
   object features {

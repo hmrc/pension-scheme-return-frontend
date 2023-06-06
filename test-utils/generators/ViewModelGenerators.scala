@@ -18,7 +18,7 @@ package generators
 
 import cats.data.NonEmptyList
 import org.scalacheck.Gen
-import play.api.data.Form
+import play.api.data.{Form, FormError}
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.MultipleQuestionsViewModel.{DoubleQuestion, SingleQuestion, TripleQuestion}
 import viewmodels.models.TaskListStatus.TaskListStatus
@@ -267,7 +267,7 @@ trait ViewModelGenerators extends BasicGenerators {
         ".csv",
         fileSize.toString,
         formFields,
-        error
+        error.map(FormError("file-upload", _))
       )
     }
 

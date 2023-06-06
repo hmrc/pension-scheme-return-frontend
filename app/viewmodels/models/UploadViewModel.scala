@@ -16,6 +16,7 @@
 
 package viewmodels.models
 
+import play.api.data.FormError
 import viewmodels.DisplayMessage
 
 case class UploadViewModel(
@@ -23,5 +24,5 @@ case class UploadViewModel(
   acceptedFileType: String,
   maxFileSize: String,
   formFields: Map[String, String],
-  error: Option[String]
+  error: Option[FormError]
 )

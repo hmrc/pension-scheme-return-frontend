@@ -16,6 +16,8 @@
 
 package viewmodels.govuk
 
+import play.api.data.FormError
+import play.api.i18n.Messages
 import play.twirl.api.Html
 import uk.gov.hmrc.govukfrontend.views.Aliases.FileUpload
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
@@ -37,7 +39,11 @@ trait FileUploadFluency {
   }
 
   implicit class FileUploadFluency(fileUpload: FileUpload) {
-    def withError(msg: Option[String]): FileUpload =
-      msg.fold(fileUpload)(err => fileUpload.copy(errorMessage = Some(ErrorMessage(content = Text(err)))))
+    def withError(msg: Option[FormError])(implicit messages: Messages): FileUpload = {
+
+      val errorMessage = msg.map(err => messages(err.message, err.args: _*))
+
+      fileUpload.copy(errorMessage = errorMessage.map(err => ErrorMessage(content = Text(err))))
+    }
   }
 }

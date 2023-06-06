@@ -38,7 +38,7 @@
 
         @viewmodel.page.error.map { errorMessage =>
           @govukErrorSummary(
-              ErrorSummaryViewModel(List(FormError("file-upload", errorMessage)))
+              ErrorSummaryViewModel(List(errorMessage))
           )
         }
 
@@ -64,7 +64,7 @@
 
         @govukFileUpload(
             FileUploadViewModel.csv(renderMessage("upload.uploadAFile"))
-                    .withError(viewmodel.page.error.map(messages(_)))
+                    .withError(viewmodel.page.error)
         )
 
         @govukButton(

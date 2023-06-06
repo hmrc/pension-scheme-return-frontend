@@ -38,7 +38,7 @@ class UploadViewSpec extends ViewSpec with Mappings {
       act.like(renderHeading(successViewModelGen)(view(_), _.heading))
       act.like(renderForm(successViewModelGen)(view(_), _.onSubmit))
       act.like(renderUpload(successViewModelGen)(view(_)))
-      act.like(renderErrors(errorViewModelGen)(view(_), _.page.error.value))
+      act.like(renderErrors(errorViewModelGen)(view(_), _.page.error.value.message))
       act.like(renderInset(errorViewModelGen)(view(_), _.page.acceptedFileType).updateName(_ + " AcceptedFileType"))
       act.like(renderInset(errorViewModelGen)(view(_), _.page.maxFileSize).updateName(_ + " MaxFileSize"))
       act.like(renderDetails(successViewModelGen)(view(_), vm => messageKey(vm.page.detailsContent)))
