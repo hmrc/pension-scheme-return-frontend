@@ -288,3 +288,8 @@ POST        /:srn/other-recipient-details                          controllers.n
 
 GET         /:srn/change-other-recipient-details           controllers.nonsipp.otherrecipientdetails.OtherRecipientDetailsController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST        /:srn/change-other-recipient-details            controllers.nonsipp.otherrecipientdetails.OtherRecipientDetailsController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET        /:srn/file-upload-error-many                      controllers.nonsipp.memberdetails.upload.FileUploadTooManyErrorsController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/submit-file-upload-error-many               controllers.nonsipp.memberdetails.upload.FileUploadTooManyErrorsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/change-file-upload-error-many               controllers.nonsipp.memberdetails.upload.FileUploadTooManyErrorsController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+GET        /:srn/change-submit-file-upload-error-many        controllers.nonsipp.memberdetails.upload.FileUploadTooManyErrorsController.onSubmit(srn: Srn, mode: Mode = CheckMode)

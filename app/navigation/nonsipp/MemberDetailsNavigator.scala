@@ -25,10 +25,15 @@ import models.ManualOrUpload.{Manual, Upload}
 import models.{CheckMode, CheckOrChange, ManualOrUpload, NormalMode, UploadErrors, UploadFormatError, UserAnswers}
 import navigation.JourneyNavigator
 import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
-import pages.{CheckingMemberDetailsFilePage, FileUploadErrorSummaryPage, FileUploadWrongFormatPage, Page}
+import pages.{
+  CheckingMemberDetailsFilePage,
+  FileUploadErrorSummaryPage,
+  FileUploadTooManyErrorsPage,
+  FileUploadWrongFormatPage,
+  Page
+}
 import pages.nonsipp.memberdetails._
 import pages.nonsipp.memberdetails.upload.{FileUploadErrorPage, FileUploadSuccessPage}
-import pages.{CheckingMemberDetailsFilePage, FileUploadWrongFormatPage, Page}
 import play.api.mvc.Call
 
 object MemberDetailsNavigator extends JourneyNavigator {
@@ -97,6 +102,9 @@ object MemberDetailsNavigator extends JourneyNavigator {
     case FileUploadErrorPage(srn, UploadFormatError) =>
       controllers.nonsipp.memberdetails.upload.routes.FileUploadWrongFormatController.onPageLoad(srn, NormalMode)
 
+    case FileUploadErrorPage(srn, UploadErrors(errs)) if errs.size > 10 =>
+      controllers.nonsipp.memberdetails.upload.routes.FileUploadTooManyErrorsController.onPageLoad(srn, NormalMode)
+
     case FileUploadErrorPage(srn, _: UploadErrors) =>
       controllers.nonsipp.memberdetails.upload.routes.FileUploadErrorSummaryController.onPageLoad(srn, NormalMode)
 
@@ -106,6 +114,8 @@ object MemberDetailsNavigator extends JourneyNavigator {
     case FileUploadErrorSummaryPage(srn) =>
       controllers.nonsipp.memberdetails.routes.UploadMemberDetailsController.onPageLoad(srn)
 
+    case FileUploadTooManyErrorsPage(srn) =>
+      controllers.nonsipp.memberdetails.routes.UploadMemberDetailsController.onPageLoad(srn)
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {

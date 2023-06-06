@@ -17,18 +17,45 @@
 package models
 
 import cats.data.NonEmptyList
+import models.ValidationErrorType.ValidationErrorType
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 import uk.gov.hmrc.domain.Nino
 import utils.ListUtils.ListOps
 
-case class ValidationError(key: String, message: String)
+case class ValidationError(key: String, errorType: ValidationErrorType, message: String)
+
+object ValidationErrorType {
+
+  sealed trait ValidationErrorType
+  case object FirstName extends ValidationErrorType
+  case object LastName extends ValidationErrorType
+  case object DateOfBirth extends ValidationErrorType
+  case object NinoFormat extends ValidationErrorType
+  case object DuplicateNino extends ValidationErrorType
+  case object NoNinoReason extends ValidationErrorType
+}
 
 object ValidationError {
+  import ValidationErrorType._
+
+  implicit val firstNameFormat: Format[ValidationErrorType.FirstName.type] =
+    Json.format[ValidationErrorType.FirstName.type]
+  implicit val lastNameFormat: Format[ValidationErrorType.LastName.type] =
+    Json.format[ValidationErrorType.LastName.type]
+  implicit val dobFormat: Format[ValidationErrorType.DateOfBirth.type] =
+    Json.format[ValidationErrorType.DateOfBirth.type]
+  implicit val ninoFormat: Format[ValidationErrorType.NinoFormat.type] =
+    Json.format[ValidationErrorType.NinoFormat.type]
+  implicit val duplicateNinoFormat: Format[ValidationErrorType.DuplicateNino.type] =
+    Json.format[ValidationErrorType.DuplicateNino.type]
+  implicit val noNinoReasonFormat: Format[ValidationErrorType.NoNinoReason.type] =
+    Json.format[ValidationErrorType.NoNinoReason.type]
+  implicit val errorTypeFormat: Format[ValidationErrorType] = Json.format[ValidationErrorType]
   implicit val format: Format[ValidationError] = Json.format[ValidationError]
 
-  def fromCell(cell: String, row: Int, errorMessage: String): ValidationError =
-    ValidationError(cell + row, errorMessage)
+  def fromCell(cell: String, row: Int, errorType: ValidationErrorType, errorMessage: String): ValidationError =
+    ValidationError(cell + row, errorType: ValidationErrorType, errorMessage)
 }
 
 case class UploadState(row: Int, previousNinos: List[Nino]) {

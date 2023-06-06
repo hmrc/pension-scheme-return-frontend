@@ -16,21 +16,22 @@
 
 package controllers.nonsipp.memberdetails.upload
 
+import cats.data.NonEmptyList
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.memberdetails.upload.FileUploadErrorSummaryController._
-import controllers.nonsipp.memberdetails.upload.FileUploadErrorSummaryController._
-import controllers.ControllerBaseSpec
-import models.{NormalMode, Upload, UploadFormatError}
+import controllers.nonsipp.memberdetails.upload.FileUploadTooManyErrorsController._
+import models.{NormalMode, Upload, ValidationErrorType}
 import org.mockito.ArgumentMatchers.any
 import play.api.inject
 import play.api.inject.guice.GuiceableModule
 import services.UploadService
-import services.{SaveService, UploadService}
 import views.html.ContentPageView
 
 import scala.concurrent.Future
 
-class FileUploadErrorSummaryControllerSpec extends ControllerBaseSpec {
+class FileUploadTooManyErrorsControllerSpec extends ControllerBaseSpec {
+
+  private lazy val onPageLoad = routes.FileUploadTooManyErrorsController.onPageLoad(srn, NormalMode)
+  private lazy val onSubmit = routes.FileUploadTooManyErrorsController.onSubmit(srn, NormalMode)
 
   private val mockUploadService = mock[UploadService]
 
@@ -38,35 +39,11 @@ class FileUploadErrorSummaryControllerSpec extends ControllerBaseSpec {
     inject.bind[UploadService].toInstance(mockUploadService)
   )
 
-  override def beforeEach(): Unit =
-    reset(mockUploadService)
-
-  private lazy val onPageLoad = routes.FileUploadErrorSummaryController.onPageLoad(srn, NormalMode)
-  private lazy val onSubmit = routes.FileUploadErrorSummaryController.onSubmit(srn, NormalMode)
-
-  "FileUploadErrorSummaryController" - {
+  "FileUploadTooManyErrorsController" - {
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
-      injected[ContentPageView].apply(viewModel(srn, uploadResultErrors.errors, NormalMode))
+      injected[ContentPageView].apply(viewModel(srn, 3, uploadResultErrors.errors.map(_.errorType), NormalMode))
     }.before(mockGetUploadResult(Some(uploadResultErrors))))
-
-    act.like(
-      journeyRecoveryPage(onPageLoad)
-        .before(mockGetUploadResult(None))
-        .updateName("onPageLoad when upload result doesn't exist" + _)
-    )
-
-    act.like(
-      journeyRecoveryPage(onPageLoad)
-        .before(mockGetUploadResult(Some(uploadResultSuccess)))
-        .updateName("onPageLoad when upload result is a success" + _)
-    )
-
-    act.like(
-      journeyRecoveryPage(onPageLoad)
-        .before(mockGetUploadResult(Some(UploadFormatError)))
-        .updateName("onPageLoad when upload result is a format error" + _)
-    )
 
     act.like(redirectNextPage(onSubmit))
 
