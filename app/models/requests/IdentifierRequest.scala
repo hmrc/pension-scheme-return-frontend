@@ -23,6 +23,8 @@ import play.api.mvc.{Request, WrappedRequest}
 
 sealed abstract class IdentifierRequest[A](request: Request[A]) extends WrappedRequest[A](request) { self =>
 
+  val userId: String
+
   def fold[B](admin: AdministratorRequest[A] => B, practitioner: PractitionerRequest[A] => B): B =
     self match {
       case a: AdministratorRequest[A] => admin(a)
