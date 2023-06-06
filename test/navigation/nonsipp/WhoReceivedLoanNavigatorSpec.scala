@@ -33,7 +33,7 @@ class WhoReceivedLoanNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       normalmode
         .navigateToWithData(
           WhoReceivedLoanPage,
-          Gen.const(ReceivedLoanType.UKPartnership),
+          Gen.const(ReceivedLoanType.Other),
           (srn, _) =>
             controllers.nonsipp.otherrecipientdetails.routes.OtherRecipientDetailsController.onPageLoad(srn, NormalMode)
         )

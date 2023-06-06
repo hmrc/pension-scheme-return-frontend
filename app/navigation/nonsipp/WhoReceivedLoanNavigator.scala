@@ -27,7 +27,7 @@ object WhoReceivedLoanNavigator extends JourneyNavigator {
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
 
     case WhoReceivedLoanPage(srn) =>
-      if (userAnswers.get(WhoReceivedLoanPage(srn)).contains(ReceivedLoanType.UKPartnership)) {
+      if (userAnswers.get(WhoReceivedLoanPage(srn)).contains(ReceivedLoanType.Other)) {
         controllers.nonsipp.otherrecipientdetails.routes.OtherRecipientDetailsController.onPageLoad(srn, NormalMode)
       } else {
         controllers.routes.UnauthorisedController.onPageLoad()
