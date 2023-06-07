@@ -145,9 +145,25 @@ trait TestValues { _: OptionValues =>
 
   val uploadResultErrors: UploadErrors = UploadErrors(
     NonEmptyList.of(
-      ValidationError("A1", "error A1"),
-      ValidationError("C3", "error C3"),
-      ValidationError("F2", "error F2")
+      ValidationError("A1", ValidationErrorType.FirstName, "error A1"),
+      ValidationError("C3", ValidationErrorType.LastName, "error C3"),
+      ValidationError("F2", ValidationErrorType.DateOfBirth, "error F2")
+    )
+  )
+
+  val over10UploadResultErrors: UploadErrors = UploadErrors(
+    NonEmptyList.of(
+      ValidationError("A1", ValidationErrorType.FirstName, "error A1"),
+      ValidationError("C3", ValidationErrorType.LastName, "error C3"),
+      ValidationError("F2", ValidationErrorType.DateOfBirth, "error F2"),
+      ValidationError("G4", ValidationErrorType.DateOfBirth, "error G4"),
+      ValidationError("V6", ValidationErrorType.DateOfBirth, "error V6"),
+      ValidationError("A7", ValidationErrorType.DateOfBirth, "error A7"),
+      ValidationError("L3", ValidationErrorType.DateOfBirth, "error L3"),
+      ValidationError("C9", ValidationErrorType.DateOfBirth, "error C9"),
+      ValidationError("M10", ValidationErrorType.DateOfBirth, "error M10"),
+      ValidationError("E2", ValidationErrorType.DateOfBirth, "error E2"),
+      ValidationError("S11", ValidationErrorType.DateOfBirth, "error S11")
     )
   )
 }

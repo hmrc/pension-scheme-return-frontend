@@ -28,7 +28,7 @@ import models.SchemeId.Srn
 import models.{CheckOrChange, ManualOrUpload, NormalMode, UploadErrors, UploadFormatError}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.{CheckingMemberDetailsFilePage, FileUploadErrorSummaryPage}
+import pages.{CheckingMemberDetailsFilePage, FileUploadErrorSummaryPage, FileUploadTooManyErrorsPage}
 import pages.nonsipp.memberdetails._
 import pages.nonsipp.memberdetails.upload.{FileUploadErrorPage, FileUploadSuccessPage}
 import utils.BaseSpec
@@ -265,10 +265,28 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
     act.like(
       normalmode
         .navigateTo(
+          FileUploadErrorPage(_, over10UploadResultErrors),
+          controllers.nonsipp.memberdetails.upload.routes.FileUploadTooManyErrorsController.onPageLoad
+        )
+        .withName("go from file upload error page to too manu file upload errors page on file upload errors over 10")
+    )
+
+    act.like(
+      normalmode
+        .navigateTo(
           FileUploadErrorSummaryPage,
           (srn, _) => controllers.nonsipp.memberdetails.routes.UploadMemberDetailsController.onPageLoad(srn)
         )
         .withName("go from file upload error summary page to upload a file page")
+    )
+
+    act.like(
+      normalmode
+        .navigateTo(
+          FileUploadTooManyErrorsPage,
+          (srn, _) => controllers.nonsipp.memberdetails.routes.UploadMemberDetailsController.onPageLoad(srn)
+        )
+        .withName("go from too many file upload errors page to upload a file page")
     )
 
     "CheckMode" - {

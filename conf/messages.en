@@ -559,3 +559,15 @@ otherRecipientDetails.name.error.length =  Recipient’s name must be 160 charac
 otherRecipientDetails.description.error.required = Enter a brief description of the recipient
 otherRecipientDetails.description.error.invalid = Description of recipient must only include letters, numbers, and special characters such as hyphens, spaces and apostrophes
 otherRecipientDetails.description.error.length = Description of recipient must be 160 characters or fewer
+
+fileUploadTooManyErrors.title = There is a problem with your member details file
+fileUploadTooManyErrors.heading = There is a problem with your member details file
+fileUploadTooManyErrors.paragraph = Correct the errors and upload it again, or upload a different file.
+fileUploadTooManyErrors.heading2 = Problems with your file
+fileUploadTooManyErrors.paragraph2 = Your file has {0} errors. At least one:
+fileUploadTooManyErrors.firstName = member’s first name is missing or in the wrong format
+fileUploadTooManyErrors.lastName = member’s last name is missing or in the wrong format
+fileUploadTooManyErrors.dateOfBirth = member’s date of birth is missing or in the wrong format
+fileUploadTooManyErrors.duplicateNino = member’s National Insurance number is a duplicate
+fileUploadTooManyErrors.noNinoReason = reason member does not have a National Insurance number is in the wrong format
+fileUploadTooManyErrors.ninoFormat = member’s National Insurance number is in the wrong format

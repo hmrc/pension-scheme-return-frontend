@@ -27,6 +27,7 @@ import cats.implicits._
 import config.Constants
 import controllers.nonsipp.memberdetails.{MemberDetailsController, MemberDetailsNinoController, NoNINOController}
 import forms.{NameDOBFormProvider, TextFormProvider}
+import models.ValidationErrorType.ValidationErrorType
 import models._
 import pages.nonsipp.memberdetails._
 import play.api.data.{Form, FormError}
@@ -159,6 +160,15 @@ class MemberDetailsUploadValidator @Inject()(
             )
           )
 
+        val errorTypeMapping: FormError => ValidationErrorType = _.key match {
+          case nameDOBFormProvider.firstName => ValidationErrorType.FirstName
+          case nameDOBFormProvider.lastName => ValidationErrorType.LastName
+          case nameDOBFormProvider.dateOfBirth => ValidationErrorType.DateOfBirth
+          case dobDayKey => ValidationErrorType.DateOfBirth
+          case dobMonthKey => ValidationErrorType.DateOfBirth
+          case dobYearKey => ValidationErrorType.DateOfBirth
+        }
+
         val cellMapping: FormError => Option[String] = {
           case err if err.key == nameDOBFormProvider.firstName => Some(firstName.key.cell)
           case err if err.key == nameDOBFormProvider.lastName => Some(lastName.key.cell)
@@ -169,9 +179,18 @@ class MemberDetailsUploadValidator @Inject()(
           case _ => None
         }
 
-        formToResult(boundForm, row, cellMapping)
+        formToResult(boundForm, row, errorTypeMapping, cellMapping)
       case _ =>
-        Some(ValidationError.fromCell(dob.key.cell, row, messages("memberDetails.dateOfBirth.error.format")).invalidNel)
+        Some(
+          ValidationError
+            .fromCell(
+              dob.key.cell,
+              row,
+              ValidationErrorType.DateOfBirth,
+              messages("memberDetails.dateOfBirth.error.format")
+            )
+            .invalidNel
+        )
     }
   }
 
@@ -188,7 +207,12 @@ class MemberDetailsUploadValidator @Inject()(
         )
       )
 
-    formToResult(boundForm, row, _ => Some(nino.key.cell))
+    val errorTypeMapping: FormError => ValidationErrorType = _.message match {
+      case "memberDetailsNino.error.duplicate" => ValidationErrorType.DuplicateNino
+      case _ => ValidationErrorType.NinoFormat
+    }
+
+    formToResult(boundForm, row, errorTypeMapping, cellMapping = _ => Some(nino.key.cell))
   }
 
   private def validateNoNino(
@@ -203,7 +227,12 @@ class MemberDetailsUploadValidator @Inject()(
         )
       )
 
-    formToResult(boundForm, row, _ => Some(noNinoReason.key.cell))
+    formToResult(
+      boundForm,
+      row,
+      errorTypeMapping = _ => ValidationErrorType.NoNinoReason,
+      cellMapping = _ => Some(noNinoReason.key.cell)
+    )
   }
 
   // Replace missing csv value with blank string so form validation can return a `value required` instead of returning a format error
@@ -230,16 +259,20 @@ class MemberDetailsUploadValidator @Inject()(
   private def formToResult[A](
     form: Form[A],
     row: Int,
+    errorTypeMapping: FormError => ValidationErrorType,
     cellMapping: FormError => Option[String]
   ): Option[Validated[NonEmptyList[ValidationError], A]] =
     form.fold(
-      // unchecked is used as there will always be errors here and theres no need to exhaustively pattern match and throw an unreachable exception
+      // unchecked is used as there will always be form errors here and theres no need to exhaustively pattern match and throw an unreachable exception
       hasErrors = form =>
         (form.errors: @unchecked) match {
           case head :: rest =>
             NonEmptyList
               .of[FormError](head, rest: _*)
-              .map(err => cellMapping(err).map(cell => ValidationError.fromCell(cell, row, err.message)))
+              .map(
+                err =>
+                  cellMapping(err).map(cell => ValidationError.fromCell(cell, row, errorTypeMapping(err), err.message))
+              )
               .sequence
               .map(_.invalid)
         },

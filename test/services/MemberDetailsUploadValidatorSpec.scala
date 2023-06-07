@@ -22,7 +22,7 @@ import cats.data.NonEmptyList
 import controllers.TestValues
 import forms.{NameDOBFormProvider, TextFormProvider}
 import generators.WrappedMemberDetails
-import models.{NameDOB, UploadErrors, UploadFormatError, UploadMemberDetails, UploadSuccess, ValidationError}
+import models._
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.api.test.Helpers.stubMessagesApi
@@ -100,8 +100,8 @@ class MemberDetailsUploadValidatorSpec extends BaseSpec with TestValues {
 
       validator.validateCSV(source).futureValue mustBe UploadErrors(
         NonEmptyList.of(
-          ValidationError("C1", "memberDetails.dateOfBirth.error.invalid.date"),
-          ValidationError("C2", "memberDetails.dateOfBirth.error.format")
+          ValidationError("C1", ValidationErrorType.DateOfBirth, "memberDetails.dateOfBirth.error.invalid.date"),
+          ValidationError("C2", ValidationErrorType.DateOfBirth, "memberDetails.dateOfBirth.error.format")
         )
       )
     }
@@ -119,8 +119,8 @@ class MemberDetailsUploadValidatorSpec extends BaseSpec with TestValues {
 
       validator.validateCSV(source).futureValue mustBe UploadErrors(
         NonEmptyList.of(
-          ValidationError("B2", "memberDetails.lastName.error.required"),
-          ValidationError("A3", "memberDetails.firstName.error.required")
+          ValidationError("B2", ValidationErrorType.LastName, "memberDetails.lastName.error.required"),
+          ValidationError("A3", ValidationErrorType.FirstName, "memberDetails.firstName.error.required")
         )
       )
     }
@@ -137,7 +137,7 @@ class MemberDetailsUploadValidatorSpec extends BaseSpec with TestValues {
 
       validator.validateCSV(source).futureValue mustBe UploadErrors(
         NonEmptyList.of(
-          ValidationError("D2", "memberDetailsNino.error.duplicate")
+          ValidationError("D2", ValidationErrorType.DuplicateNino, "memberDetailsNino.error.duplicate")
         )
       )
     }
@@ -154,7 +154,7 @@ class MemberDetailsUploadValidatorSpec extends BaseSpec with TestValues {
 
       validator.validateCSV(source).futureValue mustBe UploadErrors(
         NonEmptyList.of(
-          ValidationError("D2", "memberDetailsNino.error.invalid")
+          ValidationError("D2", ValidationErrorType.NinoFormat, "memberDetailsNino.error.invalid")
         )
       )
     }
@@ -217,11 +217,11 @@ class MemberDetailsUploadValidatorSpec extends BaseSpec with TestValues {
 
       validator.validateCSV(source).futureValue mustBe UploadErrors(
         NonEmptyList.of(
-          ValidationError("A2", "memberDetails.firstName.error.invalid"),
-          ValidationError("B3", "memberDetails.lastName.error.invalid"),
-          ValidationError("E4", "noNINO.error.invalid"),
-          ValidationError("B5", "memberDetails.lastName.error.required"),
-          ValidationError("D6", "memberDetailsNino.error.invalid")
+          ValidationError("A2", ValidationErrorType.FirstName, "memberDetails.firstName.error.invalid"),
+          ValidationError("B3", ValidationErrorType.LastName, "memberDetails.lastName.error.invalid"),
+          ValidationError("E4", ValidationErrorType.NoNinoReason, "noNINO.error.invalid"),
+          ValidationError("B5", ValidationErrorType.LastName, "memberDetails.lastName.error.required"),
+          ValidationError("D6", ValidationErrorType.NinoFormat, "memberDetailsNino.error.invalid")
         )
       )
     }
