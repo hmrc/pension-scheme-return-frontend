@@ -18,26 +18,24 @@ package services
 
 import akka.NotUsed
 import akka.stream.Materializer
-import akka.stream.scaladsl.{Flow, Framing, Sink, Source}
+import akka.stream.alpakka.csv.scaladsl.CsvParsing
+import akka.stream.scaladsl.{Flow, Sink, Source}
 import akka.util.ByteString
 import cats.data.Validated.{Invalid, Valid}
 import cats.data.{NonEmptyList, Validated, ValidatedNel}
 import cats.implicits._
+import config.Constants
 import controllers.nonsipp.memberdetails.{MemberDetailsController, MemberDetailsNinoController, NoNINOController}
 import forms.{NameDOBFormProvider, TextFormProvider}
 import models._
 import pages.nonsipp.memberdetails._
-import play.api.data.Form
 import play.api.data.{Form, FormError}
 import play.api.i18n.Messages
 import uk.gov.hmrc.domain.Nino
 
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.math.Integral.Implicits.infixIntegralOps
-import scala.util.Try
 
 class MemberDetailsUploadValidator @Inject()(
   nameDOBFormProvider: NameDOBFormProvider,
@@ -51,11 +49,12 @@ class MemberDetailsUploadValidator @Inject()(
   private def noNinoForm(memberFullName: String): Form[String] =
     NoNINOController.form(textFormProvider, memberFullName)
 
-  private val firstRowSink: Sink[ByteString, Future[String]] =
-    Sink.head[ByteString].mapMaterializedValue(_.map(_.utf8String))
+  private val firstRowSink: Sink[List[ByteString], Future[List[String]]] =
+    Sink.head[List[ByteString]].mapMaterializedValue(_.map(_.map(_.utf8String)))
 
-  private val csvFrame: Flow[ByteString, ByteString, NotUsed] =
-    Framing.delimiter(ByteString("\r\n"), maximumFrameLength = Int.MaxValue, allowTruncation = true)
+  private val csvFrame: Flow[ByteString, List[ByteString], NotUsed] = {
+    CsvParsing.lineScanner()
+  }
 
   private val aToZ: List[Char] = ('a' to 'z').toList.map(_.toUpper)
 
@@ -63,23 +62,23 @@ class MemberDetailsUploadValidator @Inject()(
     source: Source[ByteString, _]
   )(implicit mat: Materializer, messages: Messages): Future[Upload] = {
     val csvFrames = source.via(csvFrame)
-    for {
+    (for {
       csvHeader <- csvFrames.runWith(firstRowSink)
-      header = csvHeader
-        .split(",")
-        .zipWithIndex
+      header = csvHeader.zipWithIndex
         .map { case (key, index) => CsvHeaderKey(key, indexToCsvKey(index), index) }
-        .toList
       validated <- csvFrames
         .drop(1) // drop csv header and process rows
         .statefulMap[UploadState, Upload](() => UploadState.init)(
           (state, bs) => {
-            val parts = bs.utf8String.split(",").toList
-            validateMemberDetails(header, parts, state.previousNinos, state.row) match {
-              case None => state.next() -> UploadFormatError
-              case Some(Valid(memberDetails)) =>
-                state.next(memberDetails.ninoOrNoNinoReason.toOption) -> UploadSuccess(List(memberDetails))
-              case Some(Invalid(errs)) => state.next() -> UploadErrors(errs)
+            if (state.row > Constants.maxSchemeMembers) state.next() -> UploadFormatError
+            else {
+              val parts = bs.map(_.utf8String)
+              validateMemberDetails(header, parts, state.previousNinos, state.row) match {
+                case None => state.next() -> UploadFormatError
+                case Some(Valid(memberDetails)) =>
+                  state.next(memberDetails.ninoOrNoNinoReason.toOption) -> UploadSuccess(List(memberDetails))
+                case Some(Invalid(errs)) => state.next() -> UploadErrors(errs)
+              }
             }
           },
           _ => None
@@ -101,7 +100,10 @@ class MemberDetailsUploadValidator @Inject()(
             UploadSuccess(previous.memberDetails ++ current.memberDetails)
           case (_, memberDetails: UploadSuccess) => memberDetails
         }
-    } yield validated
+    } yield validated)
+      .recover {
+        case _: NoSuchElementException => UploadFormatError
+      }
   }
 
   private def validateMemberDetails(

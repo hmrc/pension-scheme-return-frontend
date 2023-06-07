@@ -415,7 +415,7 @@ uploadMemberDetails.list1 = their first and last name
 uploadMemberDetails.list2 = their National Insurance number, in the format QQ123456C, or the reason they do not have one
 uploadMemberDetails.list3 = their date of birth, in the format DD/MM/YYYY
 uploadMemberDetails.error.required = Select a file
-uploadMemberDetails.error.size = The selected file must be smaller than 100MB
+uploadMemberDetails.error.size = The selected file must be smaller than {0}
 
 howToUpload.title = How to upload member details
 howToUpload.heading = How to upload member details

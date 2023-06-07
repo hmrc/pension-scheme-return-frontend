@@ -23,6 +23,7 @@ import models.SchemeId.Srn
 import models.{Mode, Reference, UploadKey}
 import navigation.Navigator
 import pages.nonsipp.memberdetails.UploadMemberDetailsPage
+import play.api.data.FormError
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc._
 import services.UploadService
@@ -61,17 +62,23 @@ class UploadMemberDetailsController @Inject()(
     for {
       initiateResponse <- uploadService.initiateUpscan(callBackUrl, successRedirectUrl, failureRedirectUrl)
       _ <- uploadService.registerUploadRequest(uploadKey, Reference(initiateResponse.fileReference.reference))
-    } yield Ok(view(viewModel(initiateResponse.postTarget, initiateResponse.formFields, collectErrors)))
+    } yield Ok(
+      view(
+        viewModel(initiateResponse.postTarget, initiateResponse.formFields, collectErrors, config.upscanMaxFileSizeMB)
+      )
+    )
   }
 
   def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     Redirect(navigator.nextPage(UploadMemberDetailsPage(srn), mode, request.userAnswers))
   }
 
-  private def collectErrors(implicit request: Request[_]): Option[String] =
+  private def collectErrors(implicit request: Request[_]): Option[FormError] =
     request.getQueryString("errorCode").zip(request.getQueryString("errorMessage")).flatMap {
-      case ("EntityTooLarge", _) => Some("uploadMemberDetails.error.size")
-      case ("InvalidArgument", "'file' field not found") => Some("uploadMemberDetails.error.required")
+      case ("EntityTooLarge", _) =>
+        Some(FormError("file-input", "uploadMemberDetails.error.size", Seq(config.upscanMaxFileSizeMB)))
+      case ("InvalidArgument", "'file' field not found") =>
+        Some(FormError("file-input", "uploadMemberDetails.error.required"))
       case _ => None
     }
 }
@@ -81,7 +88,8 @@ object UploadMemberDetailsController {
   def viewModel(
     postTarget: String,
     formFields: Map[String, String],
-    error: Option[String]
+    error: Option[FormError],
+    maxFileSize: String
   ): FormPageViewModel[UploadViewModel] =
     FormPageViewModel(
       "uploadMemberDetails.title",
@@ -96,7 +104,7 @@ object UploadMemberDetailsController {
               "uploadMemberDetails.list3"
             ),
         acceptedFileType = ".csv",
-        maxFileSize = "100MB",
+        maxFileSize = maxFileSize,
         formFields,
         error
       ),
