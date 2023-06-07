@@ -16,29 +16,22 @@
 
 package navigation.nonsipp
 
-import controllers.routes
-import models.{NormalMode, ReceivedLoanType}
 import navigation.{Navigator, NavigatorBehaviours}
-import org.scalacheck.Gen
-import pages.nonsipp.whoreceivedloan.WhoReceivedLoanPage
+import pages.nonsipp.otherrecipientdetails.OtherRecipientDetailsPage
 import utils.BaseSpec
 
-class WhoReceivedLoanNavigatorSpec extends BaseSpec with NavigatorBehaviours {
+class OtherRecipientsDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
   val navigator: Navigator = new NonSippNavigator
 
-  "UKPartnership" - {
+  "otherRecipientsDetailsNavigator" - {
 
     act.like(
       normalmode
-        .navigateToWithData(
-          WhoReceivedLoanPage,
-          Gen.const(ReceivedLoanType.Other),
-          (srn, _) =>
-            controllers.nonsipp.otherrecipientdetails.routes.OtherRecipientDetailsController.onPageLoad(srn, NormalMode)
+        .navigateTo(
+          OtherRecipientDetailsPage,
+          (_, _) => controllers.routes.UnauthorisedController.onPageLoad()
         )
-        .withName("go from who received loan page to other recipient details page")
     )
-
   }
 }

@@ -16,24 +16,20 @@
 
 package navigation.nonsipp
 
-import models.{NormalMode, ReceivedLoanType, UserAnswers}
+import models.UserAnswers
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.whoreceivedloan.WhoReceivedLoanPage
+import pages.nonsipp.otherrecipientdetails.OtherRecipientDetailsPage
 import play.api.mvc.Call
 
-object WhoReceivedLoanNavigator extends JourneyNavigator {
+object OtherRecipientDetailsNavigator extends JourneyNavigator {
 
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
 
-    case WhoReceivedLoanPage(srn) =>
-      if (userAnswers.get(WhoReceivedLoanPage(srn)).contains(ReceivedLoanType.Other)) {
-        controllers.nonsipp.otherrecipientdetails.routes.OtherRecipientDetailsController.onPageLoad(srn, NormalMode)
-      } else {
-        controllers.routes.UnauthorisedController.onPageLoad()
-      }
-
+    case OtherRecipientDetailsPage(srn) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty
+
 }
