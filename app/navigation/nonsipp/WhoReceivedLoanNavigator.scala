@@ -27,10 +27,12 @@ object WhoReceivedLoanNavigator extends JourneyNavigator {
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
 
     case WhoReceivedLoanPage(srn) =>
-      if (userAnswers.get(WhoReceivedLoanPage(srn)).contains(ReceivedLoanType.Other)) {
-        controllers.nonsipp.otherrecipientdetails.routes.OtherRecipientDetailsController.onPageLoad(srn, NormalMode)
-      } else {
-        controllers.routes.UnauthorisedController.onPageLoad()
+      userAnswers.get(WhoReceivedLoanPage(srn)) match {
+        case Some(ReceivedLoanType.Other) =>
+          controllers.nonsipp.otherrecipientdetails.routes.OtherRecipientDetailsController.onPageLoad(srn, NormalMode)
+        case Some(ReceivedLoanType.Individual) =>
+          controllers.nonsipp.loansmadeoroutstanding.routes.IndividualRecipientNameController.onPageLoad(srn, NormalMode)
+        case _ => controllers.routes.UnauthorisedController.onPageLoad()
       }
 
   }

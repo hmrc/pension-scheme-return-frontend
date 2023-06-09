@@ -571,3 +571,9 @@ fileUploadTooManyErrors.dateOfBirth = member’s date of birth is missing or in 
 fileUploadTooManyErrors.duplicateNino = member’s National Insurance number is a duplicate
 fileUploadTooManyErrors.noNinoReason = reason member does not have a National Insurance number is in the wrong format
 fileUploadTooManyErrors.ninoFormat = member’s National Insurance number is in the wrong format
+
+individualRecipientName.title = What is the recipient’s name?
+individualRecipientName.heading = What is the recipient’s name?
+individualRecipientName.error.required = Enter the recipient’s name
+individualRecipientName.error.length = Recipient’s name must be 160 characters or fewer
+individualRecipientName.error.invalid.characters = Recipient’s name must only include letters a to z, and special characters such as hyphens, spaces and apostrophes
