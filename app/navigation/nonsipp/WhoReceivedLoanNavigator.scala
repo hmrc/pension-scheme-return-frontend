@@ -31,7 +31,8 @@ object WhoReceivedLoanNavigator extends JourneyNavigator {
         case Some(ReceivedLoanType.Other) =>
           controllers.nonsipp.otherrecipientdetails.routes.OtherRecipientDetailsController.onPageLoad(srn, NormalMode)
         case Some(ReceivedLoanType.Individual) =>
-          controllers.nonsipp.loansmadeoroutstanding.routes.IndividualRecipientNameController.onPageLoad(srn, NormalMode)
+          controllers.nonsipp.loansmadeoroutstanding.routes.IndividualRecipientNameController
+            .onPageLoad(srn, NormalMode)
         case _ => controllers.routes.UnauthorisedController.onPageLoad()
       }
 

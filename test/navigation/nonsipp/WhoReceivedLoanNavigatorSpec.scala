@@ -35,7 +35,8 @@ class WhoReceivedLoanNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             WhoReceivedLoanPage,
             Gen.const(ReceivedLoanType.Other),
             (srn, _) =>
-              controllers.nonsipp.otherrecipientdetails.routes.OtherRecipientDetailsController.onPageLoad(srn, NormalMode)
+              controllers.nonsipp.otherrecipientdetails.routes.OtherRecipientDetailsController
+                .onPageLoad(srn, NormalMode)
           )
           .withName("go from who received loan page to other recipient details page")
       )
@@ -46,7 +47,8 @@ class WhoReceivedLoanNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             WhoReceivedLoanPage,
             Gen.const(ReceivedLoanType.Individual),
             (srn, _) =>
-              controllers.nonsipp.loansmadeoroutstanding.routes.IndividualRecipientNameController.onPageLoad(srn, NormalMode)
+              controllers.nonsipp.loansmadeoroutstanding.routes.IndividualRecipientNameController
+                .onPageLoad(srn, NormalMode)
           )
           .withName("go from who received loan page to individual recipient name page")
       )
