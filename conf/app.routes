@@ -294,5 +294,5 @@ GET        /:srn/submit-file-upload-error-many               controllers.nonsipp
 GET        /:srn/change-file-upload-error-many               controllers.nonsipp.memberdetails.upload.FileUploadTooManyErrorsController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 GET        /:srn/change-submit-file-upload-error-many        controllers.nonsipp.memberdetails.upload.FileUploadTooManyErrorsController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
-GET        /:srn/what-you-will-need-loans                    controllers.nonsipp.whatyouwillneedloans.WhatYouWillNeedLoansController.onPageLoad(srn: Srn)
-GET        /:srn/submit-what-you-will-need-loans             controllers.nonsipp.whatyouwillneedloans.WhatYouWillNeedLoansController.onSubmit(srn: Srn)
+GET        /:srn/what-you-will-need-loans                    controllers.nonsipp.loansmadeoroutstanding.WhatYouWillNeedLoansController.onPageLoad(srn: Srn)
+GET        /:srn/submit-what-you-will-need-loans             controllers.nonsipp.loansmadeoroutstanding.WhatYouWillNeedLoansController.onSubmit(srn: Srn)

@@ -19,7 +19,7 @@ package navigation.nonsipp
 import controllers.routes
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.loansmadeoroutstanding.LoansMadeOrOutstandingPage
+import pages.nonsipp.loansmadeoroutstanding.{LoansMadeOrOutstandingPage, WhatYouWillNeedLoansPage}
 import utils.BaseSpec
 
 class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehaviours {
@@ -33,7 +33,7 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
         .navigateToWithData(
           LoansMadeOrOutstandingPage,
           Gen.const(true),
-          (srn, _) => controllers.nonsipp.whatyouwillneedloans.routes.WhatYouWillNeedLoansController.onPageLoad(srn)
+          (srn, _) => controllers.nonsipp.loansmadeoroutstanding.routes.WhatYouWillNeedLoansController.onPageLoad(srn)
         )
         .withName("go from loan made or outstanding page to what you will need Loans page when yes selected")
     )
@@ -49,5 +49,18 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
           "go from loan made or outstanding page to did scheme hold shares in sponsoring employer page when no selected"
         )
     )
+
+    "WhatYouWillNeedNavigator" - {
+
+      act.like(
+        normalmode
+          .navigateTo(
+            WhatYouWillNeedLoansPage,
+            (srn, _) => controllers.nonsipp.whoreceivedloan.routes.WhoReceivedLoanController.onPageLoad(srn)
+          )
+          .withName("go from what you will need loans page to who received loan page")
+      )
+    }
+
   }
 }

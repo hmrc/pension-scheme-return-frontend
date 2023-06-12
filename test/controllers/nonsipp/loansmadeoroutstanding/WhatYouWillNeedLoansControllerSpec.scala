@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.whatyouwillneedloans
+package controllers.nonsipp.loansmadeoroutstanding
 
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.whatyouwillneedloans.WhatYouWillNeedLoansController
+import controllers.nonsipp.loansmadeoroutstanding.routes
 import views.html.ContentPageView
 
 class WhatYouWillNeedLoansControllerSpec extends ControllerBaseSpec {

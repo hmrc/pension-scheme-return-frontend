@@ -20,7 +20,7 @@ import controllers.routes
 import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.loansmadeoroutstanding.LoansMadeOrOutstandingPage
+import pages.nonsipp.loansmadeoroutstanding.{LoansMadeOrOutstandingPage, WhatYouWillNeedLoansPage}
 import play.api.mvc.Call
 
 object LoanMadeOrOutstandingNavigator extends JourneyNavigator {
@@ -28,11 +28,14 @@ object LoanMadeOrOutstandingNavigator extends JourneyNavigator {
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
     case page @ LoansMadeOrOutstandingPage(srn) =>
       if (userAnswers.get(page).contains(true)) {
-        controllers.nonsipp.whatyouwillneedloans.routes.WhatYouWillNeedLoansController.onPageLoad(srn)
+        controllers.nonsipp.loansmadeoroutstanding.routes.WhatYouWillNeedLoansController.onPageLoad(srn)
       } else {
         controllers.nonsipp.sharesinsponsoringemployer.routes.DidSchemeHoldSharesInSponsoringEmployerController
           .onPageLoad(srn, NormalMode)
       }
+
+    case WhatYouWillNeedLoansPage(srn) =>
+      controllers.nonsipp.whoreceivedloan.routes.WhoReceivedLoanController.onPageLoad(srn)
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty

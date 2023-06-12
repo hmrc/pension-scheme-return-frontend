@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.whatyouwillneedloans
+package controllers.nonsipp.loansmadeoroutstanding
 
 import controllers.actions.{AllowAccessActionProvider, DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import controllers.nonsipp.loansmadeoroutstanding.routes
 import models.NormalMode
 import models.SchemeId.Srn
 import navigation.Navigator
-import pages.nonsipp.whatyouwillneedloans.WhatYouWillNeedLoansPage
+import pages.nonsipp.loansmadeoroutstanding.WhatYouWillNeedLoansPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
