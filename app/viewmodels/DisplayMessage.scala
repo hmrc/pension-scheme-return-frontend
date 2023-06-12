@@ -63,6 +63,10 @@ object DisplayMessage {
 
   case class Heading2(content: InlineMessage, headingSize: LabelSize = LabelSize.Small) extends BlockMessage
 
+  object Heading2 {
+    def medium(content: InlineMessage): Heading2 = Heading2(content, LabelSize.Medium)
+  }
+
   case class ParagraphMessage(content: NonEmptyList[InlineMessage]) extends BlockMessage
 
   object ParagraphMessage {
@@ -86,6 +90,11 @@ object DisplayMessage {
     object Bullet {
       def apply(headContent: InlineMessage, tailContents: InlineMessage*): ListMessage =
         ListMessage(NonEmptyList(headContent, tailContents.toList), ListType.Bullet)
+    }
+
+    object NewLine {
+      def apply(headContent: InlineMessage, tailContents: InlineMessage*): ListMessage =
+        ListMessage(NonEmptyList(headContent, tailContents.toList), ListType.NewLine)
     }
   }
 

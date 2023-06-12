@@ -293,3 +293,8 @@ GET        /:srn/file-upload-error-many                      controllers.nonsipp
 GET        /:srn/submit-file-upload-error-many               controllers.nonsipp.memberdetails.upload.FileUploadTooManyErrorsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 GET        /:srn/change-file-upload-error-many               controllers.nonsipp.memberdetails.upload.FileUploadTooManyErrorsController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 GET        /:srn/change-submit-file-upload-error-many        controllers.nonsipp.memberdetails.upload.FileUploadTooManyErrorsController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET        /:srn/check-your-answers-basic-details                      controllers.nonsipp.BasicDetailsCheckYourAnswersController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/submit-check-your-answers-basic-details               controllers.nonsipp.BasicDetailsCheckYourAnswersController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/change-check-your-answers-basic-details               controllers.nonsipp.BasicDetailsCheckYourAnswersController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+GET        /:srn/change-submit-check-your-answers-basic-details        controllers.nonsipp.BasicDetailsCheckYourAnswersController.onSubmit(srn: Srn, mode: Mode = CheckMode)

@@ -16,8 +16,12 @@
 
 package models
 
+import cats.Show
+import cats.implicits.toShow
+import play.api.i18n.Messages
 import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.time.TaxYear
+import utils.DateTimeUtils.localDateShow
 
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -46,4 +50,7 @@ object DateRange {
   }
 
   val readableTimeFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("h:mma")
+
+  implicit def show(implicit messages: Messages): Show[DateRange] =
+    Show.show(date => messages("site.to", date.from.show, date.to.show))
 }

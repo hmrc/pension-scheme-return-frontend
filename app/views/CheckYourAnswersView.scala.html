@@ -29,11 +29,14 @@
 
         <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
 
-        @govukSummaryList(
-          SummaryListViewModel(
-            viewmodel.page.rows.map(_.toSummaryListRow)
-          )
-        )
+        @viewmodel.page.sections.map { section =>
+            @section.heading.map(renderMessage)
+            @govukSummaryList(
+                SummaryListViewModel(
+                    section.rows.map(_.toSummaryListRow)
+                ).withMarginBottom(viewmodel.page.marginBottom)
+            )
+        }
 
         @formHelper(action = viewmodel.onSubmit, Symbol("autocomplete") -> "off") {
             @govukButton(

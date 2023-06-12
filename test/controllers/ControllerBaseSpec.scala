@@ -19,7 +19,9 @@ package controllers
 import cats.data.NonEmptyList
 import controllers.actions._
 import generators.ModelGenerators.srnGen
+import models.PensionSchemeId.PsaId
 import models.UserAnswers.SensitiveJsObject
+import models.requests.IdentifierRequest
 import models.{NameDOB, _}
 import org.scalatest.OptionValues
 import play.api.Application
@@ -28,7 +30,7 @@ import play.api.http._
 import play.api.inject.bind
 import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
 import play.api.libs.json.{Json, Writes}
-import play.api.mvc.Call
+import play.api.mvc.{Call, PlayBodyParsers}
 import play.api.test._
 import queries.Settable
 import uk.gov.hmrc.domain.Nino
@@ -95,12 +97,20 @@ trait TestValues { _: OptionValues =>
   val uploadKey: UploadKey = UploadKey("test-userid", srn)
   val reference: Reference = Reference("test-ref")
   val uploadFileName = "test-file-name"
+  val psaId: PsaId = PsaId("testPSAId")
+
+  val individualDetails: IndividualDetails = IndividualDetails("testFirstName", Some("testMiddleName"), "testLastName")
 
   val userAnswersId: String = "id"
   def emptyUserAnswers: UserAnswers = UserAnswers(userAnswersId)
 
   val defaultUserAnswers: UserAnswers =
     UserAnswers(userAnswersId, SensitiveJsObject(Json.obj("non" -> "empty")))
+
+  val dateRange: DateRange = DateRange(
+    from = LocalDate.of(2020, 4, 6),
+    to = LocalDate.of(2021, 4, 5)
+  )
 
   val localDateTime: LocalDateTime =
     LocalDateTime.of(2020, 12, 12, 10, 30, 15)
@@ -121,7 +131,7 @@ trait TestValues { _: OptionValues =>
     email,
     isPsaSuspended = false,
     Some("testOrganisation"),
-    Some(IndividualDetails("testFirstName", Some("testMiddleName"), "testLastName")),
+    Some(individualDetails),
     rlsFlag = false,
     deceasedFlag = false
   )
@@ -131,6 +141,8 @@ trait TestValues { _: OptionValues =>
     "testLastName",
     LocalDate.of(1990, 12, 12)
   )
+
+  val schemeMemberNumbers: SchemeMemberNumbers = SchemeMemberNumbers(1, 2, 3)
 
   val uploadSuccessful: UploadStatus.Success = UploadStatus.Success(uploadFileName, "text/csv", "test-url", None)
   val uploadFailure: UploadStatus.Failed.type = UploadStatus.Failed

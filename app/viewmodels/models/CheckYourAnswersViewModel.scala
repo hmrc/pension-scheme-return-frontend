@@ -20,10 +20,19 @@ import play.api.i18n.Messages
 import play.api.mvc.Call
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
+import viewmodels.DisplayMessage
 import viewmodels.DisplayMessage.Message
 import viewmodels.govuk.summarylist._
 
 case class CheckYourAnswersViewModel(
+  sections: List[CheckYourAnswersSection],
+  marginBottom: Option[Int] = None
+) {
+  def withMarginBottom(margin: Int): CheckYourAnswersViewModel = copy(marginBottom = Some(margin))
+}
+
+case class CheckYourAnswersSection(
+  heading: Option[DisplayMessage],
   rows: List[CheckYourAnswersRowViewModel]
 )
 
@@ -36,21 +45,25 @@ object CheckYourAnswersViewModel {
     FormPageViewModel(
       Message("checkYourAnswers.title"),
       Message("checkYourAnswers.heading"),
-      CheckYourAnswersViewModel(rows.toList),
+      CheckYourAnswersViewModel(List(CheckYourAnswersSection(None, rows.toList))),
       onSubmit
     )
+
+  def singleSection(rows: List[CheckYourAnswersRowViewModel]): CheckYourAnswersViewModel =
+    CheckYourAnswersViewModel(List(CheckYourAnswersSection(None, rows)))
 }
 
 case class CheckYourAnswersRowViewModel(
   key: Message,
   value: Message,
-  actions: Seq[SummaryAction]
+  actions: Seq[SummaryAction],
+  oneHalfWidth: Boolean = false
 ) {
 
   def toSummaryListRow(implicit messages: Messages): SummaryListRow =
     SummaryListRowViewModel(
-      key = key.toMessage,
-      value = value.toMessage,
+      key = if (oneHalfWidth) KeyViewModel(key.toMessage).withOneHalfWidth() else KeyViewModel(key.toMessage),
+      value = ValueViewModel(value.toMessage),
       actions = actions.map { a =>
         ActionItemViewModel(Text(a.content.toMessage), a.href)
           .withVisuallyHiddenText(a.visuallyHiddenContent.toMessage)
@@ -59,6 +72,20 @@ case class CheckYourAnswersRowViewModel(
 
   def withAction(action: SummaryAction): CheckYourAnswersRowViewModel =
     copy(actions = actions :+ action)
+
+  def withChangeAction(changeUrl: String): CheckYourAnswersRowViewModel = withAction(
+    SummaryAction("site.change", changeUrl)
+  )
+
+  def withChangeAction(changeUrl: String, hidden: String): CheckYourAnswersRowViewModel = withAction(
+    SummaryAction("site.change", changeUrl).withVisuallyHiddenContent(hidden)
+  )
+
+  def withChangeAction(changeUrl: String, hidden: Message): CheckYourAnswersRowViewModel = withAction(
+    SummaryAction("site.change", changeUrl).withVisuallyHiddenContent(hidden)
+  )
+
+  def withOneHalfWidth(): CheckYourAnswersRowViewModel = copy(oneHalfWidth = true)
 }
 
 object CheckYourAnswersRowViewModel {

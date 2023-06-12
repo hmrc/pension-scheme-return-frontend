@@ -18,6 +18,8 @@ package services
 
 import cats.data.NonEmptyList
 import com.google.inject.ImplementedBy
+import config.Refined.{Max3, OneToThree}
+import eu.timepit.refined.refineV
 import models.DateRange
 import models.SchemeId.Srn
 import models.requests.DataRequest
@@ -44,6 +46,21 @@ class SchemeDateServiceImpl @Inject()() extends SchemeDateService {
     }
   }
 
+  def taxYearOrAccountingPeriods(
+    srn: Srn
+  )(implicit request: DataRequest[_]): Option[Either[DateRange, NonEmptyList[(DateRange, Max3)]]] =
+    request.userAnswers.list(AccountingPeriods(srn)) match {
+      case Nil => request.userAnswers.get(WhichTaxYearPage(srn)).map(Left(_))
+      case head :: rest =>
+        NonEmptyList
+          .of(head, rest: _*)
+          .zipWithIndex
+          .traverse {
+            case (date, index) => refineV[OneToThree](index + 1).toOption.map(refined => date -> refined)
+          }
+          .map(Right(_))
+    }
+
   private def accountingPeriod(srn: Srn)(implicit request: DataRequest[_]): Option[DateRange] =
     request.userAnswers.get(AccountingPeriods(srn)).flatMap(_.sorted.headOption)
 
@@ -65,4 +82,8 @@ trait SchemeDateService {
   def schemeDate(srn: Srn)(implicit request: DataRequest[_]): Option[DateRange]
 
   def returnPeriods(srn: Srn)(implicit request: DataRequest[_]): Option[NonEmptyList[DateRange]]
+
+  def taxYearOrAccountingPeriods(
+    srn: Srn
+  )(implicit request: DataRequest[_]): Option[Either[DateRange, NonEmptyList[(DateRange, Max3)]]]
 }

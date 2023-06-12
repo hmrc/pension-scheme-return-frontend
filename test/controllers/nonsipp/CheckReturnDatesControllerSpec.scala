@@ -47,7 +47,6 @@ class CheckReturnDatesControllerSpec extends ControllerBaseSpec with ScalaCheckP
       bind[TaxYearService].toInstance(new FakeTaxYearService(taxYear.starts))
     )
 
-  val dateRange = dateRangeGen.sample.get
   private val userAnswers = defaultUserAnswers.unsafeSet(WhichTaxYearPage(srn), dateRange)
 
   def onwardRoute = Call("GET", "/foo")

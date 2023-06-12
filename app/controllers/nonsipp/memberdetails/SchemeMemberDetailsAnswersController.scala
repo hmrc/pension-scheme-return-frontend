@@ -157,7 +157,9 @@ object SchemeMemberDetailsAnswersController {
         check = "checkYourAnswers.heading",
         change = Message("changeMemberDetails.heading", memberDetails.fullName)
       ),
-      CheckYourAnswersViewModel(rows(index, srn, mode, memberDetails, hasNINO, maybeNino, maybeNoNinoReason)),
+      CheckYourAnswersViewModel.singleSection(
+        rows(index, srn, mode, memberDetails, hasNINO, maybeNino, maybeNoNinoReason)
+      ),
       routes.SchemeMemberDetailsAnswersController.onSubmit(srn, index, checkOrChange)
     ).withButtonText(Message("site.continue"))
 }
