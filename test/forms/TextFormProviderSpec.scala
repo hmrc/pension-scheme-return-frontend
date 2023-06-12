@@ -78,4 +78,24 @@ class TextFormProviderSpec extends FieldBehaviours {
     behave.like(invalidField(ninoForm, "value", "nino.error.invalid", invalidNinoGen))
     behave.like(fieldRejectDuplicates(ninoForm, "value", "nino.error.duplicate", duplicates.map(_.nino)))
   }
+
+  ".name" - {
+    val form: Form[String] = formProvider.name(
+      "required",
+      "tooLong",
+      "invalid"
+    )
+
+    val invalidTextGen = asciiPrintableStr.suchThat(_.trim.nonEmpty).suchThat(!_.matches(formProvider.nameRegex))
+
+    behave.like(fieldThatBindsValidData(form, "value", nonEmptyAlphaString))
+    behave.like(mandatoryField(form, "value", "required"))
+    behave.like(invalidField(form, "value", "invalid", invalidTextGen))
+    behave.like(textTooLongField(form, "value", "tooLong", formProvider.textAreaMaxLength))
+    behave.like(trimmedField(form, "value", "     untrimmed value  "))
+    "specific test value example" - {
+      behave.like(fieldThatBindsValidData(form, "value", "Aa Z'z-z"))
+      behave.like(invalidField(form, "value", "invalid", "John324324"))
+    }
+  }
 }

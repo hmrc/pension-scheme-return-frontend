@@ -27,18 +27,40 @@ class WhoReceivedLoanNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
   val navigator: Navigator = new NonSippNavigator
 
-  "UKPartnership" - {
+  "WhoReceivedLoanNavigator" - {
+    "NormalMode" - {
+      act.like(
+        normalmode
+          .navigateToWithData(
+            WhoReceivedLoanPage,
+            Gen.const(ReceivedLoanType.Other),
+            (srn, _) =>
+              controllers.nonsipp.otherrecipientdetails.routes.OtherRecipientDetailsController
+                .onPageLoad(srn, NormalMode)
+          )
+          .withName("go from who received loan page to other recipient details page")
+      )
 
-    act.like(
-      normalmode
-        .navigateToWithData(
-          WhoReceivedLoanPage,
-          Gen.const(ReceivedLoanType.Other),
-          (srn, _) =>
-            controllers.nonsipp.otherrecipientdetails.routes.OtherRecipientDetailsController.onPageLoad(srn, NormalMode)
-        )
-        .withName("go from who received loan page to other recipient details page")
-    )
+      act.like(
+        normalmode
+          .navigateToWithData(
+            WhoReceivedLoanPage,
+            Gen.const(ReceivedLoanType.Individual),
+            (srn, _) =>
+              controllers.nonsipp.loansmadeoroutstanding.routes.IndividualRecipientNameController
+                .onPageLoad(srn, NormalMode)
+          )
+          .withName("go from who received loan page to individual recipient name page")
+      )
 
+      act.like(
+        normalmode
+          .navigateTo(
+            WhoReceivedLoanPage,
+            (_, _) => routes.UnauthorisedController.onPageLoad()
+          )
+          .withName("go from who received loan page to unauthorised page")
+      )
+    }
   }
 }
