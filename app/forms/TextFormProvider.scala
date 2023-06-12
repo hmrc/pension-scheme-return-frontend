@@ -24,6 +24,7 @@ import javax.inject.Inject
 
 class TextFormProvider @Inject()() extends Mappings {
 
+  val nameRegex = "^[a-zA-Z\\-' ]+$"
   val textAreaRegex = """^[a-zA-Z0-9\-'" \t\r\n,.@/]+$"""
   val textAreaMaxLength = 160
 
@@ -58,4 +59,15 @@ class TextFormProvider @Inject()() extends Mappings {
         .verifying(verify[String](duplicateKey, !duplicates.map(_.nino).contains(_), args: _*))
         .transform[Nino](s => Nino(s.toUpperCase), _.nino.toUpperCase)
     )
+
+  def name(
+    requiredKey: String,
+    tooLongKey: String,
+    invalidCharactersKey: String,
+    args: Any*
+  ): Form[String] = Form(
+    formKey -> text(requiredKey, args.toList)
+      .verifying(verify[String](invalidCharactersKey, _.matches(nameRegex), args: _*))
+      .verifying(verify[String](tooLongKey, _.length <= textAreaMaxLength, args: _*))
+  )
 }
