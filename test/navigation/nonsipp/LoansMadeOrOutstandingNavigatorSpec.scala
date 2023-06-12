@@ -33,9 +33,9 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
         .navigateToWithData(
           LoansMadeOrOutstandingPage,
           Gen.const(true),
-          (_, _) => routes.UnauthorisedController.onPageLoad()
+          (srn, _) => controllers.nonsipp.whatyouwillneedloans.routes.WhatYouWillNeedLoansController.onPageLoad(srn)
         )
-        .withName("go from loan made or outstanding page to unauthorised when yes selected")
+        .withName("go from loan made or outstanding page to what you will need Loans page when yes selected")
     )
 
     act.like(

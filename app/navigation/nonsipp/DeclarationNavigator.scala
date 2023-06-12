@@ -20,8 +20,6 @@ import controllers.routes
 import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.BenefitsSurrenderedPage
-import pages.nonsipp.bankaccount.ActiveBankAccountPage
 import pages.nonsipp.declaration.{PsaDeclarationPage, PspDeclarationPage}
 import play.api.mvc.Call
 
