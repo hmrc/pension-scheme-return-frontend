@@ -20,7 +20,7 @@ import controllers.routes
 import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.loansmadeoroutstanding.LoansMadeOrOutstandingPage
+import pages.nonsipp.loansmadeoroutstanding.{IndividualRecipientNamePage, LoansMadeOrOutstandingPage}
 import play.api.mvc.Call
 
 object LoanMadeOrOutstandingNavigator extends JourneyNavigator {
@@ -33,6 +33,9 @@ object LoanMadeOrOutstandingNavigator extends JourneyNavigator {
         controllers.nonsipp.sharesinsponsoringemployer.routes.DidSchemeHoldSharesInSponsoringEmployerController
           .onPageLoad(srn, NormalMode)
       }
+
+    case page @ IndividualRecipientNamePage(srn) =>
+      routes.UnauthorisedController.onPageLoad()
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty
