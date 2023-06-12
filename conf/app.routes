@@ -298,3 +298,9 @@ GET        /:srn/individual-recipient-name                        controllers.no
 POST       /:srn/individual-recipient-name                        controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNameController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 GET        /:srn/change-individual-recipient-name                  controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNameController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST       /:srn/change-individual-recipient-name                  controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNameController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET        /:srn/check-your-answers-basic-details                      controllers.nonsipp.BasicDetailsCheckYourAnswersController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/submit-check-your-answers-basic-details               controllers.nonsipp.BasicDetailsCheckYourAnswersController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/change-check-your-answers-basic-details               controllers.nonsipp.BasicDetailsCheckYourAnswersController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+GET        /:srn/change-submit-check-your-answers-basic-details        controllers.nonsipp.BasicDetailsCheckYourAnswersController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+

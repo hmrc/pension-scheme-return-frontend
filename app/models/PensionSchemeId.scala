@@ -36,6 +36,8 @@ import models.PensionSchemeId.{PsaId, PspId}
 
 sealed trait PensionSchemeId { self =>
 
+  val value: String
+
   def fold[B](f1: PsaId => B, f2: PspId => B): B =
     self match {
       case id @ PsaId(_) => f1(id)

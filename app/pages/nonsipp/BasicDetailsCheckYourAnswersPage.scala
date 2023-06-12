@@ -14,24 +14,9 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.bankaccount
+package pages.nonsipp
 
 import models.SchemeId.Srn
-import models.UserAnswers
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import pages.Page
 
-import scala.util.{Success, Try}
-
-case class ActiveBankAccountPage(srn: Srn) extends QuestionPage[Boolean] {
-
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "activeBankAccount"
-
-  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
-    value match {
-      case Some(true) => userAnswers.remove(WhyNoBankAccountPage(srn))
-      case _ => Success(userAnswers)
-    }
-}
+case class BasicDetailsCheckYourAnswersPage(srn: Srn) extends Page

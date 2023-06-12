@@ -46,6 +46,7 @@ class MinimalDetailsConnectorImpl @Inject()(appConfig: FrontendAppConfig, http: 
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[MinimalDetailsError, MinimalDetails]] =
     fetch("pspId", pspId.value)
 
+  // API 1442 (Get psa/psp minimal details)
   private def fetch(
     idType: String,
     idValue: String

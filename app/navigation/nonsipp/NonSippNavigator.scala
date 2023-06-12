@@ -51,14 +51,14 @@ class NonSippNavigator @Inject()() extends Navigator {
         if (userAnswers.get(page).exists(_.total > 99)) {
           nonsipp.declaration.routes.PsaDeclarationController.onPageLoad(srn)
         } else {
-          routes.HowMuchCashController.onPageLoad(srn, NormalMode)
+          controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, NormalMode)
         }
 
       case page @ HowManyMembersPage(srn, PspId(_)) =>
         if (userAnswers.get(page).exists(_.total > 99)) {
           nonsipp.declaration.routes.PspDeclarationController.onPageLoad(srn)
         } else {
-          routes.HowMuchCashController.onPageLoad(srn, NormalMode)
+          controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, NormalMode)
         }
     }
 

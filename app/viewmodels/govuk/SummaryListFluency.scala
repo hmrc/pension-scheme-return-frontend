@@ -40,6 +40,9 @@ trait SummaryListFluency {
 
     def withAttribute(attribute: (String, String)): SummaryList =
       list.copy(attributes = list.attributes + attribute)
+
+    def withMarginBottom(maybeMargin: Option[Int]): SummaryList =
+      maybeMargin.fold(list)(margin => list.withCssClass(s"govuk-!-margin-bottom-${margin.toString}"))
   }
 
   object SummaryListRowViewModel {
@@ -127,6 +130,9 @@ trait SummaryListFluency {
 
     def apply(html: Html): Key =
       apply(HtmlContent(html))
+
+    def apply(content: String): Key =
+      apply(Text(content))
   }
 
   implicit class FluentKey(key: Key) {
@@ -136,12 +142,18 @@ trait SummaryListFluency {
 
     def withRegularFont: Key =
       withCssClass("govuk-!-font-weight-regular")
+
+    def withOneHalfWidth(): Key =
+      withCssClass("govuk-!-width-one-half")
   }
 
   object ValueViewModel {
 
     def apply(content: Content): Value =
       Value(content = content)
+
+    def apply(content: String): Value =
+      Value(content = Text(content))
   }
 
   implicit class FluentValue(value: Value) {
