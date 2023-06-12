@@ -20,7 +20,7 @@ import controllers.routes
 import models.{NormalMode, ReceivedLoanType}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.loansmadeoroutstanding.LoansMadeOrOutstandingPage
+import pages.nonsipp.loansmadeoroutstanding.{IndividualRecipientNamePage, LoansMadeOrOutstandingPage}
 import pages.nonsipp.whoreceivedloan.WhoReceivedLoanPage
 import utils.BaseSpec
 
@@ -90,4 +90,16 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
     }
   }
 
+  "IndividualRecipientNamePage" - {
+    "NormalMode" - {
+      act.like(
+        normalmode
+          .navigateTo(
+            IndividualRecipientNamePage,
+            (_, _) => routes.UnauthorisedController.onPageLoad()
+          )
+          .withName("go from individual recipient page to unauthorised")
+      )
+    }
+  }
 }
