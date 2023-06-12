@@ -23,6 +23,7 @@ import models.SchemeId.Srn
 import models.{ListMinimalSchemeDetails, SchemeDetails, SchemeId}
 import play.api.Logger
 import play.api.http.Status.NOT_FOUND
+import play.api.libs.json.JsObject
 import uk.gov.hmrc.http.HttpReads.Implicits.{readFromJson, readOptionOfNotFound}
 import uk.gov.hmrc.http.UpstreamErrorResponse.WithStatusCode
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
@@ -36,6 +37,7 @@ class SchemeDetailsConnectorImpl @Inject()(appConfig: FrontendAppConfig, http: H
 
   private def url(relativePath: String) = s"${appConfig.pensionsScheme}$relativePath"
 
+  // API 1444 (Get scheme details)
   override def details(
     psaId: PsaId,
     schemeId: SchemeId
@@ -56,6 +58,7 @@ class SchemeDetailsConnectorImpl @Inject()(appConfig: FrontendAppConfig, http: H
       }
   }
 
+  // API 1444 (Get scheme details)
   override def details(
     pspId: PspId,
     schemeId: Srn

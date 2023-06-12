@@ -84,11 +84,17 @@ trait ViewModelGenerators extends BasicGenerators {
       CheckYourAnswersRowViewModel(Message(key), Message(value), items)
     }
 
+  val summaryListSectionGen: Gen[CheckYourAnswersSection] =
+    for {
+      heading <- Gen.option(nonEmptyMessage)
+      rows <- Gen.listOf(summaryListRowGen)
+    } yield CheckYourAnswersSection(heading, rows)
+
   implicit val checkYourAnswersViewModelGen: Gen[CheckYourAnswersViewModel] =
     for {
-      rows <- Gen.listOf(summaryListRowGen)
+      sections <- Gen.listOfN(2, summaryListSectionGen)
     } yield {
-      CheckYourAnswersViewModel(rows)
+      CheckYourAnswersViewModel(sections)
     }
 
   implicit val bankAccountViewModelGen: Gen[BankAccountViewModel] =

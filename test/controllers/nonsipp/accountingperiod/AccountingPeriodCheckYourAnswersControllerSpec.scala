@@ -32,15 +32,10 @@ import java.time.LocalDate
 
 class AccountingPeriodCheckYourAnswersControllerSpec extends ControllerBaseSpec {
 
-  private val from = LocalDate.of(2020, 1, 1)
-  private val to = LocalDate.of(2020, 4, 1)
-
-  private val dateRange = DateRange(from, to)
-
   lazy val onPageLoad =
     routes.AccountingPeriodCheckYourAnswersController.onPageLoad(srn, refineMV[OneToThree](1))
   lazy val onSubmit = routes.AccountingPeriodCheckYourAnswersController.onSubmit(srn)
-  lazy val viewModel = AccountingPeriodCheckYourAnswersController.viewModel(srn, refineMV(1), DateRange(from, to))
+  lazy val viewModel = AccountingPeriodCheckYourAnswersController.viewModel(srn, refineMV(1), dateRange)
 
   val userAnswers = defaultUserAnswers.set(AccountingPeriodPage(srn, refineMV[OneToThree](1)), dateRange).success.value
 
@@ -82,21 +77,26 @@ class AccountingPeriodCheckYourAnswersControllerSpec extends ControllerBaseSpec 
       "have the correct message key for start date" in {
 
         forAll(srnGen, dateRangeWithinRangeGen(dateRange)) { (srn, dateRange) =>
-          viewModel(srn, refineMV[OneToThree](1), dateRange).page.rows.map(_.key.key) must contain("site.startDate")
+          viewModel(srn, refineMV[OneToThree](1), dateRange).page.sections.flatMap(_.rows.map(_.key.key)) must contain(
+            "site.startDate"
+          )
         }
       }
 
       "have the correct message key for end date" in {
 
         forAll(srnGen, dateRangeWithinRangeGen(dateRange)) { (srn, dateRange) =>
-          viewModel(srn, refineMV[OneToThree](1), dateRange).page.rows.map(_.key.key) must contain("site.endDate")
+          viewModel(srn, refineMV[OneToThree](1), dateRange).page.sections.flatMap(_.rows.map(_.key.key)) must contain(
+            "site.endDate"
+          )
         }
       }
 
       "have the correct start date" in {
 
         forAll(srnGen, dateRangeWithinRangeGen(dateRange)) { (srn, dateRange) =>
-          viewModel(srn, refineMV[OneToThree](1), dateRange).page.rows.map(_.value.key) must contain(
+          viewModel(srn, refineMV[OneToThree](1), dateRange).page.sections
+            .flatMap(_.rows.map(_.value.key)) must contain(
             dateRange.from.show
           )
         }
@@ -105,7 +105,8 @@ class AccountingPeriodCheckYourAnswersControllerSpec extends ControllerBaseSpec 
       "have the correct end date" in {
 
         forAll(srnGen, dateRangeWithinRangeGen(dateRange)) { (srn, dateRange) =>
-          viewModel(srn, refineMV[OneToThree](1), dateRange).page.rows.map(_.value.key) must contain(dateRange.to.show)
+          viewModel(srn, refineMV[OneToThree](1), dateRange).page.sections
+            .flatMap(_.rows.map(_.value.key)) must contain(dateRange.to.show)
         }
       }
 
@@ -120,8 +121,8 @@ class AccountingPeriodCheckYourAnswersControllerSpec extends ControllerBaseSpec 
             SummaryAction(content, href, Message("site.endDate"))
           )
 
-          viewModel(srn, refineMV[OneToThree](1), dateRange).page.rows
-            .flatMap(_.actions) must contain allElementsOf actions
+          viewModel(srn, refineMV[OneToThree](1), dateRange).page.sections
+            .flatMap(_.rows.flatMap(_.actions)) must contain allElementsOf actions
         }
       }
 

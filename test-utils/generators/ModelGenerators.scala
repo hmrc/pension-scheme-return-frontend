@@ -221,7 +221,7 @@ trait ModelGenerators extends BasicGenerators {
     NameDOB(firstName, lastName, dob)
   }
 
-  implicit val schemeMemberNumbers: Gen[SchemeMemberNumbers] = for {
+  implicit val schemeMemberNumbersGen: Gen[SchemeMemberNumbers] = for {
     active <- Gen.chooseNum(0, 99999)
     deferred <- Gen.chooseNum(0, 99999)
     pensioners <- Gen.chooseNum(0, 99999)

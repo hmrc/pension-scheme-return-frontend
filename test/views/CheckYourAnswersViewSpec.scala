@@ -38,7 +38,7 @@ class CheckYourAnswersViewSpec extends ViewSpec {
       "render the summary list keys" in {
 
         forAll(viewModelGen) { viewModel =>
-          val keys = viewModel.page.rows.map(_.key.key)
+          val keys = viewModel.page.sections.flatMap(_.rows.map(_.key.key))
           summaryListKeys(view(viewModel)) must contain theSameElementsAs keys
         }
       }
@@ -46,7 +46,7 @@ class CheckYourAnswersViewSpec extends ViewSpec {
       "render the summary list values" in {
 
         forAll(viewModelGen) { viewModel =>
-          val values = viewModel.page.rows.map(_.value.key)
+          val values = viewModel.page.sections.flatMap(_.rows.map(_.value.key))
           summaryListValues(view(viewModel)) must contain theSameElementsAs values
         }
       }
@@ -55,9 +55,11 @@ class CheckYourAnswersViewSpec extends ViewSpec {
 
         forAll(viewModelGen) { viewModel =>
           val actions =
-            viewModel.page.rows
-              .flatMap(_.actions)
-              .map { case SummaryAction(content, href, vh) => AnchorTag(href, s"${content.key} ${vh.key}") }
+            viewModel.page.sections.flatMap(
+              _.rows
+                .flatMap(_.actions)
+                .map { case SummaryAction(content, href, vh) => AnchorTag(href, s"${content.key} ${vh.key}") }
+            )
 
           summaryListActions(view(viewModel)) must contain theSameElementsAs actions
         }

@@ -93,9 +93,9 @@ class NonSippNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           .navigateToWithData(
             HowManyMembersPage(_, pensionSchemeIdGen.sample.value),
             Gen.chooseNum(1, 99).map(SchemeMemberNumbers(_, 0, 0)),
-            routes.HowMuchCashController.onPageLoad
+            routes.BasicDetailsCheckYourAnswersController.onPageLoad
           )
-          .withName("go from how many members page to how much cash page when less than 100 members")
+          .withName("go from how many members page to check your answers page when less than 100 members")
       )
 
       act.like(

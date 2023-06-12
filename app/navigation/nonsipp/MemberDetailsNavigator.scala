@@ -24,6 +24,7 @@ import models.CheckOrChange.Check
 import models.ManualOrUpload.{Manual, Upload}
 import models.{CheckMode, CheckOrChange, ManualOrUpload, NormalMode, UploadErrors, UploadFormatError, UserAnswers}
 import navigation.JourneyNavigator
+import pages.nonsipp.BasicDetailsCheckYourAnswersPage
 import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
 import pages.{
   CheckingMemberDetailsFilePage,
@@ -116,6 +117,9 @@ object MemberDetailsNavigator extends JourneyNavigator {
 
     case FileUploadTooManyErrorsPage(srn) =>
       controllers.nonsipp.memberdetails.routes.UploadMemberDetailsController.onPageLoad(srn)
+
+    case BasicDetailsCheckYourAnswersPage(srn) =>
+      controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {

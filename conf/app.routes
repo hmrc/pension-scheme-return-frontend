@@ -296,3 +296,8 @@ GET        /:srn/change-submit-file-upload-error-many        controllers.nonsipp
 
 GET        /:srn/what-you-will-need-loans                    controllers.nonsipp.loansmadeoroutstanding.WhatYouWillNeedLoansController.onPageLoad(srn: Srn)
 GET        /:srn/submit-what-you-will-need-loans             controllers.nonsipp.loansmadeoroutstanding.WhatYouWillNeedLoansController.onSubmit(srn: Srn)
+
+GET        /:srn/check-your-answers-basic-details                      controllers.nonsipp.BasicDetailsCheckYourAnswersController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/submit-check-your-answers-basic-details               controllers.nonsipp.BasicDetailsCheckYourAnswersController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/change-check-your-answers-basic-details               controllers.nonsipp.BasicDetailsCheckYourAnswersController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+GET        /:srn/change-submit-check-your-answers-basic-details        controllers.nonsipp.BasicDetailsCheckYourAnswersController.onSubmit(srn: Srn, mode: Mode = CheckMode)
