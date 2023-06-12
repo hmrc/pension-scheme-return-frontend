@@ -614,3 +614,9 @@ basicDetailsCheckYourAnswersController.memberDetails.deferredMembers = How many 
 basicDetailsCheckYourAnswersController.memberDetails.deferredMembers.hidden = number of deferred members on {0}
 basicDetailsCheckYourAnswersController.memberDetails.pensionerMembers = How many pensioner members did {0} have on {1}?
 basicDetailsCheckYourAnswersController.memberDetails.pensionerMembers.hidden = number of pension members on {0}
+
+individualRecipientName.title = What is the recipient’s name?
+individualRecipientName.heading = What is the recipient’s name?
+individualRecipientName.error.required = Enter the recipient’s name
+individualRecipientName.error.length = Recipient’s name must be 160 characters or fewer
+individualRecipientName.error.invalid.characters = Recipient’s name must only include letters a to z, and special characters such as hyphens, spaces and apostrophes
