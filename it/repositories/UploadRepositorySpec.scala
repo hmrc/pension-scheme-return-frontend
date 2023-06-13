@@ -2,11 +2,8 @@ package repositories
 
 import config.FrontendAppConfig
 import models._
-import org.bson.codecs.Codec
-import org.mongodb.scala.bson.BsonDocument
 import org.mongodb.scala.model.Filters
 import repositories.UploadRepository.MongoUpload
-import uk.gov.hmrc.mongo.play.json.Codecs
 
 import java.time.Instant
 import java.time.temporal.ChronoUnit
