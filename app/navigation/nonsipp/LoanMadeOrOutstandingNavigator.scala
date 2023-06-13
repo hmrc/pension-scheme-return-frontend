@@ -17,10 +17,11 @@
 package navigation.nonsipp
 
 import controllers.routes
-import models.{NormalMode, UserAnswers}
+import models.{NormalMode, ReceivedLoanType, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.loansmadeoroutstanding.LoansMadeOrOutstandingPage
+import pages.nonsipp.loansmadeoroutstanding.{IndividualRecipientNamePage, LoansMadeOrOutstandingPage}
+import pages.nonsipp.whoreceivedloan.WhoReceivedLoanPage
 import play.api.mvc.Call
 
 object LoanMadeOrOutstandingNavigator extends JourneyNavigator {
@@ -33,6 +34,19 @@ object LoanMadeOrOutstandingNavigator extends JourneyNavigator {
         controllers.nonsipp.sharesinsponsoringemployer.routes.DidSchemeHoldSharesInSponsoringEmployerController
           .onPageLoad(srn, NormalMode)
       }
+
+    case WhoReceivedLoanPage(srn) =>
+      userAnswers.get(WhoReceivedLoanPage(srn)) match {
+        case Some(ReceivedLoanType.Other) =>
+          controllers.nonsipp.otherrecipientdetails.routes.OtherRecipientDetailsController.onPageLoad(srn, NormalMode)
+        case Some(ReceivedLoanType.Individual) =>
+          controllers.nonsipp.loansmadeoroutstanding.routes.IndividualRecipientNameController
+            .onPageLoad(srn, NormalMode)
+        case _ => controllers.routes.UnauthorisedController.onPageLoad()
+      }
+
+    case page @ IndividualRecipientNamePage(srn) =>
+      routes.UnauthorisedController.onPageLoad()
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty
