@@ -59,6 +59,9 @@ trait HtmlHelper extends HtmlModels {
   def radios(html: Html): List[RadioItem] =
     mainContent(html).select("input[type=radio]").iterator().asScala.toList.map(RadioItem(_))
 
+  def dividers(html: Html): List[Element] =
+    mainContent(html).getElementsByClass("govuk-radios__divider").iterator().asScala.toList
+
   def labels(html: Html): List[String] =
     mainContent(html).getElementsByTag("label").iterator().asScala.map(_.text()).toList
 

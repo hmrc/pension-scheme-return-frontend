@@ -65,9 +65,9 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
       normalmode
         .navigateTo(
           IndividualRecipientNinoPage,
-          (_, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.routes.IsMemberOrConnectedPartyController.onPageLoad
         )
-        .withName("go from individual recipient nino page to unauthorised page")
+        .withName("go from individual recipient nino page to is member or connected party page")
     )
 
     "WhatYouWillNeedNavigator" - {
