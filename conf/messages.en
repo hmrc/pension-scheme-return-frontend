@@ -597,3 +597,9 @@ individualRecipientName.heading = What is the recipient’s name?
 individualRecipientName.error.required = Enter the recipient’s name
 individualRecipientName.error.length = Recipient’s name must be 160 characters or fewer
 individualRecipientName.error.invalid.characters = Recipient’s name must only include letters a to z, and special characters such as hyphens, spaces and apostrophes
+
+companyRecipientName.title = What is the recipient’s company name?
+companyRecipientName.heading = What is the recipient’s company name?
+companyRecipientName.error.required = Enter the recipient’s company name
+companyRecipientName.error.invalid.characters = Recipient’s company name must only include letters, numbers, and special characters such as hyphens, spaces and apostrophes
+companyRecipientName.error.length = Recipient’s company name must be 160 characters or fewer

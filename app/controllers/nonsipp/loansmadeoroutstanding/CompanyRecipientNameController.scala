@@ -21,7 +21,7 @@ import forms.TextFormProvider
 import models.Mode
 import models.SchemeId.Srn
 import navigation.Navigator
-import pages.nonsipp.loansmadeoroutstanding.IndividualRecipientNamePage
+import pages.nonsipp.loansmadeoroutstanding.CompanyRecipientNamePage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -35,7 +35,7 @@ import views.html.TextInputView
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
-class IndividualRecipientNameController @Inject()(
+class CompanyRecipientNameController @Inject()(
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -47,13 +47,13 @@ class IndividualRecipientNameController @Inject()(
     extends FrontendBaseController
     with I18nSupport {
 
-  private def form = IndividualRecipientNameController.form(formProvider)
+  private def form = CompanyRecipientNameController.form(formProvider)
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     Ok(
       view(
-        form.fromUserAnswers(IndividualRecipientNamePage(srn)),
-        IndividualRecipientNameController.viewModel(srn, mode)
+        form.fromUserAnswers(CompanyRecipientNamePage(srn)),
+        CompanyRecipientNameController.viewModel(srn, mode)
       )
     )
   }
@@ -68,26 +68,26 @@ class IndividualRecipientNameController @Inject()(
           ),
         answer => {
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(IndividualRecipientNamePage(srn), answer))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(CompanyRecipientNamePage(srn), answer))
             _ <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage(IndividualRecipientNamePage(srn), mode, updatedAnswers))
+          } yield Redirect(navigator.nextPage(CompanyRecipientNamePage(srn), mode, updatedAnswers))
         }
       )
   }
 }
 
-object IndividualRecipientNameController {
+object CompanyRecipientNameController {
   def form(formProvider: TextFormProvider): Form[String] = formProvider.name(
-    "individualRecipientName.error.required",
-    "individualRecipientName.error.length",
-    "individualRecipientName.error.invalid.characters"
+    "companyRecipientName.error.required",
+    "companyRecipientName.error.invalid.characters",
+    "companyRecipientName.error.length"
   )
 
   def viewModel(srn: Srn, mode: Mode): FormPageViewModel[TextInputViewModel] =
     FormPageViewModel(
-      Message("individualRecipientName.title"),
-      Message("individualRecipientName.heading"),
+      Message("companyRecipientName.title"),
+      Message("companyRecipientName.heading"),
       TextInputViewModel(true),
-      routes.IndividualRecipientNameController.onSubmit(srn, mode)
+      routes.CompanyRecipientNameController.onSubmit(srn, mode)
     )
 }

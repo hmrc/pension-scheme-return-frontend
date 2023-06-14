@@ -14,6 +14,8 @@
  * limitations under the License.
  *@
 
+@import viewmodels.InputWidth.Fixed20
+
 @this(
         layout: templates.Layout,
         formHelper: FormWithCSRF,
@@ -36,6 +38,18 @@
       <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
     }
 
+    @if(viewmodel.page.isVariable){
+    @govukInput(
+        InputViewModel(
+            field = form("value"),
+            label = viewmodel.page.label
+                .map(label => LabelViewModel(renderMessage(label)))
+                .getOrElse(LabelViewModel(renderMessage(viewmodel.heading)).asPageHeading())
+        )
+        .withWidth(Fixed20)
+    )
+
+} else{
     @govukInput(
       InputViewModel(
         field = form("value"),
@@ -44,6 +58,7 @@
                 .getOrElse(LabelViewModel(renderMessage(viewmodel.heading)).asPageHeading())
       )
     )
+}
 
     @govukButton(
       ButtonViewModel(renderMessage(viewmodel.buttonText))

@@ -20,7 +20,11 @@ import controllers.routes
 import models.{NormalMode, ReceivedLoanType, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.loansmadeoroutstanding.{IndividualRecipientNamePage, LoansMadeOrOutstandingPage}
+import pages.nonsipp.loansmadeoroutstanding.{
+  CompanyRecipientNamePage,
+  IndividualRecipientNamePage,
+  LoansMadeOrOutstandingPage
+}
 import pages.nonsipp.whoreceivedloan.WhoReceivedLoanPage
 import play.api.mvc.Call
 
@@ -42,10 +46,16 @@ object LoanMadeOrOutstandingNavigator extends JourneyNavigator {
         case Some(ReceivedLoanType.Individual) =>
           controllers.nonsipp.loansmadeoroutstanding.routes.IndividualRecipientNameController
             .onPageLoad(srn, NormalMode)
+        case Some(ReceivedLoanType.UKCompany) =>
+          controllers.nonsipp.loansmadeoroutstanding.routes.CompanyRecipientNameController
+            .onPageLoad(srn, NormalMode)
         case _ => controllers.routes.UnauthorisedController.onPageLoad()
       }
 
     case page @ IndividualRecipientNamePage(srn) =>
+      routes.UnauthorisedController.onPageLoad()
+
+    case page @ CompanyRecipientNamePage(srn) =>
       routes.UnauthorisedController.onPageLoad()
   }
 

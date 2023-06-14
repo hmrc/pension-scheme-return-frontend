@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
-package viewmodels.models
+package pages
 
-import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
-import viewmodels.DisplayMessage
+import pages.behaviours.PageBehaviours
+import pages.nonsipp.loansmadeoroutstanding.CompanyRecipientNamePage
 
-case class TextInputViewModel(
-  label: Option[DisplayMessage],
-  isVariable: Boolean
-)
+class CompanyRecipientNamePageSpec extends PageBehaviours {
 
-object TextInputViewModel {
+  "companyRecipientNamePage" - {
+    val srn = srnGen.sample.value
 
-  def apply(): TextInputViewModel = TextInputViewModel(None, false)
-  def apply(isVariable: Boolean): TextInputViewModel = TextInputViewModel(None, isVariable)
+    beRetrievable[String](CompanyRecipientNamePage(srn))
 
+    beSettable[String](CompanyRecipientNamePage(srn))
+
+    beRemovable[String](CompanyRecipientNamePage(srn))
+  }
 }

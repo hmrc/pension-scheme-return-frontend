@@ -14,19 +14,15 @@
  * limitations under the License.
  */
 
-package viewmodels.models
+package pages.nonsipp.loansmadeoroutstanding
 
-import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
-import viewmodels.DisplayMessage
+import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-case class TextInputViewModel(
-  label: Option[DisplayMessage],
-  isVariable: Boolean
-)
+case class CompanyRecipientNamePage(srn: Srn) extends QuestionPage[String] {
 
-object TextInputViewModel {
+  override def path: JsPath = JsPath \ toString
 
-  def apply(): TextInputViewModel = TextInputViewModel(None, false)
-  def apply(isVariable: Boolean): TextInputViewModel = TextInputViewModel(None, isVariable)
-
+  override def toString: String = "companyRecipientName"
 }
