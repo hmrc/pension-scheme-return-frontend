@@ -64,7 +64,7 @@ class CompanyRecipientNameController @Inject()(
       .fold(
         formWithErrors =>
           Future.successful(
-            BadRequest(view(formWithErrors, IndividualRecipientNameController.viewModel(srn, mode)))
+            BadRequest(view(formWithErrors, CompanyRecipientNameController.viewModel(srn, mode)))
           ),
         answer => {
           for {
@@ -77,7 +77,7 @@ class CompanyRecipientNameController @Inject()(
 }
 
 object CompanyRecipientNameController {
-  def form(formProvider: TextFormProvider): Form[String] = formProvider.name(
+  def form(formProvider: TextFormProvider): Form[String] = formProvider.textArea(
     "companyRecipientName.error.required",
     "companyRecipientName.error.invalid.characters",
     "companyRecipientName.error.length"

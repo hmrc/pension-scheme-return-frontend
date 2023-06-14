@@ -305,7 +305,6 @@ GET        /:srn/change-check-your-answers-basic-details               controlle
 GET        /:srn/change-submit-check-your-answers-basic-details        controllers.nonsipp.BasicDetailsCheckYourAnswersController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
 GET         /:srn/company-recipient-name                          controllers.nonsipp.loansmadeoroutstanding.CompanyRecipientNameController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-GET         /:srn/submit-company-recipient-name                          controllers.nonsipp.loansmadeoroutstanding.CompanyRecipientNameController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST        /:srn/company-recipient-name                          controllers.nonsipp.loansmadeoroutstanding.CompanyRecipientNameController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 
 GET         /:srn/change-company-recipient-name                   controllers.nonsipp.loansmadeoroutstanding.CompanyRecipientNameController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
