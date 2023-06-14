@@ -38,7 +38,7 @@ class UploadCallbackController @Inject()(
           UploadStatus.Success(
             s.uploadDetails.fileName,
             s.uploadDetails.fileMimeType,
-            s.downloadUrl.getFile,
+            s.downloadUrl.toString,
             Some(s.uploadDetails.size)
           )
         case _: FailedCallbackBody => UploadStatus.Failed
