@@ -22,14 +22,3 @@ case class RecipientDetailsViewModel(
   name: Message,
   description: Message
 )
-
-//object RecipientDetailsViewModel {
-//
-//  def apply(): RecipientDetailsViewModel =
-//    RecipientDetailsViewModel()
-//  def apply(name: Message): RecipientDetailsViewModel =
-//    RecipientDetailsViewModel(name)
-//
-//  def apply(name: Message, description: Message): RecipientDetailsViewModel =
-//    RecipientDetailsViewModel(Some(name), Some(description))
-//}

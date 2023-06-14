@@ -117,14 +117,18 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
           .withName("go from individual recipient page to unauthorised")
       )
     }
+  }
 
-    act.like(
-      normalmode
-        .navigateTo(
-          CompanyRecipientNamePage,
-          (_, _) => routes.UnauthorisedController.onPageLoad()
-        )
-        .withName("go from company recipient name page to unauthorised page")
-    )
+  "CompanyRecipientNamePage" - {
+    "NormalMode" - {
+      act.like(
+        normalmode
+          .navigateTo(
+            CompanyRecipientNamePage,
+            (_, _) => routes.UnauthorisedController.onPageLoad()
+          )
+          .withName("go from company recipient name page to unauthorised page")
+      )
+    }
   }
 }

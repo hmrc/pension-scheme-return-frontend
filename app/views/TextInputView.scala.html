@@ -38,7 +38,7 @@
       <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
     }
 
-    @if(viewmodel.page.isVariable){
+    @if(viewmodel.page.isFixedLength){
     @govukInput(
         InputViewModel(
             field = form("value"),

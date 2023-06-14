@@ -21,12 +21,12 @@ import viewmodels.DisplayMessage
 
 case class TextInputViewModel(
   label: Option[DisplayMessage],
-  isVariable: Boolean
+  isFixedLength: Boolean
 )
 
 object TextInputViewModel {
 
   def apply(): TextInputViewModel = TextInputViewModel(None, false)
-  def apply(isVariable: Boolean): TextInputViewModel = TextInputViewModel(None, isVariable)
+  def apply(isFixedLength: Boolean): TextInputViewModel = TextInputViewModel(None, isFixedLength)
 
 }
