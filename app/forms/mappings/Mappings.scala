@@ -16,11 +16,13 @@
 
 package forms.mappings
 
+import forms.mappings.Mappings.text
 import forms.mappings.errors.{DateFormErrors, IntFormErrors, MoneyFormErrors}
 import models.{DateRange, Enumerable, Money}
 import play.api.data.{FieldMapping, Mapping}
 import play.api.data.Forms.of
 import play.api.data.validation.{Constraint, Invalid, Valid}
+import uk.gov.hmrc.domain.Nino
 
 import java.time.LocalDate
 
@@ -103,6 +105,39 @@ trait Mappings extends Formatters with Constraints {
       if (pred(a)) Valid
       else Invalid(errorKey, args: _*)
     }
+
+  def validatedText(
+    requiredKey: String,
+    textRegex: String,
+    invalidCharactersKey: String,
+    maxLength: Int,
+    maxLengthErrorKey: String,
+    args: Any*
+  ): Mapping[String] =
+    text(requiredKey, args.toList)
+      .verifying(verify[String](invalidCharactersKey, _.matches(textRegex), args: _*))
+      .verifying(verify[String](maxLengthErrorKey, _.length <= maxLength, args: _*))
+
+  def nino(
+    requiredKey: String,
+    invalidKey: String,
+    args: Any*
+  ): Mapping[Nino] =
+    text(requiredKey, args.toList)
+      .verifying(verify[String](invalidKey, s => Nino.isValid(s.toUpperCase), args: _*))
+      .transform[Nino](s => Nino(s.toUpperCase), _.nino.toUpperCase)
+
+  def ninoNoDuplicates(
+    requiredKey: String,
+    invalidKey: String,
+    duplicates: List[Nino],
+    duplicateKey: String,
+    args: Any*
+  ): Mapping[Nino] =
+    text(requiredKey, args.toList)
+      .verifying(verify[String](invalidKey, s => Nino.isValid(s.toUpperCase), args: _*))
+      .verifying(verify[String](duplicateKey, !duplicates.map(_.nino).contains(_), args: _*))
+      .transform[Nino](s => Nino(s.toUpperCase), _.nino.toUpperCase)
 }
 
 object Mappings extends Mappings

@@ -17,26 +17,60 @@
 package forms
 
 import forms.mappings.Mappings
-import play.api.data.Form
+import play.api.data.Forms.mapping
+import play.api.data.{Form, Mapping}
+import uk.gov.voa.play.form.ConditionalMappings
 
 import javax.inject.Inject
 
-class YesNoPageFormProvider @Inject() extends Mappings {
+class YesNoPageFormProvider @Inject()() {
+
+  protected[forms] val textAreaRegex = """^[a-zA-Z0-9\-'" \t\r\n,.@/]+$"""
+  protected[forms] val textAreaMaxLength = 160
 
   def apply(
     requiredKey: String,
     invalidKey: String
   ): Form[Boolean] =
-    Form("value" -> boolean(requiredKey, invalidKey))
+    Form("value" -> Mappings.boolean(requiredKey, invalidKey))
 
   def apply(
     requiredKey: String
   ): Form[Boolean] =
-    Form("value" -> boolean(requiredKey, ""))
+    Form("value" -> Mappings.boolean(requiredKey, ""))
 
   def apply(
     requiredKey: String,
     args: List[String]
   ): Form[Boolean] =
-    Form("value" -> boolean(requiredKey, "", args))
+    Form("value" -> Mappings.boolean(requiredKey, "", args))
+
+  def conditional[A](
+    requiredKey: String,
+    requiredNoKey: String,
+    invalidNoKey: String,
+    maxLengthNoKey: String,
+    mappingYes: Mapping[A],
+    args: String*
+  ): Form[Either[String, A]] =
+    Form[Either[String, A]](
+      mapping(
+        "value" -> Mappings.boolean(requiredKey, args = args.toList),
+        "value.yes" -> ConditionalMappings.mandatoryIfTrue("value", mappingYes),
+        "value.no" -> ConditionalMappings.mandatoryIfFalse(
+          "value",
+          Mappings
+            .validatedText(requiredNoKey, textAreaRegex, invalidNoKey, textAreaMaxLength, maxLengthNoKey, args: _*)
+        )
+      ) {
+        case (bool, yes, no) =>
+          ((bool, yes, no): @unchecked) match {
+            case (false, _, Some(value)) => Left(value)
+            case (true, Some(value), _) => Right(value)
+          }
+      } {
+        case Left(value) => Some((false, None, Some(value)))
+        case Right(value) => Some((true, Some(value), None))
+      }
+    )
 }

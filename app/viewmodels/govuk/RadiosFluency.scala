@@ -18,12 +18,15 @@ package viewmodels.govuk
 
 import play.api.data.Field
 import play.api.i18n.Messages
-import play.twirl.api.Html
+import play.twirl.api.{Html, HtmlFormat}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{Content, HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.fieldset.{Fieldset, Legend}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
 import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.{RadioItem, Radios}
-import viewmodels.ErrorMessageAwareness
+import viewmodels.DisplayMessage.Message
+import viewmodels.{DisplayMessage, ErrorMessageAwareness, LegendSize}
+import viewmodels.models.YesNoViewModel
+import viewmodels.models.YesNoViewModel.Conditional
 
 object radios extends RadiosFluency
 
@@ -133,6 +136,52 @@ trait RadiosFluency {
         items = items
       )
     }
+
+    def conditionalYesNo(
+      field: Field,
+      fieldYes: Field,
+      fieldNo: Field,
+      yes: YesNoViewModel,
+      no: YesNoViewModel,
+      whenYes: Message => Html,
+      whenNo: Message => Html,
+      legend: Option[Message]
+    )(implicit messages: Messages): Radios =
+      Radios(
+        fieldset = Some(
+          FieldsetViewModel(
+            legend.map(legend => LegendViewModel(legend.toMessage).withSize(LegendSize.Medium))
+          )
+        ),
+        name = field.name,
+        items = Seq(
+          RadioItem(
+            id = Some("value_yes"),
+            value = Some("true"),
+            content = yes.message.fold[Content](Text(messages("site.yes")))(msg => HtmlContent(msg)),
+            checked = fieldYes.errors.nonEmpty || (field.value.contains("true") && fieldYes.value
+              .exists(s => !s.isEmpty)),
+            conditionalHtml = yes match {
+              case YesNoViewModel.Conditional(_, _, conditionalMessage) =>
+                Some(whenYes(conditionalMessage))
+              case _ => None
+            }
+          ),
+          RadioItem(
+            id = Some("value_no"),
+            value = Some("false"),
+            content = no.message.fold[Content](Text(messages("site.no")))(msg => HtmlContent(msg)),
+            checked = fieldNo.errors.nonEmpty || (field.value.contains("false") && fieldNo.value
+              .exists(s => !s.isEmpty)),
+            conditionalHtml = no match {
+              case YesNoViewModel.Conditional(_, _, conditionalMessage) =>
+                Some(whenNo(conditionalMessage))
+              case _ => None
+            }
+          )
+        ),
+        errorMessage = errorMessage(field)
+      )
   }
 
   implicit class FluentRadios(radios: Radios) {

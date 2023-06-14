@@ -87,7 +87,7 @@ object Components {
       s"""<h2 class="$cssClass">${content.body}</h2>"""
     )
 
-  def renderMessage(message: DisplayMessage)(implicit messages: Messages): Html =
+  def renderMessage(message: DisplayMessage)(implicit messages: Messages): HtmlFormat.Appendable =
     message match {
       case Empty => Html("")
       case m @ Message(_, _) => HtmlFormat.escape(m.toMessage)

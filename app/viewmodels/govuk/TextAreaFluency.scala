@@ -16,6 +16,8 @@
 
 package viewmodels.govuk
 
+import play.api.data.FormError
+import play.api.i18n.Messages
 import play.twirl.api.Html
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.errormessage.ErrorMessage
@@ -49,6 +51,9 @@ trait TextAreaFluency {
           ErrorMessage(content = Text(message))
         )
       )
+
+    def withError(maybeFormError: Option[FormError])(implicit messages: Messages): Textarea =
+      maybeFormError.fold(textArea)(error => textArea.withError(messages(error.message, error.args: _*)))
 
     def withLabel(label: Html): Textarea =
       textArea.copy(

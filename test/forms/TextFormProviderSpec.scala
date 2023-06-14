@@ -93,6 +93,7 @@ class TextFormProviderSpec extends FieldBehaviours {
     behave.like(invalidField(form, "value", "invalid", invalidTextGen))
     behave.like(textTooLongField(form, "value", "tooLong", formProvider.textAreaMaxLength))
     behave.like(trimmedField(form, "value", "     untrimmed value  "))
+
     "specific test value example" - {
       behave.like(fieldThatBindsValidData(form, "value", "Aa Z'z-z"))
       behave.like(invalidField(form, "value", "invalid", "John324324"))
