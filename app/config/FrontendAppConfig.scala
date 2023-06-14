@@ -89,6 +89,8 @@ class FrontendAppConfig @Inject()(config: Configuration) { self =>
 
     object upscan {
       val initiate: String = self.upscan.baseUrl + config.get[String]("urls.upscan.initiate")
+      val successEndpoint: String = config.get[String]("urls.upscan.success-endpoint")
+      val failureEndpoint: String = config.get[String]("urls.upscan.failure-endpoint")
     }
   }
 }

@@ -19,11 +19,13 @@ package controllers.nonsipp.memberdetails
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.memberdetails.UploadMemberDetailsController.viewModel
 import models.{UpscanFileReference, UpscanInitiateResponse}
+import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import play.api.data.FormError
 import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
 import play.api.mvc.Call
+import play.api.test.FakeRequest
 import services.UploadService
 import views.html.UploadView
 
@@ -52,6 +54,25 @@ class UploadMemberDetailsControllerSpec extends ControllerBaseSpec {
     reset(mockUploadService)
     when(mockUploadService.registerUploadRequest(any(), any()))
       .thenReturn(Future.successful((): Unit))
+  }
+
+  "onPageLoad should use the right upscan config URLs" in {
+    running(_ => applicationBuilder(Some(defaultUserAnswers))) { implicit app =>
+      when(mockUploadService.initiateUpscan(any(), any(), any())(any()))
+        .thenReturn(Future.successful(upscanInitiateResponse))
+
+      val successCaptor: ArgumentCaptor[String] = ArgumentCaptor.forClass(classOf[String])
+      val failureCaptor: ArgumentCaptor[String] = ArgumentCaptor.forClass(classOf[String])
+      val request = FakeRequest(onPageLoad)
+      route(app, request).value.futureValue
+
+      verify(mockUploadService).initiateUpscan(any(), successCaptor.capture(), failureCaptor.capture())(any())
+
+      val actualSuccessUrl = successCaptor.getValue
+      val actualFailureUrl = failureCaptor.getValue
+      actualSuccessUrl must endWith("/submit-upload-member-details-file")
+      actualFailureUrl must endWith("/upload-member-details-file")
+    }
   }
 
   "UploadMemberDetailsController" - {
