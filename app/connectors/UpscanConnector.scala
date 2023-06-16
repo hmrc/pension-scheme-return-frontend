@@ -58,5 +58,5 @@ class UpscanConnector @Inject()(httpClient: HttpClient, appConfig: FrontendAppCo
   }
 
   def download(downloadUrl: String)(implicit hc: HeaderCarrier): Future[HttpResponse] =
-    httpClient.GET[HttpResponse](appConfig.upscan.baseUrl + downloadUrl)
+    httpClient.GET[HttpResponse](downloadUrl)
 }

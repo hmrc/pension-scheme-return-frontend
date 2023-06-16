@@ -122,13 +122,13 @@ POST        /:srn/value-of-assets-and-cash               controllers.nonsipp.Val
 GET         /:srn/change-value-of-assets-and-cash        controllers.nonsipp.ValueOfAssetsController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST        /:srn/change-value-of-assets-and-cash        controllers.nonsipp.ValueOfAssetsController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
-GET         /:srn/members                             controllers.nonsipp.memberdetails.SchemeMembersListController.onPageLoad(srn: Srn, page: Int = 1, manualOrUpload: ManualOrUpload = Manual, mode: Mode = NormalMode)
-GET         /:srn/members/:page                       controllers.nonsipp.memberdetails.SchemeMembersListController.onPageLoad(srn: Srn, page: Int, manualOrUpload: ManualOrUpload = Manual, mode: Mode = NormalMode)
-POST        /:srn/members/:page                       controllers.nonsipp.memberdetails.SchemeMembersListController.onSubmit(srn: Srn, page: Int, manualOrUpload: ManualOrUpload = Manual, mode: Mode = NormalMode)
+GET        /:srn/members                             controllers.nonsipp.memberdetails.SchemeMembersListController.onPageLoad(srn: Srn, page: Int = 1, manualOrUpload: ManualOrUpload = Manual, mode: Mode = NormalMode)
+GET        /:srn/members/:page                       controllers.nonsipp.memberdetails.SchemeMembersListController.onPageLoad(srn: Srn, page: Int, manualOrUpload: ManualOrUpload = Manual, mode: Mode = NormalMode)
+POST       /:srn/members/:page                       controllers.nonsipp.memberdetails.SchemeMembersListController.onSubmit(srn: Srn, page: Int, manualOrUpload: ManualOrUpload = Manual, mode: Mode = NormalMode)
 
-GET         /:srn/members-uploaded                    controllers.nonsipp.memberdetails.SchemeMembersListController.onPageLoad(srn: Srn, page: Int = 1, manualOrUpload: ManualOrUpload = Upload, mode: Mode = NormalMode)
-GET         /:srn/members-uploaded/:page              controllers.nonsipp.memberdetails.SchemeMembersListController.onPageLoad(srn: Srn, page: Int, manualOrUpload: ManualOrUpload = Upload, mode: Mode = NormalMode)
-POST        /:srn/members-uploaded/:page              controllers.nonsipp.memberdetails.SchemeMembersListController.onSubmit(srn: Srn, page: Int, manualOrUpload: ManualOrUpload = Upload, mode: Mode = NormalMode)
+GET        /:srn/members-uploaded                    controllers.nonsipp.memberdetails.SchemeMembersListController.onPageLoad(srn: Srn, page: Int = 1, manualOrUpload: ManualOrUpload = Upload, mode: Mode = NormalMode)
+GET        /:srn/members-uploaded/:page              controllers.nonsipp.memberdetails.SchemeMembersListController.onPageLoad(srn: Srn, page: Int, manualOrUpload: ManualOrUpload = Upload, mode: Mode = NormalMode)
+POST       /:srn/members-uploaded/:page              controllers.nonsipp.memberdetails.SchemeMembersListController.onSubmit(srn: Srn, page: Int, manualOrUpload: ManualOrUpload = Upload, mode: Mode = NormalMode)
 
 GET        /:srn/remove-member-details/:index               controllers.nonsipp.memberdetails.RemoveMemberDetailsController.onPageLoad(srn: Srn, index: Max99, mode: Mode = NormalMode)
 POST       /:srn/remove-member-details/:index               controllers.nonsipp.memberdetails.RemoveMemberDetailsController.onSubmit(srn: Srn, index: Max99, mode: Mode = NormalMode)
@@ -139,11 +139,11 @@ POST       /:srn/change-remove-member-details/:index        controllers.nonsipp.
 GET        /:srn/upload-member-details-file                  controllers.nonsipp.memberdetails.UploadMemberDetailsController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 GET        /:srn/submit-upload-member-details-file           controllers.nonsipp.memberdetails.UploadMemberDetailsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 
-GET         /:srn/did-scheme-have-bank-account               controllers.nonsipp.bankaccount.ActiveBankAccountController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST        /:srn/did-scheme-have-bank-account               controllers.nonsipp.bankaccount.ActiveBankAccountController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/did-scheme-have-bank-account               controllers.nonsipp.bankaccount.ActiveBankAccountController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST       /:srn/did-scheme-have-bank-account               controllers.nonsipp.bankaccount.ActiveBankAccountController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 
-GET         /:srn/change-did-scheme-have-bank-account        controllers.nonsipp.bankaccount.ActiveBankAccountController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST        /:srn/change-did-scheme-have-bank-account        controllers.nonsipp.bankaccount.ActiveBankAccountController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+GET        /:srn/change-did-scheme-have-bank-account        controllers.nonsipp.bankaccount.ActiveBankAccountController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST       /:srn/change-did-scheme-have-bank-account        controllers.nonsipp.bankaccount.ActiveBankAccountController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
 GET        /:srn/personal-contributions               controllers.nonsipp.personalcontributions.PersonalContributionsController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST       /:srn/personal-contributions               controllers.nonsipp.personalcontributions.PersonalContributionsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
@@ -283,16 +283,19 @@ GET        /:srn/submit-file-upload-error-some               controllers.nonsipp
 GET        /:srn/change-file-upload-error-some               controllers.nonsipp.memberdetails.upload.FileUploadErrorSummaryController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 GET        /:srn/change-submit-file-upload-error-some        controllers.nonsipp.memberdetails.upload.FileUploadErrorSummaryController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
-GET         /:srn/other-recipient-details                          controllers.nonsipp.otherrecipientdetails.OtherRecipientDetailsController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST        /:srn/other-recipient-details                          controllers.nonsipp.otherrecipientdetails.OtherRecipientDetailsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/other-recipient-details                          controllers.nonsipp.otherrecipientdetails.OtherRecipientDetailsController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST       /:srn/other-recipient-details                          controllers.nonsipp.otherrecipientdetails.OtherRecipientDetailsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 
-GET         /:srn/change-other-recipient-details           controllers.nonsipp.otherrecipientdetails.OtherRecipientDetailsController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST        /:srn/change-other-recipient-details            controllers.nonsipp.otherrecipientdetails.OtherRecipientDetailsController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+GET        /:srn/change-other-recipient-details           controllers.nonsipp.otherrecipientdetails.OtherRecipientDetailsController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST       /:srn/change-other-recipient-details            controllers.nonsipp.otherrecipientdetails.OtherRecipientDetailsController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
 GET        /:srn/file-upload-error-many                      controllers.nonsipp.memberdetails.upload.FileUploadTooManyErrorsController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 GET        /:srn/submit-file-upload-error-many               controllers.nonsipp.memberdetails.upload.FileUploadTooManyErrorsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 GET        /:srn/change-file-upload-error-many               controllers.nonsipp.memberdetails.upload.FileUploadTooManyErrorsController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 GET        /:srn/change-submit-file-upload-error-many        controllers.nonsipp.memberdetails.upload.FileUploadTooManyErrorsController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET        /:srn/what-you-will-need-loans                    controllers.nonsipp.loansmadeoroutstanding.WhatYouWillNeedLoansController.onPageLoad(srn: Srn)
+GET        /:srn/submit-what-you-will-need-loans             controllers.nonsipp.loansmadeoroutstanding.WhatYouWillNeedLoansController.onSubmit(srn: Srn)
 
 GET        /:srn/individual-recipient-name                        controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNameController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST       /:srn/individual-recipient-name                        controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNameController.onSubmit(srn: Srn, mode: Mode = NormalMode)
