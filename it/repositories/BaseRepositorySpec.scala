@@ -7,7 +7,7 @@ import org.scalatest.OptionValues
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
-import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
+import uk.gov.hmrc.mongo.test.{DefaultPlayMongoRepositorySupport, TtlIndexedMongoSupport}
 
 import java.time.{Clock, Instant, ZoneId}
 import java.time.temporal.ChronoUnit
@@ -15,6 +15,7 @@ import java.time.temporal.ChronoUnit
 trait BaseRepositorySpec[A] extends AnyFreeSpec
   with Matchers
   with DefaultPlayMongoRepositorySupport[A]
+  with TtlIndexedMongoSupport
   with ScalaFutures
   with IntegrationPatience
   with OptionValues
