@@ -79,8 +79,8 @@ class CompanyRecipientNameController @Inject()(
 object CompanyRecipientNameController {
   def form(formProvider: TextFormProvider): Form[String] = formProvider.textArea(
     "companyRecipientName.error.required",
-    "companyRecipientName.error.invalid.characters",
-    "companyRecipientName.error.length"
+    "companyRecipientName.error.length",
+    "companyRecipientName.error.invalid.characters"
   )
 
   def viewModel(srn: Srn, mode: Mode): FormPageViewModel[TextInputViewModel] =
