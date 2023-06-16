@@ -59,7 +59,7 @@ class UploadRepository @Inject()(
             .expireAfter(appConfig.uploadTtl, TimeUnit.SECONDS)
         )
       ),
-      replaceIndexes = true
+      replaceIndexes = false
     ) {
 
   implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
