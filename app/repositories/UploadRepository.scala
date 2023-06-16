@@ -31,6 +31,7 @@ import repositories.UploadRepository.MongoUpload
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.Codecs._
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
+import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 import java.time.{Clock, Instant}
 import java.util.concurrent.TimeUnit
@@ -58,8 +59,10 @@ class UploadRepository @Inject()(
             .expireAfter(appConfig.uploadTtl, TimeUnit.SECONDS)
         )
       ),
-      replaceIndexes = false
+      replaceIndexes = true
     ) {
+
+  implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
 
   import UploadRepository._
 
@@ -162,7 +165,7 @@ object UploadRepository {
       (__ \ "id").format[UploadKey] ~
         (__ \ "reference").format[Reference] ~
         (__ \ "status").format[UploadStatus] ~
-        (__ \ "lastUpdated").format[Instant] ~
+        (__ \ "lastUpdated").format(MongoJavatimeFormats.instantFormat) ~
         (__ \ "result").formatNullable[Upload]
     )(MongoUpload.apply, unlift(MongoUpload.unapply))
 
