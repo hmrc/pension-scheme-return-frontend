@@ -258,8 +258,9 @@ trait ViewModelGenerators extends BasicGenerators {
   implicit val textInputViewModelGen: Gen[TextInputViewModel] =
     for {
       label <- Gen.option(nonEmptyMessage)
+      isFixedLength <- boolean
     } yield {
-      TextInputViewModel(label)
+      TextInputViewModel(label, isFixedLength)
     }
 
   implicit val uploadViewModelGen: Gen[UploadViewModel] =

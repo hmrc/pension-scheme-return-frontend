@@ -20,6 +20,11 @@ import controllers.routes
 import models.{NormalMode, ReceivedLoanType}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
+import pages.nonsipp.loansmadeoroutstanding.{
+  CompanyRecipientNamePage,
+  IndividualRecipientNamePage,
+  LoansMadeOrOutstandingPage
+}
 import pages.nonsipp.loansmadeoroutstanding.{LoansMadeOrOutstandingPage, WhatYouWillNeedLoansPage}
 import pages.nonsipp.loansmadeoroutstanding.{IndividualRecipientNamePage, LoansMadeOrOutstandingPage}
 import pages.nonsipp.whoreceivedloan.WhoReceivedLoanPage
@@ -95,6 +100,18 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
 
       act.like(
         normalmode
+          .navigateToWithData(
+            WhoReceivedLoanPage,
+            Gen.const(ReceivedLoanType.UKCompany),
+            (srn, _) =>
+              controllers.nonsipp.loansmadeoroutstanding.routes.CompanyRecipientNameController
+                .onPageLoad(srn, NormalMode)
+          )
+          .withName("go from who received loan page to company recipient name page")
+      )
+
+      act.like(
+        normalmode
           .navigateTo(
             WhoReceivedLoanPage,
             (_, _) => routes.UnauthorisedController.onPageLoad()
@@ -113,6 +130,19 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
             (_, _) => routes.UnauthorisedController.onPageLoad()
           )
           .withName("go from individual recipient page to unauthorised")
+      )
+    }
+  }
+
+  "CompanyRecipientNamePage" - {
+    "NormalMode" - {
+      act.like(
+        normalmode
+          .navigateTo(
+            CompanyRecipientNamePage,
+            (_, _) => routes.UnauthorisedController.onPageLoad()
+          )
+          .withName("go from company recipient name page to unauthorised page")
       )
     }
   }
