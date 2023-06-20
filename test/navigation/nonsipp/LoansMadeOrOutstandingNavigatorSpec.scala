@@ -20,13 +20,7 @@ import controllers.routes
 import models.{NormalMode, ReceivedLoanType}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.loansmadeoroutstanding.{
-  CompanyRecipientNamePage,
-  IndividualRecipientNamePage,
-  LoansMadeOrOutstandingPage
-}
-import pages.nonsipp.loansmadeoroutstanding.{LoansMadeOrOutstandingPage, WhatYouWillNeedLoansPage}
-import pages.nonsipp.loansmadeoroutstanding.{IndividualRecipientNamePage, LoansMadeOrOutstandingPage}
+import pages.nonsipp.loansmadeoroutstanding._
 import pages.nonsipp.whoreceivedloan.WhoReceivedLoanPage
 import utils.BaseSpec
 
@@ -56,6 +50,24 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
         .withName(
           "go from loan made or outstanding page to did scheme hold shares in sponsoring employer page when no selected"
         )
+    )
+
+    act.like(
+      normalmode
+        .navigateTo(
+          IndividualRecipientNamePage,
+          controllers.routes.IndividualRecipientNinoController.onPageLoad
+        )
+        .withName("go from Individual recipient name page to individual nino page")
+    )
+
+    act.like(
+      normalmode
+        .navigateTo(
+          IndividualRecipientNinoPage,
+          (_, _) => controllers.routes.UnauthorisedController.onPageLoad()
+        )
+        .withName("go from individual recipient nino page to unauthorised page")
     )
 
     "WhatYouWillNeedNavigator" - {
@@ -103,9 +115,7 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
           .navigateToWithData(
             WhoReceivedLoanPage,
             Gen.const(ReceivedLoanType.UKCompany),
-            (srn, _) =>
-              controllers.nonsipp.loansmadeoroutstanding.routes.CompanyRecipientNameController
-                .onPageLoad(srn, NormalMode)
+            controllers.nonsipp.loansmadeoroutstanding.routes.CompanyRecipientNameController.onPageLoad
           )
           .withName("go from who received loan page to company recipient name page")
       )
@@ -117,19 +127,6 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
             (_, _) => routes.UnauthorisedController.onPageLoad()
           )
           .withName("go from who received loan page to unauthorised page")
-      )
-    }
-  }
-
-  "IndividualRecipientNamePage" - {
-    "NormalMode" - {
-      act.like(
-        normalmode
-          .navigateTo(
-            IndividualRecipientNamePage,
-            (_, _) => routes.UnauthorisedController.onPageLoad()
-          )
-          .withName("go from individual recipient page to unauthorised")
       )
     }
   }

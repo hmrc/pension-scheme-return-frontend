@@ -18,7 +18,7 @@ package controllers
 
 import cats.data.NonEmptyList
 import controllers.actions._
-import generators.ModelGenerators.srnGen
+import generators.ModelGenerators._
 import models.PensionSchemeId.PsaId
 import models.UserAnswers.SensitiveJsObject
 import models.requests.IdentifierRequest
@@ -98,6 +98,8 @@ trait TestValues { _: OptionValues =>
   val reference: Reference = Reference("test-ref")
   val uploadFileName = "test-file-name"
   val psaId: PsaId = PsaId("testPSAId")
+  val individualName = "testIndividualName"
+  val nino: Nino = ninoGen.sample.get
 
   val individualDetails: IndividualDetails = IndividualDetails("testFirstName", Some("testMiddleName"), "testLastName")
 

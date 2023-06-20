@@ -17,7 +17,9 @@ object AppDependencies {
     "eu.timepit"         %% "refined"                        % "0.10.1",
     "uk.gov.hmrc"        %% "domain"                         % "8.1.0-play-28",
     "uk.gov.hmrc"        %% "crypto-json-play-28"            % "7.3.0",
-    "com.lightbend.akka" %% "akka-stream-alpakka-csv"        % "2.0.2"
+    "com.lightbend.akka" %% "akka-stream-alpakka-csv"        % "2.0.2",
+    "uk.gov.hmrc"        %% "play-conditional-form-mapping"  % "1.13.0-play-28"
+
   )
 
   val test = Seq(

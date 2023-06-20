@@ -19,12 +19,12 @@ package generators
 import models.PensionSchemeId.{PsaId, PspId}
 import models.SchemeId.{Pstr, Srn}
 import models.SchemeStatus._
-import models._
+import models.{ConditionalYesNo, _}
 import models.cache.PensionSchemeUser
 import models.cache.PensionSchemeUser.{Administrator, Practitioner}
 import models.requests.IdentifierRequest.{AdministratorRequest, PractitionerRequest}
 import models.requests.{AllowedAccessRequest, IdentifierRequest}
-import org.scalacheck.Gen
+import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Gen.numChar
 import play.api.mvc.Request
 import uk.gov.hmrc.domain.Nino
@@ -236,6 +236,9 @@ trait ModelGenerators extends BasicGenerators {
     } yield {
       WrappedMemberDetails(nameDob, nino)
     }
+
+  implicit def conditionalYesNoGen[A: Gen]: Gen[ConditionalYesNo[A]] =
+    Gen.either(nonEmptyString, implicitly[Gen[A]]).map(ConditionalYesNo(_))
 }
 
 object ModelGenerators extends ModelGenerators
