@@ -25,6 +25,7 @@ site.whatHappensNext = What happens next
 site.returnToFileUpload = Return to file upload
 site.cell = Cell
 site.error = Error
+site.or = or
 
 date.day = Day
 date.day.lower = day

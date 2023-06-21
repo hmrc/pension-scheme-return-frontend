@@ -28,6 +28,7 @@ import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Gen.numChar
 import play.api.mvc.Request
 import uk.gov.hmrc.domain.Nino
+import utils.WithName
 
 import java.time.{LocalDate, LocalDateTime, ZoneOffset}
 
@@ -239,6 +240,9 @@ trait ModelGenerators extends BasicGenerators {
 
   implicit def conditionalYesNoGen[A: Gen]: Gen[ConditionalYesNo[A]] =
     Gen.either(nonEmptyString, implicitly[Gen[A]]).map(ConditionalYesNo(_))
+
+  implicit val memberOrConnectedPartyGen: Gen[MemberOrConnectedParty] =
+    Gen.oneOf(MemberOrConnectedParty.Member, MemberOrConnectedParty.ConnectedParty, MemberOrConnectedParty.Neither)
 }
 
 object ModelGenerators extends ModelGenerators

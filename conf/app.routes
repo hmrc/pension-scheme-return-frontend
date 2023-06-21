@@ -302,6 +302,11 @@ POST       /:srn/individual-recipient-name                        controllers.no
 GET        /:srn/change-individual-recipient-name                  controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNameController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST       /:srn/change-individual-recipient-name                  controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNameController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
+GET        /:srn/is-individual-recipient-connected-party               controllers.nonsipp.IsMemberOrConnectedPartyController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST       /:srn/is-individual-recipient-connected-party               controllers.nonsipp.IsMemberOrConnectedPartyController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/change-is-individual-recipient-connected-party        controllers.nonsipp.IsMemberOrConnectedPartyController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST       /:srn/change-is-individual-recipient-connected-party        controllers.nonsipp.IsMemberOrConnectedPartyController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
 GET        /:srn/check-your-answers-basic-details                      controllers.nonsipp.BasicDetailsCheckYourAnswersController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 GET        /:srn/submit-check-your-answers-basic-details               controllers.nonsipp.BasicDetailsCheckYourAnswersController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 GET        /:srn/change-check-your-answers-basic-details               controllers.nonsipp.BasicDetailsCheckYourAnswersController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
@@ -309,7 +314,6 @@ GET        /:srn/change-submit-check-your-answers-basic-details        controlle
 
 GET         /:srn/company-recipient-name                          controllers.nonsipp.loansmadeoroutstanding.CompanyRecipientNameController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST        /:srn/company-recipient-name                          controllers.nonsipp.loansmadeoroutstanding.CompanyRecipientNameController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-
 GET         /:srn/change-company-recipient-name                   controllers.nonsipp.loansmadeoroutstanding.CompanyRecipientNameController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST        /:srn/change-company-recipient-name                   controllers.nonsipp.loansmadeoroutstanding.CompanyRecipientNameController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 

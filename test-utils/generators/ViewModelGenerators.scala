@@ -202,9 +202,10 @@ trait ViewModelGenerators extends BasicGenerators {
   implicit val radioListViewModelGen: Gen[RadioListViewModel] =
     for {
       legend <- Gen.option(nonEmptyMessage)
-      items <- Gen.listOf(radioListRowViewModelGen)
+      items <- Gen.listOfN(5, radioListRowViewModelGen)
+      divider <- Gen.oneOf(Nil, List(RadioListRowDivider("divider")))
     } yield {
-      RadioListViewModel(legend, items)
+      RadioListViewModel(legend, items ++ divider)
     }
 
   implicit val dateRangeViewModelGen: Gen[DateRangeViewModel] =

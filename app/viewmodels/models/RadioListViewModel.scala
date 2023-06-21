@@ -24,7 +24,7 @@ import viewmodels.DisplayMessage.{InlineMessage, Message}
 
 case class RadioListViewModel(
   legend: Option[Message],
-  items: List[RadioListRowViewModel]
+  items: List[RadioListRow]
 )
 
 object RadioListViewModel {
@@ -32,7 +32,7 @@ object RadioListViewModel {
   def apply(
     title: Message,
     heading: InlineMessage,
-    items: List[RadioListRowViewModel],
+    items: List[RadioListRow],
     onSubmit: Call
   ): FormPageViewModel[RadioListViewModel] =
     FormPageViewModel(
@@ -43,25 +43,42 @@ object RadioListViewModel {
     )
 }
 
+sealed trait RadioListRow {
+  def radioListRow(implicit messages: Messages): RadioItem
+}
+
 case class RadioListRowViewModel(
   content: Message,
-  value: String,
+  value: Option[String],
+  divider: Option[String],
   hint: Option[Message]
-) {
+) extends RadioListRow {
 
-  def radioListRow(implicit messages: Messages): RadioItem =
+  override def radioListRow(implicit messages: Messages): RadioItem =
     RadioItem(
       content = Text(content.toMessage),
-      value = Some(value),
+      value = value,
       hint = hint.map(h => Hint(content = Text(h.toMessage)))
     )
+}
+
+case class RadioListRowDivider(dividerText: String) extends RadioListRow {
+
+  override def radioListRow(implicit messages: Messages): RadioItem =
+    RadioItem(
+      divider = Some(messages(dividerText))
+    )
+}
+
+object RadioListRowDivider {
+  val Or: RadioListRowDivider = RadioListRowDivider("site.or")
 }
 
 object RadioListRowViewModel {
 
   def apply(content: Message, value: String): RadioListRowViewModel =
-    RadioListRowViewModel(content, value, None)
+    RadioListRowViewModel(content, Some(value), None, None)
 
   def apply(content: Message, value: String, hint: Message): RadioListRowViewModel =
-    RadioListRowViewModel(content, value, Some(hint))
+    RadioListRowViewModel(content, Some(value), None, Some(hint))
 }
