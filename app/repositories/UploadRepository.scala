@@ -17,17 +17,20 @@
 package repositories
 
 import cats.data.NonEmptyList
-import config.FrontendAppConfig
+import config.{Crypto, FrontendAppConfig}
 import models.SchemeId.asSrn
 import models.UploadKey.separator
 import models.UploadStatus.UploadStatus
-import models.{UploadFormatError, _}
+import models._
 import org.mongodb.scala.model.Filters.equal
 import org.mongodb.scala.model.Updates.{combine, set}
 import org.mongodb.scala.model.{FindOneAndUpdateOptions, IndexModel, IndexOptions, Indexes}
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 import repositories.UploadRepository.MongoUpload
+import repositories.UploadRepository.MongoUpload.SensitiveUpload
+import uk.gov.hmrc.crypto.json.JsonEncryption
+import uk.gov.hmrc.crypto.{Crypted, Decrypter, Encrypter, Sensitive}
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.Codecs._
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
@@ -43,12 +46,13 @@ import scala.concurrent.{ExecutionContext, Future}
 class UploadRepository @Inject()(
   mongoComponent: MongoComponent,
   clock: Clock,
-  appConfig: FrontendAppConfig
+  appConfig: FrontendAppConfig,
+  crypto: Crypto
 )(implicit ec: ExecutionContext)
     extends PlayMongoRepository[MongoUpload](
       collectionName = "upload",
       mongoComponent = mongoComponent,
-      domainFormat = UploadRepository.mongoFormat,
+      domainFormat = MongoUpload.format(crypto.getCrypto),
       indexes = Seq(
         IndexModel(Indexes.ascending("id"), IndexOptions().unique(true)),
         IndexModel(Indexes.ascending("reference"), IndexOptions().unique(true)),
@@ -88,20 +92,27 @@ class UploadRepository @Inject()(
       .toFuture()
       .map(_ => ())
 
-  def setUploadResult(key: UploadKey, result: Upload): Future[Unit] =
+  def setUploadResult(key: UploadKey, result: Upload): Future[Unit] = {
+
+    val updatedResult = result
+
     collection
       .findOneAndUpdate(
         filter = equal("id", key.toBson()),
         update = combine(
-          set("result", result.toBson()),
+          set("result", SensitiveUpload(result)),
           set("lastUpdated", Instant.now(clock).toBson())
         )
       )
       .toFuture()
       .map(_ => ())
+  }
 
   def getUploadResult(key: UploadKey): Future[Option[Upload]] =
-    collection.find(equal("id", key.value.toBson())).headOption().map(_.flatMap(_.result))
+    collection
+      .find(equal("id", key.value.toBson()))
+      .headOption()
+      .map(_.flatMap(_.result.map(_.decryptedValue)))
 
   def remove(key: UploadKey): Future[Unit] =
     collection
@@ -132,8 +143,35 @@ object UploadRepository {
     reference: Reference,
     status: UploadStatus,
     lastUpdated: Instant,
-    result: Option[Upload]
+    result: Option[SensitiveUpload] // = SensitiveObject(models.Upload)
   )
+
+  object MongoUpload {
+
+    case class SensitiveUpload(override val decryptedValue: Upload) extends Sensitive[Upload]
+
+    implicit def sensitiveObjectFormat(implicit crypto: Encrypter with Decrypter): Format[SensitiveUpload] =
+      JsonEncryption.sensitiveEncrypterDecrypter(SensitiveUpload.apply)
+    def reads(implicit crypto: Encrypter with Decrypter): Reads[MongoUpload] =
+      (__ \ "id")
+        .read[UploadKey]
+        .and((__ \ "reference").read[Reference])
+        .and((__ \ "status").read[UploadStatus])
+        .and((__ \ "lastUpdated").read(MongoJavatimeFormats.instantFormat))
+        .and((__ \ "result").readNullable[SensitiveUpload])(MongoUpload.apply _)
+
+    def writes(implicit crypto: Encrypter with Decrypter): OWrites[MongoUpload] =
+      (__ \ "id")
+        .write[UploadKey]
+        .and((__ \ "reference").write[Reference])
+        .and((__ \ "status").write[UploadStatus])
+        .and((__ \ "lastUpdated").write(MongoJavatimeFormats.instantFormat))
+        .and((__ \ "result").writeNullable[SensitiveUpload])(
+          unlift(MongoUpload.unapply)
+        )
+
+    implicit def format(implicit crypto: Encrypter with Decrypter): OFormat[MongoUpload] = OFormat(reads, writes)
+  }
 
   implicit val uploadKeyReads: Reads[UploadKey] = Reads.StringReads.flatMap(_.split(separator).toList match {
     case List(userId, asSrn(srn)) => Reads.pure(UploadKey(userId, srn))
@@ -160,6 +198,7 @@ object UploadRepository {
 
   implicit val uploadFormat: OFormat[Upload] = Json.format[Upload]
 
+  /*
   private[repositories] val mongoFormat: OFormat[MongoUpload] =
     (
       (__ \ "id").format[UploadKey] ~
@@ -168,6 +207,7 @@ object UploadRepository {
         (__ \ "lastUpdated").format(MongoJavatimeFormats.instantFormat) ~
         (__ \ "result").formatNullable[Upload]
     )(MongoUpload.apply, unlift(MongoUpload.unapply))
+   */
 
   private def stringFormat[A](to: String => A, from: A => String): Format[A] =
     Format[A](Reads.StringReads.map(to), Writes.StringWrites.contramap(from))
