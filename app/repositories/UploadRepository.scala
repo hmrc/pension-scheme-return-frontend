@@ -22,6 +22,7 @@ import models.SchemeId.asSrn
 import models.UploadKey.separator
 import models.UploadStatus.UploadStatus
 import models._
+import org.bson.conversions.Bson
 import org.mongodb.scala.model.Filters.equal
 import org.mongodb.scala.model.Updates.{combine, set}
 import org.mongodb.scala.model.{FindOneAndUpdateOptions, IndexModel, IndexOptions, Indexes}
@@ -33,7 +34,7 @@ import uk.gov.hmrc.crypto.json.JsonEncryption
 import uk.gov.hmrc.crypto.{Crypted, Decrypter, Encrypter, Sensitive}
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.Codecs._
-import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
+import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 import java.time.{Clock, Instant}
@@ -67,6 +68,7 @@ class UploadRepository @Inject()(
     ) {
 
   implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
+  implicit val cryptoEncDec: Encrypter with Decrypter = crypto.getCrypto
 
   import UploadRepository._
 
@@ -92,21 +94,17 @@ class UploadRepository @Inject()(
       .toFuture()
       .map(_ => ())
 
-  def setUploadResult(key: UploadKey, result: Upload): Future[Unit] = {
-
-    val updatedResult = result
-
+  def setUploadResult(key: UploadKey, result: Upload): Future[Unit] =
     collection
       .findOneAndUpdate(
         filter = equal("id", key.toBson()),
         update = combine(
-          set("result", SensitiveUpload(result)),
+          set("result", SensitiveUpload(result).toBson()),
           set("lastUpdated", Instant.now(clock).toBson())
         )
       )
       .toFuture()
       .map(_ => ())
-  }
 
   def getUploadResult(key: UploadKey): Future[Option[Upload]] =
     collection
@@ -143,7 +141,7 @@ object UploadRepository {
     reference: Reference,
     status: UploadStatus,
     lastUpdated: Instant,
-    result: Option[SensitiveUpload] // = SensitiveObject(models.Upload)
+    result: Option[SensitiveUpload]
   )
 
   object MongoUpload {
