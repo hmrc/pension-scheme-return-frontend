@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.memberdetails
 
-import config.Refined.Max99
+import config.Refined.Max300
 import controllers.actions._
 import controllers.nonsipp.memberdetails.MemberDetailsController._
 import forms.NameDOBFormProvider
@@ -52,12 +52,12 @@ class MemberDetailsController @Inject()(
 
   private val form = MemberDetailsController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max99, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       Ok(view(form.fromUserAnswers(MemberDetailsPage(srn, index)), viewModel(srn, index, mode)))
   }
 
-  def onSubmit(srn: Srn, index: Max99, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()
@@ -96,7 +96,7 @@ object MemberDetailsController {
     )
   )
 
-  def viewModel(srn: Srn, index: Max99, mode: Mode): FormPageViewModel[NameDOBViewModel] = FormPageViewModel(
+  def viewModel(srn: Srn, index: Max300, mode: Mode): FormPageViewModel[NameDOBViewModel] = FormPageViewModel(
     Message("memberDetails.title"),
     Message("memberDetails.heading"),
     NameDOBViewModel(

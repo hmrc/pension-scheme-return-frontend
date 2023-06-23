@@ -647,3 +647,8 @@ individualRecipientNino.no.conditional.error.required = Enter the reason you can
 individualRecipientNino.no.conditional.error.invalid = The reason you cannot provide the recipient’s National Insurance number must only include letters a to z, numbers 0 to 9, and special characters such as hyphens, spaces and apostrophes
 individualRecipientNino.no.conditional.error.length = The reason you cannot provide the recipient’s National Insurance number must be 160 characters or fewer
 individualRecipientNino.error.required = Select yes if you know the recipient’s National Insurance number
+
+fileUploadTooManyRows.title = Your member details file has too many rows
+fileUploadTooManyRows.heading = Your member details file has too many rows
+fileUploadTooManyRows.paragraph1 = We cannot accept the file you uploaded as it contains too many rows. The maximum number of rows it can have is 300.
+fileUploadTooManyRows.paragraph2 = Remove the additional rows and upload it again, or upload a different file.

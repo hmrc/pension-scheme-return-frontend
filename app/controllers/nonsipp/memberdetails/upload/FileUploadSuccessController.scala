@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.memberdetails.upload
 
-import config.Refined.OneTo99
+import config.Refined.OneTo300
 import controllers.actions._
 import controllers.nonsipp.memberdetails.upload.FileUploadSuccessController._
 import eu.timepit.refined.refineV
@@ -86,7 +86,7 @@ class FileUploadSuccessController @Inject()(
     )
 
     val insertions = memberDetails.flatMap { details =>
-      refineV[OneTo99](details.row).toOption.map { index =>
+      refineV[OneTo300](details.row).toOption.map { index =>
         List(
           UserAnswers.set(MemberDetailsPage(srn, index), details.nameDOB),
           UserAnswers.set(DoesMemberHaveNinoPage(srn, index), details.ninoOrNoNinoReason.isRight),

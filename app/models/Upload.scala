@@ -76,6 +76,8 @@ sealed trait UploadError
 
 case object UploadFormatError extends Upload with UploadError
 
+case object UploadMaxRowsError extends Upload with UploadError
+
 case class UploadErrors(errors: NonEmptyList[ValidationError]) extends Upload with UploadError
 
 case class UploadMemberDetails(row: Int, nameDOB: NameDOB, ninoOrNoNinoReason: Either[String, Nino])

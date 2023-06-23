@@ -17,7 +17,7 @@
 package controllers.nonsipp.memberdetails.upload
 
 import cats.implicits.catsSyntaxOptionId
-import config.Refined.OneTo99
+import config.Refined.OneTo300
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.memberdetails.upload.FileUploadSuccessController._
 import eu.timepit.refined.{refineMV, refineV}
@@ -62,7 +62,7 @@ class FileUploadSuccessControllerSpec extends ControllerBaseSpec {
   def addMemberDetails(userAnswers: UserAnswers, srn: Srn, total: Int): UserAnswers = {
     def addMemberDetails(userAnswers: UserAnswers, index: Int): Try[UserAnswers] = {
       val memberDetails = wrappedMemberDetailsGen.sample.value
-      val refinedIndex = refineV[OneTo99](index).toOption.value
+      val refinedIndex = refineV[OneTo300](index).toOption.value
 
       UserAnswers.compose(
         UserAnswers.set(MemberDetailsPage(srn, refinedIndex), memberDetails.nameDob),

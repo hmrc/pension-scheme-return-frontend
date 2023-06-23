@@ -17,7 +17,7 @@
 package generators
 
 import cats.data.NonEmptyList
-import config.Refined.{Max99, OneTo99}
+import config.Refined.{Max300, OneTo300}
 import eu.timepit.refined._
 import models.Pagination
 import org.scalacheck.Arbitrary.arbitrary
@@ -234,7 +234,7 @@ trait BasicGenerators extends EitherValues {
     } yield PaginatedViewModel(label, Pagination(currentPage, pageSize, totalSize, _ => call))
   }
 
-  implicit val max99: Gen[Max99] = chooseNum(1, 99).map(refineV[OneTo99](_).value)
+  implicit val max99: Gen[Max300] = chooseNum(1, 99).map(refineV[OneTo300](_).value)
 
   val jsStringGen: Gen[JsString] =
     Gen.alphaStr.map(JsString)

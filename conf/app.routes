@@ -68,13 +68,13 @@ POST        /:srn/change-how-much-cash        controllers.nonsipp.HowMuchCashCon
 GET         /:srn/pension-scheme-members                controllers.nonsipp.memberdetails.PensionSchemeMembersController.onPageLoad(srn: Srn)
 POST        /:srn/pension-scheme-members                controllers.nonsipp.memberdetails.PensionSchemeMembersController.onSubmit(srn: Srn)
 
-GET         /:srn/member-details               controllers.nonsipp.memberdetails.MemberDetailsController.onPageLoad(srn: Srn, index: Max99 = 1, mode: Mode = NormalMode)
-GET         /:srn/member-details/:index        controllers.nonsipp.memberdetails.MemberDetailsController.onPageLoad(srn: Srn, index: Max99, mode: Mode = NormalMode)
-POST        /:srn/member-details/:index        controllers.nonsipp.memberdetails.MemberDetailsController.onSubmit(srn: Srn, index: Max99, mode: Mode = NormalMode)
+GET         /:srn/member-details               controllers.nonsipp.memberdetails.MemberDetailsController.onPageLoad(srn: Srn, index: Max300 = 1, mode: Mode = NormalMode)
+GET         /:srn/member-details/:index        controllers.nonsipp.memberdetails.MemberDetailsController.onPageLoad(srn: Srn, index: Max300, mode: Mode = NormalMode)
+POST        /:srn/member-details/:index        controllers.nonsipp.memberdetails.MemberDetailsController.onSubmit(srn: Srn, index: Max300, mode: Mode = NormalMode)
 
-GET         /:srn/member-details/change               controllers.nonsipp.memberdetails.MemberDetailsController.onPageLoad(srn: Srn, index: Max99 = 1, mode: Mode = CheckMode)
-GET         /:srn/member-details/:index/change        controllers.nonsipp.memberdetails.MemberDetailsController.onPageLoad(srn: Srn, index: Max99, mode: Mode = CheckMode)
-POST        /:srn/member-details/:index/change        controllers.nonsipp.memberdetails.MemberDetailsController.onSubmit(srn: Srn, index: Max99, mode: Mode = CheckMode)
+GET         /:srn/member-details/change               controllers.nonsipp.memberdetails.MemberDetailsController.onPageLoad(srn: Srn, index: Max300 = 1, mode: Mode = CheckMode)
+GET         /:srn/member-details/:index/change        controllers.nonsipp.memberdetails.MemberDetailsController.onPageLoad(srn: Srn, index: Max300, mode: Mode = CheckMode)
+POST        /:srn/member-details/:index/change        controllers.nonsipp.memberdetails.MemberDetailsController.onSubmit(srn: Srn, index: Max300, mode: Mode = CheckMode)
 
 GET         /:srn/psa-declaration                controllers.nonsipp.declaration.PsaDeclarationController.onPageLoad(srn: Srn)
 GET         /:srn/submit-psa-declaration         controllers.nonsipp.declaration.PsaDeclarationController.onSubmit(srn: Srn)
@@ -82,39 +82,39 @@ GET         /:srn/submit-psa-declaration         controllers.nonsipp.declaration
 GET         /:srn/psp-declaration                controllers.nonsipp.declaration.PspDeclarationController.onPageLoad(srn: Srn)
 GET         /:srn/submit-psp-declaration         controllers.nonsipp.declaration.PspDeclarationController.onSubmit(srn: Srn)
 
-GET         /:srn/member-ni-number                      controllers.nonsipp.memberdetails.MemberDetailsNinoController.onPageLoad(srn: Srn, index: Max99 = 1, mode: Mode = NormalMode)
-GET         /:srn/member-ni-number/:index               controllers.nonsipp.memberdetails.MemberDetailsNinoController.onPageLoad(srn: Srn, index: Max99, mode: Mode = NormalMode)
-POST        /:srn/member-ni-number/:index               controllers.nonsipp.memberdetails.MemberDetailsNinoController.onSubmit(srn: Srn, index: Max99, mode: Mode = NormalMode)
+GET         /:srn/member-ni-number                      controllers.nonsipp.memberdetails.MemberDetailsNinoController.onPageLoad(srn: Srn, index: Max300 = 1, mode: Mode = NormalMode)
+GET         /:srn/member-ni-number/:index               controllers.nonsipp.memberdetails.MemberDetailsNinoController.onPageLoad(srn: Srn, index: Max300, mode: Mode = NormalMode)
+POST        /:srn/member-ni-number/:index               controllers.nonsipp.memberdetails.MemberDetailsNinoController.onSubmit(srn: Srn, index: Max300, mode: Mode = NormalMode)
 
-GET         /:srn/change-member-ni-number/:index        controllers.nonsipp.memberdetails.MemberDetailsNinoController.onPageLoad(srn: Srn, index: Max99, mode: Mode = CheckMode)
-POST        /:srn/change-member-ni-number/:index        controllers.nonsipp.memberdetails.MemberDetailsNinoController.onSubmit(srn: Srn, index: Max99, mode: Mode = CheckMode)
+GET         /:srn/change-member-ni-number/:index        controllers.nonsipp.memberdetails.MemberDetailsNinoController.onPageLoad(srn: Srn, index: Max300, mode: Mode = CheckMode)
+POST        /:srn/change-member-ni-number/:index        controllers.nonsipp.memberdetails.MemberDetailsNinoController.onSubmit(srn: Srn, index: Max300, mode: Mode = CheckMode)
 
-GET         /:srn/national-insurance-number                      controllers.nonsipp.memberdetails.DoesSchemeMemberHaveNINOController.onPageLoad(srn: Srn, index: Max99 = 1, mode: Mode = NormalMode)
-GET         /:srn/national-insurance-number/:index               controllers.nonsipp.memberdetails.DoesSchemeMemberHaveNINOController.onPageLoad(srn: Srn, index: Max99, mode: Mode = NormalMode)
-POST        /:srn/national-insurance-number/:index               controllers.nonsipp.memberdetails.DoesSchemeMemberHaveNINOController.onSubmit(srn: Srn, index: Max99, mode: Mode = NormalMode)
+GET         /:srn/national-insurance-number                      controllers.nonsipp.memberdetails.DoesSchemeMemberHaveNINOController.onPageLoad(srn: Srn, index: Max300 = 1, mode: Mode = NormalMode)
+GET         /:srn/national-insurance-number/:index               controllers.nonsipp.memberdetails.DoesSchemeMemberHaveNINOController.onPageLoad(srn: Srn, index: Max300, mode: Mode = NormalMode)
+POST        /:srn/national-insurance-number/:index               controllers.nonsipp.memberdetails.DoesSchemeMemberHaveNINOController.onSubmit(srn: Srn, index: Max300, mode: Mode = NormalMode)
 
-GET         /:srn/change-national-insurance-number/:index        controllers.nonsipp.memberdetails.DoesSchemeMemberHaveNINOController.onPageLoad(srn: Srn, index: Max99, mode: Mode = CheckMode)
-POST        /:srn/change-national-insurance-number/:index        controllers.nonsipp.memberdetails.DoesSchemeMemberHaveNINOController.onSubmit(srn: Srn, index: Max99, mode: Mode = CheckMode)
+GET         /:srn/change-national-insurance-number/:index        controllers.nonsipp.memberdetails.DoesSchemeMemberHaveNINOController.onPageLoad(srn: Srn, index: Max300, mode: Mode = CheckMode)
+POST        /:srn/change-national-insurance-number/:index        controllers.nonsipp.memberdetails.DoesSchemeMemberHaveNINOController.onSubmit(srn: Srn, index: Max300, mode: Mode = CheckMode)
 
-GET         /:srn/check-member-details                controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onPageLoad(srn: Srn, index: Max99 = 1, checkOrChange: CheckOrChange = Check, mode: Mode = NormalMode)
-GET         /:srn/check-member-details/:index         controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onPageLoad(srn: Srn, index: Max99, checkOrChange: CheckOrChange = Check, mode: Mode = NormalMode)
-POST        /:srn/check-member-details/:index         controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onSubmit(srn: Srn, index: Max99, checkOrChange: CheckOrChange = Check, mode: Mode = NormalMode)
+GET         /:srn/check-member-details                controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onPageLoad(srn: Srn, index: Max300 = 1, checkOrChange: CheckOrChange = Check, mode: Mode = NormalMode)
+GET         /:srn/check-member-details/:index         controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onPageLoad(srn: Srn, index: Max300, checkOrChange: CheckOrChange = Check, mode: Mode = NormalMode)
+POST        /:srn/check-member-details/:index         controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onSubmit(srn: Srn, index: Max300, checkOrChange: CheckOrChange = Check, mode: Mode = NormalMode)
 
-GET         /:srn/change-member-details               controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onPageLoad(srn: Srn, index: Max99 = 1, checkOrChange: CheckOrChange = Change, mode: Mode = NormalMode)
-GET         /:srn/change-member-details/:index        controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onPageLoad(srn: Srn, index: Max99, checkOrChange: CheckOrChange = Change, mode: Mode = NormalMode)
-POST        /:srn/change-member-details/:index        controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onSubmit(srn: Srn, index: Max99, checkOrChange: CheckOrChange = Change, mode: Mode = NormalMode)
+GET         /:srn/change-member-details               controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onPageLoad(srn: Srn, index: Max300 = 1, checkOrChange: CheckOrChange = Change, mode: Mode = NormalMode)
+GET         /:srn/change-member-details/:index        controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onPageLoad(srn: Srn, index: Max300, checkOrChange: CheckOrChange = Change, mode: Mode = NormalMode)
+POST        /:srn/change-member-details/:index        controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onSubmit(srn: Srn, index: Max300, checkOrChange: CheckOrChange = Change, mode: Mode = NormalMode)
 
 GET         /:srn/how-many-members               controllers.nonsipp.HowManyMembersController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST        /:srn/how-many-members               controllers.nonsipp.HowManyMembersController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 GET         /:srn/change-how-many-members        controllers.nonsipp.HowManyMembersController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST        /:srn/change-how-many-members        controllers.nonsipp.HowManyMembersController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
-GET         /:srn/no-ni-number                          controllers.nonsipp.memberdetails.NoNINOController.onPageLoad(srn: Srn, index: Max99 = 1, mode: Mode = NormalMode)
-GET         /:srn/no-ni-number/:index                   controllers.nonsipp.memberdetails.NoNINOController.onPageLoad(srn: Srn, index: Max99, mode: Mode = NormalMode)
-POST        /:srn/no-ni-number/:index                   controllers.nonsipp.memberdetails.NoNINOController.onSubmit(srn: Srn, index: Max99, mode: Mode = NormalMode)
+GET         /:srn/no-ni-number                          controllers.nonsipp.memberdetails.NoNINOController.onPageLoad(srn: Srn, index: Max300 = 1, mode: Mode = NormalMode)
+GET         /:srn/no-ni-number/:index                   controllers.nonsipp.memberdetails.NoNINOController.onPageLoad(srn: Srn, index: Max300, mode: Mode = NormalMode)
+POST        /:srn/no-ni-number/:index                   controllers.nonsipp.memberdetails.NoNINOController.onSubmit(srn: Srn, index: Max300, mode: Mode = NormalMode)
 
-GET         /:srn/change-no-ni-number/:index            controllers.nonsipp.memberdetails.NoNINOController.onPageLoad(srn: Srn, index: Max99, mode: Mode = CheckMode)
-POST        /:srn/change-no-ni-number/:index            controllers.nonsipp.memberdetails.NoNINOController.onSubmit(srn: Srn, index: Max99, mode: Mode = CheckMode)
+GET         /:srn/change-no-ni-number/:index            controllers.nonsipp.memberdetails.NoNINOController.onPageLoad(srn: Srn, index: Max300, mode: Mode = CheckMode)
+POST        /:srn/change-no-ni-number/:index            controllers.nonsipp.memberdetails.NoNINOController.onSubmit(srn: Srn, index: Max300, mode: Mode = CheckMode)
 
 GET         /:srn/value-of-assets-and-cash               controllers.nonsipp.ValueOfAssetsController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST        /:srn/value-of-assets-and-cash               controllers.nonsipp.ValueOfAssetsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
@@ -130,11 +130,11 @@ GET        /:srn/members-uploaded                    controllers.nonsipp.memberd
 GET        /:srn/members-uploaded/:page              controllers.nonsipp.memberdetails.SchemeMembersListController.onPageLoad(srn: Srn, page: Int, manualOrUpload: ManualOrUpload = Upload, mode: Mode = NormalMode)
 POST       /:srn/members-uploaded/:page              controllers.nonsipp.memberdetails.SchemeMembersListController.onSubmit(srn: Srn, page: Int, manualOrUpload: ManualOrUpload = Upload, mode: Mode = NormalMode)
 
-GET        /:srn/remove-member-details/:index               controllers.nonsipp.memberdetails.RemoveMemberDetailsController.onPageLoad(srn: Srn, index: Max99, mode: Mode = NormalMode)
-POST       /:srn/remove-member-details/:index               controllers.nonsipp.memberdetails.RemoveMemberDetailsController.onSubmit(srn: Srn, index: Max99, mode: Mode = NormalMode)
+GET        /:srn/remove-member-details/:index               controllers.nonsipp.memberdetails.RemoveMemberDetailsController.onPageLoad(srn: Srn, index: Max300, mode: Mode = NormalMode)
+POST       /:srn/remove-member-details/:index               controllers.nonsipp.memberdetails.RemoveMemberDetailsController.onSubmit(srn: Srn, index: Max300, mode: Mode = NormalMode)
 
-GET        /:srn/change-remove-member-details/:index        controllers.nonsipp.memberdetails.RemoveMemberDetailsController.onPageLoad(srn: Srn, index: Max99, mode: Mode = CheckMode)
-POST       /:srn/change-remove-member-details/:index        controllers.nonsipp.memberdetails.RemoveMemberDetailsController.onSubmit(srn: Srn, index: Max99, mode: Mode = CheckMode)
+GET        /:srn/change-remove-member-details/:index        controllers.nonsipp.memberdetails.RemoveMemberDetailsController.onPageLoad(srn: Srn, index: Max300, mode: Mode = CheckMode)
+POST       /:srn/change-remove-member-details/:index        controllers.nonsipp.memberdetails.RemoveMemberDetailsController.onSubmit(srn: Srn, index: Max300, mode: Mode = CheckMode)
 
 GET        /:srn/upload-member-details-file                  controllers.nonsipp.memberdetails.UploadMemberDetailsController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 GET        /:srn/submit-upload-member-details-file           controllers.nonsipp.memberdetails.UploadMemberDetailsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
@@ -321,3 +321,9 @@ GET        /:srn/individual-recipient-ni-number                        controlle
 POST       /:srn/individual-recipient-ni-number                        controllers.IndividualRecipientNinoController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 GET        /:srn/change-individual-recipient-ni-number                 controllers.IndividualRecipientNinoController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST       /:srn/change-individual-recipient-ni-number                 controllers.IndividualRecipientNinoController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+
+GET        /:srn/file-upload-too-many-rows                      controllers.nonsipp.memberdetails.upload.FileUploadTooManyRowsController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/submit-file-upload-too-many-rows               controllers.nonsipp.memberdetails.upload.FileUploadTooManyRowsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/change-file-upload-too-many-rows               controllers.nonsipp.memberdetails.upload.FileUploadTooManyRowsController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+GET        /:srn/change-submit-file-upload-too-many-rows        controllers.nonsipp.memberdetails.upload.FileUploadTooManyRowsController.onSubmit(srn: Srn, mode: Mode = CheckMode)
