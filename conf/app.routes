@@ -145,10 +145,10 @@ POST       /:srn/did-scheme-have-bank-account               controllers.nonsipp.
 GET        /:srn/change-did-scheme-have-bank-account        controllers.nonsipp.bankaccount.ActiveBankAccountController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST       /:srn/change-did-scheme-have-bank-account        controllers.nonsipp.bankaccount.ActiveBankAccountController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
-GET        /:srn/personal-contributions               controllers.nonsipp.personalcontributions.PersonalContributionsController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST       /:srn/personal-contributions               controllers.nonsipp.personalcontributions.PersonalContributionsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-GET        /:srn/change-personal-contributions        controllers.nonsipp.personalcontributions.PersonalContributionsController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST       /:srn/change-personal-contributions        controllers.nonsipp.personalcontributions.PersonalContributionsController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+GET        /:srn/member-contributions               controllers.nonsipp.membercontributions.MemberContributionsController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST       /:srn/member-contributions               controllers.nonsipp.membercontributions.MemberContributionsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/change-member-contributions        controllers.nonsipp.membercontributions.MemberContributionsController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST       /:srn/change-member-contributions        controllers.nonsipp.membercontributions.MemberContributionsController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
 GET        /:srn/employer-contributions               controllers.nonsipp.employercontributions.EmployerContributionsController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST       /:srn/employer-contributions               controllers.nonsipp.employercontributions.EmployerContributionsController.onSubmit(srn: Srn, mode: Mode = NormalMode)

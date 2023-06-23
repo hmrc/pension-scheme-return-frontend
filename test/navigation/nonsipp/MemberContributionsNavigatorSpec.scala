@@ -18,22 +18,22 @@ package navigation.nonsipp
 
 import controllers.nonsipp.receivetransfer
 import navigation.{Navigator, NavigatorBehaviours}
-import pages.nonsipp.personalcontributions.PersonalContributionsPage
+import pages.nonsipp.membercontributions.MemberContributionsPage
 import utils.BaseSpec
 
-class PersonalContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
+class MemberContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
   val navigator: Navigator = new NonSippNavigator
 
-  "PersonalContributionsNavigator" - {
+  "MemberContributionsNavigator" - {
 
     act.like(
       normalmode
         .navigateTo(
-          PersonalContributionsPage,
+          MemberContributionsPage,
           receivetransfer.routes.DidSchemeReceiveTransferController.onPageLoad
         )
-        .withName("go from personal contributions page to receive transfer page")
+        .withName("go from member contributions page to receive transfer page")
     )
   }
 }

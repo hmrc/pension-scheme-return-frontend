@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.personalcontributions
+package controllers.nonsipp.membercontributions
 
 import controllers.actions._
-import controllers.nonsipp.personalcontributions.PersonalContributionsController._
+import controllers.nonsipp.membercontributions.MemberContributionsController._
 import forms.YesNoPageFormProvider
 import models.Mode
 import models.SchemeId.Srn
 import navigation.Navigator
-import pages.nonsipp.personalcontributions.PersonalContributionsPage
+import pages.nonsipp.membercontributions.MemberContributionsPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -36,7 +36,7 @@ import views.html.YesNoPageView
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
-class PersonalContributionsController @Inject()(
+class MemberContributionsController @Inject()(
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -48,10 +48,10 @@ class PersonalContributionsController @Inject()(
     extends FrontendBaseController
     with I18nSupport {
 
-  private val form = PersonalContributionsController.form(formProvider)
+  private val form = MemberContributionsController.form(formProvider)
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    val preparedForm = request.userAnswers.fillForm(PersonalContributionsPage(srn), form)
+    val preparedForm = request.userAnswers.fillForm(MemberContributionsPage(srn), form)
     Ok(view(preparedForm, viewModel(srn, mode)))
   }
 
@@ -62,25 +62,25 @@ class PersonalContributionsController @Inject()(
         formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, mode)))),
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(PersonalContributionsPage(srn), value))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(MemberContributionsPage(srn), value))
             _ <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage(PersonalContributionsPage(srn), mode, updatedAnswers))
+          } yield Redirect(navigator.nextPage(MemberContributionsPage(srn), mode, updatedAnswers))
       )
   }
 }
 
-object PersonalContributionsController {
+object MemberContributionsController {
   def form(formProvider: YesNoPageFormProvider): Form[Boolean] = formProvider(
-    "personalContributions.error.required"
+    "memberContributions.error.required"
   )
 
   def viewModel(srn: Srn, mode: Mode): FormPageViewModel[YesNoPageViewModel] =
     YesNoPageViewModel(
-      "personalContributions.title",
-      "personalContributions.heading",
-      routes.PersonalContributionsController.onSubmit(srn, mode)
+      "memberContributions.title",
+      "memberContributions.heading",
+      routes.MemberContributionsController.onSubmit(srn, mode)
     ).withDescription(
-      ParagraphMessage("personalContributions.paragraph") ++
-        ListMessage(ListType.Bullet, "personalContributions.listItem1", "personalContributions.listItem2")
+      ParagraphMessage("memberContributions.paragraph") ++
+        ListMessage(ListType.Bullet, "memberContributions.listItem1", "memberContributions.listItem2")
     )
 }
