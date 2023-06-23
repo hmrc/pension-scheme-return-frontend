@@ -2,9 +2,9 @@ package repositories
 
 import config.{FakeCrypto, FrontendAppConfig}
 import models._
+import org.mongodb.scala.bson.BsonDocument
 import org.mongodb.scala.model.Filters
 import repositories.UploadRepository.MongoUpload
-import repositories.UploadRepository.MongoUpload.SensitiveUpload
 
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -100,6 +100,22 @@ class UploadRepositorySpec extends BaseRepositorySpec[MongoUpload] {
       removeResult mustBe()
       findAfterRemoveResult mustBe None
     }
+  }
+
+  "successfully encrypt result" in {
+    insertInitialUploadDetails()
+
+    repository.setUploadResult(uploadKey, UploadFormatError).futureValue
+    val rawData =
+      repository
+        .collection
+        .find[BsonDocument](Filters.equal("id", uploadKey.value))
+        .toFuture()
+        .futureValue
+        .headOption
+
+    assert(rawData.nonEmpty)
+    rawData.map(_.get("result").asString().getValue must fullyMatch.regex("^[A-Za-z0-9+/=]+$"))
   }
 
   private def insertInitialUploadDetails(): Unit = {
