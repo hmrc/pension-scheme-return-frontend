@@ -1,9 +1,10 @@
 package repositories
 
-import config.FrontendAppConfig
+import config.{FakeCrypto, FrontendAppConfig}
 import models._
 import org.mongodb.scala.model.Filters
 import repositories.UploadRepository.MongoUpload
+import repositories.UploadRepository.MongoUpload.SensitiveUpload
 
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -21,7 +22,8 @@ class UploadRepositorySpec extends BaseRepositorySpec[MongoUpload] {
   protected override val repository = new UploadRepository(
     mongoComponent,
     stubClock,
-    mockAppConfig
+    mockAppConfig,
+    crypto = FakeCrypto
   )
 
   ".insert" - {
@@ -71,7 +73,8 @@ class UploadRepositorySpec extends BaseRepositorySpec[MongoUpload] {
       val findAfterUpdateResult = find(Filters.equal("id", uploadKey.value)).futureValue.headOption.value
 
       updateResult mustBe()
-      findAfterUpdateResult mustBe initialMongoUpload.copy(lastUpdated = instant, result = Some(UploadFormatError))
+      findAfterUpdateResult.lastUpdated mustBe instant
+      findAfterUpdateResult.result.value.decryptedValue mustBe UploadFormatError
     }
   }
 
