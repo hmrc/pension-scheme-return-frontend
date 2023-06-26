@@ -29,7 +29,7 @@ import org.mongodb.scala.model.{FindOneAndUpdateOptions, IndexModel, IndexOption
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 import repositories.UploadRepository.MongoUpload
-import repositories.UploadRepository.MongoUpload.SensitiveUpload
+import repositories.UploadRepository.MongoUpload.{SensitiveUpload, SensitiveUploadStatus}
 import uk.gov.hmrc.crypto.json.JsonEncryption
 import uk.gov.hmrc.crypto.{Crypted, Decrypter, Encrypter, Sensitive}
 import uk.gov.hmrc.mongo.MongoComponent
@@ -86,7 +86,7 @@ class UploadRepository @Inject()(
       .findOneAndUpdate(
         filter = equal("reference", reference.toBson()),
         update = combine(
-          set("status", newStatus.toBson()),
+          set("status", SensitiveUploadStatus(newStatus).toBson()),
           set("lastUpdated", Instant.now(clock).toBson())
         ),
         options = FindOneAndUpdateOptions().upsert(false)
@@ -121,7 +121,7 @@ class UploadRepository @Inject()(
   private def toMongoUpload(details: UploadDetails): MongoUpload = MongoUpload(
     details.key,
     details.reference,
-    details.status,
+    SensitiveUploadStatus(details.status),
     details.lastUpdated,
     None
   )
@@ -129,7 +129,7 @@ class UploadRepository @Inject()(
   private def toUploadDetails(mongoUpload: MongoUpload): UploadDetails = UploadDetails(
     mongoUpload.key,
     mongoUpload.reference,
-    mongoUpload.status,
+    mongoUpload.status.decryptedValue,
     mongoUpload.lastUpdated
   )
 }
@@ -139,7 +139,7 @@ object UploadRepository {
   case class MongoUpload(
     key: UploadKey,
     reference: Reference,
-    status: UploadStatus,
+    status: SensitiveUploadStatus,
     lastUpdated: Instant,
     result: Option[SensitiveUpload]
   )
@@ -148,13 +148,19 @@ object UploadRepository {
 
     case class SensitiveUpload(override val decryptedValue: Upload) extends Sensitive[Upload]
 
-    implicit def sensitiveObjectFormat(implicit crypto: Encrypter with Decrypter): Format[SensitiveUpload] =
+    implicit def sensitiveUploadFormat(implicit crypto: Encrypter with Decrypter): Format[SensitiveUpload] =
       JsonEncryption.sensitiveEncrypterDecrypter(SensitiveUpload.apply)
+
+    case class SensitiveUploadStatus(override val decryptedValue: UploadStatus) extends Sensitive[UploadStatus]
+
+    implicit def sensitiveUploadStatusFormat(implicit crypto: Encrypter with Decrypter): Format[SensitiveUploadStatus] =
+      JsonEncryption.sensitiveEncrypterDecrypter(SensitiveUploadStatus.apply)
+
     def reads(implicit crypto: Encrypter with Decrypter): Reads[MongoUpload] =
       (__ \ "id")
         .read[UploadKey]
         .and((__ \ "reference").read[Reference])
-        .and((__ \ "status").read[UploadStatus])
+        .and((__ \ "status").read[SensitiveUploadStatus])
         .and((__ \ "lastUpdated").read(MongoJavatimeFormats.instantFormat))
         .and((__ \ "result").readNullable[SensitiveUpload])(MongoUpload.apply _)
 
@@ -162,7 +168,7 @@ object UploadRepository {
       (__ \ "id")
         .write[UploadKey]
         .and((__ \ "reference").write[Reference])
-        .and((__ \ "status").write[UploadStatus])
+        .and((__ \ "status").write[SensitiveUploadStatus])
         .and((__ \ "lastUpdated").write(MongoJavatimeFormats.instantFormat))
         .and((__ \ "result").writeNullable[SensitiveUpload])(
           unlift(MongoUpload.unapply)
@@ -195,17 +201,6 @@ object UploadRepository {
   implicit val uploadFormatErrorFormat: OFormat[UploadFormatError.type] = Json.format[UploadFormatError.type]
 
   implicit val uploadFormat: OFormat[Upload] = Json.format[Upload]
-
-  /*
-  private[repositories] val mongoFormat: OFormat[MongoUpload] =
-    (
-      (__ \ "id").format[UploadKey] ~
-        (__ \ "reference").format[Reference] ~
-        (__ \ "status").format[UploadStatus] ~
-        (__ \ "lastUpdated").format(MongoJavatimeFormats.instantFormat) ~
-        (__ \ "result").formatNullable[Upload]
-    )(MongoUpload.apply, unlift(MongoUpload.unapply))
-   */
 
   private def stringFormat[A](to: String => A, from: A => String): Format[A] =
     Format[A](Reads.StringReads.map(to), Writes.StringWrites.contramap(from))
