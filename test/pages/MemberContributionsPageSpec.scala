@@ -14,15 +14,19 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.personalcontributions
+package pages
 
-import models.SchemeId.Srn
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import pages.behaviours.PageBehaviours
+import pages.nonsipp.membercontributions.MemberContributionsPage
 
-case class PersonalContributionsPage(srn: Srn) extends QuestionPage[Boolean] {
+class MemberContributionsPageSpec extends PageBehaviours {
 
-  override def path: JsPath = JsPath \ toString
+  "MemberContributionsPage" - {
 
-  override def toString: String = "personalContributions"
+    beRetrievable[Boolean](MemberContributionsPage(srnGen.sample.value))
+
+    beSettable[Boolean](MemberContributionsPage(srnGen.sample.value))
+
+    beRemovable[Boolean](MemberContributionsPage(srnGen.sample.value))
+  }
 }

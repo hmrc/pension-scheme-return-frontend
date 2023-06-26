@@ -20,14 +20,14 @@ import controllers.nonsipp.receivetransfer
 import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.personalcontributions.PersonalContributionsPage
+import pages.nonsipp.membercontributions.MemberContributionsPage
 import play.api.mvc.Call
 
-object PersonalContributionsNavigator extends JourneyNavigator {
+object MemberContributionsNavigator extends JourneyNavigator {
 
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
 
-    case page @ PersonalContributionsPage(srn) =>
+    case page @ MemberContributionsPage(srn) =>
       if (userAnswers.get(page).contains(true)) {
         controllers.routes.UnauthorisedController.onPageLoad()
       } else {
@@ -36,7 +36,7 @@ object PersonalContributionsNavigator extends JourneyNavigator {
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
-    case page @ PersonalContributionsPage(srn) =>
+    case page @ MemberContributionsPage(srn) =>
       if (userAnswers.get(page).contains(true)) {
         controllers.routes.UnauthorisedController.onPageLoad()
       } else {

@@ -320,12 +320,12 @@ activeAccountDetails.title = Did the scheme have at least 1 active bank account 
 activeAccountDetails.heading = Did {0} have at least 1 active bank account during the period of this return?
 activeAccountDetails.error.required = Select yes if the scheme had at least 1 active bank account during the period of this return
 
-personalContributions.title = Were personal contributions made by or for any member during the period of this return?
-personalContributions.heading = Were personal contributions made by or for any member during the period of this return?
-personalContributions.paragraph = This includes:
-personalContributions.listItem1 = contributions made by a member to their own pension
-personalContributions.listItem2 = contributions made on behalf of a member by another person, for example a relative
-personalContributions.error.required = Select yes if personal contributions were made by or for any member during the period of this return
+memberContributions.title = Were member contributions made by or for any member during the period of this return?
+memberContributions.heading = Were member contributions made by or for any member during the period of this return?
+memberContributions.paragraph = This includes:
+memberContributions.listItem1 = regular contributions and any additional contributions made by a member to their own pension
+memberContributions.listItem2 = contributions made on behalf of a member by another person, for example a relative
+memberContributions.error.required = Select yes if member contributions were made by or for any member during the period of this return
 
 employerContributions.title = Were employer contributions made for any member during the period of this return?
 employerContributions.heading = Were employer contributions made for any member during the period of this return?

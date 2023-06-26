@@ -17,7 +17,7 @@
 package navigation.nonsipp
 
 import controllers.routes
-import controllers.nonsipp.personalcontributions
+import controllers.nonsipp.membercontributions
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.unallocatedemployercontributions.UnallocatedEmployerContributionsPage
@@ -44,9 +44,9 @@ class UnallocatedEmployerContributionsControllerNavigatorSpec extends BaseSpec w
         .navigateToWithData(
           UnallocatedEmployerContributionsPage,
           Gen.const(false),
-          personalcontributions.routes.PersonalContributionsController.onPageLoad
+          membercontributions.routes.MemberContributionsController.onPageLoad
         )
-        .withName("go from unallocated employer contributions page to personal contributions when no selected")
+        .withName("go from unallocated employer contributions page to member contributions when no selected")
     )
 
   }
