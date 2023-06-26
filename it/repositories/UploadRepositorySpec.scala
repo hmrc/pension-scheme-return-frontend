@@ -6,7 +6,6 @@ import org.mongodb.scala.bson.BsonDocument
 import org.mongodb.scala.model.Filters
 import repositories.UploadRepository.MongoUpload
 import repositories.UploadRepository.MongoUpload.SensitiveUploadStatus
-import uk.gov.hmrc.crypto.Sensitive
 
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -20,6 +19,7 @@ class UploadRepositorySpec extends BaseRepositorySpec[MongoUpload] {
   private val oldInstant = Instant.now.truncatedTo(ChronoUnit.MILLIS).minusMillis(1000)
   private val initialUploadDetails = UploadDetails(uploadKey, reference, UploadStatus.InProgress, oldInstant)
   private val initialMongoUpload = MongoUpload(uploadKey, reference, SensitiveUploadStatus(UploadStatus.InProgress), oldInstant, None)
+  private val encryptedRegex = "^[A-Za-z0-9+/=]+$"
 
   protected override val repository = new UploadRepository(
     mongoComponent,
@@ -66,7 +66,7 @@ class UploadRepositorySpec extends BaseRepositorySpec[MongoUpload] {
       findAfterUpdateResult mustBe initialMongoUpload.copy(status = SensitiveUploadStatus(uploadSuccessful), lastUpdated = instant)
     }
 
-    "successfully encrypt result" in {
+    "successfully encrypt status" in {
       insertInitialUploadDetails()
 
       val uploadSuccessful = UploadStatus.Success("test-name", "text/csv", "/test-url", None)
@@ -81,7 +81,7 @@ class UploadRepositorySpec extends BaseRepositorySpec[MongoUpload] {
           .headOption
 
       assert(rawData.nonEmpty)
-      rawData.map(_.get("status").asString().getValue must fullyMatch.regex("^[A-Za-z0-9+/=]+$"))
+      rawData.map(_.get("status").asString().getValue must fullyMatch.regex(encryptedRegex))
     }
 
   }
@@ -136,7 +136,7 @@ class UploadRepositorySpec extends BaseRepositorySpec[MongoUpload] {
         .headOption
 
     assert(rawData.nonEmpty)
-    rawData.map(_.get("result").asString().getValue must fullyMatch.regex("^[A-Za-z0-9+/=]+$"))
+    rawData.map(_.get("result").asString().getValue must fullyMatch.regex(encryptedRegex))
   }
 
   private def insertInitialUploadDetails(): Unit = {
