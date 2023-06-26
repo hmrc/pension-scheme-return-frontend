@@ -214,6 +214,22 @@ trait ModelGenerators extends BasicGenerators {
     Nino(s"$prefix$numbers$suffix")
   }
 
+  val crnPrefix: Gen[String] = {
+    (for {
+      fst <- Gen.oneOf('A' to 'Z')
+      snd <- Gen.oneOf('A' to 'Z')
+    } yield {
+      s"$fst$snd"
+    }).retryUntil(s => Crn.isValid(s"${s}000000"))
+  }
+
+  implicit val crnGen: Gen[Crn] = for {
+    prefix <- crnPrefix
+    numbers <- Gen.listOfN(6, Gen.numChar).map(_.mkString)
+  } yield {
+    Crn(s"$prefix$numbers")
+  }
+
   implicit val nameDobGen: Gen[NameDOB] = for {
     firstName <- nonEmptyAlphaString.map(_.take(10))
     lastName <- nonEmptyAlphaString.map(_.take(10))

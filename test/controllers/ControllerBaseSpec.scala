@@ -101,6 +101,7 @@ trait TestValues { _: OptionValues =>
   val individualName = "testIndividualName"
   val nino: Nino = ninoGen.sample.get
   val companyName = "testCompanyName"
+  val crn: Crn = crnGen.sample.get
 
   val individualDetails: IndividualDetails = IndividualDetails("testFirstName", Some("testMiddleName"), "testLastName")
 

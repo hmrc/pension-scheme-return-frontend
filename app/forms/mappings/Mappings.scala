@@ -16,9 +16,8 @@
 
 package forms.mappings
 
-import forms.mappings.Mappings.text
 import forms.mappings.errors.{DateFormErrors, IntFormErrors, MoneyFormErrors}
-import models.{DateRange, Enumerable, Money}
+import models.{Crn, DateRange, Enumerable, Money}
 import play.api.data.{FieldMapping, Mapping}
 import play.api.data.Forms.of
 import play.api.data.validation.{Constraint, Invalid, Valid}
@@ -126,6 +125,11 @@ trait Mappings extends Formatters with Constraints {
     text(requiredKey, args.toList)
       .verifying(verify[String](invalidKey, s => Nino.isValid(s.toUpperCase), args: _*))
       .transform[Nino](s => Nino(s.toUpperCase), _.nino.toUpperCase)
+
+  def crn(requiredKey: String, invalidKey: String, args: Any*): Mapping[Crn] =
+    text(requiredKey, args.toList)
+      .verifying(verify[String](invalidKey, s => Crn.isValid(s.toUpperCase), args: _*))
+      .transform[Crn](s => Crn(s.toUpperCase), _.crn.toUpperCase)
 
   def ninoNoDuplicates(
     requiredKey: String,

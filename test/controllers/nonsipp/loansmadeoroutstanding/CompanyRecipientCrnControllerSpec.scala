@@ -18,9 +18,8 @@ package controllers.nonsipp.loansmadeoroutstanding
 
 import controllers.ControllerBaseSpec
 import forms.YesNoPageFormProvider
-import models.{ConditionalYesNo, NormalMode}
+import models.{ConditionalYesNo, Crn, NormalMode}
 import pages.nonsipp.loansmadeoroutstanding.{CompanyRecipientCrnPage, CompanyRecipientNamePage}
-import uk.gov.hmrc.domain.Nino
 import views.html.ConditionalYesNoPageView
 import CompanyRecipientCrnController._
 
@@ -31,10 +30,10 @@ class CompanyRecipientCrnControllerSpec extends ControllerBaseSpec {
 
   val userAnswersWithCompanyName = defaultUserAnswers.unsafeSet(CompanyRecipientNamePage(srn), companyName)
 
-  val conditionalNo: ConditionalYesNo[Nino] = ConditionalYesNo[Nino](Left("reason"))
-  val conditionalYes: ConditionalYesNo[Nino] = ConditionalYesNo[Nino](Right(nino)) //TODO
+  val conditionalNo: ConditionalYesNo[Crn] = ConditionalYesNo[Crn](Left("reason"))
+  val conditionalYes: ConditionalYesNo[Crn] = ConditionalYesNo[Crn](Right(crn))
 
-  "IndividualRecipientNinoController" - {
+  "CompanyRecipientCrnController" - {
 
     act.like(renderView(onPageLoad, userAnswersWithCompanyName) { implicit app => implicit request =>
       injected[ConditionalYesNoPageView]
@@ -56,12 +55,12 @@ class CompanyRecipientCrnControllerSpec extends ControllerBaseSpec {
       }
     )
 
-    act.like(redirectNextPage(onSubmit, "value" -> "true", "value.yes" -> nino.value))
+    act.like(redirectNextPage(onSubmit, "value" -> "true", "value.yes" -> crn.value))
     act.like(redirectNextPage(onSubmit, "value" -> "false", "value.no" -> "reason"))
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
-    act.like(saveAndContinue(onSubmit, "value" -> "true", "value.yes" -> nino.value))
+    act.like(saveAndContinue(onSubmit, "value" -> "true", "value.yes" -> crn.value))
 
     act.like(invalidForm(onSubmit, userAnswersWithCompanyName))
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))

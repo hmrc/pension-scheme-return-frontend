@@ -16,13 +16,12 @@
 
 package pages.nonsipp.loansmadeoroutstanding
 
-import models.ConditionalYesNo
+import models.{ConditionalYesNo, Crn}
 import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
-import uk.gov.hmrc.domain.Nino
 
-case class CompanyRecipientCrnPage(srn: Srn) extends QuestionPage[ConditionalYesNo[Nino]] {
+case class CompanyRecipientCrnPage(srn: Srn) extends QuestionPage[ConditionalYesNo[Crn]] {
 
   override def path: JsPath = JsPath \ toString
 

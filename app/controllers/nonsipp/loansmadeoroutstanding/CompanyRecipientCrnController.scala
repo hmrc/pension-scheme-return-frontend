@@ -21,14 +21,13 @@ import controllers.nonsipp.loansmadeoroutstanding.CompanyRecipientCrnController.
 import forms.YesNoPageFormProvider
 import forms.mappings.Mappings
 import models.SchemeId.Srn
-import models.{ConditionalYesNo, Mode}
+import models.{ConditionalYesNo, Crn, Mode}
 import navigation.Navigator
 import pages.nonsipp.loansmadeoroutstanding.{CompanyRecipientCrnPage, CompanyRecipientNamePage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
-import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
@@ -50,7 +49,7 @@ class CompanyRecipientCrnController @Inject()(
     extends FrontendBaseController
     with I18nSupport {
 
-  private val form: Form[Either[String, Nino]] = CompanyRecipientCrnController.form(formProvider)
+  private val form: Form[Either[String, Crn]] = CompanyRecipientCrnController.form(formProvider)
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     request.usingAnswer(CompanyRecipientNamePage(srn)).sync { companyName =>
@@ -78,12 +77,12 @@ class CompanyRecipientCrnController @Inject()(
 }
 
 object CompanyRecipientCrnController {
-  def form(formProvider: YesNoPageFormProvider): Form[Either[String, Nino]] = formProvider.conditional(
+  def form(formProvider: YesNoPageFormProvider): Form[Either[String, Crn]] = formProvider.conditional(
     "companyRecipientCrn.error.required",
     requiredNoKey = "companyRecipientCrn.no.conditional.error.required",
     invalidNoKey = "companyRecipientCrn.no.conditional.error.invalid",
     maxLengthNoKey = "companyRecipientCrn.no.conditional.error.length",
-    Mappings.nino(
+    Mappings.crn(
       "companyRecipientCrn.yes.conditional.error.required",
       "companyRecipientCrn.yes.conditional.error.invalid"
     )
