@@ -647,3 +647,16 @@ individualRecipientNino.no.conditional.error.required = Enter the reason you can
 individualRecipientNino.no.conditional.error.invalid = The reason you cannot provide the recipient’s National Insurance number must only include letters a to z, numbers 0 to 9, and special characters such as hyphens, spaces and apostrophes
 individualRecipientNino.no.conditional.error.length = The reason you cannot provide the recipient’s National Insurance number must be 160 characters or fewer
 individualRecipientNino.error.required = Select yes if you know the recipient’s National Insurance number
+
+companyRecipientCrn.title = Do you know the recipient’s Company Registration Number (CRN)?
+companyRecipientCrn.heading = Do you know {0}’s Company Registration Number (CRN)?
+companyRecipientCrn.yes.conditional = What is {0}’s CRN?
+companyRecipientCrn.yes.conditional.error.required = Enter the recipient’s CRN
+companyRecipientCrn.yes.conditional.error.tooLarge = CRN must be 7 or 8 characters
+companyRecipientCrn.yes.conditional.error.tooSmall = CRN must be 7 or 8 characters
+companyRecipientCrn.yes.conditional.error.invalid = CRN must only include letters and numbers
+companyRecipientCrn.no.conditional = Tell us why you cannot provide {0}’s CRN
+companyRecipientCrn.no.conditional.error.required = Enter the reason you cannot provide the recipient’s CRN
+companyRecipientCrn.no.conditional.error.invalid = The reason you cannot provide the recipient’s CRN must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, full stops, hyphens, slashes, speech marks and spaces
+companyRecipientCrn.no.conditional.error.length = The reason you cannot provide the recipient’s CRN must be 160 characters or fewer
+companyRecipientCrn.error.required = Select yes if you know the recipient’s Company Registration Number (CRN)

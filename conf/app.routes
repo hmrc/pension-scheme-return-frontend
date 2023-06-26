@@ -321,3 +321,8 @@ GET        /:srn/individual-recipient-ni-number                        controlle
 POST       /:srn/individual-recipient-ni-number                        controllers.IndividualRecipientNinoController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 GET        /:srn/change-individual-recipient-ni-number                 controllers.IndividualRecipientNinoController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST       /:srn/change-individual-recipient-ni-number                 controllers.IndividualRecipientNinoController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET        /:srn/company-recipient-crn                                 controllers.nonsipp.loansmadeoroutstanding.CompanyRecipientCrnController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST       /:srn/company-recipient-crn                                 controllers.nonsipp.loansmadeoroutstanding.CompanyRecipientCrnController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/change-company-recipient-crn                          controllers.nonsipp.loansmadeoroutstanding.CompanyRecipientCrnController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST       /:srn/change-company-recipient-crn                          controllers.nonsipp.loansmadeoroutstanding.CompanyRecipientCrnController.onSubmit(srn: Srn, mode: Mode = CheckMode)
