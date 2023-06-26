@@ -270,10 +270,10 @@ POST       /:srn/total-value-quoted-shares                      controllers.nons
 GET        /:srn/change-total-value-quoted-shares               controllers.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST       /:srn/change-total-value-quoted-shares               controllers.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
-GET        /:srn/file-upload-error-wrong-format                      controllers.nonsipp.memberdetails.upload.FileUploadWrongFormatController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-GET        /:srn/submit-file-upload-error-wrong-format               controllers.nonsipp.memberdetails.upload.FileUploadWrongFormatController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-GET        /:srn/change-file-upload-error-wrong-format               controllers.nonsipp.memberdetails.upload.FileUploadWrongFormatController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-GET        /:srn/change-submit-file-upload-error-wrong-format        controllers.nonsipp.memberdetails.upload.FileUploadWrongFormatController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+GET        /:srn/file-upload-error-missing-information                      controllers.nonsipp.memberdetails.upload.FileUploadErrorMissingInformationController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/submit-file-upload-error-missing-information               controllers.nonsipp.memberdetails.upload.FileUploadErrorMissingInformationController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/change-file-upload-error-missing-information               controllers.nonsipp.memberdetails.upload.FileUploadErrorMissingInformationController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+GET        /:srn/change-submit-file-upload-error-missing-information        controllers.nonsipp.memberdetails.upload.FileUploadErrorMissingInformationController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
 GET         /:srn/who-received-loan                controllers.nonsipp.whoreceivedloan.WhoReceivedLoanController.onPageLoad(srn: Srn)
 POST        /:srn/who-received-loan                controllers.nonsipp.whoreceivedloan.WhoReceivedLoanController.onSubmit(srn: Srn)

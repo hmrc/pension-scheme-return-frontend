@@ -17,11 +17,11 @@
 package controllers.nonsipp.memberdetails.upload
 
 import controllers.actions._
-import controllers.nonsipp.memberdetails.upload.FileUploadWrongFormatController._
+import controllers.nonsipp.memberdetails.upload.FileUploadErrorMissingInformationController._
 import models.Mode
 import models.SchemeId.Srn
 import navigation.Navigator
-import pages.FileUploadWrongFormatPage
+import pages.FileUploadErrorMissingInformationPage
 import play.api.i18n._
 import play.api.mvc._
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -32,7 +32,7 @@ import views.html.ContentPageView
 
 import javax.inject.{Inject, Named}
 
-class FileUploadWrongFormatController @Inject()(
+class FileUploadErrorMissingInformationController @Inject()(
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -46,33 +46,33 @@ class FileUploadWrongFormatController @Inject()(
   }
 
   def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    Redirect(navigator.nextPage(FileUploadWrongFormatPage(srn), mode, request.userAnswers))
+    Redirect(navigator.nextPage(FileUploadErrorMissingInformationPage(srn), mode, request.userAnswers))
   }
 }
 
-object FileUploadWrongFormatController {
+object FileUploadErrorMissingInformationController {
   def viewModel(srn: Srn, mode: Mode): FormPageViewModel[ContentPageViewModel] =
     FormPageViewModel[ContentPageViewModel](
-      title = "fileUploadWrongFormat.title",
-      heading = "fileUploadWrongFormat.heading",
+      title = "fileUploadErrorMissingInformation.title",
+      heading = "fileUploadErrorMissingInformation.heading",
       description = Some(
-        ParagraphMessage(Message("fileUploadWrongFormat.paragraph1")) ++
+        ParagraphMessage(Message("fileUploadErrorMissingInformation.paragraph1")) ++
           ListMessage(
             ListType.Bullet,
-            "fileUploadWrongFormat.bullet1",
-            "fileUploadWrongFormat.bullet2",
-            "fileUploadWrongFormat.bullet3",
-            Message("fileUploadWrongFormat.bullet4") ++
+            "fileUploadErrorMissingInformation.bullet1",
+            "fileUploadErrorMissingInformation.bullet2",
+            "fileUploadErrorMissingInformation.bullet3",
+            Message("fileUploadErrorMissingInformation.bullet4") ++
               DownloadLinkMessage(
-                "fileUploadWrongFormat.bullet4.link",
+                "fileUploadErrorMissingInformation.bullet4.link",
                 controllers.nonsipp.memberdetails.routes.DownloadPensionSchemeTemplateController.downloadFile.url
               )
           ) ++
-          ParagraphMessage(Message("fileUploadWrongFormat.paragraph2"))
+          ParagraphMessage(Message("fileUploadErrorMissingInformation.paragraph2"))
       ),
       page = ContentPageViewModel(isLargeHeading = true),
       refresh = None,
-      buttonText = "fileUploadWrongFormat.button",
-      onSubmit = routes.FileUploadWrongFormatController.onSubmit(srn, mode)
+      buttonText = "fileUploadErrorMissingInformation.button",
+      onSubmit = routes.FileUploadErrorMissingInformationController.onSubmit(srn, mode)
     )
 }

@@ -248,9 +248,11 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       normalmode
         .navigateTo(
           FileUploadErrorPage(_, UploadFormatError),
-          controllers.nonsipp.memberdetails.upload.routes.FileUploadWrongFormatController.onPageLoad
+          controllers.nonsipp.memberdetails.upload.routes.FileUploadErrorMissingInformationController.onPageLoad
         )
-        .withName("go from file upload error page to file upload format error page on file upload format error")
+        .withName(
+          "go from file upload error page to file upload error missing information page on file upload format error"
+        )
     )
 
     act.like(
