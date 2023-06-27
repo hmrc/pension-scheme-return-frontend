@@ -84,7 +84,8 @@ object CompanyRecipientCrnController {
     maxLengthNoKey = "companyRecipientCrn.no.conditional.error.length",
     Mappings.crn(
       "companyRecipientCrn.yes.conditional.error.required",
-      "companyRecipientCrn.yes.conditional.error.invalid"
+      "companyRecipientCrn.yes.conditional.error.invalid",
+      "companyRecipientCrn.yes.conditional.error.length"
     )
   )
 
