@@ -47,7 +47,9 @@ object LoanMadeOrOutstandingNavigator extends JourneyNavigator {
         case Some(ReceivedLoanType.UKCompany) =>
           controllers.nonsipp.loansmadeoroutstanding.routes.CompanyRecipientNameController
             .onPageLoad(srn, NormalMode)
-        case _ => controllers.routes.UnauthorisedController.onPageLoad()
+        case Some(ReceivedLoanType.UKPartnership) =>
+          controllers.nonsipp.loansmadeoroutstanding.routes.PartnershipRecipientNameController
+            .onPageLoad(srn, NormalMode)
       }
 
     case page @ CompanyRecipientNamePage(srn) =>
@@ -58,6 +60,9 @@ object LoanMadeOrOutstandingNavigator extends JourneyNavigator {
 
     case IndividualRecipientNinoPage(srn) =>
       controllers.nonsipp.routes.IsMemberOrConnectedPartyController.onPageLoad(srn, NormalMode)
+
+    case PartnershipRecipientNamePage(srn) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty

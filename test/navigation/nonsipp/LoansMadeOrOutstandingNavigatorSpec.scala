@@ -122,11 +122,12 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
 
       act.like(
         normalmode
-          .navigateTo(
+          .navigateToWithData(
             WhoReceivedLoanPage,
-            (_, _) => routes.UnauthorisedController.onPageLoad()
+            Gen.const(ReceivedLoanType.UKPartnership),
+            controllers.nonsipp.loansmadeoroutstanding.routes.PartnershipRecipientNameController.onPageLoad
           )
-          .withName("go from who received loan page to unauthorised page")
+          .withName("go from who received loan page UKPartnership to partnership recipient name page")
       )
     }
   }
@@ -142,5 +143,16 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
           .withName("go from company recipient name page to unauthorised page")
       )
     }
+  }
+
+  "PartnershipRecipientNamePage" - {
+    act.like(
+      normalmode
+        .navigateTo(
+          PartnershipRecipientNamePage,
+          (_, _) => routes.UnauthorisedController.onPageLoad()
+        )
+        .withName("go from partnership recipient name page to unauthorised page")
+    )
   }
 }
