@@ -95,7 +95,7 @@ object CompanyRecipientCrnController {
       ConditionalYesNoPageViewModel(
         yes = YesNoViewModel.Conditional(Message("companyRecipientCrn.yes.conditional", companyName)),
         no = YesNoViewModel.Conditional(Message("companyRecipientCrn.no.conditional", companyName))
-      ),
+      ).withHint("companyRecipientCrn.hint"),
       routes.CompanyRecipientCrnController.onSubmit(srn, mode)
     )
 }
