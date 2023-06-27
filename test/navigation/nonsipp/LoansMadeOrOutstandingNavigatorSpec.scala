@@ -56,7 +56,7 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
       normalmode
         .navigateTo(
           IndividualRecipientNamePage,
-          controllers.routes.IndividualRecipientNinoController.onPageLoad
+          controllers.nonsipp.loansmadeoroutstanding.routes.IndividualRecipientNinoController.onPageLoad
         )
         .withName("go from Individual recipient name page to individual nino page")
     )

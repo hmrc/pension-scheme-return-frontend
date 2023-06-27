@@ -51,7 +51,7 @@ object LoanMadeOrOutstandingNavigator extends JourneyNavigator {
       }
 
     case IndividualRecipientNamePage(srn) =>
-      controllers.routes.IndividualRecipientNinoController.onPageLoad(srn, NormalMode)
+      controllers.nonsipp.loansmadeoroutstanding.routes.IndividualRecipientNinoController.onPageLoad(srn, NormalMode)
 
     case IndividualRecipientNinoPage(srn) =>
       controllers.nonsipp.routes.IsMemberOrConnectedPartyController.onPageLoad(srn, NormalMode)
