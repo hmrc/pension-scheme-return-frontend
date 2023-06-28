@@ -16,7 +16,7 @@
 
 package navigation.nonsipp
 
-import config.Refined.OneTo99
+import config.Refined.OneTo300
 import controllers.TestValues
 import controllers.nonsipp.employercontributions
 import controllers.nonsipp.memberdetails.routes
@@ -133,7 +133,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             SchemeMembersListPage(_, addMember = true, Manual),
             MemberDetailsPage,
             nameDobGen,
-            IndexGen[OneTo99](min = 1, max = 99),
+            IndexGen[OneTo300](min = 1, max = 300),
             routes.MemberDetailsController.onPageLoad,
             employercontributions.routes.EmployerContributionsController.onPageLoad
           )
@@ -148,8 +148,8 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             SchemeMembersListPage(_, addMember = true, Upload),
             MemberDetailsPage,
             nameDobGen,
-            IndexGen[OneTo99](min = 1, max = 99),
-            (srn, _: Refined[Int, OneTo99], _) => routes.PensionSchemeMembersController.onPageLoad(srn),
+            IndexGen[OneTo300](min = 1, max = 300),
+            (srn, _: Refined[Int, OneTo300], _) => routes.PensionSchemeMembersController.onPageLoad(srn),
             (srn, _) => routes.PensionSchemeMembersController.onPageLoad(srn)
           )
           .withName(
@@ -248,9 +248,11 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       normalmode
         .navigateTo(
           FileUploadErrorPage(_, UploadFormatError),
-          controllers.nonsipp.memberdetails.upload.routes.FileUploadWrongFormatController.onPageLoad
+          controllers.nonsipp.memberdetails.upload.routes.FileUploadErrorMissingInformationController.onPageLoad
         )
-        .withName("go from file upload error page to file upload format error page on file upload format error")
+        .withName(
+          "go from file upload error page to file upload error missing information page on file upload format error"
+        )
     )
 
     act.like(

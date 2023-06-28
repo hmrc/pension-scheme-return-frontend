@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.memberdetails
 
-import config.Refined.OneTo99
+import config.Refined.OneTo300
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.memberdetails.SchemeMembersListController._
 import controllers.nonsipp.employercontributions
@@ -37,9 +37,9 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
   private val userAnswersWithMembersDetails = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
 
-  private val userAnswersWith99MembersDetails =
-    (1 to 99).foldLeft(defaultUserAnswers)(
-      (ua, i) => ua.unsafeSet(MemberDetailsPage(srn, refineV[OneTo99](i).value), memberDetails)
+  private val userAnswersWith300MembersDetails =
+    (1 to 300).foldLeft(defaultUserAnswers)(
+      (ua, i) => ua.unsafeSet(MemberDetailsPage(srn, refineV[OneTo300](i).value), memberDetails)
     )
 
   "SchemeMembersListController" - {
@@ -79,7 +79,7 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
           redirectToPage(
             onSubmitManual,
             employercontributions.routes.EmployerContributionsController.onPageLoad(srn, NormalMode),
-            userAnswersWith99MembersDetails
+            userAnswersWith300MembersDetails
           )
         )
       }
@@ -120,12 +120,12 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
         )
       )
 
-      "when user answers has 99 members" - {
+      "when user answers has more than 300 members" - {
         act.like(
           redirectToPage(
             onSubmitUpload,
             employercontributions.routes.EmployerContributionsController.onPageLoad(srn, NormalMode),
-            userAnswersWith99MembersDetails
+            userAnswersWith300MembersDetails
           )
         )
       }

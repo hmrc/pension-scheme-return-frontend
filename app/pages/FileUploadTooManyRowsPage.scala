@@ -14,19 +14,10 @@
  * limitations under the License.
  */
 
-package config
+package pages
 
-import eu.timepit.refined.api.Refined
-import eu.timepit.refined.boolean.And
-import eu.timepit.refined.numeric.{Greater, LessEqual}
+import play.api.libs.json.JsPath
+import models.SchemeId.Srn
+import pages.Page
 
-object Refined {
-  type OneToTen = Greater[0] And LessEqual[10]
-  type Max10 = Int Refined OneToTen
-
-  type OneToThree = Greater[0] And LessEqual[3]
-  type Max3 = Int Refined OneToThree
-
-  type OneTo300 = Greater[0] And LessEqual[300]
-  type Max300 = Int Refined OneTo300
-}
+case class FileUploadTooManyRowsPage(srn: Srn) extends Page

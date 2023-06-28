@@ -20,7 +20,7 @@ import controllers.actions._
 import controllers.nonsipp.memberdetails.upload.FileUploadErrorController._
 import models.SchemeId.Srn
 import models.requests.DataRequest
-import models.{Mode, UploadError, UploadErrors, UploadFormatError, UploadKey}
+import models.{Mode, UploadError, UploadErrors, UploadFormatError, UploadKey, UploadMaxRowsError}
 import navigation.Navigator
 import pages.nonsipp.memberdetails.upload.FileUploadErrorPage
 import play.api.i18n._
@@ -48,7 +48,7 @@ class FileUploadErrorController @Inject()(
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
     uploadService.getUploadResult(UploadKey.fromRequest(srn)).map {
-      case Some(UploadFormatError) | Some(_: UploadErrors) => Ok(view(viewModel(srn, mode)))
+      case Some(UploadFormatError) | Some(_: UploadErrors) | Some(UploadMaxRowsError) => Ok(view(viewModel(srn, mode)))
       case _ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
     }
   }
@@ -56,6 +56,7 @@ class FileUploadErrorController @Inject()(
   def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
     uploadService.getUploadResult(UploadKey.fromRequest(srn)).map {
       case Some(UploadFormatError) => navToNextPage(srn, mode, UploadFormatError)
+      case Some(UploadMaxRowsError) => navToNextPage(srn, mode, UploadMaxRowsError)
       case Some(uploadErrors: UploadErrors) => navToNextPage(srn, mode, uploadErrors)
       case _ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
     }
