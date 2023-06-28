@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.memberdetails
 
-import config.Refined.Max99
+import config.Refined.Max300
 import controllers.actions._
 import controllers.nonsipp.memberdetails.MemberDetailsNinoController._
 import forms.TextFormProvider
@@ -56,7 +56,7 @@ class MemberDetailsNinoController @Inject()(
   private def form(details: NameDOB, duplicates: List[Nino] = List()) =
     MemberDetailsNinoController.form(formProvider, details.fullName, duplicates)
 
-  def onPageLoad(srn: Srn, index: Max99, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       request.usingAnswer(MemberDetailsPage(srn, index)).sync { details =>
         Ok(
@@ -68,7 +68,7 @@ class MemberDetailsNinoController @Inject()(
       }
   }
 
-  def onSubmit(srn: Srn, index: Max99, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       request.usingAnswer(MemberDetailsPage(srn, index)).async { details =>
         val duplicates = duplicateNinos(srn, index)
@@ -90,7 +90,7 @@ class MemberDetailsNinoController @Inject()(
       }
   }
 
-  private def duplicateNinos(srn: Srn, index: Max99)(implicit request: DataRequest[_]): List[Nino] =
+  private def duplicateNinos(srn: Srn, index: Max300)(implicit request: DataRequest[_]): List[Nino] =
     request.userAnswers.map(MemberDetailsNinoPages(srn)).removed(index.arrayIndex.toString).values.toList
 }
 
@@ -104,7 +104,7 @@ object MemberDetailsNinoController {
       memberFullName
     )
 
-  def viewModel(srn: Srn, index: Max99, mode: Mode, memberFullName: String): FormPageViewModel[TextInputViewModel] =
+  def viewModel(srn: Srn, index: Max300, mode: Mode, memberFullName: String): FormPageViewModel[TextInputViewModel] =
     FormPageViewModel(
       Message("memberDetailsNino.title"),
       Message("memberDetailsNino.heading", memberFullName),

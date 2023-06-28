@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.memberdetails
 
-import config.Refined.Max99
+import config.Refined.Max300
 import controllers.actions._
 import controllers.nonsipp.memberdetails.RemoveMemberDetailsController._
 import forms.YesNoPageFormProvider
@@ -52,12 +52,12 @@ class RemoveMemberDetailsController @Inject()(
 
   private val form = RemoveMemberDetailsController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max99, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       withMemberDetails(srn, index)(nameDOB => Ok(view(form, viewModel(srn, index, nameDOB, mode))))
     }
 
-  def onSubmit(srn: Srn, index: Max99, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
@@ -85,7 +85,7 @@ class RemoveMemberDetailsController @Inject()(
         )
     }
 
-  private def withMemberDetails(srn: Srn, index: Max99)(
+  private def withMemberDetails(srn: Srn, index: Max300)(
     f: NameDOB => Result
   )(implicit request: DataRequest[_]): Result =
     request.userAnswers.get(MemberDetailsPage(srn, index)) match {
@@ -98,7 +98,7 @@ object RemoveMemberDetailsController {
     "removeMemberDetails.error.required"
   )
 
-  def viewModel(srn: Srn, index: Max99, nameDOB: NameDOB, mode: Mode): FormPageViewModel[YesNoPageViewModel] =
+  def viewModel(srn: Srn, index: Max300, nameDOB: NameDOB, mode: Mode): FormPageViewModel[YesNoPageViewModel] =
     YesNoPageViewModel(
       Message("removeMemberDetails.title", nameDOB.fullName),
       Message("removeMemberDetails.heading", nameDOB.fullName),

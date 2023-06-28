@@ -19,7 +19,7 @@ package controllers.nonsipp.memberdetails
 import com.google.inject.Inject
 import config.Constants
 import config.Constants.maxSchemeMembers
-import config.Refined.OneTo99
+import config.Refined.OneTo300
 import controllers.actions._
 import controllers.nonsipp.memberdetails.SchemeMembersListController._
 import eu.timepit.refined._
@@ -101,7 +101,7 @@ object SchemeMembersListController {
 
     val rows: List[ListRow] = memberNames.zipWithIndex.flatMap {
       case (memberName, index) =>
-        refineV[OneTo99](index + 1) match {
+        refineV[OneTo300](index + 1) match {
           case Left(_) => Nil
           case Right(nextIndex) =>
             List(

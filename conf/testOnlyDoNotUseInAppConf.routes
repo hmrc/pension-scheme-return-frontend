@@ -12,4 +12,4 @@
 # Add all the application routes to the prod.routes file
 ->  /                                                                 prod.Routes
 
-GET /pension-scheme-return/test-only/:srn/add-member-details/:num     controllers.testonly.MongoController.addMemberDetails(srn: Srn, num: Max99)
+GET /pension-scheme-return/test-only/:srn/add-member-details/:num     controllers.testonly.MongoController.addMemberDetails(srn: Srn, num: Max300)
