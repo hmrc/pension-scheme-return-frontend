@@ -322,6 +322,10 @@ POST       /:srn/individual-recipient-ni-number                        controlle
 GET        /:srn/change-individual-recipient-ni-number                 controllers.IndividualRecipientNinoController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST       /:srn/change-individual-recipient-ni-number                 controllers.IndividualRecipientNinoController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
+GET         /:srn/partnership-recipient-name                          controllers.nonsipp.loansmadeoroutstanding.PartnershipRecipientNameController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/partnership-recipient-name                          controllers.nonsipp.loansmadeoroutstanding.PartnershipRecipientNameController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/change-partnership-recipient-name                   controllers.nonsipp.loansmadeoroutstanding.PartnershipRecipientNameController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-partnership-recipient-name                   controllers.nonsipp.loansmadeoroutstanding.PartnershipRecipientNameController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
 GET        /:srn/file-upload-too-many-rows                      controllers.nonsipp.memberdetails.upload.FileUploadTooManyRowsController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 GET        /:srn/submit-file-upload-too-many-rows               controllers.nonsipp.memberdetails.upload.FileUploadTooManyRowsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
