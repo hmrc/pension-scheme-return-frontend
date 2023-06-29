@@ -24,11 +24,10 @@ import pages.nonsipp.loansmadeoroutstanding.PartnershipRecipientNamePage
 import views.html.TextInputView
 
 class PartnershipRecipientNameControllerSpec extends ControllerBaseSpec {
-  override val partnershipRecipientName = "Partnership Recipient Name"
 
   "PartnershipRecipientNameController" - {
 
-    val populatedUserAnswers = defaultUserAnswers.set(PartnershipRecipientNamePage(srn), partnershipRecipientName).get
+    val populatedUserAnswers = defaultUserAnswers.set(PartnershipRecipientNamePage(srn), partnershipName).get
     lazy val onPageLoad = routes.PartnershipRecipientNameController.onPageLoad(srn, NormalMode)
     lazy val onSubmit = routes.PartnershipRecipientNameController.onSubmit(srn, NormalMode)
 
@@ -36,15 +35,15 @@ class PartnershipRecipientNameControllerSpec extends ControllerBaseSpec {
       injected[TextInputView].apply(form(injected[TextFormProvider]), viewModel(srn, NormalMode))
     })
 
-    act.like(renderPrePopView(onPageLoad, PartnershipRecipientNamePage(srn), partnershipRecipientName) {
+    act.like(renderPrePopView(onPageLoad, PartnershipRecipientNamePage(srn), partnershipName) {
       implicit app => implicit request =>
-        val preparedForm = form(injected[TextFormProvider]).fill(partnershipRecipientName)
+        val preparedForm = form(injected[TextFormProvider]).fill(partnershipName)
         injected[TextInputView].apply(preparedForm, viewModel(srn, NormalMode))
     })
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
-    act.like(saveAndContinue(onSubmit, "value" -> partnershipRecipientName))
+    act.like(saveAndContinue(onSubmit, "value" -> partnershipName))
     act.like(invalidForm(onSubmit, populatedUserAnswers))
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }

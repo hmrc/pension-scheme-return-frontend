@@ -21,8 +21,7 @@ import forms.RadioListFormProvider
 import models.SchemeId.Srn
 import models.{MemberOrConnectedParty, Mode}
 import navigation.Navigator
-import pages.nonsipp.IsMemberOrConnectedPartyPage
-import pages.nonsipp.loansmadeoroutstanding.IndividualRecipientNamePage
+import pages.nonsipp.loansmadeoroutstanding.{IndividualRecipientNamePage, IsMemberOrConnectedPartyPage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}

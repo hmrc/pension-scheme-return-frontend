@@ -682,3 +682,10 @@ partnershipRecipientUtr.no.conditional.error.required = Enter the reason you can
 partnershipRecipientUtr.no.conditional.error.invalid = The reason you cannot provide the recipient’s UTR must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, full stops, hyphens, slashes, speech marks and spaces
 partnershipRecipientUtr.no.conditional.error.length = The reason you cannot provide the recipient’s UTR must be 160 characters or fewer
 partnershipRecipientUtr.error.required = Select yes if you know the recipient’s Unique Taxpayer Reference (UTR)
+
+recipientSponsoringEmployerConnectedParty.title = Is the recipient a sponsoring employer or a connected party?
+recipientSponsoringEmployerConnectedParty.heading = Is {0} a sponsoring employer or a connected party?
+recipientSponsoringEmployerConnectedParty.option1 = Sponsoring employer
+recipientSponsoringEmployerConnectedParty.option2 = Connected party
+recipientSponsoringEmployerConnectedParty.option3 = Neither of these
+recipientSponsoringEmployerConnectedParty.error.required = Select Select if the recipient is a sponsoring employer, connected party or neither

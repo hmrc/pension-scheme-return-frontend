@@ -17,7 +17,7 @@
 package navigation.nonsipp
 
 import navigation.{Navigator, NavigatorBehaviours}
-import pages.nonsipp.otherrecipientdetails.OtherRecipientDetailsPage
+import pages.nonsipp.loansmadeoroutstanding.OtherRecipientDetailsPage
 import utils.BaseSpec
 
 class OtherRecipientsDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
@@ -30,7 +30,7 @@ class OtherRecipientsDetailsNavigatorSpec extends BaseSpec with NavigatorBehavio
       normalmode
         .navigateTo(
           OtherRecipientDetailsPage,
-          (_, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.loansmadeoroutstanding.routes.RecipientSponsoringEmployerConnectedPartyController.onPageLoad
         )
     )
   }

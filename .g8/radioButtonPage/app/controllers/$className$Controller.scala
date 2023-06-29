@@ -12,6 +12,7 @@ import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.RadioListView
 import $className;format="cap"$Controller._
+import play.api.data.Form
 import models.SchemeId.Srn
 import utils.FormUtils.FormOps
 import viewmodels.implicits._
@@ -61,7 +62,7 @@ class $className;format="cap"$Controller @Inject()(
 
 object $className;format="cap"$Controller {
 
-  def form(formProvider: RadioListFormProvider) =
+  def form(formProvider: RadioListFormProvider): Form[???] =
     formProvider("$className;format="decap"$.error.required")
 
   def viewModel(srn: Srn, mode: Mode): FormPageViewModel[RadioListViewModel] = RadioListViewModel(

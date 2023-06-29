@@ -14,20 +14,16 @@
  * limitations under the License.
  */
 
-package pages
+package pages.nonsipp.loansmadeoroutstanding
 
-import models.MemberOrConnectedParty
-import pages.behaviours.PageBehaviours
-import pages.nonsipp.loansmadeoroutstanding.IsMemberOrConnectedPartyPage
+import models.SchemeId.Srn
+import models.SponsoringOrConnectedParty
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-class IsMemberOrConnectedPartyPageSpec extends PageBehaviours {
+case class RecipientSponsoringEmployerConnectedPartyPage(srn: Srn) extends QuestionPage[SponsoringOrConnectedParty] {
 
-  "IsMemberOrConnectedPartyPage" - {
+  override def path: JsPath = JsPath \ toString
 
-    beRetrievable[MemberOrConnectedParty](IsMemberOrConnectedPartyPage(srnGen.sample.value))
-
-    beSettable[MemberOrConnectedParty](IsMemberOrConnectedPartyPage(srnGen.sample.value))
-
-    beRemovable[MemberOrConnectedParty](IsMemberOrConnectedPartyPage(srnGen.sample.value))
-  }
+  override def toString: String = "recipientSponsoringEmployerConnectedParty"
 }

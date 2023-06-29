@@ -16,18 +16,18 @@
 
 package pages
 
-import models.MemberOrConnectedParty
+import models.SponsoringOrConnectedParty
 import pages.behaviours.PageBehaviours
-import pages.nonsipp.loansmadeoroutstanding.IsMemberOrConnectedPartyPage
+import pages.nonsipp.loansmadeoroutstanding.RecipientSponsoringEmployerConnectedPartyPage
 
-class IsMemberOrConnectedPartyPageSpec extends PageBehaviours {
+class RecipientSponsoringEmployerConnectedPartyPageSpec extends PageBehaviours {
 
-  "IsMemberOrConnectedPartyPage" - {
+  "RecipientSponsoringEmployerConnectedPartyPage" - {
 
-    beRetrievable[MemberOrConnectedParty](IsMemberOrConnectedPartyPage(srnGen.sample.value))
+    beRetrievable[SponsoringOrConnectedParty](RecipientSponsoringEmployerConnectedPartyPage(srnGen.sample.value))
 
-    beSettable[MemberOrConnectedParty](IsMemberOrConnectedPartyPage(srnGen.sample.value))
+    beSettable[SponsoringOrConnectedParty](RecipientSponsoringEmployerConnectedPartyPage(srnGen.sample.value))
 
-    beRemovable[MemberOrConnectedParty](IsMemberOrConnectedPartyPage(srnGen.sample.value))
+    beRemovable[SponsoringOrConnectedParty](RecipientSponsoringEmployerConnectedPartyPage(srnGen.sample.value))
   }
 }

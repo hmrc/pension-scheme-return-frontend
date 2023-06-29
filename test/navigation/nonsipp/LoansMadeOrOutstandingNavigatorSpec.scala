@@ -21,7 +21,6 @@ import models.{NormalMode, ReceivedLoanType}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.loansmadeoroutstanding._
-import pages.nonsipp.whoreceivedloan.WhoReceivedLoanPage
 import utils.BaseSpec
 
 class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehaviours {
@@ -148,9 +147,9 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
         normalmode
           .navigateTo(
             CompanyRecipientCrnPage,
-            (_, _) => routes.UnauthorisedController.onPageLoad()
+            controllers.nonsipp.loansmadeoroutstanding.routes.RecipientSponsoringEmployerConnectedPartyController.onPageLoad
           )
-          .withName("go from company recipient CRN page to unauthorised page")
+          .withName("go from company recipient CRN page to sponsoring employer or connected party page")
       )
     }
   }
@@ -171,9 +170,9 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
       normalmode
         .navigateTo(
           PartnershipRecipientUtrPage,
-          (_, _) => routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.loansmadeoroutstanding.routes.RecipientSponsoringEmployerConnectedPartyController.onPageLoad
         )
-        .withName("go from partnership recipient Utr page to unauthorised page")
+        .withName("go from partnership recipient Utr page to sponsoring employer or connected party page")
     )
 
   }

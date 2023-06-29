@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.otherrecipientdetails
+package pages.nonsipp.loansmadeoroutstanding
 
 import models.RecipientDetails
 import models.SchemeId.Srn
