@@ -100,6 +100,8 @@ trait TestValues { _: OptionValues =>
   val psaId: PsaId = PsaId("testPSAId")
   val individualName = "testIndividualName"
   val nino: Nino = ninoGen.sample.get
+  val partnershipRecipientName = "testPartnershipRecipientName"
+  val utr: Utr = utrGen.sample.get
 
   val individualDetails: IndividualDetails = IndividualDetails("testFirstName", Some("testMiddleName"), "testLastName")
 
