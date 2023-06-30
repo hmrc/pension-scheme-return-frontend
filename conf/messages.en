@@ -668,3 +668,4 @@ partnershipRecipientUtr.no.conditional = Tell us why you cannot provide {0}’s 
 partnershipRecipientUtr.no.conditional.error.required = Enter the reason you cannot provide the recipient’s UTR
 partnershipRecipientUtr.no.conditional.error.invalid = The reason you cannot provide the recipient’s UTR must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, full stops, hyphens, slashes, speech marks and spaces
 partnershipRecipientUtr.no.conditional.error.length = The reason you cannot provide the recipient’s UTR must be 160 characters or fewer
+partnershipRecipientUtr.error.required = Select yes if you know the recipient’s Unique Taxpayer Reference (UTR)
