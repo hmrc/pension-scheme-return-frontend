@@ -193,13 +193,13 @@ class MemberDetailsUploadValidatorSpec extends BaseSpec with TestValues {
     "fail when there are more than 99 entries" in {
 
       val csv =
-        (validHeaders :: List.fill(100)(validRow)).mkString("\n")
+        (validHeaders :: List.fill(301)(validRow)).mkString("\n")
 
       print(csv)
 
       val source = Source.single(ByteString(csv))
 
-      validator.validateCSV(source).futureValue mustBe UploadFormatError
+      validator.validateCSV(source).futureValue mustBe UploadMaxRowsError
     }
 
     "successfully collects different errors" in {

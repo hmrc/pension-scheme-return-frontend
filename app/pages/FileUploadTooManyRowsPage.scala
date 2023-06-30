@@ -20,4 +20,4 @@ import play.api.libs.json.JsPath
 import models.SchemeId.Srn
 import pages.Page
 
-case class FileUploadWrongFormatPage(srn: Srn) extends Page
+case class FileUploadTooManyRowsPage(srn: Srn) extends Page

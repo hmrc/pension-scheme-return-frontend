@@ -17,7 +17,7 @@
 package navigation.nonsipp
 
 import controllers.routes
-import controllers.nonsipp.personalcontributions
+import controllers.nonsipp.membercontributions
 import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
@@ -31,7 +31,7 @@ object UnallocatedEmployerContributionsNavigator extends JourneyNavigator {
       if (userAnswers.get(page).contains(true)) {
         routes.UnauthorisedController.onPageLoad()
       } else {
-        personalcontributions.routes.PersonalContributionsController.onPageLoad(srn, NormalMode)
+        membercontributions.routes.MemberContributionsController.onPageLoad(srn, NormalMode)
       }
   }
 

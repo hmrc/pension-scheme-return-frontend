@@ -14,28 +14,28 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.personalcontributions
+package controllers.nonsipp.membercontributions
 
-import PersonalContributionsController._
+import MemberContributionsController._
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.personalcontributions.routes
+import controllers.nonsipp.membercontributions.routes
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import pages.nonsipp.personalcontributions.PersonalContributionsPage
+import pages.nonsipp.membercontributions.MemberContributionsPage
 import views.html.YesNoPageView
 
-class PersonalContributionsControllerSpec extends ControllerBaseSpec {
+class MemberContributionsControllerSpec extends ControllerBaseSpec {
 
-  private lazy val onPageLoad = routes.PersonalContributionsController.onPageLoad(srn, NormalMode)
-  private lazy val onSubmit = routes.PersonalContributionsController.onSubmit(srn, NormalMode)
+  private lazy val onPageLoad = routes.MemberContributionsController.onPageLoad(srn, NormalMode)
+  private lazy val onSubmit = routes.MemberContributionsController.onSubmit(srn, NormalMode)
 
-  "PersonalContributionsController" - {
+  "MemberContributionsController" - {
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       injected[YesNoPageView].apply(form(injected[YesNoPageFormProvider]), viewModel(srn, NormalMode))
     })
 
-    act.like(renderPrePopView(onPageLoad, PersonalContributionsPage(srn), true) { implicit app => implicit request =>
+    act.like(renderPrePopView(onPageLoad, MemberContributionsPage(srn), true) { implicit app => implicit request =>
       injected[YesNoPageView].apply(form(injected[YesNoPageFormProvider]).fill(true), viewModel(srn, NormalMode))
     })
 

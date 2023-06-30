@@ -1,9 +1,11 @@
 package repositories
 
-import config.FrontendAppConfig
+import config.{FakeCrypto, FrontendAppConfig}
 import models._
+import org.mongodb.scala.bson.BsonDocument
 import org.mongodb.scala.model.Filters
 import repositories.UploadRepository.MongoUpload
+import repositories.UploadRepository.MongoUpload.SensitiveUploadStatus
 
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -16,12 +18,14 @@ class UploadRepositorySpec extends BaseRepositorySpec[MongoUpload] {
 
   private val oldInstant = Instant.now.truncatedTo(ChronoUnit.MILLIS).minusMillis(1000)
   private val initialUploadDetails = UploadDetails(uploadKey, reference, UploadStatus.InProgress, oldInstant)
-  private val initialMongoUpload = MongoUpload(uploadKey, reference, UploadStatus.InProgress, oldInstant, None)
+  private val initialMongoUpload = MongoUpload(uploadKey, reference, SensitiveUploadStatus(UploadStatus.InProgress), oldInstant, None)
+  private val encryptedRegex = "^[A-Za-z0-9+/=]+$"
 
   protected override val repository = new UploadRepository(
     mongoComponent,
     stubClock,
-    mockAppConfig
+    mockAppConfig,
+    crypto = FakeCrypto
   )
 
   ".insert" - {
@@ -48,7 +52,7 @@ class UploadRepositorySpec extends BaseRepositorySpec[MongoUpload] {
       val findAfterUpdateResult = find(Filters.equal("id", uploadKey.value)).futureValue.headOption.value
 
       updateResult mustBe ()
-      findAfterUpdateResult mustBe initialMongoUpload.copy(status = UploadStatus.Failed, lastUpdated = instant)
+      findAfterUpdateResult mustBe initialMongoUpload.copy(status = SensitiveUploadStatus(UploadStatus.Failed), lastUpdated = instant)
     }
 
     "successfully update the ttl and status to success" in {
@@ -59,8 +63,27 @@ class UploadRepositorySpec extends BaseRepositorySpec[MongoUpload] {
       val findAfterUpdateResult = find(Filters.equal("id", uploadKey.value)).futureValue.headOption.value
 
       updateResult mustBe()
-      findAfterUpdateResult mustBe initialMongoUpload.copy(status = uploadSuccessful, lastUpdated = instant)
+      findAfterUpdateResult mustBe initialMongoUpload.copy(status = SensitiveUploadStatus(uploadSuccessful), lastUpdated = instant)
     }
+
+    "successfully encrypt status" in {
+      insertInitialUploadDetails()
+
+      val uploadSuccessful = UploadStatus.Success("test-name", "text/csv", "/test-url", None)
+      repository.updateStatus(reference, uploadSuccessful).futureValue
+
+      val rawData =
+        repository
+          .collection
+          .find[BsonDocument](Filters.equal("id", uploadKey.value))
+          .toFuture()
+          .futureValue
+          .headOption
+
+      assert(rawData.nonEmpty)
+      rawData.map(_.get("status").asString().getValue must fullyMatch.regex(encryptedRegex))
+    }
+
   }
 
   ".setUploadResult" - {
@@ -71,7 +94,8 @@ class UploadRepositorySpec extends BaseRepositorySpec[MongoUpload] {
       val findAfterUpdateResult = find(Filters.equal("id", uploadKey.value)).futureValue.headOption.value
 
       updateResult mustBe()
-      findAfterUpdateResult mustBe initialMongoUpload.copy(lastUpdated = instant, result = Some(UploadFormatError))
+      findAfterUpdateResult.lastUpdated mustBe instant
+      findAfterUpdateResult.result.value.decryptedValue mustBe UploadFormatError
     }
   }
 
@@ -97,6 +121,22 @@ class UploadRepositorySpec extends BaseRepositorySpec[MongoUpload] {
       removeResult mustBe()
       findAfterRemoveResult mustBe None
     }
+  }
+
+  "successfully encrypt result" in {
+    insertInitialUploadDetails()
+
+    repository.setUploadResult(uploadKey, UploadFormatError).futureValue
+    val rawData =
+      repository
+        .collection
+        .find[BsonDocument](Filters.equal("id", uploadKey.value))
+        .toFuture()
+        .futureValue
+        .headOption
+
+    assert(rawData.nonEmpty)
+    rawData.map(_.get("result").asString().getValue must fullyMatch.regex(encryptedRegex))
   }
 
   private def insertInitialUploadDetails(): Unit = {

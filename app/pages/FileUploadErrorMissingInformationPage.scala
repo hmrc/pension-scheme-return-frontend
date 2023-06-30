@@ -14,15 +14,8 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.personalcontributions
+package pages
 
 import models.SchemeId.Srn
-import pages.QuestionPage
-import play.api.libs.json.JsPath
 
-case class PersonalContributionsPage(srn: Srn) extends QuestionPage[Boolean] {
-
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "personalContributions"
-}
+case class FileUploadErrorMissingInformationPage(srn: Srn) extends Page

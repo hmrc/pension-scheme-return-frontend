@@ -16,17 +16,17 @@
 
 package controllers.nonsipp.memberdetails.upload
 
-import controllers.nonsipp.memberdetails.upload.FileUploadWrongFormatController._
+import controllers.nonsipp.memberdetails.upload.FileUploadErrorMissingInformationController._
 import controllers.ControllerBaseSpec
 import models.NormalMode
 import views.html.ContentPageView
 
-class FileUploadWrongFormatControllerSpec extends ControllerBaseSpec {
+class FileUploadErrorMissingInformationControllerSpec extends ControllerBaseSpec {
 
-  private lazy val onPageLoad = routes.FileUploadWrongFormatController.onPageLoad(srn, NormalMode)
-  private lazy val onSubmit = routes.FileUploadWrongFormatController.onSubmit(srn, NormalMode)
+  private lazy val onPageLoad = routes.FileUploadErrorMissingInformationController.onPageLoad(srn, NormalMode)
+  private lazy val onSubmit = routes.FileUploadErrorMissingInformationController.onSubmit(srn, NormalMode)
 
-  "FileUploadWrongFormatController" - {
+  "FileUploadErrorMissingInformationController" - {
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       injected[ContentPageView].apply(viewModel(srn, NormalMode))

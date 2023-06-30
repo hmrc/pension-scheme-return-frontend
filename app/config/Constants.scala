@@ -31,7 +31,7 @@ object Constants {
   val maxAccountingPeriods = 3
 
   val schemeMembersPageSize = 25
-  val maxSchemeMembers = 99
+  val maxSchemeMembers = 300
 
   val maxCashInBank = 999999999.99
   val maxAssetValue = 999999999.99

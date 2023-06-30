@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.memberdetails
 
-import config.Refined.Max99
+import config.Refined.Max300
 import controllers.actions._
 import controllers.nonsipp.memberdetails.DoesSchemeMemberHaveNINOController._
 import forms.YesNoPageFormProvider
@@ -54,7 +54,7 @@ class DoesSchemeMemberHaveNINOController @Inject()(
   private def form(memberName: String): Form[Boolean] =
     DoesSchemeMemberHaveNINOController.form(formProvider, memberName)
 
-  def onPageLoad(srn: Srn, index: Max99, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onPageLoad(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       withMemberDetails(srn, index)(
         memberDetails =>
@@ -69,7 +69,7 @@ class DoesSchemeMemberHaveNINOController @Inject()(
       )
   }
 
-  def onSubmit(srn: Srn, index: Max99, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       withMemberDetails(srn, index)(
         memberDetails =>
@@ -90,7 +90,7 @@ class DoesSchemeMemberHaveNINOController @Inject()(
       )
   }
 
-  private def withMemberDetails(srn: Srn, index: Max99)(
+  private def withMemberDetails(srn: Srn, index: Max300)(
     f: NameDOB => Future[Result]
   )(implicit request: DataRequest[_]): Future[Result] =
     request.userAnswers.get(MemberDetailsPage(srn, index)) match {
@@ -105,7 +105,7 @@ object DoesSchemeMemberHaveNINOController {
     List(memberName)
   )
 
-  def viewModel(index: Max99, memberName: String, srn: Srn, mode: Mode): FormPageViewModel[YesNoPageViewModel] =
+  def viewModel(index: Max300, memberName: String, srn: Srn, mode: Mode): FormPageViewModel[YesNoPageViewModel] =
     YesNoPageViewModel(
       Message("nationalInsuranceNumber.title"),
       Message("nationalInsuranceNumber.heading", memberName),

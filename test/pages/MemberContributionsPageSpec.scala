@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package config
+package pages
 
-import eu.timepit.refined.api.Refined
-import eu.timepit.refined.boolean.And
-import eu.timepit.refined.numeric.{Greater, LessEqual}
+import pages.behaviours.PageBehaviours
+import pages.nonsipp.membercontributions.MemberContributionsPage
 
-object Refined {
-  type OneToTen = Greater[0] And LessEqual[10]
-  type Max10 = Int Refined OneToTen
+class MemberContributionsPageSpec extends PageBehaviours {
 
-  type OneToThree = Greater[0] And LessEqual[3]
-  type Max3 = Int Refined OneToThree
+  "MemberContributionsPage" - {
 
-  type OneTo300 = Greater[0] And LessEqual[300]
-  type Max300 = Int Refined OneTo300
+    beRetrievable[Boolean](MemberContributionsPage(srnGen.sample.value))
+
+    beSettable[Boolean](MemberContributionsPage(srnGen.sample.value))
+
+    beRemovable[Boolean](MemberContributionsPage(srnGen.sample.value))
+  }
 }

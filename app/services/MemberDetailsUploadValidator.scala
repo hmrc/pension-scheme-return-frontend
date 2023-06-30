@@ -71,8 +71,9 @@ class MemberDetailsUploadValidator @Inject()(
         .drop(1) // drop csv header and process rows
         .statefulMap[UploadState, Upload](() => UploadState.init)(
           (state, bs) => {
-            if (state.row > Constants.maxSchemeMembers) state.next() -> UploadFormatError
-            else {
+            if (state.row > Constants.maxSchemeMembers) {
+              state.next() -> UploadMaxRowsError
+            } else {
               val parts = bs.map(_.utf8String)
               validateMemberDetails(header, parts, state.previousNinos, state.row) match {
                 case None => state.next() -> UploadFormatError
@@ -85,13 +86,15 @@ class MemberDetailsUploadValidator @Inject()(
           _ => None
         )
         .takeWhile({
-          case UploadFormatError => false
+          case UploadFormatError | UploadMaxRowsError => false
           case _ => true
         }, inclusive = true)
         .runReduce[Upload] {
-          // format error
+          // format and max row errors
           case (_, UploadFormatError) => UploadFormatError
+          case (_, UploadMaxRowsError) => UploadMaxRowsError
           case (UploadFormatError, _) => UploadFormatError
+          case (UploadMaxRowsError, _) => UploadMaxRowsError
           // errors
           case (UploadErrors(previous), UploadErrors(errs)) => UploadErrors(previous ++ errs.toList)
           case (errs: UploadErrors, _) => errs
@@ -164,9 +167,9 @@ class MemberDetailsUploadValidator @Inject()(
           case nameDOBFormProvider.firstName => ValidationErrorType.FirstName
           case nameDOBFormProvider.lastName => ValidationErrorType.LastName
           case nameDOBFormProvider.dateOfBirth => ValidationErrorType.DateOfBirth
-          case dobDayKey => ValidationErrorType.DateOfBirth
-          case dobMonthKey => ValidationErrorType.DateOfBirth
-          case dobYearKey => ValidationErrorType.DateOfBirth
+          case `dobDayKey` => ValidationErrorType.DateOfBirth
+          case `dobMonthKey` => ValidationErrorType.DateOfBirth
+          case `dobYearKey` => ValidationErrorType.DateOfBirth
         }
 
         val cellMapping: FormError => Option[String] = {
