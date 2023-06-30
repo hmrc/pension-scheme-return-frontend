@@ -660,11 +660,11 @@ fileUploadTooManyRows.paragraph1 = We cannot accept the file you uploaded as it 
 fileUploadTooManyRows.paragraph2 = Remove the additional rows and upload it again, or upload a different file.
 
 partnershipRecipientUtr.title = Do you know the recipient’s Unique Taxpayer Reference (UTR)?
-partnershipRecipientUtr.heading = Do you know {0} Unique Taxpayer Reference (UTR)?
-partnershipRecipientUtr.yes.conditional = What is {0} UTR?
+partnershipRecipientUtr.heading = Do you know {0}’s Unique Taxpayer Reference (UTR)?
+partnershipRecipientUtr.yes.conditional = What is {0}’s UTR?
 partnershipRecipientUtr.yes.conditional.error.required = Enter the recipient’s UTR
 partnershipRecipientUtr.yes.conditional.error.invalid = Enter a Unique Taxpayer Reference that is 10 numbers, like 1234567890
-partnershipRecipientUtr.no.conditional = Tell us why you cannot provide {0} UTR
+partnershipRecipientUtr.no.conditional = Tell us why you cannot provide {0}’s UTR
 partnershipRecipientUtr.no.conditional.error.required = Enter the reason you cannot provide the recipient’s UTR
 partnershipRecipientUtr.no.conditional.error.invalid = The reason you cannot provide the recipient’s UTR must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, full stops, hyphens, slashes, speech marks and spaces
 partnershipRecipientUtr.no.conditional.error.length = The reason you cannot provide the recipient’s UTR must be 160 characters or fewer
