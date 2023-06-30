@@ -32,7 +32,6 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
   private def onSubmit(checkOrChange: CheckOrChange) =
     routes.SchemeMemberDetailsAnswersController.onSubmit(srn, refineMV(1), checkOrChange)
 
-  private val nino = Nino("AB123456A")
   private val noNinoReason = "test reason"
 
   private val userAnswersWithNino = defaultUserAnswers

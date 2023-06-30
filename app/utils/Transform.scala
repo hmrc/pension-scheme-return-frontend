@@ -27,6 +27,12 @@ object Transform {
 
   def apply[A, B](implicit ev: Transform[A, B]): Transform[A, B] = ev
 
+  def instance[A, B](_to: A => B, _from: B => A): Transform[A, B] = new Transform[A, B] {
+    override def to(a: A): B = _to(a)
+
+    override def from(b: B): A = _from(b)
+  }
+
   implicit def identity[A]: Transform[A, A] = new Transform[A, A] {
     override def to(a: A): A = a
 

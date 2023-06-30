@@ -27,6 +27,6 @@ object Refined {
   type OneToThree = Greater[0] And LessEqual[3]
   type Max3 = Int Refined OneToThree
 
-  type OneTo99 = Greater[0] And LessEqual[99]
-  type Max99 = Int Refined OneTo99
+  type OneTo300 = Greater[0] And LessEqual[300]
+  type Max300 = Int Refined OneTo300
 }

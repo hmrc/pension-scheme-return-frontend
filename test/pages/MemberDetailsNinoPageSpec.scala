@@ -16,7 +16,7 @@
 
 package pages
 
-import config.Refined.Max99
+import config.Refined.Max300
 import eu.timepit.refined.refineMV
 import pages.behaviours.PageBehaviours
 import pages.nonsipp.memberdetails.MemberDetailsNinoPage
@@ -32,7 +32,7 @@ class MemberDetailsNinoPageSpec extends PageBehaviours {
 
     beSettable[Nino](MemberDetailsNinoPage(srn, refineMV(1)))
 
-    beSettableWithIndex[Nino, Max99](i => MemberDetailsNinoPage(srn, i))
+    beSettableWithIndex[Nino, Max300](i => MemberDetailsNinoPage(srn, i))
 
     beRemovable[Nino](MemberDetailsNinoPage(srn, refineMV(1)))
   }

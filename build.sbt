@@ -61,7 +61,10 @@ lazy val root = (project in file("."))
     retrieveManaged := true,
     evictionWarningOptions in update :=
       EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
-    resolvers ++= Seq(Resolver.jcenterRepo),
+    resolvers ++= Seq(
+      Resolver.jcenterRepo,
+      "HMRC-open-artefacts-maven" at "https://open.artefacts.tax.service.gov.uk/maven2"
+    ),
     // concatenate js
     Concat.groups := Seq(
       "javascripts/application.js" ->

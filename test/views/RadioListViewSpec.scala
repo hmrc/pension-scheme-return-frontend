@@ -19,7 +19,7 @@ package views
 import forms.RadioListFormProvider
 import models.Enumerable
 import play.api.test.FakeRequest
-import viewmodels.models.RadioListViewModel
+import viewmodels.models.{RadioListRowDivider, RadioListRowViewModel, RadioListViewModel}
 import views.html.RadioListView
 
 class RadioListViewSpec extends ViewSpec {
@@ -70,14 +70,32 @@ class RadioListViewSpec extends ViewSpec {
       "have radio list values" in {
 
         forAll(viewModelGen) { viewmodel =>
-          radios(view(radioListForm, viewmodel)).map(_.value) mustBe viewmodel.page.items.map(_.value)
+          val itemValues = viewmodel.page.items.flatMap {
+            case RadioListRowDivider(_) => None
+            case r: RadioListRowViewModel => r.value
+          }
+          radios(view(radioListForm, viewmodel)).map(_.value) mustBe itemValues
         }
       }
 
       "have radio button labels" in {
 
         forAll(viewModelGen) { viewmodel =>
-          radios(view(radioListForm, viewmodel)).map(_.label) mustBe viewmodel.page.items.map(_.content.key)
+          val itemLabels = viewmodel.page.items.flatMap {
+            case RadioListRowDivider(_) => None
+            case r: RadioListRowViewModel => Some(r.content.key)
+          }
+          radios(view(radioListForm, viewmodel)).map(_.label) mustBe itemLabels
+        }
+      }
+
+      "render divider" in {
+        forAll(viewModelGen) { viewmodel =>
+          val dividersText = viewmodel.page.items.flatMap {
+            case RadioListRowDivider(text) => Some(text)
+            case _ => None
+          }
+          dividers(view(radioListForm, viewmodel)).map(_.text()) mustBe dividersText
         }
       }
     }

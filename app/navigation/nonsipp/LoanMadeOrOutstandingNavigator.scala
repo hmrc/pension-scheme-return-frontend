@@ -20,8 +20,7 @@ import controllers.routes
 import models.{NormalMode, ReceivedLoanType, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.loansmadeoroutstanding.{LoansMadeOrOutstandingPage, WhatYouWillNeedLoansPage}
-import pages.nonsipp.loansmadeoroutstanding.{IndividualRecipientNamePage, LoansMadeOrOutstandingPage}
+import pages.nonsipp.loansmadeoroutstanding._
 import pages.nonsipp.whoreceivedloan.WhoReceivedLoanPage
 import play.api.mvc.Call
 
@@ -45,11 +44,25 @@ object LoanMadeOrOutstandingNavigator extends JourneyNavigator {
         case Some(ReceivedLoanType.Individual) =>
           controllers.nonsipp.loansmadeoroutstanding.routes.IndividualRecipientNameController
             .onPageLoad(srn, NormalMode)
-        case _ => controllers.routes.UnauthorisedController.onPageLoad()
+        case Some(ReceivedLoanType.UKCompany) =>
+          controllers.nonsipp.loansmadeoroutstanding.routes.CompanyRecipientNameController
+            .onPageLoad(srn, NormalMode)
+        case Some(ReceivedLoanType.UKPartnership) =>
+          controllers.nonsipp.loansmadeoroutstanding.routes.PartnershipRecipientNameController
+            .onPageLoad(srn, NormalMode)
       }
 
-    case page @ IndividualRecipientNamePage(srn) =>
+    case page @ CompanyRecipientNamePage(srn) =>
       routes.UnauthorisedController.onPageLoad()
+
+    case IndividualRecipientNamePage(srn) =>
+      controllers.routes.IndividualRecipientNinoController.onPageLoad(srn, NormalMode)
+
+    case IndividualRecipientNinoPage(srn) =>
+      controllers.nonsipp.routes.IsMemberOrConnectedPartyController.onPageLoad(srn, NormalMode)
+
+    case PartnershipRecipientNamePage(srn) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty

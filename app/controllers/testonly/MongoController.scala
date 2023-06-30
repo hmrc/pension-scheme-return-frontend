@@ -17,7 +17,7 @@
 package controllers.testonly
 
 import cats.implicits._
-import config.Refined.{Max99, OneTo99}
+import config.Refined.{Max300, OneTo300}
 import controllers.actions.{DataRetrievalAction, IdentifyAndRequireData}
 import controllers.nonsipp.memberdetails.DoesSchemeMemberHaveNINOController
 import controllers.testonly.MongoController.buildRandomNameDOB
@@ -44,9 +44,9 @@ class MongoController @Inject()(
     extends FrontendBaseController
     with I18nSupport {
 
-  private val max: Max99 = refineMV(99)
+  private val max: Max300 = refineMV(99)
 
-  def addMemberDetails(srn: Srn, num: Max99): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def addMemberDetails(srn: Srn, num: Max300): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       for {
         removedUserAnswers <- Future.fromTry(removeAllMemberDetails(srn, request.userAnswers))
@@ -55,8 +55,8 @@ class MongoController @Inject()(
       } yield Ok(s"Added ${num.value} member details to UserAnswers")
   }
 
-  private def buildIndexes(num: Int): Try[List[Max99]] =
-    (1 to num).map(i => refineV[OneTo99](i).leftMap(new Exception(_)).toTry).toList.sequence
+  private def buildIndexes(num: Int): Try[List[Max300]] =
+    (1 to num).map(i => refineV[OneTo300](i).leftMap(new Exception(_)).toTry).toList.sequence
 
   private def removeAllMemberDetails(srn: Srn, userAnswers: UserAnswers): Try[UserAnswers] =
     for {

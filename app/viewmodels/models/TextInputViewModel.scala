@@ -16,13 +16,17 @@
 
 package viewmodels.models
 
+import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
 import viewmodels.DisplayMessage
 
 case class TextInputViewModel(
-  label: Option[DisplayMessage]
+  label: Option[DisplayMessage],
+  isFixedLength: Boolean
 )
 
 object TextInputViewModel {
 
-  def apply(): TextInputViewModel = TextInputViewModel(None)
+  def apply(): TextInputViewModel = TextInputViewModel(None, false)
+  def apply(isFixedLength: Boolean): TextInputViewModel = TextInputViewModel(None, isFixedLength)
+
 }

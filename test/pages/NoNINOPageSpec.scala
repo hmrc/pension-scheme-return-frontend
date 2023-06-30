@@ -16,7 +16,7 @@
 
 package pages
 
-import config.Refined.Max99
+import config.Refined.Max300
 import eu.timepit.refined.refineMV
 import pages.behaviours.PageBehaviours
 import pages.nonsipp.memberdetails.NoNINOPage
@@ -29,7 +29,7 @@ class NoNINOPageSpec extends PageBehaviours {
 
     beSettable[String](NoNINOPage(srnGen.sample.value, refineMV(1)))
 
-    beSettableWithIndex[String, Max99](i => NoNINOPage(srnGen.sample.value, i))
+    beSettableWithIndex[String, Max300](i => NoNINOPage(srnGen.sample.value, i))
 
     beRemovable[String](NoNINOPage(srnGen.sample.value, refineMV(1)))
   }

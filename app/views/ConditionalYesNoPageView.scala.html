@@ -1,0 +1,76 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@this(
+    layout: templates.Layout,
+    formHelper: FormWithCSRF,
+    govukErrorSummary: GovukErrorSummary,
+    govukRadios: GovukRadios,
+    govukInput: GovukInput,
+    govukTextarea: GovukTextarea,
+    govukDetails: GovukDetails,
+    govukButton: GovukButton,
+)
+
+@(form: Form[_], viewmodel: FormPageViewModel[ConditionalYesNoPageViewModel])(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = title(form, viewmodel.title.toMessage), refresh = viewmodel.refresh) {
+
+    @formHelper(action = viewmodel.onSubmit, Symbol("autocomplete") -> "off") {
+
+        @if(form.hasErrors) {
+            @govukErrorSummary(ErrorSummaryViewModel(form))
+        }
+
+        <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
+
+        <div class="govuk-hint">@viewmodel.page.hint.map(renderMessage)</div>
+
+        @viewmodel.description.map(renderMessage)
+
+        @govukRadios(
+            RadiosViewModel.conditionalYesNo(
+                field = form("value"),
+                fieldYes = form("value.yes"),
+                fieldNo = form("value.no"),
+                yes = viewmodel.page.yes,
+                no = viewmodel.page.no,
+                whenYes = message => govukInput(InputViewModel(form("value.yes"), LabelViewModel(renderMessage(message)))),
+                whenNo = message =>
+                    govukTextarea(
+                        TextareaViewModel("value.no", form("value.no").value)
+                                .withLabel(renderMessage(message))
+                                .withRows(10)
+                                .withError(form("value.no").errors.headOption)
+                    ),
+                legend = viewmodel.page.legend
+            )
+        )
+
+        @viewmodel.page.details.map { detail =>
+            @govukDetails(
+                DetailsViewModel(
+                    renderMessage(detail.title),
+                    renderMessage(detail.contents)
+                )
+            )
+        }
+
+        @govukButton(
+            ButtonViewModel(renderMessage(viewmodel.buttonText))
+        )
+    }
+}

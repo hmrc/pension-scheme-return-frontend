@@ -18,7 +18,7 @@ package controllers.nonsipp.memberdetails
 
 import cats.implicits.{toShow, toTraverseOps}
 import com.google.inject.Inject
-import config.Refined.Max99
+import config.Refined.Max300
 import controllers.actions._
 import controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController._
 import models.SchemeId.Srn
@@ -51,7 +51,7 @@ class SchemeMemberDetailsAnswersController @Inject()(
 ) extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(srn: Srn, index: Max99, checkOrChange: CheckOrChange, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Max300, checkOrChange: CheckOrChange, mode: Mode): Action[AnyContent] =
     identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData) { implicit request =>
       val result = for {
         memberDetails <- request.userAnswers.get(MemberDetailsPage(srn, index))
@@ -63,7 +63,7 @@ class SchemeMemberDetailsAnswersController @Inject()(
       result.getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
     }
 
-  def onSubmit(srn: Srn, index: Max99, checkOrChange: CheckOrChange, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Max300, checkOrChange: CheckOrChange, mode: Mode): Action[AnyContent] =
     identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData) { implicit request =>
       Redirect(navigator.nextPage(SchemeMemberDetailsAnswersPage(srn), NormalMode, request.userAnswers))
     }
@@ -72,7 +72,7 @@ class SchemeMemberDetailsAnswersController @Inject()(
 object SchemeMemberDetailsAnswersController {
 
   private def rows(
-    index: Max99,
+    index: Max300,
     srn: Srn,
     mode: Mode,
     memberDetails: NameDOB,
@@ -111,7 +111,7 @@ object SchemeMemberDetailsAnswersController {
     maybeNino: Option[Nino],
     memberName: String,
     srn: Srn,
-    index: Max99
+    index: Max300
   ): List[CheckYourAnswersRowViewModel] =
     maybeNino.fold(List.empty[CheckYourAnswersRowViewModel])(
       nino =>
@@ -128,7 +128,7 @@ object SchemeMemberDetailsAnswersController {
     maybeNoNinoReason: Option[String],
     memberName: String,
     srn: Srn,
-    index: Max99
+    index: Max300
   ): List[CheckYourAnswersRowViewModel] =
     maybeNoNinoReason.fold(List.empty[CheckYourAnswersRowViewModel])(
       noNinoReason =>
@@ -142,7 +142,7 @@ object SchemeMemberDetailsAnswersController {
     )
 
   def viewModel(
-    index: Max99,
+    index: Max300,
     srn: Srn,
     mode: Mode,
     checkOrChange: CheckOrChange,

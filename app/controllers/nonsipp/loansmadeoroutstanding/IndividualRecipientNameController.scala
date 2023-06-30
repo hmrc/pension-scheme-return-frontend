@@ -87,7 +87,7 @@ object IndividualRecipientNameController {
     FormPageViewModel(
       Message("individualRecipientName.title"),
       Message("individualRecipientName.heading"),
-      TextInputViewModel(),
+      TextInputViewModel(true),
       routes.IndividualRecipientNameController.onSubmit(srn, mode)
     )
 }

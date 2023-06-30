@@ -25,6 +25,7 @@ site.whatHappensNext = What happens next
 site.returnToFileUpload = Return to file upload
 site.cell = Cell
 site.error = Error
+site.or = or
 
 date.day = Day
 date.day.lower = day
@@ -319,12 +320,12 @@ activeAccountDetails.title = Did the scheme have at least 1 active bank account 
 activeAccountDetails.heading = Did {0} have at least 1 active bank account during the period of this return?
 activeAccountDetails.error.required = Select yes if the scheme had at least 1 active bank account during the period of this return
 
-personalContributions.title = Were personal contributions made by or for any member during the period of this return?
-personalContributions.heading = Were personal contributions made by or for any member during the period of this return?
-personalContributions.paragraph = This includes:
-personalContributions.listItem1 = contributions made by a member to their own pension
-personalContributions.listItem2 = contributions made on behalf of a member by another person, for example a relative
-personalContributions.error.required = Select yes if personal contributions were made by or for any member during the period of this return
+memberContributions.title = Were member contributions made by or for any member during the period of this return?
+memberContributions.heading = Were member contributions made by or for any member during the period of this return?
+memberContributions.paragraph = This includes:
+memberContributions.listItem1 = regular contributions and any additional contributions made by a member to their own pension
+memberContributions.listItem2 = contributions made on behalf of a member by another person, for example a relative
+memberContributions.error.required = Select yes if member contributions were made by or for any member during the period of this return
 
 employerContributions.title = Were employer contributions made for any member during the period of this return?
 employerContributions.heading = Were employer contributions made for any member during the period of this return?
@@ -525,16 +526,16 @@ totalValueQuotedShares.error.required = Enter the total value of all quoted shar
 totalValueQuotedShares.error.invalid = Total value of all quoted shares must be an amount of money, like 123.45 or 156
 totalValueQuotedShares.error.tooLarge = Total value of all quoted shares must be 999999999.99 or less
 
-fileUploadWrongFormat.title = Your member details file is missing information or in the wrong format
-fileUploadWrongFormat.heading = Your member details file is missing information or in the wrong format
-fileUploadWrongFormat.paragraph1 = Your file might be empty, or has a header row (row 1) that is:
-fileUploadWrongFormat.bullet1 = missing
-fileUploadWrongFormat.bullet2 = missing a field name
-fileUploadWrongFormat.bullet3 = in the wrong order
-fileUploadWrongFormat.bullet4 = different to the header row in
-fileUploadWrongFormat.bullet4.link = the template file
-fileUploadWrongFormat.paragraph2 = Correct the errors and upload it again, or upload a different file.
-fileUploadWrongFormat.button = Return to file upload
+fileUploadErrorMissingInformation.title = Your member details file is missing information or incorrectly formatted
+fileUploadErrorMissingInformation.heading = Your member details file is missing information or incorrectly formatted
+fileUploadErrorMissingInformation.paragraph1 = Your file might be empty, or has a header row (row 1) that is:
+fileUploadErrorMissingInformation.bullet1 = missing
+fileUploadErrorMissingInformation.bullet2 = missing a field name
+fileUploadErrorMissingInformation.bullet3 = in the wrong order
+fileUploadErrorMissingInformation.bullet4 = different to the header row in
+fileUploadErrorMissingInformation.bullet4.link = the template file
+fileUploadErrorMissingInformation.paragraph2 = Correct the errors and upload it again, or upload a different file.
+fileUploadErrorMissingInformation.button = Return to file upload
 
 whoReceivedLoan.title = Who received the loan?
 whoReceivedLoan.heading = Who received the loan?
@@ -620,3 +621,40 @@ individualRecipientName.heading = What is the recipient’s name?
 individualRecipientName.error.required = Enter the recipient’s name
 individualRecipientName.error.length = Recipient’s name must be 160 characters or fewer
 individualRecipientName.error.invalid.characters = Recipient’s name must only include letters a to z, and special characters such as hyphens, spaces and apostrophes
+
+companyRecipientName.title = What is the recipient’s company name?
+companyRecipientName.heading = What is the recipient’s company name?
+companyRecipientName.error.required = Enter the recipient’s company name
+companyRecipientName.error.invalid.characters = Recipient’s company name must only include letters, numbers, and special characters such as hyphens, spaces and apostrophes
+companyRecipientName.error.length = Recipient’s company name must be 160 characters or fewer
+
+isMemberOrConnectedParty.title = Is the recipient a member or a connected party?
+isMemberOrConnectedParty.heading = Is {0} a member or a connected party?
+isMemberOrConnectedParty.option1 = Member of the scheme
+isMemberOrConnectedParty.option2 = Connected party
+isMemberOrConnectedParty.option3 = Neither of these
+isMemberOrConnectedParty.checkYourAnswersLabel = Is the recipient a member or a connected party?
+isMemberOrConnectedParty.error.required = Select if the recipient is a member, connected party or neither
+isMemberOrConnectedParty.change.hidden = IsMemberOrConnectedParty
+
+individualRecipientNino.title = Do you know the recipient’s National Insurance number?
+individualRecipientNino.heading = Do you know {0}’s National Insurance number?
+individualRecipientNino.yes.conditional = What is {0} National Insurance number?
+individualRecipientNino.yes.conditional.error.required = Enter the recipient’s National Insurance number
+individualRecipientNino.yes.conditional.error.invalid = Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C
+individualRecipientNino.no.conditional = Tell us why you cannot provide {0}’s National Insurance number
+individualRecipientNino.no.conditional.error.required = Enter the reason you cannot provide the recipient’s National Insurance number
+individualRecipientNino.no.conditional.error.invalid = The reason you cannot provide the recipient’s National Insurance number must only include letters a to z, numbers 0 to 9, and special characters such as hyphens, spaces and apostrophes
+individualRecipientNino.no.conditional.error.length = The reason you cannot provide the recipient’s National Insurance number must be 160 characters or fewer
+individualRecipientNino.error.required = Select yes if you know the recipient’s National Insurance number
+
+partnershipRecipientName.title = What is the recipient’s partnership name?
+partnershipRecipientName.heading = What is the recipient’s partnership name?
+partnershipRecipientName.error.required = Enter the recipient’s partnership name
+partnershipRecipientName.error.length = Recipient’s partnership name must be 160 characters or fewer
+partnershipRecipientName.error.invalid.characters = Recipient’s partnership name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), full stops, hyphens, speech marks and spaces
+
+fileUploadTooManyRows.title = Your member details file has too many rows
+fileUploadTooManyRows.heading = Your member details file has too many rows
+fileUploadTooManyRows.paragraph1 = We cannot accept the file you uploaded as it contains too many rows. The maximum number of rows it can have is 300.
+fileUploadTooManyRows.paragraph2 = Remove the additional rows and upload it again, or upload a different file.

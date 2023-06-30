@@ -17,22 +17,22 @@
 package forms
 
 import forms.mappings.Mappings
-import play.api.data.{Form, Mapping}
+import play.api.data.Form
 import uk.gov.hmrc.domain.Nino
 
 import javax.inject.Inject
 
-class TextFormProvider @Inject()() extends Mappings {
+class TextFormProvider @Inject()() {
 
-  val nameRegex = "^[a-zA-Z\\-' ]+$"
-  val textAreaRegex = """^[a-zA-Z0-9\-'" \t\r\n,.@/]+$"""
-  val textAreaMaxLength = 160
+  protected[forms] val nameRegex = "^[a-zA-Z\\-' ]+$"
+  protected[forms] val textAreaRegex = """^[a-zA-Z0-9\-'" \t\r\n,.@/]+$"""
+  protected[forms] val textAreaMaxLength = 160
 
   val formKey = "value"
 
   def apply(requiredKey: String): Form[String] =
     Form(
-      formKey -> text(requiredKey)
+      formKey -> Mappings.text(requiredKey)
     )
 
   def textArea(
@@ -41,9 +41,14 @@ class TextFormProvider @Inject()() extends Mappings {
     invalidCharactersKey: String,
     args: Any*
   ): Form[String] = Form(
-    formKey -> text(requiredKey, args.toList)
-      .verifying(verify[String](invalidCharactersKey, _.matches(textAreaRegex), args: _*))
-      .verifying(verify[String](tooLongKey, _.length <= textAreaMaxLength, args: _*))
+    formKey -> Mappings.validatedText(
+      requiredKey,
+      textAreaRegex,
+      invalidCharactersKey,
+      textAreaMaxLength,
+      tooLongKey,
+      args: _*
+    )
   )
 
   def nino(
@@ -54,10 +59,7 @@ class TextFormProvider @Inject()() extends Mappings {
     args: Any*
   ): Form[Nino] =
     Form(
-      formKey -> text(requiredKey, args.toList)
-        .verifying(verify[String](invalidKey, s => Nino.isValid(s.toUpperCase), args: _*))
-        .verifying(verify[String](duplicateKey, !duplicates.map(_.nino).contains(_), args: _*))
-        .transform[Nino](s => Nino(s.toUpperCase), _.nino.toUpperCase)
+      formKey -> Mappings.ninoNoDuplicates(requiredKey, invalidKey, duplicates, duplicateKey, args: _*)
     )
 
   def name(
@@ -66,8 +68,13 @@ class TextFormProvider @Inject()() extends Mappings {
     invalidCharactersKey: String,
     args: Any*
   ): Form[String] = Form(
-    formKey -> text(requiredKey, args.toList)
-      .verifying(verify[String](invalidCharactersKey, _.matches(nameRegex), args: _*))
-      .verifying(verify[String](tooLongKey, _.length <= textAreaMaxLength, args: _*))
+    formKey -> Mappings.validatedText(
+      requiredKey,
+      nameRegex,
+      invalidCharactersKey,
+      textAreaMaxLength,
+      tooLongKey,
+      args: _*
+    )
   )
 }

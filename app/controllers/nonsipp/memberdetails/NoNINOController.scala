@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.memberdetails
 
-import config.Refined.Max99
+import config.Refined.Max300
 import controllers.actions._
 import controllers.nonsipp.memberdetails.NoNINOController._
 import forms.TextFormProvider
@@ -51,7 +51,7 @@ class NoNINOController @Inject()(
 
   private def form(memberFullName: String): Form[String] = NoNINOController.form(formProvider, memberFullName)
 
-  def onPageLoad(srn: Srn, index: Max99, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onPageLoad(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       withMemberDetails(srn, index) { memberDetails =>
         val preparedForm =
@@ -62,7 +62,7 @@ class NoNINOController @Inject()(
       }
   }
 
-  def onSubmit(srn: Srn, index: Max99, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       withMemberDetails(srn, index) { memberDetails =>
         form(memberDetails.fullName)
@@ -79,7 +79,7 @@ class NoNINOController @Inject()(
       }
   }
 
-  private def withMemberDetails(srn: Srn, index: Max99)(
+  private def withMemberDetails(srn: Srn, index: Max300)(
     f: NameDOB => Future[Result]
   )(implicit request: DataRequest[_]): Future[Result] =
     request.userAnswers.get(MemberDetailsPage(srn, index)) match {
@@ -96,7 +96,7 @@ object NoNINOController {
     memberFullName
   )
 
-  def viewModel(srn: Srn, memberFullName: String, index: Max99, mode: Mode): FormPageViewModel[TextAreaViewModel] =
+  def viewModel(srn: Srn, memberFullName: String, index: Max300, mode: Mode): FormPageViewModel[TextAreaViewModel] =
     FormPageViewModel(
       "noNINO.title",
       "noNINO.heading" -> memberFullName,

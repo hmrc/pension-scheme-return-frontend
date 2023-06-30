@@ -16,7 +16,7 @@
 
 package pages.nonsipp.memberdetails
 
-import config.Refined.Max99
+import config.Refined.Max300
 import models.SchemeId.Srn
 import models.{NameDOB, UserAnswers}
 import pages.QuestionPage
@@ -26,7 +26,7 @@ import utils.RefinedUtils.RefinedIntOps
 
 import scala.util.Try
 
-case class MemberDetailsPage(srn: Srn, index: Max99) extends QuestionPage[NameDOB] {
+case class MemberDetailsPage(srn: Srn, index: Max300) extends QuestionPage[NameDOB] {
 
   override def path: JsPath = JsPath \ toString \ index.arrayIndex
 

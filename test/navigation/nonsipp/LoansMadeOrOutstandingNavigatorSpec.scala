@@ -20,8 +20,7 @@ import controllers.routes
 import models.{NormalMode, ReceivedLoanType}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.loansmadeoroutstanding.{LoansMadeOrOutstandingPage, WhatYouWillNeedLoansPage}
-import pages.nonsipp.loansmadeoroutstanding.{IndividualRecipientNamePage, LoansMadeOrOutstandingPage}
+import pages.nonsipp.loansmadeoroutstanding._
 import pages.nonsipp.whoreceivedloan.WhoReceivedLoanPage
 import utils.BaseSpec
 
@@ -51,6 +50,24 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
         .withName(
           "go from loan made or outstanding page to did scheme hold shares in sponsoring employer page when no selected"
         )
+    )
+
+    act.like(
+      normalmode
+        .navigateTo(
+          IndividualRecipientNamePage,
+          controllers.routes.IndividualRecipientNinoController.onPageLoad
+        )
+        .withName("go from Individual recipient name page to individual nino page")
+    )
+
+    act.like(
+      normalmode
+        .navigateTo(
+          IndividualRecipientNinoPage,
+          controllers.nonsipp.routes.IsMemberOrConnectedPartyController.onPageLoad
+        )
+        .withName("go from individual recipient nino page to is member or connected party page")
     )
 
     "WhatYouWillNeedNavigator" - {
@@ -95,25 +112,47 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
 
       act.like(
         normalmode
-          .navigateTo(
+          .navigateToWithData(
             WhoReceivedLoanPage,
-            (_, _) => routes.UnauthorisedController.onPageLoad()
+            Gen.const(ReceivedLoanType.UKCompany),
+            controllers.nonsipp.loansmadeoroutstanding.routes.CompanyRecipientNameController.onPageLoad
           )
-          .withName("go from who received loan page to unauthorised page")
+          .withName("go from who received loan page to company recipient name page")
+      )
+
+      act.like(
+        normalmode
+          .navigateToWithData(
+            WhoReceivedLoanPage,
+            Gen.const(ReceivedLoanType.UKPartnership),
+            controllers.nonsipp.loansmadeoroutstanding.routes.PartnershipRecipientNameController.onPageLoad
+          )
+          .withName("go from who received loan page UKPartnership to partnership recipient name page")
       )
     }
   }
 
-  "IndividualRecipientNamePage" - {
+  "CompanyRecipientNamePage" - {
     "NormalMode" - {
       act.like(
         normalmode
           .navigateTo(
-            IndividualRecipientNamePage,
+            CompanyRecipientNamePage,
             (_, _) => routes.UnauthorisedController.onPageLoad()
           )
-          .withName("go from individual recipient page to unauthorised")
+          .withName("go from company recipient name page to unauthorised page")
       )
     }
+  }
+
+  "PartnershipRecipientNamePage" - {
+    act.like(
+      normalmode
+        .navigateTo(
+          PartnershipRecipientNamePage,
+          (_, _) => routes.UnauthorisedController.onPageLoad()
+        )
+        .withName("go from partnership recipient name page to unauthorised page")
+    )
   }
 }

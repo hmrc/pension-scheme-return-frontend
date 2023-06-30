@@ -16,23 +16,17 @@
 
 package navigation.nonsipp
 
-import config.Refined.OneTo99
+import config.Refined.OneTo300
 import controllers.nonsipp.employercontributions
 import controllers.nonsipp.memberdetails.routes
 import eu.timepit.refined.{refineMV, refineV}
 import models.CheckOrChange.Check
 import models.ManualOrUpload.{Manual, Upload}
-import models.{CheckMode, CheckOrChange, ManualOrUpload, NormalMode, UploadErrors, UploadFormatError, UserAnswers}
+import models._
 import navigation.JourneyNavigator
 import pages.nonsipp.BasicDetailsCheckYourAnswersPage
 import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
-import pages.{
-  CheckingMemberDetailsFilePage,
-  FileUploadErrorSummaryPage,
-  FileUploadTooManyErrorsPage,
-  FileUploadWrongFormatPage,
-  Page
-}
+import pages._
 import pages.nonsipp.memberdetails._
 import pages.nonsipp.memberdetails.upload.{FileUploadErrorPage, FileUploadSuccessPage}
 import play.api.mvc.Call
@@ -69,7 +63,7 @@ object MemberDetailsNavigator extends JourneyNavigator {
       employercontributions.routes.EmployerContributionsController.onPageLoad(srn, NormalMode)
 
     case SchemeMembersListPage(srn, true, Manual) =>
-      refineV[OneTo99](userAnswers.membersDetails(srn).length + 1).fold(
+      refineV[OneTo300](userAnswers.membersDetails(srn).length + 1).fold(
         _ => employercontributions.routes.EmployerContributionsController.onPageLoad(srn, NormalMode),
         index => routes.MemberDetailsController.onPageLoad(srn, index, NormalMode)
       )
@@ -101,7 +95,8 @@ object MemberDetailsNavigator extends JourneyNavigator {
       controllers.nonsipp.memberdetails.routes.SchemeMembersListController.onPageLoad(srn, 1, Upload)
 
     case FileUploadErrorPage(srn, UploadFormatError) =>
-      controllers.nonsipp.memberdetails.upload.routes.FileUploadWrongFormatController.onPageLoad(srn, NormalMode)
+      controllers.nonsipp.memberdetails.upload.routes.FileUploadErrorMissingInformationController
+        .onPageLoad(srn, NormalMode)
 
     case FileUploadErrorPage(srn, UploadErrors(errs)) if errs.size > 10 =>
       controllers.nonsipp.memberdetails.upload.routes.FileUploadTooManyErrorsController.onPageLoad(srn, NormalMode)
@@ -109,13 +104,19 @@ object MemberDetailsNavigator extends JourneyNavigator {
     case FileUploadErrorPage(srn, _: UploadErrors) =>
       controllers.nonsipp.memberdetails.upload.routes.FileUploadErrorSummaryController.onPageLoad(srn, NormalMode)
 
-    case FileUploadWrongFormatPage(srn) =>
+    case FileUploadErrorPage(srn, UploadMaxRowsError) =>
+      controllers.nonsipp.memberdetails.upload.routes.FileUploadTooManyRowsController.onPageLoad(srn, NormalMode)
+
+    case FileUploadErrorMissingInformationPage(srn) =>
       controllers.nonsipp.memberdetails.routes.UploadMemberDetailsController.onPageLoad(srn)
 
     case FileUploadErrorSummaryPage(srn) =>
       controllers.nonsipp.memberdetails.routes.UploadMemberDetailsController.onPageLoad(srn)
 
     case FileUploadTooManyErrorsPage(srn) =>
+      controllers.nonsipp.memberdetails.routes.UploadMemberDetailsController.onPageLoad(srn)
+
+    case FileUploadTooManyRowsPage(srn) =>
       controllers.nonsipp.memberdetails.routes.UploadMemberDetailsController.onPageLoad(srn)
 
     case BasicDetailsCheckYourAnswersPage(srn) =>
