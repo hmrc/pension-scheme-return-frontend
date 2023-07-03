@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.nonsipp.loansmadeoroutstanding
 
-import controllers.IndividualRecipientNinoController._
 import controllers.actions._
+import controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNinoController._
 import forms.YesNoPageFormProvider
 import forms.mappings.Mappings
 import models.SchemeId.Srn
@@ -97,6 +97,6 @@ object IndividualRecipientNinoController {
         yes = YesNoViewModel.Conditional(Message("individualRecipientNino.yes.conditional", individualName)),
         no = YesNoViewModel.Conditional(Message("individualRecipientNino.no.conditional", individualName))
       ),
-      controllers.routes.IndividualRecipientNinoController.onSubmit(srn, mode)
+      routes.IndividualRecipientNinoController.onSubmit(srn, mode)
     )
 }

@@ -103,6 +103,10 @@ trait TestValues { _: OptionValues =>
   val partnershipRecipientName = "testPartnershipRecipientName"
   val utr: Utr = utrGen.sample.get
 
+  val companyName = "testCompanyName"
+  val crn: Crn = crnGen.sample.get
+
+
   val individualDetails: IndividualDetails = IndividualDetails("testFirstName", Some("testMiddleName"), "testLastName")
 
   val userAnswersId: String = "id"
