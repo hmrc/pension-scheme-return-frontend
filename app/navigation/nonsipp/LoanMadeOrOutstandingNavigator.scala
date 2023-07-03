@@ -65,7 +65,10 @@ object LoanMadeOrOutstandingNavigator extends JourneyNavigator {
       routes.UnauthorisedController.onPageLoad()
 
     case PartnershipRecipientNamePage(srn) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+      controllers.nonsipp.loansmadeoroutstanding.routes.PartnershipRecipientUtrController.onPageLoad(srn, NormalMode)
+
+    case PartnershipRecipientUtrPage(srn) =>
+      routes.UnauthorisedController.onPageLoad()
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty

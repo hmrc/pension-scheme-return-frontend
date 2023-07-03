@@ -336,3 +336,8 @@ GET        /:srn/file-upload-too-many-rows                      controllers.nons
 GET        /:srn/submit-file-upload-too-many-rows               controllers.nonsipp.memberdetails.upload.FileUploadTooManyRowsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 GET        /:srn/change-file-upload-too-many-rows               controllers.nonsipp.memberdetails.upload.FileUploadTooManyRowsController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 GET        /:srn/change-submit-file-upload-too-many-rows        controllers.nonsipp.memberdetails.upload.FileUploadTooManyRowsController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET        /:srn/partnership-recipient-utr                        controllers.nonsipp.loansmadeoroutstanding.PartnershipRecipientUtrController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST       /:srn/partnership-recipient-utr                        controllers.nonsipp.loansmadeoroutstanding.PartnershipRecipientUtrController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/change-partnership-recipient-utr                 controllers.nonsipp.loansmadeoroutstanding.PartnershipRecipientUtrController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST       /:srn/change-partnership-recipient-utr                 controllers.nonsipp.loansmadeoroutstanding.PartnershipRecipientUtrController.onSubmit(srn: Srn, mode: Mode = CheckMode)

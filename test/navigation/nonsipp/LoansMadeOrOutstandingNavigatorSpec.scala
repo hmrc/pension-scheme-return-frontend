@@ -160,9 +160,21 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
       normalmode
         .navigateTo(
           PartnershipRecipientNamePage,
+          controllers.nonsipp.loansmadeoroutstanding.routes.PartnershipRecipientUtrController.onPageLoad
+        )
+        .withName("go from partnership recipient name page to partnership recipient Utr page")
+    )
+  }
+
+  "PartnershipRecipientUtrPage" - {
+    act.like(
+      normalmode
+        .navigateTo(
+          PartnershipRecipientUtrPage,
           (_, _) => routes.UnauthorisedController.onPageLoad()
         )
-        .withName("go from partnership recipient name page to unauthorised page")
+        .withName("go from partnership recipient Utr page to unauthorised page")
     )
+
   }
 }

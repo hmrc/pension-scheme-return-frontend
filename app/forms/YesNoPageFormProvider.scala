@@ -27,7 +27,6 @@ class YesNoPageFormProvider @Inject()() {
 
   protected[forms] val textAreaRegex = """^[a-zA-Z0-9\-'" \t\r\n,.@/]+$"""
   protected[forms] val textAreaMaxLength = 160
-
   def apply(
     requiredKey: String,
     invalidKey: String

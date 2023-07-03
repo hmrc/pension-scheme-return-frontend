@@ -24,7 +24,7 @@ import pages.nonsipp.loansmadeoroutstanding.PartnershipRecipientNamePage
 import views.html.TextInputView
 
 class PartnershipRecipientNameControllerSpec extends ControllerBaseSpec {
-  private val partnershipRecipientName = "Partnership Recipient Name"
+  override val partnershipRecipientName = "Partnership Recipient Name"
 
   "PartnershipRecipientNameController" - {
 

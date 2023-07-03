@@ -214,6 +214,12 @@ trait ModelGenerators extends BasicGenerators {
     Nino(s"$prefix$numbers$suffix")
   }
 
+  implicit val utrGen: Gen[Utr] = for {
+    numbers <- Gen.listOfN(10, Gen.numChar).map(_.mkString)
+  } yield {
+    Utr(s"$numbers")
+  }
+
   val crnPrefix: Gen[String] = {
     (for {
       fst <- Gen.oneOf('A' to 'Z')
