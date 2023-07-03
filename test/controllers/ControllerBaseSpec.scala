@@ -106,7 +106,6 @@ trait TestValues { _: OptionValues =>
   val companyName = "testCompanyName"
   val crn: Crn = crnGen.sample.get
 
-
   val individualDetails: IndividualDetails = IndividualDetails("testFirstName", Some("testMiddleName"), "testLastName")
 
   val userAnswersId: String = "id"

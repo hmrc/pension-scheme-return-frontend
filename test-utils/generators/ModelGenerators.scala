@@ -218,7 +218,8 @@ trait ModelGenerators extends BasicGenerators {
     numbers <- Gen.listOfN(10, Gen.numChar).map(_.mkString)
   } yield {
     Utr(s"$numbers")
-    
+  }
+
   val crnPrefix: Gen[String] = {
     (for {
       fst <- Gen.oneOf('A' to 'Z')
