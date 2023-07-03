@@ -56,7 +56,7 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
       normalmode
         .navigateTo(
           IndividualRecipientNamePage,
-          controllers.routes.IndividualRecipientNinoController.onPageLoad
+          controllers.nonsipp.loansmadeoroutstanding.routes.IndividualRecipientNinoController.onPageLoad
         )
         .withName("go from Individual recipient name page to individual nino page")
     )
@@ -132,15 +132,25 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
     }
   }
 
-  "CompanyRecipientNamePage" - {
+  "CompanyRecipientJourney" - {
     "NormalMode" - {
+
       act.like(
         normalmode
           .navigateTo(
             CompanyRecipientNamePage,
+            controllers.nonsipp.loansmadeoroutstanding.routes.CompanyRecipientCrnController.onPageLoad
+          )
+          .withName("go from company recipient name page to company crn page")
+      )
+
+      act.like(
+        normalmode
+          .navigateTo(
+            CompanyRecipientCrnPage,
             (_, _) => routes.UnauthorisedController.onPageLoad()
           )
-          .withName("go from company recipient name page to unauthorised page")
+          .withName("go from company recipient CRN page to unauthorised page")
       )
     }
   }

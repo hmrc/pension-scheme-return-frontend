@@ -22,7 +22,7 @@ import org.scalatest.OptionValues
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import play.api.data.{Form, FormError}
-import models.{Enumerable, Money}
+import models.{Crn, Enumerable, Money}
 
 object MappingsSpec {
 
@@ -277,6 +277,35 @@ class MappingsSpec extends AnyFreeSpec with Matchers with OptionValues with Mapp
     "must not bind an empty map" in {
       val result = testForm.bind(Map.empty[String, String])
       result.errors must contain(FormError("value", "error.required"))
+    }
+  }
+
+  "crn" - {
+    val testForm = Form("value" -> crn("error.required", "error.invalid", "error.minmax"))
+
+    "must bind a valid value" in {
+      val result = testForm.bind(Map("value" -> "1234567"))
+      result.get mustEqual Crn("1234567")
+    }
+
+    "must not bind an empty value" in {
+      val result = testForm.bind(Map("value" -> ""))
+      result.errors must contain(FormError("value", "error.required"))
+    }
+
+    "must not bind an invalid value" in {
+      val result = testForm.bind(Map("value" -> "*"))
+      result.errors must contain(FormError("value", "error.invalid"))
+    }
+
+    "must not bind an under minimum length value" in {
+      val result = testForm.bind(Map("value" -> "12"))
+      result.errors must contain(FormError("value", "error.minmax"))
+    }
+
+    "must not bind an over maximum length value" in {
+      val result = testForm.bind(Map("value" -> "123456789"))
+      result.errors must contain(FormError("value", "error.minmax"))
     }
   }
 }

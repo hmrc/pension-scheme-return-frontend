@@ -48,7 +48,10 @@
                 fieldNo = form("value.no"),
                 yes = viewmodel.page.yes,
                 no = viewmodel.page.no,
-                whenYes = message => govukInput(InputViewModel(form("value.yes"), LabelViewModel(renderMessage(message)))),
+                whenYes = message => govukInput(
+                        InputViewModel(form("value.yes"), LabelViewModel(renderMessage(message)))
+                                .withId("value.yes")
+                    ),
                 whenNo = message =>
                     govukTextarea(
                         TextareaViewModel("value.no", form("value.no").value)

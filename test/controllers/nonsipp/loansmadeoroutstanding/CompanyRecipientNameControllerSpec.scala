@@ -24,7 +24,6 @@ import pages.nonsipp.loansmadeoroutstanding.CompanyRecipientNamePage
 import views.html.TextInputView
 
 class CompanyRecipientNameControllerSpec extends ControllerBaseSpec {
-  private val companyName = "Company Name"
 
   "IndividualRecipientNameController" - {
 

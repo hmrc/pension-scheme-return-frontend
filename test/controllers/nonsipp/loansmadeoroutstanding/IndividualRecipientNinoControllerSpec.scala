@@ -14,27 +14,22 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.nonsipp.loansmadeoroutstanding
 
-import models.{ConditionalYesNo, NormalMode, UserAnswers}
-import navigation.{FakeNavigator, Navigator}
-import play.api.inject.bind
-import play.api.mvc.Call
-import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import repositories.SessionRepository
+import controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNinoController._
+import controllers.ControllerBaseSpec
 import forms.YesNoPageFormProvider
-import views.html.{ConditionalYesNoPageView, YesNoPageView}
-import IndividualRecipientNinoController._
+import models.{ConditionalYesNo, NormalMode}
 import pages.nonsipp.loansmadeoroutstanding.{IndividualRecipientNamePage, IndividualRecipientNinoPage}
 import uk.gov.hmrc.domain.Nino
-
-import scala.concurrent.Future
+import views.html.ConditionalYesNoPageView
 
 class IndividualRecipientNinoControllerSpec extends ControllerBaseSpec {
 
-  private lazy val onPageLoad = routes.IndividualRecipientNinoController.onPageLoad(srn, NormalMode)
-  private lazy val onSubmit = routes.IndividualRecipientNinoController.onSubmit(srn, NormalMode)
+  private lazy val onPageLoad =
+    controllers.nonsipp.loansmadeoroutstanding.routes.IndividualRecipientNinoController.onPageLoad(srn, NormalMode)
+  private lazy val onSubmit =
+    controllers.nonsipp.loansmadeoroutstanding.routes.IndividualRecipientNinoController.onSubmit(srn, NormalMode)
 
   val userAnswersWithIndividualName = defaultUserAnswers.unsafeSet(IndividualRecipientNamePage(srn), individualName)
 
