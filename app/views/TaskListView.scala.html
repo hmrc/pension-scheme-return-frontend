@@ -50,9 +50,11 @@
         items => taskListItemsView(items, index)
       )
       @section.postActionLink.map { link =>
-        <p class="govuk-body govuk-!-padding-top-5">
-          @renderMessage(link)
-        </p>
+        <li>
+            <p class="govuk-body govuk-!-padding-top-5">
+              @renderMessage(link)
+            </p>
+        </li>
       }
      </ul>
     </li>
