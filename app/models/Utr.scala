@@ -33,7 +33,7 @@ object Utr extends (String => Utr) {
   implicit val utrWrite: Writes[Utr] = new SimpleObjectWrites[Utr](_.value)
   implicit val utrRead: Reads[Utr] = new SimpleObjectReads[Utr]("utr", Utr.apply)
 
-  private val validUtrFormat = """\d{10}"""
+  private val validUtrFormat = """^\d{5}\s*?\d{5}"""
 
   def isValid(utr: String) = utr != null && utr.matches(validUtrFormat)
 
