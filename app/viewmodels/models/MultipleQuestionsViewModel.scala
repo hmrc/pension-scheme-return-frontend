@@ -23,38 +23,57 @@ sealed trait MultipleQuestionsViewModel[A] {
 
   val form: Form[A]
 
-  def firstField: Field
-  def fields: List[Field]
+  def firstField: QuestionField
+  def fields: List[QuestionField]
 }
 
 object MultipleQuestionsViewModel {
 
-  case class SingleQuestion[A](form: Form[A], field1: Field) extends MultipleQuestionsViewModel[A] {
+  case class SingleQuestion[A](form: Form[A], field1: QuestionField) extends MultipleQuestionsViewModel[A] {
 
-    override def firstField: Field = field1
-    override val fields: List[Field] = List(field1)
+    override def firstField: QuestionField = field1
+    override val fields: List[QuestionField] = List(field1)
   }
 
   case class DoubleQuestion[A](
     form: Form[(A, A)],
-    field1: Field,
-    field2: Field
+    field1: QuestionField,
+    field2: QuestionField
   ) extends MultipleQuestionsViewModel[(A, A)] {
 
-    override def firstField: Field = field1
-    override val fields: List[Field] = List(field1, field2)
+    override def firstField: QuestionField = field1
+    override val fields: List[QuestionField] = List(field1, field2)
   }
 
-  case class TripleQuestion[A](
-    form: Form[(A, A, A)],
-    field1: Field,
-    field2: Field,
-    field3: Field
-  ) extends MultipleQuestionsViewModel[(A, A, A)] {
+  case class TripleQuestion[A, B, C](
+    form: Form[(A, B, C)],
+    field1: QuestionField,
+    field2: QuestionField,
+    field3: QuestionField
+  ) extends MultipleQuestionsViewModel[(A, B, C)] {
 
-    override def firstField: Field = field1
-    override val fields: List[Field] = List(field1, field2, field3)
+    override def firstField: QuestionField = field1
+    override val fields: List[QuestionField] = List(field1, field2, field3)
   }
 }
 
-case class Field(label: InlineMessage, hint: Option[InlineMessage] = None)
+sealed trait FieldType
+
+object FieldType {
+  case object Input extends FieldType
+  case object Currency extends FieldType
+  case object Date extends FieldType
+}
+
+case class QuestionField(label: InlineMessage, hint: Option[InlineMessage] = None, fieldType: FieldType)
+
+object QuestionField {
+  def input(label: InlineMessage, hint: Option[InlineMessage] = None): QuestionField =
+    QuestionField(label, hint, FieldType.Input)
+
+  def currency(label: InlineMessage, hint: Option[InlineMessage] = None): QuestionField =
+    QuestionField(label, hint, FieldType.Currency)
+
+  def date(label: InlineMessage, hint: Option[InlineMessage] = None): QuestionField =
+    QuestionField(label, hint, FieldType.Date)
+}

@@ -46,6 +46,11 @@ trait Mappings extends Formatters with Constraints {
   ): FieldMapping[Int] =
     of(intFormatter(intFormErrors, args))
 
+  def int(
+    intFormErrors: IntFormErrors
+  ): FieldMapping[Int] =
+    of(intFormatter(intFormErrors, Nil))
+
   def double(
     requiredKey: String = "error.required",
     nonNumericKey: String = "error.nonNumeric",

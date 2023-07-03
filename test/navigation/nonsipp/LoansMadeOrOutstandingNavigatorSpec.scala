@@ -81,6 +81,14 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
       )
     }
 
+    act.like(
+      normalmode
+        .navigateTo(
+          RecipientSponsoringEmployerConnectedPartyPage,
+          controllers.nonsipp.loansmadeoroutstanding.routes.DatePeriodLoanController.onPageLoad
+        )
+        .withName("go from sponsoring employer or connected party page to date period loan page")
+    )
   }
 
   "WhoReceivedLoanNavigator" - {
@@ -174,6 +182,5 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
         )
         .withName("go from partnership recipient Utr page to sponsoring employer or connected party page")
     )
-
   }
 }

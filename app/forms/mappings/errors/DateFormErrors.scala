@@ -31,5 +31,8 @@ case class DateFormErrors(
 
 object DateFormErrors {
   def failIfFutureDate(errorMsg: String): LocalDate => Option[String] =
-    date => Option.when(date.isAfter(LocalDate.now()))(errorMsg)
+    failIfDateAfter(LocalDate.now(), errorMsg)
+
+  def failIfDateAfter(dateAfter: LocalDate, errorMsg: String): LocalDate => Option[String] =
+    date => Option.when(date.isAfter(dateAfter))(errorMsg)
 }

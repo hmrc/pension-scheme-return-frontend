@@ -14,30 +14,23 @@
  * limitations under the License.
  */
 
-package config
+package forms
 
-object Constants {
+import play.api.data.Forms.mapping
+import play.api.data.{FieldMapping, Form}
 
-  val psaEnrolmentKey = "HMRC-PODS-ORG"
-  val pspEnrolmentKey = "HMRC-PODSPP-ORG"
+object MultipleQuestionFormProvider {
 
-  val psaIdKey = "PSAID"
-  val pspIdKey = "PSPID"
-
-  val delimitedPSA = "DELIMITED_PSAID"
-  val detailsNotFound = "no match found"
-
-  val maxSchemeBankAccounts = 10
-  val maxAccountingPeriods = 3
-
-  val schemeMembersPageSize = 25
-  val maxSchemeMembers = 300
-
-  val maxCashInBank = 999999999.99
-  val maxAssetValue = 999999999.99
-  val maxMoneyValue = 999999999.99
-
-  val maxMembers = 999999
-
-  val maxLoanPeriod = 999
+  def apply[A, B, C](
+    a: FieldMapping[A],
+    b: FieldMapping[B],
+    c: FieldMapping[C]
+  ): Form[(A, B, C)] =
+    Form(
+      mapping[(A, B, C), A, B, C](
+        "value.1" -> a,
+        "value.2" -> b,
+        "value.3" -> c
+      )(Tuple3.apply)(Tuple3.unapply)
+    )
 }
