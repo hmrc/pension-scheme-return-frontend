@@ -17,47 +17,39 @@
 package controllers.nonsipp.accountingperiod
 
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.accountingperiod.routes
 import eu.timepit.refined.refineMV
 import forms.DateRangeFormProvider
-import models.{DateRange, NormalMode}
+import models.NormalMode
+import pages.nonsipp.WhichTaxYearPage
 import pages.nonsipp.accountingperiod.AccountingPeriodPage
-import play.api.inject.bind
-import play.api.inject.guice.GuiceableModule
 import services.TaxYearService
 import views.html.DateRangeView
 
 class AccountingPeriodControllerSpec extends ControllerBaseSpec {
 
   private val mockTaxYearService = mock[TaxYearService]
+  private val userAnswers = defaultUserAnswers.unsafeSet(WhichTaxYearPage(srn), dateRange)
 
-  override val additionalBindings: List[GuiceableModule] = List(
-    bind[TaxYearService].toInstance(mockTaxYearService)
-  )
-
-  override def beforeEach(): Unit = {
-    reset(mockTaxYearService)
-    when(mockTaxYearService.current).thenReturn(defaultTaxYear)
-  }
+  override def beforeEach(): Unit = reset(mockTaxYearService)
 
   "AccountingPeriodController" - {
 
     val form = AccountingPeriodController.form(new DateRangeFormProvider(), defaultTaxYear, List())
     lazy val viewModel = AccountingPeriodController.viewModel(srn, refineMV(1), NormalMode)
 
-    val rangeGen = dateRangeWithinRangeGen(DateRange(defaultTaxYear.starts, defaultTaxYear.finishes))
+    val rangeGen = dateRangeWithinRangeGen(dateRange)
     val dateRangeData = rangeGen.sample.value
     val otherDateRangeData = rangeGen.sample.value
 
     lazy val onPageLoad = routes.AccountingPeriodController.onPageLoad(srn, refineMV(1), NormalMode)
     lazy val onSubmit = routes.AccountingPeriodController.onSubmit(srn, refineMV(1), NormalMode)
 
-    act.like(renderView(onPageLoad) { implicit app => implicit request =>
+    act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
       val view = injected[DateRangeView]
       view(form, viewModel)
     })
 
-    act.like(renderPrePopView(onPageLoad, AccountingPeriodPage(srn, refineMV(1)), dateRangeData) {
+    act.like(renderPrePopView(onPageLoad, AccountingPeriodPage(srn, refineMV(1)), dateRangeData, userAnswers) {
       implicit app => implicit request =>
         val view = injected[DateRangeView]
         view(form.fill(dateRangeData), viewModel)
@@ -65,20 +57,21 @@ class AccountingPeriodControllerSpec extends ControllerBaseSpec {
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
-    act.like(saveAndContinue(onSubmit, formData(form, dateRangeData): _*))
+    act.like(saveAndContinue(onSubmit, userAnswers, formData(form, dateRangeData): _*))
 
-    act.like(invalidForm(onSubmit))
+    act.like(invalidForm(onSubmit, userAnswers))
 
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
 
     "allow accounting period to be updated" - {
-      val userAnswers = emptyUserAnswers.set(AccountingPeriodPage(srn, refineMV(1)), dateRangeData).get
       act.like(saveAndContinue(onSubmit, userAnswers, formData(form, dateRangeData): _*))
     }
 
     "return a 400 if range intersects" - {
       val userAnswers =
         emptyUserAnswers
+          .set(WhichTaxYearPage(srn), dateRange)
+          .get
           .set(AccountingPeriodPage(srn, refineMV(1)), otherDateRangeData)
           .get
           .set(AccountingPeriodPage(srn, refineMV(2)), dateRangeData)
