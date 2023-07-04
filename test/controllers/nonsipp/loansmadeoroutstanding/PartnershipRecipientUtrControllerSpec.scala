@@ -29,7 +29,7 @@ class PartnershipRecipientUtrControllerSpec extends ControllerBaseSpec {
   private lazy val onSubmit = routes.PartnershipRecipientUtrController.onSubmit(srn, NormalMode)
 
   val userAnswersWithPartnershipRecipientName =
-    defaultUserAnswers.unsafeSet(PartnershipRecipientNamePage(srn), partnershipRecipientName)
+    defaultUserAnswers.unsafeSet(PartnershipRecipientNamePage(srn), partnershipName)
 
   val conditionalNo: ConditionalYesNo[Utr] = ConditionalYesNo[Utr](Left("reason"))
   val conditionalYes: ConditionalYesNo[Utr] = ConditionalYesNo[Utr](Right(utr))
@@ -38,7 +38,7 @@ class PartnershipRecipientUtrControllerSpec extends ControllerBaseSpec {
 
     act.like(renderView(onPageLoad, userAnswersWithPartnershipRecipientName) { implicit app => implicit request =>
       injected[ConditionalYesNoPageView]
-        .apply(form(injected[YesNoPageFormProvider]), viewModel(srn, partnershipRecipientName, NormalMode))
+        .apply(form(injected[YesNoPageFormProvider]), viewModel(srn, partnershipName, NormalMode))
     })
 
     act.like(
@@ -51,7 +51,7 @@ class PartnershipRecipientUtrControllerSpec extends ControllerBaseSpec {
         injected[ConditionalYesNoPageView]
           .apply(
             form(injected[YesNoPageFormProvider]).fill(conditionalNo.value),
-            viewModel(srn, partnershipRecipientName, NormalMode)
+            viewModel(srn, partnershipName, NormalMode)
           )
       }
     )

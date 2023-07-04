@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.whoreceivedloan
+package utils
 
-import models.ReceivedLoanType
-import models.SchemeId.Srn
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import models.UserAnswers
+import queries.Removable
 
-case class WhoReceivedLoanPage(srn: Srn) extends QuestionPage[ReceivedLoanType] {
+import scala.util.Try
 
-  override def path: JsPath = JsPath \ toString
+object PageUtils {
 
-  override def toString: String = "whoReceivedLoan"
+  def removePages(userAnswers: UserAnswers, pages: List[Removable[_]]): Try[UserAnswers] =
+    pages.foldLeft(Try(userAnswers))((a, b) => a.flatMap(_.remove(b)))
+
 }

@@ -15,6 +15,7 @@ import repositories.SessionRepository
 import views.html.$className$View
 import forms.RadioListFormProvider
 import $className$Controller._
+import views.html.RadioListView
 
 import scala.concurrent.Future
 

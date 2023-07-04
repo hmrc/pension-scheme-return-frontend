@@ -16,10 +16,10 @@
 
 package navigation.nonsipp
 
-import models.UserAnswers
+import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.otherrecipientdetails.OtherRecipientDetailsPage
+import pages.nonsipp.loansmadeoroutstanding.OtherRecipientDetailsPage
 import play.api.mvc.Call
 
 object OtherRecipientDetailsNavigator extends JourneyNavigator {
@@ -27,7 +27,8 @@ object OtherRecipientDetailsNavigator extends JourneyNavigator {
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
 
     case OtherRecipientDetailsPage(srn) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+      controllers.nonsipp.loansmadeoroutstanding.routes.RecipientSponsoringEmployerConnectedPartyController
+        .onPageLoad(srn, NormalMode)
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty

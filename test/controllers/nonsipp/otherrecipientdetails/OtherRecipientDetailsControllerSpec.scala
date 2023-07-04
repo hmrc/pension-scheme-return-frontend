@@ -19,7 +19,7 @@ package controllers.nonsipp.otherrecipientdetails
 import controllers.ControllerBaseSpec
 import forms.RecipientDetailsFormProvider
 import models.{NormalMode, RecipientDetails}
-import pages.nonsipp.otherrecipientdetails.OtherRecipientDetailsPage
+import pages.nonsipp.loansmadeoroutstanding.OtherRecipientDetailsPage
 import views.html.RecipientDetailsView
 
 class OtherRecipientDetailsControllerSpec extends ControllerBaseSpec {

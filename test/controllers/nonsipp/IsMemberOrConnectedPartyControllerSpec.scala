@@ -22,8 +22,7 @@ import models.{MemberOrConnectedParty, NormalMode, UserAnswers}
 import play.api.mvc.Call
 import views.html.RadioListView
 import IsMemberOrConnectedPartyController._
-import pages.nonsipp.IsMemberOrConnectedPartyPage
-import pages.nonsipp.loansmadeoroutstanding.IndividualRecipientNamePage
+import pages.nonsipp.loansmadeoroutstanding.{IndividualRecipientNamePage, IsMemberOrConnectedPartyPage}
 
 class IsMemberOrConnectedPartyControllerSpec extends ControllerBaseSpec {
 

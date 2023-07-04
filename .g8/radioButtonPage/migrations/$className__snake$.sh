@@ -15,11 +15,9 @@ echo "POST       /:srn/change-$urlPath$                  controllers.$className$
 echo "Adding messages to conf.messages"
 echo "" >> ../conf/messages.en
 echo "$className;format="decap"$.title = $title$" >> ../conf/messages.en
-echo "$className;format="decap"$.heading = $title$" >> ../conf/messages.en
-echo "$className;format="decap"$.option1 = $option1msg$" >> ../conf/messages.en
-echo "$className;format="decap"$.option2key = $option2msg$" >> ../conf/messages.en
-echo "$className;format="decap"$.checkYourAnswersLabel = $title$" >> ../conf/messages.en
-echo "$className;format="decap"$.error.required = Select $className;format="decap"$" >> ../conf/messages.en
-echo "$className;format="decap"$.change.hidden = $className$" >> ../conf/messages.en
+echo "$className;format="decap"$.heading = $heading$" >> ../conf/messages.en
+echo "$className;format="decap"$.option1 = $option1$" >> ../conf/messages.en
+echo "$className;format="decap"$.option2 = $option2$" >> ../conf/messages.en
+echo "$className;format="decap"$.error.required = Select $errorRequired$" >> ../conf/messages.en
 
 echo "Migration $className;format="snake"$ completed"

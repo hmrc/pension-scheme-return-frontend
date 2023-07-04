@@ -22,7 +22,7 @@ import forms.RecipientDetailsFormProvider
 import models.SchemeId.Srn
 import models.{Mode, RecipientDetails}
 import navigation.Navigator
-import pages.nonsipp.otherrecipientdetails.OtherRecipientDetailsPage
+import pages.nonsipp.loansmadeoroutstanding.OtherRecipientDetailsPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
