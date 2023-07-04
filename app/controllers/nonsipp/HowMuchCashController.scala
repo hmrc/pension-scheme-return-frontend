@@ -37,7 +37,7 @@ import utils.DateTimeUtils.localDateShow
 import viewmodels.DisplayMessage.{Message, ParagraphMessage}
 import viewmodels.implicits._
 import viewmodels.models.MultipleQuestionsViewModel.DoubleQuestion
-import viewmodels.models.{Field, FormPageViewModel}
+import viewmodels.models.{FormPageViewModel, QuestionField}
 import views.html.MoneyView
 
 import javax.inject.Named
@@ -131,8 +131,8 @@ object HowMuchCashController {
       Message("howMuchCash.heading", schemeName),
       page = DoubleQuestion(
         form,
-        Field(Message("howMuchCash.start.label", period.from.show)),
-        Field(Message("howMuchCash.end.label", period.to.show))
+        QuestionField.input(Message("howMuchCash.start.label", period.from.show)),
+        QuestionField.input(Message("howMuchCash.end.label", period.to.show))
       ),
       routes.HowMuchCashController.onSubmit(srn, mode)
     ).withDescription(ParagraphMessage("howMuchCash.paragraph"))

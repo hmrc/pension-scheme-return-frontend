@@ -14,30 +14,22 @@
  * limitations under the License.
  */
 
-package config
+package pages.nonsipp.loansmadeoroutstanding
 
-object Constants {
+import models.Money
+import pages.behaviours.PageBehaviours
 
-  val psaEnrolmentKey = "HMRC-PODS-ORG"
-  val pspEnrolmentKey = "HMRC-PODSPP-ORG"
+import java.time.LocalDate
 
-  val psaIdKey = "PSAID"
-  val pspIdKey = "PSPID"
+class DatePeriodLoanPageSpec extends PageBehaviours {
 
-  val delimitedPSA = "DELIMITED_PSAID"
-  val detailsNotFound = "no match found"
+  "DatePeriodLoanPage" - {
+    val srn = srnGen.sample.value
 
-  val maxSchemeBankAccounts = 10
-  val maxAccountingPeriods = 3
+    beRetrievable[(LocalDate, Money, Int)](DatePeriodLoanPage(srn))
 
-  val schemeMembersPageSize = 25
-  val maxSchemeMembers = 300
+    beSettable[(LocalDate, Money, Int)](DatePeriodLoanPage(srn))
 
-  val maxCashInBank = 999999999.99
-  val maxAssetValue = 999999999.99
-  val maxMoneyValue = 999999999.99
-
-  val maxMembers = 999999
-
-  val maxLoanPeriod = 999
+    beRemovable[(LocalDate, Money, Int)](DatePeriodLoanPage(srn))
+  }
 }

@@ -37,7 +37,7 @@ import utils.DateTimeUtils.localDateShow
 import viewmodels.DisplayMessage.{Empty, Message}
 import viewmodels.implicits._
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
-import viewmodels.models.{Field, FormPageViewModel}
+import viewmodels.models.{FormPageViewModel, QuestionField}
 import views.html.MoneyView
 
 import java.time.LocalDate
@@ -120,7 +120,7 @@ object TotalValueQuotedSharesController {
       Message("totalValueQuotedShares.heading", schemeName, period.to.show),
       SingleQuestion(
         form,
-        Field(Empty, Some("totalValueQuotedShares.hint"))
+        QuestionField.input(Empty, Some("totalValueQuotedShares.hint"))
       ),
       routes.TotalValueQuotedSharesController.onSubmit(srn, mode)
     )

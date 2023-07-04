@@ -219,12 +219,13 @@ trait ViewModelGenerators extends BasicGenerators {
       )
     }
 
-  def fieldGen: Gen[Field] =
+  def fieldGen: Gen[QuestionField] =
     for {
       label <- nonEmptyInlineMessage
       hint <- Gen.option(nonEmptyInlineMessage)
+      fieldType <- Gen.oneOf(FieldType.Input, FieldType.Date, FieldType.Currency)
     } yield {
-      Field(label, hint)
+      QuestionField(label, hint, fieldType)
     }
 
   def singleQuestionGen[A](form: Form[A]): Gen[SingleQuestion[A]] =
@@ -242,7 +243,7 @@ trait ViewModelGenerators extends BasicGenerators {
       )
     }
 
-  def tripleQuestionGen[A](form: Form[(A, A, A)]): Gen[TripleQuestion[A]] =
+  def tripleQuestionGen[A](form: Form[(A, A, A)]): Gen[TripleQuestion[A, A, A]] =
     for {
       field1 <- fieldGen
       field2 <- fieldGen

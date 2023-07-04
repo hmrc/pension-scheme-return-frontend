@@ -42,6 +42,7 @@ import java.time.{LocalDate, LocalDateTime}
 trait ControllerBaseSpec
     extends BaseSpec
     with ControllerBehaviours
+    with MockBehaviours
     with DefaultAwaitTimeout
     with HttpVerbs
     with Writeables
@@ -101,6 +102,7 @@ trait TestValues { _: OptionValues =>
   val individualName = "testIndividualName"
   val nino: Nino = ninoGen.sample.get
   val utr: Utr = utrGen.sample.get
+  val money: Money = Money(123456)
   val companyName = "testCompanyName"
   val partnershipName = "testPartnershipName"
   val otherName = "testOtherName"
