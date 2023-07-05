@@ -25,10 +25,11 @@ import models.SchemeId.Srn
 import models.requests.DataRequest
 import models.{DateRange, Mode}
 import navigation.Navigator
+import pages.nonsipp.WhichTaxYearPage
 import pages.nonsipp.accountingperiod.{AccountingPeriodPage, AccountingPeriods}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.{SaveService, TaxYearService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.time.TaxYear
@@ -53,39 +54,56 @@ class AccountingPeriodController @Inject()(
   val controllerComponents: MessagesControllerComponents,
   view: DateRangeView,
   formProvider: DateRangeFormProvider,
-  saveService: SaveService,
-  taxYearService: TaxYearService
+  saveService: SaveService
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
 
-  private def form(usedAccountingPeriods: List[DateRange] = List()) =
-    AccountingPeriodController.form(formProvider, taxYearService.current, usedAccountingPeriods)
+  private def form(usedAccountingPeriods: List[DateRange] = List(), taxYear: TaxYear = TaxYear.current) =
+    AccountingPeriodController.form(formProvider, taxYear, usedAccountingPeriods)
   private val viewModel = AccountingPeriodController.viewModel _
 
   def onPageLoad(srn: Srn, index: Max3, mode: Mode): Action[AnyContent] =
     identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData) { implicit request =>
-      Ok(view(form().fromUserAnswers(AccountingPeriodPage(srn, index)), viewModel(srn, index, mode)))
+      getWhichTaxYear(srn) { taxYear =>
+        Ok(
+          view(
+            form(taxYear = taxYear).fromUserAnswers(AccountingPeriodPage(srn, index)),
+            viewModel(srn, index, mode)
+          )
+        )
+      }
     }
 
   def onSubmit(srn: Srn, index: Max3, mode: Mode): Action[AnyContent] =
     identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData).async { implicit request =>
       val usedAccountingPeriods = duplicateAccountingPeriods(srn, index)
-
-      form(usedAccountingPeriods)
-        .bindFromRequest()
-        .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode)))),
-          value =>
-            for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(AccountingPeriodPage(srn, index), value))
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(AccountingPeriodPage(srn, index), mode, updatedAnswers))
-        )
+      request.userAnswers.get(WhichTaxYearPage(srn)) match {
+        case Some(dateRange: DateRange) =>
+          form(usedAccountingPeriods, TaxYear(dateRange.from.getYear))
+            .bindFromRequest()
+            .fold(
+              formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode)))),
+              value =>
+                for {
+                  updatedAnswers <- Future.fromTry(request.userAnswers.set(AccountingPeriodPage(srn, index), value))
+                  _ <- saveService.save(updatedAnswers)
+                } yield Redirect(navigator.nextPage(AccountingPeriodPage(srn, index), mode, updatedAnswers))
+            )
+        case None => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+      }
     }
 
   def duplicateAccountingPeriods(srn: Srn, index: Max3)(implicit request: DataRequest[_]): List[DateRange] =
     request.userAnswers.list(AccountingPeriods(srn)).removeAt(index.arrayIndex)
+
+  private def getWhichTaxYear(
+    srn: Srn
+  )(f: TaxYear => Result)(implicit request: DataRequest[_]): Result =
+    request.userAnswers.get(WhichTaxYearPage(srn)) match {
+      case Some(taxYear) => f(TaxYear(taxYear.from.getYear))
+      case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+    }
 }
 
 object AccountingPeriodController {
