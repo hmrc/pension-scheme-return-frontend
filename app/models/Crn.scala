@@ -33,7 +33,7 @@ object Crn extends (String => Crn) {
   implicit val crnWrite: Writes[Crn] = new SimpleObjectWrites[Crn](_.value)
   implicit val crnRead: Reads[Crn] = new SimpleObjectReads[Crn]("crn", Crn.apply)
 
-  private val validCrnFormat = "^[A-Za-z0-9 -]{7,8}$"
+  private val validCrnFormat = "^[A-Za-z0-9]*$"
   private val minLength = 7
   private val maxLength = 8
 
