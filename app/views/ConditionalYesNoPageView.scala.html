@@ -56,7 +56,7 @@
                     govukTextarea(
                         TextareaViewModel("value.no", form("value.no").value)
                                 .withLabel(renderMessage(message))
-                                .withRows(10)
+                                .withRows(5)
                                 .withError(form("value.no").errors.headOption)
                     ),
                 legend = viewmodel.page.legend
