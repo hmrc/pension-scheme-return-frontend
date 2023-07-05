@@ -688,7 +688,7 @@ recipientSponsoringEmployerConnectedParty.heading = Is {0} a sponsoring employer
 recipientSponsoringEmployerConnectedParty.option1 = Sponsoring employer
 recipientSponsoringEmployerConnectedParty.option2 = Connected party
 recipientSponsoringEmployerConnectedParty.option3 = Neither of these
-recipientSponsoringEmployerConnectedParty.error.required = Select Select if the recipient is a sponsoring employer, connected party or neither
+recipientSponsoringEmployerConnectedParty.error.required = Select if the recipient is a sponsoring employer, connected party or neither
 
 datePeriodLoan.title = Date and period of the loan
 datePeriodLoan.heading = Date and period of the loan
