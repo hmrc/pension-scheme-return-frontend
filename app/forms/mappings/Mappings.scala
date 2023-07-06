@@ -142,8 +142,8 @@ trait Mappings extends Formatters with Constraints {
       .transform[Utr](s => Utr(s.toUpperCase), _.utr.toUpperCase)
   def crn(requiredKey: String, invalidKey: String, minMaxLengthErrorKey: String, args: Any*): Mapping[Crn] =
     text(requiredKey, args.toList)
-      .verifying(verify[String](minMaxLengthErrorKey, s => Crn.isLengthInRange(s.toUpperCase), args: _*))
       .verifying(verify[String](invalidKey, s => Crn.isValid(s.toUpperCase), args: _*))
+      .verifying(verify[String](minMaxLengthErrorKey, s => Crn.isLengthInRange(s.toUpperCase), args: _*))
       .transform[Crn](s => Crn(s.toUpperCase), _.crn.toUpperCase)
 
   def ninoNoDuplicates(
