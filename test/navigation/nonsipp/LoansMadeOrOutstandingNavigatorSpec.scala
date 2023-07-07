@@ -89,6 +89,15 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
         )
         .withName("go from sponsoring employer or connected party page to date period loan page")
     )
+
+    act.like(
+      normalmode
+        .navigateTo(
+          DatePeriodLoanPage,
+          controllers.nonsipp.loansmadeoroutstanding.routes.AmountOfTheLoanController.onPageLoad
+        )
+        .withName("go from date period loan page to amount of loan page")
+    )
   }
 
   "WhoReceivedLoanNavigator" - {

@@ -74,6 +74,10 @@ object LoanMadeOrOutstandingNavigator extends JourneyNavigator {
     case RecipientSponsoringEmployerConnectedPartyPage(srn) =>
       controllers.nonsipp.loansmadeoroutstanding.routes.DatePeriodLoanController
         .onPageLoad(srn, NormalMode)
+
+    case DatePeriodLoanPage(srn) =>
+      controllers.nonsipp.loansmadeoroutstanding.routes.AmountOfTheLoanController
+        .onPageLoad(srn, NormalMode)
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty
