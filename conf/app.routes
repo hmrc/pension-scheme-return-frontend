@@ -350,3 +350,8 @@ GET        /:srn/date-period-of-loan                            controllers.nons
 POST       /:srn/date-period-of-loan                            controllers.nonsipp.loansmadeoroutstanding.DatePeriodLoanController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 GET        /:srn/change-date-period-of-loan                            controllers.nonsipp.loansmadeoroutstanding.DatePeriodLoanController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST       /:srn/change-date-period-of-loan                            controllers.nonsipp.loansmadeoroutstanding.DatePeriodLoanController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET        /:srn/amount-of-loan-payments                            controllers.nonsipp.loansmadeoroutstanding.AmountOfTheLoanController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST       /:srn/amount-of-loan-payments                            controllers.nonsipp.loansmadeoroutstanding.AmountOfTheLoanController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/change-amount-of-loan-payments                     controllers.nonsipp.loansmadeoroutstanding.AmountOfTheLoanController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST       /:srn/change-amount-of-loan-payments                     controllers.nonsipp.loansmadeoroutstanding.AmountOfTheLoanController.onSubmit(srn: Srn, mode: Mode = CheckMode)

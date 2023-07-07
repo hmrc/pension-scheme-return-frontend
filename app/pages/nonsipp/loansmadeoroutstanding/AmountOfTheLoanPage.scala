@@ -14,31 +14,15 @@
  * limitations under the License.
  */
 
-package config
+package pages.nonsipp.loansmadeoroutstanding
 
-object Constants {
+import models.Money
+import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-  val psaEnrolmentKey = "HMRC-PODS-ORG"
-  val pspEnrolmentKey = "HMRC-PODSPP-ORG"
+case class AmountOfTheLoanPage(srn: Srn) extends QuestionPage[(Money, Money, Money)] {
+  override def path: JsPath = JsPath \ toString
 
-  val psaIdKey = "PSAID"
-  val pspIdKey = "PSPID"
-
-  val delimitedPSA = "DELIMITED_PSAID"
-  val detailsNotFound = "no match found"
-
-  val maxSchemeBankAccounts = 10
-  val maxAccountingPeriods = 3
-
-  val schemeMembersPageSize = 25
-  val maxSchemeMembers = 300
-
-  val maxCurrencyValue = 999999999.99
-  val maxCashInBank = 999999999.99
-  val maxAssetValue = 999999999.99
-  val maxMoneyValue = 999999999.99
-
-  val maxMembers = 999999
-
-  val maxLoanPeriod = 999
+  override def toString: String = "amountOfTheLoan"
 }

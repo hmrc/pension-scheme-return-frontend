@@ -204,7 +204,7 @@ class MappingsSpec extends AnyFreeSpec with Matchers with OptionValues with Mapp
   "money" - {
     val testForm: Form[Money] =
       Form(
-        "value" -> money(MoneyFormErrors.default(max = 100d -> "error.tooLarge"))
+        "value" -> money(MoneyFormErrors.default(max = 999999999.99d -> "error.tooLarge"))
       )
 
     "must bind a valid int" in {
@@ -243,8 +243,13 @@ class MappingsSpec extends AnyFreeSpec with Matchers with OptionValues with Mapp
     }
 
     "must not bind double that is too large" in {
-      val result = testForm.bind(Map("value" -> "100.01"))
+      val result = testForm.bind(Map("value" -> "1000000000.00"))
       result.errors must contain(FormError("value", "error.tooLarge"))
+    }
+
+    "must bind max allowed value" in {
+      val result = testForm.bind(Map("value" -> "999999999.99"))
+      result.get.value mustEqual 999999999.99
     }
 
     "must unbind a valid value" in {
