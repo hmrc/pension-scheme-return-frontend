@@ -25,7 +25,7 @@ import java.time.LocalDate
 
 case class DatePeriodLoanPage(srn: Srn) extends QuestionPage[(LocalDate, Money, Int)] {
 
-  override def path: JsPath = JsPath \ "loan" \ "loanTransactions" \ toString
+  override def path: JsPath = JsPath \ "loans" \ "loanTransactions" \ toString
 
   override def toString: String = "datePeriodLoanPage"
 
