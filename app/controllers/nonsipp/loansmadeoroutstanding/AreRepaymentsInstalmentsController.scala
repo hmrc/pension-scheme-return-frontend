@@ -16,6 +16,7 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
+import config.Refined.Max9999999
 import controllers.actions._
 import controllers.nonsipp.loansmadeoroutstanding.AreRepaymentsInstalmentsController.viewModel
 import forms.YesNoPageFormProvider
@@ -49,22 +50,24 @@ class AreRepaymentsInstalmentsController @Inject()(
 
   private val form = AreRepaymentsInstalmentsController.form(formProvider)
 
-  def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    val preparedForm = request.userAnswers.fillForm(AreRepaymentsInstalmentsPage(srn), form)
-    Ok(view(preparedForm, viewModel(srn, mode)))
+  def onPageLoad(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+    implicit request =>
+      val preparedForm = request.userAnswers.fillForm(AreRepaymentsInstalmentsPage(srn, index), form)
+      Ok(view(preparedForm, viewModel(srn, index, mode)))
   }
 
-  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
-    form
-      .bindFromRequest()
-      .fold(
-        formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, mode)))),
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(AreRepaymentsInstalmentsPage(srn), value))
-            _ <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage(AreRepaymentsInstalmentsPage(srn), mode, updatedAnswers))
-      )
+  def onSubmit(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+    implicit request =>
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode)))),
+          value =>
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(AreRepaymentsInstalmentsPage(srn, index), value))
+              _ <- saveService.save(updatedAnswers)
+            } yield Redirect(navigator.nextPage(AreRepaymentsInstalmentsPage(srn, index), mode, updatedAnswers))
+        )
   }
 }
 
@@ -73,10 +76,10 @@ object AreRepaymentsInstalmentsController {
     "areRepaymentsInstalments.equalInstallments.error.required"
   )
 
-  def viewModel(srn: Srn, mode: Mode): FormPageViewModel[YesNoPageViewModel] =
+  def viewModel(srn: Srn, index: Max9999999, mode: Mode): FormPageViewModel[YesNoPageViewModel] =
     YesNoPageViewModel(
       Message("areRepaymentsInstalments.equalInstallments.title"),
       Message("areRepaymentsInstalments.equalInstallments.heading"),
-      routes.AreRepaymentsInstalmentsController.onSubmit(srn, mode)
+      routes.AreRepaymentsInstalmentsController.onSubmit(srn, index, mode)
     )
 }

@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.otherrecipientdetails
+package controllers.nonsipp.loansmadeoroutstanding
 
+import config.Refined.Max9999999
 import controllers.actions._
-import controllers.nonsipp.otherrecipientdetails.OtherRecipientDetailsController.viewModel
+import controllers.nonsipp.loansmadeoroutstanding.OtherRecipientDetailsController.viewModel
 import forms.RecipientDetailsFormProvider
 import models.SchemeId.Srn
 import models.{Mode, RecipientDetails}
@@ -50,25 +51,27 @@ class OtherRecipientDetailsController @Inject()(
 
   private val form = OtherRecipientDetailsController.form(formProvider)
 
-  def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    Ok(view(form.fromUserAnswers(OtherRecipientDetailsPage(srn)), viewModel(srn, mode)))
+  def onPageLoad(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+    implicit request =>
+      Ok(view(form.fromUserAnswers(OtherRecipientDetailsPage(srn, index)), viewModel(srn, index, mode)))
   }
 
-  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
-    form
-      .bindFromRequest()
-      .fold(
-        formWithErrors =>
-          Future.successful(
-            BadRequest(view(formWithErrors, viewModel(srn, mode)))
-          ),
-        answer => {
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(OtherRecipientDetailsPage(srn), answer))
-            _ <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage(OtherRecipientDetailsPage(srn), mode, updatedAnswers))
-        }
-      )
+  def onSubmit(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+    implicit request =>
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors =>
+            Future.successful(
+              BadRequest(view(formWithErrors, viewModel(srn, index, mode)))
+            ),
+          answer => {
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(OtherRecipientDetailsPage(srn, index), answer))
+              _ <- saveService.save(updatedAnswers)
+            } yield Redirect(navigator.nextPage(OtherRecipientDetailsPage(srn, index), mode, updatedAnswers))
+          }
+        )
   }
 }
 
@@ -82,13 +85,14 @@ object OtherRecipientDetailsController {
     "otherRecipientDetails.description.error.length"
   )
 
-  def viewModel(srn: Srn, mode: Mode): FormPageViewModel[RecipientDetailsViewModel] = FormPageViewModel(
-    Message("otherRecipientDetails.title"),
-    Message("otherRecipientDetails.heading"),
-    RecipientDetailsViewModel(
-      Message("otherRecipientDetails.name"),
-      Message("otherRecipientDetails.description")
-    ),
-    routes.OtherRecipientDetailsController.onSubmit(srn, mode)
-  )
+  def viewModel(srn: Srn, index: Max9999999, mode: Mode): FormPageViewModel[RecipientDetailsViewModel] =
+    FormPageViewModel(
+      Message("otherRecipientDetails.title"),
+      Message("otherRecipientDetails.heading"),
+      RecipientDetailsViewModel(
+        Message("otherRecipientDetails.name"),
+        Message("otherRecipientDetails.description")
+      ),
+      routes.OtherRecipientDetailsController.onSubmit(srn, index, mode)
+    )
 }

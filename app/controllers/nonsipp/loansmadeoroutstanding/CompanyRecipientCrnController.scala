@@ -16,6 +16,7 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
+import config.Refined.Max9999999
 import controllers.actions._
 import controllers.nonsipp.loansmadeoroutstanding.CompanyRecipientCrnController._
 import forms.YesNoPageFormProvider
@@ -51,28 +52,30 @@ class CompanyRecipientCrnController @Inject()(
 
   private val form: Form[Either[String, Crn]] = CompanyRecipientCrnController.form(formProvider)
 
-  def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    request.usingAnswer(CompanyRecipientNamePage(srn)).sync { companyName =>
-      val preparedForm = request.userAnswers.fillForm(CompanyRecipientCrnPage(srn), form)
-      Ok(view(preparedForm, viewModel(srn, companyName, mode)))
-    }
+  def onPageLoad(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+    implicit request =>
+      request.usingAnswer(CompanyRecipientNamePage(srn, index)).sync { companyName =>
+        val preparedForm = request.userAnswers.fillForm(CompanyRecipientCrnPage(srn, index), form)
+        Ok(view(preparedForm, viewModel(srn, index, companyName, mode)))
+      }
   }
 
-  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
-    form
-      .bindFromRequest()
-      .fold(
-        formWithErrors =>
-          request.usingAnswer(CompanyRecipientNamePage(srn)).async { companyName =>
-            Future.successful(BadRequest(view(formWithErrors, viewModel(srn, companyName, mode))))
-          },
-        value =>
-          for {
-            updatedAnswers <- Future
-              .fromTry(request.userAnswers.set(CompanyRecipientCrnPage(srn), ConditionalYesNo(value)))
-            _ <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage(CompanyRecipientCrnPage(srn), mode, updatedAnswers))
-      )
+  def onSubmit(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+    implicit request =>
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors =>
+            request.usingAnswer(CompanyRecipientNamePage(srn, index)).async { companyName =>
+              Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, companyName, mode))))
+            },
+          value =>
+            for {
+              updatedAnswers <- Future
+                .fromTry(request.userAnswers.set(CompanyRecipientCrnPage(srn, index), ConditionalYesNo(value)))
+              _ <- saveService.save(updatedAnswers)
+            } yield Redirect(navigator.nextPage(CompanyRecipientCrnPage(srn, index), mode, updatedAnswers))
+        )
   }
 }
 
@@ -89,7 +92,12 @@ object CompanyRecipientCrnController {
     )
   )
 
-  def viewModel(srn: Srn, companyName: String, mode: Mode): FormPageViewModel[ConditionalYesNoPageViewModel] =
+  def viewModel(
+    srn: Srn,
+    index: Max9999999,
+    companyName: String,
+    mode: Mode
+  ): FormPageViewModel[ConditionalYesNoPageViewModel] =
     FormPageViewModel[ConditionalYesNoPageViewModel](
       "companyRecipientCrn.title",
       Message("companyRecipientCrn.heading", companyName),
@@ -97,6 +105,6 @@ object CompanyRecipientCrnController {
         yes = YesNoViewModel.Conditional(Message("companyRecipientCrn.yes.conditional", companyName)),
         no = YesNoViewModel.Conditional(Message("companyRecipientCrn.no.conditional", companyName))
       ).withHint("companyRecipientCrn.hint"),
-      routes.CompanyRecipientCrnController.onSubmit(srn, mode)
+      routes.CompanyRecipientCrnController.onSubmit(srn, index, mode)
     )
 }

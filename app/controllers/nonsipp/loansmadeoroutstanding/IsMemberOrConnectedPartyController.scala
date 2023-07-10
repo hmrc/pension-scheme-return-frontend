@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp
+package controllers.nonsipp.loansmadeoroutstanding
 
+import config.Refined.Max9999999
 import controllers.actions._
+import controllers.nonsipp.loansmadeoroutstanding.IsMemberOrConnectedPartyController._
 import forms.RadioListFormProvider
 import models.SchemeId.Srn
 import models.{MemberOrConnectedParty, Mode}
@@ -50,35 +52,37 @@ class IsMemberOrConnectedPartyController @Inject()(
 
   val form = IsMemberOrConnectedPartyController.form(formProvider)
 
-  def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    request.usingAnswer(IndividualRecipientNamePage(srn)).sync { individualName =>
-      Ok(
-        view(
-          form.fromUserAnswers(IsMemberOrConnectedPartyPage(srn)),
-          IsMemberOrConnectedPartyController.viewModel(srn, individualName, mode)
+  def onPageLoad(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+    implicit request =>
+      request.usingAnswer(IndividualRecipientNamePage(srn, index)).sync { individualName =>
+        Ok(
+          view(
+            form.fromUserAnswers(IsMemberOrConnectedPartyPage(srn, index)),
+            viewModel(srn, index, individualName, mode)
+          )
         )
-      )
-    }
+      }
   }
 
-  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
-    form
-      .bindFromRequest()
-      .fold(
-        errors =>
-          request.usingAnswer(IndividualRecipientNamePage(srn)).async { individualName =>
-            Future.successful(
-              BadRequest(view(errors, IsMemberOrConnectedPartyController.viewModel(srn, individualName, mode)))
-            )
-          },
-        success =>
-          for {
-            userAnswers <- Future.fromTry(request.userAnswers.set(IsMemberOrConnectedPartyPage(srn), success))
-            _ <- saveService.save(userAnswers)
-          } yield {
-            Redirect(navigator.nextPage(IsMemberOrConnectedPartyPage(srn), mode, userAnswers))
-          }
-      )
+  def onSubmit(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+    implicit request =>
+      form
+        .bindFromRequest()
+        .fold(
+          errors =>
+            request.usingAnswer(IndividualRecipientNamePage(srn, index)).async { individualName =>
+              Future.successful(
+                BadRequest(view(errors, viewModel(srn, index, individualName, mode)))
+              )
+            },
+          success =>
+            for {
+              userAnswers <- Future.fromTry(request.userAnswers.set(IsMemberOrConnectedPartyPage(srn, index), success))
+              _ <- saveService.save(userAnswers)
+            } yield {
+              Redirect(navigator.nextPage(IsMemberOrConnectedPartyPage(srn, index), mode, userAnswers))
+            }
+        )
   }
 }
 
@@ -87,7 +91,12 @@ object IsMemberOrConnectedPartyController {
   def form(formProvider: RadioListFormProvider): Form[MemberOrConnectedParty] =
     formProvider("isMemberOrConnectedParty.error.required")
 
-  def viewModel(srn: Srn, individualName: String, mode: Mode): FormPageViewModel[RadioListViewModel] =
+  def viewModel(
+    srn: Srn,
+    index: Max9999999,
+    individualName: String,
+    mode: Mode
+  ): FormPageViewModel[RadioListViewModel] =
     RadioListViewModel(
       "isMemberOrConnectedParty.title",
       Message("isMemberOrConnectedParty.heading", individualName),
@@ -97,6 +106,6 @@ object IsMemberOrConnectedPartyController {
         RadioListRowDivider.Or,
         RadioListRowViewModel("isMemberOrConnectedParty.option3", MemberOrConnectedParty.Neither.name)
       ),
-      routes.IsMemberOrConnectedPartyController.onSubmit(srn, mode)
+      routes.IsMemberOrConnectedPartyController.onSubmit(srn, index, mode)
     )
 }

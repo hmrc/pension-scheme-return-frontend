@@ -14,20 +14,22 @@
  * limitations under the License.
  */
 
-package pages
+package pages.nonsipp.loansmadeoroutstanding
 
-import models.{ConditionalYesNo, Utr}
+import config.Refined.OneTo9999999
+import eu.timepit.refined.refineMV
 import pages.behaviours.PageBehaviours
-import pages.nonsipp.loansmadeoroutstanding.PartnershipRecipientUtrPage
 
-class PartnershipRecipientUtrPageSpec extends PageBehaviours {
+class IndividualRecipientNamePageSpec extends PageBehaviours {
 
-  "PartnershipRecipientUtrPage" - {
+  "IndividualRecipientNamePage" - {
+    val srn = srnGen.sample.value
+    val index = refineMV[OneTo9999999](1)
 
-    beRetrievable[ConditionalYesNo[Utr]](PartnershipRecipientUtrPage(srnGen.sample.value))
+    beRetrievable[String](IndividualRecipientNamePage(srn, index))
 
-    beSettable[ConditionalYesNo[Utr]](PartnershipRecipientUtrPage(srnGen.sample.value))
+    beSettable[String](IndividualRecipientNamePage(srn, index))
 
-    beRemovable[ConditionalYesNo[Utr]](PartnershipRecipientUtrPage(srnGen.sample.value))
+    beRemovable[String](IndividualRecipientNamePage(srn, index))
   }
 }

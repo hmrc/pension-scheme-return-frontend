@@ -14,20 +14,22 @@
  * limitations under the License.
  */
 
-package pages
+package pages.nonsipp.loansmadeoroutstanding
 
-import models.SponsoringOrConnectedParty
+import config.Refined.OneTo9999999
+import eu.timepit.refined.refineMV
 import pages.behaviours.PageBehaviours
-import pages.nonsipp.loansmadeoroutstanding.RecipientSponsoringEmployerConnectedPartyPage
 
-class RecipientSponsoringEmployerConnectedPartyPageSpec extends PageBehaviours {
+class CompanyRecipientNamePageSpec extends PageBehaviours {
 
-  "RecipientSponsoringEmployerConnectedPartyPage" - {
+  "companyRecipientNamePage" - {
+    val srn = srnGen.sample.value
+    val index = refineMV[OneTo9999999](1)
 
-    beRetrievable[SponsoringOrConnectedParty](RecipientSponsoringEmployerConnectedPartyPage(srnGen.sample.value))
+    beRetrievable[String](CompanyRecipientNamePage(srn, index))
 
-    beSettable[SponsoringOrConnectedParty](RecipientSponsoringEmployerConnectedPartyPage(srnGen.sample.value))
+    beSettable[String](CompanyRecipientNamePage(srn, index))
 
-    beRemovable[SponsoringOrConnectedParty](RecipientSponsoringEmployerConnectedPartyPage(srnGen.sample.value))
+    beRemovable[String](CompanyRecipientNamePage(srn, index))
   }
 }

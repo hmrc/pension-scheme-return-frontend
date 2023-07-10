@@ -16,8 +16,10 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
-import controllers.nonsipp.loansmadeoroutstanding.CompanyRecipientNameController._
+import config.Refined.OneTo9999999
 import controllers.ControllerBaseSpec
+import controllers.nonsipp.loansmadeoroutstanding.CompanyRecipientNameController._
+import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import models.NormalMode
 import pages.nonsipp.loansmadeoroutstanding.CompanyRecipientNamePage
@@ -25,20 +27,22 @@ import views.html.TextInputView
 
 class CompanyRecipientNameControllerSpec extends ControllerBaseSpec {
 
+  private val index = refineMV[OneTo9999999](1)
+
   "IndividualRecipientNameController" - {
 
-    val populatedUserAnswers = defaultUserAnswers.set(CompanyRecipientNamePage(srn), companyName).get
-    lazy val onPageLoad = routes.CompanyRecipientNameController.onPageLoad(srn, NormalMode)
-    lazy val onSubmit = routes.CompanyRecipientNameController.onSubmit(srn, NormalMode)
+    val populatedUserAnswers = defaultUserAnswers.set(CompanyRecipientNamePage(srn, index), companyName).get
+    lazy val onPageLoad = routes.CompanyRecipientNameController.onPageLoad(srn, index, NormalMode)
+    lazy val onSubmit = routes.CompanyRecipientNameController.onSubmit(srn, index, NormalMode)
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
-      injected[TextInputView].apply(form(injected[TextFormProvider]), viewModel(srn, NormalMode))
+      injected[TextInputView].apply(form(injected[TextFormProvider]), viewModel(srn, index, NormalMode))
     })
 
-    act.like(renderPrePopView(onPageLoad, CompanyRecipientNamePage(srn), companyName) {
+    act.like(renderPrePopView(onPageLoad, CompanyRecipientNamePage(srn, index), companyName) {
       implicit app => implicit request =>
         val preparedForm = form(injected[TextFormProvider]).fill(companyName)
-        injected[TextInputView].apply(preparedForm, viewModel(srn, NormalMode))
+        injected[TextInputView].apply(preparedForm, viewModel(srn, index, NormalMode))
     })
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))

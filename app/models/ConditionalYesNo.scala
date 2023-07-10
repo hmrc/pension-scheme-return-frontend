@@ -23,6 +23,8 @@ import utils.Transform
 case class ConditionalYesNo[A](value: Either[String, A])
 
 object ConditionalYesNo {
+
+  def yes[A](value: A): ConditionalYesNo[A] = ConditionalYesNo(Right(value))
   private def reads[A: Reads]: Reads[ConditionalYesNo[A]] =
     (__ \ "no").read[String].map(value => ConditionalYesNo[A](Left(value))) |
       (__ \ "yes").read[A].map(value => ConditionalYesNo[A](Right(value)))

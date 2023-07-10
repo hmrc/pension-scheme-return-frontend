@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.whoreceivedloan
+package controllers.nonsipp.loansmadeoroutstanding
 
+import config.Refined.Max9999999
 import controllers.actions._
-import controllers.nonsipp.whoreceivedloan.WhoReceivedLoanController._
+import controllers.nonsipp.loansmadeoroutstanding.WhoReceivedLoanController._
 import forms.RadioListFormProvider
 import models.ReceivedLoanType.{Individual, Other, UKCompany, UKPartnership}
 import models.SchemeId.Srn
-import models.{NormalMode, ReceivedLoanType}
+import models.{Mode, NormalMode, ReceivedLoanType}
 import navigation.Navigator
 import pages.nonsipp.loansmadeoroutstanding.WhoReceivedLoanPage
 import play.api.data.Form
@@ -31,7 +32,6 @@ import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.FormUtils.FormOps
 import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, RadioListRowViewModel, RadioListViewModel}
 import views.html.RadioListView
 
@@ -52,27 +52,29 @@ class WhoReceivedLoanController @Inject()(
 
   private val form = WhoReceivedLoanController.form(formProvider)
 
-  def onPageLoad(srn: Srn): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    Ok(
-      view(
-        form.fromUserAnswers(WhoReceivedLoanPage(srn)),
-        viewModel(srn)
+  def onPageLoad(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+    implicit request =>
+      Ok(
+        view(
+          form.fromUserAnswers(WhoReceivedLoanPage(srn, index)),
+          viewModel(srn, index, mode)
+        )
       )
-    )
   }
 
-  def onSubmit(srn: Srn): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
-    form
-      .bindFromRequest()
-      .fold(
-        formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn)))),
-        answer => {
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(WhoReceivedLoanPage(srn), answer))
-            _ <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage(WhoReceivedLoanPage(srn), NormalMode, updatedAnswers))
-        }
-      )
+  def onSubmit(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+    implicit request =>
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode)))),
+          answer => {
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(WhoReceivedLoanPage(srn, index), answer))
+              _ <- saveService.save(updatedAnswers)
+            } yield Redirect(navigator.nextPage(WhoReceivedLoanPage(srn, index), NormalMode, updatedAnswers))
+          }
+        )
   }
 }
 
@@ -90,7 +92,7 @@ object WhoReceivedLoanController {
       RadioListRowViewModel(Message("whoReceivedLoan.pageContent3"), Other.name)
     )
 
-  def viewModel(srn: Srn): FormPageViewModel[RadioListViewModel] =
+  def viewModel(srn: Srn, index: Max9999999, mode: Mode): FormPageViewModel[RadioListViewModel] =
     FormPageViewModel(
       Message("whoReceivedLoan.title"),
       Message("whoReceivedLoan.heading"),
@@ -98,6 +100,6 @@ object WhoReceivedLoanController {
         None,
         radioListItems
       ),
-      routes.WhoReceivedLoanController.onSubmit(srn)
+      routes.WhoReceivedLoanController.onSubmit(srn, index, mode)
     )
 }

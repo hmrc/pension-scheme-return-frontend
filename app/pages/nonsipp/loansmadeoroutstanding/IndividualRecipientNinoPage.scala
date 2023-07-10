@@ -16,15 +16,17 @@
 
 package pages.nonsipp.loansmadeoroutstanding
 
+import config.Refined.Max9999999
 import models.ConditionalYesNo
 import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import uk.gov.hmrc.domain.Nino
+import utils.RefinedUtils.RefinedIntOps
 
-case class IndividualRecipientNinoPage(srn: Srn) extends QuestionPage[ConditionalYesNo[Nino]] {
+case class IndividualRecipientNinoPage(srn: Srn, index: Max9999999) extends QuestionPage[ConditionalYesNo[Nino]] {
 
-  override def path: JsPath = JsPath \ toString
+  override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString
 
   override def toString: String = "individualRecipientNino"
 }

@@ -14,20 +14,9 @@
  * limitations under the License.
  */
 
-package pages
+package pages.nonsipp.loansmadeoroutstanding
 
-import models.MemberOrConnectedParty
-import pages.behaviours.PageBehaviours
-import pages.nonsipp.loansmadeoroutstanding.IsMemberOrConnectedPartyPage
+import models.SchemeId.Srn
+import pages.Page
 
-class IsMemberOrConnectedPartyPageSpec extends PageBehaviours {
-
-  "IsMemberOrConnectedPartyPage" - {
-
-    beRetrievable[MemberOrConnectedParty](IsMemberOrConnectedPartyPage(srnGen.sample.value))
-
-    beSettable[MemberOrConnectedParty](IsMemberOrConnectedPartyPage(srnGen.sample.value))
-
-    beRemovable[MemberOrConnectedParty](IsMemberOrConnectedPartyPage(srnGen.sample.value))
-  }
-}
+case class LoansCYAPage(srn: Srn) extends Page

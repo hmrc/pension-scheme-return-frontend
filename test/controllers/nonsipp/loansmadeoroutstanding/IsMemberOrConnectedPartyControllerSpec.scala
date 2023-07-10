@@ -14,41 +14,45 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp
+package controllers.nonsipp.loansmadeoroutstanding
 
+import config.Refined.OneTo9999999
 import controllers.ControllerBaseSpec
+import controllers.nonsipp.loansmadeoroutstanding.IsMemberOrConnectedPartyController._
+import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
 import models.{MemberOrConnectedParty, NormalMode, UserAnswers}
-import play.api.mvc.Call
-import views.html.RadioListView
-import IsMemberOrConnectedPartyController._
 import pages.nonsipp.loansmadeoroutstanding.{IndividualRecipientNamePage, IsMemberOrConnectedPartyPage}
+import views.html.RadioListView
 
 class IsMemberOrConnectedPartyControllerSpec extends ControllerBaseSpec {
 
-  lazy val onPageLoad = routes.IsMemberOrConnectedPartyController.onPageLoad(srn, NormalMode)
-  lazy val onSubmit = routes.IsMemberOrConnectedPartyController.onSubmit(srn, NormalMode)
+  private val index = refineMV[OneTo9999999](1)
+
+  lazy val onPageLoad = routes.IsMemberOrConnectedPartyController.onPageLoad(srn, index, NormalMode)
+  lazy val onSubmit = routes.IsMemberOrConnectedPartyController.onSubmit(srn, index, NormalMode)
 
   val userServicesWithIndividualName: UserAnswers =
-    defaultUserAnswers.unsafeSet(IndividualRecipientNamePage(srn), individualName)
+    defaultUserAnswers.unsafeSet(IndividualRecipientNamePage(srn, index), individualName)
 
   "IsMemberOrConnectedParty Controller" - {
 
     act.like(renderView(onPageLoad, userServicesWithIndividualName) { implicit app => implicit request =>
-      injected[RadioListView].apply(form(injected[RadioListFormProvider]), viewModel(srn, individualName, NormalMode))
+      injected[RadioListView]
+        .apply(form(injected[RadioListFormProvider]), viewModel(srn, index, individualName, NormalMode))
     })
 
     act.like(
       renderPrePopView(
         onPageLoad,
-        IsMemberOrConnectedPartyPage(srn),
+        IsMemberOrConnectedPartyPage(srn, index),
         MemberOrConnectedParty.Member,
         userServicesWithIndividualName
       ) { implicit app => implicit request =>
         injected[RadioListView]
           .apply(
             form(injected[RadioListFormProvider]).fill(MemberOrConnectedParty.Member),
-            viewModel(srn, individualName, NormalMode)
+            viewModel(srn, index, individualName, NormalMode)
           )
       }
     )

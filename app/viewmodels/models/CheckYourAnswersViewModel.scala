@@ -94,13 +94,19 @@ object CheckYourAnswersRowViewModel {
     key: String,
     value: String
   ): CheckYourAnswersRowViewModel =
-    CheckYourAnswersRowViewModel(Message(key), Message(value), Seq())
+    apply(Message(key), Message(value))
 
   def apply(
     key: Message,
     value: String
   ): CheckYourAnswersRowViewModel =
-    CheckYourAnswersRowViewModel(key, Message(value), Seq())
+    apply(key, Message(value))
+
+  def apply(
+    key: Message,
+    value: Message
+  ): CheckYourAnswersRowViewModel =
+    CheckYourAnswersRowViewModel(key, value, Seq())
 }
 
 case class SummaryAction(content: Message, href: String, visuallyHiddenContent: Message) {

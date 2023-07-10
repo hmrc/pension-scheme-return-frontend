@@ -16,14 +16,16 @@
 
 package pages.nonsipp.loansmadeoroutstanding
 
+import config.Refined.Max9999999
 import models.{ConditionalYesNo, Utr}
 import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
+import utils.RefinedUtils.RefinedIntOps
 
-case class PartnershipRecipientUtrPage(srn: Srn) extends QuestionPage[ConditionalYesNo[Utr]] {
+case class PartnershipRecipientUtrPage(srn: Srn, index: Max9999999) extends QuestionPage[ConditionalYesNo[Utr]] {
 
-  override def path: JsPath = JsPath \ toString
+  override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString
 
   override def toString: String = "partnershipRecipientUtr"
 }

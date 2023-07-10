@@ -18,6 +18,7 @@ package controllers.nonsipp.loansmadeoroutstanding
 
 import cats.implicits.toShow
 import config.Constants.{maxAssetValue, maxLoanPeriod}
+import config.Refined.Max9999999
 import controllers.PSRController
 import controllers.actions._
 import forms.MultipleQuestionFormProvider
@@ -54,37 +55,41 @@ class DatePeriodLoanController @Inject()(
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
-  def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
-      Ok(
-        view(
-          viewModel(
-            srn,
-            request.schemeDetails.schemeName,
-            mode,
-            request.userAnswers.fillForm(DatePeriodLoanPage(srn), form(date.to))
+  def onPageLoad(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+    implicit request =>
+      schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
+        Ok(
+          view(
+            viewModel(
+              srn,
+              index,
+              request.schemeDetails.schemeName,
+              mode,
+              request.userAnswers.fillForm(DatePeriodLoanPage(srn, index), form(date.to))
+            )
           )
         )
-      )
-    }
+      }
   }
 
-  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
-    schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
-      form(date.to)
-        .bindFromRequest()
-        .fold(
-          formWithErrors =>
-            Future.successful {
-              BadRequest(view(viewModel(srn, request.schemeDetails.schemeName, mode, formWithErrors)))
-            },
-          value =>
-            for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.transformAndSet(DatePeriodLoanPage(srn), value))
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(DatePeriodLoanPage(srn), mode, updatedAnswers))
-        )
-    }
+  def onSubmit(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+    implicit request =>
+      schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
+        form(date.to)
+          .bindFromRequest()
+          .fold(
+            formWithErrors =>
+              Future.successful {
+                BadRequest(view(viewModel(srn, index, request.schemeDetails.schemeName, mode, formWithErrors)))
+              },
+            value =>
+              for {
+                updatedAnswers <- Future
+                  .fromTry(request.userAnswers.transformAndSet(DatePeriodLoanPage(srn, index), value))
+                _ <- saveService.save(updatedAnswers)
+              } yield Redirect(navigator.nextPage(DatePeriodLoanPage(srn, index), mode, updatedAnswers))
+          )
+      }
   }
 }
 
@@ -125,6 +130,7 @@ object DatePeriodLoanController {
 
   def viewModel(
     srn: Srn,
+    index: Max9999999,
     schemeName: String,
     mode: Mode,
     form: Form[(LocalDate, Money, Int)]
@@ -138,6 +144,6 @@ object DatePeriodLoanController {
       QuestionField.input("datePeriodLoan.field3", hint = Some("datePeriodLoan.field3.hint"))
     ),
     details = None,
-    routes.DatePeriodLoanController.onSubmit(srn, mode)
+    routes.DatePeriodLoanController.onSubmit(srn, index, mode)
   )
 }

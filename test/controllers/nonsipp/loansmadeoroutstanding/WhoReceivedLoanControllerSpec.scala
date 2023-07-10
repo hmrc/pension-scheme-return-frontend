@@ -14,18 +14,23 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.whoreceivedloan
+package controllers.nonsipp.loansmadeoroutstanding
 
-import WhoReceivedLoanController._
+import config.Refined.OneTo9999999
 import controllers.ControllerBaseSpec
+import controllers.nonsipp.loansmadeoroutstanding.WhoReceivedLoanController._
+import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
+import models.NormalMode
 import models.ReceivedLoanType.{Individual, Other, UKCompany, UKPartnership}
 import views.html.RadioListView
 
 class WhoReceivedLoanControllerSpec extends ControllerBaseSpec {
 
-  private lazy val onPageLoad = routes.WhoReceivedLoanController.onPageLoad(srn)
-  private lazy val onSubmit = routes.WhoReceivedLoanController.onSubmit(srn)
+  private val index = refineMV[OneTo9999999](1)
+
+  private lazy val onPageLoad = routes.WhoReceivedLoanController.onPageLoad(srn, index, NormalMode)
+  private lazy val onSubmit = routes.WhoReceivedLoanController.onSubmit(srn, index, NormalMode)
 
   "WhoReceivedLoanController" - {
 
@@ -34,7 +39,7 @@ class WhoReceivedLoanControllerSpec extends ControllerBaseSpec {
 
       view(
         form(injected[RadioListFormProvider]),
-        viewModel(srn)
+        viewModel(srn, index, NormalMode)
       )
     })
 

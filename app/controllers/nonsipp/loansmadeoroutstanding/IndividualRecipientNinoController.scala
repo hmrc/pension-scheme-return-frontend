@@ -16,6 +16,7 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
+import config.Refined.Max9999999
 import controllers.actions._
 import controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNinoController._
 import forms.YesNoPageFormProvider
@@ -52,28 +53,30 @@ class IndividualRecipientNinoController @Inject()(
 
   private val form: Form[Either[String, Nino]] = IndividualRecipientNinoController.form(formProvider)
 
-  def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    request.usingAnswer(IndividualRecipientNamePage(srn)).sync { individualName =>
-      val preparedForm = request.userAnswers.fillForm(IndividualRecipientNinoPage(srn), form)
-      Ok(view(preparedForm, viewModel(srn, individualName, mode)))
-    }
+  def onPageLoad(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+    implicit request =>
+      request.usingAnswer(IndividualRecipientNamePage(srn, index)).sync { individualName =>
+        val preparedForm = request.userAnswers.fillForm(IndividualRecipientNinoPage(srn, index), form)
+        Ok(view(preparedForm, viewModel(srn, index, individualName, mode)))
+      }
   }
 
-  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
-    form
-      .bindFromRequest()
-      .fold(
-        formWithErrors =>
-          request.usingAnswer(IndividualRecipientNamePage(srn)).async { individualName =>
-            Future.successful(BadRequest(view(formWithErrors, viewModel(srn, individualName, mode))))
-          },
-        value =>
-          for {
-            updatedAnswers <- Future
-              .fromTry(request.userAnswers.set(IndividualRecipientNinoPage(srn), ConditionalYesNo(value)))
-            _ <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage(IndividualRecipientNinoPage(srn), mode, updatedAnswers))
-      )
+  def onSubmit(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+    implicit request =>
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors =>
+            request.usingAnswer(IndividualRecipientNamePage(srn, index)).async { individualName =>
+              Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, individualName, mode))))
+            },
+          value =>
+            for {
+              updatedAnswers <- Future
+                .fromTry(request.userAnswers.set(IndividualRecipientNinoPage(srn, index), ConditionalYesNo(value)))
+              _ <- saveService.save(updatedAnswers)
+            } yield Redirect(navigator.nextPage(IndividualRecipientNinoPage(srn, index), mode, updatedAnswers))
+        )
   }
 }
 
@@ -89,7 +92,12 @@ object IndividualRecipientNinoController {
     )
   )
 
-  def viewModel(srn: Srn, individualName: String, mode: Mode): FormPageViewModel[ConditionalYesNoPageViewModel] =
+  def viewModel(
+    srn: Srn,
+    index: Max9999999,
+    individualName: String,
+    mode: Mode
+  ): FormPageViewModel[ConditionalYesNoPageViewModel] =
     FormPageViewModel[ConditionalYesNoPageViewModel](
       "individualRecipientNino.title",
       Message("individualRecipientNino.heading", individualName),
@@ -97,6 +105,6 @@ object IndividualRecipientNinoController {
         yes = YesNoViewModel.Conditional(Message("individualRecipientNino.yes.conditional", individualName)),
         no = YesNoViewModel.Conditional(Message("individualRecipientNino.no.conditional", individualName))
       ),
-      routes.IndividualRecipientNinoController.onSubmit(srn, mode)
+      routes.IndividualRecipientNinoController.onSubmit(srn, index, mode)
     )
 }

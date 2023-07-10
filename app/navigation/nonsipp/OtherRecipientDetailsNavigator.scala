@@ -26,9 +26,9 @@ object OtherRecipientDetailsNavigator extends JourneyNavigator {
 
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
 
-    case OtherRecipientDetailsPage(srn) =>
+    case OtherRecipientDetailsPage(srn, index) =>
       controllers.nonsipp.loansmadeoroutstanding.routes.RecipientSponsoringEmployerConnectedPartyController
-        .onPageLoad(srn, NormalMode)
+        .onPageLoad(srn, index, NormalMode)
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty

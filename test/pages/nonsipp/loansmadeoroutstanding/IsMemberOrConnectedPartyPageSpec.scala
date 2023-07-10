@@ -14,20 +14,23 @@
  * limitations under the License.
  */
 
-package pages
+package pages.nonsipp.loansmadeoroutstanding
 
+import config.Refined.OneTo9999999
+import eu.timepit.refined.refineMV
+import models.MemberOrConnectedParty
 import pages.behaviours.PageBehaviours
-import pages.nonsipp.loansmadeoroutstanding.IndividualRecipientNamePage
 
-class IndividualRecipientNamePageSpec extends PageBehaviours {
+class IsMemberOrConnectedPartyPageSpec extends PageBehaviours {
 
-  "IndividualRecipientNamePage" - {
-    val srn = srnGen.sample.value
+  "IsMemberOrConnectedPartyPage" - {
 
-    beRetrievable[String](IndividualRecipientNamePage(srn))
+    val index = refineMV[OneTo9999999](1)
 
-    beSettable[String](IndividualRecipientNamePage(srn))
+    beRetrievable[MemberOrConnectedParty](IsMemberOrConnectedPartyPage(srnGen.sample.value, index))
 
-    beRemovable[String](IndividualRecipientNamePage(srn))
+    beSettable[MemberOrConnectedParty](IsMemberOrConnectedPartyPage(srnGen.sample.value, index))
+
+    beRemovable[MemberOrConnectedParty](IsMemberOrConnectedPartyPage(srnGen.sample.value, index))
   }
 }

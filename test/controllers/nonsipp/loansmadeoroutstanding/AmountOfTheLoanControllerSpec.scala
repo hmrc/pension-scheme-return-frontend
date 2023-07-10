@@ -16,18 +16,20 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
+import config.Refined.OneTo9999999
 import controllers.ControllerBaseSpec
+import eu.timepit.refined.refineMV
 import forms.MoneyFormProvider
-import models.{DateRange, Money, NormalMode}
+import models.{DateRange, NormalMode}
 import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.HowMuchCashPage
 import pages.nonsipp.loansmadeoroutstanding.AmountOfTheLoanPage
 import play.api.inject.bind
 import services.SchemeDateService
-import utils.Transform._
 import views.html.MoneyView
 
 class AmountOfTheLoanControllerSpec extends ControllerBaseSpec {
+
+  private val index = refineMV[OneTo9999999](1)
 
   val schemeDatePeriod = dateRangeGen.sample.value
   val mockSchemeDateService = mock[SchemeDateService]
@@ -49,18 +51,18 @@ class AmountOfTheLoanControllerSpec extends ControllerBaseSpec {
 
     val schemeName = defaultSchemeDetails.schemeName
 
-    val form = AmountOfTheLoanController.form(new MoneyFormProvider(), schemeName, schemeDatePeriod)
-    lazy val viewModel = AmountOfTheLoanController.viewModel(srn, NormalMode, schemeName, schemeDatePeriod, _)
+    val form = AmountOfTheLoanController.form(new MoneyFormProvider(), schemeDatePeriod)
+    lazy val viewModel = AmountOfTheLoanController.viewModel(srn, index, NormalMode, schemeName, schemeDatePeriod, _)
 
-    lazy val onPageLoad = routes.AmountOfTheLoanController.onPageLoad(srn, NormalMode)
-    lazy val onSubmit = routes.AmountOfTheLoanController.onSubmit(srn, NormalMode)
+    lazy val onPageLoad = routes.AmountOfTheLoanController.onPageLoad(srn, index, NormalMode)
+    lazy val onSubmit = routes.AmountOfTheLoanController.onSubmit(srn, index, NormalMode)
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       val view = injected[MoneyView]
       view(viewModel(form))
     })
 
-    act.like(renderPrePopView(onPageLoad, AmountOfTheLoanPage(srn), (money, money, money)) {
+    act.like(renderPrePopView(onPageLoad, AmountOfTheLoanPage(srn, index), (money, money, money)) {
       implicit app => implicit request =>
         val view = injected[MoneyView]
         view(viewModel(form.fill((money, money, money))))

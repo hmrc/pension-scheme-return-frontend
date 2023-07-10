@@ -105,10 +105,12 @@ trait TestValues { _: OptionValues =>
   val money: Money = Money(123456)
   val double: Double = 7.7
   val percentage: Percentage = Percentage(7.7)
+  val loanPeriod = 5
   val companyName = "testCompanyName"
   val partnershipName = "testPartnershipName"
   val otherName = "testOtherName"
   val crn: Crn = crnGen.sample.get
+  val recipientName = "testRecipientName"
 
   val individualDetails: IndividualDetails = IndividualDetails("testFirstName", Some("testMiddleName"), "testLastName")
 

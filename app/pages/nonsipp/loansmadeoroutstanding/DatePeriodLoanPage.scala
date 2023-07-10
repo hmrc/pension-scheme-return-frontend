@@ -16,16 +16,18 @@
 
 package pages.nonsipp.loansmadeoroutstanding
 
+import config.Refined.Max9999999
 import models.Money
 import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
+import utils.RefinedUtils.RefinedIntOps
 
 import java.time.LocalDate
 
-case class DatePeriodLoanPage(srn: Srn) extends QuestionPage[(LocalDate, Money, Int)] {
+case class DatePeriodLoanPage(srn: Srn, index: Max9999999) extends QuestionPage[(LocalDate, Money, Int)] {
 
-  override def path: JsPath = JsPath \ "loans" \ "loanTransactions" \ toString
+  override def path: JsPath = JsPath \ "loans" \ "loanTransactions" \ toString \ index.arrayIndex.toString
 
   override def toString: String = "datePeriodLoanPage"
 

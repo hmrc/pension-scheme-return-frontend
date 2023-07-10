@@ -16,19 +16,23 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
+import config.Refined.OneTo9999999
 import controllers.ControllerBaseSpec
+import controllers.nonsipp.loansmadeoroutstanding.CompanyRecipientCrnController._
+import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.{ConditionalYesNo, Crn, NormalMode}
 import pages.nonsipp.loansmadeoroutstanding.{CompanyRecipientCrnPage, CompanyRecipientNamePage}
 import views.html.ConditionalYesNoPageView
-import CompanyRecipientCrnController._
 
 class CompanyRecipientCrnControllerSpec extends ControllerBaseSpec {
 
-  private lazy val onPageLoad = routes.CompanyRecipientCrnController.onPageLoad(srn, NormalMode)
-  private lazy val onSubmit = routes.CompanyRecipientCrnController.onSubmit(srn, NormalMode)
+  private val index = refineMV[OneTo9999999](1)
 
-  val userAnswersWithCompanyName = defaultUserAnswers.unsafeSet(CompanyRecipientNamePage(srn), companyName)
+  private lazy val onPageLoad = routes.CompanyRecipientCrnController.onPageLoad(srn, index, NormalMode)
+  private lazy val onSubmit = routes.CompanyRecipientCrnController.onSubmit(srn, index, NormalMode)
+
+  val userAnswersWithCompanyName = defaultUserAnswers.unsafeSet(CompanyRecipientNamePage(srn, index), companyName)
 
   val conditionalNo: ConditionalYesNo[Crn] = ConditionalYesNo[Crn](Left("reason"))
   val conditionalYes: ConditionalYesNo[Crn] = ConditionalYesNo[Crn](Right(crn))
@@ -37,20 +41,20 @@ class CompanyRecipientCrnControllerSpec extends ControllerBaseSpec {
 
     act.like(renderView(onPageLoad, userAnswersWithCompanyName) { implicit app => implicit request =>
       injected[ConditionalYesNoPageView]
-        .apply(form(injected[YesNoPageFormProvider]), viewModel(srn, companyName, NormalMode))
+        .apply(form(injected[YesNoPageFormProvider]), viewModel(srn, index, companyName, NormalMode))
     })
 
     act.like(
       renderPrePopView(
         onPageLoad,
-        CompanyRecipientCrnPage(srn),
+        CompanyRecipientCrnPage(srn, index),
         conditionalNo,
         userAnswersWithCompanyName
       ) { implicit app => implicit request =>
         injected[ConditionalYesNoPageView]
           .apply(
             form(injected[YesNoPageFormProvider]).fill(conditionalNo.value),
-            viewModel(srn, companyName, NormalMode)
+            viewModel(srn, index, companyName, NormalMode)
           )
       }
     )

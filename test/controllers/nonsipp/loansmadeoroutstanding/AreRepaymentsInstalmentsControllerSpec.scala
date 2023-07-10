@@ -16,8 +16,10 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
-import AreRepaymentsInstalmentsController.viewModel
+import config.Refined.OneTo9999999
 import controllers.ControllerBaseSpec
+import controllers.nonsipp.loansmadeoroutstanding.AreRepaymentsInstalmentsController.viewModel
+import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.NormalMode
 import pages.nonsipp.loansmadeoroutstanding.AreRepaymentsInstalmentsPage
@@ -25,8 +27,10 @@ import views.html.YesNoPageView
 
 class AreRepaymentsInstalmentsControllerSpec extends ControllerBaseSpec {
 
-  private lazy val onPageLoad = routes.AreRepaymentsInstalmentsController.onPageLoad(srn, NormalMode)
-  private lazy val onSubmit = routes.AreRepaymentsInstalmentsController.onSubmit(srn, NormalMode)
+  private val index = refineMV[OneTo9999999](1)
+
+  private lazy val onPageLoad = routes.AreRepaymentsInstalmentsController.onPageLoad(srn, index, NormalMode)
+  private lazy val onSubmit = routes.AreRepaymentsInstalmentsController.onSubmit(srn, index, NormalMode)
 
   val form = AreRepaymentsInstalmentsController.form(new YesNoPageFormProvider())
 
@@ -35,13 +39,14 @@ class AreRepaymentsInstalmentsControllerSpec extends ControllerBaseSpec {
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       injected[YesNoPageView].apply(
         form,
-        viewModel(srn, NormalMode)
+        viewModel(srn, index, NormalMode)
       )
     })
 
-    act.like(renderPrePopView(onPageLoad, AreRepaymentsInstalmentsPage(srn), true) { implicit app => implicit request =>
-      val preparedForm = form.fill(true)
-      injected[YesNoPageView].apply(preparedForm, viewModel(srn, NormalMode))
+    act.like(renderPrePopView(onPageLoad, AreRepaymentsInstalmentsPage(srn, index), true) {
+      implicit app => implicit request =>
+        val preparedForm = form.fill(true)
+        injected[YesNoPageView].apply(preparedForm, viewModel(srn, index, NormalMode))
     })
 
     act.like(redirectNextPage(onSubmit, "value" -> "true"))
