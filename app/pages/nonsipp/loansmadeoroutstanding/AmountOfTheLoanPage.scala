@@ -21,12 +21,9 @@ import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-import java.time.LocalDate
-
-case class DatePeriodLoanPage(srn: Srn) extends QuestionPage[(LocalDate, Money, Int)] {
+case class AmountOfTheLoanPage(srn: Srn) extends QuestionPage[(Money, Money, Money)] {
 
   override def path: JsPath = JsPath \ "loans" \ "loanTransactions" \ toString
 
-  override def toString: String = "datePeriodLoanPage"
-
+  override def toString: String = "loanAmountPage"
 }

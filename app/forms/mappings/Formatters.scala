@@ -142,7 +142,7 @@ trait Formatters {
         baseFormatter
           .bind(key, data.view.mapValues(_.replace("£", "")).toMap)
           .flatMap { double =>
-            if (double.toString.matches(decimalRegex))
+            if (BigDecimal(double).toString().matches(decimalRegex))
               Right(Money(double, data(key).replace("£", "")))
             else
               Left(Seq(FormError(key, errors.nonNumericKey, args)))
