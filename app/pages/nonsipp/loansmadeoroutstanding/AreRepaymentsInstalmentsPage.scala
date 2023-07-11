@@ -24,5 +24,5 @@ case class AreRepaymentsInstalmentsPage(srn: Srn) extends QuestionPage[Boolean] 
 
   override def path: JsPath = JsPath \ "loans" \ "loanTransactions" \ toString
 
-  override def toString: String = "areRepaymentsInstalments"
+  override def toString: String = "equalInstallments"
 }

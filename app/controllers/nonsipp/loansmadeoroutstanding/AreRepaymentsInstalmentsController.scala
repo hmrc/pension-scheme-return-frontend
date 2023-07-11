@@ -70,13 +70,13 @@ class AreRepaymentsInstalmentsController @Inject()(
 
 object AreRepaymentsInstalmentsController {
   def form(formProvider: YesNoPageFormProvider): Form[Boolean] = formProvider(
-    "areRepaymentsInstalments.error.required"
+    "areRepaymentsInstalments.equalInstallments.error.required"
   )
 
   def viewModel(srn: Srn, mode: Mode): FormPageViewModel[YesNoPageViewModel] =
     YesNoPageViewModel(
-      Message("areRepaymentsInstalments.title"),
-      Message("areRepaymentsInstalments.heading"),
+      Message("areRepaymentsInstalments.equalInstallments.title"),
+      Message("areRepaymentsInstalments.equalInstallments.heading"),
       routes.AreRepaymentsInstalmentsController.onSubmit(srn, mode)
     )
 }
