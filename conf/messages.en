@@ -725,3 +725,7 @@ amountOfTheLoan.amountOutstanding.label = Total amount of loan outstanding on {0
 amountOfTheLoan.amountOutstanding.error.required = Enter the total amount of the loan outstanding on {0}, in pounds and pence
 amountOfTheLoan.amountOutstanding.error.nonNumeric = Total amount of the loan outstanding on {0} must be an amount of money, like 123 or 123.45
 amountOfTheLoan.amountOutstanding.error.tooLarge = Total amount of the loan outstanding on {0} must be 999999999.99 or less
+
+areRepaymentsInstalments.title = Are the loan repayments in equal annual instalments?
+areRepaymentsInstalments.heading = Are the loan repayments in equal annual instalments?
+areRepaymentsInstalments.error.required = Select yes if the loan repayments are in equal annual instalments
