@@ -201,6 +201,27 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
           (_, _) => controllers.routes.UnauthorisedController.onPageLoad()
         )
         .withName("go from interest on loan page to unauthorised page")
+
+  "AmountOfTheLoanPage" - {
+    act.like(
+      normalmode
+        .navigateTo(
+          AmountOfTheLoanPage,
+          controllers.nonsipp.loansmadeoroutstanding.routes.AreRepaymentsInstalmentsController.onPageLoad
+        )
+        .withName("go from amount of the loan page to are repayments instalments page")
+    )
+  }
+
+  "AreRepaymentsInstalmentsPage" - {
+    act.like(
+      normalmode
+        .navigateTo(
+          AreRepaymentsInstalmentsPage,
+          (_, _) => controllers.routes.UnauthorisedController.onPageLoad()
+        )
+        .withName("go from are repayments instalments page to unauthorised page")
+
     )
   }
 }

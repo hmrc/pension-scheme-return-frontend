@@ -80,6 +80,11 @@ object LoanMadeOrOutstandingNavigator extends JourneyNavigator {
         .onPageLoad(srn, NormalMode)
 
     case InterestOnLoanPage(srn) =>
+    case AmountOfTheLoanPage(srn) =>
+      controllers.nonsipp.loansmadeoroutstanding.routes.AreRepaymentsInstalmentsController.onPageLoad(srn, NormalMode)
+
+    case AreRepaymentsInstalmentsPage(srn) =>
+    
       controllers.routes.UnauthorisedController.onPageLoad()
   }
 
