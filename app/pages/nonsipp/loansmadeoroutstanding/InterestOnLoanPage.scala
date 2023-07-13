@@ -25,5 +25,5 @@ case class InterestOnLoanPage(srn: Srn) extends QuestionPage[(Money, Double, Mon
 
   override def path: JsPath = JsPath \ "loans" \ "loanTransactions" \ toString
 
-  override def toString: String = "loanInterestRate"
+  override def toString: String = "loanInterestPage"
 }

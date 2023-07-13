@@ -92,23 +92,23 @@ object InterestOnLoanController {
 
   private val field1Errors: MoneyFormErrors =
     MoneyFormErrors(
-      "interestOnLoan.field1.error.required",
-      "interestOnLoan.field1.error.nonNumeric",
-      (maxCurrencyValue, "interestOnLoan.field1.error.max")
+      "interestOnLoan.loanInterestAmount.error.required",
+      "interestOnLoan.loanInterestAmount.error.nonNumeric",
+      (maxCurrencyValue, "interestOnLoan.loanInterestAmount.error.max")
     )
 
   private val field2Errors: DoubleFormErrors =
     DoubleFormErrors(
-      "interestOnLoan.field2.error.required",
-      "interestOnLoan.field2.error.nonNumeric",
+      "interestOnLoan.loanInterestRate.error.required",
+      "interestOnLoan.loanInterestRate.error.nonNumeric",
       (maxPercentage, "")
     )
 
   private val field3Errors: MoneyFormErrors =
     MoneyFormErrors(
-      "interestOnLoan.field3.error.required",
-      "interestOnLoan.field3.error.nonNumeric",
-      (maxCurrencyValue, "interestOnLoan.field3.error.max")
+      "interestOnLoan.intReceivedCY.error.required",
+      "interestOnLoan.intReceivedCY.error.nonNumeric",
+      (maxCurrencyValue, "interestOnLoan.intReceivedCY.error.max")
     )
 
   def form(implicit messages: Messages): Form[(Money, Double, Money)] =
@@ -129,12 +129,12 @@ object InterestOnLoanController {
       Message("interestOnLoan.loanInterestRate.heading", schemeName),
       page = TripleQuestion(
         form,
-        QuestionField.currency(Message("interestOnLoan.field1.label")),
+        QuestionField.currency(Message("interestOnLoan.loanInterestAmount.label")),
         QuestionField.percentage(
-          Message("interestOnLoan.field2.label"),
-          Option(Message("interestOnLoan.field2.hint"))
+          Message("interestOnLoan.loanInterestRate.label"),
+          Option(Message("interestOnLoan.loanInterestRate.hint"))
         ),
-        QuestionField.currency(Message("interestOnLoan.field3.label"))
+        QuestionField.currency(Message("interestOnLoan.intReceivedCY.label"))
       ),
       routes.InterestOnLoanController.onSubmit(srn, mode)
     )
