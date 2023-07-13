@@ -63,6 +63,7 @@ object FieldType {
   case object Input extends FieldType
   case object Currency extends FieldType
   case object Date extends FieldType
+  case object Percentage extends FieldType
 }
 
 case class QuestionField(label: InlineMessage, hint: Option[InlineMessage] = None, fieldType: FieldType)
@@ -76,4 +77,7 @@ object QuestionField {
 
   def date(label: InlineMessage, hint: Option[InlineMessage] = None): QuestionField =
     QuestionField(label, hint, FieldType.Date)
+
+  def percentage(label: InlineMessage, hint: Option[InlineMessage] = None): QuestionField =
+    QuestionField(label, hint, FieldType.Percentage)
 }

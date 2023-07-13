@@ -16,7 +16,7 @@
 
 package forms.mappings
 
-import forms.mappings.errors.{IntFormErrors, MoneyFormErrors}
+import forms.mappings.errors.{DoubleFormErrors, IntFormErrors, MoneyFormErrors}
 import models.{Enumerable, Money}
 import play.api.data.FormError
 import play.api.data.format.Formatter
@@ -102,6 +102,12 @@ trait Formatters {
     }
 
   private[mappings] def doubleFormatter(
+    doubleFormErrors: DoubleFormErrors,
+    args: Seq[String]
+  ): Formatter[Double] =
+    doubleFormatter(doubleFormErrors.requiredKey, doubleFormErrors.nonNumericKey, doubleFormErrors.max, args)
+
+  private[mappings] def doubleFormatter(
     requiredKey: String,
     nonNumericKey: String,
     max: (Double, String),
@@ -111,16 +117,19 @@ trait Formatters {
 
       private val baseFormatter = stringFormatter(requiredKey, args)
       private val (maxSize, maxError) = max
+      private val decimalRegex = "^%?[0-9]+(\\.[0-9]{1,2})?%?$"
 
       override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Double] =
         baseFormatter
           .bind(key, data)
-          .map(_.replace(",", ""))
+          .map(_.replace(",", "").replace("%", ""))
           .flatMap { s =>
             s.toDoubleOption
               .toRight(Seq(FormError(key, nonNumericKey, args)))
               .flatMap { double =>
                 if (double > maxSize) Left(Seq(FormError(key, maxError, args)))
+                else if (double.toString().matches(decimalRegex))
+                  Right(double)
                 else Right(double)
               }
           }

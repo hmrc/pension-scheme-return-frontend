@@ -192,4 +192,15 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
         .withName("go from partnership recipient Utr page to sponsoring employer or connected party page")
     )
   }
+
+  "InterestOnLoanPage" - {
+    act.like(
+      normalmode
+        .navigateTo(
+          InterestOnLoanPage,
+          (_, _) => controllers.routes.UnauthorisedController.onPageLoad()
+        )
+        .withName("go from interest on loan page to unauthorised page")
+    )
+  }
 }

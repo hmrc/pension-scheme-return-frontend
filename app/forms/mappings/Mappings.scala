@@ -16,7 +16,7 @@
 
 package forms.mappings
 
-import forms.mappings.errors.{DateFormErrors, IntFormErrors, MoneyFormErrors}
+import forms.mappings.errors.{DateFormErrors, DoubleFormErrors, IntFormErrors, MoneyFormErrors}
 import models.{DateRange, Enumerable, Money, Utr}
 import models.{Crn, DateRange, Enumerable, Money}
 import play.api.data.{FieldMapping, Mapping}
@@ -58,6 +58,17 @@ trait Mappings extends Formatters with Constraints {
     args: Seq[String] = Seq.empty
   ): FieldMapping[Double] =
     of(doubleFormatter(requiredKey, nonNumericKey, max, args))
+
+  def double(
+    doubleFormErrors: DoubleFormErrors,
+    args: Seq[String]
+  ): FieldMapping[Double] =
+    of(doubleFormatter(doubleFormErrors, args))
+
+  def double(
+    doubleFormErrors: DoubleFormErrors
+  ): FieldMapping[Double] =
+    of(doubleFormatter(doubleFormErrors, Nil))
 
   def money(
     moneyFormErrors: MoneyFormErrors,

@@ -50,6 +50,7 @@
           viewmodel.page.fields.zipWithIndex.map {
             case (field @ QuestionField(_, _, FieldType.Input), index) => input(index, field)
             case (field @ QuestionField(_, _, FieldType.Currency), index) => currency(index, field)
+            case (field @ QuestionField(_, _, FieldType.Percentage), index) => percentage(index, field)
             case (field @ QuestionField(_, _, FieldType.Date), index) => date(index, field)
           }
       }
@@ -91,6 +92,19 @@
         .withPrefix(PrefixOrSuffix(content = Text("£")))
     )
 }
+
+  @percentage(index: Int, field: QuestionField) = {
+    @govukInput(
+        InputViewModel(
+            field = viewmodel.page.form(s"value.${index + 1}"),
+            label = LabelViewModel(renderMessage(field.label))
+        )
+        .withHint(field.hint.map(h => Hint(content = HtmlContent(renderMessage(h)))))
+        .asNumeric()
+        .withWidth(InputWidth.Fixed3)
+        .withSuffix(PrefixOrSuffix(content = Text("%")))
+    )
+  }
 
 @date(index: Int, field: QuestionField) = {
     @govukDateInput(
