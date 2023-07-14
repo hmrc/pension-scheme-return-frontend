@@ -14,16 +14,23 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.loansmadeoroutstanding
+package forms.mappings.errors
 
-import models.{Money, Percentage}
-import models.SchemeId.Srn
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+case class PercentageFormErrors(
+  requiredKey: String,
+  wholeNumberKey: String,
+  nonNumericKey: String,
+  max: (Double, String),
+  min: (Double, String)
+)
 
-case class InterestOnLoanPage(srn: Srn) extends QuestionPage[(Money, Percentage, Money)] {
+object PercentageFormErrors {
 
-  override def path: JsPath = JsPath \ "loans" \ "loanTransactions" \ toString
-
-  override def toString: String = "loanInterestPage"
+  def apply(
+    requiredKey: String,
+    invalidKey: String,
+    max: (Double, String),
+    min: (Double, String)
+  ): PercentageFormErrors =
+    PercentageFormErrors(requiredKey, invalidKey, invalidKey, max, min)
 }

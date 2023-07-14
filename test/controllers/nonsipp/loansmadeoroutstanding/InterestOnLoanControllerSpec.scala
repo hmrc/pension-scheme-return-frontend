@@ -39,10 +39,10 @@ class InterestOnLoanControllerSpec extends ControllerBaseSpec {
       view(viewModel(InterestOnLoanController.form))
     })
 
-    act.like(renderPrePopView(onPageLoad, InterestOnLoanPage(srn), (money, double, money)) {
+    act.like(renderPrePopView(onPageLoad, InterestOnLoanPage(srn), (money, percentage, money)) {
       implicit app => implicit request =>
         val view = injected[MultipleQuestionView]
-        view(viewModel(InterestOnLoanController.form.fill((money, double, money))))
+        view(viewModel(InterestOnLoanController.form.fill((money, percentage, money))))
     })
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
@@ -51,7 +51,7 @@ class InterestOnLoanControllerSpec extends ControllerBaseSpec {
       saveAndContinue(
         onSubmit,
         "value.1" -> money.value.toString,
-        "value.2" -> double.toString,
+        "value.2" -> percentage.value.toString,
         "value.3" -> money.value.toString
       )
     )

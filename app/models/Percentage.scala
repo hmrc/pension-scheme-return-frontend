@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.loansmadeoroutstanding
+package models
 
-import models.{Money, Percentage}
-import models.SchemeId.Srn
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import play.api.libs.json.{Format, Json}
 
-case class InterestOnLoanPage(srn: Srn) extends QuestionPage[(Money, Percentage, Money)] {
+case class Percentage(value: Double, displayAs: String)
 
-  override def path: JsPath = JsPath \ "loans" \ "loanTransactions" \ toString
+object Percentage {
 
-  override def toString: String = "loanInterestPage"
+  def apply(value: Double): Percentage =
+    Percentage(value, value.toString)
+
+  implicit val formats: Format[Percentage] = Json.format[Percentage]
+
 }

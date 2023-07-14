@@ -104,6 +104,7 @@ trait TestValues { _: OptionValues =>
   val utr: Utr = utrGen.sample.get
   val money: Money = Money(123456)
   val double: Double = 7.7
+  val percentage: Percentage = Percentage(7.7)
   val companyName = "testCompanyName"
   val partnershipName = "testPartnershipName"
   val otherName = "testOtherName"

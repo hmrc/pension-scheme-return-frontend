@@ -20,6 +20,7 @@ case class DoubleFormErrors(
   requiredKey: String,
   wholeNumberKey: String,
   nonNumericKey: String,
+  min: (Double, String),
   max: (Double, String)
 )
 
@@ -28,7 +29,8 @@ object DoubleFormErrors {
   def apply(
     requiredKey: String,
     invalidKey: String,
+    min: (Double, String),
     max: (Double, String)
   ): DoubleFormErrors =
-    DoubleFormErrors(requiredKey, invalidKey, invalidKey, max)
+    DoubleFormErrors(requiredKey, invalidKey, invalidKey, min, max)
 }

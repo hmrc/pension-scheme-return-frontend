@@ -18,13 +18,13 @@ package controllers.nonsipp.loansmadeoroutstanding
 
 import controllers.nonsipp.loansmadeoroutstanding.InterestOnLoanController._
 import com.google.inject.Inject
-import config.Constants.{maxCurrencyValue, maxPercentage}
+import config.Constants.{maxCurrencyValue, maxPercentage, minPercentage}
 import controllers.actions._
 import forms.mappings.Mappings
 import forms.MultipleQuestionFormProvider
-import forms.mappings.errors.{DoubleFormErrors, MoneyFormErrors}
+import forms.mappings.errors.{DoubleFormErrors, MoneyFormErrors, PercentageFormErrors}
 import models.SchemeId.Srn
-import models.{Mode, Money}
+import models.{Mode, Money, Percentage}
 import navigation.Navigator
 import pages.nonsipp.loansmadeoroutstanding.InterestOnLoanPage
 import play.api.data.Form
@@ -97,11 +97,12 @@ object InterestOnLoanController {
       (maxCurrencyValue, "interestOnLoan.loanInterestAmount.error.max")
     )
 
-  private val field2Errors: DoubleFormErrors =
-    DoubleFormErrors(
+  private val field2Errors: PercentageFormErrors =
+    PercentageFormErrors(
       "interestOnLoan.loanInterestRate.error.required",
       "interestOnLoan.loanInterestRate.error.nonNumeric",
-      (maxPercentage, "")
+      (maxPercentage, "interestOnLoan.loanInterestRate.error.tooLarge"),
+      (minPercentage, "interestOnLoan.loanInterestRate.error.tooLow")
     )
 
   private val field3Errors: MoneyFormErrors =
@@ -111,10 +112,10 @@ object InterestOnLoanController {
       (maxCurrencyValue, "interestOnLoan.intReceivedCY.error.max")
     )
 
-  def form(implicit messages: Messages): Form[(Money, Double, Money)] =
+  def form(implicit messages: Messages): Form[(Money, Percentage, Money)] =
     MultipleQuestionFormProvider(
       Mappings.money(field1Errors),
-      Mappings.double(field2Errors),
+      Mappings.percentage(field2Errors),
       Mappings.money(field3Errors)
     )
 
@@ -122,8 +123,8 @@ object InterestOnLoanController {
     srn: Srn,
     mode: Mode,
     schemeName: String,
-    form: Form[(Money, Double, Money)]
-  ): FormPageViewModel[TripleQuestion[Money, Double, Money]] =
+    form: Form[(Money, Percentage, Money)]
+  ): FormPageViewModel[TripleQuestion[Money, Percentage, Money]] =
     FormPageViewModel(
       "interestOnLoan.loanInterestRate.title",
       Message("interestOnLoan.loanInterestRate.heading", schemeName),
