@@ -356,6 +356,11 @@ POST       /:srn/amount-of-loan-payments                            controllers.
 GET        /:srn/change-amount-of-loan-payments                     controllers.nonsipp.loansmadeoroutstanding.AmountOfTheLoanController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST       /:srn/change-amount-of-loan-payments                     controllers.nonsipp.loansmadeoroutstanding.AmountOfTheLoanController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
+GET        /:srn/interest-on-loan                            controllers.nonsipp.loansmadeoroutstanding.InterestOnLoanController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST       /:srn/interest-on-loan                            controllers.nonsipp.loansmadeoroutstanding.InterestOnLoanController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/change-interest-on-loan                     controllers.nonsipp.loansmadeoroutstanding.InterestOnLoanController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST       /:srn/change-interest-on-loan                     controllers.nonsipp.loansmadeoroutstanding.InterestOnLoanController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
 GET        /:srn/are-repayments-instalments                         controllers.nonsipp.loansmadeoroutstanding.AreRepaymentsInstalmentsController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST       /:srn/are-repayments-instalments                         controllers.nonsipp.loansmadeoroutstanding.AreRepaymentsInstalmentsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 

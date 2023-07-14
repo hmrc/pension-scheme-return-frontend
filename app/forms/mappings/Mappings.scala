@@ -16,9 +16,8 @@
 
 package forms.mappings
 
-import forms.mappings.errors.{DateFormErrors, IntFormErrors, MoneyFormErrors}
-import models.{DateRange, Enumerable, Money, Utr}
-import models.{Crn, DateRange, Enumerable, Money}
+import forms.mappings.errors.{DateFormErrors, DoubleFormErrors, IntFormErrors, MoneyFormErrors, PercentageFormErrors}
+import models.{Crn, DateRange, Enumerable, Money, Percentage, Utr}
 import play.api.data.{FieldMapping, Mapping}
 import play.api.data.Forms.of
 import play.api.data.validation.{Constraint, Invalid, Valid}
@@ -55,15 +54,33 @@ trait Mappings extends Formatters with Constraints {
     requiredKey: String = "error.required",
     nonNumericKey: String = "error.nonNumeric",
     max: (Double, String) = (Double.MaxValue, "error.tooLarge"),
+    min: (Double, String) = (Double.MinValue, "error.tooLow"),
     args: Seq[String] = Seq.empty
   ): FieldMapping[Double] =
-    of(doubleFormatter(requiredKey, nonNumericKey, max, args))
+    of(doubleFormatter(requiredKey, nonNumericKey, max, min, args))
+
+  def double(
+    doubleFormErrors: DoubleFormErrors,
+    args: Seq[String]
+  ): FieldMapping[Double] =
+    of(doubleFormatter(doubleFormErrors, args))
+
+  def double(
+    doubleFormErrors: DoubleFormErrors
+  ): FieldMapping[Double] =
+    of(doubleFormatter(doubleFormErrors, Nil))
 
   def money(
     moneyFormErrors: MoneyFormErrors,
     args: Seq[String] = Seq.empty
   ): FieldMapping[Money] =
     of(moneyFormatter(moneyFormErrors, args))
+
+  def percentage(
+    percentageFormErrors: PercentageFormErrors,
+    args: Seq[String] = Seq.empty
+  ): FieldMapping[Percentage] =
+    of(percentageFormatter(percentageFormErrors, args))
 
   def boolean(
     requiredKey: String = "error.required",

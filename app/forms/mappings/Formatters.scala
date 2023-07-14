@@ -16,8 +16,8 @@
 
 package forms.mappings
 
-import forms.mappings.errors.{IntFormErrors, MoneyFormErrors}
-import models.{Enumerable, Money}
+import forms.mappings.errors.{DoubleFormErrors, IntFormErrors, MoneyFormErrors, PercentageFormErrors}
+import models.{Enumerable, Money, Percentage}
 import play.api.data.FormError
 import play.api.data.format.Formatter
 
@@ -102,6 +102,12 @@ trait Formatters {
     }
 
   private[mappings] def doubleFormatter(
+    doubleFormErrors: DoubleFormErrors,
+    args: Seq[String]
+  ): Formatter[Double] =
+    doubleFormatter(doubleFormErrors.requiredKey, doubleFormErrors.nonNumericKey, doubleFormErrors.max, args)
+
+  private[mappings] def doubleFormatter(
     requiredKey: String,
     nonNumericKey: String,
     max: (Double, String),
@@ -111,16 +117,53 @@ trait Formatters {
 
       private val baseFormatter = stringFormatter(requiredKey, args)
       private val (maxSize, maxError) = max
+      private val decimalRegex = "^%?[0-9]+(\\.[0-9]{1,2})?%?$"
 
       override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Double] =
         baseFormatter
           .bind(key, data)
-          .map(_.replace(",", ""))
+          .map(_.replace(",", "").replace("%", ""))
           .flatMap { s =>
             s.toDoubleOption
               .toRight(Seq(FormError(key, nonNumericKey, args)))
               .flatMap { double =>
                 if (double > maxSize) Left(Seq(FormError(key, maxError, args)))
+                else if (double.toString().matches(decimalRegex))
+                  Right(double)
+                else Right(double)
+              }
+          }
+
+      override def unbind(key: String, value: Double): Map[String, String] =
+        baseFormatter.unbind(key, value.toString)
+    }
+
+  private[mappings] def doubleFormatter(
+    requiredKey: String,
+    nonNumericKey: String,
+    max: (Double, String),
+    min: (Double, String),
+    args: Seq[String]
+  ): Formatter[Double] =
+    new Formatter[Double] {
+
+      private val baseFormatter = stringFormatter(requiredKey, args)
+      private val (maxSize, maxError) = max
+      private val (minSize, minError) = min
+      private val decimalRegex = "^%?[0-9]+(\\.[0-9]{1,2})?%?$"
+
+      override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Double] =
+        baseFormatter
+          .bind(key, data)
+          .map(_.replace(",", "").replace("%", ""))
+          .flatMap { s =>
+            s.toDoubleOption
+              .toRight(Seq(FormError(key, nonNumericKey, args)))
+              .flatMap { double =>
+                if (double < minSize) Left(Seq(FormError(key, minError, args)))
+                else if (double > maxSize) Left(Seq(FormError(key, maxError, args)))
+                else if (double.toString().matches(decimalRegex))
+                  Right(double)
                 else Right(double)
               }
           }
@@ -149,6 +192,30 @@ trait Formatters {
           }
 
       override def unbind(key: String, value: Money): Map[String, String] =
+        Map(key -> value.displayAs)
+    }
+
+  private[mappings] def percentageFormatter(
+    errors: PercentageFormErrors,
+    args: Seq[String] = Seq.empty
+  ): Formatter[Percentage] =
+    new Formatter[Percentage] {
+
+      private val baseFormatter =
+        doubleFormatter(errors.requiredKey, errors.nonNumericKey, errors.max, errors.min, args)
+      private val decimalRegex = """^%?-?\d+(?:\.\d{1,2})?$"""
+
+      override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Percentage] =
+        baseFormatter
+          .bind(key, data.view.mapValues(_.replace("%", "")).toMap)
+          .flatMap { double =>
+            if (double.toString().matches(decimalRegex))
+              Right(Percentage(double, data(key).replace("%", "")))
+            else
+              Left(Seq(FormError(key, errors.nonNumericKey, args)))
+          }
+
+      override def unbind(key: String, value: Percentage): Map[String, String] =
         Map(key -> value.displayAs)
     }
 

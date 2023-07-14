@@ -41,4 +41,6 @@ object Constants {
   val maxMembers = 999999
 
   val maxLoanPeriod = 999
+  val minPercentage = -999.99
+  val maxPercentage = 999.99
 }
