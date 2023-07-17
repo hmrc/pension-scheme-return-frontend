@@ -39,8 +39,8 @@ class IndividualRecipientNinoControllerSpec extends ControllerBaseSpec {
   val userAnswersWithIndividualName =
     defaultUserAnswers.unsafeSet(IndividualRecipientNamePage(srn, index), individualName)
 
-  val conditionalNo: ConditionalYesNo[Nino] = ConditionalYesNo[Nino](Left("reason"))
-  val conditionalYes: ConditionalYesNo[Nino] = ConditionalYesNo[Nino](Right(nino))
+  val conditionalNo: ConditionalYesNo[String, Nino] = ConditionalYesNo.no("reason")
+  val conditionalYes: ConditionalYesNo[String, Nino] = ConditionalYesNo.yes(nino)
 
   "IndividualRecipientNinoController" - {
 

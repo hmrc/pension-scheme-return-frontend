@@ -44,23 +44,17 @@ class YesNoPageFormProvider @Inject()() {
   ): Form[Boolean] =
     Form("value" -> Mappings.boolean(requiredKey, "", args))
 
-  def conditional[A](
+  def conditional[No, Yes](
     requiredKey: String,
-    requiredNoKey: String,
-    invalidNoKey: String,
-    maxLengthNoKey: String,
-    mappingYes: Mapping[A],
+    mappingNo: Mapping[No],
+    mappingYes: Mapping[Yes],
     args: String*
-  ): Form[Either[String, A]] =
-    Form[Either[String, A]](
+  ): Form[Either[No, Yes]] =
+    Form[Either[No, Yes]](
       mapping(
         "value" -> Mappings.boolean(requiredKey, args = args.toList),
         "value.yes" -> ConditionalMappings.mandatoryIfTrue("value", mappingYes),
-        "value.no" -> ConditionalMappings.mandatoryIfFalse(
-          "value",
-          Mappings
-            .validatedText(requiredNoKey, textAreaRegex, invalidNoKey, textAreaMaxLength, maxLengthNoKey, args: _*)
-        )
+        "value.no" -> ConditionalMappings.mandatoryIfFalse("value", mappingNo)
       ) {
         case (bool, yes, no) =>
           ((bool, yes, no): @unchecked) match {
@@ -69,6 +63,28 @@ class YesNoPageFormProvider @Inject()() {
           }
       } {
         case Left(value) => Some((false, None, Some(value)))
+        case Right(value) => Some((true, Some(value), None))
+      }
+    )
+
+  def conditionalYes[Yes](
+    requiredKey: String,
+    mappingYes: Mapping[Yes],
+    args: String*
+  ): Form[Either[Unit, Yes]] =
+    Form[Either[Unit, Yes]](
+      mapping(
+        "value" -> Mappings.boolean(requiredKey, args = args.toList),
+        "value.yes" -> ConditionalMappings.mandatoryIfTrue("value", mappingYes),
+        "value.no" -> Mappings.unit
+      ) {
+        case (bool, yes, _) =>
+          ((bool, yes): @unchecked) match {
+            case (true, Some(value)) => Right(value)
+            case (false, _) => Left(())
+          }
+      } {
+        case Left(_) => Some((false, None, Some(())))
         case Right(value) => Some((true, Some(value), None))
       }
     )

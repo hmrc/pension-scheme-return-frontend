@@ -20,17 +20,9 @@ import config.Refined.OneTo9999999
 import controllers.nonsipp.loansmadeoroutstanding.LoansCYAController._
 import controllers.ControllerBaseSpec
 import eu.timepit.refined.refineMV
-import models.{ConditionalYesNo, Crn, NormalMode, ReceivedLoanType, SponsoringOrConnectedParty}
-import pages.nonsipp.loansmadeoroutstanding.{
-  AmountOfTheLoanPage,
-  AreRepaymentsInstalmentsPage,
-  CompanyRecipientCrnPage,
-  CompanyRecipientNamePage,
-  DatePeriodLoanPage,
-  InterestOnLoanPage,
-  RecipientSponsoringEmployerConnectedPartyPage,
-  WhoReceivedLoanPage
-}
+import models.{ConditionalYesNo, Crn, Money, NormalMode, ReceivedLoanType, SponsoringOrConnectedParty}
+import models.ConditionalYesNo._
+import pages.nonsipp.loansmadeoroutstanding._
 import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
 import services.SchemeDateService
@@ -56,12 +48,13 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
   private val filledUserAnswers = defaultUserAnswers
     .unsafeSet(WhoReceivedLoanPage(srn, index), ReceivedLoanType.UKCompany)
     .unsafeSet(CompanyRecipientNamePage(srn, index), recipientName)
-    .unsafeSet(CompanyRecipientCrnPage(srn, index), ConditionalYesNo.yes(crn))
+    .unsafeSet(CompanyRecipientCrnPage(srn, index), ConditionalYesNo.yes[String, Crn](crn))
     .unsafeSet(RecipientSponsoringEmployerConnectedPartyPage(srn, index), SponsoringOrConnectedParty.ConnectedParty)
     .unsafeSet(DatePeriodLoanPage(srn, index), (localDate, money, loanPeriod))
     .unsafeSet(AmountOfTheLoanPage(srn, index), (money, money, money))
     .unsafeSet(AreRepaymentsInstalmentsPage(srn, index), true)
     .unsafeSet(InterestOnLoanPage(srn, index), (money, percentage, money))
+    .unsafeSet(OutstandingArrearsOnLoanPage(srn, index), ConditionalYesNo.yes[Unit, Money](money))
 
   "LoansCYAController" - {
 
@@ -80,6 +73,7 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
           returnEndDate = dateRange.to,
           repaymentInstalments = true,
           loanInterest = (money, percentage, money),
+          outstandingArrearsOnLoan = Some(money),
           NormalMode
         )
       )

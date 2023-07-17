@@ -14,20 +14,14 @@
  * limitations under the License.
  */
 
-package generators
+package viewmodels.models
 
-import org.scalacheck.{Arbitrary, Gen, Shrink}
+sealed trait FieldType
 
-trait Generators
-    extends UserAnswersGenerator
-    with PageGenerators
-    with ModelGenerators
-    with UserAnswersEntryGenerators
-    with ViewModelGenerators
-    with BasicGenerators {
-
-  implicit val dontShrinkString: Shrink[String] = Shrink.shrinkAny
-  implicit def dontShrinkList[T]: Shrink[List[T]] = Shrink.shrinkAny
-
-  implicit def arbitraryGen[A](implicit g: Gen[A]): Arbitrary[A] = Arbitrary(g)
+object FieldType {
+  case object Input extends FieldType
+  case object Currency extends FieldType
+  case object Date extends FieldType
+  case object Percentage extends FieldType
+  case object Textarea extends FieldType
 }

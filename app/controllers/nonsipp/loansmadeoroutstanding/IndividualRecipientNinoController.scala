@@ -33,7 +33,7 @@ import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
-import viewmodels.models.{ConditionalYesNoPageViewModel, FormPageViewModel, YesNoViewModel}
+import viewmodels.models.{ConditionalYesNoPageViewModel, FieldType, FormPageViewModel, YesNoViewModel}
 import views.html.ConditionalYesNoPageView
 
 import javax.inject.{Inject, Named}
@@ -83,10 +83,12 @@ class IndividualRecipientNinoController @Inject()(
 object IndividualRecipientNinoController {
   def form(formProvider: YesNoPageFormProvider): Form[Either[String, Nino]] = formProvider.conditional(
     "individualRecipientNino.error.required",
-    requiredNoKey = "individualRecipientNino.no.conditional.error.required",
-    invalidNoKey = "individualRecipientNino.no.conditional.error.invalid",
-    maxLengthNoKey = "individualRecipientNino.no.conditional.error.length",
-    Mappings.nino(
+    mappingNo = Mappings.textArea(
+      "individualRecipientNino.no.conditional.error.required",
+      "individualRecipientNino.no.conditional.error.invalid",
+      "individualRecipientNino.no.conditional.error.length"
+    ),
+    mappingYes = Mappings.nino(
       "individualRecipientNino.yes.conditional.error.required",
       "individualRecipientNino.yes.conditional.error.invalid"
     )
@@ -102,8 +104,10 @@ object IndividualRecipientNinoController {
       "individualRecipientNino.title",
       Message("individualRecipientNino.heading", individualName),
       ConditionalYesNoPageViewModel(
-        yes = YesNoViewModel.Conditional(Message("individualRecipientNino.yes.conditional", individualName)),
-        no = YesNoViewModel.Conditional(Message("individualRecipientNino.no.conditional", individualName))
+        yes = YesNoViewModel
+          .Conditional(Message("individualRecipientNino.yes.conditional", individualName), FieldType.Input),
+        no = YesNoViewModel
+          .Conditional(Message("individualRecipientNino.no.conditional", individualName), FieldType.Textarea)
       ),
       routes.IndividualRecipientNinoController.onSubmit(srn, index, mode)
     )

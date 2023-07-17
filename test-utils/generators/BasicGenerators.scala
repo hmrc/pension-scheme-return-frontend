@@ -35,6 +35,9 @@ import java.time.{Instant, LocalDate, ZoneOffset}
 
 trait BasicGenerators extends EitherValues {
 
+  implicit val basicStringGen: Gen[String] = nonEmptyAlphaString
+  implicit val unitGen: Gen[Unit] = Gen.const(())
+
   def genIntersperseString(gen: Gen[String], value: String, frequencyV: Int = 1, frequencyN: Int = 10): Gen[String] = {
 
     val genValue: Gen[Option[String]] = Gen.frequency(frequencyN -> None, frequencyV -> Gen.const(Some(value)))

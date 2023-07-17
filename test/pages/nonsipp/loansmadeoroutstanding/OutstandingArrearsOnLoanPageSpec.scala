@@ -18,20 +18,20 @@ package pages.nonsipp.loansmadeoroutstanding
 
 import config.Refined.OneTo9999999
 import eu.timepit.refined.refineMV
-import models.ConditionalYesNo
+import models.ConditionalYesNo._
+import models.Money
 import pages.behaviours.PageBehaviours
-import uk.gov.hmrc.domain.Nino
 
-class CompanyRecipientCrnPageSpec extends PageBehaviours {
+class OutstandingArrearsOnLoanPageSpec extends PageBehaviours {
 
-  "CompanyRecipientCrnPage" - {
+  "OutstandingArrearsOnLoanPage" - {
 
     val index = refineMV[OneTo9999999](1)
 
-    beRetrievable[ConditionalYesNo[String, Nino]](IndividualRecipientNinoPage(srnGen.sample.value, index))
+    beRetrievable[ConditionalYes[Money]](OutstandingArrearsOnLoanPage(srnGen.sample.value, index))
 
-    beSettable[ConditionalYesNo[String, Nino]](IndividualRecipientNinoPage(srnGen.sample.value, index))
+    beSettable[ConditionalYes[Money]](OutstandingArrearsOnLoanPage(srnGen.sample.value, index))
 
-    beRemovable[ConditionalYesNo[String, Nino]](IndividualRecipientNinoPage(srnGen.sample.value, index))
+    beRemovable[ConditionalYes[Money]](OutstandingArrearsOnLoanPage(srnGen.sample.value, index))
   }
 }

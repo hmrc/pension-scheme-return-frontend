@@ -32,6 +32,7 @@ object MultipleQuestionsViewModel {
   case class SingleQuestion[A](form: Form[A], field1: QuestionField) extends MultipleQuestionsViewModel[A] {
 
     override def firstField: QuestionField = field1
+
     override val fields: List[QuestionField] = List(field1)
   }
 
@@ -42,6 +43,7 @@ object MultipleQuestionsViewModel {
   ) extends MultipleQuestionsViewModel[(A, A)] {
 
     override def firstField: QuestionField = field1
+
     override val fields: List[QuestionField] = List(field1, field2)
   }
 
@@ -53,17 +55,9 @@ object MultipleQuestionsViewModel {
   ) extends MultipleQuestionsViewModel[(A, B, C)] {
 
     override def firstField: QuestionField = field1
+
     override val fields: List[QuestionField] = List(field1, field2, field3)
   }
-}
-
-sealed trait FieldType
-
-object FieldType {
-  case object Input extends FieldType
-  case object Currency extends FieldType
-  case object Date extends FieldType
-  case object Percentage extends FieldType
 }
 
 case class QuestionField(label: InlineMessage, hint: Option[InlineMessage] = None, fieldType: FieldType)

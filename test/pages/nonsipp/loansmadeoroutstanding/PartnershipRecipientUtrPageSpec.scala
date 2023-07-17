@@ -27,10 +27,10 @@ class PartnershipRecipientUtrPageSpec extends PageBehaviours {
 
     val index = refineMV[OneTo9999999](1)
 
-    beRetrievable[ConditionalYesNo[Utr]](PartnershipRecipientUtrPage(srnGen.sample.value, index))
+    beRetrievable[ConditionalYesNo[String, Utr]](PartnershipRecipientUtrPage(srnGen.sample.value, index))
 
-    beSettable[ConditionalYesNo[Utr]](PartnershipRecipientUtrPage(srnGen.sample.value, index))
+    beSettable[ConditionalYesNo[String, Utr]](PartnershipRecipientUtrPage(srnGen.sample.value, index))
 
-    beRemovable[ConditionalYesNo[Utr]](PartnershipRecipientUtrPage(srnGen.sample.value, index))
+    beRemovable[ConditionalYesNo[String, Utr]](PartnershipRecipientUtrPage(srnGen.sample.value, index))
   }
 }

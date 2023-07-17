@@ -35,8 +35,8 @@ class PartnershipRecipientUtrControllerSpec extends ControllerBaseSpec {
   val userAnswersWithPartnershipRecipientName =
     defaultUserAnswers.unsafeSet(PartnershipRecipientNamePage(srn, index), partnershipName)
 
-  val conditionalNo: ConditionalYesNo[Utr] = ConditionalYesNo[Utr](Left("reason"))
-  val conditionalYes: ConditionalYesNo[Utr] = ConditionalYesNo[Utr](Right(utr))
+  val conditionalNo: ConditionalYesNo[String, Utr] = ConditionalYesNo.no("reason")
+  val conditionalYes: ConditionalYesNo[String, Utr] = ConditionalYesNo.yes(utr)
 
   "PartnershipRecipientUtrController" - {
 
