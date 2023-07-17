@@ -32,7 +32,7 @@ import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
-import viewmodels.models.{ConditionalYesNoPageViewModel, FormPageViewModel, YesNoViewModel}
+import viewmodels.models.{ConditionalYesNoPageViewModel, FieldType, FormPageViewModel, YesNoViewModel}
 import views.html.ConditionalYesNoPageView
 
 import javax.inject.{Inject, Named}
@@ -82,10 +82,12 @@ class PartnershipRecipientUtrController @Inject()(
 object PartnershipRecipientUtrController {
   def form(formProvider: YesNoPageFormProvider): Form[Either[String, Utr]] = formProvider.conditional(
     "partnershipRecipientUtr.error.required",
-    requiredNoKey = "partnershipRecipientUtr.no.conditional.error.required",
-    invalidNoKey = "partnershipRecipientUtr.no.conditional.error.invalid",
-    maxLengthNoKey = "partnershipRecipientUtr.no.conditional.error.length",
-    Mappings.utr(
+    mappingNo = Mappings.textArea(
+      "partnershipRecipientUtr.no.conditional.error.required",
+      "partnershipRecipientUtr.no.conditional.error.invalid",
+      "partnershipRecipientUtr.no.conditional.error.length"
+    ),
+    mappingYes = Mappings.utr(
       "partnershipRecipientUtr.yes.conditional.error.required",
       "partnershipRecipientUtr.yes.conditional.error.invalid"
     )
@@ -101,8 +103,10 @@ object PartnershipRecipientUtrController {
       "partnershipRecipientUtr.title",
       Message("partnershipRecipientUtr.heading", partnershipRecipientName),
       ConditionalYesNoPageViewModel(
-        yes = YesNoViewModel.Conditional(Message("partnershipRecipientUtr.yes.conditional", partnershipRecipientName)),
-        no = YesNoViewModel.Conditional(Message("partnershipRecipientUtr.no.conditional", partnershipRecipientName))
+        yes = YesNoViewModel
+          .Conditional(Message("partnershipRecipientUtr.yes.conditional", partnershipRecipientName), FieldType.Input),
+        no = YesNoViewModel
+          .Conditional(Message("partnershipRecipientUtr.no.conditional", partnershipRecipientName), FieldType.Textarea)
       ),
       routes.PartnershipRecipientUtrController.onSubmit(srn, index, mode)
     )

@@ -27,6 +27,9 @@ import java.time.LocalDate
 
 trait Mappings extends Formatters with Constraints {
 
+  protected[forms] val textAreaRegex = """^[a-zA-Z0-9\-'" \t\r\n,.@/]+$"""
+  protected[forms] val textAreaMaxLength = 160
+
   def text(errorKey: String = "error.required", args: Seq[Any] = Seq.empty): Mapping[String] =
     of(stringFormatter(errorKey, args)).transform(_.trim, _.trim)
 
@@ -89,6 +92,8 @@ trait Mappings extends Formatters with Constraints {
   ): FieldMapping[Boolean] =
     of(booleanFormatter(requiredKey, invalidKey, args))
 
+  val unit: FieldMapping[Unit] = of(unitFormatter)
+
   def enumerable[A](
     requiredKey: String = "error.required",
     invalidKey: String = "error.invalid",
@@ -139,6 +144,14 @@ trait Mappings extends Formatters with Constraints {
     text(requiredKey, args.toList)
       .verifying(verify[String](invalidCharactersKey, _.matches(textRegex), args: _*))
       .verifying(verify[String](maxLengthErrorKey, _.length <= maxLength, args: _*))
+
+  def textArea(
+    requiredNoKey: String,
+    invalidNoKey: String,
+    maxLengthNoKey: String,
+    args: Any*
+  ): Mapping[String] =
+    validatedText(requiredNoKey, textAreaRegex, invalidNoKey, textAreaMaxLength, maxLengthNoKey, args: _*)
 
   def nino(
     requiredKey: String,

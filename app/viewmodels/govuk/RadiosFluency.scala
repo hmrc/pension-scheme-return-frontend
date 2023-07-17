@@ -25,7 +25,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
 import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.{RadioItem, Radios}
 import viewmodels.DisplayMessage.Message
 import viewmodels.{DisplayMessage, ErrorMessageAwareness, LegendSize}
-import viewmodels.models.YesNoViewModel
+import viewmodels.models.{FieldType, YesNoViewModel}
 import viewmodels.models.YesNoViewModel.Conditional
 
 object radios extends RadiosFluency
@@ -143,8 +143,8 @@ trait RadiosFluency {
       fieldNo: Field,
       yes: YesNoViewModel,
       no: YesNoViewModel,
-      whenYes: Message => Html,
-      whenNo: Message => Html,
+      whenYes: (Message, FieldType) => Html,
+      whenNo: (Message, FieldType) => Html,
       legend: Option[Message]
     )(implicit messages: Messages): Radios =
       Radios(
@@ -162,8 +162,8 @@ trait RadiosFluency {
             checked = fieldYes.errors.nonEmpty || (field.value.contains("true") && fieldYes.value
               .exists(s => !s.isEmpty)),
             conditionalHtml = yes match {
-              case YesNoViewModel.Conditional(_, _, conditionalMessage) =>
-                Some(whenYes(conditionalMessage))
+              case YesNoViewModel.Conditional(_, _, conditionalMessage, fieldType) =>
+                Some(whenYes(conditionalMessage, fieldType))
               case _ => None
             }
           ),
@@ -174,8 +174,8 @@ trait RadiosFluency {
             checked = fieldNo.errors.nonEmpty || (field.value.contains("false") && fieldNo.value
               .exists(s => !s.isEmpty)),
             conditionalHtml = no match {
-              case YesNoViewModel.Conditional(_, _, conditionalMessage) =>
-                Some(whenNo(conditionalMessage))
+              case YesNoViewModel.Conditional(_, _, conditionalMessage, fieldType) =>
+                Some(whenNo(conditionalMessage, fieldType))
               case _ => None
             }
           )

@@ -42,9 +42,10 @@ object YesNoViewModel {
 
   object Unconditional extends Unconditional(None, None)
 
-  case class Conditional(message: Option[Html], hint: Option[Html], conditionalMessage: Message) extends YesNoViewModel
+  case class Conditional(message: Option[Html], hint: Option[Html], conditionalMessage: Message, fieldType: FieldType)
+      extends YesNoViewModel
 
   object Conditional {
-    def apply(nestedHtml: Message): Conditional = Conditional(None, None, nestedHtml)
+    def apply(nestedHtml: Message, fieldType: FieldType): Conditional = Conditional(None, None, nestedHtml, fieldType)
   }
 }

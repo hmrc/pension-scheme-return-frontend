@@ -24,7 +24,8 @@ import play.api.libs.json.JsPath
 import uk.gov.hmrc.domain.Nino
 import utils.RefinedUtils.RefinedIntOps
 
-case class IndividualRecipientNinoPage(srn: Srn, index: Max9999999) extends QuestionPage[ConditionalYesNo[Nino]] {
+case class IndividualRecipientNinoPage(srn: Srn, index: Max9999999)
+    extends QuestionPage[ConditionalYesNo[String, Nino]] {
 
   override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString
 

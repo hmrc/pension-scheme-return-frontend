@@ -23,7 +23,7 @@ import pages.QuestionPage
 import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
 
-case class CompanyRecipientCrnPage(srn: Srn, index: Max9999999) extends QuestionPage[ConditionalYesNo[Crn]] {
+case class CompanyRecipientCrnPage(srn: Srn, index: Max9999999) extends QuestionPage[ConditionalYesNo[String, Crn]] {
 
   override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString
 

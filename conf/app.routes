@@ -430,3 +430,13 @@ GET        /:srn/submit-check-answers-loan                                      
 GET        /:srn/change-check-answers-loan                                           controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onPageLoad(srn: Srn, index: Max9999999 = 1, mode: Mode = CheckMode)
 GET        /:srn/change-check-answers-loan/:index                                    controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onPageLoad(srn: Srn, index: Max9999999, mode: Mode = CheckMode)
 GET        /:srn/change-submit-check-answers-loan                                    controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+
+GET        /:srn/outstanding-arrears-on-loan               controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController.onPageLoad(srn: Srn, index: Max9999999 = 1, mode: Mode = NormalMode)
+GET        /:srn/outstanding-arrears-on-loan/:index               controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController.onPageLoad(srn: Srn, index: Max9999999, mode: Mode = NormalMode)
+POST       /:srn/outstanding-arrears-on-loan               controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController.onSubmit(srn: Srn, index: Max9999999 = 1, mode: Mode = NormalMode)
+POST       /:srn/outstanding-arrears-on-loan/:index               controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController.onSubmit(srn: Srn, index: Max9999999, mode: Mode = NormalMode)
+GET        /:srn/change-outstanding-arrears-on-loan        controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController.onPageLoad(srn: Srn, index: Max9999999 = 1, mode: Mode = CheckMode)
+GET        /:srn/change-outstanding-arrears-on-loan/:index        controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController.onPageLoad(srn: Srn, index: Max9999999, mode: Mode = CheckMode)
+POST       /:srn/change-outstanding-arrears-on-loan        controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController.onSubmit(srn: Srn, index: Max9999999 = 1, mode: Mode = CheckMode)
+POST       /:srn/change-outstanding-arrears-on-loan/:index        controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController.onSubmit(srn: Srn, index: Max9999999, mode: Mode = CheckMode)
