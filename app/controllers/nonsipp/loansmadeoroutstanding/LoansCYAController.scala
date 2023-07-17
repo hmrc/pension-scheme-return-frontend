@@ -81,9 +81,7 @@ class LoansCYAController @Inject()(
           returnEndDate <- schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney.map(_.to)
           repaymentInstalments <- request.userAnswers.get(AreRepaymentsInstalmentsPage(srn, index)).getOrRecoverJourney
           loanInterest <- request.userAnswers.get(InterestOnLoanPage(srn, index)).getOrRecoverJourney
-          security <- request.userAnswers
-            .get(SecurityGivenForLoanPage(srn, index))
-            .getOrRecoverJourney
+          security <- request.userAnswers.get(SecurityGivenForLoanPage(srn, index)).getOrRecoverJourney
         } yield Ok(
           view(
             viewModel(

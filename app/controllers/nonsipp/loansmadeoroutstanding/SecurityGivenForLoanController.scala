@@ -50,7 +50,7 @@ class SecurityGivenForLoanController @Inject()(
     extends FrontendBaseController
     with I18nSupport {
 
-  private val form: Form[Either[String, Security]] = SecurityGivenForLoanController.form(formProvider)
+  private val form = SecurityGivenForLoanController.form(formProvider)
 
   def onPageLoad(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
@@ -71,7 +71,9 @@ class SecurityGivenForLoanController @Inject()(
           value =>
             for {
               updatedAnswers <- Future
-                .fromTry(request.userAnswers.set(SecurityGivenForLoanPage(srn, index), ConditionalYesNo(value)))
+                .fromTry(
+                  request.userAnswers.set(SecurityGivenForLoanPage(srn, index), ConditionalYesNo(value))
+                )
               _ <- saveService.save(updatedAnswers)
             } yield Redirect(navigator.nextPage(SecurityGivenForLoanPage(srn, index), mode, updatedAnswers))
         )
@@ -79,11 +81,14 @@ class SecurityGivenForLoanController @Inject()(
 }
 
 object SecurityGivenForLoanController {
-  def form(formProvider: YesNoPageFormProvider): Form[Either[String, Security]] = formProvider.yesConditional(
+  def form(formProvider: YesNoPageFormProvider) = formProvider.yesConditional[Security](
     "securityGivenForLoan.securityGiven.error.required",
-    "securityGivenForLoan.securityGiven.yes.conditional.error.required",
-    "securityGivenForLoan.securityGiven.yes.conditional.error.invalid",
-    "securityGivenForLoan.securityGiven.yes.conditional.error.length"
+    Mappings
+      .security(
+        "securityGivenForLoan.securityGiven.yes.conditional.error.required",
+        "securityGivenForLoan.securityGiven.yes.conditional.error.invalid",
+        "securityGivenForLoan.securityGiven.yes.conditional.error.length"
+      )
   )
 
   def viewModel(srn: Srn, index: Max9999999, mode: Mode): FormPageViewModel[ConditionalYesNoPageViewModel] =

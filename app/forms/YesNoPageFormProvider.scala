@@ -75,27 +75,24 @@ class YesNoPageFormProvider @Inject()() {
 
   def yesConditional[A](
     requiredKey: String,
-    requiredYesKey: String,
-    invalidYesKey: String,
-    maxLengthYesKey: String,
+    mappingYes: Mapping[A],
     args: String*
   ): Form[Either[String, A]] =
     Form[Either[String, A]](
-      mapping[String, Boolean, A](
+      mapping(
         "value" -> Mappings.boolean(requiredKey, args = args.toList),
         "value.yes" -> ConditionalMappings.mandatoryIfTrue(
           "value",
-          Mappings
-            .validatedText(requiredYesKey, textAreaRegex, invalidYesKey, textAreaMaxLength, maxLengthYesKey, args: _*)
+          mappingYes
         )
       ) {
         case (bool, yes) =>
           ((bool, yes): @unchecked) match {
-            case (false, Some(value)) => Left(value)
+            case (false, _) => Left("")
             case (true, Some(value)) => Right(value)
           }
       } {
-        case Left(value) => Some((false, Some(value)))
+        case Left(_) => Some((false, None))
         case Right(value) => Some((true, Some(value)))
       }
     )

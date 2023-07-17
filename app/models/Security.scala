@@ -17,6 +17,7 @@
 package models
 import play.api.libs.json.{Reads, Writes}
 import uk.gov.hmrc.domain.{SimpleName, SimpleObjectReads, SimpleObjectWrites, TaxIdentifier}
+import utils.Transform
 
 case class Security(security: String) extends TaxIdentifier with SimpleName {
 
@@ -38,4 +39,15 @@ object Security extends (String => Security) {
 
   def isValid(security: String) = security != null && security.matches(validSecurityFormat)
   def maxLengthCheck(security: String) = security != null && (maxLength > security.length)
+
+  implicit val transform: Transform[Option[Security], ConditionalYesNo[Security]] =
+    new Transform[Option[Security], ConditionalYesNo[Security]] {
+
+      override def to(a: Option[Security]): ConditionalYesNo[Security] = a match {
+        case None => ConditionalYesNo(Left(""))
+        case Some(value) => ConditionalYesNo(Right(value))
+      }
+
+      override def from(b: ConditionalYesNo[Security]): Option[Security] = b.value.toOption
+    }
 }
