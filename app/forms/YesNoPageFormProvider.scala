@@ -72,4 +72,27 @@ class YesNoPageFormProvider @Inject()() {
         case Right(value) => Some((true, Some(value), None))
       }
     )
+
+  def conditional2[No, Yes](
+    requiredKey: String,
+    mappingNo: Mapping[No],
+    mappingYes: Mapping[Yes],
+    args: String*
+  ): Form[Either[No, Yes]] =
+    Form[Either[No, Yes]](
+      mapping(
+        "value" -> Mappings.boolean(requiredKey, args = args.toList),
+        "value.yes" -> ConditionalMappings.mandatoryIfTrue("value", mappingYes),
+        "value.no" -> ConditionalMappings.mandatoryIfFalse("value", mappingNo)
+      ) {
+        case (bool, yes, no) =>
+          ((bool, yes, no): @unchecked) match {
+            case (false, _, Some(value)) => Left(value)
+            case (true, Some(value), _) => Right(value)
+          }
+      } {
+        case Left(value) => Some((false, None, Some(value)))
+        case Right(value) => Some((true, Some(value), None))
+      }
+    )
 }

@@ -14,19 +14,14 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.loansmadeoroutstanding
+package viewmodels.models
 
-import config.Refined.Max9999999
-import models.{ConditionalYesNo, Utr}
-import models.SchemeId.Srn
-import pages.QuestionPage
-import play.api.libs.json.JsPath
-import utils.RefinedUtils.RefinedIntOps
+sealed trait FieldType
 
-case class PartnershipRecipientUtrPage(srn: Srn, index: Max9999999)
-    extends QuestionPage[ConditionalYesNo[String, Utr]] {
-
-  override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString
-
-  override def toString: String = "partnershipRecipientUtr"
+object FieldType {
+  case object Input extends FieldType
+  case object Currency extends FieldType
+  case object Date extends FieldType
+  case object Percentage extends FieldType
+  case object Textarea extends FieldType
 }

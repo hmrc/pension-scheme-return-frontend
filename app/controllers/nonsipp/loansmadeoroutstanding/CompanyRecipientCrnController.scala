@@ -32,7 +32,7 @@ import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
-import viewmodels.models.{ConditionalYesNoPageViewModel, FormPageViewModel, YesNoViewModel}
+import viewmodels.models.{ConditionalYesNoPageViewModel, FieldType, FormPageViewModel, YesNoViewModel}
 import views.html.ConditionalYesNoPageView
 
 import javax.inject.{Inject, Named}
@@ -80,12 +80,15 @@ class CompanyRecipientCrnController @Inject()(
 }
 
 object CompanyRecipientCrnController {
-  def form(formProvider: YesNoPageFormProvider): Form[Either[String, Crn]] = formProvider.conditional(
+
+  def form(formProvider: YesNoPageFormProvider): Form[Either[String, Crn]] = formProvider.conditional2(
     "companyRecipientCrn.error.required",
-    requiredNoKey = "companyRecipientCrn.no.conditional.error.required",
-    invalidNoKey = "companyRecipientCrn.no.conditional.error.invalid",
-    maxLengthNoKey = "companyRecipientCrn.no.conditional.error.length",
-    Mappings.crn(
+    mappingNo = Mappings.textArea(
+      "companyRecipientCrn.no.conditional.error.required",
+      "companyRecipientCrn.no.conditional.error.invalid",
+      "companyRecipientCrn.no.conditional.error.length"
+    ),
+    mappingYes = Mappings.crn(
       "companyRecipientCrn.yes.conditional.error.required",
       "companyRecipientCrn.yes.conditional.error.invalid",
       "companyRecipientCrn.yes.conditional.error.length"
@@ -102,8 +105,8 @@ object CompanyRecipientCrnController {
       "companyRecipientCrn.title",
       Message("companyRecipientCrn.heading", companyName),
       ConditionalYesNoPageViewModel(
-        yes = YesNoViewModel.Conditional(Message("companyRecipientCrn.yes.conditional", companyName)),
-        no = YesNoViewModel.Conditional(Message("companyRecipientCrn.no.conditional", companyName))
+        yes = YesNoViewModel.Conditional(Message("companyRecipientCrn.yes.conditional", companyName), FieldType.Input),
+        no = YesNoViewModel.Conditional(Message("companyRecipientCrn.no.conditional", companyName), FieldType.Textarea)
       ).withHint("companyRecipientCrn.hint"),
       routes.CompanyRecipientCrnController.onSubmit(srn, index, mode)
     )

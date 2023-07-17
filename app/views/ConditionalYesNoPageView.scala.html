@@ -48,17 +48,14 @@
                 fieldNo = form("value.no"),
                 yes = viewmodel.page.yes,
                 no = viewmodel.page.no,
-                whenYes = message => govukInput(
-                        InputViewModel(form("value.yes"), LabelViewModel(renderMessage(message)))
-                                .withId("value.yes")
-                    ),
-                whenNo = message =>
-                    govukTextarea(
-                        TextareaViewModel("value.no", form("value.no").value)
-                                .withLabel(renderMessage(message))
-                                .withRows(5)
-                                .withError(form("value.no").errors.headOption)
-                    ),
+                whenYes = {
+                    case (message, FieldType.Input) => input("value.yes", message)
+                    case (message, FieldType.Textarea) => textArea("value.yes", message)
+                },
+                whenNo = {
+                    case (message, FieldType.Input) => input("value.no", message)
+                    case (message, FieldType.Textarea) => textArea("value.no", message)
+                },
                 legend = viewmodel.page.legend
             )
         )
@@ -76,4 +73,20 @@
             ButtonViewModel(renderMessage(viewmodel.buttonText))
         )
     }
+}
+
+@input(key: String, message: DisplayMessage) = @{
+    govukInput(
+        InputViewModel(form(key), LabelViewModel(renderMessage(message)))
+                .withId(key)
+    )
+}
+
+@textArea(key: String, message: DisplayMessage) = @{
+    govukTextarea(
+        TextareaViewModel(key, form(key).value)
+                .withLabel(renderMessage(message))
+                .withRows(5)
+                .withError(form(key).errors.headOption)
+    )
 }
