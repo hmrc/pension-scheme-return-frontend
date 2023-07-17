@@ -236,6 +236,12 @@ trait ModelGenerators extends BasicGenerators {
     Crn(s"$prefix$numbers")
   }
 
+  implicit val securityGen: Gen[Security] = for {
+    numbers <- Gen.listOfN(6, Gen.alphaNumChar).map(_.mkString)
+  } yield {
+    Security(s"$numbers")
+  }
+
   implicit val nameDobGen: Gen[NameDOB] = for {
     firstName <- nonEmptyAlphaString.map(_.take(10))
     lastName <- nonEmptyAlphaString.map(_.take(10))

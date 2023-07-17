@@ -17,13 +17,15 @@
 package viewmodels.models
 
 import play.twirl.api.Html
-import viewmodels.DisplayMessage.Message
+import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
+import viewmodels.DisplayMessage.{InlineMessage, Message, ParagraphMessage}
 
 case class ConditionalYesNoPageViewModel(
   legend: Option[Message] = None,
   hint: Option[Message] = None,
   yes: YesNoViewModel,
   no: YesNoViewModel,
+  isTextAreaEnableForYes: Boolean = false,
   details: Option[FurtherDetailsViewModel] = None
 ) {
 
@@ -31,20 +33,25 @@ case class ConditionalYesNoPageViewModel(
     copy(hint = Some(message))
 }
 
+object ConditionalYesNoPageViewModel
+
 sealed trait YesNoViewModel {
-  val hint: Option[Html]
+  val hint: Option[InlineMessage]
   val message: Option[Html]
 }
 
 object YesNoViewModel {
 
-  case class Unconditional(message: Option[Html], hint: Option[Html]) extends YesNoViewModel
+  case class Unconditional(message: Option[Html], hint: Option[InlineMessage]) extends YesNoViewModel
 
   object Unconditional extends Unconditional(None, None)
 
-  case class Conditional(message: Option[Html], hint: Option[Html], conditionalMessage: Message) extends YesNoViewModel
+  case class Conditional(message: Option[Html], hint: Option[InlineMessage], conditionalMessage: Message)
+      extends YesNoViewModel
 
   object Conditional {
     def apply(nestedHtml: Message): Conditional = Conditional(None, None, nestedHtml)
+
+    def apply(nestedHtml: Message, hint: Option[InlineMessage]): Conditional = Conditional(None, hint, nestedHtml)
   }
 }

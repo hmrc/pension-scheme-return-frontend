@@ -17,7 +17,7 @@
 package forms.mappings
 
 import forms.mappings.errors.{DateFormErrors, DoubleFormErrors, IntFormErrors, MoneyFormErrors, PercentageFormErrors}
-import models.{Crn, DateRange, Enumerable, Money, Percentage, Utr}
+import models.{Crn, DateRange, Enumerable, Money, Percentage, Security, Utr}
 import play.api.data.{FieldMapping, Mapping}
 import play.api.data.Forms.of
 import play.api.data.validation.{Constraint, Invalid, Valid}
@@ -162,6 +162,12 @@ trait Mappings extends Formatters with Constraints {
       .verifying(verify[String](invalidKey, s => Crn.isValid(s.toUpperCase), args: _*))
       .verifying(verify[String](minMaxLengthErrorKey, s => Crn.isLengthInRange(s.toUpperCase), args: _*))
       .transform[Crn](s => Crn(s.toUpperCase), _.crn.toUpperCase)
+
+  def security(requiredKey: String, invalidKey: String, maxLengthErrorKey: String, args: Any*): Mapping[Security] =
+    text(requiredKey, args.toList)
+      .verifying(verify[String](invalidKey, s => Security.isValid(s.toUpperCase), args: _*))
+      .verifying(verify[String](maxLengthErrorKey, s => Security.maxLengthCheck(s.toUpperCase), args: _*))
+      .transform[Security](s => Security(s.toUpperCase), _.security.toUpperCase)
 
   def ninoNoDuplicates(
     requiredKey: String,

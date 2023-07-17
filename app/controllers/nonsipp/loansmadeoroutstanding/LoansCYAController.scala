@@ -81,6 +81,9 @@ class LoansCYAController @Inject()(
           returnEndDate <- schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney.map(_.to)
           repaymentInstalments <- request.userAnswers.get(AreRepaymentsInstalmentsPage(srn, index)).getOrRecoverJourney
           loanInterest <- request.userAnswers.get(InterestOnLoanPage(srn, index)).getOrRecoverJourney
+          security <- request.userAnswers
+            .get(SecurityGivenForLoanPage(srn, index))
+            .getOrRecoverJourney
         } yield Ok(
           view(
             viewModel(
@@ -96,6 +99,7 @@ class LoansCYAController @Inject()(
               returnEndDate,
               repaymentInstalments,
               loanInterest,
+              security,
               mode
             )
           )
@@ -122,6 +126,7 @@ object LoansCYAController {
     returnEndDate: LocalDate,
     repaymentInstalments: Boolean,
     loanInterest: (Money, Percentage, Money),
+    securityGiven: ConditionalYesNo[Security],
     mode: Mode
   ): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](
@@ -142,6 +147,7 @@ object LoansCYAController {
           returnEndDate,
           repaymentInstalments,
           loanInterest,
+          securityGiven,
           mode
         )
       ),
@@ -163,6 +169,7 @@ object LoansCYAController {
     returnEndDate: LocalDate,
     repaymentInstalments: Boolean,
     loanInterest: (Money, Percentage, Money),
+    securityGiven: ConditionalYesNo[Security],
     mode: Mode
   ): List[CheckYourAnswersSection] = {
     val (loanDate, assetsValue, loanPeriod) = datePeriodLoan
@@ -180,7 +187,8 @@ object LoansCYAController {
       mode
     ) ++ loanPeriodSection(srn, index, recipientName, loanDate, assetsValue, loanPeriod, mode) ++
       loanAmountSection(srn, index, totalLoan, repayments, outstanding, returnEndDate, repaymentInstalments, mode) ++
-      loanInterestSection(srn, index, interestPayable, interestRate, interestPayments, mode)
+      loanInterestSection(srn, index, interestPayable, interestRate, interestPayments, mode) ++
+      loanSecuritySection(srn, index, securityGiven, mode)
   }
 
   private def recipientSection(
@@ -468,4 +476,30 @@ object LoansCYAController {
         )
       )
     )
+
+  private def loanSecuritySection(
+    srn: Srn,
+    index: Max9999999,
+    securityGivenForLoan: ConditionalYesNo[Security],
+    mode: Mode
+  ): List[CheckYourAnswersSection] = {
+    val securityGivenForLoanValue = if (true) "site.yes" else "site.no"
+    println(securityGivenForLoan.toString)
+    List(
+      CheckYourAnswersSection(
+        Some(Heading2.medium("loanCheckYourAnswers.section5.heading")),
+        List(
+          CheckYourAnswersRowViewModel(
+            "loanCheckYourAnswers.section5.securityGiven.security",
+            securityGivenForLoanValue
+          ).withAction(
+            SummaryAction(
+              "site.change",
+              routes.SecurityGivenForLoanController.onPageLoad(srn, index, mode).url
+            ).withVisuallyHiddenContent("loanCheckYourAnswers.section5.securityGiven.security.hidden")
+          )
+        )
+      )
+    )
+  }
 }

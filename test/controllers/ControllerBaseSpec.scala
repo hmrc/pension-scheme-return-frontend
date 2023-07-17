@@ -110,6 +110,7 @@ trait TestValues { _: OptionValues =>
   val partnershipName = "testPartnershipName"
   val otherName = "testOtherName"
   val crn: Crn = crnGen.sample.get
+  val security: Security = securityGen.sample.get
   val recipientName = "testRecipientName"
 
   val individualDetails: IndividualDetails = IndividualDetails("testFirstName", Some("testMiddleName"), "testLastName")
