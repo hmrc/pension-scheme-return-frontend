@@ -14,21 +14,23 @@
  * limitations under the License.
  */
 
-package pages
+package pages.nonsipp.loansmadeoroutstanding
 
-import models.ConditionalYesNo
+import config.Refined.OneTo9999999
+import eu.timepit.refined.refineMV
 import pages.behaviours.PageBehaviours
-import pages.nonsipp.loansmadeoroutstanding.IndividualRecipientNinoPage
-import uk.gov.hmrc.domain.Nino
 
-class CompanyRecipientCrnPageSpec extends PageBehaviours {
+class AreRepaymentsInstalmentsPageSpec extends PageBehaviours {
 
-  "CompanyRecipientCrnPage" - {
+  "AreRepaymentsInstalmentsPage" - {
 
-    beRetrievable[ConditionalYesNo[Nino]](IndividualRecipientNinoPage(srnGen.sample.value)) //TODO
+    val srn = srnGen.sample.value
+    val index = refineMV[OneTo9999999](1)
 
-    beSettable[ConditionalYesNo[Nino]](IndividualRecipientNinoPage(srnGen.sample.value))
+    beRetrievable[Boolean](AreRepaymentsInstalmentsPage(srn, index))
 
-    beRemovable[ConditionalYesNo[Nino]](IndividualRecipientNinoPage(srnGen.sample.value))
+    beSettable[Boolean](AreRepaymentsInstalmentsPage(srn, index))
+
+    beRemovable[Boolean](AreRepaymentsInstalmentsPage(srn, index))
   }
 }

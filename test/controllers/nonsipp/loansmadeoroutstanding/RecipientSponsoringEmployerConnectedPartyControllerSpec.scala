@@ -16,65 +16,64 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
-import controllers.nonsipp.loansmadeoroutstanding.RecipientSponsoringEmployerConnectedPartyController._
+import config.Refined.OneTo9999999
 import controllers.ControllerBaseSpec
+import controllers.nonsipp.loansmadeoroutstanding.RecipientSponsoringEmployerConnectedPartyController._
+import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
 import models.{NormalMode, ReceivedLoanType, RecipientDetails, SponsoringOrConnectedParty, UserAnswers}
-import pages.nonsipp.loansmadeoroutstanding.{
-  CompanyRecipientNamePage,
-  IndividualRecipientNamePage,
-  OtherRecipientDetailsPage,
-  PartnershipRecipientNamePage,
-  RecipientSponsoringEmployerConnectedPartyPage,
-  WhoReceivedLoanPage
-}
+import pages.nonsipp.loansmadeoroutstanding._
 import views.html.RadioListView
 
 class RecipientSponsoringEmployerConnectedPartyControllerSpec extends ControllerBaseSpec {
 
-  lazy val onPageLoad = routes.RecipientSponsoringEmployerConnectedPartyController.onPageLoad(srn, NormalMode)
-  lazy val onSubmit = routes.RecipientSponsoringEmployerConnectedPartyController.onSubmit(srn, NormalMode)
+  private val index = refineMV[OneTo9999999](1)
+
+  lazy val onPageLoad = routes.RecipientSponsoringEmployerConnectedPartyController.onPageLoad(srn, index, NormalMode)
+  lazy val onSubmit = routes.RecipientSponsoringEmployerConnectedPartyController.onSubmit(srn, index, NormalMode)
 
   val userAnswersWithCompanyName: UserAnswers =
     defaultUserAnswers
-      .unsafeSet(WhoReceivedLoanPage(srn), ReceivedLoanType.UKCompany)
-      .unsafeSet(CompanyRecipientNamePage(srn), companyName)
+      .unsafeSet(WhoReceivedLoanPage(srn, index), ReceivedLoanType.UKCompany)
+      .unsafeSet(CompanyRecipientNamePage(srn, index), companyName)
 
   val userAnswersWithPartnershipName: UserAnswers =
     defaultUserAnswers
-      .unsafeSet(WhoReceivedLoanPage(srn), ReceivedLoanType.UKPartnership)
-      .unsafeSet(PartnershipRecipientNamePage(srn), partnershipName)
+      .unsafeSet(WhoReceivedLoanPage(srn, index), ReceivedLoanType.UKPartnership)
+      .unsafeSet(PartnershipRecipientNamePage(srn, index), partnershipName)
 
   val userAnswersWithOtherName: UserAnswers =
     defaultUserAnswers
-      .unsafeSet(WhoReceivedLoanPage(srn), ReceivedLoanType.Other)
-      .unsafeSet(OtherRecipientDetailsPage(srn), RecipientDetails(otherName, "test description"))
+      .unsafeSet(WhoReceivedLoanPage(srn, index), ReceivedLoanType.Other)
+      .unsafeSet(OtherRecipientDetailsPage(srn, index), RecipientDetails(otherName, "test description"))
 
   "RecipientSponsoringEmployerConnectedParty Controller" - {
 
     act.like(renderView(onPageLoad, userAnswersWithCompanyName) { implicit app => implicit request =>
-      injected[RadioListView].apply(form(injected[RadioListFormProvider]), viewModel(srn, companyName, NormalMode))
+      injected[RadioListView]
+        .apply(form(injected[RadioListFormProvider]), viewModel(srn, index, companyName, NormalMode))
     }.updateName(_ + " company name"))
 
     act.like(renderView(onPageLoad, userAnswersWithPartnershipName) { implicit app => implicit request =>
-      injected[RadioListView].apply(form(injected[RadioListFormProvider]), viewModel(srn, partnershipName, NormalMode))
+      injected[RadioListView]
+        .apply(form(injected[RadioListFormProvider]), viewModel(srn, index, partnershipName, NormalMode))
     }.updateName(_ + " partnership name"))
 
     act.like(renderView(onPageLoad, userAnswersWithOtherName) { implicit app => implicit request =>
-      injected[RadioListView].apply(form(injected[RadioListFormProvider]), viewModel(srn, otherName, NormalMode))
+      injected[RadioListView].apply(form(injected[RadioListFormProvider]), viewModel(srn, index, otherName, NormalMode))
     }.updateName(_ + " other name"))
 
     act.like(
       renderPrePopView(
         onPageLoad,
-        RecipientSponsoringEmployerConnectedPartyPage(srn),
+        RecipientSponsoringEmployerConnectedPartyPage(srn, index),
         SponsoringOrConnectedParty.Sponsoring,
         userAnswersWithCompanyName
       ) { implicit app => implicit request =>
         injected[RadioListView]
           .apply(
             form(injected[RadioListFormProvider]).fill(SponsoringOrConnectedParty.Sponsoring),
-            viewModel(srn, companyName, NormalMode)
+            viewModel(srn, index, companyName, NormalMode)
           )
       }.updateName(_ + " company name")
     )
@@ -82,14 +81,14 @@ class RecipientSponsoringEmployerConnectedPartyControllerSpec extends Controller
     act.like(
       renderPrePopView(
         onPageLoad,
-        RecipientSponsoringEmployerConnectedPartyPage(srn),
+        RecipientSponsoringEmployerConnectedPartyPage(srn, index),
         SponsoringOrConnectedParty.Sponsoring,
         userAnswersWithPartnershipName
       ) { implicit app => implicit request =>
         injected[RadioListView]
           .apply(
             form(injected[RadioListFormProvider]).fill(SponsoringOrConnectedParty.Sponsoring),
-            viewModel(srn, partnershipName, NormalMode)
+            viewModel(srn, index, partnershipName, NormalMode)
           )
       }.updateName(_ + " partnership name")
     )
@@ -97,14 +96,14 @@ class RecipientSponsoringEmployerConnectedPartyControllerSpec extends Controller
     act.like(
       renderPrePopView(
         onPageLoad,
-        RecipientSponsoringEmployerConnectedPartyPage(srn),
+        RecipientSponsoringEmployerConnectedPartyPage(srn, index),
         SponsoringOrConnectedParty.Sponsoring,
         userAnswersWithOtherName
       ) { implicit app => implicit request =>
         injected[RadioListView]
           .apply(
             form(injected[RadioListFormProvider]).fill(SponsoringOrConnectedParty.Sponsoring),
-            viewModel(srn, otherName, NormalMode)
+            viewModel(srn, index, otherName, NormalMode)
           )
       }.updateName(_ + " other name")
     )

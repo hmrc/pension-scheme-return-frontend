@@ -16,8 +16,10 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
-import controllers.nonsipp.loansmadeoroutstanding.PartnershipRecipientNameController._
+import config.Refined.OneTo9999999
 import controllers.ControllerBaseSpec
+import controllers.nonsipp.loansmadeoroutstanding.PartnershipRecipientNameController._
+import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import models.NormalMode
 import pages.nonsipp.loansmadeoroutstanding.PartnershipRecipientNamePage
@@ -25,20 +27,22 @@ import views.html.TextInputView
 
 class PartnershipRecipientNameControllerSpec extends ControllerBaseSpec {
 
+  private val index = refineMV[OneTo9999999](1)
+
   "PartnershipRecipientNameController" - {
 
-    val populatedUserAnswers = defaultUserAnswers.set(PartnershipRecipientNamePage(srn), partnershipName).get
-    lazy val onPageLoad = routes.PartnershipRecipientNameController.onPageLoad(srn, NormalMode)
-    lazy val onSubmit = routes.PartnershipRecipientNameController.onSubmit(srn, NormalMode)
+    val populatedUserAnswers = defaultUserAnswers.set(PartnershipRecipientNamePage(srn, index), partnershipName).get
+    lazy val onPageLoad = routes.PartnershipRecipientNameController.onPageLoad(srn, index, NormalMode)
+    lazy val onSubmit = routes.PartnershipRecipientNameController.onSubmit(srn, index, NormalMode)
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
-      injected[TextInputView].apply(form(injected[TextFormProvider]), viewModel(srn, NormalMode))
+      injected[TextInputView].apply(form(injected[TextFormProvider]), viewModel(srn, index, NormalMode))
     })
 
-    act.like(renderPrePopView(onPageLoad, PartnershipRecipientNamePage(srn), partnershipName) {
+    act.like(renderPrePopView(onPageLoad, PartnershipRecipientNamePage(srn, index), partnershipName) {
       implicit app => implicit request =>
         val preparedForm = form(injected[TextFormProvider]).fill(partnershipName)
-        injected[TextInputView].apply(preparedForm, viewModel(srn, NormalMode))
+        injected[TextInputView].apply(preparedForm, viewModel(srn, index, NormalMode))
     })
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))

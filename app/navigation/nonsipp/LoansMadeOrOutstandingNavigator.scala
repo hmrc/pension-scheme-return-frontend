@@ -16,14 +16,14 @@
 
 package navigation.nonsipp
 
-import controllers.routes
+import eu.timepit.refined.refineMV
 import models.{NormalMode, ReceivedLoanType, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.loansmadeoroutstanding._
 import play.api.mvc.Call
 
-object LoanMadeOrOutstandingNavigator extends JourneyNavigator {
+object LoansMadeOrOutstandingNavigator extends JourneyNavigator {
 
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
     case page @ LoansMadeOrOutstandingPage(srn) =>
@@ -35,57 +35,67 @@ object LoanMadeOrOutstandingNavigator extends JourneyNavigator {
       }
 
     case WhatYouWillNeedLoansPage(srn) =>
-      controllers.nonsipp.whoreceivedloan.routes.WhoReceivedLoanController.onPageLoad(srn)
-    case WhoReceivedLoanPage(srn) =>
-      userAnswers.get(WhoReceivedLoanPage(srn)) match {
+      controllers.nonsipp.loansmadeoroutstanding.routes.WhoReceivedLoanController
+        .onPageLoad(srn, refineMV(1), NormalMode)
+    case WhoReceivedLoanPage(srn, index) =>
+      userAnswers.get(WhoReceivedLoanPage(srn, index)) match {
         case Some(ReceivedLoanType.Other) =>
-          controllers.nonsipp.otherrecipientdetails.routes.OtherRecipientDetailsController.onPageLoad(srn, NormalMode)
+          controllers.nonsipp.loansmadeoroutstanding.routes.OtherRecipientDetailsController
+            .onPageLoad(srn, index, NormalMode)
         case Some(ReceivedLoanType.Individual) =>
           controllers.nonsipp.loansmadeoroutstanding.routes.IndividualRecipientNameController
-            .onPageLoad(srn, NormalMode)
+            .onPageLoad(srn, index, NormalMode)
         case Some(ReceivedLoanType.UKCompany) =>
           controllers.nonsipp.loansmadeoroutstanding.routes.CompanyRecipientNameController
-            .onPageLoad(srn, NormalMode)
+            .onPageLoad(srn, index, NormalMode)
         case Some(ReceivedLoanType.UKPartnership) =>
           controllers.nonsipp.loansmadeoroutstanding.routes.PartnershipRecipientNameController
-            .onPageLoad(srn, NormalMode)
+            .onPageLoad(srn, index, NormalMode)
       }
 
-    case IndividualRecipientNamePage(srn) =>
-      controllers.nonsipp.loansmadeoroutstanding.routes.IndividualRecipientNinoController.onPageLoad(srn, NormalMode)
+    case IndividualRecipientNamePage(srn, index) =>
+      controllers.nonsipp.loansmadeoroutstanding.routes.IndividualRecipientNinoController
+        .onPageLoad(srn, index, NormalMode)
 
-    case IndividualRecipientNinoPage(srn) =>
-      controllers.nonsipp.routes.IsMemberOrConnectedPartyController.onPageLoad(srn, NormalMode)
+    case IndividualRecipientNinoPage(srn, index) =>
+      controllers.nonsipp.loansmadeoroutstanding.routes.IsMemberOrConnectedPartyController
+        .onPageLoad(srn, index, NormalMode)
 
-    case CompanyRecipientNamePage(srn) =>
-      controllers.nonsipp.loansmadeoroutstanding.routes.CompanyRecipientCrnController.onPageLoad(srn, NormalMode)
+    case CompanyRecipientNamePage(srn, index) =>
+      controllers.nonsipp.loansmadeoroutstanding.routes.CompanyRecipientCrnController.onPageLoad(srn, index, NormalMode)
 
-    case CompanyRecipientCrnPage(srn) =>
+    case CompanyRecipientCrnPage(srn, index) =>
       controllers.nonsipp.loansmadeoroutstanding.routes.RecipientSponsoringEmployerConnectedPartyController
-        .onPageLoad(srn, NormalMode)
+        .onPageLoad(srn, index, NormalMode)
 
-    case PartnershipRecipientNamePage(srn) =>
-      controllers.nonsipp.loansmadeoroutstanding.routes.PartnershipRecipientUtrController.onPageLoad(srn, NormalMode)
+    case PartnershipRecipientNamePage(srn, index) =>
+      controllers.nonsipp.loansmadeoroutstanding.routes.PartnershipRecipientUtrController
+        .onPageLoad(srn, index, NormalMode)
 
-    case PartnershipRecipientUtrPage(srn) =>
+    case PartnershipRecipientUtrPage(srn, index) =>
       controllers.nonsipp.loansmadeoroutstanding.routes.RecipientSponsoringEmployerConnectedPartyController
-        .onPageLoad(srn, NormalMode)
+        .onPageLoad(srn, index, NormalMode)
 
-    case RecipientSponsoringEmployerConnectedPartyPage(srn) =>
+    case IsMemberOrConnectedPartyPage(srn, index) =>
       controllers.nonsipp.loansmadeoroutstanding.routes.DatePeriodLoanController
-        .onPageLoad(srn, NormalMode)
+        .onPageLoad(srn, index, NormalMode)
 
-    case DatePeriodLoanPage(srn) =>
+    case RecipientSponsoringEmployerConnectedPartyPage(srn, index) =>
+      controllers.nonsipp.loansmadeoroutstanding.routes.DatePeriodLoanController
+        .onPageLoad(srn, index, NormalMode)
+
+    case DatePeriodLoanPage(srn, index) =>
       controllers.nonsipp.loansmadeoroutstanding.routes.AmountOfTheLoanController
-        .onPageLoad(srn, NormalMode)
+        .onPageLoad(srn, index, NormalMode)
 
-    case AmountOfTheLoanPage(srn) =>
-      controllers.nonsipp.loansmadeoroutstanding.routes.AreRepaymentsInstalmentsController.onPageLoad(srn, NormalMode)
+    case AmountOfTheLoanPage(srn, index) =>
+      controllers.nonsipp.loansmadeoroutstanding.routes.AreRepaymentsInstalmentsController
+        .onPageLoad(srn, index, NormalMode)
 
-    case AreRepaymentsInstalmentsPage(srn) =>
-      controllers.nonsipp.loansmadeoroutstanding.routes.InterestOnLoanController.onPageLoad(srn, NormalMode)
+    case AreRepaymentsInstalmentsPage(srn, index) =>
+      controllers.nonsipp.loansmadeoroutstanding.routes.InterestOnLoanController.onPageLoad(srn, index, NormalMode)
 
-    case InterestOnLoanPage(srn) =>
+    case InterestOnLoanPage(srn, index) =>
       controllers.routes.UnauthorisedController.onPageLoad()
 
   }

@@ -82,7 +82,7 @@ class NonSippNavigator @Inject()() extends Navigator {
       OtherAssetsNavigator,
       UnregulatedOrConnectedBondsNavigator,
       LandOrPropertyNavigator,
-      LoanMadeOrOutstandingNavigator,
+      LoansMadeOrOutstandingNavigator,
       PensionCommencementLumpSumNavigator,
       SharesInSponsoringEmployerNavigator,
       PensionCommencementLumpSumNavigator,

@@ -16,8 +16,10 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
-import controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNinoController._
+import config.Refined.OneTo9999999
 import controllers.ControllerBaseSpec
+import controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNinoController._
+import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.{ConditionalYesNo, NormalMode}
 import pages.nonsipp.loansmadeoroutstanding.{IndividualRecipientNamePage, IndividualRecipientNinoPage}
@@ -26,12 +28,16 @@ import views.html.ConditionalYesNoPageView
 
 class IndividualRecipientNinoControllerSpec extends ControllerBaseSpec {
 
-  private lazy val onPageLoad =
-    controllers.nonsipp.loansmadeoroutstanding.routes.IndividualRecipientNinoController.onPageLoad(srn, NormalMode)
-  private lazy val onSubmit =
-    controllers.nonsipp.loansmadeoroutstanding.routes.IndividualRecipientNinoController.onSubmit(srn, NormalMode)
+  private val index = refineMV[OneTo9999999](1)
 
-  val userAnswersWithIndividualName = defaultUserAnswers.unsafeSet(IndividualRecipientNamePage(srn), individualName)
+  private lazy val onPageLoad =
+    controllers.nonsipp.loansmadeoroutstanding.routes.IndividualRecipientNinoController
+      .onPageLoad(srn, index, NormalMode)
+  private lazy val onSubmit =
+    controllers.nonsipp.loansmadeoroutstanding.routes.IndividualRecipientNinoController.onSubmit(srn, index, NormalMode)
+
+  val userAnswersWithIndividualName =
+    defaultUserAnswers.unsafeSet(IndividualRecipientNamePage(srn, index), individualName)
 
   val conditionalNo: ConditionalYesNo[Nino] = ConditionalYesNo[Nino](Left("reason"))
   val conditionalYes: ConditionalYesNo[Nino] = ConditionalYesNo[Nino](Right(nino))
@@ -40,20 +46,20 @@ class IndividualRecipientNinoControllerSpec extends ControllerBaseSpec {
 
     act.like(renderView(onPageLoad, userAnswersWithIndividualName) { implicit app => implicit request =>
       injected[ConditionalYesNoPageView]
-        .apply(form(injected[YesNoPageFormProvider]), viewModel(srn, individualName, NormalMode))
+        .apply(form(injected[YesNoPageFormProvider]), viewModel(srn, index, individualName, NormalMode))
     })
 
     act.like(
       renderPrePopView(
         onPageLoad,
-        IndividualRecipientNinoPage(srn),
+        IndividualRecipientNinoPage(srn, index),
         conditionalNo,
         userAnswersWithIndividualName
       ) { implicit app => implicit request =>
         injected[ConditionalYesNoPageView]
           .apply(
             form(injected[YesNoPageFormProvider]).fill(conditionalNo.value),
-            viewModel(srn, individualName, NormalMode)
+            viewModel(srn, index, individualName, NormalMode)
           )
       }
     )

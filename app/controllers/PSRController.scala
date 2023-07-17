@@ -21,11 +21,20 @@ import cats.data.NonEmptyList
 import cats.syntax.applicative._
 import config.Refined.Max3
 import models.DateRange
+import models.requests.DataRequest
 import play.api.i18n.I18nSupport
+import play.api.libs.json.Reads
 import play.api.mvc.Result
+import queries.Gettable
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 abstract class PSRController extends FrontendBaseController with I18nSupport {
+
+  def requiredPage[A: Reads](page: Gettable[A])(implicit request: DataRequest[_]): Either[Result, A] =
+    request.userAnswers.get(page) match {
+      case Some(value) => Right(value)
+      case None => Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+    }
 
   implicit class OptionOps[A](maybe: Option[A]) {
     def getOrRecoverJourney[F[_]: Applicative](f: A => F[Result]): F[Result] = maybe match {
@@ -36,6 +45,11 @@ abstract class PSRController extends FrontendBaseController with I18nSupport {
     def getOrRecoverJourney(f: A => Result): Result = maybe match {
       case Some(value) => f(value)
       case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+    }
+
+    def getOrRecoverJourney: Either[Result, A] = maybe match {
+      case Some(value) => Right(value)
+      case None => Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
     }
   }
 

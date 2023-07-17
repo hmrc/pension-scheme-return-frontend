@@ -16,12 +16,13 @@
 
 package pages.nonsipp.loansmadeoroutstanding
 
+import config.Refined.Max9999999
 import models.{Money, Percentage}
 import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case class InterestOnLoanPage(srn: Srn) extends QuestionPage[(Money, Percentage, Money)] {
+case class InterestOnLoanPage(srn: Srn, index: Max9999999) extends QuestionPage[(Money, Percentage, Money)] {
 
   override def path: JsPath = JsPath \ "loans" \ "loanTransactions" \ toString
 

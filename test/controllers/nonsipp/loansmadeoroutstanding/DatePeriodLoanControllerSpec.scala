@@ -16,8 +16,10 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
+import config.Refined.OneTo9999999
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.loansmadeoroutstanding.DatePeriodLoanController._
+import eu.timepit.refined.refineMV
 import models.NormalMode
 import pages.nonsipp.loansmadeoroutstanding.{CompanyRecipientNamePage, DatePeriodLoanPage}
 import play.api.inject.bind
@@ -28,6 +30,8 @@ import views.html.MultipleQuestionView
 import java.time.LocalDate
 
 class DatePeriodLoanControllerSpec extends ControllerBaseSpec {
+
+  private val index = refineMV[OneTo9999999](1)
 
   private implicit val mockSchemeDateService = mock[SchemeDateService]
 
@@ -40,22 +44,22 @@ class DatePeriodLoanControllerSpec extends ControllerBaseSpec {
 
   "DatePeriodLoanController" - {
 
-    val populatedUserAnswers = defaultUserAnswers.set(CompanyRecipientNamePage(srn), companyName).get
-    lazy val onPageLoad = routes.DatePeriodLoanController.onPageLoad(srn, NormalMode)
-    lazy val onSubmit = routes.DatePeriodLoanController.onSubmit(srn, NormalMode)
+    val populatedUserAnswers = defaultUserAnswers.set(CompanyRecipientNamePage(srn, index), companyName).get
+    lazy val onPageLoad = routes.DatePeriodLoanController.onPageLoad(srn, index, NormalMode)
+    lazy val onSubmit = routes.DatePeriodLoanController.onSubmit(srn, index, NormalMode)
 
     val date = LocalDate.of(2020, 12, 10)
 
     val taxYear = Some(Left(dateRange))
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
-      injected[MultipleQuestionView].apply(viewModel(srn, schemeName, NormalMode, form(date)))
+      injected[MultipleQuestionView].apply(viewModel(srn, index, schemeName, NormalMode, form(date)))
     }.before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear)))
 
-    act.like(renderPrePopView(onPageLoad, DatePeriodLoanPage(srn), (date, money, 12)) {
+    act.like(renderPrePopView(onPageLoad, DatePeriodLoanPage(srn, index), (date, money, 12)) {
       implicit app => implicit request =>
         val preparedForm = form(date).fill((date, money, 12))
-        injected[MultipleQuestionView].apply(viewModel(srn, schemeName, NormalMode, preparedForm))
+        injected[MultipleQuestionView].apply(viewModel(srn, index, schemeName, NormalMode, preparedForm))
     }.before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear)))
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))

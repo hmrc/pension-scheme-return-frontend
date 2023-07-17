@@ -16,7 +16,9 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
+import config.Refined.Max9999999
 import controllers.actions._
+import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
 import models.SchemeId.Srn
 import models.requests.DataRequest
@@ -58,50 +60,54 @@ class RecipientSponsoringEmployerConnectedPartyController @Inject()(
 
   val form = RecipientSponsoringEmployerConnectedPartyController.form(formProvider)
 
-  def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      recipientName(srn)
+      recipientName(srn, index)
         .map { recipientName =>
           Ok(
             view(
-              form.fromUserAnswers(RecipientSponsoringEmployerConnectedPartyPage(srn)),
-              RecipientSponsoringEmployerConnectedPartyController.viewModel(srn, recipientName, mode)
+              form.fromUserAnswers(RecipientSponsoringEmployerConnectedPartyPage(srn, index)),
+              RecipientSponsoringEmployerConnectedPartyController.viewModel(srn, index, recipientName, mode)
             )
           )
         }
         .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
     }
 
-  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
-    form
-      .bindFromRequest()
-      .fold(
-        errors =>
-          recipientName(srn)
-            .map { recipientName =>
-              Future.successful(
-                BadRequest(
-                  view(errors, RecipientSponsoringEmployerConnectedPartyController.viewModel(srn, recipientName, mode))
+  def onSubmit(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+    implicit request =>
+      form
+        .bindFromRequest()
+        .fold(
+          errors =>
+            recipientName(srn, index)
+              .map { recipientName =>
+                Future.successful(
+                  BadRequest(
+                    view(
+                      errors,
+                      RecipientSponsoringEmployerConnectedPartyController.viewModel(srn, index, recipientName, mode)
+                    )
+                  )
                 )
-              )
+              }
+              .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))),
+          success =>
+            for {
+              userAnswers <- Future
+                .fromTry(request.userAnswers.set(RecipientSponsoringEmployerConnectedPartyPage(srn, index), success))
+              _ <- saveService.save(userAnswers)
+            } yield {
+              Redirect(navigator.nextPage(RecipientSponsoringEmployerConnectedPartyPage(srn, index), mode, userAnswers))
             }
-            .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))),
-        success =>
-          for {
-            userAnswers <- Future
-              .fromTry(request.userAnswers.set(RecipientSponsoringEmployerConnectedPartyPage(srn), success))
-            _ <- saveService.save(userAnswers)
-          } yield {
-            Redirect(navigator.nextPage(RecipientSponsoringEmployerConnectedPartyPage(srn), mode, userAnswers))
-          }
-      )
+        )
   }
 
-  private def recipientName(srn: Srn)(implicit request: DataRequest[_]): Option[String] =
-    request.userAnswers.get(WhoReceivedLoanPage(srn)).flatMap {
-      case ReceivedLoanType.UKCompany => request.userAnswers.get(CompanyRecipientNamePage(srn))
-      case ReceivedLoanType.UKPartnership => request.userAnswers.get(PartnershipRecipientNamePage(srn))
-      case ReceivedLoanType.Other => request.userAnswers.get(OtherRecipientDetailsPage(srn)).map(_.name)
+  private def recipientName(srn: Srn, index: Max9999999)(implicit request: DataRequest[_]): Option[String] =
+    request.userAnswers.get(WhoReceivedLoanPage(srn, refineMV(1))).flatMap {
+      case ReceivedLoanType.UKCompany => request.userAnswers.get(CompanyRecipientNamePage(srn, index))
+      case ReceivedLoanType.UKPartnership => request.userAnswers.get(PartnershipRecipientNamePage(srn, index))
+      case ReceivedLoanType.Other => request.userAnswers.get(OtherRecipientDetailsPage(srn, index)).map(_.name)
       case _ => None
     }
 }
@@ -111,7 +117,7 @@ object RecipientSponsoringEmployerConnectedPartyController {
   def form(formProvider: RadioListFormProvider): Form[SponsoringOrConnectedParty] =
     formProvider("recipientSponsoringEmployerConnectedParty.error.required")
 
-  def viewModel(srn: Srn, recipientName: String, mode: Mode): FormPageViewModel[RadioListViewModel] =
+  def viewModel(srn: Srn, index: Max9999999, recipientName: String, mode: Mode): FormPageViewModel[RadioListViewModel] =
     RadioListViewModel(
       "recipientSponsoringEmployerConnectedParty.title",
       Message("recipientSponsoringEmployerConnectedParty.heading", recipientName),
@@ -130,6 +136,6 @@ object RecipientSponsoringEmployerConnectedPartyController {
           SponsoringOrConnectedParty.Neither.name
         )
       ),
-      routes.RecipientSponsoringEmployerConnectedPartyController.onSubmit(srn, mode)
+      routes.RecipientSponsoringEmployerConnectedPartyController.onSubmit(srn, index, mode)
     )
 }

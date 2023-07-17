@@ -16,51 +16,44 @@
 
 package pages.nonsipp.loansmadeoroutstanding
 
+import config.Refined.Max9999999
 import models.SchemeId.Srn
 import models.{ReceivedLoanType, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import queries.Removable
 import utils.PageUtils._
+import utils.RefinedUtils.RefinedIntOps
 
 import scala.util.Try
 
-case class WhoReceivedLoanPage(srn: Srn) extends QuestionPage[ReceivedLoanType] {
+case class WhoReceivedLoanPage(srn: Srn, index: Max9999999) extends QuestionPage[ReceivedLoanType] {
 
-  override def path: JsPath = JsPath \ toString
+  override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString
 
   override def toString: String = "whoReceivedLoan"
 
-  private def individualPages(srn: Srn): List[Removable[_]] = List(
-    IndividualRecipientNamePage(srn),
-    IndividualRecipientNinoPage(srn),
-    IsMemberOrConnectedPartyPage(srn)
+  private def pages(srn: Srn): List[Removable[_]] = List(
+    IndividualRecipientNamePage(srn, index),
+    IndividualRecipientNinoPage(srn, index),
+    IsMemberOrConnectedPartyPage(srn, index),
+    CompanyRecipientNamePage(srn, index),
+    CompanyRecipientCrnPage(srn, index),
+    RecipientSponsoringEmployerConnectedPartyPage(srn, index),
+    PartnershipRecipientNamePage(srn, index),
+    OtherRecipientDetailsPage(srn, index),
+    DatePeriodLoanPage(srn, index),
+    AmountOfTheLoanPage(srn, index),
+    AreRepaymentsInstalmentsPage(srn, index)
   )
 
-  private def companyPages(srn: Srn): List[Removable[_]] = List(
-    CompanyRecipientNamePage(srn),
-    CompanyRecipientCrnPage(srn),
-    RecipientSponsoringEmployerConnectedPartyPage(srn)
-  )
-
-  private def partnershipPages(srn: Srn): List[Removable[_]] = List(
-    PartnershipRecipientNamePage(srn),
-    RecipientSponsoringEmployerConnectedPartyPage(srn)
-  )
-
-  private def otherPages(srn: Srn): List[Removable[_]] = List(
-    OtherRecipientDetailsPage(srn)
-  )
-
-  override def cleanup(value: Option[ReceivedLoanType], userAnswers: UserAnswers): Try[UserAnswers] = value match {
-    case Some(ReceivedLoanType.Individual) =>
-      removePages(userAnswers, companyPages(srn) ++ partnershipPages(srn) ++ otherPages(srn))
-    case Some(ReceivedLoanType.UKCompany) =>
-      removePages(userAnswers, individualPages(srn) ++ partnershipPages(srn) ++ otherPages(srn))
-    case Some(ReceivedLoanType.UKPartnership) =>
-      removePages(userAnswers, individualPages(srn) ++ companyPages(srn) ++ otherPages(srn))
-    case Some(ReceivedLoanType.Other) =>
-      removePages(userAnswers, individualPages(srn) ++ companyPages(srn) ++ partnershipPages(srn))
-    case None => Try(userAnswers)
-  }
+  override def cleanup(value: Option[ReceivedLoanType], userAnswers: UserAnswers): Try[UserAnswers] =
+    (value, userAnswers.get(this)) match {
+      case (Some(ReceivedLoanType.Individual), Some(ReceivedLoanType.Individual)) => Try(userAnswers)
+      case (Some(ReceivedLoanType.UKCompany), Some(ReceivedLoanType.UKCompany)) => Try(userAnswers)
+      case (Some(ReceivedLoanType.UKPartnership), Some(ReceivedLoanType.UKPartnership)) => Try(userAnswers)
+      case (Some(ReceivedLoanType.Other), Some(ReceivedLoanType.Other)) => Try(userAnswers)
+      case (None, _) => Try(userAnswers)
+      case _ => removePages(userAnswers, pages(srn))
+    }
 }

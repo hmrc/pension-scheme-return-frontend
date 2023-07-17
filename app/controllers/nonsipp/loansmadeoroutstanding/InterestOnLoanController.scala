@@ -19,6 +19,7 @@ package controllers.nonsipp.loansmadeoroutstanding
 import controllers.nonsipp.loansmadeoroutstanding.InterestOnLoanController._
 import com.google.inject.Inject
 import config.Constants.{maxCurrencyValue, maxPercentage, minPercentage}
+import config.Refined.Max9999999
 import controllers.actions._
 import forms.mappings.Mappings
 import forms.MultipleQuestionFormProvider
@@ -53,38 +54,42 @@ class InterestOnLoanController @Inject()(
     extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    {
-      val form = InterestOnLoanController.form
-      val viewModel = InterestOnLoanController.viewModel(
-        srn,
-        mode,
-        request.schemeDetails.schemeName,
-        request.userAnswers.fillForm(InterestOnLoanPage(srn), form)
-      )
+  def onPageLoad(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+    implicit request =>
+      {
+        val form = InterestOnLoanController.form
+        val viewModel = InterestOnLoanController.viewModel(
+          srn,
+          index,
+          mode,
+          request.schemeDetails.schemeName,
+          request.userAnswers.fillForm(InterestOnLoanPage(srn, index), form)
+        )
 
-      Ok(view(viewModel))
-    }
+        Ok(view(viewModel))
+      }
   }
 
-  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
-    val form = InterestOnLoanController.form
+  def onSubmit(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+    implicit request =>
+      val form = InterestOnLoanController.form
 
-    form
-      .bindFromRequest()
-      .fold(
-        formWithErrors => {
-          val viewModel =
-            InterestOnLoanController.viewModel(srn, mode, request.schemeDetails.schemeName, formWithErrors)
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => {
+            val viewModel =
+              InterestOnLoanController.viewModel(srn, index, mode, request.schemeDetails.schemeName, formWithErrors)
 
-          Future.successful(BadRequest(view(viewModel)))
-        },
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.transformAndSet(InterestOnLoanPage(srn), value))
-            _ <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage(InterestOnLoanPage(srn), mode, updatedAnswers))
-      )
+            Future.successful(BadRequest(view(viewModel)))
+          },
+          value =>
+            for {
+              updatedAnswers <- Future
+                .fromTry(request.userAnswers.transformAndSet(InterestOnLoanPage(srn, index), value))
+              _ <- saveService.save(updatedAnswers)
+            } yield Redirect(navigator.nextPage(InterestOnLoanPage(srn, index), mode, updatedAnswers))
+        )
   }
 }
 
@@ -121,6 +126,7 @@ object InterestOnLoanController {
 
   def viewModel(
     srn: Srn,
+    index: Max9999999,
     mode: Mode,
     schemeName: String,
     form: Form[(Money, Percentage, Money)]
@@ -137,6 +143,6 @@ object InterestOnLoanController {
         ),
         QuestionField.currency(Message("interestOnLoan.intReceivedCY.label"))
       ),
-      routes.InterestOnLoanController.onSubmit(srn, mode)
+      routes.InterestOnLoanController.onSubmit(srn, index, mode)
     )
 }

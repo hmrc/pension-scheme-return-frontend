@@ -21,6 +21,7 @@ import cats.implicits.toShow
 import cats.{Id, Monad}
 import com.google.inject.Inject
 import config.Constants.maxCurrencyValue
+import config.Refined.Max9999999
 import controllers.actions._
 import forms.MoneyFormProvider
 import forms.mappings.errors.MoneyFormErrors
@@ -57,41 +58,46 @@ class AmountOfTheLoanController @Inject()(
     extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    usingSchemeDate[Id](srn) { period =>
-      val form = AmountOfTheLoanController.form(formProvider, request.schemeDetails.schemeName, period)
-      val viewModel = AmountOfTheLoanController.viewModel(
-        srn,
-        mode,
-        request.schemeDetails.schemeName,
-        period,
-        request.userAnswers.fillForm(AmountOfTheLoanPage(srn), form)
-      )
+  def onPageLoad(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+    implicit request =>
+      usingSchemeDate[Id](srn) { period =>
+        val form = AmountOfTheLoanController.form(formProvider, period)
+        val viewModel = AmountOfTheLoanController.viewModel(
+          srn,
+          index,
+          mode,
+          request.schemeDetails.schemeName,
+          period,
+          request.userAnswers.fillForm(AmountOfTheLoanPage(srn, index), form)
+        )
 
-      Ok(view(viewModel))
-    }
+        Ok(view(viewModel))
+      }
   }
 
-  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
-    usingSchemeDate(srn) { period =>
-      val form = AmountOfTheLoanController.form(formProvider, request.schemeDetails.schemeName, period)
+  def onSubmit(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+    implicit request =>
+      usingSchemeDate(srn) { period =>
+        val form = AmountOfTheLoanController.form(formProvider, period)
 
-      form
-        .bindFromRequest()
-        .fold(
-          formWithErrors => {
-            val viewModel =
-              AmountOfTheLoanController.viewModel(srn, mode, request.schemeDetails.schemeName, period, formWithErrors)
+        form
+          .bindFromRequest()
+          .fold(
+            formWithErrors => {
+              val viewModel =
+                AmountOfTheLoanController
+                  .viewModel(srn, index, mode, request.schemeDetails.schemeName, period, formWithErrors)
 
-            Future.successful(BadRequest(view(viewModel)))
-          },
-          value =>
-            for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.transformAndSet(AmountOfTheLoanPage(srn), value))
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(AmountOfTheLoanPage(srn), mode, updatedAnswers))
-        )
-    }
+              Future.successful(BadRequest(view(viewModel)))
+            },
+            value =>
+              for {
+                updatedAnswers <- Future
+                  .fromTry(request.userAnswers.transformAndSet(AmountOfTheLoanPage(srn, index), value))
+                _ <- saveService.save(updatedAnswers)
+              } yield Redirect(navigator.nextPage(AmountOfTheLoanPage(srn, index), mode, updatedAnswers))
+          )
+      }
   }
 
   private def usingSchemeDate[F[_]: Monad](
@@ -105,7 +111,7 @@ class AmountOfTheLoanController @Inject()(
 
 object AmountOfTheLoanController {
 
-  def form(formProvider: MoneyFormProvider, schemeName: String, period: DateRange): Form[(Money, Money, Money)] =
+  def form(formProvider: MoneyFormProvider, period: DateRange): Form[(Money, Money, Money)] =
     formProvider(
       MoneyFormErrors(
         "amountOfTheLoan.loanAmount.error.required",
@@ -127,6 +133,7 @@ object AmountOfTheLoanController {
 
   def viewModel(
     srn: Srn,
+    index: Max9999999,
     mode: Mode,
     schemeName: String,
     period: DateRange,
@@ -141,6 +148,6 @@ object AmountOfTheLoanController {
         QuestionField.input(Message("amountOfTheLoan.capRepaymentCY.label")),
         QuestionField.input(Message("amountOfTheLoan.amountOutstanding.label", period.to.show))
       ),
-      routes.AmountOfTheLoanController.onSubmit(srn, mode)
+      routes.AmountOfTheLoanController.onSubmit(srn, index, mode)
     )
 }

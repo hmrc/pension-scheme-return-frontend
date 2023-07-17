@@ -14,20 +14,14 @@
  * limitations under the License.
  */
 
-package pages
+package utils
 
-import pages.behaviours.PageBehaviours
-import pages.nonsipp.loansmadeoroutstanding.CompanyRecipientNamePage
+object Tuple2Utils {
 
-class CompanyRecipientNamePageSpec extends PageBehaviours {
-
-  "companyRecipientNamePage" - {
-    val srn = srnGen.sample.value
-
-    beRetrievable[String](CompanyRecipientNamePage(srn))
-
-    beSettable[String](CompanyRecipientNamePage(srn))
-
-    beRemovable[String](CompanyRecipientNamePage(srn))
+  implicit class Tuple2OptionOps[A, B](tup: (Option[A], Option[B])) {
+    def toEither: Either[A, B] = tup match {
+      case (Some(a), _) => Left(a)
+      case (_, Some(b)) => Right(b)
+    }
   }
 }

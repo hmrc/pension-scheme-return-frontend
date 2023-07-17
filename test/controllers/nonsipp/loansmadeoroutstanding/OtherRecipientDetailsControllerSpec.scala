@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.otherrecipientdetails
+package controllers.nonsipp.loansmadeoroutstanding
 
+import config.Refined.OneTo9999999
 import controllers.ControllerBaseSpec
+import eu.timepit.refined.refineMV
 import forms.RecipientDetailsFormProvider
 import models.{NormalMode, RecipientDetails}
 import pages.nonsipp.loansmadeoroutstanding.OtherRecipientDetailsPage
@@ -24,8 +26,10 @@ import views.html.RecipientDetailsView
 
 class OtherRecipientDetailsControllerSpec extends ControllerBaseSpec {
 
-  private lazy val onPageLoad = routes.OtherRecipientDetailsController.onPageLoad(srn, NormalMode)
-  private lazy val onSubmit = routes.OtherRecipientDetailsController.onSubmit(srn, NormalMode)
+  private val index = refineMV[OneTo9999999](1)
+
+  private lazy val onPageLoad = routes.OtherRecipientDetailsController.onPageLoad(srn, index, NormalMode)
+  private lazy val onSubmit = routes.OtherRecipientDetailsController.onSubmit(srn, index, NormalMode)
 
   private val validForm = List(
     "name" -> "name",
@@ -42,15 +46,16 @@ class OtherRecipientDetailsControllerSpec extends ControllerBaseSpec {
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       injected[RecipientDetailsView].apply(
         OtherRecipientDetailsController.form(injected[RecipientDetailsFormProvider]),
-        OtherRecipientDetailsController.viewModel(srn, NormalMode)
+        OtherRecipientDetailsController.viewModel(srn, index, NormalMode)
       )
     })
 
-    act.like(renderPrePopView(onPageLoad, OtherRecipientDetailsPage(srn), recipientDetails) {
+    act.like(renderPrePopView(onPageLoad, OtherRecipientDetailsPage(srn, index), recipientDetails) {
       implicit app => implicit request =>
         val preparedForm =
           OtherRecipientDetailsController.form(injected[RecipientDetailsFormProvider]).fill(recipientDetails)
-        injected[RecipientDetailsView].apply(preparedForm, OtherRecipientDetailsController.viewModel(srn, NormalMode))
+        injected[RecipientDetailsView]
+          .apply(preparedForm, OtherRecipientDetailsController.viewModel(srn, index, NormalMode))
     })
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))

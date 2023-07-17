@@ -16,6 +16,7 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
+import config.Refined.Max9999999
 import controllers.actions._
 import forms.TextFormProvider
 import models.Mode
@@ -49,30 +50,33 @@ class PartnershipRecipientNameController @Inject()(
 
   private def form = PartnershipRecipientNameController.form(formProvider)
 
-  def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    Ok(
-      view(
-        form.fromUserAnswers(PartnershipRecipientNamePage(srn)),
-        PartnershipRecipientNameController.viewModel(srn, mode)
+  def onPageLoad(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+    implicit request =>
+      Ok(
+        view(
+          form.fromUserAnswers(PartnershipRecipientNamePage(srn, index)),
+          PartnershipRecipientNameController.viewModel(srn, index, mode)
+        )
       )
-    )
   }
 
-  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
-    form
-      .bindFromRequest()
-      .fold(
-        formWithErrors =>
-          Future.successful(
-            BadRequest(view(formWithErrors, PartnershipRecipientNameController.viewModel(srn, mode)))
-          ),
-        answer => {
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(PartnershipRecipientNamePage(srn), answer))
-            _ <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage(PartnershipRecipientNamePage(srn), mode, updatedAnswers))
-        }
-      )
+  def onSubmit(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+    implicit request =>
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors =>
+            Future.successful(
+              BadRequest(view(formWithErrors, PartnershipRecipientNameController.viewModel(srn, index, mode)))
+            ),
+          answer => {
+            for {
+              updatedAnswers <- Future
+                .fromTry(request.userAnswers.set(PartnershipRecipientNamePage(srn, index), answer))
+              _ <- saveService.save(updatedAnswers)
+            } yield Redirect(navigator.nextPage(PartnershipRecipientNamePage(srn, index), mode, updatedAnswers))
+          }
+        )
   }
 }
 
@@ -83,11 +87,11 @@ object PartnershipRecipientNameController {
     "partnershipRecipientName.error.invalid.characters"
   )
 
-  def viewModel(srn: Srn, mode: Mode): FormPageViewModel[TextInputViewModel] =
+  def viewModel(srn: Srn, index: Max9999999, mode: Mode): FormPageViewModel[TextInputViewModel] =
     FormPageViewModel(
       Message("partnershipRecipientName.title"),
       Message("partnershipRecipientName.heading"),
       TextInputViewModel(true),
-      routes.PartnershipRecipientNameController.onSubmit(srn, mode)
+      routes.PartnershipRecipientNameController.onSubmit(srn, index, mode)
     )
 }

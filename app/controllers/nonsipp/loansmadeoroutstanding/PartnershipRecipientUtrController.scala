@@ -16,6 +16,7 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
+import config.Refined.Max9999999
 import controllers.nonsipp.loansmadeoroutstanding.PartnershipRecipientUtrController._
 import controllers.actions._
 import forms.YesNoPageFormProvider
@@ -28,7 +29,6 @@ import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
-
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
@@ -52,28 +52,30 @@ class PartnershipRecipientUtrController @Inject()(
 
   private val form: Form[Either[String, Utr]] = PartnershipRecipientUtrController.form(formProvider)
 
-  def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    request.usingAnswer(PartnershipRecipientNamePage(srn)).sync { partnershipRecipientName =>
-      val preparedForm = request.userAnswers.fillForm(PartnershipRecipientUtrPage(srn), form)
-      Ok(view(preparedForm, viewModel(srn, partnershipRecipientName, mode)))
-    }
+  def onPageLoad(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+    implicit request =>
+      request.usingAnswer(PartnershipRecipientNamePage(srn, index)).sync { partnershipRecipientName =>
+        val preparedForm = request.userAnswers.fillForm(PartnershipRecipientUtrPage(srn, index), form)
+        Ok(view(preparedForm, viewModel(srn, index, partnershipRecipientName, mode)))
+      }
   }
 
-  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
-    form
-      .bindFromRequest()
-      .fold(
-        formWithErrors =>
-          request.usingAnswer(PartnershipRecipientNamePage(srn)).async { partnershipRecipientName =>
-            Future.successful(BadRequest(view(formWithErrors, viewModel(srn, partnershipRecipientName, mode))))
-          },
-        value =>
-          for {
-            updatedAnswers <- Future
-              .fromTry(request.userAnswers.set(PartnershipRecipientUtrPage(srn), ConditionalYesNo(value)))
-            _ <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage(PartnershipRecipientUtrPage(srn), mode, updatedAnswers))
-      )
+  def onSubmit(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+    implicit request =>
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors =>
+            request.usingAnswer(PartnershipRecipientNamePage(srn, index)).async { partnershipRecipientName =>
+              Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, partnershipRecipientName, mode))))
+            },
+          value =>
+            for {
+              updatedAnswers <- Future
+                .fromTry(request.userAnswers.set(PartnershipRecipientUtrPage(srn, index), ConditionalYesNo(value)))
+              _ <- saveService.save(updatedAnswers)
+            } yield Redirect(navigator.nextPage(PartnershipRecipientUtrPage(srn, index), mode, updatedAnswers))
+        )
   }
 }
 
@@ -91,6 +93,7 @@ object PartnershipRecipientUtrController {
 
   def viewModel(
     srn: Srn,
+    index: Max9999999,
     partnershipRecipientName: String,
     mode: Mode
   ): FormPageViewModel[ConditionalYesNoPageViewModel] =
@@ -101,6 +104,6 @@ object PartnershipRecipientUtrController {
         yes = YesNoViewModel.Conditional(Message("partnershipRecipientUtr.yes.conditional", partnershipRecipientName)),
         no = YesNoViewModel.Conditional(Message("partnershipRecipientUtr.no.conditional", partnershipRecipientName))
       ),
-      routes.PartnershipRecipientUtrController.onSubmit(srn, mode)
+      routes.PartnershipRecipientUtrController.onSubmit(srn, index, mode)
     )
 }

@@ -16,7 +16,9 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
+import config.Refined.OneTo9999999
 import controllers.ControllerBaseSpec
+import eu.timepit.refined.refineMV
 import models.NormalMode
 import pages.nonsipp.loansmadeoroutstanding.InterestOnLoanPage
 import views.html.MultipleQuestionView
@@ -24,22 +26,23 @@ import views.html.MultipleQuestionView
 class InterestOnLoanControllerSpec extends ControllerBaseSpec {
 
   val maxAllowedAmount = 999999999.99
+  private val index = refineMV[OneTo9999999](1)
 
   "InterestOnLoanController" - {
 
     val schemeName = defaultSchemeDetails.schemeName
 
-    lazy val viewModel = InterestOnLoanController.viewModel(srn, NormalMode, schemeName, _)
+    lazy val viewModel = InterestOnLoanController.viewModel(srn, index, NormalMode, schemeName, _)
 
-    lazy val onPageLoad = routes.InterestOnLoanController.onPageLoad(srn, NormalMode)
-    lazy val onSubmit = routes.InterestOnLoanController.onSubmit(srn, NormalMode)
+    lazy val onPageLoad = routes.InterestOnLoanController.onPageLoad(srn, index, NormalMode)
+    lazy val onSubmit = routes.InterestOnLoanController.onSubmit(srn, index, NormalMode)
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       val view = injected[MultipleQuestionView]
       view(viewModel(InterestOnLoanController.form))
     })
 
-    act.like(renderPrePopView(onPageLoad, InterestOnLoanPage(srn), (money, percentage, money)) {
+    act.like(renderPrePopView(onPageLoad, InterestOnLoanPage(srn, index), (money, percentage, money)) {
       implicit app => implicit request =>
         val view = injected[MultipleQuestionView]
         view(viewModel(InterestOnLoanController.form.fill((money, percentage, money))))
