@@ -22,7 +22,7 @@ import controllers.actions._
 import controllers.nonsipp.loansmadeoroutstanding.LoansCYAController._
 import controllers.PSRController
 import models.SchemeId.Srn
-import models._
+import models.{Money, Percentage, _}
 import navigation.Navigator
 import pages.nonsipp.loansmadeoroutstanding._
 import play.api.i18n._
@@ -80,6 +80,7 @@ class LoansCYAController @Inject()(
           loanAmount <- request.userAnswers.get(AmountOfTheLoanPage(srn, index)).getOrRecoverJourney
           returnEndDate <- schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney.map(_.to)
           repaymentInstalments <- request.userAnswers.get(AreRepaymentsInstalmentsPage(srn, index)).getOrRecoverJourney
+          loanInterest <- request.userAnswers.get(InterestOnLoanPage(srn, index)).getOrRecoverJourney
         } yield Ok(
           view(
             viewModel(
@@ -94,6 +95,7 @@ class LoansCYAController @Inject()(
               loanAmount,
               returnEndDate,
               repaymentInstalments,
+              loanInterest,
               mode
             )
           )
@@ -119,6 +121,7 @@ object LoansCYAController {
     loanAmount: (Money, Money, Money),
     returnEndDate: LocalDate,
     repaymentInstalments: Boolean,
+    loanInterest: (Money, Percentage, Money),
     mode: Mode
   ): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](
@@ -138,6 +141,7 @@ object LoansCYAController {
           loanAmount,
           returnEndDate,
           repaymentInstalments,
+          loanInterest,
           mode
         )
       ),
@@ -158,10 +162,12 @@ object LoansCYAController {
     loanAmount: (Money, Money, Money),
     returnEndDate: LocalDate,
     repaymentInstalments: Boolean,
+    loanInterest: (Money, Percentage, Money),
     mode: Mode
   ): List[CheckYourAnswersSection] = {
     val (loanDate, assetsValue, loanPeriod) = datePeriodLoan
     val (totalLoan, repayments, outstanding) = loanAmount
+    val (interestPayable, interestRate, interestPayments) = loanInterest
 
     recipientSection(
       srn,
@@ -173,7 +179,8 @@ object LoansCYAController {
       connectedParty,
       mode
     ) ++ loanPeriodSection(srn, index, recipientName, loanDate, assetsValue, loanPeriod, mode) ++
-      loanAmountSection(srn, index, totalLoan, repayments, outstanding, returnEndDate, repaymentInstalments, mode)
+      loanAmountSection(srn, index, totalLoan, repayments, outstanding, returnEndDate, repaymentInstalments, mode) ++
+      loanInterestSection(srn, index, interestPayable, interestRate, interestPayments, mode)
   }
 
   private def recipientSection(
@@ -424,4 +431,41 @@ object LoansCYAController {
       )
     )
   }
+
+  private def loanInterestSection(
+    srn: Srn,
+    index: Max9999999,
+    interestPayable: Money,
+    interestRate: Percentage,
+    interestPayments: Money,
+    mode: Mode
+  ): List[CheckYourAnswersSection] =
+    List(
+      CheckYourAnswersSection(
+        Some(Heading2.medium("loanCheckYourAnswers.section4.heading")),
+        List(
+          CheckYourAnswersRowViewModel("loanCheckYourAnswers.section4.payable", s"£${interestPayable.displayAs}")
+            .withAction(
+              SummaryAction(
+                "site.change",
+                routes.InterestOnLoanController.onPageLoad(srn, index, mode).url
+              ).withVisuallyHiddenContent("loanCheckYourAnswers.section4.payable.hidden")
+            ),
+          CheckYourAnswersRowViewModel("loanCheckYourAnswers.section4.rate", s"${interestRate.displayAs}%")
+            .withAction(
+              SummaryAction(
+                "site.change",
+                routes.InterestOnLoanController.onPageLoad(srn, index, mode).url
+              ).withVisuallyHiddenContent("loanCheckYourAnswers.section4.rate.hidden")
+            ),
+          CheckYourAnswersRowViewModel("loanCheckYourAnswers.section4.payments", s"£${interestPayments.displayAs}")
+            .withAction(
+              SummaryAction(
+                "site.change",
+                routes.InterestOnLoanController.onPageLoad(srn, index, mode).url
+              ).withVisuallyHiddenContent("loanCheckYourAnswers.section4.payments.hidden")
+            )
+        )
+      )
+    )
 }

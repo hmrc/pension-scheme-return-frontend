@@ -27,6 +27,7 @@ import pages.nonsipp.loansmadeoroutstanding.{
   CompanyRecipientCrnPage,
   CompanyRecipientNamePage,
   DatePeriodLoanPage,
+  InterestOnLoanPage,
   RecipientSponsoringEmployerConnectedPartyPage,
   WhoReceivedLoanPage
 }
@@ -60,6 +61,7 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
     .unsafeSet(DatePeriodLoanPage(srn, index), (localDate, money, loanPeriod))
     .unsafeSet(AmountOfTheLoanPage(srn, index), (money, money, money))
     .unsafeSet(AreRepaymentsInstalmentsPage(srn, index), true)
+    .unsafeSet(InterestOnLoanPage(srn, index), (money, percentage, money))
 
   "LoansCYAController" - {
 
@@ -77,6 +79,7 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
           loanAmount = (money, money, money),
           returnEndDate = dateRange.to,
           repaymentInstalments = true,
+          loanInterest = (money, percentage, money),
           NormalMode
         )
       )
