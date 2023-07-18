@@ -16,22 +16,17 @@
 
 package pages.nonsipp.loansmadeoroutstanding
 
-import config.Refined.OneTo9999999
-import eu.timepit.refined.refineMV
-import models.ConditionalYesNo
-import pages.behaviours.PageBehaviours
-import uk.gov.hmrc.domain.Nino
+import config.Refined.Max9999999
+import models.ConditionalYesNo.ConditionalYes
+import models.Money
+import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
+import utils.RefinedUtils.RefinedIntOps
 
-class CompanyRecipientCrnPageSpec extends PageBehaviours {
+case class OutstandingArrearsOnLoanPage(srn: Srn, index: Max9999999) extends QuestionPage[ConditionalYes[Money]] {
 
-  "CompanyRecipientCrnPage" - {
+  override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString
 
-    val index = refineMV[OneTo9999999](1)
-
-    beRetrievable[ConditionalYesNo[String, Nino]](IndividualRecipientNinoPage(srnGen.sample.value, index))
-
-    beSettable[ConditionalYesNo[String, Nino]](IndividualRecipientNinoPage(srnGen.sample.value, index))
-
-    beRemovable[ConditionalYesNo[String, Nino]](IndividualRecipientNinoPage(srnGen.sample.value, index))
-  }
+  override def toString: String = "outstandingArrearsOnLoan"
 }

@@ -802,3 +802,16 @@ loanCheckYourAnswers.section4.rate = Interest rate
 loanCheckYourAnswers.section4.rate.hidden = interest rate
 loanCheckYourAnswers.section4.payments = Interest payments received in the period of this return
 loanCheckYourAnswers.section4.payments.hidden = interest payments received in the period of this return
+loanCheckYourAnswers.section6.heading = Arrears
+loanCheckYourAnswers.section6.arrears = Are there any outstanding arrears on this loan?
+loanCheckYourAnswers.section6.arrears.hidden = if there are any outstanding arrears on this loan
+loanCheckYourAnswers.section6.arrears.yes = What is the amount of the arrears?
+loanCheckYourAnswers.section6.arrears.yes.hidden = amount of the arrears
+
+outstandingArrearsOnLoan.title = Are there any outstanding arrears on this loan?
+outstandingArrearsOnLoan.heading = Are there any outstanding arrears on this loan?
+outstandingArrearsOnLoan.yes.conditional = What is the amount of the arrears, in pounds and pence?
+outstandingArrearsOnLoan.yes.error.required = Enter the total amount of arrears, in pounds and pence
+outstandingArrearsOnLoan.yes.error.nonNumeric = Total amount of arrears must be an amount of money, like 123 or 123.45
+outstandingArrearsOnLoan.yes.error.max = Total amount of arrears must be 999999999.99 or less
+outstandingArrearsOnLoan.error.required = Select yes if there are any outstanding arrears on this loan

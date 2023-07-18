@@ -260,8 +260,8 @@ trait ModelGenerators extends BasicGenerators {
       WrappedMemberDetails(nameDob, nino)
     }
 
-  implicit def conditionalYesNoGen[A: Gen]: Gen[ConditionalYesNo[A]] =
-    Gen.either(nonEmptyString, implicitly[Gen[A]]).map(ConditionalYesNo(_))
+  implicit def conditionalYesNoGen[No: Gen, Yes: Gen]: Gen[ConditionalYesNo[No, Yes]] =
+    Gen.either(implicitly[Gen[No]], implicitly[Gen[Yes]]).map(ConditionalYesNo(_))
 
   implicit val memberOrConnectedPartyGen: Gen[MemberOrConnectedParty] =
     Gen.oneOf(MemberOrConnectedParty.Member, MemberOrConnectedParty.ConnectedParty, MemberOrConnectedParty.Neither)

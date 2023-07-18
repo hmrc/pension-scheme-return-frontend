@@ -34,8 +34,8 @@ class CompanyRecipientCrnControllerSpec extends ControllerBaseSpec {
 
   val userAnswersWithCompanyName = defaultUserAnswers.unsafeSet(CompanyRecipientNamePage(srn, index), companyName)
 
-  val conditionalNo: ConditionalYesNo[Crn] = ConditionalYesNo[Crn](Left("reason"))
-  val conditionalYes: ConditionalYesNo[Crn] = ConditionalYesNo[Crn](Right(crn))
+  val conditionalNo: ConditionalYesNo[String, Crn] = ConditionalYesNo.no("reason")
+  val conditionalYes: ConditionalYesNo[String, Crn] = ConditionalYesNo.yes(crn)
 
   "CompanyRecipientCrnController" - {
 

@@ -60,6 +60,13 @@ trait Formatters {
       def unbind(key: String, value: Boolean) = Map(key -> value.toString)
     }
 
+  private[mappings] val unitFormatter: Formatter[Unit] =
+    new Formatter[Unit] {
+      override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Unit] = Right(())
+
+      override def unbind(key: String, value: Unit): Map[String, String] = Map(key -> "unit")
+    }
+
   private[mappings] def intFormatter(
     errors: IntFormErrors,
     args: Seq[String] = Seq.empty

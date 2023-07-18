@@ -21,6 +21,7 @@ import config.Refined.Max9999999
 import controllers.actions._
 import controllers.nonsipp.loansmadeoroutstanding.LoansCYAController._
 import controllers.PSRController
+import models.ConditionalYesNo._
 import models.SchemeId.Srn
 import models.{Money, Percentage, _}
 import navigation.Navigator
@@ -81,6 +82,10 @@ class LoansCYAController @Inject()(
           returnEndDate <- schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney.map(_.to)
           repaymentInstalments <- request.userAnswers.get(AreRepaymentsInstalmentsPage(srn, index)).getOrRecoverJourney
           loanInterest <- request.userAnswers.get(InterestOnLoanPage(srn, index)).getOrRecoverJourney
+          outstandingArrearsOnLoan <- request.userAnswers
+            .get(OutstandingArrearsOnLoanPage(srn, index))
+            .map(_.value.toOption)
+            .getOrRecoverJourney
         } yield Ok(
           view(
             viewModel(
@@ -96,6 +101,7 @@ class LoansCYAController @Inject()(
               returnEndDate,
               repaymentInstalments,
               loanInterest,
+              outstandingArrearsOnLoan,
               mode
             )
           )
@@ -122,6 +128,7 @@ object LoansCYAController {
     returnEndDate: LocalDate,
     repaymentInstalments: Boolean,
     loanInterest: (Money, Percentage, Money),
+    outstandingArrearsOnLoan: Option[Money],
     mode: Mode
   ): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](
@@ -142,6 +149,7 @@ object LoansCYAController {
           returnEndDate,
           repaymentInstalments,
           loanInterest,
+          outstandingArrearsOnLoan,
           mode
         )
       ),
@@ -163,6 +171,7 @@ object LoansCYAController {
     returnEndDate: LocalDate,
     repaymentInstalments: Boolean,
     loanInterest: (Money, Percentage, Money),
+    outstandingArrearsOnLoan: Option[Money],
     mode: Mode
   ): List[CheckYourAnswersSection] = {
     val (loanDate, assetsValue, loanPeriod) = datePeriodLoan
@@ -180,7 +189,8 @@ object LoansCYAController {
       mode
     ) ++ loanPeriodSection(srn, index, recipientName, loanDate, assetsValue, loanPeriod, mode) ++
       loanAmountSection(srn, index, totalLoan, repayments, outstanding, returnEndDate, repaymentInstalments, mode) ++
-      loanInterestSection(srn, index, interestPayable, interestRate, interestPayments, mode)
+      loanInterestSection(srn, index, interestPayable, interestRate, interestPayments, mode) ++
+      loanOutstandingSection(srn, index, outstandingArrearsOnLoan, mode)
   }
 
   private def recipientSection(
@@ -468,4 +478,35 @@ object LoansCYAController {
         )
       )
     )
+
+  private def loanOutstandingSection(
+    srn: Srn,
+    index: Max9999999,
+    outstandingArrearsOnLoan: Option[Money],
+    mode: Mode
+  ): List[CheckYourAnswersSection] = {
+    val outstandingMessage = if (outstandingArrearsOnLoan.isEmpty) "site.no" else "site.yes"
+    List(
+      CheckYourAnswersSection(
+        Some(Heading2.medium("loanCheckYourAnswers.section6.heading")),
+        List(
+          CheckYourAnswersRowViewModel("loanCheckYourAnswers.section6.arrears", outstandingMessage)
+            .withAction(
+              SummaryAction(
+                "site.change",
+                routes.OutstandingArrearsOnLoanController.onPageLoad(srn, index, mode).url
+              ).withVisuallyHiddenContent("loanCheckYourAnswers.section6.arrears.hidden")
+            )
+        ) :?+ outstandingArrearsOnLoan.map { value =>
+          CheckYourAnswersRowViewModel("loanCheckYourAnswers.section6.arrears.yes", s"£${value.displayAs}")
+            .withAction(
+              SummaryAction(
+                "site.change",
+                routes.OutstandingArrearsOnLoanController.onPageLoad(srn, index, mode).url
+              ).withVisuallyHiddenContent("loanCheckYourAnswers.section6.arrears.yes.hidden")
+            )
+        }
+      )
+    )
+  }
 }
