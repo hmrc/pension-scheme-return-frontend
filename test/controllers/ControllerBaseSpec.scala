@@ -103,6 +103,7 @@ trait TestValues { _: OptionValues =>
   val nino: Nino = ninoGen.sample.get
   val utr: Utr = utrGen.sample.get
   val money: Money = Money(123456)
+  val security: Security = Security("securityGivenForLoan")
   val double: Double = 7.7
   val percentage: Percentage = Percentage(7.7)
   val loanPeriod = 5

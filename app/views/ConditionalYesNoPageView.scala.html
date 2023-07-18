@@ -96,12 +96,13 @@
 }
 
 @security(key: String, message: DisplayMessage) = @{
-govukTextarea(
-TextareaViewModel(key, form(key).value)
-.withLabel(renderMessage(message))
-.withRows(5)
-.withError(form(key).errors.headOption)
-)
+    govukTextarea(
+        TextareaViewModel(key, form(key).value)
+                .withLabel(renderMessage(message))
+                .withHint(viewmodel.page.yes.hint.map(h => Hint(content = HtmlContent(renderMessage(h)))))
+                .withRows(5)
+                .withError(form(key).errors.headOption)
+    )
 }
 
 @currency(key: String, message: DisplayMessage) = @{

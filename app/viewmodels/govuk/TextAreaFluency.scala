@@ -21,6 +21,7 @@ import play.api.i18n.Messages
 import play.twirl.api.Html
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.errormessage.ErrorMessage
+import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
 import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
 import uk.gov.hmrc.govukfrontend.views.viewmodels.textarea.Textarea
 import viewmodels.govuk.label._
@@ -61,5 +62,11 @@ trait TextAreaFluency {
           HtmlContent(label)
         )
       )
+
+    def withHint(hint: Hint): Textarea =
+      textArea.copy(hint = Some(hint))
+
+    def withHint(hint: Option[Hint]): Textarea =
+      textArea.copy(hint = hint)
   }
 }

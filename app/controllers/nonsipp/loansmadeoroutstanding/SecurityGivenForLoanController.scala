@@ -16,19 +16,16 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
-import config.Constants.maxCurrencyValue
 import config.Refined.Max9999999
 import controllers.actions._
 import controllers.nonsipp.loansmadeoroutstanding.SecurityGivenForLoanController._
 import forms.YesNoPageFormProvider
 import forms.mappings.Mappings
 import models.ConditionalYesNo._
-import forms.mappings.errors.{MoneyFormErrors, SecurityFormErrors}
 import models.SchemeId.Srn
 import models.{ConditionalYesNo, Mode, Security}
 import navigation.Navigator
 import pages.nonsipp.loansmadeoroutstanding.SecurityGivenForLoanPage
-import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
@@ -86,13 +83,12 @@ class SecurityGivenForLoanController @Inject()(
 object SecurityGivenForLoanController {
   def form(formProvider: YesNoPageFormProvider) = formProvider.conditionalYes[Security](
     "securityGivenForLoan.securityGiven.error.required",
-    mappingYes = Mappings.security(
-      SecurityFormErrors(
+    mappingYes = Mappings
+      .security(
         "securityGivenForLoan.securityGiven.yes.conditional.error.required",
         "securityGivenForLoan.securityGiven.yes.conditional.error.invalid",
-        (maxCurrencyValue, "securityGivenForLoan.securityGiven.yes.conditional.error.length")
+        "securityGivenForLoan.securityGiven.yes.conditional.error.length"
       )
-    )
   )
 
   def viewModel(srn: Srn, index: Max9999999, mode: Mode): FormPageViewModel[ConditionalYesNoPageViewModel] =
@@ -101,7 +97,11 @@ object SecurityGivenForLoanController {
       Message("securityGivenForLoan.securityGiven.heading"),
       page = ConditionalYesNoPageViewModel(
         yes = YesNoViewModel
-          .Conditional("securityGivenForLoan.securityGiven.yes.conditional", FieldType.Security),
+          .Conditional(
+            "securityGivenForLoan.securityGiven.yes.conditional",
+            Option(Message("securityGivenForLoan.securityGiven.yes.hint")),
+            FieldType.Security
+          ),
         no = YesNoViewModel.Unconditional
       ),
       routes.SecurityGivenForLoanController.onSubmit(srn, index, mode)

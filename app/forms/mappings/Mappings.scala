@@ -92,6 +92,12 @@ trait Mappings extends Formatters with Constraints {
   ): FieldMapping[Security] =
     of(securityFormatter(securityFormErrors, args))
 
+  def security(requiredKey: String, invalidKey: String, maxLengthErrorKey: String, args: Any*): Mapping[Security] =
+    text(requiredKey, args.toList)
+      .verifying(verify[String](invalidKey, s => Security.isValid(s), args: _*))
+      .verifying(verify[String](maxLengthErrorKey, s => Security.maxLengthCheck(s), args: _*))
+      .transform[Security](s => Security(s), _.security)
+
   def percentage(
     percentageFormErrors: PercentageFormErrors,
     args: Seq[String] = Seq.empty
