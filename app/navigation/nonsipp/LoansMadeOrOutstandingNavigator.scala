@@ -16,7 +16,8 @@
 
 package navigation.nonsipp
 
-import eu.timepit.refined.refineMV
+import config.Refined.OneTo9999999
+import eu.timepit.refined.{refineMV, refineV}
 import models.{NormalMode, ReceivedLoanType, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
@@ -101,6 +102,19 @@ object LoansMadeOrOutstandingNavigator extends JourneyNavigator {
     case OutstandingArrearsOnLoanPage(srn, index) =>
       controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController.onPageLoad(srn, index, NormalMode)
 
+    case LoansCYAPage(srn) =>
+      controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController.onPageLoad(srn, NormalMode)
+
+    case LoansListPage(srn, addLoan @ true) =>
+      refineV[OneTo9999999](userAnswers.map(WhoReceivedLoans(srn)).size + 1) match {
+        case Left(_) => controllers.routes.JourneyRecoveryController.onPageLoad()
+        case Right(nextIndex) =>
+          controllers.nonsipp.loansmadeoroutstanding.routes.WhoReceivedLoanController
+            .onPageLoad(srn, nextIndex, NormalMode)
+      }
+
+    case LoansListPage(srn, addLoan @ false) =>
+      controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty
