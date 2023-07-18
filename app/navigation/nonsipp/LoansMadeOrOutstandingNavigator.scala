@@ -96,7 +96,12 @@ object LoansMadeOrOutstandingNavigator extends JourneyNavigator {
       controllers.nonsipp.loansmadeoroutstanding.routes.InterestOnLoanController.onPageLoad(srn, index, NormalMode)
 
     case InterestOnLoanPage(srn, index) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+      controllers.nonsipp.loansmadeoroutstanding.routes.SecurityGivenForLoanController
+        .onPageLoad(srn, index, NormalMode)
+
+    case SecurityGivenForLoanPage(srn, index) =>
+      controllers.nonsipp.loansmadeoroutstanding.routes.OutstandingArrearsOnLoanController
+        .onPageLoad(srn, index, NormalMode)
 
     case OutstandingArrearsOnLoanPage(srn, index) =>
       controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController.onPageLoad(srn, index, NormalMode)

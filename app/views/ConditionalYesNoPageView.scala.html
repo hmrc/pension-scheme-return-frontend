@@ -52,11 +52,13 @@
                     case (message, FieldType.Input) => input("value.yes", message)
                     case (message, FieldType.Textarea) => textArea("value.yes", message)
                     case (message, FieldType.Currency) => currency("value.yes", message)
+                    case (message, FieldType.Security) => security("value.yes", message)
                 },
                 whenNo = {
                     case (message, FieldType.Input) => input("value.no", message)
                     case (message, FieldType.Textarea) => textArea("value.no", message)
                     case (message, FieldType.Currency) => currency("value.no", message)
+                    case (message, FieldType.Security) => security("value.yes", message)
                 },
                 legend = viewmodel.page.legend
             )
@@ -91,6 +93,15 @@
                 .withRows(5)
                 .withError(form(key).errors.headOption)
     )
+}
+
+@security(key: String, message: DisplayMessage) = @{
+govukTextarea(
+TextareaViewModel(key, form(key).value)
+.withLabel(renderMessage(message))
+.withRows(5)
+.withError(form(key).errors.headOption)
+)
 }
 
 @currency(key: String, message: DisplayMessage) = @{

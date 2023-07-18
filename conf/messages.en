@@ -815,3 +815,11 @@ outstandingArrearsOnLoan.yes.error.required = Enter the total amount of arrears,
 outstandingArrearsOnLoan.yes.error.nonNumeric = Total amount of arrears must be an amount of money, like 123 or 123.45
 outstandingArrearsOnLoan.yes.error.max = Total amount of arrears must be 999999999.99 or less
 outstandingArrearsOnLoan.error.required = Select yes if there are any outstanding arrears on this loan
+
+securityGivenForLoan.securityGiven.title = Has security been given for this loan?
+securityGivenForLoan.securityGiven.heading = Has security been given for this loan?
+securityGivenForLoan.securityGiven.yes.conditional = Provide details of the security
+securityGivenForLoan.securityGiven.error.required = Select yes if security has been given for this loan
+securityGivenForLoan.securityGiven.yes.conditional.error.required = Enter details of the security
+securityGivenForLoan.securityGiven.yes.conditional.error.invalid = Details of the security must only include letters, numbers, and special characters such as hyphens, spaces and apostrophes
+securityGivenForLoan.securityGiven.yes.conditional.error.length = Details of the security must be 160 characters or fewer
