@@ -61,6 +61,8 @@
             @govukPagination(PaginationViewModel(paginatedViewModel.pagination))
         }
 
+        @viewmodel.description.map(renderMessage)
+
         @if(viewmodel.page.showRadios){
             @govukRadios(
               RadiosViewModel.yesNo(

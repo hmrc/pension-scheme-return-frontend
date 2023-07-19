@@ -57,3 +57,9 @@ case class WhoReceivedLoanPage(srn: Srn, index: Max9999999) extends QuestionPage
       case _ => removePages(userAnswers, pages(srn))
     }
 }
+
+case class WhoReceivedLoans(srn: Srn) extends QuestionPage[Map[String, ReceivedLoanType]] {
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "whoReceivedLoan"
+}
