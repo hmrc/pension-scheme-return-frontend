@@ -104,7 +104,7 @@ class RecipientSponsoringEmployerConnectedPartyController @Inject()(
   }
 
   private def recipientName(srn: Srn, index: Max9999999)(implicit request: DataRequest[_]): Option[String] =
-    request.userAnswers.get(WhoReceivedLoanPage(srn, refineMV(1))).flatMap {
+    request.userAnswers.get(WhoReceivedLoanPage(srn, index)).flatMap {
       case ReceivedLoanType.UKCompany => request.userAnswers.get(CompanyRecipientNamePage(srn, index))
       case ReceivedLoanType.UKPartnership => request.userAnswers.get(PartnershipRecipientNamePage(srn, index))
       case ReceivedLoanType.Other => request.userAnswers.get(OtherRecipientDetailsPage(srn, index)).map(_.name)
