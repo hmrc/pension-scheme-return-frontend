@@ -235,9 +235,21 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
         .navigateToWithIndex(
           index,
           InterestOnLoanPage,
-          (_, _: Max9999999, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.loansmadeoroutstanding.routes.SecurityGivenForLoanController.onPageLoad
         )
-        .withName("go from interest on loan page to unauthorised page")
+        .withName("go from interest on loan page to security given for loan page")
+    )
+  }
+
+  "SecurityGivenForLoan" - {
+    act.like(
+      normalmode
+        .navigateToWithIndex(
+          index,
+          SecurityGivenForLoanPage,
+          controllers.nonsipp.loansmadeoroutstanding.routes.OutstandingArrearsOnLoanController.onPageLoad
+        )
+        .withName("go from interest on loan page to outstanding arrears on loan page")
     )
   }
 }

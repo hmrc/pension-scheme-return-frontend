@@ -14,16 +14,19 @@
  * limitations under the License.
  */
 
-package viewmodels.models
+package pages.nonsipp.loansmadeoroutstanding
 
-sealed trait FieldType
+import config.Refined.Max9999999
+import models.ConditionalYesNo.ConditionalYes
+import models.Security
+import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
+import utils.RefinedUtils.RefinedIntOps
 
-object FieldType {
-  case object Input extends FieldType
-  case object Currency extends FieldType
-  case object Date extends FieldType
-  case object Percentage extends FieldType
-  case object Textarea extends FieldType
+case class SecurityGivenForLoanPage(srn: Srn, index: Max9999999) extends QuestionPage[ConditionalYes[Security]] {
 
-  case object Security extends FieldType
+  override def path: JsPath = JsPath \ "loans" \ "loanTransactions" \ toString \ index.arrayIndex.toString
+
+  override def toString: String = "securityGivenPage"
 }

@@ -17,7 +17,7 @@
 package viewmodels.models
 
 import play.twirl.api.Html
-import viewmodels.DisplayMessage.Message
+import viewmodels.DisplayMessage.{InlineMessage, Message}
 
 case class ConditionalYesNoPageViewModel(
   legend: Option[Message] = None,
@@ -32,20 +32,27 @@ case class ConditionalYesNoPageViewModel(
 }
 
 sealed trait YesNoViewModel {
-  val hint: Option[Html]
+  val hint: Option[InlineMessage]
   val message: Option[Html]
 }
 
 object YesNoViewModel {
 
-  case class Unconditional(message: Option[Html], hint: Option[Html]) extends YesNoViewModel
+  case class Unconditional(message: Option[Html], hint: Option[InlineMessage]) extends YesNoViewModel
 
   object Unconditional extends Unconditional(None, None)
 
-  case class Conditional(message: Option[Html], hint: Option[Html], conditionalMessage: Message, fieldType: FieldType)
-      extends YesNoViewModel
+  case class Conditional(
+    message: Option[Html],
+    hint: Option[InlineMessage],
+    conditionalMessage: Message,
+    fieldType: FieldType
+  ) extends YesNoViewModel
 
   object Conditional {
     def apply(nestedHtml: Message, fieldType: FieldType): Conditional = Conditional(None, None, nestedHtml, fieldType)
+
+    def apply(nestedHtml: Message, hint: Option[InlineMessage], fieldType: FieldType): Conditional =
+      Conditional(None, hint, nestedHtml, fieldType)
   }
 }

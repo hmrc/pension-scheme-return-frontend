@@ -14,16 +14,20 @@
  * limitations under the License.
  */
 
-package viewmodels.models
+package forms.mappings.errors
 
-sealed trait FieldType
+case class SecurityFormErrors(
+  requiredKey: String,
+  nonNumericKey: String,
+  max: (Double, String)
+)
 
-object FieldType {
-  case object Input extends FieldType
-  case object Currency extends FieldType
-  case object Date extends FieldType
-  case object Percentage extends FieldType
-  case object Textarea extends FieldType
+object SecurityFormErrors {
 
-  case object Security extends FieldType
+  def default(
+    requiredKey: String = "error.required",
+    nonNumericKey: String = "error.nonMoney",
+    max: (Double, String) = (Double.MaxValue, "error.tooLarge")
+  ): SecurityFormErrors =
+    SecurityFormErrors(requiredKey, nonNumericKey, max)
 }

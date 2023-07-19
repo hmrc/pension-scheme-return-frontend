@@ -16,8 +16,14 @@
 
 package forms.mappings
 
-import forms.mappings.errors.{DoubleFormErrors, IntFormErrors, MoneyFormErrors, PercentageFormErrors}
-import models.{Enumerable, Money, Percentage}
+import forms.mappings.errors.{
+  DoubleFormErrors,
+  IntFormErrors,
+  MoneyFormErrors,
+  PercentageFormErrors,
+  SecurityFormErrors
+}
+import models.{Enumerable, Money, Percentage, Security}
 import play.api.data.FormError
 import play.api.data.format.Formatter
 
@@ -224,6 +230,29 @@ trait Formatters {
 
       override def unbind(key: String, value: Percentage): Map[String, String] =
         Map(key -> value.displayAs)
+    }
+
+  private[mappings] def securityFormatter(
+    errors: SecurityFormErrors,
+    args: Seq[String] = Seq.empty
+  ): Formatter[Security] =
+    new Formatter[Security] {
+
+      private val baseFormatter = doubleFormatter(errors.requiredKey, errors.nonNumericKey, errors.max, args)
+      private val decimalRegex = "^-?\\d+(\\.\\d{1,2})?$"
+
+      override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Security] =
+        baseFormatter
+          .bind(key, data.view.toMap)
+          .flatMap { double =>
+            if (BigDecimal(double).toString().matches(decimalRegex))
+              Right(Security(double.toString))
+            else
+              Left(Seq(FormError(key, errors.nonNumericKey, args)))
+          }
+
+      override def unbind(key: String, value: Security): Map[String, String] =
+        Map(key -> value.security)
     }
 
   private[mappings] def enumerableFormatter[A](requiredKey: String, invalidKey: String, args: Seq[String] = Seq.empty)(

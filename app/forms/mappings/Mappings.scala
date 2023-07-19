@@ -16,8 +16,15 @@
 
 package forms.mappings
 
-import forms.mappings.errors.{DateFormErrors, DoubleFormErrors, IntFormErrors, MoneyFormErrors, PercentageFormErrors}
-import models.{Crn, DateRange, Enumerable, Money, Percentage, Utr}
+import forms.mappings.errors.{
+  DateFormErrors,
+  DoubleFormErrors,
+  IntFormErrors,
+  MoneyFormErrors,
+  PercentageFormErrors,
+  SecurityFormErrors
+}
+import models.{Crn, DateRange, Enumerable, Money, Percentage, Security, Utr}
 import play.api.data.{FieldMapping, Mapping}
 import play.api.data.Forms.of
 import play.api.data.validation.{Constraint, Invalid, Valid}
@@ -78,6 +85,18 @@ trait Mappings extends Formatters with Constraints {
     args: Seq[String] = Seq.empty
   ): FieldMapping[Money] =
     of(moneyFormatter(moneyFormErrors, args))
+
+  def security(
+    securityFormErrors: SecurityFormErrors,
+    args: Seq[String] = Seq.empty
+  ): FieldMapping[Security] =
+    of(securityFormatter(securityFormErrors, args))
+
+  def security(requiredKey: String, invalidKey: String, maxLengthErrorKey: String, args: Any*): Mapping[Security] =
+    text(requiredKey, args.toList)
+      .verifying(verify[String](invalidKey, s => Security.isValid(s), args: _*))
+      .verifying(verify[String](maxLengthErrorKey, s => Security.maxLengthCheck(s), args: _*))
+      .transform[Security](s => Security(s), _.security)
 
   def percentage(
     percentageFormErrors: PercentageFormErrors,
