@@ -100,7 +100,7 @@ object SecurityGivenForLoanController {
           .Conditional(
             "securityGivenForLoan.securityGiven.yes.conditional",
             Option(Message("securityGivenForLoan.securityGiven.yes.hint")),
-            FieldType.Security
+            FieldType.Textarea
           ),
         no = YesNoViewModel.Unconditional
       ),
