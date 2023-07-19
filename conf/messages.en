@@ -829,3 +829,14 @@ securityGivenForLoan.securityGiven.error.required = Select yes if security has b
 securityGivenForLoan.securityGiven.yes.conditional.error.required = Enter details of the security
 securityGivenForLoan.securityGiven.yes.conditional.error.invalid = Details of the security must only include letters, numbers, and special characters such as hyphens, spaces and apostrophes
 securityGivenForLoan.securityGiven.yes.conditional.error.length = Details of the security must be 160 characters or fewer
+
+loansList.title = You have added {0} loan
+loansList.title.plural = You have added {0} loans
+loansList.heading = You have added {0} loan
+loansList.heading.plural = You have added {0} loans
+loansList.row = Loan of £{0} to {1}
+loansList.row.change.hidden = change loan of {0} to {1}
+loansList.row.remove.hidden = remove loan of {0} to {1} from the list
+loansList.description = You must tell us about all loans the scheme made, or had outstanding, during the period of this return.
+loansList.radios = Do you need to add another loan?
+loansList.radios.error.required = Select yes if you need to add another loan
