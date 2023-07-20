@@ -18,7 +18,7 @@ package controllers.nonsipp.loansmadeoroutstanding
 
 import cats.implicits._
 import com.google.inject.Inject
-import config.Constants.maxAccountingPeriods
+import config.Constants.maxLoans
 import config.Refined.{Max9999999, OneTo9999999}
 import controllers.PSRController
 import controllers.actions._
@@ -59,7 +59,7 @@ class LoansListController @Inject()(
 
   def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     loanRecipients(srn).map { recipients =>
-      if (recipients.length == maxAccountingPeriods) {
+      if (recipients.length == maxLoans) {
 
         Redirect(navigator.nextPage(AccountingPeriodListPage(srn, addPeriod = false), mode, request.userAnswers))
       } else {
