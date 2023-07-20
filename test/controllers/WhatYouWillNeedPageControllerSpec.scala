@@ -22,21 +22,21 @@ import play.api.mvc.Call
 import play.api.test.FakeRequest
 import views.html.ContentPageView
 
-class StartPageControllerSpec extends ControllerBaseSpec {
+class WhatYouWillNeedPageControllerSpec extends ControllerBaseSpec {
 
   def onwardRoute = Call("GET", "/foo")
 
-  lazy val onPageLoad = routes.StartPageController.onPageLoad(srn).url
-  lazy val onSubmit = routes.StartPageController.onSubmit(srn).url
+  lazy val onPageLoad = routes.WhatYouWillNeedController.onPageLoad(srn).url
+  lazy val onSubmit = routes.WhatYouWillNeedController.onSubmit(srn).url
 
-  "StartPageController" - {
+  "WhatYouWillNeedController" - {
 
     "return OK and the correct view for a GET" in runningApplication { implicit app =>
       val view = injected[ContentPageView]
       val request = FakeRequest(GET, onPageLoad)
 
       val result = route(app, request).value
-      val expectedView = view(StartPageController.viewModel(srn))(request, createMessages(app))
+      val expectedView = view(WhatYouWillNeedController.viewModel(srn))(request, createMessages(app))
 
       status(result) mustEqual OK
       contentAsString(result) mustEqual expectedView.toString

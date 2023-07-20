@@ -22,8 +22,8 @@ GET         /account/signed-out                                   controllers.au
 
 GET         /unauthorised                                         controllers.UnauthorisedController.onPageLoad()
 
-GET         /:srn/start                                           controllers.StartPageController.onPageLoad(srn: Srn)
-GET         /:srn/start-next-page                                 controllers.StartPageController.onSubmit(srn: Srn)
+GET         /:srn/what-you-will-need                                           controllers.WhatYouWillNeedController.onPageLoad(srn: Srn)
+GET         /:srn/what-you-will-need-next-page                                 controllers.WhatYouWillNeedController.onSubmit(srn: Srn)
 
 GET         /:srn/which-tax-year                         controllers.nonsipp.WhichTaxYearController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST        /:srn/which-tax-year                         controllers.nonsipp.WhichTaxYearController.onSubmit(srn: Srn, mode: Mode = NormalMode)

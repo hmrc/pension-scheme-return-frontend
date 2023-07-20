@@ -36,7 +36,7 @@ class NavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
       act.like(
         normalmode
-          .navigateTo(StartPage, routes.WhichTaxYearController.onPageLoad)
+          .navigateTo(WhatYouWillNeedPage, routes.WhichTaxYearController.onPageLoad)
           .withName("go from start page to which tax year page")
       )
     }

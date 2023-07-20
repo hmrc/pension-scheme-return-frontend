@@ -16,30 +16,7 @@
 
 package viewmodels.models
 
-import play.api.mvc.Call
-import viewmodels.DisplayMessage
-import viewmodels.DisplayMessage._
-import viewmodels.implicits._
-
 case class ContentPageViewModel(
   isStartButton: Boolean = false,
   isLargeHeading: Boolean = false
 )
-
-object ContentPageViewModel {
-
-  def startPage(
-    title: String,
-    heading: String,
-    contents: List[String],
-    onSubmit: Call
-  ): FormPageViewModel[ContentPageViewModel] =
-    FormPageViewModel(
-      title,
-      heading,
-      ContentPageViewModel(isStartButton = true, isLargeHeading = false),
-      onSubmit
-    ).withButtonText("site.start")
-      .withDescription(contents.map(ParagraphMessage(_)).fold[DisplayMessage](Empty)(_ ++ _))
-
-}

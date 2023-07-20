@@ -88,11 +88,15 @@ upload.acceptedFileType = Accepted file type: {0}
 upload.maxFileSize = Maximum file size: {0}
 upload.uploadAFile = Upload a file
 
-startPage.title = Submit a pension scheme return
-startPage.heading = Submit a pension scheme return
-startPage.paragraph1 = Use this online service to submit a pension scheme return.
-startPage.paragraph2 = You must submit the return by the deadline. You may be charged penalties if it is not received by the deadline.
-startPage.paragraph3 = You do not have to complete the whole return at once. You can save your answers and come back to them later.
+whatYouWillNeed.title = What you will need
+whatYouWillNeed.heading = What you will need
+whatYouWillNeed.paragraph = To start a pension scheme return, you will need to tell us:
+whatYouWillNeed.listItem1 = the dates of your pension scheme return – this will usually be a tax year
+whatYouWillNeed.listItem2 = the accounting period covered by your pension scheme return, if this is different from the tax year
+whatYouWillNeed.listItem3 = if the pension scheme had at least 1 active bank account during the tax year or accounting period
+whatYouWillNeed.listItem4 = how many members the pension scheme had at the end of the tax year or accounting period
+whatYouWillNeed.paragraph1 = You may need to provide more information, like details of members, payments and assets, to complete the return.
+whatYouWillNeed.paragraph2 = You do not have to complete the whole return at once. You can save your answers and come back to them later.
 
 whichTaxYear.title = Which tax year are you submitting a return for?
 whichTaxYear.heading = Which tax year are you submitting a return for?
