@@ -44,7 +44,7 @@ class PensionCommencementLumpSumNavigatorSpec extends BaseSpec with NavigatorBeh
         .navigateToWithData(
           PensionCommencementLumpSumPage,
           Gen.const(false),
-          controllers.nonsipp.routes.PensionPaymentsReceivedController.onPageLoad
+          controllers.nonsipp.memberpayments.routes.PensionPaymentsReceivedController.onPageLoad
         )
         .withName("go from pension commencement lump sum page to pension payments received page when no selected")
     )

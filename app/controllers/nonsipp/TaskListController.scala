@@ -177,7 +177,7 @@ object TaskListController {
       TaskListItemViewModel(
         LinkMessage(
           messageKey(prefix, "payments.title", UnableToStart),
-          controllers.nonsipp.routes.PensionPaymentsReceivedController.onPageLoad(srn, NormalMode).url
+          controllers.nonsipp.memberpayments.routes.PensionPaymentsReceivedController.onPageLoad(srn, NormalMode).url
         ),
         UnableToStart
       ),

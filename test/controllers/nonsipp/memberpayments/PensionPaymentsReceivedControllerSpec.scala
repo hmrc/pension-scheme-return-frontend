@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp
+package controllers.nonsipp.memberpayments
 
-import PensionPaymentsReceivedController.{form, viewModel}
 import controllers.ControllerBaseSpec
+import controllers.nonsipp.memberpayments.PensionPaymentsReceivedController.{form, viewModel}
+import controllers.nonsipp.memberpayments.routes
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import pages.nonsipp.PensionPaymentsReceivedPage
+import pages.nonsipp.memberpayments.PensionPaymentsReceivedPage
 import views.html.YesNoPageView
 
 class PensionPaymentsReceivedControllerSpec extends ControllerBaseSpec {
@@ -44,7 +45,7 @@ class PensionPaymentsReceivedControllerSpec extends ControllerBaseSpec {
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
-    act.like(saveAndContinue(onSubmit, "value" -> "true"))
+    act.like(saveAndContinue(onSubmit, "pensionReceived", "value" -> "true"))
 
     act.like(invalidForm(onSubmit))
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))

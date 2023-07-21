@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages.nonsipp.memberpayments
 
 import models.SchemeId.Srn
 import pages.QuestionPage
@@ -24,5 +24,5 @@ case class PensionPaymentsReceivedPage(srn: Srn) extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "pensionPaymentsReceived"
+  override def toString: String = "pensionReceived"
 }

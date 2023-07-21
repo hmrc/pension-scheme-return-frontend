@@ -207,10 +207,10 @@ POST        /:srn/money-borrowed                             controllers.nonsipp
 GET         /:srn/change-money-borrowed                      controllers.nonsipp.moneyborrowed.MoneyBorrowedController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST        /:srn/change-money-borrowed                      controllers.nonsipp.moneyborrowed.MoneyBorrowedController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
-GET        /:srn/pension-payments-received               controllers.nonsipp.PensionPaymentsReceivedController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST       /:srn/pension-payments-received               controllers.nonsipp.PensionPaymentsReceivedController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-GET        /:srn/change-pension-payments-received        controllers.nonsipp.PensionPaymentsReceivedController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST       /:srn/change-pension-payments-received        controllers.nonsipp.PensionPaymentsReceivedController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+GET        /:srn/pension-payments-received               controllers.nonsipp.memberpayments.PensionPaymentsReceivedController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST       /:srn/pension-payments-received               controllers.nonsipp.memberpayments.PensionPaymentsReceivedController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/change-pension-payments-received        controllers.nonsipp.memberpayments.PensionPaymentsReceivedController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST       /:srn/change-pension-payments-received        controllers.nonsipp.memberpayments.PensionPaymentsReceivedController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
 GET        /:srn/benefits-surrendered               controllers.nonsipp.benefitssurrendered.BenefitsSurrenderedController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST       /:srn/benefits-surrendered               controllers.nonsipp.benefitssurrendered.BenefitsSurrenderedController.onSubmit(srn: Srn, mode: Mode = NormalMode)

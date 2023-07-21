@@ -19,7 +19,7 @@ package navigation.nonsipp
 import controllers.routes
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.PensionPaymentsReceivedPage
+import pages.nonsipp.memberpayments.PensionPaymentsReceivedPage
 import utils.BaseSpec
 
 class PensionPaymentsReceivedNavigatorSpec extends BaseSpec with NavigatorBehaviours {
