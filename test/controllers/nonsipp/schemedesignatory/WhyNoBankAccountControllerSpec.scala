@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.bankaccount
+package controllers.nonsipp.schemedesignatory
 
-import WhyNoBankAccountController.{form, viewModel}
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.bankaccount.routes
+import controllers.nonsipp.schemedesignatory.WhyNoBankAccountController.{form, viewModel}
 import forms.TextFormProvider
 import models.NormalMode
 import pages.nonsipp.schemeDesignatory.WhyNoBankAccountPage

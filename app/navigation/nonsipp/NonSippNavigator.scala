@@ -39,7 +39,7 @@ class NonSippNavigator @Inject()() extends Navigator {
 
       case page @ CheckReturnDatesPage(srn) =>
         if (userAnswers.get(page).contains(true)) {
-          nonsipp.bankaccount.routes.ActiveBankAccountController.onPageLoad(srn, NormalMode)
+          nonsipp.schemedesignatory.routes.ActiveBankAccountController.onPageLoad(srn, NormalMode)
         } else {
           nonsipp.accountingperiod.routes.AccountingPeriodController.onPageLoad(srn, refineMV(1), NormalMode)
         }

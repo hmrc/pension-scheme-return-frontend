@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.bankaccount
+package controllers.nonsipp.schemedesignatory
 
 import controllers.actions._
-import controllers.nonsipp.bankaccount.WhyNoBankAccountController._
+import controllers.nonsipp.schemedesignatory.WhyNoBankAccountController._
 import forms.TextFormProvider
 import models.Mode
 import models.SchemeId.Srn

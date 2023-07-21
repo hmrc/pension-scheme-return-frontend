@@ -32,7 +32,7 @@ object BankAccountNavigator extends JourneyNavigator {
       if (userAnswers.get(page).contains(true)) {
         routes.HowManyMembersController.onPageLoad(srn, NormalMode)
       } else {
-        nonsipp.bankaccount.routes.WhyNoBankAccountController.onPageLoad(srn, NormalMode)
+        nonsipp.schemedesignatory.routes.WhyNoBankAccountController.onPageLoad(srn, NormalMode)
       }
 
     case WhyNoBankAccountPage(srn) => routes.HowManyMembersController.onPageLoad(srn, NormalMode)

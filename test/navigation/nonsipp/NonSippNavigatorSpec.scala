@@ -17,7 +17,7 @@
 package navigation.nonsipp
 
 import controllers.nonsipp.accountingperiod
-import controllers.nonsipp.bankaccount
+import controllers.nonsipp.schemedesignatory
 import controllers.nonsipp.declaration
 import controllers.nonsipp.memberdetails
 import controllers.nonsipp.routes
@@ -55,7 +55,7 @@ class NonSippNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           .navigateToWithData(
             CheckReturnDatesPage,
             Gen.const(true),
-            bankaccount.routes.ActiveBankAccountController.onPageLoad
+            schemedesignatory.routes.ActiveBankAccountController.onPageLoad
           )
           .withName("go from check return dates page to bank account page when yes selected")
       )

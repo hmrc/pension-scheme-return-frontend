@@ -199,7 +199,7 @@ object BasicDetailsCheckYourAnswersController {
           Message("basicDetailsCheckYourAnswersController.schemeDetails.bankAccount", schemeDetails.schemeName),
           if (activeBankAccount: Boolean) "site.yes" else "site.no"
         ).withChangeAction(
-            controllers.nonsipp.bankaccount.routes.ActiveBankAccountController.onPageLoad(srn, mode).url,
+            controllers.nonsipp.schemedesignatory.routes.ActiveBankAccountController.onPageLoad(srn, mode).url,
             hidden = "basicDetailsCheckYourAnswersController.schemeDetails.bankAccount.hidden"
           )
           .withOneHalfWidth()
@@ -212,7 +212,7 @@ object BasicDetailsCheckYourAnswersController {
               ),
               reason
             ).withChangeAction(
-                controllers.nonsipp.bankaccount.routes.WhyNoBankAccountController.onPageLoad(srn, mode).url,
+                controllers.nonsipp.schemedesignatory.routes.WhyNoBankAccountController.onPageLoad(srn, mode).url,
                 hidden = "basicDetailsCheckYourAnswersController.schemeDetails.whyNoBankAccount.hidden"
               )
               .withOneHalfWidth()

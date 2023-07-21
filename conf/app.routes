@@ -139,11 +139,11 @@ POST       /:srn/change-remove-member-details/:index        controllers.nonsipp.
 GET        /:srn/upload-member-details-file                  controllers.nonsipp.memberdetails.UploadMemberDetailsController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 GET        /:srn/submit-upload-member-details-file           controllers.nonsipp.memberdetails.UploadMemberDetailsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 
-GET        /:srn/did-scheme-have-bank-account               controllers.nonsipp.bankaccount.ActiveBankAccountController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST       /:srn/did-scheme-have-bank-account               controllers.nonsipp.bankaccount.ActiveBankAccountController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/did-scheme-have-bank-account               controllers.nonsipp.schemedesignatory.ActiveBankAccountController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST       /:srn/did-scheme-have-bank-account               controllers.nonsipp.schemedesignatory.ActiveBankAccountController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 
-GET        /:srn/change-did-scheme-have-bank-account        controllers.nonsipp.bankaccount.ActiveBankAccountController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST       /:srn/change-did-scheme-have-bank-account        controllers.nonsipp.bankaccount.ActiveBankAccountController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+GET        /:srn/change-did-scheme-have-bank-account        controllers.nonsipp.schemedesignatory.ActiveBankAccountController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST       /:srn/change-did-scheme-have-bank-account        controllers.nonsipp.schemedesignatory.ActiveBankAccountController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
 GET        /:srn/member-contributions               controllers.nonsipp.membercontributions.MemberContributionsController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST       /:srn/member-contributions               controllers.nonsipp.membercontributions.MemberContributionsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
@@ -166,10 +166,10 @@ POST       /:srn/transfer-out               controllers.nonsipp.transferout.Sche
 GET        /:srn/change-transfer-out        controllers.nonsipp.transferout.SchemeTransferOutController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST       /:srn/change-transfer-out        controllers.nonsipp.transferout.SchemeTransferOutController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
-GET        /:srn/reason-for-no-bank-account               controllers.nonsipp.bankaccount.WhyNoBankAccountController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST       /:srn/reason-for-no-bank-account               controllers.nonsipp.bankaccount.WhyNoBankAccountController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-GET        /:srn/change-reason-for-no-bank-account        controllers.nonsipp.bankaccount.WhyNoBankAccountController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST       /:srn/change-reason-for-no-bank-account        controllers.nonsipp.bankaccount.WhyNoBankAccountController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+GET        /:srn/reason-for-no-bank-account               controllers.nonsipp.schemedesignatory.WhyNoBankAccountController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST       /:srn/reason-for-no-bank-account               controllers.nonsipp.schemedesignatory.WhyNoBankAccountController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/change-reason-for-no-bank-account        controllers.nonsipp.schemedesignatory.WhyNoBankAccountController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST       /:srn/change-reason-for-no-bank-account        controllers.nonsipp.schemedesignatory.WhyNoBankAccountController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
 GET        /:srn/land-or-property-held               controllers.nonsipp.landorproperty.LandOrPropertyHeldController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST       /:srn/land-or-property-held               controllers.nonsipp.landorproperty.LandOrPropertyHeldController.onSubmit(srn: Srn, mode: Mode = NormalMode)

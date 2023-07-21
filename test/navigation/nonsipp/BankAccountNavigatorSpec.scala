@@ -16,7 +16,7 @@
 
 package navigation.nonsipp
 
-import controllers.nonsipp.bankaccount
+import controllers.nonsipp.schemedesignatory
 import controllers.nonsipp.routes
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
@@ -44,7 +44,7 @@ class BankAccountNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateToWithData(
           ActiveBankAccountPage,
           Gen.const(false),
-          bankaccount.routes.WhyNoBankAccountController.onPageLoad
+          schemedesignatory.routes.WhyNoBankAccountController.onPageLoad
         )
         .withName("go from bank account page to no bank account page when no selected")
     )
