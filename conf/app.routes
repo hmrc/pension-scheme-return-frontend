@@ -212,10 +212,10 @@ POST       /:srn/pension-payments-received               controllers.nonsipp.mem
 GET        /:srn/change-pension-payments-received        controllers.nonsipp.memberpayments.PensionPaymentsReceivedController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST       /:srn/change-pension-payments-received        controllers.nonsipp.memberpayments.PensionPaymentsReceivedController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
-GET        /:srn/benefits-surrendered               controllers.nonsipp.benefitssurrendered.BenefitsSurrenderedController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST       /:srn/benefits-surrendered               controllers.nonsipp.benefitssurrendered.BenefitsSurrenderedController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-GET        /:srn/change-benefits-surrendered        controllers.nonsipp.benefitssurrendered.BenefitsSurrenderedController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST       /:srn/change-benefits-surrendered        controllers.nonsipp.benefitssurrendered.BenefitsSurrenderedController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+GET        /:srn/benefits-surrendered               controllers.nonsipp.memberpayments.BenefitsSurrenderedController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST       /:srn/benefits-surrendered               controllers.nonsipp.memberpayments.BenefitsSurrenderedController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/change-benefits-surrendered        controllers.nonsipp.memberpayments.BenefitsSurrenderedController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST       /:srn/change-benefits-surrendered        controllers.nonsipp.memberpayments.BenefitsSurrenderedController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
 GET        /:srn/other-assets-held                      controllers.nonsipp.otherassetsheld.OtherAssetsHeldController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST       /:srn/other-assets-held                      controllers.nonsipp.otherassetsheld.OtherAssetsHeldController.onSubmit(srn: Srn, mode: Mode = NormalMode)

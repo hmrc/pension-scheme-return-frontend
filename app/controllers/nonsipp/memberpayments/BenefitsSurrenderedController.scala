@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.benefitssurrendered
+package controllers.nonsipp.memberpayments
 
 import controllers.actions._
-import controllers.nonsipp.benefitssurrendered.BenefitsSurrenderedController._
+import controllers.nonsipp.memberpayments.BenefitsSurrenderedController._
 import forms.YesNoPageFormProvider
 import models.Mode
 import models.SchemeId.Srn
 import navigation.Navigator
-import pages.nonsipp.BenefitsSurrenderedPage
+import pages.nonsipp.memberpayments.BenefitsSurrenderedPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}

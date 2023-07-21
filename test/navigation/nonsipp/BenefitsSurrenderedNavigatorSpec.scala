@@ -20,7 +20,7 @@ import controllers.routes
 import models.NormalMode
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.BenefitsSurrenderedPage
+import pages.nonsipp.memberpayments.BenefitsSurrenderedPage
 import utils.BaseSpec
 
 class BenefitsSurrenderedNavigatorSpec extends BaseSpec with NavigatorBehaviours {

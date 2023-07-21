@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.benefitssurrendered
+package controllers.nonsipp.memberpayments
 
-import controllers.nonsipp.benefitssurrendered.BenefitsSurrenderedController._
 import controllers.ControllerBaseSpec
+import controllers.nonsipp.benefitssurrendered.routes
+import controllers.nonsipp.memberpayments.BenefitsSurrenderedController._
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import pages.nonsipp.BenefitsSurrenderedPage
+import pages.nonsipp.memberpayments.BenefitsSurrenderedPage
 import views.html.YesNoPageView
 
 class BenefitsSurrenderedControllerSpec extends ControllerBaseSpec {
@@ -44,7 +45,7 @@ class BenefitsSurrenderedControllerSpec extends ControllerBaseSpec {
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
-    act.like(saveAndContinue(onSubmit, "value" -> "true"))
+    act.like(saveAndContinue(onSubmit, "surrenderMade", "value" -> "true"))
 
     act.like(invalidForm(onSubmit))
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
