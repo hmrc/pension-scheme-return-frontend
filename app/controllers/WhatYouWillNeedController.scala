@@ -20,16 +20,18 @@ import controllers.actions._
 import models.NormalMode
 import models.SchemeId.Srn
 import navigation.Navigator
-import pages.StartPage
+import pages.WhatYouWillNeedPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.DisplayMessage.{ListMessage, ListType, Message, ParagraphMessage}
+import viewmodels.implicits._
 import viewmodels.models.{ContentPageViewModel, FormPageViewModel}
 import views.html.ContentPageView
 
 import javax.inject.{Inject, Named}
 
-class StartPageController @Inject()(
+class WhatYouWillNeedController @Inject()(
   override val messagesApi: MessagesApi,
   @Named("root") navigator: Navigator,
   identify: IdentifierAction,
@@ -42,26 +44,34 @@ class StartPageController @Inject()(
     with I18nSupport {
 
   def onPageLoad(srn: Srn): Action[AnyContent] = identify.andThen(allowAccess(srn)) { implicit request =>
-    Ok(view(StartPageController.viewModel(srn)))
+    Ok(view(WhatYouWillNeedController.viewModel(srn)))
   }
 
   def onSubmit(srn: Srn): Action[AnyContent] = identify.andThen(allowAccess(srn)).andThen(getData).andThen(createData) {
     implicit request =>
-      Redirect(navigator.nextPage(StartPage(srn), NormalMode, request.userAnswers))
+      Redirect(navigator.nextPage(WhatYouWillNeedPage(srn), NormalMode, request.userAnswers))
   }
 }
 
-object StartPageController {
+object WhatYouWillNeedController {
 
-  def viewModel(srn: Srn): FormPageViewModel[ContentPageViewModel] = ContentPageViewModel.startPage(
-    "startPage.title",
-    "startPage.heading",
-    List(
-      "startPage.paragraph1",
-      "startPage.paragraph2",
-      "startPage.paragraph3"
-    ),
-    routes.StartPageController.onSubmit(srn)
-  )
-
+  def viewModel(srn: Srn): FormPageViewModel[ContentPageViewModel] =
+    FormPageViewModel(
+      Message("whatYouWillNeed.title"),
+      Message("whatYouWillNeed.heading"),
+      ContentPageViewModel(isStartButton = true, isLargeHeading = false),
+      routes.WhatYouWillNeedController.onSubmit(srn)
+    ).withButtonText(Message("site.continue"))
+      .withDescription(
+        ParagraphMessage("whatYouWillNeed.paragraph") ++
+          ListMessage(
+            ListType.Bullet,
+            "whatYouWillNeed.listItem1",
+            "whatYouWillNeed.listItem2",
+            "whatYouWillNeed.listItem3",
+            "whatYouWillNeed.listItem4"
+          ) ++
+          ParagraphMessage("whatYouWillNeed.paragraph1") ++
+          ParagraphMessage("whatYouWillNeed.paragraph2")
+      )
 }

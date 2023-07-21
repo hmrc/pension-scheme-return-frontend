@@ -125,6 +125,7 @@ object PensionSchemeMembersController {
           "pensionSchemeMembers.description.name",
           "pensionSchemeMembers.description.dob",
           "pensionSchemeMembers.description.nino"
-        )
+        ) ++
+        ParagraphMessage("pensionSchemeMembers.description1")
     )
 }

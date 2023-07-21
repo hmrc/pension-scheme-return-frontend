@@ -29,7 +29,7 @@ class RootNavigator @Inject()() extends Navigator {
   val journeys: List[JourneyNavigator] =
     List(new JourneyNavigator {
       override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = _ => {
-        case StartPage(srn) => routes.WhichTaxYearController.onPageLoad(srn, NormalMode)
+        case WhatYouWillNeedPage(srn) => routes.WhichTaxYearController.onPageLoad(srn, NormalMode)
       }
 
       override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty
