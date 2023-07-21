@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp
+package controllers.nonsipp.schemedesignatory
 
 import cats.implicits.toShow
 import cats.{Id, Monad}
@@ -27,7 +27,7 @@ import models.SchemeId.Srn
 import models.requests.DataRequest
 import models.{DateRange, Mode, Money}
 import navigation.Navigator
-import pages.nonsipp.ValueOfAssetsPage
+import pages.nonsipp.schemeDesignatory.ValueOfAssetsPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}

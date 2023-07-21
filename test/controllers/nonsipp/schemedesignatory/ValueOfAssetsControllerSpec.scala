@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp
+package controllers.nonsipp.schemedesignatory
 
 import controllers.ControllerBaseSpec
 import forms.MoneyFormProvider
 import models.{DateRange, Money, NormalMode}
 import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.ValueOfAssetsPage
+import pages.nonsipp.schemeDesignatory.ValueOfAssetsPage
 import play.api.inject.bind
 import services.SchemeDateService
 import utils.Transform.TransformOps
@@ -73,7 +73,7 @@ class ValueOfAssetsControllerSpec extends ControllerBaseSpec {
         .before(setSchemeDate(None))
     )
 
-    act.like(saveAndContinue(onSubmit, formData(form, moneyInPeriodData.from[(Money, Money)]): _*))
+    act.like(saveAndContinue(onSubmit, "totalAssetValue", formData(form, moneyInPeriodData.from[(Money, Money)]): _*))
 
     act.like(invalidForm(onSubmit))
 

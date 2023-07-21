@@ -116,11 +116,11 @@ POST        /:srn/no-ni-number/:index                   controllers.nonsipp.memb
 GET         /:srn/change-no-ni-number/:index            controllers.nonsipp.memberdetails.NoNINOController.onPageLoad(srn: Srn, index: Max300, mode: Mode = CheckMode)
 POST        /:srn/change-no-ni-number/:index            controllers.nonsipp.memberdetails.NoNINOController.onSubmit(srn: Srn, index: Max300, mode: Mode = CheckMode)
 
-GET         /:srn/value-of-assets-and-cash               controllers.nonsipp.ValueOfAssetsController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST        /:srn/value-of-assets-and-cash               controllers.nonsipp.ValueOfAssetsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/value-of-assets-and-cash               controllers.nonsipp.schemedesignatory.ValueOfAssetsController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/value-of-assets-and-cash               controllers.nonsipp.schemedesignatory.ValueOfAssetsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 
-GET         /:srn/change-value-of-assets-and-cash        controllers.nonsipp.ValueOfAssetsController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST        /:srn/change-value-of-assets-and-cash        controllers.nonsipp.ValueOfAssetsController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+GET         /:srn/change-value-of-assets-and-cash        controllers.nonsipp.schemedesignatory.ValueOfAssetsController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-value-of-assets-and-cash        controllers.nonsipp.schemedesignatory.ValueOfAssetsController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
 GET        /:srn/members                             controllers.nonsipp.memberdetails.SchemeMembersListController.onPageLoad(srn: Srn, page: Int = 1, manualOrUpload: ManualOrUpload = Manual, mode: Mode = NormalMode)
 GET        /:srn/members/:page                       controllers.nonsipp.memberdetails.SchemeMembersListController.onPageLoad(srn: Srn, page: Int, manualOrUpload: ManualOrUpload = Manual, mode: Mode = NormalMode)

@@ -25,7 +25,7 @@ import models.{NormalMode, UserAnswers}
 import navigation.{JourneyNavigator, Navigator}
 import pages.Page
 import pages.nonsipp._
-import pages.nonsipp.schemeDesignatory.HowManyMembersPage
+import pages.nonsipp.schemeDesignatory.{HowManyMembersPage, ValueOfAssetsPage}
 import play.api.mvc.Call
 
 import javax.inject.Inject
@@ -45,7 +45,7 @@ class NonSippNavigator @Inject()() extends Navigator {
           nonsipp.accountingperiod.routes.AccountingPeriodController.onPageLoad(srn, refineMV(1), NormalMode)
         }
 
-      case HowMuchCashPage(srn) => routes.ValueOfAssetsController.onPageLoad(srn, NormalMode)
+      case HowMuchCashPage(srn) => nonsipp.schemedesignatory.routes.ValueOfAssetsController.onPageLoad(srn, NormalMode)
       case ValueOfAssetsPage(srn) => nonsipp.memberdetails.routes.PensionSchemeMembersController.onPageLoad(srn)
 
       case page @ HowManyMembersPage(srn, PsaId(_)) =>

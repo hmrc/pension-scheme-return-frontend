@@ -18,7 +18,7 @@ package pages
 
 import models.MoneyInPeriod
 import pages.behaviours.PageBehaviours
-import pages.nonsipp.ValueOfAssetsPage
+import pages.nonsipp.schemeDesignatory.ValueOfAssetsPage
 
 class ValueOfAssetsPageSpec extends PageBehaviours {
 
