@@ -20,6 +20,8 @@ import javax.inject.Inject
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.DisplayMessage.{LinkMessage, Message}
+import viewmodels.models.{ContentPageViewModel, FormPageViewModel}
 import views.html.UnauthorisedView
 
 class UnauthorisedController @Inject()(
@@ -31,4 +33,21 @@ class UnauthorisedController @Inject()(
   def onPageLoad: Action[AnyContent] = Action { implicit request =>
     Ok(view())
   }
+}
+
+object UnauthorisedController {
+
+  def viewModel(): FormPageViewModel[ContentPageViewModel] =
+    FormPageViewModel(
+      Message("unauthorised.title"),
+      Message("unauthorised.heading"),
+      ContentPageViewModel(isLargeHeading = false),
+      routes.UnauthorisedController.onPageLoad()
+    ).withDescription(
+      Message("unauthorised.paragraph") ++
+        LinkMessage(
+          Message("unauthorised.linkMessage"),
+          "https://www.gov.uk/government/organisations/hm-revenue-customs/contact/pension-scheme-enquiries"
+        )
+    )
 }
