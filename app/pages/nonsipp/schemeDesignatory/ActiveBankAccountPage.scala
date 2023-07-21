@@ -14,19 +14,24 @@
  * limitations under the License.
  */
 
-package pages
+package pages.nonsipp.schemeDesignatory
 
-import pages.behaviours.PageBehaviours
-import pages.nonsipp.schemeDesignatory.WhyNoBankAccountPage
+import models.SchemeId.Srn
+import models.UserAnswers
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-class WhyNoBankAccountPageSpec extends PageBehaviours {
+import scala.util.{Success, Try}
 
-  "WhyNoBankAccountPage" - {
+case class ActiveBankAccountPage(srn: Srn) extends QuestionPage[Boolean] {
 
-    beRetrievable[String](WhyNoBankAccountPage(srnGen.sample.value))
+  override def path: JsPath = SchemeDesignatoryPage.path \ toString
 
-    beSettable[String](WhyNoBankAccountPage(srnGen.sample.value))
+  override def toString: String = "openBankAccount"
 
-    beRemovable[String](WhyNoBankAccountPage(srnGen.sample.value))
-  }
+  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
+    value match {
+      case Some(true) => userAnswers.remove(WhyNoBankAccountPage(srn))
+      case _ => Success(userAnswers)
+    }
 }

@@ -27,7 +27,7 @@ import models.requests.DataRequest
 import models.{DateRange, Mode, SchemeDetails, SchemeMemberNumbers}
 import navigation.Navigator
 import pages.nonsipp.accountingperiod.AccountingPeriods
-import pages.nonsipp.bankaccount.{ActiveBankAccountPage, WhyNoBankAccountPage}
+import pages.nonsipp.schemeDesignatory.{ActiveBankAccountPage, WhyNoBankAccountPage}
 import pages.nonsipp.{BasicDetailsCheckYourAnswersPage, HowManyMembersPage, WhichTaxYearPage}
 import play.api.i18n._
 import play.api.libs.json.Reads

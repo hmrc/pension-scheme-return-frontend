@@ -21,7 +21,7 @@ import controllers.nonsipp.routes
 import models.{CheckMode, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.bankaccount.{ActiveBankAccountPage, WhyNoBankAccountPage}
+import pages.nonsipp.schemeDesignatory.{ActiveBankAccountPage, WhyNoBankAccountPage}
 import play.api.mvc.Call
 
 object BankAccountNavigator extends JourneyNavigator {

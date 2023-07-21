@@ -21,7 +21,7 @@ import controllers.ControllerBaseSpec
 import controllers.nonsipp.bankaccount.routes
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import pages.nonsipp.bankaccount.ActiveBankAccountPage
+import pages.nonsipp.schemeDesignatory.ActiveBankAccountPage
 import views.html.YesNoPageView
 
 class ActiveBankAccountControllerSpec extends ControllerBaseSpec {
@@ -49,7 +49,7 @@ class ActiveBankAccountControllerSpec extends ControllerBaseSpec {
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
-    act.like(saveAndContinue(onSubmit, "value" -> "true"))
+    act.like(saveAndContinue(onSubmit, "schemeDesignatory\":{\"openBankAccount", "value" -> "true"))
 
     act.like(invalidForm(onSubmit))
 

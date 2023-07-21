@@ -21,7 +21,7 @@ import controllers.ControllerBaseSpec
 import controllers.nonsipp.bankaccount.routes
 import forms.TextFormProvider
 import models.NormalMode
-import pages.nonsipp.bankaccount.WhyNoBankAccountPage
+import pages.nonsipp.schemeDesignatory.WhyNoBankAccountPage
 import views.html.TextAreaView
 
 class WhyNoBankAccountControllerSpec extends ControllerBaseSpec {
@@ -44,7 +44,7 @@ class WhyNoBankAccountControllerSpec extends ControllerBaseSpec {
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
-    act.like(saveAndContinue(onSubmit, "value" -> "test text"))
+    act.like(saveAndContinue(onSubmit, "reasonNoOpenAccount", "value" -> "test text"))
 
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
 
