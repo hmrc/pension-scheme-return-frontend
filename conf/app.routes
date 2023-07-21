@@ -150,11 +150,11 @@ POST       /:srn/member-contributions               controllers.nonsipp.memberco
 GET        /:srn/change-member-contributions        controllers.nonsipp.membercontributions.MemberContributionsController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST       /:srn/change-member-contributions        controllers.nonsipp.membercontributions.MemberContributionsController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
-GET        /:srn/employer-contributions               controllers.nonsipp.employercontributions.EmployerContributionsController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST       /:srn/employer-contributions               controllers.nonsipp.employercontributions.EmployerContributionsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/employer-contributions               controllers.nonsipp.memberpayments.EmployerContributionsController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST       /:srn/employer-contributions               controllers.nonsipp.memberpayments.EmployerContributionsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 
-GET        /:srn/change-employer-contributions        controllers.nonsipp.employercontributions.EmployerContributionsController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST       /:srn/change-employer-contributions        controllers.nonsipp.employercontributions.EmployerContributionsController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+GET        /:srn/change-employer-contributions        controllers.nonsipp.memberpayments.EmployerContributionsController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST       /:srn/change-employer-contributions        controllers.nonsipp.memberpayments.EmployerContributionsController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
 GET        /:srn/transfer-received               controllers.nonsipp.receivetransfer.DidSchemeReceiveTransferController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST       /:srn/transfer-received               controllers.nonsipp.receivetransfer.DidSchemeReceiveTransferController.onSubmit(srn: Srn, mode: Mode = NormalMode)

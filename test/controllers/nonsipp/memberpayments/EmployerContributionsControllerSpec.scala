@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.employercontributions
+package controllers.nonsipp.memberpayments
 
-import EmployerContributionsController.viewModel
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.employercontributions.routes
+import EmployerContributionsController.viewModel
+import controllers.nonsipp.memberpayments.routes
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import pages.nonsipp.employercontributions.EmployerContributionsPage
+import pages.nonsipp.memberpayments.EmployerContributionsPage
 import views.html.YesNoPageView
 
 class EmployerContributionsControllerSpec extends ControllerBaseSpec {
@@ -50,7 +50,7 @@ class EmployerContributionsControllerSpec extends ControllerBaseSpec {
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
-    act.like(saveAndContinue(onSubmit, "value" -> "true"))
+    act.like(saveAndContinue(onSubmit, "employerContributionMade", "value" -> "true"))
 
     act.like(invalidForm(onSubmit))
 

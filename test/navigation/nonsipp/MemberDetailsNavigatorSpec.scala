@@ -18,7 +18,7 @@ package navigation.nonsipp
 
 import config.Refined.OneTo300
 import controllers.TestValues
-import controllers.nonsipp.employercontributions
+import controllers.nonsipp.memberpayments
 import controllers.nonsipp.memberdetails.routes
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.refineMV
@@ -135,7 +135,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             nameDobGen,
             IndexGen[OneTo300](min = 1, max = 300),
             routes.MemberDetailsController.onPageLoad,
-            employercontributions.routes.EmployerContributionsController.onPageLoad
+            memberpayments.routes.EmployerContributionsController.onPageLoad
           )
           .withName(
             "go from scheme members list page to member details page when yes selected during the manual journey"
@@ -161,7 +161,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         normalmode
           .navigateTo(
             SchemeMembersListPage(_, addMember = false, Manual),
-            employercontributions.routes.EmployerContributionsController.onPageLoad
+            memberpayments.routes.EmployerContributionsController.onPageLoad
           )
           .withName(
             "go from scheme members list page to employer contributions page when no selected during the manual journey"
@@ -172,7 +172,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         normalmode
           .navigateTo(
             SchemeMembersListPage(_, addMember = false, Upload),
-            employercontributions.routes.EmployerContributionsController.onPageLoad
+            memberpayments.routes.EmployerContributionsController.onPageLoad
           )
           .withName(
             "go from scheme members list page to employer contributions page when no selected during the upload journey"

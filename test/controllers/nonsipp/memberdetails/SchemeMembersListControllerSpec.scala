@@ -19,7 +19,7 @@ package controllers.nonsipp.memberdetails
 import config.Refined.OneTo300
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.memberdetails.SchemeMembersListController._
-import controllers.nonsipp.employercontributions
+import controllers.nonsipp.memberpayments
 import eu.timepit.refined._
 import forms.YesNoPageFormProvider
 import models.ManualOrUpload.{Manual, Upload}
@@ -78,7 +78,7 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
         act.like(
           redirectToPage(
             onSubmitManual,
-            employercontributions.routes.EmployerContributionsController.onPageLoad(srn, NormalMode),
+            memberpayments.routes.EmployerContributionsController.onPageLoad(srn, NormalMode),
             userAnswersWith300MembersDetails
           )
         )
@@ -124,7 +124,7 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
         act.like(
           redirectToPage(
             onSubmitUpload,
-            employercontributions.routes.EmployerContributionsController.onPageLoad(srn, NormalMode),
+            memberpayments.routes.EmployerContributionsController.onPageLoad(srn, NormalMode),
             userAnswersWith300MembersDetails
           )
         )
