@@ -227,7 +227,7 @@ object BasicDetailsCheckYourAnswersController {
             schemeDetails.schemeName,
             taxEndDate(taxYearOrAccountingPeriods).show
           ),
-          schemeMemberNumbers.active.toString
+          schemeMemberNumbers.noOfActiveMembers.toString
         ).withChangeAction(
             controllers.nonsipp.schemedesignatory.routes.HowManyMembersController.onPageLoad(srn, mode).url,
             hidden = Message(
@@ -242,7 +242,7 @@ object BasicDetailsCheckYourAnswersController {
             schemeDetails.schemeName,
             taxEndDate(taxYearOrAccountingPeriods).show
           ),
-          schemeMemberNumbers.deferred.toString
+          schemeMemberNumbers.noOfDeferredMembers.toString
         ).withChangeAction(
             controllers.nonsipp.schemedesignatory.routes.HowManyMembersController.onPageLoad(srn, mode).url,
             hidden = Message(
@@ -257,7 +257,7 @@ object BasicDetailsCheckYourAnswersController {
             schemeDetails.schemeName,
             taxEndDate(taxYearOrAccountingPeriods).show
           ),
-          schemeMemberNumbers.pensioner.toString
+          schemeMemberNumbers.noOfPensionerMembers.toString
         ).withChangeAction(
             controllers.nonsipp.schemedesignatory.routes.HowManyMembersController.onPageLoad(srn, mode).url,
             hidden = Message(

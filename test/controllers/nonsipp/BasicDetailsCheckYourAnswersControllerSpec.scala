@@ -175,9 +175,11 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec {
         vm.page.sections.flatMap(_.rows.map(_.key.key)) must contain(
           "basicDetailsCheckYourAnswersController.memberDetails.pensionerMembers"
         )
-        vm.page.sections.flatMap(_.rows.map(_.value.key)) must contain(schemeMemberNumbers.active.toString)
-        vm.page.sections.flatMap(_.rows.map(_.value.key)) must contain(schemeMemberNumbers.deferred.toString)
-        vm.page.sections.flatMap(_.rows.map(_.value.key)) must contain(schemeMemberNumbers.pensioner.toString)
+        vm.page.sections.flatMap(_.rows.map(_.value.key)) must contain(schemeMemberNumbers.noOfActiveMembers.toString)
+        vm.page.sections.flatMap(_.rows.map(_.value.key)) must contain(schemeMemberNumbers.noOfDeferredMembers.toString)
+        vm.page.sections.flatMap(_.rows.map(_.value.key)) must contain(
+          schemeMemberNumbers.noOfPensionerMembers.toString
+        )
       }
     }
   }

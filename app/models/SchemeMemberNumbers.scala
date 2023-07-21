@@ -19,9 +19,9 @@ package models
 import play.api.libs.json.{Format, Json}
 import utils.Transform
 
-case class SchemeMemberNumbers(active: Int, deferred: Int, pensioner: Int) {
+case class SchemeMemberNumbers(noOfActiveMembers: Int, noOfDeferredMembers: Int, noOfPensionerMembers: Int) {
 
-  val total: Int = active + deferred + pensioner
+  val total: Int = noOfActiveMembers + noOfDeferredMembers + noOfPensionerMembers
 }
 
 object SchemeMemberNumbers {
@@ -35,6 +35,6 @@ object SchemeMemberNumbers {
         SchemeMemberNumbers(a._1, a._2, a._3)
 
       override def from(b: SchemeMemberNumbers): (Int, Int, Int) =
-        (b.active, b.deferred, b.pensioner)
+        (b.noOfActiveMembers, b.noOfDeferredMembers, b.noOfPensionerMembers)
     }
 }
