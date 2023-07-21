@@ -59,11 +59,11 @@ POST        /:srn/remove-accounting-period/:index               controllers.nons
 GET         /:srn/change-remove-accounting-period/:index        controllers.nonsipp.accountingperiod.RemoveAccountingPeriodController.onPageLoad(srn: Srn, index: Max3, mode: Mode = CheckMode)
 POST        /:srn/change-remove-accounting-period/:index        controllers.nonsipp.accountingperiod.RemoveAccountingPeriodController.onSubmit(srn: Srn, index: Max3, mode: Mode = CheckMode)
 
-GET         /:srn/how-much-cash               controllers.nonsipp.HowMuchCashController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST        /:srn/how-much-cash               controllers.nonsipp.HowMuchCashController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/how-much-cash               controllers.nonsipp.schemedesignatory.HowMuchCashController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/how-much-cash               controllers.nonsipp.schemedesignatory.HowMuchCashController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 
-GET         /:srn/change-how-much-cash        controllers.nonsipp.HowMuchCashController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST        /:srn/change-how-much-cash        controllers.nonsipp.HowMuchCashController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+GET         /:srn/change-how-much-cash        controllers.nonsipp.schemedesignatory.HowMuchCashController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-how-much-cash        controllers.nonsipp.schemedesignatory.HowMuchCashController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
 GET         /:srn/pension-scheme-members                controllers.nonsipp.memberdetails.PensionSchemeMembersController.onPageLoad(srn: Srn)
 POST        /:srn/pension-scheme-members                controllers.nonsipp.memberdetails.PensionSchemeMembersController.onSubmit(srn: Srn)

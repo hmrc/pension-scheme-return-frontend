@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp
+package controllers.nonsipp.schemedesignatory
 
 import controllers.ControllerBaseSpec
+import controllers.nonsipp.schemedesignatory.routes
 import forms.MoneyFormProvider
 import models.{DateRange, Money, NormalMode}
 import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.HowMuchCashPage
+import pages.nonsipp.schemeDesignatory.HowMuchCashPage
 import play.api.inject.bind
 import services.SchemeDateService
 import utils.Transform._
@@ -74,7 +75,7 @@ class HowMuchCashControllerSpec extends ControllerBaseSpec {
         .before(setSchemeDate(None))
     )
 
-    act.like(saveAndContinue(onSubmit, formData(form, moneyInPeriodData.from[(Money, Money)]): _*))
+    act.like(saveAndContinue(onSubmit, "totalCash", formData(form, moneyInPeriodData.from[(Money, Money)]): _*))
 
     act.like(invalidForm(onSubmit))
 

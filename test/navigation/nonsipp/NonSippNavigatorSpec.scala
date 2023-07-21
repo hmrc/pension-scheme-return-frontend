@@ -25,8 +25,8 @@ import eu.timepit.refined.refineMV
 import models.SchemeMemberNumbers
 import navigation.{Navigator, NavigatorBehaviours, UnknownPage}
 import org.scalacheck.Gen
-import pages.nonsipp.schemeDesignatory.{HowManyMembersPage, ValueOfAssetsPage}
-import pages.nonsipp.{CheckReturnDatesPage, HowMuchCashPage, WhichTaxYearPage}
+import pages.nonsipp.schemeDesignatory.{HowManyMembersPage, HowMuchCashPage, ValueOfAssetsPage}
+import pages.nonsipp.{CheckReturnDatesPage, WhichTaxYearPage}
 import utils.BaseSpec
 
 class NonSippNavigatorSpec extends BaseSpec with NavigatorBehaviours {

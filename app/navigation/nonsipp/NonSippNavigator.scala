@@ -25,7 +25,7 @@ import models.{NormalMode, UserAnswers}
 import navigation.{JourneyNavigator, Navigator}
 import pages.Page
 import pages.nonsipp._
-import pages.nonsipp.schemeDesignatory.{HowManyMembersPage, ValueOfAssetsPage}
+import pages.nonsipp.schemeDesignatory.{HowManyMembersPage, HowMuchCashPage, ValueOfAssetsPage}
 import play.api.mvc.Call
 
 import javax.inject.Inject

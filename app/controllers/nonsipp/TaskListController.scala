@@ -97,7 +97,7 @@ object TaskListController {
       TaskListItemViewModel(
         LinkMessage(
           Message(messageKey(prefix, "finances.title", NotStarted), schemeName),
-          controllers.nonsipp.routes.HowMuchCashController.onPageLoad(srn, NormalMode).url
+          controllers.nonsipp.schemedesignatory.routes.HowMuchCashController.onPageLoad(srn, NormalMode).url
         ),
         NotStarted
       )
