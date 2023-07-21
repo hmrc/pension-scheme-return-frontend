@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp
+package controllers.nonsipp.schemedesignatory
 
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.HowManyMembersController._
+import controllers.nonsipp.schemedesignatory.HowManyMembersController._
 import forms.IntFormProvider
 import models.{NormalMode, SchemeMemberNumbers}
 import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.HowManyMembersPage
+import pages.nonsipp.schemeDesignatory.HowManyMembersPage
 import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
 import services.SchemeDateService

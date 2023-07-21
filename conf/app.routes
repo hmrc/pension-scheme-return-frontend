@@ -104,10 +104,10 @@ GET         /:srn/change-member-details               controllers.nonsipp.member
 GET         /:srn/change-member-details/:index        controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onPageLoad(srn: Srn, index: Max300, checkOrChange: CheckOrChange = Change, mode: Mode = NormalMode)
 POST        /:srn/change-member-details/:index        controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onSubmit(srn: Srn, index: Max300, checkOrChange: CheckOrChange = Change, mode: Mode = NormalMode)
 
-GET         /:srn/how-many-members               controllers.nonsipp.HowManyMembersController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST        /:srn/how-many-members               controllers.nonsipp.HowManyMembersController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-GET         /:srn/change-how-many-members        controllers.nonsipp.HowManyMembersController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST        /:srn/change-how-many-members        controllers.nonsipp.HowManyMembersController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+GET         /:srn/how-many-members               controllers.nonsipp.schemedesignatory.HowManyMembersController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/how-many-members               controllers.nonsipp.schemedesignatory.HowManyMembersController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/change-how-many-members        controllers.nonsipp.schemedesignatory.HowManyMembersController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-how-many-members        controllers.nonsipp.schemedesignatory.HowManyMembersController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
 GET         /:srn/no-ni-number                          controllers.nonsipp.memberdetails.NoNINOController.onPageLoad(srn: Srn, index: Max300 = 1, mode: Mode = NormalMode)
 GET         /:srn/no-ni-number/:index                   controllers.nonsipp.memberdetails.NoNINOController.onPageLoad(srn: Srn, index: Max300, mode: Mode = NormalMode)

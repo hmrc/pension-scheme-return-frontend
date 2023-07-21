@@ -17,7 +17,7 @@
 package navigation.nonsipp
 
 import controllers.nonsipp.schemedesignatory
-import controllers.nonsipp.routes
+import controllers.nonsipp.schemedesignatory.routes
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.schemeDesignatory.{ActiveBankAccountPage, WhyNoBankAccountPage}

@@ -17,7 +17,7 @@
 package navigation.nonsipp
 
 import controllers.nonsipp
-import controllers.nonsipp.routes
+import controllers.nonsipp.schemedesignatory.routes
 import models.{CheckMode, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page

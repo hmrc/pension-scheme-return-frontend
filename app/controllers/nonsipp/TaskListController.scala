@@ -90,7 +90,7 @@ object TaskListController {
       TaskListItemViewModel(
         LinkMessage(
           Message(s"$prefix.details.title", schemeName),
-          controllers.nonsipp.routes.HowManyMembersController.onPageLoad(srn, NormalMode).url
+          controllers.nonsipp.schemedesignatory.routes.HowManyMembersController.onPageLoad(srn, NormalMode).url
         ),
         Completed
       ),

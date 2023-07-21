@@ -27,8 +27,8 @@ import models.requests.DataRequest
 import models.{DateRange, Mode, SchemeDetails, SchemeMemberNumbers}
 import navigation.Navigator
 import pages.nonsipp.accountingperiod.AccountingPeriods
-import pages.nonsipp.schemeDesignatory.{ActiveBankAccountPage, WhyNoBankAccountPage}
-import pages.nonsipp.{BasicDetailsCheckYourAnswersPage, HowManyMembersPage, WhichTaxYearPage}
+import pages.nonsipp.schemeDesignatory.{ActiveBankAccountPage, HowManyMembersPage, WhyNoBankAccountPage}
+import pages.nonsipp.{BasicDetailsCheckYourAnswersPage, WhichTaxYearPage}
 import play.api.i18n._
 import play.api.libs.json.Reads
 import play.api.mvc._
@@ -229,7 +229,7 @@ object BasicDetailsCheckYourAnswersController {
           ),
           schemeMemberNumbers.active.toString
         ).withChangeAction(
-            controllers.nonsipp.routes.HowManyMembersController.onPageLoad(srn, mode).url,
+            controllers.nonsipp.schemedesignatory.routes.HowManyMembersController.onPageLoad(srn, mode).url,
             hidden = Message(
               "basicDetailsCheckYourAnswersController.memberDetails.activeMembers.hidden",
               taxEndDate(taxYearOrAccountingPeriods).show
@@ -244,7 +244,7 @@ object BasicDetailsCheckYourAnswersController {
           ),
           schemeMemberNumbers.deferred.toString
         ).withChangeAction(
-            controllers.nonsipp.routes.HowManyMembersController.onPageLoad(srn, mode).url,
+            controllers.nonsipp.schemedesignatory.routes.HowManyMembersController.onPageLoad(srn, mode).url,
             hidden = Message(
               "basicDetailsCheckYourAnswersController.memberDetails.deferredMembers.hidden",
               taxEndDate(taxYearOrAccountingPeriods).show
@@ -259,7 +259,7 @@ object BasicDetailsCheckYourAnswersController {
           ),
           schemeMemberNumbers.pensioner.toString
         ).withChangeAction(
-            controllers.nonsipp.routes.HowManyMembersController.onPageLoad(srn, mode).url,
+            controllers.nonsipp.schemedesignatory.routes.HowManyMembersController.onPageLoad(srn, mode).url,
             hidden = Message(
               "basicDetailsCheckYourAnswersController.memberDetails.pensionerMembers.hidden",
               taxEndDate(taxYearOrAccountingPeriods).show

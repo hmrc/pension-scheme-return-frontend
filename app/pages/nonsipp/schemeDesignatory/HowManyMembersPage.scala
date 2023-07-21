@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages.nonsipp.schemeDesignatory
 
 import models.SchemeId.Srn
 import models.{PensionSchemeId, SchemeMemberNumbers}
@@ -23,7 +23,7 @@ import play.api.libs.json.JsPath
 
 case class HowManyMembersPage(srn: Srn, request: PensionSchemeId) extends QuestionPage[SchemeMemberNumbers] {
 
-  override def path: JsPath = JsPath \ toString
+  override def path: JsPath = SchemeDesignatoryPage.path \ toString
 
-  override def toString: String = "howManyMembers"
+  override def toString: String = "howManyMembersPage"
 }

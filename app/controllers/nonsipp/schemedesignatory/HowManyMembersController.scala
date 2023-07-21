@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp
+package controllers.nonsipp.schemedesignatory
 
 import cats.implicits.toShow
 import config.Constants.maxMembers
 import controllers.actions._
-import controllers.nonsipp.HowManyMembersController._
+import controllers.nonsipp.schemedesignatory.HowManyMembersController._
 import forms.IntFormProvider
 import forms.mappings.errors.IntFormErrors
 import models.Mode
 import models.SchemeId.Srn
 import models.requests.DataRequest
 import navigation.Navigator
-import pages.nonsipp.HowManyMembersPage
+import pages.nonsipp.schemeDesignatory.HowManyMembersPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
