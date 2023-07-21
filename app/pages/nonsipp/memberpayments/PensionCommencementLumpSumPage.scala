@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.pensioncommencementlumpsum
+package pages.nonsipp.memberpayments
 
 import models.SchemeId.Srn
 import pages.QuestionPage
@@ -22,7 +22,7 @@ import play.api.libs.json.JsPath
 
 case class PensionCommencementLumpSumPage(srn: Srn) extends QuestionPage[Boolean] {
 
-  override def path: JsPath = JsPath \ toString
+  override def path: JsPath = MemberPaymentsPage.path \ toString
 
-  override def toString: String = "pensionCommencementLumpSum"
+  override def toString: String = "lumpSumReceived"
 }

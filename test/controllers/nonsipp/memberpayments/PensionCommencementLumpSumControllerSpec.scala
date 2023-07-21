@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.pensioncommencementlumpsum
+package controllers.nonsipp.memberpayments
 
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.pensioncommencementlumpsum.PensionCommencementLumpSumController.viewModel
+import controllers.nonsipp.memberpayments.PensionCommencementLumpSumController.viewModel
+import controllers.nonsipp.memberpayments.routes
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import pages.nonsipp.pensioncommencementlumpsum.PensionCommencementLumpSumPage
+import pages.nonsipp.memberpayments.PensionCommencementLumpSumPage
 import views.html.YesNoPageView
 
 class PensionCommencementLumpSumControllerSpec extends ControllerBaseSpec {
@@ -48,7 +49,7 @@ class PensionCommencementLumpSumControllerSpec extends ControllerBaseSpec {
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit " + _))
 
-    act.like(saveAndContinue(onSubmit, "value" -> "true"))
+    act.like(saveAndContinue(onSubmit, "lumpSumReceived", "value" -> "true"))
 
     act.like(invalidForm(onSubmit))
   }

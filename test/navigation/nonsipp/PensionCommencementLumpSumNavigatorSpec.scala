@@ -20,7 +20,7 @@ import controllers.routes
 import models.NormalMode
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.pensioncommencementlumpsum.PensionCommencementLumpSumPage
+import pages.nonsipp.memberpayments.PensionCommencementLumpSumPage
 import utils.BaseSpec
 
 class PensionCommencementLumpSumNavigatorSpec extends BaseSpec with NavigatorBehaviours {

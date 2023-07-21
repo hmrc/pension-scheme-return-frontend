@@ -187,10 +187,10 @@ POST       /:srn/shares-in-sponsoring-employer               controllers.nonsipp
 GET        /:srn/change-shares-in-sponsoring-employer        controllers.nonsipp.sharesinsponsoringemployer.DidSchemeHoldSharesInSponsoringEmployerController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST       /:srn/change-shares-in-sponsoring-employer        controllers.nonsipp.sharesinsponsoringemployer.DidSchemeHoldSharesInSponsoringEmployerController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
-GET        /:srn/pension-commencement-lump-sum               controllers.nonsipp.pensioncommencementlumpsum.PensionCommencementLumpSumController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST       /:srn/pension-commencement-lump-sum               controllers.nonsipp.pensioncommencementlumpsum.PensionCommencementLumpSumController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-GET        /:srn/change-pension-commencement-lump-sum        controllers.nonsipp.pensioncommencementlumpsum.PensionCommencementLumpSumController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST       /:srn/change-pension-commencement-lump-sum        controllers.nonsipp.pensioncommencementlumpsum.PensionCommencementLumpSumController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+GET        /:srn/pension-commencement-lump-sum               controllers.nonsipp.memberpayments.PensionCommencementLumpSumController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST       /:srn/pension-commencement-lump-sum               controllers.nonsipp.memberpayments.PensionCommencementLumpSumController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/change-pension-commencement-lump-sum        controllers.nonsipp.memberpayments.PensionCommencementLumpSumController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST       /:srn/change-pension-commencement-lump-sum        controllers.nonsipp.memberpayments.PensionCommencementLumpSumController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
 GET        /:srn/fees-commissions-wages-salaries               controllers.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST       /:srn/fees-commissions-wages-salaries               controllers.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesController.onSubmit(srn: Srn, mode: Mode = NormalMode)

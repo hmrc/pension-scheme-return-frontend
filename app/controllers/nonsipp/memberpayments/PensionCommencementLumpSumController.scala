@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.pensioncommencementlumpsum
+package controllers.nonsipp.memberpayments
 
 import controllers.actions._
-import controllers.nonsipp.pensioncommencementlumpsum.PensionCommencementLumpSumController.viewModel
+import controllers.nonsipp.memberpayments.PensionCommencementLumpSumController.viewModel
 import forms.YesNoPageFormProvider
 import models.Mode
 import models.SchemeId.Srn
 import navigation.Navigator
-import pages.nonsipp.pensioncommencementlumpsum.PensionCommencementLumpSumPage
+import pages.nonsipp.memberpayments.PensionCommencementLumpSumPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}

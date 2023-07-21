@@ -168,7 +168,7 @@ object TaskListController {
       TaskListItemViewModel(
         LinkMessage(
           messageKey(prefix, "pcls.title", UnableToStart),
-          controllers.nonsipp.pensioncommencementlumpsum.routes.PensionCommencementLumpSumController
+          controllers.nonsipp.memberpayments.routes.PensionCommencementLumpSumController
             .onPageLoad(srn, NormalMode)
             .url
         ),
