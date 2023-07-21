@@ -20,7 +20,7 @@ import controllers.nonsipp.transferout
 import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.receivetransfer.DidSchemeReceiveTransferPage
+import pages.nonsipp.memberpayments.DidSchemeReceiveTransferPage
 import play.api.mvc.Call
 
 object ReceiveTransferNavigator extends JourneyNavigator {

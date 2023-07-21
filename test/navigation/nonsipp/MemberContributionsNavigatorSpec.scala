@@ -16,7 +16,7 @@
 
 package navigation.nonsipp
 
-import controllers.nonsipp.receivetransfer
+import controllers.nonsipp.memberpayments
 import navigation.{Navigator, NavigatorBehaviours}
 import pages.nonsipp.memberpayments.MemberContributionsPage
 import utils.BaseSpec
@@ -31,7 +31,7 @@ class MemberContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviours
       normalmode
         .navigateTo(
           MemberContributionsPage,
-          receivetransfer.routes.DidSchemeReceiveTransferController.onPageLoad
+          memberpayments.routes.DidSchemeReceiveTransferController.onPageLoad
         )
         .withName("go from member contributions page to receive transfer page")
     )

@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.receivetransfer
+package controllers.nonsipp.memberpayments
 
 import controllers.actions._
-import controllers.nonsipp.receivetransfer.DidSchemeReceiveTransferController._
+import controllers.nonsipp.memberpayments.DidSchemeReceiveTransferController._
 import forms.YesNoPageFormProvider
 import models.Mode
 import models.SchemeId.Srn
 import navigation.Navigator
-import pages.nonsipp.receivetransfer.DidSchemeReceiveTransferPage
+import pages.nonsipp.memberpayments.DidSchemeReceiveTransferPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}

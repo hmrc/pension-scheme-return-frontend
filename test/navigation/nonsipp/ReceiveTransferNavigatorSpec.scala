@@ -20,7 +20,7 @@ import controllers.nonsipp.transferout
 import controllers.routes
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.receivetransfer.DidSchemeReceiveTransferPage
+import pages.nonsipp.memberpayments.DidSchemeReceiveTransferPage
 import utils.BaseSpec
 
 class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
