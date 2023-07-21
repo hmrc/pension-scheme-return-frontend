@@ -90,7 +90,6 @@ object FeesCommissionsWagesSalariesController {
         form,
         QuestionField.input(Empty, Some("feesCommissionsWagesSalaries.hint"))
       ),
-      routes.ValueOfAssetsController.onSubmit(srn, mode)
-      // routes.FeesCommissionsWagesSalariesController.onSubmit(srn, mode)
+      routes.FeesCommissionsWagesSalariesController.onSubmit(srn, mode)
     )
 }
