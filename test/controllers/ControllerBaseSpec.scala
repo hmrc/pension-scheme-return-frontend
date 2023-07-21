@@ -121,6 +121,8 @@ trait TestValues { _: OptionValues =>
   val defaultUserAnswers: UserAnswers =
     UserAnswers(userAnswersId, SensitiveJsObject(Json.obj("non" -> "empty")))
 
+  val defaultExpectedData: String = ""
+
   val dateRange: DateRange = DateRange(
     from = LocalDate.of(2020, 4, 6),
     to = LocalDate.of(2021, 4, 5)

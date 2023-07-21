@@ -18,6 +18,7 @@ package controllers
 
 import models.UserAnswers
 import navigation.{FakeNavigator, Navigator}
+import org.mockito.{ArgumentCaptor, ArgumentMatchers}
 import org.mockito.ArgumentMatchers.any
 import play.api.Application
 import play.api.inject.bind
@@ -155,11 +156,17 @@ trait ControllerBehaviours {
   def redirectToPage(call: => Call, page: => Call, form: (String, String)*): BehaviourTest =
     redirectToPage(call, page, defaultUserAnswers, form: _*)
 
-  def saveAndContinue(call: => Call, userAnswers: UserAnswers, form: (String, String)*): BehaviourTest =
+  def saveAndContinue(
+    call: => Call,
+    userAnswers: UserAnswers,
+    expectedData: String,
+    form: (String, String)*
+  ): BehaviourTest =
     "save data and continue to next page".hasBehaviour {
 
       val saveService = mock[SaveService]
-      when(saveService.save(any())(any(), any())).thenReturn(Future.successful(()))
+      val userDetailsCaptor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
+      when(saveService.save(userDetailsCaptor.capture())(any(), any())).thenReturn(Future.successful(()))
 
       val appBuilder = applicationBuilder(Some(userAnswers))
         .overrides(
@@ -178,11 +185,21 @@ trait ControllerBehaviours {
         redirectLocation(result).value mustEqual testOnwardRoute.url
 
         verify(saveService, times(1)).save(any())(any(), any())
+        if (!expectedData.isEmpty) {
+          val data = userDetailsCaptor.getValue.data.decryptedValue
+          assert(data.toString().contains(expectedData))
+        }
       }
     }
 
   def saveAndContinue(call: => Call, form: (String, String)*): BehaviourTest =
-    saveAndContinue(call, defaultUserAnswers, form: _*)
+    saveAndContinue(call, defaultUserAnswers, defaultExpectedData, form: _*)
+
+  def saveAndContinue(call: => Call, userAnswers: UserAnswers, form: (String, String)*): BehaviourTest =
+    saveAndContinue(call, userAnswers, defaultExpectedData, form: _*)
+
+  def saveAndContinue(call: => Call, expectedData: String, form: (String, String)*): BehaviourTest =
+    saveAndContinue(call, defaultUserAnswers, expectedData, form: _*)
 
   def continueNoSave(call: => Call, userAnswers: UserAnswers, form: (String, String)*): BehaviourTest =
     "continue to the next page without saving".hasBehaviour {

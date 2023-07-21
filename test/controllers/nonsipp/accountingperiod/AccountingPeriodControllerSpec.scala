@@ -64,7 +64,7 @@ class AccountingPeriodControllerSpec extends ControllerBaseSpec {
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
 
     "allow accounting period to be updated" - {
-      act.like(saveAndContinue(onSubmit, userAnswers, formData(form, dateRangeData): _*))
+      act.like(saveAndContinue(onSubmit, userAnswers, "accountingPeriods", formData(form, dateRangeData): _*))
     }
 
     "return a 400 if range intersects" - {
