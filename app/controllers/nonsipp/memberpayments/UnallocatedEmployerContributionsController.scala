@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.unallocatedemployercontributions
+package controllers.nonsipp.memberpayments
 
 import controllers.actions._
-import controllers.nonsipp.unallocatedemployercontributions.UnallocatedEmployerContributionsController.viewModel
-import pages.nonsipp.unallocatedemployercontributions.UnallocatedEmployerContributionsPage
+import controllers.nonsipp.memberpayments.UnallocatedEmployerContributionsController.viewModel
 import forms.YesNoPageFormProvider
 import models.Mode
 import models.SchemeId.Srn
 import navigation.Navigator
+import pages.nonsipp.memberpayments.UnallocatedEmployerContributionsPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}

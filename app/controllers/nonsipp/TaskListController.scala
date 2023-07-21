@@ -136,7 +136,7 @@ object TaskListController {
       TaskListItemViewModel(
         LinkMessage(
           messageKey(prefix, "unallocatedcontributions.title", UnableToStart),
-          controllers.nonsipp.unallocatedemployercontributions.routes.UnallocatedEmployerContributionsController
+          controllers.nonsipp.memberpayments.routes.UnallocatedEmployerContributionsController
             .onPageLoad(srn, NormalMode)
             .url
         ),

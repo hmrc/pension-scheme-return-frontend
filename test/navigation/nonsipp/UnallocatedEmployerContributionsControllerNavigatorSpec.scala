@@ -20,7 +20,7 @@ import controllers.routes
 import controllers.nonsipp.membercontributions
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.unallocatedemployercontributions.UnallocatedEmployerContributionsPage
+import pages.nonsipp.memberpayments.UnallocatedEmployerContributionsPage
 import utils.BaseSpec
 
 class UnallocatedEmployerContributionsControllerNavigatorSpec extends BaseSpec with NavigatorBehaviours {

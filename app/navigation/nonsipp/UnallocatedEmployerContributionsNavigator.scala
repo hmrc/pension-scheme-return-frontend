@@ -21,7 +21,7 @@ import controllers.nonsipp.membercontributions
 import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.unallocatedemployercontributions.UnallocatedEmployerContributionsPage
+import pages.nonsipp.memberpayments.UnallocatedEmployerContributionsPage
 import play.api.mvc.Call
 
 object UnallocatedEmployerContributionsNavigator extends JourneyNavigator {

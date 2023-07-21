@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.unallocatedemployercontributions
+package controllers.nonsipp.memberpayments
 
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.unallocatedemployercontributions.UnallocatedEmployerContributionsController.{form, viewModel}
+import controllers.nonsipp.memberpayments.UnallocatedEmployerContributionsController.{form, viewModel}
+import controllers.nonsipp.memberpayments.routes
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import pages.nonsipp.unallocatedemployercontributions.UnallocatedEmployerContributionsPage
+import pages.nonsipp.memberpayments.UnallocatedEmployerContributionsPage
 import views.html.YesNoPageView
 
 class UnallocatedEmployerContributionsControllerSpec extends ControllerBaseSpec {
@@ -45,7 +46,7 @@ class UnallocatedEmployerContributionsControllerSpec extends ControllerBaseSpec 
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
-    act.like(saveAndContinue(onSubmit, "value" -> "true"))
+    act.like(saveAndContinue(onSubmit, "unallocatedContribsMade", "value" -> "true"))
 
     act.like(invalidForm(onSubmit))
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
