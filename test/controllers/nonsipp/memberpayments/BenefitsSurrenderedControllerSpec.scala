@@ -17,7 +17,7 @@
 package controllers.nonsipp.memberpayments
 
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.benefitssurrendered.routes
+import controllers.nonsipp.memberpayments.routes
 import controllers.nonsipp.memberpayments.BenefitsSurrenderedController._
 import forms.YesNoPageFormProvider
 import models.NormalMode
