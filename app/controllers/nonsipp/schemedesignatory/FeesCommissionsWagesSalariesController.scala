@@ -24,7 +24,7 @@ import forms.mappings.errors.MoneyFormErrors
 import models.SchemeId.Srn
 import models.{Mode, Money}
 import navigation.Navigator
-import pages.nonsipp.schemeDesignatory.FeesCommissionsWagesSalariesPage
+import pages.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}

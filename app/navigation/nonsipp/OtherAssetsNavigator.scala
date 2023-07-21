@@ -19,7 +19,7 @@ package navigation.nonsipp
 import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.schemeDesignatory.FeesCommissionsWagesSalariesPage
+import pages.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesPage
 import play.api.mvc.Call
 
 object OtherAssetsNavigator extends JourneyNavigator {

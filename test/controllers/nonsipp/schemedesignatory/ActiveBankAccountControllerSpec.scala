@@ -20,7 +20,7 @@ import controllers.ControllerBaseSpec
 import controllers.nonsipp.schemedesignatory.ActiveBankAccountController._
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import pages.nonsipp.schemeDesignatory.ActiveBankAccountPage
+import pages.nonsipp.schemedesignatory.ActiveBankAccountPage
 import views.html.YesNoPageView
 
 class ActiveBankAccountControllerSpec extends ControllerBaseSpec {

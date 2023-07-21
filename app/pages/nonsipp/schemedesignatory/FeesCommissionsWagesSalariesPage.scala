@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.schemeDesignatory
+package pages.nonsipp.schemedesignatory
 
-import models.MoneyInPeriod
+import models.Money
 import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case class ValueOfAssetsPage(srn: Srn) extends QuestionPage[MoneyInPeriod] {
+case class FeesCommissionsWagesSalariesPage(srn: Srn) extends QuestionPage[Money] {
   override def path: JsPath = SchemeDesignatoryPage.path \ toString
 
-  override def toString: String = "totalAssetValue"
+  override def toString: String = "totalPayments"
 }

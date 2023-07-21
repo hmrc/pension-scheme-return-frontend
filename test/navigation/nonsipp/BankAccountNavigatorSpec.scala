@@ -20,7 +20,7 @@ import controllers.nonsipp.schemedesignatory
 import controllers.nonsipp.schemedesignatory.routes
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.schemeDesignatory.{ActiveBankAccountPage, WhyNoBankAccountPage}
+import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, WhyNoBankAccountPage}
 import utils.BaseSpec
 
 class BankAccountNavigatorSpec extends BaseSpec with NavigatorBehaviours {

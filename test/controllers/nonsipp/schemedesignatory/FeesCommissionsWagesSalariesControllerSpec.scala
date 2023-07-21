@@ -20,7 +20,7 @@ import controllers.ControllerBaseSpec
 import controllers.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesController._
 import forms.MoneyFormProvider
 import models.NormalMode
-import pages.nonsipp.schemeDesignatory.FeesCommissionsWagesSalariesPage
+import pages.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesPage
 import play.api.Application
 import views.html.MoneyView
 

@@ -21,7 +21,7 @@ import org.scalacheck.Arbitrary
 import pages._
 import pages.nonsipp.CheckReturnDatesPage
 import pages.nonsipp.accountingperiod.AccountingPeriodPage
-import pages.nonsipp.schemeDesignatory.HowMuchCashPage
+import pages.nonsipp.schemedesignatory.HowMuchCashPage
 
 trait PageGenerators {
 

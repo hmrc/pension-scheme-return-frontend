@@ -20,7 +20,7 @@ import controllers.ControllerBaseSpec
 import controllers.nonsipp.schemedesignatory.WhyNoBankAccountController.{form, viewModel}
 import forms.TextFormProvider
 import models.NormalMode
-import pages.nonsipp.schemeDesignatory.WhyNoBankAccountPage
+import pages.nonsipp.schemedesignatory.WhyNoBankAccountPage
 import views.html.TextAreaView
 
 class WhyNoBankAccountControllerSpec extends ControllerBaseSpec {

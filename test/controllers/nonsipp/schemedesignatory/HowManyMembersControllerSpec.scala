@@ -21,7 +21,7 @@ import controllers.nonsipp.schemedesignatory.HowManyMembersController._
 import forms.IntFormProvider
 import models.{NormalMode, SchemeMemberNumbers}
 import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.schemeDesignatory.HowManyMembersPage
+import pages.nonsipp.schemedesignatory.HowManyMembersPage
 import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
 import services.SchemeDateService

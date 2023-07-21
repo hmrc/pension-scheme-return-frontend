@@ -20,7 +20,7 @@ import controllers.ControllerBaseSpec
 import forms.MoneyFormProvider
 import models.{DateRange, Money, NormalMode}
 import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.schemeDesignatory.ValueOfAssetsPage
+import pages.nonsipp.schemedesignatory.ValueOfAssetsPage
 import play.api.inject.bind
 import services.SchemeDateService
 import utils.Transform.TransformOps

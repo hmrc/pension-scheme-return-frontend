@@ -21,7 +21,7 @@ import controllers.nonsipp.schemedesignatory.routes
 import forms.MoneyFormProvider
 import models.{DateRange, Money, NormalMode}
 import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.schemeDesignatory.HowMuchCashPage
+import pages.nonsipp.schemedesignatory.HowMuchCashPage
 import play.api.inject.bind
 import services.SchemeDateService
 import utils.Transform._

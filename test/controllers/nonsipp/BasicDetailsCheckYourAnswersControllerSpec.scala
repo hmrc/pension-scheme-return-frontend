@@ -25,7 +25,7 @@ import eu.timepit.refined.refineMV
 import models.SchemeId.Srn
 import models.{DateRange, Mode, NormalMode, SchemeDetails, SchemeMemberNumbers}
 import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.schemeDesignatory.{ActiveBankAccountPage, HowManyMembersPage}
+import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, HowManyMembersPage}
 import pages.nonsipp.WhichTaxYearPage
 import play.api.i18n.Messages
 import play.api.inject.bind

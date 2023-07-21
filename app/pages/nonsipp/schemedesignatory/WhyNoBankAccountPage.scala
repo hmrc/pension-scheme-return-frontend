@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.schemeDesignatory
+package pages.nonsipp.schemedesignatory
 
+import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case object SchemeDesignatoryPage extends QuestionPage[Nothing] {
+case class WhyNoBankAccountPage(srn: Srn) extends QuestionPage[String] {
 
-  override def path: JsPath = JsPath \ toString
+  override def path: JsPath = SchemeDesignatoryPage.path \ toString
 
-  override def toString: String = "schemeDesignatory"
+  override def toString: String = "reasonNoOpenAccount"
 }
