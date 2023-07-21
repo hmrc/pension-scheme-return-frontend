@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.transferout
+package pages.nonsipp.memberpayments
 
 import models.SchemeId.Srn
 import pages.QuestionPage
@@ -22,7 +22,7 @@ import play.api.libs.json.JsPath
 
 case class SchemeTransferOutPage(srn: Srn) extends QuestionPage[Boolean] {
 
-  override def path: JsPath = JsPath \ toString
+  override def path: JsPath = MemberPaymentsPage.path \ toString
 
-  override def toString: String = "schemeTransferOut"
+  override def toString: String = "schemeMadeTransferOut"
 }

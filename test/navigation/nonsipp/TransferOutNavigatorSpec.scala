@@ -20,7 +20,7 @@ import controllers.nonsipp.pensioncommencementlumpsum
 import controllers.routes
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.transferout.SchemeTransferOutPage
+import pages.nonsipp.memberpayments.SchemeTransferOutPage
 import utils.BaseSpec
 
 class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {

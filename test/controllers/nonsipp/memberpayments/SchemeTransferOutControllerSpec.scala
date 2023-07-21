@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.transferout
+package controllers.nonsipp.memberpayments
 
-import SchemeTransferOutController.{form, viewModel}
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.transferout.routes
+import controllers.nonsipp.memberpayments.SchemeTransferOutController.{form, viewModel}
+import controllers.nonsipp.memberpayments.routes
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import pages.nonsipp.transferout.SchemeTransferOutPage
+import pages.nonsipp.memberpayments.SchemeTransferOutPage
 import views.html.YesNoPageView
 
 class SchemeTransferOutControllerSpec extends ControllerBaseSpec {
@@ -45,7 +45,7 @@ class SchemeTransferOutControllerSpec extends ControllerBaseSpec {
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
-    act.like(saveAndContinue(onSubmit, "value" -> "true"))
+    act.like(saveAndContinue(onSubmit, "schemeMadeTransferOut", "value" -> "true"))
 
     act.like(invalidForm(onSubmit))
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))

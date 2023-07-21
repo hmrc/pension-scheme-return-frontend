@@ -161,10 +161,10 @@ POST       /:srn/transfer-received               controllers.nonsipp.memberpayme
 GET        /:srn/change-transfer-received        controllers.nonsipp.memberpayments.DidSchemeReceiveTransferController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST       /:srn/change-transfer-received        controllers.nonsipp.memberpayments.DidSchemeReceiveTransferController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
-GET        /:srn/transfer-out               controllers.nonsipp.transferout.SchemeTransferOutController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST       /:srn/transfer-out               controllers.nonsipp.transferout.SchemeTransferOutController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-GET        /:srn/change-transfer-out        controllers.nonsipp.transferout.SchemeTransferOutController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST       /:srn/change-transfer-out        controllers.nonsipp.transferout.SchemeTransferOutController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+GET        /:srn/transfer-out               controllers.nonsipp.memberpayments.SchemeTransferOutController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST       /:srn/transfer-out               controllers.nonsipp.memberpayments.SchemeTransferOutController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/change-transfer-out        controllers.nonsipp.memberpayments.SchemeTransferOutController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST       /:srn/change-transfer-out        controllers.nonsipp.memberpayments.SchemeTransferOutController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
 GET        /:srn/reason-for-no-bank-account               controllers.nonsipp.schemedesignatory.WhyNoBankAccountController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST       /:srn/reason-for-no-bank-account               controllers.nonsipp.schemedesignatory.WhyNoBankAccountController.onSubmit(srn: Srn, mode: Mode = NormalMode)

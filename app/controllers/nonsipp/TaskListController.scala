@@ -161,7 +161,7 @@ object TaskListController {
       TaskListItemViewModel(
         LinkMessage(
           messageKey(prefix, "transfersout.title", UnableToStart),
-          controllers.nonsipp.transferout.routes.SchemeTransferOutController.onPageLoad(srn, NormalMode).url
+          controllers.nonsipp.memberpayments.routes.SchemeTransferOutController.onPageLoad(srn, NormalMode).url
         ),
         UnableToStart
       ),
