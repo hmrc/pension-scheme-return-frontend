@@ -18,7 +18,7 @@ package navigation.nonsipp
 
 import controllers.routes
 import navigation.{Navigator, NavigatorBehaviours}
-import pages.nonsipp.otherassets.FeesCommissionsWagesSalariesPage
+import pages.nonsipp.schemeDesignatory.FeesCommissionsWagesSalariesPage
 import utils.BaseSpec
 
 class OtherAssetsNavigatorSpec extends BaseSpec with NavigatorBehaviours {

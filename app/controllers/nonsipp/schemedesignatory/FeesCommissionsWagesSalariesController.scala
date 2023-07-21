@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.otherassets
+package controllers.nonsipp.schemedesignatory
 
 import config.Constants.maxMoneyValue
 import controllers.actions._
-import controllers.nonsipp.otherassets.FeesCommissionsWagesSalariesController._
+import controllers.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesController._
 import forms.MoneyFormProvider
 import forms.mappings.errors.MoneyFormErrors
 import models.SchemeId.Srn
 import models.{Mode, Money}
 import navigation.Navigator
-import pages.nonsipp.otherassets.FeesCommissionsWagesSalariesPage
+import pages.nonsipp.schemeDesignatory.FeesCommissionsWagesSalariesPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -90,6 +90,7 @@ object FeesCommissionsWagesSalariesController {
         form,
         QuestionField.input(Empty, Some("feesCommissionsWagesSalaries.hint"))
       ),
-      routes.FeesCommissionsWagesSalariesController.onSubmit(srn, mode)
+      routes.ValueOfAssetsController.onSubmit(srn, mode)
+      // routes.FeesCommissionsWagesSalariesController.onSubmit(srn, mode)
     )
 }

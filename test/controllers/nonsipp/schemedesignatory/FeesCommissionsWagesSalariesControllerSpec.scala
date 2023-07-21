@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.otherassets
+package controllers.nonsipp.schemedesignatory
 
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.otherassets.FeesCommissionsWagesSalariesController._
+import controllers.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesController._
 import forms.MoneyFormProvider
 import models.NormalMode
-import pages.nonsipp.otherassets.FeesCommissionsWagesSalariesPage
+import pages.nonsipp.schemeDesignatory.FeesCommissionsWagesSalariesPage
 import play.api.Application
 import views.html.MoneyView
 
@@ -46,7 +46,7 @@ class FeesCommissionsWagesSalariesControllerSpec extends ControllerBaseSpec {
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
-    act.like(saveAndContinue(onSubmit, "value" -> s"${validMoney.value}"))
+    act.like(saveAndContinue(onSubmit, "totalPayments", "value" -> s"${validMoney.value}"))
 
     act.like(invalidForm(onSubmit))
 
