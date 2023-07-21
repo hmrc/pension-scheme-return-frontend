@@ -20,7 +20,7 @@ import controllers.nonsipp.receivetransfer
 import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.membercontributions.MemberContributionsPage
+import pages.nonsipp.memberpayments.MemberContributionsPage
 import play.api.mvc.Call
 
 object MemberContributionsNavigator extends JourneyNavigator {

@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.membercontributions
+package controllers.nonsipp.memberpayments
 
 import controllers.actions._
-import controllers.nonsipp.membercontributions.MemberContributionsController._
+import controllers.nonsipp.memberpayments.MemberContributionsController._
 import forms.YesNoPageFormProvider
 import models.Mode
 import models.SchemeId.Srn
 import navigation.Navigator
-import pages.nonsipp.membercontributions.MemberContributionsPage
+import pages.nonsipp.memberpayments.MemberContributionsPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}

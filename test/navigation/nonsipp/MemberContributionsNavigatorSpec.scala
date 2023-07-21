@@ -18,7 +18,7 @@ package navigation.nonsipp
 
 import controllers.nonsipp.receivetransfer
 import navigation.{Navigator, NavigatorBehaviours}
-import pages.nonsipp.membercontributions.MemberContributionsPage
+import pages.nonsipp.memberpayments.MemberContributionsPage
 import utils.BaseSpec
 
 class MemberContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviours {

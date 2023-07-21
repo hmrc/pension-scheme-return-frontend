@@ -145,10 +145,10 @@ POST       /:srn/did-scheme-have-bank-account               controllers.nonsipp.
 GET        /:srn/change-did-scheme-have-bank-account        controllers.nonsipp.schemedesignatory.ActiveBankAccountController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST       /:srn/change-did-scheme-have-bank-account        controllers.nonsipp.schemedesignatory.ActiveBankAccountController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
-GET        /:srn/member-contributions               controllers.nonsipp.membercontributions.MemberContributionsController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST       /:srn/member-contributions               controllers.nonsipp.membercontributions.MemberContributionsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-GET        /:srn/change-member-contributions        controllers.nonsipp.membercontributions.MemberContributionsController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST       /:srn/change-member-contributions        controllers.nonsipp.membercontributions.MemberContributionsController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+GET        /:srn/member-contributions               controllers.nonsipp.memberpayments.MemberContributionsController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST       /:srn/member-contributions               controllers.nonsipp.memberpayments.MemberContributionsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/change-member-contributions        controllers.nonsipp.memberpayments.MemberContributionsController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST       /:srn/change-member-contributions        controllers.nonsipp.memberpayments.MemberContributionsController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
 GET        /:srn/employer-contributions               controllers.nonsipp.memberpayments.EmployerContributionsController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST       /:srn/employer-contributions               controllers.nonsipp.memberpayments.EmployerContributionsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
