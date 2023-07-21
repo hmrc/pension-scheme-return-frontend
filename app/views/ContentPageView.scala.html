@@ -23,7 +23,28 @@
 
 @(viewmodel: FormPageViewModel[ContentPageViewModel])(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(viewmodel.title.toMessage)) {
+ @if(viewmodel.page.isStartButton) {
+
+   @layout(pageTitle = titleNoForm(viewmodel.title.toMessage), showBackLink = false) {
+
+        @if(viewmodel.page.isLargeHeading) {
+            <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
+        } else {
+            <h1 class="govuk-heading-xl">@renderMessage(viewmodel.heading)</h1>
+        }
+
+   @viewmodel.description.map(renderMessage)
+
+         <p class="govuk-body">
+             @govukButton(
+                ButtonViewModel(viewmodel.buttonText.toMessage).asLink(viewmodel.onSubmit.url)
+             )
+    </p>
+   }
+
+} else {
+
+        @layout(pageTitle = titleNoForm(viewmodel.title.toMessage)) {
 
             @if(viewmodel.page.isLargeHeading) {
                 <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
@@ -31,15 +52,12 @@
                 <h1 class="govuk-heading-xl">@renderMessage(viewmodel.heading)</h1>
             }
 
-    @viewmodel.description.map(renderMessage)
+        @viewmodel.description.map(renderMessage)
 
-    <p class="govuk-body">
-        @govukButton(
-            if(viewmodel.page.isStartButton)
-                ButtonViewModel(viewmodel.buttonText.toMessage).asLink(viewmodel.onSubmit.url).asStartButton()
-            else {
-                ButtonViewModel(viewmodel.buttonText.toMessage).asLink(viewmodel.onSubmit.url)
-            }
-        )
-    </p>
+            <p class="govuk-body">
+                @govukButton(
+                     ButtonViewModel(viewmodel.buttonText.toMessage).asLink(viewmodel.onSubmit.url)
+                )
+            </p>
+        }
 }
