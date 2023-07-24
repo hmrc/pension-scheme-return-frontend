@@ -22,6 +22,7 @@ import controllers.nonsipp.memberpayments.routes
 import forms.YesNoPageFormProvider
 import models.NormalMode
 import pages.nonsipp.memberpayments.PensionCommencementLumpSumPage
+import play.api.libs.json.JsPath
 import views.html.YesNoPageView
 
 class PensionCommencementLumpSumControllerSpec extends ControllerBaseSpec {
@@ -49,7 +50,7 @@ class PensionCommencementLumpSumControllerSpec extends ControllerBaseSpec {
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit " + _))
 
-    act.like(saveAndContinue(onSubmit, "lumpSumReceived", "value" -> "true"))
+    act.like(saveAndContinue(onSubmit, Some(JsPath \ "membersPayments" \ "lumpSumReceived"), "value" -> "true"))
 
     act.like(invalidForm(onSubmit))
   }

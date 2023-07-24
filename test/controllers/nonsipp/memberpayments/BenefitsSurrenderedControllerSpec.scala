@@ -17,11 +17,11 @@
 package controllers.nonsipp.memberpayments
 
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.memberpayments.routes
 import controllers.nonsipp.memberpayments.BenefitsSurrenderedController._
 import forms.YesNoPageFormProvider
 import models.NormalMode
 import pages.nonsipp.memberpayments.BenefitsSurrenderedPage
+import play.api.libs.json.JsPath
 import views.html.YesNoPageView
 
 class BenefitsSurrenderedControllerSpec extends ControllerBaseSpec {
@@ -45,7 +45,14 @@ class BenefitsSurrenderedControllerSpec extends ControllerBaseSpec {
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
-    act.like(saveAndContinue(onSubmit, "surrenderMade", "value" -> "true"))
+    act.like(
+      saveAndContinue(
+        onSubmit,
+        defaultUserAnswers,
+        Some(JsPath \ "membersPayments" \ "surrenderMade"),
+        "value" -> "true"
+      )
+    )
 
     act.like(invalidForm(onSubmit))
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))

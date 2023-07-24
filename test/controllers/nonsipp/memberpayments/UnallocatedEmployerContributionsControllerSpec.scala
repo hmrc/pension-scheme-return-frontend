@@ -22,6 +22,7 @@ import controllers.nonsipp.memberpayments.routes
 import forms.YesNoPageFormProvider
 import models.NormalMode
 import pages.nonsipp.memberpayments.UnallocatedEmployerContributionsPage
+import play.api.libs.json.JsPath
 import views.html.YesNoPageView
 
 class UnallocatedEmployerContributionsControllerSpec extends ControllerBaseSpec {
@@ -46,7 +47,7 @@ class UnallocatedEmployerContributionsControllerSpec extends ControllerBaseSpec 
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
-    act.like(saveAndContinue(onSubmit, "unallocatedContribsMade", "value" -> "true"))
+    act.like(saveAndContinue(onSubmit, Some(JsPath \ "membersPayments" \ "unallocatedContribsMade"), "value" -> "true"))
 
     act.like(invalidForm(onSubmit))
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))

@@ -18,20 +18,17 @@ package controllers
 
 import models.UserAnswers
 import navigation.{FakeNavigator, Navigator}
-import org.mockito.{ArgumentCaptor, ArgumentMatchers}
+import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import play.api.Application
 import play.api.inject.bind
 import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
-import play.api.libs.json.Writes
-import play.api.mvc.{AnyContentAsEmpty, Call, Request}
+import play.api.libs.json.{JsPath, Writes}
+import play.api.mvc.{Call, Request}
 import play.api.test.FakeRequest
 import play.twirl.api.Html
 import queries.Settable
 import services.SaveService
-
-import java.nio.charset.StandardCharsets
-import java.nio.file.{Files, Paths}
 import scala.concurrent.Future
 
 trait ControllerBehaviours {
@@ -159,7 +156,7 @@ trait ControllerBehaviours {
   def saveAndContinue(
     call: => Call,
     userAnswers: UserAnswers,
-    expectedData: String,
+    expectedDataPath: Option[JsPath],
     form: (String, String)*
   ): BehaviourTest =
     "save data and continue to next page".hasBehaviour {
@@ -185,21 +182,21 @@ trait ControllerBehaviours {
         redirectLocation(result).value mustEqual testOnwardRoute.url
 
         verify(saveService, times(1)).save(any())(any(), any())
-        if (!expectedData.isEmpty) {
+        if (expectedDataPath.nonEmpty) {
           val data = userDetailsCaptor.getValue.data.decryptedValue
-          assert(data.toString().contains(expectedData))
+          assert(expectedDataPath.get(data).nonEmpty)
         }
       }
     }
 
   def saveAndContinue(call: => Call, form: (String, String)*): BehaviourTest =
-    saveAndContinue(call, defaultUserAnswers, defaultExpectedData, form: _*)
+    saveAndContinue(call, defaultUserAnswers, defaultExpectedDataPath, form: _*)
 
   def saveAndContinue(call: => Call, userAnswers: UserAnswers, form: (String, String)*): BehaviourTest =
-    saveAndContinue(call, userAnswers, defaultExpectedData, form: _*)
+    saveAndContinue(call, userAnswers, defaultExpectedDataPath, form: _*)
 
-  def saveAndContinue(call: => Call, expectedData: String, form: (String, String)*): BehaviourTest =
-    saveAndContinue(call, defaultUserAnswers, expectedData, form: _*)
+  def saveAndContinue(call: => Call, jsPathOption: Option[JsPath], form: (String, String)*): BehaviourTest =
+    saveAndContinue(call, defaultUserAnswers, jsPathOption, form: _*)
 
   def continueNoSave(call: => Call, userAnswers: UserAnswers, form: (String, String)*): BehaviourTest =
     "continue to the next page without saving".hasBehaviour {

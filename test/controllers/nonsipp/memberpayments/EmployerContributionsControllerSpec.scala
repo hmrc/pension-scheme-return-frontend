@@ -22,6 +22,7 @@ import controllers.nonsipp.memberpayments.routes
 import forms.YesNoPageFormProvider
 import models.NormalMode
 import pages.nonsipp.memberpayments.EmployerContributionsPage
+import play.api.libs.json.JsPath
 import views.html.YesNoPageView
 
 class EmployerContributionsControllerSpec extends ControllerBaseSpec {
@@ -50,7 +51,9 @@ class EmployerContributionsControllerSpec extends ControllerBaseSpec {
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
-    act.like(saveAndContinue(onSubmit, "employerContributionMade", "value" -> "true"))
+    act.like(
+      saveAndContinue(onSubmit, Some(JsPath \ "membersPayments" \ "employerContributionMade"), "value" -> "true")
+    )
 
     act.like(invalidForm(onSubmit))
 

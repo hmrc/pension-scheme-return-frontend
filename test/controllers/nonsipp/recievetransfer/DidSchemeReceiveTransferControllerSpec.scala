@@ -22,6 +22,7 @@ import controllers.nonsipp.memberpayments.routes
 import forms.YesNoPageFormProvider
 import models.NormalMode
 import pages.nonsipp.memberpayments.DidSchemeReceiveTransferPage
+import play.api.libs.json.JsPath
 import views.html.YesNoPageView
 
 class DidSchemeReceiveTransferControllerSpec extends ControllerBaseSpec {
@@ -45,7 +46,9 @@ class DidSchemeReceiveTransferControllerSpec extends ControllerBaseSpec {
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
-    act.like(saveAndContinue(onSubmit, "schemeReceivedTransferIn", "value" -> "true"))
+    act.like(
+      saveAndContinue(onSubmit, Some(JsPath \ "membersPayments" \ "schemeReceivedTransferIn"), "value" -> "true")
+    )
 
     act.like(invalidForm(onSubmit))
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))

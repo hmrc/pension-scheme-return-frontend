@@ -18,10 +18,10 @@ package controllers.nonsipp.memberpayments
 
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.memberpayments.SchemeTransferOutController.{form, viewModel}
-import controllers.nonsipp.memberpayments.routes
 import forms.YesNoPageFormProvider
 import models.NormalMode
 import pages.nonsipp.memberpayments.SchemeTransferOutPage
+import play.api.libs.json.JsPath
 import views.html.YesNoPageView
 
 class SchemeTransferOutControllerSpec extends ControllerBaseSpec {
@@ -45,7 +45,7 @@ class SchemeTransferOutControllerSpec extends ControllerBaseSpec {
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
-    act.like(saveAndContinue(onSubmit, "schemeMadeTransferOut", "value" -> "true"))
+    act.like(saveAndContinue(onSubmit, Some(JsPath \ "membersPayments" \ "schemeMadeTransferOut"), "value" -> "true"))
 
     act.like(invalidForm(onSubmit))
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))

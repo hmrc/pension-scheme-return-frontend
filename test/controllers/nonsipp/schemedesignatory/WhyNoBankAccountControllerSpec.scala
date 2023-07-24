@@ -21,6 +21,7 @@ import controllers.nonsipp.schemedesignatory.WhyNoBankAccountController.{form, v
 import forms.TextFormProvider
 import models.NormalMode
 import pages.nonsipp.schemedesignatory.WhyNoBankAccountPage
+import play.api.libs.json.JsPath
 import views.html.TextAreaView
 
 class WhyNoBankAccountControllerSpec extends ControllerBaseSpec {
@@ -43,7 +44,9 @@ class WhyNoBankAccountControllerSpec extends ControllerBaseSpec {
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
-    act.like(saveAndContinue(onSubmit, "reasonNoOpenAccount", "value" -> "test text"))
+    act.like(
+      saveAndContinue(onSubmit, Some(JsPath \ "schemeDesignatory" \ "reasonNoOpenAccount"), "value" -> "test text")
+    )
 
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
 

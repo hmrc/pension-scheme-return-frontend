@@ -21,6 +21,7 @@ import controllers.nonsipp.schemedesignatory.ActiveBankAccountController._
 import forms.YesNoPageFormProvider
 import models.NormalMode
 import pages.nonsipp.schemedesignatory.ActiveBankAccountPage
+import play.api.libs.json.JsPath
 import views.html.YesNoPageView
 
 class ActiveBankAccountControllerSpec extends ControllerBaseSpec {
@@ -48,7 +49,7 @@ class ActiveBankAccountControllerSpec extends ControllerBaseSpec {
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
-    act.like(saveAndContinue(onSubmit, "schemeDesignatory\":{\"openBankAccount", "value" -> "true"))
+    act.like(saveAndContinue(onSubmit, Some(JsPath \ "schemeDesignatory" \ "openBankAccount"), "value" -> "true"))
 
     act.like(invalidForm(onSubmit))
 

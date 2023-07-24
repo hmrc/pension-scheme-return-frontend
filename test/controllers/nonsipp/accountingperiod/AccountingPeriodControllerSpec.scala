@@ -22,6 +22,7 @@ import forms.DateRangeFormProvider
 import models.NormalMode
 import pages.nonsipp.WhichTaxYearPage
 import pages.nonsipp.accountingperiod.AccountingPeriodPage
+import play.api.libs.json.JsPath
 import services.TaxYearService
 import views.html.DateRangeView
 
@@ -64,7 +65,9 @@ class AccountingPeriodControllerSpec extends ControllerBaseSpec {
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
 
     "allow accounting period to be updated" - {
-      act.like(saveAndContinue(onSubmit, userAnswers, "accountingPeriods", formData(form, dateRangeData): _*))
+      act.like(
+        saveAndContinue(onSubmit, userAnswers, Some(JsPath \ "accountingPeriods"), formData(form, dateRangeData): _*)
+      )
     }
 
     "return a 400 if range intersects" - {

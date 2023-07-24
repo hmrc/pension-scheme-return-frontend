@@ -22,6 +22,7 @@ import forms.MoneyFormProvider
 import models.NormalMode
 import pages.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesPage
 import play.api.Application
+import play.api.libs.json.JsPath
 import views.html.MoneyView
 
 class FeesCommissionsWagesSalariesControllerSpec extends ControllerBaseSpec {
@@ -46,7 +47,9 @@ class FeesCommissionsWagesSalariesControllerSpec extends ControllerBaseSpec {
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
-    act.like(saveAndContinue(onSubmit, "totalPayments", "value" -> s"${validMoney.value}"))
+    act.like(
+      saveAndContinue(onSubmit, Some(JsPath \ "schemeDesignatory" \ "totalPayments"), "value" -> s"${validMoney.value}")
+    )
 
     act.like(invalidForm(onSubmit))
 

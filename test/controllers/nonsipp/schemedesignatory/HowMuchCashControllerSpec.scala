@@ -23,6 +23,7 @@ import models.{DateRange, Money, NormalMode}
 import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.schemedesignatory.HowMuchCashPage
 import play.api.inject.bind
+import play.api.libs.json.JsPath
 import services.SchemeDateService
 import utils.Transform._
 import views.html.MoneyView
@@ -75,7 +76,13 @@ class HowMuchCashControllerSpec extends ControllerBaseSpec {
         .before(setSchemeDate(None))
     )
 
-    act.like(saveAndContinue(onSubmit, "totalCash", formData(form, moneyInPeriodData.from[(Money, Money)]): _*))
+    act.like(
+      saveAndContinue(
+        onSubmit,
+        Some(JsPath \ "schemeDesignatory" \ "totalCash"),
+        formData(form, moneyInPeriodData.from[(Money, Money)]): _*
+      )
+    )
 
     act.like(invalidForm(onSubmit))
 

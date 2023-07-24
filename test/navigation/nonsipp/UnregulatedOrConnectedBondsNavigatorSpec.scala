@@ -17,7 +17,6 @@
 package navigation.nonsipp
 
 import controllers.routes
-import controllers.nonsipp.receivetransfer
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldPage

@@ -22,6 +22,7 @@ import models.{DateRange, Money, NormalMode}
 import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.schemedesignatory.ValueOfAssetsPage
 import play.api.inject.bind
+import play.api.libs.json.JsPath
 import services.SchemeDateService
 import utils.Transform.TransformOps
 import views.html.MoneyView
@@ -73,7 +74,13 @@ class ValueOfAssetsControllerSpec extends ControllerBaseSpec {
         .before(setSchemeDate(None))
     )
 
-    act.like(saveAndContinue(onSubmit, "totalAssetValue", formData(form, moneyInPeriodData.from[(Money, Money)]): _*))
+    act.like(
+      saveAndContinue(
+        onSubmit,
+        Some(JsPath \ "schemeDesignatory" \ "totalAssetValue"),
+        formData(form, moneyInPeriodData.from[(Money, Money)]): _*
+      )
+    )
 
     act.like(invalidForm(onSubmit))
 

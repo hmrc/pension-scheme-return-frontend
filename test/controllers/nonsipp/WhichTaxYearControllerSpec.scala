@@ -23,6 +23,7 @@ import org.scalacheck.Gen
 import pages.nonsipp.WhichTaxYearPage
 import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
+import play.api.libs.json.JsPath
 import services.TaxYearService
 import views.html.RadioListView
 
@@ -64,7 +65,7 @@ class WhichTaxYearControllerSpec extends ControllerBaseSpec {
 
     act.like(invalidForm(onSubmit, "value" -> "invalid data"))
 
-    act.like(saveAndContinue(onSubmit, "reportDetails", "value" -> testDate.toString))
+    act.like(saveAndContinue(onSubmit, Some(JsPath \ "reportDetails"), "value" -> testDate.toString))
 
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }
