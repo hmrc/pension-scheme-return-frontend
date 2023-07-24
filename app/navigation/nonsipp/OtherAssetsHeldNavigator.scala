@@ -30,7 +30,7 @@ object OtherAssetsHeldNavigator extends JourneyNavigator {
       if (userAnswers.get(page).contains(true)) {
         routes.UnauthorisedController.onPageLoad()
       } else {
-        controllers.nonsipp.otherassets.routes.FeesCommissionsWagesSalariesController.onPageLoad(srn, NormalMode)
+        controllers.nonsipp.schemedesignatory.routes.FeesCommissionsWagesSalariesController.onPageLoad(srn, NormalMode)
       }
   }
 

@@ -16,11 +16,11 @@
 
 package navigation.nonsipp
 
-import controllers.nonsipp.transferout
+import controllers.nonsipp.memberpayments
 import controllers.routes
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.receivetransfer.DidSchemeReceiveTransferPage
+import pages.nonsipp.memberpayments.DidSchemeReceiveTransferPage
 import utils.BaseSpec
 
 class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
@@ -44,7 +44,7 @@ class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateToWithData(
           DidSchemeReceiveTransferPage,
           Gen.const(false),
-          transferout.routes.SchemeTransferOutController.onPageLoad
+          memberpayments.routes.SchemeTransferOutController.onPageLoad
         )
         .withName("go from did scheme receive transfer page to scheme transfer out page when no selected")
     )

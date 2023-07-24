@@ -17,7 +17,7 @@
 package navigation.nonsipp
 
 import config.Refined.OneTo300
-import controllers.nonsipp.employercontributions
+import controllers.nonsipp.memberpayments
 import controllers.nonsipp.memberdetails.routes
 import eu.timepit.refined.{refineMV, refineV}
 import models.CheckOrChange.Check
@@ -60,11 +60,11 @@ object MemberDetailsNavigator extends JourneyNavigator {
       routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, CheckOrChange.Check)
 
     case SchemeMembersListPage(srn, false, _) =>
-      employercontributions.routes.EmployerContributionsController.onPageLoad(srn, NormalMode)
+      memberpayments.routes.EmployerContributionsController.onPageLoad(srn, NormalMode)
 
     case SchemeMembersListPage(srn, true, Manual) =>
       refineV[OneTo300](userAnswers.membersDetails(srn).length + 1).fold(
-        _ => employercontributions.routes.EmployerContributionsController.onPageLoad(srn, NormalMode),
+        _ => memberpayments.routes.EmployerContributionsController.onPageLoad(srn, NormalMode),
         index => routes.MemberDetailsController.onPageLoad(srn, index, NormalMode)
       )
 

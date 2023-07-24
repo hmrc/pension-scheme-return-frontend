@@ -90,14 +90,14 @@ object TaskListController {
       TaskListItemViewModel(
         LinkMessage(
           Message(s"$prefix.details.title", schemeName),
-          controllers.nonsipp.routes.HowManyMembersController.onPageLoad(srn, NormalMode).url
+          controllers.nonsipp.schemedesignatory.routes.HowManyMembersController.onPageLoad(srn, NormalMode).url
         ),
         Completed
       ),
       TaskListItemViewModel(
         LinkMessage(
           Message(messageKey(prefix, "finances.title", NotStarted), schemeName),
-          controllers.nonsipp.routes.HowMuchCashController.onPageLoad(srn, NormalMode).url
+          controllers.nonsipp.schemedesignatory.routes.HowMuchCashController.onPageLoad(srn, NormalMode).url
         ),
         NotStarted
       )
@@ -127,7 +127,7 @@ object TaskListController {
       TaskListItemViewModel(
         LinkMessage(
           messageKey(prefix, "employercontributions.title", UnableToStart),
-          controllers.nonsipp.employercontributions.routes.EmployerContributionsController
+          controllers.nonsipp.memberpayments.routes.EmployerContributionsController
             .onPageLoad(srn, NormalMode)
             .url
         ),
@@ -136,7 +136,7 @@ object TaskListController {
       TaskListItemViewModel(
         LinkMessage(
           messageKey(prefix, "unallocatedcontributions.title", UnableToStart),
-          controllers.nonsipp.unallocatedemployercontributions.routes.UnallocatedEmployerContributionsController
+          controllers.nonsipp.memberpayments.routes.UnallocatedEmployerContributionsController
             .onPageLoad(srn, NormalMode)
             .url
         ),
@@ -145,7 +145,7 @@ object TaskListController {
       TaskListItemViewModel(
         LinkMessage(
           messageKey(prefix, "memberContributions.title", UnableToStart),
-          controllers.nonsipp.membercontributions.routes.MemberContributionsController
+          controllers.nonsipp.memberpayments.routes.MemberContributionsController
             .onPageLoad(srn, NormalMode)
             .url
         ),
@@ -154,21 +154,21 @@ object TaskListController {
       TaskListItemViewModel(
         LinkMessage(
           messageKey(prefix, "transfersreceived.title", UnableToStart),
-          controllers.nonsipp.receivetransfer.routes.DidSchemeReceiveTransferController.onPageLoad(srn, NormalMode).url
+          controllers.nonsipp.memberpayments.routes.DidSchemeReceiveTransferController.onPageLoad(srn, NormalMode).url
         ),
         UnableToStart
       ),
       TaskListItemViewModel(
         LinkMessage(
           messageKey(prefix, "transfersout.title", UnableToStart),
-          controllers.nonsipp.transferout.routes.SchemeTransferOutController.onPageLoad(srn, NormalMode).url
+          controllers.nonsipp.memberpayments.routes.SchemeTransferOutController.onPageLoad(srn, NormalMode).url
         ),
         UnableToStart
       ),
       TaskListItemViewModel(
         LinkMessage(
           messageKey(prefix, "pcls.title", UnableToStart),
-          controllers.nonsipp.pensioncommencementlumpsum.routes.PensionCommencementLumpSumController
+          controllers.nonsipp.memberpayments.routes.PensionCommencementLumpSumController
             .onPageLoad(srn, NormalMode)
             .url
         ),
@@ -177,14 +177,14 @@ object TaskListController {
       TaskListItemViewModel(
         LinkMessage(
           messageKey(prefix, "payments.title", UnableToStart),
-          controllers.nonsipp.routes.PensionPaymentsReceivedController.onPageLoad(srn, NormalMode).url
+          controllers.nonsipp.memberpayments.routes.PensionPaymentsReceivedController.onPageLoad(srn, NormalMode).url
         ),
         UnableToStart
       ),
       TaskListItemViewModel(
         LinkMessage(
           messageKey(prefix, "surrenderedbenefits.title", UnableToStart),
-          controllers.nonsipp.benefitssurrendered.routes.BenefitsSurrenderedController.onPageLoad(srn, NormalMode).url
+          controllers.nonsipp.memberpayments.routes.BenefitsSurrenderedController.onPageLoad(srn, NormalMode).url
         ),
         UnableToStart
       )

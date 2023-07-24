@@ -17,7 +17,7 @@
 package pages
 
 import pages.behaviours.PageBehaviours
-import pages.nonsipp.transferout.SchemeTransferOutPage
+import pages.nonsipp.memberpayments.SchemeTransferOutPage
 
 class SchemeTransferoutPageSpec extends PageBehaviours {
 

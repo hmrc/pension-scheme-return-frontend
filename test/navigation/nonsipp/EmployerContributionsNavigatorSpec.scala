@@ -18,7 +18,7 @@ package navigation.nonsipp
 
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.employercontributions.EmployerContributionsPage
+import pages.nonsipp.memberpayments.EmployerContributionsPage
 import utils.BaseSpec
 
 class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
@@ -32,7 +32,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
         .navigateToWithData(
           EmployerContributionsPage,
           Gen.const(true),
-          controllers.nonsipp.unallocatedemployercontributions.routes.UnallocatedEmployerContributionsController.onPageLoad
+          controllers.nonsipp.memberpayments.routes.UnallocatedEmployerContributionsController.onPageLoad
         )
         .withName("go from employer contribution page to unallocated employer contributions page when yes selected")
     )
@@ -42,7 +42,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
         .navigateToWithData(
           EmployerContributionsPage,
           Gen.const(false),
-          controllers.nonsipp.unallocatedemployercontributions.routes.UnallocatedEmployerContributionsController.onPageLoad
+          controllers.nonsipp.memberpayments.routes.UnallocatedEmployerContributionsController.onPageLoad
         )
         .withName("go from employer contribution page to unallocated employer contributions page when no selected")
     )

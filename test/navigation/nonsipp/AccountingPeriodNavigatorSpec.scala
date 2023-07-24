@@ -18,7 +18,7 @@ package navigation.nonsipp
 
 import config.Refined.OneToThree
 import controllers.nonsipp.accountingperiod.routes
-import controllers.nonsipp.bankaccount
+import controllers.nonsipp.schemedesignatory
 import eu.timepit.refined.refineMV
 import generators.IndexGen
 import navigation.{Navigator, NavigatorBehaviours}
@@ -62,7 +62,7 @@ class AccountingPeriodNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           dateRangeGen,
           IndexGen[OneToThree](1, 3),
           routes.AccountingPeriodController.onPageLoad,
-          bankaccount.routes.ActiveBankAccountController.onPageLoad
+          schemedesignatory.routes.ActiveBankAccountController.onPageLoad
         )
         .withName("go from list page")
     )
@@ -71,7 +71,7 @@ class AccountingPeriodNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       normalmode
         .navigateTo(
           AccountingPeriodListPage(_, addPeriod = false),
-          bankaccount.routes.ActiveBankAccountController.onPageLoad
+          schemedesignatory.routes.ActiveBankAccountController.onPageLoad
         )
         .withName("go from list page to bank account page when no selected")
     )

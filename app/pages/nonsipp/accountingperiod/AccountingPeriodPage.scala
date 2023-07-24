@@ -28,12 +28,12 @@ case class AccountingPeriodPage(srn: Srn, index: Max3) extends QuestionPage[Date
 
   override def path: JsPath = JsPath \ toString \ index.arrayIndex
 
-  override def toString: String = "accountPeriod"
+  override def toString: String = "accountingPeriods"
 }
 
 case class AccountingPeriods(srn: Srn) extends Gettable[List[DateRange]] with Removable[List[DateRange]] {
 
   override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "accountPeriod"
+  override def toString: String = "accountingPeriods"
 }

@@ -16,11 +16,11 @@
 
 package navigation.nonsipp
 
-import controllers.nonsipp.receivetransfer
+import controllers.nonsipp.memberpayments
 import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.membercontributions.MemberContributionsPage
+import pages.nonsipp.memberpayments.MemberContributionsPage
 import play.api.mvc.Call
 
 object MemberContributionsNavigator extends JourneyNavigator {
@@ -31,7 +31,7 @@ object MemberContributionsNavigator extends JourneyNavigator {
       if (userAnswers.get(page).contains(true)) {
         controllers.routes.UnauthorisedController.onPageLoad()
       } else {
-        receivetransfer.routes.DidSchemeReceiveTransferController.onPageLoad(srn, NormalMode)
+        memberpayments.routes.DidSchemeReceiveTransferController.onPageLoad(srn, NormalMode)
       }
   }
 
@@ -40,7 +40,7 @@ object MemberContributionsNavigator extends JourneyNavigator {
       if (userAnswers.get(page).contains(true)) {
         controllers.routes.UnauthorisedController.onPageLoad()
       } else {
-        receivetransfer.routes.DidSchemeReceiveTransferController.onPageLoad(srn, NormalMode)
+        memberpayments.routes.DidSchemeReceiveTransferController.onPageLoad(srn, NormalMode)
       }
   }
 }

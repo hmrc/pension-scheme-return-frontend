@@ -16,11 +16,11 @@
 
 package navigation.nonsipp
 
-import controllers.nonsipp.pensioncommencementlumpsum
+import controllers.nonsipp.memberpayments
 import controllers.routes
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.transferout.SchemeTransferOutPage
+import pages.nonsipp.memberpayments.SchemeTransferOutPage
 import utils.BaseSpec
 
 class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
@@ -44,7 +44,7 @@ class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateToWithData(
           SchemeTransferOutPage,
           Gen.const(false),
-          pensioncommencementlumpsum.routes.PensionCommencementLumpSumController.onPageLoad
+          memberpayments.routes.PensionCommencementLumpSumController.onPageLoad
         )
         .withName("go from did scheme transfer out page to pension commencement lump sum page when no selected")
     )

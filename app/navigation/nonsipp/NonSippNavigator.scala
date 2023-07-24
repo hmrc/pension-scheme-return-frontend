@@ -25,6 +25,7 @@ import models.{NormalMode, UserAnswers}
 import navigation.{JourneyNavigator, Navigator}
 import pages.Page
 import pages.nonsipp._
+import pages.nonsipp.schemedesignatory.{HowManyMembersPage, HowMuchCashPage, ValueOfAssetsPage}
 import play.api.mvc.Call
 
 import javax.inject.Inject
@@ -39,12 +40,12 @@ class NonSippNavigator @Inject()() extends Navigator {
 
       case page @ CheckReturnDatesPage(srn) =>
         if (userAnswers.get(page).contains(true)) {
-          nonsipp.bankaccount.routes.ActiveBankAccountController.onPageLoad(srn, NormalMode)
+          nonsipp.schemedesignatory.routes.ActiveBankAccountController.onPageLoad(srn, NormalMode)
         } else {
           nonsipp.accountingperiod.routes.AccountingPeriodController.onPageLoad(srn, refineMV(1), NormalMode)
         }
 
-      case HowMuchCashPage(srn) => routes.ValueOfAssetsController.onPageLoad(srn, NormalMode)
+      case HowMuchCashPage(srn) => nonsipp.schemedesignatory.routes.ValueOfAssetsController.onPageLoad(srn, NormalMode)
       case ValueOfAssetsPage(srn) => nonsipp.memberdetails.routes.PensionSchemeMembersController.onPageLoad(srn)
 
       case page @ HowManyMembersPage(srn, PsaId(_)) =>

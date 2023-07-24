@@ -20,7 +20,7 @@ import controllers.routes
 import models.NormalMode
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.pensioncommencementlumpsum.PensionCommencementLumpSumPage
+import pages.nonsipp.memberpayments.PensionCommencementLumpSumPage
 import utils.BaseSpec
 
 class PensionCommencementLumpSumNavigatorSpec extends BaseSpec with NavigatorBehaviours {
@@ -44,7 +44,7 @@ class PensionCommencementLumpSumNavigatorSpec extends BaseSpec with NavigatorBeh
         .navigateToWithData(
           PensionCommencementLumpSumPage,
           Gen.const(false),
-          controllers.nonsipp.routes.PensionPaymentsReceivedController.onPageLoad
+          controllers.nonsipp.memberpayments.routes.PensionPaymentsReceivedController.onPageLoad
         )
         .withName("go from pension commencement lump sum page to pension payments received page when no selected")
     )

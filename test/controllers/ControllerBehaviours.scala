@@ -18,19 +18,17 @@ package controllers
 
 import models.UserAnswers
 import navigation.{FakeNavigator, Navigator}
+import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import play.api.Application
 import play.api.inject.bind
 import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
-import play.api.libs.json.Writes
-import play.api.mvc.{AnyContentAsEmpty, Call, Request}
+import play.api.libs.json.{JsPath, Writes}
+import play.api.mvc.{Call, Request}
 import play.api.test.FakeRequest
 import play.twirl.api.Html
 import queries.Settable
 import services.SaveService
-
-import java.nio.charset.StandardCharsets
-import java.nio.file.{Files, Paths}
 import scala.concurrent.Future
 
 trait ControllerBehaviours {
@@ -155,11 +153,17 @@ trait ControllerBehaviours {
   def redirectToPage(call: => Call, page: => Call, form: (String, String)*): BehaviourTest =
     redirectToPage(call, page, defaultUserAnswers, form: _*)
 
-  def saveAndContinue(call: => Call, userAnswers: UserAnswers, form: (String, String)*): BehaviourTest =
+  def saveAndContinue(
+    call: => Call,
+    userAnswers: UserAnswers,
+    expectedDataPath: Option[JsPath],
+    form: (String, String)*
+  ): BehaviourTest =
     "save data and continue to next page".hasBehaviour {
 
       val saveService = mock[SaveService]
-      when(saveService.save(any())(any(), any())).thenReturn(Future.successful(()))
+      val userDetailsCaptor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
+      when(saveService.save(userDetailsCaptor.capture())(any(), any())).thenReturn(Future.successful(()))
 
       val appBuilder = applicationBuilder(Some(userAnswers))
         .overrides(
@@ -178,11 +182,21 @@ trait ControllerBehaviours {
         redirectLocation(result).value mustEqual testOnwardRoute.url
 
         verify(saveService, times(1)).save(any())(any(), any())
+        if (expectedDataPath.nonEmpty) {
+          val data = userDetailsCaptor.getValue.data.decryptedValue
+          assert(expectedDataPath.get(data).nonEmpty)
+        }
       }
     }
 
   def saveAndContinue(call: => Call, form: (String, String)*): BehaviourTest =
-    saveAndContinue(call, defaultUserAnswers, form: _*)
+    saveAndContinue(call, defaultUserAnswers, defaultExpectedDataPath, form: _*)
+
+  def saveAndContinue(call: => Call, userAnswers: UserAnswers, form: (String, String)*): BehaviourTest =
+    saveAndContinue(call, userAnswers, defaultExpectedDataPath, form: _*)
+
+  def saveAndContinue(call: => Call, jsPathOption: Option[JsPath], form: (String, String)*): BehaviourTest =
+    saveAndContinue(call, defaultUserAnswers, jsPathOption, form: _*)
 
   def continueNoSave(call: => Call, userAnswers: UserAnswers, form: (String, String)*): BehaviourTest =
     "continue to the next page without saving".hasBehaviour {

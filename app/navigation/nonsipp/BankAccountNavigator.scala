@@ -17,11 +17,11 @@
 package navigation.nonsipp
 
 import controllers.nonsipp
-import controllers.nonsipp.routes
+import controllers.nonsipp.schemedesignatory.routes
 import models.{CheckMode, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.bankaccount.{ActiveBankAccountPage, WhyNoBankAccountPage}
+import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, WhyNoBankAccountPage}
 import play.api.mvc.Call
 
 object BankAccountNavigator extends JourneyNavigator {
@@ -32,7 +32,7 @@ object BankAccountNavigator extends JourneyNavigator {
       if (userAnswers.get(page).contains(true)) {
         routes.HowManyMembersController.onPageLoad(srn, NormalMode)
       } else {
-        nonsipp.bankaccount.routes.WhyNoBankAccountController.onPageLoad(srn, NormalMode)
+        nonsipp.schemedesignatory.routes.WhyNoBankAccountController.onPageLoad(srn, NormalMode)
       }
 
     case WhyNoBankAccountPage(srn) => routes.HowManyMembersController.onPageLoad(srn, NormalMode)

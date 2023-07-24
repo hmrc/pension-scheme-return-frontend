@@ -18,7 +18,7 @@ package pages
 
 import models.SchemeMemberNumbers
 import pages.behaviours.PageBehaviours
-import pages.nonsipp.HowManyMembersPage
+import pages.nonsipp.schemedesignatory.HowManyMembersPage
 
 class HowManyMembersPageSpec extends PageBehaviours {
 

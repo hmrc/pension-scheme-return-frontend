@@ -17,7 +17,7 @@
 package navigation.nonsipp
 
 import controllers.nonsipp.accountingperiod
-import controllers.nonsipp.bankaccount
+import controllers.nonsipp.schemedesignatory
 import controllers.nonsipp.declaration
 import controllers.nonsipp.memberdetails
 import controllers.nonsipp.routes
@@ -25,7 +25,8 @@ import eu.timepit.refined.refineMV
 import models.SchemeMemberNumbers
 import navigation.{Navigator, NavigatorBehaviours, UnknownPage}
 import org.scalacheck.Gen
-import pages.nonsipp.{CheckReturnDatesPage, HowManyMembersPage, HowMuchCashPage, ValueOfAssetsPage, WhichTaxYearPage}
+import pages.nonsipp.schemedesignatory.{HowManyMembersPage, HowMuchCashPage, ValueOfAssetsPage}
+import pages.nonsipp.{CheckReturnDatesPage, WhichTaxYearPage}
 import utils.BaseSpec
 
 class NonSippNavigatorSpec extends BaseSpec with NavigatorBehaviours {
@@ -55,7 +56,7 @@ class NonSippNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           .navigateToWithData(
             CheckReturnDatesPage,
             Gen.const(true),
-            bankaccount.routes.ActiveBankAccountController.onPageLoad
+            schemedesignatory.routes.ActiveBankAccountController.onPageLoad
           )
           .withName("go from check return dates page to bank account page when yes selected")
       )
@@ -74,7 +75,7 @@ class NonSippNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         normalmode
           .navigateTo(
             HowMuchCashPage,
-            routes.ValueOfAssetsController.onPageLoad
+            schemedesignatory.routes.ValueOfAssetsController.onPageLoad
           )
           .withName("go from how much cash page to value of assets page")
       )

@@ -27,8 +27,8 @@ import models.requests.DataRequest
 import models.{DateRange, Mode, SchemeDetails, SchemeMemberNumbers}
 import navigation.Navigator
 import pages.nonsipp.accountingperiod.AccountingPeriods
-import pages.nonsipp.bankaccount.{ActiveBankAccountPage, WhyNoBankAccountPage}
-import pages.nonsipp.{BasicDetailsCheckYourAnswersPage, HowManyMembersPage, WhichTaxYearPage}
+import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, HowManyMembersPage, WhyNoBankAccountPage}
+import pages.nonsipp.{BasicDetailsCheckYourAnswersPage, WhichTaxYearPage}
 import play.api.i18n._
 import play.api.libs.json.Reads
 import play.api.mvc._
@@ -199,7 +199,7 @@ object BasicDetailsCheckYourAnswersController {
           Message("basicDetailsCheckYourAnswersController.schemeDetails.bankAccount", schemeDetails.schemeName),
           if (activeBankAccount: Boolean) "site.yes" else "site.no"
         ).withChangeAction(
-            controllers.nonsipp.bankaccount.routes.ActiveBankAccountController.onPageLoad(srn, mode).url,
+            controllers.nonsipp.schemedesignatory.routes.ActiveBankAccountController.onPageLoad(srn, mode).url,
             hidden = "basicDetailsCheckYourAnswersController.schemeDetails.bankAccount.hidden"
           )
           .withOneHalfWidth()
@@ -212,7 +212,7 @@ object BasicDetailsCheckYourAnswersController {
               ),
               reason
             ).withChangeAction(
-                controllers.nonsipp.bankaccount.routes.WhyNoBankAccountController.onPageLoad(srn, mode).url,
+                controllers.nonsipp.schemedesignatory.routes.WhyNoBankAccountController.onPageLoad(srn, mode).url,
                 hidden = "basicDetailsCheckYourAnswersController.schemeDetails.whyNoBankAccount.hidden"
               )
               .withOneHalfWidth()
@@ -227,9 +227,9 @@ object BasicDetailsCheckYourAnswersController {
             schemeDetails.schemeName,
             taxEndDate(taxYearOrAccountingPeriods).show
           ),
-          schemeMemberNumbers.active.toString
+          schemeMemberNumbers.noOfActiveMembers.toString
         ).withChangeAction(
-            controllers.nonsipp.routes.HowManyMembersController.onPageLoad(srn, mode).url,
+            controllers.nonsipp.schemedesignatory.routes.HowManyMembersController.onPageLoad(srn, mode).url,
             hidden = Message(
               "basicDetailsCheckYourAnswersController.memberDetails.activeMembers.hidden",
               taxEndDate(taxYearOrAccountingPeriods).show
@@ -242,9 +242,9 @@ object BasicDetailsCheckYourAnswersController {
             schemeDetails.schemeName,
             taxEndDate(taxYearOrAccountingPeriods).show
           ),
-          schemeMemberNumbers.deferred.toString
+          schemeMemberNumbers.noOfDeferredMembers.toString
         ).withChangeAction(
-            controllers.nonsipp.routes.HowManyMembersController.onPageLoad(srn, mode).url,
+            controllers.nonsipp.schemedesignatory.routes.HowManyMembersController.onPageLoad(srn, mode).url,
             hidden = Message(
               "basicDetailsCheckYourAnswersController.memberDetails.deferredMembers.hidden",
               taxEndDate(taxYearOrAccountingPeriods).show
@@ -257,9 +257,9 @@ object BasicDetailsCheckYourAnswersController {
             schemeDetails.schemeName,
             taxEndDate(taxYearOrAccountingPeriods).show
           ),
-          schemeMemberNumbers.pensioner.toString
+          schemeMemberNumbers.noOfPensionerMembers.toString
         ).withChangeAction(
-            controllers.nonsipp.routes.HowManyMembersController.onPageLoad(srn, mode).url,
+            controllers.nonsipp.schemedesignatory.routes.HowManyMembersController.onPageLoad(srn, mode).url,
             hidden = Message(
               "basicDetailsCheckYourAnswersController.memberDetails.pensionerMembers.hidden",
               taxEndDate(taxYearOrAccountingPeriods).show

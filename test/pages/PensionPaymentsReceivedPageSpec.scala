@@ -17,7 +17,7 @@
 package pages
 
 import pages.behaviours.PageBehaviours
-import pages.nonsipp.PensionPaymentsReceivedPage
+import pages.nonsipp.memberpayments.PensionPaymentsReceivedPage
 
 class PensionPaymentsReceivedPageSpec extends PageBehaviours {
 

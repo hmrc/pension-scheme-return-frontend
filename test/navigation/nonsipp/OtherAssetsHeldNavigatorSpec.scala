@@ -43,7 +43,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateToWithData(
           OtherAssetsHeldPage,
           Gen.const(false),
-          controllers.nonsipp.otherassets.routes.FeesCommissionsWagesSalariesController.onPageLoad
+          controllers.nonsipp.schemedesignatory.routes.FeesCommissionsWagesSalariesController.onPageLoad
         )
         .withName("go from other assets held page to fees commissions wages salaries page when no selected")
     )

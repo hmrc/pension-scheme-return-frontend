@@ -17,7 +17,7 @@
 package pages
 
 import pages.behaviours.PageBehaviours
-import pages.nonsipp.bankaccount.WhyNoBankAccountPage
+import pages.nonsipp.schemedesignatory.WhyNoBankAccountPage
 
 class WhyNoBankAccountPageSpec extends PageBehaviours {
 

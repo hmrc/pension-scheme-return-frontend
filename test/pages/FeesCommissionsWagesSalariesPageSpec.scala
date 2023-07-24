@@ -18,7 +18,7 @@ package pages
 
 import models.Money
 import pages.behaviours.PageBehaviours
-import pages.nonsipp.otherassets.FeesCommissionsWagesSalariesPage
+import pages.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesPage
 
 class FeesCommissionsWagesSalariesPageSpec extends PageBehaviours {
 

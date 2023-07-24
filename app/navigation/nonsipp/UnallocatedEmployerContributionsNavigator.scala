@@ -17,11 +17,11 @@
 package navigation.nonsipp
 
 import controllers.routes
-import controllers.nonsipp.membercontributions
+import controllers.nonsipp.memberpayments
 import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.unallocatedemployercontributions.UnallocatedEmployerContributionsPage
+import pages.nonsipp.memberpayments.UnallocatedEmployerContributionsPage
 import play.api.mvc.Call
 
 object UnallocatedEmployerContributionsNavigator extends JourneyNavigator {
@@ -31,7 +31,7 @@ object UnallocatedEmployerContributionsNavigator extends JourneyNavigator {
       if (userAnswers.get(page).contains(true)) {
         routes.UnauthorisedController.onPageLoad()
       } else {
-        membercontributions.routes.MemberContributionsController.onPageLoad(srn, NormalMode)
+        memberpayments.routes.MemberContributionsController.onPageLoad(srn, NormalMode)
       }
   }
 

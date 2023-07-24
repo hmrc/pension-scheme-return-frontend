@@ -17,7 +17,7 @@
 package pages
 
 import pages.behaviours.PageBehaviours
-import pages.nonsipp.BenefitsSurrenderedPage
+import pages.nonsipp.memberpayments.BenefitsSurrenderedPage
 
 class BenefitsSurrenderedPageSpec extends PageBehaviours {
 

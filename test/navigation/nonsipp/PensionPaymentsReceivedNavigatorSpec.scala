@@ -19,7 +19,7 @@ package navigation.nonsipp
 import controllers.routes
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.PensionPaymentsReceivedPage
+import pages.nonsipp.memberpayments.PensionPaymentsReceivedPage
 import utils.BaseSpec
 
 class PensionPaymentsReceivedNavigatorSpec extends BaseSpec with NavigatorBehaviours {
@@ -43,7 +43,7 @@ class PensionPaymentsReceivedNavigatorSpec extends BaseSpec with NavigatorBehavi
         .navigateToWithData(
           PensionPaymentsReceivedPage,
           Gen.const(false),
-          controllers.nonsipp.benefitssurrendered.routes.BenefitsSurrenderedController.onPageLoad
+          controllers.nonsipp.memberpayments.routes.BenefitsSurrenderedController.onPageLoad
         )
         .withName("go from pension payments received page to benefits surrendered page on no selected")
     )
