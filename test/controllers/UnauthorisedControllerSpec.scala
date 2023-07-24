@@ -21,22 +21,23 @@ import views.html.UnauthorisedView
 
 class UnauthorisedControllerSpec extends ControllerBaseSpec {
 
-  "Unauthorised Controller" - {
+  "UnauthorisedController" - {
 
     "return OK and the correct view for a GET" in {
-
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-
       running(application) {
+
         val request = FakeRequest(GET, routes.UnauthorisedController.onPageLoad().url)
-
         val result = route(application, request).value
-
         val view = application.injector.instanceOf[UnauthorisedView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view()(request, createMessages(application)).toString
+
+        contentAsString(result) mustEqual view(UnauthorisedController.viewModel
+        ("https://www.gov.uk/government/organisations/hm-revenue-customs/contact/pension-scheme-enquiries"))(request, createMessages(application)).toString
+
       }
+
     }
   }
 }
