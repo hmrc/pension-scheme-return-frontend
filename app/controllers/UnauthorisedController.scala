@@ -47,7 +47,7 @@ object UnauthorisedController {
       Message("unauthorised.paragraph") ++
         LinkMessage(
           Message("unauthorised.linkMessage"),
-          "https://www.gov.uk/government/organisations/hm-revenue-customs/contact/pension-scheme-enquiries"
+          "pensionSchemeEnquiry"
         )
     )
 }
