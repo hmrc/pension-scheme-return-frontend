@@ -49,8 +49,13 @@ class LoansCYAController @Inject()(
   view: CheckYourAnswersView
 ) extends PSRController {
 
-  def onPageLoad(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
-    implicit request =>
+  def onPageLoad(
+    srn: Srn,
+    index: Max9999999,
+    checkOrChange: CheckOrChange,
+    mode: Mode
+  ): Action[AnyContent] =
+    identifyAndRequireData(srn) { implicit request =>
       (
         for {
           receivedLoanType <- requiredPage(WhoReceivedLoanPage(srn, index))
@@ -107,19 +112,22 @@ class LoansCYAController @Inject()(
               loanInterest,
               outstandingArrearsOnLoan,
               securityOnLoan,
+              checkOrChange,
               mode
             )
           )
         )
       ).merge
-  }
+    }
 
-  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    Redirect(navigator.nextPage(LoansCYAPage(srn), mode, request.userAnswers))
-  }
+  def onSubmit(srn: Srn, checkOrChange: CheckOrChange, mode: Mode): Action[AnyContent] =
+    identifyAndRequireData(srn) { implicit request =>
+      Redirect(navigator.nextPage(LoansCYAPage(srn), mode, request.userAnswers))
+    }
 }
 
 object LoansCYAController {
+  // TODO +15 parameters
   def viewModel(
     srn: Srn,
     index: Max9999999,
@@ -135,11 +143,15 @@ object LoansCYAController {
     loanInterest: (Money, Percentage, Money),
     outstandingArrearsOnLoan: Option[Money],
     securityOnLoan: Option[Security],
+    checkOrChange: CheckOrChange,
     mode: Mode
   ): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](
-      title = "checkYourAnswers.title",
-      heading = "checkYourAnswers.heading",
+      title = checkOrChange.fold(check = "checkYourAnswers.title", change = "loanCheckYourAnswers.change.title"),
+      heading = checkOrChange.fold(
+        check = "checkYourAnswers.heading",
+        change = Message("loanCheckYourAnswers.change.heading", loanAmount._1.displayAs, recipientName) //TODO £
+      ),
       description = Some(ParagraphMessage("loansCYA.paragraph")),
       page = CheckYourAnswersViewModel(
         sections(
@@ -162,7 +174,7 @@ object LoansCYAController {
       ),
       refresh = None,
       buttonText = "site.continue",
-      onSubmit = routes.LoansCYAController.onSubmit(srn, mode)
+      onSubmit = routes.LoansCYAController.onSubmit(srn, checkOrChange)
     )
 
   private def sections(

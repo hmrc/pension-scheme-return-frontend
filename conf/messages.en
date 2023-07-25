@@ -818,6 +818,9 @@ loanCheckYourAnswers.section6.arrears.hidden = if there are any outstanding arre
 loanCheckYourAnswers.section6.arrears.yes = What is the amount of the arrears?
 loanCheckYourAnswers.section6.arrears.yes.hidden = amount of the arrears
 
+loanCheckYourAnswers.change.title = Change details for loan
+loanCheckYourAnswers.change.heading =Change details for loan of {0} to {1}
+
 outstandingArrearsOnLoan.title = Are there any outstanding arrears on this loan?
 outstandingArrearsOnLoan.heading = Are there any outstanding arrears on this loan?
 outstandingArrearsOnLoan.yes.conditional = What is the amount of the arrears, in pounds and pence?

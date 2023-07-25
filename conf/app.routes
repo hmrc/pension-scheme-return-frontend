@@ -424,12 +424,12 @@ GET        /:srn/change-amount-of-loan-payments/:index                          
 POST       /:srn/change-amount-of-loan-payments                                      controllers.nonsipp.loansmadeoroutstanding.AmountOfTheLoanController.onSubmit(srn: Srn, index: Max9999999 = 1, mode: Mode = CheckMode)
 POST       /:srn/change-amount-of-loan-payments/:index                               controllers.nonsipp.loansmadeoroutstanding.AmountOfTheLoanController.onSubmit(srn: Srn, index: Max9999999, mode: Mode = CheckMode)
 
-GET        /:srn/check-answers-loan                                                  controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onPageLoad(srn: Srn, index: Max9999999 = 1, mode: Mode = NormalMode)
-GET        /:srn/check-answers-loan/:index                                           controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onPageLoad(srn: Srn, index: Max9999999, mode: Mode = NormalMode)
-GET        /:srn/submit-check-answers-loan                                           controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-GET        /:srn/change-check-answers-loan                                           controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onPageLoad(srn: Srn, index: Max9999999 = 1, mode: Mode = CheckMode)
-GET        /:srn/change-check-answers-loan/:index                                    controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onPageLoad(srn: Srn, index: Max9999999, mode: Mode = CheckMode)
-GET        /:srn/change-submit-check-answers-loan                                    controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+GET        /:srn/check-answers-loan                                                  controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onPageLoad(srn: Srn, index: Max9999999 = 1, checkOrChange: CheckOrChange = Check, mode: Mode = NormalMode)
+GET        /:srn/check-answers-loan/:index                                           controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onPageLoad(srn: Srn, index: Max9999999, checkOrChange: CheckOrChange = Check, mode: Mode = NormalMode)
+GET        /:srn/submit-check-answers-loan                                           controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onSubmit(srn: Srn, checkOrChange: CheckOrChange = Check, mode: Mode = NormalMode)
+GET        /:srn/change-check-answers-loan                                           controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onPageLoad(srn: Srn, index: Max9999999 = 1, checkOrChange: CheckOrChange = Change, mode: Mode = NormalMode)
+GET        /:srn/change-check-answers-loan/:index                                    controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onPageLoad(srn: Srn, index: Max9999999, checkOrChange: CheckOrChange = Change, mode: Mode = NormalMode)
+GET        /:srn/change-submit-check-answers-loan                                    controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onSubmit(srn: Srn, checkOrChange: CheckOrChange = Change, mode: Mode = NormalMode)
 
 GET        /:srn/outstanding-arrears-on-loan                                         controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController.onPageLoad(srn: Srn, index: Max9999999 = 1, mode: Mode = NormalMode)
 GET        /:srn/outstanding-arrears-on-loan/:index                                  controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController.onPageLoad(srn: Srn, index: Max9999999, mode: Mode = NormalMode)

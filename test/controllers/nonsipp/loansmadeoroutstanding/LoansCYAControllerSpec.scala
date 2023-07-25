@@ -20,7 +20,17 @@ import config.Refined.OneTo9999999
 import controllers.nonsipp.loansmadeoroutstanding.LoansCYAController._
 import controllers.ControllerBaseSpec
 import eu.timepit.refined.refineMV
-import models.{ConditionalYesNo, Crn, Money, NormalMode, ReceivedLoanType, Security, SponsoringOrConnectedParty}
+import models.CheckOrChange.Check
+import models.{
+  CheckOrChange,
+  ConditionalYesNo,
+  Crn,
+  Money,
+  NormalMode,
+  ReceivedLoanType,
+  Security,
+  SponsoringOrConnectedParty
+}
 import models.ConditionalYesNo._
 import pages.nonsipp.loansmadeoroutstanding._
 import play.api.inject.bind
@@ -42,8 +52,8 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
   private val index = refineMV[OneTo9999999](1)
   private val taxYear = Some(Left(dateRange))
 
-  private lazy val onPageLoad = routes.LoansCYAController.onPageLoad(srn, index, NormalMode)
-  private lazy val onSubmit = routes.LoansCYAController.onSubmit(srn, NormalMode)
+  private lazy val onPageLoad = routes.LoansCYAController.onPageLoad(srn, index, Check)
+  private lazy val onSubmit = routes.LoansCYAController.onSubmit(srn, Check)
 
   private val filledUserAnswers = defaultUserAnswers
     .unsafeSet(WhoReceivedLoanPage(srn, index), ReceivedLoanType.UKCompany)
@@ -76,6 +86,7 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
           loanInterest = (money, percentage, money),
           outstandingArrearsOnLoan = Some(money),
           securityOnLoan = Some(security),
+          Check,
           NormalMode
         )
       )
