@@ -150,7 +150,7 @@ object LoansCYAController {
       title = checkOrChange.fold(check = "checkYourAnswers.title", change = "loanCheckYourAnswers.change.title"),
       heading = checkOrChange.fold(
         check = "checkYourAnswers.heading",
-        change = Message("loanCheckYourAnswers.change.heading", loanAmount._1.displayAs, recipientName) //TODO £
+        change = Message("loanCheckYourAnswers.change.heading", loanAmount._1.displayAs, recipientName)
       ),
       description = Some(ParagraphMessage("loansCYA.paragraph")),
       page = CheckYourAnswersViewModel(
@@ -173,7 +173,7 @@ object LoansCYAController {
         )
       ),
       refresh = None,
-      buttonText = "site.continue",
+      buttonText = checkOrChange.fold(check = "site.saveAndContinue", change = "site.continue"),
       onSubmit = routes.LoansCYAController.onSubmit(srn, checkOrChange)
     )
 
@@ -240,20 +240,42 @@ object LoansCYAController {
       case ReceivedLoanType.Other => routes.OtherRecipientDetailsController.onPageLoad(srn, index, mode).url
     }
 
-    val (recipientDetailsKey, recipientDetailsUrl): (Message, String) = receivedLoanType match {
-      case ReceivedLoanType.Individual =>
-        Message("loanCheckYourAnswers.section1.recipientDetails.nino", recipientName) ->
-          routes.IndividualRecipientNinoController.onPageLoad(srn, index, mode).url
-      case ReceivedLoanType.UKCompany =>
-        Message("loanCheckYourAnswers.section1.recipientDetails.crn", recipientName) ->
-          routes.CompanyRecipientCrnController.onPageLoad(srn, index, mode).url
-      case ReceivedLoanType.UKPartnership =>
-        Message("loanCheckYourAnswers.section1.recipientDetails.utr", recipientName) ->
-          routes.PartnershipRecipientUtrController.onPageLoad(srn, index, mode).url
-      case ReceivedLoanType.Other =>
-        Message("loanCheckYourAnswers.section1.recipientDetails.other", recipientName) ->
-          routes.OtherRecipientDetailsController.onPageLoad(srn, index, mode).url
-    }
+    val (
+      recipientDetailsKey,
+      recipientDetailsUrl,
+      recipientDetailsIdChangeHiddenKey,
+      recipientDetailsNoIdChangeHiddenKey
+    ): (Message, String, String, String) =
+      receivedLoanType match {
+        case ReceivedLoanType.Individual =>
+          (
+            Message("loanCheckYourAnswers.section1.recipientDetails.nino", recipientName),
+            routes.IndividualRecipientNinoController.onPageLoad(srn, index, mode).url,
+            "loanCheckYourAnswers.section1.recipientDetails.nino.hidden",
+            "loanCheckYourAnswers.section1.recipientDetails.noNinoReason.hidden"
+          )
+        case ReceivedLoanType.UKCompany =>
+          (
+            Message("loanCheckYourAnswers.section1.recipientDetails.crn", recipientName),
+            routes.CompanyRecipientCrnController.onPageLoad(srn, index, mode).url,
+            "loanCheckYourAnswers.section1.recipientDetails.crn.hidden",
+            "loanCheckYourAnswers.section1.recipientDetails.noCrnReason.hidden"
+          )
+        case ReceivedLoanType.UKPartnership =>
+          (
+            Message("loanCheckYourAnswers.section1.recipientDetails.utr", recipientName),
+            routes.PartnershipRecipientUtrController.onPageLoad(srn, index, mode).url,
+            "loanCheckYourAnswers.section1.recipientDetails.utr.hidden",
+            "loanCheckYourAnswers.section1.recipientDetails.noUtrReason.hidden"
+          )
+        case ReceivedLoanType.Other =>
+          (
+            Message("loanCheckYourAnswers.section1.recipientDetails.other", recipientName),
+            routes.OtherRecipientDetailsController.onPageLoad(srn, index, mode).url,
+            "loanCheckYourAnswers.section1.recipientDetails.other.hidden",
+            ""
+          )
+      }
 
     val (recipientNoDetailsReasonKey, recipientNoDetailsUrl): (Message, String) = receivedLoanType match {
       case ReceivedLoanType.Individual =>
@@ -341,14 +363,14 @@ object LoansCYAController {
             CheckYourAnswersRowViewModel(recipientDetailsKey, details)
               .withAction(
                 SummaryAction("site.change", recipientDetailsUrl)
-                  .withVisuallyHiddenContent(s"$recipientDetailsKey.hidden")
+                  .withVisuallyHiddenContent(recipientDetailsIdChangeHiddenKey)
               )
         ) :?+ recipientReasonNoDetails.map(
           reason =>
             CheckYourAnswersRowViewModel(recipientNoDetailsReasonKey, reason)
               .withAction(
                 SummaryAction("site.change", recipientNoDetailsUrl)
-                  .withVisuallyHiddenContent(s"$recipientNoDetailsReasonKey.hidden")
+                  .withVisuallyHiddenContent(recipientDetailsNoIdChangeHiddenKey)
               )
         ) :+ CheckYourAnswersRowViewModel(connectedPartyKey, connectedPartyValue)
           .withAction(

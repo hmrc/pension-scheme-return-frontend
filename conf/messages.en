@@ -774,8 +774,8 @@ loanCheckYourAnswers.section1.recipientDetails.noCrnReason = Reason you cannot p
 loanCheckYourAnswers.section1.recipientDetails.noCrnReason.hidden = reason you cannot provide recipient’s Company Reference Number
 loanCheckYourAnswers.section1.recipientDetails.noUtrReason = Reason you cannot provide {0}’s Unique Taxpayer Reference (UTR)
 loanCheckYourAnswers.section1.recipientDetails.noUtrReason.hidden = reason you cannot provide recipient’s Unique Taxpayer Reference
-loanCheckYourAnswers.section1.memberOrConnectedParty = Is {0} a member or a connected party?
-loanCheckYourAnswers.section1.memberOrConnectedParty.hidden = if the recipient is a member or a connected party
+loanCheckYourAnswers.section1.memberOrConnectedParty = Is {0} a connected party?
+loanCheckYourAnswers.section1.memberOrConnectedParty.hidden = if the recipient is a connected party
 loanCheckYourAnswers.section1.memberOrConnectedParty.member = Member of the scheme
 loanCheckYourAnswers.section1.memberOrConnectedParty.connectedParty = Connected party
 loanCheckYourAnswers.section1.memberOrConnectedParty.neither = Neither of these
@@ -819,7 +819,7 @@ loanCheckYourAnswers.section6.arrears.yes = What is the amount of the arrears?
 loanCheckYourAnswers.section6.arrears.yes.hidden = amount of the arrears
 
 loanCheckYourAnswers.change.title = Change details for loan
-loanCheckYourAnswers.change.heading =Change details for loan of {0} to {1}
+loanCheckYourAnswers.change.heading = Change details for loan of £{0} to {1}
 
 outstandingArrearsOnLoan.title = Are there any outstanding arrears on this loan?
 outstandingArrearsOnLoan.heading = Are there any outstanding arrears on this loan?
