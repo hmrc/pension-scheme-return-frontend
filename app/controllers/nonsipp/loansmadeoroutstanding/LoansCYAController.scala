@@ -98,22 +98,24 @@ class LoansCYAController @Inject()(
         } yield Ok(
           view(
             viewModel(
-              srn,
-              index,
-              receivedLoanType,
-              recipientName,
-              recipientDetails,
-              recipientReasonNoDetails,
-              connectedParty,
-              datePeriodLoan,
-              loanAmount,
-              returnEndDate,
-              repaymentInstalments,
-              loanInterest,
-              outstandingArrearsOnLoan,
-              securityOnLoan,
-              checkOrChange,
-              mode
+              ViewModelParameters(
+                srn,
+                index,
+                receivedLoanType,
+                recipientName,
+                recipientDetails,
+                recipientReasonNoDetails,
+                connectedParty,
+                datePeriodLoan,
+                loanAmount,
+                returnEndDate,
+                repaymentInstalments,
+                loanInterest,
+                outstandingArrearsOnLoan,
+                securityOnLoan,
+                checkOrChange,
+                mode
+              )
             )
           )
         )
@@ -126,55 +128,57 @@ class LoansCYAController @Inject()(
     }
 }
 
+case class ViewModelParameters(
+  srn: Srn,
+  index: Max9999999,
+  receivedLoanType: ReceivedLoanType,
+  recipientName: String,
+  recipientDetails: Option[String],
+  recipientReasonNoDetails: Option[String],
+  connectedParty: Either[MemberOrConnectedParty, SponsoringOrConnectedParty],
+  datePeriodLoan: (LocalDate, Money, Int),
+  loanAmount: (Money, Money, Money),
+  returnEndDate: LocalDate,
+  repaymentInstalments: Boolean,
+  loanInterest: (Money, Percentage, Money),
+  outstandingArrearsOnLoan: Option[Money],
+  securityOnLoan: Option[Security],
+  checkOrChange: CheckOrChange,
+  mode: Mode
+)
 object LoansCYAController {
-  // TODO +15 parameters
-  def viewModel(
-    srn: Srn,
-    index: Max9999999,
-    receivedLoanType: ReceivedLoanType,
-    recipientName: String,
-    recipientDetails: Option[String],
-    recipientReasonNoDetails: Option[String],
-    connectedParty: Either[MemberOrConnectedParty, SponsoringOrConnectedParty],
-    datePeriodLoan: (LocalDate, Money, Int),
-    loanAmount: (Money, Money, Money),
-    returnEndDate: LocalDate,
-    repaymentInstalments: Boolean,
-    loanInterest: (Money, Percentage, Money),
-    outstandingArrearsOnLoan: Option[Money],
-    securityOnLoan: Option[Security],
-    checkOrChange: CheckOrChange,
-    mode: Mode
-  ): FormPageViewModel[CheckYourAnswersViewModel] =
+  def viewModel(parameters: ViewModelParameters): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](
-      title = checkOrChange.fold(check = "checkYourAnswers.title", change = "loanCheckYourAnswers.change.title"),
-      heading = checkOrChange.fold(
+      title =
+        parameters.checkOrChange.fold(check = "checkYourAnswers.title", change = "loanCheckYourAnswers.change.title"),
+      heading = parameters.checkOrChange.fold(
         check = "checkYourAnswers.heading",
-        change = Message("loanCheckYourAnswers.change.heading", loanAmount._1.displayAs, recipientName)
+        change =
+          Message("loanCheckYourAnswers.change.heading", parameters.loanAmount._1.displayAs, parameters.recipientName)
       ),
       description = Some(ParagraphMessage("loansCYA.paragraph")),
       page = CheckYourAnswersViewModel(
         sections(
-          srn,
-          index,
-          receivedLoanType,
-          recipientName,
-          recipientDetails,
-          recipientReasonNoDetails,
-          connectedParty,
-          datePeriodLoan,
-          loanAmount,
-          returnEndDate,
-          repaymentInstalments,
-          loanInterest,
-          outstandingArrearsOnLoan,
-          securityOnLoan,
-          mode
+          parameters.srn,
+          parameters.index,
+          parameters.receivedLoanType,
+          parameters.recipientName,
+          parameters.recipientDetails,
+          parameters.recipientReasonNoDetails,
+          parameters.connectedParty,
+          parameters.datePeriodLoan,
+          parameters.loanAmount,
+          parameters.returnEndDate,
+          parameters.repaymentInstalments,
+          parameters.loanInterest,
+          parameters.outstandingArrearsOnLoan,
+          parameters.securityOnLoan,
+          parameters.mode
         )
       ),
       refresh = None,
-      buttonText = checkOrChange.fold(check = "site.saveAndContinue", change = "site.continue"),
-      onSubmit = routes.LoansCYAController.onSubmit(srn, checkOrChange)
+      buttonText = parameters.checkOrChange.fold(check = "site.saveAndContinue", change = "site.continue"),
+      onSubmit = routes.LoansCYAController.onSubmit(parameters.srn, parameters.checkOrChange)
     )
 
   private def sections(

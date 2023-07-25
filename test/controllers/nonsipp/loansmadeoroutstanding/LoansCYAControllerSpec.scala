@@ -69,40 +69,50 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
 
   "LoansCYAController" - {
     List(CheckOrChange.Check, CheckOrChange.Change).foreach { checkOrChange =>
-      act.like(renderView(onPageLoad(checkOrChange), filledUserAnswers) { implicit app =>
-        implicit request =>
+      act.like(
+        renderView(onPageLoad(checkOrChange), filledUserAnswers) { implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
             viewModel(
-              srn,
-              index,
-              ReceivedLoanType.UKCompany,
-              recipientName,
-              recipientDetails = Some(crn.value),
-              recipientReasonNoDetails = None,
-              connectedParty = Right(SponsoringOrConnectedParty.ConnectedParty),
-              datePeriodLoan = (localDate, money, loanPeriod),
-              loanAmount = (money, money, money),
-              returnEndDate = dateRange.to,
-              repaymentInstalments = true,
-              loanInterest = (money, percentage, money),
-              outstandingArrearsOnLoan = Some(money),
-              securityOnLoan = Some(security),
-              checkOrChange,
-              NormalMode
+              ViewModelParameters(
+                srn,
+                index,
+                ReceivedLoanType.UKCompany,
+                recipientName,
+                recipientDetails = Some(crn.value),
+                recipientReasonNoDetails = None,
+                connectedParty = Right(SponsoringOrConnectedParty.ConnectedParty),
+                datePeriodLoan = (localDate, money, loanPeriod),
+                loanAmount = (money, money, money),
+                returnEndDate = dateRange.to,
+                repaymentInstalments = true,
+                loanInterest = (money, percentage, money),
+                outstandingArrearsOnLoan = Some(money),
+                securityOnLoan = Some(security),
+                checkOrChange,
+                NormalMode
+              )
             )
           )
-      }
-        .before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear))
-        .withName(s"render correct ${checkOrChange.name} view"))
+        }.before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear))
+          .withName(s"render correct ${checkOrChange.name} view")
+      )
 
-      act.like(redirectNextPage(onSubmit(checkOrChange))
-        .withName(s"redirect to next page when in ${checkOrChange.name} mode"))
+      act.like(
+        redirectNextPage(onSubmit(checkOrChange))
+          .withName(s"redirect to next page when in ${checkOrChange.name} mode")
+      )
 
-      act.like(journeyRecoveryPage(onPageLoad(checkOrChange)).updateName("onPageLoad" + _)
-        .withName(s"redirect to journey recovery page on page load when in ${checkOrChange.name} mode"))
+      act.like(
+        journeyRecoveryPage(onPageLoad(checkOrChange))
+          .updateName("onPageLoad" + _)
+          .withName(s"redirect to journey recovery page on page load when in ${checkOrChange.name} mode")
+      )
 
-      act.like(journeyRecoveryPage(onSubmit(checkOrChange)).updateName("onSubmit" + _)
-        .withName(s"redirect to journey recovery page on submit when in ${checkOrChange.name} mode"))
+      act.like(
+        journeyRecoveryPage(onSubmit(checkOrChange))
+          .updateName("onSubmit" + _)
+          .withName(s"redirect to journey recovery page on submit when in ${checkOrChange.name} mode")
+      )
     }
   }
 }
