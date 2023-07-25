@@ -80,8 +80,10 @@ signedOut.title = For your security, we signed you out
 signedOut.heading = For your security, we signed you out
 signedOut.guidance = We did not save your answers.
 
-unauthorised.title = You can’t access this service with this account
-unauthorised.heading = You can’t access this service with this account
+unauthorised.title = You cannot access this service with this account
+unauthorised.heading = You cannot access this service with this account
+unauthorised.paragraph =  If you think you should have access to this service, you can
+unauthorised.linkMessage = contact HMRC for pension scheme help
 
 upload.whatDoINeedToInclude = What information do I need to include in this file?
 upload.acceptedFileType = Accepted file type: {0}
