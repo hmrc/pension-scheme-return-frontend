@@ -124,7 +124,6 @@ object LoansListController {
         List(
           ListRow(
             Message("loansList.row", totalLoan.displayAs, recipientName),
-            //changeUrl = controllers.routes.UnauthorisedController.onPageLoad().url,
             changeUrl = routes.LoansCYAController.onPageLoad(srn, index, Change).url,
             changeHiddenText = Message("loansList.row.change.hidden", totalLoan.displayAs, recipientName),
             removeUrl = controllers.routes.UnauthorisedController.onPageLoad().url,
