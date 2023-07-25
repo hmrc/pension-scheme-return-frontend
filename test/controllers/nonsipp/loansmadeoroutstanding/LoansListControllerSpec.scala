@@ -60,10 +60,10 @@ class LoansListControllerSpec extends ControllerBaseSpec {
       )
     })
 
-//    act.like(redirectNextPage(onSubmit, "value" -> "true"))
-//
-//    act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
-//
-//    act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
+    act.like(redirectNextPage(onSubmit, "value" -> "true"))
+
+    act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
+
+    act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }
 }
