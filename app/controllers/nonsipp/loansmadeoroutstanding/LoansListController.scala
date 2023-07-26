@@ -62,7 +62,7 @@ class LoansListController @Inject()(
     loanRecipients(srn).map { recipients =>
       if (recipients.length == maxLoans) {
 
-        Redirect(navigator.nextPage(AccountingPeriodListPage(srn, addPeriod = false), mode, request.userAnswers))
+        Redirect(navigator.nextPage(AccountingPeriodListPage(srn, addPeriod = false), mode, request.userAnswers)) // TODO bug
       } else {
 
         val viewModel = LoansListController.viewModel(srn, mode, recipients)
@@ -126,7 +126,7 @@ object LoansListController {
             Message("loansList.row", totalLoan.displayAs, recipientName),
             changeUrl = routes.LoansCYAController.onPageLoad(srn, index, Change).url,
             changeHiddenText = Message("loansList.row.change.hidden", totalLoan.displayAs, recipientName),
-            removeUrl = controllers.routes.UnauthorisedController.onPageLoad().url,
+            removeUrl = routes.RemoveLoanController.onPageLoad(srn, index, mode).url,
             removeHiddenText = Message("loansList.row.remove.hidden", totalLoan.displayAs, recipientName)
           )
         )
