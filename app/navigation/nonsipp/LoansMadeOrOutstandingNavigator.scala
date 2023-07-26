@@ -18,7 +18,7 @@ package navigation.nonsipp
 
 import config.Refined.OneTo9999999
 import eu.timepit.refined.{refineMV, refineV}
-import models.{NormalMode, ReceivedLoanType, UserAnswers}
+import models.{CheckOrChange, NormalMode, ReceivedLoanType, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.loansmadeoroutstanding._
@@ -105,7 +105,8 @@ object LoansMadeOrOutstandingNavigator extends JourneyNavigator {
         .onPageLoad(srn, index, NormalMode)
 
     case OutstandingArrearsOnLoanPage(srn, index) =>
-      controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController.onPageLoad(srn, index, NormalMode)
+      controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
+        .onPageLoad(srn, index, CheckOrChange.Check)
 
     case LoansCYAPage(srn) =>
       controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController.onPageLoad(srn, NormalMode)

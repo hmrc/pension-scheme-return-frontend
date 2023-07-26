@@ -49,8 +49,13 @@ class LoansCYAController @Inject()(
   view: CheckYourAnswersView
 ) extends PSRController {
 
-  def onPageLoad(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
-    implicit request =>
+  def onPageLoad(
+    srn: Srn,
+    index: Max9999999,
+    checkOrChange: CheckOrChange,
+    mode: Mode
+  ): Action[AnyContent] =
+    identifyAndRequireData(srn) { implicit request =>
       (
         for {
           receivedLoanType <- requiredPage(WhoReceivedLoanPage(srn, index))
@@ -93,76 +98,87 @@ class LoansCYAController @Inject()(
         } yield Ok(
           view(
             viewModel(
-              srn,
-              index,
-              receivedLoanType,
-              recipientName,
-              recipientDetails,
-              recipientReasonNoDetails,
-              connectedParty,
-              datePeriodLoan,
-              loanAmount,
-              returnEndDate,
-              repaymentInstalments,
-              loanInterest,
-              outstandingArrearsOnLoan,
-              securityOnLoan,
-              mode
+              ViewModelParameters(
+                srn,
+                index,
+                receivedLoanType,
+                recipientName,
+                recipientDetails,
+                recipientReasonNoDetails,
+                connectedParty,
+                datePeriodLoan,
+                loanAmount,
+                returnEndDate,
+                repaymentInstalments,
+                loanInterest,
+                outstandingArrearsOnLoan,
+                securityOnLoan,
+                checkOrChange,
+                mode
+              )
             )
           )
         )
       ).merge
-  }
+    }
 
-  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    Redirect(navigator.nextPage(LoansCYAPage(srn), mode, request.userAnswers))
-  }
+  def onSubmit(srn: Srn, checkOrChange: CheckOrChange, mode: Mode): Action[AnyContent] =
+    identifyAndRequireData(srn) { implicit request =>
+      Redirect(navigator.nextPage(LoansCYAPage(srn), mode, request.userAnswers))
+    }
 }
 
+case class ViewModelParameters(
+  srn: Srn,
+  index: Max9999999,
+  receivedLoanType: ReceivedLoanType,
+  recipientName: String,
+  recipientDetails: Option[String],
+  recipientReasonNoDetails: Option[String],
+  connectedParty: Either[MemberOrConnectedParty, SponsoringOrConnectedParty],
+  datePeriodLoan: (LocalDate, Money, Int),
+  loanAmount: (Money, Money, Money),
+  returnEndDate: LocalDate,
+  repaymentInstalments: Boolean,
+  loanInterest: (Money, Percentage, Money),
+  outstandingArrearsOnLoan: Option[Money],
+  securityOnLoan: Option[Security],
+  checkOrChange: CheckOrChange,
+  mode: Mode
+)
 object LoansCYAController {
-  def viewModel(
-    srn: Srn,
-    index: Max9999999,
-    receivedLoanType: ReceivedLoanType,
-    recipientName: String,
-    recipientDetails: Option[String],
-    recipientReasonNoDetails: Option[String],
-    connectedParty: Either[MemberOrConnectedParty, SponsoringOrConnectedParty],
-    datePeriodLoan: (LocalDate, Money, Int),
-    loanAmount: (Money, Money, Money),
-    returnEndDate: LocalDate,
-    repaymentInstalments: Boolean,
-    loanInterest: (Money, Percentage, Money),
-    outstandingArrearsOnLoan: Option[Money],
-    securityOnLoan: Option[Security],
-    mode: Mode
-  ): FormPageViewModel[CheckYourAnswersViewModel] =
+  def viewModel(parameters: ViewModelParameters): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](
-      title = "checkYourAnswers.title",
-      heading = "checkYourAnswers.heading",
+      title =
+        parameters.checkOrChange.fold(check = "checkYourAnswers.title", change = "loanCheckYourAnswers.change.title"),
+      heading = parameters.checkOrChange.fold(
+        check = "checkYourAnswers.heading",
+        change =
+          Message("loanCheckYourAnswers.change.heading", parameters.loanAmount._1.displayAs, parameters.recipientName)
+      ),
       description = Some(ParagraphMessage("loansCYA.paragraph")),
       page = CheckYourAnswersViewModel(
         sections(
-          srn,
-          index,
-          receivedLoanType,
-          recipientName,
-          recipientDetails,
-          recipientReasonNoDetails,
-          connectedParty,
-          datePeriodLoan,
-          loanAmount,
-          returnEndDate,
-          repaymentInstalments,
-          loanInterest,
-          outstandingArrearsOnLoan,
-          securityOnLoan,
-          mode
+          parameters.srn,
+          parameters.index,
+          parameters.receivedLoanType,
+          parameters.recipientName,
+          parameters.recipientDetails,
+          parameters.recipientReasonNoDetails,
+          parameters.connectedParty,
+          parameters.datePeriodLoan,
+          parameters.loanAmount,
+          parameters.returnEndDate,
+          parameters.repaymentInstalments,
+          parameters.loanInterest,
+          parameters.outstandingArrearsOnLoan,
+          parameters.securityOnLoan,
+          parameters.mode
         )
       ),
       refresh = None,
-      buttonText = "site.continue",
-      onSubmit = routes.LoansCYAController.onSubmit(srn, mode)
+      buttonText = parameters.checkOrChange.fold(check = "site.saveAndContinue", change = "site.continue"),
+      onSubmit = routes.LoansCYAController.onSubmit(parameters.srn, parameters.checkOrChange)
     )
 
   private def sections(
@@ -228,20 +244,42 @@ object LoansCYAController {
       case ReceivedLoanType.Other => routes.OtherRecipientDetailsController.onPageLoad(srn, index, mode).url
     }
 
-    val (recipientDetailsKey, recipientDetailsUrl): (Message, String) = receivedLoanType match {
-      case ReceivedLoanType.Individual =>
-        Message("loanCheckYourAnswers.section1.recipientDetails.nino", recipientName) ->
-          routes.IndividualRecipientNinoController.onPageLoad(srn, index, mode).url
-      case ReceivedLoanType.UKCompany =>
-        Message("loanCheckYourAnswers.section1.recipientDetails.crn", recipientName) ->
-          routes.CompanyRecipientCrnController.onPageLoad(srn, index, mode).url
-      case ReceivedLoanType.UKPartnership =>
-        Message("loanCheckYourAnswers.section1.recipientDetails.utr", recipientName) ->
-          routes.PartnershipRecipientUtrController.onPageLoad(srn, index, mode).url
-      case ReceivedLoanType.Other =>
-        Message("loanCheckYourAnswers.section1.recipientDetails.other", recipientName) ->
-          routes.OtherRecipientDetailsController.onPageLoad(srn, index, mode).url
-    }
+    val (
+      recipientDetailsKey,
+      recipientDetailsUrl,
+      recipientDetailsIdChangeHiddenKey,
+      recipientDetailsNoIdChangeHiddenKey
+    ): (Message, String, String, String) =
+      receivedLoanType match {
+        case ReceivedLoanType.Individual =>
+          (
+            Message("loanCheckYourAnswers.section1.recipientDetails.nino", recipientName),
+            routes.IndividualRecipientNinoController.onPageLoad(srn, index, mode).url,
+            "loanCheckYourAnswers.section1.recipientDetails.nino.hidden",
+            "loanCheckYourAnswers.section1.recipientDetails.noNinoReason.hidden"
+          )
+        case ReceivedLoanType.UKCompany =>
+          (
+            Message("loanCheckYourAnswers.section1.recipientDetails.crn", recipientName),
+            routes.CompanyRecipientCrnController.onPageLoad(srn, index, mode).url,
+            "loanCheckYourAnswers.section1.recipientDetails.crn.hidden",
+            "loanCheckYourAnswers.section1.recipientDetails.noCrnReason.hidden"
+          )
+        case ReceivedLoanType.UKPartnership =>
+          (
+            Message("loanCheckYourAnswers.section1.recipientDetails.utr", recipientName),
+            routes.PartnershipRecipientUtrController.onPageLoad(srn, index, mode).url,
+            "loanCheckYourAnswers.section1.recipientDetails.utr.hidden",
+            "loanCheckYourAnswers.section1.recipientDetails.noUtrReason.hidden"
+          )
+        case ReceivedLoanType.Other =>
+          (
+            Message("loanCheckYourAnswers.section1.recipientDetails.other", recipientName),
+            routes.OtherRecipientDetailsController.onPageLoad(srn, index, mode).url,
+            "loanCheckYourAnswers.section1.recipientDetails.other.hidden",
+            ""
+          )
+      }
 
     val (recipientNoDetailsReasonKey, recipientNoDetailsUrl): (Message, String) = receivedLoanType match {
       case ReceivedLoanType.Individual =>
@@ -329,14 +367,14 @@ object LoansCYAController {
             CheckYourAnswersRowViewModel(recipientDetailsKey, details)
               .withAction(
                 SummaryAction("site.change", recipientDetailsUrl)
-                  .withVisuallyHiddenContent(s"$recipientDetailsKey.hidden")
+                  .withVisuallyHiddenContent(recipientDetailsIdChangeHiddenKey)
               )
         ) :?+ recipientReasonNoDetails.map(
           reason =>
             CheckYourAnswersRowViewModel(recipientNoDetailsReasonKey, reason)
               .withAction(
                 SummaryAction("site.change", recipientNoDetailsUrl)
-                  .withVisuallyHiddenContent(s"$recipientNoDetailsReasonKey.hidden")
+                  .withVisuallyHiddenContent(recipientDetailsNoIdChangeHiddenKey)
               )
         ) :+ CheckYourAnswersRowViewModel(connectedPartyKey, connectedPartyValue)
           .withAction(
@@ -380,14 +418,14 @@ object LoansCYAController {
           ).withAction(
             SummaryAction(
               "site.change",
-              routes.DatePeriodLoanController.onPageLoad(srn, index, mode).url
+              routes.DatePeriodLoanController.onPageLoad(srn, index, mode).url + "#assetsValue"
             ).withVisuallyHiddenContent("loanCheckYourAnswers.section2.assetsValue.hidden")
           ),
           CheckYourAnswersRowViewModel("loanCheckYourAnswers.section2.loanPeriod", loanPeriodMonths)
             .withAction(
               SummaryAction(
                 "site.change",
-                routes.DatePeriodLoanController.onPageLoad(srn, index, mode).url
+                routes.DatePeriodLoanController.onPageLoad(srn, index, mode).url + "#loanPeriod"
               ).withVisuallyHiddenContent("loanCheckYourAnswers.section2.loanPeriod.hidden")
             )
         )
@@ -424,7 +462,7 @@ object LoansCYAController {
           ).withAction(
             SummaryAction(
               "site.change",
-              routes.AmountOfTheLoanController.onPageLoad(srn, index, mode).url
+              routes.AmountOfTheLoanController.onPageLoad(srn, index, mode).url + "#repayments"
             ).withVisuallyHiddenContent("loanCheckYourAnswers.section3.loanAmount.repayments.hidden")
           ),
           CheckYourAnswersRowViewModel(
@@ -433,7 +471,7 @@ object LoansCYAController {
           ).withAction(
             SummaryAction(
               "site.change",
-              routes.AmountOfTheLoanController.onPageLoad(srn, index, mode).url
+              routes.AmountOfTheLoanController.onPageLoad(srn, index, mode).url + "#outstanding"
             ).withVisuallyHiddenContent(
               Message("loanCheckYourAnswers.section3.loanAmount.outstanding.hidden", returnEndDate.show)
             )
@@ -475,14 +513,14 @@ object LoansCYAController {
             .withAction(
               SummaryAction(
                 "site.change",
-                routes.InterestOnLoanController.onPageLoad(srn, index, mode).url
+                routes.InterestOnLoanController.onPageLoad(srn, index, mode).url + "#rate"
               ).withVisuallyHiddenContent("loanCheckYourAnswers.section4.rate.hidden")
             ),
           CheckYourAnswersRowViewModel("loanCheckYourAnswers.section4.payments", s"£${interestPayments.displayAs}")
             .withAction(
               SummaryAction(
                 "site.change",
-                routes.InterestOnLoanController.onPageLoad(srn, index, mode).url
+                routes.InterestOnLoanController.onPageLoad(srn, index, mode).url + "#payments"
               ).withVisuallyHiddenContent("loanCheckYourAnswers.section4.payments.hidden")
             )
         )
@@ -512,7 +550,7 @@ object LoansCYAController {
             .withAction(
               SummaryAction(
                 "site.change",
-                routes.OutstandingArrearsOnLoanController.onPageLoad(srn, index, mode).url
+                routes.OutstandingArrearsOnLoanController.onPageLoad(srn, index, mode).url + "#details"
               ).withVisuallyHiddenContent("loanCheckYourAnswers.section6.arrears.yes.hidden")
             )
         }
@@ -543,7 +581,7 @@ object LoansCYAController {
             .withAction(
               SummaryAction(
                 "site.change",
-                routes.SecurityGivenForLoanController.onPageLoad(srn, index, mode).url
+                routes.SecurityGivenForLoanController.onPageLoad(srn, index, mode).url + "#details"
               ).withVisuallyHiddenContent("loanCheckYourAnswers.section5.security.yes.hidden")
             )
         }

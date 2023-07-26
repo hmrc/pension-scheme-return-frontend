@@ -20,7 +20,17 @@ import config.Refined.OneTo9999999
 import controllers.nonsipp.loansmadeoroutstanding.LoansCYAController._
 import controllers.ControllerBaseSpec
 import eu.timepit.refined.refineMV
-import models.{ConditionalYesNo, Crn, Money, NormalMode, ReceivedLoanType, Security, SponsoringOrConnectedParty}
+import models.CheckOrChange.Check
+import models.{
+  CheckOrChange,
+  ConditionalYesNo,
+  Crn,
+  Money,
+  NormalMode,
+  ReceivedLoanType,
+  Security,
+  SponsoringOrConnectedParty
+}
 import models.ConditionalYesNo._
 import pages.nonsipp.loansmadeoroutstanding._
 import play.api.inject.bind
@@ -42,8 +52,8 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
   private val index = refineMV[OneTo9999999](1)
   private val taxYear = Some(Left(dateRange))
 
-  private lazy val onPageLoad = routes.LoansCYAController.onPageLoad(srn, index, NormalMode)
-  private lazy val onSubmit = routes.LoansCYAController.onSubmit(srn, NormalMode)
+  private def onPageLoad(checkOrChange: CheckOrChange) = routes.LoansCYAController.onPageLoad(srn, index, checkOrChange)
+  private def onSubmit(checkOrChange: CheckOrChange) = routes.LoansCYAController.onSubmit(srn, checkOrChange)
 
   private val filledUserAnswers = defaultUserAnswers
     .unsafeSet(WhoReceivedLoanPage(srn, index), ReceivedLoanType.UKCompany)
@@ -58,33 +68,51 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
     .unsafeSet(OutstandingArrearsOnLoanPage(srn, index), ConditionalYesNo.yes[Unit, Money](money))
 
   "LoansCYAController" - {
-
-    act.like(renderView(onPageLoad, filledUserAnswers) { implicit app => implicit request =>
-      injected[CheckYourAnswersView].apply(
-        viewModel(
-          srn,
-          index,
-          ReceivedLoanType.UKCompany,
-          recipientName,
-          recipientDetails = Some(crn.value),
-          recipientReasonNoDetails = None,
-          connectedParty = Right(SponsoringOrConnectedParty.ConnectedParty),
-          datePeriodLoan = (localDate, money, loanPeriod),
-          loanAmount = (money, money, money),
-          returnEndDate = dateRange.to,
-          repaymentInstalments = true,
-          loanInterest = (money, percentage, money),
-          outstandingArrearsOnLoan = Some(money),
-          securityOnLoan = Some(security),
-          NormalMode
-        )
+    List(CheckOrChange.Check, CheckOrChange.Change).foreach { checkOrChange =>
+      act.like(
+        renderView(onPageLoad(checkOrChange), filledUserAnswers) { implicit app => implicit request =>
+          injected[CheckYourAnswersView].apply(
+            viewModel(
+              ViewModelParameters(
+                srn,
+                index,
+                ReceivedLoanType.UKCompany,
+                recipientName,
+                recipientDetails = Some(crn.value),
+                recipientReasonNoDetails = None,
+                connectedParty = Right(SponsoringOrConnectedParty.ConnectedParty),
+                datePeriodLoan = (localDate, money, loanPeriod),
+                loanAmount = (money, money, money),
+                returnEndDate = dateRange.to,
+                repaymentInstalments = true,
+                loanInterest = (money, percentage, money),
+                outstandingArrearsOnLoan = Some(money),
+                securityOnLoan = Some(security),
+                checkOrChange,
+                NormalMode
+              )
+            )
+          )
+        }.before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear))
+          .withName(s"render correct ${checkOrChange.name} view")
       )
-    }.before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear)))
 
-    act.like(redirectNextPage(onSubmit))
+      act.like(
+        redirectNextPage(onSubmit(checkOrChange))
+          .withName(s"redirect to next page when in ${checkOrChange.name} mode")
+      )
 
-    act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
+      act.like(
+        journeyRecoveryPage(onPageLoad(checkOrChange))
+          .updateName("onPageLoad" + _)
+          .withName(s"redirect to journey recovery page on page load when in ${checkOrChange.name} mode")
+      )
 
-    act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
+      act.like(
+        journeyRecoveryPage(onSubmit(checkOrChange))
+          .updateName("onSubmit" + _)
+          .withName(s"redirect to journey recovery page on submit when in ${checkOrChange.name} mode")
+      )
+    }
   }
 }

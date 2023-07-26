@@ -26,9 +26,10 @@ import controllers.nonsipp.loansmadeoroutstanding.LoansListController._
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.refineV
 import forms.YesNoPageFormProvider
+import models.CheckOrChange.Change
 import models.SchemeId.Srn
 import models.requests.DataRequest
-import models.{Mode, Money, ReceivedLoanType}
+import models.{CheckOrChange, Mode, Money, NormalMode, ReceivedLoanType}
 import navigation.Navigator
 import pages.nonsipp.accountingperiod.AccountingPeriodListPage
 import pages.nonsipp.loansmadeoroutstanding._
@@ -123,7 +124,7 @@ object LoansListController {
         List(
           ListRow(
             Message("loansList.row", totalLoan.displayAs, recipientName),
-            changeUrl = controllers.routes.UnauthorisedController.onPageLoad().url,
+            changeUrl = routes.LoansCYAController.onPageLoad(srn, index, Change).url,
             changeHiddenText = Message("loansList.row.change.hidden", totalLoan.displayAs, recipientName),
             removeUrl = controllers.routes.UnauthorisedController.onPageLoad().url,
             removeHiddenText = Message("loansList.row.remove.hidden", totalLoan.displayAs, recipientName)
