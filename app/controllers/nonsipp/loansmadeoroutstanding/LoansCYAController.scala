@@ -418,14 +418,14 @@ object LoansCYAController {
           ).withAction(
             SummaryAction(
               "site.change",
-              routes.DatePeriodLoanController.onPageLoad(srn, index, mode).url
+              routes.DatePeriodLoanController.onPageLoad(srn, index, mode).url + "#assetsValue"
             ).withVisuallyHiddenContent("loanCheckYourAnswers.section2.assetsValue.hidden")
           ),
           CheckYourAnswersRowViewModel("loanCheckYourAnswers.section2.loanPeriod", loanPeriodMonths)
             .withAction(
               SummaryAction(
                 "site.change",
-                routes.DatePeriodLoanController.onPageLoad(srn, index, mode).url
+                routes.DatePeriodLoanController.onPageLoad(srn, index, mode).url + "#loanPeriod"
               ).withVisuallyHiddenContent("loanCheckYourAnswers.section2.loanPeriod.hidden")
             )
         )
@@ -462,7 +462,7 @@ object LoansCYAController {
           ).withAction(
             SummaryAction(
               "site.change",
-              routes.AmountOfTheLoanController.onPageLoad(srn, index, mode).url
+              routes.AmountOfTheLoanController.onPageLoad(srn, index, mode).url + "#repayments"
             ).withVisuallyHiddenContent("loanCheckYourAnswers.section3.loanAmount.repayments.hidden")
           ),
           CheckYourAnswersRowViewModel(
@@ -471,7 +471,7 @@ object LoansCYAController {
           ).withAction(
             SummaryAction(
               "site.change",
-              routes.AmountOfTheLoanController.onPageLoad(srn, index, mode).url
+              routes.AmountOfTheLoanController.onPageLoad(srn, index, mode).url + "#outstanding"
             ).withVisuallyHiddenContent(
               Message("loanCheckYourAnswers.section3.loanAmount.outstanding.hidden", returnEndDate.show)
             )
@@ -513,14 +513,14 @@ object LoansCYAController {
             .withAction(
               SummaryAction(
                 "site.change",
-                routes.InterestOnLoanController.onPageLoad(srn, index, mode).url
+                routes.InterestOnLoanController.onPageLoad(srn, index, mode).url + "#rate"
               ).withVisuallyHiddenContent("loanCheckYourAnswers.section4.rate.hidden")
             ),
           CheckYourAnswersRowViewModel("loanCheckYourAnswers.section4.payments", s"£${interestPayments.displayAs}")
             .withAction(
               SummaryAction(
                 "site.change",
-                routes.InterestOnLoanController.onPageLoad(srn, index, mode).url
+                routes.InterestOnLoanController.onPageLoad(srn, index, mode).url + "#payments"
               ).withVisuallyHiddenContent("loanCheckYourAnswers.section4.payments.hidden")
             )
         )
@@ -550,7 +550,7 @@ object LoansCYAController {
             .withAction(
               SummaryAction(
                 "site.change",
-                routes.OutstandingArrearsOnLoanController.onPageLoad(srn, index, mode).url
+                routes.OutstandingArrearsOnLoanController.onPageLoad(srn, index, mode).url + "#details"
               ).withVisuallyHiddenContent("loanCheckYourAnswers.section6.arrears.yes.hidden")
             )
         }
@@ -581,7 +581,7 @@ object LoansCYAController {
             .withAction(
               SummaryAction(
                 "site.change",
-                routes.SecurityGivenForLoanController.onPageLoad(srn, index, mode).url
+                routes.SecurityGivenForLoanController.onPageLoad(srn, index, mode).url + "#details"
               ).withVisuallyHiddenContent("loanCheckYourAnswers.section5.security.yes.hidden")
             )
         }
