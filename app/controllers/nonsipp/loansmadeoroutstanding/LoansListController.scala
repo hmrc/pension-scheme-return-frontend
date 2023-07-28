@@ -62,7 +62,7 @@ class LoansListController @Inject()(
     loanRecipients(srn).map { recipients =>
       if (recipients.length == maxLoans) {
 
-        Redirect(navigator.nextPage(AccountingPeriodListPage(srn, addPeriod = false), mode, request.userAnswers)) // TODO bug
+        Redirect(navigator.nextPage(AccountingPeriodListPage(srn, addPeriod = false), mode, request.userAnswers))
       } else {
 
         val viewModel = LoansListController.viewModel(srn, mode, recipients)

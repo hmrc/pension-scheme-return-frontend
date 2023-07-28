@@ -16,13 +16,10 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
-import cats.implicits._
 import config.Refined.{Max9999999, OneTo9999999}
 import controllers.PSRController
 import controllers.actions._
 import controllers.nonsipp.loansmadeoroutstanding.RemoveLoanController._
-import eu.timepit.refined.api.Refined
-import eu.timepit.refined.{refineMV, refineV}
 import forms.YesNoPageFormProvider
 import models.{Mode, Money, ReceivedLoanType}
 import models.SchemeId.Srn
@@ -35,15 +32,12 @@ import pages.nonsipp.loansmadeoroutstanding.{
   OtherRecipientDetailsPage,
   PartnershipRecipientNamePage,
   RemoveLoanPage,
-  WhoReceivedLoanPage,
-  WhoReceivedLoans
+  WhoReceivedLoanPage
 }
-import pages.nonsipp.memberdetails.MemberDetailsPage
 import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.SaveService
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
@@ -72,8 +66,6 @@ class RemoveLoanController @Inject()(
         .get(WhoReceivedLoanPage(srn, index))
       whoReceivedLoanPage match {
         case Some(who) => {
-//          TODO remove
-//          val indexFail: Max9999999 = refineMV(13)
           val recipientName =
             who match {
               case ReceivedLoanType.Individual =>
@@ -110,7 +102,8 @@ class RemoveLoanController @Inject()(
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode, "", "")))),
           value =>
             for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.remove(RemoveLoanPage(srn, index))) // TODO remove all data
+              updatedAnswers <- Future
+                .fromTry(request.userAnswers.remove(WhoReceivedLoanPage(srn, index)))
               _ <- saveService.save(updatedAnswers)
             } yield Redirect(navigator.nextPage(RemoveLoanPage(srn, index), mode, updatedAnswers))
         )
@@ -122,7 +115,7 @@ class RemoveLoanController @Inject()(
 
     val whoReceivedLoanPage = request.userAnswers
       .get(WhoReceivedLoanPage(srn, index))
-      .get // TODO else
+      .get
 
     val recipientName = whoReceivedLoanPage match {
       case ReceivedLoanType.Individual =>

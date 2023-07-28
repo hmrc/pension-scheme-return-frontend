@@ -17,12 +17,18 @@
 package controllers.nonsipp.loansmadeoroutstanding
 
 import config.Refined.OneTo9999999
-import controllers.nonsipp.loansmadeoroutstanding.RemoveLoanController._
 import controllers.ControllerBaseSpec
+import controllers.nonsipp.loansmadeoroutstanding.RemoveLoanController._
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
-import models.NormalMode
-import pages.nonsipp.loansmadeoroutstanding.RemoveLoanPage
+import models.{NormalMode, ReceivedLoanType}
+import pages.nonsipp.loansmadeoroutstanding.{
+  AmountOfTheLoanPage,
+  CompanyRecipientNamePage,
+  IndividualRecipientNamePage,
+  PartnershipRecipientNamePage,
+  WhoReceivedLoanPage
+}
 import views.html.YesNoPageView
 
 class RemoveLoanControllerSpec extends ControllerBaseSpec {
@@ -31,15 +37,25 @@ class RemoveLoanControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoad = routes.RemoveLoanController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.RemoveLoanController.onSubmit(srn, index, NormalMode)
+  private val filledUserAnswers = defaultUserAnswers
+    .unsafeSet(WhoReceivedLoanPage(srn, refineMV(1)), ReceivedLoanType.UKCompany)
+    .unsafeSet(CompanyRecipientNamePage(srn, refineMV(1)), "recipientName1")
+    .unsafeSet(AmountOfTheLoanPage(srn, refineMV(1)), (money, money, money))
+    .unsafeSet(WhoReceivedLoanPage(srn, refineMV(2)), ReceivedLoanType.UKPartnership)
+    .unsafeSet(PartnershipRecipientNamePage(srn, refineMV(2)), "recipientName2")
+    .unsafeSet(AmountOfTheLoanPage(srn, refineMV(2)), (money, money, money))
+    .unsafeSet(WhoReceivedLoanPage(srn, refineMV(3)), ReceivedLoanType.Individual)
+    .unsafeSet(IndividualRecipientNamePage(srn, refineMV(3)), "recipientName3")
+    .unsafeSet(AmountOfTheLoanPage(srn, refineMV(3)), (money, money, money))
 
   "RemoveLoanController" - {
 
-    act.like(renderView(onPageLoad) { implicit app => implicit request =>
-      injected[YesNoPageView].apply(form(injected[YesNoPageFormProvider]), viewModel(srn, index, NormalMode))
-    })
-
-    act.like(renderPrePopView(onPageLoad, RemoveLoanPage(srn), true) { implicit app => implicit request =>
-      injected[YesNoPageView].apply(form(injected[YesNoPageFormProvider]).fill(true), viewModel(srn, index, NormalMode))
+    act.like(renderView(onPageLoad, filledUserAnswers) { implicit app => implicit request =>
+      injected[YesNoPageView]
+        .apply(
+          form(injected[YesNoPageFormProvider]),
+          viewModel(srn, index, NormalMode, money.displayAs, "recipientName1")
+        )
     })
 
     act.like(redirectNextPage(onSubmit, "value" -> "true"))
