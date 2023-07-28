@@ -101,11 +101,16 @@ class RemoveLoanController @Inject()(
           // TODO get loan amount and recipientName
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode, "", "")))),
           value =>
-            for {
-              updatedAnswers <- Future
-                .fromTry(request.userAnswers.remove(WhoReceivedLoanPage(srn, index)))
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(RemoveLoanPage(srn, index), mode, updatedAnswers))
+            if (value) {
+              for {
+                updatedAnswers <- Future
+                  .fromTry(request.userAnswers.remove(WhoReceivedLoanPage(srn, index)))
+                _ <- saveService.save(updatedAnswers)
+              } yield Redirect(navigator.nextPage(RemoveLoanPage(srn, index), mode, updatedAnswers))
+            } else {
+              Future
+                .successful(Redirect(navigator.nextPage(RemoveLoanPage(srn, index), mode, request.userAnswers)))
+            }
         )
   }
 
