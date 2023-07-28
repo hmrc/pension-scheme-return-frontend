@@ -257,7 +257,9 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
       normalmode
         .navigateTo(
           srn => RemoveLoanPage(srn, refineMV(1)),
-          (srn, _) => controllers.nonsipp.loansmadeoroutstanding.routes.LoansMadeOrOutstandingController.onPageLoad(srn, NormalMode)
+          (srn, _) =>
+            controllers.nonsipp.loansmadeoroutstanding.routes.LoansMadeOrOutstandingController
+              .onPageLoad(srn, NormalMode)
         )
         .withName("go from remove page to list page")
     )

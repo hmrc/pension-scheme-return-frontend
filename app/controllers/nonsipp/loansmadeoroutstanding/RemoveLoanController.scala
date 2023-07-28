@@ -61,36 +61,46 @@ class RemoveLoanController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      val preparedForm = request.userAnswers.fillForm(RemoveLoanPage(srn, index), form)
-      val whoReceivedLoanPage = request.userAnswers
-        .get(WhoReceivedLoanPage(srn, index))
-      whoReceivedLoanPage match {
-        case Some(who) => {
-          val recipientName =
-            who match {
-              case ReceivedLoanType.Individual =>
-                request.userAnswers.get(IndividualRecipientNamePage(srn, index)).getOrRecoverJourney
-              case ReceivedLoanType.UKCompany =>
-                request.userAnswers.get(CompanyRecipientNamePage(srn, index)).getOrRecoverJourney
-              case ReceivedLoanType.UKPartnership =>
-                request.userAnswers.get(PartnershipRecipientNamePage(srn, index)).getOrRecoverJourney
-              case ReceivedLoanType.Other =>
-                request.userAnswers.get(OtherRecipientDetailsPage(srn, index)).map(_.name).getOrRecoverJourney
-            }
-          recipientName.fold(
-            l => l,
-            name => {
-              val loanAmount =
-                request.userAnswers.get(AmountOfTheLoanPage(srn, index)).map(_._1).getOrRecoverJourney
-              loanAmount.fold(
-                l => l,
-                amount => Ok(view(preparedForm, viewModel(srn, index, mode, amount.displayAs, name)))
-              )
-            }
-          )
-        }
-        case _ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      getResult(srn, index, mode, request.userAnswers.fillForm(RemoveLoanPage(srn, index), form))
+  }
+
+  private def getResult(srn: Srn, index: Max9999999, mode: Mode, form: Form[Boolean], error: Boolean = false)(
+    implicit request: DataRequest[_]
+  ) = {
+    val whoReceivedLoanPage = request.userAnswers
+      .get(WhoReceivedLoanPage(srn, index))
+    whoReceivedLoanPage match {
+      case Some(who) => {
+        val recipientName =
+          who match {
+            case ReceivedLoanType.Individual =>
+              request.userAnswers.get(IndividualRecipientNamePage(srn, index)).getOrRecoverJourney
+            case ReceivedLoanType.UKCompany =>
+              request.userAnswers.get(CompanyRecipientNamePage(srn, index)).getOrRecoverJourney
+            case ReceivedLoanType.UKPartnership =>
+              request.userAnswers.get(PartnershipRecipientNamePage(srn, index)).getOrRecoverJourney
+            case ReceivedLoanType.Other =>
+              request.userAnswers.get(OtherRecipientDetailsPage(srn, index)).map(_.name).getOrRecoverJourney
+          }
+        recipientName.fold(
+          l => l,
+          name => {
+            val loanAmount =
+              request.userAnswers.get(AmountOfTheLoanPage(srn, index)).map(_._1).getOrRecoverJourney
+            loanAmount.fold(
+              l => l,
+              amount =>
+                if (error) {
+                  BadRequest(view(form, viewModel(srn, index, mode, amount.displayAs, name)))
+                } else {
+                  Ok(view(form, viewModel(srn, index, mode, amount.displayAs, name)))
+                }
+            )
+          }
+        )
       }
+      case _ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+    }
   }
 
   def onSubmit(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
@@ -98,8 +108,7 @@ class RemoveLoanController @Inject()(
       form
         .bindFromRequest()
         .fold(
-          // TODO get loan amount and recipientName
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode, "", "")))),
+          formWithErrors => Future.successful(getResult(srn, index, mode, formWithErrors, true)),
           value =>
             if (value) {
               for {

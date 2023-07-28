@@ -65,7 +65,8 @@ class RemoveLoanControllerSpec extends ControllerBaseSpec {
 
     act.like(saveAndContinue(onSubmit, "value" -> "true"))
 
-    act.like(invalidForm(onSubmit))
+    act.like(invalidForm(onSubmit, filledUserAnswers))
+
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }
 }
