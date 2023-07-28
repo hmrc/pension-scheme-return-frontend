@@ -122,37 +122,6 @@ class RemoveLoanController @Inject()(
             }
         )
   }
-
-  private def loanRecipientDetails(srn: Srn, index: Max9999999)(
-    implicit request: DataRequest[_]
-  ): (Either[Result, String], Either[Result, Money]) = {
-
-    val whoReceivedLoanPage = request.userAnswers
-      .get(WhoReceivedLoanPage(srn, index))
-      .get
-
-    val recipientName = whoReceivedLoanPage match {
-      case ReceivedLoanType.Individual =>
-        request.userAnswers.get(IndividualRecipientNamePage(srn, index)).getOrRecoverJourney
-      case ReceivedLoanType.UKCompany =>
-        request.userAnswers.get(CompanyRecipientNamePage(srn, index)).getOrRecoverJourney
-      case ReceivedLoanType.UKPartnership =>
-        request.userAnswers.get(PartnershipRecipientNamePage(srn, index)).getOrRecoverJourney
-      case ReceivedLoanType.Other =>
-        request.userAnswers.get(OtherRecipientDetailsPage(srn, index)).map(_.name).getOrRecoverJourney
-    }
-    val loanAmount = request.userAnswers.get(AmountOfTheLoanPage(srn, index)).map(_._1).getOrRecoverJourney
-
-    val recipientDetails = (recipientName, loanAmount)
-    recipientDetails
-//        case recipientName =>
-//          request.userAnswers
-//            .get(AmountOfTheLoanPage(srn, index))
-//            .map(_._1)
-//            .getOrRecoverJourney
-//            .map((index, recipientName, _))
-//      }
-  }
 }
 
 object RemoveLoanController {
