@@ -63,8 +63,15 @@ class NonSippNavigator @Inject()() extends Navigator {
         }
     }
 
-    override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => {
-      case CheckReturnDatesPage(_) => controllers.routes.UnauthorisedController.onPageLoad()
+    override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
+
+      case page @ CheckReturnDatesPage(srn) =>
+        if (userAnswers.get(page).contains(true)) {
+          nonsipp.schemedesignatory.routes.ActiveBankAccountController.onPageLoad(srn, NormalMode)
+        } else {
+          nonsipp.accountingperiod.routes.AccountingPeriodController.onPageLoad(srn, refineMV(1), NormalMode)
+        }
+
       case HowManyMembersPage(_, _) => controllers.routes.UnauthorisedController.onPageLoad()
     }
   }

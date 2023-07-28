@@ -21,6 +21,7 @@ import controllers.nonsipp.accountingperiod.routes
 import controllers.nonsipp.schemedesignatory
 import eu.timepit.refined.refineMV
 import generators.IndexGen
+import models.NormalMode
 import navigation.{Navigator, NavigatorBehaviours}
 import pages.nonsipp.accountingperiod.{
   AccountingPeriodCheckYourAnswersPage,
@@ -57,7 +58,7 @@ class AccountingPeriodNavigatorSpec extends BaseSpec with NavigatorBehaviours {
     act.like(
       normalmode
         .navigateFromListPage(
-          AccountingPeriodListPage(_, addPeriod = true),
+          AccountingPeriodListPage(_, addPeriod = true, NormalMode),
           AccountingPeriodPage,
           dateRangeGen,
           IndexGen[OneToThree](1, 3),
@@ -70,7 +71,7 @@ class AccountingPeriodNavigatorSpec extends BaseSpec with NavigatorBehaviours {
     act.like(
       normalmode
         .navigateTo(
-          AccountingPeriodListPage(_, addPeriod = false),
+          AccountingPeriodListPage(_, addPeriod = false, NormalMode),
           schemedesignatory.routes.ActiveBankAccountController.onPageLoad
         )
         .withName("go from list page to bank account page when no selected")
@@ -79,7 +80,7 @@ class AccountingPeriodNavigatorSpec extends BaseSpec with NavigatorBehaviours {
     act.like(
       normalmode
         .navigateTo(
-          RemoveAccountingPeriodPage,
+          RemoveAccountingPeriodPage(_, NormalMode),
           routes.AccountingPeriodListController.onPageLoad
         )
         .withName("go from remove page to list page")

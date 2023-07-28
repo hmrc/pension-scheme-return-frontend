@@ -77,10 +77,12 @@ class RemoveAccountingPeriodController @Inject()(
               for {
                 updatedAnswers <- Future.fromTry(request.userAnswers.remove(AccountingPeriodPage(srn, index)))
                 _ <- saveService.save(updatedAnswers)
-              } yield Redirect(navigator.nextPage(RemoveAccountingPeriodPage(srn), mode, updatedAnswers))
+              } yield Redirect(navigator.nextPage(RemoveAccountingPeriodPage(srn, mode), mode, updatedAnswers))
             } else {
               Future
-                .successful(Redirect(navigator.nextPage(RemoveAccountingPeriodPage(srn), mode, request.userAnswers)))
+                .successful(
+                  Redirect(navigator.nextPage(RemoveAccountingPeriodPage(srn, mode), mode, request.userAnswers))
+                )
             }
           }
         )

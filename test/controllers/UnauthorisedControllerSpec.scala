@@ -33,8 +33,11 @@ class UnauthorisedControllerSpec extends ControllerBaseSpec {
 
         status(result) mustEqual OK
 
-        contentAsString(result) mustEqual view(UnauthorisedController.viewModel
-        ("https://www.gov.uk/government/organisations/hm-revenue-customs/contact/pension-scheme-enquiries"))(request, createMessages(application)).toString
+        contentAsString(result) mustEqual view(
+          UnauthorisedController.viewModel(
+            "https://www.gov.uk/government/organisations/hm-revenue-customs/contact/pension-scheme-enquiries"
+          )
+        )(request, createMessages(application)).toString
 
       }
 

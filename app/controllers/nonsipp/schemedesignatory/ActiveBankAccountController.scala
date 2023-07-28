@@ -19,10 +19,12 @@ package controllers.nonsipp.schemedesignatory
 import controllers.actions._
 import controllers.nonsipp.schemedesignatory.ActiveBankAccountController.viewModel
 import forms.YesNoPageFormProvider
-import models.Mode
+import models.{CheckMode, Mode, NormalMode}
 import models.SchemeId.Srn
 import navigation.Navigator
-import pages.nonsipp.schemedesignatory.ActiveBankAccountPage
+import pages.nonsipp.BasicDetailsCheckYourAnswersPage
+import pages.nonsipp.accountingperiod.AccountingPeriodListPage
+import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, WhyNoBankAccountPage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -66,7 +68,16 @@ class ActiveBankAccountController @Inject()(
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(ActiveBankAccountPage(srn), value))
             _ <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage(ActiveBankAccountPage(srn), mode, updatedAnswers))
+          } yield {
+            mode match {
+              case CheckMode =>
+                if (value)
+                  Redirect(navigator.nextPage(BasicDetailsCheckYourAnswersPage(srn), mode, request.userAnswers))
+                else
+                  Redirect(navigator.nextPage(WhyNoBankAccountPage(srn), mode, request.userAnswers))
+              case NormalMode => Redirect(navigator.nextPage(ActiveBankAccountPage(srn), mode, updatedAnswers))
+            }
+          }
       )
   }
 }

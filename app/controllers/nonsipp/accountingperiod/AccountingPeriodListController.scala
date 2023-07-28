@@ -24,8 +24,9 @@ import controllers.actions._
 import eu.timepit.refined.{refineMV, refineV}
 import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
-import models.{DateRange, Mode}
+import models.{CheckMode, DateRange, Mode, NormalMode}
 import navigation.Navigator
+import pages.nonsipp.BasicDetailsCheckYourAnswersPage
 import pages.nonsipp.accountingperiod.{AccountingPeriodListPage, AccountingPeriods}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -60,7 +61,7 @@ class AccountingPeriodListController @Inject()(
       Ok(view(form, viewModel))
     } else {
 
-      Redirect(routes.AccountingPeriodController.onPageLoad(srn, refineMV(1), mode))
+      Redirect(controllers.nonsipp.routes.CheckReturnDatesController.onPageLoad(srn, mode))
     }
   }
 
@@ -69,7 +70,7 @@ class AccountingPeriodListController @Inject()(
 
     if (periods.length == maxAccountingPeriods) {
 
-      Redirect(navigator.nextPage(AccountingPeriodListPage(srn, addPeriod = false), mode, request.userAnswers))
+      Redirect(navigator.nextPage(AccountingPeriodListPage(srn, addPeriod = false, mode), mode, request.userAnswers))
     } else {
 
       val viewModel = AccountingPeriodListController.viewModel(srn, mode, periods)
@@ -78,7 +79,17 @@ class AccountingPeriodListController @Inject()(
         .bindFromRequest()
         .fold(
           errors => BadRequest(view(errors, viewModel)),
-          answer => Redirect(navigator.nextPage(AccountingPeriodListPage(srn, answer), mode, request.userAnswers))
+          answer => {
+            mode match {
+              case CheckMode =>
+                if (answer)
+                  Redirect(navigator.nextPage(AccountingPeriodListPage(srn, answer, mode), mode, request.userAnswers))
+                else
+                  Redirect(navigator.nextPage(BasicDetailsCheckYourAnswersPage(srn), mode, request.userAnswers))
+              case NormalMode =>
+                Redirect(navigator.nextPage(AccountingPeriodListPage(srn, answer, mode), mode, request.userAnswers))
+            }
+          }
         )
     }
   }

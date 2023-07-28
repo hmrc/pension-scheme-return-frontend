@@ -47,7 +47,7 @@ class AccountingPeriodListControllerSpec extends ControllerBaseSpec {
     lazy val onPageLoad = routes.AccountingPeriodListController.onPageLoad(srn, NormalMode)
     lazy val onSubmit = routes.AccountingPeriodListController.onSubmit(srn, NormalMode)
 
-    lazy val accountingPeriodPage = routes.AccountingPeriodController.onPageLoad(srn, refineMV(1), NormalMode)
+    lazy val accountingPeriodPage = controllers.nonsipp.routes.CheckReturnDatesController.onPageLoad(srn, NormalMode)
 
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
       val view = injected[ListView]
