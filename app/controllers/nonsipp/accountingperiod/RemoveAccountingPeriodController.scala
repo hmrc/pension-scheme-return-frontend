@@ -56,7 +56,7 @@ class RemoveAccountingPeriodController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max3, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      withAccountingPeriodAtIndex(srn, index) { period =>
+      withAccountingPeriodAtIndex(srn, index, mode) { period =>
         Ok(view(form, viewModel(srn, index, period, mode)))
       }
   }
@@ -68,14 +68,14 @@ class RemoveAccountingPeriodController @Inject()(
         .fold(
           formWithErrors =>
             Future.successful(
-              withAccountingPeriodAtIndex(srn, index) { period =>
+              withAccountingPeriodAtIndex(srn, index, mode) { period =>
                 BadRequest(view(formWithErrors, viewModel(srn, index, period, mode)))
               }
             ),
           answer => {
             if (answer) {
               for {
-                updatedAnswers <- Future.fromTry(request.userAnswers.remove(AccountingPeriodPage(srn, index)))
+                updatedAnswers <- Future.fromTry(request.userAnswers.remove(AccountingPeriodPage(srn, index, mode)))
                 _ <- saveService.save(updatedAnswers)
               } yield Redirect(navigator.nextPage(RemoveAccountingPeriodPage(srn, mode), mode, updatedAnswers))
             } else {
@@ -88,10 +88,10 @@ class RemoveAccountingPeriodController @Inject()(
         )
   }
 
-  private def withAccountingPeriodAtIndex(srn: Srn, index: Max3)(
+  private def withAccountingPeriodAtIndex(srn: Srn, index: Max3, mode: Mode)(
     f: DateRange => Result
   )(implicit request: DataRequest[_]): Result =
-    request.userAnswers.get(AccountingPeriodPage(srn, index)) match {
+    request.userAnswers.get(AccountingPeriodPage(srn, index, mode)) match {
       case Some(bankAccount) => f(bankAccount)
       case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
     }

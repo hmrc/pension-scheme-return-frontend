@@ -37,11 +37,11 @@ object AccountingPeriodNavigator extends JourneyNavigator {
 
   val normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
 
-    case AccountingPeriodPage(srn, index) =>
-      routes.AccountingPeriodCheckYourAnswersController.onPageLoad(srn, index)
+    case AccountingPeriodPage(srn, index, mode) =>
+      routes.AccountingPeriodCheckYourAnswersController.onPageLoad(srn, index, mode)
 
-    case AccountingPeriodCheckYourAnswersPage(srn) =>
-      routes.AccountingPeriodListController.onPageLoad(srn, NormalMode)
+    case AccountingPeriodCheckYourAnswersPage(srn, mode) =>
+      routes.AccountingPeriodListController.onPageLoad(srn, mode)
 
     case AccountingPeriodListPage(srn, false, mode) =>
       nonsipp.schemedesignatory.routes.ActiveBankAccountController.onPageLoad(srn, mode)
@@ -59,14 +59,14 @@ object AccountingPeriodNavigator extends JourneyNavigator {
 
   val checkRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
 
-    case AccountingPeriodPage(srn, index) =>
-      routes.AccountingPeriodCheckYourAnswersController.onPageLoad(srn, index)
+    case AccountingPeriodPage(srn, index, mode) =>
+      routes.AccountingPeriodCheckYourAnswersController.onPageLoad(srn, index, mode)
 
-    case AccountingPeriodCheckYourAnswersPage(srn) =>
-      routes.AccountingPeriodListController.onPageLoad(srn, NormalMode)
+    case AccountingPeriodCheckYourAnswersPage(srn, mode) =>
+      routes.AccountingPeriodListController.onPageLoad(srn, mode)
 
     case AccountingPeriodListPage(srn, false, mode) =>
-      nonsipp.schemedesignatory.routes.ActiveBankAccountController.onPageLoad(srn, mode)
+      controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, NormalMode)
 
     case AccountingPeriodListPage(srn, true, mode) =>
       val count = userAnswers.list(AccountingPeriods(srn)).length

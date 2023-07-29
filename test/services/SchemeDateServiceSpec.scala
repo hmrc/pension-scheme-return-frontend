@@ -19,7 +19,7 @@ package services
 import cats.data.NonEmptyList
 import eu.timepit.refined.refineMV
 import models.requests.DataRequest
-import models.{DateRange, UserAnswers}
+import models.{DateRange, NormalMode, UserAnswers}
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import pages.nonsipp.WhichTaxYearPage
 import pages.nonsipp.accountingperiod.AccountingPeriodPage
@@ -72,7 +72,7 @@ class SchemeDateServiceSpec extends BaseSpec with ScalaCheckPropertyChecks {
           forAll(dateRangeGen, dateRangeGen) { (whichTaxYearPage, accountingPeriod) =>
             val userAnswers = defaultUserAnswers
               .unsafeSet(WhichTaxYearPage(srn), whichTaxYearPage)
-              .unsafeSet(AccountingPeriodPage(srn, refineMV(1)), accountingPeriod)
+              .unsafeSet(AccountingPeriodPage(srn, refineMV(1), NormalMode), accountingPeriod)
 
             val request = DataRequest(allowedAccessRequest, userAnswers)
 
@@ -86,8 +86,8 @@ class SchemeDateServiceSpec extends BaseSpec with ScalaCheckPropertyChecks {
             (whichTaxYearPage, oldestAccountingPeriod, newestAccountingPeriod) =>
               val userAnswers = defaultUserAnswers
                 .unsafeSet(WhichTaxYearPage(srn), whichTaxYearPage)
-                .unsafeSet(AccountingPeriodPage(srn, refineMV(1)), newestAccountingPeriod)
-                .unsafeSet(AccountingPeriodPage(srn, refineMV(2)), oldestAccountingPeriod)
+                .unsafeSet(AccountingPeriodPage(srn, refineMV(1), NormalMode), newestAccountingPeriod)
+                .unsafeSet(AccountingPeriodPage(srn, refineMV(2), NormalMode), oldestAccountingPeriod)
 
               val request = DataRequest(allowedAccessRequest, userAnswers)
 

@@ -17,7 +17,7 @@
 package pages
 
 import eu.timepit.refined.refineMV
-import models.DateRange
+import models.{DateRange, NormalMode}
 import pages.behaviours.PageBehaviours
 import pages.nonsipp.accountingperiod.{AccountingPeriodPage, AccountingPeriods}
 
@@ -27,11 +27,11 @@ class AccountingPeriodPageSpec extends PageBehaviours {
 
   "AccountingPeriodPage" - {
 
-    beRetrievable[DateRange](AccountingPeriodPage(srn, refineMV(1)))
+    beRetrievable[DateRange](AccountingPeriodPage(srn, refineMV(1), NormalMode))
 
-    beSettable[DateRange](AccountingPeriodPage(srn, refineMV(1)))
+    beSettable[DateRange](AccountingPeriodPage(srn, refineMV(1), NormalMode))
 
-    beRemovable[DateRange](AccountingPeriodPage(srn, refineMV(1)))
+    beRemovable[DateRange](AccountingPeriodPage(srn, refineMV(1), NormalMode))
   }
 
   "AccountingPeriods" - {
@@ -39,13 +39,13 @@ class AccountingPeriodPageSpec extends PageBehaviours {
     beRetrievable[DateRange]
       .list(
         getter = AccountingPeriods(srn),
-        setter = AccountingPeriodPage(srn, refineMV(1))
+        setter = AccountingPeriodPage(srn, refineMV(1), NormalMode)
       )
 
     beRemovable[DateRange]
       .list(
         getter = AccountingPeriods(srn),
-        setter = AccountingPeriodPage(srn, refineMV(1)),
+        setter = AccountingPeriodPage(srn, refineMV(1), NormalMode),
         remover = AccountingPeriods(srn)
       )
   }

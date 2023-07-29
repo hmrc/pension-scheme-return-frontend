@@ -17,14 +17,14 @@
 package pages.nonsipp.accountingperiod
 
 import config.Refined.Max3
-import models.DateRange
+import models.{DateRange, Mode}
 import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import queries.{Gettable, Removable}
 import utils.RefinedUtils.RefinedIntOps
 
-case class AccountingPeriodPage(srn: Srn, index: Max3) extends QuestionPage[DateRange] {
+case class AccountingPeriodPage(srn: Srn, index: Max3, mode: Mode) extends QuestionPage[DateRange] {
 
   override def path: JsPath = JsPath \ toString \ index.arrayIndex
 

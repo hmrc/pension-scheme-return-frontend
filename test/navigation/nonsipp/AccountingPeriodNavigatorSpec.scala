@@ -40,8 +40,8 @@ class AccountingPeriodNavigatorSpec extends BaseSpec with NavigatorBehaviours {
     act.like(
       normalmode
         .navigateTo(
-          AccountingPeriodPage(_, refineMV(1)),
-          (srn, _) => routes.AccountingPeriodCheckYourAnswersController.onPageLoad(srn, refineMV(1))
+          AccountingPeriodPage(_, refineMV(1), NormalMode),
+          (srn, _) => routes.AccountingPeriodCheckYourAnswersController.onPageLoad(srn, refineMV(1), NormalMode)
         )
         .withName("go from accounting period page to check answers page")
     )
@@ -49,7 +49,7 @@ class AccountingPeriodNavigatorSpec extends BaseSpec with NavigatorBehaviours {
     act.like(
       normalmode
         .navigateTo(
-          AccountingPeriodCheckYourAnswersPage,
+          AccountingPeriodCheckYourAnswersPage(_, NormalMode),
           routes.AccountingPeriodListController.onPageLoad
         )
         .withName("go from check your answers page to list page")
@@ -59,7 +59,7 @@ class AccountingPeriodNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       normalmode
         .navigateFromListPage(
           AccountingPeriodListPage(_, addPeriod = true, NormalMode),
-          AccountingPeriodPage,
+          AccountingPeriodPage(_, _, NormalMode),
           dateRangeGen,
           IndexGen[OneToThree](1, 3),
           routes.AccountingPeriodController.onPageLoad,

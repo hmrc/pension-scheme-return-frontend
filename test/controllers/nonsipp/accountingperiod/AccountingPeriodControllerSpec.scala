@@ -50,11 +50,13 @@ class AccountingPeriodControllerSpec extends ControllerBaseSpec {
       view(form, viewModel)
     })
 
-    act.like(renderPrePopView(onPageLoad, AccountingPeriodPage(srn, refineMV(1)), dateRangeData, userAnswers) {
-      implicit app => implicit request =>
-        val view = injected[DateRangeView]
-        view(form.fill(dateRangeData), viewModel)
-    })
+    act.like(
+      renderPrePopView(onPageLoad, AccountingPeriodPage(srn, refineMV(1), NormalMode), dateRangeData, userAnswers) {
+        implicit app => implicit request =>
+          val view = injected[DateRangeView]
+          view(form.fill(dateRangeData), viewModel)
+      }
+    )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
@@ -75,9 +77,9 @@ class AccountingPeriodControllerSpec extends ControllerBaseSpec {
         emptyUserAnswers
           .set(WhichTaxYearPage(srn), dateRange)
           .get
-          .set(AccountingPeriodPage(srn, refineMV(1)), otherDateRangeData)
+          .set(AccountingPeriodPage(srn, refineMV(1), NormalMode), otherDateRangeData)
           .get
-          .set(AccountingPeriodPage(srn, refineMV(2)), dateRangeData)
+          .set(AccountingPeriodPage(srn, refineMV(2), NormalMode), dateRangeData)
           .get
 
       act.like(invalidForm(onSubmit, userAnswers, formData(form, dateRangeData): _*))

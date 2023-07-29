@@ -68,7 +68,7 @@ class AccountingPeriodController @Inject()(
       getWhichTaxYear(srn) { taxYear =>
         Ok(
           view(
-            form(taxYear = taxYear).fromUserAnswers(AccountingPeriodPage(srn, index)),
+            form(taxYear = taxYear).fromUserAnswers(AccountingPeriodPage(srn, index, mode)),
             viewModel(srn, index, mode)
           )
         )
@@ -86,9 +86,10 @@ class AccountingPeriodController @Inject()(
               formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode)))),
               value =>
                 for {
-                  updatedAnswers <- Future.fromTry(request.userAnswers.set(AccountingPeriodPage(srn, index), value))
+                  updatedAnswers <- Future
+                    .fromTry(request.userAnswers.set(AccountingPeriodPage(srn, index, mode), value))
                   _ <- saveService.save(updatedAnswers)
-                } yield Redirect(navigator.nextPage(AccountingPeriodPage(srn, index), mode, updatedAnswers))
+                } yield Redirect(navigator.nextPage(AccountingPeriodPage(srn, index, mode), mode, updatedAnswers))
             )
         case None => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
       }
