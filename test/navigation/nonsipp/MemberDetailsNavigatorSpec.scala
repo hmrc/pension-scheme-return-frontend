@@ -134,11 +134,11 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             MemberDetailsPage,
             nameDobGen,
             IndexGen[OneTo300](min = 1, max = 300),
-            routes.MemberDetailsController.onPageLoad,
-            memberpayments.routes.EmployerContributionsController.onPageLoad
+            (srn, _: Refined[Int, OneTo300], _) => routes.PensionSchemeMembersController.onPageLoad(srn),
+            (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
           )
           .withName(
-            "go from scheme members list page to member details page when yes selected during the manual journey"
+            "go from scheme members list page to select manual or upload page when yes selected during the manual journey"
           )
       )
 
@@ -153,7 +153,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             (srn, _) => routes.PensionSchemeMembersController.onPageLoad(srn)
           )
           .withName(
-            "go from scheme members list page to member details page when yes selected during the upload journey"
+            "go from scheme members list page to select manual or upload when yes selected during the upload journey"
           )
       )
 
@@ -161,10 +161,10 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         normalmode
           .navigateTo(
             SchemeMembersListPage(_, addMember = false, Manual),
-            memberpayments.routes.EmployerContributionsController.onPageLoad
+            (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
           )
           .withName(
-            "go from scheme members list page to employer contributions page when no selected during the manual journey"
+            "go from scheme members list page to tasklist page when no selected during the manual journey"
           )
       )
 
@@ -172,10 +172,10 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         normalmode
           .navigateTo(
             SchemeMembersListPage(_, addMember = false, Upload),
-            memberpayments.routes.EmployerContributionsController.onPageLoad
+            (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
           )
           .withName(
-            "go from scheme members list page to employer contributions page when no selected during the upload journey"
+            "go from scheme members list page to tasklist page when no selected during the upload journey"
           )
       )
 
@@ -238,58 +238,57 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         normalmode
           .navigateTo(
             FileUploadSuccessPage,
-            (srn, _) => controllers.nonsipp.memberdetails.routes.SchemeMembersListController.onPageLoad(srn, 1, Upload)
+            (srn, _) => controllers.nonsipp.memberdetails.routes.SchemeMembersListController.onPageLoad(srn, 1, Manual)
           )
           .withName("go from file upload success page to scheme members list page")
       )
+      act.like(
+        normalmode
+          .navigateTo(
+            FileUploadErrorPage(_, UploadFormatError),
+            controllers.nonsipp.memberdetails.upload.routes.FileUploadErrorMissingInformationController.onPageLoad
+          )
+          .withName(
+            "go from file upload error page to file upload error missing information page on file upload format error"
+          )
+      )
+
+      act.like(
+        normalmode
+          .navigateTo(
+            FileUploadErrorPage(_, uploadResultErrors),
+            controllers.nonsipp.memberdetails.upload.routes.FileUploadErrorSummaryController.onPageLoad
+          )
+          .withName("go from file upload error page to file upload error summary page on file upload errors")
+      )
+
+      act.like(
+        normalmode
+          .navigateTo(
+            FileUploadErrorPage(_, over10UploadResultErrors),
+            controllers.nonsipp.memberdetails.upload.routes.FileUploadTooManyErrorsController.onPageLoad
+          )
+          .withName("go from file upload error page to too manu file upload errors page on file upload errors over 10")
+      )
+
+      act.like(
+        normalmode
+          .navigateTo(
+            FileUploadErrorSummaryPage,
+            (srn, _) => controllers.nonsipp.memberdetails.routes.UploadMemberDetailsController.onPageLoad(srn)
+          )
+          .withName("go from file upload error summary page to upload a file page")
+      )
+
+      act.like(
+        normalmode
+          .navigateTo(
+            FileUploadTooManyErrorsPage,
+            (srn, _) => controllers.nonsipp.memberdetails.routes.UploadMemberDetailsController.onPageLoad(srn)
+          )
+          .withName("go from too many file upload errors page to upload a file page")
+      )
     }
-
-    act.like(
-      normalmode
-        .navigateTo(
-          FileUploadErrorPage(_, UploadFormatError),
-          controllers.nonsipp.memberdetails.upload.routes.FileUploadErrorMissingInformationController.onPageLoad
-        )
-        .withName(
-          "go from file upload error page to file upload error missing information page on file upload format error"
-        )
-    )
-
-    act.like(
-      normalmode
-        .navigateTo(
-          FileUploadErrorPage(_, uploadResultErrors),
-          controllers.nonsipp.memberdetails.upload.routes.FileUploadErrorSummaryController.onPageLoad
-        )
-        .withName("go from file upload error page to file upload error summary page on file upload errors")
-    )
-
-    act.like(
-      normalmode
-        .navigateTo(
-          FileUploadErrorPage(_, over10UploadResultErrors),
-          controllers.nonsipp.memberdetails.upload.routes.FileUploadTooManyErrorsController.onPageLoad
-        )
-        .withName("go from file upload error page to too manu file upload errors page on file upload errors over 10")
-    )
-
-    act.like(
-      normalmode
-        .navigateTo(
-          FileUploadErrorSummaryPage,
-          (srn, _) => controllers.nonsipp.memberdetails.routes.UploadMemberDetailsController.onPageLoad(srn)
-        )
-        .withName("go from file upload error summary page to upload a file page")
-    )
-
-    act.like(
-      normalmode
-        .navigateTo(
-          FileUploadTooManyErrorsPage,
-          (srn, _) => controllers.nonsipp.memberdetails.routes.UploadMemberDetailsController.onPageLoad(srn)
-        )
-        .withName("go from too many file upload errors page to upload a file page")
-    )
 
     "CheckMode" - {
 
