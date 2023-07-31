@@ -16,17 +16,19 @@
 
 package pages.nonsipp.loansmadeoroutstanding
 
-import config.Refined.Max9999999
-import models.ConditionalYesNo.ConditionalYes
-import models.Security
-import models.SchemeId.Srn
-import pages.QuestionPage
-import play.api.libs.json.JsPath
-import utils.RefinedUtils.RefinedIntOps
+import config.Refined.OneTo9999999
+import eu.timepit.refined.refineMV
+import pages.behaviours.PageBehaviours
 
-case class SecurityGivenForLoanPage(srn: Srn, index: Max9999999) extends QuestionPage[ConditionalYes[Security]] {
+class RemoveLoanPageSpec extends PageBehaviours {
 
-  override def path: JsPath = JsPath \ "loans" \ "loanTransactions" \ index.arrayIndex.toString \ toString
+  "RemoveLoanPage" - {
+    val index = refineMV[OneTo9999999](1)
 
-  override def toString: String = "securityGivenPage"
+    beRetrievable[Boolean](RemoveLoanPage(srnGen.sample.value, index))
+
+    beSettable[Boolean](RemoveLoanPage(srnGen.sample.value, index))
+
+    beRemovable[Boolean](RemoveLoanPage(srnGen.sample.value, index))
+  }
 }

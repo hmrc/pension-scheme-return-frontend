@@ -16,8 +16,7 @@
 
 package navigation.nonsipp
 
-import config.Refined.{Max9999999, OneTo9999999}
-import controllers.routes
+import config.Refined.OneTo9999999
 import eu.timepit.refined.refineMV
 import models.{NormalMode, ReceivedLoanType}
 import navigation.{Navigator, NavigatorBehaviours}
@@ -251,5 +250,19 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
         )
         .withName("go from interest on loan page to outstanding arrears on loan page")
     )
+  }
+
+  "RemoveLoan" - {
+    act.like(
+      normalmode
+        .navigateTo(
+          srn => RemoveLoanPage(srn, refineMV(1)),
+          (srn, _) =>
+            controllers.nonsipp.loansmadeoroutstanding.routes.LoansMadeOrOutstandingController
+              .onPageLoad(srn, NormalMode)
+        )
+        .withName("go from remove page to list page")
+    )
+
   }
 }

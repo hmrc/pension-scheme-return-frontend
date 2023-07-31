@@ -462,3 +462,8 @@ GET        /:srn/change-security-given-for-loan                                 
 GET        /:srn/change-security-given-for-loan/:index                               controllers.nonsipp.loansmadeoroutstanding.SecurityGivenForLoanController.onPageLoad(srn: Srn, index: Max9999999, mode: Mode = CheckMode)
 POST       /:srn/change-security-given-for-loan                                      controllers.nonsipp.loansmadeoroutstanding.SecurityGivenForLoanController.onSubmit(srn: Srn, index: Max9999999 = 1, mode: Mode = CheckMode)
 POST       /:srn/change-security-given-for-loan/:index                               controllers.nonsipp.loansmadeoroutstanding.SecurityGivenForLoanController.onSubmit(srn: Srn, index: Max9999999, mode: Mode = CheckMode)
+
+GET        /:srn/remove-loan/:index                        controllers.nonsipp.loansmadeoroutstanding.RemoveLoanController.onPageLoad(srn: Srn, index: Max9999999, mode: Mode = NormalMode)
+POST       /:srn/remove-loan/:index                        controllers.nonsipp.loansmadeoroutstanding.RemoveLoanController.onSubmit(srn: Srn, index: Max9999999, mode: Mode = NormalMode)
+GET        /:srn/change-remove-loan/:index                 controllers.nonsipp.loansmadeoroutstanding.RemoveLoanController.onPageLoad(srn: Srn, index: Max9999999, mode: Mode = CheckMode)
+POST       /:srn/change-remove-loan/:index                 controllers.nonsipp.loansmadeoroutstanding.RemoveLoanController.onSubmit(srn: Srn, index: Max9999999, mode: Mode = CheckMode)

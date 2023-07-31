@@ -17,16 +17,14 @@
 package pages.nonsipp.loansmadeoroutstanding
 
 import config.Refined.Max9999999
-import models.ConditionalYesNo.ConditionalYes
-import models.Security
 import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
 
-case class SecurityGivenForLoanPage(srn: Srn, index: Max9999999) extends QuestionPage[ConditionalYes[Security]] {
+case class RemoveLoanPage(srn: Srn, index: Max9999999) extends QuestionPage[Boolean] {
 
-  override def path: JsPath = JsPath \ "loans" \ "loanTransactions" \ index.arrayIndex.toString \ toString
+  override def path: JsPath = JsPath \ "loans" \ "loanTransactions" \ index.arrayIndex.toString
 
-  override def toString: String = "securityGivenPage"
+  override def toString: String = "removeLoan"
 }

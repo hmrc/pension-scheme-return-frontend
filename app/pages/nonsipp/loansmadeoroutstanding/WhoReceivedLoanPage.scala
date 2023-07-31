@@ -33,7 +33,16 @@ case class WhoReceivedLoanPage(srn: Srn, index: Max9999999) extends QuestionPage
 
   override def toString: String = "whoReceivedLoan"
 
-  private def pages(srn: Srn): List[Removable[_]] = List(
+  private def pages(srn: Srn): List[Removable[_]] = pagesFirstPart(srn) ++ List(
+    DatePeriodLoanPage(srn, index),
+    AmountOfTheLoanPage(srn, index),
+    AreRepaymentsInstalmentsPage(srn, index),
+    InterestOnLoanPage(srn, index),
+    OutstandingArrearsOnLoanPage(srn, index),
+    SecurityGivenForLoanPage(srn, index)
+  )
+
+  private def pagesFirstPart(srn: Srn): List[Removable[_]] = List(
     IndividualRecipientNamePage(srn, index),
     IndividualRecipientNinoPage(srn, index),
     IsMemberOrConnectedPartyPage(srn, index),
@@ -41,10 +50,8 @@ case class WhoReceivedLoanPage(srn: Srn, index: Max9999999) extends QuestionPage
     CompanyRecipientCrnPage(srn, index),
     RecipientSponsoringEmployerConnectedPartyPage(srn, index),
     PartnershipRecipientNamePage(srn, index),
-    OtherRecipientDetailsPage(srn, index),
-    DatePeriodLoanPage(srn, index),
-    AmountOfTheLoanPage(srn, index),
-    AreRepaymentsInstalmentsPage(srn, index)
+    PartnershipRecipientUtrPage(srn, index),
+    OtherRecipientDetailsPage(srn, index)
   )
 
   override def cleanup(value: Option[ReceivedLoanType], userAnswers: UserAnswers): Try[UserAnswers] =
@@ -53,8 +60,12 @@ case class WhoReceivedLoanPage(srn: Srn, index: Max9999999) extends QuestionPage
       case (Some(ReceivedLoanType.UKCompany), Some(ReceivedLoanType.UKCompany)) => Try(userAnswers)
       case (Some(ReceivedLoanType.UKPartnership), Some(ReceivedLoanType.UKPartnership)) => Try(userAnswers)
       case (Some(ReceivedLoanType.Other), Some(ReceivedLoanType.Other)) => Try(userAnswers)
-      case (None, _) => Try(userAnswers)
-      case _ => removePages(userAnswers, pages(srn))
+      case (Some(ReceivedLoanType.Individual), _) => removePages(userAnswers, pagesFirstPart(srn))
+      case (Some(ReceivedLoanType.UKCompany), _) => removePages(userAnswers, pagesFirstPart(srn))
+      case (Some(ReceivedLoanType.UKPartnership), _) => removePages(userAnswers, pagesFirstPart(srn))
+      case (Some(ReceivedLoanType.Other), _) => removePages(userAnswers, pagesFirstPart(srn))
+      case (Some(any), _) => Try(userAnswers)
+      case (None, _) => removePages(userAnswers, pages(srn))
     }
 }
 

@@ -16,17 +16,27 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
-import config.Refined.Max9999999
+import config.Refined.OneTo9999999
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.loansmadeoroutstanding.LoansListController._
+import controllers.nonsipp.loansmadeoroutstanding.RemoveLoanController._
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
-import models.{Money, NormalMode, ReceivedLoanType}
-import pages.nonsipp.loansmadeoroutstanding._
-import views.html.ListView
+import models.{NormalMode, ReceivedLoanType}
+import pages.nonsipp.loansmadeoroutstanding.{
+  AmountOfTheLoanPage,
+  CompanyRecipientNamePage,
+  IndividualRecipientNamePage,
+  PartnershipRecipientNamePage,
+  WhoReceivedLoanPage
+}
+import views.html.YesNoPageView
 
-class LoansListControllerSpec extends ControllerBaseSpec {
+class RemoveLoanControllerSpec extends ControllerBaseSpec {
 
+  private val index = refineMV[OneTo9999999](1)
+
+  private lazy val onPageLoad = routes.RemoveLoanController.onPageLoad(srn, index, NormalMode)
+  private lazy val onSubmit = routes.RemoveLoanController.onSubmit(srn, index, NormalMode)
   private val filledUserAnswers = defaultUserAnswers
     .unsafeSet(WhoReceivedLoanPage(srn, refineMV(1)), ReceivedLoanType.UKCompany)
     .unsafeSet(CompanyRecipientNamePage(srn, refineMV(1)), "recipientName1")
@@ -38,40 +48,24 @@ class LoansListControllerSpec extends ControllerBaseSpec {
     .unsafeSet(IndividualRecipientNamePage(srn, refineMV(3)), "recipientName3")
     .unsafeSet(AmountOfTheLoanPage(srn, refineMV(3)), (money, money, money))
 
-  private lazy val onPageLoad = routes.LoansListController.onPageLoad(srn, NormalMode)
-  private lazy val onSubmit = routes.LoansListController.onSubmit(srn, NormalMode)
-  private lazy val onLoansMadePageLoad = routes.LoansMadeOrOutstandingController.onPageLoad(srn, NormalMode)
-
-  private val recipients: List[(Max9999999, String, Money)] = List(
-    (refineMV(1), "recipientName1", money),
-    (refineMV(2), "recipientName2", money),
-    (refineMV(3), "recipientName3", money)
-  )
-
-  "LoansListController" - {
+  "RemoveLoanController" - {
 
     act.like(renderView(onPageLoad, filledUserAnswers) { implicit app => implicit request =>
-      injected[ListView].apply(
-        form(new YesNoPageFormProvider()),
-        viewModel(
-          srn,
-          NormalMode,
-          recipients
+      injected[YesNoPageView]
+        .apply(
+          form(injected[YesNoPageFormProvider]),
+          viewModel(srn, index, NormalMode, money.displayAs, "recipientName1")
         )
-      )
     })
 
-    act.like(
-      redirectToPage(
-        onPageLoad,
-        onLoansMadePageLoad,
-        defaultUserAnswers
-      )
-    )
-
     act.like(redirectNextPage(onSubmit, "value" -> "true"))
+    act.like(redirectNextPage(onSubmit, "value" -> "false"))
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
+
+    act.like(saveAndContinue(onSubmit, "value" -> "true"))
+
+    act.like(invalidForm(onSubmit, filledUserAnswers))
 
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }
