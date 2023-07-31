@@ -18,7 +18,7 @@ package navigation.nonsipp
 
 import com.google.inject.Singleton
 import controllers.nonsipp
-import controllers.nonsipp.routes
+import controllers.nonsipp.{routes, FinancialDetailsCheckYourAnswersController}
 import eu.timepit.refined.refineMV
 import models.PensionSchemeId.{PsaId, PspId}
 import models.{NormalMode, UserAnswers}
@@ -46,7 +46,9 @@ class NonSippNavigator @Inject()() extends Navigator {
         }
 
       case HowMuchCashPage(srn) => nonsipp.schemedesignatory.routes.ValueOfAssetsController.onPageLoad(srn, NormalMode)
-      case ValueOfAssetsPage(srn) => nonsipp.memberdetails.routes.PensionSchemeMembersController.onPageLoad(srn)
+      case ValueOfAssetsPage(srn) =>
+        nonsipp.schemedesignatory.routes.FeesCommissionsWagesSalariesController.onPageLoad(srn, NormalMode)
+      case FinancialDetailsCheckYourAnswersPage(srn) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
 
       case page @ HowManyMembersPage(srn, PsaId(_)) =>
         if (userAnswers.get(page).exists(_.total > 99)) {

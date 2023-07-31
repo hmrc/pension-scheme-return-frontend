@@ -854,3 +854,16 @@ loansList.radios.error.required = Select yes if you need to add another loan
 removeLoan.title = Are you sure you want to remove this loan?
 removeLoan.heading = Are you sure you want to remove the loan of £{0} to {1}?
 removeLoan.error.required = Select yes if you are sure you want to remove this loan
+
+financialDetailsCheckYourAnswersController.title = Check your answers
+financialDetailsCheckYourAnswersController.heading = Check your answers
+financialDetailsCheckYourAnswersController.totalCashInStartDate = How much cash did {0} hold in all bank accounts on {1}?
+financialDetailsCheckYourAnswersController.totalCashInStartDate.hidden = total cash in all bank accounts on {0}
+financialDetailsCheckYourAnswersController.totalCashInEndDate = How much cash did {0} hold in all bank accounts on {1}?
+financialDetailsCheckYourAnswersController.totalCashInEndDate.hidden = total cash in all bank accounts on {0}
+financialDetailsCheckYourAnswersController.valueOfAssetsInStartDate = What was the total value of {0}’s assets, including cash, on {1}?
+financialDetailsCheckYourAnswersController.valueOfAssetsInStartDate.hidden = total value of scheme assets, including cash, on {0}
+financialDetailsCheckYourAnswersController.valueOfAssetsInEndDate = What was the total value of {0}’s assets, including cash, on {1}?
+financialDetailsCheckYourAnswersController.valueOfAssetsInEndDate.hidden = total value of scheme assets, including cash, on {0}
+financialDetailsCheckYourAnswersController.feeCommissionWagesSalary = How much did {0} pay in fees, commissions, wages and salaries during the period of this return?
+financialDetailsCheckYourAnswersController.feeCommissionWagesSalary.hidden = how much the scheme paid in fees, commissions, wages and salaries during the period of this return

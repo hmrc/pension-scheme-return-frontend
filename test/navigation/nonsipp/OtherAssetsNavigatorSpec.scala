@@ -32,9 +32,9 @@ class OtherAssetsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateToWithData(
           FeesCommissionsWagesSalariesPage,
           moneyGen,
-          (_, _) => routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.routes.FinancialDetailsCheckYourAnswersController.onPageLoad
         )
-        .withName("go from fees, commissions, wages and salaries page to unauthorised")
+        .withName("go from fees, commissions, wages and salaries page to financial details check your answers page")
     )
   }
 }

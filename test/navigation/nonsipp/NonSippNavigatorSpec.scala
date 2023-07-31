@@ -16,17 +16,18 @@
 
 package navigation.nonsipp
 
+import controllers.nonsipp
 import controllers.nonsipp.accountingperiod
 import controllers.nonsipp.schemedesignatory
 import controllers.nonsipp.declaration
 import controllers.nonsipp.memberdetails
 import controllers.nonsipp.routes
 import eu.timepit.refined.refineMV
-import models.SchemeMemberNumbers
+import models.{NormalMode, SchemeMemberNumbers}
 import navigation.{Navigator, NavigatorBehaviours, UnknownPage}
 import org.scalacheck.Gen
 import pages.nonsipp.schemedesignatory.{HowManyMembersPage, HowMuchCashPage, ValueOfAssetsPage}
-import pages.nonsipp.{CheckReturnDatesPage, WhichTaxYearPage}
+import pages.nonsipp.{CheckReturnDatesPage, FinancialDetailsCheckYourAnswersPage, WhichTaxYearPage}
 import utils.BaseSpec
 
 class NonSippNavigatorSpec extends BaseSpec with NavigatorBehaviours {
@@ -84,9 +85,18 @@ class NonSippNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         normalmode
           .navigateTo(
             ValueOfAssetsPage,
-            (srn, _) => memberdetails.routes.PensionSchemeMembersController.onPageLoad(srn)
+            nonsipp.schemedesignatory.routes.FeesCommissionsWagesSalariesController.onPageLoad
           )
-          .withName("go from value of assets page to pension scheme members page")
+          .withName("go from value of assets page to fees commissions wages salaries page")
+      )
+
+      act.like(
+        normalmode
+          .navigateTo(
+            FinancialDetailsCheckYourAnswersPage,
+            (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
+          )
+          .withName("go from financial details check your answers page to task list page")
       )
 
       act.like(

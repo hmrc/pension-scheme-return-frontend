@@ -14,21 +14,9 @@
  * limitations under the License.
  */
 
-package navigation.nonsipp
+package pages.nonsipp
 
-import models.{NormalMode, UserAnswers}
-import navigation.JourneyNavigator
+import models.SchemeId.Srn
 import pages.Page
-import pages.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesPage
-import play.api.mvc.Call
 
-object OtherAssetsNavigator extends JourneyNavigator {
-
-  override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
-
-    case FeesCommissionsWagesSalariesPage(srn) =>
-      controllers.nonsipp.routes.FinancialDetailsCheckYourAnswersController.onPageLoad(srn, NormalMode)
-  }
-
-  override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty
-}
+case class FinancialDetailsCheckYourAnswersPage(srn: Srn) extends Page
