@@ -34,5 +34,6 @@ case class ListViewModel(
   // whether to render the radio buttons to add another entity to the list or continue
   showRadios: Boolean = true,
   paginatedViewModel: Option[PaginatedViewModel] = None,
-  yesHintText: Option[Message] = None
+  yesHintText: Option[Message] = None,
+  showInsetWithRadios: Boolean = false
 )

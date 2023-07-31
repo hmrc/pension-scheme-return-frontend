@@ -51,8 +51,8 @@ class SchemeMembersListController @Inject()(
 ) extends FrontendBaseController
     with I18nSupport {
 
-  private def form(manualOrUpload: ManualOrUpload): Form[Boolean] =
-    SchemeMembersListController.form(formProvider, manualOrUpload)
+  private def form(manualOrUpload: ManualOrUpload, maxNumberReached: Boolean = false): Form[Boolean] =
+    SchemeMembersListController.form(formProvider, manualOrUpload, maxNumberReached)
 
   def onPageLoad(srn: Srn, page: Int, manualOrUpload: ManualOrUpload, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
@@ -60,35 +60,46 @@ class SchemeMembersListController @Inject()(
       if (membersDetails.isEmpty) {
         Redirect(routes.PensionSchemeMembersController.onPageLoad(srn))
       } else {
-        Ok(view(form(manualOrUpload), viewModel(srn, page, manualOrUpload, mode, membersDetails.map(_.fullName))))
+        Ok(
+          view(
+            form(manualOrUpload, membersDetails.size >= maxSchemeMembers),
+            viewModel(srn, page, manualOrUpload, mode, membersDetails.map(_.fullName))
+          )
+        )
       }
     }
 
   def onSubmit(srn: Srn, page: Int, manualOrUpload: ManualOrUpload, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val membersDetails = request.userAnswers.membersDetails(srn)
-      if (membersDetails.length == maxSchemeMembers) {
-        Redirect(
-          navigator.nextPage(SchemeMembersListPage(srn, addMember = false, manualOrUpload), mode, request.userAnswers)
-        )
-      } else {
-        form(manualOrUpload)
-          .bindFromRequest()
-          .fold(
-            formWithErrors =>
-              BadRequest(
-                view(formWithErrors, viewModel(srn, page, manualOrUpload, mode, membersDetails.map(_.fullName)))
-              ),
-            value =>
+      form(manualOrUpload, membersDetails.size >= maxSchemeMembers)
+        .bindFromRequest()
+        .fold(
+          formWithErrors =>
+            BadRequest(
+              view(formWithErrors, viewModel(srn, page, manualOrUpload, mode, membersDetails.map(_.fullName)))
+            ),
+          value => {
+            if (membersDetails.length == maxSchemeMembers && value) {
+              Redirect(routes.HowToUploadController.onPageLoad(srn))
+            } else {
               Redirect(navigator.nextPage(SchemeMembersListPage(srn, value, manualOrUpload), mode, request.userAnswers))
-          )
-      }
+            }
+          }
+        )
     }
 }
 
 object SchemeMembersListController {
-  def form(formProvider: YesNoPageFormProvider, manualOrUpload: ManualOrUpload): Form[Boolean] = formProvider(
-    manualOrUpload.fold(manual = "schemeMembersList.error.required", upload = "membersUploaded.error.required")
+  def form(
+    formProvider: YesNoPageFormProvider,
+    manualOrUpload: ManualOrUpload,
+    maxNumberReached: Boolean = false
+  ): Form[Boolean] = formProvider(
+    manualOrUpload.fold(
+      manual = if (maxNumberReached) "membersUploaded.error.required" else "schemeMembersList.error.required",
+      upload = "membersUploaded.error.required"
+    )
   )
 
   def viewModel(
@@ -128,14 +139,30 @@ object SchemeMembersListController {
       routes.SchemeMembersListController.onPageLoad(srn, _, manualOrUpload)
     )
 
+    val radioText = manualOrUpload.fold(
+      upload = "membersUploaded.radio",
+      manual =
+        if (memberNames.length < Constants.maxSchemeMembers) "schemeMembersList.radio" else "membersUploaded.radio"
+    )
+    val yesHintText = manualOrUpload.fold(
+      upload = Some(Message("membersUploaded.radio.yes.hint")),
+      manual =
+        if (memberNames.length < Constants.maxSchemeMembers) None else Some(Message("membersUploaded.radio.yes.hint"))
+    )
+
     FormPageViewModel(
       Message(titleKey, memberNames.length),
       Message(headingKey, memberNames.length),
       ListViewModel(
         inset = "schemeMembersList.inset",
         rows,
-        manualOrUpload.fold(manual = "schemeMembersList.radio", upload = "membersUploaded.radio"),
-        showRadios = memberNames.length < Constants.maxSchemeMembers,
+        radioText,
+        showRadios = if (memberNames.length < Constants.maxSchemeMembers) {
+          memberNames.length < Constants.maxSchemeMembers
+        } else {
+          true
+        },
+        showInsetWithRadios = memberNames.length == Constants.maxSchemeMembers,
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(
@@ -147,7 +174,7 @@ object SchemeMembersListController {
             pagination
           )
         ),
-        yesHintText = manualOrUpload.fold(manual = None, upload = Some("membersUploaded.radio.yes.hint"))
+        yesHintText = yesHintText
       ),
       onSubmit = routes.SchemeMembersListController.onSubmit(srn, page, manualOrUpload)
     )
