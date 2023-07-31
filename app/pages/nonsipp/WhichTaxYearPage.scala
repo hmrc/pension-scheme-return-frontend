@@ -18,6 +18,7 @@ package pages.nonsipp
 
 import models.{DateRange, UserAnswers}
 import models.SchemeId.Srn
+import config.Refined.Max3
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 

@@ -21,6 +21,7 @@ import controllers.nonsipp.accountingperiod.routes
 import controllers.nonsipp.schemedesignatory
 import eu.timepit.refined.refineMV
 import generators.IndexGen
+import models.NormalMode
 import navigation.{Navigator, NavigatorBehaviours}
 import pages.nonsipp.accountingperiod.{
   AccountingPeriodCheckYourAnswersPage,
@@ -39,8 +40,8 @@ class AccountingPeriodNavigatorSpec extends BaseSpec with NavigatorBehaviours {
     act.like(
       normalmode
         .navigateTo(
-          AccountingPeriodPage(_, refineMV(1)),
-          (srn, _) => routes.AccountingPeriodCheckYourAnswersController.onPageLoad(srn, refineMV(1))
+          AccountingPeriodPage(_, refineMV(1), NormalMode),
+          (srn, _) => routes.AccountingPeriodCheckYourAnswersController.onPageLoad(srn, refineMV(1), NormalMode)
         )
         .withName("go from accounting period page to check answers page")
     )
@@ -48,7 +49,7 @@ class AccountingPeriodNavigatorSpec extends BaseSpec with NavigatorBehaviours {
     act.like(
       normalmode
         .navigateTo(
-          AccountingPeriodCheckYourAnswersPage,
+          AccountingPeriodCheckYourAnswersPage(_, NormalMode),
           routes.AccountingPeriodListController.onPageLoad
         )
         .withName("go from check your answers page to list page")
@@ -57,8 +58,8 @@ class AccountingPeriodNavigatorSpec extends BaseSpec with NavigatorBehaviours {
     act.like(
       normalmode
         .navigateFromListPage(
-          AccountingPeriodListPage(_, addPeriod = true),
-          AccountingPeriodPage,
+          AccountingPeriodListPage(_, addPeriod = true, NormalMode),
+          AccountingPeriodPage(_, _, NormalMode),
           dateRangeGen,
           IndexGen[OneToThree](1, 3),
           routes.AccountingPeriodController.onPageLoad,
@@ -70,7 +71,7 @@ class AccountingPeriodNavigatorSpec extends BaseSpec with NavigatorBehaviours {
     act.like(
       normalmode
         .navigateTo(
-          AccountingPeriodListPage(_, addPeriod = false),
+          AccountingPeriodListPage(_, addPeriod = false, NormalMode),
           schemedesignatory.routes.ActiveBankAccountController.onPageLoad
         )
         .withName("go from list page to bank account page when no selected")
@@ -79,7 +80,7 @@ class AccountingPeriodNavigatorSpec extends BaseSpec with NavigatorBehaviours {
     act.like(
       normalmode
         .navigateTo(
-          RemoveAccountingPeriodPage,
+          RemoveAccountingPeriodPage(_, NormalMode),
           routes.AccountingPeriodListController.onPageLoad
         )
         .withName("go from remove page to list page")

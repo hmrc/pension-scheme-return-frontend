@@ -23,6 +23,7 @@ import eu.timepit.refined.refineV
 import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
+import pages.nonsipp.BasicDetailsCheckYourAnswersPage
 import pages.nonsipp.accountingperiod.{
   AccountingPeriodCheckYourAnswersPage,
   AccountingPeriodListPage,
@@ -36,25 +37,49 @@ object AccountingPeriodNavigator extends JourneyNavigator {
 
   val normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
 
-    case AccountingPeriodPage(srn, index) =>
-      routes.AccountingPeriodCheckYourAnswersController.onPageLoad(srn, index)
+    case AccountingPeriodPage(srn, index, mode) =>
+      routes.AccountingPeriodCheckYourAnswersController.onPageLoad(srn, index, mode)
 
-    case AccountingPeriodCheckYourAnswersPage(srn) =>
-      routes.AccountingPeriodListController.onPageLoad(srn, NormalMode)
+    case AccountingPeriodCheckYourAnswersPage(srn, mode) =>
+      routes.AccountingPeriodListController.onPageLoad(srn, mode)
 
-    case AccountingPeriodListPage(srn, false) =>
-      nonsipp.schemedesignatory.routes.ActiveBankAccountController.onPageLoad(srn, NormalMode)
+    case AccountingPeriodListPage(srn, false, mode) =>
+      nonsipp.schemedesignatory.routes.ActiveBankAccountController.onPageLoad(srn, mode)
 
-    case AccountingPeriodListPage(srn, true) =>
+    case AccountingPeriodListPage(srn, true, mode) =>
       val count = userAnswers.list(AccountingPeriods(srn)).length
       refineV[OneToThree](count + 1).fold(
-        _ => nonsipp.schemedesignatory.routes.ActiveBankAccountController.onPageLoad(srn, NormalMode),
+        _ => nonsipp.schemedesignatory.routes.ActiveBankAccountController.onPageLoad(srn, mode),
         index => routes.AccountingPeriodController.onPageLoad(srn, index, NormalMode)
       )
 
-    case RemoveAccountingPeriodPage(srn) =>
-      routes.AccountingPeriodListController.onPageLoad(srn, NormalMode)
+    case RemoveAccountingPeriodPage(srn, mode) =>
+      routes.AccountingPeriodListController.onPageLoad(srn, mode)
   }
 
-  val checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty
+  val checkRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
+
+    case AccountingPeriodPage(srn, index, mode) =>
+      routes.AccountingPeriodCheckYourAnswersController.onPageLoad(srn, index, mode)
+
+    case AccountingPeriodCheckYourAnswersPage(srn, mode) =>
+      routes.AccountingPeriodListController.onPageLoad(srn, mode)
+
+    case AccountingPeriodListPage(srn, false, mode) =>
+      controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, NormalMode)
+
+    case AccountingPeriodListPage(srn, true, mode) =>
+      val count = userAnswers.list(AccountingPeriods(srn)).length
+      refineV[OneToThree](count + 1).fold(
+        _ => nonsipp.schemedesignatory.routes.ActiveBankAccountController.onPageLoad(srn, mode),
+        index => routes.AccountingPeriodController.onPageLoad(srn, index, mode)
+      )
+
+    case RemoveAccountingPeriodPage(srn, mode) =>
+      routes.AccountingPeriodListController.onPageLoad(srn, mode)
+
+    case BasicDetailsCheckYourAnswersPage(srn) =>
+      controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, NormalMode)
+  }
+
 }

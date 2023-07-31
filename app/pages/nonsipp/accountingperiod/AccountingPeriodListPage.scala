@@ -16,7 +16,8 @@
 
 package pages.nonsipp.accountingperiod
 
+import models.Mode
 import models.SchemeId.Srn
 import pages.Page
 
-case class AccountingPeriodListPage(srn: Srn, addPeriod: Boolean) extends Page
+case class AccountingPeriodListPage(srn: Srn, addPeriod: Boolean, mode: Mode) extends Page

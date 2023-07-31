@@ -38,7 +38,7 @@ class AccountingPeriodListControllerSpec extends ControllerBaseSpec {
         .foldLeft(defaultUserAnswers) {
           case (userAnswers, (range, index)) =>
             val refinedIndex = refineV[OneToThree](index + 1).toOption.value
-            userAnswers.set(AccountingPeriodPage(srn, refinedIndex), range).get
+            userAnswers.set(AccountingPeriodPage(srn, refinedIndex, NormalMode), range).get
         }
 
     val form = AccountingPeriodListController.form(new YesNoPageFormProvider())
@@ -47,7 +47,7 @@ class AccountingPeriodListControllerSpec extends ControllerBaseSpec {
     lazy val onPageLoad = routes.AccountingPeriodListController.onPageLoad(srn, NormalMode)
     lazy val onSubmit = routes.AccountingPeriodListController.onSubmit(srn, NormalMode)
 
-    lazy val accountingPeriodPage = routes.AccountingPeriodController.onPageLoad(srn, refineMV(1), NormalMode)
+    lazy val accountingPeriodPage = controllers.nonsipp.routes.CheckReturnDatesController.onPageLoad(srn, NormalMode)
 
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
       val view = injected[ListView]

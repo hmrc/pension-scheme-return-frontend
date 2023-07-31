@@ -64,6 +64,7 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec {
           schemeMemberNumbers,
           activeBankAccount = true,
           whyNoBankAccount = None,
+          whichTaxYearPage = Some(dateRange),
           Left(dateRange),
           individualDetails.fullName,
           defaultSchemeDetails,
@@ -110,15 +111,6 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec {
           )
         )
 
-        vm.page.sections.flatMap(_.rows.map(_.key)) must contain(
-          Message("basicDetailsCheckYourAnswersController.schemeDetails.accountingPeriod", "1")
-        )
-        vm.page.sections.flatMap(_.rows.map(_.key)) must contain(
-          Message("basicDetailsCheckYourAnswersController.schemeDetails.accountingPeriod", "2")
-        )
-        vm.page.sections.flatMap(_.rows.map(_.key)) must contain(
-          Message("basicDetailsCheckYourAnswersController.schemeDetails.accountingPeriod", "3")
-        )
         vm.page.sections.flatMap(_.rows.map(_.value.key)) must contain(dateRange1.show)
         vm.page.sections.flatMap(_.rows.map(_.value.key)) must contain(dateRange2.show)
         vm.page.sections.flatMap(_.rows.map(_.value.key)) must contain(dateRange3.show)
@@ -190,6 +182,7 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec {
     schemeMemberNumbers: SchemeMemberNumbers = schemeMemberNumbersGen.sample.value,
     activeBankAccount: Boolean = true,
     whyNoBankAccount: Option[String] = None,
+    whichTaxYearPage: Option[DateRange] = Some(dateRange),
     taxYearOrAccountingPeriods: Either[DateRange, NonEmptyList[(DateRange, Max3)]] = Left(dateRange),
     schemeAdminName: String = individualDetails.fullName,
     schemeDetails: SchemeDetails = defaultSchemeDetails,
@@ -200,6 +193,7 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec {
     schemeMemberNumbers,
     activeBankAccount,
     whyNoBankAccount,
+    whichTaxYearPage,
     taxYearOrAccountingPeriods,
     schemeAdminName,
     schemeDetails,

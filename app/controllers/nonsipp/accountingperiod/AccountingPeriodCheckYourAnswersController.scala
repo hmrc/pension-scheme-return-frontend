@@ -22,7 +22,7 @@ import config.Refined.Max3
 import controllers.actions.{AllowAccessActionProvider, DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import controllers.nonsipp.accountingperiod.AccountingPeriodCheckYourAnswersController.viewModel
 import models.SchemeId.Srn
-import models.{DateRange, NormalMode}
+import models.{DateRange, Mode, NormalMode}
 import navigation.Navigator
 import pages.nonsipp.accountingperiod.{AccountingPeriodCheckYourAnswersPage, AccountingPeriodPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -46,40 +46,40 @@ class AccountingPeriodCheckYourAnswersController @Inject()(
 ) extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(srn: Srn, index: Max3): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Max3, mode: Mode): Action[AnyContent] =
     identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData) { implicit request =>
-      request.userAnswers.get(AccountingPeriodPage(srn, index)) match {
+      request.userAnswers.get(AccountingPeriodPage(srn, index, mode)) match {
         case None =>
-          Redirect(routes.AccountingPeriodController.onPageLoad(srn, index, NormalMode))
+          Redirect(routes.AccountingPeriodController.onPageLoad(srn, index, mode))
         case Some(accountingPeriod) =>
-          Ok(view(viewModel(srn, index, accountingPeriod)))
+          Ok(view(viewModel(srn, index, accountingPeriod, mode)))
       }
     }
 
-  def onSubmit(srn: Srn): Action[AnyContent] =
+  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] =
     identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData) { implicit request =>
-      Redirect(navigator.nextPage(AccountingPeriodCheckYourAnswersPage(srn), NormalMode, request.userAnswers))
+      Redirect(navigator.nextPage(AccountingPeriodCheckYourAnswersPage(srn, mode), mode, request.userAnswers))
     }
 }
 
 object AccountingPeriodCheckYourAnswersController {
 
-  private def rows(srn: Srn, index: Max3, dateRange: DateRange): List[CheckYourAnswersRowViewModel] = List(
+  private def rows(srn: Srn, index: Max3, dateRange: DateRange, mode: Mode): List[CheckYourAnswersRowViewModel] = List(
     CheckYourAnswersRowViewModel("site.startDate", dateRange.from.show)
       .withAction(
-        SummaryAction("site.change", routes.AccountingPeriodController.onPageLoad(srn, index, NormalMode).url)
+        SummaryAction("site.change", routes.AccountingPeriodController.onPageLoad(srn, index, mode).url)
           .withVisuallyHiddenContent("site.startDate")
       ),
     CheckYourAnswersRowViewModel("site.endDate", dateRange.to.show)
       .withAction(
-        SummaryAction("site.change", routes.AccountingPeriodController.onPageLoad(srn, index, NormalMode).url)
+        SummaryAction("site.change", routes.AccountingPeriodController.onPageLoad(srn, index, mode).url)
           .withVisuallyHiddenContent("site.endDate")
       )
   )
 
-  def viewModel(srn: Srn, index: Max3, dateRange: DateRange): FormPageViewModel[CheckYourAnswersViewModel] =
+  def viewModel(srn: Srn, index: Max3, dateRange: DateRange, mode: Mode): FormPageViewModel[CheckYourAnswersViewModel] =
     CheckYourAnswersViewModel(
-      rows(srn, index, dateRange),
-      routes.AccountingPeriodCheckYourAnswersController.onSubmit(srn)
+      rows(srn, index, dateRange, mode),
+      routes.AccountingPeriodCheckYourAnswersController.onSubmit(srn, mode)
     )
 }

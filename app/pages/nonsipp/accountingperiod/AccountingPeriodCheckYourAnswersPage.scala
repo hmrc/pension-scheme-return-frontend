@@ -16,7 +16,8 @@
 
 package pages.nonsipp.accountingperiod
 
+import models.Mode
 import models.SchemeId.Srn
 import pages.Page
 
-case class AccountingPeriodCheckYourAnswersPage(srn: Srn) extends Page
+case class AccountingPeriodCheckYourAnswersPage(srn: Srn, mode: Mode) extends Page

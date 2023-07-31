@@ -34,8 +34,8 @@ class RemoveAccountingPeriodControllerSpec extends ControllerBaseSpec {
   private val otherPeriod = dateRangeGen.sample.value
 
   private val userAnswers = defaultUserAnswers
-    .unsafeSet(AccountingPeriodPage(srn, refineMV(1)), period)
-    .unsafeSet(AccountingPeriodPage(srn, refineMV(2)), otherPeriod)
+    .unsafeSet(AccountingPeriodPage(srn, refineMV(1), NormalMode), period)
+    .unsafeSet(AccountingPeriodPage(srn, refineMV(2), NormalMode), otherPeriod)
 
   "RemoveSchemeBankAccountController" - {
 

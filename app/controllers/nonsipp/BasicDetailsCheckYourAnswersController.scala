@@ -24,7 +24,7 @@ import controllers.actions._
 import controllers.nonsipp.BasicDetailsCheckYourAnswersController._
 import models.SchemeId.Srn
 import models.requests.DataRequest
-import models.{DateRange, Mode, SchemeDetails, SchemeMemberNumbers}
+import models.{CheckMode, DateRange, Mode, SchemeDetails, SchemeMemberNumbers}
 import navigation.Navigator
 import pages.nonsipp.accountingperiod.AccountingPeriods
 import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, HowManyMembersPage, WhyNoBankAccountPage}
@@ -63,6 +63,7 @@ class BasicDetailsCheckYourAnswersController @Inject()(
             schemeMemberNumbers <- requiredPage(HowManyMembersPage(srn, request.pensionSchemeId))
             activeBankAccount <- requiredPage(ActiveBankAccountPage(srn))
             whyNoBankAccount = request.userAnswers.get(WhyNoBankAccountPage(srn))
+            whichTaxYearPage = request.userAnswers.get(WhichTaxYearPage(srn))
             userName <- loggedInUserNameOrRedirect
           } yield Ok(
             view(
@@ -72,6 +73,7 @@ class BasicDetailsCheckYourAnswersController @Inject()(
                 schemeMemberNumbers,
                 activeBankAccount,
                 whyNoBankAccount,
+                whichTaxYearPage,
                 periods,
                 userName,
                 request.schemeDetails,
@@ -112,6 +114,7 @@ object BasicDetailsCheckYourAnswersController {
     schemeMemberNumbers: SchemeMemberNumbers,
     activeBankAccount: Boolean,
     whyNoBankAccount: Option[String],
+    whichTaxYearPage: Option[DateRange],
     taxYearOrAccountingPeriods: Either[DateRange, NonEmptyList[(DateRange, Max3)]],
     schemeAdminName: String,
     schemeDetails: SchemeDetails,
@@ -127,6 +130,7 @@ object BasicDetailsCheckYourAnswersController {
           mode,
           activeBankAccount,
           whyNoBankAccount,
+          whichTaxYearPage,
           taxYearOrAccountingPeriods,
           schemeMemberNumbers,
           schemeAdminName,
@@ -144,6 +148,7 @@ object BasicDetailsCheckYourAnswersController {
     mode: Mode,
     activeBankAccount: Boolean,
     whyNoBankAccount: Option[String],
+    whichTaxYearPage: Option[DateRange],
     taxYearOrAccountingPeriods: Either[DateRange, NonEmptyList[(DateRange, Max3)]],
     schemeMemberNumbers: SchemeMemberNumbers,
     schemeAdminName: String,
@@ -181,25 +186,30 @@ object BasicDetailsCheckYourAnswersController {
               ).withOneHalfWidth()
             )
           case Right(accountingPeriods) =>
-            accountingPeriods.toList.map {
-              case (date, index) =>
+            List(
+              CheckYourAnswersRowViewModel(
+                "basicDetailsCheckYourAnswersController.schemeDetails.taxYear",
+                whichTaxYearPage.get.show
+              ).withOneHalfWidth()
+            ) ++
+              List(
                 CheckYourAnswersRowViewModel(
-                  Message("basicDetailsCheckYourAnswersController.schemeDetails.accountingPeriod", index.value),
-                  date.show
+                  Message("basicDetailsCheckYourAnswersController.schemeDetails.accountingPeriod"),
+                  accountingPeriods.map(_._1.show).toList.mkString("\n")
                 ).withChangeAction(
-                    controllers.nonsipp.accountingperiod.routes.AccountingPeriodController
-                      .onPageLoad(srn, index, mode)
+                    controllers.nonsipp.accountingperiod.routes.AccountingPeriodListController
+                      .onPageLoad(srn, CheckMode)
                       .url,
                     hidden = "basicDetailsCheckYourAnswersController.schemeDetails.accountingPeriod.hidden"
                   )
                   .withOneHalfWidth()
-            }
+              )
         })
         :+ CheckYourAnswersRowViewModel(
           Message("basicDetailsCheckYourAnswersController.schemeDetails.bankAccount", schemeDetails.schemeName),
           if (activeBankAccount: Boolean) "site.yes" else "site.no"
         ).withChangeAction(
-            controllers.nonsipp.schemedesignatory.routes.ActiveBankAccountController.onPageLoad(srn, mode).url,
+            controllers.nonsipp.schemedesignatory.routes.ActiveBankAccountController.onPageLoad(srn, CheckMode).url,
             hidden = "basicDetailsCheckYourAnswersController.schemeDetails.bankAccount.hidden"
           )
           .withOneHalfWidth()
@@ -212,7 +222,7 @@ object BasicDetailsCheckYourAnswersController {
               ),
               reason
             ).withChangeAction(
-                controllers.nonsipp.schemedesignatory.routes.WhyNoBankAccountController.onPageLoad(srn, mode).url,
+                controllers.nonsipp.schemedesignatory.routes.WhyNoBankAccountController.onPageLoad(srn, CheckMode).url,
                 hidden = "basicDetailsCheckYourAnswersController.schemeDetails.whyNoBankAccount.hidden"
               )
               .withOneHalfWidth()

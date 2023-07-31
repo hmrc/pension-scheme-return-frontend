@@ -17,6 +17,7 @@
 package generators
 
 import eu.timepit.refined.refineMV
+import models.NormalMode
 import org.scalacheck.Arbitrary
 import pages._
 import pages.nonsipp.CheckReturnDatesPage
@@ -29,7 +30,7 @@ trait PageGenerators {
     Arbitrary(ModelGenerators.srnGen.map(CheckReturnDatesPage))
 
   implicit lazy val arbitraryAccountingPeriodPage: Arbitrary[AccountingPeriodPage] =
-    Arbitrary(ModelGenerators.srnGen.map(AccountingPeriodPage(_, refineMV(1))))
+    Arbitrary(ModelGenerators.srnGen.map(AccountingPeriodPage(_, refineMV(1), NormalMode)))
 
   implicit lazy val arbitraryHowMuchCashPage: Arbitrary[HowMuchCashPage] =
     Arbitrary(ModelGenerators.srnGen.map(HowMuchCashPage))
