@@ -40,6 +40,7 @@ class LoansListControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoad = routes.LoansListController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.LoansListController.onSubmit(srn, NormalMode)
+  private lazy val onLoansMadePageLoad = routes.LoansMadeOrOutstandingController.onPageLoad(srn, NormalMode)
 
   private val recipients: List[(Max9999999, String, Money)] = List(
     (refineMV(1), "recipientName1", money),
@@ -59,6 +60,14 @@ class LoansListControllerSpec extends ControllerBaseSpec {
         )
       )
     })
+
+    act.like(
+      redirectToPage(
+        onPageLoad,
+        onLoansMadePageLoad,
+        defaultUserAnswers
+      )
+    )
 
     act.like(redirectNextPage(onSubmit, "value" -> "true"))
 

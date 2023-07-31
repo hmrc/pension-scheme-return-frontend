@@ -24,7 +24,7 @@ import controllers.PSRController
 import controllers.actions._
 import controllers.nonsipp.loansmadeoroutstanding.LoansListController._
 import eu.timepit.refined.api.Refined
-import eu.timepit.refined.refineV
+import eu.timepit.refined.{refineMV, refineV}
 import forms.YesNoPageFormProvider
 import models.CheckOrChange.Change
 import models.SchemeId.Srn
@@ -55,7 +55,16 @@ class LoansListController @Inject()(
   val form = LoansListController.form(formProvider)
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    loanRecipients(srn).map(recipients => Ok(view(form, viewModel(srn, mode, recipients)))).merge
+    loanRecipients(srn)
+      .map(
+        recipients =>
+          if (recipients.isEmpty) {
+            Redirect(routes.LoansMadeOrOutstandingController.onPageLoad(srn, NormalMode))
+          } else {
+            Ok(view(form, viewModel(srn, mode, recipients)))
+          }
+      )
+      .merge
   }
 
   def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
