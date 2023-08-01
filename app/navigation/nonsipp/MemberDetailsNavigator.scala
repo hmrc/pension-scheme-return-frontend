@@ -37,7 +37,7 @@ object MemberDetailsNavigator extends JourneyNavigator {
 
     case PensionSchemeMembersPage(srn) =>
       if (userAnswers.get(PensionSchemeMembersPage(srn)).contains(ManualOrUpload.Manual)) {
-        routes.MemberDetailsController.onPageLoad(srn, refineMV(1), NormalMode)
+        routeMemberDetailsFirstManualPage(userAnswers, srn)
       } else {
         controllers.nonsipp.memberdetails.routes.HowToUploadController.onPageLoad(srn)
       }
@@ -60,12 +60,12 @@ object MemberDetailsNavigator extends JourneyNavigator {
       routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, CheckOrChange.Check)
 
     case SchemeMembersListPage(srn, false, _) =>
-      memberpayments.routes.EmployerContributionsController.onPageLoad(srn, NormalMode)
+      controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
 
     case SchemeMembersListPage(srn, true, Manual) =>
       refineV[OneTo300](userAnswers.membersDetails(srn).length + 1).fold(
-        _ => memberpayments.routes.EmployerContributionsController.onPageLoad(srn, NormalMode),
-        index => routes.MemberDetailsController.onPageLoad(srn, index, NormalMode)
+        _ => controllers.nonsipp.routes.TaskListController.onPageLoad(srn),
+        index => routes.PensionSchemeMembersController.onPageLoad(srn)
       )
 
     case SchemeMembersListPage(srn, true, Upload) => routes.PensionSchemeMembersController.onPageLoad(srn)
@@ -92,7 +92,8 @@ object MemberDetailsNavigator extends JourneyNavigator {
       }
 
     case FileUploadSuccessPage(srn) =>
-      controllers.nonsipp.memberdetails.routes.SchemeMembersListController.onPageLoad(srn, 1, Upload)
+      controllers.nonsipp.memberdetails.routes.SchemeMembersListController
+        .onPageLoad(srn, 1, Manual)
 
     case FileUploadErrorPage(srn, UploadFormatError) =>
       controllers.nonsipp.memberdetails.upload.routes.FileUploadErrorMissingInformationController
@@ -122,6 +123,12 @@ object MemberDetailsNavigator extends JourneyNavigator {
     case BasicDetailsCheckYourAnswersPage(srn) =>
       controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
   }
+
+  private def routeMemberDetailsFirstManualPage(userAnswers: UserAnswers, srn: SchemeId.Srn) =
+    refineV[OneTo300](userAnswers.membersDetails(srn).length + 1) match {
+      case Left(_) => routes.SchemeMembersListController.onPageLoad(srn, page = 1, Manual)
+      case Right(nextIndex) => routes.MemberDetailsController.onPageLoad(srn, nextIndex, NormalMode)
+    }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
     case MemberDetailsPage(srn, index) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, Check)
