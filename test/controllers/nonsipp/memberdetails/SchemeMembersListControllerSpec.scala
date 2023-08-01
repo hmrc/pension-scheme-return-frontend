@@ -68,18 +68,19 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
       act.like(
         redirectToPage(
           onSubmitManual,
-          routes.MemberDetailsController.onPageLoad(srn, refineMV(2), NormalMode),
+          routes.PensionSchemeMembersController.onPageLoad(srn),
           userAnswersWithMembersDetails,
           "value" -> "true"
         )
       )
 
-      "when user answers has 99 members" - {
+      "when user answers has 300 members" - {
         act.like(
           redirectToPage(
             onSubmitManual,
-            memberpayments.routes.EmployerContributionsController.onPageLoad(srn, NormalMode),
-            userAnswersWith300MembersDetails
+            routes.HowToUploadController.onPageLoad(srn),
+            userAnswersWith300MembersDetails,
+            "value" -> "true"
           )
         )
       }
@@ -124,8 +125,9 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
         act.like(
           redirectToPage(
             onSubmitUpload,
-            memberpayments.routes.EmployerContributionsController.onPageLoad(srn, NormalMode),
-            userAnswersWith300MembersDetails
+            routes.HowToUploadController.onPageLoad(srn),
+            userAnswersWith300MembersDetails,
+            "value" -> "true"
           )
         )
       }

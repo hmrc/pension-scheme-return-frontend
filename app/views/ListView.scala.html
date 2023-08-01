@@ -63,7 +63,8 @@
 
         @viewmodel.description.map(renderMessage)
 
-        @if(viewmodel.page.showRadios){
+        @if(viewmodel.page.showRadios && viewmodel.page.showInsetWithRadios) {
+            @govukInsetText(InsetTextViewModel(renderMessage(viewmodel.page.inset)))
             @govukRadios(
               RadiosViewModel.yesNo(
                 field = form("value"),
@@ -71,7 +72,17 @@
                 yesHint = viewmodel.page.yesHintText.map(renderMessage)
               )
             )
-        } else {
+        }
+        @if(viewmodel.page.showRadios && !viewmodel.page.showInsetWithRadios){
+            @govukRadios(
+              RadiosViewModel.yesNo(
+                field = form("value"),
+                fieldset = FieldsetViewModel(LegendViewModel(renderMessage(viewmodel.page.radioText)).withSize(LegendSize.Medium)),
+                yesHint = viewmodel.page.yesHintText.map(renderMessage)
+              )
+            )
+        }
+        @if(!viewmodel.page.showRadios && !viewmodel.page.showInsetWithRadios){
           @govukInsetText(InsetTextViewModel(renderMessage(viewmodel.page.inset)))
         }
 
