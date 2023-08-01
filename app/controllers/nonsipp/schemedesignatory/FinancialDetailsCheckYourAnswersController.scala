@@ -14,20 +14,21 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp
+package controllers.nonsipp.schemedesignatory
 
 import cats.data.NonEmptyList
 import cats.implicits.toShow
-import config.Refined.{Max3, OneToThree}
+import config.Refined.Max3
 import controllers.actions._
-import controllers.nonsipp.FinancialDetailsCheckYourAnswersController.{taxStartDate, _}
+import controllers.nonsipp.routes
+import controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController._
 import models.SchemeId.Srn
 import models.requests.DataRequest
 import models.{CheckMode, DateRange, Mode, Money, MoneyInPeriod, SchemeDetails}
 import navigation.Navigator
-import pages.nonsipp.FinancialDetailsCheckYourAnswersPage
 import pages.nonsipp.schemedesignatory.{
   FeesCommissionsWagesSalariesPage,
+  FinancialDetailsCheckYourAnswersPage,
   HowManyMembersPage,
   HowMuchCashPage,
   ValueOfAssetsPage
@@ -134,7 +135,8 @@ object FinancialDetailsCheckYourAnswersController {
       ).withMarginBottom(9),
       refresh = None,
       buttonText = "site.saveAndContinue",
-      onSubmit = routes.FinancialDetailsCheckYourAnswersController.onSubmit(srn, mode)
+      onSubmit =
+        controllers.nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController.onSubmit(srn, mode)
     )
 
   private def sections(

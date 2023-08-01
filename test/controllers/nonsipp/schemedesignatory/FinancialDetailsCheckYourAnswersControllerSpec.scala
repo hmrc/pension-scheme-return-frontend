@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp
+package controllers.nonsipp.schemedesignatory
 
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.FinancialDetailsCheckYourAnswersController._
+import controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController._
 import models.{DateRange, NormalMode}
 import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.schemedesignatory.HowManyMembersPage
 import pages.nonsipp.WhichTaxYearPage
+import pages.nonsipp.schemedesignatory.HowManyMembersPage
 import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
 import services.SchemeDateService

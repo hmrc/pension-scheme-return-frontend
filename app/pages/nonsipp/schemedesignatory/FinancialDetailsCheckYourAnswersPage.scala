@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages.nonsipp.schemedesignatory
 
 import models.SchemeId.Srn
 import pages.Page

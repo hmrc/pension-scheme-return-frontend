@@ -27,7 +27,8 @@ object OtherAssetsNavigator extends JourneyNavigator {
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
 
     case FeesCommissionsWagesSalariesPage(srn) =>
-      controllers.nonsipp.routes.FinancialDetailsCheckYourAnswersController.onPageLoad(srn, NormalMode)
+      controllers.nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController
+        .onPageLoad(srn, NormalMode)
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty
