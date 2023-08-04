@@ -16,7 +16,7 @@
 
 package pages
 
-import models.Money
+import models.{Money, NormalMode}
 import pages.behaviours.PageBehaviours
 import pages.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesPage
 
@@ -26,10 +26,10 @@ class FeesCommissionsWagesSalariesPageSpec extends PageBehaviours {
 
     val srn = srnGen.sample.value
 
-    beRetrievable[Money](FeesCommissionsWagesSalariesPage(srn))
+    beRetrievable[Money](FeesCommissionsWagesSalariesPage(srn, NormalMode))
 
-    beSettable[Money](FeesCommissionsWagesSalariesPage(srn))
+    beSettable[Money](FeesCommissionsWagesSalariesPage(srn, NormalMode))
 
-    beRemovable[Money](FeesCommissionsWagesSalariesPage(srn))
+    beRemovable[Money](FeesCommissionsWagesSalariesPage(srn, NormalMode))
   }
 }

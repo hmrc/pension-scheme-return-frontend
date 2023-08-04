@@ -16,7 +16,7 @@
 
 package pages
 
-import models.{Money, MoneyInPeriod}
+import models.{Money, MoneyInPeriod, NormalMode}
 import pages.behaviours.PageBehaviours
 import pages.nonsipp.schemedesignatory.HowMuchCashPage
 
@@ -26,10 +26,10 @@ class HowMuchCashPageSpec extends PageBehaviours {
 
     val srn = srnGen.sample.value
 
-    beRetrievable[MoneyInPeriod](HowMuchCashPage(srn))
+    beRetrievable[MoneyInPeriod](HowMuchCashPage(srn, NormalMode))
 
-    beSettable[MoneyInPeriod](HowMuchCashPage(srn))
+    beSettable[MoneyInPeriod](HowMuchCashPage(srn, NormalMode))
 
-    beRemovable[MoneyInPeriod](HowMuchCashPage(srn))
+    beRemovable[MoneyInPeriod](HowMuchCashPage(srn, NormalMode))
   }
 }

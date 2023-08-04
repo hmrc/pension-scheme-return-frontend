@@ -16,12 +16,12 @@
 
 package pages.nonsipp.schemedesignatory
 
-import models.MoneyInPeriod
+import models.{Mode, MoneyInPeriod}
 import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case class ValueOfAssetsPage(srn: Srn) extends QuestionPage[MoneyInPeriod] {
+case class ValueOfAssetsPage(srn: Srn, mode: Mode) extends QuestionPage[MoneyInPeriod] {
   override def path: JsPath = SchemeDesignatoryPage.path \ toString
 
   override def toString: String = "totalAssetValue"

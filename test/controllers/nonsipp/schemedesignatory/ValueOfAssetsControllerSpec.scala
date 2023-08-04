@@ -60,7 +60,7 @@ class ValueOfAssetsControllerSpec extends ControllerBaseSpec {
       view(viewModel(form))
     })
 
-    act.like(renderPrePopView(onPageLoad, ValueOfAssetsPage(srn), moneyInPeriodData) {
+    act.like(renderPrePopView(onPageLoad, ValueOfAssetsPage(srn, NormalMode), moneyInPeriodData) {
       implicit app => implicit request =>
         val view = injected[MoneyView]
         view(viewModel(form.fill(moneyInPeriodData.from[(Money, Money)])))
