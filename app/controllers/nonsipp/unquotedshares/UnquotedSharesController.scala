@@ -75,9 +75,12 @@ object UnquotedSharesController {
   )
 
   def viewModel(srn: Srn, schemeName: String, mode: Mode): FormPageViewModel[YesNoPageViewModel] =
-    YesNoPageViewModel(
+    FormPageViewModel(
       "unquotedShares.title",
       Message("unquotedShares.heading", schemeName),
+      YesNoPageViewModel(
+        hint = Some("unquotedShares.hint")
+      ),
       routes.UnquotedSharesController.onSubmit(srn, mode)
     )
 }
