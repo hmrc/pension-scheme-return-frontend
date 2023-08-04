@@ -16,6 +16,9 @@
 
 package generators
 
+import config.Refined.OneTo9999999
+import eu.timepit.refined.api.Refined
+import eu.timepit.refined.refineV
 import models.PensionSchemeId.{PsaId, PspId}
 import models.SchemeId.{Pstr, Srn}
 import models.SchemeStatus._
@@ -272,6 +275,17 @@ trait ModelGenerators extends BasicGenerators {
       SponsoringOrConnectedParty.ConnectedParty,
       SponsoringOrConnectedParty.Neither
     )
+
+  implicit val receivedLoanTypeGen: Gen[ReceivedLoanType] =
+    Gen.oneOf(
+      ReceivedLoanType.UKCompany,
+      ReceivedLoanType.UKPartnership,
+      ReceivedLoanType.Individual,
+      ReceivedLoanType.Other
+    )
+
+  implicit val max9999999Gen: Gen[Refined[Int, OneTo9999999]] =
+    Gen.choose(1, 9999999).map(refineV[OneTo9999999](_).value)
 }
 
 object ModelGenerators extends ModelGenerators

@@ -27,7 +27,7 @@ import utils.RefinedUtils.RefinedIntOps
 case class IndividualRecipientNinoPage(srn: Srn, index: Max9999999)
     extends QuestionPage[ConditionalYesNo[String, Nino]] {
 
-  override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString
+  override def path: JsPath = Paths.loanTransactions \ "recipientIdentityType" \ toString \ index.arrayIndex.toString
 
-  override def toString: String = "individualRecipientNino"
+  override def toString: String = "nino"
 }

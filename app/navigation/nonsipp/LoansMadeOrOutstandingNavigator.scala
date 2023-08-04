@@ -123,7 +123,7 @@ object LoansMadeOrOutstandingNavigator extends JourneyNavigator {
       controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
 
     case RemoveLoanPage(srn, index) =>
-      if (userAnswers.map(WhoReceivedLoans(srn)).size == 0) {
+      if (userAnswers.map(WhoReceivedLoans(srn)).isEmpty) {
         controllers.nonsipp.loansmadeoroutstanding.routes.LoansMadeOrOutstandingController.onPageLoad(srn, NormalMode)
       } else {
         controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController.onPageLoad(srn, NormalMode)
