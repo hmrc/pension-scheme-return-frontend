@@ -16,10 +16,9 @@
 
 package controllers.nonsipp.memberdetails.upload
 
-import controllers.nonsipp.memberdetails.upload.CheckingMemberDetailsFileController._
 import controllers.ControllerBaseSpec
+import controllers.nonsipp.memberdetails.upload.CheckingMemberDetailsFileController._
 import models.{NormalMode, Upload}
-import models.UploadStatus.UploadStatus
 import org.mockito.ArgumentMatchers.any
 import play.api.inject
 import play.api.inject.guice.GuiceableModule

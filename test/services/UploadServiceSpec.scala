@@ -20,7 +20,6 @@ import akka.stream.scaladsl.Sink
 import akka.util.ByteString
 import connectors.UpscanConnector
 import controllers.TestValues
-import models.UploadStatus.UploadStatus
 import models._
 import org.mockito.ArgumentMatchers.any
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks

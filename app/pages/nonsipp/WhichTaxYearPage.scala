@@ -16,15 +16,15 @@
 
 package pages.nonsipp
 
-import models.{DateRange, UserAnswers}
 import models.SchemeId.Srn
-import config.Refined.Max3
+import models.{DateRange, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
 import scala.util.{Success, Try}
 
-case class WhichTaxYearPage(srn: Srn) extends QuestionPage[DateRange] { self =>
+case class WhichTaxYearPage(srn: Srn) extends QuestionPage[DateRange] {
+  self =>
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "reportDetails"

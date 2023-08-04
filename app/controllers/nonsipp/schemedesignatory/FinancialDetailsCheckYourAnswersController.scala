@@ -20,19 +20,12 @@ import cats.data.NonEmptyList
 import cats.implicits.toShow
 import config.Refined.Max3
 import controllers.actions._
-import controllers.nonsipp.routes
 import controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController._
 import models.SchemeId.Srn
 import models.requests.DataRequest
 import models.{CheckMode, DateRange, Mode, Money, MoneyInPeriod, SchemeDetails}
 import navigation.Navigator
-import pages.nonsipp.schemedesignatory.{
-  FeesCommissionsWagesSalariesPage,
-  FinancialDetailsCheckYourAnswersPage,
-  HowManyMembersPage,
-  HowMuchCashPage,
-  ValueOfAssetsPage
-}
+import pages.nonsipp.schemedesignatory._
 import play.api.i18n._
 import play.api.libs.json.Reads
 import play.api.mvc._

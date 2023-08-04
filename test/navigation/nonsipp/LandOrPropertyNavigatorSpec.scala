@@ -16,7 +16,6 @@
 
 package navigation.nonsipp
 
-import controllers.routes
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.landorproperty.LandOrPropertyHeldPage
@@ -33,9 +32,9 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateToWithData(
           LandOrPropertyHeldPage,
           Gen.const(true),
-          (_, _) => routes.UnauthorisedController.onPageLoad()
+          (srn, _) => controllers.nonsipp.landorproperty.routes.WhatYouWillNeedLandOrPropertyController.onPageLoad(srn)
         )
-        .withName("go from land or property held page to unauthorised yes selected")
+        .withName("go from land or property held page to what you will need Land or Property page when yes selected")
     )
 
     act.like(

@@ -16,10 +16,9 @@
 
 package controllers.nonsipp.memberdetails.upload
 
-import controllers.nonsipp.memberdetails.upload.FileUploadErrorController._
 import controllers.ControllerBaseSpec
+import controllers.nonsipp.memberdetails.upload.FileUploadErrorController._
 import models.{NormalMode, Upload, UploadFormatError}
-import models.UploadStatus.UploadStatus
 import org.mockito.ArgumentMatchers.any
 import play.api.inject
 import play.api.inject.guice.GuiceableModule

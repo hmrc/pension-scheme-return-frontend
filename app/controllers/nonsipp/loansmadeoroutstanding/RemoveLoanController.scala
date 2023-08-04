@@ -16,27 +16,19 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
-import config.Refined.{Max9999999, OneTo9999999}
+import config.Refined.Max9999999
 import controllers.PSRController
 import controllers.actions._
 import controllers.nonsipp.loansmadeoroutstanding.RemoveLoanController._
 import forms.YesNoPageFormProvider
-import models.{Mode, Money, ReceivedLoanType}
 import models.SchemeId.Srn
 import models.requests.DataRequest
+import models.{Mode, ReceivedLoanType}
 import navigation.Navigator
-import pages.nonsipp.loansmadeoroutstanding.{
-  AmountOfTheLoanPage,
-  CompanyRecipientNamePage,
-  IndividualRecipientNamePage,
-  OtherRecipientDetailsPage,
-  PartnershipRecipientNamePage,
-  RemoveLoanPage,
-  WhoReceivedLoanPage
-}
+import pages.nonsipp.loansmadeoroutstanding._
 import play.api.data.Form
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
