@@ -20,7 +20,7 @@ import controllers.actions.{AllowAccessActionProvider, DataRequiredAction, DataR
 import models.NormalMode
 import models.SchemeId.Srn
 import navigation.Navigator
-import pages.nonsipp.loansmadeoroutstanding.WhatYouWillNeedLoansPage
+import pages.nonsipp.landorproperty.WhatYouWillNeedLandOrPropertyPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -50,7 +50,7 @@ class WhatYouWillNeedLandOrPropertyController @Inject()(
 
   def onSubmit(srn: Srn): Action[AnyContent] =
     identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData) { implicit request =>
-      Redirect(navigator.nextPage(WhatYouWillNeedLoansPage(srn), NormalMode, request.userAnswers))
+      Redirect(navigator.nextPage(WhatYouWillNeedLandOrPropertyPage(srn), NormalMode, request.userAnswers))
     }
 }
 
