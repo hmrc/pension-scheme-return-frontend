@@ -33,7 +33,8 @@ object LandOrPropertyNavigator extends JourneyNavigator {
         controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedController.onPageLoad(srn, NormalMode)
       }
 
-    case WhatYouWillNeedLandOrPropertyPage(_) => controllers.routes.UnauthorisedController.onPageLoad()
+    case WhatYouWillNeedLandOrPropertyPage(srn) =>
+      controllers.nonsipp.landorproperty.routes.LandPropertyInUKController.onPageLoad(srn, NormalMode)
 
     case page @ LandPropertyInUKPage(srn) =>
       if (userAnswers.get(page).contains(true)) {
