@@ -74,7 +74,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       normalmode
         .navigateTo(
           WhatYouWillNeedLandOrPropertyPage,
-          (_, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.landorproperty.routes.LandPropertyInUKController.onPageLoad
         )
         .withName("go from what you will need Land or Property page to Unauthorised page")
     )
