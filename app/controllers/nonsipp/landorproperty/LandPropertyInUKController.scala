@@ -16,6 +16,7 @@
 
 package controllers.nonsipp.landorproperty
 
+import config.Refined.Max5000
 import controllers.actions._
 import controllers.nonsipp.landorproperty.LandPropertyInUKController._
 import forms.YesNoPageFormProvider
@@ -49,22 +50,24 @@ class LandPropertyInUKController @Inject()(
 
   private val form = LandPropertyInUKController.form(formProvider)
 
-  def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    val preparedForm = request.userAnswers.fillForm(LandPropertyInUKPage(srn), form)
-    Ok(view(preparedForm, viewModel(srn, mode)))
+  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+    implicit request =>
+      val preparedForm = request.userAnswers.fillForm(LandPropertyInUKPage(srn, index), form)
+      Ok(view(preparedForm, viewModel(srn, index, mode)))
   }
 
-  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
-    form
-      .bindFromRequest()
-      .fold(
-        formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, mode)))),
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(LandPropertyInUKPage(srn), value))
-            _ <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage(LandPropertyInUKPage(srn), mode, updatedAnswers))
-      )
+  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+    implicit request =>
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode)))),
+          value =>
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(LandPropertyInUKPage(srn, index), value))
+              _ <- saveService.save(updatedAnswers)
+            } yield Redirect(navigator.nextPage(LandPropertyInUKPage(srn, index), mode, updatedAnswers))
+        )
   }
 }
 
@@ -73,9 +76,9 @@ object LandPropertyInUKController {
     "landPropertyInUK.error.required"
   )
 
-  def viewModel(srn: Srn, mode: Mode): FormPageViewModel[YesNoPageViewModel] = YesNoPageViewModel(
+  def viewModel(srn: Srn, index: Max5000, mode: Mode): FormPageViewModel[YesNoPageViewModel] = YesNoPageViewModel(
     "landPropertyInUK.title",
     "landPropertyInUK.heading",
-    routes.LandPropertyInUKController.onSubmit(srn, mode)
+    routes.LandPropertyInUKController.onSubmit(srn, index, mode)
   )
 }

@@ -14,17 +14,10 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.landorproperty
+package models
 
-import config.Refined.Max5000
-import models.SchemeId.Srn
-import pages.QuestionPage
-import play.api.libs.json.JsPath
-import utils.RefinedUtils.RefinedIntOps
+sealed trait ALFError
 
-case class LandPropertyInUKPage(srn: Srn, index: Max5000) extends QuestionPage[Boolean] {
-
-  override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString
-
-  override def toString: String = "landPropertyInUK"
-}
+case object AddressNotFound extends ALFError
+case object AddressMalformed extends ALFError
+case object UnexpectedFailure extends ALFError

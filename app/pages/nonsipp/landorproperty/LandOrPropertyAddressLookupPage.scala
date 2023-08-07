@@ -14,25 +14,19 @@
  * limitations under the License.
  */
 
-package config
+package pages.nonsipp.landorproperty
 
-import eu.timepit.refined.api.Refined
-import eu.timepit.refined.boolean.And
-import eu.timepit.refined.numeric.{Greater, LessEqual}
+import config.Refined.Max5000
+import models.{ALFAddress, Address}
+import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
+import utils.RefinedUtils.RefinedIntOps
 
-object Refined {
-  type OneToTen = Greater[0] And LessEqual[10]
-  type Max10 = Int Refined OneToTen
+case class LandOrPropertyAddressLookupPage(srn: Srn, index: Max5000) extends QuestionPage[Address] {
 
-  type OneToThree = Greater[0] And LessEqual[3]
-  type Max3 = Int Refined OneToThree
+  override def path: JsPath =
+    JsPath \ "assets" \ "landOrProperty" \ "landOrPropertyTransactions" \ "propertyDetails" \ "addressDetails" \ toString \ index.arrayIndex.toString
 
-  type OneTo300 = Greater[0] And LessEqual[300]
-  type Max300 = Int Refined OneTo300
-
-  type OneTo9999999 = Greater[0] And LessEqual[9999999]
-  type Max9999999 = Int Refined OneTo9999999
-
-  type OneTo5000 = Greater[0] And LessEqual[5000]
-  type Max5000 = Int Refined OneTo5000
+  override def toString: String = "landOrPropertyHeld"
 }
