@@ -37,9 +37,9 @@ object LandOrPropertyNavigator extends JourneyNavigator {
 
     case page @ LandPropertyInUKPage(srn) =>
       if (userAnswers.get(page).contains(true)) {
-        routes.UnauthorisedController.onPageLoad()
+        controllers.routes.UnauthorisedController.onPageLoad()
       } else {
-        routes.UnauthorisedController.onPageLoad()
+        controllers.routes.UnauthorisedController.onPageLoad()
       }
   }
 
