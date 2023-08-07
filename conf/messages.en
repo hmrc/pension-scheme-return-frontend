@@ -892,3 +892,7 @@ whatYouWillNeedLandOrProperty.paragraph6 = If the land or property is held as a 
 whatYouWillNeedLandOrProperty.isAcquisitionInfo1 = if it was acquired from an individual, company, partnership or other
 whatYouWillNeedLandOrProperty.isAcquisitionInfo2 = the seller’s National Insurance number, Company Reference Number, Unique Taxpayer Reference or details – whichever applies
 whatYouWillNeedLandOrProperty.isAcquisitionInfo3 = if the seller was a connected party
+
+landPropertyInUK.title = Is this land or property in the UK?
+landPropertyInUK.heading = Is this land or property in the UK?
+landPropertyInUK.error.required = Select yes if the land or property is in the UK

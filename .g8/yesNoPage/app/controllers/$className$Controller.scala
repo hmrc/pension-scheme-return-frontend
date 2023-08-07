@@ -7,7 +7,7 @@ import models.SchemeId.Srn
 import navigation.Navigator
 import pages.$className$Page
 import play.api.data.Form
-import viewmodels.models.YesNoPageViewModel
+import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -55,9 +55,9 @@ object $className;format="cap"$Controller {
     "$className;format="decap"$.error.required"
   )
 
-  def viewModel(srn: Srn, mode: Mode): YesNoPageViewModel = YesNoPageViewModel(
+  def viewModel(srn: Srn, mode: Mode): FormPageViewModel[YesNoPageViewModel] = YesNoPageViewModel(
     "$className;format="decap"$.title",
     "$className;format="decap"$.heading",
-    controllers.routes.$className;format="cap"$Controller.onSubmit(srn, mode)
+    routes.$className;format="cap"$Controller.onSubmit(srn, mode)
   )
 }

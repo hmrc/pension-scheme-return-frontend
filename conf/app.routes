@@ -450,15 +450,6 @@ POST        /:srn/loans                                                         
 GET         /:srn/change-loans                                                          controllers.nonsipp.loansmadeoroutstanding.LoansListController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST        /:srn/change-loans                                                          controllers.nonsipp.loansmadeoroutstanding.LoansListController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
-GET         /:srn/outstanding-arrears-on-loan                                           controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController.onPageLoad(srn: Srn, index: Max9999999 = 1, mode: Mode = NormalMode)
-GET         /:srn/outstanding-arrears-on-loan/:index                                    controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController.onPageLoad(srn: Srn, index: Max9999999, mode: Mode = NormalMode)
-POST        /:srn/outstanding-arrears-on-loan                                           controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController.onSubmit(srn: Srn, index: Max9999999 = 1, mode: Mode = NormalMode)
-POST        /:srn/outstanding-arrears-on-loan/:index                                    controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController.onSubmit(srn: Srn, index: Max9999999, mode: Mode = NormalMode)
-GET         /:srn/change-outstanding-arrears-on-loan                                    controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController.onPageLoad(srn: Srn, index: Max9999999 = 1, mode: Mode = CheckMode)
-GET         /:srn/change-outstanding-arrears-on-loan/:index                             controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController.onPageLoad(srn: Srn, index: Max9999999, mode: Mode = CheckMode)
-POST        /:srn/change-outstanding-arrears-on-loan                                    controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController.onSubmit(srn: Srn, index: Max9999999 = 1, mode: Mode = CheckMode)
-POST        /:srn/change-outstanding-arrears-on-loan/:index                             controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController.onSubmit(srn: Srn, index: Max9999999, mode: Mode = CheckMode)
-
 GET         /:srn/security-given-for-loan                                               controllers.nonsipp.loansmadeoroutstanding.SecurityGivenForLoanController.onPageLoad(srn: Srn, index: Max9999999 = 1, mode: Mode = NormalMode)
 GET         /:srn/security-given-for-loan/:index                                        controllers.nonsipp.loansmadeoroutstanding.SecurityGivenForLoanController.onPageLoad(srn: Srn, index: Max9999999, mode: Mode = NormalMode)
 POST        /:srn/security-given-for-loan                                               controllers.nonsipp.loansmadeoroutstanding.SecurityGivenForLoanController.onSubmit(srn: Srn, index: Max9999999 = 1, mode: Mode = NormalMode)
@@ -477,3 +468,8 @@ GET         /:srn/check-answers-financial-details                               
 GET         /:srn/submit-check-answers-financial-details                                controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 GET         /:srn/change-check-answers-financial-details                                controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 GET         /:srn/change-submit-check-answers-financial-details                         controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET        /:srn/land-property-in-uk               controllers.nonsipp.landorproperty.LandPropertyInUKController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST       /:srn/land-property-in-uk               controllers.nonsipp.landorproperty.LandPropertyInUKController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/change-land-property-in-uk        controllers.nonsipp.landorproperty.LandPropertyInUKController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST       /:srn/change-land-property-in-uk        controllers.nonsipp.landorproperty.LandPropertyInUKController.onSubmit(srn: Srn, mode: Mode = CheckMode)
