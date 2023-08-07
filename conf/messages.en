@@ -456,6 +456,7 @@ sharesAcquired.linkMessage = Section 993 of the Income Tax Act 2007.
 
 unquotedShares.title = Did the scheme hold any unquoted shares during the period of this return?
 unquotedShares.heading = Did {0} hold any unquoted shares during the period of this return?
+unquotedShares.hint = Unquoted shares are those in companies not listed by a recognised stock exchange.
 unquotedShares.error.required = Select yes if the scheme held any unquoted shares during the period of this return
 
 checkingMemberDetailsFile.title = We are checking your member details file
