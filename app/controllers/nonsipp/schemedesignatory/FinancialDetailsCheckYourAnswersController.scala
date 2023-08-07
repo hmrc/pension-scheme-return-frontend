@@ -20,7 +20,6 @@ import cats.data.NonEmptyList
 import cats.implicits.toShow
 import config.Refined.Max3
 import controllers.actions._
-import controllers.nonsipp.routes
 import controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController._
 import models.SchemeId.Srn
 import models.requests.DataRequest
@@ -160,7 +159,7 @@ object FinancialDetailsCheckYourAnswersController {
               schemeDetails.schemeName,
               taxStartDate(taxYearOrAccountingPeriods).show
             ),
-            "£" + howMuchCash.moneyAtStart.displayAs
+            howMuchCash.moneyAtStart.formattedDisplayAs("£#,###.00")
           ).withChangeAction(
               controllers.nonsipp.schemedesignatory.routes.HowMuchCashController
                 .onPageLoad(srn, CheckMode)
@@ -177,7 +176,7 @@ object FinancialDetailsCheckYourAnswersController {
                 schemeDetails.schemeName,
                 taxEndDate(taxYearOrAccountingPeriods).show
               ),
-              "£" + howMuchCash.moneyAtEnd.displayAs
+              howMuchCash.moneyAtEnd.formattedDisplayAs("£#,###.00")
             ).withChangeAction(
                 controllers.nonsipp.schemedesignatory.routes.HowMuchCashController
                   .onPageLoad(srn, CheckMode)
@@ -194,7 +193,7 @@ object FinancialDetailsCheckYourAnswersController {
                 schemeDetails.schemeName,
                 taxStartDate(taxYearOrAccountingPeriods).show
               ),
-              "£" + valueOfAssets.moneyAtStart.displayAs
+              valueOfAssets.moneyAtStart.formattedDisplayAs("£#,###.00")
             ).withChangeAction(
                 controllers.nonsipp.schemedesignatory.routes.ValueOfAssetsController
                   .onPageLoad(srn, CheckMode)
@@ -211,7 +210,7 @@ object FinancialDetailsCheckYourAnswersController {
                 schemeDetails.schemeName,
                 taxEndDate(taxYearOrAccountingPeriods).show
               ),
-              "£" + valueOfAssets.moneyAtEnd.displayAs
+              valueOfAssets.moneyAtEnd.formattedDisplayAs("£#,###.00")
             ).withChangeAction(
                 controllers.nonsipp.schemedesignatory.routes.ValueOfAssetsController
                   .onPageLoad(srn, CheckMode)
@@ -228,7 +227,7 @@ object FinancialDetailsCheckYourAnswersController {
                 schemeDetails.schemeName,
                 taxEndDate(taxYearOrAccountingPeriods).show
               ),
-              "£" + feesCommissionsWagesSalaries.displayAs
+              feesCommissionsWagesSalaries.formattedDisplayAs("£#,###.00")
             ).withChangeAction(
                 controllers.nonsipp.schemedesignatory.routes.FeesCommissionsWagesSalariesController
                   .onPageLoad(srn, CheckMode)
