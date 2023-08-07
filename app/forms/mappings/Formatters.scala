@@ -27,6 +27,7 @@ import models.{Enumerable, Money, Percentage, Security}
 import play.api.data.FormError
 import play.api.data.format.Formatter
 
+import java.text.DecimalFormat
 import scala.util.control.Exception.nonFatalCatch
 
 trait Formatters {
@@ -199,7 +200,7 @@ trait Formatters {
           .bind(key, data.view.mapValues(_.replace("£", "")).toMap)
           .flatMap { double =>
             if (BigDecimal(double).toString().matches(decimalRegex))
-              Right(Money(double, data(key).replace("£", "")))
+              Right(Money(double, new DecimalFormat("£#,##0.00").format(double)))
             else
               Left(Seq(FormError(key, errors.nonNumericKey, args)))
           }

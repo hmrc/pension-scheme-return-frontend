@@ -21,12 +21,7 @@ import utils.Transform
 
 import java.text.DecimalFormat
 
-case class Money(value: Double, displayAs: String) {
-
-  def formattedDisplayAs(format: String): String =
-    new DecimalFormat(format).format(value)
-
-}
+case class Money(value: Double, displayAs: String)
 
 object Money {
 
