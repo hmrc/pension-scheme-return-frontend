@@ -867,3 +867,7 @@ financialDetailsCheckYourAnswersController.valueOfAssetsInEndDate = What was the
 financialDetailsCheckYourAnswersController.valueOfAssetsInEndDate.hidden = total value of scheme assets, including cash, on {0}
 financialDetailsCheckYourAnswersController.feeCommissionWagesSalary = How much did {0} pay in fees, commissions, wages and salaries during the period of this return?
 financialDetailsCheckYourAnswersController.feeCommissionWagesSalary.hidden = how much the scheme paid in fees, commissions, wages and salaries during the period of this return
+
+landPropertyInUK.title = Is this land or property in the UK?
+landPropertyInUK.heading = Is this land or property in the UK?
+landPropertyInUK.error.required = Select yes if the land or property is in the UK

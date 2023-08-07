@@ -20,7 +20,7 @@ import controllers.routes
 import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.landorproperty.LandOrPropertyHeldPage
+import pages.nonsipp.landorproperty.{LandOrPropertyHeldPage, LandPropertyInUKPage}
 import play.api.mvc.Call
 
 object LandOrPropertyNavigator extends JourneyNavigator {
@@ -32,6 +32,13 @@ object LandOrPropertyNavigator extends JourneyNavigator {
         routes.UnauthorisedController.onPageLoad()
       } else {
         controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedController.onPageLoad(srn, NormalMode)
+      }
+
+    case page @ LandPropertyInUKPage(srn) =>
+      if (userAnswers.get(page).contains(true)) {
+        routes.UnauthorisedController.onPageLoad()
+      } else {
+        routes.UnauthorisedController.onPageLoad()
       }
   }
 

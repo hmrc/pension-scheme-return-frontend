@@ -16,39 +16,36 @@
 
 package controllers.nonsipp.landorproperty
 
+import controllers.nonsipp.landorproperty.LandPropertyInUKController._
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.landorproperty.LandOrPropertyHeldController._
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import pages.nonsipp.LandOrPropertyHeldPage
-import pages.nonsipp.landorproperty.LandOrPropertyHeldPage
+import pages.nonsipp.landorproperty.LandPropertyInUKPage
 import views.html.YesNoPageView
 
-class LandOrPropertyHeldControllerSpec extends ControllerBaseSpec {
+class LandPropertyInUKControllerSpec extends ControllerBaseSpec {
 
-  private lazy val onPageLoad = routes.LandOrPropertyHeldController.onPageLoad(srn, NormalMode)
-  private lazy val onSubmit = routes.LandOrPropertyHeldController.onSubmit(srn, NormalMode)
+  private lazy val onPageLoad = routes.LandPropertyInUKController.onPageLoad(srn, NormalMode)
+  private lazy val onSubmit = routes.LandPropertyInUKController.onSubmit(srn, NormalMode)
 
-  "LandOrPropertyHeldController" - {
+  "LandPropertyInUKController" - {
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
-      injected[YesNoPageView].apply(form(injected[YesNoPageFormProvider]), viewModel(srn, NormalMode, schemeName))
+      injected[YesNoPageView].apply(form(injected[YesNoPageFormProvider]), viewModel(srn, NormalMode))
     })
 
-    act.like(renderPrePopView(onPageLoad, LandOrPropertyHeldPage(srn), true) { implicit app => implicit request =>
-      injected[YesNoPageView]
-        .apply(form(injected[YesNoPageFormProvider]).fill(true), viewModel(srn, NormalMode, schemeName))
+    act.like(renderPrePopView(onPageLoad, LandPropertyInUKPage(srn), true) { implicit app => implicit request =>
+      injected[YesNoPageView].apply(form(injected[YesNoPageFormProvider]).fill(true), viewModel(srn, NormalMode))
     })
 
     act.like(redirectNextPage(onSubmit, "value" -> "true"))
     act.like(redirectNextPage(onSubmit, "value" -> "false"))
 
-    act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
+    act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
     act.like(saveAndContinue(onSubmit, "value" -> "true"))
 
     act.like(invalidForm(onSubmit))
-
-    act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit " + _))
+    act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }
 }
