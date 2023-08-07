@@ -16,7 +16,6 @@
 
 package navigation.nonsipp
 
-import controllers.nonsipp.landorproperty.routes
 import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page

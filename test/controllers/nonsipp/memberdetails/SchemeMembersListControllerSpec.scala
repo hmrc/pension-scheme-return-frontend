@@ -19,7 +19,6 @@ package controllers.nonsipp.memberdetails
 import config.Refined.OneTo300
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.memberdetails.SchemeMembersListController._
-import controllers.nonsipp.memberpayments
 import eu.timepit.refined._
 import forms.YesNoPageFormProvider
 import models.ManualOrUpload.{Manual, Upload}

@@ -24,7 +24,6 @@ import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
 import play.api.inject.bind
 import services.SchemeDateService
-import utils.Transform._
 import views.html.MoneyView
 
 class TotalValueQuotedSharesControllerSpec extends ControllerBaseSpec {

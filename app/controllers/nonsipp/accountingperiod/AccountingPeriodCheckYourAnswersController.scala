@@ -22,7 +22,7 @@ import config.Refined.Max3
 import controllers.actions.{AllowAccessActionProvider, DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import controllers.nonsipp.accountingperiod.AccountingPeriodCheckYourAnswersController.viewModel
 import models.SchemeId.Srn
-import models.{DateRange, Mode, NormalMode}
+import models.{DateRange, Mode}
 import navigation.Navigator
 import pages.nonsipp.accountingperiod.{AccountingPeriodCheckYourAnswersPage, AccountingPeriodPage}
 import play.api.i18n.{I18nSupport, MessagesApi}

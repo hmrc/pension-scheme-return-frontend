@@ -18,15 +18,13 @@ package controllers.nonsipp
 
 import cats.data.NonEmptyList
 import cats.implicits.toShow
-import config.Refined.{Max3, OneToThree}
-import eu.timepit.refined.refineV
+import config.Refined.Max3
 import controllers.actions._
 import controllers.nonsipp.BasicDetailsCheckYourAnswersController._
 import models.SchemeId.Srn
 import models.requests.DataRequest
 import models.{CheckMode, DateRange, Mode, SchemeDetails, SchemeMemberNumbers}
 import navigation.Navigator
-import pages.nonsipp.accountingperiod.AccountingPeriods
 import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, HowManyMembersPage, WhyNoBankAccountPage}
 import pages.nonsipp.{BasicDetailsCheckYourAnswersPage, WhichTaxYearPage}
 import play.api.i18n._

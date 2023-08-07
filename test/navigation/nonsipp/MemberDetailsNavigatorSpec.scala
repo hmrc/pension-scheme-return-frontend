@@ -17,20 +17,18 @@
 package navigation.nonsipp
 
 import config.Refined.OneTo300
-import controllers.TestValues
-import controllers.nonsipp.memberpayments
 import controllers.nonsipp.memberdetails.routes
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.refineMV
 import generators.IndexGen
 import models.ManualOrUpload.{Manual, Upload}
 import models.SchemeId.Srn
-import models.{CheckOrChange, ManualOrUpload, NormalMode, UploadErrors, UploadFormatError}
+import models.{CheckOrChange, ManualOrUpload, UploadFormatError}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.{CheckingMemberDetailsFilePage, FileUploadErrorSummaryPage, FileUploadTooManyErrorsPage}
 import pages.nonsipp.memberdetails._
 import pages.nonsipp.memberdetails.upload.{FileUploadErrorPage, FileUploadSuccessPage}
+import pages.{CheckingMemberDetailsFilePage, FileUploadErrorSummaryPage, FileUploadTooManyErrorsPage}
 import utils.BaseSpec
 import utils.UserAnswersUtils.UserAnswersOps
 

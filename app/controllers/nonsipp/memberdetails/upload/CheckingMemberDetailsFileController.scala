@@ -18,9 +18,9 @@ package controllers.nonsipp.memberdetails.upload
 
 import controllers.actions._
 import controllers.nonsipp.memberdetails.upload.CheckingMemberDetailsFileController._
-import models.{Mode, NormalMode, UploadError, UploadErrors, UploadFormatError, UploadKey, UploadStatus, UploadSuccess}
 import models.SchemeId.Srn
 import models.requests.DataRequest
+import models.{Mode, UploadError, UploadKey, UploadSuccess}
 import navigation.Navigator
 import pages.CheckingMemberDetailsFilePage
 import play.api.i18n._

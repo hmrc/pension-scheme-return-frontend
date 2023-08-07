@@ -18,11 +18,9 @@ package controllers.testonly
 
 import cats.implicits._
 import config.Refined.{Max300, OneTo300}
-import controllers.actions.{DataRetrievalAction, IdentifyAndRequireData}
-import controllers.nonsipp.memberdetails.DoesSchemeMemberHaveNINOController
+import controllers.actions.IdentifyAndRequireData
 import controllers.testonly.MongoController.buildRandomNameDOB
 import eu.timepit.refined._
-import eu.timepit.refined.api.Refined
 import models.SchemeId.Srn
 import models.{NameDOB, UserAnswers}
 import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsNinoPage, MemberDetailsPage, NoNINOPage}
@@ -111,6 +109,7 @@ object MongoController {
     "Payne",
     "Gonzales"
   )
+
   def buildRandomNameDOB(): NameDOB = NameDOB(
     firstNames(Random.nextInt(firstNames.size)),
     lastNames(Random.nextInt(lastNames.size)),

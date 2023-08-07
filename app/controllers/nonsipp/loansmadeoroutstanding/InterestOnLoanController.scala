@@ -16,14 +16,13 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
-import controllers.nonsipp.loansmadeoroutstanding.InterestOnLoanController._
 import com.google.inject.Inject
 import config.Constants.{maxCurrencyValue, maxPercentage, minPercentage}
 import config.Refined.Max9999999
 import controllers.actions._
-import forms.mappings.Mappings
 import forms.MultipleQuestionFormProvider
-import forms.mappings.errors.{DoubleFormErrors, MoneyFormErrors, PercentageFormErrors}
+import forms.mappings.Mappings
+import forms.mappings.errors.{MoneyFormErrors, PercentageFormErrors}
 import models.SchemeId.Srn
 import models.{Mode, Money, Percentage}
 import navigation.Navigator
@@ -31,7 +30,7 @@ import pages.nonsipp.loansmadeoroutstanding.InterestOnLoanPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.{SaveService, SchemeDateService}
+import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
@@ -48,8 +47,7 @@ class InterestOnLoanController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   view: MultipleQuestionView,
-  saveService: SaveService,
-  schemeDateService: SchemeDateService
+  saveService: SaveService
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {

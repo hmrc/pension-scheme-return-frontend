@@ -16,8 +16,6 @@
 
 package navigation.nonsipp
 
-import controllers.routes
-import models.NormalMode
 import navigation.{Navigator, NavigatorBehaviours}
 import pages.nonsipp.declaration.{PsaDeclarationPage, PspDeclarationPage}
 import utils.BaseSpec

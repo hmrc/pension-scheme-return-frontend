@@ -21,7 +21,7 @@ import com.google.inject.Inject
 import config.Constants.maxAccountingPeriods
 import config.Refined.OneToThree
 import controllers.actions._
-import eu.timepit.refined.{refineMV, refineV}
+import eu.timepit.refined.refineV
 import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
 import models.{CheckMode, DateRange, Mode, NormalMode}
@@ -118,6 +118,7 @@ object AccountingPeriodListController {
             )
         )
     }
+
   def viewModel(srn: Srn, mode: Mode, periods: List[DateRange]): FormPageViewModel[ListViewModel] = {
 
     val title = if (periods.length == 1) "accountingPeriods.title" else "accountingPeriods.title.plural"

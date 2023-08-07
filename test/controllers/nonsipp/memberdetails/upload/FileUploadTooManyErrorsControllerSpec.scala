@@ -16,10 +16,9 @@
 
 package controllers.nonsipp.memberdetails.upload
 
-import cats.data.NonEmptyList
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.memberdetails.upload.FileUploadTooManyErrorsController._
-import models.{NormalMode, Upload, ValidationErrorType}
+import models.{NormalMode, Upload}
 import org.mockito.ArgumentMatchers.any
 import play.api.inject
 import play.api.inject.guice.GuiceableModule
