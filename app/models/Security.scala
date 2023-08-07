@@ -15,10 +15,9 @@
  */
 
 package models
-import models.ConditionalYesNo.ConditionalYes
+
 import play.api.libs.json.{Reads, Writes}
 import uk.gov.hmrc.domain.{SimpleName, SimpleObjectReads, SimpleObjectWrites, TaxIdentifier}
-import utils.Transform
 
 case class Security(security: String) extends TaxIdentifier with SimpleName {
 
@@ -39,6 +38,7 @@ object Security extends (String => Security) {
   private val maxLength = 160
 
   def isValid(security: String) = security != null && security.matches(validSecurityFormat)
+
   def maxLengthCheck(security: String) = security != null && (maxLength > security.length)
 
 }

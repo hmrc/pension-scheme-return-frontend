@@ -24,12 +24,12 @@ import controllers.PSRController
 import controllers.actions._
 import controllers.nonsipp.loansmadeoroutstanding.LoansListController._
 import eu.timepit.refined.api.Refined
-import eu.timepit.refined.{refineMV, refineV}
+import eu.timepit.refined.refineV
 import forms.YesNoPageFormProvider
 import models.CheckOrChange.Change
 import models.SchemeId.Srn
 import models.requests.DataRequest
-import models.{CheckOrChange, Mode, Money, NormalMode, ReceivedLoanType}
+import models.{Mode, Money, NormalMode, ReceivedLoanType}
 import navigation.Navigator
 import pages.nonsipp.accountingperiod.AccountingPeriodListPage
 import pages.nonsipp.loansmadeoroutstanding._

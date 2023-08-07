@@ -19,16 +19,15 @@ package generators
 import models.PensionSchemeId.{PsaId, PspId}
 import models.SchemeId.{Pstr, Srn}
 import models.SchemeStatus._
-import models.{ConditionalYesNo, _}
 import models.cache.PensionSchemeUser
 import models.cache.PensionSchemeUser.{Administrator, Practitioner}
 import models.requests.IdentifierRequest.{AdministratorRequest, PractitionerRequest}
 import models.requests.{AllowedAccessRequest, IdentifierRequest}
-import org.scalacheck.{Arbitrary, Gen}
+import models.{ConditionalYesNo, _}
+import org.scalacheck.Gen
 import org.scalacheck.Gen.numChar
 import play.api.mvc.Request
 import uk.gov.hmrc.domain.Nino
-import utils.WithName
 
 import java.time.{LocalDate, LocalDateTime, ZoneOffset}
 

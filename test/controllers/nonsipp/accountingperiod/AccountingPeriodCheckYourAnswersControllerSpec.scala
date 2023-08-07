@@ -20,15 +20,13 @@ import cats.implicits.toShow
 import config.Refined.OneToThree
 import controllers.ControllerBaseSpec
 import eu.timepit.refined._
-import models.{DateRange, NormalMode}
+import models.NormalMode
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
 import pages.nonsipp.accountingperiod.AccountingPeriodPage
 import utils.DateTimeUtils.localDateShow
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.SummaryAction
 import views.html.CheckYourAnswersView
-
-import java.time.LocalDate
 
 class AccountingPeriodCheckYourAnswersControllerSpec extends ControllerBaseSpec {
 

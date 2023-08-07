@@ -17,7 +17,7 @@
 package pages.nonsipp.memberdetails.upload
 
 import models.SchemeId.Srn
-import models.{UploadError, UploadErrors, UploadFormatError}
+import models.UploadError
 import pages.Page
 
 case class FileUploadErrorPage(srn: Srn, error: UploadError) extends Page

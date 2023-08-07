@@ -16,11 +16,10 @@
 
 package navigation.nonsipp
 
-import controllers.routes
 import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.landorproperty.LandOrPropertyHeldPage
+import pages.nonsipp.landorproperty.{LandOrPropertyHeldPage, WhatYouWillNeedLandOrPropertyPage}
 import play.api.mvc.Call
 
 object LandOrPropertyNavigator extends JourneyNavigator {
@@ -29,10 +28,12 @@ object LandOrPropertyNavigator extends JourneyNavigator {
 
     case page @ LandOrPropertyHeldPage(srn) =>
       if (userAnswers.get(page).contains(true)) {
-        routes.UnauthorisedController.onPageLoad()
+        controllers.nonsipp.landorproperty.routes.WhatYouWillNeedLandOrPropertyController.onPageLoad(srn)
       } else {
         controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedController.onPageLoad(srn, NormalMode)
       }
+
+    case WhatYouWillNeedLandOrPropertyPage(_) => controllers.routes.UnauthorisedController.onPageLoad()
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty

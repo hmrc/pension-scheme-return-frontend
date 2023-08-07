@@ -21,7 +21,6 @@ import controllers.actions._
 import generators.ModelGenerators._
 import models.PensionSchemeId.PsaId
 import models.UserAnswers.SensitiveJsObject
-import models.requests.IdentifierRequest
 import models.{NameDOB, _}
 import org.scalatest.OptionValues
 import play.api.Application
@@ -30,7 +29,7 @@ import play.api.http._
 import play.api.inject.bind
 import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
 import play.api.libs.json.{Json, Writes}
-import play.api.mvc.{Call, PlayBodyParsers}
+import play.api.mvc.Call
 import play.api.test._
 import queries.Settable
 import uk.gov.hmrc.domain.Nino
@@ -89,7 +88,8 @@ trait ControllerBaseSpec
   }
 }
 
-trait TestValues { _: OptionValues =>
+trait TestValues {
+  _: OptionValues =>
   val accountNumber = "12345678"
   val sortCode = "123456"
   val srn: SchemeId.Srn = srnGen.sample.value
@@ -116,6 +116,7 @@ trait TestValues { _: OptionValues =>
   val individualDetails: IndividualDetails = IndividualDetails("testFirstName", Some("testMiddleName"), "testLastName")
 
   val userAnswersId: String = "id"
+
   def emptyUserAnswers: UserAnswers = UserAnswers(userAnswersId)
 
   val defaultExpectedDataPath = None

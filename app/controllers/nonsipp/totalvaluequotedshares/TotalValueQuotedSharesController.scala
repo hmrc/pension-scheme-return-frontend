@@ -16,8 +16,8 @@
 
 package controllers.nonsipp.totalvaluequotedshares
 
-import cats.{Id, Monad}
 import cats.implicits.toShow
+import cats.{Id, Monad}
 import config.Constants.maxMoneyValue
 import controllers.actions._
 import controllers.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesController._
@@ -40,9 +40,7 @@ import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import viewmodels.models.{FormPageViewModel, QuestionField}
 import views.html.MoneyView
 
-import java.time.LocalDate
 import javax.inject.{Inject, Named}
-import scala.Seq
 import scala.concurrent.{ExecutionContext, Future}
 
 class TotalValueQuotedSharesController @Inject()(

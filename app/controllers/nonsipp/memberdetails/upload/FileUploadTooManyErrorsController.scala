@@ -19,9 +19,9 @@ package controllers.nonsipp.memberdetails.upload
 import cats.data.NonEmptyList
 import controllers.actions._
 import controllers.nonsipp.memberdetails.upload.FileUploadTooManyErrorsController._
-import models.{Mode, UploadErrors, UploadKey, ValidationError, ValidationErrorType}
 import models.SchemeId.Srn
 import models.ValidationErrorType.ValidationErrorType
+import models.{Mode, UploadErrors, UploadKey, ValidationErrorType}
 import navigation.Navigator
 import pages.FileUploadTooManyErrorsPage
 import play.api.i18n._

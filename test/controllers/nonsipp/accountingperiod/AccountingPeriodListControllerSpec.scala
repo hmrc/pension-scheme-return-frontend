@@ -19,7 +19,7 @@ package controllers.nonsipp.accountingperiod
 import config.Constants.maxAccountingPeriods
 import config.Refined.OneToThree
 import controllers.ControllerBaseSpec
-import eu.timepit.refined.{refineMV, refineV}
+import eu.timepit.refined.refineV
 import forms.YesNoPageFormProvider
 import models.NormalMode
 import org.scalacheck.Gen

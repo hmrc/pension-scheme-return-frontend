@@ -24,7 +24,6 @@ import controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController._
 import models.SchemeId.Srn
 import models.{CheckMode, CheckOrChange, Mode, NameDOB, NormalMode}
 import navigation.Navigator
-import pages._
 import pages.nonsipp.memberdetails._
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
