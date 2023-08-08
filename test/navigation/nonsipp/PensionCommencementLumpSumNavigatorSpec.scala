@@ -17,7 +17,6 @@
 package navigation.nonsipp
 
 import controllers.routes
-import models.NormalMode
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.memberpayments.PensionCommencementLumpSumPage

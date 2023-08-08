@@ -17,10 +17,10 @@
 package controllers.nonsipp.loansmadeoroutstanding
 
 import config.Refined.OneTo9999999
-import controllers.nonsipp.loansmadeoroutstanding.LoansCYAController._
 import controllers.ControllerBaseSpec
+import controllers.nonsipp.loansmadeoroutstanding.LoansCYAController._
 import eu.timepit.refined.refineMV
-import models.CheckOrChange.Check
+import models.ConditionalYesNo._
 import models.{
   CheckOrChange,
   ConditionalYesNo,
@@ -31,7 +31,6 @@ import models.{
   Security,
   SponsoringOrConnectedParty
 }
-import models.ConditionalYesNo._
 import pages.nonsipp.loansmadeoroutstanding._
 import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
@@ -53,6 +52,7 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
   private val taxYear = Some(Left(dateRange))
 
   private def onPageLoad(checkOrChange: CheckOrChange) = routes.LoansCYAController.onPageLoad(srn, index, checkOrChange)
+
   private def onSubmit(checkOrChange: CheckOrChange) = routes.LoansCYAController.onSubmit(srn, checkOrChange)
 
   private val filledUserAnswers = defaultUserAnswers

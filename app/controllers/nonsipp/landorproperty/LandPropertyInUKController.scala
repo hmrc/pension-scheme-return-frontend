@@ -14,21 +14,20 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.unquotedshares
+package controllers.nonsipp.landorproperty
 
 import controllers.actions._
-import controllers.nonsipp.unquotedshares.UnquotedSharesController.viewModel
-import pages.nonsipp.unquotedshares.UnquotedSharesPage
+import controllers.nonsipp.landorproperty.LandPropertyInUKController._
 import forms.YesNoPageFormProvider
 import models.Mode
 import models.SchemeId.Srn
 import navigation.Navigator
+import pages.nonsipp.landorproperty.LandPropertyInUKPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 import views.html.YesNoPageView
@@ -36,7 +35,7 @@ import views.html.YesNoPageView
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
-class UnquotedSharesController @Inject()(
+class LandPropertyInUKController @Inject()(
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -48,39 +47,35 @@ class UnquotedSharesController @Inject()(
     extends FrontendBaseController
     with I18nSupport {
 
-  private val form = UnquotedSharesController.form(formProvider)
+  private val form = LandPropertyInUKController.form(formProvider)
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    val preparedForm = request.userAnswers.get(UnquotedSharesPage(srn)).fold(form)(form.fill)
-    Ok(view(preparedForm, viewModel(srn, request.schemeDetails.schemeName, mode)))
+    val preparedForm = request.userAnswers.fillForm(LandPropertyInUKPage(srn), form)
+    Ok(view(preparedForm, viewModel(srn, mode)))
   }
 
   def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
     form
       .bindFromRequest()
       .fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, viewModel(srn, request.schemeDetails.schemeName, mode)))),
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, mode)))),
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(UnquotedSharesPage(srn), value))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(LandPropertyInUKPage(srn), value))
             _ <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage(UnquotedSharesPage(srn), mode, updatedAnswers))
+          } yield Redirect(navigator.nextPage(LandPropertyInUKPage(srn), mode, updatedAnswers))
       )
   }
 }
-object UnquotedSharesController {
+
+object LandPropertyInUKController {
   def form(formProvider: YesNoPageFormProvider): Form[Boolean] = formProvider(
-    "unquotedShares.error.required"
+    "landPropertyInUK.error.required"
   )
 
-  def viewModel(srn: Srn, schemeName: String, mode: Mode): FormPageViewModel[YesNoPageViewModel] =
-    FormPageViewModel(
-      "unquotedShares.title",
-      Message("unquotedShares.heading", schemeName),
-      YesNoPageViewModel(
-        hint = Some("unquotedShares.hint")
-      ),
-      routes.UnquotedSharesController.onSubmit(srn, mode)
-    )
+  def viewModel(srn: Srn, mode: Mode): FormPageViewModel[YesNoPageViewModel] = YesNoPageViewModel(
+    "landPropertyInUK.title",
+    "landPropertyInUK.heading",
+    routes.LandPropertyInUKController.onSubmit(srn, mode)
+  )
 }

@@ -16,7 +16,6 @@
 
 package utils
 
-import utils.ListUtils.ListOps
 import viewmodels.DisplayMessage
 import viewmodels.DisplayMessage.{
   CompoundMessage,

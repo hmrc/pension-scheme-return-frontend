@@ -18,20 +18,12 @@ package controllers.nonsipp.loansmadeoroutstanding
 
 import config.Refined.Max9999999
 import controllers.actions._
-import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
 import models.SchemeId.Srn
 import models.requests.DataRequest
 import models.{Mode, ReceivedLoanType, SponsoringOrConnectedParty}
 import navigation.Navigator
-import pages.nonsipp.loansmadeoroutstanding.{
-  CompanyRecipientNamePage,
-  IndividualRecipientNamePage,
-  OtherRecipientDetailsPage,
-  PartnershipRecipientNamePage,
-  RecipientSponsoringEmployerConnectedPartyPage,
-  WhoReceivedLoanPage
-}
+import pages.nonsipp.loansmadeoroutstanding._
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}

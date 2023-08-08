@@ -17,16 +17,15 @@
 package navigation.nonsipp
 
 import config.Refined.OneTo300
-import controllers.nonsipp.memberpayments
 import controllers.nonsipp.memberdetails.routes
-import eu.timepit.refined.{refineMV, refineV}
+import eu.timepit.refined.refineV
 import models.CheckOrChange.Check
 import models.ManualOrUpload.{Manual, Upload}
 import models._
 import navigation.JourneyNavigator
+import pages._
 import pages.nonsipp.BasicDetailsCheckYourAnswersPage
 import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
-import pages._
 import pages.nonsipp.memberdetails._
 import pages.nonsipp.memberdetails.upload.{FileUploadErrorPage, FileUploadSuccessPage}
 import play.api.mvc.Call

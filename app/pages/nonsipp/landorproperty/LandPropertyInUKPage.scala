@@ -14,22 +14,15 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages.nonsipp.landorproperty
 
 import models.SchemeId.Srn
-import models.{DateRange, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-import scala.util.{Success, Try}
+case class LandPropertyInUKPage(srn: Srn) extends QuestionPage[Boolean] {
 
-case class WhichTaxYearPage(srn: Srn) extends QuestionPage[DateRange] {
-  self =>
   override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "reportDetails"
-
-  override def cleanup(value: Option[DateRange], userAnswers: UserAnswers): Try[UserAnswers] =
-    if (value != userAnswers.get(self)) userAnswers.remove(CheckReturnDatesPage(srn))
-    else Success(userAnswers)
+  override def toString: String = "landPropertyInUK"
 }

@@ -29,7 +29,6 @@ import controllers.nonsipp.memberdetails.{MemberDetailsController, MemberDetails
 import forms.{NameDOBFormProvider, TextFormProvider}
 import models.ValidationErrorType.ValidationErrorType
 import models._
-import pages.nonsipp.memberdetails._
 import play.api.data.{Form, FormError}
 import play.api.i18n.Messages
 import uk.gov.hmrc.domain.Nino
@@ -44,6 +43,7 @@ class MemberDetailsUploadValidator @Inject()(
 )(implicit ec: ExecutionContext) {
 
   private val memberDetailsForm = MemberDetailsController.form(nameDOBFormProvider)
+
   private def ninoForm(memberFullName: String, previousNinos: List[Nino]): Form[Nino] =
     MemberDetailsNinoController.form(textFormProvider, memberFullName, previousNinos)
 

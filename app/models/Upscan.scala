@@ -16,28 +16,14 @@
 
 package models
 
-import models.SchemeId.{asSrn, Srn}
+import models.SchemeId.Srn
 import models.requests.DataRequest
-import org.bson.types.ObjectId
-import play.api.libs.json.{
-  Format,
-  JsDefined,
-  JsError,
-  JsString,
-  JsUndefined,
-  JsValue,
-  Json,
-  OFormat,
-  OWrites,
-  Reads,
-  Writes
-}
+import play.api.libs.json._
 import play.api.mvc.QueryStringBindable
 import utils.HttpUrlFormat
 
 import java.net.URL
-import java.time.{Instant, LocalDateTime}
-import java.util.UUID
+import java.time.Instant
 
 case class Reference(reference: String)
 

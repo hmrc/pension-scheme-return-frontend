@@ -25,16 +25,14 @@ import eu.timepit.refined.refineMV
 import models.SchemeId.Srn
 import models.{DateRange, Mode, NormalMode, SchemeDetails, SchemeMemberNumbers}
 import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, HowManyMembersPage}
 import pages.nonsipp.WhichTaxYearPage
+import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, HowManyMembersPage}
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
 import play.api.test.FakeRequest
 import play.api.test.Helpers.stubMessagesApi
 import services.SchemeDateService
-import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
 import viewmodels.models.{CheckYourAnswersViewModel, FormPageViewModel}
 import views.html.CheckYourAnswersView
 

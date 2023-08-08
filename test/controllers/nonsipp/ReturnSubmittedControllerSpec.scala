@@ -17,14 +17,11 @@
 package controllers.nonsipp
 
 import cats.data.NonEmptyList
-import config.Refined.OneToThree
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.ReturnSubmittedController.viewModel
-import eu.timepit.refined._
 import models.DateRange
 import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.accountingperiod.AccountingPeriodPage
-import pages.nonsipp.{ReturnSubmittedPage, WhichTaxYearPage}
+import pages.nonsipp.ReturnSubmittedPage
 import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
 import services.SchemeDateService

@@ -30,7 +30,7 @@ import pages.nonsipp.accountingperiod.{AccountingPeriodPage, AccountingPeriods}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import services.{SaveService, TaxYearService}
+import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.time.TaxYear
 import utils.FormUtils._
@@ -61,6 +61,7 @@ class AccountingPeriodController @Inject()(
 
   private def form(usedAccountingPeriods: List[DateRange] = List(), taxYear: TaxYear = TaxYear.current) =
     AccountingPeriodController.form(formProvider, taxYear, usedAccountingPeriods)
+
   private val viewModel = AccountingPeriodController.viewModel _
 
   def onPageLoad(srn: Srn, index: Max3, mode: Mode): Action[AnyContent] =

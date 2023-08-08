@@ -456,6 +456,7 @@ sharesAcquired.linkMessage = Section 993 of the Income Tax Act 2007.
 
 unquotedShares.title = Did the scheme hold any unquoted shares during the period of this return?
 unquotedShares.heading = Did {0} hold any unquoted shares during the period of this return?
+unquotedShares.hint = Unquoted shares are those in companies not listed by a recognised stock exchange.
 unquotedShares.error.required = Select yes if the scheme held any unquoted shares during the period of this return
 
 checkingMemberDetailsFile.title = We are checking your member details file
@@ -867,3 +868,31 @@ financialDetailsCheckYourAnswersController.valueOfAssetsInEndDate = What was the
 financialDetailsCheckYourAnswersController.valueOfAssetsInEndDate.hidden = total value of scheme assets, including cash, on {0}
 financialDetailsCheckYourAnswersController.feeCommissionWagesSalary = How much did {0} pay in fees, commissions, wages and salaries during the period of this return?
 financialDetailsCheckYourAnswersController.feeCommissionWagesSalary.hidden = how much the scheme paid in fees, commissions, wages and salaries during the period of this return
+
+whatYouWillNeedLandOrProperty.title = Land or property held by the scheme
+whatYouWillNeedLandOrProperty.heading = Land or property held by {0}
+whatYouWillNeedLandOrProperty.paragraph1 = Answer these questions for one property or piece of land at a time. If you need to add more, you will be able to do this later.
+whatYouWillNeedLandOrProperty.paragraph2 = You must tell us about all land or property the scheme held at any point during the period of this return.
+whatYouWillNeedLandOrProperty.paragraph3 = You need to tell us:
+whatYouWillNeedLandOrProperty.info1 = the address of the land or property
+whatYouWillNeedLandOrProperty.info2 = if there is a Land Registry reference, and if so, what it is
+whatYouWillNeedLandOrProperty.info3 = if the pension scheme holds this land or property as a result of acquisition (purchase), contribution or transfer
+whatYouWillNeedLandOrProperty.info4 = the total cost or value of the land or property
+whatYouWillNeedLandOrProperty.info5 = if any part of the land or property is residential property
+whatYouWillNeedLandOrProperty.info6 = the total income received from the land or property during the period of this return
+whatYouWillNeedLandOrProperty.paragraph4 = You need to tell us if the land or property is leased, and if so:
+whatYouWillNeedLandOrProperty.isLeasedInfo1 = the lessee’s name
+whatYouWillNeedLandOrProperty.isLeasedInfo2 = the annual lease amount
+whatYouWillNeedLandOrProperty.isLeasedInfo3 = the date the lease was granted
+whatYouWillNeedLandOrProperty.isLeasedInfo4 = if the lessee is a connected party
+whatYouWillNeedLandOrProperty.paragraph5 = If the land or property is held as a result of acquisition or contribution, you need to tell us:
+whatYouWillNeedLandOrProperty.isAcquisitionOrContributionInfo1 = the date it was acquired or contributed
+whatYouWillNeedLandOrProperty.isAcquisitionOrContributionInfo2 = if the transaction was supported by an independent valuation
+whatYouWillNeedLandOrProperty.paragraph6 = If the land or property is held as a result of acquisition, you also need to tell us:
+whatYouWillNeedLandOrProperty.isAcquisitionInfo1 = if it was acquired from an individual, company, partnership or other
+whatYouWillNeedLandOrProperty.isAcquisitionInfo2 = the seller’s National Insurance number, Company Reference Number, Unique Taxpayer Reference or details – whichever applies
+whatYouWillNeedLandOrProperty.isAcquisitionInfo3 = if the seller was a connected party
+
+landPropertyInUK.title = Is this land or property in the UK?
+landPropertyInUK.heading = Is this land or property in the UK?
+landPropertyInUK.error.required = Select yes if the land or property is in the UK

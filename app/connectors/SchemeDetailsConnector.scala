@@ -23,7 +23,6 @@ import models.SchemeId.Srn
 import models.{ListMinimalSchemeDetails, SchemeDetails, SchemeId}
 import play.api.Logger
 import play.api.http.Status.NOT_FOUND
-import play.api.libs.json.JsObject
 import uk.gov.hmrc.http.HttpReads.Implicits.{readFromJson, readOptionOfNotFound}
 import uk.gov.hmrc.http.UpstreamErrorResponse.WithStatusCode
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
@@ -151,17 +150,20 @@ trait SchemeDetailsConnector {
     implicit hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[Option[SchemeDetails]]
+
   def details(pspId: PspId, schemeId: Srn)(
     implicit hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[Option[SchemeDetails]]
 
   def checkAssociation(psaId: PsaId, schemeId: Srn)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Boolean]
+
   def checkAssociation(pspId: PspId, schemeId: Srn)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Boolean]
 
   def listSchemeDetails(
     psaId: PsaId
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[ListMinimalSchemeDetails]]
+
   def listSchemeDetails(
     pspId: PspId
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[ListMinimalSchemeDetails]]

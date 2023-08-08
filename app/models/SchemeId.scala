@@ -16,8 +16,6 @@
 
 package models
 
-import play.api.libs.json.Json
-
 sealed abstract class SchemeId(val idType: String) {
   val value: String
 }

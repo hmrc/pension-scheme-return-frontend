@@ -14,21 +14,9 @@
  * limitations under the License.
  */
 
-package pages
+package pages.nonsipp.landorproperty
 
-import pages.behaviours.PageBehaviours
-import pages.nonsipp.landorproperty.LandOrPropertyHeldPage
+import models.SchemeId.Srn
+import pages.Page
 
-class LandOrPropertyHeldPage extends PageBehaviours {
-
-  "HowMuchCashPage" - {
-
-    val srn = srnGen.sample.value
-
-    beRetrievable[Boolean](LandOrPropertyHeldPage(srn))
-
-    beSettable[Boolean](LandOrPropertyHeldPage(srn))
-
-    beRemovable[Boolean](LandOrPropertyHeldPage(srn))
-  }
-}
+case class WhatYouWillNeedLandOrPropertyPage(srn: Srn) extends Page

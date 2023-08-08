@@ -16,20 +16,19 @@
 
 package pages.nonsipp
 
-import models.SchemeId.Srn
-import models.{DateRange, UserAnswers}
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import pages.behaviours.PageBehaviours
+import pages.nonsipp.landorproperty.LandOrPropertyHeldPage
 
-import scala.util.{Success, Try}
+class LandOrPropertyHeldPage extends PageBehaviours {
 
-case class WhichTaxYearPage(srn: Srn) extends QuestionPage[DateRange] {
-  self =>
-  override def path: JsPath = JsPath \ toString
+  "HowMuchCashPage" - {
 
-  override def toString: String = "reportDetails"
+    val srn = srnGen.sample.value
 
-  override def cleanup(value: Option[DateRange], userAnswers: UserAnswers): Try[UserAnswers] =
-    if (value != userAnswers.get(self)) userAnswers.remove(CheckReturnDatesPage(srn))
-    else Success(userAnswers)
+    beRetrievable[Boolean](LandOrPropertyHeldPage(srn))
+
+    beSettable[Boolean](LandOrPropertyHeldPage(srn))
+
+    beRemovable[Boolean](LandOrPropertyHeldPage(srn))
+  }
 }

@@ -14,22 +14,18 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages.nonsipp.landorproperty
 
-import models.SchemeId.Srn
-import models.{DateRange, UserAnswers}
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import pages.behaviours.PageBehaviours
 
-import scala.util.{Success, Try}
+class LandPropertyInUKPageSpec extends PageBehaviours {
 
-case class WhichTaxYearPage(srn: Srn) extends QuestionPage[DateRange] {
-  self =>
-  override def path: JsPath = JsPath \ toString
+  "LandPropertyInUKPage" - {
 
-  override def toString: String = "reportDetails"
+    beRetrievable[Boolean](LandPropertyInUKPage(srnGen.sample.value))
 
-  override def cleanup(value: Option[DateRange], userAnswers: UserAnswers): Try[UserAnswers] =
-    if (value != userAnswers.get(self)) userAnswers.remove(CheckReturnDatesPage(srn))
-    else Success(userAnswers)
+    beSettable[Boolean](LandPropertyInUKPage(srnGen.sample.value))
+
+    beRemovable[Boolean](LandPropertyInUKPage(srnGen.sample.value))
+  }
 }
