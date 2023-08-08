@@ -19,7 +19,7 @@ package navigation.nonsipp
 import controllers.nonsipp
 import controllers.nonsipp.{accountingperiod, declaration, routes, schemedesignatory}
 import eu.timepit.refined.refineMV
-import models.SchemeMemberNumbers
+import models.{NormalMode, SchemeMemberNumbers}
 import navigation.{Navigator, NavigatorBehaviours, UnknownPage}
 import org.scalacheck.Gen
 import pages.nonsipp.schemedesignatory.{
@@ -76,7 +76,7 @@ class NonSippNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       act.like(
         normalmode
           .navigateTo(
-            HowMuchCashPage,
+            HowMuchCashPage(_, NormalMode),
             schemedesignatory.routes.ValueOfAssetsController.onPageLoad
           )
           .withName("go from how much cash page to value of assets page")
@@ -85,7 +85,7 @@ class NonSippNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       act.like(
         normalmode
           .navigateTo(
-            ValueOfAssetsPage,
+            ValueOfAssetsPage(_, NormalMode),
             nonsipp.schemedesignatory.routes.FeesCommissionsWagesSalariesController.onPageLoad
           )
           .withName("go from value of assets page to fees commissions wages salaries page")

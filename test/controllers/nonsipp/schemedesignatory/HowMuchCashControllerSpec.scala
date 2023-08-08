@@ -63,9 +63,10 @@ class HowMuchCashControllerSpec extends ControllerBaseSpec {
       view(viewModel(form))
     })
 
-    act.like(renderPrePopView(onPageLoad, HowMuchCashPage(srn), moneyInPeriodData) { implicit app => implicit request =>
-      val view = injected[MoneyView]
-      view(viewModel(form.fill(moneyInPeriodData.from[(Money, Money)])))
+    act.like(renderPrePopView(onPageLoad, HowMuchCashPage(srn, NormalMode), moneyInPeriodData) {
+      implicit app => implicit request =>
+        val view = injected[MoneyView]
+        view(viewModel(form.fill(moneyInPeriodData.from[(Money, Money)])))
     })
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))

@@ -19,6 +19,8 @@ package models
 import play.api.libs.json.{Format, Json}
 import utils.Transform
 
+import java.text.DecimalFormat
+
 case class Money(value: Double, displayAs: String)
 
 object Money {

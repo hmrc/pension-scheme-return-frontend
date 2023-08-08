@@ -16,6 +16,8 @@
 
 package navigation.nonsipp
 
+import controllers.routes
+import models.NormalMode
 import navigation.{Navigator, NavigatorBehaviours}
 import pages.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesPage
 import utils.BaseSpec
@@ -29,7 +31,7 @@ class OtherAssetsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
     act.like(
       normalmode
         .navigateToWithData(
-          FeesCommissionsWagesSalariesPage,
+          FeesCommissionsWagesSalariesPage(_, NormalMode),
           moneyGen,
           controllers.nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController.onPageLoad
         )

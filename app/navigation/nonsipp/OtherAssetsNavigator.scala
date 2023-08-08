@@ -19,17 +19,25 @@ package navigation.nonsipp
 import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesPage
+import pages.nonsipp.schemedesignatory.{FeesCommissionsWagesSalariesPage, FinancialDetailsCheckYourAnswersPage}
 import play.api.mvc.Call
 
 object OtherAssetsNavigator extends JourneyNavigator {
 
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
 
-    case FeesCommissionsWagesSalariesPage(srn) =>
+    case FeesCommissionsWagesSalariesPage(srn, mode) =>
       controllers.nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController
-        .onPageLoad(srn, NormalMode)
+        .onPageLoad(srn, mode)
   }
 
-  override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty
+  override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => {
+
+    case FeesCommissionsWagesSalariesPage(srn, mode) =>
+      controllers.nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController
+        .onPageLoad(srn, mode)
+    case FinancialDetailsCheckYourAnswersPage(srn) =>
+      controllers.nonsipp.schemedesignatory.routes.FeesCommissionsWagesSalariesController.onPageLoad(srn, NormalMode)
+  }
+
 }
