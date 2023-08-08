@@ -19,7 +19,7 @@ package navigation.nonsipp
 import controllers.nonsipp
 import controllers.nonsipp.{accountingperiod, declaration, routes, schemedesignatory}
 import eu.timepit.refined.refineMV
-import models.SchemeMemberNumbers
+import models.{NormalMode, SchemeMemberNumbers}
 import navigation.{Navigator, NavigatorBehaviours, UnknownPage}
 import org.scalacheck.Gen
 import pages.nonsipp.schemedesignatory.{
