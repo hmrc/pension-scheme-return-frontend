@@ -27,7 +27,7 @@ import views.html.RadioListView
 
 class RecipientSponsoringEmployerConnectedPartyControllerSpec extends ControllerBaseSpec {
 
-  private val index = refineMV[OneTo9999999](2)
+  private val index = refineMV[OneTo9999999](1)
 
   lazy val onPageLoad = routes.RecipientSponsoringEmployerConnectedPartyController.onPageLoad(srn, index, NormalMode)
   lazy val onSubmit = routes.RecipientSponsoringEmployerConnectedPartyController.onSubmit(srn, index, NormalMode)
