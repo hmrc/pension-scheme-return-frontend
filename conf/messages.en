@@ -896,3 +896,11 @@ whatYouWillNeedLandOrProperty.isAcquisitionInfo3 = if the seller was a connected
 landPropertyInUK.title = Is this land or property in the UK?
 landPropertyInUK.heading = Is this land or property in the UK?
 landPropertyInUK.error.required = Select yes if the land or property is in the UK
+
+whyDoesSchemeHoldLandProperty.title = Why does the scheme hold this land or property?
+whyDoesSchemeHoldLandProperty.heading = Why does {0} hold {1}?
+whyDoesSchemeHoldLandProperty.option1 = Acquisition
+whyDoesSchemeHoldLandProperty.option1.hint = This can be a purchase.
+whyDoesSchemeHoldLandProperty.option2 = Contribution by an employer or member
+whyDoesSchemeHoldLandProperty.option3 = Transfer from another scheme
+whyDoesSchemeHoldLandProperty.error.required = Select why the scheme holds this land or property

@@ -19,7 +19,12 @@ package navigation.nonsipp
 import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.landorproperty.{LandOrPropertyHeldPage, LandPropertyInUKPage, WhatYouWillNeedLandOrPropertyPage}
+import pages.nonsipp.landorproperty.{
+  LandOrPropertyHeldPage,
+  LandPropertyInUKPage,
+  WhatYouWillNeedLandOrPropertyPage,
+  WhyDoesSchemeHoldLandPropertyPage
+}
 import play.api.mvc.Call
 
 object LandOrPropertyNavigator extends JourneyNavigator {
@@ -38,10 +43,13 @@ object LandOrPropertyNavigator extends JourneyNavigator {
 
     case page @ LandPropertyInUKPage(srn) =>
       if (userAnswers.get(page).contains(true)) {
-        controllers.routes.UnauthorisedController.onPageLoad()
+        controllers.nonsipp.landorproperty.routes.WhyDoesSchemeHoldLandPropertyController.onPageLoad(srn, NormalMode)
       } else {
         controllers.routes.UnauthorisedController.onPageLoad()
       }
+
+    case WhyDoesSchemeHoldLandPropertyPage(srn) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty

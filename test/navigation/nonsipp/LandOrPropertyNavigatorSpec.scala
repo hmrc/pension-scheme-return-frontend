@@ -18,7 +18,12 @@ package navigation.nonsipp
 
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.landorproperty.{LandOrPropertyHeldPage, LandPropertyInUKPage, WhatYouWillNeedLandOrPropertyPage}
+import pages.nonsipp.landorproperty.{
+  LandOrPropertyHeldPage,
+  LandPropertyInUKPage,
+  WhatYouWillNeedLandOrPropertyPage,
+  WhyDoesSchemeHoldLandPropertyPage
+}
 import utils.BaseSpec
 
 class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
@@ -52,7 +57,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateToWithData(
           LandPropertyInUKPage,
           Gen.const(true),
-          (_, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.landorproperty.routes.WhyDoesSchemeHoldLandPropertyController.onPageLoad
         )
         .withName("go from land or property in uk page to unauthorised when yes selected")
     )
@@ -77,6 +82,18 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           controllers.nonsipp.landorproperty.routes.LandPropertyInUKController.onPageLoad
         )
         .withName("go from what you will need Land or Property page to Unauthorised page")
+    )
+  }
+
+  "WhyDoesSchemeHoldLandPropertyNavigator" - {
+
+    act.like(
+      normalmode
+        .navigateTo(
+          WhyDoesSchemeHoldLandPropertyPage,
+          (_, _) => controllers.routes.UnauthorisedController.onPageLoad()
+        )
+        .withName("go from why does scheme hold land property page to unauthorised page")
     )
   }
 }
