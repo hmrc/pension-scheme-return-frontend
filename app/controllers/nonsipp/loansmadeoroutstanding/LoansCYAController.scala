@@ -25,6 +25,7 @@ import models.ConditionalYesNo._
 import models.SchemeId.Srn
 import models.{Money, Percentage, _}
 import navigation.Navigator
+import pages.nonsipp.common.WhoReceivedLoanPage
 import pages.nonsipp.loansmadeoroutstanding._
 import play.api.i18n._
 import play.api.mvc._

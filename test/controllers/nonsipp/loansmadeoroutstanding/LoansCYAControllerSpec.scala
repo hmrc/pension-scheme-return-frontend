@@ -31,6 +31,7 @@ import models.{
   Security,
   SponsoringOrConnectedParty
 }
+import pages.nonsipp.common.WhoReceivedLoanPage
 import pages.nonsipp.loansmadeoroutstanding._
 import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule

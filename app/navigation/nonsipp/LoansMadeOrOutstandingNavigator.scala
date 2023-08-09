@@ -21,6 +21,7 @@ import eu.timepit.refined.{refineMV, refineV}
 import models.{CheckOrChange, NormalMode, ReceivedLoanType, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
+import pages.nonsipp.common.{WhoReceivedLoanPage, WhoReceivedLoans}
 import pages.nonsipp.loansmadeoroutstanding._
 import play.api.mvc.Call
 

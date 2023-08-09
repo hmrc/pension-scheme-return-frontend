@@ -22,12 +22,12 @@ import controllers.nonsipp.loansmadeoroutstanding.RemoveLoanController._
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.{NormalMode, ReceivedLoanType}
+import pages.nonsipp.common.WhoReceivedLoanPage
 import pages.nonsipp.loansmadeoroutstanding.{
   AmountOfTheLoanPage,
   CompanyRecipientNamePage,
   IndividualRecipientNamePage,
-  PartnershipRecipientNamePage,
-  WhoReceivedLoanPage
+  PartnershipRecipientNamePage
 }
 import views.html.YesNoPageView
 

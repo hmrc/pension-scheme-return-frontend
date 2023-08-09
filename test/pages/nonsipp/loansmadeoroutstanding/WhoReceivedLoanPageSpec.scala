@@ -20,6 +20,7 @@ import config.Refined.OneTo9999999
 import eu.timepit.refined.refineMV
 import models.{ReceivedLoanType, UserAnswers}
 import pages.behaviours.PageBehaviours
+import pages.nonsipp.common.{WhoReceivedLoanPage, WhoReceivedLoans}
 import utils.UserAnswersUtils.UserAnswersOps
 
 class WhoReceivedLoanPageSpec extends PageBehaviours {

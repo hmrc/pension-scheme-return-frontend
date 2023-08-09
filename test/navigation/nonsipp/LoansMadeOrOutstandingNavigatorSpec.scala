@@ -21,6 +21,7 @@ import eu.timepit.refined.refineMV
 import models.{NormalMode, ReceivedLoanType}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
+import pages.nonsipp.common.WhoReceivedLoanPage
 import pages.nonsipp.loansmadeoroutstanding._
 import utils.BaseSpec
 

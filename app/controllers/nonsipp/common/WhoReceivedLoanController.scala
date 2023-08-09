@@ -25,7 +25,7 @@ import models.ReceivedLoanType.{Individual, Other, UKCompany, UKPartnership}
 import models.SchemeId.Srn
 import models.{Mode, NormalMode, ReceivedLoanType}
 import navigation.Navigator
-import pages.nonsipp.loansmadeoroutstanding.WhoReceivedLoanPage
+import pages.nonsipp.common.WhoReceivedLoanPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}

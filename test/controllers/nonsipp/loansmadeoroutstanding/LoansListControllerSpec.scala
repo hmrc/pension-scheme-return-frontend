@@ -22,6 +22,7 @@ import controllers.nonsipp.loansmadeoroutstanding.LoansListController._
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.{Money, NormalMode, ReceivedLoanType}
+import pages.nonsipp.common.WhoReceivedLoanPage
 import pages.nonsipp.loansmadeoroutstanding._
 import views.html.ListView
 

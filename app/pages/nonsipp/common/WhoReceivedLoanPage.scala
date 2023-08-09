@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.loansmadeoroutstanding
+package pages.nonsipp.common
 
 import config.Refined.Max9999999
 import models.SchemeId.Srn
 import models.{ReceivedLoanType, UserAnswers}
 import pages.QuestionPage
+import pages.nonsipp.loansmadeoroutstanding._
 import play.api.libs.json.JsPath
 import queries.Removable
 import utils.PageUtils._
