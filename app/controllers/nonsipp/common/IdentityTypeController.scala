@@ -18,7 +18,7 @@ package controllers.nonsipp.common
 
 import config.Refined.Max9999999
 import controllers.actions._
-import controllers.nonsipp.common.WhoReceivedLoanController._
+import controllers.nonsipp.common.IdentityTypeController._
 import forms.RadioListFormProvider
 import models.ReceivedLoanType.{Individual, Other, UKCompany, UKPartnership}
 import models.SchemeId.Srn
@@ -38,7 +38,7 @@ import views.html.RadioListView
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
-class WhoReceivedLoanController @Inject()(
+class IdentityTypeController @Inject()(
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -50,7 +50,7 @@ class WhoReceivedLoanController @Inject()(
     extends FrontendBaseController
     with I18nSupport {
 
-  private val form = WhoReceivedLoanController.form(formProvider)
+  private val form = IdentityTypeController.form(formProvider)
 
   def onPageLoad(
     srn: Srn,
@@ -86,7 +86,7 @@ class WhoReceivedLoanController @Inject()(
   }
 }
 
-object WhoReceivedLoanController {
+object IdentityTypeController {
 
   def form(formProvider: RadioListFormProvider): Form[ReceivedLoanType] = formProvider(
     "whoReceivedLoan.error.required"
@@ -109,7 +109,7 @@ object WhoReceivedLoanController {
         radioListItems
       ),
       // TODO:
-      controllers.nonsipp.common.routes.WhoReceivedLoanController
+      controllers.nonsipp.common.routes.IdentityTypeController
         .onSubmit(srn, index, mode, IdentitySubject.LoanRecipient)
     )
 }

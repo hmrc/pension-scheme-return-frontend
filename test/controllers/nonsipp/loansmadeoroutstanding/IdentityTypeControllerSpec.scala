@@ -18,26 +18,26 @@ package controllers.nonsipp.loansmadeoroutstanding
 
 import config.Refined.OneTo9999999
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.common.WhoReceivedLoanController._
+import controllers.nonsipp.common.IdentityTypeController._
 import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
 import models.{IdentitySubject, NormalMode}
 import models.ReceivedLoanType.{Individual, Other, UKCompany, UKPartnership}
 import views.html.RadioListView
 
-class WhoReceivedLoanControllerSpec extends ControllerBaseSpec {
+class IdentityTypeControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[OneTo9999999](1)
 
   // TODO for all identity sbujects
   private lazy val onPageLoad =
-    controllers.nonsipp.common.routes.WhoReceivedLoanController
+    controllers.nonsipp.common.routes.IdentityTypeController
       .onPageLoad(srn, index, NormalMode, IdentitySubject.LoanRecipient)
   private lazy val onSubmit =
-    controllers.nonsipp.common.routes.WhoReceivedLoanController
+    controllers.nonsipp.common.routes.IdentityTypeController
       .onSubmit(srn, index, NormalMode, IdentitySubject.LoanRecipient)
 
-  "WhoReceivedLoanController" - {
+  "IdentityTypeController" - {
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       val view = injected[RadioListView]
