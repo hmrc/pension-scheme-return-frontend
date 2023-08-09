@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.loansmadeoroutstanding
+package controllers.nonsipp.common
 
 import config.Refined.Max9999999
 import controllers.actions._
-import controllers.nonsipp.loansmadeoroutstanding.WhoReceivedLoanController._
+import controllers.nonsipp.common.WhoReceivedLoanController._
+import controllers.nonsipp.loansmadeoroutstanding.routes
 import forms.RadioListFormProvider
 import models.ReceivedLoanType.{Individual, Other, UKCompany, UKPartnership}
 import models.SchemeId.Srn
@@ -100,6 +101,6 @@ object WhoReceivedLoanController {
         None,
         radioListItems
       ),
-      routes.WhoReceivedLoanController.onSubmit(srn, index, mode)
+      controllers.nonsipp.common.routes.WhoReceivedLoanController.onSubmit(srn, index, mode)
     )
 }

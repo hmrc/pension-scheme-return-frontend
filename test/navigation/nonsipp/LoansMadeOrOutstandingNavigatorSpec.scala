@@ -80,7 +80,7 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
         normalmode
           .navigateTo(
             WhatYouWillNeedLoansPage,
-            controllers.nonsipp.loansmadeoroutstanding.routes.WhoReceivedLoanController.onPageLoad(_, index, _)
+            controllers.nonsipp.common.routes.WhoReceivedLoanController.onPageLoad(_, index, _)
           )
           .withName("go from what you will need loans page to who received loan page")
       )

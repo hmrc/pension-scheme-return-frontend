@@ -18,7 +18,7 @@ package controllers.nonsipp.loansmadeoroutstanding
 
 import config.Refined.OneTo9999999
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.loansmadeoroutstanding.WhoReceivedLoanController._
+import controllers.nonsipp.common.WhoReceivedLoanController._
 import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
 import models.NormalMode
@@ -29,8 +29,10 @@ class WhoReceivedLoanControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[OneTo9999999](1)
 
-  private lazy val onPageLoad = routes.WhoReceivedLoanController.onPageLoad(srn, index, NormalMode)
-  private lazy val onSubmit = routes.WhoReceivedLoanController.onSubmit(srn, index, NormalMode)
+  private lazy val onPageLoad =
+    controllers.nonsipp.common.routes.WhoReceivedLoanController.onPageLoad(srn, index, NormalMode)
+  private lazy val onSubmit =
+    controllers.nonsipp.common.routes.WhoReceivedLoanController.onSubmit(srn, index, NormalMode)
 
   "WhoReceivedLoanController" - {
 

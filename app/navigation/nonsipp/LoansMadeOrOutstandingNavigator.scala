@@ -36,7 +36,7 @@ object LoansMadeOrOutstandingNavigator extends JourneyNavigator {
       }
 
     case WhatYouWillNeedLoansPage(srn) =>
-      controllers.nonsipp.loansmadeoroutstanding.routes.WhoReceivedLoanController
+      controllers.nonsipp.common.routes.WhoReceivedLoanController
         .onPageLoad(srn, refineMV(1), NormalMode)
     case WhoReceivedLoanPage(srn, index) =>
       userAnswers.get(WhoReceivedLoanPage(srn, index)) match {
@@ -115,7 +115,7 @@ object LoansMadeOrOutstandingNavigator extends JourneyNavigator {
       refineV[OneTo9999999](userAnswers.map(WhoReceivedLoans(srn)).size + 1) match {
         case Left(_) => controllers.routes.JourneyRecoveryController.onPageLoad()
         case Right(nextIndex) =>
-          controllers.nonsipp.loansmadeoroutstanding.routes.WhoReceivedLoanController
+          controllers.nonsipp.common.routes.WhoReceivedLoanController
             .onPageLoad(srn, nextIndex, NormalMode)
       }
 
