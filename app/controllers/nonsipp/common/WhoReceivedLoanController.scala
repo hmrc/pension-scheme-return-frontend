@@ -56,7 +56,7 @@ class WhoReceivedLoanController @Inject()(
     srn: Srn,
     index: Max9999999,
     mode: Mode,
-    subject: IdentitySubject = IdentitySubject.LandOrPropertySeller
+    subject: IdentitySubject = IdentitySubject.Unknown
   ): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     Ok(
       view(
@@ -66,19 +66,23 @@ class WhoReceivedLoanController @Inject()(
     )
   }
 
-  def onSubmit(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
-    implicit request =>
-      form
-        .bindFromRequest()
-        .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode)))),
-          answer => {
-            for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(WhoReceivedLoanPage(srn, index), answer))
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(WhoReceivedLoanPage(srn, index), NormalMode, updatedAnswers))
-          }
-        )
+  def onSubmit(
+    srn: Srn,
+    index: Max9999999,
+    mode: Mode,
+    subject: IdentitySubject = IdentitySubject.Unknown
+  ): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
+    form
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode)))),
+        answer => {
+          for {
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(WhoReceivedLoanPage(srn, index), answer))
+            _ <- saveService.save(updatedAnswers)
+          } yield Redirect(navigator.nextPage(WhoReceivedLoanPage(srn, index), NormalMode, updatedAnswers))
+        }
+      )
   }
 }
 
@@ -104,6 +108,8 @@ object WhoReceivedLoanController {
         None,
         radioListItems
       ),
-      controllers.nonsipp.common.routes.WhoReceivedLoanController.onSubmit(srn, index, mode)
+      // TODO:
+      controllers.nonsipp.common.routes.WhoReceivedLoanController
+        .onSubmit(srn, index, mode, IdentitySubject.LoanRecipient)
     )
 }

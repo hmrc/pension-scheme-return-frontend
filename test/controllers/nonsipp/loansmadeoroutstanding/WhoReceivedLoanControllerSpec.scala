@@ -29,11 +29,13 @@ class WhoReceivedLoanControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[OneTo9999999](1)
 
+  // TODO for all identity sbujects
   private lazy val onPageLoad =
     controllers.nonsipp.common.routes.WhoReceivedLoanController
       .onPageLoad(srn, index, NormalMode, IdentitySubject.LoanRecipient)
   private lazy val onSubmit =
-    controllers.nonsipp.common.routes.WhoReceivedLoanController.onSubmit(srn, index, NormalMode)
+    controllers.nonsipp.common.routes.WhoReceivedLoanController
+      .onSubmit(srn, index, NormalMode, IdentitySubject.LoanRecipient)
 
   "WhoReceivedLoanController" - {
 
