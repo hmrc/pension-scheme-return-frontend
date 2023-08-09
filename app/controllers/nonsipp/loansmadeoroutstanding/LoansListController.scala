@@ -29,10 +29,10 @@ import forms.YesNoPageFormProvider
 import models.CheckOrChange.Change
 import models.SchemeId.Srn
 import models.requests.DataRequest
-import models.{Mode, Money, NormalMode, ReceivedLoanType}
+import models.{IdentityType, Mode, Money, NormalMode}
 import navigation.Navigator
 import pages.nonsipp.accountingperiod.AccountingPeriodListPage
-import pages.nonsipp.common.WhoReceivedLoans
+import pages.nonsipp.common.IdentityTypes
 import pages.nonsipp.loansmadeoroutstanding._
 import play.api.data.Form
 import play.api.i18n.MessagesApi
@@ -91,7 +91,7 @@ class LoansListController @Inject()(
     srn: Srn
   )(implicit request: DataRequest[_]): Either[Result, List[(Refined[Int, OneTo9999999], String, Money)]] = {
     val whoReceivedLoans = request.userAnswers
-      .map(WhoReceivedLoans(srn))
+      .map(IdentityTypes(srn))
       .map {
         case (key, value) =>
           key.toIntOption.flatMap(k => refineV[OneTo9999999](k + 1).toOption.map(_ -> value))
@@ -101,13 +101,13 @@ class LoansListController @Inject()(
     for {
       receivedLoans <- whoReceivedLoans.traverse(_.getOrRecoverJourney)
       recipientNames <- receivedLoans.traverse {
-        case (index, ReceivedLoanType.Individual) =>
+        case (index, IdentityType.Individual) =>
           request.userAnswers.get(IndividualRecipientNamePage(srn, index)).getOrRecoverJourney.map(index -> _)
-        case (index, ReceivedLoanType.UKCompany) =>
+        case (index, IdentityType.UKCompany) =>
           request.userAnswers.get(CompanyRecipientNamePage(srn, index)).getOrRecoverJourney.map(index -> _)
-        case (index, ReceivedLoanType.UKPartnership) =>
+        case (index, IdentityType.UKPartnership) =>
           request.userAnswers.get(PartnershipRecipientNamePage(srn, index)).getOrRecoverJourney.map(index -> _)
-        case (index, ReceivedLoanType.Other) =>
+        case (index, IdentityType.Other) =>
           request.userAnswers.get(OtherRecipientDetailsPage(srn, index)).map(_.name).getOrRecoverJourney.map(index -> _)
       }
       recipientDetails <- recipientNames.traverse {

@@ -18,7 +18,7 @@ package pages.nonsipp.common
 
 import config.Refined.Max9999999
 import models.SchemeId.Srn
-import models.{ReceivedLoanType, UserAnswers}
+import models.{IdentityType, UserAnswers}
 import pages.QuestionPage
 import pages.nonsipp.loansmadeoroutstanding._
 import play.api.libs.json.JsPath
@@ -28,7 +28,7 @@ import utils.RefinedUtils.RefinedIntOps
 
 import scala.util.Try
 
-case class IdentityTypePage(srn: Srn, index: Max9999999) extends QuestionPage[ReceivedLoanType] {
+case class IdentityTypePage(srn: Srn, index: Max9999999) extends QuestionPage[IdentityType] {
 
   override def path: JsPath = Paths.loanTransactions \ "recipientIdentityType" \ toString \ index.arrayIndex.toString
 
@@ -55,22 +55,23 @@ case class IdentityTypePage(srn: Srn, index: Max9999999) extends QuestionPage[Re
     OtherRecipientDetailsPage(srn, index)
   )
 
-  override def cleanup(value: Option[ReceivedLoanType], userAnswers: UserAnswers): Try[UserAnswers] =
+  override def cleanup(value: Option[IdentityType], userAnswers: UserAnswers): Try[UserAnswers] =
     (value, userAnswers.get(this)) match {
-      case (Some(ReceivedLoanType.Individual), Some(ReceivedLoanType.Individual)) => Try(userAnswers)
-      case (Some(ReceivedLoanType.UKCompany), Some(ReceivedLoanType.UKCompany)) => Try(userAnswers)
-      case (Some(ReceivedLoanType.UKPartnership), Some(ReceivedLoanType.UKPartnership)) => Try(userAnswers)
-      case (Some(ReceivedLoanType.Other), Some(ReceivedLoanType.Other)) => Try(userAnswers)
-      case (Some(ReceivedLoanType.Individual), _) => removePages(userAnswers, pagesFirstPart(srn))
-      case (Some(ReceivedLoanType.UKCompany), _) => removePages(userAnswers, pagesFirstPart(srn))
-      case (Some(ReceivedLoanType.UKPartnership), _) => removePages(userAnswers, pagesFirstPart(srn))
-      case (Some(ReceivedLoanType.Other), _) => removePages(userAnswers, pagesFirstPart(srn))
+      case (Some(IdentityType.Individual), Some(IdentityType.Individual)) => Try(userAnswers)
+      case (Some(IdentityType.UKCompany), Some(IdentityType.UKCompany)) => Try(userAnswers)
+      case (Some(IdentityType.UKPartnership), Some(IdentityType.UKPartnership)) => Try(userAnswers)
+      case (Some(IdentityType.Other), Some(IdentityType.Other)) => Try(userAnswers)
+      case (Some(IdentityType.Individual), _) => removePages(userAnswers, pagesFirstPart(srn))
+      case (Some(IdentityType.UKCompany), _) => removePages(userAnswers, pagesFirstPart(srn))
+      case (Some(IdentityType.UKPartnership), _) => removePages(userAnswers, pagesFirstPart(srn))
+      case (Some(IdentityType.Other), _) => removePages(userAnswers, pagesFirstPart(srn))
       case (Some(_), _) => Try(userAnswers)
       case (None, _) => removePages(userAnswers, pages(srn))
     }
 }
 
-case class WhoReceivedLoans(srn: Srn) extends QuestionPage[Map[String, ReceivedLoanType]] {
+// TODO add enum
+case class IdentityTypes(srn: Srn) extends QuestionPage[Map[String, IdentityType]] {
   override def path: JsPath = Paths.loanTransactions \ "recipientIdentityType" \ toString
 
   override def toString: String = "whoReceivedLoans"

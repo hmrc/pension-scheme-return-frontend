@@ -20,9 +20,9 @@ import config.Refined.Max9999999
 import controllers.actions._
 import controllers.nonsipp.common.IdentityTypeController._
 import forms.RadioListFormProvider
-import models.ReceivedLoanType.{Individual, Other, UKCompany, UKPartnership}
+import models.IdentityType.{Individual, Other, UKCompany, UKPartnership}
 import models.SchemeId.Srn
-import models.{IdentitySubject, Mode, NormalMode, ReceivedLoanType}
+import models.{IdentitySubject, IdentityType, Mode, NormalMode}
 import navigation.Navigator
 import pages.nonsipp.common.IdentityTypePage
 import play.api.data.Form
@@ -88,7 +88,7 @@ class IdentityTypeController @Inject()(
 
 object IdentityTypeController {
 
-  def form(formProvider: RadioListFormProvider): Form[ReceivedLoanType] = formProvider(
+  def form(formProvider: RadioListFormProvider): Form[IdentityType] = formProvider(
     "whoReceivedLoan.error.required"
   )
 

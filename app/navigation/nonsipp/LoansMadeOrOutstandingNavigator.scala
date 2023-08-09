@@ -18,10 +18,10 @@ package navigation.nonsipp
 
 import config.Refined.OneTo9999999
 import eu.timepit.refined.{refineMV, refineV}
-import models.{CheckOrChange, IdentitySubject, NormalMode, ReceivedLoanType, UserAnswers}
+import models.{CheckOrChange, IdentitySubject, IdentityType, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.common.{IdentityTypePage, WhoReceivedLoans}
+import pages.nonsipp.common.{IdentityTypePage, IdentityTypes}
 import pages.nonsipp.loansmadeoroutstanding._
 import play.api.mvc.Call
 
@@ -41,16 +41,16 @@ object LoansMadeOrOutstandingNavigator extends JourneyNavigator {
         .onPageLoad(srn, refineMV(1), NormalMode, IdentitySubject.LoanRecipient)
     case IdentityTypePage(srn, index) =>
       userAnswers.get(IdentityTypePage(srn, index)) match {
-        case Some(ReceivedLoanType.Other) =>
+        case Some(IdentityType.Other) =>
           controllers.nonsipp.loansmadeoroutstanding.routes.OtherRecipientDetailsController
             .onPageLoad(srn, index, NormalMode)
-        case Some(ReceivedLoanType.Individual) =>
+        case Some(IdentityType.Individual) =>
           controllers.nonsipp.loansmadeoroutstanding.routes.IndividualRecipientNameController
             .onPageLoad(srn, index, NormalMode)
-        case Some(ReceivedLoanType.UKCompany) =>
+        case Some(IdentityType.UKCompany) =>
           controllers.nonsipp.loansmadeoroutstanding.routes.CompanyRecipientNameController
             .onPageLoad(srn, index, NormalMode)
-        case Some(ReceivedLoanType.UKPartnership) =>
+        case Some(IdentityType.UKPartnership) =>
           controllers.nonsipp.loansmadeoroutstanding.routes.PartnershipRecipientNameController
             .onPageLoad(srn, index, NormalMode)
       }
@@ -113,7 +113,7 @@ object LoansMadeOrOutstandingNavigator extends JourneyNavigator {
       controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController.onPageLoad(srn, NormalMode)
 
     case LoansListPage(srn, addLoan @ true) =>
-      refineV[OneTo9999999](userAnswers.map(WhoReceivedLoans(srn)).size + 1) match {
+      refineV[OneTo9999999](userAnswers.map(IdentityTypes(srn)).size + 1) match {
         case Left(_) => controllers.routes.JourneyRecoveryController.onPageLoad()
         case Right(nextIndex) =>
           controllers.nonsipp.common.routes.IdentityTypeController
@@ -124,7 +124,7 @@ object LoansMadeOrOutstandingNavigator extends JourneyNavigator {
       controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
 
     case RemoveLoanPage(srn, index) =>
-      if (userAnswers.map(WhoReceivedLoans(srn)).isEmpty) {
+      if (userAnswers.map(IdentityTypes(srn)).isEmpty) {
         controllers.nonsipp.loansmadeoroutstanding.routes.LoansMadeOrOutstandingController.onPageLoad(srn, NormalMode)
       } else {
         controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController.onPageLoad(srn, NormalMode)

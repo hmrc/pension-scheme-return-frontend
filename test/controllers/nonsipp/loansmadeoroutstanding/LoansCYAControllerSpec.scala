@@ -25,9 +25,9 @@ import models.{
   CheckOrChange,
   ConditionalYesNo,
   Crn,
+  IdentityType,
   Money,
   NormalMode,
-  ReceivedLoanType,
   Security,
   SponsoringOrConnectedParty
 }
@@ -57,7 +57,7 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
   private def onSubmit(checkOrChange: CheckOrChange) = routes.LoansCYAController.onSubmit(srn, checkOrChange)
 
   private val filledUserAnswers = defaultUserAnswers
-    .unsafeSet(IdentityTypePage(srn, index), ReceivedLoanType.UKCompany)
+    .unsafeSet(IdentityTypePage(srn, index), IdentityType.UKCompany)
     .unsafeSet(CompanyRecipientNamePage(srn, index), recipientName)
     .unsafeSet(CompanyRecipientCrnPage(srn, index), ConditionalYesNo.yes[String, Crn](crn))
     .unsafeSet(RecipientSponsoringEmployerConnectedPartyPage(srn, index), SponsoringOrConnectedParty.ConnectedParty)
@@ -77,7 +77,7 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
               ViewModelParameters(
                 srn,
                 index,
-                ReceivedLoanType.UKCompany,
+                IdentityType.UKCompany,
                 recipientName,
                 recipientDetails = Some(crn.value),
                 recipientReasonNoDetails = None,

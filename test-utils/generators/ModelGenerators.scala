@@ -275,12 +275,12 @@ trait ModelGenerators extends BasicGenerators {
       SponsoringOrConnectedParty.Neither
     )
 
-  implicit val receivedLoanTypeGen: Gen[ReceivedLoanType] =
+  implicit val identityTypeGen: Gen[IdentityType] =
     Gen.oneOf(
-      ReceivedLoanType.UKCompany,
-      ReceivedLoanType.UKPartnership,
-      ReceivedLoanType.Individual,
-      ReceivedLoanType.Other
+      IdentityType.UKCompany,
+      IdentityType.UKPartnership,
+      IdentityType.Individual,
+      IdentityType.Other
     )
 
   implicit val max9999999Gen: Gen[Refined[Int, OneTo9999999]] =

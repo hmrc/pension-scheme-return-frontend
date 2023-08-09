@@ -18,7 +18,7 @@ package navigation.nonsipp
 
 import config.Refined.OneTo9999999
 import eu.timepit.refined.refineMV
-import models.{IdentitySubject, NormalMode, ReceivedLoanType}
+import models.{IdentitySubject, IdentityType, NormalMode}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.common.IdentityTypePage
@@ -116,7 +116,7 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
           .navigateToWithDataAndIndex(
             index,
             IdentityTypePage,
-            Gen.const(ReceivedLoanType.Other),
+            Gen.const(IdentityType.Other),
             controllers.nonsipp.loansmadeoroutstanding.routes.OtherRecipientDetailsController.onPageLoad
           )
           .withName("go from who received loan page to other recipient details page")
@@ -127,7 +127,7 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
           .navigateToWithDataAndIndex(
             index,
             IdentityTypePage,
-            Gen.const(ReceivedLoanType.Individual),
+            Gen.const(IdentityType.Individual),
             controllers.nonsipp.loansmadeoroutstanding.routes.IndividualRecipientNameController.onPageLoad
           )
           .withName("go from who received loan page to individual recipient name page")
@@ -138,7 +138,7 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
           .navigateToWithDataAndIndex(
             index,
             IdentityTypePage,
-            Gen.const(ReceivedLoanType.UKCompany),
+            Gen.const(IdentityType.UKCompany),
             controllers.nonsipp.loansmadeoroutstanding.routes.CompanyRecipientNameController.onPageLoad
           )
           .withName("go from who received loan page to company recipient name page")
@@ -149,7 +149,7 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
           .navigateToWithDataAndIndex(
             index,
             IdentityTypePage,
-            Gen.const(ReceivedLoanType.UKPartnership),
+            Gen.const(IdentityType.UKPartnership),
             controllers.nonsipp.loansmadeoroutstanding.routes.PartnershipRecipientNameController.onPageLoad
           )
           .withName("go from who received loan page UKPartnership to partnership recipient name page")

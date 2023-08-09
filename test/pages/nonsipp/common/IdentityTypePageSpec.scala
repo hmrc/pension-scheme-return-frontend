@@ -18,7 +18,7 @@ package pages.nonsipp.common
 
 import config.Refined.OneTo9999999
 import eu.timepit.refined.refineMV
-import models.{ReceivedLoanType, UserAnswers}
+import models.{IdentityType, UserAnswers}
 import pages.behaviours.PageBehaviours
 import utils.UserAnswersUtils.UserAnswersOps
 
@@ -28,22 +28,22 @@ class IdentityTypePageSpec extends PageBehaviours {
 
     val srn = srnGen.sample.value
 
-    beRetrievable[ReceivedLoanType](IdentityTypePage(srn, index))
+    beRetrievable[IdentityType](IdentityTypePage(srn, index))
 
-    beSettable[ReceivedLoanType](IdentityTypePage(srn, index))
+    beSettable[IdentityType](IdentityTypePage(srn, index))
 
-    beRemovable[ReceivedLoanType](IdentityTypePage(srn, index))
+    beRemovable[IdentityType](IdentityTypePage(srn, index))
 
     "must be able to set and retrieve multiple" in {
       val ua = UserAnswers("test")
-        .unsafeSet(IdentityTypePage(srn, refineMV[OneTo9999999](1)), ReceivedLoanType.Individual)
-        .unsafeSet(IdentityTypePage(srn, refineMV[OneTo9999999](2)), ReceivedLoanType.UKCompany)
-        .unsafeSet(IdentityTypePage(srn, refineMV[OneTo9999999](3)), ReceivedLoanType.UKPartnership)
+        .unsafeSet(IdentityTypePage(srn, refineMV[OneTo9999999](1)), IdentityType.Individual)
+        .unsafeSet(IdentityTypePage(srn, refineMV[OneTo9999999](2)), IdentityType.UKCompany)
+        .unsafeSet(IdentityTypePage(srn, refineMV[OneTo9999999](3)), IdentityType.UKPartnership)
 
-      ua.map(WhoReceivedLoans(srn)).values.toList mustBe List(
-        ReceivedLoanType.Individual,
-        ReceivedLoanType.UKCompany,
-        ReceivedLoanType.UKPartnership
+      ua.map(IdentityTypes(srn)).values.toList mustBe List(
+        IdentityType.Individual,
+        IdentityType.UKCompany,
+        IdentityType.UKPartnership
       )
     }
   }

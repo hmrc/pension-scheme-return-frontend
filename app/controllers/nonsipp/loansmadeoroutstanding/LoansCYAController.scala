@@ -132,7 +132,7 @@ class LoansCYAController @Inject()(
 case class ViewModelParameters(
   srn: Srn,
   index: Max9999999,
-  receivedLoanType: ReceivedLoanType,
+  receivedLoanType: IdentityType,
   recipientName: String,
   recipientDetails: Option[String],
   recipientReasonNoDetails: Option[String],
@@ -185,7 +185,7 @@ object LoansCYAController {
   private def sections(
     srn: Srn,
     index: Max9999999,
-    receivedLoanType: ReceivedLoanType,
+    receivedLoanType: IdentityType,
     recipientName: String,
     recipientDetails: Option[String],
     recipientReasonNoDetails: Option[String],
@@ -223,7 +223,7 @@ object LoansCYAController {
   private def recipientSection(
     srn: Srn,
     index: Max9999999,
-    receivedLoanType: ReceivedLoanType,
+    receivedLoanType: IdentityType,
     recipientName: String,
     recipientDetails: Option[String],
     recipientReasonNoDetails: Option[String],
@@ -232,17 +232,17 @@ object LoansCYAController {
   ): List[CheckYourAnswersSection] = {
 
     val receivedLoan = receivedLoanType match {
-      case ReceivedLoanType.Individual => "whoReceivedLoan.pageContent"
-      case ReceivedLoanType.UKCompany => "whoReceivedLoan.pageContent1"
-      case ReceivedLoanType.UKPartnership => "whoReceivedLoan.pageContent2"
-      case ReceivedLoanType.Other => "whoReceivedLoan.pageContent3"
+      case IdentityType.Individual => "whoReceivedLoan.pageContent"
+      case IdentityType.UKCompany => "whoReceivedLoan.pageContent1"
+      case IdentityType.UKPartnership => "whoReceivedLoan.pageContent2"
+      case IdentityType.Other => "whoReceivedLoan.pageContent3"
     }
 
     val recipientNameUrl = receivedLoanType match {
-      case ReceivedLoanType.Individual => routes.IndividualRecipientNameController.onPageLoad(srn, index, mode).url
-      case ReceivedLoanType.UKCompany => routes.CompanyRecipientNameController.onPageLoad(srn, index, mode).url
-      case ReceivedLoanType.UKPartnership => routes.PartnershipRecipientNameController.onPageLoad(srn, index, mode).url
-      case ReceivedLoanType.Other => routes.OtherRecipientDetailsController.onPageLoad(srn, index, mode).url
+      case IdentityType.Individual => routes.IndividualRecipientNameController.onPageLoad(srn, index, mode).url
+      case IdentityType.UKCompany => routes.CompanyRecipientNameController.onPageLoad(srn, index, mode).url
+      case IdentityType.UKPartnership => routes.PartnershipRecipientNameController.onPageLoad(srn, index, mode).url
+      case IdentityType.Other => routes.OtherRecipientDetailsController.onPageLoad(srn, index, mode).url
     }
 
     val (
@@ -252,28 +252,28 @@ object LoansCYAController {
       recipientDetailsNoIdChangeHiddenKey
     ): (Message, String, String, String) =
       receivedLoanType match {
-        case ReceivedLoanType.Individual =>
+        case IdentityType.Individual =>
           (
             Message("loanCheckYourAnswers.section1.recipientDetails.nino", recipientName),
             routes.IndividualRecipientNinoController.onPageLoad(srn, index, mode).url,
             "loanCheckYourAnswers.section1.recipientDetails.nino.hidden",
             "loanCheckYourAnswers.section1.recipientDetails.noNinoReason.hidden"
           )
-        case ReceivedLoanType.UKCompany =>
+        case IdentityType.UKCompany =>
           (
             Message("loanCheckYourAnswers.section1.recipientDetails.crn", recipientName),
             routes.CompanyRecipientCrnController.onPageLoad(srn, index, mode).url,
             "loanCheckYourAnswers.section1.recipientDetails.crn.hidden",
             "loanCheckYourAnswers.section1.recipientDetails.noCrnReason.hidden"
           )
-        case ReceivedLoanType.UKPartnership =>
+        case IdentityType.UKPartnership =>
           (
             Message("loanCheckYourAnswers.section1.recipientDetails.utr", recipientName),
             routes.PartnershipRecipientUtrController.onPageLoad(srn, index, mode).url,
             "loanCheckYourAnswers.section1.recipientDetails.utr.hidden",
             "loanCheckYourAnswers.section1.recipientDetails.noUtrReason.hidden"
           )
-        case ReceivedLoanType.Other =>
+        case IdentityType.Other =>
           (
             Message("loanCheckYourAnswers.section1.recipientDetails.other", recipientName),
             routes.OtherRecipientDetailsController.onPageLoad(srn, index, mode).url,
@@ -283,16 +283,16 @@ object LoansCYAController {
       }
 
     val (recipientNoDetailsReasonKey, recipientNoDetailsUrl): (Message, String) = receivedLoanType match {
-      case ReceivedLoanType.Individual =>
+      case IdentityType.Individual =>
         Message("loanCheckYourAnswers.section1.recipientDetails.noNinoReason", recipientName) ->
           routes.IndividualRecipientNinoController.onPageLoad(srn, index, mode).url
-      case ReceivedLoanType.UKCompany =>
+      case IdentityType.UKCompany =>
         Message("loanCheckYourAnswers.section1.recipientDetails.noCrnReason", recipientName) ->
           routes.CompanyRecipientCrnController.onPageLoad(srn, index, mode).url
-      case ReceivedLoanType.UKPartnership =>
+      case IdentityType.UKPartnership =>
         Message("loanCheckYourAnswers.section1.recipientDetails.noUtrReason", recipientName) ->
           routes.PartnershipRecipientUtrController.onPageLoad(srn, index, mode).url
-      case ReceivedLoanType.Other =>
+      case IdentityType.Other =>
         Message("loanCheckYourAnswers.section1.recipientDetails.other", recipientName) ->
           routes.OtherRecipientDetailsController.onPageLoad(srn, index, mode).url
     }

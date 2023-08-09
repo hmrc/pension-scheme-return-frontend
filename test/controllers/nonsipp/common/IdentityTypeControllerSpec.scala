@@ -21,7 +21,7 @@ import controllers.ControllerBaseSpec
 import controllers.nonsipp.common.IdentityTypeController._
 import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
-import models.ReceivedLoanType.{Individual, Other, UKCompany, UKPartnership}
+import models.IdentityType.{Individual, Other, UKCompany, UKPartnership}
 import models.{IdentitySubject, NormalMode}
 import views.html.RadioListView
 

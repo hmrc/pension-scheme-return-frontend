@@ -23,7 +23,7 @@ import controllers.nonsipp.loansmadeoroutstanding.RemoveLoanController._
 import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
 import models.requests.DataRequest
-import models.{Mode, ReceivedLoanType}
+import models.{IdentityType, Mode}
 import navigation.Navigator
 import pages.nonsipp.common.IdentityTypePage
 import pages.nonsipp.loansmadeoroutstanding._
@@ -66,13 +66,13 @@ class RemoveLoanController @Inject()(
       case Some(who) => {
         val recipientName =
           who match {
-            case ReceivedLoanType.Individual =>
+            case IdentityType.Individual =>
               request.userAnswers.get(IndividualRecipientNamePage(srn, index)).getOrRecoverJourney
-            case ReceivedLoanType.UKCompany =>
+            case IdentityType.UKCompany =>
               request.userAnswers.get(CompanyRecipientNamePage(srn, index)).getOrRecoverJourney
-            case ReceivedLoanType.UKPartnership =>
+            case IdentityType.UKPartnership =>
               request.userAnswers.get(PartnershipRecipientNamePage(srn, index)).getOrRecoverJourney
-            case ReceivedLoanType.Other =>
+            case IdentityType.Other =>
               request.userAnswers.get(OtherRecipientDetailsPage(srn, index)).map(_.name).getOrRecoverJourney
           }
         recipientName.fold(
