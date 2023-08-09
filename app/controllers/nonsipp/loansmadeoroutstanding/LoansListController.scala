@@ -29,7 +29,7 @@ import forms.YesNoPageFormProvider
 import models.CheckOrChange.Change
 import models.SchemeId.Srn
 import models.requests.DataRequest
-import models.{IdentityType, Mode, Money, NormalMode}
+import models.{IdentitySubject, IdentityType, Mode, Money, NormalMode}
 import navigation.Navigator
 import pages.nonsipp.accountingperiod.AccountingPeriodListPage
 import pages.nonsipp.common.IdentityTypes
@@ -91,7 +91,7 @@ class LoansListController @Inject()(
     srn: Srn
   )(implicit request: DataRequest[_]): Either[Result, List[(Refined[Int, OneTo9999999], String, Money)]] = {
     val whoReceivedLoans = request.userAnswers
-      .map(IdentityTypes(srn))
+      .map(IdentityTypes(srn, IdentitySubject.LoanRecipient))
       .map {
         case (key, value) =>
           key.toIntOption.flatMap(k => refineV[OneTo9999999](k + 1).toOption.map(_ -> value))

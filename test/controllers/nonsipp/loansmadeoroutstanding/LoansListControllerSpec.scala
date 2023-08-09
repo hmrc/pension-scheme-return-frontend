@@ -21,21 +21,22 @@ import controllers.ControllerBaseSpec
 import controllers.nonsipp.loansmadeoroutstanding.LoansListController._
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
-import models.{IdentityType, Money, NormalMode}
+import models.{IdentitySubject, IdentityType, Money, NormalMode}
 import pages.nonsipp.common.IdentityTypePage
 import pages.nonsipp.loansmadeoroutstanding._
 import views.html.ListView
 
 class LoansListControllerSpec extends ControllerBaseSpec {
+  private val subject = IdentitySubject.LoanRecipient
 
   private val filledUserAnswers = defaultUserAnswers
-    .unsafeSet(IdentityTypePage(srn, refineMV(1)), IdentityType.UKCompany)
+    .unsafeSet(IdentityTypePage(srn, refineMV(1), subject), IdentityType.UKCompany)
     .unsafeSet(CompanyRecipientNamePage(srn, refineMV(1)), "recipientName1")
     .unsafeSet(AmountOfTheLoanPage(srn, refineMV(1)), (money, money, money))
-    .unsafeSet(IdentityTypePage(srn, refineMV(2)), IdentityType.UKPartnership)
+    .unsafeSet(IdentityTypePage(srn, refineMV(2), subject), IdentityType.UKPartnership)
     .unsafeSet(PartnershipRecipientNamePage(srn, refineMV(2)), "recipientName2")
     .unsafeSet(AmountOfTheLoanPage(srn, refineMV(2)), (money, money, money))
-    .unsafeSet(IdentityTypePage(srn, refineMV(3)), IdentityType.Individual)
+    .unsafeSet(IdentityTypePage(srn, refineMV(3), subject), IdentityType.Individual)
     .unsafeSet(IndividualRecipientNamePage(srn, refineMV(3)), "recipientName3")
     .unsafeSet(AmountOfTheLoanPage(srn, refineMV(3)), (money, money, money))
 

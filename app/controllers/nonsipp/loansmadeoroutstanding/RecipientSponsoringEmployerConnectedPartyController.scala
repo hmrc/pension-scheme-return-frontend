@@ -21,7 +21,7 @@ import controllers.actions._
 import forms.RadioListFormProvider
 import models.SchemeId.Srn
 import models.requests.DataRequest
-import models.{IdentityType, Mode, SponsoringOrConnectedParty}
+import models.{IdentitySubject, IdentityType, Mode, SponsoringOrConnectedParty}
 import navigation.Navigator
 import pages.nonsipp.common.IdentityTypePage
 import pages.nonsipp.loansmadeoroutstanding._
@@ -97,7 +97,7 @@ class RecipientSponsoringEmployerConnectedPartyController @Inject()(
   }
 
   private def recipientName(srn: Srn, index: Max9999999)(implicit request: DataRequest[_]): Option[String] =
-    request.userAnswers.get(IdentityTypePage(srn, index)).flatMap {
+    request.userAnswers.get(IdentityTypePage(srn, index, IdentitySubject.LoanRecipient)).flatMap {
       case IdentityType.UKCompany => request.userAnswers.get(CompanyRecipientNamePage(srn, index))
       case IdentityType.UKPartnership => request.userAnswers.get(PartnershipRecipientNamePage(srn, index))
       case IdentityType.Other => request.userAnswers.get(OtherRecipientDetailsPage(srn, index)).map(_.name)

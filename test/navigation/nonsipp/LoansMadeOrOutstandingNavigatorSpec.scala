@@ -30,6 +30,7 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
   val navigator: Navigator = new NonSippNavigator
 
   private val index = refineMV[OneTo9999999](1)
+  private val subject = IdentitySubject.LoanRecipient
 
   "loansMadeOrOutstandingNavigator" - {
 
@@ -113,8 +114,9 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
     "NormalMode" - {
       act.like(
         normalmode
-          .navigateToWithDataAndIndex(
+          .navigateToWithDataIndexAndSubject(
             index,
+            subject,
             IdentityTypePage,
             Gen.const(IdentityType.Other),
             controllers.nonsipp.loansmadeoroutstanding.routes.OtherRecipientDetailsController.onPageLoad
@@ -124,8 +126,9 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
 
       act.like(
         normalmode
-          .navigateToWithDataAndIndex(
+          .navigateToWithDataIndexAndSubject(
             index,
+            subject,
             IdentityTypePage,
             Gen.const(IdentityType.Individual),
             controllers.nonsipp.loansmadeoroutstanding.routes.IndividualRecipientNameController.onPageLoad
@@ -135,8 +138,9 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
 
       act.like(
         normalmode
-          .navigateToWithDataAndIndex(
+          .navigateToWithDataIndexAndSubject(
             index,
+            subject,
             IdentityTypePage,
             Gen.const(IdentityType.UKCompany),
             controllers.nonsipp.loansmadeoroutstanding.routes.CompanyRecipientNameController.onPageLoad
@@ -146,8 +150,9 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
 
       act.like(
         normalmode
-          .navigateToWithDataAndIndex(
+          .navigateToWithDataIndexAndSubject(
             index,
+            subject,
             IdentityTypePage,
             Gen.const(IdentityType.UKPartnership),
             controllers.nonsipp.loansmadeoroutstanding.routes.PartnershipRecipientNameController.onPageLoad

@@ -21,12 +21,19 @@ import utils.WithName
 
 sealed trait IdentitySubject {
   val name: String
+  val key: String
 }
 object IdentitySubject extends Enumerable.Implicits {
 
-  case object LoanRecipient extends WithName("loan-recipient") with IdentitySubject
-  case object LandOrPropertySeller extends WithName("land-or-property-seller") with IdentitySubject
-  case object Unknown extends WithName("unknown") with IdentitySubject
+  case object LoanRecipient extends WithName("loan-recipient") with IdentitySubject {
+    override val key: String = "loanRecipient"
+  }
+  case object LandOrPropertySeller extends WithName("land-or-property-seller") with IdentitySubject {
+    override val key: String = "landOrPropertySeller"
+  }
+  case object Unknown extends WithName("unknown") with IdentitySubject {
+    override val key: String = "unknown"
+  }
 
   val values: List[IdentitySubject] = List(LoanRecipient, LandOrPropertySeller)
 

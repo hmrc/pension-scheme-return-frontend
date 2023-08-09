@@ -59,7 +59,7 @@ class LoansCYAController @Inject()(
     identifyAndRequireData(srn) { implicit request =>
       (
         for {
-          receivedLoanType <- requiredPage(IdentityTypePage(srn, index))
+          receivedLoanType <- requiredPage(IdentityTypePage(srn, index, IdentitySubject.LoanRecipient))
           recipientName <- List(
             request.userAnswers.get(IndividualRecipientNamePage(srn, index)),
             request.userAnswers.get(CompanyRecipientNamePage(srn, index)),
@@ -232,10 +232,10 @@ object LoansCYAController {
   ): List[CheckYourAnswersSection] = {
 
     val receivedLoan = receivedLoanType match {
-      case IdentityType.Individual => "whoReceivedLoan.pageContent"
-      case IdentityType.UKCompany => "whoReceivedLoan.pageContent1"
-      case IdentityType.UKPartnership => "whoReceivedLoan.pageContent2"
-      case IdentityType.Other => "whoReceivedLoan.pageContent3"
+      case IdentityType.Individual => "loanRecipient.identityType.pageContent"
+      case IdentityType.UKCompany => "loanRecipient.identityType.pageContent1"
+      case IdentityType.UKPartnership => "loanRecipient.identityType.pageContent2"
+      case IdentityType.Other => "loanRecipient.identityType.pageContent3"
     }
 
     val recipientNameUrl = receivedLoanType match {

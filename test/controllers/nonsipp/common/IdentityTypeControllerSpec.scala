@@ -29,13 +29,15 @@ class IdentityTypeControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[OneTo9999999](1)
 
-  // TODO for all identity sbujects
+  // TODO for all identity subjects
+
+  val identitySubject: IdentitySubject = IdentitySubject.LoanRecipient
   private lazy val onPageLoad =
     controllers.nonsipp.common.routes.IdentityTypeController
-      .onPageLoad(srn, index, NormalMode, IdentitySubject.LoanRecipient)
+      .onPageLoad(srn, index, NormalMode, identitySubject)
   private lazy val onSubmit =
     controllers.nonsipp.common.routes.IdentityTypeController
-      .onSubmit(srn, index, NormalMode, IdentitySubject.LoanRecipient)
+      .onSubmit(srn, index, NormalMode, identitySubject)
 
   "IdentityTypeController" - {
 
@@ -43,8 +45,8 @@ class IdentityTypeControllerSpec extends ControllerBaseSpec {
       val view = injected[RadioListView]
 
       view(
-        form(injected[RadioListFormProvider]),
-        viewModel(srn, index, NormalMode)
+        form(injected[RadioListFormProvider], identitySubject),
+        viewModel(srn, index, NormalMode, identitySubject)
       )
     })
 

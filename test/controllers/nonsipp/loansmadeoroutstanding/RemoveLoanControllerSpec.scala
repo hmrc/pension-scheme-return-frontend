@@ -21,7 +21,7 @@ import controllers.ControllerBaseSpec
 import controllers.nonsipp.loansmadeoroutstanding.RemoveLoanController._
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
-import models.{IdentityType, NormalMode}
+import models.{IdentitySubject, IdentityType, NormalMode}
 import pages.nonsipp.common.IdentityTypePage
 import pages.nonsipp.loansmadeoroutstanding.{
   AmountOfTheLoanPage,
@@ -38,13 +38,13 @@ class RemoveLoanControllerSpec extends ControllerBaseSpec {
   private lazy val onPageLoad = routes.RemoveLoanController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.RemoveLoanController.onSubmit(srn, index, NormalMode)
   private val filledUserAnswers = defaultUserAnswers
-    .unsafeSet(IdentityTypePage(srn, refineMV(1)), IdentityType.UKCompany)
+    .unsafeSet(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient), IdentityType.UKCompany)
     .unsafeSet(CompanyRecipientNamePage(srn, refineMV(1)), "recipientName1")
     .unsafeSet(AmountOfTheLoanPage(srn, refineMV(1)), (money, money, money))
-    .unsafeSet(IdentityTypePage(srn, refineMV(2)), IdentityType.UKPartnership)
+    .unsafeSet(IdentityTypePage(srn, refineMV(2), IdentitySubject.LoanRecipient), IdentityType.UKPartnership)
     .unsafeSet(PartnershipRecipientNamePage(srn, refineMV(2)), "recipientName2")
     .unsafeSet(AmountOfTheLoanPage(srn, refineMV(2)), (money, money, money))
-    .unsafeSet(IdentityTypePage(srn, refineMV(3)), IdentityType.Individual)
+    .unsafeSet(IdentityTypePage(srn, refineMV(3), IdentitySubject.LoanRecipient), IdentityType.Individual)
     .unsafeSet(IndividualRecipientNamePage(srn, refineMV(3)), "recipientName3")
     .unsafeSet(AmountOfTheLoanPage(srn, refineMV(3)), (money, money, money))
 

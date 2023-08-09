@@ -21,7 +21,7 @@ import eu.timepit.refined.api.{Refined, Validate}
 import eu.timepit.refined.refineV
 import generators.IndexGen
 import models.SchemeId.Srn
-import models.{CheckMode, Mode, NormalMode, UserAnswers}
+import models.{CheckMode, IdentitySubject, Mode, NormalMode, UserAnswers}
 import org.scalacheck.Gen
 import org.scalatest.EitherValues
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
@@ -154,6 +154,16 @@ trait NavigatorBehaviours extends ScalaCheckPropertyChecks with EitherValues wit
       userAnswers: Srn => UserAnswers = _ => defaultUserAnswers
     ): Behaviours.BehaviourTest =
       super.navigateToWithData(NormalMode)(page(_, index), data, nextPage(_, index, _), userAnswers)
+
+    def navigateToWithDataIndexAndSubject[A: Writes, B](
+      index: Refined[Int, B],
+      subject: IdentitySubject,
+      page: (Srn, Refined[Int, B], IdentitySubject) => QuestionPage[A],
+      data: Gen[A],
+      nextPage: (Srn, Refined[Int, B], Mode) => Call,
+      userAnswers: Srn => UserAnswers = _ => defaultUserAnswers
+    ): Behaviours.BehaviourTest =
+      super.navigateToWithData(NormalMode)(page(_, index, subject), data, nextPage(_, index, _), userAnswers)
 
     def navigateFromListPage[A: Writes, Validator](
       listPage: Srn => Page,

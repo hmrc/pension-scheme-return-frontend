@@ -39,8 +39,8 @@ object LoansMadeOrOutstandingNavigator extends JourneyNavigator {
     case WhatYouWillNeedLoansPage(srn) =>
       controllers.nonsipp.common.routes.IdentityTypeController
         .onPageLoad(srn, refineMV(1), NormalMode, IdentitySubject.LoanRecipient)
-    case IdentityTypePage(srn, index) =>
-      userAnswers.get(IdentityTypePage(srn, index)) match {
+    case IdentityTypePage(srn, index, IdentitySubject.LoanRecipient) =>
+      userAnswers.get(IdentityTypePage(srn, index, IdentitySubject.LoanRecipient)) match {
         case Some(IdentityType.Other) =>
           controllers.nonsipp.loansmadeoroutstanding.routes.OtherRecipientDetailsController
             .onPageLoad(srn, index, NormalMode)
@@ -113,7 +113,7 @@ object LoansMadeOrOutstandingNavigator extends JourneyNavigator {
       controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController.onPageLoad(srn, NormalMode)
 
     case LoansListPage(srn, addLoan @ true) =>
-      refineV[OneTo9999999](userAnswers.map(IdentityTypes(srn)).size + 1) match {
+      refineV[OneTo9999999](userAnswers.map(IdentityTypes(srn, IdentitySubject.LoanRecipient)).size + 1) match {
         case Left(_) => controllers.routes.JourneyRecoveryController.onPageLoad()
         case Right(nextIndex) =>
           controllers.nonsipp.common.routes.IdentityTypeController
@@ -124,7 +124,7 @@ object LoansMadeOrOutstandingNavigator extends JourneyNavigator {
       controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
 
     case RemoveLoanPage(srn, index) =>
-      if (userAnswers.map(IdentityTypes(srn)).isEmpty) {
+      if (userAnswers.map(IdentityTypes(srn, IdentitySubject.LoanRecipient)).isEmpty) {
         controllers.nonsipp.loansmadeoroutstanding.routes.LoansMadeOrOutstandingController.onPageLoad(srn, NormalMode)
       } else {
         controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController.onPageLoad(srn, NormalMode)

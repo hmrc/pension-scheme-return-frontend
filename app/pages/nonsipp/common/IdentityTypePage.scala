@@ -18,7 +18,7 @@ package pages.nonsipp.common
 
 import config.Refined.Max9999999
 import models.SchemeId.Srn
-import models.{IdentityType, UserAnswers}
+import models.{IdentitySubject, IdentityType, UserAnswers}
 import pages.QuestionPage
 import pages.nonsipp.loansmadeoroutstanding._
 import play.api.libs.json.JsPath
@@ -28,11 +28,16 @@ import utils.RefinedUtils.RefinedIntOps
 
 import scala.util.Try
 
-case class IdentityTypePage(srn: Srn, index: Max9999999) extends QuestionPage[IdentityType] {
+case class IdentityTypePage(srn: Srn, index: Max9999999, identitySubject: IdentitySubject)
+    extends QuestionPage[IdentityType] {
 
-  override def path: JsPath = Paths.loanTransactions \ "recipientIdentityType" \ toString \ index.arrayIndex.toString
+  override def path: JsPath = identitySubject match {
+    case IdentitySubject.LoanRecipient =>
+      Paths.loanTransactions \ "recipientIdentityType" \ toString \ index.arrayIndex.toString
+    case IdentitySubject.LandOrPropertySeller => JsPath \ "TODO"
+  }
 
-  override def toString: String = "whoReceivedLoans"
+  override def toString: String = "identityTypes"
 
   private def pages(srn: Srn): List[Removable[_]] = pagesFirstPart(srn) ++ List(
     DatePeriodLoanPage(srn, index),
@@ -55,6 +60,7 @@ case class IdentityTypePage(srn: Srn, index: Max9999999) extends QuestionPage[Id
     OtherRecipientDetailsPage(srn, index)
   )
 
+  // TODO solve cleanup based on identitySubject
   override def cleanup(value: Option[IdentityType], userAnswers: UserAnswers): Try[UserAnswers] =
     (value, userAnswers.get(this)) match {
       case (Some(IdentityType.Individual), Some(IdentityType.Individual)) => Try(userAnswers)
@@ -71,8 +77,11 @@ case class IdentityTypePage(srn: Srn, index: Max9999999) extends QuestionPage[Id
 }
 
 // TODO add enum
-case class IdentityTypes(srn: Srn) extends QuestionPage[Map[String, IdentityType]] {
-  override def path: JsPath = Paths.loanTransactions \ "recipientIdentityType" \ toString
+case class IdentityTypes(srn: Srn, identitySubject: IdentitySubject) extends QuestionPage[Map[String, IdentityType]] {
+  override def path: JsPath = identitySubject match {
+    case IdentitySubject.LoanRecipient => Paths.loanTransactions \ "recipientIdentityType" \ toString
+    case _ => JsPath \ "TODO"
+  }
 
-  override def toString: String = "whoReceivedLoans"
+  override def toString: String = "identityTypes"
 }

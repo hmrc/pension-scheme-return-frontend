@@ -23,7 +23,7 @@ import controllers.nonsipp.loansmadeoroutstanding.RemoveLoanController._
 import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
 import models.requests.DataRequest
-import models.{IdentityType, Mode}
+import models.{IdentitySubject, IdentityType, Mode}
 import navigation.Navigator
 import pages.nonsipp.common.IdentityTypePage
 import pages.nonsipp.loansmadeoroutstanding._
@@ -61,7 +61,7 @@ class RemoveLoanController @Inject()(
     implicit request: DataRequest[_]
   ) = {
     val whoReceivedLoanPage = request.userAnswers
-      .get(IdentityTypePage(srn, index))
+      .get(IdentityTypePage(srn, index, IdentitySubject.LoanRecipient))
     whoReceivedLoanPage match {
       case Some(who) => {
         val recipientName =
@@ -106,7 +106,7 @@ class RemoveLoanController @Inject()(
             if (value) {
               for {
                 updatedAnswers <- Future
-                  .fromTry(request.userAnswers.remove(IdentityTypePage(srn, index)))
+                  .fromTry(request.userAnswers.remove(IdentityTypePage(srn, index, IdentitySubject.LoanRecipient)))
                 _ <- saveService.save(updatedAnswers)
               } yield Redirect(navigator.nextPage(RemoveLoanPage(srn, index), mode, updatedAnswers))
             } else {

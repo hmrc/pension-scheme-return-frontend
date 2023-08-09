@@ -50,18 +50,17 @@ class IdentityTypeController @Inject()(
     extends FrontendBaseController
     with I18nSupport {
 
-  private val form = IdentityTypeController.form(formProvider)
-
   def onPageLoad(
     srn: Srn,
     index: Max9999999,
     mode: Mode,
-    subject: IdentitySubject = IdentitySubject.Unknown
+    subject: IdentitySubject
   ): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
+    val form = IdentityTypeController.form(formProvider, subject)
     Ok(
       view(
-        form.fromUserAnswers(IdentityTypePage(srn, index)),
-        viewModel(srn, index, mode)
+        form.fromUserAnswers(IdentityTypePage(srn, index, subject)),
+        viewModel(srn, index, mode, subject)
       )
     )
   }
@@ -70,17 +69,18 @@ class IdentityTypeController @Inject()(
     srn: Srn,
     index: Max9999999,
     mode: Mode,
-    subject: IdentitySubject = IdentitySubject.Unknown
+    subject: IdentitySubject
   ): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
+    val form = IdentityTypeController.form(formProvider, subject)
     form
       .bindFromRequest()
       .fold(
-        formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode)))),
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode, subject)))),
         answer => {
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(IdentityTypePage(srn, index), answer))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(IdentityTypePage(srn, index, subject), answer))
             _ <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage(IdentityTypePage(srn, index), NormalMode, updatedAnswers))
+          } yield Redirect(navigator.nextPage(IdentityTypePage(srn, index, subject), NormalMode, updatedAnswers))
         }
       )
   }
@@ -88,28 +88,32 @@ class IdentityTypeController @Inject()(
 
 object IdentityTypeController {
 
-  def form(formProvider: RadioListFormProvider): Form[IdentityType] = formProvider(
-    "whoReceivedLoan.error.required"
+  def form(formProvider: RadioListFormProvider, subject: IdentitySubject): Form[IdentityType] = formProvider(
+    s"${subject.key}.identityType.error.required"
   )
 
-  private val radioListItems: List[RadioListRowViewModel] =
+  private def radioListItems(subject: IdentitySubject): List[RadioListRowViewModel] =
     List(
-      RadioListRowViewModel(Message("whoReceivedLoan.pageContent"), Individual.name),
-      RadioListRowViewModel(Message("whoReceivedLoan.pageContent1"), UKCompany.name),
-      RadioListRowViewModel(Message("whoReceivedLoan.pageContent2"), UKPartnership.name),
-      RadioListRowViewModel(Message("whoReceivedLoan.pageContent3"), Other.name)
+      RadioListRowViewModel(Message(s"${subject.key}.identityType.pageContent"), Individual.name),
+      RadioListRowViewModel(Message(s"${subject.key}.identityType.pageContent1"), UKCompany.name),
+      RadioListRowViewModel(Message(s"${subject.key}.identityType.pageContent2"), UKPartnership.name),
+      RadioListRowViewModel(Message(s"${subject.key}.identityType.pageContent3"), Other.name)
     )
 
-  def viewModel(srn: Srn, index: Max9999999, mode: Mode): FormPageViewModel[RadioListViewModel] =
+  def viewModel(
+    srn: Srn,
+    index: Max9999999,
+    mode: Mode,
+    subject: IdentitySubject
+  ): FormPageViewModel[RadioListViewModel] =
     FormPageViewModel(
-      Message("whoReceivedLoan.title"),
-      Message("whoReceivedLoan.heading"),
+      Message(s"${subject.key}.identityType.title"),
+      Message(s"${subject.key}.identityType.heading"),
       RadioListViewModel(
         None,
-        radioListItems
+        radioListItems(subject)
       ),
-      // TODO:
       controllers.nonsipp.common.routes.IdentityTypeController
-        .onSubmit(srn, index, mode, IdentitySubject.LoanRecipient)
+        .onSubmit(srn, index, mode, subject)
     )
 }

@@ -25,6 +25,7 @@ import models.{
   CheckOrChange,
   ConditionalYesNo,
   Crn,
+  IdentitySubject,
   IdentityType,
   Money,
   NormalMode,
@@ -51,13 +52,14 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[OneTo9999999](1)
   private val taxYear = Some(Left(dateRange))
+  private val subject = IdentitySubject.LoanRecipient
 
   private def onPageLoad(checkOrChange: CheckOrChange) = routes.LoansCYAController.onPageLoad(srn, index, checkOrChange)
 
   private def onSubmit(checkOrChange: CheckOrChange) = routes.LoansCYAController.onSubmit(srn, checkOrChange)
 
   private val filledUserAnswers = defaultUserAnswers
-    .unsafeSet(IdentityTypePage(srn, index), IdentityType.UKCompany)
+    .unsafeSet(IdentityTypePage(srn, index, subject), IdentityType.UKCompany)
     .unsafeSet(CompanyRecipientNamePage(srn, index), recipientName)
     .unsafeSet(CompanyRecipientCrnPage(srn, index), ConditionalYesNo.yes[String, Crn](crn))
     .unsafeSet(RecipientSponsoringEmployerConnectedPartyPage(srn, index), SponsoringOrConnectedParty.ConnectedParty)
