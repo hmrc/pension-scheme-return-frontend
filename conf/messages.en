@@ -352,8 +352,8 @@ schemeTransferOut.error.required = Select yes if the scheme made a transfer out 
 whyNoBankAccount.title = Why did the scheme not have a bank account during the period of this return?
 whyNoBankAccount.heading = Why did {0} not have a bank account during the period of this return?
 whyNoBankAccount.error.required = Enter the reason the scheme did not have a bank account during the period of this return
-whyNoBankAccount.error.length = Reason the scheme did not have a bank account must be 160 characters or fewer
-whyNoBankAccount.error.invalid = Reason the scheme did not have a bank account must only include letters a to z, numbers 0 to 9, and special characters such as hyphens, spaces and apostrophes
+whyNoBankAccount.error.length = The reason the scheme did not have a bank account must be 160 characters or fewer
+whyNoBankAccount.error.invalid = The reason the scheme did not have a bank account must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, full stops, hyphens, slashes, speech marks and spaces
 
 landOrPropertyHeld.title = Did the scheme hold any land or property during the period of this return?
 landOrPropertyHeld.heading = Did {0} hold any land or property during the period of this return?
