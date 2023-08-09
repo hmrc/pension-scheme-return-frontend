@@ -21,7 +21,7 @@ import controllers.ControllerBaseSpec
 import controllers.nonsipp.common.WhoReceivedLoanController._
 import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
-import models.NormalMode
+import models.{IdentitySubject, NormalMode}
 import models.ReceivedLoanType.{Individual, Other, UKCompany, UKPartnership}
 import views.html.RadioListView
 
@@ -30,7 +30,8 @@ class WhoReceivedLoanControllerSpec extends ControllerBaseSpec {
   private val index = refineMV[OneTo9999999](1)
 
   private lazy val onPageLoad =
-    controllers.nonsipp.common.routes.WhoReceivedLoanController.onPageLoad(srn, index, NormalMode)
+    controllers.nonsipp.common.routes.WhoReceivedLoanController
+      .onPageLoad(srn, index, NormalMode, IdentitySubject.LoanRecipient)
   private lazy val onSubmit =
     controllers.nonsipp.common.routes.WhoReceivedLoanController.onSubmit(srn, index, NormalMode)
 

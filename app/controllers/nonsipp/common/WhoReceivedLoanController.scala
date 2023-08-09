@@ -19,11 +19,10 @@ package controllers.nonsipp.common
 import config.Refined.Max9999999
 import controllers.actions._
 import controllers.nonsipp.common.WhoReceivedLoanController._
-import controllers.nonsipp.loansmadeoroutstanding.routes
 import forms.RadioListFormProvider
 import models.ReceivedLoanType.{Individual, Other, UKCompany, UKPartnership}
 import models.SchemeId.Srn
-import models.{Mode, NormalMode, ReceivedLoanType}
+import models.{IdentitySubject, Mode, NormalMode, ReceivedLoanType}
 import navigation.Navigator
 import pages.nonsipp.common.WhoReceivedLoanPage
 import play.api.data.Form
@@ -53,14 +52,18 @@ class WhoReceivedLoanController @Inject()(
 
   private val form = WhoReceivedLoanController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
-    implicit request =>
-      Ok(
-        view(
-          form.fromUserAnswers(WhoReceivedLoanPage(srn, index)),
-          viewModel(srn, index, mode)
-        )
+  def onPageLoad(
+    srn: Srn,
+    index: Max9999999,
+    mode: Mode,
+    subject: IdentitySubject = IdentitySubject.LandOrPropertySeller
+  ): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
+    Ok(
+      view(
+        form.fromUserAnswers(WhoReceivedLoanPage(srn, index)),
+        viewModel(srn, index, mode)
       )
+    )
   }
 
   def onSubmit(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {

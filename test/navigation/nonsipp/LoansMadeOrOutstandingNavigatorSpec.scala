@@ -18,7 +18,7 @@ package navigation.nonsipp
 
 import config.Refined.OneTo9999999
 import eu.timepit.refined.refineMV
-import models.{NormalMode, ReceivedLoanType}
+import models.{IdentitySubject, NormalMode, ReceivedLoanType}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.common.WhoReceivedLoanPage
@@ -81,7 +81,8 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
         normalmode
           .navigateTo(
             WhatYouWillNeedLoansPage,
-            controllers.nonsipp.common.routes.WhoReceivedLoanController.onPageLoad(_, index, _)
+            controllers.nonsipp.common.routes.WhoReceivedLoanController
+              .onPageLoad(_, index, _, IdentitySubject.LoanRecipient)
           )
           .withName("go from what you will need loans page to who received loan page")
       )

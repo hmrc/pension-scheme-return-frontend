@@ -18,7 +18,7 @@ package navigation.nonsipp
 
 import config.Refined.OneTo9999999
 import eu.timepit.refined.{refineMV, refineV}
-import models.{CheckOrChange, NormalMode, ReceivedLoanType, UserAnswers}
+import models.{CheckOrChange, IdentitySubject, NormalMode, ReceivedLoanType, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.common.{WhoReceivedLoanPage, WhoReceivedLoans}
@@ -38,7 +38,7 @@ object LoansMadeOrOutstandingNavigator extends JourneyNavigator {
 
     case WhatYouWillNeedLoansPage(srn) =>
       controllers.nonsipp.common.routes.WhoReceivedLoanController
-        .onPageLoad(srn, refineMV(1), NormalMode)
+        .onPageLoad(srn, refineMV(1), NormalMode, IdentitySubject.LoanRecipient)
     case WhoReceivedLoanPage(srn, index) =>
       userAnswers.get(WhoReceivedLoanPage(srn, index)) match {
         case Some(ReceivedLoanType.Other) =>
@@ -117,7 +117,7 @@ object LoansMadeOrOutstandingNavigator extends JourneyNavigator {
         case Left(_) => controllers.routes.JourneyRecoveryController.onPageLoad()
         case Right(nextIndex) =>
           controllers.nonsipp.common.routes.WhoReceivedLoanController
-            .onPageLoad(srn, nextIndex, NormalMode)
+            .onPageLoad(srn, nextIndex, NormalMode, IdentitySubject.LoanRecipient)
       }
 
     case LoansListPage(srn, addLoan @ false) =>

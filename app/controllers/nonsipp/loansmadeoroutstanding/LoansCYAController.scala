@@ -355,7 +355,9 @@ object LoansCYAController {
             .withAction(
               SummaryAction(
                 "site.change",
-                controllers.nonsipp.common.routes.WhoReceivedLoanController.onPageLoad(srn, index, mode).url
+                controllers.nonsipp.common.routes.WhoReceivedLoanController
+                  .onPageLoad(srn, index, mode, IdentitySubject.LoanRecipient)
+                  .url
               ).withVisuallyHiddenContent("loanCheckYourAnswers.section1.whoReceivedLoan.hidden")
             ),
           CheckYourAnswersRowViewModel("loanCheckYourAnswers.section1.recipientName", recipientName)

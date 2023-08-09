@@ -280,12 +280,12 @@ GET         /:srn/submit-file-upload-error-missing-information                  
 GET         /:srn/change-file-upload-error-missing-information                          controllers.nonsipp.memberdetails.upload.FileUploadErrorMissingInformationController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 GET         /:srn/change-submit-file-upload-error-missing-information                   controllers.nonsipp.memberdetails.upload.FileUploadErrorMissingInformationController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
-GET         /:srn/who-received-loan                                                     controllers.nonsipp.common.WhoReceivedLoanController.onPageLoad(srn: Srn, index: Max9999999 = 1, mode: Mode = NormalMode)
-GET         /:srn/who-received-loan/:index                                              controllers.nonsipp.common.WhoReceivedLoanController.onPageLoad(srn: Srn, index: Max9999999, mode: Mode = NormalMode)
+GET         /:srn/type-of-:subject                                                      controllers.nonsipp.common.WhoReceivedLoanController.onPageLoad(srn: Srn, index: Max9999999 = 1, mode: Mode = NormalMode, subject: IdentitySubject)
+GET         /:srn/type-of-:subject/:index                                               controllers.nonsipp.common.WhoReceivedLoanController.onPageLoad(srn: Srn, index: Max9999999, mode: Mode = NormalMode, subject: IdentitySubject)
 POST        /:srn/who-received-loan                                                     controllers.nonsipp.common.WhoReceivedLoanController.onSubmit(srn: Srn, index: Max9999999 = 1, mode: Mode = NormalMode)
 POST        /:srn/who-received-loan/:index                                              controllers.nonsipp.common.WhoReceivedLoanController.onSubmit(srn: Srn, index: Max9999999, mode: Mode = NormalMode)
-GET         /:srn/change-who-received-loan                                              controllers.nonsipp.common.WhoReceivedLoanController.onPageLoad(srn: Srn, index: Max9999999 = 1, mode: Mode = CheckMode)
-GET         /:srn/change-who-received-loan/:index                                       controllers.nonsipp.common.WhoReceivedLoanController.onPageLoad(srn: Srn, index: Max9999999, mode: Mode = CheckMode)
+GET         /:srn/change-type-of-:subject                                               controllers.nonsipp.common.WhoReceivedLoanController.onPageLoad(srn: Srn, index: Max9999999 = 1, mode: Mode = CheckMode, subject: IdentitySubject)
+GET         /:srn/change-type-of-:subject/:index                                        controllers.nonsipp.common.WhoReceivedLoanController.onPageLoad(srn: Srn, index: Max9999999, mode: Mode = CheckMode, subject: IdentitySubject)
 POST        /:srn/change-who-received-loan                                              controllers.nonsipp.common.WhoReceivedLoanController.onSubmit(srn: Srn, index: Max9999999 = 1, mode: Mode = CheckMode)
 POST        /:srn/change-who-received-loan/:index                                       controllers.nonsipp.common.WhoReceivedLoanController.onSubmit(srn: Srn, index: Max9999999, mode: Mode = CheckMode)
 
