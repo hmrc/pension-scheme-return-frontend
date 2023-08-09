@@ -16,6 +16,8 @@
 
 package pages.nonsipp.landorproperty
 
+import config.Refined.OneTo9999999
+import eu.timepit.refined.refineMV
 import models.SchemeHoldLandProperty
 import pages.behaviours.PageBehaviours
 
@@ -23,10 +25,12 @@ class WhyDoesSchemeHoldLandPropertyPageSpec extends PageBehaviours {
 
   "WhyDoesSchemeHoldLandPropertyPage" - {
 
-    beRetrievable[SchemeHoldLandProperty](WhyDoesSchemeHoldLandPropertyPage(srnGen.sample.value))
+    val index = refineMV[OneTo9999999](1)
 
-    beSettable[SchemeHoldLandProperty](WhyDoesSchemeHoldLandPropertyPage(srnGen.sample.value))
+    beRetrievable[SchemeHoldLandProperty](WhyDoesSchemeHoldLandPropertyPage(srnGen.sample.value, index))
 
-    beRemovable[SchemeHoldLandProperty](WhyDoesSchemeHoldLandPropertyPage(srnGen.sample.value))
+    beSettable[SchemeHoldLandProperty](WhyDoesSchemeHoldLandPropertyPage(srnGen.sample.value, index))
+
+    beRemovable[SchemeHoldLandProperty](WhyDoesSchemeHoldLandPropertyPage(srnGen.sample.value, index))
   }
 }

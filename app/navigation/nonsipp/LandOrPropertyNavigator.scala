@@ -16,6 +16,7 @@
 
 package navigation.nonsipp
 
+import config.Refined.Max9999999
 import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
@@ -43,12 +44,12 @@ object LandOrPropertyNavigator extends JourneyNavigator {
 
     case page @ LandPropertyInUKPage(srn) =>
       if (userAnswers.get(page).contains(true)) {
-        controllers.nonsipp.landorproperty.routes.WhyDoesSchemeHoldLandPropertyController.onPageLoad(srn, NormalMode)
+        controllers.routes.UnauthorisedController.onPageLoad()
       } else {
         controllers.routes.UnauthorisedController.onPageLoad()
       }
 
-    case WhyDoesSchemeHoldLandPropertyPage(srn) =>
+    case WhyDoesSchemeHoldLandPropertyPage(_, _) =>
       controllers.routes.UnauthorisedController.onPageLoad()
   }
 

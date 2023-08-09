@@ -16,8 +16,10 @@
 
 package controllers.nonsipp.landorproperty
 
+import config.Refined.OneTo9999999
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.landorproperty.WhyDoesSchemeHoldLandPropertyController._
+import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
 import models.{NormalMode, SchemeHoldLandProperty}
 import pages.nonsipp.landorproperty.WhyDoesSchemeHoldLandPropertyPage
@@ -25,26 +27,28 @@ import views.html.RadioListView
 
 class WhyDoesSchemeHoldLandPropertyControllerSpec extends ControllerBaseSpec {
 
-  lazy val onPageLoad = routes.WhyDoesSchemeHoldLandPropertyController.onPageLoad(srn, NormalMode)
-  lazy val onSubmit = routes.WhyDoesSchemeHoldLandPropertyController.onSubmit(srn, NormalMode)
+  private val index = refineMV[OneTo9999999](1)
+
+  lazy val onPageLoad = routes.WhyDoesSchemeHoldLandPropertyController.onPageLoad(srn, index, NormalMode)
+  lazy val onSubmit = routes.WhyDoesSchemeHoldLandPropertyController.onSubmit(srn, index, NormalMode)
 
   "WhyDoesSchemeHoldLandPropertyController" - {
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       injected[RadioListView]
-        .apply(form(injected[RadioListFormProvider]), viewModel(srn, schemeName, NormalMode))
+        .apply(form(injected[RadioListFormProvider]), viewModel(srn, index, schemeName, NormalMode))
     })
 
     act.like(
       renderPrePopView(
         onPageLoad,
-        WhyDoesSchemeHoldLandPropertyPage(srn),
+        WhyDoesSchemeHoldLandPropertyPage(srn, index),
         SchemeHoldLandProperty.Acquisition
       ) { implicit app => implicit request =>
         injected[RadioListView]
           .apply(
             form(injected[RadioListFormProvider]).fill(SchemeHoldLandProperty.Acquisition),
-            viewModel(srn, schemeName, NormalMode)
+            viewModel(srn, index, schemeName, NormalMode)
           )
       }
     )

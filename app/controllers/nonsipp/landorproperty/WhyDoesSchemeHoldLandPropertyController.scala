@@ -16,6 +16,7 @@
 
 package controllers.nonsipp.landorproperty
 
+import config.Refined.Max9999999
 import controllers.actions._
 import controllers.nonsipp.landorproperty.WhyDoesSchemeHoldLandPropertyController._
 import forms.RadioListFormProvider
@@ -51,31 +52,34 @@ class WhyDoesSchemeHoldLandPropertyController @Inject()(
 
   val form = WhyDoesSchemeHoldLandPropertyController.form(formProvider)
 
-  def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    Ok(
-      view(
-        form.fromUserAnswers(WhyDoesSchemeHoldLandPropertyPage(srn)),
-        viewModel(srn, request.schemeDetails.schemeName, mode)
+  def onPageLoad(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+    implicit request =>
+      Ok(
+        view(
+          form.fromUserAnswers(WhyDoesSchemeHoldLandPropertyPage(srn, index)),
+          viewModel(srn, index, request.schemeDetails.schemeName, mode)
+        )
       )
-    )
   }
 
-  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
-    form
-      .bindFromRequest()
-      .fold(
-        errors =>
-          Future.successful(
-            BadRequest(view(errors, viewModel(srn, request.schemeDetails.schemeName, mode)))
-          ),
-        success =>
-          for {
-            userAnswers <- Future.fromTry(request.userAnswers.set(WhyDoesSchemeHoldLandPropertyPage(srn), success))
-            _ <- saveService.save(userAnswers)
-          } yield {
-            Redirect(navigator.nextPage(WhyDoesSchemeHoldLandPropertyPage(srn), mode, userAnswers))
-          }
-      )
+  def onSubmit(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+    implicit request =>
+      form
+        .bindFromRequest()
+        .fold(
+          errors =>
+            Future.successful(
+              BadRequest(view(errors, viewModel(srn, index, request.schemeDetails.schemeName, mode)))
+            ),
+          success =>
+            for {
+              userAnswers <- Future
+                .fromTry(request.userAnswers.set(WhyDoesSchemeHoldLandPropertyPage(srn, index), success))
+              _ <- saveService.save(userAnswers)
+            } yield {
+              Redirect(navigator.nextPage(WhyDoesSchemeHoldLandPropertyPage(srn, index), mode, userAnswers))
+            }
+        )
   }
 }
 
@@ -86,6 +90,7 @@ object WhyDoesSchemeHoldLandPropertyController {
 
   def viewModel(
     srn: Srn,
+    index: Max9999999,
     schemeName: String,
     mode: Mode
   ): FormPageViewModel[RadioListViewModel] =
@@ -101,6 +106,6 @@ object WhyDoesSchemeHoldLandPropertyController {
         RadioListRowViewModel("whyDoesSchemeHoldLandProperty.option2", SchemeHoldLandProperty.Contribution.name),
         RadioListRowViewModel("whyDoesSchemeHoldLandProperty.option3", SchemeHoldLandProperty.Transfer.name)
       ),
-      routes.WhyDoesSchemeHoldLandPropertyController.onSubmit(srn, mode)
+      routes.WhyDoesSchemeHoldLandPropertyController.onSubmit(srn, index, mode)
     )
 }

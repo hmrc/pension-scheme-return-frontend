@@ -16,14 +16,17 @@
 
 package pages.nonsipp.landorproperty
 
+import config.Refined.Max9999999
 import models.SchemeHoldLandProperty
 import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
+import utils.RefinedUtils.RefinedIntOps
 
-case class WhyDoesSchemeHoldLandPropertyPage(srn: Srn) extends QuestionPage[SchemeHoldLandProperty] {
+case class WhyDoesSchemeHoldLandPropertyPage(srn: Srn, index: Max9999999) extends QuestionPage[SchemeHoldLandProperty] {
 
-  override def path: JsPath = JsPath \ toString
+  override def path: JsPath =
+    JsPath \ "shares" \ "shareTransactions" \ "heldSharesTransaction" \ toString \ index.arrayIndex.toString
 
-  override def toString: String = "whyDoesSchemeHoldLandProperty"
+  override def toString: String = "methodOfHolding"
 }
