@@ -28,7 +28,7 @@ import utils.RefinedUtils.RefinedIntOps
 
 import scala.util.Try
 
-case class WhoReceivedLoanPage(srn: Srn, index: Max9999999) extends QuestionPage[ReceivedLoanType] {
+case class IdentityTypePage(srn: Srn, index: Max9999999) extends QuestionPage[ReceivedLoanType] {
 
   override def path: JsPath = Paths.loanTransactions \ "recipientIdentityType" \ toString \ index.arrayIndex.toString
 

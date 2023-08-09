@@ -25,7 +25,7 @@ import models.SchemeId.Srn
 import models.requests.DataRequest
 import models.{Mode, ReceivedLoanType}
 import navigation.Navigator
-import pages.nonsipp.common.WhoReceivedLoanPage
+import pages.nonsipp.common.IdentityTypePage
 import pages.nonsipp.loansmadeoroutstanding._
 import play.api.data.Form
 import play.api.i18n.MessagesApi
@@ -61,7 +61,7 @@ class RemoveLoanController @Inject()(
     implicit request: DataRequest[_]
   ) = {
     val whoReceivedLoanPage = request.userAnswers
-      .get(WhoReceivedLoanPage(srn, index))
+      .get(IdentityTypePage(srn, index))
     whoReceivedLoanPage match {
       case Some(who) => {
         val recipientName =
@@ -106,7 +106,7 @@ class RemoveLoanController @Inject()(
             if (value) {
               for {
                 updatedAnswers <- Future
-                  .fromTry(request.userAnswers.remove(WhoReceivedLoanPage(srn, index)))
+                  .fromTry(request.userAnswers.remove(IdentityTypePage(srn, index)))
                 _ <- saveService.save(updatedAnswers)
               } yield Redirect(navigator.nextPage(RemoveLoanPage(srn, index), mode, updatedAnswers))
             } else {

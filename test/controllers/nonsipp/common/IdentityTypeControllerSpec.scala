@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.loansmadeoroutstanding
+package controllers.nonsipp.common
 
 import config.Refined.OneTo9999999
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.common.IdentityTypeController._
 import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
-import models.{IdentitySubject, NormalMode}
 import models.ReceivedLoanType.{Individual, Other, UKCompany, UKPartnership}
+import models.{IdentitySubject, NormalMode}
 import views.html.RadioListView
 
 class IdentityTypeControllerSpec extends ControllerBaseSpec {

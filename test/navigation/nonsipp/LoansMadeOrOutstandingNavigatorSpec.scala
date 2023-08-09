@@ -21,7 +21,7 @@ import eu.timepit.refined.refineMV
 import models.{IdentitySubject, NormalMode, ReceivedLoanType}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.common.WhoReceivedLoanPage
+import pages.nonsipp.common.IdentityTypePage
 import pages.nonsipp.loansmadeoroutstanding._
 import utils.BaseSpec
 
@@ -115,7 +115,7 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
         normalmode
           .navigateToWithDataAndIndex(
             index,
-            WhoReceivedLoanPage,
+            IdentityTypePage,
             Gen.const(ReceivedLoanType.Other),
             controllers.nonsipp.loansmadeoroutstanding.routes.OtherRecipientDetailsController.onPageLoad
           )
@@ -126,7 +126,7 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
         normalmode
           .navigateToWithDataAndIndex(
             index,
-            WhoReceivedLoanPage,
+            IdentityTypePage,
             Gen.const(ReceivedLoanType.Individual),
             controllers.nonsipp.loansmadeoroutstanding.routes.IndividualRecipientNameController.onPageLoad
           )
@@ -137,7 +137,7 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
         normalmode
           .navigateToWithDataAndIndex(
             index,
-            WhoReceivedLoanPage,
+            IdentityTypePage,
             Gen.const(ReceivedLoanType.UKCompany),
             controllers.nonsipp.loansmadeoroutstanding.routes.CompanyRecipientNameController.onPageLoad
           )
@@ -148,7 +148,7 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
         normalmode
           .navigateToWithDataAndIndex(
             index,
-            WhoReceivedLoanPage,
+            IdentityTypePage,
             Gen.const(ReceivedLoanType.UKPartnership),
             controllers.nonsipp.loansmadeoroutstanding.routes.PartnershipRecipientNameController.onPageLoad
           )

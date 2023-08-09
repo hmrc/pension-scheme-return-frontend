@@ -23,7 +23,7 @@ import models.SchemeId.Srn
 import models.requests.DataRequest
 import models.{Mode, ReceivedLoanType, SponsoringOrConnectedParty}
 import navigation.Navigator
-import pages.nonsipp.common.WhoReceivedLoanPage
+import pages.nonsipp.common.IdentityTypePage
 import pages.nonsipp.loansmadeoroutstanding._
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -97,7 +97,7 @@ class RecipientSponsoringEmployerConnectedPartyController @Inject()(
   }
 
   private def recipientName(srn: Srn, index: Max9999999)(implicit request: DataRequest[_]): Option[String] =
-    request.userAnswers.get(WhoReceivedLoanPage(srn, index)).flatMap {
+    request.userAnswers.get(IdentityTypePage(srn, index)).flatMap {
       case ReceivedLoanType.UKCompany => request.userAnswers.get(CompanyRecipientNamePage(srn, index))
       case ReceivedLoanType.UKPartnership => request.userAnswers.get(PartnershipRecipientNamePage(srn, index))
       case ReceivedLoanType.Other => request.userAnswers.get(OtherRecipientDetailsPage(srn, index)).map(_.name)

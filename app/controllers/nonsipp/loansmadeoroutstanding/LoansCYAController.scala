@@ -23,9 +23,9 @@ import controllers.nonsipp.loansmadeoroutstanding.LoansCYAController._
 import controllers.PSRController
 import models.ConditionalYesNo._
 import models.SchemeId.Srn
-import models.{Money, Percentage, _}
+import models.{Security, _}
 import navigation.Navigator
-import pages.nonsipp.common.WhoReceivedLoanPage
+import pages.nonsipp.common.IdentityTypePage
 import pages.nonsipp.loansmadeoroutstanding._
 import play.api.i18n._
 import play.api.mvc._
@@ -59,7 +59,7 @@ class LoansCYAController @Inject()(
     identifyAndRequireData(srn) { implicit request =>
       (
         for {
-          receivedLoanType <- requiredPage(WhoReceivedLoanPage(srn, index))
+          receivedLoanType <- requiredPage(IdentityTypePage(srn, index))
           recipientName <- List(
             request.userAnswers.get(IndividualRecipientNamePage(srn, index)),
             request.userAnswers.get(CompanyRecipientNamePage(srn, index)),

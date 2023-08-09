@@ -24,7 +24,7 @@ import models.ReceivedLoanType.{Individual, Other, UKCompany, UKPartnership}
 import models.SchemeId.Srn
 import models.{IdentitySubject, Mode, NormalMode, ReceivedLoanType}
 import navigation.Navigator
-import pages.nonsipp.common.WhoReceivedLoanPage
+import pages.nonsipp.common.IdentityTypePage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -60,7 +60,7 @@ class IdentityTypeController @Inject()(
   ): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     Ok(
       view(
-        form.fromUserAnswers(WhoReceivedLoanPage(srn, index)),
+        form.fromUserAnswers(IdentityTypePage(srn, index)),
         viewModel(srn, index, mode)
       )
     )
@@ -78,9 +78,9 @@ class IdentityTypeController @Inject()(
         formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode)))),
         answer => {
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(WhoReceivedLoanPage(srn, index), answer))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(IdentityTypePage(srn, index), answer))
             _ <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage(WhoReceivedLoanPage(srn, index), NormalMode, updatedAnswers))
+          } yield Redirect(navigator.nextPage(IdentityTypePage(srn, index), NormalMode, updatedAnswers))
         }
       )
   }

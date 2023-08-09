@@ -31,7 +31,7 @@ import models.{
   Security,
   SponsoringOrConnectedParty
 }
-import pages.nonsipp.common.WhoReceivedLoanPage
+import pages.nonsipp.common.IdentityTypePage
 import pages.nonsipp.loansmadeoroutstanding._
 import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
@@ -57,7 +57,7 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
   private def onSubmit(checkOrChange: CheckOrChange) = routes.LoansCYAController.onSubmit(srn, checkOrChange)
 
   private val filledUserAnswers = defaultUserAnswers
-    .unsafeSet(WhoReceivedLoanPage(srn, index), ReceivedLoanType.UKCompany)
+    .unsafeSet(IdentityTypePage(srn, index), ReceivedLoanType.UKCompany)
     .unsafeSet(CompanyRecipientNamePage(srn, index), recipientName)
     .unsafeSet(CompanyRecipientCrnPage(srn, index), ConditionalYesNo.yes[String, Crn](crn))
     .unsafeSet(RecipientSponsoringEmployerConnectedPartyPage(srn, index), SponsoringOrConnectedParty.ConnectedParty)
