@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
-import config.Refined.OneTo9999999
+import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.loansmadeoroutstanding.LoansCYAController._
 import eu.timepit.refined.refineMV
@@ -50,7 +50,7 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
   override protected def beforeAll(): Unit =
     reset(mockSchemeDateService)
 
-  private val index = refineMV[OneTo9999999](1)
+  private val index = refineMV[OneTo5000](1)
   private val taxYear = Some(Left(dateRange))
   private val subject = IdentitySubject.LoanRecipient
 

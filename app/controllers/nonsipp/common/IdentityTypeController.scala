@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.common
 
-import config.Refined.Max9999999
+import config.Refined.Max5000
 import controllers.actions._
 import controllers.nonsipp.common.IdentityTypeController._
 import forms.RadioListFormProvider
@@ -55,7 +55,7 @@ class IdentityTypeController @Inject()(
 
   def onPageLoad(
     srn: Srn,
-    index: Max9999999,
+    index: Max5000,
     mode: Mode,
     subject: IdentitySubject
   ): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
@@ -70,7 +70,7 @@ class IdentityTypeController @Inject()(
 
   def onSubmit(
     srn: Srn,
-    index: Max9999999,
+    index: Max5000,
     mode: Mode,
     subject: IdentitySubject
   ): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
@@ -107,7 +107,7 @@ object IdentityTypeController {
 
   def viewModel(
     srn: Srn,
-    index: Max9999999,
+    index: Max5000,
     mode: Mode,
     subject: IdentitySubject,
     userAnswers: UserAnswers
@@ -116,7 +116,7 @@ object IdentityTypeController {
       case IdentitySubject.LoanRecipient => ""
       case IdentitySubject.LandOrPropertySeller => {
         // TODO from address instead of LandPropertyInUKPage
-        userAnswers.get(LandPropertyInUKPage(srn)) match {
+        userAnswers.get(LandPropertyInUKPage(srn, index)) match {
           case Some(value) => value.toString
           case None => "" // TODO
         }

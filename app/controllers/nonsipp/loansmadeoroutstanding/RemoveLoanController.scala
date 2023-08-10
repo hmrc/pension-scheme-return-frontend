@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
-import config.Refined.Max9999999
+import config.Refined.Max5000
 import controllers.PSRController
 import controllers.actions._
 import controllers.nonsipp.loansmadeoroutstanding.RemoveLoanController._
@@ -52,12 +52,12 @@ class RemoveLoanController @Inject()(
 
   private val form = RemoveLoanController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       getResult(srn, index, mode, request.userAnswers.fillForm(RemoveLoanPage(srn, index), form))
   }
 
-  private def getResult(srn: Srn, index: Max9999999, mode: Mode, form: Form[Boolean], error: Boolean = false)(
+  private def getResult(srn: Srn, index: Max5000, mode: Mode, form: Form[Boolean], error: Boolean = false)(
     implicit request: DataRequest[_]
   ) = {
     val whoReceivedLoanPage = request.userAnswers
@@ -96,7 +96,7 @@ class RemoveLoanController @Inject()(
     }
   }
 
-  def onSubmit(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()
@@ -124,7 +124,7 @@ object RemoveLoanController {
 
   def viewModel(
     srn: Srn,
-    index: Max9999999,
+    index: Max5000,
     mode: Mode,
     loanAmount: String,
     recipientName: String

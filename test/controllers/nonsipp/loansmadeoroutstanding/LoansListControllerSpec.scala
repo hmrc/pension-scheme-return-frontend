@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
-import config.Refined.Max9999999
+import config.Refined.Max5000
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.loansmadeoroutstanding.LoansListController._
 import eu.timepit.refined.refineMV
@@ -44,7 +44,7 @@ class LoansListControllerSpec extends ControllerBaseSpec {
   private lazy val onSubmit = routes.LoansListController.onSubmit(srn, NormalMode)
   private lazy val onLoansMadePageLoad = routes.LoansMadeOrOutstandingController.onPageLoad(srn, NormalMode)
 
-  private val recipients: List[(Max9999999, String, Money)] = List(
+  private val recipients: List[(Max5000, String, Money)] = List(
     (refineMV(1), "recipientName1", money),
     (refineMV(2), "recipientName2", money),
     (refineMV(3), "recipientName3", money)

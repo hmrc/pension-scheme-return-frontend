@@ -16,7 +16,7 @@
 
 package navigation.nonsipp
 
-import config.Refined.OneTo9999999
+import config.Refined.OneTo5000
 import eu.timepit.refined.refineMV
 import models.{IdentitySubject, IdentityType, NormalMode}
 import navigation.{Navigator, NavigatorBehaviours}
@@ -29,7 +29,7 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
 
   val navigator: Navigator = new NonSippNavigator
 
-  private val index = refineMV[OneTo9999999](1)
+  private val index = refineMV[OneTo5000](1)
   private val subject = IdentitySubject.LoanRecipient
 
   "loansMadeOrOutstandingNavigator" - {

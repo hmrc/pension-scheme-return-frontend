@@ -16,7 +16,7 @@
 
 package pages.nonsipp.common
 
-import config.Refined.Max9999999
+import config.Refined.Max5000
 import models.SchemeId.Srn
 import models.{IdentitySubject, IdentityType, UserAnswers}
 import pages.QuestionPage
@@ -28,7 +28,7 @@ import utils.RefinedUtils.RefinedIntOps
 
 import scala.util.Try
 
-case class IdentityTypePage(srn: Srn, index: Max9999999, identitySubject: IdentitySubject)
+case class IdentityTypePage(srn: Srn, index: Max5000, identitySubject: IdentitySubject)
     extends QuestionPage[IdentityType] {
 
   override def path: JsPath = identitySubject match {

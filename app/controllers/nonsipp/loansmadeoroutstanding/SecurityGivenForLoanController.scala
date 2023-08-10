@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
-import config.Refined.Max9999999
+import config.Refined.Max5000
 import controllers.actions._
 import controllers.nonsipp.loansmadeoroutstanding.SecurityGivenForLoanController._
 import forms.YesNoPageFormProvider
@@ -52,7 +52,7 @@ class SecurityGivenForLoanController @Inject()(
 
   private val form = SecurityGivenForLoanController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       {
         val preparedForm = request.userAnswers.fillForm(SecurityGivenForLoanPage(srn, index), form)
@@ -60,7 +60,7 @@ class SecurityGivenForLoanController @Inject()(
       }
   }
 
-  def onSubmit(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()
@@ -91,7 +91,7 @@ object SecurityGivenForLoanController {
       )
   )
 
-  def viewModel(srn: Srn, index: Max9999999, mode: Mode): FormPageViewModel[ConditionalYesNoPageViewModel] =
+  def viewModel(srn: Srn, index: Max5000, mode: Mode): FormPageViewModel[ConditionalYesNoPageViewModel] =
     FormPageViewModel[ConditionalYesNoPageViewModel](
       "securityGivenForLoan.securityGiven.title",
       Message("securityGivenForLoan.securityGiven.heading"),

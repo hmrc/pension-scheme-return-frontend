@@ -17,7 +17,7 @@
 package controllers.nonsipp.loansmadeoroutstanding
 
 import cats.implicits.toShow
-import config.Refined.Max9999999
+import config.Refined.Max5000
 import controllers.actions._
 import controllers.nonsipp.loansmadeoroutstanding.LoansCYAController._
 import controllers.PSRController
@@ -52,7 +52,7 @@ class LoansCYAController @Inject()(
 
   def onPageLoad(
     srn: Srn,
-    index: Max9999999,
+    index: Max5000,
     checkOrChange: CheckOrChange,
     mode: Mode
   ): Action[AnyContent] =
@@ -131,7 +131,7 @@ class LoansCYAController @Inject()(
 
 case class ViewModelParameters(
   srn: Srn,
-  index: Max9999999,
+  index: Max5000,
   receivedLoanType: IdentityType,
   recipientName: String,
   recipientDetails: Option[String],
@@ -184,7 +184,7 @@ object LoansCYAController {
 
   private def sections(
     srn: Srn,
-    index: Max9999999,
+    index: Max5000,
     receivedLoanType: IdentityType,
     recipientName: String,
     recipientDetails: Option[String],
@@ -222,7 +222,7 @@ object LoansCYAController {
 
   private def recipientSection(
     srn: Srn,
-    index: Max9999999,
+    index: Max5000,
     receivedLoanType: IdentityType,
     recipientName: String,
     recipientDetails: Option[String],
@@ -390,7 +390,7 @@ object LoansCYAController {
 
   private def loanPeriodSection(
     srn: Srn,
-    index: Max9999999,
+    index: Max5000,
     recipientName: String,
     loanDate: LocalDate,
     assetsValue: Money,
@@ -438,7 +438,7 @@ object LoansCYAController {
 
   private def loanAmountSection(
     srn: Srn,
-    index: Max9999999,
+    index: Max5000,
     totalLoan: Money,
     repayments: Money,
     outstanding: Money,
@@ -495,7 +495,7 @@ object LoansCYAController {
 
   private def loanInterestSection(
     srn: Srn,
-    index: Max9999999,
+    index: Max5000,
     interestPayable: Money,
     interestRate: Percentage,
     interestPayments: Money,
@@ -532,7 +532,7 @@ object LoansCYAController {
 
   private def loanOutstandingSection(
     srn: Srn,
-    index: Max9999999,
+    index: Max5000,
     outstandingArrearsOnLoan: Option[Money],
     mode: Mode
   ): List[CheckYourAnswersSection] = {
@@ -563,7 +563,7 @@ object LoansCYAController {
 
   private def loanSecuritySection(
     srn: Srn,
-    index: Max9999999,
+    index: Max5000,
     securityOnLoan: Option[Security],
     mode: Mode
   ): List[CheckYourAnswersSection] = {

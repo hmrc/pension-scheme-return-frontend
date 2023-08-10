@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
-import config.Refined.Max9999999
+import config.Refined.Max5000
 import controllers.actions._
 import forms.RadioListFormProvider
 import models.SchemeId.Srn
@@ -53,7 +53,7 @@ class RecipientSponsoringEmployerConnectedPartyController @Inject()(
 
   val form = RecipientSponsoringEmployerConnectedPartyController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       recipientName(srn, index)
         .map { recipientName =>
@@ -67,7 +67,7 @@ class RecipientSponsoringEmployerConnectedPartyController @Inject()(
         .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
     }
 
-  def onSubmit(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()
@@ -96,7 +96,7 @@ class RecipientSponsoringEmployerConnectedPartyController @Inject()(
         )
   }
 
-  private def recipientName(srn: Srn, index: Max9999999)(implicit request: DataRequest[_]): Option[String] =
+  private def recipientName(srn: Srn, index: Max5000)(implicit request: DataRequest[_]): Option[String] =
     request.userAnswers.get(IdentityTypePage(srn, index, IdentitySubject.LoanRecipient)).flatMap {
       case IdentityType.UKCompany => request.userAnswers.get(CompanyRecipientNamePage(srn, index))
       case IdentityType.UKPartnership => request.userAnswers.get(PartnershipRecipientNamePage(srn, index))
@@ -110,7 +110,7 @@ object RecipientSponsoringEmployerConnectedPartyController {
   def form(formProvider: RadioListFormProvider): Form[SponsoringOrConnectedParty] =
     formProvider("recipientSponsoringEmployerConnectedParty.error.required")
 
-  def viewModel(srn: Srn, index: Max9999999, recipientName: String, mode: Mode): FormPageViewModel[RadioListViewModel] =
+  def viewModel(srn: Srn, index: Max5000, recipientName: String, mode: Mode): FormPageViewModel[RadioListViewModel] =
     RadioListViewModel(
       "recipientSponsoringEmployerConnectedParty.title",
       Message("recipientSponsoringEmployerConnectedParty.heading", recipientName),

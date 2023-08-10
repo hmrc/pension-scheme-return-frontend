@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.common
 
-import config.Refined.OneTo9999999
+import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.common.IdentityTypeController._
 import eu.timepit.refined.refineMV
@@ -28,7 +28,7 @@ import views.html.RadioListView
 
 class IdentityTypeControllerSpec extends ControllerBaseSpec {
 
-  private val index = refineMV[OneTo9999999](1)
+  private val index = refineMV[OneTo5000](1)
   val allowedAccessRequest = allowedAccessRequestGen(FakeRequest()).sample.value
 
   // TODO for all identity subjects

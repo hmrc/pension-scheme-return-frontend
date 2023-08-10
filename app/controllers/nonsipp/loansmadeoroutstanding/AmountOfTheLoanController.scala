@@ -20,7 +20,7 @@ import cats.implicits.toShow
 import cats.{Id, Monad}
 import com.google.inject.Inject
 import config.Constants.maxCurrencyValue
-import config.Refined.Max9999999
+import config.Refined.Max5000
 import controllers.actions._
 import forms.MoneyFormProvider
 import forms.mappings.errors.MoneyFormErrors
@@ -57,7 +57,7 @@ class AmountOfTheLoanController @Inject()(
     extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       usingSchemeDate[Id](srn) { period =>
         val form = AmountOfTheLoanController.form(formProvider, period)
@@ -74,7 +74,7 @@ class AmountOfTheLoanController @Inject()(
       }
   }
 
-  def onSubmit(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       usingSchemeDate(srn) { period =>
         val form = AmountOfTheLoanController.form(formProvider, period)
@@ -132,7 +132,7 @@ object AmountOfTheLoanController {
 
   def viewModel(
     srn: Srn,
-    index: Max9999999,
+    index: Max5000,
     mode: Mode,
     schemeName: String,
     period: DateRange,

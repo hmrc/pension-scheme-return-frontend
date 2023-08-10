@@ -16,14 +16,14 @@
 
 package pages.nonsipp.loansmadeoroutstanding
 
-import config.Refined.Max9999999
+import config.Refined.Max5000
 import models.Money
 import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
 
-case class AmountOfTheLoanPage(srn: Srn, index: Max9999999) extends QuestionPage[(Money, Money, Money)] {
+case class AmountOfTheLoanPage(srn: Srn, index: Max5000) extends QuestionPage[(Money, Money, Money)] {
 
   override def path: JsPath = Paths.loanTransactions \ toString \ index.arrayIndex.toString
 
