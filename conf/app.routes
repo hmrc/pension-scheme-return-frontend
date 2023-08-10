@@ -1,6 +1,7 @@
 # microservice specific routes
 
 ->          /hmrc-frontend                                                              hmrcfrontend.Routes
+->          /                                                                           landOrProperty.Routes
 
 GET         /                                                                           controllers.IndexController.onPageLoad()
 
@@ -173,13 +174,6 @@ GET         /:srn/reason-for-no-bank-account                                    
 POST        /:srn/reason-for-no-bank-account                                            controllers.nonsipp.schemedesignatory.WhyNoBankAccountController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 GET         /:srn/change-reason-for-no-bank-account                                     controllers.nonsipp.schemedesignatory.WhyNoBankAccountController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST        /:srn/change-reason-for-no-bank-account                                     controllers.nonsipp.schemedesignatory.WhyNoBankAccountController.onSubmit(srn: Srn, mode: Mode = CheckMode)
-
-GET         /:srn/land-or-property-held                                                 controllers.nonsipp.landorproperty.LandOrPropertyHeldController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST        /:srn/land-or-property-held                                                 controllers.nonsipp.landorproperty.LandOrPropertyHeldController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-GET         /:srn/what-you-will-need-land-property                                      controllers.nonsipp.landorproperty.WhatYouWillNeedLandOrPropertyController.onPageLoad(srn: Srn)
-GET         /:srn/submit-what-you-will-need-land-property                               controllers.nonsipp.landorproperty.WhatYouWillNeedLandOrPropertyController.onSubmit(srn: Srn)
-GET         /:srn/change-land-or-property-held                                          controllers.nonsipp.landorproperty.LandOrPropertyHeldController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST        /:srn/change-land-or-property-held                                          controllers.nonsipp.landorproperty.LandOrPropertyHeldController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
 GET         /:srn/loans-made-or-outstanding                                             controllers.nonsipp.loansmadeoroutstanding.LoansMadeOrOutstandingController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST        /:srn/loans-made-or-outstanding                                             controllers.nonsipp.loansmadeoroutstanding.LoansMadeOrOutstandingController.onSubmit(srn: Srn, mode: Mode = NormalMode)
@@ -468,8 +462,3 @@ GET        /:srn/check-answers-financial-details                                
 POST       /:srn/submit-check-answers-financial-details                             controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 GET        /:srn/change-check-answers-financial-details                             controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST        /:srn/change-submit-check-answers-financial-details                      controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController.onSubmit(srn: Srn, mode: Mode = CheckMode)
-
-GET        /:srn/land-property-in-uk               controllers.nonsipp.landorproperty.LandPropertyInUKController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST       /:srn/land-property-in-uk               controllers.nonsipp.landorproperty.LandPropertyInUKController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-GET        /:srn/change-land-property-in-uk        controllers.nonsipp.landorproperty.LandPropertyInUKController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST       /:srn/change-land-property-in-uk        controllers.nonsipp.landorproperty.LandPropertyInUKController.onSubmit(srn: Srn, mode: Mode = CheckMode)

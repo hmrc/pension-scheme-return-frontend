@@ -16,8 +16,10 @@
 
 package controllers.nonsipp.landorproperty
 
+import config.Refined.OneTo5000
 import controllers.nonsipp.landorproperty.LandPropertyInUKController._
 import controllers.ControllerBaseSpec
+import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.NormalMode
 import pages.nonsipp.landorproperty.LandPropertyInUKPage
@@ -25,17 +27,19 @@ import views.html.YesNoPageView
 
 class LandPropertyInUKControllerSpec extends ControllerBaseSpec {
 
-  private lazy val onPageLoad = routes.LandPropertyInUKController.onPageLoad(srn, NormalMode)
-  private lazy val onSubmit = routes.LandPropertyInUKController.onSubmit(srn, NormalMode)
+  private val index = refineMV[OneTo5000](1)
+
+  private lazy val onPageLoad = routes.LandPropertyInUKController.onPageLoad(srn, index, NormalMode)
+  private lazy val onSubmit = routes.LandPropertyInUKController.onSubmit(srn, index, NormalMode)
 
   "LandPropertyInUKController" - {
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
-      injected[YesNoPageView].apply(form(injected[YesNoPageFormProvider]), viewModel(srn, NormalMode))
+      injected[YesNoPageView].apply(form(injected[YesNoPageFormProvider]), viewModel(srn, index, NormalMode))
     })
 
-    act.like(renderPrePopView(onPageLoad, LandPropertyInUKPage(srn), true) { implicit app => implicit request =>
-      injected[YesNoPageView].apply(form(injected[YesNoPageFormProvider]).fill(true), viewModel(srn, NormalMode))
+    act.like(renderPrePopView(onPageLoad, LandPropertyInUKPage(srn, index), true) { implicit app => implicit request =>
+      injected[YesNoPageView].apply(form(injected[YesNoPageFormProvider]).fill(true), viewModel(srn, index, NormalMode))
     })
 
     act.like(redirectNextPage(onSubmit, "value" -> "true"))
