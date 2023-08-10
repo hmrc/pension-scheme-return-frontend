@@ -20,6 +20,7 @@ import config.Refined.Max5000
 import models.SchemeId.Srn
 import models.{IdentitySubject, IdentityType, UserAnswers}
 import pages.QuestionPage
+import pages.nonsipp.landorproperty.LandPropertyInUKPage
 import pages.nonsipp.loansmadeoroutstanding._
 import play.api.libs.json.JsPath
 import queries.Removable
@@ -40,28 +41,41 @@ case class IdentityTypePage(srn: Srn, index: Max5000, identitySubject: IdentityS
 
   override def toString: String = "identityTypes"
 
-  private def pages(srn: Srn): List[Removable[_]] = pagesFirstPart(srn) ++ List(
-    DatePeriodLoanPage(srn, index),
-    AmountOfTheLoanPage(srn, index),
-    AreRepaymentsInstalmentsPage(srn, index),
-    InterestOnLoanPage(srn, index),
-    OutstandingArrearsOnLoanPage(srn, index),
-    SecurityGivenForLoanPage(srn, index)
-  )
+  private def pages(srn: Srn): List[Removable[_]] = pagesFirstPart(srn) ++ pagesSecondPart(srn)
 
-  private def pagesFirstPart(srn: Srn): List[Removable[_]] = List(
-    IndividualRecipientNamePage(srn, index),
-    IndividualRecipientNinoPage(srn, index),
-    IsMemberOrConnectedPartyPage(srn, index),
-    CompanyRecipientNamePage(srn, index),
-    CompanyRecipientCrnPage(srn, index),
-    RecipientSponsoringEmployerConnectedPartyPage(srn, index),
-    PartnershipRecipientNamePage(srn, index),
-    PartnershipRecipientUtrPage(srn, index),
-    OtherRecipientDetailsPage(srn, index)
-  )
+  private def pagesSecondPart(srn: Srn): List[Removable[_]] =
+    this.identitySubject match {
+      case IdentitySubject.LoanRecipient =>
+        List(
+          DatePeriodLoanPage(srn, index),
+          AmountOfTheLoanPage(srn, index),
+          AreRepaymentsInstalmentsPage(srn, index),
+          InterestOnLoanPage(srn, index),
+          OutstandingArrearsOnLoanPage(srn, index),
+          SecurityGivenForLoanPage(srn, index)
+        )
+      case IdentitySubject.LandOrPropertySeller =>
+        List(
+          LandPropertyInUKPage(srn, index)
+        )
+    }
+  private def pagesFirstPart(srn: Srn): List[Removable[_]] =
+    this.identitySubject match {
+      case IdentitySubject.LoanRecipient =>
+        List(
+          IndividualRecipientNamePage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
+          IndividualRecipientNinoPage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
+          IsMemberOrConnectedPartyPage(srn, index),
+          CompanyRecipientNamePage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
+          CompanyRecipientCrnPage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
+          RecipientSponsoringEmployerConnectedPartyPage(srn, index),
+          PartnershipRecipientNamePage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
+          PartnershipRecipientUtrPage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
+          OtherRecipientDetailsPage(srn, index) // TODO move this to generic page (with subject) and pass in this.identitySubject
+        )
+      case IdentitySubject.LandOrPropertySeller => List() // TODO add land or property pages here
+    }
 
-  // TODO solve cleanup based on identitySubject
   override def cleanup(value: Option[IdentityType], userAnswers: UserAnswers): Try[UserAnswers] =
     (value, userAnswers.get(this)) match {
       case (Some(IdentityType.Individual), Some(IdentityType.Individual)) => Try(userAnswers)
