@@ -16,6 +16,8 @@
 
 package navigation.nonsipp
 
+import config.Refined.{Max5000, OneTo5000, OneTo9999999}
+import eu.timepit.refined.refineMV
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.landorproperty.{LandOrPropertyHeldPage, LandPropertyInUKPage, WhatYouWillNeedLandOrPropertyPage}
@@ -24,6 +26,8 @@ import utils.BaseSpec
 class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
   val navigator: Navigator = new NonSippNavigator
+
+  private val index = refineMV[OneTo5000](1)
 
   "LandOrPropertyNavigator" - {
 
@@ -49,22 +53,26 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
     act.like(
       normalmode
-        .navigateToWithData(
+        .navigateToWithDataAndIndex(
+          index,
           LandPropertyInUKPage,
           Gen.const(true),
-          (_, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          (srn, index: Max5000, _) =>
+            controllers.nonsipp.landorproperty.routes.LandOrPropertyAddressLookupController.onPageLoad(srn, index)
         )
-        .withName("go from land or property in uk page to unauthorised when yes selected")
+        .withName("go from land or property in uk page to land or property address lookup when yes selected")
     )
 
     act.like(
       normalmode
-        .navigateToWithData(
+        .navigateToWithDataAndIndex(
+          index,
           LandPropertyInUKPage,
           Gen.const(false),
-          (_, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          (srn, index: Max5000, _) =>
+            controllers.nonsipp.landorproperty.routes.LandOrPropertyAddressLookupController.onPageLoad(srn, index)
         )
-        .withName("go from land or property in uk page to unauthorised when no selected")
+        .withName("go from land or property in uk page to land or property address lookup when no selected")
     )
   }
 
@@ -72,8 +80,9 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
     act.like(
       normalmode
-        .navigateTo(
-          WhatYouWillNeedLandOrPropertyPage,
+        .navigateToWithIndex(
+          index,
+          (srn, _: Max5000) => WhatYouWillNeedLandOrPropertyPage(srn),
           controllers.nonsipp.landorproperty.routes.LandPropertyInUKController.onPageLoad
         )
         .withName("go from what you will need Land or Property page to Unauthorised page")

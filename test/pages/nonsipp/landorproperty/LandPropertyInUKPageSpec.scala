@@ -16,16 +16,20 @@
 
 package pages.nonsipp.landorproperty
 
+import config.Refined.{Max5000, OneTo5000}
+import eu.timepit.refined.refineMV
 import pages.behaviours.PageBehaviours
 
 class LandPropertyInUKPageSpec extends PageBehaviours {
 
   "LandPropertyInUKPage" - {
 
-    beRetrievable[Boolean](LandPropertyInUKPage(srnGen.sample.value))
+    val index = refineMV[OneTo5000](1)
 
-    beSettable[Boolean](LandPropertyInUKPage(srnGen.sample.value))
+    beRetrievable[Boolean](LandPropertyInUKPage(srnGen.sample.value, index))
 
-    beRemovable[Boolean](LandPropertyInUKPage(srnGen.sample.value))
+    beSettable[Boolean](LandPropertyInUKPage(srnGen.sample.value, index))
+
+    beRemovable[Boolean](LandPropertyInUKPage(srnGen.sample.value, index))
   }
 }
