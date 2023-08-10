@@ -23,11 +23,13 @@ import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
 import models.IdentityType.{Individual, Other, UKCompany, UKPartnership}
 import models.{IdentitySubject, NormalMode}
+import play.api.test.FakeRequest
 import views.html.RadioListView
 
 class IdentityTypeControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[OneTo9999999](1)
+  val allowedAccessRequest = allowedAccessRequestGen(FakeRequest()).sample.value
 
   // TODO for all identity subjects
 
@@ -43,10 +45,9 @@ class IdentityTypeControllerSpec extends ControllerBaseSpec {
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       val view = injected[RadioListView]
-
       view(
         form(injected[RadioListFormProvider], identitySubject),
-        viewModel(srn, index, NormalMode, identitySubject)
+        viewModel(srn, index, NormalMode, identitySubject, defaultUserAnswers)
       )
     })
 

@@ -22,18 +22,21 @@ import controllers.nonsipp.common.IdentityTypeController._
 import forms.RadioListFormProvider
 import models.IdentityType.{Individual, Other, UKCompany, UKPartnership}
 import models.SchemeId.Srn
-import models.{IdentitySubject, IdentityType, Mode, NormalMode}
+import models.requests.DataRequest
+import models.{IdentitySubject, IdentityType, Mode, NormalMode, UserAnswers}
 import navigation.Navigator
 import pages.nonsipp.common.IdentityTypePage
+import pages.nonsipp.landorproperty.LandPropertyInUKPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, AnyContentAsEmpty, MessagesControllerComponents}
 import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.FormUtils.FormOps
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, RadioListRowViewModel, RadioListViewModel}
 import views.html.RadioListView
+import viewmodels.implicits._
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
@@ -60,7 +63,7 @@ class IdentityTypeController @Inject()(
     Ok(
       view(
         form.fromUserAnswers(IdentityTypePage(srn, index, subject)),
-        viewModel(srn, index, mode, subject)
+        viewModel(srn, index, mode, subject, request.userAnswers)
       )
     )
   }
@@ -75,7 +78,9 @@ class IdentityTypeController @Inject()(
     form
       .bindFromRequest()
       .fold(
-        formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode, subject)))),
+        formWithErrors =>
+          Future
+            .successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode, subject, request.userAnswers)))),
         answer => {
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(IdentityTypePage(srn, index, subject), answer))
@@ -104,11 +109,22 @@ object IdentityTypeController {
     srn: Srn,
     index: Max9999999,
     mode: Mode,
-    subject: IdentitySubject
-  ): FormPageViewModel[RadioListViewModel] =
+    subject: IdentitySubject,
+    userAnswers: UserAnswers
+  ): FormPageViewModel[RadioListViewModel] = {
+    val text = subject match {
+      case IdentitySubject.LoanRecipient => ""
+      case IdentitySubject.LandOrPropertySeller => {
+        // TODO from address instead of LandPropertyInUKPage
+        userAnswers.get(LandPropertyInUKPage(srn)) match {
+          case Some(value) => value.toString
+          case None => "" // TODO
+        }
+      }
+    }
     FormPageViewModel(
       Message(s"${subject.key}.identityType.title"),
-      Message(s"${subject.key}.identityType.heading"),
+      Message(s"${subject.key}.identityType.heading", text),
       RadioListViewModel(
         None,
         radioListItems(subject)
@@ -116,4 +132,5 @@ object IdentityTypeController {
       controllers.nonsipp.common.routes.IdentityTypeController
         .onSubmit(srn, index, mode, subject)
     )
+  }
 }

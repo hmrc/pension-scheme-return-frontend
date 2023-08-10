@@ -34,7 +34,8 @@ case class IdentityTypePage(srn: Srn, index: Max9999999, identitySubject: Identi
   override def path: JsPath = identitySubject match {
     case IdentitySubject.LoanRecipient =>
       Paths.loanTransactions \ "recipientIdentityType" \ toString \ index.arrayIndex.toString
-    case IdentitySubject.LandOrPropertySeller => JsPath \ "TODO"
+    case IdentitySubject.LandOrPropertySeller =>
+      JsPath \ "assets" \ "landOrProperty" \ "landOrPropertyTransactions" \ "heldPropertyTransaction" \ "propertyAcquiredFrom" \ "sellerIdentityType" \ toString \ index.arrayIndex.toString
   }
 
   override def toString: String = "identityTypes"
@@ -76,12 +77,11 @@ case class IdentityTypePage(srn: Srn, index: Max9999999, identitySubject: Identi
     }
 }
 
-// TODO add enum
 case class IdentityTypes(srn: Srn, identitySubject: IdentitySubject) extends QuestionPage[Map[String, IdentityType]] {
   override def path: JsPath = identitySubject match {
     case IdentitySubject.LoanRecipient => Paths.loanTransactions \ "recipientIdentityType" \ toString
-    case _ => JsPath \ "TODO"
+    case IdentitySubject.LandOrPropertySeller =>
+      JsPath \ "assets" \ "landOrProperty" \ "landOrPropertyTransactions" \ "heldPropertyTransaction" \ "propertyAcquiredFrom" \ "sellerIdentityType" \ toString
   }
-
   override def toString: String = "identityTypes"
 }
