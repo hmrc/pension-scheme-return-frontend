@@ -19,7 +19,7 @@ package controllers.nonsipp.loansmadeoroutstanding
 import cats.implicits._
 import com.google.inject.Inject
 import config.Constants.maxLoans
-import config.Refined.{Max5000, OneTo5000}
+import config.Refined.Max5000
 import controllers.PSRController
 import controllers.actions._
 import controllers.nonsipp.loansmadeoroutstanding.LoansListController._
@@ -89,12 +89,12 @@ class LoansListController @Inject()(
 
   private def loanRecipients(
     srn: Srn
-  )(implicit request: DataRequest[_]): Either[Result, List[(Refined[Int, OneTo5000], String, Money)]] = {
+  )(implicit request: DataRequest[_]): Either[Result, List[(Refined[Int, Max5000.Refined], String, Money)]] = {
     val whoReceivedLoans = request.userAnswers
       .map(IdentityTypes(srn, IdentitySubject.LoanRecipient))
       .map {
         case (key, value) =>
-          key.toIntOption.flatMap(k => refineV[OneTo5000](k + 1).toOption.map(_ -> value))
+          key.toIntOption.flatMap(k => refineV[Max5000.Refined](k + 1).toOption.map(_ -> value))
       }
       .toList
 

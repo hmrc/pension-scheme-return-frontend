@@ -32,7 +32,6 @@ class WhyDoesSchemeHoldLandPropertyControllerSpec extends ControllerBaseSpec {
   lazy val onPageLoad = routes.WhyDoesSchemeHoldLandPropertyController.onPageLoad(srn, index, NormalMode)
   lazy val onSubmit = routes.WhyDoesSchemeHoldLandPropertyController.onSubmit(srn, index, NormalMode)
 
-  val address = Address("addressLine1", "addressLine2", None, None, None, "UK")
   private val userAnswersWithLookUpPage =
     defaultUserAnswers.unsafeSet(LandOrPropertyAddressLookupPage(srn, index), address)
 
@@ -40,7 +39,10 @@ class WhyDoesSchemeHoldLandPropertyControllerSpec extends ControllerBaseSpec {
 
     act.like(renderView(onPageLoad, userAnswersWithLookUpPage) { implicit app => implicit request =>
       injected[RadioListView]
-        .apply(form(injected[RadioListFormProvider]), viewModel(srn, index, schemeName, "addressLine1", NormalMode))
+        .apply(
+          form(injected[RadioListFormProvider]),
+          viewModel(srn, index, schemeName, address.addressLine1, NormalMode)
+        )
     })
 
     act.like(
@@ -53,7 +55,7 @@ class WhyDoesSchemeHoldLandPropertyControllerSpec extends ControllerBaseSpec {
         injected[RadioListView]
           .apply(
             form(injected[RadioListFormProvider]).fill(SchemeHoldLandProperty.Acquisition),
-            viewModel(srn, index, schemeName, "addressLine1", NormalMode)
+            viewModel(srn, index, schemeName, address.addressLine1, NormalMode)
           )
       }
     )
