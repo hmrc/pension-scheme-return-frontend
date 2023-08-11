@@ -16,38 +16,49 @@
 
 package controllers.nonsipp.landorproperty
 
+import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.landorproperty.LandPropertyIndependentValuationController._
+import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
-import models.NormalMode
-import pages.nonsipp.landorproperty.LandPropertyIndependentValuationPage
+import models.{Address, NormalMode}
+import pages.nonsipp.landorproperty.{LandOrPropertyAddressLookupPage, LandPropertyIndependentValuationPage}
 import views.html.YesNoPageView
 
 class LandPropertyIndependentValuationControllerSpec extends ControllerBaseSpec {
 
-  private lazy val onPageLoad = routes.LandPropertyIndependentValuationController.onPageLoad(srn, NormalMode)
-  private lazy val onSubmit = routes.LandPropertyIndependentValuationController.onSubmit(srn, NormalMode)
+  private val index = refineMV[OneTo5000](1)
+
+  private lazy val onPageLoad = routes.LandPropertyIndependentValuationController.onPageLoad(srn, index, NormalMode)
+  private lazy val onSubmit = routes.LandPropertyIndependentValuationController.onSubmit(srn, index, NormalMode)
+
+  val address = Address("addressLine1", "addressLine2", None, None, None, "UK")
+  private val userAnswersWithLookUpPage =
+    defaultUserAnswers.unsafeSet(LandOrPropertyAddressLookupPage(srn, index), address)
 
   "LandPropertyIndependentValuationController" - {
 
-    act.like(renderView(onPageLoad) { implicit app => implicit request =>
-      injected[YesNoPageView].apply(form(injected[YesNoPageFormProvider]), viewModel(srn, NormalMode))
+    act.like(renderView(onPageLoad, userAnswersWithLookUpPage) { implicit app => implicit request =>
+      injected[YesNoPageView]
+        .apply(form(injected[YesNoPageFormProvider]), viewModel(srn, index, "addressLine1", NormalMode))
     })
 
-    act.like(renderPrePopView(onPageLoad, LandPropertyIndependentValuationPage(srn), true) {
-      implicit app => implicit request =>
-        injected[YesNoPageView]
-          .apply(form(injected[YesNoPageFormProvider]).fill(true), viewModel(srn, NormalMode))
-    })
+    act.like(
+      renderPrePopView(onPageLoad, LandPropertyIndependentValuationPage(srn, index), true, userAnswersWithLookUpPage) {
+        implicit app => implicit request =>
+          injected[YesNoPageView]
+            .apply(form(injected[YesNoPageFormProvider]).fill(true), viewModel(srn, index, "addressLine1", NormalMode))
+      }
+    )
 
-    act.like(redirectNextPage(onSubmit, "value" -> "true"))
+    act.like(redirectNextPage(onSubmit, userAnswersWithLookUpPage, "value" -> "true"))
     act.like(redirectNextPage(onSubmit, "value" -> "false"))
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
-    act.like(saveAndContinue(onSubmit, "value" -> "true"))
+    act.like(saveAndContinue(onSubmit, userAnswersWithLookUpPage, "value" -> "true"))
 
-    act.like(invalidForm(onSubmit))
+    act.like(invalidForm(onSubmit, userAnswersWithLookUpPage))
 
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit " + _))
   }

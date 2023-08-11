@@ -16,6 +16,8 @@
 
 package pages.nonsipp.landorproperty
 
+import config.Refined.{Max5000, OneTo5000}
+import eu.timepit.refined.refineMV
 import pages.behaviours.PageBehaviours
 
 class LandPropertyIndependentValuationPageSpec extends PageBehaviours {
@@ -23,11 +25,12 @@ class LandPropertyIndependentValuationPageSpec extends PageBehaviours {
   "LandPropertyIndependentValuationPage" - {
 
     val srn = srnGen.sample.value
+    val index = refineMV[OneTo5000](1)
 
-    beRetrievable[Boolean](LandPropertyIndependentValuationPage(srn))
+    beRetrievable[Boolean](LandPropertyIndependentValuationPage(srn, index))
 
-    beSettable[Boolean](LandPropertyIndependentValuationPage(srn))
+    beSettable[Boolean](LandPropertyIndependentValuationPage(srn, index))
 
-    beRemovable[Boolean](LandPropertyIndependentValuationPage(srn))
+    beRemovable[Boolean](LandPropertyIndependentValuationPage(srn, index))
   }
 }

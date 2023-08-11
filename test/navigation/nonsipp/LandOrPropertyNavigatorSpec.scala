@@ -98,20 +98,22 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
     act.like(
       normalmode
-        .navigateToWithData(
+        .navigateToWithDataAndIndex(
+          index,
           LandPropertyIndependentValuationPage,
           Gen.const(true),
-          (_, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          (srn, index: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
         )
         .withName("go from land property independent valuation page to unauthorised page when yes selected")
     )
 
     act.like(
       normalmode
-        .navigateToWithData(
+        .navigateToWithDataAndIndex(
+          index,
           LandPropertyIndependentValuationPage,
           Gen.const(false),
-          (_, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          (srn, index: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
         )
         .withName("go from land property independent valuation page to unauthorised page when no selected")
     )

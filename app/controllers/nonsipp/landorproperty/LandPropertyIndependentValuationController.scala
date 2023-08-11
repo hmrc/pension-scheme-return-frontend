@@ -16,18 +16,19 @@
 
 package controllers.nonsipp.landorproperty
 
+import config.Refined.Max5000
+import controllers.PSRController
 import controllers.actions._
 import controllers.nonsipp.landorproperty.LandPropertyIndependentValuationController._
 import forms.YesNoPageFormProvider
 import models.Mode
 import models.SchemeId.Srn
 import navigation.Navigator
-import pages.nonsipp.landorproperty.LandPropertyIndependentValuationPage
+import pages.nonsipp.landorproperty.{LandOrPropertyAddressLookupPage, LandPropertyIndependentValuationPage}
 import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
@@ -45,27 +46,34 @@ class LandPropertyIndependentValuationController @Inject()(
   val controllerComponents: MessagesControllerComponents,
   view: YesNoPageView
 )(implicit ec: ExecutionContext)
-    extends FrontendBaseController
-    with I18nSupport {
+    extends PSRController {
 
   private val form = LandPropertyIndependentValuationController.form(formProvider)
 
-  def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    val preparedForm = request.userAnswers.fillForm(LandPropertyIndependentValuationPage(srn), form)
-    Ok(view(preparedForm, viewModel(srn, mode)))
+  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+    implicit request =>
+      request.userAnswers.get(LandOrPropertyAddressLookupPage(srn, index)).getOrRecoverJourney { address =>
+        val preparedForm = request.userAnswers.fillForm(LandPropertyIndependentValuationPage(srn, index), form)
+        Ok(view(preparedForm, viewModel(srn, index, address.addressLine1, mode)))
+      }
   }
 
-  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
-    form
-      .bindFromRequest()
-      .fold(
-        formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, mode)))),
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(LandPropertyIndependentValuationPage(srn), value))
-            _ <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage(LandPropertyIndependentValuationPage(srn), mode, updatedAnswers))
-      )
+  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+    implicit request =>
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors =>
+            request.userAnswers.get(LandOrPropertyAddressLookupPage(srn, index)).getOrRecoverJourney { address =>
+              Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, address.addressLine1, mode))))
+            },
+          value =>
+            for {
+              updatedAnswers <- Future
+                .fromTry(request.userAnswers.set(LandPropertyIndependentValuationPage(srn, index), value))
+              _ <- saveService.save(updatedAnswers)
+            } yield Redirect(navigator.nextPage(LandPropertyIndependentValuationPage(srn, index), mode, updatedAnswers))
+        )
   }
 }
 
@@ -74,10 +82,10 @@ object LandPropertyIndependentValuationController {
     "landPropertyIndependentValuation.error.required"
   )
 
-  def viewModel(srn: Srn, mode: Mode): FormPageViewModel[YesNoPageViewModel] =
+  def viewModel(srn: Srn, index: Max5000, addressLine1: String, mode: Mode): FormPageViewModel[YesNoPageViewModel] =
     YesNoPageViewModel(
       "landPropertyIndependentValuation.title",
-      Message("landPropertyIndependentValuation.heading", "1 Street Road"),
-      routes.LandPropertyIndependentValuationController.onSubmit(srn, mode)
+      Message("landPropertyIndependentValuation.heading", addressLine1),
+      routes.LandPropertyIndependentValuationController.onSubmit(srn, index, mode)
     )
 }

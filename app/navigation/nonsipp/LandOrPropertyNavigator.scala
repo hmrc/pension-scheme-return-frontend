@@ -43,7 +43,7 @@ object LandOrPropertyNavigator extends JourneyNavigator {
     case LandOrPropertyAddressLookupPage(srn, index) =>
       controllers.routes.UnauthorisedController.onPageLoad()
 
-    case page @ LandPropertyIndependentValuationPage(srn) =>
+    case page @ LandPropertyIndependentValuationPage(srn, index) =>
       if (userAnswers.get(page).contains(true)) {
         controllers.routes.UnauthorisedController.onPageLoad()
       } else {
