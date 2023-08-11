@@ -51,7 +51,8 @@ object LandOrPropertyNavigator extends JourneyNavigator {
         case _ => controllers.routes.UnauthorisedController.onPageLoad()
       }
 
-    case LandOrPropertyTotalCostPage(srn, index) => controllers.routes.UnauthorisedController.onPageLoad()
+    case LandOrPropertyTotalCostPage(srn, index) =>
+      controllers.nonsipp.landorproperty.routes.IsLandOrPropertyResidentialController.onPageLoad(srn, index, NormalMode)
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty
