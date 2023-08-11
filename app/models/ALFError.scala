@@ -14,17 +14,10 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.loansmadeoroutstanding
+package models
 
-import config.Refined.Max9999999
-import models.SchemeId.Srn
-import pages.QuestionPage
-import play.api.libs.json.JsPath
-import utils.RefinedUtils.RefinedIntOps
+sealed trait ALFError
 
-case class PartnershipRecipientNamePage(srn: Srn, index: Max9999999) extends QuestionPage[String] {
-
-  override def path: JsPath = Paths.loanTransactions \ "recipientIdentityType" \ toString \ index.arrayIndex.toString
-
-  override def toString: String = "partnershipRecipientName"
-}
+case object AddressNotFound extends ALFError
+case object AddressMalformed extends ALFError
+case object UnexpectedFailure extends ALFError

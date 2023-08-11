@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.loansmadeoroutstanding
+package pages.nonsipp.landorproperty
 
-import config.Refined.Max9999999
+import config.Refined.Max5000
+import models.{ALFAddress, Address}
 import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
 
-case class PartnershipRecipientNamePage(srn: Srn, index: Max9999999) extends QuestionPage[String] {
+case class LandOrPropertyAddressLookupPage(srn: Srn, index: Max5000) extends QuestionPage[Address] {
 
-  override def path: JsPath = Paths.loanTransactions \ "recipientIdentityType" \ toString \ index.arrayIndex.toString
+  override def path: JsPath =
+    JsPath \ "assets" \ "landOrProperty" \ "landOrPropertyTransactions" \ "propertyDetails" \ "addressDetails" \ toString \ index.arrayIndex.toString
 
-  override def toString: String = "partnershipRecipientName"
+  override def toString: String = "landOrPropertyHeld"
 }

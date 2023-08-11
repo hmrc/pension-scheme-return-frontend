@@ -24,7 +24,7 @@ import utils.RefinedUtils.RefinedIntOps
 
 case class IndividualRecipientNamePage(srn: Srn, index: Max9999999) extends QuestionPage[String] {
 
-  override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString
+  override def path: JsPath = Paths.loanTransactions \ "loanRecipientName" \ toString \ index.arrayIndex.toString
 
-  override def toString: String = "individualRecipientName"
+  override def toString: String = "individual"
 }

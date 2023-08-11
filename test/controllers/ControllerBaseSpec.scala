@@ -84,7 +84,7 @@ trait ControllerBaseSpec
   def formData[A](form: Form[A], data: A): List[(String, String)] = form.fill(data).data.toList
 
   implicit class UserAnswersOps(ua: UserAnswers) {
-    def unsafeSet[A: Writes](page: Settable[A], value: A): UserAnswers = ua.set(page, value).success.value
+    def unsafeSet[A: Writes](page: Settable[A], value: A): UserAnswers = ua.set(page, value).get
   }
 }
 

@@ -40,7 +40,7 @@ class FeesCommissionsWagesSalariesControllerSpec extends ControllerBaseSpec {
       injected[MoneyView].apply(viewModel(srn, schemeName, moneyForm, NormalMode))
     })
 
-    act.like(renderPrePopView(onPageLoad, FeesCommissionsWagesSalariesPage(srn), validMoney) {
+    act.like(renderPrePopView(onPageLoad, FeesCommissionsWagesSalariesPage(srn, NormalMode), validMoney) {
       implicit app => implicit request =>
         injected[MoneyView].apply(viewModel(srn, schemeName, moneyForm.fill(validMoney), NormalMode))
     })

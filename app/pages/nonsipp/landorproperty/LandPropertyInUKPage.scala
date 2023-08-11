@@ -16,13 +16,15 @@
 
 package pages.nonsipp.landorproperty
 
+import config.Refined.Max5000
 import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
+import utils.RefinedUtils.RefinedIntOps
 
-case class LandPropertyInUKPage(srn: Srn) extends QuestionPage[Boolean] {
+case class LandPropertyInUKPage(srn: Srn, index: Max5000) extends QuestionPage[Boolean] {
 
-  override def path: JsPath = JsPath \ toString
+  override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString
 
   override def toString: String = "landPropertyInUK"
 }

@@ -16,7 +16,7 @@
 
 package pages
 
-import models.MoneyInPeriod
+import models.{MoneyInPeriod, NormalMode}
 import pages.behaviours.PageBehaviours
 import pages.nonsipp.schemedesignatory.ValueOfAssetsPage
 
@@ -26,10 +26,10 @@ class ValueOfAssetsPageSpec extends PageBehaviours {
 
     val srn = srnGen.sample.value
 
-    beRetrievable[MoneyInPeriod](ValueOfAssetsPage(srn))
+    beRetrievable[MoneyInPeriod](ValueOfAssetsPage(srn, NormalMode))
 
-    beSettable[MoneyInPeriod](ValueOfAssetsPage(srn))
+    beSettable[MoneyInPeriod](ValueOfAssetsPage(srn, NormalMode))
 
-    beRemovable[MoneyInPeriod](ValueOfAssetsPage(srn))
+    beRemovable[MoneyInPeriod](ValueOfAssetsPage(srn, NormalMode))
   }
 }

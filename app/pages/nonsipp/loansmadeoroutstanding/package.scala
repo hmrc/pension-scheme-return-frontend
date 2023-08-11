@@ -14,17 +14,13 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.loansmadeoroutstanding
+package pages.nonsipp
 
-import config.Refined.Max9999999
-import models.SchemeId.Srn
-import pages.QuestionPage
-import play.api.libs.json.JsPath
-import utils.RefinedUtils.RefinedIntOps
+import play.api.libs.json._
 
-case class PartnershipRecipientNamePage(srn: Srn, index: Max9999999) extends QuestionPage[String] {
-
-  override def path: JsPath = Paths.loanTransactions \ "recipientIdentityType" \ toString \ index.arrayIndex.toString
-
-  override def toString: String = "partnershipRecipientName"
+package object loansmadeoroutstanding {
+  object Paths {
+    val loans: JsPath = __ \ "loans"
+    val loanTransactions: JsPath = loans \ "loanTransactions"
+  }
 }

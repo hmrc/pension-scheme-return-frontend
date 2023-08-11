@@ -51,9 +51,9 @@ class NonSippNavigator @Inject()() extends Navigator {
           nonsipp.accountingperiod.routes.AccountingPeriodController.onPageLoad(srn, refineMV(1), NormalMode)
         }
 
-      case HowMuchCashPage(srn) => nonsipp.schemedesignatory.routes.ValueOfAssetsController.onPageLoad(srn, NormalMode)
-      case ValueOfAssetsPage(srn) =>
-        nonsipp.schemedesignatory.routes.FeesCommissionsWagesSalariesController.onPageLoad(srn, NormalMode)
+      case HowMuchCashPage(srn, mode) => nonsipp.schemedesignatory.routes.ValueOfAssetsController.onPageLoad(srn, mode)
+      case ValueOfAssetsPage(srn, mode) =>
+        nonsipp.schemedesignatory.routes.FeesCommissionsWagesSalariesController.onPageLoad(srn, mode)
       case FinancialDetailsCheckYourAnswersPage(srn) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
 
       case page @ HowManyMembersPage(srn, PsaId(_)) =>
@@ -81,6 +81,14 @@ class NonSippNavigator @Inject()() extends Navigator {
         }
 
       case HowManyMembersPage(_, _) => controllers.routes.UnauthorisedController.onPageLoad()
+
+      case HowMuchCashPage(srn, mode) =>
+        nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController.onPageLoad(srn, mode)
+      case ValueOfAssetsPage(srn, mode) =>
+        nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController.onPageLoad(srn, mode)
+      case FinancialDetailsCheckYourAnswersPage(srn) =>
+        controllers.nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController
+          .onPageLoad(srn, NormalMode)
     }
   }
 

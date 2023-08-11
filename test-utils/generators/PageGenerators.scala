@@ -32,5 +32,5 @@ trait PageGenerators {
     Arbitrary(ModelGenerators.srnGen.map(AccountingPeriodPage(_, refineMV(1), NormalMode)))
 
   implicit lazy val arbitraryHowMuchCashPage: Arbitrary[HowMuchCashPage] =
-    Arbitrary(ModelGenerators.srnGen.map(HowMuchCashPage))
+    Arbitrary(ModelGenerators.srnGen.map(HowMuchCashPage(_, NormalMode)))
 }

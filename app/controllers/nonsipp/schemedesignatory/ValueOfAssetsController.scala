@@ -25,9 +25,9 @@ import forms.MoneyFormProvider
 import forms.mappings.errors.MoneyFormErrors
 import models.SchemeId.Srn
 import models.requests.DataRequest
-import models.{DateRange, Mode, Money}
+import models.{CheckMode, DateRange, Mode, Money, NormalMode}
 import navigation.Navigator
-import pages.nonsipp.schemedesignatory.ValueOfAssetsPage
+import pages.nonsipp.schemedesignatory.{FinancialDetailsCheckYourAnswersPage, ValueOfAssetsPage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -64,7 +64,7 @@ class ValueOfAssetsController @Inject()(
         mode,
         request.schemeDetails.schemeName,
         period,
-        request.userAnswers.fillForm(ValueOfAssetsPage(srn), form)
+        request.userAnswers.fillForm(ValueOfAssetsPage(srn, mode), form)
       )
 
       Ok(view(viewModel))
@@ -86,9 +86,16 @@ class ValueOfAssetsController @Inject()(
           },
           value =>
             for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.transformAndSet(ValueOfAssetsPage(srn), value))
+              updatedAnswers <- Future.fromTry(request.userAnswers.transformAndSet(ValueOfAssetsPage(srn, mode), value))
               _ <- saveService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(ValueOfAssetsPage(srn), mode, updatedAnswers))
+            } yield {
+              mode match {
+                case CheckMode =>
+                  Redirect(navigator.nextPage(FinancialDetailsCheckYourAnswersPage(srn), mode, request.userAnswers))
+                case NormalMode =>
+                  Redirect(navigator.nextPage(ValueOfAssetsPage(srn, mode), mode, updatedAnswers))
+              }
+            }
         )
     }
   }

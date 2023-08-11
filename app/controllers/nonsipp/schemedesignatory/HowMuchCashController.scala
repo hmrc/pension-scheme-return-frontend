@@ -25,9 +25,9 @@ import forms.MoneyFormProvider
 import forms.mappings.errors.MoneyFormErrors
 import models.SchemeId.Srn
 import models.requests.DataRequest
-import models.{DateRange, Mode, Money}
+import models.{CheckMode, DateRange, Mode, Money, NormalMode}
 import navigation.Navigator
-import pages.nonsipp.schemedesignatory.HowMuchCashPage
+import pages.nonsipp.schemedesignatory.{FinancialDetailsCheckYourAnswersPage, HowMuchCashPage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -64,7 +64,7 @@ class HowMuchCashController @Inject()(
         mode,
         request.schemeDetails.schemeName,
         period,
-        request.userAnswers.fillForm(HowMuchCashPage(srn), form)
+        request.userAnswers.fillForm(HowMuchCashPage(srn, mode), form)
       )
 
       Ok(view(viewModel))
@@ -86,9 +86,16 @@ class HowMuchCashController @Inject()(
           },
           value =>
             for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.transformAndSet(HowMuchCashPage(srn), value))
+              updatedAnswers <- Future.fromTry(request.userAnswers.transformAndSet(HowMuchCashPage(srn, mode), value))
               _ <- saveService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(HowMuchCashPage(srn), mode, updatedAnswers))
+            } yield {
+              mode match {
+                case CheckMode =>
+                  Redirect(navigator.nextPage(FinancialDetailsCheckYourAnswersPage(srn), mode, request.userAnswers))
+                case NormalMode =>
+                  Redirect(navigator.nextPage(HowMuchCashPage(srn, mode), mode, updatedAnswers))
+              }
+            }
         )
     }
   }

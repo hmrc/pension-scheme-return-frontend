@@ -29,9 +29,9 @@ import scala.util.Try
 
 case class WhoReceivedLoanPage(srn: Srn, index: Max9999999) extends QuestionPage[ReceivedLoanType] {
 
-  override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString
+  override def path: JsPath = Paths.loanTransactions \ "recipientIdentityType" \ toString \ index.arrayIndex.toString
 
-  override def toString: String = "whoReceivedLoan"
+  override def toString: String = "whoReceivedLoans"
 
   private def pages(srn: Srn): List[Removable[_]] = pagesFirstPart(srn) ++ List(
     DatePeriodLoanPage(srn, index),
@@ -64,13 +64,13 @@ case class WhoReceivedLoanPage(srn: Srn, index: Max9999999) extends QuestionPage
       case (Some(ReceivedLoanType.UKCompany), _) => removePages(userAnswers, pagesFirstPart(srn))
       case (Some(ReceivedLoanType.UKPartnership), _) => removePages(userAnswers, pagesFirstPart(srn))
       case (Some(ReceivedLoanType.Other), _) => removePages(userAnswers, pagesFirstPart(srn))
-      case (Some(any), _) => Try(userAnswers)
+      case (Some(_), _) => Try(userAnswers)
       case (None, _) => removePages(userAnswers, pages(srn))
     }
 }
 
 case class WhoReceivedLoans(srn: Srn) extends QuestionPage[Map[String, ReceivedLoanType]] {
-  override def path: JsPath = JsPath \ toString
+  override def path: JsPath = Paths.loanTransactions \ "recipientIdentityType" \ toString
 
-  override def toString: String = "whoReceivedLoan"
+  override def toString: String = "whoReceivedLoans"
 }

@@ -26,6 +26,12 @@ import pages.nonsipp.landorproperty.{
   WhatYouWillNeedLandOrPropertyPage,
   WhyDoesSchemeHoldLandPropertyPage
 }
+
+import eu.timepit.refined.refineMV
+import models.{NormalMode, UserAnswers}
+import navigation.JourneyNavigator
+import pages.Page
+import pages.nonsipp.landorproperty._
 import play.api.mvc.Call
 
 object LandOrPropertyNavigator extends JourneyNavigator {
@@ -40,7 +46,7 @@ object LandOrPropertyNavigator extends JourneyNavigator {
       }
 
     case WhatYouWillNeedLandOrPropertyPage(srn) =>
-      controllers.nonsipp.landorproperty.routes.LandPropertyInUKController.onPageLoad(srn, NormalMode)
+      controllers.nonsipp.landorproperty.routes.LandPropertyInUKController.onPageLoad(srn, refineMV(1), NormalMode)
 
     case page @ LandPropertyInUKPage(srn) =>
       if (userAnswers.get(page).contains(true)) {
@@ -50,6 +56,12 @@ object LandOrPropertyNavigator extends JourneyNavigator {
       }
 
     case WhyDoesSchemeHoldLandPropertyPage(_, _) =>
+
+    case LandPropertyInUKPage(srn, index) =>
+      controllers.nonsipp.landorproperty.routes.LandOrPropertyAddressLookupController.onPageLoad(srn, index)
+
+    case LandOrPropertyAddressLookupPage(srn, index) =>
+
       controllers.routes.UnauthorisedController.onPageLoad()
   }
 

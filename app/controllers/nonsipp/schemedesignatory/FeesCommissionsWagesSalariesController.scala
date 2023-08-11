@@ -22,9 +22,9 @@ import controllers.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesControl
 import forms.MoneyFormProvider
 import forms.mappings.errors.MoneyFormErrors
 import models.SchemeId.Srn
-import models.{Mode, Money}
+import models.{CheckMode, Mode, Money, NormalMode}
 import navigation.Navigator
-import pages.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesPage
+import pages.nonsipp.schemedesignatory.{FeesCommissionsWagesSalariesPage, FinancialDetailsCheckYourAnswersPage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -54,7 +54,7 @@ class FeesCommissionsWagesSalariesController @Inject()(
   private val form = FeesCommissionsWagesSalariesController.form(formProvider)
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    val preparedForm = request.userAnswers.fillForm(FeesCommissionsWagesSalariesPage(srn), form)
+    val preparedForm = request.userAnswers.fillForm(FeesCommissionsWagesSalariesPage(srn, mode), form)
     Ok(view(viewModel(srn, request.schemeDetails.schemeName, preparedForm, mode)))
   }
 
@@ -66,9 +66,17 @@ class FeesCommissionsWagesSalariesController @Inject()(
           Future.successful(BadRequest(view(viewModel(srn, request.schemeDetails.schemeName, formWithErrors, mode)))),
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(FeesCommissionsWagesSalariesPage(srn), value))
+            updatedAnswers <- Future
+              .fromTry(request.userAnswers.set(FeesCommissionsWagesSalariesPage(srn, mode), value))
             _ <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage(FeesCommissionsWagesSalariesPage(srn), mode, updatedAnswers))
+          } yield {
+            mode match {
+              case CheckMode =>
+                Redirect(navigator.nextPage(FinancialDetailsCheckYourAnswersPage(srn), mode, request.userAnswers))
+              case NormalMode =>
+                Redirect(navigator.nextPage(FeesCommissionsWagesSalariesPage(srn, mode), mode, updatedAnswers))
+            }
+          }
       )
   }
 }
