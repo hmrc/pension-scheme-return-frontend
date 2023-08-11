@@ -23,7 +23,8 @@ import play.api.libs.json.JsPath
 case class LandPropertyIndependentValuationPage(srn: Srn) extends QuestionPage[Boolean] {
 
   override def path: JsPath =
-    JsPath \ "shares" \ "shareTransactions" \ "heldSharesTransaction" \ toString
+    JsPath \ "assets" \ "landOrProperty" \ "landOrPropertyTransactions" \ "heldPropertyTransaction" \ toString
 
-  override def toString: String = "supportedByIndepValuation"
+  override def toString: String = "indepValuationSupport"
+
 }
