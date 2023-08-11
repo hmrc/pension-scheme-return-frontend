@@ -42,6 +42,13 @@ object LandOrPropertyNavigator extends JourneyNavigator {
 
     case LandOrPropertyAddressLookupPage(srn, index) =>
       controllers.routes.UnauthorisedController.onPageLoad()
+
+    case page @ LandPropertyIndependentValuationPage(srn) =>
+      if (userAnswers.get(page).contains(true)) {
+        controllers.routes.UnauthorisedController.onPageLoad()
+      } else {
+        controllers.routes.UnauthorisedController.onPageLoad()
+      }
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty

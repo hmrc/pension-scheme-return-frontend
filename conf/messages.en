@@ -927,3 +927,7 @@ landOrPropertyAddressLookup.chooseAddress.searchAgain.link = Search again
 landOrPropertyAddressLookup.confirmAddress.title = Review and confirm the address
 landOrPropertyAddressLookup.confirmAddress.heading = Review and confirm the address
 landOrPropertyAddressLookup.confirmAddress.change.link = Edit the address
+
+landPropertyIndependentValuation.title = Was the transaction supported by an independent valuation?
+landPropertyIndependentValuation.heading = Was the transaction for {0} supported by an independent valuation?
+landPropertyIndependentValuation.error.required = Select yes if the transaction was supported by an independent valuation

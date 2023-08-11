@@ -20,7 +20,12 @@ import config.Refined.{Max5000, OneTo5000, OneTo9999999}
 import eu.timepit.refined.refineMV
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.landorproperty.{LandOrPropertyHeldPage, LandPropertyInUKPage, WhatYouWillNeedLandOrPropertyPage}
+import pages.nonsipp.landorproperty.{
+  LandOrPropertyHeldPage,
+  LandPropertyInUKPage,
+  LandPropertyIndependentValuationPage,
+  WhatYouWillNeedLandOrPropertyPage
+}
 import utils.BaseSpec
 
 class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
@@ -86,6 +91,29 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           controllers.nonsipp.landorproperty.routes.LandPropertyInUKController.onPageLoad
         )
         .withName("go from what you will need Land or Property page to Unauthorised page")
+    )
+  }
+
+  "LandPropertyIndependentValuationNavigator" - {
+
+    act.like(
+      normalmode
+        .navigateToWithData(
+          LandPropertyIndependentValuationPage,
+          Gen.const(true),
+          (_, _) => controllers.routes.UnauthorisedController.onPageLoad()
+        )
+        .withName("go from land property independent valuation page to unauthorised page when yes selected")
+    )
+
+    act.like(
+      normalmode
+        .navigateToWithData(
+          LandPropertyIndependentValuationPage,
+          Gen.const(false),
+          (_, _) => controllers.routes.UnauthorisedController.onPageLoad()
+        )
+        .withName("go from land property independent valuation page to unauthorised page when no selected")
     )
   }
 }
