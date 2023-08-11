@@ -26,5 +26,5 @@ case class LandPropertyInUKPage(srn: Srn, index: Max5000) extends QuestionPage[B
 
   override def path: JsPath = JsPath\ "assets" \ "landOrProperty" \ "landOrPropertyTransactions" \ "propertyDetails" \ toString \ index.arrayIndex.toString
 
-  override def toString: String = "landPropertyInUK"
+  override def toString: String = "landOrPropertyInUK"
 }
