@@ -22,10 +22,12 @@ import models.{CheckOrChange, NormalMode, ReceivedLoanType, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.loansmadeoroutstanding._
+import models.ConditionalYesNo._
 import play.api.mvc.Call
 
 object LoansMadeOrOutstandingNavigator extends JourneyNavigator {
 
+  // scalastyle:off
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
     case page @ LoansMadeOrOutstandingPage(srn) =>
       if (userAnswers.get(page).contains(true)) {
@@ -36,8 +38,14 @@ object LoansMadeOrOutstandingNavigator extends JourneyNavigator {
       }
 
     case WhatYouWillNeedLoansPage(srn) =>
-      controllers.nonsipp.loansmadeoroutstanding.routes.WhoReceivedLoanController
-        .onPageLoad(srn, refineMV(1), NormalMode)
+      // if final loans page was completed, route user to loans list page
+      userAnswers.get(OutstandingArrearsOnLoanPage(srn, refineMV(1))) match {
+        case Some(_) =>
+          controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController.onPageLoad(srn, NormalMode)
+        case None =>
+          controllers.nonsipp.loansmadeoroutstanding.routes.WhoReceivedLoanController
+            .onPageLoad(srn, refineMV(1), NormalMode)
+      }
     case WhoReceivedLoanPage(srn, index) =>
       userAnswers.get(WhoReceivedLoanPage(srn, index)) match {
         case Some(ReceivedLoanType.Other) =>
@@ -129,6 +137,7 @@ object LoansMadeOrOutstandingNavigator extends JourneyNavigator {
         controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController.onPageLoad(srn, NormalMode)
       }
   }
+  // scalastyle:on
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty
 }

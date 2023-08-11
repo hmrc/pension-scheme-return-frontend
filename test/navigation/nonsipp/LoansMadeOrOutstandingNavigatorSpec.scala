@@ -18,11 +18,14 @@ package navigation.nonsipp
 
 import config.Refined.OneTo9999999
 import eu.timepit.refined.refineMV
-import models.{NormalMode, ReceivedLoanType}
+import models.{ConditionalYesNo, Money, NormalMode, ReceivedLoanType, UserAnswers}
+import models.ConditionalYesNo._
+import models.SchemeId.Srn
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.loansmadeoroutstanding._
 import utils.BaseSpec
+import utils.UserAnswersUtils.UserAnswersOps
 
 class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
@@ -83,6 +86,23 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
             controllers.nonsipp.loansmadeoroutstanding.routes.WhoReceivedLoanController.onPageLoad(_, index, _)
           )
           .withName("go from what you will need loans page to who received loan page")
+      )
+
+      val completedLoanUserAnswers: Srn => UserAnswers =
+        srn =>
+          defaultUserAnswers.unsafeSet(
+            OutstandingArrearsOnLoanPage(srn, refineMV(1)),
+            ConditionalYesNo.no[Unit, Money](())
+          )
+
+      act.like(
+        normalmode
+          .navigateTo(
+            WhatYouWillNeedLoansPage,
+            controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController.onPageLoad,
+            completedLoanUserAnswers
+          )
+          .withName("go from what you will need loans page to loans list page when a loan has aleady been completed")
       )
     }
 
