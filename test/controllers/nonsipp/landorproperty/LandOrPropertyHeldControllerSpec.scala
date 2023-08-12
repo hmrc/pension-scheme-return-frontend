@@ -20,7 +20,6 @@ import controllers.ControllerBaseSpec
 import controllers.nonsipp.landorproperty.LandOrPropertyHeldController._
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import pages.nonsipp.LandOrPropertyHeldPage
 import pages.nonsipp.landorproperty.LandOrPropertyHeldPage
 import views.html.YesNoPageView
 

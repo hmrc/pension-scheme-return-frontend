@@ -17,7 +17,7 @@
 package pages.nonsipp.landorproperty
 
 import config.Refined.Max5000
-import models.{ALFAddress, Address}
+import models.Address
 import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath

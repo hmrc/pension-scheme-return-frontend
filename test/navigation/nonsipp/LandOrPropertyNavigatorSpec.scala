@@ -16,11 +16,16 @@
 
 package navigation.nonsipp
 
-import config.Refined.{Max5000, OneTo5000, OneTo9999999}
+import config.Refined.{Max5000, OneTo5000}
 import eu.timepit.refined.refineMV
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.landorproperty.{LandOrPropertyHeldPage, LandPropertyInUKPage, WhatYouWillNeedLandOrPropertyPage}
+import pages.nonsipp.landorproperty.{
+  LandOrPropertyHeldPage,
+  LandOrPropertyWhenDidSchemeAcquirePage,
+  LandPropertyInUKPage,
+  WhatYouWillNeedLandOrPropertyPage
+}
 import utils.BaseSpec
 
 class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
@@ -74,9 +79,6 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         )
         .withName("go from land or property in uk page to land or property address lookup when no selected")
     )
-  }
-
-  "WhatYouWillNeedNavigator" - {
 
     act.like(
       normalmode
@@ -85,7 +87,17 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           (srn, _: Max5000) => WhatYouWillNeedLandOrPropertyPage(srn),
           controllers.nonsipp.landorproperty.routes.LandPropertyInUKController.onPageLoad
         )
-        .withName("go from what you will need Land or Property page to Unauthorised page")
+        .withName("go from what you will need Land or Property page to LandProperty In UK page")
+    )
+
+    act.like(
+      normalmode
+        .navigateToWithIndex(
+          index,
+          LandOrPropertyWhenDidSchemeAcquirePage,
+          (_, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+        )
+        .withName("go from land or property when did scheme acquire page to unauthorised page")
     )
   }
 }

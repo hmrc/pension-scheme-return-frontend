@@ -19,7 +19,6 @@ package navigation.nonsipp
 import com.google.inject.Singleton
 import controllers.nonsipp
 import controllers.nonsipp.routes
-import controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController
 import eu.timepit.refined.refineMV
 import models.PensionSchemeId.{PsaId, PspId}
 import models.{NormalMode, UserAnswers}
