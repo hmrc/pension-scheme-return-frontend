@@ -548,13 +548,21 @@ fileUploadErrorMissingInformation.bullet4.link = the template file
 fileUploadErrorMissingInformation.paragraph2 = Correct the errors and upload it again, or upload a different file.
 fileUploadErrorMissingInformation.button = Return to file upload
 
-whoReceivedLoan.title = Who received the loan?
-whoReceivedLoan.heading = Who received the loan?
-whoReceivedLoan.pageContent = An individual
-whoReceivedLoan.pageContent1 = A UK company
-whoReceivedLoan.pageContent2 = A UK partnership
-whoReceivedLoan.pageContent3 = Other
-whoReceivedLoan.error.required = Select who received the loan
+loanRecipient.identityType.title = Who received the loan?
+loanRecipient.identityType.heading = Who received the loan?
+loanRecipient.identityType.pageContent = An individual
+loanRecipient.identityType.pageContent1 = A UK company
+loanRecipient.identityType.pageContent2 = A UK partnership
+loanRecipient.identityType.pageContent3 = Other
+loanRecipient.identityType.error.required = Select who received the loan
+
+landOrPropertySeller.identityType.title = Who was the the property acquired from?
+landOrPropertySeller.identityType.heading = Who was the the property {0} acquired from?
+landOrPropertySeller.identityType.pageContent = An individual
+landOrPropertySeller.identityType.pageContent1 = A UK company
+landOrPropertySeller.identityType.pageContent2 = A UK partnership
+landOrPropertySeller.identityType.pageContent3 = Other
+landOrPropertySeller.identityType.error.required = Select who was the the property acquired from
 
 fileUploadErrorSummary.title = There is a problem with your member details file
 fileUploadErrorSummary.heading = There is a problem with your member details file

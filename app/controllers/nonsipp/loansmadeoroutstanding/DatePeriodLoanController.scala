@@ -18,7 +18,7 @@ package controllers.nonsipp.loansmadeoroutstanding
 
 import cats.implicits.toShow
 import config.Constants.{maxAssetValue, maxLoanPeriod}
-import config.Refined.Max9999999
+import config.Refined.Max5000
 import controllers.PSRController
 import controllers.actions._
 import forms.MultipleQuestionFormProvider
@@ -55,7 +55,7 @@ class DatePeriodLoanController @Inject()(
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
-  def onPageLoad(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
         Ok(
@@ -72,7 +72,7 @@ class DatePeriodLoanController @Inject()(
       }
   }
 
-  def onSubmit(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
         form(date.to)
@@ -130,7 +130,7 @@ object DatePeriodLoanController {
 
   def viewModel(
     srn: Srn,
-    index: Max9999999,
+    index: Max5000,
     schemeName: String,
     mode: Mode,
     form: Form[(LocalDate, Money, Int)]

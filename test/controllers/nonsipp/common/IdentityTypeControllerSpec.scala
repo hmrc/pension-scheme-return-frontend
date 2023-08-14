@@ -14,32 +14,40 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.loansmadeoroutstanding
+package controllers.nonsipp.common
 
-import config.Refined.OneTo9999999
+import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.loansmadeoroutstanding.WhoReceivedLoanController._
+import controllers.nonsipp.common.IdentityTypeController._
 import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
-import models.NormalMode
-import models.ReceivedLoanType.{Individual, Other, UKCompany, UKPartnership}
+import models.IdentityType.{Individual, Other, UKCompany, UKPartnership}
+import models.{IdentitySubject, NormalMode}
+import play.api.test.FakeRequest
 import views.html.RadioListView
 
-class WhoReceivedLoanControllerSpec extends ControllerBaseSpec {
+class IdentityTypeControllerSpec extends ControllerBaseSpec {
 
-  private val index = refineMV[OneTo9999999](1)
+  private val index = refineMV[OneTo5000](1)
+  val allowedAccessRequest = allowedAccessRequestGen(FakeRequest()).sample.value
 
-  private lazy val onPageLoad = routes.WhoReceivedLoanController.onPageLoad(srn, index, NormalMode)
-  private lazy val onSubmit = routes.WhoReceivedLoanController.onSubmit(srn, index, NormalMode)
+  // TODO for all identity subjects
 
-  "WhoReceivedLoanController" - {
+  val identitySubject: IdentitySubject = IdentitySubject.LoanRecipient
+  private lazy val onPageLoad =
+    controllers.nonsipp.common.routes.IdentityTypeController
+      .onPageLoad(srn, index, NormalMode, identitySubject)
+  private lazy val onSubmit =
+    controllers.nonsipp.common.routes.IdentityTypeController
+      .onSubmit(srn, index, NormalMode, identitySubject)
+
+  "IdentityTypeController" - {
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       val view = injected[RadioListView]
-
       view(
-        form(injected[RadioListFormProvider]),
-        viewModel(srn, index, NormalMode)
+        form(injected[RadioListFormProvider], identitySubject),
+        viewModel(srn, index, NormalMode, identitySubject, defaultUserAnswers)
       )
     })
 

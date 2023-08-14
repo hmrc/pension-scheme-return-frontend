@@ -17,14 +17,15 @@
 package controllers.nonsipp.loansmadeoroutstanding
 
 import cats.implicits.toShow
-import config.Refined.Max9999999
+import config.Refined.Max5000
 import controllers.actions._
 import controllers.nonsipp.loansmadeoroutstanding.LoansCYAController._
 import controllers.PSRController
 import models.ConditionalYesNo._
 import models.SchemeId.Srn
-import models.{Money, Percentage, _}
+import models.{Security, _}
 import navigation.Navigator
+import pages.nonsipp.common.IdentityTypePage
 import pages.nonsipp.loansmadeoroutstanding._
 import play.api.i18n._
 import play.api.mvc._
@@ -51,14 +52,14 @@ class LoansCYAController @Inject()(
 
   def onPageLoad(
     srn: Srn,
-    index: Max9999999,
+    index: Max5000,
     checkOrChange: CheckOrChange,
     mode: Mode
   ): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       (
         for {
-          receivedLoanType <- requiredPage(WhoReceivedLoanPage(srn, index))
+          receivedLoanType <- requiredPage(IdentityTypePage(srn, index, IdentitySubject.LoanRecipient))
           recipientName <- List(
             request.userAnswers.get(IndividualRecipientNamePage(srn, index)),
             request.userAnswers.get(CompanyRecipientNamePage(srn, index)),
@@ -130,8 +131,8 @@ class LoansCYAController @Inject()(
 
 case class ViewModelParameters(
   srn: Srn,
-  index: Max9999999,
-  receivedLoanType: ReceivedLoanType,
+  index: Max5000,
+  receivedLoanType: IdentityType,
   recipientName: String,
   recipientDetails: Option[String],
   recipientReasonNoDetails: Option[String],
@@ -183,8 +184,8 @@ object LoansCYAController {
 
   private def sections(
     srn: Srn,
-    index: Max9999999,
-    receivedLoanType: ReceivedLoanType,
+    index: Max5000,
+    receivedLoanType: IdentityType,
     recipientName: String,
     recipientDetails: Option[String],
     recipientReasonNoDetails: Option[String],
@@ -221,8 +222,8 @@ object LoansCYAController {
 
   private def recipientSection(
     srn: Srn,
-    index: Max9999999,
-    receivedLoanType: ReceivedLoanType,
+    index: Max5000,
+    receivedLoanType: IdentityType,
     recipientName: String,
     recipientDetails: Option[String],
     recipientReasonNoDetails: Option[String],
@@ -231,17 +232,17 @@ object LoansCYAController {
   ): List[CheckYourAnswersSection] = {
 
     val receivedLoan = receivedLoanType match {
-      case ReceivedLoanType.Individual => "whoReceivedLoan.pageContent"
-      case ReceivedLoanType.UKCompany => "whoReceivedLoan.pageContent1"
-      case ReceivedLoanType.UKPartnership => "whoReceivedLoan.pageContent2"
-      case ReceivedLoanType.Other => "whoReceivedLoan.pageContent3"
+      case IdentityType.Individual => "loanRecipient.identityType.pageContent"
+      case IdentityType.UKCompany => "loanRecipient.identityType.pageContent1"
+      case IdentityType.UKPartnership => "loanRecipient.identityType.pageContent2"
+      case IdentityType.Other => "loanRecipient.identityType.pageContent3"
     }
 
     val recipientNameUrl = receivedLoanType match {
-      case ReceivedLoanType.Individual => routes.IndividualRecipientNameController.onPageLoad(srn, index, mode).url
-      case ReceivedLoanType.UKCompany => routes.CompanyRecipientNameController.onPageLoad(srn, index, mode).url
-      case ReceivedLoanType.UKPartnership => routes.PartnershipRecipientNameController.onPageLoad(srn, index, mode).url
-      case ReceivedLoanType.Other => routes.OtherRecipientDetailsController.onPageLoad(srn, index, mode).url
+      case IdentityType.Individual => routes.IndividualRecipientNameController.onPageLoad(srn, index, mode).url
+      case IdentityType.UKCompany => routes.CompanyRecipientNameController.onPageLoad(srn, index, mode).url
+      case IdentityType.UKPartnership => routes.PartnershipRecipientNameController.onPageLoad(srn, index, mode).url
+      case IdentityType.Other => routes.OtherRecipientDetailsController.onPageLoad(srn, index, mode).url
     }
 
     val (
@@ -251,28 +252,28 @@ object LoansCYAController {
       recipientDetailsNoIdChangeHiddenKey
     ): (Message, String, String, String) =
       receivedLoanType match {
-        case ReceivedLoanType.Individual =>
+        case IdentityType.Individual =>
           (
             Message("loanCheckYourAnswers.section1.recipientDetails.nino", recipientName),
             routes.IndividualRecipientNinoController.onPageLoad(srn, index, mode).url,
             "loanCheckYourAnswers.section1.recipientDetails.nino.hidden",
             "loanCheckYourAnswers.section1.recipientDetails.noNinoReason.hidden"
           )
-        case ReceivedLoanType.UKCompany =>
+        case IdentityType.UKCompany =>
           (
             Message("loanCheckYourAnswers.section1.recipientDetails.crn", recipientName),
             routes.CompanyRecipientCrnController.onPageLoad(srn, index, mode).url,
             "loanCheckYourAnswers.section1.recipientDetails.crn.hidden",
             "loanCheckYourAnswers.section1.recipientDetails.noCrnReason.hidden"
           )
-        case ReceivedLoanType.UKPartnership =>
+        case IdentityType.UKPartnership =>
           (
             Message("loanCheckYourAnswers.section1.recipientDetails.utr", recipientName),
             routes.PartnershipRecipientUtrController.onPageLoad(srn, index, mode).url,
             "loanCheckYourAnswers.section1.recipientDetails.utr.hidden",
             "loanCheckYourAnswers.section1.recipientDetails.noUtrReason.hidden"
           )
-        case ReceivedLoanType.Other =>
+        case IdentityType.Other =>
           (
             Message("loanCheckYourAnswers.section1.recipientDetails.other", recipientName),
             routes.OtherRecipientDetailsController.onPageLoad(srn, index, mode).url,
@@ -282,16 +283,16 @@ object LoansCYAController {
       }
 
     val (recipientNoDetailsReasonKey, recipientNoDetailsUrl): (Message, String) = receivedLoanType match {
-      case ReceivedLoanType.Individual =>
+      case IdentityType.Individual =>
         Message("loanCheckYourAnswers.section1.recipientDetails.noNinoReason", recipientName) ->
           routes.IndividualRecipientNinoController.onPageLoad(srn, index, mode).url
-      case ReceivedLoanType.UKCompany =>
+      case IdentityType.UKCompany =>
         Message("loanCheckYourAnswers.section1.recipientDetails.noCrnReason", recipientName) ->
           routes.CompanyRecipientCrnController.onPageLoad(srn, index, mode).url
-      case ReceivedLoanType.UKPartnership =>
+      case IdentityType.UKPartnership =>
         Message("loanCheckYourAnswers.section1.recipientDetails.noUtrReason", recipientName) ->
           routes.PartnershipRecipientUtrController.onPageLoad(srn, index, mode).url
-      case ReceivedLoanType.Other =>
+      case IdentityType.Other =>
         Message("loanCheckYourAnswers.section1.recipientDetails.other", recipientName) ->
           routes.OtherRecipientDetailsController.onPageLoad(srn, index, mode).url
     }
@@ -354,7 +355,9 @@ object LoansCYAController {
             .withAction(
               SummaryAction(
                 "site.change",
-                routes.WhoReceivedLoanController.onPageLoad(srn, index, mode).url
+                controllers.nonsipp.common.routes.IdentityTypeController
+                  .onPageLoad(srn, index, mode, IdentitySubject.LoanRecipient)
+                  .url
               ).withVisuallyHiddenContent("loanCheckYourAnswers.section1.whoReceivedLoan.hidden")
             ),
           CheckYourAnswersRowViewModel("loanCheckYourAnswers.section1.recipientName", recipientName)
@@ -387,7 +390,7 @@ object LoansCYAController {
 
   private def loanPeriodSection(
     srn: Srn,
-    index: Max9999999,
+    index: Max5000,
     recipientName: String,
     loanDate: LocalDate,
     assetsValue: Money,
@@ -435,7 +438,7 @@ object LoansCYAController {
 
   private def loanAmountSection(
     srn: Srn,
-    index: Max9999999,
+    index: Max5000,
     totalLoan: Money,
     repayments: Money,
     outstanding: Money,
@@ -492,7 +495,7 @@ object LoansCYAController {
 
   private def loanInterestSection(
     srn: Srn,
-    index: Max9999999,
+    index: Max5000,
     interestPayable: Money,
     interestRate: Percentage,
     interestPayments: Money,
@@ -529,7 +532,7 @@ object LoansCYAController {
 
   private def loanOutstandingSection(
     srn: Srn,
-    index: Max9999999,
+    index: Max5000,
     outstandingArrearsOnLoan: Option[Money],
     mode: Mode
   ): List[CheckYourAnswersSection] = {
@@ -560,7 +563,7 @@ object LoansCYAController {
 
   private def loanSecuritySection(
     srn: Srn,
-    index: Max9999999,
+    index: Max5000,
     securityOnLoan: Option[Security],
     mode: Mode
   ): List[CheckYourAnswersSection] = {

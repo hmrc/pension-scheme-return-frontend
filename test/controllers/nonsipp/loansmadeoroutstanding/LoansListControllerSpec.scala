@@ -16,25 +16,27 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
-import config.Refined.Max9999999
+import config.Refined.Max5000
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.loansmadeoroutstanding.LoansListController._
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
-import models.{Money, NormalMode, ReceivedLoanType}
+import models.{IdentitySubject, IdentityType, Money, NormalMode}
+import pages.nonsipp.common.IdentityTypePage
 import pages.nonsipp.loansmadeoroutstanding._
 import views.html.ListView
 
 class LoansListControllerSpec extends ControllerBaseSpec {
+  private val subject = IdentitySubject.LoanRecipient
 
   private val filledUserAnswers = defaultUserAnswers
-    .unsafeSet(WhoReceivedLoanPage(srn, refineMV(1)), ReceivedLoanType.UKCompany)
+    .unsafeSet(IdentityTypePage(srn, refineMV(1), subject), IdentityType.UKCompany)
     .unsafeSet(CompanyRecipientNamePage(srn, refineMV(1)), "recipientName1")
     .unsafeSet(AmountOfTheLoanPage(srn, refineMV(1)), (money, money, money))
-    .unsafeSet(WhoReceivedLoanPage(srn, refineMV(2)), ReceivedLoanType.UKPartnership)
+    .unsafeSet(IdentityTypePage(srn, refineMV(2), subject), IdentityType.UKPartnership)
     .unsafeSet(PartnershipRecipientNamePage(srn, refineMV(2)), "recipientName2")
     .unsafeSet(AmountOfTheLoanPage(srn, refineMV(2)), (money, money, money))
-    .unsafeSet(WhoReceivedLoanPage(srn, refineMV(3)), ReceivedLoanType.Individual)
+    .unsafeSet(IdentityTypePage(srn, refineMV(3), subject), IdentityType.Individual)
     .unsafeSet(IndividualRecipientNamePage(srn, refineMV(3)), "recipientName3")
     .unsafeSet(AmountOfTheLoanPage(srn, refineMV(3)), (money, money, money))
 
@@ -42,7 +44,7 @@ class LoansListControllerSpec extends ControllerBaseSpec {
   private lazy val onSubmit = routes.LoansListController.onSubmit(srn, NormalMode)
   private lazy val onLoansMadePageLoad = routes.LoansMadeOrOutstandingController.onPageLoad(srn, NormalMode)
 
-  private val recipients: List[(Max9999999, String, Money)] = List(
+  private val recipients: List[(Max5000, String, Money)] = List(
     (refineMV(1), "recipientName1", money),
     (refineMV(2), "recipientName2", money),
     (refineMV(3), "recipientName3", money)

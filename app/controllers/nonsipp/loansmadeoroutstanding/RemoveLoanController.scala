@@ -16,15 +16,16 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
-import config.Refined.Max9999999
+import config.Refined.Max5000
 import controllers.PSRController
 import controllers.actions._
 import controllers.nonsipp.loansmadeoroutstanding.RemoveLoanController._
 import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
 import models.requests.DataRequest
-import models.{Mode, ReceivedLoanType}
+import models.{IdentitySubject, IdentityType, Mode}
 import navigation.Navigator
+import pages.nonsipp.common.IdentityTypePage
 import pages.nonsipp.loansmadeoroutstanding._
 import play.api.data.Form
 import play.api.i18n.MessagesApi
@@ -51,27 +52,27 @@ class RemoveLoanController @Inject()(
 
   private val form = RemoveLoanController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       getResult(srn, index, mode, request.userAnswers.fillForm(RemoveLoanPage(srn, index), form))
   }
 
-  private def getResult(srn: Srn, index: Max9999999, mode: Mode, form: Form[Boolean], error: Boolean = false)(
+  private def getResult(srn: Srn, index: Max5000, mode: Mode, form: Form[Boolean], error: Boolean = false)(
     implicit request: DataRequest[_]
   ) = {
     val whoReceivedLoanPage = request.userAnswers
-      .get(WhoReceivedLoanPage(srn, index))
+      .get(IdentityTypePage(srn, index, IdentitySubject.LoanRecipient))
     whoReceivedLoanPage match {
       case Some(who) => {
         val recipientName =
           who match {
-            case ReceivedLoanType.Individual =>
+            case IdentityType.Individual =>
               request.userAnswers.get(IndividualRecipientNamePage(srn, index)).getOrRecoverJourney
-            case ReceivedLoanType.UKCompany =>
+            case IdentityType.UKCompany =>
               request.userAnswers.get(CompanyRecipientNamePage(srn, index)).getOrRecoverJourney
-            case ReceivedLoanType.UKPartnership =>
+            case IdentityType.UKPartnership =>
               request.userAnswers.get(PartnershipRecipientNamePage(srn, index)).getOrRecoverJourney
-            case ReceivedLoanType.Other =>
+            case IdentityType.Other =>
               request.userAnswers.get(OtherRecipientDetailsPage(srn, index)).map(_.name).getOrRecoverJourney
           }
         recipientName.fold(
@@ -95,7 +96,7 @@ class RemoveLoanController @Inject()(
     }
   }
 
-  def onSubmit(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()
@@ -105,7 +106,7 @@ class RemoveLoanController @Inject()(
             if (value) {
               for {
                 updatedAnswers <- Future
-                  .fromTry(request.userAnswers.remove(WhoReceivedLoanPage(srn, index)))
+                  .fromTry(request.userAnswers.remove(IdentityTypePage(srn, index, IdentitySubject.LoanRecipient)))
                 _ <- saveService.save(updatedAnswers)
               } yield Redirect(navigator.nextPage(RemoveLoanPage(srn, index), mode, updatedAnswers))
             } else {
@@ -123,7 +124,7 @@ object RemoveLoanController {
 
   def viewModel(
     srn: Srn,
-    index: Max9999999,
+    index: Max5000,
     mode: Mode,
     loanAmount: String,
     recipientName: String

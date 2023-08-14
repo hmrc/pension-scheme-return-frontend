@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
-import config.Refined.OneTo9999999
+import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.loansmadeoroutstanding.LoansCYAController._
 import eu.timepit.refined.refineMV
@@ -25,12 +25,14 @@ import models.{
   CheckOrChange,
   ConditionalYesNo,
   Crn,
+  IdentitySubject,
+  IdentityType,
   Money,
   NormalMode,
-  ReceivedLoanType,
   Security,
   SponsoringOrConnectedParty
 }
+import pages.nonsipp.common.IdentityTypePage
 import pages.nonsipp.loansmadeoroutstanding._
 import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
@@ -48,15 +50,16 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
   override protected def beforeAll(): Unit =
     reset(mockSchemeDateService)
 
-  private val index = refineMV[OneTo9999999](1)
+  private val index = refineMV[OneTo5000](1)
   private val taxYear = Some(Left(dateRange))
+  private val subject = IdentitySubject.LoanRecipient
 
   private def onPageLoad(checkOrChange: CheckOrChange) = routes.LoansCYAController.onPageLoad(srn, index, checkOrChange)
 
   private def onSubmit(checkOrChange: CheckOrChange) = routes.LoansCYAController.onSubmit(srn, checkOrChange)
 
   private val filledUserAnswers = defaultUserAnswers
-    .unsafeSet(WhoReceivedLoanPage(srn, index), ReceivedLoanType.UKCompany)
+    .unsafeSet(IdentityTypePage(srn, index, subject), IdentityType.UKCompany)
     .unsafeSet(CompanyRecipientNamePage(srn, index), recipientName)
     .unsafeSet(CompanyRecipientCrnPage(srn, index), ConditionalYesNo.yes[String, Crn](crn))
     .unsafeSet(RecipientSponsoringEmployerConnectedPartyPage(srn, index), SponsoringOrConnectedParty.ConnectedParty)
@@ -76,7 +79,7 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
               ViewModelParameters(
                 srn,
                 index,
-                ReceivedLoanType.UKCompany,
+                IdentityType.UKCompany,
                 recipientName,
                 recipientDetails = Some(crn.value),
                 recipientReasonNoDetails = None,

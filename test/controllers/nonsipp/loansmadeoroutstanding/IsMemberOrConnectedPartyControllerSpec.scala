@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
-import config.Refined.OneTo9999999
+import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.loansmadeoroutstanding.IsMemberOrConnectedPartyController._
 import eu.timepit.refined.refineMV
@@ -27,7 +27,7 @@ import views.html.RadioListView
 
 class IsMemberOrConnectedPartyControllerSpec extends ControllerBaseSpec {
 
-  private val index = refineMV[OneTo9999999](1)
+  private val index = refineMV[OneTo5000](1)
 
   lazy val onPageLoad = routes.IsMemberOrConnectedPartyController.onPageLoad(srn, index, NormalMode)
   lazy val onSubmit = routes.IsMemberOrConnectedPartyController.onSubmit(srn, index, NormalMode)

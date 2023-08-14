@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
-import config.Refined.OneTo9999999
+import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
 import eu.timepit.refined.refineMV
 import forms.MoneyFormProvider
@@ -29,7 +29,7 @@ import views.html.MoneyView
 
 class AmountOfTheLoanControllerSpec extends ControllerBaseSpec {
 
-  private val index = refineMV[OneTo9999999](1)
+  private val index = refineMV[OneTo5000](1)
 
   val schemeDatePeriod = dateRangeGen.sample.value
   val mockSchemeDateService = mock[SchemeDateService]
