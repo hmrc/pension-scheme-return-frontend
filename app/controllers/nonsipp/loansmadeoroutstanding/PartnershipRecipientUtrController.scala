@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
-import config.Refined.Max9999999
+import config.Refined.Max5000
 import controllers.nonsipp.loansmadeoroutstanding.PartnershipRecipientUtrController._
 import controllers.actions._
 import forms.YesNoPageFormProvider
@@ -52,7 +52,7 @@ class PartnershipRecipientUtrController @Inject()(
 
   private val form: Form[Either[String, Utr]] = PartnershipRecipientUtrController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       request.usingAnswer(PartnershipRecipientNamePage(srn, index)).sync { partnershipRecipientName =>
         val preparedForm = request.userAnswers.fillForm(PartnershipRecipientUtrPage(srn, index), form)
@@ -60,7 +60,7 @@ class PartnershipRecipientUtrController @Inject()(
       }
   }
 
-  def onSubmit(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()
@@ -95,7 +95,7 @@ object PartnershipRecipientUtrController {
 
   def viewModel(
     srn: Srn,
-    index: Max9999999,
+    index: Max5000,
     partnershipRecipientName: String,
     mode: Mode
   ): FormPageViewModel[ConditionalYesNoPageViewModel] =

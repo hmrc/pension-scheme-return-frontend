@@ -24,7 +24,8 @@ import pages.nonsipp.landorproperty.{
   LandOrPropertyHeldPage,
   LandOrPropertyWhenDidSchemeAcquirePage,
   LandPropertyInUKPage,
-  WhatYouWillNeedLandOrPropertyPage
+  WhatYouWillNeedLandOrPropertyPage,
+  WhyDoesSchemeHoldLandPropertyPage
 }
 import utils.BaseSpec
 
@@ -98,6 +99,19 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           (_, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
         )
         .withName("go from land or property when did scheme acquire page to unauthorised page")
+    )
+  }
+
+  "WhyDoesSchemeHoldLandPropertyNavigator" - {
+
+    act.like(
+      normalmode
+        .navigateToWithIndex(
+          index,
+          (srn, _: Max5000) => WhyDoesSchemeHoldLandPropertyPage(srn, index),
+          (srn, index: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+        )
+        .withName("why does scheme hold land property page to unauthorised page ")
     )
   }
 }

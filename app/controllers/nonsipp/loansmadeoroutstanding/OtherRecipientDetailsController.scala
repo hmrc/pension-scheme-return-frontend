@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
-import config.Refined.Max9999999
+import config.Refined.Max5000
 import controllers.actions._
 import controllers.nonsipp.loansmadeoroutstanding.OtherRecipientDetailsController.viewModel
 import forms.RecipientDetailsFormProvider
@@ -51,12 +51,12 @@ class OtherRecipientDetailsController @Inject()(
 
   private val form = OtherRecipientDetailsController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       Ok(view(form.fromUserAnswers(OtherRecipientDetailsPage(srn, index)), viewModel(srn, index, mode)))
   }
 
-  def onSubmit(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()
@@ -85,7 +85,7 @@ object OtherRecipientDetailsController {
     "otherRecipientDetails.description.error.length"
   )
 
-  def viewModel(srn: Srn, index: Max9999999, mode: Mode): FormPageViewModel[RecipientDetailsViewModel] =
+  def viewModel(srn: Srn, index: Max5000, mode: Mode): FormPageViewModel[RecipientDetailsViewModel] =
     FormPageViewModel(
       Message("otherRecipientDetails.title"),
       Message("otherRecipientDetails.heading"),

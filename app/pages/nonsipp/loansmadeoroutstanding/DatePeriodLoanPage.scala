@@ -16,7 +16,7 @@
 
 package pages.nonsipp.loansmadeoroutstanding
 
-import config.Refined.Max9999999
+import config.Refined.Max5000
 import models.Money
 import models.SchemeId.Srn
 import pages.QuestionPage
@@ -25,7 +25,7 @@ import utils.RefinedUtils.RefinedIntOps
 
 import java.time.LocalDate
 
-case class DatePeriodLoanPage(srn: Srn, index: Max9999999) extends QuestionPage[(LocalDate, Money, Int)] {
+case class DatePeriodLoanPage(srn: Srn, index: Max5000) extends QuestionPage[(LocalDate, Money, Int)] {
 
   override def path: JsPath = Paths.loanTransactions \ toString \ index.arrayIndex.toString
 

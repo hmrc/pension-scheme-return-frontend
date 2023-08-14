@@ -20,6 +20,15 @@ GET         /:srn/land-property-address-lookup                               con
 GET         /:srn/land-property-address-lookup/:index                        controllers.nonsipp.landorproperty.LandOrPropertyAddressLookupController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
 GET         /:srn/submit-land-property-address-lookup/:index                 controllers.nonsipp.landorproperty.LandOrPropertyAddressLookupController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
 
+GET         /:srn/why-does-scheme-hold-land-property                         controllers.nonsipp.landorproperty.WhyDoesSchemeHoldLandPropertyController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
+GET         /:srn/why-does-scheme-hold-land-property/:index                  controllers.nonsipp.landorproperty.WhyDoesSchemeHoldLandPropertyController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/why-does-scheme-hold-land-property                         controllers.nonsipp.landorproperty.WhyDoesSchemeHoldLandPropertyController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
+POST        /:srn/why-does-scheme-hold-land-property/:index                  controllers.nonsipp.landorproperty.WhyDoesSchemeHoldLandPropertyController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/change-why-does-scheme-hold-land-property                  controllers.nonsipp.landorproperty.WhyDoesSchemeHoldLandPropertyController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
+GET         /:srn/change-why-does-scheme-hold-land-property/:index           controllers.nonsipp.landorproperty.WhyDoesSchemeHoldLandPropertyController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-why-does-scheme-hold-land-property                  controllers.nonsipp.landorproperty.WhyDoesSchemeHoldLandPropertyController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
+POST        /:srn/change-why-does-scheme-hold-land-property/:index           controllers.nonsipp.landorproperty.WhyDoesSchemeHoldLandPropertyController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
 GET         /:srn/when-did-scheme-acquire-land-property/                     controllers.nonsipp.landorproperty.WhenDidSchemeAcquireController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
 GET         /:srn/when-did-scheme-acquire-land-property/:index               controllers.nonsipp.landorproperty.WhenDidSchemeAcquireController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
 POST        /:srn/when-did-scheme-acquire-land-property/:index               controllers.nonsipp.landorproperty.WhenDidSchemeAcquireController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)

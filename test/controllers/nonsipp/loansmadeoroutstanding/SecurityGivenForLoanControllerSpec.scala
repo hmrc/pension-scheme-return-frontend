@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
-import config.Refined.OneTo9999999
+import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.loansmadeoroutstanding.SecurityGivenForLoanController._
 import eu.timepit.refined.refineMV
@@ -28,7 +28,7 @@ import views.html.ConditionalYesNoPageView
 
 class SecurityGivenForLoanControllerSpec extends ControllerBaseSpec {
 
-  private val index = refineMV[OneTo9999999](1)
+  private val index = refineMV[OneTo5000](1)
 
   private lazy val onPageLoad = routes.SecurityGivenForLoanController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.SecurityGivenForLoanController.onSubmit(srn, index, NormalMode)

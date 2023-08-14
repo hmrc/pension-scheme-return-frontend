@@ -16,7 +16,7 @@
 
 package pages.nonsipp.loansmadeoroutstanding
 
-import config.Refined.OneTo9999999
+import config.Refined.OneTo5000
 import eu.timepit.refined.refineMV
 import models.SponsoringOrConnectedParty
 import pages.behaviours.PageBehaviours
@@ -25,7 +25,7 @@ class RecipientSponsoringEmployerConnectedPartyPageSpec extends PageBehaviours {
 
   "RecipientSponsoringEmployerConnectedPartyPage" - {
 
-    val index = refineMV[OneTo9999999](1)
+    val index = refineMV[OneTo5000](1)
 
     beRetrievable[SponsoringOrConnectedParty](RecipientSponsoringEmployerConnectedPartyPage(srnGen.sample.value, index))
 

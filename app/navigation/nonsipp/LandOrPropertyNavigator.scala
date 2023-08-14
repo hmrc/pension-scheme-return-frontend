@@ -41,6 +41,10 @@ object LandOrPropertyNavigator extends JourneyNavigator {
       controllers.nonsipp.landorproperty.routes.LandOrPropertyAddressLookupController.onPageLoad(srn, index)
 
     case LandOrPropertyAddressLookupPage(srn, index) =>
+      controllers.nonsipp.landorproperty.routes.WhyDoesSchemeHoldLandPropertyController
+        .onPageLoad(srn, index, NormalMode)
+
+    case WhyDoesSchemeHoldLandPropertyPage(srn, index) =>
       controllers.routes.UnauthorisedController.onPageLoad()
 
     case LandOrPropertyWhenDidSchemeAcquirePage(srn, index) =>

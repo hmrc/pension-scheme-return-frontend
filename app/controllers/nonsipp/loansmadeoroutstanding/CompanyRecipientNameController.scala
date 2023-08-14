@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
-import config.Refined.Max9999999
+import config.Refined.Max5000
 import controllers.actions._
 import forms.TextFormProvider
 import models.Mode
@@ -50,7 +50,7 @@ class CompanyRecipientNameController @Inject()(
 
   private def form = CompanyRecipientNameController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       Ok(
         view(
@@ -60,7 +60,7 @@ class CompanyRecipientNameController @Inject()(
       )
   }
 
-  def onSubmit(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()
@@ -86,7 +86,7 @@ object CompanyRecipientNameController {
     "companyRecipientName.error.invalid.characters"
   )
 
-  def viewModel(srn: Srn, index: Max9999999, mode: Mode): FormPageViewModel[TextInputViewModel] =
+  def viewModel(srn: Srn, index: Max5000, mode: Mode): FormPageViewModel[TextInputViewModel] =
     FormPageViewModel(
       Message("companyRecipientName.title"),
       Message("companyRecipientName.heading"),
