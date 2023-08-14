@@ -52,6 +52,10 @@ object LandOrPropertyNavigator extends JourneyNavigator {
           controllers.nonsipp.landorproperty.routes.WhenDidSchemeAcquireController.onPageLoad(srn, index, NormalMode)
       }
 
+    case LandOrPropertyWhenDidSchemeAcquirePage(srn, index) =>
+      controllers.nonsipp.landorproperty.routes.LandPropertyIndependentValuationController
+        .onPageLoad(srn, index, NormalMode)
+
     case LandOrPropertyTotalCostPage(srn, index) =>
       controllers.nonsipp.landorproperty.routes.IsLandOrPropertyResidentialController.onPageLoad(srn, index, NormalMode)
 
@@ -71,10 +75,6 @@ object LandOrPropertyNavigator extends JourneyNavigator {
       } else {
         controllers.routes.UnauthorisedController.onPageLoad()
       }
-
-    case LandOrPropertyWhenDidSchemeAcquirePage(srn, index) =>
-      controllers.nonsipp.landorproperty.routes.LandPropertyIndependentValuationController
-        .onPageLoad(srn, index, NormalMode)
 
   }
 

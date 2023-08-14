@@ -69,8 +69,16 @@ object QuestionField {
   def currency(label: InlineMessage, hint: Option[InlineMessage] = None): QuestionField =
     QuestionField(label, hint, FieldType.Currency)
 
+  // alias for currency
+  def money(label: InlineMessage, hint: Option[InlineMessage] = None): QuestionField =
+    currency(label, hint)
+
   def date(label: InlineMessage, hint: Option[InlineMessage] = None): QuestionField =
     QuestionField(label, hint, FieldType.Date)
+
+  // alias for date
+  def localDate(label: InlineMessage, hint: Option[InlineMessage] = None): QuestionField =
+    date(label, hint)
 
   def percentage(label: InlineMessage, hint: Option[InlineMessage] = None): QuestionField =
     QuestionField(label, hint, FieldType.Percentage)

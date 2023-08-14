@@ -102,6 +102,7 @@ trait TestValues {
   val individualName = "testIndividualName"
   val nino: Nino = ninoGen.sample.get
   val utr: Utr = utrGen.sample.get
+  val leaseName = "testLeaseName"
   val money: Money = Money(123456)
   val security: Security = Security("securityGivenForLoan")
   val double: Double = 7.7

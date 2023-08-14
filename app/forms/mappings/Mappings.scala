@@ -19,6 +19,7 @@ package forms.mappings
 import forms.mappings.errors.{
   DateFormErrors,
   DoubleFormErrors,
+  InputFormErrors,
   IntFormErrors,
   MoneyFormErrors,
   PercentageFormErrors,
@@ -38,7 +39,7 @@ trait Mappings extends Formatters with Constraints {
   protected[forms] val textAreaMaxLength = 160
 
   def text(errorKey: String = "error.required", args: Seq[Any] = Seq.empty): Mapping[String] =
-    of(stringFormatter(errorKey, args)).transform(_.trim, _.trim)
+    of(stringFormatter(errorKey, args)).transform[String](_.trim, _.trim)
 
   def int(
     requiredKey: String = "error.required",
@@ -163,6 +164,16 @@ trait Mappings extends Formatters with Constraints {
     text(requiredKey, args.toList)
       .verifying(verify[String](invalidCharactersKey, _.matches(textRegex), args: _*))
       .verifying(verify[String](maxLengthErrorKey, _.length <= maxLength, args: _*))
+
+  def input(formErrors: InputFormErrors): Mapping[String] =
+    validatedText(
+      formErrors.requiredKey,
+      textAreaRegex,
+      formErrors.invalidCharactersKey,
+      textAreaMaxLength,
+      formErrors.maxLengthErrorKey,
+      formErrors.args: _*
+    )
 
   def textArea(
     requiredNoKey: String,

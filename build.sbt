@@ -57,6 +57,7 @@ lazy val root = (project in file("."))
       "-Wconf:cat=deprecation:e,cat=feature:ws,cat=optimizer:ws,src=target/.*:s"
     ),
     libraryDependencies ++= AppDependencies(),
+    libraryDependencies += "org.foundweekends.giter8" %% "giter8-lib" % "0.12.0",
     retrieveManaged := true,
     update / evictionWarningOptions :=
       EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
