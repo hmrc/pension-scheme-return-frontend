@@ -17,7 +17,7 @@
 package controllers.nonsipp.loansmadeoroutstanding
 
 import config.Constants.maxCurrencyValue
-import config.Refined.Max9999999
+import config.Refined.Max5000
 import controllers.actions._
 import controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController._
 import forms.YesNoPageFormProvider
@@ -54,13 +54,13 @@ class OutstandingArrearsOnLoanController @Inject()(
 
   private val form = OutstandingArrearsOnLoanController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       val preparedForm = request.userAnswers.fillForm(OutstandingArrearsOnLoanPage(srn, index), form)
       Ok(view(preparedForm, viewModel(srn, index, mode)))
   }
 
-  def onSubmit(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()
@@ -89,7 +89,7 @@ object OutstandingArrearsOnLoanController {
     )
   )
 
-  def viewModel(srn: Srn, index: Max9999999, mode: Mode): FormPageViewModel[ConditionalYesNoPageViewModel] =
+  def viewModel(srn: Srn, index: Max5000, mode: Mode): FormPageViewModel[ConditionalYesNoPageViewModel] =
     FormPageViewModel[ConditionalYesNoPageViewModel](
       "outstandingArrearsOnLoan.title",
       "outstandingArrearsOnLoan.heading",

@@ -18,7 +18,7 @@ package controllers.nonsipp.loansmadeoroutstanding
 
 import com.google.inject.Inject
 import config.Constants.{maxCurrencyValue, maxPercentage, minPercentage}
-import config.Refined.Max9999999
+import config.Refined.Max5000
 import controllers.actions._
 import forms.MultipleQuestionFormProvider
 import forms.mappings.Mappings
@@ -52,7 +52,7 @@ class InterestOnLoanController @Inject()(
     extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       {
         val form = InterestOnLoanController.form
@@ -68,7 +68,7 @@ class InterestOnLoanController @Inject()(
       }
   }
 
-  def onSubmit(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       val form = InterestOnLoanController.form
 
@@ -124,7 +124,7 @@ object InterestOnLoanController {
 
   def viewModel(
     srn: Srn,
-    index: Max9999999,
+    index: Max5000,
     mode: Mode,
     schemeName: String,
     form: Form[(Money, Percentage, Money)]

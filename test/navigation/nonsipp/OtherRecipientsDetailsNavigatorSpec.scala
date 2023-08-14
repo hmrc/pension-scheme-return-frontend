@@ -16,7 +16,7 @@
 
 package navigation.nonsipp
 
-import config.Refined.OneTo9999999
+import config.Refined.OneTo5000
 import eu.timepit.refined.refineMV
 import navigation.{Navigator, NavigatorBehaviours}
 import pages.nonsipp.loansmadeoroutstanding.OtherRecipientDetailsPage
@@ -25,7 +25,7 @@ import utils.BaseSpec
 class OtherRecipientsDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
   val navigator: Navigator = new NonSippNavigator
-  private val index = refineMV[OneTo9999999](1)
+  private val index = refineMV[OneTo5000](1)
 
   "otherRecipientsDetailsNavigator" - {
 

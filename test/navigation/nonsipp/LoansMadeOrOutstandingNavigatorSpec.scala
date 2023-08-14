@@ -16,13 +16,15 @@
 
 package navigation.nonsipp
 
-import config.Refined.OneTo9999999
+import config.Refined.OneTo5000
 import eu.timepit.refined.refineMV
-import models.{ConditionalYesNo, Money, NormalMode, ReceivedLoanType, UserAnswers}
+import models.{IdentitySubject, IdentityType, NormalMode}
+import models.{ConditionalYesNo, Money, UserAnswers}
 import models.ConditionalYesNo._
 import models.SchemeId.Srn
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
+import pages.nonsipp.common.IdentityTypePage
 import pages.nonsipp.loansmadeoroutstanding._
 import utils.BaseSpec
 import utils.UserAnswersUtils.UserAnswersOps
@@ -31,7 +33,8 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
 
   val navigator: Navigator = new NonSippNavigator
 
-  private val index = refineMV[OneTo9999999](1)
+  private val index = refineMV[OneTo5000](1)
+  private val subject = IdentitySubject.LoanRecipient
 
   "loansMadeOrOutstandingNavigator" - {
 
@@ -83,7 +86,8 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
         normalmode
           .navigateTo(
             WhatYouWillNeedLoansPage,
-            controllers.nonsipp.loansmadeoroutstanding.routes.WhoReceivedLoanController.onPageLoad(_, index, _)
+            controllers.nonsipp.common.routes.IdentityTypeController
+              .onPageLoad(_, index, _, IdentitySubject.LoanRecipient)
           )
           .withName("go from what you will need loans page to who received loan page")
       )
@@ -131,10 +135,11 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
     "NormalMode" - {
       act.like(
         normalmode
-          .navigateToWithDataAndIndex(
+          .navigateToWithDataIndexAndSubject(
             index,
-            WhoReceivedLoanPage,
-            Gen.const(ReceivedLoanType.Other),
+            subject,
+            IdentityTypePage,
+            Gen.const(IdentityType.Other),
             controllers.nonsipp.loansmadeoroutstanding.routes.OtherRecipientDetailsController.onPageLoad
           )
           .withName("go from who received loan page to other recipient details page")
@@ -142,10 +147,11 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
 
       act.like(
         normalmode
-          .navigateToWithDataAndIndex(
+          .navigateToWithDataIndexAndSubject(
             index,
-            WhoReceivedLoanPage,
-            Gen.const(ReceivedLoanType.Individual),
+            subject,
+            IdentityTypePage,
+            Gen.const(IdentityType.Individual),
             controllers.nonsipp.loansmadeoroutstanding.routes.IndividualRecipientNameController.onPageLoad
           )
           .withName("go from who received loan page to individual recipient name page")
@@ -153,10 +159,11 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
 
       act.like(
         normalmode
-          .navigateToWithDataAndIndex(
+          .navigateToWithDataIndexAndSubject(
             index,
-            WhoReceivedLoanPage,
-            Gen.const(ReceivedLoanType.UKCompany),
+            subject,
+            IdentityTypePage,
+            Gen.const(IdentityType.UKCompany),
             controllers.nonsipp.loansmadeoroutstanding.routes.CompanyRecipientNameController.onPageLoad
           )
           .withName("go from who received loan page to company recipient name page")
@@ -164,10 +171,11 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
 
       act.like(
         normalmode
-          .navigateToWithDataAndIndex(
+          .navigateToWithDataIndexAndSubject(
             index,
-            WhoReceivedLoanPage,
-            Gen.const(ReceivedLoanType.UKPartnership),
+            subject,
+            IdentityTypePage,
+            Gen.const(IdentityType.UKPartnership),
             controllers.nonsipp.loansmadeoroutstanding.routes.PartnershipRecipientNameController.onPageLoad
           )
           .withName("go from who received loan page UKPartnership to partnership recipient name page")

@@ -18,6 +18,7 @@ package config
 
 import eu.timepit.refined.api.{Refined, Validate}
 import eu.timepit.refined.refineV
+import models.IdentitySubject
 import models.SchemeId.Srn
 import play.api.mvc.{JavascriptLiteral, PathBindable}
 
@@ -43,4 +44,13 @@ object Binders {
 
   implicit def refinedIntJSLiteral[T]: JavascriptLiteral[Refined[Int, T]] =
     (value: Refined[Int, T]) => value.value.toString
+
+  implicit val identitySubjectBinder: PathBindable[IdentitySubject] = new PathBindable[IdentitySubject] {
+
+    override def bind(key: String, value: String): Either[String, IdentitySubject] =
+      Option(IdentitySubject.withNameWithDefault(value))
+        .toRight(s" $key value $value unknown identity type")
+
+    override def unbind(key: String, value: IdentitySubject): String = value.name
+  }
 }

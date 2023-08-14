@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
-import config.Refined.OneTo9999999
+import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
 import eu.timepit.refined.refineMV
 import models.NormalMode
@@ -26,7 +26,7 @@ import views.html.MultipleQuestionView
 class InterestOnLoanControllerSpec extends ControllerBaseSpec {
 
   val maxAllowedAmount = 999999999.99
-  private val index = refineMV[OneTo9999999](1)
+  private val index = refineMV[OneTo5000](1)
 
   "InterestOnLoanController" - {
 

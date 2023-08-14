@@ -16,7 +16,7 @@
 
 package pages.nonsipp.loansmadeoroutstanding
 
-import config.Refined.Max9999999
+import config.Refined.Max5000
 import models.ConditionalYesNo
 import models.SchemeId.Srn
 import pages.QuestionPage
@@ -24,8 +24,7 @@ import play.api.libs.json.JsPath
 import uk.gov.hmrc.domain.Nino
 import utils.RefinedUtils.RefinedIntOps
 
-case class IndividualRecipientNinoPage(srn: Srn, index: Max9999999)
-    extends QuestionPage[ConditionalYesNo[String, Nino]] {
+case class IndividualRecipientNinoPage(srn: Srn, index: Max5000) extends QuestionPage[ConditionalYesNo[String, Nino]] {
 
   override def path: JsPath = Paths.loanTransactions \ "recipientIdentityType" \ toString \ index.arrayIndex.toString
 

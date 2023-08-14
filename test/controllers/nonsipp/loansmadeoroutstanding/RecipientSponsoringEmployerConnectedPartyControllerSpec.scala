@@ -16,35 +16,37 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
-import config.Refined.OneTo9999999
+import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.loansmadeoroutstanding.RecipientSponsoringEmployerConnectedPartyController._
 import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
-import models.{NormalMode, ReceivedLoanType, RecipientDetails, SponsoringOrConnectedParty, UserAnswers}
+import models.{IdentitySubject, IdentityType, NormalMode, RecipientDetails, SponsoringOrConnectedParty, UserAnswers}
+import pages.nonsipp.common.IdentityTypePage
 import pages.nonsipp.loansmadeoroutstanding._
 import views.html.RadioListView
 
 class RecipientSponsoringEmployerConnectedPartyControllerSpec extends ControllerBaseSpec {
 
-  private val index = refineMV[OneTo9999999](1)
+  private val index = refineMV[OneTo5000](1)
+  private val subject = IdentitySubject.LoanRecipient
 
   lazy val onPageLoad = routes.RecipientSponsoringEmployerConnectedPartyController.onPageLoad(srn, index, NormalMode)
   lazy val onSubmit = routes.RecipientSponsoringEmployerConnectedPartyController.onSubmit(srn, index, NormalMode)
 
   val userAnswersWithCompanyName: UserAnswers =
     defaultUserAnswers
-      .unsafeSet(WhoReceivedLoanPage(srn, index), ReceivedLoanType.UKCompany)
+      .unsafeSet(IdentityTypePage(srn, index, subject), IdentityType.UKCompany)
       .unsafeSet(CompanyRecipientNamePage(srn, index), companyName)
 
   val userAnswersWithPartnershipName: UserAnswers =
     defaultUserAnswers
-      .unsafeSet(WhoReceivedLoanPage(srn, index), ReceivedLoanType.UKPartnership)
+      .unsafeSet(IdentityTypePage(srn, index, subject), IdentityType.UKPartnership)
       .unsafeSet(PartnershipRecipientNamePage(srn, index), partnershipName)
 
   val userAnswersWithOtherName: UserAnswers =
     defaultUserAnswers
-      .unsafeSet(WhoReceivedLoanPage(srn, index), ReceivedLoanType.Other)
+      .unsafeSet(IdentityTypePage(srn, index, subject), IdentityType.Other)
       .unsafeSet(OtherRecipientDetailsPage(srn, index), RecipientDetails(otherName, "test description"))
 
   "RecipientSponsoringEmployerConnectedParty Controller" - {

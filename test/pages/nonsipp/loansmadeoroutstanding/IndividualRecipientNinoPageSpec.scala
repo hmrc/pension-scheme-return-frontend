@@ -16,7 +16,7 @@
 
 package pages.nonsipp.loansmadeoroutstanding
 
-import config.Refined.OneTo9999999
+import config.Refined.OneTo5000
 import eu.timepit.refined.refineMV
 import models.ConditionalYesNo
 import pages.behaviours.PageBehaviours
@@ -26,7 +26,7 @@ class IndividualRecipientNinoPageSpec extends PageBehaviours {
 
   "IndividualRecipientNinoPage" - {
 
-    val index = refineMV[OneTo9999999](1)
+    val index = refineMV[OneTo5000](1)
 
     beRetrievable[ConditionalYesNo[String, Nino]](IndividualRecipientNinoPage(srnGen.sample.value, index))
 

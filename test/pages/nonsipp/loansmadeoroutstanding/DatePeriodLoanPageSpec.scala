@@ -16,7 +16,7 @@
 
 package pages.nonsipp.loansmadeoroutstanding
 
-import config.Refined.OneTo9999999
+import config.Refined.OneTo5000
 import eu.timepit.refined.refineMV
 import models.Money
 import pages.behaviours.PageBehaviours
@@ -27,7 +27,7 @@ class DatePeriodLoanPageSpec extends PageBehaviours {
 
   "DatePeriodLoanPage" - {
     val srn = srnGen.sample.value
-    val index = refineMV[OneTo9999999](1)
+    val index = refineMV[OneTo5000](1)
 
     beRetrievable[(LocalDate, Money, Int)](DatePeriodLoanPage(srn, index))
 
