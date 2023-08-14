@@ -954,3 +954,7 @@ landOrPropertyTotalCost.error.tooLarge = Total cost or value of the land or prop
 isLandOrPropertyResidential.title = Is any part of the land or property residential property?
 isLandOrPropertyResidential.heading = Is any part of {0} residential property?
 isLandOrPropertyResidential.error.required = Select yes if any part of the land or property is residential property
+
+landPropertyIndependentValuation.title = Was the transaction supported by an independent valuation?
+landPropertyIndependentValuation.heading = Was the transaction for {0} supported by an independent valuation?
+landPropertyIndependentValuation.error.required = Select yes if the transaction was supported by an independent valuation

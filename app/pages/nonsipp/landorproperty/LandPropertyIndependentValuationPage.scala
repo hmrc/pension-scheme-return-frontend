@@ -20,12 +20,12 @@ import config.Refined.Max5000
 import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
-import utils.RefinedUtils.RefinedIntOps
 
-case class LandPropertyInUKPage(srn: Srn, index: Max5000) extends QuestionPage[Boolean] {
+case class LandPropertyIndependentValuationPage(srn: Srn, index: Max5000) extends QuestionPage[Boolean] {
 
   override def path: JsPath =
-    JsPath \ "assets" \ "landOrProperty" \ "landOrPropertyTransactions" \ "propertyDetails" \ toString \ index.arrayIndex.toString
+    JsPath \ "assets" \ "landOrProperty" \ "landOrPropertyTransactions" \ "heldPropertyTransaction" \ toString
 
-  override def toString: String = "landOrPropertyInUK"
+  override def toString: String = "indepValuationSupport"
+
 }
