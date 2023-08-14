@@ -62,7 +62,6 @@ class WhenDidSchemeAcquireController @Inject()(
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
-        //val address = Address("line1", "line2", None, None, None, "asd")
         request.userAnswers.get(LandOrPropertyAddressLookupPage(srn, index)).getOrRecoverJourney { address =>
           val preparedForm = {
             request.userAnswers.fillForm(LandOrPropertyWhenDidSchemeAcquirePage(srn, index), form(date.to, request))
