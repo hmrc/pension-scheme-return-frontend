@@ -76,6 +76,17 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         )
         .withName("go from land or property in uk page to land or property address lookup when no selected")
     )
+
+    act.like(
+      normalmode
+        .navigateToWithDataAndIndex(
+          index,
+          LandOrPropertyTotalCostPage,
+          Gen.const(money),
+          controllers.nonsipp.landorproperty.routes.IsLandOrPropertyResidentialController.onPageLoad
+        )
+        .withName("go from land or property total cost page to is land or property residential page")
+    )
   }
 
   "WhatYouWillNeedNavigator" - {

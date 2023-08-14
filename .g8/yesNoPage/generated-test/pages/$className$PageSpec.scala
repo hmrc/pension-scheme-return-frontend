@@ -1,15 +1,31 @@
+
 package pages
 
 import pages.behaviours.PageBehaviours
+import models.Money
+$if(!index.empty)$
+import config.Refined.$index$
+import eu.timepit.refined.refineMV
+$endif$
 
-class $className$PageSpec extends PageBehaviours {
+class $className;format="cap"$PageSpec extends PageBehaviours {
 
   "$className$Page" - {
 
-    beRetrievable[Boolean]($className$Page(srnGen.sample.value))
+    $if(!index.empty) $
+    val index = refineMV[$index$.Refined](1)
 
-    beSettable[Boolean]($className$Page(srnGen.sample.value))
+    beRetrievable[Boolean]($className;format="cap"$Page(srnGen.sample.value, index))
 
-    beRemovable[Boolean]($className$Page(srnGen.sample.value))
+    beSettable[Boolean]($className;format="cap"$Page(srnGen.sample.value, index))
+
+    beRemovable[Boolean]($className;format="cap"$Page(srnGen.sample.value, index))
+    $else$
+    beRetrievable[Boolean]($className;format="cap"$Page(srnGen.sample.value))
+
+    beSettable[Boolean]($className;format="cap"$Page(srnGen.sample.value))
+
+    beRemovable[Boolean]($className;format="cap"$Page(srnGen.sample.value))
+    $endif$
   }
 }
