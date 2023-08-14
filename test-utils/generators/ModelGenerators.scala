@@ -268,6 +268,9 @@ trait ModelGenerators extends BasicGenerators {
   implicit val memberOrConnectedPartyGen: Gen[MemberOrConnectedParty] =
     Gen.oneOf(MemberOrConnectedParty.Member, MemberOrConnectedParty.ConnectedParty, MemberOrConnectedParty.Neither)
 
+  implicit val schemeHoldLandPropertyGen: Gen[SchemeHoldLandProperty] =
+    Gen.oneOf(SchemeHoldLandProperty.Acquisition, SchemeHoldLandProperty.Contribution, SchemeHoldLandProperty.Transfer)
+
   implicit val sponsoringOrConnectedPartyGen: Gen[SponsoringOrConnectedParty] =
     Gen.oneOf(
       SponsoringOrConnectedParty.Sponsoring,

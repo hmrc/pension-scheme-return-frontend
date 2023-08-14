@@ -927,3 +927,11 @@ landOrPropertyAddressLookup.chooseAddress.searchAgain.link = Search again
 landOrPropertyAddressLookup.confirmAddress.title = Review and confirm the address
 landOrPropertyAddressLookup.confirmAddress.heading = Review and confirm the address
 landOrPropertyAddressLookup.confirmAddress.change.link = Edit the address
+
+whyDoesSchemeHoldLandProperty.title = Why does the scheme hold this land or property?
+whyDoesSchemeHoldLandProperty.heading = Why does {0} hold {1}?
+whyDoesSchemeHoldLandProperty.option1 = Acquisition
+whyDoesSchemeHoldLandProperty.option1.hint = This can be a purchase.
+whyDoesSchemeHoldLandProperty.option2 = Contribution by an employer or member
+whyDoesSchemeHoldLandProperty.option3 = Transfer from another scheme
+whyDoesSchemeHoldLandProperty.error.required = Select why the scheme holds this land or property

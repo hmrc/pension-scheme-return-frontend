@@ -20,7 +20,12 @@ import config.Refined.{Max5000, OneTo5000, OneTo9999999}
 import eu.timepit.refined.refineMV
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.landorproperty.{LandOrPropertyHeldPage, LandPropertyInUKPage, WhatYouWillNeedLandOrPropertyPage}
+import pages.nonsipp.landorproperty.{
+  LandOrPropertyHeldPage,
+  LandPropertyInUKPage,
+  WhatYouWillNeedLandOrPropertyPage,
+  WhyDoesSchemeHoldLandPropertyPage
+}
 import utils.BaseSpec
 
 class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
@@ -86,6 +91,19 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           controllers.nonsipp.landorproperty.routes.LandPropertyInUKController.onPageLoad
         )
         .withName("go from what you will need Land or Property page to Unauthorised page")
+    )
+  }
+
+  "WhyDoesSchemeHoldLandPropertyNavigator" - {
+
+    act.like(
+      normalmode
+        .navigateToWithIndex(
+          index,
+          (srn, _: Max5000) => WhyDoesSchemeHoldLandPropertyPage(srn, index),
+          (srn, index: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+        )
+        .withName("why does scheme hold land property page to unauthorised page ")
     )
   }
 }
