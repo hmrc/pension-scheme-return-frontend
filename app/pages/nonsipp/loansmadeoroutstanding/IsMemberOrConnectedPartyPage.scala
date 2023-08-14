@@ -16,14 +16,14 @@
 
 package pages.nonsipp.loansmadeoroutstanding
 
-import config.Refined.Max9999999
+import config.Refined.Max5000
 import models.MemberOrConnectedParty
 import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
 
-case class IsMemberOrConnectedPartyPage(srn: Srn, index: Max9999999) extends QuestionPage[MemberOrConnectedParty] {
+case class IsMemberOrConnectedPartyPage(srn: Srn, index: Max5000) extends QuestionPage[MemberOrConnectedParty] {
 
   override def path: JsPath = Paths.loanTransactions \ toString \ index.arrayIndex.toString
 

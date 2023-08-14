@@ -16,8 +16,9 @@
 
 package navigation.nonsipp
 
-import config.Refined.{Max5000, OneTo5000, OneTo9999999}
+import config.Refined.Max5000
 import eu.timepit.refined.refineMV
+import models.SchemeHoldLandProperty
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.landorproperty.{
@@ -26,13 +27,15 @@ import pages.nonsipp.landorproperty.{
   LandPropertyIndependentValuationPage,
   WhatYouWillNeedLandOrPropertyPage
 }
+import pages.nonsipp.landorproperty._
 import utils.BaseSpec
+import utils.UserAnswersUtils.UserAnswersOps
 
 class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
   val navigator: Navigator = new NonSippNavigator
 
-  private val index = refineMV[OneTo5000](1)
+  private val index = refineMV[Max5000.Refined](1)
 
   "LandOrPropertyNavigator" - {
 
@@ -116,6 +119,19 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           (srn, index: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
         )
         .withName("go from land property independent valuation page to unauthorised page when no selected")
+
+  "WhyDoesSchemeHoldLandPropertyNavigator" - {
+
+    act.like(
+      normalmode
+        .navigateToWithIndex(
+          index,
+          WhyDoesSchemeHoldLandPropertyPage,
+          controllers.nonsipp.landorproperty.routes.LandOrPropertyTotalCostController.onPageLoad,
+          srn =>
+            defaultUserAnswers.unsafeSet(WhyDoesSchemeHoldLandPropertyPage(srn, index), SchemeHoldLandProperty.Transfer)
+        )
+        .withName("why does scheme hold land property page to land or property total cost on Transfer")
     )
   }
 }

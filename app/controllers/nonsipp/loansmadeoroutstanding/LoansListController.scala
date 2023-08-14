@@ -19,7 +19,7 @@ package controllers.nonsipp.loansmadeoroutstanding
 import cats.implicits._
 import com.google.inject.Inject
 import config.Constants.maxLoans
-import config.Refined.{Max9999999, OneTo9999999}
+import config.Refined.Max5000
 import controllers.PSRController
 import controllers.actions._
 import controllers.nonsipp.loansmadeoroutstanding.LoansListController._
@@ -29,9 +29,10 @@ import forms.YesNoPageFormProvider
 import models.CheckOrChange.Change
 import models.SchemeId.Srn
 import models.requests.DataRequest
-import models.{Mode, Money, NormalMode, ReceivedLoanType}
+import models.{IdentitySubject, IdentityType, Mode, Money, NormalMode}
 import navigation.Navigator
 import pages.nonsipp.accountingperiod.AccountingPeriodListPage
+import pages.nonsipp.common.IdentityTypes
 import pages.nonsipp.loansmadeoroutstanding._
 import play.api.data.Form
 import play.api.i18n.MessagesApi
@@ -88,25 +89,25 @@ class LoansListController @Inject()(
 
   private def loanRecipients(
     srn: Srn
-  )(implicit request: DataRequest[_]): Either[Result, List[(Refined[Int, OneTo9999999], String, Money)]] = {
+  )(implicit request: DataRequest[_]): Either[Result, List[(Refined[Int, Max5000.Refined], String, Money)]] = {
     val whoReceivedLoans = request.userAnswers
-      .map(WhoReceivedLoans(srn))
+      .map(IdentityTypes(srn, IdentitySubject.LoanRecipient))
       .map {
         case (key, value) =>
-          key.toIntOption.flatMap(k => refineV[OneTo9999999](k + 1).toOption.map(_ -> value))
+          key.toIntOption.flatMap(k => refineV[Max5000.Refined](k + 1).toOption.map(_ -> value))
       }
       .toList
 
     for {
       receivedLoans <- whoReceivedLoans.traverse(_.getOrRecoverJourney)
       recipientNames <- receivedLoans.traverse {
-        case (index, ReceivedLoanType.Individual) =>
+        case (index, IdentityType.Individual) =>
           request.userAnswers.get(IndividualRecipientNamePage(srn, index)).getOrRecoverJourney.map(index -> _)
-        case (index, ReceivedLoanType.UKCompany) =>
+        case (index, IdentityType.UKCompany) =>
           request.userAnswers.get(CompanyRecipientNamePage(srn, index)).getOrRecoverJourney.map(index -> _)
-        case (index, ReceivedLoanType.UKPartnership) =>
+        case (index, IdentityType.UKPartnership) =>
           request.userAnswers.get(PartnershipRecipientNamePage(srn, index)).getOrRecoverJourney.map(index -> _)
-        case (index, ReceivedLoanType.Other) =>
+        case (index, IdentityType.Other) =>
           request.userAnswers.get(OtherRecipientDetailsPage(srn, index)).map(_.name).getOrRecoverJourney.map(index -> _)
       }
       recipientDetails <- recipientNames.traverse {
@@ -127,7 +128,7 @@ object LoansListController {
       "loansList.radios.error.required"
     )
 
-  private def rows(srn: Srn, mode: Mode, recipients: List[(Max9999999, String, Money)]): List[ListRow] =
+  private def rows(srn: Srn, mode: Mode, recipients: List[(Max5000, String, Money)]): List[ListRow] =
     recipients.flatMap {
       case (index, recipientName, totalLoan) =>
         List(
@@ -144,7 +145,7 @@ object LoansListController {
   def viewModel(
     srn: Srn,
     mode: Mode,
-    recipients: List[(Max9999999, String, Money)]
+    recipients: List[(Max5000, String, Money)]
   ): FormPageViewModel[ListViewModel] = {
 
     val title = if (recipients.length == 1) "loansList.title" else "loansList.title.plural"

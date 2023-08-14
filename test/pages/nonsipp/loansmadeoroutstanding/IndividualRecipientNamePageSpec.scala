@@ -16,7 +16,7 @@
 
 package pages.nonsipp.loansmadeoroutstanding
 
-import config.Refined.OneTo9999999
+import config.Refined.OneTo5000
 import eu.timepit.refined.refineMV
 import pages.behaviours.PageBehaviours
 
@@ -24,7 +24,7 @@ class IndividualRecipientNamePageSpec extends PageBehaviours {
 
   "IndividualRecipientNamePage" - {
     val srn = srnGen.sample.value
-    val index = refineMV[OneTo9999999](1)
+    val index = refineMV[OneTo5000](1)
 
     beRetrievable[String](IndividualRecipientNamePage(srn, index))
 

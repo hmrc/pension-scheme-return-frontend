@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
-import config.Refined.Max9999999
+import config.Refined.Max5000
 import controllers.actions._
 import controllers.nonsipp.loansmadeoroutstanding.IsMemberOrConnectedPartyController._
 import forms.RadioListFormProvider
@@ -52,7 +52,7 @@ class IsMemberOrConnectedPartyController @Inject()(
 
   val form = IsMemberOrConnectedPartyController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       request.usingAnswer(IndividualRecipientNamePage(srn, index)).sync { individualName =>
         Ok(
@@ -64,7 +64,7 @@ class IsMemberOrConnectedPartyController @Inject()(
       }
   }
 
-  def onSubmit(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()
@@ -93,7 +93,7 @@ object IsMemberOrConnectedPartyController {
 
   def viewModel(
     srn: Srn,
-    index: Max9999999,
+    index: Max5000,
     individualName: String,
     mode: Mode
   ): FormPageViewModel[RadioListViewModel] =

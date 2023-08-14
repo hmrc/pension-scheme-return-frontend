@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
-import config.Refined.Max9999999
+import config.Refined.Max5000
 import controllers.actions._
 import controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNinoController._
 import forms.YesNoPageFormProvider
@@ -53,7 +53,7 @@ class IndividualRecipientNinoController @Inject()(
 
   private val form: Form[Either[String, Nino]] = IndividualRecipientNinoController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       request.usingAnswer(IndividualRecipientNamePage(srn, index)).sync { individualName =>
         val preparedForm = request.userAnswers.fillForm(IndividualRecipientNinoPage(srn, index), form)
@@ -61,7 +61,7 @@ class IndividualRecipientNinoController @Inject()(
       }
   }
 
-  def onSubmit(srn: Srn, index: Max9999999, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()
@@ -96,7 +96,7 @@ object IndividualRecipientNinoController {
 
   def viewModel(
     srn: Srn,
-    index: Max9999999,
+    index: Max5000,
     individualName: String,
     mode: Mode
   ): FormPageViewModel[ConditionalYesNoPageViewModel] =

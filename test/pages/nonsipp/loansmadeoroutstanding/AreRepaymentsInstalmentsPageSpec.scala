@@ -16,7 +16,7 @@
 
 package pages.nonsipp.loansmadeoroutstanding
 
-import config.Refined.OneTo9999999
+import config.Refined.OneTo5000
 import eu.timepit.refined.refineMV
 import pages.behaviours.PageBehaviours
 
@@ -25,7 +25,7 @@ class AreRepaymentsInstalmentsPageSpec extends PageBehaviours {
   "AreRepaymentsInstalmentsPage" - {
 
     val srn = srnGen.sample.value
-    val index = refineMV[OneTo9999999](1)
+    val index = refineMV[OneTo5000](1)
 
     beRetrievable[Boolean](AreRepaymentsInstalmentsPage(srn, index))
 
