@@ -14,26 +14,24 @@
  * limitations under the License.
  */
 
-package config
+package pages
 
-import eu.timepit.refined.api.Refined
-import eu.timepit.refined.boolean.And
-import eu.timepit.refined.numeric.{Greater, LessEqual}
+import pages.behaviours.PageBehaviours
+import models.Money
+import config.Refined.Max5000
+import pages.nonsipp.landorproperty.LandOrPropertyTotalCostPage
+import eu.timepit.refined.refineMV
 
-object Refined {
-  type OneToTen = Greater[0] And LessEqual[10]
-  type Max10 = Int Refined OneToTen
+class LandOrPropertyTotalCostPageSpec extends PageBehaviours {
 
-  type OneToThree = Greater[0] And LessEqual[3]
-  type Max3 = Int Refined OneToThree
+  "LandOrPropertyTotalCostPage" - {
 
-  type OneTo300 = Greater[0] And LessEqual[300]
-  type Max300 = Int Refined OneTo300
+    val index = refineMV[Max5000.Refined](1)
 
-  type OneTo5000 = Greater[0] And LessEqual[5000]
+    beRetrievable[Money](LandOrPropertyTotalCostPage(srnGen.sample.value, index))
 
-  object Max5000 {
-    type Refined = Greater[0] And LessEqual[5000]
+    beSettable[Money](LandOrPropertyTotalCostPage(srnGen.sample.value, index))
+
+    beRemovable[Money](LandOrPropertyTotalCostPage(srnGen.sample.value, index))
   }
-  type Max5000 = Int Refined Max5000.Refined
 }

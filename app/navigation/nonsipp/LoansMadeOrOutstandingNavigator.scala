@@ -16,14 +16,14 @@
 
 package navigation.nonsipp
 
-import config.Refined.OneTo5000
+import config.Refined.Max5000
 import eu.timepit.refined.{refineMV, refineV}
+import models.ConditionalYesNo._
 import models.{CheckOrChange, IdentitySubject, IdentityType, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.common.{IdentityTypePage, IdentityTypes}
 import pages.nonsipp.loansmadeoroutstanding._
-import models.ConditionalYesNo._
 import play.api.mvc.Call
 
 object LoansMadeOrOutstandingNavigator extends JourneyNavigator {
@@ -121,7 +121,7 @@ object LoansMadeOrOutstandingNavigator extends JourneyNavigator {
       controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController.onPageLoad(srn, NormalMode)
 
     case LoansListPage(srn, addLoan @ true) =>
-      refineV[OneTo5000](userAnswers.map(IdentityTypes(srn, IdentitySubject.LoanRecipient)).size + 1) match {
+      refineV[Max5000.Refined](userAnswers.map(IdentityTypes(srn, IdentitySubject.LoanRecipient)).size + 1) match {
         case Left(_) => controllers.routes.JourneyRecoveryController.onPageLoad()
         case Right(nextIndex) =>
           controllers.nonsipp.common.routes.IdentityTypeController

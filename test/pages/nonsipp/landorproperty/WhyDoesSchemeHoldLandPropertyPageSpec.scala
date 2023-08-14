@@ -16,7 +16,7 @@
 
 package pages.nonsipp.landorproperty
 
-import config.Refined.{OneTo5000, OneTo9999999}
+import config.Refined.OneTo5000
 import eu.timepit.refined.refineMV
 import models.SchemeHoldLandProperty
 import pages.behaviours.PageBehaviours
