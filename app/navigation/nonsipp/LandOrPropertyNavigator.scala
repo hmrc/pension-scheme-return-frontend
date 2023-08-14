@@ -17,6 +17,7 @@
 package navigation.nonsipp
 
 import eu.timepit.refined.refineMV
+import models.SchemeHoldLandProperty.{Acquisition, Contribution}
 import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
@@ -44,8 +45,12 @@ object LandOrPropertyNavigator extends JourneyNavigator {
       controllers.nonsipp.landorproperty.routes.WhyDoesSchemeHoldLandPropertyController
         .onPageLoad(srn, index, NormalMode)
 
-    case WhyDoesSchemeHoldLandPropertyPage(srn, index) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+    case page @ WhyDoesSchemeHoldLandPropertyPage(srn, index) =>
+      userAnswers.get(page) match {
+        case Some(Acquisition) | Some(Contribution) =>
+          controllers.nonsipp.landorproperty.routes.WhenDidSchemeAcquireController.onPageLoad(srn, index, NormalMode)
+        case _ => controllers.routes.UnauthorisedController.onPageLoad()
+      }
 
     case LandOrPropertyWhenDidSchemeAcquirePage(srn, index) =>
       controllers.routes.UnauthorisedController.onPageLoad()

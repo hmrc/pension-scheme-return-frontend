@@ -27,7 +27,7 @@ import java.time.LocalDate
 case class LandOrPropertyWhenDidSchemeAcquirePage(srn: Srn, index: Max5000) extends QuestionPage[LocalDate] {
 
   override def path: JsPath =
-    Paths.landOrPropertyTransactions \ index.arrayIndex.toString \ "heldPropertyTransaction" \ toString
+    Paths.landOrPropertyTransactions \ "heldPropertyTransaction" \ toString \ index.arrayIndex.toString
 
   override def toString: String = "dateOfAcquisitionOrContribution"
 }
