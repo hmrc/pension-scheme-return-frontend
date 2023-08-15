@@ -52,3 +52,12 @@ GET         /:srn/when-did-scheme-acquire-land-property/:index               con
 POST        /:srn/when-did-scheme-acquire-land-property/:index               controllers.nonsipp.landorproperty.WhenDidSchemeAcquireController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
 GET         /:srn/change-when-did-scheme-acquire-land-property/:index        controllers.nonsipp.landorproperty.WhenDidSchemeAcquireController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 POST        /:srn/change-when-did-scheme-acquire-land-property/:index        controllers.nonsipp.landorproperty.WhenDidSchemeAcquireController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET        /:srn/is-land-property-leased                           controllers.nonsipp.landorproperty.IsLandPropertyLeasedController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
+GET        /:srn/is-land-property-leased/:index                    controllers.nonsipp.landorproperty.IsLandPropertyLeasedController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST       /:srn/is-land-property-leased                           controllers.nonsipp.landorproperty.IsLandPropertyLeasedController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
+POST       /:srn/is-land-property-leased/:index                    controllers.nonsipp.landorproperty.IsLandPropertyLeasedController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET        /:srn/change-is-land-property-leased                    controllers.nonsipp.landorproperty.IsLandPropertyLeasedController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
+GET        /:srn/change-is-land-property-leased/:index             controllers.nonsipp.landorproperty.IsLandPropertyLeasedController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST       /:srn/change-is-land-property-leased                    controllers.nonsipp.landorproperty.IsLandPropertyLeasedController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
+POST       /:srn/change-is-land-property-leased/:index             controllers.nonsipp.landorproperty.IsLandPropertyLeasedController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
