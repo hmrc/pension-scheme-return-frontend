@@ -26,7 +26,7 @@ import utils.RefinedUtils.RefinedIntOps
 case class WhyDoesSchemeHoldLandPropertyPage(srn: Srn, index: Max5000) extends QuestionPage[SchemeHoldLandProperty] {
 
   override def path: JsPath =
-    JsPath \ "assets" \ "landOrProperty" \ "landOrPropertyTransactions" \ "heldPropertyTransaction" \ toString \ index.arrayIndex.toString
+    Paths.landOrPropertyTransactions \ "heldPropertyTransaction" \ toString \ index.arrayIndex.toString
 
   override def toString: String = "methodOfHolding"
 }

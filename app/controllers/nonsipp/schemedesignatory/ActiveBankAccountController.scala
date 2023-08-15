@@ -23,7 +23,6 @@ import models.{CheckMode, Mode, NormalMode}
 import models.SchemeId.Srn
 import navigation.Navigator
 import pages.nonsipp.BasicDetailsCheckYourAnswersPage
-import pages.nonsipp.accountingperiod.AccountingPeriodListPage
 import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, WhyNoBankAccountPage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}

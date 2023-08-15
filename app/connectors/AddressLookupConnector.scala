@@ -20,15 +20,13 @@ import config.FrontendAppConfig
 import connectors.AddressLookupConnector._
 import models._
 import play.api.http.Status._
-import play.api.i18n.{Lang, Messages, MessagesApi}
-import play.api.libs.json.{__, Format, JsError, JsObject, JsSuccess, Json, Reads}
-import play.api.mvc.RequestHeader
+import play.api.i18n.Messages
+import play.api.libs.json._
+import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads, HttpResponse}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.HttpReads.Implicits._
-
 import scala.util.{Failure, Success, Try}
 
 class AddressLookupConnector @Inject()(http: HttpClient, appConfig: FrontendAppConfig)(

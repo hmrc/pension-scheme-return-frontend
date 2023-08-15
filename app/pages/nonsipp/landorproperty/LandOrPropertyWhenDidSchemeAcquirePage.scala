@@ -14,22 +14,20 @@
  * limitations under the License.
  */
 
-package pages
+package pages.nonsipp.landorproperty
 
-import models.{MoneyInPeriod, NormalMode}
-import pages.behaviours.PageBehaviours
-import pages.nonsipp.schemedesignatory.HowMuchCashPage
+import config.Refined.Max5000
+import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
+import utils.RefinedUtils.RefinedIntOps
 
-class HowMuchCashPageSpec extends PageBehaviours {
+import java.time.LocalDate
 
-  "HowMuchCashPage" - {
+case class LandOrPropertyWhenDidSchemeAcquirePage(srn: Srn, index: Max5000) extends QuestionPage[LocalDate] {
 
-    val srn = srnGen.sample.value
+  override def path: JsPath =
+    Paths.landOrPropertyTransactions \ "heldPropertyTransaction" \ toString \ index.arrayIndex.toString
 
-    beRetrievable[MoneyInPeriod](HowMuchCashPage(srn, NormalMode))
-
-    beSettable[MoneyInPeriod](HowMuchCashPage(srn, NormalMode))
-
-    beRemovable[MoneyInPeriod](HowMuchCashPage(srn, NormalMode))
-  }
+  override def toString: String = "dateOfAcquisitionOrContribution"
 }

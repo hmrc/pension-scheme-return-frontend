@@ -14,22 +14,24 @@
  * limitations under the License.
  */
 
-package pages
+package pages.nonsipp.landorproperty
 
-import models.{MoneyInPeriod, NormalMode}
+import config.Refined.OneTo5000
+import eu.timepit.refined.refineMV
 import pages.behaviours.PageBehaviours
-import pages.nonsipp.schemedesignatory.HowMuchCashPage
 
-class HowMuchCashPageSpec extends PageBehaviours {
+import java.time.LocalDate
 
-  "HowMuchCashPage" - {
+class LandOrPropertyWhenDidSchemeAcquirePageSpec extends PageBehaviours {
 
-    val srn = srnGen.sample.value
+  "LandOrPropertyWhenDidSchemeAcquirePage" - {
 
-    beRetrievable[MoneyInPeriod](HowMuchCashPage(srn, NormalMode))
+    val index = refineMV[OneTo5000](1)
 
-    beSettable[MoneyInPeriod](HowMuchCashPage(srn, NormalMode))
+    beRetrievable[LocalDate](LandOrPropertyWhenDidSchemeAcquirePage(srnGen.sample.value, index))
 
-    beRemovable[MoneyInPeriod](HowMuchCashPage(srn, NormalMode))
+    beSettable[LocalDate](LandOrPropertyWhenDidSchemeAcquirePage(srnGen.sample.value, index))
+
+    beRemovable[LocalDate](LandOrPropertyWhenDidSchemeAcquirePage(srnGen.sample.value, index))
   }
 }

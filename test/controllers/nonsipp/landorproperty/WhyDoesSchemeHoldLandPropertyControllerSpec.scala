@@ -21,7 +21,7 @@ import controllers.ControllerBaseSpec
 import controllers.nonsipp.landorproperty.WhyDoesSchemeHoldLandPropertyController._
 import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
-import models.{Address, NormalMode, SchemeHoldLandProperty}
+import models.{NormalMode, SchemeHoldLandProperty}
 import pages.nonsipp.landorproperty.{LandOrPropertyAddressLookupPage, WhyDoesSchemeHoldLandPropertyPage}
 import views.html.RadioListView
 
