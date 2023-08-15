@@ -55,3 +55,9 @@ GET        /:srn/change-land-property-independent-valuation                    c
 GET        /:srn/change-land-property-independent-valuation/:index             controllers.nonsipp.landorproperty.LandPropertyIndependentValuationController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 POST       /:srn/change-land-property-independent-valuation                    controllers.nonsipp.landorproperty.LandPropertyIndependentValuationController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
 POST       /:srn/change-land-property-independent-valuation/:index             controllers.nonsipp.landorproperty.LandPropertyIndependentValuationController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET         /:srn/when-did-scheme-acquire-land-property/                     controllers.nonsipp.landorproperty.WhenDidSchemeAcquireController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
+GET         /:srn/when-did-scheme-acquire-land-property/:index               controllers.nonsipp.landorproperty.WhenDidSchemeAcquireController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/when-did-scheme-acquire-land-property/:index               controllers.nonsipp.landorproperty.WhenDidSchemeAcquireController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/change-when-did-scheme-acquire-land-property/:index        controllers.nonsipp.landorproperty.WhenDidSchemeAcquireController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-when-did-scheme-acquire-land-property/:index        controllers.nonsipp.landorproperty.WhenDidSchemeAcquireController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)

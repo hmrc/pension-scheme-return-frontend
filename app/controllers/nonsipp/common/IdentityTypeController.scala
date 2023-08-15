@@ -22,21 +22,20 @@ import controllers.nonsipp.common.IdentityTypeController._
 import forms.RadioListFormProvider
 import models.IdentityType.{Individual, Other, UKCompany, UKPartnership}
 import models.SchemeId.Srn
-import models.requests.DataRequest
 import models.{IdentitySubject, IdentityType, Mode, NormalMode, UserAnswers}
 import navigation.Navigator
 import pages.nonsipp.common.IdentityTypePage
 import pages.nonsipp.landorproperty.LandPropertyInUKPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, AnyContentAsEmpty, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.FormUtils.FormOps
 import viewmodels.DisplayMessage.Message
+import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, RadioListRowViewModel, RadioListViewModel}
 import views.html.RadioListView
-import viewmodels.implicits._
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}

@@ -14,22 +14,13 @@
  * limitations under the License.
  */
 
-package pages
+package pages.nonsipp
 
-import models.{MoneyInPeriod, NormalMode}
-import pages.behaviours.PageBehaviours
-import pages.nonsipp.schemedesignatory.HowMuchCashPage
+import play.api.libs.json._
 
-class HowMuchCashPageSpec extends PageBehaviours {
-
-  "HowMuchCashPage" - {
-
-    val srn = srnGen.sample.value
-
-    beRetrievable[MoneyInPeriod](HowMuchCashPage(srn, NormalMode))
-
-    beSettable[MoneyInPeriod](HowMuchCashPage(srn, NormalMode))
-
-    beRemovable[MoneyInPeriod](HowMuchCashPage(srn, NormalMode))
+package object landorproperty {
+  object Paths {
+    val assets: JsPath = __ \ "assets"
+    val landOrPropertyTransactions: JsPath = assets \ "landOrProperty" \ "landOrPropertyTransactions"
   }
 }

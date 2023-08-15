@@ -905,6 +905,17 @@ landPropertyInUK.title = Is this land or property in the UK?
 landPropertyInUK.heading = Is this land or property in the UK?
 landPropertyInUK.error.required = Select yes if the land or property is in the UK
 
+whenDidSchemeAcquireLandOrProperty.title = When did the scheme acquire this land or property?
+whenDidSchemeAcquireLandOrProperty.heading = When did {0} acquire {1}?
+whenDidSchemeAcquireLandOrProperty.dateOfAcquired.error.required.all = Enter the date the scheme acquired this land or property
+whenDidSchemeAcquireLandOrProperty.dateOfAcquired.error.required.day = Date the scheme acquired this land or property must include a day
+whenDidSchemeAcquireLandOrProperty.dateOfAcquired.error.required.month = Date the scheme acquired this land or property must include a month
+whenDidSchemeAcquireLandOrProperty.dateOfAcquired.error.required.year = Date the scheme acquired this land or property must include a year
+whenDidSchemeAcquireLandOrProperty.dateOfAcquired.error.required.two = Date the scheme acquired this land or property must include a {0} and {1}
+whenDidSchemeAcquireLandOrProperty.dateOfAcquired.error.invalid.date = Date the scheme acquired this land or property must be a real date
+whenDidSchemeAcquireLandOrProperty.dateOfAcquired.error.invalid.characters = Date the scheme acquired this land or property must only include numbers 0 to 9
+whenDidSchemeAcquireLandOrProperty.dateOfAcquired.error.future = Date the scheme acquired this land or property must be before {0}
+
 landOrPropertyAddressLookup.selectCountry.title = Which country is the land or property in?
 landOrPropertyAddressLookup.selectCountry.heading = Which country is the land or property in?
 landOrPropertyAddressLookup.selectCountry.input = Select a country

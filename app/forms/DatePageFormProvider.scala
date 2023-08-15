@@ -14,22 +14,20 @@
  * limitations under the License.
  */
 
-package pages
+package forms
 
-import models.{MoneyInPeriod, NormalMode}
-import pages.behaviours.PageBehaviours
-import pages.nonsipp.schemedesignatory.HowMuchCashPage
+import forms.mappings.Mappings
+import forms.mappings.errors.DateFormErrors
+import play.api.data.Form
+import play.api.data.Forms.mapping
 
-class HowMuchCashPageSpec extends PageBehaviours {
+import java.time.LocalDate
+import javax.inject.Inject
 
-  "HowMuchCashPage" - {
+class DatePageFormProvider @Inject() extends Mappings {
 
-    val srn = srnGen.sample.value
-
-    beRetrievable[MoneyInPeriod](HowMuchCashPage(srn, NormalMode))
-
-    beSettable[MoneyInPeriod](HowMuchCashPage(srn, NormalMode))
-
-    beRemovable[MoneyInPeriod](HowMuchCashPage(srn, NormalMode))
-  }
+  def apply(dateFormErrors: DateFormErrors): Form[LocalDate] =
+    Form(
+      mapping("value" -> localDate(dateFormErrors))(identity)(Some(_))
+    )
 }
