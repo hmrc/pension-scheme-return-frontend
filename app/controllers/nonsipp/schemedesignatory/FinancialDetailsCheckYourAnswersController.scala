@@ -153,7 +153,7 @@ object FinancialDetailsCheckYourAnswersController {
               schemeDetails.schemeName,
               taxStartDate(taxYearOrAccountingPeriods).show
             ),
-            howMuchCash.moneyAtStart.displayAs
+            "£" + howMuchCash.moneyAtStart.displayAs
           ).withChangeAction(
               controllers.nonsipp.schemedesignatory.routes.HowMuchCashController
                 .onPageLoad(srn, CheckMode)
@@ -170,7 +170,7 @@ object FinancialDetailsCheckYourAnswersController {
                 schemeDetails.schemeName,
                 taxEndDate(taxYearOrAccountingPeriods).show
               ),
-              howMuchCash.moneyAtEnd.displayAs
+              "£" + howMuchCash.moneyAtEnd.displayAs
             ).withChangeAction(
                 controllers.nonsipp.schemedesignatory.routes.HowMuchCashController
                   .onPageLoad(srn, CheckMode)
@@ -187,7 +187,7 @@ object FinancialDetailsCheckYourAnswersController {
                 schemeDetails.schemeName,
                 taxStartDate(taxYearOrAccountingPeriods).show
               ),
-              valueOfAssets.moneyAtStart.displayAs
+              "£" + valueOfAssets.moneyAtStart.displayAs
             ).withChangeAction(
                 controllers.nonsipp.schemedesignatory.routes.ValueOfAssetsController
                   .onPageLoad(srn, CheckMode)
@@ -204,7 +204,7 @@ object FinancialDetailsCheckYourAnswersController {
                 schemeDetails.schemeName,
                 taxEndDate(taxYearOrAccountingPeriods).show
               ),
-              valueOfAssets.moneyAtEnd.displayAs
+              "£" + valueOfAssets.moneyAtEnd.displayAs
             ).withChangeAction(
                 controllers.nonsipp.schemedesignatory.routes.ValueOfAssetsController
                   .onPageLoad(srn, CheckMode)
@@ -221,7 +221,7 @@ object FinancialDetailsCheckYourAnswersController {
                 schemeDetails.schemeName,
                 taxEndDate(taxYearOrAccountingPeriods).show
               ),
-              feesCommissionsWagesSalaries.displayAs
+              "£" + feesCommissionsWagesSalaries.displayAs
             ).withChangeAction(
                 controllers.nonsipp.schemedesignatory.routes.FeesCommissionsWagesSalariesController
                   .onPageLoad(srn, CheckMode)

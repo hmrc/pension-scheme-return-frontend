@@ -417,7 +417,7 @@ object LoansCYAController {
             ),
           CheckYourAnswersRowViewModel(
             Message("loanCheckYourAnswers.section2.assetsValue", recipientName),
-            assetsValue.displayAs
+            s"£${assetsValue.displayAs}"
           ).withAction(
             SummaryAction(
               "site.change",
@@ -452,7 +452,7 @@ object LoansCYAController {
       CheckYourAnswersSection(
         Some(Heading2.medium("loanCheckYourAnswers.section3.heading")),
         List(
-          CheckYourAnswersRowViewModel("loanCheckYourAnswers.section3.loanAmount.total", totalLoan.displayAs)
+          CheckYourAnswersRowViewModel("loanCheckYourAnswers.section3.loanAmount.total", s"£${totalLoan.displayAs}")
             .withAction(
               SummaryAction(
                 "site.change",
@@ -461,7 +461,7 @@ object LoansCYAController {
             ),
           CheckYourAnswersRowViewModel(
             "loanCheckYourAnswers.section3.loanAmount.repayments",
-            repayments.displayAs
+            s"£${repayments.displayAs}"
           ).withAction(
             SummaryAction(
               "site.change",
@@ -470,7 +470,7 @@ object LoansCYAController {
           ),
           CheckYourAnswersRowViewModel(
             Message("loanCheckYourAnswers.section3.loanAmount.outstanding", returnEndDate.show),
-            outstanding.displayAs
+            s"£${outstanding.displayAs}"
           ).withAction(
             SummaryAction(
               "site.change",
@@ -505,7 +505,7 @@ object LoansCYAController {
       CheckYourAnswersSection(
         Some(Heading2.medium("loanCheckYourAnswers.section4.heading")),
         List(
-          CheckYourAnswersRowViewModel("loanCheckYourAnswers.section4.payable", interestPayable.displayAs)
+          CheckYourAnswersRowViewModel("loanCheckYourAnswers.section4.payable", s"£${interestPayable.displayAs}")
             .withAction(
               SummaryAction(
                 "site.change",
@@ -519,7 +519,7 @@ object LoansCYAController {
                 routes.InterestOnLoanController.onPageLoad(srn, index, mode).url + "#rate"
               ).withVisuallyHiddenContent("loanCheckYourAnswers.section4.rate.hidden")
             ),
-          CheckYourAnswersRowViewModel("loanCheckYourAnswers.section4.payments", interestPayments.displayAs)
+          CheckYourAnswersRowViewModel("loanCheckYourAnswers.section4.payments", s"£${interestPayments.displayAs}")
             .withAction(
               SummaryAction(
                 "site.change",
@@ -549,7 +549,7 @@ object LoansCYAController {
               ).withVisuallyHiddenContent("loanCheckYourAnswers.section6.arrears.hidden")
             )
         ) :?+ outstandingArrearsOnLoan.map { value =>
-          CheckYourAnswersRowViewModel("loanCheckYourAnswers.section6.arrears.yes", value.displayAs)
+          CheckYourAnswersRowViewModel("loanCheckYourAnswers.section6.arrears.yes", s"£${value.displayAs}")
             .withAction(
               SummaryAction(
                 "site.change",

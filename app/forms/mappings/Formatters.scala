@@ -200,7 +200,7 @@ trait Formatters {
           .bind(key, data.view.mapValues(_.replace("£", "")).toMap)
           .flatMap { double =>
             if (BigDecimal(double).toString().matches(decimalRegex))
-              Right(Money(double, new DecimalFormat("£#,##0.00").format(double)))
+              Right(Money(double, new DecimalFormat("#,##0.00").format(double)))
             else
               Left(Seq(FormError(key, errors.nonNumericKey, args)))
           }
