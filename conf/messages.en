@@ -966,6 +966,10 @@ isLandOrPropertyResidential.title = Is any part of the land or property resident
 isLandOrPropertyResidential.heading = Is any part of {0} residential property?
 isLandOrPropertyResidential.error.required = Select yes if any part of the land or property is residential property
 
+IsLandPropertyLeased.title = Is the land or property leased?
+IsLandPropertyLeased.heading = Is {0} leased?
+isLandPropertyLeased.error.required =  Select yes if the land or property is leased
+
 landPropertyIndependentValuation.title = Was the transaction supported by an independent valuation?
 landPropertyIndependentValuation.heading = Was the transaction for {0} supported by an independent valuation?
 landPropertyIndependentValuation.error.required = Select yes if the transaction was supported by an independent valuation
