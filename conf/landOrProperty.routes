@@ -38,6 +38,15 @@ GET         /:srn/change-land-property-total-cost-value/:index               con
 POST        /:srn/change-land-property-total-cost-value                      controllers.nonsipp.landorproperty.LandOrPropertyTotalCostController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
 POST        /:srn/change-land-property-total-cost-value/:index               controllers.nonsipp.landorproperty.LandOrPropertyTotalCostController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 
+GET         /:srn/is-land-property-residential                               controllers.nonsipp.landorproperty.IsLandOrPropertyResidentialController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
+GET         /:srn/is-land-property-residential/:index                        controllers.nonsipp.landorproperty.IsLandOrPropertyResidentialController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/is-land-property-residential                               controllers.nonsipp.landorproperty.IsLandOrPropertyResidentialController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
+POST        /:srn/is-land-property-residential/:index                        controllers.nonsipp.landorproperty.IsLandOrPropertyResidentialController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/change-is-land-property-residential                        controllers.nonsipp.landorproperty.IsLandOrPropertyResidentialController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
+GET         /:srn/change-is-land-property-residential/:index                 controllers.nonsipp.landorproperty.IsLandOrPropertyResidentialController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-is-land-property-residential                        controllers.nonsipp.landorproperty.IsLandOrPropertyResidentialController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
+POST        /:srn/change-is-land-property-residential/:index                 controllers.nonsipp.landorproperty.IsLandOrPropertyResidentialController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
 GET         /:srn/when-did-scheme-acquire-land-property/                     controllers.nonsipp.landorproperty.WhenDidSchemeAcquireController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
 GET         /:srn/when-did-scheme-acquire-land-property/:index               controllers.nonsipp.landorproperty.WhenDidSchemeAcquireController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
 POST        /:srn/when-did-scheme-acquire-land-property/:index               controllers.nonsipp.landorproperty.WhenDidSchemeAcquireController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)

@@ -78,6 +78,17 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
     act.like(
       normalmode
+        .navigateToWithDataAndIndex(
+          index,
+          LandOrPropertyTotalCostPage,
+          Gen.const(money),
+          controllers.nonsipp.landorproperty.routes.IsLandOrPropertyResidentialController.onPageLoad
+        )
+        .withName("go from land or property total cost page to is land or property residential page")
+    )
+
+    act.like(
+      normalmode
         .navigateToWithIndex(
           index,
           (srn, _: Max5000) => WhatYouWillNeedLandOrPropertyPage(srn),

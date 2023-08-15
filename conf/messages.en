@@ -961,3 +961,7 @@ landOrPropertyTotalCost.hint = If the land or property was acquired, provide the
 landOrPropertyTotalCost.error.required = Enter the total cost or value of the land or property, in pounds and pence
 landOrPropertyTotalCost.error.invalid = Total cost or value of the land or property must be an amount of money, like 123 or 123.45
 landOrPropertyTotalCost.error.tooLarge = Total cost or value of the land or property must be 999999999.99 or less
+
+isLandOrPropertyResidential.title = Is any part of the land or property residential property?
+isLandOrPropertyResidential.heading = Is any part of {0} residential property?
+isLandOrPropertyResidential.error.required = Select yes if any part of the land or property is residential property
