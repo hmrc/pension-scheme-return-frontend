@@ -16,16 +16,21 @@
 
 package pages.nonsipp.landorproperty
 
-import config.Refined.Max5000
-import models.SchemeId.Srn
-import pages.QuestionPage
-import play.api.libs.json.JsPath
-import utils.RefinedUtils.RefinedIntOps
+import config.Refined.{Max5000, OneTo5000}
+import eu.timepit.refined.refineMV
+import pages.behaviours.PageBehaviours
 
-case class LandPropertyInUKPage(srn: Srn, index: Max5000) extends QuestionPage[Boolean] {
+class LandPropertyIndependentValuationPageSpec extends PageBehaviours {
 
-  override def path: JsPath =
-    JsPath \ "assets" \ "landOrProperty" \ "landOrPropertyTransactions" \ "propertyDetails" \ toString \ index.arrayIndex.toString
+  "LandPropertyIndependentValuationPage" - {
 
-  override def toString: String = "landOrPropertyInUK"
+    val srn = srnGen.sample.value
+    val index = refineMV[OneTo5000](1)
+
+    beRetrievable[Boolean](LandPropertyIndependentValuationPage(srn, index))
+
+    beSettable[Boolean](LandPropertyIndependentValuationPage(srn, index))
+
+    beRemovable[Boolean](LandPropertyIndependentValuationPage(srn, index))
+  }
 }
