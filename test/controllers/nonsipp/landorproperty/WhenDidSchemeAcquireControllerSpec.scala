@@ -21,7 +21,7 @@ import controllers.ControllerBaseSpec
 import controllers.nonsipp.landorproperty.WhenDidSchemeAcquireController._
 import eu.timepit.refined.refineMV
 import forms.DatePageFormProvider
-import models.{Address, NormalMode, UserAnswers}
+import models.{NormalMode, UserAnswers}
 import pages.nonsipp.landorproperty.{LandOrPropertyAddressLookupPage, LandOrPropertyWhenDidSchemeAcquirePage}
 import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
@@ -43,9 +43,6 @@ class WhenDidSchemeAcquireControllerSpec extends ControllerBaseSpec {
   override def beforeEach(): Unit =
     reset(mockSchemeDateService)
 
-  private val addressLine1 = "addressLine1"
-  val address: Address =
-    Address(addressLine1, "addressLine2", Some("addressLine3"), Some("town"), Some("postCode"), "country")
   val populatedUserAnswers: UserAnswers =
     defaultUserAnswers.set(LandOrPropertyAddressLookupPage(srn, index), address).get
   private lazy val onPageLoad = routes.WhenDidSchemeAcquireController.onPageLoad(srn, index, NormalMode)
@@ -72,7 +69,7 @@ class WhenDidSchemeAcquireControllerSpec extends ControllerBaseSpec {
       injected[DatePageView]
         .apply(
           form(injected[DatePageFormProvider])(date, createMessages(app)),
-          viewModel(srn, index, NormalMode, schemeName, addressLine1)
+          viewModel(srn, index, NormalMode, schemeName, address.addressLine1)
         )
     }.before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear)))
 
@@ -83,7 +80,7 @@ class WhenDidSchemeAcquireControllerSpec extends ControllerBaseSpec {
             .apply(
               form(injected[DatePageFormProvider])(date, createMessages(app))
                 .fill(date),
-              viewModel(srn, index, NormalMode, schemeName, addressLine1)
+              viewModel(srn, index, NormalMode, schemeName, address.addressLine1)
             )
       }.before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear))
     )

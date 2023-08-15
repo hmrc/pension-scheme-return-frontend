@@ -17,8 +17,7 @@
 package navigation.nonsipp
 
 import eu.timepit.refined.refineMV
-import models.SchemeHoldLandProperty.{Acquisition, Contribution}
-import models.{NormalMode, UserAnswers}
+import models.{NormalMode, SchemeHoldLandProperty, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.landorproperty._
@@ -47,13 +46,15 @@ object LandOrPropertyNavigator extends JourneyNavigator {
 
     case page @ WhyDoesSchemeHoldLandPropertyPage(srn, index) =>
       userAnswers.get(page) match {
-        case Some(Acquisition) | Some(Contribution) =>
+        case Some(SchemeHoldLandProperty.Transfer) =>
+          controllers.nonsipp.landorproperty.routes.LandOrPropertyTotalCostController.onPageLoad(srn, index, NormalMode)
+        case _ =>
           controllers.nonsipp.landorproperty.routes.WhenDidSchemeAcquireController.onPageLoad(srn, index, NormalMode)
-        case _ => controllers.routes.UnauthorisedController.onPageLoad()
       }
 
-    case LandOrPropertyWhenDidSchemeAcquirePage(srn, index) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+    case LandOrPropertyTotalCostPage(srn, index) => controllers.routes.UnauthorisedController.onPageLoad()
+
+    case LandOrPropertyWhenDidSchemeAcquirePage(srn, index) => controllers.routes.UnauthorisedController.onPageLoad()
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty

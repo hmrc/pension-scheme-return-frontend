@@ -954,3 +954,10 @@ whyDoesSchemeHoldLandProperty.option1.hint = This can be a purchase.
 whyDoesSchemeHoldLandProperty.option2 = Contribution by an employer or member
 whyDoesSchemeHoldLandProperty.option3 = Transfer from another scheme
 whyDoesSchemeHoldLandProperty.error.required = Select why the scheme holds this land or property
+
+landOrPropertyTotalCost.title = What was the total cost or value of the land or property, in pounds and pence?
+landOrPropertyTotalCost.heading = What was the total cost or value of {0}, in pounds and pence?
+landOrPropertyTotalCost.hint = If the land or property was acquired, provide the total cost. If the land or property was held for another reason, provide the total value.
+landOrPropertyTotalCost.error.required = Enter the total cost or value of the land or property, in pounds and pence
+landOrPropertyTotalCost.error.invalid = Total cost or value of the land or property must be an amount of money, like 123 or 123.45
+landOrPropertyTotalCost.error.tooLarge = Total cost or value of the land or property must be 999999999.99 or less

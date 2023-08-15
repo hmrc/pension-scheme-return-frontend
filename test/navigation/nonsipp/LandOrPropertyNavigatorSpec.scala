@@ -16,25 +16,19 @@
 
 package navigation.nonsipp
 
-import config.Refined.{Max5000, OneTo5000}
+import config.Refined.Max5000
 import eu.timepit.refined.refineMV
-import models.SchemeHoldLandProperty.{Acquisition, Contribution}
+import models.SchemeHoldLandProperty.{Acquisition, Contribution, Transfer}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.landorproperty.{
-  LandOrPropertyHeldPage,
-  LandOrPropertyWhenDidSchemeAcquirePage,
-  LandPropertyInUKPage,
-  WhatYouWillNeedLandOrPropertyPage,
-  WhyDoesSchemeHoldLandPropertyPage
-}
+import pages.nonsipp.landorproperty._
 import utils.BaseSpec
 
 class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
   val navigator: Navigator = new NonSippNavigator
 
-  private val index = refineMV[OneTo5000](1)
+  private val index = refineMV[Max5000.Refined](1)
 
   "LandOrPropertyNavigator" - {
 
@@ -114,7 +108,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           (srn, index: Max5000, mode) =>
             controllers.nonsipp.landorproperty.routes.WhenDidSchemeAcquireController.onPageLoad(srn, index, mode)
         )
-        .withName("why does scheme hold land property page to WhenDidSchemeAcquireController page when Acquisition")
+        .withName("why does scheme hold land property page to WhenDidSchemeAcquireController page on Acquisition")
     )
 
     act.like(
@@ -126,7 +120,19 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           (srn, index: Max5000, mode) =>
             controllers.nonsipp.landorproperty.routes.WhenDidSchemeAcquireController.onPageLoad(srn, index, mode)
         )
-        .withName("why does scheme hold land property page to WhenDidSchemeAcquireController page when Contribution")
+        .withName("why does scheme hold land property page to WhenDidSchemeAcquireController page on Contribution")
+    )
+
+    act.like(
+      normalmode
+        .navigateToWithDataAndIndex(
+          index,
+          (srn, _: Max5000) => WhyDoesSchemeHoldLandPropertyPage(srn, index),
+          Gen.const(Transfer),
+          (srn, index: Max5000, mode) =>
+            controllers.nonsipp.landorproperty.routes.LandOrPropertyTotalCostController.onPageLoad(srn, index, mode)
+        )
+        .withName("why does scheme hold land property page to WhenDidSchemeAcquireController page on Transfer")
     )
   }
 }
