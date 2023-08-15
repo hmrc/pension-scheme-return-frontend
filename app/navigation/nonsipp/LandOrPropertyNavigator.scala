@@ -55,7 +55,15 @@ object LandOrPropertyNavigator extends JourneyNavigator {
     case LandOrPropertyTotalCostPage(srn, index) =>
       controllers.nonsipp.landorproperty.routes.IsLandOrPropertyResidentialController.onPageLoad(srn, index, NormalMode)
 
-    case LandOrPropertyWhenDidSchemeAcquirePage(srn, index) => controllers.routes.UnauthorisedController.onPageLoad()
+    case page @ LandPropertyIndependentValuationPage(srn, index) =>
+      if (userAnswers.get(page).contains(true)) {
+        controllers.nonsipp.landorproperty.routes.LandOrPropertyTotalCostController.onPageLoad(srn, index, NormalMode)
+      } else {
+        controllers.nonsipp.landorproperty.routes.LandOrPropertyTotalCostController.onPageLoad(srn, index, NormalMode)
+      }
+
+    case LandOrPropertyWhenDidSchemeAcquirePage(srn, index) => controllers.nonsipp.landorproperty.routes.LandPropertyIndependentValuationController.onPageLoad(srn, index, NormalMode)
+
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty

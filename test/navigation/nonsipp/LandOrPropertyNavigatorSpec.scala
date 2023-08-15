@@ -18,6 +18,8 @@ package navigation.nonsipp
 
 import config.Refined.Max5000
 import eu.timepit.refined.refineMV
+
+import models.{NormalMode, SchemeHoldLandProperty}
 import models.SchemeHoldLandProperty.{Acquisition, Contribution, Transfer}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
@@ -102,9 +104,9 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateToWithIndex(
           index,
           LandOrPropertyWhenDidSchemeAcquirePage,
-          (_, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          (srn, index: Max5000, _) => controllers.nonsipp.landorproperty.routes.LandPropertyIndependentValuationController.onPageLoad(srn, index, NormalMode)
         )
-        .withName("go from land or property when did scheme acquire page to unauthorised page")
+        .withName("go from land or property when did scheme acquire page to land property independent valuation page")
     )
   }
 
@@ -144,6 +146,38 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             controllers.nonsipp.landorproperty.routes.LandOrPropertyTotalCostController.onPageLoad(srn, index, mode)
         )
         .withName("why does scheme hold land property page to WhenDidSchemeAcquireController page on Transfer")
+    )
+
+  }
+
+  "LandPropertyIndependentValuationNavigator" - {
+
+    act.like(
+      normalmode
+        .navigateToWithDataAndIndex(
+          index,
+          LandPropertyIndependentValuationPage,
+          Gen.const(true),
+          (srn, index: Max5000, _) =>
+            controllers.nonsipp.landorproperty.routes.LandOrPropertyTotalCostController
+              .onPageLoad(srn, index, NormalMode)
+        )
+        .withName(
+          "go from land property independent valuation page to land Or property total cost page when yes selected"
+        )
+    )
+
+    act.like(
+      normalmode
+        .navigateToWithDataAndIndex(
+          index,
+          LandPropertyIndependentValuationPage,
+          Gen.const(false),
+          (srn, index: Max5000, _) =>
+            controllers.nonsipp.landorproperty.routes.LandOrPropertyTotalCostController
+              .onPageLoad(srn, index, NormalMode)
+        )
+        .withName("go from land property independent valuation page to land Or property total cost page when no selected")
     )
   }
 }
