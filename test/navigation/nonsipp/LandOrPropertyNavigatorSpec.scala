@@ -18,7 +18,7 @@ package navigation.nonsipp
 
 import config.Refined.Max5000
 import eu.timepit.refined.refineMV
-
+import models.NormalMode
 import models.{NormalMode, SchemeHoldLandProperty}
 import models.SchemeHoldLandProperty.{Acquisition, Contribution, Transfer}
 import navigation.{Navigator, NavigatorBehaviours}
@@ -168,4 +168,27 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         )
     )
   }
+
+  act.like(
+    normalmode
+      .navigateToWithDataAndIndex(
+        index,
+        IsLandOrPropertyResidentialPage,
+        Gen.const(true),
+        (srn, index: Max5000, _) =>
+          controllers.nonsipp.landorproperty.routes.IsLandPropertyLeasedController.onPageLoad(srn, index, NormalMode)
+      )
+      .withName("go from land or property in uk page to Is land property leased when yes selected")
+  )
+
+  act.like(
+    normalmode
+      .navigateToWithDataAndIndex(
+        index,
+        IsLandOrPropertyResidentialPage,
+        Gen.const(false),
+        (srn, index: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+      )
+      .withName("go from land or property in uk page to unauthorised when no selected")
+  )
 }
