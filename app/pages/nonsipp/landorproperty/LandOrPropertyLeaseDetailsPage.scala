@@ -14,23 +14,20 @@
  * limitations under the License.
  */
 
-package forms
+package pages.nonsipp.landorproperty
 
-import play.api.data.Forms.mapping
-import play.api.data.{FieldMapping, Form, Mapping}
+import config.Refined.Max5000
+import models.SchemeId.Srn
+import models._
+import pages.QuestionPage
+import play.api.libs.json.JsPath
+import utils.RefinedUtils._
 
-object MultipleQuestionFormProvider {
+import java.time.LocalDate
 
-  def apply[A, B, C](
-    a: Mapping[A],
-    b: Mapping[B],
-    c: Mapping[C]
-  ): Form[(A, B, C)] =
-    Form(
-      mapping[(A, B, C), A, B, C](
-        "value.1" -> a,
-        "value.2" -> b,
-        "value.3" -> c
-      )(Tuple3.apply)(Tuple3.unapply)
-    )
+case class LandOrPropertyLeaseDetailsPage(srn: Srn, index: Max5000) extends QuestionPage[(String, Money, LocalDate)] {
+
+  override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString
+
+  override def toString: String = "landOrPropertyLeaseDetails"
 }
