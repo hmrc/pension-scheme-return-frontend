@@ -104,7 +104,9 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateToWithIndex(
           index,
           LandOrPropertyWhenDidSchemeAcquirePage,
-          (srn, index: Max5000, _) => controllers.nonsipp.landorproperty.routes.LandPropertyIndependentValuationController.onPageLoad(srn, index, NormalMode)
+          (srn, index: Max5000, _) =>
+            controllers.nonsipp.landorproperty.routes.LandPropertyIndependentValuationController
+              .onPageLoad(srn, index, NormalMode)
         )
         .withName("go from land or property when did scheme acquire page to land property independent valuation page")
     )
@@ -154,10 +156,9 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
     act.like(
       normalmode
-        .navigateToWithDataAndIndex(
+        .navigateToWithIndex(
           index,
           LandPropertyIndependentValuationPage,
-          Gen.const(true),
           (srn, index: Max5000, _) =>
             controllers.nonsipp.landorproperty.routes.LandOrPropertyTotalCostController
               .onPageLoad(srn, index, NormalMode)
@@ -165,19 +166,6 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .withName(
           "go from land property independent valuation page to land Or property total cost page when yes selected"
         )
-    )
-
-    act.like(
-      normalmode
-        .navigateToWithDataAndIndex(
-          index,
-          LandPropertyIndependentValuationPage,
-          Gen.const(false),
-          (srn, index: Max5000, _) =>
-            controllers.nonsipp.landorproperty.routes.LandOrPropertyTotalCostController
-              .onPageLoad(srn, index, NormalMode)
-        )
-        .withName("go from land property independent valuation page to land Or property total cost page when no selected")
     )
   }
 

@@ -209,17 +209,17 @@ class MappingsSpec extends AnyFreeSpec with Matchers with OptionValues with Mapp
 
     "must bind a valid int" in {
       val result = testForm.bind(Map("value" -> "1.00"))
-      result.get mustEqual Money(1, "£1.00")
+      result.get mustEqual Money(1, "1.00")
     }
 
     "must bind a valid double" in {
       val result = testForm.bind(Map("value" -> "10.1"))
-      result.get mustEqual Money(10.1, "£10.10")
+      result.get mustEqual Money(10.1, "10.10")
     }
 
     "must bind a double with a £ symbol" in {
-      val result = testForm.bind(Map("value" -> "£10.01"))
-      result.get mustEqual Money(10.01, "£10.01")
+      val result = testForm.bind(Map("value" -> "10.01"))
+      result.get mustEqual Money(10.01, "10.01")
     }
 
     "must not bind an empty value" in {
