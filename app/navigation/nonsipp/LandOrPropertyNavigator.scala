@@ -71,10 +71,14 @@ object LandOrPropertyNavigator extends JourneyNavigator {
 
     case page @ IsLandPropertyLeasedPage(srn, index) =>
       if (userAnswers.get(page).contains(true)) {
-        controllers.routes.UnauthorisedController.onPageLoad()
+        controllers.nonsipp.landorproperty.routes.LandOrPropertyLeaseDetailsController
+          .onPageLoad(srn, index, NormalMode)
       } else {
         controllers.routes.UnauthorisedController.onPageLoad()
       }
+
+    case LandOrPropertyLeaseDetailsPage(srn, index) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
 
   }
 
