@@ -644,7 +644,7 @@ individualRecipientName.error.invalid.characters = Recipient’s name must only 
 companyRecipientName.title = What is the recipient’s company name?
 companyRecipientName.heading = What is the recipient’s company name?
 companyRecipientName.error.required = Enter the recipient’s company name
-companyRecipientName.error.invalid.characters = Recipient’s company name must only include letters, numbers, and special characters such as hyphens, spaces and apostrophes
+companyRecipientName.error.invalid.characters = Recipient’s company name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
 companyRecipientName.error.length = Recipient’s company name must be 160 characters or fewer
 
 isMemberOrConnectedParty.title = Is the recipient a member or a connected party?
