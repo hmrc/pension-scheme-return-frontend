@@ -17,7 +17,7 @@
 package forms
 
 import play.api.data.Forms.mapping
-import play.api.data.{FieldMapping, Form, Mapping}
+import play.api.data.{Form, Mapping}
 
 object MultipleQuestionFormProvider {
 

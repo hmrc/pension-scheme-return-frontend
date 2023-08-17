@@ -16,9 +16,9 @@
 
 package controllers.nonsipp.landorproperty
 
-import config.Refined.{Max5000, OneTo5000}
-import controllers.nonsipp.landorproperty.LandOrPropertyLeaseDetailsController._
+import config.Refined.Max5000
 import controllers.ControllerBaseSpec
+import controllers.nonsipp.landorproperty.LandOrPropertyLeaseDetailsController._
 import eu.timepit.refined.refineMV
 import models.NormalMode
 import pages.nonsipp.landorproperty.{LandOrPropertyAddressLookupPage, LandOrPropertyLeaseDetailsPage}

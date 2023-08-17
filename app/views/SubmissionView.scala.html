@@ -21,7 +21,7 @@
 
 @(viewModel: SubmissionViewModel)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(viewModel.title.toMessage)) {
+@layout(pageTitle = titleNoForm(viewModel.title.toMessage), showBackLink = false) {
 
     @govukPanel(PanelViewModel(
         renderMessage(viewModel.panelHeading),
