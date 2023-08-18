@@ -18,40 +18,40 @@ package controllers.nonsipp.loansmadeoroutstanding
 
 import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.loansmadeoroutstanding.IsMemberOrConnectedPartyController._
+import controllers.nonsipp.loansmadeoroutstanding.IsIndividualRecipientConnectedPartyController._
 import eu.timepit.refined.refineMV
-import forms.RadioListFormProvider
+import forms.YesNoPageFormProvider
 import models.{MemberOrConnectedParty, NormalMode, UserAnswers}
-import pages.nonsipp.loansmadeoroutstanding.{IndividualRecipientNamePage, IsMemberOrConnectedPartyPage}
-import views.html.RadioListView
+import pages.nonsipp.loansmadeoroutstanding.{IndividualRecipientNamePage, IsIndividualRecipientConnectedPartyPage}
+import views.html.YesNoPageView
 
-class IsMemberOrConnectedPartyControllerSpec extends ControllerBaseSpec {
+class IsIndividualRecipientConnectedPartyControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[OneTo5000](1)
 
-  lazy val onPageLoad = routes.IsMemberOrConnectedPartyController.onPageLoad(srn, index, NormalMode)
-  lazy val onSubmit = routes.IsMemberOrConnectedPartyController.onSubmit(srn, index, NormalMode)
+  lazy val onPageLoad = routes.IsIndividualRecipientConnectedPartyController.onPageLoad(srn, index, NormalMode)
+  lazy val onSubmit = routes.IsIndividualRecipientConnectedPartyController.onSubmit(srn, index, NormalMode)
 
   val userServicesWithIndividualName: UserAnswers =
     defaultUserAnswers.unsafeSet(IndividualRecipientNamePage(srn, index), individualName)
 
-  "IsMemberOrConnectedParty Controller" - {
+  "IsIndividualRecipientConnectedPartyController" - {
 
     act.like(renderView(onPageLoad, userServicesWithIndividualName) { implicit app => implicit request =>
-      injected[RadioListView]
-        .apply(form(injected[RadioListFormProvider]), viewModel(srn, index, individualName, NormalMode))
+      injected[YesNoPageView]
+        .apply(form(injected[YesNoPageFormProvider]), viewModel(srn, index, individualName, NormalMode))
     })
 
     act.like(
       renderPrePopView(
         onPageLoad,
-        IsMemberOrConnectedPartyPage(srn, index),
-        MemberOrConnectedParty.Member,
+        IsIndividualRecipientConnectedPartyPage(srn, index),
+        true,
         userServicesWithIndividualName
       ) { implicit app => implicit request =>
-        injected[RadioListView]
+        injected[YesNoPageView]
           .apply(
-            form(injected[RadioListFormProvider]).fill(MemberOrConnectedParty.Member),
+            form(injected[YesNoPageFormProvider]).fill(true),
             viewModel(srn, index, individualName, NormalMode)
           )
       }
@@ -59,7 +59,7 @@ class IsMemberOrConnectedPartyControllerSpec extends ControllerBaseSpec {
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
-    act.like(saveAndContinue(onSubmit, "value" -> MemberOrConnectedParty.Member.name))
+    act.like(saveAndContinue(onSubmit, "value" -> "true"))
 
     act.like(invalidForm(onSubmit, userServicesWithIndividualName))
 

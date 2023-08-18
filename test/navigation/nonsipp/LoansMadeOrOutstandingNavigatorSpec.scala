@@ -75,9 +75,9 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
         .navigateToWithIndex(
           index,
           IndividualRecipientNinoPage,
-          controllers.nonsipp.loansmadeoroutstanding.routes.IsMemberOrConnectedPartyController.onPageLoad
+          controllers.nonsipp.loansmadeoroutstanding.routes.IsIndividualRecipientConnectedPartyController.onPageLoad
         )
-        .withName("go from individual recipient nino page to is member or connected party page")
+        .withName("go from individual recipient nino page to is individual recipient connected party page")
     )
 
     "WhatYouWillNeedNavigator" - {

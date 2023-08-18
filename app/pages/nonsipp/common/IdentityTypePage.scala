@@ -65,7 +65,7 @@ case class IdentityTypePage(srn: Srn, index: Max5000, identitySubject: IdentityS
         List(
           IndividualRecipientNamePage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
           IndividualRecipientNinoPage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
-          IsMemberOrConnectedPartyPage(srn, index),
+          IsIndividualRecipientConnectedPartyPage(srn, index),
           CompanyRecipientNamePage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
           CompanyRecipientCrnPage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
           RecipientSponsoringEmployerConnectedPartyPage(srn, index),
