@@ -16,12 +16,12 @@
 
 package controllers.nonsipp.landorproperty
 
-import cats.implicits.toShow
+import cats.implicits._
 import config.Constants
 import config.Refined.Max5000
+import controllers.PSRController
 import controllers.actions._
 import controllers.nonsipp.landorproperty.LandOrPropertyLeaseDetailsController._
-import controllers.PSRController
 import forms.MultipleQuestionFormProvider
 import forms.mappings.Mappings
 import forms.mappings.errors._
@@ -42,9 +42,7 @@ import views.html.MultipleQuestionView
 
 import java.time.LocalDate
 import javax.inject.{Inject, Named}
-import scala.concurrent
 import scala.concurrent.{ExecutionContext, Future}
-import cats.implicits._
 
 class LandOrPropertyLeaseDetailsController @Inject()(
   override val messagesApi: MessagesApi,

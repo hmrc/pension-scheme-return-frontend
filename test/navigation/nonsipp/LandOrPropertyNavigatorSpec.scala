@@ -19,7 +19,6 @@ package navigation.nonsipp
 import config.Refined.Max5000
 import eu.timepit.refined.refineMV
 import models.NormalMode
-import models.{NormalMode, SchemeHoldLandProperty}
 import models.SchemeHoldLandProperty.{Acquisition, Contribution, Transfer}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
