@@ -846,7 +846,7 @@ securityGivenForLoan.securityGiven.yes.conditional = Provide details of the secu
 securityGivenForLoan.securityGiven.yes.hint = You can enter a maximum of 160 characters.
 securityGivenForLoan.securityGiven.error.required = Select yes if security has been given for this loan
 securityGivenForLoan.securityGiven.yes.conditional.error.required = Enter details of the security
-securityGivenForLoan.securityGiven.yes.conditional.error.invalid = Details of the security must only include letters, numbers, and special characters such as hyphens, spaces and apostrophes
+securityGivenForLoan.securityGiven.yes.conditional.error.invalid = Details of the security must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, full stops, hyphens, slashes, speech marks and spaces
 securityGivenForLoan.securityGiven.yes.conditional.error.length = Details of the security must be 160 characters or fewer
 
 loansList.title = You have added {0} loan
