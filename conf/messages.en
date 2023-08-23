@@ -989,3 +989,10 @@ landOrPropertyLeaseDetails.field3.error.required.two = Date the lease was grante
 landOrPropertyLeaseDetails.field3.error.invalid.date = Date the lease was granted must include must be a real date
 landOrPropertyLeaseDetails.field3.error.invalid.characters = Date the lease was granted must include must only include numbers 0 to 9
 landOrPropertyLeaseDetails.field3.error.future = Date the lease was granted must be before {0}
+
+landOrPropertyAcquiredFrom.title = Who was property acquired from?
+landOrPropertyAcquiredFrom.heading = Who was {0} acquired from?
+landOrPropertyAcquiredFrom.option1 = An individual
+landOrPropertyAcquiredFrom.option2 = A UK company
+landOrPropertyAcquiredFrom.option3 = A UK partnership
+landOrPropertyAcquiredFrom.option4 = Other

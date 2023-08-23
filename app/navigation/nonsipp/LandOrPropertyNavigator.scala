@@ -17,7 +17,7 @@
 package navigation.nonsipp
 
 import eu.timepit.refined.refineMV
-import models.{NormalMode, SchemeHoldLandProperty, UserAnswers}
+import models.{IdentityType, NormalMode, SchemeHoldLandProperty, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.landorproperty._
@@ -55,6 +55,19 @@ object LandOrPropertyNavigator extends JourneyNavigator {
     case LandOrPropertyWhenDidSchemeAcquirePage(srn, index) =>
       controllers.nonsipp.landorproperty.routes.LandPropertyIndependentValuationController
         .onPageLoad(srn, index, NormalMode)
+
+    //27h1
+    case page @ PropertyAcquiredFromPage(srn, index) =>
+      userAnswers.get(page) match {
+        case Some(IdentityType.UKPartnership) =>
+          //TODO change to 27h6
+          controllers.nonsipp.landorproperty.routes.WhyDoesSchemeHoldLandPropertyController
+            .onPageLoad(srn, index, NormalMode)
+        case _ =>
+          controllers.nonsipp.landorproperty.routes.WhyDoesSchemeHoldLandPropertyController
+            .onPageLoad(srn, index, NormalMode)
+
+      }
 
     case LandOrPropertyTotalCostPage(srn, index) =>
       controllers.nonsipp.landorproperty.routes.IsLandOrPropertyResidentialController.onPageLoad(srn, index, NormalMode)
