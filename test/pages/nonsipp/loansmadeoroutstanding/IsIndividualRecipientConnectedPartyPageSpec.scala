@@ -16,16 +16,20 @@
 
 package pages.nonsipp.loansmadeoroutstanding
 
-import config.Refined.Max5000
-import models.MemberOrConnectedParty
-import models.SchemeId.Srn
-import pages.QuestionPage
-import play.api.libs.json.JsPath
-import utils.RefinedUtils.RefinedIntOps
+import config.Refined.OneTo5000
+import eu.timepit.refined.refineMV
+import pages.behaviours.PageBehaviours
 
-case class IsMemberOrConnectedPartyPage(srn: Srn, index: Max5000) extends QuestionPage[MemberOrConnectedParty] {
+class IsIndividualRecipientConnectedPartyPageSpec extends PageBehaviours {
 
-  override def path: JsPath = Paths.loanTransactions \ toString \ index.arrayIndex.toString
+  "IsIndividualRecipientConnectedParty" - {
 
-  override def toString: String = "individualConnectedPartyStatus"
+    val index = refineMV[OneTo5000](1)
+
+    beRetrievable[Boolean](IsIndividualRecipientConnectedPartyPage(srnGen.sample.value, index))
+
+    beSettable[Boolean](IsIndividualRecipientConnectedPartyPage(srnGen.sample.value, index))
+
+    beRemovable[Boolean](IsIndividualRecipientConnectedPartyPage(srnGen.sample.value, index))
+  }
 }

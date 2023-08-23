@@ -18,12 +18,12 @@ package controllers.nonsipp.loansmadeoroutstanding
 
 import config.Refined.Max5000
 import controllers.actions._
-import controllers.nonsipp.loansmadeoroutstanding.IsMemberOrConnectedPartyController._
-import forms.RadioListFormProvider
+import controllers.nonsipp.loansmadeoroutstanding.IsIndividualRecipientConnectedPartyController.viewModel
+import forms.YesNoPageFormProvider
+import models.Mode
 import models.SchemeId.Srn
-import models.{MemberOrConnectedParty, Mode}
 import navigation.Navigator
-import pages.nonsipp.loansmadeoroutstanding.{IndividualRecipientNamePage, IsMemberOrConnectedPartyPage}
+import pages.nonsipp.loansmadeoroutstanding.{IndividualRecipientNamePage, IsIndividualRecipientConnectedPartyPage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -32,32 +32,33 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.FormUtils.FormOps
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
-import viewmodels.models._
-import views.html.RadioListView
+import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
+import views.html.YesNoPageView
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
-class IsMemberOrConnectedPartyController @Inject()(
+class IsIndividualRecipientConnectedPartyController @Inject()(
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
+  formProvider: YesNoPageFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  formProvider: RadioListFormProvider,
-  view: RadioListView
+  view: YesNoPageView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
 
-  val form = IsMemberOrConnectedPartyController.form(formProvider)
+  private def form: Form[Boolean] =
+    IsIndividualRecipientConnectedPartyController.form(formProvider)
 
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       request.usingAnswer(IndividualRecipientNamePage(srn, index)).sync { individualName =>
         Ok(
           view(
-            form.fromUserAnswers(IsMemberOrConnectedPartyPage(srn, index)),
+            form.fromUserAnswers(IsIndividualRecipientConnectedPartyPage(srn, index)),
             viewModel(srn, index, individualName, mode)
           )
         )
@@ -77,35 +78,24 @@ class IsMemberOrConnectedPartyController @Inject()(
             },
           success =>
             for {
-              userAnswers <- Future.fromTry(request.userAnswers.set(IsMemberOrConnectedPartyPage(srn, index), success))
+              userAnswers <- Future
+                .fromTry(request.userAnswers.set(IsIndividualRecipientConnectedPartyPage(srn, index), success))
               _ <- saveService.save(userAnswers)
             } yield {
-              Redirect(navigator.nextPage(IsMemberOrConnectedPartyPage(srn, index), mode, userAnswers))
+              Redirect(navigator.nextPage(IsIndividualRecipientConnectedPartyPage(srn, index), mode, userAnswers))
             }
         )
   }
 }
+object IsIndividualRecipientConnectedPartyController {
+  def form(formProvider: YesNoPageFormProvider): Form[Boolean] = formProvider(
+    "isIndividualRecipientConnectedParty.error.required"
+  )
 
-object IsMemberOrConnectedPartyController {
-
-  def form(formProvider: RadioListFormProvider): Form[MemberOrConnectedParty] =
-    formProvider("isMemberOrConnectedParty.error.required")
-
-  def viewModel(
-    srn: Srn,
-    index: Max5000,
-    individualName: String,
-    mode: Mode
-  ): FormPageViewModel[RadioListViewModel] =
-    RadioListViewModel(
-      "isMemberOrConnectedParty.title",
-      Message("isMemberOrConnectedParty.heading", individualName),
-      List(
-        RadioListRowViewModel("isMemberOrConnectedParty.option1", MemberOrConnectedParty.Member.name),
-        RadioListRowViewModel("isMemberOrConnectedParty.option2", MemberOrConnectedParty.ConnectedParty.name),
-        RadioListRowDivider.Or,
-        RadioListRowViewModel("isMemberOrConnectedParty.option3", MemberOrConnectedParty.Neither.name)
-      ),
-      routes.IsMemberOrConnectedPartyController.onSubmit(srn, index, mode)
+  def viewModel(srn: Srn, index: Max5000, individualName: String, mode: Mode): FormPageViewModel[YesNoPageViewModel] =
+    YesNoPageViewModel(
+      Message("isIndividualRecipientConnectedParty.title"),
+      Message("isIndividualRecipientConnectedParty.heading", individualName),
+      routes.IsIndividualRecipientConnectedPartyController.onSubmit(srn, index, mode)
     )
 }
