@@ -17,7 +17,6 @@
 package pages.nonsipp.loansmadeoroutstanding
 
 import config.Refined.Max5000
-import models.MemberOrConnectedParty
 import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath

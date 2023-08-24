@@ -103,10 +103,11 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
         normalmode
           .navigateTo(
             WhatYouWillNeedLoansPage,
-            controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController.onPageLoad,
+            (srn, mode) =>
+              controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController.onPageLoad(srn, 1, mode),
             completedLoanUserAnswers
           )
-          .withName("go from what you will need loans page to loans list page when a loan has aleady been completed")
+          .withName("go from what you will need loans page to loans list page when a loan has already been completed")
       )
     }
 

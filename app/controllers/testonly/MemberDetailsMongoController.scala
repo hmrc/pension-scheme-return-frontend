@@ -19,7 +19,7 @@ package controllers.testonly
 import cats.implicits._
 import config.Refined.{Max300, OneTo300}
 import controllers.actions.IdentifyAndRequireData
-import controllers.testonly.MongoController.buildRandomNameDOB
+import controllers.testonly.MemberDetailsMongoController.buildRandomNameDOB
 import eu.timepit.refined._
 import models.SchemeId.Srn
 import models.{NameDOB, UserAnswers}
@@ -34,7 +34,7 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Random, Try}
 
-class MongoController @Inject()(
+class MemberDetailsMongoController @Inject()(
   sessionRepository: SessionRepository,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents
@@ -76,13 +76,14 @@ class MongoController @Inject()(
       }
       hasNinoPages = indexes.map(index => DoesMemberHaveNinoPage(srn, index) -> false)
       noNinoReasonPages = indexes.map(index => NoNINOPage(srn, index) -> "test reason")
+
       ua1 <- memberDetails.foldLeft(Try(userAnswers)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
       ua2 <- hasNinoPages.foldLeft(Try(ua1)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
       ua3 <- noNinoReasonPages.foldLeft(Try(ua2)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
     } yield ua3
 }
 
-object MongoController {
+object MemberDetailsMongoController {
 
   private val firstNames = List(
     "Nathalia",
