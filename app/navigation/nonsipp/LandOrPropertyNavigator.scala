@@ -60,7 +60,7 @@ object LandOrPropertyNavigator extends JourneyNavigator {
         //27h1
         case _ =>
           controllers.nonsipp.landorproperty.routes.PropertyAcquiredFromController
-            .onPageLoad(srn, index, NormalMode, IdentitySubject.LandOrPropertySeller)
+            .onPageLoad(srn, index, NormalMode)
       }
 
     //27h1

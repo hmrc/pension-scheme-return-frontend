@@ -17,16 +17,14 @@
 package pages.nonsipp.landorproperty
 
 import config.Refined.Max5000
-import models.{IdentityType, SchemeHoldLandProperty}
+import models.SchemeHoldLandProperty
 import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
 
-import scala.util.{Success, Try}
+case class PropertyAcquiredFromPage(srn: Srn, index: Max5000) extends QuestionPage[SchemeHoldLandProperty] {
 
-case class PropertyAcquiredFromPage(srn: Srn, index: Max5000) extends QuestionPage[IdentityType] {
-//TODO double check the following path
   override def path: JsPath =
     Paths.landOrPropertyTransactions \ "acquiredFromType" \ toString \ index.arrayIndex.toString
 

@@ -19,18 +19,16 @@ package controllers.nonsipp.landorproperty
 import config.Refined.Max5000
 import controllers.PSRController
 import controllers.actions._
-import controllers.nonsipp.common.IdentityTypeController
-import controllers.nonsipp.common.IdentityTypeController.viewModel
+import controllers.nonsipp.landorproperty.PropertyAcquiredFromController._
 import forms.RadioListFormProvider
 import models.SchemeId.Srn
-import models.{IdentitySubject, IdentityType, Mode, NormalMode, SchemeHoldLandProperty}
+import models.{Mode, SchemeHoldLandProperty}
 import navigation.Navigator
-import pages.nonsipp.common.IdentityTypePage
+import pages.nonsipp.landorproperty.{LandOrPropertyAddressLookupPage, PropertyAcquiredFromPage}
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
-import utils.FormUtils.FormOps
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
 import viewmodels.models._
@@ -52,48 +50,43 @@ class PropertyAcquiredFromController @Inject()(
 
   val form = PropertyAcquiredFromController.form(formProvider)
 
-  def onPageLoad(
-    srn: Srn,
-    index: Max5000,
-    mode: Mode,
-    subject: IdentitySubject
-  ): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    val form = IdentityTypeController.form(formProvider, subject)
-    Ok(
-      view(
-        form.fromUserAnswers(IdentityTypePage(srn, index, subject)),
-        viewModel(srn, index, mode, subject, request.userAnswers)
-      )
-    )
+  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+    implicit request =>
+      request.userAnswers.get(LandOrPropertyAddressLookupPage(srn, index)).getOrRecoverJourney { address =>
+        val preparedForm = request.userAnswers.fillForm(PropertyAcquiredFromPage(srn, index), form)
+        Ok(view(preparedForm, viewModel(srn, index, request.schemeDetails.schemeName, address.addressLine1, mode)))
+      }
   }
 
-  def onSubmit(
-    srn: Srn,
-    index: Max5000,
-    mode: Mode,
-    subject: IdentitySubject
-  ): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
-    val form = IdentityTypeController.form(formProvider, subject)
-    form
-      .bindFromRequest()
-      .fold(
-        formWithErrors =>
-          Future
-            .successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode, subject, request.userAnswers)))),
-        answer => {
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(IdentityTypePage(srn, index, subject), answer))
-            _ <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage(IdentityTypePage(srn, index, subject), NormalMode, updatedAnswers))
-        }
-      )
+  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+    implicit request =>
+      form
+        .bindFromRequest()
+        .fold(
+          errors =>
+            request.userAnswers.get(LandOrPropertyAddressLookupPage(srn, index)).getOrRecoverJourney { address =>
+              Future.successful(
+                BadRequest(
+                  view(errors, viewModel(srn, index, request.schemeDetails.schemeName, address.addressLine1, mode))
+                )
+              )
+            },
+          success =>
+            for {
+              userAnswers <- Future
+                .fromTry(request.userAnswers.set(PropertyAcquiredFromPage(srn, index), success))
+              _ <- saveService.save(userAnswers)
+            } yield {
+              Redirect(navigator.nextPage(PropertyAcquiredFromPage(srn, index), mode, userAnswers))
+            }
+        )
   }
 }
 
 object PropertyAcquiredFromController {
 
-  def form(formProvider: RadioListFormProvider): Form[IdentityType] =
-    formProvider("whyDoesSchemeHoldLandProperty.error.required")
+  def form(formProvider: RadioListFormProvider): Form[SchemeHoldLandProperty] =
+    formProvider("landOrPropertyAcquiredFrom.error.required")
 
   def viewModel(
     srn: Srn,
@@ -104,16 +97,16 @@ object PropertyAcquiredFromController {
   ): FormPageViewModel[RadioListViewModel] =
     RadioListViewModel(
       "landOrPropertyAcquiredFrom.title",
-      Message("landOrPropertyAcquiredFrom.heading", schemeName, addressLine1),
+      Message("landOrPropertyAcquiredFrom.heading", addressLine1),
       List(
         RadioListRowViewModel(
-          Message("whyDoesSchemeHoldLandProperty.option1"),
+          Message("landOrPropertyAcquiredFrom.option1"),
           SchemeHoldLandProperty.Acquisition.name,
           Message("whyDoesSchemeHoldLandProperty.option1.hint")
         ),
-        RadioListRowViewModel("whyDoesSchemeHoldLandProperty.option2", SchemeHoldLandProperty.Contribution.name),
-        RadioListRowViewModel("whyDoesSchemeHoldLandProperty.option3", SchemeHoldLandProperty.Transfer.name)
+        RadioListRowViewModel("landOrPropertyAcquiredFrom.option2", SchemeHoldLandProperty.Contribution.name),
+        RadioListRowViewModel("landOrPropertyAcquiredFrom.option3", SchemeHoldLandProperty.Transfer.name)
       ),
-      routes.WhyDoesSchemeHoldLandPropertyController.onSubmit(srn, index, mode)
+      routes.PropertyAcquiredFromController.onSubmit(srn, index, mode)
     )
 }
