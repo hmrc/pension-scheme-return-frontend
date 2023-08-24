@@ -80,6 +80,9 @@ object LandOrPropertyNavigator extends JourneyNavigator {
     case LandOrPropertyLeaseDetailsPage(srn, index) =>
       controllers.routes.UnauthorisedController.onPageLoad()
 
+    case CompanySellerNamePage(srn, index) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
+
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty
