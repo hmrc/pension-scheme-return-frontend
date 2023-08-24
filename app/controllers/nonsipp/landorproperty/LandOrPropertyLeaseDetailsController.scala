@@ -18,6 +18,7 @@ package controllers.nonsipp.landorproperty
 
 import cats.implicits._
 import config.Constants
+import config.Constants._
 import config.Refined.Max5000
 import controllers.PSRController
 import controllers.actions._
@@ -92,7 +93,7 @@ class LandOrPropertyLeaseDetailsController @Inject()(
 
 object LandOrPropertyLeaseDetailsController {
   private val field1Errors: InputFormErrors =
-    InputFormErrors(
+    InputFormErrors.textArea(
       "landOrPropertyLeaseDetails.field1.error.required",
       "landOrPropertyLeaseDetails.field1.error.invalid",
       "landOrPropertyLeaseDetails.field1.error.length"

@@ -18,7 +18,7 @@ package navigation.nonsipp
 
 import config.Refined.Max5000
 import eu.timepit.refined.refineMV
-import models.{NormalMode, SchemeHoldLandProperty}
+import models._
 import models.SchemeHoldLandProperty.{Acquisition, Contribution, Transfer}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
@@ -76,6 +76,32 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             controllers.nonsipp.landorproperty.routes.LandOrPropertyAddressLookupController.onPageLoad(srn, index)
         )
         .withName("go from land or property in uk page to land or property address lookup when no selected")
+    )
+
+    act.like(
+      normalmode
+        .navigateToWithDataAndIndex(
+          index,
+          LandOrPropertyAddressLookupPage,
+          Gen.const(address),
+          (srn, index: Max5000, _) =>
+            controllers.nonsipp.landorproperty.routes.LandRegistryTitleNumberController
+              .onPageLoad(srn, index, NormalMode)
+        )
+        .withName("go from land or property address lookup page to land registry title page")
+    )
+
+    act.like(
+      normalmode
+        .navigateToWithDataAndIndex(
+          index,
+          LandRegistryTitleNumberPage,
+          Gen.const(ConditionalYesNo.yes[String, String]("test")),
+          (srn, index: Max5000, _) =>
+            controllers.nonsipp.landorproperty.routes.WhyDoesSchemeHoldLandPropertyController
+              .onPageLoad(srn, index, NormalMode)
+        )
+        .withName("go from land registry title page to why does scheme hold land or property page")
     )
 
     act.like(
