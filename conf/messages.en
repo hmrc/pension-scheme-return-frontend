@@ -996,4 +996,4 @@ landOrPropertyAcquiredFrom.option1 = An individual
 landOrPropertyAcquiredFrom.option2 = A UK company
 landOrPropertyAcquiredFrom.option3 = A UK partnership
 landOrPropertyAcquiredFrom.option4 = Other
-landOrPropertyAcquiredFrom.error.required = Select FIXME
+landOrPropertyAcquiredFrom.error.required = Select who the land or property was acquired from

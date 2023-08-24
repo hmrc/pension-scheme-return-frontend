@@ -22,7 +22,7 @@ import controllers.actions._
 import controllers.nonsipp.landorproperty.PropertyAcquiredFromController._
 import forms.RadioListFormProvider
 import models.SchemeId.Srn
-import models.{Mode, SchemeHoldLandProperty}
+import models.{IdentityType, Mode, SchemeHoldLandProperty}
 import navigation.Navigator
 import pages.nonsipp.landorproperty.{LandOrPropertyAddressLookupPage, PropertyAcquiredFromPage}
 import play.api.data.Form
@@ -99,13 +99,10 @@ object PropertyAcquiredFromController {
       "landOrPropertyAcquiredFrom.title",
       Message("landOrPropertyAcquiredFrom.heading", addressLine1),
       List(
-        RadioListRowViewModel(
-          Message("landOrPropertyAcquiredFrom.option1"),
-          SchemeHoldLandProperty.Acquisition.name,
-          Message("whyDoesSchemeHoldLandProperty.option1.hint")
-        ),
-        RadioListRowViewModel("landOrPropertyAcquiredFrom.option2", SchemeHoldLandProperty.Contribution.name),
-        RadioListRowViewModel("landOrPropertyAcquiredFrom.option3", SchemeHoldLandProperty.Transfer.name)
+        RadioListRowViewModel("landOrPropertyAcquiredFrom.option1", IdentityType.Individual.name),
+        RadioListRowViewModel("landOrPropertyAcquiredFrom.option2", IdentityType.UKCompany.name), //IdentityType
+        RadioListRowViewModel("landOrPropertyAcquiredFrom.option3", IdentityType.UKPartnership.name), //landOrPropertyAcquiredFrom.option4
+        RadioListRowViewModel("landOrPropertyAcquiredFrom.option4", IdentityType.Other.name)
       ),
       routes.PropertyAcquiredFromController.onSubmit(srn, index, mode)
     )
