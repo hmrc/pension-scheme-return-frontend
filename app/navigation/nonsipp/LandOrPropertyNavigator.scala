@@ -65,16 +65,9 @@ object LandOrPropertyNavigator extends JourneyNavigator {
 
     //27h1
     case page @ PropertyAcquiredFromPage(srn, index) =>
-      userAnswers.get(page) match {
-        case Some(IdentityType.UKPartnership) =>
-          //TODO change to 27h6
-          controllers.nonsipp.landorproperty.routes.WhyDoesSchemeHoldLandPropertyController
-            .onPageLoad(srn, index, NormalMode)
-        case _ =>
-          controllers.nonsipp.landorproperty.routes.WhyDoesSchemeHoldLandPropertyController
-            .onPageLoad(srn, index, NormalMode)
-
-      }
+      //TODO change to 27h6
+      controllers.nonsipp.landorproperty.routes.WhyDoesSchemeHoldLandPropertyController
+        .onPageLoad(srn, index, NormalMode)
 
     case LandOrPropertyTotalCostPage(srn, index) =>
       controllers.nonsipp.landorproperty.routes.IsLandOrPropertyResidentialController.onPageLoad(srn, index, NormalMode)
