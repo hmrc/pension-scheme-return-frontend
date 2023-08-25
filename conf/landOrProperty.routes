@@ -79,3 +79,8 @@ GET        /:srn/change-land-property-lease-details               controllers.no
 GET        /:srn/change-land-property-lease-details/:index        controllers.nonsipp.landorproperty.LandOrPropertyLeaseDetailsController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 POST       /:srn/change-land-property-lease-details               controllers.nonsipp.landorproperty.LandOrPropertyLeaseDetailsController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
 POST       /:srn/change-land-property-lease-details/:index        controllers.nonsipp.landorproperty.LandOrPropertyLeaseDetailsController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET        /:srn/company-seller-name/:index               controllers.nonsipp.landorproperty.CompanySellerNameController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST       /:srn/company-seller-name/:index               controllers.nonsipp.landorproperty.CompanySellerNameController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET        /:srn/change-company-seller-name/:index        controllers.nonsipp.landorproperty.CompanySellerNameController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST       /:srn/change-company-seller-name/:index        controllers.nonsipp.landorproperty.CompanySellerNameController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
