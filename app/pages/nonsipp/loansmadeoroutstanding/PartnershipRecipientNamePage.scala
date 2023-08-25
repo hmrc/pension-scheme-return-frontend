@@ -17,12 +17,13 @@
 package pages.nonsipp.loansmadeoroutstanding
 
 import config.Refined.Max5000
+import models.Mode
 import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
 
-case class PartnershipRecipientNamePage(srn: Srn, index: Max5000) extends QuestionPage[String] {
+case class PartnershipRecipientNamePage(srn: Srn, index: Max5000, mode: Mode) extends QuestionPage[String] {
 
   override def path: JsPath = Paths.loanTransactions \ "recipientIdentityType" \ toString \ index.arrayIndex.toString
 

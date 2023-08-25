@@ -56,7 +56,7 @@ class LoansListController @Inject()(
   val form = LoansListController.form(formProvider)
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    loanRecipients(srn)
+    loanRecipients(srn, mode)
       .map(
         recipients =>
           if (recipients.isEmpty) {
@@ -69,7 +69,7 @@ class LoansListController @Inject()(
   }
 
   def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    loanRecipients(srn).map { recipients =>
+    loanRecipients(srn, mode).map { recipients =>
       if (recipients.length == maxLoans) {
 
         Redirect(navigator.nextPage(AccountingPeriodListPage(srn, addPeriod = false, mode), mode, request.userAnswers))
@@ -88,7 +88,8 @@ class LoansListController @Inject()(
   }
 
   private def loanRecipients(
-    srn: Srn
+    srn: Srn,
+    mode: Mode
   )(implicit request: DataRequest[_]): Either[Result, List[(Refined[Int, Max5000.Refined], String, Money)]] = {
     val whoReceivedLoans = request.userAnswers
       .map(IdentityTypes(srn, IdentitySubject.LoanRecipient))
@@ -102,18 +103,22 @@ class LoansListController @Inject()(
       receivedLoans <- whoReceivedLoans.traverse(_.getOrRecoverJourney)
       recipientNames <- receivedLoans.traverse {
         case (index, IdentityType.Individual) =>
-          request.userAnswers.get(IndividualRecipientNamePage(srn, index)).getOrRecoverJourney.map(index -> _)
+          request.userAnswers.get(IndividualRecipientNamePage(srn, index, mode)).getOrRecoverJourney.map(index -> _)
         case (index, IdentityType.UKCompany) =>
-          request.userAnswers.get(CompanyRecipientNamePage(srn, index)).getOrRecoverJourney.map(index -> _)
+          request.userAnswers.get(CompanyRecipientNamePage(srn, index, mode)).getOrRecoverJourney.map(index -> _)
         case (index, IdentityType.UKPartnership) =>
-          request.userAnswers.get(PartnershipRecipientNamePage(srn, index)).getOrRecoverJourney.map(index -> _)
+          request.userAnswers.get(PartnershipRecipientNamePage(srn, index, mode)).getOrRecoverJourney.map(index -> _)
         case (index, IdentityType.Other) =>
-          request.userAnswers.get(OtherRecipientDetailsPage(srn, index)).map(_.name).getOrRecoverJourney.map(index -> _)
+          request.userAnswers
+            .get(OtherRecipientDetailsPage(srn, index, mode))
+            .map(_.name)
+            .getOrRecoverJourney
+            .map(index -> _)
       }
       recipientDetails <- recipientNames.traverse {
         case (index, recipientName) =>
           request.userAnswers
-            .get(AmountOfTheLoanPage(srn, index))
+            .get(AmountOfTheLoanPage(srn, index, mode))
             .map(_._1)
             .getOrRecoverJourney
             .map((index, recipientName, _))
@@ -134,7 +139,7 @@ object LoansListController {
         List(
           ListRow(
             Message("loansList.row", totalLoan.displayAs, recipientName),
-            changeUrl = routes.LoansCYAController.onPageLoad(srn, index, Change).url,
+            changeUrl = routes.LoansCYAController.onPageLoad(srn, index, Change, mode).url,
             changeHiddenText = Message("loansList.row.change.hidden", totalLoan.displayAs, recipientName),
             removeUrl = routes.RemoveLoanController.onPageLoad(srn, index, mode).url,
             removeHiddenText = Message("loansList.row.remove.hidden", totalLoan.displayAs, recipientName)

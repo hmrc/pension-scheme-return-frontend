@@ -18,6 +18,7 @@ package pages.nonsipp.loansmadeoroutstanding
 
 import config.Refined.OneTo5000
 import eu.timepit.refined.refineMV
+import models.NormalMode
 import pages.behaviours.PageBehaviours
 
 class AreRepaymentsInstalmentsPageSpec extends PageBehaviours {
@@ -27,10 +28,10 @@ class AreRepaymentsInstalmentsPageSpec extends PageBehaviours {
     val srn = srnGen.sample.value
     val index = refineMV[OneTo5000](1)
 
-    beRetrievable[Boolean](AreRepaymentsInstalmentsPage(srn, index))
+    beRetrievable[Boolean](AreRepaymentsInstalmentsPage(srn, index, NormalMode))
 
-    beSettable[Boolean](AreRepaymentsInstalmentsPage(srn, index))
+    beSettable[Boolean](AreRepaymentsInstalmentsPage(srn, index, NormalMode))
 
-    beRemovable[Boolean](AreRepaymentsInstalmentsPage(srn, index))
+    beRemovable[Boolean](AreRepaymentsInstalmentsPage(srn, index, NormalMode))
   }
 }

@@ -18,7 +18,7 @@ package pages.nonsipp.loansmadeoroutstanding
 
 import config.Refined.OneTo5000
 import eu.timepit.refined.refineMV
-import models.{ConditionalYesNo, Utr}
+import models.{ConditionalYesNo, NormalMode, Utr}
 import pages.behaviours.PageBehaviours
 
 class PartnershipRecipientUtrPageSpec extends PageBehaviours {
@@ -27,10 +27,10 @@ class PartnershipRecipientUtrPageSpec extends PageBehaviours {
 
     val index = refineMV[OneTo5000](1)
 
-    beRetrievable[ConditionalYesNo[String, Utr]](PartnershipRecipientUtrPage(srnGen.sample.value, index))
+    beRetrievable[ConditionalYesNo[String, Utr]](PartnershipRecipientUtrPage(srnGen.sample.value, index, NormalMode))
 
-    beSettable[ConditionalYesNo[String, Utr]](PartnershipRecipientUtrPage(srnGen.sample.value, index))
+    beSettable[ConditionalYesNo[String, Utr]](PartnershipRecipientUtrPage(srnGen.sample.value, index, NormalMode))
 
-    beRemovable[ConditionalYesNo[String, Utr]](PartnershipRecipientUtrPage(srnGen.sample.value, index))
+    beRemovable[ConditionalYesNo[String, Utr]](PartnershipRecipientUtrPage(srnGen.sample.value, index, NormalMode))
   }
 }

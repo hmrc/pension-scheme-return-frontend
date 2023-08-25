@@ -18,6 +18,7 @@ package pages.nonsipp.loansmadeoroutstanding
 
 import config.Refined.OneTo5000
 import eu.timepit.refined.refineMV
+import models.NormalMode
 import pages.behaviours.PageBehaviours
 
 class IndividualRecipientNamePageSpec extends PageBehaviours {
@@ -26,10 +27,10 @@ class IndividualRecipientNamePageSpec extends PageBehaviours {
     val srn = srnGen.sample.value
     val index = refineMV[OneTo5000](1)
 
-    beRetrievable[String](IndividualRecipientNamePage(srn, index))
+    beRetrievable[String](IndividualRecipientNamePage(srn, index, NormalMode))
 
-    beSettable[String](IndividualRecipientNamePage(srn, index))
+    beSettable[String](IndividualRecipientNamePage(srn, index, NormalMode))
 
-    beRemovable[String](IndividualRecipientNamePage(srn, index))
+    beRemovable[String](IndividualRecipientNamePage(srn, index, NormalMode))
   }
 }

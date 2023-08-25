@@ -21,9 +21,9 @@ import controllers.actions._
 import controllers.nonsipp.loansmadeoroutstanding.OtherRecipientDetailsController.viewModel
 import forms.RecipientDetailsFormProvider
 import models.SchemeId.Srn
-import models.{Mode, RecipientDetails}
+import models.{CheckMode, Mode, NormalMode, RecipientDetails}
 import navigation.Navigator
-import pages.nonsipp.loansmadeoroutstanding.OtherRecipientDetailsPage
+import pages.nonsipp.loansmadeoroutstanding.{LoansCYAPage, OtherRecipientDetailsPage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -53,7 +53,7 @@ class OtherRecipientDetailsController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      Ok(view(form.fromUserAnswers(OtherRecipientDetailsPage(srn, index)), viewModel(srn, index, mode)))
+      Ok(view(form.fromUserAnswers(OtherRecipientDetailsPage(srn, index, mode)), viewModel(srn, index, mode)))
   }
 
   def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
@@ -67,9 +67,13 @@ class OtherRecipientDetailsController @Inject()(
             ),
           answer => {
             for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(OtherRecipientDetailsPage(srn, index), answer))
+              updatedAnswers <- Future
+                .fromTry(request.userAnswers.set(OtherRecipientDetailsPage(srn, index, mode), answer))
               _ <- saveService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(OtherRecipientDetailsPage(srn, index), mode, updatedAnswers))
+            } yield {
+              Redirect(navigator.nextPage(OtherRecipientDetailsPage(srn, index, mode), mode, updatedAnswers))
+
+            }
           }
         )
   }

@@ -17,13 +17,13 @@
 package pages.nonsipp.loansmadeoroutstanding
 
 import config.Refined.Max5000
-import models.MemberOrConnectedParty
+import models.Mode
 import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
 
-case class IsIndividualRecipientConnectedPartyPage(srn: Srn, index: Max5000) extends QuestionPage[Boolean] {
+case class IsIndividualRecipientConnectedPartyPage(srn: Srn, index: Max5000, mode: Mode) extends QuestionPage[Boolean] {
 
   override def path: JsPath = Paths.loanTransactions \ toString \ index.arrayIndex.toString
 

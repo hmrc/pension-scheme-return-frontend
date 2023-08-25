@@ -18,7 +18,7 @@ package controllers.nonsipp.loansmadeoroutstanding
 
 import controllers.actions.{AllowAccessActionProvider, DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import controllers.nonsipp.loansmadeoroutstanding.routes
-import models.NormalMode
+import models.{Mode, NormalMode}
 import models.SchemeId.Srn
 import navigation.Navigator
 import pages.nonsipp.loansmadeoroutstanding.WhatYouWillNeedLoansPage
@@ -49,9 +49,9 @@ class WhatYouWillNeedLoansController @Inject()(
       Ok(view(WhatYouWillNeedLoansController.viewModel(srn, request.schemeDetails.schemeName)))
     }
 
-  def onSubmit(srn: Srn): Action[AnyContent] =
+  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] =
     identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData) { implicit request =>
-      Redirect(navigator.nextPage(WhatYouWillNeedLoansPage(srn), NormalMode, request.userAnswers))
+      Redirect(navigator.nextPage(WhatYouWillNeedLoansPage(srn, mode), NormalMode, request.userAnswers))
     }
 }
 

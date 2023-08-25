@@ -22,10 +22,11 @@ import controllers.nonsipp.common.IdentityTypeController._
 import forms.RadioListFormProvider
 import models.IdentityType.{Individual, Other, UKCompany, UKPartnership}
 import models.SchemeId.Srn
-import models.{IdentitySubject, IdentityType, Mode, NormalMode, UserAnswers}
+import models.{CheckMode, IdentitySubject, IdentityType, Mode, NormalMode, UserAnswers}
 import navigation.Navigator
 import pages.nonsipp.common.IdentityTypePage
 import pages.nonsipp.landorproperty.LandPropertyInUKPage
+import pages.nonsipp.loansmadeoroutstanding.LoansCYAPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -39,6 +40,7 @@ import views.html.RadioListView
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Try
 
 class IdentityTypeController @Inject()(
   override val messagesApi: MessagesApi,
@@ -61,7 +63,7 @@ class IdentityTypeController @Inject()(
     val form = IdentityTypeController.form(formProvider, subject)
     Ok(
       view(
-        form.fromUserAnswers(IdentityTypePage(srn, index, subject)),
+        form.fromUserAnswers(IdentityTypePage(srn, index, subject, mode)),
         viewModel(srn, index, mode, subject, request.userAnswers)
       )
     )
@@ -82,9 +84,31 @@ class IdentityTypeController @Inject()(
             .successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode, subject, request.userAnswers)))),
         answer => {
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(IdentityTypePage(srn, index, subject), answer))
+            updatedAnswers <- Future
+              .fromTry(request.userAnswers.set(IdentityTypePage(srn, index, subject, mode), answer))
             _ <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage(IdentityTypePage(srn, index, subject), NormalMode, updatedAnswers))
+          } yield {
+            mode match {
+              case CheckMode =>
+                (
+                  updatedAnswers.get(IdentityTypePage(srn, index, subject, mode)),
+                  request.userAnswers.get(IdentityTypePage(srn, index, subject, mode))
+                ) match {
+                  case (Some(newAnswer), Some(previousAnswer)) => {
+                    if (newAnswer.name == previousAnswer.name) {
+                      Redirect(navigator.nextPage(LoansCYAPage(srn, index, mode), mode, updatedAnswers))
+                    } else {
+                      Redirect(
+                        navigator.nextPage(IdentityTypePage(srn, index, subject, mode), CheckMode, updatedAnswers)
+                      )
+                    }
+                  }
+                }
+              case NormalMode =>
+                Redirect(navigator.nextPage(IdentityTypePage(srn, index, subject, mode), NormalMode, updatedAnswers))
+
+            }
+          }
         }
       )
   }

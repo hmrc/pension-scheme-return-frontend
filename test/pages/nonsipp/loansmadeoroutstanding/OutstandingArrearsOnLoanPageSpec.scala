@@ -19,7 +19,7 @@ package pages.nonsipp.loansmadeoroutstanding
 import config.Refined.OneTo5000
 import eu.timepit.refined.refineMV
 import models.ConditionalYesNo._
-import models.Money
+import models.{Money, NormalMode}
 import pages.behaviours.PageBehaviours
 
 class OutstandingArrearsOnLoanPageSpec extends PageBehaviours {
@@ -28,10 +28,10 @@ class OutstandingArrearsOnLoanPageSpec extends PageBehaviours {
 
     val index = refineMV[OneTo5000](1)
 
-    beRetrievable[ConditionalYes[Money]](OutstandingArrearsOnLoanPage(srnGen.sample.value, index))
+    beRetrievable[ConditionalYes[Money]](OutstandingArrearsOnLoanPage(srnGen.sample.value, index, NormalMode))
 
-    beSettable[ConditionalYes[Money]](OutstandingArrearsOnLoanPage(srnGen.sample.value, index))
+    beSettable[ConditionalYes[Money]](OutstandingArrearsOnLoanPage(srnGen.sample.value, index, NormalMode))
 
-    beRemovable[ConditionalYes[Money]](OutstandingArrearsOnLoanPage(srnGen.sample.value, index))
+    beRemovable[ConditionalYes[Money]](OutstandingArrearsOnLoanPage(srnGen.sample.value, index, NormalMode))
   }
 }

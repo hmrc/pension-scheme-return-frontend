@@ -16,7 +16,7 @@
 
 package navigation.nonsipp
 
-import models.{NormalMode, UserAnswers}
+import models.{CheckOrChange, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.loansmadeoroutstanding.OtherRecipientDetailsPage
@@ -26,11 +26,16 @@ object OtherRecipientDetailsNavigator extends JourneyNavigator {
 
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
 
-    case OtherRecipientDetailsPage(srn, index) =>
+    case OtherRecipientDetailsPage(srn, index, mode) =>
       controllers.nonsipp.loansmadeoroutstanding.routes.RecipientSponsoringEmployerConnectedPartyController
-        .onPageLoad(srn, index, NormalMode)
+        .onPageLoad(srn, index, mode)
   }
 
-  override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty
+  override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => {
+
+    case OtherRecipientDetailsPage(srn, index, mode) =>
+      controllers.nonsipp.loansmadeoroutstanding.routes.RecipientSponsoringEmployerConnectedPartyController
+        .onPageLoad(srn, index, mode)
+  }
 
 }

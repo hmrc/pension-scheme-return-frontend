@@ -16,7 +16,9 @@
 
 package pages.nonsipp.loansmadeoroutstanding
 
+import config.Refined.Max5000
+import models.Mode
 import models.SchemeId.Srn
 import pages.Page
 
-case class LoansCYAPage(srn: Srn) extends Page
+case class LoansCYAPage(srn: Srn, index: Max5000, mode: Mode) extends Page

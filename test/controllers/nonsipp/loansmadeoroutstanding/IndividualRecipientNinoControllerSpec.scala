@@ -37,7 +37,7 @@ class IndividualRecipientNinoControllerSpec extends ControllerBaseSpec {
     controllers.nonsipp.loansmadeoroutstanding.routes.IndividualRecipientNinoController.onSubmit(srn, index, NormalMode)
 
   val userAnswersWithIndividualName =
-    defaultUserAnswers.unsafeSet(IndividualRecipientNamePage(srn, index), individualName)
+    defaultUserAnswers.unsafeSet(IndividualRecipientNamePage(srn, index, NormalMode), individualName)
 
   val conditionalNo: ConditionalYesNo[String, Nino] = ConditionalYesNo.no("reason")
   val conditionalYes: ConditionalYesNo[String, Nino] = ConditionalYesNo.yes(nino)
@@ -52,7 +52,7 @@ class IndividualRecipientNinoControllerSpec extends ControllerBaseSpec {
     act.like(
       renderPrePopView(
         onPageLoad,
-        IndividualRecipientNinoPage(srn, index),
+        IndividualRecipientNinoPage(srn, index, NormalMode),
         conditionalNo,
         userAnswersWithIndividualName
       ) { implicit app => implicit request =>

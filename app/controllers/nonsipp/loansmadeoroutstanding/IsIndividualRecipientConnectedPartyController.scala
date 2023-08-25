@@ -20,10 +20,14 @@ import config.Refined.Max5000
 import controllers.actions._
 import controllers.nonsipp.loansmadeoroutstanding.IsIndividualRecipientConnectedPartyController.viewModel
 import forms.YesNoPageFormProvider
-import models.Mode
+import models.{CheckMode, Mode, NormalMode}
 import models.SchemeId.Srn
 import navigation.Navigator
-import pages.nonsipp.loansmadeoroutstanding.{IndividualRecipientNamePage, IsIndividualRecipientConnectedPartyPage}
+import pages.nonsipp.loansmadeoroutstanding.{
+  IndividualRecipientNamePage,
+  IsIndividualRecipientConnectedPartyPage,
+  LoansCYAPage
+}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -55,10 +59,10 @@ class IsIndividualRecipientConnectedPartyController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      request.usingAnswer(IndividualRecipientNamePage(srn, index)).sync { individualName =>
+      request.usingAnswer(IndividualRecipientNamePage(srn, index, mode)).sync { individualName =>
         Ok(
           view(
-            form.fromUserAnswers(IsIndividualRecipientConnectedPartyPage(srn, index)),
+            form.fromUserAnswers(IsIndividualRecipientConnectedPartyPage(srn, index, mode)),
             viewModel(srn, index, individualName, mode)
           )
         )
@@ -71,7 +75,7 @@ class IsIndividualRecipientConnectedPartyController @Inject()(
         .bindFromRequest()
         .fold(
           errors =>
-            request.usingAnswer(IndividualRecipientNamePage(srn, index)).async { individualName =>
+            request.usingAnswer(IndividualRecipientNamePage(srn, index, mode)).async { individualName =>
               Future.successful(
                 BadRequest(view(errors, viewModel(srn, index, individualName, mode)))
               )
@@ -79,10 +83,19 @@ class IsIndividualRecipientConnectedPartyController @Inject()(
           success =>
             for {
               userAnswers <- Future
-                .fromTry(request.userAnswers.set(IsIndividualRecipientConnectedPartyPage(srn, index), success))
+                .fromTry(request.userAnswers.set(IsIndividualRecipientConnectedPartyPage(srn, index, mode), success))
               _ <- saveService.save(userAnswers)
             } yield {
-              Redirect(navigator.nextPage(IsIndividualRecipientConnectedPartyPage(srn, index), mode, userAnswers))
+              mode match {
+                case CheckMode =>
+                  Redirect(navigator.nextPage(LoansCYAPage(srn, index, mode), mode, userAnswers))
+                case NormalMode =>
+                  Redirect(
+                    navigator
+                      .nextPage(IsIndividualRecipientConnectedPartyPage(srn, index, mode), mode, userAnswers)
+                  )
+
+              }
             }
         )
   }

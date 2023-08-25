@@ -62,7 +62,7 @@ class AmountOfTheLoanControllerSpec extends ControllerBaseSpec {
       view(viewModel(form))
     })
 
-    act.like(renderPrePopView(onPageLoad, AmountOfTheLoanPage(srn, index), (money, money, money)) {
+    act.like(renderPrePopView(onPageLoad, AmountOfTheLoanPage(srn, index, NormalMode), (money, money, money)) {
       implicit app => implicit request =>
         val view = injected[MoneyView]
         view(viewModel(form.fill((money, money, money))))

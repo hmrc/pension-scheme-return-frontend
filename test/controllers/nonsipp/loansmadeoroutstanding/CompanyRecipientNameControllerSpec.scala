@@ -31,7 +31,7 @@ class CompanyRecipientNameControllerSpec extends ControllerBaseSpec {
 
   "IndividualRecipientNameController" - {
 
-    val populatedUserAnswers = defaultUserAnswers.set(CompanyRecipientNamePage(srn, index), companyName).get
+    val populatedUserAnswers = defaultUserAnswers.set(CompanyRecipientNamePage(srn, index, NormalMode), companyName).get
     lazy val onPageLoad = routes.CompanyRecipientNameController.onPageLoad(srn, index, NormalMode)
     lazy val onSubmit = routes.CompanyRecipientNameController.onSubmit(srn, index, NormalMode)
 
@@ -39,7 +39,7 @@ class CompanyRecipientNameControllerSpec extends ControllerBaseSpec {
       injected[TextInputView].apply(form(injected[TextFormProvider]), viewModel(srn, index, NormalMode))
     })
 
-    act.like(renderPrePopView(onPageLoad, CompanyRecipientNamePage(srn, index), companyName) {
+    act.like(renderPrePopView(onPageLoad, CompanyRecipientNamePage(srn, index, NormalMode), companyName) {
       implicit app => implicit request =>
         val preparedForm = form(injected[TextFormProvider]).fill(companyName)
         injected[TextInputView].apply(preparedForm, viewModel(srn, index, NormalMode))

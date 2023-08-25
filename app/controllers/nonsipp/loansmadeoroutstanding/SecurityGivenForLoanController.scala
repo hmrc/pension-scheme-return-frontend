@@ -23,9 +23,9 @@ import forms.YesNoPageFormProvider
 import forms.mappings.Mappings
 import models.ConditionalYesNo._
 import models.SchemeId.Srn
-import models.{ConditionalYesNo, Mode, Security}
+import models.{CheckMode, ConditionalYesNo, Mode, NormalMode, Security}
 import navigation.Navigator
-import pages.nonsipp.loansmadeoroutstanding.SecurityGivenForLoanPage
+import pages.nonsipp.loansmadeoroutstanding.{LoansCYAPage, SecurityGivenForLoanPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
@@ -55,7 +55,7 @@ class SecurityGivenForLoanController @Inject()(
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       {
-        val preparedForm = request.userAnswers.fillForm(SecurityGivenForLoanPage(srn, index), form)
+        val preparedForm = request.userAnswers.fillForm(SecurityGivenForLoanPage(srn, index, mode), form)
         Ok(view(preparedForm, viewModel(srn, index, mode)))
       }
   }
@@ -72,10 +72,18 @@ class SecurityGivenForLoanController @Inject()(
             for {
               updatedAnswers <- Future
                 .fromTry(
-                  request.userAnswers.set(SecurityGivenForLoanPage(srn, index), ConditionalYesNo(value))
+                  request.userAnswers.set(SecurityGivenForLoanPage(srn, index, mode), ConditionalYesNo(value))
                 )
               _ <- saveService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(SecurityGivenForLoanPage(srn, index), mode, updatedAnswers))
+            } yield {
+              mode match {
+                case CheckMode =>
+                  Redirect(navigator.nextPage(LoansCYAPage(srn, index, mode), mode, updatedAnswers))
+                case NormalMode =>
+                  Redirect(navigator.nextPage(SecurityGivenForLoanPage(srn, index, mode), mode, updatedAnswers))
+
+              }
+            }
         )
   }
 }

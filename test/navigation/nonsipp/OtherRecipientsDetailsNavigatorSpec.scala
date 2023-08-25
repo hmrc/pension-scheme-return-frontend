@@ -16,8 +16,9 @@
 
 package navigation.nonsipp
 
-import config.Refined.OneTo5000
+import config.Refined.{Max5000, OneTo5000}
 import eu.timepit.refined.refineMV
+import models.NormalMode
 import navigation.{Navigator, NavigatorBehaviours}
 import pages.nonsipp.loansmadeoroutstanding.OtherRecipientDetailsPage
 import utils.BaseSpec
@@ -33,7 +34,7 @@ class OtherRecipientsDetailsNavigatorSpec extends BaseSpec with NavigatorBehavio
       normalmode
         .navigateToWithIndex(
           index,
-          OtherRecipientDetailsPage,
+          (srn, _: Max5000) => OtherRecipientDetailsPage(srn, index, NormalMode),
           controllers.nonsipp.loansmadeoroutstanding.routes.RecipientSponsoringEmployerConnectedPartyController.onPageLoad
         )
     )

@@ -25,9 +25,9 @@ import forms.MultipleQuestionFormProvider
 import forms.mappings.Mappings
 import forms.mappings.errors.{DateFormErrors, IntFormErrors, MoneyFormErrors}
 import models.SchemeId.Srn
-import models.{Mode, Money}
+import models.{CheckMode, Mode, Money, NormalMode}
 import navigation.Navigator
-import pages.nonsipp.loansmadeoroutstanding.DatePeriodLoanPage
+import pages.nonsipp.loansmadeoroutstanding.{DatePeriodLoanPage, LoansCYAPage}
 import play.api.data.Form
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -65,7 +65,7 @@ class DatePeriodLoanController @Inject()(
               index,
               request.schemeDetails.schemeName,
               mode,
-              request.userAnswers.fillForm(DatePeriodLoanPage(srn, index), form(date.to))
+              request.userAnswers.fillForm(DatePeriodLoanPage(srn, index, mode), form(date.to))
             )
           )
         )
@@ -85,9 +85,17 @@ class DatePeriodLoanController @Inject()(
             value =>
               for {
                 updatedAnswers <- Future
-                  .fromTry(request.userAnswers.transformAndSet(DatePeriodLoanPage(srn, index), value))
+                  .fromTry(request.userAnswers.transformAndSet(DatePeriodLoanPage(srn, index, mode), value))
                 _ <- saveService.save(updatedAnswers)
-              } yield Redirect(navigator.nextPage(DatePeriodLoanPage(srn, index), mode, updatedAnswers))
+              } yield {
+                mode match {
+                  case CheckMode =>
+                    Redirect(navigator.nextPage(LoansCYAPage(srn, index, mode), mode, updatedAnswers))
+                  case NormalMode =>
+                    Redirect(navigator.nextPage(DatePeriodLoanPage(srn, index, mode), mode, updatedAnswers))
+
+                }
+              }
           )
       }
   }

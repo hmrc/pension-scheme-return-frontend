@@ -19,10 +19,10 @@ package controllers.nonsipp.loansmadeoroutstanding
 import config.Refined.Max5000
 import controllers.actions._
 import forms.TextFormProvider
-import models.Mode
+import models.{CheckMode, Mode, NormalMode}
 import models.SchemeId.Srn
 import navigation.Navigator
-import pages.nonsipp.loansmadeoroutstanding.IndividualRecipientNamePage
+import pages.nonsipp.loansmadeoroutstanding.{CompanyRecipientNamePage, IndividualRecipientNamePage, LoansCYAPage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -54,7 +54,7 @@ class IndividualRecipientNameController @Inject()(
     implicit request =>
       Ok(
         view(
-          form.fromUserAnswers(IndividualRecipientNamePage(srn, index)),
+          form.fromUserAnswers(IndividualRecipientNamePage(srn, index, mode)),
           IndividualRecipientNameController.viewModel(srn, index, mode)
         )
       )
@@ -71,9 +71,33 @@ class IndividualRecipientNameController @Inject()(
             ),
           answer => {
             for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(IndividualRecipientNamePage(srn, index), answer))
+              updatedAnswers <- Future
+                .fromTry(request.userAnswers.set(IndividualRecipientNamePage(srn, index, mode), answer))
               _ <- saveService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(IndividualRecipientNamePage(srn, index), mode, updatedAnswers))
+            } yield {
+
+              mode match {
+                case CheckMode => {
+                  (
+                    updatedAnswers.get(IndividualRecipientNamePage(srn, index, mode)),
+                    request.userAnswers.get(IndividualRecipientNamePage(srn, index, mode))
+                  ) match {
+                    case (Some(newAnswer), Some(previousAnswer)) => {
+                      if (newAnswer == previousAnswer) {
+                        Redirect(navigator.nextPage(LoansCYAPage(srn, index, mode), mode, updatedAnswers))
+                      } else {
+                        Redirect(
+                          navigator.nextPage(IndividualRecipientNamePage(srn, index, mode), CheckMode, updatedAnswers)
+                        )
+                      }
+                    }
+                  }
+                }
+                case NormalMode =>
+                  Redirect(navigator.nextPage(IndividualRecipientNamePage(srn, index, mode), mode, updatedAnswers))
+              }
+
+            }
           }
         )
   }

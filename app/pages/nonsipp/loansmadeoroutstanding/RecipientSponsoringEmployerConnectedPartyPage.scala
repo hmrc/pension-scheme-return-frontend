@@ -18,12 +18,12 @@ package pages.nonsipp.loansmadeoroutstanding
 
 import config.Refined.Max5000
 import models.SchemeId.Srn
-import models.SponsoringOrConnectedParty
+import models.{Mode, SponsoringOrConnectedParty}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
 
-case class RecipientSponsoringEmployerConnectedPartyPage(srn: Srn, index: Max5000)
+case class RecipientSponsoringEmployerConnectedPartyPage(srn: Srn, index: Max5000, mode: Mode)
     extends QuestionPage[SponsoringOrConnectedParty] {
 
   override def path: JsPath = Paths.loanTransactions \ toString \ index.arrayIndex.toString

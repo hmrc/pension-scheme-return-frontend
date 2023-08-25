@@ -22,9 +22,14 @@ import controllers.actions._
 import forms.YesNoPageFormProvider
 import forms.mappings.Mappings
 import models.SchemeId.Srn
-import models.{ConditionalYesNo, Mode, Utr}
+import models.{CheckMode, ConditionalYesNo, Mode, NormalMode, Utr}
 import navigation.Navigator
-import pages.nonsipp.loansmadeoroutstanding.{PartnershipRecipientNamePage, PartnershipRecipientUtrPage}
+import pages.nonsipp.loansmadeoroutstanding.{
+  CompanyRecipientNamePage,
+  LoansCYAPage,
+  PartnershipRecipientNamePage,
+  PartnershipRecipientUtrPage
+}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -54,8 +59,8 @@ class PartnershipRecipientUtrController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      request.usingAnswer(PartnershipRecipientNamePage(srn, index)).sync { partnershipRecipientName =>
-        val preparedForm = request.userAnswers.fillForm(PartnershipRecipientUtrPage(srn, index), form)
+      request.usingAnswer(PartnershipRecipientNamePage(srn, index, mode)).sync { partnershipRecipientName =>
+        val preparedForm = request.userAnswers.fillForm(PartnershipRecipientUtrPage(srn, index, mode), form)
         Ok(view(preparedForm, viewModel(srn, index, partnershipRecipientName, mode)))
       }
   }
@@ -66,15 +71,43 @@ class PartnershipRecipientUtrController @Inject()(
         .bindFromRequest()
         .fold(
           formWithErrors =>
-            request.usingAnswer(PartnershipRecipientNamePage(srn, index)).async { partnershipRecipientName =>
+            request.usingAnswer(PartnershipRecipientNamePage(srn, index, mode)).async { partnershipRecipientName =>
               Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, partnershipRecipientName, mode))))
             },
           value =>
             for {
               updatedAnswers <- Future
-                .fromTry(request.userAnswers.set(PartnershipRecipientUtrPage(srn, index), ConditionalYesNo(value)))
+                .fromTry(
+                  request.userAnswers.set(PartnershipRecipientUtrPage(srn, index, mode), ConditionalYesNo(value))
+                )
               _ <- saveService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(PartnershipRecipientUtrPage(srn, index), mode, updatedAnswers))
+            } yield {
+
+              mode match {
+                case CheckMode => {
+                  (
+                    updatedAnswers.get(PartnershipRecipientUtrPage(srn, index, mode)),
+                    request.userAnswers.get(PartnershipRecipientUtrPage(srn, index, mode))
+                  ) match {
+                    case (Some(newAnswer), Some(previousAnswer)) => {
+
+                      if (newAnswer.value.toOption
+                          .map(_.toString)
+                          .getOrElse("") == previousAnswer.value.toOption.map(_.toString).getOrElse("")) {
+                        Redirect(navigator.nextPage(LoansCYAPage(srn, index, mode), mode, updatedAnswers))
+                      } else {
+                        Redirect(
+                          navigator.nextPage(PartnershipRecipientUtrPage(srn, index, mode), CheckMode, updatedAnswers)
+                        )
+                      }
+                    }
+                  }
+                }
+                case NormalMode =>
+                  Redirect(navigator.nextPage(PartnershipRecipientUtrPage(srn, index, mode), mode, updatedAnswers))
+              }
+
+            }
         )
   }
 }

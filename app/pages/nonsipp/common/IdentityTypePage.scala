@@ -18,7 +18,7 @@ package pages.nonsipp.common
 
 import config.Refined.Max5000
 import models.SchemeId.Srn
-import models.{IdentitySubject, IdentityType, UserAnswers}
+import models.{IdentitySubject, IdentityType, Mode, UserAnswers}
 import pages.QuestionPage
 import pages.nonsipp.landorproperty.LandPropertyInUKPage
 import pages.nonsipp.loansmadeoroutstanding._
@@ -29,7 +29,7 @@ import utils.RefinedUtils.RefinedIntOps
 
 import scala.util.Try
 
-case class IdentityTypePage(srn: Srn, index: Max5000, identitySubject: IdentitySubject)
+case class IdentityTypePage(srn: Srn, index: Max5000, identitySubject: IdentitySubject, mode: Mode)
     extends QuestionPage[IdentityType] {
 
   override def path: JsPath = identitySubject match {
@@ -47,12 +47,12 @@ case class IdentityTypePage(srn: Srn, index: Max5000, identitySubject: IdentityS
     this.identitySubject match {
       case IdentitySubject.LoanRecipient =>
         List(
-          DatePeriodLoanPage(srn, index),
-          AmountOfTheLoanPage(srn, index),
-          AreRepaymentsInstalmentsPage(srn, index),
-          InterestOnLoanPage(srn, index),
-          OutstandingArrearsOnLoanPage(srn, index),
-          SecurityGivenForLoanPage(srn, index)
+          DatePeriodLoanPage(srn, index, mode),
+          AmountOfTheLoanPage(srn, index, mode),
+          AreRepaymentsInstalmentsPage(srn, index, mode),
+          InterestOnLoanPage(srn, index, mode),
+          OutstandingArrearsOnLoanPage(srn, index, mode),
+          SecurityGivenForLoanPage(srn, index, mode)
         )
       case IdentitySubject.LandOrPropertySeller =>
         List(
@@ -63,15 +63,15 @@ case class IdentityTypePage(srn: Srn, index: Max5000, identitySubject: IdentityS
     this.identitySubject match {
       case IdentitySubject.LoanRecipient =>
         List(
-          IndividualRecipientNamePage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
-          IndividualRecipientNinoPage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
-          IsIndividualRecipientConnectedPartyPage(srn, index),
-          CompanyRecipientNamePage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
-          CompanyRecipientCrnPage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
-          RecipientSponsoringEmployerConnectedPartyPage(srn, index),
-          PartnershipRecipientNamePage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
-          PartnershipRecipientUtrPage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
-          OtherRecipientDetailsPage(srn, index) // TODO move this to generic page (with subject) and pass in this.identitySubject
+          IndividualRecipientNamePage(srn, index, mode), // TODO move this to generic page (with subject) and pass in this.identitySubject
+          IndividualRecipientNinoPage(srn, index, mode), // TODO move this to generic page (with subject) and pass in this.identitySubject
+          IsIndividualRecipientConnectedPartyPage(srn, index, mode),
+          CompanyRecipientNamePage(srn, index, mode), // TODO move this to generic page (with subject) and pass in this.identitySubject
+          CompanyRecipientCrnPage(srn, index, mode), // TODO move this to generic page (with subject) and pass in this.identitySubject
+          RecipientSponsoringEmployerConnectedPartyPage(srn, index, mode),
+          PartnershipRecipientNamePage(srn, index, mode), // TODO move this to generic page (with subject) and pass in this.identitySubject
+          PartnershipRecipientUtrPage(srn, index, mode), // TODO move this to generic page (with subject) and pass in this.identitySubject
+          OtherRecipientDetailsPage(srn, index, mode) // TODO move this to generic page (with subject) and pass in this.identitySubject
         )
       case IdentitySubject.LandOrPropertySeller => List() // TODO add land or property pages here
     }

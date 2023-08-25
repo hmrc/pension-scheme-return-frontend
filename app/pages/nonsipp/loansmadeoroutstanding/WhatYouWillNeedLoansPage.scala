@@ -16,7 +16,8 @@
 
 package pages.nonsipp.loansmadeoroutstanding
 
+import models.Mode
 import models.SchemeId.Srn
 import pages.Page
 
-case class WhatYouWillNeedLoansPage(srn: Srn) extends Page
+case class WhatYouWillNeedLoansPage(srn: Srn, mode: Mode) extends Page

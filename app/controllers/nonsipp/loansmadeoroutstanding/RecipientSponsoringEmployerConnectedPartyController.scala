@@ -21,7 +21,7 @@ import controllers.actions._
 import forms.RadioListFormProvider
 import models.SchemeId.Srn
 import models.requests.DataRequest
-import models.{IdentitySubject, IdentityType, Mode, SponsoringOrConnectedParty}
+import models.{CheckMode, IdentitySubject, IdentityType, Mode, NormalMode, SponsoringOrConnectedParty}
 import navigation.Navigator
 import pages.nonsipp.common.IdentityTypePage
 import pages.nonsipp.loansmadeoroutstanding._
@@ -55,11 +55,11 @@ class RecipientSponsoringEmployerConnectedPartyController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      recipientName(srn, index)
+      recipientName(srn, index, mode)
         .map { recipientName =>
           Ok(
             view(
-              form.fromUserAnswers(RecipientSponsoringEmployerConnectedPartyPage(srn, index)),
+              form.fromUserAnswers(RecipientSponsoringEmployerConnectedPartyPage(srn, index, mode)),
               RecipientSponsoringEmployerConnectedPartyController.viewModel(srn, index, recipientName, mode)
             )
           )
@@ -73,7 +73,7 @@ class RecipientSponsoringEmployerConnectedPartyController @Inject()(
         .bindFromRequest()
         .fold(
           errors =>
-            recipientName(srn, index)
+            recipientName(srn, index, mode)
               .map { recipientName =>
                 Future.successful(
                   BadRequest(
@@ -88,19 +88,30 @@ class RecipientSponsoringEmployerConnectedPartyController @Inject()(
           success =>
             for {
               userAnswers <- Future
-                .fromTry(request.userAnswers.set(RecipientSponsoringEmployerConnectedPartyPage(srn, index), success))
+                .fromTry(
+                  request.userAnswers.set(RecipientSponsoringEmployerConnectedPartyPage(srn, index, mode), success)
+                )
               _ <- saveService.save(userAnswers)
             } yield {
-              Redirect(navigator.nextPage(RecipientSponsoringEmployerConnectedPartyPage(srn, index), mode, userAnswers))
+              mode match {
+                case CheckMode =>
+                  Redirect(navigator.nextPage(LoansCYAPage(srn, index, mode), mode, userAnswers))
+                case NormalMode =>
+                  Redirect(
+                    navigator
+                      .nextPage(RecipientSponsoringEmployerConnectedPartyPage(srn, index, mode), mode, userAnswers)
+                  )
+
+              }
             }
         )
   }
 
-  private def recipientName(srn: Srn, index: Max5000)(implicit request: DataRequest[_]): Option[String] =
-    request.userAnswers.get(IdentityTypePage(srn, index, IdentitySubject.LoanRecipient)).flatMap {
-      case IdentityType.UKCompany => request.userAnswers.get(CompanyRecipientNamePage(srn, index))
-      case IdentityType.UKPartnership => request.userAnswers.get(PartnershipRecipientNamePage(srn, index))
-      case IdentityType.Other => request.userAnswers.get(OtherRecipientDetailsPage(srn, index)).map(_.name)
+  private def recipientName(srn: Srn, index: Max5000, mode: Mode)(implicit request: DataRequest[_]): Option[String] =
+    request.userAnswers.get(IdentityTypePage(srn, index, IdentitySubject.LoanRecipient, mode)).flatMap {
+      case IdentityType.UKCompany => request.userAnswers.get(CompanyRecipientNamePage(srn, index, mode))
+      case IdentityType.UKPartnership => request.userAnswers.get(PartnershipRecipientNamePage(srn, index, mode))
+      case IdentityType.Other => request.userAnswers.get(OtherRecipientDetailsPage(srn, index, mode)).map(_.name)
       case _ => None
     }
 }

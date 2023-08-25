@@ -22,9 +22,14 @@ import controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNinoControl
 import forms.YesNoPageFormProvider
 import forms.mappings.Mappings
 import models.SchemeId.Srn
-import models.{ConditionalYesNo, Mode}
+import models.{CheckMode, ConditionalYesNo, Mode, NormalMode}
 import navigation.Navigator
-import pages.nonsipp.loansmadeoroutstanding.{IndividualRecipientNamePage, IndividualRecipientNinoPage}
+import pages.nonsipp.loansmadeoroutstanding.{
+  CompanyRecipientNamePage,
+  IndividualRecipientNamePage,
+  IndividualRecipientNinoPage,
+  LoansCYAPage
+}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -55,8 +60,8 @@ class IndividualRecipientNinoController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      request.usingAnswer(IndividualRecipientNamePage(srn, index)).sync { individualName =>
-        val preparedForm = request.userAnswers.fillForm(IndividualRecipientNinoPage(srn, index), form)
+      request.usingAnswer(IndividualRecipientNamePage(srn, index, mode)).sync { individualName =>
+        val preparedForm = request.userAnswers.fillForm(IndividualRecipientNinoPage(srn, index, mode), form)
         Ok(view(preparedForm, viewModel(srn, index, individualName, mode)))
       }
   }
@@ -67,15 +72,40 @@ class IndividualRecipientNinoController @Inject()(
         .bindFromRequest()
         .fold(
           formWithErrors =>
-            request.usingAnswer(IndividualRecipientNamePage(srn, index)).async { individualName =>
+            request.usingAnswer(IndividualRecipientNamePage(srn, index, mode)).async { individualName =>
               Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, individualName, mode))))
             },
           value =>
             for {
               updatedAnswers <- Future
-                .fromTry(request.userAnswers.set(IndividualRecipientNinoPage(srn, index), ConditionalYesNo(value)))
+                .fromTry(
+                  request.userAnswers.set(IndividualRecipientNinoPage(srn, index, mode), ConditionalYesNo(value))
+                )
               _ <- saveService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(IndividualRecipientNinoPage(srn, index), mode, updatedAnswers))
+            } yield {
+
+              mode match {
+                case CheckMode => {
+                  (
+                    updatedAnswers.get(IndividualRecipientNinoPage(srn, index, mode)),
+                    request.userAnswers.get(IndividualRecipientNinoPage(srn, index, mode))
+                  ) match {
+                    case (Some(newAnswer), Some(previousAnswer)) => {
+                      if (newAnswer == previousAnswer) {
+                        Redirect(navigator.nextPage(LoansCYAPage(srn, index, mode), mode, updatedAnswers))
+                      } else {
+                        Redirect(
+                          navigator.nextPage(IndividualRecipientNinoPage(srn, index, mode), CheckMode, updatedAnswers)
+                        )
+                      }
+                    }
+                  }
+                }
+                case NormalMode =>
+                  Redirect(navigator.nextPage(IndividualRecipientNinoPage(srn, index, mode), mode, updatedAnswers))
+              }
+
+            }
         )
   }
 }

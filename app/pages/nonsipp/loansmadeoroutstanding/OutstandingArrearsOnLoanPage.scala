@@ -18,13 +18,14 @@ package pages.nonsipp.loansmadeoroutstanding
 
 import config.Refined.Max5000
 import models.ConditionalYesNo.ConditionalYes
-import models.Money
+import models.{Mode, Money}
 import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
 
-case class OutstandingArrearsOnLoanPage(srn: Srn, index: Max5000) extends QuestionPage[ConditionalYes[Money]] {
+case class OutstandingArrearsOnLoanPage(srn: Srn, index: Max5000, mode: Mode)
+    extends QuestionPage[ConditionalYes[Money]] {
 
   override def path: JsPath = Paths.loanTransactions \ toString \ index.arrayIndex.toString
 

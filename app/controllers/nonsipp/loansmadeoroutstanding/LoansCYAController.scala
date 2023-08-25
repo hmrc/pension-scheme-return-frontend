@@ -59,44 +59,56 @@ class LoansCYAController @Inject()(
     identifyAndRequireData(srn) { implicit request =>
       (
         for {
-          receivedLoanType <- requiredPage(IdentityTypePage(srn, index, IdentitySubject.LoanRecipient))
+          receivedLoanType <- requiredPage(IdentityTypePage(srn, index, IdentitySubject.LoanRecipient, mode))
           recipientName <- List(
-            request.userAnswers.get(IndividualRecipientNamePage(srn, index)),
-            request.userAnswers.get(CompanyRecipientNamePage(srn, index)),
-            request.userAnswers.get(PartnershipRecipientNamePage(srn, index)),
-            request.userAnswers.get(OtherRecipientDetailsPage(srn, index)).map(_.name)
+            request.userAnswers.get(IndividualRecipientNamePage(srn, index, mode)),
+            request.userAnswers.get(CompanyRecipientNamePage(srn, index, mode)),
+            request.userAnswers.get(PartnershipRecipientNamePage(srn, index, mode)),
+            request.userAnswers.get(OtherRecipientDetailsPage(srn, index, mode)).map(_.name)
           ).flatten.headOption.getOrRecoverJourney
           recipientDetails = List(
-            request.userAnswers.get(IndividualRecipientNinoPage(srn, index)).flatMap(_.value.toOption.map(_.value)),
-            request.userAnswers.get(CompanyRecipientCrnPage(srn, index)).flatMap(_.value.toOption.map(_.value)),
-            request.userAnswers.get(PartnershipRecipientUtrPage(srn, index)).flatMap(_.value.toOption.map(_.value)),
-            request.userAnswers.get(OtherRecipientDetailsPage(srn, index)).map(_.description)
+            request.userAnswers
+              .get(IndividualRecipientNinoPage(srn, index, mode))
+              .flatMap(_.value.toOption.map(_.value)),
+            request.userAnswers.get(CompanyRecipientCrnPage(srn, index, mode)).flatMap(_.value.toOption.map(_.value)),
+            request.userAnswers
+              .get(PartnershipRecipientUtrPage(srn, index, mode))
+              .flatMap(_.value.toOption.map(_.value)),
+            request.userAnswers.get(OtherRecipientDetailsPage(srn, index, mode)).map(_.description)
           ).flatten.headOption
           recipientReasonNoDetails = List(
             request.userAnswers
-              .get(IndividualRecipientNinoPage(srn, index))
+              .get(IndividualRecipientNinoPage(srn, index, mode))
               .flatMap(_.value.swap.toOption.map(_.value)),
-            request.userAnswers.get(CompanyRecipientCrnPage(srn, index)).flatMap(_.value.swap.toOption.map(_.value)),
-            request.userAnswers.get(PartnershipRecipientUtrPage(srn, index)).flatMap(_.value.swap.toOption.map(_.value))
+            request.userAnswers
+              .get(CompanyRecipientCrnPage(srn, index, mode))
+              .flatMap(_.value.swap.toOption.map(_.value)),
+            request.userAnswers
+              .get(PartnershipRecipientUtrPage(srn, index, mode))
+              .flatMap(_.value.swap.toOption.map(_.value))
           ).flatten.headOption
-          connectedParty = if (request.userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, index)).isEmpty) {
-            Right(request.userAnswers.get(RecipientSponsoringEmployerConnectedPartyPage(srn, index)).get)
-          } else if (request.userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, index)).get) {
-            Left(request.userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, index)).get)
+          connectedParty = if (request.userAnswers
+              .get(IsIndividualRecipientConnectedPartyPage(srn, index, mode))
+              .isEmpty) {
+            Right(request.userAnswers.get(RecipientSponsoringEmployerConnectedPartyPage(srn, index, mode)).get)
+          } else if (request.userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, index, mode)).get) {
+            Left(request.userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, index, mode)).get)
           } else {
-            Right(request.userAnswers.get(RecipientSponsoringEmployerConnectedPartyPage(srn, index)).get)
+            Right(request.userAnswers.get(RecipientSponsoringEmployerConnectedPartyPage(srn, index, mode)).get)
           }
-          datePeriodLoan <- request.userAnswers.get(DatePeriodLoanPage(srn, index)).getOrRecoverJourney
-          loanAmount <- request.userAnswers.get(AmountOfTheLoanPage(srn, index)).getOrRecoverJourney
+          datePeriodLoan <- request.userAnswers.get(DatePeriodLoanPage(srn, index, mode)).getOrRecoverJourney
+          loanAmount <- request.userAnswers.get(AmountOfTheLoanPage(srn, index, mode)).getOrRecoverJourney
           returnEndDate <- schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney.map(_.to)
-          repaymentInstalments <- request.userAnswers.get(AreRepaymentsInstalmentsPage(srn, index)).getOrRecoverJourney
-          loanInterest <- request.userAnswers.get(InterestOnLoanPage(srn, index)).getOrRecoverJourney
+          repaymentInstalments <- request.userAnswers
+            .get(AreRepaymentsInstalmentsPage(srn, index, mode))
+            .getOrRecoverJourney
+          loanInterest <- request.userAnswers.get(InterestOnLoanPage(srn, index, mode)).getOrRecoverJourney
           outstandingArrearsOnLoan <- request.userAnswers
-            .get(OutstandingArrearsOnLoanPage(srn, index))
+            .get(OutstandingArrearsOnLoanPage(srn, index, mode))
             .map(_.value.toOption)
             .getOrRecoverJourney
           securityOnLoan <- request.userAnswers
-            .get(SecurityGivenForLoanPage(srn, index))
+            .get(SecurityGivenForLoanPage(srn, index, mode))
             .map(_.value.toOption)
             .getOrRecoverJourney
         } yield Ok(
@@ -126,9 +138,9 @@ class LoansCYAController @Inject()(
       ).merge
     }
 
-  def onSubmit(srn: Srn, checkOrChange: CheckOrChange, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Max5000, checkOrChange: CheckOrChange, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      Redirect(navigator.nextPage(LoansCYAPage(srn), mode, request.userAnswers))
+      Redirect(navigator.nextPage(LoansCYAPage(srn, index, mode), mode, request.userAnswers))
     }
 }
 
@@ -182,7 +194,8 @@ object LoansCYAController {
       ),
       refresh = None,
       buttonText = parameters.checkOrChange.fold(check = "site.saveAndContinue", change = "site.continue"),
-      onSubmit = routes.LoansCYAController.onSubmit(parameters.srn, parameters.checkOrChange)
+      onSubmit =
+        routes.LoansCYAController.onSubmit(parameters.srn, parameters.index, parameters.checkOrChange, parameters.mode)
     )
 
   private def sections(
@@ -242,10 +255,10 @@ object LoansCYAController {
     }
 
     val recipientNameUrl = receivedLoanType match {
-      case IdentityType.Individual => routes.IndividualRecipientNameController.onPageLoad(srn, index, mode).url
-      case IdentityType.UKCompany => routes.CompanyRecipientNameController.onPageLoad(srn, index, mode).url
-      case IdentityType.UKPartnership => routes.PartnershipRecipientNameController.onPageLoad(srn, index, mode).url
-      case IdentityType.Other => routes.OtherRecipientDetailsController.onPageLoad(srn, index, mode).url
+      case IdentityType.Individual => routes.IndividualRecipientNameController.onPageLoad(srn, index, CheckMode).url
+      case IdentityType.UKCompany => routes.CompanyRecipientNameController.onPageLoad(srn, index, CheckMode).url
+      case IdentityType.UKPartnership => routes.PartnershipRecipientNameController.onPageLoad(srn, index, CheckMode).url
+      case IdentityType.Other => routes.OtherRecipientDetailsController.onPageLoad(srn, index, CheckMode).url
     }
 
     val (
@@ -258,28 +271,28 @@ object LoansCYAController {
         case IdentityType.Individual =>
           (
             Message("loanCheckYourAnswers.section1.recipientDetails.nino", recipientName),
-            routes.IndividualRecipientNinoController.onPageLoad(srn, index, mode).url,
+            routes.IndividualRecipientNinoController.onPageLoad(srn, index, CheckMode).url,
             "loanCheckYourAnswers.section1.recipientDetails.nino.hidden",
             "loanCheckYourAnswers.section1.recipientDetails.noNinoReason.hidden"
           )
         case IdentityType.UKCompany =>
           (
             Message("loanCheckYourAnswers.section1.recipientDetails.crn", recipientName),
-            routes.CompanyRecipientCrnController.onPageLoad(srn, index, mode).url,
+            routes.CompanyRecipientCrnController.onPageLoad(srn, index, CheckMode).url,
             "loanCheckYourAnswers.section1.recipientDetails.crn.hidden",
             "loanCheckYourAnswers.section1.recipientDetails.noCrnReason.hidden"
           )
         case IdentityType.UKPartnership =>
           (
             Message("loanCheckYourAnswers.section1.recipientDetails.utr", recipientName),
-            routes.PartnershipRecipientUtrController.onPageLoad(srn, index, mode).url,
+            routes.PartnershipRecipientUtrController.onPageLoad(srn, index, CheckMode).url,
             "loanCheckYourAnswers.section1.recipientDetails.utr.hidden",
             "loanCheckYourAnswers.section1.recipientDetails.noUtrReason.hidden"
           )
         case IdentityType.Other =>
           (
             Message("loanCheckYourAnswers.section1.recipientDetails.other", recipientName),
-            routes.OtherRecipientDetailsController.onPageLoad(srn, index, mode).url,
+            routes.OtherRecipientDetailsController.onPageLoad(srn, index, CheckMode).url,
             "loanCheckYourAnswers.section1.recipientDetails.other.hidden",
             ""
           )
@@ -288,16 +301,16 @@ object LoansCYAController {
     val (recipientNoDetailsReasonKey, recipientNoDetailsUrl): (Message, String) = receivedLoanType match {
       case IdentityType.Individual =>
         Message("loanCheckYourAnswers.section1.recipientDetails.noNinoReason", recipientName) ->
-          routes.IndividualRecipientNinoController.onPageLoad(srn, index, mode).url
+          routes.IndividualRecipientNinoController.onPageLoad(srn, index, CheckMode).url
       case IdentityType.UKCompany =>
         Message("loanCheckYourAnswers.section1.recipientDetails.noCrnReason", recipientName) ->
-          routes.CompanyRecipientCrnController.onPageLoad(srn, index, mode).url
+          routes.CompanyRecipientCrnController.onPageLoad(srn, index, CheckMode).url
       case IdentityType.UKPartnership =>
         Message("loanCheckYourAnswers.section1.recipientDetails.noUtrReason", recipientName) ->
-          routes.PartnershipRecipientUtrController.onPageLoad(srn, index, mode).url
+          routes.PartnershipRecipientUtrController.onPageLoad(srn, index, CheckMode).url
       case IdentityType.Other =>
         Message("loanCheckYourAnswers.section1.recipientDetails.other", recipientName) ->
-          routes.OtherRecipientDetailsController.onPageLoad(srn, index, mode).url
+          routes.OtherRecipientDetailsController.onPageLoad(srn, index, CheckMode).url
     }
 
     val (connectedPartyKey, connectedPartyValue, connectedPartyHiddenKey, connectedPartyUrl): (
@@ -314,14 +327,14 @@ object LoansCYAController {
               Message("loanCheckYourAnswers.section1.isIndividualRecipient.yes", recipientName),
               "Yes",
               "",
-              routes.IsIndividualRecipientConnectedPartyController.onPageLoad(srn, index, mode).url
+              routes.IsIndividualRecipientConnectedPartyController.onPageLoad(srn, index, CheckMode).url
             )
           } else {
             (
               Message("loanCheckYourAnswers.section1.isIndividualRecipient.no", recipientName),
               "No",
               "",
-              routes.IsIndividualRecipientConnectedPartyController.onPageLoad(srn, index, mode).url
+              routes.IsIndividualRecipientConnectedPartyController.onPageLoad(srn, index, CheckMode).url
             )
           }
         )
@@ -331,21 +344,21 @@ object LoansCYAController {
           Message("loanCheckYourAnswers.section1.sponsoringOrConnectedParty", recipientName),
           "loanCheckYourAnswers.section1.sponsoringOrConnectedParty.sponsoring",
           "loanCheckYourAnswers.section1.sponsoringOrConnectedParty.hidden",
-          routes.RecipientSponsoringEmployerConnectedPartyController.onPageLoad(srn, index, mode).url
+          routes.RecipientSponsoringEmployerConnectedPartyController.onPageLoad(srn, index, CheckMode).url
         )
       case Right(SponsoringOrConnectedParty.ConnectedParty) =>
         (
           Message("loanCheckYourAnswers.section1.sponsoringOrConnectedParty", recipientName),
           "loanCheckYourAnswers.section1.sponsoringOrConnectedParty.connectedParty",
           "loanCheckYourAnswers.section1.sponsoringOrConnectedParty.hidden",
-          routes.RecipientSponsoringEmployerConnectedPartyController.onPageLoad(srn, index, mode).url
+          routes.RecipientSponsoringEmployerConnectedPartyController.onPageLoad(srn, index, CheckMode).url
         )
       case Right(SponsoringOrConnectedParty.Neither) =>
         (
           Message("loanCheckYourAnswers.section1.sponsoringOrConnectedParty", recipientName),
           "loanCheckYourAnswers.section1.sponsoringOrConnectedParty.neither",
           "loanCheckYourAnswers.section1.sponsoringOrConnectedParty.hidden",
-          routes.RecipientSponsoringEmployerConnectedPartyController.onPageLoad(srn, index, mode).url
+          routes.RecipientSponsoringEmployerConnectedPartyController.onPageLoad(srn, index, CheckMode).url
         )
     }
 
@@ -354,37 +367,59 @@ object LoansCYAController {
         Some(Heading2.medium("loanCheckYourAnswers.section1.heading")),
         List(
           CheckYourAnswersRowViewModel("loanCheckYourAnswers.section1.whoReceivedLoan", receivedLoan)
-            .withAction(
-              SummaryAction(
-                "site.change",
-                controllers.nonsipp.common.routes.IdentityTypeController
-                  .onPageLoad(srn, index, mode, IdentitySubject.LoanRecipient)
-                  .url
-              ).withVisuallyHiddenContent("loanCheckYourAnswers.section1.whoReceivedLoan.hidden")
+          //            .withAction(
+          //              SummaryAction(
+          //                "site.change",
+          //                controllers.nonsipp.common.routes.IdentityTypeController
+          //                  .onPageLoad(srn, index, mode, IdentitySubject.LoanRecipient)
+          //                  .url
+          //              ).withVisuallyHiddenContent("loanCheckYourAnswers.section1.whoReceivedLoan.hidden")
+          //            ),
+            .withChangeAction(
+              controllers.nonsipp.common.routes.IdentityTypeController
+                .onPageLoad(srn, index, CheckMode, IdentitySubject.LoanRecipient)
+                .url,
+              hidden = "loanCheckYourAnswers.section1.whoReceivedLoan.hidden"
             ),
           CheckYourAnswersRowViewModel("loanCheckYourAnswers.section1.recipientName", recipientName)
-            .withAction(
-              SummaryAction("site.change", recipientNameUrl)
-                .withVisuallyHiddenContent("loanCheckYourAnswers.section1.recipientName.hidden")
+          //            .withAction(
+          //              SummaryAction("site.change", recipientNameUrl)
+          //                .withVisuallyHiddenContent("loanCheckYourAnswers.section1.recipientName.hidden")
+          //            )
+            .withChangeAction(
+              recipientNameUrl,
+              hidden = "loanCheckYourAnswers.section1.recipientName.hidden"
             )
         ) :?+ recipientDetails.map(
           details =>
             CheckYourAnswersRowViewModel(recipientDetailsKey, details)
-              .withAction(
-                SummaryAction("site.change", recipientDetailsUrl)
-                  .withVisuallyHiddenContent(recipientDetailsIdChangeHiddenKey)
+            //              .withAction(
+            //                SummaryAction("site.change", recipientDetailsUrl)
+            //                  .withVisuallyHiddenContent(recipientDetailsIdChangeHiddenKey)
+            //              )
+              .withChangeAction(
+                recipientDetailsUrl,
+                hidden = recipientDetailsIdChangeHiddenKey
               )
         ) :?+ recipientReasonNoDetails.map(
           reason =>
             CheckYourAnswersRowViewModel(recipientNoDetailsReasonKey, reason)
-              .withAction(
-                SummaryAction("site.change", recipientNoDetailsUrl)
-                  .withVisuallyHiddenContent(recipientDetailsNoIdChangeHiddenKey)
+            //              .withAction(
+            //                SummaryAction("site.change", recipientNoDetailsUrl)
+            //                  .withVisuallyHiddenContent(recipientDetailsNoIdChangeHiddenKey)
+            //              )
+              .withChangeAction(
+                recipientNoDetailsUrl,
+                hidden = recipientDetailsNoIdChangeHiddenKey
               )
         ) :+ CheckYourAnswersRowViewModel(connectedPartyKey, connectedPartyValue)
-          .withAction(
-            SummaryAction("site.change", connectedPartyUrl)
-              .withVisuallyHiddenContent(connectedPartyHiddenKey)
+        //          .withAction(
+        //            SummaryAction("site.change", connectedPartyUrl)
+        //              .withVisuallyHiddenContent(connectedPartyHiddenKey)
+        //          )
+          .withChangeAction(
+            connectedPartyUrl,
+            hidden = connectedPartyHiddenKey
           )
       )
     )
@@ -411,27 +446,40 @@ object LoansCYAController {
         Some(Heading2.medium("loanCheckYourAnswers.section2.heading")),
         List(
           CheckYourAnswersRowViewModel("loanCheckYourAnswers.section2.loanDate", loanDate.show)
-            .withAction(
-              SummaryAction(
-                "site.change",
-                routes.DatePeriodLoanController.onPageLoad(srn, index, mode).url
-              ).withVisuallyHiddenContent("loanCheckYourAnswers.section2.loanDate.hidden")
+          //            .withAction(
+          //              SummaryAction(
+          //                "site.change",
+          //                routes.DatePeriodLoanController.onPageLoad(srn, index, mode).url
+          //              ).withVisuallyHiddenContent("loanCheckYourAnswers.section2.loanDate.hidden")
+          //            ),
+            .withChangeAction(
+              routes.DatePeriodLoanController.onPageLoad(srn, index, CheckMode).url,
+              hidden = "loanCheckYourAnswers.section2.loanDate.hidden"
             ),
           CheckYourAnswersRowViewModel(
             Message("loanCheckYourAnswers.section2.assetsValue", recipientName),
             s"£${assetsValue.displayAs}"
-          ).withAction(
-            SummaryAction(
-              "site.change",
-              routes.DatePeriodLoanController.onPageLoad(srn, index, mode).url + "#assetsValue"
-            ).withVisuallyHiddenContent("loanCheckYourAnswers.section2.assetsValue.hidden")
-          ),
+          )
+          //            .withAction(
+          //            SummaryAction(
+          //              "site.change",
+          //              routes.DatePeriodLoanController.onPageLoad(srn, index, mode).url + "#assetsValue"
+          //            ).withVisuallyHiddenContent("loanCheckYourAnswers.section2.assetsValue.hidden")
+          //          ),
+            .withChangeAction(
+              routes.DatePeriodLoanController.onPageLoad(srn, index, CheckMode).url + "#assetsValue",
+              hidden = "loanCheckYourAnswers.section2.assetsValue.hidden"
+            ),
           CheckYourAnswersRowViewModel("loanCheckYourAnswers.section2.loanPeriod", loanPeriodMonths)
-            .withAction(
-              SummaryAction(
-                "site.change",
-                routes.DatePeriodLoanController.onPageLoad(srn, index, mode).url + "#loanPeriod"
-              ).withVisuallyHiddenContent("loanCheckYourAnswers.section2.loanPeriod.hidden")
+          //            .withAction(
+          //              SummaryAction(
+          //                "site.change",
+          //                routes.DatePeriodLoanController.onPageLoad(srn, index, mode).url + "#loanPeriod"
+          //              ).withVisuallyHiddenContent("loanCheckYourAnswers.section2.loanPeriod.hidden")
+          //            )
+            .withChangeAction(
+              routes.DatePeriodLoanController.onPageLoad(srn, index, CheckMode).url + "#loanPeriod",
+              hidden = "loanCheckYourAnswers.section2.loanPeriod.hidden"
             )
         )
       )
@@ -455,41 +503,60 @@ object LoansCYAController {
         Some(Heading2.medium("loanCheckYourAnswers.section3.heading")),
         List(
           CheckYourAnswersRowViewModel("loanCheckYourAnswers.section3.loanAmount.total", s"£${totalLoan.displayAs}")
-            .withAction(
-              SummaryAction(
-                "site.change",
-                routes.AmountOfTheLoanController.onPageLoad(srn, index, mode).url
-              ).withVisuallyHiddenContent("loanCheckYourAnswers.section3.loanAmount.total.hidden")
+          //            .withAction(
+          //              SummaryAction(
+          //                "site.change",
+          //                routes.AmountOfTheLoanController.onPageLoad(srn, index, mode).url
+          //              ).withVisuallyHiddenContent("loanCheckYourAnswers.section3.loanAmount.total.hidden")
+          //            ),
+            .withChangeAction(
+              routes.AmountOfTheLoanController.onPageLoad(srn, index, CheckMode).url,
+              hidden = "loanCheckYourAnswers.section3.loanAmount.total.hidden"
             ),
           CheckYourAnswersRowViewModel(
             "loanCheckYourAnswers.section3.loanAmount.repayments",
             s"£${repayments.displayAs}"
-          ).withAction(
-            SummaryAction(
-              "site.change",
-              routes.AmountOfTheLoanController.onPageLoad(srn, index, mode).url + "#repayments"
-            ).withVisuallyHiddenContent("loanCheckYourAnswers.section3.loanAmount.repayments.hidden")
-          ),
+          )
+          //            .withAction(
+          //            SummaryAction(
+          //              "site.change",
+          //              routes.AmountOfTheLoanController.onPageLoad(srn, index, mode).url + "#repayments"
+          //            ).withVisuallyHiddenContent("loanCheckYourAnswers.section3.loanAmount.repayments.hidden")
+          //          ),
+            .withChangeAction(
+              routes.AmountOfTheLoanController.onPageLoad(srn, index, CheckMode).url + "#repayments",
+              hidden = "loanCheckYourAnswers.section3.loanAmount.repayments.hidden"
+            ),
           CheckYourAnswersRowViewModel(
             Message("loanCheckYourAnswers.section3.loanAmount.outstanding", returnEndDate.show),
             s"£${outstanding.displayAs}"
-          ).withAction(
-            SummaryAction(
-              "site.change",
-              routes.AmountOfTheLoanController.onPageLoad(srn, index, mode).url + "#outstanding"
-            ).withVisuallyHiddenContent(
-              Message("loanCheckYourAnswers.section3.loanAmount.outstanding.hidden", returnEndDate.show)
-            )
-          ),
+          )
+          //            .withAction(
+          //            SummaryAction(
+          //              "site.change",
+          //              routes.AmountOfTheLoanController.onPageLoad(srn, index, mode).url + "#outstanding"
+          //            ).withVisuallyHiddenContent(
+          //              Message("loanCheckYourAnswers.section3.loanAmount.outstanding.hidden", returnEndDate.show)
+          //            )
+          //          ),
+            .withChangeAction(
+              routes.AmountOfTheLoanController.onPageLoad(srn, index, CheckMode).url + "#outstanding",
+              hidden = Message("loanCheckYourAnswers.section3.loanAmount.outstanding.hidden", returnEndDate.show)
+            ),
           CheckYourAnswersRowViewModel(
             "loanCheckYourAnswers.section3.loanAmount.instalments",
             repaymentsInstalmentsValue
-          ).withAction(
-            SummaryAction(
-              "site.change",
-              routes.AreRepaymentsInstalmentsController.onPageLoad(srn, index, mode).url
-            ).withVisuallyHiddenContent("loanCheckYourAnswers.section3.loanAmount.instalments.hidden")
           )
+          //            .withAction(
+          //            SummaryAction(
+          //              "site.change",
+          //              routes.AreRepaymentsInstalmentsController.onPageLoad(srn, index, mode).url
+          //            ).withVisuallyHiddenContent("loanCheckYourAnswers.section3.loanAmount.instalments.hidden")
+          //          )
+            .withChangeAction(
+              routes.AreRepaymentsInstalmentsController.onPageLoad(srn, index, CheckMode).url,
+              hidden = "loanCheckYourAnswers.section3.loanAmount.instalments.hidden"
+            )
         )
       )
     )
@@ -508,25 +575,37 @@ object LoansCYAController {
         Some(Heading2.medium("loanCheckYourAnswers.section4.heading")),
         List(
           CheckYourAnswersRowViewModel("loanCheckYourAnswers.section4.payable", s"£${interestPayable.displayAs}")
-            .withAction(
-              SummaryAction(
-                "site.change",
-                routes.InterestOnLoanController.onPageLoad(srn, index, mode).url
-              ).withVisuallyHiddenContent("loanCheckYourAnswers.section4.payable.hidden")
+          //            .withAction(
+          //              SummaryAction(
+          //                "site.change",
+          //                routes.InterestOnLoanController.onPageLoad(srn, index, mode).url
+          //              ).withVisuallyHiddenContent("loanCheckYourAnswers.section4.payable.hidden")
+          //            ),
+            .withChangeAction(
+              routes.InterestOnLoanController.onPageLoad(srn, index, CheckMode).url,
+              hidden = "loanCheckYourAnswers.section4.payable.hidden"
             ),
           CheckYourAnswersRowViewModel("loanCheckYourAnswers.section4.rate", s"${interestRate.displayAs}%")
-            .withAction(
-              SummaryAction(
-                "site.change",
-                routes.InterestOnLoanController.onPageLoad(srn, index, mode).url + "#rate"
-              ).withVisuallyHiddenContent("loanCheckYourAnswers.section4.rate.hidden")
+          //            .withAction(
+          //              SummaryAction(
+          //                "site.change",
+          //                routes.InterestOnLoanController.onPageLoad(srn, index, mode).url + "#rate"
+          //              ).withVisuallyHiddenContent("loanCheckYourAnswers.section4.rate.hidden")
+          //            ),
+            .withChangeAction(
+              routes.InterestOnLoanController.onPageLoad(srn, index, CheckMode).url + "#rate",
+              hidden = "loanCheckYourAnswers.section4.rate.hidden"
             ),
           CheckYourAnswersRowViewModel("loanCheckYourAnswers.section4.payments", s"£${interestPayments.displayAs}")
-            .withAction(
-              SummaryAction(
-                "site.change",
-                routes.InterestOnLoanController.onPageLoad(srn, index, mode).url + "#payments"
-              ).withVisuallyHiddenContent("loanCheckYourAnswers.section4.payments.hidden")
+          //            .withAction(
+          //              SummaryAction(
+          //                "site.change",
+          //                routes.InterestOnLoanController.onPageLoad(srn, index, mode).url + "#payments"
+          //              ).withVisuallyHiddenContent("loanCheckYourAnswers.section4.payments.hidden")
+          //            )
+            .withChangeAction(
+              routes.InterestOnLoanController.onPageLoad(srn, index, CheckMode).url + "#payments",
+              hidden = "loanCheckYourAnswers.section4.payments.hidden"
             )
         )
       )
@@ -575,11 +654,15 @@ object LoansCYAController {
         Some(Heading2.medium("loanCheckYourAnswers.section5.heading")),
         List(
           CheckYourAnswersRowViewModel("loanCheckYourAnswers.section5.security", outstandingMessage)
-            .withAction(
-              SummaryAction(
-                "site.change",
-                routes.SecurityGivenForLoanController.onPageLoad(srn, index, mode).url
-              ).withVisuallyHiddenContent("loanCheckYourAnswers.section5.security.hidden")
+          //            .withAction(
+          //              SummaryAction(
+          //                "site.change",
+          //                routes.SecurityGivenForLoanController.onPageLoad(srn, index, mode).url
+          //              ).withVisuallyHiddenContent("loanCheckYourAnswers.section5.security.hidden")
+          //            )
+            .withChangeAction(
+              routes.SecurityGivenForLoanController.onPageLoad(srn, index, CheckMode).url,
+              hidden = "loanCheckYourAnswers.section5.security.hidden"
             )
         ) :?+ securityOnLoan.map { value =>
           CheckYourAnswersRowViewModel("loanCheckYourAnswers.section5.security.yes", s"${value.security}")

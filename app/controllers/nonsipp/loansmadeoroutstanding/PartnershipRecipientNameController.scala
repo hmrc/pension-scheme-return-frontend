@@ -19,10 +19,10 @@ package controllers.nonsipp.loansmadeoroutstanding
 import config.Refined.Max5000
 import controllers.actions._
 import forms.TextFormProvider
-import models.Mode
+import models.{CheckMode, Mode, NormalMode}
 import models.SchemeId.Srn
 import navigation.Navigator
-import pages.nonsipp.loansmadeoroutstanding.PartnershipRecipientNamePage
+import pages.nonsipp.loansmadeoroutstanding.{CompanyRecipientNamePage, LoansCYAPage, PartnershipRecipientNamePage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -54,7 +54,7 @@ class PartnershipRecipientNameController @Inject()(
     implicit request =>
       Ok(
         view(
-          form.fromUserAnswers(PartnershipRecipientNamePage(srn, index)),
+          form.fromUserAnswers(PartnershipRecipientNamePage(srn, index, mode)),
           PartnershipRecipientNameController.viewModel(srn, index, mode)
         )
       )
@@ -72,9 +72,33 @@ class PartnershipRecipientNameController @Inject()(
           answer => {
             for {
               updatedAnswers <- Future
-                .fromTry(request.userAnswers.set(PartnershipRecipientNamePage(srn, index), answer))
+                .fromTry(request.userAnswers.set(PartnershipRecipientNamePage(srn, index, mode), answer))
               _ <- saveService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(PartnershipRecipientNamePage(srn, index), mode, updatedAnswers))
+            } yield {
+
+              mode match {
+                case CheckMode => {
+                  (
+                    updatedAnswers.get(PartnershipRecipientNamePage(srn, index, mode)),
+                    request.userAnswers.get(PartnershipRecipientNamePage(srn, index, mode))
+                  ) match {
+                    case (Some(newAnswer), Some(previousAnswer)) => {
+                      if (newAnswer == previousAnswer) {
+                        Redirect(navigator.nextPage(LoansCYAPage(srn, index, mode), mode, updatedAnswers))
+                      } else {
+                        Redirect(
+                          navigator.nextPage(PartnershipRecipientNamePage(srn, index, mode), CheckMode, updatedAnswers)
+                        )
+                      }
+                    }
+                  }
+                }
+                case NormalMode =>
+                  Redirect(navigator.nextPage(PartnershipRecipientNamePage(srn, index, mode), mode, updatedAnswers))
+              }
+
+            }
+
           }
         )
   }

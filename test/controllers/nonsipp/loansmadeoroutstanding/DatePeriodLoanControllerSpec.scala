@@ -44,7 +44,7 @@ class DatePeriodLoanControllerSpec extends ControllerBaseSpec {
 
   "DatePeriodLoanController" - {
 
-    val populatedUserAnswers = defaultUserAnswers.set(CompanyRecipientNamePage(srn, index), companyName).get
+    val populatedUserAnswers = defaultUserAnswers.set(CompanyRecipientNamePage(srn, index, NormalMode), companyName).get
     lazy val onPageLoad = routes.DatePeriodLoanController.onPageLoad(srn, index, NormalMode)
     lazy val onSubmit = routes.DatePeriodLoanController.onSubmit(srn, index, NormalMode)
 
@@ -56,7 +56,7 @@ class DatePeriodLoanControllerSpec extends ControllerBaseSpec {
       injected[MultipleQuestionView].apply(viewModel(srn, index, schemeName, NormalMode, form(date)))
     }.before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear)))
 
-    act.like(renderPrePopView(onPageLoad, DatePeriodLoanPage(srn, index), (date, money, 12)) {
+    act.like(renderPrePopView(onPageLoad, DatePeriodLoanPage(srn, index, NormalMode), (date, money, 12)) {
       implicit app => implicit request =>
         val preparedForm = form(date).fill((date, money, 12))
         injected[MultipleQuestionView].apply(viewModel(srn, index, schemeName, NormalMode, preparedForm))

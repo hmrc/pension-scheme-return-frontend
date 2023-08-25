@@ -22,9 +22,9 @@ import controllers.nonsipp.loansmadeoroutstanding.CompanyRecipientCrnController.
 import forms.YesNoPageFormProvider
 import forms.mappings.Mappings
 import models.SchemeId.Srn
-import models.{ConditionalYesNo, Crn, Mode}
+import models.{CheckMode, ConditionalYesNo, Crn, Mode, NormalMode}
 import navigation.Navigator
-import pages.nonsipp.loansmadeoroutstanding.{CompanyRecipientCrnPage, CompanyRecipientNamePage}
+import pages.nonsipp.loansmadeoroutstanding.{CompanyRecipientCrnPage, CompanyRecipientNamePage, LoansCYAPage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -54,8 +54,8 @@ class CompanyRecipientCrnController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      request.usingAnswer(CompanyRecipientNamePage(srn, index)).sync { companyName =>
-        val preparedForm = request.userAnswers.fillForm(CompanyRecipientCrnPage(srn, index), form)
+      request.usingAnswer(CompanyRecipientNamePage(srn, index, mode)).sync { companyName =>
+        val preparedForm = request.userAnswers.fillForm(CompanyRecipientCrnPage(srn, index, mode), form)
         Ok(view(preparedForm, viewModel(srn, index, companyName, mode)))
       }
   }
@@ -66,15 +66,37 @@ class CompanyRecipientCrnController @Inject()(
         .bindFromRequest()
         .fold(
           formWithErrors =>
-            request.usingAnswer(CompanyRecipientNamePage(srn, index)).async { companyName =>
+            request.usingAnswer(CompanyRecipientNamePage(srn, index, mode)).async { companyName =>
               Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, companyName, mode))))
             },
           value =>
             for {
               updatedAnswers <- Future
-                .fromTry(request.userAnswers.set(CompanyRecipientCrnPage(srn, index), ConditionalYesNo(value)))
+                .fromTry(request.userAnswers.set(CompanyRecipientCrnPage(srn, index, mode), ConditionalYesNo(value)))
               _ <- saveService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(CompanyRecipientCrnPage(srn, index), mode, updatedAnswers))
+            } yield {
+              mode match {
+                case CheckMode => {
+                  (
+                    updatedAnswers.get(CompanyRecipientCrnPage(srn, index, mode)),
+                    request.userAnswers.get(CompanyRecipientCrnPage(srn, index, mode))
+                  ) match {
+                    case (Some(newAnswer), Some(previousAnswer)) => {
+                      if (newAnswer == previousAnswer) {
+                        Redirect(navigator.nextPage(LoansCYAPage(srn, index, mode), mode, updatedAnswers))
+                      } else {
+                        Redirect(
+                          navigator.nextPage(CompanyRecipientCrnPage(srn, index, mode), CheckMode, updatedAnswers)
+                        )
+                      }
+                    }
+                  }
+                }
+                case NormalMode =>
+                  Redirect(navigator.nextPage(CompanyRecipientCrnPage(srn, index, mode), mode, updatedAnswers))
+              }
+
+            }
         )
   }
 }

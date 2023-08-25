@@ -42,7 +42,7 @@ class InterestOnLoanControllerSpec extends ControllerBaseSpec {
       view(viewModel(InterestOnLoanController.form))
     })
 
-    act.like(renderPrePopView(onPageLoad, InterestOnLoanPage(srn, index), (money, percentage, money)) {
+    act.like(renderPrePopView(onPageLoad, InterestOnLoanPage(srn, index, NormalMode), (money, percentage, money)) {
       implicit app => implicit request =>
         val view = injected[MultipleQuestionView]
         view(viewModel(InterestOnLoanController.form.fill((money, percentage, money))))

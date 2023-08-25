@@ -36,18 +36,18 @@ class RecipientSponsoringEmployerConnectedPartyControllerSpec extends Controller
 
   val userAnswersWithCompanyName: UserAnswers =
     defaultUserAnswers
-      .unsafeSet(IdentityTypePage(srn, index, subject), IdentityType.UKCompany)
-      .unsafeSet(CompanyRecipientNamePage(srn, index), companyName)
+      .unsafeSet(IdentityTypePage(srn, index, subject, NormalMode), IdentityType.UKCompany)
+      .unsafeSet(CompanyRecipientNamePage(srn, index, NormalMode), companyName)
 
   val userAnswersWithPartnershipName: UserAnswers =
     defaultUserAnswers
-      .unsafeSet(IdentityTypePage(srn, index, subject), IdentityType.UKPartnership)
-      .unsafeSet(PartnershipRecipientNamePage(srn, index), partnershipName)
+      .unsafeSet(IdentityTypePage(srn, index, subject, NormalMode), IdentityType.UKPartnership)
+      .unsafeSet(PartnershipRecipientNamePage(srn, index, NormalMode), partnershipName)
 
   val userAnswersWithOtherName: UserAnswers =
     defaultUserAnswers
-      .unsafeSet(IdentityTypePage(srn, index, subject), IdentityType.Other)
-      .unsafeSet(OtherRecipientDetailsPage(srn, index), RecipientDetails(otherName, "test description"))
+      .unsafeSet(IdentityTypePage(srn, index, subject, NormalMode), IdentityType.Other)
+      .unsafeSet(OtherRecipientDetailsPage(srn, index, NormalMode), RecipientDetails(otherName, "test description"))
 
   "RecipientSponsoringEmployerConnectedParty Controller" - {
 
@@ -68,7 +68,7 @@ class RecipientSponsoringEmployerConnectedPartyControllerSpec extends Controller
     act.like(
       renderPrePopView(
         onPageLoad,
-        RecipientSponsoringEmployerConnectedPartyPage(srn, index),
+        RecipientSponsoringEmployerConnectedPartyPage(srn, index, NormalMode),
         SponsoringOrConnectedParty.Sponsoring,
         userAnswersWithCompanyName
       ) { implicit app => implicit request =>
@@ -83,7 +83,7 @@ class RecipientSponsoringEmployerConnectedPartyControllerSpec extends Controller
     act.like(
       renderPrePopView(
         onPageLoad,
-        RecipientSponsoringEmployerConnectedPartyPage(srn, index),
+        RecipientSponsoringEmployerConnectedPartyPage(srn, index, NormalMode),
         SponsoringOrConnectedParty.Sponsoring,
         userAnswersWithPartnershipName
       ) { implicit app => implicit request =>
@@ -98,7 +98,7 @@ class RecipientSponsoringEmployerConnectedPartyControllerSpec extends Controller
     act.like(
       renderPrePopView(
         onPageLoad,
-        RecipientSponsoringEmployerConnectedPartyPage(srn, index),
+        RecipientSponsoringEmployerConnectedPartyPage(srn, index, NormalMode),
         SponsoringOrConnectedParty.Sponsoring,
         userAnswersWithOtherName
       ) { implicit app => implicit request =>

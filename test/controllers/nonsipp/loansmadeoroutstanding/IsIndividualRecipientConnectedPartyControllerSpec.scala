@@ -33,7 +33,7 @@ class IsIndividualRecipientConnectedPartyControllerSpec extends ControllerBaseSp
   lazy val onSubmit = routes.IsIndividualRecipientConnectedPartyController.onSubmit(srn, index, NormalMode)
 
   val userServicesWithIndividualName: UserAnswers =
-    defaultUserAnswers.unsafeSet(IndividualRecipientNamePage(srn, index), individualName)
+    defaultUserAnswers.unsafeSet(IndividualRecipientNamePage(srn, index, NormalMode), individualName)
 
   "IsIndividualRecipientConnectedPartyController" - {
 
@@ -45,7 +45,7 @@ class IsIndividualRecipientConnectedPartyControllerSpec extends ControllerBaseSp
     act.like(
       renderPrePopView(
         onPageLoad,
-        IsIndividualRecipientConnectedPartyPage(srn, index),
+        IsIndividualRecipientConnectedPartyPage(srn, index, NormalMode),
         true,
         userServicesWithIndividualName
       ) { implicit app => implicit request =>

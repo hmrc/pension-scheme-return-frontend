@@ -31,7 +31,8 @@ class PartnershipRecipientNameControllerSpec extends ControllerBaseSpec {
 
   "PartnershipRecipientNameController" - {
 
-    val populatedUserAnswers = defaultUserAnswers.set(PartnershipRecipientNamePage(srn, index), partnershipName).get
+    val populatedUserAnswers =
+      defaultUserAnswers.set(PartnershipRecipientNamePage(srn, index, NormalMode), partnershipName).get
     lazy val onPageLoad = routes.PartnershipRecipientNameController.onPageLoad(srn, index, NormalMode)
     lazy val onSubmit = routes.PartnershipRecipientNameController.onSubmit(srn, index, NormalMode)
 
@@ -39,7 +40,7 @@ class PartnershipRecipientNameControllerSpec extends ControllerBaseSpec {
       injected[TextInputView].apply(form(injected[TextFormProvider]), viewModel(srn, index, NormalMode))
     })
 
-    act.like(renderPrePopView(onPageLoad, PartnershipRecipientNamePage(srn, index), partnershipName) {
+    act.like(renderPrePopView(onPageLoad, PartnershipRecipientNamePage(srn, index, NormalMode), partnershipName) {
       implicit app => implicit request =>
         val preparedForm = form(injected[TextFormProvider]).fill(partnershipName)
         injected[TextInputView].apply(preparedForm, viewModel(srn, index, NormalMode))

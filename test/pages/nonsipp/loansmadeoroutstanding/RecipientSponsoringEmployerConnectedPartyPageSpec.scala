@@ -18,7 +18,7 @@ package pages.nonsipp.loansmadeoroutstanding
 
 import config.Refined.OneTo5000
 import eu.timepit.refined.refineMV
-import models.SponsoringOrConnectedParty
+import models.{NormalMode, SponsoringOrConnectedParty}
 import pages.behaviours.PageBehaviours
 
 class RecipientSponsoringEmployerConnectedPartyPageSpec extends PageBehaviours {
@@ -27,10 +27,16 @@ class RecipientSponsoringEmployerConnectedPartyPageSpec extends PageBehaviours {
 
     val index = refineMV[OneTo5000](1)
 
-    beRetrievable[SponsoringOrConnectedParty](RecipientSponsoringEmployerConnectedPartyPage(srnGen.sample.value, index))
+    beRetrievable[SponsoringOrConnectedParty](
+      RecipientSponsoringEmployerConnectedPartyPage(srnGen.sample.value, index, NormalMode)
+    )
 
-    beSettable[SponsoringOrConnectedParty](RecipientSponsoringEmployerConnectedPartyPage(srnGen.sample.value, index))
+    beSettable[SponsoringOrConnectedParty](
+      RecipientSponsoringEmployerConnectedPartyPage(srnGen.sample.value, index, NormalMode)
+    )
 
-    beRemovable[SponsoringOrConnectedParty](RecipientSponsoringEmployerConnectedPartyPage(srnGen.sample.value, index))
+    beRemovable[SponsoringOrConnectedParty](
+      RecipientSponsoringEmployerConnectedPartyPage(srnGen.sample.value, index, NormalMode)
+    )
   }
 }

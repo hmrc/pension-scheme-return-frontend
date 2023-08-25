@@ -24,9 +24,9 @@ import forms.MultipleQuestionFormProvider
 import forms.mappings.Mappings
 import forms.mappings.errors.{MoneyFormErrors, PercentageFormErrors}
 import models.SchemeId.Srn
-import models.{Mode, Money, Percentage}
+import models.{CheckMode, Mode, Money, NormalMode, Percentage}
 import navigation.Navigator
-import pages.nonsipp.loansmadeoroutstanding.InterestOnLoanPage
+import pages.nonsipp.loansmadeoroutstanding.{InterestOnLoanPage, LoansCYAPage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -61,7 +61,7 @@ class InterestOnLoanController @Inject()(
           index,
           mode,
           request.schemeDetails.schemeName,
-          request.userAnswers.fillForm(InterestOnLoanPage(srn, index), form)
+          request.userAnswers.fillForm(InterestOnLoanPage(srn, index, mode), form)
         )
 
         Ok(view(viewModel))
@@ -84,9 +84,17 @@ class InterestOnLoanController @Inject()(
           value =>
             for {
               updatedAnswers <- Future
-                .fromTry(request.userAnswers.transformAndSet(InterestOnLoanPage(srn, index), value))
+                .fromTry(request.userAnswers.transformAndSet(InterestOnLoanPage(srn, index, mode), value))
               _ <- saveService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(InterestOnLoanPage(srn, index), mode, updatedAnswers))
+            } yield {
+              mode match {
+                case CheckMode =>
+                  Redirect(navigator.nextPage(LoansCYAPage(srn, index, mode), mode, updatedAnswers))
+                case NormalMode =>
+                  Redirect(navigator.nextPage(InterestOnLoanPage(srn, index, mode), mode, updatedAnswers))
+
+              }
+            }
         )
   }
 }

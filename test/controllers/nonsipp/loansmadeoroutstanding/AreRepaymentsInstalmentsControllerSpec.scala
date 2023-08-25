@@ -43,7 +43,7 @@ class AreRepaymentsInstalmentsControllerSpec extends ControllerBaseSpec {
       )
     })
 
-    act.like(renderPrePopView(onPageLoad, AreRepaymentsInstalmentsPage(srn, index), true) {
+    act.like(renderPrePopView(onPageLoad, AreRepaymentsInstalmentsPage(srn, index, NormalMode), true) {
       implicit app => implicit request =>
         val preparedForm = form.fill(true)
         injected[YesNoPageView].apply(preparedForm, viewModel(srn, index, NormalMode))

@@ -18,6 +18,7 @@ package pages.nonsipp.loansmadeoroutstanding
 
 import config.Refined.OneTo5000
 import eu.timepit.refined.refineMV
+import models.NormalMode
 import pages.behaviours.PageBehaviours
 
 class IsIndividualRecipientConnectedPartyPageSpec extends PageBehaviours {
@@ -26,10 +27,10 @@ class IsIndividualRecipientConnectedPartyPageSpec extends PageBehaviours {
 
     val index = refineMV[OneTo5000](1)
 
-    beRetrievable[Boolean](IsIndividualRecipientConnectedPartyPage(srnGen.sample.value, index))
+    beRetrievable[Boolean](IsIndividualRecipientConnectedPartyPage(srnGen.sample.value, index, NormalMode))
 
-    beSettable[Boolean](IsIndividualRecipientConnectedPartyPage(srnGen.sample.value, index))
+    beSettable[Boolean](IsIndividualRecipientConnectedPartyPage(srnGen.sample.value, index, NormalMode))
 
-    beRemovable[Boolean](IsIndividualRecipientConnectedPartyPage(srnGen.sample.value, index))
+    beRemovable[Boolean](IsIndividualRecipientConnectedPartyPage(srnGen.sample.value, index, NormalMode))
   }
 }

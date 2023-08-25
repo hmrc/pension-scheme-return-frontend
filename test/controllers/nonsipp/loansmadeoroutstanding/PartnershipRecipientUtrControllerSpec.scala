@@ -33,7 +33,7 @@ class PartnershipRecipientUtrControllerSpec extends ControllerBaseSpec {
   private lazy val onSubmit = routes.PartnershipRecipientUtrController.onSubmit(srn, index, NormalMode)
 
   val userAnswersWithPartnershipRecipientName =
-    defaultUserAnswers.unsafeSet(PartnershipRecipientNamePage(srn, index), partnershipName)
+    defaultUserAnswers.unsafeSet(PartnershipRecipientNamePage(srn, index, NormalMode), partnershipName)
 
   val conditionalNo: ConditionalYesNo[String, Utr] = ConditionalYesNo.no("reason")
   val conditionalYes: ConditionalYesNo[String, Utr] = ConditionalYesNo.yes(utr)
@@ -48,7 +48,7 @@ class PartnershipRecipientUtrControllerSpec extends ControllerBaseSpec {
     act.like(
       renderPrePopView(
         onPageLoad,
-        PartnershipRecipientUtrPage(srn, index),
+        PartnershipRecipientUtrPage(srn, index, NormalMode),
         conditionalNo,
         userAnswersWithPartnershipRecipientName
       ) { implicit app => implicit request =>

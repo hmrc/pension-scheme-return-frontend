@@ -32,7 +32,8 @@ class CompanyRecipientCrnControllerSpec extends ControllerBaseSpec {
   private lazy val onPageLoad = routes.CompanyRecipientCrnController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.CompanyRecipientCrnController.onSubmit(srn, index, NormalMode)
 
-  val userAnswersWithCompanyName = defaultUserAnswers.unsafeSet(CompanyRecipientNamePage(srn, index), companyName)
+  val userAnswersWithCompanyName =
+    defaultUserAnswers.unsafeSet(CompanyRecipientNamePage(srn, index, NormalMode), companyName)
 
   val conditionalNo: ConditionalYesNo[String, Crn] = ConditionalYesNo.no("reason")
   val conditionalYes: ConditionalYesNo[String, Crn] = ConditionalYesNo.yes(crn)
@@ -47,7 +48,7 @@ class CompanyRecipientCrnControllerSpec extends ControllerBaseSpec {
     act.like(
       renderPrePopView(
         onPageLoad,
-        CompanyRecipientCrnPage(srn, index),
+        CompanyRecipientCrnPage(srn, index, NormalMode),
         conditionalNo,
         userAnswersWithCompanyName
       ) { implicit app => implicit request =>

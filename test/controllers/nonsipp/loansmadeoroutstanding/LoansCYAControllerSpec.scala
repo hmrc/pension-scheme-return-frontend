@@ -54,21 +54,26 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
   private val taxYear = Some(Left(dateRange))
   private val subject = IdentitySubject.LoanRecipient
 
-  private def onPageLoad(checkOrChange: CheckOrChange) = routes.LoansCYAController.onPageLoad(srn, index, checkOrChange)
+  private def onPageLoad(checkOrChange: CheckOrChange) =
+    routes.LoansCYAController.onPageLoad(srn, index, checkOrChange, NormalMode)
 
-  private def onSubmit(checkOrChange: CheckOrChange) = routes.LoansCYAController.onSubmit(srn, checkOrChange)
+  private def onSubmit(checkOrChange: CheckOrChange) =
+    routes.LoansCYAController.onSubmit(srn, index, checkOrChange, NormalMode)
 
   private val filledUserAnswers = defaultUserAnswers
-    .unsafeSet(IdentityTypePage(srn, index, subject), IdentityType.UKCompany)
-    .unsafeSet(CompanyRecipientNamePage(srn, index), recipientName)
-    .unsafeSet(CompanyRecipientCrnPage(srn, index), ConditionalYesNo.yes[String, Crn](crn))
-    .unsafeSet(RecipientSponsoringEmployerConnectedPartyPage(srn, index), SponsoringOrConnectedParty.ConnectedParty)
-    .unsafeSet(DatePeriodLoanPage(srn, index), (localDate, money, loanPeriod))
-    .unsafeSet(AmountOfTheLoanPage(srn, index), (money, money, money))
-    .unsafeSet(AreRepaymentsInstalmentsPage(srn, index), true)
-    .unsafeSet(InterestOnLoanPage(srn, index), (money, percentage, money))
-    .unsafeSet(SecurityGivenForLoanPage(srn, index), ConditionalYesNo.yes[Unit, Security](security))
-    .unsafeSet(OutstandingArrearsOnLoanPage(srn, index), ConditionalYesNo.yes[Unit, Money](money))
+    .unsafeSet(IdentityTypePage(srn, index, subject, NormalMode), IdentityType.UKCompany)
+    .unsafeSet(CompanyRecipientNamePage(srn, index, NormalMode), recipientName)
+    .unsafeSet(CompanyRecipientCrnPage(srn, index, NormalMode), ConditionalYesNo.yes[String, Crn](crn))
+    .unsafeSet(
+      RecipientSponsoringEmployerConnectedPartyPage(srn, index, NormalMode),
+      SponsoringOrConnectedParty.ConnectedParty
+    )
+    .unsafeSet(DatePeriodLoanPage(srn, index, NormalMode), (localDate, money, loanPeriod))
+    .unsafeSet(AmountOfTheLoanPage(srn, index, NormalMode), (money, money, money))
+    .unsafeSet(AreRepaymentsInstalmentsPage(srn, index, NormalMode), true)
+    .unsafeSet(InterestOnLoanPage(srn, index, NormalMode), (money, percentage, money))
+    .unsafeSet(SecurityGivenForLoanPage(srn, index, NormalMode), ConditionalYesNo.yes[Unit, Security](security))
+    .unsafeSet(OutstandingArrearsOnLoanPage(srn, index, NormalMode), ConditionalYesNo.yes[Unit, Money](money))
 
   "LoansCYAController" - {
     List(CheckOrChange.Check, CheckOrChange.Change).foreach { checkOrChange =>

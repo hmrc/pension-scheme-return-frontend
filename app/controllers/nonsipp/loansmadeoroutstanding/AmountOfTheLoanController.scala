@@ -26,9 +26,9 @@ import forms.MoneyFormProvider
 import forms.mappings.errors.MoneyFormErrors
 import models.SchemeId.Srn
 import models.requests.DataRequest
-import models.{DateRange, Mode, Money}
+import models.{CheckMode, DateRange, Mode, Money, NormalMode}
 import navigation.Navigator
-import pages.nonsipp.loansmadeoroutstanding.AmountOfTheLoanPage
+import pages.nonsipp.loansmadeoroutstanding.{AmountOfTheLoanPage, LoansCYAPage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -67,7 +67,7 @@ class AmountOfTheLoanController @Inject()(
           mode,
           request.schemeDetails.schemeName,
           period,
-          request.userAnswers.fillForm(AmountOfTheLoanPage(srn, index), form)
+          request.userAnswers.fillForm(AmountOfTheLoanPage(srn, index, mode), form)
         )
 
         Ok(view(viewModel))
@@ -92,9 +92,17 @@ class AmountOfTheLoanController @Inject()(
             value =>
               for {
                 updatedAnswers <- Future
-                  .fromTry(request.userAnswers.transformAndSet(AmountOfTheLoanPage(srn, index), value))
+                  .fromTry(request.userAnswers.transformAndSet(AmountOfTheLoanPage(srn, index, mode), value))
                 _ <- saveService.save(updatedAnswers)
-              } yield Redirect(navigator.nextPage(AmountOfTheLoanPage(srn, index), mode, updatedAnswers))
+              } yield {
+                mode match {
+                  case CheckMode =>
+                    Redirect(navigator.nextPage(LoansCYAPage(srn, index, mode), mode, updatedAnswers))
+                  case NormalMode =>
+                    Redirect(navigator.nextPage(AmountOfTheLoanPage(srn, index, mode), mode, updatedAnswers))
+
+                }
+              }
           )
       }
   }

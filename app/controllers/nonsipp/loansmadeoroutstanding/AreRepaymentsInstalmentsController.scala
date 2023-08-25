@@ -20,10 +20,10 @@ import config.Refined.Max5000
 import controllers.actions._
 import controllers.nonsipp.loansmadeoroutstanding.AreRepaymentsInstalmentsController.viewModel
 import forms.YesNoPageFormProvider
-import models.Mode
+import models.{CheckMode, Mode, NormalMode}
 import models.SchemeId.Srn
 import navigation.Navigator
-import pages.nonsipp.loansmadeoroutstanding.AreRepaymentsInstalmentsPage
+import pages.nonsipp.loansmadeoroutstanding.{AreRepaymentsInstalmentsPage, LoansCYAPage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -52,7 +52,7 @@ class AreRepaymentsInstalmentsController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      val preparedForm = request.userAnswers.fillForm(AreRepaymentsInstalmentsPage(srn, index), form)
+      val preparedForm = request.userAnswers.fillForm(AreRepaymentsInstalmentsPage(srn, index, mode), form)
       Ok(view(preparedForm, viewModel(srn, index, mode)))
   }
 
@@ -64,9 +64,18 @@ class AreRepaymentsInstalmentsController @Inject()(
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode)))),
           value =>
             for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(AreRepaymentsInstalmentsPage(srn, index), value))
+              updatedAnswers <- Future
+                .fromTry(request.userAnswers.set(AreRepaymentsInstalmentsPage(srn, index, mode), value))
               _ <- saveService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(AreRepaymentsInstalmentsPage(srn, index), mode, updatedAnswers))
+            } yield {
+              mode match {
+                case CheckMode =>
+                  Redirect(navigator.nextPage(LoansCYAPage(srn, index, mode), mode, updatedAnswers))
+                case NormalMode =>
+                  Redirect(navigator.nextPage(AreRepaymentsInstalmentsPage(srn, index, mode), mode, updatedAnswers))
+
+              }
+            }
         )
   }
 }

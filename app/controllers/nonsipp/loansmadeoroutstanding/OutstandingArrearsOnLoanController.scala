@@ -56,7 +56,7 @@ class OutstandingArrearsOnLoanController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      val preparedForm = request.userAnswers.fillForm(OutstandingArrearsOnLoanPage(srn, index), form)
+      val preparedForm = request.userAnswers.fillForm(OutstandingArrearsOnLoanPage(srn, index, mode), form)
       Ok(view(preparedForm, viewModel(srn, index, mode)))
   }
 
@@ -69,9 +69,11 @@ class OutstandingArrearsOnLoanController @Inject()(
           value =>
             for {
               updatedAnswers <- Future
-                .fromTry(request.userAnswers.set(OutstandingArrearsOnLoanPage(srn, index), ConditionalYesNo(value)))
+                .fromTry(
+                  request.userAnswers.set(OutstandingArrearsOnLoanPage(srn, index, mode), ConditionalYesNo(value))
+                )
               _ <- saveService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(OutstandingArrearsOnLoanPage(srn, index), mode, updatedAnswers))
+            } yield Redirect(navigator.nextPage(OutstandingArrearsOnLoanPage(srn, index, mode), mode, updatedAnswers))
         )
   }
 }

@@ -50,7 +50,7 @@ class OtherRecipientDetailsControllerSpec extends ControllerBaseSpec {
       )
     })
 
-    act.like(renderPrePopView(onPageLoad, OtherRecipientDetailsPage(srn, index), recipientDetails) {
+    act.like(renderPrePopView(onPageLoad, OtherRecipientDetailsPage(srn, index, NormalMode), recipientDetails) {
       implicit app => implicit request =>
         val preparedForm =
           OtherRecipientDetailsController.form(injected[RecipientDetailsFormProvider]).fill(recipientDetails)

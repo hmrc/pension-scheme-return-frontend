@@ -61,25 +61,25 @@ class RemoveLoanController @Inject()(
     implicit request: DataRequest[_]
   ) = {
     val whoReceivedLoanPage = request.userAnswers
-      .get(IdentityTypePage(srn, index, IdentitySubject.LoanRecipient))
+      .get(IdentityTypePage(srn, index, IdentitySubject.LoanRecipient, mode))
     whoReceivedLoanPage match {
       case Some(who) => {
         val recipientName =
           who match {
             case IdentityType.Individual =>
-              request.userAnswers.get(IndividualRecipientNamePage(srn, index)).getOrRecoverJourney
+              request.userAnswers.get(IndividualRecipientNamePage(srn, index, mode)).getOrRecoverJourney
             case IdentityType.UKCompany =>
-              request.userAnswers.get(CompanyRecipientNamePage(srn, index)).getOrRecoverJourney
+              request.userAnswers.get(CompanyRecipientNamePage(srn, index, mode)).getOrRecoverJourney
             case IdentityType.UKPartnership =>
-              request.userAnswers.get(PartnershipRecipientNamePage(srn, index)).getOrRecoverJourney
+              request.userAnswers.get(PartnershipRecipientNamePage(srn, index, mode)).getOrRecoverJourney
             case IdentityType.Other =>
-              request.userAnswers.get(OtherRecipientDetailsPage(srn, index)).map(_.name).getOrRecoverJourney
+              request.userAnswers.get(OtherRecipientDetailsPage(srn, index, mode)).map(_.name).getOrRecoverJourney
           }
         recipientName.fold(
           l => l,
           name => {
             val loanAmount =
-              request.userAnswers.get(AmountOfTheLoanPage(srn, index)).map(_._1).getOrRecoverJourney
+              request.userAnswers.get(AmountOfTheLoanPage(srn, index, mode)).map(_._1).getOrRecoverJourney
             loanAmount.fold(
               l => l,
               amount =>
@@ -106,7 +106,9 @@ class RemoveLoanController @Inject()(
             if (value) {
               for {
                 updatedAnswers <- Future
-                  .fromTry(request.userAnswers.remove(IdentityTypePage(srn, index, IdentitySubject.LoanRecipient)))
+                  .fromTry(
+                    request.userAnswers.remove(IdentityTypePage(srn, index, IdentitySubject.LoanRecipient, mode))
+                  )
                 _ <- saveService.save(updatedAnswers)
               } yield Redirect(navigator.nextPage(RemoveLoanPage(srn, index), mode, updatedAnswers))
             } else {

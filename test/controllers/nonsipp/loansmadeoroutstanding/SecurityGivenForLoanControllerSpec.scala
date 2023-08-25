@@ -42,7 +42,7 @@ class SecurityGivenForLoanControllerSpec extends ControllerBaseSpec {
       injected[ConditionalYesNoPageView].apply(form(injected[YesNoPageFormProvider]), viewModel(srn, index, NormalMode))
     })
 
-    act.like(renderPrePopView(onPageLoad, SecurityGivenForLoanPage(srn, index), conditionalYes) {
+    act.like(renderPrePopView(onPageLoad, SecurityGivenForLoanPage(srn, index, NormalMode), conditionalYes) {
       implicit app => implicit request =>
         injected[ConditionalYesNoPageView]
           .apply(
