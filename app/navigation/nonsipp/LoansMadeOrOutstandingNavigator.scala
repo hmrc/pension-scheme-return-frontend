@@ -42,7 +42,7 @@ object LoansMadeOrOutstandingNavigator extends JourneyNavigator {
       // if final loans page was completed, route user to loans list page
       userAnswers.get(OutstandingArrearsOnLoanPage(srn, refineMV(1))) match {
         case Some(_) =>
-          controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController.onPageLoad(srn, NormalMode)
+          controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController.onPageLoad(srn, page = 1, NormalMode)
         case None =>
           controllers.nonsipp.common.routes.IdentityTypeController
             .onPageLoad(srn, refineMV(1), NormalMode, IdentitySubject.LoanRecipient)
@@ -118,7 +118,7 @@ object LoansMadeOrOutstandingNavigator extends JourneyNavigator {
         .onPageLoad(srn, index, CheckOrChange.Check)
 
     case LoansCYAPage(srn) =>
-      controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController.onPageLoad(srn, NormalMode)
+      controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController.onPageLoad(srn, page = 1, NormalMode)
 
     case LoansListPage(srn, addLoan @ true) =>
       refineV[Max5000.Refined](userAnswers.map(IdentityTypes(srn, IdentitySubject.LoanRecipient)).size + 1) match {
@@ -135,7 +135,7 @@ object LoansMadeOrOutstandingNavigator extends JourneyNavigator {
       if (userAnswers.map(IdentityTypes(srn, IdentitySubject.LoanRecipient)).isEmpty) {
         controllers.nonsipp.loansmadeoroutstanding.routes.LoansMadeOrOutstandingController.onPageLoad(srn, NormalMode)
       } else {
-        controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController.onPageLoad(srn, NormalMode)
+        controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController.onPageLoad(srn, page = 1, NormalMode)
       }
   }
   // scalastyle:on
