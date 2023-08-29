@@ -84,3 +84,8 @@ GET        /:srn/company-seller-name/:index               controllers.nonsipp.la
 POST       /:srn/company-seller-name/:index               controllers.nonsipp.landorproperty.CompanySellerNameController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
 GET        /:srn/change-company-seller-name/:index        controllers.nonsipp.landorproperty.CompanySellerNameController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 POST       /:srn/change-company-seller-name/:index        controllers.nonsipp.landorproperty.CompanySellerNameController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET        /:srn/is-seller-connected-party/:index                 controllers.nonsipp.landorproperty.LandOrPropertySellerConnectedPartyController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST       /:srn/is-seller-connected-party/:index                 controllers.nonsipp.landorproperty.LandOrPropertySellerConnectedPartyController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET        /:srn/change-is-seller-connected-party/:index          controllers.nonsipp.landorproperty.LandOrPropertySellerConnectedPartyController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST       /:srn/change-is-seller-connected-party/:index          controllers.nonsipp.landorproperty.LandOrPropertySellerConnectedPartyController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)

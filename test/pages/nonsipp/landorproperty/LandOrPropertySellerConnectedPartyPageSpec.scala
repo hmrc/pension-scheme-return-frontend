@@ -14,12 +14,22 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages.nonsipp.landorproperty
 
-import play.api.libs.json.__
+import config.Refined.Max5000
+import eu.timepit.refined.refineMV
+import pages.behaviours.PageBehaviours
 
-package object memberdetails {
-  object Paths {
-    val personalDetails = __ \ "membersPayments" \ "memberDetails" \ "personalDetails"
+class LandOrPropertySellerConnectedPartyPageSpec extends PageBehaviours {
+
+  "LandOrPropertySellerConnectedPartyPage" - {
+
+    val index = refineMV[Max5000.Refined](1)
+
+    beRetrievable[Boolean](LandOrPropertySellerConnectedPartyPage(srnGen.sample.value, index))
+
+    beSettable[Boolean](LandOrPropertySellerConnectedPartyPage(srnGen.sample.value, index))
+
+    beRemovable[Boolean](LandOrPropertySellerConnectedPartyPage(srnGen.sample.value, index))
   }
 }

@@ -1,11 +1,14 @@
-package controllers
+$if(directory.empty)$
+package controllers.nonsipp
+$else$
+package controllers.nonsipp.$directory$
+$endif$
 
 import controllers.actions._
 import forms.YesNoPageFormProvider
 import models.Mode
 import models.SchemeId.Srn
 import navigation.Navigator
-import pages.$className$Page
 import play.api.data.Form
 import controllers.PSRController
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
@@ -16,6 +19,11 @@ import views.html.YesNoPageView
 import services.SaveService
 import $className;format="cap"$Controller._
 import viewmodels.implicits._
+$if(directory.empty)$
+import pages.nonsipp.$className$Page
+$else$
+import pages.nonsipp.$directory$.$className$Page
+$endif$
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
@@ -31,7 +39,7 @@ class $className;format="cap"$Controller @Inject()(
    formProvider: YesNoPageFormProvider,
    val controllerComponents: MessagesControllerComponents,
    view: YesNoPageView
-)(implicit ec: ExecutionContext) extends extends PSRController {
+)(implicit ec: ExecutionContext) extends PSRController {
 
   private val form = $className;format="cap"$Controller.form(formProvider)
 
@@ -89,9 +97,17 @@ object $className;format="cap"$Controller {
     "$className;format="decap"$.title",
     "$className;format="decap"$.heading",
     $if(index.empty)$
-    routes.$className;format="cap"$Controller.onSubmit(srn, mode)
+      $if(directory.empty)$
+      controllers.nonsipp.routes.$className;format="cap"$Controller.onSubmit(srn, mode)
+      $else$
+      controllers.nonsipp.$directory$.routes.$className;format="cap"$Controller.onSubmit(srn, mode)
+      $endif$
     $else$
-    routes.$className;format="cap"$Controller.onSubmit(srn, index, mode)
+    $if(directory.empty)$
+      controllers.nonsipp.routes.$className;format="cap"$Controller.onSubmit(srn, index, mode)
+      $else$
+      controllers.nonsipp.$directory$.routes.$className;format="cap"$Controller.onSubmit(srn, index, mode)
+      $endif$
     $endif$
   )
 }
