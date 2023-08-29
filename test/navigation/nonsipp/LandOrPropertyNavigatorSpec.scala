@@ -100,9 +100,10 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
     act.like(
       normalmode
-        .navigateToWithIndex(
+        .navigateToWithDataAndIndex(
           index,
-          LandOrPropertyWhenDidSchemeAcquirePage,
+          (srn, _: Max5000) =>LandOrPropertyWhenDidSchemeAcquirePage(srn, index),
+          Gen.const(Contribution),
           (srn, index: Max5000, _) =>
             controllers.nonsipp.landorproperty.routes.LandPropertyIndependentValuationController
               .onPageLoad(srn, index, NormalMode)
