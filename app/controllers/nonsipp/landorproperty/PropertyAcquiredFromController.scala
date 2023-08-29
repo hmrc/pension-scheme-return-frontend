@@ -22,7 +22,7 @@ import controllers.actions._
 import controllers.nonsipp.landorproperty.PropertyAcquiredFromController._
 import forms.RadioListFormProvider
 import models.SchemeId.Srn
-import models.{IdentityType, Mode, SchemeHoldLandProperty}
+import models.{IdentityType, Mode}
 import navigation.Navigator
 import pages.nonsipp.landorproperty.{LandOrPropertyAddressLookupPage, PropertyAcquiredFromPage}
 import play.api.data.Form
@@ -38,15 +38,15 @@ import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
 class PropertyAcquiredFromController @Inject()(
-  override val messagesApi: MessagesApi,
-  saveService: SaveService,
-  @Named("non-sipp") navigator: Navigator,
-  identifyAndRequireData: IdentifyAndRequireData,
-  val controllerComponents: MessagesControllerComponents,
-  formProvider: RadioListFormProvider,
-  view: RadioListView
-)(implicit ec: ExecutionContext)
-    extends PSRController {
+      override val messagesApi: MessagesApi,
+      saveService: SaveService,
+      @Named("non-sipp") navigator: Navigator,
+      identifyAndRequireData: IdentifyAndRequireData,
+      val controllerComponents: MessagesControllerComponents,
+      formProvider: RadioListFormProvider,
+      view: RadioListView
+    )(implicit ec: ExecutionContext)
+  extends PSRController {
 
   val form = PropertyAcquiredFromController.form(formProvider)
 
@@ -54,7 +54,7 @@ class PropertyAcquiredFromController @Inject()(
     implicit request =>
       request.userAnswers.get(LandOrPropertyAddressLookupPage(srn, index)).getOrRecoverJourney { address =>
         val preparedForm = request.userAnswers.fillForm(PropertyAcquiredFromPage(srn, index), form)
-        Ok(view(preparedForm, viewModel(srn, index, request.schemeDetails.schemeName, address.addressLine1, mode)))
+        Ok(view(preparedForm, viewModel(srn, index, address.addressLine1, mode)))
       }
   }
 
@@ -67,7 +67,7 @@ class PropertyAcquiredFromController @Inject()(
             request.userAnswers.get(LandOrPropertyAddressLookupPage(srn, index)).getOrRecoverJourney { address =>
               Future.successful(
                 BadRequest(
-                  view(errors, viewModel(srn, index, request.schemeDetails.schemeName, address.addressLine1, mode))
+                  view(errors, viewModel(srn, index, address.addressLine1, mode))
                 )
               )
             },
@@ -85,23 +85,22 @@ class PropertyAcquiredFromController @Inject()(
 
 object PropertyAcquiredFromController {
 
-  def form(formProvider: RadioListFormProvider): Form[SchemeHoldLandProperty] =
+  def form(formProvider: RadioListFormProvider): Form[IdentityType] =
     formProvider("landOrPropertyAcquiredFrom.error.required")
 
   def viewModel(
-    srn: Srn,
-    index: Max5000,
-    schemeName: String,
-    addressLine1: String,
-    mode: Mode
-  ): FormPageViewModel[RadioListViewModel] =
+      srn: Srn,
+      index: Max5000,
+      addressLine1: String,
+      mode: Mode
+    ): FormPageViewModel[RadioListViewModel] =
     RadioListViewModel(
       "landOrPropertyAcquiredFrom.title",
       Message("landOrPropertyAcquiredFrom.heading", addressLine1),
       List(
         RadioListRowViewModel("landOrPropertyAcquiredFrom.option1", IdentityType.Individual.name),
-        RadioListRowViewModel("landOrPropertyAcquiredFrom.option2", IdentityType.UKCompany.name), //IdentityType
-        RadioListRowViewModel("landOrPropertyAcquiredFrom.option3", IdentityType.UKPartnership.name), //landOrPropertyAcquiredFrom.option4
+        RadioListRowViewModel("landOrPropertyAcquiredFrom.option2", IdentityType.UKCompany.name),
+        RadioListRowViewModel("landOrPropertyAcquiredFrom.option3", IdentityType.UKPartnership.name),
         RadioListRowViewModel("landOrPropertyAcquiredFrom.option4", IdentityType.Other.name)
       ),
       routes.PropertyAcquiredFromController.onSubmit(srn, index, mode)

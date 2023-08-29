@@ -17,16 +17,16 @@
 package pages.nonsipp.landorproperty
 
 import config.Refined.Max5000
-import models.SchemeHoldLandProperty
+import models.IdentityType
 import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
 
-case class PropertyAcquiredFromPage(srn: Srn, index: Max5000) extends QuestionPage[SchemeHoldLandProperty] {
+case class PropertyAcquiredFromPage(srn: Srn, index: Max5000) extends QuestionPage[IdentityType] {
 
   override def path: JsPath =
-    Paths.landOrPropertyTransactions \ "heldPropertyTransaction"\ "propertyAcquiredFromName" \ toString \ index.arrayIndex.toString
+    Paths.landOrPropertyTransactions \ "heldPropertyTransaction" \ "propertyAcquiredFromName" \ toString \ index.arrayIndex.toString
 
   override def toString: String = "methodOfHolding"
 }
