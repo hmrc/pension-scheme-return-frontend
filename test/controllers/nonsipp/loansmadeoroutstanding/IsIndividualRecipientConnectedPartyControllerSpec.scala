@@ -21,7 +21,7 @@ import controllers.ControllerBaseSpec
 import controllers.nonsipp.loansmadeoroutstanding.IsIndividualRecipientConnectedPartyController._
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
-import models.{MemberOrConnectedParty, NormalMode, UserAnswers}
+import models.{NormalMode, UserAnswers}
 import pages.nonsipp.loansmadeoroutstanding.{IndividualRecipientNamePage, IsIndividualRecipientConnectedPartyPage}
 import views.html.YesNoPageView
 

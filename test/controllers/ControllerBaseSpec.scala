@@ -113,6 +113,7 @@ trait TestValues {
   val otherName = "testOtherName"
   val crn: Crn = crnGen.sample.get
   val recipientName = "testRecipientName"
+  val pstr = "testPstr"
 
   val address: Address = Address(
     "testAddressLine1",

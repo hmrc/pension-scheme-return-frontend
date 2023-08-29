@@ -16,9 +16,10 @@
 
 package controllers.nonsipp
 
-import cats.data.NonEmptyList
-import cats.implicits.toShow
+import cats.data.{EitherT, NonEmptyList}
+import cats.implicits.{toFunctorOps, toShow}
 import config.Refined.Max3
+import controllers.PSRController
 import controllers.actions._
 import controllers.nonsipp.BasicDetailsCheckYourAnswersController._
 import models.SchemeId.Srn
@@ -31,9 +32,10 @@ import play.api.i18n._
 import play.api.libs.json.Reads
 import play.api.mvc._
 import queries.Gettable
-import services.SchemeDateService
+import services.{PSRSubmissionService, SchemeDateService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.DateTimeUtils.localDateShow
+import utils.FutureUtils.FutureOps
 import utils.ListUtils.ListOps
 import viewmodels.DisplayMessage._
 import viewmodels.implicits._
@@ -42,6 +44,7 @@ import views.html.CheckYourAnswersView
 
 import java.time.LocalDate
 import javax.inject.{Inject, Named}
+import scala.concurrent.{ExecutionContext, Future}
 
 class BasicDetailsCheckYourAnswersController @Inject()(
   override val messagesApi: MessagesApi,
@@ -49,9 +52,10 @@ class BasicDetailsCheckYourAnswersController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   schemeDateService: SchemeDateService,
   val controllerComponents: MessagesControllerComponents,
+  psrSubmissionService: PSRSubmissionService,
   view: CheckYourAnswersView
-) extends FrontendBaseController
-    with I18nSupport {
+)(implicit ec: ExecutionContext)
+    extends PSRController {
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     schemeDateService.taxYearOrAccountingPeriods(srn) match {
@@ -84,9 +88,32 @@ class BasicDetailsCheckYourAnswersController @Inject()(
     }
   }
 
-  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    Redirect(navigator.nextPage(BasicDetailsCheckYourAnswersPage(srn), mode, request.userAnswers))
+  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
+    submitMinimalRequiredDetails(srn)
+      .as(
+        Redirect(navigator.nextPage(BasicDetailsCheckYourAnswersPage(srn), mode, request.userAnswers))
+      )
+      .merge
   }
+
+  private def submitMinimalRequiredDetails(srn: Srn)(implicit request: DataRequest[_]): EitherT[Future, Result, Unit] =
+    for {
+      returnPeriods <- schemeDateService.returnPeriods(srn).getOrRecoverJourneyT
+      reasonForNoBankAccount = request.userAnswers.get(WhyNoBankAccountPage(srn))
+      schemeMemberNumbers <- request.userAnswers
+        .get(HowManyMembersPage(srn, request.pensionSchemeId))
+        .getOrRecoverJourneyT
+      _ <- psrSubmissionService
+        .submitMinimalRequiredDetails(
+          pstr = request.schemeDetails.pstr,
+          periodStart = returnPeriods.last.to,
+          periodEnd = returnPeriods.last.from,
+          accountingPeriods = returnPeriods,
+          reasonForNoBankAccount = reasonForNoBankAccount,
+          schemeMemberNumbers = schemeMemberNumbers
+        )
+        .liftF
+    } yield ()
 
   private def loggedInUserNameOrRedirect(implicit request: DataRequest[_]): Either[Result, String] =
     request.minimalDetails.individualDetails match {
@@ -96,12 +123,6 @@ class BasicDetailsCheckYourAnswersController @Inject()(
           case Some(orgName) => Right(orgName)
           case None => Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
         }
-    }
-
-  private def requiredPage[A: Reads](page: Gettable[A])(implicit request: DataRequest[_]): Either[Result, A] =
-    request.userAnswers.get(page) match {
-      case Some(value) => Right(value)
-      case None => Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
     }
 }
 

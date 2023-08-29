@@ -26,7 +26,7 @@ import javax.inject.Inject
 class RecipientDetailsFormProvider @Inject()() extends Mappings {
 
   val nameMaxLength = 160
-  val nameRegex = "^[a-zA-Z\\-' ]+$"
+  val nameRegex = """^[a-zA-Z0-9 \-'".@/]+$"""
 
   val firstName = "name"
   val description = "description"

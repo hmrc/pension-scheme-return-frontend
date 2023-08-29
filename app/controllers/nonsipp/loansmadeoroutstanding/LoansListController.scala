@@ -18,6 +18,7 @@ package controllers.nonsipp.loansmadeoroutstanding
 
 import cats.implicits._
 import com.google.inject.Inject
+import config.Constants
 import config.Constants.maxLoans
 import config.Refined.Max5000
 import controllers.PSRController
@@ -29,7 +30,7 @@ import forms.YesNoPageFormProvider
 import models.CheckOrChange.Change
 import models.SchemeId.Srn
 import models.requests.DataRequest
-import models.{IdentitySubject, IdentityType, Mode, Money, NormalMode}
+import models.{IdentitySubject, IdentityType, Mode, Money, NormalMode, Pagination}
 import navigation.Navigator
 import pages.nonsipp.accountingperiod.AccountingPeriodListPage
 import pages.nonsipp.common.IdentityTypes
@@ -39,7 +40,7 @@ import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import viewmodels.DisplayMessage.{Message, ParagraphMessage}
 import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, ListRow, ListViewModel}
+import viewmodels.models.{FormPageViewModel, ListRow, ListViewModel, PaginatedViewModel}
 import views.html.ListView
 
 import javax.inject.Named
@@ -55,27 +56,28 @@ class LoansListController @Inject()(
 
   val form = LoansListController.form(formProvider)
 
-  def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    loanRecipients(srn)
-      .map(
-        recipients =>
-          if (recipients.isEmpty) {
-            Redirect(routes.LoansMadeOrOutstandingController.onPageLoad(srn, NormalMode))
-          } else {
-            Ok(view(form, viewModel(srn, mode, recipients)))
-          }
-      )
-      .merge
+  def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+    implicit request =>
+      loanRecipients(srn)
+        .map(
+          recipients =>
+            if (recipients.isEmpty) {
+              Redirect(routes.LoansMadeOrOutstandingController.onPageLoad(srn, NormalMode))
+            } else {
+              Ok(view(form, viewModel(srn, page, mode, recipients)))
+            }
+        )
+        .merge
   }
 
-  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
+  def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     loanRecipients(srn).map { recipients =>
       if (recipients.length == maxLoans) {
 
         Redirect(navigator.nextPage(AccountingPeriodListPage(srn, addPeriod = false, mode), mode, request.userAnswers))
       } else {
 
-        val viewModel = LoansListController.viewModel(srn, mode, recipients)
+        val viewModel = LoansListController.viewModel(srn, page, mode, recipients)
 
         form
           .bindFromRequest()
@@ -144,12 +146,20 @@ object LoansListController {
 
   def viewModel(
     srn: Srn,
+    page: Int,
     mode: Mode,
     recipients: List[(Max5000, String, Money)]
   ): FormPageViewModel[ListViewModel] = {
 
     val title = if (recipients.length == 1) "loansList.title" else "loansList.title.plural"
     val heading = if (recipients.length == 1) "loansList.heading" else "loansList.heading.plural"
+
+    val pagination = Pagination(
+      currentPage = page,
+      pageSize = Constants.loanPageSize,
+      recipients.size,
+      routes.LoansListController.onPageLoad(srn, _, NormalMode)
+    )
 
     FormPageViewModel(
       title = Message(title, recipients.length),
@@ -160,12 +170,22 @@ object LoansListController {
         rows(srn, mode, recipients),
         Message("loansList.radios"),
         showRadios = recipients.length < 9999999,
-        paginatedViewModel = None
+        paginatedViewModel = Some(
+          PaginatedViewModel(
+            Message(
+              "loansList.pagination.label",
+              pagination.pageStart,
+              pagination.pageEnd,
+              pagination.totalSize
+            ),
+            pagination
+          )
+        )
       ),
       refresh = None,
       buttonText = "site.saveAndContinue",
       details = None,
-      onSubmit = routes.LoansListController.onSubmit(srn, mode)
+      onSubmit = routes.LoansListController.onSubmit(srn, page, mode)
     )
   }
 }

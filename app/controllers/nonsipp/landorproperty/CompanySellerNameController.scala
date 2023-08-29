@@ -14,50 +14,45 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.loansmadeoroutstanding
+package controllers.nonsipp.landorproperty
 
 import config.Refined.Max5000
 import controllers.actions._
+import controllers.nonsipp.landorproperty.CompanySellerNameController._
+import controllers.PSRController
 import forms.TextFormProvider
 import models.Mode
 import models.SchemeId.Srn
 import navigation.Navigator
-import pages.nonsipp.loansmadeoroutstanding.IndividualRecipientNamePage
+import pages.nonsipp.landorproperty.CompanySellerNamePage
 import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.FormUtils._
-import viewmodels.DisplayMessage.Message
-import viewmodels.models.{FormPageViewModel, TextInputViewModel}
+import viewmodels.implicits._
+import viewmodels.models._
 import views.html.TextInputView
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
-class IndividualRecipientNameController @Inject()(
+class CompanySellerNameController @Inject()(
   override val messagesApi: MessagesApi,
+  saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
-  saveService: SaveService,
   formProvider: TextFormProvider,
   val controllerComponents: MessagesControllerComponents,
   view: TextInputView
 )(implicit ec: ExecutionContext)
-    extends FrontendBaseController
-    with I18nSupport {
+    extends PSRController {
 
-  private def form = IndividualRecipientNameController.form(formProvider)
+  private val form = CompanySellerNameController.form(formProvider)
 
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      Ok(
-        view(
-          form.fromUserAnswers(IndividualRecipientNamePage(srn, index)),
-          IndividualRecipientNameController.viewModel(srn, index, mode)
-        )
-      )
+      val preparedForm = request.userAnswers.fillForm(CompanySellerNamePage(srn, index), form)
+      Ok(view(preparedForm, viewModel(srn, index, mode)))
   }
 
   def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
@@ -65,32 +60,27 @@ class IndividualRecipientNameController @Inject()(
       form
         .bindFromRequest()
         .fold(
-          formWithErrors =>
-            Future.successful(
-              BadRequest(view(formWithErrors, IndividualRecipientNameController.viewModel(srn, index, mode)))
-            ),
-          answer => {
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode)))),
+          value =>
             for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(IndividualRecipientNamePage(srn, index), answer))
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(CompanySellerNamePage(srn, index), value))
               _ <- saveService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(IndividualRecipientNamePage(srn, index), mode, updatedAnswers))
-          }
+            } yield Redirect(navigator.nextPage(CompanySellerNamePage(srn, index), mode, updatedAnswers))
         )
   }
 }
 
-object IndividualRecipientNameController {
+object CompanySellerNameController {
   def form(formProvider: TextFormProvider): Form[String] = formProvider.text(
-    "individualRecipientName.error.required",
-    "individualRecipientName.error.length",
-    "individualRecipientName.error.invalid.characters"
+    "companySellerName.error.required",
+    "companySellerName.error.tooLong",
+    "companySellerName.error.invalid"
   )
 
-  def viewModel(srn: Srn, index: Max5000, mode: Mode): FormPageViewModel[TextInputViewModel] =
-    FormPageViewModel(
-      Message("individualRecipientName.title"),
-      Message("individualRecipientName.heading"),
-      TextInputViewModel(true),
-      routes.IndividualRecipientNameController.onSubmit(srn, index, mode)
-    )
+  def viewModel(srn: Srn, index: Max5000, mode: Mode): FormPageViewModel[TextInputViewModel] = FormPageViewModel(
+    "companySellerName.title",
+    "companySellerName.heading",
+    TextInputViewModel(isFixedLength = true),
+    routes.CompanySellerNameController.onSubmit(srn, index, mode)
+  )
 }

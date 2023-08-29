@@ -110,6 +110,16 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         )
         .withName("go from land or property when did scheme acquire page to land property independent valuation page")
     )
+
+    act.like(
+      normalmode
+        .navigateToWithIndex(
+          index,
+          CompanySellerNamePage,
+          (srn, index: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+        )
+        .withName("go from land or property company seller page to ? page")
+    )
   }
 
   "WhyDoesSchemeHoldLandPropertyNavigator" - {

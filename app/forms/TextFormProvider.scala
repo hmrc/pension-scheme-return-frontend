@@ -77,4 +77,20 @@ class TextFormProvider @Inject()() {
       args: _*
     )
   )
+
+  def text(
+    requiredKey: String,
+    tooLongKey: String,
+    invalidCharactersKey: String,
+    args: Any*
+  ): Form[String] = Form(
+    formKey -> Mappings.validatedText(
+      requiredKey,
+      textAreaRegex,
+      invalidCharactersKey,
+      textAreaMaxLength,
+      tooLongKey,
+      args: _*
+    )
+  )
 }

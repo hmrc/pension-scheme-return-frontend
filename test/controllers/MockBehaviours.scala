@@ -22,7 +22,9 @@ import models.DateRange
 import org.mockito.ArgumentMatchers.any
 import org.mockito.MockitoSugar.when
 import org.mockito.stubbing.ScalaOngoingStubbing
-import services.SchemeDateService
+import services.{PSRSubmissionService, SchemeDateService}
+
+import scala.concurrent.Future
 
 trait MockBehaviours {
 
@@ -33,5 +35,16 @@ trait MockBehaviours {
       implicit mock: SchemeDateService
     ): ScalaOngoingStubbing[Option[Either[DateRange, NonEmptyList[(DateRange, Max3)]]]] =
       when(mock.taxYearOrAccountingPeriods(any())(any())).thenReturn(returns)
+
+    def returnPeriods(
+      returns: Option[NonEmptyList[DateRange]]
+    )(implicit mock: SchemeDateService): ScalaOngoingStubbing[Option[NonEmptyList[DateRange]]] =
+      when(mock.returnPeriods(any())(any())).thenReturn(returns)
+  }
+
+  object MockPSRSubmissionService {
+    def submitMinimalRequiredDetails()(implicit mock: PSRSubmissionService): ScalaOngoingStubbing[Future[Unit]] =
+      when(mock.submitMinimalRequiredDetails(any(), any(), any(), any(), any(), any())(any(), any()))
+        .thenReturn(Future.successful(()))
   }
 }

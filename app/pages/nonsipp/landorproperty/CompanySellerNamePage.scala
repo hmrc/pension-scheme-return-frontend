@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.loansmadeoroutstanding
+package pages.nonsipp.landorproperty
 
 import config.Refined.Max5000
 import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
-import utils.RefinedUtils.RefinedIntOps
+import utils.RefinedUtils._
 
-case class IsIndividualRecipientConnectedPartyPage(srn: Srn, index: Max5000) extends QuestionPage[Boolean] {
+case class CompanySellerNamePage(srn: Srn, index: Max5000) extends QuestionPage[String] {
 
-  override def path: JsPath = Paths.loanTransactions \ toString \ index.arrayIndex.toString
+  override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString
 
-  override def toString: String = "individualConnectedPartyStatus"
+  override def toString: String = "companySellerName"
 }

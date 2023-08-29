@@ -14,17 +14,11 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.loansmadeoroutstanding
+package utils
 
-import config.Refined.Max5000
-import models.SchemeId.Srn
-import pages.QuestionPage
-import play.api.libs.json.JsPath
-import utils.RefinedUtils.RefinedIntOps
+import cats.data.NonEmptyList
+import play.api.libs.json.{Json, OWrites, Writes}
 
-case class IsIndividualRecipientConnectedPartyPage(srn: Srn, index: Max5000) extends QuestionPage[Boolean] {
-
-  override def path: JsPath = Paths.loanTransactions \ toString \ index.arrayIndex.toString
-
-  override def toString: String = "individualConnectedPartyStatus"
+object JsonUtils {
+  implicit def nelWrites[A: Writes]: Writes[NonEmptyList[A]] = Writes(nel => Json.toJson(nel.toList))
 }

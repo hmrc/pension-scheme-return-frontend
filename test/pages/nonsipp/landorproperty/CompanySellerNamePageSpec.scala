@@ -14,17 +14,22 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.loansmadeoroutstanding
+package pages.nonsipp.landorproperty
 
 import config.Refined.Max5000
-import models.SchemeId.Srn
-import pages.QuestionPage
-import play.api.libs.json.JsPath
-import utils.RefinedUtils.RefinedIntOps
+import eu.timepit.refined.refineMV
+import pages.behaviours.PageBehaviours
 
-case class IsIndividualRecipientConnectedPartyPage(srn: Srn, index: Max5000) extends QuestionPage[Boolean] {
+class CompanySellerNamePageSpec extends PageBehaviours {
 
-  override def path: JsPath = Paths.loanTransactions \ toString \ index.arrayIndex.toString
+  "CompanySellerNamePage" - {
 
-  override def toString: String = "individualConnectedPartyStatus"
+    val index = refineMV[Max5000.Refined](1)
+
+    beRetrievable[String](CompanySellerNamePage(srnGen.sample.value, index))
+
+    beSettable[String](CompanySellerNamePage(srnGen.sample.value, index))
+
+    beRemovable[String](CompanySellerNamePage(srnGen.sample.value, index))
+  }
 }
