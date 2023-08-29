@@ -20,6 +20,7 @@ import config.Refined.Max300
 import models.SchemeId.Srn
 import models.{NameDOB, UserAnswers}
 import pages.QuestionPage
+import pages.nonsipp.memberdetails.Paths.personalDetails
 import play.api.libs.json.JsPath
 import queries.{Gettable, Removable}
 import utils.RefinedUtils.RefinedIntOps
@@ -28,30 +29,23 @@ import scala.util.Try
 
 case class MemberDetailsPage(srn: Srn, index: Max300) extends QuestionPage[NameDOB] {
 
-  override def path: JsPath = JsPath \ toString \ index.arrayIndex
+  override def path: JsPath = Paths.personalDetails \ toString \ index.arrayIndex
 
   override def cleanup(value: Option[NameDOB], userAnswers: UserAnswers): Try[UserAnswers] =
     value.fold(userAnswers.remove(DoesMemberHaveNinoPage(srn, index)))(_ => Try(userAnswers))
 
-  override def toString: String = "memberDetailsPage"
+  override def toString: String = "nameDob"
 }
 
 case class MembersDetailsPages(srn: Srn) extends Gettable[List[NameDOB]] with Removable[List[NameDOB]] {
 
-  override def path: JsPath = JsPath \ toString
+  override def path: JsPath = Paths.personalDetails \ toString
 
-  override def toString: String = "memberDetailsPage"
+  override def toString: String = "nameDob"
 }
 
 object MembersDetailsPages {
   implicit class MembersDetailsOps(ua: UserAnswers) {
     def membersDetails(srn: Srn): List[NameDOB] = ua.get(MembersDetailsPages(srn)).toList.flatten
   }
-}
-
-case class MemberDetails(srn: Srn) extends Gettable[Map[String, NameDOB]] {
-
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "memberDetailsPage"
 }

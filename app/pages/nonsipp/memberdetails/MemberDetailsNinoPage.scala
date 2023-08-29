@@ -26,14 +26,14 @@ import utils.RefinedUtils.RefinedIntOps
 
 case class MemberDetailsNinoPage(srn: Srn, index: Max300) extends QuestionPage[Nino] {
 
-  override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString
+  override def path: JsPath = Paths.personalDetails \ toString \ index.arrayIndex.toString
 
-  override def toString: String = "memberDetailsNinoPage"
+  override def toString: String = "nino"
 }
 
 case class MemberDetailsNinoPages(srn: Srn) extends Gettable[Map[String, Nino]] with Removable[Map[String, Nino]] {
 
-  override def path: JsPath = JsPath \ toString
+  override def path: JsPath = Paths.personalDetails \ toString
 
-  override def toString: String = "memberDetailsNinoPage"
+  override def toString: String = "nino"
 }
