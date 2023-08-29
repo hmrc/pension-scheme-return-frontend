@@ -84,3 +84,12 @@ GET        /:srn/company-seller-name/:index               controllers.nonsipp.la
 POST       /:srn/company-seller-name/:index               controllers.nonsipp.landorproperty.CompanySellerNameController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
 GET        /:srn/change-company-seller-name/:index        controllers.nonsipp.landorproperty.CompanySellerNameController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 POST       /:srn/change-company-seller-name/:index        controllers.nonsipp.landorproperty.CompanySellerNameController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET         /:srn/who-was-land-property-acquired-from                               controllers.nonsipp.landorproperty.PropertyAcquiredFromController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
+GET         /:srn/who-was-land-property-acquired-from/:index                        controllers.nonsipp.landorproperty.PropertyAcquiredFromController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/who-was-land-property-acquired-from                               controllers.nonsipp.landorproperty.PropertyAcquiredFromController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
+POST        /:srn/who-was-land-property-acquired-from/:index                        controllers.nonsipp.landorproperty.PropertyAcquiredFromController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/who-was-land-property-acquired-from                        controllers.nonsipp.landorproperty.PropertyAcquiredFromController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
+GET         /:srn/who-was-land-property-acquired-from/:index                 controllers.nonsipp.landorproperty.PropertyAcquiredFromController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/who-was-land-property-acquired-from                       controllers.nonsipp.landorproperty.PropertyAcquiredFromController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
+POST        /:srn/who-was-land-property-acquired-from/:index                 controllers.nonsipp.landorproperty.PropertyAcquiredFromController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)

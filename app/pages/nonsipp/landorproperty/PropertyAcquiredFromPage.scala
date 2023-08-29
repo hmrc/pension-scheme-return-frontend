@@ -14,12 +14,19 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages.nonsipp.landorproperty
 
-import play.api.libs.json.__
+import config.Refined.Max5000
+import models.SchemeHoldLandProperty
+import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
+import utils.RefinedUtils.RefinedIntOps
 
-package object memberdetails {
-  object Paths {
-    val personalDetails = __ \ "membersPayments" \ "memberDetails" \ "personalDetails"
-  }
+case class PropertyAcquiredFromPage(srn: Srn, index: Max5000) extends QuestionPage[SchemeHoldLandProperty] {
+
+  override def path: JsPath =
+    Paths.landOrPropertyTransactions \ "acquiredFromType" \ toString \ index.arrayIndex.toString
+
+  override def toString: String = "methodOfHolding"
 }

@@ -53,8 +53,19 @@ object LandOrPropertyNavigator extends JourneyNavigator {
       }
 
     case LandOrPropertyWhenDidSchemeAcquirePage(srn, index) =>
-      controllers.nonsipp.landorproperty.routes.LandPropertyIndependentValuationController
-        .onPageLoad(srn, index, NormalMode)
+      userAnswers.get(WhyDoesSchemeHoldLandPropertyPage(srn, index)) match {
+        case Some(SchemeHoldLandProperty.Contribution) =>
+          controllers.nonsipp.landorproperty.routes.LandPropertyIndependentValuationController
+            .onPageLoad(srn, index, NormalMode)
+        case _ => //27h1
+          controllers.nonsipp.landorproperty.routes.PropertyAcquiredFromController
+            .onPageLoad(srn, index, NormalMode)
+      }
+
+    //27h1
+    case page @ PropertyAcquiredFromPage(srn, index) =>
+      //TODO change to 27h6 and all the different pages
+      controllers.routes.UnauthorisedController.onPageLoad()
 
     case LandOrPropertyTotalCostPage(srn, index) =>
       controllers.nonsipp.landorproperty.routes.IsLandOrPropertyResidentialController.onPageLoad(srn, index, NormalMode)
