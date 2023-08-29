@@ -1005,3 +1005,7 @@ landOrPropertyAcquiredFrom.option2 = A UK company
 landOrPropertyAcquiredFrom.option3 = A UK partnership
 landOrPropertyAcquiredFrom.option4 = Other
 landOrPropertyAcquiredFrom.error.required = Select who the land or property was acquired from
+
+landOrPropertySellerConnectedParty.title = Is the seller a connected party?
+landOrPropertySellerConnectedParty.heading = Is {0} a connected party?
+landOrPropertySellerConnectedParty.error.required = Select yes if the seller is a connected party
