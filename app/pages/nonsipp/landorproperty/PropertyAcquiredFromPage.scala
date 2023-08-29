@@ -26,7 +26,7 @@ import utils.RefinedUtils.RefinedIntOps
 case class PropertyAcquiredFromPage(srn: Srn, index: Max5000) extends QuestionPage[SchemeHoldLandProperty] {
 
   override def path: JsPath =
-    Paths.landOrPropertyTransactions \ "acquiredFromType" \ toString \ index.arrayIndex.toString
+    Paths.landOrPropertyTransactions \ "heldPropertyTransaction"\ "propertyAcquiredFromName" \ toString \ index.arrayIndex.toString
 
   override def toString: String = "methodOfHolding"
 }
