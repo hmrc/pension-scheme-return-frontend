@@ -18,12 +18,13 @@ package navigation.nonsipp
 
 import config.Refined.Max5000
 import eu.timepit.refined.refineMV
-import models.NormalMode
+import models.{NormalMode, SchemeHoldLandProperty}
 import models.SchemeHoldLandProperty.{Acquisition, Contribution, Transfer}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.landorproperty._
 import utils.BaseSpec
+import utils.UserAnswersUtils.UserAnswersOps
 
 class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
@@ -102,11 +103,10 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       normalmode
         .navigateToWithDataAndIndex(
           index,
-          (srn, _: Max5000) =>LandOrPropertyWhenDidSchemeAcquirePage(srn, index),
-          Gen.const(Contribution),
-          (srn, index: Max5000, _) =>
-            controllers.nonsipp.landorproperty.routes.LandPropertyIndependentValuationController
-              .onPageLoad(srn, index, NormalMode)
+          LandOrPropertyWhenDidSchemeAcquirePage,
+          Gen.const(localDate),
+          controllers.nonsipp.landorproperty.routes.LandPropertyIndependentValuationController.onPageLoad,
+          srn => defaultUserAnswers.unsafeSet(WhyDoesSchemeHoldLandPropertyPage(srn, index), SchemeHoldLandProperty.Contribution)
         )
         .withName("go from land or property when did scheme acquire page to land property independent valuation page")
     )
