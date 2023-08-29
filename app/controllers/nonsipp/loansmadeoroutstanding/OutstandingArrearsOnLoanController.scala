@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
-import config.Constants.maxCurrencyValue
+import config.Constants.{maxCurrencyValue, minCurrencyValue}
 import config.Refined.Max5000
 import controllers.actions._
 import controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController._
@@ -84,6 +84,7 @@ object OutstandingArrearsOnLoanController {
       MoneyFormErrors(
         "outstandingArrearsOnLoan.yes.error.required",
         "outstandingArrearsOnLoan.yes.error.nonNumeric",
+        (minCurrencyValue, "outstandingArrearsOnLoan.yes.error.min"),
         (maxCurrencyValue, "outstandingArrearsOnLoan.yes.error.max")
       )
     )

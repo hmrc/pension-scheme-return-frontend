@@ -18,7 +18,7 @@ package controllers.nonsipp.totalvaluequotedshares
 
 import cats.implicits.toShow
 import cats.{Id, Monad}
-import config.Constants.maxMoneyValue
+import config.Constants.{maxMoneyValue, minMoneyValue}
 import controllers.actions._
 import controllers.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesController._
 import forms.MoneyFormProvider
@@ -101,6 +101,7 @@ object TotalValueQuotedSharesController {
     MoneyFormErrors(
       ("totalValueQuotedShares.error.required"),
       "totalValueQuotedShares.error.invalid",
+      (minMoneyValue, "totalValueQuotedShares.error.min"),
       (maxMoneyValue, "totalValueQuotedShares.error.tooLarge")
     ),
     Seq(period.to.show)

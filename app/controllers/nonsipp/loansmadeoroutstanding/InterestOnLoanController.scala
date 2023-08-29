@@ -17,7 +17,7 @@
 package controllers.nonsipp.loansmadeoroutstanding
 
 import com.google.inject.Inject
-import config.Constants.{maxCurrencyValue, maxPercentage, minPercentage}
+import config.Constants.{maxCurrencyValue, maxPercentage, minCurrencyValue, minPercentage}
 import config.Refined.Max5000
 import controllers.actions._
 import forms.MultipleQuestionFormProvider
@@ -97,6 +97,7 @@ object InterestOnLoanController {
     MoneyFormErrors(
       "interestOnLoan.loanInterestAmount.error.required",
       "interestOnLoan.loanInterestAmount.error.nonNumeric",
+      (minCurrencyValue, "interestOnLoan.loanInterestAmount.error.min"),
       (maxCurrencyValue, "interestOnLoan.loanInterestAmount.error.max")
     )
 
@@ -112,6 +113,7 @@ object InterestOnLoanController {
     MoneyFormErrors(
       "interestOnLoan.intReceivedCY.error.required",
       "interestOnLoan.intReceivedCY.error.nonNumeric",
+      (minCurrencyValue, "interestOnLoan.intReceivedCY.error.min"),
       (maxCurrencyValue, "interestOnLoan.intReceivedCY.error.max")
     )
 

@@ -17,7 +17,7 @@
 package controllers.nonsipp.schemedesignatory
 
 import cats.implicits.toShow
-import config.Constants.maxMembers
+import config.Constants.{maxMembers, minMembers}
 import controllers.actions._
 import controllers.nonsipp.schemedesignatory.HowManyMembersController._
 import forms.IntFormProvider
@@ -102,6 +102,7 @@ object HowManyMembersController {
     IntFormErrors(
       "howManyMembers.field1.error.required",
       "howManyMembers.field1.error.invalid",
+      (minMembers, "howManyMembers.field1.error.min"),
       (maxMembers, "howManyMembers.field1.error.max")
     )
 
@@ -109,6 +110,7 @@ object HowManyMembersController {
     IntFormErrors(
       "howManyMembers.field2.error.required",
       "howManyMembers.field2.error.invalid",
+      (minMembers, "howManyMembers.field2.error.min"),
       (maxMembers, "howManyMembers.field2.error.max")
     )
 
@@ -116,6 +118,7 @@ object HowManyMembersController {
     IntFormErrors(
       "howManyMembers.field3.error.required",
       "howManyMembers.field3.error.invalid",
+      (minMembers, "howManyMembers.field3.error.min"),
       (maxMembers, "howManyMembers.field3.error.max")
     )
 

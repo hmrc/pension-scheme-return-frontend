@@ -19,7 +19,7 @@ package controllers.nonsipp.schemedesignatory
 import cats.implicits.toShow
 import cats.{Id, Monad}
 import com.google.inject.Inject
-import config.Constants.maxCashInBank
+import config.Constants.{maxCashInBank, minCashInBank}
 import controllers.actions._
 import forms.MoneyFormProvider
 import forms.mappings.errors.MoneyFormErrors
@@ -116,11 +116,13 @@ object HowMuchCashController {
       MoneyFormErrors(
         "howMuchCash.start.error.required",
         "howMuchCash.start.error.nonNumeric",
+        minCashInBank -> "howMuchCash.start.error.min",
         maxCashInBank -> "howMuchCash.start.error.tooLarge"
       ),
       MoneyFormErrors(
         "howMuchCash.end.error.required",
         "howMuchCash.end.error.nonNumeric",
+        minCashInBank -> "howMuchCash.end.error.min",
         maxCashInBank -> "howMuchCash.end.error.tooLarge"
       ),
       Seq(period.from.show, period.to.show)

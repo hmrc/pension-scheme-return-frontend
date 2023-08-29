@@ -86,6 +86,7 @@ object LandOrPropertyTotalCostController {
     MoneyFormErrors(
       "landOrPropertyTotalCost.error.required",
       "landOrPropertyTotalCost.error.invalid",
+      (Constants.minMoneyValue, "landOrPropertyTotalCost.error.min"),
       (Constants.maxMoneyValue, "landOrPropertyTotalCost.error.tooLarge")
     )
   )

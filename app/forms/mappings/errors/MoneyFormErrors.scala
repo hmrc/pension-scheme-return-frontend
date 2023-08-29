@@ -19,6 +19,7 @@ package forms.mappings.errors
 case class MoneyFormErrors(
   requiredKey: String,
   nonNumericKey: String,
+  min: (Double, String),
   max: (Double, String)
 )
 
@@ -27,7 +28,8 @@ object MoneyFormErrors {
   def default(
     requiredKey: String = "error.required",
     nonNumericKey: String = "error.nonMoney",
+    min: (Double, String) = (Double.MaxValue, "error.tooSmall"),
     max: (Double, String) = (Double.MaxValue, "error.tooLarge")
   ): MoneyFormErrors =
-    MoneyFormErrors(requiredKey, nonNumericKey, max)
+    MoneyFormErrors(requiredKey, nonNumericKey, min, max)
 }

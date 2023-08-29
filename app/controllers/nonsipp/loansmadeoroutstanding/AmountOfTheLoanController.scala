@@ -19,7 +19,7 @@ package controllers.nonsipp.loansmadeoroutstanding
 import cats.implicits.toShow
 import cats.{Id, Monad}
 import com.google.inject.Inject
-import config.Constants.maxCurrencyValue
+import config.Constants.{maxCurrencyValue, minCurrencyValue}
 import config.Refined.Max5000
 import controllers.actions._
 import forms.MoneyFormProvider
@@ -115,16 +115,19 @@ object AmountOfTheLoanController {
       MoneyFormErrors(
         "amountOfTheLoan.loanAmount.error.required",
         "amountOfTheLoan.loanAmount.error.nonNumeric",
+        (minCurrencyValue, "amountOfTheLoan.loanAmount.error.min"),
         (maxCurrencyValue, "amountOfTheLoan.loanAmount.error.tooLarge")
       ),
       MoneyFormErrors(
         "amountOfTheLoan.capRepaymentCY.error.required",
         "amountOfTheLoan.capRepaymentCY.error.nonNumeric",
+        (minCurrencyValue, "amountOfTheLoan.capRepaymentCY.error.min"),
         (maxCurrencyValue, "amountOfTheLoan.capRepaymentCY.error.tooLarge")
       ),
       MoneyFormErrors(
         "amountOfTheLoan.amountOutstanding.error.required",
         "amountOfTheLoan.amountOutstanding.error.nonNumeric",
+        (minCurrencyValue, "amountOfTheLoan.amountOutstanding.error.min"),
         (maxCurrencyValue, "amountOfTheLoan.amountOutstanding.error.tooLarge")
       ),
       Seq(period.to.show)

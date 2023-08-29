@@ -102,13 +102,13 @@ trait Formatters {
                   else Seq(FormError(key, errors.nonNumericKey, args))
                 }
           }
-          .flatMap { int =>
-            errors.max match {
-              case (max, error) if int > max =>
-                Left(Seq(FormError(key, error, args)))
-              case _ =>
-                Right(int)
-            }
+          .flatMap[Seq[FormError], Int] { int =>
+            val (maxSize, maxError) = errors.max
+            val (minSize, minError) = errors.min
+            for {
+              _ <- if (int > maxSize) Left(Seq(FormError(key, maxError, args))) else Right(int)
+              _ <- if (int < minSize) Left(Seq(FormError(key, minError, args))) else Right(int)
+            } yield int
           }
 
       override def unbind(key: String, value: Int) =
@@ -119,11 +119,18 @@ trait Formatters {
     doubleFormErrors: DoubleFormErrors,
     args: Seq[String]
   ): Formatter[Double] =
-    doubleFormatter(doubleFormErrors.requiredKey, doubleFormErrors.nonNumericKey, doubleFormErrors.max, args)
+    doubleFormatter(
+      doubleFormErrors.requiredKey,
+      doubleFormErrors.nonNumericKey,
+      doubleFormErrors.min,
+      doubleFormErrors.max,
+      args
+    )
 
   private[mappings] def doubleFormatter(
     requiredKey: String,
     nonNumericKey: String,
+    min: Option[(Double, String)] = None,
     max: (Double, String),
     args: Seq[String] = Seq.empty
   ): Formatter[Double] =
@@ -141,10 +148,17 @@ trait Formatters {
             s.toDoubleOption
               .toRight(Seq(FormError(key, nonNumericKey, args)))
               .flatMap { double =>
-                if (double > maxSize) Left(Seq(FormError(key, maxError, args)))
-                else if (double.toString().matches(decimalRegex))
-                  Right(double)
-                else Right(double)
+                val minCheck = min match {
+                  case Some((minSize, minError)) if minSize < double => Left(Seq(FormError(key, minError, args)))
+                  case _ => Right(double)
+                }
+
+                for {
+                  _ <- minCheck
+                  _ <- if (double > maxSize) Left(Seq(FormError(key, maxError, args))) else Right(double)
+                  _ <- if (double.toString.matches(decimalRegex)) Right(double)
+                  else Left(Seq(FormError(key, nonNumericKey)))
+                } yield double
               }
           }
 
@@ -155,8 +169,8 @@ trait Formatters {
   private[mappings] def doubleFormatter(
     requiredKey: String,
     nonNumericKey: String,
-    max: (Double, String),
     min: (Double, String),
+    max: (Double, String),
     args: Seq[String]
   ): Formatter[Double] =
     new Formatter[Double] {
@@ -192,7 +206,8 @@ trait Formatters {
   ): Formatter[Money] =
     new Formatter[Money] {
 
-      private val baseFormatter = doubleFormatter(errors.requiredKey, errors.nonNumericKey, errors.max, args)
+      private val baseFormatter =
+        doubleFormatter(errors.requiredKey, errors.nonNumericKey, min = errors.min, max = errors.max, args)
       private val decimalRegex = "^-?\\d+(\\.\\d{1,2})?$"
 
       override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Money] =
@@ -216,7 +231,7 @@ trait Formatters {
     new Formatter[Percentage] {
 
       private val baseFormatter =
-        doubleFormatter(errors.requiredKey, errors.nonNumericKey, errors.max, errors.min, args)
+        doubleFormatter(errors.requiredKey, errors.nonNumericKey, min = errors.min, max = errors.max, args)
       private val decimalRegex = """^%?-?\d+(?:\.\d{1,2})?$"""
 
       override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Percentage] =
@@ -239,7 +254,8 @@ trait Formatters {
   ): Formatter[Security] =
     new Formatter[Security] {
 
-      private val baseFormatter = doubleFormatter(errors.requiredKey, errors.nonNumericKey, errors.max, args)
+      private val baseFormatter =
+        doubleFormatter(errors.requiredKey, errors.nonNumericKey, min = None, errors.max, args)
       private val decimalRegex = "^-?\\d+(\\.\\d{1,2})?$"
 
       override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Security] =

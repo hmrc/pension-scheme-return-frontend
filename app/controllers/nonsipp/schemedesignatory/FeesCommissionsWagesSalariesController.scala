@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.schemedesignatory
 
-import config.Constants.maxMoneyValue
+import config.Constants.{maxMoneyValue, minMoneyValue}
 import controllers.actions._
 import controllers.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesController._
 import forms.MoneyFormProvider
@@ -86,6 +86,7 @@ object FeesCommissionsWagesSalariesController {
     MoneyFormErrors(
       "feesCommissionsWagesSalaries.error.required",
       "feesCommissionsWagesSalaries.error.invalid",
+      (minMoneyValue, "feesCommissionsWagesSalaries.error.min"),
       (maxMoneyValue, "feesCommissionsWagesSalaries.error.tooLarge")
     )
   )

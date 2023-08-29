@@ -36,13 +36,19 @@ object Constants {
   val loanPageSize = 25
 
   val maxLoans = 9999999
+  val minCurrencyValue = 0
   val maxCurrencyValue = 999999999.99
+  val minCashInBank = 0d
   val maxCashInBank = 999999999.99
+  val minAssetValue = 0.01
   val maxAssetValue = 999999999.99
+  val minMoneyValue = 0d
   val maxMoneyValue = 999999999.99
 
+  val minMembers = 1
   val maxMembers = 999999
 
+  val minLoanPeriod = 1
   val maxLoanPeriod = 999
   val minPercentage = -999.99
   val maxPercentage = 999.99

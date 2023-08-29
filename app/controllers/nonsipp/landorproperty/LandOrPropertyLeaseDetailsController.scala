@@ -103,6 +103,7 @@ object LandOrPropertyLeaseDetailsController {
     MoneyFormErrors(
       "landOrPropertyLeaseDetails.field2.error.required",
       "landOrPropertyLeaseDetails.field2.error.invalid",
+      (Constants.minMoneyValue, "landOrPropertyLeaseDetails.field2.error.min"),
       (Constants.maxMoneyValue, "landOrPropertyLeaseDetails.field2.error.max")
     )
 
