@@ -17,7 +17,7 @@
 package navigation.nonsipp
 
 import eu.timepit.refined.refineMV
-import models.{NormalMode, SchemeHoldLandProperty, UserAnswers}
+import models.{IdentitySubject, NormalMode, SchemeHoldLandProperty, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.landorproperty._
@@ -78,6 +78,10 @@ object LandOrPropertyNavigator extends JourneyNavigator {
       }
 
     case LandOrPropertyLeaseDetailsPage(srn, index) =>
+      controllers.nonsipp.landorproperty.routes.IndividualRecipientNinoNumberController
+        .onPageLoad(srn, index, NormalMode, IdentitySubject.LandOrProperty)
+
+    case IndividualRecipientNinoNumberPage(srn, index, subject) =>
       controllers.routes.UnauthorisedController.onPageLoad()
 
   }

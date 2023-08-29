@@ -25,7 +25,7 @@ import models.SchemeId.Srn
 import models.{IdentitySubject, IdentityType, Mode, NormalMode, UserAnswers}
 import navigation.Navigator
 import pages.nonsipp.common.IdentityTypePage
-import pages.nonsipp.landorproperty.LandPropertyInUKPage
+import pages.nonsipp.landorproperty.{IndividualRecipientNinoNumberPage, LandPropertyInUKPage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -113,9 +113,10 @@ object IdentityTypeController {
   ): FormPageViewModel[RadioListViewModel] = {
     val text = subject match {
       case IdentitySubject.LoanRecipient => ""
-      case IdentitySubject.LandOrPropertySeller => {
+      case IdentitySubject.LandOrPropertySeller => "LandPropertyInUKPage"
+      case IdentitySubject.LandOrProperty => {
         // TODO from address instead of LandPropertyInUKPage
-        userAnswers.get(LandPropertyInUKPage(srn, index)) match {
+        userAnswers.get(IndividualRecipientNinoNumberPage(srn, index, subject)) match {
           case Some(value) => value.toString
           case None => "" // TODO
         }

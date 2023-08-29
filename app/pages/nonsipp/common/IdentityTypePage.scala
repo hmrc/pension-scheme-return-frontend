@@ -20,7 +20,7 @@ import config.Refined.Max5000
 import models.SchemeId.Srn
 import models.{IdentitySubject, IdentityType, UserAnswers}
 import pages.QuestionPage
-import pages.nonsipp.landorproperty.LandPropertyInUKPage
+import pages.nonsipp.landorproperty.{IndividualRecipientNinoNumberPage, LandPropertyInUKPage}
 import pages.nonsipp.loansmadeoroutstanding._
 import play.api.libs.json.JsPath
 import queries.Removable
@@ -37,6 +37,9 @@ case class IdentityTypePage(srn: Srn, index: Max5000, identitySubject: IdentityS
       Paths.loanTransactions \ "recipientIdentityType" \ toString \ index.arrayIndex.toString
     case IdentitySubject.LandOrPropertySeller =>
       JsPath \ "assets" \ "landOrProperty" \ "landOrPropertyTransactions" \ "heldPropertyTransaction" \ "propertyAcquiredFrom" \ "sellerIdentityType" \ toString \ index.arrayIndex.toString
+
+    case IdentitySubject.LandOrProperty =>
+      JsPath \ "assets" \ "landOrProperty" \ "landOrPropertyTransactions" \ "heldPropertyTransaction" \ "propertyAcquiredFrom" \ "landOrProperty" \ toString \ index.arrayIndex.toString
   }
 
   override def toString: String = "identityTypes"
@@ -58,6 +61,10 @@ case class IdentityTypePage(srn: Srn, index: Max5000, identitySubject: IdentityS
         List(
           LandPropertyInUKPage(srn, index)
         )
+      case IdentitySubject.LandOrProperty =>
+        List(
+          IndividualRecipientNinoNumberPage(srn, index, identitySubject)
+        )
     }
   private def pagesFirstPart(srn: Srn): List[Removable[_]] =
     this.identitySubject match {
@@ -74,6 +81,7 @@ case class IdentityTypePage(srn: Srn, index: Max5000, identitySubject: IdentityS
           OtherRecipientDetailsPage(srn, index) // TODO move this to generic page (with subject) and pass in this.identitySubject
         )
       case IdentitySubject.LandOrPropertySeller => List() // TODO add land or property pages here
+      case IdentitySubject.LandOrProperty => List()
     }
 
   override def cleanup(value: Option[IdentityType], userAnswers: UserAnswers): Try[UserAnswers] =
@@ -96,6 +104,8 @@ case class IdentityTypes(srn: Srn, identitySubject: IdentitySubject) extends Que
     case IdentitySubject.LoanRecipient => Paths.loanTransactions \ "recipientIdentityType" \ toString
     case IdentitySubject.LandOrPropertySeller =>
       JsPath \ "assets" \ "landOrProperty" \ "landOrPropertyTransactions" \ "heldPropertyTransaction" \ "propertyAcquiredFrom" \ "sellerIdentityType" \ toString
+    case IdentitySubject.LandOrProperty =>
+      JsPath \ "assets" \ "landOrProperty" \ "landOrPropertyTransactions" \ "heldPropertyTransaction" \ "propertyAcquiredFrom" \ "landOrProperty" \ toString
   }
   override def toString: String = "identityTypes"
 }

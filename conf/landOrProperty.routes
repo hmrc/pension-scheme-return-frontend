@@ -79,3 +79,12 @@ GET        /:srn/change-land-property-lease-details               controllers.no
 GET        /:srn/change-land-property-lease-details/:index        controllers.nonsipp.landorproperty.LandOrPropertyLeaseDetailsController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 POST       /:srn/change-land-property-lease-details               controllers.nonsipp.landorproperty.LandOrPropertyLeaseDetailsController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
 POST       /:srn/change-land-property-lease-details/:index        controllers.nonsipp.landorproperty.LandOrPropertyLeaseDetailsController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET        /:srn/nino-of-:subject                    controllers.nonsipp.landorproperty.IndividualRecipientNinoNumberController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode, subject: IdentitySubject)
+GET        /:srn/nino-of-:subject/:index               controllers.nonsipp.landorproperty.IndividualRecipientNinoNumberController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode, subject: IdentitySubject)
+POST       /:srn/nino-of-:subject                    controllers.nonsipp.landorproperty.IndividualRecipientNinoNumberController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode, subject: IdentitySubject)
+POST       /:srn/nino-of-:subject/:index               controllers.nonsipp.landorproperty.IndividualRecipientNinoNumberController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode, subject: IdentitySubject)
+GET        /:srn/change-nino-of-:subject              controllers.nonsipp.landorproperty.IndividualRecipientNinoNumberController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode, subject: IdentitySubject)
+GET        /:srn/change-nino-of-:subject/:index        controllers.nonsipp.landorproperty.IndividualRecipientNinoNumberController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode, subject: IdentitySubject)
+POST       /:srn/change-nino-of-:subject               controllers.nonsipp.landorproperty.IndividualRecipientNinoNumberController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode, subject: IdentitySubject)
+POST       /:srn/change-nino-of-:subject/:index        controllers.nonsipp.landorproperty.IndividualRecipientNinoNumberController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode, subject: IdentitySubject)
