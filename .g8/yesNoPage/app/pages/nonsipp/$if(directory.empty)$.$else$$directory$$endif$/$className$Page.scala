@@ -1,8 +1,13 @@
-package pages
+$if(directory.empty)$
+package pages.nonsipp
+$else$
+package pages.nonsipp.$directory$
+$endif$
 
 import play.api.libs.json.JsPath
 import models.SchemeId.Srn
 import models.Money
+import pages.QuestionPage
 $if(!index.empty)$
 import config.Refined.$index$
 import utils.RefinedUtils._

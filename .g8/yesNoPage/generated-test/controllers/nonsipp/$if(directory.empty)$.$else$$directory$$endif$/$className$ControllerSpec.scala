@@ -1,8 +1,11 @@
-package controllers
+$if(directory.empty)$
+package controllers.nonsipp
+$else$
+package controllers.nonsipp.$directory$
+$endif$
 
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
-import pages.$className$Page
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -10,7 +13,13 @@ import play.api.test.Helpers._
 import repositories.SessionRepository
 import forms.YesNoPageFormProvider
 import views.html.YesNoPageView
+import controllers.ControllerBaseSpec
 import $className;format="cap"$Controller._
+$if(directory.empty)$
+import pages.nonsipp.$className$Page
+$else$
+import pages.nonsipp.$directory$.$className$Page
+$endif$
 $if(!index.empty)$
 import config.Refined.$index$
 import eu.timepit.refined.refineMV
@@ -48,7 +57,7 @@ class $className;format="cap"$ControllerSpec extends ControllerBaseSpec {
       injected[YesNoPageView].apply(form(injected[YesNoPageFormProvider]).fill(true), viewModel(srn, index, NormalMode))
     })
     $endif$
-
+      .g8/conditionalYesNoPage/app/controllers/nonsipp/$if(directory.empty)$.$else$$directory$$endif$/$className$Controller.scala
     act.like(redirectNextPage(onSubmit, "value" -> "true"))
     act.like(redirectNextPage(onSubmit, "value" -> "false"))
 

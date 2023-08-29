@@ -14,12 +14,17 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages.nonsipp.landorproperty
 
-import play.api.libs.json.__
+import config.Refined.Max5000
+import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
+import utils.RefinedUtils._
 
-package object memberdetails {
-  object Paths {
-    val personalDetails = __ \ "membersPayments" \ "memberDetails" \ "personalDetails"
-  }
+case class LandOrPropertySellerConnectedPartyPage(srn: Srn, index: Max5000) extends QuestionPage[Boolean] {
+
+  override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString
+
+  override def toString: String = "landOrPropertySellerConnectedParty"
 }
