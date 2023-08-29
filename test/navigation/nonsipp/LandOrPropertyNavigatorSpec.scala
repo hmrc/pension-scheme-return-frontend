@@ -106,7 +106,11 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           LandOrPropertyWhenDidSchemeAcquirePage,
           Gen.const(localDate),
           controllers.nonsipp.landorproperty.routes.LandPropertyIndependentValuationController.onPageLoad,
-          srn => defaultUserAnswers.unsafeSet(WhyDoesSchemeHoldLandPropertyPage(srn, index), SchemeHoldLandProperty.Contribution) //Needed to mock the user input from 2 pages "ago"
+          srn =>
+            defaultUserAnswers.unsafeSet(
+              WhyDoesSchemeHoldLandPropertyPage(srn, index),
+              SchemeHoldLandProperty.Contribution
+            ) //Needed to mock the user input from 2 pages "ago"
         )
         .withName("go from land or property when did scheme acquire page to land property independent valuation page")
     )
@@ -118,9 +122,15 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           LandOrPropertyWhenDidSchemeAcquirePage,
           Gen.const(localDate),
           controllers.nonsipp.landorproperty.routes.PropertyAcquiredFromController.onPageLoad,
-          srn => defaultUserAnswers.unsafeSet(WhyDoesSchemeHoldLandPropertyPage(srn, index), SchemeHoldLandProperty.Acquisition) //Needed to mock the user input from 2 pages "ago"
+          srn =>
+            defaultUserAnswers.unsafeSet(
+              WhyDoesSchemeHoldLandPropertyPage(srn, index),
+              SchemeHoldLandProperty.Acquisition
+            ) //Needed to mock the user input from 2 pages "ago"
         )
-        .withName("go from land or property when did scheme acquire page to from who was land or property acquired from ")
+        .withName(
+          "go from land or property when did scheme acquire page to from who was land or property acquired from "
+        )
     )
   }
 
