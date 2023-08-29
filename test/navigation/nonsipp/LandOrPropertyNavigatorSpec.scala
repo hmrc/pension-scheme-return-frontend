@@ -124,6 +124,19 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         )
         .withName("go from land or property company seller page to ? page")
     )
+
+    act.like(
+      normalmode
+        .navigateToWithDataAndIndex(
+          index,
+          LandOrPropertySellerConnectedPartyPage,
+          Gen.const(true),
+          controllers.nonsipp.landorproperty.routes.LandPropertyIndependentValuationController.onPageLoad
+        )
+        .withName(
+          "go from land or property is seller a connected party page to is land or property independent valuation page"
+        )
+    )
   }
 
   "WhyDoesSchemeHoldLandPropertyNavigator" - {
