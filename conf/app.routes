@@ -276,12 +276,12 @@ GET         /:srn/change-submit-file-upload-error-missing-information           
 
 GET         /:srn/type-of-:subject                                                      controllers.nonsipp.common.IdentityTypeController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode, subject: IdentitySubject)
 GET         /:srn/type-of-:subject/:index                                               controllers.nonsipp.common.IdentityTypeController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode, subject: IdentitySubject)
-POST        /:srn/type-of-:subject                                                     controllers.nonsipp.common.IdentityTypeController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode, subject: IdentitySubject)
-POST        /:srn/type-of-:subject/:index                                              controllers.nonsipp.common.IdentityTypeController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode, subject: IdentitySubject)
+POST        /:srn/type-of-:subject                                                      controllers.nonsipp.common.IdentityTypeController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode, subject: IdentitySubject)
+POST        /:srn/type-of-:subject/:index                                               controllers.nonsipp.common.IdentityTypeController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode, subject: IdentitySubject)
 GET         /:srn/change-type-of-:subject                                               controllers.nonsipp.common.IdentityTypeController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode, subject: IdentitySubject)
 GET         /:srn/change-type-of-:subject/:index                                        controllers.nonsipp.common.IdentityTypeController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode, subject: IdentitySubject)
-POST        /:srn/change-type-of-:subject                                              controllers.nonsipp.common.IdentityTypeController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode, subject: IdentitySubject)
-POST        /:srn/change-type-of-:subject/:index                                       controllers.nonsipp.common.IdentityTypeController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode, subject: IdentitySubject)
+POST        /:srn/change-type-of-:subject                                               controllers.nonsipp.common.IdentityTypeController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode, subject: IdentitySubject)
+POST        /:srn/change-type-of-:subject/:index                                        controllers.nonsipp.common.IdentityTypeController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode, subject: IdentitySubject)
 
 GET         /:srn/file-upload-error-some                                                controllers.nonsipp.memberdetails.upload.FileUploadErrorSummaryController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 GET         /:srn/submit-file-upload-error-some                                         controllers.nonsipp.memberdetails.upload.FileUploadErrorSummaryController.onSubmit(srn: Srn, mode: Mode = NormalMode)
@@ -314,14 +314,14 @@ GET         /:srn/change-individual-recipient-name/:index                       
 POST        /:srn/change-individual-recipient-name                                      controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNameController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
 POST        /:srn/change-individual-recipient-name/:index                               controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNameController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 
-GET         /:srn/is-individual-recipient-connected-party                               controllers.nonsipp.loansmadeoroutstanding.IsMemberOrConnectedPartyController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
-GET         /:srn/is-individual-recipient-connected-party/:index                        controllers.nonsipp.loansmadeoroutstanding.IsMemberOrConnectedPartyController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
-POST        /:srn/is-individual-recipient-connected-party                               controllers.nonsipp.loansmadeoroutstanding.IsMemberOrConnectedPartyController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
-POST        /:srn/is-individual-recipient-connected-party/:index                        controllers.nonsipp.loansmadeoroutstanding.IsMemberOrConnectedPartyController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
-GET         /:srn/change-is-individual-recipient-connected-party                        controllers.nonsipp.loansmadeoroutstanding.IsMemberOrConnectedPartyController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
-GET         /:srn/change-is-individual-recipient-connected-party/:index                 controllers.nonsipp.loansmadeoroutstanding.IsMemberOrConnectedPartyController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
-POST        /:srn/change-is-individual-recipient-connected-party                        controllers.nonsipp.loansmadeoroutstanding.IsMemberOrConnectedPartyController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
-POST        /:srn/change-is-individual-recipient-connected-party/:index                 controllers.nonsipp.loansmadeoroutstanding.IsMemberOrConnectedPartyController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+GET         /:srn/is-individual-recipient-connected-party                               controllers.nonsipp.loansmadeoroutstanding.IsIndividualRecipientConnectedPartyController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
+GET         /:srn/is-individual-recipient-connected-party/:index                        controllers.nonsipp.loansmadeoroutstanding.IsIndividualRecipientConnectedPartyController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/is-individual-recipient-connected-party                               controllers.nonsipp.loansmadeoroutstanding.IsIndividualRecipientConnectedPartyController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
+POST        /:srn/is-individual-recipient-connected-party/:index                        controllers.nonsipp.loansmadeoroutstanding.IsIndividualRecipientConnectedPartyController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/change-is-individual-recipient-connected-party                        controllers.nonsipp.loansmadeoroutstanding.IsIndividualRecipientConnectedPartyController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
+GET         /:srn/change-is-individual-recipient-connected-party/:index                 controllers.nonsipp.loansmadeoroutstanding.IsIndividualRecipientConnectedPartyController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-is-individual-recipient-connected-party                        controllers.nonsipp.loansmadeoroutstanding.IsIndividualRecipientConnectedPartyController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
+POST        /:srn/change-is-individual-recipient-connected-party/:index                 controllers.nonsipp.loansmadeoroutstanding.IsIndividualRecipientConnectedPartyController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 
 GET         /:srn/check-your-answers-basic-details                                      controllers.nonsipp.BasicDetailsCheckYourAnswersController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 GET         /:srn/submit-check-your-answers-basic-details                               controllers.nonsipp.BasicDetailsCheckYourAnswersController.onSubmit(srn: Srn, mode: Mode = NormalMode)
@@ -439,10 +439,13 @@ GET         /:srn/change-outstanding-arrears-on-loan/:index                     
 POST        /:srn/change-outstanding-arrears-on-loan                                    controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
 POST        /:srn/change-outstanding-arrears-on-loan/:index                             controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 
-GET         /:srn/loans                                                                 controllers.nonsipp.loansmadeoroutstanding.LoansListController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST        /:srn/loans                                                                 controllers.nonsipp.loansmadeoroutstanding.LoansListController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-GET         /:srn/change-loans                                                          controllers.nonsipp.loansmadeoroutstanding.LoansListController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST        /:srn/change-loans                                                          controllers.nonsipp.loansmadeoroutstanding.LoansListController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+GET         /:srn/loans                                                                 controllers.nonsipp.loansmadeoroutstanding.LoansListController.onPageLoad(srn: Srn, page: Int = 1, mode: Mode = NormalMode)
+GET         /:srn/loans/:page                                                           controllers.nonsipp.loansmadeoroutstanding.LoansListController.onPageLoad(srn: Srn, page: Int, mode: Mode = NormalMode)
+POST        /:srn/loans/:page                                                           controllers.nonsipp.loansmadeoroutstanding.LoansListController.onSubmit(srn: Srn, page: Int, mode: Mode = NormalMode)
+
+GET         /:srn/change-loans                                                          controllers.nonsipp.loansmadeoroutstanding.LoansListController.onPageLoad(srn: Srn, page: Int = 1, mode: Mode = CheckMode)
+GET         /:srn/change-loans/:page                                                    controllers.nonsipp.loansmadeoroutstanding.LoansListController.onPageLoad(srn: Srn, page: Int, mode: Mode = CheckMode)
+POST        /:srn/change-loans/:page                                                    controllers.nonsipp.loansmadeoroutstanding.LoansListController.onSubmit(srn: Srn, page: Int, mode: Mode = CheckMode)
 
 GET         /:srn/security-given-for-loan                                               controllers.nonsipp.loansmadeoroutstanding.SecurityGivenForLoanController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
 GET         /:srn/security-given-for-loan/:index                                        controllers.nonsipp.loansmadeoroutstanding.SecurityGivenForLoanController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
@@ -462,3 +465,6 @@ GET         /:srn/check-answers-financial-details                               
 POST        /:srn/submit-check-answers-financial-details                                controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 GET         /:srn/change-check-answers-financial-details                                controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST        /:srn/change-submit-check-answers-financial-details                         controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+
+

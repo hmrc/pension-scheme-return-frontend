@@ -81,7 +81,19 @@ object LandOrPropertyNavigator extends JourneyNavigator {
       controllers.routes.UnauthorisedController.onPageLoad()
 
     case LandPropertyIndividualSellersNamePage(srn, index) =>
+      controllers.nonsipp.landorproperty.routes.IndividualSellerNiController.onPageLoad(srn, index, NormalMode)
+
+    case CompanySellerNamePage(srn, index) =>
       controllers.routes.UnauthorisedController.onPageLoad()
+
+    case page @ IndividualSellerNiPage(srn, index) =>
+      controllers.nonsipp.landorproperty.routes.LandOrPropertySellerConnectedPartyController
+        .onPageLoad(srn, index, NormalMode)
+
+    case LandOrPropertySellerConnectedPartyPage(srn, index) =>
+      controllers.nonsipp.landorproperty.routes.LandPropertyIndependentValuationController
+        .onPageLoad(srn, index, NormalMode)
+
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty

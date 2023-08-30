@@ -80,7 +80,7 @@ class IndividualRecipientNameController @Inject()(
 }
 
 object IndividualRecipientNameController {
-  def form(formProvider: TextFormProvider): Form[String] = formProvider.name(
+  def form(formProvider: TextFormProvider): Form[String] = formProvider.text(
     "individualRecipientName.error.required",
     "individualRecipientName.error.length",
     "individualRecipientName.error.invalid.characters"

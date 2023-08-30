@@ -574,11 +574,11 @@ otherRecipientDetails.heading = Recipient’s details
 otherRecipientDetails.name = Recipient’s name
 otherRecipientDetails.description = Brief description of recipient
 otherRecipientDetails.name.error.required = Enter the recipient’s name
-otherRecipientDetails.name.error.invalid = Recipient’s name must only include letters, numbers, and special characters such as hyphens, spaces and apostrophes
+otherRecipientDetails.name.error.invalid = Recipient’s name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
 otherRecipientDetails.name.error.length =  Recipient’s name must be 160 characters or fewer
 otherRecipientDetails.description.error.required = Enter a brief description of the recipient
-otherRecipientDetails.description.error.invalid = Description of recipient must only include letters, numbers, and special characters such as hyphens, spaces and apostrophes
-otherRecipientDetails.description.error.length = Description of recipient must be 160 characters or fewer
+otherRecipientDetails.description.error.invalid = The brief description of the recipient must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, full stops, hyphens, slashes, speech marks and spaces
+otherRecipientDetails.description.error.length = The brief description of the recipient must be 160 characters or fewer
 
 fileUploadTooManyErrors.title = There is a problem with your member details file
 fileUploadTooManyErrors.heading = There is a problem with your member details file
@@ -621,7 +621,7 @@ basicDetailsCheckYourAnswersController.schemeDetails.pstr = Pension Scheme Tax R
 basicDetailsCheckYourAnswersController.schemeDetails.schemeAdminName = Scheme administrator name
 basicDetailsCheckYourAnswersController.schemeDetails.adminId = Administrator ID
 basicDetailsCheckYourAnswersController.schemeDetails.taxYear = Tax year
-basicDetailsCheckYourAnswersController.schemeDetails.accountingPeriod = Accounting Periods
+basicDetailsCheckYourAnswersController.schemeDetails.accountingPeriod = Accounting periods
 basicDetailsCheckYourAnswersController.schemeDetails.accountingPeriod.hidden = accounting period
 basicDetailsCheckYourAnswersController.schemeDetails.bankAccount = Did {0} have at least 1 active bank account during the period of this return?
 basicDetailsCheckYourAnswersController.schemeDetails.bankAccount.hidden =  if the scheme had at least 1 active bank account during the period of this return
@@ -647,13 +647,10 @@ companyRecipientName.error.required = Enter the recipient’s company name
 companyRecipientName.error.invalid.characters = Recipient’s company name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
 companyRecipientName.error.length = Recipient’s company name must be 160 characters or fewer
 
-isMemberOrConnectedParty.title = Is the recipient a member or a connected party?
-isMemberOrConnectedParty.heading = Is {0} a member or a connected party?
-isMemberOrConnectedParty.option1 = Member of the scheme
-isMemberOrConnectedParty.option2 = Connected party
-isMemberOrConnectedParty.option3 = Neither of these
+isIndividualRecipientConnectedParty.title= Is the recipient a connected party?
+isIndividualRecipientConnectedParty.heading = Is {0} a connected party?
 isMemberOrConnectedParty.checkYourAnswersLabel = Is the recipient a member or a connected party?
-isMemberOrConnectedParty.error.required = Select if the recipient is a member, connected party or neither
+isIndividualRecipientConnectedParty.error.required = Select if the recipient is a member, connected party or neither
 isMemberOrConnectedParty.change.hidden = IsMemberOrConnectedParty
 
 individualRecipientNino.title = Do you know the recipient’s National Insurance number?
@@ -787,9 +784,8 @@ loanCheckYourAnswers.section1.recipientDetails.noUtrReason = Reason you cannot p
 loanCheckYourAnswers.section1.recipientDetails.noUtrReason.hidden = reason you cannot provide recipient’s Unique Taxpayer Reference
 loanCheckYourAnswers.section1.memberOrConnectedParty = Is {0} a connected party?
 loanCheckYourAnswers.section1.memberOrConnectedParty.hidden = if the recipient is a connected party
-loanCheckYourAnswers.section1.memberOrConnectedParty.member = Member of the scheme
-loanCheckYourAnswers.section1.memberOrConnectedParty.connectedParty = Connected party
-loanCheckYourAnswers.section1.memberOrConnectedParty.neither = Neither of these
+loanCheckYourAnswers.section1.isIndividualRecipient.yes = Is {0} a connected party?
+loanCheckYourAnswers.section1.isIndividualRecipient.no = Is {0} a connected party?
 loanCheckYourAnswers.section1.sponsoringOrConnectedParty =  Is {0} a sponsoring employer or a connected party?
 loanCheckYourAnswers.section1.sponsoringOrConnectedParty.hidden =  if the recipient is a sponsoring employer or a connected party
 loanCheckYourAnswers.section1.sponsoringOrConnectedParty.sponsoring = Sponsoring employer
@@ -859,6 +855,7 @@ loansList.row.remove.hidden = remove loan of {0} to {1} from the list
 loansList.description = You must tell us about all loans the scheme made, or had outstanding, during the period of this return.
 loansList.radios = Do you need to add another loan?
 loansList.radios.error.required = Select yes if you need to add another loan
+loansList.pagination.label = Showing {0} - {1} of {2} loans
 
 removeLoan.title = Are you sure you want to remove this loan?
 removeLoan.heading = Are you sure you want to remove the loan of £{0} to {1}?
@@ -994,9 +991,33 @@ landOrPropertyLeaseDetails.field3.error.invalid.date = Date the lease was grante
 landOrPropertyLeaseDetails.field3.error.invalid.characters = Date the lease was granted must include must only include numbers 0 to 9
 landOrPropertyLeaseDetails.field3.error.future = Date the lease was granted must be before {0}
 
+
 landPropertyIndividualSellersName.title = What is the seller’s name?
 landPropertyIndividualSellersName.heading = What is the seller’s name?
 landPropertyIndividualSellersName.error.required = Enter the seller’s name
 landPropertyIndividualSellersName.error.tooLong = Seller’s name must be 160 characters or fewer
 landPropertyIndividualSellersName.error.invalid = Seller’s name must only include letters a to z, hyphens, apostrophes and spaces
+
+
+
+companySellerName.title = What is the seller’s company name?
+companySellerName.heading = What is the seller’s company name?
+companySellerName.error.required = Enter the seller’s company name
+companySellerName.error.invalid = Seller’s company name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+companySellerName.error.tooLong = Seller’s company name must be 160 characters or fewer
+
+landOrPropertySellerConnectedParty.title = Is the seller a connected party?
+landOrPropertySellerConnectedParty.heading = Is {0} a connected party?
+landOrPropertySellerConnectedParty.error.required = Select yes if the seller is a connected party
+
+individualSellerNi.title = Do you know the seller’s National Insurance number?
+individualSellerNi.heading = Do you know {0}’s National Insurance number?
+individualSellerNi.yes.conditional = What is {0} National Insurance number?
+individualSellerNi.no.conditional = Tell us why you cannot provide {0}’s National Insurance number
+individualSellerNi.error.required = Select yes if you know the seller’s National Insurance number
+individualSellerNi.no.conditional.error.required = Enter the reason you cannot provide the seller’s National Insurance number
+individualSellerNi.no.conditional.error.invalid = The reason you cannot provide the seller’s National Insurance number must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, full stops, hyphens, slashes, speech marks and spaces
+individualSellerNi.no.conditional.error.length = The reason you cannot provide the seller’s National Insurance number must be 160 characters or fewer
+individualSellerNi.yes.conditional.error.required = Enter the seller’s National Insurance number
+individualSellerNi.yes.conditional.error.invalid = Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C
 

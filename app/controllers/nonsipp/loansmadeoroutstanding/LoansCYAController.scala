@@ -79,10 +79,13 @@ class LoansCYAController @Inject()(
             request.userAnswers.get(CompanyRecipientCrnPage(srn, index)).flatMap(_.value.swap.toOption.map(_.value)),
             request.userAnswers.get(PartnershipRecipientUtrPage(srn, index)).flatMap(_.value.swap.toOption.map(_.value))
           ).flatten.headOption
-          connectedParty = (
-            request.userAnswers.get(IsMemberOrConnectedPartyPage(srn, index)),
-            request.userAnswers.get(RecipientSponsoringEmployerConnectedPartyPage(srn, index))
-          ).toEither
+          connectedParty = if (request.userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, index)).isEmpty) {
+            Right(request.userAnswers.get(RecipientSponsoringEmployerConnectedPartyPage(srn, index)).get)
+          } else if (request.userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, index)).get) {
+            Left(request.userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, index)).get)
+          } else {
+            Right(request.userAnswers.get(RecipientSponsoringEmployerConnectedPartyPage(srn, index)).get)
+          }
           datePeriodLoan <- request.userAnswers.get(DatePeriodLoanPage(srn, index)).getOrRecoverJourney
           loanAmount <- request.userAnswers.get(AmountOfTheLoanPage(srn, index)).getOrRecoverJourney
           returnEndDate <- schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney.map(_.to)
@@ -136,7 +139,7 @@ case class ViewModelParameters(
   recipientName: String,
   recipientDetails: Option[String],
   recipientReasonNoDetails: Option[String],
-  connectedParty: Either[MemberOrConnectedParty, SponsoringOrConnectedParty],
+  connectedParty: Either[Boolean, SponsoringOrConnectedParty],
   datePeriodLoan: (LocalDate, Money, Int),
   loanAmount: (Money, Money, Money),
   returnEndDate: LocalDate,
@@ -189,7 +192,7 @@ object LoansCYAController {
     recipientName: String,
     recipientDetails: Option[String],
     recipientReasonNoDetails: Option[String],
-    connectedParty: Either[MemberOrConnectedParty, SponsoringOrConnectedParty],
+    connectedParty: Either[Boolean, SponsoringOrConnectedParty],
     datePeriodLoan: (LocalDate, Money, Int),
     loanAmount: (Money, Money, Money),
     returnEndDate: LocalDate,
@@ -227,7 +230,7 @@ object LoansCYAController {
     recipientName: String,
     recipientDetails: Option[String],
     recipientReasonNoDetails: Option[String],
-    connectedParty: Either[MemberOrConnectedParty, SponsoringOrConnectedParty],
+    connectedParty: Either[Boolean, SponsoringOrConnectedParty],
     mode: Mode
   ): List[CheckYourAnswersSection] = {
 
@@ -303,27 +306,26 @@ object LoansCYAController {
       String,
       String
     ) = connectedParty match {
-      case Left(MemberOrConnectedParty.Member) =>
+
+      case Left(value) =>
         (
-          Message("loanCheckYourAnswers.section1.memberOrConnectedParty", recipientName),
-          "loanCheckYourAnswers.section1.memberOrConnectedParty.member",
-          "loanCheckYourAnswers.section1.memberOrConnectedParty.hidden",
-          routes.IsMemberOrConnectedPartyController.onPageLoad(srn, index, mode).url
+          if (value) {
+            (
+              Message("loanCheckYourAnswers.section1.isIndividualRecipient.yes", recipientName),
+              "Yes",
+              "",
+              routes.IsIndividualRecipientConnectedPartyController.onPageLoad(srn, index, mode).url
+            )
+          } else {
+            (
+              Message("loanCheckYourAnswers.section1.isIndividualRecipient.no", recipientName),
+              "No",
+              "",
+              routes.IsIndividualRecipientConnectedPartyController.onPageLoad(srn, index, mode).url
+            )
+          }
         )
-      case Left(MemberOrConnectedParty.ConnectedParty) =>
-        (
-          Message("loanCheckYourAnswers.section1.memberOrConnectedParty", recipientName),
-          "loanCheckYourAnswers.section1.memberOrConnectedParty.connectedParty",
-          "loanCheckYourAnswers.section1.memberOrConnectedParty.hidden",
-          routes.IsMemberOrConnectedPartyController.onPageLoad(srn, index, mode).url
-        )
-      case Left(MemberOrConnectedParty.Neither) =>
-        (
-          Message("loanCheckYourAnswers.section1.memberOrConnectedParty", recipientName),
-          "loanCheckYourAnswers.section1.memberOrConnectedParty.neither",
-          "loanCheckYourAnswers.section1.memberOrConnectedParty.hidden",
-          routes.IsMemberOrConnectedPartyController.onPageLoad(srn, index, mode).url
-        )
+
       case Right(SponsoringOrConnectedParty.Sponsoring) =>
         (
           Message("loanCheckYourAnswers.section1.sponsoringOrConnectedParty", recipientName),

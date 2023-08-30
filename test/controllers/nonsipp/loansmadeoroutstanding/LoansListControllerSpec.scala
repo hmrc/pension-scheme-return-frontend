@@ -40,8 +40,8 @@ class LoansListControllerSpec extends ControllerBaseSpec {
     .unsafeSet(IndividualRecipientNamePage(srn, refineMV(3)), "recipientName3")
     .unsafeSet(AmountOfTheLoanPage(srn, refineMV(3)), (money, money, money))
 
-  private lazy val onPageLoad = routes.LoansListController.onPageLoad(srn, NormalMode)
-  private lazy val onSubmit = routes.LoansListController.onSubmit(srn, NormalMode)
+  private lazy val onPageLoad = routes.LoansListController.onPageLoad(srn, page = 1, NormalMode)
+  private lazy val onSubmit = routes.LoansListController.onSubmit(srn, page = 1, NormalMode)
   private lazy val onLoansMadePageLoad = routes.LoansMadeOrOutstandingController.onPageLoad(srn, NormalMode)
 
   private val recipients: List[(Max5000, String, Money)] = List(
@@ -57,6 +57,7 @@ class LoansListControllerSpec extends ControllerBaseSpec {
         form(new YesNoPageFormProvider()),
         viewModel(
           srn,
+          1,
           NormalMode,
           recipients
         )

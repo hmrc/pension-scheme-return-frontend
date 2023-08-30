@@ -33,6 +33,8 @@ object Constants {
   val schemeMembersPageSize = 25
   val maxSchemeMembers = 300
 
+  val loanPageSize = 25
+
   val maxLoans = 9999999
   val maxCurrencyValue = 999999999.99
   val maxCashInBank = 999999999.99

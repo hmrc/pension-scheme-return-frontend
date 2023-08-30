@@ -32,7 +32,7 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
 import play.api.test.FakeRequest
 import play.api.test.Helpers.stubMessagesApi
-import services.SchemeDateService
+import services.{PSRSubmissionService, SchemeDateService}
 import viewmodels.models.{CheckYourAnswersViewModel, FormPageViewModel}
 import views.html.CheckYourAnswersView
 
@@ -41,10 +41,12 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec {
   private lazy val onPageLoad = routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.BasicDetailsCheckYourAnswersController.onSubmit(srn, NormalMode)
 
-  private val mockSchemeDateService = mock[SchemeDateService]
+  private implicit val mockSchemeDateService = mock[SchemeDateService]
+  private implicit val mockPSRSubmissionService = mock[PSRSubmissionService]
 
   override protected val additionalBindings: List[GuiceableModule] = List(
-    bind[SchemeDateService].toInstance(mockSchemeDateService)
+    bind[SchemeDateService].toInstance(mockSchemeDateService),
+    bind[PSRSubmissionService].toInstance(mockPSRSubmissionService)
   )
 
   "BasicDetailsCheckYourAnswersController" - {
@@ -71,7 +73,13 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec {
       )
     }.before(mockTaxYear(dateRange)))
 
-    act.like(redirectNextPage(onSubmit))
+    act.like(
+      redirectNextPage(onSubmit, userAnswersWithTaxYear)
+        .before {
+          MockSchemeDateService.returnPeriods(Some(NonEmptyList.of(dateRange)))
+          MockPSRSubmissionService.submitMinimalRequiredDetails()
+        }
+    )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 

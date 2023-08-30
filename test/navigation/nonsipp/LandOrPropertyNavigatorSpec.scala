@@ -119,6 +119,29 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         )
         .withName("go from land or property individual seller name page to ? page")
     )
+
+    act.like(
+      normalmode
+        .navigateToWithIndex(
+          index,
+          CompanySellerNamePage,
+          (srn, index: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+        )
+        .withName("go from land or property company seller page to ? page")
+    )
+
+    act.like(
+      normalmode
+        .navigateToWithDataAndIndex(
+          index,
+          LandOrPropertySellerConnectedPartyPage,
+          Gen.const(true),
+          controllers.nonsipp.landorproperty.routes.LandPropertyIndependentValuationController.onPageLoad
+        )
+        .withName(
+          "go from land or property is seller a connected party page to is land or property independent valuation page"
+        )
+    )
   }
 
   "WhyDoesSchemeHoldLandPropertyNavigator" - {
@@ -243,6 +266,21 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           (srn, index: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
         )
         .withName("go from is land property leased page to unauthorised when no selected")
+    )
+  }
+
+  "IndividualSellerNi" - {
+
+    act.like(
+      normalmode
+        .navigateToWithIndex(
+          index,
+          IndividualSellerNiPage,
+          (srn, index: Max5000, mode) =>
+            controllers.nonsipp.landorproperty.routes.LandOrPropertySellerConnectedPartyController
+              .onPageLoad(srn, index, NormalMode)
+        )
+        .withName("go from individual sellerNi page to land Or property seller connected party page when yes selected")
     )
   }
 }
