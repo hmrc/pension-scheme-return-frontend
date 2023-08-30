@@ -23,7 +23,6 @@ import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.{ConditionalYesNo, NormalMode}
 import pages.nonsipp.landorproperty.IndividualSellerNiPage
-import pages.nonsipp.loansmadeoroutstanding.IndividualRecipientNamePage
 import uk.gov.hmrc.domain.Nino
 import views.html.ConditionalYesNoPageView
 
@@ -38,15 +37,12 @@ class IndividualSellerNiControllerSpec extends ControllerBaseSpec {
     controllers.nonsipp.landorproperty.routes.IndividualSellerNiController
       .onSubmit(srn, index, NormalMode)
 
-  val userAnswersWithIndividualName =
-    defaultUserAnswers.unsafeSet(IndividualRecipientNamePage(srn, index), individualName)
-
   val conditionalNo: ConditionalYesNo[String, Nino] = ConditionalYesNo.no("reason")
   val conditionalYes: ConditionalYesNo[String, Nino] = ConditionalYesNo.yes(nino)
 
   "IndividualSellerNiController" - {
 
-    act.like(renderView(onPageLoad, userAnswersWithIndividualName) { implicit app => implicit request =>
+    act.like(renderView(onPageLoad) { implicit app => implicit request =>
       injected[ConditionalYesNoPageView]
         .apply(form(injected[YesNoPageFormProvider]), viewModel(srn, index, individualName, NormalMode))
     })
@@ -55,8 +51,7 @@ class IndividualSellerNiControllerSpec extends ControllerBaseSpec {
       renderPrePopView(
         onPageLoad,
         IndividualSellerNiPage(srn, index),
-        conditionalNo,
-        userAnswersWithIndividualName
+        conditionalNo
       ) { implicit app => implicit request =>
         injected[ConditionalYesNoPageView]
           .apply(
@@ -73,7 +68,6 @@ class IndividualSellerNiControllerSpec extends ControllerBaseSpec {
 
     act.like(saveAndContinue(onSubmit, "value" -> "true", "value.yes" -> nino.value))
 
-    act.like(invalidForm(onSubmit, userAnswersWithIndividualName))
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }
 }
