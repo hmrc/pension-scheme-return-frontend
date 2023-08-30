@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,28 +12,21 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@this(
+package pages.nonsipp.landorproperty
 
-layout: templates.Layout
+import config.Refined.Max5000
+import models.ConditionalYesNo
+import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
+import uk.gov.hmrc.domain.Nino
+import utils.RefinedUtils.RefinedIntOps
 
-)
+case class IndividualSellerNiPage(srn: Srn, index: Max5000) extends QuestionPage[ConditionalYesNo[String, Nino]] {
 
-    @(viewmodel: FormPageViewModel[UnauthorisedPageViewModel])(implicit request: Request[_], messages: Messages)
+  override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString
 
-    @layout(
-
-    pageTitle = titleNoForm(messages("unauthorised.title")),
-
-    timeout   = false
-
-) {
-
-<h1 class="govuk-heading-xl">@messages("unauthorised.heading")</h1>
-
-        <p class="govuk-body">@messages("unauthorised.paragraph")
-                 <a href=@renderMessage(viewmodel.page.pensionSchemeUrl)
-                    class="govuk-link" >@messages("unauthorised.linkMessage")</a>.
-        </p>
+  override def toString: String = "individualRecipientNinoNumber"
 }
