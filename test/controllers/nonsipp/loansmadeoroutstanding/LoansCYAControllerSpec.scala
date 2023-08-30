@@ -28,7 +28,6 @@ import models.{
   IdentitySubject,
   IdentityType,
   Money,
-  NormalMode,
   Security,
   SponsoringOrConnectedParty
 }
@@ -41,7 +40,7 @@ import views.html.CheckYourAnswersView
 
 class LoansCYAControllerSpec extends ControllerBaseSpec {
 
-  private implicit val mockSchemeDateService = mock[SchemeDateService]
+  private implicit val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
 
   override protected val additionalBindings: List[GuiceableModule] = List(
     bind[SchemeDateService].toInstance(mockSchemeDateService)
@@ -91,8 +90,7 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
                 loanInterest = (money, percentage, money),
                 outstandingArrearsOnLoan = Some(money),
                 securityOnLoan = Some(security),
-                checkOrChange,
-                NormalMode
+                checkOrChange
               )
             )
           )

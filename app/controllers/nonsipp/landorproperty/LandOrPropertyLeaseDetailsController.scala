@@ -18,7 +18,6 @@ package controllers.nonsipp.landorproperty
 
 import cats.implicits._
 import config.Constants
-import config.Constants._
 import config.Refined.Max5000
 import controllers.PSRController
 import controllers.actions._

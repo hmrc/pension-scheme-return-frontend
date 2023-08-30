@@ -20,7 +20,6 @@ import config.Refined.Max300
 import models.SchemeId.Srn
 import models.{NameDOB, UserAnswers}
 import pages.QuestionPage
-import pages.nonsipp.memberdetails.Paths.personalDetails
 import play.api.libs.json.JsPath
 import queries.{Gettable, Removable}
 import utils.RefinedUtils.RefinedIntOps
