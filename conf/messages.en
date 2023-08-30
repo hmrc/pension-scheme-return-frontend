@@ -1006,6 +1006,15 @@ companySellerName.error.required = Enter the seller’s company name
 companySellerName.error.invalid = Seller’s company name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
 companySellerName.error.tooLong = Seller’s company name must be 160 characters or fewer
 
+
+landOrPropertyAcquiredFrom.title = Who was the land or property acquired from?
+landOrPropertyAcquiredFrom.heading = Who was {0} acquired from?
+landOrPropertyAcquiredFrom.option1 = An individual
+landOrPropertyAcquiredFrom.option2 = A UK company
+landOrPropertyAcquiredFrom.option3 = A UK partnership
+landOrPropertyAcquiredFrom.option4 = Other
+landOrPropertyAcquiredFrom.error.required = Select who the land or property was acquired from
+
 landOrPropertySellerConnectedParty.title = Is the seller a connected party?
 landOrPropertySellerConnectedParty.heading = Is {0} a connected party?
 landOrPropertySellerConnectedParty.error.required = Select yes if the seller is a connected party
@@ -1019,5 +1028,7 @@ individualSellerNi.no.conditional.error.required = Enter the reason you cannot p
 individualSellerNi.no.conditional.error.invalid = The reason you cannot provide the seller’s National Insurance number must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, full stops, hyphens, slashes, speech marks and spaces
 individualSellerNi.no.conditional.error.length = The reason you cannot provide the seller’s National Insurance number must be 160 characters or fewer
 individualSellerNi.yes.conditional.error.required = Enter the seller’s National Insurance number
+
 individualSellerNi.yes.conditional.error.invalid = Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C
 
+individualSellerNi.yes.conditional.error.invalid = Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C
