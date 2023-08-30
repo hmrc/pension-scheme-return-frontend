@@ -66,6 +66,24 @@ object FormPageViewModel {
   def apply[A](
     title: Message,
     heading: InlineMessage,
+    description: DisplayMessage,
+    page: A,
+    onSubmit: Call
+  ): FormPageViewModel[A] =
+    FormPageViewModel(
+      title,
+      heading,
+      Some(description),
+      page,
+      refresh = None,
+      Message("site.saveAndContinue"),
+      None,
+      onSubmit
+    )
+
+  def apply[A](
+    title: Message,
+    heading: InlineMessage,
     page: A,
     details: Option[FurtherDetailsViewModel],
     onSubmit: Call

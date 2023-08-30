@@ -14,29 +14,20 @@
  * limitations under the License.
  */
 
-package forms.mappings.errors
+package pages.nonsipp.landorproperty
 
-import config.Constants._
+import play.api.libs.json.JsPath
+import models.SchemeId.Srn
+import models._
+import pages.QuestionPage
+import config.Refined.Max5000
+import utils.RefinedUtils._
+import eu.timepit.refined.refineMV
 
-case class InputFormErrors(
-  requiredKey: String,
-  invalidCharactersKey: String,
-  regex: String,
-  max: (Int, String),
-  args: Any*
-)
+case class LandRegistryTitleNumberPage(srn: Srn, index: Max5000)
+    extends QuestionPage[ConditionalYesNo[String, String]] {
 
-object InputFormErrors {
-  def textArea(
-    requiredKey: String,
-    invalidCharactersKey: String,
-    maxError: String,
-    args: Any*
-  ): InputFormErrors = InputFormErrors(
-    requiredKey,
-    invalidCharactersKey,
-    textAreaRegex,
-    (maxTextAreaLength, maxError),
-    args: _*
-  )
+  override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString
+
+  override def toString: String = "landRegistryTitleNumber"
 }
