@@ -46,4 +46,10 @@ object Constants {
   val maxLoanPeriod = 999
   val minPercentage = -999.99
   val maxPercentage = 999.99
+
+  val maxTextAreaLength = 160
+  val maxTitleNumberLength = 35
+
+  val textAreaRegex = """^[a-zA-Z0-9\-'" \t\r\n,.@/]+$"""
+  val titleNumberRegex = """^[a-zA-Z]{2,3}[0-9]+$"""
 }

@@ -30,13 +30,11 @@ import play.api.data.{FieldMapping, Mapping}
 import play.api.data.Forms.of
 import play.api.data.validation.{Constraint, Invalid, Valid}
 import uk.gov.hmrc.domain.Nino
+import config.Constants._
 
 import java.time.LocalDate
 
 trait Mappings extends Formatters with Constraints {
-
-  protected[forms] val textAreaRegex = """^[a-zA-Z0-9\-'" \t\r\n,.@/]+$"""
-  protected[forms] val textAreaMaxLength = 160
 
   def text(errorKey: String = "error.required", args: Seq[Any] = Seq.empty): Mapping[String] =
     of(stringFormatter(errorKey, args)).transform[String](_.trim, _.trim)
@@ -168,10 +166,18 @@ trait Mappings extends Formatters with Constraints {
   def input(formErrors: InputFormErrors): Mapping[String] =
     validatedText(
       formErrors.requiredKey,
-      textAreaRegex,
+      formErrors.regex,
       formErrors.invalidCharactersKey,
-      textAreaMaxLength,
-      formErrors.maxLengthErrorKey,
+      formErrors.max._1,
+      formErrors.max._2,
+      formErrors.args: _*
+    )
+
+  def textArea(formErrors: InputFormErrors): Mapping[String] =
+    textArea(
+      formErrors.requiredKey,
+      formErrors.invalidCharactersKey,
+      formErrors.max._2,
       formErrors.args: _*
     )
 
@@ -181,7 +187,7 @@ trait Mappings extends Formatters with Constraints {
     maxLengthNoKey: String,
     args: Any*
   ): Mapping[String] =
-    validatedText(requiredNoKey, textAreaRegex, invalidNoKey, textAreaMaxLength, maxLengthNoKey, args: _*)
+    validatedText(requiredNoKey, textAreaRegex, invalidNoKey, maxTextAreaLength, maxLengthNoKey, args: _*)
 
   def nino(
     requiredKey: String,

@@ -16,6 +16,7 @@
 
 package forms
 
+import config.Constants.{maxTextAreaLength, textAreaRegex}
 import models.RecipientDetails
 import play.api.data.Form
 import play.api.data.Forms._
@@ -50,7 +51,7 @@ class RecipientDetailsFormProvider @Inject()() extends Mappings {
         description -> text(descriptionRequired).verifying(
           firstError(
             regexp(textAreaRegex, descriptionInvalid),
-            maxLength(textAreaMaxLength, descriptionLength)
+            maxLength(maxTextAreaLength, descriptionLength)
           )
         )
       )(RecipientDetails.apply)(RecipientDetails.unapply)

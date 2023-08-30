@@ -1006,6 +1006,14 @@ companySellerName.error.required = Enter the seller’s company name
 companySellerName.error.invalid = Seller’s company name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
 companySellerName.error.tooLong = Seller’s company name must be 160 characters or fewer
 
+landOrPropertyAcquiredFrom.title = Who was the land or property acquired from?
+landOrPropertyAcquiredFrom.heading = Who was {0} acquired from?
+landOrPropertyAcquiredFrom.option1 = An individual
+landOrPropertyAcquiredFrom.option2 = A UK company
+landOrPropertyAcquiredFrom.option3 = A UK partnership
+landOrPropertyAcquiredFrom.option4 = Other
+landOrPropertyAcquiredFrom.error.required = Select who the land or property was acquired from
+
 landOrPropertySellerConnectedParty.title = Is the seller a connected party?
 landOrPropertySellerConnectedParty.heading = Is {0} a connected party?
 landOrPropertySellerConnectedParty.error.required = Select yes if the seller is a connected party
@@ -1021,3 +1029,15 @@ individualSellerNi.no.conditional.error.length = The reason you cannot provide t
 individualSellerNi.yes.conditional.error.required = Enter the seller’s National Insurance number
 individualSellerNi.yes.conditional.error.invalid = Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C
 
+landRegistryTitleNumber.title = Is there a title number for this land or property?
+landRegistryTitleNumber.heading = Is there a title number for {0}?
+landRegistryTitleNumber.hint = This is 2 or 3 letters followed by numbers, like MS123456. You can find it on Land Registry documents, like the title register, title plan and registered deeds.
+landRegistryTitleNumber.error.required = Select yes if there is a title number for this land or property
+landRegistryTitleNumber.yes.conditional = What is the title number?
+landRegistryTitleNumber.yes.conditional.error.required = Enter the title number
+landRegistryTitleNumber.yes.conditional.error.invalid = The title number must only include letters and numbers
+landRegistryTitleNumber.yes.conditional.error.length = The title number must be 35 characters or fewer
+landRegistryTitleNumber.no.conditional = Tell us why {0} does not have a title number
+landRegistryTitleNumber.no.conditional.error.required = Enter the reason this land or property does not have a title number
+landRegistryTitleNumber.no.conditional.error.invalid = The reason this land or property does not have a title number must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, full stops, hyphens, slashes, speech marks and spaces
+landRegistryTitleNumber.no.conditional.error.length = The reason this land or property does not have a title number must be 160 characters or fewer
