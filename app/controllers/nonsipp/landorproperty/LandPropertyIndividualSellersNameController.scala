@@ -86,7 +86,7 @@ class LandPropertyIndividualSellersNameController @Inject()(
 object LandPropertyIndividualSellersNameController {
   def form(formProvider: TextFormProvider): Form[String] = formProvider.textArea(
     "landPropertyIndividualSellersName.error.required",
-    "landPropertyIndividualSellersName.error.length",
+    "landPropertyIndividualSellersName.error.tooLong",
     "landPropertyIndividualSellersName.error.invalid"
   )
 

@@ -997,6 +997,6 @@ landOrPropertyLeaseDetails.field3.error.future = Date the lease was granted must
 landPropertyIndividualSellersName.title = What is the seller’s name?
 landPropertyIndividualSellersName.heading = What is the seller’s name?
 landPropertyIndividualSellersName.error.required = Enter the seller’s name
-landPropertyIndividualSellersName.error.length = Seller’s name must be 160 characters or fewer
+landPropertyIndividualSellersName.error.tooLong = Seller’s name must be 160 characters or fewer
 landPropertyIndividualSellersName.error.invalid = Seller’s name must only include letters a to z, hyphens, apostrophes and spaces
 
