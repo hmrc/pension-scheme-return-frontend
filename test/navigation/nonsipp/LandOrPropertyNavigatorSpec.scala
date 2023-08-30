@@ -115,7 +115,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateToWithIndex(
           index,
           LandPropertyIndividualSellersNamePage,
-          (srn, index: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          (srn, index: Max5000, _) => controllers.nonsipp.landorproperty.routes.IndividualSellerNiController.onPageLoad(srn, index, NormalMode)
         )
         .withName("go from land or property individual seller name page to ? page")
     )
