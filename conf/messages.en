@@ -993,3 +993,10 @@ landOrPropertyLeaseDetails.field3.error.required.two = Date the lease was grante
 landOrPropertyLeaseDetails.field3.error.invalid.date = Date the lease was granted must include must be a real date
 landOrPropertyLeaseDetails.field3.error.invalid.characters = Date the lease was granted must include must only include numbers 0 to 9
 landOrPropertyLeaseDetails.field3.error.future = Date the lease was granted must be before {0}
+
+landPropertyIndividualSellersName.title = What is the seller’s name?
+landPropertyIndividualSellersName.heading = What is the seller’s name?
+landPropertyIndividualSellersName.error.required = Enter the seller’s name
+landPropertyIndividualSellersName.error.length = Seller’s name must be 160 characters or fewer
+landPropertyIndividualSellersName.error.invalid = Seller’s name must only include letters a to z, hyphens, apostrophes and spaces
+

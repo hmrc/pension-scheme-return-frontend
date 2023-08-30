@@ -25,6 +25,10 @@ import pages.nonsipp.schemedesignatory.HowMuchCashPage
 
 trait PageGenerators {
 
+  implicit lazy val arbitraryLandPropertyIndividualSellersNamePage
+    : Arbitrary[LandPropertyIndividualSellersNamePage.type] =
+    Arbitrary(LandPropertyIndividualSellersNamePage)
+
   implicit lazy val arbitraryCheckReturnDatesPage: Arbitrary[CheckReturnDatesPage] =
     Arbitrary(ModelGenerators.srnGen.map(CheckReturnDatesPage))
 
