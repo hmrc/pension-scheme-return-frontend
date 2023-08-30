@@ -263,4 +263,19 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .withName("go from is land property leased page to unauthorised when no selected")
     )
   }
+
+  "IndividualSellerNi" - {
+
+    act.like(
+      normalmode
+        .navigateToWithIndex(
+          index,
+          IndividualSellerNiPage,
+          (srn, index: Max5000, mode) =>
+            controllers.nonsipp.landorproperty.routes.LandOrPropertySellerConnectedPartyController
+              .onPageLoad(srn, index, NormalMode)
+        )
+        .withName("go from individual sellerNi page to land Or property seller connected party page when yes selected")
+    )
+  }
 }

@@ -97,4 +97,15 @@ POST        /:srn/who-was-land-property-acquired-from/:index                 con
 GET        /:srn/is-seller-connected-party/:index                 controllers.nonsipp.landorproperty.LandOrPropertySellerConnectedPartyController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
 POST       /:srn/is-seller-connected-party/:index                 controllers.nonsipp.landorproperty.LandOrPropertySellerConnectedPartyController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
 GET        /:srn/change-is-seller-connected-party/:index          controllers.nonsipp.landorproperty.LandOrPropertySellerConnectedPartyController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
 POST       /:srn/change-is-seller-connected-party/:index          controllers.nonsipp.landorproperty.LandOrPropertySellerConnectedPartyController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST       /:srn/change-is-seller-connected-party/:index          controllers.nonsipp.landorproperty.LandOrPropertySellerConnectedPartyController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET        /:srn/individual-seller-ni-number                    controllers.nonsipp.landorproperty.IndividualSellerNiController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
+GET        /:srn/individual-seller-ni-number/:index               controllers.nonsipp.landorproperty.IndividualSellerNiController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST       /:srn/individual-seller-ni-number                    controllers.nonsipp.landorproperty.IndividualSellerNiController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
+POST       /:srn/individual-seller-ni-number/:index               controllers.nonsipp.landorproperty.IndividualSellerNiController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET        /:srn/change-individual-seller-ni-number              controllers.nonsipp.landorproperty.IndividualSellerNiController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
+GET        /:srn/change-individual-seller-ni-number/:index        controllers.nonsipp.landorproperty.IndividualSellerNiController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST       /:srn/change-individual-seller-ni-number               controllers.nonsipp.landorproperty.IndividualSellerNiController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
+POST       /:srn/change-individual-seller-ni-number/:index        controllers.nonsipp.landorproperty.IndividualSellerNiController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
