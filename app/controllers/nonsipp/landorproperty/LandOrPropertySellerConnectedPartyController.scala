@@ -24,11 +24,12 @@ import forms.YesNoPageFormProvider
 import models.Mode
 import models.SchemeId.Srn
 import navigation.Navigator
-import pages.nonsipp.landorproperty.LandOrPropertySellerConnectedPartyPage
+import pages.nonsipp.landorproperty.{LandOrPropertySellerConnectedPartyPage, LandPropertyIndividualSellersNamePage}
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
+import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 import views.html.YesNoPageView
@@ -51,8 +52,10 @@ class LandOrPropertySellerConnectedPartyController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      val preparedForm = request.userAnswers.fillForm(LandOrPropertySellerConnectedPartyPage(srn, index), form)
-      Ok(view(preparedForm, viewModel(srn, index, mode)))
+      request.usingAnswer(LandPropertyIndividualSellersNamePage(srn, index)).sync { individualName =>
+        val preparedForm = request.userAnswers.fillForm(LandOrPropertySellerConnectedPartyPage(srn, index), form)
+        Ok(view(preparedForm, viewModel(srn, index, individualName, mode)))
+      }
   }
 
   def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
@@ -60,7 +63,10 @@ class LandOrPropertySellerConnectedPartyController @Inject()(
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode)))),
+          formWithErrors =>
+            request.usingAnswer(LandPropertyIndividualSellersNamePage(srn, index)).async { individualName =>
+              Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, individualName, mode))))
+            },
           value =>
             for {
               updatedAnswers <- Future
@@ -78,9 +84,10 @@ object LandOrPropertySellerConnectedPartyController {
     "landOrPropertySellerConnectedParty.error.required"
   )
 
-  def viewModel(srn: Srn, index: Max5000, mode: Mode): FormPageViewModel[YesNoPageViewModel] = YesNoPageViewModel(
-    "landOrPropertySellerConnectedParty.title",
-    "landOrPropertySellerConnectedParty.heading",
-    controllers.nonsipp.landorproperty.routes.LandOrPropertySellerConnectedPartyController.onSubmit(srn, index, mode)
-  )
+  def viewModel(srn: Srn, index: Max5000, individualName: String, mode: Mode): FormPageViewModel[YesNoPageViewModel] =
+    YesNoPageViewModel(
+      "landOrPropertySellerConnectedParty.title",
+      Message("landOrPropertySellerConnectedParty.heading", individualName),
+      controllers.nonsipp.landorproperty.routes.LandOrPropertySellerConnectedPartyController.onSubmit(srn, index, mode)
+    )
 }
