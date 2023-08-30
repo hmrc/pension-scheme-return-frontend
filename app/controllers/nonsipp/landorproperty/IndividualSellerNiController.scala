@@ -24,7 +24,8 @@ import forms.mappings.Mappings
 import models.SchemeId.Srn
 import models.{ConditionalYesNo, Mode}
 import navigation.Navigator
-import pages.nonsipp.landorproperty.IndividualSellerNiPage
+import pages.nonsipp.landorproperty.{IndividualSellerNiPage, LandPropertyIndividualSellersNamePage}
+import pages.nonsipp.loansmadeoroutstanding.IndividualRecipientNamePage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -55,8 +56,10 @@ class IndividualSellerNiController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      val preparedForm = request.userAnswers.fillForm(IndividualSellerNiPage(srn, index), form)
-      Ok(view(preparedForm, viewModel(srn, index, mode)))
+      request.usingAnswer(LandPropertyIndividualSellersNamePage(srn, index)).sync { individualName =>
+        val preparedForm = request.userAnswers.fillForm(IndividualSellerNiPage(srn, index), form)
+        Ok(view(preparedForm, viewModel(srn, index, individualName, mode)))
+      }
     }
 
   def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
@@ -64,7 +67,10 @@ class IndividualSellerNiController @Inject()(
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode)))),
+          formWithErrors =>
+            request.usingAnswer(LandPropertyIndividualSellersNamePage(srn, index)).async { individualName =>
+              Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, individualName, mode))))
+            },
           value =>
             for {
               updatedAnswers <- Future
@@ -97,16 +103,17 @@ object IndividualSellerNiController {
   def viewModel(
     srn: Srn,
     index: Max5000,
+    individualName: String,
     mode: Mode
   ): FormPageViewModel[ConditionalYesNoPageViewModel] =
     FormPageViewModel[ConditionalYesNoPageViewModel](
       "individualSellerNi.title",
-      Message("individualSellerNi.heading", "John Smith"),
+      Message("individualSellerNi.heading", individualName),
       ConditionalYesNoPageViewModel(
         yes = YesNoViewModel
-          .Conditional(Message("individualSellerNi.yes.conditional", "John Smith"), FieldType.Input),
+          .Conditional(Message("individualSellerNi.yes.conditional", individualName), FieldType.Input),
         no = YesNoViewModel
-          .Conditional(Message("individualSellerNi.no.conditional", "John Smith"), FieldType.Textarea)
+          .Conditional(Message("individualSellerNi.no.conditional", individualName), FieldType.Textarea)
       ),
       routes.IndividualSellerNiController.onSubmit(srn, index, mode)
     )

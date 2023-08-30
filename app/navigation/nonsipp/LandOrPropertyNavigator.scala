@@ -17,7 +17,7 @@
 package navigation.nonsipp
 
 import eu.timepit.refined.refineMV
-import models.{NormalMode, SchemeHoldLandProperty, UserAnswers}
+import models.{IdentityType, NormalMode, SchemeHoldLandProperty, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.landorproperty._
@@ -67,9 +67,15 @@ object LandOrPropertyNavigator extends JourneyNavigator {
       }
 
     //27h1
-    case page @ PropertyAcquiredFromPage(srn, index) =>
+    case PropertyAcquiredFromPage(srn, index) =>
       //TODO change to 27h6 and all the different pages
-      controllers.routes.UnauthorisedController.onPageLoad()
+      userAnswers.get(PropertyAcquiredFromPage(srn, index)) match {
+        case Some(IdentityType.Individual) =>
+          controllers.nonsipp.landorproperty.routes.LandPropertyIndividualSellersNameController
+            .onPageLoad(srn, index, NormalMode)
+        case Some(_) =>
+          controllers.routes.UnauthorisedController.onPageLoad()
+      }
 
     case LandOrPropertyTotalCostPage(srn, index) =>
       controllers.nonsipp.landorproperty.routes.IsLandOrPropertyResidentialController.onPageLoad(srn, index, NormalMode)
@@ -97,6 +103,9 @@ object LandOrPropertyNavigator extends JourneyNavigator {
 
     case CompanySellerNamePage(srn, index) =>
       controllers.routes.UnauthorisedController.onPageLoad()
+
+    case LandPropertyIndividualSellersNamePage(srn, index) =>
+      controllers.nonsipp.landorproperty.routes.IndividualSellerNiController.onPageLoad(srn, index, NormalMode)
 
     case page @ IndividualSellerNiPage(srn, index) =>
       controllers.nonsipp.landorproperty.routes.LandOrPropertySellerConnectedPartyController
