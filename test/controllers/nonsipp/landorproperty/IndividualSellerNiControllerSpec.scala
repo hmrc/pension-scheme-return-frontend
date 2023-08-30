@@ -44,7 +44,7 @@ class IndividualSellerNiControllerSpec extends ControllerBaseSpec {
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       injected[ConditionalYesNoPageView]
-        .apply(form(injected[YesNoPageFormProvider]), viewModel(srn, index, NormalMode))
+        .apply(form(injected[YesNoPageFormProvider]), viewModel(srn, index, individualName, NormalMode))
     })
 
     act.like(
@@ -56,7 +56,7 @@ class IndividualSellerNiControllerSpec extends ControllerBaseSpec {
         injected[ConditionalYesNoPageView]
           .apply(
             form(injected[YesNoPageFormProvider]).fill(conditionalNo.value),
-            viewModel(srn, index, NormalMode)
+            viewModel(srn, index, individualName, NormalMode)
           )
       }
     )
