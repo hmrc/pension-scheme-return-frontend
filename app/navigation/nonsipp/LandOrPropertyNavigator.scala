@@ -69,10 +69,12 @@ object LandOrPropertyNavigator extends JourneyNavigator {
     //27h1
     case page @ PropertyAcquiredFromPage(srn, index) =>
       userAnswers.get(page) match {
-      //TODO change all the "UnauthorisedController.onPageLoad()" with actual controllers
+        //TODO change all the "UnauthorisedController.onPageLoad()" with actual controllers
         case Some(IdentityType.Individual) => controllers.routes.UnauthorisedController.onPageLoad() //27h2
-        case Some(IdentityType.UKCompany) =>controllers.nonsipp.landorproperty.routes.CompanySellerNameController.onPageLoad(srn,index, NormalMode)//27h4
-        case Some(IdentityType.UKPartnership) => controllers.routes.UnauthorisedController.onPageLoad()//27h6
+        case Some(IdentityType.UKCompany) =>
+          controllers.nonsipp.landorproperty.routes.CompanySellerNameController
+            .onPageLoad(srn, index, NormalMode) //27h4
+        case Some(IdentityType.UKPartnership) => controllers.routes.UnauthorisedController.onPageLoad() //27h6
         case _ => controllers.routes.UnauthorisedController.onPageLoad() //Others 27h8
 
       }
