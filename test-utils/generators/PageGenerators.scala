@@ -21,6 +21,7 @@ import models.NormalMode
 import org.scalacheck.Arbitrary
 import pages.nonsipp.CheckReturnDatesPage
 import pages.nonsipp.accountingperiod.AccountingPeriodPage
+import pages.nonsipp.landorproperty.LandPropertyIndividualSellersNamePage
 import pages.nonsipp.schemedesignatory.HowMuchCashPage
 
 trait PageGenerators {
