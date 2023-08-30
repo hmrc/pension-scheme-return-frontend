@@ -1017,7 +1017,7 @@ landOrPropertySellerConnectedParty.error.required = Select yes if the seller is 
 
 individualSellerNi.title = Do you know the seller’s National Insurance number?
 individualSellerNi.heading = Do you know {0}’s National Insurance number?
-individualSellerNi.yes.conditional = What is {0} National Insurance number?
+individualSellerNi.yes.conditional = What is {0}’s National Insurance number?
 individualSellerNi.no.conditional = Tell us why you cannot provide {0}’s National Insurance number
 individualSellerNi.error.required = Select yes if you know the seller’s National Insurance number
 individualSellerNi.no.conditional.error.required = Enter the reason you cannot provide the seller’s National Insurance number
