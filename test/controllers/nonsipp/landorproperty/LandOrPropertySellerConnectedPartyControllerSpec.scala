@@ -21,8 +21,8 @@ import controllers.ControllerBaseSpec
 import controllers.nonsipp.landorproperty.LandOrPropertySellerConnectedPartyController._
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
-import models.NormalMode
-import pages.nonsipp.landorproperty.LandOrPropertySellerConnectedPartyPage
+import models.{NormalMode, UserAnswers}
+import pages.nonsipp.landorproperty.{LandOrPropertySellerConnectedPartyPage, LandPropertyIndividualSellersNamePage}
 import views.html.YesNoPageView
 
 class LandOrPropertySellerConnectedPartyControllerSpec extends ControllerBaseSpec {
@@ -31,17 +31,27 @@ class LandOrPropertySellerConnectedPartyControllerSpec extends ControllerBaseSpe
   private lazy val onPageLoad = routes.LandOrPropertySellerConnectedPartyController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.LandOrPropertySellerConnectedPartyController.onSubmit(srn, index, NormalMode)
 
+  val userServicesWithIndividualName: UserAnswers =
+    defaultUserAnswers.unsafeSet(LandPropertyIndividualSellersNamePage(srn, index), individualName)
+
   "LandOrPropertySellerConnectedPartyController" - {
 
-    act.like(renderView(onPageLoad) { implicit app => implicit request =>
-      injected[YesNoPageView].apply(form(injected[YesNoPageFormProvider]), viewModel(srn, index, NormalMode))
+    act.like(renderView(onPageLoad, userServicesWithIndividualName) { implicit app => implicit request =>
+      injected[YesNoPageView]
+        .apply(form(injected[YesNoPageFormProvider]), viewModel(srn, index, individualName, NormalMode))
     })
 
-    act.like(renderPrePopView(onPageLoad, LandOrPropertySellerConnectedPartyPage(srn, index), true) {
-      implicit app => implicit request =>
+    act.like(
+      renderPrePopView(
+        onPageLoad,
+        LandOrPropertySellerConnectedPartyPage(srn, index),
+        true,
+        userServicesWithIndividualName
+      ) { implicit app => implicit request =>
         injected[YesNoPageView]
-          .apply(form(injected[YesNoPageFormProvider]).fill(true), viewModel(srn, index, NormalMode))
-    })
+          .apply(form(injected[YesNoPageFormProvider]).fill(true), viewModel(srn, index, individualName, NormalMode))
+      }
+    )
 
     act.like(redirectNextPage(onSubmit, "value" -> "true"))
     act.like(redirectNextPage(onSubmit, "value" -> "false"))
@@ -50,7 +60,7 @@ class LandOrPropertySellerConnectedPartyControllerSpec extends ControllerBaseSpe
 
     act.like(saveAndContinue(onSubmit, "value" -> "true"))
 
-    act.like(invalidForm(onSubmit))
+    act.like(invalidForm(onSubmit, userServicesWithIndividualName))
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }
 }

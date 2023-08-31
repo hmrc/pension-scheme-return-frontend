@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.landorproperty
+package pages
 
 import config.Refined.Max5000
-import models.SchemeId.Srn
-import models._
-import pages.QuestionPage
-import play.api.libs.json.JsPath
-import utils.RefinedUtils._
+import eu.timepit.refined.refineMV
+import pages.behaviours.PageBehaviours
+import pages.nonsipp.landorproperty.LandPropertyIndividualSellersNamePage
 
-case class LandRegistryTitleNumberPage(srn: Srn, index: Max5000)
-    extends QuestionPage[ConditionalYesNo[String, String]] {
+class LandPropertyIndividualSellersNamePageSpec extends PageBehaviours {
+  "LandPropertyIndividualSellersNamePage" - {
+    val srn = srnGen.sample.value
+    val index = refineMV[Max5000.Refined](1)
 
-  override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString
-
-  override def toString: String = "landRegistryTitleNumber"
+    beRetrievable[String](LandPropertyIndividualSellersNamePage(srn, index))
+    beSettable[String](LandPropertyIndividualSellersNamePage(srn, index))
+    beRemovable[String](LandPropertyIndividualSellersNamePage(srn, index))
+  }
 }

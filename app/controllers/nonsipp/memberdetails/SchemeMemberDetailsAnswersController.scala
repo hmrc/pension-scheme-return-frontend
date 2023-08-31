@@ -22,7 +22,7 @@ import config.Refined.Max300
 import controllers.actions._
 import controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController._
 import models.SchemeId.Srn
-import models.{CheckMode, CheckOrChange, Mode, NameDOB, NormalMode}
+import models.{CheckMode, CheckOrChange, NameDOB, NormalMode}
 import navigation.Navigator
 import pages.nonsipp.memberdetails._
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -50,19 +50,19 @@ class SchemeMemberDetailsAnswersController @Inject()(
 ) extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(srn: Srn, index: Max300, checkOrChange: CheckOrChange, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Max300, checkOrChange: CheckOrChange): Action[AnyContent] =
     identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData) { implicit request =>
       val result = for {
         memberDetails <- request.userAnswers.get(MemberDetailsPage(srn, index))
         hasNINO <- request.userAnswers.get(DoesMemberHaveNinoPage(srn, index))
         maybeNino <- Option.when(hasNINO)(request.userAnswers.get(MemberDetailsNinoPage(srn, index))).sequence
         maybeNoNinoReason <- Option.when(!hasNINO)(request.userAnswers.get(NoNINOPage(srn, index))).sequence
-      } yield Ok(view(viewModel(index, srn, mode, checkOrChange, memberDetails, hasNINO, maybeNino, maybeNoNinoReason)))
+      } yield Ok(view(viewModel(index, srn, checkOrChange, memberDetails, hasNINO, maybeNino, maybeNoNinoReason)))
 
       result.getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
     }
 
-  def onSubmit(srn: Srn, index: Max300, checkOrChange: CheckOrChange, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Max300, checkOrChange: CheckOrChange): Action[AnyContent] =
     identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData) { implicit request =>
       Redirect(navigator.nextPage(SchemeMemberDetailsAnswersPage(srn), NormalMode, request.userAnswers))
     }
@@ -73,7 +73,6 @@ object SchemeMemberDetailsAnswersController {
   private def rows(
     index: Max300,
     srn: Srn,
-    mode: Mode,
     memberDetails: NameDOB,
     hasNINO: Boolean,
     maybeNino: Option[Nino],
@@ -143,7 +142,6 @@ object SchemeMemberDetailsAnswersController {
   def viewModel(
     index: Max300,
     srn: Srn,
-    mode: Mode,
     checkOrChange: CheckOrChange,
     memberDetails: NameDOB,
     hasNINO: Boolean,
@@ -157,7 +155,7 @@ object SchemeMemberDetailsAnswersController {
         change = Message("changeMemberDetails.heading", memberDetails.fullName)
       ),
       CheckYourAnswersViewModel.singleSection(
-        rows(index, srn, mode, memberDetails, hasNINO, maybeNino, maybeNoNinoReason)
+        rows(index, srn, memberDetails, hasNINO, maybeNino, maybeNoNinoReason)
       ),
       routes.SchemeMemberDetailsAnswersController.onSubmit(srn, index, checkOrChange)
     ).withButtonText(Message("site.continue"))

@@ -14,19 +14,16 @@
  * limitations under the License.
  */
 
-package models
+package pages.nonsipp.landorproperty
 
-import play.api.mvc.JavascriptLiteral
+import config.Refined.Max5000
+import models.IdentityType
+import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
+import utils.RefinedUtils.RefinedIntOps
 
-sealed trait Mode
-
-case object CheckMode extends Mode
-case object NormalMode extends Mode
-
-object Mode {
-
-  implicit val jsLiteral: JavascriptLiteral[Mode] = {
-    case NormalMode => "NormalMode"
-    case CheckMode => "CheckMode"
-  }
+case class LandPropertyIndividualSellersNamePage(srn: Srn, index: Max5000) extends QuestionPage[String] {
+  override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString
+  override def toString: String = "individualSellerName"
 }

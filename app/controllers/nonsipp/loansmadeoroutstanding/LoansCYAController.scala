@@ -18,9 +18,9 @@ package controllers.nonsipp.loansmadeoroutstanding
 
 import cats.implicits.toShow
 import config.Refined.Max5000
+import controllers.PSRController
 import controllers.actions._
 import controllers.nonsipp.loansmadeoroutstanding.LoansCYAController._
-import controllers.PSRController
 import models.ConditionalYesNo._
 import models.SchemeId.Srn
 import models.{Security, _}
@@ -36,7 +36,6 @@ import viewmodels.DisplayMessage._
 import viewmodels.implicits._
 import viewmodels.models._
 import views.html.CheckYourAnswersView
-import utils.Tuple2Utils._
 
 import java.time.LocalDate
 import javax.inject.{Inject, Named}
@@ -53,8 +52,7 @@ class LoansCYAController @Inject()(
   def onPageLoad(
     srn: Srn,
     index: Max5000,
-    checkOrChange: CheckOrChange,
-    mode: Mode
+    checkOrChange: CheckOrChange
   ): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       (
@@ -81,10 +79,8 @@ class LoansCYAController @Inject()(
           ).flatten.headOption
           connectedParty = if (request.userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, index)).isEmpty) {
             Right(request.userAnswers.get(RecipientSponsoringEmployerConnectedPartyPage(srn, index)).get)
-          } else if (request.userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, index)).get) {
-            Left(request.userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, index)).get)
           } else {
-            Right(request.userAnswers.get(RecipientSponsoringEmployerConnectedPartyPage(srn, index)).get)
+            Left(request.userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, index)).get)
           }
           datePeriodLoan <- request.userAnswers.get(DatePeriodLoanPage(srn, index)).getOrRecoverJourney
           loanAmount <- request.userAnswers.get(AmountOfTheLoanPage(srn, index)).getOrRecoverJourney
@@ -117,8 +113,7 @@ class LoansCYAController @Inject()(
                 loanInterest,
                 outstandingArrearsOnLoan,
                 securityOnLoan,
-                checkOrChange,
-                mode
+                checkOrChange
               )
             )
           )
@@ -126,9 +121,9 @@ class LoansCYAController @Inject()(
       ).merge
     }
 
-  def onSubmit(srn: Srn, checkOrChange: CheckOrChange, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, checkOrChange: CheckOrChange): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      Redirect(navigator.nextPage(LoansCYAPage(srn), mode, request.userAnswers))
+      Redirect(navigator.nextPage(LoansCYAPage(srn), NormalMode, request.userAnswers))
     }
 }
 
@@ -147,8 +142,7 @@ case class ViewModelParameters(
   loanInterest: (Money, Percentage, Money),
   outstandingArrearsOnLoan: Option[Money],
   securityOnLoan: Option[Security],
-  checkOrChange: CheckOrChange,
-  mode: Mode
+  checkOrChange: CheckOrChange
 )
 object LoansCYAController {
   def viewModel(parameters: ViewModelParameters): FormPageViewModel[CheckYourAnswersViewModel] =
@@ -177,7 +171,7 @@ object LoansCYAController {
           parameters.loanInterest,
           parameters.outstandingArrearsOnLoan,
           parameters.securityOnLoan,
-          parameters.mode
+          CheckMode
         )
       ),
       refresh = None,
@@ -308,23 +302,21 @@ object LoansCYAController {
     ) = connectedParty match {
 
       case Left(value) =>
-        (
-          if (value) {
-            (
-              Message("loanCheckYourAnswers.section1.isIndividualRecipient.yes", recipientName),
-              "Yes",
-              "",
-              routes.IsIndividualRecipientConnectedPartyController.onPageLoad(srn, index, mode).url
-            )
-          } else {
-            (
-              Message("loanCheckYourAnswers.section1.isIndividualRecipient.no", recipientName),
-              "No",
-              "",
-              routes.IsIndividualRecipientConnectedPartyController.onPageLoad(srn, index, mode).url
-            )
-          }
-        )
+        if (value) {
+          (
+            Message("loanCheckYourAnswers.section1.isIndividualRecipient.yes", recipientName),
+            "Yes",
+            "",
+            routes.IsIndividualRecipientConnectedPartyController.onPageLoad(srn, index, mode).url
+          )
+        } else {
+          (
+            Message("loanCheckYourAnswers.section1.isIndividualRecipient.no", recipientName),
+            "No",
+            "",
+            routes.IsIndividualRecipientConnectedPartyController.onPageLoad(srn, index, mode).url
+          )
+        }
 
       case Right(SponsoringOrConnectedParty.Sponsoring) =>
         (
