@@ -22,7 +22,7 @@ import controllers.nonsipp.common.IdentityTypeController._
 import forms.RadioListFormProvider
 import models.IdentityType.{Individual, Other, UKCompany, UKPartnership}
 import models.SchemeId.Srn
-import models.{IdentitySubject, IdentityType, Mode, NormalMode, UserAnswers}
+import models.{IdentitySubject, IdentityType, Mode, UserAnswers}
 import navigation.Navigator
 import pages.nonsipp.common.IdentityTypePage
 import pages.nonsipp.landorproperty.LandPropertyInUKPage
@@ -84,7 +84,7 @@ class IdentityTypeController @Inject()(
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(IdentityTypePage(srn, index, subject), answer))
             _ <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage(IdentityTypePage(srn, index, subject), NormalMode, updatedAnswers))
+          } yield Redirect(navigator.nextPage(IdentityTypePage(srn, index, subject), mode, updatedAnswers))
         }
       )
   }

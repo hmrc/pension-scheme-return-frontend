@@ -19,7 +19,7 @@ package controllers.nonsipp.memberdetails
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController._
 import eu.timepit.refined.refineMV
-import models.{CheckOrChange, NormalMode}
+import models.CheckOrChange
 import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsNinoPage, MemberDetailsPage, NoNINOPage}
 import viewmodels.DisplayMessage.Message
 import views.html.CheckYourAnswersView
@@ -52,7 +52,7 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
           implicit app =>
             implicit request =>
               injected[CheckYourAnswersView].apply(
-                viewModel(refineMV(1), srn, NormalMode, checkOrChange, memberDetails, hasNINO = true, Some(nino), None)
+                viewModel(refineMV(1), srn, checkOrChange, memberDetails, hasNINO = true, Some(nino), None)
               )
         ).withName(s"render correct ${checkOrChange.name} view when nino provided")
       )
@@ -65,7 +65,6 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
                 viewModel(
                   refineMV(1),
                   srn,
-                  NormalMode,
                   checkOrChange,
                   memberDetails,
                   hasNINO = false,
@@ -118,7 +117,6 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
         viewModel(
           refineMV(1),
           srn,
-          NormalMode,
           checkOrChange,
           memberDetails,
           hasNINO = true,
@@ -149,7 +147,7 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
 
       "contain all rows if has nino is true and nino is present" in {
         val vm =
-          viewModel(refineMV(1), srn, NormalMode, CheckOrChange.Check, memberDetails, hasNINO = true, Some(nino), None)
+          viewModel(refineMV(1), srn, CheckOrChange.Check, memberDetails, hasNINO = true, Some(nino), None)
         vm.page.sections.map(_.rows.size).sum mustBe 5
       }
 
@@ -158,7 +156,6 @@ class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
           viewModel(
             refineMV(1),
             srn,
-            NormalMode,
             CheckOrChange.Check,
             memberDetails,
             hasNINO = false,
