@@ -14,26 +14,23 @@
  * limitations under the License.
  */
 
-package pages
+package pages.nonsipp.landorproperty
 
 import config.Refined.OneTo5000
 import eu.timepit.refined.refineMV
-import models._
+import models.Money
 import pages.behaviours.PageBehaviours
-import pages.nonsipp.landorproperty.LandOrPropertyLeaseDetailsPage
 
-import java.time.LocalDate
+class LandOrPropertyTotalCostPageSpec extends PageBehaviours {
 
-class LandOrPropertyLeaseDetailsPageSpec extends PageBehaviours {
-
-  "LandOrPropertyLeaseDetailsPage" - {
+  "LandOrPropertyTotalCostPage" - {
 
     val index = refineMV[OneTo5000](1)
 
-    beRetrievable[(String, Money, LocalDate)](LandOrPropertyLeaseDetailsPage(srnGen.sample.value, index))
+    beRetrievable[Money](LandOrPropertyTotalCostPage(srnGen.sample.value, index))
 
-    beSettable[(String, Money, LocalDate)](LandOrPropertyLeaseDetailsPage(srnGen.sample.value, index))
+    beSettable[Money](LandOrPropertyTotalCostPage(srnGen.sample.value, index))
 
-    beRemovable[(String, Money, LocalDate)](LandOrPropertyLeaseDetailsPage(srnGen.sample.value, index))
+    beRemovable[Money](LandOrPropertyTotalCostPage(srnGen.sample.value, index))
   }
 }
