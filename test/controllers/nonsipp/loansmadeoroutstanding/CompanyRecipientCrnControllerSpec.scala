@@ -18,7 +18,7 @@ package controllers.nonsipp.loansmadeoroutstanding
 
 import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.loansmadeoroutstanding.CompanyRecipientCrnController._
+import controllers.nonsipp.common.CompanyRecipientCrnController._
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.{ConditionalYesNo, Crn, NormalMode}
@@ -29,8 +29,10 @@ class CompanyRecipientCrnControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[OneTo5000](1)
 
-  private lazy val onPageLoad = routes.CompanyRecipientCrnController.onPageLoad(srn, index, NormalMode)
-  private lazy val onSubmit = routes.CompanyRecipientCrnController.onSubmit(srn, index, NormalMode)
+  private lazy val onPageLoad =
+    controllers.nonsipp.common.routes.CompanyRecipientCrnController.onPageLoad(srn, index, NormalMode)
+  private lazy val onSubmit =
+    controllers.nonsipp.common.routes.CompanyRecipientCrnController.onSubmit(srn, index, NormalMode)
 
   val userAnswersWithCompanyName = defaultUserAnswers.unsafeSet(CompanyRecipientNamePage(srn, index), companyName)
 

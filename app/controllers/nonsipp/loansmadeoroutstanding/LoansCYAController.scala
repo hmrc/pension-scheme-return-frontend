@@ -259,7 +259,7 @@ object LoansCYAController {
         case IdentityType.UKCompany =>
           (
             Message("loanCheckYourAnswers.section1.recipientDetails.crn", recipientName),
-            routes.CompanyRecipientCrnController.onPageLoad(srn, index, mode).url,
+            controllers.nonsipp.common.routes.CompanyRecipientCrnController.onPageLoad(srn, index, mode).url,
             "loanCheckYourAnswers.section1.recipientDetails.crn.hidden",
             "loanCheckYourAnswers.section1.recipientDetails.noCrnReason.hidden"
           )
@@ -285,7 +285,7 @@ object LoansCYAController {
           routes.IndividualRecipientNinoController.onPageLoad(srn, index, mode).url
       case IdentityType.UKCompany =>
         Message("loanCheckYourAnswers.section1.recipientDetails.noCrnReason", recipientName) ->
-          routes.CompanyRecipientCrnController.onPageLoad(srn, index, mode).url
+          controllers.nonsipp.common.routes.CompanyRecipientCrnController.onPageLoad(srn, index, mode).url
       case IdentityType.UKPartnership =>
         Message("loanCheckYourAnswers.section1.recipientDetails.noUtrReason", recipientName) ->
           routes.PartnershipRecipientUtrController.onPageLoad(srn, index, mode).url

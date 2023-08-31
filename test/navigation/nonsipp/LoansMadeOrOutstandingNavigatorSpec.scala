@@ -192,7 +192,7 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
           .navigateToWithIndex(
             index,
             CompanyRecipientNamePage,
-            controllers.nonsipp.loansmadeoroutstanding.routes.CompanyRecipientCrnController.onPageLoad
+            controllers.nonsipp.common.routes.CompanyRecipientCrnController.onPageLoad
           )
           .withName("go from company recipient name page to company crn page")
       )

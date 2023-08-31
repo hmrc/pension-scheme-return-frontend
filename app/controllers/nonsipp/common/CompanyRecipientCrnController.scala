@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.loansmadeoroutstanding
+package controllers.nonsipp.common
 
 import config.Refined.Max5000
 import controllers.actions._
-import controllers.nonsipp.loansmadeoroutstanding.CompanyRecipientCrnController._
+import controllers.nonsipp.common.CompanyRecipientCrnController._
+import controllers.nonsipp.loansmadeoroutstanding.routes
 import forms.YesNoPageFormProvider
 import forms.mappings.Mappings
 import models.SchemeId.Srn
@@ -108,6 +109,6 @@ object CompanyRecipientCrnController {
         yes = YesNoViewModel.Conditional(Message("companyRecipientCrn.yes.conditional", companyName), FieldType.Input),
         no = YesNoViewModel.Conditional(Message("companyRecipientCrn.no.conditional", companyName), FieldType.Textarea)
       ).withHint("companyRecipientCrn.hint"),
-      routes.CompanyRecipientCrnController.onSubmit(srn, index, mode)
+      controllers.nonsipp.common.routes.CompanyRecipientCrnController.onSubmit(srn, index, mode)
     )
 }

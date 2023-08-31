@@ -73,7 +73,7 @@ object LoansMadeOrOutstandingNavigator extends JourneyNavigator {
         .onPageLoad(srn, index, NormalMode)
 
     case CompanyRecipientNamePage(srn, index) =>
-      controllers.nonsipp.loansmadeoroutstanding.routes.CompanyRecipientCrnController.onPageLoad(srn, index, NormalMode)
+      controllers.nonsipp.common.routes.CompanyRecipientCrnController.onPageLoad(srn, index, NormalMode)
 
     case CompanyRecipientCrnPage(srn, index) =>
       controllers.nonsipp.loansmadeoroutstanding.routes.RecipientSponsoringEmployerConnectedPartyController
