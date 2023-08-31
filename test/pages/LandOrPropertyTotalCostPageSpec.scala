@@ -16,17 +16,17 @@
 
 package pages
 
-import pages.behaviours.PageBehaviours
-import models.Money
-import config.Refined.Max5000
-import pages.nonsipp.landorproperty.LandOrPropertyTotalCostPage
+import config.Refined.OneTo5000
 import eu.timepit.refined.refineMV
+import models.Money
+import pages.behaviours.PageBehaviours
+import pages.nonsipp.landorproperty.LandOrPropertyTotalCostPage
 
 class LandOrPropertyTotalCostPageSpec extends PageBehaviours {
 
   "LandOrPropertyTotalCostPage" - {
 
-    val index = refineMV[Max5000.Refined](1)
+    val index = refineMV[OneTo5000](1)
 
     beRetrievable[Money](LandOrPropertyTotalCostPage(srnGen.sample.value, index))
 

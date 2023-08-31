@@ -21,8 +21,6 @@ import eu.timepit.refined.boolean.And
 import eu.timepit.refined.numeric.{Greater, LessEqual}
 
 object Refined {
-  type OneToTen = Greater[0] And LessEqual[10]
-  type Max10 = Int Refined OneToTen
 
   type OneToThree = Greater[0] And LessEqual[3]
   type Max3 = Int Refined OneToThree
@@ -31,9 +29,6 @@ object Refined {
   type Max300 = Int Refined OneTo300
 
   type OneTo5000 = Greater[0] And LessEqual[5000]
+  type Max5000 = Int Refined OneTo5000
 
-  object Max5000 {
-    type Refined = Greater[0] And LessEqual[5000]
-  }
-  type Max5000 = Int Refined Max5000.Refined
 }

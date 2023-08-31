@@ -16,9 +16,9 @@
 
 package controllers.nonsipp.landorproperty
 
-import config.Refined.Max5000
-import controllers.nonsipp.landorproperty.IsLandPropertyLeasedController._
+import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
+import controllers.nonsipp.landorproperty.IsLandPropertyLeasedController._
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.NormalMode
@@ -27,7 +27,7 @@ import views.html.YesNoPageView
 
 class IsLandPropertyLeasedControllerSpec extends ControllerBaseSpec {
 
-  private val index = refineMV[Max5000.Refined](1)
+  private val index = refineMV[OneTo5000](1)
 
   private lazy val onPageLoad = routes.IsLandPropertyLeasedController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.IsLandPropertyLeasedController.onSubmit(srn, index, NormalMode)

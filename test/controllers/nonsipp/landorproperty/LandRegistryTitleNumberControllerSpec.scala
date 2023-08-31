@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.landorproperty
 
-import config.Refined.Max5000
+import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.landorproperty.LandRegistryTitleNumberController._
 import eu.timepit.refined.refineMV
@@ -27,7 +27,7 @@ import views.html._
 
 class LandRegistryTitleNumberControllerSpec extends ControllerBaseSpec {
 
-  private val index = refineMV[Max5000.Refined](1)
+  private val index = refineMV[OneTo5000](1)
   private lazy val onPageLoad = routes.LandRegistryTitleNumberController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.LandRegistryTitleNumberController.onSubmit(srn, index, NormalMode)
 
