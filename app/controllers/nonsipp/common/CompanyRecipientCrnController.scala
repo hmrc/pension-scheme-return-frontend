@@ -19,13 +19,13 @@ package controllers.nonsipp.common
 import config.Refined.Max5000
 import controllers.actions._
 import controllers.nonsipp.common.CompanyRecipientCrnController._
-import controllers.nonsipp.loansmadeoroutstanding.routes
 import forms.YesNoPageFormProvider
 import forms.mappings.Mappings
 import models.SchemeId.Srn
 import models.{ConditionalYesNo, Crn, Mode}
 import navigation.Navigator
-import pages.nonsipp.loansmadeoroutstanding.{CompanyRecipientCrnPage, CompanyRecipientNamePage}
+import pages.nonsipp.common.CompanyRecipientCrnPage
+import pages.nonsipp.loansmadeoroutstanding.CompanyRecipientNamePage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}

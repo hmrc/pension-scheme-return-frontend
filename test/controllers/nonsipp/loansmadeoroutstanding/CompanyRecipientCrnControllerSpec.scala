@@ -22,7 +22,8 @@ import controllers.nonsipp.common.CompanyRecipientCrnController._
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.{ConditionalYesNo, Crn, NormalMode}
-import pages.nonsipp.loansmadeoroutstanding.{CompanyRecipientCrnPage, CompanyRecipientNamePage}
+import pages.nonsipp.common.CompanyRecipientCrnPage
+import pages.nonsipp.loansmadeoroutstanding.CompanyRecipientNamePage
 import views.html.ConditionalYesNoPageView
 
 class CompanyRecipientCrnControllerSpec extends ControllerBaseSpec {

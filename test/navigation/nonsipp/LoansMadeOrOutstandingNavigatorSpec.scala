@@ -24,7 +24,7 @@ import models.ConditionalYesNo._
 import models.SchemeId.Srn
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.common.IdentityTypePage
+import pages.nonsipp.common.{CompanyRecipientCrnPage, IdentityTypePage}
 import pages.nonsipp.loansmadeoroutstanding._
 import utils.BaseSpec
 import utils.UserAnswersUtils.UserAnswersOps
