@@ -74,7 +74,11 @@ object LandOrPropertyNavigator extends JourneyNavigator {
         case Some(IdentityType.UKCompany) =>
           controllers.nonsipp.landorproperty.routes.CompanySellerNameController
             .onPageLoad(srn, index, NormalMode) //27h4
-        case Some(IdentityType.UKPartnership) => controllers.routes.UnauthorisedController.onPageLoad() //27h6
+
+        case Some(IdentityType.UKPartnership) =>
+          controllers.nonsipp.landorproperty.routes.PartnershipSellerNameController
+            .onPageLoad(srn, index, NormalMode) //27h6
+
         case _ => controllers.routes.UnauthorisedController.onPageLoad() //Others 27h8
 
       }
