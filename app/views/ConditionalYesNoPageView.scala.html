@@ -101,6 +101,7 @@
             field = form(key),
             label = LabelViewModel(renderMessage(message))
         )
+        .withId(key)
         .asNumeric()
         .withWidth(InputWidth.Fixed10)
         .withPrefix(PrefixOrSuffix(content = Text("£")))

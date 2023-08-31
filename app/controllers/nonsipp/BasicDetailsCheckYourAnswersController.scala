@@ -29,13 +29,9 @@ import navigation.Navigator
 import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, HowManyMembersPage, WhyNoBankAccountPage}
 import pages.nonsipp.{BasicDetailsCheckYourAnswersPage, WhichTaxYearPage}
 import play.api.i18n._
-import play.api.libs.json.Reads
 import play.api.mvc._
-import queries.Gettable
 import services.{PSRSubmissionService, SchemeDateService}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.DateTimeUtils.localDateShow
-import utils.FutureUtils.FutureOps
 import utils.ListUtils.ListOps
 import viewmodels.DisplayMessage._
 import viewmodels.implicits._

@@ -100,13 +100,13 @@ POST        /:srn/national-insurance-number/:index                              
 GET         /:srn/change-national-insurance-number/:index                               controllers.nonsipp.memberdetails.DoesSchemeMemberHaveNINOController.onPageLoad(srn: Srn, index: Max300, mode: Mode = CheckMode)
 POST        /:srn/change-national-insurance-number/:index                               controllers.nonsipp.memberdetails.DoesSchemeMemberHaveNINOController.onSubmit(srn: Srn, index: Max300, mode: Mode = CheckMode)
 
-GET         /:srn/check-member-details                                                  controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onPageLoad(srn: Srn, index: Max300 = 1, checkOrChange: CheckOrChange = Check, mode: Mode = NormalMode)
-GET         /:srn/check-member-details/:index                                           controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onPageLoad(srn: Srn, index: Max300, checkOrChange: CheckOrChange = Check, mode: Mode = NormalMode)
-POST        /:srn/check-member-details/:index                                           controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onSubmit(srn: Srn, index: Max300, checkOrChange: CheckOrChange = Check, mode: Mode = NormalMode)
+GET         /:srn/check-member-details                                                  controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onPageLoad(srn: Srn, index: Max300 = 1, checkOrChange: CheckOrChange = Check)
+GET         /:srn/check-member-details/:index                                           controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onPageLoad(srn: Srn, index: Max300, checkOrChange: CheckOrChange = Check)
+POST        /:srn/check-member-details/:index                                           controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onSubmit(srn: Srn, index: Max300, checkOrChange: CheckOrChange = Check)
 
-GET         /:srn/change-member-details                                                 controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onPageLoad(srn: Srn, index: Max300 = 1, checkOrChange: CheckOrChange = Change, mode: Mode = NormalMode)
-GET         /:srn/change-member-details/:index                                          controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onPageLoad(srn: Srn, index: Max300, checkOrChange: CheckOrChange = Change, mode: Mode = NormalMode)
-POST        /:srn/change-member-details/:index                                          controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onSubmit(srn: Srn, index: Max300, checkOrChange: CheckOrChange = Change, mode: Mode = NormalMode)
+GET         /:srn/change-member-details                                                 controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onPageLoad(srn: Srn, index: Max300 = 1, checkOrChange: CheckOrChange = Change)
+GET         /:srn/change-member-details/:index                                          controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onPageLoad(srn: Srn, index: Max300, checkOrChange: CheckOrChange = Change)
+POST        /:srn/change-member-details/:index                                          controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController.onSubmit(srn: Srn, index: Max300, checkOrChange: CheckOrChange = Change)
 
 GET         /:srn/how-many-members                                                      controllers.nonsipp.schemedesignatory.HowManyMembersController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST        /:srn/how-many-members                                                      controllers.nonsipp.schemedesignatory.HowManyMembersController.onSubmit(srn: Srn, mode: Mode = NormalMode)
@@ -423,12 +423,12 @@ GET         /:srn/change-amount-of-loan-payments/:index                         
 POST        /:srn/change-amount-of-loan-payments                                        controllers.nonsipp.loansmadeoroutstanding.AmountOfTheLoanController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
 POST        /:srn/change-amount-of-loan-payments/:index                                 controllers.nonsipp.loansmadeoroutstanding.AmountOfTheLoanController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 
-GET         /:srn/check-answers-loan                                                    controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onPageLoad(srn: Srn, index: Max5000 = 1, checkOrChange: CheckOrChange = Check, mode: Mode = NormalMode)
-GET         /:srn/check-answers-loan/:index                                             controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onPageLoad(srn: Srn, index: Max5000, checkOrChange: CheckOrChange = Check, mode: Mode = NormalMode)
-GET         /:srn/submit-check-answers-loan                                             controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onSubmit(srn: Srn, checkOrChange: CheckOrChange = Check, mode: Mode = NormalMode)
-GET         /:srn/change-check-answers-loan                                             controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onPageLoad(srn: Srn, index: Max5000 = 1, checkOrChange: CheckOrChange = Change, mode: Mode = NormalMode)
-GET         /:srn/change-check-answers-loan/:index                                      controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onPageLoad(srn: Srn, index: Max5000, checkOrChange: CheckOrChange = Change, mode: Mode = NormalMode)
-GET         /:srn/change-submit-check-answers-loan                                      controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onSubmit(srn: Srn, checkOrChange: CheckOrChange = Change, mode: Mode = NormalMode)
+GET         /:srn/check-answers-loan                                                    controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onPageLoad(srn: Srn, index: Max5000 = 1, checkOrChange: CheckOrChange = Check)
+GET         /:srn/check-answers-loan/:index                                             controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onPageLoad(srn: Srn, index: Max5000, checkOrChange: CheckOrChange = Check)
+POST        /:srn/submit-check-answers-loan                                             controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onSubmit(srn: Srn, checkOrChange: CheckOrChange = Check)
+GET         /:srn/change-check-answers-loan                                             controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onPageLoad(srn: Srn, index: Max5000 = 1, checkOrChange: CheckOrChange = Change)
+GET         /:srn/change-check-answers-loan/:index                                      controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onPageLoad(srn: Srn, index: Max5000, checkOrChange: CheckOrChange = Change)
+POST        /:srn/change-submit-check-answers-loan                                      controllers.nonsipp.loansmadeoroutstanding.LoansCYAController.onSubmit(srn: Srn, checkOrChange: CheckOrChange = Change)
 
 GET         /:srn/outstanding-arrears-on-loan                                           controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
 GET         /:srn/outstanding-arrears-on-loan/:index                                    controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)

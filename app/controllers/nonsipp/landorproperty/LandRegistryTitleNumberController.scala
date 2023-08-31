@@ -16,29 +16,29 @@
 
 package controllers.nonsipp.landorproperty
 
-import controllers.actions._
-import forms.YesNoPageFormProvider
-import models._
-import models.SchemeId.Srn
-import navigation.Navigator
-import play.api.data.Form
+import config.Constants._
+import config.Refined.Max5000
 import controllers.PSRController
-import viewmodels.models._
+import controllers.actions._
+import controllers.nonsipp.landorproperty.LandRegistryTitleNumberController._
+import forms.YesNoPageFormProvider
+import forms.mappings.Mappings
+import forms.mappings.errors._
+import models.SchemeId.Srn
+import models._
+import navigation.Navigator
+import pages.nonsipp.landorproperty.{LandOrPropertyAddressLookupPage, LandRegistryTitleNumberPage}
+import play.api.data.Form
 import play.api.i18n._
 import play.api.mvc._
-import views.html.ConditionalYesNoPageView
 import services.SaveService
+import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
-import pages.nonsipp.landorproperty.{LandOrPropertyAddressLookupPage, LandRegistryTitleNumberPage}
-import LandRegistryTitleNumberController._
+import viewmodels.models._
+import views.html.ConditionalYesNoPageView
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
-import forms.mappings.Mappings
-import forms.mappings.errors._
-import config.Refined.Max5000
-import viewmodels.DisplayMessage.{Message, ParagraphMessage}
-import config.Constants._
 
 class LandRegistryTitleNumberController @Inject()(
   override val messagesApi: MessagesApi,

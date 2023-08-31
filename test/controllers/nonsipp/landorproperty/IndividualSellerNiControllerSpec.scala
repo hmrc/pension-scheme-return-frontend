@@ -22,7 +22,8 @@ import controllers.nonsipp.landorproperty.IndividualSellerNiController._
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.{ConditionalYesNo, NormalMode}
-import pages.nonsipp.landorproperty.IndividualSellerNiPage
+import pages.nonsipp.landorproperty.{IndividualSellerNiPage, LandPropertyIndividualSellersNamePage}
+import pages.nonsipp.loansmadeoroutstanding.IndividualRecipientNamePage
 import uk.gov.hmrc.domain.Nino
 import views.html.ConditionalYesNoPageView
 
@@ -37,26 +38,30 @@ class IndividualSellerNiControllerSpec extends ControllerBaseSpec {
     controllers.nonsipp.landorproperty.routes.IndividualSellerNiController
       .onSubmit(srn, index, NormalMode)
 
+  val userAnswersWithIndividualName =
+    defaultUserAnswers.unsafeSet(LandPropertyIndividualSellersNamePage(srn, index), individualName)
+
   val conditionalNo: ConditionalYesNo[String, Nino] = ConditionalYesNo.no("reason")
   val conditionalYes: ConditionalYesNo[String, Nino] = ConditionalYesNo.yes(nino)
 
   "IndividualSellerNiController" - {
 
-    act.like(renderView(onPageLoad) { implicit app => implicit request =>
+    act.like(renderView(onPageLoad, userAnswersWithIndividualName) { implicit app => implicit request =>
       injected[ConditionalYesNoPageView]
-        .apply(form(injected[YesNoPageFormProvider]), viewModel(srn, index, NormalMode))
+        .apply(form(injected[YesNoPageFormProvider]), viewModel(srn, index, individualName, NormalMode))
     })
 
     act.like(
       renderPrePopView(
         onPageLoad,
         IndividualSellerNiPage(srn, index),
-        conditionalNo
+        conditionalNo,
+        userAnswersWithIndividualName
       ) { implicit app => implicit request =>
         injected[ConditionalYesNoPageView]
           .apply(
             form(injected[YesNoPageFormProvider]).fill(conditionalNo.value),
-            viewModel(srn, index, NormalMode)
+            viewModel(srn, index, individualName, NormalMode)
           )
       }
     )
@@ -68,6 +73,7 @@ class IndividualSellerNiControllerSpec extends ControllerBaseSpec {
 
     act.like(saveAndContinue(onSubmit, "value" -> "true", "value.yes" -> nino.value))
 
+    act.like(invalidForm(onSubmit, userAnswersWithIndividualName))
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }
 }

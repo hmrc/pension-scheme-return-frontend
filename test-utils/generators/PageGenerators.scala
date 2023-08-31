@@ -21,9 +21,14 @@ import models.NormalMode
 import org.scalacheck.Arbitrary
 import pages.nonsipp.CheckReturnDatesPage
 import pages.nonsipp.accountingperiod.AccountingPeriodPage
+import pages.nonsipp.landorproperty.LandPropertyIndividualSellersNamePage
 import pages.nonsipp.schemedesignatory.HowMuchCashPage
 
 trait PageGenerators {
+
+  implicit lazy val arbitraryLandPropertyIndividualSellersNamePage
+    : Arbitrary[LandPropertyIndividualSellersNamePage.type] =
+    Arbitrary(LandPropertyIndividualSellersNamePage)
 
   implicit lazy val arbitraryCheckReturnDatesPage: Arbitrary[CheckReturnDatesPage] =
     Arbitrary(ModelGenerators.srnGen.map(CheckReturnDatesPage))

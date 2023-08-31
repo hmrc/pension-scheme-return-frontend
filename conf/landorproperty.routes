@@ -80,6 +80,16 @@ GET        /:srn/change-land-property-lease-details/:index        controllers.no
 POST       /:srn/change-land-property-lease-details               controllers.nonsipp.landorproperty.LandOrPropertyLeaseDetailsController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
 POST       /:srn/change-land-property-lease-details/:index        controllers.nonsipp.landorproperty.LandOrPropertyLeaseDetailsController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 
+GET        /:srn/company-seller-name/:index               controllers.nonsipp.landorproperty.CompanySellerNameController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST       /:srn/company-seller-name/:index               controllers.nonsipp.landorproperty.CompanySellerNameController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET        /:srn/change-company-seller-name/:index        controllers.nonsipp.landorproperty.CompanySellerNameController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST       /:srn/change-company-seller-name/:index        controllers.nonsipp.landorproperty.CompanySellerNameController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET        /:srn/individual-seller-name/:index                    controllers.nonsipp.landorproperty.LandPropertyIndividualSellersNameController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST       /:srn/individual-seller-name/:index                    controllers.nonsipp.landorproperty.LandPropertyIndividualSellersNameController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET        /:srn/change-individual-seller-name/:index             controllers.nonsipp.landorproperty.LandPropertyIndividualSellersNameController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST       /:srn/change-individual-seller-name/:index             controllers.nonsipp.landorproperty.LandPropertyIndividualSellersNameController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
 GET         /:srn/who-was-land-property-acquired-from                               controllers.nonsipp.landorproperty.PropertyAcquiredFromController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
 GET         /:srn/who-was-land-property-acquired-from/:index                        controllers.nonsipp.landorproperty.PropertyAcquiredFromController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
 POST        /:srn/who-was-land-property-acquired-from                               controllers.nonsipp.landorproperty.PropertyAcquiredFromController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
@@ -88,11 +98,6 @@ GET         /:srn/who-was-land-property-acquired-from                        con
 GET         /:srn/who-was-land-property-acquired-from/:index                 controllers.nonsipp.landorproperty.PropertyAcquiredFromController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 POST        /:srn/who-was-land-property-acquired-from                       controllers.nonsipp.landorproperty.PropertyAcquiredFromController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
 POST        /:srn/who-was-land-property-acquired-from/:index                 controllers.nonsipp.landorproperty.PropertyAcquiredFromController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
-
-GET        /:srn/company-seller-name/:index               controllers.nonsipp.landorproperty.CompanySellerNameController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
-POST       /:srn/company-seller-name/:index               controllers.nonsipp.landorproperty.CompanySellerNameController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
-GET        /:srn/change-company-seller-name/:index        controllers.nonsipp.landorproperty.CompanySellerNameController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
-POST       /:srn/change-company-seller-name/:index        controllers.nonsipp.landorproperty.CompanySellerNameController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 
 GET        /:srn/partnership-seller-name/:index               controllers.nonsipp.landorproperty.PartnershipSellerNameController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
 POST       /:srn/partnership-seller-name/:index               controllers.nonsipp.landorproperty.PartnershipSellerNameController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
