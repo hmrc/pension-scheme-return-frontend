@@ -17,9 +17,10 @@
 package navigation.nonsipp
 
 import eu.timepit.refined.refineMV
-import models.{IdentityType, NormalMode, SchemeHoldLandProperty, UserAnswers}
+import models.{IdentitySubject, IdentityType, NormalMode, SchemeHoldLandProperty, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
+import pages.nonsipp.common.CompanyRecipientCrnPage
 import pages.nonsipp.landorproperty._
 import play.api.mvc.Call
 
@@ -76,6 +77,13 @@ object LandOrPropertyNavigator extends JourneyNavigator {
         case Some(_) =>
           controllers.routes.UnauthorisedController.onPageLoad()
       }
+
+    case CompanySellerNamePage(srn, index) =>
+      controllers.nonsipp.common.routes.CompanyRecipientCrnController
+        .onPageLoad(srn, index, NormalMode, IdentitySubject.LandOrPropertySeller)
+
+    case CompanyRecipientCrnPage(srn, index, IdentitySubject.LandOrPropertySeller) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
 
     case LandOrPropertyTotalCostPage(srn, index) =>
       controllers.nonsipp.landorproperty.routes.IsLandOrPropertyResidentialController.onPageLoad(srn, index, NormalMode)
