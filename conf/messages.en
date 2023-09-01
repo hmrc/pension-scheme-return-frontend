@@ -1038,3 +1038,9 @@ landRegistryTitleNumber.no.conditional = Tell us why {0} does not have a title n
 landRegistryTitleNumber.no.conditional.error.required = Enter the reason this land or property does not have a title number
 landRegistryTitleNumber.no.conditional.error.invalid = The reason this land or property does not have a title number must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, full stops, hyphens, slashes, speech marks and spaces
 landRegistryTitleNumber.no.conditional.error.length = The reason this land or property does not have a title number must be 160 characters or fewer
+
+partnershipSellerName.title = What is the seller’s partnership name?
+partnershipSellerName.heading = What is the seller’s partnership name?
+partnershipSellerName.error.required = Enter the seller’s partnership name
+partnershipSellerName.error.invalid = Seller’s partnership name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+partnershipSellerName.error.tooLong = Seller’s partnership name must be 160 characters or fewer

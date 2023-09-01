@@ -99,6 +99,11 @@ GET         /:srn/who-was-land-property-acquired-from/:index                 con
 POST        /:srn/who-was-land-property-acquired-from                       controllers.nonsipp.landorproperty.PropertyAcquiredFromController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
 POST        /:srn/who-was-land-property-acquired-from/:index                 controllers.nonsipp.landorproperty.PropertyAcquiredFromController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 
+GET        /:srn/partnership-seller-name/:index               controllers.nonsipp.landorproperty.PartnershipSellerNameController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST       /:srn/partnership-seller-name/:index               controllers.nonsipp.landorproperty.PartnershipSellerNameController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET        /:srn/change-partnership-seller-name/:index        controllers.nonsipp.landorproperty.PartnershipSellerNameController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST       /:srn/change-partnership-seller-name/:index        controllers.nonsipp.landorproperty.PartnershipSellerNameController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
 GET        /:srn/is-seller-connected-party/:index                 controllers.nonsipp.landorproperty.LandOrPropertySellerConnectedPartyController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
 POST       /:srn/is-seller-connected-party/:index                 controllers.nonsipp.landorproperty.LandOrPropertySellerConnectedPartyController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
 GET        /:srn/change-is-seller-connected-party/:index          controllers.nonsipp.landorproperty.LandOrPropertySellerConnectedPartyController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)

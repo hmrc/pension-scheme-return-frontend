@@ -66,15 +66,19 @@ object LandOrPropertyNavigator extends JourneyNavigator {
             .onPageLoad(srn, index, NormalMode)
       }
 
-    //27h1
-    case PropertyAcquiredFromPage(srn, index) =>
-      //TODO change to 27h6 and all the different pages
-      userAnswers.get(PropertyAcquiredFromPage(srn, index)) match {
-        case Some(IdentityType.Individual) =>
-          controllers.nonsipp.landorproperty.routes.LandPropertyIndividualSellersNameController
-            .onPageLoad(srn, index, NormalMode)
-        case Some(_) =>
-          controllers.routes.UnauthorisedController.onPageLoad()
+    case page @ PropertyAcquiredFromPage(srn, index) => //27h1
+      userAnswers.get(page) match {
+        case Some(IdentityType.Individual) => controllers.routes.UnauthorisedController.onPageLoad() //TODO 27h2
+        case Some(IdentityType.UKCompany) =>
+          controllers.nonsipp.landorproperty.routes.CompanySellerNameController
+            .onPageLoad(srn, index, NormalMode) //27h4
+
+        case Some(IdentityType.UKPartnership) =>
+          controllers.nonsipp.landorproperty.routes.PartnershipSellerNameController
+            .onPageLoad(srn, index, NormalMode) //27h6
+
+        case _ => controllers.routes.UnauthorisedController.onPageLoad() //TODO 27h8
+
       }
 
     case LandOrPropertyTotalCostPage(srn, index) =>
@@ -104,8 +108,13 @@ object LandOrPropertyNavigator extends JourneyNavigator {
     case CompanySellerNamePage(srn, index) =>
       controllers.routes.UnauthorisedController.onPageLoad()
 
+
+    case PartnershipSellerNamePage(srn, index) => //27h6
+      controllers.routes.UnauthorisedController.onPageLoad() //TODO 27h7
+
     case LandPropertyIndividualSellersNamePage(srn, index) =>
       controllers.nonsipp.landorproperty.routes.IndividualSellerNiController.onPageLoad(srn, index, NormalMode)
+
 
     case page @ IndividualSellerNiPage(srn, index) =>
       controllers.nonsipp.landorproperty.routes.LandOrPropertySellerConnectedPartyController
