@@ -16,7 +16,7 @@
 
 package navigation.nonsipp
 
-import config.Refined.Max5000
+import config.Refined.OneTo5000
 import eu.timepit.refined.{refineMV, refineV}
 import models.CheckOrChange.Check
 import models.ConditionalYesNo._
@@ -126,7 +126,7 @@ object LoansMadeOrOutstandingNavigator extends JourneyNavigator {
       controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController.onPageLoad(srn, page = 1, NormalMode)
 
     case LoansListPage(srn, addLoan @ true) =>
-      refineV[Max5000.Refined](userAnswers.map(IdentityTypes(srn, IdentitySubject.LoanRecipient)).size + 1) match {
+      refineV[OneTo5000](userAnswers.map(IdentityTypes(srn, IdentitySubject.LoanRecipient)).size + 1) match {
         case Left(_) => controllers.routes.JourneyRecoveryController.onPageLoad()
         case Right(nextIndex) =>
           controllers.nonsipp.common.routes.IdentityTypeController

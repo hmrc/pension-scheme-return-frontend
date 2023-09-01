@@ -14,24 +14,20 @@
  * limitations under the License.
  */
 
-package pages
+package pages.nonsipp.landorproperty
 
 import pages.behaviours.PageBehaviours
-import models.Money
-import config.Refined.Max5000
-import pages.nonsipp.landorproperty.LandOrPropertyTotalCostPage
-import eu.timepit.refined.refineMV
 
-class LandOrPropertyTotalCostPageSpec extends PageBehaviours {
+class LandOrPropertyHeldPageSpec extends PageBehaviours {
 
-  "LandOrPropertyTotalCostPage" - {
+  "HowMuchCashPage" - {
 
-    val index = refineMV[Max5000.Refined](1)
+    val srn = srnGen.sample.value
 
-    beRetrievable[Money](LandOrPropertyTotalCostPage(srnGen.sample.value, index))
+    beRetrievable[Boolean](LandOrPropertyHeldPage(srn))
 
-    beSettable[Money](LandOrPropertyTotalCostPage(srnGen.sample.value, index))
+    beSettable[Boolean](LandOrPropertyHeldPage(srn))
 
-    beRemovable[Money](LandOrPropertyTotalCostPage(srnGen.sample.value, index))
+    beRemovable[Boolean](LandOrPropertyHeldPage(srn))
   }
 }

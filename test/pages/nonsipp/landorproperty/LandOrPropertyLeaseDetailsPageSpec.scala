@@ -14,21 +14,25 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages.nonsipp.landorproperty
 
+import config.Refined.OneTo5000
+import eu.timepit.refined.refineMV
+import models._
 import pages.behaviours.PageBehaviours
-import pages.nonsipp.landorproperty.LandOrPropertyHeldPage
 
-class LandOrPropertyHeldPage extends PageBehaviours {
+import java.time.LocalDate
 
-  "HowMuchCashPage" - {
+class LandOrPropertyLeaseDetailsPageSpec extends PageBehaviours {
 
-    val srn = srnGen.sample.value
+  "LandOrPropertyLeaseDetailsPage" - {
 
-    beRetrievable[Boolean](LandOrPropertyHeldPage(srn))
+    val index = refineMV[OneTo5000](1)
 
-    beSettable[Boolean](LandOrPropertyHeldPage(srn))
+    beRetrievable[(String, Money, LocalDate)](LandOrPropertyLeaseDetailsPage(srnGen.sample.value, index))
 
-    beRemovable[Boolean](LandOrPropertyHeldPage(srn))
+    beSettable[(String, Money, LocalDate)](LandOrPropertyLeaseDetailsPage(srnGen.sample.value, index))
+
+    beRemovable[(String, Money, LocalDate)](LandOrPropertyLeaseDetailsPage(srnGen.sample.value, index))
   }
 }

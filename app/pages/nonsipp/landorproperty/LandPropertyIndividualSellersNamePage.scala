@@ -17,7 +17,6 @@
 package pages.nonsipp.landorproperty
 
 import config.Refined.Max5000
-import models.IdentityType
 import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
