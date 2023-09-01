@@ -60,7 +60,7 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
   private val filledUserAnswers = defaultUserAnswers
     .unsafeSet(IdentityTypePage(srn, index, subject), IdentityType.UKCompany)
     .unsafeSet(CompanyRecipientNamePage(srn, index), recipientName)
-    .unsafeSet(CompanyRecipientCrnPage(srn, index), ConditionalYesNo.yes[String, Crn](crn))
+    .unsafeSet(CompanyRecipientCrnPage(srn, index, subject), ConditionalYesNo.yes[String, Crn](crn))
     .unsafeSet(RecipientSponsoringEmployerConnectedPartyPage(srn, index), SponsoringOrConnectedParty.ConnectedParty)
     .unsafeSet(DatePeriodLoanPage(srn, index), (localDate, money, loanPeriod))
     .unsafeSet(AmountOfTheLoanPage(srn, index), (money, money, money))

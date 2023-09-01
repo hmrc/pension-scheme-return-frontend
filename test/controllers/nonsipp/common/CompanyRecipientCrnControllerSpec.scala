@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.loansmadeoroutstanding
+package controllers.nonsipp.common
 
 import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.common.CompanyRecipientCrnController._
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
-import models.{ConditionalYesNo, Crn, NormalMode}
+import models.{ConditionalYesNo, Crn, IdentitySubject, NormalMode}
 import pages.nonsipp.common.CompanyRecipientCrnPage
 import pages.nonsipp.loansmadeoroutstanding.CompanyRecipientNamePage
 import views.html.ConditionalYesNoPageView
@@ -29,11 +29,12 @@ import views.html.ConditionalYesNoPageView
 class CompanyRecipientCrnControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[OneTo5000](1)
+  val identitySubject: IdentitySubject = IdentitySubject.LoanRecipient
 
   private lazy val onPageLoad =
-    controllers.nonsipp.common.routes.CompanyRecipientCrnController.onPageLoad(srn, index, NormalMode)
+    controllers.nonsipp.common.routes.CompanyRecipientCrnController.onPageLoad(srn, index, NormalMode, identitySubject)
   private lazy val onSubmit =
-    controllers.nonsipp.common.routes.CompanyRecipientCrnController.onSubmit(srn, index, NormalMode)
+    controllers.nonsipp.common.routes.CompanyRecipientCrnController.onSubmit(srn, index, NormalMode, identitySubject)
 
   val userAnswersWithCompanyName = defaultUserAnswers.unsafeSet(CompanyRecipientNamePage(srn, index), companyName)
 
@@ -44,20 +45,23 @@ class CompanyRecipientCrnControllerSpec extends ControllerBaseSpec {
 
     act.like(renderView(onPageLoad, userAnswersWithCompanyName) { implicit app => implicit request =>
       injected[ConditionalYesNoPageView]
-        .apply(form(injected[YesNoPageFormProvider]), viewModel(srn, index, companyName, NormalMode))
+        .apply(
+          form(injected[YesNoPageFormProvider], identitySubject),
+          viewModel(srn, index, companyName, NormalMode, identitySubject)
+        )
     })
 
     act.like(
       renderPrePopView(
         onPageLoad,
-        CompanyRecipientCrnPage(srn, index),
+        CompanyRecipientCrnPage(srn, index, identitySubject),
         conditionalNo,
         userAnswersWithCompanyName
       ) { implicit app => implicit request =>
         injected[ConditionalYesNoPageView]
           .apply(
-            form(injected[YesNoPageFormProvider]).fill(conditionalNo.value),
-            viewModel(srn, index, companyName, NormalMode)
+            form(injected[YesNoPageFormProvider], identitySubject).fill(conditionalNo.value),
+            viewModel(srn, index, companyName, NormalMode, identitySubject)
           )
       }
     )

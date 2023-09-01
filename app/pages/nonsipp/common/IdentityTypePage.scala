@@ -67,7 +67,7 @@ case class IdentityTypePage(srn: Srn, index: Max5000, identitySubject: IdentityS
           IndividualRecipientNinoPage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
           IsIndividualRecipientConnectedPartyPage(srn, index),
           CompanyRecipientNamePage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
-          CompanyRecipientCrnPage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
+          CompanyRecipientCrnPage(srn, index, this.identitySubject),
           RecipientSponsoringEmployerConnectedPartyPage(srn, index),
           PartnershipRecipientNamePage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
           PartnershipRecipientUtrPage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
@@ -94,7 +94,7 @@ case class IdentityTypes(srn: Srn, identitySubject: IdentitySubject) extends Que
   override def path: JsPath = identitySubject match {
     case IdentitySubject.LoanRecipient => Paths.loanTransactions \ "recipientIdentityType" \ toString
     case IdentitySubject.LandOrPropertySeller =>
-      JsPath \ "assets" \ "landOrProperty" \ "landOrPropertyTransactions" \ "heldPropertyTransaction" \ "propertyAcquiredFrom" \ "sellerIdentityType" \ toString
+      pages.nonsipp.landorproperty.Paths.landOrPropertyTransactions \ "heldPropertyTransaction" \ "propertyAcquiredFrom" \ "sellerIdentityType" \ toString
   }
   override def toString: String = "identityTypes"
 }

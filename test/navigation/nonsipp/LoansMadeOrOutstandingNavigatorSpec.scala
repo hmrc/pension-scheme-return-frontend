@@ -189,9 +189,11 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
 
       act.like(
         normalmode
-          .navigateToWithIndex(
+          .navigateToWithDataIndexAndSubjects(
             index,
+            subject,
             CompanyRecipientNamePage,
+            Gen.const(""),
             controllers.nonsipp.common.routes.CompanyRecipientCrnController.onPageLoad
           )
           .withName("go from company recipient name page to company crn page")
@@ -199,8 +201,9 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
 
       act.like(
         normalmode
-          .navigateToWithIndex(
+          .navigateToWithIndexAndSubject(
             index,
+            subject,
             CompanyRecipientCrnPage,
             controllers.nonsipp.loansmadeoroutstanding.routes.RecipientSponsoringEmployerConnectedPartyController.onPageLoad
           )

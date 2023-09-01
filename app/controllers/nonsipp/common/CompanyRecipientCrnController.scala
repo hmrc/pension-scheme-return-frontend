@@ -22,7 +22,7 @@ import controllers.nonsipp.common.CompanyRecipientCrnController._
 import forms.YesNoPageFormProvider
 import forms.mappings.Mappings
 import models.SchemeId.Srn
-import models.{ConditionalYesNo, Crn, Mode}
+import models.{ConditionalYesNo, Crn, IdentitySubject, Mode, UserAnswers}
 import navigation.Navigator
 import pages.nonsipp.common.CompanyRecipientCrnPage
 import pages.nonsipp.loansmadeoroutstanding.CompanyRecipientNamePage
@@ -51,64 +51,73 @@ class CompanyRecipientCrnController @Inject()(
     extends FrontendBaseController
     with I18nSupport {
 
-  private val form: Form[Either[String, Crn]] = CompanyRecipientCrnController.form(formProvider)
-
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
-    implicit request =>
+  def onPageLoad(srn: Srn, index: Max5000, mode: Mode, subject: IdentitySubject): Action[AnyContent] =
+    identifyAndRequireData(srn) { implicit request =>
+      val form: Form[Either[String, Crn]] = CompanyRecipientCrnController.form(formProvider, subject)
       request.usingAnswer(CompanyRecipientNamePage(srn, index)).sync { companyName =>
-        val preparedForm = request.userAnswers.fillForm(CompanyRecipientCrnPage(srn, index), form)
-        Ok(view(preparedForm, viewModel(srn, index, companyName, mode)))
+        val preparedForm = request.userAnswers.fillForm(CompanyRecipientCrnPage(srn, index, subject), form)
+        Ok(view(preparedForm, viewModel(srn, index, companyName, mode, subject)))
       }
-  }
+    }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
-    implicit request =>
+  def onSubmit(srn: Srn, index: Max5000, mode: Mode, subject: IdentitySubject): Action[AnyContent] =
+    identifyAndRequireData(srn).async { implicit request =>
+      val form: Form[Either[String, Crn]] = CompanyRecipientCrnController.form(formProvider, subject)
       form
         .bindFromRequest()
         .fold(
           formWithErrors =>
             request.usingAnswer(CompanyRecipientNamePage(srn, index)).async { companyName =>
-              Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, companyName, mode))))
+              Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, companyName, mode, subject))))
             },
           value =>
             for {
               updatedAnswers <- Future
-                .fromTry(request.userAnswers.set(CompanyRecipientCrnPage(srn, index), ConditionalYesNo(value)))
+                .fromTry(request.userAnswers.set(CompanyRecipientCrnPage(srn, index, subject), ConditionalYesNo(value)))
               _ <- saveService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(CompanyRecipientCrnPage(srn, index), mode, updatedAnswers))
+            } yield Redirect(navigator.nextPage(CompanyRecipientCrnPage(srn, index, subject), mode, updatedAnswers))
         )
-  }
+    }
 }
 
 object CompanyRecipientCrnController {
 
-  def form(formProvider: YesNoPageFormProvider): Form[Either[String, Crn]] = formProvider.conditional(
-    "companyRecipientCrn.error.required",
-    mappingNo = Mappings.textArea(
-      "companyRecipientCrn.no.conditional.error.required",
-      "companyRecipientCrn.no.conditional.error.invalid",
-      "companyRecipientCrn.no.conditional.error.length"
-    ),
-    mappingYes = Mappings.crn(
-      "companyRecipientCrn.yes.conditional.error.required",
-      "companyRecipientCrn.yes.conditional.error.invalid",
-      "companyRecipientCrn.yes.conditional.error.length"
+  def form(formProvider: YesNoPageFormProvider, subject: IdentitySubject): Form[Either[String, Crn]] =
+    formProvider.conditional(
+      s"${subject.key}.companyRecipientCrn.error.required",
+      mappingNo = Mappings.textArea(
+        s"${subject.key}.companyRecipientCrn.no.conditional.error.required",
+        s"${subject.key}.companyRecipientCrn.no.conditional.error.invalid",
+        s"${subject.key}.companyRecipientCrn.no.conditional.error.length"
+      ),
+      mappingYes = Mappings.crn(
+        s"${subject.key}.companyRecipientCrn.yes.conditional.error.required",
+        s"${subject.key}.companyRecipientCrn.yes.conditional.error.invalid",
+        s"${subject.key}.companyRecipientCrn.yes.conditional.error.length"
+      )
     )
-  )
 
   def viewModel(
     srn: Srn,
     index: Max5000,
     companyName: String,
-    mode: Mode
-  ): FormPageViewModel[ConditionalYesNoPageViewModel] =
+    mode: Mode,
+    subject: IdentitySubject
+  ): FormPageViewModel[ConditionalYesNoPageViewModel] = {
+    val text = subject match {
+      case IdentitySubject.LoanRecipient => ""
+      case IdentitySubject.LandOrPropertySeller => companyName
+    }
     FormPageViewModel[ConditionalYesNoPageViewModel](
-      "companyRecipientCrn.title",
-      Message("companyRecipientCrn.heading", companyName),
+      Message(s"${subject.key}.companyRecipientCrn.title"),
+      Message(s"${subject.key}.companyRecipientCrn.heading", text),
       ConditionalYesNoPageViewModel(
-        yes = YesNoViewModel.Conditional(Message("companyRecipientCrn.yes.conditional", companyName), FieldType.Input),
-        no = YesNoViewModel.Conditional(Message("companyRecipientCrn.no.conditional", companyName), FieldType.Textarea)
-      ).withHint("companyRecipientCrn.hint"),
-      controllers.nonsipp.common.routes.CompanyRecipientCrnController.onSubmit(srn, index, mode)
+        yes = YesNoViewModel
+          .Conditional(Message(s"${subject.key}.companyRecipientCrn.yes.conditional", companyName), FieldType.Input),
+        no = YesNoViewModel
+          .Conditional(Message(s"${subject.key}.companyRecipientCrn.no.conditional", companyName), FieldType.Textarea)
+      ).withHint(s"${subject.key}.companyRecipientCrn.hint"),
+      controllers.nonsipp.common.routes.CompanyRecipientCrnController.onSubmit(srn, index, mode, subject)
     )
+  }
 }
