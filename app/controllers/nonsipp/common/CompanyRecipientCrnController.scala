@@ -25,6 +25,7 @@ import models.SchemeId.Srn
 import models.{ConditionalYesNo, Crn, IdentitySubject, Mode, UserAnswers}
 import navigation.Navigator
 import pages.nonsipp.common.CompanyRecipientCrnPage
+import pages.nonsipp.landorproperty.CompanySellerNamePage
 import pages.nonsipp.loansmadeoroutstanding.CompanyRecipientNamePage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -54,10 +55,8 @@ class CompanyRecipientCrnController @Inject()(
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode, subject: IdentitySubject): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val form: Form[Either[String, Crn]] = CompanyRecipientCrnController.form(formProvider, subject)
-      request.usingAnswer(CompanyRecipientNamePage(srn, index)).sync { companyName =>
-        val preparedForm = request.userAnswers.fillForm(CompanyRecipientCrnPage(srn, index, subject), form)
-        Ok(view(preparedForm, viewModel(srn, index, companyName, mode, subject)))
-      }
+      val preparedForm = request.userAnswers.fillForm(CompanyRecipientCrnPage(srn, index, subject), form)
+      Ok(view(preparedForm, viewModel(srn, index, mode, subject, request.userAnswers)))
     }
 
   def onSubmit(srn: Srn, index: Max5000, mode: Mode, subject: IdentitySubject): Action[AnyContent] =
@@ -67,9 +66,8 @@ class CompanyRecipientCrnController @Inject()(
         .bindFromRequest()
         .fold(
           formWithErrors =>
-            request.usingAnswer(CompanyRecipientNamePage(srn, index)).async { companyName =>
-              Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, companyName, mode, subject))))
-            },
+            Future
+              .successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode, subject, request.userAnswers)))),
           value =>
             for {
               updatedAnswers <- Future
@@ -100,17 +98,25 @@ object CompanyRecipientCrnController {
   def viewModel(
     srn: Srn,
     index: Max5000,
-    companyName: String,
     mode: Mode,
-    subject: IdentitySubject
+    subject: IdentitySubject,
+    userAnswers: UserAnswers
   ): FormPageViewModel[ConditionalYesNoPageViewModel] = {
-    val text = subject match {
-      case IdentitySubject.LoanRecipient => ""
-      case IdentitySubject.LandOrPropertySeller => companyName
+    val companyName = subject match {
+      case IdentitySubject.LoanRecipient =>
+        userAnswers.get(CompanyRecipientNamePage(srn, index)) match {
+          case Some(value) => value
+          case None => ""
+        }
+      case IdentitySubject.LandOrPropertySeller =>
+        userAnswers.get(CompanySellerNamePage(srn, index)) match {
+          case Some(value) => value
+          case None => ""
+        }
     }
     FormPageViewModel[ConditionalYesNoPageViewModel](
       Message(s"${subject.key}.companyRecipientCrn.title"),
-      Message(s"${subject.key}.companyRecipientCrn.heading", text),
+      Message(s"${subject.key}.companyRecipientCrn.heading", companyName),
       ConditionalYesNoPageViewModel(
         yes = YesNoViewModel
           .Conditional(Message(s"${subject.key}.companyRecipientCrn.yes.conditional", companyName), FieldType.Input),

@@ -21,33 +21,59 @@ import controllers.ControllerBaseSpec
 import controllers.nonsipp.common.CompanyRecipientCrnController._
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
-import models.{ConditionalYesNo, Crn, IdentitySubject, NormalMode}
+import models.{ConditionalYesNo, Crn, IdentitySubject, NormalMode, UserAnswers}
 import pages.nonsipp.common.CompanyRecipientCrnPage
+import pages.nonsipp.landorproperty.CompanySellerNamePage
 import pages.nonsipp.loansmadeoroutstanding.CompanyRecipientNamePage
+import play.api.mvc.Call
 import views.html.ConditionalYesNoPageView
 
 class CompanyRecipientCrnControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[OneTo5000](1)
-  val identitySubject: IdentitySubject = IdentitySubject.LoanRecipient
-
-  private lazy val onPageLoad =
-    controllers.nonsipp.common.routes.CompanyRecipientCrnController.onPageLoad(srn, index, NormalMode, identitySubject)
-  private lazy val onSubmit =
-    controllers.nonsipp.common.routes.CompanyRecipientCrnController.onSubmit(srn, index, NormalMode, identitySubject)
-
-  val userAnswersWithCompanyName = defaultUserAnswers.unsafeSet(CompanyRecipientNamePage(srn, index), companyName)
 
   val conditionalNo: ConditionalYesNo[String, Crn] = ConditionalYesNo.no("reason")
   val conditionalYes: ConditionalYesNo[String, Crn] = ConditionalYesNo.yes(crn)
 
   "CompanyRecipientCrnController" - {
+    "loans journey" - {
+      val identitySubject: IdentitySubject = IdentitySubject.LoanRecipient
+      lazy val onPageLoad =
+        controllers.nonsipp.common.routes.CompanyRecipientCrnController
+          .onPageLoad(srn, index, NormalMode, identitySubject)
+      lazy val onSubmit =
+        controllers.nonsipp.common.routes.CompanyRecipientCrnController
+          .onSubmit(srn, index, NormalMode, identitySubject)
+      val userAnswersWithCompanyName = defaultUserAnswers.unsafeSet(CompanyRecipientNamePage(srn, index), companyName)
 
+      testCrnController(identitySubject, onPageLoad, onSubmit, userAnswersWithCompanyName)
+    }
+    "land or property journey" - {
+      val identitySubject: IdentitySubject = IdentitySubject.LandOrPropertySeller
+      lazy val onPageLoad =
+        controllers.nonsipp.common.routes.CompanyRecipientCrnController
+          .onPageLoad(srn, index, NormalMode, identitySubject)
+      lazy val onSubmit =
+        controllers.nonsipp.common.routes.CompanyRecipientCrnController
+          .onSubmit(srn, index, NormalMode, identitySubject)
+      val userAnswersWithCompanySellerName =
+        defaultUserAnswers.unsafeSet(CompanySellerNamePage(srn, index), companyName)
+
+      testCrnController(identitySubject, onPageLoad, onSubmit, userAnswersWithCompanySellerName)
+    }
+  }
+
+  private def testCrnController(
+    identitySubject: IdentitySubject,
+    onPageLoad: => Call,
+    onSubmit: => Call,
+    userAnswersWithCompanyName: UserAnswers
+  ): Unit = {
     act.like(renderView(onPageLoad, userAnswersWithCompanyName) { implicit app => implicit request =>
       injected[ConditionalYesNoPageView]
         .apply(
           form(injected[YesNoPageFormProvider], identitySubject),
-          viewModel(srn, index, companyName, NormalMode, identitySubject)
+          viewModel(srn, index, NormalMode, identitySubject, userAnswersWithCompanyName)
         )
     })
 
@@ -61,7 +87,7 @@ class CompanyRecipientCrnControllerSpec extends ControllerBaseSpec {
         injected[ConditionalYesNoPageView]
           .apply(
             form(injected[YesNoPageFormProvider], identitySubject).fill(conditionalNo.value),
-            viewModel(srn, index, companyName, NormalMode, identitySubject)
+            viewModel(srn, index, NormalMode, identitySubject, userAnswersWithCompanyName)
           )
       }
     )
