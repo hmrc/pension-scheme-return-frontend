@@ -23,7 +23,6 @@ import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.{ConditionalYesNo, NormalMode}
 import pages.nonsipp.landorproperty.{IndividualSellerNiPage, LandPropertyIndividualSellersNamePage}
-import pages.nonsipp.loansmadeoroutstanding.IndividualRecipientNamePage
 import uk.gov.hmrc.domain.Nino
 import views.html.ConditionalYesNoPageView
 

@@ -16,10 +16,10 @@
 
 package navigation.nonsipp
 
-import config.Refined.Max5000
+import config.Refined.{Max5000, OneTo5000}
 import eu.timepit.refined.refineMV
-import models._
 import models.SchemeHoldLandProperty.{Acquisition, Contribution, Transfer}
+import models._
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.landorproperty._
@@ -30,7 +30,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
   val navigator: Navigator = new NonSippNavigator
 
-  private val index = refineMV[Max5000.Refined](1)
+  private val index = refineMV[OneTo5000](1)
   private val subject = IdentitySubject.LandOrPropertySeller
 
   "LandOrPropertyNavigator" - {

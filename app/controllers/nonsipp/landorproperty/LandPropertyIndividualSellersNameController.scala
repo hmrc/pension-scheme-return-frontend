@@ -23,7 +23,6 @@ import models.Mode
 import models.SchemeId.Srn
 import navigation.Navigator
 import pages.nonsipp.landorproperty.LandPropertyIndividualSellersNamePage
-import controllers.nonsipp.landorproperty.LandPropertyIndividualSellersNameController._
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}

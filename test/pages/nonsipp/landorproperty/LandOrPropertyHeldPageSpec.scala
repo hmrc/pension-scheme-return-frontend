@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages.nonsipp.landorproperty
 
 import pages.behaviours.PageBehaviours
-import pages.nonsipp.landorproperty.LandOrPropertyHeldPage
 
-class LandOrPropertyHeldPage extends PageBehaviours {
+class LandOrPropertyHeldPageSpec extends PageBehaviours {
 
   "HowMuchCashPage" - {
 

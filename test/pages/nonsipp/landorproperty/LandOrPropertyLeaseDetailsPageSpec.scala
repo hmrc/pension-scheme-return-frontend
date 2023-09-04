@@ -18,18 +18,21 @@ package pages.nonsipp.landorproperty
 
 import config.Refined.OneTo5000
 import eu.timepit.refined.refineMV
+import models._
 import pages.behaviours.PageBehaviours
 
-class LandOrPropertySellerConnectedPartyPageSpec extends PageBehaviours {
+import java.time.LocalDate
 
-  "LandOrPropertySellerConnectedPartyPage" - {
+class LandOrPropertyLeaseDetailsPageSpec extends PageBehaviours {
+
+  "LandOrPropertyLeaseDetailsPage" - {
 
     val index = refineMV[OneTo5000](1)
 
-    beRetrievable[Boolean](LandOrPropertySellerConnectedPartyPage(srnGen.sample.value, index))
+    beRetrievable[(String, Money, LocalDate)](LandOrPropertyLeaseDetailsPage(srnGen.sample.value, index))
 
-    beSettable[Boolean](LandOrPropertySellerConnectedPartyPage(srnGen.sample.value, index))
+    beSettable[(String, Money, LocalDate)](LandOrPropertyLeaseDetailsPage(srnGen.sample.value, index))
 
-    beRemovable[Boolean](LandOrPropertySellerConnectedPartyPage(srnGen.sample.value, index))
+    beRemovable[(String, Money, LocalDate)](LandOrPropertyLeaseDetailsPage(srnGen.sample.value, index))
   }
 }

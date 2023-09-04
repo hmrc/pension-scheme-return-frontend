@@ -16,28 +16,27 @@
 
 package controllers.nonsipp.landorproperty
 
-import config.Refined.OneTo5000
+import config.Refined.Max5000
+import PartnershipSellerNameController.{form, viewModel}
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.landorproperty.CompanySellerNameController.{form, viewModel}
 import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import models.NormalMode
-import pages.nonsipp.landorproperty.CompanySellerNamePage
+import pages.nonsipp.landorproperty.PartnershipSellerNamePage
 import views.html.TextInputView
+class PartnershipSellerNameControllerSpec extends ControllerBaseSpec {
 
-class CompanySellerNameControllerSpec extends ControllerBaseSpec {
+  private val index = refineMV[Max5000.Refined](1)
+  private lazy val onPageLoad = routes.PartnershipSellerNameController.onPageLoad(srn, index, NormalMode)
+  private lazy val onSubmit = routes.PartnershipSellerNameController.onSubmit(srn, index, NormalMode)
 
-  private val index = refineMV[OneTo5000](1)
-  private lazy val onPageLoad = routes.CompanySellerNameController.onPageLoad(srn, index, NormalMode)
-  private lazy val onSubmit = routes.CompanySellerNameController.onSubmit(srn, index, NormalMode)
-
-  "CompanySellerNameController" - {
+  "PartnershipSellerNameController" - {
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       injected[TextInputView].apply(form(injected[TextFormProvider]), viewModel(srn, index, NormalMode))
     })
 
-    act.like(renderPrePopView(onPageLoad, CompanySellerNamePage(srn, index), "test") {
+    act.like(renderPrePopView(onPageLoad, PartnershipSellerNamePage(srn, index), "test") {
       implicit app => implicit request =>
         injected[TextInputView].apply(form(injected[TextFormProvider]).fill("test"), viewModel(srn, index, NormalMode))
     })

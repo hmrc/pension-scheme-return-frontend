@@ -1051,3 +1051,9 @@ landOrPropertySeller.companyRecipientCrn.no.conditional.error.required = Enter t
 landOrPropertySeller.companyRecipientCrn.no.conditional.error.invalid = The reason you cannot provide the seller’s CRN must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
 landOrPropertySeller.companyRecipientCrn.no.conditional.error.length = The reason you cannot provide the seller’s CRN must be 160 characters or fewer
 landOrPropertySeller.companyRecipientCrn.error.required = Select yes if you know the seller’s Company Registration Number (CRN)
+
+partnershipSellerName.title = What is the seller’s partnership name?
+partnershipSellerName.heading = What is the seller’s partnership name?
+partnershipSellerName.error.required = Enter the seller’s partnership name
+partnershipSellerName.error.invalid = Seller’s partnership name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+partnershipSellerName.error.tooLong = Seller’s partnership name must be 160 characters or fewer

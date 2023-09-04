@@ -14,24 +14,18 @@
  * limitations under the License.
  */
 
-package pages
+package pages.nonsipp.landorproperty
 
-import pages.behaviours.PageBehaviours
-import models.Money
 import config.Refined.Max5000
-import pages.nonsipp.landorproperty.LandOrPropertyTotalCostPage
-import eu.timepit.refined.refineMV
+import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
+import utils.RefinedUtils._
 
-class LandOrPropertyTotalCostPageSpec extends PageBehaviours {
+case class PartnershipSellerNamePage(srn: Srn, index: Max5000) extends QuestionPage[String] {
 
-  "LandOrPropertyTotalCostPage" - {
+  override def path: JsPath =
+    Paths.landOrPropertyTransactions \ "heldPropertyTransaction" \ "propertyAcquiredFromName" \ toString \ index.arrayIndex.toString
 
-    val index = refineMV[Max5000.Refined](1)
-
-    beRetrievable[Money](LandOrPropertyTotalCostPage(srnGen.sample.value, index))
-
-    beSettable[Money](LandOrPropertyTotalCostPage(srnGen.sample.value, index))
-
-    beRemovable[Money](LandOrPropertyTotalCostPage(srnGen.sample.value, index))
-  }
+  override def toString: String = "partnershipSellerName"
 }
