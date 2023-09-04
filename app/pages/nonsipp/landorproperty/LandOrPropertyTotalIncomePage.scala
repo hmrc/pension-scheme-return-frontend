@@ -14,14 +14,19 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages.nonsipp.landorproperty
 
-import play.api.libs.json._
+import play.api.libs.json.JsPath
+import models.SchemeId.Srn
+import models.Money
+import pages.QuestionPage
+import config.Refined.Max5000
+import utils.RefinedUtils._
+import eu.timepit.refined.refineMV
 
-package object landorproperty {
-  object Paths {
-    val assets: JsPath = __ \ "assets"
-    val landOrPropertyTransactions: JsPath = assets \ "landOrProperty" \ "landOrPropertyTransactions"
-    val heldPropertyTransactions: JsPath = landOrPropertyTransactions \ "heldPropertyTransaction"
-  }
+case class LandOrPropertyTotalIncomePage(srn: Srn, index: Max5000) extends QuestionPage[Money] {
+
+  override def path: JsPath = Paths.heldPropertyTransactions \ toString \ index.arrayIndex.toString
+
+  override def toString: String = "totalIncomeOrReceipts"
 }

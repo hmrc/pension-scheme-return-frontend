@@ -298,9 +298,9 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           index,
           IsLandPropertyLeasedPage,
           Gen.const(false),
-          (srn, index: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.landorproperty.routes.LandOrPropertyTotalIncomeController.onPageLoad
         )
-        .withName("go from is land property leased page to unauthorised when no selected")
+        .withName("go from is land property leased page to land property total income when no selected")
     )
   }
 
@@ -320,7 +320,6 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
   }
 
   "LandOrPropertyLeaseDetailsPage" - {
-
     act.like(
       normalmode
         .navigateToWithIndex(
@@ -344,6 +343,18 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           (srn, index: Max5000, mode) => controllers.routes.UnauthorisedController.onPageLoad()
         )
         .withName("go from is lessee connected party page to unauthorised")
+    )
+  }
+
+  "LandOrPropertyTotalIncomePage" - {
+    act.like(
+      normalmode
+        .navigateToWithIndex(
+          index,
+          LandOrPropertyTotalIncomePage,
+          (srn, index: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+        )
+        .withName("go from LandOrPropertyTotalIncome page to unauthorised page")
     )
   }
 }
