@@ -1039,7 +1039,7 @@ landRegistryTitleNumber.no.conditional.error.required = Enter the reason this la
 landRegistryTitleNumber.no.conditional.error.invalid = The reason this land or property does not have a title number must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, full stops, hyphens, slashes, speech marks and spaces
 landRegistryTitleNumber.no.conditional.error.length = The reason this land or property does not have a title number must be 160 characters or fewer
 
-landOrPropertySeller.companyRecipientCrn.title = Do you know the sellers’s Company Registration Number (CRN)?
+landOrPropertySeller.companyRecipientCrn.title = Do you know the seller’s Company Registration Number (CRN)?
 landOrPropertySeller.companyRecipientCrn.heading = Do you know {0}’s Company Registration Number (CRN)?
 landOrPropertySeller.companyRecipientCrn.hint = This is 7 or 8 characters, like 0123456 or AB123456. It may also be called ‘company number’ or ‘Companies House number’
 landOrPropertySeller.companyRecipientCrn.yes.conditional = What is {0}’s CRN?
