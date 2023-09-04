@@ -96,6 +96,14 @@ object NoNINOController {
     memberFullName
   )
 
+  def uploadFormSummaryErrors(formProvider: TextFormProvider, memberFullName: String): Form[String] =
+    formProvider.textArea(
+      "noNINO.error.required",
+      "noNINO.error.length",
+      "noNINO.upload.error.invalid",
+      memberFullName
+    )
+
   def viewModel(srn: Srn, memberFullName: String, index: Max300, mode: Mode): FormPageViewModel[TextAreaViewModel] =
     FormPageViewModel(
       "noNINO.title",
