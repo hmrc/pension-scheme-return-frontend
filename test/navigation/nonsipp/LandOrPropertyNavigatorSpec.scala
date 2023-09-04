@@ -31,6 +31,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
   val navigator: Navigator = new NonSippNavigator
 
   private val index = refineMV[OneTo5000](1)
+  private val subject = IdentitySubject.LandOrPropertySeller
 
   "LandOrPropertyNavigator" - {
 
@@ -143,12 +144,14 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
     act.like(
       normalmode
-        .navigateToWithIndex(
+        .navigateToWithDataIndexAndSubjects(
           index,
+          subject,
           CompanySellerNamePage,
-          (srn, index: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          Gen.const(""),
+          controllers.nonsipp.common.routes.CompanyRecipientCrnController.onPageLoad
         )
-        .withName("go from land or property company seller page to ? page")
+        .withName("go from company land or property company seller  page to company crn page")
     )
 
     act.like(

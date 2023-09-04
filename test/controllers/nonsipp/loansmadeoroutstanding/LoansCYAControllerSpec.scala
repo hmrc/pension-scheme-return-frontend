@@ -31,7 +31,7 @@ import models.{
   Security,
   SponsoringOrConnectedParty
 }
-import pages.nonsipp.common.IdentityTypePage
+import pages.nonsipp.common.{CompanyRecipientCrnPage, IdentityTypePage}
 import pages.nonsipp.loansmadeoroutstanding._
 import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
@@ -60,7 +60,7 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
   private val filledUserAnswers = defaultUserAnswers
     .unsafeSet(IdentityTypePage(srn, index, subject), IdentityType.UKCompany)
     .unsafeSet(CompanyRecipientNamePage(srn, index), recipientName)
-    .unsafeSet(CompanyRecipientCrnPage(srn, index), ConditionalYesNo.yes[String, Crn](crn))
+    .unsafeSet(CompanyRecipientCrnPage(srn, index, subject), ConditionalYesNo.yes[String, Crn](crn))
     .unsafeSet(RecipientSponsoringEmployerConnectedPartyPage(srn, index), SponsoringOrConnectedParty.ConnectedParty)
     .unsafeSet(DatePeriodLoanPage(srn, index), (localDate, money, loanPeriod))
     .unsafeSet(AmountOfTheLoanPage(srn, index), (money, money, money))

@@ -24,7 +24,7 @@ import models.ConditionalYesNo._
 import models.SchemeId.Srn
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.common.IdentityTypePage
+import pages.nonsipp.common.{CompanyRecipientCrnPage, IdentityTypePage}
 import pages.nonsipp.loansmadeoroutstanding._
 import utils.BaseSpec
 import utils.UserAnswersUtils.UserAnswersOps
@@ -189,18 +189,21 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
 
       act.like(
         normalmode
-          .navigateToWithIndex(
+          .navigateToWithDataIndexAndSubjects(
             index,
+            subject,
             CompanyRecipientNamePage,
-            controllers.nonsipp.loansmadeoroutstanding.routes.CompanyRecipientCrnController.onPageLoad
+            Gen.const(""),
+            controllers.nonsipp.common.routes.CompanyRecipientCrnController.onPageLoad
           )
           .withName("go from company recipient name page to company crn page")
       )
 
       act.like(
         normalmode
-          .navigateToWithIndex(
+          .navigateToWithIndexAndSubject(
             index,
+            subject,
             CompanyRecipientCrnPage,
             controllers.nonsipp.loansmadeoroutstanding.routes.RecipientSponsoringEmployerConnectedPartyController.onPageLoad
           )
