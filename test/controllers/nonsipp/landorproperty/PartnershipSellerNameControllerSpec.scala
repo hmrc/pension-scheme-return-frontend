@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.landorproperty
 
-import config.Refined.Max5000
+import config.Refined.OneTo5000
 import PartnershipSellerNameController.{form, viewModel}
 import controllers.ControllerBaseSpec
 import eu.timepit.refined.refineMV
@@ -26,7 +26,7 @@ import pages.nonsipp.landorproperty.PartnershipSellerNamePage
 import views.html.TextInputView
 class PartnershipSellerNameControllerSpec extends ControllerBaseSpec {
 
-  private val index = refineMV[Max5000.Refined](1)
+  private val index = refineMV[OneTo5000](1)
   private lazy val onPageLoad = routes.PartnershipSellerNameController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.PartnershipSellerNameController.onSubmit(srn, index, NormalMode)
 
