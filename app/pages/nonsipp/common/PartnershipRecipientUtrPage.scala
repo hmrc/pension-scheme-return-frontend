@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.loansmadeoroutstanding
+package pages.nonsipp.common
 
 import config.Refined.Max5000
-import models.{ConditionalYesNo, Utr}
 import models.SchemeId.Srn
+import models.{ConditionalYesNo, Utr}
 import pages.QuestionPage
+import pages.nonsipp.loansmadeoroutstanding.Paths
 import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
 

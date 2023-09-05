@@ -18,19 +18,22 @@ package controllers.nonsipp.loansmadeoroutstanding
 
 import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.loansmadeoroutstanding.PartnershipRecipientUtrController._
+import controllers.nonsipp.common.PartnershipRecipientUtrController._
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.{ConditionalYesNo, NormalMode, Utr}
-import pages.nonsipp.loansmadeoroutstanding.{PartnershipRecipientNamePage, PartnershipRecipientUtrPage}
+import pages.nonsipp.common.PartnershipRecipientUtrPage
+import pages.nonsipp.loansmadeoroutstanding.PartnershipRecipientNamePage
 import views.html.ConditionalYesNoPageView
 
 class PartnershipRecipientUtrControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[OneTo5000](1)
 
-  private lazy val onPageLoad = routes.PartnershipRecipientUtrController.onPageLoad(srn, index, NormalMode)
-  private lazy val onSubmit = routes.PartnershipRecipientUtrController.onSubmit(srn, index, NormalMode)
+  private lazy val onPageLoad =
+    controllers.nonsipp.common.routes.PartnershipRecipientUtrController.onPageLoad(srn, index, NormalMode)
+  private lazy val onSubmit =
+    controllers.nonsipp.common.routes.PartnershipRecipientUtrController.onSubmit(srn, index, NormalMode)
 
   val userAnswersWithPartnershipRecipientName =
     defaultUserAnswers.unsafeSet(PartnershipRecipientNamePage(srn, index), partnershipName)

@@ -23,7 +23,7 @@ import models.ConditionalYesNo._
 import models.{CheckOrChange, IdentitySubject, IdentityType, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.common.{CompanyRecipientCrnPage, IdentityTypePage, IdentityTypes}
+import pages.nonsipp.common.{CompanyRecipientCrnPage, IdentityTypePage, IdentityTypes, PartnershipRecipientUtrPage}
 import pages.nonsipp.loansmadeoroutstanding._
 import play.api.mvc.Call
 
@@ -81,7 +81,7 @@ object LoansMadeOrOutstandingNavigator extends JourneyNavigator {
         .onPageLoad(srn, index, NormalMode)
 
     case PartnershipRecipientNamePage(srn, index) =>
-      controllers.nonsipp.loansmadeoroutstanding.routes.PartnershipRecipientUtrController
+      controllers.nonsipp.common.routes.PartnershipRecipientUtrController
         .onPageLoad(srn, index, NormalMode)
 
     case OtherRecipientDetailsPage(srn, index) =>

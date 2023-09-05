@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.loansmadeoroutstanding
+package controllers.nonsipp.common
 
 import config.Refined.Max5000
-import controllers.nonsipp.loansmadeoroutstanding.PartnershipRecipientUtrController._
 import controllers.actions._
+import controllers.nonsipp.common.PartnershipRecipientUtrController._
 import forms.YesNoPageFormProvider
 import forms.mappings.Mappings
 import models.SchemeId.Srn
 import models.{ConditionalYesNo, Mode, Utr}
 import navigation.Navigator
-import pages.nonsipp.loansmadeoroutstanding.{PartnershipRecipientNamePage, PartnershipRecipientUtrPage}
+import pages.nonsipp.common.PartnershipRecipientUtrPage
+import pages.nonsipp.loansmadeoroutstanding.PartnershipRecipientNamePage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}

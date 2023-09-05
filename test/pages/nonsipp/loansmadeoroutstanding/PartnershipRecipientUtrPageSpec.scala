@@ -20,6 +20,7 @@ import config.Refined.OneTo5000
 import eu.timepit.refined.refineMV
 import models.{ConditionalYesNo, Utr}
 import pages.behaviours.PageBehaviours
+import pages.nonsipp.common.PartnershipRecipientUtrPage
 
 class PartnershipRecipientUtrPageSpec extends PageBehaviours {
 

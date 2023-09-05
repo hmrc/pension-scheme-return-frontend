@@ -24,7 +24,7 @@ import models.ConditionalYesNo._
 import models.SchemeId.Srn
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.common.{CompanyRecipientCrnPage, IdentityTypePage}
+import pages.nonsipp.common.{CompanyRecipientCrnPage, IdentityTypePage, PartnershipRecipientUtrPage}
 import pages.nonsipp.loansmadeoroutstanding._
 import utils.BaseSpec
 import utils.UserAnswersUtils.UserAnswersOps
@@ -218,7 +218,7 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
         .navigateToWithIndex(
           index,
           PartnershipRecipientNamePage,
-          controllers.nonsipp.loansmadeoroutstanding.routes.PartnershipRecipientUtrController.onPageLoad
+          controllers.nonsipp.common.routes.PartnershipRecipientUtrController.onPageLoad
         )
         .withName("go from partnership recipient name page to partnership recipient Utr page")
     )

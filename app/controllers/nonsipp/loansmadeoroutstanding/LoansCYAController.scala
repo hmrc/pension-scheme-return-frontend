@@ -25,7 +25,7 @@ import models.ConditionalYesNo._
 import models.SchemeId.Srn
 import models.{Security, _}
 import navigation.Navigator
-import pages.nonsipp.common.{CompanyRecipientCrnPage, IdentityTypePage}
+import pages.nonsipp.common.{CompanyRecipientCrnPage, IdentityTypePage, PartnershipRecipientUtrPage}
 import pages.nonsipp.loansmadeoroutstanding._
 import play.api.i18n._
 import play.api.mvc._
@@ -272,7 +272,7 @@ object LoansCYAController {
         case IdentityType.UKPartnership =>
           (
             Message("loanCheckYourAnswers.section1.recipientDetails.utr", recipientName),
-            routes.PartnershipRecipientUtrController.onPageLoad(srn, index, mode).url,
+            controllers.nonsipp.common.routes.PartnershipRecipientUtrController.onPageLoad(srn, index, mode).url,
             "loanCheckYourAnswers.section1.recipientDetails.utr.hidden",
             "loanCheckYourAnswers.section1.recipientDetails.noUtrReason.hidden"
           )
@@ -296,7 +296,7 @@ object LoansCYAController {
             .url
       case IdentityType.UKPartnership =>
         Message("loanCheckYourAnswers.section1.recipientDetails.noUtrReason", recipientName) ->
-          routes.PartnershipRecipientUtrController.onPageLoad(srn, index, mode).url
+          controllers.nonsipp.common.routes.PartnershipRecipientUtrController.onPageLoad(srn, index, mode).url
       case IdentityType.Other =>
         Message("loanCheckYourAnswers.section1.recipientDetails.other", recipientName) ->
           routes.OtherRecipientDetailsController.onPageLoad(srn, index, mode).url
