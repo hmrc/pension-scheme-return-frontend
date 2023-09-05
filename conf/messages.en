@@ -296,6 +296,7 @@ noNINO.error.required = Enter the reason {0} does not have a National Insurance 
 noNINO.error.length = The reason {0} does not have a National Insurance number must be 160 characters or fewer
 noNINO.error.invalid = The reason {0} does not have a National Insurance number must only include letters a to z, numbers 0 to 9, and special characters such as hyphens, spaces and apostrophes
 noNINO.upload.error.invalid = Reason member does not have a National Insurance number must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+noNINO.upload.error.length = Reason member does not have a National Insurance number must be 160 characters or fewer
 
 valueOfAssets.title = What was the total value of the scheme’s assets, including cash?
 valueOfAssets.heading = What was the total value of {0}’s assets, including cash?
@@ -1058,6 +1059,22 @@ partnershipSellerName.heading = What is the seller’s partnership name?
 partnershipSellerName.error.required = Enter the seller’s partnership name
 partnershipSellerName.error.invalid = Seller’s partnership name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
 partnershipSellerName.error.tooLong = Seller’s partnership name must be 160 characters or fewer
+
+whatYouWillNeedLandPropertyDisposal.title = Land or property disposed of by the scheme
+whatYouWillNeedLandPropertyDisposal.heading = Land or property disposed of by {0}
+whatYouWillNeedLandPropertyDisposal.paragraph1 = Answer these questions for one property or piece of land at a time. If you need to report more, you will be able to do this later.
+whatYouWillNeedLandPropertyDisposal.paragraph2 = You must tell us about all land or property the scheme disposed of during the period of this return.
+whatYouWillNeedLandPropertyDisposal.paragraph3 = You need to tell us:
+whatYouWillNeedLandPropertyDisposal.tellUs1 = which land or property was disposed of
+whatYouWillNeedLandPropertyDisposal.tellUs2 = if it was disposed of by sale, transfer out or other
+whatYouWillNeedLandPropertyDisposal.tellUs3 = if any part of the land or property is still held
+whatYouWillNeedLandPropertyDisposal.paragraph4 = If any land or property was sold, you need to tell us:
+whatYouWillNeedLandPropertyDisposal.landOrPropertySold1 = the date it was sold
+whatYouWillNeedLandPropertyDisposal.landOrPropertySold2 = if the buyer was an individual, company, partnership or other
+whatYouWillNeedLandPropertyDisposal.landOrPropertySold3 = the buyer’s National Insurance number, Company Registration Number, Unique Taxpayer Reference or details – whichever applies
+whatYouWillNeedLandPropertyDisposal.landOrPropertySold4 = if the buyer was a connected party
+whatYouWillNeedLandPropertyDisposal.landOrPropertySold5 = the total amount of proceeds from the sale
+whatYouWillNeedLandPropertyDisposal.landOrPropertySold6 = if the sale was supported by an independent valuation
 
 isLesseeConnectedParty.title = Is the lessee a connected party?
 isLesseeConnectedParty.heading = Is {0} a connected party?
