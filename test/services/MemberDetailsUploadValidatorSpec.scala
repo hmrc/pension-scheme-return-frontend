@@ -219,7 +219,7 @@ class MemberDetailsUploadValidatorSpec extends BaseSpec with TestValues {
         NonEmptyList.of(
           ValidationError("A2", ValidationErrorType.FirstName, "memberDetails.firstName.error.invalid"),
           ValidationError("B3", ValidationErrorType.LastName, "memberDetails.lastName.error.invalid"),
-          ValidationError("E4", ValidationErrorType.NoNinoReason, "noNINO.error.invalid"),
+          ValidationError("E4", ValidationErrorType.NoNinoReason, "noNINO.upload.error.invalid"),
           ValidationError("B5", ValidationErrorType.LastName, "memberDetails.lastName.error.required"),
           ValidationError("D6", ValidationErrorType.NinoFormat, "memberDetailsNino.error.invalid")
         )

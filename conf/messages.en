@@ -242,7 +242,7 @@ memberDetails.dateOfBirth.error.required.two = Date of birth must include a {0} 
 memberDetails.dateOfBirth.error.invalid.date = Date of birth must be a real date
 memberDetails.dateOfBirth.error.invalid.characters = Date of birth must only include numbers 0 to 9
 memberDetails.dateOfBirth.error.future = Date of birth must be in the past
-memberDetails.dateOfBirth.error.format = Member’s date of birth must be in the format DD/MM/YYYY. For example, 31/01/1970
+memberDetails.dateOfBirth.error.format = Member’s date of birth must be in the format 01/08/1970
 
 
 psaDeclaration.title = Declaration
@@ -295,6 +295,7 @@ noNINO.heading = Why does {0} not have a National Insurance number?
 noNINO.error.required = Enter the reason {0} does not have a National Insurance number
 noNINO.error.length = The reason {0} does not have a National Insurance number must be 160 characters or fewer
 noNINO.error.invalid = The reason {0} does not have a National Insurance number must only include letters a to z, numbers 0 to 9, and special characters such as hyphens, spaces and apostrophes
+noNINO.upload.error.invalid = Reason member does not have a National Insurance number must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
 
 valueOfAssets.title = What was the total value of the scheme’s assets, including cash?
 valueOfAssets.heading = What was the total value of {0}’s assets, including cash?

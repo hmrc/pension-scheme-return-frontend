@@ -48,7 +48,7 @@ class MemberDetailsUploadValidator @Inject()(
     MemberDetailsNinoController.form(textFormProvider, memberFullName, previousNinos)
 
   private def noNinoForm(memberFullName: String): Form[String] =
-    NoNINOController.form(textFormProvider, memberFullName)
+    NoNINOController.uploadFormSummaryErrors(textFormProvider, memberFullName)
 
   private val firstRowSink: Sink[List[ByteString], Future[List[String]]] =
     Sink.head[List[ByteString]].mapMaterializedValue(_.map(_.map(_.utf8String)))
