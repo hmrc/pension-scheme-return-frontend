@@ -18,13 +18,12 @@ package navigation.nonsipp
 
 import config.Refined.OneTo5000
 import eu.timepit.refined.refineMV
-import models.{IdentitySubject, IdentityType, NormalMode}
-import models.{ConditionalYesNo, Money, UserAnswers}
+import models.{ConditionalYesNo, IdentitySubject, IdentityType, Money, NormalMode, RecipientDetails, UserAnswers}
 import models.ConditionalYesNo._
 import models.SchemeId.Srn
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.common.{CompanyRecipientCrnPage, IdentityTypePage}
+import pages.nonsipp.common.{CompanyRecipientCrnPage, IdentityTypePage, OtherRecipientDetailsPage}
 import pages.nonsipp.loansmadeoroutstanding._
 import utils.BaseSpec
 import utils.UserAnswersUtils.UserAnswersOps
@@ -136,7 +135,7 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
     "NormalMode" - {
       act.like(
         normalmode
-          .navigateToWithDataIndexAndSubject(
+          .navigateToWithDataIndexAndSubjectBoth(
             index,
             subject,
             IdentityTypePage,
@@ -296,5 +295,24 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
         .withName("go from remove page to list page")
     )
 
+  }
+
+  "otherRecipientsDetailsPage" - {
+
+    val recipientDetails = RecipientDetails(
+      "testName",
+      "testDescription"
+    )
+
+    act.like(
+      normalmode
+        .navigateToWithDataIndexAndSubject(
+          index,
+          subject,
+          OtherRecipientDetailsPage,
+          Gen.const(recipientDetails),
+          controllers.nonsipp.loansmadeoroutstanding.routes.RecipientSponsoringEmployerConnectedPartyController.onPageLoad
+        )
+    )
   }
 }

@@ -110,7 +110,11 @@ class LoansListController @Inject()(
         case (index, IdentityType.UKPartnership) =>
           request.userAnswers.get(PartnershipRecipientNamePage(srn, index)).getOrRecoverJourney.map(index -> _)
         case (index, IdentityType.Other) =>
-          request.userAnswers.get(OtherRecipientDetailsPage(srn, index)).map(_.name).getOrRecoverJourney.map(index -> _)
+          request.userAnswers
+            .get(OtherRecipientDetailsPage(srn, index, IdentitySubject.LoanRecipient))
+            .map(_.name)
+            .getOrRecoverJourney
+            .map(index -> _)
       }
       recipientDetails <- recipientNames.traverse {
         case (index, recipientName) =>

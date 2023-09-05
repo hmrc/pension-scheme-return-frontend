@@ -47,7 +47,10 @@ class RecipientSponsoringEmployerConnectedPartyControllerSpec extends Controller
   val userAnswersWithOtherName: UserAnswers =
     defaultUserAnswers
       .unsafeSet(IdentityTypePage(srn, index, subject), IdentityType.Other)
-      .unsafeSet(OtherRecipientDetailsPage(srn, index), RecipientDetails(otherName, "test description"))
+      .unsafeSet(
+        OtherRecipientDetailsPage(srn, index, IdentitySubject.LoanRecipient),
+        RecipientDetails(otherName, "test description")
+      )
 
   "RecipientSponsoringEmployerConnectedParty Controller" - {
 

@@ -100,7 +100,8 @@ class RecipientSponsoringEmployerConnectedPartyController @Inject()(
     request.userAnswers.get(IdentityTypePage(srn, index, IdentitySubject.LoanRecipient)).flatMap {
       case IdentityType.UKCompany => request.userAnswers.get(CompanyRecipientNamePage(srn, index))
       case IdentityType.UKPartnership => request.userAnswers.get(PartnershipRecipientNamePage(srn, index))
-      case IdentityType.Other => request.userAnswers.get(OtherRecipientDetailsPage(srn, index)).map(_.name)
+      case IdentityType.Other =>
+        request.userAnswers.get(OtherRecipientDetailsPage(srn, index, IdentitySubject.LoanRecipient)).map(_.name)
       case _ => None
     }
 }

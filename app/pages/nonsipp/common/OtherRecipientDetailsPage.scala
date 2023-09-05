@@ -17,16 +17,21 @@
 package pages.nonsipp.common
 
 import config.Refined.Max5000
-import models.RecipientDetails
+import models.{IdentitySubject, RecipientDetails}
 import models.SchemeId.Srn
 import pages.QuestionPage
-import pages.nonsipp.loansmadeoroutstanding.Paths
 import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
 
-case class OtherRecipientDetailsPage(srn: Srn, index: Max5000) extends QuestionPage[RecipientDetails] {
+case class OtherRecipientDetailsPage(srn: Srn, index: Max5000, identitySubject: IdentitySubject)
+    extends QuestionPage[RecipientDetails] {
 
-  override def path: JsPath = Paths.loanTransactions \ "recipientIdentityType" \ toString \ index.arrayIndex.toString
-
+  override def path: JsPath =
+    identitySubject match {
+      case IdentitySubject.LoanRecipient =>
+        pages.nonsipp.loansmadeoroutstanding.Paths.loanTransactions \ "recipientIdentityType" \ toString \ index.arrayIndex.toString
+      case IdentitySubject.LandOrPropertySeller =>
+        pages.nonsipp.landorproperty.Paths.landOrPropertyTransactions \ "heldPropertyTransaction" \ "propertyAcquiredFrom" \ "sellerIdentityType" \ toString \ index.arrayIndex.toString
+    }
   override def toString: String = "otherRecipientDetails"
 }

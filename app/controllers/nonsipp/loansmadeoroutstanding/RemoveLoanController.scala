@@ -73,7 +73,10 @@ class RemoveLoanController @Inject()(
             case IdentityType.UKPartnership =>
               request.userAnswers.get(PartnershipRecipientNamePage(srn, index)).getOrRecoverJourney
             case IdentityType.Other =>
-              request.userAnswers.get(OtherRecipientDetailsPage(srn, index)).map(_.name).getOrRecoverJourney
+              request.userAnswers
+                .get(OtherRecipientDetailsPage(srn, index, IdentitySubject.LoanRecipient))
+                .map(_.name)
+                .getOrRecoverJourney
           }
         recipientName.fold(
           l => l,
