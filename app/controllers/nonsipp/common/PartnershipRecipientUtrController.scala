@@ -22,7 +22,7 @@ import controllers.nonsipp.common.PartnershipRecipientUtrController._
 import forms.YesNoPageFormProvider
 import forms.mappings.Mappings
 import models.SchemeId.Srn
-import models.{ConditionalYesNo, Mode, Utr}
+import models.{ConditionalYesNo, IdentitySubject, Mode, Utr}
 import navigation.Navigator
 import pages.nonsipp.common.PartnershipRecipientUtrPage
 import pages.nonsipp.loansmadeoroutstanding.PartnershipRecipientNamePage
@@ -53,16 +53,16 @@ class PartnershipRecipientUtrController @Inject()(
 
   private val form: Form[Either[String, Utr]] = PartnershipRecipientUtrController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
-    implicit request =>
+  def onPageLoad(srn: Srn, index: Max5000, mode: Mode, subject: IdentitySubject): Action[AnyContent] =
+    identifyAndRequireData(srn) { implicit request =>
       request.usingAnswer(PartnershipRecipientNamePage(srn, index)).sync { partnershipRecipientName =>
-        val preparedForm = request.userAnswers.fillForm(PartnershipRecipientUtrPage(srn, index), form)
+        val preparedForm = request.userAnswers.fillForm(PartnershipRecipientUtrPage(srn, index, subject), form)
         Ok(view(preparedForm, viewModel(srn, index, partnershipRecipientName, mode)))
       }
-  }
+    }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
-    implicit request =>
+  def onSubmit(srn: Srn, index: Max5000, mode: Mode, subject: IdentitySubject): Action[AnyContent] =
+    identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
@@ -73,11 +73,13 @@ class PartnershipRecipientUtrController @Inject()(
           value =>
             for {
               updatedAnswers <- Future
-                .fromTry(request.userAnswers.set(PartnershipRecipientUtrPage(srn, index), ConditionalYesNo(value)))
+                .fromTry(
+                  request.userAnswers.set(PartnershipRecipientUtrPage(srn, index, subject), ConditionalYesNo(value))
+                )
               _ <- saveService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(PartnershipRecipientUtrPage(srn, index), mode, updatedAnswers))
+            } yield Redirect(navigator.nextPage(PartnershipRecipientUtrPage(srn, index, subject), mode, updatedAnswers))
         )
-  }
+    }
 }
 
 object PartnershipRecipientUtrController {

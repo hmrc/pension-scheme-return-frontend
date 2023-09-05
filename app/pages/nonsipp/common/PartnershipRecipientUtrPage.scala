@@ -18,15 +18,21 @@ package pages.nonsipp.common
 
 import config.Refined.Max5000
 import models.SchemeId.Srn
-import models.{ConditionalYesNo, Utr}
+import models.{ConditionalYesNo, IdentitySubject, Utr}
 import pages.QuestionPage
 import pages.nonsipp.loansmadeoroutstanding.Paths
 import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
 
-case class PartnershipRecipientUtrPage(srn: Srn, index: Max5000) extends QuestionPage[ConditionalYesNo[String, Utr]] {
+case class PartnershipRecipientUtrPage(srn: Srn, index: Max5000, identitySubject: IdentitySubject)
+    extends QuestionPage[ConditionalYesNo[String, Utr]] {
 
-  override def path: JsPath = Paths.loanTransactions \ "recipientIdentityType" \ toString \ index.arrayIndex.toString
+  override def path: JsPath = identitySubject match {
+    case IdentitySubject.LoanRecipient =>
+      pages.nonsipp.loansmadeoroutstanding.Paths.loanTransactions \ "recipientIdentityType" \ toString \ index.arrayIndex.toString
+    case IdentitySubject.LandOrPropertySeller =>
+      pages.nonsipp.landorproperty.Paths.landOrPropertyTransactions \ "heldPropertyTransaction" \ "propertyAcquiredFromName" \ "sellerIdentityType" \ toString \ index.arrayIndex.toString
+  }
 
   override def toString: String = "utr"
 }
