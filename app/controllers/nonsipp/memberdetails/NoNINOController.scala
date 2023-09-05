@@ -99,7 +99,7 @@ object NoNINOController {
   def uploadFormSummaryErrors(formProvider: TextFormProvider, memberFullName: String): Form[String] =
     formProvider.textArea(
       "noNINO.error.required",
-      "noNINO.error.length",
+      "noNINO.upload.error.length",
       "noNINO.upload.error.invalid",
       memberFullName
     )

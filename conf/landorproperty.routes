@@ -122,3 +122,6 @@ GET        /:srn/title-number/:index                 controllers.nonsipp.landorp
 POST       /:srn/title-number/:index                 controllers.nonsipp.landorproperty.LandRegistryTitleNumberController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
 GET        /:srn/change-title-number/:index          controllers.nonsipp.landorproperty.LandRegistryTitleNumberController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 POST       /:srn/change-title-number/:index          controllers.nonsipp.landorproperty.LandRegistryTitleNumberController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET         /:srn/what-you-will-need-land-property-disposal            controllers.nonsipp.landorpropertydisposal.WhatYouWillNeedLandPropertyDisposalController.onPageLoad(srn: Srn)
+GET         /:srn/submit-what-you-will-need-land-property-disposal      controllers.nonsipp.landorpropertydisposal.WhatYouWillNeedLandPropertyDisposalController.onSubmit(srn: Srn)
