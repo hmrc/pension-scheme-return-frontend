@@ -25,7 +25,7 @@ import utils.RefinedUtils.RefinedIntOps
 case class IsLesseeConnectedPartyPage(srn: Srn, index: Max5000) extends QuestionPage[Boolean] {
 
   override def path: JsPath =
-    JsPath \ "assets" \ "landOrProperty" \ "landOrPropertyTransactions" \ "heldPropertyTransaction" \ "leaseDetails" \ "connectedPartyStatus" \ toString \ index.arrayIndex.toString
+    Paths.landOrPropertyTransactions \ "heldPropertyTransaction" \ "leaseDetails" \ "connectedPartyStatus" \ toString \ index.arrayIndex.toString
 
 
   override def toString: String = "isLesseeConnectedParty"
