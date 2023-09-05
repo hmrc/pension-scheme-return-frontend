@@ -51,7 +51,7 @@ object LoansMadeOrOutstandingNavigator extends JourneyNavigator {
     case IdentityTypePage(srn, index, IdentitySubject.LoanRecipient) =>
       userAnswers.get(IdentityTypePage(srn, index, IdentitySubject.LoanRecipient)) match {
         case Some(IdentityType.Other) =>
-          controllers.nonsipp.loansmadeoroutstanding.routes.OtherRecipientDetailsController
+          controllers.nonsipp.common.routes.OtherRecipientDetailsController
             .onPageLoad(srn, index, NormalMode)
         case Some(IdentityType.Individual) =>
           controllers.nonsipp.loansmadeoroutstanding.routes.IndividualRecipientNameController
@@ -160,7 +160,7 @@ object LoansMadeOrOutstandingNavigator extends JourneyNavigator {
           controllers.nonsipp.loansmadeoroutstanding.routes.PartnershipRecipientNameController
             .onPageLoad(srn, index, NormalMode)
         case Some(IdentityType.Other) if userAnswers.get(OtherRecipientDetailsPage(srn, index)).isEmpty =>
-          controllers.nonsipp.loansmadeoroutstanding.routes.OtherRecipientDetailsController
+          controllers.nonsipp.common.routes.OtherRecipientDetailsController
             .onPageLoad(srn, index, NormalMode)
         case Some(_) =>
           controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController

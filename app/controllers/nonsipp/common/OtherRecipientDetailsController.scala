@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.loansmadeoroutstanding
+package controllers.nonsipp.common
 
 import config.Refined.Max5000
 import controllers.actions._
-import controllers.nonsipp.loansmadeoroutstanding.OtherRecipientDetailsController.viewModel
+import controllers.nonsipp.common.OtherRecipientDetailsController.viewModel
 import forms.RecipientDetailsFormProvider
 import models.SchemeId.Srn
 import models.{Mode, RecipientDetails}

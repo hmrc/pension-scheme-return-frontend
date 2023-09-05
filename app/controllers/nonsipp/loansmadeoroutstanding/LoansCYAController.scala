@@ -243,7 +243,8 @@ object LoansCYAController {
       case IdentityType.Individual => routes.IndividualRecipientNameController.onPageLoad(srn, index, mode).url
       case IdentityType.UKCompany => routes.CompanyRecipientNameController.onPageLoad(srn, index, mode).url
       case IdentityType.UKPartnership => routes.PartnershipRecipientNameController.onPageLoad(srn, index, mode).url
-      case IdentityType.Other => routes.OtherRecipientDetailsController.onPageLoad(srn, index, mode).url
+      case IdentityType.Other =>
+        controllers.nonsipp.common.routes.OtherRecipientDetailsController.onPageLoad(srn, index, mode).url
     }
 
     val (
@@ -279,7 +280,7 @@ object LoansCYAController {
         case IdentityType.Other =>
           (
             Message("loanCheckYourAnswers.section1.recipientDetails.other", recipientName),
-            routes.OtherRecipientDetailsController.onPageLoad(srn, index, mode).url,
+            controllers.nonsipp.common.routes.OtherRecipientDetailsController.onPageLoad(srn, index, mode).url,
             "loanCheckYourAnswers.section1.recipientDetails.other.hidden",
             ""
           )
@@ -299,7 +300,7 @@ object LoansCYAController {
           routes.PartnershipRecipientUtrController.onPageLoad(srn, index, mode).url
       case IdentityType.Other =>
         Message("loanCheckYourAnswers.section1.recipientDetails.other", recipientName) ->
-          routes.OtherRecipientDetailsController.onPageLoad(srn, index, mode).url
+          controllers.nonsipp.common.routes.OtherRecipientDetailsController.onPageLoad(srn, index, mode).url
     }
 
     val (connectedPartyKey, connectedPartyValue, connectedPartyHiddenKey, connectedPartyUrl): (

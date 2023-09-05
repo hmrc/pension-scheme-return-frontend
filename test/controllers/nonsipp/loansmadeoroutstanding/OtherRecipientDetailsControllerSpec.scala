@@ -18,6 +18,7 @@ package controllers.nonsipp.loansmadeoroutstanding
 
 import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
+import controllers.nonsipp.common.OtherRecipientDetailsController
 import eu.timepit.refined.refineMV
 import forms.RecipientDetailsFormProvider
 import models.{NormalMode, RecipientDetails}
@@ -28,8 +29,10 @@ class OtherRecipientDetailsControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[OneTo5000](1)
 
-  private lazy val onPageLoad = routes.OtherRecipientDetailsController.onPageLoad(srn, index, NormalMode)
-  private lazy val onSubmit = routes.OtherRecipientDetailsController.onSubmit(srn, index, NormalMode)
+  private lazy val onPageLoad =
+    controllers.nonsipp.common.routes.OtherRecipientDetailsController.onPageLoad(srn, index, NormalMode)
+  private lazy val onSubmit =
+    controllers.nonsipp.common.routes.OtherRecipientDetailsController.onSubmit(srn, index, NormalMode)
 
   private val validForm = List(
     "name" -> "name",
