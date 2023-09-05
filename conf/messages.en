@@ -1075,3 +1075,7 @@ whatYouWillNeedLandPropertyDisposal.landOrPropertySold3 = the buyer’s National
 whatYouWillNeedLandPropertyDisposal.landOrPropertySold4 = if the buyer was a connected party
 whatYouWillNeedLandPropertyDisposal.landOrPropertySold5 = the total amount of proceeds from the sale
 whatYouWillNeedLandPropertyDisposal.landOrPropertySold6 = if the sale was supported by an independent valuation
+
+isLesseeConnectedParty.title = Is the lessee a connected party?
+isLesseeConnectedParty.heading = Is {0} a connected party?
+isLesseeConnectedParty.error.required = Select yes if the lessee is a connected party
