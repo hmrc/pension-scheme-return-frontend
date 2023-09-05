@@ -57,7 +57,7 @@ class PartnershipRecipientUtrController @Inject()(
     identifyAndRequireData(srn) { implicit request =>
       request.usingAnswer(PartnershipRecipientNamePage(srn, index)).sync { partnershipRecipientName =>
         val preparedForm = request.userAnswers.fillForm(PartnershipRecipientUtrPage(srn, index, subject), form)
-        Ok(view(preparedForm, viewModel(srn, index, partnershipRecipientName, mode)))
+        Ok(view(preparedForm, viewModel(srn, index, partnershipRecipientName, mode, subject)))
       }
     }
 
@@ -68,7 +68,9 @@ class PartnershipRecipientUtrController @Inject()(
         .fold(
           formWithErrors =>
             request.usingAnswer(PartnershipRecipientNamePage(srn, index)).async { partnershipRecipientName =>
-              Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, partnershipRecipientName, mode))))
+              Future.successful(
+                BadRequest(view(formWithErrors, viewModel(srn, index, partnershipRecipientName, mode, subject)))
+              )
             },
           value =>
             for {
@@ -100,7 +102,8 @@ object PartnershipRecipientUtrController {
     srn: Srn,
     index: Max5000,
     partnershipRecipientName: String,
-    mode: Mode
+    mode: Mode,
+    subject: IdentitySubject
   ): FormPageViewModel[ConditionalYesNoPageViewModel] =
     FormPageViewModel[ConditionalYesNoPageViewModel](
       "partnershipRecipientUtr.title",
@@ -111,6 +114,6 @@ object PartnershipRecipientUtrController {
         no = YesNoViewModel
           .Conditional(Message("partnershipRecipientUtr.no.conditional", partnershipRecipientName), FieldType.Textarea)
       ),
-      routes.PartnershipRecipientUtrController.onSubmit(srn, index, mode)
+      routes.PartnershipRecipientUtrController.onSubmit(srn, index, mode, subject)
     )
 }
