@@ -22,7 +22,7 @@ import controllers.nonsipp.common.OtherRecipientDetailsController
 import eu.timepit.refined.refineMV
 import forms.RecipientDetailsFormProvider
 import models.{NormalMode, RecipientDetails}
-import pages.nonsipp.loansmadeoroutstanding.OtherRecipientDetailsPage
+import pages.nonsipp.common.OtherRecipientDetailsPage
 import views.html.RecipientDetailsView
 
 class OtherRecipientDetailsControllerSpec extends ControllerBaseSpec {

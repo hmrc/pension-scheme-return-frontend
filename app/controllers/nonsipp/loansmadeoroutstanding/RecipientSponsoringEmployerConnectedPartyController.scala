@@ -23,7 +23,7 @@ import models.SchemeId.Srn
 import models.requests.DataRequest
 import models.{IdentitySubject, IdentityType, Mode, SponsoringOrConnectedParty}
 import navigation.Navigator
-import pages.nonsipp.common.IdentityTypePage
+import pages.nonsipp.common.{IdentityTypePage, OtherRecipientDetailsPage}
 import pages.nonsipp.loansmadeoroutstanding._
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}

@@ -23,7 +23,7 @@ import models.ConditionalYesNo._
 import models.{CheckOrChange, IdentitySubject, IdentityType, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.common.{CompanyRecipientCrnPage, IdentityTypePage, IdentityTypes}
+import pages.nonsipp.common.{CompanyRecipientCrnPage, IdentityTypePage, IdentityTypes, OtherRecipientDetailsPage}
 import pages.nonsipp.loansmadeoroutstanding._
 import play.api.mvc.Call
 
