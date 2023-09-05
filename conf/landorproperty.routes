@@ -122,3 +122,12 @@ GET        /:srn/title-number/:index                 controllers.nonsipp.landorp
 POST       /:srn/title-number/:index                 controllers.nonsipp.landorproperty.LandRegistryTitleNumberController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
 GET        /:srn/change-title-number/:index          controllers.nonsipp.landorproperty.LandRegistryTitleNumberController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 POST       /:srn/change-title-number/:index          controllers.nonsipp.landorproperty.LandRegistryTitleNumberController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET        /:srn/is-lessee-connected-party                      controllers.nonsipp.landorproperty.IsLesseeConnectedPartyController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
+GET        /:srn/is-lessee-connected-party/:index               controllers.nonsipp.landorproperty.IsLesseeConnectedPartyController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST       /:srn/is-lessee-connected-party                      controllers.nonsipp.landorproperty.IsLesseeConnectedPartyController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
+POST       /:srn/is-lessee-connected-party/:index               controllers.nonsipp.landorproperty.IsLesseeConnectedPartyController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET        /:srn/change-is-lessee-connected-party               controllers.nonsipp.landorproperty.IsLesseeConnectedPartyController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
+GET        /:srn/change-is-lessee-connected-party/:index        controllers.nonsipp.landorproperty.IsLesseeConnectedPartyController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST       /:srn/change-is-lessee-connected-party               controllers.nonsipp.landorproperty.IsLesseeConnectedPartyController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
+POST       /:srn/change-is-lessee-connected-party/:index        controllers.nonsipp.landorproperty.IsLesseeConnectedPartyController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
