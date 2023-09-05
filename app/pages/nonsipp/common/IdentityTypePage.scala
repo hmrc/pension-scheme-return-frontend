@@ -70,7 +70,7 @@ case class IdentityTypePage(srn: Srn, index: Max5000, identitySubject: IdentityS
           CompanyRecipientCrnPage(srn, index, this.identitySubject),
           RecipientSponsoringEmployerConnectedPartyPage(srn, index),
           PartnershipRecipientNamePage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
-          PartnershipRecipientUtrPage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
+          PartnershipRecipientUtrPage(srn, index, this.identitySubject),
           OtherRecipientDetailsPage(srn, index) // TODO move this to generic page (with subject) and pass in this.identitySubject
         )
       case IdentitySubject.LandOrPropertySeller => List() // TODO add land or property pages here
