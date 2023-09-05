@@ -17,6 +17,7 @@
 package controllers.nonsipp.common
 
 import config.Refined.Max5000
+import controllers.PSRController
 import controllers.actions._
 import controllers.nonsipp.common.OtherRecipientDetailsController.viewModel
 import forms.RecipientDetailsFormProvider
@@ -29,7 +30,6 @@ import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.FormUtils._
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
@@ -48,7 +48,7 @@ class OtherRecipientDetailsController @Inject()(
   view: RecipientDetailsView,
   val controllerComponents: MessagesControllerComponents
 )(implicit ec: ExecutionContext)
-    extends FrontendBaseController
+    extends PSRController
     with I18nSupport {
 
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode, subject: IdentitySubject): Action[AnyContent] =
@@ -104,7 +104,7 @@ object OtherRecipientDetailsController {
       case IdentitySubject.LoanRecipient => ""
       case IdentitySubject.LandOrPropertySeller =>
         userAnswers.get(LandOrPropertyAddressLookupPage(srn, index)) match {
-          case Some(value) => value.toString
+          case Some(value) => value.addressLine1
           case None => ""
         }
     }

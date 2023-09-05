@@ -20,7 +20,7 @@ import eu.timepit.refined.refineMV
 import models.{IdentitySubject, IdentityType, NormalMode, SchemeHoldLandProperty, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.common.CompanyRecipientCrnPage
+import pages.nonsipp.common.{CompanyRecipientCrnPage, OtherRecipientDetailsPage}
 import pages.nonsipp.landorproperty._
 import play.api.mvc.Call
 
@@ -78,6 +78,10 @@ object LandOrPropertyNavigator extends JourneyNavigator {
           controllers.nonsipp.landorproperty.routes.PartnershipSellerNameController
             .onPageLoad(srn, index, NormalMode) //27h6
 
+        case Some(IdentityType.Other) =>
+          controllers.nonsipp.common.routes.OtherRecipientDetailsController
+            .onPageLoad(srn, index, NormalMode, IdentitySubject.LandOrPropertySeller)
+
         case _ => controllers.routes.UnauthorisedController.onPageLoad() //TODO 27h8
 
       }
@@ -128,6 +132,10 @@ object LandOrPropertyNavigator extends JourneyNavigator {
 
     case LandOrPropertySellerConnectedPartyPage(srn, index) =>
       controllers.nonsipp.landorproperty.routes.LandPropertyIndependentValuationController
+        .onPageLoad(srn, index, NormalMode)
+
+    case OtherRecipientDetailsPage(srn, index, IdentitySubject.LandOrPropertySeller) =>
+      controllers.nonsipp.landorproperty.routes.LandOrPropertySellerConnectedPartyController
         .onPageLoad(srn, index, NormalMode)
 
   }

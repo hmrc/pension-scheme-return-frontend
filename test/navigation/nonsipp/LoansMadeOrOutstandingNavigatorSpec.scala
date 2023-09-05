@@ -313,6 +313,7 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
           Gen.const(recipientDetails),
           controllers.nonsipp.loansmadeoroutstanding.routes.RecipientSponsoringEmployerConnectedPartyController.onPageLoad
         )
+        .withName("go from other recipient details page to recipient connected party page")
     )
   }
 }
