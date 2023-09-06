@@ -14,14 +14,24 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages
 
-import play.api.libs.json._
+import config.Refined.OneTo5000
+import eu.timepit.refined.refineMV
+import models.NormalMode
+import pages.behaviours.PageBehaviours
+import pages.nonsipp.landorproperty.IsLesseeConnectedPartyPage
 
-package object landorproperty {
-  object Paths {
-    val assets: JsPath = __ \ "assets"
-    val landOrPropertyTransactions: JsPath = assets \ "landOrProperty" \ "landOrPropertyTransactions"
-    val heldPropertyTransactions: JsPath = landOrPropertyTransactions \ "heldPropertyTransaction"
+class IsLesseeConnectedPartyPageSpec extends PageBehaviours {
+
+  "IsLesseeConnectedPartyPage" - {
+
+    val index = refineMV[OneTo5000](1)
+
+    beRetrievable[Boolean](IsLesseeConnectedPartyPage(srnGen.sample.value, index))
+
+    beSettable[Boolean](IsLesseeConnectedPartyPage(srnGen.sample.value, index))
+
+    beRemovable[Boolean](IsLesseeConnectedPartyPage(srnGen.sample.value, index))
   }
 }

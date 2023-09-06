@@ -14,14 +14,9 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages.nonsipp.landorpropertydisposal
 
-import play.api.libs.json._
+import models.SchemeId.Srn
+import pages.Page
 
-package object landorproperty {
-  object Paths {
-    val assets: JsPath = __ \ "assets"
-    val landOrPropertyTransactions: JsPath = assets \ "landOrProperty" \ "landOrPropertyTransactions"
-    val heldPropertyTransactions: JsPath = landOrPropertyTransactions \ "heldPropertyTransaction"
-  }
-}
+case class WhatYouWillNeedLandPropertyDisposalPage(srn: Srn) extends Page

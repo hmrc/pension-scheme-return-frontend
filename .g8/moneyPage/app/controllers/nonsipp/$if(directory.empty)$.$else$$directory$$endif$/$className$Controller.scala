@@ -1,4 +1,24 @@
-package controllers
+/*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+$if(directory.empty)$
+package controllers.nonsipp
+$else$
+package controllers.nonsipp.$directory$
+$endif$
 
 import controllers.actions._
 import forms.MoneyFormProvider
@@ -7,7 +27,6 @@ import forms.mappings.errors.MoneyFormErrors
 import config.Constants
 import models.SchemeId.Srn
 import navigation.Navigator
-import pages.$className$Page
 import play.api.data.Form
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel, QuestionField}
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
@@ -17,8 +36,13 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import controllers.PSRController
 import views.html.MoneyView
 import services.SaveService
-import $className;format="cap"$Controller._
 import viewmodels.implicits._
+import $className;format="cap"$Controller._
+$if(directory.empty)$
+import pages.$className$Page
+$else$
+import pages.nonsipp.$directory$.$className$Page
+$endif$
 $if(!index.empty)$
 import config.Refined.$index$
 $endif$
@@ -106,11 +130,19 @@ object $className;format="cap"$Controller {
         QuestionField.input(Empty, Some("$className;format="decap"$.hint"))
         $endif$
       ),
-      $if(index.empty)$
-      routes.$className;format="cap"$Controller.onSubmit(srn, mode)
+     $if(index.empty)$
+      $if(directory.empty)$
+      controllers.nonsipp.routes.$className;format="cap"$Controller.onSubmit(srn, mode)
       $else$
-      routes.$className;format="cap"$Controller.onSubmit(srn, index, mode)
+      controllers.nonsipp.$directory$.routes.$className;format="cap"$Controller.onSubmit(srn, mode)
       $endif$
+    $else$
+    $if(directory.empty)$
+      controllers.nonsipp.routes.$className;format="cap"$Controller.onSubmit(srn, index, mode)
+      $else$
+      controllers.nonsipp.$directory$.routes.$className;format="cap"$Controller.onSubmit(srn, index, mode)
+      $endif$
+    $endif$
     )
   }
 }

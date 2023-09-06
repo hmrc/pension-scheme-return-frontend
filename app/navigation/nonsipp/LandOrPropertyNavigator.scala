@@ -106,15 +106,20 @@ object LandOrPropertyNavigator extends JourneyNavigator {
         controllers.routes.UnauthorisedController.onPageLoad()
       }
 
-    case page @ IsLandPropertyLeasedPage(srn, index) =>
+    case page @ IsLandPropertyLeasedPage(srn, index) => //27j2
       if (userAnswers.get(page).contains(true)) {
         controllers.nonsipp.landorproperty.routes.LandOrPropertyLeaseDetailsController
           .onPageLoad(srn, index, NormalMode)
       } else {
-        controllers.routes.UnauthorisedController.onPageLoad()
+        //27j5
+        controllers.nonsipp.landorproperty.routes.LandOrPropertyTotalIncomeController
+          .onPageLoad(srn, index, NormalMode)
       }
 
     case LandOrPropertyLeaseDetailsPage(srn, index) =>
+      controllers.nonsipp.landorproperty.routes.IsLesseeConnectedPartyController.onPageLoad(srn, index, NormalMode)
+
+    case IsLesseeConnectedPartyPage(srn, index) =>
       controllers.routes.UnauthorisedController.onPageLoad()
 
     case CompanySellerNamePage(srn, index) =>
@@ -138,6 +143,8 @@ object LandOrPropertyNavigator extends JourneyNavigator {
       controllers.nonsipp.landorproperty.routes.LandOrPropertySellerConnectedPartyController
         .onPageLoad(srn, index, NormalMode)
 
+    case LandOrPropertyTotalIncomePage(srn, index) => //27j5
+      controllers.routes.UnauthorisedController.onPageLoad()
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty

@@ -31,4 +31,8 @@ object Refined {
   type OneTo5000 = Greater[0] And LessEqual[5000]
   type Max5000 = Int Refined OneTo5000
 
+  // used by generators
+  object Max5000 {
+    type Refined = Greater[0] And LessEqual[5000]
+  }
 }
