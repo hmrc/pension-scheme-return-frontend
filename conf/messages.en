@@ -1093,3 +1093,8 @@ landOrPropertyTotalIncome.error.tooLarge = Total income from the land or propert
 landOrPropertyDisposal.title = Did the scheme dispose of any land or property during the period of this return?
 landOrPropertyDisposal.heading = Did {0} dispose of any land or property during the period of this return?
 landOrPropertyDisposal.error.required = Select yes if the scheme disposed of any land or property during the period of this return
+
+
+landOrPropertyStillHeld.title = Is any part of the land or property still held by the scheme?
+landOrPropertyStillHeld.heading = Is any part of {0} still held by {1}?
+landOrPropertyStillHeld.error.required = Select yes if any part of the land or property is still held by the scheme

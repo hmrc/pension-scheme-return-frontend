@@ -14,14 +14,21 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages.nonsipp.landorpropertydisposal
 
-import play.api.libs.json.{__, JsPath}
+import play.api.libs.json.JsPath
+import models.SchemeId.Srn
+import models.Money
+import pages.QuestionPage
+import config.Refined.{Max50, Max5000}
+import utils.RefinedUtils._
+import eu.timepit.refined.refineMV
 
-package object landorpropertydisposal {
-  object Paths {
-    val assets: JsPath = __ \ "assets"
-    val landOrProperty: JsPath = assets \ "landOrProperty"
-    val disposalPropertyTransaction: JsPath = landOrProperty \ "heldPropertyTransaction" \ "disposedPropertyTransaction"
-  }
+case class LandOrPropertyStillHeldPage(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50)
+    extends QuestionPage[Boolean] {
+
+  override def path: JsPath =
+    Paths.disposalPropertyTransaction \ toString \ landOrPropertyIndex.arrayIndex.toString \ disposalIndex.arrayIndex.toString
+
+  override def toString: String = "portionStillHeld"
 }
