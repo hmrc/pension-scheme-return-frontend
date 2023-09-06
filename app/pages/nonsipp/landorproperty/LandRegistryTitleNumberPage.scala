@@ -26,7 +26,8 @@ import utils.RefinedUtils._
 case class LandRegistryTitleNumberPage(srn: Srn, index: Max5000)
     extends QuestionPage[ConditionalYesNo[String, String]] {
 
-  override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString
+  override def path: JsPath =
+    Paths.landOrPropertyTransactions \ "propertyDetails" \ toString \ index.arrayIndex.toString
 
   override def toString: String = "landRegistryTitleNumber"
 }

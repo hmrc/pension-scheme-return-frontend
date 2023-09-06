@@ -24,8 +24,7 @@ import utils.RefinedUtils.RefinedIntOps
 
 case class IsLandPropertyLeasedPage(srn: Srn, index: Max5000) extends QuestionPage[Boolean] {
 
-  override def path: JsPath =
-    JsPath \ "assets" \ "landOrProperty" \ "landOrPropertyTransactions" \ "heldPropertyTransaction" \ toString \ index.arrayIndex.toString
+  override def path: JsPath = Paths.heldPropertyTransactions \ toString \ index.arrayIndex.toString
 
   override def toString: String = "landOrPropertyLeased"
 
