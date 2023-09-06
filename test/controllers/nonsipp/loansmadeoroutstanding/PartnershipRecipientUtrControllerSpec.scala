@@ -49,7 +49,7 @@ class PartnershipRecipientUtrControllerSpec extends ControllerBaseSpec {
       injected[ConditionalYesNoPageView]
         .apply(
           form(injected[YesNoPageFormProvider]),
-          viewModel(srn, index, partnershipName, NormalMode, IdentitySubject.LoanRecipient)
+          viewModel(srn, index, NormalMode, IdentitySubject.LoanRecipient, userAnswersWithPartnershipRecipientName)
         )
     })
 
@@ -63,7 +63,7 @@ class PartnershipRecipientUtrControllerSpec extends ControllerBaseSpec {
         injected[ConditionalYesNoPageView]
           .apply(
             form(injected[YesNoPageFormProvider]).fill(conditionalNo.value),
-            viewModel(srn, index, partnershipName, NormalMode, IdentitySubject.LoanRecipient)
+            viewModel(srn, index, NormalMode, IdentitySubject.LoanRecipient, userAnswersWithPartnershipRecipientName)
           )
       }
     )
