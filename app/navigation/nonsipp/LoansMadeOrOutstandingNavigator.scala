@@ -82,13 +82,13 @@ object LoansMadeOrOutstandingNavigator extends JourneyNavigator {
 
     case PartnershipRecipientNamePage(srn, index) =>
       controllers.nonsipp.common.routes.PartnershipRecipientUtrController
-        .onPageLoad(srn, index, NormalMode)
+        .onPageLoad(srn, index, NormalMode, IdentitySubject.LoanRecipient)
 
     case OtherRecipientDetailsPage(srn, index) =>
       controllers.nonsipp.loansmadeoroutstanding.routes.RecipientSponsoringEmployerConnectedPartyController
         .onPageLoad(srn, index, NormalMode)
 
-    case PartnershipRecipientUtrPage(srn, index) =>
+    case PartnershipRecipientUtrPage(srn, index, IdentitySubject.LoanRecipient) =>
       controllers.nonsipp.loansmadeoroutstanding.routes.RecipientSponsoringEmployerConnectedPartyController
         .onPageLoad(srn, index, NormalMode)
 
@@ -193,7 +193,7 @@ object LoansMadeOrOutstandingNavigator extends JourneyNavigator {
       controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
         .onPageLoad(srn, index, Check)
 
-    case PartnershipRecipientUtrPage(srn, index) =>
+    case PartnershipRecipientUtrPage(srn, index, IdentitySubject.LoanRecipient) =>
       controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
         .onPageLoad(srn, index, Check)
 

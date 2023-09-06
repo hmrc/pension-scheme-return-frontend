@@ -69,7 +69,9 @@ class LoansCYAController @Inject()(
             request.userAnswers
               .get(CompanyRecipientCrnPage(srn, index, IdentitySubject.LoanRecipient))
               .flatMap(_.value.toOption.map(_.value)),
-            request.userAnswers.get(PartnershipRecipientUtrPage(srn, index)).flatMap(_.value.toOption.map(_.value)),
+            request.userAnswers
+              .get(PartnershipRecipientUtrPage(srn, index, IdentitySubject.LoanRecipient))
+              .flatMap(_.value.toOption.map(_.value)),
             request.userAnswers.get(OtherRecipientDetailsPage(srn, index)).map(_.description)
           ).flatten.headOption
           recipientReasonNoDetails = List(
@@ -79,7 +81,9 @@ class LoansCYAController @Inject()(
             request.userAnswers
               .get(CompanyRecipientCrnPage(srn, index, IdentitySubject.LoanRecipient))
               .flatMap(_.value.swap.toOption.map(_.value)),
-            request.userAnswers.get(PartnershipRecipientUtrPage(srn, index)).flatMap(_.value.swap.toOption.map(_.value))
+            request.userAnswers
+              .get(PartnershipRecipientUtrPage(srn, index, IdentitySubject.LoanRecipient))
+              .flatMap(_.value.swap.toOption.map(_.value))
           ).flatten.headOption
           connectedParty = if (request.userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, index)).isEmpty) {
             Right(request.userAnswers.get(RecipientSponsoringEmployerConnectedPartyPage(srn, index)).get)
@@ -272,7 +276,9 @@ object LoansCYAController {
         case IdentityType.UKPartnership =>
           (
             Message("loanCheckYourAnswers.section1.recipientDetails.utr", recipientName),
-            controllers.nonsipp.common.routes.PartnershipRecipientUtrController.onPageLoad(srn, index, mode).url,
+            controllers.nonsipp.common.routes.PartnershipRecipientUtrController
+              .onPageLoad(srn, index, mode, IdentitySubject.LoanRecipient)
+              .url,
             "loanCheckYourAnswers.section1.recipientDetails.utr.hidden",
             "loanCheckYourAnswers.section1.recipientDetails.noUtrReason.hidden"
           )
@@ -296,7 +302,9 @@ object LoansCYAController {
             .url
       case IdentityType.UKPartnership =>
         Message("loanCheckYourAnswers.section1.recipientDetails.noUtrReason", recipientName) ->
-          controllers.nonsipp.common.routes.PartnershipRecipientUtrController.onPageLoad(srn, index, mode).url
+          controllers.nonsipp.common.routes.PartnershipRecipientUtrController
+            .onPageLoad(srn, index, mode, IdentitySubject.LoanRecipient)
+            .url
       case IdentityType.Other =>
         Message("loanCheckYourAnswers.section1.recipientDetails.other", recipientName) ->
           routes.OtherRecipientDetailsController.onPageLoad(srn, index, mode).url
