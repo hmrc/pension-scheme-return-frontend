@@ -54,7 +54,7 @@ class PartnershipRecipientUtrController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode, subject: IdentitySubject): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      val form: Form[Either[String, Utr]] = PartnershipRecipientUtrController.form(formProvider)
+      val form: Form[Either[String, Utr]] = PartnershipRecipientUtrController.form(formProvider, subject)
 
       val preparedForm = request.userAnswers.fillForm(PartnershipRecipientUtrPage(srn, index, subject), form)
 
@@ -63,7 +63,7 @@ class PartnershipRecipientUtrController @Inject()(
 
   def onSubmit(srn: Srn, index: Max5000, mode: Mode, subject: IdentitySubject): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      val form: Form[Either[String, Utr]] = PartnershipRecipientUtrController.form(formProvider)
+      val form: Form[Either[String, Utr]] = PartnershipRecipientUtrController.form(formProvider, subject)
       form
         .bindFromRequest()
         .fold(
@@ -83,18 +83,19 @@ class PartnershipRecipientUtrController @Inject()(
 }
 
 object PartnershipRecipientUtrController {
-  def form(formProvider: YesNoPageFormProvider): Form[Either[String, Utr]] = formProvider.conditional(
-    "partnershipRecipientUtr.error.required",
-    mappingNo = Mappings.textArea(
-      "partnershipRecipientUtr.no.conditional.error.required",
-      "partnershipRecipientUtr.no.conditional.error.invalid",
-      "partnershipRecipientUtr.no.conditional.error.length"
-    ),
-    mappingYes = Mappings.utr(
-      "partnershipRecipientUtr.yes.conditional.error.required",
-      "partnershipRecipientUtr.yes.conditional.error.invalid"
+  def form(formProvider: YesNoPageFormProvider, subject: IdentitySubject): Form[Either[String, Utr]] =
+    formProvider.conditional(
+      s"${subject.key}.partnershipRecipientUtr.error.required",
+      mappingNo = Mappings.textArea(
+        s"${subject.key}.partnershipRecipientUtr.no.conditional.error.required",
+        s"${subject.key}.partnershipRecipientUtr.no.conditional.error.invalid",
+        s"${subject.key}.partnershipRecipientUtr.no.conditional.error.length"
+      ),
+      mappingYes = Mappings.utr(
+        s"${subject.key}.partnershipRecipientUtr.yes.conditional.error.required",
+        s"${subject.key}.partnershipRecipientUtr.yes.conditional.error.invalid"
+      )
     )
-  )
 
   def viewModel(
     srn: Srn,
@@ -116,13 +117,19 @@ object PartnershipRecipientUtrController {
         }
     }
     FormPageViewModel[ConditionalYesNoPageViewModel](
-      "partnershipRecipientUtr.title",
-      Message("partnershipRecipientUtr.heading", partnershipRecipientName),
+      s"${subject.key}.partnershipRecipientUtr.title",
+      Message(s"${subject.key}.partnershipRecipientUtr.heading", partnershipRecipientName),
       ConditionalYesNoPageViewModel(
         yes = YesNoViewModel
-          .Conditional(Message("partnershipRecipientUtr.yes.conditional", partnershipRecipientName), FieldType.Input),
+          .Conditional(
+            Message(s"${subject.key}.partnershipRecipientUtr.yes.conditional", partnershipRecipientName),
+            FieldType.Input
+          ),
         no = YesNoViewModel
-          .Conditional(Message("partnershipRecipientUtr.no.conditional", partnershipRecipientName), FieldType.Textarea)
+          .Conditional(
+            Message(s"${subject.key}.partnershipRecipientUtr.no.conditional", partnershipRecipientName),
+            FieldType.Textarea
+          )
       ),
       routes.PartnershipRecipientUtrController.onSubmit(srn, index, mode, subject)
     )

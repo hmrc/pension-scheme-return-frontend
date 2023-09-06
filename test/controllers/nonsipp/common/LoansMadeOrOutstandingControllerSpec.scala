@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.loansmadeoroutstanding
+package controllers.nonsipp.common
 
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.loansmadeoroutstanding.LoansMadeOrOutstandingController._
+import controllers.nonsipp.loansmadeoroutstanding.routes
 import forms.YesNoPageFormProvider
 import models.NormalMode
 import pages.nonsipp.loansmadeoroutstanding.LoansMadeOrOutstandingPage

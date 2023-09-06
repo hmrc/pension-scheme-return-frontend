@@ -48,7 +48,7 @@ class PartnershipRecipientUtrControllerSpec extends ControllerBaseSpec {
     act.like(renderView(onPageLoad, userAnswersWithPartnershipRecipientName) { implicit app => implicit request =>
       injected[ConditionalYesNoPageView]
         .apply(
-          form(injected[YesNoPageFormProvider]),
+          form(injected[YesNoPageFormProvider], IdentitySubject.LoanRecipient),
           viewModel(srn, index, NormalMode, IdentitySubject.LoanRecipient, userAnswersWithPartnershipRecipientName)
         )
     })
@@ -62,7 +62,7 @@ class PartnershipRecipientUtrControllerSpec extends ControllerBaseSpec {
       ) { implicit app => implicit request =>
         injected[ConditionalYesNoPageView]
           .apply(
-            form(injected[YesNoPageFormProvider]).fill(conditionalNo.value),
+            form(injected[YesNoPageFormProvider], IdentitySubject.LoanRecipient).fill(conditionalNo.value),
             viewModel(srn, index, NormalMode, IdentitySubject.LoanRecipient, userAnswersWithPartnershipRecipientName)
           )
       }
