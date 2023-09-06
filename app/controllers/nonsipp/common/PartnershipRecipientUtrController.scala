@@ -22,9 +22,10 @@ import controllers.nonsipp.common.PartnershipRecipientUtrController._
 import forms.YesNoPageFormProvider
 import forms.mappings.Mappings
 import models.SchemeId.Srn
-import models.{ConditionalYesNo, IdentitySubject, Mode, Utr}
+import models.{ConditionalYesNo, IdentitySubject, Mode, UserAnswers, Utr}
 import navigation.Navigator
 import pages.nonsipp.common.PartnershipRecipientUtrPage
+import pages.nonsipp.landorproperty.PartnershipSellerNamePage
 import pages.nonsipp.loansmadeoroutstanding.PartnershipRecipientNamePage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -51,27 +52,24 @@ class PartnershipRecipientUtrController @Inject()(
     extends FrontendBaseController
     with I18nSupport {
 
-  private val form: Form[Either[String, Utr]] = PartnershipRecipientUtrController.form(formProvider)
-
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode, subject: IdentitySubject): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      request.usingAnswer(PartnershipRecipientNamePage(srn, index)).sync { partnershipRecipientName =>
-        val preparedForm = request.userAnswers.fillForm(PartnershipRecipientUtrPage(srn, index, subject), form)
-        Ok(view(preparedForm, viewModel(srn, index, partnershipRecipientName, mode, subject)))
-      }
+      val form: Form[Either[String, Utr]] = PartnershipRecipientUtrController.form(formProvider)
+
+      val preparedForm = request.userAnswers.fillForm(PartnershipRecipientUtrPage(srn, index, subject), form)
+
+      Ok(view(preparedForm, viewModel(srn, index, mode, subject, request.userAnswers)))
     }
 
   def onSubmit(srn: Srn, index: Max5000, mode: Mode, subject: IdentitySubject): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
+      val form: Form[Either[String, Utr]] = PartnershipRecipientUtrController.form(formProvider)
       form
         .bindFromRequest()
         .fold(
           formWithErrors =>
-            request.usingAnswer(PartnershipRecipientNamePage(srn, index)).async { partnershipRecipientName =>
-              Future.successful(
-                BadRequest(view(formWithErrors, viewModel(srn, index, partnershipRecipientName, mode, subject)))
-              )
-            },
+            Future
+              .successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode, subject, request.userAnswers)))),
           value =>
             for {
               updatedAnswers <- Future
@@ -101,10 +99,22 @@ object PartnershipRecipientUtrController {
   def viewModel(
     srn: Srn,
     index: Max5000,
-    partnershipRecipientName: String,
     mode: Mode,
-    subject: IdentitySubject
-  ): FormPageViewModel[ConditionalYesNoPageViewModel] =
+    subject: IdentitySubject,
+    userAnswers: UserAnswers
+  ): FormPageViewModel[ConditionalYesNoPageViewModel] = {
+    val partnershipRecipientName = subject match {
+      case IdentitySubject.LoanRecipient =>
+        userAnswers.get(PartnershipRecipientNamePage(srn, index)) match { //loan
+          case Some(value) => value
+          case None => ""
+        }
+      case IdentitySubject.LandOrPropertySeller =>
+        userAnswers.get(PartnershipSellerNamePage(srn, index)) match { //property
+          case Some(value) => value
+          case None => ""
+        }
+    }
     FormPageViewModel[ConditionalYesNoPageViewModel](
       "partnershipRecipientUtr.title",
       Message("partnershipRecipientUtr.heading", partnershipRecipientName),
@@ -116,4 +126,5 @@ object PartnershipRecipientUtrController {
       ),
       routes.PartnershipRecipientUtrController.onSubmit(srn, index, mode, subject)
     )
+  }
 }
