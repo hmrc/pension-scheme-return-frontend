@@ -522,6 +522,8 @@ nonsipp.tasklist.shares.change.quotedshares.title = Change value of quoted share
 nonsipp.tasklist.landorproperty.title = Land or property
 nonsipp.tasklist.landorproperty.add.title = Add land or property
 nonsipp.tasklist.landorproperty.change.title = Change land or property
+nonsipp.tasklist.landorpropertydisposal.add.title = Report disposal of land or property
+nonsipp.tasklist.landorpropertydisposal.change.title = Change disposal of land or property
 nonsipp.tasklist.bonds.title = Unregulated or connected party bonds
 nonsipp.tasklist.bonds.add.unregulatedorconnected.title = Add unregulated or connected party bonds
 nonsipp.tasklist.bonds.change.unregulatedorconnected.title = Add unregulated or connected party bonds
@@ -1097,3 +1099,13 @@ landOrPropertyTotalIncome.hint = This includes income, such as rent, and all oth
 landOrPropertyTotalIncome.error.required = Enter the total income from the land or property in the period of this return, in pounds and pence
 landOrPropertyTotalIncome.error.invalid = Total income from the land or property in the period of this return must be an amount of money, like 123 or 123.45
 landOrPropertyTotalIncome.error.tooLarge = Total income from the land or property in the period of this return must be 999999999.99 or less
+
+
+landOrPropertyDisposal.title = Did the scheme dispose of any land or property during the period of this return?
+landOrPropertyDisposal.heading = Did {0} dispose of any land or property during the period of this return?
+landOrPropertyDisposal.error.required = Select yes if the scheme disposed of any land or property during the period of this return
+
+
+landOrPropertyStillHeld.title = Is any part of the land or property still held by the scheme?
+landOrPropertyStillHeld.heading = Is any part of {0} still held by {1}?
+landOrPropertyStillHeld.error.required = Select yes if any part of the land or property is still held by the scheme

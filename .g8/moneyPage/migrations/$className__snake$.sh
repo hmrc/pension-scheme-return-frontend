@@ -42,25 +42,16 @@ echo "$className;format="decap"$.error.required = $errorRequired$"  >> ../conf/m
 echo "$className;format="decap"$.error.invalid = $errorInvalid$"  >> ../conf/messages.en
 echo "$className;format="decap"$.error.tooLarge = $errorTooLarge$"  >> ../conf/messages.en
 
-case $directory$ in
-  landorproperty)
-    NAV="../app/navigation/nonsipp/LandOrPropertyNavigator.scala"
-    SPEC="../test/navigation/nonsipp/LandOrPropertyNavigatorSpec.scala"
-    ;;
-  *)
-    NAV=
-    SPEC=
-    ;;
-esac
+DIR="$directory$"
 
-if [ -z \$NAV ]; then
-  echo "NAV empty, skipping"
+if [ -z \$DIR ]; then
+  echo "DIR empty, skipping"
 else
   echo "Add to navigator"
   $if(index.empty)$
-  ../.g8/scripts/updateNavigator $className;format="cap"$Page \$NAV \$SPEC
+  ../.g8/scripts/updateNavigator $className;format="cap"$Page $directory$
   $else$
-  ../.g8/scripts/updateNavigator $className;format="cap"$Page \$NAV \$SPEC "index=true"
+  ../.g8/scripts/updateNavigator $className;format="cap"$Page $directory$ "index=true"
   $endif$
 fi
 

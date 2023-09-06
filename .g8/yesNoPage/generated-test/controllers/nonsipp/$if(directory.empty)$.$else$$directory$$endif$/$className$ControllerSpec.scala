@@ -57,7 +57,6 @@ class $className;format="cap"$ControllerSpec extends ControllerBaseSpec {
       injected[YesNoPageView].apply(form(injected[YesNoPageFormProvider]).fill(true), viewModel(srn, index, NormalMode))
     })
     $endif$
-      .g8/conditionalYesNoPage/app/controllers/nonsipp/$if(directory.empty)$.$else$$directory$$endif$/$className$Controller.scala
     act.like(redirectNextPage(onSubmit, "value" -> "true"))
     act.like(redirectNextPage(onSubmit, "value" -> "false"))
 
