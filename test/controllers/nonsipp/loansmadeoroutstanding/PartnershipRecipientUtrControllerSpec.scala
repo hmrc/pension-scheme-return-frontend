@@ -21,7 +21,7 @@ import controllers.ControllerBaseSpec
 import controllers.nonsipp.common.PartnershipRecipientUtrController._
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
-import models.{ConditionalYesNo, NormalMode, Utr}
+import models.{ConditionalYesNo, IdentitySubject, NormalMode, Utr}
 import pages.nonsipp.common.PartnershipRecipientUtrPage
 import pages.nonsipp.loansmadeoroutstanding.PartnershipRecipientNamePage
 import views.html.ConditionalYesNoPageView
@@ -31,9 +31,11 @@ class PartnershipRecipientUtrControllerSpec extends ControllerBaseSpec {
   private val index = refineMV[OneTo5000](1)
 
   private lazy val onPageLoad =
-    controllers.nonsipp.common.routes.PartnershipRecipientUtrController.onPageLoad(srn, index, NormalMode)
+    controllers.nonsipp.common.routes.PartnershipRecipientUtrController
+      .onPageLoad(srn, index, NormalMode, IdentitySubject.LoanRecipient)
   private lazy val onSubmit =
-    controllers.nonsipp.common.routes.PartnershipRecipientUtrController.onSubmit(srn, index, NormalMode)
+    controllers.nonsipp.common.routes.PartnershipRecipientUtrController
+      .onSubmit(srn, index, NormalMode, IdentitySubject.LoanRecipient)
 
   val userAnswersWithPartnershipRecipientName =
     defaultUserAnswers.unsafeSet(PartnershipRecipientNamePage(srn, index), partnershipName)
@@ -45,20 +47,23 @@ class PartnershipRecipientUtrControllerSpec extends ControllerBaseSpec {
 
     act.like(renderView(onPageLoad, userAnswersWithPartnershipRecipientName) { implicit app => implicit request =>
       injected[ConditionalYesNoPageView]
-        .apply(form(injected[YesNoPageFormProvider]), viewModel(srn, index, partnershipName, NormalMode))
+        .apply(
+          form(injected[YesNoPageFormProvider]),
+          viewModel(srn, index, partnershipName, NormalMode, IdentitySubject.LoanRecipient)
+        )
     })
 
     act.like(
       renderPrePopView(
         onPageLoad,
-        PartnershipRecipientUtrPage(srn, index),
+        PartnershipRecipientUtrPage(srn, index, IdentitySubject.LoanRecipient),
         conditionalNo,
         userAnswersWithPartnershipRecipientName
       ) { implicit app => implicit request =>
         injected[ConditionalYesNoPageView]
           .apply(
             form(injected[YesNoPageFormProvider]).fill(conditionalNo.value),
-            viewModel(srn, index, partnershipName, NormalMode)
+            viewModel(srn, index, partnershipName, NormalMode, IdentitySubject.LoanRecipient)
           )
       }
     )
