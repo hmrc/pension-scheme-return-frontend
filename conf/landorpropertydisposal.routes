@@ -1,0 +1,7 @@
+GET        /:srn/land-property-disposal                 controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST       /:srn/land-property-disposal                 controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/change-land-property-disposal          controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST       /:srn/change-land-property-disposal          controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET         /:srn/what-you-will-need-land-property-disposal            controllers.nonsipp.landorpropertydisposal.WhatYouWillNeedLandPropertyDisposalController.onPageLoad(srn: Srn)
+GET         /:srn/submit-what-you-will-need-land-property-disposal      controllers.nonsipp.landorpropertydisposal.WhatYouWillNeedLandPropertyDisposalController.onSubmit(srn: Srn)

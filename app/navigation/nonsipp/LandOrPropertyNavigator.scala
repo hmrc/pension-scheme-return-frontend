@@ -115,8 +115,10 @@ object LandOrPropertyNavigator extends JourneyNavigator {
     case LandOrPropertyLeaseDetailsPage(srn, index) =>
       controllers.nonsipp.landorproperty.routes.IsLesseeConnectedPartyController.onPageLoad(srn, index, NormalMode)
 
-    case IsLesseeConnectedPartyPage(srn, index) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+    case IsLesseeConnectedPartyPage(srn, index) => //27j4
+      //27j5
+      controllers.nonsipp.landorproperty.routes.LandOrPropertyTotalIncomeController
+        .onPageLoad(srn, index, NormalMode)
 
     case CompanySellerNamePage(srn, index) =>
       controllers.routes.UnauthorisedController.onPageLoad()

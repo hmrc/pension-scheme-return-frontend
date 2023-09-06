@@ -340,7 +340,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateToWithIndex(
           index,
           IsLesseeConnectedPartyPage,
-          (srn, index: Max5000, mode) => controllers.routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.landorproperty.routes.LandOrPropertyTotalIncomeController.onPageLoad
         )
         .withName("go from is lessee connected party page to unauthorised")
     )
