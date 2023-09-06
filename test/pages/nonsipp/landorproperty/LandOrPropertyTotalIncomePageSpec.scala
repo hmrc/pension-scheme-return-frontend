@@ -14,14 +14,23 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages.nonsipp.landorproperty
 
-import play.api.libs.json._
+import pages.behaviours.PageBehaviours
+import models.Money
+import config.Refined.Max5000
+import eu.timepit.refined.refineMV
 
-package object landorproperty {
-  object Paths {
-    val assets: JsPath = __ \ "assets"
-    val landOrPropertyTransactions: JsPath = assets \ "landOrProperty" \ "landOrPropertyTransactions"
-    val heldPropertyTransactions: JsPath = landOrPropertyTransactions \ "heldPropertyTransaction"
+class LandOrPropertyTotalIncomePageSpec extends PageBehaviours {
+
+  "LandOrPropertyTotalIncomePage" - {
+
+    val index = refineMV[Max5000.Refined](1)
+
+    beRetrievable[Money](LandOrPropertyTotalIncomePage(srnGen.sample.value, index))
+
+    beSettable[Money](LandOrPropertyTotalIncomePage(srnGen.sample.value, index))
+
+    beRemovable[Money](LandOrPropertyTotalIncomePage(srnGen.sample.value, index))
   }
 }

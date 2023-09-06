@@ -22,6 +22,7 @@ import models.SchemeHoldLandProperty.{Acquisition, Contribution, Transfer}
 import models._
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
+import pages.nonsipp.common.OtherRecipientDetailsPage
 import pages.nonsipp.landorproperty._
 import utils.BaseSpec
 import utils.UserAnswersUtils.UserAnswersOps
@@ -152,6 +153,23 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           controllers.nonsipp.common.routes.CompanyRecipientCrnController.onPageLoad
         )
         .withName("go from company land or property company seller  page to company crn page")
+    )
+
+    val recipientDetails = RecipientDetails(
+      "testName",
+      "testDescription"
+    )
+
+    act.like(
+      normalmode
+        .navigateToWithDataIndexAndSubject(
+          index,
+          subject,
+          OtherRecipientDetailsPage,
+          Gen.const(recipientDetails),
+          controllers.nonsipp.landorproperty.routes.LandOrPropertySellerConnectedPartyController.onPageLoad
+        )
+        .withName("go from other recipient details page to recipient connected party page")
     )
 
     act.like(
@@ -298,9 +316,9 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           index,
           IsLandPropertyLeasedPage,
           Gen.const(false),
-          (srn, index: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.landorproperty.routes.LandOrPropertyTotalIncomeController.onPageLoad
         )
-        .withName("go from is land property leased page to unauthorised when no selected")
+        .withName("go from is land property leased page to land property total income when no selected")
     )
   }
 
@@ -316,6 +334,45 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               .onPageLoad(srn, index, NormalMode)
         )
         .withName("go from individual sellerNi page to land Or property seller connected party page when yes selected")
+    )
+  }
+
+  "LandOrPropertyLeaseDetailsPage" - {
+    act.like(
+      normalmode
+        .navigateToWithIndex(
+          index,
+          LandOrPropertyLeaseDetailsPage,
+          (srn, index: Max5000, mode) =>
+            controllers.nonsipp.landorproperty.routes.IsLesseeConnectedPartyController
+              .onPageLoad(srn, index, NormalMode)
+        )
+        .withName("go from land Or property lease details page to is lessee connected party page")
+    )
+  }
+
+  "IsLesseeConnectedPartyPage" - {
+
+    act.like(
+      normalmode
+        .navigateToWithIndex(
+          index,
+          IsLesseeConnectedPartyPage,
+          (srn, index: Max5000, mode) => controllers.routes.UnauthorisedController.onPageLoad()
+        )
+        .withName("go from is lessee connected party page to unauthorised")
+    )
+  }
+
+  "LandOrPropertyTotalIncomePage" - {
+    act.like(
+      normalmode
+        .navigateToWithIndex(
+          index,
+          LandOrPropertyTotalIncomePage,
+          (srn, index: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+        )
+        .withName("go from LandOrPropertyTotalIncome page to unauthorised page")
     )
   }
 }

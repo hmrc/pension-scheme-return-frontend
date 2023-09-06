@@ -242,7 +242,7 @@ memberDetails.dateOfBirth.error.required.two = Date of birth must include a {0} 
 memberDetails.dateOfBirth.error.invalid.date = Date of birth must be a real date
 memberDetails.dateOfBirth.error.invalid.characters = Date of birth must only include numbers 0 to 9
 memberDetails.dateOfBirth.error.future = Date of birth must be in the past
-memberDetails.dateOfBirth.error.format = Member’s date of birth must be in the format DD/MM/YYYY. For example, 31/01/1970
+memberDetails.dateOfBirth.error.format = Member’s date of birth must be in the format 01/08/1970
 
 
 psaDeclaration.title = Declaration
@@ -295,6 +295,8 @@ noNINO.heading = Why does {0} not have a National Insurance number?
 noNINO.error.required = Enter the reason {0} does not have a National Insurance number
 noNINO.error.length = The reason {0} does not have a National Insurance number must be 160 characters or fewer
 noNINO.error.invalid = The reason {0} does not have a National Insurance number must only include letters a to z, numbers 0 to 9, and special characters such as hyphens, spaces and apostrophes
+noNINO.upload.error.invalid = Reason member does not have a National Insurance number must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+noNINO.upload.error.length = Reason member does not have a National Insurance number must be 160 characters or fewer
 
 valueOfAssets.title = What was the total value of the scheme’s assets, including cash?
 valueOfAssets.heading = What was the total value of {0}’s assets, including cash?
@@ -569,16 +571,16 @@ fileUploadErrorSummary.heading = There is a problem with your member details fil
 fileUploadErrorSummary.paragraph = Correct the errors and upload it again, or upload a different file.
 fileUploadErrorSummary.heading2 = Problems with your file
 
-otherRecipientDetails.title = Recipient’s details
-otherRecipientDetails.heading = Recipient’s details
-otherRecipientDetails.name = Recipient’s name
-otherRecipientDetails.description = Brief description of recipient
-otherRecipientDetails.name.error.required = Enter the recipient’s name
-otherRecipientDetails.name.error.invalid = Recipient’s name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
-otherRecipientDetails.name.error.length =  Recipient’s name must be 160 characters or fewer
-otherRecipientDetails.description.error.required = Enter a brief description of the recipient
-otherRecipientDetails.description.error.invalid = The brief description of the recipient must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, full stops, hyphens, slashes, speech marks and spaces
-otherRecipientDetails.description.error.length = The brief description of the recipient must be 160 characters or fewer
+loanRecipient.otherRecipientDetails.title = Recipient’s details
+loanRecipient.otherRecipientDetails.heading = Recipient’s details
+loanRecipient.otherRecipientDetails.name = Recipient’s name
+loanRecipient.otherRecipientDetails.description = Brief description of recipient
+loanRecipient.otherRecipientDetails.name.error.required = Enter the recipient’s name
+loanRecipient.otherRecipientDetails.name.error.invalid = Recipient’s name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+loanRecipient.otherRecipientDetails.name.error.length =  Recipient’s name must be 160 characters or fewer
+loanRecipient.otherRecipientDetails.description.error.required = Enter a brief description of the recipient
+loanRecipient.otherRecipientDetails.description.error.invalid = The brief description of the recipient must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, full stops, hyphens, slashes, speech marks and spaces
+loanRecipient.otherRecipientDetails.description.error.length = The brief description of the recipient must be 160 characters or fewer
 
 fileUploadTooManyErrors.title = There is a problem with your member details file
 fileUploadTooManyErrors.heading = There is a problem with your member details file
@@ -1052,8 +1054,46 @@ landOrPropertySeller.companyRecipientCrn.no.conditional.error.invalid = The reas
 landOrPropertySeller.companyRecipientCrn.no.conditional.error.length = The reason you cannot provide the seller’s CRN must be 160 characters or fewer
 landOrPropertySeller.companyRecipientCrn.error.required = Select yes if you know the seller’s Company Registration Number (CRN)
 
+landOrPropertySeller.otherRecipientDetails.title = Seller’s details
+landOrPropertySeller.otherRecipientDetails.heading = Seller’s details for {0}
+landOrPropertySeller.otherRecipientDetails.name = Seller’s name
+landOrPropertySeller.otherRecipientDetails.description = Brief description of seller (optional)
+landOrPropertySeller.otherRecipientDetails.name.error.required = Enter the seller’s name
+landOrPropertySeller.otherRecipientDetails.name.error.invalid = Seller’s name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+landOrPropertySeller.otherRecipientDetails.name.error.length =  Seller’s name must be 160 characters or fewer
+landOrPropertySeller.otherRecipientDetails.description.error.required = Enter a brief description of the seller
+landOrPropertySeller.otherRecipientDetails.description.error.invalid = The description of the seller must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+landOrPropertySeller.otherRecipientDetails.description.error.length = The description of the seller must be 160 characters or fewer
+
 partnershipSellerName.title = What is the seller’s partnership name?
 partnershipSellerName.heading = What is the seller’s partnership name?
 partnershipSellerName.error.required = Enter the seller’s partnership name
 partnershipSellerName.error.invalid = Seller’s partnership name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
 partnershipSellerName.error.tooLong = Seller’s partnership name must be 160 characters or fewer
+
+whatYouWillNeedLandPropertyDisposal.title = Land or property disposed of by the scheme
+whatYouWillNeedLandPropertyDisposal.heading = Land or property disposed of by {0}
+whatYouWillNeedLandPropertyDisposal.paragraph1 = Answer these questions for one property or piece of land at a time. If you need to report more, you will be able to do this later.
+whatYouWillNeedLandPropertyDisposal.paragraph2 = You must tell us about all land or property the scheme disposed of during the period of this return.
+whatYouWillNeedLandPropertyDisposal.paragraph3 = You need to tell us:
+whatYouWillNeedLandPropertyDisposal.tellUs1 = which land or property was disposed of
+whatYouWillNeedLandPropertyDisposal.tellUs2 = if it was disposed of by sale, transfer out or other
+whatYouWillNeedLandPropertyDisposal.tellUs3 = if any part of the land or property is still held
+whatYouWillNeedLandPropertyDisposal.paragraph4 = If any land or property was sold, you need to tell us:
+whatYouWillNeedLandPropertyDisposal.landOrPropertySold1 = the date it was sold
+whatYouWillNeedLandPropertyDisposal.landOrPropertySold2 = if the buyer was an individual, company, partnership or other
+whatYouWillNeedLandPropertyDisposal.landOrPropertySold3 = the buyer’s National Insurance number, Company Registration Number, Unique Taxpayer Reference or details – whichever applies
+whatYouWillNeedLandPropertyDisposal.landOrPropertySold4 = if the buyer was a connected party
+whatYouWillNeedLandPropertyDisposal.landOrPropertySold5 = the total amount of proceeds from the sale
+whatYouWillNeedLandPropertyDisposal.landOrPropertySold6 = if the sale was supported by an independent valuation
+
+isLesseeConnectedParty.title = Is the lessee a connected party?
+isLesseeConnectedParty.heading = Is {0} a connected party?
+isLesseeConnectedParty.error.required = Select yes if the lessee is a connected party
+
+landOrPropertyTotalIncome.title = What was the total income from the land or property in the period of this return, in pounds and pence?
+landOrPropertyTotalIncome.heading = What was the total income from {0} in the period of this return, in pounds and pence?
+landOrPropertyTotalIncome.hint = This includes income, such as rent, and all other receipts received in respect of this land or property.
+landOrPropertyTotalIncome.error.required = Enter the total income from the land or property in the period of this return, in pounds and pence
+landOrPropertyTotalIncome.error.invalid = Total income from the land or property in the period of this return must be an amount of money, like 123 or 123.45
+landOrPropertyTotalIncome.error.tooLarge = Total income from the land or property in the period of this return must be 999999999.99 or less

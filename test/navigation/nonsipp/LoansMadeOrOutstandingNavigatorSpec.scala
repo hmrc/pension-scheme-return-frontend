@@ -18,13 +18,19 @@ package navigation.nonsipp
 
 import config.Refined.OneTo5000
 import eu.timepit.refined.refineMV
-import models.{IdentitySubject, IdentityType, NormalMode}
-import models.{ConditionalYesNo, Money, UserAnswers}
+import models.{ConditionalYesNo, IdentitySubject, IdentityType, Money, NormalMode, RecipientDetails, UserAnswers}
 import models.ConditionalYesNo._
 import models.SchemeId.Srn
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.common.{CompanyRecipientCrnPage, IdentityTypePage, PartnershipRecipientUtrPage}
+
+import pages.nonsipp.common.{
+  CompanyRecipientCrnPage,
+  IdentityTypePage,
+  OtherRecipientDetailsPage,
+  PartnershipRecipientUtrPage
+}
+
 import pages.nonsipp.loansmadeoroutstanding._
 import utils.BaseSpec
 import utils.UserAnswersUtils.UserAnswersOps
@@ -136,12 +142,12 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
     "NormalMode" - {
       act.like(
         normalmode
-          .navigateToWithDataIndexAndSubject(
+          .navigateToWithDataIndexAndSubjectBoth(
             index,
             subject,
             IdentityTypePage,
             Gen.const(IdentityType.Other),
-            controllers.nonsipp.loansmadeoroutstanding.routes.OtherRecipientDetailsController.onPageLoad
+            controllers.nonsipp.common.routes.OtherRecipientDetailsController.onPageLoad
           )
           .withName("go from who received loan page to other recipient details page")
       )
@@ -299,5 +305,25 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
         .withName("go from remove page to list page")
     )
 
+  }
+
+  "otherRecipientsDetailsPage" - {
+
+    val recipientDetails = RecipientDetails(
+      "testName",
+      "testDescription"
+    )
+
+    act.like(
+      normalmode
+        .navigateToWithDataIndexAndSubject(
+          index,
+          subject,
+          OtherRecipientDetailsPage,
+          Gen.const(recipientDetails),
+          controllers.nonsipp.loansmadeoroutstanding.routes.RecipientSponsoringEmployerConnectedPartyController.onPageLoad
+        )
+        .withName("go from other recipient details page to recipient connected party page")
+    )
   }
 }

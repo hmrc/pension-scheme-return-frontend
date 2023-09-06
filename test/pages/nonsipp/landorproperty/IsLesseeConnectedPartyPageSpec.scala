@@ -14,28 +14,24 @@
  * limitations under the License.
  */
 
-package navigation.nonsipp
+package pages
 
 import config.Refined.OneTo5000
 import eu.timepit.refined.refineMV
-import navigation.{Navigator, NavigatorBehaviours}
-import pages.nonsipp.loansmadeoroutstanding.OtherRecipientDetailsPage
-import utils.BaseSpec
+import models.NormalMode
+import pages.behaviours.PageBehaviours
+import pages.nonsipp.landorproperty.IsLesseeConnectedPartyPage
 
-class OtherRecipientsDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
+class IsLesseeConnectedPartyPageSpec extends PageBehaviours {
 
-  val navigator: Navigator = new NonSippNavigator
-  private val index = refineMV[OneTo5000](1)
+  "IsLesseeConnectedPartyPage" - {
 
-  "otherRecipientsDetailsNavigator" - {
+    val index = refineMV[OneTo5000](1)
 
-    act.like(
-      normalmode
-        .navigateToWithIndex(
-          index,
-          OtherRecipientDetailsPage,
-          controllers.nonsipp.loansmadeoroutstanding.routes.RecipientSponsoringEmployerConnectedPartyController.onPageLoad
-        )
-    )
+    beRetrievable[Boolean](IsLesseeConnectedPartyPage(srnGen.sample.value, index))
+
+    beSettable[Boolean](IsLesseeConnectedPartyPage(srnGen.sample.value, index))
+
+    beRemovable[Boolean](IsLesseeConnectedPartyPage(srnGen.sample.value, index))
   }
 }

@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.loansmadeoroutstanding
+package pages.nonsipp.landorproperty
 
-import config.Refined.Max5000
-import models.RecipientDetails
-import models.SchemeId.Srn
-import pages.QuestionPage
 import play.api.libs.json.JsPath
-import utils.RefinedUtils.RefinedIntOps
+import models.SchemeId.Srn
+import models.Money
+import pages.QuestionPage
+import config.Refined.Max5000
+import utils.RefinedUtils._
+import eu.timepit.refined.refineMV
 
-case class OtherRecipientDetailsPage(srn: Srn, index: Max5000) extends QuestionPage[RecipientDetails] {
+case class LandOrPropertyTotalIncomePage(srn: Srn, index: Max5000) extends QuestionPage[Money] {
 
-  override def path: JsPath = Paths.loanTransactions \ "recipientIdentityType" \ toString \ index.arrayIndex.toString
+  override def path: JsPath = Paths.heldPropertyTransactions \ toString \ index.arrayIndex.toString
 
-  override def toString: String = "otherRecipientDetails"
+  override def toString: String = "totalIncomeOrReceipts"
 }

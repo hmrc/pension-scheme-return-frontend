@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages.nonsipp.landorproperty
 
-import play.api.libs.json._
+import config.Refined.Max5000
+import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
+import utils.RefinedUtils.RefinedIntOps
 
-package object landorproperty {
-  object Paths {
-    val assets: JsPath = __ \ "assets"
-    val landOrPropertyTransactions: JsPath = assets \ "landOrProperty" \ "landOrPropertyTransactions"
-    val heldPropertyTransactions: JsPath = landOrPropertyTransactions \ "heldPropertyTransaction"
-  }
+case class IsLesseeConnectedPartyPage(srn: Srn, index: Max5000) extends QuestionPage[Boolean] {
+
+  override def path: JsPath =
+    Paths.landOrPropertyTransactions \ "heldPropertyTransaction" \ "leaseDetails" \ "connectedPartyStatus" \ toString \ index.arrayIndex.toString
+
+  override def toString: String = "isLesseeConnectedParty"
 }

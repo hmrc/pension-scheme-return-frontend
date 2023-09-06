@@ -23,7 +23,15 @@ import models.ConditionalYesNo._
 import models.{CheckOrChange, IdentitySubject, IdentityType, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.common.{CompanyRecipientCrnPage, IdentityTypePage, IdentityTypes, PartnershipRecipientUtrPage}
+
+import pages.nonsipp.common.{
+  CompanyRecipientCrnPage,
+  IdentityTypePage,
+  IdentityTypes,
+  OtherRecipientDetailsPage,
+  PartnershipRecipientUtrPage
+}
+
 import pages.nonsipp.loansmadeoroutstanding._
 import play.api.mvc.Call
 
@@ -51,8 +59,8 @@ object LoansMadeOrOutstandingNavigator extends JourneyNavigator {
     case IdentityTypePage(srn, index, IdentitySubject.LoanRecipient) =>
       userAnswers.get(IdentityTypePage(srn, index, IdentitySubject.LoanRecipient)) match {
         case Some(IdentityType.Other) =>
-          controllers.nonsipp.loansmadeoroutstanding.routes.OtherRecipientDetailsController
-            .onPageLoad(srn, index, NormalMode)
+          controllers.nonsipp.common.routes.OtherRecipientDetailsController
+            .onPageLoad(srn, index, NormalMode, IdentitySubject.LoanRecipient)
         case Some(IdentityType.Individual) =>
           controllers.nonsipp.loansmadeoroutstanding.routes.IndividualRecipientNameController
             .onPageLoad(srn, index, NormalMode)
@@ -84,7 +92,7 @@ object LoansMadeOrOutstandingNavigator extends JourneyNavigator {
       controllers.nonsipp.common.routes.PartnershipRecipientUtrController
         .onPageLoad(srn, index, NormalMode, IdentitySubject.LoanRecipient)
 
-    case OtherRecipientDetailsPage(srn, index) =>
+    case OtherRecipientDetailsPage(srn, index, IdentitySubject.LoanRecipient) =>
       controllers.nonsipp.loansmadeoroutstanding.routes.RecipientSponsoringEmployerConnectedPartyController
         .onPageLoad(srn, index, NormalMode)
 
@@ -159,9 +167,10 @@ object LoansMadeOrOutstandingNavigator extends JourneyNavigator {
         case Some(IdentityType.UKPartnership) if userAnswers.get(PartnershipRecipientNamePage(srn, index)).isEmpty =>
           controllers.nonsipp.loansmadeoroutstanding.routes.PartnershipRecipientNameController
             .onPageLoad(srn, index, NormalMode)
-        case Some(IdentityType.Other) if userAnswers.get(OtherRecipientDetailsPage(srn, index)).isEmpty =>
-          controllers.nonsipp.loansmadeoroutstanding.routes.OtherRecipientDetailsController
-            .onPageLoad(srn, index, NormalMode)
+        case Some(IdentityType.Other)
+            if userAnswers.get(OtherRecipientDetailsPage(srn, index, IdentitySubject.LoanRecipient)).isEmpty =>
+          controllers.nonsipp.common.routes.OtherRecipientDetailsController
+            .onPageLoad(srn, index, NormalMode, IdentitySubject.LoanRecipient)
         case Some(_) =>
           controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
             .onPageLoad(srn, index, Check)
@@ -181,7 +190,7 @@ object LoansMadeOrOutstandingNavigator extends JourneyNavigator {
       controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
         .onPageLoad(srn, index, Check)
 
-    case OtherRecipientDetailsPage(srn, index) =>
+    case OtherRecipientDetailsPage(srn, index, IdentitySubject.LoanRecipient) =>
       controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
         .onPageLoad(srn, index, Check)
 
