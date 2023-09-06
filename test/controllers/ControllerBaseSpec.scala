@@ -17,12 +17,15 @@
 package controllers
 
 import cats.data.NonEmptyList
+import config.Refined.Max5000
 import controllers.actions._
 import generators.ModelGenerators._
 import models.PensionSchemeId.PsaId
+import models.SchemeId.Srn
 import models.UserAnswers.SensitiveJsObject
 import models.{NameDOB, _}
 import org.scalatest.OptionValues
+import pages.nonsipp.landorproperty.LandOrPropertyAddressLookupPage
 import play.api.Application
 import play.api.data.Form
 import play.api.http._
@@ -34,6 +37,7 @@ import play.api.test._
 import queries.Settable
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.time.TaxYear
+import utils.UserAnswersUtils.UserAnswersOps
 import utils.{BaseSpec, DisplayMessageUtils}
 
 import java.time.{LocalDate, LocalDateTime}
@@ -207,4 +211,7 @@ trait TestValues {
       ValidationError("S11", ValidationErrorType.DateOfBirth, "error S11")
     )
   )
+
+  def userAnswersWithAddress(srn: Srn, index: Max5000): UserAnswers =
+    defaultUserAnswers.unsafeSet(LandOrPropertyAddressLookupPage(srn, index), address)
 }

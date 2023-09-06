@@ -135,3 +135,8 @@ GET        /:srn/change-is-lessee-connected-party               controllers.nons
 GET        /:srn/change-is-lessee-connected-party/:index        controllers.nonsipp.landorproperty.IsLesseeConnectedPartyController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 POST       /:srn/change-is-lessee-connected-party               controllers.nonsipp.landorproperty.IsLesseeConnectedPartyController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
 POST       /:srn/change-is-lessee-connected-party/:index        controllers.nonsipp.landorproperty.IsLesseeConnectedPartyController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET        /:srn/land-property-total-income/:index                 controllers.nonsipp.landorproperty.LandOrPropertyTotalIncomeController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST       /:srn/land-property-total-income/:index                 controllers.nonsipp.landorproperty.LandOrPropertyTotalIncomeController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET        /:srn/change-land-property-total-income/:index          controllers.nonsipp.landorproperty.LandOrPropertyTotalIncomeController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST       /:srn/change-land-property-total-income/:index          controllers.nonsipp.landorproperty.LandOrPropertyTotalIncomeController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)

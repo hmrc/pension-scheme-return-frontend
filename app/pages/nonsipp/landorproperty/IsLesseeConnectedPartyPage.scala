@@ -27,6 +27,5 @@ case class IsLesseeConnectedPartyPage(srn: Srn, index: Max5000) extends Question
   override def path: JsPath =
     Paths.landOrPropertyTransactions \ "heldPropertyTransaction" \ "leaseDetails" \ "connectedPartyStatus" \ toString \ index.arrayIndex.toString
 
-
   override def toString: String = "isLesseeConnectedParty"
 }
