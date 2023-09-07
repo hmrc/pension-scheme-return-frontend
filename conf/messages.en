@@ -1120,3 +1120,7 @@ landOrPropertyDisposal.error.required = Select yes if the scheme disposed of any
 landOrPropertyStillHeld.title = Is any part of the land or property still held by the scheme?
 landOrPropertyStillHeld.heading = Is any part of {0} still held by {1}?
 landOrPropertyStillHeld.error.required = Select yes if any part of the land or property is still held by the scheme
+
+removeLandOrProperty.title = Are you sure you want to remove this land or property?
+removeLandOrProperty.heading = Are you sure you want to remove {0}?
+removeLandOrProperty.error.required = Select yes if you are sure you want to remove this land or property

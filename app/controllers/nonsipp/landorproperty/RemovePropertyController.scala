@@ -62,7 +62,10 @@ class RemovePropertyController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      getResult(srn, index, mode, request.userAnswers.fillForm(RemovePropertyPage(srn, index), form))
+      request.userAnswers.get(LandOrPropertyAddressLookupPage(srn, index)).getOrRecoverJourney { address =>
+        val preparedForm = request.userAnswers.fillForm(RemovePropertyPage(srn, index), form)
+        Ok(view(preparedForm, RemovePropertyController.viewModel(srn, index, mode, address.addressLine1)))
+      }
   }
 
   private def getResult(srn: Srn, index: Max5000, mode: Mode, form: Form[Boolean], error: Boolean = false)(
@@ -133,7 +136,7 @@ class RemovePropertyController @Inject()(
 
 object RemovePropertyController {
   def form(formProvider: YesNoPageFormProvider): Form[Boolean] = formProvider(
-    "removeLoan.error.required"
+    "removeLandOrProperty.error.required"
   )
 
   def viewModel(
@@ -144,8 +147,8 @@ object RemovePropertyController {
   ): FormPageViewModel[YesNoPageViewModel] =
     (
       YesNoPageViewModel(
-        "removeLoan.title",
-        Message("removeLoan.heading", addressLine1),
+        "removeLandOrProperty.title",
+        Message("removeLandOrProperty.heading", addressLine1),
         routes.RemovePropertyController.onSubmit(srn, index, mode)
       )
     )
