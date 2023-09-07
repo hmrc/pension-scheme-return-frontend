@@ -19,19 +19,13 @@ package controllers.nonsipp.landorproperty
 import config.Refined.Max5000
 import controllers.PSRController
 import controllers.actions._
-import controllers.nonsipp.landorproperty.RemovePropertyController
 import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
-import models.requests.DataRequest
-import models.{IdentitySubject, IdentityType, Mode}
+import models.Mode
 import navigation.Navigator
-import pages.nonsipp.common.{IdentityTypePage, OtherRecipientDetailsPage}
 
 import pages.nonsipp.landorproperty.{
-  CompanySellerNamePage,
-  IndividualSellerNiPage,
   LandOrPropertyAddressLookupPage,
-  PartnershipSellerNamePage,
   RemovePropertyPage
 }
 
@@ -68,67 +62,26 @@ class RemovePropertyController @Inject()(
       }
   }
 
-  private def getResult(srn: Srn, index: Max5000, mode: Mode, form: Form[Boolean], error: Boolean = false)(
-    implicit request: DataRequest[_]
-  ) = {
-    val whoReceivedLandPage = request.userAnswers
-      .get(IdentityTypePage(srn, index, IdentitySubject.LandOrPropertySeller))
-    whoReceivedLandPage match {
-      case Some(who) => {
-        val sellerNinOrName =
-          who match {
-            case IdentityType.Individual =>
-              request.userAnswers.get(IndividualSellerNiPage(srn, index)).getOrRecoverJourney
-            case IdentityType.UKCompany =>
-              request.userAnswers.get(CompanySellerNamePage(srn, index)).getOrRecoverJourney
-            case IdentityType.UKPartnership =>
-              request.userAnswers.get(PartnershipSellerNamePage(srn, index)).getOrRecoverJourney
-            case IdentityType.Other =>
-              request.userAnswers
-                .get(OtherRecipientDetailsPage(srn, index, IdentitySubject.LandOrPropertySeller))
-                .map(_.name)
-                .getOrRecoverJourney
-          }
-        sellerNinOrName.fold(
-          l => l,
-          address => {
-            val propertyAddress =
-              request.userAnswers.get(LandOrPropertyAddressLookupPage(srn, index)).getOrRecoverJourney
-
-            propertyAddress.fold(
-              l => l,
-              address =>
-                if (error) {
-                  BadRequest(view(form, RemovePropertyController.viewModel(srn, index, mode, address.addressLine1)))
-                } else {
-                  Ok(view(form, RemovePropertyController.viewModel(srn, index, mode, address.addressLine1)))
-                }
-            )
-          }
-        )
-      }
-      case _ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-    }
-  }
-
   def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(getResult(srn, index, mode, formWithErrors, true)),
-          value =>
-            if (value) {
-              for {
-                updatedAnswers <- Future
-                  .fromTry(
-                    request.userAnswers.remove(IdentityTypePage(srn, index, IdentitySubject.LandOrPropertySeller))
-                  )
-                _ <- saveService.save(updatedAnswers)
-              } yield Redirect(navigator.nextPage(RemovePropertyPage(srn, index), mode, updatedAnswers))
-            } else {
-              Future
-                .successful(Redirect(navigator.nextPage(RemovePropertyPage(srn, index), mode, request.userAnswers)))
+          errors =>
+            request.userAnswers.get(LandOrPropertyAddressLookupPage(srn, index)).getOrRecoverJourney { address =>
+              Future.successful(
+                BadRequest(
+                  view(errors, RemovePropertyController.viewModel(srn, index, mode, address.addressLine1))
+                )
+              )
+            },
+          success =>
+            for {
+              userAnswers <- Future
+                .fromTry(request.userAnswers.set(RemovePropertyPage(srn, index), success))
+              _ <- saveService.save(userAnswers)
+            } yield {
+              Redirect(navigator.nextPage(RemovePropertyPage(srn, index), mode, userAnswers))
             }
         )
   }
@@ -145,11 +98,10 @@ object RemovePropertyController {
     mode: Mode,
     addressLine1: String
   ): FormPageViewModel[YesNoPageViewModel] =
-    (
-      YesNoPageViewModel(
-        "removeLandOrProperty.title",
-        Message("removeLandOrProperty.heading", addressLine1),
-        routes.RemovePropertyController.onSubmit(srn, index, mode)
-      )
+
+    YesNoPageViewModel(
+      "removeLandOrProperty.title",
+      Message("removeLandOrProperty.heading", addressLine1),
+      routes.RemovePropertyController.onSubmit(srn, index, mode)
     )
 }
