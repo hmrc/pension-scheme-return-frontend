@@ -21,12 +21,9 @@ import controllers.ControllerBaseSpec
 import controllers.nonsipp.landorproperty.LandOrPropertySellerConnectedPartyController._
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
-import models.{IdentityType, NormalMode, UserAnswers}
-import pages.nonsipp.landorproperty.{
-  LandOrPropertySellerConnectedPartyPage,
-  LandPropertyIndividualSellersNamePage,
-  PropertyAcquiredFromPage
-}
+import models.{IdentitySubject, IdentityType, NormalMode, UserAnswers}
+import pages.nonsipp.common.IdentityTypePage
+import pages.nonsipp.landorproperty.{LandOrPropertySellerConnectedPartyPage, LandPropertyIndividualSellersNamePage}
 import views.html.YesNoPageView
 
 class LandOrPropertySellerConnectedPartyControllerSpec extends ControllerBaseSpec {
@@ -37,8 +34,8 @@ class LandOrPropertySellerConnectedPartyControllerSpec extends ControllerBaseSpe
 
   val userServicesWithIndividualName: UserAnswers =
     defaultUserAnswers
+      .unsafeSet(IdentityTypePage(srn, index, IdentitySubject.LandOrPropertySeller), IdentityType.Individual)
       .unsafeSet(LandPropertyIndividualSellersNamePage(srn, index), individualName)
-      .unsafeSet(PropertyAcquiredFromPage(srn, index), IdentityType.Individual) // TODO change it to IdentityTypePage
 
   "LandOrPropertySellerConnectedPartyController" - {
 
