@@ -22,7 +22,7 @@ import controllers.nonsipp.loansmadeoroutstanding.RecipientSponsoringEmployerCon
 import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
 import models.{IdentitySubject, IdentityType, NormalMode, RecipientDetails, SponsoringOrConnectedParty, UserAnswers}
-import pages.nonsipp.common.IdentityTypePage
+import pages.nonsipp.common.{IdentityTypePage, OtherRecipientDetailsPage}
 import pages.nonsipp.loansmadeoroutstanding._
 import views.html.RadioListView
 
@@ -47,7 +47,10 @@ class RecipientSponsoringEmployerConnectedPartyControllerSpec extends Controller
   val userAnswersWithOtherName: UserAnswers =
     defaultUserAnswers
       .unsafeSet(IdentityTypePage(srn, index, subject), IdentityType.Other)
-      .unsafeSet(OtherRecipientDetailsPage(srn, index), RecipientDetails(otherName, "test description"))
+      .unsafeSet(
+        OtherRecipientDetailsPage(srn, index, IdentitySubject.LoanRecipient),
+        RecipientDetails(otherName, "test description")
+      )
 
   "RecipientSponsoringEmployerConnectedParty Controller" - {
 

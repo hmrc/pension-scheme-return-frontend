@@ -19,6 +19,7 @@ package controllers.nonsipp
 import cats.implicits.toShow
 import com.google.inject.Inject
 import controllers.actions._
+import eu.timepit.refined.refineMV
 import models.SchemeId.Srn
 import models.requests.DataRequest
 import models.{DateRange, NormalMode}
@@ -248,6 +249,15 @@ object TaskListController {
         LinkMessage(
           messageKey(prefix, "title", UnableToStart),
           controllers.nonsipp.landorproperty.routes.LandOrPropertyHeldController.onPageLoad(srn, NormalMode).url
+        ),
+        NotStarted
+      ),
+      TaskListItemViewModel(
+        LinkMessage(
+          messageKey("nonsipp.tasklist.landorpropertydisposal", "title", UnableToStart),
+          controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalController
+            .onPageLoad(srn, NormalMode)
+            .url
         ),
         NotStarted
       )

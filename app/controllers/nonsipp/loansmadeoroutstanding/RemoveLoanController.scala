@@ -25,7 +25,7 @@ import models.SchemeId.Srn
 import models.requests.DataRequest
 import models.{IdentitySubject, IdentityType, Mode}
 import navigation.Navigator
-import pages.nonsipp.common.IdentityTypePage
+import pages.nonsipp.common.{IdentityTypePage, OtherRecipientDetailsPage}
 import pages.nonsipp.loansmadeoroutstanding._
 import play.api.data.Form
 import play.api.i18n.MessagesApi
@@ -73,7 +73,10 @@ class RemoveLoanController @Inject()(
             case IdentityType.UKPartnership =>
               request.userAnswers.get(PartnershipRecipientNamePage(srn, index)).getOrRecoverJourney
             case IdentityType.Other =>
-              request.userAnswers.get(OtherRecipientDetailsPage(srn, index)).map(_.name).getOrRecoverJourney
+              request.userAnswers
+                .get(OtherRecipientDetailsPage(srn, index, IdentitySubject.LoanRecipient))
+                .map(_.name)
+                .getOrRecoverJourney
           }
         recipientName.fold(
           l => l,

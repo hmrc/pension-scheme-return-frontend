@@ -22,6 +22,7 @@ import models.SchemeHoldLandProperty.{Acquisition, Contribution, Transfer}
 import models._
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
+import pages.nonsipp.common.OtherRecipientDetailsPage
 import pages.nonsipp.landorproperty._
 import utils.BaseSpec
 import utils.UserAnswersUtils.UserAnswersOps
@@ -152,6 +153,23 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           controllers.nonsipp.common.routes.CompanyRecipientCrnController.onPageLoad
         )
         .withName("go from company land or property company seller  page to company crn page")
+    )
+
+    val recipientDetails = RecipientDetails(
+      "testName",
+      "testDescription"
+    )
+
+    act.like(
+      normalmode
+        .navigateToWithDataIndexAndSubject(
+          index,
+          subject,
+          OtherRecipientDetailsPage,
+          Gen.const(recipientDetails),
+          controllers.nonsipp.landorproperty.routes.LandOrPropertySellerConnectedPartyController.onPageLoad
+        )
+        .withName("go from other recipient details page to recipient connected party page")
     )
 
     act.like(
@@ -340,7 +358,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateToWithIndex(
           index,
           IsLesseeConnectedPartyPage,
-          (srn, index: Max5000, mode) => controllers.routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.landorproperty.routes.LandOrPropertyTotalIncomeController.onPageLoad
         )
         .withName("go from is lessee connected party page to unauthorised")
     )

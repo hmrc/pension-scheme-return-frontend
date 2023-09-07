@@ -114,10 +114,6 @@ POST       /:srn/title-number/:index                 controllers.nonsipp.landorp
 GET        /:srn/change-title-number/:index          controllers.nonsipp.landorproperty.LandRegistryTitleNumberController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 POST       /:srn/change-title-number/:index          controllers.nonsipp.landorproperty.LandRegistryTitleNumberController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 
-
-GET         /:srn/what-you-will-need-land-property-disposal            controllers.nonsipp.landorpropertydisposal.WhatYouWillNeedLandPropertyDisposalController.onPageLoad(srn: Srn)
-GET         /:srn/submit-what-you-will-need-land-property-disposal      controllers.nonsipp.landorpropertydisposal.WhatYouWillNeedLandPropertyDisposalController.onSubmit(srn: Srn)
-
 GET        /:srn/is-lessee-connected-party                      controllers.nonsipp.landorproperty.IsLesseeConnectedPartyController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
 GET        /:srn/is-lessee-connected-party/:index               controllers.nonsipp.landorproperty.IsLesseeConnectedPartyController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
 POST       /:srn/is-lessee-connected-party                      controllers.nonsipp.landorproperty.IsLesseeConnectedPartyController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)

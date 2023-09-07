@@ -37,8 +37,17 @@ echo "$className;format="decap"$.title = $title$" >> ../conf/messages.en
 echo "$className;format="decap"$.heading = $heading$" >> ../conf/messages.en
 echo "$className;format="decap"$.error.required = $errorRequired$"  >> ../conf/messages.en
 
-echo "Add to navigator"
+DIR="$directory$"
 
-echo "case $className;format="cap"$Page(srn) => controllers.routes.UnauthorisedController.onPageLoad()"
+if [ -z \$DIR ]; then
+  echo "DIR empty, skipping"
+else
+  echo "Add to navigator"
+  $if(index.empty)$
+  ../.g8/scripts/updateNavigator $className;format="cap"$Page $directory$
+  $else$
+  ../.g8/scripts/updateNavigator $className;format="cap"$Page $directory$ "index=true"
+  $endif$
+fi
 
 echo "Migration $className;format="snake"$ completed"

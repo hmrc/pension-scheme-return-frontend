@@ -14,18 +14,21 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.loansmadeoroutstanding
+package pages.nonsipp.landorpropertydisposal
 
-import config.Refined.Max5000
-import models.RecipientDetails
-import models.SchemeId.Srn
-import pages.QuestionPage
 import play.api.libs.json.JsPath
-import utils.RefinedUtils.RefinedIntOps
+import models.SchemeId.Srn
+import models.Money
+import pages.QuestionPage
+import config.Refined.{Max50, Max5000}
+import utils.RefinedUtils._
+import eu.timepit.refined.refineMV
 
-case class OtherRecipientDetailsPage(srn: Srn, index: Max5000) extends QuestionPage[RecipientDetails] {
+case class LandOrPropertyStillHeldPage(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50)
+    extends QuestionPage[Boolean] {
 
-  override def path: JsPath = Paths.loanTransactions \ "recipientIdentityType" \ toString \ index.arrayIndex.toString
+  override def path: JsPath =
+    Paths.disposalPropertyTransaction \ toString \ landOrPropertyIndex.arrayIndex.toString \ disposalIndex.arrayIndex.toString
 
-  override def toString: String = "otherRecipientDetails"
+  override def toString: String = "portionStillHeld"
 }

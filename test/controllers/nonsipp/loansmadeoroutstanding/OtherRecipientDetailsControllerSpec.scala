@@ -18,18 +18,23 @@ package controllers.nonsipp.loansmadeoroutstanding
 
 import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
+import controllers.nonsipp.common.OtherRecipientDetailsController
 import eu.timepit.refined.refineMV
 import forms.RecipientDetailsFormProvider
-import models.{NormalMode, RecipientDetails}
-import pages.nonsipp.loansmadeoroutstanding.OtherRecipientDetailsPage
+import models.{IdentitySubject, NormalMode, RecipientDetails}
+import pages.nonsipp.common.OtherRecipientDetailsPage
 import views.html.RecipientDetailsView
 
 class OtherRecipientDetailsControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[OneTo5000](1)
+  val identitySubject: IdentitySubject = IdentitySubject.LoanRecipient
 
-  private lazy val onPageLoad = routes.OtherRecipientDetailsController.onPageLoad(srn, index, NormalMode)
-  private lazy val onSubmit = routes.OtherRecipientDetailsController.onSubmit(srn, index, NormalMode)
+  private lazy val onPageLoad =
+    controllers.nonsipp.common.routes.OtherRecipientDetailsController
+      .onPageLoad(srn, index, NormalMode, identitySubject)
+  private lazy val onSubmit =
+    controllers.nonsipp.common.routes.OtherRecipientDetailsController.onSubmit(srn, index, NormalMode, identitySubject)
 
   private val validForm = List(
     "name" -> "name",
@@ -45,18 +50,30 @@ class OtherRecipientDetailsControllerSpec extends ControllerBaseSpec {
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       injected[RecipientDetailsView].apply(
-        OtherRecipientDetailsController.form(injected[RecipientDetailsFormProvider]),
-        OtherRecipientDetailsController.viewModel(srn, index, NormalMode)
+        OtherRecipientDetailsController.form(injected[RecipientDetailsFormProvider], IdentitySubject.LoanRecipient),
+        OtherRecipientDetailsController
+          .viewModel(srn, index, NormalMode, IdentitySubject.LoanRecipient, defaultUserAnswers)
       )
     })
 
-    act.like(renderPrePopView(onPageLoad, OtherRecipientDetailsPage(srn, index), recipientDetails) {
-      implicit app => implicit request =>
+    act.like(
+      renderPrePopView(
+        onPageLoad,
+        OtherRecipientDetailsPage(srn, index, IdentitySubject.LoanRecipient),
+        recipientDetails
+      ) { implicit app => implicit request =>
         val preparedForm =
-          OtherRecipientDetailsController.form(injected[RecipientDetailsFormProvider]).fill(recipientDetails)
+          OtherRecipientDetailsController
+            .form(injected[RecipientDetailsFormProvider], IdentitySubject.LoanRecipient)
+            .fill(recipientDetails)
         injected[RecipientDetailsView]
-          .apply(preparedForm, OtherRecipientDetailsController.viewModel(srn, index, NormalMode))
-    })
+          .apply(
+            preparedForm,
+            OtherRecipientDetailsController
+              .viewModel(srn, index, NormalMode, IdentitySubject.LoanRecipient, defaultUserAnswers)
+          )
+      }
+    )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
