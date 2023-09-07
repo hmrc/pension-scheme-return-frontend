@@ -152,6 +152,9 @@ object LandOrPropertyNavigator extends JourneyNavigator {
 
     case LandOrPropertyTotalIncomePage(srn, index) => //27j5
       controllers.routes.UnauthorisedController.onPageLoad()
+
+    case RemovePropertyPage(srn, index) => //27j9
+      controllers.routes.UnauthorisedController.onPageLoad() //TODO it is not very clear where 27j9 should lead
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty

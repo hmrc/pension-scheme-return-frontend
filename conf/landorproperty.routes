@@ -136,3 +136,8 @@ GET        /:srn/land-property-total-income/:index                 controllers.n
 POST       /:srn/land-property-total-income/:index                 controllers.nonsipp.landorproperty.LandOrPropertyTotalIncomeController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
 GET        /:srn/change-land-property-total-income/:index          controllers.nonsipp.landorproperty.LandOrPropertyTotalIncomeController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 POST       /:srn/change-land-property-total-income/:index          controllers.nonsipp.landorproperty.LandOrPropertyTotalIncomeController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET         /:srn/remove-land-property/:index                       controllers.nonsipp.landorproperty.RemovePropertyController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/remove-land-property/:index                       controllers.nonsipp.landorproperty.RemovePropertyController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/change-remove-land-property/:index                controllers.nonsipp.landorproperty.RemovePropertyController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-remove-land-property/:index                controllers.nonsipp.landorproperty.RemovePropertyController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)

@@ -26,7 +26,12 @@ import models.SchemeId.Srn
 import models.{Security, _}
 import navigation.Navigator
 
-import pages.nonsipp.common.{CompanyRecipientCrnPage, IdentityTypePage, PartnershipRecipientUtrPage , OtherRecipientDetailsPage}
+import pages.nonsipp.common.{
+  CompanyRecipientCrnPage,
+  IdentityTypePage,
+  OtherRecipientDetailsPage,
+  PartnershipRecipientUtrPage
+}
 
 import pages.nonsipp.loansmadeoroutstanding._
 import play.api.i18n._
@@ -71,14 +76,12 @@ class LoansCYAController @Inject()(
             request.userAnswers
               .get(CompanyRecipientCrnPage(srn, index, IdentitySubject.LoanRecipient))
               .flatMap(_.value.toOption.map(_.value)),
-
             request.userAnswers
               .get(PartnershipRecipientUtrPage(srn, index, IdentitySubject.LoanRecipient))
               .flatMap(_.value.toOption.map(_.value)),
             request.userAnswers
               .get(OtherRecipientDetailsPage(srn, index, IdentitySubject.LoanRecipient))
               .map(_.description)
-
           ).flatten.headOption
           recipientReasonNoDetails = List(
             request.userAnswers
