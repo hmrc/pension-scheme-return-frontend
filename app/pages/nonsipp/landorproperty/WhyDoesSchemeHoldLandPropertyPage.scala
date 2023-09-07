@@ -17,11 +17,17 @@
 package pages.nonsipp.landorproperty
 
 import config.Refined.Max5000
-import models.SchemeHoldLandProperty
+import models.{IdentitySubject, SchemeHoldLandProperty, UserAnswers}
 import models.SchemeId.Srn
 import pages.QuestionPage
+import pages.nonsipp.common
+import pages.nonsipp.common.IdentityTypePage
 import play.api.libs.json.JsPath
+import queries.Removable
 import utils.RefinedUtils.RefinedIntOps
+import utils.PageUtils._
+
+import scala.util.Try
 
 case class WhyDoesSchemeHoldLandPropertyPage(srn: Srn, index: Max5000) extends QuestionPage[SchemeHoldLandProperty] {
 
@@ -29,4 +35,24 @@ case class WhyDoesSchemeHoldLandPropertyPage(srn: Srn, index: Max5000) extends Q
     Paths.heldPropertyTransactions \ toString \ index.arrayIndex.toString
 
   override def toString: String = "methodOfHolding"
+
+  override def cleanup(value: Option[SchemeHoldLandProperty], userAnswers: UserAnswers): Try[UserAnswers] = {
+    val saved = userAnswers.get(this)
+    (value, saved) match {
+      case (Some(SchemeHoldLandProperty.Acquisition), Some(SchemeHoldLandProperty.Acquisition)) => Try(userAnswers)
+      case (Some(SchemeHoldLandProperty.Contribution), Some(SchemeHoldLandProperty.Contribution)) => Try(userAnswers)
+      case (Some(SchemeHoldLandProperty.Transfer), Some(SchemeHoldLandProperty.Transfer)) => Try(userAnswers)
+      case (Some(SchemeHoldLandProperty.Acquisition), Some(_)) => removePages(userAnswers, pages(srn))
+      case (Some(SchemeHoldLandProperty.Contribution), Some(_)) => removePages(userAnswers, pages(srn))
+      case (Some(SchemeHoldLandProperty.Transfer), Some(_)) => removePages(userAnswers, pages(srn))
+      case _ => Try(userAnswers)
+    }
+  }
+
+  private def pages(srn: Srn): List[Removable[_]] =
+    List(
+      LandOrPropertyWhenDidSchemeAcquirePage(srn, index),
+      LandPropertyIndependentValuationPage(srn, index),
+      common.IdentityTypePage(srn, index, IdentitySubject.LandOrPropertySeller)
+    )
 }
