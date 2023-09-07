@@ -23,11 +23,17 @@ import pages.QuestionPage
 import pages.nonsipp.landorproperty.{
   CompanySellerNamePage,
   IndividualSellerNiPage,
+  LandOrPropertySellerConnectedPartyPage,
   LandPropertyInUKPage,
   LandPropertyIndividualSellersNamePage,
   PartnershipSellerNamePage
 }
-import pages.nonsipp.loansmadeoroutstanding.{DatePeriodLoanPage, IsIndividualRecipientConnectedPartyPage, _}
+import pages.nonsipp.loansmadeoroutstanding.{
+  DatePeriodLoanPage,
+  IsIndividualRecipientConnectedPartyPage,
+  RecipientSponsoringEmployerConnectedPartyPage,
+  _
+}
 import play.api.libs.json.JsPath
 import queries.Removable
 import utils.PageUtils._
@@ -69,9 +75,8 @@ case class IdentityTypePage(srn: Srn, index: Max5000, identitySubject: IdentityS
     List(
       IsIndividualRecipientConnectedPartyPage(srn, index),
       CompanyRecipientCrnPage(srn, index, this.identitySubject),
-      RecipientSponsoringEmployerConnectedPartyPage(srn, index)
-      // TODO add generic other details page here
-      // TODO add generic UTR page here
+      PartnershipRecipientUtrPage(srn, index, this.identitySubject),
+      OtherRecipientDetailsPage(srn, index, this.identitySubject)
     )
   private def pagesFirstPartSpecific(srn: Srn): List[Removable[_]] =
     this.identitySubject match {
@@ -81,15 +86,15 @@ case class IdentityTypePage(srn: Srn, index: Max5000, identitySubject: IdentityS
           IndividualRecipientNinoPage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
           CompanyRecipientNamePage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
           PartnershipRecipientNamePage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
-          PartnershipRecipientUtrPage(srn, index, this.identitySubject),
-          OtherRecipientDetailsPage(srn, index, this.identitySubject)
+          RecipientSponsoringEmployerConnectedPartyPage(srn, index)
         )
       case IdentitySubject.LandOrPropertySeller =>
         List(
           LandPropertyIndividualSellersNamePage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
           IndividualSellerNiPage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
           CompanySellerNamePage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
-          PartnershipSellerNamePage(srn, index) // TODO move this to generic page (with subject) and pass in this.identitySubject
+          PartnershipSellerNamePage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
+          LandOrPropertySellerConnectedPartyPage(srn, index)
         )
     }
   private def pagesFirstPart(srn: Srn): List[Removable[_]] = pagesFirstPartGeneric(srn) ++ pagesFirstPartSpecific(srn)
