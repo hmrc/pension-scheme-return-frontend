@@ -23,7 +23,14 @@ import models.ConditionalYesNo._
 import models.SchemeId.Srn
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.common.{CompanyRecipientCrnPage, IdentityTypePage, OtherRecipientDetailsPage}
+
+import pages.nonsipp.common.{
+  CompanyRecipientCrnPage,
+  IdentityTypePage,
+  OtherRecipientDetailsPage,
+  PartnershipRecipientUtrPage
+}
+
 import pages.nonsipp.loansmadeoroutstanding._
 import utils.BaseSpec
 import utils.UserAnswersUtils.UserAnswersOps
@@ -214,10 +221,12 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
   "PartnershipRecipientNamePage" - {
     act.like(
       normalmode
-        .navigateToWithIndex(
+        .navigateToWithDataIndexAndSubjects(
           index,
+          subject,
           PartnershipRecipientNamePage,
-          controllers.nonsipp.loansmadeoroutstanding.routes.PartnershipRecipientUtrController.onPageLoad
+          Gen.const(""),
+          controllers.nonsipp.common.routes.PartnershipRecipientUtrController.onPageLoad
         )
         .withName("go from partnership recipient name page to partnership recipient Utr page")
     )
@@ -226,8 +235,9 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
   "PartnershipRecipientUtrPage" - {
     act.like(
       normalmode
-        .navigateToWithIndex(
+        .navigateToWithIndexAndSubject(
           index,
+          subject,
           PartnershipRecipientUtrPage,
           controllers.nonsipp.loansmadeoroutstanding.routes.RecipientSponsoringEmployerConnectedPartyController.onPageLoad
         )

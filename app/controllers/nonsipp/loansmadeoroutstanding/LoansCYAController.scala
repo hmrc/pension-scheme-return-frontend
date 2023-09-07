@@ -25,7 +25,14 @@ import models.ConditionalYesNo._
 import models.SchemeId.Srn
 import models.{Security, _}
 import navigation.Navigator
-import pages.nonsipp.common.{CompanyRecipientCrnPage, IdentityTypePage, OtherRecipientDetailsPage}
+
+import pages.nonsipp.common.{
+  CompanyRecipientCrnPage,
+  IdentityTypePage,
+  OtherRecipientDetailsPage,
+  PartnershipRecipientUtrPage
+}
+
 import pages.nonsipp.loansmadeoroutstanding._
 import play.api.i18n._
 import play.api.mvc._
@@ -69,7 +76,9 @@ class LoansCYAController @Inject()(
             request.userAnswers
               .get(CompanyRecipientCrnPage(srn, index, IdentitySubject.LoanRecipient))
               .flatMap(_.value.toOption.map(_.value)),
-            request.userAnswers.get(PartnershipRecipientUtrPage(srn, index)).flatMap(_.value.toOption.map(_.value)),
+            request.userAnswers
+              .get(PartnershipRecipientUtrPage(srn, index, IdentitySubject.LoanRecipient))
+              .flatMap(_.value.toOption.map(_.value)),
             request.userAnswers
               .get(OtherRecipientDetailsPage(srn, index, IdentitySubject.LoanRecipient))
               .map(_.description)
@@ -81,7 +90,9 @@ class LoansCYAController @Inject()(
             request.userAnswers
               .get(CompanyRecipientCrnPage(srn, index, IdentitySubject.LoanRecipient))
               .flatMap(_.value.swap.toOption.map(_.value)),
-            request.userAnswers.get(PartnershipRecipientUtrPage(srn, index)).flatMap(_.value.swap.toOption.map(_.value))
+            request.userAnswers
+              .get(PartnershipRecipientUtrPage(srn, index, IdentitySubject.LoanRecipient))
+              .flatMap(_.value.swap.toOption.map(_.value))
           ).flatten.headOption
           connectedParty = if (request.userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, index)).isEmpty) {
             Right(request.userAnswers.get(RecipientSponsoringEmployerConnectedPartyPage(srn, index)).get)
@@ -277,7 +288,9 @@ object LoansCYAController {
         case IdentityType.UKPartnership =>
           (
             Message("loanCheckYourAnswers.section1.recipientDetails.utr", recipientName),
-            routes.PartnershipRecipientUtrController.onPageLoad(srn, index, mode).url,
+            controllers.nonsipp.common.routes.PartnershipRecipientUtrController
+              .onPageLoad(srn, index, mode, IdentitySubject.LoanRecipient)
+              .url,
             "loanCheckYourAnswers.section1.recipientDetails.utr.hidden",
             "loanCheckYourAnswers.section1.recipientDetails.noUtrReason.hidden"
           )
@@ -303,7 +316,9 @@ object LoansCYAController {
             .url
       case IdentityType.UKPartnership =>
         Message("loanCheckYourAnswers.section1.recipientDetails.noUtrReason", recipientName) ->
-          routes.PartnershipRecipientUtrController.onPageLoad(srn, index, mode).url
+          controllers.nonsipp.common.routes.PartnershipRecipientUtrController
+            .onPageLoad(srn, index, mode, IdentitySubject.LoanRecipient)
+            .url
       case IdentityType.Other =>
         Message("loanCheckYourAnswers.section1.recipientDetails.other", recipientName) ->
           controllers.nonsipp.common.routes.OtherRecipientDetailsController
