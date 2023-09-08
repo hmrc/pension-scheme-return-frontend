@@ -109,6 +109,7 @@ case class IdentityTypePage(srn: Srn, index: Max5000, identitySubject: IdentityS
       case (Some(IdentityType.UKCompany), _) => removePages(userAnswers, pagesFirstPart(srn))
       case (Some(IdentityType.UKPartnership), _) => removePages(userAnswers, pagesFirstPart(srn))
       case (Some(IdentityType.Other), _) => removePages(userAnswers, pagesFirstPart(srn))
+      case (None, _) => removePages(userAnswers, pages(srn))
       case _ => Try(userAnswers)
     }
 }
