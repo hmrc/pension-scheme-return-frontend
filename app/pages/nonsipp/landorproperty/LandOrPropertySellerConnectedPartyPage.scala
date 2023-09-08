@@ -24,7 +24,7 @@ import utils.RefinedUtils._
 
 case class LandOrPropertySellerConnectedPartyPage(srn: Srn, index: Max5000) extends QuestionPage[Boolean] {
 
-  override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString
+  override def path: JsPath = Paths.heldPropertyTransactions \ toString \ index.arrayIndex.toString
 
-  override def toString: String = "landOrPropertySellerConnectedParty"
+  override def toString: String = "connectedPartyStatus"
 }

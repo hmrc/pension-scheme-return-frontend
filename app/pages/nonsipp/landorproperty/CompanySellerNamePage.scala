@@ -24,7 +24,7 @@ import utils.RefinedUtils._
 
 case class CompanySellerNamePage(srn: Srn, index: Max5000) extends QuestionPage[String] {
 
-  override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString
+  override def path: JsPath = Paths.heldPropertyTransactions \ toString \ index.arrayIndex.toString
 
   override def toString: String = "companySellerName"
 }

@@ -21,7 +21,8 @@ import play.api.libs.json._
 package object landorproperty {
   object Paths {
     val assets: JsPath = __ \ "assets"
-    val landOrPropertyTransactions: JsPath = assets \ "landOrProperty" \ "landOrPropertyTransactions"
+    val landOrProperty: JsPath = assets \ "landOrProperty"
+    val landOrPropertyTransactions: JsPath = landOrProperty \ "landOrPropertyTransactions"
     val heldPropertyTransactions: JsPath = landOrPropertyTransactions \ "heldPropertyTransaction"
   }
 }
