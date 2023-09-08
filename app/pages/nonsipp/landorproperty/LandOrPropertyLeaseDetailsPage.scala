@@ -27,7 +27,7 @@ import java.time.LocalDate
 
 case class LandOrPropertyLeaseDetailsPage(srn: Srn, index: Max5000) extends QuestionPage[(String, Money, LocalDate)] {
 
-  override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString
+  override def path: JsPath = Paths.heldPropertyTransactions \ toString \ index.arrayIndex.toString
 
-  override def toString: String = "landOrPropertyLeaseDetails"
+  override def toString: String = "leaseDetails"
 }

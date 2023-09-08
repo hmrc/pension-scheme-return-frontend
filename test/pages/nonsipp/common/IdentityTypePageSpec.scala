@@ -18,9 +18,13 @@ package pages.nonsipp.common
 
 import config.Refined.OneTo5000
 import eu.timepit.refined.refineMV
-import models.{IdentitySubject, IdentityType, UserAnswers}
+import models.{ConditionalYesNo, Crn, IdentitySubject, IdentityType, Money, UserAnswers}
 import pages.behaviours.PageBehaviours
+import pages.nonsipp.landorproperty.LandPropertyInUKPage
+import pages.nonsipp.loansmadeoroutstanding.DatePeriodLoanPage
 import utils.UserAnswersUtils.UserAnswersOps
+
+import java.time.LocalDate
 
 class IdentityTypePageSpec extends PageBehaviours {
   "WhoReceivedLoanPage" - {
@@ -46,6 +50,49 @@ class IdentityTypePageSpec extends PageBehaviours {
         IdentityType.UKCompany,
         IdentityType.UKPartnership
       )
+    }
+
+    "cleanup" - {
+      val localDate: LocalDate = LocalDate.of(1989, 10, 6)
+      val userAnswers =
+        UserAnswers("id")
+          .unsafeSet(DatePeriodLoanPage(srn, index), (localDate, Money(Double.MinPositiveValue), Int.MaxValue))
+          .unsafeSet(
+            CompanyRecipientCrnPage(srn, index, IdentitySubject.LoanRecipient),
+            ConditionalYesNo.yes[String, Crn](crnGen.sample.value)
+          )
+          .unsafeSet(
+            CompanyRecipientCrnPage(srn, index, IdentitySubject.LandOrPropertySeller),
+            ConditionalYesNo.yes[String, Crn](crnGen.sample.value)
+          )
+          .unsafeSet(IdentityTypePage(srn, index, IdentitySubject.LoanRecipient), IdentityType.UKCompany) // part of loans journey
+          .unsafeSet(LandPropertyInUKPage(srn, index), true) // part of land or property journey
+
+      s"remove dependant loan values when current answer is None (removal) and existing answers are present" in {
+
+        val result = IdentityTypePage(srn, index, IdentitySubject.LoanRecipient)
+          .cleanup(None, userAnswers)
+          .toOption
+          .value
+
+        result.get(DatePeriodLoanPage(srn, index)) mustBe None
+        result.get(LandPropertyInUKPage(srn, index)) must not be None
+        result.get(CompanyRecipientCrnPage(srn, index, IdentitySubject.LoanRecipient)) mustBe None
+        result.get(CompanyRecipientCrnPage(srn, index, IdentitySubject.LandOrPropertySeller)) must not be None
+      }
+
+      s"remove dependant loan values when current answer is Partnership and existing answer is UKCompany (update)" in {
+
+        val result = IdentityTypePage(srn, index, IdentitySubject.LoanRecipient)
+          .cleanup(Some(IdentityType.UKPartnership), userAnswers)
+          .toOption
+          .value
+
+        result.get(DatePeriodLoanPage(srn, index)) must not be None
+        result.get(LandPropertyInUKPage(srn, index)) must not be None
+        result.get(CompanyRecipientCrnPage(srn, index, IdentitySubject.LoanRecipient)) mustBe None
+        result.get(CompanyRecipientCrnPage(srn, index, IdentitySubject.LandOrPropertySeller)) must not be None
+      }
     }
   }
 }

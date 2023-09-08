@@ -24,8 +24,7 @@ import utils.RefinedUtils._
 
 case class IsLandOrPropertyResidentialPage(srn: Srn, index: Max5000) extends QuestionPage[Boolean] {
 
-  override def path: JsPath =
-    JsPath \ "assets" \ "landOrProperty" \ "landOrPropertyTransactions" \ toString \ index.arrayIndex.toString
+  override def path: JsPath = Paths.heldPropertyTransactions \ toString \ index.arrayIndex.toString
 
   override def toString: String = "isLandOrPropertyResidential"
 }

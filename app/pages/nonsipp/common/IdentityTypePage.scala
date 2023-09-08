@@ -39,6 +39,17 @@ import pages.nonsipp.landorproperty.{
   WhyDoesSchemeHoldLandPropertyPage
 }
 import pages.nonsipp.loansmadeoroutstanding.{DatePeriodLoanPage, IsIndividualRecipientConnectedPartyPage, _}
+  LandOrPropertySellerConnectedPartyPage,
+  LandPropertyInUKPage,
+  LandPropertyIndividualSellersNamePage,
+  PartnershipSellerNamePage
+}
+import pages.nonsipp.loansmadeoroutstanding.{
+  DatePeriodLoanPage,
+  IsIndividualRecipientConnectedPartyPage,
+  RecipientSponsoringEmployerConnectedPartyPage,
+  _
+}
 import play.api.libs.json.JsPath
 import queries.Removable
 import utils.PageUtils._
@@ -87,19 +98,30 @@ case class IdentityTypePage(srn: Srn, index: Max5000, identitySubject: IdentityS
           IsLesseeConnectedPartyPage(srn, index)
         )
     }
-  private def pagesFirstPart(srn: Srn): List[Removable[_]] =
+  private def pagesFirstPartGeneric(srn: Srn): List[Removable[_]] =
+    List(
+      IsIndividualRecipientConnectedPartyPage(srn, index),
+      CompanyRecipientCrnPage(srn, index, this.identitySubject),
+      PartnershipRecipientUtrPage(srn, index, this.identitySubject),
+      OtherRecipientDetailsPage(srn, index, this.identitySubject)
+    )
+  private def pagesFirstPartSpecific(srn: Srn): List[Removable[_]] =
     this.identitySubject match {
       case IdentitySubject.LoanRecipient =>
         List(
           IndividualRecipientNamePage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
           IndividualRecipientNinoPage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
-          IsIndividualRecipientConnectedPartyPage(srn, index),
           CompanyRecipientNamePage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
-          CompanyRecipientCrnPage(srn, index, this.identitySubject),
-          RecipientSponsoringEmployerConnectedPartyPage(srn, index),
           PartnershipRecipientNamePage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
-          PartnershipRecipientUtrPage(srn, index, this.identitySubject),
-          OtherRecipientDetailsPage(srn, index, this.identitySubject)
+          RecipientSponsoringEmployerConnectedPartyPage(srn, index)
+        )
+      case IdentitySubject.LandOrPropertySeller =>
+        List(
+          LandPropertyIndividualSellersNamePage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
+          IndividualSellerNiPage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
+          CompanySellerNamePage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
+          PartnershipSellerNamePage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
+          LandOrPropertySellerConnectedPartyPage(srn, index)
         )
       case IdentitySubject.LandOrPropertySeller =>
         List(
@@ -111,7 +133,9 @@ case class IdentityTypePage(srn: Srn, index: Max5000, identitySubject: IdentityS
           OtherRecipientDetailsPage(srn, index, this.identitySubject),
           LandOrPropertySellerConnectedPartyPage(srn, index)
         ) // TODO add land or property pages here
+
     }
+  private def pagesFirstPart(srn: Srn): List[Removable[_]] = pagesFirstPartGeneric(srn) ++ pagesFirstPartSpecific(srn)
 
   override def cleanup(value: Option[IdentityType], userAnswers: UserAnswers): Try[UserAnswers] =
     (value, userAnswers.get(this)) match {
@@ -123,6 +147,7 @@ case class IdentityTypePage(srn: Srn, index: Max5000, identitySubject: IdentityS
       case (Some(IdentityType.UKCompany), _) => removePages(userAnswers, pagesFirstPart(srn))
       case (Some(IdentityType.UKPartnership), _) => removePages(userAnswers, pagesFirstPart(srn))
       case (Some(IdentityType.Other), _) => removePages(userAnswers, pagesFirstPart(srn))
+      case (None, _) => removePages(userAnswers, pages(srn))
       case _ => Try(userAnswers)
     }
 }
