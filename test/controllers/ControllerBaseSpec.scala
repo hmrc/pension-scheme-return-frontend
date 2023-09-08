@@ -21,6 +21,7 @@ import config.Refined.Max5000
 import controllers.actions._
 import generators.ModelGenerators._
 import models.PensionSchemeId.PsaId
+import models.SchemeHoldLandProperty.Acquisition
 import models.SchemeId.Srn
 import models.UserAnswers.SensitiveJsObject
 import models.{NameDOB, _}
@@ -117,8 +118,10 @@ trait TestValues {
   val otherName = "testOtherName"
   val crn: Crn = crnGen.sample.get
   val recipientName = "testRecipientName"
+  val sellerName = "testSellerName"
   val pstr = "testPstr"
   val titleNumber = "AB123456"
+  val schemeHoldLandProperty: SchemeHoldLandProperty = Acquisition
 
   val address: Address = Address(
     "testAddressLine1",

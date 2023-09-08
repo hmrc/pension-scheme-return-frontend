@@ -136,3 +136,10 @@ GET        /:srn/land-property-total-income/:index                 controllers.n
 POST       /:srn/land-property-total-income/:index                 controllers.nonsipp.landorproperty.LandOrPropertyTotalIncomeController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
 GET        /:srn/change-land-property-total-income/:index          controllers.nonsipp.landorproperty.LandOrPropertyTotalIncomeController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 POST       /:srn/change-land-property-total-income/:index          controllers.nonsipp.landorproperty.LandOrPropertyTotalIncomeController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET         /:srn/check-answers-land-property                                                    controllers.nonsipp.landorproperty.LandOrPropertyCYAController.onPageLoad(srn: Srn, index: Max5000 = 1, checkOrChange: CheckOrChange = Check)
+GET         /:srn/check-answers-land-property/:index                                             controllers.nonsipp.landorproperty.LandOrPropertyCYAController.onPageLoad(srn: Srn, index: Max5000, checkOrChange: CheckOrChange = Check)
+POST        /:srn/submit-check-answers-land-property                                            controllers.nonsipp.landorproperty.LandOrPropertyCYAController.onSubmit(srn: Srn, checkOrChange: CheckOrChange = Check)
+GET         /:srn/change-check-answers-land-property                                            controllers.nonsipp.landorproperty.LandOrPropertyCYAController.onPageLoad(srn: Srn, index: Max5000 = 1, checkOrChange: CheckOrChange = Change)
+GET         /:srn/change-check-answers-land-property/:index                                      controllers.nonsipp.landorproperty.LandOrPropertyCYAController.onPageLoad(srn: Srn, index: Max5000, checkOrChange: CheckOrChange = Change)
+POST        /:srn/change-submit-check-answers-land-property                                      controllers.nonsipp.landorproperty.LandOrPropertyCYAController.onSubmit(srn: Srn, checkOrChange: CheckOrChange = Change)

@@ -20,7 +20,24 @@ import config.Refined.Max5000
 import models.SchemeId.Srn
 import models.{IdentitySubject, IdentityType, UserAnswers}
 import pages.QuestionPage
-import pages.nonsipp.landorproperty.LandPropertyInUKPage
+import pages.nonsipp.landorproperty.{
+  CompanySellerNamePage,
+  IndividualSellerNiPage,
+  IsLandOrPropertyResidentialPage,
+  IsLandPropertyLeasedPage,
+  IsLesseeConnectedPartyPage,
+  LandOrPropertyAddressLookupPage,
+  LandOrPropertyLeaseDetailsPage,
+  LandOrPropertySellerConnectedPartyPage,
+  LandOrPropertyTotalCostPage,
+  LandOrPropertyTotalIncomePage,
+  LandOrPropertyWhenDidSchemeAcquirePage,
+  LandPropertyInUKPage,
+  LandPropertyIndependentValuationPage,
+  LandPropertyIndividualSellersNamePage,
+  LandRegistryTitleNumberPage,
+  WhyDoesSchemeHoldLandPropertyPage
+}
 import pages.nonsipp.loansmadeoroutstanding.{DatePeriodLoanPage, IsIndividualRecipientConnectedPartyPage, _}
 import play.api.libs.json.JsPath
 import queries.Removable
@@ -56,7 +73,18 @@ case class IdentityTypePage(srn: Srn, index: Max5000, identitySubject: IdentityS
         )
       case IdentitySubject.LandOrPropertySeller =>
         List(
-          LandPropertyInUKPage(srn, index)
+          LandPropertyInUKPage(srn, index),
+          LandRegistryTitleNumberPage(srn, index),
+          LandOrPropertyAddressLookupPage(srn, index),
+          WhyDoesSchemeHoldLandPropertyPage(srn, index),
+          LandOrPropertyWhenDidSchemeAcquirePage(srn, index),
+          LandOrPropertyTotalCostPage(srn, index),
+          LandPropertyIndependentValuationPage(srn, index),
+          IsLandOrPropertyResidentialPage(srn, index),
+          IsLandPropertyLeasedPage(srn, index),
+          LandOrPropertyTotalIncomePage(srn, index),
+          LandOrPropertyLeaseDetailsPage(srn, index),
+          IsLesseeConnectedPartyPage(srn, index)
         )
     }
   private def pagesFirstPart(srn: Srn): List[Removable[_]] =
@@ -73,7 +101,16 @@ case class IdentityTypePage(srn: Srn, index: Max5000, identitySubject: IdentityS
           PartnershipRecipientUtrPage(srn, index, this.identitySubject),
           OtherRecipientDetailsPage(srn, index, this.identitySubject)
         )
-      case IdentitySubject.LandOrPropertySeller => List() // TODO add land or property pages here
+      case IdentitySubject.LandOrPropertySeller =>
+        List(
+          LandPropertyIndividualSellersNamePage(srn, index),
+          IndividualSellerNiPage(srn, index),
+          CompanySellerNamePage(srn, index),
+          CompanyRecipientCrnPage(srn, index, this.identitySubject),
+          PartnershipRecipientUtrPage(srn, index, this.identitySubject),
+          OtherRecipientDetailsPage(srn, index, this.identitySubject),
+          LandOrPropertySellerConnectedPartyPage(srn, index)
+        ) // TODO add land or property pages here
     }
 
   override def cleanup(value: Option[IdentityType], userAnswers: UserAnswers): Try[UserAnswers] =

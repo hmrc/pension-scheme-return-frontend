@@ -358,9 +358,11 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateToWithIndex(
           index,
           IsLesseeConnectedPartyPage,
-          controllers.nonsipp.landorproperty.routes.LandOrPropertyTotalIncomeController.onPageLoad
+          (srn, index: Max5000, _) =>
+            controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
+              .onPageLoad(srn, index, CheckOrChange.Check)
         )
-        .withName("go from is lessee connected party page to unauthorised")
+        .withName("go from is lessee connected party page to Land or property CYA page")
     )
   }
 
@@ -370,9 +372,11 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateToWithIndex(
           index,
           LandOrPropertyTotalIncomePage,
-          (srn, index: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          (srn, index: Max5000, _) =>
+            controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
+              .onPageLoad(srn, index, CheckOrChange.Check)
         )
-        .withName("go from LandOrPropertyTotalIncome page to unauthorised page")
+        .withName("go from LandOrPropertyTotalIncome page to Land or property CYA page")
     )
   }
 }
