@@ -23,12 +23,7 @@ import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
 import models.Mode
 import navigation.Navigator
-
-import pages.nonsipp.landorproperty.{
-  LandOrPropertyAddressLookupPage,
-  RemovePropertyPage
-}
-
+import pages.nonsipp.landorproperty.{LandOrPropertyAddressLookupPage, LandPropertyInUKPage, RemovePropertyPage}
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -75,13 +70,18 @@ class RemovePropertyController @Inject()(
                 )
               )
             },
-          success =>
-            for {
-              userAnswers <- Future
-                .fromTry(request.userAnswers.set(RemovePropertyPage(srn, index), success))
-              _ <- saveService.save(userAnswers)
-            } yield {
-              Redirect(navigator.nextPage(RemovePropertyPage(srn, index), mode, userAnswers))
+          value =>
+            if (value) {
+              for {
+                updatedAnswers <- Future
+                  .fromTry(request.userAnswers.remove(LandPropertyInUKPage(srn, index)))
+                _ <- saveService.save(updatedAnswers)
+              } yield {
+                Redirect(navigator.nextPage(RemovePropertyPage(srn, index), mode, updatedAnswers))
+              }
+            } else {
+              Future
+                .successful(Redirect(navigator.nextPage(RemovePropertyPage(srn, index), mode, request.userAnswers)))
             }
         )
   }
@@ -98,7 +98,6 @@ object RemovePropertyController {
     mode: Mode,
     addressLine1: String
   ): FormPageViewModel[YesNoPageViewModel] =
-
     YesNoPageViewModel(
       "removeLandOrProperty.title",
       Message("removeLandOrProperty.heading", addressLine1),
