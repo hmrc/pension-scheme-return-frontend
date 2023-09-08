@@ -57,8 +57,14 @@ class IdentityTypePageSpec extends PageBehaviours {
       val userAnswers =
         UserAnswers("id")
           .unsafeSet(DatePeriodLoanPage(srn, index), (localDate, Money(Double.MinPositiveValue), Int.MaxValue))
-          .unsafeSet(CompanyRecipientCrnPage(srn, index, IdentitySubject.LoanRecipient), ConditionalYesNo.yes[String, Crn](crnGen.sample.value))
-          .unsafeSet(CompanyRecipientCrnPage(srn, index, IdentitySubject.LandOrPropertySeller), ConditionalYesNo.yes[String, Crn](crnGen.sample.value))
+          .unsafeSet(
+            CompanyRecipientCrnPage(srn, index, IdentitySubject.LoanRecipient),
+            ConditionalYesNo.yes[String, Crn](crnGen.sample.value)
+          )
+          .unsafeSet(
+            CompanyRecipientCrnPage(srn, index, IdentitySubject.LandOrPropertySeller),
+            ConditionalYesNo.yes[String, Crn](crnGen.sample.value)
+          )
           .unsafeSet(IdentityTypePage(srn, index, IdentitySubject.LoanRecipient), IdentityType.UKCompany) // part of loans journey
           .unsafeSet(LandPropertyInUKPage(srn, index), true) // part of land or property journey
 

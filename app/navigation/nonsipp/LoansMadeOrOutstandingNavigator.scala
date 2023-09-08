@@ -135,7 +135,9 @@ object LoansMadeOrOutstandingNavigator extends JourneyNavigator {
       controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController.onPageLoad(srn, page = 1, NormalMode)
 
     case LoansListPage(srn, addLoan @ true) =>
-      refineV[OneTo5000](userAnswers.map(IdentityTypes(srn, IdentitySubject.LoanRecipient)).size + 1) match {
+      val answers = userAnswers.map(IdentityTypes(srn, IdentitySubject.LoanRecipient))
+      val nextDataKey = if (answers.isEmpty) 1 else answers.maxBy(_._1)._1.toIntOption.orElse(Some(0)).get + 1
+      refineV[OneTo5000](nextDataKey + 1) match {
         case Left(_) => controllers.routes.JourneyRecoveryController.onPageLoad()
         case Right(nextIndex) =>
           controllers.nonsipp.common.routes.IdentityTypeController

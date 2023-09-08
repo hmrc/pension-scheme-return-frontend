@@ -17,20 +17,18 @@
 package navigation.nonsipp
 
 import config.Refined.OneTo5000
-import eu.timepit.refined.refineMV
+import eu.timepit.refined.{refineMV, refineV}
 import models.{ConditionalYesNo, IdentitySubject, IdentityType, Money, NormalMode, RecipientDetails, UserAnswers}
 import models.ConditionalYesNo._
 import models.SchemeId.Srn
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-
 import pages.nonsipp.common.{
   CompanyRecipientCrnPage,
   IdentityTypePage,
   OtherRecipientDetailsPage,
   PartnershipRecipientUtrPage
 }
-
 import pages.nonsipp.loansmadeoroutstanding._
 import utils.BaseSpec
 import utils.UserAnswersUtils.UserAnswersOps
@@ -291,6 +289,54 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
         )
         .withName("go from interest on loan page to outstanding arrears on loan page")
     )
+  }
+
+  "AddLoan" - {
+    "One record at index 1" - {
+      act.like(
+        normalmode
+          .navigateTo(
+            srn => LoansListPage(srn, true),
+            (srn, _) =>
+              controllers.nonsipp.common.routes.IdentityTypeController
+                .onPageLoad(srn, refineMV(2), NormalMode, IdentitySubject.LoanRecipient),
+            (srn) =>
+              defaultUserAnswers
+                .unsafeSet(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient), IdentityType.Individual)
+                .unsafeSet(IndividualRecipientNamePage(srn, refineMV(1)), individualName)
+          )
+          .withName("go to who received the loan at index 2")
+      )
+    }
+    "One record at index 2" - {
+      act.like(
+        normalmode
+          .navigateTo(
+            srn => LoansListPage(srn, true),
+            (srn, _) =>
+              controllers.nonsipp.common.routes.IdentityTypeController
+                .onPageLoad(srn, refineMV(3), NormalMode, IdentitySubject.LoanRecipient),
+            (srn) =>
+              defaultUserAnswers
+                .unsafeSet(IdentityTypePage(srn, refineMV(2), IdentitySubject.LoanRecipient), IdentityType.Individual)
+                .unsafeSet(IndividualRecipientNamePage(srn, refineMV(2)), individualName)
+          )
+          .withName("go to who received the loan at index 3")
+      )
+    }
+    "No existing loan records" - {
+      act.like(
+        normalmode
+          .navigateTo(
+            srn => LoansListPage(srn, true),
+            (srn, _) =>
+              controllers.nonsipp.common.routes.IdentityTypeController
+                .onPageLoad(srn, refineMV(2), NormalMode, IdentitySubject.LoanRecipient),
+            (srn) => defaultUserAnswers
+          )
+          .withName("go to who received the loan at index 1")
+      )
+    }
   }
 
   "RemoveLoan" - {
