@@ -23,6 +23,7 @@ import pages.QuestionPage
 import pages.nonsipp.landorproperty.{
   CompanySellerNamePage,
   IndividualSellerNiPage,
+  PartnershipSellerNamePage,
   IsLandOrPropertyResidentialPage,
   IsLandPropertyLeasedPage,
   IsLesseeConnectedPartyPage,
@@ -37,12 +38,6 @@ import pages.nonsipp.landorproperty.{
   LandPropertyIndividualSellersNamePage,
   LandRegistryTitleNumberPage,
   WhyDoesSchemeHoldLandPropertyPage
-}
-import pages.nonsipp.loansmadeoroutstanding.{DatePeriodLoanPage, IsIndividualRecipientConnectedPartyPage, _}
-  LandOrPropertySellerConnectedPartyPage,
-  LandPropertyInUKPage,
-  LandPropertyIndividualSellersNamePage,
-  PartnershipSellerNamePage
 }
 import pages.nonsipp.loansmadeoroutstanding.{
   DatePeriodLoanPage,
@@ -115,19 +110,13 @@ case class IdentityTypePage(srn: Srn, index: Max5000, identitySubject: IdentityS
           PartnershipRecipientNamePage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
           RecipientSponsoringEmployerConnectedPartyPage(srn, index)
         )
+     
       case IdentitySubject.LandOrPropertySeller =>
         List(
-          LandPropertyIndividualSellersNamePage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
+           LandPropertyIndividualSellersNamePage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
           IndividualSellerNiPage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
           CompanySellerNamePage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
           PartnershipSellerNamePage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
-          LandOrPropertySellerConnectedPartyPage(srn, index)
-        )
-      case IdentitySubject.LandOrPropertySeller =>
-        List(
-          LandPropertyIndividualSellersNamePage(srn, index),
-          IndividualSellerNiPage(srn, index),
-          CompanySellerNamePage(srn, index),
           CompanyRecipientCrnPage(srn, index, this.identitySubject),
           PartnershipRecipientUtrPage(srn, index, this.identitySubject),
           OtherRecipientDetailsPage(srn, index, this.identitySubject),
