@@ -74,7 +74,10 @@ object LandOrPropertyNavigator extends JourneyNavigator {
 
     case page @ IdentityTypePage(srn, index, IdentitySubject.LandOrPropertySeller) =>
       userAnswers.get(page) match {
-        case Some(IdentityType.Individual) => controllers.routes.UnauthorisedController.onPageLoad() //TODO 27h2
+        case Some(IdentityType.Individual) =>
+          controllers.nonsipp.landorproperty.routes.LandPropertyIndividualSellersNameController
+            .onPageLoad(srn, index, NormalMode)
+
         case Some(IdentityType.UKCompany) =>
           controllers.nonsipp.landorproperty.routes.CompanySellerNameController
             .onPageLoad(srn, index, NormalMode) //27h4
@@ -96,7 +99,8 @@ object LandOrPropertyNavigator extends JourneyNavigator {
         .onPageLoad(srn, index, NormalMode, IdentitySubject.LandOrPropertySeller)
 
     case CompanyRecipientCrnPage(srn, index, IdentitySubject.LandOrPropertySeller) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+      controllers.nonsipp.landorproperty.routes.LandOrPropertySellerConnectedPartyController
+        .onPageLoad(srn, index, NormalMode)
 
     case LandOrPropertyTotalCostPage(srn, index) =>
       controllers.nonsipp.landorproperty.routes.IsLandOrPropertyResidentialController.onPageLoad(srn, index, NormalMode)
