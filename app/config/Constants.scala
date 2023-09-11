@@ -29,6 +29,7 @@ object Constants {
 
   val maxSchemeBankAccounts = 10
   val maxAccountingPeriods = 3
+  val maxLandOrProperties = 5000
 
   val schemeMembersPageSize = 25
   val maxSchemeMembers = 300
