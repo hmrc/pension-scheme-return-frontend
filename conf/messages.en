@@ -560,13 +560,13 @@ loanRecipient.identityType.pageContent2 = A UK partnership
 loanRecipient.identityType.pageContent3 = Other
 loanRecipient.identityType.error.required = Select who received the loan
 
-landOrPropertySeller.identityType.title = Who was the the property acquired from?
-landOrPropertySeller.identityType.heading = Who was the the property {0} acquired from?
+landOrPropertySeller.identityType.title = Who was the land or property acquired from?
+landOrPropertySeller.identityType.heading = Who was {0} acquired from?
 landOrPropertySeller.identityType.pageContent = An individual
 landOrPropertySeller.identityType.pageContent1 = A UK company
 landOrPropertySeller.identityType.pageContent2 = A UK partnership
 landOrPropertySeller.identityType.pageContent3 = Other
-landOrPropertySeller.identityType.error.required = Select who was the the property acquired from
+landOrPropertySeller.identityType.error.required = Select who the land or property was acquired from
 
 fileUploadErrorSummary.title = There is a problem with your member details file
 fileUploadErrorSummary.heading = There is a problem with your member details file
@@ -1018,14 +1018,6 @@ landPropertyIndividualSellersName.error.required = Enter the seller’s name
 landPropertyIndividualSellersName.error.tooLong = Seller’s name must be 160 characters or fewer
 landPropertyIndividualSellersName.error.invalid = Seller’s name must only include letters a to z, hyphens, apostrophes and spaces
 
-landOrPropertyAcquiredFrom.title = Who was the land or property acquired from?
-landOrPropertyAcquiredFrom.heading = Who was {0} acquired from?
-landOrPropertyAcquiredFrom.option1 = An individual
-landOrPropertyAcquiredFrom.option2 = A UK company
-landOrPropertyAcquiredFrom.option3 = A UK partnership
-landOrPropertyAcquiredFrom.option4 = Other
-landOrPropertyAcquiredFrom.error.required = Select who the land or property was acquired from
-
 landOrPropertySellerConnectedParty.title = Is the seller a connected party?
 landOrPropertySellerConnectedParty.heading = Is {0} a connected party?
 landOrPropertySellerConnectedParty.error.required = Select yes if the seller is a connected party
@@ -1116,6 +1108,14 @@ landOrPropertyDisposal.title = Did the scheme dispose of any land or property du
 landOrPropertyDisposal.heading = Did {0} dispose of any land or property during the period of this return?
 landOrPropertyDisposal.error.required = Select yes if the scheme disposed of any land or property during the period of this return
 
+landOrPropertyList.title = You have added {0} land or property
+landOrPropertyList.title.plural = You have added {0} land or properties
+landOrPropertyList.heading = You have added {0} land or property
+landOrPropertyList.heading.plural = You have added {0} land or properties
+landOrPropertyList.paragraph = You must tell us about all land or property the scheme held at any point during the period of this return.
+landOrPropertyList.inset = You cannot add another land or property as you have entered the maximum of 5,000.
+landOrPropertyList.radios = Do you need to add another land or property?
+landOrPropertyList.radios.error.required = Select yes if you need to add another land or property
 
 landOrPropertyStillHeld.title = Is any part of the land or property still held by the scheme?
 landOrPropertyStillHeld.heading = Is any part of {0} still held by {1}?

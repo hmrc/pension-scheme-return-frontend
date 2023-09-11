@@ -30,3 +30,10 @@ case class LandOrPropertyAddressLookupPage(srn: Srn, index: Max5000) extends Que
 
   override def toString: String = "landOrPropertyHeld"
 }
+
+case class LandOrPropertyAddressLookupPages(srn: Srn) extends QuestionPage[Map[String, Address]] {
+  override def path: JsPath =
+    Paths.landOrPropertyTransactions \ "propertyDetails" \ "addressDetails" \ toString
+
+  override def toString: String = "landOrPropertyHeld"
+}

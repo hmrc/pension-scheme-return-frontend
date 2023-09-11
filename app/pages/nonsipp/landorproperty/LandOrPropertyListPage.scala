@@ -16,21 +16,13 @@
 
 package pages.nonsipp.landorproperty
 
-import config.Refined.OneTo5000
-import eu.timepit.refined.refineMV
-import models.IdentityType
-import pages.behaviours.PageBehaviours
+import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-class PropertyAcquiredFromPageSpec extends PageBehaviours {
+case class LandOrPropertyListPage(srn: Srn, addLandOrProperty: Boolean) extends QuestionPage[Boolean] {
 
-  "PropertyAcquiredFromPageSpec" - {
+  override def path: JsPath = JsPath \ toString
 
-    val index = refineMV[OneTo5000](1)
-
-    beRetrievable[IdentityType](PropertyAcquiredFromPage(srnGen.sample.value, index))
-
-    beSettable[IdentityType](PropertyAcquiredFromPage(srnGen.sample.value, index))
-
-    beRemovable[IdentityType](PropertyAcquiredFromPage(srnGen.sample.value, index))
-  }
+  override def toString: String = "landOrPropertyListPage"
 }

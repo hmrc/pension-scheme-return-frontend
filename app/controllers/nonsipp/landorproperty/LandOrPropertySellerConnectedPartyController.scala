@@ -30,8 +30,7 @@ import pages.nonsipp.landorproperty.{
   CompanySellerNamePage,
   LandOrPropertySellerConnectedPartyPage,
   LandPropertyIndividualSellersNamePage,
-  PartnershipSellerNamePage,
-  PropertyAcquiredFromPage
+  PartnershipSellerNamePage
 }
 import play.api.data.Form
 import play.api.i18n.MessagesApi
@@ -103,8 +102,7 @@ class LandOrPropertySellerConnectedPartyController @Inject()(
   }
 
   private def recipientName(srn: Srn, index: Max5000)(implicit request: DataRequest[_]): Option[String] =
-    // TODO change next to request.userAnswers.get(IdentityTypePage(srn, index, IdentitySubject.LandOrPropertySeller)).flatMap {
-    request.userAnswers.get(PropertyAcquiredFromPage(srn, index)).flatMap {
+    request.userAnswers.get(IdentityTypePage(srn, index, IdentitySubject.LandOrPropertySeller)).flatMap {
       case IdentityType.Individual => request.userAnswers.get(LandPropertyIndividualSellersNamePage(srn, index))
       case IdentityType.UKCompany => request.userAnswers.get(CompanySellerNamePage(srn, index))
       case IdentityType.UKPartnership => request.userAnswers.get(PartnershipSellerNamePage(srn, index))

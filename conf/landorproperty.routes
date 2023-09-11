@@ -90,15 +90,6 @@ POST       /:srn/individual-seller-name/:index                    controllers.no
 GET        /:srn/change-individual-seller-name/:index             controllers.nonsipp.landorproperty.LandPropertyIndividualSellersNameController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 POST       /:srn/change-individual-seller-name/:index             controllers.nonsipp.landorproperty.LandPropertyIndividualSellersNameController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 
-GET         /:srn/who-was-land-property-acquired-from                               controllers.nonsipp.landorproperty.PropertyAcquiredFromController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
-GET         /:srn/who-was-land-property-acquired-from/:index                        controllers.nonsipp.landorproperty.PropertyAcquiredFromController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
-POST        /:srn/who-was-land-property-acquired-from                               controllers.nonsipp.landorproperty.PropertyAcquiredFromController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
-POST        /:srn/who-was-land-property-acquired-from/:index                        controllers.nonsipp.landorproperty.PropertyAcquiredFromController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
-GET         /:srn/who-was-land-property-acquired-from                        controllers.nonsipp.landorproperty.PropertyAcquiredFromController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
-GET         /:srn/who-was-land-property-acquired-from/:index                 controllers.nonsipp.landorproperty.PropertyAcquiredFromController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
-POST        /:srn/who-was-land-property-acquired-from                       controllers.nonsipp.landorproperty.PropertyAcquiredFromController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
-POST        /:srn/who-was-land-property-acquired-from/:index                 controllers.nonsipp.landorproperty.PropertyAcquiredFromController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
-
 GET        /:srn/partnership-seller-name/:index               controllers.nonsipp.landorproperty.PartnershipSellerNameController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
 POST       /:srn/partnership-seller-name/:index               controllers.nonsipp.landorproperty.PartnershipSellerNameController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
 GET        /:srn/change-partnership-seller-name/:index        controllers.nonsipp.landorproperty.PartnershipSellerNameController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
@@ -139,5 +130,8 @@ POST       /:srn/change-land-property-total-income/:index          controllers.n
 
 GET         /:srn/remove-land-property/:index                       controllers.nonsipp.landorproperty.RemovePropertyController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
 POST        /:srn/remove-land-property/:index                       controllers.nonsipp.landorproperty.RemovePropertyController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
-GET         /:srn/change-remove-land-property/:index                controllers.nonsipp.landorproperty.RemovePropertyController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
-POST        /:srn/change-remove-land-property/:index                controllers.nonsipp.landorproperty.RemovePropertyController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET        /:srn/land-property-list                 controllers.nonsipp.landorproperty.LandOrPropertyListController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST       /:srn/land-property-list                 controllers.nonsipp.landorproperty.LandOrPropertyListController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/change-land-property-list          controllers.nonsipp.landorproperty.LandOrPropertyListController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST       /:srn/change-land-property-list          controllers.nonsipp.landorproperty.LandOrPropertyListController.onSubmit(srn: Srn, mode: Mode = CheckMode)
