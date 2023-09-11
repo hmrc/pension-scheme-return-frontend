@@ -21,8 +21,13 @@ import eu.timepit.refined.{refineMV, refineV}
 import models.{IdentitySubject, IdentityType, NormalMode, SchemeHoldLandProperty, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.accountingperiod.AccountingPeriods
-import pages.nonsipp.common.CompanyRecipientCrnPage
+import pages.nonsipp.common.{
+  CompanyRecipientCrnPage,
+  IdentityTypePage,
+  OtherRecipientDetailsPage,
+  PartnershipRecipientUtrPage
+}
+
 import pages.nonsipp.landorproperty._
 import play.api.mvc.Call
 
@@ -65,13 +70,16 @@ object LandOrPropertyNavigator extends JourneyNavigator {
           controllers.nonsipp.landorproperty.routes.LandPropertyIndependentValuationController
             .onPageLoad(srn, index, NormalMode)
         case _ => //27h1
-          controllers.nonsipp.landorproperty.routes.PropertyAcquiredFromController
-            .onPageLoad(srn, index, NormalMode)
+          controllers.nonsipp.common.routes.IdentityTypeController
+            .onPageLoad(srn, index, NormalMode, IdentitySubject.LandOrPropertySeller)
       }
 
-    case page @ PropertyAcquiredFromPage(srn, index) => //27h1
+    case page @ IdentityTypePage(srn, index, IdentitySubject.LandOrPropertySeller) =>
       userAnswers.get(page) match {
-        case Some(IdentityType.Individual) => controllers.routes.UnauthorisedController.onPageLoad() //TODO 27h2
+        case Some(IdentityType.Individual) =>
+          controllers.nonsipp.landorproperty.routes.LandPropertyIndividualSellersNameController
+            .onPageLoad(srn, index, NormalMode)
+
         case Some(IdentityType.UKCompany) =>
           controllers.nonsipp.landorproperty.routes.CompanySellerNameController
             .onPageLoad(srn, index, NormalMode) //27h4
@@ -79,6 +87,10 @@ object LandOrPropertyNavigator extends JourneyNavigator {
         case Some(IdentityType.UKPartnership) =>
           controllers.nonsipp.landorproperty.routes.PartnershipSellerNameController
             .onPageLoad(srn, index, NormalMode) //27h6
+
+        case Some(IdentityType.Other) =>
+          controllers.nonsipp.common.routes.OtherRecipientDetailsController
+            .onPageLoad(srn, index, NormalMode, IdentitySubject.LandOrPropertySeller)
 
         case _ => controllers.routes.UnauthorisedController.onPageLoad() //TODO 27h8
 
@@ -89,7 +101,8 @@ object LandOrPropertyNavigator extends JourneyNavigator {
         .onPageLoad(srn, index, NormalMode, IdentitySubject.LandOrPropertySeller)
 
     case CompanyRecipientCrnPage(srn, index, IdentitySubject.LandOrPropertySeller) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+      controllers.nonsipp.landorproperty.routes.LandOrPropertySellerConnectedPartyController
+        .onPageLoad(srn, index, NormalMode)
 
     case LandOrPropertyTotalCostPage(srn, index) =>
       controllers.nonsipp.landorproperty.routes.IsLandOrPropertyResidentialController.onPageLoad(srn, index, NormalMode)
@@ -126,7 +139,12 @@ object LandOrPropertyNavigator extends JourneyNavigator {
       controllers.routes.UnauthorisedController.onPageLoad()
 
     case PartnershipSellerNamePage(srn, index) => //27h6
-      controllers.routes.UnauthorisedController.onPageLoad() //TODO 27h7
+      controllers.nonsipp.common.routes.PartnershipRecipientUtrController
+        .onPageLoad(srn, index, NormalMode, IdentitySubject.LandOrPropertySeller) //27h7
+
+    case PartnershipRecipientUtrPage(srn, index, IdentitySubject.LandOrPropertySeller) => //27h7
+      controllers.nonsipp.landorproperty.routes.LandOrPropertySellerConnectedPartyController //27i1
+        .onPageLoad(srn, index, NormalMode)
 
     case LandPropertyIndividualSellersNamePage(srn, index) =>
       controllers.nonsipp.landorproperty.routes.IndividualSellerNiController.onPageLoad(srn, index, NormalMode)
@@ -135,8 +153,12 @@ object LandOrPropertyNavigator extends JourneyNavigator {
       controllers.nonsipp.landorproperty.routes.LandOrPropertySellerConnectedPartyController
         .onPageLoad(srn, index, NormalMode)
 
-    case LandOrPropertySellerConnectedPartyPage(srn, index) =>
+    case LandOrPropertySellerConnectedPartyPage(srn, index) => //27i1
       controllers.nonsipp.landorproperty.routes.LandPropertyIndependentValuationController
+        .onPageLoad(srn, index, NormalMode)
+
+    case OtherRecipientDetailsPage(srn, index, IdentitySubject.LandOrPropertySeller) =>
+      controllers.nonsipp.landorproperty.routes.LandOrPropertySellerConnectedPartyController
         .onPageLoad(srn, index, NormalMode)
 
     case LandOrPropertyTotalIncomePage(srn, index) => //27j5

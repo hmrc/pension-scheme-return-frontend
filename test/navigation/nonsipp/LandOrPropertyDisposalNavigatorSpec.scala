@@ -16,7 +16,7 @@
 
 package navigation.nonsipp
 
-import config.Refined.Max5000
+import config.Refined.{Max50, Max5000}
 import eu.timepit.refined.refineMV
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
@@ -28,6 +28,7 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
   val navigator: Navigator = new NonSippNavigator
 
   private val index = refineMV[Max5000.Refined](1)
+  private val disposalIndex = refineMV[Max50.Refined](1)
 
   "LandOrPropertyDisposalPage" - {
     act.like(
@@ -50,6 +51,19 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
           (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
         )
         .withName("go from LandOrPropertyDisposalPage to task list page on no")
+    )
+  }
+
+  "LandOrPropertyStillHeldPage" - {
+    act.like(
+      normalmode
+        .navigateToWithDoubleIndex(
+          index,
+          disposalIndex,
+          LandOrPropertyStillHeldPage,
+          (srn, index: Max5000, disposalIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+        )
+        .withName("go from LandOrPropertyStillHeldPage to ??? page")
     )
   }
 }

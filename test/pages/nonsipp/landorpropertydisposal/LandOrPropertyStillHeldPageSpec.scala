@@ -14,23 +14,24 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.landorproperty
+package pages.nonsipp.landorpropertydisposal
 
-import config.Refined.OneTo5000
-import eu.timepit.refined.refineMV
-import models.IdentityType
 import pages.behaviours.PageBehaviours
+import models.Money
+import config.Refined.{Max50, Max5000}
+import eu.timepit.refined.refineMV
 
-class PropertyAcquiredFromPageSpec extends PageBehaviours {
+class LandOrPropertyStillHeldPageSpec extends PageBehaviours {
 
-  "PropertyAcquiredFromPageSpec" - {
+  "LandOrPropertyStillHeldPage" - {
 
-    val index = refineMV[OneTo5000](1)
+    val index = refineMV[Max5000.Refined](1)
+    val disposalIndex = refineMV[Max50.Refined](1)
 
-    beRetrievable[IdentityType](PropertyAcquiredFromPage(srnGen.sample.value, index))
+    beRetrievable[Boolean](LandOrPropertyStillHeldPage(srnGen.sample.value, index, disposalIndex))
 
-    beSettable[IdentityType](PropertyAcquiredFromPage(srnGen.sample.value, index))
+    beSettable[Boolean](LandOrPropertyStillHeldPage(srnGen.sample.value, index, disposalIndex))
 
-    beRemovable[IdentityType](PropertyAcquiredFromPage(srnGen.sample.value, index))
+    beRemovable[Boolean](LandOrPropertyStillHeldPage(srnGen.sample.value, index, disposalIndex))
   }
 }

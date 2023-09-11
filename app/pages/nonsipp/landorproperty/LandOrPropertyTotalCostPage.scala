@@ -25,7 +25,7 @@ import utils.RefinedUtils._
 
 case class LandOrPropertyTotalCostPage(srn: Srn, index: Max5000) extends QuestionPage[Money] {
 
-  override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString
+  override def path: JsPath = Paths.heldPropertyTransactions \ toString \ index.arrayIndex.toString
 
-  override def toString: String = "landOrPropertyTotalCost"
+  override def toString: String = "totalCostOfLandOrProperty"
 }

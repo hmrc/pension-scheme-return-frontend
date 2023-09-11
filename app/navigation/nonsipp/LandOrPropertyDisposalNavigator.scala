@@ -32,6 +32,9 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
       } else {
         controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
       }
+
+    case LandOrPropertyStillHeldPage(srn, landOrPropertyIndex, disposalIndex) => //41d
+      controllers.routes.UnauthorisedController.onPageLoad()
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty

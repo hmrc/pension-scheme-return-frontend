@@ -33,7 +33,7 @@ import models.requests.DataRequest
 import models.{IdentitySubject, IdentityType, Mode, Money, NormalMode, Pagination}
 import navigation.Navigator
 import pages.nonsipp.accountingperiod.AccountingPeriodListPage
-import pages.nonsipp.common.IdentityTypes
+import pages.nonsipp.common.{IdentityTypes, OtherRecipientDetailsPage}
 import pages.nonsipp.loansmadeoroutstanding._
 import play.api.data.Form
 import play.api.i18n.MessagesApi
@@ -110,7 +110,11 @@ class LoansListController @Inject()(
         case (index, IdentityType.UKPartnership) =>
           request.userAnswers.get(PartnershipRecipientNamePage(srn, index)).getOrRecoverJourney.map(index -> _)
         case (index, IdentityType.Other) =>
-          request.userAnswers.get(OtherRecipientDetailsPage(srn, index)).map(_.name).getOrRecoverJourney.map(index -> _)
+          request.userAnswers
+            .get(OtherRecipientDetailsPage(srn, index, IdentitySubject.LoanRecipient))
+            .map(_.name)
+            .getOrRecoverJourney
+            .map(index -> _)
       }
       recipientDetails <- recipientNames.traverse {
         case (index, recipientName) =>

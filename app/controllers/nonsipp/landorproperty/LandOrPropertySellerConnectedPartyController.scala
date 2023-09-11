@@ -21,14 +21,22 @@ import controllers.PSRController
 import controllers.actions._
 import controllers.nonsipp.landorproperty.LandOrPropertySellerConnectedPartyController._
 import forms.YesNoPageFormProvider
-import models.Mode
+import models.{IdentitySubject, IdentityType, Mode}
 import models.SchemeId.Srn
+import models.requests.DataRequest
 import navigation.Navigator
-import pages.nonsipp.landorproperty.{LandOrPropertySellerConnectedPartyPage, LandPropertyIndividualSellersNamePage}
+import pages.nonsipp.common.{IdentityTypePage, OtherRecipientDetailsPage}
+import pages.nonsipp.landorproperty.{
+  CompanySellerNamePage,
+  LandOrPropertySellerConnectedPartyPage,
+  LandPropertyIndividualSellersNamePage,
+  PartnershipSellerNamePage
+}
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
+import utils.FormUtils.FormOps
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
@@ -50,13 +58,19 @@ class LandOrPropertySellerConnectedPartyController @Inject()(
 
   private val form = LandOrPropertySellerConnectedPartyController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
-    implicit request =>
-      request.usingAnswer(LandPropertyIndividualSellersNamePage(srn, index)).sync { individualName =>
-        val preparedForm = request.userAnswers.fillForm(LandOrPropertySellerConnectedPartyPage(srn, index), form)
-        Ok(view(preparedForm, viewModel(srn, index, individualName, mode)))
-      }
-  }
+  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+    identifyAndRequireData(srn) { implicit request =>
+      recipientName(srn, index)
+        .map { recipientName =>
+          Ok(
+            view(
+              form.fromUserAnswers(LandOrPropertySellerConnectedPartyPage(srn, index)),
+              LandOrPropertySellerConnectedPartyController.viewModel(srn, index, recipientName, mode)
+            )
+          )
+        }
+        .getOrElse(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+    }
 
   def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
@@ -64,9 +78,18 @@ class LandOrPropertySellerConnectedPartyController @Inject()(
         .bindFromRequest()
         .fold(
           formWithErrors =>
-            request.usingAnswer(LandPropertyIndividualSellersNamePage(srn, index)).async { individualName =>
-              Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, individualName, mode))))
-            },
+            recipientName(srn, index)
+              .map { recipientName =>
+                Future.successful(
+                  BadRequest(
+                    view(
+                      formWithErrors,
+                      LandOrPropertySellerConnectedPartyController.viewModel(srn, index, recipientName, mode)
+                    )
+                  )
+                )
+              }
+              .getOrElse(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))),
           value =>
             for {
               updatedAnswers <- Future
@@ -77,6 +100,16 @@ class LandOrPropertySellerConnectedPartyController @Inject()(
             )
         )
   }
+
+  private def recipientName(srn: Srn, index: Max5000)(implicit request: DataRequest[_]): Option[String] =
+    request.userAnswers.get(IdentityTypePage(srn, index, IdentitySubject.LandOrPropertySeller)).flatMap {
+      case IdentityType.Individual => request.userAnswers.get(LandPropertyIndividualSellersNamePage(srn, index))
+      case IdentityType.UKCompany => request.userAnswers.get(CompanySellerNamePage(srn, index))
+      case IdentityType.UKPartnership => request.userAnswers.get(PartnershipSellerNamePage(srn, index))
+      case IdentityType.Other =>
+        request.userAnswers.get(OtherRecipientDetailsPage(srn, index, IdentitySubject.LandOrPropertySeller)).map(_.name)
+      case _ => None
+    }
 }
 
 object LandOrPropertySellerConnectedPartyController {

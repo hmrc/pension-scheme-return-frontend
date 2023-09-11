@@ -14,19 +14,24 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.landorproperty
+package pages.nonsipp.common
 
 import config.Refined.Max5000
-import models.IdentityType
+import models.{IdentitySubject, RecipientDetails}
 import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
 
-case class PropertyAcquiredFromPage(srn: Srn, index: Max5000) extends QuestionPage[IdentityType] {
+case class OtherRecipientDetailsPage(srn: Srn, index: Max5000, identitySubject: IdentitySubject)
+    extends QuestionPage[RecipientDetails] {
 
   override def path: JsPath =
-    Paths.landOrPropertyTransactions \ "heldPropertyTransaction" \ "propertyAcquiredFromName" \ toString \ index.arrayIndex.toString
-
-  override def toString: String = "methodOfHolding"
+    identitySubject match {
+      case IdentitySubject.LoanRecipient =>
+        pages.nonsipp.loansmadeoroutstanding.Paths.loanTransactions \ "recipientIdentityType" \ toString \ index.arrayIndex.toString
+      case IdentitySubject.LandOrPropertySeller =>
+        pages.nonsipp.landorproperty.Paths.landOrPropertyTransactions \ "heldPropertyTransaction" \ "propertyAcquiredFrom" \ "sellerIdentityType" \ toString \ index.arrayIndex.toString
+    }
+  override def toString: String = "otherRecipientDetails"
 }

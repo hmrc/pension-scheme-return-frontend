@@ -560,29 +560,29 @@ loanRecipient.identityType.pageContent2 = A UK partnership
 loanRecipient.identityType.pageContent3 = Other
 loanRecipient.identityType.error.required = Select who received the loan
 
-landOrPropertySeller.identityType.title = Who was the the property acquired from?
-landOrPropertySeller.identityType.heading = Who was the the property {0} acquired from?
+landOrPropertySeller.identityType.title = Who was the land or property acquired from?
+landOrPropertySeller.identityType.heading = Who was {0} acquired from?
 landOrPropertySeller.identityType.pageContent = An individual
 landOrPropertySeller.identityType.pageContent1 = A UK company
 landOrPropertySeller.identityType.pageContent2 = A UK partnership
 landOrPropertySeller.identityType.pageContent3 = Other
-landOrPropertySeller.identityType.error.required = Select who was the the property acquired from
+landOrPropertySeller.identityType.error.required = Select who the land or property was acquired from
 
 fileUploadErrorSummary.title = There is a problem with your member details file
 fileUploadErrorSummary.heading = There is a problem with your member details file
 fileUploadErrorSummary.paragraph = Correct the errors and upload it again, or upload a different file.
 fileUploadErrorSummary.heading2 = Problems with your file
 
-otherRecipientDetails.title = Recipient’s details
-otherRecipientDetails.heading = Recipient’s details
-otherRecipientDetails.name = Recipient’s name
-otherRecipientDetails.description = Brief description of recipient
-otherRecipientDetails.name.error.required = Enter the recipient’s name
-otherRecipientDetails.name.error.invalid = Recipient’s name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
-otherRecipientDetails.name.error.length =  Recipient’s name must be 160 characters or fewer
-otherRecipientDetails.description.error.required = Enter a brief description of the recipient
-otherRecipientDetails.description.error.invalid = The brief description of the recipient must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, full stops, hyphens, slashes, speech marks and spaces
-otherRecipientDetails.description.error.length = The brief description of the recipient must be 160 characters or fewer
+loanRecipient.otherRecipientDetails.title = Recipient’s details
+loanRecipient.otherRecipientDetails.heading = Recipient’s details
+loanRecipient.otherRecipientDetails.name = Recipient’s name
+loanRecipient.otherRecipientDetails.description = Brief description of recipient
+loanRecipient.otherRecipientDetails.name.error.required = Enter the recipient’s name
+loanRecipient.otherRecipientDetails.name.error.invalid = Recipient’s name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+loanRecipient.otherRecipientDetails.name.error.length =  Recipient’s name must be 160 characters or fewer
+loanRecipient.otherRecipientDetails.description.error.required = Enter a brief description of the recipient
+loanRecipient.otherRecipientDetails.description.error.invalid = The brief description of the recipient must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, full stops, hyphens, slashes, speech marks and spaces
+loanRecipient.otherRecipientDetails.description.error.length = The brief description of the recipient must be 160 characters or fewer
 
 fileUploadTooManyErrors.title = There is a problem with your member details file
 fileUploadTooManyErrors.heading = There is a problem with your member details file
@@ -692,16 +692,27 @@ fileUploadTooManyRows.heading = Your member details file has too many rows
 fileUploadTooManyRows.paragraph1 = We cannot accept the file you uploaded as it contains too many rows. The maximum number of rows it can have is 300.
 fileUploadTooManyRows.paragraph2 = Remove the additional rows and upload it again, or upload a different file.
 
-partnershipRecipientUtr.title = Do you know the recipient’s Unique Taxpayer Reference (UTR)?
-partnershipRecipientUtr.heading = Do you know {0}’s Unique Taxpayer Reference (UTR)?
-partnershipRecipientUtr.yes.conditional = What is {0}’s UTR?
-partnershipRecipientUtr.yes.conditional.error.required = Enter the recipient’s UTR
-partnershipRecipientUtr.yes.conditional.error.invalid = Enter a Unique Taxpayer Reference that is 10 numbers, like 1234567890 or 12345 67890
-partnershipRecipientUtr.no.conditional = Tell us why you cannot provide {0}’s UTR
-partnershipRecipientUtr.no.conditional.error.required = Enter the reason you cannot provide the recipient’s UTR
-partnershipRecipientUtr.no.conditional.error.invalid = The reason you cannot provide the recipient’s UTR must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, full stops, hyphens, slashes, speech marks and spaces
-partnershipRecipientUtr.no.conditional.error.length = The reason you cannot provide the recipient’s UTR must be 160 characters or fewer
-partnershipRecipientUtr.error.required = Select yes if you know the recipient’s Unique Taxpayer Reference (UTR)
+loanRecipient.partnershipRecipientUtr.title = Do you know the recipient’s Unique Taxpayer Reference (UTR)?
+loanRecipient.partnershipRecipientUtr.heading = Do you know {0}’s Unique Taxpayer Reference (UTR)?
+loanRecipient.partnershipRecipientUtr.yes.conditional = What is {0}’s UTR?
+loanRecipient.partnershipRecipientUtr.yes.conditional.error.required = Enter the recipient’s UTR
+loanRecipient.partnershipRecipientUtr.yes.conditional.error.invalid = Enter a Unique Taxpayer Reference that is 10 numbers, like 1234567890 or 12345 67890
+loanRecipient.partnershipRecipientUtr.no.conditional = Tell us why you cannot provide {0}’s UTR
+loanRecipient.partnershipRecipientUtr.no.conditional.error.required = Enter the reason you cannot provide the recipient’s UTR
+loanRecipient.partnershipRecipientUtr.no.conditional.error.invalid = The reason you cannot provide the recipient’s UTR must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, full stops, hyphens, slashes, speech marks and spaces
+loanRecipient.partnershipRecipientUtr.no.conditional.error.length = The reason you cannot provide the recipient’s UTR must be 160 characters or fewer
+loanRecipient.partnershipRecipientUtr.error.required = Select yes if you know the recipient’s Unique Taxpayer Reference (UTR)
+
+landOrPropertySeller.partnershipRecipientUtr.title = Do you know the seller’s Unique Taxpayer Reference (UTR)?
+landOrPropertySeller.partnershipRecipientUtr.heading = Do you know {0}’s Unique Taxpayer Reference (UTR)?
+landOrPropertySeller.partnershipRecipientUtr.yes.conditional = What is {0}’s UTR?
+landOrPropertySeller.partnershipRecipientUtr.yes.conditional.error.required = Enter the seller’s UTR
+landOrPropertySeller.partnershipRecipientUtr.yes.conditional.error.invalid = Enter a Unique Taxpayer Reference that is 10 numbers, like 1234567890 or 12345 67890
+landOrPropertySeller.partnershipRecipientUtr.no.conditional = Tell us why you cannot provide {0}’s UTR
+landOrPropertySeller.partnershipRecipientUtr.no.conditional.error.required = Enter the reason you cannot provide the seller’s UTR
+landOrPropertySeller.partnershipRecipientUtr.no.conditional.error.invalid = The reason you cannot provide the seller’s UTR must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+landOrPropertySeller.partnershipRecipientUtr.no.conditional.error.length = The reason you cannot provide the seller’s UTR must be 160 characters or fewer
+landOrPropertySeller.partnershipRecipientUtr.error.required = Select yes if you know the seller’s Unique Taxpayer Reference (UTR)
 
 recipientSponsoringEmployerConnectedParty.title = Is the recipient a sponsoring employer or a connected party?
 recipientSponsoringEmployerConnectedParty.heading = Is {0} a sponsoring employer or a connected party?
@@ -1007,14 +1018,6 @@ landPropertyIndividualSellersName.error.required = Enter the seller’s name
 landPropertyIndividualSellersName.error.tooLong = Seller’s name must be 160 characters or fewer
 landPropertyIndividualSellersName.error.invalid = Seller’s name must only include letters a to z, hyphens, apostrophes and spaces
 
-landOrPropertyAcquiredFrom.title = Who was the land or property acquired from?
-landOrPropertyAcquiredFrom.heading = Who was {0} acquired from?
-landOrPropertyAcquiredFrom.option1 = An individual
-landOrPropertyAcquiredFrom.option2 = A UK company
-landOrPropertyAcquiredFrom.option3 = A UK partnership
-landOrPropertyAcquiredFrom.option4 = Other
-landOrPropertyAcquiredFrom.error.required = Select who the land or property was acquired from
-
 landOrPropertySellerConnectedParty.title = Is the seller a connected party?
 landOrPropertySellerConnectedParty.heading = Is {0} a connected party?
 landOrPropertySellerConnectedParty.error.required = Select yes if the seller is a connected party
@@ -1055,6 +1058,17 @@ landOrPropertySeller.companyRecipientCrn.no.conditional.error.required = Enter t
 landOrPropertySeller.companyRecipientCrn.no.conditional.error.invalid = The reason you cannot provide the seller’s CRN must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
 landOrPropertySeller.companyRecipientCrn.no.conditional.error.length = The reason you cannot provide the seller’s CRN must be 160 characters or fewer
 landOrPropertySeller.companyRecipientCrn.error.required = Select yes if you know the seller’s Company Registration Number (CRN)
+
+landOrPropertySeller.otherRecipientDetails.title = Seller’s details
+landOrPropertySeller.otherRecipientDetails.heading = Seller’s details for {0}
+landOrPropertySeller.otherRecipientDetails.name = Seller’s name
+landOrPropertySeller.otherRecipientDetails.description = Brief description of seller (optional)
+landOrPropertySeller.otherRecipientDetails.name.error.required = Enter the seller’s name
+landOrPropertySeller.otherRecipientDetails.name.error.invalid = Seller’s name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+landOrPropertySeller.otherRecipientDetails.name.error.length =  Seller’s name must be 160 characters or fewer
+landOrPropertySeller.otherRecipientDetails.description.error.required = Enter a brief description of the seller
+landOrPropertySeller.otherRecipientDetails.description.error.invalid = The description of the seller must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+landOrPropertySeller.otherRecipientDetails.description.error.length = The description of the seller must be 160 characters or fewer
 
 partnershipSellerName.title = What is the seller’s partnership name?
 partnershipSellerName.heading = What is the seller’s partnership name?
@@ -1102,3 +1116,7 @@ landOrPropertyList.paragraph = You must tell us about all land or property the s
 landOrPropertyList.inset = You cannot add another land or property as you have entered the maximum of 5,000.
 landOrPropertyList.radios = Do you need to add another land or property?
 landOrPropertyList.radios.error.required = Select yes if you need to add another land or property
+
+landOrPropertyStillHeld.title = Is any part of the land or property still held by the scheme?
+landOrPropertyStillHeld.heading = Is any part of {0} still held by {1}?
+landOrPropertyStillHeld.error.required = Select yes if any part of the land or property is still held by the scheme

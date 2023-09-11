@@ -17,14 +17,18 @@
 package navigation.nonsipp
 
 import config.Refined.OneTo5000
-import eu.timepit.refined.refineMV
-import models.{IdentitySubject, IdentityType, NormalMode}
-import models.{ConditionalYesNo, Money, UserAnswers}
+import eu.timepit.refined.{refineMV, refineV}
+import models.{ConditionalYesNo, IdentitySubject, IdentityType, Money, NormalMode, RecipientDetails, UserAnswers}
 import models.ConditionalYesNo._
 import models.SchemeId.Srn
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.common.{CompanyRecipientCrnPage, IdentityTypePage}
+import pages.nonsipp.common.{
+  CompanyRecipientCrnPage,
+  IdentityTypePage,
+  OtherRecipientDetailsPage,
+  PartnershipRecipientUtrPage
+}
 import pages.nonsipp.loansmadeoroutstanding._
 import utils.BaseSpec
 import utils.UserAnswersUtils.UserAnswersOps
@@ -136,12 +140,12 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
     "NormalMode" - {
       act.like(
         normalmode
-          .navigateToWithDataIndexAndSubject(
+          .navigateToWithDataIndexAndSubjectBoth(
             index,
             subject,
             IdentityTypePage,
             Gen.const(IdentityType.Other),
-            controllers.nonsipp.loansmadeoroutstanding.routes.OtherRecipientDetailsController.onPageLoad
+            controllers.nonsipp.common.routes.OtherRecipientDetailsController.onPageLoad
           )
           .withName("go from who received loan page to other recipient details page")
       )
@@ -215,10 +219,12 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
   "PartnershipRecipientNamePage" - {
     act.like(
       normalmode
-        .navigateToWithIndex(
+        .navigateToWithDataIndexAndSubjects(
           index,
+          subject,
           PartnershipRecipientNamePage,
-          controllers.nonsipp.loansmadeoroutstanding.routes.PartnershipRecipientUtrController.onPageLoad
+          Gen.const(""),
+          controllers.nonsipp.common.routes.PartnershipRecipientUtrController.onPageLoad
         )
         .withName("go from partnership recipient name page to partnership recipient Utr page")
     )
@@ -227,8 +233,9 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
   "PartnershipRecipientUtrPage" - {
     act.like(
       normalmode
-        .navigateToWithIndex(
+        .navigateToWithIndexAndSubject(
           index,
+          subject,
           PartnershipRecipientUtrPage,
           controllers.nonsipp.loansmadeoroutstanding.routes.RecipientSponsoringEmployerConnectedPartyController.onPageLoad
         )
@@ -284,6 +291,54 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
     )
   }
 
+  "AddLoan" - {
+    "One record at index 1" - {
+      act.like(
+        normalmode
+          .navigateTo(
+            srn => LoansListPage(srn, true),
+            (srn, _) =>
+              controllers.nonsipp.common.routes.IdentityTypeController
+                .onPageLoad(srn, refineMV(2), NormalMode, IdentitySubject.LoanRecipient),
+            (srn) =>
+              defaultUserAnswers
+                .unsafeSet(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient), IdentityType.Individual)
+                .unsafeSet(IndividualRecipientNamePage(srn, refineMV(1)), individualName)
+          )
+          .withName("go to who received the loan at index 2")
+      )
+    }
+    "One record at index 2" - {
+      act.like(
+        normalmode
+          .navigateTo(
+            srn => LoansListPage(srn, true),
+            (srn, _) =>
+              controllers.nonsipp.common.routes.IdentityTypeController
+                .onPageLoad(srn, refineMV(3), NormalMode, IdentitySubject.LoanRecipient),
+            (srn) =>
+              defaultUserAnswers
+                .unsafeSet(IdentityTypePage(srn, refineMV(2), IdentitySubject.LoanRecipient), IdentityType.Individual)
+                .unsafeSet(IndividualRecipientNamePage(srn, refineMV(2)), individualName)
+          )
+          .withName("go to who received the loan at index 3")
+      )
+    }
+    "No existing loan records" - {
+      act.like(
+        normalmode
+          .navigateTo(
+            srn => LoansListPage(srn, true),
+            (srn, _) =>
+              controllers.nonsipp.common.routes.IdentityTypeController
+                .onPageLoad(srn, refineMV(2), NormalMode, IdentitySubject.LoanRecipient),
+            (srn) => defaultUserAnswers
+          )
+          .withName("go to who received the loan at index 1")
+      )
+    }
+  }
+
   "RemoveLoan" - {
     act.like(
       normalmode
@@ -296,5 +351,25 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
         .withName("go from remove page to list page")
     )
 
+  }
+
+  "otherRecipientsDetailsPage" - {
+
+    val recipientDetails = RecipientDetails(
+      "testName",
+      "testDescription"
+    )
+
+    act.like(
+      normalmode
+        .navigateToWithDataIndexAndSubject(
+          index,
+          subject,
+          OtherRecipientDetailsPage,
+          Gen.const(recipientDetails),
+          controllers.nonsipp.loansmadeoroutstanding.routes.RecipientSponsoringEmployerConnectedPartyController.onPageLoad
+        )
+        .withName("go from other recipient details page to recipient connected party page")
+    )
   }
 }

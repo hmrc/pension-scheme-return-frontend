@@ -22,6 +22,12 @@ import models.SchemeHoldLandProperty.{Acquisition, Contribution, Transfer}
 import models._
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
+import pages.nonsipp.common.{
+  CompanyRecipientCrnPage,
+  IdentityTypePage,
+  OtherRecipientDetailsPage,
+  PartnershipRecipientUtrPage
+}
 import pages.nonsipp.landorproperty._
 import utils.BaseSpec
 import utils.UserAnswersUtils.UserAnswersOps
@@ -152,6 +158,35 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           controllers.nonsipp.common.routes.CompanyRecipientCrnController.onPageLoad
         )
         .withName("go from company land or property company seller  page to company crn page")
+    )
+
+    val recipientDetails = RecipientDetails(
+      "testName",
+      "testDescription"
+    )
+
+    List(OtherRecipientDetailsPage, CompanyRecipientCrnPage, PartnershipRecipientUtrPage).foreach { page =>
+      act.like(
+        normalmode
+          .navigateToWithDataIndexAndSubject(
+            index,
+            subject,
+            OtherRecipientDetailsPage,
+            Gen.const(recipientDetails),
+            controllers.nonsipp.landorproperty.routes.LandOrPropertySellerConnectedPartyController.onPageLoad
+          )
+          .withName(s"go from ${page} page to recipient connected party page")
+      )
+    }
+
+    act.like(
+      normalmode
+        .navigateToWithIndex(
+          index,
+          IndividualSellerNiPage,
+          controllers.nonsipp.landorproperty.routes.LandOrPropertySellerConnectedPartyController.onPageLoad
+        )
+        .withName("go from idividual seller NI page to recipient connected party page")
     )
 
     act.like(
@@ -356,5 +391,57 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         )
         .withName("go from LandOrPropertyTotalIncome page to unauthorised page")
     )
+  }
+
+  "IdentityType navigation" - {
+    "NormalMode" - {
+      act.like(
+        normalmode
+          .navigateToWithDataIndexAndSubjectBoth(
+            index,
+            subject,
+            IdentityTypePage,
+            Gen.const(IdentityType.Other),
+            controllers.nonsipp.common.routes.OtherRecipientDetailsController.onPageLoad
+          )
+          .withName("go from identity type page to other recipient details page")
+      )
+
+      act.like(
+        normalmode
+          .navigateToWithDataIndexAndSubject(
+            index,
+            subject,
+            IdentityTypePage,
+            Gen.const(IdentityType.Individual),
+            controllers.nonsipp.landorproperty.routes.LandPropertyIndividualSellersNameController.onPageLoad
+          )
+          .withName("go from identity type page to individual recipient name page")
+      )
+
+      act.like(
+        normalmode
+          .navigateToWithDataIndexAndSubject(
+            index,
+            subject,
+            IdentityTypePage,
+            Gen.const(IdentityType.UKCompany),
+            controllers.nonsipp.landorproperty.routes.CompanySellerNameController.onPageLoad
+          )
+          .withName("go from identity type page to company recipient name page")
+      )
+
+      act.like(
+        normalmode
+          .navigateToWithDataIndexAndSubject(
+            index,
+            subject,
+            IdentityTypePage,
+            Gen.const(IdentityType.UKPartnership),
+            controllers.nonsipp.landorproperty.routes.PartnershipSellerNameController.onPageLoad
+          )
+          .withName("go fromidentity type page to UKPartnership to partnership recipient name page")
+      )
+    }
   }
 }
