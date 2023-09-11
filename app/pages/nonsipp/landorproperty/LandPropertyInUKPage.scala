@@ -36,18 +36,12 @@ case class LandPropertyInUKPage(srn: Srn, index: Max5000) extends QuestionPage[B
 
   override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
     (value, userAnswers.get(this)) match {
-      case (Some(true), Some(true)) => Try(userAnswers)
-      case (Some(false), Some(false)) => Try(userAnswers)
-      case (Some(true), Some(false)) => Try(userAnswers)
-      case (Some(false), Some(true)) => removePages(userAnswers, pages(srn))
       case (None, _) => removePages(userAnswers, pages(srn))
       case _ => Try(userAnswers)
     }
 
   private def pages(srn: Srn): List[Removable[_]] =
     List(
-      LandPropertyInUKPage(srn, index),
-      //Which
       LandOrPropertyAddressLookupPage(srn, index),
       LandRegistryTitleNumberPage(srn, index),
       WhyDoesSchemeHoldLandPropertyPage(srn, index),
@@ -56,7 +50,6 @@ case class LandPropertyInUKPage(srn: Srn, index: Max5000) extends QuestionPage[B
       IsLandPropertyLeasedPage(srn, index),
       LandOrPropertySellerConnectedPartyPage(srn, index),
       LandOrPropertyTotalIncomePage(srn, index),
-      //========
       RemovePropertyPage(srn, index)
     )
 }

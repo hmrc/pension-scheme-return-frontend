@@ -24,6 +24,7 @@ import pages.Page
 import pages.nonsipp.common.{
   CompanyRecipientCrnPage,
   IdentityTypePage,
+  IdentityTypes,
   OtherRecipientDetailsPage,
   PartnershipRecipientUtrPage
 }
@@ -165,7 +166,12 @@ object LandOrPropertyNavigator extends JourneyNavigator {
       controllers.routes.UnauthorisedController.onPageLoad()
 
     case RemovePropertyPage(srn, index) =>
-      controllers.routes.UnauthorisedController.onPageLoad() //TODO it is not very clear where 27j9 should lead
+      controllers.nonsipp.landorproperty.routes.LandOrPropertyListController.onPageLoad(srn, NormalMode)
+      if (userAnswers.map(IdentityTypes(srn, IdentitySubject.LandOrPropertySeller)).isEmpty) {
+        controllers.nonsipp.landorproperty.routes.LandPropertyInUKController.onPageLoad(srn, refineMV(1), NormalMode)
+      } else {
+        controllers.nonsipp.landorproperty.routes.LandOrPropertyListController.onPageLoad(srn, NormalMode)
+      }
 
     case LandOrPropertyListPage(srn, addLandOrProperty) => //27j7
       if (addLandOrProperty) {
