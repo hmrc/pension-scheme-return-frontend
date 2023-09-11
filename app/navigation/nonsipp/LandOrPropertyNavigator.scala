@@ -166,17 +166,17 @@ object LandOrPropertyNavigator extends JourneyNavigator {
       controllers.routes.UnauthorisedController.onPageLoad()
 
     case RemovePropertyPage(srn, index) =>
-      controllers.nonsipp.landorproperty.routes.LandOrPropertyListController.onPageLoad(srn, NormalMode)
-      if (userAnswers.map(IdentityTypes(srn, IdentitySubject.LandOrPropertySeller)).isEmpty) {
-        controllers.nonsipp.landorproperty.routes.LandPropertyInUKController.onPageLoad(srn, refineMV(1), NormalMode)
+      if (userAnswers.map(LandOrPropertyAddressLookupPages(srn)).isEmpty) {
+        controllers.nonsipp.landorproperty.routes.LandOrPropertyHeldController.onPageLoad(srn, NormalMode)
       } else {
         controllers.nonsipp.landorproperty.routes.LandOrPropertyListController.onPageLoad(srn, NormalMode)
       }
 
-    case LandOrPropertyListPage(srn, addLandOrProperty) => //27j7
+    case LandOrPropertyListPage(srn, addLandOrProperty) =>
       if (addLandOrProperty) {
-        val count = userAnswers.map(LandOrPropertyAddressLookupPages(srn)).size
-        refineV[Max5000.Refined](count + 1).fold(
+        val answers = userAnswers.map(LandOrPropertyAddressLookupPages(srn))
+        val nextDataKey = if (answers.isEmpty) 1 else answers.maxBy(_._1)._1.toIntOption.orElse(Some(0)).get + 1
+        refineV[Max5000.Refined](nextDataKey + 1).fold(
           err => controllers.routes.JourneyRecoveryController.onPageLoad(),
           nextIndex =>
             controllers.nonsipp.landorproperty.routes.LandPropertyInUKController.onPageLoad(srn, nextIndex, NormalMode)
