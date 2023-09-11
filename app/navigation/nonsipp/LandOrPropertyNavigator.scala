@@ -17,7 +17,7 @@
 package navigation.nonsipp
 
 import eu.timepit.refined.refineMV
-import models.{IdentitySubject, IdentityType, NormalMode, SchemeHoldLandProperty, UserAnswers}
+import models.{CheckOrChange, IdentitySubject, IdentityType, NormalMode, SchemeHoldLandProperty, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.common.{
@@ -126,8 +126,7 @@ object LandOrPropertyNavigator extends JourneyNavigator {
 
     case IsLesseeConnectedPartyPage(srn, index) => //27j4
       //27j5
-      controllers.nonsipp.landorproperty.routes.LandOrPropertyTotalIncomeController
-        .onPageLoad(srn, index, NormalMode)
+      controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController.onPageLoad(srn, index, CheckOrChange.Check)
 
     case CompanySellerNamePage(srn, index) =>
       controllers.routes.UnauthorisedController.onPageLoad()
@@ -156,7 +155,13 @@ object LandOrPropertyNavigator extends JourneyNavigator {
         .onPageLoad(srn, index, NormalMode)
 
     case LandOrPropertyTotalIncomePage(srn, index) => //27j5
+      controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController.onPageLoad(srn, index, CheckOrChange.Check)
+
+    case LandOrPropertyCYAPage(srn) =>
       controllers.routes.UnauthorisedController.onPageLoad()
+
+    case LandOrPropertyCYAPage(srn) =>
+      controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController.onPageLoad(srn, page = 1, NormalMode)
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty
