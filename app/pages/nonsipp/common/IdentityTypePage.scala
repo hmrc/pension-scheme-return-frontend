@@ -23,21 +23,9 @@ import pages.QuestionPage
 import pages.nonsipp.landorproperty.{
   CompanySellerNamePage,
   IndividualSellerNiPage,
-  IsLandOrPropertyResidentialPage,
-  IsLandPropertyLeasedPage,
-  IsLesseeConnectedPartyPage,
-  LandOrPropertyAddressLookupPage,
-  LandOrPropertyLeaseDetailsPage,
   LandOrPropertySellerConnectedPartyPage,
-  LandOrPropertyTotalCostPage,
-  LandOrPropertyTotalIncomePage,
-  LandOrPropertyWhenDidSchemeAcquirePage,
-  LandPropertyInUKPage,
-  LandPropertyIndependentValuationPage,
   LandPropertyIndividualSellersNamePage,
-  LandRegistryTitleNumberPage,
-  PartnershipSellerNamePage,
-  WhyDoesSchemeHoldLandPropertyPage
+  PartnershipSellerNamePage
 }
 import pages.nonsipp.loansmadeoroutstanding.{
   DatePeriodLoanPage,
@@ -78,20 +66,7 @@ case class IdentityTypePage(srn: Srn, index: Max5000, identitySubject: IdentityS
           SecurityGivenForLoanPage(srn, index)
         )
       case IdentitySubject.LandOrPropertySeller =>
-        List(
-          LandPropertyInUKPage(srn, index),
-          LandRegistryTitleNumberPage(srn, index),
-          LandOrPropertyAddressLookupPage(srn, index),
-          WhyDoesSchemeHoldLandPropertyPage(srn, index),
-          LandOrPropertyWhenDidSchemeAcquirePage(srn, index),
-          LandOrPropertyTotalCostPage(srn, index),
-          LandPropertyIndependentValuationPage(srn, index),
-          IsLandOrPropertyResidentialPage(srn, index),
-          IsLandPropertyLeasedPage(srn, index),
-          LandOrPropertyTotalIncomePage(srn, index),
-          LandOrPropertyLeaseDetailsPage(srn, index),
-          IsLesseeConnectedPartyPage(srn, index)
-        )
+        List().empty
     }
   private def pagesFirstPartGeneric(srn: Srn): List[Removable[_]] =
     List(
