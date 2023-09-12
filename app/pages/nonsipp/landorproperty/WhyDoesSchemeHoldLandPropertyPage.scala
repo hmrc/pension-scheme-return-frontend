@@ -44,6 +44,7 @@ case class WhyDoesSchemeHoldLandPropertyPage(srn: Srn, index: Max5000) extends Q
       case (Some(SchemeHoldLandProperty.Acquisition), Some(_)) => removePages(userAnswers, pages(srn))
       case (Some(SchemeHoldLandProperty.Contribution), Some(_)) => removePages(userAnswers, pages(srn))
       case (Some(SchemeHoldLandProperty.Transfer), Some(_)) => removePages(userAnswers, pages(srn))
+      case (None, _) => removePages(userAnswers, pages(srn))
       case _ => Try(userAnswers)
     }
   }

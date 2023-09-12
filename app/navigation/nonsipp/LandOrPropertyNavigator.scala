@@ -24,6 +24,7 @@ import pages.Page
 import pages.nonsipp.common.{
   CompanyRecipientCrnPage,
   IdentityTypePage,
+  IdentityTypes,
   OtherRecipientDetailsPage,
   PartnershipRecipientUtrPage
 }
@@ -163,10 +164,18 @@ object LandOrPropertyNavigator extends JourneyNavigator {
     case LandOrPropertyCYAPage(srn) =>
       controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController.onPageLoad(srn, page = 1, NormalMode)
 
-    case LandOrPropertyListPage(srn, addLandOrProperty) => //27j7
+    case RemovePropertyPage(srn, index) =>
+      if (userAnswers.map(LandOrPropertyAddressLookupPages(srn)).isEmpty) {
+        controllers.nonsipp.landorproperty.routes.LandOrPropertyHeldController.onPageLoad(srn, NormalMode)
+      } else {
+        controllers.nonsipp.landorproperty.routes.LandOrPropertyListController.onPageLoad(srn, NormalMode)
+      }
+
+    case LandOrPropertyListPage(srn, addLandOrProperty) =>
       if (addLandOrProperty) {
-        val count = userAnswers.map(LandOrPropertyAddressLookupPages(srn)).size
-        refineV[Max5000.Refined](count + 1).fold(
+        val answers = userAnswers.map(LandOrPropertyAddressLookupPages(srn))
+        val nextDataKey = if (answers.isEmpty) 1 else answers.maxBy(_._1)._1.toIntOption.orElse(Some(0)).get + 1
+        refineV[Max5000.Refined](nextDataKey + 1).fold(
           err => controllers.routes.JourneyRecoveryController.onPageLoad(),
           nextIndex =>
             controllers.nonsipp.landorproperty.routes.LandPropertyInUKController.onPageLoad(srn, nextIndex, NormalMode)

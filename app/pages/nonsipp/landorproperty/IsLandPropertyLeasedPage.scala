@@ -38,6 +38,7 @@ case class IsLandPropertyLeasedPage(srn: Srn, index: Max5000) extends QuestionPa
       case (Some(false), Some(false)) => Try(userAnswers)
       case (Some(true), Some(false)) => Try(userAnswers)
       case (Some(false), Some(true)) => removePages(userAnswers, pages(srn))
+      case (None, _) => removePages(userAnswers, pages(srn))
       case _ => Try(userAnswers)
     }
 

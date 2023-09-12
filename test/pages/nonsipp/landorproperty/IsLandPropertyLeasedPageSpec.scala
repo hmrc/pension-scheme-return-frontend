@@ -73,7 +73,7 @@ class IsLandPropertyLeasedPageSpec extends PageBehaviours {
         result.get(IsLesseeConnectedPartyPage(srn, index)) must not be None
       }
 
-      List(Some(true), Some(false), None).foreach { currentAnswer =>
+      List(Some(true), Some(false)).foreach { currentAnswer =>
         s"retain dependant values when current answer is $currentAnswer and existing answer is false" in {
 
           val answer = userAnswers.unsafeSet(IsLandPropertyLeasedPage(srn, index), false)
@@ -82,6 +82,18 @@ class IsLandPropertyLeasedPageSpec extends PageBehaviours {
 
           result.get(LandOrPropertyLeaseDetailsPage(srn, index)) must not be None
           result.get(IsLesseeConnectedPartyPage(srn, index)) must not be None
+        }
+      }
+
+      List(true, false, None).foreach { existingAnswer =>
+        s"remove dependant values when current answer is None and existing answer is ${existingAnswer}" in {
+
+          val answer = userAnswers.unsafeSet(IsLandPropertyLeasedPage(srn, index), true)
+
+          val result = IsLandPropertyLeasedPage(srn, index).cleanup(None, answer).toOption.value
+
+          result.get(LandOrPropertyLeaseDetailsPage(srn, index)) mustBe None
+          result.get(IsLesseeConnectedPartyPage(srn, index)) mustBe None
         }
       }
     }

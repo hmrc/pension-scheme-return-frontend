@@ -448,4 +448,16 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       )
     }
   }
+  "Remove Land or Property" - {
+    act.like(
+      normalmode
+        .navigateTo(
+          srn => RemovePropertyPage(srn, refineMV(1)),
+          (srn, _) =>
+            controllers.nonsipp.landorproperty.routes.LandOrPropertyHeldController
+              .onPageLoad(srn, NormalMode)
+        )
+        .withName("go from remove page to LandOrPropertyHeldPage page")
+    )
+  }
 }
