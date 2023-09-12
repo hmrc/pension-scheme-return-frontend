@@ -18,7 +18,6 @@ package navigation.nonsipp
 
 import config.Refined.Max5000
 import eu.timepit.refined.{refineMV, refineV}
-import models.CheckOrChange.Check
 import models.{CheckOrChange, IdentitySubject, IdentityType, NormalMode, SchemeHoldLandProperty, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
