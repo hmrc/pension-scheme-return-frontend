@@ -397,7 +397,7 @@ object LandOrPropertyCYAController {
             case Right(titleNumber) =>
               CheckYourAnswersRowViewModel(
                 Message("landOrPropertyCYA.section1.registryTitleNumber.yes"),
-                titleNumber
+                titleNumber.toUpperCase
               ).withAction(
                 SummaryAction(
                   "site.change",
