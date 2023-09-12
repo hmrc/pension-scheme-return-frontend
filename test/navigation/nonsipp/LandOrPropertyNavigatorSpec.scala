@@ -22,12 +22,7 @@ import models.SchemeHoldLandProperty.{Acquisition, Contribution, Transfer}
 import models._
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.common.{
-  CompanyRecipientCrnPage,
-  IdentityTypePage,
-  OtherRecipientDetailsPage,
-  PartnershipRecipientUtrPage
-}
+import pages.nonsipp.common.{CompanyRecipientCrnPage, IdentityTypePage, OtherRecipientDetailsPage, PartnershipRecipientUtrPage}
 import pages.nonsipp.landorproperty._
 import utils.BaseSpec
 import utils.UserAnswersUtils.UserAnswersOps
@@ -376,8 +371,8 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           index,
           IsLesseeConnectedPartyPage,
           (srn, index: Max5000, _) =>
-            controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
-              .onPageLoad(srn, index, CheckOrChange.Check)
+            controllers.nonsipp.landorproperty.routes.LandOrPropertyTotalIncomeController
+              .onPageLoad(srn, index, NormalMode)
         )
         .withName("go from is lessee connected party page to Land or property CYA page")
     )

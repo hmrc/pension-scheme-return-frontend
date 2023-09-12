@@ -16,13 +16,12 @@
 
 package pages.nonsipp.landorproperty
 
-import play.api.libs.json.JsPath
-import models.SchemeId.Srn
-import models.Money
-import pages.QuestionPage
 import config.Refined.Max5000
+import models.Money
+import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 import utils.RefinedUtils._
-import eu.timepit.refined.refineMV
 
 case class LandOrPropertyTotalIncomePage(srn: Srn, index: Max5000) extends QuestionPage[Money] {
 

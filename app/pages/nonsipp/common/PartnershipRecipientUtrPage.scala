@@ -20,7 +20,6 @@ import config.Refined.Max5000
 import models.SchemeId.Srn
 import models.{ConditionalYesNo, IdentitySubject, Utr}
 import pages.QuestionPage
-import pages.nonsipp.loansmadeoroutstanding.Paths
 import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
 

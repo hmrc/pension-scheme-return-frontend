@@ -133,9 +133,6 @@ object LandOrPropertyNavigator extends JourneyNavigator {
       controllers.nonsipp.landorproperty.routes.LandOrPropertyTotalIncomeController
         .onPageLoad(srn, index, NormalMode)
 
-    case CompanySellerNamePage(srn, index) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
-
     case PartnershipSellerNamePage(srn, index) => //27h6
       controllers.nonsipp.common.routes.PartnershipRecipientUtrController
         .onPageLoad(srn, index, NormalMode, IdentitySubject.LandOrPropertySeller) //27h7
@@ -161,9 +158,6 @@ object LandOrPropertyNavigator extends JourneyNavigator {
 
     case LandOrPropertyTotalIncomePage(srn, index) => //27j5
       controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController.onPageLoad(srn, index, CheckOrChange.Check)
-
-    case LandOrPropertyCYAPage(srn) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
 
     case LandOrPropertyCYAPage(srn) =>
       controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController.onPageLoad(srn, page = 1, NormalMode)
