@@ -22,7 +22,12 @@ import models.SchemeHoldLandProperty.{Acquisition, Contribution, Transfer}
 import models._
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.common.{CompanyRecipientCrnPage, IdentityTypePage, OtherRecipientDetailsPage, PartnershipRecipientUtrPage}
+import pages.nonsipp.common.{
+  CompanyRecipientCrnPage,
+  IdentityTypePage,
+  OtherRecipientDetailsPage,
+  PartnershipRecipientUtrPage
+}
 import pages.nonsipp.landorproperty._
 import utils.BaseSpec
 import utils.UserAnswersUtils.UserAnswersOps
