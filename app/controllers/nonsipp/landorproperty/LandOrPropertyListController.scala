@@ -24,10 +24,8 @@ import eu.timepit.refined.refineV
 import forms.YesNoPageFormProvider
 import models.CheckOrChange.Change
 import models.SchemeId.Srn
-import models.{Address, CheckMode, Mode, NormalMode}
+import models.{Address, Mode}
 import navigation.Navigator
-import pages.nonsipp.BasicDetailsCheckYourAnswersPage
-import pages.nonsipp.accountingperiod.AccountingPeriodListPage
 import pages.nonsipp.landorproperty.{LandOrPropertyAddressLookupPages, LandOrPropertyListPage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}

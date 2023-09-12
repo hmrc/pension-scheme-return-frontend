@@ -16,22 +16,14 @@
 
 package controllers.nonsipp.landorpropertydisposal
 
-import models.{NormalMode, UserAnswers}
-import navigation.{FakeNavigator, Navigator}
-import play.api.inject.bind
-import play.api.mvc.Call
-import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import repositories.SessionRepository
-import forms.YesNoPageFormProvider
-import views.html.YesNoPageView
-import controllers.ControllerBaseSpec
-import LandOrPropertyStillHeldController._
-import pages.nonsipp.landorpropertydisposal.LandOrPropertyStillHeldPage
 import config.Refined.{Max50, Max5000}
+import controllers.ControllerBaseSpec
+import controllers.nonsipp.landorpropertydisposal.LandOrPropertyStillHeldController._
 import eu.timepit.refined.refineMV
-
-import scala.concurrent.Future
+import forms.YesNoPageFormProvider
+import models.NormalMode
+import pages.nonsipp.landorpropertydisposal.LandOrPropertyStillHeldPage
+import views.html.YesNoPageView
 
 class LandOrPropertyStillHeldControllerSpec extends ControllerBaseSpec {
 

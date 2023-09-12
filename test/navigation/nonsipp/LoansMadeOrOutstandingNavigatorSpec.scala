@@ -17,10 +17,10 @@
 package navigation.nonsipp
 
 import config.Refined.OneTo5000
-import eu.timepit.refined.{refineMV, refineV}
-import models.{ConditionalYesNo, IdentitySubject, IdentityType, Money, NormalMode, RecipientDetails, UserAnswers}
+import eu.timepit.refined.refineMV
 import models.ConditionalYesNo._
 import models.SchemeId.Srn
+import models.{ConditionalYesNo, IdentitySubject, IdentityType, Money, NormalMode, RecipientDetails, UserAnswers}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.common.{
