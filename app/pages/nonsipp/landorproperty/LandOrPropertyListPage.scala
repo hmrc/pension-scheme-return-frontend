@@ -16,24 +16,13 @@
 
 package pages.nonsipp.landorproperty
 
-import config.Refined.Max5000
-import models.Address
 import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
-import utils.RefinedUtils.RefinedIntOps
 
-case class LandOrPropertyAddressLookupPage(srn: Srn, index: Max5000) extends QuestionPage[Address] {
+case class LandOrPropertyListPage(srn: Srn, addLandOrProperty: Boolean) extends QuestionPage[Boolean] {
 
-  override def path: JsPath =
-    Paths.landOrPropertyTransactions \ "propertyDetails" \ "addressDetails" \ toString \ index.arrayIndex.toString
+  override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "landOrPropertyHeld"
-}
-
-case class LandOrPropertyAddressLookupPages(srn: Srn) extends QuestionPage[Map[String, Address]] {
-  override def path: JsPath =
-    Paths.landOrPropertyTransactions \ "propertyDetails" \ "addressDetails" \ toString
-
-  override def toString: String = "landOrPropertyHeld"
+  override def toString: String = "landOrPropertyListPage"
 }

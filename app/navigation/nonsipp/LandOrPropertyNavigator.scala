@@ -16,16 +16,12 @@
 
 package navigation.nonsipp
 
-import eu.timepit.refined.refineMV
+import config.Refined.Max5000
+import eu.timepit.refined.{refineMV, refineV}
 import models.{CheckOrChange, IdentitySubject, IdentityType, NormalMode, SchemeHoldLandProperty, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.common.{
-  CompanyRecipientCrnPage,
-  IdentityTypePage,
-  OtherRecipientDetailsPage,
-  PartnershipRecipientUtrPage
-}
+import pages.nonsipp.common.{CompanyRecipientCrnPage, IdentityTypePage, OtherRecipientDetailsPage, PartnershipRecipientUtrPage}
 import pages.nonsipp.landorproperty._
 import play.api.mvc.Call
 
@@ -161,6 +157,18 @@ object LandOrPropertyNavigator extends JourneyNavigator {
 
     case LandOrPropertyCYAPage(srn) =>
       controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController.onPageLoad(srn, page = 1, NormalMode)
+
+    case LandOrPropertyListPage(srn, addLandOrProperty) => //27j7
+      if (addLandOrProperty) {
+        val count = userAnswers.map(LandOrPropertyAddressLookupPages(srn)).size
+        refineV[Max5000.Refined](count + 1).fold(
+          err => controllers.routes.JourneyRecoveryController.onPageLoad(),
+          nextIndex =>
+            controllers.nonsipp.landorproperty.routes.LandPropertyInUKController.onPageLoad(srn, nextIndex, NormalMode)
+        )
+      } else {
+        controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
+      }
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty
