@@ -16,13 +16,11 @@
 
 package pages.nonsipp.landorpropertydisposal
 
-import play.api.libs.json.JsPath
-import models.SchemeId.Srn
-import models.Money
-import pages.QuestionPage
 import config.Refined.{Max50, Max5000}
+import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 import utils.RefinedUtils._
-import eu.timepit.refined.refineMV
 
 case class LandOrPropertyStillHeldPage(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50)
     extends QuestionPage[Boolean] {

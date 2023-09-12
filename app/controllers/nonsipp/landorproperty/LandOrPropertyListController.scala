@@ -22,11 +22,10 @@ import config.Refined.Max5000
 import controllers.actions._
 import eu.timepit.refined.refineV
 import forms.YesNoPageFormProvider
+import models.CheckOrChange.Change
 import models.SchemeId.Srn
-import models.{Address, CheckMode, Mode, NormalMode}
+import models.{Address, Mode}
 import navigation.Navigator
-import pages.nonsipp.BasicDetailsCheckYourAnswersPage
-import pages.nonsipp.accountingperiod.AccountingPeriodListPage
 import pages.nonsipp.landorproperty.{LandOrPropertyAddressLookupPages, LandOrPropertyListPage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -98,8 +97,8 @@ object LandOrPropertyListController {
             List(
               ListRow(
                 address.addressLine1,
-                "url",
-                Message("landOrPropertyList.row.change.hiddenText"),
+                changeUrl = routes.LandOrPropertyCYAController.onPageLoad(srn, index, Change).url,
+                changeHiddenText = Message("landOrPropertyList.row.change.hiddenText", address.addressLine1),
                 routes.RemovePropertyController.onPageLoad(srn, index, mode).url,
                 Message("landOrPropertyList.row.remove.hiddenText")
               )

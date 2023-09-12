@@ -18,7 +18,6 @@ package pages
 
 import config.Refined.OneTo5000
 import eu.timepit.refined.refineMV
-import models.NormalMode
 import pages.behaviours.PageBehaviours
 import pages.nonsipp.landorproperty.IsLesseeConnectedPartyPage
 

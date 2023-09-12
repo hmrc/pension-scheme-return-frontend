@@ -16,16 +16,7 @@
 
 package pages.nonsipp.landorproperty
 
-import config.Refined.Max5000
-import models.Money
 import models.SchemeId.Srn
-import pages.QuestionPage
-import play.api.libs.json.JsPath
-import utils.RefinedUtils._
+import pages.Page
 
-case class LandOrPropertyTotalIncomePage(srn: Srn, index: Max5000) extends QuestionPage[Money] {
-
-  override def path: JsPath = Paths.heldPropertyTransactions \ toString \ index.arrayIndex.toString
-
-  override def toString: String = "totalIncomeOrReceipts"
-}
+case class LandOrPropertyCYAPage(srn: Srn) extends Page

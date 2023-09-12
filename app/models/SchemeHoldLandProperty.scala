@@ -25,11 +25,11 @@ sealed trait SchemeHoldLandProperty {
 
 object SchemeHoldLandProperty extends Enumerable.Implicits {
 
-  case object Acquisition extends WithName("acquisition") with SchemeHoldLandProperty
+  case object Acquisition extends WithName("Acquisition") with SchemeHoldLandProperty
 
-  case object Contribution extends WithName("contribution") with SchemeHoldLandProperty
+  case object Contribution extends WithName("Contribution") with SchemeHoldLandProperty
 
-  case object Transfer extends WithName("transfer") with SchemeHoldLandProperty
+  case object Transfer extends WithName("Transfer") with SchemeHoldLandProperty
 
   val values: List[SchemeHoldLandProperty] = List(Acquisition, Contribution, Transfer)
 

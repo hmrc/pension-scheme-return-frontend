@@ -19,11 +19,10 @@ package controllers.nonsipp.landorproperty
 import config.Refined.Max5000
 import controllers.PSRController
 import controllers.actions._
-import controllers.nonsipp.landorproperty.LandOrPropertySellerConnectedPartyController._
 import forms.YesNoPageFormProvider
-import models.{IdentitySubject, IdentityType, Mode}
 import models.SchemeId.Srn
 import models.requests.DataRequest
+import models.{IdentitySubject, IdentityType, Mode}
 import navigation.Navigator
 import pages.nonsipp.common.{IdentityTypePage, OtherRecipientDetailsPage}
 import pages.nonsipp.landorproperty.{

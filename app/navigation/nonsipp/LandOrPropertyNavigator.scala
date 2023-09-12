@@ -18,17 +18,10 @@ package navigation.nonsipp
 
 import config.Refined.Max5000
 import eu.timepit.refined.{refineMV, refineV}
-import models.{IdentitySubject, IdentityType, NormalMode, SchemeHoldLandProperty, UserAnswers}
+import models.{CheckOrChange, IdentitySubject, IdentityType, NormalMode, SchemeHoldLandProperty, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.common.{
-  CompanyRecipientCrnPage,
-  IdentityTypePage,
-  IdentityTypes,
-  OtherRecipientDetailsPage,
-  PartnershipRecipientUtrPage
-}
-
+import pages.nonsipp.common.{CompanyRecipientCrnPage, IdentityTypePage, OtherRecipientDetailsPage, PartnershipRecipientUtrPage}
 import pages.nonsipp.landorproperty._
 import play.api.mvc.Call
 
@@ -115,7 +108,7 @@ object LandOrPropertyNavigator extends JourneyNavigator {
       if (userAnswers.get(page).contains(true)) {
         controllers.nonsipp.landorproperty.routes.IsLandPropertyLeasedController.onPageLoad(srn, index, NormalMode)
       } else {
-        controllers.routes.UnauthorisedController.onPageLoad()
+        controllers.nonsipp.landorproperty.routes.IsLandPropertyLeasedController.onPageLoad(srn, index, NormalMode)
       }
 
     case page @ IsLandPropertyLeasedPage(srn, index) => //27j2
@@ -135,9 +128,6 @@ object LandOrPropertyNavigator extends JourneyNavigator {
       //27j5
       controllers.nonsipp.landorproperty.routes.LandOrPropertyTotalIncomeController
         .onPageLoad(srn, index, NormalMode)
-
-    case CompanySellerNamePage(srn, index) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
 
     case PartnershipSellerNamePage(srn, index) => //27h6
       controllers.nonsipp.common.routes.PartnershipRecipientUtrController
@@ -163,7 +153,10 @@ object LandOrPropertyNavigator extends JourneyNavigator {
         .onPageLoad(srn, index, NormalMode)
 
     case LandOrPropertyTotalIncomePage(srn, index) => //27j5
-      controllers.routes.UnauthorisedController.onPageLoad()
+      controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController.onPageLoad(srn, index, CheckOrChange.Check)
+
+    case LandOrPropertyCYAPage(srn) =>
+      controllers.nonsipp.landorproperty.routes.LandOrPropertyListController.onPageLoad(srn, NormalMode)
 
     case RemovePropertyPage(srn, index) =>
       if (userAnswers.map(LandOrPropertyAddressLookupPages(srn)).isEmpty) {

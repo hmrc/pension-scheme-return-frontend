@@ -20,20 +20,14 @@ import cats.implicits._
 import config.Refined.{Max5000, OneTo5000}
 import controllers.actions.IdentifyAndRequireData
 import eu.timepit.refined._
-import models.ConditionalYesNo._
 import models.SchemeId.Srn
-import models.{Address, ConditionalYesNo, IdentitySubject, IdentityType, Money, Percentage, Security, UserAnswers}
-import pages.nonsipp.common.IdentityTypePage
+import models.{Address, UserAnswers}
 import pages.nonsipp.landorproperty.{LandOrPropertyAddressLookupPage, LandPropertyInUKPage}
-import pages.nonsipp.loansmadeoroutstanding._
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import repositories.SessionRepository
 import services.SaveService
-import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
-import java.time.LocalDate
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try

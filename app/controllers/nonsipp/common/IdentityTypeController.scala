@@ -25,7 +25,7 @@ import models.SchemeId.Srn
 import models.{IdentitySubject, IdentityType, Mode, UserAnswers}
 import navigation.Navigator
 import pages.nonsipp.common.IdentityTypePage
-import pages.nonsipp.landorproperty.{LandOrPropertyAddressLookupPage, LandPropertyInUKPage}
+import pages.nonsipp.landorproperty.LandOrPropertyAddressLookupPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}

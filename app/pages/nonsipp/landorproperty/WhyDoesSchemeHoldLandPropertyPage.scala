@@ -17,15 +17,14 @@
 package pages.nonsipp.landorproperty
 
 import config.Refined.Max5000
-import models.{IdentitySubject, SchemeHoldLandProperty, UserAnswers}
 import models.SchemeId.Srn
+import models.{IdentitySubject, SchemeHoldLandProperty, UserAnswers}
 import pages.QuestionPage
 import pages.nonsipp.common
-import pages.nonsipp.common.IdentityTypePage
 import play.api.libs.json.JsPath
 import queries.Removable
-import utils.RefinedUtils.RefinedIntOps
 import utils.PageUtils._
+import utils.RefinedUtils.RefinedIntOps
 
 import scala.util.Try
 

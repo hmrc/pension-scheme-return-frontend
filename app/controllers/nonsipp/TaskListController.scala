@@ -19,7 +19,6 @@ package controllers.nonsipp
 import cats.implicits.toShow
 import com.google.inject.Inject
 import controllers.actions._
-import eu.timepit.refined.refineMV
 import models.SchemeId.Srn
 import models.requests.DataRequest
 import models.{DateRange, NormalMode}

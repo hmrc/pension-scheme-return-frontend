@@ -24,7 +24,6 @@ import pages.nonsipp.landorproperty.{
   CompanySellerNamePage,
   IndividualSellerNiPage,
   LandOrPropertySellerConnectedPartyPage,
-  LandPropertyInUKPage,
   LandPropertyIndividualSellersNamePage,
   PartnershipSellerNamePage
 }
