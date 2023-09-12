@@ -61,106 +61,77 @@ class LandOrPropertyCYAController @Inject()(
           holdLandProperty <- requiredPage(WhyDoesSchemeHoldLandPropertyPage(srn, index))
           landOrPropertyTotalCost <- requiredPage(LandOrPropertyTotalCostPage(srn, index))
 
-          landPropertyIndependentValuation = if (holdLandProperty != Transfer) {
-            Right(
-              request.userAnswers.get(LandPropertyIndependentValuationPage(srn, index)).get
-            )
-          } else {
-            Left(false)
-          }
+          landPropertyIndependentValuation = Option.when(holdLandProperty != Transfer)(
+            request.userAnswers.get(LandPropertyIndependentValuationPage(srn, index)).get
+          )
+          landOrPropertyAcquire = Option.when(holdLandProperty != Transfer)(
+            request.userAnswers.get(LandOrPropertyWhenDidSchemeAcquirePage(srn, index)).get
+          )
 
-          landOrPropertyAcquire = if (holdLandProperty != Transfer) {
-            Right(
-              request.userAnswers.get(LandOrPropertyWhenDidSchemeAcquirePage(srn, index)).get
-            )
-          } else {
-            Left(false)
-          }
+          receivedLandType = Option.when(holdLandProperty == Acquisition)(
+            request.userAnswers.get(IdentityTypePage(srn, index, IdentitySubject.LandOrPropertySeller)).get
+          )
 
-          receivedLandType = if (holdLandProperty == Acquisition) {
-            Right(request.userAnswers.get(IdentityTypePage(srn, index, IdentitySubject.LandOrPropertySeller)).get)
-          } else {
-            Left(false)
-          }
+          landOrPropertySellerConnectedParty = Option.when(holdLandProperty == Acquisition)(
+            request.userAnswers.get(LandOrPropertySellerConnectedPartyPage(srn, index)).get
+          )
 
-          landOrPropertySellerConnectedParty = if (holdLandProperty == Acquisition) {
-            Right(
-              request.userAnswers.get(LandOrPropertySellerConnectedPartyPage(srn, index)).get
-            )
-          } else {
-            Left(false)
-          }
+          recipientName = Option.when(holdLandProperty == Acquisition)(
+            List(
+              request.userAnswers.get(LandPropertyIndividualSellersNamePage(srn, index)),
+              request.userAnswers.get(CompanySellerNamePage(srn, index)),
+              request.userAnswers.get(PartnershipSellerNamePage(srn, index)),
+              request.userAnswers
+                .get(OtherRecipientDetailsPage(srn, index, IdentitySubject.LandOrPropertySeller))
+                .map(_.name)
+            ).flatten.head
+          )
 
-          recipientName = if (holdLandProperty == Acquisition) {
-            Right(
-              List(
-                request.userAnswers.get(LandPropertyIndividualSellersNamePage(srn, index)),
-                request.userAnswers.get(CompanySellerNamePage(srn, index)),
-                request.userAnswers.get(PartnershipSellerNamePage(srn, index)),
-                request.userAnswers
-                  .get(OtherRecipientDetailsPage(srn, index, IdentitySubject.LandOrPropertySeller))
-                  .map(_.name)
-              ).flatten.head
-            )
-          } else {
-            Left(false)
-          }
+          recipientDetails = Option.when(holdLandProperty == Acquisition)(
+            List(
+              request.userAnswers.get(IndividualSellerNiPage(srn, index)).flatMap(_.value.toOption.map(_.value)),
+              request.userAnswers
+                .get(CompanyRecipientCrnPage(srn, index, IdentitySubject.LandOrPropertySeller))
+                .flatMap(_.value.toOption.map(_.value)),
+              request.userAnswers
+                .get(PartnershipRecipientUtrPage(srn, index, IdentitySubject.LandOrPropertySeller))
+                .flatMap(_.value.toOption.map(_.value)),
+              request.userAnswers
+                .get(OtherRecipientDetailsPage(srn, index, IdentitySubject.LandOrPropertySeller))
+                .map(_.description)
+            ).flatten.headOption
+          )
 
-          recipientDetails = if (holdLandProperty == Acquisition) {
-            Right(
-              List(
-                request.userAnswers.get(IndividualSellerNiPage(srn, index)).flatMap(_.value.toOption.map(_.value)),
-                request.userAnswers
-                  .get(CompanyRecipientCrnPage(srn, index, IdentitySubject.LandOrPropertySeller))
-                  .flatMap(_.value.toOption.map(_.value)),
-                request.userAnswers
-                  .get(PartnershipRecipientUtrPage(srn, index, IdentitySubject.LandOrPropertySeller))
-                  .flatMap(_.value.toOption.map(_.value)),
-                request.userAnswers
-                  .get(OtherRecipientDetailsPage(srn, index, IdentitySubject.LandOrPropertySeller))
-                  .map(_.description)
-              ).flatten.head
-            )
-          } else {
-            Left(false)
-          }
-
-          recipientReasonNoDetails = if (holdLandProperty == Acquisition) {
-            Right(
-              List(
-                request.userAnswers
-                  .get(IndividualSellerNiPage(srn, index))
-                  .flatMap(_.value.swap.toOption.map(_.value)),
-                request.userAnswers
-                  .get(CompanyRecipientCrnPage(srn, index, IdentitySubject.LandOrPropertySeller))
-                  .flatMap(_.value.swap.toOption.map(_.value)),
-                request.userAnswers
-                  .get(PartnershipRecipientUtrPage(srn, index, IdentitySubject.LandOrPropertySeller))
-                  .flatMap(_.value.swap.toOption.map(_.value))
-              ).flatten.head
-            )
-          } else {
-            Left(false)
-          }
+          recipientReasonNoDetails = Option.when(holdLandProperty == Acquisition)(
+            List(
+              request.userAnswers
+                .get(IndividualSellerNiPage(srn, index))
+                .flatMap(_.value.swap.toOption.map(_.value)),
+              request.userAnswers
+                .get(CompanyRecipientCrnPage(srn, index, IdentitySubject.LandOrPropertySeller))
+                .flatMap(_.value.swap.toOption.map(_.value)),
+              request.userAnswers
+                .get(PartnershipRecipientUtrPage(srn, index, IdentitySubject.LandOrPropertySeller))
+                .flatMap(_.value.swap.toOption.map(_.value))
+            ).flatten.headOption
+          )
 
           landOrPropertyResidential <- requiredPage(IsLandOrPropertyResidentialPage(srn, index))
           landOrPropertyLease <- requiredPage(IsLandPropertyLeasedPage(srn, index))
           landOrPropertyTotalIncome <- requiredPage(LandOrPropertyTotalIncomePage(srn, index))
 
-          leaseDetails = if (landOrPropertyLease) {
+          leaseDetails = Option.when(landOrPropertyLease) {
             val landOrPropertyLeaseDetailsPage = request.userAnswers.get(LandOrPropertyLeaseDetailsPage(srn, index)).get
             val leaseConnectedParty = request.userAnswers.get(IsLesseeConnectedPartyPage(srn, index)).get
-            Right(
-              Tuple4(
-                landOrPropertyLeaseDetailsPage._1,
-                landOrPropertyLeaseDetailsPage._2,
-                landOrPropertyLeaseDetailsPage._3,
-                leaseConnectedParty
-              )
+
+            Tuple4(
+              landOrPropertyLeaseDetailsPage._1,
+              landOrPropertyLeaseDetailsPage._2,
+              landOrPropertyLeaseDetailsPage._3,
+              leaseConnectedParty
             )
-          } else {
-            Left(false)
           }
+
           schemeName = request.schemeDetails.schemeName
         } yield Ok(
           view(
@@ -177,8 +148,8 @@ class LandOrPropertyCYAController @Inject()(
                 landPropertyIndependentValuation,
                 receivedLandType,
                 recipientName,
-                recipientDetails,
-                recipientReasonNoDetails,
+                recipientDetails.flatten,
+                recipientReasonNoDetails.flatten,
                 landOrPropertySellerConnectedParty,
                 landOrPropertyResidential,
                 landOrPropertyLease,
@@ -207,19 +178,19 @@ case class ViewModelParameters(
   landOrPropertyInUk: Boolean,
   landRegistryTitleNumber: ConditionalYesNo[String, String],
   holdLandProperty: SchemeHoldLandProperty,
-  landOrPropertyAcquire: Either[Boolean, LocalDate],
+  landOrPropertyAcquire: Option[LocalDate],
   landOrPropertyTotalCost: Money,
-  landPropertyIndependentValuation: Either[Boolean, Boolean],
-  receivedLandType: Either[Boolean, IdentityType],
-  recipientName: Either[Boolean, String],
-  recipientDetails: Either[Boolean, String],
-  recipientReasonNoDetails: Either[Boolean, String],
-  landOrPropertySellerConnectedParty: Either[Boolean, Boolean],
+  landPropertyIndependentValuation: Option[Boolean],
+  receivedLandType: Option[IdentityType],
+  recipientName: Option[String],
+  recipientDetails: Option[String],
+  recipientReasonNoDetails: Option[String],
+  landOrPropertySellerConnectedParty: Option[Boolean],
   landOrPropertyResidential: Boolean,
   landOrPropertyLease: Boolean,
   landOrPropertyTotalIncome: Money,
   addressLookUpPage: Address,
-  leaseDetails: Either[Boolean, (String, Money, LocalDate, Boolean)],
+  leaseDetails: Option[(String, Money, LocalDate, Boolean)],
   checkOrChange: CheckOrChange
 )
 object LandOrPropertyCYAController {
@@ -267,15 +238,15 @@ object LandOrPropertyCYAController {
     landOrPropertyInUk: Boolean,
     landRegistryTitleNumber: ConditionalYesNo[String, String],
     holdLandProperty: SchemeHoldLandProperty,
-    landOrPropertyAcquire: Either[Boolean, LocalDate],
+    landOrPropertyAcquire: Option[LocalDate],
     landOrPropertyTotalCost: Money,
-    receivedLandType: Either[Boolean, IdentityType],
-    recipientName: Either[Boolean, String],
-    recipientDetails: Either[Boolean, String],
-    recipientReasonNoDetails: Either[Boolean, String],
-    landOrPropertySellerConnectedParty: Either[Boolean, Boolean],
-    landPropertyIndependentValuation: Either[Boolean, Boolean],
-    leaseDetails: Either[Boolean, (String, Money, LocalDate, Boolean)],
+    receivedLandType: Option[IdentityType],
+    recipientName: Option[String],
+    recipientDetails: Option[String],
+    recipientReasonNoDetails: Option[String],
+    landOrPropertySellerConnectedParty: Option[Boolean],
+    landPropertyIndependentValuation: Option[Boolean],
+    leaseDetails: Option[(String, Money, LocalDate, Boolean)],
     landOrPropertyResidential: Boolean,
     landOrPropertyLease: Boolean,
     landOrPropertyTotalIncome: Money,
@@ -296,19 +267,19 @@ object LandOrPropertyCYAController {
           index,
           schemeName,
           holdLandProperty,
-          landOrPropertyAcquire.toOption,
+          landOrPropertyAcquire,
           landOrPropertyTotalCost,
-          landPropertyIndependentValuation.toOption,
+          landPropertyIndependentValuation,
           addressLookUpPage.addressLine1,
           mode
         ) ++ DetailsOfTheAcquisition(
           srn,
           index,
-          receivedLandType.toOption.get,
-          recipientName.toOption.get,
-          recipientDetails.toOption,
-          recipientReasonNoDetails.toOption,
-          landOrPropertySellerConnectedParty.toOption.get,
+          receivedLandType.get,
+          recipientName.get,
+          recipientDetails,
+          recipientReasonNoDetails,
+          landOrPropertySellerConnectedParty.get,
           addressLookUpPage.addressLine1,
           mode
         ) ++
@@ -349,9 +320,9 @@ object LandOrPropertyCYAController {
           index,
           schemeName,
           holdLandProperty,
-          landOrPropertyAcquire.toOption,
+          landOrPropertyAcquire,
           landOrPropertyTotalCost,
-          landPropertyIndependentValuation.toOption,
+          landPropertyIndependentValuation,
           addressLookUpPage.addressLine1,
           mode
         ) ++ leaseDetailsAndIncome(
@@ -443,8 +414,8 @@ object LandOrPropertyCYAController {
     index: Max5000,
     receivedLandType: IdentityType,
     recipientName: String,
-    recipientDetails: Option[String],
-    recipientReasonNoDetails: Option[String],
+    optRecipientDetails: Option[String],
+    optRecipientReasonNoDetails: Option[String],
     landOrPropertySellerConnectedParty: Boolean,
     address: String,
     mode: Mode
@@ -550,37 +521,30 @@ object LandOrPropertyCYAController {
               SummaryAction("site.change", recipientNameUrl)
                 .withVisuallyHiddenContent("landOrPropertyCYA.section3.recipientName.hidden")
             )
-        ) :?+
-          recipientDetails.map(
-            details =>
-              CheckYourAnswersRowViewModel(recipientDetailsKey, details)
-                .withAction(
-                  SummaryAction("site.change", recipientDetailsUrl)
-                    .withVisuallyHiddenContent(recipientDetailsIdChangeHiddenKey)
-                )
-          ) :?+
-          recipientReasonNoDetails.map(
-            reason =>
-              CheckYourAnswersRowViewModel(recipientNoDetailsReasonKey, reason)
-                .withAction(
-                  SummaryAction("site.change", recipientNoDetailsUrl)
-                    .withVisuallyHiddenContent(recipientDetailsNoIdChangeHiddenKey)
-                )
-          ) :?+
-          Option {
-            CheckYourAnswersRowViewModel(
-              Message("landOrPropertyCYA.section3.landOrPropertySellerConnectedParty", recipientName),
-              if (landOrPropertySellerConnectedParty) "site.yes" else "site.no"
-            ).withAction(
-              SummaryAction(
-                "site.change",
-                routes.LandOrPropertySellerConnectedPartyController.onPageLoad(srn, index, mode).url
-              ).withVisuallyHiddenContent("landOrPropertyCYA.section3.landOrPropertySellerConnectedPartyInfo.hidden")
+        ) :?+ optRecipientDetails.map { recipientDetails =>
+          CheckYourAnswersRowViewModel(recipientDetailsKey, recipientDetails)
+            .withAction(
+              SummaryAction("site.change", recipientDetailsUrl)
+                .withVisuallyHiddenContent(recipientDetailsIdChangeHiddenKey)
             )
-          }
+        } :?+ optRecipientReasonNoDetails.map { recipientReasonNoDetails =>
+          CheckYourAnswersRowViewModel(recipientNoDetailsReasonKey, recipientReasonNoDetails)
+            .withAction(
+              SummaryAction("site.change", recipientNoDetailsUrl)
+                .withVisuallyHiddenContent(recipientDetailsNoIdChangeHiddenKey)
+            )
+        } :+
+          CheckYourAnswersRowViewModel(
+            Message("landOrPropertyCYA.section3.landOrPropertySellerConnectedParty", recipientName),
+            if (landOrPropertySellerConnectedParty) "site.yes" else "site.no"
+          ).withAction(
+            SummaryAction(
+              "site.change",
+              routes.LandOrPropertySellerConnectedPartyController.onPageLoad(srn, index, mode).url
+            ).withVisuallyHiddenContent("landOrPropertyCYA.section3.landOrPropertySellerConnectedPartyInfo.hidden")
+          )
       )
     )
-
   }
 
   private def detailsOfTheTransaction(

@@ -18,7 +18,7 @@ package pages.nonsipp.landorproperty
 
 import config.Refined.OneTo5000
 import eu.timepit.refined.refineMV
-import models.{Money, NormalMode, UserAnswers}
+import models.{Money, UserAnswers}
 import pages.behaviours.PageBehaviours
 import utils.UserAnswersUtils.UserAnswersOps
 
