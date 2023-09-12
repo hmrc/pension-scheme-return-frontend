@@ -21,13 +21,7 @@ import eu.timepit.refined.{refineMV, refineV}
 import models.{CheckOrChange, IdentitySubject, IdentityType, NormalMode, SchemeHoldLandProperty, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.common.{
-  CompanyRecipientCrnPage,
-  IdentityTypePage,
-  IdentityTypes,
-  OtherRecipientDetailsPage,
-  PartnershipRecipientUtrPage
-}
+import pages.nonsipp.common.{CompanyRecipientCrnPage, IdentityTypePage, OtherRecipientDetailsPage, PartnershipRecipientUtrPage}
 import pages.nonsipp.landorproperty._
 import play.api.mvc.Call
 
