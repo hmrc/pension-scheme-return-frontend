@@ -378,7 +378,7 @@ object LandOrPropertyCYAController {
           ).withAction(
             SummaryAction(
               "site.change",
-              routes.LandOrPropertyAddressLookupController.onPageLoad(srn, index).url
+              routes.LandOrPropertyAddressLookupController.onPageLoad(srn, index).url + "#registryTitleQuestion"
             ).withVisuallyHiddenContent("landOrPropertyCYA.section1.addressInfo.hidden")
           ),
           CheckYourAnswersRowViewModel(
@@ -390,7 +390,7 @@ object LandOrPropertyCYAController {
           ).withAction(
             SummaryAction(
               "site.change",
-              routes.LandRegistryTitleNumberController.onPageLoad(srn, index, mode).url
+              routes.LandRegistryTitleNumberController.onPageLoad(srn, index, mode).url + "#registryTitleQuestion"
             ).withVisuallyHiddenContent("landOrPropertyCYA.section1.landRegistryTitleNumber.hidden")
           ),
           landRegistryTitleNumber.value match {
@@ -401,7 +401,7 @@ object LandOrPropertyCYAController {
               ).withAction(
                 SummaryAction(
                   "site.change",
-                  routes.LandRegistryTitleNumberController.onPageLoad(srn, index, mode).url
+                  routes.LandRegistryTitleNumberController.onPageLoad(srn, index, mode).url + "#registryTitleValue"
                 ).withVisuallyHiddenContent("landOrPropertyCYA.section1.landRegistryTitleNumber.yes.hidden")
               )
             case Left(reason) =>
@@ -411,7 +411,7 @@ object LandOrPropertyCYAController {
               ).withAction(
                 SummaryAction(
                   "site.change",
-                  routes.LandRegistryTitleNumberController.onPageLoad(srn, index, mode).url
+                  routes.LandRegistryTitleNumberController.onPageLoad(srn, index, mode).url + "#registryTitleValue"
                 ).withVisuallyHiddenContent("landOrPropertyCYA.section1.landRegistryTitleNumber.no.hidden")
               )
           }
