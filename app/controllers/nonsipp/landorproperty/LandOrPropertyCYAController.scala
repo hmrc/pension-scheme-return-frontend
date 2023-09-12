@@ -382,10 +382,10 @@ object LandOrPropertyCYAController {
             ).withVisuallyHiddenContent("landOrPropertyCYA.section1.addressInfo.hidden")
           ),
           CheckYourAnswersRowViewModel(
-            Message("landOrPropertyCYA.section1.registryTitleNumber", address.addressLine1),
+            Message("landOrPropertyCYA.section1.isThereATitleNumber", address.addressLine1),
             landRegistryTitleNumber.value match {
-              case Right(x) => "site.yes"
-              case Left(y) => "site.no"
+              case Right(_) => "site.yes"
+              case Left(_) => "site.no"
             }
           ).withAction(
             SummaryAction(
