@@ -393,18 +393,28 @@ object LandOrPropertyCYAController {
               routes.LandRegistryTitleNumberController.onPageLoad(srn, index, mode).url
             ).withVisuallyHiddenContent("landOrPropertyCYA.section1.landRegistryTitleNumber.hidden")
           ),
-          CheckYourAnswersRowViewModel(
-            Message("landOrPropertyCYA.section1.registryTitleNumber", address.addressLine1),
-            landRegistryTitleNumber.value match {
-              case Right(titleNumber) => titleNumber.toUpperCase
-              case Left(reason) => reason
-            }
-          ).withAction(
-            SummaryAction(
-              "site.change",
-              routes.LandRegistryTitleNumberController.onPageLoad(srn, index, mode).url
-            ).withVisuallyHiddenContent("landOrPropertyCYA.section1.landRegistryTitleNumber.hidden")
-          )
+          landRegistryTitleNumber.value match {
+            case Right(titleNumber) =>
+              CheckYourAnswersRowViewModel(
+                Message("landOrPropertyCYA.section1.registryTitleNumber.yes"),
+                titleNumber
+              ).withAction(
+                SummaryAction(
+                  "site.change",
+                  routes.LandRegistryTitleNumberController.onPageLoad(srn, index, mode).url
+                ).withVisuallyHiddenContent("landOrPropertyCYA.section1.landRegistryTitleNumber.yes.hidden")
+              )
+            case Left(reason) =>
+              CheckYourAnswersRowViewModel(
+                Message("landOrPropertyCYA.section1.registryTitleNumber.no", address.addressLine1),
+                reason
+              ).withAction(
+                SummaryAction(
+                  "site.change",
+                  routes.LandRegistryTitleNumberController.onPageLoad(srn, index, mode).url
+                ).withVisuallyHiddenContent("landOrPropertyCYA.section1.landRegistryTitleNumber.no.hidden")
+              )
+          }
         )
       )
     )
