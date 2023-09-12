@@ -18,9 +18,14 @@ package pages.nonsipp.landorproperty
 
 import config.Refined.Max5000
 import models.SchemeId.Srn
+import models.UserAnswers
 import pages.QuestionPage
 import play.api.libs.json.JsPath
+import queries.Removable
+import utils.PageUtils.removePages
 import utils.RefinedUtils.RefinedIntOps
+
+import scala.util.Try
 
 case class LandPropertyInUKPage(srn: Srn, index: Max5000) extends QuestionPage[Boolean] {
 
@@ -28,4 +33,23 @@ case class LandPropertyInUKPage(srn: Srn, index: Max5000) extends QuestionPage[B
     Paths.landOrPropertyTransactions \ "propertyDetails" \ toString \ index.arrayIndex.toString
 
   override def toString: String = "landOrPropertyInUK"
+
+  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
+    (value, userAnswers.get(this)) match {
+      case (None, _) => removePages(userAnswers, pages(srn))
+      case _ => Try(userAnswers)
+    }
+
+  private def pages(srn: Srn): List[Removable[_]] =
+    List(
+      LandOrPropertyAddressLookupPage(srn, index),
+      LandRegistryTitleNumberPage(srn, index),
+      WhyDoesSchemeHoldLandPropertyPage(srn, index),
+      LandOrPropertyTotalCostPage(srn, index),
+      IsLandOrPropertyResidentialPage(srn, index),
+      IsLandPropertyLeasedPage(srn, index),
+      LandOrPropertySellerConnectedPartyPage(srn, index),
+      LandOrPropertyTotalIncomePage(srn, index),
+      RemovePropertyPage(srn, index)
+    )
 }

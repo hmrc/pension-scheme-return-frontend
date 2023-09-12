@@ -67,9 +67,7 @@ case class IdentityTypePage(srn: Srn, index: Max5000, identitySubject: IdentityS
           SecurityGivenForLoanPage(srn, index)
         )
       case IdentitySubject.LandOrPropertySeller =>
-        List(
-          LandPropertyInUKPage(srn, index)
-        )
+        List().empty
     }
   private def pagesFirstPartGeneric(srn: Srn): List[Removable[_]] =
     List(
