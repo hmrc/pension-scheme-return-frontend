@@ -228,7 +228,7 @@ object LandOrPropertyCYAController {
       title = parameters.checkOrChange.fold(check = "checkYourAnswers.title", change = "landOrPropertyCYA.change.title"),
       heading = parameters.checkOrChange.fold(
         check = "checkYourAnswers.heading",
-        change = Message("landOrPropertyCYA.change.heading")
+        change = Message("landOrPropertyCYA.change.heading", parameters.addressLookUpPage.addressLine1)
       ),
       description = Some(ParagraphMessage("landOrPropertyCYA.paragraph")),
       page = CheckYourAnswersViewModel(

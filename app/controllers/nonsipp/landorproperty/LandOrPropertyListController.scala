@@ -22,6 +22,7 @@ import config.Refined.Max5000
 import controllers.actions._
 import eu.timepit.refined.refineV
 import forms.YesNoPageFormProvider
+import models.CheckOrChange.Change
 import models.SchemeId.Srn
 import models.{Address, CheckMode, Mode, NormalMode}
 import navigation.Navigator
@@ -98,8 +99,8 @@ object LandOrPropertyListController {
             List(
               ListRow(
                 address.addressLine1,
-                "url",
-                Message("landOrPropertyList.row.change.hiddenText"),
+                changeUrl = routes.LandOrPropertyCYAController.onPageLoad(srn, index, Change).url,
+                changeHiddenText = Message("landOrPropertyList.row.change.hiddenText", address.addressLine1),
                 "url",
                 Message("landOrPropertyList.row.remove.hiddenText")
               )

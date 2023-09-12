@@ -1182,5 +1182,5 @@ landOrPropertyCYA.section5.leaseDate.hidden = date the lease was granted
 landOrPropertyCYA.section5.connectedParty = Is {0} a connected party?
 landOrPropertyCYA.section5.leaseConnected.hidden = if {0} is a connected party
 
-landOrPropertyCYA.change.title = Check your answers
-landOrPropertyCYA.change.heading = Check your answers
+landOrPropertyCYA.change.title = Change details for land or property
+landOrPropertyCYA.change.heading = Change details for {0}
