@@ -306,7 +306,8 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           index,
           IsLandOrPropertyResidentialPage,
           Gen.const(false),
-          (srn, index: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          (srn, index: Max5000, _) =>
+            controllers.nonsipp.landorproperty.routes.IsLandPropertyLeasedController.onPageLoad(srn, index, NormalMode)
         )
         .withName("go from land or property in uk page to unauthorised when no selected")
     )
