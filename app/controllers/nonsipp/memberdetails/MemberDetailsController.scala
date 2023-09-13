@@ -53,16 +53,16 @@ class MemberDetailsController @Inject()(
     extends FrontendBaseController
     with I18nSupport {
 
-  private val form = MemberDetailsController.form(formProvider)
-
   def onPageLoad(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      getTaxDates(srn)(request)
+      val form = MemberDetailsController.form(formProvider, getTaxDates(srn)(request))
+
       Ok(view(form.fromUserAnswers(MemberDetailsPage(srn, index)), viewModel(srn, index, mode)))
   }
 
   def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
+      val form = MemberDetailsController.form(formProvider, getTaxDates(srn)(request))
       form
         .bindFromRequest()
         .fold(
@@ -79,20 +79,18 @@ class MemberDetailsController @Inject()(
         )
   }
 
-  def formMaker(srn:Srn)(implicit request:  DataRequest[AnyContent]): Form[NameDOB] = ???
-  def getTaxDates(srn: Srn)(implicit request:  DataRequest[AnyContent]): Option[LocalDate] = schemeDateService.taxYearOrAccountingPeriods(srn) match {
-    case Some(taxPeriod) =>
-      taxPeriod.fold(l => Some(l.from), r => Some(r.head._1.from))
-    case _ => None
-  }
-  def getMostRecentDate(dates: DateRange): LocalDate = ???
+  def getTaxDates(srn: Srn)(implicit request: DataRequest[AnyContent]): Option[LocalDate] =
+    schemeDateService.taxYearOrAccountingPeriods(srn) match {
+      case Some(taxPeriod) =>
+        taxPeriod.fold(l => Some(l.from), r => Some(r.map(x => x._1).toList.sortBy(_.from).head.from))
+      case _ => None
+    }
 
 }
 
 object MemberDetailsController {
 
-
-  def form(formProvider: NameDOBFormProvider): Form[NameDOB] = formProvider(
+  def form(formProvider: NameDOBFormProvider, validDateThreshold: Option[LocalDate]): Form[NameDOB] = formProvider(
     "memberDetails.firstName.error.required",
     "memberDetails.firstName.error.invalid",
     "memberDetails.firstName.error.length",
@@ -107,7 +105,10 @@ object MemberDetailsController {
       "memberDetails.dateOfBirth.error.required.two",
       "memberDetails.dateOfBirth.error.invalid.date",
       "memberDetails.dateOfBirth.error.invalid.characters",
-      List(DateFormErrors.failIfFutureDate("memberDetails.dateOfBirth.error.future"))
+      List(
+        DateFormErrors
+          .failIfDateAfter(validDateThreshold.getOrElse(LocalDate.now()), "memberDetails.dateOfBirth.error.future")
+      )
     )
   )
 

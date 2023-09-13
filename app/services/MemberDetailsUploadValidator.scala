@@ -42,7 +42,7 @@ class MemberDetailsUploadValidator @Inject()(
   textFormProvider: TextFormProvider
 )(implicit ec: ExecutionContext) {
 
-  private val memberDetailsForm = MemberDetailsController.form(nameDOBFormProvider)
+  private val memberDetailsForm = MemberDetailsController.form(nameDOBFormProvider, None)
 
   private def ninoForm(memberFullName: String, previousNinos: List[Nino]): Form[Nino] =
     MemberDetailsNinoController.form(textFormProvider, memberFullName, previousNinos)
