@@ -82,7 +82,7 @@ class MemberDetailsController @Inject()(
   def getTaxDates(srn: Srn)(implicit request: DataRequest[AnyContent]): Option[LocalDate] =
     schemeDateService.taxYearOrAccountingPeriods(srn) match {
       case Some(taxPeriod) =>
-        taxPeriod.fold(l => Some(l.from), r => Some(r.map(x => x._1).toList.sortBy(_.from).reverse.head.to))
+        taxPeriod.fold(l => Some(l.from), r => Some(r.map(x => x._1).toList.sortBy(_.to).reverse.head.to))
       case _ => None
     }
 
