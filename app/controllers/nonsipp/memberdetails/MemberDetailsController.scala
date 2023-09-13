@@ -23,7 +23,7 @@ import forms.NameDOBFormProvider
 import forms.mappings.errors.DateFormErrors
 import models.SchemeId.Srn
 import models.requests.DataRequest
-import models.{DateRange, Mode, NameDOB}
+import models.{Mode, NameDOB}
 import navigation.Navigator
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import play.api.data.Form
