@@ -1048,7 +1048,7 @@ landRegistryTitleNumber.no.conditional.error.length = The reason this land or pr
 
 landOrPropertySeller.companyRecipientCrn.title = Do you know the seller’s Company Registration Number (CRN)?
 landOrPropertySeller.companyRecipientCrn.heading = Do you know {0}’s Company Registration Number (CRN)?
-landOrPropertySeller.companyRecipientCrn.hint = This is 7 or 8 characters, like 0123456 or AB123456. It may also be called ‘company number’ or ‘Companies House number’
+landOrPropertySeller.companyRecipientCrn.hint = This is 7 or 8 characters, like 0123456 or AB123456. It may also be called ‘company number’ or ‘Companies House number’.
 landOrPropertySeller.companyRecipientCrn.yes.conditional = What is {0}’s CRN?
 landOrPropertySeller.companyRecipientCrn.yes.conditional.error.required = Enter the seller’s CRN
 landOrPropertySeller.companyRecipientCrn.yes.conditional.error.length = CRN must be 7 or 8 characters
