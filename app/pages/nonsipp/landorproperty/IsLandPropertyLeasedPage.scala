@@ -18,15 +18,34 @@ package pages.nonsipp.landorproperty
 
 import config.Refined.Max5000
 import models.SchemeId.Srn
+import models.UserAnswers
 import pages.QuestionPage
 import play.api.libs.json.JsPath
+import queries.Removable
 import utils.RefinedUtils.RefinedIntOps
 
+import scala.util.Try
+import utils.PageUtils._
 case class IsLandPropertyLeasedPage(srn: Srn, index: Max5000) extends QuestionPage[Boolean] {
 
-  override def path: JsPath =
-    JsPath \ "assets" \ "landOrProperty" \ "landOrPropertyTransactions" \ "heldPropertyTransaction" \ toString \ index.arrayIndex.toString
+  override def path: JsPath = Paths.heldPropertyTransactions \ toString \ index.arrayIndex.toString
 
   override def toString: String = "landOrPropertyLeased"
+
+  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
+    (value, userAnswers.get(this)) match {
+      case (Some(true), Some(true)) => Try(userAnswers)
+      case (Some(false), Some(false)) => Try(userAnswers)
+      case (Some(true), Some(false)) => Try(userAnswers)
+      case (Some(false), Some(true)) => removePages(userAnswers, pages(srn))
+      case (None, _) => removePages(userAnswers, pages(srn))
+      case _ => Try(userAnswers)
+    }
+
+  private def pages(srn: Srn): List[Removable[_]] =
+    List(
+      LandOrPropertyLeaseDetailsPage(srn, index),
+      IsLesseeConnectedPartyPage(srn, index)
+    )
 
 }

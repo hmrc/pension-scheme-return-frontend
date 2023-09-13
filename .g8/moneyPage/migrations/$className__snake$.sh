@@ -7,23 +7,27 @@ echo "Applying migration $className;format="snake"$"
 
 echo "Adding routes to conf/app.routes"
 
-echo -en "\n\n" >> ../conf/app.routes
-$if(index.empty)$
-echo "GET        /:srn/$urlPath$                        controllers.$className$Controller.onPageLoad(srn: Srn, mode: Mode = NormalMode)" >> ../conf/app.routes
-echo "POST       /:srn/$urlPath$                        controllers.$className$Controller.onSubmit(srn: Srn, mode: Mode = NormalMode)" >> ../conf/app.routes
-
-echo "GET        /:srn/change-$urlPath$                 controllers.$className$Controller.onPageLoad(srn: Srn, mode: Mode = CheckMode)" >> ../conf/app.routes
-echo "POST       /:srn/change-$urlPath$                 controllers.$className$Controller.onSubmit(srn: Srn, mode: Mode = CheckMode)" >> ../conf/app.routes
+$if(directory.empty)$
+DIR=../conf/app.routes
+PACKAGE="controllers.nonsipp"
 $else$
-echo "GET        /:srn/$urlPath$                        controllers.$className$Controller.onPageLoad(srn: Srn, index: $index$ = 1, mode: Mode = NormalMode)" >> ../conf/app.routes
-echo "GET        /:srn/$urlPath$/:index                 controllers.$className$Controller.onPageLoad(srn: Srn, index: $index$, mode: Mode = NormalMode)" >> ../conf/app.routes
-echo "POST       /:srn/$urlPath$                        controllers.$className$Controller.onSubmit(srn: Srn, index: $index$ = 1, mode: Mode = NormalMode)" >> ../conf/app.routes
-echo "POST       /:srn/$urlPath$/:index                 controllers.$className$Controller.onSubmit(srn: Srn, index: $index$, mode: Mode = NormalMode)" >> ../conf/app.routes
+DIR=../conf/$directory$.routes
+PACKAGE="controllers.nonsipp.$directory$"
+$endif$
 
-echo "GET        /:srn/change-$urlPath$                 controllers.$className$Controller.onPageLoad(srn: Srn, index: $index$ = 1, mode: Mode = CheckMode)" >> ../conf/app.routes
-echo "GET        /:srn/change-$urlPath$/:index          controllers.$className$Controller.onPageLoad(srn: Srn, index: $index$, mode: Mode = CheckMode)" >> ../conf/app.routes
-echo "POST       /:srn/change-$urlPath$                 controllers.$className$Controller.onSubmit(srn: Srn, index: $index$ = 1, mode: Mode = CheckMode)" >> ../conf/app.routes
-echo "POST       /:srn/change-$urlPath$/:index          controllers.$className$Controller.onSubmit(srn: Srn, index: $index$, mode: Mode = CheckMode)" >> ../conf/app.routes
+echo -en "\n\n" >> \$DIR
+$if(index.empty)$
+echo "GET        /:srn/$urlPath$                        \${PACKAGE}.$className$Controller.onPageLoad(srn: Srn, mode: Mode = NormalMode)" >> \$DIR
+echo "POST       /:srn/$urlPath$                        \${PACKAGE}.$className$Controller.onSubmit(srn: Srn, mode: Mode = NormalMode)" >> \$DIR
+
+echo "GET        /:srn/change-$urlPath$                 \${PACKAGE}.$className$Controller.onPageLoad(srn: Srn, mode: Mode = CheckMode)" >> \$DIR
+echo "POST       /:srn/change-$urlPath$                 \${PACKAGE}.$className$Controller.onSubmit(srn: Srn, mode: Mode = CheckMode)" >> \$DIR
+$else$
+echo "GET        /:srn/$urlPath$/:index                 \${PACKAGE}.$className$Controller.onPageLoad(srn: Srn, index: $index$, mode: Mode = NormalMode)" >> \$DIR
+echo "POST       /:srn/$urlPath$/:index                 \${PACKAGE}.$className$Controller.onSubmit(srn: Srn, index: $index$, mode: Mode = NormalMode)" >> \$DIR
+
+echo "GET        /:srn/change-$urlPath$/:index          \${PACKAGE}.$className$Controller.onPageLoad(srn: Srn, index: $index$, mode: Mode = CheckMode)" >> \$DIR
+echo "POST       /:srn/change-$urlPath$/:index          \${PACKAGE}.$className$Controller.onSubmit(srn: Srn, index: $index$, mode: Mode = CheckMode)" >> \$DIR
 $endif$
 
 echo "Adding messages to conf.messages"
@@ -38,8 +42,17 @@ echo "$className;format="decap"$.error.required = $errorRequired$"  >> ../conf/m
 echo "$className;format="decap"$.error.invalid = $errorInvalid$"  >> ../conf/messages.en
 echo "$className;format="decap"$.error.tooLarge = $errorTooLarge$"  >> ../conf/messages.en
 
-echo "Add to navigator"
+DIR="$directory$"
 
-echo "case $className;format="cap"$Page(srn) => controllers.routes.UnauthorisedController.onPageLoad()"
+if [ -z \$DIR ]; then
+  echo "DIR empty, skipping"
+else
+  echo "Add to navigator"
+  $if(index.empty)$
+  ../.g8/scripts/updateNavigator $className;format="cap"$Page $directory$
+  $else$
+  ../.g8/scripts/updateNavigator $className;format="cap"$Page $directory$ "index=true"
+  $endif$
+fi
 
 echo "Migration $className;format="snake"$ completed"

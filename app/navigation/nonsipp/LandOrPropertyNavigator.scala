@@ -16,10 +16,12 @@
 
 package navigation.nonsipp
 
-import eu.timepit.refined.refineMV
-import models.{IdentityType, NormalMode, SchemeHoldLandProperty, UserAnswers}
+import config.Refined.Max5000
+import eu.timepit.refined.{refineMV, refineV}
+import models.{CheckOrChange, IdentitySubject, IdentityType, NormalMode, SchemeHoldLandProperty, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
+import pages.nonsipp.common.{CompanyRecipientCrnPage, IdentityTypePage, OtherRecipientDetailsPage, PartnershipRecipientUtrPage}
 import pages.nonsipp.landorproperty._
 import play.api.mvc.Call
 
@@ -62,20 +64,39 @@ object LandOrPropertyNavigator extends JourneyNavigator {
           controllers.nonsipp.landorproperty.routes.LandPropertyIndependentValuationController
             .onPageLoad(srn, index, NormalMode)
         case _ => //27h1
-          controllers.nonsipp.landorproperty.routes.PropertyAcquiredFromController
-            .onPageLoad(srn, index, NormalMode)
+          controllers.nonsipp.common.routes.IdentityTypeController
+            .onPageLoad(srn, index, NormalMode, IdentitySubject.LandOrPropertySeller)
       }
 
-    //27h1
-    case PropertyAcquiredFromPage(srn, index) =>
-      //TODO change to 27h6 and all the different pages
-      userAnswers.get(PropertyAcquiredFromPage(srn, index)) match {
+    case page @ IdentityTypePage(srn, index, IdentitySubject.LandOrPropertySeller) =>
+      userAnswers.get(page) match {
         case Some(IdentityType.Individual) =>
           controllers.nonsipp.landorproperty.routes.LandPropertyIndividualSellersNameController
             .onPageLoad(srn, index, NormalMode)
-        case Some(_) =>
-          controllers.routes.UnauthorisedController.onPageLoad()
+
+        case Some(IdentityType.UKCompany) =>
+          controllers.nonsipp.landorproperty.routes.CompanySellerNameController
+            .onPageLoad(srn, index, NormalMode) //27h4
+
+        case Some(IdentityType.UKPartnership) =>
+          controllers.nonsipp.landorproperty.routes.PartnershipSellerNameController
+            .onPageLoad(srn, index, NormalMode) //27h6
+
+        case Some(IdentityType.Other) =>
+          controllers.nonsipp.common.routes.OtherRecipientDetailsController
+            .onPageLoad(srn, index, NormalMode, IdentitySubject.LandOrPropertySeller)
+
+        case _ => controllers.routes.UnauthorisedController.onPageLoad() //TODO 27h8
+
       }
+
+    case CompanySellerNamePage(srn, index) =>
+      controllers.nonsipp.common.routes.CompanyRecipientCrnController
+        .onPageLoad(srn, index, NormalMode, IdentitySubject.LandOrPropertySeller)
+
+    case CompanyRecipientCrnPage(srn, index, IdentitySubject.LandOrPropertySeller) =>
+      controllers.nonsipp.landorproperty.routes.LandOrPropertySellerConnectedPartyController
+        .onPageLoad(srn, index, NormalMode)
 
     case LandOrPropertyTotalCostPage(srn, index) =>
       controllers.nonsipp.landorproperty.routes.IsLandOrPropertyResidentialController.onPageLoad(srn, index, NormalMode)
@@ -87,22 +108,34 @@ object LandOrPropertyNavigator extends JourneyNavigator {
       if (userAnswers.get(page).contains(true)) {
         controllers.nonsipp.landorproperty.routes.IsLandPropertyLeasedController.onPageLoad(srn, index, NormalMode)
       } else {
-        controllers.routes.UnauthorisedController.onPageLoad()
+        controllers.nonsipp.landorproperty.routes.IsLandPropertyLeasedController.onPageLoad(srn, index, NormalMode)
       }
 
-    case page @ IsLandPropertyLeasedPage(srn, index) =>
+    case page @ IsLandPropertyLeasedPage(srn, index) => //27j2
       if (userAnswers.get(page).contains(true)) {
         controllers.nonsipp.landorproperty.routes.LandOrPropertyLeaseDetailsController
           .onPageLoad(srn, index, NormalMode)
       } else {
-        controllers.routes.UnauthorisedController.onPageLoad()
+        //27j5
+        controllers.nonsipp.landorproperty.routes.LandOrPropertyTotalIncomeController
+          .onPageLoad(srn, index, NormalMode)
       }
 
     case LandOrPropertyLeaseDetailsPage(srn, index) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+      controllers.nonsipp.landorproperty.routes.IsLesseeConnectedPartyController.onPageLoad(srn, index, NormalMode)
 
-    case CompanySellerNamePage(srn, index) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+    case IsLesseeConnectedPartyPage(srn, index) => //27j4
+      //27j5
+      controllers.nonsipp.landorproperty.routes.LandOrPropertyTotalIncomeController
+        .onPageLoad(srn, index, NormalMode)
+
+    case PartnershipSellerNamePage(srn, index) => //27h6
+      controllers.nonsipp.common.routes.PartnershipRecipientUtrController
+        .onPageLoad(srn, index, NormalMode, IdentitySubject.LandOrPropertySeller) //27h7
+
+    case PartnershipRecipientUtrPage(srn, index, IdentitySubject.LandOrPropertySeller) => //27h7
+      controllers.nonsipp.landorproperty.routes.LandOrPropertySellerConnectedPartyController //27i1
+        .onPageLoad(srn, index, NormalMode)
 
     case LandPropertyIndividualSellersNamePage(srn, index) =>
       controllers.nonsipp.landorproperty.routes.IndividualSellerNiController.onPageLoad(srn, index, NormalMode)
@@ -111,10 +144,39 @@ object LandOrPropertyNavigator extends JourneyNavigator {
       controllers.nonsipp.landorproperty.routes.LandOrPropertySellerConnectedPartyController
         .onPageLoad(srn, index, NormalMode)
 
-    case LandOrPropertySellerConnectedPartyPage(srn, index) =>
+    case LandOrPropertySellerConnectedPartyPage(srn, index) => //27i1
       controllers.nonsipp.landorproperty.routes.LandPropertyIndependentValuationController
         .onPageLoad(srn, index, NormalMode)
 
+    case OtherRecipientDetailsPage(srn, index, IdentitySubject.LandOrPropertySeller) =>
+      controllers.nonsipp.landorproperty.routes.LandOrPropertySellerConnectedPartyController
+        .onPageLoad(srn, index, NormalMode)
+
+    case LandOrPropertyTotalIncomePage(srn, index) => //27j5
+      controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController.onPageLoad(srn, index, CheckOrChange.Check)
+
+    case LandOrPropertyCYAPage(srn) =>
+      controllers.nonsipp.landorproperty.routes.LandOrPropertyListController.onPageLoad(srn, NormalMode)
+
+    case RemovePropertyPage(srn, index) =>
+      if (userAnswers.map(LandOrPropertyAddressLookupPages(srn)).isEmpty) {
+        controllers.nonsipp.landorproperty.routes.LandOrPropertyHeldController.onPageLoad(srn, NormalMode)
+      } else {
+        controllers.nonsipp.landorproperty.routes.LandOrPropertyListController.onPageLoad(srn, NormalMode)
+      }
+
+    case LandOrPropertyListPage(srn, addLandOrProperty) =>
+      if (addLandOrProperty) {
+        val answers = userAnswers.map(LandOrPropertyAddressLookupPages(srn))
+        val nextDataKey = if (answers.isEmpty) 1 else answers.maxBy(_._1)._1.toIntOption.orElse(Some(0)).get + 1
+        refineV[Max5000.Refined](nextDataKey + 1).fold(
+          err => controllers.routes.JourneyRecoveryController.onPageLoad(),
+          nextIndex =>
+            controllers.nonsipp.landorproperty.routes.LandPropertyInUKController.onPageLoad(srn, nextIndex, NormalMode)
+        )
+      } else {
+        controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
+      }
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty

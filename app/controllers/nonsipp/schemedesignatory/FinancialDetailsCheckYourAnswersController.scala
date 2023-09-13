@@ -19,6 +19,7 @@ package controllers.nonsipp.schemedesignatory
 import cats.data.NonEmptyList
 import cats.implicits.toShow
 import config.Refined.Max3
+import controllers.PSRController
 import controllers.actions._
 import controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController._
 import models.SchemeId.Srn
@@ -27,11 +28,8 @@ import models.{CheckMode, DateRange, Mode, Money, MoneyInPeriod, SchemeDetails}
 import navigation.Navigator
 import pages.nonsipp.schemedesignatory._
 import play.api.i18n._
-import play.api.libs.json.Reads
 import play.api.mvc._
-import queries.Gettable
 import services.SchemeDateService
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.DateTimeUtils.localDateShow
 import utils.ListUtils.ListOps
 import viewmodels.DisplayMessage._
@@ -49,7 +47,7 @@ class FinancialDetailsCheckYourAnswersController @Inject()(
   schemeDateService: SchemeDateService,
   val controllerComponents: MessagesControllerComponents,
   view: CheckYourAnswersView
-) extends FrontendBaseController
+) extends PSRController
     with I18nSupport {
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
@@ -92,12 +90,6 @@ class FinancialDetailsCheckYourAnswersController @Inject()(
           case Some(orgName) => Right(orgName)
           case None => Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
         }
-    }
-
-  private def requiredPage[A: Reads](page: Gettable[A])(implicit request: DataRequest[_]): Either[Result, A] =
-    request.userAnswers.get(page) match {
-      case Some(value) => Right(value)
-      case None => Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
     }
 }
 

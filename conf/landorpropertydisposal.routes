@@ -1,0 +1,12 @@
+GET        /:srn/land-property-disposal                 controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST       /:srn/land-property-disposal                 controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/change-land-property-disposal          controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST       /:srn/change-land-property-disposal          controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET         /:srn/what-you-will-need-land-property-disposal            controllers.nonsipp.landorpropertydisposal.WhatYouWillNeedLandPropertyDisposalController.onPageLoad(srn: Srn)
+GET         /:srn/submit-what-you-will-need-land-property-disposal      controllers.nonsipp.landorpropertydisposal.WhatYouWillNeedLandPropertyDisposalController.onSubmit(srn: Srn)
+
+GET        /:srn/any-part-land-property-still-held/:landOrPropertyIndex/:disposalIndex                 controllers.nonsipp.landorpropertydisposal.LandOrPropertyStillHeldController.onPageLoad(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode = NormalMode)
+POST       /:srn/any-part-land-property-still-held/:landOrPropertyIndex/:disposalIndex                 controllers.nonsipp.landorpropertydisposal.LandOrPropertyStillHeldController.onSubmit(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode = NormalMode)
+GET        /:srn/change-any-part-land-property-still-held/:landOrPropertyIndex/:disposalIndex          controllers.nonsipp.landorpropertydisposal.LandOrPropertyStillHeldController.onPageLoad(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode = CheckMode)
+POST       /:srn/change-any-part-land-property-still-held/:landOrPropertyIndex/:disposalIndex          controllers.nonsipp.landorpropertydisposal.LandOrPropertyStillHeldController.onSubmit(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode = CheckMode)

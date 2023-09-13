@@ -138,6 +138,15 @@ trait NavigatorBehaviours extends ScalaCheckPropertyChecks with EitherValues wit
     ): Behaviours.BehaviourTest =
       super.navigateTo(NormalMode)(page(_, index), nextPage(_, index, _), userAnswers)
 
+    def navigateToWithDoubleIndex[A, B](
+      index: Refined[Int, A],
+      secondIndex: Refined[Int, B],
+      page: (Srn, Refined[Int, A], Refined[Int, B]) => Page,
+      nextPage: (Srn, Refined[Int, A], Refined[Int, B], Mode) => Call,
+      userAnswers: Srn => UserAnswers = _ => defaultUserAnswers
+    ): Behaviours.BehaviourTest =
+      super.navigateTo(NormalMode)(page(_, index, secondIndex), nextPage(_, index, secondIndex, _), userAnswers)
+
     def navigateToWithData[A: Writes](
       page: Srn => QuestionPage[A],
       data: Gen[A],
@@ -164,6 +173,35 @@ trait NavigatorBehaviours extends ScalaCheckPropertyChecks with EitherValues wit
       userAnswers: Srn => UserAnswers = _ => defaultUserAnswers
     ): Behaviours.BehaviourTest =
       super.navigateToWithData(NormalMode)(page(_, index, subject), data, nextPage(_, index, _), userAnswers)
+
+    def navigateToWithDataIndexAndSubjects[A: Writes, B](
+      index: Refined[Int, B],
+      subject: IdentitySubject,
+      page: (Srn, Refined[Int, B]) => QuestionPage[A],
+      data: Gen[A],
+      nextPage: (Srn, Refined[Int, B], Mode, IdentitySubject) => Call,
+      userAnswers: Srn => UserAnswers = _ => defaultUserAnswers
+    ): Behaviours.BehaviourTest =
+      super.navigateToWithData(NormalMode)(page(_, index), data, nextPage(_, index, _, subject), userAnswers)
+
+    def navigateToWithDataIndexAndSubjectBoth[A: Writes, B](
+      index: Refined[Int, B],
+      subject: IdentitySubject,
+      page: (Srn, Refined[Int, B], IdentitySubject) => QuestionPage[A],
+      data: Gen[A],
+      nextPage: (Srn, Refined[Int, B], Mode, IdentitySubject) => Call,
+      userAnswers: Srn => UserAnswers = _ => defaultUserAnswers
+    ): Behaviours.BehaviourTest =
+      super.navigateToWithData(NormalMode)(page(_, index, subject), data, nextPage(_, index, _, subject), userAnswers)
+
+    def navigateToWithIndexAndSubject[A: Writes, B](
+      index: Refined[Int, B],
+      subject: IdentitySubject,
+      page: (Srn, Refined[Int, B], IdentitySubject) => QuestionPage[A],
+      nextPage: (Srn, Refined[Int, B], Mode) => Call,
+      userAnswers: Srn => UserAnswers = _ => defaultUserAnswers
+    ): Behaviours.BehaviourTest =
+      super.navigateTo(NormalMode)(page(_, index, subject), nextPage(_, index, _), userAnswers)
 
     def navigateFromListPage[A: Writes, Validator](
       listPage: Srn => Page,

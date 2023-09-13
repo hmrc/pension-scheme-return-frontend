@@ -1,0 +1,67 @@
+#!/bin/bash
+
+# uses sed to insert route to supplied navigator file and update navigator spec
+
+set -e
+
+[ -z "$1" ] && echo "missing first param PAGE" && exit 1
+[ -z "$2" ] && echo "missing first param DIR" && exit 1
+
+PAGE=$1
+DIR=$2
+INDEX=$3
+
+case $DIR in
+  landorproperty)
+    NAV_FILE="../app/navigation/nonsipp/LandOrPropertyNavigator.scala"
+    NAV_SPEC="../test/navigation/nonsipp/LandOrPropertyNavigatorSpec.scala"
+    ;;
+  landorpropertydisposal)
+    NAV_FILE="../app/navigation/nonsipp/LandOrPropertyDisposalNavigator.scala"
+    NAV_SPEC="../test/navigation/nonsipp/LandOrPropertyDisposalNavigatorSpec.scala"
+    ;;
+  *)
+    NAV_FILE=
+    NAV_SPEC=
+    ;;
+esac
+
+[ -z "$NAV_FILE" ] && echo "unknown directory $DIR" && exit 1
+
+tmpfile=$(mktemp)
+echo "$tmpfile"
+
+echo "updating navigator"
+
+if [ -z "$INDEX" ]; then
+  sed "s/\( *override def normalRoutes.*\)/& \n\n case $PAGE(srn) => controllers.routes.UnauthorisedController.onPageLoad()/" "$NAV_FILE" > "$tmpfile"
+else
+  sed "s/\( *override def normalRoutes.*\)/& \n\n case $PAGE(srn, index) => controllers.routes.UnauthorisedController.onPageLoad()/" "$NAV_FILE" > "$tmpfile"
+fi
+cat "$tmpfile"
+cp "$tmpfile" "$NAV_FILE"
+rm "$tmpfile"
+
+tmpfile=$(mktemp)
+echo "$tmpfile"
+
+echo "updating navigator spec"
+
+if [ -z "$INDEX" ]; then
+  echo "TODO no index, skipping test"
+else
+sed "\$s/\(}\)/\n  \"$PAGE\" - {\n"\
+"    act.like(\n"\
+"      normalmode\n"\
+"      .navigateToWithIndex(\n"\
+"        index,\n"\
+"        $PAGE,\n"\
+"        (srn, index: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()\n"\
+"      )\n"\
+"      .withName(\"go from $PAGE to ??? page\")\n"\
+"    )\n"\
+"  }\n\1/" "$NAV_SPEC" > "$tmpfile"
+cat "$tmpfile"
+cp "$tmpfile" "$NAV_SPEC"
+rm "$tmpfile"
+fi

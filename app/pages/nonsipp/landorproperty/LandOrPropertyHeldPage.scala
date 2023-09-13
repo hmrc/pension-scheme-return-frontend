@@ -21,7 +21,6 @@ import pages.QuestionPage
 import play.api.libs.json.JsPath
 
 case class LandOrPropertyHeldPage(srn: Srn) extends QuestionPage[Boolean] {
-  override def path: JsPath = JsPath \ toString
-
+  override def path: JsPath = Paths.landOrProperty \ toString
   override def toString: String = "landOrPropertyHeld"
 }
