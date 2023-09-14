@@ -30,7 +30,6 @@ case class DateFormErrors(
 )
 
 object DateFormErrors {
-
   def failIfFutureDate(errorMsg: String): LocalDate => Option[String] =
     failIfDateAfter(LocalDate.now(), errorMsg)
 
