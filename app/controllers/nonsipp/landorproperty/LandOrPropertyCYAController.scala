@@ -600,7 +600,7 @@ object LandOrPropertyCYAController {
           List(
             CheckYourAnswersRowViewModel(
               Message("landOrPropertyCYA.section2.totalCost", address),
-              landOrPropertyTotalCost.displayAs
+              s"£${landOrPropertyTotalCost.displayAs}"
             ).withAction(
               SummaryAction(
                 "site.change",
