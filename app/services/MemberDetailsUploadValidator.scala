@@ -27,22 +27,25 @@ import cats.implicits._
 import config.Constants
 import controllers.nonsipp.memberdetails.{MemberDetailsController, MemberDetailsNinoController, NoNINOController}
 import forms.{NameDOBFormProvider, TextFormProvider}
+import models.SchemeId.Srn
 import models.ValidationErrorType.ValidationErrorType
 import models._
+import models.requests.DataRequest
 import play.api.data.{Form, FormError}
 import play.api.i18n.Messages
+import play.api.mvc.AnyContent
 import uk.gov.hmrc.domain.Nino
 
+import java.time.LocalDate
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.math.Integral.Implicits.infixIntegralOps
 
 class MemberDetailsUploadValidator @Inject()(
   nameDOBFormProvider: NameDOBFormProvider,
-  textFormProvider: TextFormProvider
+  textFormProvider: TextFormProvider,
+  schemeDateService: SchemeDateService
 )(implicit ec: ExecutionContext) {
-
-  private val memberDetailsForm = MemberDetailsController.form(nameDOBFormProvider)
 
   private def ninoForm(memberFullName: String, previousNinos: List[Nino]): Form[Nino] =
     MemberDetailsNinoController.form(textFormProvider, memberFullName, previousNinos)
@@ -59,8 +62,17 @@ class MemberDetailsUploadValidator @Inject()(
 
   private val aToZ: List[Char] = ('a' to 'z').toList.map(_.toUpper)
 
+  def getTaxDates(srn: Srn)(implicit request: DataRequest[AnyContent]): Option[LocalDate] =
+    schemeDateService.taxYearOrAccountingPeriods(srn) match {
+      case Some(taxPeriod) =>
+        taxPeriod.fold(l => Some(l.to), r => Some(r.map(x => x._1).toList.sortBy(_.to).reverse.head.to))
+      case _ => None
+    }
+
   def validateCSV(
-    source: Source[ByteString, _]
+    source: Source[ByteString, _],
+    srn: Srn,
+    request: DataRequest[AnyContent]
   )(implicit mat: Materializer, messages: Messages): Future[Upload] = {
     val csvFrames = source.via(csvFrame)
     (for {
@@ -75,7 +87,7 @@ class MemberDetailsUploadValidator @Inject()(
               state.next() -> UploadMaxRowsError
             } else {
               val parts = bs.map(_.utf8String)
-              validateMemberDetails(header, parts, state.previousNinos, state.row) match {
+              validateMemberDetails(header, parts, state.previousNinos, state.row, srn, request) match {
                 case None => state.next() -> UploadFormatError
                 case Some(Valid(memberDetails)) =>
                   state.next(memberDetails.ninoOrNoNinoReason.toOption) -> UploadSuccess(List(memberDetails))
@@ -114,7 +126,9 @@ class MemberDetailsUploadValidator @Inject()(
     headerKeys: List[CsvHeaderKey],
     csvData: List[String],
     previousNinos: List[Nino],
-    row: Int
+    row: Int,
+    srn: Srn,
+    request: DataRequest[AnyContent]
   )(implicit messages: Messages): Option[ValidatedNel[ValidationError, UploadMemberDetails]] =
     for {
       firstName <- getCSVValue(UploadKeys.firstName, headerKeys, csvData)
@@ -122,7 +136,7 @@ class MemberDetailsUploadValidator @Inject()(
       dob <- getCSVValue(UploadKeys.dateOfBirth, headerKeys, csvData)
       maybeNino <- getOptionalCSVValue(UploadKeys.nino, headerKeys, csvData)
       maybeNoNinoReason <- getOptionalCSVValue(UploadKeys.reasonForNoNino, headerKeys, csvData)
-      validatedNameDOB <- validateNameDOB(firstName, lastName, dob, row)
+      validatedNameDOB <- validateNameDOB(firstName, lastName, dob, row, srn, request)
       memberFullName = s"${firstName.value} ${lastName.value}"
       maybeValidatedNino = maybeNino.value.flatMap { nino =>
         validateNino(maybeNino.as(nino), memberFullName, previousNinos, row)
@@ -144,7 +158,9 @@ class MemberDetailsUploadValidator @Inject()(
     firstName: CsvValue[String],
     lastName: CsvValue[String],
     dob: CsvValue[String],
-    row: Int
+    row: Int,
+    srn: Srn,
+    request: DataRequest[AnyContent]
   )(implicit messages: Messages): Option[ValidatedNel[ValidationError, NameDOB]] = {
     val dobDayKey = s"${nameDOBFormProvider.dateOfBirth}.day"
     val dobMonthKey = s"${nameDOBFormProvider.dateOfBirth}.month"
@@ -152,7 +168,8 @@ class MemberDetailsUploadValidator @Inject()(
 
     dob.value.split("/").toList match {
       case day :: month :: year :: Nil =>
-        val boundForm = memberDetailsForm
+        val memberDetailsForm = MemberDetailsController
+          .form(nameDOBFormProvider, getTaxDates(srn)(request))
           .bind(
             Map(
               nameDOBFormProvider.firstName -> firstName.value,
@@ -182,7 +199,7 @@ class MemberDetailsUploadValidator @Inject()(
           case _ => None
         }
 
-        formToResult(boundForm, row, errorTypeMapping, cellMapping)
+        formToResult(memberDetailsForm, row, errorTypeMapping, cellMapping)
       case _ =>
         Some(
           ValidationError

@@ -22,19 +22,21 @@ import controllers.nonsipp.memberdetails.MemberDetailsController._
 import forms.NameDOBFormProvider
 import forms.mappings.errors.DateFormErrors
 import models.SchemeId.Srn
+import models.requests.DataRequest
 import models.{Mode, NameDOB}
 import navigation.Navigator
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
+import services.{SaveService, SchemeDateService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.FormUtils._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, NameDOBViewModel}
 import views.html.NameDOBView
 
+import java.time.LocalDate
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -45,20 +47,22 @@ class MemberDetailsController @Inject()(
   saveService: SaveService,
   formProvider: NameDOBFormProvider,
   view: NameDOBView,
+  schemeDateService: SchemeDateService,
   val controllerComponents: MessagesControllerComponents
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
 
-  private val form = MemberDetailsController.form(formProvider)
-
   def onPageLoad(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
+      val form = MemberDetailsController.form(formProvider, getTaxDates(srn)(request))
+
       Ok(view(form.fromUserAnswers(MemberDetailsPage(srn, index)), viewModel(srn, index, mode)))
   }
 
   def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
+      val form = MemberDetailsController.form(formProvider, getTaxDates(srn)(request))
       form
         .bindFromRequest()
         .fold(
@@ -74,10 +78,19 @@ class MemberDetailsController @Inject()(
           }
         )
   }
+
+  def getTaxDates(srn: Srn)(implicit request: DataRequest[AnyContent]): Option[LocalDate] =
+    schemeDateService.taxYearOrAccountingPeriods(srn) match {
+      case Some(taxPeriod) =>
+        taxPeriod.fold(l => Some(l.to), r => Some(r.map(x => x._1).toList.sortBy(_.to).reverse.head.to))
+      case _ => None
+    }
+
 }
 
 object MemberDetailsController {
-  def form(formProvider: NameDOBFormProvider): Form[NameDOB] = formProvider(
+
+  def form(formProvider: NameDOBFormProvider, validDateThreshold: Option[LocalDate]): Form[NameDOB] = formProvider(
     "memberDetails.firstName.error.required",
     "memberDetails.firstName.error.invalid",
     "memberDetails.firstName.error.length",
@@ -92,7 +105,10 @@ object MemberDetailsController {
       "memberDetails.dateOfBirth.error.required.two",
       "memberDetails.dateOfBirth.error.invalid.date",
       "memberDetails.dateOfBirth.error.invalid.characters",
-      List(DateFormErrors.failIfFutureDate("memberDetails.dateOfBirth.error.future"))
+      List(
+        DateFormErrors
+          .failIfDateAfter(validDateThreshold.getOrElse(LocalDate.now()), "memberDetails.dateOfBirth.error.future")
+      )
     )
   )
 

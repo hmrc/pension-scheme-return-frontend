@@ -80,7 +80,7 @@ class CheckMemberDetailsFileController @Inject()(
             case Some(file) =>
               for {
                 source <- uploadService.stream(file.downloadUrl)
-                validated <- uploadValidator.validateCSV(source)
+                validated <- uploadValidator.validateCSV(source, srn, request)
                 _ <- uploadService.saveValidatedUpload(uploadKey, validated)
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(CheckMemberDetailsFilePage(srn), value))
                 _ <- saveService.save(updatedAnswers)
