@@ -17,15 +17,21 @@
 package controllers.nonsipp
 
 import controllers.ControllerBaseSpec
+import models.{NormalMode, SchemeMemberNumbers, UserAnswers}
 import org.mockito.ArgumentMatchers.any
+import pages.nonsipp.CheckReturnDatesPage
+import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, HowManyMembersPage}
 import play.api.inject
 import play.api.inject.guice.GuiceableModule
 import services.SchemeDateService
+import viewmodels.models.TaskListStatus
+import viewmodels.models.TaskListStatus.TaskListStatus
 import views.html.TaskListView
 
 class TaskListControllerSpec extends ControllerBaseSpec {
 
   val schemeDateRange = dateRangeGen.sample.value
+  val pensionSchemeId = pensionSchemeIdGen.sample.value
 
   private val mockSchemeDateService = mock[SchemeDateService]
 
@@ -39,14 +45,162 @@ class TaskListControllerSpec extends ControllerBaseSpec {
 
   "TaskListController" - {
 
-    lazy val viewModel = TaskListController.viewModel(srn, schemeName, schemeDateRange.from, schemeDateRange.to)
+    lazy val viewModel = TaskListController.viewModel(
+      srn,
+      schemeName,
+      schemeDateRange.from,
+      schemeDateRange.to,
+      defaultUserAnswers,
+      pensionSchemeId
+    )
     lazy val onPageLoad = routes.TaskListController.onPageLoad(srn)
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       val view = injected[TaskListView]
       view(viewModel)
-    })
+    }.withName("task list renders OK"))
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
+
+    "schemeDetailsSection" - {
+      "inProgress" - {
+
+        "stopped at check dates page" in {
+          testViewModel(
+            defaultUserAnswers,
+            0,
+            0,
+            false,
+            expectedStatus = TaskListStatus.InProgress,
+            expectedTitleKey = "nonsipp.tasklist.schemedetails.title",
+            expectedLinkContentKey = "nonsipp.tasklist.schemedetails.details.title",
+            expectedLinkUrl = controllers.nonsipp.routes.CheckReturnDatesController.onPageLoad(srn, NormalMode).url
+          )
+        }
+
+        "stopped after dates page" in {
+          val userAnswersPopulated =
+            defaultUserAnswers
+              .unsafeSet(CheckReturnDatesPage(srn), false)
+
+          testViewModel(
+            userAnswersPopulated,
+            0,
+            0,
+            false,
+            expectedStatus = TaskListStatus.InProgress,
+            expectedTitleKey = "nonsipp.tasklist.schemedetails.title",
+            expectedLinkContentKey = "nonsipp.tasklist.schemedetails.details.title",
+            expectedLinkUrl = controllers.nonsipp.routes.CheckReturnDatesController.onPageLoad(srn, NormalMode).url
+          )
+        }
+
+        "stopped at active bank account page" in {
+          val userAnswersPopulated =
+            defaultUserAnswers
+              .unsafeSet(CheckReturnDatesPage(srn), true)
+
+          testViewModel(
+            userAnswersPopulated,
+            0,
+            0,
+            false,
+            expectedStatus = TaskListStatus.InProgress,
+            expectedTitleKey = "nonsipp.tasklist.schemedetails.title",
+            expectedLinkContentKey = "nonsipp.tasklist.schemedetails.details.title",
+            expectedLinkUrl =
+              controllers.nonsipp.schemedesignatory.routes.ActiveBankAccountController.onPageLoad(srn, NormalMode).url
+          )
+
+        }
+        "stopped at reason no bank account page" in {
+          val userAnswersPopulated =
+            defaultUserAnswers
+              .unsafeSet(CheckReturnDatesPage(srn), true)
+              .unsafeSet(ActiveBankAccountPage(srn), false)
+
+          testViewModel(
+            userAnswersPopulated,
+            0,
+            0,
+            false,
+            expectedStatus = TaskListStatus.InProgress,
+            expectedTitleKey = "nonsipp.tasklist.schemedetails.title",
+            expectedLinkContentKey = "nonsipp.tasklist.schemedetails.details.title",
+            expectedLinkUrl =
+              controllers.nonsipp.schemedesignatory.routes.WhyNoBankAccountController.onPageLoad(srn, NormalMode).url
+          )
+        }
+
+        "stopped at how many members page" in {
+          val userAnswersPopulated =
+            defaultUserAnswers
+              .unsafeSet(CheckReturnDatesPage(srn), true)
+              .unsafeSet(ActiveBankAccountPage(srn), true)
+
+          testViewModel(
+            userAnswersPopulated,
+            0,
+            0,
+            false,
+            expectedStatus = TaskListStatus.InProgress,
+            expectedTitleKey = "nonsipp.tasklist.schemedetails.title",
+            expectedLinkContentKey = "nonsipp.tasklist.schemedetails.details.title",
+            expectedLinkUrl =
+              controllers.nonsipp.schemedesignatory.routes.HowManyMembersController.onPageLoad(srn, NormalMode).url
+          )
+        }
+      }
+
+      "completed" in {
+        val userAnswersWithHowManyMembers =
+          defaultUserAnswers.unsafeSet(HowManyMembersPage(srn, pensionSchemeId), SchemeMemberNumbers(1, 1, 1))
+
+        testViewModel(
+          userAnswersWithHowManyMembers,
+          0,
+          0,
+          false,
+          expectedStatus = TaskListStatus.Completed,
+          expectedTitleKey = "nonsipp.tasklist.schemedetails.title",
+          expectedLinkContentKey = "nonsipp.tasklist.schemedetails.details.title",
+          expectedLinkUrl =
+            controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, NormalMode).url
+        )
+      }
+    }
+  }
+
+  private def testViewModel(
+    userAnswersPopulated: UserAnswers,
+    sectionIndex: Int,
+    itemIndex: Int,
+    isAdd: Boolean,
+    expectedStatus: TaskListStatus,
+    expectedTitleKey: String,
+    expectedLinkContentKey: String,
+    expectedLinkUrl: String
+  ) = {
+    val customViewModel = TaskListController.viewModel(
+      srn,
+      schemeName,
+      schemeDateRange.from,
+      schemeDateRange.to,
+      userAnswersPopulated,
+      pensionSchemeId
+    )
+    val sections = customViewModel.page.sections.toList
+    val addOrChange = if (isAdd) "site.change" else "site.change"
+    sections(sectionIndex).title.key mustBe expectedTitleKey
+    sections(sectionIndex).items.fold(
+      _ => "",
+      list => {
+        val item = list.toList(itemIndex)
+        item.link.content.key mustBe expectedLinkContentKey
+        item.link.content.args(0).key mustBe addOrChange
+        item.link.url mustBe expectedLinkUrl
+        item.status mustBe expectedStatus
+      }
+    )
   }
 }
