@@ -28,7 +28,7 @@ case class WhenWasPropertySoldPage(srn: Srn, landOrPropertyIndex: Max5000, dispo
     extends QuestionPage[LocalDate] {
 
   override def path: JsPath =
-    Paths.disposalPropertyTransaction \ toString \ "dateOfSale"
+    Paths.disposalPropertyTransaction \ toString \ landOrPropertyIndex.arrayIndex.toString \ disposalIndex.arrayIndex.toString
 
-  override def toString: String = "propertyDateOfSale"
+  override def toString: String = "dateOfSale"
 }
