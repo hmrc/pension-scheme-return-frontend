@@ -5,7 +5,6 @@ site.back = Back
 site.back.aria-label = Return to previous page
 site.remove = Remove
 site.change = Change
-site.add = Add
 site.no = No
 site.yes = Yes
 site.next = Next
