@@ -24,7 +24,14 @@ import models.requests.DataRequest
 import models.{DateRange, NormalMode, PensionSchemeId, UserAnswers}
 import pages.nonsipp.CheckReturnDatesPage
 import pages.nonsipp.accountingperiod.AccountingPeriods
-import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, HowManyMembersPage, WhyNoBankAccountPage}
+import pages.nonsipp.schemedesignatory.{
+  ActiveBankAccountPage,
+  FeesCommissionsWagesSalariesPage,
+  HowManyMembersPage,
+  HowMuchCashPage,
+  ValueOfAssetsPage,
+  WhyNoBankAccountPage
+}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.SchemeDateService
@@ -87,13 +94,7 @@ object TaskListController {
     TaskListSectionViewModel(
       s"$prefix.title",
       getBasicSchemeDetailsTaskListItem(srn, schemeName, prefix, userAnswers, pensionSchemeId),
-      TaskListItemViewModel(
-        LinkMessage(
-          Message(messageKey(prefix, "finances.title", NotStarted), schemeName),
-          controllers.nonsipp.schemedesignatory.routes.HowMuchCashController.onPageLoad(srn, NormalMode).url
-        ),
-        NotStarted
-      )
+      getFinancialDetailsTaskListItem(srn, schemeName, prefix, userAnswers)
     )
   }
 
@@ -111,15 +112,15 @@ object TaskListController {
 
     TaskListItemViewModel(
       LinkMessage(
-        Message(s"$prefix.details.title", Message("site.change"), schemeName),
+        Message(s"$prefix.details.title", schemeName),
         taskListStatus match {
           case Completed =>
             controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, NormalMode).url
           case _ =>
             val checkReturnDates = userAnswers.get(CheckReturnDatesPage(srn))
-            val accountingPeriods = userAnswers.get(AccountingPeriods(srn))
-            val activeBankAccount = userAnswers.get(ActiveBankAccountPage(srn))
-            val whyNoBankAccountPage = userAnswers.get(WhyNoBankAccountPage(srn))
+            lazy val accountingPeriods = userAnswers.get(AccountingPeriods(srn))
+            lazy val activeBankAccount = userAnswers.get(ActiveBankAccountPage(srn))
+            lazy val whyNoBankAccountPage = userAnswers.get(WhyNoBankAccountPage(srn))
 
             if (checkReturnDates.isEmpty) {
               controllers.nonsipp.routes.CheckReturnDatesController.onPageLoad(srn, NormalMode).url
@@ -131,6 +132,45 @@ object TaskListController {
               controllers.nonsipp.schemedesignatory.routes.WhyNoBankAccountController.onPageLoad(srn, NormalMode).url
             } else {
               controllers.nonsipp.schemedesignatory.routes.HowManyMembersController.onPageLoad(srn, NormalMode).url
+            }
+        }
+      ),
+      taskListStatus
+    )
+  }
+
+  private def getFinancialDetailsTaskListItem(
+    srn: Srn,
+    schemeName: String,
+    prefix: String,
+    userAnswers: UserAnswers
+  ) = {
+    val totalSalaries = userAnswers.get(FeesCommissionsWagesSalariesPage(srn, NormalMode))
+    val howMuchCash = userAnswers.get(HowMuchCashPage(srn, NormalMode))
+    val taskListStatus = (howMuchCash, totalSalaries) match {
+      case (Some(_), Some(_)) => Completed
+      case (None, _) => NotStarted
+      case (Some(_), None) => InProgress
+    }
+
+    TaskListItemViewModel(
+      LinkMessage(
+        Message(messageKey(prefix, "finances.title", taskListStatus), schemeName),
+        taskListStatus match {
+          case NotStarted =>
+            controllers.nonsipp.schemedesignatory.routes.HowMuchCashController.onPageLoad(srn, NormalMode).url
+          case Completed =>
+            controllers.nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController
+              .onPageLoad(srn, NormalMode)
+              .url
+          case _ =>
+            val valueOfAssets = userAnswers.get(ValueOfAssetsPage(srn, NormalMode))
+            if (valueOfAssets.isEmpty) {
+              controllers.nonsipp.schemedesignatory.routes.ValueOfAssetsController.onPageLoad(srn, NormalMode).url
+            } else {
+              controllers.nonsipp.schemedesignatory.routes.FeesCommissionsWagesSalariesController
+                .onPageLoad(srn, NormalMode)
+                .url
             }
         }
       ),
