@@ -1198,3 +1198,4 @@ whenWasPropertySold.dateOfSale.error.required.year = Date the scheme sold this l
 whenWasPropertySold.dateOfSale.error.invalid.date = Date the scheme sold this land or property must be a real date
 whenWasPropertySold.dateOfSale.error.invalid.characters = Date the scheme sold this land or property must only include numbers 0 to 9
 whenWasPropertySold.dateOfSale.error.future = Date the scheme sold this land or property must be the same as or before {0}
+whenWasPropertySold.dateOfSale.error.after = Date the scheme sold this land or property must be the same as or after {0}

@@ -35,4 +35,7 @@ object DateFormErrors {
 
   def failIfDateAfter(dateAfter: LocalDate, errorMsg: String): LocalDate => Option[String] =
     date => Option.when(date.isAfter(dateAfter))(errorMsg)
+
+  def failIfDateBefore(dateBefore: LocalDate, errorMsg: String): LocalDate => Option[String] =
+    date => Option.when(date.isBefore(dateBefore))(errorMsg)
 }

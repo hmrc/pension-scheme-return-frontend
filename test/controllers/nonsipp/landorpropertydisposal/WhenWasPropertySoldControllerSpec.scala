@@ -51,6 +51,7 @@ class WhenWasPropertySoldControllerSpec extends ControllerBaseSpec {
 
     val taxYear = Some(Left(dateRange))
     val date = LocalDate.of(2020, 12, 10)
+    val beforeDate = LocalDate.of(2021, 9, 18)
 
     act.like(
       journeyRecoveryPage(onPageLoad, Some(emptyUserAnswers))
@@ -61,7 +62,7 @@ class WhenWasPropertySoldControllerSpec extends ControllerBaseSpec {
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       injected[DatePageView]
         .apply(
-          form(injected[DatePageFormProvider])(date, createMessages(app)),
+          form(injected[DatePageFormProvider])(date, beforeDate, createMessages(app)),
           viewModel(srn, index, disposalIndex, NormalMode)
         )
     }.before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear)))
@@ -71,7 +72,7 @@ class WhenWasPropertySoldControllerSpec extends ControllerBaseSpec {
         implicit app => implicit request =>
           injected[DatePageView]
             .apply(
-              form(injected[DatePageFormProvider])(date, createMessages(app))
+              form(injected[DatePageFormProvider])(date, beforeDate, createMessages(app))
                 .fill(date),
               viewModel(srn, index, disposalIndex, NormalMode)
             )

@@ -17,13 +17,14 @@
 package pages.nonsipp
 
 import pages.nonsipp.landorproperty.Paths.landOrProperty
-import play.api.libs.json.{JsPath, __}
+import play.api.libs.json.{__, JsPath}
 
 package object landorpropertydisposal {
   object Paths {
     val assets: JsPath = __ \ "assets"
     val landOrProperty: JsPath = assets \ "landOrProperty"
     val landOrPropertyTransactions: JsPath = landOrProperty \ "landOrPropertyTransactions"
-    val disposalPropertyTransaction: JsPath = landOrPropertyTransactions \ "heldPropertyTransaction" \ "disposedPropertyTransaction"
+    val disposalPropertyTransaction
+      : JsPath = landOrPropertyTransactions \ "heldPropertyTransaction" \ "disposedPropertyTransaction"
   }
 }

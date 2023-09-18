@@ -56,15 +56,18 @@ class WhenWasPropertySoldController @Inject()(
     with I18nSupport {
 
   private val form =
-    (date: LocalDate, request: DataRequest[AnyContent]) =>
-      WhenWasPropertySoldController.form(formProvider)(date, request.messages(messagesApi))
+    (date: LocalDate, beforeDate: LocalDate, request: DataRequest[AnyContent]) =>
+      WhenWasPropertySoldController.form(formProvider)(date, beforeDate, request.messages(messagesApi))
 
   def onPageLoad(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
         val preparedForm = {
           request.userAnswers
-            .fillForm(WhenWasPropertySoldPage(srn, landOrPropertyIndex, disposalIndex), form(date.to, request))
+            .fillForm(
+              WhenWasPropertySoldPage(srn, landOrPropertyIndex, disposalIndex),
+              form(date.to, date.from, request)
+            )
         }
         Ok(view(preparedForm, viewModel(srn, landOrPropertyIndex, disposalIndex, mode)))
       }
@@ -73,7 +76,7 @@ class WhenWasPropertySoldController @Inject()(
   def onSubmit(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
-        form(date.to, request)
+        form(date.to, date.from, request)
           .bindFromRequest()
           .fold(
             formWithErrors =>
@@ -102,7 +105,9 @@ class WhenWasPropertySoldController @Inject()(
 }
 
 object WhenWasPropertySoldController {
-  def form(formProvider: DatePageFormProvider)(date: LocalDate, messages: Messages): Form[LocalDate] = formProvider(
+  def form(
+    formProvider: DatePageFormProvider
+  )(date: LocalDate, beforeDate: LocalDate, messages: Messages): Form[LocalDate] = formProvider(
     DateFormErrors(
       required = "whenWasPropertySold.dateOfSale.error.required.all",
       requiredDay = "whenWasPropertySold.dateOfSale.error.required.day",
@@ -113,7 +118,9 @@ object WhenWasPropertySoldController {
       invalidCharacters = "whenWasPropertySold.dateOfSale.error.invalid.characters",
       validators = List(
         DateFormErrors
-          .failIfDateAfter(date, messages("whenWasPropertySold.dateOfSale.error.future", date.show))
+          .failIfDateAfter(date, messages("whenWasPropertySold.dateOfSale.error.future", date.show)),
+        DateFormErrors
+          .failIfDateBefore(beforeDate, messages("whenWasPropertySold.dateOfSale.error.after", beforeDate.show))
       )
     )
   )
