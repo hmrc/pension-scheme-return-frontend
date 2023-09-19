@@ -91,7 +91,7 @@ object LandOrPropertyNavigator extends JourneyNavigator {
           controllers.nonsipp.common.routes.OtherRecipientDetailsController
             .onPageLoad(srn, index, NormalMode, IdentitySubject.LandOrPropertySeller)
 
-        case _ => controllers.routes.UnauthorisedController.onPageLoad() //TODO 27h8
+        case _ => controllers.routes.UnauthorisedController.onPageLoad()
 
       }
 
@@ -149,9 +149,14 @@ object LandOrPropertyNavigator extends JourneyNavigator {
       controllers.nonsipp.landorproperty.routes.LandOrPropertySellerConnectedPartyController
         .onPageLoad(srn, index, NormalMode)
 
-    case LandOrPropertySellerConnectedPartyPage(srn, index) => //27i1
-      controllers.nonsipp.landorproperty.routes.LandPropertyIndependentValuationController
-        .onPageLoad(srn, index, NormalMode)
+    case LandOrPropertySellerConnectedPartyPage(srn, index) =>
+      if (userAnswers.get(LandOrPropertyTotalIncomePage(srn, index)).isEmpty) {
+        controllers.nonsipp.landorproperty.routes.LandPropertyIndependentValuationController
+          .onPageLoad(srn, index, NormalMode)
+      } else {
+        controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
+          .onPageLoad(srn, index, CheckOrChange.Check)
+      }
 
     case OtherRecipientDetailsPage(srn, index, IdentitySubject.LandOrPropertySeller) =>
       controllers.nonsipp.landorproperty.routes.LandOrPropertySellerConnectedPartyController
@@ -261,7 +266,7 @@ object LandOrPropertyNavigator extends JourneyNavigator {
           controllers.nonsipp.common.routes.OtherRecipientDetailsController
             .onPageLoad(srn, index, NormalMode, IdentitySubject.LandOrPropertySeller)
 
-        case _ => controllers.routes.UnauthorisedController.onPageLoad() //TODO 27h8
+        case _ => controllers.routes.UnauthorisedController.onPageLoad()
 
       }
 

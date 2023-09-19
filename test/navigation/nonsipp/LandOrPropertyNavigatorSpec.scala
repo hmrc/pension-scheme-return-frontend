@@ -209,7 +209,23 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           controllers.nonsipp.landorproperty.routes.LandPropertyIndependentValuationController.onPageLoad
         )
         .withName(
-          "go from land or property is seller a connected party page to is land or property independent valuation page"
+          "go from land or property is seller a connected party page to is land or property independent valuation page when there is no total value"
+        )
+    )
+
+    act.like(
+      normalmode
+        .navigateToWithDataAndIndex(
+          index,
+          LandOrPropertySellerConnectedPartyPage,
+          Gen.const(true),
+          (srn, index: Max5000, _) =>
+            controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
+              .onPageLoad(srn, index, CheckOrChange.Check),
+          srn => defaultUserAnswers.unsafeSet(LandOrPropertyTotalIncomePage(srn, index), Money(1))
+        )
+        .withName(
+          "go from land or property is seller a connected party page to is land or property independent valuation page when there is total value data"
         )
     )
   }
