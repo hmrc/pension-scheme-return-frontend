@@ -20,3 +20,6 @@ GET        /:srn/company-buyer-name/:landOrPropertyIndex/:disposalIndex         
 POST       /:srn/company-buyer-name/:landOrPropertyIndex/:disposalIndex                          controllers.nonsipp.landorpropertydisposal.CompanyBuyerNameController.onSubmit(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode = NormalMode)
 GET        /:srn/change-company-buyer-name/:landOrPropertyIndex/:disposalIndex                   controllers.nonsipp.landorpropertydisposal.CompanyBuyerNameController.onPageLoad(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode = CheckMode)
 POST       /:srn/change-company-buyer-name/:landOrPropertyIndex/:disposalIndex                   controllers.nonsipp.landorpropertydisposal.CompanyBuyerNameController.onSubmit(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode = CheckMode)
+
+GET        /:srn/start-reporting-land-property-disposal/:page                 controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalListController.onPageLoad(srn: Srn, page: Int, mode: Mode = NormalMode)
+POST       /:srn/start-reporting-land-property-disposal/:page                 controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalListController.onSubmit(srn: Srn, page: Int, mode: Mode = NormalMode)

@@ -42,8 +42,8 @@ class LandOrPropertyMongoController @Inject()(
 
   private val max: Max5000 = refineMV(5000)
 
-  private val address = Address(
-    addressLine1 = "1 test street",
+  private def address(index: Int) = Address(
+    addressLine1 = s"${index.toString} test street",
     addressLine2 = "test line 2",
     addressLine3 = None,
     town = Some("test town"),
@@ -77,7 +77,7 @@ class LandOrPropertyMongoController @Inject()(
     for {
       indexes <- buildIndexes(num)
       landOrPropertyInUK = indexes.map(index => LandPropertyInUKPage(srn, index) -> true)
-      addressLookup = indexes.map(index => LandOrPropertyAddressLookupPage(srn, index) -> address)
+      addressLookup = indexes.map(index => LandOrPropertyAddressLookupPage(srn, index) -> address(index.value))
       ua1 <- landOrPropertyInUK.foldLeft(Try(userAnswers)) {
         case (ua, (page, value)) => ua.flatMap(_.set(page, value))
       }
