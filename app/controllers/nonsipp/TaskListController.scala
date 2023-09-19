@@ -105,10 +105,16 @@ object TaskListController {
     userAnswers: UserAnswers,
     pensionSchemeId: PensionSchemeId
   ) = {
-    val taskListStatus = userAnswers.get(HowManyMembersPage(srn, pensionSchemeId)) match {
-      case None => InProgress
-      case Some(value) => Completed
-    }
+    val activeBankAccount = userAnswers.get(ActiveBankAccountPage(srn))
+    val whyNoBankAccountPage = userAnswers.get(WhyNoBankAccountPage(srn))
+
+    val taskListStatus =
+      (userAnswers.get(HowManyMembersPage(srn, pensionSchemeId)), activeBankAccount, whyNoBankAccountPage) match {
+        case (None, _, _) => InProgress
+        case (Some(_), Some(true), _) => Completed
+        case (Some(_), Some(false), Some(_)) => Completed
+        case (Some(_), Some(false), None) => InProgress
+      }
 
     TaskListItemViewModel(
       LinkMessage(
@@ -119,8 +125,6 @@ object TaskListController {
           case _ =>
             val checkReturnDates = userAnswers.get(CheckReturnDatesPage(srn))
             lazy val accountingPeriods = userAnswers.get(AccountingPeriods(srn))
-            lazy val activeBankAccount = userAnswers.get(ActiveBankAccountPage(srn))
-            lazy val whyNoBankAccountPage = userAnswers.get(WhyNoBankAccountPage(srn))
 
             if (checkReturnDates.isEmpty) {
               controllers.nonsipp.routes.CheckReturnDatesController.onPageLoad(srn, NormalMode).url

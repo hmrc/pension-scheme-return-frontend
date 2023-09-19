@@ -134,6 +134,25 @@ class TaskListControllerSpec extends ControllerBaseSpec {
           )
         }
 
+        "stopped at reason no bank account page when how many members already populated" in {
+          val userAnswersPopulated =
+            defaultUserAnswers
+              .unsafeSet(CheckReturnDatesPage(srn), true)
+              .unsafeSet(ActiveBankAccountPage(srn), false)
+              .unsafeSet(HowManyMembersPage(srn, pensionSchemeId), SchemeMemberNumbers(1, 1, 1))
+
+          testViewModel(
+            userAnswersPopulated,
+            0,
+            0,
+            expectedStatus = TaskListStatus.InProgress,
+            expectedTitleKey = "nonsipp.tasklist.schemedetails.title",
+            expectedLinkContentKey = "nonsipp.tasklist.schemedetails.details.title",
+            expectedLinkUrl =
+              controllers.nonsipp.schemedesignatory.routes.WhyNoBankAccountController.onPageLoad(srn, NormalMode).url
+          )
+        }
+
         "stopped at how many members page" in {
           val userAnswersPopulated =
             defaultUserAnswers
@@ -155,7 +174,9 @@ class TaskListControllerSpec extends ControllerBaseSpec {
 
       "completed" in {
         val userAnswersWithHowManyMembers =
-          defaultUserAnswers.unsafeSet(HowManyMembersPage(srn, pensionSchemeId), SchemeMemberNumbers(1, 1, 1))
+          defaultUserAnswers
+            .unsafeSet(ActiveBankAccountPage(srn), true)
+            .unsafeSet(HowManyMembersPage(srn, pensionSchemeId), SchemeMemberNumbers(1, 1, 1))
 
         testViewModel(
           userAnswersWithHowManyMembers,
