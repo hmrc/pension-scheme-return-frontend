@@ -39,7 +39,7 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
     case WhenWasPropertySoldPage(srn, landOrPropertyIndex, disposalIndex) =>
       controllers.routes.UnauthorisedController.onPageLoad()
 
-    case CompanyBuyerNamePage(srn, landOrPropertyIndex, disposalIndex) => //TODO 41h is is supposed to come from 41f and go to 41h1
+    case CompanyBuyerNamePage(srn, landOrPropertyIndex, disposalIndex) => //TODO Navigation. Subsequent and previous pages still need to be implemented
       controllers.routes.UnauthorisedController.onPageLoad()
   }
 

@@ -28,5 +28,5 @@ case class CompanyBuyerNamePage(srn: Srn, landOrPropertyIndex: Max5000, disposal
   override def path: JsPath =
     Paths.disposalPropertyTransaction \ toString \ landOrPropertyIndex.arrayIndex.toString \ disposalIndex.arrayIndex.toString
 
-  override def toString: String = "companyBuyerName"
+  override def toString: String = "nameOfPurchaser"
 }
