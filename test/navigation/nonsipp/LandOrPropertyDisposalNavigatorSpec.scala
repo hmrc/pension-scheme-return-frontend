@@ -66,4 +66,17 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
         .withName("go from LandOrPropertyStillHeldPage to ??? page")
     )
   }
+
+  "WhenWasPropertySoldPage" - {
+    act.like(
+      normalmode
+        .navigateToWithDoubleIndex(
+          index,
+          disposalIndex,
+          WhenWasPropertySoldPage,
+          (srn, index: Max5000, disposalIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+        )
+        .withName("go from when was property sold page to unauthorised page")
+    )
+  }
 }

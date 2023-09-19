@@ -14,17 +14,21 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages.nonsipp.landorpropertydisposal
 
-import pages.nonsipp.landorproperty.Paths.landOrProperty
-import play.api.libs.json.{__, JsPath}
+import config.Refined.{Max50, Max5000}
+import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
+import utils.RefinedUtils.RefinedIntOps
 
-package object landorpropertydisposal {
-  object Paths {
-    val assets: JsPath = __ \ "assets"
-    val landOrProperty: JsPath = assets \ "landOrProperty"
-    val landOrPropertyTransactions: JsPath = landOrProperty \ "landOrPropertyTransactions"
-    val disposalPropertyTransaction
-      : JsPath = landOrPropertyTransactions \ "heldPropertyTransaction" \ "disposedPropertyTransaction"
-  }
+import java.time.LocalDate
+
+case class WhenWasPropertySoldPage(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50)
+    extends QuestionPage[LocalDate] {
+
+  override def path: JsPath =
+    Paths.disposalPropertyTransaction \ toString \ landOrPropertyIndex.arrayIndex.toString \ disposalIndex.arrayIndex.toString
+
+  override def toString: String = "dateOfSale"
 }

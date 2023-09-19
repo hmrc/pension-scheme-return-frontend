@@ -1188,3 +1188,14 @@ landOrPropertyCYA.change.heading = Change details for {0}
 removeLandOrProperty.title = Are you sure you want to remove this land or property?
 removeLandOrProperty.heading = Are you sure you want to remove {0}?
 removeLandOrProperty.error.required = Select yes if you are sure you want to remove this land or property
+
+whenWasPropertySold.title = When was the land or property sold?
+whenWasPropertySold.heading = When was {0} sold?
+whenWasPropertySold.dateOfSale.error.required.all = Enter the date the scheme sold this land or property
+whenWasPropertySold.dateOfSale.error.required.day = Date the scheme sold this land or property must include day
+whenWasPropertySold.dateOfSale.error.required.month = Date the scheme sold this land or property must include month
+whenWasPropertySold.dateOfSale.error.required.year = Date the scheme sold this land or property must include a day and year
+whenWasPropertySold.dateOfSale.error.invalid.date = Date the scheme sold this land or property must be a real date
+whenWasPropertySold.dateOfSale.error.invalid.characters = Date the scheme sold this land or property must only include numbers 0 to 9
+whenWasPropertySold.dateOfSale.error.future = Date the scheme sold this land or property must be the same as or before {0}
+whenWasPropertySold.dateOfSale.error.after = Date the scheme sold this land or property must be the same as or after {0}
