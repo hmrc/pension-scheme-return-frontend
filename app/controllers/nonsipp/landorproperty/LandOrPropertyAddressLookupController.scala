@@ -80,7 +80,8 @@ class LandOrPropertyAddressLookupController @Inject()(
           alfAddress.thirdLine,
           alfAddress.town,
           alfAddress.postcode,
-          alfAddress.country.name
+          alfAddress.country.name,
+          alfAddress.country.code
         )
     )
 }
