@@ -18,13 +18,15 @@ package controllers.nonsipp
 
 import cats.implicits.toShow
 import com.google.inject.Inject
+import config.Refined.OneTo300
 import controllers.actions._
+import eu.timepit.refined.refineV
 import models.SchemeId.Srn
 import models.requests.DataRequest
-import models.{DateRange, NormalMode, PensionSchemeId, UserAnswers}
+import models.{DateRange, ManualOrUpload, NormalMode, PensionSchemeId, UserAnswers}
 import pages.nonsipp.CheckReturnDatesPage
 import pages.nonsipp.accountingperiod.AccountingPeriods
-import pages.nonsipp.memberdetails.{MemberDetailsNinoPages, MembersDetailsPages, NoNinoPages}
+import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsNinoPages, MembersDetailsPages, NoNinoPages}
 import pages.nonsipp.schemedesignatory.{
   ActiveBankAccountPage,
   FeesCommissionsWagesSalariesPage,
@@ -203,8 +205,40 @@ object TaskListController {
       s"$prefix.title",
       TaskListItemViewModel(
         LinkMessage(
-          Message(messageKey(prefix, "details.title", NotStarted), schemeName),
-          controllers.nonsipp.memberdetails.routes.PensionSchemeMembersController.onPageLoad(srn).url
+          Message(messageKey(prefix, "details.title", taskListStatus), schemeName),
+          taskListStatus match {
+            case NotStarted =>
+              controllers.nonsipp.memberdetails.routes.PensionSchemeMembersController.onPageLoad(srn).url
+            case Completed =>
+              controllers.nonsipp.memberdetails.routes.SchemeMembersListController
+                .onPageLoad(srn, 1, ManualOrUpload.Manual)
+                .url
+            case _ =>
+              val membersDetailsPages = userAnswers.get(MembersDetailsPages(srn))
+              val incompleteIndex = membersDetailsPages.get.size
+              refineV[OneTo300](incompleteIndex).fold(
+                _ =>
+                  controllers.nonsipp.memberdetails.routes.SchemeMembersListController
+                    .onPageLoad(srn, 1, ManualOrUpload.Manual)
+                    .url,
+                index => {
+                  val doesMemberHaveNino = userAnswers.get(DoesMemberHaveNinoPage(srn, index))
+                  if (doesMemberHaveNino.isEmpty) {
+                    controllers.nonsipp.memberdetails.routes.DoesSchemeMemberHaveNINOController
+                      .onPageLoad(srn, index, NormalMode)
+                      .url
+                  } else if (doesMemberHaveNino.getOrElse(false)) {
+                    controllers.nonsipp.memberdetails.routes.MemberDetailsNinoController
+                      .onPageLoad(srn, index, NormalMode)
+                      .url
+                  } else {
+                    controllers.nonsipp.memberdetails.routes.NoNINOController
+                      .onPageLoad(srn, index, NormalMode)
+                      .url
+                  }
+                }
+              )
+          }
         ),
         taskListStatus
       )

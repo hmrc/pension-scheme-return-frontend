@@ -18,11 +18,17 @@ package controllers.nonsipp
 
 import controllers.ControllerBaseSpec
 import eu.timepit.refined.refineMV
-import models.{Money, MoneyInPeriod, NormalMode, SchemeMemberNumbers, UserAnswers}
+import models.{ManualOrUpload, Money, MoneyInPeriod, NormalMode, SchemeMemberNumbers, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.CheckReturnDatesPage
 import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsNinoPage, MemberDetailsPage, NoNINOPage}
-import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, FeesCommissionsWagesSalariesPage, HowManyMembersPage, HowMuchCashPage, ValueOfAssetsPage}
+import pages.nonsipp.schemedesignatory.{
+  ActiveBankAccountPage,
+  FeesCommissionsWagesSalariesPage,
+  HowManyMembersPage,
+  HowMuchCashPage,
+  ValueOfAssetsPage
+}
 import play.api.inject
 import play.api.inject.guice.GuiceableModule
 import services.SchemeDateService
@@ -259,6 +265,11 @@ class TaskListControllerSpec extends ControllerBaseSpec {
     }
 
     "membersSection" - {
+      val userAnswersOneMember = defaultUserAnswers
+        .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+        .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), true)
+        .unsafeSet(MemberDetailsNinoPage(srn, refineMV(1)), nino)
+
       "notStarted" in {
         testViewModel(
           defaultUserAnswers,
@@ -273,8 +284,8 @@ class TaskListControllerSpec extends ControllerBaseSpec {
 
       "inProgress" - {
         "DoesMemberHaveNinoPage is missing" in {
-          val userAnswers = defaultUserAnswers
-            .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+          val userAnswers = userAnswersOneMember
+            .unsafeSet(MemberDetailsPage(srn, refineMV(2)), memberDetails)
 
           testViewModel(
             userAnswers,
@@ -282,16 +293,17 @@ class TaskListControllerSpec extends ControllerBaseSpec {
             0,
             expectedStatus = TaskListStatus.InProgress,
             expectedTitleKey = "nonsipp.tasklist.members.title",
-            // TODO:
-            expectedLinkContentKey = "nonsipp.tasklist.members.add.details.title",
-            expectedLinkUrl = controllers.nonsipp.memberdetails.routes.PensionSchemeMembersController.onPageLoad(srn).url
+            expectedLinkContentKey = "nonsipp.tasklist.members.change.details.title",
+            expectedLinkUrl = controllers.nonsipp.memberdetails.routes.DoesSchemeMemberHaveNINOController
+              .onPageLoad(srn, refineMV(2), NormalMode)
+              .url
           )
         }
 
         "nino missing" in {
-          val userAnswers = defaultUserAnswers
-            .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-            .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), true)
+          val userAnswers = userAnswersOneMember
+            .unsafeSet(MemberDetailsPage(srn, refineMV(2)), memberDetails)
+            .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(2)), true)
 
           testViewModel(
             userAnswers,
@@ -299,15 +311,16 @@ class TaskListControllerSpec extends ControllerBaseSpec {
             0,
             expectedStatus = TaskListStatus.InProgress,
             expectedTitleKey = "nonsipp.tasklist.members.title",
-            // TODO:
-            expectedLinkContentKey = "nonsipp.tasklist.members.add.details.title",
-            expectedLinkUrl = controllers.nonsipp.memberdetails.routes.PensionSchemeMembersController.onPageLoad(srn).url
+            expectedLinkContentKey = "nonsipp.tasklist.members.change.details.title",
+            expectedLinkUrl = controllers.nonsipp.memberdetails.routes.MemberDetailsNinoController
+              .onPageLoad(srn, refineMV(2), NormalMode)
+              .url
           )
         }
         "no nino reason is missing" in {
-          val userAnswers = defaultUserAnswers
-            .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-            .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), false)
+          val userAnswers = userAnswersOneMember
+            .unsafeSet(MemberDetailsPage(srn, refineMV(2)), memberDetails)
+            .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(2)), false)
 
           testViewModel(
             userAnswers,
@@ -315,28 +328,25 @@ class TaskListControllerSpec extends ControllerBaseSpec {
             0,
             expectedStatus = TaskListStatus.InProgress,
             expectedTitleKey = "nonsipp.tasklist.members.title",
-            // TODO:
-            expectedLinkContentKey = "nonsipp.tasklist.members.add.details.title",
-            expectedLinkUrl = controllers.nonsipp.memberdetails.routes.PensionSchemeMembersController.onPageLoad(srn).url
+            expectedLinkContentKey = "nonsipp.tasklist.members.change.details.title",
+            expectedLinkUrl = controllers.nonsipp.memberdetails.routes.NoNINOController
+              .onPageLoad(srn, refineMV(2), NormalMode)
+              .url
           )
         }
       }
 
       "completed" in {
-        val userAnswers = defaultUserAnswers
-          .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-          .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), true)
-          .unsafeSet(MemberDetailsNinoPage(srn, refineMV(1)), nino)
-
         testViewModel(
-          userAnswers,
+          userAnswersOneMember,
           1,
           0,
           expectedStatus = TaskListStatus.Completed,
           expectedTitleKey = "nonsipp.tasklist.members.title",
-          // TODO:
-          expectedLinkContentKey = "nonsipp.tasklist.members.add.details.title",
-          expectedLinkUrl = controllers.nonsipp.memberdetails.routes.PensionSchemeMembersController.onPageLoad(srn).url
+          expectedLinkContentKey = "nonsipp.tasklist.members.change.details.title",
+          expectedLinkUrl = controllers.nonsipp.memberdetails.routes.SchemeMembersListController
+            .onPageLoad(srn, 1, ManualOrUpload.Manual)
+            .url
         )
       }
     }
