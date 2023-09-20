@@ -24,6 +24,7 @@ import models.requests.DataRequest
 import models.{DateRange, NormalMode, PensionSchemeId, UserAnswers}
 import pages.nonsipp.CheckReturnDatesPage
 import pages.nonsipp.accountingperiod.AccountingPeriods
+import pages.nonsipp.memberdetails.{MemberDetailsNinoPages, MembersDetailsPages, NoNinoPages}
 import pages.nonsipp.schemedesignatory.{
   ActiveBankAccountPage,
   FeesCommissionsWagesSalariesPage,
@@ -108,13 +109,8 @@ object TaskListController {
     val activeBankAccount = userAnswers.get(ActiveBankAccountPage(srn))
     val whyNoBankAccountPage = userAnswers.get(WhyNoBankAccountPage(srn))
 
-    val taskListStatus =
-      (userAnswers.get(HowManyMembersPage(srn, pensionSchemeId)), activeBankAccount, whyNoBankAccountPage) match {
-        case (None, _, _) => InProgress
-        case (Some(_), Some(true), _) => Completed
-        case (Some(_), Some(false), Some(_)) => Completed
-        case (Some(_), Some(false), None) => InProgress
-      }
+    val taskListStatus: TaskListStatus =
+      getBasicSchemeDetailsTaskListStatus(srn, userAnswers, pensionSchemeId, activeBankAccount, whyNoBankAccountPage)
 
     TaskListItemViewModel(
       LinkMessage(
@@ -142,6 +138,19 @@ object TaskListController {
       taskListStatus
     )
   }
+  private def getBasicSchemeDetailsTaskListStatus(
+    srn: Srn,
+    userAnswers: UserAnswers,
+    pensionSchemeId: PensionSchemeId,
+    activeBankAccount: Option[Boolean],
+    whyNoBankAccountPage: Option[String]
+  ) =
+    (userAnswers.get(HowManyMembersPage(srn, pensionSchemeId)), activeBankAccount, whyNoBankAccountPage) match {
+      case (None, _, _) => InProgress
+      case (Some(_), Some(true), _) => Completed
+      case (Some(_), Some(false), Some(_)) => Completed
+      case (Some(_), Some(false), None) => InProgress
+    }
 
   private def getFinancialDetailsTaskListItem(
     srn: Srn,
@@ -149,13 +158,8 @@ object TaskListController {
     prefix: String,
     userAnswers: UserAnswers
   ) = {
-    val totalSalaries = userAnswers.get(FeesCommissionsWagesSalariesPage(srn, NormalMode))
-    val howMuchCash = userAnswers.get(HowMuchCashPage(srn, NormalMode))
-    val taskListStatus = (howMuchCash, totalSalaries) match {
-      case (Some(_), Some(_)) => Completed
-      case (None, _) => NotStarted
-      case (Some(_), None) => InProgress
-    }
+
+    val taskListStatus: TaskListStatus = getFinancialDetailsTaskListStatus(userAnswers, srn)
 
     TaskListItemViewModel(
       LinkMessage(
@@ -182,9 +186,19 @@ object TaskListController {
     )
   }
 
-  private def membersSection(srn: Srn, schemeName: String) = {
-    val prefix = "nonsipp.tasklist.members"
+  private def getFinancialDetailsTaskListStatus(userAnswers: UserAnswers, srn: Srn) = {
+    val totalSalaries = userAnswers.get(FeesCommissionsWagesSalariesPage(srn, NormalMode))
+    val howMuchCash = userAnswers.get(HowMuchCashPage(srn, NormalMode))
+    (howMuchCash, totalSalaries) match {
+      case (Some(_), Some(_)) => Completed
+      case (None, _) => NotStarted
+      case (Some(_), None) => InProgress
+    }
+  }
 
+  private def membersSection(srn: Srn, schemeName: String, userAnswers: UserAnswers) = {
+    val prefix = "nonsipp.tasklist.members"
+    val taskListStatus = getMembersTaskListStatus(userAnswers, srn)
     TaskListSectionViewModel(
       s"$prefix.title",
       TaskListItemViewModel(
@@ -192,9 +206,32 @@ object TaskListController {
           Message(messageKey(prefix, "details.title", NotStarted), schemeName),
           controllers.nonsipp.memberdetails.routes.PensionSchemeMembersController.onPageLoad(srn).url
         ),
-        NotStarted
+        taskListStatus
       )
     )
+  }
+
+  private def getMembersTaskListStatus(userAnswers: UserAnswers, srn: Srn) = {
+    val membersDetailsPages = userAnswers.get(MembersDetailsPages(srn))
+    val ninoPages = userAnswers.get(MemberDetailsNinoPages(srn))
+    val noNinoPages = userAnswers.get(NoNinoPages(srn))
+    (membersDetailsPages, ninoPages, noNinoPages) match {
+      case (None, _, _) => NotStarted
+      case (Some(_), None, None) => InProgress
+      case (Some(memberDetails), ninos, noNinos) =>
+        if (memberDetails.isEmpty) {
+          NotStarted
+        } else {
+          val countMemberDetails = memberDetails.size
+          val countNinos = ninos.getOrElse(List.empty).size
+          val countNoninos = noNinos.getOrElse(List.empty).size
+          if (countMemberDetails > countNinos + countNoninos) {
+            InProgress
+          } else {
+            Completed
+          }
+        }
+    }
   }
 
   private def memberPaymentsSection(srn: Srn) = {
@@ -410,7 +447,7 @@ object TaskListController {
 
     val viewmodel = TaskListViewModel(
       schemeDetailsSection(srn, schemeName, userAnswers, pensionSchemeId),
-      membersSection(srn, schemeName),
+      membersSection(srn, schemeName, userAnswers),
       memberPaymentsSection(srn),
       loansSection(srn, schemeName),
       sharesSection(srn),

@@ -17,16 +17,12 @@
 package controllers.nonsipp
 
 import controllers.ControllerBaseSpec
+import eu.timepit.refined.refineMV
 import models.{Money, MoneyInPeriod, NormalMode, SchemeMemberNumbers, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.CheckReturnDatesPage
-import pages.nonsipp.schemedesignatory.{
-  ActiveBankAccountPage,
-  FeesCommissionsWagesSalariesPage,
-  HowManyMembersPage,
-  HowMuchCashPage,
-  ValueOfAssetsPage
-}
+import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsNinoPage, MemberDetailsPage, NoNINOPage}
+import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, FeesCommissionsWagesSalariesPage, HowManyMembersPage, HowMuchCashPage, ValueOfAssetsPage}
 import play.api.inject
 import play.api.inject.guice.GuiceableModule
 import services.SchemeDateService
@@ -262,6 +258,88 @@ class TaskListControllerSpec extends ControllerBaseSpec {
       }
     }
 
+    "membersSection" - {
+      "notStarted" in {
+        testViewModel(
+          defaultUserAnswers,
+          1,
+          0,
+          expectedStatus = TaskListStatus.NotStarted,
+          expectedTitleKey = "nonsipp.tasklist.members.title",
+          expectedLinkContentKey = "nonsipp.tasklist.members.add.details.title",
+          expectedLinkUrl = controllers.nonsipp.memberdetails.routes.PensionSchemeMembersController.onPageLoad(srn).url
+        )
+      }
+
+      "inProgress" - {
+        "DoesMemberHaveNinoPage is missing" in {
+          val userAnswers = defaultUserAnswers
+            .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+
+          testViewModel(
+            userAnswers,
+            1,
+            0,
+            expectedStatus = TaskListStatus.InProgress,
+            expectedTitleKey = "nonsipp.tasklist.members.title",
+            // TODO:
+            expectedLinkContentKey = "nonsipp.tasklist.members.add.details.title",
+            expectedLinkUrl = controllers.nonsipp.memberdetails.routes.PensionSchemeMembersController.onPageLoad(srn).url
+          )
+        }
+
+        "nino missing" in {
+          val userAnswers = defaultUserAnswers
+            .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+            .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), true)
+
+          testViewModel(
+            userAnswers,
+            1,
+            0,
+            expectedStatus = TaskListStatus.InProgress,
+            expectedTitleKey = "nonsipp.tasklist.members.title",
+            // TODO:
+            expectedLinkContentKey = "nonsipp.tasklist.members.add.details.title",
+            expectedLinkUrl = controllers.nonsipp.memberdetails.routes.PensionSchemeMembersController.onPageLoad(srn).url
+          )
+        }
+        "no nino reason is missing" in {
+          val userAnswers = defaultUserAnswers
+            .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+            .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), false)
+
+          testViewModel(
+            userAnswers,
+            1,
+            0,
+            expectedStatus = TaskListStatus.InProgress,
+            expectedTitleKey = "nonsipp.tasklist.members.title",
+            // TODO:
+            expectedLinkContentKey = "nonsipp.tasklist.members.add.details.title",
+            expectedLinkUrl = controllers.nonsipp.memberdetails.routes.PensionSchemeMembersController.onPageLoad(srn).url
+          )
+        }
+      }
+
+      "completed" in {
+        val userAnswers = defaultUserAnswers
+          .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+          .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), true)
+          .unsafeSet(MemberDetailsNinoPage(srn, refineMV(1)), nino)
+
+        testViewModel(
+          userAnswers,
+          1,
+          0,
+          expectedStatus = TaskListStatus.Completed,
+          expectedTitleKey = "nonsipp.tasklist.members.title",
+          // TODO:
+          expectedLinkContentKey = "nonsipp.tasklist.members.add.details.title",
+          expectedLinkUrl = controllers.nonsipp.memberdetails.routes.PensionSchemeMembersController.onPageLoad(srn).url
+        )
+      }
+    }
   }
 
   private def testViewModel(
