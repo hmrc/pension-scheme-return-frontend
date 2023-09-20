@@ -16,7 +16,7 @@
 
 package navigation.nonsipp
 
-import models.UserAnswers
+import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.landorpropertydisposal._
@@ -39,8 +39,9 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
     case WhenWasPropertySoldPage(srn, landOrPropertyIndex, disposalIndex) =>
       controllers.routes.UnauthorisedController.onPageLoad()
 
-    case CompanyBuyerNamePage(srn, landOrPropertyIndex, disposalIndex) => //TODO Navigation. Subsequent and previous pages still need to be implemented
-      controllers.routes.UnauthorisedController.onPageLoad()
+    case CompanyBuyerNamePage(srn, landOrPropertyIndex, disposalIndex) => //TODO Navigation. Previous page still needs to be implemented
+      controllers.nonsipp.landorpropertydisposal.routes.CompanyBuyerCrnController
+        .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty
