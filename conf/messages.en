@@ -1199,3 +1199,9 @@ whenWasPropertySold.dateOfSale.error.invalid.date = Date the scheme sold this la
 whenWasPropertySold.dateOfSale.error.invalid.characters = Date the scheme sold this land or property must only include numbers 0 to 9
 whenWasPropertySold.dateOfSale.error.future = Date the scheme sold this land or property must be the same as or before {0}
 whenWasPropertySold.dateOfSale.error.after = Date the scheme sold this land or property must be the same as or after {0}
+
+landOrPropertyIndividualBuyerName.title = What is the buyer’s name?
+landOrPropertyIndividualBuyerName.heading = What is the buyer’s name?
+landOrPropertyIndividualBuyerName.error.required = Enter the buyer’s name
+landOrPropertyIndividualBuyerName.error.length = Buyer’s name must be 160 characters or fewer
+landOrPropertyIndividualBuyerName.error.invalid.characters = Buyer’s name must only include letters a to z, hyphens, apostrophes and spaces
