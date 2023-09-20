@@ -16,7 +16,8 @@
 
 package navigation.nonsipp
 
-import models.{NormalMode, UserAnswers}
+
+import models.{IdentityType, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.landorpropertydisposal._
@@ -33,11 +34,27 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
         controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
       }
 
+    case WhatYouWillNeedLandPropertyDisposalPage(srn) =>
+      controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalListController.onPageLoad(srn, page = 1)
+
     case LandOrPropertyStillHeldPage(srn, landOrPropertyIndex, disposalIndex) => //41d
       controllers.routes.UnauthorisedController.onPageLoad()
 
     case WhenWasPropertySoldPage(srn, landOrPropertyIndex, disposalIndex) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+      controllers.nonsipp.landorpropertydisposal.routes.WhoPurchasedLandOrPropertyController
+        .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
+
+    case WhoPurchasedLandOrPropertyPage(srn, landOrPropertyIndex, disposalIndex) =>
+      userAnswers.get(WhoPurchasedLandOrPropertyPage(srn, landOrPropertyIndex, disposalIndex)) match {
+        case Some(IdentityType.Other) =>
+          controllers.routes.UnauthorisedController.onPageLoad()
+        case Some(IdentityType.Individual) =>
+          controllers.routes.UnauthorisedController.onPageLoad()
+        case Some(IdentityType.UKCompany) =>
+          controllers.routes.UnauthorisedController.onPageLoad()
+        case Some(IdentityType.UKPartnership) =>
+          controllers.routes.UnauthorisedController.onPageLoad()
+      }
 
     case CompanyBuyerNamePage(srn, landOrPropertyIndex, disposalIndex) => //TODO Navigation. Previous page still needs to be implemented
       controllers.nonsipp.landorpropertydisposal.routes.CompanyBuyerCrnController

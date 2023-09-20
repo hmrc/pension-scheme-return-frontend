@@ -18,14 +18,15 @@ package viewmodels.govuk
 
 import play.api.data.Field
 import play.api.i18n.Messages
-import play.twirl.api.Html
+import play.twirl.api.{Html, HtmlFormat}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{Content, HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.fieldset.{Fieldset, Legend}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
 import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.{RadioItem, Radios}
 import viewmodels.DisplayMessage.Message
-import viewmodels.models.{FieldType, YesNoViewModel}
+import viewmodels.models.{FieldType, ListRadiosRow, RadioListRow, YesNoViewModel}
 import viewmodels.{ErrorMessageAwareness, LegendSize}
+import views.components.Components.renderMessage
 
 object radios extends RadiosFluency
 
@@ -41,6 +42,24 @@ trait RadiosFluency {
       apply(
         field = field,
         items = items,
+        fieldset = FieldsetViewModel(legend)
+      )
+
+    def radioList(
+      field: Field,
+      items: List[ListRadiosRow],
+      legend: Option[Legend]
+    )(implicit messages: Messages): Radios =
+      apply(
+        field = field,
+        items = items.map(
+          item =>
+            RadioItem(
+              id = Some(item.index.toString),
+              content = HtmlContent(renderMessage(item.text)),
+              value = Some(item.index.toString)
+            )
+        ),
         fieldset = FieldsetViewModel(legend)
       )
 

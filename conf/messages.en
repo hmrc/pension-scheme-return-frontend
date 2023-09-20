@@ -1200,11 +1200,20 @@ whenWasPropertySold.dateOfSale.error.invalid.characters = Date the scheme sold t
 whenWasPropertySold.dateOfSale.error.future = Date the scheme sold this land or property must be the same as or before {0}
 whenWasPropertySold.dateOfSale.error.after = Date the scheme sold this land or property must be the same as or after {0}
 
+whoPurchasedLandOrProperty.title = Who purchased the land or property?
+whoPurchasedLandOrProperty.heading = Who purchased 12 Holly Lane?
+whoPurchasedLandOrProperty.radioList1 = An individual
+whoPurchasedLandOrProperty.radioList2 = A UK company
+whoPurchasedLandOrProperty.radioList3 = A UK partnership
+whoPurchasedLandOrProperty.radioList4 = Other
+whoReceivedLoan.error.required = Select who purchased the land or property
+
 companyBuyerName.title = What is the buyer’s company name?
 companyBuyerName.heading = What is the buyer’s company name?
 companyBuyerName.error.required = Enter the buyer’s company name
 companyBuyerName.error.invalid = Buyer’s company name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
 companyBuyerName.error.tooLong = Buyer’s company name must be 160 characters or fewer
+
 
 companyBuyerCrn.title = Do you know the buyer’s Company Registration Number (CRN)?
 companyBuyerCrn.heading = Do you know {0}’s Company Registration Number (CRN)?
@@ -1218,3 +1227,11 @@ companyBuyerCrn.no.conditional.error.required = Enter the reason you cannot prov
 companyBuyerCrn.no.conditional.error.invalid = The reason you cannot provide the buyer’s CRN must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, full stops, hyphens, slashes, speech marks and spaces
 companyBuyerCrn.no.conditional.error.length = The reason you cannot provide the buyer’s CRN must be 160 characters or fewer
 companyBuyerCrn.error.required = Select yes if you know the buyer’s Company Registration Number (CRN)
+
+landOrPropertyDisposalList.title = Start reporting a land or property disposal
+landOrPropertyDisposalList.heading = Start reporting a land or property disposal
+landOrPropertyDisposalList.paragraph1 = Select one option to start reporting disposal. If you need to report more, you will be able to do this later.
+landOrPropertyDisposalList.paragraph2 = You can only report disposal of land or property you have told us is held by your scheme. If the land or property does not appear here, you will need to tell us about it first using the ‘land or property’ section of this pension scheme return.
+landOrPropertyDisposalList.legend = Which land or property was disposed of?
+landOrPropertyDisposalList.radios.error.required = Select the land or property that was disposed of
+landOrPropertyDisposalList.pagination.label = Showing {0} - {1} of {2} land or properties

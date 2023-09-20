@@ -709,7 +709,7 @@ object LandOrPropertyCYAController {
               ).withVisuallyHiddenContent("landOrPropertyCYA.section5.leaseDate.hidden")
             ),
           CheckYourAnswersRowViewModel(
-            Message("landOrPropertyCYA.section5.connectedParty", address),
+            Message("landOrPropertyCYA.section5.connectedParty", leaseName.show),
             if (leaseConnectedParty) "site.yes" else "site.no"
           ).withAction(
             SummaryAction(

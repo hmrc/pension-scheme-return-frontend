@@ -149,6 +149,12 @@ trait ViewModelGenerators extends BasicGenerators {
       removeHiddenText <- nonEmptyMessage
     } yield ListRow(text, changeUrl, changeHiddenText, removeUrl, removeHiddenText)
 
+  val listRadiosRowGen: Gen[ListRadiosRow] =
+    for {
+      index <- Gen.chooseNum(1, 100)
+      text <- nonEmptyMessage
+    } yield ListRadiosRow(index, text)
+
   def summaryViewModelGen(rows: Int): Gen[ListViewModel] =
     summaryViewModelGen(rows = Some(rows))
 
@@ -170,6 +176,20 @@ trait ViewModelGenerators extends BasicGenerators {
       showRadios,
       pagination,
       Some(yesHint)
+    )
+
+  def listRadiosViewModelGen(
+    rows: Option[Int] = None,
+    paginate: Boolean = false
+  ): Gen[ListRadiosViewModel] =
+    for {
+      legend <- nonEmptyDisplayMessage
+      rows <- rows.fold(Gen.choose(1, 10))(Gen.const).flatMap(Gen.listOfN(_, listRadiosRowGen))
+      pagination <- if (paginate) Gen.option(paginationGen) else Gen.const(None)
+    } yield ListRadiosViewModel(
+      legend,
+      rows,
+      pagination
     )
 
   implicit val yesNoPageViewModelGen: Gen[YesNoPageViewModel] =
