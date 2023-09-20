@@ -33,6 +33,9 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
         controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
       }
 
+    case WhatYouWillNeedLandPropertyDisposalPage(srn) =>
+      controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalListController.onPageLoad(srn, page = 1)
+
     case LandOrPropertyStillHeldPage(srn, landOrPropertyIndex, disposalIndex) => //41d
       controllers.routes.UnauthorisedController.onPageLoad()
 
