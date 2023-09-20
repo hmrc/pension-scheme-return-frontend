@@ -1200,6 +1200,14 @@ whenWasPropertySold.dateOfSale.error.invalid.characters = Date the scheme sold t
 whenWasPropertySold.dateOfSale.error.future = Date the scheme sold this land or property must be the same as or before {0}
 whenWasPropertySold.dateOfSale.error.after = Date the scheme sold this land or property must be the same as or after {0}
 
+whoPurchasedLandOrProperty.title = Who purchased the land or property?
+whoPurchasedLandOrProperty.heading = Who purchased 12 Holly Lane?
+whoPurchasedLandOrProperty.radioList1 = An individual
+whoPurchasedLandOrProperty.radioList2 = A UK company
+whoPurchasedLandOrProperty.radioList3 = A UK partnership
+whoPurchasedLandOrProperty.radioList4 = Other
+whoReceivedLoan.error.required = Select who purchased the land or property
+
 companyBuyerName.title = What is the buyer’s company name?
 companyBuyerName.heading = What is the buyer’s company name?
 companyBuyerName.error.required = Enter the buyer’s company name

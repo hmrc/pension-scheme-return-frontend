@@ -18,6 +18,7 @@ package navigation.nonsipp
 
 import config.Refined.{Max50, Max5000}
 import eu.timepit.refined.refineMV
+import models.{IdentityType, NormalMode}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.landorpropertydisposal._
@@ -74,9 +75,11 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
           index,
           disposalIndex,
           WhenWasPropertySoldPage,
-          (srn, index: Max5000, disposalIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          (srn, index: Max5000, disposalIndex: Max50, _) =>
+            controllers.nonsipp.landorpropertydisposal.routes.WhoPurchasedLandOrPropertyController
+              .onPageLoad(srn, index, disposalIndex, NormalMode)
         )
-        .withName("go from when was property sold page to unauthorised page")
+        .withName("go from when was property sold page to who purchased land or property page")
     )
   }
 }
