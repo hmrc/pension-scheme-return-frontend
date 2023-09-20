@@ -21,7 +21,17 @@ import com.google.inject.Inject
 import controllers.actions._
 import models.SchemeId.Srn
 import models.requests.DataRequest
-import models.{DateRange, NormalMode}
+import models.{DateRange, NormalMode, PensionSchemeId, UserAnswers}
+import pages.nonsipp.CheckReturnDatesPage
+import pages.nonsipp.accountingperiod.AccountingPeriods
+import pages.nonsipp.schemedesignatory.{
+  ActiveBankAccountPage,
+  FeesCommissionsWagesSalariesPage,
+  HowManyMembersPage,
+  HowMuchCashPage,
+  ValueOfAssetsPage,
+  WhyNoBankAccountPage
+}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.SchemeDateService
@@ -29,7 +39,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.DateTimeUtils.localDateShow
 import viewmodels.DisplayMessage.{Heading2, LinkMessage, Message, ParagraphMessage}
 import viewmodels.implicits._
-import viewmodels.models.TaskListStatus.{Completed, NotStarted, TaskListStatus, UnableToStart}
+import viewmodels.models.TaskListStatus.{Completed, InProgress, NotStarted, TaskListStatus, UnableToStart}
 import viewmodels.models.{PageViewModel, TaskListItemViewModel, TaskListSectionViewModel, TaskListViewModel}
 import views.html.TaskListView
 
@@ -46,7 +56,14 @@ class TaskListController @Inject()(
 
   def onPageLoad(srn: Srn): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     withSchemeDate(srn) { dates =>
-      val viewModel = TaskListController.viewModel(srn, request.schemeDetails.schemeName, dates.from, dates.to)
+      val viewModel = TaskListController.viewModel(
+        srn,
+        request.schemeDetails.schemeName,
+        dates.from,
+        dates.to,
+        request.userAnswers,
+        request.pensionSchemeId
+      )
       Ok(view(viewModel))
     }
   }
@@ -66,25 +83,102 @@ object TaskListController {
       case _ => s"$prefix.change.$suffix"
     }
 
-  private def schemeDetailsSection(srn: Srn, schemeName: String) = {
+  private def schemeDetailsSection(
+    srn: Srn,
+    schemeName: String,
+    userAnswers: UserAnswers,
+    pensionSchemeId: PensionSchemeId
+  ) = {
     val prefix = "nonsipp.tasklist.schemedetails"
 
     TaskListSectionViewModel(
       s"$prefix.title",
-      TaskListItemViewModel(
-        LinkMessage(
-          Message(s"$prefix.details.title", schemeName),
-          controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, NormalMode).url
-        ),
-        Completed
+      getBasicSchemeDetailsTaskListItem(srn, schemeName, prefix, userAnswers, pensionSchemeId),
+      getFinancialDetailsTaskListItem(srn, schemeName, prefix, userAnswers)
+    )
+  }
+
+  private def getBasicSchemeDetailsTaskListItem(
+    srn: Srn,
+    schemeName: String,
+    prefix: String,
+    userAnswers: UserAnswers,
+    pensionSchemeId: PensionSchemeId
+  ) = {
+    val activeBankAccount = userAnswers.get(ActiveBankAccountPage(srn))
+    val whyNoBankAccountPage = userAnswers.get(WhyNoBankAccountPage(srn))
+
+    val taskListStatus =
+      (userAnswers.get(HowManyMembersPage(srn, pensionSchemeId)), activeBankAccount, whyNoBankAccountPage) match {
+        case (None, _, _) => InProgress
+        case (Some(_), Some(true), _) => Completed
+        case (Some(_), Some(false), Some(_)) => Completed
+        case (Some(_), Some(false), None) => InProgress
+      }
+
+    TaskListItemViewModel(
+      LinkMessage(
+        Message(s"$prefix.details.title", schemeName),
+        taskListStatus match {
+          case Completed =>
+            controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, NormalMode).url
+          case _ =>
+            val checkReturnDates = userAnswers.get(CheckReturnDatesPage(srn))
+            lazy val accountingPeriods = userAnswers.get(AccountingPeriods(srn))
+
+            if (checkReturnDates.isEmpty) {
+              controllers.nonsipp.routes.CheckReturnDatesController.onPageLoad(srn, NormalMode).url
+            } else if (checkReturnDates.get == false && accountingPeriods.isEmpty) {
+              controllers.nonsipp.routes.CheckReturnDatesController.onPageLoad(srn, NormalMode).url
+            } else if (activeBankAccount.isEmpty) {
+              controllers.nonsipp.schemedesignatory.routes.ActiveBankAccountController.onPageLoad(srn, NormalMode).url
+            } else if (activeBankAccount.get == false && whyNoBankAccountPage.isEmpty) {
+              controllers.nonsipp.schemedesignatory.routes.WhyNoBankAccountController.onPageLoad(srn, NormalMode).url
+            } else {
+              controllers.nonsipp.schemedesignatory.routes.HowManyMembersController.onPageLoad(srn, NormalMode).url
+            }
+        }
       ),
-      TaskListItemViewModel(
-        LinkMessage(
-          Message(messageKey(prefix, "finances.title", NotStarted), schemeName),
-          controllers.nonsipp.schemedesignatory.routes.HowMuchCashController.onPageLoad(srn, NormalMode).url
-        ),
-        NotStarted
-      )
+      taskListStatus
+    )
+  }
+
+  private def getFinancialDetailsTaskListItem(
+    srn: Srn,
+    schemeName: String,
+    prefix: String,
+    userAnswers: UserAnswers
+  ) = {
+    val totalSalaries = userAnswers.get(FeesCommissionsWagesSalariesPage(srn, NormalMode))
+    val howMuchCash = userAnswers.get(HowMuchCashPage(srn, NormalMode))
+    val taskListStatus = (howMuchCash, totalSalaries) match {
+      case (Some(_), Some(_)) => Completed
+      case (None, _) => NotStarted
+      case (Some(_), None) => InProgress
+    }
+
+    TaskListItemViewModel(
+      LinkMessage(
+        Message(messageKey(prefix, "finances.title", taskListStatus), schemeName),
+        taskListStatus match {
+          case NotStarted =>
+            controllers.nonsipp.schemedesignatory.routes.HowMuchCashController.onPageLoad(srn, NormalMode).url
+          case Completed =>
+            controllers.nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController
+              .onPageLoad(srn, NormalMode)
+              .url
+          case _ =>
+            val valueOfAssets = userAnswers.get(ValueOfAssetsPage(srn, NormalMode))
+            if (valueOfAssets.isEmpty) {
+              controllers.nonsipp.schemedesignatory.routes.ValueOfAssetsController.onPageLoad(srn, NormalMode).url
+            } else {
+              controllers.nonsipp.schemedesignatory.routes.FeesCommissionsWagesSalariesController
+                .onPageLoad(srn, NormalMode)
+                .url
+            }
+        }
+      ),
+      taskListStatus
     )
   }
 
@@ -309,11 +403,13 @@ object TaskListController {
     srn: Srn,
     schemeName: String,
     startDate: LocalDate,
-    endDate: LocalDate
+    endDate: LocalDate,
+    userAnswers: UserAnswers,
+    pensionSchemeId: PensionSchemeId
   ): PageViewModel[TaskListViewModel] = {
 
     val viewmodel = TaskListViewModel(
-      schemeDetailsSection(srn, schemeName),
+      schemeDetailsSection(srn, schemeName, userAnswers, pensionSchemeId),
       membersSection(srn, schemeName),
       memberPaymentsSection(srn),
       loansSection(srn, schemeName),
