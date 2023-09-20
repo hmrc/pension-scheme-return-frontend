@@ -38,6 +38,9 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
 
     case WhenWasPropertySoldPage(srn, landOrPropertyIndex, disposalIndex) =>
       controllers.routes.UnauthorisedController.onPageLoad()
+
+    case CompanyBuyerNamePage(srn, landOrPropertyIndex, disposalIndex) => //TODO Navigation. Subsequent and previous pages still need to be implemented
+      controllers.routes.UnauthorisedController.onPageLoad()
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty
