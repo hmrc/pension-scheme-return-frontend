@@ -1205,3 +1205,9 @@ landOrPropertyIndividualBuyerName.heading = What is the buyer’s name?
 landOrPropertyIndividualBuyerName.error.required = Enter the buyer’s name
 landOrPropertyIndividualBuyerName.error.length = Buyer’s name must be 160 characters or fewer
 landOrPropertyIndividualBuyerName.error.invalid.characters = Buyer’s name must only include letters a to z, hyphens, apostrophes and spaces
+
+companyBuyerName.title = What is the buyer’s company name?
+companyBuyerName.heading = What is the buyer’s company name?
+companyBuyerName.error.required = Enter the buyer’s company name
+companyBuyerName.error.invalid = Buyer’s company name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+companyBuyerName.error.tooLong = Buyer’s company name must be 160 characters or fewer
