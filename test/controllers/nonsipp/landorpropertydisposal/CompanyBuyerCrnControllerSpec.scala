@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.landorpropertydisposal
 
-import config.Refined.{Max50, OneTo5000}
+import config.Refined.{Max50, Max5000}
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.landorpropertydisposal.CompanyBuyerCrnController._
 import eu.timepit.refined.refineMV
@@ -27,7 +27,7 @@ import views.html.ConditionalYesNoPageView
 
 class CompanyBuyerCrnControllerSpec extends ControllerBaseSpec {
 
-  private val index = refineMV[OneTo5000](1)
+  private val index = refineMV[Max5000.Refined](1)
   private val disposalIndex = refineMV[Max50.Refined](1)
 
   private lazy val onPageLoad =
@@ -49,7 +49,7 @@ class CompanyBuyerCrnControllerSpec extends ControllerBaseSpec {
       injected[ConditionalYesNoPageView]
         .apply(
           form(injected[YesNoPageFormProvider]),
-          viewModel(srn, index, disposalIndex, NormalMode, userAnswersCompanyName)
+          viewModel(srn, index, disposalIndex, NormalMode, companyName)
         )
     })
 
@@ -63,7 +63,7 @@ class CompanyBuyerCrnControllerSpec extends ControllerBaseSpec {
         injected[ConditionalYesNoPageView]
           .apply(
             form(injected[YesNoPageFormProvider]).fill(conditionalNo.value),
-            viewModel(srn, index, disposalIndex, NormalMode, userAnswersCompanyName)
+            viewModel(srn, index, disposalIndex, NormalMode, companyName)
           )
       }
     )

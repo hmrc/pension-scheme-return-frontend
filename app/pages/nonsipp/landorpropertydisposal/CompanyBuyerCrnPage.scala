@@ -29,5 +29,5 @@ case class CompanyBuyerCrnPage(srn: Srn, landOrPropertyIndex: Max5000, disposalI
   override def path: JsPath =
     Paths.disposalPropertyTransaction \ toString \ landOrPropertyIndex.arrayIndex.toString \ disposalIndex.arrayIndex.toString
 
-  override def toString: String = "nameOfPurchaser"
+  override def toString: String = "idNumber"
 }

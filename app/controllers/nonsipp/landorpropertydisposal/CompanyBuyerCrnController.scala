@@ -48,37 +48,39 @@ class CompanyBuyerCrnController @Inject()(
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
-
+  val form: Form[Either[String, Crn]] = CompanyBuyerCrnController.form(formProvider)
   def onPageLoad(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      val form: Form[Either[String, Crn]] = CompanyBuyerCrnController.form(formProvider)
-      val preparedForm =
-        request.userAnswers.fillForm(CompanyBuyerCrnPage(srn, landOrPropertyIndex, disposalIndex), form)
-      Ok(
-        view(
-          preparedForm,
-          CompanyBuyerCrnController.viewModel(srn, landOrPropertyIndex, disposalIndex, mode, request.userAnswers)
+      request.usingAnswer(CompanyBuyerNamePage(srn, landOrPropertyIndex, disposalIndex)).sync { companyName =>
+        val preparedForm =
+          request.userAnswers.fillForm(CompanyBuyerCrnPage(srn, landOrPropertyIndex, disposalIndex), form)
+        Ok(
+          view(
+            preparedForm,
+            CompanyBuyerCrnController.viewModel(srn, landOrPropertyIndex, disposalIndex, mode, companyName)
+          )
         )
-      )
+      }
     }
 
   def onSubmit(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      val form: Form[Either[String, Crn]] = CompanyBuyerCrnController.form(formProvider)
       form
         .bindFromRequest()
         .fold(
           formWithErrors =>
-            Future
-              .successful(
-                BadRequest(
-                  view(
-                    formWithErrors,
-                    CompanyBuyerCrnController
-                      .viewModel(srn, landOrPropertyIndex, disposalIndex, mode, request.userAnswers)
+            request.usingAnswer(CompanyBuyerNamePage(srn, landOrPropertyIndex, disposalIndex)).async { individualName =>
+              Future
+                .successful(
+                  BadRequest(
+                    view(
+                      formWithErrors,
+                      CompanyBuyerCrnController
+                        .viewModel(srn, landOrPropertyIndex, disposalIndex, mode, individualName)
+                    )
                   )
                 )
-              ),
+            },
           value =>
             for {
               updatedAnswers <- Future
@@ -116,14 +118,10 @@ object CompanyBuyerCrnController {
     landOrPropertyIndex: Max5000,
     disposalIndex: Max50,
     mode: Mode,
-    userAnswers: UserAnswers
-  ): FormPageViewModel[ConditionalYesNoPageViewModel] = {
-    val companyName = userAnswers.get(CompanyBuyerNamePage(srn, landOrPropertyIndex, disposalIndex)) match {
-      case Some(value) => value
-      case None => ""
-    }
+    companyName: String
+  ): FormPageViewModel[ConditionalYesNoPageViewModel] =
     FormPageViewModel[ConditionalYesNoPageViewModel](
-      Message("companyBuyerCrn.title"),
+      "companyBuyerCrn.title",
       Message("companyBuyerCrn.heading", companyName),
       ConditionalYesNoPageViewModel(
         yes = YesNoViewModel
@@ -133,5 +131,4 @@ object CompanyBuyerCrnController {
       ).withHint("companyBuyerCrn.hint"),
       routes.CompanyBuyerCrnController.onSubmit(srn, landOrPropertyIndex, disposalIndex, mode)
     )
-  }
 }
