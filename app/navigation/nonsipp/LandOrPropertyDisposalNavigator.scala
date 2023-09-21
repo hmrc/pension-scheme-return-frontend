@@ -45,15 +45,20 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
 
     case WhoPurchasedLandOrPropertyPage(srn, landOrPropertyIndex, disposalIndex) =>
       userAnswers.get(WhoPurchasedLandOrPropertyPage(srn, landOrPropertyIndex, disposalIndex)) match {
-        case Some(IdentityType.Other) =>
-          controllers.routes.UnauthorisedController.onPageLoad()
         case Some(IdentityType.Individual) =>
           controllers.routes.UnauthorisedController.onPageLoad()
         case Some(IdentityType.UKCompany) =>
           controllers.routes.UnauthorisedController.onPageLoad()
         case Some(IdentityType.UKPartnership) =>
           controllers.routes.UnauthorisedController.onPageLoad()
+        case Some(IdentityType.Other) =>
+          controllers.routes.UnauthorisedController.onPageLoad()
+        case Some(IdentityType.Other) =>
+          controllers.routes.UnauthorisedController.onPageLoad()
       }
+
+    case IndividualBuyerNinoNumberPage(srn, landOrPropertyIndex, disposalIndex) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
 
     case CompanyBuyerNamePage(srn, landOrPropertyIndex, disposalIndex) => //TODO Navigation. Subsequent and previous pages still need to be implemented
       controllers.routes.UnauthorisedController.onPageLoad()

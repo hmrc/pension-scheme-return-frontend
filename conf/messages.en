@@ -1221,3 +1221,14 @@ landOrPropertyDisposalList.paragraph2 = You can only report disposal of land or 
 landOrPropertyDisposalList.legend = Which land or property was disposed of?
 landOrPropertyDisposalList.radios.error.required = Select the land or property that was disposed of
 landOrPropertyDisposalList.pagination.label = Showing {0} - {1} of {2} land or properties
+
+individualBuyerNinoNumber.title = Do you know the buyer’s National Insurance number?
+individualBuyerNinoNumber.heading = Do you know {0}’s National Insurance number?
+individualBuyerNinoNumber.yes.conditional = What is {0}’s National Insurance number?
+individualBuyerNinoNumber.no.conditional = ell us why you cannot provide {0}’s National Insurance number
+individualBuyerNinoNumber.error.required = Select yes if you know the buyer’s National Insurance number
+individualBuyerNinoNumber.no.conditional.error.required = Enter the reason you cannot provide the buyer’s National Insurance number
+individualBuyerNinoNumber.no.conditional.error.invalid = The reason you cannot provide the buyer’s National Insurance number must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+individualBuyerNinoNumber.no.conditional.error.length = The reason you cannot provide the buyer’s National Insurance number must be 160 characters or fewer
+individualBuyerNinoNumber.yes.conditional.error.required = Enter the buyer’s National Insurance number
+individualBuyerNinoNumber.yes.conditional.error.invalid = Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C
