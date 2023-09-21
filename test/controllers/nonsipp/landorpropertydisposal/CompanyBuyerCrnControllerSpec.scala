@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.landorpropertydisposal
 
-import config.Refined.{Max50, Max5000, OneTo5000}
+import config.Refined.{Max50, OneTo5000}
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.landorpropertydisposal.CompanyBuyerCrnController._
 import eu.timepit.refined.refineMV
