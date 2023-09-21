@@ -115,6 +115,19 @@ trait ModelGenerators extends BasicGenerators {
           .fold[Gen[Srn]](Gen.fail)(x => Gen.const(x))
       }
 
+  val addressGen: Gen[Address] = for {
+    addressLine1 <- nonEmptyString
+    addressLine2 <- nonEmptyString
+  } yield Address(
+    addressLine1,
+    addressLine2,
+    None,
+    None,
+    Some("ZZ1 1ZZ"),
+    "United Kingdom",
+    "GB"
+  )
+
   val pstrGen: Gen[Pstr] = nonEmptyString.map(Pstr)
 
   val schemeIdGen: Gen[SchemeId] = Gen.oneOf(srnGen, pstrGen)

@@ -19,6 +19,8 @@ package config
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.boolean.And
 import eu.timepit.refined.numeric.{Greater, LessEqual}
+import eu.timepit.refined.{refineMV, refineV}
+import models.Enumerable
 
 object Refined {
 
@@ -36,6 +38,18 @@ object Refined {
   // used by generators
   object Max5000 {
     type Refined = Greater[0] And LessEqual[5000]
+
+    implicit val enumerable: Enumerable[Max5000] = Enumerable(
+      (1 to 5000).toList
+        .map(
+          i =>
+            refineV[Refined](i).fold(
+              err => throw new Exception(err),
+              index => index
+            )
+        )
+        .map(index => index.value.toString -> index): _*
+    )
   }
 
   object Max50 {

@@ -110,17 +110,36 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         )
         .withName("go from land registry title page to why does scheme hold land or property page")
     )
+    "go from land or property total cost page" - {
+      act.like(
+        normalmode
+          .navigateToWithDataAndIndex(
+            index,
+            LandOrPropertyTotalCostPage,
+            Gen.const(money),
+            controllers.nonsipp.landorproperty.routes.IsLandOrPropertyResidentialController.onPageLoad
+          )
+          .withName(
+            "to is land or property residential page - when there is no total value"
+          )
+      )
 
-    act.like(
-      normalmode
-        .navigateToWithDataAndIndex(
-          index,
-          LandOrPropertyTotalCostPage,
-          Gen.const(money),
-          controllers.nonsipp.landorproperty.routes.IsLandOrPropertyResidentialController.onPageLoad
-        )
-        .withName("go from land or property total cost page to is land or property residential page")
-    )
+      act.like(
+        normalmode
+          .navigateToWithDataAndIndex(
+            index,
+            LandOrPropertyTotalCostPage,
+            Gen.const(money),
+            (srn, index: Max5000, _) =>
+              controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
+                .onPageLoad(srn, index, CheckOrChange.Check),
+            srn => defaultUserAnswers.unsafeSet(LandOrPropertyTotalIncomePage(srn, index), Money(1))
+          )
+          .withName(
+            "to is land or property residential page - when there is total value"
+          )
+      )
+    }
 
     act.like(
       normalmode
@@ -200,18 +219,55 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .withName("go from land or property individual seller name page to ? page")
     )
 
-    act.like(
-      normalmode
-        .navigateToWithDataAndIndex(
-          index,
-          LandOrPropertySellerConnectedPartyPage,
-          Gen.const(true),
-          controllers.nonsipp.landorproperty.routes.LandPropertyIndependentValuationController.onPageLoad
-        )
-        .withName(
-          "go from land or property is seller a connected party page to is land or property independent valuation page"
-        )
-    )
+    "go from land or property is seller a connected party page" - {
+
+      act.like(
+        normalmode
+          .navigateToWithDataAndIndex(
+            index,
+            LandOrPropertySellerConnectedPartyPage,
+            Gen.const(true),
+            controllers.nonsipp.landorproperty.routes.LandPropertyIndependentValuationController.onPageLoad
+          )
+          .withName("to is land or property independent valuation page - when there is no total value")
+      )
+
+      act.like(
+        normalmode
+          .navigateToWithDataAndIndex(
+            index,
+            LandOrPropertySellerConnectedPartyPage,
+            Gen.const(true),
+            controllers.nonsipp.landorproperty.routes.LandPropertyIndependentValuationController.onPageLoad,
+            srn =>
+              defaultUserAnswers
+                .unsafeSet(LandOrPropertyTotalIncomePage(srn, index), Money(1))
+          )
+          .withName(
+            "to is CYA page - when there is total value data but not total cost data"
+          )
+      )
+
+      act.like(
+        normalmode
+          .navigateToWithDataAndIndex(
+            index,
+            LandOrPropertySellerConnectedPartyPage,
+            Gen.const(true),
+            (srn, index: Max5000, _) =>
+              controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
+                .onPageLoad(srn, index, CheckOrChange.Check),
+            srn =>
+              defaultUserAnswers
+                .unsafeSet(LandOrPropertyTotalCostPage(srn, index), Money(1))
+                .unsafeSet(LandPropertyIndependentValuationPage(srn, index), true)
+                .unsafeSet(LandOrPropertyTotalIncomePage(srn, index), Money(1))
+          )
+          .withName(
+            "to CYA page - when all dependent data exist"
+          )
+      )
+    }
   }
 
   "WhyDoesSchemeHoldLandPropertyNavigator" - {
