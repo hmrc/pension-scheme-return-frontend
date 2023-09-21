@@ -17,6 +17,7 @@
 package controllers.nonsipp.landorpropertydisposal
 
 import config.Refined.{Max50, Max5000}
+import controllers.PSRController
 import controllers.actions._
 import controllers.nonsipp.landorpropertydisposal.WhoPurchasedLandOrPropertyController._
 import forms.RadioListFormProvider
@@ -24,6 +25,7 @@ import models.IdentityType.{Individual, Other, UKCompany, UKPartnership}
 import models.SchemeId.Srn
 import models.{IdentityType, Mode, NormalMode}
 import navigation.Navigator
+import pages.nonsipp.landorproperty.LandOrPropertyAddressLookupPage
 import pages.nonsipp.landorpropertydisposal.WhoPurchasedLandOrPropertyPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -34,6 +36,8 @@ import utils.FormUtils.FormOps
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, RadioListRowViewModel, RadioListViewModel}
 import views.html.RadioListView
+import viewmodels.DisplayMessage._
+import viewmodels.implicits._
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
@@ -47,19 +51,21 @@ class WhoPurchasedLandOrPropertyController @Inject()(
   val controllerComponents: MessagesControllerComponents,
   view: RadioListView
 )(implicit ec: ExecutionContext)
-    extends FrontendBaseController
-    with I18nSupport {
+    extends PSRController {
 
   private val form = WhoPurchasedLandOrPropertyController.form(formProvider)
 
   def onPageLoad(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      Ok(
-        view(
-          form.fromUserAnswers(WhoPurchasedLandOrPropertyPage(srn, landOrPropertyIndex, disposalIndex)),
-          viewModel(srn, landOrPropertyIndex, disposalIndex, mode)
-        )
-      )
+      request.userAnswers.get(LandOrPropertyAddressLookupPage(srn, landOrPropertyIndex)).getOrRecoverJourney {
+        address =>
+          Ok(
+            view(
+              form.fromUserAnswers(WhoPurchasedLandOrPropertyPage(srn, landOrPropertyIndex, disposalIndex)),
+              viewModel(srn, landOrPropertyIndex, disposalIndex, address.addressLine1, mode)
+            )
+          )
+      }
     }
 
   def onSubmit(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
@@ -68,8 +74,18 @@ class WhoPurchasedLandOrPropertyController @Inject()(
         .bindFromRequest()
         .fold(
           formWithErrors =>
-            Future
-              .successful(BadRequest(view(formWithErrors, viewModel(srn, landOrPropertyIndex, disposalIndex, mode)))),
+            request.userAnswers.get(LandOrPropertyAddressLookupPage(srn, landOrPropertyIndex)).getOrRecoverJourney {
+              address =>
+                Future
+                  .successful(
+                    BadRequest(
+                      view(
+                        formWithErrors,
+                        viewModel(srn, landOrPropertyIndex, disposalIndex, address.addressLine1, mode)
+                      )
+                    )
+                  )
+            },
           answer => {
             for {
               updatedAnswers <- Future.fromTry(
@@ -106,11 +122,12 @@ object WhoPurchasedLandOrPropertyController {
     srn: Srn,
     landOrPropertyIndex: Max5000,
     disposalIndex: Max50,
+    addressLine1: String,
     mode: Mode
   ): FormPageViewModel[RadioListViewModel] =
     FormPageViewModel(
       Message("whoPurchasedLandOrProperty.title"),
-      Message("whoPurchasedLandOrProperty.heading"),
+      Message("whoPurchasedLandOrProperty.heading", addressLine1),
       RadioListViewModel(
         None,
         radioListItems
