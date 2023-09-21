@@ -58,7 +58,6 @@ class LandOrPropertyDisposalListController @Inject()(
     implicit request =>
       val addresses = request.userAnswers.map(LandOrPropertyAddressLookupPages(srn))
       withIndexedAddress(addresses) { sortedAddresses =>
-        println(sortedAddresses)
         Ok(view(form, viewModel(srn, page, sortedAddresses)))
       }
   }

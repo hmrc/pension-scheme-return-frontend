@@ -32,7 +32,7 @@ class LandPropertyIndependentValuationControllerSpec extends ControllerBaseSpec 
   private lazy val onPageLoad = routes.LandPropertyIndependentValuationController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.LandPropertyIndependentValuationController.onSubmit(srn, index, NormalMode)
 
-  override val address = Address("addressLine1", "addressLine2", None, None, None, "UK")
+  override val address = Address("addressLine1", "addressLine2", None, None, None, "United Kingdom", "GB")
   private val userAnswersWithLookUpPage =
     defaultUserAnswers.unsafeSet(LandOrPropertyAddressLookupPage(srn, index), address)
 

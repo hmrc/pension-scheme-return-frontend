@@ -61,6 +61,9 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
         .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
 
     case CompanyBuyerCrnPage(srn, landOrPropertyIndex, disposalIndex) =>
+    controllers.routes.UnauthorisedController.onPageLoad()
+
+    case LandOrPropertyIndividualBuyerNamePage(srn, landOrPropertyIndex, disposalIndex) =>   controllers.routes.UnauthorisedController.onPageLoad()
       controllers.routes.UnauthorisedController.onPageLoad()
   }
 

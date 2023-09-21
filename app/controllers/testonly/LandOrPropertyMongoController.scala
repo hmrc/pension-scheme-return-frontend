@@ -48,7 +48,8 @@ class LandOrPropertyMongoController @Inject()(
     addressLine3 = None,
     town = Some("test town"),
     postCode = Some("ZZ1 1ZZ"),
-    country = "United Kingdom"
+    country = "United Kingdom",
+    countryCode = "GB"
   )
 
   def addLandOrProperty(srn: Srn, num: Max5000): Action[AnyContent] = identifyAndRequireData(srn).async {

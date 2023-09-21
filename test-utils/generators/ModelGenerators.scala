@@ -124,7 +124,8 @@ trait ModelGenerators extends BasicGenerators {
     None,
     None,
     Some("ZZ1 1ZZ"),
-    "UK"
+    "United Kingdom",
+    "GB"
   )
 
   val pstrGen: Gen[Pstr] = nonEmptyString.map(Pstr)

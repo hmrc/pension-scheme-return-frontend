@@ -33,7 +33,8 @@ case class Address(
   addressLine3: Option[String],
   town: Option[String],
   postCode: Option[String],
-  country: String
+  country: String,
+  countryCode: String
 )
 
 object Address {

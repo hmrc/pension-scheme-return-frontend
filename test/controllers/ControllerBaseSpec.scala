@@ -126,7 +126,8 @@ trait TestValues {
     Some("testAddressLine3"),
     Some("testTown"),
     Some("testPostCode"),
-    "testCountry"
+    "testCountry",
+    "GB"
   )
 
   val individualDetails: IndividualDetails = IndividualDetails("testFirstName", Some("testMiddleName"), "testLastName")
