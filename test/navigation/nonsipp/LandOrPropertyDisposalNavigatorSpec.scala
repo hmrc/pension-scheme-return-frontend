@@ -103,9 +103,11 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
           index,
           disposalIndex,
           LandOrPropertyIndividualBuyerNamePage,
-          (srn, index: Max5000, disposalIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          (srn, index: Max5000, disposalIndex: Max50, _) =>
+            controllers.nonsipp.landorpropertydisposal.routes.IndividualBuyerNinoNumberController
+              .onPageLoad(srn, index, disposalIndex, NormalMode)
         )
-        .withName("go from land or property individual buyer name page to unauthorised page")
+        .withName("go from land or property individual buyer name page to individual buyer nino number page")
     )
   }
 }

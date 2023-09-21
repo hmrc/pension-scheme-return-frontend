@@ -22,7 +22,7 @@ import controllers.nonsipp.landorpropertydisposal.IndividualBuyerNinoNumberContr
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.{ConditionalYesNo, NormalMode}
-import pages.nonsipp.landorpropertydisposal.IndividualBuyerNinoNumberPage
+import pages.nonsipp.landorpropertydisposal.{IndividualBuyerNinoNumberPage, LandOrPropertyIndividualBuyerNamePage}
 import uk.gov.hmrc.domain.Nino
 import views.html.ConditionalYesNoPageView
 
@@ -38,26 +38,30 @@ class IndividualBuyerNinoNumberControllerSpec extends ControllerBaseSpec {
     controllers.nonsipp.landorpropertydisposal.routes.IndividualBuyerNinoNumberController
       .onSubmit(srn, index, disposalIndex, NormalMode)
 
+  val userAnswersWithIndividualName =
+    defaultUserAnswers.unsafeSet(LandOrPropertyIndividualBuyerNamePage(srn, index, disposalIndex), individualName)
+
   val conditionalNo: ConditionalYesNo[String, Nino] = ConditionalYesNo.no("reason")
   val conditionalYes: ConditionalYesNo[String, Nino] = ConditionalYesNo.yes(nino)
 
   "IndividualBuyerNinoNumberController" - {
 
-    act.like(renderView(onPageLoad) { implicit app => implicit request =>
+    act.like(renderView(onPageLoad, userAnswersWithIndividualName) { implicit app => implicit request =>
       injected[ConditionalYesNoPageView]
-        .apply(form(injected[YesNoPageFormProvider]), viewModel(srn, index, disposalIndex, NormalMode))
+        .apply(form(injected[YesNoPageFormProvider]), viewModel(srn, index, disposalIndex, individualName, NormalMode))
     })
 
     act.like(
       renderPrePopView(
         onPageLoad,
         IndividualBuyerNinoNumberPage(srn, index, disposalIndex),
-        conditionalNo
+        conditionalNo,
+        userAnswersWithIndividualName
       ) { implicit app => implicit request =>
         injected[ConditionalYesNoPageView]
           .apply(
             form(injected[YesNoPageFormProvider]).fill(conditionalNo.value),
-            viewModel(srn, index, disposalIndex, NormalMode)
+            viewModel(srn, index, disposalIndex, individualName, NormalMode)
           )
       }
     )
@@ -68,6 +72,8 @@ class IndividualBuyerNinoNumberControllerSpec extends ControllerBaseSpec {
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
     act.like(saveAndContinue(onSubmit, "value" -> "true", "value.yes" -> nino.value))
+
+    act.like(invalidForm(onSubmit, userAnswersWithIndividualName))
 
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }

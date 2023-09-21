@@ -24,7 +24,7 @@ import forms.mappings.Mappings
 import models.SchemeId.Srn
 import models.{ConditionalYesNo, Mode}
 import navigation.Navigator
-import pages.nonsipp.landorpropertydisposal.IndividualBuyerNinoNumberPage
+import pages.nonsipp.landorpropertydisposal.{IndividualBuyerNinoNumberPage, LandOrPropertyIndividualBuyerNamePage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -55,9 +55,12 @@ class IndividualBuyerNinoNumberController @Inject()(
 
   def onPageLoad(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      val preparedForm =
-        request.userAnswers.fillForm(IndividualBuyerNinoNumberPage(srn, landOrPropertyIndex, disposalIndex), form)
-      Ok(view(preparedForm, viewModel(srn, landOrPropertyIndex, disposalIndex, mode)))
+      request.usingAnswer(LandOrPropertyIndividualBuyerNamePage(srn, landOrPropertyIndex, disposalIndex)).sync {
+        individualName =>
+          val preparedForm =
+            request.userAnswers.fillForm(IndividualBuyerNinoNumberPage(srn, landOrPropertyIndex, disposalIndex), form)
+          Ok(view(preparedForm, viewModel(srn, landOrPropertyIndex, disposalIndex, individualName, mode)))
+      }
 
     }
 
@@ -67,8 +70,14 @@ class IndividualBuyerNinoNumberController @Inject()(
         .bindFromRequest()
         .fold(
           formWithErrors =>
-            Future
-              .successful(BadRequest(view(formWithErrors, viewModel(srn, landOrPropertyIndex, disposalIndex, mode)))),
+            request.usingAnswer(LandOrPropertyIndividualBuyerNamePage(srn, landOrPropertyIndex, disposalIndex)).async {
+              individualName =>
+                Future.successful(
+                  BadRequest(
+                    view(formWithErrors, viewModel(srn, landOrPropertyIndex, disposalIndex, individualName, mode))
+                  )
+                )
+            },
           value =>
             for {
               updatedAnswers <- Future
@@ -106,16 +115,17 @@ object IndividualBuyerNinoNumberController {
     srn: Srn,
     landOrPropertyIndex: Max5000,
     disposalIndex: Max50,
+    individualName: String,
     mode: Mode
   ): FormPageViewModel[ConditionalYesNoPageViewModel] =
     FormPageViewModel[ConditionalYesNoPageViewModel](
       "individualBuyerNinoNumber.title",
-      Message("individualBuyerNinoNumber.heading", "John Doe"),
+      Message("individualBuyerNinoNumber.heading", individualName),
       ConditionalYesNoPageViewModel(
         yes = YesNoViewModel
-          .Conditional(Message("individualBuyerNinoNumber.yes.conditional", "John Doe"), FieldType.Input),
+          .Conditional(Message("individualBuyerNinoNumber.yes.conditional", individualName), FieldType.Input),
         no = YesNoViewModel
-          .Conditional(Message("individualBuyerNinoNumber.no.conditional", "John Doe"), FieldType.Textarea)
+          .Conditional(Message("individualBuyerNinoNumber.no.conditional", individualName), FieldType.Textarea)
       ),
       routes.IndividualBuyerNinoNumberController.onSubmit(srn, landOrPropertyIndex, disposalIndex, mode)
     )
