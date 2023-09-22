@@ -17,21 +17,15 @@
 package services
 
 import cats.implicits._
-import config.Refined.Max5000
+import config.Refined.OneTo5000
 import connectors.PSRConnector
 import eu.timepit.refined.refineV
 import models.ConditionalYesNo._
-import models.IdentitySubject.LoanRecipient
 import models.SchemeId.Srn
 import models.requests.DataRequest
 import models.{RecipientIdentityType, _}
 import pages.nonsipp.CheckReturnDatesPage
-import pages.nonsipp.common.{
-  CompanyRecipientCrnPage,
-  IdentityTypes,
-  OtherRecipientDetailsPage,
-  PartnershipRecipientUtrPage
-}
+import pages.nonsipp.common.{CompanyRecipientCrnPage, IdentityTypes, OtherRecipientDetailsPage, PartnershipRecipientUtrPage}
 import pages.nonsipp.loansmadeoroutstanding._
 import pages.nonsipp.schemedesignatory.{HowManyMembersPage, WhyNoBankAccountPage}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -76,10 +70,10 @@ class PSRSubmissionService @Inject()(psrConnector: PSRConnector, schemeDateServi
 
   private def buildLoanTransactions(srn: Srn)(implicit request: DataRequest[_]): List[LoanTransactions] = {
     request.userAnswers
-      .map(IdentityTypes(srn, LoanRecipient))
+      .map(IdentityTypes(srn, IdentitySubject.LoanRecipient))
       .map {
         case (key, identityType) =>
-          key.toIntOption.flatMap(i => refineV[Max5000.Refined](i).toOption) match {
+          key.toIntOption.flatMap(i => refineV[OneTo5000](i + 1).toOption) match {
             case None => None
             case Some(index) =>
               val optRecipientIdentityDetails: OptionalRecipientDetails = identityType match {
