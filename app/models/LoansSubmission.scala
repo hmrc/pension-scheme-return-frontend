@@ -31,13 +31,14 @@ case class Loans(schemeHadLoans: Boolean, loanTransactions: Seq[LoanTransactions
 case class LoanTransactions(
   recipientIdentityType: RecipientIdentityType,
   loanRecipientName: String,
-  recipientSponsoringEmployer: Boolean,
-  datePeriodLoanDetails: Seq[LoanPeriod],
-  loanAmountDetails: Seq[LoanAmountDetails],
+  optConnectedPartyStatus: Option[Boolean],
+  optRecipientSponsoringEmployer: Option[String],
+  datePeriodLoanDetails: LoanPeriod,
+  loanAmountDetails: LoanAmountDetails,
   equalInstallments: Boolean,
-  loanInterestDetails: Seq[LoanInterestDetails],
-  securityGivenDetails: Option[String],
-  outstandingArrearsOnLoan: Option[Money]
+  loanInterestDetails: LoanInterestDetails,
+  optSecurityGivenDetails: Option[String],
+  optOutstandingArrearsOnLoan: Option[Double]
 )
 
 case class RecipientIdentityType(
