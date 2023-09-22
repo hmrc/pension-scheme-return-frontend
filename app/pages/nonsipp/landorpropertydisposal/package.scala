@@ -16,7 +16,6 @@
 
 package pages.nonsipp
 
-import pages.nonsipp.landorproperty.Paths.landOrProperty
 import play.api.libs.json.{__, JsPath}
 
 package object landorpropertydisposal {

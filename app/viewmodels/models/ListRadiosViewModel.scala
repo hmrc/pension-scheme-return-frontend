@@ -17,7 +17,6 @@
 package viewmodels.models
 
 import viewmodels.DisplayMessage
-import viewmodels.DisplayMessage.Message
 
 case class ListRadiosRow(
   index: Int,
