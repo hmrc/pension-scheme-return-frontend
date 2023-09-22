@@ -52,14 +52,18 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
         case Some(IdentityType.UKCompany) =>
           controllers.routes.UnauthorisedController.onPageLoad()
         case Some(IdentityType.UKPartnership) =>
-          controllers.routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.landorpropertydisposal.routes.PartnershipBuyerNameController
+            .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
       }
 
-
-    case LandOrPropertyIndividualBuyerNamePage(srn, landOrPropertyIndex, disposalIndex) =>   controllers.routes.UnauthorisedController.onPageLoad()
+    case LandOrPropertyIndividualBuyerNamePage(srn, landOrPropertyIndex, disposalIndex) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
 
     case CompanyBuyerNamePage(srn, landOrPropertyIndex, disposalIndex) => //TODO Navigation. Subsequent and previous pages still need to be implemented
 
+      controllers.routes.UnauthorisedController.onPageLoad()
+
+    case PartnershipBuyerNamePage(srn, landOrPropertyIndex, disposalIndex) =>
       controllers.routes.UnauthorisedController.onPageLoad()
   }
 

@@ -1227,3 +1227,9 @@ landOrPropertyDisposalList.paragraph2 = You can only report disposal of land or 
 landOrPropertyDisposalList.legend = Which land or property was disposed of?
 landOrPropertyDisposalList.radios.error.required = Select the land or property that was disposed of
 landOrPropertyDisposalList.pagination.label = Showing {0} - {1} of {2} land or properties
+
+partnershipBuyerName.title = What is the buyer’s partnership name?
+partnershipBuyerName.heading = What is the buyer’s partnership name?
+partnershipBuyerName.error.required = Enter the buyer’s partnership name
+partnershipBuyerName.error.tooLong = Buyer’s partnership name must be 160 characters or fewer
+partnershipBuyerName.error.invalid = Buyer’s partnership name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
