@@ -214,8 +214,7 @@ object TaskListController {
                 .onPageLoad(srn, 1, ManualOrUpload.Manual)
                 .url
             case _ =>
-              val membersDetailsPages = userAnswers.get(MembersDetailsPages(srn))
-              val incompleteIndex = membersDetailsPages.get.size
+              val incompleteIndex = getIncompleteMembersIndex(userAnswers, srn)
               refineV[OneTo300](incompleteIndex).fold(
                 _ =>
                   controllers.nonsipp.memberdetails.routes.SchemeMembersListController
@@ -263,6 +262,31 @@ object TaskListController {
             InProgress
           } else {
             Completed
+          }
+        }
+    }
+  }
+
+  private def getIncompleteMembersIndex(userAnswers: UserAnswers, srn: Srn) = {
+    val membersDetailsPages = userAnswers.get(MembersDetailsPages(srn))
+    val ninoPages = userAnswers.get(MemberDetailsNinoPages(srn))
+    val noNinoPages = userAnswers.get(NoNinoPages(srn))
+    (membersDetailsPages, ninoPages, noNinoPages) match {
+      case (None, _, _) => 1
+      case (Some(_), None, None) => 1
+      case (Some(memberDetails), ninos, noNinos) =>
+        if (memberDetails.isEmpty) {
+          1
+        } else {
+          val memberDetailsIndexes = (0 to memberDetails.size - 1).toList
+          val ninoIndexes = ninos.getOrElse(List.empty).map(_._1.toInt).toList
+          val noninoIndexes = noNinos.getOrElse(List.empty).map(_._1.toInt).toList
+          val finishedIndexes = ninoIndexes ++ noninoIndexes
+          val filtered = memberDetailsIndexes.filter(finishedIndexes.indexOf(_) < 0)
+          if (filtered.isEmpty) {
+            1
+          } else {
+            filtered(0) + 1
           }
         }
     }
