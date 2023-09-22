@@ -159,7 +159,7 @@ trait ControllerBehaviours {
     expectedDataPath: Option[JsPath],
     form: (String, String)*
   ): BehaviourTest =
-    "save data and continue to next page".hasBehaviour {
+    s"save data and continue to next page with ${form.toList.toString()}".hasBehaviour {
 
       val saveService = mock[SaveService]
       val userDetailsCaptor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])

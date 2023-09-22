@@ -33,19 +33,24 @@ class LandOrPropertyStillHeldControllerSpec extends ControllerBaseSpec {
     routes.LandOrPropertyStillHeldController.onPageLoad(srn, index, disposalIndex, NormalMode)
   private lazy val onSubmit = routes.LandOrPropertyStillHeldController.onSubmit(srn, index, disposalIndex, NormalMode)
 
+  private val userAnswers = userAnswersWithAddress(srn, index)
+
   "LandOrPropertyStillHeldController" - {
 
-    act.like(renderView(onPageLoad) { implicit app => implicit request =>
+    act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
       injected[YesNoPageView]
-        .apply(form(injected[YesNoPageFormProvider]), viewModel(srn, index, disposalIndex, schemeName, NormalMode))
+        .apply(
+          form(injected[YesNoPageFormProvider]),
+          viewModel(srn, index, disposalIndex, address.addressLine1, schemeName, NormalMode)
+        )
     })
 
-    act.like(renderPrePopView(onPageLoad, LandOrPropertyStillHeldPage(srn, index, disposalIndex), true) {
+    act.like(renderPrePopView(onPageLoad, LandOrPropertyStillHeldPage(srn, index, disposalIndex), true, userAnswers) {
       implicit app => implicit request =>
         injected[YesNoPageView]
           .apply(
             form(injected[YesNoPageFormProvider]).fill(true),
-            viewModel(srn, index, disposalIndex, schemeName, NormalMode)
+            viewModel(srn, index, disposalIndex, address.addressLine1, schemeName, NormalMode)
           )
     })
     act.like(redirectNextPage(onSubmit, "value" -> "true"))
@@ -55,7 +60,7 @@ class LandOrPropertyStillHeldControllerSpec extends ControllerBaseSpec {
 
     act.like(saveAndContinue(onSubmit, "value" -> "true"))
 
-    act.like(invalidForm(onSubmit))
+    act.like(invalidForm(onSubmit, userAnswers))
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }
 }

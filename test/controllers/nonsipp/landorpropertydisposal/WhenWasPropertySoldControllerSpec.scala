@@ -47,6 +47,8 @@ class WhenWasPropertySoldControllerSpec extends ControllerBaseSpec {
   private lazy val onPageLoad = routes.WhenWasPropertySoldController.onPageLoad(srn, index, disposalIndex, NormalMode)
   private lazy val onSubmit = routes.WhenWasPropertySoldController.onSubmit(srn, index, disposalIndex, NormalMode)
 
+  private val userAnswers = userAnswersWithAddress(srn, index)
+
   "WhenWasPropertySoldController" - {
 
     val taxYear = Some(Left(dateRange))
@@ -59,22 +61,22 @@ class WhenWasPropertySoldControllerSpec extends ControllerBaseSpec {
         .withName("onPageLoad redirect to journey recovery page when taxYearOrAccountingPeriods is not found")
     )
 
-    act.like(renderView(onPageLoad) { implicit app => implicit request =>
+    act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
       injected[DatePageView]
         .apply(
           form(injected[DatePageFormProvider])(date, beforeDate, createMessages(app)),
-          viewModel(srn, index, disposalIndex, NormalMode)
+          viewModel(srn, index, disposalIndex, address.addressLine1, NormalMode)
         )
     }.before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear)))
 
     act.like(
-      renderPrePopView(onPageLoad, WhenWasPropertySoldPage(srn, index, disposalIndex), date) {
+      renderPrePopView(onPageLoad, WhenWasPropertySoldPage(srn, index, disposalIndex), date, userAnswers) {
         implicit app => implicit request =>
           injected[DatePageView]
             .apply(
               form(injected[DatePageFormProvider])(date, beforeDate, createMessages(app))
                 .fill(date),
-              viewModel(srn, index, disposalIndex, NormalMode)
+              viewModel(srn, index, disposalIndex, address.addressLine1, NormalMode)
             )
       }.before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear))
     )
@@ -86,12 +88,13 @@ class WhenWasPropertySoldControllerSpec extends ControllerBaseSpec {
     )
 
     act.like(
-      invalidForm(onSubmit).before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear))
+      invalidForm(onSubmit, userAnswers).before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear))
     )
 
     act.like(
       saveAndContinue(
         onSubmit,
+        userAnswers,
         "value.day" -> "10",
         "value.month" -> "12",
         "value.year" -> "2020"

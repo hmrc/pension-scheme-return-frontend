@@ -18,7 +18,10 @@ package forms
 
 import forms.mappings.Mappings
 import models.Enumerable
-import play.api.data.Form
+import models.GenericFormMapper.ConditionalRadioMapper
+import play.api.data.Forms.mapping
+import play.api.data.{Form, Mapping}
+import uk.gov.voa.play.form.ConditionalMappings
 
 import javax.inject.Inject
 
@@ -28,4 +31,21 @@ class RadioListFormProvider @Inject() extends Mappings {
     requiredKey: String
   ): Form[A] =
     Form("value" -> enumerable(requiredKey, requiredKey))
+
+  // mapping for a list of radios where one can conditionally reveal html
+  def singleConditional[A, Conditional](
+    requiredKey: String,
+    conditionalKey: String,
+    conditionalMapping: Mapping[Conditional]
+  )(implicit ev: ConditionalRadioMapper[Conditional, A]): Form[A] = {
+
+    val conditional: Map[String, String] => Boolean = _.get("value").contains(conditionalKey)
+
+    Form(
+      mapping[A, String, Option[Conditional]](
+        "value" -> text(requiredKey),
+        "conditional" -> ConditionalMappings.mandatoryIf[Conditional](conditional, conditionalMapping)
+      )(ev.to(_, _))(ev.from)
+    )
+  }
 }

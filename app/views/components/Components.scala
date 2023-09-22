@@ -87,6 +87,11 @@ object Components {
       s"""<h2 class="$cssClass">${content.body}</h2>"""
     )
 
+  private def hint(content: Html): Html =
+    HtmlFormat.raw(
+      s"""<p class="govuk-hint">${content.body}</p>"""
+    )
+
   def renderMessage(message: DisplayMessage)(implicit messages: Messages): HtmlFormat.Appendable =
     message match {
       case Empty => Html("")
@@ -103,5 +108,6 @@ object Components {
         )
       case CompoundMessage(first, second) => combine(renderMessage(first), renderMessage(second))
       case Heading2(content, labelSize) => h2(renderMessage(content), labelSize.toString)
+      case HintMessage(content) => hint(renderMessage(content))
     }
 }
