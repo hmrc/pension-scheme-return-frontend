@@ -69,14 +69,14 @@ class CompanyBuyerCrnController @Inject()(
         .bindFromRequest()
         .fold(
           formWithErrors =>
-            request.usingAnswer(CompanyBuyerNamePage(srn, landOrPropertyIndex, disposalIndex)).async { individualName =>
+            request.usingAnswer(CompanyBuyerNamePage(srn, landOrPropertyIndex, disposalIndex)).async { companyName =>
               Future
                 .successful(
                   BadRequest(
                     view(
                       formWithErrors,
                       CompanyBuyerCrnController
-                        .viewModel(srn, landOrPropertyIndex, disposalIndex, mode, individualName)
+                        .viewModel(srn, landOrPropertyIndex, disposalIndex, mode, companyName)
                     )
                   )
                 )
