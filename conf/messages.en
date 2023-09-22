@@ -1227,3 +1227,14 @@ landOrPropertyDisposalList.paragraph2 = You can only report disposal of land or 
 landOrPropertyDisposalList.legend = Which land or property was disposed of?
 landOrPropertyDisposalList.radios.error.required = Select the land or property that was disposed of
 landOrPropertyDisposalList.pagination.label = Showing {0} - {1} of {2} land or properties
+
+otherBuyerDetails.title =  Buyer’s details
+otherBuyerDetails.heading = Buyer’s details
+otherBuyerDetails.name = Buyer’s name
+otherBuyerDetails.description = Brief description of recipient
+otherBuyerDetails.name.error.required = Enter the  buyer’s name
+otherBuyerDetails.name.error.invalid = Buyer’s name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+otherBuyerDetails.name.error.length =  Buyer’s name must be 160 characters or fewer
+otherBuyerDetails.description.error.required = Enter a brief description of the recipient
+otherBuyerDetails.description.error.invalid = The brief description of the recipient must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, full stops, hyphens, slashes, speech marks and spaces
+otherBuyerDetails.description.error.length = The brief description of the recipient must be 160 characters or fewer

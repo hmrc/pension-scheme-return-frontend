@@ -46,7 +46,8 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
     case WhoPurchasedLandOrPropertyPage(srn, landOrPropertyIndex, disposalIndex) =>
       userAnswers.get(WhoPurchasedLandOrPropertyPage(srn, landOrPropertyIndex, disposalIndex)) match {
         case Some(IdentityType.Other) =>
-          controllers.routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.landorpropertydisposal.routes.OtherBuyerDetailsController
+            .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
         case Some(IdentityType.Individual) =>
           controllers.routes.UnauthorisedController.onPageLoad()
         case Some(IdentityType.UKCompany) =>
@@ -55,8 +56,8 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
           controllers.routes.UnauthorisedController.onPageLoad()
       }
 
-
-    case LandOrPropertyIndividualBuyerNamePage(srn, landOrPropertyIndex, disposalIndex) =>   controllers.routes.UnauthorisedController.onPageLoad()
+    case LandOrPropertyIndividualBuyerNamePage(srn, landOrPropertyIndex, disposalIndex) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
 
     case CompanyBuyerNamePage(srn, landOrPropertyIndex, disposalIndex) => //TODO Navigation. Subsequent and previous pages still need to be implemented
 
