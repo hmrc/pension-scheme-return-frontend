@@ -229,8 +229,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             Gen.const(true),
             controllers.nonsipp.landorproperty.routes.LandPropertyIndependentValuationController.onPageLoad
           )
-          .withName("to is land or property independent valuation page - when there is no total value"
-          )
+          .withName("to is land or property independent valuation page - when there is no total value")
       )
 
       act.like(

@@ -26,5 +26,5 @@ case class CompanyRecipientNamePage(srn: Srn, index: Max5000) extends QuestionPa
 
   override def path: JsPath = Paths.loanTransactions \ "loanRecipientName" \ toString \ index.arrayIndex.toString
 
-  override def toString: String = "companyName"
+  override def toString: String = "company"
 }

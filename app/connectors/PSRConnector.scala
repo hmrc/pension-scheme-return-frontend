@@ -17,9 +17,9 @@
 package connectors
 
 import config.FrontendAppConfig
-import models.MinimalRequiredSubmission
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import models.{LoansSubmission, MinimalRequiredSubmission}
 import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -33,6 +33,14 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClient) {
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
     http.POST[MinimalRequiredSubmission, Unit](
       baseUrl + "/pension-scheme-return/psr/submit-minimal-required-details",
+      submission
+    )
+
+  def submitLoansDetails(
+    submission: LoansSubmission
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
+    http.POST[LoansSubmission, Unit](
+      baseUrl + "/pension-scheme-return/psr/standard",
       submission
     )
 }

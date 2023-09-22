@@ -25,18 +25,18 @@ import models.ConditionalYesNo._
 import models.SchemeId.Srn
 import models.{Security, _}
 import navigation.Navigator
-
+import pages.nonsipp.CheckReturnDatesPage
 import pages.nonsipp.common.{
   CompanyRecipientCrnPage,
   IdentityTypePage,
   OtherRecipientDetailsPage,
   PartnershipRecipientUtrPage
 }
-
 import pages.nonsipp.loansmadeoroutstanding._
+import pages.nonsipp.schemedesignatory.{HowManyMembersPage, WhyNoBankAccountPage}
 import play.api.i18n._
 import play.api.mvc._
-import services.SchemeDateService
+import services.{PSRSubmissionService, SchemeDateService}
 import utils.DateTimeUtils.localDateShow
 import utils.ListUtils.ListOps
 import viewmodels.DisplayMessage._
@@ -46,6 +46,7 @@ import views.html.CheckYourAnswersView
 
 import java.time.LocalDate
 import javax.inject.{Inject, Named}
+import scala.concurrent.ExecutionContext
 
 class LoansCYAController @Inject()(
   override val messagesApi: MessagesApi,
@@ -53,8 +54,10 @@ class LoansCYAController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   schemeDateService: SchemeDateService,
+  psrSubmissionService: PSRSubmissionService,
   view: CheckYourAnswersView
-) extends PSRController {
+)(implicit ec: ExecutionContext)
+    extends PSRController {
 
   def onPageLoad(
     srn: Srn,
@@ -139,8 +142,29 @@ class LoansCYAController @Inject()(
     }
 
   def onSubmit(srn: Srn, checkOrChange: CheckOrChange): Action[AnyContent] =
-    identifyAndRequireData(srn) { implicit request =>
-      Redirect(navigator.nextPage(LoansCYAPage(srn), NormalMode, request.userAnswers))
+    identifyAndRequireData(srn).async { implicit request =>
+      val result = for {
+        returnPeriods <- schemeDateService.returnPeriods(srn).getOrRecoverJourneyT
+        reasonForNoBankAccount = request.userAnswers.get(WhyNoBankAccountPage(srn))
+        schemeMemberNumbers <- request.userAnswers
+          .get(HowManyMembersPage(srn, request.pensionSchemeId))
+          .getOrRecoverJourneyT
+        checkReturnDates <- request.userAnswers.get(CheckReturnDatesPage(srn)).getOrRecoverJourneyT
+        schemeHadLoans <- request.userAnswers.get(LoansMadeOrOutstandingPage(srn)).getOrRecoverJourneyT
+        _ <- psrSubmissionService
+          .submitLoanDetails(
+            pstr = request.schemeDetails.pstr,
+            periodStart = returnPeriods.last.to,
+            periodEnd = returnPeriods.last.from,
+            accountingPeriods = returnPeriods,
+            reasonForNoBankAccount = reasonForNoBankAccount,
+            schemeMemberNumbers = schemeMemberNumbers,
+            checkReturnDates,
+            schemeHadLoans
+          )
+          .liftF
+      } yield Redirect(navigator.nextPage(LoansCYAPage(srn), NormalMode, request.userAnswers))
+      result.merge
     }
 }
 
