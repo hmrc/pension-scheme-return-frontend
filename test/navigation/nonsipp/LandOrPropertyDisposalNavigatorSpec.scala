@@ -90,7 +90,7 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
           index,
           disposalIndex,
           IndividualBuyerNinoNumberPage,
-          (srn, index: Max5000, disposalIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalSellerConnectedPartyController.onPageLoad
         )
         .withName("go from individual buyer nino page to unauthorised page")
     )
@@ -118,11 +118,35 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
           index,
           disposalIndex,
           PartnershipBuyerNamePage,
-          (srn, index: Max5000, disposalIndex: Max50, _) =>
-            controllers.nonsipp.landorpropertydisposal.routes.PartnershipBuyerUtrController
-              .onPageLoad(srn, index, disposalIndex, NormalMode)
+          controllers.nonsipp.landorpropertydisposal.routes.PartnershipBuyerUtrController.onPageLoad
         )
         .withName("go from partnership buyer UTR page")
+    )
+  }
+
+  "PartnershipBuyerUtrPage" - {
+    act.like(
+      normalmode
+        .navigateToWithDoubleIndex(
+          index,
+          disposalIndex,
+          PartnershipBuyerUtrPage,
+          controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalSellerConnectedPartyController.onPageLoad
+        )
+        .withName("go from partnership buyer UTR page")
+    )
+  }
+
+  "LandOrPropertyDisposalSellerConnectedPartyPage" - {
+    act.like(
+      normalmode
+        .navigateToWithDoubleIndex(
+          index,
+          disposalIndex,
+          LandOrPropertyDisposalSellerConnectedPartyPage,
+          (srn, index: Max5000, disposalIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+        )
+        .withName("go from LandOrPropertyDisposalSellerConnectedPartyPage to ??? page")
     )
   }
 }

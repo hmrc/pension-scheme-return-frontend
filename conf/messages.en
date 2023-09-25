@@ -1293,3 +1293,7 @@ howWasDisposed.error.required = Select how the land or property was disposed of
 howWasDisposed.conditional.error.required = Enter details of the disposal
 howWasDisposed.conditional.error.invalid = Details of the disposal must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
 howWasDisposed.conditional.error.length = Details of the disposal must be 160 characters or fewer
+
+landOrPropertyDisposalSellerConnectedParty.title = Is the seller a connected party?
+landOrPropertyDisposalSellerConnectedParty.heading = Is {0} a connected party?
+landOrPropertyDisposalSellerConnectedParty.error.required = Select yes if the seller is a connected party
