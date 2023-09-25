@@ -1207,7 +1207,7 @@ landOrPropertyIndividualBuyerName.error.length = Buyer’s name must be 160 char
 landOrPropertyIndividualBuyerName.error.invalid.characters = Buyer’s name must only include letters a to z, hyphens, apostrophes and spaces
 
 whoPurchasedLandOrProperty.title = Who purchased the land or property?
-whoPurchasedLandOrProperty.heading = Who purchased 12 Holly Lane?
+whoPurchasedLandOrProperty.heading = Who purchased {0}?
 whoPurchasedLandOrProperty.radioList1 = An individual
 whoPurchasedLandOrProperty.radioList2 = A UK company
 whoPurchasedLandOrProperty.radioList3 = A UK partnership
@@ -1241,3 +1241,25 @@ landOrPropertyDisposalList.paragraph2 = You can only report disposal of land or 
 landOrPropertyDisposalList.legend = Which land or property was disposed of?
 landOrPropertyDisposalList.radios.error.required = Select the land or property that was disposed of
 landOrPropertyDisposalList.pagination.label = Showing {0} - {1} of {2} land or properties
+
+individualBuyerNinoNumber.title = Do you know the buyer’s National Insurance number?
+individualBuyerNinoNumber.heading = Do you know {0}’s National Insurance number?
+individualBuyerNinoNumber.yes.conditional = What is {0}’s National Insurance number?
+individualBuyerNinoNumber.no.conditional = Tell us why you cannot provide {0}’s National Insurance number
+individualBuyerNinoNumber.error.required = Select yes if you know the buyer’s National Insurance number
+individualBuyerNinoNumber.no.conditional.error.required = Enter the reason you cannot provide the buyer’s National Insurance number
+individualBuyerNinoNumber.no.conditional.error.invalid = The reason you cannot provide the buyer’s National Insurance number must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+individualBuyerNinoNumber.no.conditional.error.length = The reason you cannot provide the buyer’s National Insurance number must be 160 characters or fewer
+individualBuyerNinoNumber.yes.conditional.error.required = Enter the buyer’s National Insurance number
+individualBuyerNinoNumber.yes.conditional.error.invalid = Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C
+
+howWasDisposed.title = How was the land or property disposed of?
+howWasDisposed.heading = How was {0} disposed of?
+howWasDisposed.option1 = Sold
+howWasDisposed.option2 = Transferred out
+howWasDisposed.option3 = Other
+howWasDisposed.option3.label = Provide details of the disposal
+howWasDisposed.error.required = Select how the land or property was disposed of
+howWasDisposed.conditional.error.required = Enter details of the disposal
+howWasDisposed.conditional.error.invalid = Details of the disposal must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+howWasDisposed.conditional.error.length = Details of the disposal must be 160 characters or fewer

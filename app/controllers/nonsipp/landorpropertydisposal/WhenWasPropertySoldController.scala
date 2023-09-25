@@ -27,6 +27,7 @@ import models.Mode
 import models.SchemeId.Srn
 import models.requests.DataRequest
 import navigation.Navigator
+import pages.nonsipp.landorproperty.LandOrPropertyAddressLookupPage
 import pages.nonsipp.landorpropertydisposal.WhenWasPropertySoldPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
@@ -62,14 +63,17 @@ class WhenWasPropertySoldController @Inject()(
   def onPageLoad(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
-        val preparedForm = {
-          request.userAnswers
-            .fillForm(
-              WhenWasPropertySoldPage(srn, landOrPropertyIndex, disposalIndex),
-              form(date.to, date.from, request)
-            )
+        request.userAnswers.get(LandOrPropertyAddressLookupPage(srn, landOrPropertyIndex)).getOrRecoverJourney {
+          address =>
+            val preparedForm = {
+              request.userAnswers
+                .fillForm(
+                  WhenWasPropertySoldPage(srn, landOrPropertyIndex, disposalIndex),
+                  form(date.to, date.from, request)
+                )
+            }
+            Ok(view(preparedForm, viewModel(srn, landOrPropertyIndex, disposalIndex, address.addressLine1, mode)))
         }
-        Ok(view(preparedForm, viewModel(srn, landOrPropertyIndex, disposalIndex, mode)))
       }
     }
 
@@ -80,14 +84,17 @@ class WhenWasPropertySoldController @Inject()(
           .bindFromRequest()
           .fold(
             formWithErrors =>
-              Future.successful(
-                BadRequest(
-                  view(
-                    formWithErrors,
-                    viewModel(srn, landOrPropertyIndex, disposalIndex, mode)
+              request.userAnswers.get(LandOrPropertyAddressLookupPage(srn, landOrPropertyIndex)).getOrRecoverJourney {
+                address =>
+                  Future.successful(
+                    BadRequest(
+                      view(
+                        formWithErrors,
+                        viewModel(srn, landOrPropertyIndex, disposalIndex, address.addressLine1, mode)
+                      )
+                    )
                   )
-                )
-              ),
+              },
             value =>
               for {
                 updatedAnswers <- Future
@@ -129,11 +136,12 @@ object WhenWasPropertySoldController {
     srn: Srn,
     landOrPropertyIndex: Max5000,
     disposalIndex: Max50,
+    addressLine1: String,
     mode: Mode
   ): FormPageViewModel[DatePageViewModel] =
     FormPageViewModel(
       "whenWasPropertySold.title",
-      Message("whenWasPropertySold.heading", "12 Holly Lane"),
+      Message("whenWasPropertySold.heading", addressLine1),
       DatePageViewModel(),
       routes.WhenWasPropertySoldController.onSubmit(srn, landOrPropertyIndex, disposalIndex, mode)
     )

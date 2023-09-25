@@ -16,13 +16,7 @@
 
 package forms.mappings
 
-import forms.mappings.errors.{
-  DoubleFormErrors,
-  IntFormErrors,
-  MoneyFormErrors,
-  PercentageFormErrors,
-  SecurityFormErrors
-}
+import forms.mappings.errors._
 import models.{Enumerable, Money, Percentage, Security}
 import play.api.data.FormError
 import play.api.data.format.Formatter

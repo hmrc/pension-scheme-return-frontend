@@ -16,10 +16,8 @@
 
 package viewmodels.models
 
-import play.api.i18n.Messages
 import play.api.mvc.Call
-import uk.gov.hmrc.govukfrontend.views.Aliases.{Hint, Text}
-import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.RadioItem
+import viewmodels.DisplayMessage
 import viewmodels.DisplayMessage.{InlineMessage, Message}
 
 case class RadioListViewModel(
@@ -43,32 +41,22 @@ object RadioListViewModel {
     )
 }
 
-sealed trait RadioListRow {
-  def radioListRow(implicit messages: Messages): RadioItem
-}
+sealed trait RadioListRow
+
+case class RadioItemConditional(
+  fieldType: FieldType,
+  label: Option[DisplayMessage]
+)
 
 case class RadioListRowViewModel(
   content: Message,
   value: Option[String],
   divider: Option[String],
-  hint: Option[Message]
-) extends RadioListRow {
+  hint: Option[Message],
+  conditional: Option[RadioItemConditional] = None
+) extends RadioListRow
 
-  override def radioListRow(implicit messages: Messages): RadioItem =
-    RadioItem(
-      content = Text(content.toMessage),
-      value = value,
-      hint = hint.map(h => Hint(content = Text(h.toMessage)))
-    )
-}
-
-case class RadioListRowDivider(dividerText: String) extends RadioListRow {
-
-  override def radioListRow(implicit messages: Messages): RadioItem =
-    RadioItem(
-      divider = Some(messages(dividerText))
-    )
-}
+case class RadioListRowDivider(dividerText: String) extends RadioListRow
 
 object RadioListRowDivider {
   val Or: RadioListRowDivider = RadioListRowDivider("site.or")
@@ -81,4 +69,12 @@ object RadioListRowViewModel {
 
   def apply(content: Message, value: String, hint: Message): RadioListRowViewModel =
     RadioListRowViewModel(content, Some(value), None, Some(hint))
+
+  def conditional(
+    content: Message,
+    value: String,
+    hint: Option[Message],
+    conditional: RadioItemConditional
+  ): RadioListRowViewModel =
+    RadioListRowViewModel(content, Some(value), None, hint, Some(conditional))
 }
