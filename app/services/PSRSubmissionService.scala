@@ -25,7 +25,12 @@ import models.SchemeId.Srn
 import models.requests.DataRequest
 import models.{RecipientIdentityType, _}
 import pages.nonsipp.CheckReturnDatesPage
-import pages.nonsipp.common.{CompanyRecipientCrnPage, IdentityTypes, OtherRecipientDetailsPage, PartnershipRecipientUtrPage}
+import pages.nonsipp.common.{
+  CompanyRecipientCrnPage,
+  IdentityTypes,
+  OtherRecipientDetailsPage,
+  PartnershipRecipientUtrPage
+}
 import pages.nonsipp.loansmadeoroutstanding._
 import pages.nonsipp.schemedesignatory.{HowManyMembersPage, WhyNoBankAccountPage}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -165,8 +170,10 @@ class PSRSubmissionService @Inject()(psrConnector: PSRConnector, schemeDateServi
                 equalInstallments <- request.userAnswers.get(AreRepaymentsInstalmentsPage(srn, index))
                 datePeriodLoanDetails <- request.userAnswers.get(DatePeriodLoanPage(srn, index))
                 loanAmountDetails <- request.userAnswers.get(AmountOfTheLoanPage(srn, index))
+                (loanAmount, capRepaymentCY, amountOutstanding) = loanAmountDetails
                 optSecurity <- request.userAnswers.get(SecurityGivenForLoanPage(srn, index)).map(_.value.toOption)
                 loanInterestDetails <- request.userAnswers.get(InterestOnLoanPage(srn, index))
+                (loanInterestAmount, loanInterestRate, intReceivedCY) = loanInterestDetails
                 optOutstandingArrearsOnLoan <- request.userAnswers
                   .get(OutstandingArrearsOnLoanPage(srn, index))
                   .map(_.value.toOption)
@@ -178,15 +185,15 @@ class PSRSubmissionService @Inject()(psrConnector: PSRConnector, schemeDateServi
                   optRecipientSponsoringEmployer,
                   LoanPeriod(datePeriodLoanDetails._1, datePeriodLoanDetails._2.value, datePeriodLoanDetails._3),
                   LoanAmountDetails(
-                    loanAmountDetails._1.value,
-                    loanAmountDetails._2.value,
-                    loanAmountDetails._3.value
+                    loanAmount.value,
+                    capRepaymentCY.value,
+                    amountOutstanding.value
                   ),
                   equalInstallments,
                   LoanInterestDetails(
-                    loanInterestDetails._1.value,
-                    loanInterestDetails._2.value,
-                    loanInterestDetails._3.value
+                    loanInterestAmount.value,
+                    loanInterestRate.value,
+                    intReceivedCY.value
                   ),
                   optSecurity.map(_.security),
                   optOutstandingArrearsOnLoan.map(_.value)
