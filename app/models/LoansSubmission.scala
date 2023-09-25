@@ -16,7 +16,7 @@
 
 package models
 
-import play.api.libs.json.{Json, OWrites}
+import play.api.libs.json.{JsString, Json, OWrites, Writes}
 
 import java.time.LocalDate
 
@@ -52,11 +52,13 @@ case class LoanAmountDetails(loanAmount: Double, capRepaymentCY: Double, amountO
 case class LoanInterestDetails(loanInterestAmount: Double, loanInterestRate: Double, intReceivedCY: Double)
 
 object LoansSubmission {
-  implicit val writes: OWrites[LoansSubmission] = Json.writes[LoansSubmission]
-  private implicit val writesLoans: OWrites[Loans] = Json.writes[Loans]
-  private implicit val writesLoanTransactions: OWrites[LoanTransactions] = Json.writes[LoanTransactions]
-  private implicit val writesRecipientIdentityType: OWrites[RecipientIdentityType] = Json.writes[RecipientIdentityType]
-  private implicit val writesLoanPeriod: OWrites[LoanPeriod] = Json.writes[LoanPeriod]
-  private implicit val writesLoanAmountDetails: OWrites[LoanAmountDetails] = Json.writes[LoanAmountDetails]
+  private implicit val writesIdentityType: Writes[IdentityType] =
+    Writes(value => JsString(value.toString))
   private implicit val writesLoanInterestDetails: OWrites[LoanInterestDetails] = Json.writes[LoanInterestDetails]
+  private implicit val writesLoanAmountDetails: OWrites[LoanAmountDetails] = Json.writes[LoanAmountDetails]
+  private implicit val writesLoanPeriod: OWrites[LoanPeriod] = Json.writes[LoanPeriod]
+  private implicit val writesRecipientIdentityType: OWrites[RecipientIdentityType] = Json.writes[RecipientIdentityType]
+  private implicit val writesLoanTransactions: OWrites[LoanTransactions] = Json.writes[LoanTransactions]
+  private implicit val writesLoans: OWrites[Loans] = Json.writes[Loans]
+  implicit val writes: OWrites[LoansSubmission] = Json.writes[LoansSubmission]
 }
