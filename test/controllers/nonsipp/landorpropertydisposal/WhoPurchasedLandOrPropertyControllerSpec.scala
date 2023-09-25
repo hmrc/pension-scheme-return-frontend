@@ -35,33 +35,35 @@ class WhoPurchasedLandOrPropertyControllerSpec extends ControllerBaseSpec {
   private lazy val onSubmit =
     routes.WhoPurchasedLandOrPropertyController.onSubmit(srn, index, disposalIndex, NormalMode)
 
+  private val userAnswers = userAnswersWithAddress(srn, index)
+
   "whoPurchasedLandOrPropertyController" - {
 
-    act.like(renderView(onPageLoad) { implicit app => implicit request =>
+    act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
       val view = injected[RadioListView]
 
       view(
         form(injected[RadioListFormProvider]),
-        viewModel(srn, index, disposalIndex, NormalMode)
+        viewModel(srn, index, disposalIndex, address.addressLine1, NormalMode)
       )
     })
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
     "anIndividual data is submitted" - {
-      act.like(saveAndContinue(onSubmit, "value" -> Individual.name))
+      act.like(saveAndContinue(onSubmit, userAnswers, "value" -> Individual.name))
     }
 
     "aUKCompany data is submitted" - {
-      act.like(saveAndContinue(onSubmit, "value" -> UKCompany.name))
+      act.like(saveAndContinue(onSubmit, userAnswers, "value" -> UKCompany.name))
     }
 
     "aUKPartnership data is submitted" - {
-      act.like(saveAndContinue(onSubmit, "value" -> UKPartnership.name))
+      act.like(saveAndContinue(onSubmit, userAnswers, "value" -> UKPartnership.name))
     }
 
     "other data is submitted" - {
-      act.like(saveAndContinue(onSubmit, "value" -> Other.name))
+      act.like(saveAndContinue(onSubmit, userAnswers, "value" -> Other.name))
     }
 
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))

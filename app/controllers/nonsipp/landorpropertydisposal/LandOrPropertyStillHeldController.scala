@@ -24,6 +24,7 @@ import forms.YesNoPageFormProvider
 import models.Mode
 import models.SchemeId.Srn
 import navigation.Navigator
+import pages.nonsipp.landorproperty.LandOrPropertyAddressLookupPage
 import pages.nonsipp.landorpropertydisposal.LandOrPropertyStillHeldPage
 import play.api.data.Form
 import play.api.i18n.MessagesApi
@@ -52,9 +53,25 @@ class LandOrPropertyStillHeldController @Inject()(
 
   def onPageLoad(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      val preparedForm =
-        request.userAnswers.fillForm(LandOrPropertyStillHeldPage(srn, landOrPropertyIndex, disposalIndex), form)
-      Ok(view(preparedForm, viewModel(srn, landOrPropertyIndex, disposalIndex, request.schemeDetails.schemeName, mode)))
+      request.userAnswers
+        .get(LandOrPropertyAddressLookupPage(srn, landOrPropertyIndex))
+        .getOrRecoverJourney { address =>
+          val preparedForm =
+            request.userAnswers.fillForm(LandOrPropertyStillHeldPage(srn, landOrPropertyIndex, disposalIndex), form)
+          Ok(
+            view(
+              preparedForm,
+              viewModel(
+                srn,
+                landOrPropertyIndex,
+                disposalIndex,
+                address.addressLine1,
+                request.schemeDetails.schemeName,
+                mode
+              )
+            )
+          )
+        }
     }
 
   def onSubmit(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
@@ -63,14 +80,25 @@ class LandOrPropertyStillHeldController @Inject()(
         .bindFromRequest()
         .fold(
           formWithErrors =>
-            Future.successful(
-              BadRequest(
-                view(
-                  formWithErrors,
-                  viewModel(srn, landOrPropertyIndex, disposalIndex, request.schemeDetails.schemeName, mode)
+            request.userAnswers
+              .get(LandOrPropertyAddressLookupPage(srn, landOrPropertyIndex))
+              .getOrRecoverJourney { address =>
+                Future.successful(
+                  BadRequest(
+                    view(
+                      formWithErrors,
+                      viewModel(
+                        srn,
+                        landOrPropertyIndex,
+                        disposalIndex,
+                        address.addressLine1,
+                        request.schemeDetails.schemeName,
+                        mode
+                      )
+                    )
+                  )
                 )
-              )
-            ),
+              },
           value =>
             for {
               updatedAnswers <- Future.fromTry(
@@ -94,12 +122,13 @@ object LandOrPropertyStillHeldController {
     srn: Srn,
     landOrPropertyIndex: Max5000,
     disposalIndex: Max50,
+    addressLine1: String,
     schemeName: String,
     mode: Mode
   ): FormPageViewModel[YesNoPageViewModel] =
     YesNoPageViewModel(
       "landOrPropertyStillHeld.title",
-      Message("landOrPropertyStillHeld.heading", "{0}", schemeName),
+      Message("landOrPropertyStillHeld.heading", addressLine1, schemeName),
       controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyStillHeldController
         .onSubmit(srn, landOrPropertyIndex, disposalIndex, mode)
     )
