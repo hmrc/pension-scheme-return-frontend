@@ -75,6 +75,8 @@ object DisplayMessage {
       ParagraphMessage(NonEmptyList(headContent, tailContents.toList))
   }
 
+  case class HintMessage(content: InlineMessage) extends BlockMessage
+
   case class TableMessage(
     content: NonEmptyList[(InlineMessage, DisplayMessage)],
     heading: Option[(InlineMessage, InlineMessage)] = None

@@ -23,6 +23,7 @@
     govukErrorSummary: GovukErrorSummary,
     govukRadios: GovukRadios,
     govukButton: GovukButton,
+    govukTextarea: GovukTextarea,
 )
 
 @(form: Form[_], viewmodel: FormPageViewModel[RadioListViewModel])(implicit request: Request[_], messages: Messages)
@@ -42,7 +43,18 @@
         @govukRadios(
             RadiosViewModel(
                 field = form("value"),
-                viewmodel.page.items.map(_.radioListRow),
+                viewmodel.page.items.map {
+                    case row: RadioListRowDivider => RadioItem(divider = Some(messages(row.dividerText)))
+                    case row: RadioListRowViewModel =>
+                        RadioItem(
+                            content = Text(row.content.toMessage),
+                            value = row.value,
+                            hint = row.hint.map(h => Hint(content = Text(h.toMessage))),
+                            conditionalHtml = row.conditional.map{
+                                case RadioItemConditional(FieldType.Textarea, hint) => textArea(hint, row)
+                            }
+                        )
+                },
                 legend = viewmodel.page.legend.map(legend => LegendViewModel(legend.toMessage).withSize(LegendSize.Medium))
             )
         )
@@ -51,4 +63,13 @@
             ButtonViewModel(renderMessage(viewmodel.buttonText))
         )
     }
+}
+
+@textArea(label: Option[DisplayMessage], row: RadioListRowViewModel) = @{
+    govukTextarea(
+        TextareaViewModel("conditional", form("conditional").value)
+            .withLabel(label.map(l => renderMessage(l)))
+            .withRows(5)
+            .withError(form("conditional").errors.headOption)
+    )
 }

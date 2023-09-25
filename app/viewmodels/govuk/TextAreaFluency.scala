@@ -62,6 +62,16 @@ trait TextAreaFluency {
         )
       )
 
+    def withLabel(maybeLabel: Option[Html]): Textarea =
+      maybeLabel.fold(textArea)(
+        label =>
+          textArea.copy(
+            label = LabelViewModel(
+              HtmlContent(label)
+            )
+          )
+      )
+
     def withHint(hint: Hint): Textarea =
       textArea.copy(hint = Some(hint))
 
