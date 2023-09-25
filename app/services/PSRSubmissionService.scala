@@ -25,12 +25,7 @@ import models.SchemeId.Srn
 import models.requests.DataRequest
 import models.{RecipientIdentityType, _}
 import pages.nonsipp.CheckReturnDatesPage
-import pages.nonsipp.common.{
-  CompanyRecipientCrnPage,
-  IdentityTypes,
-  OtherRecipientDetailsPage,
-  PartnershipRecipientUtrPage
-}
+import pages.nonsipp.common.{CompanyRecipientCrnPage, IdentityTypes, OtherRecipientDetailsPage, PartnershipRecipientUtrPage}
 import pages.nonsipp.loansmadeoroutstanding._
 import pages.nonsipp.schemedesignatory.{HowManyMembersPage, WhyNoBankAccountPage}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -223,7 +218,6 @@ class PSRSubmissionService @Inject()(psrConnector: PSRConnector, schemeDateServi
           schemeMemberNumbers.total
         )
       )
-
     }
   }
 
