@@ -57,6 +57,7 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
 
     case WhoPurchasedLandOrPropertyPage(srn, landOrPropertyIndex, disposalIndex) =>
       userAnswers.get(WhoPurchasedLandOrPropertyPage(srn, landOrPropertyIndex, disposalIndex)) match {
+        
         case Some(IdentityType.Individual) =>
           controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyIndividualBuyerNameController
             .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
@@ -64,8 +65,11 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
         case Some(IdentityType.UKCompany) =>
           controllers.nonsipp.landorpropertydisposal.routes.CompanyBuyerNameController
             .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
+
         case Some(IdentityType.UKPartnership) =>
-          controllers.routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.landorpropertydisposal.routes.PartnershipBuyerNameController
+            .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
+  
         case Some(IdentityType.Other) =>
           controllers.routes.UnauthorisedController.onPageLoad()
       }
@@ -89,6 +93,12 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
       controllers.nonsipp.landorpropertydisposal.routes.HowWasPropertyDisposedOfController
         .onPageLoad(srn, choice, refineMV(1), NormalMode)
 
+    case CompanyBuyerNamePage(srn, landOrPropertyIndex, disposalIndex) => //TODO Navigation. Subsequent and previous pages still need to be implemented
+
+      controllers.routes.UnauthorisedController.onPageLoad()
+
+    case PartnershipBuyerNamePage(srn, landOrPropertyIndex, disposalIndex) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty
