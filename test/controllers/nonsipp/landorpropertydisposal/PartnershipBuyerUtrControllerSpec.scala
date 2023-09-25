@@ -43,7 +43,7 @@ class PartnershipBuyerUtrControllerSpec extends ControllerBaseSpec {
   val conditionalNo: ConditionalYesNo[String, Utr] = ConditionalYesNo.no("reason")
   val conditionalYes: ConditionalYesNo[String, Utr] = ConditionalYesNo.yes(utr)
 
-  "CompanyBuyerCrnController" - {
+  "PartnershipBuyerUtrController" - {
 
     act.like(renderView(onPageLoad, userAnswersCompanyName) { implicit app => implicit request =>
       injected[ConditionalYesNoPageView]
