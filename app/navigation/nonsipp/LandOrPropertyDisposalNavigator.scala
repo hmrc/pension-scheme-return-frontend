@@ -57,7 +57,7 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
 
     case WhoPurchasedLandOrPropertyPage(srn, landOrPropertyIndex, disposalIndex) =>
       userAnswers.get(WhoPurchasedLandOrPropertyPage(srn, landOrPropertyIndex, disposalIndex)) match {
-        
+
         case Some(IdentityType.Individual) =>
           controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyIndividualBuyerNameController
             .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
@@ -69,7 +69,7 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
         case Some(IdentityType.UKPartnership) =>
           controllers.nonsipp.landorpropertydisposal.routes.PartnershipBuyerNameController
             .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
-  
+
         case Some(IdentityType.Other) =>
           controllers.routes.UnauthorisedController.onPageLoad()
       }
@@ -81,14 +81,10 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
       controllers.nonsipp.landorpropertydisposal.routes.CompanyBuyerCrnController
         .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
 
-
     case CompanyBuyerCrnPage(srn, landOrPropertyIndex, disposalIndex) =>
-    controllers.routes.UnauthorisedController.onPageLoad()
-
-    case IndividualBuyerNinoNumberPage(srn, landOrPropertyIndex, disposalIndex) =>
       controllers.routes.UnauthorisedController.onPageLoad()
 
-    case PartnershipBuyerUtrPage(srn, landOrPropertyIndex, disposalIndex) => //TODO Navigation. Subsequent and previous pages still need to be implemented
+    case IndividualBuyerNinoNumberPage(srn, landOrPropertyIndex, disposalIndex) =>
       controllers.routes.UnauthorisedController.onPageLoad()
 
     case LandOrPropertyIndividualBuyerNamePage(srn, landOrPropertyIndex, disposalIndex) =>
@@ -99,11 +95,11 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
       controllers.nonsipp.landorpropertydisposal.routes.HowWasPropertyDisposedOfController
         .onPageLoad(srn, choice, refineMV(1), NormalMode)
 
-    case CompanyBuyerNamePage(srn, landOrPropertyIndex, disposalIndex) => //TODO Navigation. Subsequent and previous pages still need to be implemented
-
-      controllers.routes.UnauthorisedController.onPageLoad()
-
     case PartnershipBuyerNamePage(srn, landOrPropertyIndex, disposalIndex) =>
+      controllers.nonsipp.landorpropertydisposal.routes.PartnershipBuyerUtrController
+        .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
+
+    case PartnershipBuyerUtrPage(srn, landOrPropertyIndex, disposalIndex) => //TODO Navigation. Subsequent page still need to be implemented
       controllers.routes.UnauthorisedController.onPageLoad()
   }
 

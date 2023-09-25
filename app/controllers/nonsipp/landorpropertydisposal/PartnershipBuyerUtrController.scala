@@ -23,7 +23,7 @@ import forms.mappings.Mappings
 import models.{ConditionalYesNo, Mode, UserAnswers, Utr}
 import models.SchemeId.Srn
 import navigation.Navigator
-import pages.nonsipp.landorpropertydisposal.PartnershipBuyerUtrPage
+import pages.nonsipp.landorpropertydisposal.{PartnershipBuyerNamePage, PartnershipBuyerUtrPage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -38,20 +38,20 @@ import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
 class PartnershipBuyerUtrController @Inject()(
-                                                override val messagesApi: MessagesApi,
-                                                saveService: SaveService,
-                                                @Named("non-sipp") navigator: Navigator,
-                                                identifyAndRequireData: IdentifyAndRequireData,
-                                                formProvider: YesNoPageFormProvider,
-                                                val controllerComponents: MessagesControllerComponents,
-                                                view: ConditionalYesNoPageView
-                                              )(implicit ec: ExecutionContext)
-  extends FrontendBaseController
+  override val messagesApi: MessagesApi,
+  saveService: SaveService,
+  @Named("non-sipp") navigator: Navigator,
+  identifyAndRequireData: IdentifyAndRequireData,
+  formProvider: YesNoPageFormProvider,
+  val controllerComponents: MessagesControllerComponents,
+  view: ConditionalYesNoPageView
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport {
   val form: Form[Either[String, Utr]] = PartnershipBuyerUtrController.form(formProvider)
   def onPageLoad(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      request.usingAnswer(CompanyBuyerNamePage(srn, landOrPropertyIndex, disposalIndex)).sync { partnershipName => //TODO to change when the PartnershipNamePage is ready
+      request.usingAnswer(PartnershipBuyerNamePage(srn, landOrPropertyIndex, disposalIndex)).sync { partnershipName =>
         val preparedForm =
           request.userAnswers.fillForm(PartnershipBuyerUtrPage(srn, landOrPropertyIndex, disposalIndex), form)
         Ok(
@@ -69,17 +69,18 @@ class PartnershipBuyerUtrController @Inject()(
         .bindFromRequest()
         .fold(
           formWithErrors =>
-            request.usingAnswer(CompanyBuyerNamePage(srn, landOrPropertyIndex, disposalIndex)).async { partnershipName => //TODO to change when the PartnershipNamePage is ready
-              Future
-                .successful(
-                  BadRequest(
-                    view(
-                      formWithErrors,
-                      PartnershipBuyerUtrController
-                        .viewModel(srn, landOrPropertyIndex, disposalIndex, mode, partnershipName)
+            request.usingAnswer(PartnershipBuyerNamePage(srn, landOrPropertyIndex, disposalIndex)).async {
+              partnershipName =>
+                Future
+                  .successful(
+                    BadRequest(
+                      view(
+                        formWithErrors,
+                        PartnershipBuyerUtrController
+                          .viewModel(srn, landOrPropertyIndex, disposalIndex, mode, partnershipName)
+                      )
                     )
                   )
-                )
             },
           value =>
             for {
@@ -106,7 +107,7 @@ object PartnershipBuyerUtrController {
         "partnershipBuyerUtr.no.conditional.error.invalid",
         "partnershipBuyerUtr.no.conditional.error.length"
       ),
-      mappingYes = Mappings.crn(
+      mappingYes = Mappings.utr(
         "partnershipBuyerUtr.yes.conditional.error.required",
         "partnershipBuyerUtr.yes.conditional.error.invalid",
         "partnershipBuyerUtr.yes.conditional.error.length"
@@ -114,12 +115,12 @@ object PartnershipBuyerUtrController {
     )
 
   def viewModel(
-                 srn: Srn,
-                 landOrPropertyIndex: Max5000,
-                 disposalIndex: Max50,
-                 mode: Mode,
-                 partnershipName: String
-               ): FormPageViewModel[ConditionalYesNoPageViewModel] =
+    srn: Srn,
+    landOrPropertyIndex: Max5000,
+    disposalIndex: Max50,
+    mode: Mode,
+    partnershipName: String
+  ): FormPageViewModel[ConditionalYesNoPageViewModel] =
     FormPageViewModel[ConditionalYesNoPageViewModel](
       "partnershipBuyerUtr.title",
       Message("partnershipBuyerUtr.heading", partnershipName),
