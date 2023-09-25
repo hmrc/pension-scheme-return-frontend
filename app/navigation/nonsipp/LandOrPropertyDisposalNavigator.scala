@@ -63,8 +63,9 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
             .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
 
         case Some(IdentityType.UKCompany) =>
-          controllers.routes.UnauthorisedController.onPageLoad()
-        
+          controllers.nonsipp.landorpropertydisposal.routes.CompanyBuyerNameController
+            .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
+
         case Some(IdentityType.UKPartnership) =>
           controllers.nonsipp.landorpropertydisposal.routes.PartnershipBuyerNameController
             .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
@@ -72,6 +73,14 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
         case Some(IdentityType.Other) =>
           controllers.routes.UnauthorisedController.onPageLoad()
       }
+
+
+    case CompanyBuyerNamePage(srn, landOrPropertyIndex, disposalIndex) =>
+      controllers.nonsipp.landorpropertydisposal.routes.CompanyBuyerCrnController
+        .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
+
+    case CompanyBuyerCrnPage(srn, landOrPropertyIndex, disposalIndex) =>
+    controllers.routes.UnauthorisedController.onPageLoad()
 
     case IndividualBuyerNinoNumberPage(srn, landOrPropertyIndex, disposalIndex) =>
       controllers.routes.UnauthorisedController.onPageLoad()
