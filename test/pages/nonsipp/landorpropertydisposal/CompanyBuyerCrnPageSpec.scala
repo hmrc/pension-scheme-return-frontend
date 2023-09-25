@@ -23,7 +23,7 @@ import pages.behaviours.PageBehaviours
 
 class CompanyBuyerCrnPageSpec extends PageBehaviours {
 
-  "PartnershipRecipientUtrPage" - {
+  "CompanyBuyerCRNPage" - {
 
     val index = refineMV[OneTo5000](1)
     val disposalIndex = refineMV[Max50.Refined](1)
