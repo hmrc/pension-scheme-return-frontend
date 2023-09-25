@@ -20,7 +20,7 @@ import config.Refined.Max300
 import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
-import queries.Removable
+import queries.{Gettable, Removable}
 import utils.RefinedUtils.RefinedIntOps
 
 case class NoNINOPage(srn: Srn, index: Max300) extends QuestionPage[String] {
@@ -30,7 +30,10 @@ case class NoNINOPage(srn: Srn, index: Max300) extends QuestionPage[String] {
   override def toString: String = "noNINO"
 }
 
-case class NoNinoPages(srn: Srn) extends Removable[List[String]] {
+case class NoNinoPages(srn: Srn) extends Gettable[Map[String, String]] with Removable[Map[String, String]] {
 
-  override def path: JsPath = Paths.personalDetails \ "noNINO"
+  override def path: JsPath = Paths.personalDetails \ toString
+
+  override def toString: String = "noNINO"
+
 }
