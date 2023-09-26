@@ -118,9 +118,11 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
           index,
           disposalIndex,
           PartnershipBuyerNamePage,
-          (srn, index: Max5000, disposalIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          (srn, index: Max5000, disposalIndex: Max50, _) =>
+            controllers.nonsipp.landorpropertydisposal.routes.PartnershipBuyerUtrController
+              .onPageLoad(srn, index, disposalIndex, NormalMode)
         )
-        .withName("go from partnership buyer name page to unauthorised page")
+        .withName("go from partnership buyer UTR page")
     )
   }
 }

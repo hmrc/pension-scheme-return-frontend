@@ -1242,7 +1242,6 @@ landOrPropertyDisposalList.legend = Which land or property was disposed of?
 landOrPropertyDisposalList.radios.error.required = Select the land or property that was disposed of
 landOrPropertyDisposalList.pagination.label = Showing {0} - {1} of {2} land or properties
 
-
 otherBuyerDetails.title =  Buyer’s details
 otherBuyerDetails.heading = Buyer’s details
 otherBuyerDetails.name = Buyer’s name
@@ -1253,6 +1252,19 @@ otherBuyerDetails.name.error.length =  Buyer’s name must be 160 characters or 
 otherBuyerDetails.description.error.required = Enter a brief description of the recipient
 otherBuyerDetails.description.error.invalid = The brief description of the recipient must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, full stops, hyphens, slashes, speech marks and spaces
 otherBuyerDetails.description.error.length = The brief description of the recipient must be 160 characters or fewer
+
+partnershipBuyerUtr.title = Do you know the buyer’s Unique Taxpayer Reference (UTR)?
+partnershipBuyerUtr.heading = Do you know {0}’s Unique Taxpayer Reference (UTR)?
+partnershipBuyerUtr.yes.conditional = What is {0}’s UTR?
+partnershipBuyerUtr.yes.conditional.error.required = Enter the buyer’s UTR
+partnershipBuyerUtr.yes.conditional.error.length = Enter a Unique Taxpayer Reference that is 10 numbers, like 1234567890 or 12345 67890
+partnershipBuyerUtr.yes.conditional.error.invalid = Enter a Unique Taxpayer Reference that is 10 numbers, like 1234567890 or 12345 67890
+
+partnershipBuyerUtr.no.conditional = Tell us why you cannot provide {0}’s UTR
+partnershipBuyerUtr.no.conditional.error.required = Enter the reason you cannot provide the buyer’s UTR
+partnershipBuyerUtr.no.conditional.error.invalid = The reason you cannot provide the buyer’s UTR must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+partnershipBuyerUtr.no.conditional.error.length = The reason you cannot provide the buyer’s UTR must be 160 characters or fewer
+partnershipBuyerUtr.error.required = Select yes if you know the buyer’s Unique Taxpayer Reference (UTR)
 
 partnershipBuyerName.title = What is the buyer’s partnership name?
 partnershipBuyerName.heading = What is the buyer’s partnership name?
