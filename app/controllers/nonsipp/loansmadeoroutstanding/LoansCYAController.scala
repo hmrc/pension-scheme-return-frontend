@@ -141,7 +141,7 @@ class LoansCYAController @Inject()(
 
   def onSubmit(srn: Srn, checkOrChange: CheckOrChange): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      psrSubmissionService.submitLoanDetails(srn).map {
+      psrSubmissionService.submitPsrDetails(srn).map {
         case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         case Some(_) => Redirect(navigator.nextPage(LoansCYAPage(srn), NormalMode, request.userAnswers))
       }

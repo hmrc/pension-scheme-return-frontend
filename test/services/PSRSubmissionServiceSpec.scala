@@ -18,8 +18,9 @@ package services
 
 import connectors.PSRConnector
 import controllers.TestValues
-import models.requests.DataRequest
+import models.requests.{AllowedAccessRequest, DataRequest}
 import org.mockito.ArgumentMatchers.any
+import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -30,24 +31,34 @@ import scala.concurrent.Future
 
 class PSRSubmissionServiceSpec extends BaseSpec with TestValues {
 
-  val allowedAccessRequest = allowedAccessRequestGen(FakeRequest()).sample.value
-  implicit val request = DataRequest(allowedAccessRequest, defaultUserAnswers)
+  val allowedAccessRequest
+    : AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(FakeRequest()).sample.value
+  implicit val request: DataRequest[AnyContentAsEmpty.type] = DataRequest(allowedAccessRequest, defaultUserAnswers)
 
   private val mockConnector = mock[PSRConnector]
   private val mockSchemeDateService = mock[SchemeDateService]
 
   private val service = new PSRSubmissionService(mockConnector, mockSchemeDateService)
 
-  private implicit val hc = HeaderCarrier()
+  private implicit val hc: HeaderCarrier = HeaderCarrier()
 
   "PSRSubmissionService" - {
-    "proxy request successfully" in {
+    "submitMinimalRequiredDetails request successfully" in {
 
       when(mockConnector.submitMinimalRequiredDetails(any())(any(), any())).thenReturn(Future.successful(()))
 
       val result = service.submitMinimalRequiredDetails(srn)
 
-      await(result) mustEqual (())
+      await(result) mustEqual ()
+    }
+
+    "submitLoansDetails request successfully" in {
+
+      when(mockConnector.submitPsrSubmissionDetails(any())(any(), any())).thenReturn(Future.successful(()))
+
+      val result = service.submitPsrDetails(srn)
+
+      await(result) mustEqual ()
     }
   }
 }

@@ -22,8 +22,9 @@ import connectors.PSRConnector
 import eu.timepit.refined.refineV
 import models.ConditionalYesNo._
 import models.SchemeId.Srn
-import models.requests.DataRequest
-import models.{RecipientIdentityType, _}
+import models._
+import models.requests.psr._
+import models.requests.{psr, DataRequest}
 import pages.nonsipp.CheckReturnDatesPage
 import pages.nonsipp.common.{
   CompanyRecipientCrnPage,
@@ -47,7 +48,7 @@ class PSRSubmissionService @Inject()(psrConnector: PSRConnector, schemeDateServi
   )(implicit hc: HeaderCarrier, ec: ExecutionContext, request: DataRequest[_]): Future[Option[Unit]] =
     buildMinimalRequiredDetails(srn).map(psrConnector.submitMinimalRequiredDetails(_)).sequence
 
-  def submitLoanDetails(
+  def submitPsrDetails(
     srn: Srn
   )(implicit hc: HeaderCarrier, ec: ExecutionContext, request: DataRequest[_]): Future[Option[Unit]] =
     (
@@ -55,23 +56,14 @@ class PSRSubmissionService @Inject()(psrConnector: PSRConnector, schemeDateServi
       request.userAnswers.get(CheckReturnDatesPage(srn)),
       request.userAnswers.get(LoansMadeOrOutstandingPage(srn))
     ).mapN { (minimalRequiredDetails, checkReturnDates, schemeHadLoans) =>
-      psrConnector.submitLoansDetails(
-        buildLoanDetails(
-          srn,
-          checkReturnDates,
-          minimalRequiredDetails,
-          schemeHadLoans
+      psrConnector.submitPsrSubmissionDetails(
+        PsrSubmission(
+          minimalRequiredSubmission = minimalRequiredDetails,
+          checkReturnDates = checkReturnDates,
+          loans = if (schemeHadLoans) Some(Loans(schemeHadLoans, buildLoanTransactions(srn))) else None
         )
       )
     }.sequence
-
-  private def buildLoanDetails(
-    srn: Srn,
-    checkReturnDates: Boolean,
-    minimalRequiredDetails: MinimalRequiredSubmission,
-    schemeHadLoans: Boolean
-  )(implicit request: DataRequest[_]): LoansSubmission =
-    LoansSubmission(minimalRequiredDetails, checkReturnDates, Loans(schemeHadLoans, buildLoanTransactions(srn)))
 
   private def buildLoanTransactions(srn: Srn)(implicit request: DataRequest[_]): List[LoanTransactions] = {
     request.userAnswers

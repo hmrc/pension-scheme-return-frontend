@@ -14,17 +14,12 @@
  * limitations under the License.
  */
 
-package models
+package models.requests.psr
 
+import models.IdentityType
 import play.api.libs.json.{JsString, Json, OWrites, Writes}
 
 import java.time.LocalDate
-
-case class LoansSubmission(
-  minimalRequiredSubmission: MinimalRequiredSubmission,
-  checkReturnDates: Boolean,
-  loans: Loans
-)
 
 case class Loans(schemeHadLoans: Boolean, loanTransactions: Seq[LoanTransactions])
 
@@ -51,7 +46,7 @@ case class LoanPeriod(dateOfLoan: LocalDate, loanTotalSchemeAssets: Double, loan
 case class LoanAmountDetails(loanAmount: Double, capRepaymentCY: Double, amountOutstanding: Double)
 case class LoanInterestDetails(loanInterestAmount: Double, loanInterestRate: Double, intReceivedCY: Double)
 
-object LoansSubmission {
+object Loans {
   private implicit val writesIdentityType: Writes[IdentityType] =
     Writes(value => JsString(value.toString))
   private implicit val writesLoanInterestDetails: OWrites[LoanInterestDetails] = Json.writes[LoanInterestDetails]
@@ -59,6 +54,5 @@ object LoansSubmission {
   private implicit val writesLoanPeriod: OWrites[LoanPeriod] = Json.writes[LoanPeriod]
   private implicit val writesRecipientIdentityType: OWrites[RecipientIdentityType] = Json.writes[RecipientIdentityType]
   private implicit val writesLoanTransactions: OWrites[LoanTransactions] = Json.writes[LoanTransactions]
-  private implicit val writesLoans: OWrites[Loans] = Json.writes[Loans]
-  implicit val writes: OWrites[LoansSubmission] = Json.writes[LoansSubmission]
+  implicit val writes: OWrites[Loans] = Json.writes[Loans]
 }

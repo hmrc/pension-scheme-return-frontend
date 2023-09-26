@@ -17,7 +17,7 @@
 package connectors
 
 import config.FrontendAppConfig
-import models.{LoansSubmission, MinimalRequiredSubmission}
+import models.requests.psr.{MinimalRequiredSubmission, PsrSubmission}
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 
@@ -36,11 +36,11 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClient) {
       submission
     )
 
-  def submitLoansDetails(
-    submission: LoansSubmission
+  def submitPsrSubmissionDetails(
+    psrSubmission: PsrSubmission
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
-    http.POST[LoansSubmission, Unit](
+    http.POST[PsrSubmission, Unit](
       baseUrl + "/pension-scheme-return/psr/standard",
-      submission
+      psrSubmission
     )
 }

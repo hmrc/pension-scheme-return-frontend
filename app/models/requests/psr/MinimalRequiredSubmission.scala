@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package models
+package models.requests.psr
 
 import cats.data.NonEmptyList
 import play.api.libs.json.{Json, OWrites}
