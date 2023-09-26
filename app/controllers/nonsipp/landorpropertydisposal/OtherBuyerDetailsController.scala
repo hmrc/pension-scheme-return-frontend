@@ -31,6 +31,7 @@ import utils.FormUtils.FormOps
 import viewmodels.models.{FormPageViewModel, RecipientDetailsViewModel}
 import views.html.RecipientDetailsView
 import controllers.nonsipp.landorpropertydisposal.OtherBuyerDetailsController._
+import pages.nonsipp.landorproperty.LandOrPropertyAddressLookupPage
 import pages.nonsipp.landorpropertydisposal.OtherBuyerDetailsPage
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
@@ -57,24 +58,28 @@ class OtherBuyerDetailsController @Inject()(
     mode: Mode
   ): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
+      val address: String =
+        request.userAnswers.get(LandOrPropertyAddressLookupPage(srn, landOrPropertyIndex)).get.addressLine1
       val form = OtherBuyerDetailsController.form(formProvider)
       Ok(
         view(
           form.fromUserAnswers(OtherBuyerDetailsPage(srn, landOrPropertyIndex, disposalIndex)),
-          viewModel(srn, landOrPropertyIndex, disposalIndex, mode)
+          viewModel(srn, landOrPropertyIndex, disposalIndex, mode, address)
         )
       )
     }
 
   def onSubmit(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
+      val address: String =
+        request.userAnswers.get(LandOrPropertyAddressLookupPage(srn, landOrPropertyIndex)).get.addressLine1
       val form = OtherBuyerDetailsController.form(formProvider)
       form
         .bindFromRequest()
         .fold(
           formWithErrors =>
             Future.successful(
-              BadRequest(view(formWithErrors, viewModel(srn, landOrPropertyIndex, disposalIndex, mode)))
+              BadRequest(view(formWithErrors, viewModel(srn, landOrPropertyIndex, disposalIndex, mode, address)))
             ),
           answer => {
             for {
@@ -96,7 +101,7 @@ object OtherBuyerDetailsController {
     "otherBuyerDetails.name.error.required",
     "otherBuyerDetails.name.error.invalid",
     "otherBuyerDetails.name.error.length",
-    "otherBuyerDetails.description.error.required",
+    "Enter the  buyer’s name", //TODO fix the "RecipientDetails" to allow optional description
     "otherBuyerDetails.description.error.invalid",
     "otherBuyerDetails.description.error.length"
   )
@@ -105,10 +110,9 @@ object OtherBuyerDetailsController {
     srn: Srn,
     landOrPropertyIndex: Max5000,
     disposalIndex: Max50,
-    mode: Mode
-  ): FormPageViewModel[RecipientDetailsViewModel] = {
-
-    val address: String = disposalIndex.value.toString
+    mode: Mode,
+    address: String
+  ): FormPageViewModel[RecipientDetailsViewModel] =
     FormPageViewModel(
       Message("otherBuyerDetails.title"),
       Message("otherBuyerDetails.heading", address),
@@ -118,5 +122,4 @@ object OtherBuyerDetailsController {
       ),
       routes.OtherBuyerDetailsController.onSubmit(srn, landOrPropertyIndex, disposalIndex, mode)
     )
-  }
 }
