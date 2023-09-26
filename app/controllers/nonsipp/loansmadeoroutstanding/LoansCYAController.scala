@@ -25,18 +25,16 @@ import models.ConditionalYesNo._
 import models.SchemeId.Srn
 import models.{Security, _}
 import navigation.Navigator
-
 import pages.nonsipp.common.{
   CompanyRecipientCrnPage,
   IdentityTypePage,
   OtherRecipientDetailsPage,
   PartnershipRecipientUtrPage
 }
-
 import pages.nonsipp.loansmadeoroutstanding._
 import play.api.i18n._
 import play.api.mvc._
-import services.SchemeDateService
+import services.{PSRSubmissionService, SchemeDateService}
 import utils.DateTimeUtils.localDateShow
 import utils.ListUtils.ListOps
 import viewmodels.DisplayMessage._
@@ -46,6 +44,7 @@ import views.html.CheckYourAnswersView
 
 import java.time.LocalDate
 import javax.inject.{Inject, Named}
+import scala.concurrent.ExecutionContext
 
 class LoansCYAController @Inject()(
   override val messagesApi: MessagesApi,
@@ -53,8 +52,10 @@ class LoansCYAController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   schemeDateService: SchemeDateService,
+  psrSubmissionService: PSRSubmissionService,
   view: CheckYourAnswersView
-) extends PSRController {
+)(implicit ec: ExecutionContext)
+    extends PSRController {
 
   def onPageLoad(
     srn: Srn,
@@ -139,8 +140,11 @@ class LoansCYAController @Inject()(
     }
 
   def onSubmit(srn: Srn, checkOrChange: CheckOrChange): Action[AnyContent] =
-    identifyAndRequireData(srn) { implicit request =>
-      Redirect(navigator.nextPage(LoansCYAPage(srn), NormalMode, request.userAnswers))
+    identifyAndRequireData(srn).async { implicit request =>
+      psrSubmissionService.submitPsrDetails(srn).map {
+        case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        case Some(_) => Redirect(navigator.nextPage(LoansCYAPage(srn), NormalMode, request.userAnswers))
+      }
     }
 }
 

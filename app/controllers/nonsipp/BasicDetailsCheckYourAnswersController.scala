@@ -16,8 +16,8 @@
 
 package controllers.nonsipp
 
-import cats.data.{EitherT, NonEmptyList}
-import cats.implicits.{toFunctorOps, toShow}
+import cats.data.NonEmptyList
+import cats.implicits.toShow
 import config.Refined.Max3
 import controllers.PSRController
 import controllers.actions._
@@ -40,7 +40,7 @@ import views.html.CheckYourAnswersView
 
 import java.time.LocalDate
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 class BasicDetailsCheckYourAnswersController @Inject()(
   override val messagesApi: MessagesApi,
@@ -85,31 +85,13 @@ class BasicDetailsCheckYourAnswersController @Inject()(
   }
 
   def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
-    submitMinimalRequiredDetails(srn)
-      .as(
-        Redirect(navigator.nextPage(BasicDetailsCheckYourAnswersPage(srn), mode, request.userAnswers))
-      )
-      .merge
+    psrSubmissionService
+      .submitMinimalRequiredDetails(srn)
+      .map {
+        case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        case Some(_) => Redirect(navigator.nextPage(BasicDetailsCheckYourAnswersPage(srn), mode, request.userAnswers))
+      }
   }
-
-  private def submitMinimalRequiredDetails(srn: Srn)(implicit request: DataRequest[_]): EitherT[Future, Result, Unit] =
-    for {
-      returnPeriods <- schemeDateService.returnPeriods(srn).getOrRecoverJourneyT
-      reasonForNoBankAccount = request.userAnswers.get(WhyNoBankAccountPage(srn))
-      schemeMemberNumbers <- request.userAnswers
-        .get(HowManyMembersPage(srn, request.pensionSchemeId))
-        .getOrRecoverJourneyT
-      _ <- psrSubmissionService
-        .submitMinimalRequiredDetails(
-          pstr = request.schemeDetails.pstr,
-          periodStart = returnPeriods.last.to,
-          periodEnd = returnPeriods.last.from,
-          accountingPeriods = returnPeriods,
-          reasonForNoBankAccount = reasonForNoBankAccount,
-          schemeMemberNumbers = schemeMemberNumbers
-        )
-        .liftF
-    } yield ()
 
   private def loggedInUserNameOrRedirect(implicit request: DataRequest[_]): Either[Result, String] =
     request.minimalDetails.individualDetails match {

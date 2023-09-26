@@ -18,13 +18,13 @@ package viewmodels.govuk
 
 import play.api.data.Field
 import play.api.i18n.Messages
-import play.twirl.api.{Html, HtmlFormat}
+import play.twirl.api.Html
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{Content, HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.fieldset.{Fieldset, Legend}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
 import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.{RadioItem, Radios}
 import viewmodels.DisplayMessage.Message
-import viewmodels.models.{FieldType, ListRadiosRow, RadioListRow, YesNoViewModel}
+import viewmodels.models.{FieldType, ListRadiosRow, YesNoViewModel}
 import viewmodels.{ErrorMessageAwareness, LegendSize}
 import views.components.Components.renderMessage
 
