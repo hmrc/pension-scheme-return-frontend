@@ -1243,7 +1243,7 @@ landOrPropertyDisposalList.radios.error.required = Select the land or property t
 landOrPropertyDisposalList.pagination.label = Showing {0} - {1} of {2} land or properties
 
 partnershipBuyerUtr.title = Do you know the buyer’s Unique Taxpayer Reference (UTR)?
-partnershipBuyerUtr.heading = Do you know {0}’s Partnership Registration Number (UTR)?
+partnershipBuyerUtr.heading = Do you know {0}’s Unique Taxpayer Reference (UTR)?
 partnershipBuyerUtr.yes.conditional = What is {0}’s UTR?
 partnershipBuyerUtr.yes.conditional.error.required = Enter the buyer’s UTR
 partnershipBuyerUtr.yes.conditional.error.length = Enter a Unique Taxpayer Reference that is 10 numbers, like 1234567890 or 12345 67890
