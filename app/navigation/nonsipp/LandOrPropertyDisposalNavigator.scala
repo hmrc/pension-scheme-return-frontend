@@ -71,7 +71,8 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
             .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
 
         case Some(IdentityType.Other) =>
-          controllers.routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.landorpropertydisposal.routes.OtherBuyerDetailsController
+            .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
       }
 
     case CompanyBuyerNamePage(srn, landOrPropertyIndex, disposalIndex) =>
@@ -98,6 +99,11 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
 
     case PartnershipBuyerUtrPage(srn, landOrPropertyIndex, disposalIndex) => //TODO Navigation. Subsequent page still need to be implemented
       controllers.routes.UnauthorisedController.onPageLoad()
+
+    case OtherBuyerDetailsPage(srn, landOrPropertyIndex, disposalIndex) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
+
+      
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty
