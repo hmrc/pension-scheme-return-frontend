@@ -105,6 +105,7 @@ trait TestValues {
   val psaId: PsaId = PsaId("testPSAId")
   val individualName = "testIndividualName"
   val nino: Nino = ninoGen.sample.get
+  val noninoReason: String = "reason"
   val utr: Utr = utrGen.sample.get
   val leaseName = "testLeaseName"
   val money: Money = Money(123456)
@@ -126,7 +127,8 @@ trait TestValues {
     Some("testAddressLine3"),
     Some("testTown"),
     Some("testPostCode"),
-    "testCountry"
+    "testCountry",
+    "GB"
   )
 
   val individualDetails: IndividualDetails = IndividualDetails("testFirstName", Some("testMiddleName"), "testLastName")

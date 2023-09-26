@@ -14,26 +14,20 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.memberdetails
+package pages.nonsipp.landorpropertydisposal
 
-import config.Refined.Max300
+import config.Refined.{Max50, Max5000}
+import models.{ConditionalYesNo, Crn}
 import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
-import queries.{Gettable, Removable}
 import utils.RefinedUtils.RefinedIntOps
 
-case class NoNINOPage(srn: Srn, index: Max300) extends QuestionPage[String] {
+case class CompanyBuyerCrnPage(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50)
+    extends QuestionPage[ConditionalYesNo[String, Crn]] {
 
-  override def path: JsPath = Paths.personalDetails \ toString \ index.arrayIndex.toString
+  override def path: JsPath =
+    Paths.disposalPropertyTransaction \ toString \ landOrPropertyIndex.arrayIndex.toString \ disposalIndex.arrayIndex.toString
 
-  override def toString: String = "noNINO"
-}
-
-case class NoNinoPages(srn: Srn) extends Gettable[Map[String, String]] with Removable[Map[String, String]] {
-
-  override def path: JsPath = Paths.personalDetails \ toString
-
-  override def toString: String = "noNINO"
-
+  override def toString: String = "idNumber"
 }

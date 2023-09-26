@@ -19,6 +19,7 @@ package generators
 import config.Refined.OneTo5000
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.refineV
+import models.HowDisposed.HowDisposed
 import models.PensionSchemeId.{PsaId, PspId}
 import models.SchemeId.{Pstr, Srn}
 import models.SchemeStatus._
@@ -124,7 +125,8 @@ trait ModelGenerators extends BasicGenerators {
     None,
     None,
     Some("ZZ1 1ZZ"),
-    "UK"
+    "United Kingdom",
+    "GB"
   )
 
   val pstrGen: Gen[Pstr] = nonEmptyString.map(Pstr)
@@ -296,6 +298,13 @@ trait ModelGenerators extends BasicGenerators {
       IdentityType.UKPartnership,
       IdentityType.Individual,
       IdentityType.Other
+    )
+
+  implicit val howDisposedGen: Gen[HowDisposed] =
+    Gen.oneOf(
+      HowDisposed.Sold,
+      HowDisposed.Transferred,
+      HowDisposed.Other("test details")
     )
 
   implicit val Max5000Gen: Gen[Refined[Int, OneTo5000]] =
