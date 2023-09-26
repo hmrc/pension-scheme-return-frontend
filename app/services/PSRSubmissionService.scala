@@ -23,8 +23,8 @@ import eu.timepit.refined.refineV
 import models.ConditionalYesNo._
 import models.SchemeId.Srn
 import models._
+import models.requests.DataRequest
 import models.requests.psr._
-import models.requests.{psr, DataRequest}
 import pages.nonsipp.CheckReturnDatesPage
 import pages.nonsipp.common.{
   CompanyRecipientCrnPage,
@@ -46,19 +46,19 @@ class PSRSubmissionService @Inject()(psrConnector: PSRConnector, schemeDateServi
   def submitMinimalRequiredDetails(
     srn: Srn
   )(implicit hc: HeaderCarrier, ec: ExecutionContext, request: DataRequest[_]): Future[Option[Unit]] =
-    buildMinimalRequiredDetails(srn).map(psrConnector.submitMinimalRequiredDetails(_)).sequence
+    buildMinimalRequiredSubmission(srn).map(psrConnector.submitMinimalRequiredDetails(_)).sequence
 
   def submitPsrDetails(
     srn: Srn
   )(implicit hc: HeaderCarrier, ec: ExecutionContext, request: DataRequest[_]): Future[Option[Unit]] =
     (
-      buildMinimalRequiredDetails(srn),
+      buildMinimalRequiredSubmission(srn),
       request.userAnswers.get(CheckReturnDatesPage(srn)),
       request.userAnswers.get(LoansMadeOrOutstandingPage(srn))
-    ).mapN { (minimalRequiredDetails, checkReturnDates, schemeHadLoans) =>
-      psrConnector.submitPsrSubmissionDetails(
+    ).mapN { (minimalRequiredSubmission, checkReturnDates, schemeHadLoans) =>
+      psrConnector.submitPsrDetails(
         PsrSubmission(
-          minimalRequiredSubmission = minimalRequiredDetails,
+          minimalRequiredSubmission = minimalRequiredSubmission,
           checkReturnDates = checkReturnDates,
           loans = if (schemeHadLoans) Some(Loans(schemeHadLoans, buildLoanTransactions(srn))) else None
         )
@@ -197,7 +197,7 @@ class PSRSubmissionService @Inject()(psrConnector: PSRConnector, schemeDateServi
       .flatten
   }
 
-  private def buildMinimalRequiredDetails(srn: Srn)(implicit request: DataRequest[_]) = {
+  private def buildMinimalRequiredSubmission(srn: Srn)(implicit request: DataRequest[_]) = {
     val reasonForNoBankAccount = request.userAnswers.get(WhyNoBankAccountPage(srn))
     (
       schemeDateService.returnPeriods(srn),

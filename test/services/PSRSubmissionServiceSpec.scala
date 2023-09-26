@@ -52,9 +52,9 @@ class PSRSubmissionServiceSpec extends BaseSpec with TestValues {
       await(result) mustEqual ()
     }
 
-    "submitLoansDetails request successfully" in {
+    "submitPsrDetails request successfully" in {
 
-      when(mockConnector.submitPsrSubmissionDetails(any())(any(), any())).thenReturn(Future.successful(()))
+      when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(()))
 
       val result = service.submitPsrDetails(srn)
 

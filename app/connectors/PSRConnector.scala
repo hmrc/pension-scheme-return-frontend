@@ -29,14 +29,14 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClient) {
   private val baseUrl = appConfig.pensionSchemeReturn.baseUrl
 
   def submitMinimalRequiredDetails(
-    submission: MinimalRequiredSubmission
+    minimalRequiredSubmission: MinimalRequiredSubmission
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
     http.POST[MinimalRequiredSubmission, Unit](
       baseUrl + "/pension-scheme-return/psr/submit-minimal-required-details",
-      submission
+      minimalRequiredSubmission
     )
 
-  def submitPsrSubmissionDetails(
+  def submitPsrDetails(
     psrSubmission: PsrSubmission
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
     http.POST[PsrSubmission, Unit](
