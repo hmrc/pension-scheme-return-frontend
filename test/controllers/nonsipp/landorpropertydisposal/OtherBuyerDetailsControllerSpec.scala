@@ -21,6 +21,7 @@ import controllers.ControllerBaseSpec
 import eu.timepit.refined.refineMV
 import forms.RecipientDetailsFormProvider
 import models.{NormalMode, RecipientDetails}
+import pages.nonsipp.landorproperty.LandOrPropertyAddressLookupPage
 import pages.nonsipp.landorpropertydisposal.OtherBuyerDetailsPage
 import views.html.RecipientDetailsView
 
@@ -36,6 +37,8 @@ class OtherBuyerDetailsControllerSpec extends ControllerBaseSpec {
     controllers.nonsipp.landorpropertydisposal.routes.OtherBuyerDetailsController
       .onSubmit(srn, index, disposalIndex, NormalMode)
 
+  val updatedUserAnswers = defaultUserAnswers.unsafeSet(LandOrPropertyAddressLookupPage(srn, index), address)
+
   private val validForm = List(
     "name" -> "name",
     "description" -> "description"
@@ -48,11 +51,11 @@ class OtherBuyerDetailsControllerSpec extends ControllerBaseSpec {
 
   "OtherBuyerDetailsController" - {
 
-    act.like(renderView(onPageLoad) { implicit app => implicit request =>
+    act.like(renderView(onPageLoad, updatedUserAnswers) { implicit app => implicit request =>
       injected[RecipientDetailsView].apply(
         OtherBuyerDetailsController.form(injected[RecipientDetailsFormProvider]),
         OtherBuyerDetailsController
-          .viewModel(srn, index, disposalIndex, NormalMode)
+          .viewModel(srn, index, disposalIndex, NormalMode, address.addressLine1)
       )
     })
 
@@ -60,7 +63,8 @@ class OtherBuyerDetailsControllerSpec extends ControllerBaseSpec {
       renderPrePopView(
         onPageLoad,
         OtherBuyerDetailsPage(srn, index, disposalIndex),
-        recipientDetails
+        recipientDetails,
+        updatedUserAnswers
       ) { implicit app => implicit request =>
         val preparedForm =
           OtherBuyerDetailsController
@@ -70,15 +74,15 @@ class OtherBuyerDetailsControllerSpec extends ControllerBaseSpec {
           .apply(
             preparedForm,
             OtherBuyerDetailsController
-              .viewModel(srn, index, disposalIndex, NormalMode)
+              .viewModel(srn, index, disposalIndex, NormalMode, address.addressLine1)
           )
       }
     )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
-    act.like(saveAndContinue(onSubmit, validForm: _*))
-    act.like(invalidForm(onSubmit))
+    act.like(saveAndContinue(onSubmit, updatedUserAnswers, validForm: _*))
+    act.like(invalidForm(onSubmit, updatedUserAnswers))
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }
 }

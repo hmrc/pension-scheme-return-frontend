@@ -1251,7 +1251,7 @@ otherBuyerDetails.name.error.invalid = Buyer’s name must only include letters 
 otherBuyerDetails.name.error.length =  Buyer’s name must be 160 characters or fewer
 otherBuyerDetails.description.error.required = Enter a brief description of the buyer
 otherBuyerDetails.description.error.invalid = The brief description of the buyer must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
-otherBuyerDetails.description.error.length = The description of the buyer must be 35 characters or fewer
+otherBuyerDetails.description.error.length = The description of the buyer must be 160 characters or fewer
 
 partnershipBuyerUtr.title = Do you know the buyer’s Unique Taxpayer Reference (UTR)?
 partnershipBuyerUtr.heading = Do you know {0}’s Unique Taxpayer Reference (UTR)?
