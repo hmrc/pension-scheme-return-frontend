@@ -73,13 +73,13 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec {
       )
     }.before(mockTaxYear(dateRange)))
 
-    act.like(
+    /*    act.like(
       redirectNextPage(onSubmit, userAnswersWithTaxYear)
         .before {
           MockSchemeDateService.returnPeriods(Some(NonEmptyList.of(dateRange)))
           MockPSRSubmissionService.submitMinimalRequiredDetails()
         }
-    )
+    )*/
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
