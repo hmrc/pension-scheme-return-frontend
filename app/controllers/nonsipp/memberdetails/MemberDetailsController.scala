@@ -37,7 +37,9 @@ import viewmodels.models.{FormPageViewModel, NameDOBViewModel}
 import views.html.NameDOBView
 import play.api.i18n.Messages
 import viewmodels.implicits._
+
 import java.time.LocalDate
+import java.time.format.{DateTimeFormatter, FormatStyle}
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -116,7 +118,10 @@ object MemberDetailsController {
           DateFormErrors
             .failIfDateAfter(
               dateThreshold,
-              messages("whenDidSchemeAcquireLandOrProperty.dateOfAcquired.error.future", dateThreshold)
+              messages(
+                "memberDetails.dateOfBirth.error.future",
+                dateThreshold.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG))
+              )
             )
         )
       )
