@@ -43,7 +43,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.math.Integral.Implicits.infixIntegralOps
 
 class MemberDetailsUploadValidator @Inject()(
-  messagesApi: MessagesApi,
+  //messagesApi: MessagesApi,
   nameDOBFormProvider: NameDOBFormProvider,
   textFormProvider: TextFormProvider,
   schemeDateService: SchemeDateService
@@ -171,7 +171,7 @@ class MemberDetailsUploadValidator @Inject()(
     dob.value.split("/").toList match {
       case day :: month :: year :: Nil =>
         val memberDetailsForm = MemberDetailsController
-          .form(nameDOBFormProvider, getTaxDates(srn)(request), request.messages(messagesApi))
+          .form(nameDOBFormProvider, getTaxDates(srn)(request))
           .bind(
             Map(
               nameDOBFormProvider.firstName -> firstName.value,

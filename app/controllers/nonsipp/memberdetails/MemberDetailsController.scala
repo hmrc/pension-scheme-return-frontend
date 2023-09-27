@@ -58,14 +58,14 @@ class MemberDetailsController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      val form = MemberDetailsController.form(formProvider, getTaxDates(srn)(request), request.messages(messagesApi))
+      val form = MemberDetailsController.form(formProvider, getTaxDates(srn)(request))
 
       Ok(view(form.fromUserAnswers(MemberDetailsPage(srn, index)), viewModel(srn, index, mode)))
   }
 
   def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
-      val form = MemberDetailsController.form(formProvider, getTaxDates(srn)(request), request.messages(messagesApi))
+      val form = MemberDetailsController.form(formProvider, getTaxDates(srn)(request))
       form
         .bindFromRequest()
         .fold(
@@ -95,9 +95,8 @@ object MemberDetailsController {
 
   def form(
     formProvider: NameDOBFormProvider,
-    validDateThreshold: Option[LocalDate],
-    messages: Messages
-  ): Form[NameDOB] = {
+    validDateThreshold: Option[LocalDate]
+  )(implicit messages: Messages): Form[NameDOB] = {
     val dateThreshold: LocalDate = validDateThreshold.getOrElse(LocalDate.now())
     formProvider(
       "memberDetails.firstName.error.required",
