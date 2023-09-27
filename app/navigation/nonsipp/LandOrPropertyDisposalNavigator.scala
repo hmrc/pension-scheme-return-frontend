@@ -27,9 +27,6 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
 
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
 
-    case LandOrPropertyDisposalSellerConnectedPartyPage(srn, index, disposalIndex) => // 41k
-      controllers.routes.UnauthorisedController.onPageLoad()
-
     case page @ LandOrPropertyDisposalPage(srn) => //41
       if (userAnswers.get(page).contains(true)) {
         controllers.nonsipp.landorpropertydisposal.routes.WhatYouWillNeedLandPropertyDisposalController.onPageLoad(srn)
@@ -98,14 +95,9 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
       controllers.nonsipp.landorpropertydisposal.routes.HowWasPropertyDisposedOfController
         .onPageLoad(srn, choice, refineMV(1), NormalMode)
 
-
     case CompanyBuyerNamePage(srn, landOrPropertyIndex, disposalIndex) =>
       controllers.nonsipp.landorpropertydisposal.routes.CompanyBuyerCrnController
         .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
-
-
-    case TotalProceedsSaleLandPropertyPage(srn, landOrPropertyIndex, disposalIndex) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
 
     case PartnershipBuyerNamePage(srn, landOrPropertyIndex, disposalIndex) =>
       controllers.nonsipp.landorpropertydisposal.routes.PartnershipBuyerUtrController
@@ -118,6 +110,13 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
     case PartnershipBuyerUtrPage(srn, landOrPropertyIndex, disposalIndex) =>
       controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalSellerConnectedPartyController
         .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
+
+    case LandOrPropertyDisposalSellerConnectedPartyPage(srn, index, disposalIndex) =>
+      controllers.nonsipp.landorpropertydisposal.routes.TotalProceedsSaleLandPropertyController
+        .onSubmit(srn, index, disposalIndex, NormalMode)
+
+    case TotalProceedsSaleLandPropertyPage(srn, landOrPropertyIndex, disposalIndex) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
 
   }
 

@@ -18,7 +18,7 @@ package navigation.nonsipp
 
 import config.Refined.{Max50, Max5000}
 import eu.timepit.refined.refineMV
-import models.NormalMode
+import models.{IdentityType, NormalMode}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.landorpropertydisposal._
@@ -92,7 +92,7 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
           IndividualBuyerNinoNumberPage,
           controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalSellerConnectedPartyController.onPageLoad
         )
-        .withName("go from individual buyer nino page to unauthorised page")
+        .withName("go from individual buyer nino page to land or property disposal seller connected party page")
     )
   }
 
@@ -120,7 +120,7 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
           PartnershipBuyerNamePage,
           controllers.nonsipp.landorpropertydisposal.routes.PartnershipBuyerUtrController.onPageLoad
         )
-        .withName("go from partnership buyer UTR page")
+        .withName("go from partnership buyer name page to partnership buyer UTR page")
     )
   }
 
@@ -133,20 +133,22 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
           PartnershipBuyerUtrPage,
           controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalSellerConnectedPartyController.onPageLoad
         )
-        .withName("go from partnership buyer UTR page")
+        .withName("go from partnership buyer UTR page to land or property disposal seller connected party page")
     )
   }
 
-  "LandOrPropertyDisposalSellerConnectedPartyPage" - {
+  "OtherBuyerDetailsPage" - {
     act.like(
       normalmode
         .navigateToWithDoubleIndex(
           index,
           disposalIndex,
-          LandOrPropertyDisposalSellerConnectedPartyPage,
-          (srn, index: Max5000, disposalIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          OtherBuyerDetailsPage,
+          (srn, index: Max5000, disposalIndex: Max50, _) =>
+            controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalSellerConnectedPartyController
+              .onPageLoad(srn, index, disposalIndex, NormalMode)
         )
-        .withName("go from LandOrPropertyDisposalSellerConnectedPartyPage to ??? page")
+        .withName("go from other buyer details page to land or property disposal seller connected party page")
     )
   }
 
@@ -201,7 +203,9 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
           disposalIndex,
           WhoPurchasedLandOrPropertyPage,
           Gen.const(IdentityType.Other),
-          (srn, index: Max5000, disposalIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          (srn, index: Max5000, disposalIndex: Max50, _) =>
+            controllers.nonsipp.landorpropertydisposal.routes.OtherBuyerDetailsController
+              .onPageLoad(srn, index, disposalIndex, NormalMode)
         )
         .withName("go from who purchased land or property page to unauthorised page")
     )
