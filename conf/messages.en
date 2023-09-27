@@ -241,7 +241,7 @@ memberDetails.dateOfBirth.error.required.year = Date of birth must include a yea
 memberDetails.dateOfBirth.error.required.two = Date of birth must include a {0} and {1}
 memberDetails.dateOfBirth.error.invalid.date = Date of birth must be a real date
 memberDetails.dateOfBirth.error.invalid.characters = Date of birth must only include numbers 0 to 9
-memberDetails.dateOfBirth.error.future = Date of birth must be in the past
+memberDetails.dateOfBirth.error.future = Date of birth must be before {0}
 memberDetails.dateOfBirth.error.format = Member’s date of birth must be in the format 01/08/1970
 
 
@@ -1277,6 +1277,7 @@ individualBuyerNinoNumber.title = Do you know the buyer’s National Insurance n
 individualBuyerNinoNumber.heading = Do you know {0}’s National Insurance number?
 individualBuyerNinoNumber.yes.conditional = What is {0}’s National Insurance number?
 individualBuyerNinoNumber.no.conditional = Tell us why you cannot provide {0}’s National Insurance number
+individualBuyerNinoNumber.error.required = Select yes if you know the buyer’s National Insurance number
 individualBuyerNinoNumber.no.conditional.error.required = Enter the reason you cannot provide the buyer’s National Insurance number
 individualBuyerNinoNumber.no.conditional.error.invalid = The reason you cannot provide the buyer’s National Insurance number must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
 individualBuyerNinoNumber.no.conditional.error.length = The reason you cannot provide the buyer’s National Insurance number must be 160 characters or fewer
@@ -1293,6 +1294,15 @@ howWasDisposed.error.required = Select how the land or property was disposed of
 howWasDisposed.conditional.error.required = Enter details of the disposal
 howWasDisposed.conditional.error.invalid = Details of the disposal must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
 howWasDisposed.conditional.error.length = Details of the disposal must be 160 characters or fewer
+
+totalProceedsSaleLandProperty.title = What were the total proceeds from the sale of the land or property, in pounds and pence?
+totalProceedsSaleLandProperty.heading = What were the total proceeds from the sale of {0}, in pounds and pence?
+totalProceedsSaleLandProperty.paragraph = You need to report all proceeds, including:
+totalProceedsSaleLandProperty.list1 = total sale proceeds of any land or interest in land sold
+totalProceedsSaleLandProperty.list2 = premiums received on the disposal of a leasehold interest in land
+totalProceedsSaleLandProperty.error.required = Enter the total proceeds from the sale, in pounds and pence
+totalProceedsSaleLandProperty.error.invalid = Total proceeds from the sale must be an amount of money, like 123 or 123.45
+totalProceedsSaleLandProperty.error.tooLarge = Total proceeds from the sale must be 999999999.99 or less
 
 landOrPropertyDisposalSellerConnectedParty.title = Is the seller a connected party?
 landOrPropertyDisposalSellerConnectedParty.heading = Is {0} a connected party?

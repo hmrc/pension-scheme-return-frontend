@@ -35,8 +35,11 @@ import utils.FormUtils._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, NameDOBViewModel}
 import views.html.NameDOBView
+import play.api.i18n.Messages
+import viewmodels.implicits._
 
 import java.time.LocalDate
+import java.time.format.{DateTimeFormatter, FormatStyle}
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -90,27 +93,39 @@ class MemberDetailsController @Inject()(
 
 object MemberDetailsController {
 
-  def form(formProvider: NameDOBFormProvider, validDateThreshold: Option[LocalDate]): Form[NameDOB] = formProvider(
-    "memberDetails.firstName.error.required",
-    "memberDetails.firstName.error.invalid",
-    "memberDetails.firstName.error.length",
-    "memberDetails.lastName.error.required",
-    "memberDetails.lastName.error.invalid",
-    "memberDetails.lastName.error.length",
-    DateFormErrors(
-      "memberDetails.dateOfBirth.error.required.all",
-      "memberDetails.dateOfBirth.error.required.day",
-      "memberDetails.dateOfBirth.error.required.month",
-      "memberDetails.dateOfBirth.error.required.year",
-      "memberDetails.dateOfBirth.error.required.two",
-      "memberDetails.dateOfBirth.error.invalid.date",
-      "memberDetails.dateOfBirth.error.invalid.characters",
-      List(
-        DateFormErrors
-          .failIfDateAfter(validDateThreshold.getOrElse(LocalDate.now()), "memberDetails.dateOfBirth.error.future")
+  def form(
+    formProvider: NameDOBFormProvider,
+    validDateThreshold: Option[LocalDate]
+  )(implicit messages: Messages): Form[NameDOB] = {
+    val dateThreshold: LocalDate = validDateThreshold.getOrElse(LocalDate.now())
+    formProvider(
+      "memberDetails.firstName.error.required",
+      "memberDetails.firstName.error.invalid",
+      "memberDetails.firstName.error.length",
+      "memberDetails.lastName.error.required",
+      "memberDetails.lastName.error.invalid",
+      "memberDetails.lastName.error.length",
+      DateFormErrors(
+        "memberDetails.dateOfBirth.error.required.all",
+        "memberDetails.dateOfBirth.error.required.day",
+        "memberDetails.dateOfBirth.error.required.month",
+        "memberDetails.dateOfBirth.error.required.year",
+        "memberDetails.dateOfBirth.error.required.two",
+        "memberDetails.dateOfBirth.error.invalid.date",
+        "memberDetails.dateOfBirth.error.invalid.characters",
+        List(
+          DateFormErrors
+            .failIfDateAfter(
+              dateThreshold,
+              messages(
+                "memberDetails.dateOfBirth.error.future",
+                dateThreshold.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG))
+              )
+            )
+        )
       )
     )
-  )
+  }
 
   def viewModel(srn: Srn, index: Max300, mode: Mode): FormPageViewModel[NameDOBViewModel] = FormPageViewModel(
     Message("memberDetails.title"),

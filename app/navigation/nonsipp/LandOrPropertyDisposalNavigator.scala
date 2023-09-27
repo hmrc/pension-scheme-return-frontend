@@ -27,9 +27,6 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
 
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
 
-    case LandOrPropertyDisposalSellerConnectedPartyPage(srn, index, disposalIndex) => // 41k
-      controllers.routes.UnauthorisedController.onPageLoad()
-
     case page @ LandOrPropertyDisposalPage(srn) => //41
       if (userAnswers.get(page).contains(true)) {
         controllers.nonsipp.landorpropertydisposal.routes.WhatYouWillNeedLandPropertyDisposalController.onPageLoad(srn)
@@ -109,6 +106,14 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
     case PartnershipBuyerUtrPage(srn, landOrPropertyIndex, disposalIndex) =>
       controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalSellerConnectedPartyController
         .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
+
+    case LandOrPropertyDisposalSellerConnectedPartyPage(srn, index, disposalIndex) =>
+      controllers.nonsipp.landorpropertydisposal.routes.TotalProceedsSaleLandPropertyController
+        .onPageLoad(srn, index, disposalIndex, NormalMode)
+
+    case TotalProceedsSaleLandPropertyPage(srn, landOrPropertyIndex, disposalIndex) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
+
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty
