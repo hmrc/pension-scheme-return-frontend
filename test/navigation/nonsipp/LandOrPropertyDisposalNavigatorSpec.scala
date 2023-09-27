@@ -18,7 +18,7 @@ package navigation.nonsipp
 
 import config.Refined.{Max50, Max5000}
 import eu.timepit.refined.refineMV
-import models.NormalMode
+import models.{IdentityType, NormalMode}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.landorpropertydisposal._
@@ -92,7 +92,7 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
           IndividualBuyerNinoNumberPage,
           controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalSellerConnectedPartyController.onPageLoad
         )
-        .withName("go from individual buyer nino page to unauthorised page")
+        .withName("go from individual buyer nino page to land or property disposal seller connected party page")
     )
   }
 
@@ -120,7 +120,7 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
           PartnershipBuyerNamePage,
           controllers.nonsipp.landorpropertydisposal.routes.PartnershipBuyerUtrController.onPageLoad
         )
-        .withName("go from partnership buyer UTR page")
+        .withName("go from partnership buyer name page to partnership buyer UTR page")
     )
   }
 
@@ -133,20 +133,113 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
           PartnershipBuyerUtrPage,
           controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalSellerConnectedPartyController.onPageLoad
         )
-        .withName("go from partnership buyer UTR page")
+        .withName("go from partnership buyer UTR page to land or property disposal seller connected party page")
+    )
+  }
+
+  "OtherBuyerDetailsPage" - {
+    act.like(
+      normalmode
+        .navigateToWithDoubleIndex(
+          index,
+          disposalIndex,
+          OtherBuyerDetailsPage,
+          (srn, index: Max5000, disposalIndex: Max50, _) =>
+            controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalSellerConnectedPartyController
+              .onPageLoad(srn, index, disposalIndex, NormalMode)
+        )
+        .withName("go from other buyer details page to land or property disposal seller connected party page")
+    )
+  }
+
+  "WhoPurchasedLandOrPropertyPage" - {
+
+    act.like(
+      normalmode
+        .navigateToWithDoubleDataAndIndex(
+          index,
+          disposalIndex,
+          WhoPurchasedLandOrPropertyPage,
+          Gen.const(IdentityType.Individual),
+          (srn, index: Max5000, disposalIndex: Max50, _) =>
+            controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyIndividualBuyerNameController
+              .onPageLoad(srn, index, disposalIndex, NormalMode)
+        )
+        .withName("go from who purchased land or property page to land or property individual buyer name page")
+    )
+
+    act.like(
+      normalmode
+        .navigateToWithDoubleDataAndIndex(
+          index,
+          disposalIndex,
+          WhoPurchasedLandOrPropertyPage,
+          Gen.const(IdentityType.UKCompany),
+          (srn, index: Max5000, disposalIndex: Max50, _) =>
+            controllers.nonsipp.landorpropertydisposal.routes.CompanyBuyerNameController
+              .onPageLoad(srn, index, disposalIndex, NormalMode)
+        )
+        .withName("go from who purchased land or property page to company buyer name page")
+    )
+
+    act.like(
+      normalmode
+        .navigateToWithDoubleDataAndIndex(
+          index,
+          disposalIndex,
+          WhoPurchasedLandOrPropertyPage,
+          Gen.const(IdentityType.UKPartnership),
+          (srn, index: Max5000, disposalIndex: Max50, _) =>
+            controllers.nonsipp.landorpropertydisposal.routes.PartnershipBuyerNameController
+              .onPageLoad(srn, index, disposalIndex, NormalMode)
+        )
+        .withName("go from who purchased land or property page to partnership buyer name page")
+    )
+
+    act.like(
+      normalmode
+        .navigateToWithDoubleDataAndIndex(
+          index,
+          disposalIndex,
+          WhoPurchasedLandOrPropertyPage,
+          Gen.const(IdentityType.Other),
+          (srn, index: Max5000, disposalIndex: Max50, _) =>
+            controllers.nonsipp.landorpropertydisposal.routes.OtherBuyerDetailsController
+              .onPageLoad(srn, index, disposalIndex, NormalMode)
+        )
+        .withName("go from who purchased land or property page to unauthorised page")
     )
   }
 
   "LandOrPropertyDisposalSellerConnectedPartyPage" - {
+
     act.like(
       normalmode
         .navigateToWithDoubleIndex(
           index,
           disposalIndex,
           LandOrPropertyDisposalSellerConnectedPartyPage,
+          (srn, index: Max5000, disposalIndex: Max50, _) =>
+            controllers.nonsipp.landorpropertydisposal.routes.TotalProceedsSaleLandPropertyController
+              .onPageLoad(srn, index, disposalIndex, NormalMode)
+        )
+        .withName(
+          "go from land or property disposal seller connected party Page to total proceeds sale land property"
+        )
+    )
+  }
+
+  "TotalProceedsSaleLandPropertyPage" - {
+
+    act.like(
+      normalmode
+        .navigateToWithDoubleIndex(
+          index,
+          disposalIndex,
+          TotalProceedsSaleLandPropertyPage,
           (srn, index: Max5000, disposalIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
         )
-        .withName("go from LandOrPropertyDisposalSellerConnectedPartyPage to ??? page")
+        .withName("go from total proceeds sale land property page to unauthorised page")
     )
   }
 }

@@ -16,17 +16,24 @@
 
 package pages.nonsipp.landorpropertydisposal
 
-import play.api.libs.json.JsPath
-import models.SchemeId.Srn
-import pages.QuestionPage
 import config.Refined.{Max50, Max5000}
-import utils.RefinedUtils._
+import eu.timepit.refined.refineMV
+import models.Money
+import pages.behaviours.PageBehaviours
 
-case class LandOrPropertyDisposalSellerConnectedPartyPage(srn: Srn, index: Max5000, disposalIndex: Max50)
-    extends QuestionPage[Boolean] {
+class TotalProceedsSaleLandPropertyPageSpec extends PageBehaviours {
 
-  override def path: JsPath =
-    Paths.disposalPropertyTransaction \ toString \ index.arrayIndex.toString \ disposalIndex.arrayIndex.toString
+  "TotalProceedsSaleLandPropertyPage" - {
 
-  override def toString: String = "isSellerConnectedParty"
+    val index = refineMV[Max5000.Refined](1)
+    val disposalIndex = refineMV[Max50.Refined](1)
+
+    beRetrievable[Money](TotalProceedsSaleLandPropertyPage(srnGen.sample.value, index, disposalIndex))
+
+    beSettable[Money](TotalProceedsSaleLandPropertyPage(srnGen.sample.value, index, disposalIndex))
+
+    beRemovable[Money](TotalProceedsSaleLandPropertyPage(srnGen.sample.value, index, disposalIndex))
+
+  }
+
 }

@@ -29,6 +29,7 @@ import pages.nonsipp.landorpropertydisposal.{
   CompanyBuyerNamePage,
   LandOrPropertyDisposalSellerConnectedPartyPage,
   LandOrPropertyIndividualBuyerNamePage,
+  OtherBuyerDetailsPage,
   PartnershipBuyerNamePage,
   WhoPurchasedLandOrPropertyPage
 }
@@ -114,7 +115,10 @@ class LandOrPropertyDisposalSellerConnectedPartyController @Inject()(
         case IdentityType.UKPartnership =>
           request.userAnswers.get(PartnershipBuyerNamePage(srn, landOrPropertyIndex, disposalIndex)).getOrRecoverJourney
         case IdentityType.Other =>
-          Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+          request.userAnswers
+            .get(OtherBuyerDetailsPage(srn, landOrPropertyIndex, disposalIndex))
+            .getOrRecoverJourney
+            .map(_.name)
       }
     } yield buyerName
 }

@@ -16,17 +16,18 @@
 
 package pages.nonsipp.landorpropertydisposal
 
-import play.api.libs.json.JsPath
+import config.Refined.{Max50, Max5000}
+import models.Money
 import models.SchemeId.Srn
 import pages.QuestionPage
-import config.Refined.{Max50, Max5000}
-import utils.RefinedUtils._
+import play.api.libs.json.JsPath
+import utils.RefinedUtils.RefinedIntOps
 
-case class LandOrPropertyDisposalSellerConnectedPartyPage(srn: Srn, index: Max5000, disposalIndex: Max50)
-    extends QuestionPage[Boolean] {
+case class TotalProceedsSaleLandPropertyPage(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50)
+    extends QuestionPage[Money] {
 
   override def path: JsPath =
-    Paths.disposalPropertyTransaction \ toString \ index.arrayIndex.toString \ disposalIndex.arrayIndex.toString
+    Paths.disposalPropertyTransaction \ toString \ landOrPropertyIndex.arrayIndex.toString \ disposalIndex.arrayIndex.toString
 
-  override def toString: String = "isSellerConnectedParty"
+  override def toString: String = "saleProceeds"
 }
