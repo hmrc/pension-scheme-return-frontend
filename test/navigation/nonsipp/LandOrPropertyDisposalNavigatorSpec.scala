@@ -123,4 +123,75 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
         .withName("go from partnership buyer name page to unauthorised page")
     )
   }
+
+  "WhoPurchasedLandOrPropertyPage" - {
+
+    act.like(
+      normalmode
+        .navigateToWithDoubleDataAndIndex(
+          index,
+          disposalIndex,
+          WhoPurchasedLandOrPropertyPage,
+          Gen.const(IdentityType.Individual),
+          (srn, index: Max5000, disposalIndex: Max50, _) =>
+            controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyIndividualBuyerNameController
+              .onPageLoad(srn, index, disposalIndex, NormalMode)
+        )
+        .withName("go from who purchased land or property page to land or property individual buyer name page")
+    )
+
+    act.like(
+      normalmode
+        .navigateToWithDoubleDataAndIndex(
+          index,
+          disposalIndex,
+          WhoPurchasedLandOrPropertyPage,
+          Gen.const(IdentityType.UKCompany),
+          (srn, index: Max5000, disposalIndex: Max50, _) =>
+            controllers.nonsipp.landorpropertydisposal.routes.CompanyBuyerNameController
+              .onPageLoad(srn, index, disposalIndex, NormalMode)
+        )
+        .withName("go from who purchased land or property page to company buyer name page")
+    )
+
+    act.like(
+      normalmode
+        .navigateToWithDoubleDataAndIndex(
+          index,
+          disposalIndex,
+          WhoPurchasedLandOrPropertyPage,
+          Gen.const(IdentityType.UKPartnership),
+          (srn, index: Max5000, disposalIndex: Max50, _) =>
+            controllers.nonsipp.landorpropertydisposal.routes.PartnershipBuyerNameController
+              .onPageLoad(srn, index, disposalIndex, NormalMode)
+        )
+        .withName("go from who purchased land or property page to partnership buyer name page")
+    )
+
+    act.like(
+      normalmode
+        .navigateToWithDoubleDataAndIndex(
+          index,
+          disposalIndex,
+          WhoPurchasedLandOrPropertyPage,
+          Gen.const(IdentityType.Other),
+          (srn, index: Max5000, disposalIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+        )
+        .withName("go from who purchased land or property page to unauthorised page")
+    )
+  }
+
+  "TotalProceedsSaleLandPropertyPage" - {
+
+    act.like(
+      normalmode
+        .navigateToWithDoubleIndex(
+          index,
+          disposalIndex,
+          TotalProceedsSaleLandPropertyPage,
+          (srn, index: Max5000, disposalIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+        )
+        .withName("go from total proceeds sale land property page to unauthorised page")
+    )
+  }
 }

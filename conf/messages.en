@@ -1269,3 +1269,12 @@ howWasDisposed.error.required = Select how the land or property was disposed of
 howWasDisposed.conditional.error.required = Enter details of the disposal
 howWasDisposed.conditional.error.invalid = Details of the disposal must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
 howWasDisposed.conditional.error.length = Details of the disposal must be 160 characters or fewer
+
+totalProceedsSaleLandProperty.title = What were the total proceeds from the sale of the land or property, in pounds and pence?
+totalProceedsSaleLandProperty.heading = What were the total proceeds from the sale of {0}, in pounds and pence?
+totalProceedsSaleLandProperty.paragraph = You need to report all proceeds, including:
+totalProceedsSaleLandProperty.list1 = total sale proceeds of any land or interest in land sold
+totalProceedsSaleLandProperty.list2 = premiums received on the disposal of a leasehold interest in land
+totalProceedsSaleLandProperty.error.required = Enter the total proceeds from the sale, in pounds and pence
+totalProceedsSaleLandProperty.error.invalid = Total proceeds from the sale must be an amount of money, like 123 or 123.45
+totalProceedsSaleLandProperty.error.tooLarge = Total proceeds from the sale must be 999999999.99 or less
