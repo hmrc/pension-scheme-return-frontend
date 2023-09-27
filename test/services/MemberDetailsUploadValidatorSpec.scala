@@ -24,7 +24,7 @@ import forms.{NameDOBFormProvider, TextFormProvider}
 import generators.WrappedMemberDetails
 import models._
 import models.requests.DataRequest
-import play.api.i18n.{Messages, MessagesApi}
+import play.api.i18n.Messages
 import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
 import play.api.test.Helpers.stubMessagesApi
