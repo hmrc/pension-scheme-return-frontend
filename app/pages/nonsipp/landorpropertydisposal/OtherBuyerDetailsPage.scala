@@ -14,17 +14,20 @@
  * limitations under the License.
  */
 
-package viewmodels.models
+package pages.nonsipp.landorpropertydisposal
 
-import viewmodels.DisplayMessage
+import config.Refined.{Max50, Max5000}
+import models.RecipientDetails
+import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
+import utils.RefinedUtils.RefinedIntOps
 
-case class ListRadiosRow(
-  index: Int,
-  text: DisplayMessage
-)
+case class OtherBuyerDetailsPage(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50)
+    extends QuestionPage[RecipientDetails] {
 
-case class ListRadiosViewModel(
-  legend: DisplayMessage,
-  rows: List[ListRadiosRow],
-  paginatedViewModel: Option[PaginatedViewModel] = None
-)
+  override def path: JsPath =
+    Paths.disposalPropertyTransaction \ toString \ landOrPropertyIndex.arrayIndex.toString \ disposalIndex.arrayIndex.toString
+
+  override def toString: String = "otherDescription"
+}

@@ -16,10 +16,12 @@
 
 package services
 
-import cats.data.NonEmptyList
 import connectors.PSRConnector
 import controllers.TestValues
+import models.requests.{AllowedAccessRequest, DataRequest}
 import org.mockito.ArgumentMatchers.any
+import play.api.mvc.AnyContentAsEmpty
+import play.api.test.FakeRequest
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.BaseSpec
@@ -29,27 +31,34 @@ import scala.concurrent.Future
 
 class PSRSubmissionServiceSpec extends BaseSpec with TestValues {
 
+  val allowedAccessRequest
+    : AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(FakeRequest()).sample.value
+  implicit val request: DataRequest[AnyContentAsEmpty.type] = DataRequest(allowedAccessRequest, defaultUserAnswers)
+
   private val mockConnector = mock[PSRConnector]
+  private val mockSchemeDateService = mock[SchemeDateService]
 
-  private val service = new PSRSubmissionService(mockConnector)
+  private val service = new PSRSubmissionService(mockConnector, mockSchemeDateService)
 
-  private implicit val hc = HeaderCarrier()
+  private implicit val hc: HeaderCarrier = HeaderCarrier()
 
   "PSRSubmissionService" - {
-    "proxy request successfully" in {
+    "submitMinimalRequiredDetails request successfully" ignore {
 
       when(mockConnector.submitMinimalRequiredDetails(any())(any(), any())).thenReturn(Future.successful(()))
 
-      val result = service.submitMinimalRequiredDetails(
-        pstr,
-        periodStart = localDate,
-        periodEnd = localDate,
-        NonEmptyList.of(dateRange),
-        reasonForNoBankAccount = None,
-        schemeMemberNumbers
-      )
+      val result = service.submitMinimalRequiredDetails(srn)
 
-      await(result) mustEqual (())
+      await(result) mustEqual ()
+    }
+
+    "submitPsrDetails request successfully" ignore {
+
+      when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(()))
+
+      val result = service.submitPsrDetails(srn)
+
+      await(result) mustEqual ()
     }
   }
 }

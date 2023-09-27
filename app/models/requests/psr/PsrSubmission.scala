@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-package viewmodels.models
+package models.requests.psr
 
-import viewmodels.DisplayMessage
+import play.api.libs.json.{Json, OWrites}
 
-case class ListRadiosRow(
-  index: Int,
-  text: DisplayMessage
+case class PsrSubmission(
+  minimalRequiredSubmission: MinimalRequiredSubmission,
+  checkReturnDates: Boolean,
+  loans: Option[Loans]
 )
 
-case class ListRadiosViewModel(
-  legend: DisplayMessage,
-  rows: List[ListRadiosRow],
-  paginatedViewModel: Option[PaginatedViewModel] = None
-)
+object PsrSubmission {
+  implicit val writes: OWrites[PsrSubmission] = Json.writes[PsrSubmission]
+}

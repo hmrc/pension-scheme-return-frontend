@@ -18,7 +18,7 @@ package navigation.nonsipp
 
 import config.Refined.{Max50, Max5000}
 import eu.timepit.refined.refineMV
-import models.{IdentityType, NormalMode}
+import models.NormalMode
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.landorpropertydisposal._
@@ -90,7 +90,7 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
           index,
           disposalIndex,
           IndividualBuyerNinoNumberPage,
-          (srn, index: Max5000, disposalIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalSellerConnectedPartyController.onPageLoad
         )
         .withName("go from individual buyer nino page to unauthorised page")
     )
@@ -118,9 +118,35 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
           index,
           disposalIndex,
           PartnershipBuyerNamePage,
+          controllers.nonsipp.landorpropertydisposal.routes.PartnershipBuyerUtrController.onPageLoad
+        )
+        .withName("go from partnership buyer UTR page")
+    )
+  }
+
+  "PartnershipBuyerUtrPage" - {
+    act.like(
+      normalmode
+        .navigateToWithDoubleIndex(
+          index,
+          disposalIndex,
+          PartnershipBuyerUtrPage,
+          controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalSellerConnectedPartyController.onPageLoad
+        )
+        .withName("go from partnership buyer UTR page")
+    )
+  }
+
+  "LandOrPropertyDisposalSellerConnectedPartyPage" - {
+    act.like(
+      normalmode
+        .navigateToWithDoubleIndex(
+          index,
+          disposalIndex,
+          LandOrPropertyDisposalSellerConnectedPartyPage,
           (srn, index: Max5000, disposalIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
         )
-        .withName("go from partnership buyer name page to unauthorised page")
+        .withName("go from LandOrPropertyDisposalSellerConnectedPartyPage to ??? page")
     )
   }
 

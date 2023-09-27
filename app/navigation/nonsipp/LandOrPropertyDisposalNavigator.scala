@@ -27,6 +27,9 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
 
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
 
+    case LandOrPropertyDisposalSellerConnectedPartyPage(srn, index, disposalIndex) => // 41k
+      controllers.routes.UnauthorisedController.onPageLoad()
+
     case page @ LandOrPropertyDisposalPage(srn) => //41
       if (userAnswers.get(page).contains(true)) {
         controllers.nonsipp.landorpropertydisposal.routes.WhatYouWillNeedLandPropertyDisposalController.onPageLoad(srn)
@@ -71,7 +74,8 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
             .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
 
         case Some(IdentityType.Other) =>
-          controllers.routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.landorpropertydisposal.routes.OtherBuyerDetailsController
+            .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
       }
 
     case CompanyBuyerNamePage(srn, landOrPropertyIndex, disposalIndex) =>
@@ -79,10 +83,12 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
         .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
 
     case CompanyBuyerCrnPage(srn, landOrPropertyIndex, disposalIndex) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+      controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalSellerConnectedPartyController
+        .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
 
     case IndividualBuyerNinoNumberPage(srn, landOrPropertyIndex, disposalIndex) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+      controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalSellerConnectedPartyController
+        .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
 
     case LandOrPropertyIndividualBuyerNamePage(srn, landOrPropertyIndex, disposalIndex) =>
       controllers.nonsipp.landorpropertydisposal.routes.IndividualBuyerNinoNumberController
@@ -92,14 +98,27 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
       controllers.nonsipp.landorpropertydisposal.routes.HowWasPropertyDisposedOfController
         .onPageLoad(srn, choice, refineMV(1), NormalMode)
 
-    case CompanyBuyerNamePage(srn, landOrPropertyIndex, disposalIndex) => //TODO Navigation. Subsequent and previous pages still need to be implemented
-      controllers.routes.UnauthorisedController.onPageLoad()
 
-    case PartnershipBuyerNamePage(srn, landOrPropertyIndex, disposalIndex) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+    case CompanyBuyerNamePage(srn, landOrPropertyIndex, disposalIndex) =>
+      controllers.nonsipp.landorpropertydisposal.routes.CompanyBuyerCrnController
+        .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
+
 
     case TotalProceedsSaleLandPropertyPage(srn, landOrPropertyIndex, disposalIndex) =>
       controllers.routes.UnauthorisedController.onPageLoad()
+
+    case PartnershipBuyerNamePage(srn, landOrPropertyIndex, disposalIndex) =>
+      controllers.nonsipp.landorpropertydisposal.routes.PartnershipBuyerUtrController
+        .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
+
+    case OtherBuyerDetailsPage(srn, landOrPropertyIndex, disposalIndex) =>
+      controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalSellerConnectedPartyController
+        .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
+
+    case PartnershipBuyerUtrPage(srn, landOrPropertyIndex, disposalIndex) =>
+      controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalSellerConnectedPartyController
+        .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
+
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty

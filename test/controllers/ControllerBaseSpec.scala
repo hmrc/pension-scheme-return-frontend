@@ -120,6 +120,7 @@ trait TestValues {
   val recipientName = "testRecipientName"
   val pstr = "testPstr"
   val titleNumber = "AB123456"
+  val buyersName = "testBuyersName"
 
   val address: Address = Address(
     "testAddressLine1",

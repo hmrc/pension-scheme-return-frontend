@@ -14,17 +14,20 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.loansmadeoroutstanding
+package pages.nonsipp.landorpropertydisposal
 
-import config.Refined.Max5000
+import config.Refined.{Max50, Max5000}
 import models.SchemeId.Srn
+import models.{ConditionalYesNo, Utr}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
 
-case class CompanyRecipientNamePage(srn: Srn, index: Max5000) extends QuestionPage[String] {
+case class PartnershipBuyerUtrPage(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50)
+    extends QuestionPage[ConditionalYesNo[String, Utr]] {
 
-  override def path: JsPath = Paths.loanTransactions \ "loanRecipientName" \ toString \ index.arrayIndex.toString
+  override def path: JsPath =
+    Paths.disposalPropertyTransaction \ toString \ landOrPropertyIndex.arrayIndex.toString \ disposalIndex.arrayIndex.toString
 
-  override def toString: String = "company"
+  override def toString: String = "idNumber"
 }

@@ -14,17 +14,21 @@
  * limitations under the License.
  */
 
-package viewmodels.models
+package pages.nonsipp.landorpropertydisposal
 
-import viewmodels.DisplayMessage
+import play.api.libs.json.JsPath
+import models.SchemeId.Srn
+import models.Money
+import pages.QuestionPage
+import config.Refined.{Max50, Max5000}
+import utils.RefinedUtils._
+import eu.timepit.refined.refineMV
 
-case class ListRadiosRow(
-  index: Int,
-  text: DisplayMessage
-)
+case class LandOrPropertyDisposalSellerConnectedPartyPage(srn: Srn, index: Max5000, disposalIndex: Max50)
+    extends QuestionPage[Boolean] {
 
-case class ListRadiosViewModel(
-  legend: DisplayMessage,
-  rows: List[ListRadiosRow],
-  paginatedViewModel: Option[PaginatedViewModel] = None
-)
+  override def path: JsPath =
+    Paths.disposalPropertyTransaction \ toString \ index.arrayIndex.toString \ disposalIndex.arrayIndex.toString
+
+  override def toString: String = "isSellerConnectedParty"
+}

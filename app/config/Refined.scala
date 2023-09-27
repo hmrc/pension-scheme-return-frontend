@@ -19,7 +19,7 @@ package config
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.boolean.And
 import eu.timepit.refined.numeric.{Greater, LessEqual}
-import eu.timepit.refined.{refineMV, refineV}
+import eu.timepit.refined.refineV
 import models.Enumerable
 
 object Refined {
