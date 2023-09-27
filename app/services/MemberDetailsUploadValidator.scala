@@ -32,7 +32,8 @@ import models.ValidationErrorType.ValidationErrorType
 import models._
 import models.requests.DataRequest
 import play.api.data.{Form, FormError}
-import play.api.i18n.Messages
+import play.api.i18n.I18nSupport.RequestWithMessagesApi
+import play.api.i18n.{Messages, MessagesApi}
 import play.api.mvc.AnyContent
 import uk.gov.hmrc.domain.Nino
 
@@ -42,6 +43,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.math.Integral.Implicits.infixIntegralOps
 
 class MemberDetailsUploadValidator @Inject()(
+  val messagesApi: MessagesApi,
   nameDOBFormProvider: NameDOBFormProvider,
   textFormProvider: TextFormProvider,
   schemeDateService: SchemeDateService
@@ -169,7 +171,7 @@ class MemberDetailsUploadValidator @Inject()(
     dob.value.split("/").toList match {
       case day :: month :: year :: Nil =>
         val memberDetailsForm = MemberDetailsController
-          .form(nameDOBFormProvider, getTaxDates(srn)(request))
+          .form(nameDOBFormProvider, getTaxDates(srn)(request), request.messages(messagesApi))
           .bind(
             Map(
               nameDOBFormProvider.firstName -> firstName.value,
