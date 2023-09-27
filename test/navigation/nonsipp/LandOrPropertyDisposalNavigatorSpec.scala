@@ -211,6 +211,24 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
     )
   }
 
+  "LandOrPropertyDisposalSellerConnectedPartyPage" - {
+
+    act.like(
+      normalmode
+        .navigateToWithDoubleIndex(
+          index,
+          disposalIndex,
+          LandOrPropertyDisposalSellerConnectedPartyPage,
+          (srn, index: Max5000, disposalIndex: Max50, _) =>
+            controllers.nonsipp.landorpropertydisposal.routes.TotalProceedsSaleLandPropertyController
+              .onPageLoad(srn, index, disposalIndex, NormalMode)
+        )
+        .withName(
+          "go from land or property disposal seller connected party Page to total proceeds sale land property"
+        )
+    )
+  }
+
   "TotalProceedsSaleLandPropertyPage" - {
 
     act.like(
