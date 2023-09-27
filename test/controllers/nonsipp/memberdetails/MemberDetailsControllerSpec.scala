@@ -56,12 +56,13 @@ class MemberDetailsControllerSpec extends ControllerBaseSpec {
   "MemberDetailsController" - {
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
-      injected[NameDOBView].apply(form(injected[NameDOBFormProvider], None), viewModel(srn, refineMV(1), NormalMode))
+      injected[NameDOBView]
+        .apply(form(injected[NameDOBFormProvider], None, createMessages(app)), viewModel(srn, refineMV(1), NormalMode))
     })
 
     act.like(renderPrePopView(onPageLoad, MemberDetailsPage(srn, refineMV(1)), nameDOB) {
       implicit app => implicit request =>
-        val preparedForm = form(injected[NameDOBFormProvider], None).fill(nameDOB)
+        val preparedForm = form(injected[NameDOBFormProvider], None, createMessages(app)).fill(nameDOB)
         injected[NameDOBView].apply(preparedForm, viewModel(srn, refineMV(1), NormalMode))
     })
 
