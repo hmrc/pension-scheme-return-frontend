@@ -241,7 +241,7 @@ memberDetails.dateOfBirth.error.required.year = Date of birth must include a yea
 memberDetails.dateOfBirth.error.required.two = Date of birth must include a {0} and {1}
 memberDetails.dateOfBirth.error.invalid.date = Date of birth must be a real date
 memberDetails.dateOfBirth.error.invalid.characters = Date of birth must only include numbers 0 to 9
-memberDetails.dateOfBirth.error.future = Date of birth must be in the past
+memberDetails.dateOfBirth.error.future = Date of birth must be before {0}
 memberDetails.dateOfBirth.error.format = Member’s date of birth must be in the format 01/08/1970
 
 
