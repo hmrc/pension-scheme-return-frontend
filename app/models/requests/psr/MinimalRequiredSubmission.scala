@@ -40,7 +40,11 @@ case class SchemeDesignatory(
   activeMembers: Int,
   deferredMembers: Int,
   pensionerMembers: Int,
-  totalPayments: Int
+  totalAssetValueStart: Option[Double],
+  totalAssetValueEnd: Option[Double],
+  totalCashStart: Option[Double],
+  totalCashEnd: Option[Double],
+  totalPayments: Option[Double]
 )
 
 object MinimalRequiredSubmission {

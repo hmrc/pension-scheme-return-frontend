@@ -25,7 +25,7 @@ import models.SchemeId.Srn
 import models._
 import models.requests.DataRequest
 import models.requests.psr._
-import pages.nonsipp.CheckReturnDatesPage
+import pages.nonsipp.{CheckReturnDatesPage, WhichTaxYearPage}
 import pages.nonsipp.common.{
   CompanyRecipientCrnPage,
   IdentityTypes,
@@ -33,7 +33,13 @@ import pages.nonsipp.common.{
   PartnershipRecipientUtrPage
 }
 import pages.nonsipp.loansmadeoroutstanding._
-import pages.nonsipp.schemedesignatory.{HowManyMembersPage, WhyNoBankAccountPage}
+import pages.nonsipp.schemedesignatory.{
+  FeesCommissionsWagesSalariesPage,
+  HowManyMembersPage,
+  HowMuchCashPage,
+  ValueOfAssetsPage,
+  WhyNoBankAccountPage
+}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
@@ -199,12 +205,16 @@ class PSRSubmissionService @Inject()(psrConnector: PSRConnector, schemeDateServi
 
   private def buildMinimalRequiredSubmission(srn: Srn)(implicit request: DataRequest[_]) = {
     val reasonForNoBankAccount = request.userAnswers.get(WhyNoBankAccountPage(srn))
+    val taxYear = request.userAnswers.get(WhichTaxYearPage(srn))
+    val valueOfAssets = request.userAnswers.get(ValueOfAssetsPage(srn, NormalMode))
+    val howMuchCash = request.userAnswers.get(HowMuchCashPage(srn, NormalMode))
+    val feesCommissionsWagesSalaries = request.userAnswers.get(FeesCommissionsWagesSalariesPage(srn, NormalMode))
     (
       schemeDateService.returnPeriods(srn),
       request.userAnswers.get(HowManyMembersPage(srn, request.pensionSchemeId))
     ).mapN { (returnPeriods, schemeMemberNumbers) =>
       MinimalRequiredSubmission(
-        ReportDetails(request.schemeDetails.pstr, returnPeriods.last.to, returnPeriods.last.from),
+        ReportDetails(request.schemeDetails.pstr, taxYear.get.from, taxYear.get.to),
         returnPeriods.map(range => range.from -> range.to),
         SchemeDesignatory(
           openBankAccount = reasonForNoBankAccount.isEmpty,
@@ -212,7 +222,11 @@ class PSRSubmissionService @Inject()(psrConnector: PSRConnector, schemeDateServi
           schemeMemberNumbers.noOfActiveMembers,
           schemeMemberNumbers.noOfDeferredMembers,
           schemeMemberNumbers.noOfPensionerMembers,
-          schemeMemberNumbers.total
+          valueOfAssets.map(_.moneyAtStart.value),
+          valueOfAssets.map(_.moneyAtEnd.value),
+          howMuchCash.map(_.moneyAtStart.value),
+          howMuchCash.map(_.moneyAtEnd.value),
+          feesCommissionsWagesSalaries.map(_.value)
         )
       )
     }
