@@ -43,7 +43,6 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.math.Integral.Implicits.infixIntegralOps
 
 class MemberDetailsUploadValidator @Inject()(
-  //messagesApi: MessagesApi,
   nameDOBFormProvider: NameDOBFormProvider,
   textFormProvider: TextFormProvider,
   schemeDateService: SchemeDateService
