@@ -29,5 +29,5 @@ case class TotalProceedsSaleLandPropertyPage(srn: Srn, landOrPropertyIndex: Max5
   override def path: JsPath =
     Paths.disposalPropertyTransaction \ toString \ landOrPropertyIndex.arrayIndex.toString \ disposalIndex.arrayIndex.toString
 
-  override def toString: String = "totalProceedsSaleLandProperty"
+  override def toString: String = "saleProceeds"
 }
