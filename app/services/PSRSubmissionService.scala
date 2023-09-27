@@ -17,48 +17,34 @@
 package services
 
 import cats.implicits._
-import config.Refined.OneTo5000
 import connectors.PSRConnector
-import eu.timepit.refined.refineV
-import models.ConditionalYesNo._
 import models.SchemeId.Srn
-import models._
 import models.requests.DataRequest
 import models.requests.psr._
-import pages.nonsipp.{CheckReturnDatesPage, WhichTaxYearPage}
-import pages.nonsipp.common.{
-  CompanyRecipientCrnPage,
-  IdentityTypes,
-  OtherRecipientDetailsPage,
-  PartnershipRecipientUtrPage
-}
+import pages.nonsipp.CheckReturnDatesPage
 import pages.nonsipp.loansmadeoroutstanding._
-import pages.nonsipp.schemedesignatory.{
-  FeesCommissionsWagesSalariesPage,
-  HowManyMembersPage,
-  HowMuchCashPage,
-  ValueOfAssetsPage,
-  WhyNoBankAccountPage
-}
+import transformations.{LoanTransactionsTransformer, MinimalRequiredSubmissionTransformer}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class PSRSubmissionService @Inject()(psrConnector: PSRConnector, schemeDateService: SchemeDateService) {
-
-  private type OptionalRecipientDetails = Option[(String, RecipientIdentityType, Option[Boolean], Option[String])]
+class PSRSubmissionService @Inject()(
+  psrConnector: PSRConnector,
+  minimalRequiredSubmissionTransformer: MinimalRequiredSubmissionTransformer,
+  loanTransactionsTransformer: LoanTransactionsTransformer
+) {
 
   def submitMinimalRequiredDetails(
     srn: Srn
   )(implicit hc: HeaderCarrier, ec: ExecutionContext, request: DataRequest[_]): Future[Option[Unit]] =
-    buildMinimalRequiredSubmission(srn).map(psrConnector.submitMinimalRequiredDetails(_)).sequence
+    minimalRequiredSubmissionTransformer.transform(srn).map(psrConnector.submitMinimalRequiredDetails(_)).sequence
 
   def submitPsrDetails(
     srn: Srn
   )(implicit hc: HeaderCarrier, ec: ExecutionContext, request: DataRequest[_]): Future[Option[Unit]] =
     (
-      buildMinimalRequiredSubmission(srn),
+      minimalRequiredSubmissionTransformer.transform(srn),
       request.userAnswers.get(CheckReturnDatesPage(srn)),
       request.userAnswers.get(LoansMadeOrOutstandingPage(srn))
     ).mapN { (minimalRequiredSubmission, checkReturnDates, schemeHadLoans) =>
@@ -66,170 +52,9 @@ class PSRSubmissionService @Inject()(psrConnector: PSRConnector, schemeDateServi
         PsrSubmission(
           minimalRequiredSubmission = minimalRequiredSubmission,
           checkReturnDates = checkReturnDates,
-          loans = if (schemeHadLoans) Some(Loans(schemeHadLoans, buildLoanTransactions(srn))) else None
+          loans = if (schemeHadLoans) Some(Loans(schemeHadLoans, loanTransactionsTransformer.transform(srn))) else None
         )
       )
     }.sequence
-
-  private def buildLoanTransactions(srn: Srn)(implicit request: DataRequest[_]): List[LoanTransactions] = {
-    request.userAnswers
-      .map(IdentityTypes(srn, IdentitySubject.LoanRecipient))
-      .map {
-        case (key, identityType) =>
-          key.toIntOption.flatMap(i => refineV[OneTo5000](i + 1).toOption) match {
-            case None => None
-            case Some(index) =>
-              val optRecipientIdentityDetails: OptionalRecipientDetails = identityType match {
-                case IdentityType.Individual =>
-                  (
-                    request.userAnswers.get(IndividualRecipientNamePage(srn, index)),
-                    request.userAnswers.get(IndividualRecipientNinoPage(srn, index)).map(_.value),
-                    request.userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, index))
-                  ).mapN {
-                    case (name, Left(noNinoReason), connectedParty) =>
-                      (
-                        name,
-                        RecipientIdentityType(IdentityType.Individual, None, Some(noNinoReason), None),
-                        Some(connectedParty),
-                        None
-                      )
-                    case (name, Right(nino), connectedParty) =>
-                      (
-                        name,
-                        RecipientIdentityType(IdentityType.Individual, Some(nino.value), None, None),
-                        Some(connectedParty),
-                        None
-                      )
-                  }
-                case IdentityType.UKCompany =>
-                  (
-                    request.userAnswers.get(CompanyRecipientNamePage(srn, index)),
-                    request.userAnswers
-                      .get(CompanyRecipientCrnPage(srn, index, IdentitySubject.LoanRecipient))
-                      .map(_.value),
-                    request.userAnswers.get(RecipientSponsoringEmployerConnectedPartyPage(srn, index)).map(_.name)
-                  ).mapN {
-                    case (name, Left(noCrnReason), recipientSponsoringEmployer) =>
-                      (
-                        name,
-                        RecipientIdentityType(IdentityType.UKCompany, None, Some(noCrnReason), None),
-                        None,
-                        Some(recipientSponsoringEmployer)
-                      )
-                    case (name, Right(crn), recipientSponsoringEmployer) =>
-                      (
-                        name,
-                        RecipientIdentityType(IdentityType.UKCompany, Some(crn.value), None, None),
-                        None,
-                        Some(recipientSponsoringEmployer)
-                      )
-                  }
-                case IdentityType.UKPartnership =>
-                  (
-                    request.userAnswers.get(PartnershipRecipientNamePage(srn, index)),
-                    request.userAnswers
-                      .get(PartnershipRecipientUtrPage(srn, index, IdentitySubject.LoanRecipient))
-                      .map(_.value),
-                    request.userAnswers.get(RecipientSponsoringEmployerConnectedPartyPage(srn, index)).map(_.name)
-                  ).mapN {
-                    case (name, Left(noUtrReason), recipientSponsoringEmployer) =>
-                      (
-                        name,
-                        RecipientIdentityType(IdentityType.UKPartnership, None, Some(noUtrReason), None),
-                        None,
-                        Some(recipientSponsoringEmployer)
-                      )
-                    case (name, Right(utr), recipientSponsoringEmployer) =>
-                      (
-                        name,
-                        RecipientIdentityType(IdentityType.UKPartnership, Some(utr.value), None, None),
-                        None,
-                        Some(recipientSponsoringEmployer)
-                      )
-                  }
-                case IdentityType.Other =>
-                  (
-                    request.userAnswers.get(OtherRecipientDetailsPage(srn, index, IdentitySubject.LoanRecipient)),
-                    request.userAnswers.get(RecipientSponsoringEmployerConnectedPartyPage(srn, index)).map(_.name)
-                  ).mapN(
-                    (other, recipientSponsoringEmployer) =>
-                      (
-                        other.name,
-                        RecipientIdentityType(IdentityType.Other, None, None, Some(other.description)),
-                        None,
-                        Some(recipientSponsoringEmployer)
-                      )
-                  )
-              }
-
-              for {
-                recipientIdentityDetails <- optRecipientIdentityDetails
-                (recipientName, recipientIdentityType, optConnectedParty, optRecipientSponsoringEmployer) = recipientIdentityDetails
-                equalInstallments <- request.userAnswers.get(AreRepaymentsInstalmentsPage(srn, index))
-                datePeriodLoanDetails <- request.userAnswers.get(DatePeriodLoanPage(srn, index))
-                loanAmountDetails <- request.userAnswers.get(AmountOfTheLoanPage(srn, index))
-                (loanAmount, capRepaymentCY, amountOutstanding) = loanAmountDetails
-                optSecurity <- request.userAnswers.get(SecurityGivenForLoanPage(srn, index)).map(_.value.toOption)
-                loanInterestDetails <- request.userAnswers.get(InterestOnLoanPage(srn, index))
-                (loanInterestAmount, loanInterestRate, intReceivedCY) = loanInterestDetails
-                optOutstandingArrearsOnLoan <- request.userAnswers
-                  .get(OutstandingArrearsOnLoanPage(srn, index))
-                  .map(_.value.toOption)
-              } yield {
-                LoanTransactions(
-                  recipientIdentityType,
-                  recipientName,
-                  optConnectedParty,
-                  optRecipientSponsoringEmployer,
-                  LoanPeriod(datePeriodLoanDetails._1, datePeriodLoanDetails._2.value, datePeriodLoanDetails._3),
-                  LoanAmountDetails(
-                    loanAmount.value,
-                    capRepaymentCY.value,
-                    amountOutstanding.value
-                  ),
-                  equalInstallments,
-                  LoanInterestDetails(
-                    loanInterestAmount.value,
-                    loanInterestRate.value,
-                    intReceivedCY.value
-                  ),
-                  optSecurity.map(_.security),
-                  optOutstandingArrearsOnLoan.map(_.value)
-                )
-              }
-          }
-      }
-      .toList
-      .flatten
-  }
-
-  private def buildMinimalRequiredSubmission(srn: Srn)(implicit request: DataRequest[_]) = {
-    val reasonForNoBankAccount = request.userAnswers.get(WhyNoBankAccountPage(srn))
-    val taxYear = request.userAnswers.get(WhichTaxYearPage(srn))
-    val valueOfAssets = request.userAnswers.get(ValueOfAssetsPage(srn, NormalMode))
-    val howMuchCash = request.userAnswers.get(HowMuchCashPage(srn, NormalMode))
-    val feesCommissionsWagesSalaries = request.userAnswers.get(FeesCommissionsWagesSalariesPage(srn, NormalMode))
-    (
-      schemeDateService.returnPeriods(srn),
-      request.userAnswers.get(HowManyMembersPage(srn, request.pensionSchemeId))
-    ).mapN { (returnPeriods, schemeMemberNumbers) =>
-      MinimalRequiredSubmission(
-        ReportDetails(request.schemeDetails.pstr, taxYear.get.from, taxYear.get.to),
-        returnPeriods.map(range => range.from -> range.to),
-        SchemeDesignatory(
-          openBankAccount = reasonForNoBankAccount.isEmpty,
-          reasonForNoBankAccount,
-          schemeMemberNumbers.noOfActiveMembers,
-          schemeMemberNumbers.noOfDeferredMembers,
-          schemeMemberNumbers.noOfPensionerMembers,
-          valueOfAssets.map(_.moneyAtStart.value),
-          valueOfAssets.map(_.moneyAtEnd.value),
-          howMuchCash.map(_.moneyAtStart.value),
-          howMuchCash.map(_.moneyAtEnd.value),
-          feesCommissionsWagesSalaries.map(_.value)
-        )
-      )
-    }
-  }
 
 }

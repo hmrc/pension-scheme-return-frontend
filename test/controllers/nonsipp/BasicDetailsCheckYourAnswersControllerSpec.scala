@@ -41,8 +41,8 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec {
   private lazy val onPageLoad = routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.BasicDetailsCheckYourAnswersController.onSubmit(srn, NormalMode)
 
-  private implicit val mockSchemeDateService = mock[SchemeDateService]
-  private implicit val mockPSRSubmissionService = mock[PSRSubmissionService]
+  private implicit val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
+  private implicit val mockPSRSubmissionService: PSRSubmissionService = mock[PSRSubmissionService]
 
   override protected val additionalBindings: List[GuiceableModule] = List(
     bind[SchemeDateService].toInstance(mockSchemeDateService),
@@ -73,13 +73,13 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec {
       )
     }.before(mockTaxYear(dateRange)))
 
-    /*    act.like(
+    act.like(
       redirectNextPage(onSubmit, userAnswersWithTaxYear)
         .before {
           MockSchemeDateService.returnPeriods(Some(NonEmptyList.of(dateRange)))
           MockPSRSubmissionService.submitMinimalRequiredDetails()
         }
-    )*/
+    )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 

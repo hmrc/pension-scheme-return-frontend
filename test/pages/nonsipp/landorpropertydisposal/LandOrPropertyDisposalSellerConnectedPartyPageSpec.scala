@@ -17,7 +17,6 @@
 package pages.nonsipp.landorpropertydisposal
 
 import pages.behaviours.PageBehaviours
-import models.Money
 import config.Refined.{Max50, Max5000}
 import eu.timepit.refined.refineMV
 

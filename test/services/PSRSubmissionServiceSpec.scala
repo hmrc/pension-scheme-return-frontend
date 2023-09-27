@@ -16,49 +16,158 @@
 
 package services
 
+import cats.data.NonEmptyList
 import connectors.PSRConnector
 import controllers.TestValues
+import models.requests.psr.{Loans, MinimalRequiredSubmission, PsrSubmission, ReportDetails, SchemeDesignatory}
 import models.requests.{AllowedAccessRequest, DataRequest}
+import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
+import pages.nonsipp.CheckReturnDatesPage
+import pages.nonsipp.loansmadeoroutstanding.LoansMadeOrOutstandingPage
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{await, defaultAwaitTimeout}
+import services.PSRSubmissionServiceSpec.{captor, minimalRequiredSubmission}
+import transformations.{LoanTransactionsTransformer, MinimalRequiredSubmissionTransformer}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.BaseSpec
+import utils.UserAnswersUtils.UserAnswersOps
 
+import java.time.LocalDate
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class PSRSubmissionServiceSpec extends BaseSpec with TestValues {
+
+  override def beforeEach(): Unit = {
+    reset(mockConnector)
+    reset(mockMinimalRequiredSubmissionTransformer)
+    reset(mockLoanTransactionsTransformer)
+  }
 
   val allowedAccessRequest
     : AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(FakeRequest()).sample.value
   implicit val request: DataRequest[AnyContentAsEmpty.type] = DataRequest(allowedAccessRequest, defaultUserAnswers)
 
   private val mockConnector = mock[PSRConnector]
-  private val mockSchemeDateService = mock[SchemeDateService]
+  private val mockMinimalRequiredSubmissionTransformer = mock[MinimalRequiredSubmissionTransformer]
+  private val mockLoanTransactionsTransformer = mock[LoanTransactionsTransformer]
 
-  private val service = new PSRSubmissionService(mockConnector, mockSchemeDateService)
+  private val service =
+    new PSRSubmissionService(mockConnector, mockMinimalRequiredSubmissionTransformer, mockLoanTransactionsTransformer)
 
   private implicit val hc: HeaderCarrier = HeaderCarrier()
 
   "PSRSubmissionService" - {
-    "submitMinimalRequiredDetails request successfully" ignore {
+    "submitMinimalRequiredDetails request successfully" in {
 
+      when(mockMinimalRequiredSubmissionTransformer.transform(any())(any())).thenReturn(Some(minimalRequiredSubmission))
       when(mockConnector.submitMinimalRequiredDetails(any())(any(), any())).thenReturn(Future.successful(()))
 
-      val result = service.submitMinimalRequiredDetails(srn)
+      whenReady(service.submitMinimalRequiredDetails(srn)) { result: Option[Unit] =>
+        verify(mockMinimalRequiredSubmissionTransformer, times(1)).transform(any())(any())
+        verify(mockConnector, times(1)).submitMinimalRequiredDetails(any())(any(), any())
+        result mustBe Some(())
+      }
 
-      await(result) mustEqual ()
     }
 
-    "submitPsrDetails request successfully" ignore {
+    "shouldn't submitMinimalRequiredDetails request when minimalRequiredSubmission object is None" in {
 
+      when(mockMinimalRequiredSubmissionTransformer.transform(any())(any())).thenReturn(None)
+
+      whenReady(service.submitMinimalRequiredDetails(srn)) { result: Option[Unit] =>
+        verify(mockMinimalRequiredSubmissionTransformer, times(1)).transform(any())(any())
+        verify(mockConnector, never).submitMinimalRequiredDetails(any())(any(), any())
+        result mustBe None
+      }
+    }
+
+    "submitPsrDetails request successfully when LoansMadeOrOutstandingPage is true" in {
+      val userAnswers = defaultUserAnswers
+        .unsafeSet(CheckReturnDatesPage(srn), false)
+        .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
+      val request = DataRequest(allowedAccessRequest, userAnswers)
+
+      when(mockMinimalRequiredSubmissionTransformer.transform(any())(any())).thenReturn(Some(minimalRequiredSubmission))
+      when(mockLoanTransactionsTransformer.transform(any())(any())).thenReturn(List.empty)
       when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(()))
 
-      val result = service.submitPsrDetails(srn)
+      whenReady(service.submitPsrDetails(srn)(implicitly, implicitly, request)) { result: Option[Unit] =>
+        verify(mockMinimalRequiredSubmissionTransformer, times(1)).transform(any())(any())
+        verify(mockLoanTransactionsTransformer, times(1)).transform(any())(any())
+        verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
 
-      await(result) mustEqual ()
+        captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
+        captor.getValue.checkReturnDates mustBe false
+        captor.getValue.loans mustBe Some(Loans(true, List.empty))
+        result mustBe Some(())
+      }
+    }
+
+    "submitPsrDetails request successfully when LoansMadeOrOutstandingPage is false" in {
+
+      val userAnswers = defaultUserAnswers
+        .unsafeSet(CheckReturnDatesPage(srn), false)
+        .unsafeSet(LoansMadeOrOutstandingPage(srn), false)
+      val request = DataRequest(allowedAccessRequest, userAnswers)
+
+      when(mockMinimalRequiredSubmissionTransformer.transform(any())(any())).thenReturn(Some(minimalRequiredSubmission))
+      when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(()))
+
+      whenReady(service.submitPsrDetails(srn)(implicitly, implicitly, request)) { result: Option[Unit] =>
+        verify(mockMinimalRequiredSubmissionTransformer, times(1)).transform(any())(any())
+        verify(mockLoanTransactionsTransformer, never).transform(any())(any())
+        verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
+        captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
+        captor.getValue.checkReturnDates mustBe false
+        captor.getValue.loans mustBe None
+        result mustBe Some(())
+      }
+    }
+
+    "shouldn't submitPsrDetails request when minimalRequiredSubmission object is None" in {
+      when(mockMinimalRequiredSubmissionTransformer.transform(any())(any())).thenReturn(None)
+
+      whenReady(service.submitPsrDetails(srn)) { result: Option[Unit] =>
+        verify(mockMinimalRequiredSubmissionTransformer, times(1)).transform(any())(any())
+        verify(mockLoanTransactionsTransformer, never).transform(any())(any())
+        verify(mockConnector, never).submitMinimalRequiredDetails(any())(any(), any())
+        result mustBe None
+      }
+    }
+
+    "shouldn't submitPsrDetails request when userAnswer is empty" in {
+      when(mockMinimalRequiredSubmissionTransformer.transform(any())(any())).thenReturn(Some(minimalRequiredSubmission))
+
+      whenReady(service.submitPsrDetails(srn)) { result: Option[Unit] =>
+        verify(mockMinimalRequiredSubmissionTransformer, times(1)).transform(any())(any())
+        verify(mockLoanTransactionsTransformer, never).transform(any())(any())
+        verify(mockConnector, never).submitMinimalRequiredDetails(any())(any(), any())
+        result mustBe None
+      }
     }
   }
+}
+
+object PSRSubmissionServiceSpec {
+  val captor: ArgumentCaptor[PsrSubmission] = ArgumentCaptor.forClass(classOf[PsrSubmission])
+
+  val sampleDate: LocalDate = LocalDate.now
+  val minimalRequiredSubmission: MinimalRequiredSubmission = MinimalRequiredSubmission(
+    ReportDetails("testPstr", sampleDate, sampleDate),
+    NonEmptyList.of(sampleDate -> sampleDate),
+    SchemeDesignatory(
+      openBankAccount = true,
+      Some("reasonForNoBankAccount"),
+      1,
+      2,
+      3,
+      None,
+      None,
+      None,
+      None,
+      None
+    )
+  )
 }
