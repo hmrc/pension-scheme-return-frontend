@@ -20,7 +20,7 @@ import uk.gov.hmrc.domain.{SimpleName, SimpleObjectReads, SimpleObjectWrites, Ta
 
 case class Utr(utr: String) extends TaxIdentifier with SimpleName {
 
-  require(Utr.isValid(utr.filterNot(_.isWhitespace)), s"$utr is not a valid utr.")
+  require(Utr.isValid(utr), s"$utr is not a valid utr.")
 
   override def toString = utr
 
@@ -33,7 +33,7 @@ object Utr extends (String => Utr) {
   implicit val utrWrite: Writes[Utr] = new SimpleObjectWrites[Utr](_.value)
   implicit val utrRead: Reads[Utr] = new SimpleObjectReads[Utr]("utr", Utr.apply)
 
-  private val validUtrFormat = """^[0-9]{10}$"""
+  private val validUtrFormat = """^\d{5}\s*?\d{5}"""
 
   def isValid(utr: String) = utr != null && utr.matches(validUtrFormat)
 

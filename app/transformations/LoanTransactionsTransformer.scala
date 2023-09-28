@@ -114,7 +114,12 @@ class LoanTransactionsTransformer @Inject()() {
                     case (name, Right(utr)) =>
                       (
                         name,
-                        RecipientIdentityType(IdentityType.UKPartnership, Some(utr.value), None, None),
+                        RecipientIdentityType(
+                          IdentityType.UKPartnership,
+                          Some(utr.value.filterNot(_.isWhitespace)),
+                          None,
+                          None
+                        ),
                         None,
                         recipientSponsoringEmployer
                       )
