@@ -97,7 +97,7 @@ class DisposalIndependentValuationController @Inject()(
 
 object DisposalIndependentValuationController {
   def form(formProvider: YesNoPageFormProvider): Form[Boolean] = formProvider(
-    "landPropertyIndependentValuation.error.required"
+    "DisposalIndependentValuation.error.required"
   )
 
   def viewModel(
@@ -108,8 +108,8 @@ object DisposalIndependentValuationController {
     addressLine1: String
   ): FormPageViewModel[YesNoPageViewModel] =
     YesNoPageViewModel(
-      "landPropertyIndependentValuation.title",
-      Message("landPropertyIndependentValuation.heading", addressLine1),
+      "DisposalIndependentValuation.title",
+      Message("DisposalIndependentValuation.heading", addressLine1),
       controllers.nonsipp.landorpropertydisposal.routes.DisposalIndependentValuationController
         .onSubmit(srn, landOrPropertyIndex, disposalIndex, mode)
     )
