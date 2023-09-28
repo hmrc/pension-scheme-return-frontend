@@ -112,8 +112,11 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
         .onPageLoad(srn, index, disposalIndex, NormalMode)
 
     case TotalProceedsSaleLandPropertyPage(srn, landOrPropertyIndex, disposalIndex) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+      controllers.nonsipp.landorpropertydisposal.routes.DisposalIndependentValuationController
+        .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
 
+    case DisposalIndependentValuationPage(srn, landOrPropertyIndex, disposalIndex) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty

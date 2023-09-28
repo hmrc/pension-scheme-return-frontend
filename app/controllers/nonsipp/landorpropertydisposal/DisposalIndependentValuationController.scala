@@ -33,6 +33,8 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 import views.html.YesNoPageView
+import viewmodels.DisplayMessage.Message
+import viewmodels.implicits._
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
@@ -108,6 +110,7 @@ object DisposalIndependentValuationController {
     YesNoPageViewModel(
       "landPropertyIndependentValuation.title",
       Message("landPropertyIndependentValuation.heading", addressLine1),
-      routes.DisposalIndependentValuationController.onSubmit(srn, landOrPropertyIndex, disposalIndex, mode)
+      controllers.nonsipp.landorpropertydisposal.routes.DisposalIndependentValuationController
+        .onSubmit(srn, landOrPropertyIndex, disposalIndex, mode)
     )
 }
