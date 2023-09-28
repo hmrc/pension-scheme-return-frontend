@@ -17,7 +17,7 @@
 package connectors
 
 import config.FrontendAppConfig
-import models.requests.psr.{MinimalRequiredSubmission, PsrSubmission}
+import models.requests.psr.PsrSubmission
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 
@@ -27,14 +27,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClient) {
 
   private val baseUrl = appConfig.pensionSchemeReturn.baseUrl
-
-  def submitMinimalRequiredDetails(
-    minimalRequiredSubmission: MinimalRequiredSubmission
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
-    http.POST[MinimalRequiredSubmission, Unit](
-      baseUrl + "/pension-scheme-return/psr/submit-minimal-required-details",
-      minimalRequiredSubmission
-    )
 
   def submitPsrDetails(
     psrSubmission: PsrSubmission

@@ -77,7 +77,7 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec {
       redirectNextPage(onSubmit, userAnswersWithTaxYear)
         .before {
           MockSchemeDateService.returnPeriods(Some(NonEmptyList.of(dateRange)))
-          MockPSRSubmissionService.submitMinimalRequiredDetails()
+          MockPSRSubmissionService.submitPsrDetails()
         }
     )
 

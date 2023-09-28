@@ -19,7 +19,7 @@ package services
 import cats.data.NonEmptyList
 import connectors.PSRConnector
 import controllers.TestValues
-import models.requests.psr.{Loans, MinimalRequiredSubmission, PsrSubmission, ReportDetails, SchemeDesignatory}
+import models.requests.psr._
 import models.requests.{AllowedAccessRequest, DataRequest}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
@@ -59,27 +59,23 @@ class PSRSubmissionServiceSpec extends BaseSpec with TestValues {
   private implicit val hc: HeaderCarrier = HeaderCarrier()
 
   "PSRSubmissionService" - {
-    "submitMinimalRequiredDetails request successfully" in {
 
+    "should submitPsrDetails request when only minimalRequiredSubmission object is exist" in {
+      val userAnswers = defaultUserAnswers
+        .unsafeSet(CheckReturnDatesPage(srn), false)
+      val request = DataRequest(allowedAccessRequest, userAnswers)
       when(mockMinimalRequiredSubmissionTransformer.transform(any())(any())).thenReturn(Some(minimalRequiredSubmission))
-      when(mockConnector.submitMinimalRequiredDetails(any())(any(), any())).thenReturn(Future.successful(()))
+      when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(()))
 
-      whenReady(service.submitMinimalRequiredDetails(srn)) { result: Option[Unit] =>
+      whenReady(service.submitPsrDetails(srn)(implicitly, implicitly, request)) { result: Option[Unit] =>
         verify(mockMinimalRequiredSubmissionTransformer, times(1)).transform(any())(any())
-        verify(mockConnector, times(1)).submitMinimalRequiredDetails(any())(any(), any())
+        verify(mockLoanTransactionsTransformer, never).transform(any())(any())
+        verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
+
+        captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
+        captor.getValue.checkReturnDates mustBe false
+        captor.getValue.loans mustBe None
         result mustBe Some(())
-      }
-
-    }
-
-    "shouldn't submitMinimalRequiredDetails request when minimalRequiredSubmission object is None" in {
-
-      when(mockMinimalRequiredSubmissionTransformer.transform(any())(any())).thenReturn(None)
-
-      whenReady(service.submitMinimalRequiredDetails(srn)) { result: Option[Unit] =>
-        verify(mockMinimalRequiredSubmissionTransformer, times(1)).transform(any())(any())
-        verify(mockConnector, never).submitMinimalRequiredDetails(any())(any(), any())
-        result mustBe None
       }
     }
 
@@ -126,24 +122,13 @@ class PSRSubmissionServiceSpec extends BaseSpec with TestValues {
       }
     }
 
-    "shouldn't submitPsrDetails request when minimalRequiredSubmission object is None" in {
-      when(mockMinimalRequiredSubmissionTransformer.transform(any())(any())).thenReturn(None)
-
-      whenReady(service.submitPsrDetails(srn)) { result: Option[Unit] =>
-        verify(mockMinimalRequiredSubmissionTransformer, times(1)).transform(any())(any())
-        verify(mockLoanTransactionsTransformer, never).transform(any())(any())
-        verify(mockConnector, never).submitMinimalRequiredDetails(any())(any(), any())
-        result mustBe None
-      }
-    }
-
     "shouldn't submitPsrDetails request when userAnswer is empty" in {
       when(mockMinimalRequiredSubmissionTransformer.transform(any())(any())).thenReturn(Some(minimalRequiredSubmission))
 
       whenReady(service.submitPsrDetails(srn)) { result: Option[Unit] =>
         verify(mockMinimalRequiredSubmissionTransformer, times(1)).transform(any())(any())
         verify(mockLoanTransactionsTransformer, never).transform(any())(any())
-        verify(mockConnector, never).submitMinimalRequiredDetails(any())(any(), any())
+        verify(mockConnector, never).submitPsrDetails(any())(any(), any())
         result mustBe None
       }
     }

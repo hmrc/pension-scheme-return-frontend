@@ -86,7 +86,7 @@ class BasicDetailsCheckYourAnswersController @Inject()(
 
   def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
     psrSubmissionService
-      .submitMinimalRequiredDetails(srn)
+      .submitPsrDetails(srn)
       .map {
         case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         case Some(_) => Redirect(navigator.nextPage(BasicDetailsCheckYourAnswersPage(srn), mode, request.userAnswers))

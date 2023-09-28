@@ -35,19 +35,15 @@ class PSRSubmissionService @Inject()(
   loanTransactionsTransformer: LoanTransactionsTransformer
 ) {
 
-  def submitMinimalRequiredDetails(
-    srn: Srn
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext, request: DataRequest[_]): Future[Option[Unit]] =
-    minimalRequiredSubmissionTransformer.transform(srn).map(psrConnector.submitMinimalRequiredDetails(_)).sequence
-
   def submitPsrDetails(
     srn: Srn
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext, request: DataRequest[_]): Future[Option[Unit]] =
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext, request: DataRequest[_]): Future[Option[Unit]] = {
+
+    val schemeHadLoans = request.userAnswers.get(LoansMadeOrOutstandingPage(srn)).getOrElse(false)
     (
       minimalRequiredSubmissionTransformer.transform(srn),
-      request.userAnswers.get(CheckReturnDatesPage(srn)),
-      request.userAnswers.get(LoansMadeOrOutstandingPage(srn))
-    ).mapN { (minimalRequiredSubmission, checkReturnDates, schemeHadLoans) =>
+      request.userAnswers.get(CheckReturnDatesPage(srn))
+    ).mapN { (minimalRequiredSubmission, checkReturnDates) =>
       psrConnector.submitPsrDetails(
         PsrSubmission(
           minimalRequiredSubmission = minimalRequiredSubmission,
@@ -56,5 +52,5 @@ class PSRSubmissionService @Inject()(
         )
       )
     }.sequence
-
+  }
 }
