@@ -43,8 +43,9 @@ trait MockBehaviours {
   }
 
   object MockPSRSubmissionService {
-    def submitMinimalRequiredDetails()(implicit mock: PSRSubmissionService): ScalaOngoingStubbing[Future[Unit]] =
-      when(mock.submitMinimalRequiredDetails(any())(any(), any(), any()))
+
+    def submitPsrDetails()(implicit mock: PSRSubmissionService): ScalaOngoingStubbing[Future[Option[Unit]]] =
+      when(mock.submitPsrDetails(any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(())))
   }
 }

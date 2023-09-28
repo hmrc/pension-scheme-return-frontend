@@ -20,8 +20,8 @@ import config.Refined.{Max50, Max5000}
 import controllers.actions.IdentifyAndRequireData
 import forms.YesNoPageFormProvider
 import forms.mappings.Mappings
-import models.{ConditionalYesNo, Crn, Mode, UserAnswers}
 import models.SchemeId.Srn
+import models.{ConditionalYesNo, Crn, Mode}
 import navigation.Navigator
 import pages.nonsipp.landorpropertydisposal.{CompanyBuyerCrnPage, CompanyBuyerNamePage}
 import play.api.data.Form

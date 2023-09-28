@@ -32,8 +32,7 @@ import models.ValidationErrorType.ValidationErrorType
 import models._
 import models.requests.DataRequest
 import play.api.data.{Form, FormError}
-import play.api.i18n.I18nSupport.RequestWithMessagesApi
-import play.api.i18n.{Messages, MessagesApi}
+import play.api.i18n.Messages
 import play.api.mvc.AnyContent
 import uk.gov.hmrc.domain.Nino
 

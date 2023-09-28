@@ -17,7 +17,6 @@
 package pages.nonsipp.landorpropertydisposal
 
 import config.Refined.{Max50, Max5000}
-import models.HowDisposed
 import models.HowDisposed.HowDisposed
 import models.SchemeId.Srn
 import pages.QuestionPage

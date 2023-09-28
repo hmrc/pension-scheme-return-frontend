@@ -35,19 +35,21 @@ import pages.nonsipp.common.{CompanyRecipientCrnPage, IdentityTypePage}
 import pages.nonsipp.loansmadeoroutstanding._
 import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
-import services.SchemeDateService
+import services.{PSRSubmissionService, SchemeDateService}
 import views.html.CheckYourAnswersView
 
 class LoansCYAControllerSpec extends ControllerBaseSpec {
 
   private implicit val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
+  private implicit val mockPSRSubmissionService: PSRSubmissionService = mock[PSRSubmissionService]
 
   override protected val additionalBindings: List[GuiceableModule] = List(
-    bind[SchemeDateService].toInstance(mockSchemeDateService)
+    bind[SchemeDateService].toInstance(mockSchemeDateService),
+    bind[PSRSubmissionService].toInstance(mockPSRSubmissionService)
   )
 
   override protected def beforeAll(): Unit =
-    reset(mockSchemeDateService)
+    reset(mockSchemeDateService, mockPSRSubmissionService)
 
   private val index = refineMV[OneTo5000](1)
   private val taxYear = Some(Left(dateRange))
@@ -98,10 +100,11 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
           .withName(s"render correct ${checkOrChange.name} view")
       )
 
-      /*      act.like(
+      act.like(
         redirectNextPage(onSubmit(checkOrChange))
+          .before(MockPSRSubmissionService.submitPsrDetails())
           .withName(s"redirect to next page when in ${checkOrChange.name} mode")
-      )*/
+      )
 
       act.like(
         journeyRecoveryPage(onPageLoad(checkOrChange))
