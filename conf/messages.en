@@ -1307,3 +1307,7 @@ totalProceedsSaleLandProperty.error.tooLarge = Total proceeds from the sale must
 landOrPropertyDisposalSellerConnectedParty.title = Is the seller a connected party?
 landOrPropertyDisposalSellerConnectedParty.heading = Is {0} a connected party?
 landOrPropertyDisposalSellerConnectedParty.error.required = Select yes if the seller is a connected party
+
+DisposalIndependentValuation.title = Was the sale of the land or property supported by an independent valuation?
+DisposalIndependentValuation.heading = Was the sale of {0} supported by an independent valuation?
+DisposalIndependentValuation.error.required = Select yes if the sale of the land or property was supported by an independent valuation
