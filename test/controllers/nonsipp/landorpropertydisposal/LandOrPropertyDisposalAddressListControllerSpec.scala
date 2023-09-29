@@ -17,13 +17,13 @@
 package controllers.nonsipp.landorpropertydisposal
 
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalListController._
+import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalAddressListController._
 import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
 import pages.nonsipp.landorproperty.LandOrPropertyAddressLookupPage
 import views.html.ListRadiosView
 
-class LandOrPropertyDisposalListControllerSpec extends ControllerBaseSpec {
+class LandOrPropertyDisposalAddressListControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoad = routes.LandOrPropertyDisposalListController.onPageLoad(srn, page = 1)
   private lazy val onSubmit = routes.LandOrPropertyDisposalListController.onSubmit(srn, page = 1)

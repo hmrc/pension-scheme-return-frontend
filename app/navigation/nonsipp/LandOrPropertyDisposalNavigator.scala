@@ -35,7 +35,8 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
       }
 
     case WhatYouWillNeedLandPropertyDisposalPage(srn) =>
-      controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalListController.onPageLoad(srn, page = 1)
+      controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalAddressListController
+        .onPageLoad(srn, page = 1)
 
     case page @ HowWasPropertyDisposedOfPage(srn, landOrPropertyIndex, disposalIndex) => //41c
       userAnswers.get(page) match {
@@ -91,7 +92,7 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
       controllers.nonsipp.landorpropertydisposal.routes.IndividualBuyerNinoNumberController
         .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
 
-    case LandOrPropertyDisposalListPage(srn, choice) =>
+    case LandOrPropertyDisposalAddressListPage(srn, choice) =>
       controllers.nonsipp.landorpropertydisposal.routes.HowWasPropertyDisposedOfController
         .onPageLoad(srn, choice, refineMV(1), NormalMode)
 
@@ -118,6 +119,11 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
     case DisposalIndependentValuationPage(srn, landOrPropertyIndex, disposalIndex) =>
       controllers.routes.UnauthorisedController.onPageLoad()
 
+    case LandOrPropertyDisposalListPage(srn, addDisposal @ true) =>
+      controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalAddressListController.onPageLoad(srn, 1)
+
+    case LandOrPropertyDisposalListPage(srn, addDisposal @ false) =>
+      controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty

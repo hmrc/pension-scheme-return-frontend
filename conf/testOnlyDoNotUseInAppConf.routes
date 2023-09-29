@@ -10,8 +10,9 @@
 # Failing to follow this rule may result in test routes deployed in production.
 
 # Add all the application routes to the prod.routes file
-->         /                                                                    prod.Routes
+->         /                                                                                     prod.Routes
 
-GET        /pension-scheme-return/test-only/:srn/add-member-details/:num        controllers.testonly.MemberDetailsMongoController.addMemberDetails(srn: Srn, num: Max300)
-GET        /pension-scheme-return/test-only/:srn/add-loan-details/:num          controllers.testonly.LoanDetailsMongoController.addLoanDetails(srn: Srn, num: Max5000)
-GET        /pension-scheme-return/test-only/:srn/add-land-or-property/:num      controllers.testonly.LandOrPropertyMongoController.addLandOrProperty(srn: Srn, num: Max5000)
+GET        /pension-scheme-return/test-only/:srn/add-member-details/:num                         controllers.testonly.MemberDetailsMongoController.addMemberDetails(srn: Srn, num: Max300)
+GET        /pension-scheme-return/test-only/:srn/add-loan-details/:num                           controllers.testonly.LoanDetailsMongoController.addLoanDetails(srn: Srn, num: Max5000)
+GET        /pension-scheme-return/test-only/:srn/add-land-or-property/:num                       controllers.testonly.LandOrPropertyMongoController.addLandOrProperty(srn: Srn, num: Max5000)
+GET        /pension-scheme-return/test-only/:srn/add-land-or-property-disposals/:index/:num      controllers.testonly.LandOrPropertyDisposalMongoController.addLandOrPropertyDisposal(srn: Srn, index: Max5000, num: Max50)
