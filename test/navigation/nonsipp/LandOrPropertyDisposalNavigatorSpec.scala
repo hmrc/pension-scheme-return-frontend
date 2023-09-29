@@ -237,6 +237,22 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
           index,
           disposalIndex,
           TotalProceedsSaleLandPropertyPage,
+          (srn, index: Max5000, disposalIndex: Max50, _) =>
+            controllers.nonsipp.landorpropertydisposal.routes.DisposalIndependentValuationController
+              .onPageLoad(srn, index, disposalIndex, NormalMode)
+        )
+        .withName("go from total proceeds sale land property page to Independent Valuation Page")
+    )
+  }
+
+  "DisposalIndependentValuationPage" - {
+
+    act.like(
+      normalmode
+        .navigateToWithDoubleIndex(
+          index,
+          disposalIndex,
+          DisposalIndependentValuationPage,
           (srn, index: Max5000, disposalIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
         )
         .withName("go from total proceeds sale land property page to unauthorised page")
