@@ -1,3 +1,19 @@
+/*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package controllers.nonsipp.landorpropertydisposal
 
 import config.Refined.{Max50, Max5000}
@@ -23,15 +39,15 @@ import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
 class DisposalIndependentValuationController @Inject()(
-                                                        override val messagesApi: MessagesApi,
-                                                        saveService: SaveService,
-                                                        @Named("non-sipp") navigator: Navigator,
-                                                        identifyAndRequireData: IdentifyAndRequireData,
-                                                        formProvider: YesNoPageFormProvider,
-                                                        val controllerComponents: MessagesControllerComponents,
-                                                        view: YesNoPageView
-                                                      )(implicit ec: ExecutionContext)
-  extends PSRController {
+  override val messagesApi: MessagesApi,
+  saveService: SaveService,
+  @Named("non-sipp") navigator: Navigator,
+  identifyAndRequireData: IdentifyAndRequireData,
+  formProvider: YesNoPageFormProvider,
+  val controllerComponents: MessagesControllerComponents,
+  view: YesNoPageView
+)(implicit ec: ExecutionContext)
+    extends PSRController {
 
   private val form = DisposalIndependentValuationController.form(formProvider)
 
@@ -84,12 +100,12 @@ object DisposalIndependentValuationController {
   )
 
   def viewModel(
-                 srn: Srn,
-                 landOrPropertyIndex: Max5000,
-                 disposalIndex: Max50,
-                 mode: Mode,
-                 addressLine1: String
-               ): FormPageViewModel[YesNoPageViewModel] =
+    srn: Srn,
+    landOrPropertyIndex: Max5000,
+    disposalIndex: Max50,
+    mode: Mode,
+    addressLine1: String
+  ): FormPageViewModel[YesNoPageViewModel] =
     YesNoPageViewModel(
       "DisposalIndependentValuation.title",
       Message("DisposalIndependentValuation.heading", addressLine1),
