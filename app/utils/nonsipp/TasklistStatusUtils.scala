@@ -19,10 +19,7 @@ package utils.nonsipp
 import models.SchemeId.Srn
 import models.{IdentitySubject, NormalMode, PensionSchemeId, UserAnswers}
 import pages.nonsipp.common.IdentityTypes
-import pages.nonsipp.loansmadeoroutstanding.{
-  LoansMadeOrOutstandingPage,
-  OutstandingArrearsOnLoanPages
-}
+import pages.nonsipp.loansmadeoroutstanding.{LoansMadeOrOutstandingPage, OutstandingArrearsOnLoanPages}
 import pages.nonsipp.memberdetails.{MemberDetailsNinoPages, MembersDetailsPages, NoNinoPages}
 import pages.nonsipp.schemedesignatory.{FeesCommissionsWagesSalariesPage, HowManyMembersPage, HowMuchCashPage}
 import viewmodels.models.TaskListStatus.{Completed, InProgress, NotStarted}

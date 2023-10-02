@@ -18,14 +18,17 @@ package controllers.nonsipp
 
 import cats.implicits.toShow
 import com.google.inject.Inject
-import config.Refined.OneTo300
+import config.Refined.{OneTo300, OneTo5000}
 import controllers.actions._
 import eu.timepit.refined.refineV
 import models.SchemeId.Srn
 import models.requests.DataRequest
-import models.{DateRange, ManualOrUpload, NormalMode, PensionSchemeId, UserAnswers}
+import models.{DateRange, IdentitySubject, ManualOrUpload, NormalMode, PensionSchemeId, UserAnswers}
+import models.ConditionalYesNo._
 import pages.nonsipp.CheckReturnDatesPage
 import pages.nonsipp.accountingperiod.AccountingPeriods
+import pages.nonsipp.common.IdentityTypes
+import pages.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanPages
 import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsNinoPages, MembersDetailsPages, NoNinoPages}
 import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, ValueOfAssetsPage, WhyNoBankAccountPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -36,7 +39,7 @@ import utils.DateTimeUtils.localDateShow
 import utils.nonsipp.TasklistStatusUtils._
 import viewmodels.DisplayMessage.{Heading2, LinkMessage, Message, ParagraphMessage}
 import viewmodels.implicits._
-import viewmodels.models.TaskListStatus.{Completed, NotStarted, TaskListStatus, UnableToStart}
+import viewmodels.models.TaskListStatus.{Completed, InProgress, NotStarted, TaskListStatus, UnableToStart}
 import viewmodels.models.{PageViewModel, TaskListItemViewModel, TaskListSectionViewModel, TaskListViewModel}
 import views.html.TaskListView
 
@@ -240,6 +243,29 @@ object TaskListController {
     }
   }
 
+  private def getIncompleteLoansIndex(userAnswers: UserAnswers, srn: Srn) = {
+    val whoReceivedTheLoanPages = userAnswers.get(IdentityTypes(srn, IdentitySubject.LoanRecipient))
+    val outstandingArrearsOnLoanPages = userAnswers.get(OutstandingArrearsOnLoanPages(srn))
+
+    (whoReceivedTheLoanPages, outstandingArrearsOnLoanPages) match {
+      case (None, _) => 1
+      case (Some(_), None) => 1
+      case (Some(whoReceived), arrears) =>
+        if (whoReceived.isEmpty) {
+          1
+        } else {
+          val whoReceivedIndexes = (0 to whoReceived.size - 1).toList
+          val arrearsIndexes = arrears.getOrElse(List.empty).map(_._1.toInt).toList
+          val filtered = whoReceivedIndexes.filter(arrearsIndexes.indexOf(_) < 0)
+          if (filtered.isEmpty) {
+            1
+          } else {
+            filtered(0) + 1
+          }
+        }
+    }
+  }
+
   private def memberPaymentsSection(srn: Srn) = {
     val prefix = "nonsipp.tasklist.memberpayments"
 
@@ -320,10 +346,29 @@ object TaskListController {
       s"$prefix.title",
       TaskListItemViewModel(
         LinkMessage(
-          Message(messageKey(prefix, "loansmade.title", UnableToStart), schemeName),
-          controllers.nonsipp.loansmadeoroutstanding.routes.LoansMadeOrOutstandingController
-            .onPageLoad(srn, NormalMode)
-            .url
+          Message(messageKey(prefix, "loansmade.title", taskListStatus), schemeName),
+          taskListStatus match {
+            case NotStarted =>
+              controllers.nonsipp.loansmadeoroutstanding.routes.LoansMadeOrOutstandingController
+                .onPageLoad(srn, NormalMode)
+                .url
+            case Completed =>
+              controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController
+                .onPageLoad(srn, 1, NormalMode)
+                .url
+            case InProgress =>
+              val incompleteIndex: Int = getIncompleteLoansIndex(userAnswers, srn)
+              refineV[OneTo5000](incompleteIndex).fold(
+                _ =>
+                  controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController
+                    .onPageLoad(srn, 1, NormalMode)
+                    .url,
+                index =>
+                  controllers.nonsipp.common.routes.IdentityTypeController
+                    .onPageLoad(srn, index, NormalMode, IdentitySubject.LoanRecipient)
+                    .url
+              )
+          }
         ),
         taskListStatus
       ),

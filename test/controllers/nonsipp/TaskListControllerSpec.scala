@@ -18,9 +18,27 @@ package controllers.nonsipp
 
 import controllers.ControllerBaseSpec
 import eu.timepit.refined.refineMV
-import models.{ManualOrUpload, Money, MoneyInPeriod, NormalMode, SchemeMemberNumbers, UserAnswers}
+import models.{
+  ConditionalYesNo,
+  IdentitySubject,
+  IdentityType,
+  ManualOrUpload,
+  Money,
+  MoneyInPeriod,
+  NormalMode,
+  SchemeMemberNumbers,
+  UserAnswers
+}
+import models.ConditionalYesNo._
 import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.CheckReturnDatesPage
+import pages.nonsipp.common.IdentityTypePage
+import pages.nonsipp.loansmadeoroutstanding.{
+  CompanyRecipientNamePage,
+  LoansMadeOrOutstandingPage,
+  OutstandingArrearsOnLoanPage,
+  OutstandingArrearsOnLoanPages
+}
 import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsNinoPage, MemberDetailsPage, NoNINOPage}
 import pages.nonsipp.schemedesignatory.{
   ActiveBankAccountPage,
@@ -353,6 +371,89 @@ class TaskListControllerSpec extends ControllerBaseSpec {
           expectedLinkUrl = controllers.nonsipp.memberdetails.routes.SchemeMembersListController
             .onPageLoad(srn, 1, ManualOrUpload.Manual)
             .url
+        )
+      }
+    }
+
+    "schemeDetailsSection - loans" - {
+
+      "notStarted" in {
+        testViewModel(
+          defaultUserAnswers,
+          3,
+          0,
+          expectedStatus = TaskListStatus.NotStarted,
+          expectedTitleKey = "nonsipp.tasklist.loans.title",
+          expectedLinkContentKey = "nonsipp.tasklist.loans.add.loansmade.title",
+          expectedLinkUrl = controllers.nonsipp.loansmadeoroutstanding.routes.LoansMadeOrOutstandingController
+            .onPageLoad(srn, NormalMode)
+            .url
+        )
+      }
+
+      "inProgress" - {
+
+        "stopped at IdentitySubject page" in {
+          val userAnswersWithLoans =
+            defaultUserAnswers
+              .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
+              .unsafeSet(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient), IdentityType.Individual)
+              .unsafeSet(IdentityTypePage(srn, refineMV(2), IdentitySubject.LoanRecipient), IdentityType.UKCompany)
+              .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Money](money))
+
+          testViewModel(
+            userAnswersWithLoans,
+            3,
+            0,
+            expectedStatus = TaskListStatus.InProgress,
+            expectedTitleKey = "nonsipp.tasklist.loans.title",
+            expectedLinkContentKey = "nonsipp.tasklist.loans.change.loansmade.title",
+            expectedLinkUrl = controllers.nonsipp.common.routes.IdentityTypeController
+              .onPageLoad(srn, refineMV(2), NormalMode, IdentitySubject.LoanRecipient)
+              .url
+          )
+        }
+        "stopped later on in the journey" in {
+          val userAnswersWithLoans =
+            defaultUserAnswers
+              .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
+              .unsafeSet(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient), IdentityType.Individual)
+              .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Money](money))
+              .unsafeSet(IdentityTypePage(srn, refineMV(2), IdentitySubject.LoanRecipient), IdentityType.UKCompany)
+              .unsafeSet(CompanyRecipientNamePage(srn, refineMV(1)), "CompanyRecipientName")
+
+          testViewModel(
+            userAnswersWithLoans,
+            3,
+            0,
+            expectedStatus = TaskListStatus.InProgress,
+            expectedTitleKey = "nonsipp.tasklist.loans.title",
+            expectedLinkContentKey = "nonsipp.tasklist.loans.change.loansmade.title",
+            expectedLinkUrl = controllers.nonsipp.common.routes.IdentityTypeController
+              .onPageLoad(srn, refineMV(2), NormalMode, IdentitySubject.LoanRecipient)
+              .url
+          )
+        }
+      }
+
+      "completed" in {
+        val userAnswersWithLoans =
+          defaultUserAnswers
+            .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
+            .unsafeSet(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient), IdentityType.Individual)
+            .unsafeSet(IdentityTypePage(srn, refineMV(2), IdentitySubject.LoanRecipient), IdentityType.UKCompany)
+            .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Money](money))
+            .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(2)), ConditionalYesNo.yes[Unit, Money](money))
+
+        testViewModel(
+          userAnswersWithLoans,
+          3,
+          0,
+          expectedStatus = TaskListStatus.Completed,
+          expectedTitleKey = "nonsipp.tasklist.loans.title",
+          expectedLinkContentKey = "nonsipp.tasklist.loans.change.loansmade.title",
+          expectedLinkUrl =
+            controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController.onPageLoad(srn, 1, NormalMode).url
         )
       }
     }
