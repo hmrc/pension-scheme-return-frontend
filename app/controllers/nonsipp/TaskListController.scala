@@ -28,7 +28,11 @@ import models.ConditionalYesNo._
 import pages.nonsipp.CheckReturnDatesPage
 import pages.nonsipp.accountingperiod.AccountingPeriods
 import pages.nonsipp.common.IdentityTypes
-import pages.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanPages
+import pages.nonsipp.loansmadeoroutstanding.{
+  IsIndividualRecipientConnectedPartyPages,
+  OutstandingArrearsOnLoanPages,
+  RecipientSponsoringEmployerConnectedPartyPages
+}
 import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsNinoPages, MembersDetailsPages, NoNinoPages}
 import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, ValueOfAssetsPage, WhyNoBankAccountPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -246,21 +250,32 @@ object TaskListController {
   private def getIncompleteLoansIndex(userAnswers: UserAnswers, srn: Srn) = {
     val whoReceivedTheLoanPages = userAnswers.get(IdentityTypes(srn, IdentitySubject.LoanRecipient))
     val outstandingArrearsOnLoanPages = userAnswers.get(OutstandingArrearsOnLoanPages(srn))
+    val sponsoringPages = userAnswers.get(RecipientSponsoringEmployerConnectedPartyPages(srn))
+    val connectedPartyPages = userAnswers.get(IsIndividualRecipientConnectedPartyPages(srn))
 
-    (whoReceivedTheLoanPages, outstandingArrearsOnLoanPages) match {
-      case (None, _) => 1
-      case (Some(_), None) => 1
-      case (Some(whoReceived), arrears) =>
+    (whoReceivedTheLoanPages, outstandingArrearsOnLoanPages, sponsoringPages, connectedPartyPages) match {
+      case (None, _, _, _) => 1
+      case (Some(_), None, _, _) => 1
+      case (Some(whoReceived), arrears, sponsoring, connected) =>
         if (whoReceived.isEmpty) {
           1
         } else {
           val whoReceivedIndexes = (0 to whoReceived.size - 1).toList
           val arrearsIndexes = arrears.getOrElse(List.empty).map(_._1.toInt).toList
+          val sponsoringAndConnectedIndexes = sponsoring.getOrElse(List.empty).map(_._1.toInt).toList ++ connected
+            .getOrElse(List.empty)
+            .map(_._1.toInt)
+            .toList
           val filtered = whoReceivedIndexes.filter(arrearsIndexes.indexOf(_) < 0)
-          if (filtered.isEmpty) {
+          val filteredSC = whoReceivedIndexes.filter(sponsoringAndConnectedIndexes.indexOf(_) < 0)
+          if (filtered.isEmpty && filteredSC.isEmpty) {
             1
           } else {
-            filtered(0) + 1
+            if (filteredSC.isEmpty) {
+              filtered(0) + 1 // index based on arrears page missing
+            } else {
+              filteredSC(0) + 1 // index based on sponsoring employer or individual connected party
+            }
           }
         }
     }

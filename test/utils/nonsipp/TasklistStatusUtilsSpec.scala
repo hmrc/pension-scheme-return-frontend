@@ -23,10 +23,16 @@ import org.scalatest.OptionValues
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import pages.nonsipp.common.{IdentityTypePage, IdentityTypes}
-import pages.nonsipp.loansmadeoroutstanding.{LoansMadeOrOutstandingPage, OutstandingArrearsOnLoanPage}
+import pages.nonsipp.loansmadeoroutstanding.{
+  IsIndividualRecipientConnectedPartyPage,
+  LoansMadeOrOutstandingPage,
+  OutstandingArrearsOnLoanPage,
+  RecipientSponsoringEmployerConnectedPartyPage
+}
 import viewmodels.models.TaskListStatus.{Completed, InProgress, NotStarted}
 import utils.UserAnswersUtils.UserAnswersOps
 import models.ConditionalYesNo._
+import models.SponsoringOrConnectedParty.Sponsoring
 
 class TasklistStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValues with TestValues {
   "Loans status" - {
@@ -61,6 +67,30 @@ class TasklistStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
         val result = TasklistStatusUtils.getLoansTaskListStatus(customUserAnswers, srn)
         result mustBe InProgress
       }
+      "when LoansMadeOrOutstandingPage true and there is a missing sponsoring employer page" in {
+        val customUserAnswers = defaultUserAnswers
+          .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
+          .unsafeSet(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient), IdentityType.UKCompany)
+          .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Money](money))
+          .unsafeSet(IdentityTypePage(srn, refineMV(2), IdentitySubject.LoanRecipient), IdentityType.Individual)
+          .unsafeSet(IsIndividualRecipientConnectedPartyPage(srn, refineMV(1)), true)
+          .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(2)), ConditionalYesNo.yes[Unit, Money](money))
+
+        val result = TasklistStatusUtils.getLoansTaskListStatus(customUserAnswers, srn)
+        result mustBe InProgress
+      }
+      "when LoansMadeOrOutstandingPage true and there is a missing individual connected party page" in {
+        val customUserAnswers = defaultUserAnswers
+          .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
+          .unsafeSet(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient), IdentityType.UKCompany)
+          .unsafeSet(RecipientSponsoringEmployerConnectedPartyPage(srn, refineMV(1)), Sponsoring)
+          .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Money](money))
+          .unsafeSet(IdentityTypePage(srn, refineMV(2), IdentitySubject.LoanRecipient), IdentityType.Individual)
+          .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(2)), ConditionalYesNo.yes[Unit, Money](money))
+
+        val result = TasklistStatusUtils.getLoansTaskListStatus(customUserAnswers, srn)
+        result mustBe InProgress
+      }
     }
     "should be Complete" - {
       "when only LoansMadeOrOutstandingPage false is present" in {
@@ -69,12 +99,14 @@ class TasklistStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
         val result = TasklistStatusUtils.getLoansTaskListStatus(customUserAnswers, srn)
         result mustBe Completed
       }
-      "when LoansMadeOrOutstandingPage true and equal number of first pages and last pages is present" in {
+      "when LoansMadeOrOutstandingPage true and equal number of first pages and last pages and sponsoring/connected party pages is present" in {
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
           .unsafeSet(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient), IdentityType.UKCompany)
-          .unsafeSet(IdentityTypePage(srn, refineMV(2), IdentitySubject.LoanRecipient), IdentityType.Individual)
+          .unsafeSet(RecipientSponsoringEmployerConnectedPartyPage(srn, refineMV(1)), Sponsoring)
           .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Money](money))
+          .unsafeSet(IdentityTypePage(srn, refineMV(2), IdentitySubject.LoanRecipient), IdentityType.Individual)
+          .unsafeSet(IsIndividualRecipientConnectedPartyPage(srn, refineMV(1)), true)
           .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(2)), ConditionalYesNo.yes[Unit, Money](money))
 
         val result = TasklistStatusUtils.getLoansTaskListStatus(customUserAnswers, srn)

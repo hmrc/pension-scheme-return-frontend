@@ -28,3 +28,10 @@ case class IsIndividualRecipientConnectedPartyPage(srn: Srn, index: Max5000) ext
 
   override def toString: String = "individualConnectedPartyStatus"
 }
+
+case class IsIndividualRecipientConnectedPartyPages(srn: Srn) extends QuestionPage[Map[String, Boolean]] {
+
+  override def path: JsPath = Paths.loanTransactions \ toString
+
+  override def toString: String = "individualConnectedPartyStatus"
+}

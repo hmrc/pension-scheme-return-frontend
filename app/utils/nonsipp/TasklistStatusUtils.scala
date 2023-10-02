@@ -19,7 +19,13 @@ package utils.nonsipp
 import models.SchemeId.Srn
 import models.{IdentitySubject, NormalMode, PensionSchemeId, UserAnswers}
 import pages.nonsipp.common.IdentityTypes
-import pages.nonsipp.loansmadeoroutstanding.{LoansMadeOrOutstandingPage, OutstandingArrearsOnLoanPages}
+import pages.nonsipp.loansmadeoroutstanding.{
+  IsIndividualRecipientConnectedPartyPage,
+  IsIndividualRecipientConnectedPartyPages,
+  LoansMadeOrOutstandingPage,
+  OutstandingArrearsOnLoanPages,
+  RecipientSponsoringEmployerConnectedPartyPages
+}
 import pages.nonsipp.memberdetails.{MemberDetailsNinoPages, MembersDetailsPages, NoNinoPages}
 import pages.nonsipp.schemedesignatory.{FeesCommissionsWagesSalariesPage, HowManyMembersPage, HowMuchCashPage}
 import viewmodels.models.TaskListStatus.{Completed, InProgress, NotStarted}
@@ -74,23 +80,32 @@ object TasklistStatusUtils {
   }
 
   def getLoansTaskListStatus(userAnswers: UserAnswers, srn: Srn) = {
-    val loansMadeOrOutstandingPage = userAnswers.get(LoansMadeOrOutstandingPage(srn))
-    val whoReceivedTheLoanPages = userAnswers.get(IdentityTypes(srn, IdentitySubject.LoanRecipient))
-    val outstandingArrearsOnLoanPages = userAnswers.get(OutstandingArrearsOnLoanPages(srn))
-    (loansMadeOrOutstandingPage, whoReceivedTheLoanPages, outstandingArrearsOnLoanPages) match {
-      case (None, _, _) => NotStarted
-      case (Some(loansMadeOrOutstanding), whoReceivedTheLoan, outstandingArrearsOnLoan) =>
-        if (!loansMadeOrOutstanding) {
+    val loansMadePage = userAnswers.get(LoansMadeOrOutstandingPage(srn))
+    val whoReceivedPages = userAnswers.get(IdentityTypes(srn, IdentitySubject.LoanRecipient))
+    val arrearsPages = userAnswers.get(OutstandingArrearsOnLoanPages(srn))
+    val sponsoringPages = userAnswers.get(RecipientSponsoringEmployerConnectedPartyPages(srn))
+    val connectedPartyPages = userAnswers.get(IsIndividualRecipientConnectedPartyPages(srn))
+    (loansMadePage, whoReceivedPages, arrearsPages, sponsoringPages, connectedPartyPages) match {
+      case (None, _, _, _, _) => NotStarted
+      case (Some(loansMade), whoReceived, arrears, sponsoring, connected) =>
+        if (!loansMade) {
           Completed
         } else {
-          val countLoanTransactions = whoReceivedTheLoanPages.getOrElse(List.empty).size
-          val countLastPage = outstandingArrearsOnLoanPages.getOrElse(List.empty).size
+          val countLoanTransactions = whoReceived.getOrElse(List.empty).size
+          val countLastPage = arrears.getOrElse(List.empty).size
           if (countLoanTransactions + countLastPage == 0) {
             InProgress
           } else if (countLoanTransactions > countLastPage) {
             InProgress
           } else {
-            Completed
+            val countSponsoringAndConnectedPages = sponsoring.getOrElse(List.empty).size + connected
+              .getOrElse(List.empty)
+              .size
+            if (countSponsoringAndConnectedPages < countLastPage) {
+              InProgress
+            } else {
+              Completed
+            }
           }
         }
     }

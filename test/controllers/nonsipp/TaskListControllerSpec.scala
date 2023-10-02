@@ -30,14 +30,17 @@ import models.{
   UserAnswers
 }
 import models.ConditionalYesNo._
+import models.SponsoringOrConnectedParty.Sponsoring
 import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.CheckReturnDatesPage
 import pages.nonsipp.common.IdentityTypePage
 import pages.nonsipp.loansmadeoroutstanding.{
   CompanyRecipientNamePage,
+  IndividualRecipientNamePage,
+  IsIndividualRecipientConnectedPartyPage,
   LoansMadeOrOutstandingPage,
   OutstandingArrearsOnLoanPage,
-  OutstandingArrearsOnLoanPages
+  RecipientSponsoringEmployerConnectedPartyPage
 }
 import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsNinoPage, MemberDetailsPage, NoNINOPage}
 import pages.nonsipp.schemedesignatory.{
@@ -375,7 +378,7 @@ class TaskListControllerSpec extends ControllerBaseSpec {
       }
     }
 
-    "schemeDetailsSection - loans" - {
+    "loansSection" - {
 
       "notStarted" in {
         testViewModel(
@@ -393,13 +396,14 @@ class TaskListControllerSpec extends ControllerBaseSpec {
 
       "inProgress" - {
 
-        "stopped at IdentitySubject page" in {
+        "stopped after the second IdentitySubject page" in {
           val userAnswersWithLoans =
             defaultUserAnswers
               .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
               .unsafeSet(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient), IdentityType.Individual)
-              .unsafeSet(IdentityTypePage(srn, refineMV(2), IdentitySubject.LoanRecipient), IdentityType.UKCompany)
+              .unsafeSet(IsIndividualRecipientConnectedPartyPage(srn, refineMV(1)), true)
               .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Money](money))
+              .unsafeSet(IdentityTypePage(srn, refineMV(2), IdentitySubject.LoanRecipient), IdentityType.UKCompany)
 
           testViewModel(
             userAnswersWithLoans,
@@ -418,9 +422,10 @@ class TaskListControllerSpec extends ControllerBaseSpec {
             defaultUserAnswers
               .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
               .unsafeSet(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient), IdentityType.Individual)
+              .unsafeSet(IsIndividualRecipientConnectedPartyPage(srn, refineMV(1)), true)
               .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Money](money))
               .unsafeSet(IdentityTypePage(srn, refineMV(2), IdentitySubject.LoanRecipient), IdentityType.UKCompany)
-              .unsafeSet(CompanyRecipientNamePage(srn, refineMV(1)), "CompanyRecipientName")
+              .unsafeSet(CompanyRecipientNamePage(srn, refineMV(2)), "CompanyRecipientName")
 
           testViewModel(
             userAnswersWithLoans,
@@ -434,6 +439,53 @@ class TaskListControllerSpec extends ControllerBaseSpec {
               .url
           )
         }
+
+        "sponsoring answer is missing - change journey" in {
+          val userAnswersWithLoans =
+            defaultUserAnswers
+              .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
+              .unsafeSet(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient), IdentityType.Individual)
+              .unsafeSet(IndividualRecipientNamePage(srn, refineMV(1)), "First Last")
+              .unsafeSet(IsIndividualRecipientConnectedPartyPage(srn, refineMV(1)), true)
+              .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Money](money))
+              .unsafeSet(IdentityTypePage(srn, refineMV(2), IdentitySubject.LoanRecipient), IdentityType.UKCompany)
+              .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(2)), ConditionalYesNo.yes[Unit, Money](money))
+
+          testViewModel(
+            userAnswersWithLoans,
+            3,
+            0,
+            expectedStatus = TaskListStatus.InProgress,
+            expectedTitleKey = "nonsipp.tasklist.loans.title",
+            expectedLinkContentKey = "nonsipp.tasklist.loans.change.loansmade.title",
+            expectedLinkUrl = controllers.nonsipp.common.routes.IdentityTypeController
+              .onPageLoad(srn, refineMV(2), NormalMode, IdentitySubject.LoanRecipient)
+              .url
+          )
+        }
+        "individual connected party answer is missing - change journey" in {
+          val userAnswersWithLoans =
+            defaultUserAnswers
+              .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
+              .unsafeSet(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient), IdentityType.Individual)
+              .unsafeSet(IndividualRecipientNamePage(srn, refineMV(1)), "First Last")
+              .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Money](money))
+              .unsafeSet(IdentityTypePage(srn, refineMV(2), IdentitySubject.LoanRecipient), IdentityType.UKCompany)
+              .unsafeSet(RecipientSponsoringEmployerConnectedPartyPage(srn, refineMV(2)), Sponsoring)
+              .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(2)), ConditionalYesNo.yes[Unit, Money](money))
+
+          testViewModel(
+            userAnswersWithLoans,
+            3,
+            0,
+            expectedStatus = TaskListStatus.InProgress,
+            expectedTitleKey = "nonsipp.tasklist.loans.title",
+            expectedLinkContentKey = "nonsipp.tasklist.loans.change.loansmade.title",
+            expectedLinkUrl = controllers.nonsipp.common.routes.IdentityTypeController
+              .onPageLoad(srn, refineMV(1), NormalMode, IdentitySubject.LoanRecipient)
+              .url
+          )
+        }
       }
 
       "completed" in {
@@ -441,8 +493,10 @@ class TaskListControllerSpec extends ControllerBaseSpec {
           defaultUserAnswers
             .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
             .unsafeSet(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient), IdentityType.Individual)
+            .unsafeSet(IsIndividualRecipientConnectedPartyPage(srn, refineMV(1)), false)
             .unsafeSet(IdentityTypePage(srn, refineMV(2), IdentitySubject.LoanRecipient), IdentityType.UKCompany)
             .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(1)), ConditionalYesNo.yes[Unit, Money](money))
+            .unsafeSet(RecipientSponsoringEmployerConnectedPartyPage(srn, refineMV(2)), Sponsoring)
             .unsafeSet(OutstandingArrearsOnLoanPage(srn, refineMV(2)), ConditionalYesNo.yes[Unit, Money](money))
 
         testViewModel(
