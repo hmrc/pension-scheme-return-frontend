@@ -30,3 +30,9 @@ case class OutstandingArrearsOnLoanPage(srn: Srn, index: Max5000) extends Questi
 
   override def toString: String = "outstandingArrearsOnLoan"
 }
+case class OutstandingArrearsOnLoanPages(srn: Srn) extends QuestionPage[Map[String, ConditionalYes[Money]]] {
+
+  override def path: JsPath = Paths.loanTransactions \ toString
+
+  override def toString: String = "outstandingArrearsOnLoan"
+}

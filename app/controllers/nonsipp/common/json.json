@@ -1,0 +1,26 @@
+{
+  "reportDetails": {
+    "pstr": "00000042IN",
+    "psrStatus": "Compiled",
+    "periodStart": "2024-02-10",
+    "periodEnd": "2024-02-01"
+  },
+  "accountingPeriodDetails": {
+    "recordVersion": "001",
+    "accountingPeriods": [
+      {
+        "accPeriodStart": "2024-02-01",
+        "accPeriodEnd": "2024-02-10"
+      }
+    ]
+  },
+  "schemeDesignatory": {
+    "recordVersion": "001",
+    "openBankAccount": "No",
+    "reasonNoOpenAccount": "test",
+    "noOfActiveMembers": 1,
+    "noOfDeferredMembers": 2,
+    "noOfPensionerMembers": 3,
+    "totalPayments": 6
+  }
+}]
