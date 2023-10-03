@@ -21,11 +21,15 @@ import controllers.PSRController
 import controllers.actions._
 import controllers.nonsipp.landorpropertydisposal.LandOrPropertyStillHeldController._
 import forms.YesNoPageFormProvider
-import models.Mode
+import models.{HowDisposed, Mode}
 import models.SchemeId.Srn
 import navigation.Navigator
 import pages.nonsipp.landorproperty.LandOrPropertyAddressLookupPage
-import pages.nonsipp.landorpropertydisposal.LandOrPropertyStillHeldPage
+import pages.nonsipp.landorpropertydisposal.{
+  HowWasPropertyDisposedOfPage,
+  LandOrPropertyStillHeldPage,
+  LandPropertyDisposalCYAPage
+}
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -105,10 +109,42 @@ class LandOrPropertyStillHeldController @Inject()(
                 request.userAnswers.set(LandOrPropertyStillHeldPage(srn, landOrPropertyIndex, disposalIndex), value)
               )
               _ <- saveService.save(updatedAnswers)
-            } yield Redirect(
-              navigator
-                .nextPage(LandOrPropertyStillHeldPage(srn, landOrPropertyIndex, disposalIndex), mode, updatedAnswers)
-            )
+            } yield {
+              val x = updatedAnswers.get(HowWasPropertyDisposedOfPage(srn, landOrPropertyIndex, disposalIndex))
+
+              x match {
+                case Some(HowDisposed.Transferred) =>
+                  Redirect(
+                    navigator
+                      .nextPage(
+                        LandOrPropertyStillHeldPage(srn, landOrPropertyIndex, disposalIndex),
+                        mode,
+                        updatedAnswers
+                      )
+                  )
+
+                case Some(HowDisposed.Sold) =>
+                  Redirect(
+                    navigator
+                      .nextPage(
+                        LandOrPropertyStillHeldPage(srn, landOrPropertyIndex, disposalIndex),
+                        mode,
+                        updatedAnswers
+                      )
+                  )
+
+                case _ =>
+                  Redirect(
+                    navigator
+                      .nextPage(
+                        LandOrPropertyStillHeldPage(srn, landOrPropertyIndex, disposalIndex),
+                        mode,
+                        updatedAnswers
+                      )
+                  )
+              }
+
+            }
         )
     }
 }

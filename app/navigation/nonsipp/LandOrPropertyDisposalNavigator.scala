@@ -17,7 +17,7 @@
 package navigation.nonsipp
 
 import eu.timepit.refined.refineMV
-import models.{HowDisposed, IdentityType, NormalMode, UserAnswers}
+import models.{CheckMode, CheckOrChange, HowDisposed, IdentityType, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.landorpropertydisposal._
@@ -49,7 +49,8 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
       }
 
     case LandOrPropertyStillHeldPage(srn, landOrPropertyIndex, disposalIndex) => //41d
-      controllers.routes.UnauthorisedController.onPageLoad()
+      controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
+        .onPageLoad(srn, landOrPropertyIndex, disposalIndex, CheckOrChange.Check)
 
     case WhenWasPropertySoldPage(srn, landOrPropertyIndex, disposalIndex) =>
       controllers.nonsipp.landorpropertydisposal.routes.WhoPurchasedLandOrPropertyController
@@ -112,10 +113,13 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
         .onPageLoad(srn, index, disposalIndex, NormalMode)
 
     case TotalProceedsSaleLandPropertyPage(srn, landOrPropertyIndex, disposalIndex) =>
-      controllers.nonsipp.landorpropertydisposal.routes.DisposalIndependentValuationController
+      controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyStillHeldController
         .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
 
     case DisposalIndependentValuationPage(srn, landOrPropertyIndex, disposalIndex) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
+
+    case LandPropertyDisposalCYAPage(srn) =>
       controllers.routes.UnauthorisedController.onPageLoad()
 
   }
