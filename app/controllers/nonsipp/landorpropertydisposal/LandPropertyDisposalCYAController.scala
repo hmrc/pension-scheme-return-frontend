@@ -58,9 +58,7 @@ class LandPropertyDisposalCYAController @Inject()(
       (
         for {
 
-//          landOrPropertyDisposalListPage <- requiredPage(LandOrPropertyDisposalListPage(srn, index))
           howWasPropertyDisposed <- requiredPage(HowWasPropertyDisposedOfPage(srn, index, disposalIndex))
-          whenWasPropertySold <- requiredPage(WhenWasPropertySoldPage(srn, index, disposalIndex))
           addressLookUpPage <- requiredPage(LandOrPropertyAddressLookupPage(srn, index))
           totalProceedsSale <- requiredPage(TotalProceedsSaleLandPropertyPage(srn, index, disposalIndex))
           landOrPropertyStillHeld <- requiredPage(LandOrPropertyStillHeldPage(srn, index, disposalIndex))
@@ -69,6 +67,10 @@ class LandPropertyDisposalCYAController @Inject()(
             request.userAnswers
               .get(WhoPurchasedLandOrPropertyPage(srn: Srn, index, disposalIndex))
               .get
+          )
+
+          whenWasPropertySold = Option.when(howWasPropertyDisposed == Sold)(
+            request.userAnswers.get(WhenWasPropertySoldPage(srn, index, disposalIndex)).get
           )
 
           landOrPropertyDisposalSellerConnectedParty = Option.when(howWasPropertyDisposed == Sold)(
@@ -161,7 +163,7 @@ case class ViewModelParameters(
   schemeName: String,
 //                                landOrPropertyDisposalListPage: Page,
   howWasPropertyDisposed: HowDisposed,
-  whenWasPropertySold: LocalDate,
+  whenWasPropertySold: Option[LocalDate],
   addressLookUpPage: Address,
   landOrPropertyDisposedType: Option[IdentityType],
   landOrPropertyDisposalSellerConnectedParty: Option[Boolean],
@@ -216,7 +218,7 @@ object LandPropertyDisposalCYAController {
     schemeName: String,
     //                        landOrPropertyDisposalListPage: Page,
     howWasPropertyDisposed: HowDisposed,
-    whenWasPropertySold: LocalDate,
+    whenWasPropertySold: Option[LocalDate],
     addressLookUpPage: Address,
     landOrPropertyDisposedType: Option[IdentityType],
     recipientReasonNoDetails: Option[String],
@@ -285,7 +287,7 @@ object LandPropertyDisposalCYAController {
     schemeName: String,
 //                                           landOrPropertyDisposalListPage: Page,
     howWasPropertyDisposed: HowDisposed,
-    whenWasPropertySold: LocalDate,
+    whenWasPropertySold: Option[LocalDate],
     addressLookUpPage: Address,
     landOrPropertyDisposedType: Option[IdentityType],
     recipientReasonNoDetails: Option[String],
@@ -380,15 +382,15 @@ object LandPropertyDisposalCYAController {
       CheckYourAnswersSection(
         Some(Heading2.medium("")),
         List(
-          //          CheckYourAnswersRowViewModel(
-          //            Message("landPropertyDisposalCYA.section1.propertyInUk"),
-          //            addressLookUpPage.addressLine1
-          //          ).withAction(
-          //            SummaryAction(
-          //              "site.change",
-          //              routes.LandOrPropertyDisposalListController.onSubmit(srn, page).url
-          //            ).withVisuallyHiddenContent("landPropertyDisposalCYA.section1.landOrPropertyInUk.hidden")
-          //          ),
+          CheckYourAnswersRowViewModel(
+            Message("landPropertyDisposalCYA.section1.propertyInUk"),
+            addressLookUpPage.addressLine1
+          ).withAction(
+            SummaryAction(
+              "site.change",
+              routes.LandOrPropertyDisposalListController.onSubmit(srn, index.value).url
+            ).withVisuallyHiddenContent("landPropertyDisposalCYA.section1.landOrPropertyInUk.hidden")
+          ),
           CheckYourAnswersRowViewModel(
             Message("landPropertyDisposalCYA.section1.propertyDisposed", addressLookUpPage.addressLine1),
             howWasPropertyDisposed.toString
@@ -402,7 +404,7 @@ object LandPropertyDisposalCYAController {
           ),
           CheckYourAnswersRowViewModel(
             Message("landPropertyDisposalCYA.section1.whenWasPropertySold", addressLookUpPage.addressLine1),
-            whenWasPropertySold.show
+            whenWasPropertySold.get.show
           ).withAction(
             SummaryAction(
               "site.change",
@@ -422,20 +424,22 @@ object LandPropertyDisposalCYAController {
             .withAction(
               SummaryAction("site.change", recipientNameUrl)
                 .withVisuallyHiddenContent("landPropertyDisposalCYA.section1.recipientName.hidden")
-            ),
-          CheckYourAnswersRowViewModel(recipientDetailsKey, recipientDetails.get)
-            .withAction(
-              SummaryAction("site.change", recipientDetailsUrl)
-                .withVisuallyHiddenContent(recipientDetailsIdChangeHiddenKey)
             )
-        ) ++ recipientReasonNoDetails.map(
+        ) :?+ recipientDetails.map(
+          res =>
+            CheckYourAnswersRowViewModel(recipientDetailsKey, res)
+              .withAction(
+                SummaryAction("site.change", recipientDetailsUrl)
+                  .withVisuallyHiddenContent(recipientDetailsIdChangeHiddenKey)
+              )
+        ) :?+ recipientReasonNoDetails.map(
           reason =>
             CheckYourAnswersRowViewModel(recipientNoDetailsReasonKey, reason)
               .withAction(
                 SummaryAction("site.change", recipientNoDetailsUrl)
                   .withVisuallyHiddenContent(recipientDetailsNoIdChangeHiddenKey)
               )
-        ) ++ List(
+        ) :+
           CheckYourAnswersRowViewModel(
             Message("landPropertyDisposalCYA.section1.landOrPropertyDisposalSellerConnectedParty", recipientName),
             if (landOrPropertyDisposalSellerConnectedParty.get) "site.yes" else "site.no"
@@ -448,7 +452,7 @@ object LandPropertyDisposalCYAController {
             ).withVisuallyHiddenContent(
               "landPropertyDisposalCYA.section1.landOrPropertyDisposalSellerConnectedPartyInfo.hidden"
             )
-          ),
+          ) :+
           CheckYourAnswersRowViewModel(
             Message("landPropertyDisposalCYA.section1.totalProceedsSale", addressLookUpPage.addressLine1),
             totalProceedsSale.displayAs
@@ -459,7 +463,7 @@ object LandPropertyDisposalCYAController {
             ).withVisuallyHiddenContent(
               "landPropertyDisposalCYA.section1.totalProceedsSaleInfo.hidden"
             )
-          ),
+          ) :+
           CheckYourAnswersRowViewModel(
             Message(
               "landPropertyDisposalCYA.section1.landOrPropertyStillHeld",
@@ -477,7 +481,6 @@ object LandPropertyDisposalCYAController {
               "landPropertyDisposalCYA.section1.landOrPropertyStillHeldInfo.hidden"
             )
           )
-        )
       )
     )
 

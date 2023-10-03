@@ -156,7 +156,7 @@ object LandOrPropertyDisposalListController {
   ): FormPageViewModel[ListViewModel] = {
 
     val disposalAmount = addressesWithIndexes.map { case ((_, disposalIndexes), _) => disposalIndexes.size }.sum
-    
+
     val title =
       if (disposalAmount == 1) "landOrPropertyDisposalList.title"
       else "landOrPropertyDisposalList.title.plural"

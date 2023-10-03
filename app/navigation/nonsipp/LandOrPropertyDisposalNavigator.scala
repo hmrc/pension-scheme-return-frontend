@@ -120,10 +120,8 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
     case DisposalIndependentValuationPage(srn, landOrPropertyIndex, disposalIndex) =>
       controllers.routes.UnauthorisedController.onPageLoad()
 
-
     case LandPropertyDisposalCYAPage(srn) =>
       controllers.routes.UnauthorisedController.onPageLoad()
-
 
     case LandOrPropertyDisposalListPage(srn, addDisposal @ true) =>
       controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalAddressListController.onPageLoad(srn, 1)
