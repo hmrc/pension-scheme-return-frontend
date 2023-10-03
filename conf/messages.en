@@ -1234,13 +1234,13 @@ companyBuyerCrn.no.conditional.error.invalid = The reason you cannot provide the
 companyBuyerCrn.no.conditional.error.length = The reason you cannot provide the buyer’s CRN must be 160 characters or fewer
 companyBuyerCrn.error.required = Select yes if you know the buyer’s Company Registration Number (CRN)
 
-landOrPropertyDisposalList.title = Start reporting a land or property disposal
-landOrPropertyDisposalList.heading = Start reporting a land or property disposal
-landOrPropertyDisposalList.paragraph1 = Select one option to start reporting disposal. If you need to report more, you will be able to do this later.
-landOrPropertyDisposalList.paragraph2 = You can only report disposal of land or property you have told us is held by your scheme. If the land or property does not appear here, you will need to tell us about it first using the ‘land or property’ section of this pension scheme return.
-landOrPropertyDisposalList.legend = Which land or property was disposed of?
-landOrPropertyDisposalList.radios.error.required = Select the land or property that was disposed of
-landOrPropertyDisposalList.pagination.label = Showing {0} - {1} of {2} land or properties
+landOrPropertyDisposalAddressList.title = Start reporting a land or property disposal
+landOrPropertyDisposalAddressList.heading = Start reporting a land or property disposal
+landOrPropertyDisposalAddressList.paragraph1 = Select one option to start reporting disposal. If you need to report more, you will be able to do this later.
+landOrPropertyDisposalAddressList.paragraph2 = You can only report disposal of land or property you have told us is held by your scheme. If the land or property does not appear here, you will need to tell us about it first using the ‘land or property’ section of this pension scheme return.
+landOrPropertyDisposalAddressList.legend = Which land or property was disposed of?
+landOrPropertyDisposalAddressList.radios.error.required = Select the land or property that was disposed of
+landOrPropertyDisposalAddressList.pagination.label = Showing {0} - {1} of {2} land or properties
 
 otherBuyerDetails.title =  Buyer’s details
 otherBuyerDetails.heading = Buyer’s details for {0}
@@ -1311,3 +1311,14 @@ landOrPropertyDisposalSellerConnectedParty.error.required = Select yes if the se
 DisposalIndependentValuation.title = Was the sale of the land or property supported by an independent valuation?
 DisposalIndependentValuation.heading = Was the sale of {0} supported by an independent valuation?
 DisposalIndependentValuation.error.required = Select yes if the sale of the land or property was supported by an independent valuation
+
+landOrPropertyDisposalList.title = You have reported {0} land or property disposal
+landOrPropertyDisposalList.title.plural = You have reported {0} land or property disposals
+landOrPropertyDisposalList.heading = You have reported {0} land or property disposal
+landOrPropertyDisposalList.heading.plural = You have reported {0} land or property disposals
+landOrPropertyDisposalList.row = Disposal of {0}
+landOrPropertyDisposalList.description = You must tell us about all land or property the scheme disposed of during the period of this return.
+landOrPropertyDisposalList.radios = Do you need to report another land or property disposal?
+landOrPropertyDisposalList.inset = You cannot add another land or property disposal as you have entered the maximum of 50.
+landOrPropertyDisposalList.pagination.label = Showing {0} - {1} of {2} land or property disposals
+landOrPropertyDisposalList.radios.error.required = Select yes if you need to report another land or property disposal

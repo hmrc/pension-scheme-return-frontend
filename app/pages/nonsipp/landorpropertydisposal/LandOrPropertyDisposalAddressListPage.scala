@@ -16,7 +16,8 @@
 
 package pages.nonsipp.landorpropertydisposal
 
+import config.Refined.Max5000
 import models.SchemeId.Srn
 import pages.Page
 
-case class LandOrPropertyDisposalListPage(srn: Srn, addDisposal: Boolean) extends Page
+case class LandOrPropertyDisposalAddressListPage(srn: Srn, choice: Max5000) extends Page

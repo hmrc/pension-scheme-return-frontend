@@ -50,7 +50,7 @@ class LoansListControllerSpec extends ControllerBaseSpec {
     (refineMV(3), "recipientName3", money)
   )
 
-  "LoansListController" - {
+  "LandOrPropertyDisposalListController" - {
 
     act.like(renderView(onPageLoad, filledUserAnswers) { implicit app => implicit request =>
       injected[ListView].apply(

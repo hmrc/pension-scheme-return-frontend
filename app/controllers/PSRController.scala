@@ -20,7 +20,9 @@ import cats.Applicative
 import cats.data.{EitherT, NonEmptyList}
 import cats.syntax.applicative._
 import cats.syntax.either._
-import config.Refined.Max3
+import config.Refined.{Max3, Max50}
+import eu.timepit.refined.api.{Refined, Validate}
+import eu.timepit.refined.refineV
 import models.DateRange
 import models.requests.DataRequest
 import play.api.i18n.I18nSupport
@@ -39,6 +41,11 @@ abstract class PSRController extends FrontendBaseController with I18nSupport {
       case Some(value) => Right(value)
       case None => Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
     }
+
+  // Used to specifically refine an index retrieved from user answers
+  // These indexes will be strings and 0 based so we need to add 1 before refining
+  def refineStringIndex[A](indexAsString: String)(implicit ev: Validate[Int, A]): Option[Refined[Int, A]] =
+    indexAsString.toIntOption.flatMap(index => refineV[A](index + 1).toOption)
 
   implicit class OptionOps[A](maybe: Option[A]) {
     def getOrRecoverJourney[F[_]: Applicative](f: A => F[Result]): F[Result] = maybe match {

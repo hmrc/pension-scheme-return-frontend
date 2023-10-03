@@ -19,125 +19,167 @@ package controllers.nonsipp.landorpropertydisposal
 import cats.implicits._
 import com.google.inject.Inject
 import config.Constants
-import config.Refined.Max5000
-import config.Refined.Max5000._
+import config.Constants.maxLandOrPropertyDisposals
+import config.Refined.{Max50, Max5000}
+import controllers.PSRController
 import controllers.actions._
 import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalListController._
-import eu.timepit.refined.refineV
-import forms.RadioListFormProvider
+import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
+import models.requests.DataRequest
 import models.{Address, Mode, Pagination}
 import navigation.Navigator
-import pages.nonsipp.landorproperty.LandOrPropertyAddressLookupPages
-import pages.nonsipp.landorpropertydisposal.LandOrPropertyDisposalListPage
+import pages.nonsipp.landorproperty.LandOrPropertyAddressLookupPage
+import pages.nonsipp.landorpropertydisposal._
 import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc._
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import play.api.i18n.MessagesApi
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import viewmodels.DisplayMessage.{Message, ParagraphMessage}
 import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, ListRadiosRow, ListRadiosViewModel, PaginatedViewModel}
-import views.html.ListRadiosView
+import viewmodels.models.{FormPageViewModel, ListRow, ListViewModel, PaginatedViewModel}
+import views.html.ListView
 
 import javax.inject.Named
-import scala.collection.immutable.SortedMap
 
 class LandOrPropertyDisposalListController @Inject()(
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
-  view: ListRadiosView,
-  formProvider: RadioListFormProvider
-) extends FrontendBaseController
-    with I18nSupport {
+  view: ListView,
+  formProvider: YesNoPageFormProvider
+) extends PSRController {
 
   val form = LandOrPropertyDisposalListController.form(formProvider)
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      val addresses = request.userAnswers.map(LandOrPropertyAddressLookupPages(srn))
-      withIndexedAddress(addresses) { sortedAddresses =>
-        Ok(view(form, viewModel(srn, page, sortedAddresses)))
-      }
+      getDisposals(srn)
+        .map(
+          disposals =>
+            if (disposals.isEmpty) {
+              Redirect(routes.LandOrPropertyDisposalAddressListController.onPageLoad(srn, page = 1))
+            } else {
+              getAddressesWithIndexes(srn, disposals)
+                .map(indexes => Ok(view(form, viewModel(srn, page, indexes))))
+                .merge
+            }
+        )
+        .merge
   }
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    val addresses = request.userAnswers.map(LandOrPropertyAddressLookupPages(srn))
-    form
-      .bindFromRequest()
-      .fold(
-        errors =>
-          withIndexedAddress(addresses) { sortedAddresses =>
-            BadRequest(view(errors, viewModel(srn, page, sortedAddresses)))
-          },
-        answer =>
-          Redirect(
-            navigator.nextPage(LandOrPropertyDisposalListPage(srn, answer), mode, request.userAnswers)
+    getDisposals(srn).map { disposals =>
+      if (disposals.size == maxLandOrPropertyDisposals) {
+        Redirect(
+          navigator.nextPage(LandOrPropertyDisposalListPage(srn, addDisposal = false), mode, request.userAnswers)
+        )
+      } else {
+        form
+          .bindFromRequest()
+          .fold(
+            errors =>
+              getAddressesWithIndexes(srn, disposals)
+                .map(indexes => BadRequest(view(errors, viewModel(srn, page, indexes))))
+                .merge,
+            answer =>
+              Redirect(navigator.nextPage(LandOrPropertyDisposalListPage(srn, answer), mode, request.userAnswers))
           )
-      )
+      }
+    }.merge
   }
 
-  private def withIndexedAddress(addresses: Map[String, Address])(
-    f: Map[Int, Address] => Result
-  ): Result = {
-    val maybeIndexedAddresses: Option[List[(Int, Address)]] = addresses.toList
-      .traverse { case (key, value) => key.toIntOption.map(_ -> value) }
+  private def getDisposals(
+    srn: Srn
+  )(implicit request: DataRequest[_]): Either[Result, Map[Max5000, List[Max50]]] =
+    request.userAnswers
+      .map(LandOrPropertyStillHeldPages(srn))
+      .map {
+        case (key, stillHeldMap) =>
+          val maybeLandOrPropertyIndex: Either[Result, Max5000] =
+            refineStringIndex[Max5000.Refined](key).getOrRecoverJourney
 
-    maybeIndexedAddresses match {
-      case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-      case Some(indexedAddresses) =>
-        val sortedMap = SortedMap.from(indexedAddresses)
-        f(sortedMap)
-    }
-  }
+          val maybeDisposalIndexes: Either[Result, List[Max50]] =
+            stillHeldMap.keys.toList
+              .map(refineStringIndex[Max50.Refined])
+              .traverse(_.getOrRecoverJourney)
+
+          for {
+            landOrPropertyIndex <- maybeLandOrPropertyIndex
+            disposalIndexes <- maybeDisposalIndexes
+          } yield (landOrPropertyIndex, disposalIndexes)
+      }
+      .toList
+      .sequence
+      .map(_.toMap)
+
+  private def getAddressesWithIndexes(srn: Srn, disposals: Map[Max5000, List[Max50]])(
+    implicit request: DataRequest[_]
+  ): Either[Result, List[((Max5000, List[Max50]), Address)]] =
+    disposals
+      .map {
+        case indexes @ (landOrPropertyIndex, _) =>
+          request.userAnswers
+            .get(LandOrPropertyAddressLookupPage(srn, landOrPropertyIndex))
+            .getOrRecoverJourney
+            .map(address => (indexes, address))
+      }
+      .toList
+      .sequence
+
 }
 
 object LandOrPropertyDisposalListController {
-  def form(formProvider: RadioListFormProvider): Form[Max5000] =
+  def form(formProvider: YesNoPageFormProvider): Form[Boolean] =
     formProvider(
       "landOrPropertyDisposalList.radios.error.required"
     )
 
-  private def buildRows(addresses: Map[Int, Address]): List[ListRadiosRow] =
-    addresses.flatMap {
-      case (index, address) =>
-        refineV[Max5000.Refined](index + 1).fold(
-          _ => Nil,
-          index =>
-            List(
-              ListRadiosRow(
-                index.value,
-                address.addressLine1
-              )
-            )
-        )
-    }.toList
+  private def rows(srn: Srn, addressesWithIndexes: List[((Max5000, List[Max50]), Address)]): List[ListRow] =
+    addressesWithIndexes.flatMap {
+      case ((index, disposalIndexes), address) =>
+        disposalIndexes.map { _ =>
+          ListRow(
+            Message("landOrPropertyDisposalList.row", address.addressLine1),
+            changeUrl = "url",
+            changeHiddenText = Message("landOrPropertyDisposalList.row.change.hidden"),
+            removeUrl = "url",
+            removeHiddenText = Message("landOrPropertyDisposalList.row.remove.hidden")
+          )
+        }
+    }
 
   def viewModel(
     srn: Srn,
     page: Int,
-    addresses: Map[Int, Address]
-  ): FormPageViewModel[ListRadiosViewModel] = {
-    val rows = buildRows(addresses)
+    addressesWithIndexes: List[((Max5000, List[Max50]), Address)]
+  ): FormPageViewModel[ListViewModel] = {
+
+    val disposalAmount = addressesWithIndexes.map { case ((_, disposalIndexes), _) => disposalIndexes.size }.sum
+    
+    val title =
+      if (disposalAmount == 1) "landOrPropertyDisposalList.title"
+      else "landOrPropertyDisposalList.title.plural"
+    val heading =
+      if (disposalAmount == 1) "landOrPropertyDisposalList.heading"
+      else "landOrPropertyDisposalList.heading.plural"
 
     val pagination = Pagination(
       currentPage = page,
-      pageSize = Constants.landOrPropertiesSize,
-      totalSize = rows.size,
-      page => routes.LandOrPropertyDisposalListController.onPageLoad(srn, page)
+      pageSize = Constants.landOrPropertyDisposalsSize,
+      disposalAmount,
+      routes.LandOrPropertyDisposalListController.onPageLoad(srn, _)
     )
 
     FormPageViewModel(
-      title = "landOrPropertyDisposalList.title",
-      heading = "landOrPropertyDisposalList.heading",
-      description = Some(
-        ParagraphMessage("landOrPropertyDisposalList.paragraph1") ++
-          ParagraphMessage("landOrPropertyDisposalList.paragraph2")
-      ),
-      page = ListRadiosViewModel(
-        legend = "landOrPropertyDisposalList.legend",
-        rows = rows,
+      title = Message(title, disposalAmount),
+      heading = Message(heading, disposalAmount),
+      description = Some(ParagraphMessage("landOrPropertyDisposalList.description")),
+      page = ListViewModel(
+        inset = "landOrPropertyDisposalList.inset",
+        rows(srn, addressesWithIndexes),
+        Message("landOrPropertyDisposalList.radios"),
+        showRadios = disposalAmount < maxLandOrPropertyDisposals,
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(
@@ -151,9 +193,9 @@ object LandOrPropertyDisposalListController {
         )
       ),
       refresh = None,
-      buttonText = Message("site.saveAndContinue"),
+      buttonText = "site.saveAndContinue",
       details = None,
-      routes.LandOrPropertyDisposalListController.onSubmit(srn, page)
+      onSubmit = routes.LandOrPropertyDisposalListController.onSubmit(srn, page)
     )
   }
 }
