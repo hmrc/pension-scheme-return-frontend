@@ -25,8 +25,8 @@ import views.html.ListRadiosView
 
 class LandOrPropertyDisposalAddressListControllerSpec extends ControllerBaseSpec {
 
-  private lazy val onPageLoad = routes.LandOrPropertyDisposalListController.onPageLoad(srn, page = 1)
-  private lazy val onSubmit = routes.LandOrPropertyDisposalListController.onSubmit(srn, page = 1)
+  private lazy val onPageLoad = routes.LandOrPropertyDisposalAddressListController.onPageLoad(srn, page = 1)
+  private lazy val onSubmit = routes.LandOrPropertyDisposalAddressListController.onSubmit(srn, page = 1)
 
   private val address1 = addressGen.sample.value
   private val address2 = addressGen.sample.value
@@ -37,7 +37,7 @@ class LandOrPropertyDisposalAddressListControllerSpec extends ControllerBaseSpec
     .unsafeSet(LandOrPropertyAddressLookupPage(srn, refineMV(1)), address1)
     .unsafeSet(LandOrPropertyAddressLookupPage(srn, refineMV(2)), address2)
 
-  "LandOrPropertyDisposalController" - {
+  "LandOrPropertyDisposalAddressListController" - {
 
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
       injected[ListRadiosView]

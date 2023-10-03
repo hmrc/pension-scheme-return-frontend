@@ -1320,5 +1320,5 @@ landOrPropertyDisposalList.row = Disposal of {0}
 landOrPropertyDisposalList.description = You must tell us about all land or property the scheme disposed of during the period of this return.
 landOrPropertyDisposalList.radios = Do you need to report another land or property disposal?
 landOrPropertyDisposalList.inset = You cannot add another land or property disposal as you have entered the maximum of 50.
-landOrPropertyDisposalList.pagination.label = Showing {0} - {1} of {2} disposals
+landOrPropertyDisposalList.pagination.label = Showing {0} - {1} of {2} land or property disposals
 landOrPropertyDisposalList.radios.error.required = Select yes if you need to report another land or property disposal
