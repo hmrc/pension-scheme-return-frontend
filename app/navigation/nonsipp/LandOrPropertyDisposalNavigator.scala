@@ -122,7 +122,7 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
         .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
 
     case LandPropertyDisposalCYAPage(srn) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+      controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalListController.onPageLoad(srn, 1)
 
     case LandOrPropertyDisposalListPage(srn, addDisposal @ true) =>
       controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalAddressListController.onPageLoad(srn, 1)
@@ -213,5 +213,7 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
       controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
         .onPageLoad(srn, landOrPropertyIndex, disposalIndex, CheckOrChange.Check)
 
+    case LandPropertyDisposalCYAPage(srn) =>
+      controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalListController.onPageLoad(srn, 1)
   }
 }

@@ -154,7 +154,7 @@ class LandPropertyDisposalCYAController @Inject()(
 
   def onSubmit(srn: Srn, index: Max5000, disposalIndex: Max50, checkOrChange: CheckOrChange): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      Redirect(navigator.nextPage(LandOrPropertyDisposalPage(srn), NormalMode, request.userAnswers))
+      Redirect(navigator.nextPage(LandPropertyDisposalCYAPage(srn), NormalMode, request.userAnswers))
     }
 }
 
