@@ -23,11 +23,11 @@ object HowDisposed {
 
   sealed trait HowDisposed
 
-  case object Sold extends WithName("sold") with HowDisposed
-  case object Transferred extends WithName("transferred") with HowDisposed
+  case object Sold extends WithName("Sold") with HowDisposed
+  case object Transferred extends WithName("Transferred") with HowDisposed
   case class Other(details: String) extends HowDisposed
 
-  case object Other extends WithName("other")
+  case object Other extends WithName("Other")
 
   implicit val jsLiteral: JavascriptLiteral[HowDisposed] = {
     case Sold => Sold.name
