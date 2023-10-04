@@ -353,25 +353,20 @@ object LandPropertyDisposalCYAController {
 
     val (recipientNoDetailsReasonKey, recipientNoDetailsUrl): (Message, String) = landOrPropertyDisposedType match {
       case Some(IdentityType.Individual) =>
-        (
-          Message("landPropertyDisposalCYA.section1.recipientDetails.noNinoReason", recipientName),
+        Message("landPropertyDisposalCYA.section1.recipientDetails.noNinoReason", recipientName) ->
           routes.IndividualBuyerNinoNumberController.onSubmit(srn, index, disposalIndex, mode).url
-        )
+
       case Some(IdentityType.UKCompany) =>
-        (
-          Message("landPropertyDisposalCYA.section1.recipientDetails.noCrnReason", recipientName),
+        Message("landPropertyDisposalCYA.section1.recipientDetails.noCrnReason", recipientName) ->
           routes.CompanyBuyerCrnController.onSubmit(srn, index, disposalIndex, mode).url
-        )
+
       case Some(IdentityType.UKPartnership) =>
-        (
-          Message("landPropertyDisposalCYA.section1.recipientDetails.noUtrReason", recipientName),
+        Message("landPropertyDisposalCYA.section1.recipientDetails.noUtrReason", recipientName) ->
           routes.PartnershipBuyerUtrController.onSubmit(srn, index, disposalIndex, mode).url
-        )
+
       case Some(IdentityType.Other) =>
-        (
-          Message("landPropertyDisposalCYA.section1.recipientDetails.other", recipientName),
+        Message("landPropertyDisposalCYA.section1.recipientDetails.other", recipientName) ->
           routes.OtherBuyerDetailsController.onSubmit(srn, index, disposalIndex, mode).url
-        )
 
     }
 
@@ -423,15 +418,15 @@ object LandPropertyDisposalCYAController {
                 .withVisuallyHiddenContent("landPropertyDisposalCYA.section1.recipientName.hidden")
             )
         ) :?+ recipientDetails.map(
-          res =>
-            CheckYourAnswersRowViewModel(recipientDetailsKey, res)
+          reason =>
+            CheckYourAnswersRowViewModel(recipientDetailsKey, reason)
               .withAction(
                 SummaryAction("site.change", recipientDetailsUrl)
                   .withVisuallyHiddenContent(recipientDetailsIdChangeHiddenKey)
               )
         ) :?+ recipientReasonNoDetails.map(
-          reason =>
-            CheckYourAnswersRowViewModel(recipientNoDetailsReasonKey, reason)
+          noreason =>
+            CheckYourAnswersRowViewModel(recipientNoDetailsReasonKey, noreason)
               .withAction(
                 SummaryAction("site.change", recipientNoDetailsUrl)
                   .withVisuallyHiddenContent(recipientDetailsNoIdChangeHiddenKey)
