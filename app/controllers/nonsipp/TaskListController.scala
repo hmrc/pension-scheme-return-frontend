@@ -18,28 +18,29 @@ package controllers.nonsipp
 
 import cats.implicits.toShow
 import com.google.inject.Inject
-import config.Refined.OneTo300
+import config.Refined.{OneTo300, OneTo5000}
 import controllers.actions._
 import eu.timepit.refined.refineV
 import models.SchemeId.Srn
 import models.requests.DataRequest
-import models.{DateRange, ManualOrUpload, NormalMode, PensionSchemeId, UserAnswers}
+import models.{DateRange, IdentitySubject, ManualOrUpload, NormalMode, PensionSchemeId, UserAnswers}
+import models.ConditionalYesNo._
 import pages.nonsipp.CheckReturnDatesPage
 import pages.nonsipp.accountingperiod.AccountingPeriods
-import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsNinoPages, MembersDetailsPages, NoNinoPages}
-import pages.nonsipp.schemedesignatory.{
-  ActiveBankAccountPage,
-  FeesCommissionsWagesSalariesPage,
-  HowManyMembersPage,
-  HowMuchCashPage,
-  ValueOfAssetsPage,
-  WhyNoBankAccountPage
+import pages.nonsipp.common.IdentityTypes
+import pages.nonsipp.loansmadeoroutstanding.{
+  IsIndividualRecipientConnectedPartyPages,
+  OutstandingArrearsOnLoanPages,
+  RecipientSponsoringEmployerConnectedPartyPages
 }
+import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsNinoPages, MembersDetailsPages, NoNinoPages}
+import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, ValueOfAssetsPage, WhyNoBankAccountPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.SchemeDateService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.DateTimeUtils.localDateShow
+import utils.nonsipp.TasklistStatusUtils._
 import viewmodels.DisplayMessage.{Heading2, LinkMessage, Message, ParagraphMessage}
 import viewmodels.implicits._
 import viewmodels.models.TaskListStatus.{Completed, InProgress, NotStarted, TaskListStatus, UnableToStart}
@@ -140,19 +141,6 @@ object TaskListController {
       taskListStatus
     )
   }
-  private def getBasicSchemeDetailsTaskListStatus(
-    srn: Srn,
-    userAnswers: UserAnswers,
-    pensionSchemeId: PensionSchemeId,
-    activeBankAccount: Option[Boolean],
-    whyNoBankAccountPage: Option[String]
-  ) =
-    (userAnswers.get(HowManyMembersPage(srn, pensionSchemeId)), activeBankAccount, whyNoBankAccountPage) match {
-      case (None, _, _) => InProgress
-      case (Some(_), Some(true), _) => Completed
-      case (Some(_), Some(false), Some(_)) => Completed
-      case (Some(_), Some(false), None) => InProgress
-    }
 
   private def getFinancialDetailsTaskListItem(
     srn: Srn,
@@ -186,16 +174,6 @@ object TaskListController {
       ),
       taskListStatus
     )
-  }
-
-  private def getFinancialDetailsTaskListStatus(userAnswers: UserAnswers, srn: Srn) = {
-    val totalSalaries = userAnswers.get(FeesCommissionsWagesSalariesPage(srn, NormalMode))
-    val howMuchCash = userAnswers.get(HowMuchCashPage(srn, NormalMode))
-    (howMuchCash, totalSalaries) match {
-      case (Some(_), Some(_)) => Completed
-      case (None, _) => NotStarted
-      case (Some(_), None) => InProgress
-    }
   }
 
   private def membersSection(srn: Srn, schemeName: String, userAnswers: UserAnswers) = {
@@ -244,29 +222,6 @@ object TaskListController {
     )
   }
 
-  private def getMembersTaskListStatus(userAnswers: UserAnswers, srn: Srn) = {
-    val membersDetailsPages = userAnswers.get(MembersDetailsPages(srn))
-    val ninoPages = userAnswers.get(MemberDetailsNinoPages(srn))
-    val noNinoPages = userAnswers.get(NoNinoPages(srn))
-    (membersDetailsPages, ninoPages, noNinoPages) match {
-      case (None, _, _) => NotStarted
-      case (Some(_), None, None) => InProgress
-      case (Some(memberDetails), ninos, noNinos) =>
-        if (memberDetails.isEmpty) {
-          NotStarted
-        } else {
-          val countMemberDetails = memberDetails.size
-          val countNinos = ninos.getOrElse(List.empty).size
-          val countNoninos = noNinos.getOrElse(List.empty).size
-          if (countMemberDetails > countNinos + countNoninos) {
-            InProgress
-          } else {
-            Completed
-          }
-        }
-    }
-  }
-
   private def getIncompleteMembersIndex(userAnswers: UserAnswers, srn: Srn) = {
     val membersDetailsPages = userAnswers.get(MembersDetailsPages(srn))
     val ninoPages = userAnswers.get(MemberDetailsNinoPages(srn))
@@ -287,6 +242,40 @@ object TaskListController {
             1
           } else {
             filtered(0) + 1
+          }
+        }
+    }
+  }
+
+  private def getIncompleteLoansIndex(userAnswers: UserAnswers, srn: Srn) = {
+    val whoReceivedTheLoanPages = userAnswers.get(IdentityTypes(srn, IdentitySubject.LoanRecipient))
+    val outstandingArrearsOnLoanPages = userAnswers.get(OutstandingArrearsOnLoanPages(srn))
+    val sponsoringPages = userAnswers.get(RecipientSponsoringEmployerConnectedPartyPages(srn))
+    val connectedPartyPages = userAnswers.get(IsIndividualRecipientConnectedPartyPages(srn))
+
+    (whoReceivedTheLoanPages, outstandingArrearsOnLoanPages, sponsoringPages, connectedPartyPages) match {
+      case (None, _, _, _) => 1
+      case (Some(_), None, _, _) => 1
+      case (Some(whoReceived), arrears, sponsoring, connected) =>
+        if (whoReceived.isEmpty) {
+          1
+        } else {
+          val whoReceivedIndexes = (0 to whoReceived.size - 1).toList
+          val arrearsIndexes = arrears.getOrElse(List.empty).map(_._1.toInt).toList
+          val sponsoringAndConnectedIndexes = sponsoring.getOrElse(List.empty).map(_._1.toInt).toList ++ connected
+            .getOrElse(List.empty)
+            .map(_._1.toInt)
+            .toList
+          val filtered = whoReceivedIndexes.filter(arrearsIndexes.indexOf(_) < 0)
+          val filteredSC = whoReceivedIndexes.filter(sponsoringAndConnectedIndexes.indexOf(_) < 0)
+          if (filtered.isEmpty && filteredSC.isEmpty) {
+            1
+          } else {
+            if (filteredSC.isEmpty) {
+              filtered(0) + 1 // index based on arrears page missing
+            } else {
+              filteredSC(0) + 1 // index based on sponsoring employer or individual connected party
+            }
           }
         }
     }
@@ -364,19 +353,39 @@ object TaskListController {
     )
   }
 
-  private def loansSection(srn: Srn, schemeName: String) = {
+  private def loansSection(srn: Srn, schemeName: String, userAnswers: UserAnswers) = {
     val prefix = s"nonsipp.tasklist.loans"
+    val taskListStatus: TaskListStatus = getLoansTaskListStatus(userAnswers, srn)
 
     TaskListSectionViewModel(
       s"$prefix.title",
       TaskListItemViewModel(
         LinkMessage(
-          Message(messageKey(prefix, "loansmade.title", UnableToStart), schemeName),
-          controllers.nonsipp.loansmadeoroutstanding.routes.LoansMadeOrOutstandingController
-            .onPageLoad(srn, NormalMode)
-            .url
+          Message(messageKey(prefix, "loansmade.title", taskListStatus), schemeName),
+          taskListStatus match {
+            case NotStarted =>
+              controllers.nonsipp.loansmadeoroutstanding.routes.LoansMadeOrOutstandingController
+                .onPageLoad(srn, NormalMode)
+                .url
+            case Completed =>
+              controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController
+                .onPageLoad(srn, 1, NormalMode)
+                .url
+            case InProgress =>
+              val incompleteIndex: Int = getIncompleteLoansIndex(userAnswers, srn)
+              refineV[OneTo5000](incompleteIndex).fold(
+                _ =>
+                  controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController
+                    .onPageLoad(srn, 1, NormalMode)
+                    .url,
+                index =>
+                  controllers.nonsipp.common.routes.IdentityTypeController
+                    .onPageLoad(srn, index, NormalMode, IdentitySubject.LoanRecipient)
+                    .url
+              )
+          }
         ),
-        NotStarted
+        taskListStatus
       ),
       TaskListItemViewModel(
         LinkMessage(
@@ -507,7 +516,7 @@ object TaskListController {
       schemeDetailsSection(srn, schemeName, userAnswers, pensionSchemeId),
       membersSection(srn, schemeName, userAnswers),
       memberPaymentsSection(srn),
-      loansSection(srn, schemeName),
+      loansSection(srn, schemeName, userAnswers),
       sharesSection(srn),
       landOrPropertySection(srn),
       bondsSection(srn),
