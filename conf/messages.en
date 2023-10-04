@@ -1315,7 +1315,7 @@ DisposalIndependentValuation.error.required = Select yes if the sale of the land
 
 checkYourAnswers.title = Check your answers
 checkYourAnswers.heading = Check your answers
-landPropertyDisposalCYA.section1.propertyInUk = {0}
+landPropertyDisposalCYA.section1.propertyInUk =  Which land or property was disposed of?
 landPropertyDisposalCYA.section1.landOrPropertyInUk.hidden = which land or property was disposed of
 landPropertyDisposalCYA.section1.propertyDisposed = How was {0} disposed of?
 landPropertyDisposalCYA.section1.propertyDisposed.hidden = how {0} was disposed of
@@ -1340,6 +1340,8 @@ landPropertyDisposalCYA.section1.landOrPropertyDisposalSellerConnectedParty = Is
 landPropertyDisposalCYA.section1.landOrPropertyDisposalSellerConnectedPartyInfo.hidden = if {0}’s is a connected party]
 landPropertyDisposalCYA.section1.totalProceedsSale = What were the total proceeds from the sale of {0}?
 landPropertyDisposalCYA.section1.totalProceedsSaleInfo.hidden = the total proceeds from the sale of {0}
+landPropertyDisposalCYA.section1.DisposalIndependentValuation = Was the sale of {0} supported by an independent valuation?
+landPropertyDisposalCYA.section1.DisposalIndependentValuationInfo.hidden = if the sale of {0} was supported by an independent valuation
 landPropertyDisposalCYA.section1.landOrPropertyStillHeld = Is any part of {0} still held by {1}?
 landPropertyDisposalCYA.section1.landOrPropertyStillHeldInfo.hidden = if any part of {0} is still held by the scheme
 landPropertyDisposalCYA.section1.propertyDisposedDetails = Details of how {0} was disposed of
