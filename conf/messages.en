@@ -1347,6 +1347,9 @@ landPropertyDisposalCYA.section1.landOrPropertyStillHeldInfo.hidden = if any par
 landPropertyDisposalCYA.section1.propertyDisposedDetails = Details of how {0} was disposed of
 landPropertyDisposalCYA.section1.propertyDisposedDetails.hidden = details of the disposal for {0}
 
+landPropertyDisposalCYA.change.title = Change details for land or property disposal
+landPropertyDisposalCYA.change.heading = Change details for the disposal of {0}
+
 landOrPropertyDisposalList.title = You have reported {0} land or property disposal
 landOrPropertyDisposalList.title.plural = You have reported {0} land or property disposals
 landOrPropertyDisposalList.heading = You have reported {0} land or property disposal

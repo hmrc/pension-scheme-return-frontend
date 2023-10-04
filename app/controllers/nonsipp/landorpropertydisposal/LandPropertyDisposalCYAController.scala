@@ -184,10 +184,11 @@ case class ViewModelParameters(
 object LandPropertyDisposalCYAController {
   def viewModel(parameters: ViewModelParameters): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](
-      title = parameters.checkOrChange.fold(check = "checkYourAnswers.title", change = "landOrPropertyCYA.change.title"),
+      title = parameters.checkOrChange
+        .fold(check = "checkYourAnswers.title", change = "landPropertyDisposalCYA.change.title"),
       heading = parameters.checkOrChange.fold(
         check = "checkYourAnswers.heading",
-        change = Message("landOrPropertyCYA.change.heading", parameters.addressLookUpPage.addressLine1)
+        change = Message("landPropertyDisposalCYA.change.heading", parameters.addressLookUpPage.addressLine1)
       ),
       description = Some(ParagraphMessage("landOrPropertyCYA.paragraph")),
       page = CheckYourAnswersViewModel(

@@ -27,7 +27,7 @@ object HowDisposed {
   case object Transferred extends WithName("Transferred") with HowDisposed
   case class Other(details: String) extends HowDisposed
 
-  case object Other extends WithName("Other")
+  case object Other extends WithName("other")
 
   implicit val jsLiteral: JavascriptLiteral[HowDisposed] = {
     case Sold => Sold.name
