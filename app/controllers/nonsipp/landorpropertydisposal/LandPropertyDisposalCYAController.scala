@@ -462,7 +462,7 @@ object LandPropertyDisposalCYAController {
               "landPropertyDisposalCYA.section1.DisposalIndependentValuation",
               addressLookUpPage.addressLine1
             ),
-            if (landOrPropertyStillHeld) "site.yes" else "site.no"
+            if (independentValuation.get) "site.yes" else "site.no"
           ).withAction(
             SummaryAction(
               "site.change",
