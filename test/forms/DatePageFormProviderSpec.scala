@@ -27,8 +27,6 @@ class DatePageFormProviderSpec extends FieldBehaviours {
 
   private val formProvider = new DatePageFormProvider()
 
-  import formProvider._
-
   val form: Form[LocalDate] = formProvider(
     DateFormErrors(
       "error.required.all",

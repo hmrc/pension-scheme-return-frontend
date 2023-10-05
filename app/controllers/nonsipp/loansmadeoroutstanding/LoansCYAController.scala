@@ -113,12 +113,15 @@ class LoansCYAController @Inject()(
             .get(SecurityGivenForLoanPage(srn, index))
             .map(_.value.toOption)
             .getOrRecoverJourney
+
+          schemeName = request.schemeDetails.schemeName
         } yield Ok(
           view(
             viewModel(
               ViewModelParameters(
                 srn,
                 index,
+                schemeName,
                 receivedLoanType,
                 recipientName,
                 recipientDetails,
@@ -151,6 +154,7 @@ class LoansCYAController @Inject()(
 case class ViewModelParameters(
   srn: Srn,
   index: Max5000,
+  schemeName: String,
   receivedLoanType: IdentityType,
   recipientName: String,
   recipientDetails: Option[String],
@@ -180,6 +184,7 @@ object LoansCYAController {
         sections(
           parameters.srn,
           parameters.index,
+          parameters.schemeName,
           parameters.receivedLoanType,
           parameters.recipientName,
           parameters.recipientDetails,
@@ -203,6 +208,7 @@ object LoansCYAController {
   private def sections(
     srn: Srn,
     index: Max5000,
+    schemeName: String,
     receivedLoanType: IdentityType,
     recipientName: String,
     recipientDetails: Option[String],
@@ -230,7 +236,7 @@ object LoansCYAController {
       recipientReasonNoDetails,
       connectedParty,
       mode
-    ) ++ loanPeriodSection(srn, index, recipientName, loanDate, assetsValue, loanPeriod, mode) ++
+    ) ++ loanPeriodSection(srn, index, schemeName, loanDate, assetsValue, loanPeriod, mode) ++
       loanAmountSection(srn, index, totalLoan, repayments, outstanding, returnEndDate, repaymentInstalments, mode) ++
       loanInterestSection(srn, index, interestPayable, interestRate, interestPayments, mode) ++
       loanSecuritySection(srn, index, securityOnLoan, mode) ++
@@ -421,7 +427,7 @@ object LoansCYAController {
   private def loanPeriodSection(
     srn: Srn,
     index: Max5000,
-    recipientName: String,
+    schemeName: String,
     loanDate: LocalDate,
     assetsValue: Money,
     loanPeriod: Int,
@@ -446,7 +452,7 @@ object LoansCYAController {
               ).withVisuallyHiddenContent("loanCheckYourAnswers.section2.loanDate.hidden")
             ),
           CheckYourAnswersRowViewModel(
-            Message("loanCheckYourAnswers.section2.assetsValue", recipientName),
+            Message("loanCheckYourAnswers.section2.assetsValue", schemeName),
             s"£${assetsValue.displayAs}"
           ).withAction(
             SummaryAction(
