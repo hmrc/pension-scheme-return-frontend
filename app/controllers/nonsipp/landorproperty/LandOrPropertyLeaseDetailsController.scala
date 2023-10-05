@@ -41,6 +41,7 @@ import viewmodels.models._
 import views.html.MultipleQuestionView
 
 import java.time.LocalDate
+import java.time.format.{DateTimeFormatter, FormatStyle}
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -114,7 +115,17 @@ object LandOrPropertyLeaseDetailsController {
       "landOrPropertyLeaseDetails.field3.error.required.two",
       "landOrPropertyLeaseDetails.field3.error.invalid.date",
       "landOrPropertyLeaseDetails.field3.error.invalid.characters",
-      List(DateFormErrors.failIfDateAfter(date, messages("landOrPropertyLeaseDetails.field3.error.future", date.show)))
+      List(
+        DateFormErrors.failIfDateAfter(date, messages("landOrPropertyLeaseDetails.field3.error.future", date.show)),
+        DateFormErrors
+          .failIfDateBefore(
+            Constants.earliestDate,
+            messages(
+              "landOrPropertyLeaseDetails.field3.error.after",
+              Constants.earliestDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG))
+            )
+          )
+      )
     )
 
   def form(accountingPeriodEndDate: LocalDate)(implicit messages: Messages): Form[(String, Money, LocalDate)] =

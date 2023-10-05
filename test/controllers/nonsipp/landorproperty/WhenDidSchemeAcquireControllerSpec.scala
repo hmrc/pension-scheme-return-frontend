@@ -48,6 +48,12 @@ class WhenDidSchemeAcquireControllerSpec extends ControllerBaseSpec {
   private lazy val onPageLoad = routes.WhenDidSchemeAcquireController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.WhenDidSchemeAcquireController.onSubmit(srn, index, NormalMode)
 
+  private val dateTooEarlyForm = List(
+    "value.day" -> "31",
+    "value.month" -> "12",
+    "value.year" -> "1899"
+  )
+
   "WhenDidSchemeAcquireController" - {
 
     val taxYear = Some(Left(dateRange))
@@ -109,6 +115,11 @@ class WhenDidSchemeAcquireControllerSpec extends ControllerBaseSpec {
         "value.month" -> "12",
         "value.year" -> "2020"
       ).before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear))
+    )
+
+    act.like(
+      invalidForm(onSubmit, populatedUserAnswers, dateTooEarlyForm: _*)
+        .before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear))
     )
   }
 }

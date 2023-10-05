@@ -163,6 +163,12 @@ trait BasicGenerators extends EitherValues {
   def date: Gen[LocalDate] =
     datesBetween(earliestDate, latestDate)
 
+  def tooEarlyDateGen: Gen[LocalDate] =
+    datesBetween(
+      LocalDate.of(-1000, 1, 1),
+      LocalDate.of(1899, 12, 31)
+    )
+
   val nonEmptyMessage: Gen[Message] = nonEmptyString.map(Message(_))
   val nonEmptyLinkMessage: Gen[LinkMessage] =
     for {
