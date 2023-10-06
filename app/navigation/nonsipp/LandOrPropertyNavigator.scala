@@ -38,7 +38,7 @@ object LandOrPropertyNavigator extends JourneyNavigator {
       if (userAnswers.get(page).contains(true)) {
         controllers.nonsipp.landorproperty.routes.WhatYouWillNeedLandOrPropertyController.onPageLoad(srn)
       } else {
-        controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedController.onPageLoad(srn, NormalMode)
+        controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
       }
 
     case WhatYouWillNeedLandOrPropertyPage(srn) =>

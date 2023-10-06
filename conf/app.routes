@@ -3,6 +3,7 @@
 ->          /hmrc-frontend                                                              hmrcfrontend.Routes
 ->          /                                                                           landorproperty.Routes
 ->          /                                                                           landorpropertydisposal.Routes
+->          /                                                                           moneyborrowed.Routes
 
 GET         /                                                                           controllers.IndexController.onPageLoad()
 
@@ -201,11 +202,6 @@ GET         /:srn/unregulated-connected-party-bonds-held                        
 POST        /:srn/unregulated-connected-party-bonds-held                                controllers.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 GET         /:srn/change-unregulated-connected-party-bonds-held                         controllers.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST        /:srn/change-unregulated-connected-party-bonds-held                         controllers.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldController.onSubmit(srn: Srn, mode: Mode = CheckMode)
-
-GET         /:srn/money-borrowed                                                        controllers.nonsipp.moneyborrowed.MoneyBorrowedController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST        /:srn/money-borrowed                                                        controllers.nonsipp.moneyborrowed.MoneyBorrowedController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-GET         /:srn/change-money-borrowed                                                 controllers.nonsipp.moneyborrowed.MoneyBorrowedController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST        /:srn/change-money-borrowed                                                 controllers.nonsipp.moneyborrowed.MoneyBorrowedController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
 GET         /:srn/pension-payments-received                                             controllers.nonsipp.memberpayments.PensionPaymentsReceivedController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST        /:srn/pension-payments-received                                             controllers.nonsipp.memberpayments.PensionPaymentsReceivedController.onSubmit(srn: Srn, mode: Mode = NormalMode)

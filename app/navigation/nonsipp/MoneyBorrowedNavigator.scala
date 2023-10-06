@@ -19,7 +19,7 @@ package navigation.nonsipp
 import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.moneyborrowed.MoneyBorrowedPage
+import pages.nonsipp.moneyborrowed.{MoneyBorrowedPage, WhatYouWillNeedMoneyBorrowedPage}
 import play.api.mvc.Call
 
 object MoneyBorrowedNavigator extends JourneyNavigator {
@@ -27,11 +27,13 @@ object MoneyBorrowedNavigator extends JourneyNavigator {
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
     case page @ MoneyBorrowedPage(srn) =>
       if (userAnswers.get(page).contains(true)) {
-        controllers.routes.UnauthorisedController.onPageLoad()
+        controllers.nonsipp.moneyborrowed.routes.WhatYouWillNeedMoneyBorrowedController.onPageLoad(srn)
       } else {
-        controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldController
-          .onPageLoad(srn, NormalMode)
+        controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
       }
+
+    case WhatYouWillNeedMoneyBorrowedPage(srn) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty
