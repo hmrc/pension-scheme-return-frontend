@@ -47,7 +47,7 @@ class DisposalIndependentValuationControllerSpec extends ControllerBaseSpec {
       val formProvider = application.injector.instanceOf[YesNoPageFormProvider]
       val testForm = DisposalIndependentValuationController.form(formProvider)
       val boundForm = testForm.bind(Map("value" -> ""))
-      boundForm.errors must contain(FormError("value", "DisposalIndependentValuation.error.required"))
+      boundForm.errors must contain(FormError("value", "disposalIndependentValuation.error.required"))
     }
   }
 
@@ -61,8 +61,8 @@ class DisposalIndependentValuationControllerSpec extends ControllerBaseSpec {
             srn,
             index,
             disposalIndex,
-            NormalMode,
-            address.addressLine1
+            address.addressLine1,
+            NormalMode
           )
         )
     })
@@ -73,7 +73,7 @@ class DisposalIndependentValuationControllerSpec extends ControllerBaseSpec {
           injected[YesNoPageView]
             .apply(
               form(injected[YesNoPageFormProvider]).fill(true),
-              viewModel(srn, index, disposalIndex, NormalMode, address.addressLine1)
+              viewModel(srn, index, disposalIndex, address.addressLine1, NormalMode)
             )
       }
     )

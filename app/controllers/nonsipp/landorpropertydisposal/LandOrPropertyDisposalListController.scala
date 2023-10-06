@@ -25,9 +25,10 @@ import controllers.PSRController
 import controllers.actions._
 import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalListController._
 import forms.YesNoPageFormProvider
+import models.CheckOrChange.Change
 import models.SchemeId.Srn
 import models.requests.DataRequest
-import models.{Address, Mode, Pagination}
+import models.{Address, CheckOrChange, Mode, NormalMode, Pagination}
 import navigation.Navigator
 import pages.nonsipp.landorproperty.LandOrPropertyAddressLookupPage
 import pages.nonsipp.landorpropertydisposal._
@@ -138,10 +139,12 @@ object LandOrPropertyDisposalListController {
   private def rows(srn: Srn, addressesWithIndexes: List[((Max5000, List[Max50]), Address)]): List[ListRow] =
     addressesWithIndexes.flatMap {
       case ((index, disposalIndexes), address) =>
-        disposalIndexes.map { _ =>
+        disposalIndexes.map { x =>
           ListRow(
             Message("landOrPropertyDisposalList.row", address.addressLine1),
-            changeUrl = "url",
+            changeUrl = routes.LandPropertyDisposalCYAController
+              .onPageLoad(srn, index, x, Change)
+              .url,
             changeHiddenText = Message("landOrPropertyDisposalList.row.change.hidden"),
             removeUrl = "url",
             removeHiddenText = Message("landOrPropertyDisposalList.row.remove.hidden")
@@ -156,7 +159,7 @@ object LandOrPropertyDisposalListController {
   ): FormPageViewModel[ListViewModel] = {
 
     val disposalAmount = addressesWithIndexes.map { case ((_, disposalIndexes), _) => disposalIndexes.size }.sum
-    
+
     val title =
       if (disposalAmount == 1) "landOrPropertyDisposalList.title"
       else "landOrPropertyDisposalList.title.plural"

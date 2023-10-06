@@ -1312,9 +1312,50 @@ landOrPropertyDisposalSellerConnectedParty.title = Is the seller a connected par
 landOrPropertyDisposalSellerConnectedParty.heading = Is {0} a connected party?
 landOrPropertyDisposalSellerConnectedParty.error.required = Select yes if the seller is a connected party
 
-DisposalIndependentValuation.title = Was the sale of the land or property supported by an independent valuation?
-DisposalIndependentValuation.heading = Was the sale of {0} supported by an independent valuation?
-DisposalIndependentValuation.error.required = Select yes if the sale of the land or property was supported by an independent valuation
+disposalIndependentValuation.title = Was the sale of the land or property supported by an independent valuation?
+disposalIndependentValuation.heading = Was the sale of {0} supported by an independent valuation?
+disposalIndependentValuation.error.required = Select yes if the sale of the land or property was supported by an independent valuation
+
+
+checkYourAnswers.title = Check your answers
+checkYourAnswers.heading = Check your answers
+landPropertyDisposalCYA.section1.propertyInUk =  Which land or property was disposed of?
+landPropertyDisposalCYA.section1.landOrPropertyInUk.hidden = which land or property was disposed of
+landPropertyDisposalCYA.section1.propertyDisposed = How was {0} disposed of?
+landPropertyDisposalCYA.section1.propertyDisposed.hidden = how {0} was disposed of
+landPropertyDisposalCYA.section1.whenWasPropertySold = When was {0} sold?
+landPropertyDisposalCYA.section1.whenWasPropertySold.hidden = when {0} was sold
+landPropertyDisposalCYA.section1.whoPurchasedLandOrProperty = Who purchased {0}?
+landPropertyDisposalCYA.section1.whoPurchasedLandOrProperty.hidden =  who purchased {0}
+landPropertyDisposalCYA.section1.recipientName = Buyer’s name
+landPropertyDisposalCYA.section1.recipientName.hidden = buyer’s name
+landPropertyDisposalCYA.section1.recipientDetails.nino = {0}’s National Insurance number
+landPropertyDisposalCYA.section1.recipientDetails.nino.hidden = buyer’s National Insurance number
+landPropertyDisposalCYA.section1.recipientDetails.crn = Company Registration Number (CRN)
+landPropertyDisposalCYA.section1.recipientDetails.crn.hidden = Company Registration Number
+landPropertyDisposalCYA.section1.recipientDetails.utr = Unique Taxpayer Reference (UTR)
+landPropertyDisposalCYA.section1.recipientDetails.utr.hidden = Unique Taxpayer Reference
+landPropertyDisposalCYA.section1.recipientDetails.other = details
+landPropertyDisposalCYA.section1.recipientDetails.other.hidden = details
+landPropertyDisposalCYA.section1.recipientDetails.noNinoReason = Reason you cannot provide {0}’s National Insurance number
+landPropertyDisposalCYA.section1.recipientDetails.noNinoReason.hidden = reason you cannot provide buyer’s National Insurance number
+landPropertyDisposalCYA.section1.recipientDetails.noCrnReason = Reason you cannot provide {0}’s Company Registration Number (CRN)
+landPropertyDisposalCYA.section1.recipientDetails.noCrnReason.hidden = reason you cannot provide buyer’s Company Registration Number
+landPropertyDisposalCYA.section1.recipientDetails.noUtrReason = Reason you cannot provide {0}’s Unique Taxpayer Reference (UTR)
+landPropertyDisposalCYA.section1.recipientDetails.noUtrReason.hidden = reason you cannot provide buyer’s Unique Taxpayer Reference
+landPropertyDisposalCYA.section1.landOrPropertyDisposalSellerConnectedParty = Is {0} a connected party?
+landPropertyDisposalCYA.section1.landOrPropertyDisposalSellerConnectedPartyInfo.hidden = if {0} is a connected party]
+landPropertyDisposalCYA.section1.totalProceedsSale = What were the total proceeds from the sale of {0}?
+landPropertyDisposalCYA.section1.totalProceedsSaleInfo.hidden = the total proceeds from the sale of {0}
+landPropertyDisposalCYA.section1.DisposalIndependentValuation = Was the sale of {0} supported by an independent valuation?
+landPropertyDisposalCYA.section1.DisposalIndependentValuationInfo.hidden = if the sale of {0} was supported by an independent valuation
+landPropertyDisposalCYA.section1.landOrPropertyStillHeld = Is any part of {0} still held by {1}?
+landPropertyDisposalCYA.section1.landOrPropertyStillHeldInfo.hidden = if any part of {0} is still held by the scheme
+landPropertyDisposalCYA.section1.propertyDisposedDetails = Details of how {0} was disposed of
+landPropertyDisposalCYA.section1.propertyDisposedDetails.hidden = details of the disposal for {0}
+
+landPropertyDisposalCYA.change.title = Change details for land or property disposal
+landPropertyDisposalCYA.change.heading = Change details for the disposal of {0}
 
 landOrPropertyDisposalList.title = You have reported {0} land or property disposal
 landOrPropertyDisposalList.title.plural = You have reported {0} land or property disposals
