@@ -372,7 +372,7 @@ object LandPropertyDisposalCYAController {
 
     List(
       CheckYourAnswersSection(
-        Some(Heading2.medium("")),
+        None,
         List(
           CheckYourAnswersRowViewModel(
             Message("landPropertyDisposalCYA.section1.propertyInUk", addressLookUpPage.addressLine1),
@@ -507,7 +507,7 @@ object LandPropertyDisposalCYAController {
   ): List[CheckYourAnswersSection] =
     List(
       CheckYourAnswersSection(
-        Some(Heading2.medium("")),
+        None,
         List(
           CheckYourAnswersRowViewModel(
             Message("landPropertyDisposalCYA.section1.propertyInUk", addressLookUpPage.addressLine1),
@@ -562,7 +562,7 @@ object LandPropertyDisposalCYAController {
   ): List[CheckYourAnswersSection] =
     List(
       CheckYourAnswersSection(
-        Some(Heading2.medium("")),
+        None,
         List(
           CheckYourAnswersRowViewModel(
             Message("landPropertyDisposalCYA.section1.propertyInUk", addressLookUpPage.addressLine1),
