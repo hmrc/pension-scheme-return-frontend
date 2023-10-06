@@ -1322,3 +1322,16 @@ landOrPropertyDisposalList.radios = Do you need to report another land or proper
 landOrPropertyDisposalList.inset = You cannot add another land or property disposal as you have entered the maximum of 50.
 landOrPropertyDisposalList.pagination.label = Showing {0} - {1} of {2} land or property disposals
 landOrPropertyDisposalList.radios.error.required = Select yes if you need to report another land or property disposal
+
+whatYouWillNeedMoneyBorrowed.title = Money borrowed by the scheme
+whatYouWillNeedMoneyBorrowed.heading = Money borrowed by {0}
+whatYouWillNeedMoneyBorrowed.paragraph1 = Answer these questions for one instance of borrowing at a time. If you need to add more, you will be able to do this later.
+whatYouWillNeedMoneyBorrowed.paragraph2 = You must tell us about all times the scheme borrowed money during the period of this return.
+whatYouWillNeedMoneyBorrowed.paragraph3 = For each instance of borrowing, you need to tell us:
+whatYouWillNeedMoneyBorrowed.list1 = the name of the lender
+whatYouWillNeedMoneyBorrowed.list2 = if the lender is a connected party
+whatYouWillNeedMoneyBorrowed.list3 = the amount of money borrowed by the scheme
+whatYouWillNeedMoneyBorrowed.list4 = the interest rate
+whatYouWillNeedMoneyBorrowed.list5 = when the scheme borrowed this money
+whatYouWillNeedMoneyBorrowed.list6 = the value of the scheme’s assets on the date the money was borrowed
+whatYouWillNeedMoneyBorrowed.list7 = why the scheme borrowed this money

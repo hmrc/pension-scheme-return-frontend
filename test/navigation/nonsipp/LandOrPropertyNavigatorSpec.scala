@@ -56,9 +56,9 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateToWithData(
           LandOrPropertyHeldPage,
           Gen.const(false),
-          controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedController.onPageLoad
+          (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
         )
-        .withName("go from land or property held page to money borrowed page when no selected")
+        .withName("go from land or property held page to task list page on no")
     )
 
     act.like(
