@@ -380,7 +380,7 @@ object LandPropertyDisposalCYAController {
           ).withAction(
             SummaryAction(
               "site.change",
-              routes.LandOrPropertyDisposalListController.onSubmit(srn, index.value).url
+              routes.LandOrPropertyDisposalAddressListController.onSubmit(srn, index.value).url
             ).withVisuallyHiddenContent("landPropertyDisposalCYA.section1.landOrPropertyInUk.hidden")
           ),
           CheckYourAnswersRowViewModel(
@@ -515,7 +515,7 @@ object LandPropertyDisposalCYAController {
           ).withAction(
             SummaryAction(
               "site.change",
-              routes.LandOrPropertyDisposalListController.onSubmit(srn, index.value).url
+              routes.LandOrPropertyDisposalAddressListController.onSubmit(srn, index.value).url
             ).withVisuallyHiddenContent("landPropertyDisposalCYA.section1.landOrPropertyInUk.hidden")
           ),
           CheckYourAnswersRowViewModel(
@@ -570,7 +570,7 @@ object LandPropertyDisposalCYAController {
           ).withAction(
             SummaryAction(
               "site.change",
-              routes.LandOrPropertyDisposalListController.onSubmit(srn, index.value).url
+              routes.LandOrPropertyDisposalAddressListController.onSubmit(srn, index.value).url
             ).withVisuallyHiddenContent("landPropertyDisposalCYA.section1.landOrPropertyInUk.hidden")
           ),
           CheckYourAnswersRowViewModel(

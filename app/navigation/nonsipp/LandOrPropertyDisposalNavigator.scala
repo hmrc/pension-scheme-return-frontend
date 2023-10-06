@@ -220,7 +220,9 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
       controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
         .onPageLoad(srn, landOrPropertyIndex, disposalIndex, CheckOrChange.Check)
 
-    case LandPropertyDisposalCYAPage(srn) =>
-      controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalListController.onPageLoad(srn, 1)
+    case LandOrPropertyDisposalAddressListPage(srn, choice) =>
+      controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
+        .onPageLoad(srn, choice, refineMV(1), CheckOrChange.Change)
+
   }
 }
