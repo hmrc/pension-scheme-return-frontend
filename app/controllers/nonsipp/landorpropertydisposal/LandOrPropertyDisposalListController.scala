@@ -28,7 +28,7 @@ import forms.YesNoPageFormProvider
 import models.CheckOrChange.Change
 import models.SchemeId.Srn
 import models.requests.DataRequest
-import models.{Address, CheckOrChange, Mode, NormalMode, Pagination}
+import models.{Address, Mode, Pagination}
 import navigation.Navigator
 import pages.nonsipp.landorproperty.LandOrPropertyAddressLookupPage
 import pages.nonsipp.landorpropertydisposal._

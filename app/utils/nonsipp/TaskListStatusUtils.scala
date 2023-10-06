@@ -16,11 +16,11 @@
 
 package utils.nonsipp
 
+import models.ConditionalYesNo._
 import models.SchemeId.Srn
 import models.{IdentitySubject, NormalMode, PensionSchemeId, UserAnswers}
 import pages.nonsipp.common.IdentityTypes
 import pages.nonsipp.loansmadeoroutstanding.{
-  IsIndividualRecipientConnectedPartyPage,
   IsIndividualRecipientConnectedPartyPages,
   LoansMadeOrOutstandingPage,
   OutstandingArrearsOnLoanPages,
@@ -28,17 +28,18 @@ import pages.nonsipp.loansmadeoroutstanding.{
 }
 import pages.nonsipp.memberdetails.{MemberDetailsNinoPages, MembersDetailsPages, NoNinoPages}
 import pages.nonsipp.schemedesignatory.{FeesCommissionsWagesSalariesPage, HowManyMembersPage, HowMuchCashPage}
+import viewmodels.models.TaskListStatus
 import viewmodels.models.TaskListStatus.{Completed, InProgress, NotStarted}
-import models.ConditionalYesNo._
 
-object TasklistStatusUtils {
+object TaskListStatusUtils {
+
   def getBasicSchemeDetailsTaskListStatus(
     srn: Srn,
     userAnswers: UserAnswers,
     pensionSchemeId: PensionSchemeId,
     activeBankAccount: Option[Boolean],
     whyNoBankAccountPage: Option[String]
-  ) =
+  ): TaskListStatus.TaskListStatus with Serializable =
     (userAnswers.get(HowManyMembersPage(srn, pensionSchemeId)), activeBankAccount, whyNoBankAccountPage) match {
       case (None, _, _) => InProgress
       case (Some(_), Some(true), _) => Completed

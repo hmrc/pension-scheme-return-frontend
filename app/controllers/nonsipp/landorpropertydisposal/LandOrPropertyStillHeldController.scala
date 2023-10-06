@@ -21,15 +21,11 @@ import controllers.PSRController
 import controllers.actions._
 import controllers.nonsipp.landorpropertydisposal.LandOrPropertyStillHeldController._
 import forms.YesNoPageFormProvider
-import models.{HowDisposed, Mode}
 import models.SchemeId.Srn
+import models.{HowDisposed, Mode}
 import navigation.Navigator
 import pages.nonsipp.landorproperty.LandOrPropertyAddressLookupPage
-import pages.nonsipp.landorpropertydisposal.{
-  HowWasPropertyDisposedOfPage,
-  LandOrPropertyStillHeldPage,
-  LandPropertyDisposalCYAPage
-}
+import pages.nonsipp.landorpropertydisposal.{HowWasPropertyDisposedOfPage, LandOrPropertyStillHeldPage}
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
