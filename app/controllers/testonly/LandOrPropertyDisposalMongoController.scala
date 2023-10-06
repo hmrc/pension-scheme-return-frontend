@@ -17,17 +17,12 @@
 package controllers.testonly
 
 import cats.implicits._
-import config.Refined.{Max50, Max5000, OneTo5000}
+import config.Refined.{Max50, Max5000}
 import controllers.actions.IdentifyAndRequireData
 import eu.timepit.refined._
 import models.SchemeId.Srn
-import models.{Address, RecipientDetails, UserAnswers}
-import pages.nonsipp.landorproperty.{LandOrPropertyAddressLookupPage, LandPropertyInUKPage}
-import pages.nonsipp.landorpropertydisposal.{
-  IndividualBuyerNinoNumberPage,
-  LandOrPropertyStillHeldPage,
-  OtherBuyerDetailsPage
-}
+import models.{RecipientDetails, UserAnswers}
+import pages.nonsipp.landorpropertydisposal.{LandOrPropertyStillHeldPage, OtherBuyerDetailsPage}
 import play.api.i18n.I18nSupport
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
