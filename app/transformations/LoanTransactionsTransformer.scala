@@ -23,6 +23,7 @@ import eu.timepit.refined.refineV
 import models.ConditionalYesNo._
 import models.IdentityType.reads
 import models.SchemeId.Srn
+import models.SponsoringOrConnectedParty.ConnectedParty
 import models.requests.DataRequest
 import models.requests.psr._
 import models.{IdentitySubject, IdentityType}
@@ -39,7 +40,7 @@ import javax.inject.Inject
 @Singleton()
 class LoanTransactionsTransformer @Inject()() {
 
-  private type OptionalRecipientDetails = Option[(String, RecipientIdentityType, Option[Boolean], Option[String])]
+  private type OptionalRecipientDetails = Option[(String, RecipientIdentityType, Boolean, Option[String])]
 
   def transform(srn: Srn)(implicit request: DataRequest[_]): List[LoanTransactions] = {
     request.userAnswers
@@ -60,20 +61,20 @@ class LoanTransactionsTransformer @Inject()() {
                       (
                         name,
                         RecipientIdentityType(IdentityType.Individual, None, Some(noNinoReason), None),
-                        Some(connectedParty),
+                        connectedParty,
                         None
                       )
                     case (name, Right(nino), connectedParty) =>
                       (
                         name,
                         RecipientIdentityType(IdentityType.Individual, Some(nino.value), None, None),
-                        Some(connectedParty),
+                        connectedParty,
                         None
                       )
                   }
                 case IdentityType.UKCompany =>
                   val recipientSponsoringEmployer =
-                    request.userAnswers.get(RecipientSponsoringEmployerConnectedPartyPage(srn, index)).map(_.name)
+                    request.userAnswers.get(RecipientSponsoringEmployerConnectedPartyPage(srn, index))
                   (
                     request.userAnswers.get(CompanyRecipientNamePage(srn, index)),
                     request.userAnswers
@@ -84,20 +85,20 @@ class LoanTransactionsTransformer @Inject()() {
                       (
                         name,
                         RecipientIdentityType(IdentityType.UKCompany, None, Some(noCrnReason), None),
-                        None,
-                        recipientSponsoringEmployer
+                        recipientSponsoringEmployer.contains(ConnectedParty),
+                        recipientSponsoringEmployer.map(_.name)
                       )
                     case (name, Right(crn)) =>
                       (
                         name,
                         RecipientIdentityType(IdentityType.UKCompany, Some(crn.value), None, None),
-                        None,
-                        recipientSponsoringEmployer
+                        recipientSponsoringEmployer.contains(ConnectedParty),
+                        recipientSponsoringEmployer.map(_.name)
                       )
                   }
                 case IdentityType.UKPartnership =>
                   val recipientSponsoringEmployer =
-                    request.userAnswers.get(RecipientSponsoringEmployerConnectedPartyPage(srn, index)).map(_.name)
+                    request.userAnswers.get(RecipientSponsoringEmployerConnectedPartyPage(srn, index))
                   (
                     request.userAnswers.get(PartnershipRecipientNamePage(srn, index)),
                     request.userAnswers
@@ -108,8 +109,8 @@ class LoanTransactionsTransformer @Inject()() {
                       (
                         name,
                         RecipientIdentityType(IdentityType.UKPartnership, None, Some(noUtrReason), None),
-                        None,
-                        recipientSponsoringEmployer
+                        recipientSponsoringEmployer.contains(ConnectedParty),
+                        recipientSponsoringEmployer.map(_.name)
                       )
                     case (name, Right(utr)) =>
                       (
@@ -120,13 +121,13 @@ class LoanTransactionsTransformer @Inject()() {
                           None,
                           None
                         ),
-                        None,
-                        recipientSponsoringEmployer
+                        recipientSponsoringEmployer.contains(ConnectedParty),
+                        recipientSponsoringEmployer.map(_.name)
                       )
                   }
                 case IdentityType.Other =>
                   val recipientSponsoringEmployer =
-                    request.userAnswers.get(RecipientSponsoringEmployerConnectedPartyPage(srn, index)).map(_.name)
+                    request.userAnswers.get(RecipientSponsoringEmployerConnectedPartyPage(srn, index))
                   request.userAnswers
                     .get(OtherRecipientDetailsPage(srn, index, IdentitySubject.LoanRecipient))
                     .map(
@@ -134,15 +135,15 @@ class LoanTransactionsTransformer @Inject()() {
                         (
                           other.name,
                           RecipientIdentityType(IdentityType.Other, None, None, Some(other.description)),
-                          None,
-                          recipientSponsoringEmployer
+                          recipientSponsoringEmployer.contains(ConnectedParty),
+                          recipientSponsoringEmployer.map(_.name)
                         )
                     )
               }
 
               for {
                 recipientIdentityDetails <- optRecipientIdentityDetails
-                (recipientName, recipientIdentityType, optConnectedParty, optRecipientSponsoringEmployer) = recipientIdentityDetails
+                (recipientName, recipientIdentityType, connectedParty, optRecipientSponsoringEmployer) = recipientIdentityDetails
                 equalInstallments <- request.userAnswers.get(AreRepaymentsInstalmentsPage(srn, index))
                 datePeriodLoanDetails <- request.userAnswers.get(DatePeriodLoanPage(srn, index))
                 loanAmountDetails <- request.userAnswers.get(AmountOfTheLoanPage(srn, index))
@@ -157,7 +158,7 @@ class LoanTransactionsTransformer @Inject()() {
                 LoanTransactions(
                   recipientIdentityType,
                   recipientName,
-                  optConnectedParty,
+                  connectedParty,
                   optRecipientSponsoringEmployer,
                   LoanPeriod(datePeriodLoanDetails._1, datePeriodLoanDetails._2.value, datePeriodLoanDetails._3),
                   LoanAmountDetails(

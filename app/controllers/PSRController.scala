@@ -20,7 +20,7 @@ import cats.Applicative
 import cats.data.{EitherT, NonEmptyList}
 import cats.syntax.applicative._
 import cats.syntax.either._
-import config.Refined.{Max3, Max50}
+import config.Refined.Max3
 import eu.timepit.refined.api.{Refined, Validate}
 import eu.timepit.refined.refineV
 import models.DateRange

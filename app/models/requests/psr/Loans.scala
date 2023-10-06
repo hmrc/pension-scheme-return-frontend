@@ -26,7 +26,7 @@ case class Loans(schemeHadLoans: Boolean, loanTransactions: Seq[LoanTransactions
 case class LoanTransactions(
   recipientIdentityType: RecipientIdentityType,
   loanRecipientName: String,
-  optConnectedPartyStatus: Option[Boolean],
+  connectedPartyStatus: Boolean,
   optRecipientSponsoringEmployer: Option[String],
   datePeriodLoanDetails: LoanPeriod,
   loanAmountDetails: LoanAmountDetails,

@@ -84,7 +84,7 @@ class LoanTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
         LoanTransactions(
           RecipientIdentityType(IdentityType.Individual, Some(nino.value), None, None),
           "IndividualRecipientName",
-          Some(true),
+          true,
           None,
           LoanPeriod(localDate, Double.MinPositiveValue, Int.MaxValue),
           LoanAmountDetails(money.value, money.value, money.value),
@@ -116,7 +116,7 @@ class LoanTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
         LoanTransactions(
           RecipientIdentityType(IdentityType.Individual, None, Some("noNinoReason"), None),
           "IndividualRecipientName",
-          Some(false),
+          false,
           None,
           LoanPeriod(localDate, Double.MinPositiveValue, Int.MaxValue),
           LoanAmountDetails(money.value, money.value, money.value),
@@ -151,7 +151,7 @@ class LoanTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
         LoanTransactions(
           RecipientIdentityType(IdentityType.UKCompany, Some(crn.value), None, None),
           "CompanyRecipientName",
-          None,
+          false,
           Some(Sponsoring.name),
           LoanPeriod(localDate, Double.MinPositiveValue, Int.MaxValue),
           LoanAmountDetails(money.value, money.value, money.value),
@@ -185,7 +185,7 @@ class LoanTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
         LoanTransactions(
           RecipientIdentityType(IdentityType.UKCompany, None, Some("noCrnReason"), None),
           "CompanyRecipientName",
-          None,
+          false,
           None,
           LoanPeriod(localDate, Double.MinPositiveValue, Int.MaxValue),
           LoanAmountDetails(money.value, money.value, money.value),
@@ -220,7 +220,7 @@ class LoanTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
         LoanTransactions(
           RecipientIdentityType(IdentityType.UKPartnership, Some(utr.value), None, None),
           "PartnershipRecipientName",
-          None,
+          true,
           Some(ConnectedParty.name),
           LoanPeriod(localDate, Double.MinPositiveValue, Int.MaxValue),
           LoanAmountDetails(money.value, money.value, money.value),
@@ -255,7 +255,7 @@ class LoanTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
         LoanTransactions(
           RecipientIdentityType(IdentityType.UKPartnership, None, Some("noUtrReason"), None),
           "PartnershipRecipientName",
-          None,
+          false,
           Some(Neither.name),
           LoanPeriod(localDate, Double.MinPositiveValue, Int.MaxValue),
           LoanAmountDetails(money.value, money.value, money.value),
@@ -289,7 +289,7 @@ class LoanTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
         LoanTransactions(
           RecipientIdentityType(IdentityType.Other, None, None, Some("otherDescription")),
           "OtherRecipientDetailsName",
-          None,
+          false,
           Some(Neither.name),
           LoanPeriod(localDate, Double.MinPositiveValue, Int.MaxValue),
           LoanAmountDetails(money.value, money.value, money.value),
