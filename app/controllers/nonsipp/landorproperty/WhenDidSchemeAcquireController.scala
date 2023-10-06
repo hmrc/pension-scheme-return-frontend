@@ -17,6 +17,7 @@
 package controllers.nonsipp.landorproperty
 
 import cats.implicits.toShow
+import config.Constants
 import config.Refined.Max5000
 import controllers.PSRController
 import controllers.actions._
@@ -39,6 +40,7 @@ import viewmodels.models.{DatePageViewModel, FormPageViewModel}
 import views.html.DatePageView
 
 import java.time.LocalDate
+import java.time.format.{DateTimeFormatter, FormatStyle}
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -113,7 +115,15 @@ object WhenDidSchemeAcquireController {
       invalidCharacters = "whenDidSchemeAcquireLandOrProperty.dateOfAcquired.error.invalid.characters",
       validators = List(
         DateFormErrors
-          .failIfDateAfter(date, messages("whenDidSchemeAcquireLandOrProperty.dateOfAcquired.error.future", date.show))
+          .failIfDateAfter(date, messages("whenDidSchemeAcquireLandOrProperty.dateOfAcquired.error.future", date.show)),
+        DateFormErrors
+          .failIfDateBefore(
+            Constants.earliestDate,
+            messages(
+              "whenDidSchemeAcquireLandOrProperty.dateOfAcquired.error.after",
+              Constants.earliestDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG))
+            )
+          )
       )
     )
   )

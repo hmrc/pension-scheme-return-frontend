@@ -16,6 +16,7 @@
 
 package controllers.nonsipp.memberdetails
 
+import config.Constants
 import config.Refined.Max300
 import controllers.actions._
 import controllers.nonsipp.memberdetails.MemberDetailsController._
@@ -118,6 +119,14 @@ object MemberDetailsController {
               messages(
                 "memberDetails.dateOfBirth.error.future",
                 dateThreshold.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG))
+              )
+            ),
+          DateFormErrors
+            .failIfDateBefore(
+              Constants.earliestDate,
+              messages(
+                "memberDetails.dateOfBirth.error.after",
+                Constants.earliestDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG))
               )
             )
         )

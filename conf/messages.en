@@ -242,6 +242,7 @@ memberDetails.dateOfBirth.error.required.two = Date of birth must include a {0} 
 memberDetails.dateOfBirth.error.invalid.date = Date of birth must be a real date
 memberDetails.dateOfBirth.error.invalid.characters = Date of birth must only include numbers 0 to 9
 memberDetails.dateOfBirth.error.future = Date of birth must be before {0}
+memberDetails.dateOfBirth.error.after = Date of birth must be after {0}
 memberDetails.dateOfBirth.error.format = Member’s date of birth must be in the format 01/08/1970
 
 
@@ -732,6 +733,7 @@ datePeriodLoan.field1.error.required.month = Date the loan was made must include
 datePeriodLoan.field1.error.required.year = Date the loan was made must include a year
 datePeriodLoan.field1.error.required.two = Date the loan was made must include a {0} and {1}
 datePeriodLoan.field1.error.future = Date the loan was made must be before {0}
+datePeriodLoan.field1.error.after = Date the loan was made must be after {0}
 datePeriodLoan.field2 = Total value of {0}’s assets on the date the loan was made, in pounds and pence
 datePeriodLoan.field2.error.required = Enter the total value of the scheme’s assets on the date the loan was made, in pounds and pence
 datePeriodLoan.field2.error.invalid = Total value of the scheme’s assets must be an amount of money, like 123 or 123.45
@@ -927,6 +929,7 @@ whenDidSchemeAcquireLandOrProperty.dateOfAcquired.error.required.two = Date the 
 whenDidSchemeAcquireLandOrProperty.dateOfAcquired.error.invalid.date = Date the scheme acquired this land or property must be a real date
 whenDidSchemeAcquireLandOrProperty.dateOfAcquired.error.invalid.characters = Date the scheme acquired this land or property must only include numbers 0 to 9
 whenDidSchemeAcquireLandOrProperty.dateOfAcquired.error.future = Date the scheme acquired this land or property must be before {0}
+whenDidSchemeAcquireLandOrProperty.dateOfAcquired.error.after = Date the scheme acquired this land or property must be after {0}
 
 landOrPropertyAddressLookup.selectCountry.title = Which country is the land or property in?
 landOrPropertyAddressLookup.selectCountry.heading = Which country is the land or property in?
@@ -1005,6 +1008,7 @@ landOrPropertyLeaseDetails.field3.error.required.two = Date the lease was grante
 landOrPropertyLeaseDetails.field3.error.invalid.date = Date the lease was granted must include must be a real date
 landOrPropertyLeaseDetails.field3.error.invalid.characters = Date the lease was granted must include must only include numbers 0 to 9
 landOrPropertyLeaseDetails.field3.error.future = Date the lease was granted must be before {0}
+landOrPropertyLeaseDetails.field3.error.after = Date the lease was granted must be after {0}
 
 companySellerName.title = What is the seller’s company name?
 companySellerName.heading = What is the seller’s company name?
@@ -1308,9 +1312,50 @@ landOrPropertyDisposalSellerConnectedParty.title = Is the seller a connected par
 landOrPropertyDisposalSellerConnectedParty.heading = Is {0} a connected party?
 landOrPropertyDisposalSellerConnectedParty.error.required = Select yes if the seller is a connected party
 
-DisposalIndependentValuation.title = Was the sale of the land or property supported by an independent valuation?
-DisposalIndependentValuation.heading = Was the sale of {0} supported by an independent valuation?
-DisposalIndependentValuation.error.required = Select yes if the sale of the land or property was supported by an independent valuation
+disposalIndependentValuation.title = Was the sale of the land or property supported by an independent valuation?
+disposalIndependentValuation.heading = Was the sale of {0} supported by an independent valuation?
+disposalIndependentValuation.error.required = Select yes if the sale of the land or property was supported by an independent valuation
+
+
+checkYourAnswers.title = Check your answers
+checkYourAnswers.heading = Check your answers
+landPropertyDisposalCYA.section1.propertyInUk =  Which land or property was disposed of?
+landPropertyDisposalCYA.section1.landOrPropertyInUk.hidden = which land or property was disposed of
+landPropertyDisposalCYA.section1.propertyDisposed = How was {0} disposed of?
+landPropertyDisposalCYA.section1.propertyDisposed.hidden = how {0} was disposed of
+landPropertyDisposalCYA.section1.whenWasPropertySold = When was {0} sold?
+landPropertyDisposalCYA.section1.whenWasPropertySold.hidden = when {0} was sold
+landPropertyDisposalCYA.section1.whoPurchasedLandOrProperty = Who purchased {0}?
+landPropertyDisposalCYA.section1.whoPurchasedLandOrProperty.hidden =  who purchased {0}
+landPropertyDisposalCYA.section1.recipientName = Buyer’s name
+landPropertyDisposalCYA.section1.recipientName.hidden = buyer’s name
+landPropertyDisposalCYA.section1.recipientDetails.nino = {0}’s National Insurance number
+landPropertyDisposalCYA.section1.recipientDetails.nino.hidden = buyer’s National Insurance number
+landPropertyDisposalCYA.section1.recipientDetails.crn = Company Registration Number (CRN)
+landPropertyDisposalCYA.section1.recipientDetails.crn.hidden = Company Registration Number
+landPropertyDisposalCYA.section1.recipientDetails.utr = Unique Taxpayer Reference (UTR)
+landPropertyDisposalCYA.section1.recipientDetails.utr.hidden = Unique Taxpayer Reference
+landPropertyDisposalCYA.section1.recipientDetails.other = details
+landPropertyDisposalCYA.section1.recipientDetails.other.hidden = details
+landPropertyDisposalCYA.section1.recipientDetails.noNinoReason = Reason you cannot provide {0}’s National Insurance number
+landPropertyDisposalCYA.section1.recipientDetails.noNinoReason.hidden = reason you cannot provide buyer’s National Insurance number
+landPropertyDisposalCYA.section1.recipientDetails.noCrnReason = Reason you cannot provide {0}’s Company Registration Number (CRN)
+landPropertyDisposalCYA.section1.recipientDetails.noCrnReason.hidden = reason you cannot provide buyer’s Company Registration Number
+landPropertyDisposalCYA.section1.recipientDetails.noUtrReason = Reason you cannot provide {0}’s Unique Taxpayer Reference (UTR)
+landPropertyDisposalCYA.section1.recipientDetails.noUtrReason.hidden = reason you cannot provide buyer’s Unique Taxpayer Reference
+landPropertyDisposalCYA.section1.landOrPropertyDisposalSellerConnectedParty = Is {0} a connected party?
+landPropertyDisposalCYA.section1.landOrPropertyDisposalSellerConnectedPartyInfo.hidden = if {0} is a connected party]
+landPropertyDisposalCYA.section1.totalProceedsSale = What were the total proceeds from the sale of {0}?
+landPropertyDisposalCYA.section1.totalProceedsSaleInfo.hidden = the total proceeds from the sale of {0}
+landPropertyDisposalCYA.section1.DisposalIndependentValuation = Was the sale of {0} supported by an independent valuation?
+landPropertyDisposalCYA.section1.DisposalIndependentValuationInfo.hidden = if the sale of {0} was supported by an independent valuation
+landPropertyDisposalCYA.section1.landOrPropertyStillHeld = Is any part of {0} still held by {1}?
+landPropertyDisposalCYA.section1.landOrPropertyStillHeldInfo.hidden = if any part of {0} is still held by the scheme
+landPropertyDisposalCYA.section1.propertyDisposedDetails = Details of how {0} was disposed of
+landPropertyDisposalCYA.section1.propertyDisposedDetails.hidden = details of the disposal for {0}
+
+landPropertyDisposalCYA.change.title = Change details for land or property disposal
+landPropertyDisposalCYA.change.heading = Change details for the disposal of {0}
 
 landOrPropertyDisposalList.title = You have reported {0} land or property disposal
 landOrPropertyDisposalList.title.plural = You have reported {0} land or property disposals

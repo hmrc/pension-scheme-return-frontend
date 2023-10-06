@@ -18,8 +18,8 @@ package controllers.nonsipp.landorpropertydisposal
 
 import config.Refined.{Max50, Max5000}
 import controllers.PSRController
-import controllers.actions.IdentifyAndRequireData
-import controllers.nonsipp.landorpropertydisposal.DisposalIndependentValuationController.viewModel
+import controllers.actions._
+import controllers.nonsipp.landorpropertydisposal.DisposalIndependentValuationController._
 import forms.YesNoPageFormProvider
 import models.Mode
 import models.SchemeId.Srn
@@ -56,8 +56,8 @@ class DisposalIndependentValuationController @Inject()(
       request.userAnswers.get(LandOrPropertyAddressLookupPage(srn, landOrPropertyIndex)).getOrRecoverJourney {
         address =>
           val preparedForm = request.userAnswers
-            .fillForm(DisposalIndependentValuationPage(srn, landOrPropertyIndex, disposalIndex), form)
-          Ok(view(preparedForm, viewModel(srn, landOrPropertyIndex, disposalIndex, mode, address.addressLine1)))
+            .fillForm(DisposalIndependentValuationPage(srn: Srn, landOrPropertyIndex, disposalIndex), form)
+          Ok(view(preparedForm, viewModel(srn, landOrPropertyIndex, disposalIndex, address.addressLine1, mode)))
       }
     }
 
@@ -71,7 +71,7 @@ class DisposalIndependentValuationController @Inject()(
               address =>
                 Future.successful(
                   BadRequest(
-                    view(formWithErrors, viewModel(srn, landOrPropertyIndex, disposalIndex, mode, address.addressLine1))
+                    view(formWithErrors, viewModel(srn, landOrPropertyIndex, disposalIndex, address.addressLine1, mode))
                   )
                 )
             },
@@ -80,12 +80,12 @@ class DisposalIndependentValuationController @Inject()(
               updatedAnswers <- Future
                 .fromTry(
                   request.userAnswers
-                    .set(DisposalIndependentValuationPage(srn, landOrPropertyIndex, disposalIndex), value)
+                    .set(DisposalIndependentValuationPage(srn: Srn, landOrPropertyIndex, disposalIndex), value)
                 )
               _ <- saveService.save(updatedAnswers)
             } yield Redirect(
               navigator.nextPage(
-                DisposalIndependentValuationPage(srn, landOrPropertyIndex, disposalIndex),
+                DisposalIndependentValuationPage(srn: Srn, landOrPropertyIndex, disposalIndex),
                 mode,
                 updatedAnswers
               )
@@ -96,20 +96,19 @@ class DisposalIndependentValuationController @Inject()(
 
 object DisposalIndependentValuationController {
   def form(formProvider: YesNoPageFormProvider): Form[Boolean] = formProvider(
-    "DisposalIndependentValuation.error.required"
+    "disposalIndependentValuation.error.required"
   )
 
   def viewModel(
     srn: Srn,
     landOrPropertyIndex: Max5000,
     disposalIndex: Max50,
-    mode: Mode,
-    addressLine1: String
+    addressLine1: String,
+    mode: Mode
   ): FormPageViewModel[YesNoPageViewModel] =
     YesNoPageViewModel(
-      "DisposalIndependentValuation.title",
-      Message("DisposalIndependentValuation.heading", addressLine1),
-      controllers.nonsipp.landorpropertydisposal.routes.DisposalIndependentValuationController
-        .onSubmit(srn, landOrPropertyIndex, disposalIndex, mode)
+      "disposalIndependentValuation.title",
+      Message("disposalIndependentValuation.heading", addressLine1),
+      routes.DisposalIndependentValuationController.onSubmit(srn, landOrPropertyIndex, disposalIndex, mode)
     )
 }

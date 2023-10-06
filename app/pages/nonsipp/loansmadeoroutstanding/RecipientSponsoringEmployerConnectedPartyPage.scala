@@ -30,3 +30,11 @@ case class RecipientSponsoringEmployerConnectedPartyPage(srn: Srn, index: Max500
 
   override def toString: String = "recipientSponsoringEmployerConnectedParty"
 }
+
+case class RecipientSponsoringEmployerConnectedPartyPages(srn: Srn)
+    extends QuestionPage[Map[String, SponsoringOrConnectedParty]] {
+
+  override def path: JsPath = Paths.loanTransactions \ toString
+
+  override def toString: String = "recipientSponsoringEmployerConnectedParty"
+}

@@ -18,7 +18,7 @@ package navigation.nonsipp
 
 import config.Refined.{Max50, Max5000}
 import eu.timepit.refined.refineMV
-import models.{IdentityType, NormalMode}
+import models.{CheckOrChange, IdentityType, NormalMode}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.landorpropertydisposal._
@@ -62,9 +62,11 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
           index,
           disposalIndex,
           LandOrPropertyStillHeldPage,
-          (srn, index: Max5000, disposalIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          (srn, index: Max5000, disposalIndex: Max50, _) =>
+            controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
+              .onPageLoad(srn, index, disposalIndex, CheckOrChange.Check)
         )
-        .withName("go from LandOrPropertyStillHeldPage to ??? page")
+        .withName("go from LandOrPropertyStillHeldPage to land property disposal CYA page")
     )
   }
 
@@ -241,7 +243,7 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
             controllers.nonsipp.landorpropertydisposal.routes.DisposalIndependentValuationController
               .onPageLoad(srn, index, disposalIndex, NormalMode)
         )
-        .withName("go from total proceeds sale land property page to Independent Valuation Page")
+        .withName("go from total proceeds sale land property page to independent valuation page")
     )
   }
 
@@ -253,9 +255,11 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
           index,
           disposalIndex,
           DisposalIndependentValuationPage,
-          (srn, index: Max5000, disposalIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          (srn, index: Max5000, disposalIndex: Max50, _) =>
+            controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyStillHeldController
+              .onPageLoad(srn, index, disposalIndex, NormalMode)
         )
-        .withName("go from total proceeds sale land property page to unauthorised page")
+        .withName("go from total proceeds sale land property page to land or property still held page")
     )
   }
 }

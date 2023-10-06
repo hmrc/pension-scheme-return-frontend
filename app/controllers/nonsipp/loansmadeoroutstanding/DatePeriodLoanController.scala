@@ -17,6 +17,7 @@
 package controllers.nonsipp.loansmadeoroutstanding
 
 import cats.implicits.toShow
+import config.Constants
 import config.Constants.{maxAssetValue, maxLoanPeriod}
 import config.Refined.Max5000
 import controllers.PSRController
@@ -41,6 +42,7 @@ import views.html.MultipleQuestionView
 import controllers.nonsipp.loansmadeoroutstanding.DatePeriodLoanController._
 
 import java.time.LocalDate
+import java.time.format.{DateTimeFormatter, FormatStyle}
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -104,7 +106,17 @@ object DatePeriodLoanController {
       "datePeriodLoan.field1.error.required.two",
       "datePeriodLoan.field1.error.invalid.date",
       "datePeriodLoan.field1.error.invalid.characters",
-      List(DateFormErrors.failIfDateAfter(date, messages("datePeriodLoan.field1.error.future", date.show)))
+      List(
+        DateFormErrors.failIfDateAfter(date, messages("datePeriodLoan.field1.error.future", date.show)),
+        DateFormErrors
+          .failIfDateBefore(
+            Constants.earliestDate,
+            messages(
+              "datePeriodLoan.field1.error.after",
+              Constants.earliestDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG))
+            )
+          )
+      )
     )
 
   private val field2Errors: MoneyFormErrors =

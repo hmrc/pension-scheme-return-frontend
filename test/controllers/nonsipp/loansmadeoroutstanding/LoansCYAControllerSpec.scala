@@ -80,6 +80,7 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
               ViewModelParameters(
                 srn,
                 index,
+                schemeName,
                 IdentityType.UKCompany,
                 recipientName,
                 recipientDetails = Some(crn.value),

@@ -153,6 +153,8 @@ trait TestValues {
 
   val localDate: LocalDate = LocalDate.of(1989, 10, 6)
 
+  val tooEarlyDate: LocalDate = LocalDate.of(1899, 12, 31)
+
   val defaultSchemeDetails: SchemeDetails = SchemeDetails(
     "testSRN",
     schemeName,
