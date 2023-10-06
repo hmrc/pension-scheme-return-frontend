@@ -1308,9 +1308,9 @@ landOrPropertyDisposalSellerConnectedParty.title = Is the seller a connected par
 landOrPropertyDisposalSellerConnectedParty.heading = Is {0} a connected party?
 landOrPropertyDisposalSellerConnectedParty.error.required = Select yes if the seller is a connected party
 
-DisposalIndependentValuation.title = Was the sale of the land or property supported by an independent valuation?
-DisposalIndependentValuation.heading = Was the sale of {0} supported by an independent valuation?
-DisposalIndependentValuation.error.required = Select yes if the sale of the land or property was supported by an independent valuation
+disposalIndependentValuation.title = Was the sale of the land or property supported by an independent valuation?
+disposalIndependentValuation.heading = Was the sale of {0} supported by an independent valuation?
+disposalIndependentValuation.error.required = Select yes if the sale of the land or property was supported by an independent valuation
 
 
 checkYourAnswers.title = Check your answers
@@ -1334,8 +1334,11 @@ landPropertyDisposalCYA.section1.recipientDetails.utr.hidden = Unique Taxpayer R
 landPropertyDisposalCYA.section1.recipientDetails.other = details
 landPropertyDisposalCYA.section1.recipientDetails.other.hidden = details
 landPropertyDisposalCYA.section1.recipientDetails.noNinoReason = Reason you cannot provide {0}’s National Insurance number
+landPropertyDisposalCYA.section1.recipientDetails.noNinoReason.hidden = reason you cannot provide buyer’s National Insurance number
 landPropertyDisposalCYA.section1.recipientDetails.noCrnReason = Reason you cannot provide {0}’s Company Registration Number (CRN)
+landPropertyDisposalCYA.section1.recipientDetails.noCrnReason.hidden = reason you cannot provide buyer’s Company Registration Number
 landPropertyDisposalCYA.section1.recipientDetails.noUtrReason = Reason you cannot provide {0}’s Unique Taxpayer Reference (UTR)
+landPropertyDisposalCYA.section1.recipientDetails.noUtrReason.hidden = reason you cannot provide buyer’s Unique Taxpayer Reference
 landPropertyDisposalCYA.section1.landOrPropertyDisposalSellerConnectedParty = Is {0}’s a connected party?
 landPropertyDisposalCYA.section1.landOrPropertyDisposalSellerConnectedPartyInfo.hidden = if {0}’s is a connected party]
 landPropertyDisposalCYA.section1.totalProceedsSale = What were the total proceeds from the sale of {0}?

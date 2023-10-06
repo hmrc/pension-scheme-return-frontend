@@ -447,7 +447,7 @@ object LandPropertyDisposalCYAController {
           ) :+
           CheckYourAnswersRowViewModel(
             Message("landPropertyDisposalCYA.section1.totalProceedsSale", addressLookUpPage.addressLine1),
-            s"${totalProceedsSale.get.displayAs}"
+            s"£${totalProceedsSale.get.displayAs}"
           ).withAction(
             SummaryAction(
               "site.change",
