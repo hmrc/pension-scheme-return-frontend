@@ -29,8 +29,7 @@ object MoneyBorrowedNavigator extends JourneyNavigator {
       if (userAnswers.get(page).contains(true)) {
         controllers.nonsipp.moneyborrowed.routes.WhatYouWillNeedMoneyBorrowedController.onPageLoad(srn)
       } else {
-        controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldController
-          .onPageLoad(srn, NormalMode)
+        controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
       }
 
     case WhatYouWillNeedMoneyBorrowedPage(srn) =>

@@ -1,0 +1,7 @@
+GET         /:srn/money-borrowed                                                        controllers.nonsipp.moneyborrowed.MoneyBorrowedController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/money-borrowed                                                        controllers.nonsipp.moneyborrowed.MoneyBorrowedController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/change-money-borrowed                                                 controllers.nonsipp.moneyborrowed.MoneyBorrowedController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-money-borrowed                                                 controllers.nonsipp.moneyborrowed.MoneyBorrowedController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET         /:srn/what-you-will-need-money-borrowed                                     controllers.nonsipp.moneyborrowed.WhatYouWillNeedMoneyBorrowedController.onPageLoad(srn: Srn)
+GET         /:srn/submit-what-you-will-need-money-borrowed                              controllers.nonsipp.moneyborrowed.WhatYouWillNeedMoneyBorrowedController.onSubmit(srn: Srn)
