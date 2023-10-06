@@ -404,6 +404,17 @@ object LandPropertyDisposalCYAController {
             ).withVisuallyHiddenContent("landPropertyDisposalCYA.section1.whenWasPropertySold.hidden")
           ),
           CheckYourAnswersRowViewModel(
+            Message("landPropertyDisposalCYA.section1.totalProceedsSale", addressLookUpPage.addressLine1),
+            s"£${totalProceedsSale.get.displayAs}"
+          ).withAction(
+            SummaryAction(
+              "site.change",
+              routes.TotalProceedsSaleLandPropertyController.onSubmit(srn, index, disposalIndex, mode).url
+            ).withVisuallyHiddenContent(
+              "landPropertyDisposalCYA.section1.totalProceedsSaleInfo.hidden"
+            )
+          ),
+          CheckYourAnswersRowViewModel(
             Message("landPropertyDisposalCYA.section1.whoPurchasedLandOrProperty", addressLookUpPage.addressLine1),
             receivedLoan
           ).withAction(
@@ -445,18 +456,6 @@ object LandPropertyDisposalCYAController {
               "landPropertyDisposalCYA.section1.landOrPropertyDisposalSellerConnectedPartyInfo.hidden"
             )
           ) :+
-          CheckYourAnswersRowViewModel(
-            Message("landPropertyDisposalCYA.section1.totalProceedsSale", addressLookUpPage.addressLine1),
-            s"£${totalProceedsSale.get.displayAs}"
-          ).withAction(
-            SummaryAction(
-              "site.change",
-              routes.TotalProceedsSaleLandPropertyController.onSubmit(srn, index, disposalIndex, mode).url
-            ).withVisuallyHiddenContent(
-              "landPropertyDisposalCYA.section1.totalProceedsSaleInfo.hidden"
-            )
-          ) :+
-
           CheckYourAnswersRowViewModel(
             Message(
               "landPropertyDisposalCYA.section1.DisposalIndependentValuation",
