@@ -29,27 +29,26 @@ class RecipientDetailsFormProvider @Inject()() extends Mappings {
   val nameMaxLength = 160
   val nameRegex = """^[a-zA-Z0-9 \-'".@/]+$"""
 
-  val firstName = "name"
+  val name = "name"
   val description = "description"
 
   def apply(
-    firstNameRequired: String,
-    firstNameInvalid: String,
-    firstNameLength: String,
-    descriptionRequired: String,
+    nameRequired: String,
+    nameInvalid: String,
+    nameLength: String,
     descriptionInvalid: String,
     descriptionLength: String
   ): Form[RecipientDetails] =
     Form(
       mapping(
-        firstName -> text(firstNameRequired).verifying(
+        name -> text(nameRequired).verifying(
           firstError(
-            regexp(nameRegex, firstNameInvalid),
-            maxLength(nameMaxLength, firstNameLength)
+            regexp(nameRegex, nameInvalid),
+            maxLength(nameMaxLength, nameLength)
           )
         ),
-        description -> text(descriptionRequired).verifying(
-          firstError(
+        description -> optionalText().verifying(
+          whenNotEmpty(
             regexp(textAreaRegex, descriptionInvalid),
             maxLength(maxTextAreaLength, descriptionLength)
           )

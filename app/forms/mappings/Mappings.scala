@@ -31,6 +31,9 @@ trait Mappings extends Formatters with Constraints {
   def text(errorKey: String = "error.required", args: Seq[Any] = Seq.empty): Mapping[String] =
     of(stringFormatter(errorKey, args)).transform[String](_.trim, _.trim)
 
+  def optionalText(): Mapping[String] =
+    of(optionalStringFormatter()).transform[String](_.trim, _.trim)
+
   def int(
     requiredKey: String = "error.required",
     wholeNumberKey: String = "error.wholeNumber",

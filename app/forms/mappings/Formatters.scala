@@ -40,6 +40,16 @@ trait Formatters {
         Map(key -> value)
     }
 
+  private[mappings] def optionalStringFormatter(): Formatter[String] =
+    new Formatter[String] {
+
+      override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], String] =
+        Right(data.get(key).getOrElse(""))
+
+      override def unbind(key: String, value: String): Map[String, String] =
+        Map(key -> value)
+    }
+
   private[mappings] def booleanFormatter(
     requiredKey: String,
     invalidKey: String,

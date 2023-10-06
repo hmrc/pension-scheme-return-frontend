@@ -34,6 +34,18 @@ trait Constraints {
         .getOrElse(Valid)
     }
 
+  protected def whenNotEmpty[A](constraints: Constraint[A]*): Constraint[A] =
+    Constraint { input =>
+      if (input.toString.isEmpty) {
+        Valid
+      } else {
+        constraints
+          .map(_.apply(input))
+          .find(_ != Valid)
+          .getOrElse(Valid)
+      }
+    }
+
   protected def when[A](predicate: A => Boolean, constraint: Constraint[A]): Constraint[A] =
     Constraint[A]((value: A) => if (predicate(value)) constraint(value) else Valid)
 
