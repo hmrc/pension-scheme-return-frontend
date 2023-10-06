@@ -22,6 +22,10 @@ import eu.timepit.refined.refineMV
 import forms.NameDOBFormProvider
 import models.{NameDOB, NormalMode}
 import pages.nonsipp.memberdetails.MemberDetailsPage
+import play.api.data.FormError
+import play.api.i18n.Messages
+import play.api.test.FakeRequest
+import play.api.test.Helpers.stubMessagesApi
 import views.html.NameDOBView
 
 import java.time.LocalDate
@@ -45,6 +49,14 @@ class MemberDetailsControllerSpec extends ControllerBaseSpec {
     "dateOfBirth.day" -> "12",
     "dateOfBirth.month" -> "12",
     "dateOfBirth.year" -> (LocalDate.now().getYear + 1).toString
+  )
+
+  private val dobTooEarlyForm = List(
+    "firstName" -> "testFirstName",
+    "lastName" -> "testLastName",
+    "dateOfBirth.day" -> "31",
+    "dateOfBirth.month" -> "12",
+    "dateOfBirth.year" -> "1899"
   )
 
   private val nameDOB = NameDOB(
@@ -71,6 +83,26 @@ class MemberDetailsControllerSpec extends ControllerBaseSpec {
     act.like(saveAndContinue(onSubmit, validForm: _*))
     act.like(invalidForm(onSubmit))
     act.like(invalidForm(onSubmit, dobInFutureForm: _*))
+    act.like(invalidForm(onSubmit, dobTooEarlyForm: _*))
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
+  }
+
+  "must bind validation errors when earlier than earliest date is submitted" in {
+
+    val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+    implicit val stubMessages: Messages = stubMessagesApi().preferred(FakeRequest())
+
+    running(application) {
+      val formProvider = application.injector.instanceOf[NameDOBFormProvider]
+      val testForm = MemberDetailsController.form(formProvider, Some(LocalDate.now()))
+      val boundForm = testForm.bind(
+        Map(
+          "dateOfBirth.day" -> tooEarlyDate.getDayOfMonth.toString,
+          "dateOfBirth.month" -> tooEarlyDate.getMonthValue.toString,
+          "dateOfBirth.year" -> tooEarlyDate.getYear.toString
+        )
+      )
+      boundForm.errors must contain(FormError("dateOfBirth", "memberDetails.dateOfBirth.error.after"))
+    }
   }
 }

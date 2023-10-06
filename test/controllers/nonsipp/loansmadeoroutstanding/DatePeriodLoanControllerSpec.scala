@@ -39,6 +39,14 @@ class DatePeriodLoanControllerSpec extends ControllerBaseSpec {
     bind[SchemeDateService].toInstance(mockSchemeDateService)
   )
 
+  private val dateTooEarlyForm = List(
+    "value.1.day" -> "31",
+    "value.1.month" -> "12",
+    "value.1.year" -> "1899",
+    "value.2" -> money.value.toString,
+    "value.3" -> "12"
+  )
+
   override def beforeEach(): Unit =
     reset(mockSchemeDateService)
 
@@ -80,5 +88,10 @@ class DatePeriodLoanControllerSpec extends ControllerBaseSpec {
     )
 
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
+
+    act.like(
+      invalidForm(onSubmit, populatedUserAnswers, dateTooEarlyForm: _*)
+        .before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear))
+    )
   }
 }

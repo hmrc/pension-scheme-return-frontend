@@ -41,6 +41,14 @@ class LandOrPropertyLeaseDetailsControllerSpec extends ControllerBaseSpec {
 
   val taxYear = Some(Left(dateRange))
 
+  private val dateTooEarlyForm = List(
+    "value.1" -> "test",
+    "value.2" -> "1",
+    "value.3.day" -> "31",
+    "value.3.month" -> "12",
+    "value.3.year" -> "1899"
+  )
+
   private val userAnswersWithAddress =
     defaultUserAnswers.unsafeSet(LandOrPropertyAddressLookupPage(srn, index), address)
 
@@ -100,5 +108,10 @@ class LandOrPropertyLeaseDetailsControllerSpec extends ControllerBaseSpec {
     )
 
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
+
+    act.like(
+      invalidForm(onSubmit, userAnswersWithAddress, dateTooEarlyForm: _*)
+        .before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear))
+    )
   }
 }

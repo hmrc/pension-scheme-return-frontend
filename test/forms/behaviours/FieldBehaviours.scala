@@ -146,4 +146,22 @@ trait FieldBehaviours extends FormSpec with ScalaCheckPropertyChecks with Genera
         result.errors mustBe empty
       }
     }
+
+  def fieldThatBindsTooEarlyDate(form: Form[_], fieldName: String, formError: FormError): Unit =
+    "bind too early date" in {
+
+      forAll(tooEarlyDateGen -> "invalid date") { localDate: LocalDate =>
+        val result = form
+          .bind(
+            Map(
+              s"$fieldName.day" -> localDate.getDayOfMonth.toString,
+              s"$fieldName.month" -> localDate.getMonthValue.toString,
+              s"$fieldName.year" -> localDate.getYear.toString
+            )
+          )
+          .apply(fieldName)
+
+        result.errors must contain only formError
+      }
+    }
 }

@@ -16,6 +16,8 @@
 
 package config
 
+import java.time.LocalDate
+
 object Constants {
 
   val psaEnrolmentKey = "HMRC-PODS-ORG"
@@ -56,4 +58,6 @@ object Constants {
 
   val textAreaRegex = """^[a-zA-Z0-9\-'" \t\r\n,.@/]+$"""
   val titleNumberRegex = """^[a-zA-Z]{2,3}[0-9]+$"""
+
+  val earliestDate = LocalDate.of(1900, 1, 1)
 }

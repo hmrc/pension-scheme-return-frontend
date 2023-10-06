@@ -16,6 +16,7 @@
 
 package forms
 
+import config.Constants
 import forms.behaviours.FieldBehaviours
 import forms.mappings.errors.DateFormErrors
 import models.NameDOB
@@ -42,7 +43,14 @@ class NameDOBFormProviderSpec extends FieldBehaviours {
       "dateOfBirth.error.required.year",
       "dateOfBirth.error.required.two",
       "dateOfBirth.error.invalid.date",
-      "dateOfBirth.error.invalid.characters"
+      "dateOfBirth.error.invalid.characters",
+      List(
+        DateFormErrors
+          .failIfDateBefore(
+            Constants.earliestDate,
+            "dateOfBirth.error.after"
+          )
+      )
     )
   )
 
@@ -84,6 +92,13 @@ class NameDOBFormProviderSpec extends FieldBehaviours {
 
   ".dateOfBirth" - {
     behave.like(fieldThatBindsValidDate(form, "dateOfBirth"))
+    behave.like(
+      fieldThatBindsTooEarlyDate(
+        form,
+        "dateOfBirth",
+        formError = FormError("dateOfBirth", "dateOfBirth.error.after")
+      )
+    )
     behave.like(mandatoryField(form, "dateOfBirth", "dateOfBirth.error.required.all"))
   }
 }
