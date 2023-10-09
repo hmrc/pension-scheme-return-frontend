@@ -27,7 +27,7 @@ import pages.nonsipp.CheckReturnDatesPage
 import pages.nonsipp.loansmadeoroutstanding.LoansMadeOrOutstandingPage
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
-import services.PSRSubmissionServiceSpec.{captor, minimalRequiredSubmission}
+import services.PsrSubmissionServiceSpec.{captor, minimalRequiredSubmission}
 import transformations.{LoanTransactionsTransformer, MinimalRequiredSubmissionTransformer}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.BaseSpec
@@ -37,7 +37,7 @@ import java.time.LocalDate
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class PSRSubmissionServiceSpec extends BaseSpec with TestValues {
+class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
 
   override def beforeEach(): Unit = {
     reset(mockConnector)
@@ -54,7 +54,7 @@ class PSRSubmissionServiceSpec extends BaseSpec with TestValues {
   private val mockLoanTransactionsTransformer = mock[LoanTransactionsTransformer]
 
   private val service =
-    new PSRSubmissionService(mockConnector, mockMinimalRequiredSubmissionTransformer, mockLoanTransactionsTransformer)
+    new PsrSubmissionService(mockConnector, mockMinimalRequiredSubmissionTransformer, mockLoanTransactionsTransformer)
 
   private implicit val hc: HeaderCarrier = HeaderCarrier()
 
@@ -135,7 +135,7 @@ class PSRSubmissionServiceSpec extends BaseSpec with TestValues {
   }
 }
 
-object PSRSubmissionServiceSpec {
+object PsrSubmissionServiceSpec {
   val captor: ArgumentCaptor[PsrSubmission] = ArgumentCaptor.forClass(classOf[PsrSubmission])
 
   val sampleDate: LocalDate = LocalDate.now
