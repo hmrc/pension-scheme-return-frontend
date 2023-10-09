@@ -28,7 +28,7 @@ import forms.YesNoPageFormProvider
 import models.CheckOrChange.Change
 import models.SchemeId.Srn
 import models.requests.DataRequest
-import models.{Address, Mode, Pagination}
+import models.{Address, Mode, NormalMode, Pagination}
 import navigation.Navigator
 import pages.nonsipp.landorproperty.LandOrPropertyAddressLookupPage
 import pages.nonsipp.landorpropertydisposal._
@@ -146,7 +146,7 @@ object LandOrPropertyDisposalListController {
               .onPageLoad(srn, index, x, Change)
               .url,
             changeHiddenText = Message("landOrPropertyDisposalList.row.change.hidden"),
-            removeUrl = "url",
+            removeUrl = routes.RemoveLandPropertyDisposalController.onSubmit(srn, index, x, NormalMode).url,
             removeHiddenText = Message("landOrPropertyDisposalList.row.remove.hidden")
           )
         }
