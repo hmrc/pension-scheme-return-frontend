@@ -17,7 +17,7 @@
 package controllers.nonsipp.moneyborrowed
 
 import com.google.inject.Inject
-import config.Constants.{borrowMaxPercentage, borrowMinPercentage, maxCurrencyValue, maxPercentage, minPercentage}
+import config.Constants.{borrowMaxPercentage, borrowMinPercentage, maxCurrencyValue}
 import config.Refined.Max5000
 import controllers.actions.IdentifyAndRequireData
 import forms.MultipleQuestionFormProvider
