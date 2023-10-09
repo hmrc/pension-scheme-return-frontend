@@ -20,25 +20,22 @@ import com.google.inject.Inject
 import config.Constants.{borrowMaxPercentage, borrowMinPercentage, maxCurrencyValue, maxPercentage, minPercentage}
 import config.Refined.Max5000
 import controllers.actions.IdentifyAndRequireData
-import controllers.nonsipp.loansmadeoroutstanding.routes
 import forms.MultipleQuestionFormProvider
 import forms.mappings.Mappings
 import forms.mappings.errors.{MoneyFormErrors, PercentageFormErrors}
 import models.{Mode, Money, Percentage}
 import models.SchemeId.Srn
-import models.requests.DataRequest
 import navigation.Navigator
 import pages.nonsipp.moneyborrowed.BorrowedAmountAndRatePage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import services.{SaveService, SchemeDateService}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.MultipleQuestionsViewModel.DoubleDifferentQuestion
 import viewmodels.models.{FormPageViewModel, QuestionField}
 import views.html.MultipleQuestionView
-import viewmodels.DisplayMessage._
 import viewmodels.implicits._
 
 import javax.inject.Named
