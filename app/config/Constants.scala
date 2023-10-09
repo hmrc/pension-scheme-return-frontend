@@ -53,6 +53,9 @@ object Constants {
   val minPercentage = -999.99
   val maxPercentage = 999.99
 
+  val borrowMinPercentage = 0
+  val borrowMaxPercentage = 100
+
   val maxTextAreaLength = 160
   val maxTitleNumberLength = 35
 

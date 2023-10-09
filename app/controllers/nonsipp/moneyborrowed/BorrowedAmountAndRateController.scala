@@ -17,7 +17,7 @@
 package controllers.nonsipp.moneyborrowed
 
 import com.google.inject.Inject
-import config.Constants.{maxCurrencyValue, maxPercentage, minPercentage}
+import config.Constants.{borrowMaxPercentage, borrowMinPercentage, maxCurrencyValue, maxPercentage, minPercentage}
 import config.Refined.Max5000
 import controllers.actions.IdentifyAndRequireData
 import controllers.nonsipp.loansmadeoroutstanding.routes
@@ -98,17 +98,17 @@ object BorrowedAmountAndRateController {
 
   private val field1Errors: MoneyFormErrors =
     MoneyFormErrors(
-      "interestOnLoan.loanInterestAmount.error.required",
-      "interestOnLoan.loanInterestAmount.error.nonNumeric",
-      (maxCurrencyValue, "interestOnLoan.loanInterestAmount.error.max")
+      "moneyBorrowed.borrowedAmountAndRate.borrowAmount.error.required",
+      "moneyBorrowed.borrowedAmountAndRate.borrowAmount.error.nonNumeric",
+      (maxCurrencyValue, "moneyBorrowed.borrowedAmountAndRate.borrowAmount.error.tooHigh")
     )
 
   private val field2Errors: PercentageFormErrors =
     PercentageFormErrors(
-      "interestOnLoan.loanInterestRate.error.required",
-      "interestOnLoan.loanInterestRate.error.nonNumeric",
-      (maxPercentage, "interestOnLoan.loanInterestRate.error.tooLarge"),
-      (minPercentage, "interestOnLoan.loanInterestRate.error.tooLow")
+      "moneyBorrowed.borrowedAmountAndRate.borrowInterestRate.error.required",
+      "moneyBorrowed.borrowedAmountAndRate.borrowInterestRate.error.nonNumeric",
+      (borrowMaxPercentage, "moneyBorrowed.borrowedAmountAndRate.borrowInterestRate.error.tooHigh"),
+      (borrowMinPercentage, "moneyBorrowed.borrowedAmountAndRate.borrowInterestRate.error.tooLow")
     )
   def form(implicit messages: Messages): Form[(Money, Percentage)] =
     MultipleQuestionFormProvider(Mappings.money(field1Errors), Mappings.percentage(field2Errors))
@@ -121,14 +121,14 @@ object BorrowedAmountAndRateController {
     form: Form[(Money, Percentage)]
   ): FormPageViewModel[DoubleDifferentQuestion[Money, Percentage]] =
     FormPageViewModel(
-      "interestOnLoan.loanInterestRate.title",
-      Message("interestOnLoan.loanInterestRate.heading", schemeName),
+      "moneyBorrowed.borrowedAmountAndRate.title",
+      Message("moneyBorrowed.borrowedAmountAndRate.heading", schemeName),
       page = DoubleDifferentQuestion(
         form,
-        QuestionField.currency(Message("interestOnLoan.loanInterestAmount.label")),
+        QuestionField.currency(Message("moneyBorrowed.borrowedAmountAndRate.borrowAmount.label")),
         QuestionField.percentage(
-          Message("interestOnLoan.loanInterestRate.label"),
-          Option(Message("interestOnLoan.loanInterestRate.hint"))
+          Message("moneyBorrowed.borrowedAmountAndRate.borrowInterestRate.label"),
+          Option(Message("moneyBorrowed.borrowedAmountAndRate.borrowInterestRate.hint"))
         )
       ),
       controllers.nonsipp.moneyborrowed.routes.BorrowedAmountAndRateController.onSubmit(srn, index, mode)
