@@ -19,7 +19,7 @@ package navigation.nonsipp
 import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.moneyborrowed.{MoneyBorrowedPage, WhatYouWillNeedMoneyBorrowedPage}
+import pages.nonsipp.moneyborrowed._
 import play.api.mvc.Call
 
 object MoneyBorrowedNavigator extends JourneyNavigator {
@@ -33,6 +33,9 @@ object MoneyBorrowedNavigator extends JourneyNavigator {
       }
 
     case WhatYouWillNeedMoneyBorrowedPage(srn) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
+
+    case BorrowedAmountAndRatePage(srn, index) =>
       controllers.routes.UnauthorisedController.onPageLoad()
   }
 
