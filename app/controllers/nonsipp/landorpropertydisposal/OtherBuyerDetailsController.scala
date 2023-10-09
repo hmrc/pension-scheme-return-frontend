@@ -101,7 +101,6 @@ object OtherBuyerDetailsController {
     "otherBuyerDetails.name.error.required",
     "otherBuyerDetails.name.error.invalid",
     "otherBuyerDetails.name.error.length",
-    "Enter the  buyer’s name", //TODO fix the "RecipientDetails" to allow optional description
     "otherBuyerDetails.description.error.invalid",
     "otherBuyerDetails.description.error.length"
   )

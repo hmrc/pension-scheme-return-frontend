@@ -41,7 +41,12 @@ class OtherBuyerDetailsControllerSpec extends ControllerBaseSpec {
 
   private val validForm = List(
     "name" -> "name",
-    "description" -> "description"
+    "description" -> ""
+  )
+
+  private val invalidForm = List(
+    "name" -> "",
+    "description" -> ""
   )
 
   private val recipientDetails = RecipientDetails(
@@ -82,7 +87,7 @@ class OtherBuyerDetailsControllerSpec extends ControllerBaseSpec {
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
     act.like(saveAndContinue(onSubmit, updatedUserAnswers, validForm: _*))
-    act.like(invalidForm(onSubmit, updatedUserAnswers))
+    act.like(invalidForm(onSubmit, updatedUserAnswers, invalidForm: _*))
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }
 }

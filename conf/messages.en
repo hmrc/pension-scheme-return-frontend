@@ -581,7 +581,6 @@ loanRecipient.otherRecipientDetails.description = Brief description of recipient
 loanRecipient.otherRecipientDetails.name.error.required = Enter the recipient’s name
 loanRecipient.otherRecipientDetails.name.error.invalid = Recipient’s name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
 loanRecipient.otherRecipientDetails.name.error.length =  Recipient’s name must be 160 characters or fewer
-loanRecipient.otherRecipientDetails.description.error.required = Enter a brief description of the recipient
 loanRecipient.otherRecipientDetails.description.error.invalid = The brief description of the recipient must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, full stops, hyphens, slashes, speech marks and spaces
 loanRecipient.otherRecipientDetails.description.error.length = The brief description of the recipient must be 160 characters or fewer
 
@@ -1070,7 +1069,6 @@ landOrPropertySeller.otherRecipientDetails.description = Brief description of se
 landOrPropertySeller.otherRecipientDetails.name.error.required = Enter the seller’s name
 landOrPropertySeller.otherRecipientDetails.name.error.invalid = Seller’s name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
 landOrPropertySeller.otherRecipientDetails.name.error.length =  Seller’s name must be 160 characters or fewer
-landOrPropertySeller.otherRecipientDetails.description.error.required = Enter a brief description of the seller
 landOrPropertySeller.otherRecipientDetails.description.error.invalid = The description of the seller must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
 landOrPropertySeller.otherRecipientDetails.description.error.length = The description of the seller must be 160 characters or fewer
 
