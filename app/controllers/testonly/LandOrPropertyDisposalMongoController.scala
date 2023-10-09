@@ -21,8 +21,13 @@ import config.Refined.{Max50, Max5000}
 import controllers.actions.IdentifyAndRequireData
 import eu.timepit.refined._
 import models.SchemeId.Srn
-import models.{RecipientDetails, UserAnswers}
-import pages.nonsipp.landorpropertydisposal.{LandOrPropertyStillHeldPage, OtherBuyerDetailsPage}
+import models.{HowDisposed, RecipientDetails, UserAnswers}
+import pages.nonsipp.landorpropertydisposal.{
+  HowWasPropertyDisposedOfPage,
+  LandOrPropertyDisposalPage,
+  LandOrPropertyStillHeldPage,
+  OtherBuyerDetailsPage
+}
 import play.api.i18n.I18nSupport
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -65,7 +70,8 @@ class LandOrPropertyDisposalMongoController @Inject()(
       indexes <- buildIndexes(max.value)
       updatedUserAnswers <- indexes.foldLeft(Try(userAnswers)) {
         case (ua, disposalIndex) =>
-          ua.flatMap(_.remove(LandOrPropertyStillHeldPage(srn, index, disposalIndex)))
+          ua.flatMap(_.remove(LandOrPropertyDisposalPage(srn)))
+            .flatMap(_.remove(LandOrPropertyStillHeldPage(srn, index, disposalIndex)))
             .flatMap(_.remove(OtherBuyerDetailsPage(srn, index, disposalIndex)))
       }
     } yield updatedUserAnswers
@@ -80,12 +86,19 @@ class LandOrPropertyDisposalMongoController @Inject()(
   ): Try[UserAnswers] =
     for {
       indexes <- buildIndexes(num)
-      otherBuyer = indexes.map(disposalIndex => OtherBuyerDetailsPage(srn, index, disposalIndex) -> recipientDetails)
+      schemeHadDisposals = indexes.map(_ => LandOrPropertyDisposalPage(srn) -> true)
+      howDisposed = indexes.map(
+        disposalIndex => HowWasPropertyDisposedOfPage(srn, index, disposalIndex) -> HowDisposed.Other
+      )
       stillHeld = indexes.map(disposalIndex => LandOrPropertyStillHeldPage(srn, index, disposalIndex) -> true)
-      ua1 <- otherBuyer.foldLeft(Try(userAnswers)) {
+
+      ua1 <- schemeHadDisposals.foldLeft(Try(userAnswers)) {
         case (ua, (page, value)) => ua.flatMap(_.set(page, value))
       }
-      ua2 <- stillHeld.foldLeft(Try(ua1)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
-    } yield ua2
+      //TODO
+      //ua2 <- howDisposed.foldLeft(Try(ua1)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
+      //TODO ua2
+      ua3 <- stillHeld.foldLeft(Try(ua1)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
+    } yield ua3
 
 }

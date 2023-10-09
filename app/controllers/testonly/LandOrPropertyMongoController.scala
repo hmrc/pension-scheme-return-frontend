@@ -21,9 +21,20 @@ import config.Refined.{Max5000, OneTo5000}
 import controllers.actions.IdentifyAndRequireData
 import eu.timepit.refined._
 import models.SchemeId.Srn
-import models.{Address, UserAnswers}
-import pages.nonsipp.landorproperty.{LandOrPropertyAddressLookupPage, LandPropertyInUKPage}
+import models.{Address, ConditionalYesNo, Money, SchemeHoldLandProperty, UserAnswers}
+import pages.nonsipp.landorproperty.{
+  IsLandOrPropertyResidentialPage,
+  IsLandPropertyLeasedPage,
+  LandOrPropertyAddressLookupPage,
+  LandOrPropertyHeldPage,
+  LandOrPropertyTotalCostPage,
+  LandOrPropertyTotalIncomePage,
+  LandPropertyInUKPage,
+  LandRegistryTitleNumberPage,
+  WhyDoesSchemeHoldLandPropertyPage
+}
 import play.api.i18n.I18nSupport
+import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -58,7 +69,9 @@ class LandOrPropertyMongoController @Inject()(
         removedUserAnswers <- Future.fromTry(removeAllLandOrProperties(srn, request.userAnswers))
         updatedUserAnswers <- Future.fromTry(updateUserAnswersWithLandOrProperties(num.value, srn, removedUserAnswers))
         _ <- saveService.save(updatedUserAnswers)
-      } yield Ok(s"Added ${num.value} loan details to UserAnswers")
+      } yield Ok(
+        s"Added ${num.value} land or property to UserAnswers \n${Json.prettyPrint(updatedUserAnswers.data.decryptedValue)}"
+      )
   }
 
   private def buildIndexes(num: Int): Try[List[Max5000]] =
@@ -69,20 +82,43 @@ class LandOrPropertyMongoController @Inject()(
       indexes <- buildIndexes(max.value)
       updatedUserAnswers <- indexes.foldLeft(Try(userAnswers)) {
         case (ua, index) =>
-          ua.flatMap(_.remove(LandPropertyInUKPage(srn, index)))
+          ua.flatMap(_.remove(LandOrPropertyHeldPage(srn)))
+            .flatMap(_.remove(LandPropertyInUKPage(srn, index)))
             .flatMap(_.remove(LandOrPropertyAddressLookupPage(srn, index)))
+            .flatMap(_.remove(LandRegistryTitleNumberPage(srn, index)))
+            .flatMap(_.remove(WhyDoesSchemeHoldLandPropertyPage(srn, index)))
+            .flatMap(_.remove(LandOrPropertyTotalCostPage(srn, index)))
+            .flatMap(_.remove(IsLandOrPropertyResidentialPage(srn, index)))
+            .flatMap(_.remove(IsLandPropertyLeasedPage(srn, index)))
+            .flatMap(_.remove(LandOrPropertyTotalIncomePage(srn, index)))
       }
     } yield updatedUserAnswers
 
   private def updateUserAnswersWithLandOrProperties(num: Int, srn: Srn, userAnswers: UserAnswers): Try[UserAnswers] =
     for {
       indexes <- buildIndexes(num)
+      ua0 <- userAnswers.set(LandOrPropertyHeldPage(srn), true)
       landOrPropertyInUK = indexes.map(index => LandPropertyInUKPage(srn, index) -> true)
       addressLookup = indexes.map(index => LandOrPropertyAddressLookupPage(srn, index) -> address(index.value))
-      ua1 <- landOrPropertyInUK.foldLeft(Try(userAnswers)) {
+      titleNumber = indexes.map(
+        index => LandRegistryTitleNumberPage(srn, index) -> ConditionalYesNo.no[String, String]("reason")
+      )
+      whyHeld = indexes.map(index => WhyDoesSchemeHoldLandPropertyPage(srn, index) -> SchemeHoldLandProperty.Transfer)
+      cost = indexes.map(index => LandOrPropertyTotalCostPage(srn, index) -> Money(123.45))
+      residential = indexes.map(index => IsLandOrPropertyResidentialPage(srn, index) -> false)
+      leased = indexes.map(index => IsLandPropertyLeasedPage(srn, index) -> false)
+      income = indexes.map(index => LandOrPropertyTotalIncomePage(srn, index) -> Money(45.67))
+
+      ua1 <- landOrPropertyInUK.foldLeft(Try(ua0)) {
         case (ua, (page, value)) => ua.flatMap(_.set(page, value))
       }
       ua2 <- addressLookup.foldLeft(Try(ua1)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
-    } yield ua2
+      ua3 <- titleNumber.foldLeft(Try(ua2)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
+      ua4 <- whyHeld.foldLeft(Try(ua3)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
+      ua5 <- cost.foldLeft(Try(ua4)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
+      ua6 <- residential.foldLeft(Try(ua5)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
+      ua7 <- leased.foldLeft(Try(ua6)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
+      ua8 <- income.foldLeft(Try(ua7)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
+    } yield ua8
 
 }
