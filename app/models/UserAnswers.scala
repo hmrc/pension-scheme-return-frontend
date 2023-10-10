@@ -63,6 +63,20 @@ final case class UserAnswers(
         _ => setOnly(page, value)
       )
 
+  def set(path: JsPath, value: JsValue): Try[UserAnswers] = {
+    val updatedData = data.decryptedValue.setObject(path, Json.toJson(value)) match {
+      case JsSuccess(jsValue, _) =>
+        Success(jsValue)
+      case JsError(errors) =>
+        Failure(JsResultException(errors))
+    }
+
+    updatedData.flatMap { d =>
+      val updatedAnswers = copy(data = SensitiveJsObject(d))
+      Success(updatedAnswers)
+    }
+  }
+
   def remove[A](page: Removable[A]): Try[UserAnswers] =
     page
       .cleanup(None, self)
