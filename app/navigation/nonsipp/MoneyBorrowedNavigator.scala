@@ -36,6 +36,9 @@ object MoneyBorrowedNavigator extends JourneyNavigator {
       controllers.routes.UnauthorisedController.onPageLoad()
 
     case BorrowedAmountAndRatePage(srn, index) =>
+      controllers.nonsipp.moneyborrowed.routes.WhenBorrowedController.onPageLoad(srn, index, NormalMode)
+
+    case WhenBorrowedPage(srn, index) =>
       controllers.routes.UnauthorisedController.onPageLoad()
   }
 

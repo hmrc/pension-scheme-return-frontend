@@ -1392,3 +1392,6 @@ moneyBorrowed.borrowedAmountAndRate.borrowInterestRate.error.nonNumeric = Intere
 moneyBorrowed.borrowedAmountAndRate.borrowAmount.error.required = Enter the total amount of money borrowed, in pounds and pence
 moneyBorrowed.borrowedAmountAndRate.borrowAmount.error.nonNumeric = Total amount of money borrowed must be an amount of money, like 123 or 123.45
 moneyBorrowed.borrowedAmountAndRate.borrowAmount.error.tooHigh = Total amount of money borrowed must be 999999999.99 or less
+
+moneyBorrowed.WhenBorrowed.title = When did the scheme borrow this money from the lender?
+moneyBorrowed.WhenBorrowed.heading = When did {0} borrow {1} from {2}
