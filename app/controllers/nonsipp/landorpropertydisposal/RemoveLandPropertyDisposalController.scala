@@ -25,8 +25,18 @@ import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
 import models.{Mode, RecipientDetails, UserAnswers}
 import navigation.Navigator
-import pages.nonsipp.landorproperty.LandOrPropertyAddressLookupPage
-import pages.nonsipp.landorpropertydisposal._
+import pages.nonsipp.landorproperty.{LandOrPropertyAddressLookupPage, LandOrPropertyAddressLookupPages}
+import pages.nonsipp.landorpropertydisposal.{
+  DisposalIndependentValuationPage,
+  HowWasPropertyDisposedOfPage,
+  LandOrPropertyDisposalListPage,
+  LandOrPropertyDisposalSellerConnectedPartyPage,
+  LandOrPropertyStillHeldPage,
+  OtherBuyerDetailsPage,
+  RemoveLandPropertyDisposalPage,
+  TotalProceedsSaleLandPropertyPage,
+  WhenWasPropertySoldPage
+}
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -83,7 +93,8 @@ class RemoveLandPropertyDisposalController @Inject()(
       indexes <- buildIndexes(max.value)
       updatedUserAnswers <- indexes.foldLeft(Try(userAnswers)) {
         case (ua, disposalIndex) =>
-          ua.flatMap(_.remove(HowWasPropertyDisposedOfPage(srn, landOrPropertyIndex, disposalIndex)))
+          ua.flatMap(_.remove(LandOrPropertyAddressLookupPage(srn, landOrPropertyIndex)))
+            .flatMap(_.remove(HowWasPropertyDisposedOfPage(srn, landOrPropertyIndex, disposalIndex)))
             .flatMap(_.remove(LandOrPropertyStillHeldPage(srn, landOrPropertyIndex, disposalIndex)))
             .flatMap(_.remove(WhenWasPropertySoldPage(srn, landOrPropertyIndex, disposalIndex)))
             .flatMap(_.remove(LandOrPropertyDisposalSellerConnectedPartyPage(srn, landOrPropertyIndex, disposalIndex)))
