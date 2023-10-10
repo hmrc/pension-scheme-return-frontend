@@ -24,7 +24,11 @@ import models.requests.psr._
 import pages.nonsipp.CheckReturnDatesPage
 import pages.nonsipp.landorproperty.LandOrPropertyHeldPage
 import pages.nonsipp.loansmadeoroutstanding._
-import transformations.{LandOrPropertyTransactionsTransformer, LoanTransactionsTransformer, MinimalRequiredSubmissionTransformer}
+import transformations.{
+  LandOrPropertyTransactionsTransformer,
+  LoanTransactionsTransformer,
+  MinimalRequiredSubmissionTransformer
+}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject

@@ -24,11 +24,16 @@ import models.requests.{AllowedAccessRequest, DataRequest}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.CheckReturnDatesPage
+import pages.nonsipp.landorproperty.LandOrPropertyHeldPage
 import pages.nonsipp.loansmadeoroutstanding.LoansMadeOrOutstandingPage
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import services.PsrSubmissionServiceSpec.{captor, minimalRequiredSubmission}
-import transformations.{LandOrPropertyTransactionsTransformer, LoanTransactionsTransformer, MinimalRequiredSubmissionTransformer}
+import transformations.{
+  LandOrPropertyTransactionsTransformer,
+  LoanTransactionsTransformer,
+  MinimalRequiredSubmissionTransformer
+}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.BaseSpec
 import utils.UserAnswersUtils.UserAnswersOps
@@ -130,12 +135,56 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
       }
     }
 
+    "submitPsrDetails request successfully when LandOrPropertyHeldPage is true" in {
+      val userAnswers = defaultUserAnswers
+        .unsafeSet(CheckReturnDatesPage(srn), false)
+        .unsafeSet(LandOrPropertyHeldPage(srn), true)
+      val request = DataRequest(allowedAccessRequest, userAnswers)
+
+      when(mockMinimalRequiredSubmissionTransformer.transform(any())(any())).thenReturn(Some(minimalRequiredSubmission))
+      when(mockLandOrPropertyTransactionsTransformer.transform(any())(any())).thenReturn(List.empty)
+      when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(()))
+
+      whenReady(service.submitPsrDetails(srn)(implicitly, implicitly, request)) { result: Option[Unit] =>
+        verify(mockMinimalRequiredSubmissionTransformer, times(1)).transform(any())(any())
+        verify(mockLandOrPropertyTransactionsTransformer, times(1)).transform(any())(any())
+        verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
+
+        captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
+        captor.getValue.checkReturnDates mustBe false
+        captor.getValue.assets mustBe Some(Assets(LandOrProperty(true, List.empty)))
+        result mustBe Some(())
+      }
+    }
+
+    "submitPsrDetails request successfully when LandOrPropertyHeldPage is false" in {
+
+      val userAnswers = defaultUserAnswers
+        .unsafeSet(CheckReturnDatesPage(srn), false)
+        .unsafeSet(LandOrPropertyHeldPage(srn), false)
+      val request = DataRequest(allowedAccessRequest, userAnswers)
+
+      when(mockMinimalRequiredSubmissionTransformer.transform(any())(any())).thenReturn(Some(minimalRequiredSubmission))
+      when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(()))
+
+      whenReady(service.submitPsrDetails(srn)(implicitly, implicitly, request)) { result: Option[Unit] =>
+        verify(mockMinimalRequiredSubmissionTransformer, times(1)).transform(any())(any())
+        verify(mockLandOrPropertyTransactionsTransformer, never).transform(any())(any())
+        verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
+        captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
+        captor.getValue.checkReturnDates mustBe false
+        captor.getValue.assets mustBe None
+        result mustBe Some(())
+      }
+    }
+
     "shouldn't submitPsrDetails request when userAnswer is empty" in {
       when(mockMinimalRequiredSubmissionTransformer.transform(any())(any())).thenReturn(Some(minimalRequiredSubmission))
 
       whenReady(service.submitPsrDetails(srn)) { result: Option[Unit] =>
         verify(mockMinimalRequiredSubmissionTransformer, times(1)).transform(any())(any())
         verify(mockLoanTransactionsTransformer, never).transform(any())(any())
+        verify(mockLandOrPropertyTransactionsTransformer, never).transform(any())(any())
         verify(mockConnector, never).submitPsrDetails(any())(any(), any())
         result mustBe None
       }
