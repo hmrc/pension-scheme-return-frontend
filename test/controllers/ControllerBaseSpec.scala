@@ -121,6 +121,7 @@ trait TestValues {
   val pstr = "testPstr"
   val titleNumber = "AB123456"
   val buyersName = "testBuyersName"
+  val lenderName = "testLenderName"
 
   val address: Address = Address(
     "testAddressLine1",

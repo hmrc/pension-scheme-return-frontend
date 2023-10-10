@@ -16,6 +16,7 @@
 
 package navigation.nonsipp
 
+import eu.timepit.refined.refineMV
 import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
@@ -33,7 +34,10 @@ object MoneyBorrowedNavigator extends JourneyNavigator {
       }
 
     case WhatYouWillNeedMoneyBorrowedPage(srn) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+      controllers.nonsipp.moneyborrowed.routes.LenderNameController.onPageLoad(srn, refineMV(1), NormalMode)
+
+    case LenderNamePage(srn, index) =>
+      controllers.nonsipp.moneyborrowed.routes.BorrowedAmountAndRateController.onPageLoad(srn, index, NormalMode)
 
     case BorrowedAmountAndRatePage(srn, index) =>
       controllers.routes.UnauthorisedController.onPageLoad()
