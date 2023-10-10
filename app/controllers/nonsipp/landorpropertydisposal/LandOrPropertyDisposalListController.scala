@@ -146,7 +146,7 @@ object LandOrPropertyDisposalListController {
               .onPageLoad(srn, index, x, Change)
               .url,
             changeHiddenText = Message("landOrPropertyDisposalList.row.change.hidden"),
-            removeUrl = routes.RemoveLandPropertyDisposalController.onSubmit(srn, index, x, NormalMode).url,
+            removeUrl = routes.RemoveLandPropertyDisposalController.onPageLoad(srn, index, x, NormalMode).url,
             removeHiddenText = Message("landOrPropertyDisposalList.row.remove.hidden")
           )
         }

@@ -16,7 +16,7 @@
 
 package navigation.nonsipp
 
-import config.Refined.Max5000
+import config.Refined.{Max50, Max5000}
 import eu.timepit.refined.{refineMV, refineV}
 import models.{CheckOrChange, HowDisposed, IdentityType, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
@@ -143,7 +143,8 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
       if (userAnswers.map(LandOrPropertyAddressLookupPages(srn)).isEmpty) {
         controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalController.onPageLoad(srn, NormalMode)
       } else {
-        controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalListController.onPageLoad(srn, 1)
+        controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalListController
+          .onPageLoad(srn, 1)
       }
 
   }
