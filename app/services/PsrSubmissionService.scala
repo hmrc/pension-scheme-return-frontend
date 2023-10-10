@@ -22,8 +22,9 @@ import models.SchemeId.Srn
 import models.requests.DataRequest
 import models.requests.psr._
 import pages.nonsipp.CheckReturnDatesPage
+import pages.nonsipp.landorproperty.LandOrPropertyHeldPage
 import pages.nonsipp.loansmadeoroutstanding._
-import transformations.{LoanTransactionsTransformer, MinimalRequiredSubmissionTransformer}
+import transformations.{LandOrPropertyTransactionsTransformer, LoanTransactionsTransformer, MinimalRequiredSubmissionTransformer}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
@@ -32,7 +33,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class PsrSubmissionService @Inject()(
   psrConnector: PSRConnector,
   minimalRequiredSubmissionTransformer: MinimalRequiredSubmissionTransformer,
-  loanTransactionsTransformer: LoanTransactionsTransformer
+  loanTransactionsTransformer: LoanTransactionsTransformer,
+  landOrPropertyTransactionsTransformer: LandOrPropertyTransactionsTransformer
 ) {
 
   def submitPsrDetails(
@@ -40,6 +42,7 @@ class PsrSubmissionService @Inject()(
   )(implicit hc: HeaderCarrier, ec: ExecutionContext, request: DataRequest[_]): Future[Option[Unit]] = {
 
     val schemeHadLoans = request.userAnswers.get(LoansMadeOrOutstandingPage(srn)).getOrElse(false)
+    val landOrPropertyHeld = request.userAnswers.get(LandOrPropertyHeldPage(srn)).getOrElse(false)
     (
       minimalRequiredSubmissionTransformer.transform(srn),
       request.userAnswers.get(CheckReturnDatesPage(srn))
@@ -48,7 +51,15 @@ class PsrSubmissionService @Inject()(
         PsrSubmission(
           minimalRequiredSubmission = minimalRequiredSubmission,
           checkReturnDates = checkReturnDates,
-          loans = if (schemeHadLoans) Some(Loans(schemeHadLoans, loanTransactionsTransformer.transform(srn))) else None
+          loans = Option.when(schemeHadLoans)(Loans(schemeHadLoans, loanTransactionsTransformer.transform(srn))),
+          assets = Option.when(landOrPropertyHeld)(
+            Assets(
+              LandOrProperty(
+                landOrPropertyHeld = landOrPropertyHeld,
+                landOrPropertyTransactions = landOrPropertyTransactionsTransformer.transform(srn)
+              )
+            )
+          )
         )
       )
     }.sequence

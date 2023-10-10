@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-package models.requests.psr
+package transformations
 
-import play.api.libs.json.{Json, OWrites}
+import com.google.inject.Singleton
+import models.SchemeId.Srn
+import models.requests.DataRequest
+import models.requests.psr._
 
-case class PsrSubmission(
-  minimalRequiredSubmission: MinimalRequiredSubmission,
-  checkReturnDates: Boolean,
-  loans: Option[Loans],
-  assets: Option[Assets]
-)
+import javax.inject.Inject
 
-object PsrSubmission {
-  implicit val writes: OWrites[PsrSubmission] = Json.writes[PsrSubmission]
+@Singleton()
+class LandOrPropertyTransactionsTransformer @Inject()() {
+
+  def transform(srn: Srn)(implicit request: DataRequest[_]): List[LandOrPropertyTransactions] =
+    ???
 }

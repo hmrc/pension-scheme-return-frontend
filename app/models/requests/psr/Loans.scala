@@ -17,7 +17,7 @@
 package models.requests.psr
 
 import models.IdentityType
-import play.api.libs.json.{JsString, Json, OWrites, Writes}
+import play.api.libs.json.{Json, OWrites}
 
 import java.time.LocalDate
 
@@ -47,8 +47,7 @@ case class LoanAmountDetails(loanAmount: Double, capRepaymentCY: Double, amountO
 case class LoanInterestDetails(loanInterestAmount: Double, loanInterestRate: Double, intReceivedCY: Double)
 
 object Loans {
-  private implicit val writesIdentityType: Writes[IdentityType] =
-    Writes(value => JsString(value.toString))
+
   private implicit val writesLoanInterestDetails: OWrites[LoanInterestDetails] = Json.writes[LoanInterestDetails]
   private implicit val writesLoanAmountDetails: OWrites[LoanAmountDetails] = Json.writes[LoanAmountDetails]
   private implicit val writesLoanPeriod: OWrites[LoanPeriod] = Json.writes[LoanPeriod]

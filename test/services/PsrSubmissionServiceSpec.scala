@@ -28,7 +28,7 @@ import pages.nonsipp.loansmadeoroutstanding.LoansMadeOrOutstandingPage
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import services.PsrSubmissionServiceSpec.{captor, minimalRequiredSubmission}
-import transformations.{LoanTransactionsTransformer, MinimalRequiredSubmissionTransformer}
+import transformations.{LandOrPropertyTransactionsTransformer, LoanTransactionsTransformer, MinimalRequiredSubmissionTransformer}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.BaseSpec
 import utils.UserAnswersUtils.UserAnswersOps
@@ -43,6 +43,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
     reset(mockConnector)
     reset(mockMinimalRequiredSubmissionTransformer)
     reset(mockLoanTransactionsTransformer)
+    reset(mockLandOrPropertyTransactionsTransformer)
   }
 
   val allowedAccessRequest
@@ -52,9 +53,15 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
   private val mockConnector = mock[PSRConnector]
   private val mockMinimalRequiredSubmissionTransformer = mock[MinimalRequiredSubmissionTransformer]
   private val mockLoanTransactionsTransformer = mock[LoanTransactionsTransformer]
+  private val mockLandOrPropertyTransactionsTransformer = mock[LandOrPropertyTransactionsTransformer]
 
   private val service =
-    new PsrSubmissionService(mockConnector, mockMinimalRequiredSubmissionTransformer, mockLoanTransactionsTransformer)
+    new PsrSubmissionService(
+      mockConnector,
+      mockMinimalRequiredSubmissionTransformer,
+      mockLoanTransactionsTransformer,
+      mockLandOrPropertyTransactionsTransformer
+    )
 
   private implicit val hc: HeaderCarrier = HeaderCarrier()
 
@@ -70,6 +77,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
       whenReady(service.submitPsrDetails(srn)(implicitly, implicitly, request)) { result: Option[Unit] =>
         verify(mockMinimalRequiredSubmissionTransformer, times(1)).transform(any())(any())
         verify(mockLoanTransactionsTransformer, never).transform(any())(any())
+        verify(mockLandOrPropertyTransactionsTransformer, never).transform(any())(any())
         verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
 
         captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
