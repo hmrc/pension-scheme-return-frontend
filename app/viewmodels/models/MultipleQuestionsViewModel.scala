@@ -47,6 +47,17 @@ object MultipleQuestionsViewModel {
     override val fields: List[QuestionField] = List(field1, field2)
   }
 
+  case class DoubleDifferentQuestion[A, B](
+    form: Form[(A, B)],
+    field1: QuestionField,
+    field2: QuestionField
+  ) extends MultipleQuestionsViewModel[(A, B)] {
+
+    override def firstField: QuestionField = field1
+
+    override val fields: List[QuestionField] = List(field1, field2)
+  }
+
   case class TripleQuestion[A, B, C](
     form: Form[(A, B, C)],
     field1: QuestionField,

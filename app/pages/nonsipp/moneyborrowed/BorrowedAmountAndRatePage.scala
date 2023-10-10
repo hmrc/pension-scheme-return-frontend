@@ -14,34 +14,19 @@
  * limitations under the License.
  */
 
-package forms
+package pages.nonsipp.moneyborrowed
 
-import play.api.data.Forms.mapping
-import play.api.data.{Form, Mapping}
+import config.Refined.Max5000
+import models.{Money, Percentage}
+import models.SchemeId.Srn
+import pages.QuestionPage
 
-object MultipleQuestionFormProvider {
+import play.api.libs.json.JsPath
+import utils.RefinedUtils.RefinedIntOps
 
-  def apply[A, B, C](
-    a: Mapping[A],
-    b: Mapping[B],
-    c: Mapping[C]
-  ): Form[(A, B, C)] =
-    Form(
-      mapping[(A, B, C), A, B, C](
-        "value.1" -> a,
-        "value.2" -> b,
-        "value.3" -> c
-      )(Tuple3.apply)(Tuple3.unapply)
-    )
+case class BorrowedAmountAndRatePage(srn: Srn, index: Max5000) extends QuestionPage[(Money, Percentage)] {
 
-  def apply[A, B](
-    a: Mapping[A],
-    b: Mapping[B]
-  ): Form[(A, B)] =
-    Form(
-      mapping[(A, B), A, B](
-        "value.1" -> a,
-        "value.2" -> b
-      )(Tuple2.apply)(Tuple2.unapply)
-    )
+  override def path: JsPath = Paths.moneyBorrowed \ toString \ index.arrayIndex.toString
+
+  override def toString: String = "interestRate"
 }
