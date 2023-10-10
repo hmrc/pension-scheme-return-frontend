@@ -37,6 +37,9 @@ final case class UserAnswers(
   def get[A](page: Gettable[A])(implicit rds: Reads[A]): Option[A] =
     Reads.optionNoError(Reads.at(page.path)).reads(data.decryptedValue).getOrElse(None)
 
+  def get(path: JsPath)(implicit rds: Reads[JsValue]): Option[JsValue] =
+    Reads.optionNoError(Reads.at(path)).reads(data.decryptedValue).getOrElse(None)
+
   def list[A](page: Gettable[List[A]])(implicit rds: Reads[A]): List[A] =
     get(page).getOrElse(Nil)
 

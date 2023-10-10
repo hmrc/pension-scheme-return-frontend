@@ -36,20 +36,20 @@ case class LandOrPropertyTransactions(
 case class PropertyDetails(
   landOrPropertyInUK: Boolean,
   addressDetails: Address,
-  landRegistryTitleNumberKey: String,
+  landRegistryTitleNumberKey: Boolean,
   landRegistryTitleNumberValue: String
 )
 
 case class HeldPropertyTransaction(
   methodOfHolding: SchemeHoldLandProperty,
   dateOfAcquisitionOrContribution: Option[LocalDate],
-  propertyAcquiredFromName: Option[String],
-  propertyAcquiredFrom: Option[PropertyAcquiredFrom],
-  connectedPartyStatus: Boolean,
+  optPropertyAcquiredFromName: Option[String],
+  optPropertyAcquiredFrom: Option[PropertyAcquiredFrom],
+  optConnectedPartyStatus: Option[Boolean],
   totalCostOfLandOrProperty: Double,
-  indepValuationSupport: Option[Boolean],
+  optIndepValuationSupport: Option[Boolean],
   isLandOrPropertyResidential: Boolean,
-  leaseDetails: LeaseDetails,
+  optLeaseDetails: Option[LeaseDetails],
   landOrPropertyLeased: Boolean,
   totalIncomeOrReceipts: Double
 )
@@ -64,8 +64,8 @@ case class PropertyAcquiredFrom(
 
 case class LeaseDetails(
   lesseeName: String,
-  leaseGrantDate: Double,
-  annualLeaseAmount: String
+  leaseGrantDate: LocalDate,
+  annualLeaseAmount: Double
 )
 
 object Assets {
