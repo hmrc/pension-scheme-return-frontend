@@ -20,6 +20,8 @@ import play.api.libs.json.{__, JsPath}
 
 package object moneyborrowed {
   object Paths {
-    val borrowingDetailsType: JsPath = __ \ "borrowingDetailsType"
+    val assets: JsPath = __ \ "assets"
+    val borrowing: JsPath = assets \ "borrowing"
+    val moneyBorrowed: JsPath = borrowing \ "moneyBorrowed"
   }
 }

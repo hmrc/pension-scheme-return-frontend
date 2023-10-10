@@ -26,7 +26,7 @@ import utils.RefinedUtils.RefinedIntOps
 
 case class BorrowedAmountAndRatePage(srn: Srn, index: Max5000) extends QuestionPage[(Money, Percentage)] {
 
-  override def path: JsPath = Paths.borrowingDetailsType \ toString \ index.arrayIndex.toString
+  override def path: JsPath = Paths.moneyBorrowed \ toString \ index.arrayIndex.toString
 
-  override def toString: String = "borrowedMoneyRatesPage"
+  override def toString: String = "interestRate"
 }
