@@ -17,7 +17,7 @@
 package models.requests.psr
 
 import models.{Address, IdentityType, SchemeHoldLandProperty}
-import play.api.libs.json.{JsString, Json, OWrites, Writes}
+import play.api.libs.json.{Json, OWrites}
 
 import java.time.LocalDate
 
@@ -71,8 +71,6 @@ case class LeaseDetails(
 object Assets {
 
   private implicit val writesLeaseDetails: OWrites[LeaseDetails] = Json.writes[LeaseDetails]
-  private implicit val writesSchemeHoldLandProperty: Writes[SchemeHoldLandProperty] =
-    Writes(value => JsString(value.toString))
   private implicit val writesPropertyAcquiredFrom: OWrites[PropertyAcquiredFrom] = Json.writes[PropertyAcquiredFrom]
   private implicit val writesHeldPropertyTransaction: OWrites[HeldPropertyTransaction] =
     Json.writes[HeldPropertyTransaction]
