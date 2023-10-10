@@ -69,7 +69,7 @@ class WhenBorrowedController @Inject()(
             view(
               preparedForm,
               WhenBorrowedController
-                .viewModel(srn, index, mode, request.schemeDetails.schemeName, "CHANGE ME!!!", amountBorrowed._1.value)
+                .viewModel(srn, index, mode, request.schemeDetails.schemeName, amountBorrowed._1.value, "CHANGE ME!!!")
             )
           )
         }
@@ -93,8 +93,8 @@ class WhenBorrowedController @Inject()(
                         index,
                         mode,
                         request.schemeDetails.schemeName,
-                        "CHANGE ME!!!",
-                        amountBorrowed._1.value
+                        amountBorrowed._1.value,
+                        "CHANGE ME!!!"
                       )
                     )
                   )
@@ -116,21 +116,21 @@ class WhenBorrowedController @Inject()(
 object WhenBorrowedController {
   def form(formProvider: DatePageFormProvider)(date: LocalDate, messages: Messages): Form[LocalDate] = formProvider(
     DateFormErrors(
-      required = "whenDidSchemeAcquireLandOrProperty.dateOfAcquired.error.required.all",
-      requiredDay = "whenDidSchemeAcquireLandOrProperty.dateOfAcquired.error.required.day",
-      requiredMonth = "whenDidSchemeAcquireLandOrProperty.dateOfAcquired.error.required.month",
-      requiredYear = "whenDidSchemeAcquireLandOrProperty.dateOfAcquired.error.required.year",
-      requiredTwo = "whenDidSchemeAcquireLandOrProperty.dateOfAcquired.error.required.two",
-      invalidDate = "whenDidSchemeAcquireLandOrProperty.dateOfAcquired.error.invalid.date",
-      invalidCharacters = "whenDidSchemeAcquireLandOrProperty.dateOfAcquired.error.invalid.characters",
+      required = "moneyBorrowed.WhenBorrowed.error.required.all",
+      requiredDay = "moneyBorrowed.WhenBorrowed.error.required.day",
+      requiredMonth = "moneyBorrowed.WhenBorrowed.error.required.month",
+      requiredYear = "moneyBorrowed.WhenBorrowed.error.required.year",
+      requiredTwo = "moneyBorrowed.WhenBorrowed.error.required.two",
+      invalidDate = "moneyBorrowed.WhenBorrowed.error.invalid.date",
+      invalidCharacters = "moneyBorrowed.WhenBorrowed.error.invalid.characters",
       validators = List(
         DateFormErrors
-          .failIfDateAfter(date, messages("whenDidSchemeAcquireLandOrProperty.dateOfAcquired.error.future", date)),
+          .failIfDateAfter(date, messages("moneyBorrowed.WhenBorrowed.error.future", date)),
         DateFormErrors
           .failIfDateBefore(
             Constants.earliestDate,
             messages(
-              "whenDidSchemeAcquireLandOrProperty.dateOfAcquired.error.after",
+              "moneyBorrowed.WhenBorrowed.error.after",
               Constants.earliestDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG))
             )
           )
@@ -143,8 +143,8 @@ object WhenBorrowedController {
     index: Max5000,
     mode: Mode,
     schemeName: String,
-    lenderName: String,
-    amountBorrowed: Double
+    amountBorrowed: Double,
+    lenderName: String
   ): FormPageViewModel[DatePageViewModel] =
     FormPageViewModel(
       "moneyBorrowed.WhenBorrowed.title",
