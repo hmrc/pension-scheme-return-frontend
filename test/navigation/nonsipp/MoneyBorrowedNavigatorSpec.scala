@@ -16,15 +16,23 @@
 
 package navigation.nonsipp
 
-import controllers.routes
+import config.Refined.{Max5000, OneTo5000}
+import eu.timepit.refined.refineMV
+import models.NormalMode
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.moneyborrowed.MoneyBorrowedPage
+import pages.nonsipp.moneyborrowed.{
+  BorrowedAmountAndRatePage,
+  LenderNamePage,
+  MoneyBorrowedPage,
+  WhatYouWillNeedMoneyBorrowedPage
+}
 import utils.BaseSpec
 
 class MoneyBorrowedNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
   val navigator: Navigator = new NonSippNavigator
+  private val index = refineMV[OneTo5000](1)
 
   "MoneyBorrowedNavigator" - {
 
@@ -48,4 +56,30 @@ class MoneyBorrowedNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .withName("go from money borrowed page to task list controller page when no selected")
     )
   }
+
+  "WhatYouWillNeedMoneyBorrowedPage" - {
+    act.like(
+      normalmode
+        .navigateToWithIndex(
+          index,
+          (srn, _: Max5000) => WhatYouWillNeedMoneyBorrowedPage(srn),
+          controllers.nonsipp.moneyborrowed.routes.LenderNameController.onPageLoad
+        )
+        .withName("go from what you will need money borrowed page to lender name page")
+    )
+  }
+
+  "LenderNamePage" - {
+    act.like(
+      normalmode
+        .navigateToWithIndex(
+          index,
+          LenderNamePage,
+          (srn, _: Max5000, _) =>
+            controllers.nonsipp.moneyborrowed.routes.BorrowedAmountAndRateController.onPageLoad(srn, index, NormalMode)
+        )
+        .withName("go from lender name page to borrowed amount and rate page")
+    )
+  }
+
 }
