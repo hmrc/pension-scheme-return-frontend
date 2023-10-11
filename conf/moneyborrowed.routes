@@ -5,3 +5,13 @@ POST        /:srn/change-money-borrowed                                         
 
 GET         /:srn/what-you-will-need-money-borrowed                                     controllers.nonsipp.moneyborrowed.WhatYouWillNeedMoneyBorrowedController.onPageLoad(srn: Srn)
 GET         /:srn/submit-what-you-will-need-money-borrowed                              controllers.nonsipp.moneyborrowed.WhatYouWillNeedMoneyBorrowedController.onSubmit(srn: Srn)
+
+GET         /:srn/lender-name/:index                                                        controllers.nonsipp.moneyborrowed.LenderNameController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/lender-name/:index                                                        controllers.nonsipp.moneyborrowed.LenderNameController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/change-lender-name/:index                                                 controllers.nonsipp.moneyborrowed.LenderNameController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-lender-name/:index                                                 controllers.nonsipp.moneyborrowed.LenderNameController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET         /:srn/amount-borrowed-interest/:index                                              controllers.nonsipp.moneyborrowed.BorrowedAmountAndRateController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/amount-borrowed-interest/:index                                              controllers.nonsipp.moneyborrowed.BorrowedAmountAndRateController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/change-amount-borrowed-interest/:index                                       controllers.nonsipp.moneyborrowed.BorrowedAmountAndRateController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-amount-borrowed-interest/:index                                       controllers.nonsipp.moneyborrowed.BorrowedAmountAndRateController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)

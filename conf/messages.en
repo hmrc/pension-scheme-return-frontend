@@ -1378,3 +1378,23 @@ whatYouWillNeedMoneyBorrowed.list4 = the interest rate
 whatYouWillNeedMoneyBorrowed.list5 = when the scheme borrowed this money
 whatYouWillNeedMoneyBorrowed.list6 = the value of the scheme’s assets on the date the money was borrowed
 whatYouWillNeedMoneyBorrowed.list7 = why the scheme borrowed this money
+
+lenderName.title = What is the name of the lender?
+lenderName.heading = What is the name of the lender?
+lenderName.error.required = Enter the name of the lender
+lenderName.error.tooLong = Lender’s name must be 160 characters or fewer
+lenderName.error.invalid = Lender’s name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+
+moneyBorrowed.borrowedAmountAndRate.title = Amount of money borrowed and interest rate
+moneyBorrowed.borrowedAmountAndRate.heading = Amount of money borrowed and interest rate
+moneyBorrowed.borrowedAmountAndRate.borrowAmount.label = Total amount of money borrowed, in pounds and pence
+moneyBorrowed.borrowedAmountAndRate.borrowInterestRate.label = Interest rate, as a percentage
+moneyBorrowed.borrowedAmountAndRate.borrowInterestRate.hint = Provide the interest rate on the date the money was borrowed.
+moneyBorrowed.borrowedAmountAndRate.borrowInterestRate.error.required = Enter the interest rate, as a percentage
+moneyBorrowed.borrowedAmountAndRate.borrowInterestRate.error.tooHigh = Interest rate must be 100 or less
+moneyBorrowed.borrowedAmountAndRate.borrowInterestRate.error.tooLow = Interest rate must be 0 or more
+moneyBorrowed.borrowedAmountAndRate.borrowInterestRate.error.nonNumeric = Interest rate must be a number, like 2 or 2.1
+
+moneyBorrowed.borrowedAmountAndRate.borrowAmount.error.required = Enter the total amount of money borrowed, in pounds and pence
+moneyBorrowed.borrowedAmountAndRate.borrowAmount.error.nonNumeric = Total amount of money borrowed must be an amount of money, like 123 or 123.45
+moneyBorrowed.borrowedAmountAndRate.borrowAmount.error.tooHigh = Total amount of money borrowed must be 999999999.99 or less

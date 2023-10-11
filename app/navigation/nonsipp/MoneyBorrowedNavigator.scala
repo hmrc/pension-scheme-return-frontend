@@ -16,10 +16,11 @@
 
 package navigation.nonsipp
 
-import models.UserAnswers
+import eu.timepit.refined.refineMV
+import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.moneyborrowed.{MoneyBorrowedPage, WhatYouWillNeedMoneyBorrowedPage}
+import pages.nonsipp.moneyborrowed._
 import play.api.mvc.Call
 
 object MoneyBorrowedNavigator extends JourneyNavigator {
@@ -33,6 +34,12 @@ object MoneyBorrowedNavigator extends JourneyNavigator {
       }
 
     case WhatYouWillNeedMoneyBorrowedPage(srn) =>
+      controllers.nonsipp.moneyborrowed.routes.LenderNameController.onPageLoad(srn, refineMV(1), NormalMode)
+
+    case LenderNamePage(srn, index) =>
+      controllers.nonsipp.moneyborrowed.routes.BorrowedAmountAndRateController.onPageLoad(srn, index, NormalMode)
+
+    case BorrowedAmountAndRatePage(srn, index) =>
       controllers.routes.UnauthorisedController.onPageLoad()
   }
 

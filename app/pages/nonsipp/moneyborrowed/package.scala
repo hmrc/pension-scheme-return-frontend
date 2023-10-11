@@ -14,34 +14,14 @@
  * limitations under the License.
  */
 
-package forms
+package pages.nonsipp
 
-import play.api.data.Forms.mapping
-import play.api.data.{Form, Mapping}
+import play.api.libs.json.{__, JsPath}
 
-object MultipleQuestionFormProvider {
-
-  def apply[A, B, C](
-    a: Mapping[A],
-    b: Mapping[B],
-    c: Mapping[C]
-  ): Form[(A, B, C)] =
-    Form(
-      mapping[(A, B, C), A, B, C](
-        "value.1" -> a,
-        "value.2" -> b,
-        "value.3" -> c
-      )(Tuple3.apply)(Tuple3.unapply)
-    )
-
-  def apply[A, B](
-    a: Mapping[A],
-    b: Mapping[B]
-  ): Form[(A, B)] =
-    Form(
-      mapping[(A, B), A, B](
-        "value.1" -> a,
-        "value.2" -> b
-      )(Tuple2.apply)(Tuple2.unapply)
-    )
+package object moneyborrowed {
+  object Paths {
+    val assets: JsPath = __ \ "assets"
+    val borrowing: JsPath = assets \ "borrowing"
+    val moneyBorrowed: JsPath = borrowing \ "moneyBorrowed"
+  }
 }

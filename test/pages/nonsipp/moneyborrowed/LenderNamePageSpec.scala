@@ -14,34 +14,22 @@
  * limitations under the License.
  */
 
-package forms
+package pages.nonsipp.moneyborrowed
 
-import play.api.data.Forms.mapping
-import play.api.data.{Form, Mapping}
+import config.Refined.OneTo5000
+import eu.timepit.refined.refineMV
+import pages.behaviours.PageBehaviours
 
-object MultipleQuestionFormProvider {
+class LenderNamePageSpec extends PageBehaviours {
 
-  def apply[A, B, C](
-    a: Mapping[A],
-    b: Mapping[B],
-    c: Mapping[C]
-  ): Form[(A, B, C)] =
-    Form(
-      mapping[(A, B, C), A, B, C](
-        "value.1" -> a,
-        "value.2" -> b,
-        "value.3" -> c
-      )(Tuple3.apply)(Tuple3.unapply)
-    )
+  "lenderNamePage" - {
+    val srn = srnGen.sample.value
+    val index = refineMV[OneTo5000](1)
 
-  def apply[A, B](
-    a: Mapping[A],
-    b: Mapping[B]
-  ): Form[(A, B)] =
-    Form(
-      mapping[(A, B), A, B](
-        "value.1" -> a,
-        "value.2" -> b
-      )(Tuple2.apply)(Tuple2.unapply)
-    )
+    beRetrievable[String](LenderNamePage(srn, index))
+
+    beSettable[String](LenderNamePage(srn, index))
+
+    beRemovable[String](LenderNamePage(srn, index))
+  }
 }
