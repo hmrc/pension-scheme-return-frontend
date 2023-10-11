@@ -225,5 +225,4 @@ trait TestValues {
 
   def userAnswersWithNameAndAmount(srn: Srn, index: Max5000): UserAnswers =
     defaultUserAnswers.unsafeSet(LenderNamePage(srn, index), lenderName)
-  //defaultUserAnswers.unsafeSet(BorrowedAmountAndRatePage(srn, index), amountBorrowed)
 }
