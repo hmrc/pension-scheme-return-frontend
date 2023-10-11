@@ -16,9 +16,9 @@
 
 package controllers.nonsipp.moneyborrowed
 
-import config.Refined.{Max50, Max5000}
-import controllers.actions._
+import config.Refined.Max5000
 import controllers.PSRController
+import controllers.actions._
 import forms.TextFormProvider
 import models.Mode
 import models.SchemeId.Srn

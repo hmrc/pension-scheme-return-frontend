@@ -30,7 +30,7 @@ import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, HowManyMembersPag
 import pages.nonsipp.{BasicDetailsCheckYourAnswersPage, WhichTaxYearPage}
 import play.api.i18n._
 import play.api.mvc._
-import services.{PSRSubmissionService, SchemeDateService}
+import services.{PsrSubmissionService, SchemeDateService}
 import utils.DateTimeUtils.localDateShow
 import utils.ListUtils.ListOps
 import viewmodels.DisplayMessage._
@@ -48,7 +48,7 @@ class BasicDetailsCheckYourAnswersController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   schemeDateService: SchemeDateService,
   val controllerComponents: MessagesControllerComponents,
-  psrSubmissionService: PSRSubmissionService,
+  psrSubmissionService: PsrSubmissionService,
   view: CheckYourAnswersView
 )(implicit ec: ExecutionContext)
     extends PSRController {

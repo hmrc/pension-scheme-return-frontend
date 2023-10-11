@@ -22,6 +22,7 @@ import models.NormalMode
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.moneyborrowed._
+
 import utils.BaseSpec
 
 class MoneyBorrowedNavigatorSpec extends BaseSpec with NavigatorBehaviours {
