@@ -136,7 +136,13 @@ object WhenBorrowedController {
       invalidCharacters = "moneyBorrowed.WhenBorrowed.error.invalid.characters",
       validators = List(
         DateFormErrors
-          .failIfDateAfter(date, messages("moneyBorrowed.WhenBorrowed.error.future", date)),
+          .failIfDateAfter(
+            date,
+            messages(
+              "moneyBorrowed.WhenBorrowed.error.future",
+              date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG))
+            )
+          ),
         DateFormErrors
           .failIfDateBefore(
             Constants.earliestDate,
