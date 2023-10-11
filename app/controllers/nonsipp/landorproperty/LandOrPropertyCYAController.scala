@@ -29,6 +29,7 @@ import pages.nonsipp.common._
 import pages.nonsipp.landorproperty._
 import play.api.i18n._
 import play.api.mvc._
+import services.PsrSubmissionService
 import utils.DateTimeUtils.localDateShow
 import utils.ListUtils.ListOps
 import viewmodels.DisplayMessage._
@@ -38,14 +39,17 @@ import views.html.CheckYourAnswersView
 
 import java.time.LocalDate
 import javax.inject.{Inject, Named}
+import scala.concurrent.ExecutionContext
 
 class LandOrPropertyCYAController @Inject()(
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
-  view: CheckYourAnswersView
-) extends PSRController {
+  view: CheckYourAnswersView,
+  psrSubmissionService: PsrSubmissionService
+)(implicit ec: ExecutionContext)
+    extends PSRController {
 
   def onPageLoad(
     srn: Srn,
@@ -166,8 +170,11 @@ class LandOrPropertyCYAController @Inject()(
     }
 
   def onSubmit(srn: Srn, checkOrChange: CheckOrChange): Action[AnyContent] =
-    identifyAndRequireData(srn) { implicit request =>
-      Redirect(navigator.nextPage(LandOrPropertyCYAPage(srn), NormalMode, request.userAnswers))
+    identifyAndRequireData(srn).async { implicit request =>
+      psrSubmissionService.submitPsrDetails(srn).map {
+        case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        case Some(_) => Redirect(navigator.nextPage(LandOrPropertyCYAPage(srn), NormalMode, request.userAnswers))
+      }
     }
 }
 

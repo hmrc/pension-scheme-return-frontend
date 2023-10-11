@@ -34,7 +34,7 @@ import pages.nonsipp.common.{
 import pages.nonsipp.loansmadeoroutstanding._
 import play.api.i18n._
 import play.api.mvc._
-import services.{PSRSubmissionService, SchemeDateService}
+import services.{PsrSubmissionService, SchemeDateService}
 import utils.DateTimeUtils.localDateShow
 import utils.ListUtils.ListOps
 import viewmodels.DisplayMessage._
@@ -52,7 +52,7 @@ class LoansCYAController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   schemeDateService: SchemeDateService,
-  psrSubmissionService: PSRSubmissionService,
+  psrSubmissionService: PsrSubmissionService,
   view: CheckYourAnswersView
 )(implicit ec: ExecutionContext)
     extends PSRController {

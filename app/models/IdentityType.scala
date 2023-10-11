@@ -16,6 +16,7 @@
 
 package models
 
+import play.api.libs.json.{JsString, Writes}
 import play.api.mvc.JavascriptLiteral
 import utils.WithName
 
@@ -43,4 +44,7 @@ object IdentityType extends Enumerable.Implicits {
   implicit val enumerable: Enumerable[IdentityType] = Enumerable(values.map(v => (v.toString, v)): _*)
 
   implicit val jsLiteral: JavascriptLiteral[IdentityType] = (value: IdentityType) => value.name
+
+  implicit val writes: Writes[IdentityType] =
+    Writes(value => JsString(value.toString))
 }
