@@ -1398,3 +1398,15 @@ moneyBorrowed.borrowedAmountAndRate.borrowInterestRate.error.nonNumeric = Intere
 moneyBorrowed.borrowedAmountAndRate.borrowAmount.error.required = Enter the total amount of money borrowed, in pounds and pence
 moneyBorrowed.borrowedAmountAndRate.borrowAmount.error.nonNumeric = Total amount of money borrowed must be an amount of money, like 123 or 123.45
 moneyBorrowed.borrowedAmountAndRate.borrowAmount.error.tooHigh = Total amount of money borrowed must be 999999999.99 or less
+
+moneyBorrowed.WhenBorrowed.title = When did the scheme borrow this money from the lender?
+moneyBorrowed.WhenBorrowed.heading = When did {0} borrow £{2} from {1}
+moneyBorrowed.WhenBorrowed.error.required.all = Enter the date the scheme borrowed this money
+moneyBorrowed.WhenBorrowed.error.required.day = Date the scheme acquired this land or property must include a day
+moneyBorrowed.WhenBorrowed.error.required.month = Date the scheme borrowed this money must include a month
+moneyBorrowed.WhenBorrowed.error.required.year = Date the scheme borrowed this money must include a year
+moneyBorrowed.WhenBorrowed.error.required.two = Date the scheme borrowed this money must include a {0} and {1}
+moneyBorrowed.WhenBorrowed.error.invalid.date = Date the scheme borrowed this money must be a real date
+moneyBorrowed.WhenBorrowed.error.invalid.characters = Date the scheme borrowed this money must only include numbers 0 to 9
+moneyBorrowed.WhenBorrowed.error.future = Date the scheme borrowed this money must be before {0}
+moneyBorrowed.WhenBorrowed.error.after = Date the scheme borrowed this money must be after {0}

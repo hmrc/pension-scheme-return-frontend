@@ -21,7 +21,8 @@ import eu.timepit.refined.refineMV
 import models.NormalMode
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.moneyborrowed.{LenderNamePage, MoneyBorrowedPage, WhatYouWillNeedMoneyBorrowedPage}
+import pages.nonsipp.moneyborrowed._
+
 import utils.BaseSpec
 
 class MoneyBorrowedNavigatorSpec extends BaseSpec with NavigatorBehaviours {
@@ -74,6 +75,31 @@ class MoneyBorrowedNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             controllers.nonsipp.moneyborrowed.routes.BorrowedAmountAndRateController.onPageLoad(srn, index, NormalMode)
         )
         .withName("go from lender name page to borrowed amount and rate page")
+    )
+  }
+
+  "BorrowedAmountAndRatePage" - {
+    act.like(
+      normalmode
+        .navigateToWithIndex(
+          index,
+          BorrowedAmountAndRatePage,
+          (srn, _: Max5000, _) =>
+            controllers.nonsipp.moneyborrowed.routes.WhenBorrowedController.onPageLoad(srn, index, NormalMode)
+        )
+        .withName("go from borrowed amount and interest rate to when amount was borrowed rate page")
+    )
+  }
+
+  "WhenBorrowedPage" - {
+    act.like(
+      normalmode
+        .navigateToWithIndex(
+          index,
+          WhenBorrowedPage,
+          (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+        )
+        .withName("go from when amount was borrowed rate page to unauthorised controller")
     )
   }
 
