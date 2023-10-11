@@ -22,7 +22,7 @@ import models.DateRange
 import org.mockito.ArgumentMatchers.any
 import org.mockito.MockitoSugar.when
 import org.mockito.stubbing.ScalaOngoingStubbing
-import services.{PSRSubmissionService, SchemeDateService}
+import services.{PsrSubmissionService, SchemeDateService}
 
 import scala.concurrent.Future
 
@@ -44,7 +44,7 @@ trait MockBehaviours {
 
   object MockPSRSubmissionService {
 
-    def submitPsrDetails()(implicit mock: PSRSubmissionService): ScalaOngoingStubbing[Future[Option[Unit]]] =
+    def submitPsrDetails()(implicit mock: PsrSubmissionService): ScalaOngoingStubbing[Future[Option[Unit]]] =
       when(mock.submitPsrDetails(any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(())))
   }

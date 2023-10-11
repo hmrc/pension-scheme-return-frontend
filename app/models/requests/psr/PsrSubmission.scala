@@ -21,7 +21,8 @@ import play.api.libs.json.{Json, OWrites}
 case class PsrSubmission(
   minimalRequiredSubmission: MinimalRequiredSubmission,
   checkReturnDates: Boolean,
-  loans: Option[Loans]
+  loans: Option[Loans],
+  assets: Option[Assets]
 )
 
 object PsrSubmission {

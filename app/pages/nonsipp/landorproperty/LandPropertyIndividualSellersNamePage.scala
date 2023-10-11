@@ -23,6 +23,7 @@ import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
 
 case class LandPropertyIndividualSellersNamePage(srn: Srn, index: Max5000) extends QuestionPage[String] {
-  override def path: JsPath = Paths.heldPropertyTransactions \ index.arrayIndex.toString
+  override def path: JsPath = Paths.heldPropertyTransactions \ toString \ index.arrayIndex.toString
+
   override def toString: String = "individualSellerName"
 }

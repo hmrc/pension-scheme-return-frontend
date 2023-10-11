@@ -32,7 +32,7 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
 import play.api.test.FakeRequest
 import play.api.test.Helpers.stubMessagesApi
-import services.{PSRSubmissionService, SchemeDateService}
+import services.{PsrSubmissionService, SchemeDateService}
 import viewmodels.models.{CheckYourAnswersViewModel, FormPageViewModel}
 import views.html.CheckYourAnswersView
 
@@ -42,11 +42,11 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec {
   private lazy val onSubmit = routes.BasicDetailsCheckYourAnswersController.onSubmit(srn, NormalMode)
 
   private implicit val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
-  private implicit val mockPSRSubmissionService: PSRSubmissionService = mock[PSRSubmissionService]
+  private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
 
   override protected val additionalBindings: List[GuiceableModule] = List(
     bind[SchemeDateService].toInstance(mockSchemeDateService),
-    bind[PSRSubmissionService].toInstance(mockPSRSubmissionService)
+    bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
   )
 
   "BasicDetailsCheckYourAnswersController" - {
