@@ -26,7 +26,7 @@ import models.Mode
 import models.SchemeId.Srn
 import models.requests.DataRequest
 import navigation.Navigator
-import pages.nonsipp.moneyborrowed.{BorrowedAmountAndRatePage, WhenBorrowedPage}
+import pages.nonsipp.moneyborrowed.{BorrowedAmountAndRatePage, LenderNamePage, WhenBorrowedPage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -61,17 +61,19 @@ class WhenBorrowedController @Inject()(
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
-        request.userAnswers.get(BorrowedAmountAndRatePage(srn, index)).getOrRecoverJourney { amountBorrowed =>
-          val preparedForm = {
-            request.userAnswers.fillForm(WhenBorrowedPage(srn, index), form(date.to, request))
-          }
-          Ok(
-            view(
-              preparedForm,
-              WhenBorrowedController
-                .viewModel(srn, index, mode, request.schemeDetails.schemeName, amountBorrowed._1.value, "CHANGE ME!!!")
+        request.userAnswers.get(LenderNamePage(srn, index)).getOrRecoverJourney { lenderName =>
+          request.userAnswers.get(BorrowedAmountAndRatePage(srn, index)).getOrRecoverJourney { amountBorrowed =>
+            val preparedForm = {
+              request.userAnswers.fillForm(WhenBorrowedPage(srn, index), form(date.to, request))
+            }
+            Ok(
+              view(
+                preparedForm,
+                WhenBorrowedController
+                  .viewModel(srn, index, mode, request.schemeDetails.schemeName, amountBorrowed._1.value, lenderName)
+              )
             )
-          )
+          }
         }
       }
   }
@@ -79,35 +81,37 @@ class WhenBorrowedController @Inject()(
   def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
-        request.userAnswers.get(BorrowedAmountAndRatePage(srn, index)).getOrRecoverJourney { amountBorrowed =>
-          form(date.to, request)
-            .bindFromRequest()
-            .fold(
-              formWithErrors =>
-                Future.successful(
-                  BadRequest(
-                    view(
-                      formWithErrors,
-                      WhenBorrowedController.viewModel(
-                        srn,
-                        index,
-                        mode,
-                        request.schemeDetails.schemeName,
-                        amountBorrowed._1.value,
-                        "CHANGE ME!!!"
+        request.userAnswers.get(LenderNamePage(srn, index)).getOrRecoverJourney { lenderName =>
+          request.userAnswers.get(BorrowedAmountAndRatePage(srn, index)).getOrRecoverJourney { amountBorrowed =>
+            form(date.to, request)
+              .bindFromRequest()
+              .fold(
+                formWithErrors =>
+                  Future.successful(
+                    BadRequest(
+                      view(
+                        formWithErrors,
+                        WhenBorrowedController.viewModel(
+                          srn,
+                          index,
+                          mode,
+                          request.schemeDetails.schemeName,
+                          amountBorrowed._1.value,
+                          lenderName
+                        )
                       )
                     )
+                  ),
+                value =>
+                  for {
+                    updatedAnswers <- Future
+                      .fromTry(request.userAnswers.set(WhenBorrowedPage(srn, index), value))
+                    _ <- saveService.save(updatedAnswers)
+                  } yield Redirect(
+                    navigator.nextPage(WhenBorrowedPage(srn, index), mode, updatedAnswers)
                   )
-                ),
-              value =>
-                for {
-                  updatedAnswers <- Future
-                    .fromTry(request.userAnswers.set(WhenBorrowedPage(srn, index), value))
-                  _ <- saveService.save(updatedAnswers)
-                } yield Redirect(
-                  navigator.nextPage(WhenBorrowedPage(srn, index), mode, updatedAnswers)
-                )
-            )
+              )
+          }
         }
       }
   }
