@@ -97,6 +97,6 @@ object LenderNameController {
       "lenderName.title",
       "lenderName.heading",
       TextInputViewModel(isFixedLength = true),
-      controllers.nonsipp.moneyborrowed.routes.LenderNameController.onSubmit(srn, index, mode)
+      routes.LenderNameController.onSubmit(srn, index, mode)
     )
 }
