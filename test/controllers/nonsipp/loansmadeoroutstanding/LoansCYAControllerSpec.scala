@@ -35,21 +35,21 @@ import pages.nonsipp.common.{CompanyRecipientCrnPage, IdentityTypePage}
 import pages.nonsipp.loansmadeoroutstanding._
 import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
-import services.{PSRSubmissionService, SchemeDateService}
+import services.{PsrSubmissionService, SchemeDateService}
 import views.html.CheckYourAnswersView
 
 class LoansCYAControllerSpec extends ControllerBaseSpec {
 
   private implicit val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
-  private implicit val mockPSRSubmissionService: PSRSubmissionService = mock[PSRSubmissionService]
+  private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
 
   override protected val additionalBindings: List[GuiceableModule] = List(
     bind[SchemeDateService].toInstance(mockSchemeDateService),
-    bind[PSRSubmissionService].toInstance(mockPSRSubmissionService)
+    bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
   )
 
   override protected def beforeAll(): Unit =
-    reset(mockSchemeDateService, mockPSRSubmissionService)
+    reset(mockSchemeDateService, mockPsrSubmissionService)
 
   private val index = refineMV[OneTo5000](1)
   private val taxYear = Some(Left(dateRange))

@@ -14,30 +14,24 @@
  * limitations under the License.
  */
 
-package forms
+package pages.nonsipp.moneyborrowed
 
-import forms.behaviours.FieldBehaviours
-import models.RecipientDetails
-import play.api.data.Form
+import config.Refined.OneTo5000
+import eu.timepit.refined.refineMV
+import pages.behaviours.PageBehaviours
 
-class RecipientDetailsFormProviderSpec extends FieldBehaviours {
+import java.time.LocalDate
 
-  private val formProvider = new RecipientDetailsFormProvider()
+class WhenBorrowedPageSpec extends PageBehaviours {
 
-  val form: Form[RecipientDetails] = formProvider(
-    "name.error.required",
-    "name.error.invalid",
-    "name.error.length",
-    "description.error.invalid",
-    "description.error.length"
-  )
+  "WhenBorrowedPage" - {
 
-  "name" - {
-    behave.like(mandatoryField(form, "name", "name.error.required"))
+    val index = refineMV[OneTo5000](1)
+
+    beRetrievable[LocalDate](WhenBorrowedPage(srnGen.sample.value, index))
+
+    beSettable[LocalDate](WhenBorrowedPage(srnGen.sample.value, index))
+
+    beRemovable[LocalDate](WhenBorrowedPage(srnGen.sample.value, index))
   }
-
-  "description" - {
-    behave.like(optionalField(form, "description"))
-  }
-
 }

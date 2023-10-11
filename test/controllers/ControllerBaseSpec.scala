@@ -26,6 +26,7 @@ import models.UserAnswers.SensitiveJsObject
 import models.{NameDOB, _}
 import org.scalatest.OptionValues
 import pages.nonsipp.landorproperty.LandOrPropertyAddressLookupPage
+import pages.nonsipp.moneyborrowed.{BorrowedAmountAndRatePage, LenderNamePage}
 import play.api.Application
 import play.api.data.Form
 import play.api.http._
@@ -122,6 +123,7 @@ trait TestValues {
   val titleNumber = "AB123456"
   val buyersName = "testBuyersName"
   val lenderName = "testLenderName"
+  val amountBorrowed: (Money, Percentage) = (money, percentage)
 
   val address: Address = Address(
     "testAddressLine1",
@@ -220,4 +222,7 @@ trait TestValues {
 
   def userAnswersWithAddress(srn: Srn, index: Max5000): UserAnswers =
     defaultUserAnswers.unsafeSet(LandOrPropertyAddressLookupPage(srn, index), address)
+
+  def userAnswersWithNameAndAmount(srn: Srn, index: Max5000): UserAnswers =
+    defaultUserAnswers.unsafeSet(LenderNamePage(srn, index), lenderName)
 }

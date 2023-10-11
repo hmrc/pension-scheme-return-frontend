@@ -14,30 +14,20 @@
  * limitations under the License.
  */
 
-package forms
+package pages.nonsipp.moneyborrowed
 
-import forms.behaviours.FieldBehaviours
-import models.RecipientDetails
-import play.api.data.Form
+import config.Refined.Max5000
+import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
+import utils.RefinedUtils.RefinedIntOps
 
-class RecipientDetailsFormProviderSpec extends FieldBehaviours {
+import java.time.LocalDate
 
-  private val formProvider = new RecipientDetailsFormProvider()
+case class WhenBorrowedPage(srn: Srn, index: Max5000) extends QuestionPage[LocalDate] {
 
-  val form: Form[RecipientDetails] = formProvider(
-    "name.error.required",
-    "name.error.invalid",
-    "name.error.length",
-    "description.error.invalid",
-    "description.error.length"
-  )
+  override def path: JsPath =
+    Paths.moneyBorrowed \ toString \ index.arrayIndex.toString
 
-  "name" - {
-    behave.like(mandatoryField(form, "name", "name.error.required"))
-  }
-
-  "description" - {
-    behave.like(optionalField(form, "description"))
-  }
-
+  override def toString: String = "dateOfBorrow"
 }
