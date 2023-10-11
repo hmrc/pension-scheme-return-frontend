@@ -42,6 +42,14 @@
 
     @viewmodel.description.map(renderMessage)
 
+                    @viewmodel.details.map { detail =>
+                            @govukDetails(
+                                DetailsViewModel(
+                                     renderMessage(detail.title),
+                                    renderMessage(detail.contents))
+                            )
+                   }
+
     @govukRadios(
         RadiosViewModel.yesNo(
             field = form("value"),

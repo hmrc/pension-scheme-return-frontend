@@ -16,6 +16,7 @@
 
 package controllers.nonsipp.sharesacquiredfromconnectedparty
 
+import config.FrontendAppConfig
 import controllers.actions._
 import controllers.nonsipp.sharesacquiredfromconnectedparty.SharesAcquiredFromConnectedPartyController.viewModel
 import forms.YesNoPageFormProvider
@@ -42,6 +43,7 @@ class SharesAcquiredFromConnectedPartyController @Inject()(
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   formProvider: YesNoPageFormProvider,
+  config: FrontendAppConfig,
   val controllerComponents: MessagesControllerComponents,
   view: YesNoPageView
 )(implicit ec: ExecutionContext)
@@ -52,7 +54,7 @@ class SharesAcquiredFromConnectedPartyController @Inject()(
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     val preparedForm = request.userAnswers.get(SharesAcquiredFromConnectedPartyPage(srn)).fold(form)(form.fill)
-    Ok(view(preparedForm, viewModel(srn, request.schemeDetails.schemeName, mode)))
+    Ok(view(preparedForm, viewModel(srn, request.schemeDetails.schemeName, config.urls.incomeTaxAct, mode)))
   }
 
   def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
@@ -60,7 +62,11 @@ class SharesAcquiredFromConnectedPartyController @Inject()(
       .bindFromRequest()
       .fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, viewModel(srn, request.schemeDetails.schemeName, mode)))),
+          Future.successful(
+            BadRequest(
+              view(formWithErrors, viewModel(srn, request.schemeDetails.schemeName, config.urls.incomeTaxAct, mode))
+            )
+          ),
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(SharesAcquiredFromConnectedPartyPage(srn), value))
@@ -74,7 +80,7 @@ object SharesAcquiredFromConnectedPartyController {
     "sharesAcquiredFromConnectedParty.error.required"
   )
 
-  def viewModel(srn: Srn, schemeName: String, mode: Mode): FormPageViewModel[YesNoPageViewModel] =
+  def viewModel(srn: Srn, schemeName: String, incomeTaxAct: String, mode: Mode): FormPageViewModel[YesNoPageViewModel] =
     FormPageViewModel(
       "sharesAcquiredFromConnectedParty.title",
       Message("sharesAcquiredFromConnectedParty.heading", schemeName),
@@ -88,10 +94,7 @@ object SharesAcquiredFromConnectedPartyController {
               ++ ParagraphMessage("sharesAcquiredFromConnectedParty.details.paragraph2")
               ++ ParagraphMessage(
                 "sharesAcquiredFromConnectedParty.details.paragraph3",
-                LinkMessage(
-                  "sharesAcquired.linkMessage",
-                  "https://www.legislation.gov.uk/ukpga/2007/3/section/993"
-                )
+                LinkMessage("sharesAcquiredFromConnectedParty.details.paragraph3.link", incomeTaxAct)
               )
           )
         )
