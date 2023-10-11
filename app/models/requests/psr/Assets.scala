@@ -58,14 +58,14 @@ case class PropertyAcquiredFrom(
   identityType: IdentityType,
   idNumber: Option[String],
   reasonNoIdNumber: Option[String],
-  otherDescription: Option[String],
-  connectedPartyStatus: Boolean
+  otherDescription: Option[String]
 )
 
 case class LeaseDetails(
   lesseeName: String,
   leaseGrantDate: LocalDate,
-  annualLeaseAmount: Double
+  annualLeaseAmount: Double,
+  connectedPartyStatus: Boolean
 )
 
 object Assets {

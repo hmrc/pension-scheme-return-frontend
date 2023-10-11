@@ -80,12 +80,12 @@ class LandOrPropertyTransactionsTransformer @Inject()() {
                       methodOfHolding = methodOfHolding,
                       dateOfAcquisitionOrContribution = optNoneTransferRelatedDetails.map(_._2),
                       optPropertyAcquiredFromName = optAcquisitionRelatedDetails.map(_._1),
-                      optPropertyAcquiredFrom = optAcquisitionRelatedDetails.map(_._2),
-                      optConnectedPartyStatus = optLandOrPropertyLeasedDetails.map(_._2),
+                      optPropertyAcquiredFrom = optAcquisitionRelatedDetails.map(_._3),
+                      optConnectedPartyStatus = optAcquisitionRelatedDetails.map(_._2),
                       totalCostOfLandOrProperty = totalCostOfLandOrProperty.value,
                       optIndepValuationSupport = optNoneTransferRelatedDetails.map(_._1),
                       isLandOrPropertyResidential = isLandOrPropertyResidential,
-                      optLeaseDetails = optLandOrPropertyLeasedDetails.map(_._1),
+                      optLeaseDetails = optLandOrPropertyLeasedDetails,
                       landOrPropertyLeased = landOrPropertyLeased,
                       totalIncomeOrReceipts = totalIncomeOrReceipts.value
                     )
@@ -117,7 +117,7 @@ class LandOrPropertyTransactionsTransformer @Inject()() {
     methodOfHolding: SchemeHoldLandProperty,
     srn: Srn,
     index: Refined[Int, OneTo5000]
-  )(implicit request: DataRequest[_]): Option[(String, PropertyAcquiredFrom)] =
+  )(implicit request: DataRequest[_]): Option[(String, Boolean, PropertyAcquiredFrom)] =
     Option
       .when(methodOfHolding == Acquisition) {
         val receivedLandType =
@@ -134,23 +134,23 @@ class LandOrPropertyTransactionsTransformer @Inject()() {
               case (name, Right(nino)) =>
                 (
                   name,
+                  sellerConnectedParty,
                   PropertyAcquiredFrom(
                     identityType = receivedLandType,
                     idNumber = Some(nino.value),
                     reasonNoIdNumber = None,
-                    otherDescription = None,
-                    connectedPartyStatus = sellerConnectedParty
+                    otherDescription = None
                   )
                 )
               case (name, Left(noNinoReason)) =>
                 (
                   name,
+                  sellerConnectedParty,
                   PropertyAcquiredFrom(
                     identityType = receivedLandType,
                     idNumber = None,
                     reasonNoIdNumber = Some(noNinoReason),
-                    otherDescription = None,
-                    connectedPartyStatus = sellerConnectedParty
+                    otherDescription = None
                   )
                 )
             }
@@ -164,23 +164,23 @@ class LandOrPropertyTransactionsTransformer @Inject()() {
               case (name, Right(crn)) =>
                 (
                   name,
+                  sellerConnectedParty,
                   PropertyAcquiredFrom(
                     identityType = receivedLandType,
                     idNumber = Some(crn.value),
                     reasonNoIdNumber = None,
-                    otherDescription = None,
-                    connectedPartyStatus = sellerConnectedParty
+                    otherDescription = None
                   )
                 )
               case (name, Left(noCrnReason)) =>
                 (
                   name,
+                  sellerConnectedParty,
                   PropertyAcquiredFrom(
                     identityType = receivedLandType,
                     idNumber = None,
                     reasonNoIdNumber = Some(noCrnReason),
-                    otherDescription = None,
-                    connectedPartyStatus = sellerConnectedParty
+                    otherDescription = None
                   )
                 )
             }
@@ -195,23 +195,23 @@ class LandOrPropertyTransactionsTransformer @Inject()() {
               case (name, Right(utr)) =>
                 (
                   name,
+                  sellerConnectedParty,
                   PropertyAcquiredFrom(
                     identityType = receivedLandType,
                     idNumber = Some(utr.value.filterNot(_.isWhitespace)),
                     reasonNoIdNumber = None,
-                    otherDescription = None,
-                    connectedPartyStatus = sellerConnectedParty
+                    otherDescription = None
                   )
                 )
               case (name, Left(noUtrReason)) =>
                 (
                   name,
+                  sellerConnectedParty,
                   PropertyAcquiredFrom(
                     identityType = receivedLandType,
                     idNumber = None,
                     reasonNoIdNumber = Some(noUtrReason),
-                    otherDescription = None,
-                    connectedPartyStatus = sellerConnectedParty
+                    otherDescription = None
                   )
                 )
             }
@@ -222,12 +222,12 @@ class LandOrPropertyTransactionsTransformer @Inject()() {
                 other =>
                   (
                     other.name,
+                    sellerConnectedParty,
                     PropertyAcquiredFrom(
                       identityType = receivedLandType,
                       idNumber = None,
                       reasonNoIdNumber = None,
-                      otherDescription = Some(other.description),
-                      connectedPartyStatus = sellerConnectedParty
+                      otherDescription = Some(other.description)
                     )
                   )
               )
@@ -240,18 +240,16 @@ class LandOrPropertyTransactionsTransformer @Inject()() {
     landOrPropertyLeased: Boolean,
     srn: Srn,
     index: Refined[Int, OneTo5000]
-  )(implicit request: DataRequest[_]): Option[(LeaseDetails, Boolean)] =
+  )(implicit request: DataRequest[_]): Option[LeaseDetails] =
     Option.when(landOrPropertyLeased) {
       val leaseDetails =
         request.userAnswers.get(LandOrPropertyLeaseDetailsPage(srn, index)).get
       val leaseConnectedParty = request.userAnswers.get(IsLesseeConnectedPartyPage(srn, index)).get
-      (
-        LeaseDetails(
-          lesseeName = leaseDetails._1,
-          leaseGrantDate = leaseDetails._3,
-          annualLeaseAmount = leaseDetails._2.value
-        ),
-        leaseConnectedParty
+      LeaseDetails(
+        lesseeName = leaseDetails._1,
+        leaseGrantDate = leaseDetails._3,
+        annualLeaseAmount = leaseDetails._2.value,
+        connectedPartyStatus = leaseConnectedParty
       )
     }
 
