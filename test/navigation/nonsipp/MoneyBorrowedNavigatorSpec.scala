@@ -21,12 +21,7 @@ import eu.timepit.refined.refineMV
 import models.NormalMode
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.moneyborrowed.{
-  BorrowedAmountAndRatePage,
-  LenderNamePage,
-  MoneyBorrowedPage,
-  WhatYouWillNeedMoneyBorrowedPage
-}
+import pages.nonsipp.moneyborrowed.{LenderNamePage, MoneyBorrowedPage, WhatYouWillNeedMoneyBorrowedPage}
 import utils.BaseSpec
 
 class MoneyBorrowedNavigatorSpec extends BaseSpec with NavigatorBehaviours {
