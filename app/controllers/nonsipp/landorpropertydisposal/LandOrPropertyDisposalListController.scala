@@ -55,18 +55,16 @@ class LandOrPropertyDisposalListController @Inject()(
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      getDisposals(srn)
-        .map(
-          disposals =>
-            if (disposals.isEmpty) {
-              Redirect(routes.LandOrPropertyDisposalAddressListController.onPageLoad(srn, page = 1))
-            } else {
-              getAddressesWithIndexes(srn, disposals)
-                .map(indexes => Ok(view(form, viewModel(srn, page, indexes))))
-                .merge
-            }
-        )
-        .merge
+      getDisposals(srn).map { disposals =>
+        val disposalAmount = disposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
+        if (disposalAmount == 0) {
+          Redirect(routes.LandOrPropertyDisposalController.onPageLoad(srn, NormalMode))
+        } else {
+          getAddressesWithIndexes(srn, disposals)
+            .map(indexes => Ok(view(form, viewModel(srn, page, indexes))))
+            .merge
+        }
+      }.merge
   }
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
