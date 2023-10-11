@@ -70,7 +70,14 @@ class WhenBorrowedController @Inject()(
               view(
                 preparedForm,
                 WhenBorrowedController
-                  .viewModel(srn, index, mode, request.schemeDetails.schemeName, amountBorrowed._1.value, lenderName)
+                  .viewModel(
+                    srn,
+                    index,
+                    mode,
+                    request.schemeDetails.schemeName,
+                    amountBorrowed._1.displayAs,
+                    lenderName
+                  )
               )
             )
           }
@@ -96,7 +103,7 @@ class WhenBorrowedController @Inject()(
                           index,
                           mode,
                           request.schemeDetails.schemeName,
-                          amountBorrowed._1.value,
+                          amountBorrowed._1.displayAs,
                           lenderName
                         )
                       )
@@ -147,12 +154,12 @@ object WhenBorrowedController {
     index: Max5000,
     mode: Mode,
     schemeName: String,
-    amountBorrowed: Double,
+    amountBorrowed: String,
     lenderName: String
   ): FormPageViewModel[DatePageViewModel] =
     FormPageViewModel(
       "moneyBorrowed.WhenBorrowed.title",
-      Message("moneyBorrowed.WhenBorrowed.heading", schemeName, lenderName, amountBorrowed.toString),
+      Message("moneyBorrowed.WhenBorrowed.heading", schemeName, lenderName, amountBorrowed),
       DatePageViewModel(),
       controllers.nonsipp.moneyborrowed.routes.WhenBorrowedController.onSubmit(srn, index, mode)
     )
