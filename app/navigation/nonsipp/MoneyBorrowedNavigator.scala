@@ -37,6 +37,9 @@ object MoneyBorrowedNavigator extends JourneyNavigator {
       controllers.nonsipp.moneyborrowed.routes.LenderNameController.onPageLoad(srn, refineMV(1), NormalMode)
 
     case LenderNamePage(srn, index) =>
+      controllers.nonsipp.moneyborrowed.routes.IsLenderConnectedPartyController.onPageLoad(srn, index, NormalMode)
+
+    case IsLenderConnectedPartyPage(srn, index) =>
       controllers.nonsipp.moneyborrowed.routes.BorrowedAmountAndRateController.onPageLoad(srn, index, NormalMode)
 
     case BorrowedAmountAndRatePage(srn, index) =>

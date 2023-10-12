@@ -43,4 +43,18 @@ object YesNoPageViewModel {
       YesNoPageViewModel(),
       onSubmit
     )
+
+  def apply(
+    title: Message,
+    heading: Message,
+    furtherDetailsViewModel: Option[FurtherDetailsViewModel],
+    onSubmit: Call
+  ): FormPageViewModel[YesNoPageViewModel] =
+    FormPageViewModel(
+      title,
+      heading,
+      YesNoPageViewModel(),
+      furtherDetailsViewModel,
+      onSubmit
+    )
 }

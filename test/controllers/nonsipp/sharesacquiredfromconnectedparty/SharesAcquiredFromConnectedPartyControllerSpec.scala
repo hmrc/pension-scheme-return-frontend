@@ -28,16 +28,19 @@ class SharesAcquiredFromConnectedPartyControllerSpec extends ControllerBaseSpec 
   private lazy val onPageLoad = routes.SharesAcquiredFromConnectedPartyController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.SharesAcquiredFromConnectedPartyController.onSubmit(srn, NormalMode)
 
+  private val incomeTaxAct = "https://www.legislation.gov.uk/ukpga/2007/3/section/993"
+
   "SharesAcquiredFromConnectedParty" - {
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
-      injected[YesNoPageView].apply(form(injected[YesNoPageFormProvider]), viewModel(srn, schemeName, NormalMode))
+      injected[YesNoPageView]
+        .apply(form(injected[YesNoPageFormProvider]), viewModel(srn, schemeName, incomeTaxAct, NormalMode))
     })
 
     act.like(renderPrePopView(onPageLoad, SharesAcquiredFromConnectedPartyPage(srn), true) {
       implicit app => implicit request =>
         injected[YesNoPageView]
-          .apply(form(injected[YesNoPageFormProvider]).fill(true), viewModel(srn, schemeName, NormalMode))
+          .apply(form(injected[YesNoPageFormProvider]).fill(true), viewModel(srn, schemeName, incomeTaxAct, NormalMode))
     })
 
     act.like(redirectNextPage(onSubmit, "value" -> "true"))

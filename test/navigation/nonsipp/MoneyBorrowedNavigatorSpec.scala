@@ -72,9 +72,9 @@ class MoneyBorrowedNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           index,
           LenderNamePage,
           (srn, _: Max5000, _) =>
-            controllers.nonsipp.moneyborrowed.routes.BorrowedAmountAndRateController.onPageLoad(srn, index, NormalMode)
+            controllers.nonsipp.moneyborrowed.routes.IsLenderConnectedPartyController.onPageLoad(srn, index, NormalMode)
         )
-        .withName("go from lender name page to borrowed amount and rate page")
+        .withName("go from lender name page to is lender connected party page")
     )
   }
 

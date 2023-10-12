@@ -11,6 +11,11 @@ POST        /:srn/lender-name/:index                                            
 GET         /:srn/change-lender-name/:index                                             controllers.nonsipp.moneyborrowed.LenderNameController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 POST        /:srn/change-lender-name/:index                                             controllers.nonsipp.moneyborrowed.LenderNameController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 
+GET         /:srn/is-lender-connected-party/:index                                                        controllers.nonsipp.moneyborrowed.IsLenderConnectedPartyController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/is-lender-connected-party/:index                                                        controllers.nonsipp.moneyborrowed.IsLenderConnectedPartyController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/change-is-lender-connected-party/:index                                                 controllers.nonsipp.moneyborrowed.IsLenderConnectedPartyController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-is-lender-connected-party/:index                                                 controllers.nonsipp.moneyborrowed.IsLenderConnectedPartyController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
 GET         /:srn/amount-borrowed-interest/:index                                       controllers.nonsipp.moneyborrowed.BorrowedAmountAndRateController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
 POST        /:srn/amount-borrowed-interest/:index                                       controllers.nonsipp.moneyborrowed.BorrowedAmountAndRateController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
 GET         /:srn/change-amount-borrowed-interest/:index                                controllers.nonsipp.moneyborrowed.BorrowedAmountAndRateController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
