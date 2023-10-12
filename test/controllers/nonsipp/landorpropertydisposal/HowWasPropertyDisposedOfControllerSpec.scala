@@ -63,13 +63,13 @@ class HowWasPropertyDisposedOfControllerSpec extends ControllerBaseSpec {
 
     act.like(redirectNextPage(onSubmit, "value" -> "Sold"))
     act.like(redirectNextPage(onSubmit, "value" -> "Transferred"))
-    act.like(redirectNextPage(onSubmit, "value" -> "other", "conditional" -> "details"))
+    act.like(redirectNextPage(onSubmit, "value" -> "Other", "conditional" -> "details"))
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
     act.like(saveAndContinue(onSubmit, "value" -> "Sold"))
     act.like(saveAndContinue(onSubmit, "value" -> "Transferred"))
-    act.like(saveAndContinue(onSubmit, "value" -> "other", "conditional" -> "details"))
+    act.like(saveAndContinue(onSubmit, "value" -> "Other", "conditional" -> "details"))
 
     act.like(invalidForm(onSubmit, userAnswers))
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))

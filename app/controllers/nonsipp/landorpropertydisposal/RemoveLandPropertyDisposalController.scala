@@ -81,6 +81,8 @@ class RemoveLandPropertyDisposalController @Inject()(
       .flatMap(_.remove(DisposalIndependentValuationPage(srn, landOrPropertyIndex, disposalIndex)))
       .flatMap(_.remove(TotalProceedsSaleLandPropertyPage(srn, landOrPropertyIndex, disposalIndex)))
       .flatMap(_.remove(RemoveLandPropertyDisposalPage(srn, landOrPropertyIndex, disposalIndex)))
+      .flatMap(_.remove(WhoPurchasedLandOrPropertyPage(srn, landOrPropertyIndex, disposalIndex)))
+      .flatMap(_.remove(LandPropertyDisposalCompletedPage(srn, landOrPropertyIndex, disposalIndex)))
 
   def onSubmit(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>

@@ -14,21 +14,6 @@
  * limitations under the License.
  */
 
-package navigation
-
-import models.UserAnswers
-import pages.Page
-import play.api.mvc.Call
-
-trait JourneyNavigator {
-
-  val recoverJourney: Call = controllers.routes.JourneyRecoveryController.onPageLoad()
-
-  implicit class OptionOps[A](opt: Option[A]) {
-    def getOrRecoverJourney(f: A => Call): Call = opt.fold(recoverJourney)(f)
-  }
-
-  def normalRoutes: UserAnswers => PartialFunction[Page, Call]
-
-  def checkRoutes: UserAnswers => PartialFunction[Page, Call]
+package object pages {
+  type IndexedQuestionPage[A] = QuestionPage[Map[String, A]]
 }

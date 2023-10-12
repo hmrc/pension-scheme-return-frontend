@@ -18,7 +18,7 @@ package navigation.nonsipp
 
 import config.Refined.{Max50, Max5000}
 import eu.timepit.refined.refineMV
-import models.{CheckOrChange, IdentityType, NormalMode}
+import models.{CheckMode, CheckOrChange, IdentityType, NormalMode}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.landorpropertydisposal._
@@ -62,9 +62,9 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
           index,
           disposalIndex,
           LandOrPropertyStillHeldPage,
-          (srn, index: Max5000, disposalIndex: Max50, _) =>
+          (srn, index: Max5000, disposalIndex: Max50, mode) =>
             controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
-              .onPageLoad(srn, index, disposalIndex, CheckOrChange.Check)
+              .onPageLoad(srn, index, disposalIndex, mode)
         )
         .withName("go from LandOrPropertyStillHeldPage to land property disposal CYA page")
     )

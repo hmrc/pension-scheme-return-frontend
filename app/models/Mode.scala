@@ -18,7 +18,12 @@ package models
 
 import play.api.mvc.JavascriptLiteral
 
-sealed trait Mode
+sealed trait Mode {
+  def fold[A](normal: => A, check: => A): A = this match {
+    case CheckMode => check
+    case NormalMode => normal
+  }
+}
 
 case object CheckMode extends Mode
 case object NormalMode extends Mode
