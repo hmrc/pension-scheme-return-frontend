@@ -23,6 +23,7 @@ import controllers.PSRController
 import controllers.actions._
 import controllers.nonsipp.BasicDetailsCheckYourAnswersController._
 import models.SchemeId.Srn
+import models.audit.PSRStartAuditEvent
 import models.requests.DataRequest
 import models.{CheckMode, DateRange, Mode, SchemeDetails, SchemeMemberNumbers}
 import navigation.Navigator
@@ -30,7 +31,7 @@ import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, HowManyMembersPag
 import pages.nonsipp.{BasicDetailsCheckYourAnswersPage, WhichTaxYearPage}
 import play.api.i18n._
 import play.api.mvc._
-import services.{PsrSubmissionService, SchemeDateService}
+import services.{AuditService, PsrSubmissionService, SchemeDateService}
 import utils.DateTimeUtils.localDateShow
 import utils.ListUtils.ListOps
 import viewmodels.DisplayMessage._
@@ -49,6 +50,7 @@ class BasicDetailsCheckYourAnswersController @Inject()(
   schemeDateService: SchemeDateService,
   val controllerComponents: MessagesControllerComponents,
   psrSubmissionService: PsrSubmissionService,
+  auditService: AuditService,
   view: CheckYourAnswersView
 )(implicit ec: ExecutionContext)
     extends PSRController {
@@ -89,9 +91,31 @@ class BasicDetailsCheckYourAnswersController @Inject()(
       .submitPsrDetails(srn)
       .map {
         case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-        case Some(_) => Redirect(navigator.nextPage(BasicDetailsCheckYourAnswersPage(srn), mode, request.userAnswers))
+        case Some(_) =>
+          (
+            for {
+              taxYear <- schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney
+              schemeMemberNumbers <- requiredPage(HowManyMembersPage(srn, request.pensionSchemeId))
+              _ = auditService.sendEvent(buildAuditEvent(taxYear, schemeMemberNumbers))
+            } yield Redirect(navigator.nextPage(BasicDetailsCheckYourAnswersPage(srn), mode, request.userAnswers))
+          ).merge
       }
   }
+
+  private def buildAuditEvent(taxYear: DateRange, schemeMemberNumbers: SchemeMemberNumbers)(
+    implicit req: DataRequest[_]
+  ) = PSRStartAuditEvent(
+    schemeName = req.schemeDetails.schemeName,
+    schemeAdministratorName = req.schemeDetails.establishers.headOption.get.name,
+    psaOrPspId = req.pensionSchemeId.value,
+    schemeTaxReference = req.schemeDetails.pstr,
+    affinityGroup = if (req.minimalDetails.organisationName.nonEmpty) "Organisation" else "Individual",
+    credentialRole = if (req.pensionSchemeId.isPSP) "PSP" else "PSA",
+    taxYear = taxYear,
+    howManyMembers = schemeMemberNumbers.noOfActiveMembers,
+    howManyDeferredMembers = schemeMemberNumbers.noOfDeferredMembers,
+    howManyPensionerMembers = schemeMemberNumbers.noOfPensionerMembers
+  )
 
   private def loggedInUserNameOrRedirect(implicit request: DataRequest[_]): Either[Result, String] =
     request.minimalDetails.individualDetails match {
