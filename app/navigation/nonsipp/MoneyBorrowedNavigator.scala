@@ -47,6 +47,9 @@ object MoneyBorrowedNavigator extends JourneyNavigator {
 
     case WhenBorrowedPage(srn, index) =>
       controllers.routes.UnauthorisedController.onPageLoad()
+
+    case WhySchemeBorrowedMoneyPage(srn, index) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty

@@ -25,3 +25,8 @@ GET         /:srn/when-did-scheme-borrow-money/:index                           
 POST        /:srn/when-did-scheme-borrow-money/:index                                   controllers.nonsipp.moneyborrowed.WhenBorrowedController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
 GET         /:srn/change-when-did-scheme-borrow-money/:index                            controllers.nonsipp.moneyborrowed.WhenBorrowedController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 POST        /:srn/change-when-did-scheme-borrow-money/:index                            controllers.nonsipp.moneyborrowed.WhenBorrowedController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET         /:srn/why-did-scheme-borrow-money/:index                                   controllers.nonsipp.moneyborrowed.WhySchemeBorrowedMoneyController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/why-did-scheme-borrow-money/:index                                   controllers.nonsipp.moneyborrowed.WhySchemeBorrowedMoneyController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/change-why-did-scheme-borrow-money/:index                            controllers.nonsipp.moneyborrowed.WhySchemeBorrowedMoneyController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-why-did-scheme-borrow-money/:index                            controllers.nonsipp.moneyborrowed.WhySchemeBorrowedMoneyController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
