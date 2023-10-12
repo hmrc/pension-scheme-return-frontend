@@ -16,10 +16,12 @@
 
 package navigation.nonsipp
 
-import eu.timepit.refined.refineMV
+import config.Refined.{Max50, Max5000}
+import eu.timepit.refined.{refineMV, refineV}
 import models.{CheckOrChange, HowDisposed, IdentityType, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
+import pages.nonsipp.landorproperty.LandOrPropertyAddressLookupPages
 import pages.nonsipp.landorpropertydisposal._
 import play.api.mvc.Call
 
@@ -136,6 +138,14 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
 
     case LandOrPropertyDisposalListPage(srn, addDisposal @ false) =>
       controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
+
+    case RemoveLandPropertyDisposalPage(srn, landOrPropertyIndex, disposalIndex) =>
+      if (userAnswers.map(LandOrPropertyAddressLookupPages(srn)).isEmpty) {
+        controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalController.onPageLoad(srn, NormalMode)
+      } else {
+        controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalListController
+          .onPageLoad(srn, 1)
+      }
 
   }
 

@@ -28,7 +28,7 @@ import forms.YesNoPageFormProvider
 import models.CheckOrChange.Change
 import models.SchemeId.Srn
 import models.requests.DataRequest
-import models.{Address, Mode, Pagination}
+import models.{Address, Mode, NormalMode, Pagination}
 import navigation.Navigator
 import pages.nonsipp.landorproperty.LandOrPropertyAddressLookupPage
 import pages.nonsipp.landorpropertydisposal._
@@ -55,18 +55,16 @@ class LandOrPropertyDisposalListController @Inject()(
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      getDisposals(srn)
-        .map(
-          disposals =>
-            if (disposals.isEmpty) {
-              Redirect(routes.LandOrPropertyDisposalAddressListController.onPageLoad(srn, page = 1))
-            } else {
-              getAddressesWithIndexes(srn, disposals)
-                .map(indexes => Ok(view(form, viewModel(srn, page, indexes))))
-                .merge
-            }
-        )
-        .merge
+      getDisposals(srn).map { disposals =>
+        val disposalAmount = disposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
+        if (disposalAmount == 0) {
+          Redirect(routes.LandOrPropertyDisposalController.onPageLoad(srn, NormalMode))
+        } else {
+          getAddressesWithIndexes(srn, disposals)
+            .map(indexes => Ok(view(form, viewModel(srn, page, indexes))))
+            .merge
+        }
+      }.merge
   }
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
@@ -146,7 +144,7 @@ object LandOrPropertyDisposalListController {
               .onPageLoad(srn, index, x, Change)
               .url,
             changeHiddenText = Message("landOrPropertyDisposalList.row.change.hidden"),
-            removeUrl = "url",
+            removeUrl = routes.RemoveLandPropertyDisposalController.onPageLoad(srn, index, x, NormalMode).url,
             removeHiddenText = Message("landOrPropertyDisposalList.row.remove.hidden")
           )
         }
