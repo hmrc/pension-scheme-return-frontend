@@ -8,7 +8,7 @@ import scala.sys.process.*
 lazy val appName: String = "pension-scheme-return-frontend"
 
 lazy val root = (project in file("."))
-  .enablePlugins(PlayScala, SbtAutoBuildPlugin, SbtDistributablesPlugin)
+  .enablePlugins(PlayScala, SbtDistributablesPlugin)
   .disablePlugins(JUnitXmlReportPlugin) //Required to prevent https://github.com/scalatest/scalatest/issues/1427
   .settings(inConfig(Test)(testSettings) *)
   .configs(IntegrationTest)
@@ -88,12 +88,11 @@ lazy val root = (project in file("."))
       val scriptPath = baseDirectory.value.getCanonicalPath + "/migrate.sh"
       s"bash -c $scriptPath".!
     },
-    scalafmtOnCompile := true,
     addCommandAlias("runLocal", "run -Dapplication.router=testOnlyDoNotUseInAppConf.Routes")
   )
 
 lazy val testSettings: Seq[Def.Setting[?]] = Seq(
-  fork := false,
+  fork := true,
   unmanagedSourceDirectories += baseDirectory.value / "test-utils"
 )
 
@@ -105,6 +104,6 @@ lazy val itSettings = Defaults.itSettings ++ Seq(
   unmanagedResourceDirectories := Seq(
     baseDirectory.value / "it" / "resources"
   ),
-  parallelExecution := false,
-  fork := false
+  parallelExecution := true,
+  fork := true
 )
