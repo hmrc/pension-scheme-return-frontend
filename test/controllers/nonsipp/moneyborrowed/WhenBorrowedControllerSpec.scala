@@ -45,10 +45,7 @@ class WhenBorrowedControllerSpec extends ControllerBaseSpec {
 
   val populatedUserAnswers: UserAnswers = defaultUserAnswers
     .unsafeSet(LenderNamePage(srn, index), lenderName)
-    .unsafeSet(BorrowedAmountAndRatePage(srn, index), amountBorrowed) //.unsafeSet(LandOrPropertyAddressLookupPage(srn, refineMV(1)), address1)
-
-  val populatedUserAnswers1: UserAnswers =
-    defaultUserAnswers.set(BorrowedAmountAndRatePage(srn, index), amountBorrowed).get
+    .unsafeSet(BorrowedAmountAndRatePage(srn, index), amountBorrowed)
 
   private lazy val onPageLoad = routes.WhenBorrowedController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.WhenBorrowedController.onSubmit(srn, index, NormalMode)
