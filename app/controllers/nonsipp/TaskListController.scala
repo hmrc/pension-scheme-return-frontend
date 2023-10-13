@@ -302,7 +302,7 @@ object TaskListController {
             .onPageLoad(srn, NormalMode)
             .url
         ),
-        UnableToStart
+        NotStarted
       ),
       TaskListItemViewModel(
         LinkMessage(
