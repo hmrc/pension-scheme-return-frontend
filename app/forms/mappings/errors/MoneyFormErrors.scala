@@ -31,3 +31,21 @@ object MoneyFormErrors {
   ): MoneyFormErrors =
     MoneyFormErrors(requiredKey, nonNumericKey, max)
 }
+
+case class MoneyFormErrorValue(
+  requiredKey: String,
+  nonNumericKey: String,
+  max: (Double, String),
+  min: (Double, String)
+)
+
+object MoneyFormErrorValue {
+
+  def default(
+    requiredKey: String = "error.required",
+    nonNumericKey: String = "error.nonMoney",
+    max: (Double, String) = (Double.MaxValue, "error.tooLarge"),
+    min: (Double, String) = (Double.MinValue, "error.tooSmall")
+  ): MoneyFormErrorValue =
+    MoneyFormErrorValue(requiredKey, nonNumericKey, max, min)
+}
