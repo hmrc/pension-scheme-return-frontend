@@ -43,7 +43,6 @@ class WhySchemeBorrowedMoneyController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   formProvider: TextFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  schemeDateService: SchemeDateService,
   view: TextAreaView
 )(implicit ec: ExecutionContext)
     extends PSRController
@@ -53,67 +52,65 @@ class WhySchemeBorrowedMoneyController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
-        request.userAnswers.get(LenderNamePage(srn, index)).getOrRecoverJourney { lenderName =>
-          request.userAnswers.get(BorrowedAmountAndRatePage(srn, index)).getOrRecoverJourney { amountBorrowed =>
-            val preparedForm = {
-              request.userAnswers.fillForm(WhySchemeBorrowedMoneyPage(srn, index), form)
-            }
-            Ok(
-              view(
-                preparedForm,
-                WhySchemeBorrowedMoneyController
-                  .viewModel(
-                    srn,
-                    index,
-                    mode,
-                    request.schemeDetails.schemeName,
-                    amountBorrowed._1.displayAs,
-                    lenderName
-                  )
-              )
-            )
+      request.userAnswers.get(LenderNamePage(srn, index)).getOrRecoverJourney { lenderName =>
+        request.userAnswers.get(BorrowedAmountAndRatePage(srn, index)).getOrRecoverJourney { amountBorrowed =>
+          val preparedForm = {
+            request.userAnswers.fillForm(WhySchemeBorrowedMoneyPage(srn, index), form)
           }
+          Ok(
+            view(
+              preparedForm,
+              WhySchemeBorrowedMoneyController
+                .viewModel(
+                  srn,
+                  index,
+                  mode,
+                  request.schemeDetails.schemeName,
+                  amountBorrowed._1.displayAs,
+                  lenderName
+                )
+            )
+          )
         }
+
       }
   }
 
   def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
-      schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
-        request.userAnswers.get(LenderNamePage(srn, index)).getOrRecoverJourney { lenderName =>
-          request.userAnswers.get(BorrowedAmountAndRatePage(srn, index)).getOrRecoverJourney { amountBorrowed =>
-            form
-              .bindFromRequest()
-              .fold(
-                formWithErrors =>
-                  Future.successful(
-                    BadRequest(
-                      view(
-                        formWithErrors,
-                        WhySchemeBorrowedMoneyController.viewModel(
-                          srn,
-                          index,
-                          mode,
-                          request.schemeDetails.schemeName,
-                          amountBorrowed._1.displayAs,
-                          lenderName
-                        )
+      request.userAnswers.get(LenderNamePage(srn, index)).getOrRecoverJourney { lenderName =>
+        request.userAnswers.get(BorrowedAmountAndRatePage(srn, index)).getOrRecoverJourney { amountBorrowed =>
+          form
+            .bindFromRequest()
+            .fold(
+              formWithErrors =>
+                Future.successful(
+                  BadRequest(
+                    view(
+                      formWithErrors,
+                      WhySchemeBorrowedMoneyController.viewModel(
+                        srn,
+                        index,
+                        mode,
+                        request.schemeDetails.schemeName,
+                        amountBorrowed._1.displayAs,
+                        lenderName
                       )
                     )
-                  ),
-                value =>
-                  for {
-                    updatedAnswers <- Future
-                      .fromTry(request.userAnswers.set(WhySchemeBorrowedMoneyPage(srn, index), value))
-                    _ <- saveService.save(updatedAnswers)
-                  } yield Redirect(
-                    navigator.nextPage(WhySchemeBorrowedMoneyPage(srn, index), mode, updatedAnswers)
                   )
-              )
-          }
+                ),
+              value =>
+                for {
+                  updatedAnswers <- Future
+                    .fromTry(request.userAnswers.set(WhySchemeBorrowedMoneyPage(srn, index), value))
+                  _ <- saveService.save(updatedAnswers)
+                } yield Redirect(
+                  navigator.nextPage(WhySchemeBorrowedMoneyPage(srn, index), mode, updatedAnswers)
+                )
+            )
         }
       }
+
   }
 }
 

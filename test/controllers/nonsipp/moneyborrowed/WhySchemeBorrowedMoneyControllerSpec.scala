@@ -39,28 +39,28 @@ class WhySchemeBorrowedMoneyControllerSpec extends ControllerBaseSpec {
 
   "WhySchemeBorrowedMoneyController" - {
 
-//    act.like(renderView(onPageLoad, populatedUserAnswers) { implicit app => implicit request =>
-//      injected[TextAreaView].apply(
-//        form(injected[TextFormProvider]),
-//        viewModel(srn, index, NormalMode, schemeName, amountBorrowed._1.displayAs, lenderName)
-//      )
-//    })
+    act.like(renderView(onPageLoad, populatedUserAnswers) { implicit app => implicit request =>
+      injected[TextAreaView].apply(
+        form(injected[TextFormProvider]),
+        viewModel(srn, index, NormalMode, schemeName, amountBorrowed._1.displayAs, lenderName)
+      )
+    })
 
-//    act.like(renderPrePopView(onPageLoad, WhySchemeBorrowedMoneyPage(srn, index), "test text", populatedUserAnswers) {
-//      implicit app => implicit request =>
-//        injected[TextAreaView].apply(
-//          form(injected[TextFormProvider]).fill("test text"),
-//          viewModel(srn, index, NormalMode, schemeName, amountBorrowed._1.displayAs, lenderName)
-//        )
-//    })
+    act.like(renderPrePopView(onPageLoad, WhySchemeBorrowedMoneyPage(srn, index), "test text", populatedUserAnswers) {
+      implicit app => implicit request =>
+        injected[TextAreaView].apply(
+          form(injected[TextFormProvider]).fill("test text"),
+          viewModel(srn, index, NormalMode, schemeName, amountBorrowed._1.displayAs, lenderName)
+        )
+    })
 
-//    act.like(redirectNextPage(onSubmit, populatedUserAnswers, "value" -> "test text"))
+    act.like(redirectNextPage(onSubmit, populatedUserAnswers, "value" -> "test text"))
 
-    //act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
+    act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
-//    act.like(saveAndContinue(onSubmit, populatedUserAnswers, "value" -> "test text"))
+    act.like(saveAndContinue(onSubmit, populatedUserAnswers, "value" -> "test text"))
 
-    //act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit " + _))
+    act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit " + _))
 
     act.like(invalidForm(onSubmit, populatedUserAnswers))
   }
