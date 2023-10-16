@@ -1424,6 +1424,12 @@ moneyBorrowed.WhenBorrowed.error.invalid.characters = Date the scheme borrowed t
 moneyBorrowed.WhenBorrowed.error.future = Date the scheme borrowed this money must be before {0}
 moneyBorrowed.WhenBorrowed.error.after = Date the scheme borrowed this money must be after {0}
 
+moneyBorrowed.WhyBorrowed.title = Why did the scheme borrow this money from the lender?
+moneyBorrowed.WhyBorrowed.heading = Why did {0} borrow £{2} from {1}
+moneyBorrowed.WhyBorrowed.error.required = Enter the reason why the scheme borrowed this money
+moneyBorrowed.WhyBorrowed.error.invalid = The reason the scheme borrowed this money must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+moneyBorrowed.WhyBorrowed.error.length = The reason the scheme borrowed this money must be 160 characters or fewer
+
 valueOfSchemeAssetsWhenMoneyBorrowed.title = What was the total value of the scheme’s assets on the date this money was borrowed, in pounds and pence?
 valueOfSchemeAssetsWhenMoneyBorrowed.heading = What was the total value of {0}’s assets on {1}, in pounds and pence?
 valueOfSchemeAssetsWhenMoneyBorrowed.error.required = Enter the total value of the scheme’s assets on the date this money was borrowed, in pounds and pence
