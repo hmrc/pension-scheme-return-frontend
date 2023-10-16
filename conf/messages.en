@@ -1423,3 +1423,10 @@ moneyBorrowed.WhenBorrowed.error.invalid.date = Date the scheme borrowed this mo
 moneyBorrowed.WhenBorrowed.error.invalid.characters = Date the scheme borrowed this money must only include numbers 0 to 9
 moneyBorrowed.WhenBorrowed.error.future = Date the scheme borrowed this money must be before {0}
 moneyBorrowed.WhenBorrowed.error.after = Date the scheme borrowed this money must be after {0}
+
+valueOfSchemeAssetsWhenMoneyBorrowed.title = What was the total value of the scheme’s assets on the date this money was borrowed, in pounds and pence?
+valueOfSchemeAssetsWhenMoneyBorrowed.heading = What was the total value of {0}’s assets on {1}, in pounds and pence?
+valueOfSchemeAssetsWhenMoneyBorrowed.error.required = Enter the total value of the scheme’s assets on the date this money was borrowed, in pounds and pence
+valueOfSchemeAssetsWhenMoneyBorrowed.error.invalid = Total value of the scheme’s assets must be an amount of money, like 123 or 123.45
+valueOfSchemeAssetsWhenMoneyBorrowed.error.tooLarge = Total value of the scheme’s assets must be 999999999.99 or less
+valueOfSchemeAssetsWhenMoneyBorrowed.error.tooSmall = Total value of the scheme’s assets must be -999999999.99 or more

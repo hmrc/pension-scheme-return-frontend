@@ -17,7 +17,7 @@
 package forms.mappings
 
 import config.Constants._
-import forms.mappings.errors._
+import forms.mappings.errors.{MoneyFormErrorValue, _}
 import models.{Crn, DateRange, Enumerable, Money, Percentage, Security, Utr}
 import play.api.data.Forms.of
 import play.api.data.validation.{Constraint, Invalid, Valid}
@@ -79,6 +79,12 @@ trait Mappings extends Formatters with Constraints {
     args: Seq[String] = Seq.empty
   ): FieldMapping[Money] =
     of(moneyFormatter(moneyFormErrors, args))
+
+  def moneyError(
+    moneyFormErrorValue: MoneyFormErrorValue,
+    args: Seq[String] = Seq.empty
+  ): FieldMapping[Money] =
+    of(moneyErrorFormatter(moneyFormErrorValue, args))
 
   def security(
     securityFormErrors: SecurityFormErrors,
