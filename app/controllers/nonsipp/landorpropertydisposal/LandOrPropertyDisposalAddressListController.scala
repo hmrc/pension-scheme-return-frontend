@@ -23,18 +23,17 @@ import config.Refined.Max5000
 import config.Refined.Max5000._
 import controllers.actions._
 import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalAddressListController._
-import eu.timepit.refined.{refineMV, refineV}
+import eu.timepit.refined.refineV
 import forms.RadioListFormProvider
 import models.SchemeId.Srn
-import models.{Address, Mode, NormalMode, Pagination, UserAnswers}
+import models.{Address, Mode, Pagination, UserAnswers}
 import navigation.Navigator
 import pages.nonsipp.landorproperty.LandOrPropertyAddressLookupPages
 import pages.nonsipp.landorpropertydisposal.{LandOrPropertyDisposalAddressListPage, LandPropertyDisposalCompletedPages}
 import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.MessagesApi
 import play.api.mvc._
 import services.SaveService
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.{Message, ParagraphMessage}
 import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, ListRadiosRow, ListRadiosViewModel, PaginatedViewModel}
@@ -44,8 +43,7 @@ import controllers.PSRController
 
 import javax.inject.Named
 import scala.collection.immutable.SortedMap
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.ExecutionContext
 
 class LandOrPropertyDisposalAddressListController @Inject()(
   override val messagesApi: MessagesApi,
@@ -55,7 +53,8 @@ class LandOrPropertyDisposalAddressListController @Inject()(
   saveService: SaveService,
   view: ListRadiosView,
   formProvider: RadioListFormProvider
-) extends PSRController {
+)(implicit ec: ExecutionContext)
+  extends PSRController {
 
   val form = LandOrPropertyDisposalAddressListController.form(formProvider)
 
