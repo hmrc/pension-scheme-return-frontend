@@ -39,8 +39,7 @@ import views.html.CheckYourAnswersView
 
 import java.time.LocalDate
 import javax.inject.{Inject, Named}
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class LandPropertyDisposalCYAController @Inject()(
   override val messagesApi: MessagesApi,
@@ -49,7 +48,8 @@ class LandPropertyDisposalCYAController @Inject()(
   saveService: SaveService,
   val controllerComponents: MessagesControllerComponents,
   view: CheckYourAnswersView
-) extends PSRController {
+)(implicit ec: ExecutionContext)
+    extends PSRController {
 
   def onPageLoad(
     srn: Srn,
