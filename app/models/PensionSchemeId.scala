@@ -43,6 +43,11 @@ sealed trait PensionSchemeId { self =>
       case id @ PsaId(_) => f1(id)
       case id @ PspId(_) => f2(id)
     }
+
+  val isPSP: Boolean = this match {
+    case PspId(_) => true
+    case _ => false
+  }
 }
 
 object PensionSchemeId {
