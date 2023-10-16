@@ -23,7 +23,7 @@ import cats.syntax.either._
 import config.Refined.Max3
 import eu.timepit.refined.api.{Refined, Validate}
 import eu.timepit.refined.refineV
-import models.DateRange
+import models.{DateRange, UserAnswers}
 import models.requests.DataRequest
 import play.api.i18n.I18nSupport
 import play.api.libs.json.Reads
@@ -35,6 +35,8 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
 abstract class PSRController extends FrontendBaseController with I18nSupport {
+
+  implicit def requestToUserAnswers(implicit req: DataRequest[_]): UserAnswers = req.userAnswers
 
   def requiredPage[A: Reads](page: Gettable[A])(implicit request: DataRequest[_]): Either[Result, A] =
     request.userAnswers.get(page) match {
@@ -84,5 +86,10 @@ abstract class PSRController extends FrontendBaseController with I18nSupport {
 
   implicit class TaxOrAccountingPeriodOps(o: Option[Either[DateRange, NonEmptyList[(DateRange, Max3)]]]) {
     def merge: Option[DateRange] = o.map(_.map(_.toList.map(_._1).sorted.head).merge)
+  }
+
+  implicit class UserAnswersOps(userAnswers: UserAnswers) {
+    def exists[A: Reads](page: Gettable[A])(f: A => Boolean)(implicit request: DataRequest[_]): Boolean =
+      request.userAnswers.get(page).fold(true)(f)
   }
 }
