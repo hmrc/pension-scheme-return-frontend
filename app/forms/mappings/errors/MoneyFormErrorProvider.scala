@@ -14,21 +14,11 @@
  * limitations under the License.
  */
 
-package navigation
+package forms.mappings.errors
 
-import models.UserAnswers
-import pages.Page
-import play.api.mvc.Call
+import com.google.inject.Inject
+import forms.FormProvider
+import forms.mappings.Mappings
+import models.Money
 
-trait JourneyNavigator {
-
-  val recoverJourney: Call = controllers.routes.JourneyRecoveryController.onPageLoad()
-
-  implicit class OptionOps[A](opt: Option[A]) {
-    def getOrRecoverJourney(f: A => Call): Call = opt.fold(recoverJourney)(f)
-  }
-
-  def normalRoutes: UserAnswers => PartialFunction[Page, Call]
-
-  def checkRoutes: UserAnswers => PartialFunction[Page, Call]
-}
+class MoneyFormErrorProvider @Inject()() extends FormProvider[MoneyFormErrorValue, Money](Mappings.moneyError)

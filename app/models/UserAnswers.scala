@@ -17,6 +17,7 @@
 package models
 
 import models.UserAnswers.SensitiveJsObject
+import pages.QuestionPage
 import play.api.data.Form
 import play.api.libs.json._
 import queries.{Gettable, Removable, Settable}
@@ -77,7 +78,7 @@ final case class UserAnswers(
     }
   }
 
-  def remove[A](page: Removable[A]): Try[UserAnswers] =
+  def remove(page: Removable[_]): Try[UserAnswers] =
     page
       .cleanup(None, self)
       .transform(

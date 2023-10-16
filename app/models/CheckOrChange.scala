@@ -19,6 +19,7 @@ package models
 import play.api.mvc.JavascriptLiteral
 import utils.WithName
 
+// TODO deprecated - use Mode instead
 sealed trait CheckOrChange extends Product with Serializable {
   val name: String
 

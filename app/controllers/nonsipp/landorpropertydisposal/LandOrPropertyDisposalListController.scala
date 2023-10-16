@@ -61,7 +61,7 @@ class LandOrPropertyDisposalListController @Inject()(
           Redirect(routes.LandOrPropertyDisposalController.onPageLoad(srn, NormalMode))
         } else {
           getAddressesWithIndexes(srn, disposals)
-            .map(indexes => Ok(view(form, viewModel(srn, page, indexes))))
+            .map(indexes => Ok(view(form, viewModel(srn, mode, page, indexes))))
             .merge
         }
       }.merge
@@ -79,7 +79,7 @@ class LandOrPropertyDisposalListController @Inject()(
           .fold(
             errors =>
               getAddressesWithIndexes(srn, disposals)
-                .map(indexes => BadRequest(view(errors, viewModel(srn, page, indexes))))
+                .map(indexes => BadRequest(view(errors, viewModel(srn, mode, page, indexes))))
                 .merge,
             answer =>
               Redirect(navigator.nextPage(LandOrPropertyDisposalListPage(srn, answer), mode, request.userAnswers))
@@ -92,14 +92,14 @@ class LandOrPropertyDisposalListController @Inject()(
     srn: Srn
   )(implicit request: DataRequest[_]): Either[Result, Map[Max5000, List[Max50]]] =
     request.userAnswers
-      .map(LandOrPropertyStillHeldPages(srn))
+      .map(LandPropertyDisposalCompletedPages(srn))
       .map {
-        case (key, stillHeldMap) =>
+        case (key, sectionCompleted) =>
           val maybeLandOrPropertyIndex: Either[Result, Max5000] =
             refineStringIndex[Max5000.Refined](key).getOrRecoverJourney
 
           val maybeDisposalIndexes: Either[Result, List[Max50]] =
-            stillHeldMap.keys.toList
+            sectionCompleted.keys.toList
               .map(refineStringIndex[Max50.Refined])
               .traverse(_.getOrRecoverJourney)
 
@@ -134,14 +134,14 @@ object LandOrPropertyDisposalListController {
       "landOrPropertyDisposalList.radios.error.required"
     )
 
-  private def rows(srn: Srn, addressesWithIndexes: List[((Max5000, List[Max50]), Address)]): List[ListRow] =
+  private def rows(srn: Srn, mode: Mode, addressesWithIndexes: List[((Max5000, List[Max50]), Address)]): List[ListRow] =
     addressesWithIndexes.flatMap {
       case ((index, disposalIndexes), address) =>
         disposalIndexes.map { x =>
           ListRow(
             Message("landOrPropertyDisposalList.row", address.addressLine1),
             changeUrl = routes.LandPropertyDisposalCYAController
-              .onPageLoad(srn, index, x, Change)
+              .onPageLoad(srn, index, x, mode)
               .url,
             changeHiddenText = Message("landOrPropertyDisposalList.row.change.hidden"),
             removeUrl = routes.RemoveLandPropertyDisposalController.onPageLoad(srn, index, x, NormalMode).url,
@@ -152,6 +152,7 @@ object LandOrPropertyDisposalListController {
 
   def viewModel(
     srn: Srn,
+    mode: Mode,
     page: Int,
     addressesWithIndexes: List[((Max5000, List[Max50]), Address)]
   ): FormPageViewModel[ListViewModel] = {
@@ -178,7 +179,7 @@ object LandOrPropertyDisposalListController {
       description = Some(ParagraphMessage("landOrPropertyDisposalList.description")),
       page = ListViewModel(
         inset = "landOrPropertyDisposalList.inset",
-        rows(srn, addressesWithIndexes),
+        rows(srn, mode, addressesWithIndexes),
         Message("landOrPropertyDisposalList.radios"),
         showRadios = disposalAmount < maxLandOrPropertyDisposals,
         paginatedViewModel = Some(
