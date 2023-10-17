@@ -18,20 +18,22 @@ package transformations
 
 import cats.implicits.catsSyntaxTuple2Semigroupal
 import com.google.inject.Singleton
-import models.NormalMode
+import models.{DateRange, NormalMode, PensionSchemeId, SchemeMemberNumbers, UserAnswers}
 import models.SchemeId.Srn
 import models.requests.DataRequest
 import models.requests.psr.{MinimalRequiredSubmission, ReportDetails, SchemeDesignatory}
-import pages.nonsipp.WhichTaxYearPage
+import pages.nonsipp.accountingperiod.AccountingPeriods
+import pages.nonsipp.{CheckReturnDatesPage, WhichTaxYearPage}
 import pages.nonsipp.schemedesignatory._
 import services.SchemeDateService
 
 import javax.inject.Inject
+import scala.util.Try
 
 @Singleton()
 class MinimalRequiredSubmissionTransformer @Inject()(schemeDateService: SchemeDateService) {
 
-  def transform(srn: Srn)(implicit request: DataRequest[_]): Option[MinimalRequiredSubmission] = {
+  def transformToEtmp(srn: Srn)(implicit request: DataRequest[_]): Option[MinimalRequiredSubmission] = {
     val reasonForNoBankAccount = request.userAnswers.get(WhyNoBankAccountPage(srn))
     val taxYear = request.userAnswers.get(WhichTaxYearPage(srn))
     val valueOfAssets = request.userAnswers.get(ValueOfAssetsPage(srn, NormalMode))
@@ -60,4 +62,50 @@ class MinimalRequiredSubmissionTransformer @Inject()(schemeDateService: SchemeDa
       )
     }
   }
+
+  def transformFromEtmp(
+    userAnswers: UserAnswers,
+    srn: Srn,
+    pensionSchemeId: PensionSchemeId,
+    minimalRequiredSubmission: MinimalRequiredSubmission
+  ): Try[UserAnswers] =
+    for {
+      ua0 <- userAnswers.set(
+        WhichTaxYearPage(srn),
+        DateRange(
+          minimalRequiredSubmission.reportDetails.periodStart,
+          minimalRequiredSubmission.reportDetails.periodEnd
+        )
+      )
+      ua1 <- ua0.set(
+        CheckReturnDatesPage(srn),
+        minimalRequiredSubmission.accountingPeriods.size == 1 &&
+          minimalRequiredSubmission.accountingPeriods.head._1
+            .isEqual(minimalRequiredSubmission.reportDetails.periodStart) &&
+          minimalRequiredSubmission.accountingPeriods.head._2.isEqual(minimalRequiredSubmission.reportDetails.periodEnd)
+      )
+      ua2 <- ua1.set(
+        AccountingPeriods(srn),
+        minimalRequiredSubmission.accountingPeriods.toList
+          .map(x => DateRange(x._1, x._2))
+      )
+      ua6 <- ua2.set(
+        ActiveBankAccountPage(srn),
+        minimalRequiredSubmission.schemeDesignatory.openBankAccount
+      )
+      ua5 <- ua6.set(
+        WhyNoBankAccountPage(srn),
+        minimalRequiredSubmission.schemeDesignatory.reasonForNoBankAccount.getOrElse("")
+      )
+      ua7 <- ua5.set(
+        HowManyMembersPage(srn, pensionSchemeId),
+        SchemeMemberNumbers(
+          minimalRequiredSubmission.schemeDesignatory.activeMembers,
+          minimalRequiredSubmission.schemeDesignatory.deferredMembers,
+          minimalRequiredSubmission.schemeDesignatory.pensionerMembers
+        )
+      )
+    } yield {
+      ua7
+    }
 }

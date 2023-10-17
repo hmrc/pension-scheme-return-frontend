@@ -17,8 +17,7 @@
 package models.requests.psr
 
 import cats.data.NonEmptyList
-import play.api.libs.json.{Json, OWrites}
-import utils.JsonUtils._
+import play.api.libs.json.{Format, Json, OFormat, Reads, Writes}
 
 import java.time.LocalDate
 
@@ -48,7 +47,13 @@ case class SchemeDesignatory(
 )
 
 object MinimalRequiredSubmission {
-  private implicit val reportDetailsWrites: OWrites[ReportDetails] = Json.writes[ReportDetails]
-  private implicit val schemeDesignatoryWrites: OWrites[SchemeDesignatory] = Json.writes[SchemeDesignatory]
-  implicit val writes: OWrites[MinimalRequiredSubmission] = Json.writes[MinimalRequiredSubmission]
+  private implicit val reportDetailsFormat: OFormat[ReportDetails] = Json.format[ReportDetails]
+  private implicit val schemeDesignatoryFormat: OFormat[SchemeDesignatory] = Json.format[SchemeDesignatory]
+  implicit def nonEmptyListFormat[T: Format]: Format[NonEmptyList[T]] = Format(
+    Reads.list[T].flatMap { xs =>
+      NonEmptyList.fromList(xs).fold[Reads[NonEmptyList[T]]](Reads.failed("The list is empty"))(Reads.pure(_))
+    },
+    Writes.list[T].contramap(_.toList)
+  )
+  implicit val format: OFormat[MinimalRequiredSubmission] = Json.format[MinimalRequiredSubmission]
 }

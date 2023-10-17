@@ -35,4 +35,27 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClient) {
       baseUrl + "/pension-scheme-return/psr/standard",
       psrSubmission
     )
+
+  def getStandardPsrDetails(
+    pstr: String,
+    optFbNumber: Option[String],
+    optPeriodStartDate: Option[String],
+    optPsrVersion: Option[String]
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[PsrSubmission] = {
+    val queryParams = (optPeriodStartDate, optPsrVersion, optFbNumber) match {
+      case (Some(startDate), Some(version), _) =>
+        Seq(
+          "periodStartDate" -> startDate,
+          "psrVersion" -> version
+        )
+      case (_, _, Some(fbNumber)) =>
+        Seq("fbNumber" -> fbNumber)
+    }
+
+    http.GET[PsrSubmission](
+      baseUrl + s"/pension-scheme-return/psr/standard/${pstr}",
+      queryParams
+    )
+  }
+
 }

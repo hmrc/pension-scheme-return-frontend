@@ -225,4 +225,11 @@ trait TestValues {
 
   def userAnswersWithNameAndAmount(srn: Srn, index: Max5000): UserAnswers =
     defaultUserAnswers.unsafeSet(LenderNamePage(srn, index), lenderName)
+
+  val accountingPeriods = NonEmptyList.of(
+    LocalDate.of(2020, 4, 6) ->
+      LocalDate.of(2020, 5, 5),
+    LocalDate.of(2020, 5, 6) ->
+      LocalDate.of(2020, 6, 5)
+  )
 }

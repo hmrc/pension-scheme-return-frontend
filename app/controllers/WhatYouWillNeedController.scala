@@ -22,7 +22,9 @@ import models.SchemeId.Srn
 import navigation.Navigator
 import pages.WhatYouWillNeedPage
 import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.libs.json.JsObject
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.{PsrRetrievalService, SaveService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.{ListMessage, ListType, Message, ParagraphMessage}
 import viewmodels.implicits._
@@ -30,6 +32,7 @@ import viewmodels.models.{ContentPageViewModel, FormPageViewModel}
 import views.html.ContentPageView
 
 import javax.inject.{Inject, Named}
+import scala.concurrent.ExecutionContext
 
 class WhatYouWillNeedController @Inject()(
   override val messagesApi: MessagesApi,
@@ -39,18 +42,31 @@ class WhatYouWillNeedController @Inject()(
   getData: DataRetrievalAction,
   createData: DataCreationAction,
   val controllerComponents: MessagesControllerComponents,
-  view: ContentPageView
-) extends FrontendBaseController
+  view: ContentPageView,
+  psrRetrievalService: PsrRetrievalService,
+  saveService: SaveService
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport {
 
   def onPageLoad(srn: Srn): Action[AnyContent] = identify.andThen(allowAccess(srn)) { implicit request =>
     Ok(view(WhatYouWillNeedController.viewModel(srn)))
   }
 
-  def onSubmit(srn: Srn): Action[AnyContent] = identify.andThen(allowAccess(srn)).andThen(getData).andThen(createData) {
-    implicit request =>
-      Redirect(navigator.nextPage(WhatYouWillNeedPage(srn), NormalMode, request.userAnswers))
-  }
+  def onSubmit(srn: Srn): Action[AnyContent] =
+    identify.andThen(allowAccess(srn)).andThen(getData).andThen(createData).async { implicit request =>
+      for {
+        updatedUserAnswers <- psrRetrievalService.getStandardPsrDetails(
+          request,
+          None,
+          Some("2023-04-06"), // TODO determine the tax year start based on the routing from the dashboard and/or GET report overview or GET report versions API calls
+          Some("001")
+        )
+        _ <- saveService.save(updatedUserAnswers)
+      } yield {
+        Redirect(navigator.nextPage(WhatYouWillNeedPage(srn), NormalMode, updatedUserAnswers))
+      }
+    }
 }
 
 object WhatYouWillNeedController {

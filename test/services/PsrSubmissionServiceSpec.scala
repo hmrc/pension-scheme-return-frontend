@@ -76,11 +76,12 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
       val userAnswers = defaultUserAnswers
         .unsafeSet(CheckReturnDatesPage(srn), false)
       val request = DataRequest(allowedAccessRequest, userAnswers)
-      when(mockMinimalRequiredSubmissionTransformer.transform(any())(any())).thenReturn(Some(minimalRequiredSubmission))
+      when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any())(any()))
+        .thenReturn(Some(minimalRequiredSubmission))
       when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(()))
 
       whenReady(service.submitPsrDetails(srn)(implicitly, implicitly, request)) { result: Option[Unit] =>
-        verify(mockMinimalRequiredSubmissionTransformer, times(1)).transform(any())(any())
+        verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
         verify(mockLoanTransactionsTransformer, never).transform(any())(any())
         verify(mockLandOrPropertyTransactionsTransformer, never).transform(any())(any())
         verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
@@ -98,12 +99,13 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
         .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
       val request = DataRequest(allowedAccessRequest, userAnswers)
 
-      when(mockMinimalRequiredSubmissionTransformer.transform(any())(any())).thenReturn(Some(minimalRequiredSubmission))
+      when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any())(any()))
+        .thenReturn(Some(minimalRequiredSubmission))
       when(mockLoanTransactionsTransformer.transform(any())(any())).thenReturn(List.empty)
       when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(()))
 
       whenReady(service.submitPsrDetails(srn)(implicitly, implicitly, request)) { result: Option[Unit] =>
-        verify(mockMinimalRequiredSubmissionTransformer, times(1)).transform(any())(any())
+        verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
         verify(mockLoanTransactionsTransformer, times(1)).transform(any())(any())
         verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
 
@@ -121,11 +123,12 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
         .unsafeSet(LoansMadeOrOutstandingPage(srn), false)
       val request = DataRequest(allowedAccessRequest, userAnswers)
 
-      when(mockMinimalRequiredSubmissionTransformer.transform(any())(any())).thenReturn(Some(minimalRequiredSubmission))
+      when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any())(any()))
+        .thenReturn(Some(minimalRequiredSubmission))
       when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(()))
 
       whenReady(service.submitPsrDetails(srn)(implicitly, implicitly, request)) { result: Option[Unit] =>
-        verify(mockMinimalRequiredSubmissionTransformer, times(1)).transform(any())(any())
+        verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
         verify(mockLoanTransactionsTransformer, never).transform(any())(any())
         verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
         captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
@@ -141,12 +144,13 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
         .unsafeSet(LandOrPropertyHeldPage(srn), true)
       val request = DataRequest(allowedAccessRequest, userAnswers)
 
-      when(mockMinimalRequiredSubmissionTransformer.transform(any())(any())).thenReturn(Some(minimalRequiredSubmission))
+      when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any())(any()))
+        .thenReturn(Some(minimalRequiredSubmission))
       when(mockLandOrPropertyTransactionsTransformer.transform(any())(any())).thenReturn(List.empty)
       when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(()))
 
       whenReady(service.submitPsrDetails(srn)(implicitly, implicitly, request)) { result: Option[Unit] =>
-        verify(mockMinimalRequiredSubmissionTransformer, times(1)).transform(any())(any())
+        verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
         verify(mockLandOrPropertyTransactionsTransformer, times(1)).transform(any())(any())
         verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
 
@@ -164,11 +168,12 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
         .unsafeSet(LandOrPropertyHeldPage(srn), false)
       val request = DataRequest(allowedAccessRequest, userAnswers)
 
-      when(mockMinimalRequiredSubmissionTransformer.transform(any())(any())).thenReturn(Some(minimalRequiredSubmission))
+      when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any())(any()))
+        .thenReturn(Some(minimalRequiredSubmission))
       when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(()))
 
       whenReady(service.submitPsrDetails(srn)(implicitly, implicitly, request)) { result: Option[Unit] =>
-        verify(mockMinimalRequiredSubmissionTransformer, times(1)).transform(any())(any())
+        verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
         verify(mockLandOrPropertyTransactionsTransformer, never).transform(any())(any())
         verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
         captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
@@ -179,10 +184,11 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
     }
 
     "shouldn't submitPsrDetails request when userAnswer is empty" in {
-      when(mockMinimalRequiredSubmissionTransformer.transform(any())(any())).thenReturn(Some(minimalRequiredSubmission))
+      when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any())(any()))
+        .thenReturn(Some(minimalRequiredSubmission))
 
       whenReady(service.submitPsrDetails(srn)) { result: Option[Unit] =>
-        verify(mockMinimalRequiredSubmissionTransformer, times(1)).transform(any())(any())
+        verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
         verify(mockLoanTransactionsTransformer, never).transform(any())(any())
         verify(mockLandOrPropertyTransactionsTransformer, never).transform(any())(any())
         verify(mockConnector, never).submitPsrDetails(any())(any(), any())

@@ -17,7 +17,7 @@
 package models.requests.psr
 
 import models.IdentityType
-import play.api.libs.json.{Json, OWrites}
+import play.api.libs.json.{Json, OFormat}
 
 import java.time.LocalDate
 
@@ -48,10 +48,10 @@ case class LoanInterestDetails(loanInterestAmount: Double, loanInterestRate: Dou
 
 object Loans {
 
-  private implicit val writesLoanInterestDetails: OWrites[LoanInterestDetails] = Json.writes[LoanInterestDetails]
-  private implicit val writesLoanAmountDetails: OWrites[LoanAmountDetails] = Json.writes[LoanAmountDetails]
-  private implicit val writesLoanPeriod: OWrites[LoanPeriod] = Json.writes[LoanPeriod]
-  private implicit val writesRecipientIdentityType: OWrites[RecipientIdentityType] = Json.writes[RecipientIdentityType]
-  private implicit val writesLoanTransactions: OWrites[LoanTransactions] = Json.writes[LoanTransactions]
-  implicit val writes: OWrites[Loans] = Json.writes[Loans]
+  private implicit val formatLoanInterestDetails: OFormat[LoanInterestDetails] = Json.format[LoanInterestDetails]
+  private implicit val formatLoanAmountDetails: OFormat[LoanAmountDetails] = Json.format[LoanAmountDetails]
+  private implicit val formatLoanPeriod: OFormat[LoanPeriod] = Json.format[LoanPeriod]
+  private implicit val formatRecipientIdentityType: OFormat[RecipientIdentityType] = Json.format[RecipientIdentityType]
+  private implicit val formatLoanTransactions: OFormat[LoanTransactions] = Json.format[LoanTransactions]
+  implicit val format: OFormat[Loans] = Json.format[Loans]
 }

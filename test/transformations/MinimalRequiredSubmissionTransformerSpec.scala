@@ -19,10 +19,11 @@ package transformations
 import cats.data.NonEmptyList
 import controllers.TestValues
 import generators.ModelGenerators.allowedAccessRequestGen
+import models.SchemeId.Srn
 import models.SchemeMemberNumbers._
 import models.requests.psr.{MinimalRequiredSubmission, ReportDetails, SchemeDesignatory}
 import models.requests.{AllowedAccessRequest, DataRequest}
-import models.{MoneyInPeriod, NormalMode, SchemeMemberNumbers}
+import models.{DateRange, MoneyInPeriod, NormalMode, SchemeMemberNumbers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
 import org.mockito.Mockito.{times, verify}
@@ -30,14 +31,16 @@ import org.mockito.MockitoSugar.{mock, when}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.{BeforeAndAfterEach, OptionValues}
-import pages.nonsipp.WhichTaxYearPage
+import pages.nonsipp.{CheckReturnDatesPage, WhichTaxYearPage}
+import pages.nonsipp.accountingperiod.AccountingPeriods
 import pages.nonsipp.schemedesignatory.{
+  ActiveBankAccountPage,
   FeesCommissionsWagesSalariesPage,
   HowManyMembersPage,
   ValueOfAssetsPage,
   WhyNoBankAccountPage
 }
-import play.api.mvc.AnyContentAsEmpty
+import play.api.mvc.{AnyContent, AnyContentAsEmpty}
 import play.api.test.FakeRequest
 import services.SchemeDateService
 import utils.UserAnswersUtils.UserAnswersOps
@@ -55,17 +58,18 @@ class MinimalRequiredSubmissionTransformerSpec
   val allowedAccessRequest
     : AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(FakeRequest()).sample.value
   implicit val request: DataRequest[AnyContentAsEmpty.type] = DataRequest(allowedAccessRequest, defaultUserAnswers)
+  private val mockReq = mock[DataRequest[AnyContent]]
 
   private val mockSchemeDateService = mock[SchemeDateService]
 
   private val transformer = new MinimalRequiredSubmissionTransformer(mockSchemeDateService)
 
-  "MinimalRequiredSubmissionTransformer" - {
+  "Transform to ETMP" - {
     "should return None when userAnswer is empty" in {
 
       when(mockSchemeDateService.returnPeriods(any())(any())).thenReturn(Some(NonEmptyList.of(dateRange)))
 
-      val result = transformer.transform(srn)
+      val result = transformer.transformToEtmp(srn)
       verify(mockSchemeDateService, times(1)).returnPeriods(any())(any())
       result mustBe None
     }
@@ -78,7 +82,7 @@ class MinimalRequiredSubmissionTransformerSpec
 
       when(mockSchemeDateService.returnPeriods(any())(any())).thenReturn(None)
 
-      val result = transformer.transform(srn)(request)
+      val result = transformer.transformToEtmp(srn)(request)
       verify(mockSchemeDateService, times(1)).returnPeriods(any())(any())
       result mustBe None
     }
@@ -95,7 +99,7 @@ class MinimalRequiredSubmissionTransformerSpec
 
       when(mockSchemeDateService.returnPeriods(any())(any())).thenReturn(Some(NonEmptyList.of(dateRange)))
 
-      val result = transformer.transform(srn)(request)
+      val result = transformer.transformToEtmp(srn)(request)
       verify(mockSchemeDateService, times(1)).returnPeriods(any())(any())
       result mustBe Some(
         MinimalRequiredSubmission(
@@ -117,5 +121,50 @@ class MinimalRequiredSubmissionTransformerSpec
       )
     }
 
+  }
+
+  "Transform from ETMP" - {
+    "should transform minimal details" in {
+
+      val userAnswers = defaultUserAnswers
+      val minimalRequiredSubmission = MinimalRequiredSubmission(
+        ReportDetails(request.schemeDetails.pstr, dateRange.from, dateRange.to),
+        accountingPeriods,
+        SchemeDesignatory(
+          openBankAccount = true,
+          //Some("reasonForNoBankAccount"),
+          None,
+          2,
+          3,
+          4,
+          Some(money.value),
+          Some(money.value),
+          None,
+          None,
+          Some(money.value)
+        )
+      )
+
+      val result = transformer.transformFromEtmp(
+        userAnswers,
+        Srn(allowedAccessRequest.schemeDetails.srn).get,
+        allowedAccessRequest.pensionSchemeId,
+        minimalRequiredSubmission
+      )
+      result.fold(
+        ex => fail(ex.getMessage()),
+        userAnswers => {
+          userAnswers.get(WhichTaxYearPage(srn)) mustBe Some(DateRange(dateRange.from, dateRange.to))
+          userAnswers.get(CheckReturnDatesPage(srn)) mustBe Some(false)
+          userAnswers.get(ActiveBankAccountPage(srn)) mustBe Some(true)
+          userAnswers.get(WhyNoBankAccountPage(srn)) mustBe Some("reasonForNoBankAccount")
+          userAnswers.get(HowManyMembersPage(srn, allowedAccessRequest.pensionSchemeId)) mustBe Some(
+            SchemeMemberNumbers(2, 3, 4)
+          )
+          val aps = userAnswers.get(AccountingPeriods(srn))
+          aps mustBe Some(accountingPeriods.toList.map(period => DateRange(period._1, period._2)))
+        }
+      )
+    }
   }
 }

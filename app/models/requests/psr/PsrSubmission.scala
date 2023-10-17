@@ -16,7 +16,7 @@
 
 package models.requests.psr
 
-import play.api.libs.json.{Json, OWrites}
+import play.api.libs.json.{Json, OFormat}
 
 case class PsrSubmission(
   minimalRequiredSubmission: MinimalRequiredSubmission,
@@ -26,5 +26,5 @@ case class PsrSubmission(
 )
 
 object PsrSubmission {
-  implicit val writes: OWrites[PsrSubmission] = Json.writes[PsrSubmission]
+  implicit val format: OFormat[PsrSubmission] = Json.format[PsrSubmission]
 }

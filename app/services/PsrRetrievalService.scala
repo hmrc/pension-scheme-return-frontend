@@ -19,11 +19,14 @@ package services
 import cats.implicits._
 import connectors.PSRConnector
 import models.SchemeId.Srn
+import models.UserAnswers
 import models.requests.DataRequest
 import models.requests.psr._
 import pages.nonsipp.CheckReturnDatesPage
 import pages.nonsipp.landorproperty.LandOrPropertyHeldPage
 import pages.nonsipp.loansmadeoroutstanding._
+import play.api.mvc.AnyContent
+import repositories.SessionRepository
 import transformations.{
   LandOrPropertyTransactionsTransformer,
   LoanTransactionsTransformer,
@@ -34,38 +37,39 @@ import uk.gov.hmrc.http.HeaderCarrier
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class PsrSubmissionService @Inject()(
+class PsrRetrievalService @Inject()(
+  sessionRepository: SessionRepository,
   psrConnector: PSRConnector,
   minimalRequiredSubmissionTransformer: MinimalRequiredSubmissionTransformer,
   loanTransactionsTransformer: LoanTransactionsTransformer,
   landOrPropertyTransactionsTransformer: LandOrPropertyTransactionsTransformer
 ) {
 
-  def submitPsrDetails(
-    srn: Srn
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext, request: DataRequest[_]): Future[Option[Unit]] = {
-
-    val schemeHadLoans = request.userAnswers.get(LoansMadeOrOutstandingPage(srn)).getOrElse(false)
-    val landOrPropertyHeld = request.userAnswers.get(LandOrPropertyHeldPage(srn)).getOrElse(false)
-    (
-      minimalRequiredSubmissionTransformer.transformToEtmp(srn),
-      request.userAnswers.get(CheckReturnDatesPage(srn))
-    ).mapN { (minimalRequiredSubmission, checkReturnDates) =>
-      psrConnector.submitPsrDetails(
-        PsrSubmission(
-          minimalRequiredSubmission = minimalRequiredSubmission,
-          checkReturnDates = checkReturnDates,
-          loans = Option.when(schemeHadLoans)(Loans(schemeHadLoans, loanTransactionsTransformer.transform(srn))),
-          assets = Option.when(landOrPropertyHeld)(
-            Assets(
-              LandOrProperty(
-                landOrPropertyHeld = landOrPropertyHeld,
-                landOrPropertyTransactions = landOrPropertyTransactionsTransformer.transform(srn)
-              )
-            )
-          )
-        )
+  def getStandardPsrDetails(
+    request: DataRequest[AnyContent],
+    optFbNumber: Option[String],
+    optPeriodStartDate: Option[String],
+    optPsrVersion: Option[String]
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[UserAnswers] =
+    for {
+      psrDetails <- psrConnector.getStandardPsrDetails(
+        request.pensionSchemeId.value,
+        optFbNumber,
+        optPeriodStartDate,
+        optPsrVersion
       )
-    }.sequence
-  }
+      userAnswersKey = request.getUserId + request.schemeDetails.srn
+      userAnswers <- Future(Some(UserAnswers(userAnswersKey)))
+      transformedFromEtmp <- Future.fromTry(
+        minimalRequiredSubmissionTransformer
+          .transformFromEtmp(
+            userAnswers.get,
+            Srn(request.schemeDetails.srn).get,
+            request.pensionSchemeId,
+            psrDetails.minimalRequiredSubmission
+          )
+      )
+    } yield {
+      transformedFromEtmp
+    }
 }
