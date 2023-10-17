@@ -24,24 +24,21 @@ import models.CheckOrChange
 import pages.nonsipp.moneyborrowed._
 import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
-import services.{PsrSubmissionService, SchemeDateService}
+import services.PsrSubmissionService
 import views.html.CheckYourAnswersView
 
 class MoneyBorrowedCYAControllerSpec extends ControllerBaseSpec {
 
-  private implicit val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
 
   override protected val additionalBindings: List[GuiceableModule] = List(
-    bind[SchemeDateService].toInstance(mockSchemeDateService),
     bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
   )
 
   override protected def beforeAll(): Unit =
-    reset(mockSchemeDateService, mockPsrSubmissionService)
+    reset(mockPsrSubmissionService)
 
   private val index = refineMV[OneTo5000](1)
-  private val taxYear = Some(Left(dateRange))
 
   private def onPageLoad(checkOrChange: CheckOrChange) =
     routes.MoneyBorrowedCYAController.onPageLoad(srn, index, checkOrChange)
@@ -77,8 +74,7 @@ class MoneyBorrowedCYAControllerSpec extends ControllerBaseSpec {
               )
             )
           )
-        }.before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear))
-          .withName(s"render correct ${checkOrChange.name} view")
+        }.withName(s"render correct ${checkOrChange.name} view")
       )
 
       act.like(
