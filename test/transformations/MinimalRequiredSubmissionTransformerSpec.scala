@@ -23,7 +23,7 @@ import models.SchemeId.Srn
 import models.SchemeMemberNumbers._
 import models.requests.psr.{MinimalRequiredSubmission, ReportDetails, SchemeDesignatory}
 import models.requests.{AllowedAccessRequest, DataRequest}
-import models.{DateRange, MoneyInPeriod, NormalMode, SchemeMemberNumbers}
+import models.{DateRange, Money, MoneyInPeriod, NormalMode, SchemeMemberNumbers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
 import org.mockito.Mockito.{times, verify}
@@ -37,6 +37,7 @@ import pages.nonsipp.schemedesignatory.{
   ActiveBankAccountPage,
   FeesCommissionsWagesSalariesPage,
   HowManyMembersPage,
+  HowMuchCashPage,
   ValueOfAssetsPage,
   WhyNoBankAccountPage
 }
@@ -131,17 +132,61 @@ class MinimalRequiredSubmissionTransformerSpec
         ReportDetails(request.schemeDetails.pstr, dateRange.from, dateRange.to),
         accountingPeriods,
         SchemeDesignatory(
-          openBankAccount = true,
-          //Some("reasonForNoBankAccount"),
-          None,
+          openBankAccount = false,
+          Some("reasonForNoBankAccount"),
           2,
           3,
           4,
           Some(money.value),
+          Some(2 * money.value),
+          None,
+          None,
+          Some(3 * money.value)
+        )
+      )
+
+      val result = transformer.transformFromEtmp(
+        userAnswers,
+        Srn(allowedAccessRequest.schemeDetails.srn).get,
+        allowedAccessRequest.pensionSchemeId,
+        minimalRequiredSubmission
+      )
+      result.fold(
+        ex => fail(ex.getMessage()),
+        userAnswers => {
+          userAnswers.get(WhichTaxYearPage(srn)) mustBe Some(DateRange(dateRange.from, dateRange.to))
+          userAnswers.get(CheckReturnDatesPage(srn)) mustBe Some(false)
+          userAnswers.get(ActiveBankAccountPage(srn)) mustBe Some(false)
+          userAnswers.get(WhyNoBankAccountPage(srn)) mustBe Some("reasonForNoBankAccount")
+          userAnswers.get(HowManyMembersPage(srn, allowedAccessRequest.pensionSchemeId)) mustBe Some(
+            SchemeMemberNumbers(2, 3, 4)
+          )
+          userAnswers.get(AccountingPeriods(srn)) mustBe Some(
+            accountingPeriods.toList.map(period => DateRange(period._1, period._2))
+          )
+          userAnswers.get(ValueOfAssetsPage(srn, NormalMode)) mustBe Some(MoneyInPeriod(money, Money(2 * money.value)))
+          userAnswers.get(HowMuchCashPage(srn, NormalMode)) mustBe None
+          userAnswers.get(FeesCommissionsWagesSalariesPage(srn, NormalMode)) mustBe Some(Money(3 * money.value))
+        }
+      )
+    }
+    "should transform minimal details with bank account" in {
+
+      val userAnswers = defaultUserAnswers
+      val minimalRequiredSubmission = MinimalRequiredSubmission(
+        ReportDetails(request.schemeDetails.pstr, dateRange.from, dateRange.to),
+        accountingPeriods,
+        SchemeDesignatory(
+          openBankAccount = true,
+          None,
+          2,
+          3,
+          4,
+          None,
+          None,
           Some(money.value),
-          None,
-          None,
-          Some(money.value)
+          Some(2 * money.value),
+          None
         )
       )
 
@@ -157,12 +202,15 @@ class MinimalRequiredSubmissionTransformerSpec
           userAnswers.get(WhichTaxYearPage(srn)) mustBe Some(DateRange(dateRange.from, dateRange.to))
           userAnswers.get(CheckReturnDatesPage(srn)) mustBe Some(false)
           userAnswers.get(ActiveBankAccountPage(srn)) mustBe Some(true)
-          userAnswers.get(WhyNoBankAccountPage(srn)) mustBe Some("reasonForNoBankAccount")
+          userAnswers.get(WhyNoBankAccountPage(srn)) mustBe None
           userAnswers.get(HowManyMembersPage(srn, allowedAccessRequest.pensionSchemeId)) mustBe Some(
             SchemeMemberNumbers(2, 3, 4)
           )
           val aps = userAnswers.get(AccountingPeriods(srn))
           aps mustBe Some(accountingPeriods.toList.map(period => DateRange(period._1, period._2)))
+          userAnswers.get(ValueOfAssetsPage(srn, NormalMode)) mustBe None
+          userAnswers.get(HowMuchCashPage(srn, NormalMode)) mustBe Some(MoneyInPeriod(money, Money(2 * money.value)))
+          userAnswers.get(FeesCommissionsWagesSalariesPage(srn, NormalMode)) mustBe None
         }
       )
     }

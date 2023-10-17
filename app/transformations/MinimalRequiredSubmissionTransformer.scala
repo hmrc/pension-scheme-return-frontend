@@ -18,7 +18,7 @@ package transformations
 
 import cats.implicits.catsSyntaxTuple2Semigroupal
 import com.google.inject.Singleton
-import models.{DateRange, NormalMode, PensionSchemeId, SchemeMemberNumbers, UserAnswers}
+import models.{DateRange, Money, MoneyInPeriod, NormalMode, PensionSchemeId, SchemeMemberNumbers, UserAnswers}
 import models.SchemeId.Srn
 import models.requests.DataRequest
 import models.requests.psr.{MinimalRequiredSubmission, ReportDetails, SchemeDesignatory}
@@ -89,15 +89,60 @@ class MinimalRequiredSubmissionTransformer @Inject()(schemeDateService: SchemeDa
         minimalRequiredSubmission.accountingPeriods.toList
           .map(x => DateRange(x._1, x._2))
       )
-      ua6 <- ua2.set(
+      openBankAccount = minimalRequiredSubmission.schemeDesignatory.openBankAccount
+      ua3 <- ua2.set(
         ActiveBankAccountPage(srn),
-        minimalRequiredSubmission.schemeDesignatory.openBankAccount
+        openBankAccount
       )
-      ua5 <- ua6.set(
-        WhyNoBankAccountPage(srn),
-        minimalRequiredSubmission.schemeDesignatory.reasonForNoBankAccount.getOrElse("")
-      )
-      ua7 <- ua5.set(
+      ua4 <- {
+        if (openBankAccount) {
+          Try(ua3)
+        } else {
+          ua3.set(
+            WhyNoBankAccountPage(srn),
+            minimalRequiredSubmission.schemeDesignatory.reasonForNoBankAccount.getOrElse("")
+          )
+        }
+      }
+      ua5 <- {
+        if (minimalRequiredSubmission.schemeDesignatory.totalAssetValueStart.isEmpty ||
+          minimalRequiredSubmission.schemeDesignatory.totalAssetValueEnd.isEmpty) {
+          Try(ua4)
+        } else {
+          ua4.set(
+            ValueOfAssetsPage(srn, NormalMode),
+            MoneyInPeriod(
+              Money(minimalRequiredSubmission.schemeDesignatory.totalAssetValueStart.get),
+              Money(minimalRequiredSubmission.schemeDesignatory.totalAssetValueEnd.get)
+            )
+          )
+        }
+      }
+      ua6 <- {
+        if (minimalRequiredSubmission.schemeDesignatory.totalCashStart.isEmpty ||
+          minimalRequiredSubmission.schemeDesignatory.totalCashEnd.isEmpty) {
+          Try(ua5)
+        } else {
+          ua5.set(
+            HowMuchCashPage(srn, NormalMode),
+            MoneyInPeriod(
+              Money(minimalRequiredSubmission.schemeDesignatory.totalCashStart.get),
+              Money(minimalRequiredSubmission.schemeDesignatory.totalCashEnd.get)
+            )
+          )
+        }
+      }
+      ua7 <- {
+        if (minimalRequiredSubmission.schemeDesignatory.totalPayments.isEmpty) {
+          Try(ua6)
+        } else {
+          ua6.set(
+            FeesCommissionsWagesSalariesPage(srn, NormalMode),
+            Money(minimalRequiredSubmission.schemeDesignatory.totalPayments.get)
+          )
+        }
+      }
+      ua8 <- ua7.set(
         HowManyMembersPage(srn, pensionSchemeId),
         SchemeMemberNumbers(
           minimalRequiredSubmission.schemeDesignatory.activeMembers,
@@ -106,6 +151,6 @@ class MinimalRequiredSubmissionTransformer @Inject()(schemeDateService: SchemeDa
         )
       )
     } yield {
-      ua7
+      ua8
     }
 }
