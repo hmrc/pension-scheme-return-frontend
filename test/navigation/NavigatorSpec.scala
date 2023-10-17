@@ -17,6 +17,7 @@
 package navigation
 
 import controllers.nonsipp.routes
+import models.NormalMode
 import pages._
 import utils.BaseSpec
 
@@ -36,8 +37,22 @@ class NavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
       act.like(
         normalmode
-          .navigateTo(WhatYouWillNeedPage, routes.WhichTaxYearController.onPageLoad)
+          .navigateTo(
+            WhatYouWillNeedPage,
+            (srn, _) => routes.WhichTaxYearController.onPageLoad(srn, NormalMode),
+            srn => emptyUserAnswers
+          )
           .withName("go from start page to which tax year page")
+      )
+
+      act.like(
+        normalmode
+          .navigateTo(
+            WhatYouWillNeedPage,
+            (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn),
+            srn => defaultUserAnswers
+          )
+          .withName("go from start page to task list page")
       )
     }
 

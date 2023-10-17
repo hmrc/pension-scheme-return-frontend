@@ -17,10 +17,16 @@
 package controllers
 
 import navigation.{FakeNavigator, Navigator}
+import org.mockito.ArgumentMatchers.any
 import play.api.inject.bind
+import play.api.inject.guice.GuiceableModule
 import play.api.mvc.Call
 import play.api.test.FakeRequest
+import services.PsrRetrievalService
 import views.html.ContentPageView
+
+import scala.concurrent.Future
+
 
 class WhatYouWillNeedPageControllerSpec extends ControllerBaseSpec {
 
@@ -28,6 +34,15 @@ class WhatYouWillNeedPageControllerSpec extends ControllerBaseSpec {
 
   lazy val onPageLoad = routes.WhatYouWillNeedController.onPageLoad(srn).url
   lazy val onSubmit = routes.WhatYouWillNeedController.onSubmit(srn).url
+
+  private implicit val mockPsrRetrievalService: PsrRetrievalService = mock[PsrRetrievalService]
+
+  override protected val additionalBindings: List[GuiceableModule] = List(
+    bind[PsrRetrievalService].toInstance(mockPsrRetrievalService)
+  )
+
+  override protected def beforeAll(): Unit =
+    reset(mockPsrRetrievalService)
 
   "WhatYouWillNeedController" - {
 
@@ -43,7 +58,9 @@ class WhatYouWillNeedPageControllerSpec extends ControllerBaseSpec {
     }
 
     "redirect to the next page" in {
-
+      when(mockPsrRetrievalService.getStandardPsrDetails(any(), any(), any(), any())(any(), any())).thenReturn(
+        Future.successful(defaultUserAnswers)
+      )
       val fakeNavigatorApplication =
         applicationBuilder()
           .overrides(
