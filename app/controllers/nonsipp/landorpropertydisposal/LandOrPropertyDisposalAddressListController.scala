@@ -26,31 +26,35 @@ import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalAddressL
 import eu.timepit.refined.refineV
 import forms.RadioListFormProvider
 import models.SchemeId.Srn
-import models.{Address, Mode, Pagination}
+import models.{Address, Mode, Pagination, UserAnswers}
 import navigation.Navigator
 import pages.nonsipp.landorproperty.LandOrPropertyAddressLookupPages
-import pages.nonsipp.landorpropertydisposal.LandOrPropertyDisposalAddressListPage
+import pages.nonsipp.landorpropertydisposal.{LandOrPropertyDisposalAddressListPage, LandPropertyDisposalCompletedPages}
 import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.MessagesApi
 import play.api.mvc._
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import services.SaveService
 import viewmodels.DisplayMessage.{Message, ParagraphMessage}
 import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, ListRadiosRow, ListRadiosViewModel, PaginatedViewModel}
 import views.html.ListRadiosView
+import config.Refined._
+import controllers.PSRController
 
 import javax.inject.Named
 import scala.collection.immutable.SortedMap
+import scala.concurrent.ExecutionContext
 
 class LandOrPropertyDisposalAddressListController @Inject()(
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
+  saveService: SaveService,
   view: ListRadiosView,
   formProvider: RadioListFormProvider
-) extends FrontendBaseController
-    with I18nSupport {
+)(implicit ec: ExecutionContext)
+  extends PSRController {
 
   val form = LandOrPropertyDisposalAddressListController.form(formProvider)
 
@@ -68,12 +72,19 @@ class LandOrPropertyDisposalAddressListController @Inject()(
       .bindFromRequest()
       .fold(
         errors =>
-          withIndexedAddress(addresses) { sortedAddresses =>
-            BadRequest(view(errors, viewModel(srn, page, sortedAddresses)))
-          },
+          withIndexedAddress(addresses)(
+            sortedAddresses => BadRequest(view(errors, viewModel(srn, page, sortedAddresses)))
+          ),
         answer =>
-          Redirect(
-            navigator.nextPage(LandOrPropertyDisposalAddressListPage(srn, answer), mode, request.userAnswers)
+          getNextDisposal(srn, answer).getOrRecoverJourney(
+            nextDisposal =>
+              Redirect(
+                navigator.nextPage(
+                  LandOrPropertyDisposalAddressListPage(srn, answer, nextDisposal),
+                  mode,
+                  request.userAnswers
+                )
+              )
           )
       )
   }
@@ -91,6 +102,33 @@ class LandOrPropertyDisposalAddressListController @Inject()(
         f(sortedMap)
     }
   }
+
+  private def getNextDisposal(srn: Srn, addressChoice: Max5000)(implicit userAnswers: UserAnswers): Option[Max50] =
+    userAnswers.get(LandPropertyDisposalCompletedPages(srn)) match {
+      case None => refineV[Max50.Refined](1).toOption
+      case Some(completedDisposals) =>
+        /**
+         *  Indexes of completed disposals sorted in ascending order.
+         *  We -1 from the address choice as the refined indexes is 1-based (e.g. 1 to 5000)
+         *  while we are trying to fetch a completed disposal from a Map which is 0-based.
+         *  We then +1 when we re-refine the index
+         */
+        val completedDisposalsForAddress =
+          completedDisposals
+            .get((addressChoice.value - 1).toString)
+            .map(_.keys.toList)
+            .flatMap(_.traverse(_.toIntOption))
+            .flatMap(_.traverse(index => refineV[Max50.Refined](index + 1).toOption))
+            .toList
+            .flatten
+            .sortBy(_.value)
+
+        completedDisposalsForAddress.lastOption match {
+          case None => refineV[Max50.Refined](1).toOption
+          case Some(lastCompletedDisposalForAddress) =>
+            refineV[Max50.Refined](lastCompletedDisposalForAddress.value + 1).toOption
+        }
+    }
 }
 
 object LandOrPropertyDisposalAddressListController {

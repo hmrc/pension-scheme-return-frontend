@@ -14,21 +14,11 @@
  * limitations under the License.
  */
 
-package navigation
+package models.audit
 
-import models.UserAnswers
-import pages.Page
-import play.api.mvc.Call
+trait AuditEvent {
 
-trait JourneyNavigator {
+  def auditType: String
 
-  val recoverJourney: Call = controllers.routes.JourneyRecoveryController.onPageLoad()
-
-  implicit class OptionOps[A](opt: Option[A]) {
-    def getOrRecoverJourney(f: A => Call): Call = opt.fold(recoverJourney)(f)
-  }
-
-  def normalRoutes: UserAnswers => PartialFunction[Page, Call]
-
-  def checkRoutes: UserAnswers => PartialFunction[Page, Call]
+  def details: Map[String, String]
 }

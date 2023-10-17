@@ -17,26 +17,22 @@
 package pages.nonsipp.landorpropertydisposal
 
 import config.Refined.{Max50, Max5000}
-import models.HowDisposed.HowDisposed
 import models.SchemeId.Srn
-import pages.QuestionPage
+import pages.{IndexedQuestionPage, QuestionPage}
 import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
-
-case class HowWasPropertyDisposedOfPage(
-  srn: Srn,
-  landOrPropertyIndex: Max5000,
-  disposalIndex: Max50,
-  answerChanged: Boolean
-) extends QuestionPage[HowDisposed] {
-
+import viewmodels.models.SectionCompleted
+case class LandPropertyDisposalCompletedPage(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50)
+    extends QuestionPage[SectionCompleted.type] {
   override def path: JsPath =
-    Paths.disposalPropertyTransaction \ toString \ landOrPropertyIndex.arrayIndex.toString \ disposalIndex.arrayIndex.toString
+    JsPath \ toString \ landOrPropertyIndex.arrayIndex.toString \ disposalIndex.arrayIndex.toString
 
-  override def toString: String = "disposedOf"
+  override def toString: String = "disposalCompleted"
 }
 
-object HowWasPropertyDisposedOfPage {
-  def apply(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50): HowWasPropertyDisposedOfPage =
-    HowWasPropertyDisposedOfPage(srn, landOrPropertyIndex, disposalIndex, answerChanged = false)
+case class LandPropertyDisposalCompletedPages(srn: Srn)
+    extends IndexedQuestionPage[Map[String, SectionCompleted.type]] {
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "disposalCompleted"
 }

@@ -59,7 +59,10 @@ class HowWasPropertyDisposedOfController @Inject()(
       request.userAnswers.get(LandOrPropertyAddressLookupPage(srn, landOrPropertyIndex)).getOrRecoverJourney {
         address =>
           val preparedForm =
-            request.userAnswers.fillForm(HowWasPropertyDisposedOfPage(srn, landOrPropertyIndex, disposalIndex), form)
+            request.userAnswers.fillForm(
+              HowWasPropertyDisposedOfPage(srn, landOrPropertyIndex, disposalIndex),
+              form
+            )
 
           Ok(view(preparedForm, viewModel(srn, landOrPropertyIndex, disposalIndex, address.addressLine1, mode)))
       }
@@ -79,16 +82,20 @@ class HowWasPropertyDisposedOfController @Inject()(
                   )
                 )
             },
-          value =>
+          value => {
+            val page = HowWasPropertyDisposedOfPage(srn, landOrPropertyIndex, disposalIndex)
             for {
-              updatedAnswers <- Future.fromTry(
-                request.userAnswers.set(HowWasPropertyDisposedOfPage(srn, landOrPropertyIndex, disposalIndex), value)
-              )
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(page, value))
+              hasAnswerChanged = request.userAnswers.exists(page)(_ == value)
               _ <- saveService.save(updatedAnswers)
             } yield Redirect(
-              navigator
-                .nextPage(HowWasPropertyDisposedOfPage(srn, landOrPropertyIndex, disposalIndex), mode, updatedAnswers)
+              navigator.nextPage(
+                HowWasPropertyDisposedOfPage(srn, landOrPropertyIndex, disposalIndex, hasAnswerChanged),
+                mode,
+                updatedAnswers
+              )
             )
+          }
         )
     }
 }
@@ -112,7 +119,7 @@ object HowWasPropertyDisposedOfController {
   def form(formProvider: RadioListFormProvider): Form[HowDisposed] =
     formProvider.singleConditional[HowDisposed, String](
       "howWasDisposed.error.required",
-      "other",
+      Other.name,
       Mappings.textArea(
         "howWasDisposed.conditional.error.required",
         "howWasDisposed.conditional.error.invalid",

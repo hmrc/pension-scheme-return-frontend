@@ -31,7 +31,7 @@ object UnallocatedEmployerContributionsNavigator extends JourneyNavigator {
       if (userAnswers.get(page).contains(true)) {
         routes.UnauthorisedController.onPageLoad()
       } else {
-        memberpayments.routes.MemberContributionsController.onPageLoad(srn, NormalMode)
+        controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
       }
   }
 

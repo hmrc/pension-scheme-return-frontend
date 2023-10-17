@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-package navigation
+package pages.nonsipp.moneyborrowed
 
-import models.UserAnswers
-import pages.Page
-import play.api.mvc.Call
+import config.Refined.OneTo5000
+import eu.timepit.refined.refineMV
+import pages.behaviours.PageBehaviours
 
-trait JourneyNavigator {
+class WhySchemeBorrowedMoneyPageSpec extends PageBehaviours {
 
-  val recoverJourney: Call = controllers.routes.JourneyRecoveryController.onPageLoad()
+  "WhySchemeBorrowedMoneyPage" - {
+    val index = refineMV[OneTo5000](1)
 
-  implicit class OptionOps[A](opt: Option[A]) {
-    def getOrRecoverJourney(f: A => Call): Call = opt.fold(recoverJourney)(f)
+    beRetrievable[String](WhySchemeBorrowedMoneyPage(srnGen.sample.value, index))
+
+    beSettable[String](WhySchemeBorrowedMoneyPage(srnGen.sample.value, index))
+
+    beRemovable[String](WhySchemeBorrowedMoneyPage(srnGen.sample.value, index))
   }
-
-  def normalRoutes: UserAnswers => PartialFunction[Page, Call]
-
-  def checkRoutes: UserAnswers => PartialFunction[Page, Call]
 }

@@ -29,6 +29,7 @@ import pages.nonsipp.landorproperty.LandOrPropertyAddressLookupPage
 import pages.nonsipp.landorpropertydisposal._
 import play.api.i18n._
 import play.api.mvc._
+import services.SaveService
 import utils.DateTimeUtils.localDateShow
 import utils.ListUtils.ListOps
 import viewmodels.DisplayMessage._
@@ -38,25 +39,27 @@ import views.html.CheckYourAnswersView
 
 import java.time.LocalDate
 import javax.inject.{Inject, Named}
+import scala.concurrent.{ExecutionContext, Future}
 
 class LandPropertyDisposalCYAController @Inject()(
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
+  saveService: SaveService,
   val controllerComponents: MessagesControllerComponents,
   view: CheckYourAnswersView
-) extends PSRController {
+)(implicit ec: ExecutionContext)
+  extends PSRController {
 
   def onPageLoad(
     srn: Srn,
     index: Max5000,
     disposalIndex: Max50,
-    checkOrChange: CheckOrChange
+    mode: Mode
   ): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       (
         for {
-
           howWasPropertyDisposed <- requiredPage(HowWasPropertyDisposedOfPage(srn, index, disposalIndex))
           addressLookUpPage <- requiredPage(LandOrPropertyAddressLookupPage(srn, index))
           landOrPropertyStillHeld <- requiredPage(LandOrPropertyStillHeldPage(srn, index, disposalIndex))
@@ -143,18 +146,25 @@ class LandPropertyDisposalCYAController @Inject()(
                 recipientName,
                 recipientDetails.flatten,
                 recipientReasonNoDetails.flatten,
-                checkOrChange
+                mode
               )
             )
           )
         )
       ).merge
-
     }
 
-  def onSubmit(srn: Srn, index: Max5000, disposalIndex: Max50, checkOrChange: CheckOrChange): Action[AnyContent] =
-    identifyAndRequireData(srn) { implicit request =>
-      Redirect(navigator.nextPage(LandPropertyDisposalCYAPage(srn), NormalMode, request.userAnswers))
+  def onSubmit(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+    identifyAndRequireData(srn).async { implicit request =>
+      for {
+        updatedUserAnswers <- Future.fromTry(
+          request.userAnswers.set(LandPropertyDisposalCompletedPage(srn, index, disposalIndex), SectionCompleted)
+        )
+        _ <- saveService.save(updatedUserAnswers)
+      } yield Redirect(
+        navigator
+          .nextPage(LandPropertyDisposalCompletedPage(srn, index, disposalIndex), NormalMode, request.userAnswers)
+      )
     }
 }
 
@@ -174,20 +184,22 @@ case class ViewModelParameters(
   recipientName: Option[String],
   recipientDetails: Option[String],
   recipientReasonNoDetails: Option[String],
-  checkOrChange: CheckOrChange
+  mode: Mode
 )
 object LandPropertyDisposalCYAController {
   def viewModel(parameters: ViewModelParameters): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](
-      title = parameters.checkOrChange
-        .fold(check = "checkYourAnswers.title", change = "landPropertyDisposalCYA.change.title"),
-      heading = parameters.checkOrChange.fold(
-        check = "checkYourAnswers.heading",
-        change = Message("landPropertyDisposalCYA.change.heading", parameters.addressLookUpPage.addressLine1)
+      title = parameters.mode.fold(
+        normal = "checkYourAnswers.title",
+        check = "landPropertyDisposalCYA.change.title"
+      ),
+      heading = parameters.mode.fold(
+        normal = "checkYourAnswers.heading",
+        check = Message("landPropertyDisposalCYA.change.heading", parameters.addressLookUpPage.addressLine1)
       ),
       description = Some(ParagraphMessage("landOrPropertyCYA.paragraph")),
-      page = CheckYourAnswersViewModel(
-        sections(
+      page = CheckYourAnswersViewModel.singleSection(
+        rows(
           parameters.srn,
           parameters.index,
           parameters.disposalIndex,
@@ -202,17 +214,16 @@ object LandPropertyDisposalCYAController {
           parameters.independentValuation,
           parameters.landOrPropertyStillHeld,
           parameters.recipientName,
-          parameters.recipientDetails,
-          CheckMode
+          parameters.recipientDetails
         )
       ),
       refresh = None,
-      buttonText = parameters.checkOrChange.fold(check = "site.saveAndContinue", change = "site.continue"),
+      buttonText = parameters.mode.fold(normal = "site.saveAndContinue", check = "site.continue"),
       onSubmit = routes.LandPropertyDisposalCYAController
-        .onSubmit(parameters.srn, parameters.index, parameters.disposalIndex, parameters.checkOrChange)
+        .onSubmit(parameters.srn, parameters.index, parameters.disposalIndex, parameters.mode)
     )
 
-  private def sections(
+  private def rows(
     srn: Srn,
     index: Max5000,
     disposalIndex: Max50,
@@ -227,62 +238,87 @@ object LandPropertyDisposalCYAController {
     independentValuation: Option[Boolean],
     landOrPropertyStillHeld: Boolean,
     recipientName: Option[String],
-    recipientDetails: Option[String],
-    mode: Mode
-  ): List[CheckYourAnswersSection] =
-    howWasPropertyDisposed match {
-      case Sold =>
-        landOrPropertyDisposal(
-          srn,
-          index,
-          disposalIndex,
-          schemeName,
-          howWasPropertyDisposed,
-          whenWasPropertySold,
-          addressLookUpPage,
-          landOrPropertyDisposedType,
-          recipientReasonNoDetails,
-          landOrPropertyDisposalSellerConnectedParty,
-          totalProceedsSale,
-          independentValuation,
-          landOrPropertyStillHeld,
-          recipientName.get,
-          recipientDetails,
-          mode
-        )
+    recipientDetails: Option[String]
+  ): List[CheckYourAnswersRowViewModel] =
+    baseRows(srn, index, disposalIndex, howWasPropertyDisposed, addressLookUpPage.addressLine1) ++
+      (howWasPropertyDisposed match {
+        case Sold =>
+          soldRows(
+            srn,
+            index,
+            disposalIndex,
+            schemeName,
+            whenWasPropertySold,
+            addressLookUpPage,
+            landOrPropertyDisposedType,
+            recipientReasonNoDetails,
+            landOrPropertyDisposalSellerConnectedParty,
+            totalProceedsSale,
+            independentValuation,
+            landOrPropertyStillHeld,
+            recipientName.get,
+            recipientDetails
+          )
 
-      case Transferred =>
-        transferredSection(
-          srn,
-          index,
-          disposalIndex,
-          schemeName,
-          howWasPropertyDisposed,
-          addressLookUpPage,
-          landOrPropertyStillHeld,
-          mode
-        )
+        case Transferred =>
+          transferredRows(
+            srn,
+            index,
+            disposalIndex,
+            schemeName,
+            addressLookUpPage,
+            landOrPropertyStillHeld
+          )
 
-      case _ =>
-        otherSection(
-          srn,
-          index,
-          disposalIndex,
-          schemeName,
-          howWasPropertyDisposed,
-          addressLookUpPage,
-          landOrPropertyStillHeld,
-          mode
-        )
+        case Other(details) =>
+          otherRows(
+            srn,
+            index,
+            disposalIndex,
+            schemeName,
+            details,
+            addressLookUpPage,
+            landOrPropertyStillHeld
+          )
+      })
 
+  private def baseRows(
+    srn: Srn,
+    index: Max5000,
+    disposalIndex: Max50,
+    howDisposed: HowDisposed,
+    addressLine1: String
+  ): List[CheckYourAnswersRowViewModel] = {
+    val howDisposedName = howDisposed match {
+      case Sold => Sold.name
+      case Transferred => Transferred.name
+      case Other(_) => Other.name
     }
 
-  private def landOrPropertyDisposal(
+    List(
+      CheckYourAnswersRowViewModel(
+        Message("landPropertyDisposalCYA.section1.propertyInUk", addressLine1),
+        addressLine1
+      ),
+      CheckYourAnswersRowViewModel(
+        Message("landPropertyDisposalCYA.section1.propertyDisposed", addressLine1),
+        howDisposedName
+      ).withAction(
+        SummaryAction(
+          "site.change",
+          controllers.nonsipp.landorpropertydisposal.routes.HowWasPropertyDisposedOfController
+            .onSubmit(srn, index, disposalIndex, CheckMode)
+            .url
+        ).withVisuallyHiddenContent("landPropertyDisposalCYA.section1.propertyDisposed.hidden")
+      )
+    )
+  }
+
+  private def soldRows(
     srn: Srn,
     index: Max5000,
     disposalIndex: Max50,
     schemeName: String,
-    howWasPropertyDisposed: HowDisposed,
     whenWasPropertySold: Option[LocalDate],
     addressLookUpPage: Address,
     landOrPropertyDisposedType: Option[IdentityType],
@@ -292,9 +328,8 @@ object LandPropertyDisposalCYAController {
     independentValuation: Option[Boolean],
     landOrPropertyStillHeld: Boolean,
     recipientName: String,
-    recipientDetails: Option[String],
-    mode: Mode
-  ): List[CheckYourAnswersSection] = {
+    recipientDetails: Option[String]
+  ): List[CheckYourAnswersRowViewModel] = {
 
     val receivedLoan = landOrPropertyDisposedType match {
       case Some(IdentityType.Individual) => "landOrPropertySeller.identityType.pageContent"
@@ -305,13 +340,13 @@ object LandPropertyDisposalCYAController {
 
     val recipientNameUrl = landOrPropertyDisposedType match {
       case Some(IdentityType.Individual) =>
-        routes.LandOrPropertyIndividualBuyerNameController.onSubmit(srn, index, disposalIndex, mode).url
+        routes.LandOrPropertyIndividualBuyerNameController.onSubmit(srn, index, disposalIndex, CheckMode).url
       case Some(IdentityType.UKCompany) =>
-        routes.CompanyBuyerNameController.onSubmit(srn, index, disposalIndex, mode).url
+        routes.CompanyBuyerNameController.onSubmit(srn, index, disposalIndex, CheckMode).url
       case Some(IdentityType.UKPartnership) =>
-        routes.PartnershipBuyerNameController.onSubmit(srn, index, disposalIndex, mode).url
+        routes.PartnershipBuyerNameController.onSubmit(srn, index, disposalIndex, CheckMode).url
       case Some(IdentityType.Other) =>
-        routes.OtherBuyerDetailsController.onSubmit(srn, index, disposalIndex, mode).url
+        routes.OtherBuyerDetailsController.onSubmit(srn, index, disposalIndex, CheckMode).url
     }
 
     val (
@@ -324,28 +359,28 @@ object LandPropertyDisposalCYAController {
         case Some(IdentityType.Individual) =>
           (
             Message("landPropertyDisposalCYA.section1.recipientDetails.nino", recipientName),
-            routes.IndividualBuyerNinoNumberController.onSubmit(srn, index, disposalIndex, mode).url,
+            routes.IndividualBuyerNinoNumberController.onSubmit(srn, index, disposalIndex, CheckMode).url,
             "landPropertyDisposalCYA.section1.recipientDetails.nino.hidden",
             "landPropertyDisposalCYA.section1.recipientDetails.noNinoReason.hidden"
           )
         case Some(IdentityType.UKCompany) =>
           (
             Message("landPropertyDisposalCYA.section1.recipientDetails.crn", recipientName),
-            routes.CompanyBuyerCrnController.onSubmit(srn, index, disposalIndex, mode).url,
+            routes.CompanyBuyerCrnController.onSubmit(srn, index, disposalIndex, CheckMode).url,
             "landPropertyDisposalCYA.section1.recipientDetails.crn.hidden",
             "landPropertyDisposalCYA.section1.recipientDetails.noCrnReason.hidden"
           )
         case Some(IdentityType.UKPartnership) =>
           (
             Message("landPropertyDisposalCYA.section1.recipientDetails.utr", recipientName),
-            routes.PartnershipBuyerUtrController.onSubmit(srn, index, disposalIndex, mode).url,
+            routes.PartnershipBuyerUtrController.onSubmit(srn, index, disposalIndex, CheckMode).url,
             "landPropertyDisposalCYA.section1.recipientDetails.utr.hidden",
             "landPropertyDisposalCYA.section1.recipientDetails.noUtrReason.hidden"
           )
         case Some(IdentityType.Other) =>
           (
             Message("landPropertyDisposalCYA.section1.recipientDetails.other", recipientName),
-            routes.OtherBuyerDetailsController.onSubmit(srn, index, disposalIndex, mode).url,
+            routes.OtherBuyerDetailsController.onSubmit(srn, index, disposalIndex, CheckMode).url,
             "landPropertyDisposalCYA.section1.recipientDetails.other.hidden",
             ""
           )
@@ -354,267 +389,185 @@ object LandPropertyDisposalCYAController {
     val (recipientNoDetailsReasonKey, recipientNoDetailsUrl): (Message, String) = landOrPropertyDisposedType match {
       case Some(IdentityType.Individual) =>
         Message("landPropertyDisposalCYA.section1.recipientDetails.noNinoReason", recipientName) ->
-          routes.IndividualBuyerNinoNumberController.onSubmit(srn, index, disposalIndex, mode).url
+          routes.IndividualBuyerNinoNumberController.onSubmit(srn, index, disposalIndex, CheckMode).url
 
       case Some(IdentityType.UKCompany) =>
         Message("landPropertyDisposalCYA.section1.recipientDetails.noCrnReason", recipientName) ->
-          routes.CompanyBuyerCrnController.onSubmit(srn, index, disposalIndex, mode).url
+          routes.CompanyBuyerCrnController.onSubmit(srn, index, disposalIndex, CheckMode).url
 
       case Some(IdentityType.UKPartnership) =>
         Message("landPropertyDisposalCYA.section1.recipientDetails.noUtrReason", recipientName) ->
-          routes.PartnershipBuyerUtrController.onSubmit(srn, index, disposalIndex, mode).url
+          routes.PartnershipBuyerUtrController.onSubmit(srn, index, disposalIndex, CheckMode).url
 
       case Some(IdentityType.Other) =>
         Message("landPropertyDisposalCYA.section1.recipientDetails.other", recipientName) ->
-          routes.OtherBuyerDetailsController.onSubmit(srn, index, disposalIndex, mode).url
+          routes.OtherBuyerDetailsController.onSubmit(srn, index, disposalIndex, CheckMode).url
 
     }
 
     List(
-      CheckYourAnswersSection(
-        None,
-        List(
-          CheckYourAnswersRowViewModel(
-            Message("landPropertyDisposalCYA.section1.propertyInUk", addressLookUpPage.addressLine1),
-            addressLookUpPage.addressLine1
-          ).withAction(
-            SummaryAction(
-              "site.change",
-              routes.LandOrPropertyDisposalAddressListController.onSubmit(srn, index.value).url
-            ).withVisuallyHiddenContent("landPropertyDisposalCYA.section1.landOrPropertyInUk.hidden")
-          ),
-          CheckYourAnswersRowViewModel(
-            Message("landPropertyDisposalCYA.section1.propertyDisposed", addressLookUpPage.addressLine1),
-            howWasPropertyDisposed.toString
-          ).withAction(
-            SummaryAction(
-              "site.change",
-              controllers.nonsipp.landorpropertydisposal.routes.HowWasPropertyDisposedOfController
-                .onSubmit(srn, index, disposalIndex, mode)
-                .url
-            ).withVisuallyHiddenContent("landPropertyDisposalCYA.section1.propertyDisposed.hidden")
-          ),
-          CheckYourAnswersRowViewModel(
-            Message("landPropertyDisposalCYA.section1.whenWasPropertySold", addressLookUpPage.addressLine1),
-            whenWasPropertySold.get.show
-          ).withAction(
-            SummaryAction(
-              "site.change",
-              routes.WhenWasPropertySoldController.onSubmit(srn, index, disposalIndex, mode).url
-            ).withVisuallyHiddenContent("landPropertyDisposalCYA.section1.whenWasPropertySold.hidden")
-          ),
-          CheckYourAnswersRowViewModel(
-            Message("landPropertyDisposalCYA.section1.totalProceedsSale", addressLookUpPage.addressLine1),
-            s"£${totalProceedsSale.get.displayAs}"
-          ).withAction(
-            SummaryAction(
-              "site.change",
-              routes.TotalProceedsSaleLandPropertyController.onSubmit(srn, index, disposalIndex, mode).url
-            ).withVisuallyHiddenContent(
-              "landPropertyDisposalCYA.section1.totalProceedsSaleInfo.hidden"
-            )
-          ),
-          CheckYourAnswersRowViewModel(
-            Message("landPropertyDisposalCYA.section1.whoPurchasedLandOrProperty", addressLookUpPage.addressLine1),
-            receivedLoan
-          ).withAction(
-            SummaryAction(
-              "site.change",
-              routes.WhoPurchasedLandOrPropertyController.onSubmit(srn, index, disposalIndex, mode).url
-            ).withVisuallyHiddenContent("landPropertyDisposalCYA.section1.whoPurchasedLandOrProperty.hidden")
-          ),
-          CheckYourAnswersRowViewModel("landPropertyDisposalCYA.section1.recipientName", recipientName)
-            .withAction(
-              SummaryAction("site.change", recipientNameUrl)
-                .withVisuallyHiddenContent("landPropertyDisposalCYA.section1.recipientName.hidden")
-            )
-        ) :?+ recipientDetails.map(
-          reason =>
-            CheckYourAnswersRowViewModel(recipientDetailsKey, reason)
-              .withAction(
-                SummaryAction("site.change", recipientDetailsUrl)
-                  .withVisuallyHiddenContent(recipientDetailsIdChangeHiddenKey)
-              )
-        ) :?+ recipientReasonNoDetails.map(
-          noreason =>
-            CheckYourAnswersRowViewModel(recipientNoDetailsReasonKey, noreason)
-              .withAction(
-                SummaryAction("site.change", recipientNoDetailsUrl)
-                  .withVisuallyHiddenContent(recipientDetailsNoIdChangeHiddenKey)
-              )
-        ) :+
-          CheckYourAnswersRowViewModel(
-            Message("landPropertyDisposalCYA.section1.landOrPropertyDisposalSellerConnectedParty", recipientName),
-            if (landOrPropertyDisposalSellerConnectedParty.get) "site.yes" else "site.no"
-          ).withAction(
-            SummaryAction(
-              "site.change",
-              controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalSellerConnectedPartyController
-                .onSubmit(srn, index, disposalIndex, mode)
-                .url
-            ).withVisuallyHiddenContent(
-              "landPropertyDisposalCYA.section1.landOrPropertyDisposalSellerConnectedPartyInfo.hidden"
-            )
-          ) :+
-          CheckYourAnswersRowViewModel(
-            Message(
-              "landPropertyDisposalCYA.section1.DisposalIndependentValuation",
-              addressLookUpPage.addressLine1
-            ),
-            if (independentValuation.get) "site.yes" else "site.no"
-          ).withAction(
-            SummaryAction(
-              "site.change",
-              controllers.nonsipp.landorpropertydisposal.routes.DisposalIndependentValuationController
-                .onSubmit(srn, index, disposalIndex, mode)
-                .url
-            ).withVisuallyHiddenContent(
-              "landPropertyDisposalCYA.section1.DisposalIndependentValuationInfo.hidden"
-            )
-          ) :+
-          CheckYourAnswersRowViewModel(
-            Message(
-              "landPropertyDisposalCYA.section1.landOrPropertyStillHeld",
-              addressLookUpPage.addressLine1,
-              schemeName
-            ),
-            if (landOrPropertyStillHeld) "site.yes" else "site.no"
-          ).withAction(
-            SummaryAction(
-              "site.change",
-              controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyStillHeldController
-                .onSubmit(srn, index, disposalIndex, mode)
-                .url
-            ).withVisuallyHiddenContent(
-              "landPropertyDisposalCYA.section1.landOrPropertyStillHeldInfo.hidden"
-            )
+      CheckYourAnswersRowViewModel(
+        Message("landPropertyDisposalCYA.section1.whenWasPropertySold", addressLookUpPage.addressLine1),
+        whenWasPropertySold.get.show
+      ).withAction(
+        SummaryAction(
+          "site.change",
+          routes.WhenWasPropertySoldController.onSubmit(srn, index, disposalIndex, CheckMode).url
+        ).withVisuallyHiddenContent("landPropertyDisposalCYA.section1.whenWasPropertySold.hidden")
+      ),
+      CheckYourAnswersRowViewModel(
+        Message("landPropertyDisposalCYA.section1.totalProceedsSale", addressLookUpPage.addressLine1),
+        s"£${totalProceedsSale.get.displayAs}"
+      ).withAction(
+        SummaryAction(
+          "site.change",
+          routes.TotalProceedsSaleLandPropertyController.onSubmit(srn, index, disposalIndex, CheckMode).url
+        ).withVisuallyHiddenContent(
+          "landPropertyDisposalCYA.section1.totalProceedsSaleInfo.hidden"
+        )
+      ),
+      CheckYourAnswersRowViewModel(
+        Message("landPropertyDisposalCYA.section1.whoPurchasedLandOrProperty", addressLookUpPage.addressLine1),
+        receivedLoan
+      ).withAction(
+        SummaryAction(
+          "site.change",
+          routes.WhoPurchasedLandOrPropertyController.onSubmit(srn, index, disposalIndex, CheckMode).url
+        ).withVisuallyHiddenContent("landPropertyDisposalCYA.section1.whoPurchasedLandOrProperty.hidden")
+      ),
+      CheckYourAnswersRowViewModel("landPropertyDisposalCYA.section1.recipientName", recipientName)
+        .withAction(
+          SummaryAction("site.change", recipientNameUrl)
+            .withVisuallyHiddenContent("landPropertyDisposalCYA.section1.recipientName.hidden")
+        )
+    ) :?+ recipientDetails.map(
+      reason =>
+        CheckYourAnswersRowViewModel(recipientDetailsKey, reason)
+          .withAction(
+            SummaryAction("site.change", recipientDetailsUrl)
+              .withVisuallyHiddenContent(recipientDetailsIdChangeHiddenKey)
           )
+    ) :?+ recipientReasonNoDetails.map(
+      noreason =>
+        CheckYourAnswersRowViewModel(recipientNoDetailsReasonKey, noreason)
+          .withAction(
+            SummaryAction("site.change", recipientNoDetailsUrl)
+              .withVisuallyHiddenContent(recipientDetailsNoIdChangeHiddenKey)
+          )
+    ) :+
+      CheckYourAnswersRowViewModel(
+        Message("landPropertyDisposalCYA.section1.landOrPropertyDisposalSellerConnectedParty", recipientName),
+        if (landOrPropertyDisposalSellerConnectedParty.get) "site.yes" else "site.no"
+      ).withAction(
+        SummaryAction(
+          "site.change",
+          controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalSellerConnectedPartyController
+            .onSubmit(srn, index, disposalIndex, CheckMode)
+            .url
+        ).withVisuallyHiddenContent(
+          "landPropertyDisposalCYA.section1.landOrPropertyDisposalSellerConnectedPartyInfo.hidden"
+        )
+      ) :+
+      CheckYourAnswersRowViewModel(
+        Message(
+          "landPropertyDisposalCYA.section1.DisposalIndependentValuation",
+          addressLookUpPage.addressLine1
+        ),
+        if (independentValuation.get) "site.yes" else "site.no"
+      ).withAction(
+        SummaryAction(
+          "site.change",
+          controllers.nonsipp.landorpropertydisposal.routes.DisposalIndependentValuationController
+            .onSubmit(srn, index, disposalIndex, CheckMode)
+            .url
+        ).withVisuallyHiddenContent(
+          "landPropertyDisposalCYA.section1.DisposalIndependentValuationInfo.hidden"
+        )
+      ) :+
+      CheckYourAnswersRowViewModel(
+        Message(
+          "landPropertyDisposalCYA.section1.landOrPropertyStillHeld",
+          addressLookUpPage.addressLine1,
+          schemeName
+        ),
+        if (landOrPropertyStillHeld) "site.yes" else "site.no"
+      ).withAction(
+        SummaryAction(
+          "site.change",
+          controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyStillHeldController
+            .onSubmit(srn, index, disposalIndex, CheckMode)
+            .url
+        ).withVisuallyHiddenContent(
+          "landPropertyDisposalCYA.section1.landOrPropertyStillHeldInfo.hidden"
+        )
       )
-    )
-
   }
 
-  private def transferredSection(
+  private def transferredRows(
     srn: Srn,
     index: Max5000,
     disposalIndex: Max50,
     schemeName: String,
-    howWasPropertyDisposed: HowDisposed,
     addressLookUpPage: Address,
-    landOrPropertyStillHeld: Boolean,
-    mode: Mode
-  ): List[CheckYourAnswersSection] =
+    landOrPropertyStillHeld: Boolean
+  ): List[CheckYourAnswersRowViewModel] =
     List(
-      CheckYourAnswersSection(
-        None,
-        List(
-          CheckYourAnswersRowViewModel(
-            Message("landPropertyDisposalCYA.section1.propertyInUk", addressLookUpPage.addressLine1),
-            addressLookUpPage.addressLine1
-          ).withAction(
-            SummaryAction(
-              "site.change",
-              routes.LandOrPropertyDisposalAddressListController.onSubmit(srn, index.value).url
-            ).withVisuallyHiddenContent("landPropertyDisposalCYA.section1.landOrPropertyInUk.hidden")
-          ),
-          CheckYourAnswersRowViewModel(
-            Message("landPropertyDisposalCYA.section1.propertyDisposed", addressLookUpPage.addressLine1),
-            howWasPropertyDisposed.toString
-          ).withAction(
-            SummaryAction(
-              "site.change",
-              controllers.nonsipp.landorpropertydisposal.routes.HowWasPropertyDisposedOfController
-                .onSubmit(srn, index, disposalIndex, mode)
-                .url
-            ).withVisuallyHiddenContent("landPropertyDisposalCYA.section1.propertyDisposed.hidden")
-          ),
-          CheckYourAnswersRowViewModel(
-            Message(
-              "landPropertyDisposalCYA.section1.landOrPropertyStillHeld",
-              addressLookUpPage.addressLine1,
-              schemeName
-            ),
-            if (landOrPropertyStillHeld) "site.yes" else "site.no"
-          ).withAction(
-            SummaryAction(
-              "site.change",
-              controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyStillHeldController
-                .onSubmit(srn, index, disposalIndex, mode)
-                .url
-            ).withVisuallyHiddenContent(
-              "landPropertyDisposalCYA.section1.landOrPropertyStillHeldInfo.hidden"
-            )
-          )
+      CheckYourAnswersRowViewModel(
+        Message(
+          "landPropertyDisposalCYA.section1.landOrPropertyStillHeld",
+          addressLookUpPage.addressLine1,
+          schemeName
+        ),
+        if (landOrPropertyStillHeld) "site.yes" else "site.no"
+      ).withAction(
+        SummaryAction(
+          "site.change",
+          controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyStillHeldController
+            .onSubmit(srn, index, disposalIndex, CheckMode)
+            .url
+        ).withVisuallyHiddenContent(
+          "landPropertyDisposalCYA.section1.landOrPropertyStillHeldInfo.hidden"
         )
       )
     )
 
-  private def otherSection(
+  private def otherRows(
     srn: Srn,
     index: Max5000,
     disposalIndex: Max50,
     schemeName: String,
-    howWasPropertyDisposed: HowDisposed,
+    otherDetails: String,
     addressLookUpPage: Address,
-    landOrPropertyStillHeld: Boolean,
-    mode: Mode
-  ): List[CheckYourAnswersSection] =
+    landOrPropertyStillHeld: Boolean
+  ): List[CheckYourAnswersRowViewModel] =
     List(
-      CheckYourAnswersSection(
-        None,
-        List(
-          CheckYourAnswersRowViewModel(
-            Message("landPropertyDisposalCYA.section1.propertyInUk", addressLookUpPage.addressLine1),
-            addressLookUpPage.addressLine1
-          ).withAction(
-            SummaryAction(
-              "site.change",
-              routes.LandOrPropertyDisposalAddressListController.onSubmit(srn, index.value).url
-            ).withVisuallyHiddenContent("landPropertyDisposalCYA.section1.landOrPropertyInUk.hidden")
-          ),
-          CheckYourAnswersRowViewModel(
-            Message("landPropertyDisposalCYA.section1.propertyDisposed", addressLookUpPage.addressLine1),
-            "Other"
-          ).withAction(
-            SummaryAction(
-              "site.change",
-              controllers.nonsipp.landorpropertydisposal.routes.HowWasPropertyDisposedOfController
-                .onSubmit(srn, index, disposalIndex, mode)
-                .url
-            ).withVisuallyHiddenContent("landPropertyDisposalCYA.section1.propertyDisposed.hidden")
-          ),
-          CheckYourAnswersRowViewModel(
-            Message("landPropertyDisposalCYA.section1.propertyDisposedDetails", addressLookUpPage.addressLine1),
-            howWasPropertyDisposed match {
-              case Other(details) => details
-            }
-          ).withAction(
-            SummaryAction(
-              "site.change",
-              controllers.nonsipp.landorpropertydisposal.routes.HowWasPropertyDisposedOfController
-                .onSubmit(srn, index, disposalIndex, mode)
-                .url
-            ).withVisuallyHiddenContent("landPropertyDisposalCYA.section1.propertyDisposedDetails.hidden")
-          ),
-          CheckYourAnswersRowViewModel(
-            Message(
-              "landPropertyDisposalCYA.section1.landOrPropertyStillHeld",
-              addressLookUpPage.addressLine1,
-              schemeName
-            ),
-            if (landOrPropertyStillHeld) "site.yes" else "site.no"
-          ).withAction(
-            SummaryAction(
-              "site.change",
-              controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyStillHeldController
-                .onSubmit(srn, index, disposalIndex, mode)
-                .url
-            ).withVisuallyHiddenContent(
-              "landPropertyDisposalCYA.section1.landOrPropertyStillHeldInfo.hidden"
-            )
-          )
+      CheckYourAnswersRowViewModel(
+        Message("landPropertyDisposalCYA.section1.propertyDisposedDetails", addressLookUpPage.addressLine1),
+        otherDetails
+      ).withAction(
+        SummaryAction(
+          "site.change",
+          controllers.nonsipp.landorpropertydisposal.routes.HowWasPropertyDisposedOfController
+            .onSubmit(srn, index, disposalIndex, CheckMode)
+            .url
+        ).withVisuallyHiddenContent("landPropertyDisposalCYA.section1.propertyDisposedDetails.hidden")
+      ),
+      CheckYourAnswersRowViewModel(
+        Message(
+          "landPropertyDisposalCYA.section1.landOrPropertyStillHeld",
+          addressLookUpPage.addressLine1,
+          schemeName
+        ),
+        if (landOrPropertyStillHeld) "site.yes" else "site.no"
+      ).withAction(
+        SummaryAction(
+          "site.change",
+          controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyStillHeldController
+            .onSubmit(srn, index, disposalIndex, CheckMode)
+            .url
+        ).withVisuallyHiddenContent(
+          "landPropertyDisposalCYA.section1.landOrPropertyStillHeldInfo.hidden"
         )
       )
     )
-
 }

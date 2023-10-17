@@ -30,10 +30,3 @@ case class LandOrPropertyStillHeldPage(srn: Srn, landOrPropertyIndex: Max5000, d
 
   override def toString: String = "portionStillHeld"
 }
-
-case class LandOrPropertyStillHeldPages(srn: Srn) extends QuestionPage[Map[String, Map[String, Boolean]]] {
-
-  override def path: JsPath = Paths.disposalPropertyTransaction \ toString
-
-  override def toString: String = "portionStillHeld"
-}

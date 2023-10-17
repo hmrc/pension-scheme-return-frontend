@@ -14,21 +14,17 @@
  * limitations under the License.
  */
 
-package navigation
+package pages.nonsipp.moneyborrowed
 
-import models.UserAnswers
-import pages.Page
-import play.api.mvc.Call
+import config.Refined.Max5000
+import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
+import utils.RefinedUtils.RefinedIntOps
 
-trait JourneyNavigator {
+case class WhySchemeBorrowedMoneyPage(srn: Srn, index: Max5000) extends QuestionPage[String] {
 
-  val recoverJourney: Call = controllers.routes.JourneyRecoveryController.onPageLoad()
+  override def path: JsPath = Paths.moneyBorrowed \ toString \ index.arrayIndex.toString
 
-  implicit class OptionOps[A](opt: Option[A]) {
-    def getOrRecoverJourney(f: A => Call): Call = opt.fold(recoverJourney)(f)
-  }
-
-  def normalRoutes: UserAnswers => PartialFunction[Page, Call]
-
-  def checkRoutes: UserAnswers => PartialFunction[Page, Call]
+  override def toString: String = "reasonForBorrow"
 }

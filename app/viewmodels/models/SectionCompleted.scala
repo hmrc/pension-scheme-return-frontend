@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.landorpropertydisposal
+package viewmodels.models
 
-import models.SchemeId.Srn
-import pages.Page
+import play.api.libs.json.{Json, OFormat}
 
-case class LandPropertyDisposalCYAPage(srn: Srn) extends Page
+case object SectionCompleted {
+  implicit val format: OFormat[SectionCompleted.type] = Json.format[SectionCompleted.type]
+}

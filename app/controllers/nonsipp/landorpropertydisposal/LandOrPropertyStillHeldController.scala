@@ -106,9 +106,7 @@ class LandOrPropertyStillHeldController @Inject()(
               )
               _ <- saveService.save(updatedAnswers)
             } yield {
-              val x = updatedAnswers.get(HowWasPropertyDisposedOfPage(srn, landOrPropertyIndex, disposalIndex))
-
-              x match {
+              updatedAnswers.get(HowWasPropertyDisposedOfPage(srn, landOrPropertyIndex, disposalIndex)) match {
                 case Some(HowDisposed.Transferred) =>
                   Redirect(
                     navigator
