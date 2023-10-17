@@ -53,22 +53,28 @@ class PsrRetrievalService @Inject()(
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[UserAnswers] =
     for {
       psrDetails <- psrConnector.getStandardPsrDetails(
-        request.pensionSchemeId.value,
+        request.schemeDetails.pstr,
         optFbNumber,
         optPeriodStartDate,
         optPsrVersion
       )
       userAnswersKey = request.getUserId + request.schemeDetails.srn
       userAnswers <- Future(Some(UserAnswers(userAnswersKey)))
-      transformedFromEtmp <- Future.fromTry(
-        minimalRequiredSubmissionTransformer
-          .transformFromEtmp(
-            userAnswers.get,
-            Srn(request.schemeDetails.srn).get,
-            request.pensionSchemeId,
-            psrDetails.minimalRequiredSubmission
+      transformedFromEtmp <- {
+        if (psrDetails.isEmpty) {
+          Future(userAnswers.get)
+        } else {
+          Future.fromTry(
+            minimalRequiredSubmissionTransformer
+              .transformFromEtmp(
+                userAnswers.get,
+                Srn(request.schemeDetails.srn).get,
+                request.pensionSchemeId,
+                psrDetails.get.minimalRequiredSubmission
+              )
           )
-      )
+        }
+      }
     } yield {
       transformedFromEtmp
     }

@@ -18,8 +18,10 @@ package connectors
 
 import config.FrontendAppConfig
 import models.requests.psr.PsrSubmission
+import play.api.http.Status.{NOT_FOUND, OK}
+import play.api.libs.json.{JsError, JsResultException, JsSuccess, Json}
 import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -41,7 +43,7 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClient) {
     optFbNumber: Option[String],
     optPeriodStartDate: Option[String],
     optPsrVersion: Option[String]
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[PsrSubmission] = {
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[PsrSubmission]] = {
     val queryParams = (optPeriodStartDate, optPsrVersion, optFbNumber) match {
       case (Some(startDate), Some(version), _) =>
         Seq(
@@ -52,10 +54,20 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClient) {
         Seq("fbNumber" -> fbNumber)
     }
 
-    http.GET[PsrSubmission](
-      baseUrl + s"/pension-scheme-return/psr/standard/${pstr}",
-      queryParams
-    )
+    http
+      .GET[HttpResponse](
+        baseUrl + s"/pension-scheme-return/psr/standard/${pstr}",
+        queryParams
+      )
+      .map { response =>
+        response.status match {
+          case OK =>
+            Json.parse(response.body).validate[PsrSubmission] match {
+              case JsSuccess(data, _) => Some(data)
+              case JsError(errors) => throw JsResultException(errors)
+            }
+          case NOT_FOUND => None
+        }
+      }
   }
-
 }

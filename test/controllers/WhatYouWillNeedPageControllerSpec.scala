@@ -27,7 +27,6 @@ import views.html.ContentPageView
 
 import scala.concurrent.Future
 
-
 class WhatYouWillNeedPageControllerSpec extends ControllerBaseSpec {
 
   def onwardRoute = Call("GET", "/foo")
