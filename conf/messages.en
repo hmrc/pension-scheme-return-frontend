@@ -1436,3 +1436,23 @@ valueOfSchemeAssetsWhenMoneyBorrowed.error.required = Enter the total value of t
 valueOfSchemeAssetsWhenMoneyBorrowed.error.invalid = Total value of the scheme’s assets must be an amount of money, like 123 or 123.45
 valueOfSchemeAssetsWhenMoneyBorrowed.error.tooLarge = Total value of the scheme’s assets must be 999999999.99 or less
 valueOfSchemeAssetsWhenMoneyBorrowed.error.tooSmall = Total value of the scheme’s assets must be -999999999.99 or more
+
+moneyBorrowedCheckYourAnswers.title = Check your answers
+moneyBorrowedCheckYourAnswers.heading = Check your answers
+moneyBorrowedCheckYourAnswers.section.lenderName =  Name of lender
+moneyBorrowedCheckYourAnswers.section.lenderName.hidden = the name of the lender
+moneyBorrowedCheckYourAnswers.section.lenderConnectedParty = Is {0} a connected party?
+moneyBorrowedCheckYourAnswers.section.lenderConnectedParty.hidden = if the lender is a connected party
+moneyBorrowedCheckYourAnswers.section.borrowedAmount = Total amount of money borrowed
+moneyBorrowedCheckYourAnswers.section.borrowedAmount.hidden = total amount of money borrowed
+moneyBorrowedCheckYourAnswers.section.borrowedRate = Interest rate
+moneyBorrowedCheckYourAnswers.section.borrowedRate.hidden = interest rate
+moneyBorrowedCheckYourAnswers.section.whenBorrowed =  Date {0} borrowed this money
+moneyBorrowedCheckYourAnswers.section.whenBorrowed.hidden = the date the scheme borrowed this money
+moneyBorrowedCheckYourAnswers.section.schemeAssets = Total value of {0}’s assets on {1}
+moneyBorrowedCheckYourAnswers.section.schemeAssets.hidden = total value of the scheme’s assets on {0}
+moneyBorrowedCheckYourAnswers.section.schemeBorrowed = Reason {0} borrowed this money
+moneyBorrowedCheckYourAnswers.section.schemeBorrowed.hidden = the reason the scheme borrowed this money
+
+moneyBorrowedCheckYourAnswers.change.title = Change details for money borrowed
+moneyBorrowedCheckYourAnswers.change.heading = Change details for {0} borrowed from {1}

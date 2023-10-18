@@ -18,11 +18,11 @@ package navigation.nonsipp
 
 import config.Refined.{Max5000, OneTo5000}
 import eu.timepit.refined.refineMV
-import models.NormalMode
+import models.CheckOrChange.Check
+import models.{CheckOrChange, NormalMode}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.moneyborrowed._
-
 import utils.BaseSpec
 
 class MoneyBorrowedNavigatorSpec extends BaseSpec with NavigatorBehaviours {
@@ -124,10 +124,76 @@ class MoneyBorrowedNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateToWithIndex(
           index,
           WhySchemeBorrowedMoneyPage,
-          (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          (srn, _: Max5000, _) =>
+            controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController
+              .onPageLoad(srn, index, CheckOrChange.Check)
         )
-        .withName("go from why scheme borrowed amount page to unauthorised controller")
+        .withName("go from why scheme borrowed amount page to money borrowed CYA page")
     )
+  }
+
+  "MoneyBorrowedNavigator in check mode" - {
+
+    act.like(
+      checkmode
+        .navigateTo(
+          LenderNamePage(_, refineMV(1)),
+          (srn, _) =>
+            controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController.onPageLoad(srn, refineMV(1), Check)
+        )
+        .withName("go from lender name page to money borrowed CYA page")
+    )
+
+    act.like(
+      checkmode
+        .navigateTo(
+          IsLenderConnectedPartyPage(_, refineMV(1)),
+          (srn, _) =>
+            controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController.onPageLoad(srn, refineMV(1), Check)
+        )
+        .withName("go from is lender connected party page to money borrowed CYA page")
+    )
+
+    act.like(
+      checkmode
+        .navigateTo(
+          BorrowedAmountAndRatePage(_, refineMV(1)),
+          (srn, _) =>
+            controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController.onPageLoad(srn, refineMV(1), Check)
+        )
+        .withName("go from borrowed amount and interest rate page to money borrowed CYA page")
+    )
+
+    act.like(
+      checkmode
+        .navigateTo(
+          WhenBorrowedPage(_, refineMV(1)),
+          (srn, _) =>
+            controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController.onPageLoad(srn, refineMV(1), Check)
+        )
+        .withName("go from when amount was borrowed rate page to money borrowed CYA page")
+    )
+
+    act.like(
+      checkmode
+        .navigateTo(
+          ValueOfSchemeAssetsWhenMoneyBorrowedPage(_, refineMV(1)),
+          (srn, _) =>
+            controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController.onPageLoad(srn, refineMV(1), Check)
+        )
+        .withName("go from value of scheme assets when money borrowed page to money borrowed CYA page")
+    )
+
+    act.like(
+      checkmode
+        .navigateTo(
+          WhySchemeBorrowedMoneyPage(_, refineMV(1)),
+          (srn, _) =>
+            controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController.onPageLoad(srn, refineMV(1), Check)
+        )
+        .withName("go from why scheme borrowed amount page to money borrowed CYA page")
+    )
+
   }
 
 }

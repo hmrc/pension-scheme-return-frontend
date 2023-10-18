@@ -36,3 +36,10 @@ GET         /:srn/value-of-scheme-assets-when-money-borrowed/:index             
 POST        /:srn/value-of-scheme-assets-when-money-borrowed/:index                                   controllers.nonsipp.moneyborrowed.ValueOfSchemeAssetsWhenMoneyBorrowedController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
 GET         /:srn/change-value-of-scheme-assets-when-money-borrowed/:index                            controllers.nonsipp.moneyborrowed.ValueOfSchemeAssetsWhenMoneyBorrowedController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 POST        /:srn/change-value-of-scheme-assets-when-money-borrowed/:index                            controllers.nonsipp.moneyborrowed.ValueOfSchemeAssetsWhenMoneyBorrowedController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET         /:srn/check-answers-money-borrowed                                controllers.nonsipp.moneyborrowed.MoneyBorrowedCYAController.onPageLoad(srn: Srn, index: Max5000 = 1, checkOrChange: CheckOrChange = Check)
+GET         /:srn/check-answers-money-borrowed/:index                         controllers.nonsipp.moneyborrowed.MoneyBorrowedCYAController.onPageLoad(srn: Srn, index: Max5000, checkOrChange: CheckOrChange = Check)
+POST        /:srn/submit-check-answers-money-borrowed                         controllers.nonsipp.moneyborrowed.MoneyBorrowedCYAController.onSubmit(srn: Srn, checkOrChange: CheckOrChange = Check)
+GET         /:srn/change-check-answers-money-borrowed                         controllers.nonsipp.moneyborrowed.MoneyBorrowedCYAController.onPageLoad(srn: Srn, index: Max5000 = 1, checkOrChange: CheckOrChange = Change)
+GET         /:srn/change-check-answers-money-borrowed/:index                  controllers.nonsipp.moneyborrowed.MoneyBorrowedCYAController.onPageLoad(srn: Srn, index: Max5000, checkOrChange: CheckOrChange = Change)
+POST        /:srn/change-submit-check-answers-money-borrowed                 controllers.nonsipp.moneyborrowed.MoneyBorrowedCYAController.onSubmit(srn: Srn, checkOrChange: CheckOrChange = Change)

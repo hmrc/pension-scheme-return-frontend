@@ -17,7 +17,7 @@
 package navigation.nonsipp
 
 import eu.timepit.refined.refineMV
-import models.{NormalMode, UserAnswers}
+import models.{CheckOrChange, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.moneyborrowed._
@@ -53,8 +53,30 @@ object MoneyBorrowedNavigator extends JourneyNavigator {
       controllers.nonsipp.moneyborrowed.routes.WhySchemeBorrowedMoneyController.onPageLoad(srn, index, NormalMode)
 
     case WhySchemeBorrowedMoneyPage(srn, index) =>
+      controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController.onPageLoad(srn, index, CheckOrChange.Check)
+
+    case MoneyBorrowedCYAPage(srn) =>
       controllers.routes.UnauthorisedController.onPageLoad()
   }
 
-  override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty
+  override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => {
+
+    case LenderNamePage(srn, index) =>
+      controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController.onPageLoad(srn, index, CheckOrChange.Check)
+
+    case IsLenderConnectedPartyPage(srn, index) =>
+      controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController.onPageLoad(srn, index, CheckOrChange.Check)
+
+    case BorrowedAmountAndRatePage(srn, index) =>
+      controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController.onPageLoad(srn, index, CheckOrChange.Check)
+
+    case WhenBorrowedPage(srn, index) =>
+      controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController.onPageLoad(srn, index, CheckOrChange.Check)
+
+    case ValueOfSchemeAssetsWhenMoneyBorrowedPage(srn, index) =>
+      controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController.onPageLoad(srn, index, CheckOrChange.Check)
+
+    case WhySchemeBorrowedMoneyPage(srn, index) =>
+      controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController.onPageLoad(srn, index, CheckOrChange.Check)
+  }
 }
