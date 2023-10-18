@@ -49,7 +49,7 @@ class LandPropertyDisposalCYAController @Inject()(
   val controllerComponents: MessagesControllerComponents,
   view: CheckYourAnswersView
 )(implicit ec: ExecutionContext)
-  extends PSRController {
+    extends PSRController {
 
   def onPageLoad(
     srn: Srn,

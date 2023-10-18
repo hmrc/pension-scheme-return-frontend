@@ -111,7 +111,8 @@ class MoneyBorrowedNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateToWithIndex(
           index,
           ValueOfSchemeAssetsWhenMoneyBorrowedPage,
-          (srn, _: Max5000, _) => controllers.nonsipp.moneyborrowed.routes.WhySchemeBorrowedMoneyController.onPageLoad(srn, index, NormalMode)
+          (srn, _: Max5000, _) =>
+            controllers.nonsipp.moneyborrowed.routes.WhySchemeBorrowedMoneyController.onPageLoad(srn, index, NormalMode)
         )
         .withName("go from value of scheme assets when money borrowed page to unauthorised controller")
     )

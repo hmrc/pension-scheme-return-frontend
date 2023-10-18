@@ -55,7 +55,7 @@ class PsrSubmissionService @Inject()(
         PsrSubmission(
           minimalRequiredSubmission = minimalRequiredSubmission,
           checkReturnDates = checkReturnDates,
-          loans = Option.when(schemeHadLoans)(Loans(schemeHadLoans, loanTransactionsTransformer.transform(srn))),
+          loans = Option.when(schemeHadLoans)(Loans(schemeHadLoans, loanTransactionsTransformer.transformToEtmp(srn))),
           assets = Option.when(landOrPropertyHeld)(
             Assets(
               LandOrProperty(

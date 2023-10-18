@@ -38,7 +38,6 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class PsrRetrievalService @Inject()(
-  sessionRepository: SessionRepository,
   psrConnector: PSRConnector,
   minimalRequiredSubmissionTransformer: MinimalRequiredSubmissionTransformer,
   loanTransactionsTransformer: LoanTransactionsTransformer,
@@ -60,7 +59,7 @@ class PsrRetrievalService @Inject()(
       )
       userAnswersKey = request.getUserId + request.schemeDetails.srn
       userAnswers <- Future(Some(UserAnswers(userAnswersKey)))
-      transformedFromEtmp <- {
+      transformedMinimal <- {
         if (psrDetails.isEmpty) {
           Future(userAnswers.get)
         } else {
@@ -75,7 +74,21 @@ class PsrRetrievalService @Inject()(
           )
         }
       }
+      transformedLoans <- {
+        if (psrDetails.isEmpty || psrDetails.get.loans.isEmpty) {
+          Future(transformedMinimal)
+        } else {
+          Future.fromTry(
+            loanTransactionsTransformer
+              .transformFromEtmp(
+                transformedMinimal,
+                Srn(request.schemeDetails.srn).get,
+                psrDetails.get.loans.get.loanTransactions.toList
+              )
+          )
+        }
+      }
     } yield {
-      transformedFromEtmp
+      transformedLoans
     }
 }
