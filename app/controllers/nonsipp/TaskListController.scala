@@ -413,22 +413,6 @@ object TaskListController {
       ),
       TaskListItemViewModel(
         LinkMessage(
-          messageKey(prefix, "connectedparty.title", UnableToStart),
-          controllers.nonsipp.sharesacquiredfromconnectedparty.routes.SharesAcquiredFromConnectedPartyController
-            .onPageLoad(srn, NormalMode)
-            .url
-        ),
-        NotStarted
-      ),
-      TaskListItemViewModel(
-        LinkMessage(
-          messageKey(prefix, "unquotedshares.title", UnableToStart),
-          controllers.nonsipp.unquotedshares.routes.UnquotedSharesController.onPageLoad(srn, NormalMode).url
-        ),
-        NotStarted
-      ),
-      TaskListItemViewModel(
-        LinkMessage(
           messageKey(prefix, "quotedshares.title", UnableToStart),
           controllers.routes.UnauthorisedController.onPageLoad().url
         ),
