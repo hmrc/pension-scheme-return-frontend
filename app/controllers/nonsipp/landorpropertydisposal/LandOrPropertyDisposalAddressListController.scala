@@ -54,7 +54,7 @@ class LandOrPropertyDisposalAddressListController @Inject()(
   view: ListRadiosView,
   formProvider: RadioListFormProvider
 )(implicit ec: ExecutionContext)
-  extends PSRController {
+    extends PSRController {
 
   val form = LandOrPropertyDisposalAddressListController.form(formProvider)
 

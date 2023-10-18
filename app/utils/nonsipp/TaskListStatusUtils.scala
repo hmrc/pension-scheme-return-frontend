@@ -20,6 +20,11 @@ import models.ConditionalYesNo._
 import models.SchemeId.Srn
 import models.{IdentitySubject, NormalMode, PensionSchemeId, UserAnswers}
 import pages.nonsipp.common.IdentityTypes
+import pages.nonsipp.landorpropertydisposal.{
+  LandOrPropertyDisposalPage,
+  LandPropertyDisposalCompletedPage,
+  LandPropertyDisposalCompletedPages
+}
 import pages.nonsipp.loansmadeoroutstanding.{
   IsIndividualRecipientConnectedPartyPages,
   LoansMadeOrOutstandingPage,
@@ -29,7 +34,7 @@ import pages.nonsipp.loansmadeoroutstanding.{
 import pages.nonsipp.memberdetails.{MemberDetailsNinoPages, MembersDetailsPages, NoNinoPages}
 import pages.nonsipp.schemedesignatory.{FeesCommissionsWagesSalariesPage, HowManyMembersPage, HowMuchCashPage}
 import viewmodels.models.TaskListStatus
-import viewmodels.models.TaskListStatus.{Completed, InProgress, NotStarted}
+import viewmodels.models.TaskListStatus.{Completed, InProgress, NotStarted, TaskListStatus}
 
 object TaskListStatusUtils {
 
@@ -112,4 +117,23 @@ object TaskListStatusUtils {
     }
   }
 
+  def getDisposalsTaskListStatusWithLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
+    val atLeastOneCompleted =
+      userAnswers.get(LandPropertyDisposalCompletedPages(srn)).exists(_.values.exists(_.values.nonEmpty))
+    val started = userAnswers.get(LandOrPropertyDisposalPage(srn)).contains(true)
+    val completedNoDisposals = userAnswers.get(LandOrPropertyDisposalPage(srn)).contains(false)
+
+    val initialDisposalUrl = controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalController
+      .onPageLoad(srn, NormalMode)
+      .url
+
+    val disposalListPage = controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalListController
+      .onPageLoad(srn, page = 1)
+      .url
+
+    if (atLeastOneCompleted) (TaskListStatus.Completed, disposalListPage)
+    else if (completedNoDisposals) (TaskListStatus.Completed, initialDisposalUrl)
+    else if (started) (TaskListStatus.InProgress, initialDisposalUrl)
+    else (TaskListStatus.NotStarted, initialDisposalUrl)
+  }
 }
