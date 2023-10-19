@@ -17,7 +17,7 @@
 package models.requests.psr
 
 import models.{Address, IdentityType, SchemeHoldLandProperty}
-import play.api.libs.json.{Json, OWrites}
+import play.api.libs.json.{Json, OFormat}
 
 import java.time.LocalDate
 
@@ -69,13 +69,13 @@ case class LeaseDetails(
 
 object Assets {
 
-  private implicit val writesLeaseDetails: OWrites[LeaseDetails] = Json.writes[LeaseDetails]
-  private implicit val writesPropertyAcquiredFrom: OWrites[PropertyAcquiredFrom] = Json.writes[PropertyAcquiredFrom]
-  private implicit val writesHeldPropertyTransaction: OWrites[HeldPropertyTransaction] =
-    Json.writes[HeldPropertyTransaction]
-  private implicit val writesPropertyDetails: OWrites[PropertyDetails] = Json.writes[PropertyDetails]
-  private implicit val writesLandOrPropertyTransactions: OWrites[LandOrPropertyTransactions] =
-    Json.writes[LandOrPropertyTransactions]
-  private implicit val writesLandOrProperty: OWrites[LandOrProperty] = Json.writes[LandOrProperty]
-  implicit val writes: OWrites[Assets] = Json.writes[Assets]
+  private implicit val formatLeaseDetails: OFormat[LeaseDetails] = Json.format[LeaseDetails]
+  private implicit val formatPropertyAcquiredFrom: OFormat[PropertyAcquiredFrom] = Json.format[PropertyAcquiredFrom]
+  private implicit val formatHeldPropertyTransaction: OFormat[HeldPropertyTransaction] =
+    Json.format[HeldPropertyTransaction]
+  private implicit val formatPropertyDetails: OFormat[PropertyDetails] = Json.format[PropertyDetails]
+  private implicit val formatLandOrPropertyTransactions: OFormat[LandOrPropertyTransactions] =
+    Json.format[LandOrPropertyTransactions]
+  private implicit val formatLandOrProperty: OFormat[LandOrProperty] = Json.format[LandOrProperty]
+  implicit val writes: OFormat[Assets] = Json.format[Assets]
 }

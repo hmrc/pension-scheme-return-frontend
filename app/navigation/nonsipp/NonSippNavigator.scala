@@ -21,7 +21,7 @@ import controllers.nonsipp
 import controllers.nonsipp.routes
 import eu.timepit.refined.refineMV
 import models.PensionSchemeId.{PsaId, PspId}
-import models.{NormalMode, UserAnswers}
+import models.{CheckMode, NormalMode, UserAnswers}
 import navigation.{JourneyNavigator, Navigator}
 import pages.Page
 import pages.nonsipp._
@@ -79,7 +79,19 @@ class NonSippNavigator @Inject()() extends Navigator {
           nonsipp.accountingperiod.routes.AccountingPeriodController.onPageLoad(srn, refineMV(1), NormalMode)
         }
 
-      case HowManyMembersPage(_, _) => controllers.routes.UnauthorisedController.onPageLoad()
+      case page @ HowManyMembersPage(srn, PsaId(_)) =>
+        if (userAnswers.get(page).exists(_.total > 99)) {
+          nonsipp.declaration.routes.PsaDeclarationController.onPageLoad(srn)
+        } else {
+          controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, CheckMode)
+        }
+
+      case page @ HowManyMembersPage(srn, PspId(_)) =>
+        if (userAnswers.get(page).exists(_.total > 99)) {
+          nonsipp.declaration.routes.PspDeclarationController.onPageLoad(srn)
+        } else {
+          controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, CheckMode)
+        }
 
       case HowMuchCashPage(srn, mode) =>
         nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController.onPageLoad(srn, mode)

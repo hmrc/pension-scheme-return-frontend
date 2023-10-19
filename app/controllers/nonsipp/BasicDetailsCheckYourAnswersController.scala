@@ -19,13 +19,13 @@ package controllers.nonsipp
 import cats.data.NonEmptyList
 import cats.implicits.toShow
 import config.Refined.Max3
-import controllers.PSRController
+import controllers.{nonsipp, PSRController}
 import controllers.actions._
 import controllers.nonsipp.BasicDetailsCheckYourAnswersController._
 import models.SchemeId.Srn
 import models.audit.PSRStartAuditEvent
 import models.requests.DataRequest
-import models.{CheckMode, DateRange, Mode, SchemeDetails, SchemeMemberNumbers}
+import models.{CheckMode, DateRange, Mode, NormalMode, SchemeDetails, SchemeMemberNumbers}
 import navigation.Navigator
 import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, HowManyMembersPage, WhyNoBankAccountPage}
 import pages.nonsipp.{BasicDetailsCheckYourAnswersPage, WhichTaxYearPage}
@@ -97,7 +97,19 @@ class BasicDetailsCheckYourAnswersController @Inject()(
               taxYear <- schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney
               schemeMemberNumbers <- requiredPage(HowManyMembersPage(srn, request.pensionSchemeId))
               _ = auditService.sendEvent(buildAuditEvent(taxYear, schemeMemberNumbers))
-            } yield Redirect(navigator.nextPage(BasicDetailsCheckYourAnswersPage(srn), mode, request.userAnswers))
+            } yield {
+              mode match {
+                case NormalMode =>
+                  Redirect(navigator.nextPage(BasicDetailsCheckYourAnswersPage(srn), mode, request.userAnswers))
+                case CheckMode =>
+                  val members = request.userAnswers.get(HowManyMembersPage(srn, request.pensionSchemeId))
+                  if (members.exists(_.total > 99)) { // as we cannot access pensionSchemeId in the navigator
+                    Redirect(nonsipp.declaration.routes.PsaDeclarationController.onPageLoad(srn))
+                  } else {
+                    Redirect(navigator.nextPage(BasicDetailsCheckYourAnswersPage(srn), NormalMode, request.userAnswers))
+                  }
+              }
+            }
           ).merge
       }
   }

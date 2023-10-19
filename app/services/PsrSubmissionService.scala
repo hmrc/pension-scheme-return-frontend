@@ -48,14 +48,14 @@ class PsrSubmissionService @Inject()(
     val schemeHadLoans = request.userAnswers.get(LoansMadeOrOutstandingPage(srn)).getOrElse(false)
     val landOrPropertyHeld = request.userAnswers.get(LandOrPropertyHeldPage(srn)).getOrElse(false)
     (
-      minimalRequiredSubmissionTransformer.transform(srn),
+      minimalRequiredSubmissionTransformer.transformToEtmp(srn),
       request.userAnswers.get(CheckReturnDatesPage(srn))
     ).mapN { (minimalRequiredSubmission, checkReturnDates) =>
       psrConnector.submitPsrDetails(
         PsrSubmission(
           minimalRequiredSubmission = minimalRequiredSubmission,
           checkReturnDates = checkReturnDates,
-          loans = Option.when(schemeHadLoans)(Loans(schemeHadLoans, loanTransactionsTransformer.transform(srn))),
+          loans = Option.when(schemeHadLoans)(Loans(schemeHadLoans, loanTransactionsTransformer.transformToEtmp(srn))),
           assets = Option.when(landOrPropertyHeld)(
             Assets(
               LandOrProperty(

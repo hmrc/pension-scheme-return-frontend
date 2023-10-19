@@ -108,6 +108,7 @@ trait TestValues {
   val nino: Nino = ninoGen.sample.get
   val noninoReason: String = "reason"
   val utr: Utr = utrGen.sample.get
+  val noUtrReason: String = "no utr reason"
   val leaseName = "testLeaseName"
   val money: Money = Money(123456)
   val security: Security = Security("securityGivenForLoan")
@@ -118,8 +119,15 @@ trait TestValues {
   val partnershipName = "testPartnershipName"
   val otherName = "testOtherName"
   val crn: Crn = crnGen.sample.get
+  val noCrnReason: String = "no crn reason"
   val recipientName = "testRecipientName"
+  val individualRecipientName = "individual " + recipientName
+  val companyRecipientName = "company " + recipientName
+  val partnershipRecipientName = "partnership " + recipientName
+  val otherRecipientName = "other " + recipientName
+  val otherRecipientDescription = "other description"
   val pstr = "testPstr"
+  val version = "001"
   val titleNumber = "AB123456"
   val buyersName = "testBuyersName"
   val lenderName = "testLenderName"
@@ -225,4 +233,11 @@ trait TestValues {
 
   def userAnswersWithNameAndAmount(srn: Srn, index: Max5000): UserAnswers =
     defaultUserAnswers.unsafeSet(LenderNamePage(srn, index), lenderName)
+
+  val accountingPeriods = NonEmptyList.of(
+    LocalDate.of(2020, 4, 6) ->
+      LocalDate.of(2020, 5, 5),
+    LocalDate.of(2020, 5, 6) ->
+      LocalDate.of(2020, 6, 5)
+  )
 }

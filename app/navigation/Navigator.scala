@@ -19,6 +19,7 @@ package navigation
 import controllers.nonsipp.routes
 import models._
 import pages._
+import play.api.libs.json.JsObject
 import play.api.mvc.Call
 
 import javax.inject.{Inject, Singleton}
@@ -28,8 +29,15 @@ class RootNavigator @Inject()() extends Navigator {
 
   val journeys: List[JourneyNavigator] =
     List(new JourneyNavigator {
-      override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = _ => {
-        case WhatYouWillNeedPage(srn) => routes.WhichTaxYearController.onPageLoad(srn, NormalMode)
+      override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
+        case WhatYouWillNeedPage(srn) => {
+          val isDataEmpty = userAnswers.data.decryptedValue == JsObject.empty
+          if (isDataEmpty) {
+            routes.WhichTaxYearController.onPageLoad(srn, NormalMode)
+          } else {
+            controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
+          }
+        }
       }
 
       override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty

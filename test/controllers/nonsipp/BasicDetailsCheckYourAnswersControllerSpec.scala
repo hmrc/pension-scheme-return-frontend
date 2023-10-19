@@ -19,11 +19,11 @@ package controllers.nonsipp
 import cats.data.NonEmptyList
 import cats.implicits.toShow
 import config.Refined.Max3
-import controllers.ControllerBaseSpec
+import controllers.{nonsipp, ControllerBaseSpec}
 import controllers.nonsipp.BasicDetailsCheckYourAnswersController._
 import eu.timepit.refined.refineMV
 import models.SchemeId.Srn
-import models.{DateRange, Mode, NormalMode, SchemeDetails, SchemeMemberNumbers}
+import models.{CheckMode, DateRange, Mode, NormalMode, SchemeDetails, SchemeMemberNumbers}
 import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.WhichTaxYearPage
 import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, HowManyMembersPage}
@@ -40,6 +40,7 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoad = routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.BasicDetailsCheckYourAnswersController.onSubmit(srn, NormalMode)
+  private lazy val onSubmitInCheckMode = routes.BasicDetailsCheckYourAnswersController.onSubmit(srn, CheckMode)
 
   private implicit val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
@@ -55,6 +56,9 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec {
       .unsafeSet(WhichTaxYearPage(srn), dateRange)
       .unsafeSet(HowManyMembersPage(srn, psaId), schemeMemberNumbers)
       .unsafeSet(ActiveBankAccountPage(srn), true)
+    val pensionSchemeId = pensionSchemeIdGen.sample.value
+    val userAnswersWithManyMembers = userAnswersWithTaxYear
+      .unsafeSet(HowManyMembersPage(srn, pensionSchemeId), SchemeMemberNumbers(50, 60, 70))
 
     act.like(renderView(onPageLoad, userAnswersWithTaxYear) { implicit app => implicit request =>
       injected[CheckYourAnswersView].apply(
@@ -81,6 +85,16 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec {
         }
     )
 
+    act.like(
+      redirectToPage(
+        onSubmitInCheckMode,
+        nonsipp.declaration.routes.PsaDeclarationController.onPageLoad(srn),
+        userAnswersWithManyMembers
+      ).before {
+        MockSchemeDateService.returnPeriods(Some(NonEmptyList.of(dateRange)))
+        MockPSRSubmissionService.submitPsrDetails()
+      }
+    )
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
