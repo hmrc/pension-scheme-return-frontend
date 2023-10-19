@@ -17,10 +17,10 @@
 package pages.nonsipp.moneyborrowed
 
 import config.Refined.Max5000
-import models.{Money, Percentage}
+import models.{Address, Money, Percentage}
 import models.SchemeId.Srn
 import pages.QuestionPage
-
+import pages.nonsipp.moneyborrowed.Paths
 import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
 
@@ -30,3 +30,12 @@ case class BorrowedAmountAndRatePage(srn: Srn, index: Max5000) extends QuestionP
 
   override def toString: String = "interestRate"
 }
+
+case class BorrowedAmountAndRatePages(srn: Srn) extends QuestionPage[Map[String, (Money, Percentage)]] {
+  override def path: JsPath = Paths.moneyBorrowed \ toString
+
+  override def toString: String = "interestRate"
+}
+//Create a made-up page with (QuestionPageQuestionPage[(Money, Percentage)],whateverLenderNameIs) OR
+// make a plural of amount and lenderName page and then try to merge them together
+//A good step by step approach is to use the second approach but only for one type of data
