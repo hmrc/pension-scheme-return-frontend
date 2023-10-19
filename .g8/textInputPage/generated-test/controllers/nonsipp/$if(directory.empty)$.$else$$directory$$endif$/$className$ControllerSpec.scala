@@ -1,4 +1,8 @@
-package controllers
+$if(directory.empty)$
+package controllers.nonsipp
+$else$
+package controllers.nonsipp.$directory$
+$endif$
 
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}

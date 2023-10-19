@@ -20,6 +20,10 @@ case $DIR in
     NAV_FILE="../app/navigation/nonsipp/LandOrPropertyDisposalNavigator.scala"
     NAV_SPEC="../test/navigation/nonsipp/LandOrPropertyDisposalNavigatorSpec.scala"
     ;;
+  employercontributions)
+    NAV_FILE="../app/navigation/nonsipp/EmployerContributionsNavigator.scala"
+    NAV_SPEC="../test/navigation/nonsipp/EmployerContributionsNavigatorSpec.scala"
+    ;;
   *)
     NAV_FILE=
     NAV_SPEC=
