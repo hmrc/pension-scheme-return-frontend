@@ -1,5 +1,6 @@
 
 GET         /:srn/what-you-will-need-employer-contributions                                    controllers.nonsipp.employercontributions.WhatYouWillNeedEmployerContributionsController.onPageLoad(srn: Srn)
+GET         /:srn/submit-what-you-will-need-employer-contributions                             controllers.nonsipp.employercontributions.WhatYouWillNeedEmployerContributionsController.onSubmit(srn: Srn)
 
 GET        /:srn/employer-name/:memberIndex/:index                 controllers.nonsipp.employercontributions.EmployerNameController.onPageLoad(srn: Srn, memberIndex: Max300, index: Max50, mode: Mode = NormalMode)
 POST       /:srn/employer-name/:memberIndex/:index                 controllers.nonsipp.employercontributions.EmployerNameController.onSubmit(srn: Srn, memberIndex: Max300, index: Max50, mode: Mode = NormalMode)
