@@ -254,7 +254,7 @@ class MappingsSpec extends AnyFreeSpec with Matchers with OptionValues with Mapp
 
     "must unbind a valid value" in {
       val result = testForm.fill(Money(123.4))
-      result.apply("value").value.value mustEqual "123.4"
+      result.apply("value").value.value mustEqual "123.40"
     }
 
     "must unbind using displayAs" in {

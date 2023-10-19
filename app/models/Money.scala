@@ -24,7 +24,7 @@ case class Money(value: Double, displayAs: String)
 object Money {
 
   def apply(value: Double): Money =
-    Money(value, value.toString)
+    Money(value, f"$value%2.2f")
 
   implicit val formats: Format[Money] = Json.format[Money]
 }
