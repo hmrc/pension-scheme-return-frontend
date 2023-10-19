@@ -1,0 +1,2 @@
+GET         /:srn/what-you-will-need-employer-contributions                                    controllers.nonsipp.employercontributions.WhatYouWillNeedEmployerContributionsController.onPageLoad(srn: Srn)
+GET         /:srn/submit-what-you-will-need-employer-contributions                              controllers.nonsipp.employercontributions.WhatYouWillNeedEmployerContributionsController.onSubmit(srn: Srn)

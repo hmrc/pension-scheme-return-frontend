@@ -4,7 +4,7 @@
 ->          /                                                                           landorproperty.Routes
 ->          /                                                                           landorpropertydisposal.Routes
 ->          /                                                                           moneyborrowed.Routes
-->          /                                                                           memberpayments.Routes
+->          /                                                                           employercontributions.Routes
 
 GET         /                                                                           controllers.IndexController.onPageLoad()
 
@@ -152,6 +152,27 @@ POST        /:srn/did-scheme-have-bank-account                                  
 GET         /:srn/change-did-scheme-have-bank-account                                   controllers.nonsipp.schemedesignatory.ActiveBankAccountController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST        /:srn/change-did-scheme-have-bank-account                                   controllers.nonsipp.schemedesignatory.ActiveBankAccountController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
+GET         /:srn/member-contributions                                                  controllers.nonsipp.memberpayments.MemberContributionsController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/member-contributions                                                  controllers.nonsipp.memberpayments.MemberContributionsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/change-member-contributions                                           controllers.nonsipp.memberpayments.MemberContributionsController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-member-contributions                                           controllers.nonsipp.memberpayments.MemberContributionsController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET         /:srn/employer-contributions                                                controllers.nonsipp.memberpayments.EmployerContributionsController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/employer-contributions                                                controllers.nonsipp.memberpayments.EmployerContributionsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+
+GET         /:srn/change-employer-contributions                                         controllers.nonsipp.memberpayments.EmployerContributionsController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-employer-contributions                                         controllers.nonsipp.memberpayments.EmployerContributionsController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET         /:srn/transfer-received                                                     controllers.nonsipp.memberpayments.DidSchemeReceiveTransferController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/transfer-received                                                     controllers.nonsipp.memberpayments.DidSchemeReceiveTransferController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/change-transfer-received                                              controllers.nonsipp.memberpayments.DidSchemeReceiveTransferController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-transfer-received                                              controllers.nonsipp.memberpayments.DidSchemeReceiveTransferController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET         /:srn/transfer-out                                                          controllers.nonsipp.memberpayments.SchemeTransferOutController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/transfer-out                                                          controllers.nonsipp.memberpayments.SchemeTransferOutController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/change-transfer-out                                                   controllers.nonsipp.memberpayments.SchemeTransferOutController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-transfer-out                                                   controllers.nonsipp.memberpayments.SchemeTransferOutController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
 GET         /:srn/reason-for-no-bank-account                                            controllers.nonsipp.schemedesignatory.WhyNoBankAccountController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST        /:srn/reason-for-no-bank-account                                            controllers.nonsipp.schemedesignatory.WhyNoBankAccountController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 GET         /:srn/change-reason-for-no-bank-account                                     controllers.nonsipp.schemedesignatory.WhyNoBankAccountController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
@@ -168,6 +189,11 @@ POST        /:srn/shares-in-sponsoring-employer                                 
 GET         /:srn/change-shares-in-sponsoring-employer                                  controllers.nonsipp.sharesinsponsoringemployer.DidSchemeHoldSharesInSponsoringEmployerController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST        /:srn/change-shares-in-sponsoring-employer                                  controllers.nonsipp.sharesinsponsoringemployer.DidSchemeHoldSharesInSponsoringEmployerController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
+GET         /:srn/pension-commencement-lump-sum                                         controllers.nonsipp.memberpayments.PensionCommencementLumpSumController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/pension-commencement-lump-sum                                         controllers.nonsipp.memberpayments.PensionCommencementLumpSumController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/change-pension-commencement-lump-sum                                  controllers.nonsipp.memberpayments.PensionCommencementLumpSumController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-pension-commencement-lump-sum                                  controllers.nonsipp.memberpayments.PensionCommencementLumpSumController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
 GET         /:srn/fees-commissions-wages-salaries                                       controllers.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST        /:srn/fees-commissions-wages-salaries                                       controllers.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 GET         /:srn/change-fees-commissions-wages-salaries                                controllers.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
@@ -178,12 +204,27 @@ POST        /:srn/unregulated-connected-party-bonds-held                        
 GET         /:srn/change-unregulated-connected-party-bonds-held                         controllers.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST        /:srn/change-unregulated-connected-party-bonds-held                         controllers.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
+GET         /:srn/pension-payments-received                                             controllers.nonsipp.memberpayments.PensionPaymentsReceivedController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/pension-payments-received                                             controllers.nonsipp.memberpayments.PensionPaymentsReceivedController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/change-pension-payments-received                                      controllers.nonsipp.memberpayments.PensionPaymentsReceivedController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-pension-payments-received                                      controllers.nonsipp.memberpayments.PensionPaymentsReceivedController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET         /:srn/benefits-surrendered                                                  controllers.nonsipp.memberpayments.BenefitsSurrenderedController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/benefits-surrendered                                                  controllers.nonsipp.memberpayments.BenefitsSurrenderedController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/change-benefits-surrendered                                           controllers.nonsipp.memberpayments.BenefitsSurrenderedController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-benefits-surrendered                                           controllers.nonsipp.memberpayments.BenefitsSurrenderedController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
 GET         /:srn/other-assets-held                                                     controllers.nonsipp.otherassetsheld.OtherAssetsHeldController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST        /:srn/other-assets-held                                                     controllers.nonsipp.otherassetsheld.OtherAssetsHeldController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 GET         /:srn/change-other-assets-held                                              controllers.nonsipp.otherassetsheld.OtherAssetsHeldController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST        /:srn/change-other-assets-held                                              controllers.nonsipp.otherassetsheld.OtherAssetsHeldController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
 GET         /:srn/return-submitted                                                      controllers.nonsipp.ReturnSubmittedController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+
+GET         /:srn/unallocated-employer-contributions                                    controllers.nonsipp.memberpayments.UnallocatedEmployerContributionsController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/unallocated-employer-contributions                                    controllers.nonsipp.memberpayments.UnallocatedEmployerContributionsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/change-unallocated-employer-contributions                             controllers.nonsipp.memberpayments.UnallocatedEmployerContributionsController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-unallocated-employer-contributions                             controllers.nonsipp.memberpayments.UnallocatedEmployerContributionsController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
 GET         /:srn/how-to-upload                                                         controllers.nonsipp.memberdetails.HowToUploadController.onPageLoad(srn: Srn)
 GET         /:srn/submit-how-to-upload                                                  controllers.nonsipp.memberdetails.HowToUploadController.onSubmit(srn: Srn)

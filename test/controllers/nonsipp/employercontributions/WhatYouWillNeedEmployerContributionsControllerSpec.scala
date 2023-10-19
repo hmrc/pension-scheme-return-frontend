@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.memberpayments
+package controllers.nonsipp.employercontributions
 
 import controllers.ControllerBaseSpec
 import views.html.ContentPageView

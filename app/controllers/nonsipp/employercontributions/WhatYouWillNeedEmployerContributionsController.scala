@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.memberpayments
+package controllers.nonsipp.employercontributions
 
 import controllers.actions.{AllowAccessActionProvider, DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import models.NormalMode

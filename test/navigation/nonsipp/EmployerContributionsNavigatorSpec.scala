@@ -33,7 +33,8 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
           EmployerContributionsPage,
           Gen.const(true),
           (srn, _) =>
-            controllers.nonsipp.memberpayments.routes.WhatYouWillNeedEmployerContributionsController.onPageLoad(srn)
+            controllers.nonsipp.employercontributions.routes.WhatYouWillNeedEmployerContributionsController
+              .onPageLoad(srn)
         )
         .withName(
           "go from employer contribution page to what you will need employer contributions page when yes selected"
