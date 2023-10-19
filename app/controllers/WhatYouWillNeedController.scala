@@ -17,10 +17,11 @@
 package controllers
 
 import controllers.actions._
-import models.NormalMode
+import models.{CheckMode, NormalMode}
 import models.SchemeId.Srn
 import navigation.Navigator
 import pages.WhatYouWillNeedPage
+import pages.nonsipp.schemedesignatory.HowManyMembersPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{PsrRetrievalService, SaveService}
@@ -63,7 +64,12 @@ class WhatYouWillNeedController @Inject()(
         )
         _ <- saveService.save(updatedUserAnswers)
       } yield {
-        Redirect(navigator.nextPage(WhatYouWillNeedPage(srn), NormalMode, updatedUserAnswers))
+        val members = updatedUserAnswers.get(HowManyMembersPage(srn, request.pensionSchemeId))
+        if (members.exists(_.total > 99)) { // as we cannot access pensionSchemeId in the navigator
+          Redirect(controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, CheckMode))
+        } else {
+          Redirect(navigator.nextPage(WhatYouWillNeedPage(srn), NormalMode, updatedUserAnswers))
+        }
       }
     }
 }

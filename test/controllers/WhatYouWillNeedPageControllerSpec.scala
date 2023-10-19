@@ -16,8 +16,10 @@
 
 package controllers
 
+import models.{CheckMode, SchemeMemberNumbers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
+import pages.nonsipp.schemedesignatory.HowManyMembersPage
 import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
 import play.api.mvc.Call
@@ -73,6 +75,32 @@ class WhatYouWillNeedPageControllerSpec extends ControllerBaseSpec {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual onwardRoute.url
+      }
+    }
+    "redirect to the next page more than 100 members" in {
+      val pensionSchemeId = pensionSchemeIdGen.sample.value
+
+      when(mockPsrRetrievalService.getStandardPsrDetails(any(), any(), any(), any())(any(), any())).thenReturn(
+        Future.successful(
+          defaultUserAnswers
+            .unsafeSet(HowManyMembersPage(srn, pensionSchemeId), SchemeMemberNumbers(50, 60, 70))
+        )
+      )
+      val fakeNavigatorApplication =
+        applicationBuilder()
+          .overrides(
+            bind[Navigator].qualifiedWith("root").toInstance(new FakeNavigator(onwardRoute))
+          )
+
+      running(_ => fakeNavigatorApplication) { app =>
+        val request = FakeRequest(GET, onSubmit)
+
+        val result = route(app, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController
+          .onPageLoad(srn, CheckMode)
+          .url
       }
     }
   }

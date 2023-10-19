@@ -23,7 +23,6 @@ import eu.timepit.refined.refineV
 import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.BasicDetailsCheckYourAnswersPage
 import pages.nonsipp.accountingperiod.{
   AccountingPeriodCheckYourAnswersPage,
   AccountingPeriodListPage,
@@ -77,9 +76,6 @@ object AccountingPeriodNavigator extends JourneyNavigator {
 
     case RemoveAccountingPeriodPage(srn, mode) =>
       routes.AccountingPeriodListController.onPageLoad(srn, mode)
-
-    case BasicDetailsCheckYourAnswersPage(srn) =>
-      controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, NormalMode)
   }
 
 }
