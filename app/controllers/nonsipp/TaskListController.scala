@@ -40,6 +40,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.SchemeDateService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.DateTimeUtils.localDateShow
+import utils.nonsipp.TaskListStatusUtils
 import utils.nonsipp.TaskListStatusUtils._
 import viewmodels.DisplayMessage.{Heading2, LinkMessage, Message, ParagraphMessage}
 import viewmodels.implicits._
@@ -437,8 +438,10 @@ object TaskListController {
     )
   }
 
-  private def landOrPropertySection(srn: Srn) = {
+  private def landOrPropertySection(srn: Srn, userAnswers: UserAnswers) = {
     val prefix = "nonsipp.tasklist.landorproperty"
+
+    val (disposalsStatus, disposalLinkUrl) = TaskListStatusUtils.getDisposalsTaskListStatusWithLink(userAnswers, srn)
 
     TaskListSectionViewModel(
       s"$prefix.title",
@@ -452,11 +455,9 @@ object TaskListController {
       TaskListItemViewModel(
         LinkMessage(
           messageKey("nonsipp.tasklist.landorpropertydisposal", "title", UnableToStart),
-          controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalController
-            .onPageLoad(srn, NormalMode)
-            .url
+          disposalLinkUrl
         ),
-        NotStarted
+        disposalsStatus
       )
     )
   }
@@ -518,7 +519,7 @@ object TaskListController {
       memberPaymentsSection(srn),
       loansSection(srn, schemeName, userAnswers),
       sharesSection(srn),
-      landOrPropertySection(srn),
+      landOrPropertySection(srn, userAnswers),
       bondsSection(srn),
       otherAssetsSection(srn),
       declarationSection

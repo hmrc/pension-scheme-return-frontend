@@ -1456,3 +1456,9 @@ moneyBorrowedCheckYourAnswers.section.schemeBorrowed.hidden = the reason the sch
 
 moneyBorrowedCheckYourAnswers.change.title = Change details for money borrowed
 moneyBorrowedCheckYourAnswers.change.heading = Change details for {0} borrowed from {1}
+
+employerName.title = What is the employer’s name?
+employerName.heading = What is the employer’s name?
+employerName.error.required = Enter the employer’s name
+employerName.error.invalid = Employer’s name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+employerName.error.tooLong = Employer’s name must be 160 characters or fewer
