@@ -1,5 +1,8 @@
-
-package pages
+$if(directory.empty)$
+package pages.nonsipp
+$else$
+package pages.nonsipp.$directory$
+$endif$
 
 import pages.behaviours.PageBehaviours
 import models.Money

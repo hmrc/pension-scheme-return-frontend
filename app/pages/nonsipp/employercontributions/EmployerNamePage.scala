@@ -14,29 +14,17 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.accountingperiod
+package pages.nonsipp.employercontributions
 
-import config.Refined.Max3
-import models.{DateRange, Mode}
+import config.Refined.{Max300, Max50}
 import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
-import queries.{Gettable, Removable, Settable}
-import utils.RefinedUtils.RefinedIntOps
+import utils.RefinedUtils._
 
-case class AccountingPeriodPage(srn: Srn, index: Max3, mode: Mode) extends QuestionPage[DateRange] {
+case class EmployerNamePage(srn: Srn, memberIndex: Max300, index: Max50) extends QuestionPage[String] {
 
-  override def path: JsPath = JsPath \ toString \ index.arrayIndex
+  override def path: JsPath = JsPath \ toString \ memberIndex.arrayIndex.toString \ index.arrayIndex.toString
 
-  override def toString: String = "accountingPeriods"
-}
-
-case class AccountingPeriods(srn: Srn)
-    extends Gettable[List[DateRange]]
-    with Settable[List[DateRange]]
-    with Removable[List[DateRange]] {
-
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "accountingPeriods"
+  override def toString: String = "employerName"
 }

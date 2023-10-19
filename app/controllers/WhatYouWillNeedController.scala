@@ -17,12 +17,14 @@
 package controllers
 
 import controllers.actions._
-import models.NormalMode
+import models.{CheckMode, NormalMode}
 import models.SchemeId.Srn
 import navigation.Navigator
 import pages.WhatYouWillNeedPage
+import pages.nonsipp.schemedesignatory.HowManyMembersPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.{PsrRetrievalService, SaveService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.{ListMessage, ListType, Message, ParagraphMessage}
 import viewmodels.implicits._
@@ -30,6 +32,7 @@ import viewmodels.models.{ContentPageViewModel, FormPageViewModel}
 import views.html.ContentPageView
 
 import javax.inject.{Inject, Named}
+import scala.concurrent.ExecutionContext
 
 class WhatYouWillNeedController @Inject()(
   override val messagesApi: MessagesApi,
@@ -39,18 +42,36 @@ class WhatYouWillNeedController @Inject()(
   getData: DataRetrievalAction,
   createData: DataCreationAction,
   val controllerComponents: MessagesControllerComponents,
-  view: ContentPageView
-) extends FrontendBaseController
+  view: ContentPageView,
+  psrRetrievalService: PsrRetrievalService,
+  saveService: SaveService
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport {
 
   def onPageLoad(srn: Srn): Action[AnyContent] = identify.andThen(allowAccess(srn)) { implicit request =>
     Ok(view(WhatYouWillNeedController.viewModel(srn)))
   }
 
-  def onSubmit(srn: Srn): Action[AnyContent] = identify.andThen(allowAccess(srn)).andThen(getData).andThen(createData) {
-    implicit request =>
-      Redirect(navigator.nextPage(WhatYouWillNeedPage(srn), NormalMode, request.userAnswers))
-  }
+  def onSubmit(srn: Srn): Action[AnyContent] =
+    identify.andThen(allowAccess(srn)).andThen(getData).andThen(createData).async { implicit request =>
+      for {
+        updatedUserAnswers <- psrRetrievalService.getStandardPsrDetails(
+          request,
+          None,
+          Some("2023-04-06"), // TODO determine the tax year start based on the routing from the dashboard and/or GET report overview or GET report versions API calls
+          Some("001")
+        )
+        _ <- saveService.save(updatedUserAnswers)
+      } yield {
+        val members = updatedUserAnswers.get(HowManyMembersPage(srn, request.pensionSchemeId))
+        if (members.exists(_.total > 99)) { // as we cannot access pensionSchemeId in the navigator
+          Redirect(controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, CheckMode))
+        } else {
+          Redirect(navigator.nextPage(WhatYouWillNeedPage(srn), NormalMode, updatedUserAnswers))
+        }
+      }
+    }
 }
 
 object WhatYouWillNeedController {

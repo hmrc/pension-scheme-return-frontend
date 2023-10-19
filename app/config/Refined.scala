@@ -48,6 +48,21 @@ object Refined {
   implicit def indexWrites[A]: Writes[Refined[Int, A]] = (o: Refined[Int, A]) => JsNumber(o.value)
 
   // used by generators
+  object Max300 {
+    type Refined = Greater[0] And LessEqual[300]
+
+    implicit val enumerable: Enumerable[Max300] = Enumerable(
+      (1 to 300).toList
+        .map(
+          i =>
+            refineV[Refined](i).fold(
+              err => throw new Exception(err),
+              index => index
+            )
+        )
+        .map(index => index.value.toString -> index): _*
+    )
+  }
   object Max5000 {
     type Refined = Greater[0] And LessEqual[5000]
 

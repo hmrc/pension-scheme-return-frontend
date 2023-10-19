@@ -80,8 +80,8 @@ trait ModelGenerators extends BasicGenerators {
 
   val schemeDetailsGen: Gen[SchemeDetails] =
     for {
-      srn <- nonEmptyString
       name <- nonEmptyString
+      srn <- srnGen.map(_.value)
       pstr <- nonEmptyString
       status <- schemeStatusGen
       schemeType <- nonEmptyString

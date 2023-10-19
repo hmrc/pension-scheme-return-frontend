@@ -14,17 +14,23 @@
  * limitations under the License.
  */
 
-package models.requests.psr
+package pages.nonsipp.employercontributions
 
-import play.api.libs.json.{Json, OFormat}
+import config.Refined.{Max300, Max50}
+import eu.timepit.refined.refineMV
+import pages.behaviours.PageBehaviours
 
-case class PsrSubmission(
-  minimalRequiredSubmission: MinimalRequiredSubmission,
-  checkReturnDates: Boolean,
-  loans: Option[Loans],
-  assets: Option[Assets]
-)
+class EmployerNamePageSpec extends PageBehaviours {
 
-object PsrSubmission {
-  implicit val format: OFormat[PsrSubmission] = Json.format[PsrSubmission]
+  "EmployerNamePage" - {
+
+    val memberIndex = refineMV[Max300.Refined](1)
+    val index = refineMV[Max50.Refined](1)
+
+    beRetrievable[String](EmployerNamePage(srnGen.sample.value, memberIndex, index))
+
+    beSettable[String](EmployerNamePage(srnGen.sample.value, memberIndex, index))
+
+    beRemovable[String](EmployerNamePage(srnGen.sample.value, memberIndex, index))
+  }
 }

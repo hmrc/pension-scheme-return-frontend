@@ -16,33 +16,49 @@
 
 package transformations
 
-import cats.implicits.{catsSyntaxTuple2Semigroupal, catsSyntaxTuple3Semigroupal}
+import cats.implicits.{catsSyntaxTuple2Semigroupal, catsSyntaxTuple3Semigroupal, toBifunctorOps, toTraverseOps}
 import com.google.inject.Singleton
-import config.Refined.OneTo5000
+import config.Refined.{Max5000, OneTo5000}
 import eu.timepit.refined.refineV
 import models.ConditionalYesNo._
 import models.IdentityType.reads
+import models.RecipientDetails.format
 import models.SchemeId.Srn
 import models.SponsoringOrConnectedParty.ConnectedParty
 import models.requests.DataRequest
 import models.requests.psr._
-import models.{IdentitySubject, IdentityType}
+import models.{
+  ConditionalYesNo,
+  Crn,
+  IdentitySubject,
+  IdentityType,
+  Money,
+  Percentage,
+  RecipientDetails,
+  Security,
+  SponsoringOrConnectedParty,
+  UserAnswers,
+  Utr
+}
 import pages.nonsipp.common.{
   CompanyRecipientCrnPage,
+  IdentityTypePage,
   IdentityTypes,
   OtherRecipientDetailsPage,
   PartnershipRecipientUtrPage
 }
 import pages.nonsipp.loansmadeoroutstanding._
+import uk.gov.hmrc.domain.Nino
 
 import javax.inject.Inject
+import scala.util.Try
 
 @Singleton()
 class LoanTransactionsTransformer @Inject()() {
 
   private type OptionalRecipientDetails = Option[(String, RecipientIdentityType, Boolean, Option[String])]
 
-  def transform(srn: Srn)(implicit request: DataRequest[_]): List[LoanTransactions] = {
+  def transformToEtmp(srn: Srn)(implicit request: DataRequest[_]): List[LoanTransactions] = {
     request.userAnswers
       .map(IdentityTypes(srn, IdentitySubject.LoanRecipient))
       .map {
@@ -181,4 +197,256 @@ class LoanTransactionsTransformer @Inject()() {
       .toList
       .flatten
   }
+
+  def transformFromEtmp(
+    userAnswers: UserAnswers,
+    srn: Srn,
+    loanTransactions: List[LoanTransactions]
+  ): Try[UserAnswers] =
+    for {
+      indexes <- buildIndexes(loanTransactions.size)
+      schemeHadLoans = indexes.map(_ => LoansMadeOrOutstandingPage(srn) -> true)
+      identityTypes = indexes.map(
+        index =>
+          IdentityTypePage(srn, index, IdentitySubject.LoanRecipient) -> loanTransactions(index.value - 1).recipientIdentityType.identityType
+      )
+      loanRecipientName = indexes
+        .filter(
+          index => {
+            loanTransactions(index.value - 1).recipientIdentityType.identityType != IdentityType.Other
+          }
+        )
+        .map(
+          index => {
+            val recipientName = loanTransactions(index.value - 1).loanRecipientName
+            loanTransactions(index.value - 1).recipientIdentityType.identityType match {
+              case IdentityType.Individual => IndividualRecipientNamePage(srn, index) -> recipientName
+              case IdentityType.UKCompany => CompanyRecipientNamePage(srn, index) -> recipientName
+              case IdentityType.UKPartnership => PartnershipRecipientNamePage(srn, index) -> recipientName
+            }
+          }
+        )
+      otherRecipientName = indexes
+        .filter(
+          index => {
+            loanTransactions(index.value - 1).recipientIdentityType.identityType == IdentityType.Other
+          }
+        )
+        .map(
+          index => {
+            val recipientName = loanTransactions(index.value - 1).loanRecipientName
+            val description = loanTransactions(index.value - 1).recipientIdentityType.otherDescription
+            OtherRecipientDetailsPage(srn, index, IdentitySubject.LoanRecipient) -> RecipientDetails(
+              recipientName,
+              description.getOrElse("")
+            )
+          }
+        )
+      nino = indexes
+        .filter(
+          index => {
+            loanTransactions(index.value - 1).recipientIdentityType.identityType == IdentityType.Individual &&
+              loanTransactions(index.value - 1).recipientIdentityType.idNumber.getOrElse("").nonEmpty
+          }
+        )
+        .map(
+          index => {
+            IndividualRecipientNinoPage(srn, index) -> ConditionalYesNo.yes[String, Nino](
+              Nino(loanTransactions(index.value - 1).recipientIdentityType.idNumber.getOrElse(""))
+            )
+          }
+        )
+      noNino = indexes
+        .filter(
+          index => {
+            loanTransactions(index.value - 1).recipientIdentityType.identityType == IdentityType.Individual &&
+              loanTransactions(index.value - 1).recipientIdentityType.reasonNoIdNumber.getOrElse("").nonEmpty
+          }
+        )
+        .map(
+          index => {
+            IndividualRecipientNinoPage(srn, index) -> ConditionalYesNo
+              .no[String, Nino](loanTransactions(index.value - 1).recipientIdentityType.reasonNoIdNumber.getOrElse(""))
+          }
+        )
+      crn = indexes
+        .filter(
+          index => {
+            loanTransactions(index.value - 1).recipientIdentityType.identityType == IdentityType.UKCompany &&
+              loanTransactions(index.value - 1).recipientIdentityType.idNumber.getOrElse("").nonEmpty
+          }
+        )
+        .map(
+          index => {
+            CompanyRecipientCrnPage(srn, index, IdentitySubject.LoanRecipient) -> ConditionalYesNo.yes[String, Crn](
+              Crn(loanTransactions(index.value - 1).recipientIdentityType.idNumber.getOrElse(""))
+            )
+          }
+        )
+      noCrn = indexes
+        .filter(
+          index => {
+            loanTransactions(index.value - 1).recipientIdentityType.identityType == IdentityType.UKCompany &&
+              loanTransactions(index.value - 1).recipientIdentityType.reasonNoIdNumber.getOrElse("").nonEmpty
+          }
+        )
+        .map(
+          index => {
+            CompanyRecipientCrnPage(srn, index, IdentitySubject.LoanRecipient) -> ConditionalYesNo
+              .no[String, Crn](loanTransactions(index.value - 1).recipientIdentityType.reasonNoIdNumber.getOrElse(""))
+          }
+        )
+      utr = indexes
+        .filter(
+          index => {
+            loanTransactions(index.value - 1).recipientIdentityType.identityType == IdentityType.UKPartnership &&
+              loanTransactions(index.value - 1).recipientIdentityType.idNumber.getOrElse("").nonEmpty
+          }
+        )
+        .map(
+          index => {
+            PartnershipRecipientUtrPage(srn, index, IdentitySubject.LoanRecipient) -> ConditionalYesNo.yes[String, Utr](
+              Utr(loanTransactions(index.value - 1).recipientIdentityType.idNumber.getOrElse(""))
+            )
+          }
+        )
+      noUtr = indexes
+        .filter(
+          index => {
+            loanTransactions(index.value - 1).recipientIdentityType.identityType == IdentityType.UKPartnership &&
+              loanTransactions(index.value - 1).recipientIdentityType.reasonNoIdNumber.getOrElse("").nonEmpty
+          }
+        )
+        .map(
+          index => {
+            PartnershipRecipientUtrPage(srn, index, IdentitySubject.LoanRecipient) -> ConditionalYesNo
+              .no[String, Utr](loanTransactions(index.value - 1).recipientIdentityType.reasonNoIdNumber.getOrElse(""))
+          }
+        )
+      individualConnectedPartyStatus = indexes
+        .filter(
+          index => {
+            loanTransactions(index.value - 1).recipientIdentityType.identityType == IdentityType.Individual
+          }
+        )
+        .map(index => IsIndividualRecipientConnectedPartyPage(srn, index) -> true)
+      sponsoringEmployer = indexes
+        .filter(
+          index => {
+            loanTransactions(index.value - 1).recipientIdentityType.identityType != IdentityType.Individual
+          }
+        )
+        .map(
+          index =>
+            RecipientSponsoringEmployerConnectedPartyPage(srn, index) -> {
+              val sponsoring = loanTransactions(index.value - 1).optRecipientSponsoringEmployer
+              val connected = loanTransactions(index.value - 1).connectedPartyStatus
+              (sponsoring, connected) match {
+                case (Some(_), _) => SponsoringOrConnectedParty.Sponsoring
+                case (None, true) => SponsoringOrConnectedParty.ConnectedParty
+                case (None, false) => SponsoringOrConnectedParty.Neither
+              }
+            }
+        )
+      datePeriodLoan = indexes.map(
+        index =>
+          DatePeriodLoanPage(srn, index) -> (loanTransactions(index.value - 1).datePeriodLoanDetails.dateOfLoan,
+          Money(loanTransactions(index.value - 1).datePeriodLoanDetails.loanTotalSchemeAssets),
+          loanTransactions(index.value - 1).datePeriodLoanDetails.loanPeriodInMonths)
+      )
+      loanAmount = indexes.map(
+        index =>
+          AmountOfTheLoanPage(srn, index) -> (
+            Money(loanTransactions(index.value - 1).loanAmountDetails.loanAmount),
+            Money(loanTransactions(index.value - 1).loanAmountDetails.capRepaymentCY),
+            Money(loanTransactions(index.value - 1).loanAmountDetails.amountOutstanding)
+          )
+      )
+      equalInstallments = indexes.map(
+        index => AreRepaymentsInstalmentsPage(srn, index) -> loanTransactions(index.value - 1).equalInstallments
+      )
+      loanInterest = indexes.map(
+        index =>
+          InterestOnLoanPage(srn, index) -> (
+            Money(loanTransactions(index.value - 1).loanInterestDetails.loanInterestAmount),
+            Percentage(loanTransactions(index.value - 1).loanInterestDetails.loanInterestRate),
+            Money(loanTransactions(index.value - 1).loanInterestDetails.intReceivedCY)
+          )
+      )
+      securityGiven = indexes
+        .filter(
+          index => {
+            loanTransactions(index.value - 1).optSecurityGivenDetails.nonEmpty
+          }
+        )
+        .map(
+          index =>
+            SecurityGivenForLoanPage(srn, index) ->
+              ConditionalYesNo
+                .yes[Unit, Security](Security(loanTransactions(index.value - 1).optSecurityGivenDetails.get))
+        )
+      securityNotGiven = indexes
+        .filter(
+          index => {
+            loanTransactions(index.value - 1).optSecurityGivenDetails.isEmpty
+          }
+        )
+        .map(
+          index =>
+            SecurityGivenForLoanPage(srn, index) ->
+              ConditionalYesNo.no[Unit, Security](())
+        )
+      outstandingArrearsOnLoan = indexes
+        .filter(
+          index => {
+            loanTransactions(index.value - 1).optOutstandingArrearsOnLoan.nonEmpty
+          }
+        )
+        .map(
+          index =>
+            OutstandingArrearsOnLoanPage(srn, index) -> ConditionalYesNo
+              .yes[Unit, Money](Money(loanTransactions(index.value - 1).optOutstandingArrearsOnLoan.get))
+        )
+      noOutstandingArrearsOnLoan = indexes
+        .filter(
+          index => {
+            loanTransactions(index.value - 1).optOutstandingArrearsOnLoan.isEmpty
+          }
+        )
+        .map(
+          index => OutstandingArrearsOnLoanPage(srn, index) -> ConditionalYesNo.no[Unit, Money](())
+        )
+
+      ua1 <- schemeHadLoans.foldLeft(Try(userAnswers)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
+      ua2 <- identityTypes.foldLeft(Try(ua1)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
+      ua3 <- loanRecipientName.foldLeft(Try(ua2)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
+      ua31 <- otherRecipientName.foldLeft(Try(ua3)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
+      ua4 <- nino.foldLeft(Try(ua31)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
+      ua41 <- noNino.foldLeft(Try(ua4)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
+      ua42 <- crn.foldLeft(Try(ua41)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
+      ua43 <- noCrn.foldLeft(Try(ua42)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
+      ua44 <- utr.foldLeft(Try(ua43)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
+      ua45 <- noUtr.foldLeft(Try(ua44)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
+      ua5 <- individualConnectedPartyStatus.foldLeft(Try(ua45)) {
+        case (ua, (page, value)) => ua.flatMap(_.set(page, value))
+      }
+      ua51 <- sponsoringEmployer.foldLeft(Try(ua5)) {
+        case (ua, (page, value)) => ua.flatMap(_.set(page, value))
+      }
+      ua6 <- datePeriodLoan.foldLeft(Try(ua51)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
+      ua7 <- loanAmount.foldLeft(Try(ua6)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
+      ua8 <- equalInstallments.foldLeft(Try(ua7)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
+      ua9 <- loanInterest.foldLeft(Try(ua8)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
+      ua10 <- securityGiven.foldLeft(Try(ua9)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
+      ua11 <- securityNotGiven.foldLeft(Try(ua10)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
+      ua12 <- outstandingArrearsOnLoan.foldLeft(Try(ua11)) {
+        case (ua, (page, value)) => ua.flatMap(_.set(page, value))
+      }
+      ua13 <- noOutstandingArrearsOnLoan.foldLeft(Try(ua12)) {
+        case (ua, (page, value)) => ua.flatMap(_.set(page, value))
+      }
+    } yield ua13
+
+  private def buildIndexes(num: Int): Try[List[Max5000]] =
+    (1 to num).map(i => refineV[OneTo5000](i).leftMap(new Exception(_)).toTry).toList.sequence
 }

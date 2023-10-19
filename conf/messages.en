@@ -1467,3 +1467,9 @@ whatYouWillNeedEmployerContributions.tellUs3 = the employer’s Company Registra
 whatYouWillNeedEmployerContributions.tellUs4 = the total contribution made for the member by the employer
 whatYouWillNeedEmployerContributions.paragraph3 = On the next page, you will be able to select a member from a list of those whose details you have already provided. If you want to add a new member, you will need to provide their details using the ‘member details’ section of this pension scheme return.
 whatYouWillNeedEmployerContributions.paragraph4 = If employer contributions were made for any member by more than one employer, you must tell us about all of them. Answer the questions for one employer at a time.
+
+employerName.title = What is the employer’s name?
+employerName.heading = What is the employer’s name?
+employerName.error.required = Enter the employer’s name
+employerName.error.invalid = Employer’s name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+employerName.error.tooLong = Employer’s name must be 160 characters or fewer

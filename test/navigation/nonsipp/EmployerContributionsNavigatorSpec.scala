@@ -16,14 +16,20 @@
 
 package navigation.nonsipp
 
+import config.Refined.{Max300, Max50, Max5000}
+import eu.timepit.refined.refineMV
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
+import pages.nonsipp.employercontributions._
 import pages.nonsipp.memberpayments.EmployerContributionsPage
 import utils.BaseSpec
 
 class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
   val navigator: Navigator = new NonSippNavigator
+
+  private val memberIndex = refineMV[Max300.Refined](1)
+  private val index = refineMV[Max50.Refined](1)
 
   "EmployerContributionsNavigator" - {
 
@@ -51,5 +57,18 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
         .withName("go from employer contribution page to unallocated employer contributions page when no selected")
     )
 
+  }
+
+  "EmployerNamePage" - {
+    act.like(
+      normalmode
+        .navigateToWithDoubleIndex(
+          memberIndex,
+          index,
+          EmployerNamePage,
+          (srn, memberIndex: Max300, index: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+        )
+        .withName("go from EmployerNamePage to ??? page")
+    )
   }
 }

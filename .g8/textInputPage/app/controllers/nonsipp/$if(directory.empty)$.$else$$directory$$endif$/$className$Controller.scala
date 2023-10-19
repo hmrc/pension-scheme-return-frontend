@@ -1,11 +1,14 @@
-package controllers
+$if(directory.empty)$
+package controllers.nonsipp
+$else$
+package controllers.nonsipp.$directory$
+$endif$
 
 import controllers.actions._
 import forms.TextFormProvider
 import models.Mode
 import models.SchemeId.Srn
 import navigation.Navigator
-import pages.$className$Page
 import play.api.data.Form
 import controllers.PSRController
 import viewmodels.models._
@@ -19,6 +22,11 @@ import viewmodels.implicits._
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
+$if(directory.empty)$
+import pages.nonsipp.$className$Page
+$else$
+import pages.nonsipp.$directory$.$className$Page
+$endif$
 $if(!index.empty)$
 import config.Refined.$index$
 $endif$
