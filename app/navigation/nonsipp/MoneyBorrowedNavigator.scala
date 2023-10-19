@@ -56,7 +56,7 @@ object MoneyBorrowedNavigator extends JourneyNavigator {
       controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController.onPageLoad(srn, index, CheckOrChange.Check)
 
     case MoneyBorrowedCYAPage(srn) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+      controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController.onPageLoad(srn, CheckOrChange.Check)
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => {
