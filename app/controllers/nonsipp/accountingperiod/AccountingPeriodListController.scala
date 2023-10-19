@@ -80,15 +80,7 @@ class AccountingPeriodListController @Inject()(
         .fold(
           errors => BadRequest(view(errors, viewModel)),
           answer => {
-            mode match {
-              case CheckMode =>
-                if (answer)
-                  Redirect(navigator.nextPage(AccountingPeriodListPage(srn, answer, mode), mode, request.userAnswers))
-                else
-                  Redirect(navigator.nextPage(BasicDetailsCheckYourAnswersPage(srn), mode, request.userAnswers))
-              case NormalMode =>
-                Redirect(navigator.nextPage(AccountingPeriodListPage(srn, answer, mode), mode, request.userAnswers))
-            }
+            Redirect(navigator.nextPage(AccountingPeriodListPage(srn, answer, mode), mode, request.userAnswers))
           }
         )
     }

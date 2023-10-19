@@ -68,14 +68,7 @@ class ActiveBankAccountController @Inject()(
             updatedAnswers <- Future.fromTry(request.userAnswers.set(ActiveBankAccountPage(srn), value))
             _ <- saveService.save(updatedAnswers)
           } yield {
-            mode match {
-              case CheckMode =>
-                if (value)
-                  Redirect(navigator.nextPage(BasicDetailsCheckYourAnswersPage(srn), mode, request.userAnswers))
-                else
-                  Redirect(navigator.nextPage(WhyNoBankAccountPage(srn), mode, request.userAnswers))
-              case NormalMode => Redirect(navigator.nextPage(ActiveBankAccountPage(srn), mode, updatedAnswers))
-            }
+            Redirect(navigator.nextPage(ActiveBankAccountPage(srn), mode, updatedAnswers))
           }
       )
   }

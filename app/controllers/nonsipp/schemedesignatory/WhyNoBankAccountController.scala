@@ -67,12 +67,7 @@ class WhyNoBankAccountController @Inject()(
             updatedAnswers <- Future.fromTry(request.userAnswers.set(WhyNoBankAccountPage(srn), value))
             _ <- saveService.save(updatedAnswers)
           } yield {
-            mode match {
-              case CheckMode =>
-                Redirect(navigator.nextPage(BasicDetailsCheckYourAnswersPage(srn), mode, request.userAnswers))
-              case NormalMode => Redirect(navigator.nextPage(WhyNoBankAccountPage(srn), mode, updatedAnswers))
-
-            }
+            Redirect(navigator.nextPage(WhyNoBankAccountPage(srn), mode, request.userAnswers))
           }
       )
   }

@@ -39,6 +39,14 @@ object BankAccountNavigator extends JourneyNavigator {
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
-    case WhyNoBankAccountPage(srn) => routes.WhyNoBankAccountController.onPageLoad(srn, CheckMode)
+    case page @ ActiveBankAccountPage(srn) =>
+      if (userAnswers.get(page).contains(true)) {
+        routes.HowManyMembersController.onPageLoad(srn, CheckMode)
+      } else {
+        nonsipp.schemedesignatory.routes.WhyNoBankAccountController.onPageLoad(srn, CheckMode)
+      }
+
+    case WhyNoBankAccountPage(srn) =>
+      controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, CheckMode)
   }
 }

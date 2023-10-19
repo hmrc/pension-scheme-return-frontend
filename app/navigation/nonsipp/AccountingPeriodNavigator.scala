@@ -65,7 +65,7 @@ object AccountingPeriodNavigator extends JourneyNavigator {
       routes.AccountingPeriodListController.onPageLoad(srn, mode)
 
     case AccountingPeriodListPage(srn, false, mode) =>
-      controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, NormalMode)
+      controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, mode)
 
     case AccountingPeriodListPage(srn, true, mode) =>
       val count = userAnswers.list(AccountingPeriods(srn)).length
