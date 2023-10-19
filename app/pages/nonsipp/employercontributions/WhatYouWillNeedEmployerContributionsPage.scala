@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.memberpayments
+package pages.nonsipp.employercontributions
 
 import models.SchemeId.Srn
 import pages.Page

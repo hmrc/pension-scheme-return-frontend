@@ -20,7 +20,7 @@ import controllers.actions.{AllowAccessActionProvider, DataRequiredAction, DataR
 import models.NormalMode
 import models.SchemeId.Srn
 import navigation.Navigator
-import pages.nonsipp.memberpayments.WhatYouWillNeedEmployerContributionsPage
+import pages.nonsipp.employercontributions.WhatYouWillNeedEmployerContributionsPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController

@@ -18,7 +18,7 @@ package navigation.nonsipp
 
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.memberpayments.{EmployerContributionsPage, WhatYouWillNeedEmployerContributionsPage}
+import pages.nonsipp.memberpayments.EmployerContributionsPage
 import utils.BaseSpec
 
 class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviours {

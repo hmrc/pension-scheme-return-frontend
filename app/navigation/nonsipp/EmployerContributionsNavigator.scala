@@ -19,7 +19,8 @@ package navigation.nonsipp
 import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.memberpayments.{EmployerContributionsPage, WhatYouWillNeedEmployerContributionsPage}
+import pages.nonsipp.employercontributions.WhatYouWillNeedEmployerContributionsPage
+import pages.nonsipp.memberpayments.EmployerContributionsPage
 import play.api.mvc.Call
 
 object EmployerContributionsNavigator extends JourneyNavigator {
