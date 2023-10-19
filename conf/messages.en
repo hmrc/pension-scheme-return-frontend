@@ -1456,3 +1456,14 @@ moneyBorrowedCheckYourAnswers.section.schemeBorrowed.hidden = the reason the sch
 
 moneyBorrowedCheckYourAnswers.change.title = Change details for money borrowed
 moneyBorrowedCheckYourAnswers.change.heading = Change details for {0} borrowed from {1}
+
+whatYouWillNeedEmployerContributions.title = Employer contributions for members of {0}
+whatYouWillNeedEmployerContributions.heading = Employer contributions for members of {0}
+whatYouWillNeedEmployerContributions.paragraph1 = You must tell us about all employer contributions made for members of the scheme during the period of this return.
+whatYouWillNeedEmployerContributions.paragraph2 = For each member employer contributions were made for, you need to tell us:
+whatYouWillNeedEmployerContributions.tellUs1 = the name of the employer
+whatYouWillNeedEmployerContributions.tellUs2 = if the employer is a UK company, UK partnership or other
+whatYouWillNeedEmployerContributions.tellUs3 = the employer’s Company Registration Number, Unique Taxpayer Reference, or a description of the employer – whichever applies
+whatYouWillNeedEmployerContributions.tellUs4 = the total contribution made for the member by the employer
+whatYouWillNeedEmployerContributions.paragraph3 = On the next page, you will be able to select a member from a list of those whose details you have already provided. If you want to add a new member, you will need to provide their details using the ‘member details’ section of this pension scheme return.
+whatYouWillNeedEmployerContributions.paragraph4 = If employer contributions were made for any member by more than one employer, you must tell us about all of them. Answer the questions for one employer at a time.
