@@ -16,6 +16,7 @@
 
 package services
 
+import cats.implicits._
 import com.google.inject.Inject
 import config.FrontendAppConfig
 import models.audit.AuditEvent
@@ -28,8 +29,7 @@ import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.language.implicitConversions
-import scala.util.{Failure, Success, Try}
-import cats.implicits._
+import scala.util.{Failure, Success}
 
 class AuditService @Inject()(
   config: FrontendAppConfig,

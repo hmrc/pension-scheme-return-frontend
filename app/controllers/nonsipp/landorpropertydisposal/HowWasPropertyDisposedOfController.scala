@@ -110,9 +110,9 @@ object HowWasPropertyDisposedOfController {
         case (HowDisposed.Other.name, Some(details)) => HowDisposed.Other(details)
       },
     from = {
-      case HowDisposed.Sold => Some(HowDisposed.Sold.name, None)
-      case HowDisposed.Transferred => Some(HowDisposed.Transferred.name, None)
-      case HowDisposed.Other(details) => Some(HowDisposed.Other.name, Some(details))
+      case HowDisposed.Sold => Some((HowDisposed.Sold.name, None))
+      case HowDisposed.Transferred => Some((HowDisposed.Transferred.name, None))
+      case HowDisposed.Other(details) => Some((HowDisposed.Other.name, Some(details)))
     }
   )
 

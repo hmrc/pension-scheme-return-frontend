@@ -26,7 +26,7 @@ import models.UserAnswers.SensitiveJsObject
 import models.{NameDOB, _}
 import org.scalatest.OptionValues
 import pages.nonsipp.landorproperty.LandOrPropertyAddressLookupPage
-import pages.nonsipp.moneyborrowed.{BorrowedAmountAndRatePage, LenderNamePage}
+import pages.nonsipp.moneyborrowed.LenderNamePage
 import play.api.Application
 import play.api.data.Form
 import play.api.http._

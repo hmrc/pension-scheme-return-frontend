@@ -18,13 +18,12 @@ package controllers.nonsipp.moneyborrowed
 
 import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
+import controllers.nonsipp.moneyborrowed.WhySchemeBorrowedMoneyController._
 import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import models.{NormalMode, UserAnswers}
 import pages.nonsipp.moneyborrowed.{BorrowedAmountAndRatePage, LenderNamePage, WhySchemeBorrowedMoneyPage}
 import views.html.TextAreaView
-import controllers.nonsipp.moneyborrowed.WhySchemeBorrowedMoneyController._
-import pages.nonsipp.memberdetails.MemberDetailsPage
 
 class WhySchemeBorrowedMoneyControllerSpec extends ControllerBaseSpec {
 

@@ -577,7 +577,7 @@ object LandOrPropertyCYAController {
   ): List[CheckYourAnswersSection] =
     List(
       CheckYourAnswersSection(
-        Some(Heading2.medium("landOrPropertyCYA.section2.heading", address)),
+        Some(Heading2.medium(("landOrPropertyCYA.section2.heading", address))),
         List(
           CheckYourAnswersRowViewModel(
             Message("landOrPropertyCYA.section2.holdProperty", schemeName, address),
@@ -643,7 +643,7 @@ object LandOrPropertyCYAController {
   ): List[CheckYourAnswersSection] =
     List(
       CheckYourAnswersSection(
-        Some(Heading2.medium("landOrPropertyCYA.section4.heading", address)),
+        Some(Heading2.medium(("landOrPropertyCYA.section4.heading", address))),
         List(
           CheckYourAnswersRowViewModel(
             Message("landOrPropertyCYA.section4.residential", address),
