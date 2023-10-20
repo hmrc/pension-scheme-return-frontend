@@ -173,6 +173,7 @@ object TaskListStatusUtils {
             firstPages,
             lastPages,
             whyHeldPages,
+            indepValPages,
             firstLesseeSubjourney,
             lastLesseeSubjourney
           )
@@ -201,34 +202,39 @@ object TaskListStatusUtils {
     firstPages: Option[Map[String, Boolean]],
     lastPages: Option[Map[String, Money]],
     whyHeldPages: Option[Map[String, SchemeHoldLandProperty]],
+    indepValPages: Option[Map[String, Boolean]],
     firstLesseeSubjourney: Option[Map[String, Boolean]],
     lastLesseeSubjourney: Option[Map[String, Boolean]]
   ): Int =
-    (firstPages, lastPages, firstLesseeSubjourney, lastLesseeSubjourney) match {
-      case (None, _, _, _) => 1
-      case (Some(_), None, _, _) => 1
-      case (Some(first), last, firstLessee, lastLessee) =>
+    (firstPages, lastPages, whyHeldPages, indepValPages, firstLesseeSubjourney, lastLesseeSubjourney) match {
+      case (None, _, _, _, _, _) => 1
+      case (Some(_), None, _, _, _, _) => 1
+      case (Some(first), last, whyHeld, indepVal, firstLessee, lastLessee) =>
         if (first.isEmpty) {
           1
         } else {
           val firstIndexes = (0 to first.size - 1).toList
           val lastIndexes = last.getOrElse(List.empty).map(_._1.toInt).toList
-// TODO
-//          val sponsoringAndConnectedIndexes = sponsoring.getOrElse(List.empty).map(_._1.toInt).toList ++ connected
-//            .getOrElse(List.empty)
-//            .map(_._1.toInt)
-//            .toList
+          val whyHeldIndexes =
+            whyHeld.getOrElse(List.empty).filter(b => b._2 != SchemeHoldLandProperty.Transfer).map(_._1.toInt).toList
+          val indepValIndexes = indepVal.getOrElse(List.empty).map(_._1.toInt).toList
+          val firstLesseeIndexes = firstLessee.getOrElse(List.empty).filter(b => !b._2).map(_._1.toInt).toList
+          val lastLesseeIndexes = lastLessee.getOrElse(List.empty).map(_._1.toInt).toList
+          val lesseeIndexes = firstLesseeIndexes ++ lastLesseeIndexes
+
           val filtered = firstIndexes.filter(lastIndexes.indexOf(_) < 0)
-//          val filteredSC = whoReceivedIndexes.filter(sponsoringAndConnectedIndexes.indexOf(_) < 0)
-          if (filtered.isEmpty /*&& filteredSC.isEmpty*/ ) {
+          val filteredWhyHeld = whyHeldIndexes.filter(indepValIndexes.indexOf(_) < 0)
+          val filteredLessee = lastIndexes.filter(lesseeIndexes.indexOf(_) < 0)
+          if (filtered.isEmpty && filteredWhyHeld.isEmpty && filteredLessee.isEmpty) {
             1
           } else {
-//            if (filteredSC.isEmpty) {
-            filtered(0) + 1 // index based on last page missing
-//            } else {
-//              filteredSC(0) + 1 // index based on sponsoring employer or individual connected party
-//            }
-//          }
+            if (filtered.nonEmpty) {
+              filtered(0) + 1 // index based on last page missing
+            } else if (filteredWhyHeld.nonEmpty) {
+              filteredWhyHeld(0) + 1 // index based on whyHeld and indepVal indexes
+            } else {
+              filteredLessee(0) + 1 // index based on lessee and indepVal indexes
+            }
           }
         }
     }

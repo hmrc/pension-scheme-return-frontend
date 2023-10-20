@@ -193,6 +193,23 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
         result mustBe (InProgress, inUkPageUrl(refineMV(1)))
       }
 
+      "when landOrPropertyHeldPage true and there is a missing lessee connected party page at index 2" in {
+        val customUserAnswers = defaultUserAnswers
+        // index 1
+          .unsafeSet(LandOrPropertyHeldPage(srn), true)
+          .unsafeSet(LandPropertyInUKPage(srn, refineMV(1)), true)
+          .unsafeSet(IsLesseeConnectedPartyPage(srn, refineMV(1)), true)
+          .unsafeSet(LandOrPropertyTotalIncomePage(srn, refineMV(1)), money)
+
+          // index 2
+          .unsafeSet(LandPropertyInUKPage(srn, refineMV(2)), true)
+          //  IsLesseeConnectedPartyPage at index 1 is missing here
+          .unsafeSet(LandOrPropertyTotalIncomePage(srn, refineMV(2)), money)
+
+        val result = TaskListStatusUtils.getLandOrPropertyTaskListStatusAndLink(customUserAnswers, srn)
+        result mustBe (InProgress, inUkPageUrl(refineMV(2)))
+      }
+
       "when landOrPropertyHeldPage true and there is a missing independent valuation page" in {
         val customUserAnswers = defaultUserAnswers
         // index 1
@@ -213,27 +230,26 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
         val result = TaskListStatusUtils.getLandOrPropertyTaskListStatusAndLink(customUserAnswers, srn)
         result mustBe (InProgress, inUkPageUrl(refineMV(1)))
       }
-//      TODO:
-//      "when landOrPropertyHeldPage true and there is a missing independent valuation page at index 2" in {
-//        val customUserAnswers = defaultUserAnswers
-//          // index 1
-//          .unsafeSet(LandOrPropertyHeldPage(srn), true)
-//          .unsafeSet(LandPropertyInUKPage(srn, refineMV(1)), true)
-//          .unsafeSet(WhyDoesSchemeHoldLandPropertyPage(srn, refineMV(1)), SchemeHoldLandProperty.Acquisition)
-//          .unsafeSet(LandPropertyIndependentValuationPage(srn, refineMV(1)), true)
-//          .unsafeSet(IsLesseeConnectedPartyPage(srn, refineMV(1)), true)
-//          .unsafeSet(LandOrPropertyTotalIncomePage(srn, refineMV(1)), money)
-//
-//          // index 2
-//          .unsafeSet(LandPropertyInUKPage(srn, refineMV(2)), true)
-//          .unsafeSet(WhyDoesSchemeHoldLandPropertyPage(srn, refineMV(2)), SchemeHoldLandProperty.Acquisition)
-//          // indep valuation data is missing
-//          .unsafeSet(IsLesseeConnectedPartyPage(srn, refineMV(2)), true)
-//          .unsafeSet(LandOrPropertyTotalIncomePage(srn, refineMV(2)), money)
-//
-//        val result = TaskListStatusUtils.getLandOrPropertyTaskListStatusAndLink(customUserAnswers, srn)
-//        result mustBe(InProgress, inUkPageUrl(refineMV(2)))
-//      }
+      "when landOrPropertyHeldPage true and there is a missing independent valuation page at index 2" in {
+        val customUserAnswers = defaultUserAnswers
+        // index 1
+          .unsafeSet(LandOrPropertyHeldPage(srn), true)
+          .unsafeSet(LandPropertyInUKPage(srn, refineMV(1)), true)
+          .unsafeSet(WhyDoesSchemeHoldLandPropertyPage(srn, refineMV(1)), SchemeHoldLandProperty.Acquisition)
+          .unsafeSet(LandPropertyIndependentValuationPage(srn, refineMV(1)), true)
+          .unsafeSet(IsLesseeConnectedPartyPage(srn, refineMV(1)), true)
+          .unsafeSet(LandOrPropertyTotalIncomePage(srn, refineMV(1)), money)
+
+          // index 2
+          .unsafeSet(LandPropertyInUKPage(srn, refineMV(2)), true)
+          .unsafeSet(WhyDoesSchemeHoldLandPropertyPage(srn, refineMV(2)), SchemeHoldLandProperty.Acquisition)
+          // indep valuation data is missing
+          .unsafeSet(IsLesseeConnectedPartyPage(srn, refineMV(2)), true)
+          .unsafeSet(LandOrPropertyTotalIncomePage(srn, refineMV(2)), money)
+
+        val result = TaskListStatusUtils.getLandOrPropertyTaskListStatusAndLink(customUserAnswers, srn)
+        result mustBe (InProgress, inUkPageUrl(refineMV(2)))
+      }
     }
     "should be Complete" - {
       "when only landOrPropertyHeldPage false is present" in {
