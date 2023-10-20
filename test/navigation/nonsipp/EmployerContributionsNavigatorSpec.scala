@@ -18,6 +18,7 @@ package navigation.nonsipp
 
 import config.Refined.{Max300, Max50, Max5000}
 import eu.timepit.refined.refineMV
+import models.NormalMode
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.employercontributions._
@@ -57,6 +58,19 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
         .withName("go from employer contribution page to unallocated employer contributions page when no selected")
     )
 
+  }
+
+  "WhatYouWillNeedEmployerContributionsPage" - {
+    act.like(
+      normalmode
+        .navigateTo(
+          WhatYouWillNeedEmployerContributionsPage,
+          (srn, _) =>
+            controllers.nonsipp.employercontributions.routes.EmployerNameController
+              .onPageLoad(srn, refineMV(1), refineMV(2), NormalMode)
+        )
+        .withName("go from what you will need employer contributions page to employer name page ")
+    )
   }
 
   "EmployerNamePage" - {

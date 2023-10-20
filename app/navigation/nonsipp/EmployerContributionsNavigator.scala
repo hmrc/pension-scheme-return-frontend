@@ -16,6 +16,7 @@
 
 package navigation.nonsipp
 
+import eu.timepit.refined.refineMV
 import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
@@ -39,7 +40,8 @@ object EmployerContributionsNavigator extends JourneyNavigator {
       }
 
     case WhatYouWillNeedEmployerContributionsPage(srn) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+      controllers.nonsipp.employercontributions.routes.EmployerNameController
+        .onPageLoad(srn, refineMV(1), refineMV(2), NormalMode)
 
   }
 
