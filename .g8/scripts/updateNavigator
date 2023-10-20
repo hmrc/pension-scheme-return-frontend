@@ -9,25 +9,26 @@ set -e
 
 PAGE=$1
 DIR=$2
-INDEX=$3
+INDEX="$3"
+SECONDARY_INDEX="$4"
 
 case $DIR in
-  landorproperty)
-    NAV_FILE="../app/navigation/nonsipp/LandOrPropertyNavigator.scala"
-    NAV_SPEC="../test/navigation/nonsipp/LandOrPropertyNavigatorSpec.scala"
-    ;;
-  landorpropertydisposal)
-    NAV_FILE="../app/navigation/nonsipp/LandOrPropertyDisposalNavigator.scala"
-    NAV_SPEC="../test/navigation/nonsipp/LandOrPropertyDisposalNavigatorSpec.scala"
-    ;;
-  employercontributions)
-    NAV_FILE="../app/navigation/nonsipp/EmployerContributionsNavigator.scala"
-    NAV_SPEC="../test/navigation/nonsipp/EmployerContributionsNavigatorSpec.scala"
-    ;;
-  *)
-    NAV_FILE=
-    NAV_SPEC=
-    ;;
+landorproperty)
+  NAV_FILE="../app/navigation/nonsipp/LandOrPropertyNavigator.scala"
+  NAV_SPEC="../test/navigation/nonsipp/LandOrPropertyNavigatorSpec.scala"
+  ;;
+landorpropertydisposal)
+  NAV_FILE="../app/navigation/nonsipp/LandOrPropertyDisposalNavigator.scala"
+  NAV_SPEC="../test/navigation/nonsipp/LandOrPropertyDisposalNavigatorSpec.scala"
+  ;;
+employercontributions)
+  NAV_FILE="../app/navigation/nonsipp/EmployerContributionsNavigator.scala"
+  NAV_SPEC="../test/navigation/nonsipp/EmployerContributionsNavigatorSpec.scala"
+  ;;
+*)
+  NAV_FILE=
+  NAV_SPEC=
+  ;;
 esac
 
 [ -z "$NAV_FILE" ] && echo "unknown directory $DIR" && exit 1
@@ -38,9 +39,13 @@ echo "$tmpfile"
 echo "updating navigator"
 
 if [ -z "$INDEX" ]; then
-  sed "s/\( *override def normalRoutes.*\)/& \n\n case $PAGE(srn) => controllers.routes.UnauthorisedController.onPageLoad()/" "$NAV_FILE" > "$tmpfile"
+  sed "s/\( *override def normalRoutes.*\)/& \n\n case $PAGE(srn) => controllers.routes.UnauthorisedController.onPageLoad()/" "$NAV_FILE" >"$tmpfile"
 else
-  sed "s/\( *override def normalRoutes.*\)/& \n\n case $PAGE(srn, index) => controllers.routes.UnauthorisedController.onPageLoad()/" "$NAV_FILE" > "$tmpfile"
+  if [ -z "$SECONDARY_INDEX" ]; then
+    sed "s/\( *override def normalRoutes.*\)/& \n\n case $PAGE(srn, index) => controllers.routes.UnauthorisedController.onPageLoad()/" "$NAV_FILE" >"$tmpfile"
+  else
+    sed "s/\( *override def normalRoutes.*\)/& \n\n case $PAGE(srn, index, secondaryIndex) => controllers.routes.UnauthorisedController.onPageLoad()/" "$NAV_FILE" >"$tmpfile"
+  fi
 fi
 cat "$tmpfile"
 cp "$tmpfile" "$NAV_FILE"
@@ -50,17 +55,20 @@ tmpfile=$(mktemp)
 echo "$tmpfile"
 
 echo "updating navigator spec"
+echo "INDEX=$INDEX"
+echo "SECONDARY_INDEX=$SECONDARY_INDEX"
 
 if [ -z "$INDEX" ]; then
   echo "TODO no index, skipping test"
 else
+if [ -z "$SECONDARY_INDEX" ]; then
 sed "\$s/\(}\)/\n  \"$PAGE\" - {\n"\
 "    act.like(\n"\
 "      normalmode\n"\
 "      .navigateToWithIndex(\n"\
 "        index,\n"\
 "        $PAGE,\n"\
-"        (srn, index: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()\n"\
+"        (srn, index: "$INDEX", _) => controllers.routes.UnauthorisedController.onPageLoad()\n"\
 "      )\n"\
 "      .withName(\"go from $PAGE to ??? page\")\n"\
 "    )\n"\
@@ -68,4 +76,21 @@ sed "\$s/\(}\)/\n  \"$PAGE\" - {\n"\
 cat "$tmpfile"
 cp "$tmpfile" "$NAV_SPEC"
 rm "$tmpfile"
+else
+sed "\$s/\(}\)/\n  \"$PAGE\" - {\n"\
+"    act.like(\n"\
+"      normalmode\n"\
+"      .navigateToWithDoubleIndex(\n"\
+"        index,\n"\
+"        secondaryIndex,\n"\
+"        $PAGE,\n"\
+"        (srn, index: "$INDEX", secondaryIndex: "$SECONDARY_INDEX", _) => controllers.routes.UnauthorisedController.onPageLoad()\n"\
+"      )\n"\
+"      .withName(\"go from $PAGE to ??? page\")\n"\
+"    )\n"\
+"  }\n\1/" "$NAV_SPEC" > "$tmpfile"
+cat "$tmpfile"
+cp "$tmpfile" "$NAV_SPEC"
+rm "$tmpfile"
+fi
 fi

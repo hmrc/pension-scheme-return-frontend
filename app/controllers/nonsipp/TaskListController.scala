@@ -294,7 +294,7 @@ object TaskListController {
             .onPageLoad(srn, NormalMode)
             .url
         ),
-        UnableToStart
+        NotStarted
       ),
       TaskListItemViewModel(
         LinkMessage(
@@ -409,22 +409,6 @@ object TaskListController {
           controllers.nonsipp.sharesinsponsoringemployer.routes.DidSchemeHoldSharesInSponsoringEmployerController
             .onPageLoad(srn, NormalMode)
             .url
-        ),
-        NotStarted
-      ),
-      TaskListItemViewModel(
-        LinkMessage(
-          messageKey(prefix, "connectedparty.title", UnableToStart),
-          controllers.nonsipp.sharesacquiredfromconnectedparty.routes.SharesAcquiredFromConnectedPartyController
-            .onPageLoad(srn, NormalMode)
-            .url
-        ),
-        NotStarted
-      ),
-      TaskListItemViewModel(
-        LinkMessage(
-          messageKey(prefix, "unquotedshares.title", UnableToStart),
-          controllers.nonsipp.unquotedshares.routes.UnquotedSharesController.onPageLoad(srn, NormalMode).url
         ),
         NotStarted
       ),
