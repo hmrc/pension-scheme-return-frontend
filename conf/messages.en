@@ -1462,3 +1462,9 @@ employerName.heading = What is the employer’s name?
 employerName.error.required = Enter the employer’s name
 employerName.error.invalid = Employer’s name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
 employerName.error.tooLong = Employer’s name must be 160 characters or fewer
+
+otherEmployeeDescription.title = Provide a brief description of the employer
+otherEmployeeDescription.heading = Provide a brief description of {0}
+otherEmployeeDescription.error.required = Provide a brief description of the employer
+otherEmployeeDescription.error.length = The brief description of the employer must be 160 characters or fewer
+otherEmployeeDescription.error.invalid = The brief description of employer must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces

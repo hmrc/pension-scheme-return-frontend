@@ -27,6 +27,9 @@ object EmployerContributionsNavigator extends JourneyNavigator {
 
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
 
+    case OtherEmployeeDescriptionPage(srn, index, secondaryIndex) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
+
     case EmployerNamePage(srn, memberIndex, index) => controllers.routes.UnauthorisedController.onPageLoad()
 
     case page @ EmployerContributionsPage(srn) =>
