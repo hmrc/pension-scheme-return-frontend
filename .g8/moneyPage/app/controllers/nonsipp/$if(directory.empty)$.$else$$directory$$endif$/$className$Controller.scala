@@ -14,111 +14,106 @@
  * limitations under the License.
  */
 
+$! Generic imports !$
 $if(directory.empty)$
 package controllers.nonsipp
 $else$
 package controllers.nonsipp.$directory$
 $endif$
 
+$if(directory.empty)$
+import pages.nonsipp.$className$Page
+import controllers.nonsipp.$className;format="cap"$Controller._
+$else$
+import pages.nonsipp.$directory$.$className$Page
+import controllers.nonsipp.$directory$.$className;format="cap"$Controller._
+$endif$
+
+$if(!index.empty)$
+import config.Refined._
+$endif$
+
 import controllers.actions._
-import forms.MoneyFormProvider
-import models.{Mode, Money}
-import forms.mappings.errors.MoneyFormErrors
-import config.Constants
+import models._
 import models.SchemeId.Srn
 import navigation.Navigator
 import play.api.data.Form
-import viewmodels.models.{FormPageViewModel, YesNoPageViewModel, QuestionField}
-import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
-import viewmodels.DisplayMessage.{Empty, Message}
-import play.api.i18n.{I18nSupport, MessagesApi}
+import viewmodels.models._
+import viewmodels.implicits._
+import services.SaveService
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import controllers.PSRController
-import views.html.MoneyView
-import services.SaveService
-import viewmodels.implicits._
-import $className;format="cap"$Controller._
-$if(directory.empty)$
-import pages.$className$Page
-$else$
-import pages.nonsipp.$directory$.$className$Page
-$endif$
-$if(!index.empty)$
-import config.Refined.$index$
-$endif$
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
+$! Generic imports end!$
+
+import config.Constants
+import forms.mappings.errors.MoneyFormErrorProvider
+import forms.mappings.errors.MoneyFormErrorValue
+import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
+import viewmodels.DisplayMessage._
+import play.api.i18n.{I18nSupport, MessagesApi}
+import views.html.MoneyView
 
 class $className;format="cap"$Controller @Inject()(
     override val messagesApi: MessagesApi,
     saveService: SaveService,
     @Named("non-sipp") navigator: Navigator,
     identifyAndRequireData: IdentifyAndRequireData,
-    formProvider: MoneyFormProvider,
+    formProvider: MoneyFormErrorProvider,
     val controllerComponents: MessagesControllerComponents,
     view: MoneyView,
 )(implicit ec: ExecutionContext) extends PSRController {
 
   private val form = $className;format="cap"$Controller.form(formProvider)
 
-  $if(index.empty)$
-  def onPageLoad(srn:Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  $! Generic functions (viewmodel might accept extra params) !$
+  def onPageLoad(srn: Srn, $if(!index.empty)$index: $index$, $endif$$if(!secondaryIndex.empty)$secondaryIndex: $secondaryIndex$, $endif$mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      val preparedForm = request.userAnswers.fillForm($className$Page(srn), form)
-      Ok(view(viewModel(srn, preparedForm, mode)))
+      val preparedForm = request.userAnswers.get($className$Page(srn$if(!index.empty)$, index$endif$$if(!secondaryIndex.empty)$, secondaryIndex$endif$)).fold(form)(form.fill)
+      $if(!requiredPage)$
+      request.userAnswers.get($requiredPage$(srn$if(!index.empty)$, index$endif$$if(!secondaryIndex.empty)$, secondaryIndex$endif$)).getOrRecoverJourney { requiredPage =>
+      $endif$
+      Ok(view(viewModel(srn, $if(!requiredPage)$requiredPage, $endif$$if(!index.empty) $index, $endif$$if(!secondaryIndex.empty) $secondaryIndex, $endif$preparedForm, mode)))
+      $if(!requiredPage) $
+      }
+      $endif$
   }
-  $else$
-  def onPageLoad(srn:Srn, index: $index$, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
-    implicit request =>
-      val preparedForm = request.userAnswers.fillForm($className$Page(srn, index), form)
-      Ok(view(viewModel(srn, index, preparedForm, mode)))
-  }
-  $endif$
 
-  $if(index.empty)$
-  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
-  $else$
-  def onSubmit(srn: Srn, index: $index$, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
-  $endif$
+  def onSubmit(srn: Srn, $if(!index.empty)$index: $index$, $endif$$if(!secondaryIndex.empty)$secondaryIndex: $secondaryIndex$, $endif$mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       form.bindFromRequest().fold(
-        $if(index.empty)$
-        formWithErrors => Future.successful(BadRequest(view(viewModel(srn, formWithErrors, mode)))),
-        $else$
-        formWithErrors => Future.successful(BadRequest(view(viewModel(srn, index, formWithErrors, mode)))),
-        $endif$
+        formWithErrors => {
+          $if(!requiredPage)$
+          request.userAnswers.get($requiredPage$(srn$if(!index.empty)$, index$endif$$if(!secondaryIndex.empty)$, secondaryIndex$endif$)).getOrRecoverJourney { requiredPage =>
+          $endif$
+          Future.successful(BadRequest(view(viewModel(srn, $if(!requiredPage)$requiredPage, $endif$$if(!index.empty) $index, $endif$$if(!secondaryIndex.empty) $secondaryIndex, $endif$formWithErrors, mode))))
+          $if(!requiredPage) $
+          }
+          $endif$
+        },
         value =>
           for {
-            $if(index.empty)$
-            updatedAnswers <- Future.fromTry(request.userAnswers.transformAndSet($className$Page(srn), value))
-            $else$
-            updatedAnswers <- Future.fromTry(request.userAnswers.transformAndSet($className$Page(srn, index), value))
-            $endif$
+            updatedAnswers <- Future.fromTry(request.userAnswers.set($className$Page(srn$if(!index.empty)$, index$endif$$if(!secondaryIndex.empty)$, secondaryIndex$endif$), value))
             _              <- saveService.save(updatedAnswers)
-          $if(index.empty)$
-          } yield Redirect(navigator.nextPage($className$Page(srn), mode, updatedAnswers))
-          $else$
-          } yield Redirect(navigator.nextPage($className$Page(srn, index), mode, updatedAnswers))
-          $endif$
+          } yield Redirect(navigator.nextPage($className$Page(srn$if(!index.empty)$, index$endif$$if(!secondaryIndex.empty)$, secondaryIndex$endif$), mode, updatedAnswers))
       )
   }
+  $! Generic functions end !$
 }
 
 object $className;format="cap"$Controller {
-  def form(formProvider: MoneyFormProvider): Form[Money] = formProvider(
-    MoneyFormErrors(
-      "$className;format="decap"$.error.required",
-      "$className;format="decap"$.error.invalid",
-      (Constants.maxMoneyValue, "$className;format="decap"$.error.tooLarge")
+  def form(formProvider: MoneyFormErrorProvider): Form[Money] = formProvider(
+    MoneyFormErrorValue(
+      requiredKey = "$className;format="decap"$.error.required",
+      nonNumericKey = "$className;format="decap"$.error.invalid",
+      max = (Constants.maxMoneyValue, "$className;format="decap"$.error.tooLarge"),
+      min = (Constants.minMoneyValue, "$className;format="decap"$.error.tooSmall")
     )
   )
 
-  $if(index.empty)$
-  def viewModel(srn: Srn, form: Form[Money], mode: Mode): FormPageViewModel[SingleQuestion[Money]] = {
-  $else$
-  def viewModel(srn: Srn, index: $index$, form: Form[Money], mode: Mode): FormPageViewModel[SingleQuestion[Money]] = {
-  $endif$
+  def viewModel(srn: Srn, $if(!requiredPage.empty)$requiredPage: ???, $endif$$if(!index.empty)$index: $index$, $endif$$if(!secondaryIndex.empty)$secondaryIndex: $secondaryIndex$, $endif$form: Form[Money], mode: Mode): FormPageViewModel[SingleQuestion[Money]] = {
     FormPageViewModel(
       "$className;format="decap"$.title",
       "$className;format="decap"$.heading",
@@ -130,19 +125,13 @@ object $className;format="cap"$Controller {
         QuestionField.input(Empty, Some("$className;format="decap"$.hint"))
         $endif$
       ),
-     $if(index.empty)$
+      $! Generic onSubmit !$
       $if(directory.empty)$
-      controllers.nonsipp.routes.$className;format="cap"$Controller.onSubmit(srn, mode)
+      controllers.nonsipp.routes.$className;format="cap"$Controller.onSubmit(srn, $if(!index.empty)$index, $endif$$if(!secondaryIndex.empty)$secondaryIndex, $endif$mode)
       $else$
-      controllers.nonsipp.$directory$.routes.$className;format="cap"$Controller.onSubmit(srn, mode)
+      controllers.nonsipp.$directory$.routes.$className;format="cap"$Controller.onSubmit(srn, $if(!index.empty)$index, $endif$$if(!secondaryIndex.empty)$secondaryIndex, $endif$mode)
       $endif$
-    $else$
-    $if(directory.empty)$
-      controllers.nonsipp.routes.$className;format="cap"$Controller.onSubmit(srn, index, mode)
-      $else$
-      controllers.nonsipp.$directory$.routes.$className;format="cap"$Controller.onSubmit(srn, index, mode)
-      $endif$
-    $endif$
+      $! Generic onSubmit end !$
     )
   }
 }

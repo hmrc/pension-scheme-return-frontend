@@ -28,8 +28,8 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
 
   val navigator: Navigator = new NonSippNavigator
 
-  private val memberIndex = refineMV[Max300.Refined](1)
-  private val index = refineMV[Max50.Refined](1)
+  private val index = refineMV[Max300.Refined](1)
+  private val secondaryIndex = refineMV[Max50.Refined](1)
 
   "EmployerContributionsNavigator" - {
 
@@ -59,12 +59,25 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
     act.like(
       normalmode
         .navigateToWithDoubleIndex(
-          memberIndex,
           index,
+          secondaryIndex,
           EmployerNamePage,
           (srn, memberIndex: Max300, index: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
         )
         .withName("go from EmployerNamePage to ??? page")
+    )
+  }
+
+  "OtherEmployeeDescriptionPage" - {
+    act.like(
+      normalmode
+        .navigateToWithDoubleIndex(
+          index,
+          secondaryIndex,
+          OtherEmployeeDescriptionPage,
+          (srn, index: Max300, secondaryIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+        )
+        .withName("go from OtherEmployeeDescriptionPage to ??? page")
     )
   }
 }
