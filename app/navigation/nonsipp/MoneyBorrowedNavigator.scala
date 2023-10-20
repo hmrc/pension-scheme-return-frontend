@@ -57,10 +57,9 @@ object MoneyBorrowedNavigator extends JourneyNavigator {
       controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController.onPageLoad(srn, index, CheckOrChange.Check)
 
     case MoneyBorrowedCYAPage(srn) =>
-      controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController.onPageLoad(srn, NormalMode)
+      controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController.onPageLoad(srn, page = 1, NormalMode)
 
-    case BorrowInstancesListPage(srn, addBorrow) => //instances-of-borrowing
-      println(s"\n\n\n\n\n\n\n${addBorrow}")
+    case BorrowInstancesListPage(srn, addBorrow) =>
       if (addBorrow) {
         val answers = userAnswers.map(BorrowedAmountAndRatePages(srn))
         val nextDataKey = if (answers.isEmpty) 1 else answers.maxBy(_._1)._1.toIntOption.orElse(Some(0)).get + 1
