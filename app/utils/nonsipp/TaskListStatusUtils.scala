@@ -183,15 +183,15 @@ object TaskListStatusUtils {
           )
 
           if (countFirstPages + countLastPages == 0) {
-            (InProgress, inUkPageUrl(refineMV(1))) // index ok
+            (InProgress, inUkPageUrl(refineMV(1)))
           } else if (countFirstPages > countLastPages) {
-            (InProgress, inProgressCalculatedUrl) //Calculated here!
+            (InProgress, inProgressCalculatedUrl)
           } else {
             if ((countLastLesseeSubjourney + countFirstLesseeSubjourney) != countLastPages ||
               countAcquisitionContributionSubJourney != countIndepValPages) {
-              (InProgress, inProgressCalculatedUrl) //Calculated here!
+              (InProgress, inProgressCalculatedUrl)
             } else {
-              (Completed, listPageUrl) // no index
+              (Completed, listPageUrl)
             }
           }
         }
