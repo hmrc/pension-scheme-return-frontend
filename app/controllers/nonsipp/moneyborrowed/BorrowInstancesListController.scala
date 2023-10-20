@@ -25,16 +25,8 @@ import eu.timepit.refined.refineV
 import forms.YesNoPageFormProvider
 import models.{CheckOrChange, Mode, Money, NormalMode, Pagination, Percentage}
 import models.SchemeId.Srn
-import models.requests.DataRequest
-import pages.nonsipp.moneyborrowed.{
-  BorrowInstancesListPage,
-  BorrowedAmountAndRatePages,
-  LenderNamePage,
-  LenderNamePages,
-  MoneyBorrowedCYAPage
-}
+import pages.nonsipp.moneyborrowed.{BorrowInstancesListPage, BorrowedAmountAndRatePages, LenderNamePages}
 import navigation.Navigator
-import navigation.nonsipp.BankAccountNavigator.OptionOps
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
