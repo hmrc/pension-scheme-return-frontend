@@ -16,22 +16,12 @@
 
 package services
 
-import cats.implicits._
 import connectors.PSRConnector
 import models.SchemeId.Srn
 import models.UserAnswers
 import models.requests.DataRequest
-import models.requests.psr._
-import pages.nonsipp.CheckReturnDatesPage
-import pages.nonsipp.landorproperty.LandOrPropertyHeldPage
-import pages.nonsipp.loansmadeoroutstanding._
 import play.api.mvc.AnyContent
-import repositories.SessionRepository
-import transformations.{
-  LandOrPropertyTransactionsTransformer,
-  LoanTransactionsTransformer,
-  MinimalRequiredSubmissionTransformer
-}
+import transformations.{LoanTransactionsTransformer, MinimalRequiredSubmissionTransformer}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
@@ -40,16 +30,14 @@ import scala.concurrent.{ExecutionContext, Future}
 class PsrRetrievalService @Inject()(
   psrConnector: PSRConnector,
   minimalRequiredSubmissionTransformer: MinimalRequiredSubmissionTransformer,
-  loanTransactionsTransformer: LoanTransactionsTransformer,
-  landOrPropertyTransactionsTransformer: LandOrPropertyTransactionsTransformer
+  loanTransactionsTransformer: LoanTransactionsTransformer
 ) {
 
   def getStandardPsrDetails(
-    request: DataRequest[AnyContent],
     optFbNumber: Option[String],
     optPeriodStartDate: Option[String],
     optPsrVersion: Option[String]
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[UserAnswers] =
+  )(implicit request: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext): Future[UserAnswers] =
     for {
       psrDetails <- psrConnector.getStandardPsrDetails(
         request.schemeDetails.pstr,

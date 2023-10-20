@@ -25,7 +25,6 @@ import controllers.PSRController
 import controllers.actions._
 import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalListController._
 import forms.YesNoPageFormProvider
-import models.CheckOrChange.Change
 import models.SchemeId.Srn
 import models.requests.DataRequest
 import models.{Address, Mode, NormalMode, Pagination}

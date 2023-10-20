@@ -18,7 +18,7 @@ package navigation.nonsipp
 
 import config.Refined.{Max50, Max5000}
 import eu.timepit.refined.refineMV
-import models.{CheckMode, CheckOrChange, IdentityType, NormalMode}
+import models.{IdentityType, NormalMode}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.landorpropertydisposal._

@@ -17,7 +17,6 @@
 package models
 
 import models.UserAnswers.SensitiveJsObject
-import pages.QuestionPage
 import play.api.data.Form
 import play.api.libs.json._
 import queries.{Gettable, Removable, Settable}

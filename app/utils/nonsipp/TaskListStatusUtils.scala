@@ -20,17 +20,8 @@ import models.ConditionalYesNo._
 import models.SchemeId.Srn
 import models.{IdentitySubject, NormalMode, PensionSchemeId, UserAnswers}
 import pages.nonsipp.common.IdentityTypes
-import pages.nonsipp.landorpropertydisposal.{
-  LandOrPropertyDisposalPage,
-  LandPropertyDisposalCompletedPage,
-  LandPropertyDisposalCompletedPages
-}
-import pages.nonsipp.loansmadeoroutstanding.{
-  IsIndividualRecipientConnectedPartyPages,
-  LoansMadeOrOutstandingPage,
-  OutstandingArrearsOnLoanPages,
-  RecipientSponsoringEmployerConnectedPartyPages
-}
+import pages.nonsipp.landorpropertydisposal.{LandOrPropertyDisposalPage, LandPropertyDisposalCompletedPages}
+import pages.nonsipp.loansmadeoroutstanding.{IsIndividualRecipientConnectedPartyPages, LoansMadeOrOutstandingPage, OutstandingArrearsOnLoanPages, RecipientSponsoringEmployerConnectedPartyPages}
 import pages.nonsipp.memberdetails.{MemberDetailsNinoPages, MembersDetailsPages, NoNinoPages}
 import pages.nonsipp.schemedesignatory.{FeesCommissionsWagesSalariesPage, HowManyMembersPage, HowMuchCashPage}
 import viewmodels.models.TaskListStatus
