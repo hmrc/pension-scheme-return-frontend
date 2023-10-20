@@ -48,9 +48,9 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
         .navigateToWithData(
           EmployerContributionsPage,
           Gen.const(false),
-          controllers.nonsipp.memberpayments.routes.UnallocatedEmployerContributionsController.onPageLoad
+          (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
         )
-        .withName("go from employer contribution page to unallocated employer contributions page when no selected")
+        .withName("go from employer contribution page to task list page when no selected")
     )
 
   }

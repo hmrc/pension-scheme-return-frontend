@@ -34,8 +34,7 @@ object EmployerContributionsNavigator extends JourneyNavigator {
         controllers.nonsipp.memberpayments.routes.UnallocatedEmployerContributionsController
           .onPageLoad(srn, NormalMode)
       } else {
-        controllers.nonsipp.memberpayments.routes.UnallocatedEmployerContributionsController
-          .onPageLoad(srn, NormalMode)
+        controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
       }
   }
 
