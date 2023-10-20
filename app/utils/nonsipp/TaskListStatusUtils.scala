@@ -18,10 +18,26 @@ package utils.nonsipp
 
 import models.ConditionalYesNo._
 import models.SchemeId.Srn
-import models.{IdentitySubject, NormalMode, PensionSchemeId, UserAnswers}
+import models.{IdentitySubject, NormalMode, PensionSchemeId, SchemeHoldLandProperty, UserAnswers}
 import pages.nonsipp.common.IdentityTypes
+
+import pages.nonsipp.loansmadeoroutstanding.{
+  IsIndividualRecipientConnectedPartyPages,
+  LoansMadeOrOutstandingPage,
+  OutstandingArrearsOnLoanPages,
+  RecipientSponsoringEmployerConnectedPartyPages
+}
+
+import pages.nonsipp.landorproperty.{
+  IsLandPropertyLeasedPages,
+  IsLesseeConnectedPartyPages,
+  LandOrPropertyHeldPage,
+  LandOrPropertyTotalIncomePages,
+  LandPropertyInUKPages,
+  LandPropertyIndependentValuationPages,
+  WhyDoesSchemeHoldLandPropertyPages
+}
 import pages.nonsipp.landorpropertydisposal.{LandOrPropertyDisposalPage, LandPropertyDisposalCompletedPages}
-import pages.nonsipp.loansmadeoroutstanding.{IsIndividualRecipientConnectedPartyPages, LoansMadeOrOutstandingPage, OutstandingArrearsOnLoanPages, RecipientSponsoringEmployerConnectedPartyPages}
 import pages.nonsipp.memberdetails.{MemberDetailsNinoPages, MembersDetailsPages, NoNinoPages}
 import pages.nonsipp.schemedesignatory.{FeesCommissionsWagesSalariesPage, HowManyMembersPage, HowMuchCashPage}
 import viewmodels.models.TaskListStatus
@@ -108,6 +124,58 @@ object TaskListStatusUtils {
     }
   }
 
+  def getLandOrPropertyTaskListStatus(userAnswers: UserAnswers, srn: Srn) = {
+    val landOrPropertyHeldPage = userAnswers.get(LandOrPropertyHeldPage(srn))
+    val firstPages = userAnswers.get(LandPropertyInUKPages(srn))
+    val lastPages = userAnswers.get(LandOrPropertyTotalIncomePages(srn))
+    val lastLesseeSubJourneyPages = userAnswers.get(IsLesseeConnectedPartyPages(srn))
+    val firstLesseeSubJourneyPages = userAnswers.get(IsLandPropertyLeasedPages(srn))
+    val whyDoesSchemeHoldLandPropertyPages = userAnswers.get(WhyDoesSchemeHoldLandPropertyPages(srn))
+    val landPropertyIndependentValuationPages = userAnswers.get(LandPropertyIndependentValuationPages(srn))
+    (
+      landOrPropertyHeldPage,
+      firstPages,
+      lastPages,
+      firstLesseeSubJourneyPages,
+      lastLesseeSubJourneyPages,
+      whyDoesSchemeHoldLandPropertyPages,
+      landPropertyIndependentValuationPages
+    ) match {
+      case (None, _, _, _, _, _, _) => NotStarted
+      case (
+          Some(landOrPropertyHeld),
+          firstPage,
+          lastPages,
+          firstLesseeSubjourney,
+          lastLesseeSubjourney,
+          whyHeld,
+          indepVal
+          ) =>
+        if (!landOrPropertyHeld) {
+          Completed
+        } else {
+          val countFirstPages = firstPage.getOrElse(List.empty).size
+          val countLastPages = lastPages.getOrElse(List.empty).size
+          val countLastLesseeSubjourney = lastLesseeSubjourney.getOrElse(List.empty).size
+          val countFirstLesseeSubjourney = firstLesseeSubjourney.getOrElse(List.empty).filter(b => !b._2).size
+          val countAcquisitionContributionSubJourney =
+            whyHeld.getOrElse(List.empty).filter(b => b._2 != SchemeHoldLandProperty.Transfer).size
+          val countIndepValPages = indepVal.getOrElse(List.empty).size
+          if (countFirstPages + countLastPages == 0) {
+            InProgress
+          } else if (countFirstPages > countLastPages) {
+            InProgress
+          } else {
+            if ((countLastLesseeSubjourney + countFirstLesseeSubjourney) != countLastPages ||
+              countAcquisitionContributionSubJourney != countIndepValPages) {
+              InProgress
+            } else {
+              Completed
+            }
+          }
+        }
+    }
+  }
   def getDisposalsTaskListStatusWithLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
     val atLeastOneCompleted =
       userAnswers.get(LandPropertyDisposalCompletedPages(srn)).exists(_.values.exists(_.values.nonEmpty))

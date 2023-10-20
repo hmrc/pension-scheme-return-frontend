@@ -441,6 +441,7 @@ object TaskListController {
   private def landOrPropertySection(srn: Srn, userAnswers: UserAnswers) = {
     val prefix = "nonsipp.tasklist.landorproperty"
 
+    val (landOrPropertyStatus) = TaskListStatusUtils.getLandOrPropertyTaskListStatus(userAnswers, srn)
     val (disposalsStatus, disposalLinkUrl) = TaskListStatusUtils.getDisposalsTaskListStatusWithLink(userAnswers, srn)
 
     TaskListSectionViewModel(
@@ -450,7 +451,7 @@ object TaskListController {
           messageKey(prefix, "title", UnableToStart),
           controllers.nonsipp.landorproperty.routes.LandOrPropertyHeldController.onPageLoad(srn, NormalMode).url
         ),
-        NotStarted
+        landOrPropertyStatus
       ),
       TaskListItemViewModel(
         LinkMessage(
