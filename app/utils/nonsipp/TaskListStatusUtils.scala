@@ -16,11 +16,11 @@
 
 package utils.nonsipp
 
-import config.Refined.Max5000
-import eu.timepit.refined.refineMV
+import config.Refined.{Max5000, OneTo5000}
+import eu.timepit.refined.{refineMV, refineV}
 import models.ConditionalYesNo._
 import models.SchemeId.Srn
-import models.{IdentitySubject, NormalMode, PensionSchemeId, SchemeHoldLandProperty, UserAnswers}
+import models.{IdentitySubject, Money, NormalMode, PensionSchemeId, SchemeHoldLandProperty, UserAnswers}
 import pages.nonsipp.common.IdentityTypes
 import pages.nonsipp.loansmadeoroutstanding.{
   IsIndividualRecipientConnectedPartyPages,
@@ -151,38 +151,88 @@ object TaskListStatusUtils {
       case (None, _, _, _, _, _, _) => (NotStarted, heldPageUrl)
       case (
           Some(landOrPropertyHeld),
-          firstPage,
+          firstPages,
           lastPages,
           firstLesseeSubjourney,
           lastLesseeSubjourney,
-          whyHeld,
-          indepVal
+          whyHeldPages,
+          indepValPages
           ) =>
         if (!landOrPropertyHeld) {
           (Completed, listPageUrl)
         } else {
-          val countFirstPages = firstPage.getOrElse(List.empty).size
+          val countFirstPages = firstPages.getOrElse(List.empty).size
           val countLastPages = lastPages.getOrElse(List.empty).size
           val countLastLesseeSubjourney = lastLesseeSubjourney.getOrElse(List.empty).size
           val countFirstLesseeSubjourney = firstLesseeSubjourney.getOrElse(List.empty).filter(b => !b._2).size
           val countAcquisitionContributionSubJourney =
-            whyHeld.getOrElse(List.empty).filter(b => b._2 != SchemeHoldLandProperty.Transfer).size
-          val countIndepValPages = indepVal.getOrElse(List.empty).size
+            whyHeldPages.getOrElse(List.empty).filter(b => b._2 != SchemeHoldLandProperty.Transfer).size
+          val countIndepValPages = indepValPages.getOrElse(List.empty).size
+
+          val incompleteIndex: Int = getLandOrPropertyIncompleteIndex(
+            firstPages,
+            lastPages,
+            whyHeldPages,
+            firstLesseeSubjourney,
+            lastLesseeSubjourney
+          )
+          val inProgressCalculatedUrl = refineV[OneTo5000](incompleteIndex).fold(
+            _ => listPageUrl,
+            index => inUkPageUrl(index)
+          )
+
           if (countFirstPages + countLastPages == 0) {
-            (InProgress, inUkPageUrl(refineMV(1)))
+            (InProgress, inUkPageUrl(refineMV(1))) // index ok
           } else if (countFirstPages > countLastPages) {
-            (InProgress, inUkPageUrl(refineMV(1)))
+            (InProgress, inProgressCalculatedUrl) //Calculated here!
           } else {
             if ((countLastLesseeSubjourney + countFirstLesseeSubjourney) != countLastPages ||
               countAcquisitionContributionSubJourney != countIndepValPages) {
-              (InProgress, inUkPageUrl(refineMV(1)))
+              (InProgress, inProgressCalculatedUrl) //Calculated here!
             } else {
-              (Completed, listPageUrl)
+              (Completed, listPageUrl) // no index
             }
           }
         }
     }
   }
+
+  private def getLandOrPropertyIncompleteIndex(
+    firstPages: Option[Map[String, Boolean]],
+    lastPages: Option[Map[String, Money]],
+    whyHeldPages: Option[Map[String, SchemeHoldLandProperty]],
+    firstLesseeSubjourney: Option[Map[String, Boolean]],
+    lastLesseeSubjourney: Option[Map[String, Boolean]]
+  ): Int =
+    (firstPages, lastPages, firstLesseeSubjourney, lastLesseeSubjourney) match {
+      case (None, _, _, _) => 1
+      case (Some(_), None, _, _) => 1
+      case (Some(first), last, firstLessee, lastLessee) =>
+        if (first.isEmpty) {
+          1
+        } else {
+          val firstIndexes = (0 to first.size - 1).toList
+          val lastIndexes = last.getOrElse(List.empty).map(_._1.toInt).toList
+// TODO
+//          val sponsoringAndConnectedIndexes = sponsoring.getOrElse(List.empty).map(_._1.toInt).toList ++ connected
+//            .getOrElse(List.empty)
+//            .map(_._1.toInt)
+//            .toList
+          val filtered = firstIndexes.filter(lastIndexes.indexOf(_) < 0)
+//          val filteredSC = whoReceivedIndexes.filter(sponsoringAndConnectedIndexes.indexOf(_) < 0)
+          if (filtered.isEmpty /*&& filteredSC.isEmpty*/ ) {
+            1
+          } else {
+//            if (filteredSC.isEmpty) {
+            filtered(0) + 1 // index based on last page missing
+//            } else {
+//              filteredSC(0) + 1 // index based on sponsoring employer or individual connected party
+//            }
+//          }
+          }
+        }
+    }
+
   def getDisposalsTaskListStatusWithLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
     val atLeastOneCompleted =
       userAnswers.get(LandPropertyDisposalCompletedPages(srn)).exists(_.values.exists(_.values.nonEmpty))
