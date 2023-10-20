@@ -24,9 +24,8 @@ import controllers.actions._
 import eu.timepit.refined.refineV
 import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
-import models.{CheckMode, DateRange, Mode, NormalMode}
+import models.{DateRange, Mode}
 import navigation.Navigator
-import pages.nonsipp.BasicDetailsCheckYourAnswersPage
 import pages.nonsipp.accountingperiod.{AccountingPeriodListPage, AccountingPeriods}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}

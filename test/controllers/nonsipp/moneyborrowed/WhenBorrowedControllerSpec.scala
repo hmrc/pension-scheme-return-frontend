@@ -18,17 +18,17 @@ package controllers.nonsipp.moneyborrowed
 
 import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
+import controllers.nonsipp.moneyborrowed.WhenBorrowedController._
 import eu.timepit.refined.refineMV
 import forms.DatePageFormProvider
-import models.{Money, NormalMode, Percentage, UserAnswers}
+import models.{NormalMode, UserAnswers}
+import pages.nonsipp.moneyborrowed.{BorrowedAmountAndRatePage, LenderNamePage, WhenBorrowedPage}
 import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
 import services.SchemeDateService
 import views.html.DatePageView
 
 import java.time.LocalDate
-import pages.nonsipp.moneyborrowed.{BorrowedAmountAndRatePage, LenderNamePage, WhenBorrowedPage}
-import controllers.nonsipp.moneyborrowed.WhenBorrowedController._
 
 class WhenBorrowedControllerSpec extends ControllerBaseSpec {
 

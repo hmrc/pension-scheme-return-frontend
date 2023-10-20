@@ -31,17 +31,10 @@ import org.mockito.MockitoSugar.{mock, when}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.{BeforeAndAfterEach, OptionValues}
-import pages.nonsipp.{CheckReturnDatesPage, WhichTaxYearPage}
 import pages.nonsipp.accountingperiod.AccountingPeriods
-import pages.nonsipp.schemedesignatory.{
-  ActiveBankAccountPage,
-  FeesCommissionsWagesSalariesPage,
-  HowManyMembersPage,
-  HowMuchCashPage,
-  ValueOfAssetsPage,
-  WhyNoBankAccountPage
-}
-import play.api.mvc.{AnyContent, AnyContentAsEmpty}
+import pages.nonsipp.schemedesignatory._
+import pages.nonsipp.{CheckReturnDatesPage, WhichTaxYearPage}
+import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import services.SchemeDateService
 import utils.UserAnswersUtils.UserAnswersOps
@@ -59,7 +52,6 @@ class MinimalRequiredSubmissionTransformerSpec
   val allowedAccessRequest
     : AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(FakeRequest()).sample.value
   implicit val request: DataRequest[AnyContentAsEmpty.type] = DataRequest(allowedAccessRequest, defaultUserAnswers)
-  private val mockReq = mock[DataRequest[AnyContent]]
 
   private val mockSchemeDateService = mock[SchemeDateService]
 

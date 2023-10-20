@@ -9,7 +9,7 @@ import models.SchemeId.Srn
 import models.Money
 import pages.QuestionPage
 $if(!index.empty)$
-import config.Refined.$index$
+import config.Refined._
 import utils.RefinedUtils._
 import eu.timepit.refined.refineMV
 $endif$

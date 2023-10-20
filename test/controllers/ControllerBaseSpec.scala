@@ -26,7 +26,7 @@ import models.UserAnswers.SensitiveJsObject
 import models.{NameDOB, _}
 import org.scalatest.OptionValues
 import pages.nonsipp.landorproperty.LandOrPropertyAddressLookupPage
-import pages.nonsipp.moneyborrowed.{BorrowedAmountAndRatePage, LenderNamePage}
+import pages.nonsipp.moneyborrowed.LenderNamePage
 import play.api.Application
 import play.api.data.Form
 import play.api.http._
@@ -121,6 +121,7 @@ trait TestValues {
   val crn: Crn = crnGen.sample.get
   val noCrnReason: String = "no crn reason"
   val recipientName = "testRecipientName"
+  val employerName = "testEmployerName"
   val individualRecipientName = "individual " + recipientName
   val companyRecipientName = "company " + recipientName
   val partnershipRecipientName = "partnership " + recipientName

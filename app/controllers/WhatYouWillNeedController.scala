@@ -17,8 +17,8 @@
 package controllers
 
 import controllers.actions._
-import models.{CheckMode, NormalMode}
 import models.SchemeId.Srn
+import models.{CheckMode, NormalMode}
 import navigation.Navigator
 import pages.WhatYouWillNeedPage
 import pages.nonsipp.schemedesignatory.HowManyMembersPage
@@ -57,7 +57,6 @@ class WhatYouWillNeedController @Inject()(
     identify.andThen(allowAccess(srn)).andThen(getData).andThen(createData).async { implicit request =>
       for {
         updatedUserAnswers <- psrRetrievalService.getStandardPsrDetails(
-          request,
           None,
           Some("2023-04-06"), // TODO determine the tax year start based on the routing from the dashboard and/or GET report overview or GET report versions API calls
           Some("001")

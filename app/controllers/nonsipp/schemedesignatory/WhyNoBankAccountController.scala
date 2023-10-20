@@ -19,10 +19,9 @@ package controllers.nonsipp.schemedesignatory
 import controllers.actions._
 import controllers.nonsipp.schemedesignatory.WhyNoBankAccountController._
 import forms.TextFormProvider
-import models.{CheckMode, Mode, NormalMode}
+import models.Mode
 import models.SchemeId.Srn
 import navigation.Navigator
-import pages.nonsipp.BasicDetailsCheckYourAnswersPage
 import pages.nonsipp.schemedesignatory.WhyNoBankAccountPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}

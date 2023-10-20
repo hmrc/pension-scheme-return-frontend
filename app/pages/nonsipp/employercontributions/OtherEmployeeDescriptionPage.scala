@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.landorpropertydisposal
+package pages.nonsipp.employercontributions
 
-import config.Refined.{Max50, Max5000}
+import config.Refined._
+import utils.RefinedUtils._
+
+import play.api.libs.json.JsPath
 import models.SchemeId.Srn
 import pages.QuestionPage
-import play.api.libs.json.JsPath
-import utils.RefinedUtils.RefinedIntOps
 
-case class DisposalIndependentValuationPage(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50)
-    extends QuestionPage[Boolean] {
+case class OtherEmployeeDescriptionPage(srn: Srn, index: Max300, secondaryIndex: Max50) extends QuestionPage[String] {
 
-  override def path: JsPath =
-    Paths.disposalPropertyTransaction \ toString \ landOrPropertyIndex.arrayIndex.toString \ disposalIndex.arrayIndex.toString
+  override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString \ secondaryIndex.arrayIndex.toString
 
-  override def toString: String = "indepValuationSupport"
+  override def toString: String = "otherEmployeeDescription"
 }
