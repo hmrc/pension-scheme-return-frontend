@@ -57,7 +57,7 @@ class LandOrPropertyListController @Inject()(
       val viewModel = LandOrPropertyListController.viewModel(srn, mode, addresses)
       Ok(view(form, viewModel))
     } else {
-      Redirect(controllers.nonsipp.routes.CheckReturnDatesController.onPageLoad(srn, mode))
+      Redirect(controllers.nonsipp.landorproperty.routes.LandOrPropertyHeldController.onPageLoad(srn, mode))
     }
   }
 
