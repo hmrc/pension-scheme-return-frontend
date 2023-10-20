@@ -14,14 +14,9 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages.nonsipp.moneyborrowed
 
-import play.api.libs.json._
+import models.SchemeId.Srn
+import pages.Page
 
-package object moneyborrowed {
-  object Paths {
-    val assets: JsPath = __ \ "assets"
-    val borrowing: JsPath = assets \ "borrowing"
-    val moneyBorrowed: JsPath = borrowing \ "moneyBorrowed"
-  }
-}
+case class BorrowInstancesListPage(srn: Srn, addBorrow: Boolean) extends Page

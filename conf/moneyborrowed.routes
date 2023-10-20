@@ -42,4 +42,9 @@ GET         /:srn/check-answers-money-borrowed/:index                         co
 POST        /:srn/submit-check-answers-money-borrowed                         controllers.nonsipp.moneyborrowed.MoneyBorrowedCYAController.onSubmit(srn: Srn, checkOrChange: CheckOrChange = Check)
 GET         /:srn/change-check-answers-money-borrowed                         controllers.nonsipp.moneyborrowed.MoneyBorrowedCYAController.onPageLoad(srn: Srn, index: Max5000 = 1, checkOrChange: CheckOrChange = Change)
 GET         /:srn/change-check-answers-money-borrowed/:index                  controllers.nonsipp.moneyborrowed.MoneyBorrowedCYAController.onPageLoad(srn: Srn, index: Max5000, checkOrChange: CheckOrChange = Change)
-POST        /:srn/change-submit-check-answers-money-borrowed                 controllers.nonsipp.moneyborrowed.MoneyBorrowedCYAController.onSubmit(srn: Srn, checkOrChange: CheckOrChange = Change)
+POST        /:srn/change-submit-check-answers-money-borrowed                  controllers.nonsipp.moneyborrowed.MoneyBorrowedCYAController.onSubmit(srn: Srn, checkOrChange: CheckOrChange = Change)
+
+GET        /:srn/instances-of-borrowing                                       controllers.nonsipp.moneyborrowed.BorrowInstancesListController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST       /:srn/instances-of-borrowing                                       controllers.nonsipp.moneyborrowed.BorrowInstancesListController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/change-instances-of-borrowing                                controllers.nonsipp.moneyborrowed.BorrowInstancesListController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST       /:srn/change-instances-of-borrowing                                controllers.nonsipp.moneyborrowed.BorrowInstancesListController.onSubmit(srn: Srn, mode: Mode = CheckMode)
