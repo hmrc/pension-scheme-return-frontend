@@ -24,8 +24,16 @@ import eu.timepit.refined.refineV
 import forms.YesNoPageFormProvider
 import models.{CheckOrChange, Mode, Money, Percentage}
 import models.SchemeId.Srn
-import pages.nonsipp.moneyborrowed.{BorrowInstancesListPage, BorrowedAmountAndRatePages, MoneyBorrowedCYAPage}
+import models.requests.DataRequest
+import pages.nonsipp.moneyborrowed.{
+  BorrowInstancesListPage,
+  BorrowedAmountAndRatePages,
+  LenderNamePage,
+  LenderNamePages,
+  MoneyBorrowedCYAPage
+}
 import navigation.Navigator
+import navigation.nonsipp.BankAccountNavigator.OptionOps
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -51,10 +59,11 @@ class BorrowInstancesListController @Inject()(
   val form = BorrowInstancesListController.form(formProvider)
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    val addresses = request.userAnswers.map(BorrowedAmountAndRatePages(srn))
+    val borrows = request.userAnswers.map(BorrowedAmountAndRatePages(srn))
+    val lenderName = request.userAnswers.map(LenderNamePages(srn))
 
-    if (addresses.nonEmpty) {
-      val viewModel = BorrowInstancesListController.viewModel(srn, mode, addresses)
+    if (borrows.nonEmpty) {
+      val viewModel = BorrowInstancesListController.viewModel(srn, mode, borrows, lenderName)
       Ok(view(form, viewModel))
     } else {
       Redirect(controllers.nonsipp.routes.CheckReturnDatesController.onPageLoad(srn, mode))
@@ -62,12 +71,13 @@ class BorrowInstancesListController @Inject()(
   }
 
   def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    val addresses = request.userAnswers.map(BorrowedAmountAndRatePages(srn))
+    val borrows = request.userAnswers.map(BorrowedAmountAndRatePages(srn))
+    val lenderName = request.userAnswers.map(LenderNamePages(srn))
 
-    if (addresses.size == maxBorrows) {
+    if (borrows.size == maxBorrows) {
       Redirect(navigator.nextPage(BorrowInstancesListPage(srn, addBorrow = false), mode, request.userAnswers))
     } else {
-      val viewModel = BorrowInstancesListController.viewModel(srn, mode, addresses)
+      val viewModel = BorrowInstancesListController.viewModel(srn, mode, borrows, lenderName)
 
       form
         .bindFromRequest()
@@ -85,10 +95,21 @@ class BorrowInstancesListController @Inject()(
 object BorrowInstancesListController {
   def form(formProvider: YesNoPageFormProvider): Form[Boolean] =
     formProvider(
-      "landOrPropertyList.radios.error.required"
+      "borrowList.radios.error.required"
     )
 
-  private def rows(srn: Srn, mode: Mode, borrow: Map[String, (Money, Percentage)]): List[ListRow] =
+  private def rows(
+    srn: Srn,
+    mode: Mode,
+    borrow: Map[String, (Money, Percentage)],
+    lenderName: Map[String, String]
+  ): List[ListRow] = {
+    val bho = lenderName.map {
+      case (index, name) =>
+        refineV[Max5000.Refined](index.toInt + 1).fold(_ => Nil, index => {
+          name
+        })
+    }.toList
     borrow.flatMap {
       case (index, amount) =>
         refineV[Max5000.Refined](index.toInt + 1).fold(
@@ -96,32 +117,39 @@ object BorrowInstancesListController {
           index =>
             List(
               ListRow(
-                amount._1.displayAs,
+                Message("borrowList.row.change.hidden", amount._1.displayAs, bho(index.value - 1).toString),
                 changeUrl = controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController
                   .onPageLoad(srn, index, CheckOrChange.Check)
                   .url,
-                changeHiddenText = Message("landOrPropertyList.row.change.hiddenText", amount._1.displayAs),
+                changeHiddenText = Message("borrowList.row.change.hidden", amount._1.displayAs),
                 controllers.routes.UnauthorisedController.onPageLoad().url, //TODO change with remove controller
-                Message("landOrPropertyList.row.remove.hiddenText")
+                Message("borrowList.row.remove.hiddenText")
               )
             )
         )
     }.toList
 
-  def viewModel(srn: Srn, mode: Mode, addresses: Map[String, (Money, Percentage)]): FormPageViewModel[ListViewModel] = {
+  }
 
-    val title = if (addresses.size == 1) "landOrPropertyList.title" else "landOrPropertyList.title.plural"
-    val heading = if (addresses.size == 1) "landOrPropertyList.heading" else "landOrPropertyList.heading.plural"
+  def viewModel(
+    srn: Srn,
+    mode: Mode,
+    borrows: Map[String, (Money, Percentage)],
+    lenderName: Map[String, String]
+  ): FormPageViewModel[ListViewModel] = {
+
+    val title = if (borrows.size == 1) "borrowList.title" else "borrowList.title.plural"
+    val heading = if (borrows.size == 1) "borrowList.heading" else "borrowList.heading.plural"
 
     FormPageViewModel(
-      Message(title, addresses.size),
-      Message(heading, addresses.size),
-      ParagraphMessage("landOrPropertyList.paragraph"),
+      Message(title, borrows.size),
+      Message(heading, borrows.size),
+      ParagraphMessage("borrowList.description"),
       ListViewModel(
-        inset = "landOrPropertyList.inset",
-        rows(srn, mode, addresses),
-        Message("landOrPropertyList.radios"),
-        showRadios = addresses.size < 25,
+        inset = "borrowList.inset",
+        rows(srn, mode, borrows, lenderName),
+        Message("borrowList.radios"),
+        showRadios = borrows.size < 25,
         paginatedViewModel = None
       ),
       controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController.onSubmit(srn, mode)
