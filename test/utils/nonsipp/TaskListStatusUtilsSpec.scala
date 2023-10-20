@@ -16,9 +16,10 @@
 
 package utils.nonsipp
 
+import config.Refined.Max5000
 import controllers.TestValues
 import eu.timepit.refined.refineMV
-import models.{ConditionalYesNo, IdentitySubject, IdentityType, Money, SchemeHoldLandProperty}
+import models.{ConditionalYesNo, IdentitySubject, IdentityType, Money, NormalMode, SchemeHoldLandProperty}
 import org.scalatest.OptionValues
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
@@ -128,26 +129,34 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
   }
 
   "Land or property status" - {
+    val heldPageUrl =
+      controllers.nonsipp.landorproperty.routes.LandOrPropertyHeldController.onPageLoad(srn, NormalMode).url
+    val listPageUrl =
+      controllers.nonsipp.landorproperty.routes.LandOrPropertyListController.onPageLoad(srn, NormalMode).url
+
+    def inUkPageUrl(index: Max5000) =
+      controllers.nonsipp.landorproperty.routes.LandPropertyInUKController.onPageLoad(srn, index, NormalMode).url
+
     "should be Not Started" - {
       "when default data" in {
-        val result = TaskListStatusUtils.getLandOrPropertyTaskListStatus(defaultUserAnswers, srn)
-        result mustBe NotStarted
+        val result = TaskListStatusUtils.getLandOrPropertyTaskListStatusAndLink(defaultUserAnswers, srn)
+        result mustBe (NotStarted, heldPageUrl)
       }
     }
     "should be InProgress" - {
       "when only landOrPropertyHeldPage true is present" in {
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(LandOrPropertyHeldPage(srn), true)
-        val result = TaskListStatusUtils.getLandOrPropertyTaskListStatus(customUserAnswers, srn)
-        result mustBe InProgress
+        val result = TaskListStatusUtils.getLandOrPropertyTaskListStatusAndLink(customUserAnswers, srn)
+        result mustBe (InProgress, inUkPageUrl(refineMV(1)))
       }
       "when landOrPropertyHeldPage true and first page is present" in {
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(LandOrPropertyHeldPage(srn), true)
           .unsafeSet(LandPropertyInUKPages(srn), Map("0" -> true))
 
-        val result = TaskListStatusUtils.getLandOrPropertyTaskListStatus(customUserAnswers, srn)
-        result mustBe InProgress
+        val result = TaskListStatusUtils.getLandOrPropertyTaskListStatusAndLink(customUserAnswers, srn)
+        result mustBe (InProgress, inUkPageUrl(refineMV(1)))
       }
       "when andOrPropertyHeldPage true and more first pages than last pages is present" in {
         val customUserAnswers = defaultUserAnswers
@@ -156,8 +165,8 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           .unsafeSet(LandOrPropertyTotalIncomePage(srn, refineMV(1)), money)
           .unsafeSet(LandPropertyInUKPage(srn, refineMV(2)), true)
 
-        val result = TaskListStatusUtils.getLandOrPropertyTaskListStatus(customUserAnswers, srn)
-        result mustBe InProgress
+        val result = TaskListStatusUtils.getLandOrPropertyTaskListStatusAndLink(customUserAnswers, srn)
+        result mustBe (InProgress, inUkPageUrl(refineMV(1)))
       }
       "when landOrPropertyHeldPage true and there is a missing lessee connected party page" in {
         val customUserAnswers = defaultUserAnswers
@@ -169,8 +178,8 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           .unsafeSet(IsLesseeConnectedPartyPage(srn, refineMV(2)), true)
           .unsafeSet(LandOrPropertyTotalIncomePage(srn, refineMV(2)), money)
 
-        val result = TaskListStatusUtils.getLandOrPropertyTaskListStatus(customUserAnswers, srn)
-        result mustBe InProgress
+        val result = TaskListStatusUtils.getLandOrPropertyTaskListStatusAndLink(customUserAnswers, srn)
+        result mustBe (InProgress, inUkPageUrl(refineMV(1)))
       }
 
       "when landOrPropertyHeldPage true and there is a missing independent valuation page" in {
@@ -187,26 +196,8 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           .unsafeSet(IsLesseeConnectedPartyPage(srn, refineMV(2)), true)
           .unsafeSet(LandOrPropertyTotalIncomePage(srn, refineMV(2)), money)
 
-        val result = TaskListStatusUtils.getLandOrPropertyTaskListStatus(customUserAnswers, srn)
-        result mustBe InProgress
-      }
-
-      "when landOrPropertyHeldPage true and there is a missing independent valuation page" in {
-        val customUserAnswers = defaultUserAnswers
-          .unsafeSet(LandOrPropertyHeldPage(srn), true)
-          .unsafeSet(LandPropertyInUKPage(srn, refineMV(1)), true)
-          .unsafeSet(WhyDoesSchemeHoldLandPropertyPage(srn, refineMV(1)), SchemeHoldLandProperty.Transfer)
-          // indep valuation data is missing
-          .unsafeSet(IsLesseeConnectedPartyPage(srn, refineMV(1)), true)
-          .unsafeSet(LandOrPropertyTotalIncomePage(srn, refineMV(1)), money)
-          .unsafeSet(LandPropertyInUKPage(srn, refineMV(2)), true)
-          .unsafeSet(WhyDoesSchemeHoldLandPropertyPage(srn, refineMV(2)), SchemeHoldLandProperty.Transfer)
-          .unsafeSet(LandPropertyIndependentValuationPage(srn, refineMV(2)), true)
-          .unsafeSet(IsLesseeConnectedPartyPage(srn, refineMV(2)), true)
-          .unsafeSet(LandOrPropertyTotalIncomePage(srn, refineMV(2)), money)
-
-        val result = TaskListStatusUtils.getLandOrPropertyTaskListStatus(customUserAnswers, srn)
-        result mustBe InProgress
+        val result = TaskListStatusUtils.getLandOrPropertyTaskListStatusAndLink(customUserAnswers, srn)
+        result mustBe (InProgress, inUkPageUrl(refineMV(1)))
       }
 
     }
@@ -214,8 +205,8 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
       "when only landOrPropertyHeldPage false is present" in {
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(LandOrPropertyHeldPage(srn), false)
-        val result = TaskListStatusUtils.getLandOrPropertyTaskListStatus(customUserAnswers, srn)
-        result mustBe Completed
+        val result = TaskListStatusUtils.getLandOrPropertyTaskListStatusAndLink(customUserAnswers, srn)
+        result mustBe (Completed, listPageUrl)
       }
       "when landOrPropertyHeldPage true and equal number of first pages and last pages and intermediate sub journey last pages are present" in {
         val customUserAnswers = defaultUserAnswers
@@ -227,8 +218,8 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           .unsafeSet(IsLesseeConnectedPartyPage(srn, refineMV(2)), false)
           .unsafeSet(LandOrPropertyTotalIncomePage(srn, refineMV(2)), money)
 
-        val result = TaskListStatusUtils.getLandOrPropertyTaskListStatus(customUserAnswers, srn)
-        result mustBe Completed
+        val result = TaskListStatusUtils.getLandOrPropertyTaskListStatusAndLink(customUserAnswers, srn)
+        result mustBe (Completed, listPageUrl)
       }
 
       "when landOrPropertyHeldPage true and equal number of first pages and last pages and intermediate sub journey last + first pages are present" in {
@@ -241,8 +232,8 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           .unsafeSet(IsLesseeConnectedPartyPage(srn, refineMV(2)), false)
           .unsafeSet(LandOrPropertyTotalIncomePage(srn, refineMV(2)), money)
 
-        val result = TaskListStatusUtils.getLandOrPropertyTaskListStatus(customUserAnswers, srn)
-        result mustBe Completed
+        val result = TaskListStatusUtils.getLandOrPropertyTaskListStatusAndLink(customUserAnswers, srn)
+        result mustBe (Completed, listPageUrl)
       }
 
     }

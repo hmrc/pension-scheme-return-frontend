@@ -16,18 +16,18 @@
 
 package utils.nonsipp
 
+import config.Refined.Max5000
+import eu.timepit.refined.refineMV
 import models.ConditionalYesNo._
 import models.SchemeId.Srn
 import models.{IdentitySubject, NormalMode, PensionSchemeId, SchemeHoldLandProperty, UserAnswers}
 import pages.nonsipp.common.IdentityTypes
-
 import pages.nonsipp.loansmadeoroutstanding.{
   IsIndividualRecipientConnectedPartyPages,
   LoansMadeOrOutstandingPage,
   OutstandingArrearsOnLoanPages,
   RecipientSponsoringEmployerConnectedPartyPages
 }
-
 import pages.nonsipp.landorproperty.{
   IsLandPropertyLeasedPages,
   IsLesseeConnectedPartyPages,
@@ -124,7 +124,14 @@ object TaskListStatusUtils {
     }
   }
 
-  def getLandOrPropertyTaskListStatus(userAnswers: UserAnswers, srn: Srn) = {
+  def getLandOrPropertyTaskListStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
+    val heldPageUrl =
+      controllers.nonsipp.landorproperty.routes.LandOrPropertyHeldController.onPageLoad(srn, NormalMode).url
+    val listPageUrl =
+      controllers.nonsipp.landorproperty.routes.LandOrPropertyListController.onPageLoad(srn, NormalMode).url
+    def inUkPageUrl(index: Max5000) =
+      controllers.nonsipp.landorproperty.routes.LandPropertyInUKController.onPageLoad(srn, index, NormalMode).url
+
     val landOrPropertyHeldPage = userAnswers.get(LandOrPropertyHeldPage(srn))
     val firstPages = userAnswers.get(LandPropertyInUKPages(srn))
     val lastPages = userAnswers.get(LandOrPropertyTotalIncomePages(srn))
@@ -141,7 +148,7 @@ object TaskListStatusUtils {
       whyDoesSchemeHoldLandPropertyPages,
       landPropertyIndependentValuationPages
     ) match {
-      case (None, _, _, _, _, _, _) => NotStarted
+      case (None, _, _, _, _, _, _) => (NotStarted, heldPageUrl)
       case (
           Some(landOrPropertyHeld),
           firstPage,
@@ -152,7 +159,7 @@ object TaskListStatusUtils {
           indepVal
           ) =>
         if (!landOrPropertyHeld) {
-          Completed
+          (Completed, listPageUrl)
         } else {
           val countFirstPages = firstPage.getOrElse(List.empty).size
           val countLastPages = lastPages.getOrElse(List.empty).size
@@ -162,15 +169,15 @@ object TaskListStatusUtils {
             whyHeld.getOrElse(List.empty).filter(b => b._2 != SchemeHoldLandProperty.Transfer).size
           val countIndepValPages = indepVal.getOrElse(List.empty).size
           if (countFirstPages + countLastPages == 0) {
-            InProgress
+            (InProgress, inUkPageUrl(refineMV(1)))
           } else if (countFirstPages > countLastPages) {
-            InProgress
+            (InProgress, inUkPageUrl(refineMV(1)))
           } else {
             if ((countLastLesseeSubjourney + countFirstLesseeSubjourney) != countLastPages ||
               countAcquisitionContributionSubJourney != countIndepValPages) {
-              InProgress
+              (InProgress, inUkPageUrl(refineMV(1)))
             } else {
-              Completed
+              (Completed, listPageUrl)
             }
           }
         }
