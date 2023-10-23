@@ -16,7 +16,8 @@
 
 package navigation.nonsipp
 
-import eu.timepit.refined.refineMV
+import config.Refined.Max5000
+import eu.timepit.refined.{refineMV, refineV}
 import models.{CheckOrChange, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
@@ -56,7 +57,20 @@ object MoneyBorrowedNavigator extends JourneyNavigator {
       controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController.onPageLoad(srn, index, CheckOrChange.Check)
 
     case MoneyBorrowedCYAPage(srn) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+      controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController.onPageLoad(srn, page = 1, NormalMode)
+
+    case BorrowInstancesListPage(srn, addBorrow) =>
+      if (addBorrow) {
+        val answers = userAnswers.map(BorrowedAmountAndRatePages(srn))
+        val nextDataKey = if (answers.isEmpty) 1 else answers.maxBy(_._1)._1.toIntOption.orElse(Some(0)).get + 1
+        refineV[Max5000.Refined](nextDataKey + 1).fold(
+          err => controllers.routes.JourneyRecoveryController.onPageLoad(),
+          nextIndex =>
+            controllers.nonsipp.moneyborrowed.routes.LenderNameController.onPageLoad(srn, nextIndex, NormalMode)
+        )
+      } else {
+        controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
+      }
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => {
