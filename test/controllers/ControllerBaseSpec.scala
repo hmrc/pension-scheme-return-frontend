@@ -134,7 +134,6 @@ trait TestValues {
   val buyersName = "testBuyersName"
   val lenderName = "testLenderName"
   val amountBorrowed: (Money, Percentage) = (money, percentage)
-  val employerName = "testEmployerName"
 
   val address: Address = Address(
     "testAddressLine1",

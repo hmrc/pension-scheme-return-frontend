@@ -30,8 +30,6 @@ object EmployerContributionsNavigator extends JourneyNavigator {
     case OtherEmployeeDescriptionPage(srn, index, secondaryIndex) =>
       controllers.routes.UnauthorisedController.onPageLoad()
 
-    case EmployerNamePage(srn, memberIndex, index) => controllers.routes.UnauthorisedController.onPageLoad()
-
     case page @ EmployerContributionsPage(srn) =>
       if (userAnswers.get(page).contains(true)) {
         controllers.nonsipp.memberpayments.routes.UnallocatedEmployerContributionsController
@@ -54,7 +52,8 @@ object EmployerContributionsNavigator extends JourneyNavigator {
           controllers.routes.UnauthorisedController.onPageLoad()
 
         case Some(IdentityType.Other) =>
-          controllers.routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.employercontributions.routes.OtherEmployeeDescriptionController
+            .onPageLoad(srn, memberIndex, index, NormalMode)
       }
   }
 

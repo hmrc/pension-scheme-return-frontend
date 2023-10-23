@@ -16,7 +16,7 @@
 
 package navigation.nonsipp
 
-import config.Refined.{indexWrites, Max300, Max50, Max5000}
+import config.Refined.{Max300, Max50}
 import eu.timepit.refined.refineMV
 import models.{IdentityType, NormalMode}
 import navigation.{Navigator, NavigatorBehaviours}
@@ -63,21 +63,20 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
           index,
           secondaryIndex,
           EmployerNamePage,
-          (srn, memberIndex: Max300, index: Max50, _) =>
+          (srn, index: Max300, secondaryIndex: Max50, _) =>
             controllers.nonsipp.employercontributions.routes.EmployerTypeOfBusinessController
-              .onPageLoad(srn, memberIndex, index, NormalMode)
+              .onPageLoad(srn, index, secondaryIndex, NormalMode)
         )
-        .withName("go from EmployerNamePage to ??? page")
+        .withName("go from employer name page to employer type of business page")
     )
   }
-
 
   "EmployerTypeOfBusinessPage" - {
     act.like(
       normalmode
         .navigateToWithDoubleDataAndIndex(
-          memberIndex,
           index,
+          secondaryIndex,
           EmployerTypeOfBusinessPage,
           Gen.const(IdentityType.UKCompany),
           (srn, memberIndex: Max300, index: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
@@ -88,8 +87,8 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
     act.like(
       normalmode
         .navigateToWithDoubleDataAndIndex(
-          memberIndex,
           index,
+          secondaryIndex,
           EmployerTypeOfBusinessPage,
           Gen.const(IdentityType.UKPartnership),
           (srn, memberIndex: Max300, index: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
@@ -100,15 +99,17 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
     act.like(
       normalmode
         .navigateToWithDoubleDataAndIndex(
-          memberIndex,
           index,
+          secondaryIndex,
           EmployerTypeOfBusinessPage,
           Gen.const(IdentityType.Other),
-          (srn, memberIndex: Max300, index: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          (srn, memberIndex: Max300, index: Max50, _) =>
+            controllers.nonsipp.employercontributions.routes.OtherEmployeeDescriptionController
+              .onPageLoad(srn, memberIndex, index, NormalMode)
         )
         .withName("go from employer type of business page to unauthorised controller page")
     )
-
+  }
 
   "OtherEmployeeDescriptionPage" - {
     act.like(
