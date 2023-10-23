@@ -71,6 +71,14 @@ object MoneyBorrowedNavigator extends JourneyNavigator {
       } else {
         controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
       }
+
+    case RemoveBorrowInstancesPage(srn, _) =>
+      if (userAnswers.map(LenderNamePages(srn)).isEmpty) {
+        controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedController.onPageLoad(srn, NormalMode)
+      } else {
+        controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController
+          .onPageLoad(srn = srn, page = 1, mode = NormalMode)
+      }
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => {

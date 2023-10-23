@@ -1476,3 +1476,7 @@ otherEmployeeDescription.heading = Provide a brief description of {0}
 otherEmployeeDescription.error.required = Provide a brief description of the employer
 otherEmployeeDescription.error.length = The brief description of the employer must be 160 characters or fewer
 otherEmployeeDescription.error.invalid = The brief description of employer must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+
+removeBorrowInstances.title = Are you sure you want to remove {0} borrowed from {1}?
+removeBorrowInstances.heading = Are you sure you want to remove {0} borrowed from {1}?
+removeBorrowInstances.error.required = Select yes if you are sure you want to remove this instance of borrowing
