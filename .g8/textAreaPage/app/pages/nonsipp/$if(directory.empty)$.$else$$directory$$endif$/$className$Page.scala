@@ -31,16 +31,14 @@ import models.SchemeId.Srn
 import pages.QuestionPage
 $! Generic end !$
 
-import models.Money
-
 $! Generic (change QuestionPage type) !$
 $if(index.empty)$
-case class $className;format="cap"$Page(srn: Srn) extends QuestionPage[Money] {
+case class $className;format="cap"$Page(srn: Srn) extends QuestionPage[String] {
 $else$
 $if(secondaryIndex.empty)$
-case class $className;format="cap"$Page(srn: Srn, index: $index$) extends QuestionPage[Money] {
+case class $className;format="cap"$Page(srn: Srn, index: $index$) extends QuestionPage[String] {
 $else$
-case class $className;format="cap"$Page(srn: Srn, index: $index$, secondaryIndex: $secondaryIndex$) extends QuestionPage[Money] {
+case class $className;format="cap"$Page(srn: Srn, index: $index$, secondaryIndex: $secondaryIndex$) extends QuestionPage[String] {
 $endif$
 $endif$
 

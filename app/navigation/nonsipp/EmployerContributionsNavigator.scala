@@ -27,13 +27,17 @@ object EmployerContributionsNavigator extends JourneyNavigator {
 
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
 
+    case OtherEmployeeDescriptionPage(srn, index, secondaryIndex) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
+
+    case EmployerNamePage(srn, memberIndex, index) => controllers.routes.UnauthorisedController.onPageLoad()
+
     case page @ EmployerContributionsPage(srn) =>
       if (userAnswers.get(page).contains(true)) {
         controllers.nonsipp.memberpayments.routes.UnallocatedEmployerContributionsController
           .onPageLoad(srn, NormalMode)
       } else {
-        controllers.nonsipp.memberpayments.routes.UnallocatedEmployerContributionsController
-          .onPageLoad(srn, NormalMode)
+        controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
       }
 
     case EmployerNamePage(srn, memberIndex, index) =>

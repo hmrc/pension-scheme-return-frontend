@@ -29,8 +29,8 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
 
   val navigator: Navigator = new NonSippNavigator
 
-  private val memberIndex = refineMV[Max300.Refined](1)
-  private val index = refineMV[Max50.Refined](1)
+  private val index = refineMV[Max300.Refined](1)
+  private val secondaryIndex = refineMV[Max50.Refined](1)
 
   "EmployerContributionsNavigator" - {
 
@@ -49,9 +49,9 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
         .navigateToWithData(
           EmployerContributionsPage,
           Gen.const(false),
-          controllers.nonsipp.memberpayments.routes.UnallocatedEmployerContributionsController.onPageLoad
+          (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
         )
-        .withName("go from employer contribution page to unallocated employer contributions page when no selected")
+        .withName("go from employer contribution page to task list page when no selected")
     )
 
   }
@@ -60,8 +60,8 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
     act.like(
       normalmode
         .navigateToWithDoubleIndex(
-          memberIndex,
           index,
+          secondaryIndex,
           EmployerNamePage,
           (srn, memberIndex: Max300, index: Max50, _) =>
             controllers.nonsipp.employercontributions.routes.EmployerTypeOfBusinessController
@@ -70,6 +70,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
         .withName("go from EmployerNamePage to ??? page")
     )
   }
+
 
   "EmployerTypeOfBusinessPage" - {
     act.like(
@@ -106,6 +107,19 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
           (srn, memberIndex: Max300, index: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
         )
         .withName("go from employer type of business page to unauthorised controller page")
+    )
+
+
+  "OtherEmployeeDescriptionPage" - {
+    act.like(
+      normalmode
+        .navigateToWithDoubleIndex(
+          index,
+          secondaryIndex,
+          OtherEmployeeDescriptionPage,
+          (srn, index: Max300, secondaryIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+        )
+        .withName("go from OtherEmployeeDescriptionPage to ??? page")
     )
 
   }
