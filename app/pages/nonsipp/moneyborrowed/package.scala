@@ -16,7 +16,7 @@
 
 package pages.nonsipp
 
-import play.api.libs.json.{__, JsPath}
+import play.api.libs.json._
 
 package object moneyborrowed {
   object Paths {
