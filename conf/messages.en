@@ -1466,6 +1466,18 @@ employerTypeOfBusiness.radioList1 = A UK company
 employerTypeOfBusiness.radioList2 = A UK partnership
 employerTypeOfBusiness.radioList3 = Other
 
+borrowList.title = You have added {0} instance of borrowing
+borrowList.title.plural = You have added {0} instances of borrowing
+borrowList.heading = You have added {0} instance of borrowing
+borrowList.heading.plural = You have added {0} instances of borrowing
+borrowList.row = £{0} borrowed from {1}
+borrowList.row.change.hidden = £{0} borrowed from {1}
+borrowList.row.remove.hidden = £{0} borrowed from {1}
+borrowList.description = You must tell us about all times the scheme borrowed money during the period of this return.
+borrowList.radios = Do you need to add another instance of borrowing?
+borrowList.radios.error.required = Select yes if you need to add another instance of borrowing
+borrowList.pagination.label = Showing {0} - {1} of {2} borrows
+
 otherEmployeeDescription.title = Provide a brief description of the employer
 otherEmployeeDescription.heading = Provide a brief description of {0}
 otherEmployeeDescription.error.required = Provide a brief description of the employer
