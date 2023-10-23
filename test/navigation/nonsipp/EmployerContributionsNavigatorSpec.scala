@@ -16,7 +16,7 @@
 
 package navigation.nonsipp
 
-import config.Refined.{Max300, Max50, Max5000}
+import config.Refined.{Max300, Max50}
 import eu.timepit.refined.refineMV
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
