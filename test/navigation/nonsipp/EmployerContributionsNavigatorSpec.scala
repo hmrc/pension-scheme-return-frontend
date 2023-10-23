@@ -16,8 +16,9 @@
 
 package navigation.nonsipp
 
-import config.Refined.{Max300, Max50, Max5000}
+import config.Refined.{indexWrites, Max300, Max50, Max5000}
 import eu.timepit.refined.refineMV
+import models.{IdentityType, NormalMode}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.employercontributions._
@@ -62,9 +63,50 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
           memberIndex,
           index,
           EmployerNamePage,
-          (srn, memberIndex: Max300, index: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          (srn, memberIndex: Max300, index: Max50, _) =>
+            controllers.nonsipp.employercontributions.routes.EmployerTypeOfBusinessController
+              .onPageLoad(srn, memberIndex, index, NormalMode)
         )
         .withName("go from EmployerNamePage to ??? page")
     )
+  }
+
+  "EmployerTypeOfBusinessPage" - {
+    act.like(
+      normalmode
+        .navigateToWithDoubleDataAndIndex(
+          memberIndex,
+          index,
+          EmployerTypeOfBusinessPage,
+          Gen.const(IdentityType.UKCompany),
+          (srn, memberIndex: Max300, index: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+        )
+        .withName("go from employer type of business page to unauthorised")
+    )
+
+    act.like(
+      normalmode
+        .navigateToWithDoubleDataAndIndex(
+          memberIndex,
+          index,
+          EmployerTypeOfBusinessPage,
+          Gen.const(IdentityType.UKPartnership),
+          (srn, memberIndex: Max300, index: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+        )
+        .withName("go from employer type of business page to unauthorised page")
+    )
+
+    act.like(
+      normalmode
+        .navigateToWithDoubleDataAndIndex(
+          memberIndex,
+          index,
+          EmployerTypeOfBusinessPage,
+          Gen.const(IdentityType.Other),
+          (srn, memberIndex: Max300, index: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+        )
+        .withName("go from employer type of business page to unauthorised controller page")
+    )
+
   }
 }

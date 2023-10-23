@@ -17,7 +17,7 @@
 package controllers
 
 import cats.data.NonEmptyList
-import config.Refined.Max5000
+import config.Refined.{Max50, Max5000}
 import controllers.actions._
 import generators.ModelGenerators._
 import models.PensionSchemeId.PsaId
@@ -25,6 +25,7 @@ import models.SchemeId.Srn
 import models.UserAnswers.SensitiveJsObject
 import models.{NameDOB, _}
 import org.scalatest.OptionValues
+import pages.nonsipp.employercontributions.{EmployerNamePage, EmployerTypeOfBusinessPage}
 import pages.nonsipp.landorproperty.LandOrPropertyAddressLookupPage
 import pages.nonsipp.moneyborrowed.LenderNamePage
 import play.api.Application
@@ -132,6 +133,7 @@ trait TestValues {
   val buyersName = "testBuyersName"
   val lenderName = "testLenderName"
   val amountBorrowed: (Money, Percentage) = (money, percentage)
+  val employerName = "testEmployerName"
 
   val address: Address = Address(
     "testAddressLine1",
