@@ -81,7 +81,7 @@ class BorrowingInstancesMongoController @Inject()(
       isLenderConnectedParty = indexes.map(index => IsLenderConnectedPartyPage(srn, index) -> true)
 
       borrowedAmount = indexes.map(
-        index => BorrowedAmountAndRatePage(srn, index) -> (Money(12.00, "12.00"), Percentage(2, "2%"))
+        index => BorrowedAmountAndRatePage(srn, index) -> (Money(12.00, "12.00"), Percentage(2, "2"))
       )
 
       whenBorrowed = indexes.map(
