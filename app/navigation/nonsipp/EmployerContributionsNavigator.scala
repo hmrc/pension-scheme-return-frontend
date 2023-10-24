@@ -17,7 +17,6 @@
 package navigation.nonsipp
 
 import eu.timepit.refined.refineMV
-import models.{NormalMode, UserAnswers}
 import models.{IdentityType, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page

@@ -18,7 +18,6 @@ package navigation.nonsipp
 
 import config.Refined.{Max300, Max50}
 import eu.timepit.refined.refineMV
-import models.NormalMode
 import models.{IdentityType, NormalMode}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
