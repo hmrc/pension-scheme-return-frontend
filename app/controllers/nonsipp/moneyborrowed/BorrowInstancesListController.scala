@@ -19,7 +19,7 @@ package controllers.nonsipp.moneyborrowed
 import cats.implicits._
 import com.google.inject.Inject
 import config.Constants
-import config.Constants.{borrowPageSize, maxBorrows}
+import config.Constants.maxBorrows
 import config.Refined.{Max5000, OneTo5000}
 import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
@@ -30,7 +30,7 @@ import models.SchemeId.Srn
 import models.requests.DataRequest
 import models.{CheckOrChange, Mode, Money, NormalMode, Pagination}
 import navigation.Navigator
-import pages.nonsipp.moneyborrowed.{BorrowInstancesListPage, BorrowedAmountAndRatePage, LenderNamePage, LenderNamePages}
+import pages.nonsipp.moneyborrowed.{BorrowInstancesListPage, BorrowedAmountAndRatePage, LenderNamePages}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
