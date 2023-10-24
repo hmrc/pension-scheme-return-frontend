@@ -14,26 +14,19 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.landorproperty
+package pages.nonsipp.employercontributions
 
-import config.Refined.Max5000
+import config.Refined.{Max300, Max50}
+import models.IdentityType
 import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
 
-case class IsLesseeConnectedPartyPage(srn: Srn, index: Max5000) extends QuestionPage[Boolean] {
+case class EmployerTypeOfBusinessPage(srn: Srn, memberIndex: Max300, index: Max50) extends QuestionPage[IdentityType] {
 
   override def path: JsPath =
-    Paths.heldPropertyTransactions \ "leaseDetails" \ "connectedPartyStatus" \ toString \ index.arrayIndex.toString
+    Paths.memberEmpContribution \ toString \ memberIndex.arrayIndex.toString \ index.arrayIndex.toString
 
-  override def toString: String = "isLesseeConnectedParty"
-}
-
-case class IsLesseeConnectedPartyPages(srn: Srn) extends QuestionPage[Map[String, Boolean]] {
-
-  override def path: JsPath =
-    Paths.heldPropertyTransactions \ "leaseDetails" \ "connectedPartyStatus" \ toString
-
-  override def toString: String = "isLesseeConnectedParty"
+  override def toString: String = "employerTypeOfBusiness"
 }

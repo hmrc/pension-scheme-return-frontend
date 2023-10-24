@@ -18,7 +18,7 @@ package navigation.nonsipp
 
 import config.Refined.Max5000
 import eu.timepit.refined.{refineMV, refineV}
-import models.{CheckOrChange, IdentitySubject, IdentityType, NormalMode, SchemeHoldLandProperty, UserAnswers}
+import models.{CheckMode, CheckOrChange, IdentitySubject, IdentityType, NormalMode, SchemeHoldLandProperty, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.common.{
@@ -104,7 +104,10 @@ object LandOrPropertyNavigator extends JourneyNavigator {
         .onPageLoad(srn, index, NormalMode)
 
     case LandOrPropertyTotalCostPage(srn, index) =>
-      if (userAnswers.get(LandOrPropertyTotalIncomePage(srn, index)).isEmpty) {
+      if (userAnswers.get(LandOrPropertyTotalIncomePage(srn, index)).isEmpty ||
+        (userAnswers.get(IsLandPropertyLeasedPage(srn, index)).getOrElse(false) && userAnswers
+          .get(LandOrPropertyLeaseDetailsPage(srn, index))
+          .isEmpty)) {
         controllers.nonsipp.landorproperty.routes.IsLandOrPropertyResidentialController
           .onPageLoad(srn, index, NormalMode)
       } else {
@@ -158,7 +161,9 @@ object LandOrPropertyNavigator extends JourneyNavigator {
     case LandOrPropertySellerConnectedPartyPage(srn, index) =>
       if (userAnswers.get(LandOrPropertyTotalIncomePage(srn, index)).isEmpty ||
         userAnswers.get(LandPropertyIndependentValuationPage(srn, index)).isEmpty ||
-        userAnswers.get(LandOrPropertyTotalCostPage(srn, index)).isEmpty) {
+        userAnswers.get(LandOrPropertyTotalCostPage(srn, index)).isEmpty ||
+        (userAnswers.get(IsLandPropertyLeasedPage(srn, index)).getOrElse(false) &&
+        userAnswers.get(LandOrPropertyLeaseDetailsPage(srn, index)).isEmpty)) {
         controllers.nonsipp.landorproperty.routes.LandPropertyIndependentValuationController
           .onPageLoad(srn, index, NormalMode)
       } else {
@@ -227,12 +232,28 @@ object LandOrPropertyNavigator extends JourneyNavigator {
       }
 
     case LandOrPropertyTotalCostPage(srn, index) =>
-      controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
-        .onPageLoad(srn, index, CheckOrChange.Check)
+      if (userAnswers.get(LandOrPropertyTotalIncomePage(srn, index)).isEmpty ||
+        (userAnswers.get(IsLandPropertyLeasedPage(srn, index)).getOrElse(false) &&
+        userAnswers.get(LandOrPropertyLeaseDetailsPage(srn, index)).isEmpty)) {
+        controllers.nonsipp.landorproperty.routes.IsLandOrPropertyResidentialController
+          .onPageLoad(srn, index, CheckMode)
+      } else {
+        controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
+          .onPageLoad(srn, index, CheckOrChange.Check)
+      }
 
     case LandOrPropertySellerConnectedPartyPage(srn, index) =>
-      controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
-        .onPageLoad(srn, index, CheckOrChange.Check)
+      if (userAnswers.get(LandOrPropertyTotalIncomePage(srn, index)).isEmpty ||
+        userAnswers.get(LandPropertyIndependentValuationPage(srn, index)).isEmpty ||
+        userAnswers.get(LandOrPropertyTotalCostPage(srn, index)).isEmpty ||
+        (userAnswers.get(IsLandPropertyLeasedPage(srn, index)).getOrElse(false) &&
+        userAnswers.get(LandOrPropertyLeaseDetailsPage(srn, index)).isEmpty)) {
+        controllers.nonsipp.landorproperty.routes.LandPropertyIndependentValuationController
+          .onPageLoad(srn, index, NormalMode)
+      } else {
+        controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
+          .onPageLoad(srn, index, CheckOrChange.Check)
+      }
 
     case LandPropertyIndependentValuationPage(srn, index) =>
       controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController.onPageLoad(srn, index, CheckOrChange.Check)
