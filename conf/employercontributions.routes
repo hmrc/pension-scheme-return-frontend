@@ -2,6 +2,12 @@ GET        /:srn/employer-name/:memberIndex/:index                 controllers.n
 POST       /:srn/employer-name/:memberIndex/:index                 controllers.nonsipp.employercontributions.EmployerNameController.onSubmit(srn: Srn, memberIndex: Max300, index: Max50, mode: Mode = NormalMode)
 GET        /:srn/change-employer-name/:memberIndex/:index          controllers.nonsipp.employercontributions.EmployerNameController.onPageLoad(srn: Srn, memberIndex: Max300, index: Max50, mode: Mode = CheckMode)
 POST       /:srn/change-employer-name/:memberIndex/:index          controllers.nonsipp.employercontributions.EmployerNameController.onSubmit(srn: Srn, memberIndex: Max300, index: Max50, mode: Mode = CheckMode)
+
+GET        /:srn/employer-type-of-business/:memberIndex/:index                 controllers.nonsipp.employercontributions.EmployerTypeOfBusinessController.onPageLoad(srn: Srn, memberIndex: Max300, index: Max50, mode: Mode = NormalMode)
+POST       /:srn/employer-type-of-business/:memberIndex/:index                 controllers.nonsipp.employercontributions.EmployerTypeOfBusinessController.onSubmit(srn: Srn, memberIndex: Max300, index: Max50, mode: Mode = NormalMode)
+GET        /:srn/change-employer-type-of-business/:memberIndex/:index          controllers.nonsipp.employercontributions.EmployerTypeOfBusinessController.onPageLoad(srn: Srn, memberIndex: Max300, index: Max50, mode: Mode = CheckMode)
+POST       /:srn/change-employer-type-of-business/:memberIndex/:index          controllers.nonsipp.employercontributions.EmployerTypeOfBusinessController.onSubmit(srn: Srn, memberIndex: Max300, index: Max50, mode: Mode = CheckMode)
+
 GET        /:srn/other-employer-description/:index/:secondaryIndex                 controllers.nonsipp.employercontributions.OtherEmployeeDescriptionController.onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode = NormalMode)
 POST       /:srn/other-employer-description/:index/:secondaryIndex                 controllers.nonsipp.employercontributions.OtherEmployeeDescriptionController.onSubmit(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode = NormalMode)
 GET        /:srn/change-other-employer-description/:index/:secondaryIndex          controllers.nonsipp.employercontributions.OtherEmployeeDescriptionController.onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode = CheckMode)

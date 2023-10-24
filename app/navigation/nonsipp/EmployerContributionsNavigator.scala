@@ -16,7 +16,7 @@
 
 package navigation.nonsipp
 
-import models.{NormalMode, UserAnswers}
+import models.{IdentityType, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.employercontributions._
@@ -30,14 +30,30 @@ object EmployerContributionsNavigator extends JourneyNavigator {
     case OtherEmployeeDescriptionPage(srn, index, secondaryIndex) =>
       controllers.routes.UnauthorisedController.onPageLoad()
 
-    case EmployerNamePage(srn, memberIndex, index) => controllers.routes.UnauthorisedController.onPageLoad()
-
     case page @ EmployerContributionsPage(srn) =>
       if (userAnswers.get(page).contains(true)) {
         controllers.nonsipp.memberpayments.routes.UnallocatedEmployerContributionsController
           .onPageLoad(srn, NormalMode)
       } else {
         controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
+      }
+
+    case EmployerNamePage(srn, memberIndex, index) =>
+      controllers.nonsipp.employercontributions.routes.EmployerTypeOfBusinessController
+        .onPageLoad(srn, memberIndex, index, NormalMode)
+
+    case EmployerTypeOfBusinessPage(srn, memberIndex, index) =>
+      userAnswers.get(EmployerTypeOfBusinessPage(srn, memberIndex, index)) match {
+
+        case Some(IdentityType.UKCompany) =>
+          controllers.routes.UnauthorisedController.onPageLoad()
+
+        case Some(IdentityType.UKPartnership) =>
+          controllers.routes.UnauthorisedController.onPageLoad()
+
+        case Some(IdentityType.Other) =>
+          controllers.nonsipp.employercontributions.routes.OtherEmployeeDescriptionController
+            .onPageLoad(srn, memberIndex, index, NormalMode)
       }
   }
 
