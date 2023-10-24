@@ -151,12 +151,14 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
           index,
           secondaryIndex,
           PartnershipEmployerUtrPage,
-          (srn, index: Max300, secondaryIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          (srn, index: Max300, secondaryIndex: Max50, _) =>
+            controllers.nonsipp.employercontributions.routes.TotalEmployerContributionController
+              .onPageLoad(srn, index, secondaryIndex, NormalMode)
         )
         .withName("go from partnership employer utr page to unauthorised page")
     )
   }
-  
+
   "TotalEmployerContributionPage" - {
     act.like(
       normalmode
