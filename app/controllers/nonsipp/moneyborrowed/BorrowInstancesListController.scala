@@ -23,19 +23,18 @@ import config.Refined.Max5000
 import controllers.actions.IdentifyAndRequireData
 import eu.timepit.refined.refineV
 import forms.YesNoPageFormProvider
-import models.{CheckOrChange, Mode, Money, NormalMode, Pagination, Percentage}
 import models.SchemeId.Srn
-import pages.nonsipp.moneyborrowed.{BorrowInstancesListPage, BorrowedAmountAndRatePages, LenderNamePages}
+import models.{CheckOrChange, Mode, Money, NormalMode, Pagination, Percentage}
 import navigation.Navigator
+import pages.nonsipp.moneyborrowed.{BorrowInstancesListPage, BorrowedAmountAndRatePages, LenderNamePages}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.DisplayMessage.ParagraphMessage
+import viewmodels.DisplayMessage.{Message, ParagraphMessage}
+import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, ListRow, ListViewModel, PaginatedViewModel}
 import views.html.ListView
-import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
 
 import javax.inject.Named
 
@@ -113,10 +112,12 @@ object BorrowInstancesListController {
               ListRow(
                 Message("borrowList.row.change.hidden", amount._1.displayAs, myLenderName(index.value - 1).toString),
                 changeUrl = controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController
-                  .onPageLoad(srn, index, CheckOrChange.Check)
+                  .onPageLoad(srn, index, CheckOrChange.Change)
                   .url,
                 changeHiddenText = Message("borrowList.row.change.hidden", amount._1.displayAs),
-                controllers.routes.UnauthorisedController.onPageLoad().url, //TODO change with remove controller
+                controllers.nonsipp.moneyborrowed.routes.RemoveBorrowInstancesController
+                  .onPageLoad(srn, index, mode)
+                  .url,
                 Message("borrowList.row.remove.hiddenText")
               )
             )
@@ -136,10 +137,6 @@ object BorrowInstancesListController {
     val title = if (borrows.size == 1) "borrowList.title" else "borrowList.title.plural"
     val heading = if (borrows.size == 1) "borrowList.heading" else "borrowList.heading.plural"
 
-    borrows.map {
-      case (index, _) =>
-        refineV[Max5000.Refined](index.toInt + 1).fold(_ => Nil, index => (index.value - 1).toString)
-    }
     val pagination = Pagination(
       currentPage = page,
       pageSize = Constants.borrowPageSize,

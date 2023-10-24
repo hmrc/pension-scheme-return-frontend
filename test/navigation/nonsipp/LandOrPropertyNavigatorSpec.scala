@@ -133,7 +133,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             (srn, index: Max5000, _) =>
               controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
                 .onPageLoad(srn, index, CheckOrChange.Check),
-            srn => defaultUserAnswers.unsafeSet(LandOrPropertyTotalIncomePage(srn, index), Money(1))
+            srn => defaultUserAnswers.unsafeSet(LandOrPropertyTotalIncomePage(srn, index), money)
           )
           .withName(
             "to is land or property residential page - when there is total value"
@@ -262,6 +262,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
                 .unsafeSet(LandOrPropertyTotalCostPage(srn, index), Money(1))
                 .unsafeSet(LandPropertyIndependentValuationPage(srn, index), true)
                 .unsafeSet(LandOrPropertyTotalIncomePage(srn, index), Money(1))
+                .unsafeSet(IsLandPropertyLeasedPage(srn, index), false)
           )
           .withName(
             "to CYA page - when all dependent data exist"
@@ -622,9 +623,28 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             Gen.const(money),
             (srn, _) =>
               controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
-                .onPageLoad(srn, index, CheckOrChange.Check)
+                .onPageLoad(srn, index, CheckOrChange.Check),
+            srn =>
+              defaultUserAnswers
+                .unsafeSet(IsLandPropertyLeasedPage(srn, index), false)
+                .unsafeSet(LandOrPropertyTotalIncomePage(srn, index), money)
           )
           .withName("go from land or property total cost page to Land or property CYA page")
+      )
+      act.like(
+        checkmode
+          .navigateToWithData(
+            LandOrPropertyTotalCostPage(_, index),
+            Gen.const(money),
+            (srn, _) =>
+              controllers.nonsipp.landorproperty.routes.IsLandOrPropertyResidentialController
+                .onPageLoad(srn, index, CheckMode),
+            srn =>
+              defaultUserAnswers
+                .unsafeSet(IsLandPropertyLeasedPage(srn, index), true)
+                .unsafeSet(LandOrPropertyTotalIncomePage(srn, index), money)
+          )
+          .withName("go from land or property total cost page to next page in the journey")
       )
     }
 
@@ -636,7 +656,13 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             Gen.const(true),
             (srn, _) =>
               controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
-                .onPageLoad(srn, index, CheckOrChange.Check)
+                .onPageLoad(srn, index, CheckOrChange.Check),
+            srn =>
+              defaultUserAnswers
+                .unsafeSet(LandOrPropertyTotalCostPage(srn, index), Money(1))
+                .unsafeSet(LandPropertyIndependentValuationPage(srn, index), true)
+                .unsafeSet(LandOrPropertyTotalIncomePage(srn, index), Money(1))
+                .unsafeSet(IsLandPropertyLeasedPage(srn, index), false)
           )
           .withName(
             "go from land or property is seller a connected party page to is land or property independent valuation page"

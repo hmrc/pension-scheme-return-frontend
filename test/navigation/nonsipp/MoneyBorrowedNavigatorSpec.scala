@@ -19,11 +19,13 @@ package navigation.nonsipp
 import config.Refined.{Max5000, OneTo5000}
 import eu.timepit.refined.refineMV
 import models.CheckOrChange.Check
-import models.{CheckOrChange, NormalMode}
+import models.SchemeId.Srn
+import models.{CheckOrChange, NormalMode, UserAnswers}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.moneyborrowed._
 import utils.BaseSpec
+import utils.UserAnswersUtils.UserAnswersOps
 
 class MoneyBorrowedNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
@@ -129,6 +131,32 @@ class MoneyBorrowedNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               .onPageLoad(srn, index, CheckOrChange.Check)
         )
         .withName("go from why scheme borrowed amount page to money borrowed CYA page")
+    )
+  }
+
+  "RemoveBorrowInstancesPage" - {
+    act.like(
+      normalmode
+        .navigateTo(
+          srn => RemoveBorrowInstancesPage(srn, refineMV(1)),
+          (srn, _) => controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedController.onPageLoad(srn, NormalMode)
+        )
+        .withName("go from remove page to Money Borrowed page")
+    )
+
+    val completedLoanUserAnswers: Srn => UserAnswers =
+      srn => defaultUserAnswers.unsafeSet(LenderNamePage(srn, index), "LenderName")
+
+    act.like(
+      normalmode
+        .navigateTo(
+          srn => RemoveBorrowInstancesPage(srn, refineMV(1)),
+          (srn, _) =>
+            controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController
+              .onPageLoad(srn = srn, page = 1, mode = NormalMode),
+          completedLoanUserAnswers
+        )
+        .withName("go from remove page to Borrow Instances List page")
     )
   }
 
