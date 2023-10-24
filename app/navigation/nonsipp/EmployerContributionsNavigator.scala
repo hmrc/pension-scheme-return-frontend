@@ -49,12 +49,16 @@ object EmployerContributionsNavigator extends JourneyNavigator {
           controllers.routes.UnauthorisedController.onPageLoad()
 
         case Some(IdentityType.UKPartnership) =>
-          controllers.routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.employercontributions.routes.PartnershipEmployerUtrController
+            .onPageLoad(srn, memberIndex, index, NormalMode)
 
         case Some(IdentityType.Other) =>
           controllers.nonsipp.employercontributions.routes.OtherEmployeeDescriptionController
             .onPageLoad(srn, memberIndex, index, NormalMode)
       }
+
+    case PartnershipEmployerUtrPage(srn, index, secondaryIndex) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty

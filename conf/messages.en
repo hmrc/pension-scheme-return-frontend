@@ -1483,3 +1483,14 @@ otherEmployeeDescription.heading = Provide a brief description of {0}
 otherEmployeeDescription.error.required = Provide a brief description of the employer
 otherEmployeeDescription.error.length = The brief description of the employer must be 160 characters or fewer
 otherEmployeeDescription.error.invalid = The brief description of employer must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+
+partnershipEmployerUtr.title = Do you know the employer’s Unique Taxpayer Reference (UTR)?
+partnershipEmployerUtr.heading = Do you know {0}’s Unique Taxpayer Reference (UTR)?
+partnershipEmployerUtr.yes.conditional = What is {0}’s UTR?
+partnershipEmployerUtr.no.conditional = Tell us why you cannot provide {0}’s UTR
+partnershipEmployerUtr.error.required = Select yes if you know the employer’s Unique Taxpayer Reference (UTR)
+partnershipEmployerUtr.yes.conditional.error.required = Enter the employer’s UTR
+partnershipEmployerUtr.yes.conditional.error.invalid = Enter a Unique Taxpayer Reference that is 10 numbers, like 1234567890 or 12345 67890
+partnershipEmployerUtr.no.conditional.error.required = Enter the reason you cannot provide the employer’s UTR
+partnershipEmployerUtr.no.conditional.error.invalid = The reason you cannot provide the employer’s UTR must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+partnershipEmployerUtr.no.conditional.error.length = The reason you cannot provide the employer’s UTR must be 160 characters or fewer
