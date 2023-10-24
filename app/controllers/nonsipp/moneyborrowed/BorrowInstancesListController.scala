@@ -97,12 +97,9 @@ class BorrowInstancesListController @Inject()(
       .toList
 
     for {
-      lendRawData <- fromLenderPages.traverse(_.getOrRecoverJourney)
-      lendNames <- lendRawData.traverse {
-        case (index, name) =>
-          request.userAnswers.get(LenderNamePage(srn, index)).getOrRecoverJourney.map(index -> _)
-      }
-      borrowingInstanceDetails <- lendNames.traverse {
+      lendersNames <- fromLenderPages.traverse(_.getOrRecoverJourney)
+
+      borrowingInstanceDetails <- lendersNames.traverse {
         case (index, lenderName) =>
           request.userAnswers
             .get(BorrowedAmountAndRatePage(srn, index))
