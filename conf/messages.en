@@ -1498,3 +1498,11 @@ otherEmployeeDescription.error.invalid = The brief description of employer must 
 removeBorrowInstances.title = Are you sure you want to remove this instance of borrowing?
 removeBorrowInstances.heading = Are you sure you want to remove {0} borrowed from {1}?
 removeBorrowInstances.error.required = Select yes if you are sure you want to remove this instance of borrowing
+
+totalEmployerContribution.title = What was the total contribution by this employer for the member, in pounds and pence?
+totalEmployerContribution.heading = What was the total contribution by {0} for {1}, in pounds and pence?
+totalEmployerContribution.hint = Enter the total contribution made by this employer for this member during the period of this return.
+totalEmployerContribution.error.required = Enter the total amount of the contribution, in pounds and pence
+totalEmployerContribution.error.invalid = Total contribution must be an amount of money, like 123 or 123.45
+totalEmployerContribution.error.tooSmall = Total contribution must be 0.01 or more
+totalEmployerContribution.error.tooLarge = Total contribution must be 999999999.99 or less
