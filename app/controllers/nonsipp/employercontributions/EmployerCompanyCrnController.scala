@@ -129,6 +129,7 @@ object EmployerCompanyCrnController {
         no = YesNoViewModel
           .Conditional(Message("companyBuyerCrn.no.conditional", companyName), FieldType.Textarea)
       ).withHint("companyBuyerCrn.hint"),
-      controllers.nonsipp.employercontributions.routes.EmployerCompanyCrnController.onSubmit(srn, memberIndex, index, mode)
+      controllers.nonsipp.employercontributions.routes.EmployerCompanyCrnController
+        .onSubmit(srn, memberIndex, index, mode)
     )
 }
