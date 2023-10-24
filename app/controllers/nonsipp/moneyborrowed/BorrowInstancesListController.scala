@@ -156,7 +156,7 @@ object BorrowInstancesListController {
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(
-              "loansList.pagination.label",
+              "borrowList.pagination.label",
               pagination.pageStart,
               pagination.pageEnd,
               pagination.totalSize
