@@ -134,7 +134,7 @@ object RemoveBorrowInstancesController {
     lendersName: String
   ): FormPageViewModel[YesNoPageViewModel] =
     YesNoPageViewModel(
-      Message("removeBorrowInstances.title", amount, lendersName),
+      "removeBorrowInstances.title",
       Message("removeBorrowInstances.heading", amount, lendersName),
       routes.RemoveBorrowInstancesController.onSubmit(srn, index, mode)
     )

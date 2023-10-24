@@ -20,6 +20,7 @@ import config.Refined.OneTo5000
 import eu.timepit.refined.refineMV
 import models.CheckOrChange.Check
 import models.ConditionalYesNo._
+import models.IdentityType.UKCompany
 import models.SchemeId.Srn
 import models.{ConditionalYesNo, IdentitySubject, IdentityType, Money, NormalMode, RecipientDetails, UserAnswers}
 import navigation.{Navigator, NavigatorBehaviours}
@@ -349,7 +350,22 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
             controllers.nonsipp.loansmadeoroutstanding.routes.LoansMadeOrOutstandingController
               .onPageLoad(srn, NormalMode)
         )
-        .withName("go from remove page to list page")
+        .withName("go from remove page to LoansMadeOrOutstanding page")
+    )
+
+    val completedLoanUserAnswers: Srn => UserAnswers =
+      srn => defaultUserAnswers.unsafeSet(IdentityTypePage(srn, index, subject), UKCompany)
+
+    act.like(
+      normalmode
+        .navigateTo(
+          srn => RemoveLoanPage(srn, refineMV(1)),
+          (srn, _) =>
+            controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController
+              .onPageLoad(srn, 1, NormalMode),
+          completedLoanUserAnswers
+        )
+        .withName("go from remove page to LoansList page")
     )
 
   }
