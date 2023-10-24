@@ -1451,7 +1451,7 @@ moneyBorrowedCheckYourAnswers.section.schemeBorrowed = Reason {0} borrowed this 
 moneyBorrowedCheckYourAnswers.section.schemeBorrowed.hidden = the reason the scheme borrowed this money
 
 moneyBorrowedCheckYourAnswers.change.title = Change details for money borrowed
-moneyBorrowedCheckYourAnswers.change.heading = Change details for {0} borrowed from {1}
+moneyBorrowedCheckYourAnswers.change.heading = Change details for £{0} borrowed from {1}
 
 employerName.title = What is the employer’s name?
 employerName.heading = What is the employer’s name?

@@ -53,3 +53,9 @@ case class LandPropertyInUKPage(srn: Srn, index: Max5000) extends QuestionPage[B
       RemovePropertyPage(srn, index)
     )
 }
+
+case class LandPropertyInUKPages(srn: Srn) extends QuestionPage[Map[String, Boolean]] {
+  override def path: JsPath =
+    Paths.landOrPropertyTransactions \ "propertyDetails" \ toString
+  override def toString: String = "landOrPropertyInUK"
+}

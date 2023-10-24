@@ -56,3 +56,12 @@ case class WhyDoesSchemeHoldLandPropertyPage(srn: Srn, index: Max5000) extends Q
       common.IdentityTypePage(srn, index, IdentitySubject.LandOrPropertySeller)
     )
 }
+
+case class WhyDoesSchemeHoldLandPropertyPages(srn: Srn) extends QuestionPage[Map[String, SchemeHoldLandProperty]] {
+
+  override def path: JsPath =
+    Paths.heldPropertyTransactions \ toString
+
+  override def toString: String = "methodOfHolding"
+
+}

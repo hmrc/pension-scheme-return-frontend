@@ -113,7 +113,7 @@ object BorrowInstancesListController {
               ListRow(
                 Message("borrowList.row.change.hidden", amount._1.displayAs, myLenderName(index.value - 1).toString),
                 changeUrl = controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController
-                  .onPageLoad(srn, index, CheckOrChange.Check)
+                  .onPageLoad(srn, index, CheckOrChange.Change)
                   .url,
                 changeHiddenText = Message("borrowList.row.change.hidden", amount._1.displayAs),
                 controllers.routes.UnauthorisedController.onPageLoad().url, //TODO change with remove controller
