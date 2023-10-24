@@ -16,21 +16,24 @@
 
 package controllers.nonsipp.moneyborrowed
 
+import cats.implicits._
 import com.google.inject.Inject
 import config.Constants
-import config.Constants.maxBorrows
-import config.Refined.Max5000
+import config.Constants.{borrowPageSize, maxBorrows}
+import config.Refined.{Max5000, OneTo5000}
+import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
+import eu.timepit.refined.api.Refined
 import eu.timepit.refined.refineV
 import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
-import models.{CheckOrChange, Mode, Money, NormalMode, Pagination, Percentage}
+import models.requests.DataRequest
+import models.{CheckOrChange, Mode, Money, NormalMode, Pagination}
 import navigation.Navigator
-import pages.nonsipp.moneyborrowed.{BorrowInstancesListPage, BorrowedAmountAndRatePages, LenderNamePages}
+import pages.nonsipp.moneyborrowed.{BorrowInstancesListPage, BorrowedAmountAndRatePage, LenderNamePage, LenderNamePages}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import viewmodels.DisplayMessage.{Message, ParagraphMessage}
 import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, ListRow, ListViewModel, PaginatedViewModel}
@@ -45,43 +48,70 @@ class BorrowInstancesListController @Inject()(
   val controllerComponents: MessagesControllerComponents,
   view: ListView,
   formProvider: YesNoPageFormProvider
-) extends FrontendBaseController
+) extends PSRController
     with I18nSupport {
 
   val form = BorrowInstancesListController.form(formProvider)
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      val borrows = request.userAnswers.map(BorrowedAmountAndRatePages(srn))
-      val lenderName = request.userAnswers.map(LenderNamePages(srn))
-
-      if (borrows.nonEmpty) {
-        val viewModel = BorrowInstancesListController.viewModel(srn, mode, page, borrows, lenderName)
-        Ok(view(form, viewModel))
-      } else {
-        Redirect(controllers.nonsipp.routes.CheckReturnDatesController.onPageLoad(srn, mode))
-      }
+      borrowDetails(srn).map { instances =>
+        if (instances.isEmpty) {
+          Redirect(controllers.nonsipp.routes.CheckReturnDatesController.onPageLoad(srn, mode))
+        } else {
+          val viewModel = BorrowInstancesListController.viewModel(srn, mode, page, instances)
+          Ok(view(form, viewModel))
+        }
+      }.merge
   }
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    val borrows = request.userAnswers.map(BorrowedAmountAndRatePages(srn))
-    val lenderName = request.userAnswers.map(LenderNamePages(srn))
+    borrowDetails(srn).map { instances =>
+      if (instances.length == maxBorrows) {
+        Redirect(navigator.nextPage(BorrowInstancesListPage(srn, addBorrow = false), mode, request.userAnswers))
+      } else {
+        val viewModel = BorrowInstancesListController.viewModel(srn, mode, page, instances)
 
-    if (borrows.size == maxBorrows) {
-      Redirect(navigator.nextPage(BorrowInstancesListPage(srn, addBorrow = false), mode, request.userAnswers))
-    } else {
-      val viewModel = BorrowInstancesListController.viewModel(srn, mode, page, borrows, lenderName)
+        form
+          .bindFromRequest()
+          .fold(
+            errors => BadRequest(view(errors, viewModel)),
+            answer =>
+              Redirect(
+                navigator.nextPage(BorrowInstancesListPage(srn, answer), mode, request.userAnswers)
+              )
+          )
+      }
+    }.merge
+  }
 
-      form
-        .bindFromRequest()
-        .fold(
-          errors => BadRequest(view(errors, viewModel)),
-          answer =>
-            Redirect(
-              navigator.nextPage(BorrowInstancesListPage(srn, answer), mode, request.userAnswers)
-            )
-        )
-    }
+  private def borrowDetails(
+    srn: Srn
+  )(implicit request: DataRequest[_]): Either[Result, List[(Refined[Int, OneTo5000], String, Money)]] = {
+    val fromLenderPages = request.userAnswers
+      .map(LenderNamePages(srn))
+      .map {
+        case (key, value) =>
+          key.toIntOption.flatMap(k => refineV[OneTo5000](k + 1).toOption.map(_ -> value))
+      }
+      .toList
+
+    for {
+      lendRawData <- fromLenderPages.traverse(_.getOrRecoverJourney)
+      lendNames <- lendRawData.traverse {
+        case (index, name) =>
+          request.userAnswers.get(LenderNamePage(srn, index)).getOrRecoverJourney.map(index -> _)
+      }
+      borrowingInstanceDetails <- lendNames.traverse {
+        case (index, lenderName) =>
+          request.userAnswers
+            .get(BorrowedAmountAndRatePage(srn, index))
+            .map(_._1)
+            .getOrRecoverJourney
+            .map((index, lenderName, _))
+      }
+    } yield borrowingInstanceDetails
+
   }
 }
 
@@ -94,65 +124,51 @@ object BorrowInstancesListController {
   private def rows(
     srn: Srn,
     mode: Mode,
-    borrow: Map[String, (Money, Percentage)],
-    lenderName: Map[String, String]
-  ): List[ListRow] = {
-    val myLenderName = lenderName.map {
-      case (index, name) =>
-        refineV[Max5000.Refined](index.toInt + 1).fold(_ => Nil, index => {
-          name
-        })
-    }.toList
-    borrow.flatMap {
-      case (index, amount) =>
-        refineV[Max5000.Refined](index.toInt + 1).fold(
-          _ => Nil,
-          index =>
-            List(
-              ListRow(
-                Message("borrowList.row.change.hidden", amount._1.displayAs, myLenderName(index.value - 1).toString),
-                changeUrl = controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController
-                  .onPageLoad(srn, index, CheckOrChange.Change)
-                  .url,
-                changeHiddenText = Message("borrowList.row.change.hidden", amount._1.displayAs),
-                controllers.nonsipp.moneyborrowed.routes.RemoveBorrowInstancesController
-                  .onPageLoad(srn, index, mode)
-                  .url,
-                Message("borrowList.row.remove.hiddenText")
-              )
-            )
+    borrowingInstances: List[(Max5000, String, Money)]
+  ): List[ListRow] =
+    borrowingInstances.flatMap {
+      case (index, lenderName, amount) =>
+        List(
+          ListRow(
+            Message("borrowList.row.change.hidden", amount.displayAs, lenderName),
+            changeUrl = controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController
+              .onPageLoad(srn, index, CheckOrChange.Change)
+              .url,
+            changeHiddenText = Message("borrowList.row.change.hidden", amount.displayAs),
+            controllers.nonsipp.moneyborrowed.routes.RemoveBorrowInstancesController
+              .onPageLoad(srn, index, mode)
+              .url,
+            Message("borrowList.row.remove.hiddenText")
+          )
         )
-    }.toList
-
-  }
+    }
 
   def viewModel(
     srn: Srn,
     mode: Mode,
     page: Int,
-    borrows: Map[String, (Money, Percentage)],
-    lenderName: Map[String, String]
+    borrowingInstances: List[(Max5000, String, Money)]
   ): FormPageViewModel[ListViewModel] = {
 
-    val title = if (borrows.size == 1) "borrowList.title" else "borrowList.title.plural"
-    val heading = if (borrows.size == 1) "borrowList.heading" else "borrowList.heading.plural"
+    val title = if (borrowingInstances.size == 1) "borrowList.title" else "borrowList.title.plural"
+    val heading = if (borrowingInstances.size == 1) "borrowList.heading" else "borrowList.heading.plural"
 
     val pagination = Pagination(
       currentPage = page,
       pageSize = Constants.borrowPageSize,
-      borrows.size,
+      borrowingInstances.size,
       routes.BorrowInstancesListController.onPageLoad(srn, _, NormalMode)
     )
 
     FormPageViewModel(
-      title = Message(title, borrows.size),
-      heading = Message(heading, borrows.size),
+      title = Message(title, borrowingInstances.size),
+      heading = Message(heading, borrowingInstances.size),
       description = Some(ParagraphMessage("borrowList.description")),
       page = ListViewModel(
         inset = "borrowList.inset",
-        rows(srn, mode, borrows, lenderName),
+        rows(srn, mode, borrowingInstances),
         Message("borrowList.radios"),
-        showRadios = borrows.size < Constants.maxBorrows,
+        showRadios = borrowingInstances.size < Constants.maxBorrows,
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(
