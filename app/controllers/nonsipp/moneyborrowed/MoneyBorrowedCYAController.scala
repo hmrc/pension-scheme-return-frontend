@@ -21,21 +21,13 @@ import config.Refined.Max5000
 import controllers.PSRController
 import controllers.actions._
 import controllers.nonsipp.moneyborrowed.MoneyBorrowedCYAController._
-import models.{CheckMode, CheckOrChange, Mode, Money, NormalMode, Percentage}
 import models.SchemeId.Srn
+import models.{CheckMode, CheckOrChange, Mode, Money, NormalMode, Percentage}
 import navigation.Navigator
-import pages.nonsipp.moneyborrowed.{
-  BorrowedAmountAndRatePage,
-  IsLenderConnectedPartyPage,
-  LenderNamePage,
-  MoneyBorrowedCYAPage,
-  ValueOfSchemeAssetsWhenMoneyBorrowedPage,
-  WhenBorrowedPage,
-  WhySchemeBorrowedMoneyPage
-}
+import pages.nonsipp.moneyborrowed._
 import play.api.i18n._
 import play.api.mvc._
-import services.{PsrSubmissionService, SchemeDateService}
+import services.PsrSubmissionService
 import utils.DateTimeUtils.localDateShow
 import viewmodels.DisplayMessage._
 import viewmodels.implicits._
@@ -51,7 +43,6 @@ class MoneyBorrowedCYAController @Inject()(
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
-  schemeDateService: SchemeDateService,
   psrSubmissionService: PsrSubmissionService,
   view: CheckYourAnswersView
 )(implicit ec: ExecutionContext)

@@ -18,19 +18,13 @@ package pages.nonsipp.moneyborrowed
 
 import config.Refined.Max5000
 import models.SchemeId.Srn
-import models.{Money, Percentage}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
 
-case class BorrowedAmountAndRatePage(srn: Srn, index: Max5000) extends QuestionPage[(Money, Percentage)] {
+case class RemoveBorrowInstancesPage(srn: Srn, index: Max5000) extends QuestionPage[Boolean] {
 
   override def path: JsPath = Paths.moneyBorrowed \ toString \ index.arrayIndex.toString
 
-  override def toString: String = "interestRate"
-}
-case class BorrowedAmountAndRatePages(srn: Srn) extends QuestionPage[Map[String, (Money, Percentage)]] {
-  override def path: JsPath = Paths.moneyBorrowed \ toString
-
-  override def toString: String = "interestRate"
+  override def toString: String = "RemoveBorrowInstances"
 }

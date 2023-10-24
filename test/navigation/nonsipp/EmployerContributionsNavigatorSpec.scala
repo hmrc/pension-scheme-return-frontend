@@ -39,9 +39,13 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
         .navigateToWithData(
           EmployerContributionsPage,
           Gen.const(true),
-          controllers.nonsipp.memberpayments.routes.UnallocatedEmployerContributionsController.onPageLoad
+          (srn, _) =>
+            controllers.nonsipp.employercontributions.routes.WhatYouWillNeedEmployerContributionsController
+              .onPageLoad(srn)
         )
-        .withName("go from employer contribution page to unallocated employer contributions page when yes selected")
+        .withName(
+          "go from employer contribution page to what you will need employer contributions page when yes selected"
+        )
     )
 
     act.like(
@@ -54,6 +58,19 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
         .withName("go from employer contribution page to task list page when no selected")
     )
 
+  }
+
+  "WhatYouWillNeedEmployerContributionsPage" - {
+    act.like(
+      normalmode
+        .navigateTo(
+          WhatYouWillNeedEmployerContributionsPage,
+          (srn, _) =>
+            controllers.nonsipp.employercontributions.routes.EmployerNameController
+              .onPageLoad(srn, refineMV(1), refineMV(2), NormalMode)
+        )
+        .withName("go from what you will need employer contributions page to employer name page ")
+    )
   }
 
   "EmployerNamePage" - {
@@ -120,9 +137,9 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
           index,
           secondaryIndex,
           OtherEmployeeDescriptionPage,
-          (srn, index: Max300, secondaryIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.employercontributions.routes.TotalEmployerContributionController.onPageLoad
         )
-        .withName("go from OtherEmployeeDescriptionPage to ??? page")
+        .withName("go from OtherEmployeeDescriptionPage to TotalEmployerContribution page")
     )
 
   }
@@ -137,6 +154,19 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
           (srn, index: Max300, secondaryIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
         )
         .withName("go from partnership employer utr page to unauthorised page")
+    )
+  }
+  
+  "TotalEmployerContributionPage" - {
+    act.like(
+      normalmode
+        .navigateToWithDoubleIndex(
+          index,
+          secondaryIndex,
+          TotalEmployerContributionPage,
+          (srn, index: Max300, secondaryIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+        )
+        .withName("go from TotalEmployerContributionPage to ??? page")
     )
   }
 }
