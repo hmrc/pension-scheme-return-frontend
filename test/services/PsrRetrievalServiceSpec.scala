@@ -24,24 +24,14 @@ import models.requests.psr._
 import models.requests.{AllowedAccessRequest, DataRequest}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
-import org.scalatest.concurrent.Futures
-import org.scalatest.concurrent.Futures.whenReady
-import pages.nonsipp.CheckReturnDatesPage
-import pages.nonsipp.landorproperty.LandOrPropertyHeldPage
-import pages.nonsipp.loansmadeoroutstanding.LoansMadeOrOutstandingPage
-import play.api.libs.json.{JsObject, JsValue}
+import play.api.libs.json.JsObject
 import play.api.mvc.{AnyContent, AnyContentAsEmpty}
 import play.api.test.FakeRequest
 import services.PsrRetrievalServiceSpec.loans
-import services.PsrSubmissionServiceSpec.{captor, minimalRequiredSubmission}
-import transformations.{
-  LandOrPropertyTransactionsTransformer,
-  LoanTransactionsTransformer,
-  MinimalRequiredSubmissionTransformer
-}
+import services.PsrSubmissionServiceSpec.minimalRequiredSubmission
+import transformations.{LoanTransactionsTransformer, MinimalRequiredSubmissionTransformer}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.BaseSpec
-import utils.UserAnswersUtils.UserAnswersOps
 
 import java.time.LocalDate
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -54,7 +44,6 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
     reset(mockConnector)
     reset(mockMinimalRequiredSubmissionTransformer)
     reset(mockLoanTransactionsTransformer)
-    reset(mockLandOrPropertyTransactionsTransformer)
   }
 
   val allowedAccessRequest
@@ -64,15 +53,13 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
   private val mockConnector = mock[PSRConnector]
   private val mockMinimalRequiredSubmissionTransformer = mock[MinimalRequiredSubmissionTransformer]
   private val mockLoanTransactionsTransformer = mock[LoanTransactionsTransformer]
-  private val mockLandOrPropertyTransactionsTransformer = mock[LandOrPropertyTransactionsTransformer]
   private val mockReq = mock[DataRequest[AnyContent]]
 
   private val service =
     new PsrRetrievalService(
       mockConnector,
       mockMinimalRequiredSubmissionTransformer,
-      mockLoanTransactionsTransformer,
-      mockLandOrPropertyTransactionsTransformer
+      mockLoanTransactionsTransformer
     )
 
   private implicit val hc: HeaderCarrier = HeaderCarrier()
@@ -83,7 +70,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
       when(mockReq.schemeDetails).thenReturn(allowedAccessRequest.schemeDetails)
       when(mockConnector.getStandardPsrDetails(any(), any(), any(), any())(any(), any()))
         .thenReturn(Future.successful(None))
-      whenReady(service.getStandardPsrDetails(mockReq, None, Some(pstr), Some(version))(implicitly, implicitly)) {
+      whenReady(service.getStandardPsrDetails(None, Some(pstr), Some(version))(mockReq, implicitly, implicitly)) {
         result: UserAnswers =>
           verify(mockMinimalRequiredSubmissionTransformer, never).transformFromEtmp(any(), any(), any(), any())
           verify(mockLoanTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
@@ -108,7 +95,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
           )
         )
       )
-      whenReady(service.getStandardPsrDetails(mockReq, None, Some(pstr), Some(version))(implicitly, implicitly)) {
+      whenReady(service.getStandardPsrDetails(None, Some(pstr), Some(version))(mockReq, implicitly, implicitly)) {
         result: UserAnswers =>
           verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformFromEtmp(any(), any(), any(), any())
           verify(mockLoanTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
@@ -136,7 +123,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
           )
         )
       )
-      whenReady(service.getStandardPsrDetails(mockReq, None, Some(pstr), Some(version))(implicitly, implicitly)) {
+      whenReady(service.getStandardPsrDetails(None, Some(pstr), Some(version))(mockReq, implicitly, implicitly)) {
         result: UserAnswers =>
           verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformFromEtmp(any(), any(), any(), any())
           verify(mockLoanTransactionsTransformer, times(1)).transformFromEtmp(any(), any(), any())

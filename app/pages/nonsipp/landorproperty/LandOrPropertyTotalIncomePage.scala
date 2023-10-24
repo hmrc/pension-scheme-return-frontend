@@ -29,3 +29,10 @@ case class LandOrPropertyTotalIncomePage(srn: Srn, index: Max5000) extends Quest
 
   override def toString: String = "totalIncomeOrReceipts"
 }
+
+case class LandOrPropertyTotalIncomePages(srn: Srn) extends QuestionPage[Map[String, Money]] {
+
+  override def path: JsPath = Paths.heldPropertyTransactions \ toString
+
+  override def toString: String = "totalIncomeOrReceipts"
+}

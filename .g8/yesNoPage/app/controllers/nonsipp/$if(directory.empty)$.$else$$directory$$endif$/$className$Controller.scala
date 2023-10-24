@@ -28,7 +28,7 @@ $endif$
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 $if(!index.empty)$
-import config.Refined.$index$
+import config.Refined._
 $endif$
 
 class $className;format="cap"$Controller @Inject()(

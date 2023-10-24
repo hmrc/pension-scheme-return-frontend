@@ -18,7 +18,7 @@ package pages.nonsipp.landorpropertydisposal
 
 import config.Refined.{Max50, Max5000}
 import models.SchemeId.Srn
-import pages.{IndexedQuestionPage, QuestionPage}
+import pages.QuestionPage
 import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
 

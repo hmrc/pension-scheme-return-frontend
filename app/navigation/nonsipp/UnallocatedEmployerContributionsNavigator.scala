@@ -17,8 +17,7 @@
 package navigation.nonsipp
 
 import controllers.routes
-import controllers.nonsipp.memberpayments
-import models.{NormalMode, UserAnswers}
+import models.UserAnswers
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.memberpayments.UnallocatedEmployerContributionsPage

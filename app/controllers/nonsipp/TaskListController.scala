@@ -294,7 +294,7 @@ object TaskListController {
             .onPageLoad(srn, NormalMode)
             .url
         ),
-        UnableToStart
+        NotStarted
       ),
       TaskListItemViewModel(
         LinkMessage(
@@ -414,22 +414,6 @@ object TaskListController {
       ),
       TaskListItemViewModel(
         LinkMessage(
-          messageKey(prefix, "connectedparty.title", UnableToStart),
-          controllers.nonsipp.sharesacquiredfromconnectedparty.routes.SharesAcquiredFromConnectedPartyController
-            .onPageLoad(srn, NormalMode)
-            .url
-        ),
-        NotStarted
-      ),
-      TaskListItemViewModel(
-        LinkMessage(
-          messageKey(prefix, "unquotedshares.title", UnableToStart),
-          controllers.nonsipp.unquotedshares.routes.UnquotedSharesController.onPageLoad(srn, NormalMode).url
-        ),
-        NotStarted
-      ),
-      TaskListItemViewModel(
-        LinkMessage(
           messageKey(prefix, "quotedshares.title", UnableToStart),
           controllers.routes.UnauthorisedController.onPageLoad().url
         ),
@@ -441,16 +425,17 @@ object TaskListController {
   private def landOrPropertySection(srn: Srn, userAnswers: UserAnswers) = {
     val prefix = "nonsipp.tasklist.landorproperty"
 
+    val (landOrPropertyStatus) = TaskListStatusUtils.getLandOrPropertyTaskListStatusAndLink(userAnswers, srn)
     val (disposalsStatus, disposalLinkUrl) = TaskListStatusUtils.getDisposalsTaskListStatusWithLink(userAnswers, srn)
 
     TaskListSectionViewModel(
       s"$prefix.title",
       TaskListItemViewModel(
         LinkMessage(
-          messageKey(prefix, "title", UnableToStart),
-          controllers.nonsipp.landorproperty.routes.LandOrPropertyHeldController.onPageLoad(srn, NormalMode).url
+          messageKey(prefix, "title", landOrPropertyStatus._1),
+          landOrPropertyStatus._2
         ),
-        NotStarted
+        landOrPropertyStatus._1
       ),
       TaskListItemViewModel(
         LinkMessage(

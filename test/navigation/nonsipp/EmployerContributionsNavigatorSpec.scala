@@ -16,9 +16,10 @@
 
 package navigation.nonsipp
 
-import config.Refined.{Max300, Max50, Max5000}
+import config.Refined.{Max300, Max50}
 import eu.timepit.refined.refineMV
 import models.NormalMode
+import models.{IdentityType, NormalMode}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.employercontributions._
@@ -29,8 +30,8 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
 
   val navigator: Navigator = new NonSippNavigator
 
-  private val memberIndex = refineMV[Max300.Refined](1)
-  private val index = refineMV[Max50.Refined](1)
+  private val index = refineMV[Max300.Refined](1)
+  private val secondaryIndex = refineMV[Max50.Refined](1)
 
   "EmployerContributionsNavigator" - {
 
@@ -53,9 +54,9 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
         .navigateToWithData(
           EmployerContributionsPage,
           Gen.const(false),
-          controllers.nonsipp.memberpayments.routes.UnallocatedEmployerContributionsController.onPageLoad
+          (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
         )
-        .withName("go from employer contribution page to unallocated employer contributions page when no selected")
+        .withName("go from employer contribution page to task list page when no selected")
     )
 
   }
@@ -77,12 +78,68 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
     act.like(
       normalmode
         .navigateToWithDoubleIndex(
-          memberIndex,
           index,
+          secondaryIndex,
           EmployerNamePage,
+          (srn, index: Max300, secondaryIndex: Max50, _) =>
+            controllers.nonsipp.employercontributions.routes.EmployerTypeOfBusinessController
+              .onPageLoad(srn, index, secondaryIndex, NormalMode)
+        )
+        .withName("go from employer name page to employer type of business page")
+    )
+  }
+
+  "EmployerTypeOfBusinessPage" - {
+    act.like(
+      normalmode
+        .navigateToWithDoubleDataAndIndex(
+          index,
+          secondaryIndex,
+          EmployerTypeOfBusinessPage,
+          Gen.const(IdentityType.UKCompany),
           (srn, memberIndex: Max300, index: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
         )
-        .withName("go from EmployerNamePage to ??? page")
+        .withName("go from employer type of business page to unauthorised")
     )
+
+    act.like(
+      normalmode
+        .navigateToWithDoubleDataAndIndex(
+          index,
+          secondaryIndex,
+          EmployerTypeOfBusinessPage,
+          Gen.const(IdentityType.UKPartnership),
+          (srn, memberIndex: Max300, index: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+        )
+        .withName("go from employer type of business page to unauthorised page")
+    )
+
+    act.like(
+      normalmode
+        .navigateToWithDoubleDataAndIndex(
+          index,
+          secondaryIndex,
+          EmployerTypeOfBusinessPage,
+          Gen.const(IdentityType.Other),
+          (srn, memberIndex: Max300, index: Max50, _) =>
+            controllers.nonsipp.employercontributions.routes.OtherEmployeeDescriptionController
+              .onPageLoad(srn, memberIndex, index, NormalMode)
+        )
+        .withName("go from employer type of business page to unauthorised controller page")
+    )
+  }
+
+  "OtherEmployeeDescriptionPage" - {
+    act.like(
+      normalmode
+        .navigateToWithDoubleIndex(
+          index,
+          secondaryIndex,
+          OtherEmployeeDescriptionPage,
+          (srn, index: Max300, secondaryIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+        )
+        .withName("go from OtherEmployeeDescriptionPage to ??? page")
+    )
+
   }
 }

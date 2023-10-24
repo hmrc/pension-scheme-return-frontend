@@ -14,73 +14,75 @@
  * limitations under the License.
  */
 
+$! Generic !$
 $if(directory.empty)$
 package controllers.nonsipp
 $else$
 package controllers.nonsipp.$directory$
 $endif$
 
-import models.{NormalMode, UserAnswers}
-import navigation.{FakeNavigator, Navigator}
-import play.api.inject.bind
-import play.api.mvc.Call
-import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import repositories.SessionRepository
-import forms.MoneyFormProvider
-import views.html.MoneyView
-import controllers.ControllerBaseSpec
-import $className;format="cap"$Controller._
 $if(directory.empty)$
-import pages.$className$Page
+import pages.nonsipp.$className$Page
+import controllers.nonsipp.$className;format="cap"$Controller._
 $else$
 import pages.nonsipp.$directory$.$className$Page
+import controllers.nonsipp.$directory$.$className;format="cap"$Controller._
 $endif$
+
 $if(!index.empty)$
-import config.Refined.$index$
+import config.Refined._
 import eu.timepit.refined.refineMV
 $endif$
 
-import scala.concurrent.Future
+import models.NormalMode
+import controllers.ControllerBaseSpec
+$! Generic end !$
+
+import forms.mappings.errors.MoneyFormErrorProvider
+import views.html.MoneyView
 
 class $className;format="cap"$ControllerSpec extends ControllerBaseSpec {
 
+  $! Generic !$
   $if(index.empty)$
   private lazy val onPageLoad = routes.$className;format="cap"$Controller.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.$className;format="cap"$Controller.onSubmit(srn, NormalMode)
   $else$
   private val index = refineMV[$index$.Refined](1)
-  private lazy val onPageLoad = routes.$className; format = "cap" $Controller.onPageLoad(srn, index, NormalMode)
-  private lazy val onSubmit = routes.$className; format = "cap" $Controller.onSubmit(srn, index, NormalMode)
+  $if(secondaryIndex.empty)$
+  private lazy val onPageLoad = routes.$className;format="cap"$Controller.onPageLoad(srn, index, NormalMode)
+  private lazy val onSubmit = routes.$className;format="cap"$Controller.onSubmit(srn, index, NormalMode)
+  $else$
+  private val secondaryIndex = refineMV[$secondaryIndex$.Refined](1)
+  private lazy val onPageLoad = routes.$className;format="cap"$Controller.onPageLoad(srn, index, secondaryIndex, NormalMode)
+  private lazy val onSubmit = routes.$className;format="cap"$Controller.onSubmit(srn, index, secondaryIndex, NormalMode)
   $endif$
+  $endif$
+
+  $if(!requiredPage.empty)$
+  private val userAnswers = defaultUserAnswers.unsafeSet($requiredPage$(srn, index), ???)
+  $endif$
+  $! Generic end !$
 
   "$className;format="cap"$Controller" - {
 
-    $if(index.empty)$
-    act.like(renderView(onPageLoad) { implicit app => implicit request =>
-      injected[MoneyView].apply(viewModel(srn, form(injected[MoneyFormProvider]), NormalMode))
-    })
+    $! Generic (change view and form value) !$
+    act like renderView(onPageLoad$if(!requiredPage.empty)$, userAnswers$endif$) { implicit app => implicit request =>
+      injected[MoneyView].apply(form(injected[MoneyFormErrorProvider]), viewModel(srn, $if(!index.empty)$index, $endif$$if(!secondaryIndex.empty)$secondaryIndex, $endif$NormalMode))
+    }
 
-    act.like(renderPrePopView(onPageLoad, $className;format="cap"$Page(srn), money) { implicit app => implicit request =>
-      injected[MoneyView].apply(viewModel(srn, form(injected[MoneyFormProvider]).fill(money), NormalMode))
-    })
-    $else$
-    act.like(renderView(onPageLoad) { implicit app => implicit request =>
-      injected[MoneyView].apply(viewModel(srn, index, form(injected[MoneyFormProvider]), NormalMode))
-    })
+    act like renderPrePopView(onPageLoad, $className;format="cap"$Page(srn$if(!index.empty), $index$endif$$if(!secondaryIndex.empty), $secondaryIndex$endif$), money$if(!requiredPage.empty)$, userAnswers$endif$) { implicit app => implicit request =>
+      injected[MoneyView].apply(form(injected[MoneyFormErrorProvider]).fill(money), viewModel(srn, $if(!index.empty)$index, $endif$$if(!secondaryIndex.empty)$secondaryIndex, $endif$NormalMode))
+    }
+    $! Generic end !$
 
-    act.like(renderPrePopView(onPageLoad, $className;format="cap"$Page(srn, index), money) { implicit app => implicit request =>
-      injected[MoneyView].apply(viewModel(srn, index, form(injected[MoneyFormProvider]).fill(money), NormalMode))
-    })
-    $endif$
-
-    act.like(redirectNextPage(onSubmit, "value" -> "1"))
+    act.like(redirectNextPage(onSubmit, $if(!requiredPage.empty)$userAnswers, $endif$"value" -> "1"))
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
-    act.like(saveAndContinue(onSubmit, "value" -> "1"))
+    act.like(saveAndContinue(onSubmit, $if(!requiredPage.empty)$userAnswers, $endif$"value" -> "1"))
 
-    act.like(invalidForm(onSubmit))
+    act.like(invalidForm(onSubmit$if(!requiredPage.empty)$, userAnswers$endif$))
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }
 }

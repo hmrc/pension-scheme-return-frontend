@@ -24,8 +24,14 @@ import utils.RefinedUtils.RefinedIntOps
 
 case class LenderNamePage(srn: Srn, index: Max5000) extends QuestionPage[String] {
 
-  override def path: JsPath =
-    Paths.moneyBorrowed \ toString \ index.arrayIndex.toString
+  override def path: JsPath = Paths.moneyBorrowed \ toString \ index.arrayIndex.toString
+
+  override def toString: String = "borrowingFromName"
+}
+
+case class LenderNamePages(srn: Srn) extends QuestionPage[Map[String, String]] {
+
+  override def path: JsPath = Paths.moneyBorrowed \ toString
 
   override def toString: String = "borrowingFromName"
 }

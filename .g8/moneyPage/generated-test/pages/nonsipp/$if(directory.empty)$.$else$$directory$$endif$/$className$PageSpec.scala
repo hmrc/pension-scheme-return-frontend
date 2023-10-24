@@ -14,37 +14,58 @@
  * limitations under the License.
  */
 
+$! Generic !$
 $if(directory.empty)$
 package pages.nonsipp
 $else$
 package pages.nonsipp.$directory$
 $endif$
 
-import pages.behaviours.PageBehaviours
-import models.Money
+$if(directory.empty)$
+import pages.nonsipp.$className$Page
+$else$
+import pages.nonsipp.$directory$.$className$Page
+$endif$
+
 $if(!index.empty)$
-import config.Refined.$index$
+import config.Refined._
 import eu.timepit.refined.refineMV
 $endif$
 
+import pages.behaviours.PageBehaviours
+$! Generic end !$
+
+import models.Money
+
+$! Generic (change page type) !$
 class $className$PageSpec extends PageBehaviours {
 
   "$className$Page" - {
 
-    $if(!index.empty) $
+    $if(!index.empty)$
     val index = refineMV[$index$.Refined](1)
+    $if(!secondaryIndex.empty)$
+    val secondaryIndex = refineMV[$secondaryIndex$.Refined](1)
 
-    beRetrievable[Money]($className$Page(srnGen.sample.value, index))
+    beRetrievable[Money]($className;format="cap"$Page(srnGen.sample.value, index, secondaryIndex))
 
-    beSettable[Money]($className$Page(srnGen.sample.value, index))
+    beSettable[Money]($className;format="cap"$Page(srnGen.sample.value, index, secondaryIndex))
 
-    beRemovable[Money]($className$Page(srnGen.sample.value, index))
+    beRemovable[Money]($className;format="cap"$Page(srnGen.sample.value, index, secondaryIndex))
     $else$
-    beRetrievable[Money]($className$Page(srnGen.sample.value))
+    beRetrievable[Money]($className;format="cap"$Page(srnGen.sample.value, index))
 
-    beSettable[Money]($className$Page(srnGen.sample.value))
+    beSettable[Money]($className;format="cap"$Page(srnGen.sample.value, index))
 
-    beRemovable[Money]($className$Page(srnGen.sample.value))
+    beRemovable[Money]($className;format="cap"$Page(srnGen.sample.value, index))
+    $endif$
+    $else$
+    beRetrievable[Money]($className;format="cap"$Page(srnGen.sample.value))
+
+    beSettable[Money]($className;format="cap"$Page(srnGen.sample.value))
+
+    beRemovable[Money]($className;format="cap"$Page(srnGen.sample.value))
     $endif$
   }
 }
+$! Generic end !$

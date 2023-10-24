@@ -59,7 +59,7 @@ class WhatYouWillNeedPageControllerSpec extends ControllerBaseSpec {
     }
 
     "redirect to the next page" in {
-      when(mockPsrRetrievalService.getStandardPsrDetails(any(), any(), any(), any())(any(), any())).thenReturn(
+      when(mockPsrRetrievalService.getStandardPsrDetails(any(), any(), any())(any(), any(), any())).thenReturn(
         Future.successful(defaultUserAnswers)
       )
       val fakeNavigatorApplication =
@@ -80,7 +80,7 @@ class WhatYouWillNeedPageControllerSpec extends ControllerBaseSpec {
     "redirect to the next page more than 100 members" in {
       val pensionSchemeId = pensionSchemeIdGen.sample.value
 
-      when(mockPsrRetrievalService.getStandardPsrDetails(any(), any(), any(), any())(any(), any())).thenReturn(
+      when(mockPsrRetrievalService.getStandardPsrDetails(any(), any(), any())(any(), any(), any())).thenReturn(
         Future.successful(
           defaultUserAnswers
             .unsafeSet(HowManyMembersPage(srn, pensionSchemeId), SchemeMemberNumbers(50, 60, 70))
