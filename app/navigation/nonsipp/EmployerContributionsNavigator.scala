@@ -28,8 +28,12 @@ object EmployerContributionsNavigator extends JourneyNavigator {
 
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
 
-    case OtherEmployeeDescriptionPage(srn, index, secondaryIndex) =>
+    case TotalEmployerContributionPage(srn, index, secondaryIndex) =>
       controllers.routes.UnauthorisedController.onPageLoad()
+
+    case OtherEmployeeDescriptionPage(srn, index, secondaryIndex) =>
+      controllers.nonsipp.employercontributions.routes.TotalEmployerContributionController
+        .onPageLoad(srn, index, secondaryIndex, NormalMode)
 
     case page @ EmployerContributionsPage(srn) =>
       if (userAnswers.get(page).contains(true)) {

@@ -135,10 +135,23 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
           index,
           secondaryIndex,
           OtherEmployeeDescriptionPage,
-          (srn, index: Max300, secondaryIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.employercontributions.routes.TotalEmployerContributionController.onPageLoad
         )
-        .withName("go from OtherEmployeeDescriptionPage to ??? page")
+        .withName("go from OtherEmployeeDescriptionPage to TotalEmployerContribution page")
     )
 
+  }
+
+  "TotalEmployerContributionPage" - {
+    act.like(
+      normalmode
+        .navigateToWithDoubleIndex(
+          index,
+          secondaryIndex,
+          TotalEmployerContributionPage,
+          (srn, index: Max300, secondaryIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+        )
+        .withName("go from TotalEmployerContributionPage to ??? page")
+    )
   }
 }

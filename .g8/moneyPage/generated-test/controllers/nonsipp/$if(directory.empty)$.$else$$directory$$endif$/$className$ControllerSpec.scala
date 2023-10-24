@@ -71,7 +71,7 @@ class $className;format="cap"$ControllerSpec extends ControllerBaseSpec {
       injected[MoneyView].apply(form(injected[MoneyFormErrorProvider]), viewModel(srn, $if(!index.empty)$index, $endif$$if(!secondaryIndex.empty)$secondaryIndex, $endif$NormalMode))
     }
 
-    act like renderPrePopView(onPageLoad, $className;format="cap"$Page(srn$if(!index.empty), $index$endif$$if(!secondaryIndex.empty), $secondaryIndex$endif$), money$if(!requiredPage.empty)$, userAnswers$endif$) { implicit app => implicit request =>
+    act like renderPrePopView(onPageLoad, $className;format="cap"$Page(srn$if(!index.empty)$, index$endif$$if(!secondaryIndex.empty)$, secondaryIndex$endif$), money$if(!requiredPage.empty)$, userAnswers$endif$) { implicit app => implicit request =>
       injected[MoneyView].apply(form(injected[MoneyFormErrorProvider]).fill(money), viewModel(srn, $if(!index.empty)$index, $endif$$if(!secondaryIndex.empty)$secondaryIndex, $endif$NormalMode))
     }
     $! Generic end !$
