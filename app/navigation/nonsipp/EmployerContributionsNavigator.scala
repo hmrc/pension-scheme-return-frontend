@@ -16,6 +16,7 @@
 
 package navigation.nonsipp
 
+import eu.timepit.refined.refineMV
 import models.{IdentityType, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
@@ -32,8 +33,8 @@ object EmployerContributionsNavigator extends JourneyNavigator {
 
     case page @ EmployerContributionsPage(srn) =>
       if (userAnswers.get(page).contains(true)) {
-        controllers.nonsipp.memberpayments.routes.UnallocatedEmployerContributionsController
-          .onPageLoad(srn, NormalMode)
+        controllers.nonsipp.employercontributions.routes.WhatYouWillNeedEmployerContributionsController
+          .onPageLoad(srn)
       } else {
         controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
       }
@@ -55,6 +56,11 @@ object EmployerContributionsNavigator extends JourneyNavigator {
           controllers.nonsipp.employercontributions.routes.OtherEmployeeDescriptionController
             .onPageLoad(srn, memberIndex, index, NormalMode)
       }
+
+    case WhatYouWillNeedEmployerContributionsPage(srn) =>
+      controllers.nonsipp.employercontributions.routes.EmployerNameController
+        .onPageLoad(srn, refineMV(1), refineMV(2), NormalMode)
+
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty
