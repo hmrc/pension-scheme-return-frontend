@@ -14,23 +14,19 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.moneyborrowed
+package pages.nonsipp.employercontributions
 
-import config.Refined.Max5000
+import config.Refined.{Max300, Max50}
+import models.IdentityType
 import models.SchemeId.Srn
-import models.{Money, Percentage}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
 
-case class BorrowedAmountAndRatePage(srn: Srn, index: Max5000) extends QuestionPage[(Money, Percentage)] {
+case class EmployerTypeOfBusinessPage(srn: Srn, memberIndex: Max300, index: Max50) extends QuestionPage[IdentityType] {
 
-  override def path: JsPath = Paths.moneyBorrowed \ toString \ index.arrayIndex.toString
+  override def path: JsPath =
+    Paths.memberEmpContribution \ toString \ memberIndex.arrayIndex.toString \ index.arrayIndex.toString
 
-  override def toString: String = "interestRate"
-}
-case class BorrowedAmountAndRatePages(srn: Srn) extends QuestionPage[Map[String, (Money, Percentage)]] {
-  override def path: JsPath = Paths.moneyBorrowed \ toString
-
-  override def toString: String = "interestRate"
+  override def toString: String = "employerTypeOfBusiness"
 }

@@ -1453,11 +1453,29 @@ moneyBorrowedCheckYourAnswers.section.schemeBorrowed.hidden = the reason the sch
 moneyBorrowedCheckYourAnswers.change.title = Change details for money borrowed
 moneyBorrowedCheckYourAnswers.change.heading = Change details for £{0} borrowed from {1}
 
+whatYouWillNeedEmployerContributions.title = Employer contributions for members of {0}
+whatYouWillNeedEmployerContributions.heading = Employer contributions for members of {0}
+whatYouWillNeedEmployerContributions.paragraph1 = You must tell us about all employer contributions made for members of the scheme during the period of this return.
+whatYouWillNeedEmployerContributions.paragraph2 = For each member employer contributions were made for, you need to tell us:
+whatYouWillNeedEmployerContributions.tellUs1 = the name of the employer
+whatYouWillNeedEmployerContributions.tellUs2 = if the employer is a UK company, UK partnership or other
+whatYouWillNeedEmployerContributions.tellUs3 = the employer’s Company Registration Number, Unique Taxpayer Reference, or a description of the employer – whichever applies
+whatYouWillNeedEmployerContributions.tellUs4 = the total contribution made for the member by the employer
+whatYouWillNeedEmployerContributions.paragraph3 = On the next page, you will be able to select a member from a list of those whose details you have already provided. If you want to add a new member, you will need to provide their details using the ‘member details’ section of this pension scheme return.
+whatYouWillNeedEmployerContributions.paragraph4 = If employer contributions were made for any member by more than one employer, you must tell us about all of them. Answer the questions for one employer at a time.
+
 employerName.title = What is the employer’s name?
 employerName.heading = What is the employer’s name?
 employerName.error.required = Enter the employer’s name
 employerName.error.invalid = Employer’s name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
 employerName.error.tooLong = Employer’s name must be 160 characters or fewer
+
+employerTypeOfBusiness.title = What type of business is the employer?
+employerTypeOfBusiness.heading = What type of business is {0}?
+employerTypeOfBusiness.error.required = Select what type of business the employer is
+employerTypeOfBusiness.radioList1 = A UK company
+employerTypeOfBusiness.radioList2 = A UK partnership
+employerTypeOfBusiness.radioList3 = Other
 
 borrowList.title = You have added {0} instance of borrowing
 borrowList.title.plural = You have added {0} instances of borrowing
@@ -1469,10 +1487,23 @@ borrowList.row.remove.hidden = £{0} borrowed from {1}
 borrowList.description = You must tell us about all times the scheme borrowed money during the period of this return.
 borrowList.radios = Do you need to add another instance of borrowing?
 borrowList.radios.error.required = Select yes if you need to add another instance of borrowing
-borrowList.pagination.label = Showing {0} - {1} of {2} borrows
+borrowList.pagination.label = Showing {0} - {1} of {2} instances of borrowing
+borrowList.inset = You cannot add another instance of borrowing as you have entered the maximum of 5,000.
 
 otherEmployeeDescription.title = Provide a brief description of the employer
 otherEmployeeDescription.heading = Provide a brief description of {0}
 otherEmployeeDescription.error.required = Provide a brief description of the employer
 otherEmployeeDescription.error.length = The brief description of the employer must be 160 characters or fewer
 otherEmployeeDescription.error.invalid = The brief description of employer must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+
+removeBorrowInstances.title = Are you sure you want to remove this instance of borrowing?
+removeBorrowInstances.heading = Are you sure you want to remove {0} borrowed from {1}?
+removeBorrowInstances.error.required = Select yes if you are sure you want to remove this instance of borrowing
+
+totalEmployerContribution.title = What was the total contribution by this employer for the member, in pounds and pence?
+totalEmployerContribution.heading = What was the total contribution by {0} for {1}, in pounds and pence?
+totalEmployerContribution.hint = Enter the total contribution made by this employer for this member during the period of this return.
+totalEmployerContribution.error.required = Enter the total amount of the contribution, in pounds and pence
+totalEmployerContribution.error.invalid = Total contribution must be an amount of money, like 123 or 123.45
+totalEmployerContribution.error.tooSmall = Total contribution must be 0.01 or more
+totalEmployerContribution.error.tooLarge = Total contribution must be 999999999.99 or less
