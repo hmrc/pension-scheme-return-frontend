@@ -51,7 +51,8 @@ object EmployerContributionsNavigator extends JourneyNavigator {
       userAnswers.get(EmployerTypeOfBusinessPage(srn, memberIndex, index)) match {
 
         case Some(IdentityType.UKCompany) =>
-          controllers.routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.employercontributions.routes.EmployerCompanyCrnController
+            .onPageLoad(srn, memberIndex, index, NormalMode)
 
         case Some(IdentityType.UKPartnership) =>
           controllers.nonsipp.employercontributions.routes.PartnershipEmployerUtrController
@@ -61,6 +62,8 @@ object EmployerContributionsNavigator extends JourneyNavigator {
           controllers.nonsipp.employercontributions.routes.OtherEmployeeDescriptionController
             .onPageLoad(srn, memberIndex, index, NormalMode)
       }
+
+    case EmployerCompanyCrnPage(srn, memberIndex, index) => controllers.routes.UnauthorisedController.onPageLoad()
 
     case PartnershipEmployerUtrPage(srn, index, secondaryIndex) =>
       controllers.nonsipp.employercontributions.routes.TotalEmployerContributionController

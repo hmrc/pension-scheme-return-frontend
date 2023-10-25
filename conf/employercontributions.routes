@@ -1,4 +1,3 @@
-
 GET        /:srn/partnership-employer-utr/:index/:secondaryIndex                 controllers.nonsipp.employercontributions.PartnershipEmployerUtrController.onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode = NormalMode)
 POST       /:srn/partnership-employer-utr/:index/:secondaryIndex                 controllers.nonsipp.employercontributions.PartnershipEmployerUtrController.onSubmit(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode = NormalMode)
 GET        /:srn/change-partnership-employer-utr/:index/:secondaryIndex          controllers.nonsipp.employercontributions.PartnershipEmployerUtrController.onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode = CheckMode)
@@ -26,3 +25,8 @@ GET         /:srn/total-employer-contribution/:index/:secondaryIndex            
 POST        /:srn/total-employer-contribution/:index/:secondaryIndex                 controllers.nonsipp.employercontributions.TotalEmployerContributionController.onSubmit(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode = NormalMode)
 GET         /:srn/change-total-employer-contribution/:index/:secondaryIndex          controllers.nonsipp.employercontributions.TotalEmployerContributionController.onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode = CheckMode)
 POST        /:srn/change-total-employer-contribution/:index/:secondaryIndex          controllers.nonsipp.employercontributions.TotalEmployerContributionController.onSubmit(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode = CheckMode)
+
+GET        /:srn/company-employer-crn/:memberIndex/:index                           controllers.nonsipp.employercontributions.EmployerCompanyCrnController.onPageLoad(srn: Srn, memberIndex: Max300, index: Max50, mode: Mode = NormalMode)
+POST       /:srn/company-employer-crn/:memberIndex/:index                           controllers.nonsipp.employercontributions.EmployerCompanyCrnController.onSubmit(srn: Srn, memberIndex: Max300, index: Max50, mode: Mode = NormalMode)
+GET        /:srn/change-company-employer-crn/:memberIndex/:index                    controllers.nonsipp.employercontributions.EmployerCompanyCrnController.onPageLoad(srn: Srn, memberIndex: Max300, index: Max50, mode: Mode = CheckMode)
+POST       /:srn/change-company-employer-crn/:memberIndex/:index                    controllers.nonsipp.employercontributions.EmployerCompanyCrnController.onSubmit(srn: Srn, memberIndex: Max300, index: Max50, mode: Mode = CheckMode)

@@ -1409,7 +1409,7 @@ moneyBorrowed.borrowedAmountAndRate.borrowAmount.error.nonNumeric = Total amount
 moneyBorrowed.borrowedAmountAndRate.borrowAmount.error.tooHigh = Total amount of money borrowed must be 999999999.99 or less
 
 moneyBorrowed.WhenBorrowed.title = When did the scheme borrow this money from the lender?
-moneyBorrowed.WhenBorrowed.heading = When did {0} borrow £{2} from {1}
+moneyBorrowed.WhenBorrowed.heading = When did {0} borrow £{2} from {1}?
 moneyBorrowed.WhenBorrowed.error.required.all = Enter the date the scheme borrowed this money
 moneyBorrowed.WhenBorrowed.error.required.day = Date the scheme acquired this land or property must include a day
 moneyBorrowed.WhenBorrowed.error.required.month = Date the scheme borrowed this money must include a month
@@ -1421,7 +1421,7 @@ moneyBorrowed.WhenBorrowed.error.future = Date the scheme borrowed this money mu
 moneyBorrowed.WhenBorrowed.error.after = Date the scheme borrowed this money must be after {0}
 
 moneyBorrowed.WhyBorrowed.title = Why did the scheme borrow this money from the lender?
-moneyBorrowed.WhyBorrowed.heading = Why did {0} borrow £{2} from {1}
+moneyBorrowed.WhyBorrowed.heading = Why did {0} borrow £{2} from {1}?
 moneyBorrowed.WhyBorrowed.error.required = Enter the reason why the scheme borrowed this money
 moneyBorrowed.WhyBorrowed.error.invalid = The reason the scheme borrowed this money must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
 moneyBorrowed.WhyBorrowed.error.length = The reason the scheme borrowed this money must be 160 characters or fewer
@@ -1518,3 +1518,16 @@ totalEmployerContribution.error.required = Enter the total amount of the contrib
 totalEmployerContribution.error.invalid = Total contribution must be an amount of money, like 123 or 123.45
 totalEmployerContribution.error.tooSmall = Total contribution must be 0.01 or more
 totalEmployerContribution.error.tooLarge = Total contribution must be 999999999.99 or less
+
+employerCompanyCRN.title = Do you know the employer’s Company Registration Number (CRN)?
+employerCompanyCRN.heading = Do you know {0}’s Company Registration Number (CRN)?
+employerCompanyCRN.hint = This is 7 or 8 characters, like 0123456 or AB123456. It may also be called ‘company number’ or ‘Companies House number’.
+employerCompanyCRN.yes.conditional =What is {0}’s CRN?
+employerCompanyCRN.yes.conditional.error.required = Enter the employer’s CRN
+employerCompanyCRN.yes.conditional.error.length = CRN must be 7 or 8 characters
+employerCompanyCRN.yes.conditional.error.invalid = CRN must only include letters and numbers
+employerCompanyCRN.no.conditional = Tell us why you cannot provide {0}’s CRN
+employerCompanyCRN.no.conditional.error.required = Enter the reason you cannot provide the employer’s CRN
+employerCompanyCRN.no.conditional.error.invalid = The reason you cannot provide the employer’s CRN must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+employerCompanyCRN.no.conditional.error.length = The reason you cannot provide the employer’s CRN must be 160 characters or fewer
+employerCompanyCRN.error.required = Select yes if you know the employer’s Company Registration Number (CRN)

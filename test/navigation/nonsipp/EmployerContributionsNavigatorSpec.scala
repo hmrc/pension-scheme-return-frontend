@@ -96,7 +96,9 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
           secondaryIndex,
           EmployerTypeOfBusinessPage,
           Gen.const(IdentityType.UKCompany),
-          (srn, memberIndex: Max300, index: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          (srn, memberIndex: Max300, index: Max50, _) =>
+            controllers.nonsipp.employercontributions.routes.EmployerCompanyCrnController
+              .onPageLoad(srn, memberIndex, index, NormalMode)
         )
         .withName("go from employer type of business page to unauthorised")
     )
@@ -166,6 +168,19 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
           index,
           secondaryIndex,
           TotalEmployerContributionPage,
+          (srn, index: Max300, secondaryIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+        )
+        .withName("go from TotalEmployerContributionPage to ??? page")
+    )
+  }
+
+  "EmployerCompanyCrnPage" - {
+    act.like(
+      normalmode
+        .navigateToWithDoubleIndex(
+          index,
+          secondaryIndex,
+          EmployerCompanyCrnPage,
           (srn, index: Max300, secondaryIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
         )
         .withName("go from TotalEmployerContributionPage to ??? page")
