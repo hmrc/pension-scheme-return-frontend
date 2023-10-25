@@ -1,3 +1,8 @@
+GET        /:srn/partnership-employer-utr/:index/:secondaryIndex                 controllers.nonsipp.employercontributions.PartnershipEmployerUtrController.onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode = NormalMode)
+POST       /:srn/partnership-employer-utr/:index/:secondaryIndex                 controllers.nonsipp.employercontributions.PartnershipEmployerUtrController.onSubmit(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode = NormalMode)
+GET        /:srn/change-partnership-employer-utr/:index/:secondaryIndex          controllers.nonsipp.employercontributions.PartnershipEmployerUtrController.onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode = CheckMode)
+POST       /:srn/change-partnership-employer-utr/:index/:secondaryIndex          controllers.nonsipp.employercontributions.PartnershipEmployerUtrController.onSubmit(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode = CheckMode)
+
 GET         /:srn/what-you-will-need-employer-contributions                       controllers.nonsipp.employercontributions.WhatYouWillNeedEmployerContributionsController.onPageLoad(srn: Srn)
 GET         /:srn/submit-what-you-will-need-employer-contributions                controllers.nonsipp.employercontributions.WhatYouWillNeedEmployerContributionsController.onSubmit(srn: Srn)
 
