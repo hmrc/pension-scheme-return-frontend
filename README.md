@@ -36,6 +36,12 @@ sbt 'run 17000'
 
 ### Running the test suite
 
+```bash
+sbt clean coverage test it:test coverageReport
+```
+
+or
+
 You can execute the [runtests.sh](runtests.sh) file to run the tests and generate coverage report easily.
 ```bash
 /bin/bash ./runtests.sh
