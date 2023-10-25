@@ -100,16 +100,16 @@ object EmployerCompanyCrnController {
 
   def form(formProvider: YesNoPageFormProvider): Form[Either[String, Crn]] =
     formProvider.conditional(
-      "companyBuyerCrn.error.required",
+      "employerCompanyCRN.error.required",
       mappingNo = Mappings.textArea(
-        "companyBuyerCrn.no.conditional.error.required",
-        "companyBuyerCrn.no.conditional.error.invalid",
-        "companyBuyerCrn.no.conditional.error.length"
+        "employerCompanyCRN.no.conditional.error.required",
+        "employerCompanyCRN.no.conditional.error.invalid",
+        "employerCompanyCRN.no.conditional.error.length"
       ),
       mappingYes = Mappings.crn(
-        "companyBuyerCrn.yes.conditional.error.required",
-        "companyBuyerCrn.yes.conditional.error.invalid",
-        "companyBuyerCrn.yes.conditional.error.length"
+        "employerCompanyCRN.yes.conditional.error.required",
+        "employerCompanyCRN.yes.conditional.error.invalid",
+        "employerCompanyCRN.yes.conditional.error.length"
       )
     )
 
@@ -121,14 +121,14 @@ object EmployerCompanyCrnController {
     companyName: String
   ): FormPageViewModel[ConditionalYesNoPageViewModel] =
     FormPageViewModel[ConditionalYesNoPageViewModel](
-      "companyBuyerCrn.title",
-      Message("companyBuyerCrn.heading", companyName),
+      "employerCompanyCRN.title",
+      Message("employerCompanyCRN.heading", companyName),
       ConditionalYesNoPageViewModel(
         yes = YesNoViewModel
-          .Conditional(Message("companyBuyerCrn.yes.conditional", companyName), FieldType.Input),
+          .Conditional(Message("employerCompanyCRN.yes.conditional", companyName), FieldType.Input),
         no = YesNoViewModel
-          .Conditional(Message("companyBuyerCrn.no.conditional", companyName), FieldType.Textarea)
-      ).withHint("companyBuyerCrn.hint"),
+          .Conditional(Message("employerCompanyCRN.no.conditional", companyName), FieldType.Textarea)
+      ).withHint("employerCompanyCRN.hint"),
       controllers.nonsipp.employercontributions.routes.EmployerCompanyCrnController
         .onSubmit(srn, memberIndex, index, mode)
     )
