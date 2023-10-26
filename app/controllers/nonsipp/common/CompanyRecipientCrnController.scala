@@ -21,6 +21,7 @@ import controllers.actions._
 import controllers.nonsipp.common.CompanyRecipientCrnController._
 import forms.YesNoPageFormProvider
 import forms.mappings.Mappings
+import forms.mappings.errors.InputFormErrors
 import models.SchemeId.Srn
 import models.{ConditionalYesNo, Crn, IdentitySubject, Mode, UserAnswers}
 import navigation.Navigator
@@ -80,14 +81,16 @@ class CompanyRecipientCrnController @Inject()(
 
 object CompanyRecipientCrnController {
 
+  private def inputFormErrors(subjectKey: String) = InputFormErrors.textArea(
+    s"${subjectKey}.companyRecipientCrn.no.conditional.error.required",
+    s"${subjectKey}.companyRecipientCrn.no.conditional.error.invalid",
+    s"${subjectKey}.companyRecipientCrn.no.conditional.error.length"
+  )
+
   def form(formProvider: YesNoPageFormProvider, subject: IdentitySubject): Form[Either[String, Crn]] =
     formProvider.conditional(
       s"${subject.key}.companyRecipientCrn.error.required",
-      mappingNo = Mappings.textArea(
-        s"${subject.key}.companyRecipientCrn.no.conditional.error.required",
-        s"${subject.key}.companyRecipientCrn.no.conditional.error.invalid",
-        s"${subject.key}.companyRecipientCrn.no.conditional.error.length"
-      ),
+      mappingNo = Mappings.input(inputFormErrors(subject.key)),
       mappingYes = Mappings.crn(
         s"${subject.key}.companyRecipientCrn.yes.conditional.error.required",
         s"${subject.key}.companyRecipientCrn.yes.conditional.error.invalid",

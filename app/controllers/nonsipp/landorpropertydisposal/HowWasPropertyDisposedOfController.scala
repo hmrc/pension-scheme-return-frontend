@@ -22,12 +22,13 @@ import controllers.actions.IdentifyAndRequireData
 import controllers.nonsipp.landorpropertydisposal.HowWasPropertyDisposedOfController._
 import forms.RadioListFormProvider
 import forms.mappings.Mappings
+import forms.mappings.errors.InputFormErrors
 import models.GenericFormMapper.ConditionalRadioMapper
-import models.HowDisposed.{HowDisposed, _}
+import models.HowDisposed._
 import models.SchemeId.Srn
 import models.{ConditionalRadioMapper, HowDisposed, Mode}
 import navigation.Navigator
-import pages.nonsipp.landorproperty.LandOrPropertyAddressLookupPage
+import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import pages.nonsipp.landorpropertydisposal.HowWasPropertyDisposedOfPage
 import play.api.data.Form
 import play.api.i18n.MessagesApi
@@ -56,7 +57,7 @@ class HowWasPropertyDisposedOfController @Inject()(
 
   def onPageLoad(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      request.userAnswers.get(LandOrPropertyAddressLookupPage(srn, landOrPropertyIndex)).getOrRecoverJourney {
+      request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, landOrPropertyIndex)).getOrRecoverJourney {
         address =>
           val preparedForm =
             request.userAnswers.fillForm(
@@ -74,7 +75,7 @@ class HowWasPropertyDisposedOfController @Inject()(
         .bindFromRequest()
         .fold(
           formWithErrors =>
-            request.userAnswers.get(LandOrPropertyAddressLookupPage(srn, landOrPropertyIndex)).getOrRecoverJourney {
+            request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, landOrPropertyIndex)).getOrRecoverJourney {
               address =>
                 Future.successful(
                   BadRequest(
@@ -116,15 +117,17 @@ object HowWasPropertyDisposedOfController {
     }
   )
 
+  private val formErrors = InputFormErrors.textArea(
+    "howWasDisposed.conditional.error.required",
+    "howWasDisposed.conditional.error.invalid",
+    "howWasDisposed.conditional.error.length"
+  )
+
   def form(formProvider: RadioListFormProvider): Form[HowDisposed] =
     formProvider.singleConditional[HowDisposed, String](
       "howWasDisposed.error.required",
       Other.name,
-      Mappings.textArea(
-        "howWasDisposed.conditional.error.required",
-        "howWasDisposed.conditional.error.invalid",
-        "howWasDisposed.conditional.error.length"
-      )
+      Mappings.input(formErrors)
     )
 
   def viewModel(

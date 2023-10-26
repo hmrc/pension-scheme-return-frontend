@@ -21,6 +21,7 @@ import controllers.actions._
 import controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNinoController._
 import forms.YesNoPageFormProvider
 import forms.mappings.Mappings
+import forms.mappings.errors.InputFormErrors
 import models.SchemeId.Srn
 import models.{ConditionalYesNo, Mode}
 import navigation.Navigator
@@ -81,13 +82,16 @@ class IndividualRecipientNinoController @Inject()(
 }
 
 object IndividualRecipientNinoController {
+
+  private val noFormErrors = InputFormErrors.textArea(
+    "individualRecipientNino.no.conditional.error.required",
+    "individualRecipientNino.no.conditional.error.invalid",
+    "individualRecipientNino.no.conditional.error.length"
+  )
+
   def form(formProvider: YesNoPageFormProvider): Form[Either[String, Nino]] = formProvider.conditional(
     "individualRecipientNino.error.required",
-    mappingNo = Mappings.textArea(
-      "individualRecipientNino.no.conditional.error.required",
-      "individualRecipientNino.no.conditional.error.invalid",
-      "individualRecipientNino.no.conditional.error.length"
-    ),
+    mappingNo = Mappings.input(noFormErrors),
     mappingYes = Mappings.nino(
       "individualRecipientNino.yes.conditional.error.required",
       "individualRecipientNino.yes.conditional.error.invalid"

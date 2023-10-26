@@ -18,6 +18,7 @@ package navigation
 
 import controllers.nonsipp.routes
 import models._
+import models.requests.DataRequest
 import pages._
 import play.api.libs.json.JsObject
 import play.api.mvc.Call
@@ -40,7 +41,8 @@ class RootNavigator @Inject()() extends Navigator {
         }
       }
 
-      override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty
+      override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] =
+        _ => _ => PartialFunction.empty
     })
 
   override def defaultNormalMode: Call = controllers.routes.IndexController.onPageLoad()
@@ -53,7 +55,7 @@ trait Navigator {
   def defaultNormalMode: Call
   def defaultCheckMode: Call
 
-  def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = mode match {
+  def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers)(implicit req: DataRequest[_]): Call = mode match {
 
     case NormalMode =>
       journeys
@@ -63,7 +65,9 @@ trait Navigator {
 
     case CheckMode =>
       journeys
-        .foldLeft(PartialFunction.empty[Page, Call])((acc, curr) => acc.orElse(curr.checkRoutes(userAnswers)))
+        .foldLeft(PartialFunction.empty[Page, Call])(
+          (acc, curr) => acc.orElse(curr.checkRoutes(req.userAnswers)(userAnswers))
+        )
         .lift(page)
         .getOrElse(defaultCheckMode)
   }

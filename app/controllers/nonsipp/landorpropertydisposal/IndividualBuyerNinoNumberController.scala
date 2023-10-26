@@ -21,6 +21,7 @@ import controllers.actions._
 import controllers.nonsipp.landorpropertydisposal.IndividualBuyerNinoNumberController._
 import forms.YesNoPageFormProvider
 import forms.mappings.Mappings
+import forms.mappings.errors.InputFormErrors
 import models.SchemeId.Srn
 import models.{ConditionalYesNo, Mode}
 import navigation.Navigator
@@ -98,13 +99,16 @@ class IndividualBuyerNinoNumberController @Inject()(
 }
 
 object IndividualBuyerNinoNumberController {
+
+  private val noFormErrors = InputFormErrors.textArea(
+    "individualBuyerNinoNumber.no.conditional.error.required",
+    "individualBuyerNinoNumber.no.conditional.error.invalid",
+    "individualBuyerNinoNumber.no.conditional.error.length"
+  )
+
   def form(formProvider: YesNoPageFormProvider): Form[Either[String, Nino]] = formProvider.conditional(
     "individualBuyerNinoNumber.error.required",
-    mappingNo = Mappings.textArea(
-      "individualBuyerNinoNumber.no.conditional.error.required",
-      "individualBuyerNinoNumber.no.conditional.error.invalid",
-      "individualBuyerNinoNumber.no.conditional.error.length"
-    ),
+    mappingNo = Mappings.input(noFormErrors),
     mappingYes = Mappings.nino(
       "individualBuyerNinoNumber.yes.conditional.error.required",
       "individualBuyerNinoNumber.yes.conditional.error.invalid"

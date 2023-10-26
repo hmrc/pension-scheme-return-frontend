@@ -21,6 +21,7 @@ import controllers.actions._
 import controllers.nonsipp.common.PartnershipRecipientUtrController._
 import forms.YesNoPageFormProvider
 import forms.mappings.Mappings
+import forms.mappings.errors.InputFormErrors
 import models.SchemeId.Srn
 import models.{ConditionalYesNo, IdentitySubject, Mode, UserAnswers, Utr}
 import navigation.Navigator
@@ -83,14 +84,17 @@ class PartnershipRecipientUtrController @Inject()(
 }
 
 object PartnershipRecipientUtrController {
+
+  private def noFormErrors(subjectKey: String) = InputFormErrors.input(
+    s"${subjectKey}.partnershipRecipientUtr.no.conditional.error.required",
+    s"${subjectKey}.partnershipRecipientUtr.no.conditional.error.invalid",
+    s"${subjectKey}.partnershipRecipientUtr.no.conditional.error.length"
+  )
+
   def form(formProvider: YesNoPageFormProvider, subject: IdentitySubject): Form[Either[String, Utr]] =
     formProvider.conditional(
       s"${subject.key}.partnershipRecipientUtr.error.required",
-      mappingNo = Mappings.textArea(
-        s"${subject.key}.partnershipRecipientUtr.no.conditional.error.required",
-        s"${subject.key}.partnershipRecipientUtr.no.conditional.error.invalid",
-        s"${subject.key}.partnershipRecipientUtr.no.conditional.error.length"
-      ),
+      mappingNo = Mappings.input(noFormErrors(subject.key)),
       mappingYes = Mappings.utr(
         s"${subject.key}.partnershipRecipientUtr.yes.conditional.error.required",
         s"${subject.key}.partnershipRecipientUtr.yes.conditional.error.invalid"

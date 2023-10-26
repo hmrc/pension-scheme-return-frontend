@@ -24,7 +24,7 @@ import forms.YesNoPageFormProvider
 import models.Mode
 import models.SchemeId.Srn
 import navigation.Navigator
-import pages.nonsipp.landorproperty.{IsLandOrPropertyResidentialPage, LandOrPropertyAddressLookupPage}
+import pages.nonsipp.landorproperty.{IsLandOrPropertyResidentialPage, LandOrPropertyChosenAddressPage}
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -52,7 +52,7 @@ class IsLandOrPropertyResidentialController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      request.userAnswers.get(LandOrPropertyAddressLookupPage(srn, index)).getOrRecoverJourney { address =>
+      request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index)).getOrRecoverJourney { address =>
         val preparedForm = request.userAnswers.fillForm(IsLandOrPropertyResidentialPage(srn, index), form)
         Ok(view(preparedForm, viewModel(srn, index, address.addressLine1, mode)))
       }
@@ -64,7 +64,7 @@ class IsLandOrPropertyResidentialController @Inject()(
         .bindFromRequest()
         .fold(
           formWithErrors =>
-            request.userAnswers.get(LandOrPropertyAddressLookupPage(srn, index)).getOrRecoverJourney { address =>
+            request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index)).getOrRecoverJourney { address =>
               Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, address.addressLine1, mode))))
             },
           value =>

@@ -23,7 +23,7 @@ import pages.QuestionPage
 import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
 
-case class LandOrPropertyAddressLookupPage(srn: Srn, index: Max5000) extends QuestionPage[Address] {
+case class LandOrPropertyChosenAddressPage(srn: Srn, index: Max5000) extends QuestionPage[Address] {
 
   override def path: JsPath =
     Paths.landOrPropertyTransactions \ "propertyDetails" \ "addressDetails" \ toString \ index.arrayIndex.toString

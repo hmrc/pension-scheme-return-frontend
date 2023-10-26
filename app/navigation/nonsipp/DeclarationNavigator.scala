@@ -31,5 +31,5 @@ object DeclarationNavigator extends JourneyNavigator {
       controllers.nonsipp.routes.ReturnSubmittedController.onPageLoad(srn)
   }
 
-  override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty
+  override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] = _ => _ => PartialFunction.empty
 }

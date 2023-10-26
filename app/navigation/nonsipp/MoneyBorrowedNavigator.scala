@@ -81,24 +81,32 @@ object MoneyBorrowedNavigator extends JourneyNavigator {
       }
   }
 
-  override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => {
+  override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] =
+    _ =>
+      _ => {
 
-    case LenderNamePage(srn, index) =>
-      controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController.onPageLoad(srn, index, CheckOrChange.Check)
+        case LenderNamePage(srn, index) =>
+          controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController
+            .onPageLoad(srn, index, CheckOrChange.Check)
 
-    case IsLenderConnectedPartyPage(srn, index) =>
-      controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController.onPageLoad(srn, index, CheckOrChange.Check)
+        case IsLenderConnectedPartyPage(srn, index) =>
+          controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController
+            .onPageLoad(srn, index, CheckOrChange.Check)
 
-    case BorrowedAmountAndRatePage(srn, index) =>
-      controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController.onPageLoad(srn, index, CheckOrChange.Check)
+        case BorrowedAmountAndRatePage(srn, index) =>
+          controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController
+            .onPageLoad(srn, index, CheckOrChange.Check)
 
-    case WhenBorrowedPage(srn, index) =>
-      controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController.onPageLoad(srn, index, CheckOrChange.Check)
+        case WhenBorrowedPage(srn, index) =>
+          controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController
+            .onPageLoad(srn, index, CheckOrChange.Check)
 
-    case ValueOfSchemeAssetsWhenMoneyBorrowedPage(srn, index) =>
-      controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController.onPageLoad(srn, index, CheckOrChange.Check)
+        case ValueOfSchemeAssetsWhenMoneyBorrowedPage(srn, index) =>
+          controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController
+            .onPageLoad(srn, index, CheckOrChange.Check)
 
-    case WhySchemeBorrowedMoneyPage(srn, index) =>
-      controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController.onPageLoad(srn, index, CheckOrChange.Check)
-  }
+        case WhySchemeBorrowedMoneyPage(srn, index) =>
+          controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedCYAController
+            .onPageLoad(srn, index, CheckOrChange.Check)
+      }
 }

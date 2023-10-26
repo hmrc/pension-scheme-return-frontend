@@ -21,6 +21,7 @@ import controllers.actions._
 import controllers.nonsipp.landorproperty.IndividualSellerNiController._
 import forms.YesNoPageFormProvider
 import forms.mappings.Mappings
+import forms.mappings.errors.InputFormErrors
 import models.SchemeId.Srn
 import models.{ConditionalYesNo, Mode}
 import navigation.Navigator
@@ -86,13 +87,16 @@ class IndividualSellerNiController @Inject()(
 }
 
 object IndividualSellerNiController {
+
+  private val noFormErrors = InputFormErrors.input(
+    "individualSellerNi.no.conditional.error.required",
+    "individualSellerNi.no.conditional.error.invalid",
+    "individualSellerNi.no.conditional.error.length"
+  )
+
   def form(formProvider: YesNoPageFormProvider): Form[Either[String, Nino]] = formProvider.conditional(
     "individualSellerNi.error.required",
-    mappingNo = Mappings.textArea(
-      "individualSellerNi.no.conditional.error.required",
-      "individualSellerNi.no.conditional.error.invalid",
-      "individualSellerNi.no.conditional.error.length"
-    ),
+    mappingNo = Mappings.input(noFormErrors),
     mappingYes = Mappings.nino(
       "individualSellerNi.yes.conditional.error.required",
       "individualSellerNi.yes.conditional.error.invalid"

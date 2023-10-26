@@ -26,7 +26,7 @@ import eu.timepit.refined.refineV
 import forms.YesNoPageFormProvider
 import models.CheckOrChange.Change
 import models.SchemeId.Srn
-import models.{Address, Mode, NormalMode, Pagination}
+import models._
 import navigation.Navigator
 import pages.nonsipp.landorproperty.{LandOrPropertyAddressLookupPages, LandOrPropertyListPage}
 import play.api.data.Form
@@ -98,9 +98,7 @@ object LandOrPropertyListController {
             List(
               ListRow(
                 address.addressLine1,
-                changeUrl = routes.LandOrPropertyCYAController
-                  .onPageLoad(srn, index, Change)
-                  .url,
+                changeUrl = routes.LandOrPropertyCYAController.onPageLoad(srn, index, CheckMode).url,
                 changeHiddenText = Message("landOrPropertyList.row.change.hiddenText", address.addressLine1),
                 routes.RemovePropertyController.onPageLoad(srn, index, mode).url,
                 Message("landOrPropertyList.row.remove.hiddenText")

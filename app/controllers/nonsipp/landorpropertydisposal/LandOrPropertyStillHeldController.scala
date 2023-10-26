@@ -24,7 +24,7 @@ import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
 import models.{HowDisposed, Mode}
 import navigation.Navigator
-import pages.nonsipp.landorproperty.LandOrPropertyAddressLookupPage
+import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import pages.nonsipp.landorpropertydisposal.{HowWasPropertyDisposedOfPage, LandOrPropertyStillHeldPage}
 import play.api.data.Form
 import play.api.i18n.MessagesApi
@@ -54,7 +54,7 @@ class LandOrPropertyStillHeldController @Inject()(
   def onPageLoad(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       request.userAnswers
-        .get(LandOrPropertyAddressLookupPage(srn, landOrPropertyIndex))
+        .get(LandOrPropertyChosenAddressPage(srn, landOrPropertyIndex))
         .getOrRecoverJourney { address =>
           val preparedForm =
             request.userAnswers.fillForm(LandOrPropertyStillHeldPage(srn, landOrPropertyIndex, disposalIndex), form)
@@ -81,7 +81,7 @@ class LandOrPropertyStillHeldController @Inject()(
         .fold(
           formWithErrors =>
             request.userAnswers
-              .get(LandOrPropertyAddressLookupPage(srn, landOrPropertyIndex))
+              .get(LandOrPropertyChosenAddressPage(srn, landOrPropertyIndex))
               .getOrRecoverJourney { address =>
                 Future.successful(
                   BadRequest(

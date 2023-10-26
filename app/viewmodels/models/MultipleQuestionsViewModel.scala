@@ -18,6 +18,7 @@ package viewmodels.models
 
 import play.api.data.Form
 import viewmodels.DisplayMessage.InlineMessage
+import viewmodels.InputWidth
 
 sealed trait MultipleQuestionsViewModel[A] {
 
@@ -69,28 +70,77 @@ object MultipleQuestionsViewModel {
 
     override val fields: List[QuestionField] = List(field1, field2, field3)
   }
+
+  case class QuadrupleQuestion[A, B, C, D](
+    form: Form[(A, B, C, D)],
+    field1: QuestionField,
+    field2: QuestionField,
+    field3: QuestionField,
+    field4: QuestionField
+  ) extends MultipleQuestionsViewModel[(A, B, C, D)] {
+
+    override def firstField: QuestionField = field1
+
+    override val fields: List[QuestionField] = List(field1, field2, field3, field4)
+  }
+
+  case class QuintupleQuestion[A, B, C, D, E](
+    form: Form[(A, B, C, D, E)],
+    field1: QuestionField,
+    field2: QuestionField,
+    field3: QuestionField,
+    field4: QuestionField,
+    field5: QuestionField
+  ) extends MultipleQuestionsViewModel[(A, B, C, D, E)] {
+
+    override def firstField: QuestionField = field1
+
+    override val fields: List[QuestionField] = List(field1, field2, field3, field4, field5)
+  }
+
+  case class SextupleQuestion[A, B, C, D, E, F](
+    form: Form[(A, B, C, D, E, F)],
+    field1: QuestionField,
+    field2: QuestionField,
+    field3: QuestionField,
+    field4: QuestionField,
+    field5: QuestionField,
+    field6: QuestionField
+  ) extends MultipleQuestionsViewModel[(A, B, C, D, E, F)] {
+
+    override def firstField: QuestionField = field1
+
+    override val fields: List[QuestionField] = List(field1, field2, field3, field4, field5, field6)
+  }
 }
 
-case class QuestionField(label: InlineMessage, hint: Option[InlineMessage] = None, fieldType: FieldType)
+case class QuestionField(
+  label: InlineMessage,
+  hint: Option[InlineMessage] = None,
+  width: Option[InputWidth] = None,
+  fieldType: FieldType
+) {
+  def withWidth(width: InputWidth): QuestionField = copy(width = Some(width))
+}
 
 object QuestionField {
   def input(label: InlineMessage, hint: Option[InlineMessage] = None): QuestionField =
-    QuestionField(label, hint, FieldType.Input)
+    QuestionField(label, hint, None, FieldType.Input)
 
   def currency(label: InlineMessage, hint: Option[InlineMessage] = None): QuestionField =
-    QuestionField(label, hint, FieldType.Currency)
+    QuestionField(label, hint, None, FieldType.Currency)
 
   // alias for currency
   def money(label: InlineMessage, hint: Option[InlineMessage] = None): QuestionField =
     currency(label, hint)
 
   def date(label: InlineMessage, hint: Option[InlineMessage] = None): QuestionField =
-    QuestionField(label, hint, FieldType.Date)
+    QuestionField(label, hint, None, FieldType.Date)
 
   // alias for date
   def localDate(label: InlineMessage, hint: Option[InlineMessage] = None): QuestionField =
     date(label, hint)
 
   def percentage(label: InlineMessage, hint: Option[InlineMessage] = None): QuestionField =
-    QuestionField(label, hint, FieldType.Percentage)
+    QuestionField(label, hint, None, FieldType.Percentage)
 }

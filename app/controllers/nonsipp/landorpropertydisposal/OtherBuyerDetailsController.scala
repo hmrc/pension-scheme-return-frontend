@@ -31,7 +31,7 @@ import utils.FormUtils.FormOps
 import viewmodels.models.{FormPageViewModel, RecipientDetailsViewModel}
 import views.html.RecipientDetailsView
 import controllers.nonsipp.landorpropertydisposal.OtherBuyerDetailsController._
-import pages.nonsipp.landorproperty.LandOrPropertyAddressLookupPage
+import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import pages.nonsipp.landorpropertydisposal.OtherBuyerDetailsPage
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
@@ -59,7 +59,7 @@ class OtherBuyerDetailsController @Inject()(
   ): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val address: String =
-        request.userAnswers.get(LandOrPropertyAddressLookupPage(srn, landOrPropertyIndex)).get.addressLine1
+        request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, landOrPropertyIndex)).get.addressLine1
       val form = OtherBuyerDetailsController.form(formProvider)
       Ok(
         view(
@@ -72,7 +72,7 @@ class OtherBuyerDetailsController @Inject()(
   def onSubmit(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       val address: String =
-        request.userAnswers.get(LandOrPropertyAddressLookupPage(srn, landOrPropertyIndex)).get.addressLine1
+        request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, landOrPropertyIndex)).get.addressLine1
       val form = OtherBuyerDetailsController.form(formProvider)
       form
         .bindFromRequest()

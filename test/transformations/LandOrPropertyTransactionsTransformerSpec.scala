@@ -83,7 +83,7 @@ class LandOrPropertyTransactionsTransformerSpec extends AnyFreeSpec with Matcher
         userAnswers => {
           userAnswers.get(LandOrPropertyHeldPage(srn)) mustBe Some(true)
           userAnswers.get(LandPropertyInUKPage(srn, refineMV(1))) mustBe Some(true)
-          userAnswers.get(LandOrPropertyAddressLookupPage(srn, refineMV(1))) mustBe Some(address)
+          userAnswers.get(LandOrPropertyChosenAddressPage(srn, refineMV(1))) mustBe Some(address)
           userAnswers.get(LandRegistryTitleNumberPage(srn, refineMV(1))) mustBe Some(
             ConditionalYesNo.yes("landRegistryTitleNumberValue")
           )
@@ -124,7 +124,7 @@ class LandOrPropertyTransactionsTransformerSpec extends AnyFreeSpec with Matcher
         userAnswers => {
           userAnswers.get(LandOrPropertyHeldPage(srn)) mustBe Some(true)
           userAnswers.get(LandPropertyInUKPage(srn, refineMV(1))) mustBe Some(true)
-          userAnswers.get(LandOrPropertyAddressLookupPage(srn, refineMV(1))) mustBe Some(address)
+          userAnswers.get(LandOrPropertyChosenAddressPage(srn, refineMV(1))) mustBe Some(address)
           userAnswers.get(LandRegistryTitleNumberPage(srn, refineMV(1))) mustBe Some(
             ConditionalYesNo.yes("landRegistryTitleNumberValue")
           )
@@ -164,7 +164,7 @@ class LandOrPropertyTransactionsTransformerSpec extends AnyFreeSpec with Matcher
         userAnswers => {
           userAnswers.get(LandOrPropertyHeldPage(srn)) mustBe Some(true)
           userAnswers.get(LandPropertyInUKPage(srn, refineMV(1))) mustBe Some(true)
-          userAnswers.get(LandOrPropertyAddressLookupPage(srn, refineMV(1))) mustBe Some(address)
+          userAnswers.get(LandOrPropertyChosenAddressPage(srn, refineMV(1))) mustBe Some(address)
           userAnswers.get(LandRegistryTitleNumberPage(srn, refineMV(1))) mustBe Some(
             ConditionalYesNo.yes("landRegistryTitleNumberValue")
           )
@@ -207,7 +207,7 @@ class LandOrPropertyTransactionsTransformerSpec extends AnyFreeSpec with Matcher
         userAnswers => {
           userAnswers.get(LandOrPropertyHeldPage(srn)) mustBe Some(true)
           userAnswers.get(LandPropertyInUKPage(srn, refineMV(1))) mustBe Some(true)
-          userAnswers.get(LandOrPropertyAddressLookupPage(srn, refineMV(1))) mustBe Some(address)
+          userAnswers.get(LandOrPropertyChosenAddressPage(srn, refineMV(1))) mustBe Some(address)
           userAnswers.get(LandRegistryTitleNumberPage(srn, refineMV(1))) mustBe Some(
             ConditionalYesNo.yes("landRegistryTitleNumberValue")
           )
@@ -250,7 +250,7 @@ class LandOrPropertyTransactionsTransformerSpec extends AnyFreeSpec with Matcher
         userAnswers => {
           userAnswers.get(LandOrPropertyHeldPage(srn)) mustBe Some(true)
           userAnswers.get(LandPropertyInUKPage(srn, refineMV(1))) mustBe Some(true)
-          userAnswers.get(LandOrPropertyAddressLookupPage(srn, refineMV(1))) mustBe Some(address)
+          userAnswers.get(LandOrPropertyChosenAddressPage(srn, refineMV(1))) mustBe Some(address)
           userAnswers.get(LandRegistryTitleNumberPage(srn, refineMV(1))) mustBe Some(
             ConditionalYesNo.yes("landRegistryTitleNumberValue")
           )
@@ -294,7 +294,7 @@ class LandOrPropertyTransactionsTransformerSpec extends AnyFreeSpec with Matcher
         userAnswers => {
           userAnswers.get(LandOrPropertyHeldPage(srn)) mustBe Some(true)
           userAnswers.get(LandPropertyInUKPage(srn, refineMV(1))) mustBe Some(true)
-          userAnswers.get(LandOrPropertyAddressLookupPage(srn, refineMV(1))) mustBe Some(address)
+          userAnswers.get(LandOrPropertyChosenAddressPage(srn, refineMV(1))) mustBe Some(address)
           userAnswers.get(LandRegistryTitleNumberPage(srn, refineMV(1))) mustBe Some(
             ConditionalYesNo.yes("landRegistryTitleNumberValue")
           )
@@ -338,7 +338,7 @@ class LandOrPropertyTransactionsTransformerSpec extends AnyFreeSpec with Matcher
         userAnswers => {
           userAnswers.get(LandOrPropertyHeldPage(srn)) mustBe Some(true)
           userAnswers.get(LandPropertyInUKPage(srn, refineMV(1))) mustBe Some(true)
-          userAnswers.get(LandOrPropertyAddressLookupPage(srn, refineMV(1))) mustBe Some(address)
+          userAnswers.get(LandOrPropertyChosenAddressPage(srn, refineMV(1))) mustBe Some(address)
           userAnswers.get(LandRegistryTitleNumberPage(srn, refineMV(1))) mustBe Some(
             ConditionalYesNo.yes("landRegistryTitleNumberValue")
           )

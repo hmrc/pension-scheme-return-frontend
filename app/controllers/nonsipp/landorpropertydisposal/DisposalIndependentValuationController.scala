@@ -24,7 +24,7 @@ import forms.YesNoPageFormProvider
 import models.Mode
 import models.SchemeId.Srn
 import navigation.Navigator
-import pages.nonsipp.landorproperty.LandOrPropertyAddressLookupPage
+import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import pages.nonsipp.landorpropertydisposal.DisposalIndependentValuationPage
 import play.api.data.Form
 import play.api.i18n.MessagesApi
@@ -53,7 +53,7 @@ class DisposalIndependentValuationController @Inject()(
 
   def onPageLoad(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      request.userAnswers.get(LandOrPropertyAddressLookupPage(srn, landOrPropertyIndex)).getOrRecoverJourney {
+      request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, landOrPropertyIndex)).getOrRecoverJourney {
         address =>
           val preparedForm = request.userAnswers
             .fillForm(DisposalIndependentValuationPage(srn: Srn, landOrPropertyIndex, disposalIndex), form)
@@ -67,7 +67,7 @@ class DisposalIndependentValuationController @Inject()(
         .bindFromRequest()
         .fold(
           formWithErrors =>
-            request.userAnswers.get(LandOrPropertyAddressLookupPage(srn, landOrPropertyIndex)).getOrRecoverJourney {
+            request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, landOrPropertyIndex)).getOrRecoverJourney {
               address =>
                 Future.successful(
                   BadRequest(

@@ -35,12 +35,14 @@ object MemberContributionsNavigator extends JourneyNavigator {
       }
   }
 
-  override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
-    case page @ MemberContributionsPage(srn) =>
-      if (userAnswers.get(page).contains(true)) {
-        controllers.routes.UnauthorisedController.onPageLoad()
-      } else {
-        memberpayments.routes.DidSchemeReceiveTransferController.onPageLoad(srn, NormalMode)
+  override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] =
+    _ =>
+      userAnswers => {
+        case page @ MemberContributionsPage(srn) =>
+          if (userAnswers.get(page).contains(true)) {
+            controllers.routes.UnauthorisedController.onPageLoad()
+          } else {
+            memberpayments.routes.DidSchemeReceiveTransferController.onPageLoad(srn, NormalMode)
+          }
       }
-  }
 }
