@@ -16,6 +16,7 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
+import config.FrontendAppConfig
 import config.Refined.Max5000
 import controllers.actions._
 import controllers.nonsipp.loansmadeoroutstanding.IsIndividualRecipientConnectedPartyController.viewModel
@@ -30,9 +31,9 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.FormUtils.FormOps
-import viewmodels.DisplayMessage.Message
+import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
 import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
+import viewmodels.models.{FormPageViewModel, FurtherDetailsViewModel, YesNoPageViewModel}
 import views.html.YesNoPageView
 
 import javax.inject.{Inject, Named}
@@ -44,6 +45,7 @@ class IsIndividualRecipientConnectedPartyController @Inject()(
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   formProvider: YesNoPageFormProvider,
+  config: FrontendAppConfig,
   val controllerComponents: MessagesControllerComponents,
   view: YesNoPageView
 )(implicit ec: ExecutionContext)
@@ -59,7 +61,7 @@ class IsIndividualRecipientConnectedPartyController @Inject()(
         Ok(
           view(
             form.fromUserAnswers(IsIndividualRecipientConnectedPartyPage(srn, index)),
-            viewModel(srn, index, individualName, mode)
+            viewModel(srn, index, individualName, config.urls.incomeTaxAct, mode)
           )
         )
       }
@@ -73,7 +75,7 @@ class IsIndividualRecipientConnectedPartyController @Inject()(
           errors =>
             request.usingAnswer(IndividualRecipientNamePage(srn, index)).async { individualName =>
               Future.successful(
-                BadRequest(view(errors, viewModel(srn, index, individualName, mode)))
+                BadRequest(view(errors, viewModel(srn, index, individualName, config.urls.incomeTaxAct, mode)))
               )
             },
           success =>
@@ -92,10 +94,27 @@ object IsIndividualRecipientConnectedPartyController {
     "isIndividualRecipientConnectedParty.error.required"
   )
 
-  def viewModel(srn: Srn, index: Max5000, individualName: String, mode: Mode): FormPageViewModel[YesNoPageViewModel] =
+  def viewModel(
+    srn: Srn,
+    index: Max5000,
+    individualName: String,
+    incomeTaxAct: String,
+    mode: Mode
+  ): FormPageViewModel[YesNoPageViewModel] =
     YesNoPageViewModel(
       Message("isIndividualRecipientConnectedParty.title"),
       Message("isIndividualRecipientConnectedParty.heading", individualName),
+      Option(
+        FurtherDetailsViewModel(
+          Message("isIndividualRecipientConnectedParty.content"),
+          ParagraphMessage("isIndividualRecipientConnectedParty.paragraph1") ++
+            ParagraphMessage("isIndividualRecipientConnectedParty.paragraph2") ++
+            ParagraphMessage(
+              "isIndividualRecipientConnectedParty.paragraph3",
+              LinkMessage("isIndividualRecipientConnectedParty.paragraph3.link", incomeTaxAct)
+            )
+        )
+      ),
       routes.IsIndividualRecipientConnectedPartyController.onSubmit(srn, index, mode)
     )
 }
