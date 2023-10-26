@@ -31,6 +31,7 @@ class IsIndividualRecipientConnectedPartyControllerSpec extends ControllerBaseSp
 
   lazy val onPageLoad = routes.IsIndividualRecipientConnectedPartyController.onPageLoad(srn, index, NormalMode)
   lazy val onSubmit = routes.IsIndividualRecipientConnectedPartyController.onSubmit(srn, index, NormalMode)
+  private val incomeTaxAct = "https://www.legislation.gov.uk/ukpga/2007/3/section/993"
 
   val userServicesWithIndividualName: UserAnswers =
     defaultUserAnswers.unsafeSet(IndividualRecipientNamePage(srn, index), individualName)
@@ -39,7 +40,7 @@ class IsIndividualRecipientConnectedPartyControllerSpec extends ControllerBaseSp
 
     act.like(renderView(onPageLoad, userServicesWithIndividualName) { implicit app => implicit request =>
       injected[YesNoPageView]
-        .apply(form(injected[YesNoPageFormProvider]), viewModel(srn, index, individualName, NormalMode))
+        .apply(form(injected[YesNoPageFormProvider]), viewModel(srn, index, individualName, incomeTaxAct, NormalMode))
     })
 
     act.like(
@@ -52,7 +53,7 @@ class IsIndividualRecipientConnectedPartyControllerSpec extends ControllerBaseSp
         injected[YesNoPageView]
           .apply(
             form(injected[YesNoPageFormProvider]).fill(true),
-            viewModel(srn, index, individualName, NormalMode)
+            viewModel(srn, index, individualName, incomeTaxAct, NormalMode)
           )
       }
     )
