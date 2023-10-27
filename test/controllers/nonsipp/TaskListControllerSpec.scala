@@ -43,6 +43,7 @@ import pages.nonsipp.loansmadeoroutstanding.{
   RecipientSponsoringEmployerConnectedPartyPage
 }
 import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsNinoPage, MemberDetailsPage, NoNINOPage}
+import pages.nonsipp.moneyborrowed.{LenderNamePages, MoneyBorrowedPage}
 import pages.nonsipp.schemedesignatory.{
   ActiveBankAccountPage,
   FeesCommissionsWagesSalariesPage,
@@ -508,6 +509,59 @@ class TaskListControllerSpec extends ControllerBaseSpec {
           expectedLinkContentKey = "nonsipp.tasklist.loans.change.loansmade.title",
           expectedLinkUrl =
             controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController.onPageLoad(srn, 1, NormalMode).url
+        )
+      }
+    }
+    "borrowingSection" - {
+      "notStarted" in {
+        testViewModel(
+          defaultUserAnswers,
+          3,
+          1,
+          expectedStatus = TaskListStatus.NotStarted,
+          expectedTitleKey = "nonsipp.tasklist.loans.title",
+          expectedLinkContentKey = "nonsipp.tasklist.loans.add.moneyborrowed.title",
+          expectedLinkUrl = controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedController
+            .onPageLoad(srn, NormalMode)
+            .url
+        )
+      }
+
+      "inProgress" - {
+        "stopped after money borrowed value yes page" in {
+          val userAnswersWithBorrowings =
+            defaultUserAnswers
+              .unsafeSet(MoneyBorrowedPage(srn), true)
+              .unsafeSet(LenderNamePages(srn), Map("0" -> lenderName))
+
+          testViewModel(
+            userAnswersWithBorrowings,
+            3,
+            1,
+            expectedStatus = TaskListStatus.InProgress,
+            expectedTitleKey = "nonsipp.tasklist.loans.title",
+            expectedLinkContentKey = "nonsipp.tasklist.loans.change.moneyborrowed.title",
+            expectedLinkUrl = controllers.nonsipp.moneyborrowed.routes.LenderNameController
+              .onPageLoad(srn, refineMV(1), NormalMode)
+              .url
+          )
+        }
+      }
+
+      "completed" in {
+        val userAnswersWithBorrowings =
+          defaultUserAnswers
+            .unsafeSet(MoneyBorrowedPage(srn), false)
+
+        testViewModel(
+          userAnswersWithBorrowings,
+          3,
+          1,
+          expectedStatus = TaskListStatus.Completed,
+          expectedTitleKey = "nonsipp.tasklist.loans.title",
+          expectedLinkContentKey = "nonsipp.tasklist.loans.change.moneyborrowed.title",
+          expectedLinkUrl =
+            controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController.onPageLoad(srn, 1, NormalMode).url
         )
       }
     }

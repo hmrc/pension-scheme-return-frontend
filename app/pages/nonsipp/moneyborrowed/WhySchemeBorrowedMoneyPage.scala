@@ -28,3 +28,10 @@ case class WhySchemeBorrowedMoneyPage(srn: Srn, index: Max5000) extends Question
 
   override def toString: String = "reasonForBorrow"
 }
+
+case class WhySchemeBorrowedMoneyPages(srn: Srn) extends QuestionPage[Map[String, String]] {
+
+  override def path: JsPath = Paths.moneyBorrowed \ toString
+
+  override def toString: String = "reasonForBorrow"
+}

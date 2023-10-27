@@ -39,6 +39,11 @@ import pages.nonsipp.landorproperty.{
 }
 import pages.nonsipp.landorpropertydisposal.{LandOrPropertyDisposalPage, LandPropertyDisposalCompletedPages}
 import pages.nonsipp.memberdetails.{MemberDetailsNinoPages, MembersDetailsPages, NoNinoPages}
+import pages.nonsipp.moneyborrowed.{
+  LenderNamePages,
+  MoneyBorrowedPage,
+  WhySchemeBorrowedMoneyPages
+}
 import pages.nonsipp.schemedesignatory.{FeesCommissionsWagesSalariesPage, HowManyMembersPage, HowMuchCashPage}
 import viewmodels.models.TaskListStatus
 import viewmodels.models.TaskListStatus.{Completed, InProgress, NotStarted, TaskListStatus}
@@ -258,4 +263,73 @@ object TaskListStatusUtils {
     else if (started) (TaskListStatus.InProgress, initialDisposalUrl)
     else (TaskListStatus.NotStarted, initialDisposalUrl)
   }
+
+  def getBorrowingTaskListStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
+    val moneyBorrowedPageUrl =
+      controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedController.onPageLoad(srn, NormalMode).url
+    val listPageUrl =
+      controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController.onPageLoad(srn, 1, NormalMode).url
+
+    def lenderNamePageUrl(index: Max5000) =
+      controllers.nonsipp.moneyborrowed.routes.LenderNameController.onPageLoad(srn, index, NormalMode).url
+
+    val moneyBorrowedPage = userAnswers.get(MoneyBorrowedPage(srn))
+    val firstPages = userAnswers.get(LenderNamePages(srn))
+    val lastPages = userAnswers.get(WhySchemeBorrowedMoneyPages(srn))
+    (
+      moneyBorrowedPage,
+      firstPages,
+      lastPages
+    ) match {
+      case (None, _, _) => (NotStarted, moneyBorrowedPageUrl)
+      case (
+          Some(moneyBorrowed),
+          firstPages,
+          lastPages
+          ) =>
+        if (!moneyBorrowed) {
+          (Completed, listPageUrl)
+        } else {
+          val countFirstPages = firstPages.getOrElse(List.empty).size
+          val countLastPages = lastPages.getOrElse(List.empty).size
+
+          val incompleteIndex: Int = getBorrowingIncompleteIndex(firstPages, lastPages)
+          val inProgressCalculatedUrl = refineV[OneTo5000](incompleteIndex).fold(
+            _ => listPageUrl,
+            index => lenderNamePageUrl(index)
+          )
+
+          if (countFirstPages + countLastPages == 0) {
+            (InProgress, lenderNamePageUrl(refineMV(1)))
+          } else if (countFirstPages > countLastPages) {
+            (InProgress, inProgressCalculatedUrl)
+          } else {
+            (Completed, listPageUrl)
+          }
+        }
+    }
+  }
+
+  private def getBorrowingIncompleteIndex(
+    firstPages: Option[Map[String, String]],
+    lastPages: Option[Map[String, String]]
+  ): Int =
+    (firstPages, lastPages) match {
+      case (None, _) => 1
+      case (Some(_), None) => 1
+      case (Some(first), last) =>
+        if (first.isEmpty) {
+          1
+        } else {
+          val firstIndexes = (0 to first.size - 1).toList
+          val lastIndexes = last.getOrElse(List.empty).map(_._1.toInt).toList
+
+          val filtered = firstIndexes.filter(lastIndexes.indexOf(_) < 0)
+          if (filtered.isEmpty) {
+            1
+          } else {
+            filtered(0) + 1
+          }
+        }
+    }
 }
