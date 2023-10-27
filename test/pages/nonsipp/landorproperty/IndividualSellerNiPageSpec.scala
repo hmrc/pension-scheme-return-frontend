@@ -32,8 +32,12 @@ class IndividualSellerNiPageSpec extends PageBehaviours {
       IndividualSellerNiPage(srnGen.sample.value, index)
     )
 
-    beSettable[ConditionalYesNo[String, Nino]](IndividualSellerNiPage(srnGen.sample.value, index))
+    beSettable[ConditionalYesNo[String, Nino]](
+      IndividualSellerNiPage(srnGen.sample.value, index)
+    )
 
-    beRemovable[ConditionalYesNo[String, Nino]](IndividualSellerNiPage(srnGen.sample.value, index))
+    beRemovable[ConditionalYesNo[String, Nino]](
+      IndividualSellerNiPage(srnGen.sample.value, index)
+    )
   }
 }
