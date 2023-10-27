@@ -649,9 +649,13 @@ companyRecipientName.error.length = Recipient’s company name must be 160 chara
 
 isIndividualRecipientConnectedParty.title= Is the recipient a connected party?
 isIndividualRecipientConnectedParty.heading = Is {0} a connected party?
-isMemberOrConnectedParty.checkYourAnswersLabel = Is the recipient a member or a connected party?
 isIndividualRecipientConnectedParty.error.required = Select yes if the recipient is a connected party
-isMemberOrConnectedParty.change.hidden = IsMemberOrConnectedParty
+isIndividualRecipientConnectedParty.change.hidden = IsMemberOrConnectedParty
+isIndividualRecipientConnectedParty.content = What is a connected party?
+isIndividualRecipientConnectedParty.paragraph1 = A connected party is an individual, company or partnership that is connected to either a member of the scheme or the sponsoring employer of the scheme.
+isIndividualRecipientConnectedParty.paragraph2 = A connected party of a member is usually their spouse, civil partner or close relative (for example their parent, sibling, child or grandchild). A connected party of a sponsoring employer can be someone who has control over the company; it can also be another company, where the same person has control of both.
+isIndividualRecipientConnectedParty.paragraph3 = There are other circumstances where an individual, company or partnership might be a connected party. You can read a full list in
+isIndividualRecipientConnectedParty.paragraph3.link = Section 993 of the Income Tax Act 2007.
 
 individualRecipientNino.title = Do you know the recipient’s National Insurance number?
 individualRecipientNino.heading = Do you know {0}’s National Insurance number?
