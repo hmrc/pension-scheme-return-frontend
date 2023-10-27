@@ -18,6 +18,7 @@ package pages.nonsipp.landorpropertydisposal
 
 import config.Refined.{Max50, Max5000}
 import eu.timepit.refined.refineMV
+import models.{ConditionalYesNo, Utr}
 import pages.behaviours.PageBehaviours
 
 class PartnershipBuyerUtrPageSpec extends PageBehaviours {
@@ -27,11 +28,17 @@ class PartnershipBuyerUtrPageSpec extends PageBehaviours {
     val index = refineMV[Max5000.Refined](1)
     val disposalIndex = refineMV[Max50.Refined](1)
 
-    beRetrievable[String](CompanyBuyerNamePage(srnGen.sample.value, index, disposalIndex))
+    beRetrievable[ConditionalYesNo[String, Utr]](
+      PartnershipBuyerUtrPage(srnGen.sample.value, index, disposalIndex)
+    )
 
-    beSettable[String](CompanyBuyerNamePage(srnGen.sample.value, index, disposalIndex))
+    beSettable[ConditionalYesNo[String, Utr]](
+      PartnershipBuyerUtrPage(srnGen.sample.value, index, disposalIndex)
+    )
 
-    beRemovable[String](CompanyBuyerNamePage(srnGen.sample.value, index, disposalIndex))
+    beRemovable[ConditionalYesNo[String, Utr]](
+      PartnershipBuyerUtrPage(srnGen.sample.value, index, disposalIndex)
+    )
   }
 
 }

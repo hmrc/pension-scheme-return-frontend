@@ -17,7 +17,6 @@
 package controllers.nonsipp.loansmadeoroutstanding
 
 import controllers.actions.{AllowAccessActionProvider, DataRequiredAction, DataRetrievalAction, IdentifierAction}
-import controllers.nonsipp.loansmadeoroutstanding.routes
 import models.NormalMode
 import models.SchemeId.Srn
 import navigation.Navigator
