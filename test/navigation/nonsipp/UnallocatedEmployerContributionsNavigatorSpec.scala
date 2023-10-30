@@ -24,12 +24,12 @@ import org.scalacheck.Gen
 import pages.nonsipp.memberpayments.UnallocatedEmployerContributionsPage
 import utils.BaseSpec
 
-class UnallocatedEmployerContributionsControllerNavigatorSpec extends BaseSpec with NavigatorBehaviours {
+class UnallocatedEmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
   private val index = refineMV[OneTo5000](1)
   val navigator: Navigator = new NonSippNavigator
 
-  "UnallocatedEmployerContributionsControllerNavigator" - {
+  "UnallocatedEmployerContributionsNavigator" - {
 
     act.like(
       normalmode
