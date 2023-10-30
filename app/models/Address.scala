@@ -20,8 +20,7 @@ import play.api.libs.functional.FunctionalBuilder
 import play.api.libs.functional.syntax._
 import play.api.libs.json.Reads._
 import play.api.libs.json.{JsPath, Json, Reads, Writes}
-
-import java.util.Locale
+import utils.Country
 
 case class ALFCountry(code: String, name: String)
 
@@ -56,14 +55,13 @@ object Address {
   implicit val addressReads: Reads[Address] =
     addressReadsBuilder.apply(
       (addressLine1, addressLine2, addressLine3, town, postCode, countryCode) => {
-        val locale = new Locale("en", countryCode)
         Address(
           addressLine1,
           addressLine2,
           addressLine3,
           town,
           postCode,
-          locale.getDisplayCountry(),
+          Country.getCountry(countryCode).getOrElse(""),
           countryCode
         )
       }
