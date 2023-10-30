@@ -116,18 +116,23 @@ object TotalProceedsSaleLandPropertyController {
     mode: Mode
   ): FormPageViewModel[SingleQuestion[Money]] =
     FormPageViewModel(
-      "totalProceedsSaleLandProperty.title",
-      Message("totalProceedsSaleLandProperty.heading", addressLine1) ++
+      title = "totalProceedsSaleLandProperty.title",
+      heading = Message("totalProceedsSaleLandProperty.heading", addressLine1),
+      description = Some(
         ParagraphMessage("totalProceedsSaleLandProperty.paragraph") ++
-        ListMessage(
-          ListType.Bullet,
-          "totalProceedsSaleLandProperty.list1",
-          "totalProceedsSaleLandProperty.list2"
-        ),
-      SingleQuestion(
+          ListMessage(
+            ListType.Bullet,
+            "totalProceedsSaleLandProperty.list1",
+            "totalProceedsSaleLandProperty.list2"
+          )
+      ),
+      refresh = None,
+      buttonText = Message("site.saveAndContinue"),
+      details = None,
+      page = SingleQuestion(
         form,
         QuestionField.input(Empty)
       ),
-      routes.TotalProceedsSaleLandPropertyController.onSubmit(srn, landOrPropertyIndex, disposalIndex, mode)
+      onSubmit = routes.TotalProceedsSaleLandPropertyController.onSubmit(srn, landOrPropertyIndex, disposalIndex, mode)
     )
 }
