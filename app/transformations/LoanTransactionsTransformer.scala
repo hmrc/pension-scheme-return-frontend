@@ -16,9 +16,9 @@
 
 package transformations
 
-import cats.implicits.{catsSyntaxTuple2Semigroupal, catsSyntaxTuple3Semigroupal, toBifunctorOps, toTraverseOps}
+import cats.implicits.{catsSyntaxTuple2Semigroupal, catsSyntaxTuple3Semigroupal}
 import com.google.inject.Singleton
-import config.Refined.{Max5000, OneTo5000}
+import config.Refined.OneTo5000
 import eu.timepit.refined.refineV
 import models.ConditionalYesNo._
 import models.IdentityType.reads
@@ -40,13 +40,7 @@ import models.{
   UserAnswers,
   Utr
 }
-import pages.nonsipp.common.{
-  CompanyRecipientCrnPage,
-  IdentityTypePage,
-  IdentityTypes,
-  OtherRecipientDetailsPage,
-  PartnershipRecipientUtrPage
-}
+import pages.nonsipp.common._
 import pages.nonsipp.loansmadeoroutstanding._
 import uk.gov.hmrc.domain.Nino
 
@@ -54,7 +48,7 @@ import javax.inject.Inject
 import scala.util.Try
 
 @Singleton()
-class LoanTransactionsTransformer @Inject()() {
+class LoanTransactionsTransformer @Inject()() extends Transformer {
 
   private type OptionalRecipientDetails = Option[(String, RecipientIdentityType, Boolean, Option[String])]
 
@@ -202,10 +196,10 @@ class LoanTransactionsTransformer @Inject()() {
     userAnswers: UserAnswers,
     srn: Srn,
     loanTransactions: List[LoanTransactions]
-  ): Try[UserAnswers] =
+  ): Try[UserAnswers] = {
+
     for {
-      indexes <- buildIndexes(loanTransactions.size)
-      schemeHadLoans = indexes.map(_ => LoansMadeOrOutstandingPage(srn) -> true)
+      indexes <- buildIndexesForMax5000(loanTransactions.size)
       identityTypes = indexes.map(
         index =>
           IdentityTypePage(srn, index, IdentitySubject.LoanRecipient) -> loanTransactions(index.value - 1).recipientIdentityType.identityType
@@ -417,7 +411,7 @@ class LoanTransactionsTransformer @Inject()() {
           index => OutstandingArrearsOnLoanPage(srn, index) -> ConditionalYesNo.no[Unit, Money](())
         )
 
-      ua1 <- schemeHadLoans.foldLeft(Try(userAnswers)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
+      ua1 <- userAnswers.set(LoansMadeOrOutstandingPage(srn), true)
       ua2 <- identityTypes.foldLeft(Try(ua1)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
       ua3 <- loanRecipientName.foldLeft(Try(ua2)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
       ua31 <- otherRecipientName.foldLeft(Try(ua3)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
@@ -446,7 +440,5 @@ class LoanTransactionsTransformer @Inject()() {
         case (ua, (page, value)) => ua.flatMap(_.set(page, value))
       }
     } yield ua13
-
-  private def buildIndexes(num: Int): Try[List[Max5000]] =
-    (1 to num).map(i => refineV[OneTo5000](i).leftMap(new Exception(_)).toTry).toList.sequence
+  }
 }

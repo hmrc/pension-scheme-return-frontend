@@ -39,7 +39,6 @@ import pages.nonsipp.landorproperty.{
   IsLesseeConnectedPartyPage,
   LandOrPropertyHeldPage,
   LandOrPropertyTotalIncomePage,
-  LandOrPropertyTotalIncomePages,
   LandPropertyInUKPage,
   LandPropertyInUKPages,
   LandPropertyIndependentValuationPage,

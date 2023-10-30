@@ -33,7 +33,7 @@ class AuthControllerSpec extends ControllerBaseSpec {
     "clear user answers and redirect to sign out, specifying the exit survey as the continue URL" in {
 
       val mockSessionRepository = mock[SessionRepository]
-      when(mockSessionRepository.clear(any())).thenReturn(Future.successful(true))
+      when(mockSessionRepository.clear(any())).thenReturn(Future.successful(()))
 
       val application =
         applicationBuilder(None)
@@ -62,7 +62,7 @@ class AuthControllerSpec extends ControllerBaseSpec {
     "clear users answers and redirect to sign out, specifying SignedOut as the continue URL" in {
 
       val mockSessionRepository = mock[SessionRepository]
-      when(mockSessionRepository.clear(any())).thenReturn(Future.successful(true))
+      when(mockSessionRepository.clear(any())).thenReturn(Future.successful(()))
 
       val application =
         applicationBuilder(None)
