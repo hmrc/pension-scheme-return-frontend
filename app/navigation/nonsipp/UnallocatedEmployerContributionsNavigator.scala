@@ -18,7 +18,7 @@ package navigation.nonsipp
 
 import controllers.routes
 import eu.timepit.refined.refineMV
-import models.{NormalMode, UserAnswers}
+import models.{CheckOrChange, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.memberpayments._
@@ -36,9 +36,19 @@ object UnallocatedEmployerContributionsNavigator extends JourneyNavigator {
       }
 
     case UnallocatedEmployerAmountPage(srn, index) =>
-      routes.UnauthorisedController.onPageLoad()
+      controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController
+        .onPageLoad(srn, index, CheckOrChange.Check)
+
+    case UnallocatedContributionCYAPage(srn) =>
+      controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
 
   }
 
-  override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty
+  override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => {
+
+    case UnallocatedEmployerAmountPage(srn, index) =>
+      controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController
+        .onPageLoad(srn, index, CheckOrChange.Check)
+
+  }
 }
