@@ -146,7 +146,7 @@ object HowWasPropertyDisposedOfController {
           hint = None,
           RadioItemConditional(
             FieldType.Textarea,
-            label = Some(HintMessage("howWasDisposed.option3.label"))
+            label = Some(Message("howWasDisposed.option3.label"))
           )
         )
       ),
