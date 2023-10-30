@@ -21,7 +21,7 @@ import forms.mappings.errors.{MoneyFormErrorValue, _}
 import models.{Crn, DateRange, Enumerable, Money, Percentage, Security, Utr}
 import play.api.data.Forms.of
 import play.api.data.validation.{Constraint, Invalid, Valid}
-import play.api.data.{FieldMapping, Mapping}
+import play.api.data.{FieldMapping, Form, Mapping}
 import uk.gov.hmrc.domain.Nino
 
 import java.time.LocalDate
@@ -222,7 +222,9 @@ trait Mappings extends Formatters with Constraints {
   ): Mapping[Nino] =
     text(requiredKey, args.toList)
       .verifying(verify[String](invalidKey, s => Nino.isValid(s.toUpperCase), args: _*))
-      .verifying(verify[String](duplicateKey, !duplicates.map(_.nino).contains(_), args: _*))
+      .verifying(
+        verify[String](duplicateKey, n => !duplicates.map(_.nino.toUpperCase()).contains(n.toUpperCase), args: _*)
+      )
       .transform[Nino](s => Nino(s.toUpperCase), _.nino.toUpperCase)
 }
 

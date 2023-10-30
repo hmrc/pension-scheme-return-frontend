@@ -265,6 +265,15 @@ pspDeclaration.listItem5 = you understand that if you have made a false statemen
 nationalInsuranceNumber.title = Does the member have a National Insurance number?
 nationalInsuranceNumber.heading = Does {0} have a National Insurance number?
 nationalInsuranceNumber.error.required = Select yes if {0} has a National Insurance number
+nationalInsuranceNumber.yes.conditional = What is {0}’s National Insurance number?
+nationalInsuranceNumber.no.conditional = Why does {0} not have a National Insurance number?
+nationalInsuranceNumber.no.conditional.error.required = Enter the reason {0} does not have a National Insurance number
+nationalInsuranceNumber.no.conditional.error.invalid = The reason {0} does not have a National Insurance number must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+nationalInsuranceNumber.no.conditional.error.length = The reason {0} does not have a National Insurance number must be 160 characters or fewer
+nationalInsuranceNumber.yes.conditional.error.required = Enter {0}’s National Insurance number
+nationalInsuranceNumber.yes.conditional.error.invalid = Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C
+nationalInsuranceNumber.yes.conditional.error.duplicate = National Insurance number is already in use and cannot be duplicated
+
 
 memberDetailsNino.title = What is the member’s National Insurance number?
 memberDetailsNino.heading = What is {0}’s National Insurance number?

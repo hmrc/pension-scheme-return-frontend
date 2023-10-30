@@ -78,9 +78,9 @@ class MemberDetailsMongoController @Inject()(
       noNinoReasonPages = indexes.map(index => NoNINOPage(srn, index) -> "test reason")
 
       ua1 <- memberDetails.foldLeft(Try(userAnswers)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
-      ua2 <- hasNinoPages.foldLeft(Try(ua1)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
-      ua3 <- noNinoReasonPages.foldLeft(Try(ua2)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
-    } yield ua3
+//      ua2 <- hasNinoPages.foldLeft(Try(ua1)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
+//      ua3 <- noNinoReasonPages.foldLeft(Try(ua2)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
+    } yield ua1
 }
 
 object MemberDetailsMongoController {

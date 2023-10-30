@@ -201,19 +201,18 @@ object TaskListController {
                     .url,
                 index => {
                   val doesMemberHaveNino = userAnswers.get(DoesMemberHaveNinoPage(srn, index))
-                  if (doesMemberHaveNino.isEmpty) {
-                    controllers.nonsipp.memberdetails.routes.DoesSchemeMemberHaveNINOController
-                      .onPageLoad(srn, index, NormalMode)
-                      .url
-                  } else if (doesMemberHaveNino.getOrElse(false)) {
-                    controllers.nonsipp.memberdetails.routes.MemberDetailsNinoController
-                      .onPageLoad(srn, index, NormalMode)
-                      .url
-                  } else {
-                    controllers.nonsipp.memberdetails.routes.NoNINOController
-                      .onPageLoad(srn, index, NormalMode)
-                      .url
-                  }
+                  controllers.nonsipp.memberdetails.routes.DoesSchemeMemberHaveNINOController
+                    .onPageLoad(srn, index, NormalMode)
+                    .url
+//                  else if (doesMemberHaveNino.getOrElse(false)) {
+//                    controllers.nonsipp.memberdetails.routes.MemberDetailsNinoController
+//                      .onPageLoad(srn, index, NormalMode)
+//                      .url
+//                  } else {
+//                    controllers.nonsipp.memberdetails.routes.NoNINOController
+//                      .onPageLoad(srn, index, NormalMode)
+//                      .url
+//                  }
                 }
               )
           }

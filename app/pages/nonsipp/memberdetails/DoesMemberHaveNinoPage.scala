@@ -18,32 +18,42 @@ package pages.nonsipp.memberdetails
 
 import config.Refined.Max300
 import models.SchemeId.Srn
-import models.UserAnswers
+import models.ConditionalYesNo
 import pages.QuestionPage
 import play.api.libs.json.JsPath
-import queries.Removable
+import queries.{Gettable, Removable}
+import uk.gov.hmrc.domain.Nino
 import utils.RefinedUtils.RefinedIntOps
 
-import scala.util.Try
+import scala.tools.nsc.interpreter.shell.NoHistory.index
 
-case class DoesMemberHaveNinoPage(srn: Srn, index: Max300) extends QuestionPage[Boolean] {
+case class DoesMemberHaveNinoPage(srn: Srn, index: Max300) extends QuestionPage[ConditionalYesNo[String, Nino]] {
 
   override def path: JsPath = JsPath \ toString \ index.arrayIndex
 
   override def toString: String = "nationalInsuranceNumber"
 
-  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
-    value match {
-      case Some(true) => userAnswers.remove(NoNINOPage(srn, index))
-      case Some(false) => userAnswers.remove(MemberDetailsNinoPage(srn, index))
-      case None =>
-        userAnswers
-          .remove(NoNINOPage(srn, index))
-          .flatMap(_.remove(MemberDetailsNinoPage(srn, index)))
-    }
+//  override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
+//    value match {
+//      case Some(true) => userAnswers.remove(NoNINOPage(srn, index))
+//      case Some(false) => userAnswers.remove(MemberDetailsNinoPage(srn, index))
+//      case None =>
+//        userAnswers
+//          .remove(NoNINOPage(srn, index))
+//          .flatMap(_.remove(MemberDetailsNinoPage(srn, index)))
+//    }
 }
 
-case class DoesMemberHaveNinoPages(srn: Srn) extends Removable[List[Boolean]] {
+//case class DoesMemberHaveNinoPages(srn: Srn) extends Removable[List[Boolean]] {
+//
+//  override def path: JsPath = JsPath \ "nationalInsuranceNumber"
+//}
 
-  override def path: JsPath = JsPath \ "nationalInsuranceNumber"
+case class DoesMemberHaveNinoPages(srn: Srn)
+    extends Gettable[Map[String, ConditionalYesNo[String, Nino]]]
+    with Removable[Map[String, ConditionalYesNo[String, Nino]]] {
+
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "nationalInsuranceNumber"
 }

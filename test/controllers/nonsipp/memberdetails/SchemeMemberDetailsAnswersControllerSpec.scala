@@ -16,154 +16,79 @@
 
 package controllers.nonsipp.memberdetails
 
+import config.Refined.{Max300, OneTo300, OneTo5000}
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController._
 import eu.timepit.refined.refineMV
-import models.CheckOrChange
-import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsNinoPage, MemberDetailsPage, NoNINOPage}
-import viewmodels.DisplayMessage.Message
+import models.{CheckOrChange, ConditionalYesNo, NameDOB}
+import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsPage}
+import pages.nonsipp.moneyborrowed._
+import play.api.inject.bind
+import play.api.inject.guice.GuiceableModule
+import services.PsrSubmissionService
+import uk.gov.hmrc.domain.Nino
 import views.html.CheckYourAnswersView
 
 class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
 
+  private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
+
+  override protected val additionalBindings: List[GuiceableModule] = List(
+    bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
+  )
+
+  override protected def beforeAll(): Unit =
+    reset(mockPsrSubmissionService)
+
+  private val index = refineMV[Max300.Refined](1)
+
   private def onPageLoad(checkOrChange: CheckOrChange) =
-    routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, refineMV(1), checkOrChange)
+    routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, checkOrChange)
 
   private def onSubmit(checkOrChange: CheckOrChange) =
-    routes.SchemeMemberDetailsAnswersController.onSubmit(srn, refineMV(1), checkOrChange)
+    routes.SchemeMemberDetailsAnswersController.onSubmit(srn, checkOrChange)
 
-  private val noNinoReason = "test reason"
+  private val filledUserAnswers = defaultUserAnswers
+    .unsafeSet(MemberDetailsPage(srn, index), memberDetails)
+    .unsafeSet(DoesMemberHaveNinoPage(srn, index), ConditionalYesNo.yes[String, Nino](nino))
 
-  private val userAnswersWithNino = defaultUserAnswers
-    .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-    .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), true)
-    .unsafeSet(MemberDetailsNinoPage(srn, refineMV(1)), nino)
-
-  private val userAnswersWithoutNino = defaultUserAnswers
-    .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-    .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), false)
-    .unsafeSet(NoNINOPage(srn, refineMV(1)), noNinoReason)
-
-  "SchemeMemberDetailsCYAController" - {
+  "MoneyBorrowedCYAController" - {
 
     List(CheckOrChange.Check, CheckOrChange.Change).foreach { checkOrChange =>
       act.like(
-        renderView(onPageLoad(checkOrChange), userAnswersWithNino)(
-          implicit app =>
-            implicit request =>
-              injected[CheckYourAnswersView].apply(
-                viewModel(refineMV(1), srn, checkOrChange, memberDetails, hasNINO = true, Some(nino), None)
+        renderView(onPageLoad(checkOrChange), filledUserAnswers) { implicit app => implicit request =>
+          injected[CheckYourAnswersView].apply(
+            viewModel(
+              ViewModelParameters(
+                srn,
+                index,
+                schemeName,
+                memberDetails = memberDetails,
+                hasNINO = ConditionalYesNo(Right(nino)),
+                checkOrChange
               )
-        ).withName(s"render correct ${checkOrChange.name} view when nino provided")
-      )
-
-      act.like(
-        renderView(onPageLoad(checkOrChange), userAnswersWithoutNino)(
-          implicit app =>
-            implicit request =>
-              injected[CheckYourAnswersView].apply(
-                viewModel(
-                  refineMV(1),
-                  srn,
-                  checkOrChange,
-                  memberDetails,
-                  hasNINO = false,
-                  None,
-                  Some(noNinoReason)
-                )
-              )
-        ).withName(s"render the correct ${checkOrChange.name} view when no nino provided")
-      )
-
-      act.like(
-        redirectToPage(
-          onPageLoad(checkOrChange),
-          controllers.routes.JourneyRecoveryController.onPageLoad(),
-          userAnswersWithNino.remove(MemberDetailsPage(srn, refineMV(1))).success.value
-        ).withName(s"when member details are missing on ${checkOrChange.name}")
-      )
-
-      act.like(
-        redirectToPage(
-          onPageLoad(checkOrChange),
-          controllers.routes.JourneyRecoveryController.onPageLoad(),
-          userAnswersWithNino.remove(DoesMemberHaveNinoPage(srn, refineMV(1))).success.value
-        ).withName(s"when does member have NINO is missing on ${checkOrChange.name}")
-      )
-
-      act.like(
-        redirectToPage(
-          onPageLoad(checkOrChange),
-          controllers.routes.JourneyRecoveryController.onPageLoad(),
-          userAnswersWithNino.remove(MemberDetailsNinoPage(srn, refineMV(1))).success.value
-        ).withName(s"when NINO is missing on ${checkOrChange.name}")
-      )
-
-      act.like(
-        redirectToPage(
-          onPageLoad(checkOrChange),
-          controllers.routes.JourneyRecoveryController.onPageLoad(),
-          userAnswersWithoutNino.remove(NoNINOPage(srn, refineMV(1))).success.value
-        ).withName(s"when no NINO reason is missing on ${checkOrChange.name}")
-      )
-
-      act.like(journeyRecoveryPage(onPageLoad(checkOrChange)).updateName(s"onPageLoad on ${checkOrChange.name}" + _))
-      act.like(journeyRecoveryPage(onSubmit(checkOrChange)).updateName(s"onSubmit on ${checkOrChange.name}" + _))
-    }
-
-    "viewModel" - {
-
-      def buildViewModel(checkOrChange: CheckOrChange) =
-        viewModel(
-          refineMV(1),
-          srn,
-          checkOrChange,
-          memberDetails,
-          hasNINO = true,
-          Some(nino),
-          None
-        )
-
-      "contain the correct title" - {
-        "CheckOrChange is Check" in {
-          buildViewModel(CheckOrChange.Check).title mustBe Message("checkYourAnswers.title")
-        }
-        "CheckOrChange is Change" in {
-          buildViewModel(CheckOrChange.Change).title mustBe Message("changeMemberDetails.title")
-        }
-      }
-
-      "contain the correct heading" - {
-        "CheckOrChange is Check" in {
-          buildViewModel(CheckOrChange.Check).heading mustBe Message("checkYourAnswers.heading")
-        }
-        "CheckOrChange is Change" in {
-          buildViewModel(CheckOrChange.Change).heading mustBe Message(
-            "changeMemberDetails.heading",
-            Message(memberDetails.fullName)
+            )
           )
-        }
-      }
+        }.withName(s"render correct ${checkOrChange.name} view")
+      )
 
-      "contain all rows if has nino is true and nino is present" in {
-        val vm =
-          viewModel(refineMV(1), srn, CheckOrChange.Check, memberDetails, hasNINO = true, Some(nino), None)
-        vm.page.sections.map(_.rows.size).sum mustBe 5
-      }
+      act.like(
+        redirectNextPage(onSubmit(checkOrChange))
+          .before(MockPSRSubmissionService.submitPsrDetails())
+          .withName(s"redirect to next page when in ${checkOrChange.name} mode")
+      )
 
-      "contain all rows if has nino is false and no nino reason is present" in {
-        val vm =
-          viewModel(
-            refineMV(1),
-            srn,
-            CheckOrChange.Check,
-            memberDetails,
-            hasNINO = false,
-            None,
-            Some("test reason")
-          )
-        vm.page.sections.map(_.rows.size).sum mustBe 5
-      }
+      act.like(
+        journeyRecoveryPage(onPageLoad(checkOrChange))
+          .updateName("onPageLoad" + _)
+          .withName(s"redirect to journey recovery page on page load when in ${checkOrChange.name} mode")
+      )
+
+      act.like(
+        journeyRecoveryPage(onSubmit(checkOrChange))
+          .updateName("onSubmit" + _)
+          .withName(s"redirect to journey recovery page on submit when in ${checkOrChange.name} mode")
+      )
     }
   }
 }

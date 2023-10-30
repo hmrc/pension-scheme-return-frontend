@@ -44,11 +44,13 @@ object MemberDetailsNavigator extends JourneyNavigator {
     case MemberDetailsPage(srn, index) => routes.DoesSchemeMemberHaveNINOController.onPageLoad(srn, index, NormalMode)
 
     case page @ DoesMemberHaveNinoPage(srn, index) =>
-      if (userAnswers.get(page).contains(true)) {
-        routes.MemberDetailsNinoController.onPageLoad(srn, index, NormalMode)
-      } else {
-        routes.NoNINOController.onPageLoad(srn, index, NormalMode)
-      }
+      routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, CheckOrChange.Check)
+
+//      if (userAnswers.get(page).contains(true)) {
+//        routes.MemberDetailsNinoController.onPageLoad(srn, index, NormalMode)
+//      } else {
+//        routes.NoNINOController.onPageLoad(srn, index, NormalMode)
+//      }
 
     case MemberDetailsNinoPage(srn, index) =>
       routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, CheckOrChange.Check)
@@ -133,10 +135,10 @@ object MemberDetailsNavigator extends JourneyNavigator {
     case MemberDetailsPage(srn, index) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, Check)
     case page @ DoesMemberHaveNinoPage(srn, index) =>
       userAnswers.get(page) match {
-        case Some(true) if userAnswers.get(MemberDetailsNinoPage(srn, index)).isEmpty =>
-          routes.MemberDetailsNinoController.onPageLoad(srn, index, CheckMode)
-        case Some(false) if userAnswers.get(NoNINOPage(srn, index)).isEmpty =>
-          routes.NoNINOController.onPageLoad(srn, index, CheckMode)
+//        case Some(true) if userAnswers.get(MemberDetailsNinoPage(srn, index)).isEmpty =>
+//          routes.MemberDetailsNinoController.onPageLoad(srn, index, CheckMode)
+//        case Some(false) if userAnswers.get(NoNINOPage(srn, index)).isEmpty =>
+//          routes.NoNINOController.onPageLoad(srn, index, CheckMode)
         case Some(_) =>
           routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, Check)
         case None =>

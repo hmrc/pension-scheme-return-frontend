@@ -19,6 +19,7 @@ package forms
 import forms.mappings.Mappings
 import play.api.data.Forms.mapping
 import play.api.data.{Form, Mapping}
+import uk.gov.hmrc.domain.Nino
 import uk.gov.voa.play.form.ConditionalMappings
 
 import javax.inject.Inject
@@ -27,6 +28,9 @@ class YesNoPageFormProvider @Inject()() {
 
   protected[forms] val textAreaRegex = """^[a-zA-Z0-9\-'" \t\r\n,.@/]+$"""
   protected[forms] val textAreaMaxLength = 160
+
+  val formKey = "value"
+
   def apply(
     requiredKey: String,
     invalidKey: String
@@ -87,5 +91,16 @@ class YesNoPageFormProvider @Inject()() {
         case Left(_) => Some((false, None, Some(())))
         case Right(value) => Some((true, Some(value), None))
       }
+    )
+
+  def ninoDuplicates(
+    requiredKey: String,
+    invalidKey: String,
+    duplicates: List[Nino],
+    duplicateKey: String,
+    args: Any*
+  ): Form[Nino] =
+    Form(
+      formKey -> Mappings.ninoNoDuplicates(requiredKey, invalidKey, duplicates, duplicateKey, args: _*)
     )
 }
