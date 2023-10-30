@@ -43,6 +43,15 @@ final case class UserAnswers(
   def list[A](page: Gettable[List[A]])(implicit rds: Reads[A]): List[A] =
     get(page).getOrElse(Nil)
 
+  def listFromMap[A](page: Gettable[Map[String, A]])(implicit rds: Reads[A]): List[A] =
+    get(page.path)
+      .map {
+        case JsArray(value) => value.toList.flatMap(_.asOpt[A])
+        case _ => Nil
+      }
+      .toList
+      .flatten
+
   def transformAndSet[A, B](
     page: Settable[B],
     value: A

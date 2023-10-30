@@ -28,6 +28,7 @@ import navigation.Navigator
 import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, DoesMemberHaveNinoPages, MemberDetailsPage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.libs.json.{JsArray, Json}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.SaveService
 import uk.gov.hmrc.domain.Nino
@@ -70,8 +71,6 @@ class DoesSchemeMemberHaveNINOController @Inject()(
       withMemberDetails(srn, index) { memberDetails =>
         val duplicates = duplicateNinos(srn, index)
 
-        println(duplicates)
-
         form(memberDetails.fullName, duplicates)
           .bindFromRequest()
           .fold(
@@ -88,10 +87,18 @@ class DoesSchemeMemberHaveNINOController @Inject()(
   }
 
   private def duplicateNinos(srn: Srn, index: Max300)(implicit request: DataRequest[_]): List[Nino] =
-    request.userAnswers.map(DoesMemberHaveNinoPages(srn)).removed(index.arrayIndex.toString).values.toList.flatMap {
-      case ConditionalYesNo(Left(_)) => Nil
-      case ConditionalYesNo(Right(nino)) => List(nino)
-    }
+    request.userAnswers
+      .listFromMap(DoesMemberHaveNinoPages(srn))
+      .zipWithIndex
+      .map { case (a, i) => (i, a) }
+      .toMap
+      .removed(index.arrayIndex)
+      .values
+      .toList
+      .flatMap {
+        case ConditionalYesNo(Left(_)) => Nil
+        case ConditionalYesNo(Right(nino)) => List(nino)
+      }
 
   private def withMemberDetails(srn: Srn, index: Max300)(
     f: NameDOB => Future[Result]
