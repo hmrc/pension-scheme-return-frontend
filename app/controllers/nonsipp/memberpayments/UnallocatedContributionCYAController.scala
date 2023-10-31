@@ -16,7 +16,6 @@
 
 package controllers.nonsipp.memberpayments
 
-import config.Refined.Max5000
 import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
 import models.{CheckMode, CheckOrChange, Mode, Money, NormalMode}
@@ -95,11 +94,11 @@ object UnallocatedContributionCYAController {
   def viewModel(parameters: ViewModelParameters): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](
       title = parameters.checkOrChange
-        .fold(check = "moneyBorrowedCheckYourAnswers.title", change = "moneyBorrowedCheckYourAnswers.change.title"),
+        .fold(check = "unallocatedEmployerCYA.title", change = "unallocatedEmployerCYA.change.title"),
       heading = parameters.checkOrChange.fold(
-        check = "moneyBorrowedCheckYourAnswers.heading",
+        check = "unallocatedEmployerCYA.heading",
         change = Message(
-          "moneyBorrowedCheckYourAnswers.change.heading",
+          "unallocatedEmployerCYA.change.heading",
           parameters.schemeName
         )
       ),
@@ -141,15 +140,17 @@ object UnallocatedContributionCYAController {
       CheckYourAnswersSection(
         None,
         List(
-          CheckYourAnswersRowViewModel("moneyBorrowedCheckYourAnswers.section.lenderName", unallocatedAmount.displayAs)
-            .withAction(
-              SummaryAction(
-                "site.change",
-                controllers.nonsipp.memberpayments.routes.UnallocatedEmployerAmountController
-                  .onSubmit(srn, mode)
-                  .url
-              ).withVisuallyHiddenContent("moneyBorrowedCheckYourAnswers.section.lenderName.hidden")
-            )
+          CheckYourAnswersRowViewModel(
+            Message("unallocatedEmployerCYA.section.schemeName", schemeName),
+            Message("unallocatedEmployerCYA.section.amount", unallocatedAmount.displayAs)
+          ).withAction(
+            SummaryAction(
+              "site.change",
+              controllers.nonsipp.memberpayments.routes.UnallocatedEmployerAmountController
+                .onSubmit(srn, mode)
+                .url
+            ).withVisuallyHiddenContent(Message("unallocatedEmployerCYA.section.schemeName.hidden", schemeName))
+          )
         )
       )
     )
