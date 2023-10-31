@@ -141,7 +141,7 @@ trait TestValues {
     Some("testAddressLine3"),
     Some("testTown"),
     Some("testPostCode"),
-    "testCountry",
+    "United Kingdom",
     "GB"
   )
 

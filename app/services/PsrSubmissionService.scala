@@ -60,7 +60,7 @@ class PsrSubmissionService @Inject()(
             Assets(
               LandOrProperty(
                 landOrPropertyHeld = landOrPropertyHeld,
-                landOrPropertyTransactions = landOrPropertyTransactionsTransformer.transform(srn)
+                landOrPropertyTransactions = landOrPropertyTransactionsTransformer.transformToEtmp(srn)
               )
             )
           )

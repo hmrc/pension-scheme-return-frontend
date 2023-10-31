@@ -56,7 +56,7 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClient) {
 
     http
       .GET[HttpResponse](
-        baseUrl + s"/pension-scheme-return/psr/standard/${pstr}",
+        baseUrl + s"/pension-scheme-return/psr/standard/$pstr",
         queryParams
       )
       .map { response =>

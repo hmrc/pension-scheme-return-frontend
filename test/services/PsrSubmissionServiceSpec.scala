@@ -83,7 +83,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
       whenReady(service.submitPsrDetails(srn)(implicitly, implicitly, request)) { result: Option[Unit] =>
         verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
         verify(mockLoanTransactionsTransformer, never).transformToEtmp(any())(any())
-        verify(mockLandOrPropertyTransactionsTransformer, never).transform(any())(any())
+        verify(mockLandOrPropertyTransactionsTransformer, never).transformToEtmp(any())(any())
         verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
 
         captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
@@ -146,12 +146,12 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
 
       when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any())(any()))
         .thenReturn(Some(minimalRequiredSubmission))
-      when(mockLandOrPropertyTransactionsTransformer.transform(any())(any())).thenReturn(List.empty)
+      when(mockLandOrPropertyTransactionsTransformer.transformToEtmp(any())(any())).thenReturn(List.empty)
       when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(()))
 
       whenReady(service.submitPsrDetails(srn)(implicitly, implicitly, request)) { result: Option[Unit] =>
         verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
-        verify(mockLandOrPropertyTransactionsTransformer, times(1)).transform(any())(any())
+        verify(mockLandOrPropertyTransactionsTransformer, times(1)).transformToEtmp(any())(any())
         verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
 
         captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
@@ -174,7 +174,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
 
       whenReady(service.submitPsrDetails(srn)(implicitly, implicitly, request)) { result: Option[Unit] =>
         verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
-        verify(mockLandOrPropertyTransactionsTransformer, never).transform(any())(any())
+        verify(mockLandOrPropertyTransactionsTransformer, never).transformToEtmp(any())(any())
         verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
         captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
         captor.getValue.checkReturnDates mustBe false
@@ -190,7 +190,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
       whenReady(service.submitPsrDetails(srn)) { result: Option[Unit] =>
         verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
         verify(mockLoanTransactionsTransformer, never).transformToEtmp(any())(any())
-        verify(mockLandOrPropertyTransactionsTransformer, never).transform(any())(any())
+        verify(mockLandOrPropertyTransactionsTransformer, never).transformToEtmp(any())(any())
         verify(mockConnector, never).submitPsrDetails(any())(any(), any())
         result mustBe None
       }

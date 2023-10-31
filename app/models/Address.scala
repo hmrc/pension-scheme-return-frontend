@@ -16,7 +16,11 @@
 
 package models
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.functional.FunctionalBuilder
+import play.api.libs.functional.syntax._
+import play.api.libs.json.Reads._
+import play.api.libs.json.{JsPath, Json, Reads, Writes}
+import utils.Country
 
 case class ALFCountry(code: String, name: String)
 
@@ -38,5 +42,29 @@ case class Address(
 )
 
 object Address {
-  implicit val format: OFormat[Address] = Json.format[Address]
+
+  private val addressReadsBuilder
+    : FunctionalBuilder[Reads]#CanBuild6[String, String, Option[String], Option[String], Option[String], String] =
+    (JsPath \ "addressLine1")
+      .read[String]
+      .and((JsPath \ "addressLine2").read[String])
+      .and((JsPath \ "addressLine3").readNullable[String])
+      .and((JsPath \ "town").readNullable[String])
+      .and((JsPath \ "postCode").readNullable[String])
+      .and((JsPath \ "countryCode").read[String])
+  implicit val addressReads: Reads[Address] =
+    addressReadsBuilder.apply(
+      (addressLine1, addressLine2, addressLine3, town, postCode, countryCode) => {
+        Address(
+          addressLine1,
+          addressLine2,
+          addressLine3,
+          town,
+          postCode,
+          Country.getCountry(countryCode).getOrElse(""),
+          countryCode
+        )
+      }
+    )
+  implicit val addressWrites: Writes[Address] = Json.writes[Address]
 }
