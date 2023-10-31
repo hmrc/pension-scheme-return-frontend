@@ -51,14 +51,13 @@ class UnallocatedContributionCYAController @Inject()(
 
   def onPageLoad(
     srn: Srn,
-    index: Max5000,
     checkOrChange: CheckOrChange
   ): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       (
         for {
 
-          unallocatedAmount <- request.userAnswers.get(UnallocatedEmployerAmountPage(srn, index)).getOrRecoverJourney
+          unallocatedAmount <- request.userAnswers.get(UnallocatedEmployerAmountPage(srn)).getOrRecoverJourney
 
           schemeName = request.schemeDetails.schemeName
         } yield Ok(
@@ -66,7 +65,6 @@ class UnallocatedContributionCYAController @Inject()(
             UnallocatedContributionCYAController.viewModel(
               ViewModelParameters(
                 srn,
-                index,
                 schemeName,
                 unallocatedAmount,
                 checkOrChange
@@ -89,7 +87,6 @@ class UnallocatedContributionCYAController @Inject()(
 
 case class ViewModelParameters(
   srn: Srn,
-  index: Max5000,
   schemeName: String,
   unallocatedAmount: Money,
   checkOrChange: CheckOrChange
@@ -110,7 +107,6 @@ object UnallocatedContributionCYAController {
       page = CheckYourAnswersViewModel(
         sections(
           parameters.srn,
-          parameters.index,
           parameters.schemeName,
           parameters.unallocatedAmount,
           CheckMode
@@ -124,14 +120,12 @@ object UnallocatedContributionCYAController {
 
   private def sections(
     srn: Srn,
-    index: Max5000,
     schemeName: String,
     unallocatedAmount: Money,
     mode: Mode
   ): List[CheckYourAnswersSection] =
     checkYourAnswerSection(
       srn,
-      index,
       schemeName,
       unallocatedAmount,
       mode
@@ -139,7 +133,6 @@ object UnallocatedContributionCYAController {
 
   private def checkYourAnswerSection(
     srn: Srn,
-    index: Max5000,
     schemeName: String,
     unallocatedAmount: Money,
     mode: Mode
@@ -153,7 +146,7 @@ object UnallocatedContributionCYAController {
               SummaryAction(
                 "site.change",
                 controllers.nonsipp.memberpayments.routes.UnallocatedEmployerAmountController
-                  .onSubmit(srn, index, mode)
+                  .onSubmit(srn, mode)
                   .url
               ).withVisuallyHiddenContent("moneyBorrowedCheckYourAnswers.section.lenderName.hidden")
             )

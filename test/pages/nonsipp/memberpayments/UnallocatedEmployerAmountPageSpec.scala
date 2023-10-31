@@ -25,12 +25,10 @@ class UnallocatedEmployerAmountPageSpec extends PageBehaviours {
 
   "TotalEmployerContributionPage" - {
 
-    val index = refineMV[Max5000.Refined](1)
+    beRetrievable[Money](UnallocatedEmployerAmountPage(srnGen.sample.value))
 
-    beRetrievable[Money](UnallocatedEmployerAmountPage(srnGen.sample.value, index))
+    beSettable[Money](UnallocatedEmployerAmountPage(srnGen.sample.value))
 
-    beSettable[Money](UnallocatedEmployerAmountPage(srnGen.sample.value, index))
-
-    beRemovable[Money](UnallocatedEmployerAmountPage(srnGen.sample.value, index))
+    beRemovable[Money](UnallocatedEmployerAmountPage(srnGen.sample.value))
   }
 }

@@ -23,10 +23,10 @@ import pages.QuestionPage
 import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
 
-case class UnallocatedEmployerAmountPage(srn: Srn, index: Max5000) extends QuestionPage[Money] {
+case class UnallocatedEmployerAmountPage(srn: Srn) extends QuestionPage[Money] {
 
   override def path: JsPath =
-    MemberPaymentsPage.path \ toString \ index.arrayIndex.toString
+    MemberPaymentsPage.path \ toString
 
   override def toString: String = "unallocatedContribAmount"
 }

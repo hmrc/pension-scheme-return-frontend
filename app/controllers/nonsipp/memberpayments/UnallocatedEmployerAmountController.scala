@@ -51,20 +51,20 @@ class UnallocatedEmployerAmountController @Inject()(
 
   private val form = UnallocatedEmployerAmountController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      val preparedForm = request.userAnswers.get(UnallocatedEmployerAmountPage(srn, index)).fold(form)(form.fill)
+      val preparedForm = request.userAnswers.get(UnallocatedEmployerAmountPage(srn)).fold(form)(form.fill)
 
       Ok(
         view(
           UnallocatedEmployerAmountController
-            .viewModel(srn, index, request.schemeDetails.schemeName, preparedForm, mode)
+            .viewModel(srn, request.schemeDetails.schemeName, preparedForm, mode)
         )
       )
 
     }
 
-  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
@@ -72,16 +72,16 @@ class UnallocatedEmployerAmountController @Inject()(
           formWithErrors => {
             val viewModel =
               UnallocatedEmployerAmountController
-                .viewModel(srn, index, request.schemeDetails.schemeName, formWithErrors, mode)
+                .viewModel(srn, request.schemeDetails.schemeName, formWithErrors, mode)
 
             Future.successful(BadRequest(view(viewModel)))
           },
           value =>
             for {
               updatedAnswers <- Future
-                .fromTry(request.userAnswers.transformAndSet(UnallocatedEmployerAmountPage(srn, index), value))
+                .fromTry(request.userAnswers.transformAndSet(UnallocatedEmployerAmountPage(srn), value))
               _ <- saveService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(UnallocatedEmployerAmountPage(srn, index), mode, updatedAnswers))
+            } yield Redirect(navigator.nextPage(UnallocatedEmployerAmountPage(srn), mode, updatedAnswers))
         )
     }
 }
@@ -98,7 +98,6 @@ object UnallocatedEmployerAmountController {
 
   def viewModel(
     srn: Srn,
-    index: Max5000,
     schemeName: String,
     form: Form[Money],
     mode: Mode
@@ -110,6 +109,6 @@ object UnallocatedEmployerAmountController {
         form,
         QuestionField.input(Empty)
       ),
-      controllers.nonsipp.memberpayments.routes.UnallocatedEmployerAmountController.onSubmit(srn, index, mode)
+      controllers.nonsipp.memberpayments.routes.UnallocatedEmployerAmountController.onSubmit(srn, mode)
     )
 }

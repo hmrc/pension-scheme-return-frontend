@@ -30,9 +30,8 @@ import java.util.Locale
 
 class UnallocatedEmployerAmountControllerSpec extends ControllerBaseSpec {
 
-  private val index = refineMV[OneTo5000](1)
-  private lazy val onPageLoad = routes.UnallocatedEmployerAmountController.onPageLoad(srn, index, NormalMode)
-  private lazy val onSubmit = routes.UnallocatedEmployerAmountController.onSubmit(srn, index, NormalMode)
+  private lazy val onPageLoad = routes.UnallocatedEmployerAmountController.onPageLoad(srn, NormalMode)
+  private lazy val onSubmit = routes.UnallocatedEmployerAmountController.onSubmit(srn, NormalMode)
 
   "ValueOfSchemeAssetsWhenMoneyBorrowedController" - {
 
@@ -53,7 +52,6 @@ class UnallocatedEmployerAmountControllerSpec extends ControllerBaseSpec {
       injected[MoneyView].apply(
         UnallocatedEmployerAmountController.viewModel(
           srn,
-          index,
           schemeName,
           UnallocatedEmployerAmountController.form(injected[MoneyFormErrorProvider]),
           NormalMode
@@ -62,17 +60,15 @@ class UnallocatedEmployerAmountControllerSpec extends ControllerBaseSpec {
     })
 
     act.like(
-      renderPrePopView(onPageLoad, UnallocatedEmployerAmountPage(srn, index), money) {
-        implicit app => implicit request =>
-          injected[MoneyView].apply(
-            UnallocatedEmployerAmountController.viewModel(
-              srn,
-              index,
-              schemeName,
-              UnallocatedEmployerAmountController.form(injected[MoneyFormErrorProvider]).fill(money),
-              NormalMode
-            )
+      renderPrePopView(onPageLoad, UnallocatedEmployerAmountPage(srn), money) { implicit app => implicit request =>
+        injected[MoneyView].apply(
+          UnallocatedEmployerAmountController.viewModel(
+            srn,
+            schemeName,
+            UnallocatedEmployerAmountController.form(injected[MoneyFormErrorProvider]).fill(money),
+            NormalMode
           )
+        )
       }
     )
 
