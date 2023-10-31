@@ -22,7 +22,7 @@ import controllers.actions._
 import controllers.nonsipp.loansmadeoroutstanding.RemoveLoanController._
 import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
-import models.requests.DataRequest
+import models.requests.{AllowedAccessRequest, DataRequest}
 import models.{IdentitySubject, IdentityType, Mode}
 import navigation.Navigator
 import pages.nonsipp.common.{IdentityTypePage, OtherRecipientDetailsPage}
@@ -30,7 +30,7 @@ import pages.nonsipp.loansmadeoroutstanding._
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
+import services.{PsrSubmissionService, SaveService}
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
@@ -45,6 +45,7 @@ class RemoveLoanController @Inject()(
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   formProvider: YesNoPageFormProvider,
+  psrSubmissionService: PsrSubmissionService,
   val controllerComponents: MessagesControllerComponents,
   view: YesNoPageView
 )(implicit ec: ExecutionContext)
@@ -111,7 +112,13 @@ class RemoveLoanController @Inject()(
                 updatedAnswers <- Future
                   .fromTry(request.userAnswers.remove(IdentityTypePage(srn, index, IdentitySubject.LoanRecipient)))
                 _ <- saveService.save(updatedAnswers)
-              } yield Redirect(navigator.nextPage(RemoveLoanPage(srn, index), mode, updatedAnswers))
+                redirectTo <- psrSubmissionService
+                  .submitPsrDetails(srn)(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
+                  .map {
+                    case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+                    case Some(_) => Redirect(navigator.nextPage(RemoveLoanPage(srn, index), mode, updatedAnswers))
+                  }
+              } yield redirectTo
             } else {
               Future
                 .successful(Redirect(navigator.nextPage(RemoveLoanPage(srn, index), mode, request.userAnswers)))
