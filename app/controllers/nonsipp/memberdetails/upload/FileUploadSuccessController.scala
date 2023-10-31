@@ -89,7 +89,7 @@ class FileUploadSuccessController @Inject()(
       refineV[OneTo300](details.row).toOption.map { index =>
         List(
           UserAnswers.set(MemberDetailsPage(srn, index), details.nameDOB)
-//          UserAnswers.set(DoesMemberHaveNinoPage(srn, index), details.ninoOrNoNinoReason.isRight),
+//          UserAnswers.set(DoesMemberHaveNinoPage(srn, index), details.ninoOrNoNinoReason.isRight)
 //          details.ninoOrNoNinoReason.fold(
 //            UserAnswers.set(NoNINOPage(srn, index), _),
 //            UserAnswers.set(MemberDetailsNinoPage(srn, index), _)
