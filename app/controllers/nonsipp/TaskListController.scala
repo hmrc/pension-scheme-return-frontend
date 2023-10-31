@@ -357,6 +357,7 @@ object TaskListController {
   private def loansSection(srn: Srn, schemeName: String, userAnswers: UserAnswers) = {
     val prefix = s"nonsipp.tasklist.loans"
     val taskListStatus: TaskListStatus = getLoansTaskListStatus(userAnswers, srn)
+    val borrowingStatus = TaskListStatusUtils.getBorrowingTaskListStatusAndLink(userAnswers, srn)
 
     TaskListSectionViewModel(
       s"$prefix.title",
@@ -390,10 +391,10 @@ object TaskListController {
       ),
       TaskListItemViewModel(
         LinkMessage(
-          Message(messageKey(prefix, "moneyborrowed.title", UnableToStart), schemeName),
-          controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedController.onPageLoad(srn, NormalMode).url
+          Message(messageKey(prefix, "moneyborrowed.title", borrowingStatus._1), schemeName),
+          borrowingStatus._2
         ),
-        NotStarted
+        borrowingStatus._1
       )
     )
   }
@@ -425,7 +426,7 @@ object TaskListController {
   private def landOrPropertySection(srn: Srn, userAnswers: UserAnswers) = {
     val prefix = "nonsipp.tasklist.landorproperty"
 
-    val (landOrPropertyStatus) = TaskListStatusUtils.getLandOrPropertyTaskListStatusAndLink(userAnswers, srn)
+    val landOrPropertyStatus = TaskListStatusUtils.getLandOrPropertyTaskListStatusAndLink(userAnswers, srn)
     val (disposalsStatus, disposalLinkUrl) = TaskListStatusUtils.getDisposalsTaskListStatusWithLink(userAnswers, srn)
 
     TaskListSectionViewModel(
