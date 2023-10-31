@@ -39,12 +39,12 @@ import pages.nonsipp.landorproperty.{
   IsLesseeConnectedPartyPage,
   LandOrPropertyHeldPage,
   LandOrPropertyTotalIncomePage,
-  LandOrPropertyTotalIncomePages,
   LandPropertyInUKPage,
   LandPropertyInUKPages,
   LandPropertyIndependentValuationPage,
   WhyDoesSchemeHoldLandPropertyPage
 }
+import pages.nonsipp.moneyborrowed.{LenderNamePage, LenderNamePages, MoneyBorrowedPage, WhySchemeBorrowedMoneyPage}
 
 class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValues with TestValues {
   "Loans status" - {
@@ -286,6 +286,78 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
         result mustBe (Completed, listPageUrl)
       }
 
+    }
+  }
+  "Borrowing status" - {
+    val moneyBorrowedPageUrl =
+      controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedController.onPageLoad(srn, NormalMode).url
+    val listPageUrl =
+      controllers.nonsipp.moneyborrowed.routes.BorrowInstancesListController.onPageLoad(srn, 1, NormalMode).url
+
+    def lenderNamePageUrl(index: Max5000) =
+      controllers.nonsipp.moneyborrowed.routes.LenderNameController.onPageLoad(srn, index, NormalMode).url
+
+    "should be Not Started" - {
+      "when default data" in {
+        val result = TaskListStatusUtils.getBorrowingTaskListStatusAndLink(defaultUserAnswers, srn)
+        result mustBe (NotStarted, moneyBorrowedPageUrl)
+      }
+    }
+    "should be InProgress" - {
+      "when only moneyBorrowedPage true is present" in {
+        val customUserAnswers = defaultUserAnswers
+          .unsafeSet(MoneyBorrowedPage(srn), true)
+        val result = TaskListStatusUtils.getBorrowingTaskListStatusAndLink(customUserAnswers, srn)
+        result mustBe (InProgress, lenderNamePageUrl(refineMV(1)))
+      }
+      "when moneyBorrowedPage true and first page is present" in {
+        val customUserAnswers = defaultUserAnswers
+          .unsafeSet(MoneyBorrowedPage(srn), true)
+          .unsafeSet(LenderNamePages(srn), Map("0" -> lenderName))
+
+        val result = TaskListStatusUtils.getBorrowingTaskListStatusAndLink(customUserAnswers, srn)
+        result mustBe (InProgress, lenderNamePageUrl(refineMV(1)))
+      }
+      "when moneyBorrowedPage true and more first pages than last pages is present - index 2 is missing" in {
+        val customUserAnswers = defaultUserAnswers
+          .unsafeSet(MoneyBorrowedPage(srn), true)
+          .unsafeSet(LenderNamePage(srn, refineMV(1)), lenderName)
+          .unsafeSet(WhySchemeBorrowedMoneyPage(srn, refineMV(1)), reasonBorrowed)
+          .unsafeSet(LenderNamePage(srn, refineMV(2)), lenderName)
+
+        val result = TaskListStatusUtils.getBorrowingTaskListStatusAndLink(customUserAnswers, srn)
+        result mustBe (InProgress, lenderNamePageUrl(refineMV(2)))
+      }
+      "when moneyBorrowedPage true and more first pages than last pages is present - index 1 is missing" in {
+        val customUserAnswers = defaultUserAnswers
+          .unsafeSet(MoneyBorrowedPage(srn), true)
+          .unsafeSet(LenderNamePage(srn, refineMV(1)), lenderName)
+          // missing here
+          .unsafeSet(LenderNamePage(srn, refineMV(2)), lenderName)
+          .unsafeSet(WhySchemeBorrowedMoneyPage(srn, refineMV(2)), reasonBorrowed)
+
+        val result = TaskListStatusUtils.getBorrowingTaskListStatusAndLink(customUserAnswers, srn)
+        result mustBe (InProgress, lenderNamePageUrl(refineMV(1)))
+      }
+    }
+    "should be Complete" - {
+      "when only moneyBorrowedPage false is present" in {
+        val customUserAnswers = defaultUserAnswers
+          .unsafeSet(MoneyBorrowedPage(srn), false)
+        val result = TaskListStatusUtils.getBorrowingTaskListStatusAndLink(customUserAnswers, srn)
+        result mustBe (Completed, listPageUrl)
+      }
+      "when moneyBorrowedPage true and equal number of first pages and last pages are present" in {
+        val customUserAnswers = defaultUserAnswers
+          .unsafeSet(MoneyBorrowedPage(srn), true)
+          .unsafeSet(LenderNamePage(srn, refineMV(1)), lenderName)
+          .unsafeSet(WhySchemeBorrowedMoneyPage(srn, refineMV(1)), reasonBorrowed)
+          .unsafeSet(LenderNamePage(srn, refineMV(2)), lenderName)
+          .unsafeSet(WhySchemeBorrowedMoneyPage(srn, refineMV(2)), reasonBorrowed)
+
+        val result = TaskListStatusUtils.getBorrowingTaskListStatusAndLink(customUserAnswers, srn)
+        result mustBe (Completed, listPageUrl)
+      }
     }
   }
 }

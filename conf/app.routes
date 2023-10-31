@@ -474,4 +474,3 @@ GET         /:srn/check-answers-unallocated-employer-contributions              
 POST        /:srn/submit-check-answers-unallocated-employer-contributions               controllers.nonsipp.memberpayments.UnallocatedContributionCYAController.onSubmit(srn: Srn, checkOrChange: CheckOrChange = Check)
 GET         /:srn/change-check-answers-unallocated-employer-contributions               controllers.nonsipp.memberpayments.UnallocatedContributionCYAController.onPageLoad(srn: Srn, checkOrChange: CheckOrChange = Change)
 POST        /:srn/change-submit-answers-unallocated-employer-contributions              controllers.nonsipp.memberpayments.UnallocatedContributionCYAController.onSubmit(srn: Srn, checkOrChange: CheckOrChange = Change)
-

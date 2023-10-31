@@ -133,6 +133,7 @@ trait TestValues {
   val buyersName = "testBuyersName"
   val lenderName = "testLenderName"
   val amountBorrowed: (Money, Percentage) = (money, percentage)
+  val reasonBorrowed = "test reason borrowed"
 
   val address: Address = Address(
     "testAddressLine1",
@@ -140,7 +141,7 @@ trait TestValues {
     Some("testAddressLine3"),
     Some("testTown"),
     Some("testPostCode"),
-    "testCountry",
+    "United Kingdom",
     "GB"
   )
 

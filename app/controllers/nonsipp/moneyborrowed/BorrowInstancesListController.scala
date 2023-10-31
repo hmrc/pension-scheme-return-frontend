@@ -57,7 +57,7 @@ class BorrowInstancesListController @Inject()(
     implicit request =>
       borrowDetails(srn).map { instances =>
         if (instances.isEmpty) {
-          Redirect(controllers.nonsipp.routes.CheckReturnDatesController.onPageLoad(srn, mode))
+          Redirect(controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedController.onPageLoad(srn, mode))
         } else {
           val viewModel = BorrowInstancesListController.viewModel(srn, mode, page, instances)
           Ok(view(form, viewModel))

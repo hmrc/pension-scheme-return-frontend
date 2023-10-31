@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.employercontributions
 
-import config.Refined.{Max300, Max50, Max5000}
+import config.Refined.{Max300, Max50}
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.employercontributions.PartnershipEmployerUtrController._
 import eu.timepit.refined.refineMV

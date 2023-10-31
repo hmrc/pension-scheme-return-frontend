@@ -31,7 +31,7 @@ class KeepAliveControllerSpec extends ControllerBaseSpec {
       "the user has answered some questions" in {
 
         val mockSessionRepository = mock[SessionRepository]
-        when(mockSessionRepository.keepAlive(any())).thenReturn(Future.successful(true))
+        when(mockSessionRepository.keepAlive(any())).thenReturn(Future.successful(()))
 
         val application =
           applicationBuilder(Some(emptyUserAnswers))
@@ -54,7 +54,7 @@ class KeepAliveControllerSpec extends ControllerBaseSpec {
       "the user has not answered any questions" in {
 
         val mockSessionRepository = mock[SessionRepository]
-        when(mockSessionRepository.keepAlive(any())).thenReturn(Future.successful(true))
+        when(mockSessionRepository.keepAlive(any())).thenReturn(Future.successful(()))
 
         val application =
           applicationBuilder(None)
