@@ -73,6 +73,9 @@ case class CheckYourAnswersRowViewModel(
   def withAction(action: SummaryAction): CheckYourAnswersRowViewModel =
     copy(actions = actions :+ action)
 
+  def with2Actions(action1: SummaryAction, action2: SummaryAction): CheckYourAnswersRowViewModel =
+    copy(actions = actions :+ action1 :+ action2)
+
   def withChangeAction(changeUrl: String): CheckYourAnswersRowViewModel = withAction(
     SummaryAction("site.change", changeUrl)
   )

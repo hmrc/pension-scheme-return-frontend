@@ -35,7 +35,9 @@ import viewmodels.models.{
 }
 import views.html.CheckYourAnswersView
 import viewmodels.implicits._
+
 import javax.inject.{Inject, Named}
+import scala.:+
 import scala.concurrent.ExecutionContext
 
 class UnallocatedContributionCYAController @Inject()(
@@ -143,12 +145,16 @@ object UnallocatedContributionCYAController {
           CheckYourAnswersRowViewModel(
             Message("unallocatedEmployerCYA.section.schemeName", schemeName),
             Message("unallocatedEmployerCYA.section.amount", unallocatedAmount.displayAs)
-          ).withAction(
+          ).with2Actions(
             SummaryAction(
               "site.change",
               controllers.nonsipp.memberpayments.routes.UnallocatedEmployerAmountController
                 .onSubmit(srn, mode)
                 .url
+            ).withVisuallyHiddenContent(Message("unallocatedEmployerCYA.section.schemeName.hidden", schemeName)),
+            SummaryAction(
+              "site.remove",
+              controllers.routes.UnauthorisedController.onPageLoad().url //TODO add the link to the Remove Controller
             ).withVisuallyHiddenContent(Message("unallocatedEmployerCYA.section.schemeName.hidden", schemeName))
           )
         )
