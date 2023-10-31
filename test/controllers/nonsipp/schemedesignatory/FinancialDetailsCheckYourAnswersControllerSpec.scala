@@ -24,7 +24,7 @@ import pages.nonsipp.WhichTaxYearPage
 import pages.nonsipp.schemedesignatory.HowManyMembersPage
 import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
-import services.SchemeDateService
+import services.{PsrSubmissionService, SchemeDateService}
 import views.html.CheckYourAnswersView
 
 class FinancialDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec {
@@ -33,9 +33,11 @@ class FinancialDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec 
   private lazy val onSubmit = routes.FinancialDetailsCheckYourAnswersController.onSubmit(srn, NormalMode)
 
   private val mockSchemeDateService = mock[SchemeDateService]
+  private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
 
   override protected val additionalBindings: List[GuiceableModule] = List(
-    bind[SchemeDateService].toInstance(mockSchemeDateService)
+    bind[SchemeDateService].toInstance(mockSchemeDateService),
+    bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
   )
 
   "FinancialDetailsCheckYourAnswersController" - {
@@ -58,7 +60,15 @@ class FinancialDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec 
       )
     }.before(mockTaxYear(dateRange)))
 
-    act.like(redirectNextPage(onSubmit))
+    act.like(
+      redirectNextPage(onSubmit)
+        .before(
+          MockPSRSubmissionService.submitPsrDetails()
+        )
+        .after(
+          verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any())(any(), any(), any())
+        )
+    )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 

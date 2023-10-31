@@ -83,6 +83,9 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec {
           MockSchemeDateService.returnPeriods(Some(NonEmptyList.of(dateRange)))
           MockPSRSubmissionService.submitPsrDetails()
         }
+        .after(
+          verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any())(any(), any(), any())
+        )
     )
 
     act.like(

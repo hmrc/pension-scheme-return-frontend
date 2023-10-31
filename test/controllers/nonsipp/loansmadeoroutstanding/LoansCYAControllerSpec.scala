@@ -31,6 +31,7 @@ import models.{
   Security,
   SponsoringOrConnectedParty
 }
+import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.common.{CompanyRecipientCrnPage, IdentityTypePage}
 import pages.nonsipp.loansmadeoroutstanding._
 import play.api.inject.bind
@@ -104,6 +105,10 @@ class LoansCYAControllerSpec extends ControllerBaseSpec {
       act.like(
         redirectNextPage(onSubmit(checkOrChange))
           .before(MockPSRSubmissionService.submitPsrDetails())
+          .after({
+            verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any())(any(), any(), any())
+            reset(mockPsrSubmissionService)
+          })
           .withName(s"redirect to next page when in ${checkOrChange.name} mode")
       )
 
