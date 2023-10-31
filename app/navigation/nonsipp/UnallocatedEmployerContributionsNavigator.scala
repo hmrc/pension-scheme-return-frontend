@@ -30,12 +30,12 @@ object UnallocatedEmployerContributionsNavigator extends JourneyNavigator {
     case page @ UnallocatedEmployerContributionsPage(srn) =>
       if (userAnswers.get(page).contains(true)) {
         controllers.nonsipp.memberpayments.routes.UnallocatedEmployerAmountController
-          .onPageLoad(srn, refineMV(1), NormalMode)
+          .onPageLoad(srn, NormalMode)
       } else {
         controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
       }
 
-    case UnallocatedEmployerAmountPage(srn, index) =>
+    case UnallocatedEmployerAmountPage(srn) =>
       routes.UnauthorisedController.onPageLoad()
 
   }

@@ -464,7 +464,7 @@ POST        /:srn/submit-check-answers-financial-details                        
 GET         /:srn/change-check-answers-financial-details                                controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST        /:srn/change-submit-check-answers-financial-details                         controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
-GET         /:srn/unallocated-employer-contributions/:index                             controllers.nonsipp.memberpayments.UnallocatedEmployerAmountController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
-POST        /:srn/unallocated-employer-contributions/:index                             controllers.nonsipp.memberpayments.UnallocatedEmployerAmountController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
-GET         /:srn/change-unallocated-employer-contributions/:index                      controllers.nonsipp.memberpayments.UnallocatedEmployerAmountController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
-POST        /:srn/change-unallocated-employer-contributions/:index                      controllers.nonsipp.memberpayments.UnallocatedEmployerAmountController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+GET         /:srn/how-much-unallocated-employer-contributions                             controllers.nonsipp.memberpayments.UnallocatedEmployerAmountController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/how-much-unallocated-employer-contributions                             controllers.nonsipp.memberpayments.UnallocatedEmployerAmountController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/change-how-much-unallocated-employer-contributions                     controllers.nonsipp.memberpayments.UnallocatedEmployerAmountController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-how-much-unallocated-employer-contributions                     controllers.nonsipp.memberpayments.UnallocatedEmployerAmountController.onSubmit(srn: Srn, mode: Mode = CheckMode)

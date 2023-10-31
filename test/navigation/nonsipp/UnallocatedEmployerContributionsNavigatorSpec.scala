@@ -16,9 +16,6 @@
 
 package navigation.nonsipp
 
-import config.Refined.{Max5000, OneTo5000}
-import controllers.routes
-import eu.timepit.refined.refineMV
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.memberpayments.UnallocatedEmployerContributionsPage
@@ -26,16 +23,14 @@ import utils.BaseSpec
 
 class UnallocatedEmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
-  private val index = refineMV[OneTo5000](1)
   val navigator: Navigator = new NonSippNavigator
 
   "UnallocatedEmployerContributionsNavigator" - {
 
     act.like(
       normalmode
-        .navigateToWithDataAndIndex(
-          index,
-          (srn, _: Max5000) => UnallocatedEmployerContributionsPage(srn),
+        .navigateToWithData(
+          UnallocatedEmployerContributionsPage,
           Gen.const(true),
           controllers.nonsipp.memberpayments.routes.UnallocatedEmployerAmountController.onPageLoad
         )
