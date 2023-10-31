@@ -16,26 +16,25 @@
 
 package navigation.nonsipp
 
-import controllers.routes
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.memberpayments.UnallocatedEmployerContributionsPage
 import utils.BaseSpec
 
-class UnallocatedEmployerContributionsControllerNavigatorSpec extends BaseSpec with NavigatorBehaviours {
+class UnallocatedEmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
   val navigator: Navigator = new NonSippNavigator
 
-  "UnallocatedEmployerContributionsControllerNavigator" - {
+  "UnallocatedEmployerContributionsNavigator" - {
 
     act.like(
       normalmode
         .navigateToWithData(
           UnallocatedEmployerContributionsPage,
           Gen.const(true),
-          (_, _) => routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.memberpayments.routes.UnallocatedEmployerAmountController.onPageLoad
         )
-        .withName("go from unallocated employer contributions page to unauthorised page when yes selected")
+        .withName("go from unallocated employer contributions page to Unallocated amount")
     )
 
     act.like(

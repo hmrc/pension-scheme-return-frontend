@@ -17,10 +17,11 @@
 package navigation.nonsipp
 
 import controllers.routes
-import models.UserAnswers
+import eu.timepit.refined.refineMV
+import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.memberpayments.UnallocatedEmployerContributionsPage
+import pages.nonsipp.memberpayments._
 import play.api.mvc.Call
 
 object UnallocatedEmployerContributionsNavigator extends JourneyNavigator {
@@ -28,10 +29,15 @@ object UnallocatedEmployerContributionsNavigator extends JourneyNavigator {
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
     case page @ UnallocatedEmployerContributionsPage(srn) =>
       if (userAnswers.get(page).contains(true)) {
-        routes.UnauthorisedController.onPageLoad()
+        controllers.nonsipp.memberpayments.routes.UnallocatedEmployerAmountController
+          .onPageLoad(srn, NormalMode)
       } else {
         controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
       }
+
+    case UnallocatedEmployerAmountPage(srn) =>
+      routes.UnauthorisedController.onPageLoad()
+
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty
