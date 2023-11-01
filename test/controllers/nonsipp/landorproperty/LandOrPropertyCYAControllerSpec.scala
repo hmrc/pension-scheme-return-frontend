@@ -22,6 +22,7 @@ import eu.timepit.refined.refineMV
 import models.ConditionalYesNo._
 import models.SchemeHoldLandProperty.Transfer
 import models.{CheckOrChange, ConditionalYesNo}
+import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.landorproperty._
 import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
@@ -92,6 +93,10 @@ class LandOrPropertyCYAControllerSpec extends ControllerBaseSpec {
       act.like(
         redirectNextPage(onSubmit(checkOrChange))
           .before(MockPSRSubmissionService.submitPsrDetails())
+          .after({
+            verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any())(any(), any(), any())
+            reset(mockPsrSubmissionService)
+          })
           .withName(s"redirect to next page when in ${checkOrChange.name} mode")
       )
 

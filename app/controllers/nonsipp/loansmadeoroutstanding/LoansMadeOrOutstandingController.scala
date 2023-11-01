@@ -68,7 +68,6 @@ class LoansMadeOrOutstandingController @Inject()(
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(LoansMadeOrOutstandingPage(srn), value))
             _ <- saveService.save(updatedAnswers)
-
             redirectTo <- if (value) {
               Future.successful(Redirect(navigator.nextPage(LoansMadeOrOutstandingPage(srn), mode, updatedAnswers)))
             } else {
