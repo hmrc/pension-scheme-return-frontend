@@ -39,11 +39,7 @@ import pages.nonsipp.landorproperty.{
 }
 import pages.nonsipp.landorpropertydisposal.{LandOrPropertyDisposalPage, LandPropertyDisposalCompletedPages}
 import pages.nonsipp.memberdetails.{MemberDetailsNinoPages, MembersDetailsPages, NoNinoPages}
-import pages.nonsipp.moneyborrowed.{
-  LenderNamePages,
-  MoneyBorrowedPage,
-  WhySchemeBorrowedMoneyPages
-}
+import pages.nonsipp.moneyborrowed.{LenderNamePages, MoneyBorrowedPage, WhySchemeBorrowedMoneyPages}
 import pages.nonsipp.schemedesignatory.{FeesCommissionsWagesSalariesPage, HowManyMembersPage, HowMuchCashPage}
 import viewmodels.models.TaskListStatus
 import viewmodels.models.TaskListStatus.{Completed, InProgress, NotStarted, TaskListStatus}

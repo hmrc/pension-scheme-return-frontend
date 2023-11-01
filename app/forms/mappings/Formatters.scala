@@ -100,11 +100,27 @@ trait Formatters {
             case s =>
               nonFatalCatch
                 .either(s.toInt)
-                .left
-                .map { _ =>
-                  if (s.matches(intRegex)) Seq(FormError(key, errors.max._2, args))
-                  else Seq(FormError(key, errors.nonNumericKey, args))
-                }
+                .fold(
+                  _ => {
+                    if (s.matches(intRegex)) {
+                      Left(Seq(FormError(key, errors.max._2, args)))
+                    } else {
+                      Left(Seq(FormError(key, errors.nonNumericKey, args)))
+                    }
+                  },
+                  value => {
+                    if (value > errors.max._1) {
+                      Left(Seq(FormError(key, errors.max._2, args)))
+                    } else if (value < errors.min._1 && errors.min._1 == 0) {
+                      // deliberately displaying nonNumericKey error message here
+                      Left(Seq(FormError(key, errors.nonNumericKey, args)))
+                    } else if (value < errors.min._1) {
+                      Left(Seq(FormError(key, errors.min._2, args)))
+                    } else {
+                      Right(value)
+                    }
+                  }
+                )
           }
           .flatMap { int =>
             errors.max match {

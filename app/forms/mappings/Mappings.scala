@@ -39,9 +39,10 @@ trait Mappings extends Formatters with Constraints {
     wholeNumberKey: String = "error.wholeNumber",
     nonNumericKey: String = "error.nonNumeric",
     max: (Int, String) = (Int.MaxValue, "error.tooLarge"),
+    min: (Int, String) = (0, "error.tooSmall"),
     args: Seq[String] = Seq.empty
   ): FieldMapping[Int] =
-    int(IntFormErrors(requiredKey, wholeNumberKey, nonNumericKey, max), args)
+    int(IntFormErrors(requiredKey, wholeNumberKey, nonNumericKey, max, min), args)
 
   def int(
     intFormErrors: IntFormErrors,

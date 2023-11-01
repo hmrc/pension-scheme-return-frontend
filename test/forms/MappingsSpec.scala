@@ -126,6 +126,10 @@ class MappingsSpec extends AnyFreeSpec with Matchers with OptionValues with Mapp
       Form(
         "value" -> int(max = (99, "error.tooLarge"))
       )
+    val testFormWithMin: Form[Int] =
+      Form(
+        "value" -> int(max = (99, "error.tooLarge"), min = (-99, "error.tooSmall"))
+      )
 
     "must bind a valid integer" in {
       val result = testForm.bind(Map("value" -> "1"))
@@ -150,6 +154,21 @@ class MappingsSpec extends AnyFreeSpec with Matchers with OptionValues with Mapp
     "must not bind when larger than max int" in {
       val result = testForm.bind(Map("value" -> (Int.MaxValue.toLong + 1).toString))
       result.errors must contain(FormError("value", "error.tooLarge"))
+    }
+
+    "must not bind when smaller than 0" in {
+      val result = testForm.bind(Map("value" -> "-1"))
+      result.errors must contain(FormError("value", "error.nonNumeric"))
+    }
+
+    "must bind when -99" in {
+      val result = testFormWithMin.bind(Map("value" -> "-99"))
+      result.get mustEqual -99
+    }
+
+    "must not bind when smaller than -99" in {
+      val result = testFormWithMin.bind(Map("value" -> "-100"))
+      result.errors must contain(FormError("value", "error.tooSmall"))
     }
 
     "must unbind a valid value" in {
