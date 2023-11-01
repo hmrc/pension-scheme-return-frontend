@@ -24,12 +24,13 @@ import controllers.nonsipp.landorpropertydisposal.LandPropertyDisposalCYAControl
 import models.HowDisposed.{HowDisposed, Other, Sold, Transferred}
 import models.SchemeId.Srn
 import models._
+import models.requests.DataRequest
 import navigation.Navigator
 import pages.nonsipp.landorproperty.LandOrPropertyAddressLookupPage
 import pages.nonsipp.landorpropertydisposal._
 import play.api.i18n._
 import play.api.mvc._
-import services.SaveService
+import services.{PsrSubmissionService, SaveService}
 import utils.DateTimeUtils.localDateShow
 import utils.ListUtils.ListOps
 import viewmodels.DisplayMessage._
@@ -46,6 +47,7 @@ class LandPropertyDisposalCYAController @Inject()(
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   saveService: SaveService,
+  psrSubmissionService: PsrSubmissionService,
   val controllerComponents: MessagesControllerComponents,
   view: CheckYourAnswersView
 )(implicit ec: ExecutionContext)
@@ -161,10 +163,17 @@ class LandPropertyDisposalCYAController @Inject()(
           request.userAnswers.set(LandPropertyDisposalCompletedPage(srn, index, disposalIndex), SectionCompleted)
         )
         _ <- saveService.save(updatedUserAnswers)
-      } yield Redirect(
-        navigator
-          .nextPage(LandPropertyDisposalCompletedPage(srn, index, disposalIndex), NormalMode, request.userAnswers)
-      )
+        redirectTo <- psrSubmissionService
+          .submitPsrDetails(srn)(implicitly, implicitly, request = DataRequest(request.request, updatedUserAnswers))
+          .map {
+            case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+            case Some(_) =>
+              Redirect(
+                navigator
+                  .nextPage(LandPropertyDisposalCompletedPage(srn, index, disposalIndex), mode, request.userAnswers)
+              )
+          }
+      } yield redirectTo
     }
 }
 

@@ -48,12 +48,13 @@ class LandOrPropertyHeldControllerSpec extends ControllerBaseSpec {
         .apply(form(injected[YesNoPageFormProvider]).fill(true), viewModel(srn, NormalMode, schemeName))
     })
 
-    act.like(redirectNextPage(onSubmit, "value" -> "true")
-      .before(MockPSRSubmissionService.submitPsrDetails())
-      .after({
-        verify(mockPsrSubmissionService, never).submitPsrDetails(any())(any(), any(), any())
-        reset(mockPsrSubmissionService)
-      })
+    act.like(
+      redirectNextPage(onSubmit, "value" -> "true")
+        .before(MockPSRSubmissionService.submitPsrDetails())
+        .after({
+          verify(mockPsrSubmissionService, never).submitPsrDetails(any())(any(), any(), any())
+          reset(mockPsrSubmissionService)
+        })
     )
 
     act.like(

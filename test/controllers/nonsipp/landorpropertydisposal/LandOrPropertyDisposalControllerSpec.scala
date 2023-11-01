@@ -20,14 +20,22 @@ import controllers.ControllerBaseSpec
 import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalController._
 import forms.YesNoPageFormProvider
 import models.NormalMode
+import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.landorpropertydisposal.LandOrPropertyDisposalPage
+import play.api.inject.bind
+import play.api.inject.guice.GuiceableModule
+import services.PsrSubmissionService
 import views.html.YesNoPageView
 
 class LandOrPropertyDisposalControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoad = routes.LandOrPropertyDisposalController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.LandOrPropertyDisposalController.onSubmit(srn, NormalMode)
+  private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
 
+  override protected val additionalBindings: List[GuiceableModule] = List(
+    bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
+  )
   "LandOrPropertyDisposalController" - {
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
@@ -39,8 +47,22 @@ class LandOrPropertyDisposalControllerSpec extends ControllerBaseSpec {
       injected[YesNoPageView]
         .apply(form(injected[YesNoPageFormProvider]).fill(true), viewModel(srn, schemeName, NormalMode))
     })
-    act.like(redirectNextPage(onSubmit, "value" -> "true"))
-    act.like(redirectNextPage(onSubmit, "value" -> "false"))
+    act.like(
+      redirectNextPage(onSubmit, "value" -> "true")
+        .before(MockPSRSubmissionService.submitPsrDetails())
+        .after({
+          verify(mockPsrSubmissionService, never).submitPsrDetails(any())(any(), any(), any())
+          reset(mockPsrSubmissionService)
+        })
+    )
+    act.like(
+      redirectNextPage(onSubmit, "value" -> "false")
+        .before(MockPSRSubmissionService.submitPsrDetails())
+        .after({
+          verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any())(any(), any(), any())
+          reset(mockPsrSubmissionService)
+        })
+    )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 

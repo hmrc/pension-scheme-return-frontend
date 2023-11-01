@@ -22,13 +22,14 @@ import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
 import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
+import models.requests.DataRequest
 import models.{Mode, UserAnswers}
 import navigation.Navigator
 import pages.nonsipp.moneyborrowed._
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
+import services.{PsrSubmissionService, SaveService}
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
@@ -44,6 +45,7 @@ class RemoveBorrowInstancesController @Inject()(
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   formProvider: YesNoPageFormProvider,
+  psrSubmissionService: PsrSubmissionService,
   val controllerComponents: MessagesControllerComponents,
   view: YesNoPageView
 )(implicit ec: ExecutionContext)
@@ -95,9 +97,14 @@ class RemoveBorrowInstancesController @Inject()(
                 updatedAnswers <- Future
                   .fromTry(removeAllMoneyBorrowedPages(srn, index, request.userAnswers))
                 _ <- saveService.save(updatedAnswers)
-              } yield {
-                Redirect(navigator.nextPage(RemoveBorrowInstancesPage(srn, index), mode, updatedAnswers))
-              }
+                redirectTo <- psrSubmissionService
+                  .submitPsrDetails(srn)(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
+                  .map {
+                    case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+                    case Some(_) =>
+                      Redirect(navigator.nextPage(RemoveBorrowInstancesPage(srn, index), mode, updatedAnswers))
+                  }
+              } yield redirectTo
             } else {
               Future
                 .successful(

@@ -22,12 +22,13 @@ import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalControll
 import forms.YesNoPageFormProvider
 import models.Mode
 import models.SchemeId.Srn
+import models.requests.DataRequest
 import navigation.Navigator
 import pages.nonsipp.landorpropertydisposal.LandOrPropertyDisposalPage
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
+import services.{PsrSubmissionService, SaveService}
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
@@ -42,6 +43,7 @@ class LandOrPropertyDisposalController @Inject()(
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   formProvider: YesNoPageFormProvider,
+  psrSubmissionService: PsrSubmissionService,
   val controllerComponents: MessagesControllerComponents,
   view: YesNoPageView
 )(implicit ec: ExecutionContext)
@@ -66,7 +68,17 @@ class LandOrPropertyDisposalController @Inject()(
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(LandOrPropertyDisposalPage(srn), value))
             _ <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage(LandOrPropertyDisposalPage(srn), mode, updatedAnswers))
+            redirectTo <- if (value) {
+              Future.successful(Redirect(navigator.nextPage(LandOrPropertyDisposalPage(srn), mode, updatedAnswers)))
+            } else {
+              psrSubmissionService
+                .submitPsrDetails(srn)(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
+                .map {
+                  case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+                  case Some(_) => Redirect(navigator.nextPage(LandOrPropertyDisposalPage(srn), mode, updatedAnswers))
+                }
+            }
+          } yield redirectTo
       )
   }
 }

@@ -21,7 +21,11 @@ import controllers.ControllerBaseSpec
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.NormalMode
+import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.moneyborrowed._
+import play.api.inject.bind
+import play.api.inject.guice.GuiceableModule
+import services.PsrSubmissionService
 import views.html.YesNoPageView
 
 class RemoveBorrowInstancesControllerSpec extends ControllerBaseSpec {
@@ -39,6 +43,12 @@ class RemoveBorrowInstancesControllerSpec extends ControllerBaseSpec {
     .unsafeSet(ValueOfSchemeAssetsWhenMoneyBorrowedPage(srn, refineMV(1)), money)
     .unsafeSet(WhySchemeBorrowedMoneyPage(srn, refineMV(1)), "reason")
 
+  private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
+
+  override protected val additionalBindings: List[GuiceableModule] = List(
+    bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
+  )
+
   "RemoveBorrowInstancesController" - {
 
     act.like(renderView(onPageLoad, filledUserAnswers) { implicit app => implicit request =>
@@ -49,12 +59,29 @@ class RemoveBorrowInstancesControllerSpec extends ControllerBaseSpec {
         )
     })
 
-    act.like(redirectNextPage(onSubmit, "value" -> "true"))
-    act.like(redirectNextPage(onSubmit, "value" -> "false"))
+    act.like(
+      redirectNextPage(onSubmit, "value" -> "true")
+        .before(MockPSRSubmissionService.submitPsrDetails())
+        .after({
+          verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any())(any(), any(), any())
+          reset(mockPsrSubmissionService)
+        })
+    )
+    act.like(
+      redirectNextPage(onSubmit, "value" -> "false")
+        .before(MockPSRSubmissionService.submitPsrDetails())
+        .after({
+          verify(mockPsrSubmissionService, never).submitPsrDetails(any())(any(), any(), any())
+          reset(mockPsrSubmissionService)
+        })
+    )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
-    act.like(saveAndContinue(onSubmit, "value" -> "true"))
+    act.like(
+      saveAndContinue(onSubmit, "value" -> "true")
+        .before(MockPSRSubmissionService.submitPsrDetails())
+    )
 
     act.like(invalidForm(onSubmit, filledUserAnswers))
 
