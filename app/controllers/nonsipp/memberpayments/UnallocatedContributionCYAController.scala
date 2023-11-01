@@ -33,7 +33,7 @@ import viewmodels.models.{
   FormPageViewModel,
   SummaryAction
 }
-import views.html.CheckYourAnswersView
+import views.html.CYAWithRemove
 import viewmodels.implicits._
 
 import javax.inject.{Inject, Named}
@@ -46,7 +46,7 @@ class UnallocatedContributionCYAController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   psrSubmissionService: PsrSubmissionService,
-  view: CheckYourAnswersView
+  view: CYAWithRemove
 )(implicit ec: ExecutionContext)
     extends PSRController {
 

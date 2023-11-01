@@ -70,6 +70,16 @@ case class CheckYourAnswersRowViewModel(
       }
     )
 
+  def toSummaryListRowPartitioned(implicit messages: Messages): SummaryListRow =
+    SummaryListRowViewModel(
+      key = if (oneHalfWidth) KeyViewModel(key.toMessage).withOneHalfWidth() else KeyViewModel(key.toMessage),
+      value = ValueViewModel(value.toMessage).withCssClass("govuk-!-width-one-quarter"),
+      actions = actions.map { a =>
+        ActionItemViewModel(Text(a.content.toMessage), a.href)
+          .withVisuallyHiddenText(a.visuallyHiddenContent.toMessage)
+      }
+    )
+
   def withAction(action: SummaryAction): CheckYourAnswersRowViewModel =
     copy(actions = actions :+ action)
 
