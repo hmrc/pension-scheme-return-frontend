@@ -18,7 +18,6 @@ package controllers.nonsipp.memberpayments
 
 import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.memberpayments.routes
 import eu.timepit.refined.refineMV
 import models.CheckOrChange
 import pages.nonsipp.memberpayments.UnallocatedEmployerAmountPage

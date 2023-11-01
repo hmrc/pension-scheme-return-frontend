@@ -37,7 +37,6 @@ import views.html.CYAWithRemove
 import viewmodels.implicits._
 
 import javax.inject.{Inject, Named}
-import scala.:+
 import scala.concurrent.ExecutionContext
 
 class UnallocatedContributionCYAController @Inject()(
@@ -151,11 +150,11 @@ object UnallocatedContributionCYAController {
               controllers.nonsipp.memberpayments.routes.UnallocatedEmployerAmountController
                 .onSubmit(srn, mode)
                 .url
-            ).withVisuallyHiddenContent(Message("unallocatedEmployerCYA.section.schemeName.hidden", schemeName)),
+            ).withVisuallyHiddenContent(Message("unallocatedEmployerCYA.section.hide", schemeName)),
             SummaryAction(
               "site.remove",
               controllers.routes.UnauthorisedController.onPageLoad().url //TODO add the link to the Remove Controller
-            ).withVisuallyHiddenContent(Message("unallocatedEmployerCYA.section.schemeName.hidden", schemeName))
+            ).withVisuallyHiddenContent(Message("unallocatedEmployerCYA.section.hide", schemeName))
           )
         )
       )

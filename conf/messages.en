@@ -1548,6 +1548,5 @@ unallocatedEmployerCYA.change.title = Check your answers
 unallocatedEmployerCYA.heading = Check your answers
 unallocatedEmployerCYA.change.heading = Check your answers
 unallocatedEmployerCYA.section.schemeName = Amount of unallocated employer contributions received by {0}
-unallocatedEmployerCYA.section.schemeName.hidde = amount of unallocated employer contributions received by {0}
 unallocatedEmployerCYA.section.amount = £ {0}
-unallocatedEmployerCYA.section.amount.hide = amount of unallocated employer contributions received by
+unallocatedEmployerCYA.section.hide = amount of unallocated employer contributions received by {0}
