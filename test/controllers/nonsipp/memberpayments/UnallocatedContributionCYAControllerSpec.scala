@@ -25,7 +25,7 @@ import pages.nonsipp.memberpayments.UnallocatedEmployerAmountPage
 import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
 import services.PsrSubmissionService
-import views.html.CheckYourAnswersView
+import views.html.CYAWithRemove
 
 class UnallocatedContributionCYAControllerSpec extends ControllerBaseSpec {
 
@@ -54,7 +54,7 @@ class UnallocatedContributionCYAControllerSpec extends ControllerBaseSpec {
     List(CheckOrChange.Check, CheckOrChange.Change).foreach { checkOrChange =>
       act.like(
         renderView(onPageLoad(checkOrChange), filledUserAnswers) { implicit app => implicit request =>
-          injected[CheckYourAnswersView].apply(
+          injected[CYAWithRemove].apply(
             UnallocatedContributionCYAController.viewModel(
               ViewModelParameters(
                 srn,
