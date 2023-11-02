@@ -24,85 +24,103 @@ import play.api.mvc.AnyContent
 import transformations.{
   LandOrPropertyTransactionsTransformer,
   LoanTransactionsTransformer,
-  MinimalRequiredSubmissionTransformer
+  MinimalRequiredSubmissionTransformer,
+  MoneyBorrowedTransformer
 }
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Try
 
 class PsrRetrievalService @Inject()(
   psrConnector: PSRConnector,
   minimalRequiredSubmissionTransformer: MinimalRequiredSubmissionTransformer,
   loanTransactionsTransformer: LoanTransactionsTransformer,
-  landOrPropertyTransactionsTransformer: LandOrPropertyTransactionsTransformer
+  landOrPropertyTransactionsTransformer: LandOrPropertyTransactionsTransformer,
+  moneyBorrowedTransformer: MoneyBorrowedTransformer
 ) {
 
   def getStandardPsrDetails(
     optFbNumber: Option[String],
     optPeriodStartDate: Option[String],
     optPsrVersion: Option[String]
-  )(implicit request: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext): Future[UserAnswers] = {
+  )(
+    implicit request: DataRequest[AnyContent],
+    hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[UserAnswers] = {
 
     val srnValue = request.schemeDetails.srn
     val srn = Srn(srnValue).get
     val emptyUserAnswers = UserAnswers(request.getUserId + srnValue)
 
-    for {
-      psrDetails <- psrConnector.getStandardPsrDetails(
+    psrConnector
+      .getStandardPsrDetails(
         request.schemeDetails.pstr,
         optFbNumber,
         optPeriodStartDate,
         optPsrVersion
       )
-
-      transformedMinimal <- {
-        if (psrDetails.isEmpty) {
-          Future(emptyUserAnswers)
-        } else {
-          Future.fromTry(
-            minimalRequiredSubmissionTransformer
+      .flatMap {
+        case Some(psrDetails) =>
+          val result = for {
+            transformedMinimalUa <- minimalRequiredSubmissionTransformer
               .transformFromEtmp(
                 emptyUserAnswers,
                 srn,
                 request.pensionSchemeId,
-                psrDetails.get.minimalRequiredSubmission
+                psrDetails.minimalRequiredSubmission
               )
-          )
-        }
-      }
 
-      transformedLoans <- {
-        if (psrDetails.isEmpty || psrDetails.get.loans.isEmpty) {
-          Future(transformedMinimal)
-        } else {
-          Future.fromTry(
-            loanTransactionsTransformer
-              .transformFromEtmp(
-                transformedMinimal,
-                srn,
-                psrDetails.get.loans.get.loanTransactions.toList
+            transformedLoansUa <- psrDetails.loans
+              .map(
+                l =>
+                  loanTransactionsTransformer
+                    .transformFromEtmp(
+                      transformedMinimalUa,
+                      srn,
+                      l.loanTransactions.toList
+                    )
               )
-          )
-        }
-      }
+              .getOrElse(Try(transformedMinimalUa))
 
-      transformedAssets <- {
-        if (psrDetails.isEmpty || psrDetails.get.assets.isEmpty) {
-          Future(transformedLoans)
-        } else {
-          Future.fromTry(
-            landOrPropertyTransactionsTransformer
-              .transformFromEtmp(
-                transformedLoans,
-                srn,
-                psrDetails.get.assets.get.landOrProperty
+            transformedLandOrPropertyAssetsUa <- psrDetails.assets
+              .map(
+                a =>
+                  if (a.landOrProperty.landOrPropertyHeld) {
+                    landOrPropertyTransactionsTransformer
+                      .transformFromEtmp(
+                        transformedLoansUa,
+                        srn,
+                        a.landOrProperty
+                      )
+                  } else {
+                    Try(transformedLoansUa)
+                  }
               )
-          )
-        }
+              .getOrElse(Try(transformedLoansUa))
+
+            transformedMoneyBorrowingAssets <- psrDetails.assets
+              .map(
+                a =>
+                  if (a.borrowing.moneyWasBorrowed) {
+                    moneyBorrowedTransformer
+                      .transformFromEtmp(
+                        transformedLandOrPropertyAssetsUa,
+                        srn,
+                        a.borrowing
+                      )
+                  } else {
+                    Try(transformedLandOrPropertyAssetsUa)
+                  }
+              )
+              .getOrElse(Try(transformedLandOrPropertyAssetsUa))
+          } yield {
+            transformedMoneyBorrowingAssets
+          }
+          Future.fromTry(result)
+        case _ => Future(emptyUserAnswers)
       }
-    } yield {
-      transformedAssets
-    }
   }
 }

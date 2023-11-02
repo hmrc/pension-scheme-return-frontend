@@ -33,7 +33,7 @@ import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
-import viewmodels.DisplayMessage.{HintMessage, Message}
+import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
 import viewmodels.models._
 import views.html.RadioListView

@@ -16,8 +16,6 @@
 
 package navigation.nonsipp
 
-import controllers.routes
-import eu.timepit.refined.refineMV
 import models.{CheckOrChange, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
