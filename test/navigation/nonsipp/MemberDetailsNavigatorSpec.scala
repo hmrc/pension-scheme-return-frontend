@@ -16,23 +16,26 @@
 
 package navigation.nonsipp
 
-import config.Refined.OneTo300
+import config.Refined.{Max300, OneTo300}
 import controllers.nonsipp.memberdetails.routes
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.refineMV
 import generators.IndexGen
 import models.ManualOrUpload.{Manual, Upload}
 import models.SchemeId.Srn
-import models.{CheckOrChange, ManualOrUpload, UploadFormatError}
+import models.{CheckOrChange, ConditionalYesNo, ManualOrUpload, NormalMode, UploadFormatError}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.memberdetails._
 import pages.nonsipp.memberdetails.upload.{FileUploadErrorPage, FileUploadSuccessPage}
 import pages.{CheckingMemberDetailsFilePage, FileUploadErrorSummaryPage, FileUploadTooManyErrorsPage}
+import uk.gov.hmrc.domain.Nino
 import utils.BaseSpec
 import utils.UserAnswersUtils.UserAnswersOps
 
 class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
+
+  private val index = refineMV[Max300.Refined](1)
 
   val navigator: Navigator = new NonSippNavigator
 
@@ -80,41 +83,21 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
 //      act.like(
 //        normalmode
-//          .navigateToWithData(
-//            DoesMemberHaveNinoPage(_, refineMV(1)),
-//            Gen.const(true),
-//            routes.MemberDetailsNinoController.onPageLoad(_, refineMV(1), _)
+//          .navigateTo(
+//            MemberDetailsNinoPage(_, refineMV(1)),
+//            (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, refineMV(1), CheckOrChange.Check)
 //          )
-//          .withName("go from does member have nino Page to member details nino page when yes selected")
+//          .withName("go from nino page to check answers page")
 //      )
 
 //      act.like(
 //        normalmode
-//          .navigateToWithData(
-//            DoesMemberHaveNinoPage(_, refineMV(1)),
-//            Gen.const(false),
-//            routes.NoNINOController.onPageLoad(_, refineMV(1), _)
+//          .navigateTo(
+//            NoNINOPage(_, refineMV(1)),
+//            (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, refineMV(1), CheckOrChange.Check)
 //          )
-//          .withName("go from does member have nino Page to no nino page when no selected")
+//          .withName("go from no nino page to scheme member details answers page")
 //      )
-
-      act.like(
-        normalmode
-          .navigateTo(
-            MemberDetailsNinoPage(_, refineMV(1)),
-            (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, refineMV(1), CheckOrChange.Check)
-          )
-          .withName("go from nino page to check answers page")
-      )
-
-      act.like(
-        normalmode
-          .navigateTo(
-            NoNINOPage(_, refineMV(1)),
-            (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, refineMV(1), CheckOrChange.Check)
-          )
-          .withName("go from no nino page to scheme member details answers page")
-      )
 
       act.like(
         normalmode
@@ -319,50 +302,15 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
       "does member have nino page should go to" - {
 
-        val userAnswersWithNino =
-          (srn: Srn) => defaultUserAnswers.unsafeSet(MemberDetailsNinoPage(srn, refineMV(1)), ninoGen.sample.value)
-        val userAnswersWithNoNinoReason =
-          (srn: Srn) => defaultUserAnswers.unsafeSet(NoNINOPage(srn, refineMV(1)), nonEmptyAlphaString.sample.value)
-
-//        act.like(
-//          checkmode
-//            .navigateToWithData(
-//              DoesMemberHaveNinoPage(_, refineMV(1)),
-//              Gen.const(true),
-//              routes.MemberDetailsNinoController.onPageLoad(_, refineMV(1), _)
-//            )
-//            .withName("nino page when yes selected and no data")
-//        )
-
-//        act.like(
-//          checkmode
-//            .navigateToWithData(
-//              DoesMemberHaveNinoPage(_, refineMV(1)),
-//              Gen.const(false),
-//              routes.NoNINOController.onPageLoad(_, refineMV(1), _)
-//            )
-//            .withName("no nino page when no selected and no data")
-//        )
-
-//        act.like(
-//          checkmode
-//            .navigateToWithData(
-//              DoesMemberHaveNinoPage(_, refineMV(1)),
-//              Gen.const(true),
-//              (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, refineMV(1), CheckOrChange.Check)
-//            )
-//            .withName("check answers page when yes selected and nino exists")
-//        )
-//
-//        act.like(
-//          checkmode
-//            .navigateToWithData(
-//              DoesMemberHaveNinoPage(srn, refineMV(1)),
-//              Gen.const(false),
-//              (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, refineMV(1), CheckOrChange.Check)
-//            )
-//            .withName("check answers page when no selected and no nino reason exists")
-//        )
+        act.like(
+          checkmode
+            .navigateToWithData(
+              DoesMemberHaveNinoPage(_, index),
+              Gen.const(ConditionalYesNo.yes[String, Nino](nino)),
+              (srn, _) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, refineMV(1), CheckOrChange.Check)
+            )
+            .withName("go from does member have ni page to scheme members CYA page")
+        )
 
         act.like(
           checkmode

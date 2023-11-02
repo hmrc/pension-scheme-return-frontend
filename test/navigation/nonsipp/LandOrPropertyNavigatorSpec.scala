@@ -205,7 +205,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           IndividualSellerNiPage,
           controllers.nonsipp.landorproperty.routes.LandOrPropertySellerConnectedPartyController.onPageLoad
         )
-        .withName("go from idividual seller NI page to recipient connected party page")
+        .withName("go from individual seller NI page to recipient connected party page")
     )
 
     act.like(
