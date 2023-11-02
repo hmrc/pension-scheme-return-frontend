@@ -16,21 +16,17 @@
 
 package pages.nonsipp.landorpropertydisposal
 
-import pages.behaviours.PageBehaviours
 import config.Refined.{Max50, Max5000}
-import eu.timepit.refined.refineMV
+import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
+import utils.RefinedUtils._
 
-class LandOrPropertyDisposalSellerConnectedPartyPageSpec extends PageBehaviours {
+case class LandOrPropertyDisposalBuyerConnectedPartyPage(srn: Srn, index: Max5000, disposalIndex: Max50)
+    extends QuestionPage[Boolean] {
 
-  "LandOrPropertyDisposalSellerConnectedPartyPage" - {
+  override def path: JsPath =
+    Paths.disposalPropertyTransaction \ toString \ index.arrayIndex.toString \ disposalIndex.arrayIndex.toString
 
-    val index = refineMV[Max5000.Refined](1)
-    val disposalIndex = refineMV[Max50.Refined](1)
-
-    beRetrievable[Boolean](LandOrPropertyDisposalSellerConnectedPartyPage(srnGen.sample.value, index, disposalIndex))
-
-    beSettable[Boolean](LandOrPropertyDisposalSellerConnectedPartyPage(srnGen.sample.value, index, disposalIndex))
-
-    beRemovable[Boolean](LandOrPropertyDisposalSellerConnectedPartyPage(srnGen.sample.value, index, disposalIndex))
-  }
+  override def toString: String = "isBuyerConnectedParty"
 }

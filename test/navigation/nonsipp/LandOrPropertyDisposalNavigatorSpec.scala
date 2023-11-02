@@ -92,9 +92,9 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
           index,
           disposalIndex,
           IndividualBuyerNinoNumberPage,
-          controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalSellerConnectedPartyController.onPageLoad
+          controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalBuyerConnectedPartyController.onPageLoad
         )
-        .withName("go from individual buyer nino page to land or property disposal seller connected party page")
+        .withName("go from individual buyer nino page to land or property disposal buyer connected party page")
     )
   }
 
@@ -133,9 +133,9 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
           index,
           disposalIndex,
           PartnershipBuyerUtrPage,
-          controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalSellerConnectedPartyController.onPageLoad
+          controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalBuyerConnectedPartyController.onPageLoad
         )
-        .withName("go from partnership buyer UTR page to land or property disposal seller connected party page")
+        .withName("go from partnership buyer UTR page to land or property disposal buyer connected party page")
     )
   }
 
@@ -147,10 +147,10 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
           disposalIndex,
           OtherBuyerDetailsPage,
           (srn, index: Max5000, disposalIndex: Max50, _) =>
-            controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalSellerConnectedPartyController
+            controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalBuyerConnectedPartyController
               .onPageLoad(srn, index, disposalIndex, NormalMode)
         )
-        .withName("go from other buyer details page to land or property disposal seller connected party page")
+        .withName("go from other buyer details page to land or property disposal buyer connected party page")
     )
   }
 
@@ -213,20 +213,20 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
     )
   }
 
-  "LandOrPropertyDisposalSellerConnectedPartyPage" - {
+  "LandOrPropertyDisposalBuyerConnectedPartyPage" - {
 
     act.like(
       normalmode
         .navigateToWithDoubleIndex(
           index,
           disposalIndex,
-          LandOrPropertyDisposalSellerConnectedPartyPage,
+          LandOrPropertyDisposalBuyerConnectedPartyPage,
           (srn, index: Max5000, disposalIndex: Max50, _) =>
             controllers.nonsipp.landorpropertydisposal.routes.TotalProceedsSaleLandPropertyController
               .onPageLoad(srn, index, disposalIndex, NormalMode)
         )
         .withName(
-          "go from land or property disposal seller connected party Page to total proceeds sale land property"
+          "go from land or property disposal buyer connected party Page to total proceeds sale land property"
         )
     )
   }
