@@ -1543,5 +1543,4 @@ unallocatedEmployerAmount.title = How much did the scheme receive in unallocated
 unallocatedEmployerAmount.heading = How much did {0} receive in unallocated employer contributions during the period of this return, in pounds and pence?
 unallocatedEmployerAmount.error.required = Enter the amount of unallocated employer contributions received by the scheme during the period of this return, in pounds and pence
 unallocatedEmployerAmount.error.invalid = Amount of unallocated employer contributions must be an amount of money, like 123.45 or 156
-unallocatedEmployerAmount.error.tooSmall = Amount of unallocated employer contributions must be 0.01 or more
 unallocatedEmployerAmount.error.tooLarge = Amount of unallocated employer contributions must be 999999999.99 or less
