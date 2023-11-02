@@ -70,8 +70,21 @@ case class CheckYourAnswersRowViewModel(
       }
     )
 
+  def toSummaryListRowPartitioned(implicit messages: Messages): SummaryListRow =
+    SummaryListRowViewModel(
+      key = if (oneHalfWidth) KeyViewModel(key.toMessage).withOneHalfWidth() else KeyViewModel(key.toMessage),
+      value = ValueViewModel(value.toMessage).withCssClass("govuk-!-width-one-quarter"),
+      actions = actions.map { a =>
+        ActionItemViewModel(Text(a.content.toMessage), a.href)
+          .withVisuallyHiddenText(a.visuallyHiddenContent.toMessage)
+      }
+    )
+
   def withAction(action: SummaryAction): CheckYourAnswersRowViewModel =
     copy(actions = actions :+ action)
+
+  def with2Actions(action1: SummaryAction, action2: SummaryAction): CheckYourAnswersRowViewModel =
+    copy(actions = actions :+ action1 :+ action2)
 
   def withChangeAction(changeUrl: String): CheckYourAnswersRowViewModel = withAction(
     SummaryAction("site.change", changeUrl)

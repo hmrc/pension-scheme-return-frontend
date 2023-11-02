@@ -17,12 +17,6 @@
 package pages.nonsipp.memberpayments
 
 import models.SchemeId.Srn
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import pages.Page
 
-case class RemoveUnallocatedAmountPage(srn: Srn) extends QuestionPage[Boolean] {
-
-  override def path: JsPath = MemberPaymentsPage.path \ toString
-
-  override def toString: String = "removeUnallocatedAmount"
-}
+case class UnallocatedContributionCYAPage(srn: Srn) extends Page

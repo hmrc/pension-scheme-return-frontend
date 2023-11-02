@@ -17,7 +17,6 @@
 package controllers.nonsipp.memberpayments
 
 import config.Constants
-import config.Refined.Max5000
 import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
 import forms.mappings.errors.{MoneyFormErrorProvider, MoneyFormErrorValue}

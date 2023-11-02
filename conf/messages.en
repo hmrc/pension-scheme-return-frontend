@@ -1542,3 +1542,11 @@ unallocatedEmployerAmount.error.required = Enter the amount of unallocated emplo
 unallocatedEmployerAmount.error.invalid = Amount of unallocated employer contributions must be an amount of money, like 123.45 or 156
 unallocatedEmployerAmount.error.tooSmall = Amount of unallocated employer contributions must be 0.01 or more
 unallocatedEmployerAmount.error.tooLarge = Amount of unallocated employer contributions must be 999999999.99 or less
+
+unallocatedEmployerCYA.title = Check your answers
+unallocatedEmployerCYA.change.title = Check your answers
+unallocatedEmployerCYA.heading = Check your answers
+unallocatedEmployerCYA.change.heading = Check your answers
+unallocatedEmployerCYA.section.schemeName = Amount of unallocated employer contributions received by {0}
+unallocatedEmployerCYA.section.amount = £ {0}
+unallocatedEmployerCYA.section.hide = amount of unallocated employer contributions received by {0}

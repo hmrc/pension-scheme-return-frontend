@@ -88,7 +88,7 @@ class RemoveUnallocatedAmountController @Inject()(
           if (value) {
             for {
               updatedAnswers <- Future
-                .fromTry(removeAllMoneyBorrowedPages(srn, request.userAnswers))
+                .fromTry(removeUnallocatedAmountPage(srn, request.userAnswers))
               _ <- saveService.save(updatedAnswers)
             } yield {
               Redirect(navigator.nextPage(RemoveUnallocatedAmountPage(srn), mode, updatedAnswers))
@@ -102,7 +102,7 @@ class RemoveUnallocatedAmountController @Inject()(
       )
   }
 
-  private def removeAllMoneyBorrowedPages(
+  private def removeUnallocatedAmountPage(
     srn: Srn,
     userAnswers: UserAnswers
   ): Try[UserAnswers] =
