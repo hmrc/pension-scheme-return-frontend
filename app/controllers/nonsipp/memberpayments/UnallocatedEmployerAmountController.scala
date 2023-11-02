@@ -92,7 +92,7 @@ object UnallocatedEmployerAmountController {
       requiredKey = "unallocatedEmployerAmount.error.required",
       nonNumericKey = "unallocatedEmployerAmount.error.invalid",
       max = (Constants.maxMoneyValue, "unallocatedEmployerAmount.error.tooLarge"),
-      min = (Constants.unallocatedContributionMin, "unallocatedEmployerAmount.error.tooSmall")
+      min = (0d, "unallocatedEmployerAmount.error.invalid")
     )
   )
 
