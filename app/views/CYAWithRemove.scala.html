@@ -17,30 +17,30 @@
 @import viewmodels.models.CheckYourAnswersViewModel
 
 @this(
-layout: templates.Layout,
-formHelper: FormWithCSRF,
-govukSummaryList: GovukSummaryList,
-govukButton: GovukButton,
+    layout: templates.Layout,
+    formHelper: FormWithCSRF,
+    govukSummaryList: GovukSummaryList,
+    govukButton: GovukButton,
 )
 
 @(viewmodel: FormPageViewModel[CheckYourAnswersViewModel])(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(viewmodel.title.toMessage)) {
+    @layout(pageTitle = titleNoForm(viewmodel.title.toMessage)) {
 
-<h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
+        <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
 
-@viewmodel.page.sections.map { section =>
-@section.heading.map(renderMessage)
-@govukSummaryList(
-SummaryListViewModel(
-section.rows.map(_.toSummaryListRowPartitioned)
-).withMarginBottom(viewmodel.page.marginBottom)
-)
-}
+        @viewmodel.page.sections.map { section =>
+            @section.heading.map(renderMessage)
+            @govukSummaryList(
+                SummaryListViewModel(
+                    section.rows.map(_.toSummaryListRowPartitioned)
+                ).withMarginBottom(viewmodel.page.marginBottom)
+            )
+        }
 
-@formHelper(action = viewmodel.onSubmit, Symbol("autocomplete") -> "off") {
-@govukButton(
-ButtonViewModel(renderMessage(viewmodel.buttonText))
-)
-}
-}
+        @formHelper(action = viewmodel.onSubmit, Symbol("autocomplete") -> "off") {
+            @govukButton(
+                ButtonViewModel(renderMessage(viewmodel.buttonText))
+            )
+        }
+    }
