@@ -19,13 +19,12 @@ package controllers.nonsipp.memberdetails
 import DoesSchemeMemberHaveNINOController._
 import config.Refined.Max300
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.memberdetails.routes
 import eu.timepit.refined.refineMV
-import forms.{TextFormProvider, YesNoPageFormProvider}
+import forms.YesNoPageFormProvider
 import models.{ConditionalYesNo, NormalMode}
 import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsPage}
 import uk.gov.hmrc.domain.Nino
-import views.html.{ConditionalYesNoPageView, TextAreaView, YesNoPageView}
+import views.html.ConditionalYesNoPageView
 
 class DoesSchemeMemberHaveNINOControllerSpec extends ControllerBaseSpec {
 
@@ -42,7 +41,7 @@ class DoesSchemeMemberHaveNINOControllerSpec extends ControllerBaseSpec {
 
   private val memberName: String = "memberName"
 
-  "NationalInsuranceNumberController" - {
+  "DoesSchemeMemberHaveNINO" - {
 
     act.like(renderView(onPageLoad, userAnswersWithMemberDetails) { implicit app => implicit request =>
       injected[ConditionalYesNoPageView].apply(
@@ -66,10 +65,12 @@ class DoesSchemeMemberHaveNINOControllerSpec extends ControllerBaseSpec {
       }
     )
 
-//    act.like(redirectNextPage(onSubmit, "value" -> "true", "value.yes" -> nino.value))
-//    act.like(redirectNextPage(onSubmit, "value" -> "false", "value.no" -> "reason"))
+    act.like(redirectNextPage(onSubmit, userAnswersWithMemberDetails, "value" -> "true", "value.yes" -> nino.value))
+    act.like(redirectNextPage(onSubmit, userAnswersWithMemberDetails, "value" -> "false", "value.no" -> "reason"))
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
+
+    act.like(saveAndContinue(onSubmit, userAnswersWithMemberDetails, "value" -> "true", "value.yes" -> nino.value))
 
     act.like(invalidForm(onSubmit, userAnswersWithMemberDetails))
 

@@ -22,7 +22,7 @@ import controllers.nonsipp.memberdetails.upload.FileUploadSuccessController._
 import eu.timepit.refined.{refineMV, refineV}
 import models.SchemeId.Srn
 import models.requests.DataRequest
-import models.{Mode, UploadKey, UploadMemberDetails, UploadStatus, UploadSuccess, UserAnswers}
+import models.{ConditionalYesNo, Mode, UploadKey, UploadMemberDetails, UploadStatus, UploadSuccess, UserAnswers}
 import navigation.Navigator
 import pages.nonsipp.memberdetails._
 import pages.nonsipp.memberdetails.upload.FileUploadSuccessPage
@@ -80,20 +80,14 @@ class FileUploadSuccessController @Inject()(
 
     val removals = List(
       UserAnswers.remove(MembersDetailsPages(srn)),
-      UserAnswers.remove(DoesMemberHaveNinoPage(srn, refineMV(1))),
-      UserAnswers.remove(MemberDetailsNinoPages(srn)),
-      UserAnswers.remove(NoNinoPages(srn))
+      UserAnswers.remove(DoesMemberHaveNinoPage(srn, refineMV(1)))
     )
 
     val insertions = memberDetails.flatMap { details =>
       refineV[OneTo300](details.row).toOption.map { index =>
         List(
-          UserAnswers.set(MemberDetailsPage(srn, index), details.nameDOB)
-//          UserAnswers.set(DoesMemberHaveNinoPage(srn, index), details.ninoOrNoNinoReason.isRight)
-//          details.ninoOrNoNinoReason.fold(
-//            UserAnswers.set(NoNINOPage(srn, index), _),
-//            UserAnswers.set(MemberDetailsNinoPage(srn, index), _)
-//          )
+          UserAnswers.set(MemberDetailsPage(srn, index), details.nameDOB),
+          UserAnswers.set(DoesMemberHaveNinoPage(srn, index), ConditionalYesNo(details.ninoOrNoNinoReason))
         )
       }
     }.flatten

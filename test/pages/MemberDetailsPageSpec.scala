@@ -19,7 +19,7 @@ package pages
 import eu.timepit.refined.refineMV
 import models.{ConditionalYesNo, NameDOB, UserAnswers}
 import pages.behaviours.PageBehaviours
-import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsNinoPage, MemberDetailsPage, NoNINOPage}
+import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsPage}
 import uk.gov.hmrc.domain.Nino
 import utils.UserAnswersUtils.UserAnswersOps
 
@@ -35,37 +35,28 @@ class MemberDetailsPageSpec extends PageBehaviours {
   beSettable[NameDOB](MemberDetailsPage(srn, refineMV(1)))
   beRemovable[NameDOB](MemberDetailsPage(srn, refineMV(1)))
 
-}
+  "Remove data when member details page is removed" in {
 
-//  "Remove data when member details page is removed" in {
-//
-//    val userAnswers = defaultUserAnswers
-//      .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-////      .unsafeSet(MemberDetailsNinoPage(srn, refineMV(1)), nino)
-////      .unsafeSet(NoNINOPage(srn, refineMV(1)), "test reason")
-//      .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), ConditionalYesNo.yes[String, Nino](nino))
-//
-//    val result = userAnswers.remove(MemberDetailsPage(srn, refineMV(1))).success.value
-//    result.get(MemberDetailsPage(srn, refineMV(1))) must be(empty)
-//    result.get(DoesMemberHaveNinoPage(srn, refineMV(1))) must be(empty)
-////    result.get(MemberDetailsNinoPage(srn, refineMV(1))) must be(empty)
-////    result.get(NoNINOPage(srn, refineMV(1))) must be(empty)
-//  }
-//
-//  "Retain data when member details page is modified" in {
-//    val srn = srnGen.sample.value
-//    val nino = ninoGen.sample.value
-//
-//    val userAnswers = defaultUserAnswers
-//      .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-//      .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), ConditionalYesNo.yes[String, Nino](nino))
-////      .unsafeSet(MemberDetailsNinoPage(srn, refineMV(1)), nino)
-////      .unsafeSet(NoNINOPage(srn, refineMV(1)), "test reason")
-//
-//    val result = userAnswers.set(MemberDetailsPage(srn, refineMV(1)), memberDetails).success.value
-//    result.get(MemberDetailsPage(srn, refineMV(1))) mustBe Some(memberDetails)
-//    result.get(DoesMemberHaveNinoPage(srn, refineMV(1))) mustBe Some(true)
-////    result.get(MemberDetailsNinoPage(srn, refineMV(1))) mustBe Some(nino)
-////    result.get(NoNINOPage(srn, refineMV(1))) mustBe Some("test reason")
-//  }
-//}
+    val userAnswers = defaultUserAnswers
+      .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+      .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), ConditionalYesNo.yes[String, Nino](nino))
+
+    val result = userAnswers.remove(MemberDetailsPage(srn, refineMV(1))).success.value
+    result.get(MemberDetailsPage(srn, refineMV(1))) must be(empty)
+    result.get(DoesMemberHaveNinoPage(srn, refineMV(1))) must be(empty)
+  }
+
+  "Retain data when member details page is modified" in {
+    val srn = srnGen.sample.value
+    val nino = ninoGen.sample.value
+
+    val userAnswers = defaultUserAnswers
+      .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+      .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), ConditionalYesNo.yes[String, Nino](nino))
+
+    val result = userAnswers.set(MemberDetailsPage(srn, refineMV(1)), memberDetails).success.value
+    result.get(MemberDetailsPage(srn, refineMV(1))) mustBe Some(memberDetails)
+    result.get(DoesMemberHaveNinoPage(srn, refineMV(1))) mustBe Some(ConditionalYesNo.yes[String, Nino](nino))
+
+  }
+}

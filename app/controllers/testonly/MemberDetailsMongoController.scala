@@ -63,8 +63,6 @@ class MemberDetailsMongoController @Inject()(
         case (ua, index) =>
           ua.flatMap(_.remove(MemberDetailsPage(srn, index)))
             .flatMap(_.remove(DoesMemberHaveNinoPage(srn, index)))
-            .flatMap(_.remove(MemberDetailsNinoPage(srn, index)))
-            .flatMap(_.remove(NoNINOPage(srn, index)))
       }
     } yield updatedUserAnswers
 

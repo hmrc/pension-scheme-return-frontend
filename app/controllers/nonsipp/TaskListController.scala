@@ -18,9 +18,9 @@ package controllers.nonsipp
 
 import cats.implicits.toShow
 import com.google.inject.Inject
-import config.Refined.{OneTo300, OneTo5000}
+import config.Refined.{Max300, OneTo300, OneTo5000}
 import controllers.actions._
-import eu.timepit.refined.refineV
+import eu.timepit.refined.{refineMV, refineV}
 import models.SchemeId.Srn
 import models.requests.DataRequest
 import models.{DateRange, IdentitySubject, ManualOrUpload, NormalMode, PensionSchemeId, UserAnswers}
@@ -33,7 +33,13 @@ import pages.nonsipp.loansmadeoroutstanding.{
   OutstandingArrearsOnLoanPages,
   RecipientSponsoringEmployerConnectedPartyPages
 }
-import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsNinoPages, MembersDetailsPages, NoNinoPages}
+import pages.nonsipp.memberdetails.{
+  DoesMemberHaveNinoPage,
+  DoesMemberHaveNinoPages,
+  MemberDetailsNinoPages,
+  MembersDetailsPages,
+  NoNinoPages
+}
 import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, ValueOfAssetsPage, WhyNoBankAccountPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -177,7 +183,7 @@ object TaskListController {
     )
   }
 
-  private def membersSection(srn: Srn, schemeName: String, userAnswers: UserAnswers) = {
+  private def membersSection(srn: Srn, index: Max300, schemeName: String, userAnswers: UserAnswers) = {
     val prefix = "nonsipp.tasklist.members"
     val taskListStatus = getMembersTaskListStatus(userAnswers, srn)
     TaskListSectionViewModel(
@@ -201,18 +207,18 @@ object TaskListController {
                     .url,
                 index => {
                   val doesMemberHaveNino = userAnswers.get(DoesMemberHaveNinoPage(srn, index))
-                  controllers.nonsipp.memberdetails.routes.DoesSchemeMemberHaveNINOController
-                    .onPageLoad(srn, index, NormalMode)
-                    .url
-//                  else if (doesMemberHaveNino.getOrElse(false)) {
-//                    controllers.nonsipp.memberdetails.routes.MemberDetailsNinoController
-//                      .onPageLoad(srn, index, NormalMode)
-//                      .url
-//                  } else {
-//                    controllers.nonsipp.memberdetails.routes.NoNINOController
-//                      .onPageLoad(srn, index, NormalMode)
-//                      .url
-//                  }
+//                  controllers.nonsipp.memberdetails.routes.DoesSchemeMemberHaveNINOController
+//                    .onPageLoad(srn, index, NormalMode)
+//                    .url
+                  if (doesMemberHaveNino.isEmpty) {
+                    controllers.nonsipp.memberdetails.routes.DoesSchemeMemberHaveNINOController
+                      .onPageLoad(srn, index, NormalMode)
+                      .url
+                  } else {
+                    controllers.nonsipp.memberdetails.routes.SchemeMembersListController
+                      .onPageLoad(srn, 1, ManualOrUpload.Manual)
+                      .url
+                  }
                 }
               )
           }
@@ -224,19 +230,22 @@ object TaskListController {
 
   private def getIncompleteMembersIndex(userAnswers: UserAnswers, srn: Srn) = {
     val membersDetailsPages = userAnswers.get(MembersDetailsPages(srn))
-    val ninoPages = userAnswers.get(MemberDetailsNinoPages(srn))
-    val noNinoPages = userAnswers.get(NoNinoPages(srn))
-    (membersDetailsPages, ninoPages, noNinoPages) match {
-      case (None, _, _) => 1
-      case (Some(_), None, None) => 1
-      case (Some(memberDetails), ninos, noNinos) =>
+    val doesMemberHaveNinoPages = userAnswers.get(DoesMemberHaveNinoPages(srn))
+
+//    val ninoPages = userAnswers.get(MemberDetailsNinoPages(srn))
+//    val noNinoPages = userAnswers.get(NoNinoPages(srn))
+    (membersDetailsPages, doesMemberHaveNinoPages) match {
+      case (None, _) => 0
+      case (Some(_), None) => 0
+      case (Some(memberDetails), doesMemberHaveNino) =>
         if (memberDetails.isEmpty) {
-          1
+          0
         } else {
           val memberDetailsIndexes = (0 to memberDetails.size - 1).toList
-          val ninoIndexes = ninos.getOrElse(List.empty).map(_._1.toInt).toList
-          val noninoIndexes = noNinos.getOrElse(List.empty).map(_._1.toInt).toList
-          val finishedIndexes = ninoIndexes ++ noninoIndexes
+          val doesMemberHaveNinoIndexes = doesMemberHaveNino.getOrElse(List.empty).map(_._1.toInt).toList
+//          val ninoIndexes = ninos.getOrElse(List.empty).map(_._1.toInt).toList
+//          val noninoIndexes = noNinos.getOrElse(List.empty).map(_._1.toInt).toList
+          val finishedIndexes = doesMemberHaveNinoIndexes
           val filtered = memberDetailsIndexes.filter(finishedIndexes.indexOf(_) < 0)
           if (filtered.isEmpty) {
             1
@@ -499,7 +508,7 @@ object TaskListController {
 
     val viewmodel = TaskListViewModel(
       schemeDetailsSection(srn, schemeName, userAnswers, pensionSchemeId),
-      membersSection(srn, schemeName, userAnswers),
+      membersSection(srn, refineMV(1), schemeName, userAnswers),
       memberPaymentsSection(srn),
       loansSection(srn, schemeName, userAnswers),
       sharesSection(srn),

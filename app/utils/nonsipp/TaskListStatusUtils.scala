@@ -38,7 +38,13 @@ import pages.nonsipp.landorproperty.{
   WhyDoesSchemeHoldLandPropertyPages
 }
 import pages.nonsipp.landorpropertydisposal.{LandOrPropertyDisposalPage, LandPropertyDisposalCompletedPages}
-import pages.nonsipp.memberdetails.{MemberDetailsNinoPages, MembersDetailsPages, NoNinoPages}
+import pages.nonsipp.memberdetails.{
+  DoesMemberHaveNinoPage,
+  DoesMemberHaveNinoPages,
+  MemberDetailsNinoPages,
+  MembersDetailsPages,
+  NoNinoPages
+}
 import pages.nonsipp.schemedesignatory.{FeesCommissionsWagesSalariesPage, HowManyMembersPage, HowMuchCashPage}
 import viewmodels.models.TaskListStatus
 import viewmodels.models.TaskListStatus.{Completed, InProgress, NotStarted, TaskListStatus}
@@ -71,19 +77,23 @@ object TaskListStatusUtils {
 
   def getMembersTaskListStatus(userAnswers: UserAnswers, srn: Srn) = {
     val membersDetailsPages = userAnswers.get(MembersDetailsPages(srn))
-    val ninoPages = userAnswers.get(MemberDetailsNinoPages(srn))
-    val noNinoPages = userAnswers.get(NoNinoPages(srn))
-    (membersDetailsPages, ninoPages, noNinoPages) match {
-      case (None, _, _) => NotStarted
-      case (Some(_), None, None) => InProgress
-      case (Some(memberDetails), ninos, noNinos) =>
+    val doesMemberHaveNinoPages = userAnswers.get(DoesMemberHaveNinoPages(srn))
+
+//    val ninoPages = userAnswers.get(MemberDetailsNinoPages(srn))
+//    val noNinoPages = userAnswers.get(NoNinoPages(srn))
+    (membersDetailsPages, doesMemberHaveNinoPages) match {
+      case (None, _) => NotStarted
+      case (Some(_), None) => InProgress
+      case (Some(memberDetails), doesMemberHaveNino) =>
         if (memberDetails.isEmpty) {
           NotStarted
         } else {
           val countMemberDetails = memberDetails.size
-          val countNinos = ninos.getOrElse(List.empty).size
-          val countNoninos = noNinos.getOrElse(List.empty).size
-          if (countMemberDetails > countNinos + countNoninos) {
+          val countdoesMemberHaveNino = doesMemberHaveNino.getOrElse(List.empty).size
+
+//          val countNinos = ninos.getOrElse(List.empty).size
+//          val countNoninos = noNinos.getOrElse(List.empty).size
+          if (countMemberDetails > countdoesMemberHaveNino) {
             InProgress
           } else {
             Completed
