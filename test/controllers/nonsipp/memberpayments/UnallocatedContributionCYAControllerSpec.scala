@@ -20,6 +20,7 @@ import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
 import eu.timepit.refined.refineMV
 import models.CheckOrChange
+import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.memberpayments.UnallocatedEmployerAmountPage
 import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
@@ -48,7 +49,7 @@ class UnallocatedContributionCYAControllerSpec extends ControllerBaseSpec {
   private val filledUserAnswers = defaultUserAnswers
     .unsafeSet(UnallocatedEmployerAmountPage(srn), money)
 
-  "MoneyBorrowedCYAController" - {
+  "UnallocatedContributionCYAController" - {
 
     List(CheckOrChange.Check, CheckOrChange.Change).foreach { checkOrChange =>
       act.like(
@@ -70,6 +71,10 @@ class UnallocatedContributionCYAControllerSpec extends ControllerBaseSpec {
         redirectNextPage(onSubmit(checkOrChange))
           .before(MockPSRSubmissionService.submitPsrDetails())
           .withName(s"redirect to next page when in ${checkOrChange.name} mode")
+          .after({
+            verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any())(any(), any(), any())
+            reset(mockPsrSubmissionService)
+          })
       )
 
       act.like(
