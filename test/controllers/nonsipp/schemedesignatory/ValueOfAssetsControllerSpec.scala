@@ -18,7 +18,7 @@ package controllers.nonsipp.schemedesignatory
 
 import controllers.ControllerBaseSpec
 import forms.MoneyFormProvider
-import models.{DateRange, Money, NormalMode}
+import models.{DateRange, Money, MoneyInPeriod, NormalMode}
 import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.schemedesignatory.ValueOfAssetsPage
 import play.api.inject.bind
@@ -50,7 +50,7 @@ class ValueOfAssetsControllerSpec extends ControllerBaseSpec {
     val form = ValueOfAssetsController.form(new MoneyFormProvider(), schemeDatePeriod)
     lazy val viewModel = ValueOfAssetsController.viewModel(srn, NormalMode, schemeName, schemeDatePeriod, _)
 
-    val moneyInPeriodData = moneyInPeriodGen.sample.value
+    val moneyInPeriodData = MoneyInPeriod(moneyNegative, moneyNegative)
 
     lazy val onPageLoad = routes.ValueOfAssetsController.onPageLoad(srn, NormalMode)
     lazy val onSubmit = routes.ValueOfAssetsController.onSubmit(srn, NormalMode)

@@ -18,7 +18,7 @@ package controllers.nonsipp.loansmadeoroutstanding
 
 import cats.implicits.toShow
 import config.Constants
-import config.Constants.{maxAssetValue, maxLoanPeriod}
+import config.Constants.{maxAssetValue, maxLoanPeriod, minAssetValue}
 import config.Refined.Max5000
 import controllers.PSRController
 import controllers.actions._
@@ -123,7 +123,8 @@ object DatePeriodLoanController {
     MoneyFormErrors(
       "datePeriodLoan.field2.error.required",
       "datePeriodLoan.field2.error.invalid",
-      (maxAssetValue, "datePeriodLoan.field2.error.max")
+      (maxAssetValue, "datePeriodLoan.field2.error.max"),
+      (minAssetValue, "datePeriodLoan.field2.error.min")
     )
 
   private val field3Errors: IntFormErrors =

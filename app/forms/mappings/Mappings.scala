@@ -59,7 +59,7 @@ trait Mappings extends Formatters with Constraints {
     requiredKey: String = "error.required",
     nonNumericKey: String = "error.nonNumeric",
     max: (Double, String) = (Double.MaxValue, "error.tooLarge"),
-    min: (Double, String) = (Double.MinValue, "error.tooLow"),
+    min: (Double, String) = (0d, "error.tooSmall"),
     args: Seq[String] = Seq.empty
   ): FieldMapping[Double] =
     of(doubleFormatter(requiredKey, nonNumericKey, max, min, args))

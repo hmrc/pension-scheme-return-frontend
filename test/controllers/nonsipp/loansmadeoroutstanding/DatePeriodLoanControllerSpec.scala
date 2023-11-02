@@ -43,7 +43,7 @@ class DatePeriodLoanControllerSpec extends ControllerBaseSpec {
     "value.1.day" -> "31",
     "value.1.month" -> "12",
     "value.1.year" -> "1899",
-    "value.2" -> money.value.toString,
+    "value.2" -> moneyNegative.value.toString,
     "value.3" -> "12"
   )
 
@@ -78,7 +78,7 @@ class DatePeriodLoanControllerSpec extends ControllerBaseSpec {
         "value.1.day" -> "10",
         "value.1.month" -> "12",
         "value.1.year" -> "2020",
-        "value.2" -> money.value.toString,
+        "value.2" -> moneyNegative.value.toString,
         "value.3" -> "12"
       ).before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear))
     )

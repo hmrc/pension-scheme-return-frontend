@@ -111,6 +111,7 @@ trait TestValues {
   val noUtrReason: String = "no utr reason"
   val leaseName = "testLeaseName"
   val money: Money = Money(123456)
+  val moneyNegative: Money = Money(1123456)
   val security: Security = Security("securityGivenForLoan")
   val double: Double = 7.7
   val percentage: Percentage = Percentage(7.7)

@@ -184,6 +184,11 @@ class MappingsSpec extends AnyFreeSpec with Matchers with OptionValues with Mapp
         "value" -> double(max = 100d -> "error.tooLarge")
       )
 
+    val testFormWithMin: Form[Double] =
+      Form(
+        "value" -> double(max = 100d -> "error.tooLarge", min = -100d -> "error.tooSmall")
+      )
+
     "must bind a valid int" in {
       val result = testForm.bind(Map("value" -> "1"))
       result.get mustEqual 1
@@ -218,12 +223,33 @@ class MappingsSpec extends AnyFreeSpec with Matchers with OptionValues with Mapp
       val result = testForm.fill(123.2)
       result.apply("value").value.value mustEqual "123.2"
     }
+
+    "must not bind when smaller than 0" in {
+      val result = testForm.bind(Map("value" -> "-1.23"))
+      result.errors must contain(FormError("value", "error.nonNumeric"))
+    }
+
+    "must bind when -99" in {
+      val result = testFormWithMin.bind(Map("value" -> "-100"))
+      result.get mustEqual -100
+    }
+
+    "must not bind when smaller than -100" in {
+      val result = testFormWithMin.bind(Map("value" -> "-100.01"))
+      result.errors must contain(FormError("value", "error.tooSmall"))
+    }
   }
 
   "money" - {
     val testForm: Form[Money] =
       Form(
         "value" -> money(MoneyFormErrors.default(max = 999999999.99d -> "error.tooLarge"))
+      )
+    val testFormWithMin: Form[Money] =
+      Form(
+        "value" -> money(
+          MoneyFormErrors.default(max = 999999999.99d -> "error.tooLarge", min = -100d -> "error.tooSmall")
+        )
       )
 
     "must bind a valid int" in {
@@ -280,6 +306,22 @@ class MappingsSpec extends AnyFreeSpec with Matchers with OptionValues with Mapp
       val result = testForm.fill(Money(123, "123"))
       result.apply("value").value.value mustEqual "123"
     }
+
+    "must not bind when smaller than 0" in {
+      val result = testForm.bind(Map("value" -> "-0.01"))
+      result.errors must contain(FormError("value", "error.nonMoney"))
+    }
+
+    "must bind when -100" in {
+      val result = testFormWithMin.bind(Map("value" -> "-100"))
+      result.apply("value").value.value mustEqual "-100"
+    }
+
+    "must not bind when smaller than -100" in {
+      val result = testFormWithMin.bind(Map("value" -> "-100.01"))
+      result.errors must contain(FormError("value", "error.tooSmall"))
+    }
+
   }
 
   "enumerable" - {
