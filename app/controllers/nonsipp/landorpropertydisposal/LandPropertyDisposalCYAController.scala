@@ -170,7 +170,11 @@ class LandPropertyDisposalCYAController @Inject()(
             case Some(_) =>
               Redirect(
                 navigator
-                  .nextPage(LandPropertyDisposalCompletedPage(srn, index, disposalIndex), mode, request.userAnswers)
+                  .nextPage(
+                    LandPropertyDisposalCompletedPage(srn, index, disposalIndex),
+                    NormalMode,
+                    updatedUserAnswers
+                  )
               )
           }
       } yield redirectTo
