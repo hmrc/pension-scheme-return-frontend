@@ -32,7 +32,8 @@ import services.PsrSubmissionServiceSpec.minimalRequiredSubmission
 import transformations.{
   LandOrPropertyTransactionsTransformer,
   LoanTransactionsTransformer,
-  MinimalRequiredSubmissionTransformer
+  MinimalRequiredSubmissionTransformer,
+  MoneyBorrowedTransformer
 }
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.BaseSpec
@@ -52,6 +53,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
     reset(mockMinimalRequiredSubmissionTransformer)
     reset(mockLoanTransactionsTransformer)
     reset(mockLandOrPropertyTransactionsTransformer)
+    reset(mockMoneyBorrowedTransformer)
   }
 
   val allowedAccessRequest
@@ -62,6 +64,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
   private val mockMinimalRequiredSubmissionTransformer = mock[MinimalRequiredSubmissionTransformer]
   private val mockLoanTransactionsTransformer = mock[LoanTransactionsTransformer]
   private val mockLandOrPropertyTransactionsTransformer = mock[LandOrPropertyTransactionsTransformer]
+  private val mockMoneyBorrowedTransformer = mock[MoneyBorrowedTransformer]
   private val mockReq = mock[DataRequest[AnyContent]]
 
   private val service =
@@ -69,12 +72,13 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
       mockConnector,
       mockMinimalRequiredSubmissionTransformer,
       mockLoanTransactionsTransformer,
-      mockLandOrPropertyTransactionsTransformer
+      mockLandOrPropertyTransactionsTransformer,
+      mockMoneyBorrowedTransformer
     )
 
   private implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  "PSRRetievalService" - {
+  "PSRRetrievalService" - {
 
     "should not getPsrDetails return data when not found" in {
       when(mockConnector.getStandardPsrDetails(any(), any(), any(), any())(any(), any()))
@@ -84,6 +88,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
           verify(mockMinimalRequiredSubmissionTransformer, never).transformFromEtmp(any(), any(), any(), any())
           verify(mockLoanTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
           verify(mockLandOrPropertyTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
+          verify(mockMoneyBorrowedTransformer, never).transformFromEtmp(any(), any(), any())
           result mustBe a[UserAnswers]
           result.data.decryptedValue mustBe JsObject.empty
       }
@@ -108,6 +113,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
           verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformFromEtmp(any(), any(), any(), any())
           verify(mockLoanTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
           verify(mockLandOrPropertyTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
+          verify(mockMoneyBorrowedTransformer, never).transformFromEtmp(any(), any(), any())
           result mustBe a[UserAnswers]
           result.data.decryptedValue must not be JsObject.empty
       }
@@ -135,6 +141,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
           verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformFromEtmp(any(), any(), any(), any())
           verify(mockLoanTransactionsTransformer, times(1)).transformFromEtmp(any(), any(), any())
           verify(mockLandOrPropertyTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
+          verify(mockMoneyBorrowedTransformer, never).transformFromEtmp(any(), any(), any())
           result mustBe a[UserAnswers]
           result.data.decryptedValue must not be JsObject.empty
       }
@@ -144,6 +151,8 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
       when(mockMinimalRequiredSubmissionTransformer.transformFromEtmp(any(), any(), any(), any()))
         .thenReturn(Try(defaultUserAnswers))
       when(mockLandOrPropertyTransactionsTransformer.transformFromEtmp(any(), any(), any()))
+        .thenReturn(Try(defaultUserAnswers))
+      when(mockMoneyBorrowedTransformer.transformFromEtmp(any(), any(), any()))
         .thenReturn(Try(defaultUserAnswers))
       when(mockConnector.getStandardPsrDetails(any(), any(), any(), any())(any(), any())).thenReturn(
         Future.successful(
@@ -161,6 +170,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
         result: UserAnswers =>
           verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformFromEtmp(any(), any(), any(), any())
           verify(mockLandOrPropertyTransactionsTransformer, times(1)).transformFromEtmp(any(), any(), any())
+          verify(mockMoneyBorrowedTransformer, times(1)).transformFromEtmp(any(), any(), any())
           verify(mockLoanTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
           result mustBe a[UserAnswers]
           result.data.decryptedValue must not be JsObject.empty
@@ -195,6 +205,7 @@ object PsrRetrievalServiceSpec {
   )
 
   val assets: Assets = Assets(
-    LandOrProperty(landOrPropertyHeld = true, landOrPropertyTransactions = Seq.empty)
+    LandOrProperty(landOrPropertyHeld = true, landOrPropertyTransactions = Seq.empty),
+    Borrowing(moneyWasBorrowed = true, moneyBorrowed = Seq.empty)
   )
 }

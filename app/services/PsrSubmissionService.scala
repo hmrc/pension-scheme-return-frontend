@@ -24,10 +24,12 @@ import models.requests.psr._
 import pages.nonsipp.CheckReturnDatesPage
 import pages.nonsipp.landorproperty.LandOrPropertyHeldPage
 import pages.nonsipp.loansmadeoroutstanding._
+import pages.nonsipp.moneyborrowed.MoneyBorrowedPage
 import transformations.{
   LandOrPropertyTransactionsTransformer,
   LoanTransactionsTransformer,
-  MinimalRequiredSubmissionTransformer
+  MinimalRequiredSubmissionTransformer,
+  MoneyBorrowedTransformer
 }
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -38,7 +40,8 @@ class PsrSubmissionService @Inject()(
   psrConnector: PSRConnector,
   minimalRequiredSubmissionTransformer: MinimalRequiredSubmissionTransformer,
   loanTransactionsTransformer: LoanTransactionsTransformer,
-  landOrPropertyTransactionsTransformer: LandOrPropertyTransactionsTransformer
+  landOrPropertyTransactionsTransformer: LandOrPropertyTransactionsTransformer,
+  moneyBorrowedTransformer: MoneyBorrowedTransformer
 ) {
 
   def submitPsrDetails(
@@ -47,6 +50,7 @@ class PsrSubmissionService @Inject()(
 
     val schemeHadLoans = request.userAnswers.get(LoansMadeOrOutstandingPage(srn)).getOrElse(false)
     val landOrPropertyHeld = request.userAnswers.get(LandOrPropertyHeldPage(srn)).getOrElse(false)
+    val moneyWasBorrowed: Boolean = request.userAnswers.get(MoneyBorrowedPage(srn)).getOrElse(false)
     (
       minimalRequiredSubmissionTransformer.transformToEtmp(srn),
       request.userAnswers.get(CheckReturnDatesPage(srn))
@@ -56,11 +60,15 @@ class PsrSubmissionService @Inject()(
           minimalRequiredSubmission = minimalRequiredSubmission,
           checkReturnDates = checkReturnDates,
           loans = Option.when(schemeHadLoans)(Loans(schemeHadLoans, loanTransactionsTransformer.transformToEtmp(srn))),
-          assets = Option.when(landOrPropertyHeld)(
+          assets = Option.when(landOrPropertyHeld || moneyWasBorrowed)(
             Assets(
-              LandOrProperty(
+              landOrProperty = LandOrProperty(
                 landOrPropertyHeld = landOrPropertyHeld,
                 landOrPropertyTransactions = landOrPropertyTransactionsTransformer.transformToEtmp(srn)
+              ),
+              borrowing = Borrowing(
+                moneyWasBorrowed = moneyWasBorrowed,
+                moneyBorrowed = moneyBorrowedTransformer.transformToEtmp(srn)
               )
             )
           )

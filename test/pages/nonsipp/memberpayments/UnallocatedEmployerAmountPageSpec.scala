@@ -16,8 +16,6 @@
 
 package pages.nonsipp.memberpayments
 
-import config.Refined.Max5000
-import eu.timepit.refined.refineMV
 import models.Money
 import pages.behaviours.PageBehaviours
 

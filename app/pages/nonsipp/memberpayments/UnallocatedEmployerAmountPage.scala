@@ -16,12 +16,10 @@
 
 package pages.nonsipp.memberpayments
 
-import config.Refined.Max5000
 import models.Money
 import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
-import utils.RefinedUtils.RefinedIntOps
 
 case class UnallocatedEmployerAmountPage(srn: Srn) extends QuestionPage[Money] {
 
