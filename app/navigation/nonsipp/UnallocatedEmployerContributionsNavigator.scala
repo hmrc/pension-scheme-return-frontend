@@ -16,7 +16,7 @@
 
 package navigation.nonsipp
 
-import models.{ CheckOrChange, NormalMode, UserAnswers}
+import models.{CheckOrChange, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.memberpayments._
@@ -50,7 +50,7 @@ object UnallocatedEmployerContributionsNavigator extends JourneyNavigator {
             controllers.nonsipp.memberpayments.routes.UnallocatedEmployerContributionsController
               .onPageLoad(srn, NormalMode)
           }
-        case _ => controllers.routes.UnauthorisedController.onPageLoad()
+        case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
       }
   }
 
