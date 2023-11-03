@@ -185,7 +185,8 @@ object UploadRepository {
 
   implicit val uploadedSuccessfullyFormat: OFormat[UploadStatus.Success] =
     Json.format[UploadStatus.Success]
-  implicit val uploadedFailedFormat: OFormat[UploadStatus.Failed.type] = Json.format[UploadStatus.Failed.type]
+  implicit val errorDetailsFormat: OFormat[ErrorDetails] = Json.format[ErrorDetails]
+  implicit val uploadedFailedFormat: OFormat[UploadStatus.Failed] = Json.format[UploadStatus.Failed]
   implicit val uploadedInProgressFormat: OFormat[UploadStatus.InProgress.type] =
     Json.format[UploadStatus.InProgress.type]
   implicit val uploadedStatusFormat: OFormat[UploadStatus] = Json.format[UploadStatus]

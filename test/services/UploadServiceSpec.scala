@@ -41,7 +41,8 @@ class UploadServiceSpec extends BaseSpec with ScalaCheckPropertyChecks with Test
   private val mockUploadRepository = mock[UploadRepository]
 
   val instant: Instant = Instant.now.truncatedTo(ChronoUnit.MILLIS)
-  private val uploadDetails = UploadDetails(uploadKey, reference, UploadStatus.Failed, instant)
+  private val failure: UploadStatus.Failed = UploadStatus.Failed(ErrorDetails("reason", "message"))
+  private val uploadDetails = UploadDetails(uploadKey, reference, failure, instant)
   private val stubClock: Clock = Clock.fixed(instant, ZoneId.systemDefault)
 
   override def beforeEach(): Unit = {
@@ -71,14 +72,14 @@ class UploadServiceSpec extends BaseSpec with ScalaCheckPropertyChecks with Test
 
     "registerUploadResult should call updateStatus and return unit" in {
       when(mockUploadRepository.updateStatus(any(), any())).thenReturn(Future.successful(UploadStatus.Failed))
-      val result = service.registerUploadResult(reference, UploadStatus.Failed)
+      val result = service.registerUploadResult(reference, failure)
       result.futureValue mustBe (())
     }
 
     "getUploadStatus return the status from the connector" in {
       when(mockUploadRepository.getUploadDetails(any())).thenReturn(Future.successful(Some(uploadDetails)))
       val result = service.getUploadStatus(uploadKey)
-      result.futureValue mustBe Some(UploadStatus.Failed)
+      result.futureValue mustBe Some(failure)
     }
 
     "getUploadResult return the status from the connector" in {
