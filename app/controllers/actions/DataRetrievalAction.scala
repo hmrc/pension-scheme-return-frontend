@@ -29,7 +29,7 @@ class DataRetrievalActionImpl @Inject()(
     extends DataRetrievalAction {
 
   override protected def transform[A](request: AllowedAccessRequest[A]): Future[OptionalDataRequest[A]] = {
-    val userAnswersKey = request.getUserId + request.schemeDetails.srn
+    val userAnswersKey = request.getUserId + request.srn
     sessionRepository.get(userAnswersKey).map(OptionalDataRequest(request, _))
   }
 }

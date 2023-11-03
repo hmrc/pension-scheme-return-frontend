@@ -81,13 +81,12 @@ trait ModelGenerators extends BasicGenerators {
   val schemeDetailsGen: Gen[SchemeDetails] =
     for {
       name <- nonEmptyString
-      srn <- srnGen.map(_.value)
       pstr <- nonEmptyString
       status <- schemeStatusGen
       schemeType <- nonEmptyString
       authorisingPsa <- Gen.option(nonEmptyString)
       establishers <- Gen.listOf(establisherGen)
-    } yield SchemeDetails(srn, name, pstr, status, schemeType, authorisingPsa, establishers)
+    } yield SchemeDetails(name, pstr, status, schemeType, authorisingPsa, establishers)
 
   val minimalSchemeDetailsGen: Gen[MinimalSchemeDetails] =
     for {
@@ -155,7 +154,8 @@ trait ModelGenerators extends BasicGenerators {
       request <- identifierRequestGen[A](request)
       schemeDetails <- schemeDetailsGen
       minimalDetails <- minimalDetailsGen
-    } yield AllowedAccessRequest(request, schemeDetails, minimalDetails)
+      srn <- srnGen
+    } yield AllowedAccessRequest(request, schemeDetails, minimalDetails, srn)
 
   def modeGen: Gen[Mode] = Gen.oneOf(NormalMode, CheckMode)
 

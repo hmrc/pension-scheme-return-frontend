@@ -19,7 +19,6 @@ package transformations
 import cats.data.NonEmptyList
 import controllers.TestValues
 import generators.ModelGenerators.allowedAccessRequestGen
-import models.SchemeId.Srn
 import models.SchemeMemberNumbers._
 import models.requests.psr.{MinimalRequiredSubmission, ReportDetails, SchemeDesignatory}
 import models.requests.{AllowedAccessRequest, DataRequest}
@@ -139,7 +138,7 @@ class MinimalRequiredSubmissionTransformerSpec
 
       val result = transformer.transformFromEtmp(
         userAnswers,
-        Srn(allowedAccessRequest.schemeDetails.srn).get,
+        allowedAccessRequest.srn,
         allowedAccessRequest.pensionSchemeId,
         minimalRequiredSubmission
       )
@@ -184,7 +183,7 @@ class MinimalRequiredSubmissionTransformerSpec
 
       val result = transformer.transformFromEtmp(
         userAnswers,
-        Srn(allowedAccessRequest.schemeDetails.srn).get,
+        allowedAccessRequest.srn,
         allowedAccessRequest.pensionSchemeId,
         minimalRequiredSubmission
       )

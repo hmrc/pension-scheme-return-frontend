@@ -22,7 +22,7 @@ import controllers.actions._
 import controllers.nonsipp.loansmadeoroutstanding.RemoveLoanController._
 import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
-import models.requests.{AllowedAccessRequest, DataRequest}
+import models.requests.DataRequest
 import models.{IdentitySubject, IdentityType, Mode}
 import navigation.Navigator
 import pages.nonsipp.common.{IdentityTypePage, OtherRecipientDetailsPage}
