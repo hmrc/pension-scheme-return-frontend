@@ -21,7 +21,7 @@ import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
 import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
-import models.{Mode, UserAnswers}
+import models.{Mode, NormalMode, UserAnswers}
 import navigation.Navigator
 import pages.nonsipp.memberpayments._
 import play.api.data.Form
@@ -91,12 +91,12 @@ class RemoveUnallocatedAmountController @Inject()(
                 .fromTry(removeUnallocatedAmountPage(srn, request.userAnswers))
               _ <- saveService.save(updatedAnswers)
             } yield {
-              Redirect(navigator.nextPage(RemoveUnallocatedAmountPage(srn), mode, updatedAnswers))
+              Redirect(navigator.nextPage(RemoveUnallocatedAmountPage(srn), NormalMode, updatedAnswers))
             }
           } else {
             Future
               .successful(
-                Redirect(navigator.nextPage(RemoveUnallocatedAmountPage(srn), mode, request.userAnswers))
+                Redirect(navigator.nextPage(RemoveUnallocatedAmountPage(srn), NormalMode, request.userAnswers))
               )
           }
       )

@@ -16,7 +16,7 @@
 
 package navigation.nonsipp
 
-import models.{CheckOrChange, NormalMode, UserAnswers}
+import models.{ CheckOrChange, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.memberpayments._
@@ -40,13 +40,17 @@ object UnallocatedEmployerContributionsNavigator extends JourneyNavigator {
     case UnallocatedContributionCYAPage(srn) =>
       controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
 
-    case page @ RemoveUnallocatedAmountPage(srn) =>
-      if (userAnswers.get(page).contains(true)) {
-        controllers.nonsipp.memberpayments.routes.UnallocatedEmployerContributionsController
-          .onPageLoad(srn, NormalMode)
-      } else {
-        controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController
-          .onPageLoad(srn, CheckOrChange.Check)
+    case RemoveUnallocatedAmountPage(srn) =>
+      userAnswers.data.decryptedValue.value("membersPayments") match {
+        case value =>
+          if (value.toString != "{}") {
+            controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController
+              .onPageLoad(srn, CheckOrChange.Check)
+          } else {
+            controllers.nonsipp.memberpayments.routes.UnallocatedEmployerContributionsController
+              .onPageLoad(srn, NormalMode)
+          }
+        case _ => controllers.routes.UnauthorisedController.onPageLoad()
       }
   }
 
