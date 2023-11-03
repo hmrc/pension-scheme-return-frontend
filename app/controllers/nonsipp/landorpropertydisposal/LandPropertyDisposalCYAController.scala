@@ -82,8 +82,8 @@ class LandPropertyDisposalCYAController @Inject()(
             request.userAnswers.get(WhenWasPropertySoldPage(srn, index, disposalIndex)).get
           )
 
-          landOrPropertyDisposalSellerConnectedParty = Option.when(howWasPropertyDisposed == Sold)(
-            request.userAnswers.get(LandOrPropertyDisposalSellerConnectedPartyPage(srn, index, disposalIndex)).get
+          landOrPropertyDisposalBuyerConnectedParty = Option.when(howWasPropertyDisposed == Sold)(
+            request.userAnswers.get(LandOrPropertyDisposalBuyerConnectedPartyPage(srn, index, disposalIndex)).get
           )
 
           recipientName = Option.when(howWasPropertyDisposed == Sold)(
@@ -141,7 +141,7 @@ class LandPropertyDisposalCYAController @Inject()(
                 whenWasPropertySold,
                 addressLookUpPage,
                 landOrPropertyDisposedType,
-                landOrPropertyDisposalSellerConnectedParty,
+                landOrPropertyDisposalBuyerConnectedParty,
                 totalProceedsSale,
                 independentValuation,
                 landOrPropertyStillHeld,
@@ -190,7 +190,7 @@ case class ViewModelParameters(
   whenWasPropertySold: Option[LocalDate],
   addressLookUpPage: Address,
   landOrPropertyDisposedType: Option[IdentityType],
-  landOrPropertyDisposalSellerConnectedParty: Option[Boolean],
+  landOrPropertyDisposalBuyerConnectedParty: Option[Boolean],
   totalProceedsSale: Option[Money],
   independentValuation: Option[Boolean],
   landOrPropertyStillHeld: Boolean,
@@ -222,7 +222,7 @@ object LandPropertyDisposalCYAController {
           parameters.addressLookUpPage,
           parameters.landOrPropertyDisposedType,
           parameters.recipientReasonNoDetails,
-          parameters.landOrPropertyDisposalSellerConnectedParty,
+          parameters.landOrPropertyDisposalBuyerConnectedParty,
           parameters.totalProceedsSale,
           parameters.independentValuation,
           parameters.landOrPropertyStillHeld,
@@ -246,7 +246,7 @@ object LandPropertyDisposalCYAController {
     addressLookUpPage: Address,
     landOrPropertyDisposedType: Option[IdentityType],
     recipientReasonNoDetails: Option[String],
-    landOrPropertyDisposalSellerConnectedParty: Option[Boolean],
+    landOrPropertyDisposalBuyerConnectedParty: Option[Boolean],
     totalProceedsSale: Option[Money],
     independentValuation: Option[Boolean],
     landOrPropertyStillHeld: Boolean,
@@ -265,7 +265,7 @@ object LandPropertyDisposalCYAController {
             addressLookUpPage,
             landOrPropertyDisposedType,
             recipientReasonNoDetails,
-            landOrPropertyDisposalSellerConnectedParty,
+            landOrPropertyDisposalBuyerConnectedParty,
             totalProceedsSale,
             independentValuation,
             landOrPropertyStillHeld,
@@ -336,7 +336,7 @@ object LandPropertyDisposalCYAController {
     addressLookUpPage: Address,
     landOrPropertyDisposedType: Option[IdentityType],
     recipientReasonNoDetails: Option[String],
-    landOrPropertyDisposalSellerConnectedParty: Option[Boolean],
+    landOrPropertyDisposalBuyerConnectedParty: Option[Boolean],
     totalProceedsSale: Option[Money],
     independentValuation: Option[Boolean],
     landOrPropertyStillHeld: Boolean,
@@ -469,16 +469,16 @@ object LandPropertyDisposalCYAController {
           )
     ) :+
       CheckYourAnswersRowViewModel(
-        Message("landPropertyDisposalCYA.section1.landOrPropertyDisposalSellerConnectedParty", recipientName),
-        if (landOrPropertyDisposalSellerConnectedParty.get) "site.yes" else "site.no"
+        Message("landPropertyDisposalCYA.section1.landOrPropertyDisposalBuyerConnectedParty", recipientName),
+        if (landOrPropertyDisposalBuyerConnectedParty.get) "site.yes" else "site.no"
       ).withAction(
         SummaryAction(
           "site.change",
-          controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalSellerConnectedPartyController
+          controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalBuyerConnectedPartyController
             .onSubmit(srn, index, disposalIndex, CheckMode)
             .url
         ).withVisuallyHiddenContent(
-          "landPropertyDisposalCYA.section1.landOrPropertyDisposalSellerConnectedPartyInfo.hidden"
+          "landPropertyDisposalCYA.section1.landOrPropertyDisposalBuyerConnectedPartyInfo.hidden"
         )
       ) :+
       CheckYourAnswersRowViewModel(

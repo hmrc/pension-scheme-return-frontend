@@ -82,11 +82,11 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
         .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
 
     case CompanyBuyerCrnPage(srn, landOrPropertyIndex, disposalIndex) =>
-      controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalSellerConnectedPartyController
+      controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalBuyerConnectedPartyController
         .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
 
     case IndividualBuyerNinoNumberPage(srn, landOrPropertyIndex, disposalIndex) =>
-      controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalSellerConnectedPartyController
+      controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalBuyerConnectedPartyController
         .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
 
     case LandOrPropertyIndividualBuyerNamePage(srn, landOrPropertyIndex, disposalIndex) =>
@@ -102,14 +102,14 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
         .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
 
     case OtherBuyerDetailsPage(srn, landOrPropertyIndex, disposalIndex) =>
-      controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalSellerConnectedPartyController
+      controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalBuyerConnectedPartyController
         .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
 
     case PartnershipBuyerUtrPage(srn, landOrPropertyIndex, disposalIndex) =>
-      controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalSellerConnectedPartyController
+      controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalBuyerConnectedPartyController
         .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
 
-    case LandOrPropertyDisposalSellerConnectedPartyPage(srn, index, disposalIndex) =>
+    case LandOrPropertyDisposalBuyerConnectedPartyPage(srn, index, disposalIndex) =>
       if (userAnswers.get(TotalProceedsSaleLandPropertyPage(srn, index, disposalIndex)).isEmpty ||
         userAnswers.get(DisposalIndependentValuationPage(srn, index, disposalIndex)).isEmpty ||
         userAnswers.get(LandOrPropertyStillHeldPage(srn, index, disposalIndex)).isEmpty) {
@@ -179,7 +179,7 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
       controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
         .onPageLoad(srn, landOrPropertyIndex, disposalIndex, CheckMode)
 
-    case LandOrPropertyDisposalSellerConnectedPartyPage(srn, index, disposalIndex) =>
+    case LandOrPropertyDisposalBuyerConnectedPartyPage(srn, index, disposalIndex) =>
       controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
         .onPageLoad(srn, index, disposalIndex, CheckMode)
 

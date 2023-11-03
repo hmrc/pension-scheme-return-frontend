@@ -79,7 +79,7 @@ class RemoveLandPropertyDisposalController @Inject()(
       .remove(HowWasPropertyDisposedOfPage(srn, landOrPropertyIndex, disposalIndex))
       .flatMap(_.remove(LandOrPropertyStillHeldPage(srn, landOrPropertyIndex, disposalIndex)))
       .flatMap(_.remove(WhenWasPropertySoldPage(srn, landOrPropertyIndex, disposalIndex)))
-      .flatMap(_.remove(LandOrPropertyDisposalSellerConnectedPartyPage(srn, landOrPropertyIndex, disposalIndex)))
+      .flatMap(_.remove(LandOrPropertyDisposalBuyerConnectedPartyPage(srn, landOrPropertyIndex, disposalIndex)))
       .flatMap(_.remove(DisposalIndependentValuationPage(srn, landOrPropertyIndex, disposalIndex)))
       .flatMap(_.remove(TotalProceedsSaleLandPropertyPage(srn, landOrPropertyIndex, disposalIndex)))
       .flatMap(_.remove(RemoveLandPropertyDisposalPage(srn, landOrPropertyIndex, disposalIndex)))

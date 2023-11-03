@@ -19,20 +19,13 @@ package controllers.nonsipp.landorpropertydisposal
 import config.Refined.{Max50, Max5000}
 import controllers.PSRController
 import controllers.actions._
-import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalSellerConnectedPartyController._
+import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalBuyerConnectedPartyController._
 import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
 import models.requests.DataRequest
 import models.{IdentityType, Mode}
 import navigation.Navigator
-import pages.nonsipp.landorpropertydisposal.{
-  CompanyBuyerNamePage,
-  LandOrPropertyDisposalSellerConnectedPartyPage,
-  LandOrPropertyIndividualBuyerNamePage,
-  OtherBuyerDetailsPage,
-  PartnershipBuyerNamePage,
-  WhoPurchasedLandOrPropertyPage
-}
+import pages.nonsipp.landorpropertydisposal._
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -45,7 +38,7 @@ import views.html.YesNoPageView
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
-class LandOrPropertyDisposalSellerConnectedPartyController @Inject()(
+class LandOrPropertyDisposalBuyerConnectedPartyController @Inject()(
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -56,12 +49,12 @@ class LandOrPropertyDisposalSellerConnectedPartyController @Inject()(
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
-  private val form = LandOrPropertyDisposalSellerConnectedPartyController.form(formProvider)
+  private val form = LandOrPropertyDisposalBuyerConnectedPartyController.form(formProvider)
 
   def onPageLoad(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val preparedForm =
-        request.userAnswers.fillForm(LandOrPropertyDisposalSellerConnectedPartyPage(srn, index, disposalIndex), form)
+        request.userAnswers.fillForm(LandOrPropertyDisposalBuyerConnectedPartyPage(srn, index, disposalIndex), form)
       getBuyersName(srn, index, disposalIndex)
         .map(buyersName => Ok(view(preparedForm, viewModel(srn, buyersName, index, disposalIndex, mode))))
         .merge
@@ -85,12 +78,12 @@ class LandOrPropertyDisposalSellerConnectedPartyController @Inject()(
               updatedAnswers <- Future
                 .fromTry(
                   request.userAnswers
-                    .set(LandOrPropertyDisposalSellerConnectedPartyPage(srn, index, disposalIndex), value)
+                    .set(LandOrPropertyDisposalBuyerConnectedPartyPage(srn, index, disposalIndex), value)
                 )
               _ <- saveService.save(updatedAnswers)
             } yield Redirect(
               navigator.nextPage(
-                LandOrPropertyDisposalSellerConnectedPartyPage(srn, index, disposalIndex),
+                LandOrPropertyDisposalBuyerConnectedPartyPage(srn, index, disposalIndex),
                 mode,
                 updatedAnswers
               )
@@ -123,9 +116,9 @@ class LandOrPropertyDisposalSellerConnectedPartyController @Inject()(
     } yield buyerName
 }
 
-object LandOrPropertyDisposalSellerConnectedPartyController {
+object LandOrPropertyDisposalBuyerConnectedPartyController {
   def form(formProvider: YesNoPageFormProvider): Form[Boolean] = formProvider(
-    "landOrPropertyDisposalSellerConnectedParty.error.required"
+    "landOrPropertyDisposalBuyerConnectedParty.error.required"
   )
 
   def viewModel(
@@ -135,9 +128,9 @@ object LandOrPropertyDisposalSellerConnectedPartyController {
     disposalIndex: Max50,
     mode: Mode
   ): FormPageViewModel[YesNoPageViewModel] = YesNoPageViewModel(
-    "landOrPropertyDisposalSellerConnectedParty.title",
-    Message("landOrPropertyDisposalSellerConnectedParty.heading", buyersName),
-    controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalSellerConnectedPartyController
+    "landOrPropertyDisposalBuyerConnectedParty.title",
+    Message("landOrPropertyDisposalBuyerConnectedParty.heading", buyersName),
+    controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyDisposalBuyerConnectedPartyController
       .onSubmit(srn, index, disposalIndex, mode)
   )
 }

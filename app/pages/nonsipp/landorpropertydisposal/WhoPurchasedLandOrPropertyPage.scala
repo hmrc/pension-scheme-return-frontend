@@ -43,7 +43,7 @@ case class WhoPurchasedLandOrPropertyPage(srn: Srn, landOrPropertyIndex: Max5000
     PartnershipBuyerNamePage(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50),
     PartnershipBuyerUtrPage(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50),
     OtherBuyerDetailsPage(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50),
-    LandOrPropertyDisposalSellerConnectedPartyPage(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50)
+    LandOrPropertyDisposalBuyerConnectedPartyPage(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50)
   )
   override def cleanup(value: Option[IdentityType], userAnswers: UserAnswers): Try[UserAnswers] =
     (value, userAnswers.get(this)) match {

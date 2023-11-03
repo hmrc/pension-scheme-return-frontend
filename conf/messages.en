@@ -1306,9 +1306,9 @@ totalProceedsSaleLandProperty.error.required = Enter the total proceeds from the
 totalProceedsSaleLandProperty.error.invalid = Total proceeds from the sale must be an amount of money, like 123 or 123.45
 totalProceedsSaleLandProperty.error.tooLarge = Total proceeds from the sale must be 999999999.99 or less
 
-landOrPropertyDisposalSellerConnectedParty.title = Is the seller a connected party?
-landOrPropertyDisposalSellerConnectedParty.heading = Is {0} a connected party?
-landOrPropertyDisposalSellerConnectedParty.error.required = Select yes if the seller is a connected party
+landOrPropertyDisposalBuyerConnectedParty.title = Is the buyer a connected party?
+landOrPropertyDisposalBuyerConnectedParty.heading = Is {0} a connected party?
+landOrPropertyDisposalBuyerConnectedParty.error.required = Select yes if the buyer is a connected party
 
 disposalIndependentValuation.title = Was the sale of the land or property supported by an independent valuation?
 disposalIndependentValuation.heading = Was the sale of {0} supported by an independent valuation?
@@ -1341,8 +1341,8 @@ landPropertyDisposalCYA.section1.recipientDetails.noCrnReason = Reason you canno
 landPropertyDisposalCYA.section1.recipientDetails.noCrnReason.hidden = reason you cannot provide buyer’s Company Registration Number
 landPropertyDisposalCYA.section1.recipientDetails.noUtrReason = Reason you cannot provide {0}’s Unique Taxpayer Reference (UTR)
 landPropertyDisposalCYA.section1.recipientDetails.noUtrReason.hidden = reason you cannot provide buyer’s Unique Taxpayer Reference
-landPropertyDisposalCYA.section1.landOrPropertyDisposalSellerConnectedParty = Is {0} a connected party?
-landPropertyDisposalCYA.section1.landOrPropertyDisposalSellerConnectedPartyInfo.hidden = if {0} is a connected party]
+landPropertyDisposalCYA.section1.landOrPropertyDisposalBuyerConnectedParty = Is {0} a connected party?
+landPropertyDisposalCYA.section1.landOrPropertyDisposalBuyerConnectedPartyInfo.hidden = if {0} is a connected party]
 landPropertyDisposalCYA.section1.totalProceedsSale = What were the total proceeds from the sale of {0}?
 landPropertyDisposalCYA.section1.totalProceedsSaleInfo.hidden = the total proceeds from the sale of {0}
 landPropertyDisposalCYA.section1.DisposalIndependentValuation = Was the sale of {0} supported by an independent valuation?

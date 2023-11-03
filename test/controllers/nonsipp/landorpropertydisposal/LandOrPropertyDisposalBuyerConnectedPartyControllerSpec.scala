@@ -18,22 +18,22 @@ package controllers.nonsipp.landorpropertydisposal
 
 import config.Refined.{Max50, Max5000}
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalSellerConnectedPartyController._
+import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalBuyerConnectedPartyController._
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.{IdentityType, NormalMode}
 import pages.nonsipp.landorpropertydisposal._
 import views.html.YesNoPageView
 
-class LandOrPropertyDisposalSellerConnectedPartyControllerSpec extends ControllerBaseSpec {
+class LandOrPropertyDisposalBuyerConnectedPartyControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[Max5000.Refined](1)
   private val disposalIndex = refineMV[Max50.Refined](1)
 
   private lazy val onPageLoad =
-    routes.LandOrPropertyDisposalSellerConnectedPartyController.onPageLoad(srn, index, disposalIndex, NormalMode)
+    routes.LandOrPropertyDisposalBuyerConnectedPartyController.onPageLoad(srn, index, disposalIndex, NormalMode)
   private lazy val onSubmit =
-    routes.LandOrPropertyDisposalSellerConnectedPartyController.onSubmit(srn, index, disposalIndex, NormalMode)
+    routes.LandOrPropertyDisposalBuyerConnectedPartyController.onSubmit(srn, index, disposalIndex, NormalMode)
 
   "LandOrPropertyDisposalSellerConnectedPartyController" - {
 
@@ -63,7 +63,7 @@ class LandOrPropertyDisposalSellerConnectedPartyControllerSpec extends Controlle
         act.like(
           renderPrePopView(
             onPageLoad,
-            LandOrPropertyDisposalSellerConnectedPartyPage(srn, index, disposalIndex),
+            LandOrPropertyDisposalBuyerConnectedPartyPage(srn, index, disposalIndex),
             true,
             userAnswers
           ) { implicit app => implicit request =>
