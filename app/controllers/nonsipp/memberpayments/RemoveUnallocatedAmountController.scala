@@ -23,7 +23,7 @@ import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
 import models.{Mode, UserAnswers}
 import navigation.Navigator
-import pages.nonsipp.memberpayments.{RemoveUnallocatedAmountPage, UnallocatedEmployerAmountPage}
+import pages.nonsipp.memberpayments._
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -107,12 +107,13 @@ class RemoveUnallocatedAmountController @Inject()(
     userAnswers: UserAnswers
   ): Try[UserAnswers] =
     userAnswers
-      .remove(UnallocatedEmployerAmountPage(srn))
+      .remove(UnallocatedEmployerContributionsPage(srn))
+      .flatMap(_.remove(UnallocatedEmployerAmountPage(srn)))
 }
 
 object RemoveUnallocatedAmountController {
   def form(formProvider: YesNoPageFormProvider): Form[Boolean] = formProvider(
-    "removeBorrowInstances.error.required"
+    "removeUnallocatedAmount.error.required"
   )
 
   def viewModel(
@@ -121,8 +122,8 @@ object RemoveUnallocatedAmountController {
     amount: String
   ): FormPageViewModel[YesNoPageViewModel] =
     YesNoPageViewModel(
-      "removeBorrowInstances.title",
-      Message("removeBorrowInstances.heading", amount),
+      "removeUnallocatedAmount.title",
+      Message("removeUnallocatedAmount.heading", amount),
       controllers.nonsipp.memberpayments.routes.RemoveUnallocatedAmountController.onSubmit(srn, mode)
     )
 }

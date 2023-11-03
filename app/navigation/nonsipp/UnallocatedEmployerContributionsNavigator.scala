@@ -40,10 +40,14 @@ object UnallocatedEmployerContributionsNavigator extends JourneyNavigator {
     case UnallocatedContributionCYAPage(srn) =>
       controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
 
-    case RemoveUnallocatedAmountPage(srn) =>
-      controllers.nonsipp.memberpayments.routes.UnallocatedEmployerAmountController
-        .onPageLoad(srn, NormalMode)
-
+    case page @ RemoveUnallocatedAmountPage(srn) =>
+      if (userAnswers.get(page).contains(true)) {
+        controllers.nonsipp.memberpayments.routes.UnallocatedEmployerContributionsController
+          .onPageLoad(srn, NormalMode)
+      } else {
+        controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController
+          .onPageLoad(srn, CheckOrChange.Check)
+      }
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => {
