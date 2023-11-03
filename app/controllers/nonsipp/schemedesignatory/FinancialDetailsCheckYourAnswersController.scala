@@ -29,7 +29,7 @@ import navigation.Navigator
 import pages.nonsipp.schemedesignatory._
 import play.api.i18n._
 import play.api.mvc._
-import services.SchemeDateService
+import services.{PsrSubmissionService, SchemeDateService}
 import utils.DateTimeUtils.localDateShow
 import utils.ListUtils.ListOps
 import viewmodels.DisplayMessage._
@@ -39,15 +39,18 @@ import views.html.CheckYourAnswersView
 
 import java.time.LocalDate
 import javax.inject.{Inject, Named}
+import scala.concurrent.ExecutionContext
 
 class FinancialDetailsCheckYourAnswersController @Inject()(
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   schemeDateService: SchemeDateService,
+  psrSubmissionService: PsrSubmissionService,
   val controllerComponents: MessagesControllerComponents,
   view: CheckYourAnswersView
-) extends PSRController
+)(implicit ec: ExecutionContext)
+    extends PSRController
     with I18nSupport {
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
@@ -78,8 +81,11 @@ class FinancialDetailsCheckYourAnswersController @Inject()(
     }
   }
 
-  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    Redirect(navigator.nextPage(FinancialDetailsCheckYourAnswersPage(srn), mode, request.userAnswers))
+  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
+    psrSubmissionService.submitPsrDetails(srn).map {
+      case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      case Some(_) => Redirect(navigator.nextPage(FinancialDetailsCheckYourAnswersPage(srn), mode, request.userAnswers))
+    }
   }
 
   private def loggedInUserNameOrRedirect(implicit request: DataRequest[_]): Either[Result, String] =

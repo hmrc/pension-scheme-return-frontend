@@ -22,6 +22,7 @@ import controllers.nonsipp.loansmadeoroutstanding.RemoveLoanController._
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.{IdentitySubject, IdentityType, NormalMode}
+import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.common.IdentityTypePage
 import pages.nonsipp.loansmadeoroutstanding.{
   AmountOfTheLoanPage,
@@ -29,6 +30,9 @@ import pages.nonsipp.loansmadeoroutstanding.{
   IndividualRecipientNamePage,
   PartnershipRecipientNamePage
 }
+import play.api.inject.bind
+import play.api.inject.guice.GuiceableModule
+import services.PsrSubmissionService
 import views.html.YesNoPageView
 
 class RemoveLoanControllerSpec extends ControllerBaseSpec {
@@ -37,6 +41,7 @@ class RemoveLoanControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoad = routes.RemoveLoanController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.RemoveLoanController.onSubmit(srn, index, NormalMode)
+
   private val filledUserAnswers = defaultUserAnswers
     .unsafeSet(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient), IdentityType.UKCompany)
     .unsafeSet(CompanyRecipientNamePage(srn, refineMV(1)), "recipientName1")
@@ -48,6 +53,12 @@ class RemoveLoanControllerSpec extends ControllerBaseSpec {
     .unsafeSet(IndividualRecipientNamePage(srn, refineMV(3)), "recipientName3")
     .unsafeSet(AmountOfTheLoanPage(srn, refineMV(3)), (money, money, money))
 
+  private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
+
+  override protected val additionalBindings: List[GuiceableModule] = List(
+    bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
+  )
+
   "RemoveLoanController" - {
 
     act.like(renderView(onPageLoad, filledUserAnswers) { implicit app => implicit request =>
@@ -58,12 +69,33 @@ class RemoveLoanControllerSpec extends ControllerBaseSpec {
         )
     })
 
-    act.like(redirectNextPage(onSubmit, "value" -> "true"))
-    act.like(redirectNextPage(onSubmit, "value" -> "false"))
+    act.like(
+      redirectNextPage(onSubmit, "value" -> "true")
+        .before(MockPSRSubmissionService.submitPsrDetails())
+        .after({
+          verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any())(any(), any(), any())
+          reset(mockPsrSubmissionService)
+        })
+    )
+    act.like(
+      redirectNextPage(onSubmit, "value" -> "false")
+        .before(MockPSRSubmissionService.submitPsrDetails())
+        .after({
+          verify(mockPsrSubmissionService, never).submitPsrDetails(any())(any(), any(), any())
+          reset(mockPsrSubmissionService)
+        })
+    )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
-    act.like(saveAndContinue(onSubmit, "value" -> "true"))
+    act.like(
+      saveAndContinue(onSubmit, "value" -> "true")
+        .before(MockPSRSubmissionService.submitPsrDetails())
+        .after({
+          verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any())(any(), any(), any())
+          reset(mockPsrSubmissionService)
+        })
+    )
 
     act.like(invalidForm(onSubmit, filledUserAnswers))
 

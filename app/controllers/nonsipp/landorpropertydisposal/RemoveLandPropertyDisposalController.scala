@@ -21,6 +21,7 @@ import controllers.PSRController
 import controllers.actions._
 import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
+import models.requests.DataRequest
 import models.{Mode, UserAnswers}
 import navigation.Navigator
 import pages.nonsipp.landorproperty.LandOrPropertyAddressLookupPage
@@ -28,7 +29,7 @@ import pages.nonsipp.landorpropertydisposal._
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
+import services.{PsrSubmissionService, SaveService}
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
@@ -44,6 +45,7 @@ class RemoveLandPropertyDisposalController @Inject()(
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   formProvider: YesNoPageFormProvider,
+  psrSubmissionService: PsrSubmissionService,
   val controllerComponents: MessagesControllerComponents,
   view: YesNoPageView
 )(implicit ec: ExecutionContext)
@@ -109,15 +111,24 @@ class RemoveLandPropertyDisposalController @Inject()(
                   .fromTry(removeAllLandOrProperty(srn, landOrPropertyIndex, disposalIndex, request.userAnswers))
 
                 _ <- saveService.save(removedUserAnswers)
-              } yield {
-                Redirect(
-                  navigator.nextPage(
-                    RemoveLandPropertyDisposalPage(srn, landOrPropertyIndex, disposalIndex),
-                    mode,
-                    removedUserAnswers
+                redirectTo <- psrSubmissionService
+                  .submitPsrDetails(srn)(
+                    implicitly,
+                    implicitly,
+                    request = DataRequest(request.request, removedUserAnswers)
                   )
-                )
-              }
+                  .map {
+                    case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+                    case Some(_) =>
+                      Redirect(
+                        navigator.nextPage(
+                          RemoveLandPropertyDisposalPage(srn, landOrPropertyIndex, disposalIndex),
+                          mode,
+                          removedUserAnswers
+                        )
+                      )
+                  }
+              } yield redirectTo
             } else {
               Future
                 .successful(

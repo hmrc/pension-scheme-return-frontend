@@ -21,6 +21,7 @@ import controllers.ControllerBaseSpec
 import controllers.nonsipp.moneyborrowed.MoneyBorrowedCYAController._
 import eu.timepit.refined.refineMV
 import models.CheckOrChange
+import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.moneyborrowed._
 import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
@@ -80,6 +81,10 @@ class MoneyBorrowedCYAControllerSpec extends ControllerBaseSpec {
       act.like(
         redirectNextPage(onSubmit(checkOrChange))
           .before(MockPSRSubmissionService.submitPsrDetails())
+          .after({
+            verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any())(any(), any(), any())
+            reset(mockPsrSubmissionService)
+          })
           .withName(s"redirect to next page when in ${checkOrChange.name} mode")
       )
 
