@@ -48,7 +48,8 @@ private[mappings] class LocalDateFormatter(
         requiredKey = required,
         wholeNumberKey = dateFormErrors.invalidCharacters,
         nonNumericKey = dateFormErrors.invalidCharacters,
-        max = (max, dateFormErrors.invalidDate)
+        max = (max, dateFormErrors.invalidDate),
+        min = (1, dateFormErrors.invalidDate)
       ),
       args
     )

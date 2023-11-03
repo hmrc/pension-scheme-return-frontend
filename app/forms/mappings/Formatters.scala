@@ -16,7 +16,7 @@
 
 package forms.mappings
 
-import forms.mappings.errors.{MoneyFormErrorValue, _}
+import forms.mappings.errors._
 import models.{Enumerable, Money, Percentage, Security}
 import play.api.data.FormError
 import play.api.data.format.Formatter
@@ -100,11 +100,27 @@ trait Formatters {
             case s =>
               nonFatalCatch
                 .either(s.toInt)
-                .left
-                .map { _ =>
-                  if (s.matches(intRegex)) Seq(FormError(key, errors.max._2, args))
-                  else Seq(FormError(key, errors.nonNumericKey, args))
-                }
+                .fold(
+                  _ => {
+                    if (s.matches(intRegex)) {
+                      Left(Seq(FormError(key, errors.max._2, args)))
+                    } else {
+                      Left(Seq(FormError(key, errors.nonNumericKey, args)))
+                    }
+                  },
+                  value => {
+                    if (value > errors.max._1) {
+                      Left(Seq(FormError(key, errors.max._2, args)))
+                    } else if (value < errors.min._1 && errors.min._1 == 0) {
+                      // deliberately displaying nonNumericKey error message here
+                      Left(Seq(FormError(key, errors.nonNumericKey, args)))
+                    } else if (value < errors.min._1) {
+                      Left(Seq(FormError(key, errors.min._2, args)))
+                    } else {
+                      Right(value)
+                    }
+                  }
+                )
           }
           .flatMap { int =>
             errors.max match {
@@ -123,45 +139,20 @@ trait Formatters {
     doubleFormErrors: DoubleFormErrors,
     args: Seq[String]
   ): Formatter[Double] =
-    doubleFormatter(doubleFormErrors.requiredKey, doubleFormErrors.nonNumericKey, doubleFormErrors.max, args)
-
-  private[mappings] def doubleFormatter(
-    requiredKey: String,
-    nonNumericKey: String,
-    max: (Double, String),
-    args: Seq[String] = Seq.empty
-  ): Formatter[Double] =
-    new Formatter[Double] {
-
-      private val baseFormatter = stringFormatter(requiredKey, args)
-      private val (maxSize, maxError) = max
-      private val decimalRegex = "^%?[0-9]+(\\.[0-9]{1,2})?%?$"
-
-      override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Double] =
-        baseFormatter
-          .bind(key, data)
-          .map(_.replace(",", "").replace("%", ""))
-          .flatMap { s =>
-            s.toDoubleOption
-              .toRight(Seq(FormError(key, nonNumericKey, args)))
-              .flatMap { double =>
-                if (double > maxSize) Left(Seq(FormError(key, maxError, args)))
-                else if (double.toString().matches(decimalRegex))
-                  Right(double)
-                else Right(double)
-              }
-          }
-
-      override def unbind(key: String, value: Double): Map[String, String] =
-        baseFormatter.unbind(key, value.toString)
-    }
+    doubleFormatter(
+      doubleFormErrors.requiredKey,
+      doubleFormErrors.nonNumericKey,
+      doubleFormErrors.max,
+      doubleFormErrors.min,
+      args
+    )
 
   private[mappings] def doubleFormatter(
     requiredKey: String,
     nonNumericKey: String,
     max: (Double, String),
     min: (Double, String),
-    args: Seq[String]
+    args: Seq[String] = Seq.empty
   ): Formatter[Double] =
     new Formatter[Double] {
 
@@ -178,11 +169,18 @@ trait Formatters {
             s.toDoubleOption
               .toRight(Seq(FormError(key, nonNumericKey, args)))
               .flatMap { double =>
-                if (double < minSize) Left(Seq(FormError(key, minError, args)))
-                else if (double > maxSize) Left(Seq(FormError(key, maxError, args)))
-                else if (double.toString().matches(decimalRegex))
+                if (double > maxSize) {
+                  Left(Seq(FormError(key, maxError, args)))
+                } else if (double < minSize && minSize == 0) {
+                  // deliberately displaying nonNumericKey error message here
+                  Left(Seq(FormError(key, nonNumericKey, args)))
+                } else if (double < minSize) {
+                  Left(Seq(FormError(key, minError, args)))
+                } else if (double.toString().matches(decimalRegex)) {
                   Right(double)
-                else Right(double)
+                } else {
+                  Right(double)
+                }
               }
           }
 
@@ -196,29 +194,6 @@ trait Formatters {
   ): Formatter[Money] =
     new Formatter[Money] {
 
-      private val baseFormatter = doubleFormatter(errors.requiredKey, errors.nonNumericKey, errors.max, args)
-      private val decimalRegex = "^-?\\d+(\\.\\d{1,2})?$"
-
-      override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Money] =
-        baseFormatter
-          .bind(key, data.view.mapValues(_.replace("£", "")).toMap)
-          .flatMap { double =>
-            if (BigDecimal(double).toString().matches(decimalRegex))
-              Right(Money(double, new DecimalFormat("#,##0.00").format(double)))
-            else
-              Left(Seq(FormError(key, errors.nonNumericKey, args)))
-          }
-
-      override def unbind(key: String, value: Money): Map[String, String] =
-        Map(key -> value.displayAs)
-    }
-
-  private[mappings] def moneyErrorFormatter(
-    errors: MoneyFormErrorValue,
-    args: Seq[String] = Seq.empty
-  ): Formatter[Money] =
-    new Formatter[Money] {
-
       private val baseFormatter =
         doubleFormatter(errors.requiredKey, errors.nonNumericKey, errors.max, errors.min, args)
       private val decimalRegex = "^-?\\d+(\\.\\d{1,2})?$"
@@ -227,10 +202,11 @@ trait Formatters {
         baseFormatter
           .bind(key, data.view.mapValues(_.replace("£", "")).toMap)
           .flatMap { double =>
-            if (BigDecimal(double).toString().matches(decimalRegex))
+            if (BigDecimal(double).toString().matches(decimalRegex)) {
               Right(Money(double, new DecimalFormat("#,##0.00").format(double)))
-            else
+            } else {
               Left(Seq(FormError(key, errors.nonNumericKey, args)))
+            }
           }
 
       override def unbind(key: String, value: Money): Map[String, String] =
@@ -251,10 +227,11 @@ trait Formatters {
         baseFormatter
           .bind(key, data.view.mapValues(_.replace("%", "")).toMap)
           .flatMap { double =>
-            if (double.toString().matches(decimalRegex))
+            if (double.toString().matches(decimalRegex)) {
               Right(Percentage(double, data(key).replace("%", "")))
-            else
+            } else {
               Left(Seq(FormError(key, errors.nonNumericKey, args)))
+            }
           }
 
       override def unbind(key: String, value: Percentage): Map[String, String] =
@@ -267,17 +244,19 @@ trait Formatters {
   ): Formatter[Security] =
     new Formatter[Security] {
 
-      private val baseFormatter = doubleFormatter(errors.requiredKey, errors.nonNumericKey, errors.max, args)
+      private val baseFormatter =
+        doubleFormatter(errors.requiredKey, errors.nonNumericKey, errors.max, (0, "error.tooSmall"), args)
       private val decimalRegex = "^-?\\d+(\\.\\d{1,2})?$"
 
       override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Security] =
         baseFormatter
           .bind(key, data.view.toMap)
           .flatMap { double =>
-            if (BigDecimal(double).toString().matches(decimalRegex))
+            if (BigDecimal(double).toString().matches(decimalRegex)) {
               Right(Security(double.toString))
-            else
+            } else {
               Left(Seq(FormError(key, errors.nonNumericKey, args)))
+            }
           }
 
       override def unbind(key: String, value: Security): Map[String, String] =

@@ -20,7 +20,8 @@ case class IntFormErrors(
   requiredKey: String,
   wholeNumberKey: String,
   nonNumericKey: String,
-  max: (Int, String)
+  max: (Int, String),
+  min: (Int, String)
 )
 
 object IntFormErrors {
@@ -28,7 +29,8 @@ object IntFormErrors {
   def apply(
     requiredKey: String,
     invalidKey: String,
-    max: (Int, String)
+    max: (Int, String),
+    min: (Int, String) = (0, "error.min")
   ): IntFormErrors =
-    IntFormErrors(requiredKey, invalidKey, invalidKey, max)
+    IntFormErrors(requiredKey, invalidKey, invalidKey, max, min)
 }

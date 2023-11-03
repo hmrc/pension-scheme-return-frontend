@@ -165,7 +165,7 @@ trait BasicGenerators extends EitherValues {
 
   def tooEarlyDateGen: Gen[LocalDate] =
     datesBetween(
-      LocalDate.of(-1000, 1, 1),
+      LocalDate.of(1, 1, 1),
       LocalDate.of(1899, 12, 31)
     )
 

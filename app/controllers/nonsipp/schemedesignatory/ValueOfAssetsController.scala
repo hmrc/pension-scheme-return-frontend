@@ -19,7 +19,7 @@ package controllers.nonsipp.schemedesignatory
 import cats.implicits.toShow
 import cats.{Id, Monad}
 import com.google.inject.Inject
-import config.Constants.maxAssetValue
+import config.Constants.{maxAssetValue, minAssetValue}
 import controllers.actions._
 import forms.MoneyFormProvider
 import forms.mappings.errors.MoneyFormErrors
@@ -116,12 +116,14 @@ object ValueOfAssetsController {
       MoneyFormErrors(
         "valueOfAssets.start.error.required",
         "valueOfAssets.start.error.nonNumeric",
-        maxAssetValue -> "valueOfAssets.start.error.tooLarge"
+        maxAssetValue -> "valueOfAssets.start.error.tooLarge",
+        minAssetValue -> "valueOfAssets.start.error.tooSmall"
       ),
       MoneyFormErrors(
         "valueOfAssets.end.error.required",
         "valueOfAssets.end.error.nonNumeric",
-        maxAssetValue -> "valueOfAssets.end.error.tooLarge"
+        maxAssetValue -> "valueOfAssets.end.error.tooLarge",
+        minAssetValue -> "valueOfAssets.end.error.tooSmall"
       ),
       Seq(period.from.show, period.to.show)
     )
