@@ -239,10 +239,10 @@ memberDetails.dateOfBirth.error.required.day = Date of birth must include a day
 memberDetails.dateOfBirth.error.required.month = Date of birth must include a month
 memberDetails.dateOfBirth.error.required.year = Date of birth must include a year
 memberDetails.dateOfBirth.error.required.two = Date of birth must include a {0} and {1}
-memberDetails.dateOfBirth.error.invalid.date = Date of birth must be a real date
+memberDetails.dateOfBirth.error.invalid.date = Member’s date of birth must be a real date
 memberDetails.dateOfBirth.error.invalid.characters = Date of birth must only include numbers 0 to 9
-memberDetails.dateOfBirth.error.future = Date of birth must be before {0}
-memberDetails.dateOfBirth.error.after = Date of birth must be after {0}
+memberDetails.dateOfBirth.error.future = Member’s date of birth must be before {0}
+memberDetails.dateOfBirth.error.after = Member’s date of birth must be after {0}
 memberDetails.dateOfBirth.error.format = Member’s date of birth must be in the format 01/08/1970
 
 
@@ -269,7 +269,7 @@ nationalInsuranceNumber.error.required = Select yes if {0} has a National Insura
 memberDetailsNino.title = What is the member’s National Insurance number?
 memberDetailsNino.heading = What is {0}’s National Insurance number?
 memberDetailsNino.error.required = Enter {0}’s National Insurance number
-memberDetailsNino.error.invalid = Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C
+memberDetailsNino.error.invalid =  Member’s National Insurance number must be 2 letters, 6 numbers, then A, B, C or D. For example, QQ123456C
 memberDetailsNino.error.duplicate = National Insurance number is already in use and cannot be duplicated
 
 howManyMembers.title = How many members did the scheme have on {0}?
