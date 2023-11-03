@@ -21,7 +21,7 @@ import config.Refined.Max5000
 import controllers.PSRController
 import controllers.actions._
 import controllers.nonsipp.moneyborrowed.ValueOfSchemeAssetsWhenMoneyBorrowedController._
-import forms.mappings.errors.{MoneyFormErrorProvider, MoneyFormErrorValue}
+import forms.mappings.errors.{MoneyFormErrorProvider, MoneyFormErrors}
 import models.SchemeId.Srn
 import models.{Mode, Money}
 import navigation.Navigator
@@ -104,11 +104,10 @@ class ValueOfSchemeAssetsWhenMoneyBorrowedController @Inject()(
 
 object ValueOfSchemeAssetsWhenMoneyBorrowedController {
   def form(formProvider: MoneyFormErrorProvider): Form[Money] = formProvider(
-    MoneyFormErrorValue(
+    MoneyFormErrors(
       "valueOfSchemeAssetsWhenMoneyBorrowed.error.required",
       "valueOfSchemeAssetsWhenMoneyBorrowed.error.invalid",
-      (Constants.maxMoneyValue, "valueOfSchemeAssetsWhenMoneyBorrowed.error.tooLarge"),
-      (Constants.minMoneyValue, "valueOfSchemeAssetsWhenMoneyBorrowed.error.tooSmall")
+      (Constants.maxMoneyValue, "valueOfSchemeAssetsWhenMoneyBorrowed.error.tooLarge")
     )
   )
 

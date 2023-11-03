@@ -20,7 +20,7 @@ import config.Constants
 import config.Refined.Max5000
 import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
-import forms.mappings.errors.{MoneyFormErrorProvider, MoneyFormErrorValue}
+import forms.mappings.errors.{MoneyFormErrorProvider, MoneyFormErrors}
 import models.{Mode, Money}
 import models.SchemeId.Srn
 import navigation.Navigator
@@ -88,11 +88,10 @@ class UnallocatedEmployerAmountController @Inject()(
 
 object UnallocatedEmployerAmountController {
   def form(formProvider: MoneyFormErrorProvider): Form[Money] = formProvider(
-    MoneyFormErrorValue(
+    MoneyFormErrors(
       requiredKey = "unallocatedEmployerAmount.error.required",
       nonNumericKey = "unallocatedEmployerAmount.error.invalid",
-      max = (Constants.maxMoneyValue, "unallocatedEmployerAmount.error.tooLarge"),
-      min = (0d, "unallocatedEmployerAmount.error.invalid")
+      max = (Constants.maxMoneyValue, "unallocatedEmployerAmount.error.tooLarge")
     )
   )
 

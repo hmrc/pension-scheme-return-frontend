@@ -16,6 +16,13 @@
 
 package forms.mappings.errors
 
+/**
+ * Form errors for Money
+ * @param requiredKey requiredKey
+ * @param nonNumericKey nonNumericKey
+ * @param max max
+ * @param min If not specified, nonNumericKey error is shown when value less than min
+ */
 case class MoneyFormErrors(
   requiredKey: String,
   nonNumericKey: String,
@@ -32,22 +39,4 @@ object MoneyFormErrors {
     min: (Double, String) = (0, "error.tooSmall")
   ): MoneyFormErrors =
     MoneyFormErrors(requiredKey, nonNumericKey, max, min)
-}
-
-case class MoneyFormErrorValue(
-  requiredKey: String,
-  nonNumericKey: String,
-  max: (Double, String),
-  min: (Double, String)
-)
-
-object MoneyFormErrorValue {
-
-  def default(
-    requiredKey: String = "error.required",
-    nonNumericKey: String = "error.nonMoney",
-    max: (Double, String) = (Double.MaxValue, "error.tooLarge"),
-    min: (Double, String) = (Double.MinValue, "error.tooSmall")
-  ): MoneyFormErrorValue =
-    MoneyFormErrorValue(requiredKey, nonNumericKey, max, min)
 }

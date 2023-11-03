@@ -21,7 +21,7 @@ import config.Refined._
 import controllers.PSRController
 import controllers.actions._
 import controllers.nonsipp.employercontributions.TotalEmployerContributionController._
-import forms.mappings.errors.{MoneyFormErrorProvider, MoneyFormErrorValue}
+import forms.mappings.errors.{MoneyFormErrorProvider, MoneyFormErrors}
 import models.SchemeId.Srn
 import models._
 import navigation.Navigator
@@ -96,11 +96,10 @@ class TotalEmployerContributionController @Inject()(
 
 object TotalEmployerContributionController {
   def form(formProvider: MoneyFormErrorProvider): Form[Money] = formProvider(
-    MoneyFormErrorValue(
+    MoneyFormErrors(
       requiredKey = "totalEmployerContribution.error.required",
       nonNumericKey = "totalEmployerContribution.error.invalid",
-      max = (Constants.maxMoneyValue, "totalEmployerContribution.error.tooLarge"),
-      min = (Constants.minMoneyValue, "totalEmployerContribution.error.tooSmall")
+      max = (Constants.maxMoneyValue, "totalEmployerContribution.error.tooLarge")
     )
   )
 
