@@ -17,18 +17,22 @@
 package controllers.nonsipp.memberdetails
 
 import config.FrontendAppConfig
+import controllers.PSRController
 import controllers.actions._
 import controllers.nonsipp.memberdetails.UploadMemberDetailsController._
 import models.SchemeId.Srn
-import models.{Mode, Reference, UploadKey}
+import models.UploadStatus.UploadStatus
+import models.audit.PSRUpscanFileUploadAuditEvent
+import models.requests.DataRequest
+import models.{DateRange, ErrorDetails, Mode, Reference, UploadKey, UploadStatus}
 import navigation.Navigator
 import pages.nonsipp.memberdetails.UploadMemberDetailsPage
 import play.api.data.FormError
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc._
-import services.UploadService
+import services.{AuditService, SchemeDateService, UploadService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.DisplayMessage.{ListMessage, ListType, ParagraphMessage}
+import viewmodels.DisplayMessage.{ListMessage, ListType, Message, ParagraphMessage}
 import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, UploadViewModel}
 import views.html.UploadView
@@ -42,10 +46,12 @@ class UploadMemberDetailsController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   view: UploadView,
   uploadService: UploadService,
+  schemeDateService: SchemeDateService,
+  auditService: AuditService,
   config: FrontendAppConfig,
   val controllerComponents: MessagesControllerComponents
 )(implicit ec: ExecutionContext)
-    extends FrontendBaseController
+    extends PSRController
     with I18nSupport {
 
   private def callBackUrl(implicit req: Request[_]): String =
@@ -55,6 +61,7 @@ class UploadMemberDetailsController @Inject()(
     val redirectTag = "upload-member-details"
     val successRedirectUrl = config.urls.upscan.successEndpoint.format(srn.value, redirectTag)
     val failureRedirectUrl = config.urls.upscan.failureEndpoint.format(srn.value, redirectTag)
+    val startTime = System.currentTimeMillis
 
     val uploadKey = UploadKey.fromRequest(srn)
 
@@ -63,7 +70,12 @@ class UploadMemberDetailsController @Inject()(
       _ <- uploadService.registerUploadRequest(uploadKey, Reference(initiateResponse.fileReference.reference))
     } yield Ok(
       view(
-        viewModel(initiateResponse.postTarget, initiateResponse.formFields, collectErrors, config.upscanMaxFileSizeMB)
+        viewModel(
+          initiateResponse.postTarget,
+          initiateResponse.formFields,
+          collectErrors(srn, startTime),
+          config.upscanMaxFileSizeMB
+        )
       )
     )
   }
@@ -72,14 +84,44 @@ class UploadMemberDetailsController @Inject()(
     Redirect(navigator.nextPage(UploadMemberDetailsPage(srn), mode, request.userAnswers))
   }
 
-  private def collectErrors(implicit request: Request[_]): Option[FormError] =
+  private def collectErrors(srn: Srn, startTime: Long)(implicit request: DataRequest[_]): Option[FormError] =
     request.getQueryString("errorCode").zip(request.getQueryString("errorMessage")).flatMap {
-      case ("EntityTooLarge", _) =>
+      case ("EntityTooLarge", error) =>
+        val failure = UploadStatus.Failed(ErrorDetails("EntityTooLarge", error))
+        audit(srn, failure, startTime)
         Some(FormError("file-input", "uploadMemberDetails.error.size", Seq(config.upscanMaxFileSizeMB)))
       case ("InvalidArgument", "'file' field not found") =>
+        val failure = UploadStatus.Failed(ErrorDetails("InvalidArgument", "'file' field not found"))
+        audit(srn, failure, startTime)
         Some(FormError("file-input", "uploadMemberDetails.error.required"))
       case _ => None
     }
+
+  private def buildAuditEvent(taxYear: DateRange, uploadStatus: UploadStatus, duration: Long)(
+    implicit req: DataRequest[_]
+  ) = PSRUpscanFileUploadAuditEvent(
+    schemeName = req.schemeDetails.schemeName,
+    schemeAdministratorName = req.schemeDetails.establishers.headOption.get.name,
+    psaOrPspId = req.pensionSchemeId.value,
+    schemeTaxReference = req.schemeDetails.pstr,
+    affinityGroup = if (req.minimalDetails.organisationName.nonEmpty) "Organisation" else "Individual",
+    credentialRole = if (req.pensionSchemeId.isPSP) "PSP" else "PSA",
+    taxYear = taxYear,
+    uploadStatus,
+    duration
+  )
+
+  private def audit(srn: Srn, uploadStatus: UploadStatus, startTime: Long)(implicit request: DataRequest[_]): Unit = {
+    val endTime = System.currentTimeMillis
+    val duration = endTime - startTime
+    for {
+      taxYear <- {
+        val x = schemeDateService.taxYearOrAccountingPeriods(srn)
+        x.merge.getOrRecoverJourney
+      }
+      _ = auditService.sendEvent(buildAuditEvent(taxYear, uploadStatus, duration))
+    } yield taxYear
+  }
 }
 
 object UploadMemberDetailsController {

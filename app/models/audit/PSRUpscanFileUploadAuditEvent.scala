@@ -48,7 +48,8 @@ case class PSRUpscanFileUploadAuditEvent(
       case UploadStatus.Failed(failure) =>
         Map(
           "UploadStatus" -> "Failed",
-          "FailureDetail" -> failure.failureReason
+          "FailureDetail" -> failure.failureReason,
+          "FailureMessage" -> failure.message
         )
 
       case UploadStatus.Success(name, mimeType, downloadUrl, size) =>
