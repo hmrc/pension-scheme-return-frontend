@@ -17,7 +17,7 @@
 package controllers.actions
 
 import models.UserAnswers
-import models.requests.OptionalDataRequest
+import models.requests.{AllowedAccessRequest, OptionalDataRequest}
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import repositories.SessionRepository
@@ -33,7 +33,7 @@ class DataRetrievalActionSpec extends BaseSpec {
       transform(request)
   }
 
-  val request = allowedAccessRequestGen(FakeRequest()).sample.value
+  val request: AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(FakeRequest()).sample.value
 
   "Data Retrieval Action" - {
 
@@ -41,7 +41,7 @@ class DataRetrievalActionSpec extends BaseSpec {
       "there is no data in the cache" in {
 
         val sessionRepository = mock[SessionRepository]
-        when(sessionRepository.get(request.request.getUserId + request.schemeDetails.srn)).thenReturn(Future(None))
+        when(sessionRepository.get(request.request.getUserId + request.srn)).thenReturn(Future(None))
         val action = new Harness(sessionRepository)
 
         val result = action.callTransform().futureValue
@@ -54,7 +54,7 @@ class DataRetrievalActionSpec extends BaseSpec {
       "when there is data in the cache" in {
 
         val sessionRepository = mock[SessionRepository]
-        when(sessionRepository.get(request.request.getUserId + request.schemeDetails.srn))
+        when(sessionRepository.get(request.request.getUserId + request.srn))
           .thenReturn(Future(Some(UserAnswers("id"))))
         val action = new Harness(sessionRepository)
 

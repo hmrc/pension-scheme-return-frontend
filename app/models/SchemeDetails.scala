@@ -24,7 +24,6 @@ import utils.WithName
 import java.time.LocalDate
 
 case class SchemeDetails(
-  srn: String,
   schemeName: String,
   pstr: String,
   schemeStatus: SchemeStatus,
@@ -82,9 +81,8 @@ object Establisher {
 object SchemeDetails {
 
   implicit val reads: Reads[SchemeDetails] =
-    ((__ \ "srn")
+    (__ \ "schemeName")
       .read[String]
-      .and((__ \ "schemeName").read[String])
       .and((__ \ "pstr").read[String])
       .and((__ \ "schemeStatus").read[SchemeStatus])
       .and((__ \ "schemeType" \ "name").read[String])
@@ -94,10 +92,13 @@ object SchemeDetails {
           .read[JsArray]
           .map[List[Establisher]](
             l =>
-              if (l.value.isEmpty) Nil
-              else l.as[List[Establisher]]
+              if (l.value.isEmpty) {
+                Nil
+              } else {
+                l.as[List[Establisher]]
+              }
           )
-      ))(SchemeDetails.apply _)
+      )(SchemeDetails.apply _)
 }
 
 sealed trait SchemeStatus

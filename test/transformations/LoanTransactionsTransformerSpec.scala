@@ -20,9 +20,8 @@ import controllers.TestValues
 import eu.timepit.refined.refineMV
 import generators.ModelGenerators.allowedAccessRequestGen
 import models.ConditionalYesNo._
-import models.SchemeId.Srn
 import models.SponsoringOrConnectedParty.{ConnectedParty, Neither, Sponsoring}
-import models.requests.psr.{RecipientIdentityType, _}
+import models.requests.psr._
 import models.requests.{AllowedAccessRequest, DataRequest}
 import models.{
   ConditionalYesNo,
@@ -38,13 +37,7 @@ import models.{
 import org.scalatest.OptionValues
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
-import pages.nonsipp.common.{
-  CompanyRecipientCrnPage,
-  IdentityTypePage,
-  IdentityTypes,
-  OtherRecipientDetailsPage,
-  PartnershipRecipientUtrPage
-}
+import pages.nonsipp.common._
 import pages.nonsipp.loansmadeoroutstanding._
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
@@ -321,7 +314,7 @@ class LoanTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
 
       val result = transformer.transformFromEtmp(
         userAnswers,
-        Srn(allowedAccessRequest.schemeDetails.srn).get,
+        allowedAccessRequest.srn,
         loans(individualRecipientName, RecipientIdentityType(IdentityType.Individual, Some(nino.value), None, None)).loanTransactions.toList
       )
       result.fold(
@@ -350,7 +343,7 @@ class LoanTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
 
       val result = transformer.transformFromEtmp(
         userAnswers,
-        Srn(allowedAccessRequest.schemeDetails.srn).get,
+        allowedAccessRequest.srn,
         loans(individualRecipientName, RecipientIdentityType(IdentityType.Individual, None, Some(noninoReason), None)).loanTransactions.toList
       )
       result.fold(
@@ -371,7 +364,7 @@ class LoanTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
 
       val result = transformer.transformFromEtmp(
         userAnswers,
-        Srn(allowedAccessRequest.schemeDetails.srn).get,
+        allowedAccessRequest.srn,
         loans(companyRecipientName, RecipientIdentityType(IdentityType.UKCompany, Some(crn.value), None, None), true).loanTransactions.toList
       )
       result.fold(
@@ -397,7 +390,7 @@ class LoanTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
 
       val result = transformer.transformFromEtmp(
         userAnswers,
-        Srn(allowedAccessRequest.schemeDetails.srn).get,
+        allowedAccessRequest.srn,
         loans(companyRecipientName, RecipientIdentityType(IdentityType.UKCompany, None, Some(noCrnReason), None)).loanTransactions.toList
       )
       result.fold(
@@ -423,7 +416,7 @@ class LoanTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
 
       val result = transformer.transformFromEtmp(
         userAnswers,
-        Srn(allowedAccessRequest.schemeDetails.srn).get,
+        allowedAccessRequest.srn,
         loans(partnershipRecipientName, RecipientIdentityType(IdentityType.UKPartnership, Some(utr.value), None, None)).loanTransactions.toList
       )
       result.fold(
@@ -446,7 +439,7 @@ class LoanTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
 
       val result = transformer.transformFromEtmp(
         userAnswers,
-        Srn(allowedAccessRequest.schemeDetails.srn).get,
+        allowedAccessRequest.srn,
         loans(
           "partnership " + recipientName,
           RecipientIdentityType(IdentityType.UKPartnership, None, Some(noUtrReason), None)
@@ -472,7 +465,7 @@ class LoanTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
 
       val result = transformer.transformFromEtmp(
         userAnswers,
-        Srn(allowedAccessRequest.schemeDetails.srn).get,
+        allowedAccessRequest.srn,
         loans(
           otherRecipientName,
           RecipientIdentityType(IdentityType.Other, None, None, Some(otherRecipientDescription))

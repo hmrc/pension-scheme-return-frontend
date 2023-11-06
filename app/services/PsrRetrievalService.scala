@@ -17,7 +17,6 @@
 package services
 
 import connectors.PSRConnector
-import models.SchemeId.Srn
 import models.UserAnswers
 import models.requests.DataRequest
 import play.api.mvc.AnyContent
@@ -51,9 +50,9 @@ class PsrRetrievalService @Inject()(
     ec: ExecutionContext
   ): Future[UserAnswers] = {
 
-    val srnValue = request.schemeDetails.srn
-    val srn = Srn(srnValue).get
-    val emptyUserAnswers = UserAnswers(request.getUserId + srnValue)
+    val srn = request.srn
+
+    val emptyUserAnswers = UserAnswers(request.getUserId + srn)
 
     psrConnector
       .getStandardPsrDetails(

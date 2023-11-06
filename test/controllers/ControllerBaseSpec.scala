@@ -170,7 +170,6 @@ trait TestValues {
   val tooEarlyDate: LocalDate = LocalDate.of(1899, 12, 31)
 
   val defaultSchemeDetails: SchemeDetails = SchemeDetails(
-    "testSRN",
     schemeName,
     "testPSTR",
     SchemeStatus.Open,

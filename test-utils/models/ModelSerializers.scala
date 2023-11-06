@@ -56,7 +56,6 @@ trait ModelSerializers {
     )
 
     Json.obj(
-      "srn" -> details.srn,
       "schemeName" -> details.schemeName,
       "pstr" -> details.pstr,
       "schemeStatus" -> details.schemeStatus,
