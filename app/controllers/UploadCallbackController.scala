@@ -41,7 +41,7 @@ class UploadCallbackController @Inject()(
             s.downloadUrl.toString,
             Some(s.uploadDetails.size)
           )
-        case _: FailedCallbackBody => UploadStatus.Failed
+        case f: FailedCallbackBody => UploadStatus.Failed(f.failureDetails)
       }
       uploadService.registerUploadResult(callback.reference, uploadStatus).map(_ => Ok)
     }

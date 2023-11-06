@@ -24,10 +24,12 @@ import forms.YesNoPageFormProvider
 import models.UploadStatus.UploadStatus
 import models._
 import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
+import org.mockito.MockitoSugar.when
 import pages.nonsipp.memberdetails.CheckMemberDetailsFilePage
 import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
-import services.{MemberDetailsUploadValidator, UploadService}
+import services.{AuditService, MemberDetailsUploadValidator, SchemeDateService, UploadService}
 import views.html.YesNoPageView
 
 import scala.concurrent.Future
@@ -49,15 +51,21 @@ class CheckMemberDetailsFileControllerSpec extends ControllerBaseSpec {
 
   private val mockUploadService = mock[UploadService]
   private val mockMemberDetailsUploadValidator = mock[MemberDetailsUploadValidator]
+  private val mockSchemeDateService = mock[SchemeDateService]
+  private val mockAuditService = mock[AuditService]
 
   override val additionalBindings: List[GuiceableModule] = List(
     bind[UploadService].toInstance(mockUploadService),
-    bind[MemberDetailsUploadValidator].toInstance(mockMemberDetailsUploadValidator)
+    bind[MemberDetailsUploadValidator].toInstance(mockMemberDetailsUploadValidator),
+    bind[SchemeDateService].toInstance(mockSchemeDateService),
+    bind[AuditService].toInstance(mockAuditService)
   )
 
   override def beforeEach(): Unit = {
     reset(mockUploadService)
     reset(mockMemberDetailsUploadValidator)
+    reset(mockSchemeDateService)
+    reset(mockAuditService)
     mockStream()
     mockSaveValidatedUpload()
     mockValidateCSV(UploadFormatError)
@@ -65,14 +73,26 @@ class CheckMemberDetailsFileControllerSpec extends ControllerBaseSpec {
 
   "CheckMemberDetailsFileController" - {
 
-    act.like(renderView(onPageLoad) { implicit app => implicit request =>
-      injected[YesNoPageView].apply(form(injected[YesNoPageFormProvider]), viewModel(srn, Some(fileName), NormalMode))
-    }.before(mockGetUploadStatus(Some(uploadedSuccessfully))))
+    act.like(
+      renderView(onPageLoad) { implicit app => implicit request =>
+        injected[YesNoPageView].apply(form(injected[YesNoPageFormProvider]), viewModel(srn, Some(fileName), NormalMode))
+      }.before({
+          mockTaxYear(dateRange)
+          mockGetUploadStatus(Some(uploadedSuccessfully))
+        })
+        .after({
+          verify(mockAuditService, times(1)).sendEvent(any())(any(), any())
+          reset(mockAuditService)
+        })
+    )
 
     act.like(renderPrePopView(onPageLoad, CheckMemberDetailsFilePage(srn), true) { implicit app => implicit request =>
       injected[YesNoPageView]
         .apply(form(injected[YesNoPageFormProvider]).fill(true), viewModel(srn, Some(fileName), NormalMode))
-    }.before(mockGetUploadStatus(Some(uploadedSuccessfully))))
+    }.before({
+      mockTaxYear(dateRange)
+      mockGetUploadStatus(Some(uploadedSuccessfully))
+    }))
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
@@ -94,4 +114,8 @@ class CheckMemberDetailsFileControllerSpec extends ControllerBaseSpec {
 
   private def mockSaveValidatedUpload(): Unit =
     when(mockUploadService.saveValidatedUpload(any(), any())).thenReturn(Future.successful(()))
+
+  private def mockTaxYear(taxYear: DateRange) =
+    when(mockSchemeDateService.taxYearOrAccountingPeriods(any())(any())).thenReturn(Some(Left(taxYear)))
+
 }

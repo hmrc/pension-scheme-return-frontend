@@ -24,6 +24,7 @@ import eu.timepit.refined.{refineMV, refineV}
 import models.SchemeId.Srn
 import models.UploadStatus.UploadStatus
 import models.{
+  ErrorDetails,
   NameDOB,
   NormalMode,
   Upload,
@@ -97,7 +98,7 @@ class FileUploadSuccessControllerSpec extends ControllerBaseSpec {
 
     act.like(
       journeyRecoveryPage(onPageLoad)
-        .before(mockGetUploadStatus(Some(UploadStatus.Failed)))
+        .before(mockGetUploadStatus(Some(UploadStatus.Failed(ErrorDetails("reason", "message")))))
         .updateName("onPageLoad when upload status failed" + _)
     )
 
