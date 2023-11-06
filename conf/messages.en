@@ -1552,3 +1552,7 @@ unallocatedEmployerCYA.change.heading = Check your answers
 unallocatedEmployerCYA.section.schemeName = Amount of unallocated employer contributions received by {0}
 unallocatedEmployerCYA.section.amount = £ {0}
 unallocatedEmployerCYA.section.hide = amount of unallocated employer contributions received by {0}
+
+removeUnallocatedAmount.title = Are you sure you want to remove the unallocated employer contributions?
+removeUnallocatedAmount.heading = Are you sure you want to remove the unallocated employer contributions of {0}?
+removeUnallocatedAmount.error.required = Select yes if you are sure you want to remove the unallocated employer contributions

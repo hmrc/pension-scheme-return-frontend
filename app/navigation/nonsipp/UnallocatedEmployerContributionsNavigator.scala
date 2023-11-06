@@ -40,6 +40,18 @@ object UnallocatedEmployerContributionsNavigator extends JourneyNavigator {
     case UnallocatedContributionCYAPage(srn) =>
       controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
 
+    case RemoveUnallocatedAmountPage(srn) =>
+      userAnswers.data.decryptedValue.value("membersPayments") match {
+        case value =>
+          if (value.toString != "{}") {
+            controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController
+              .onPageLoad(srn, CheckOrChange.Check)
+          } else {
+            controllers.nonsipp.memberpayments.routes.UnallocatedEmployerContributionsController
+              .onPageLoad(srn, NormalMode)
+          }
+        case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
+      }
   }
 
   override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => {
