@@ -92,7 +92,7 @@ class UploadServiceSpec extends BaseSpec with ScalaCheckPropertyChecks with Test
       val httpResponseBody = "test body"
       when(mockUpscanConnector.download(any())(any())).thenReturn(Future.successful(HttpResponse(OK, httpResponseBody)))
       val result = service.stream("/test-download-url")
-      result.flatMap(_.runWith(Sink.seq).map(_.toList)).futureValue mustBe List(ByteString(httpResponseBody))
+      result.flatMap(_._2.runWith(Sink.seq).map(_.toList)).futureValue mustBe List(ByteString(httpResponseBody))
     }
   }
 }

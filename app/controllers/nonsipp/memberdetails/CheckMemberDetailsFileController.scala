@@ -23,7 +23,7 @@ import controllers.nonsipp.memberdetails.CheckMemberDetailsFileController._
 import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
 import models.UploadStatus.UploadStatus
-import models.audit.PSRUpscanFileUploadAuditEvent
+import models.audit.{PSRUpscanFileDownloadAuditEvent, PSRUpscanFileUploadAuditEvent}
 import models.requests.DataRequest
 import models.{DateRange, Mode, UploadKey, UploadStatus}
 import navigation.Navigator
@@ -66,17 +66,18 @@ class CheckMemberDetailsFileController @Inject()(
     uploadService.getUploadStatus(uploadKey).map {
       case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
       case Some(upload: UploadStatus.Success) => {
-        audit(srn, upload, startTime)
+        auditUpload(srn, upload, startTime)
         Ok(view(preparedForm, viewModel(srn, Some(upload.name), mode)))
       }
       case Some(failure: UploadStatus.Failed) =>
-        audit(srn, failure, startTime)
+        auditUpload(srn, failure, startTime)
         Ok(view(preparedForm, viewModel(srn, Some(""), mode)))
       case Some(_) => Ok(view(preparedForm, viewModel(srn, None, mode)))
     }
   }
 
   def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
+    val startTime = System.currentTimeMillis
     val uploadKey = UploadKey.fromRequest(srn)
 
     form
@@ -90,8 +91,13 @@ class CheckMemberDetailsFileController @Inject()(
             case None => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
             case Some(file) =>
               for {
-                source <- uploadService.stream(file.downloadUrl)
-                validated <- uploadValidator.validateCSV(source, srn, request)
+                source <- {
+                  uploadService.stream(file.downloadUrl)
+                }
+                validated <- {
+                  auditDownload(srn, source._1, startTime)
+                  uploadValidator.validateCSV(source._2, srn, request)
+                }
                 _ <- uploadService.saveValidatedUpload(uploadKey, validated)
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(CheckMemberDetailsFilePage(srn), value))
                 _ <- saveService.save(updatedAnswers)
@@ -110,7 +116,7 @@ class CheckMemberDetailsFileController @Inject()(
         case _ => None
       }
 
-  private def buildAuditEvent(taxYear: DateRange, uploadStatus: UploadStatus, duration: Long)(
+  private def buildUploadAuditEvent(taxYear: DateRange, uploadStatus: UploadStatus, duration: Long)(
     implicit req: DataRequest[_]
   ) = PSRUpscanFileUploadAuditEvent(
     schemeName = req.schemeDetails.schemeName,
@@ -124,12 +130,40 @@ class CheckMemberDetailsFileController @Inject()(
     duration
   )
 
-  private def audit(srn: Srn, uploadStatus: UploadStatus, startTime: Long)(implicit request: DataRequest[_]): Unit = {
+  private def auditUpload(srn: Srn, uploadStatus: UploadStatus, startTime: Long)(
+    implicit request: DataRequest[_]
+  ): Unit = {
     val endTime = System.currentTimeMillis
     val duration = endTime - startTime
     for {
       taxYear <- schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney
-      _ = auditService.sendEvent(buildAuditEvent(taxYear, uploadStatus, duration))
+      _ = auditService.sendEvent(buildUploadAuditEvent(taxYear, uploadStatus, duration))
+    } yield taxYear
+  }
+
+  private def buildDownloadAuditEvent(taxYear: DateRange, responseStatus: Int, duration: Long)(
+    implicit req: DataRequest[_]
+  ) = PSRUpscanFileDownloadAuditEvent(
+    schemeName = req.schemeDetails.schemeName,
+    schemeAdministratorName = req.schemeDetails.establishers.headOption.get.name,
+    psaOrPspId = req.pensionSchemeId.value,
+    schemeTaxReference = req.schemeDetails.pstr,
+    affinityGroup = if (req.minimalDetails.organisationName.nonEmpty) "Organisation" else "Individual",
+    credentialRole = if (req.pensionSchemeId.isPSP) "PSP" else "PSA",
+    taxYear = taxYear,
+    downloadStatus = responseStatus match {
+      case 200 => "Success"
+      case _ => "Failed"
+    },
+    duration
+  )
+
+  private def auditDownload(srn: Srn, responseStatus: Int, startTime: Long)(implicit request: DataRequest[_]): Unit = {
+    val endTime = System.currentTimeMillis
+    val duration = endTime - startTime
+    for {
+      taxYear <- schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney
+      _ = auditService.sendEvent(buildDownloadAuditEvent(taxYear, responseStatus, duration))
     } yield taxYear
   }
 }
