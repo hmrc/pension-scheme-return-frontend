@@ -96,7 +96,16 @@ class CheckMemberDetailsFileControllerSpec extends ControllerBaseSpec {
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
-    act.like(saveAndContinue(onSubmit, "value" -> "true").before(mockGetUploadStatus(Some(uploadedSuccessfully))))
+    act.like(saveAndContinue(onSubmit, "value" -> "true")
+      .before({
+        mockTaxYear(dateRange)
+        mockGetUploadStatus(Some(uploadedSuccessfully))
+      })
+      .after({
+        verify(mockAuditService, times(1)).sendEvent(any())(any(), any())
+        reset(mockAuditService)
+      })
+    )
 
     act.like(invalidForm(onSubmit, "invalid" -> "form").before(mockGetUploadStatus(Some(uploadedSuccessfully))))
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
@@ -106,7 +115,7 @@ class CheckMemberDetailsFileControllerSpec extends ControllerBaseSpec {
     when(mockUploadService.getUploadStatus(any())).thenReturn(Future.successful(uploadStatus))
 
   private def mockStream(): Unit =
-    when(mockUploadService.stream(any())(any())).thenReturn(Future.successful(Source.single(byteString)))
+    when(mockUploadService.stream(any())(any())).thenReturn(Future.successful((200, Source.single(byteString))))
 
   private def mockValidateCSV(result: Upload): Unit =
     when(mockMemberDetailsUploadValidator.validateCSV(any(), any(), any())(any(), any()))
