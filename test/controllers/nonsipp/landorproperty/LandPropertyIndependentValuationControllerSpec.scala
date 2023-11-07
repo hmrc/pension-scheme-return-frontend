@@ -22,7 +22,7 @@ import controllers.nonsipp.landorproperty.LandPropertyIndependentValuationContro
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.{Address, NormalMode}
-import pages.nonsipp.landorproperty.{LandOrPropertyAddressLookupPage, LandPropertyIndependentValuationPage}
+import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandPropertyIndependentValuationPage}
 import views.html.YesNoPageView
 
 class LandPropertyIndependentValuationControllerSpec extends ControllerBaseSpec {
@@ -32,22 +32,24 @@ class LandPropertyIndependentValuationControllerSpec extends ControllerBaseSpec 
   private lazy val onPageLoad = routes.LandPropertyIndependentValuationController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.LandPropertyIndependentValuationController.onSubmit(srn, index, NormalMode)
 
-  override val address = Address("addressLine1", "addressLine2", None, None, None, "United Kingdom", "GB")
   private val userAnswersWithLookUpPage =
-    defaultUserAnswers.unsafeSet(LandOrPropertyAddressLookupPage(srn, index), address)
+    defaultUserAnswers.unsafeSet(LandOrPropertyChosenAddressPage(srn, index), address)
 
   "LandPropertyIndependentValuationController" - {
 
     act.like(renderView(onPageLoad, userAnswersWithLookUpPage) { implicit app => implicit request =>
       injected[YesNoPageView]
-        .apply(form(injected[YesNoPageFormProvider]), viewModel(srn, index, "addressLine1", NormalMode))
+        .apply(form(injected[YesNoPageFormProvider]), viewModel(srn, index, address.addressLine1, NormalMode))
     })
 
     act.like(
       renderPrePopView(onPageLoad, LandPropertyIndependentValuationPage(srn, index), true, userAnswersWithLookUpPage) {
         implicit app => implicit request =>
           injected[YesNoPageView]
-            .apply(form(injected[YesNoPageFormProvider]).fill(true), viewModel(srn, index, "addressLine1", NormalMode))
+            .apply(
+              form(injected[YesNoPageFormProvider]).fill(true),
+              viewModel(srn, index, address.addressLine1, NormalMode)
+            )
       }
     )
 

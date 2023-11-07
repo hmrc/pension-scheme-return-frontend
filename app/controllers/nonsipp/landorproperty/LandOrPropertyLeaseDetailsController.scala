@@ -28,7 +28,7 @@ import forms.mappings.errors._
 import models.SchemeId.Srn
 import models._
 import navigation.Navigator
-import pages.nonsipp.landorproperty.{LandOrPropertyAddressLookupPage, LandOrPropertyLeaseDetailsPage}
+import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandOrPropertyLeaseDetailsPage}
 import play.api.data.Form
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -60,7 +60,7 @@ class LandOrPropertyLeaseDetailsController @Inject()(
     implicit request =>
       val result = for {
         endDate <- schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourneyT
-        address <- request.userAnswers.get(LandOrPropertyAddressLookupPage(srn, index)).getOrRecoverJourneyT
+        address <- request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index)).getOrRecoverJourneyT
         preparedForm = request.userAnswers.fillForm(LandOrPropertyLeaseDetailsPage(srn, index), form(endDate.to))
       } yield Ok(view(viewModel(srn, index, address.addressLine1, preparedForm, mode)))
 
@@ -71,7 +71,7 @@ class LandOrPropertyLeaseDetailsController @Inject()(
     implicit request =>
       val result = for {
         endDate <- schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourneyT
-        address <- request.userAnswers.get(LandOrPropertyAddressLookupPage(srn, index)).getOrRecoverJourneyT
+        address <- request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index)).getOrRecoverJourneyT
       } yield {
         form(endDate.to)
           .bindFromRequest()

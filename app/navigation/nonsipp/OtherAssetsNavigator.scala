@@ -31,13 +31,16 @@ object OtherAssetsNavigator extends JourneyNavigator {
         .onPageLoad(srn, mode)
   }
 
-  override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => {
+  override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] =
+    _ =>
+      _ => {
 
-    case FeesCommissionsWagesSalariesPage(srn, mode) =>
-      controllers.nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController
-        .onPageLoad(srn, mode)
-    case FinancialDetailsCheckYourAnswersPage(srn) =>
-      controllers.nonsipp.schemedesignatory.routes.FeesCommissionsWagesSalariesController.onPageLoad(srn, NormalMode)
-  }
+        case FeesCommissionsWagesSalariesPage(srn, mode) =>
+          controllers.nonsipp.schemedesignatory.routes.FinancialDetailsCheckYourAnswersController
+            .onPageLoad(srn, mode)
+        case FinancialDetailsCheckYourAnswersPage(srn) =>
+          controllers.nonsipp.schemedesignatory.routes.FeesCommissionsWagesSalariesController
+            .onPageLoad(srn, NormalMode)
+      }
 
 }

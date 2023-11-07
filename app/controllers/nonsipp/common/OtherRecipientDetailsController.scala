@@ -25,7 +25,7 @@ import models.SchemeId.Srn
 import models.{IdentitySubject, Mode, RecipientDetails, UserAnswers}
 import navigation.Navigator
 import pages.nonsipp.common.OtherRecipientDetailsPage
-import pages.nonsipp.landorproperty.LandOrPropertyAddressLookupPage
+import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -102,7 +102,7 @@ object OtherRecipientDetailsController {
     val text = subject match {
       case IdentitySubject.LoanRecipient => ""
       case IdentitySubject.LandOrPropertySeller =>
-        userAnswers.get(LandOrPropertyAddressLookupPage(srn, index)) match {
+        userAnswers.get(LandOrPropertyChosenAddressPage(srn, index)) match {
           case Some(value) => value.addressLine1
           case None => ""
         }

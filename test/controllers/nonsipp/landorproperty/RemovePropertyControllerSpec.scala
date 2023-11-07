@@ -45,7 +45,7 @@ class RemovePropertyControllerSpec extends ControllerBaseSpec {
     .unsafeSet(LandOrPropertyTotalCostPage(srn, index), money)
     .unsafeSet(IsLandOrPropertyResidentialPage(srn, index), false)
     .unsafeSet(LandOrPropertyTotalIncomePage(srn, index), money)
-    .unsafeSet(LandOrPropertyAddressLookupPage(srn, index), address)
+    .unsafeSet(LandOrPropertyChosenAddressPage(srn, index), address)
     .unsafeSet(IsLandPropertyLeasedPage(srn, index), false)
 
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]

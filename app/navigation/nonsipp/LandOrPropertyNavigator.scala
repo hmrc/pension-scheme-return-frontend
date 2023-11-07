@@ -44,10 +44,19 @@ object LandOrPropertyNavigator extends JourneyNavigator {
     case WhatYouWillNeedLandOrPropertyPage(srn) =>
       controllers.nonsipp.landorproperty.routes.LandPropertyInUKController.onPageLoad(srn, refineMV(1), NormalMode)
 
-    case LandPropertyInUKPage(srn, index) =>
-      controllers.nonsipp.landorproperty.routes.LandOrPropertyAddressLookupController.onPageLoad(srn, index)
+    case page @ LandPropertyInUKPage(srn, index) =>
+      if (userAnswers.get(page).contains(true)) {
+        controllers.nonsipp.landorproperty.routes.LandOrPropertyPostcodeLookupController
+          .onPageLoad(srn, index, NormalMode)
+      } else {
+        controllers.nonsipp.landorproperty.routes.LandPropertyAddressManualController
+          .onPageLoad(srn, index, isUkAddress = false, NormalMode)
+      }
 
-    case LandOrPropertyAddressLookupPage(srn, index) =>
+    case LandOrPropertyPostcodeLookupPage(srn, index) =>
+      controllers.nonsipp.landorproperty.routes.LandPropertyAddressResultsController.onPageLoad(srn, index, NormalMode)
+
+    case LandOrPropertyChosenAddressPage(srn, index) =>
       controllers.nonsipp.landorproperty.routes.LandRegistryTitleNumberController
         .onPageLoad(srn, index, NormalMode)
 
@@ -112,7 +121,7 @@ object LandOrPropertyNavigator extends JourneyNavigator {
           .onPageLoad(srn, index, NormalMode)
       } else {
         controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
-          .onPageLoad(srn, index, CheckOrChange.Check)
+          .onPageLoad(srn, index, NormalMode)
       }
 
     case LandPropertyIndependentValuationPage(srn, index) =>
@@ -168,7 +177,7 @@ object LandOrPropertyNavigator extends JourneyNavigator {
           .onPageLoad(srn, index, NormalMode)
       } else {
         controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
-          .onPageLoad(srn, index, CheckOrChange.Check)
+          .onPageLoad(srn, index, NormalMode)
       }
 
     case OtherRecipientDetailsPage(srn, index, IdentitySubject.LandOrPropertySeller) =>
@@ -176,7 +185,7 @@ object LandOrPropertyNavigator extends JourneyNavigator {
         .onPageLoad(srn, index, NormalMode)
 
     case LandOrPropertyTotalIncomePage(srn, index) => //27j5
-      controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController.onPageLoad(srn, index, CheckOrChange.Check)
+      controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController.onPageLoad(srn, index, NormalMode)
 
     case LandOrPropertyCYAPage(srn) =>
       controllers.nonsipp.landorproperty.routes.LandOrPropertyListController.onPageLoad(srn, page = 1, NormalMode)
@@ -202,126 +211,179 @@ object LandOrPropertyNavigator extends JourneyNavigator {
       }
   }
 
-  override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
+  override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] =
+    oldUserAnswers =>
+      userAnswers => {
 
-    case LandOrPropertyTotalIncomePage(srn, index) =>
-      controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController.onPageLoad(srn, index, CheckOrChange.Check)
+        case page @ LandPropertyInUKPage(srn, index) =>
+          (oldUserAnswers.get(page), userAnswers.get(page)) match {
+            // chosen same answer
+            case (Some(true), Some(true)) =>
+              //check if address answer still exists
+              userAnswers.get(AddressLookupResultsPage(srn, index)) match {
+                case Some(_) =>
+                  controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
+                    .onPageLoad(srn, index, CheckMode)
+                case None =>
+                  controllers.nonsipp.landorproperty.routes.LandOrPropertyPostcodeLookupController
+                    .onPageLoad(srn, index, CheckMode)
+              }
+            case (Some(false), Some(false)) =>
+              //check if address answer still exists
+              userAnswers.get(AddressLookupResultsPage(srn, index)) match {
+                case Some(_) =>
+                  controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
+                    .onPageLoad(srn, index, CheckMode)
+                case None =>
+                  controllers.nonsipp.landorproperty.routes.LandPropertyAddressManualController
+                    .onPageLoad(srn, index, isUkAddress = false, CheckMode)
+              }
+            case (_, Some(true)) =>
+              controllers.nonsipp.landorproperty.routes.LandOrPropertyPostcodeLookupController
+                .onPageLoad(srn, index, CheckMode)
+            case (_, Some(false)) =>
+              controllers.nonsipp.landorproperty.routes.LandPropertyAddressManualController
+                .onPageLoad(srn, index, isUkAddress = false, CheckMode)
+          }
 
-    case IsLesseeConnectedPartyPage(srn, index) =>
-      controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController.onPageLoad(srn, index, CheckOrChange.Check)
+        case LandOrPropertyPostcodeLookupPage(srn, index) =>
+          controllers.nonsipp.landorproperty.routes.LandPropertyAddressResultsController
+            .onPageLoad(srn, index, CheckMode)
 
-    case LandOrPropertyLeaseDetailsPage(srn, index) =>
-      controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController.onPageLoad(srn, index, CheckOrChange.Check)
-
-    case page @ IsLandPropertyLeasedPage(srn, index) =>
-      if (userAnswers.get(page).contains(true)) {
-        controllers.nonsipp.landorproperty.routes.LandOrPropertyLeaseDetailsController
-          .onPageLoad(srn, index, NormalMode)
-      } else {
-        controllers.nonsipp.landorproperty.routes.LandOrPropertyTotalIncomeController
-          .onPageLoad(srn, index, NormalMode)
-      }
-
-    case page @ IsLandOrPropertyResidentialPage(srn, index) =>
-      if (userAnswers.get(page).contains(true)) {
-        controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
-          .onPageLoad(srn, index, CheckOrChange.Check)
-      } else {
-        controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
-          .onPageLoad(srn, index, CheckOrChange.Check)
-      }
-
-    case LandOrPropertyTotalCostPage(srn, index) =>
-      if (userAnswers.get(LandOrPropertyTotalIncomePage(srn, index)).isEmpty ||
-        (userAnswers.get(IsLandPropertyLeasedPage(srn, index)).getOrElse(false) &&
-        userAnswers.get(LandOrPropertyLeaseDetailsPage(srn, index)).isEmpty)) {
-        controllers.nonsipp.landorproperty.routes.IsLandOrPropertyResidentialController
-          .onPageLoad(srn, index, CheckMode)
-      } else {
-        controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
-          .onPageLoad(srn, index, CheckOrChange.Check)
-      }
-
-    case LandOrPropertySellerConnectedPartyPage(srn, index) =>
-      if (userAnswers.get(LandOrPropertyTotalIncomePage(srn, index)).isEmpty ||
-        userAnswers.get(LandPropertyIndependentValuationPage(srn, index)).isEmpty ||
-        userAnswers.get(LandOrPropertyTotalCostPage(srn, index)).isEmpty ||
-        (userAnswers.get(IsLandPropertyLeasedPage(srn, index)).getOrElse(false) &&
-        userAnswers.get(LandOrPropertyLeaseDetailsPage(srn, index)).isEmpty)) {
-        controllers.nonsipp.landorproperty.routes.LandPropertyIndependentValuationController
-          .onPageLoad(srn, index, NormalMode)
-      } else {
-        controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
-          .onPageLoad(srn, index, CheckOrChange.Check)
-      }
-
-    case LandPropertyIndependentValuationPage(srn, index) =>
-      controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController.onPageLoad(srn, index, CheckOrChange.Check)
-
-    case page @ WhyDoesSchemeHoldLandPropertyPage(srn, index) =>
-      userAnswers.get(page) match {
-        case Some(SchemeHoldLandProperty.Transfer) =>
+        case LandOrPropertyChosenAddressPage(srn, index) =>
           controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
-            .onPageLoad(srn, index, CheckOrChange.Check)
-        case _ =>
-          controllers.nonsipp.landorproperty.routes.WhenDidSchemeAcquireController.onPageLoad(srn, index, NormalMode)
-      }
+            .onPageLoad(srn, index, CheckMode)
 
-    case LandOrPropertyWhenDidSchemeAcquirePage(srn, index) =>
-      userAnswers.get(WhyDoesSchemeHoldLandPropertyPage(srn, index)) match {
-        case Some(SchemeHoldLandProperty.Contribution) =>
+        case LandOrPropertyTotalIncomePage(srn, index) =>
           controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
-            .onPageLoad(srn, index, CheckOrChange.Check)
-        case _ => //27h1
+            .onPageLoad(srn, index, CheckMode)
+
+        case IsLesseeConnectedPartyPage(srn, index) =>
           controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
-            .onPageLoad(srn, index, CheckOrChange.Check)
+            .onPageLoad(srn, index, CheckMode)
+
+        case LandOrPropertyLeaseDetailsPage(srn, index) =>
+          controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
+            .onPageLoad(srn, index, CheckMode)
+
+        case page @ IsLandPropertyLeasedPage(srn, index) =>
+          if (userAnswers.get(page).contains(true)) {
+            controllers.nonsipp.landorproperty.routes.LandOrPropertyLeaseDetailsController
+              .onPageLoad(srn, index, NormalMode)
+          } else {
+            controllers.nonsipp.landorproperty.routes.LandOrPropertyTotalIncomeController
+              .onPageLoad(srn, index, NormalMode)
+          }
+
+        case page @ IsLandOrPropertyResidentialPage(srn, index) =>
+          if (userAnswers.get(page).contains(true)) {
+            controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
+              .onPageLoad(srn, index, CheckMode)
+          } else {
+            controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
+              .onPageLoad(srn, index, CheckMode)
+          }
+
+        case LandOrPropertyTotalCostPage(srn, index) =>
+          if (userAnswers.get(LandOrPropertyTotalIncomePage(srn, index)).isEmpty ||
+            (userAnswers.get(IsLandPropertyLeasedPage(srn, index)).getOrElse(false) &&
+            userAnswers.get(LandOrPropertyLeaseDetailsPage(srn, index)).isEmpty)) {
+            controllers.nonsipp.landorproperty.routes.IsLandOrPropertyResidentialController
+              .onPageLoad(srn, index, CheckMode)
+          } else {
+            controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
+              .onPageLoad(srn, index, CheckMode)
+          }
+
+        case LandOrPropertySellerConnectedPartyPage(srn, index) =>
+          if (userAnswers.get(LandOrPropertyTotalIncomePage(srn, index)).isEmpty ||
+            userAnswers.get(LandPropertyIndependentValuationPage(srn, index)).isEmpty ||
+            userAnswers.get(LandOrPropertyTotalCostPage(srn, index)).isEmpty ||
+            (userAnswers.get(IsLandPropertyLeasedPage(srn, index)).getOrElse(false) &&
+            userAnswers.get(LandOrPropertyLeaseDetailsPage(srn, index)).isEmpty)) {
+            controllers.nonsipp.landorproperty.routes.LandPropertyIndependentValuationController
+              .onPageLoad(srn, index, NormalMode)
+          } else {
+            controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
+              .onPageLoad(srn, index, CheckMode)
+          }
+
+        case LandPropertyIndependentValuationPage(srn, index) =>
+          controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
+            .onPageLoad(srn, index, CheckMode)
+
+        case page @ WhyDoesSchemeHoldLandPropertyPage(srn, index) =>
+          userAnswers.get(page) match {
+            case Some(SchemeHoldLandProperty.Transfer) =>
+              controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
+                .onPageLoad(srn, index, CheckMode)
+            case _ =>
+              controllers.nonsipp.landorproperty.routes.WhenDidSchemeAcquireController
+                .onPageLoad(srn, index, NormalMode)
+          }
+
+        case LandOrPropertyWhenDidSchemeAcquirePage(srn, index) =>
+          userAnswers.get(WhyDoesSchemeHoldLandPropertyPage(srn, index)) match {
+            case Some(SchemeHoldLandProperty.Contribution) =>
+              controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
+                .onPageLoad(srn, index, CheckMode)
+            case _ => //27h1
+              controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
+                .onPageLoad(srn, index, CheckMode)
+          }
+
+        case page @ IdentityTypePage(srn, index, IdentitySubject.LandOrPropertySeller) =>
+          userAnswers.get(page) match {
+            case Some(IdentityType.Individual) =>
+              controllers.nonsipp.landorproperty.routes.LandPropertyIndividualSellersNameController
+                .onPageLoad(srn, index, NormalMode)
+
+            case Some(IdentityType.UKCompany) =>
+              controllers.nonsipp.landorproperty.routes.CompanySellerNameController
+                .onPageLoad(srn, index, NormalMode) //27h4
+
+            case Some(IdentityType.UKPartnership) =>
+              controllers.nonsipp.landorproperty.routes.PartnershipSellerNameController
+                .onPageLoad(srn, index, NormalMode) //27h6
+
+            case Some(IdentityType.Other) =>
+              controllers.nonsipp.common.routes.OtherRecipientDetailsController
+                .onPageLoad(srn, index, NormalMode, IdentitySubject.LandOrPropertySeller)
+
+            case _ => controllers.routes.UnauthorisedController.onPageLoad()
+
+          }
+
+        case CompanySellerNamePage(srn, index) =>
+          controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
+            .onPageLoad(srn, index, CheckMode)
+
+        case CompanyRecipientCrnPage(srn, index, IdentitySubject.LandOrPropertySeller) =>
+          controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
+            .onPageLoad(srn, index, CheckMode)
+
+        case PartnershipSellerNamePage(srn, index) => //27h6
+          controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
+            .onPageLoad(srn, index, CheckMode) //27h7
+
+        case PartnershipRecipientUtrPage(srn, index, IdentitySubject.LandOrPropertySeller) => //27h7
+          controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
+            .onPageLoad(srn, index, CheckMode)
+
+        case LandPropertyIndividualSellersNamePage(srn, index) =>
+          controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
+            .onPageLoad(srn, index, CheckMode)
+
+        case page @ IndividualSellerNiPage(srn, index) =>
+          controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
+            .onPageLoad(srn, index, CheckMode)
+
+        case OtherRecipientDetailsPage(srn, index, IdentitySubject.LandOrPropertySeller) =>
+          controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
+            .onPageLoad(srn, index, CheckMode)
+
+        case LandRegistryTitleNumberPage(srn, index) =>
+          controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
+            .onPageLoad(srn, index, CheckMode)
       }
-
-    case page @ IdentityTypePage(srn, index, IdentitySubject.LandOrPropertySeller) =>
-      userAnswers.get(page) match {
-        case Some(IdentityType.Individual) =>
-          controllers.nonsipp.landorproperty.routes.LandPropertyIndividualSellersNameController
-            .onPageLoad(srn, index, NormalMode)
-
-        case Some(IdentityType.UKCompany) =>
-          controllers.nonsipp.landorproperty.routes.CompanySellerNameController
-            .onPageLoad(srn, index, NormalMode) //27h4
-
-        case Some(IdentityType.UKPartnership) =>
-          controllers.nonsipp.landorproperty.routes.PartnershipSellerNameController
-            .onPageLoad(srn, index, NormalMode) //27h6
-
-        case Some(IdentityType.Other) =>
-          controllers.nonsipp.common.routes.OtherRecipientDetailsController
-            .onPageLoad(srn, index, NormalMode, IdentitySubject.LandOrPropertySeller)
-
-        case _ => controllers.routes.UnauthorisedController.onPageLoad()
-
-      }
-
-    case CompanySellerNamePage(srn, index) =>
-      controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController.onPageLoad(srn, index, CheckOrChange.Check)
-
-    case CompanyRecipientCrnPage(srn, index, IdentitySubject.LandOrPropertySeller) =>
-      controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController.onPageLoad(srn, index, CheckOrChange.Check)
-
-    case PartnershipSellerNamePage(srn, index) => //27h6
-      controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
-        .onPageLoad(srn, index, CheckOrChange.Check) //27h7
-
-    case PartnershipRecipientUtrPage(srn, index, IdentitySubject.LandOrPropertySeller) => //27h7
-      controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController.onPageLoad(srn, index, CheckOrChange.Check)
-
-    case LandPropertyIndividualSellersNamePage(srn, index) =>
-      controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController.onPageLoad(srn, index, CheckOrChange.Check)
-
-    case page @ IndividualSellerNiPage(srn, index) =>
-      controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController.onPageLoad(srn, index, CheckOrChange.Check)
-
-    case OtherRecipientDetailsPage(srn, index, IdentitySubject.LandOrPropertySeller) =>
-      controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController.onPageLoad(srn, index, CheckOrChange.Check)
-
-    case LandRegistryTitleNumberPage(srn, index) =>
-      controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController.onPageLoad(srn, index, CheckOrChange.Check)
-  }
 }

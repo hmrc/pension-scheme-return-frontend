@@ -24,7 +24,7 @@ import forms.RadioListFormProvider
 import models.SchemeId.Srn
 import models.{Mode, SchemeHoldLandProperty}
 import navigation.Navigator
-import pages.nonsipp.landorproperty.{LandOrPropertyAddressLookupPage, WhyDoesSchemeHoldLandPropertyPage}
+import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, WhyDoesSchemeHoldLandPropertyPage}
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -52,7 +52,7 @@ class WhyDoesSchemeHoldLandPropertyController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      request.userAnswers.get(LandOrPropertyAddressLookupPage(srn, index)).getOrRecoverJourney { address =>
+      request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index)).getOrRecoverJourney { address =>
         val preparedForm = request.userAnswers.fillForm(WhyDoesSchemeHoldLandPropertyPage(srn, index), form)
         Ok(view(preparedForm, viewModel(srn, index, request.schemeDetails.schemeName, address.addressLine1, mode)))
       }
@@ -64,7 +64,7 @@ class WhyDoesSchemeHoldLandPropertyController @Inject()(
         .bindFromRequest()
         .fold(
           errors =>
-            request.userAnswers.get(LandOrPropertyAddressLookupPage(srn, index)).getOrRecoverJourney { address =>
+            request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index)).getOrRecoverJourney { address =>
               Future.successful(
                 BadRequest(
                   view(errors, viewModel(srn, index, request.schemeDetails.schemeName, address.addressLine1, mode))

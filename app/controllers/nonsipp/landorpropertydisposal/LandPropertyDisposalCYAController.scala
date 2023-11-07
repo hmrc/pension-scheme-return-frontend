@@ -26,7 +26,7 @@ import models.SchemeId.Srn
 import models._
 import models.requests.DataRequest
 import navigation.Navigator
-import pages.nonsipp.landorproperty.LandOrPropertyAddressLookupPage
+import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import pages.nonsipp.landorpropertydisposal._
 import play.api.i18n._
 import play.api.mvc._
@@ -63,7 +63,7 @@ class LandPropertyDisposalCYAController @Inject()(
       (
         for {
           howWasPropertyDisposed <- requiredPage(HowWasPropertyDisposedOfPage(srn, index, disposalIndex))
-          addressLookUpPage <- requiredPage(LandOrPropertyAddressLookupPage(srn, index))
+          addressLookUpPage <- requiredPage(LandOrPropertyChosenAddressPage(srn, index))
           landOrPropertyStillHeld <- requiredPage(LandOrPropertyStillHeldPage(srn, index, disposalIndex))
 
           totalProceedsSale = Option.when(howWasPropertyDisposed == Sold)(

@@ -21,7 +21,7 @@ import play.api.mvc.Call
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.DisplayMessage
-import viewmodels.DisplayMessage.Message
+import viewmodels.DisplayMessage.{InlineMessage, Message}
 import viewmodels.govuk.summarylist._
 
 case class CheckYourAnswersViewModel(
@@ -55,30 +55,10 @@ object CheckYourAnswersViewModel {
 
 case class CheckYourAnswersRowViewModel(
   key: Message,
-  value: Message,
+  value: DisplayMessage,
   actions: Seq[SummaryAction],
   oneHalfWidth: Boolean = false
 ) {
-
-  def toSummaryListRow(implicit messages: Messages): SummaryListRow =
-    SummaryListRowViewModel(
-      key = if (oneHalfWidth) KeyViewModel(key.toMessage).withOneHalfWidth() else KeyViewModel(key.toMessage),
-      value = ValueViewModel(value.toMessage),
-      actions = actions.map { a =>
-        ActionItemViewModel(Text(a.content.toMessage), a.href)
-          .withVisuallyHiddenText(a.visuallyHiddenContent.toMessage)
-      }
-    )
-
-  def toSummaryListRowPartitioned(implicit messages: Messages): SummaryListRow =
-    SummaryListRowViewModel(
-      key = if (oneHalfWidth) KeyViewModel(key.toMessage).withOneHalfWidth() else KeyViewModel(key.toMessage),
-      value = ValueViewModel(value.toMessage).withCssClass("govuk-!-width-one-quarter"),
-      actions = actions.map { a =>
-        ActionItemViewModel(Text(a.content.toMessage), a.href)
-          .withVisuallyHiddenText(a.visuallyHiddenContent.toMessage)
-      }
-    )
 
   def withAction(action: SummaryAction): CheckYourAnswersRowViewModel =
     copy(actions = actions :+ action)
@@ -117,7 +97,7 @@ object CheckYourAnswersRowViewModel {
 
   def apply(
     key: Message,
-    value: Message
+    value: DisplayMessage
   ): CheckYourAnswersRowViewModel =
     CheckYourAnswersRowViewModel(key, value, Seq())
 }

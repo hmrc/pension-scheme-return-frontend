@@ -28,6 +28,8 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads, HttpResponse}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
+import utils.JsonUtils._
+import models.ALFAddress._
 
 class AddressLookupConnector @Inject()(http: HttpClient, appConfig: FrontendAppConfig)(
   implicit ec: ExecutionContext
@@ -35,6 +37,19 @@ class AddressLookupConnector @Inject()(http: HttpClient, appConfig: FrontendAppC
 
   private val initUrl = appConfig.addressLookupFrontend.baseUrl + "/api/v2/init"
   private val confirmedAddressUrl = appConfig.addressLookupFrontend.baseUrl + "/api/v2/confirmed"
+
+  private val addressLookupUrl = appConfig.addressLookup.baseUrl + "/lookup"
+
+  def lookup(address: String, filter: Option[String])(implicit hc: HeaderCarrier): Future[List[ALFAddressResponse]] =
+    http
+      .POST[JsObject, List[ALFAddressResponse]](
+        addressLookupUrl,
+        Json.obj("postcode" -> address) +? filter.map(f => Json.obj("filter" -> f)),
+        headers = List(
+          "User-Agent" -> "pension-scheme-return-frontend",
+          "Content-Type" -> "application/json"
+        )
+      )
 
   def init(continueUrl: String, isUkAddress: Boolean)(implicit hc: HeaderCarrier, messages: Messages): Future[String] =
     http

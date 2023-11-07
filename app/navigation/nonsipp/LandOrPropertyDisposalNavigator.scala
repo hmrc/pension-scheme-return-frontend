@@ -147,92 +147,90 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
 
   }
 
-  override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
+  override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] =
+    _ =>
+      userAnswers => {
 
-    case page @ HowWasPropertyDisposedOfPage(srn, landOrPropertyIndex, disposalIndex, hasAnswerChanged) => //41c
-      userAnswers.get(page) match {
-        case None => controllers.routes.UnauthorisedController.onPageLoad()
-        case _ if hasAnswerChanged =>
+        case page @ HowWasPropertyDisposedOfPage(srn, landOrPropertyIndex, disposalIndex, hasAnswerChanged) => //41c
+          userAnswers.get(page) match {
+            case None => controllers.routes.UnauthorisedController.onPageLoad()
+            case _ if hasAnswerChanged =>
+              controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
+                .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
+            case Some(HowDisposed.Sold) =>
+              controllers.nonsipp.landorpropertydisposal.routes.WhenWasPropertySoldController
+                .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
+            case Some(HowDisposed.Transferred) | Some(HowDisposed.Other(_)) =>
+              controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyStillHeldController
+                .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
+          }
+
+        case WhenWasPropertySoldPage(srn, landOrPropertyIndex, disposalIndex) =>
           controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
-            .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
-        case Some(HowDisposed.Sold) =>
-          controllers.nonsipp.landorpropertydisposal.routes.WhenWasPropertySoldController
-            .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
-        case Some(HowDisposed.Transferred) | Some(HowDisposed.Other(_)) =>
-          controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyStillHeldController
-            .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
+            .onPageLoad(srn, landOrPropertyIndex, disposalIndex, CheckMode)
+
+        case LandOrPropertyStillHeldPage(srn, landOrPropertyIndex, disposalIndex) => //41d
+          controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
+            .onPageLoad(srn, landOrPropertyIndex, disposalIndex, CheckMode)
+
+        case DisposalIndependentValuationPage(srn, landOrPropertyIndex, disposalIndex) =>
+          controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
+            .onPageLoad(srn, landOrPropertyIndex, disposalIndex, CheckMode)
+
+        case TotalProceedsSaleLandPropertyPage(srn, landOrPropertyIndex, disposalIndex) =>
+          controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
+            .onPageLoad(srn, landOrPropertyIndex, disposalIndex, CheckMode)
+
+        case WhoPurchasedLandOrPropertyPage(srn, landOrPropertyIndex, disposalIndex) =>
+          userAnswers.get(WhoPurchasedLandOrPropertyPage(srn, landOrPropertyIndex, disposalIndex)) match {
+
+            case Some(IdentityType.Individual) =>
+              controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyIndividualBuyerNameController
+                .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
+
+            case Some(IdentityType.UKCompany) =>
+              controllers.nonsipp.landorpropertydisposal.routes.CompanyBuyerNameController
+                .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
+
+            case Some(IdentityType.UKPartnership) =>
+              controllers.nonsipp.landorpropertydisposal.routes.PartnershipBuyerNameController
+                .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
+
+            case Some(IdentityType.Other) =>
+              controllers.nonsipp.landorpropertydisposal.routes.OtherBuyerDetailsController
+                .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
+          }
+
+        case CompanyBuyerNamePage(srn, landOrPropertyIndex, disposalIndex) =>
+          controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
+            .onPageLoad(srn, landOrPropertyIndex, disposalIndex, CheckMode)
+
+        case CompanyBuyerCrnPage(srn, landOrPropertyIndex, disposalIndex) =>
+          controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
+            .onPageLoad(srn, landOrPropertyIndex, disposalIndex, CheckMode)
+
+        case IndividualBuyerNinoNumberPage(srn, landOrPropertyIndex, disposalIndex) =>
+          controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
+            .onPageLoad(srn, landOrPropertyIndex, disposalIndex, CheckMode)
+
+        case LandOrPropertyIndividualBuyerNamePage(srn, landOrPropertyIndex, disposalIndex) =>
+          controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
+            .onPageLoad(srn, landOrPropertyIndex, disposalIndex, CheckMode)
+
+        case PartnershipBuyerNamePage(srn, landOrPropertyIndex, disposalIndex) =>
+          controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
+            .onPageLoad(srn, landOrPropertyIndex, disposalIndex, CheckMode)
+
+        case OtherBuyerDetailsPage(srn, landOrPropertyIndex, disposalIndex) =>
+          controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
+            .onPageLoad(srn, landOrPropertyIndex, disposalIndex, CheckMode)
+
+        case PartnershipBuyerUtrPage(srn, landOrPropertyIndex, disposalIndex) =>
+          controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
+            .onPageLoad(srn, landOrPropertyIndex, disposalIndex, CheckMode)
+
+        case LandOrPropertyDisposalAddressListPage(srn, addressChoice, disposalChoice) =>
+          controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
+            .onPageLoad(srn, addressChoice, disposalChoice, CheckMode)
       }
-
-    case WhenWasPropertySoldPage(srn, landOrPropertyIndex, disposalIndex) =>
-      controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
-        .onPageLoad(srn, landOrPropertyIndex, disposalIndex, CheckMode)
-
-    case LandOrPropertyStillHeldPage(srn, landOrPropertyIndex, disposalIndex) => //41d
-      controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
-        .onPageLoad(srn, landOrPropertyIndex, disposalIndex, CheckMode)
-
-    case DisposalIndependentValuationPage(srn, landOrPropertyIndex, disposalIndex) =>
-      controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
-        .onPageLoad(srn, landOrPropertyIndex, disposalIndex, CheckMode)
-
-    case TotalProceedsSaleLandPropertyPage(srn, landOrPropertyIndex, disposalIndex) =>
-      controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
-        .onPageLoad(srn, landOrPropertyIndex, disposalIndex, CheckMode)
-
-    case LandOrPropertyDisposalBuyerConnectedPartyPage(srn, index, disposalIndex) =>
-      controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
-        .onPageLoad(srn, index, disposalIndex, CheckMode)
-
-    case WhoPurchasedLandOrPropertyPage(srn, landOrPropertyIndex, disposalIndex) =>
-      userAnswers.get(WhoPurchasedLandOrPropertyPage(srn, landOrPropertyIndex, disposalIndex)) match {
-
-        case Some(IdentityType.Individual) =>
-          controllers.nonsipp.landorpropertydisposal.routes.LandOrPropertyIndividualBuyerNameController
-            .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
-
-        case Some(IdentityType.UKCompany) =>
-          controllers.nonsipp.landorpropertydisposal.routes.CompanyBuyerNameController
-            .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
-
-        case Some(IdentityType.UKPartnership) =>
-          controllers.nonsipp.landorpropertydisposal.routes.PartnershipBuyerNameController
-            .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
-
-        case Some(IdentityType.Other) =>
-          controllers.nonsipp.landorpropertydisposal.routes.OtherBuyerDetailsController
-            .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
-      }
-
-    case CompanyBuyerNamePage(srn, landOrPropertyIndex, disposalIndex) =>
-      controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
-        .onPageLoad(srn, landOrPropertyIndex, disposalIndex, CheckMode)
-
-    case CompanyBuyerCrnPage(srn, landOrPropertyIndex, disposalIndex) =>
-      controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
-        .onPageLoad(srn, landOrPropertyIndex, disposalIndex, CheckMode)
-
-    case IndividualBuyerNinoNumberPage(srn, landOrPropertyIndex, disposalIndex) =>
-      controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
-        .onPageLoad(srn, landOrPropertyIndex, disposalIndex, CheckMode)
-
-    case LandOrPropertyIndividualBuyerNamePage(srn, landOrPropertyIndex, disposalIndex) =>
-      controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
-        .onPageLoad(srn, landOrPropertyIndex, disposalIndex, CheckMode)
-
-    case PartnershipBuyerNamePage(srn, landOrPropertyIndex, disposalIndex) =>
-      controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
-        .onPageLoad(srn, landOrPropertyIndex, disposalIndex, CheckMode)
-
-    case OtherBuyerDetailsPage(srn, landOrPropertyIndex, disposalIndex) =>
-      controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
-        .onPageLoad(srn, landOrPropertyIndex, disposalIndex, CheckMode)
-
-    case PartnershipBuyerUtrPage(srn, landOrPropertyIndex, disposalIndex) =>
-      controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
-        .onPageLoad(srn, landOrPropertyIndex, disposalIndex, CheckMode)
-
-    case LandOrPropertyDisposalAddressListPage(srn, addressChoice, disposalChoice) =>
-      controllers.nonsipp.landorpropertydisposal.routes.LandPropertyDisposalCYAController
-        .onPageLoad(srn, addressChoice, disposalChoice, CheckMode)
-  }
 }

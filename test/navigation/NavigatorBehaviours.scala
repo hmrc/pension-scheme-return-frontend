@@ -21,6 +21,7 @@ import eu.timepit.refined.api.{Refined, Validate}
 import eu.timepit.refined.refineV
 import generators.IndexGen
 import models.SchemeId.Srn
+import models.requests.DataRequest
 import models.{CheckMode, IdentitySubject, Mode, NormalMode, UserAnswers}
 import org.scalacheck.Gen
 import org.scalatest.EitherValues
@@ -28,6 +29,7 @@ import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import pages.{Page, QuestionPage}
 import play.api.libs.json.Writes
 import play.api.mvc.Call
+import play.api.test.FakeRequest
 import utils.BaseSpec
 import utils.UserAnswersUtils.UserAnswersOps
 
@@ -38,6 +40,8 @@ trait NavigatorBehaviours extends ScalaCheckPropertyChecks with EitherValues wit
   protected trait AllModes {
 
     import Behaviours._
+
+    implicit val req = DataRequest(allowedAccessRequestGen(FakeRequest()).sample.value, defaultUserAnswers)
 
     protected def navigateTo(mode: Mode)(
       page: Srn => Page,

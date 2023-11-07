@@ -22,7 +22,7 @@ import controllers.nonsipp.landorproperty.WhenDidSchemeAcquireController._
 import eu.timepit.refined.refineMV
 import forms.DatePageFormProvider
 import models.{NormalMode, UserAnswers}
-import pages.nonsipp.landorproperty.{LandOrPropertyAddressLookupPage, LandOrPropertyWhenDidSchemeAcquirePage}
+import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandOrPropertyWhenDidSchemeAcquirePage}
 import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
 import services.SchemeDateService
@@ -44,7 +44,7 @@ class WhenDidSchemeAcquireControllerSpec extends ControllerBaseSpec {
     reset(mockSchemeDateService)
 
   val populatedUserAnswers: UserAnswers =
-    defaultUserAnswers.set(LandOrPropertyAddressLookupPage(srn, index), address).get
+    defaultUserAnswers.set(LandOrPropertyChosenAddressPage(srn, index), address).get
   private lazy val onPageLoad = routes.WhenDidSchemeAcquireController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.WhenDidSchemeAcquireController.onSubmit(srn, index, NormalMode)
 

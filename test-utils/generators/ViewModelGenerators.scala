@@ -20,6 +20,7 @@ import cats.data.NonEmptyList
 import org.scalacheck.Gen
 import play.api.data.{Form, FormError}
 import viewmodels.DisplayMessage.Message
+import viewmodels.InputWidth
 import viewmodels.models.MultipleQuestionsViewModel.{DoubleQuestion, SingleQuestion, TripleQuestion}
 import viewmodels.models.TaskListStatus.TaskListStatus
 import viewmodels.models._
@@ -245,7 +246,7 @@ trait ViewModelGenerators extends BasicGenerators {
       hint <- Gen.option(nonEmptyInlineMessage)
       fieldType <- Gen.oneOf(FieldType.Input, FieldType.Date, FieldType.Currency)
     } yield {
-      QuestionField(label, hint, fieldType)
+      QuestionField(label, hint, Some(InputWidth.Full), fieldType)
     }
 
   def singleQuestionGen[A](form: Form[A]): Gen[SingleQuestion[A]] =

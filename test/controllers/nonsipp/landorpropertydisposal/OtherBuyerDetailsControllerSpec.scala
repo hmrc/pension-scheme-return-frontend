@@ -21,7 +21,7 @@ import controllers.ControllerBaseSpec
 import eu.timepit.refined.refineMV
 import forms.RecipientDetailsFormProvider
 import models.{NormalMode, RecipientDetails}
-import pages.nonsipp.landorproperty.LandOrPropertyAddressLookupPage
+import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import pages.nonsipp.landorpropertydisposal.OtherBuyerDetailsPage
 import views.html.RecipientDetailsView
 
@@ -37,7 +37,7 @@ class OtherBuyerDetailsControllerSpec extends ControllerBaseSpec {
     controllers.nonsipp.landorpropertydisposal.routes.OtherBuyerDetailsController
       .onSubmit(srn, index, disposalIndex, NormalMode)
 
-  val updatedUserAnswers = defaultUserAnswers.unsafeSet(LandOrPropertyAddressLookupPage(srn, index), address)
+  val updatedUserAnswers = defaultUserAnswers.unsafeSet(LandOrPropertyChosenAddressPage(srn, index), address)
 
   private val validForm = List(
     "name" -> "name",
