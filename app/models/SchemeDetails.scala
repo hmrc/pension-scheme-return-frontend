@@ -152,10 +152,10 @@ object MinimalSchemeDetails {
   }
 
   implicit val reads: Reads[MinimalSchemeDetails] =
-    ((__ \ "name")
+    (__ \ "name")
       .read[String]
       .and((__ \ "referenceNumber").read[String])
       .and((__ \ "schemeStatus").read[SchemeStatus])
       .and((__ \ "openDate").readNullable[LocalDate])
-      .and((__ \ "windUpDate").readNullable[LocalDate]))(MinimalSchemeDetails.apply _)
+      .and((__ \ "windUpDate").readNullable[LocalDate])(MinimalSchemeDetails.apply _)
 }

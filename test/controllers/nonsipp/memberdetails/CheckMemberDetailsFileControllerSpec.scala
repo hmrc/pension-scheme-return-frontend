@@ -24,8 +24,6 @@ import forms.YesNoPageFormProvider
 import models.UploadStatus.UploadStatus
 import models._
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
-import org.mockito.MockitoSugar.when
 import pages.nonsipp.memberdetails.CheckMemberDetailsFilePage
 import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule

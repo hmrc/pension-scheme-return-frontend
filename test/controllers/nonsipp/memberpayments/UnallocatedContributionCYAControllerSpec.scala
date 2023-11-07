@@ -16,9 +16,7 @@
 
 package controllers.nonsipp.memberpayments
 
-import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
-import eu.timepit.refined.refineMV
 import models.CheckOrChange
 import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.memberpayments.UnallocatedEmployerAmountPage
@@ -37,8 +35,6 @@ class UnallocatedContributionCYAControllerSpec extends ControllerBaseSpec {
 
   override protected def beforeAll(): Unit =
     reset(mockPsrSubmissionService)
-
-  private val index = refineMV[OneTo5000](1)
 
   private def onPageLoad(checkOrChange: CheckOrChange) =
     routes.UnallocatedContributionCYAController.onPageLoad(srn, checkOrChange)
