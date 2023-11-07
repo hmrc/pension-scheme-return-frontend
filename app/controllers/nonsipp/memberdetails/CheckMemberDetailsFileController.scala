@@ -34,6 +34,7 @@ import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 import views.html.YesNoPageView
 
+import java.time.LocalDate
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -80,7 +81,7 @@ class CheckMemberDetailsFileController @Inject()(
             case Some(file) =>
               for {
                 source <- uploadService.stream(file.downloadUrl)
-                validated <- uploadValidator.validateCSV(source, srn, request)
+                validated <- uploadValidator.validateCSV(source, srn, request, None)
                 _ <- uploadService.saveValidatedUpload(uploadKey, validated)
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(CheckMemberDetailsFilePage(srn), value))
                 _ <- saveService.save(updatedAnswers)
