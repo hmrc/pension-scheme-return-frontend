@@ -17,7 +17,7 @@
 package models.audit
 
 import models.UploadStatus.UploadStatus
-import models.{DateRange, UploadCallbackDetails, UploadStatus}
+import models.{DateRange, UploadStatus}
 
 case class PSRUpscanFileUploadAuditEvent(
   schemeName: String,

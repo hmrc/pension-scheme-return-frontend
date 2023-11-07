@@ -34,11 +34,10 @@ object Crn extends (String => Crn) {
   implicit val crnRead: Reads[Crn] = new SimpleObjectReads[Crn]("crn", Crn.apply)
 
   private val validCrnFormat = "^[A-Za-z0-9 ]*$"
-  private val minLength = 7
-  private val maxLength = 8
+  private val length = 8
 
   def isValid(crn: String) = crn != null && crn.matches(validCrnFormat)
-  def isLengthInRange(crn: String) = crn != null && (minLength to maxLength contains cutSpaces(crn).length)
+  def isLengthInRange(crn: String) = crn != null && (cutSpaces(crn).length == length)
 
   //To do not let spaces tamper the length check
   private def cutSpaces(crn: String): String = crn.replaceAll("\\s", "")

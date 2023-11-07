@@ -350,8 +350,8 @@ class MappingsSpec extends AnyFreeSpec with Matchers with OptionValues with Mapp
     val testForm = Form("value" -> crn("error.required", "error.invalid", "error.minmax"))
 
     "must bind a valid value" in {
-      val result = testForm.bind(Map("value" -> "1234567"))
-      result.get mustEqual Crn("1234567")
+      val result = testForm.bind(Map("value" -> "12345678"))
+      result.get mustEqual Crn("12345678")
     }
 
     "must not bind an empty value" in {
