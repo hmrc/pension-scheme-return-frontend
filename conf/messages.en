@@ -1121,6 +1121,7 @@ landOrPropertyList.paragraph = You must tell us about all land or property the s
 landOrPropertyList.inset = You cannot add another land or property as you have entered the maximum of 5,000.
 landOrPropertyList.radios = Do you need to add another land or property?
 landOrPropertyList.radios.error.required = Select yes if you need to add another land or property
+landOrPropertyList.pagination.label = Showing {0} - {1} of {2} land or properties
 
 landOrPropertyStillHeld.title = Is any part of the land or property still held by the scheme?
 landOrPropertyStillHeld.heading = Is any part of {0} still held by {1}?
