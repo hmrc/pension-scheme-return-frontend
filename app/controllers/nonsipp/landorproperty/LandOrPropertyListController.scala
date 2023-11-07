@@ -129,7 +129,7 @@ object LandOrPropertyListController {
         inset = "landOrPropertyList.inset",
         rows(srn, mode, addresses),
         Message("landOrPropertyList.radios"),
-        showRadios = addresses.size < 25,
+        showRadios = addresses.size < Constants.maxLandOrProperties,
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(
