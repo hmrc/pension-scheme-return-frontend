@@ -84,13 +84,15 @@ class MemberDetailsUploadValidatorSpec extends BaseSpec with TestValues {
 
           val source = Source.single(ByteString(csv))
 
-          validator.validateCSV(source, mockSrn, mockReq).futureValue mustBe UploadSuccess(
+          val actual = validator.validateCSV(source, mockSrn, mockReq).futureValue
+          actual._1 mustBe UploadSuccess(
             List(
               UploadMemberDetails(1, NameDOB("Jason", "Lawrence", LocalDate.of(1989, 10, 6)), Right(Nino("AB123456A"))),
               UploadMemberDetails(2, NameDOB("Pearl", "Parsons", LocalDate.of(1990, 4, 12)), Left("reason")),
               UploadMemberDetails(3, NameDOB("Katherine", "Kennedy", LocalDate.of(1985, 1, 30)), Left("reason"))
             )
           )
+          actual._2 mustBe 3
         }
     }
 
@@ -104,12 +106,14 @@ class MemberDetailsUploadValidatorSpec extends BaseSpec with TestValues {
 
       val source = Source.single(ByteString(csv))
 
-      validator.validateCSV(source, mockSrn, mockReq).futureValue mustBe UploadErrors(
+      val actual = validator.validateCSV(source, mockSrn, mockReq).futureValue
+      actual._1 mustBe UploadErrors(
         NonEmptyList.of(
           ValidationError("C1", ValidationErrorType.DateOfBirth, "memberDetails.dateOfBirth.error.invalid.date"),
           ValidationError("C2", ValidationErrorType.DateOfBirth, "memberDetails.dateOfBirth.error.format")
         )
       )
+      actual._2 mustBe 3
     }
 
     "successfully collect required errors when mandatory csv values is missing" in {
@@ -123,12 +127,14 @@ class MemberDetailsUploadValidatorSpec extends BaseSpec with TestValues {
 
       val source = Source.single(ByteString(csv))
 
-      validator.validateCSV(source, mockSrn, mockReq).futureValue mustBe UploadErrors(
+      val actual = validator.validateCSV(source, mockSrn, mockReq).futureValue
+      actual._1 mustBe UploadErrors(
         NonEmptyList.of(
           ValidationError("B2", ValidationErrorType.LastName, "memberDetails.lastName.error.required"),
           ValidationError("A3", ValidationErrorType.FirstName, "memberDetails.firstName.error.required")
         )
       )
+      actual._2 mustBe 4
     }
 
     "successfully collect duplicate Nino error" in {
@@ -141,11 +147,13 @@ class MemberDetailsUploadValidatorSpec extends BaseSpec with TestValues {
 
       val source = Source.single(ByteString(csv))
 
-      validator.validateCSV(source, mockSrn, mockReq).futureValue mustBe UploadErrors(
+      val actual = validator.validateCSV(source, mockSrn, mockReq).futureValue
+      actual._1 mustBe UploadErrors(
         NonEmptyList.of(
           ValidationError("D2", ValidationErrorType.DuplicateNino, "memberDetailsNino.error.duplicate")
         )
       )
+      actual._2 mustBe 3
     }
 
     "successfully collect invalid Nino error" in {
@@ -158,11 +166,13 @@ class MemberDetailsUploadValidatorSpec extends BaseSpec with TestValues {
 
       val source = Source.single(ByteString(csv))
 
-      validator.validateCSV(source, mockSrn, mockReq).futureValue mustBe UploadErrors(
+      val actual = validator.validateCSV(source, mockSrn, mockReq).futureValue
+      actual._1 mustBe UploadErrors(
         NonEmptyList.of(
           ValidationError("D2", ValidationErrorType.NinoFormat, "memberDetailsNino.error.invalid")
         )
       )
+      actual._2 mustBe 3
     }
 
     "fails when both Nino and No Nino reason are present" in {
@@ -175,7 +185,9 @@ class MemberDetailsUploadValidatorSpec extends BaseSpec with TestValues {
 
       val source = Source.single(ByteString(csv))
 
-      validator.validateCSV(source, mockSrn, mockReq).futureValue mustBe UploadFormatError
+      val actual = validator.validateCSV(source, mockSrn, mockReq).futureValue
+      actual._1 mustBe UploadFormatError
+      actual._2 mustBe 2
     }
 
     "fails when no rows provided" in {
@@ -184,7 +196,9 @@ class MemberDetailsUploadValidatorSpec extends BaseSpec with TestValues {
 
       val source = Source.single(ByteString(csv))
 
-      validator.validateCSV(source, mockSrn, mockReq).futureValue mustBe UploadFormatError
+      val actual = validator.validateCSV(source, mockSrn, mockReq).futureValue
+      actual._1 mustBe UploadFormatError
+      actual._2 mustBe 0
     }
 
     "fails when empty file sent" in {
@@ -193,10 +207,12 @@ class MemberDetailsUploadValidatorSpec extends BaseSpec with TestValues {
 
       val source = Source.single(ByteString(csv))
 
-      validator.validateCSV(source, mockSrn, mockReq).futureValue mustBe UploadFormatError
+      val actual = validator.validateCSV(source, mockSrn, mockReq).futureValue
+      actual._1 mustBe UploadFormatError
+      actual._2 mustBe 0
     }
 
-    "fail when there are more than 99 entries" in {
+    "fail when there are more than 300 entries" in {
 
       val csv =
         (validHeaders :: List.fill(301)(validRow)).mkString("\n")
@@ -205,7 +221,9 @@ class MemberDetailsUploadValidatorSpec extends BaseSpec with TestValues {
 
       val source = Source.single(ByteString(csv))
 
-      validator.validateCSV(source, mockSrn, mockReq).futureValue mustBe UploadMaxRowsError
+      val actual = validator.validateCSV(source, mockSrn, mockReq).futureValue
+      actual._1 mustBe UploadMaxRowsError
+      actual._2 mustBe 301
     }
 
     "successfully collects different errors" in {
@@ -221,7 +239,8 @@ class MemberDetailsUploadValidatorSpec extends BaseSpec with TestValues {
 
       val source = Source.single(ByteString(csv))
 
-      validator.validateCSV(source, mockSrn, mockReq).futureValue mustBe UploadErrors(
+      val actual = validator.validateCSV(source, mockSrn, mockReq).futureValue
+      actual._1 mustBe UploadErrors(
         NonEmptyList.of(
           ValidationError("A2", ValidationErrorType.FirstName, "memberDetails.firstName.error.invalid"),
           ValidationError("B3", ValidationErrorType.LastName, "memberDetails.lastName.error.invalid"),
@@ -230,6 +249,7 @@ class MemberDetailsUploadValidatorSpec extends BaseSpec with TestValues {
           ValidationError("D6", ValidationErrorType.NinoFormat, "memberDetailsNino.error.invalid")
         )
       )
+      actual._2 mustBe 6
     }
   }
 }
