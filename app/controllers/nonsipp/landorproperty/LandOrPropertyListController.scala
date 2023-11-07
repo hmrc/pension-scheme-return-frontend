@@ -20,6 +20,7 @@ import com.google.inject.Inject
 import config.Constants
 import config.Constants.maxLandOrProperties
 import config.Refined.Max5000
+import controllers.PSRController
 import controllers.actions._
 import eu.timepit.refined.refineV
 import forms.YesNoPageFormProvider
@@ -29,9 +30,8 @@ import models.{Address, Mode, NormalMode, Pagination}
 import navigation.Navigator
 import pages.nonsipp.landorproperty.{LandOrPropertyAddressLookupPages, LandOrPropertyListPage}
 import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.{Message, ParagraphMessage}
 import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, ListRow, ListViewModel, PaginatedViewModel}
@@ -46,8 +46,7 @@ class LandOrPropertyListController @Inject()(
   val controllerComponents: MessagesControllerComponents,
   view: ListView,
   formProvider: YesNoPageFormProvider
-) extends FrontendBaseController
-    with I18nSupport {
+) extends PSRController {
 
   val form = LandOrPropertyListController.form(formProvider)
 
@@ -99,11 +98,11 @@ object LandOrPropertyListController {
             List(
               ListRow(
                 address.addressLine1,
-                changeUrl = controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
+                changeUrl = routes.LandOrPropertyCYAController
                   .onPageLoad(srn, index, Change)
                   .url,
                 changeHiddenText = Message("landOrPropertyList.row.change.hiddenText", address.addressLine1),
-                controllers.nonsipp.landorproperty.routes.RemovePropertyController.onPageLoad(srn, index, mode).url,
+                routes.RemovePropertyController.onPageLoad(srn, index, mode).url,
                 Message("landOrPropertyList.row.remove.hiddenText")
               )
             )
@@ -117,9 +116,9 @@ object LandOrPropertyListController {
 
     val pagination = Pagination(
       currentPage = page,
-      pageSize = Constants.loanPageSize,
+      pageSize = Constants.landOrPropertiesSize,
       addresses.size,
-      controllers.nonsipp.landorproperty.routes.LandOrPropertyListController.onPageLoad(srn, _, NormalMode)
+      routes.LandOrPropertyListController.onPageLoad(srn, _, NormalMode)
     )
 
     FormPageViewModel(
@@ -143,7 +142,7 @@ object LandOrPropertyListController {
           )
         )
       ),
-      controllers.nonsipp.landorproperty.routes.LandOrPropertyListController.onSubmit(srn, page, mode)
+      routes.LandOrPropertyListController.onSubmit(srn, page, mode)
     )
   }
 }
