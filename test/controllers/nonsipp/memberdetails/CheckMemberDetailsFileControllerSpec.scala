@@ -103,7 +103,7 @@ class CheckMemberDetailsFileControllerSpec extends ControllerBaseSpec {
           mockGetUploadStatus(Some(uploadedSuccessfully))
         })
         .after({
-          verify(mockAuditService, times(1)).sendEvent(any())(any(), any())
+          verify(mockAuditService, times(2)).sendEvent(any())(any(), any())
           reset(mockAuditService)
         })
     )

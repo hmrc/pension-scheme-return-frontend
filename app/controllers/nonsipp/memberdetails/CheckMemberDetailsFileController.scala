@@ -23,9 +23,19 @@ import controllers.nonsipp.memberdetails.CheckMemberDetailsFileController._
 import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
 import models.UploadStatus.UploadStatus
-import models.audit.{PSRUpscanFileDownloadAuditEvent, PSRUpscanFileUploadAuditEvent}
+import models.audit.{PSRFileValidationAuditEvent, PSRUpscanFileDownloadAuditEvent, PSRUpscanFileUploadAuditEvent}
 import models.requests.DataRequest
-import models.{DateRange, Mode, UploadKey, UploadStatus}
+import models.{
+  DateRange,
+  Mode,
+  Upload,
+  UploadErrors,
+  UploadFormatError,
+  UploadKey,
+  UploadMaxRowsError,
+  UploadStatus,
+  UploadSuccess
+}
 import navigation.Navigator
 import pages.nonsipp.memberdetails.CheckMemberDetailsFilePage
 import play.api.data.Form
@@ -98,7 +108,10 @@ class CheckMemberDetailsFileController @Inject()(
                   auditDownload(srn, source._1, startTime)
                   uploadValidator.validateCSV(source._2, srn, request)
                 }
-                _ <- uploadService.saveValidatedUpload(uploadKey, validated._1)
+                _ <- {
+                  auditValidation(srn, validated, startTime)
+                  uploadService.saveValidatedUpload(uploadKey, validated._1)
+                }
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(CheckMemberDetailsFilePage(srn), value))
                 _ <- saveService.save(updatedAnswers)
               } yield Redirect(navigator.nextPage(CheckMemberDetailsFilePage(srn), mode, updatedAnswers))
@@ -166,6 +179,42 @@ class CheckMemberDetailsFileController @Inject()(
       _ = auditService.sendEvent(buildDownloadAuditEvent(taxYear, responseStatus, duration))
     } yield taxYear
   }
+
+  private def auditValidation(srn: Srn, outcome: (Upload, Int), startTime: Long)(
+    implicit request: DataRequest[_]
+  ): Unit = {
+    val endTime = System.currentTimeMillis
+    val duration = endTime - startTime
+    for {
+      taxYear <- schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney
+      _ = auditService.sendEvent(buildValidationAuditEvent(taxYear, outcome, duration))
+    } yield taxYear
+  }
+
+  private def buildValidationAuditEvent(taxYear: DateRange, outcome: (Upload, Int), duration: Long)(
+    implicit req: DataRequest[_]
+  ) = PSRFileValidationAuditEvent(
+    schemeName = req.schemeDetails.schemeName,
+    schemeAdministratorName = req.schemeDetails.establishers.headOption.get.name,
+    psaOrPspId = req.pensionSchemeId.value,
+    schemeTaxReference = req.schemeDetails.pstr,
+    affinityGroup = if (req.minimalDetails.organisationName.nonEmpty) "Organisation" else "Individual",
+    credentialRole = if (req.pensionSchemeId.isPSP) "PSP" else "PSA",
+    taxYear = taxYear,
+    validationCheckStatus = outcome._1 match {
+      case _: UploadSuccess => "Success"
+      case _ => "Failed"
+    },
+    fileValidationTimeInMilliSeconds = duration,
+    numberOfEntries = outcome._2,
+    numberOfFailures = outcome._1 match {
+      case _: UploadSuccess => 0
+      case errors: UploadErrors => errors.errors.size
+      case _: UploadMaxRowsError.type => 1
+      case _: UploadFormatError.type => 1
+      case _ => 0
+    }
+  )
 }
 
 object CheckMemberDetailsFileController {
