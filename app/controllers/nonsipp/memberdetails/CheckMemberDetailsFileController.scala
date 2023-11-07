@@ -109,7 +109,7 @@ class CheckMemberDetailsFileController @Inject()(
                   uploadValidator.validateCSV(source._2, srn, request)
                 }
                 _ <- {
-                  auditValidation(srn, validated, startTime)
+                  auditValidation(srn, validated)
                   uploadService.saveValidatedUpload(uploadKey, validated._1)
                 }
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(CheckMemberDetailsFilePage(srn), value))
@@ -171,27 +171,21 @@ class CheckMemberDetailsFileController @Inject()(
     duration
   )
 
-  private def auditDownload(srn: Srn, responseStatus: Int, startTime: Long)(implicit request: DataRequest[_]): Unit = {
-    val endTime = System.currentTimeMillis
-    val duration = endTime - startTime
+  private def auditDownload(srn: Srn, responseStatus: Int, duration: Long)(implicit request: DataRequest[_]): Unit =
     for {
       taxYear <- schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney
       _ = auditService.sendEvent(buildDownloadAuditEvent(taxYear, responseStatus, duration))
     } yield taxYear
-  }
 
-  private def auditValidation(srn: Srn, outcome: (Upload, Int), startTime: Long)(
+  private def auditValidation(srn: Srn, outcome: (Upload, Int, Long))(
     implicit request: DataRequest[_]
-  ): Unit = {
-    val endTime = System.currentTimeMillis
-    val duration = endTime - startTime
+  ): Unit =
     for {
       taxYear <- schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney
-      _ = auditService.sendEvent(buildValidationAuditEvent(taxYear, outcome, duration))
+      _ = auditService.sendEvent(buildValidationAuditEvent(taxYear, outcome))
     } yield taxYear
-  }
 
-  private def buildValidationAuditEvent(taxYear: DateRange, outcome: (Upload, Int), duration: Long)(
+  private def buildValidationAuditEvent(taxYear: DateRange, outcome: (Upload, Int, Long))(
     implicit req: DataRequest[_]
   ) = PSRFileValidationAuditEvent(
     schemeName = req.schemeDetails.schemeName,
@@ -205,7 +199,7 @@ class CheckMemberDetailsFileController @Inject()(
       case _: UploadSuccess => "Success"
       case _ => "Failed"
     },
-    fileValidationTimeInMilliSeconds = duration,
+    fileValidationTimeInMilliSeconds = outcome._3,
     numberOfEntries = outcome._2,
     numberOfFailures = outcome._1 match {
       case _: UploadSuccess => 0

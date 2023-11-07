@@ -84,13 +84,15 @@ class MemberDetailsUploadValidatorSpec extends BaseSpec with TestValues {
 
           val source = Source.single(ByteString(csv))
 
-          validator.validateCSV(source, mockSrn, mockReq).futureValue mustBe (UploadSuccess(
+          val actual = validator.validateCSV(source, mockSrn, mockReq).futureValue
+          actual._1 mustBe UploadSuccess(
             List(
               UploadMemberDetails(1, NameDOB("Jason", "Lawrence", LocalDate.of(1989, 10, 6)), Right(Nino("AB123456A"))),
               UploadMemberDetails(2, NameDOB("Pearl", "Parsons", LocalDate.of(1990, 4, 12)), Left("reason")),
               UploadMemberDetails(3, NameDOB("Katherine", "Kennedy", LocalDate.of(1985, 1, 30)), Left("reason"))
             )
-          ), 3)
+          )
+          actual._2 mustBe 3
         }
     }
 
@@ -104,12 +106,14 @@ class MemberDetailsUploadValidatorSpec extends BaseSpec with TestValues {
 
       val source = Source.single(ByteString(csv))
 
-      validator.validateCSV(source, mockSrn, mockReq).futureValue mustBe (UploadErrors(
+      val actual = validator.validateCSV(source, mockSrn, mockReq).futureValue
+      actual._1 mustBe UploadErrors(
         NonEmptyList.of(
           ValidationError("C1", ValidationErrorType.DateOfBirth, "memberDetails.dateOfBirth.error.invalid.date"),
           ValidationError("C2", ValidationErrorType.DateOfBirth, "memberDetails.dateOfBirth.error.format")
         )
-      ), 3)
+      )
+      actual._2 mustBe 3
     }
 
     "successfully collect required errors when mandatory csv values is missing" in {

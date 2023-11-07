@@ -74,7 +74,8 @@ class MemberDetailsUploadValidator @Inject()(
     source: Source[ByteString, _],
     srn: Srn,
     request: DataRequest[AnyContent]
-  )(implicit mat: Materializer, messages: Messages): Future[(Upload, Int)] = {
+  )(implicit mat: Materializer, messages: Messages): Future[(Upload, Int, Long)] = {
+    val startTime = System.currentTimeMillis
     val counter = new AtomicInteger()
     val csvFrames = source.via(csvFrame)
     (for {
@@ -119,9 +120,9 @@ class MemberDetailsUploadValidator @Inject()(
             UploadSuccess(previous.memberDetails ++ current.memberDetails)
           case (_, memberDetails: UploadSuccess) => memberDetails
         }
-    } yield (validated, counter.get()))
+    } yield (validated, counter.get(), System.currentTimeMillis - startTime))
       .recover {
-        case _: NoSuchElementException => (UploadFormatError, 0)
+        case _: NoSuchElementException => (UploadFormatError, 0, System.currentTimeMillis - startTime)
       }
   }
 

@@ -68,7 +68,7 @@ class CheckMemberDetailsFileControllerSpec extends ControllerBaseSpec {
     reset(mockAuditService)
     mockStream()
     mockSaveValidatedUpload()
-    mockValidateCSV(UploadFormatError, 0)
+    mockValidateCSV(UploadFormatError, 0, 0L)
   }
 
   "CheckMemberDetailsFileController" - {
@@ -118,7 +118,7 @@ class CheckMemberDetailsFileControllerSpec extends ControllerBaseSpec {
   private def mockStream(): Unit =
     when(mockUploadService.stream(any())(any())).thenReturn(Future.successful((200, Source.single(byteString))))
 
-  private def mockValidateCSV(result: (Upload, Int)): Unit =
+  private def mockValidateCSV(result: (Upload, Int, Long)): Unit =
     when(mockMemberDetailsUploadValidator.validateCSV(any(), any(), any())(any(), any()))
       .thenReturn(Future.successful(result))
 
