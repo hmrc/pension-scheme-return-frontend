@@ -29,7 +29,7 @@ import models.SchemeId.Srn
 import models.requests.DataRequest
 import models.{Address, Mode, NormalMode, Pagination}
 import navigation.Navigator
-import pages.nonsipp.landorproperty.LandOrPropertyAddressLookupPage
+import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import pages.nonsipp.landorpropertydisposal._
 import play.api.data.Form
 import play.api.i18n.MessagesApi
@@ -118,7 +118,7 @@ class LandOrPropertyDisposalListController @Inject()(
       .map {
         case indexes @ (landOrPropertyIndex, _) =>
           request.userAnswers
-            .get(LandOrPropertyAddressLookupPage(srn, landOrPropertyIndex))
+            .get(LandOrPropertyChosenAddressPage(srn, landOrPropertyIndex))
             .getOrRecoverJourney
             .map(address => (indexes, address))
       }

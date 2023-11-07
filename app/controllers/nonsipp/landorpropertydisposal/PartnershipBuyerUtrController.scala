@@ -20,6 +20,7 @@ import config.Refined.{Max50, Max5000}
 import controllers.actions.IdentifyAndRequireData
 import forms.YesNoPageFormProvider
 import forms.mappings.Mappings
+import forms.mappings.errors.InputFormErrors
 import models.SchemeId.Srn
 import models.{ConditionalYesNo, Mode, Utr}
 import navigation.Navigator
@@ -99,14 +100,16 @@ class PartnershipBuyerUtrController @Inject()(
 
 object PartnershipBuyerUtrController {
 
+  private val noFormErrors = InputFormErrors.textArea(
+    "partnershipBuyerUtr.no.conditional.error.required",
+    "partnershipBuyerUtr.no.conditional.error.invalid",
+    "partnershipBuyerUtr.no.conditional.error.length"
+  )
+
   def form(formProvider: YesNoPageFormProvider): Form[Either[String, Utr]] =
     formProvider.conditional(
       "partnershipBuyerUtr.error.required",
-      mappingNo = Mappings.textArea(
-        "partnershipBuyerUtr.no.conditional.error.required",
-        "partnershipBuyerUtr.no.conditional.error.invalid",
-        "partnershipBuyerUtr.no.conditional.error.length"
-      ),
+      mappingNo = Mappings.input(noFormErrors),
       mappingYes = Mappings.utr(
         "partnershipBuyerUtr.yes.conditional.error.required",
         "partnershipBuyerUtr.yes.conditional.error.invalid",

@@ -129,27 +129,30 @@ object MemberDetailsNavigator extends JourneyNavigator {
       case Right(nextIndex) => routes.MemberDetailsController.onPageLoad(srn, nextIndex, NormalMode)
     }
 
-  override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
-    case MemberDetailsPage(srn, index) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, Check)
-    case page @ DoesMemberHaveNinoPage(srn, index) =>
-      userAnswers.get(page) match {
-        case Some(true) if userAnswers.get(MemberDetailsNinoPage(srn, index)).isEmpty =>
-          routes.MemberDetailsNinoController.onPageLoad(srn, index, CheckMode)
-        case Some(false) if userAnswers.get(NoNINOPage(srn, index)).isEmpty =>
-          routes.NoNINOController.onPageLoad(srn, index, CheckMode)
-        case Some(_) =>
+  override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] =
+    _ =>
+      userAnswers => {
+        case MemberDetailsPage(srn, index) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, Check)
+        case page @ DoesMemberHaveNinoPage(srn, index) =>
+          userAnswers.get(page) match {
+            case Some(true) if userAnswers.get(MemberDetailsNinoPage(srn, index)).isEmpty =>
+              routes.MemberDetailsNinoController.onPageLoad(srn, index, CheckMode)
+            case Some(false) if userAnswers.get(NoNINOPage(srn, index)).isEmpty =>
+              routes.NoNINOController.onPageLoad(srn, index, CheckMode)
+            case Some(_) =>
+              routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, Check)
+            case None =>
+              routes.DoesSchemeMemberHaveNINOController.onPageLoad(srn, index, CheckMode)
+          }
+        case MemberDetailsNinoPage(srn, index) =>
           routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, Check)
-        case None =>
-          routes.DoesSchemeMemberHaveNINOController.onPageLoad(srn, index, CheckMode)
+        case NoNINOPage(srn, index) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, Check)
+        case UploadMemberDetailsPage(srn) => routes.CheckMemberDetailsFileController.onPageLoad(srn, CheckMode)
+        case page @ CheckMemberDetailsFilePage(srn) =>
+          if (userAnswers.get(page).contains(true)) {
+            controllers.routes.UnauthorisedController.onPageLoad()
+          } else {
+            routes.UploadMemberDetailsController.onPageLoad(srn)
+          }
       }
-    case MemberDetailsNinoPage(srn, index) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, Check)
-    case NoNINOPage(srn, index) => routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, Check)
-    case UploadMemberDetailsPage(srn) => routes.CheckMemberDetailsFileController.onPageLoad(srn, CheckMode)
-    case page @ CheckMemberDetailsFilePage(srn) =>
-      if (userAnswers.get(page).contains(true)) {
-        controllers.routes.UnauthorisedController.onPageLoad()
-      } else {
-        routes.UploadMemberDetailsController.onPageLoad(srn)
-      }
-  }
 }

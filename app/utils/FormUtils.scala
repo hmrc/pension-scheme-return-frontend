@@ -17,7 +17,7 @@
 package utils
 
 import models.requests.DataRequest
-import play.api.data.Form
+import play.api.data.{Form, FormError}
 import play.api.libs.json.Reads
 import queries.Gettable
 
@@ -31,5 +31,14 @@ object FormUtils {
 
     def fromUserAnswers(page: Gettable[A])(implicit rds: Reads[A], request: DataRequest[_]): Form[A] =
       request.userAnswers.get(page).fold(form)(form.fill)
+
+    // removes any additional form errors that use the same key
+    val uniqueFormErrors: Form[A] = {
+      val formErrors = form.errors.foldLeft[List[FormError]](Nil)(
+        (errors, err) => if (errors.map(_.key).contains(err.key)) errors else errors :+ err
+      )
+
+      form.copy(errors = formErrors)
+    }
   }
 }

@@ -24,7 +24,7 @@ import models.SchemeId.Srn
 import models.Mode
 import models.requests.DataRequest
 import navigation.Navigator
-import pages.nonsipp.landorproperty.{LandOrPropertyAddressLookupPage, LandPropertyInUKPage, RemovePropertyPage}
+import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandPropertyInUKPage, RemovePropertyPage}
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -53,7 +53,7 @@ class RemovePropertyController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      request.userAnswers.get(LandOrPropertyAddressLookupPage(srn, index)).getOrRecoverJourney { address =>
+      request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index)).getOrRecoverJourney { address =>
         val preparedForm = request.userAnswers.fillForm(RemovePropertyPage(srn, index), form)
         Ok(view(preparedForm, RemovePropertyController.viewModel(srn, index, mode, address.addressLine1)))
       }
@@ -65,7 +65,7 @@ class RemovePropertyController @Inject()(
         .bindFromRequest()
         .fold(
           errors =>
-            request.userAnswers.get(LandOrPropertyAddressLookupPage(srn, index)).getOrRecoverJourney { address =>
+            request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index)).getOrRecoverJourney { address =>
               Future.successful(
                 BadRequest(
                   view(errors, RemovePropertyController.viewModel(srn, index, mode, address.addressLine1))

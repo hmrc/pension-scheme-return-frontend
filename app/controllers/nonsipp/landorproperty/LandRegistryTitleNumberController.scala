@@ -27,7 +27,7 @@ import forms.mappings.errors._
 import models.SchemeId.Srn
 import models._
 import navigation.Navigator
-import pages.nonsipp.landorproperty.{LandOrPropertyAddressLookupPage, LandRegistryTitleNumberPage}
+import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandRegistryTitleNumberPage}
 import play.api.data.Form
 import play.api.i18n._
 import play.api.mvc._
@@ -55,7 +55,7 @@ class LandRegistryTitleNumberController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      request.userAnswers.get(LandOrPropertyAddressLookupPage(srn, index)).getOrRecoverJourney { address =>
+      request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index)).getOrRecoverJourney { address =>
         val preparedForm = request.userAnswers.fillForm(LandRegistryTitleNumberPage(srn, index), form)
         Ok(view(preparedForm, viewModel(srn, index, address.addressLine1, mode)))
       }
@@ -67,7 +67,7 @@ class LandRegistryTitleNumberController @Inject()(
         .bindFromRequest()
         .fold(
           formWithErrors => {
-            request.userAnswers.get(LandOrPropertyAddressLookupPage(srn, index)).getOrRecoverJourney { address =>
+            request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index)).getOrRecoverJourney { address =>
               Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, address.addressLine1, mode))))
             }
           },
@@ -89,16 +89,15 @@ object LandRegistryTitleNumberController {
     "landRegistryTitleNumber.no.conditional.error.length"
   )
 
-  private val yesFormErrors = InputFormErrors(
+  private val yesFormErrors = InputFormErrors.input(
     "landRegistryTitleNumber.yes.conditional.error.required",
     "landRegistryTitleNumber.yes.conditional.error.invalid",
-    titleNumberRegex,
-    (maxTitleNumberLength, "landRegistryTitleNumber.yes.conditional.error.length")
+    "landRegistryTitleNumber.yes.conditional.error.length"
   )
 
   def form(formProvider: YesNoPageFormProvider): Form[Either[String, String]] = formProvider.conditional(
     "landRegistryTitleNumber.error.required",
-    mappingNo = Mappings.textArea(noFormErrors),
+    mappingNo = Mappings.input(noFormErrors),
     mappingYes = Mappings.input(yesFormErrors)
   )
 

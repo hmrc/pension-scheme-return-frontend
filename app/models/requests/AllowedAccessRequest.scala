@@ -16,13 +16,15 @@
 
 package models.requests
 
+import models.SchemeId.Srn
 import models.{MinimalDetails, PensionSchemeId, SchemeDetails}
 import play.api.mvc.WrappedRequest
 
 case class AllowedAccessRequest[A](
   request: IdentifierRequest[A],
   schemeDetails: SchemeDetails,
-  minimalDetails: MinimalDetails
+  minimalDetails: MinimalDetails,
+  srn: Srn
 ) extends WrappedRequest[A](request) {
 
   val getUserId: String = request.getUserId

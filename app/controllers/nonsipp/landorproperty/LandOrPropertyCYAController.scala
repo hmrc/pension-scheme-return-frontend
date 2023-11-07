@@ -54,14 +54,14 @@ class LandOrPropertyCYAController @Inject()(
   def onPageLoad(
     srn: Srn,
     index: Max5000,
-    checkOrChange: CheckOrChange
+    mode: Mode
   ): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       (
         for {
           landOrPropertyInUk <- requiredPage(LandPropertyInUKPage(srn, index))
           landRegistryTitleNumber <- requiredPage(LandRegistryTitleNumberPage(srn, index))
-          addressLookUpPage <- requiredPage(LandOrPropertyAddressLookupPage(srn, index))
+          addressLookUpPage <- requiredPage(LandOrPropertyChosenAddressPage(srn, index))
           holdLandProperty <- requiredPage(WhyDoesSchemeHoldLandPropertyPage(srn, index))
           landOrPropertyTotalCost <- requiredPage(LandOrPropertyTotalCostPage(srn, index))
 
@@ -160,7 +160,7 @@ class LandOrPropertyCYAController @Inject()(
                 landOrPropertyTotalIncome,
                 addressLookUpPage,
                 leaseDetails,
-                checkOrChange
+                mode
               )
             )
           )
@@ -169,7 +169,7 @@ class LandOrPropertyCYAController @Inject()(
 
     }
 
-  def onSubmit(srn: Srn, checkOrChange: CheckOrChange): Action[AnyContent] =
+  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       psrSubmissionService.submitPsrDetails(srn).map {
         case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
@@ -198,15 +198,15 @@ case class ViewModelParameters(
   landOrPropertyTotalIncome: Money,
   addressLookUpPage: Address,
   leaseDetails: Option[(String, Money, LocalDate, Boolean)],
-  checkOrChange: CheckOrChange
+  mode: Mode
 )
 object LandOrPropertyCYAController {
   def viewModel(parameters: ViewModelParameters): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](
-      title = parameters.checkOrChange.fold(check = "checkYourAnswers.title", change = "landOrPropertyCYA.change.title"),
-      heading = parameters.checkOrChange.fold(
-        check = "checkYourAnswers.heading",
-        change = Message("landOrPropertyCYA.change.heading", parameters.addressLookUpPage.addressLine1)
+      title = parameters.mode.fold(normal = "checkYourAnswers.title", check = "landOrPropertyCYA.change.title"),
+      heading = parameters.mode.fold(
+        normal = "checkYourAnswers.heading",
+        check = Message("landOrPropertyCYA.change.heading", parameters.addressLookUpPage.addressLine1)
       ),
       description = Some(ParagraphMessage("landOrPropertyCYA.paragraph")),
       page = CheckYourAnswersViewModel(
@@ -234,8 +234,8 @@ object LandOrPropertyCYAController {
         )
       ),
       refresh = None,
-      buttonText = parameters.checkOrChange.fold(check = "site.saveAndContinue", change = "site.continue"),
-      onSubmit = routes.LandOrPropertyCYAController.onSubmit(parameters.srn, parameters.checkOrChange)
+      buttonText = parameters.mode.fold(normal = "site.saveAndContinue", check = "site.continue"),
+      onSubmit = routes.LandOrPropertyCYAController.onSubmit(parameters.srn, parameters.mode)
     )
 
   private def sections(
@@ -381,11 +381,11 @@ object LandOrPropertyCYAController {
           ),
           CheckYourAnswersRowViewModel(
             "landOrPropertyCYA.section1.address",
-            address.addressLine1
+            ListMessage(address.asNel.map(Message(_)), ListType.NewLine)
           ).withAction(
             SummaryAction(
               "site.change",
-              routes.LandOrPropertyAddressLookupController.onPageLoad(srn, index).url + "#registryTitleQuestion"
+              routes.LandOrPropertyPostcodeLookupController.onPageLoad(srn, index, mode).url
             ).withVisuallyHiddenContent("landOrPropertyCYA.section1.addressInfo.hidden")
           ),
           CheckYourAnswersRowViewModel(

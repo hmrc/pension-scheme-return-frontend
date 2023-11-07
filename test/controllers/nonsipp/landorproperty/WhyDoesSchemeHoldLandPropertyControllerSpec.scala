@@ -22,7 +22,7 @@ import controllers.nonsipp.landorproperty.WhyDoesSchemeHoldLandPropertyControlle
 import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
 import models.{NormalMode, SchemeHoldLandProperty}
-import pages.nonsipp.landorproperty.{LandOrPropertyAddressLookupPage, WhyDoesSchemeHoldLandPropertyPage}
+import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, WhyDoesSchemeHoldLandPropertyPage}
 import views.html.RadioListView
 
 class WhyDoesSchemeHoldLandPropertyControllerSpec extends ControllerBaseSpec {
@@ -33,7 +33,7 @@ class WhyDoesSchemeHoldLandPropertyControllerSpec extends ControllerBaseSpec {
   lazy val onSubmit = routes.WhyDoesSchemeHoldLandPropertyController.onSubmit(srn, index, NormalMode)
 
   private val userAnswersWithLookUpPage =
-    defaultUserAnswers.unsafeSet(LandOrPropertyAddressLookupPage(srn, index), address)
+    defaultUserAnswers.unsafeSet(LandOrPropertyChosenAddressPage(srn, index), address)
 
   "WhyDoesSchemeHoldLandPropertyController" - {
 

@@ -56,26 +56,27 @@ object AccountingPeriodNavigator extends JourneyNavigator {
       routes.AccountingPeriodListController.onPageLoad(srn, mode)
   }
 
-  val checkRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
+  val checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] = _ =>
+    userAnswers => {
 
-    case AccountingPeriodPage(srn, index, mode) =>
-      routes.AccountingPeriodCheckYourAnswersController.onPageLoad(srn, index, mode)
+      case AccountingPeriodPage(srn, index, mode) =>
+        routes.AccountingPeriodCheckYourAnswersController.onPageLoad(srn, index, mode)
 
-    case AccountingPeriodCheckYourAnswersPage(srn, mode) =>
-      routes.AccountingPeriodListController.onPageLoad(srn, mode)
+      case AccountingPeriodCheckYourAnswersPage(srn, mode) =>
+        routes.AccountingPeriodListController.onPageLoad(srn, mode)
 
-    case AccountingPeriodListPage(srn, false, mode) =>
-      controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, mode)
+      case AccountingPeriodListPage(srn, false, mode) =>
+        controllers.nonsipp.routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, mode)
 
-    case AccountingPeriodListPage(srn, true, mode) =>
-      val count = userAnswers.list(AccountingPeriods(srn)).length
-      refineV[OneToThree](count + 1).fold(
-        _ => nonsipp.schemedesignatory.routes.ActiveBankAccountController.onPageLoad(srn, mode),
-        index => routes.AccountingPeriodController.onPageLoad(srn, index, mode)
-      )
+      case AccountingPeriodListPage(srn, true, mode) =>
+        val count = userAnswers.list(AccountingPeriods(srn)).length
+        refineV[OneToThree](count + 1).fold(
+          _ => nonsipp.schemedesignatory.routes.ActiveBankAccountController.onPageLoad(srn, mode),
+          index => routes.AccountingPeriodController.onPageLoad(srn, index, mode)
+        )
 
-    case RemoveAccountingPeriodPage(srn, mode) =>
-      routes.AccountingPeriodListController.onPageLoad(srn, mode)
-  }
+      case RemoveAccountingPeriodPage(srn, mode) =>
+        routes.AccountingPeriodListController.onPageLoad(srn, mode)
+    }
 
 }

@@ -17,6 +17,7 @@
 package models.requests
 
 import controllers.routes
+import models.SchemeId.Srn
 import models.{MinimalDetails, PensionSchemeId, SchemeDetails, UserAnswers}
 import play.api.libs.json.Reads
 import play.api.mvc.Results.Redirect
@@ -33,6 +34,8 @@ case class OptionalDataRequest[A](request: AllowedAccessRequest[A], userAnswers:
   val pensionSchemeId: PensionSchemeId = request.pensionSchemeId
 
   val schemeDetails: SchemeDetails = request.schemeDetails
+
+  val srn: Srn = request.srn
 }
 
 case class DataRequest[A](request: AllowedAccessRequest[A], userAnswers: UserAnswers)
@@ -45,6 +48,8 @@ case class DataRequest[A](request: AllowedAccessRequest[A], userAnswers: UserAns
   val schemeDetails: SchemeDetails = request.schemeDetails
 
   val minimalDetails: MinimalDetails = request.minimalDetails
+
+  val srn: Srn = request.srn
 
   def usingAnswer[B: Reads](page: Gettable[B]): UsingAnswer[B] = new UsingAnswer(page, userAnswers)
 }

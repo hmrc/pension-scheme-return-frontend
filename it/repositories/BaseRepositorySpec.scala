@@ -1,7 +1,7 @@
 package repositories
 
 import generators.Generators
-import models.{Reference, SchemeId, UploadKey}
+import models.{ErrorDetails, Reference, SchemeId, UploadKey, UploadStatus}
 import org.mockito.MockitoSugar
 import org.scalatest.OptionValues
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
@@ -27,4 +27,5 @@ trait BaseRepositorySpec[A] extends AnyFreeSpec
   val reference: Reference = Reference("test-ref")
   val instant: Instant = Instant.now.truncatedTo(ChronoUnit.MILLIS)
   val stubClock: Clock = Clock.fixed(instant, ZoneId.systemDefault)
+  val failure: UploadStatus.Failed = UploadStatus.Failed(ErrorDetails("reason", "message"))
 }

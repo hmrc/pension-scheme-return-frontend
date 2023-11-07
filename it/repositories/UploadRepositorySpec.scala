@@ -48,11 +48,11 @@ class UploadRepositorySpec extends BaseRepositorySpec[MongoUpload] {
     "successfully update the ttl and status to failed" in {
       insertInitialUploadDetails()
 
-      val updateResult: Unit = repository.updateStatus(reference, UploadStatus.Failed).futureValue
+      val updateResult: Unit = repository.updateStatus(reference, failure).futureValue
       val findAfterUpdateResult = find(Filters.equal("id", uploadKey.value)).futureValue.headOption.value
 
       updateResult mustBe ()
-      findAfterUpdateResult mustBe initialMongoUpload.copy(status = SensitiveUploadStatus(UploadStatus.Failed), lastUpdated = instant)
+      findAfterUpdateResult mustBe initialMongoUpload.copy(status = SensitiveUploadStatus(failure), lastUpdated = instant)
     }
 
     "successfully update the ttl and status to success" in {

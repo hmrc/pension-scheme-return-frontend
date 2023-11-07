@@ -153,7 +153,7 @@ object UnallocatedContributionCYAController {
             ).withVisuallyHiddenContent(Message("unallocatedEmployerCYA.section.hide", schemeName)),
             SummaryAction(
               "site.remove",
-              controllers.routes.UnauthorisedController.onPageLoad().url //TODO add the link to the Remove Controller
+              controllers.nonsipp.memberpayments.routes.RemoveUnallocatedAmountController.onSubmit(srn, mode).url
             ).withVisuallyHiddenContent(Message("unallocatedEmployerCYA.section.hide", schemeName))
           )
         )

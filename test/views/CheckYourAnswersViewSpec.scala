@@ -17,6 +17,7 @@
 package views
 
 import play.api.test.FakeRequest
+import viewmodels.DisplayMessage.Message
 import viewmodels.models.{CheckYourAnswersViewModel, SummaryAction}
 import views.html.CheckYourAnswersView
 
@@ -46,7 +47,9 @@ class CheckYourAnswersViewSpec extends ViewSpec {
       "render the summary list values" in {
 
         forAll(viewModelGen) { viewModel =>
-          val values = viewModel.page.sections.flatMap(_.rows.map(_.value.key))
+          val values = viewModel.page.sections.flatMap(_.rows.collect(_.value match {
+            case m: Message => m.key
+          }))
           summaryListValues(view(viewModel)) must contain theSameElementsAs values
         }
       }

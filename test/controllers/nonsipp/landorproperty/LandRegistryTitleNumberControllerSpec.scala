@@ -22,7 +22,7 @@ import controllers.nonsipp.landorproperty.LandRegistryTitleNumberController._
 import eu.timepit.refined.refineMV
 import forms._
 import models.{ConditionalYesNo, NormalMode}
-import pages.nonsipp.landorproperty.{LandOrPropertyAddressLookupPage, LandRegistryTitleNumberPage}
+import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandRegistryTitleNumberPage}
 import views.html._
 
 class LandRegistryTitleNumberControllerSpec extends ControllerBaseSpec {
@@ -32,7 +32,7 @@ class LandRegistryTitleNumberControllerSpec extends ControllerBaseSpec {
   private lazy val onSubmit = routes.LandRegistryTitleNumberController.onSubmit(srn, index, NormalMode)
 
   private val userAnswersWithLookUpPage =
-    defaultUserAnswers.unsafeSet(LandOrPropertyAddressLookupPage(srn, index), address)
+    defaultUserAnswers.unsafeSet(LandOrPropertyChosenAddressPage(srn, index), address)
 
   "LandRegistryTitleNumberController" - {
 

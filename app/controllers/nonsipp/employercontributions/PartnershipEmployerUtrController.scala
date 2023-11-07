@@ -21,6 +21,7 @@ import controllers.actions.IdentifyAndRequireData
 import controllers.nonsipp.employercontributions.PartnershipEmployerUtrController._
 import forms.YesNoPageFormProvider
 import forms.mappings.Mappings
+import forms.mappings.errors.InputFormErrors
 import models.SchemeId.Srn
 import models.{ConditionalYesNo, Mode, Utr}
 import navigation.Navigator
@@ -92,14 +93,16 @@ class PartnershipEmployerUtrController @Inject()(
 
 object PartnershipEmployerUtrController {
 
+  private val noFormErrors = InputFormErrors.input(
+    "partnershipEmployerUtr.no.conditional.error.required",
+    "partnershipEmployerUtr.no.conditional.error.invalid",
+    "partnershipEmployerUtr.no.conditional.error.length"
+  )
+
   def form(formProvider: YesNoPageFormProvider): Form[Either[String, Utr]] =
     formProvider.conditional(
       "partnershipEmployerUtr.error.required",
-      mappingNo = Mappings.textArea(
-        "partnershipEmployerUtr.no.conditional.error.required",
-        "partnershipEmployerUtr.no.conditional.error.invalid",
-        "partnershipEmployerUtr.no.conditional.error.length"
-      ),
+      mappingNo = Mappings.input(noFormErrors),
       mappingYes = Mappings.utr(
         "partnershipEmployerUtr.yes.conditional.error.required",
         "partnershipEmployerUtr.yes.conditional.error.invalid"

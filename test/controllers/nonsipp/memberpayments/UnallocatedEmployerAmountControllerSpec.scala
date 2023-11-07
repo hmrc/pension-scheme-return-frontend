@@ -16,17 +16,11 @@
 
 package controllers.nonsipp.memberpayments
 
-import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
-import eu.timepit.refined.refineMV
 import forms.mappings.errors.MoneyFormErrorProvider
 import models.NormalMode
 import pages.nonsipp.memberpayments.UnallocatedEmployerAmountPage
 import views.html.MoneyView
-
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.util.Locale
 
 class UnallocatedEmployerAmountControllerSpec extends ControllerBaseSpec {
 
@@ -34,19 +28,6 @@ class UnallocatedEmployerAmountControllerSpec extends ControllerBaseSpec {
   private lazy val onSubmit = routes.UnallocatedEmployerAmountController.onSubmit(srn, NormalMode)
 
   "ValueOfSchemeAssetsWhenMoneyBorrowedController" - {
-
-    val myform = UnallocatedEmployerAmountController
-    val schemeName = defaultSchemeDetails.schemeName
-
-    def formatDate(
-      date: LocalDate
-    ): String = {
-      val inputFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-      val outputFormat = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH)
-      val dateParsed = LocalDate.parse(date.toString, inputFormat)
-      dateParsed.format(outputFormat)
-
-    }
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       injected[MoneyView].apply(

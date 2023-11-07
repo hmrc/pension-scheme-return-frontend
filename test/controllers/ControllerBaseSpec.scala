@@ -23,9 +23,9 @@ import generators.ModelGenerators._
 import models.PensionSchemeId.PsaId
 import models.SchemeId.Srn
 import models.UserAnswers.SensitiveJsObject
-import models.{NameDOB, _}
+import models._
 import org.scalatest.OptionValues
-import pages.nonsipp.landorproperty.LandOrPropertyAddressLookupPage
+import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import pages.nonsipp.moneyborrowed.LenderNamePage
 import play.api.Application
 import play.api.data.Form
@@ -137,13 +137,15 @@ trait TestValues {
   val reasonBorrowed = "test reason borrowed"
 
   val address: Address = Address(
+    "test-id",
     "testAddressLine1",
-    "testAddressLine2",
+    Some("testAddressLine2"),
     Some("testAddressLine3"),
-    Some("testTown"),
+    "testTown",
     Some("testPostCode"),
     "United Kingdom",
-    "GB"
+    "GB",
+    ManualAddress
   )
 
   val individualDetails: IndividualDetails = IndividualDetails("testFirstName", Some("testMiddleName"), "testLastName")
@@ -170,7 +172,6 @@ trait TestValues {
   val tooEarlyDate: LocalDate = LocalDate.of(1899, 12, 31)
 
   val defaultSchemeDetails: SchemeDetails = SchemeDetails(
-    "testSRN",
     schemeName,
     "testPSTR",
     SchemeStatus.Open,
@@ -232,7 +233,7 @@ trait TestValues {
   )
 
   def userAnswersWithAddress(srn: Srn, index: Max5000): UserAnswers =
-    defaultUserAnswers.unsafeSet(LandOrPropertyAddressLookupPage(srn, index), address)
+    defaultUserAnswers.unsafeSet(LandOrPropertyChosenAddressPage(srn, index), address)
 
   def userAnswersWithNameAndAmount(srn: Srn, index: Max5000): UserAnswers =
     defaultUserAnswers.unsafeSet(LenderNamePage(srn, index), lenderName)

@@ -21,6 +21,17 @@ import play.api.data.{Form, Mapping}
 
 object MultipleQuestionFormProvider {
 
+  def apply[A, B](
+    a: Mapping[A],
+    b: Mapping[B]
+  ): Form[(A, B)] =
+    Form(
+      mapping[(A, B), A, B](
+        "value.1" -> a,
+        "value.2" -> b
+      )(Tuple2.apply)(Tuple2.unapply)
+    )
+
   def apply[A, B, C](
     a: Mapping[A],
     b: Mapping[B],
@@ -34,14 +45,54 @@ object MultipleQuestionFormProvider {
       )(Tuple3.apply)(Tuple3.unapply)
     )
 
-  def apply[A, B](
+  def apply[A, B, C, D](
     a: Mapping[A],
-    b: Mapping[B]
-  ): Form[(A, B)] =
+    b: Mapping[B],
+    c: Mapping[C],
+    d: Mapping[D]
+  ): Form[(A, B, C, D)] =
     Form(
-      mapping[(A, B), A, B](
+      mapping[(A, B, C, D), A, B, C, D](
         "value.1" -> a,
-        "value.2" -> b
-      )(Tuple2.apply)(Tuple2.unapply)
+        "value.2" -> b,
+        "value.3" -> c,
+        "value.4" -> d
+      )(Tuple4.apply)(Tuple4.unapply)
+    )
+
+  def apply[A, B, C, D, E](
+    a: Mapping[A],
+    b: Mapping[B],
+    c: Mapping[C],
+    d: Mapping[D],
+    e: Mapping[E]
+  ): Form[(A, B, C, D, E)] =
+    Form(
+      mapping[(A, B, C, D, E), A, B, C, D, E](
+        "value.1" -> a,
+        "value.2" -> b,
+        "value.3" -> c,
+        "value.4" -> d,
+        "value.5" -> e
+      )(Tuple5.apply)(Tuple5.unapply)
+    )
+
+  def apply[A, B, C, D, E, F](
+    a: Mapping[A],
+    b: Mapping[B],
+    c: Mapping[C],
+    d: Mapping[D],
+    e: Mapping[E],
+    f: Mapping[F]
+  ): Form[(A, B, C, D, E, F)] =
+    Form(
+      mapping[(A, B, C, D, E, F), A, B, C, D, E, F](
+        "value.1" -> a,
+        "value.2" -> b,
+        "value.3" -> c,
+        "value.4" -> d,
+        "value.5" -> e,
+        "value.6" -> f
+      )(Tuple6.apply)(Tuple6.unapply)
     )
 }

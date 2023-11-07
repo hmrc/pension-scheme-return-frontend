@@ -1,0 +1,125 @@
+/*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package controllers.nonsipp.landorproperty
+
+import config.Refined._
+import controllers.PSRController
+import controllers.actions._
+import controllers.nonsipp.landorproperty.LandPropertyAddressResultsController._
+import forms.TextFormProvider
+import models.SchemeId.Srn
+import models.{Address, Mode}
+import navigation.Navigator
+import pages.nonsipp.landorproperty.{AddressLookupResultsPage, LandOrPropertyChosenAddressPage}
+import play.api.data.Form
+import play.api.i18n.MessagesApi
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.SaveService
+import viewmodels.DisplayMessage.{LinkMessage, ParagraphMessage}
+import viewmodels.implicits._
+import viewmodels.models.{FormPageViewModel, RadioListRowViewModel, RadioListViewModel}
+import views.html.RadioListView
+
+import javax.inject.{Inject, Named}
+import scala.concurrent.{ExecutionContext, Future}
+
+class LandPropertyAddressResultsController @Inject()(
+  override val messagesApi: MessagesApi,
+  saveService: SaveService,
+  @Named("non-sipp") navigator: Navigator,
+  identifyAndRequireData: IdentifyAndRequireData,
+  formProvider: TextFormProvider,
+  val controllerComponents: MessagesControllerComponents,
+  view: RadioListView
+)(implicit ec: ExecutionContext)
+    extends PSRController {
+
+  private val form = LandPropertyAddressResultsController.form(formProvider)
+
+  def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+    implicit request =>
+      (
+        for {
+          addresses <- request.userAnswers.get(AddressLookupResultsPage(srn, index)).getOrRecoverJourney
+          previouslySelectedAddress = request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index))
+          foundAddress = addresses.find(address => previouslySelectedAddress.exists(_.id == address.id))
+          preparedForm = foundAddress.fold(form)(address => form.fill(address.id))
+        } yield Ok(view(preparedForm, viewModel(srn, index, addresses, mode)))
+      ).merge
+  }
+
+  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+    implicit request =>
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors =>
+            request.userAnswers.get(AddressLookupResultsPage(srn, index)).getOrRecoverJourney { addresses =>
+              Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, addresses, mode))))
+            },
+          value =>
+            (
+              for {
+                addresses <- request.userAnswers.get(AddressLookupResultsPage(srn, index)).getOrRecoverJourneyT
+                foundAddress <- addresses.find(_.id == value).getOrRecoverJourneyT
+                updatedAnswers <- Future
+                  .fromTry(request.userAnswers.set(LandOrPropertyChosenAddressPage(srn, index), foundAddress))
+                  .liftF
+                _ <- saveService.save(updatedAnswers).liftF
+              } yield Redirect(navigator.nextPage(LandOrPropertyChosenAddressPage(srn, index), mode, updatedAnswers))
+            ).merge
+        )
+  }
+}
+
+object LandPropertyAddressResultsController {
+  def form(formProvider: TextFormProvider): Form[String] = formProvider(
+    "landPropertyAddressResults.error.required"
+  )
+
+  def viewModel(srn: Srn, index: Max5000, addresses: List[Address], mode: Mode): FormPageViewModel[RadioListViewModel] =
+    FormPageViewModel(
+      title = "landPropertyAddressResults.title",
+      heading = "landPropertyAddressResults.heading",
+      description = Some(
+        ParagraphMessage(
+          "landPropertyAddressResults.description",
+          LinkMessage(
+            "landPropertyAddressResults.description.link",
+            controllers.nonsipp.landorproperty.routes.LandPropertyAddressManualController
+              .onPageLoad(srn, index, isUkAddress = true, mode)
+              .url
+          )
+        )
+      ),
+      page = RadioListViewModel(
+        legend = None,
+        items = addresses.map(
+          address =>
+            RadioListRowViewModel(
+              content = address.asString,
+              value = address.id
+            )
+        )
+      ),
+      refresh = None,
+      buttonText = "site.saveAndContinue",
+      details = None,
+      onSubmit =
+        controllers.nonsipp.landorproperty.routes.LandPropertyAddressResultsController.onSubmit(srn, index, mode)
+    )
+}

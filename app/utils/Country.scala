@@ -29,7 +29,7 @@ object Country {
   implicit val formats: OFormat[Country] = Json.format[Country]
 
   private val countries: List[Country] = {
-    val jsonSchemaFile = new File("conf/country-code.json")
+    val jsonSchemaFile = new File(getClass.getClassLoader.getResource("country-code.json").toURI.getPath)
     val inputStream = new FileInputStream(jsonSchemaFile)
     val jsonFile = Json.parse(readStreamToString(inputStream))
     jsonFile.validate[List[Country]].get

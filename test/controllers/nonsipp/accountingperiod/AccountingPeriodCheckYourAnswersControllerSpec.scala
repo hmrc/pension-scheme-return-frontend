@@ -97,7 +97,9 @@ class AccountingPeriodCheckYourAnswersControllerSpec extends ControllerBaseSpec 
 
         forAll(srnGen, dateRangeWithinRangeGen(dateRange)) { (srn, dateRange) =>
           viewModel(srn, refineMV[OneToThree](1), dateRange, NormalMode).page.sections
-            .flatMap(_.rows.map(_.value.key)) must contain(
+            .flatMap(_.rows.collect(_.value match {
+              case m: Message => m.key
+            })) must contain(
             dateRange.from.show
           )
         }
@@ -107,7 +109,9 @@ class AccountingPeriodCheckYourAnswersControllerSpec extends ControllerBaseSpec 
 
         forAll(srnGen, dateRangeWithinRangeGen(dateRange)) { (srn, dateRange) =>
           viewModel(srn, refineMV[OneToThree](1), dateRange, NormalMode).page.sections
-            .flatMap(_.rows.map(_.value.key)) must contain(dateRange.to.show)
+            .flatMap(_.rows.collect(_.value match {
+              case m: Message => m.key
+            })) must contain(dateRange.to.show)
         }
       }
 

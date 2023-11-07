@@ -22,9 +22,9 @@ import connectors.AddressLookupConnector
 import controllers.PSRController
 import controllers.actions._
 import models.SchemeId.Srn
-import models.{ALFAddress, Address, Mode}
+import models.{ALFAddress, Address, ManualAddress, Mode}
 import navigation.Navigator
-import pages.nonsipp.landorproperty.{LandOrPropertyAddressLookupPage, LandPropertyInUKPage}
+import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandPropertyInUKPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
@@ -60,28 +60,24 @@ class LandOrPropertyAddressLookupController @Inject()(
         addressLookupId <- request.queryString.get("id").flatMap(_.headOption).getOrRecoverJourneyT
         maybeALFAddress <- addressLookupConnector.fetchAddress(addressLookupId).map(_.toOption).liftF
         alfAddress <- maybeALFAddress.getOrRecoverJourneyT
-        address <- addressFromALFAddress(alfAddress).getOrRecoverJourneyT
-        updatedAnswers <- request.userAnswers.set(LandOrPropertyAddressLookupPage(srn, index), address).toFuture.liftF
+        address = addressFromALFAddress(alfAddress)
+        updatedAnswers <- request.userAnswers.set(LandOrPropertyChosenAddressPage(srn, index), address).toFuture.liftF
         _ <- saveService.save(updatedAnswers).liftF
-      } yield Redirect(navigator.nextPage(LandOrPropertyAddressLookupPage(srn, index), mode, updatedAnswers))
+      } yield Redirect(navigator.nextPage(LandOrPropertyChosenAddressPage(srn, index), mode, updatedAnswers))
 
       result.merge
   }
 
-  private def addressFromALFAddress(alfAddress: ALFAddress): Option[Address] =
-    (
+  private def addressFromALFAddress(alfAddress: ALFAddress): Address =
+    Address(
+      "",
       alfAddress.firstLine,
-      alfAddress.secondLine
-    ).mapN(
-      (firstLine, secondLine) =>
-        Address(
-          firstLine,
-          secondLine,
-          alfAddress.thirdLine,
-          alfAddress.town,
-          alfAddress.postcode,
-          alfAddress.country.name,
-          alfAddress.country.code
-        )
+      alfAddress.secondLine,
+      alfAddress.thirdLine,
+      alfAddress.town,
+      Some(alfAddress.postcode),
+      alfAddress.country.name,
+      alfAddress.country.code,
+      ManualAddress
     )
 }

@@ -16,9 +16,10 @@
 
 package navigation.nonsipp
 
+import models.CheckOrChange
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.memberpayments.UnallocatedEmployerContributionsPage
+import pages.nonsipp.memberpayments._
 import utils.BaseSpec
 
 class UnallocatedEmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
@@ -46,6 +47,44 @@ class UnallocatedEmployerContributionsNavigatorSpec extends BaseSpec with Naviga
         )
         .withName("go from unallocated employer contributions page to task list page when no selected")
     )
+  }
 
+  "UnallocatedEmployerAmountPage" - {
+    act.like(
+      normalmode
+        .navigateToWithData(
+          UnallocatedEmployerAmountPage,
+          Gen.const(money),
+          (srn, _) =>
+            controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController
+              .onPageLoad(srn, CheckOrChange.Check)
+        )
+        .withName("go from Unallocated amount page to CYA and Remove page ")
+    )
+  }
+
+  "UnallocatedContributionCYAPage" - {
+    act.like(
+      normalmode
+        .navigateTo(
+          srn => UnallocatedContributionCYAPage(srn),
+          (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
+        )
+        .withName("go from remove page to Money Borrowed page")
+    )
+  }
+
+  "RemoveUnallocatedAmountsPage" - {
+    act.like(
+      normalmode
+        .navigateToWithData(
+          RemoveUnallocatedAmountPage,
+          Gen.const(false),
+          (srn, _) =>
+            controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController
+              .onPageLoad(srn, CheckOrChange.Check)
+        )
+        .withName("go from remove page to CYA")
+    )
   }
 }

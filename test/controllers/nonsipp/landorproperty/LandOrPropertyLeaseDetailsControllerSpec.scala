@@ -21,7 +21,7 @@ import controllers.ControllerBaseSpec
 import controllers.nonsipp.landorproperty.LandOrPropertyLeaseDetailsController._
 import eu.timepit.refined.refineMV
 import models.NormalMode
-import pages.nonsipp.landorproperty.{LandOrPropertyAddressLookupPage, LandOrPropertyLeaseDetailsPage}
+import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandOrPropertyLeaseDetailsPage}
 import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
 import services.SchemeDateService
@@ -50,7 +50,7 @@ class LandOrPropertyLeaseDetailsControllerSpec extends ControllerBaseSpec {
   )
 
   private val userAnswersWithAddress =
-    defaultUserAnswers.unsafeSet(LandOrPropertyAddressLookupPage(srn, index), address)
+    defaultUserAnswers.unsafeSet(LandOrPropertyChosenAddressPage(srn, index), address)
 
   override def beforeEach(): Unit =
     reset(mockSchemeDateService)

@@ -21,7 +21,8 @@ import play.api.libs.json.{Json, OFormat}
 
 import java.time.LocalDate
 
-case class Assets(landOrProperty: LandOrProperty)
+case class Assets(landOrProperty: LandOrProperty, borrowing: Borrowing)
+
 case class LandOrProperty(
   landOrPropertyHeld: Boolean,
   landOrPropertyTransactions: Seq[LandOrPropertyTransactions]
@@ -67,7 +68,21 @@ case class LeaseDetails(
   connectedPartyStatus: Boolean
 )
 
+case class Borrowing(moneyWasBorrowed: Boolean, moneyBorrowed: Seq[MoneyBorrowed])
+
+case class MoneyBorrowed(
+  dateOfBorrow: LocalDate,
+  schemeAssetsValue: Double,
+  amountBorrowed: Double,
+  interestRate: Double,
+  borrowingFromName: String,
+  connectedPartyStatus: Boolean,
+  reasonForBorrow: String
+)
+
 object Assets {
+  private implicit val formatMoneyBorrowed: OFormat[MoneyBorrowed] = Json.format[MoneyBorrowed]
+  private implicit val formatBorrowing: OFormat[Borrowing] = Json.format[Borrowing]
 
   private implicit val formatLeaseDetails: OFormat[LeaseDetails] = Json.format[LeaseDetails]
   private implicit val formatPropertyAcquiredFrom: OFormat[PropertyAcquiredFrom] = Json.format[PropertyAcquiredFrom]
@@ -77,5 +92,6 @@ object Assets {
   private implicit val formatLandOrPropertyTransactions: OFormat[LandOrPropertyTransactions] =
     Json.format[LandOrPropertyTransactions]
   private implicit val formatLandOrProperty: OFormat[LandOrProperty] = Json.format[LandOrProperty]
+
   implicit val writes: OFormat[Assets] = Json.format[Assets]
 }

@@ -19,8 +19,9 @@ package controllers.nonsipp.landorpropertydisposal
 import cats.implicits._
 import com.google.inject.Inject
 import config.Constants
-import config.Refined.Max5000
 import config.Refined.Max5000._
+import config.Refined.{Max5000, _}
+import controllers.PSRController
 import controllers.actions._
 import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalAddressListController._
 import eu.timepit.refined.refineV
@@ -33,13 +34,10 @@ import pages.nonsipp.landorpropertydisposal.{LandOrPropertyDisposalAddressListPa
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc._
-import services.SaveService
 import viewmodels.DisplayMessage.{Message, ParagraphMessage}
 import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, ListRadiosRow, ListRadiosViewModel, PaginatedViewModel}
 import views.html.ListRadiosView
-import config.Refined._
-import controllers.PSRController
 
 import javax.inject.Named
 import scala.collection.immutable.SortedMap
@@ -50,7 +48,6 @@ class LandOrPropertyDisposalAddressListController @Inject()(
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
-  saveService: SaveService,
   view: ListRadiosView,
   formProvider: RadioListFormProvider
 )(implicit ec: ExecutionContext)

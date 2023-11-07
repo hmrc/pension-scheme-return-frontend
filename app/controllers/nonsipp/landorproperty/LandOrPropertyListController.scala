@@ -17,23 +17,24 @@
 package controllers.nonsipp.landorproperty
 
 import com.google.inject.Inject
+import config.Constants
 import config.Constants.maxLandOrProperties
 import config.Refined.Max5000
+import controllers.PSRController
 import controllers.actions._
 import eu.timepit.refined.refineV
 import forms.YesNoPageFormProvider
 import models.CheckOrChange.Change
 import models.SchemeId.Srn
-import models.{Address, Mode}
+import models._
 import navigation.Navigator
 import pages.nonsipp.landorproperty.{LandOrPropertyAddressLookupPages, LandOrPropertyListPage}
 import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.{Message, ParagraphMessage}
 import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, ListRow, ListViewModel}
+import viewmodels.models.{FormPageViewModel, ListRow, ListViewModel, PaginatedViewModel}
 import views.html.ListView
 
 import javax.inject.Named
@@ -45,29 +46,29 @@ class LandOrPropertyListController @Inject()(
   val controllerComponents: MessagesControllerComponents,
   view: ListView,
   formProvider: YesNoPageFormProvider
-) extends FrontendBaseController
-    with I18nSupport {
+) extends PSRController {
 
   val form = LandOrPropertyListController.form(formProvider)
 
-  def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    val addresses = request.userAnswers.map(LandOrPropertyAddressLookupPages(srn))
+  def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+    implicit request =>
+      val addresses = request.userAnswers.map(LandOrPropertyAddressLookupPages(srn))
 
-    if (addresses.nonEmpty) {
-      val viewModel = LandOrPropertyListController.viewModel(srn, mode, addresses)
-      Ok(view(form, viewModel))
-    } else {
-      Redirect(controllers.nonsipp.landorproperty.routes.LandOrPropertyHeldController.onPageLoad(srn, mode))
-    }
+      if (addresses.nonEmpty) {
+        val viewModel = LandOrPropertyListController.viewModel(srn, page, mode, addresses)
+        Ok(view(form, viewModel))
+      } else {
+        Redirect(controllers.nonsipp.landorproperty.routes.LandOrPropertyHeldController.onPageLoad(srn, mode))
+      }
   }
 
-  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
+  def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     val addresses = request.userAnswers.map(LandOrPropertyAddressLookupPages(srn))
 
     if (addresses.size == maxLandOrProperties) {
       Redirect(navigator.nextPage(LandOrPropertyListPage(srn, addLandOrProperty = false), mode, request.userAnswers))
     } else {
-      val viewModel = LandOrPropertyListController.viewModel(srn, mode, addresses)
+      val viewModel = LandOrPropertyListController.viewModel(srn, page, mode, addresses)
 
       form
         .bindFromRequest()
@@ -97,7 +98,7 @@ object LandOrPropertyListController {
             List(
               ListRow(
                 address.addressLine1,
-                changeUrl = routes.LandOrPropertyCYAController.onPageLoad(srn, index, Change).url,
+                changeUrl = routes.LandOrPropertyCYAController.onPageLoad(srn, index, CheckMode).url,
                 changeHiddenText = Message("landOrPropertyList.row.change.hiddenText", address.addressLine1),
                 routes.RemovePropertyController.onPageLoad(srn, index, mode).url,
                 Message("landOrPropertyList.row.remove.hiddenText")
@@ -106,10 +107,17 @@ object LandOrPropertyListController {
         )
     }.toList
 
-  def viewModel(srn: Srn, mode: Mode, addresses: Map[String, Address]): FormPageViewModel[ListViewModel] = {
+  def viewModel(srn: Srn, page: Int, mode: Mode, addresses: Map[String, Address]): FormPageViewModel[ListViewModel] = {
 
     val title = if (addresses.size == 1) "landOrPropertyList.title" else "landOrPropertyList.title.plural"
     val heading = if (addresses.size == 1) "landOrPropertyList.heading" else "landOrPropertyList.heading.plural"
+
+    val pagination = Pagination(
+      currentPage = page,
+      pageSize = Constants.landOrPropertiesSize,
+      addresses.size,
+      routes.LandOrPropertyListController.onPageLoad(srn, _, NormalMode)
+    )
 
     FormPageViewModel(
       Message(title, addresses.size),
@@ -119,10 +127,20 @@ object LandOrPropertyListController {
         inset = "landOrPropertyList.inset",
         rows(srn, mode, addresses),
         Message("landOrPropertyList.radios"),
-        showRadios = addresses.size < 25,
-        paginatedViewModel = None
+        showRadios = addresses.size < Constants.maxLandOrProperties,
+        paginatedViewModel = Some(
+          PaginatedViewModel(
+            Message(
+              "landOrPropertyList.pagination.label",
+              pagination.pageStart,
+              pagination.pageEnd,
+              pagination.totalSize
+            ),
+            pagination
+          )
+        )
       ),
-      routes.LandOrPropertyListController.onSubmit(srn, mode)
+      routes.LandOrPropertyListController.onSubmit(srn, page, mode)
     )
   }
 }

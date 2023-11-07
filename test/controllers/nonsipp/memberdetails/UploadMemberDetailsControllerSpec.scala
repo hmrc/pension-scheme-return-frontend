@@ -18,7 +18,7 @@ package controllers.nonsipp.memberdetails
 
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.memberdetails.UploadMemberDetailsController.viewModel
-import models.{UpscanFileReference, UpscanInitiateResponse}
+import models.{DateRange, UpscanFileReference, UpscanInitiateResponse}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import play.api.data.FormError
@@ -26,7 +26,7 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
 import play.api.mvc.Call
 import play.api.test.FakeRequest
-import services.UploadService
+import services.{AuditService, SchemeDateService, UploadService}
 import views.html.UploadView
 
 import scala.concurrent.Future
@@ -45,13 +45,19 @@ class UploadMemberDetailsControllerSpec extends ControllerBaseSpec {
   private val upscanInitiateResponse = UpscanInitiateResponse(UpscanFileReference("test-ref"), postTarget, formFields)
 
   private val mockUploadService = mock[UploadService]
+  private val mockSchemeDateService = mock[SchemeDateService]
+  private val mockAuditService = mock[AuditService]
 
   override val additionalBindings: List[GuiceableModule] = List(
-    bind[UploadService].toInstance(mockUploadService)
+    bind[UploadService].toInstance(mockUploadService),
+    bind[SchemeDateService].toInstance(mockSchemeDateService),
+    bind[AuditService].toInstance(mockAuditService)
   )
 
   override def beforeEach(): Unit = {
     reset(mockUploadService)
+    reset(mockSchemeDateService)
+    reset(mockAuditService)
     when(mockUploadService.registerUploadRequest(any(), any()))
       .thenReturn(Future.successful((): Unit))
   }
@@ -80,22 +86,38 @@ class UploadMemberDetailsControllerSpec extends ControllerBaseSpec {
       injected[UploadView].apply(viewModel(postTarget, formFields, None, "50MB"))
     }.before(mockInitiateUpscan()))
 
-    act.like(renderView(onPageLoad("EntityTooLarge", "file too large")) { implicit app => implicit request =>
-      injected[UploadView].apply(
-        viewModel(
-          postTarget,
-          formFields,
-          Some(FormError("file-input", "uploadMemberDetails.error.size", Seq("50MB"))),
-          "50MB"
+    act.like(
+      renderView(onPageLoad("EntityTooLarge", "file too large")) { implicit app => implicit request =>
+        injected[UploadView].apply(
+          viewModel(
+            postTarget,
+            formFields,
+            Some(FormError("file-input", "uploadMemberDetails.error.size", Seq("50MB"))),
+            "50MB"
+          )
         )
-      )
-    }.updateName(_ + " with error EntityTooLarge").before(mockInitiateUpscan()))
+      }.before({
+          mockTaxYear(dateRange)
+          mockInitiateUpscan()
+        })
+        .after({
+          verify(mockAuditService, times(1)).sendEvent(any())(any(), any())
+          reset(mockAuditService)
+        })
+        .updateName(_ + " with error EntityTooLarge")
+    )
 
-    act.like(renderView(onPageLoad("InvalidArgument", "'file' field not found")) { implicit app => implicit request =>
-      injected[UploadView].apply(
-        viewModel(postTarget, formFields, Some(FormError("file-input", "uploadMemberDetails.error.required")), "50MB")
-      )
-    }.updateName(_ + " with error InvalidArgument").before(mockInitiateUpscan()))
+    act.like(
+      renderView(onPageLoad("InvalidArgument", "'file' field not found")) { implicit app => implicit request =>
+        injected[UploadView].apply(
+          viewModel(postTarget, formFields, Some(FormError("file-input", "uploadMemberDetails.error.required")), "50MB")
+        )
+      }.updateName(_ + " with error InvalidArgument")
+        .before({
+          mockTaxYear(dateRange)
+          mockInitiateUpscan()
+        })
+    )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
@@ -106,4 +128,7 @@ class UploadMemberDetailsControllerSpec extends ControllerBaseSpec {
   private def mockInitiateUpscan(): Unit =
     when(mockUploadService.initiateUpscan(any(), any(), any())(any()))
       .thenReturn(Future.successful(upscanInitiateResponse))
+
+  private def mockTaxYear(taxYear: DateRange) =
+    when(mockSchemeDateService.taxYearOrAccountingPeriods(any())(any())).thenReturn(Some(Left(taxYear)))
 }

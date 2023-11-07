@@ -17,12 +17,11 @@
 package controllers.nonsipp.memberpayments
 
 import config.Constants
-import config.Refined.Max5000
 import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
 import forms.mappings.errors.{MoneyFormErrorProvider, MoneyFormErrors}
-import models.{Mode, Money}
 import models.SchemeId.Srn
+import models.{Mode, Money}
 import navigation.Navigator
 import pages.nonsipp.memberpayments.UnallocatedEmployerAmountPage
 import play.api.data.Form
@@ -30,10 +29,10 @@ import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
 import viewmodels.DisplayMessage.{Empty, Message}
+import viewmodels.implicits._
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import viewmodels.models.{FormPageViewModel, QuestionField}
 import views.html.MoneyView
-import viewmodels.implicits._
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
