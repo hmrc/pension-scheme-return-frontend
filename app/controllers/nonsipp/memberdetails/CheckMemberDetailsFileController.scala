@@ -98,7 +98,7 @@ class CheckMemberDetailsFileController @Inject()(
                   auditDownload(srn, source._1, startTime)
                   uploadValidator.validateCSV(source._2, srn, request)
                 }
-                _ <- uploadService.saveValidatedUpload(uploadKey, validated)
+                _ <- uploadService.saveValidatedUpload(uploadKey, validated._1)
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(CheckMemberDetailsFilePage(srn), value))
                 _ <- saveService.save(updatedAnswers)
               } yield Redirect(navigator.nextPage(CheckMemberDetailsFilePage(srn), mode, updatedAnswers))

@@ -84,13 +84,13 @@ class MemberDetailsUploadValidatorSpec extends BaseSpec with TestValues {
 
           val source = Source.single(ByteString(csv))
 
-          validator.validateCSV(source, mockSrn, mockReq).futureValue mustBe UploadSuccess(
+          validator.validateCSV(source, mockSrn, mockReq).futureValue mustBe (UploadSuccess(
             List(
               UploadMemberDetails(1, NameDOB("Jason", "Lawrence", LocalDate.of(1989, 10, 6)), Right(Nino("AB123456A"))),
               UploadMemberDetails(2, NameDOB("Pearl", "Parsons", LocalDate.of(1990, 4, 12)), Left("reason")),
               UploadMemberDetails(3, NameDOB("Katherine", "Kennedy", LocalDate.of(1985, 1, 30)), Left("reason"))
             )
-          )
+          ), 3)
         }
     }
 
@@ -104,12 +104,12 @@ class MemberDetailsUploadValidatorSpec extends BaseSpec with TestValues {
 
       val source = Source.single(ByteString(csv))
 
-      validator.validateCSV(source, mockSrn, mockReq).futureValue mustBe UploadErrors(
+      validator.validateCSV(source, mockSrn, mockReq).futureValue mustBe (UploadErrors(
         NonEmptyList.of(
           ValidationError("C1", ValidationErrorType.DateOfBirth, "memberDetails.dateOfBirth.error.invalid.date"),
           ValidationError("C2", ValidationErrorType.DateOfBirth, "memberDetails.dateOfBirth.error.format")
         )
-      )
+      ), 3)
     }
 
     "successfully collect required errors when mandatory csv values is missing" in {
@@ -123,12 +123,12 @@ class MemberDetailsUploadValidatorSpec extends BaseSpec with TestValues {
 
       val source = Source.single(ByteString(csv))
 
-      validator.validateCSV(source, mockSrn, mockReq).futureValue mustBe UploadErrors(
+      validator.validateCSV(source, mockSrn, mockReq).futureValue mustBe (UploadErrors(
         NonEmptyList.of(
           ValidationError("B2", ValidationErrorType.LastName, "memberDetails.lastName.error.required"),
           ValidationError("A3", ValidationErrorType.FirstName, "memberDetails.firstName.error.required")
         )
-      )
+      ), 4)
     }
 
     "successfully collect duplicate Nino error" in {
@@ -141,11 +141,11 @@ class MemberDetailsUploadValidatorSpec extends BaseSpec with TestValues {
 
       val source = Source.single(ByteString(csv))
 
-      validator.validateCSV(source, mockSrn, mockReq).futureValue mustBe UploadErrors(
+      validator.validateCSV(source, mockSrn, mockReq).futureValue mustBe (UploadErrors(
         NonEmptyList.of(
           ValidationError("D2", ValidationErrorType.DuplicateNino, "memberDetailsNino.error.duplicate")
         )
-      )
+      ), 3)
     }
 
     "successfully collect invalid Nino error" in {
@@ -158,11 +158,11 @@ class MemberDetailsUploadValidatorSpec extends BaseSpec with TestValues {
 
       val source = Source.single(ByteString(csv))
 
-      validator.validateCSV(source, mockSrn, mockReq).futureValue mustBe UploadErrors(
+      validator.validateCSV(source, mockSrn, mockReq).futureValue mustBe (UploadErrors(
         NonEmptyList.of(
           ValidationError("D2", ValidationErrorType.NinoFormat, "memberDetailsNino.error.invalid")
         )
-      )
+      ), 3)
     }
 
     "fails when both Nino and No Nino reason are present" in {
@@ -175,7 +175,7 @@ class MemberDetailsUploadValidatorSpec extends BaseSpec with TestValues {
 
       val source = Source.single(ByteString(csv))
 
-      validator.validateCSV(source, mockSrn, mockReq).futureValue mustBe UploadFormatError
+      validator.validateCSV(source, mockSrn, mockReq).futureValue mustBe (UploadFormatError, 2)
     }
 
     "fails when no rows provided" in {
@@ -184,7 +184,7 @@ class MemberDetailsUploadValidatorSpec extends BaseSpec with TestValues {
 
       val source = Source.single(ByteString(csv))
 
-      validator.validateCSV(source, mockSrn, mockReq).futureValue mustBe UploadFormatError
+      validator.validateCSV(source, mockSrn, mockReq).futureValue mustBe (UploadFormatError, 0)
     }
 
     "fails when empty file sent" in {
@@ -193,10 +193,10 @@ class MemberDetailsUploadValidatorSpec extends BaseSpec with TestValues {
 
       val source = Source.single(ByteString(csv))
 
-      validator.validateCSV(source, mockSrn, mockReq).futureValue mustBe UploadFormatError
+      validator.validateCSV(source, mockSrn, mockReq).futureValue mustBe (UploadFormatError, 0)
     }
 
-    "fail when there are more than 99 entries" in {
+    "fail when there are more than 300 entries" in {
 
       val csv =
         (validHeaders :: List.fill(301)(validRow)).mkString("\n")
@@ -205,7 +205,7 @@ class MemberDetailsUploadValidatorSpec extends BaseSpec with TestValues {
 
       val source = Source.single(ByteString(csv))
 
-      validator.validateCSV(source, mockSrn, mockReq).futureValue mustBe UploadMaxRowsError
+      validator.validateCSV(source, mockSrn, mockReq).futureValue mustBe (UploadMaxRowsError, 301)
     }
 
     "successfully collects different errors" in {
@@ -221,7 +221,7 @@ class MemberDetailsUploadValidatorSpec extends BaseSpec with TestValues {
 
       val source = Source.single(ByteString(csv))
 
-      validator.validateCSV(source, mockSrn, mockReq).futureValue mustBe UploadErrors(
+      validator.validateCSV(source, mockSrn, mockReq).futureValue mustBe (UploadErrors(
         NonEmptyList.of(
           ValidationError("A2", ValidationErrorType.FirstName, "memberDetails.firstName.error.invalid"),
           ValidationError("B3", ValidationErrorType.LastName, "memberDetails.lastName.error.invalid"),
@@ -229,7 +229,7 @@ class MemberDetailsUploadValidatorSpec extends BaseSpec with TestValues {
           ValidationError("B5", ValidationErrorType.LastName, "memberDetails.lastName.error.required"),
           ValidationError("D6", ValidationErrorType.NinoFormat, "memberDetailsNino.error.invalid")
         )
-      )
+      ), 6)
     }
   }
 }

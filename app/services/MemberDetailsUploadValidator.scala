@@ -37,6 +37,7 @@ import play.api.mvc.AnyContent
 import uk.gov.hmrc.domain.Nino
 
 import java.time.LocalDate
+import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.math.Integral.Implicits.infixIntegralOps
@@ -73,7 +74,8 @@ class MemberDetailsUploadValidator @Inject()(
     source: Source[ByteString, _],
     srn: Srn,
     request: DataRequest[AnyContent]
-  )(implicit mat: Materializer, messages: Messages): Future[Upload] = {
+  )(implicit mat: Materializer, messages: Messages): Future[(Upload, Int)] = {
+    val counter = new AtomicInteger()
     val csvFrames = source.via(csvFrame)
     (for {
       csvHeader <- csvFrames.runWith(firstRowSink)
@@ -83,6 +85,7 @@ class MemberDetailsUploadValidator @Inject()(
         .drop(1) // drop csv header and process rows
         .statefulMap[UploadState, Upload](() => UploadState.init)(
           (state, bs) => {
+            counter.incrementAndGet()
             if (state.row > Constants.maxSchemeMembers) {
               state.next() -> UploadMaxRowsError
             } else {
@@ -116,9 +119,9 @@ class MemberDetailsUploadValidator @Inject()(
             UploadSuccess(previous.memberDetails ++ current.memberDetails)
           case (_, memberDetails: UploadSuccess) => memberDetails
         }
-    } yield validated)
+    } yield (validated, counter.get()))
       .recover {
-        case _: NoSuchElementException => UploadFormatError
+        case _: NoSuchElementException => (UploadFormatError, 0)
       }
   }
 
