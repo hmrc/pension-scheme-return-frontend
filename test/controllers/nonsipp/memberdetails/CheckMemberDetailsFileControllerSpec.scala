@@ -94,15 +94,16 @@ class CheckMemberDetailsFileControllerSpec extends ControllerBaseSpec {
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
-    act.like(saveAndContinue(onSubmit, "value" -> "true")
-      .before({
-        mockTaxYear(dateRange)
-        mockGetUploadStatus(Some(uploadedSuccessfully))
-      })
-      .after({
-        verify(mockAuditService, times(1)).sendEvent(any())(any(), any())
-        reset(mockAuditService)
-      })
+    act.like(
+      saveAndContinue(onSubmit, "value" -> "true")
+        .before({
+          mockTaxYear(dateRange)
+          mockGetUploadStatus(Some(uploadedSuccessfully))
+        })
+        .after({
+          verify(mockAuditService, times(1)).sendEvent(any())(any(), any())
+          reset(mockAuditService)
+        })
     )
 
     act.like(invalidForm(onSubmit, "invalid" -> "form").before(mockGetUploadStatus(Some(uploadedSuccessfully))))
