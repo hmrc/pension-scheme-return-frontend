@@ -133,7 +133,7 @@ class CheckMemberDetailsFileController @Inject()(
     implicit req: DataRequest[_]
   ) = PSRUpscanFileUploadAuditEvent(
     schemeName = req.schemeDetails.schemeName,
-    schemeAdministratorName = req.schemeDetails.establishers.headOption.get.name,
+    schemeAdministratorName = req.schemeDetails.establishers.head.name,
     psaOrPspId = req.pensionSchemeId.value,
     schemeTaxReference = req.schemeDetails.pstr,
     affinityGroup = if (req.minimalDetails.organisationName.nonEmpty) "Organisation" else "Individual",
@@ -148,17 +148,20 @@ class CheckMemberDetailsFileController @Inject()(
   ): Unit = {
     val endTime = System.currentTimeMillis
     val duration = endTime - startTime
-    for {
-      taxYear <- schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney
-      _ = auditService.sendEvent(buildUploadAuditEvent(taxYear, uploadStatus, duration))
-    } yield taxYear
+    schemeDateService
+      .taxYearOrAccountingPeriods(srn)
+      .merge
+      .getOrRecoverJourney
+      .map(taxYear => {
+        auditService.sendEvent(buildUploadAuditEvent(taxYear, uploadStatus, duration))
+      })
   }
 
   private def buildDownloadAuditEvent(taxYear: DateRange, responseStatus: Int, duration: Long)(
     implicit req: DataRequest[_]
   ) = PSRUpscanFileDownloadAuditEvent(
     schemeName = req.schemeDetails.schemeName,
-    schemeAdministratorName = req.schemeDetails.establishers.headOption.get.name,
+    schemeAdministratorName = req.schemeDetails.establishers.head.name,
     psaOrPspId = req.pensionSchemeId.value,
     schemeTaxReference = req.schemeDetails.pstr,
     affinityGroup = if (req.minimalDetails.organisationName.nonEmpty) "Organisation" else "Individual",
@@ -172,24 +175,30 @@ class CheckMemberDetailsFileController @Inject()(
   )
 
   private def auditDownload(srn: Srn, responseStatus: Int, duration: Long)(implicit request: DataRequest[_]): Unit =
-    for {
-      taxYear <- schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney
-      _ = auditService.sendEvent(buildDownloadAuditEvent(taxYear, responseStatus, duration))
-    } yield taxYear
+    schemeDateService
+      .taxYearOrAccountingPeriods(srn)
+      .merge
+      .getOrRecoverJourney
+      .map(
+        taxYear => auditService.sendEvent(buildDownloadAuditEvent(taxYear, responseStatus, duration))
+      )
 
   private def auditValidation(srn: Srn, outcome: (Upload, Int, Long))(
     implicit request: DataRequest[_]
   ): Unit =
-    for {
-      taxYear <- schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney
-      _ = auditService.sendEvent(buildValidationAuditEvent(taxYear, outcome))
-    } yield taxYear
+    schemeDateService
+      .taxYearOrAccountingPeriods(srn)
+      .merge
+      .getOrRecoverJourney
+      .map(
+        taxYear => auditService.sendEvent(buildValidationAuditEvent(taxYear, outcome))
+      )
 
   private def buildValidationAuditEvent(taxYear: DateRange, outcome: (Upload, Int, Long))(
     implicit req: DataRequest[_]
   ) = PSRFileValidationAuditEvent(
     schemeName = req.schemeDetails.schemeName,
-    schemeAdministratorName = req.schemeDetails.establishers.headOption.get.name,
+    schemeAdministratorName = req.schemeDetails.establishers.head.name,
     psaOrPspId = req.pensionSchemeId.value,
     schemeTaxReference = req.schemeDetails.pstr,
     affinityGroup = if (req.minimalDetails.organisationName.nonEmpty) "Organisation" else "Individual",
