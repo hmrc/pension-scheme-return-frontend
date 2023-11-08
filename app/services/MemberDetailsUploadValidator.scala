@@ -50,7 +50,6 @@ class MemberDetailsUploadValidator @Inject()(
 )(implicit ec: ExecutionContext) {
 
   private def ninoForm(memberFullName: String, previousNinos: List[Nino]): Form[Nino] =
-//    MemberDetailsNinoController.form(textFormProvider, memberFullName, previousNinos)
     textFormProvider.nino(
       "memberDetailsNino.upload.error.required",
       "memberDetailsNino.upload.error.invalid",
@@ -60,14 +59,12 @@ class MemberDetailsUploadValidator @Inject()(
     )
 
   private def noNinoForm(memberFullName: String): Form[String] =
-//    NoNINOController.uploadFormSummaryErrors(textFormProvider, memberFullName)
     textFormProvider.textArea(
       "noNINO.upload.error.required",
       "noNINO.upload.upload.error.length",
       "noNINO.upload.upload.error.invalid",
       memberFullName
     )
-
   private val firstRowSink: Sink[List[ByteString], Future[List[String]]] =
     Sink.head[List[ByteString]].mapMaterializedValue(_.map(_.map(_.utf8String)))
 
@@ -89,8 +86,6 @@ class MemberDetailsUploadValidator @Inject()(
     srn: Srn,
     request: DataRequest[AnyContent],
     validDateThreshold: Option[LocalDate]
-  )(implicit mat: Materializer, messages: Messages): Future[Upload] = {
-    request: DataRequest[AnyContent]
   )(implicit mat: Materializer, messages: Messages): Future[(Upload, Int, Long)] = {
     val startTime = System.currentTimeMillis
     val counter = new AtomicInteger()

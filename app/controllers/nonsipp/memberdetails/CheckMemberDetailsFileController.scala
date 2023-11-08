@@ -102,30 +102,23 @@ class CheckMemberDetailsFileController @Inject()(
             case None => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
             case Some(file) =>
               for {
-
-                source <- uploadService.stream(file.downloadUrl)
-                validated <- uploadValidator.validateCSV(source, srn, request, None)
-                _ <- uploadService.saveValidatedUpload(uploadKey, validated)
-
                 source <- {
                   uploadService.stream(file.downloadUrl)
                 }
                 validated <- {
                   auditDownload(srn, source._1, startTime)
-                  uploadValidator.validateCSV(source._2, srn, request)
+                  uploadValidator.validateCSV(source._2, srn, request, None)
                 }
                 _ <- {
                   auditValidation(srn, validated)
                   uploadService.saveValidatedUpload(uploadKey, validated._1)
                 }
-
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(CheckMemberDetailsFilePage(srn), value))
                 _ <- saveService.save(updatedAnswers)
               } yield Redirect(navigator.nextPage(CheckMemberDetailsFilePage(srn), mode, updatedAnswers))
           }
       )
   }
-
   // todo: handle all Upscan upload states
   //       None is an error case as the initial state set on the previous page should be InProgress
   private def getUploadedFile(uploadKey: UploadKey): Future[Option[UploadStatus.Success]] =
