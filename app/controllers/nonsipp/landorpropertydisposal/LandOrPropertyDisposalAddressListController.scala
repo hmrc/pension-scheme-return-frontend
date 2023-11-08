@@ -33,7 +33,6 @@ import pages.nonsipp.landorpropertydisposal.{LandOrPropertyDisposalAddressListPa
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc._
-import services.SaveService
 import viewmodels.DisplayMessage.{Message, ParagraphMessage}
 import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, ListRadiosRow, ListRadiosViewModel, PaginatedViewModel}
@@ -50,7 +49,6 @@ class LandOrPropertyDisposalAddressListController @Inject()(
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
-  saveService: SaveService,
   view: ListRadiosView,
   formProvider: RadioListFormProvider
 )(implicit ec: ExecutionContext)
@@ -163,7 +161,7 @@ object LandOrPropertyDisposalAddressListController {
       currentPage = page,
       pageSize = Constants.landOrPropertiesSize,
       totalSize = rows.size,
-      page => routes.LandOrPropertyDisposalListController.onPageLoad(srn, page)
+      page => routes.LandOrPropertyDisposalAddressListController.onPageLoad(srn, page)
     )
 
     FormPageViewModel(
