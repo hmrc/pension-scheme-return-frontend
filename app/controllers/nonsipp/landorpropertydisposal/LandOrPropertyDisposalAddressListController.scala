@@ -160,7 +160,7 @@ object LandOrPropertyDisposalAddressListController {
       currentPage = page,
       pageSize = Constants.landOrPropertiesSize,
       totalSize = rows.size,
-      page => routes.LandOrPropertyDisposalListController.onPageLoad(srn, page)
+      page => routes.LandOrPropertyDisposalAddressListController.onPageLoad(srn, page)
     )
 
     FormPageViewModel(
