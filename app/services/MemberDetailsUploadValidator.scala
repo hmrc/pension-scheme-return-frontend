@@ -25,7 +25,7 @@ import cats.data.Validated.{Invalid, Valid}
 import cats.data.{NonEmptyList, Validated, ValidatedNel}
 import cats.implicits._
 import config.Constants
-import controllers.nonsipp.memberdetails.{MemberDetailsController, MemberDetailsNinoController, NoNINOController}
+import forms.mappings.errors.DateFormErrors
 import forms.{NameDOBFormProvider, TextFormProvider}
 import models.SchemeId.Srn
 import models.ValidationErrorType.ValidationErrorType
@@ -37,6 +37,7 @@ import play.api.mvc.AnyContent
 import uk.gov.hmrc.domain.Nino
 
 import java.time.LocalDate
+import java.time.format.{DateTimeFormatter, FormatStyle}
 import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -49,11 +50,21 @@ class MemberDetailsUploadValidator @Inject()(
 )(implicit ec: ExecutionContext) {
 
   private def ninoForm(memberFullName: String, previousNinos: List[Nino]): Form[Nino] =
-    MemberDetailsNinoController.form(textFormProvider, memberFullName, previousNinos)
+    textFormProvider.nino(
+      "memberDetailsNino.upload.error.required",
+      "memberDetailsNino.upload.error.invalid",
+      previousNinos,
+      "memberDetailsNino.upload.error.duplicate",
+      memberFullName
+    )
 
   private def noNinoForm(memberFullName: String): Form[String] =
-    NoNINOController.uploadFormSummaryErrors(textFormProvider, memberFullName)
-
+    textFormProvider.textArea(
+      "noNINO.upload.error.required",
+      "noNINO.upload.upload.error.length",
+      "noNINO.upload.upload.error.invalid",
+      memberFullName
+    )
   private val firstRowSink: Sink[List[ByteString], Future[List[String]]] =
     Sink.head[List[ByteString]].mapMaterializedValue(_.map(_.map(_.utf8String)))
 
@@ -73,7 +84,8 @@ class MemberDetailsUploadValidator @Inject()(
   def validateCSV(
     source: Source[ByteString, _],
     srn: Srn,
-    request: DataRequest[AnyContent]
+    request: DataRequest[AnyContent],
+    validDateThreshold: Option[LocalDate]
   )(implicit mat: Materializer, messages: Messages): Future[(Upload, Int, Long)] = {
     val startTime = System.currentTimeMillis
     val counter = new AtomicInteger()
@@ -91,7 +103,15 @@ class MemberDetailsUploadValidator @Inject()(
               state.next() -> UploadMaxRowsError
             } else {
               val parts = bs.map(_.utf8String)
-              validateMemberDetails(header, parts, state.previousNinos, state.row, srn, request) match {
+              validateMemberDetails(
+                header,
+                parts,
+                state.previousNinos,
+                state.row,
+                srn,
+                request,
+                validDateThreshold: Option[LocalDate]
+              ) match {
                 case None => state.next() -> UploadFormatError
                 case Some(Valid(memberDetails)) =>
                   state.next(memberDetails.ninoOrNoNinoReason.toOption) -> UploadSuccess(List(memberDetails))
@@ -132,7 +152,8 @@ class MemberDetailsUploadValidator @Inject()(
     previousNinos: List[Nino],
     row: Int,
     srn: Srn,
-    request: DataRequest[AnyContent]
+    request: DataRequest[AnyContent],
+    validDateThreshold: Option[LocalDate]
   )(implicit messages: Messages): Option[ValidatedNel[ValidationError, UploadMemberDetails]] =
     for {
       firstName <- getCSVValue(UploadKeys.firstName, headerKeys, csvData)
@@ -140,7 +161,7 @@ class MemberDetailsUploadValidator @Inject()(
       dob <- getCSVValue(UploadKeys.dateOfBirth, headerKeys, csvData)
       maybeNino <- getOptionalCSVValue(UploadKeys.nino, headerKeys, csvData)
       maybeNoNinoReason <- getOptionalCSVValue(UploadKeys.reasonForNoNino, headerKeys, csvData)
-      validatedNameDOB <- validateNameDOB(firstName, lastName, dob, row, srn, request)
+      validatedNameDOB <- validateNameDOB(firstName, lastName, dob, row, srn, request, validDateThreshold)
       memberFullName = s"${firstName.value} ${lastName.value}"
       maybeValidatedNino = maybeNino.value.flatMap { nino =>
         validateNino(maybeNino.as(nino), memberFullName, previousNinos, row)
@@ -164,7 +185,8 @@ class MemberDetailsUploadValidator @Inject()(
     dob: CsvValue[String],
     row: Int,
     srn: Srn,
-    request: DataRequest[AnyContent]
+    request: DataRequest[AnyContent],
+    validDateThreshold: Option[LocalDate]
   )(implicit messages: Messages): Option[ValidatedNel[ValidationError, NameDOB]] = {
     val dobDayKey = s"${nameDOBFormProvider.dateOfBirth}.day"
     val dobMonthKey = s"${nameDOBFormProvider.dateOfBirth}.month"
@@ -172,17 +194,52 @@ class MemberDetailsUploadValidator @Inject()(
 
     dob.value.split("/").toList match {
       case day :: month :: year :: Nil =>
-        val memberDetailsForm = MemberDetailsController
-          .form(nameDOBFormProvider, getTaxDates(srn)(request))
-          .bind(
-            Map(
-              nameDOBFormProvider.firstName -> firstName.value,
-              nameDOBFormProvider.lastName -> lastName.value,
-              dobDayKey -> day,
-              dobMonthKey -> month,
-              dobYearKey -> year
+        val memberDetailsForm = {
+          val dateThreshold: LocalDate = validDateThreshold.getOrElse(LocalDate.now())
+          nameDOBFormProvider(
+            "memberDetails.firstName.upload.error.required",
+            "memberDetails.firstName.upload.error.invalid",
+            "memberDetails.firstName.upload.error.length",
+            "memberDetails.lastName.upload.error.required",
+            "memberDetails.lastName.upload.error.invalid",
+            "memberDetails.lastName.upload.error.length",
+            DateFormErrors(
+              "memberDetails.dateOfBirth.upload.error.required.all",
+              "memberDetails.dateOfBirth.upload.error.required.day",
+              "memberDetails.dateOfBirth.upload.error.required.month",
+              "memberDetails.dateOfBirth.upload.error.required.year",
+              "memberDetails.dateOfBirth.upload.error.required.two",
+              "memberDetails.dateOfBirth.upload.error.invalid.date",
+              "memberDetails.dateOfBirth.upload.error.invalid.characters",
+              List(
+                DateFormErrors
+                  .failIfDateAfter(
+                    dateThreshold,
+                    messages(
+                      "memberDetails.dateOfBirth.upload.error.future",
+                      dateThreshold.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG))
+                    )
+                  ),
+                DateFormErrors
+                  .failIfDateBefore(
+                    Constants.earliestDate,
+                    messages(
+                      "memberDetails.dateOfBirth.upload.error.after",
+                      Constants.earliestDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG))
+                    )
+                  )
+              )
             )
           )
+        }.bind(
+          Map(
+            nameDOBFormProvider.firstName -> firstName.value,
+            nameDOBFormProvider.lastName -> lastName.value,
+            dobDayKey -> day,
+            dobMonthKey -> month,
+            dobYearKey -> year
+          )
+        )
 
         val errorTypeMapping: FormError => ValidationErrorType = _.key match {
           case nameDOBFormProvider.firstName => ValidationErrorType.FirstName

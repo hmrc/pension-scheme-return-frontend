@@ -47,6 +47,7 @@ import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 import views.html.YesNoPageView
 
+import java.time.LocalDate
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -106,7 +107,7 @@ class CheckMemberDetailsFileController @Inject()(
                 }
                 validated <- {
                   auditDownload(srn, source._1, startTime)
-                  uploadValidator.validateCSV(source._2, srn, request)
+                  uploadValidator.validateCSV(source._2, srn, request, None)
                 }
                 _ <- {
                   auditValidation(srn, validated)
@@ -118,7 +119,6 @@ class CheckMemberDetailsFileController @Inject()(
           }
       )
   }
-
   // todo: handle all Upscan upload states
   //       None is an error case as the initial state set on the previous page should be InProgress
   private def getUploadedFile(uploadKey: UploadKey): Future[Option[UploadStatus.Success]] =

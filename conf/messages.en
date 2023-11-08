@@ -245,6 +245,29 @@ memberDetails.dateOfBirth.error.future = Date of birth must be before {0}
 memberDetails.dateOfBirth.error.after = Date of birth must be after {0}
 memberDetails.dateOfBirth.error.format = Member’s date of birth must be in the format 01/08/1970
 
+memberDetailsNino.upload.error.invalid = Member’s National Insurance number must be 2 letters, 6 numbers, then A, B, C or D. For example, QQ123456C
+memberDetailsNino.upload.error.duplicate = National Insurance number is already in use and cannot be duplicated
+
+noNINO.upload.upload.error.length = Reason member does not have a National Insurance number must be 160 characters or fewer
+noNINO.upload.upload.error.invalid = Reason member does not have a National Insurance number must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+
+memberDetails.firstName.upload.error.required = Enter the member’s first name
+memberDetails.firstName.upload.error.invalid = Member’s first name must only include letters a to z, hyphens, apostrophes and spaces
+memberDetails.firstName.upload.error.length = Member’s first name must be 35 characters or fewer
+memberDetails.lastName.upload.error.required = Enter the member’s last name
+memberDetails.lastName.upload.error.invalid = Member’s last name must only include letters a to z, hyphens, apostrophes and spaces
+memberDetails.lastName.upload.error.length = Member’s last name must be 35 characters or fewer
+
+memberDetails.dateOfBirth.upload.error.required.all = Enter the member’s date of birth
+memberDetails.dateOfBirth.upload.error.required.day = Date of birth must include a day
+memberDetails.dateOfBirth.upload.error.required.month = Date of birth must include a month
+memberDetails.dateOfBirth.upload.error.required.year = Date of birth must include a year
+memberDetails.dateOfBirth.upload.error.required.two = Date of birth must include a {0} and {1}
+memberDetails.dateOfBirth.upload.error.invalid.date = Member’s date of birth must be a real date
+memberDetails.dateOfBirth.upload.error.invalid.characters = Date of birth must only include numbers 0 to 9
+memberDetails.dateOfBirth.upload.error.future = Member’s date of birth must be before {0}
+memberDetails.dateOfBirth.upload.error.after = Member’s date of birth must be after {0}
+
 
 psaDeclaration.title = Declaration
 psaDeclaration.heading = Declaration
