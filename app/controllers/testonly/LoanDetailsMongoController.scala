@@ -85,7 +85,7 @@ class LoanDetailsMongoController @Inject()(
         index => IdentityTypePage(srn, index, IdentitySubject.LoanRecipient) -> IdentityType.Individual
       )
       loanRecipientName = indexes
-        .map(index => IndividualRecipientNamePage(srn, index) -> s"Name-$index")
+        .map(index => IndividualRecipientNamePage(srn, index) -> s"Name$index")
         .sortBy(_._1.index.value)
       nino = indexes.map(
         index => IndividualRecipientNinoPage(srn, index) -> ConditionalYesNo.yes[String, Nino](Nino("SX123456A"))
