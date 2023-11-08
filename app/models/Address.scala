@@ -16,55 +16,135 @@
 
 package models
 
+import cats.data.NonEmptyList
 import play.api.libs.functional.FunctionalBuilder
 import play.api.libs.functional.syntax._
 import play.api.libs.json.Reads._
-import play.api.libs.json.{JsPath, Json, Reads, Writes}
+import play.api.libs.json.{JsPath, Json, OFormat, Reads, Writes}
 import utils.Country
 
 case class ALFCountry(code: String, name: String)
 
-case class ALFAddress(lines: Seq[String], postcode: Option[String], country: ALFCountry) extends {
-  val firstLine: Option[String] = lines.headOption
+case class ALFAddress(lines: Seq[String], town: String, postcode: String, country: ALFCountry) extends {
+  val firstLine: String = lines.head
   val secondLine: Option[String] = lines.drop(1).headOption
   val thirdLine: Option[String] = lines.drop(2).headOption
-  val town: Option[String] = lines.drop(3).headOption
 }
 
+/**
+ * Based on this schema: https://github.com/hmrc/address-lookup/blob/main/public/api/conf/1.0/docs/uk-address-object.json
+ * First line, town, postcode and country are required
+ */
+case class ALFAddressResponse(id: String, address: ALFAddress)
+
+object ALFAddressResponse {
+  implicit val countryFormat: OFormat[ALFCountry] = Json.format[ALFCountry]
+  implicit val addressFormat: OFormat[ALFAddress] = Json.format[ALFAddress]
+  implicit val responseFormat: OFormat[ALFAddressResponse] = Json.format[ALFAddressResponse]
+}
+
+sealed trait AddressType
+
+case object ManualAddress extends AddressType
+
+case object LookupAddress extends AddressType
+
 case class Address(
+  id: String,
   addressLine1: String,
-  addressLine2: String,
+  addressLine2: Option[String],
   addressLine3: Option[String],
-  town: Option[String],
+  town: String,
   postCode: Option[String],
   country: String,
-  countryCode: String
-)
+  countryCode: String,
+  addressType: AddressType
+) {
+  val asString =
+    s"""$addressLine1, ${addressLine2.fold("")(al2 => s"$al2, ")}${addressLine3.fold("")(al3 => s"$al3, ")}$town${postCode
+      .fold("")(postcode => s", $postcode")}"""
+
+  val asNel: NonEmptyList[String] = NonEmptyList.of(addressLine1) ++ List(addressLine2, addressLine3).flatten ++ List(
+    town
+  ) ++ List.from(postCode)
+
+  val asUKAddressTuple: (String, Option[String], Option[String], String, Option[String]) =
+    (addressLine1, addressLine2, addressLine3, town, postCode)
+
+  val asInternationalAddressTuple: (String, Option[String], Option[String], String, Option[String], String) =
+    (addressLine1, addressLine2, addressLine3, town, postCode, country)
+
+  val isManualAddress: Boolean = addressType match {
+    case ManualAddress => true
+    case LookupAddress => false
+  }
+}
 
 object Address {
 
-  private val addressReadsBuilder
-    : FunctionalBuilder[Reads]#CanBuild6[String, String, Option[String], Option[String], Option[String], String] =
-    (JsPath \ "addressLine1")
+  implicit val lookupFormat: OFormat[LookupAddress.type] = Json.format[LookupAddress.type]
+  implicit val manualFormat: OFormat[ManualAddress.type] = Json.format[ManualAddress.type]
+  implicit val addressTypeFormat: OFormat[AddressType] = Json.format[AddressType]
+
+  private val addressReadsBuilder =
+    (JsPath \ "id")
       .read[String]
-      .and((JsPath \ "addressLine2").read[String])
+      .and((JsPath \ "addressLine1").read[String])
+      .and((JsPath \ "addressLine2").readNullable[String])
       .and((JsPath \ "addressLine3").readNullable[String])
-      .and((JsPath \ "town").readNullable[String])
+      .and((JsPath \ "town").read[String])
       .and((JsPath \ "postCode").readNullable[String])
       .and((JsPath \ "countryCode").read[String])
+      .and((JsPath \ "addressType").read[AddressType])
+
   implicit val addressReads: Reads[Address] =
     addressReadsBuilder.apply(
-      (addressLine1, addressLine2, addressLine3, town, postCode, countryCode) => {
+      (id, addressLine1, addressLine2, addressLine3, town, postCode, countryCode, addressType) => {
         Address(
+          id,
           addressLine1,
           addressLine2,
           addressLine3,
           town,
           postCode,
           Country.getCountry(countryCode).getOrElse(""),
-          countryCode
+          countryCode,
+          addressType
         )
       }
     )
+
   implicit val addressWrites: Writes[Address] = Json.writes[Address]
+
+  def fromManualUKAddress(tup: (String, Option[String], Option[String], String, Option[String])): Address = {
+    val (addressLine1, addressLine2, addressLine3, town, postCode) = tup
+    Address(
+      "manual",
+      addressLine1,
+      addressLine2,
+      addressLine3,
+      town,
+      postCode,
+      "United Kingdom",
+      "GB",
+      ManualAddress
+    )
+  }
+
+  def fromManualInternationalAddress(
+    tup: (String, Option[String], Option[String], String, Option[String], String)
+  ): Address = {
+    val (addressLine1, addressLine2, addressLine3, town, postCode, country) = tup
+    Address(
+      "manual",
+      addressLine1,
+      addressLine2,
+      addressLine3,
+      town,
+      postCode,
+      country,
+      "N/A", // TODO get country code from country
+      ManualAddress
+    )
+  }
 }

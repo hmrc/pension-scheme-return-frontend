@@ -22,7 +22,7 @@ import controllers.nonsipp.landorproperty.IsLandPropertyLeasedController._
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import pages.nonsipp.landorproperty.{IsLandPropertyLeasedPage, LandOrPropertyAddressLookupPage}
+import pages.nonsipp.landorproperty.{IsLandPropertyLeasedPage, LandOrPropertyChosenAddressPage}
 import views.html.YesNoPageView
 
 class IsLandPropertyLeasedControllerSpec extends ControllerBaseSpec {
@@ -34,7 +34,7 @@ class IsLandPropertyLeasedControllerSpec extends ControllerBaseSpec {
 
   "LandPropertyInUKController" - {
 
-    val updatedUserAnswers = defaultUserAnswers.unsafeSet(LandOrPropertyAddressLookupPage(srn, index), address)
+    val updatedUserAnswers = defaultUserAnswers.unsafeSet(LandOrPropertyChosenAddressPage(srn, index), address)
 
     act.like(renderView(onPageLoad, updatedUserAnswers) { implicit app => implicit request =>
       injected[YesNoPageView]

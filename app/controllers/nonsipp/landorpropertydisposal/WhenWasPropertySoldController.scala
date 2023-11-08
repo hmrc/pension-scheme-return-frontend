@@ -27,7 +27,7 @@ import models.Mode
 import models.SchemeId.Srn
 import models.requests.DataRequest
 import navigation.Navigator
-import pages.nonsipp.landorproperty.LandOrPropertyAddressLookupPage
+import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import pages.nonsipp.landorpropertydisposal.WhenWasPropertySoldPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
@@ -63,7 +63,7 @@ class WhenWasPropertySoldController @Inject()(
   def onPageLoad(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
-        request.userAnswers.get(LandOrPropertyAddressLookupPage(srn, landOrPropertyIndex)).getOrRecoverJourney {
+        request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, landOrPropertyIndex)).getOrRecoverJourney {
           address =>
             val preparedForm = {
               request.userAnswers
@@ -84,7 +84,7 @@ class WhenWasPropertySoldController @Inject()(
           .bindFromRequest()
           .fold(
             formWithErrors =>
-              request.userAnswers.get(LandOrPropertyAddressLookupPage(srn, landOrPropertyIndex)).getOrRecoverJourney {
+              request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, landOrPropertyIndex)).getOrRecoverJourney {
                 address =>
                   Future.successful(
                     BadRequest(

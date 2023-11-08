@@ -17,16 +17,29 @@
 package forms.mappings.errors
 
 import config.Constants._
+import forms.mappings.Regex
 
 case class InputFormErrors(
   requiredKey: String,
-  invalidCharactersKey: String,
-  regex: String,
+  regexChecks: List[(Regex, String)],
   max: (Int, String),
   args: Any*
 )
 
 object InputFormErrors {
+
+  def input(
+    requiredKey: String,
+    invalidCharactersKey: String,
+    maxError: String,
+    args: Any*
+  ): InputFormErrors = InputFormErrors(
+    requiredKey,
+    List((textAreaRegex, invalidCharactersKey)),
+    (maxInputLength, maxError),
+    args: _*
+  )
+
   def textArea(
     requiredKey: String,
     invalidCharactersKey: String,
@@ -34,9 +47,24 @@ object InputFormErrors {
     args: Any*
   ): InputFormErrors = InputFormErrors(
     requiredKey,
-    invalidCharactersKey,
-    textAreaRegex,
+    List((textAreaRegex, invalidCharactersKey)),
     (maxTextAreaLength, maxError),
     args: _*
   )
+
+  def postcode(
+    requiredKey: String,
+    invalidCharactersKey: String,
+    invalidFormatKey: String,
+    args: Any*
+  ) =
+    InputFormErrors(
+      requiredKey,
+      List(
+        (postcodeCharsRegex, invalidCharactersKey),
+        (postcodeFormatRegex, invalidFormatKey)
+      ),
+      (maxTextAreaLength, invalidFormatKey),
+      args: _*
+    )
 }

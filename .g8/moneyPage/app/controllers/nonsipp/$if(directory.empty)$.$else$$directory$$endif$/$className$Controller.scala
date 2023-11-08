@@ -16,6 +16,7 @@
 
 $! Generic imports !$
 $if(directory.empty)$
+
 package controllers.nonsipp
 $else$
 package controllers.nonsipp.$directory$

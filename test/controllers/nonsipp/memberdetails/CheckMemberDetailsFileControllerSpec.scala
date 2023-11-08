@@ -24,8 +24,6 @@ import forms.YesNoPageFormProvider
 import models.UploadStatus.UploadStatus
 import models._
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
-import org.mockito.MockitoSugar.when
 import pages.nonsipp.memberdetails.CheckMemberDetailsFilePage
 import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
@@ -68,7 +66,7 @@ class CheckMemberDetailsFileControllerSpec extends ControllerBaseSpec {
     reset(mockAuditService)
     mockStream()
     mockSaveValidatedUpload()
-    mockValidateCSV(UploadFormatError)
+    mockValidateCSV(UploadFormatError, 0, 0L)
   }
 
   "CheckMemberDetailsFileController" - {
@@ -96,15 +94,16 @@ class CheckMemberDetailsFileControllerSpec extends ControllerBaseSpec {
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
-    act.like(saveAndContinue(onSubmit, "value" -> "true")
-      .before({
-        mockTaxYear(dateRange)
-        mockGetUploadStatus(Some(uploadedSuccessfully))
-      })
-      .after({
-        verify(mockAuditService, times(1)).sendEvent(any())(any(), any())
-        reset(mockAuditService)
-      })
+    act.like(
+      saveAndContinue(onSubmit, "value" -> "true")
+        .before({
+          mockTaxYear(dateRange)
+          mockGetUploadStatus(Some(uploadedSuccessfully))
+        })
+        .after({
+          verify(mockAuditService, times(2)).sendEvent(any())(any(), any())
+          reset(mockAuditService)
+        })
     )
 
     act.like(invalidForm(onSubmit, "invalid" -> "form").before(mockGetUploadStatus(Some(uploadedSuccessfully))))
@@ -117,7 +116,7 @@ class CheckMemberDetailsFileControllerSpec extends ControllerBaseSpec {
   private def mockStream(): Unit =
     when(mockUploadService.stream(any())(any())).thenReturn(Future.successful((200, Source.single(byteString))))
 
-  private def mockValidateCSV(result: Upload): Unit =
+  private def mockValidateCSV(result: (Upload, Int, Long)): Unit =
     when(mockMemberDetailsUploadValidator.validateCSV(any(), any(), any())(any(), any()))
       .thenReturn(Future.successful(result))
 

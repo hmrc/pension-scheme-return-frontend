@@ -20,6 +20,7 @@ import config.Refined.{Max300, Max50}
 import controllers.actions.IdentifyAndRequireData
 import forms.YesNoPageFormProvider
 import forms.mappings.Mappings
+import forms.mappings.errors.InputFormErrors
 import models.SchemeId.Srn
 import models.{ConditionalYesNo, Crn, Mode}
 import navigation.Navigator
@@ -98,14 +99,16 @@ class EmployerCompanyCrnController @Inject()(
 
 object EmployerCompanyCrnController {
 
+  private val noFormErrors = InputFormErrors.input(
+    "employerCompanyCRN.no.conditional.error.required",
+    "employerCompanyCRN.no.conditional.error.invalid",
+    "employerCompanyCRN.no.conditional.error.length"
+  )
+
   def form(formProvider: YesNoPageFormProvider): Form[Either[String, Crn]] =
     formProvider.conditional(
       "employerCompanyCRN.error.required",
-      mappingNo = Mappings.textArea(
-        "employerCompanyCRN.no.conditional.error.required",
-        "employerCompanyCRN.no.conditional.error.invalid",
-        "employerCompanyCRN.no.conditional.error.length"
-      ),
+      mappingNo = Mappings.input(noFormErrors),
       mappingYes = Mappings.crn(
         "employerCompanyCRN.yes.conditional.error.required",
         "employerCompanyCRN.yes.conditional.error.invalid",

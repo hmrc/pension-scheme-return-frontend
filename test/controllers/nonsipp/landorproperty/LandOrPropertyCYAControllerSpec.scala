@@ -21,7 +21,7 @@ import controllers.ControllerBaseSpec
 import eu.timepit.refined.refineMV
 import models.ConditionalYesNo._
 import models.SchemeHoldLandProperty.Transfer
-import models.{CheckOrChange, ConditionalYesNo}
+import models.{CheckMode, CheckOrChange, ConditionalYesNo, Mode, NormalMode}
 import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.landorproperty._
 import play.api.inject.bind
@@ -42,10 +42,10 @@ class LandOrPropertyCYAControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[OneTo5000](1)
 
-  private def onPageLoad(checkOrChange: CheckOrChange) =
-    routes.LandOrPropertyCYAController.onPageLoad(srn, index, checkOrChange)
+  private def onPageLoad(mode: Mode) =
+    routes.LandOrPropertyCYAController.onPageLoad(srn, index, mode)
 
-  private def onSubmit(checkOrChange: CheckOrChange) = routes.LandOrPropertyCYAController.onSubmit(srn, checkOrChange)
+  private def onSubmit(mode: Mode) = routes.LandOrPropertyCYAController.onSubmit(srn, mode)
 
   private val filledUserAnswers = defaultUserAnswers
     .unsafeSet(LandPropertyInUKPage(srn, index), true)
@@ -54,13 +54,13 @@ class LandOrPropertyCYAControllerSpec extends ControllerBaseSpec {
     .unsafeSet(LandOrPropertyTotalCostPage(srn, index), money)
     .unsafeSet(IsLandOrPropertyResidentialPage(srn, index), false)
     .unsafeSet(LandOrPropertyTotalIncomePage(srn, index), money)
-    .unsafeSet(LandOrPropertyAddressLookupPage(srn, index), address)
+    .unsafeSet(LandOrPropertyChosenAddressPage(srn, index), address)
     .unsafeSet(IsLandPropertyLeasedPage(srn, index), false)
 
   "LandOrPropertyCYAController" - {
-    List(CheckOrChange.Check, CheckOrChange.Change).foreach { checkOrChange =>
+    List(NormalMode, CheckMode).foreach { mode =>
       act.like(
-        renderView(onPageLoad(checkOrChange), filledUserAnswers) { implicit app => implicit request =>
+        renderView(onPageLoad(mode), filledUserAnswers) { implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
             LandOrPropertyCYAController.viewModel(
               ViewModelParameters(
@@ -83,33 +83,33 @@ class LandOrPropertyCYAControllerSpec extends ControllerBaseSpec {
                 landOrPropertyTotalIncome = money,
                 addressLookUpPage = address,
                 leaseDetails = None,
-                checkOrChange = checkOrChange
+                mode = mode
               )
             )
           )
-        }.withName(s"render correct ${checkOrChange.name} view")
+        }.withName(s"render correct ${mode.toString} view")
       )
 
       act.like(
-        redirectNextPage(onSubmit(checkOrChange))
+        redirectNextPage(onSubmit(mode))
           .before(MockPSRSubmissionService.submitPsrDetails())
           .after({
             verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any())(any(), any(), any())
             reset(mockPsrSubmissionService)
           })
-          .withName(s"redirect to next page when in ${checkOrChange.name} mode")
+          .withName(s"redirect to next page when in ${mode} mode")
       )
 
       act.like(
-        journeyRecoveryPage(onPageLoad(checkOrChange))
+        journeyRecoveryPage(onPageLoad(mode))
           .updateName("onPageLoad" + _)
-          .withName(s"redirect to journey recovery page on page load when in ${checkOrChange.name} mode")
+          .withName(s"redirect to journey recovery page on page load when in ${mode} mode")
       )
 
       act.like(
-        journeyRecoveryPage(onSubmit(checkOrChange))
+        journeyRecoveryPage(onSubmit(mode))
           .updateName("onSubmit" + _)
-          .withName(s"redirect to journey recovery page on submit when in ${checkOrChange.name} mode")
+          .withName(s"redirect to journey recovery page on submit when in ${mode} mode")
       )
     }
   }

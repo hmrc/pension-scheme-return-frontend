@@ -19,7 +19,7 @@ package forms.mappings
 import config.Constants._
 import forms.mappings.errors._
 import models.{Crn, DateRange, Enumerable, Money, Percentage, Security, Utr}
-import play.api.data.Forms.of
+import play.api.data.Forms.{of, optional}
 import play.api.data.validation.{Constraint, Invalid, Valid}
 import play.api.data.{FieldMapping, Mapping}
 import uk.gov.hmrc.domain.Nino
@@ -33,6 +33,9 @@ trait Mappings extends Formatters with Constraints {
 
   def optionalText(): Mapping[String] =
     of(optionalStringFormatter()).transform[String](_.trim, _.trim)
+
+  def optionalText(invalidKey: String): Mapping[Option[String]] =
+    optional(text(invalidKey))
 
   def int(
     requiredKey: String = "error.required",
@@ -149,41 +152,29 @@ trait Mappings extends Formatters with Constraints {
 
   def validatedText(
     requiredKey: String,
-    textRegex: String,
-    invalidCharactersKey: String,
+    regexChecks: List[(Regex, String)],
     maxLength: Int,
     maxLengthErrorKey: String,
     args: Any*
   ): Mapping[String] =
-    text(requiredKey, args.toList)
-      .verifying(verify[String](invalidCharactersKey, _.matches(textRegex), args: _*))
+    regexChecks
+      .foldLeft(text(requiredKey, args.toList)) {
+        case (mapping, (regex, key)) =>
+          mapping.verifying(verify[String](key, _.matches(regex), args: _*))
+      }
       .verifying(verify[String](maxLengthErrorKey, _.length <= maxLength, args: _*))
 
   def input(formErrors: InputFormErrors): Mapping[String] =
     validatedText(
       formErrors.requiredKey,
-      formErrors.regex,
-      formErrors.invalidCharactersKey,
+      formErrors.regexChecks,
       formErrors.max._1,
       formErrors.max._2,
       formErrors.args: _*
     )
 
-  def textArea(formErrors: InputFormErrors): Mapping[String] =
-    textArea(
-      formErrors.requiredKey,
-      formErrors.invalidCharactersKey,
-      formErrors.max._2,
-      formErrors.args: _*
-    )
-
-  def textArea(
-    requiredNoKey: String,
-    invalidNoKey: String,
-    maxLengthNoKey: String,
-    args: Any*
-  ): Mapping[String] =
-    validatedText(requiredNoKey, textAreaRegex, invalidNoKey, maxTextAreaLength, maxLengthNoKey, args: _*)
+  def optionalInput(formErrors: InputFormErrors): Mapping[Option[String]] =
+    optional(input(formErrors))
 
   def nino(
     requiredKey: String,

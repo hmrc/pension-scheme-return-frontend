@@ -43,8 +43,7 @@ class TextFormProvider @Inject()() {
   ): Form[String] = Form(
     formKey -> Mappings.validatedText(
       requiredKey,
-      textAreaRegex,
-      invalidCharactersKey,
+      List((textAreaRegex, invalidCharactersKey)),
       textAreaMaxLength,
       tooLongKey,
       args: _*
@@ -70,8 +69,7 @@ class TextFormProvider @Inject()() {
   ): Form[String] = Form(
     formKey -> Mappings.validatedText(
       requiredKey,
-      nameRegex,
-      invalidCharactersKey,
+      List((nameRegex, invalidCharactersKey)),
       textAreaMaxLength,
       tooLongKey,
       args: _*
@@ -86,8 +84,7 @@ class TextFormProvider @Inject()() {
   ): Form[String] = Form(
     formKey -> Mappings.validatedText(
       requiredKey,
-      textAreaRegex,
-      invalidCharactersKey,
+      List((textAreaRegex, invalidCharactersKey)),
       textAreaMaxLength,
       tooLongKey,
       args: _*

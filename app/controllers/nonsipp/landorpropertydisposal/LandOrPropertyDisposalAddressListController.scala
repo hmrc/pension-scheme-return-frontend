@@ -19,8 +19,9 @@ package controllers.nonsipp.landorpropertydisposal
 import cats.implicits._
 import com.google.inject.Inject
 import config.Constants
-import config.Refined.Max5000
 import config.Refined.Max5000._
+import config.Refined.{Max5000, _}
+import controllers.PSRController
 import controllers.actions._
 import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalAddressListController._
 import eu.timepit.refined.refineV
@@ -37,8 +38,6 @@ import viewmodels.DisplayMessage.{Message, ParagraphMessage}
 import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, ListRadiosRow, ListRadiosViewModel, PaginatedViewModel}
 import views.html.ListRadiosView
-import config.Refined._
-import controllers.PSRController
 
 import javax.inject.Named
 import scala.collection.immutable.SortedMap

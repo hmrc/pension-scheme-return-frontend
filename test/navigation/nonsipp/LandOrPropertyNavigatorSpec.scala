@@ -67,8 +67,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           index,
           LandPropertyInUKPage,
           Gen.const(true),
-          (srn, index: Max5000, _) =>
-            controllers.nonsipp.landorproperty.routes.LandOrPropertyAddressLookupController.onPageLoad(srn, index)
+          controllers.nonsipp.landorproperty.routes.LandOrPropertyPostcodeLookupController.onPageLoad
         )
         .withName("go from land or property in uk page to land or property address lookup when yes selected")
     )
@@ -79,21 +78,20 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           index,
           LandPropertyInUKPage,
           Gen.const(false),
-          (srn, index: Max5000, _) =>
-            controllers.nonsipp.landorproperty.routes.LandOrPropertyAddressLookupController.onPageLoad(srn, index)
+          (srn, index: Max5000, mode) =>
+            controllers.nonsipp.landorproperty.routes.LandPropertyAddressManualController
+              .onPageLoad(srn, index, isUkAddress = false, mode)
         )
-        .withName("go from land or property in uk page to land or property address lookup when no selected")
+        .withName("go from land or property in uk page to manual land or property address lookup when no selected")
     )
 
     act.like(
       normalmode
         .navigateToWithDataAndIndex(
           index,
-          LandOrPropertyAddressLookupPage,
+          LandOrPropertyChosenAddressPage,
           Gen.const(address),
-          (srn, index: Max5000, _) =>
-            controllers.nonsipp.landorproperty.routes.LandRegistryTitleNumberController
-              .onPageLoad(srn, index, NormalMode)
+          controllers.nonsipp.landorproperty.routes.LandRegistryTitleNumberController.onPageLoad
         )
         .withName("go from land or property address lookup page to land registry title page")
     )
@@ -104,9 +102,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           index,
           LandRegistryTitleNumberPage,
           Gen.const(ConditionalYesNo.yes[String, String]("test")),
-          (srn, index: Max5000, _) =>
-            controllers.nonsipp.landorproperty.routes.WhyDoesSchemeHoldLandPropertyController
-              .onPageLoad(srn, index, NormalMode)
+          controllers.nonsipp.landorproperty.routes.WhyDoesSchemeHoldLandPropertyController.onPageLoad
         )
         .withName("go from land registry title page to why does scheme hold land or property page")
     )
@@ -132,7 +128,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             Gen.const(money),
             (srn, index: Max5000, _) =>
               controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
-                .onPageLoad(srn, index, CheckOrChange.Check),
+                .onPageLoad(srn, index, NormalMode),
             srn => defaultUserAnswers.unsafeSet(LandOrPropertyTotalIncomePage(srn, index), money)
           )
           .withName(
@@ -213,8 +209,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateToWithIndex(
           index,
           LandPropertyIndividualSellersNamePage,
-          (srn, index: Max5000, _) =>
-            controllers.nonsipp.landorproperty.routes.IndividualSellerNiController.onPageLoad(srn, index, NormalMode)
+          controllers.nonsipp.landorproperty.routes.IndividualSellerNiController.onPageLoad
         )
         .withName("go from land or property individual seller name page to ? page")
     )
@@ -254,9 +249,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             index,
             LandOrPropertySellerConnectedPartyPage,
             Gen.const(true),
-            (srn, index: Max5000, _) =>
-              controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
-                .onPageLoad(srn, index, CheckOrChange.Check),
+            controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController.onPageLoad,
             srn =>
               defaultUserAnswers
                 .unsafeSet(LandOrPropertyTotalCostPage(srn, index), Money(1))
@@ -279,8 +272,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           index,
           (srn, _: Max5000) => WhyDoesSchemeHoldLandPropertyPage(srn, index),
           Gen.const(Acquisition),
-          (srn, index: Max5000, mode) =>
-            controllers.nonsipp.landorproperty.routes.WhenDidSchemeAcquireController.onPageLoad(srn, index, mode)
+          controllers.nonsipp.landorproperty.routes.WhenDidSchemeAcquireController.onPageLoad
         )
         .withName("why does scheme hold land property page to WhenDidSchemeAcquireController page on Acquisition")
     )
@@ -291,8 +283,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           index,
           (srn, _: Max5000) => WhyDoesSchemeHoldLandPropertyPage(srn, index),
           Gen.const(Contribution),
-          (srn, index: Max5000, mode) =>
-            controllers.nonsipp.landorproperty.routes.WhenDidSchemeAcquireController.onPageLoad(srn, index, mode)
+          controllers.nonsipp.landorproperty.routes.WhenDidSchemeAcquireController.onPageLoad
         )
         .withName("why does scheme hold land property page to WhenDidSchemeAcquireController page on Contribution")
     )
@@ -303,8 +294,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           index,
           (srn, _: Max5000) => WhyDoesSchemeHoldLandPropertyPage(srn, index),
           Gen.const(Transfer),
-          (srn, index: Max5000, mode) =>
-            controllers.nonsipp.landorproperty.routes.LandOrPropertyTotalCostController.onPageLoad(srn, index, mode)
+          controllers.nonsipp.landorproperty.routes.LandOrPropertyTotalCostController.onPageLoad
         )
         .withName("why does scheme hold land property page to WhenDidSchemeAcquireController page on Transfer")
     )
@@ -318,9 +308,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateToWithIndex(
           index,
           LandPropertyIndependentValuationPage,
-          (srn, index: Max5000, _) =>
-            controllers.nonsipp.landorproperty.routes.LandOrPropertyTotalCostController
-              .onPageLoad(srn, index, NormalMode)
+          controllers.nonsipp.landorproperty.routes.LandOrPropertyTotalCostController.onPageLoad
         )
         .withName(
           "go from land property independent valuation page to land Or property total cost page when yes selected"
@@ -333,9 +321,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           index,
           LandPropertyIndependentValuationPage,
           Gen.const(false),
-          (srn, index: Max5000, _) =>
-            controllers.nonsipp.landorproperty.routes.LandOrPropertyTotalCostController
-              .onPageLoad(srn, index, NormalMode)
+          controllers.nonsipp.landorproperty.routes.LandOrPropertyTotalCostController.onPageLoad
         )
         .withName(
           "go from land property independent valuation page to land Or property total cost page when no selected"
@@ -351,8 +337,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           index,
           IsLandOrPropertyResidentialPage,
           Gen.const(true),
-          (srn, index: Max5000, _) =>
-            controllers.nonsipp.landorproperty.routes.IsLandPropertyLeasedController.onPageLoad(srn, index, NormalMode)
+          controllers.nonsipp.landorproperty.routes.IsLandPropertyLeasedController.onPageLoad
         )
         .withName("go from land or property in uk page to Is land property leased when yes selected")
     )
@@ -363,8 +348,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           index,
           IsLandOrPropertyResidentialPage,
           Gen.const(false),
-          (srn, index: Max5000, _) =>
-            controllers.nonsipp.landorproperty.routes.IsLandPropertyLeasedController.onPageLoad(srn, index, NormalMode)
+          controllers.nonsipp.landorproperty.routes.IsLandPropertyLeasedController.onPageLoad
         )
         .withName("go from land or property in uk page to unauthorised when no selected")
     )
@@ -378,9 +362,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           index,
           IsLandPropertyLeasedPage,
           Gen.const(true),
-          (srn, index: Max5000, _) =>
-            controllers.nonsipp.landorproperty.routes.LandOrPropertyLeaseDetailsController
-              .onPageLoad(srn, index, NormalMode)
+          controllers.nonsipp.landorproperty.routes.LandOrPropertyLeaseDetailsController.onPageLoad
         )
         .withName("go from is land property leased page to land or property lease details page when yes selected")
     )
@@ -404,9 +386,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateToWithIndex(
           index,
           IndividualSellerNiPage,
-          (srn, index: Max5000, mode) =>
-            controllers.nonsipp.landorproperty.routes.LandOrPropertySellerConnectedPartyController
-              .onPageLoad(srn, index, NormalMode)
+          controllers.nonsipp.landorproperty.routes.LandOrPropertySellerConnectedPartyController.onPageLoad
         )
         .withName("go from individual sellerNi page to land Or property seller connected party page when yes selected")
     )
@@ -418,9 +398,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateToWithIndex(
           index,
           LandOrPropertyLeaseDetailsPage,
-          (srn, index: Max5000, mode) =>
-            controllers.nonsipp.landorproperty.routes.IsLesseeConnectedPartyController
-              .onPageLoad(srn, index, NormalMode)
+          controllers.nonsipp.landorproperty.routes.IsLesseeConnectedPartyController.onPageLoad
         )
         .withName("go from land Or property lease details page to is lessee connected party page")
     )
@@ -433,9 +411,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateToWithIndex(
           index,
           IsLesseeConnectedPartyPage,
-          (srn, index: Max5000, _) =>
-            controllers.nonsipp.landorproperty.routes.LandOrPropertyTotalIncomeController
-              .onPageLoad(srn, index, NormalMode)
+          controllers.nonsipp.landorproperty.routes.LandOrPropertyTotalIncomeController.onPageLoad
         )
         .withName("go from is lessee connected party page to Land or property CYA page")
     )
@@ -447,11 +423,9 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateToWithIndex(
           index,
           LandOrPropertyTotalIncomePage,
-          (srn, index: Max5000, _) =>
-            controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
-              .onPageLoad(srn, index, CheckOrChange.Check)
+          controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController.onPageLoad
         )
-        .withName("go from LandOrPropertyTotalIncome page to Land or property CYA page page")
+        .withName("go from LandOrPropertyTotalIncome page to Land or property CYA page")
     )
   }
 
@@ -511,9 +485,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       normalmode
         .navigateTo(
           srn => RemovePropertyPage(srn, refineMV(1)),
-          (srn, _) =>
-            controllers.nonsipp.landorproperty.routes.LandOrPropertyHeldController
-              .onPageLoad(srn, NormalMode)
+          controllers.nonsipp.landorproperty.routes.LandOrPropertyHeldController.onPageLoad
         )
         .withName("go from remove page to LandOrPropertyHeldPage page")
     )
@@ -528,7 +500,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             LandOrPropertyTotalIncomePage(_, index),
             (srn, _) =>
               controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
-                .onPageLoad(srn, index, CheckOrChange.Check)
+                .onPageLoad(srn, index, CheckMode)
           )
           .withName("go from LandOrPropertyTotalIncome page to Land or property CYA page page")
       )
@@ -541,7 +513,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             IsLesseeConnectedPartyPage(_, index),
             (srn, _) =>
               controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
-                .onPageLoad(srn, index, CheckOrChange.Check)
+                .onPageLoad(srn, index, CheckMode)
           )
           .withName("go from is lessee connected party page to Land or property CYA page")
       )
@@ -554,7 +526,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             LandOrPropertyLeaseDetailsPage(_, index),
             (srn, _) =>
               controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
-                .onPageLoad(srn, index, CheckOrChange.Check)
+                .onPageLoad(srn, index, CheckMode)
           )
           .withName("go from land Or property lease details page to Land or property CYA page")
       )
@@ -568,9 +540,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             index,
             IsLandPropertyLeasedPage,
             Gen.const(true),
-            (srn, index: Max5000, _) =>
-              controllers.nonsipp.landorproperty.routes.LandOrPropertyLeaseDetailsController
-                .onPageLoad(srn, index, NormalMode)
+            controllers.nonsipp.landorproperty.routes.LandOrPropertyLeaseDetailsController.onPageLoad
           )
           .withName("go from is land property leased page to land or property lease details page when yes selected")
       )
@@ -596,7 +566,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             Gen.const(true),
             (srn, _) =>
               controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
-                .onPageLoad(srn, index, CheckOrChange.Check)
+                .onPageLoad(srn, index, CheckMode)
           )
           .withName("go from land or property in uk page to Land or property CYA page when the value is true")
       )
@@ -608,7 +578,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             Gen.const(false),
             (srn, _) =>
               controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
-                .onPageLoad(srn, index, CheckOrChange.Check)
+                .onPageLoad(srn, index, CheckMode)
           )
           .withName("go from land or property in uk page to Land or property CYA when the value is false")
       )
@@ -623,7 +593,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             Gen.const(money),
             (srn, _) =>
               controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
-                .onPageLoad(srn, index, CheckOrChange.Check),
+                .onPageLoad(srn, index, CheckMode),
             srn =>
               defaultUserAnswers
                 .unsafeSet(IsLandPropertyLeasedPage(srn, index), false)
@@ -656,7 +626,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             Gen.const(true),
             (srn, _) =>
               controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
-                .onPageLoad(srn, index, CheckOrChange.Check),
+                .onPageLoad(srn, index, CheckMode),
             srn =>
               defaultUserAnswers
                 .unsafeSet(LandOrPropertyTotalCostPage(srn, index), Money(1))
@@ -678,7 +648,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             LandPropertyIndependentValuationPage(_, index),
             (srn, _) =>
               controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
-                .onPageLoad(srn, index, CheckOrChange.Check)
+                .onPageLoad(srn, index, CheckMode)
           )
           .withName(
             "go from land property independent valuation page to Land or property CYA page when true"
@@ -692,7 +662,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             Gen.const(false),
             (srn, _) =>
               controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
-                .onPageLoad(srn, index, CheckOrChange.Check)
+                .onPageLoad(srn, index, CheckMode)
           )
           .withName(
             "go from land property independent valuation page to Land or property CYA page when it is false"
@@ -707,7 +677,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           Gen.const(localDate),
           (srn, _) =>
             controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
-              .onPageLoad(srn, index, CheckOrChange.Check),
+              .onPageLoad(srn, index, CheckMode),
           srn =>
             defaultUserAnswers.unsafeSet(
               WhyDoesSchemeHoldLandPropertyPage(srn, index),
@@ -725,8 +695,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             index,
             (srn, _: Max5000) => WhyDoesSchemeHoldLandPropertyPage(srn, index),
             Gen.const(Acquisition),
-            (srn, index: Max5000, mode) =>
-              controllers.nonsipp.landorproperty.routes.WhenDidSchemeAcquireController.onPageLoad(srn, index, mode)
+            controllers.nonsipp.landorproperty.routes.WhenDidSchemeAcquireController.onPageLoad
           )
           .withName("why does scheme hold land property page to WhenDidSchemeAcquireController page on Acquisition")
       )
@@ -737,8 +706,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             index,
             (srn, _: Max5000) => WhyDoesSchemeHoldLandPropertyPage(srn, index),
             Gen.const(Contribution),
-            (srn, index: Max5000, mode) =>
-              controllers.nonsipp.landorproperty.routes.WhenDidSchemeAcquireController.onPageLoad(srn, index, mode)
+            controllers.nonsipp.landorproperty.routes.WhenDidSchemeAcquireController.onPageLoad
           )
           .withName("why does scheme hold land property page to WhenDidSchemeAcquireController page on Contribution")
       )
@@ -749,8 +717,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             index,
             (srn, _: Max5000) => WhyDoesSchemeHoldLandPropertyPage(srn, index),
             Gen.const(Transfer),
-            (srn, index: Max5000, mode) =>
-              controllers.nonsipp.landorproperty.routes.LandOrPropertyTotalCostController.onPageLoad(srn, index, mode)
+            controllers.nonsipp.landorproperty.routes.LandOrPropertyTotalCostController.onPageLoad
           )
           .withName("why does scheme hold land property page to WhenDidSchemeAcquireController page on Transfer")
       )
@@ -818,7 +785,7 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             Gen.const(""),
             (srn, _) =>
               controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
-                .onPageLoad(srn, index, CheckOrChange.Check)
+                .onPageLoad(srn, index, CheckMode)
           )
           .withName("go from company land or property company seller  page to Land or property CYA page")
       )
@@ -832,12 +799,11 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             Gen.const(ConditionalYesNo.yes[String, String]("test")),
             (srn, _) =>
               controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
-                .onPageLoad(srn, index, CheckOrChange.Check)
+                .onPageLoad(srn, index, CheckMode)
           )
           .withName("go from land registry title page to Land or property CYA page")
       )
     }
 
   }
-
 }

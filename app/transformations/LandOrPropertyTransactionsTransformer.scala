@@ -67,7 +67,7 @@ class LandOrPropertyTransactionsTransformer @Inject()() extends Transformer {
               case Some(index) =>
                 for {
                   landOrPropertyInUK <- request.userAnswers.get(LandPropertyInUKPage(srn, index))
-                  addressDetails <- request.userAnswers.get(LandOrPropertyAddressLookupPage(srn, index))
+                  addressDetails <- request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index))
                   landRegistryTitleNumber <- request.userAnswers.get(LandRegistryTitleNumberPage(srn, index))
                   methodOfHolding <- request.userAnswers.get(WhyDoesSchemeHoldLandPropertyPage(srn, index))
 
@@ -122,7 +122,7 @@ class LandOrPropertyTransactionsTransformer @Inject()() extends Transformer {
           val heldPropertyTransaction = landOrPropertyTransactions(index.value - 1).heldPropertyTransaction
 
           val landOrPropertyInUK = LandPropertyInUKPage(srn, index) -> propertyDetails.landOrPropertyInUK
-          val addressDetails = LandOrPropertyAddressLookupPage(srn, index) -> propertyDetails.addressDetails
+          val addressDetails = LandOrPropertyChosenAddressPage(srn, index) -> propertyDetails.addressDetails
 
           val landRegistryTitleNumber = buildLandRegistryTitleNumberDetail(srn, index, propertyDetails)
           val methodOfHolding = WhyDoesSchemeHoldLandPropertyPage(srn, index) -> heldPropertyTransaction.methodOfHolding

@@ -156,88 +156,91 @@ object LoansMadeOrOutstandingNavigator extends JourneyNavigator {
   }
   // scalastyle:on
 
-  override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
+  override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] =
+    _ =>
+      userAnswers => {
 
-    case page @ IdentityTypePage(srn, index, IdentitySubject.LoanRecipient) =>
-      userAnswers.get(page) match {
-        case Some(IdentityType.Individual) if userAnswers.get(IndividualRecipientNamePage(srn, index)).isEmpty =>
-          controllers.nonsipp.loansmadeoroutstanding.routes.IndividualRecipientNameController
-            .onPageLoad(srn, index, NormalMode)
-        case Some(IdentityType.UKCompany) if userAnswers.get(CompanyRecipientNamePage(srn, index)).isEmpty =>
-          controllers.nonsipp.loansmadeoroutstanding.routes.CompanyRecipientNameController
-            .onPageLoad(srn, index, NormalMode)
-        case Some(IdentityType.UKPartnership) if userAnswers.get(PartnershipRecipientNamePage(srn, index)).isEmpty =>
-          controllers.nonsipp.loansmadeoroutstanding.routes.PartnershipRecipientNameController
-            .onPageLoad(srn, index, NormalMode)
-        case Some(IdentityType.Other)
-            if userAnswers.get(OtherRecipientDetailsPage(srn, index, IdentitySubject.LoanRecipient)).isEmpty =>
-          controllers.nonsipp.common.routes.OtherRecipientDetailsController
-            .onPageLoad(srn, index, NormalMode, IdentitySubject.LoanRecipient)
-        case Some(_) =>
+        case page @ IdentityTypePage(srn, index, IdentitySubject.LoanRecipient) =>
+          userAnswers.get(page) match {
+            case Some(IdentityType.Individual) if userAnswers.get(IndividualRecipientNamePage(srn, index)).isEmpty =>
+              controllers.nonsipp.loansmadeoroutstanding.routes.IndividualRecipientNameController
+                .onPageLoad(srn, index, NormalMode)
+            case Some(IdentityType.UKCompany) if userAnswers.get(CompanyRecipientNamePage(srn, index)).isEmpty =>
+              controllers.nonsipp.loansmadeoroutstanding.routes.CompanyRecipientNameController
+                .onPageLoad(srn, index, NormalMode)
+            case Some(IdentityType.UKPartnership)
+                if userAnswers.get(PartnershipRecipientNamePage(srn, index)).isEmpty =>
+              controllers.nonsipp.loansmadeoroutstanding.routes.PartnershipRecipientNameController
+                .onPageLoad(srn, index, NormalMode)
+            case Some(IdentityType.Other)
+                if userAnswers.get(OtherRecipientDetailsPage(srn, index, IdentitySubject.LoanRecipient)).isEmpty =>
+              controllers.nonsipp.common.routes.OtherRecipientDetailsController
+                .onPageLoad(srn, index, NormalMode, IdentitySubject.LoanRecipient)
+            case Some(_) =>
+              controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
+                .onPageLoad(srn, index, Check)
+            case None =>
+              controllers.nonsipp.loansmadeoroutstanding.routes.WhatYouWillNeedLoansController.onPageLoad(srn)
+          }
+
+        case IndividualRecipientNamePage(srn, index) =>
           controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
             .onPageLoad(srn, index, Check)
-        case None =>
-          controllers.nonsipp.loansmadeoroutstanding.routes.WhatYouWillNeedLoansController.onPageLoad(srn)
+
+        case CompanyRecipientNamePage(srn, index) =>
+          controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
+            .onPageLoad(srn, index, Check)
+
+        case PartnershipRecipientNamePage(srn, index) =>
+          controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
+            .onPageLoad(srn, index, Check)
+
+        case OtherRecipientDetailsPage(srn, index, IdentitySubject.LoanRecipient) =>
+          controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
+            .onPageLoad(srn, index, Check)
+
+        case IndividualRecipientNinoPage(srn, index) =>
+          controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
+            .onPageLoad(srn, index, Check)
+
+        case CompanyRecipientCrnPage(srn, index, IdentitySubject.LoanRecipient) =>
+          controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
+            .onPageLoad(srn, index, Check)
+
+        case PartnershipRecipientUtrPage(srn, index, IdentitySubject.LoanRecipient) =>
+          controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
+            .onPageLoad(srn, index, Check)
+
+        case IsIndividualRecipientConnectedPartyPage(srn, index) =>
+          controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
+            .onPageLoad(srn, index, Check)
+
+        case RecipientSponsoringEmployerConnectedPartyPage(srn, index) =>
+          controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
+            .onPageLoad(srn, index, Check)
+
+        case DatePeriodLoanPage(srn, index) =>
+          controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
+            .onPageLoad(srn, index, Check)
+
+        case AmountOfTheLoanPage(srn, index) =>
+          controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
+            .onPageLoad(srn, index, Check)
+
+        case AreRepaymentsInstalmentsPage(srn, index) =>
+          controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
+            .onPageLoad(srn, index, Check)
+
+        case InterestOnLoanPage(srn, index) =>
+          controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
+            .onPageLoad(srn, index, Check)
+
+        case SecurityGivenForLoanPage(srn, index) =>
+          controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
+            .onPageLoad(srn, index, Check)
+
+        case OutstandingArrearsOnLoanPage(srn, index) =>
+          controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
+            .onPageLoad(srn, index, Check)
       }
-
-    case IndividualRecipientNamePage(srn, index) =>
-      controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
-        .onPageLoad(srn, index, Check)
-
-    case CompanyRecipientNamePage(srn, index) =>
-      controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
-        .onPageLoad(srn, index, Check)
-
-    case PartnershipRecipientNamePage(srn, index) =>
-      controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
-        .onPageLoad(srn, index, Check)
-
-    case OtherRecipientDetailsPage(srn, index, IdentitySubject.LoanRecipient) =>
-      controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
-        .onPageLoad(srn, index, Check)
-
-    case IndividualRecipientNinoPage(srn, index) =>
-      controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
-        .onPageLoad(srn, index, Check)
-
-    case CompanyRecipientCrnPage(srn, index, IdentitySubject.LoanRecipient) =>
-      controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
-        .onPageLoad(srn, index, Check)
-
-    case PartnershipRecipientUtrPage(srn, index, IdentitySubject.LoanRecipient) =>
-      controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
-        .onPageLoad(srn, index, Check)
-
-    case IsIndividualRecipientConnectedPartyPage(srn, index) =>
-      controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
-        .onPageLoad(srn, index, Check)
-
-    case RecipientSponsoringEmployerConnectedPartyPage(srn, index) =>
-      controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
-        .onPageLoad(srn, index, Check)
-
-    case DatePeriodLoanPage(srn, index) =>
-      controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
-        .onPageLoad(srn, index, Check)
-
-    case AmountOfTheLoanPage(srn, index) =>
-      controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
-        .onPageLoad(srn, index, Check)
-
-    case AreRepaymentsInstalmentsPage(srn, index) =>
-      controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
-        .onPageLoad(srn, index, Check)
-
-    case InterestOnLoanPage(srn, index) =>
-      controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
-        .onPageLoad(srn, index, Check)
-
-    case SecurityGivenForLoanPage(srn, index) =>
-      controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
-        .onPageLoad(srn, index, Check)
-
-    case OutstandingArrearsOnLoanPage(srn, index) =>
-      controllers.nonsipp.loansmadeoroutstanding.routes.LoansCYAController
-        .onPageLoad(srn, index, Check)
-  }
 }

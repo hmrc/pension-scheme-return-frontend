@@ -75,5 +75,5 @@ object EmployerContributionsNavigator extends JourneyNavigator {
 
   }
 
-  override def checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty
+  override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] = _ => _ => PartialFunction.empty
 }

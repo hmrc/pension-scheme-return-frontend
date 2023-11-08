@@ -30,5 +30,5 @@ trait JourneyNavigator {
 
   def normalRoutes: UserAnswers => PartialFunction[Page, Call]
 
-  def checkRoutes: UserAnswers => PartialFunction[Page, Call]
+  def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call]
 }

@@ -152,6 +152,9 @@ trait SummaryListFluency {
     def apply(content: Content): Value =
       Value(content = content)
 
+    def apply(content: Html): Value =
+      Value(content = HtmlContent(content))
+
     def apply(content: String): Value =
       Value(content = Text(content))
   }

@@ -117,15 +117,18 @@ trait ModelGenerators extends BasicGenerators {
 
   val addressGen: Gen[Address] = for {
     addressLine1 <- nonEmptyString
-    addressLine2 <- nonEmptyString
+    addressLine2 <- Gen.option(nonEmptyString)
+    town <- nonEmptyString
   } yield Address(
+    "test-id",
     addressLine1,
     addressLine2,
     None,
-    None,
+    town,
     Some("ZZ1 1ZZ"),
     "United Kingdom",
-    "GB"
+    "GB",
+    LookupAddress
   )
 
   val pstrGen: Gen[Pstr] = nonEmptyString.map(Pstr)

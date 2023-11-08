@@ -48,10 +48,10 @@
 
       @{
           viewmodel.page.fields.zipWithIndex.map {
-            case (field @ QuestionField(_, _, FieldType.Input), index) => input(index, field)
-            case (field @ QuestionField(_, _, FieldType.Currency), index) => currency(index, field)
-            case (field @ QuestionField(_, _, FieldType.Percentage), index) => percentage(index, field)
-            case (field @ QuestionField(_, _, FieldType.Date), index) => date(index, field)
+            case (field @ QuestionField(_, _, width, FieldType.Input), index) => input(index, width, field)
+            case (field @ QuestionField(_, _, _, FieldType.Currency), index) => currency(index, field)
+            case (field @ QuestionField(_, _, _, FieldType.Percentage), index) => percentage(index, field)
+            case (field @ QuestionField(_, _, _, FieldType.Date), index) => date(index, field)
           }
       }
     } else {
@@ -69,14 +69,14 @@
   }
 }
 
-@input(index: Int, field: QuestionField) = {
+@input(index: Int, width: Option[InputWidth], field: QuestionField) = {
     @govukInput(
         InputViewModel(
             field = viewmodel.page.form(s"value.${index + 1}"),
             label = LabelViewModel(renderMessage(field.label))
         )
         .withHint(field.hint.map(h => Hint(content = HtmlContent(renderMessage(h)))))
-        .withWidth(InputWidth.Fixed10)
+        .withWidth(width.fold[InputWidth](InputWidth.Fixed10)(identity))
     )
 }
 

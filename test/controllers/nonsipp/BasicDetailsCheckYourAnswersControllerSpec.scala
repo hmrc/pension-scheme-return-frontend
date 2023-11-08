@@ -33,6 +33,7 @@ import play.api.inject.guice.GuiceableModule
 import play.api.test.FakeRequest
 import play.api.test.Helpers.stubMessagesApi
 import services.{PsrSubmissionService, SchemeDateService}
+import viewmodels.DisplayMessage.Message
 import viewmodels.models.{CheckYourAnswersViewModel, FormPageViewModel}
 import views.html.CheckYourAnswersView
 
@@ -115,7 +116,9 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec {
         vm.page.sections.flatMap(_.rows.map(_.key.key)) must contain(
           "basicDetailsCheckYourAnswersController.schemeDetails.taxYear"
         )
-        vm.page.sections.flatMap(_.rows.map(_.value.key)) must contain(dateRange.show)
+        vm.page.sections.flatMap(_.rows.map(_.value match {
+          case m: Message => m.key
+        })) must contain(dateRange.show)
       }
 
       "should display the correct accounting periods" in {
@@ -134,9 +137,15 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec {
           )
         )
 
-        vm.page.sections.flatMap(_.rows.map(_.value.key)) must contain(dateRange1.show)
-        vm.page.sections.flatMap(_.rows.map(_.value.key)) must contain(dateRange2.show)
-        vm.page.sections.flatMap(_.rows.map(_.value.key)) must contain(dateRange3.show)
+        vm.page.sections.flatMap(_.rows.map(_.value match {
+          case m: Message => m.key
+        })) must contain(dateRange1.show)
+        vm.page.sections.flatMap(_.rows.map(_.value match {
+          case m: Message => m.key
+        })) must contain(dateRange2.show)
+        vm.page.sections.flatMap(_.rows.map(_.value match {
+          case m: Message => m.key
+        })) must contain(dateRange3.show)
       }
 
       "should display the correct active bank account value" - {
@@ -148,7 +157,9 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec {
           vm.page.sections.flatMap(_.rows.map(_.key.key)) must contain(
             "basicDetailsCheckYourAnswersController.schemeDetails.bankAccount"
           )
-          vm.page.sections.flatMap(_.rows.map(_.value.key)) must contain("site.yes")
+          vm.page.sections.flatMap(_.rows.map(_.value match {
+            case m: Message => m.key
+          })) must contain("site.yes")
         }
 
         "when active bank account is false" in {
@@ -158,7 +169,9 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec {
           vm.page.sections.flatMap(_.rows.map(_.key.key)) must contain(
             "basicDetailsCheckYourAnswersController.schemeDetails.bankAccount"
           )
-          vm.page.sections.flatMap(_.rows.map(_.value.key)) must contain("site.no")
+          vm.page.sections.flatMap(_.rows.map(_.value match {
+            case m: Message => m.key
+          })) must contain("site.no")
         }
       }
 
@@ -173,7 +186,9 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec {
         vm.page.sections.flatMap(_.rows.map(_.key.key)) must contain(
           "basicDetailsCheckYourAnswersController.schemeDetails.whyNoBankAccount"
         )
-        vm.page.sections.flatMap(_.rows.map(_.value.key)) must contain(reason)
+        vm.page.sections.flatMap(_.rows.map(_.value match {
+          case m: Message => m.key
+        })) must contain(reason)
       }
 
       "should display the correct members numbers" in {
@@ -190,9 +205,15 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec {
         vm.page.sections.flatMap(_.rows.map(_.key.key)) must contain(
           "basicDetailsCheckYourAnswersController.memberDetails.pensionerMembers"
         )
-        vm.page.sections.flatMap(_.rows.map(_.value.key)) must contain(schemeMemberNumbers.noOfActiveMembers.toString)
-        vm.page.sections.flatMap(_.rows.map(_.value.key)) must contain(schemeMemberNumbers.noOfDeferredMembers.toString)
-        vm.page.sections.flatMap(_.rows.map(_.value.key)) must contain(
+        vm.page.sections.flatMap(_.rows.map(_.value match {
+          case m: Message => m.key
+        })) must contain(schemeMemberNumbers.noOfActiveMembers.toString)
+        vm.page.sections.flatMap(_.rows.map(_.value match {
+          case m: Message => m.key
+        })) must contain(schemeMemberNumbers.noOfDeferredMembers.toString)
+        vm.page.sections.flatMap(_.rows.map(_.value match {
+          case m: Message => m.key
+        })) must contain(
           schemeMemberNumbers.noOfPensionerMembers.toString
         )
       }

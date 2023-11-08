@@ -17,10 +17,10 @@
 @import viewmodels.models.CheckYourAnswersViewModel
 
 @this(
-    layout: templates.Layout,
-    formHelper: FormWithCSRF,
-    govukSummaryList: GovukSummaryList,
-    govukButton: GovukButton,
+        layout: templates.Layout,
+        formHelper: FormWithCSRF,
+        govukSummaryList: GovukSummaryList,
+        govukButton: GovukButton,
 )
 
 @(viewmodel: FormPageViewModel[CheckYourAnswersViewModel])(implicit request: Request[_], messages: Messages)
@@ -33,7 +33,16 @@
             @section.heading.map(renderMessage)
             @govukSummaryList(
                 SummaryListViewModel(
-                    section.rows.map(_.toSummaryListRow)
+                    section.rows.map { row =>
+                        SummaryListRowViewModel(
+                            key = if(row.oneHalfWidth) KeyViewModel(row.key.toMessage).withOneHalfWidth() else KeyViewModel(row.key.toMessage),
+                            value = ValueViewModel(renderMessage(row.value)),
+                            actions = row.actions.map { a =>
+                                ActionItemViewModel(Text(a.content.toMessage), a.href)
+                                        .withVisuallyHiddenText(a.visuallyHiddenContent.toMessage)
+                            }
+                        )
+                    }
                 ).withMarginBottom(viewmodel.page.marginBottom)
             )
         }

@@ -22,7 +22,7 @@ import controllers.nonsipp.landorpropertydisposal.TotalProceedsSaleLandPropertyC
 import eu.timepit.refined.refineMV
 import forms.MoneyFormProvider
 import models.NormalMode
-import pages.nonsipp.landorproperty.LandOrPropertyAddressLookupPage
+import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import pages.nonsipp.landorpropertydisposal.TotalProceedsSaleLandPropertyPage
 import views.html.MoneyView
 
@@ -38,7 +38,7 @@ class TotalProceedsSaleLandPropertyControllerSpec extends ControllerBaseSpec {
 
   "TotalProceedsSaleLandPropertyController" - {
 
-    val updatedUserAnswers = defaultUserAnswers.unsafeSet(LandOrPropertyAddressLookupPage(srn, index), address)
+    val updatedUserAnswers = defaultUserAnswers.unsafeSet(LandOrPropertyChosenAddressPage(srn, index), address)
 
     act.like(renderView(onPageLoad, updatedUserAnswers) { implicit app => implicit request =>
       injected[MoneyView].apply(

@@ -28,7 +28,7 @@ import models.Mode
 import models.SchemeId.Srn
 import models.requests.DataRequest
 import navigation.Navigator
-import pages.nonsipp.landorproperty.{LandOrPropertyAddressLookupPage, LandOrPropertyWhenDidSchemeAcquirePage}
+import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandOrPropertyWhenDidSchemeAcquirePage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -64,7 +64,7 @@ class WhenDidSchemeAcquireController @Inject()(
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
-        request.userAnswers.get(LandOrPropertyAddressLookupPage(srn, index)).getOrRecoverJourney { address =>
+        request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index)).getOrRecoverJourney { address =>
           val preparedForm = {
             request.userAnswers.fillForm(LandOrPropertyWhenDidSchemeAcquirePage(srn, index), form(date.to, request))
           }
@@ -76,7 +76,7 @@ class WhenDidSchemeAcquireController @Inject()(
   def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
       schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
-        request.userAnswers.get(LandOrPropertyAddressLookupPage(srn, index)).getOrRecoverJourney { address =>
+        request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index)).getOrRecoverJourney { address =>
           form(date.to, request)
             .bindFromRequest()
             .fold(

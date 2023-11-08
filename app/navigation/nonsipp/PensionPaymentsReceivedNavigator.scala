@@ -33,5 +33,5 @@ object PensionPaymentsReceivedNavigator extends JourneyNavigator {
       }
   }
 
-  val checkRoutes: UserAnswers => PartialFunction[Page, Call] = _ => PartialFunction.empty
+  val checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] = _ => _ => PartialFunction.empty
 }
