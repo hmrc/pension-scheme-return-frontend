@@ -220,7 +220,7 @@ object LandOrPropertyNavigator extends JourneyNavigator {
             // chosen same answer
             case (Some(true), Some(true)) =>
               //check if address answer still exists
-              userAnswers.get(AddressLookupResultsPage(srn, index)) match {
+              userAnswers.get(LandOrPropertyChosenAddressPage(srn, index)) match {
                 case Some(_) =>
                   controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
                     .onPageLoad(srn, index, CheckMode)
@@ -230,7 +230,7 @@ object LandOrPropertyNavigator extends JourneyNavigator {
               }
             case (Some(false), Some(false)) =>
               //check if address answer still exists
-              userAnswers.get(AddressLookupResultsPage(srn, index)) match {
+              userAnswers.get(LandOrPropertyChosenAddressPage(srn, index)) match {
                 case Some(_) =>
                   controllers.nonsipp.landorproperty.routes.LandOrPropertyCYAController
                     .onPageLoad(srn, index, CheckMode)
