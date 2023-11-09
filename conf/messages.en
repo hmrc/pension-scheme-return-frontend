@@ -1539,7 +1539,7 @@ partnershipEmployerUtr.no.conditional.error.invalid = The reason you cannot prov
 partnershipEmployerUtr.no.conditional.error.length = The reason you cannot provide the employer’s UTR must be 160 characters or fewer
 
 removeBorrowInstances.title = Are you sure you want to remove this instance of borrowing?
-removeBorrowInstances.heading = Are you sure you want to remove {0} borrowed from {1}?
+removeBorrowInstances.heading = Are you sure you want to remove £{0} borrowed from {1}?
 removeBorrowInstances.error.required = Select yes if you are sure you want to remove this instance of borrowing
 
 totalEmployerContribution.title = What was the total contribution by this employer for the member, in pounds and pence?
@@ -1578,7 +1578,7 @@ unallocatedEmployerCYA.section.amount = £ {0}
 unallocatedEmployerCYA.section.hide = amount of unallocated employer contributions received by {0}
 
 removeUnallocatedAmount.title = Are you sure you want to remove the unallocated employer contributions?
-removeUnallocatedAmount.heading = Are you sure you want to remove the unallocated employer contributions of {0}?
+removeUnallocatedAmount.heading = Are you sure you want to remove the unallocated employer contributions of £{0}?
 removeUnallocatedAmount.error.required = Select yes if you are sure you want to remove the unallocated employer contributions
 
 landOrPropertyPostcodeLookup.title = What is the postcode of the land or property?
