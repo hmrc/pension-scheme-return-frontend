@@ -319,7 +319,7 @@ object TaskListController {
           messageKey(prefix, "transfersreceived.title", UnableToStart),
           controllers.nonsipp.memberpayments.routes.DidSchemeReceiveTransferController.onPageLoad(srn, NormalMode).url
         ),
-        UnableToStart
+        NotStarted
       ),
       TaskListItemViewModel(
         LinkMessage(
