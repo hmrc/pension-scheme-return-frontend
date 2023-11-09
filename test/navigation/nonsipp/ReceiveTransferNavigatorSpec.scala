@@ -44,7 +44,7 @@ class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateToWithData(
           DidSchemeReceiveTransferPage,
           Gen.const(false),
-          memberpayments.routes.SchemeTransferOutController.onPageLoad
+          (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
         )
         .withName("go from did scheme receive transfer page to scheme transfer out page when no selected")
     )
