@@ -16,8 +16,8 @@
 
 package navigation.nonsipp
 
-import controllers.nonsipp.memberpayments
 import navigation.{Navigator, NavigatorBehaviours}
+import org.scalacheck.Gen
 import pages.nonsipp.memberpayments.MemberContributionsPage
 import utils.BaseSpec
 
@@ -29,9 +29,20 @@ class MemberContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviours
 
     act.like(
       normalmode
-        .navigateTo(
+        .navigateToWithData(
           MemberContributionsPage,
-          memberpayments.routes.DidSchemeReceiveTransferController.onPageLoad
+          Gen.const(true),
+          (srn, _) => controllers.routes.UnauthorisedController.onPageLoad()
+        )
+        .withName("go from member contribution page to unauthorised page when yes select ")
+    )
+
+    act.like(
+      normalmode
+        .navigateToWithData(
+          MemberContributionsPage,
+          Gen.const(false),
+          (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
         )
         .withName("go from member contributions page to receive transfer page")
     )
