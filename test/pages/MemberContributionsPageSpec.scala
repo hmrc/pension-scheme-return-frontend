@@ -23,10 +23,12 @@ class MemberContributionsPageSpec extends PageBehaviours {
 
   "MemberContributionsPage" - {
 
-    beRetrievable[Boolean](MemberContributionsPage(srnGen.sample.value))
+    val srn = srnGen.sample.value
 
-    beSettable[Boolean](MemberContributionsPage(srnGen.sample.value))
+    beRetrievable[Boolean](MemberContributionsPage(srn))
 
-    beRemovable[Boolean](MemberContributionsPage(srnGen.sample.value))
+    beSettable[Boolean](MemberContributionsPage(srn))
+
+    beRemovable[Boolean](MemberContributionsPage(srn))
   }
 }
