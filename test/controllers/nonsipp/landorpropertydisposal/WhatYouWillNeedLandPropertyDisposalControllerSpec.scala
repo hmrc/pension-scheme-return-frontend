@@ -21,7 +21,7 @@ import views.html.ContentPageView
 
 class WhatYouWillNeedLandPropertyDisposalControllerSpec extends ControllerBaseSpec {
 
-  "test" - {
+  "WhatYouWillNeedLandPropertyDisposalController" - {
 
     lazy val viewModel = WhatYouWillNeedLandPropertyDisposalController.viewModel(srn, schemeName)
 
