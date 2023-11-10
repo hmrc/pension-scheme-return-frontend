@@ -21,7 +21,7 @@ import controllers.ControllerBaseSpec
 import eu.timepit.refined.refineMV
 import models.ConditionalYesNo._
 import models.SchemeHoldLandProperty.Transfer
-import models.{CheckMode, CheckOrChange, ConditionalYesNo, Mode, NormalMode}
+import models.{CheckMode, ConditionalYesNo, Mode, NormalMode}
 import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.landorproperty._
 import play.api.inject.bind

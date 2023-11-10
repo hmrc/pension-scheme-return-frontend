@@ -17,10 +17,8 @@
 package models
 
 import cats.data.NonEmptyList
-import play.api.libs.functional.FunctionalBuilder
-import play.api.libs.functional.syntax._
-import play.api.libs.json.Reads._
-import play.api.libs.json.{JsPath, Json, OFormat, Reads, Writes}
+import play.api.libs.functional.syntax.toFunctionalBuilderOps
+import play.api.libs.json._
 import utils.Country
 
 case class ALFCountry(code: String, name: String)
@@ -60,7 +58,7 @@ case class Address(
   countryCode: String,
   addressType: AddressType
 ) {
-  val asString =
+  val asString: String =
     s"""$addressLine1, ${addressLine2.fold("")(al2 => s"$al2, ")}${addressLine3.fold("")(al3 => s"$al3, ")}$town${postCode
       .fold("")(postcode => s", $postcode")}"""
 
@@ -88,14 +86,14 @@ object Address {
 
   private val addressReadsBuilder =
     (JsPath \ "id")
-      .read[String]
+      .readWithDefault("manual")
       .and((JsPath \ "addressLine1").read[String])
       .and((JsPath \ "addressLine2").readNullable[String])
       .and((JsPath \ "addressLine3").readNullable[String])
       .and((JsPath \ "town").read[String])
       .and((JsPath \ "postCode").readNullable[String])
       .and((JsPath \ "countryCode").read[String])
-      .and((JsPath \ "addressType").read[AddressType])
+      .and((JsPath \ "addressType").readWithDefault(ManualAddress))
 
   implicit val addressReads: Reads[Address] =
     addressReadsBuilder.apply(
@@ -143,7 +141,7 @@ object Address {
       town,
       postCode,
       country,
-      countryCode = "N/A", // TODO get country code from country
+      Country.getCountryCode(country).getOrElse(""),
       ManualAddress
     )
   }

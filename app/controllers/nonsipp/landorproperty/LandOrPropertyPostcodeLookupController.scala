@@ -18,7 +18,6 @@ package controllers.nonsipp.landorproperty
 
 import cats.data.EitherT
 import config.Refined.Max5000
-import connectors.AddressLookupConnector
 import controllers.PSRController
 import controllers.actions._
 import controllers.nonsipp.landorproperty.LandOrPropertyPostcodeLookupController.viewModel
@@ -26,15 +25,15 @@ import forms.AddressLookupFormProvider
 import forms.mappings.errors.InputFormErrors
 import models.SchemeId.Srn
 import models.requests.DataRequest
-import models.{ALFAddress, Address, Mode, PostcodeLookup}
+import models.{Address, Mode, PostcodeLookup}
 import navigation.Navigator
 import pages.nonsipp.landorproperty.{AddressLookupResultsPage, LandOrPropertyPostcodeLookupPage}
-import play.api.data.{Form, FormError}
+import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import services.{AddressLookupService, SaveService}
+import services.{AddressService, SaveService}
 import utils.FormUtils.FormOps
-import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
+import viewmodels.DisplayMessage.{LinkMessage, ParagraphMessage}
 import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, PostcodeLookupViewModel}
 import views.html.PostcodeLookupView
@@ -47,7 +46,7 @@ class LandOrPropertyPostcodeLookupController @Inject()(
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   saveService: SaveService,
-  addressLookupService: AddressLookupService,
+  addressService: AddressService,
   formProvider: AddressLookupFormProvider,
   view: PostcodeLookupView,
   val controllerComponents: MessagesControllerComponents
@@ -72,7 +71,7 @@ class LandOrPropertyPostcodeLookupController @Inject()(
           value =>
             (
               for {
-                addresses <- addressLookupService.lookup(value.postcode, value.filter).liftF
+                addresses <- addressService.postcodeLookup(value.postcode, value.filter).liftF
                 _ <- EitherT.fromEither[Future](renderErrorOnEmptyAddress(srn, index, mode, value, addresses))
                 updatedUserAnswers <- Future
                   .fromTry(request.userAnswers.set(LandOrPropertyPostcodeLookupPage(srn, index), value))

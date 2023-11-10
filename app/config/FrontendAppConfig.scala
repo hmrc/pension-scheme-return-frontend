@@ -52,7 +52,6 @@ class FrontendAppConfig @Inject()(config: Configuration) { self =>
   val pensionsScheme: Service = config.get[Service]("microservice.services.pensionsScheme")
   val pensionSchemeReturn: Service = config.get[Service]("microservice.services.pensionSchemeReturn")
 
-  val addressLookupFrontend: Service = config.get[Service]("microservice.services.address-lookup-frontend")
   val addressLookup: Service = config.get[Service]("microservice.services.address-lookup")
 
   val upscan: Service = config.get[Service]("microservice.services.upscan")

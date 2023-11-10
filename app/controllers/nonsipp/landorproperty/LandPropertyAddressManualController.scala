@@ -125,10 +125,12 @@ class LandPropertyAddressManualController @Inject()(
 object LandPropertyAddressManualController {
 
   // addressLine1, addressLine2, addressLine3, town, postcode, if not uk (county)
-  type ManualUKAddressAnswers = (String, Option[String], Option[String], String, Option[String])
-  type ManualAddressAnswers = (String, Option[String], Option[String], String, Option[String], String)
-  type ManualUKAddressQuestions = QuintupleQuestion[String, Option[String], Option[String], String, Option[String]]
-  type ManualAddressQuestions = SextupleQuestion[String, Option[String], Option[String], String, Option[String], String]
+  private type ManualUKAddressAnswers = (String, Option[String], Option[String], String, Option[String])
+  private type ManualAddressAnswers = (String, Option[String], Option[String], String, Option[String], String)
+  private type ManualUKAddressQuestions =
+    QuintupleQuestion[String, Option[String], Option[String], String, Option[String]]
+  private type ManualAddressQuestions =
+    SextupleQuestion[String, Option[String], Option[String], String, Option[String], String]
 
   private val field1Errors: InputFormErrors =
     InputFormErrors.input(
@@ -181,7 +183,7 @@ object LandPropertyAddressManualController {
       Mappings.optionalInput(field5Errors)
     )
 
-  val internationalAddressForm: Form[ManualAddressAnswers] =
+  private val internationalAddressForm: Form[ManualAddressAnswers] =
     MultipleQuestionFormProvider(
       Mappings.input(field1Errors),
       Mappings.optionalInput(field2Errors),
