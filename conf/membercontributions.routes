@@ -1,0 +1,2 @@
+GET         /:srn/what-you-will-need-member-contributions                           controllers.nonsipp.membercontributions.WhatYouWillNeedMemberContributionsController.onPageLoad(srn: Srn)
+GET         /:srn/submit-what-you-will-need-member-contributions                    controllers.nonsipp.membercontributions.WhatYouWillNeedMemberContributionsController.onSubmit(srn: Srn)
