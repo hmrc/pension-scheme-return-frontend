@@ -279,7 +279,7 @@ object LandOrPropertyCYAController {
           landPropertyIndependentValuation,
           addressLookUpPage.addressLine1,
           mode
-        ) ++ DetailsOfTheAcquisition(
+        ) ++ detailsOfTheAcquisition(
           srn,
           index,
           receivedLandType.get,
@@ -385,7 +385,13 @@ object LandOrPropertyCYAController {
           ).withAction(
             SummaryAction(
               "site.change",
-              routes.LandOrPropertyPostcodeLookupController.onPageLoad(srn, index, mode).url
+              if (address.isManualAddress) {
+                routes.LandPropertyAddressManualController
+                  .onPageLoad(srn, index, isUkAddress = landOrPropertyInUk, mode)
+                  .url
+              } else {
+                routes.LandOrPropertyPostcodeLookupController.onPageLoad(srn, index, mode).url
+              }
             ).withVisuallyHiddenContent("landOrPropertyCYA.section1.addressInfo.hidden")
           ),
           CheckYourAnswersRowViewModel(
@@ -426,7 +432,7 @@ object LandOrPropertyCYAController {
       )
     )
 
-  private def DetailsOfTheAcquisition(
+  private def detailsOfTheAcquisition(
     srn: Srn,
     index: Max5000,
     receivedLandType: IdentityType,

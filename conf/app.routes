@@ -5,6 +5,7 @@
 ->          /                                                                           landorpropertydisposal.Routes
 ->          /                                                                           moneyborrowed.Routes
 ->          /                                                                           employercontributions.Routes
+->          /                                                                           membercontributions.Routes
 
 GET         /                                                                           controllers.IndexController.onPageLoad()
 

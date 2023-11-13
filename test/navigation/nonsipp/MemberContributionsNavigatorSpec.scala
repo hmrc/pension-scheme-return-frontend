@@ -18,6 +18,7 @@ package navigation.nonsipp
 
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
+import pages.nonsipp.membercontributions.WhatYouWillNeedMemberContributionsPage
 import pages.nonsipp.memberpayments.MemberContributionsPage
 import utils.BaseSpec
 
@@ -32,9 +33,10 @@ class MemberContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviours
         .navigateToWithData(
           MemberContributionsPage,
           Gen.const(true),
-          (srn, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          (srn, _) =>
+            controllers.nonsipp.membercontributions.routes.WhatYouWillNeedMemberContributionsController.onPageLoad(srn)
         )
-        .withName("go from member contribution page to unauthorised page when yes select ")
+        .withName("go from member contribution page to what you will need member contributions page when yes select ")
     )
 
     act.like(
@@ -47,4 +49,17 @@ class MemberContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviours
         .withName("go from member contributions page to receive transfer page")
     )
   }
+
+  "WhatYouWillNeedMemberContributions" - {
+
+    act.like(
+      normalmode
+        .navigateTo(
+          WhatYouWillNeedMemberContributionsPage,
+          (srn, _) => controllers.routes.UnauthorisedController.onPageLoad()
+        )
+        .withName("go from what you will need member contributions page to unauthorised page")
+    )
+  }
+
 }
