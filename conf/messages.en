@@ -1640,3 +1640,13 @@ WYWNeedReceivedTransfer.tellUs6 = the date the transfer was received
 WYWNeedReceivedTransfer.tellUs7 = if the transfer included an asset
 WYWNeedReceivedTransfer.paragraph3 = On the next page, you will be able to select a member from a list of those whose details you have already provided. If you want to add a new member, you will need to provide their details using the ‘member details’ section of this pension scheme return.
 WYWNeedReceivedTransfer.paragraph4 = If the scheme received more than one transfer for any member, you must tell us about all of them. Answer the questions for one transfer at a time.
+
+TransferIn.MemberList.title = Select a member to report transfers in
+TransferIn.MemberList.title.plural = Select a member to report transfers in
+TransferIn.MemberList.heading = Select a member to report transfers in
+TransferIn.MemberList.heading.plural = Select a member to report transfers in
+TransferIn.MemberList.paragraph = You must tell us about all transfers received for members of the scheme during the period of this return.
+TransferIn.MemberList.inset = You cannot add another land or property as you have entered the maximum of 5,000.
+TransferIn.MemberList.radios = Have you finished reporting transfers in?
+TransferIn.MemberList.radios.error.required = Select yes if you need to add another land or property
+TransferIn.MemberList.pagination.label = Showing {0} - {1} of {2} land or properties
