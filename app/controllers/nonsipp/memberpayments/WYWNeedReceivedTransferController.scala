@@ -31,7 +31,7 @@ import viewmodels.implicits._
 
 import javax.inject.{Inject, Named}
 
-//What You Will Need - Received Transfers.
+//What You Will (WYW) Need - Received Transfers.
 class WYWNeedReceivedTransferController @Inject()(
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
