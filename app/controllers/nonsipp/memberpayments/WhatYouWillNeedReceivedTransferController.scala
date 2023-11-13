@@ -20,7 +20,7 @@ import controllers.actions.{AllowAccessActionProvider, DataRequiredAction, DataR
 import models.NormalMode
 import models.SchemeId.Srn
 import navigation.Navigator
-import pages.nonsipp.memberpayments.WYWNeedReceivedTransferPage
+import pages.nonsipp.memberpayments.WhatYouWillNeedReceivedTransferPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -31,8 +31,7 @@ import viewmodels.implicits._
 
 import javax.inject.{Inject, Named}
 
-//What You Will (WYW) Need - Received Transfers.
-class WYWNeedReceivedTransferController @Inject()(
+class WhatYouWillNeedReceivedTransferController @Inject()(
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identify: IdentifierAction,
@@ -46,38 +45,38 @@ class WYWNeedReceivedTransferController @Inject()(
 
   def onPageLoad(srn: Srn): Action[AnyContent] =
     identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData) { implicit request =>
-      Ok(view(WYWNeedReceivedTransferController.viewModel(srn, request.schemeDetails.schemeName)))
+      Ok(view(WhatYouWillNeedReceivedTransferController.viewModel(srn, request.schemeDetails.schemeName)))
     }
 
   def onSubmit(srn: Srn): Action[AnyContent] =
     identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData) { implicit request =>
-      Redirect(navigator.nextPage(WYWNeedReceivedTransferPage(srn), NormalMode, request.userAnswers))
+      Redirect(navigator.nextPage(WhatYouWillNeedReceivedTransferPage(srn), NormalMode, request.userAnswers))
     }
 }
 
-object WYWNeedReceivedTransferController {
+object WhatYouWillNeedReceivedTransferController {
 
   def viewModel(srn: Srn, SchemeName: String): FormPageViewModel[ContentPageViewModel] =
     FormPageViewModel(
-      Message("WYWNeedReceivedTransfer.title"),
-      Message("WYWNeedReceivedTransfer.heading", SchemeName),
+      Message("WhatYouWillNeedReceivedTransfer.title"),
+      Message("WhatYouWillNeedReceivedTransfer.heading", SchemeName),
       ContentPageViewModel(isLargeHeading = true),
-      controllers.nonsipp.memberpayments.routes.WYWNeedReceivedTransferController.onSubmit(srn)
+      controllers.nonsipp.memberpayments.routes.WhatYouWillNeedReceivedTransferController.onSubmit(srn)
     ).withButtonText(Message("site.continue"))
       .withDescription(
-        ParagraphMessage("WYWNeedReceivedTransfer.paragraph1") ++
-          ParagraphMessage("WYWNeedReceivedTransfer.paragraph2") ++
+        ParagraphMessage("WhatYouWillNeedReceivedTransfer.paragraph1") ++
+          ParagraphMessage("WhatYouWillNeedReceivedTransfer.paragraph2") ++
           ListMessage(
             ListType.Bullet,
-            "WYWNeedReceivedTransfer.tellUs1",
-            "WYWNeedReceivedTransfer.tellUs2",
-            "WYWNeedReceivedTransfer.tellUs3",
-            "WYWNeedReceivedTransfer.tellUs4",
-            "WYWNeedReceivedTransfer.tellUs5",
-            "WYWNeedReceivedTransfer.tellUs6",
-            "WYWNeedReceivedTransfer.tellUs7"
+            "WhatYouWillNeedReceivedTransfer.tellUs1",
+            "WhatYouWillNeedReceivedTransfer.tellUs2",
+            "WhatYouWillNeedReceivedTransfer.tellUs3",
+            "WhatYouWillNeedReceivedTransfer.tellUs4",
+            "WhatYouWillNeedReceivedTransfer.tellUs5",
+            "WhatYouWillNeedReceivedTransfer.tellUs6",
+            "WhatYouWillNeedReceivedTransfer.tellUs7"
           ) ++
-          ParagraphMessage("WYWNeedReceivedTransfer.paragraph3") ++
-          ParagraphMessage("WYWNeedReceivedTransfer.paragraph4")
+          ParagraphMessage("WhatYouWillNeedReceivedTransfer.paragraph3") ++
+          ParagraphMessage("WhatYouWillNeedReceivedTransfer.paragraph4")
       )
 }

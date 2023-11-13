@@ -19,5 +19,4 @@ package pages.nonsipp.memberpayments
 import models.SchemeId.Srn
 import pages.Page
 
-//What You Will (WYW) Need - Received Transfers.
-case class WYWNeedReceivedTransferPage(srn: Srn) extends Page
+case class WhatYouWillNeedReceivedTransferPage(srn: Srn) extends Page

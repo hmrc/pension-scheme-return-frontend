@@ -23,10 +23,10 @@ class WYWNeedReceivedTransferControllerSpec extends ControllerBaseSpec {
 
   "WYWNeedReceivedTransferController" - {
 
-    lazy val viewModel = WYWNeedReceivedTransferController.viewModel(srn, schemeName)
+    lazy val viewModel = WhatYouWillNeedReceivedTransferController.viewModel(srn, schemeName)
 
-    lazy val onPageLoad = routes.WYWNeedReceivedTransferController.onPageLoad(srn)
-    lazy val onSubmit = routes.WYWNeedReceivedTransferController.onSubmit(srn)
+    lazy val onPageLoad = routes.WhatYouWillNeedReceivedTransferController.onPageLoad(srn)
+    lazy val onSubmit = routes.WhatYouWillNeedReceivedTransferController.onSubmit(srn)
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       val view = injected[ContentPageView]

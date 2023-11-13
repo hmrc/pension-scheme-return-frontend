@@ -29,12 +29,12 @@ object ReceiveTransferNavigator extends JourneyNavigator {
 
     case page @ DidSchemeReceiveTransferPage(srn) =>
       if (userAnswers.get(page).contains(true)) {
-        controllers.nonsipp.memberpayments.routes.WYWNeedReceivedTransferController.onPageLoad(srn)
+        controllers.nonsipp.memberpayments.routes.WhatYouWillNeedReceivedTransferController.onPageLoad(srn)
       } else {
         controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
       }
 
-    case WYWNeedReceivedTransferPage(srn) =>
+    case WhatYouWillNeedReceivedTransferPage(srn) =>
       controllers.routes.UnauthorisedController.onPageLoad()
   }
 
