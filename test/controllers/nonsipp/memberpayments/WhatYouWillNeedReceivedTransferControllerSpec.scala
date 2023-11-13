@@ -19,7 +19,7 @@ package controllers.nonsipp.memberpayments
 import controllers.ControllerBaseSpec
 import views.html.ContentPageView
 
-class WYWNeedReceivedTransferControllerSpec extends ControllerBaseSpec {
+class WhatYouWillNeedReceivedTransferControllerSpec extends ControllerBaseSpec {
 
   "WYWNeedReceivedTransferController" - {
 
