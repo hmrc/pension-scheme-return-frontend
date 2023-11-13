@@ -215,7 +215,7 @@ object LandPropertyAddressManualController {
       QuestionField.input("landPropertyAddressManual.field2.label").withWidth(InputWidth.TwoThirds),
       QuestionField.input("landPropertyAddressManual.field3.label").withWidth(InputWidth.TwoThirds),
       QuestionField.input("landPropertyAddressManual.field4.label").withWidth(InputWidth.TwoThirds),
-      QuestionField.input("landPropertyAddressManual.field5.label")
+      QuestionField.input("landPropertyAddressManual.field5.label.uk")
     )
 
   def internationalPage(form: Form[ManualAddressAnswers]): ManualAddressQuestions =

@@ -66,7 +66,7 @@ case class Address(
 
   val asNel: NonEmptyList[String] = NonEmptyList.of(addressLine1) ++ List(addressLine2, addressLine3).flatten ++ List(
     town
-  ) ++ List.from(postCode)
+  ) ++ List.from(postCode) :+ country
 
   val asUKAddressTuple: (String, Option[String], Option[String], String, Option[String]) =
     (addressLine1, addressLine2, addressLine3, town, postCode)
@@ -143,7 +143,7 @@ object Address {
       town,
       postCode,
       country,
-      "N/A", // TODO get country code from country
+      countryCode = "N/A", // TODO get country code from country
       ManualAddress
     )
   }
