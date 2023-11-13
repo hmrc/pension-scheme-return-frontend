@@ -20,7 +20,7 @@ import controllers.nonsipp.memberpayments
 import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.memberpayments.DidSchemeReceiveTransferPage
+import pages.nonsipp.memberpayments._
 import play.api.mvc.Call
 
 object ReceiveTransferNavigator extends JourneyNavigator {
@@ -29,10 +29,13 @@ object ReceiveTransferNavigator extends JourneyNavigator {
 
     case page @ DidSchemeReceiveTransferPage(srn) =>
       if (userAnswers.get(page).contains(true)) {
-        controllers.routes.UnauthorisedController.onPageLoad()
+        controllers.nonsipp.memberpayments.routes.WhatYouWillNeedReceivedTransferController.onPageLoad(srn)
       } else {
         controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
       }
+
+    case WhatYouWillNeedReceivedTransferPage(srn) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
   }
 
   override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] =

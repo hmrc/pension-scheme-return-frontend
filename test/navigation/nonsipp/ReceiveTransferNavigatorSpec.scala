@@ -34,7 +34,8 @@ class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateToWithData(
           DidSchemeReceiveTransferPage,
           Gen.const(true),
-          (_, _) => routes.UnauthorisedController.onPageLoad()
+          (srn, _) =>
+            controllers.nonsipp.memberpayments.routes.WhatYouWillNeedReceivedTransferController.onPageLoad(srn)
         )
         .withName("go from did scheme receive transfer page to unauthorised page when yes selected")
     )
