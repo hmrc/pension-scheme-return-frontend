@@ -1,2 +1,7 @@
 GET         /:srn/what-you-will-need-member-contributions                           controllers.nonsipp.membercontributions.WhatYouWillNeedMemberContributionsController.onPageLoad(srn: Srn)
 GET         /:srn/submit-what-you-will-need-member-contributions                    controllers.nonsipp.membercontributions.WhatYouWillNeedMemberContributionsController.onSubmit(srn: Srn)
+
+GET         /:srn/total-member-contribution/:index/:secondaryIndex                 controllers.nonsipp.membercontributions.TotalMemberContributionController.onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode = NormalMode)
+POST        /:srn/total-member-contribution/:index/:secondaryIndex                 controllers.nonsipp.membercontributions.TotalMemberContributionController.onSubmit(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode = NormalMode)
+GET         /:srn/change-total-member-contribution/:index/:secondaryIndex          controllers.nonsipp.membercontributions.TotalMemberContributionController.onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode = CheckMode)
+POST        /:srn/change-total-member-contribution/:index/:secondaryIndex          controllers.nonsipp.membercontributions.TotalMemberContributionController.onSubmit(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode = CheckMode)

@@ -1641,3 +1641,19 @@ WhatYouWillNeedReceivedTransfer.tellUs6 = the date the transfer was received
 WhatYouWillNeedReceivedTransfer.tellUs7 = if the transfer included an asset
 WhatYouWillNeedReceivedTransfer.paragraph3 = On the next page, you will be able to select a member from a list of those whose details you have already provided. If you want to add a new member, you will need to provide their details using the ‘member details’ section of this pension scheme return.
 WhatYouWillNeedReceivedTransfer.paragraph4 = If the scheme received more than one transfer for any member, you must tell us about all of them. Answer the questions for one transfer at a time.
+
+whatYouWillNeedMemberContributions.title = Member contributions for members of {0}
+whatYouWillNeedMemberContributions.heading = Member contributions for members of {0}
+whatYouWillNeedMemberContributions.paragraph1 = You must tell us about all member contributions made by or for members of the scheme during the period of this return.
+whatYouWillNeedMemberContributions.paragraph2 = This includes:
+whatYouWillNeedMemberContributions.addContribution = regular contributions and any additional contributions made by a member to their own pension
+whatYouWillNeedMemberContributions.behalfOfContribution = contributions made on behalf of a member by another person, for example a relative
+whatYouWillNeedMemberContributions.paragraph3 = It does not include any contributions made by an employer.
+whatYouWillNeedMemberContributions.paragraph4 = On the next page, you will be able to select a member from a list of those whose details you have already provided. If you want to add a new member, you will need to provide their details using the ‘member details’ section of this pension scheme return.
+
+totalMemberContribution.title = What was the total member contribution made by or for this member, in pounds and pence?
+totalMemberContribution.heading = What was the total member contribution made by or for {0}, in pounds and pence?
+totalMemberContribution.hint = Enter the total member contribution made by or for this member in the period of this return, including both personal and third party contributions.
+totalMemberContribution.error.required = Enter the total amount of the member contribution, in pounds and pence
+totalMemberContribution.error.invalid = Total member contribution must be an amount of money, like 123 or 123.45
+totalMemberContribution.error.tooLarge = Total member contribution must be 999999999.99 or less
