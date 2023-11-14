@@ -1652,7 +1652,7 @@ whatYouWillNeedMemberContributions.paragraph3 = It does not include any contribu
 whatYouWillNeedMemberContributions.paragraph4 = On the next page, you will be able to select a member from a list of those whose details you have already provided. If you want to add a new member, you will need to provide their details using the ‘member details’ section of this pension scheme return.
 
 totalMemberContribution.title = What was the total member contribution made by or for this member, in pounds and pence?
-totalMemberContribution.heading = What was the total member contribution made by or for {0}, in pounds and pence?
+totalMemberContribution.heading = What was the total member contribution made by or for Ainsley Clark, in pounds and pence?
 totalMemberContribution.hint = Enter the total member contribution made by or for this member in the period of this return, including both personal and third party contributions.
 totalMemberContribution.error.required = Enter the total amount of the member contribution, in pounds and pence
 totalMemberContribution.error.invalid = Total member contribution must be an amount of money, like 123 or 123.45
