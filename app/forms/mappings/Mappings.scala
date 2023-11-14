@@ -16,7 +16,6 @@
 
 package forms.mappings
 
-import config.Constants._
 import forms.mappings.errors._
 import models.{Crn, DateRange, Enumerable, Money, Percentage, Security, Utr}
 import play.api.data.Forms.{of, optional}

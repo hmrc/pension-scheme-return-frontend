@@ -93,5 +93,5 @@ object Assets {
     Json.format[LandOrPropertyTransactions]
   private implicit val formatLandOrProperty: OFormat[LandOrProperty] = Json.format[LandOrProperty]
 
-  implicit val writes: OFormat[Assets] = Json.format[Assets]
+  implicit val format: OFormat[Assets] = Json.format[Assets]
 }

@@ -20,10 +20,10 @@ import config.Refined._
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.landorproperty.LandPropertyAddressResultsController._
 import eu.timepit.refined.refineMV
-import forms.{TextFormProvider, YesNoPageFormProvider}
+import forms.TextFormProvider
 import models.NormalMode
 import pages.nonsipp.landorproperty._
-import views.html.{RadioListView, YesNoPageView}
+import views.html.RadioListView
 
 class LandPropertyAddressResultsControllerSpec extends ControllerBaseSpec {
 

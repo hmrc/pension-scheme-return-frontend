@@ -16,13 +16,9 @@
 
 package viewmodels.models
 
-import play.api.i18n.Messages
 import play.api.mvc.Call
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
 import viewmodels.DisplayMessage
-import viewmodels.DisplayMessage.{InlineMessage, Message}
-import viewmodels.govuk.summarylist._
+import viewmodels.DisplayMessage.Message
 
 case class CheckYourAnswersViewModel(
   sections: List[CheckYourAnswersSection],

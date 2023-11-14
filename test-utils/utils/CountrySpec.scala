@@ -25,7 +25,7 @@ class CountrySpec extends BaseSpec {
       Country.getCountry("DE") must be(Some("Germany"))
       Country.getCountry("AX") must be(Some("Åland Islands"))
       Country.getCountry("CW") must be(Some("Curaçao"))
-      Country.getCountry("TR") must be(Some("Türkiye"))
+      Country.getCountry("TR") must be(Some("Turkey"))
       Country.getCountry("IO") must be(Some("British Indian Ocean Territory (the)"))
 
       Country.getCountry("ZZ") must be(None)
@@ -39,7 +39,7 @@ class CountrySpec extends BaseSpec {
       Country.getCountryCode("France") must be(Some("FR"))
       Country.getCountryCode("Åland Islands") must be(Some("AX"))
       Country.getCountryCode("Curaçao") must be(Some("CW"))
-      Country.getCountryCode("Türkiye") must be(Some("TR"))
+      Country.getCountryCode("Turkey") must be(Some("TR"))
       Country.getCountryCode("British Indian Ocean Territory (the)") must be(Some("IO"))
 
       Country.getCountryCode("ZZ") must be(None)

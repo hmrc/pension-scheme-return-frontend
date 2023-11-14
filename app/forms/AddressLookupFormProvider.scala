@@ -19,9 +19,8 @@ package forms
 import forms.mappings.Mappings
 import forms.mappings.errors.InputFormErrors
 import models.PostcodeLookup
-import play.api.data.Forms.{mapping, optional}
-import play.api.data.{Form, Mapping}
-import uk.gov.voa.play.form.ConditionalMappings
+import play.api.data.Form
+import play.api.data.Forms.mapping
 
 import javax.inject.Inject
 

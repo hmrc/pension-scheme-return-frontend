@@ -21,9 +21,8 @@ import controllers.ControllerBaseSpec
 import controllers.nonsipp.landorproperty.LandPropertyAddressManualController._
 import eu.timepit.refined.refineMV
 import models.NormalMode
-import views.html.MultipleQuestionView
-import LandPropertyAddressManualController._
 import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
+import views.html.MultipleQuestionView
 
 class LandPropertyAddressManualControllerSpec extends ControllerBaseSpec {
 

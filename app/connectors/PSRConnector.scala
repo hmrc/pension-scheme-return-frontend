@@ -34,7 +34,7 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClient) {
     psrSubmission: PsrSubmission
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
     http.POST[PsrSubmission, Unit](
-      baseUrl + "/pension-scheme-return/psr/standard",
+      s"$baseUrl/pension-scheme-return/psr/standard",
       psrSubmission
     )
 
@@ -55,10 +55,7 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClient) {
     }
 
     http
-      .GET[HttpResponse](
-        baseUrl + s"/pension-scheme-return/psr/standard/$pstr",
-        queryParams
-      )
+      .GET[HttpResponse](s"$baseUrl/pension-scheme-return/psr/standard/$pstr", queryParams)
       .map { response =>
         response.status match {
           case OK =>
