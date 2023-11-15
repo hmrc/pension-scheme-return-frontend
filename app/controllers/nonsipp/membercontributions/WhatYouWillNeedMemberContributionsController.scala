@@ -58,20 +58,20 @@ object WhatYouWillNeedMemberContributionsController {
 
   def viewModel(srn: Srn, SchemeName: String): FormPageViewModel[ContentPageViewModel] =
     FormPageViewModel(
-      Message("whatYouWillNeedMemberContributions.title", SchemeName),
-      Message("whatYouWillNeedMemberContributions.heading", SchemeName),
+      Message("WhatYouWillNeed.MemberContributions.title", SchemeName),
+      Message("WhatYouWillNeed.MemberContributions.heading", SchemeName),
       ContentPageViewModel(isLargeHeading = true),
       routes.WhatYouWillNeedMemberContributionsController.onSubmit(srn)
     ).withButtonText(Message("site.continue"))
       .withDescription(
-        ParagraphMessage("whatYouWillNeedMemberContributions.paragraph1") ++
-          ParagraphMessage("whatYouWillNeedMemberContributions.paragraph2") ++
+        ParagraphMessage("WhatYouWillNeed.MemberContributions.paragraph1") ++
+          ParagraphMessage("WhatYouWillNeed.MemberContributions.paragraph2") ++
           ListMessage(
             ListType.Bullet,
-            "whatYouWillNeedMemberContributions.addContribution",
-            "whatYouWillNeedMemberContributions.behalfOfContribution"
+            "WhatYouWillNeed.MemberContributions.addContribution",
+            "WhatYouWillNeed.MemberContributions.behalfOfContribution"
           ) ++
-          ParagraphMessage("whatYouWillNeedMemberContributions.paragraph3") ++
-          ParagraphMessage("whatYouWillNeedMemberContributions.paragraph4")
+          ParagraphMessage("WhatYouWillNeed.MemberContributions.paragraph3") ++
+          ParagraphMessage("WhatYouWillNeed.MemberContributions.paragraph4")
       )
 }

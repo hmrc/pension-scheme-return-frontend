@@ -23,11 +23,11 @@ import uk.gov.hmrc.http.HeaderCarrier
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class AddressLookupService @Inject()(connector: AddressLookupConnector)(
+class AddressService @Inject()(connector: AddressLookupConnector)(
   implicit ec: ExecutionContext
 ) {
 
-  def lookup(postcode: String, filter: Option[String])(implicit hc: HeaderCarrier): Future[List[Address]] =
+  def postcodeLookup(postcode: String, filter: Option[String])(implicit hc: HeaderCarrier): Future[List[Address]] =
     connector.lookup(postcode, filter).map(_.map(addressFromALFAddress))
 
   private def addressFromALFAddress(lookupResponse: ALFAddressResponse): Address =

@@ -24,7 +24,6 @@ import controllers.PSRController
 import controllers.actions._
 import eu.timepit.refined.refineV
 import forms.YesNoPageFormProvider
-import models.CheckOrChange.Change
 import models.SchemeId.Srn
 import models._
 import navigation.Navigator

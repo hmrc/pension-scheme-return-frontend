@@ -21,7 +21,7 @@ import controllers.ControllerBaseSpec
 import controllers.nonsipp.landorproperty.LandPropertyIndependentValuationController._
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
-import models.{Address, NormalMode}
+import models.NormalMode
 import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandPropertyIndependentValuationPage}
 import views.html.YesNoPageView
 

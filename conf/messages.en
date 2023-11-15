@@ -1628,32 +1628,42 @@ landPropertyAddressManual.field6.error.required = Enter a country
 landPropertyAddressManual.field6.error.invalid = Country must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
 landPropertyAddressManual.field6.error.max = Country must be 35 characters or fewer
 
-WhatYouWillNeedReceivedTransfer.title   = Transfers in for members of the scheme
-WhatYouWillNeedReceivedTransfer.heading = Transfers in for members of {0}
-WhatYouWillNeedReceivedTransfer.paragraph1 = You must tell us about all transfers received for members of the scheme during the period of this return.
-WhatYouWillNeedReceivedTransfer.paragraph2 = For each transfer, you need to tell us:
-WhatYouWillNeedReceivedTransfer.tellUs1 = which member received the transfer
-WhatYouWillNeedReceivedTransfer.tellUs2 = the name of the transferring scheme
-WhatYouWillNeedReceivedTransfer.tellUs3 = if the transferring scheme is a registered pension scheme, qualifying recognised overseas pension scheme (QROPS) or other
-WhatYouWillNeedReceivedTransfer.tellUs4 = the transferring scheme’s Pension Scheme Tax Reference (PSTR), QROPS reference number, or a description of the transferring scheme – whichever applies
-WhatYouWillNeedReceivedTransfer.tellUs5 = the total value of the transfer
-WhatYouWillNeedReceivedTransfer.tellUs6 = the date the transfer was received
-WhatYouWillNeedReceivedTransfer.tellUs7 = if the transfer included an asset
-WhatYouWillNeedReceivedTransfer.paragraph3 = On the next page, you will be able to select a member from a list of those whose details you have already provided. If you want to add a new member, you will need to provide their details using the ‘member details’ section of this pension scheme return.
-WhatYouWillNeedReceivedTransfer.paragraph4 = If the scheme received more than one transfer for any member, you must tell us about all of them. Answer the questions for one transfer at a time.
-
-whatYouWillNeedMemberContributions.title = Member contributions for members of {0}
-whatYouWillNeedMemberContributions.heading = Member contributions for members of {0}
-whatYouWillNeedMemberContributions.paragraph1 = You must tell us about all member contributions made by or for members of the scheme during the period of this return.
-whatYouWillNeedMemberContributions.paragraph2 = This includes:
-whatYouWillNeedMemberContributions.addContribution = regular contributions and any additional contributions made by a member to their own pension
-whatYouWillNeedMemberContributions.behalfOfContribution = contributions made on behalf of a member by another person, for example a relative
-whatYouWillNeedMemberContributions.paragraph3 = It does not include any contributions made by an employer.
-whatYouWillNeedMemberContributions.paragraph4 = On the next page, you will be able to select a member from a list of those whose details you have already provided. If you want to add a new member, you will need to provide their details using the ‘member details’ section of this pension scheme return.
-
 totalMemberContribution.title = What was the total member contribution made by or for this member, in pounds and pence?
 totalMemberContribution.heading = What was the total member contribution made by or for Ainsley Clark, in pounds and pence?
 totalMemberContribution.hint = Enter the total member contribution made by or for this member in the period of this return, including both personal and third party contributions.
 totalMemberContribution.error.required = Enter the total amount of the member contribution, in pounds and pence
 totalMemberContribution.error.invalid = Total member contribution must be an amount of money, like 123 or 123.45
 totalMemberContribution.error.tooLarge = Total member contribution must be 999999999.99 or less
+
+WhatYouWillNeed.MemberContributions.title = Member contributions for members of {0}
+WhatYouWillNeed.MemberContributions.heading = Member contributions for members of {0}
+WhatYouWillNeed.MemberContributions.paragraph1 = You must tell us about all member contributions made by or for members of the scheme during the period of this return.
+WhatYouWillNeed.MemberContributions.paragraph2 = This includes:
+WhatYouWillNeed.MemberContributions.addContribution = regular contributions and any additional contributions made by a member to their own pension
+WhatYouWillNeed.MemberContributions.behalfOfContribution = contributions made on behalf of a member by another person, for example a relative
+WhatYouWillNeed.MemberContributions.paragraph3 = It does not include any contributions made by an employer.
+WhatYouWillNeed.MemberContributions.paragraph4 = On the next page, you will be able to select a member from a list of those whose details you have already provided. If you want to add a new member, you will need to provide their details using the ‘member details’ section of this pension scheme return.
+
+WhatYouWillNeed.ReceivedTransfer.title   = Transfers in for members of the scheme
+WhatYouWillNeed.ReceivedTransfer.heading = Transfers in for members of {0}
+WhatYouWillNeed.ReceivedTransfer.paragraph1 = You must tell us about all transfers received for members of the scheme during the period of this return.
+WhatYouWillNeed.ReceivedTransfer.paragraph2 = For each transfer, you need to tell us:
+WhatYouWillNeed.ReceivedTransfer.tellUs1 = which member received the transfer
+WhatYouWillNeed.ReceivedTransfer.tellUs2 = the name of the transferring scheme
+WhatYouWillNeed.ReceivedTransfer.tellUs3 = if the transferring scheme is a registered pension scheme, qualifying recognised overseas pension scheme (QROPS) or other
+WhatYouWillNeed.ReceivedTransfer.tellUs4 = the transferring scheme’s Pension Scheme Tax Reference (PSTR), QROPS reference number, or a description of the transferring scheme – whichever applies
+WhatYouWillNeed.ReceivedTransfer.tellUs5 = the total value of the transfer
+WhatYouWillNeed.ReceivedTransfer.tellUs6 = the date the transfer was received
+WhatYouWillNeed.ReceivedTransfer.tellUs7 = if the transfer included an asset
+WhatYouWillNeed.ReceivedTransfer.paragraph3 = On the next page, you will be able to select a member from a list of those whose details you have already provided. If you want to add a new member, you will need to provide their details using the ‘member details’ section of this pension scheme return.
+WhatYouWillNeed.ReceivedTransfer.paragraph4 = If the scheme received more than one transfer for any member, you must tell us about all of them. Answer the questions for one transfer at a time.
+
+TransferIn.MemberList.title = Select a member to report transfers in
+TransferIn.MemberList.title.plural = Select a member to report transfers in
+TransferIn.MemberList.heading = Select a member to report transfers in
+TransferIn.MemberList.heading.plural = Select a member to report transfers in
+TransferIn.MemberList.paragraph = You must tell us about all transfers received for members of the scheme during the period of this return.
+TransferIn.MemberList.row = {0} {1}
+TransferIn.MemberList.radios = Have you finished reporting transfers in?
+TransferIn.MemberList.radios.error.required = Select yes if you have finished reporting transfers in
+TransferIn.MemberList.pagination.label = Showing {0} - {1} of {2} members

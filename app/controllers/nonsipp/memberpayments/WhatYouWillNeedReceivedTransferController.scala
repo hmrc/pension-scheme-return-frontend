@@ -58,25 +58,25 @@ object WhatYouWillNeedReceivedTransferController {
 
   def viewModel(srn: Srn, SchemeName: String): FormPageViewModel[ContentPageViewModel] =
     FormPageViewModel(
-      Message("WhatYouWillNeedReceivedTransfer.title"),
-      Message("WhatYouWillNeedReceivedTransfer.heading", SchemeName),
+      Message("WhatYouWillNeed.ReceivedTransfer.title"),
+      Message("WhatYouWillNeed.ReceivedTransfer.heading", SchemeName),
       ContentPageViewModel(isLargeHeading = true),
       controllers.nonsipp.memberpayments.routes.WhatYouWillNeedReceivedTransferController.onSubmit(srn)
     ).withButtonText(Message("site.continue"))
       .withDescription(
-        ParagraphMessage("WhatYouWillNeedReceivedTransfer.paragraph1") ++
-          ParagraphMessage("WhatYouWillNeedReceivedTransfer.paragraph2") ++
+        ParagraphMessage("WhatYouWillNeed.ReceivedTransfer.paragraph1") ++
+          ParagraphMessage("WhatYouWillNeed.ReceivedTransfer.paragraph2") ++
           ListMessage(
             ListType.Bullet,
-            "WhatYouWillNeedReceivedTransfer.tellUs1",
-            "WhatYouWillNeedReceivedTransfer.tellUs2",
-            "WhatYouWillNeedReceivedTransfer.tellUs3",
-            "WhatYouWillNeedReceivedTransfer.tellUs4",
-            "WhatYouWillNeedReceivedTransfer.tellUs5",
-            "WhatYouWillNeedReceivedTransfer.tellUs6",
-            "WhatYouWillNeedReceivedTransfer.tellUs7"
+            "WhatYouWillNeed.ReceivedTransfer.tellUs1",
+            "WhatYouWillNeed.ReceivedTransfer.tellUs2",
+            "WhatYouWillNeed.ReceivedTransfer.tellUs3",
+            "WhatYouWillNeed.ReceivedTransfer.tellUs4",
+            "WhatYouWillNeed.ReceivedTransfer.tellUs5",
+            "WhatYouWillNeed.ReceivedTransfer.tellUs6",
+            "WhatYouWillNeed.ReceivedTransfer.tellUs7"
           ) ++
-          ParagraphMessage("WhatYouWillNeedReceivedTransfer.paragraph3") ++
-          ParagraphMessage("WhatYouWillNeedReceivedTransfer.paragraph4")
+          ParagraphMessage("WhatYouWillNeed.ReceivedTransfer.paragraph3") ++
+          ParagraphMessage("WhatYouWillNeed.ReceivedTransfer.paragraph4")
       )
 }
