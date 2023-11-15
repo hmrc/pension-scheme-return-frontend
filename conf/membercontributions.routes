@@ -1,2 +1,7 @@
 GET         /:srn/what-you-will-need-member-contributions                           controllers.nonsipp.membercontributions.WhatYouWillNeedMemberContributionsController.onPageLoad(srn: Srn)
 GET         /:srn/submit-what-you-will-need-member-contributions                    controllers.nonsipp.membercontributions.WhatYouWillNeedMemberContributionsController.onSubmit(srn: Srn)
+
+GET         /:srn/check-answers-member-contributions                      controllers.nonsipp.membercontributions.CYAMemberContributionsController.onPageLoad(srn: Srn, checkOrChange: CheckOrChange = Check)
+POST        /:srn/submit-check-answers-member-contributions               controllers.nonsipp.membercontributions.CYAMemberContributionsController.onSubmit(srn: Srn, checkOrChange: CheckOrChange = Check)
+GET         /:srn/change-check-answers-member-contributions               controllers.nonsipp.membercontributions.CYAMemberContributionsController.onPageLoad(srn: Srn, checkOrChange: CheckOrChange = Change)
+POST        /:srn/change-check-answers-member-contributions               controllers.nonsipp.membercontributions.CYAMemberContributionsController.onSubmit(srn: Srn, checkOrChange: CheckOrChange = Change)
