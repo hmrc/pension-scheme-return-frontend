@@ -1649,4 +1649,4 @@ TransferIn.MemberList.paragraph = You must tell us about all transfers received 
 TransferIn.MemberList.inset = You cannot add another land or property as you have entered the maximum of 5,000.
 TransferIn.MemberList.radios = Have you finished reporting transfers in?
 TransferIn.MemberList.radios.error.required = Select yes if you need to add another land or property
-TransferIn.MemberList.pagination.label = Showing {0} - {1} of {2} land or properties
+TransferIn.MemberList.pagination.label = Showing {0} - {1} of {2} members

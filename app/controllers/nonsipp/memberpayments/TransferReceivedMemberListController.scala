@@ -33,9 +33,16 @@ import pages.nonsipp.memberpayments.TransferReceivedMemberListPage
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import viewmodels.DisplayMessage.{Message, ParagraphMessage}
-import viewmodels.models.{FormPageViewModel, ListRow, ListViewModel, PaginatedViewModel}
-import views.html.ListView
+import viewmodels.DisplayMessage.{LinkMessage, ListMessage, Message, ParagraphMessage}
+import viewmodels.models.{
+  ActionTableViewModel,
+  FormPageViewModel,
+  ListRow,
+  ListViewModel,
+  PaginatedViewModel,
+  TableElem
+}
+import views.html.TwoColumnsTripleAction
 import viewmodels.implicits._
 
 import javax.inject.Named
@@ -45,7 +52,7 @@ class TransferReceivedMemberListController @Inject()(
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
-  view: ListView,
+  view: TwoColumnsTripleAction,
   formProvider: YesNoPageFormProvider
 ) extends PSRController {
 
@@ -93,25 +100,27 @@ object TransferReceivedMemberListController {
       "TransferIn.MemberList.radios.error.required"
     )
 
-  private def rows(srn: Srn, mode: Mode, memberList: List[NameDOB]): List[ListRow] =
-    memberList.zipWithIndex.flatMap {
+  private def rows(srn: Srn, mode: Mode, memberList: List[NameDOB]): List[List[TableElem]] =
+    memberList.zipWithIndex.map {
       case (memberName, index) =>
         refineV[OneTo300](index + 1) match {
           case Left(_) => Nil
           case Right(nextIndex) =>
             List(
-              ListRow(
-                memberName.fullName,
-                changeUrl = routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, nextIndex, Change).url,
-                changeHiddenText = Message("schemeMembersList.change.hidden", memberName.fullName),
-                removeUrl = routes.RemoveMemberDetailsController.onPageLoad(srn, nextIndex, mode).url,
-                removeHiddenText = Message("schemeMembersList.remove.hidden", memberName.fullName)
+              TableElem(
+                memberName.fullName
+              ),
+              TableElem(
+                "Not started"
+              ),
+              TableElem(
+                LinkMessage("Add", "www.google.com")
               )
             )
         }
     }
 
-  def viewModel(srn: Srn, page: Int, mode: Mode, memberList: List[NameDOB]): FormPageViewModel[ListViewModel] = {
+  def viewModel(srn: Srn, page: Int, mode: Mode, memberList: List[NameDOB]): FormPageViewModel[ActionTableViewModel] = {
 
     val title = if (memberList.size == 1) "TransferIn.MemberList.title" else "TransferIn.MemberList.title.plural"
     val heading = if (memberList.size == 1) "TransferIn.MemberList.heading" else "TransferIn.MemberList.heading.plural"
@@ -127,11 +136,10 @@ object TransferReceivedMemberListController {
       Message(title, memberList.size),
       Message(heading, memberList.size),
       ParagraphMessage("TransferIn.MemberList.paragraph"),
-      ListViewModel(
+      ActionTableViewModel(
         inset = "TransferIn.MemberList.inset",
-        rows(srn, mode, memberList),
-        Message("TransferIn.MemberList.radios"),
-        showRadios = memberList.size < Constants.maxSchemeMembers,
+        head = Some(List(TableElem("Member Name"), TableElem("status"), TableElem(""))),
+        rows = rows(srn, mode, memberList),
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(
