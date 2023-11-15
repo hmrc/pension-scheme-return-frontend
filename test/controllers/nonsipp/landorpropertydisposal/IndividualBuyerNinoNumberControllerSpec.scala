@@ -66,12 +66,12 @@ class IndividualBuyerNinoNumberControllerSpec extends ControllerBaseSpec {
       }
     )
 
-    act.like(redirectNextPage(onSubmit, "value" -> "true", "value.yes" -> nino.value))
-    act.like(redirectNextPage(onSubmit, "value" -> "false", "value.no" -> "reason"))
+    act.like(redirectNextPage(onSubmit, "value" -> "true", "value.yes" -> nino.value).withName("redirect on yes"))
+    act.like(redirectNextPage(onSubmit, "value" -> "false", "value.no" -> "reason").withName("redirect on no"))
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
-    act.like(saveAndContinue(onSubmit, "value" -> "true", "value.yes" -> nino.value))
+    act.like(saveAndContinue(onSubmit, "value" -> "true", "value.yes" -> nino.value).withName("save and continue"))
 
     act.like(invalidForm(onSubmit, userAnswersWithIndividualName))
 

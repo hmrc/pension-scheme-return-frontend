@@ -20,21 +20,35 @@ import models.UserAnswers
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
+import org.scalatest.Assertion
 import play.api.Application
 import play.api.inject.bind
 import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
 import play.api.libs.json.{JsPath, Writes}
 import play.api.mvc.{Call, Request}
+import play.api.routing.Router
 import play.api.test.FakeRequest
 import play.twirl.api.Html
 import queries.Settable
 import services.SaveService
+
 import scala.concurrent.Future
 
 trait ControllerBehaviours {
   _: ControllerBaseSpec =>
 
   import Behaviours._
+
+  // eagerly load routes before call to add routes prefix to ReverseRouter
+  private def eagerlyLoadRoutes()(implicit application: Application) =
+    //    injected[hmrcfrontend.Routes].prefix
+    //    injected[app.Routes].prefix
+    //    injected[employercontributions.Routes].prefix
+    //    injected[landorproperty.Routes].prefix
+    //    injected[landorpropertydisposal.Routes].prefix
+    //    injected[moneyborrowed.Routes].prefix
+    //    injected[prod.Routes].prefix
+    injected[Router].routes
 
   private def navigatorBindings(onwardRoute: Call): List[GuiceableModule] =
     List(
@@ -49,6 +63,21 @@ trait ControllerBehaviours {
       val appBuilder = applicationBuilder(Some(userAnswers))
       render(appBuilder, call)(view)
     }
+
+  def renderView[A <: BaseFixture](call: => Call, fixture: A)(
+    view: Application => Request[_] => Html
+  ): BehaviourFixtureTest[A] = renderView[A](call, defaultUserAnswers, fixture)(view)
+
+  def renderView[A <: BaseFixture](call: => Call, userAnswers: UserAnswers, fixture: A)(
+    view: Application => Request[_] => Html
+  ): BehaviourFixtureTest[A] =
+    "return OK and the correct view".hasFixtureBehaviour[A](
+      fixture, {
+        val appBuilder =
+          applicationBuilderWithBindings(userAnswers = Some(userAnswers), bindings = fixture.additionalBindings)
+        render(appBuilder, call)(view)
+      }
+    )
 
   def renderPrePopView[A: Writes](call: => Call, page: Settable[A], value: A)(
     view: Application => Request[_] => Html
@@ -92,8 +121,11 @@ trait ControllerBehaviours {
 
   private def render(appBuilder: GuiceApplicationBuilder, call: => Call)(
     view: Application => Request[_] => Html
-  ): Unit =
-    running(_ => appBuilder) { app =>
+  ): Unit = {
+    implicit val app = appBuilder.build()
+    running(app) {
+      eagerlyLoadRoutes()
+
       val request = FakeRequest(call)
       val result = route(app, request).value
       val expectedView = view(app)(request)
@@ -101,6 +133,7 @@ trait ControllerBehaviours {
       status(result) mustEqual OK
       contentAsString(result) mustEqual expectedView.body
     }
+  }
 
   def invalidForm(call: => Call, userAnswers: UserAnswers, form: (String, String)*): BehaviourTest =
     s"return BAD_REQUEST for a POST with invalid form data ${form.toString()}".hasBehaviour {
@@ -133,6 +166,34 @@ trait ControllerBehaviours {
       }
     }
 
+  def redirectNextPage[A <: BaseFixture](
+    call: => Call,
+    userAnswers: UserAnswers,
+    fixture: A,
+    form: (String, String)*
+  ): BehaviourFixtureTest[A] =
+    s"redirect to the next page with form ${form.toList}".hasFixtureBehaviour[A](
+      fixture, {
+        val appBuilder =
+          applicationBuilderWithBindings(
+            userAnswers = Some(userAnswers),
+            bindings = fixture.additionalBindings ++ navigatorBindings(testOnwardRoute)
+          )
+
+        redirectTest(appBuilder, call, form: _*)
+      }
+    )
+
+  private def redirectTest(appBuilder: GuiceApplicationBuilder, call: => Call, form: (String, String)*): Assertion =
+    running(_ => appBuilder) { app =>
+      val request = FakeRequest(call).withFormUrlEncodedBody(form: _*)
+
+      val result = route(app, request).value
+
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result).value mustEqual testOnwardRoute.url
+    }
+
   def redirectNextPage(call: => Call, form: (String, String)*): BehaviourTest =
     redirectNextPage(call, defaultUserAnswers, form: _*)
 
@@ -149,6 +210,29 @@ trait ControllerBehaviours {
         redirectLocation(result).value mustEqual page.url
       }
     }
+
+  def redirectToPage[A <: BaseFixture](
+    call: => Call,
+    page: => Call,
+    userAnswers: UserAnswers,
+    fixture: A,
+    form: (String, String)*
+  ): BehaviourFixtureTest[A] =
+    s"redirect to page with form $form".hasFixtureBehaviour[A](
+      fixture, {
+        val appBuilder =
+          applicationBuilderWithBindings(userAnswers = Some(userAnswers), bindings = fixture.additionalBindings)
+
+        running(_ => appBuilder) { app =>
+          val request = FakeRequest(call).withFormUrlEncodedBody(form: _*)
+
+          val result = route(app, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual page.url
+        }
+      }
+    )
 
   def redirectToPage(call: => Call, page: => Call, form: (String, String)*): BehaviourTest =
     redirectToPage(call, page, defaultUserAnswers, form: _*)

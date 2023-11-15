@@ -53,11 +53,11 @@ class UnallocatedEmployerAmountControllerSpec extends ControllerBaseSpec {
       }
     )
 
-    act.like(redirectNextPage(onSubmit, "value" -> "1"))
+    act.like(redirectNextPage(onSubmit, "value" -> "1").withName("redirect to next page"))
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
-    act.like(saveAndContinue(onSubmit, "value" -> "1"))
+    act.like(saveAndContinue(onSubmit, "value" -> "1").withName("save and continue"))
 
     act.like(invalidForm(onSubmit))
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))

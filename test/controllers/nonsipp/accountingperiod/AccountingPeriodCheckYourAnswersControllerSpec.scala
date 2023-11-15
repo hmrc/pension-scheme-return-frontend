@@ -49,7 +49,7 @@ class AccountingPeriodCheckYourAnswersControllerSpec extends ControllerBaseSpec 
       redirectWhenCacheEmpty(
         onPageLoad,
         routes.AccountingPeriodController.onPageLoad(srn, refineMV[OneToThree](1), NormalMode)
-      )
+      ).withName("redirect")
     )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))

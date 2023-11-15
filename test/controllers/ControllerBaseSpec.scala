@@ -25,15 +25,17 @@ import models.SchemeId.Srn
 import models.UserAnswers.SensitiveJsObject
 import models._
 import org.scalatest.OptionValues
+import org.scalatest.ParallelSuite.executionContext
 import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import pages.nonsipp.moneyborrowed.LenderNamePage
 import play.api.Application
 import play.api.data.Form
 import play.api.http._
-import play.api.inject.bind
+import play.api.inject.{bind, RoutesProvider}
 import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
 import play.api.libs.json.{Json, Writes}
 import play.api.mvc.Call
+import play.api.routing.Router
 import play.api.test._
 import queries.Settable
 import uk.gov.hmrc.domain.Nino
@@ -42,6 +44,11 @@ import utils.UserAnswersUtils.UserAnswersOps
 import utils.{BaseSpec, DisplayMessageUtils}
 
 import java.time.{LocalDate, LocalDateTime}
+import scala.concurrent.ExecutionContext
+
+trait BaseFixture {
+  val additionalBindings: List[GuiceableModule]
+}
 
 trait ControllerBaseSpec
     extends BaseSpec
@@ -52,7 +59,6 @@ trait ControllerBaseSpec
     with Writeables
     with HeaderNames
     with Status
-    with PlayRunners
     with RouteInvokers
     with ResultExtractors
     with TestValues
@@ -64,22 +70,35 @@ trait ControllerBaseSpec
 
   val defaultTaxYear = TaxYear(2022)
 
-  protected def applicationBuilder(
+  protected def applicationBuilderWithBindings(
     userAnswers: Option[UserAnswers] = None,
     schemeDetails: SchemeDetails = defaultSchemeDetails,
-    minimalDetails: MinimalDetails = defaultMinimalDetails
+    minimalDetails: MinimalDetails = defaultMinimalDetails,
+    bindings: List[GuiceableModule]
   ): GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
       .overrides(
         List[GuiceableModule](
+          bind[Router].toProvider[RoutesProvider].eagerly(),
           bind[DataRequiredAction].to[DataRequiredActionImpl],
           bind[IdentifierAction].to[FakeIdentifierAction],
           bind[AllowAccessActionProvider].toInstance(new FakeAllowAccessActionProvider(schemeDetails, minimalDetails)),
           bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers)),
           bind[DataCreationAction].toInstance(new FakeDataCreationAction(userAnswers.getOrElse(emptyUserAnswers)))
-        ) ++ additionalBindings: _*
+        ) ++ bindings: _*
       )
-      .configure("play.filters.csp.nonce.enabled" -> false)
+      .configure(
+        "play.filters.csp.nonce.enabled" -> false,
+        "play.http.router" -> "prod.Routes"
+      )
+      .eagerlyLoaded()
+
+  protected def applicationBuilder(
+    userAnswers: Option[UserAnswers] = None,
+    schemeDetails: SchemeDetails = defaultSchemeDetails,
+    minimalDetails: MinimalDetails = defaultMinimalDetails
+  ): GuiceApplicationBuilder =
+    applicationBuilderWithBindings(userAnswers, schemeDetails, minimalDetails, additionalBindings)
 
   protected val additionalBindings: List[GuiceableModule] = List()
 
@@ -97,7 +116,7 @@ trait TestValues {
   _: OptionValues =>
   val accountNumber = "12345678"
   val sortCode = "123456"
-  val srn: SchemeId.Srn = srnGen.sample.value
+  val srn: SchemeId.Srn = Srn("S1392422666").value
   val schemeName = "testSchemeName"
   val email = "testEmail"
   val uploadKey: UploadKey = UploadKey("test-userid", srn)

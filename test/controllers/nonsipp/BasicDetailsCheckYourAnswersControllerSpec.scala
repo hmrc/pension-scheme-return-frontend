@@ -19,7 +19,7 @@ package controllers.nonsipp
 import cats.data.NonEmptyList
 import cats.implicits.toShow
 import config.Refined.Max3
-import controllers.{nonsipp, ControllerBaseSpec}
+import controllers.{nonsipp, BaseFixture, ControllerBaseSpec}
 import controllers.nonsipp.BasicDetailsCheckYourAnswersController._
 import eu.timepit.refined.refineMV
 import models.SchemeId.Srn
@@ -39,17 +39,19 @@ import views.html.CheckYourAnswersView
 
 class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec {
 
+  class Fixture extends BaseFixture {
+    val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
+    val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
+
+    override val additionalBindings: List[GuiceableModule] = List(
+      bind[SchemeDateService].toInstance(mockSchemeDateService),
+      bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
+    )
+  }
+
   private lazy val onPageLoad = routes.BasicDetailsCheckYourAnswersController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.BasicDetailsCheckYourAnswersController.onSubmit(srn, NormalMode)
   private lazy val onSubmitInCheckMode = routes.BasicDetailsCheckYourAnswersController.onSubmit(srn, CheckMode)
-
-  private implicit val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
-  private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
-
-  override protected val additionalBindings: List[GuiceableModule] = List(
-    bind[SchemeDateService].toInstance(mockSchemeDateService),
-    bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
-  )
 
   "BasicDetailsCheckYourAnswersController" - {
 
@@ -57,11 +59,12 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec {
       .unsafeSet(WhichTaxYearPage(srn), dateRange)
       .unsafeSet(HowManyMembersPage(srn, psaId), schemeMemberNumbers)
       .unsafeSet(ActiveBankAccountPage(srn), true)
+
     val pensionSchemeId = pensionSchemeIdGen.sample.value
     val userAnswersWithManyMembers = userAnswersWithTaxYear
       .unsafeSet(HowManyMembersPage(srn, pensionSchemeId), SchemeMemberNumbers(50, 60, 70))
 
-    act.like(renderView(onPageLoad, userAnswersWithTaxYear) { implicit app => implicit request =>
+    act.like(renderView(onPageLoad, userAnswersWithTaxYear, new Fixture) { implicit app => implicit request =>
       injected[CheckYourAnswersView].apply(
         viewModel(
           srn,
@@ -76,27 +79,28 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec {
           psaId.value
         )
       )
-    }.before(mockTaxYear(dateRange)))
+    }.before(f => MockSchemeDateService.taxYearOrAccountingPeriods(Some(Left(dateRange)))(f.mockSchemeDateService)))
 
     act.like(
-      redirectNextPage(onSubmit, userAnswersWithTaxYear)
-        .before {
-          MockSchemeDateService.returnPeriods(Some(NonEmptyList.of(dateRange)))
-          MockPSRSubmissionService.submitPsrDetails()
+      redirectNextPage(onSubmit, userAnswersWithTaxYear, new Fixture)
+        .before { f =>
+          MockSchemeDateService.returnPeriods(Some(NonEmptyList.of(dateRange)))(f.mockSchemeDateService)
+          MockSchemeDateService.taxYearOrAccountingPeriods(Some(Left(dateRange)))(f.mockSchemeDateService)
+          MockPSRSubmissionService.submitPsrDetails()(f.mockPsrSubmissionService)
         }
-        .after(
-          verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any())(any(), any(), any())
-        )
+        .after(f => verify(f.mockPsrSubmissionService, times(1)).submitPsrDetails(any())(any(), any(), any()))
     )
 
     act.like(
       redirectToPage(
         onSubmitInCheckMode,
         nonsipp.declaration.routes.PsaDeclarationController.onPageLoad(srn),
-        userAnswersWithManyMembers
-      ).before {
-        MockSchemeDateService.returnPeriods(Some(NonEmptyList.of(dateRange)))
-        MockPSRSubmissionService.submitPsrDetails()
+        userAnswersWithManyMembers,
+        new Fixture
+      ).before { f =>
+        MockSchemeDateService.returnPeriods(Some(NonEmptyList.of(dateRange)))(f.mockSchemeDateService)
+        MockSchemeDateService.taxYearOrAccountingPeriods(Some(Left(dateRange)))(f.mockSchemeDateService)
+        MockPSRSubmissionService.submitPsrDetails()(f.mockPsrSubmissionService)
       }
     )
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
@@ -243,7 +247,4 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec {
     schemeDetails,
     pensionSchemeId
   )
-
-  private def mockTaxYear(taxYear: DateRange) =
-    when(mockSchemeDateService.taxYearOrAccountingPeriods(any())(any())).thenReturn(Some(Left(taxYear)))
 }

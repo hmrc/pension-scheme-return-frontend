@@ -82,7 +82,7 @@ class HowMuchCashControllerSpec extends ControllerBaseSpec {
         onSubmit,
         Some(JsPath \ "schemeDesignatory" \ "totalCash"),
         formData(form, moneyInPeriodData.from[(Money, Money)]): _*
-      )
+      ).withName("save and continue")
     )
 
     act.like(invalidForm(onSubmit))

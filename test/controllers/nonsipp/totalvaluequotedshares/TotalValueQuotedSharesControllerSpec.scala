@@ -71,7 +71,7 @@ class TotalValueQuotedSharesControllerSpec extends ControllerBaseSpec {
         .before(setSchemeDate(None))
     )
 
-    act.like(saveAndContinue(onSubmit, formData(form, validMoney): _*))
+    act.like(saveAndContinue(onSubmit, formData(form, validMoney): _*).withName("submit"))
 
     act.like(invalidForm(onSubmit))
 

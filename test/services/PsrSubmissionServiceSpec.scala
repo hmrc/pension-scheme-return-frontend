@@ -29,7 +29,7 @@ import pages.nonsipp.loansmadeoroutstanding.LoansMadeOrOutstandingPage
 import pages.nonsipp.moneyborrowed.MoneyBorrowedPage
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
-import services.PsrSubmissionServiceSpec.{captor, minimalRequiredSubmission}
+import services.PsrSubmissionServiceSpec.minimalRequiredSubmission
 import transformations.{
   LandOrPropertyTransactionsTransformer,
   LoanTransactionsTransformer,
@@ -46,64 +46,63 @@ import scala.concurrent.Future
 
 class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
 
-  override def beforeEach(): Unit = {
-    reset(mockConnector)
-    reset(mockMinimalRequiredSubmissionTransformer)
-    reset(mockLoanTransactionsTransformer)
-    reset(mockLandOrPropertyTransactionsTransformer)
-    reset(mockMoneyBorrowedTransformer)
+  class Fixture {
+    val mockConnector = mock[PSRConnector]
+    val mockMinimalRequiredSubmissionTransformer = mock[MinimalRequiredSubmissionTransformer]
+    val mockLoanTransactionsTransformer = mock[LoanTransactionsTransformer]
+    val mockLandOrPropertyTransactionsTransformer = mock[LandOrPropertyTransactionsTransformer]
+    val mockMoneyBorrowedTransformer = mock[MoneyBorrowedTransformer]
+
+    val service =
+      new PsrSubmissionService(
+        mockConnector,
+        mockMinimalRequiredSubmissionTransformer,
+        mockLoanTransactionsTransformer,
+        mockLandOrPropertyTransactionsTransformer,
+        mockMoneyBorrowedTransformer
+      )
   }
 
   val allowedAccessRequest
     : AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(FakeRequest()).sample.value
+
   implicit val request: DataRequest[AnyContentAsEmpty.type] = DataRequest(allowedAccessRequest, defaultUserAnswers)
-
-  private val mockConnector = mock[PSRConnector]
-  private val mockMinimalRequiredSubmissionTransformer = mock[MinimalRequiredSubmissionTransformer]
-  private val mockLoanTransactionsTransformer = mock[LoanTransactionsTransformer]
-  private val mockLandOrPropertyTransactionsTransformer = mock[LandOrPropertyTransactionsTransformer]
-  private val mockMoneyBorrowedTransformer = mock[MoneyBorrowedTransformer]
-
-  private val service =
-    new PsrSubmissionService(
-      mockConnector,
-      mockMinimalRequiredSubmissionTransformer,
-      mockLoanTransactionsTransformer,
-      mockLandOrPropertyTransactionsTransformer,
-      mockMoneyBorrowedTransformer
-    )
 
   private implicit val hc: HeaderCarrier = HeaderCarrier()
 
   "PSRSubmissionService" - {
 
-    "should submitPsrDetails request when only minimalRequiredSubmission object is exist" in {
+    "should submitPsrDetails request when only minimalRequiredSubmission object is exist" in new Fixture {
       val userAnswers = defaultUserAnswers
         .unsafeSet(CheckReturnDatesPage(srn), false)
         .unsafeSet(LoansMadeOrOutstandingPage(srn), false)
         .unsafeSet(LandOrPropertyHeldPage(srn), false)
         .unsafeSet(MoneyBorrowedPage(srn), false)
+
       val request = DataRequest(allowedAccessRequest, userAnswers)
+
       when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any())(any()))
         .thenReturn(Some(minimalRequiredSubmission))
       when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(()))
 
-      whenReady(service.submitPsrDetails(srn)(implicitly, implicitly, request)) { result: Option[Unit] =>
-        verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
-        verify(mockLoanTransactionsTransformer, never).transformToEtmp(any())(any())
-        verify(mockLandOrPropertyTransactionsTransformer, never).transformToEtmp(any())(any())
-        verify(mockMoneyBorrowedTransformer, never).transformToEtmp(any())(any())
-        verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
+      val captor: ArgumentCaptor[PsrSubmission] = ArgumentCaptor.forClass(classOf[PsrSubmission])
 
-        captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
-        captor.getValue.checkReturnDates mustBe false
-        captor.getValue.loans mustBe None
-        captor.getValue.assets mustBe None
-        result mustBe Some(())
-      }
+      val result = service.submitPsrDetails(srn)(implicitly, implicitly, request).futureValue
+
+      verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
+      verify(mockLoanTransactionsTransformer, never).transformToEtmp(any())(any())
+      verify(mockLandOrPropertyTransactionsTransformer, never).transformToEtmp(any())(any())
+      verify(mockMoneyBorrowedTransformer, never).transformToEtmp(any())(any())
+      verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
+
+      captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
+      captor.getValue.checkReturnDates mustBe false
+      captor.getValue.loans mustBe None
+      captor.getValue.assets mustBe None
+      result mustBe Some(())
     }
 
-    "submitPsrDetails request successfully when LoansMadeOrOutstandingPage is true" in {
+    "submitPsrDetails request successfully when LoansMadeOrOutstandingPage is true" in new Fixture {
       val userAnswers = defaultUserAnswers
         .unsafeSet(CheckReturnDatesPage(srn), false)
         .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
@@ -114,22 +113,24 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
       when(mockLoanTransactionsTransformer.transformToEtmp(any())(any())).thenReturn(List.empty)
       when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(()))
 
-      whenReady(service.submitPsrDetails(srn)(implicitly, implicitly, request)) { result: Option[Unit] =>
-        verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
-        verify(mockLoanTransactionsTransformer, times(1)).transformToEtmp(any())(any())
-        verify(mockLandOrPropertyTransactionsTransformer, never).transformToEtmp(any())(any())
-        verify(mockMoneyBorrowedTransformer, never).transformToEtmp(any())(any())
-        verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
+      val captor: ArgumentCaptor[PsrSubmission] = ArgumentCaptor.forClass(classOf[PsrSubmission])
 
-        captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
-        captor.getValue.checkReturnDates mustBe false
-        captor.getValue.loans mustBe Some(Loans(true, List.empty))
-        captor.getValue.assets mustBe None
-        result mustBe Some(())
-      }
+      val result = service.submitPsrDetails(srn)(implicitly, implicitly, request).futureValue
+
+      verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
+      verify(mockLoanTransactionsTransformer, times(1)).transformToEtmp(any())(any())
+      verify(mockLandOrPropertyTransactionsTransformer, never).transformToEtmp(any())(any())
+      verify(mockMoneyBorrowedTransformer, never).transformToEtmp(any())(any())
+      verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
+
+      captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
+      captor.getValue.checkReturnDates mustBe false
+      captor.getValue.loans mustBe Some(Loans(schemeHadLoans = true, List.empty))
+      captor.getValue.assets mustBe None
+      result mustBe Some(())
     }
 
-    "submitPsrDetails request successfully when LandOrPropertyHeldPage is true" in {
+    "submitPsrDetails request successfully when LandOrPropertyHeldPage is true" in new Fixture {
       val userAnswers = defaultUserAnswers
         .unsafeSet(CheckReturnDatesPage(srn), false)
         .unsafeSet(LandOrPropertyHeldPage(srn), true)
@@ -140,6 +141,8 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
       when(mockLandOrPropertyTransactionsTransformer.transformToEtmp(any())(any())).thenReturn(List.empty)
       when(mockMoneyBorrowedTransformer.transformToEtmp(any())(any())).thenReturn(List.empty)
       when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(()))
+
+      val captor: ArgumentCaptor[PsrSubmission] = ArgumentCaptor.forClass(classOf[PsrSubmission])
 
       whenReady(service.submitPsrDetails(srn)(implicitly, implicitly, request)) { result: Option[Unit] =>
         verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
@@ -156,7 +159,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
       }
     }
 
-    "submitPsrDetails request successfully when MoneyBorrowedPage is true" in {
+    "submitPsrDetails request successfully when MoneyBorrowedPage is true" in new Fixture {
       val userAnswers = defaultUserAnswers
         .unsafeSet(CheckReturnDatesPage(srn), false)
         .unsafeSet(MoneyBorrowedPage(srn), true)
@@ -167,6 +170,8 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
       when(mockMoneyBorrowedTransformer.transformToEtmp(any())(any())).thenReturn(List.empty)
       when(mockLandOrPropertyTransactionsTransformer.transformToEtmp(any())(any())).thenReturn(List.empty)
       when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(()))
+
+      val captor: ArgumentCaptor[PsrSubmission] = ArgumentCaptor.forClass(classOf[PsrSubmission])
 
       whenReady(service.submitPsrDetails(srn)(implicitly, implicitly, request)) { result: Option[Unit] =>
         verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
@@ -183,7 +188,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
       }
     }
 
-    "shouldn't submitPsrDetails request when userAnswer is empty" in {
+    "shouldn't submitPsrDetails request when userAnswer is empty" in new Fixture {
 
       whenReady(service.submitPsrDetails(srn)) { result: Option[Unit] =>
         verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
@@ -198,7 +203,6 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
 }
 
 object PsrSubmissionServiceSpec {
-  val captor: ArgumentCaptor[PsrSubmission] = ArgumentCaptor.forClass(classOf[PsrSubmission])
 
   val sampleDate: LocalDate = LocalDate.now
   val minimalRequiredSubmission: MinimalRequiredSubmission = MinimalRequiredSubmission(

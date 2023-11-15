@@ -1,0 +1,13 @@
+-J-Xss600k
+-J-Xms6g
+-J-Xmx6g
+-J-XX:MaxMetaspaceSize=1g
+-J-XX:+CMSClassUnloadingEnabled
+-J-XX:+UseG1GC
+-J-XX:MaxGCPauseMillis=100
+-J-XX:+UseStringDeduplication
+-J-XX:+AlwaysPreTouch
+-J-XX:MaxMetaspaceSize=1g
+-J-XX:MaxTenuringThreshold=10
+-J-XX:+ParallelRefProcEnabled
+-J-XX:+DisableExplicitGC

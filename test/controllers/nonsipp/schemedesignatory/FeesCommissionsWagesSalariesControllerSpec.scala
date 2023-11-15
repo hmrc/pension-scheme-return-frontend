@@ -49,6 +49,7 @@ class FeesCommissionsWagesSalariesControllerSpec extends ControllerBaseSpec {
 
     act.like(
       saveAndContinue(onSubmit, Some(JsPath \ "schemeDesignatory" \ "totalPayments"), "value" -> s"${validMoney.value}")
+        .withName("save and continue")
     )
 
     act.like(invalidForm(onSubmit))

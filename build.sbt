@@ -1,5 +1,6 @@
 import play.sbt.routes.RoutesKeys
 import sbt.Def
+import sbt.Tests._
 import scoverage.ScoverageKeys
 import uk.gov.hmrc.versioning.SbtGitVersioning.autoImport.majorVersion
 
@@ -18,6 +19,9 @@ lazy val root = (project in file("."))
   .settings(
     scalaVersion := "2.13.8",
     name := appName,
+    Global / concurrentRestrictions := Seq(
+      Tags.limit(Tags.Test, 4)
+    ),
     RoutesKeys.routesImport ++= Seq(
       "models._",
       "models.CheckOrChange._",
@@ -94,6 +98,8 @@ lazy val root = (project in file("."))
 
 lazy val testSettings: Seq[Def.Setting[?]] = Seq(
   fork := false,
+  parallelExecution := true,
+  logBuffered := false,
   unmanagedSourceDirectories += baseDirectory.value / "test-utils"
 )
 

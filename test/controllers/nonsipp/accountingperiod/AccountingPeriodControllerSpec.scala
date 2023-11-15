@@ -42,6 +42,12 @@ class AccountingPeriodControllerSpec extends ControllerBaseSpec {
     val dateRangeData = rangeGen.sample.value
     val otherDateRangeData = rangeGen.sample.value
 
+    val userAnswersWithIntersectedPeriods =
+      emptyUserAnswers
+        .unsafeSet(WhichTaxYearPage(srn), dateRange)
+        .unsafeSet(AccountingPeriodPage(srn, refineMV(1), NormalMode), otherDateRangeData)
+        .unsafeSet(AccountingPeriodPage(srn, refineMV(2), NormalMode), dateRangeData)
+
     lazy val onPageLoad = routes.AccountingPeriodController.onPageLoad(srn, refineMV(1), NormalMode)
     lazy val onSubmit = routes.AccountingPeriodController.onSubmit(srn, refineMV(1), NormalMode)
 
@@ -60,29 +66,20 @@ class AccountingPeriodControllerSpec extends ControllerBaseSpec {
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
-    act.like(saveAndContinue(onSubmit, userAnswers, formData(form, dateRangeData): _*))
+    act.like(saveAndContinue(onSubmit, userAnswers, formData(form, dateRangeData): _*).withName("save and continue"))
 
     act.like(invalidForm(onSubmit, userAnswers))
 
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
 
-    "allow accounting period to be updated" - {
-      act.like(
-        saveAndContinue(onSubmit, userAnswers, Some(JsPath \ "accountingPeriods"), formData(form, dateRangeData): _*)
-      )
-    }
+    act.like(
+      saveAndContinue(onSubmit, userAnswers, Some(JsPath \ "accountingPeriods"), formData(form, dateRangeData): _*)
+        .withName("allow accounting period to be updated")
+    )
 
-    "return a 400 if range intersects" - {
-      val userAnswers =
-        emptyUserAnswers
-          .set(WhichTaxYearPage(srn), dateRange)
-          .get
-          .set(AccountingPeriodPage(srn, refineMV(1), NormalMode), otherDateRangeData)
-          .get
-          .set(AccountingPeriodPage(srn, refineMV(2), NormalMode), dateRangeData)
-          .get
-
-      act.like(invalidForm(onSubmit, userAnswers, formData(form, dateRangeData): _*))
-    }
+    act.like(
+      invalidForm(onSubmit, userAnswersWithIntersectedPeriods, formData(form, dateRangeData): _*)
+        .withName("return a 400 if range intersects")
+    )
   }
 }
