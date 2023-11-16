@@ -70,7 +70,7 @@ case class Address(
     (addressLine1, addressLine2, addressLine3, town, postCode)
 
   val asInternationalAddressTuple: (String, Option[String], Option[String], String, Option[String], String) =
-    (addressLine1, addressLine2, addressLine3, town, postCode, country)
+    (addressLine1, addressLine2, addressLine3, town, postCode, countryCode)
 
   val isManualAddress: Boolean = addressType match {
     case ManualAddress => true
@@ -132,7 +132,7 @@ object Address {
   def fromManualInternationalAddress(
     tup: (String, Option[String], Option[String], String, Option[String], String)
   ): Address = {
-    val (addressLine1, addressLine2, addressLine3, town, postCode, country) = tup
+    val (addressLine1, addressLine2, addressLine3, town, postCode, countryCode) = tup
     Address(
       "manual",
       addressLine1,
@@ -140,8 +140,8 @@ object Address {
       addressLine3,
       town,
       postCode,
-      country,
-      Country.getCountryCode(country).getOrElse(""),
+      Country.getCountry(countryCode).getOrElse(countryCode),
+      countryCode,
       ManualAddress
     )
   }

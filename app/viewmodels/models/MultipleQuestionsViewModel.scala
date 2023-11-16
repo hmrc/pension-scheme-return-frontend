@@ -16,6 +16,7 @@
 
 package viewmodels.models
 
+import models.SelectInput
 import play.api.data.Form
 import viewmodels.DisplayMessage.InlineMessage
 import viewmodels.InputWidth
@@ -118,6 +119,7 @@ case class QuestionField(
   label: InlineMessage,
   hint: Option[InlineMessage] = None,
   width: Option[InputWidth] = None,
+  selectSource: Seq[SelectInput],
   fieldType: FieldType
 ) {
   def withWidth(width: InputWidth): QuestionField = copy(width = Some(width))
@@ -125,22 +127,25 @@ case class QuestionField(
 
 object QuestionField {
   def input(label: InlineMessage, hint: Option[InlineMessage] = None): QuestionField =
-    QuestionField(label, hint, None, FieldType.Input)
+    QuestionField(label, hint, None, Nil, FieldType.Input)
 
   def currency(label: InlineMessage, hint: Option[InlineMessage] = None): QuestionField =
-    QuestionField(label, hint, None, FieldType.Currency)
+    QuestionField(label, hint, None, Nil, FieldType.Currency)
 
   // alias for currency
   def money(label: InlineMessage, hint: Option[InlineMessage] = None): QuestionField =
     currency(label, hint)
 
   def date(label: InlineMessage, hint: Option[InlineMessage] = None): QuestionField =
-    QuestionField(label, hint, None, FieldType.Date)
+    QuestionField(label, hint, None, Nil, FieldType.Date)
 
   // alias for date
   def localDate(label: InlineMessage, hint: Option[InlineMessage] = None): QuestionField =
     date(label, hint)
 
   def percentage(label: InlineMessage, hint: Option[InlineMessage] = None): QuestionField =
-    QuestionField(label, hint, None, FieldType.Percentage)
+    QuestionField(label, hint, None, Nil, FieldType.Percentage)
+
+  def select(label: InlineMessage, hint: Option[InlineMessage] = None, selectSource: Seq[SelectInput]): QuestionField =
+    QuestionField(label, hint, None, selectSource, FieldType.Select)
 }
