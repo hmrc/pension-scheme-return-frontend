@@ -28,13 +28,6 @@ object EmployerContributionsNavigator extends JourneyNavigator {
 
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
 
-    case TotalEmployerContributionPage(srn, index, secondaryIndex) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
-
-    case OtherEmployeeDescriptionPage(srn, index, secondaryIndex) =>
-      controllers.nonsipp.employercontributions.routes.TotalEmployerContributionController
-        .onPageLoad(srn, index, secondaryIndex, NormalMode)
-
     case page @ EmployerContributionsPage(srn) =>
       if (userAnswers.get(page).contains(true)) {
         controllers.nonsipp.employercontributions.routes.WhatYouWillNeedEmployerContributionsController
@@ -43,35 +36,53 @@ object EmployerContributionsNavigator extends JourneyNavigator {
         controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
       }
 
+    case WhatYouWillNeedEmployerContributionsPage(srn) =>
+      controllers.nonsipp.employercontributions.routes.EmployerNameController
+        .onPageLoad(srn, refineMV(1), refineMV(2), NormalMode)
+
     case EmployerNamePage(srn, memberIndex, index) =>
       controllers.nonsipp.employercontributions.routes.EmployerTypeOfBusinessController
         .onPageLoad(srn, memberIndex, index, NormalMode)
 
-    case EmployerTypeOfBusinessPage(srn, memberIndex, index) =>
-      userAnswers.get(EmployerTypeOfBusinessPage(srn, memberIndex, index)) match {
+    case EmployerTypeOfBusinessPage(srn, index, secondaryIndex) =>
+      userAnswers.get(EmployerTypeOfBusinessPage(srn, index, secondaryIndex)) match {
 
         case Some(IdentityType.UKCompany) =>
           controllers.nonsipp.employercontributions.routes.EmployerCompanyCrnController
-            .onPageLoad(srn, memberIndex, index, NormalMode)
+            .onPageLoad(srn, index, secondaryIndex, NormalMode)
 
         case Some(IdentityType.UKPartnership) =>
           controllers.nonsipp.employercontributions.routes.PartnershipEmployerUtrController
-            .onPageLoad(srn, memberIndex, index, NormalMode)
+            .onPageLoad(srn, index, secondaryIndex, NormalMode)
 
         case Some(IdentityType.Other) =>
           controllers.nonsipp.employercontributions.routes.OtherEmployeeDescriptionController
-            .onPageLoad(srn, memberIndex, index, NormalMode)
+            .onPageLoad(srn, index, secondaryIndex, NormalMode)
       }
 
-    case EmployerCompanyCrnPage(srn, memberIndex, index) => controllers.routes.UnauthorisedController.onPageLoad()
+    case EmployerCompanyCrnPage(srn, index, secondaryIndex) =>
+      controllers.nonsipp.employercontributions.routes.TotalEmployerContributionController
+        .onPageLoad(srn, index, secondaryIndex, NormalMode)
 
     case PartnershipEmployerUtrPage(srn, index, secondaryIndex) =>
       controllers.nonsipp.employercontributions.routes.TotalEmployerContributionController
         .onPageLoad(srn, index, secondaryIndex, NormalMode)
 
-    case WhatYouWillNeedEmployerContributionsPage(srn) =>
-      controllers.nonsipp.employercontributions.routes.EmployerNameController
-        .onPageLoad(srn, refineMV(1), refineMV(2), NormalMode)
+    case OtherEmployeeDescriptionPage(srn, index, secondaryIndex) =>
+      controllers.nonsipp.employercontributions.routes.TotalEmployerContributionController
+        .onPageLoad(srn, index, secondaryIndex, NormalMode)
+
+    case TotalEmployerContributionPage(srn, index, secondaryIndex) =>
+      controllers.nonsipp.employercontributions.routes.ContributionsFromAnotherEmployerController
+        .onPageLoad(srn, index, secondaryIndex, NormalMode)
+
+    case page @ ContributionsFromAnotherEmployerPage(srn, memberIndex, index) =>
+      if (userAnswers.get(page).contains(true)) {
+        controllers.nonsipp.employercontributions.routes.EmployerNameController
+          .onPageLoad(srn, memberIndex, index, NormalMode)
+      } else {
+        controllers.routes.UnauthorisedController.onPageLoad()
+      }
 
   }
 
