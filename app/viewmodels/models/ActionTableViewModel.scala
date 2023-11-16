@@ -27,6 +27,10 @@ case class TableElem(
 case class ActionTableViewModel(
   inset: DisplayMessage,
   head: Option[List[TableElem]],
+  radioText: Message,
+  showRadios: Boolean = true,
   rows: List[List[TableElem]],
+  showInsetWithRadios: Boolean = false,
+  yesHintText: Option[Message] = None,
   paginatedViewModel: Option[PaginatedViewModel] = None
 )

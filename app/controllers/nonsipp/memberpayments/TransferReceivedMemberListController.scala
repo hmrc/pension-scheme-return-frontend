@@ -17,7 +17,7 @@
 package controllers.nonsipp.memberpayments
 
 import com.google.inject.Inject
-import config.Constants
+import config.{Constants, FrontendAppConfig}
 import config.Refined.OneTo300
 import controllers.PSRController
 import controllers.actions._
@@ -33,15 +33,8 @@ import pages.nonsipp.memberpayments.TransferReceivedMemberListPage
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import viewmodels.DisplayMessage.{LinkMessage, ListMessage, Message, ParagraphMessage}
-import viewmodels.models.{
-  ActionTableViewModel,
-  FormPageViewModel,
-  ListRow,
-  ListViewModel,
-  PaginatedViewModel,
-  TableElem
-}
+import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
+import viewmodels.models.{ActionTableViewModel, FormPageViewModel, PaginatedViewModel, TableElem}
 import views.html.TwoColumnsTripleAction
 import viewmodels.implicits._
 
@@ -51,6 +44,7 @@ class TransferReceivedMemberListController @Inject()(
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
+  appConfig: FrontendAppConfig,
   val controllerComponents: MessagesControllerComponents,
   view: TwoColumnsTripleAction,
   formProvider: YesNoPageFormProvider
@@ -63,7 +57,8 @@ class TransferReceivedMemberListController @Inject()(
       val memberList = request.userAnswers.membersDetails(srn)
 
       if (memberList.nonEmpty) {
-        val viewModel = TransferReceivedMemberListController.viewModel(srn, page, mode, memberList)
+        val viewModel = TransferReceivedMemberListController
+          .viewModel(srn, page, mode, memberList, appConfig.urls.pensionSchemeEnquiry)
         Ok(view(form, viewModel))
       } else {
         Redirect(controllers.nonsipp.landorproperty.routes.LandOrPropertyHeldController.onPageLoad(srn, mode))
@@ -78,7 +73,8 @@ class TransferReceivedMemberListController @Inject()(
         navigator.nextPage(TransferReceivedMemberListPage(srn, addLandOrProperty = false), mode, request.userAnswers)
       )
     } else {
-      val viewModel = TransferReceivedMemberListController.viewModel(srn, page, mode, memberList)
+      val viewModel =
+        TransferReceivedMemberListController.viewModel(srn, page, mode, memberList, appConfig.urls.pensionSchemeEnquiry)
 
       form
         .bindFromRequest()
@@ -100,7 +96,12 @@ object TransferReceivedMemberListController {
       "TransferIn.MemberList.radios.error.required"
     )
 
-  private def rows(srn: Srn, mode: Mode, memberList: List[NameDOB]): List[List[TableElem]] =
+  private def rows(
+    srn: Srn,
+    mode: Mode,
+    memberList: List[NameDOB],
+    pensionSchemeEnquiriesUrl: String
+  ): List[List[TableElem]] =
     memberList.zipWithIndex.map {
       case (memberName, index) =>
         refineV[OneTo300](index + 1) match {
@@ -114,13 +115,19 @@ object TransferReceivedMemberListController {
                 "Not started"
               ),
               TableElem(
-                LinkMessage("Add", "www.google.com")
+                LinkMessage("Add", pensionSchemeEnquiriesUrl)
               )
             )
         }
     }
 
-  def viewModel(srn: Srn, page: Int, mode: Mode, memberList: List[NameDOB]): FormPageViewModel[ActionTableViewModel] = {
+  def viewModel(
+    srn: Srn,
+    page: Int,
+    mode: Mode,
+    memberList: List[NameDOB],
+    pensionSchemeEnquiry: String
+  ): FormPageViewModel[ActionTableViewModel] = {
 
     val title = if (memberList.size == 1) "TransferIn.MemberList.title" else "TransferIn.MemberList.title.plural"
     val heading = if (memberList.size == 1) "TransferIn.MemberList.heading" else "TransferIn.MemberList.heading.plural"
@@ -139,7 +146,8 @@ object TransferReceivedMemberListController {
       ActionTableViewModel(
         inset = "TransferIn.MemberList.inset",
         head = Some(List(TableElem("Member Name"), TableElem("status"), TableElem(""))),
-        rows = rows(srn, mode, memberList),
+        Message(""),
+        rows = rows(srn, mode, memberList, pensionSchemeEnquiry),
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(
