@@ -14,19 +14,9 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.landorproperty
+package pages.nonsipp.membercontributions
 
-import config.Refined.Max5000
-import models.Address
 import models.SchemeId.Srn
-import pages.QuestionPage
-import play.api.libs.json.JsPath
-import utils.RefinedUtils.RefinedIntOps
+import pages.Page
 
-case class AddressLookupResultsPage(srn: Srn, index: Max5000) extends QuestionPage[List[Address]] {
-
-  override def path: JsPath =
-    Paths.heldPropertyTransactions \ toString \ index.arrayIndex.toString
-
-  override def toString: String = "addressLookupResults"
-}
+case class WhatYouWillNeedMemberContributionsPage(srn: Srn) extends Page

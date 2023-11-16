@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.landorproperty
+package pages.nonsipp.membercontributions
 
-import config.Refined.Max5000
-import models.Address
+import config.Refined._
+import utils.RefinedUtils._
+
+import play.api.libs.json.JsPath
 import models.SchemeId.Srn
 import pages.QuestionPage
-import play.api.libs.json.JsPath
-import utils.RefinedUtils.RefinedIntOps
 
-case class AddressLookupResultsPage(srn: Srn, index: Max5000) extends QuestionPage[List[Address]] {
+import models.Money
 
-  override def path: JsPath =
-    Paths.heldPropertyTransactions \ toString \ index.arrayIndex.toString
+case class TotalMemberContributionPage(srn: Srn, index: Max300, secondaryIndex: Max50) extends QuestionPage[Money] {
 
-  override def toString: String = "addressLookupResults"
+  override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString \ secondaryIndex.arrayIndex.toString
+
+  override def toString: String = "totalMemberContribution"
 }

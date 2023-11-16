@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package models
+package pages.nonsipp.memberpayments
 
-sealed trait ALFError
+import models.SchemeId.Srn
+import pages.Page
 
-case object AddressNotFound extends ALFError
-case object AddressMalformed extends ALFError
-case object UnexpectedFailure extends ALFError
+case class WhatYouWillNeedReceivedTransferPage(srn: Srn) extends Page

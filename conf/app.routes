@@ -5,6 +5,7 @@
 ->          /                                                                           landorpropertydisposal.Routes
 ->          /                                                                           moneyborrowed.Routes
 ->          /                                                                           employercontributions.Routes
+->          /                                                                           membercontributions.Routes
 
 GET         /                                                                           controllers.IndexController.onPageLoad()
 
@@ -168,8 +169,8 @@ POST        /:srn/transfer-received                                             
 GET         /:srn/change-transfer-received                                              controllers.nonsipp.memberpayments.DidSchemeReceiveTransferController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST        /:srn/change-transfer-received                                              controllers.nonsipp.memberpayments.DidSchemeReceiveTransferController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
-GET         /:srn/what-you-will-need-transfer-received                                  controllers.nonsipp.memberpayments.WYWNeedReceivedTransferController.onPageLoad(srn: Srn)
-GET         /:srn/submit-what-you-will-need-transfer-received                           controllers.nonsipp.memberpayments.WYWNeedReceivedTransferController.onSubmit(srn: Srn)
+GET         /:srn/what-you-will-need-transfer-received                                  controllers.nonsipp.memberpayments.WhatYouWillNeedReceivedTransferController.onPageLoad(srn: Srn)
+GET         /:srn/submit-what-you-will-need-transfer-received                           controllers.nonsipp.memberpayments.WhatYouWillNeedReceivedTransferController.onSubmit(srn: Srn)
 
 GET         /:srn/transfer-out                                                          controllers.nonsipp.memberpayments.SchemeTransferOutController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST        /:srn/transfer-out                                                          controllers.nonsipp.memberpayments.SchemeTransferOutController.onSubmit(srn: Srn, mode: Mode = NormalMode)

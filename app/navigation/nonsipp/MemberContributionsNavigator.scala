@@ -17,9 +17,11 @@
 package navigation.nonsipp
 
 import controllers.nonsipp.memberpayments
+import eu.timepit.refined.refineMV
 import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
+import pages.nonsipp.membercontributions.{TotalMemberContributionPage, WhatYouWillNeedMemberContributionsPage}
 import pages.nonsipp.memberpayments.MemberContributionsPage
 import play.api.mvc.Call
 
@@ -29,10 +31,17 @@ object MemberContributionsNavigator extends JourneyNavigator {
 
     case page @ MemberContributionsPage(srn) =>
       if (userAnswers.get(page).contains(true)) {
-        controllers.routes.UnauthorisedController.onPageLoad()
+        controllers.nonsipp.membercontributions.routes.WhatYouWillNeedMemberContributionsController.onPageLoad(srn)
       } else {
         controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
       }
+
+    case WhatYouWillNeedMemberContributionsPage(srn) =>
+      controllers.nonsipp.membercontributions.routes.TotalMemberContributionController
+        .onPageLoad(srn, refineMV(1), refineMV(2), NormalMode)
+
+    case TotalMemberContributionPage(srn, index, secondaryIndex) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
   }
 
   override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] =

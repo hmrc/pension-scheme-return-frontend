@@ -16,14 +16,21 @@
 
 package navigation.nonsipp
 
+import config.Refined.{Max300, Max50}
+import eu.timepit.refined.refineMV
+import models.NormalMode
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
+import pages.nonsipp.membercontributions.{TotalMemberContributionPage, WhatYouWillNeedMemberContributionsPage}
 import pages.nonsipp.memberpayments.MemberContributionsPage
 import utils.BaseSpec
 
 class MemberContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
   val navigator: Navigator = new NonSippNavigator
+
+  private val index = refineMV[Max300.Refined](1)
+  private val secondaryIndex = refineMV[Max50.Refined](1)
 
   "MemberContributionsNavigator" - {
 
@@ -32,9 +39,10 @@ class MemberContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviours
         .navigateToWithData(
           MemberContributionsPage,
           Gen.const(true),
-          (srn, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          (srn, _) =>
+            controllers.nonsipp.membercontributions.routes.WhatYouWillNeedMemberContributionsController.onPageLoad(srn)
         )
-        .withName("go from member contribution page to unauthorised page when yes select ")
+        .withName("go from member contribution page to what you will need member contributions page when yes select ")
     )
 
     act.like(
@@ -47,4 +55,32 @@ class MemberContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviours
         .withName("go from member contributions page to receive transfer page")
     )
   }
+
+  "WhatYouWillNeedMemberContributions" - {
+
+    act.like(
+      normalmode
+        .navigateTo(
+          WhatYouWillNeedMemberContributionsPage,
+          (srn, _) =>
+            controllers.nonsipp.membercontributions.routes.TotalMemberContributionController
+              .onPageLoad(srn, refineMV(1), refineMV(2), NormalMode)
+        )
+        .withName("go from what you will need member contributions page to total member contribution")
+    )
+  }
+
+  "TotalMemberContributionPage" - {
+    act.like(
+      normalmode
+        .navigateToWithDoubleIndex(
+          index,
+          secondaryIndex,
+          TotalMemberContributionPage,
+          (srn, index: Max300, secondaryIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+        )
+        .withName("go from total member contribution to unauthorised page")
+    )
+  }
+
 }
