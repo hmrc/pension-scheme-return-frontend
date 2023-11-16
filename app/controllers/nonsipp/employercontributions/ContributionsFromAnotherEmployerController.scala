@@ -53,13 +53,10 @@ class ContributionsFromAnotherEmployerController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-//      memberName <- request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney
       request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney { memberName =>
-        //      request.usingAnswer(EmployerNamePage(srn: Srn, index, secondaryIndex)).sync { employerName =>
         val preparedForm =
           request.userAnswers.fillForm(ContributionsFromAnotherEmployerPage(srn, index, secondaryIndex), form)
         Ok(view(preparedForm, viewModel(srn, index, secondaryIndex, mode, memberName.fullName)))
-        //      }
       }
     }
 

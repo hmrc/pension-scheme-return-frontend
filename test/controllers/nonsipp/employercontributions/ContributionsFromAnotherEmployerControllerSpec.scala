@@ -24,7 +24,6 @@ import forms.YesNoPageFormProvider
 import models.NormalMode
 import pages.nonsipp.employercontributions.ContributionsFromAnotherEmployerPage
 import pages.nonsipp.memberdetails.MemberDetailsPage
-import pages.nonsipp.unquotedshares.UnquotedSharesPage
 import views.html.YesNoPageView
 
 class ContributionsFromAnotherEmployerControllerSpec extends ControllerBaseSpec {
@@ -42,14 +41,6 @@ class ContributionsFromAnotherEmployerControllerSpec extends ControllerBaseSpec 
 
   "ContributionsFromAnotherEmployerController" - {
 
-//    act.like(renderView(onPageLoad) { implicit app => implicit request =>
-//      injected[YesNoPageView]
-//        .apply(
-//          form(injected[YesNoPageFormProvider]),
-//          viewModel(srn, index, secondaryIndex, NormalMode, memberDetails.fullName)
-//        )
-//    })
-
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
       injected[YesNoPageView]
         .apply(
@@ -63,15 +54,6 @@ class ContributionsFromAnotherEmployerControllerSpec extends ControllerBaseSpec 
           )
         )
     })
-
-//    act.like(renderPrePopView(onPageLoad, ContributionsFromAnotherEmployerPage(srn, index, secondaryIndex), true) {
-//      implicit app => implicit request =>
-//        injected[YesNoPageView]
-//          .apply(
-//            form(injected[YesNoPageFormProvider]).fill(true),
-//            viewModel(srn, index, secondaryIndex, NormalMode, memberDetails.fullName)
-//          )
-//    })
 
     act.like(
       renderPrePopView(onPageLoad, ContributionsFromAnotherEmployerPage(srn, index, secondaryIndex), true, userAnswers) {
