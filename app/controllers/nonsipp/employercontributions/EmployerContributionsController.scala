@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.memberpayments
+package controllers.nonsipp.employercontributions
 
 import controllers.actions._
-import controllers.nonsipp.memberpayments.EmployerContributionsController.viewModel
+import controllers.nonsipp.employercontributions.EmployerContributionsController.viewModel
 import forms.YesNoPageFormProvider
 import models.Mode
 import models.SchemeId.Srn

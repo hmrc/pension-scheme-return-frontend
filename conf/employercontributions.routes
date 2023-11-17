@@ -1,3 +1,8 @@
+GET         /:srn/employer-contributions                                          controllers.nonsipp.employercontributions.EmployerContributionsController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/employer-contributions                                          controllers.nonsipp.employercontributions.EmployerContributionsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/change-employer-contributions                                   controllers.nonsipp.employercontributions.EmployerContributionsController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-employer-contributions                                   controllers.nonsipp.employercontributions.EmployerContributionsController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
 GET         /:srn/remove-employer-contributions/:memberIndex/:index               controllers.nonsipp.employercontributions.RemoveEmployerContributionsController.onPageLoad(srn: Srn, memberIndex: Max300, index: Max50)
 POST        /:srn/remove-employer-contributions/:memberIndex/:index               controllers.nonsipp.employercontributions.RemoveEmployerContributionsController.onSubmit(srn: Srn, memberIndex: Max300, index: Max50)
 
