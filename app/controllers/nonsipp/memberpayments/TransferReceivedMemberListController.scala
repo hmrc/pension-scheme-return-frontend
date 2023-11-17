@@ -57,10 +57,10 @@ class TransferReceivedMemberListController @Inject()(
 
       if (memberList.nonEmpty) {
         val viewModel = TransferReceivedMemberListController
-          .viewModel(srn, page, mode, memberList, appConfig.urls.pensionSchemeEnquiry)
+          .viewModel(srn, page, mode, memberList)
         Ok(view(form, viewModel))
       } else {
-        Redirect(controllers.nonsipp.landorproperty.routes.LandOrPropertyHeldController.onPageLoad(srn, mode))
+        Redirect(controllers.routes.UnauthorisedController.onPageLoad())
       }
   }
 
@@ -69,11 +69,11 @@ class TransferReceivedMemberListController @Inject()(
 
     if (memberList.size == Constants.maxSchemeMembers) {
       Redirect(
-        navigator.nextPage(TransferReceivedMemberListPage(srn, addLandOrProperty = false), mode, request.userAnswers)
+        navigator.nextPage(TransferReceivedMemberListPage(srn, done = false), mode, request.userAnswers)
       )
     } else {
       val viewModel =
-        TransferReceivedMemberListController.viewModel(srn, page, mode, memberList, appConfig.urls.pensionSchemeEnquiry)
+        TransferReceivedMemberListController.viewModel(srn, page, mode, memberList)
 
       form
         .bindFromRequest()
@@ -82,7 +82,7 @@ class TransferReceivedMemberListController @Inject()(
           answer =>
             Redirect(
               navigator
-                .nextPage(TransferReceivedMemberListPage(srn, addLandOrProperty = answer), mode, request.userAnswers)
+                .nextPage(TransferReceivedMemberListPage(srn, done = answer), mode, request.userAnswers)
             )
         )
     }
@@ -98,8 +98,7 @@ object TransferReceivedMemberListController {
   private def rows(
     srn: Srn,
     mode: Mode,
-    memberList: List[NameDOB],
-    pensionSchemeEnquiriesUrl: String
+    memberList: List[NameDOB]
   ): List[List[TableElem]] =
     memberList.zipWithIndex.map {
       case (memberName, index) =>
@@ -111,10 +110,10 @@ object TransferReceivedMemberListController {
                 memberName.fullName
               ),
               TableElem(
-                "Not started" //TODO We need to complete the "Add" Journey to be able to make this dynamic
+                "No transfers in" //TODO We need to complete the "Add" Journey to be able to make this dynamic
               ),
               TableElem(
-                LinkMessage("Add", pensionSchemeEnquiriesUrl) //TODO we need the subsequent page in the Journey to add the right link
+                LinkMessage("Add", controllers.routes.UnauthorisedController.onPageLoad().url) //TODO we need the subsequent page in the Journey to add the right link
               )
             )
         }
@@ -124,8 +123,7 @@ object TransferReceivedMemberListController {
     srn: Srn,
     page: Int,
     mode: Mode,
-    memberList: List[NameDOB],
-    pensionSchemeEnquiry: String
+    memberList: List[NameDOB]
   ): FormPageViewModel[ActionTableViewModel] = {
 
     val title = if (memberList.size == 1) "TransferIn.MemberList.title" else "TransferIn.MemberList.title.plural"
@@ -145,7 +143,7 @@ object TransferReceivedMemberListController {
       page = ActionTableViewModel(
         inset = "TransferIn.MemberList.inset",
         head = Some(List(TableElem("Member Name"), TableElem("status"), TableElem(""))),
-        rows = rows(srn, mode, memberList, pensionSchemeEnquiry),
+        rows = rows(srn, mode, memberList),
         radioText = Message("TransferIn.MemberList.radios"),
         showRadios = memberList.length < 9999999,
         paginatedViewModel = Some(
