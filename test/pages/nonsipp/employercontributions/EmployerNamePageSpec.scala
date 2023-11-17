@@ -45,11 +45,13 @@ class EmployerNamePageSpec extends PageBehaviours with TestValues {
       .unsafeSet(EmployerNamePage(srn, memberIndex, index), employerName)
       .unsafeSet(TotalEmployerContributionPage(srn, memberIndex, index), money)
       .unsafeSet(EmployerCompanyCrnPage(srn, memberIndex, index), ConditionalYesNo.yes[String, Crn](crn))
+      .unsafeSet(ContributionsFromAnotherEmployerPage(srn, memberIndex, index), true)
 
     val result = userAnswers.remove(EmployerNamePage(srn, memberIndex, index)).success.value
 
     result.get(EmployerNamePage(srn, memberIndex, index)) must be(empty)
     result.get(TotalEmployerContributionPage(srn, memberIndex, index)) must be(empty)
     result.get(EmployerCompanyCrnPage(srn, memberIndex, index)) must be(empty)
+    result.get(ContributionsFromAnotherEmployerPage(srn, memberIndex, index)) must be(empty)
   }
 }

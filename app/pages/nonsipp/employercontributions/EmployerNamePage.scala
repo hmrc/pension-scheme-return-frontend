@@ -46,8 +46,8 @@ case class EmployerNamePage(srn: Srn, memberIndex: Max300, index: Max50) extends
     TotalEmployerContributionPage(srn, memberIndex, index),
     EmployerCompanyCrnPage(srn, memberIndex, index),
     PartnershipEmployerUtrPage(srn, memberIndex, index),
-    OtherEmployeeDescriptionPage(srn, memberIndex, index)
-    // TODO missing page contributions made page
+    OtherEmployeeDescriptionPage(srn, memberIndex, index),
+    ContributionsFromAnotherEmployerPage(srn, memberIndex, index)
   )
 
 }
