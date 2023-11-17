@@ -17,7 +17,7 @@
 package navigation.nonsipp
 
 import eu.timepit.refined.refineMV
-import models.{IdentityType, NormalMode, UserAnswers}
+import models.{IdentityType, Money, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.employercontributions._
@@ -81,6 +81,18 @@ object EmployerContributionsNavigator extends JourneyNavigator {
         controllers.nonsipp.employercontributions.routes.EmployerNameController
           .onPageLoad(srn, memberIndex, index, NormalMode)
       } else {
+        controllers.routes.UnauthorisedController.onPageLoad()
+      }
+
+    case RemoveEmployerContributionsPage(srn, memberIndex) =>
+      if (userAnswers
+          .get(TotalEmployerContributionPages(srn, memberIndex))
+          .getOrElse(Map.empty[String, Money])
+          .size > 1) {
+        controllers.nonsipp.employercontributions.routes.WhichEmployerContributionRemoveController
+          .onPageLoad(srn, memberIndex)
+      } else {
+        // TODO to list page
         controllers.routes.UnauthorisedController.onPageLoad()
       }
 

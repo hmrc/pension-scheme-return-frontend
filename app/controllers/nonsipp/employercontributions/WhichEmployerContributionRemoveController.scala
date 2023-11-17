@@ -26,15 +26,14 @@ import controllers.nonsipp.employercontributions.WhichEmployerContributionRemove
 import eu.timepit.refined.{refineMV, refineV}
 import forms.RadioListFormProvider
 import models.SchemeId.Srn
-import models.{Money, NormalMode, UserAnswers}
+import models.Money
 import navigation.Navigator
 import pages.nonsipp.employercontributions.{EmployerNamePages, TotalEmployerContributionPages}
-import pages.nonsipp.landorpropertydisposal.{LandOrPropertyDisposalAddressListPage, LandPropertyDisposalCompletedPages}
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc._
-import viewmodels.DisplayMessage.{Message, ParagraphMessage}
+import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, ListRadiosRow, ListRadiosViewModel}
 import views.html.ListRadiosView
@@ -58,10 +57,20 @@ class WhichEmployerContributionRemoveController @Inject()(
   def onPageLoad(srn: Srn, memberIndex: Max300): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     val totals = request.userAnswers.map(TotalEmployerContributionPages(srn, memberIndex))
     val employers = request.userAnswers.map(EmployerNamePages(srn, memberIndex))
-
-    request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).getOrRecoverJourney { memberName =>
-      withIndexedValues(totals, employers) { sortedValues =>
-        Ok(view(form, viewModel(srn, memberIndex, memberName.fullName, sortedValues)))
+    if (totals.size == 1) {
+      refineV[OneTo50](totals.head._1.toInt + 1).fold(
+        _ => Redirect(controllers.routes.UnauthorisedController.onPageLoad()),
+        index =>
+          Redirect(
+            controllers.nonsipp.employercontributions.routes.RemoveEmployerContributionsController
+              .onPageLoad(srn, memberIndex, index)
+          )
+      )
+    } else {
+      request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).getOrRecoverJourney { memberName =>
+        withIndexedValues(totals, employers) { sortedValues =>
+          Ok(view(form, viewModel(srn, memberIndex, memberName.fullName, sortedValues)))
+        }
       }
     }
   }
@@ -75,8 +84,7 @@ class WhichEmployerContributionRemoveController @Inject()(
         errors =>
           request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).getOrRecoverJourney { memberName =>
             withIndexedValues(totals, employers)(
-              sortedAddresses =>
-                BadRequest(view(errors, viewModel(srn, memberIndex, memberName.fullName, sortedAddresses)))
+              sortedValues => BadRequest(view(errors, viewModel(srn, memberIndex, memberName.fullName, sortedValues)))
             )
           },
         answer =>

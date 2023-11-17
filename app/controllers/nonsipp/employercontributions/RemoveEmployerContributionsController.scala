@@ -94,12 +94,15 @@ class RemoveEmployerContributionsController @Inject()(
                 _ <- saveService.save(updatedAnswers)
               } yield Redirect(
                 navigator
-                  .nextPage(RemoveEmployerContributionsPage(srn), NormalMode, updatedAnswers)
+                  .nextPage(RemoveEmployerContributionsPage(srn, memberIndex), NormalMode, updatedAnswers)
               )
             } else {
               Future
                 .successful(
-                  Redirect(navigator.nextPage(RemoveEmployerContributionsPage(srn), NormalMode, request.userAnswers))
+                  Redirect(
+                    navigator
+                      .nextPage(RemoveEmployerContributionsPage(srn, memberIndex), NormalMode, request.userAnswers)
+                  )
                 )
             }
           }

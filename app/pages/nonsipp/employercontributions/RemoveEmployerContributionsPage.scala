@@ -16,10 +16,11 @@
 
 package pages.nonsipp.employercontributions
 
+import config.Refined.Max300
 import models.SchemeId.Srn
 import pages.Page
 
-case class RemoveEmployerContributionsPage(srn: Srn) extends Page {
+case class RemoveEmployerContributionsPage(srn: Srn, memberIndex: Max300) extends Page {
 
   override def toString: String = "removeEmployerContributionsPage"
 }
