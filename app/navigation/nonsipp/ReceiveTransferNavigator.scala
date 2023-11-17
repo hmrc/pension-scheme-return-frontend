@@ -38,7 +38,7 @@ object ReceiveTransferNavigator extends JourneyNavigator {
     case WhatYouWillNeedReceivedTransferPage(srn) =>
       controllers.nonsipp.memberpayments.routes.TransferReceivedMemberListController.onPageLoad(srn, 1, NormalMode)
 
-    case TransferReceivedMemberListPage(srn, _) =>
+    case TransferReceivedMemberListPage(srn) =>
       controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
   }
 

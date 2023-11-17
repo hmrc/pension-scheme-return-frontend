@@ -67,9 +67,9 @@ class TransferReceivedMemberListController @Inject()(
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     val memberList = request.userAnswers.membersDetails(srn)
 
-    if (memberList.size == Constants.maxSchemeMembers) {
+    if (memberList.size > Constants.maxSchemeMembers) {
       Redirect(
-        navigator.nextPage(TransferReceivedMemberListPage(srn, done = false), mode, request.userAnswers)
+        navigator.nextPage(TransferReceivedMemberListPage(srn), mode, request.userAnswers)
       )
     } else {
       val viewModel =
@@ -82,7 +82,7 @@ class TransferReceivedMemberListController @Inject()(
           answer =>
             Redirect(
               navigator
-                .nextPage(TransferReceivedMemberListPage(srn, done = answer), mode, request.userAnswers)
+                .nextPage(TransferReceivedMemberListPage(srn), mode, request.userAnswers)
             )
         )
     }

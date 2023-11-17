@@ -20,7 +20,7 @@ import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case class TransferReceivedMemberListPage(srn: Srn, done: Boolean) extends QuestionPage[Boolean] {
+case class TransferReceivedMemberListPage(srn: Srn) extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ toString
 
