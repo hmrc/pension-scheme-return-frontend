@@ -29,6 +29,6 @@ case class PartnershipEmployerUtrPage(srn: Srn, index: Max300, secondaryIndex: M
   override def path: JsPath =
     Paths.memberEmpContribution \ toString \ index.arrayIndex.toString \ secondaryIndex.arrayIndex.toString
 
-  override def toString: String = "partnershipEmployerUtr"
+  override def toString: String = "idNumber"
 
 }

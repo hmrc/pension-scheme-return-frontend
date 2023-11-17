@@ -27,7 +27,8 @@ import models.Money
 
 case class TotalEmployerContributionPage(srn: Srn, index: Max300, secondaryIndex: Max50) extends QuestionPage[Money] {
 
-  override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString \ secondaryIndex.arrayIndex.toString
+  override def path: JsPath =
+    Paths.memberEmpContribution \ toString \ index.arrayIndex.toString \ secondaryIndex.arrayIndex.toString
 
-  override def toString: String = "totalEmployerContribution"
+  override def toString: String = "totalContribution"
 }
