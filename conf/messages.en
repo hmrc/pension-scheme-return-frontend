@@ -1667,3 +1667,8 @@ TransferIn.MemberList.row = {0} {1}
 TransferIn.MemberList.radios = Have you finished reporting transfers in?
 TransferIn.MemberList.radios.error.required = Select yes if you have finished reporting transfers in
 TransferIn.MemberList.pagination.label = Showing {0} - {1} of {2} members
+
+contributionsFromAnotherEmployer.title = Were employer contributions made for the member by any other employer?
+contributionsFromAnotherEmployer.heading = Were employer contributions made for {0} by any other employer?
+contributionsFromAnotherEmployer.hint =  If employer contributions were made for this member by more than one employer, you must tell us about all of them.
+contributionsFromAnotherEmployer.error.required = Select yes if employer contributions were made for the member by any other employer
