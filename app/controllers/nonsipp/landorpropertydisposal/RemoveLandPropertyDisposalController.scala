@@ -74,8 +74,8 @@ class RemoveLandPropertyDisposalController @Inject()(
     landOrPropertyIndex: Max5000,
     disposalIndex: Max50,
     userAnswers: UserAnswers
-  ): Try[UserAnswers] =
-    userAnswers
+  ): Try[UserAnswers] = {
+    val mustRemovedUa = userAnswers
       .remove(HowWasPropertyDisposedOfPage(srn, landOrPropertyIndex, disposalIndex))
       .flatMap(_.remove(LandOrPropertyStillHeldPage(srn, landOrPropertyIndex, disposalIndex)))
       .flatMap(_.remove(WhenWasPropertySoldPage(srn, landOrPropertyIndex, disposalIndex)))
@@ -85,6 +85,8 @@ class RemoveLandPropertyDisposalController @Inject()(
       .flatMap(_.remove(RemoveLandPropertyDisposalPage(srn, landOrPropertyIndex, disposalIndex)))
       .flatMap(_.remove(WhoPurchasedLandOrPropertyPage(srn, landOrPropertyIndex, disposalIndex)))
       .flatMap(_.remove(LandPropertyDisposalCompletedPage(srn, landOrPropertyIndex, disposalIndex)))
+    if (disposalIndex.value == 1) mustRemovedUa.flatMap(_.remove(LandOrPropertyDisposalPage(srn))) else mustRemovedUa
+  }
 
   def onSubmit(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>

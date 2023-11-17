@@ -49,8 +49,8 @@ case class LandPropertyInUKPage(srn: Srn, index: Max5000) extends QuestionPage[B
       AddressLookupResultsPage(srn, index)
     )
 
-  private def pages(srn: Srn): List[Removable[_]] =
-    List(
+  private def pages(srn: Srn): List[Removable[_]] = {
+    val list = List(
       LandOrPropertyChosenAddressPage(srn, index),
       LandRegistryTitleNumberPage(srn, index),
       WhyDoesSchemeHoldLandPropertyPage(srn, index),
@@ -61,6 +61,8 @@ case class LandPropertyInUKPage(srn: Srn, index: Max5000) extends QuestionPage[B
       LandOrPropertyTotalIncomePage(srn, index),
       RemovePropertyPage(srn, index)
     )
+    if (index.value == 1) list :+ LandOrPropertyHeldPage(srn) else list
+  }
 }
 
 case class LandPropertyInUKPages(srn: Srn) extends QuestionPage[Map[String, Boolean]] {

@@ -20,15 +20,20 @@ import config.Refined.{Max300, Max50}
 import controllers.TestValues
 import eu.timepit.refined.refineMV
 import models.{ConditionalYesNo, Crn}
-import utils.UserAnswersUtils.UserAnswersOps
 import pages.behaviours.PageBehaviours
 import pages.nonsipp.memberdetails.MemberDetailsPage
+import pages.nonsipp.memberpayments.EmployerContributionsPage
+import utils.UserAnswersUtils.UserAnswersOps
 
 class EmployerNamePageSpec extends PageBehaviours with TestValues {
+
   private val memberIndex = refineMV[Max300.Refined](1)
-  private val index = refineMV[Max50.Refined](1)
+  private val indexOne = refineMV[Max50.Refined](1)
+  private val indexTwo = refineMV[Max50.Refined](2)
 
   "EmployerNamePage" - {
+
+    val index = refineMV[Max50.Refined](1)
 
     beRetrievable[String](EmployerNamePage(srnGen.sample.value, memberIndex, index))
 
@@ -37,21 +42,43 @@ class EmployerNamePageSpec extends PageBehaviours with TestValues {
     beRemovable[String](EmployerNamePage(srnGen.sample.value, memberIndex, index))
   }
 
-  "cleanup other fields when removed" in {
+  "cleanup other fields when removed with index-1" in {
     val srn = srnGen.sample.value
 
     val userAnswers = defaultUserAnswers
       .unsafeSet(MemberDetailsPage(srn, memberIndex), memberDetails)
-      .unsafeSet(EmployerNamePage(srn, memberIndex, index), employerName)
-      .unsafeSet(TotalEmployerContributionPage(srn, memberIndex, index), money)
-      .unsafeSet(EmployerCompanyCrnPage(srn, memberIndex, index), ConditionalYesNo.yes[String, Crn](crn))
-      .unsafeSet(ContributionsFromAnotherEmployerPage(srn, memberIndex, index), true)
+      .unsafeSet(EmployerNamePage(srn, memberIndex, indexOne), employerName)
+      .unsafeSet(TotalEmployerContributionPage(srn, memberIndex, indexOne), money)
+      .unsafeSet(EmployerCompanyCrnPage(srn, memberIndex, indexOne), ConditionalYesNo.yes[String, Crn](crn))
+      .unsafeSet(ContributionsFromAnotherEmployerPage(srn, memberIndex, indexOne), true)
+      .unsafeSet(EmployerContributionsPage(srn), true)
 
-    val result = userAnswers.remove(EmployerNamePage(srn, memberIndex, index)).success.value
+    val result = userAnswers.remove(EmployerNamePage(srn, memberIndex, indexOne)).success.value
 
-    result.get(EmployerNamePage(srn, memberIndex, index)) must be(empty)
-    result.get(TotalEmployerContributionPage(srn, memberIndex, index)) must be(empty)
-    result.get(EmployerCompanyCrnPage(srn, memberIndex, index)) must be(empty)
-    result.get(ContributionsFromAnotherEmployerPage(srn, memberIndex, index)) must be(empty)
+    result.get(EmployerNamePage(srn, memberIndex, indexOne)) must be(empty)
+    result.get(TotalEmployerContributionPage(srn, memberIndex, indexOne)) must be(empty)
+    result.get(EmployerCompanyCrnPage(srn, memberIndex, indexOne)) must be(empty)
+    result.get(ContributionsFromAnotherEmployerPage(srn, memberIndex, indexOne)) must be(empty)
+    result.get(EmployerContributionsPage(srn)) must be(empty)
+  }
+
+  "cleanup other fields when removed with index bigger than 1" in {
+    val srn = srnGen.sample.value
+
+    val userAnswers = defaultUserAnswers
+      .unsafeSet(MemberDetailsPage(srn, memberIndex), memberDetails)
+      .unsafeSet(EmployerNamePage(srn, memberIndex, indexTwo), employerName)
+      .unsafeSet(TotalEmployerContributionPage(srn, memberIndex, indexTwo), money)
+      .unsafeSet(EmployerCompanyCrnPage(srn, memberIndex, indexTwo), ConditionalYesNo.yes[String, Crn](crn))
+      .unsafeSet(ContributionsFromAnotherEmployerPage(srn, memberIndex, indexTwo), true)
+      .unsafeSet(EmployerContributionsPage(srn), true)
+
+    val result = userAnswers.remove(EmployerNamePage(srn, memberIndex, indexTwo)).success.value
+
+    result.get(EmployerNamePage(srn, memberIndex, indexTwo)) must be(empty)
+    result.get(TotalEmployerContributionPage(srn, memberIndex, indexTwo)) must be(empty)
+    result.get(EmployerCompanyCrnPage(srn, memberIndex, indexTwo)) must be(empty)
+    result.get(ContributionsFromAnotherEmployerPage(srn, memberIndex, indexTwo)) must be(empty)
+    result.get(EmployerContributionsPage(srn)) must be(Some(true))
   }
 }

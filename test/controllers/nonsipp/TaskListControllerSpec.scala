@@ -20,12 +20,14 @@ import controllers.ControllerBaseSpec
 import eu.timepit.refined.refineMV
 import models.{
   ConditionalYesNo,
+  DateRange,
   IdentitySubject,
   IdentityType,
   ManualOrUpload,
   Money,
   MoneyInPeriod,
   NormalMode,
+  PensionSchemeId,
   SchemeMemberNumbers,
   UserAnswers
 }
@@ -60,8 +62,8 @@ import views.html.TaskListView
 
 class TaskListControllerSpec extends ControllerBaseSpec {
 
-  val schemeDateRange = dateRangeGen.sample.value
-  val pensionSchemeId = pensionSchemeIdGen.sample.value
+  val schemeDateRange: DateRange = dateRangeGen.sample.value
+  val pensionSchemeId: PensionSchemeId = pensionSchemeIdGen.sample.value
 
   private val mockSchemeDateService = mock[SchemeDateService]
 

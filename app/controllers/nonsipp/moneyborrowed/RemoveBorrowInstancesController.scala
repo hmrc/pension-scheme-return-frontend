@@ -118,14 +118,18 @@ class RemoveBorrowInstancesController @Inject()(
     srn: Srn,
     index: Max5000,
     userAnswers: UserAnswers
-  ): Try[UserAnswers] =
-    userAnswers
+  ): Try[UserAnswers] = {
+
+    val mustRemovedUa = userAnswers
       .remove(LenderNamePage(srn, index))
       .flatMap(_.remove(IsLenderConnectedPartyPage(srn, index)))
       .flatMap(_.remove(BorrowedAmountAndRatePage(srn, index)))
       .flatMap(_.remove(WhenBorrowedPage(srn, index)))
       .flatMap(_.remove(ValueOfSchemeAssetsWhenMoneyBorrowedPage(srn, index)))
       .flatMap(_.remove(WhySchemeBorrowedMoneyPage(srn, index)))
+
+    if (index.value == 1) mustRemovedUa.flatMap(_.remove(MoneyBorrowedPage(srn))) else mustRemovedUa
+  }
 }
 
 object RemoveBorrowInstancesController {

@@ -50,7 +50,7 @@ class PsrSubmissionService @Inject()(
 
     val schemeHadLoans = request.userAnswers.get(LoansMadeOrOutstandingPage(srn)).getOrElse(false)
     val landOrPropertyHeld = request.userAnswers.get(LandOrPropertyHeldPage(srn)).getOrElse(false)
-    val moneyWasBorrowed: Boolean = request.userAnswers.get(MoneyBorrowedPage(srn)).getOrElse(false)
+    val moneyWasBorrowed = request.userAnswers.get(MoneyBorrowedPage(srn)).getOrElse(false)
     (
       minimalRequiredSubmissionTransformer.transformToEtmp(srn),
       request.userAnswers.get(CheckReturnDatesPage(srn))

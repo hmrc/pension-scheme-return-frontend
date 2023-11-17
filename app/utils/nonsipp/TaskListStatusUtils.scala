@@ -22,22 +22,14 @@ import models.ConditionalYesNo._
 import models.SchemeId.Srn
 import models.{IdentitySubject, Money, NormalMode, PensionSchemeId, SchemeHoldLandProperty, UserAnswers}
 import pages.nonsipp.common.IdentityTypes
+import pages.nonsipp.landorproperty._
+import pages.nonsipp.landorpropertydisposal.{LandOrPropertyDisposalPage, LandPropertyDisposalCompletedPages}
 import pages.nonsipp.loansmadeoroutstanding.{
   IsIndividualRecipientConnectedPartyPages,
   LoansMadeOrOutstandingPage,
   OutstandingArrearsOnLoanPages,
   RecipientSponsoringEmployerConnectedPartyPages
 }
-import pages.nonsipp.landorproperty.{
-  IsLandPropertyLeasedPages,
-  IsLesseeConnectedPartyPages,
-  LandOrPropertyHeldPage,
-  LandOrPropertyTotalIncomePages,
-  LandPropertyInUKPages,
-  LandPropertyIndependentValuationPages,
-  WhyDoesSchemeHoldLandPropertyPages
-}
-import pages.nonsipp.landorpropertydisposal.{LandOrPropertyDisposalPage, LandPropertyDisposalCompletedPages}
 import pages.nonsipp.memberdetails.{MemberDetailsNinoPages, MembersDetailsPages, NoNinoPages}
 import pages.nonsipp.moneyborrowed.{LenderNamePages, MoneyBorrowedPage, WhySchemeBorrowedMoneyPages}
 import pages.nonsipp.schemedesignatory.{FeesCommissionsWagesSalariesPage, HowManyMembersPage, HowMuchCashPage}
@@ -60,7 +52,7 @@ object TaskListStatusUtils {
       case (Some(_), Some(false), None) => InProgress
     }
 
-  def getFinancialDetailsTaskListStatus(userAnswers: UserAnswers, srn: Srn) = {
+  def getFinancialDetailsTaskListStatus(userAnswers: UserAnswers, srn: Srn): TaskListStatus = {
     val totalSalaries = userAnswers.get(FeesCommissionsWagesSalariesPage(srn, NormalMode))
     val howMuchCash = userAnswers.get(HowMuchCashPage(srn, NormalMode))
     (howMuchCash, totalSalaries) match {
@@ -70,7 +62,7 @@ object TaskListStatusUtils {
     }
   }
 
-  def getMembersTaskListStatus(userAnswers: UserAnswers, srn: Srn) = {
+  def getMembersTaskListStatus(userAnswers: UserAnswers, srn: Srn): TaskListStatus = {
     val membersDetailsPages = userAnswers.get(MembersDetailsPages(srn))
     val ninoPages = userAnswers.get(MemberDetailsNinoPages(srn))
     val noNinoPages = userAnswers.get(NoNinoPages(srn))
@@ -93,7 +85,7 @@ object TaskListStatusUtils {
     }
   }
 
-  def getLoansTaskListStatus(userAnswers: UserAnswers, srn: Srn) = {
+  def getLoansTaskListStatus(userAnswers: UserAnswers, srn: Srn): TaskListStatus with Serializable = {
     val loansMadePage = userAnswers.get(LoansMadeOrOutstandingPage(srn))
     val whoReceivedPages = userAnswers.get(IdentityTypes(srn, IdentitySubject.LoanRecipient))
     val arrearsPages = userAnswers.get(OutstandingArrearsOnLoanPages(srn))
@@ -165,9 +157,9 @@ object TaskListStatusUtils {
           val countFirstPages = firstPages.getOrElse(List.empty).size
           val countLastPages = lastPages.getOrElse(List.empty).size
           val countLastLesseeSubjourney = lastLesseeSubjourney.getOrElse(List.empty).size
-          val countFirstLesseeSubjourney = firstLesseeSubjourney.getOrElse(List.empty).filter(b => !b._2).size
+          val countFirstLesseeSubjourney = firstLesseeSubjourney.getOrElse(List.empty).count(b => !b._2)
           val countAcquisitionContributionSubJourney =
-            whyHeldPages.getOrElse(List.empty).filter(b => b._2 != SchemeHoldLandProperty.Transfer).size
+            whyHeldPages.getOrElse(List.empty).count(b => b._2 != SchemeHoldLandProperty.Transfer)
           val countIndepValPages = indepValPages.getOrElse(List.empty).size
 
           val incompleteIndex: Int = getLandOrPropertyIncompleteIndex(
@@ -214,7 +206,7 @@ object TaskListStatusUtils {
         if (first.isEmpty) {
           1
         } else {
-          val firstIndexes = (0 to first.size - 1).toList
+          val firstIndexes = (0 until first.size).toList
           val lastIndexes = last.getOrElse(List.empty).map(_._1.toInt).toList
           val whyHeldIndexes =
             whyHeld.getOrElse(List.empty).filter(b => b._2 != SchemeHoldLandProperty.Transfer).map(_._1.toInt).toList
@@ -317,7 +309,7 @@ object TaskListStatusUtils {
         if (first.isEmpty) {
           1
         } else {
-          val firstIndexes = (0 to first.size - 1).toList
+          val firstIndexes = (0 until first.size).toList
           val lastIndexes = last.getOrElse(List.empty).map(_._1.toInt).toList
 
           val filtered = firstIndexes.filter(lastIndexes.indexOf(_) < 0)

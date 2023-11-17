@@ -16,8 +16,6 @@
 
 package navigation.nonsipp
 
-import controllers.nonsipp.memberpayments
-import controllers.routes
 import models.NormalMode
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
