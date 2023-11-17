@@ -19,14 +19,23 @@ package pages.nonsipp.employercontributions
 import config.Refined.{Max300, Max50}
 import models.{ConditionalYesNo, Crn}
 import models.SchemeId.Srn
-import pages.QuestionPage
+import pages.{IndexedQuestionPage, QuestionPage}
 import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
 
 case class EmployerCompanyCrnPage(srn: Srn, memberIndex: Max300, index: Max50)
     extends QuestionPage[ConditionalYesNo[String, Crn]] {
 
-  override def path: JsPath = JsPath \ toString \ memberIndex.arrayIndex.toString \ index.arrayIndex.toString
+  override def path: JsPath =
+    Paths.memberEmpContribution \ toString \ memberIndex.arrayIndex.toString \ index.arrayIndex.toString
 
-  override def toString: String = "employerCrn"
+  override def toString: String = "idNumber"
 }
+
+//case class EmployerCompanyCrnPages(srn: Srn, memberIndex: Max300)
+//    extends IndexedQuestionPage[ConditionalYesNo[String, Crn]] {
+//
+//  override def path: JsPath = JsPath \ toString \ memberIndex.arrayIndex.toString
+//
+//  override def toString: String = "employerCrn"
+//}

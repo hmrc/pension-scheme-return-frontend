@@ -16,17 +16,10 @@
 
 package pages.nonsipp.employercontributions
 
-import config.Refined.{Max300, Max50}
-import models.IdentityType
 import models.SchemeId.Srn
-import pages.QuestionPage
-import play.api.libs.json.JsPath
-import utils.RefinedUtils.RefinedIntOps
+import pages.Page
 
-case class EmployerTypeOfBusinessPage(srn: Srn, memberIndex: Max300, index: Max50) extends QuestionPage[IdentityType] {
+case class RemoveEmployerContributionsPage(srn: Srn) extends Page {
 
-  override def path: JsPath =
-    Paths.memberEmpContribution \ toString \ memberIndex.arrayIndex.toString \ index.arrayIndex.toString
-
-  override def toString: String = "orgType"
+  override def toString: String = "removeEmployerContributionsPage"
 }

@@ -168,9 +168,11 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
           index,
           secondaryIndex,
           TotalEmployerContributionPage,
-          (srn, index: Max300, secondaryIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          (srn, index: Max300, secondaryIndex: Max50, _) =>
+            controllers.nonsipp.employercontributions.routes.ContributionsFromAnotherEmployerController
+              .onPageLoad(srn, index, secondaryIndex, NormalMode)
         )
-        .withName("go from TotalEmployerContributionPage to ??? page")
+        .withName("go from TotalEmployerContributionPage to contribution from another employer page")
     )
   }
 
@@ -181,9 +183,40 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
           index,
           secondaryIndex,
           EmployerCompanyCrnPage,
-          (srn, index: Max300, secondaryIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          (srn, index: Max300, secondaryIndex: Max50, _) =>
+            controllers.nonsipp.employercontributions.routes.TotalEmployerContributionController
+              .onPageLoad(srn, index, secondaryIndex, NormalMode)
         )
-        .withName("go from TotalEmployerContributionPage to ??? page")
+        .withName("go from employer company crn page to total employer contribution page")
     )
   }
+
+  "ContributionsFromAnotherEmployerPage" - {
+    act.like(
+      normalmode
+        .navigateToWithDoubleDataAndIndex(
+          index,
+          secondaryIndex,
+          ContributionsFromAnotherEmployerPage,
+          Gen.const(true),
+          (srn, memberIndex: Max300, index: Max50, _) =>
+            controllers.nonsipp.employercontributions.routes.EmployerNameController
+              .onPageLoad(srn, memberIndex, index, NormalMode)
+        )
+        .withName("go from contribution from another employer page to employer name page")
+    )
+
+    act.like(
+      normalmode
+        .navigateToWithDoubleIndex(
+          index,
+          secondaryIndex,
+          ContributionsFromAnotherEmployerPage,
+          (srn, index: Max300, secondaryIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+        )
+        .withName("go from contribution from another employer page to unauthorised page")
+    )
+
+  }
+
 }

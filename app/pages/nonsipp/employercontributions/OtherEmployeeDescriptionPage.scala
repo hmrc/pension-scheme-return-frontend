@@ -25,7 +25,8 @@ import pages.QuestionPage
 
 case class OtherEmployeeDescriptionPage(srn: Srn, index: Max300, secondaryIndex: Max50) extends QuestionPage[String] {
 
-  override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString \ secondaryIndex.arrayIndex.toString
+  override def path: JsPath =
+    Paths.memberEmpContribution \ toString \ index.arrayIndex.toString \ secondaryIndex.arrayIndex.toString
 
-  override def toString: String = "otherEmployeeDescription"
+  override def toString: String = "otherDescription"
 }

@@ -17,16 +17,23 @@
 package pages.nonsipp.employercontributions
 
 import config.Refined.{Max300, Max50}
-import models.IdentityType
-import models.SchemeId.Srn
-import pages.QuestionPage
-import play.api.libs.json.JsPath
-import utils.RefinedUtils.RefinedIntOps
+import eu.timepit.refined.refineMV
+import pages.behaviours.PageBehaviours
 
-case class EmployerTypeOfBusinessPage(srn: Srn, memberIndex: Max300, index: Max50) extends QuestionPage[IdentityType] {
+class ContributionsFromAnotherEmployerPageSpec extends PageBehaviours {
 
-  override def path: JsPath =
-    Paths.memberEmpContribution \ toString \ memberIndex.arrayIndex.toString \ index.arrayIndex.toString
+  private val index = refineMV[Max300.Refined](1)
+  private val secondaryIndex = refineMV[Max50.Refined](1)
 
-  override def toString: String = "orgType"
+  "ContributionsFromAnotherEmployerPage" - {
+
+    val srn = srnGen.sample.value
+
+    beRetrievable[Boolean](ContributionsFromAnotherEmployerPage(srn, index, secondaryIndex))
+
+    beSettable[Boolean](ContributionsFromAnotherEmployerPage(srn, index, secondaryIndex))
+
+    beRemovable[Boolean](ContributionsFromAnotherEmployerPage(srn, index, secondaryIndex))
+  }
+
 }
