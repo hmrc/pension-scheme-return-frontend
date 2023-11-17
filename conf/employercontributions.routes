@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 GET         /:srn/employer-contributions                                          controllers.nonsipp.employercontributions.EmployerContributionsController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST        /:srn/employer-contributions                                          controllers.nonsipp.employercontributions.EmployerContributionsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 GET         /:srn/change-employer-contributions                                   controllers.nonsipp.employercontributions.EmployerContributionsController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
