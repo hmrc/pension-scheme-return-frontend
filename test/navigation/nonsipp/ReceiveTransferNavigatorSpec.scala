@@ -18,9 +18,10 @@ package navigation.nonsipp
 
 import controllers.nonsipp.memberpayments
 import controllers.routes
+import models.NormalMode
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.memberpayments.DidSchemeReceiveTransferPage
+import pages.nonsipp.memberpayments.{DidSchemeReceiveTransferPage, WhatYouWillNeedReceivedTransferPage}
 import utils.BaseSpec
 
 class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
@@ -50,4 +51,18 @@ class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .withName("go from did scheme receive transfer page to scheme transfer out page when no selected")
     )
   }
+
+  "WhatYouWillNeedReceivedTransferPage" - {
+
+    act.like(
+      normalmode
+        .navigateTo(
+          WhatYouWillNeedReceivedTransferPage,
+          (srn, _) =>
+            controllers.nonsipp.memberpayments.routes.TransferReceivedMemberListController
+              .onPageLoad(srn, 1, NormalMode)
+        )
+    )
+  }
+
 }
