@@ -22,7 +22,7 @@ import controllers.actions._
 import controllers.nonsipp.employercontributions.RemoveEmployerContributionsController._
 import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
-import models.{Mode, Money}
+import models.{Money, NormalMode}
 import navigation.Navigator
 import pages.nonsipp.employercontributions.{
   EmployerNamePage,
@@ -32,7 +32,7 @@ import pages.nonsipp.employercontributions.{
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
@@ -56,7 +56,7 @@ class RemoveEmployerContributionsController @Inject()(
 
   private val form = RemoveEmployerContributionsController.form(formProvider)
 
-  def onPageLoad(srn: Srn, memberIndex: Max300, index: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, memberIndex: Max300, index: Max50): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       (
         for {
@@ -69,7 +69,7 @@ class RemoveEmployerContributionsController @Inject()(
       ).merge
     }
 
-  def onSubmit(srn: Srn, memberIndex: Max300, index: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, memberIndex: Max300, index: Max50): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
@@ -94,12 +94,12 @@ class RemoveEmployerContributionsController @Inject()(
                 _ <- saveService.save(updatedAnswers)
               } yield Redirect(
                 navigator
-                  .nextPage(RemoveEmployerContributionsPage(srn), mode, updatedAnswers)
+                  .nextPage(RemoveEmployerContributionsPage(srn), NormalMode, updatedAnswers)
               )
             } else {
               Future
                 .successful(
-                  Redirect(navigator.nextPage(RemoveEmployerContributionsPage(srn), mode, request.userAnswers))
+                  Redirect(navigator.nextPage(RemoveEmployerContributionsPage(srn), NormalMode, request.userAnswers))
                 )
             }
           }
