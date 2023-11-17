@@ -1628,6 +1628,13 @@ landPropertyAddressManual.field6.error.required = Enter a country
 landPropertyAddressManual.field6.error.invalid = Country must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
 landPropertyAddressManual.field6.error.max = Country must be 35 characters or fewer
 
+totalMemberContribution.title = What was the total member contribution made by or for this member, in pounds and pence?
+totalMemberContribution.heading = What was the total member contribution made by or for Ainsley Clark, in pounds and pence?
+totalMemberContribution.hint = Enter the total member contribution made by or for this member in the period of this return, including both personal and third party contributions.
+totalMemberContribution.error.required = Enter the total amount of the member contribution, in pounds and pence
+totalMemberContribution.error.invalid = Total member contribution must be an amount of money, like 123 or 123.45
+totalMemberContribution.error.tooLarge = Total member contribution must be 999999999.99 or less
+
 WhatYouWillNeed.MemberContributions.title = Member contributions for members of {0}
 WhatYouWillNeed.MemberContributions.heading = Member contributions for members of {0}
 WhatYouWillNeed.MemberContributions.paragraph1 = You must tell us about all member contributions made by or for members of the scheme during the period of this return.
@@ -1660,6 +1667,11 @@ TransferIn.MemberList.row = {0} {1}
 TransferIn.MemberList.radios = Have you finished reporting transfers in?
 TransferIn.MemberList.radios.error.required = Select yes if you have finished reporting transfers in
 TransferIn.MemberList.pagination.label = Showing {0} - {1} of {2} members
+
+contributionsFromAnotherEmployer.title = Were employer contributions made for the member by any other employer?
+contributionsFromAnotherEmployer.heading = Were employer contributions made for {0} by any other employer?
+contributionsFromAnotherEmployer.hint =  If employer contributions were made for this member by more than one employer, you must tell us about all of them.
+contributionsFromAnotherEmployer.error.required = Select yes if employer contributions were made for the member by any other employer
 
 MemberContributionCYA.title = Check your answers
 MemberContributionCYA.change.title = Check your answers
