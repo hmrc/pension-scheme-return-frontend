@@ -32,3 +32,11 @@ case class TotalEmployerContributionPage(srn: Srn, index: Max300, secondaryIndex
 
   override def toString: String = "totalContribution"
 }
+
+case class TotalEmployerContributionPages(srn: Srn, index: Max300) extends QuestionPage[Map[String, Money]] {
+
+  override def path: JsPath =
+    Paths.memberEmpContribution \ toString \ index.arrayIndex.toString
+
+  override def toString: String = "totalContribution"
+}
