@@ -26,7 +26,8 @@ import utils.RefinedUtils.RefinedIntOps
 case class EmployerCompanyCrnPage(srn: Srn, memberIndex: Max300, index: Max50)
     extends QuestionPage[ConditionalYesNo[String, Crn]] {
 
-  override def path: JsPath = JsPath \ toString \ memberIndex.arrayIndex.toString \ index.arrayIndex.toString
+  override def path: JsPath =
+    Paths.memberEmpContribution \ toString \ memberIndex.arrayIndex.toString \ index.arrayIndex.toString
 
-  override def toString: String = "employerCrn"
+  override def toString: String = "idNumber"
 }

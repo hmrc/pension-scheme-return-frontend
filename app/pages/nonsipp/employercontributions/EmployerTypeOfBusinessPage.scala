@@ -28,5 +28,5 @@ case class EmployerTypeOfBusinessPage(srn: Srn, memberIndex: Max300, index: Max5
   override def path: JsPath =
     Paths.memberEmpContribution \ toString \ memberIndex.arrayIndex.toString \ index.arrayIndex.toString
 
-  override def toString: String = "employerTypeOfBusiness"
+  override def toString: String = "orgType"
 }
