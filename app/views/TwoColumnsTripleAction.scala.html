@@ -37,21 +37,26 @@
 
         <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
 
-        @govukTable(
-         TableViewModel(
-                        viewmodel.page.head.fold(List.empty[HeadCell])(
-                            heads =>
-                            heads.map( aHead =>
-                            HeadCell(HtmlContent(renderMessage(aHead.text)))
-                            )
-                        ),
-                        viewmodel.page.rows.map(
-                            rows =>
-                            rows.map( aRow =>
-                            TableRow(HtmlContent(renderMessage(aRow.text)))
-                            )
-                        ),
-         ))
+        @defining(viewmodel.page.paginatedViewModel.fold(viewmodel.page.rows)(paginatedViewModel =>
+            viewmodel.page.rows.paginate(paginatedViewModel.pagination.currentPage, paginatedViewModel.pagination.pageSize))
+        ){ rows =>
+            @govukTable(TableViewModel(
+                                viewmodel.page.head.fold(List.empty[HeadCell])(
+                                    heads =>
+                                    heads.map( aHead =>
+                                    HeadCell(HtmlContent(renderMessage(aHead.text)))
+                                    )
+                                ),
+                                rows.map(
+                                    otherRows =>
+                                    otherRows.map( aRow =>
+                                    TableRow(HtmlContent(renderMessage(aRow.text)))
+                                    )
+                                ),
+                 )
+            )
+        }
+
 
 
         @viewmodel.page.paginatedViewModel.map{ paginatedViewModel =>

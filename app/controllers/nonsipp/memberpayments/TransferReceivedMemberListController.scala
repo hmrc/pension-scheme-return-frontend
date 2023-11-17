@@ -21,7 +21,6 @@ import config.{Constants, FrontendAppConfig}
 import config.Refined.OneTo300
 import controllers.PSRController
 import controllers.actions._
-import controllers.nonsipp.memberdetails.routes
 import eu.timepit.refined.refineV
 import forms.YesNoPageFormProvider
 import models.CheckOrChange.Change
@@ -112,10 +111,10 @@ object TransferReceivedMemberListController {
                 memberName.fullName
               ),
               TableElem(
-                "Not started"
+                "Not started" //TODO We need to complete the "Add" Journey to be able to make this dynamic
               ),
               TableElem(
-                LinkMessage("Add", pensionSchemeEnquiriesUrl)
+                LinkMessage("Add", pensionSchemeEnquiriesUrl) //TODO we need the subsequent page in the Journey to add the right link
               )
             )
         }
@@ -140,14 +139,15 @@ object TransferReceivedMemberListController {
     )
 
     FormPageViewModel(
-      Message(title, memberList.size),
-      Message(heading, memberList.size),
-      ParagraphMessage("TransferIn.MemberList.paragraph"),
-      ActionTableViewModel(
+      title = Message(title, memberList.size),
+      heading = Message(heading, memberList.size),
+      description = Some(ParagraphMessage("TransferIn.MemberList.paragraph")),
+      page = ActionTableViewModel(
         inset = "TransferIn.MemberList.inset",
         head = Some(List(TableElem("Member Name"), TableElem("status"), TableElem(""))),
-        Message(""),
         rows = rows(srn, mode, memberList, pensionSchemeEnquiry),
+        Message(""),
+        showRadios = memberList.length < 9999999,
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(
@@ -160,7 +160,11 @@ object TransferReceivedMemberListController {
           )
         )
       ),
-      controllers.nonsipp.memberpayments.routes.TransferReceivedMemberListController.onSubmit(srn, page, mode)
+      refresh = None,
+      buttonText = "site.saveAndContinue",
+      details = None,
+      onSubmit =
+        controllers.nonsipp.memberpayments.routes.TransferReceivedMemberListController.onSubmit(srn, page, mode)
     )
   }
 }

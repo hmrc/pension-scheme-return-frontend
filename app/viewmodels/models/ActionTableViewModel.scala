@@ -27,10 +27,11 @@ case class TableElem(
 case class ActionTableViewModel(
   inset: DisplayMessage,
   head: Option[List[TableElem]],
-  radioText: Message,
-  showRadios: Boolean = true,
   rows: List[List[TableElem]],
-  showInsetWithRadios: Boolean = false,
+  radioText: Message,
+  // whether to render the radio buttons to add another entity to the list or continue
+  showRadios: Boolean = true,
+  paginatedViewModel: Option[PaginatedViewModel] = None,
   yesHintText: Option[Message] = None,
-  paginatedViewModel: Option[PaginatedViewModel] = None
+  showInsetWithRadios: Boolean = false
 )
