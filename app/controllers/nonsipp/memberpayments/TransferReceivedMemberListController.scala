@@ -146,7 +146,7 @@ object TransferReceivedMemberListController {
         inset = "TransferIn.MemberList.inset",
         head = Some(List(TableElem("Member Name"), TableElem("status"), TableElem(""))),
         rows = rows(srn, mode, memberList, pensionSchemeEnquiry),
-        Message(""),
+        radioText = Message("TransferIn.MemberList.radios"),
         showRadios = memberList.length < 9999999,
         paginatedViewModel = Some(
           PaginatedViewModel(
