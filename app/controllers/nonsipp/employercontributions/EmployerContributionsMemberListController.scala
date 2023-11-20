@@ -157,7 +157,7 @@ object EmployerContributionsMemberListController {
       description = Some(ParagraphMessage("employerContributions.MemberList.paragraph")),
       page = ActionTableViewModel(
         inset = "employerContributions.MemberList.inset",
-        head = Some(List(TableElem("Member Name"), TableElem("status"))),
+        head = Some(List(TableElem("Member Name"), TableElem("Status"))),
         rows = rows(srn, mode, memberList),
         radioText = Message("employerContributions.MemberList.radios"),
         showRadios = memberList.length < 9999999,
