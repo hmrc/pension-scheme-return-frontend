@@ -28,6 +28,9 @@ trait TableFluency {
 
     def apply(rows: Seq[Seq[TableRow]]): Table =
       Table(rows = rows)
+
+    def apply(head: Seq[HeadCell], rows: Seq[Seq[TableRow]]): Table =
+      Table(head = Some(head), rows = rows)
   }
 
   implicit class FluentTable(list: Table) {

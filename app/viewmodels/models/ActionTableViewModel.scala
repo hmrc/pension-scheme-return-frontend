@@ -14,19 +14,24 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.employercontributions
+package viewmodels.models
 
-import config.Refined.{Max300, Max50}
-import models.IdentityType
-import models.SchemeId.Srn
-import pages.QuestionPage
-import play.api.libs.json.JsPath
-import utils.RefinedUtils.RefinedIntOps
+import viewmodels.DisplayMessage
+import viewmodels.DisplayMessage.Message
 
-case class EmployerTypeOfBusinessPage(srn: Srn, memberIndex: Max300, index: Max50) extends QuestionPage[IdentityType] {
+case class TableElem(
+  text: DisplayMessage,
+  hiddenText: Option[Message] = None
+)
 
-  override def path: JsPath =
-    Paths.memberEmpContribution \ toString \ memberIndex.arrayIndex.toString \ index.arrayIndex.toString
-
-  override def toString: String = "orgType"
-}
+case class ActionTableViewModel(
+  inset: DisplayMessage,
+  head: Option[List[TableElem]],
+  rows: List[List[TableElem]],
+  radioText: Message,
+  // whether to render the radio buttons to add another entity to the list or continue
+  showRadios: Boolean = true,
+  paginatedViewModel: Option[PaginatedViewModel] = None,
+  yesHintText: Option[Message] = None,
+  showInsetWithRadios: Boolean = false
+)

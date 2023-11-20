@@ -14,19 +14,15 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.employercontributions
+package pages.nonsipp.memberpayments
 
-import config.Refined.{Max300, Max50}
-import models.IdentityType
 import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
-import utils.RefinedUtils.RefinedIntOps
 
-case class EmployerTypeOfBusinessPage(srn: Srn, memberIndex: Max300, index: Max50) extends QuestionPage[IdentityType] {
+case class ReportMemberContributionListPage(srn: Srn) extends QuestionPage[Boolean] {
 
-  override def path: JsPath =
-    Paths.memberEmpContribution \ toString \ memberIndex.arrayIndex.toString \ index.arrayIndex.toString
+  override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "orgType"
+  override def toString: String = "transferInListPage"
 }
