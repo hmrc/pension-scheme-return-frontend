@@ -63,8 +63,8 @@ class MemberContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviours
         .navigateTo(
           WhatYouWillNeedMemberContributionsPage,
           (srn, _) =>
-            controllers.nonsipp.membercontributions.routes.TotalMemberContributionController
-              .onPageLoad(srn, refineMV(1), refineMV(2), NormalMode)
+            controllers.nonsipp.membercontributions.routes.ReportMemberContributionListController
+              .onPageLoad(srn, page = 1, NormalMode)
         )
         .withName("go from what you will need member contributions page to total member contribution")
     )
