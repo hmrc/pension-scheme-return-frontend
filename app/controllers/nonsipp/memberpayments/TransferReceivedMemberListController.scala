@@ -143,7 +143,7 @@ object TransferReceivedMemberListController {
       description = Some(ParagraphMessage("TransferIn.MemberList.paragraph")),
       page = ActionTableViewModel(
         inset = "TransferIn.MemberList.inset",
-        head = Some(List(TableElem("Member Name"), TableElem("status"))),
+        head = Some(List(TableElem("Member Name"), TableElem("Status"))),
         rows = rows(srn, mode, memberList),
         radioText = Message("TransferIn.MemberList.radios"),
         showRadios = memberList.length < 9999999,
