@@ -16,7 +16,8 @@
 
 package navigation.nonsipp
 
-import eu.timepit.refined.refineMV
+import config.Refined.OneTo50
+import eu.timepit.refined.refineV
 import models.{IdentityType, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
@@ -79,10 +80,15 @@ object EmployerContributionsNavigator extends JourneyNavigator {
       controllers.nonsipp.employercontributions.routes.ContributionsFromAnotherEmployerController
         .onPageLoad(srn, index, secondaryIndex, NormalMode)
 
-    case page @ ContributionsFromAnotherEmployerPage(srn, memberIndex, index) =>
+    case page @ ContributionsFromAnotherEmployerPage(srn, secondaryIndex, index) =>
       if (userAnswers.get(page).contains(true)) {
-        controllers.nonsipp.employercontributions.routes.EmployerNameController
-          .onPageLoad(srn, memberIndex, index, NormalMode)
+        val nextDataKey = index.value
+        refineV[OneTo50](nextDataKey + 1) match {
+          case Left(_) => controllers.routes.UnauthorisedController.onPageLoad()
+          case Right(nextIndex) =>
+            controllers.nonsipp.employercontributions.routes.EmployerNameController
+              .onPageLoad(srn, secondaryIndex, nextIndex, NormalMode)
+        }
       } else {
         controllers.routes.UnauthorisedController.onPageLoad()
       }

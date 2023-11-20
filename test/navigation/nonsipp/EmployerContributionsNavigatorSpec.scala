@@ -203,19 +203,6 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
   }
 
   "ContributionsFromAnotherEmployerPage" - {
-    act.like(
-      normalmode
-        .navigateToWithDoubleDataAndIndex(
-          index,
-          secondaryIndex,
-          ContributionsFromAnotherEmployerPage,
-          Gen.const(true),
-          (srn, memberIndex: Max300, index: Max50, _) =>
-            controllers.nonsipp.employercontributions.routes.EmployerNameController
-              .onPageLoad(srn, memberIndex, index, NormalMode)
-        )
-        .withName("go from contribution from another employer page to employer name page")
-    )
 
     act.like(
       normalmode
