@@ -32,10 +32,14 @@ import org.scalacheck.Gen
 import org.scalacheck.Gen.numChar
 import play.api.mvc.Request
 import uk.gov.hmrc.domain.Nino
+import viewmodels.models.SectionCompleted
 
 import java.time.{LocalDate, LocalDateTime, ZoneOffset}
 
 trait ModelGenerators extends BasicGenerators {
+
+  implicit val sectionCompletedGen: Gen[SectionCompleted.type] = Gen.const(SectionCompleted)
+
   lazy val minimalDetailsGen: Gen[MinimalDetails] =
     for {
       email <- emailGen

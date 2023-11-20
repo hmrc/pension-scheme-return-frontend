@@ -137,8 +137,8 @@ object EmployerContributionsMemberListController {
                 TableElem(
                   LinkMessage(
                     Message("site.change"),
-                    controllers.nonsipp.employercontributions.routes.EmployerNameController
-                      .onSubmit(srn, nextIndex, refineMV(1), mode)
+                    controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
+                      .onSubmit(srn, nextIndex, page = 1, CheckMode)
                       .url
                   )
                 ),

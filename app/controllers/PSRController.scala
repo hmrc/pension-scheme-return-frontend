@@ -26,9 +26,9 @@ import eu.timepit.refined.refineV
 import models.{DateRange, UserAnswers}
 import models.requests.DataRequest
 import play.api.i18n.I18nSupport
-import play.api.libs.json.Reads
+import play.api.libs.json.{Reads, Writes}
 import play.api.mvc.Result
-import queries.Gettable
+import queries.{Gettable, Settable}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -75,7 +75,6 @@ abstract class PSRController extends FrontendBaseController with I18nSupport {
       case None => EitherT.left(Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())))
     }
   }
-
   implicit class FutureOps[A](f: Future[A]) {
     def liftF(implicit ec: ExecutionContext): EitherT[Future, Result, A] = EitherT.liftF(f)
   }
@@ -91,5 +90,9 @@ abstract class PSRController extends FrontendBaseController with I18nSupport {
   implicit class UserAnswersOps(userAnswers: UserAnswers) {
     def exists[A: Reads](page: Gettable[A])(f: A => Boolean)(implicit request: DataRequest[_]): Boolean =
       request.userAnswers.get(page).fold(true)(f)
+  }
+
+  implicit class UserAnswersTryOps(userAnswers: Try[UserAnswers]) {
+    def set[A: Writes](page: Settable[A], value: A): Try[UserAnswers] = userAnswers.flatMap(_.set(page, value))
   }
 }
