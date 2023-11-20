@@ -66,10 +66,10 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
         .navigateTo(
           WhatYouWillNeedEmployerContributionsPage,
           (srn, _) =>
-            controllers.nonsipp.employercontributions.routes.EmployerNameController
-              .onPageLoad(srn, refineMV(1), refineMV(2), NormalMode)
+            controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
+              .onPageLoad(srn, 1, NormalMode)
         )
-        .withName("go from what you will need employer contributions page to employer name page ")
+        .withName("go from what you will need employer contributions page to employer contributions list page ")
     )
   }
 

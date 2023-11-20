@@ -37,8 +37,11 @@ object EmployerContributionsNavigator extends JourneyNavigator {
       }
 
     case WhatYouWillNeedEmployerContributionsPage(srn) =>
-      controllers.nonsipp.employercontributions.routes.EmployerNameController
-        .onPageLoad(srn, refineMV(1), refineMV(2), NormalMode)
+      controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
+        .onPageLoad(srn, 1, NormalMode)
+
+    case EmployerContributionsMemberListPage(srn) =>
+      controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
 
     case EmployerNamePage(srn, memberIndex, index) =>
       controllers.nonsipp.employercontributions.routes.EmployerTypeOfBusinessController
