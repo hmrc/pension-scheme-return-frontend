@@ -32,6 +32,7 @@ import pages.nonsipp.memberpayments.TransferReceivedMemberListPage
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import viewmodels.DisplayMessage
 import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
 import viewmodels.models.{ActionTableViewModel, FormPageViewModel, PaginatedViewModel, TableElem}
 import views.html.TwoColumnsTripleAction
@@ -142,7 +143,7 @@ object TransferReceivedMemberListController {
       description = Some(ParagraphMessage("TransferIn.MemberList.paragraph")),
       page = ActionTableViewModel(
         inset = "TransferIn.MemberList.inset",
-        head = Some(List(TableElem("Member Name"), TableElem("status"), TableElem(""))),
+        head = Some(List(TableElem("Member Name"), TableElem("status"))),
         rows = rows(srn, mode, memberList),
         radioText = Message("TransferIn.MemberList.radios"),
         showRadios = memberList.length < 9999999,
