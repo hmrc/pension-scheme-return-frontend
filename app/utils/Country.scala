@@ -17,7 +17,6 @@
 package utils
 
 import models.SelectInput
-import org.apache.commons.lang3.StringUtils
 import play.api.libs.json.Json
 
 import java.io.{File, FileInputStream, InputStream}
@@ -40,7 +39,7 @@ object Country {
       .map {
         _.map {
           case (name, code) =>
-            SelectInput(code.replaceAll("country:", StringUtils.EMPTY), name)
+            SelectInput(code.split(":")(1).trim, name)
         }.toList
       }
       .get

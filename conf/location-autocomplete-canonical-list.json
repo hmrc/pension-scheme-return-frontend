@@ -4,6 +4,10 @@
     "country:AF"
   ],
   [
+    "Netherlands Antilles",
+    "country:AN"
+  ],
+  [
     "Albania",
     "country:AL"
   ],
@@ -12,12 +16,24 @@
     "country:DZ"
   ],
   [
+    "American Samoa",
+    "territory:AS"
+  ],
+  [
     "Andorra",
     "country:AD"
   ],
   [
     "Angola",
     "country:AO"
+  ],
+  [
+    "Anguilla",
+    "territory:AI"
+  ],
+  [
+    "Antarctica",
+    "territory:AQ"
   ],
   [
     "Antigua and Barbuda",
@@ -30,6 +46,10 @@
   [
     "Armenia",
     "country:AM"
+  ],
+  [
+    "Aruba",
+    "territory:AW"
   ],
   [
     "Australia",
@@ -72,12 +92,20 @@
     "country:BJ"
   ],
   [
+    "Bermuda",
+    "territory:BM"
+  ],
+  [
     "Bhutan",
     "country:BT"
   ],
   [
     "Bolivia",
     "country:BO"
+  ],
+  [
+    "Bonaire, Sint Eustatius and Saba",
+    "territory:BQ"
   ],
   [
     "Bosnia and Herzegovina",
@@ -88,8 +116,20 @@
     "country:BW"
   ],
   [
+    "Bouvet Island",
+    "territory:BV"
+  ],
+  [
     "Brazil",
     "country:BR"
+  ],
+  [
+    "British Indian Ocean Territory",
+    "territory:IO"
+  ],
+  [
+    "British Virgin Islands",
+    "territory:VG"
   ],
   [
     "Brunei",
@@ -128,6 +168,10 @@
     "country:CV"
   ],
   [
+    "Cayman Islands",
+    "territory:KY"
+  ],
+  [
     "Central African Republic",
     "country:CF"
   ],
@@ -142,6 +186,14 @@
   [
     "China",
     "country:CN"
+  ],
+  [
+    "Christmas Island",
+    "territory:CX"
+  ],
+  [
+    "Cocos (Keeling) Islands",
+    "territory:CC"
   ],
   [
     "Colombia",
@@ -160,6 +212,10 @@
     "country:CD"
   ],
   [
+    "Cook Islands",
+    "territory:CK"
+  ],
+  [
     "Costa Rica",
     "country:CR"
   ],
@@ -170,6 +226,10 @@
   [
     "Cuba",
     "country:CU"
+  ],
+  [
+    "Curaçao",
+    "territory:CW"
   ],
   [
     "Cyprus",
@@ -198,10 +258,6 @@
   [
     "Dominican Republic",
     "country:DO"
-  ],
-  [
-    "East Germany",
-    "country:DD"
   ],
   [
     "East Timor",
@@ -240,6 +296,14 @@
     "country:ET"
   ],
   [
+    "Falkland Islands",
+    "territory:FK"
+  ],
+  [
+    "Faroe Islands",
+    "territory:FO"
+  ],
+  [
     "Fiji",
     "country:FJ"
   ],
@@ -250,6 +314,18 @@
   [
     "France",
     "country:FR"
+  ],
+  [
+    "French Guiana",
+    "territory:GF"
+  ],
+  [
+    "French Polynesia",
+    "territory:PF"
+  ],
+  [
+    "French Southern Territories",
+    "territory:TF"
   ],
   [
     "Gabon",
@@ -268,16 +344,36 @@
     "country:GH"
   ],
   [
+    "Gibraltar",
+    "territory:GI"
+  ],
+  [
     "Greece",
     "country:GR"
+  ],
+  [
+    "Greenland",
+    "territory:GL"
   ],
   [
     "Grenada",
     "country:GD"
   ],
   [
+    "Guadeloupe",
+    "territory:GP"
+  ],
+  [
+    "Guam",
+    "territory:GU"
+  ],
+  [
     "Guatemala",
     "country:GT"
+  ],
+  [
+    "Guernsey",
+    "territory:GG"
   ],
   [
     "Guinea",
@@ -296,8 +392,16 @@
     "country:HT"
   ],
   [
+    "Heard Island and McDonald Islands",
+    "territory:HM"
+  ],
+  [
     "Honduras",
     "country:HN"
+  ],
+  [
+    "Hong Kong",
+    "territory:HK"
   ],
   [
     "Hungary",
@@ -328,6 +432,10 @@
     "country:IE"
   ],
   [
+    "Isle of Man",
+    "territory:IM"
+  ],
+  [
     "Israel",
     "country:IL"
   ],
@@ -348,6 +456,10 @@
     "country:JP"
   ],
   [
+    "Jersey",
+    "territory:JE"
+  ],
+  [
     "Jordan",
     "country:JO"
   ],
@@ -362,10 +474,6 @@
   [
     "Kiribati",
     "country:KI"
-  ],
-  [
-    "Kosovo",
-    "country:XK"
   ],
   [
     "Kuwait",
@@ -412,6 +520,10 @@
     "country:LU"
   ],
   [
+    "Macao",
+    "territory:MO"
+  ],
+  [
     "Madagascar",
     "country:MG"
   ],
@@ -440,12 +552,20 @@
     "country:MH"
   ],
   [
+    "Martinique",
+    "territory:MQ"
+  ],
+  [
     "Mauritania",
     "country:MR"
   ],
   [
     "Mauritius",
     "country:MU"
+  ],
+  [
+    "Mayotte",
+    "territory:YT"
   ],
   [
     "Mexico",
@@ -472,6 +592,10 @@
     "country:ME"
   ],
   [
+    "Montserrat",
+    "territory:MS"
+  ],
+  [
     "Morocco",
     "country:MA"
   ],
@@ -496,6 +620,10 @@
     "country:NL"
   ],
   [
+    "New Caledonia",
+    "territory:NC"
+  ],
+  [
     "New Zealand",
     "country:NZ"
   ],
@@ -512,6 +640,14 @@
     "country:NG"
   ],
   [
+    "Niue",
+    "territory:NU"
+  ],
+  [
+    "Norfolk Island",
+    "territory:NF"
+  ],
+  [
     "North Korea",
     "country:KP"
   ],
@@ -520,8 +656,16 @@
     "country:MK"
   ],
   [
+    "Northern Mariana Islands",
+    "territory:MP"
+  ],
+  [
     "Norway",
     "country:NO"
+  ],
+  [
+    "Occupied Palestinian Territories",
+    "territory:PS"
   ],
   [
     "Oman",
@@ -556,12 +700,20 @@
     "country:PH"
   ],
   [
+    "Pitcairn, Henderson, Ducie and Oeno Islands",
+    "territory:PN"
+  ],
+  [
     "Poland",
     "country:PL"
   ],
   [
     "Portugal",
     "country:PT"
+  ],
+  [
+    "Puerto Rico",
+    "territory:PR"
   ],
   [
     "Qatar",
@@ -578,6 +730,22 @@
   [
     "Rwanda",
     "country:RW"
+  ],
+  [
+    "Réunion",
+    "territory:RE"
+  ],
+  [
+    "Saint Barthélemy",
+    "territory:BL"
+  ],
+  [
+    "Saint Pierre and Miquelon",
+    "territory:PM"
+  ],
+  [
+    "Saint-Martin (French part)",
+    "territory:MF"
   ],
   [
     "Samoa",
@@ -616,6 +784,10 @@
     "country:SG"
   ],
   [
+    "Sint Maarten (Dutch part)",
+    "territory:SX"
+  ],
+  [
     "Slovakia",
     "country:SK"
   ],
@@ -634,6 +806,10 @@
   [
     "South Africa",
     "country:ZA"
+  ],
+  [
+    "South Georgia and South Sandwich Islands",
+    "territory:GS"
   ],
   [
     "South Korea",
@@ -672,6 +848,10 @@
     "country:SR"
   ],
   [
+    "Svalbard and Jan Mayen",
+    "territory:SJ"
+  ],
+  [
     "Sweden",
     "country:SE"
   ],
@@ -682,6 +862,10 @@
   [
     "Syria",
     "country:SY"
+  ],
+  [
+    "Taiwan",
+    "territory:TW"
   ],
   [
     "Tajikistan",
@@ -708,12 +892,20 @@
     "country:TG"
   ],
   [
+    "Tokelau",
+    "territory:TK"
+  ],
+  [
     "Tonga",
     "country:TO"
   ],
   [
     "Trinidad and Tobago",
     "country:TT"
+  ],
+  [
+    "Saint Helena, Ascension and Tristan da Cunha",
+    "territory:SH"
   ],
   [
     "Tunisia",
@@ -728,12 +920,12 @@
     "country:TM"
   ],
   [
-    "Tuvalu",
-    "country:TV"
+    "Turks and Caicos Islands",
+    "territory:TC"
   ],
   [
-    "USSR",
-    "country:SU"
+    "Tuvalu",
+    "country:TV"
   ],
   [
     "Uganda",
@@ -754,6 +946,10 @@
   [
     "United States",
     "country:US"
+  ],
+  [
+    "United States Virgin Islands",
+    "territory:VI"
   ],
   [
     "Uruguay",
@@ -780,12 +976,20 @@
     "country:VN"
   ],
   [
-    "Yemen",
-    "country:YE"
+    "United States Minor Outlying Islands",
+    "territory:UM"
   ],
   [
-    "Yugoslavia",
-    "country:YU"
+    "Wallis and Futuna",
+    "territory:WF"
+  ],
+  [
+    "Western Sahara",
+    "territory:EH"
+  ],
+  [
+    "Yemen",
+    "country:YE"
   ],
   [
     "Zambia",
@@ -794,5 +998,9 @@
   [
     "Zimbabwe",
     "country:ZW"
+  ],
+  [
+    "Åland Islands",
+    "territory:AX"
   ]
 ]
