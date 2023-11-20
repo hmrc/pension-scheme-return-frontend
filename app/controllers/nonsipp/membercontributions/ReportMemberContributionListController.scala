@@ -91,7 +91,7 @@ class ReportMemberContributionListController @Inject()(
 object ReportMemberContributionListController {
   def form(formProvider: YesNoPageFormProvider): Form[Boolean] =
     formProvider(
-      "TransferIn.MemberList.radios.error.required"
+      "ReportContribution.MemberList.radios.error.required"
     )
 
   private def rows(
@@ -130,8 +130,11 @@ object ReportMemberContributionListController {
     memberList: List[NameDOB]
   ): FormPageViewModel[ActionTableViewModel] = {
 
-    val title = if (memberList.size == 1) "TransferIn.MemberList.title" else "TransferIn.MemberList.title.plural"
-    val heading = if (memberList.size == 1) "TransferIn.MemberList.heading" else "TransferIn.MemberList.heading.plural"
+    val title =
+      if (memberList.size == 1) "ReportContribution.MemberList.title" else "ReportContribution.MemberList.title.plural"
+    val heading =
+      if (memberList.size == 1) "ReportContribution.MemberList.heading"
+      else "ReportContribution.MemberList.heading.plural"
 
     val pagination = Pagination(
       currentPage = page,
@@ -144,17 +147,17 @@ object ReportMemberContributionListController {
     FormPageViewModel(
       title = Message(title, memberList.size),
       heading = Message(heading, memberList.size),
-      description = Some(ParagraphMessage("TransferIn.MemberList.paragraph")),
+      description = Some(ParagraphMessage("ReportContribution.MemberList.paragraph")),
       page = ActionTableViewModel(
-        inset = "TransferIn.MemberList.inset",
+        inset = "ReportContribution.MemberList.inset",
         head = Some(List(TableElem("Member Name"), TableElem("status"))),
         rows = rows(srn, mode, memberList),
-        radioText = Message("TransferIn.MemberList.radios"),
+        radioText = Message("ReportContribution.MemberList.radios"),
         showRadios = memberList.length < 9999999,
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(
-              "TransferIn.MemberList.pagination.label",
+              "ReportContribution.MemberList.pagination.label",
               pagination.pageStart,
               pagination.pageEnd,
               pagination.totalSize

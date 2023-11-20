@@ -1676,3 +1676,12 @@ contributionsFromAnotherEmployer.title = Were employer contributions made for th
 contributionsFromAnotherEmployer.heading = Were employer contributions made for {0} by any other employer?
 contributionsFromAnotherEmployer.hint =  If employer contributions were made for this member by more than one employer, you must tell us about all of them.
 contributionsFromAnotherEmployer.error.required = Select yes if employer contributions were made for the member by any other employer
+
+ReportContribution.MemberList.title = Select a member to report member contributions
+ReportContribution.MemberList.title.plural = Select a member to report member contributions
+ReportContribution.MemberList.heading = Select a member to report member contributions
+ReportContribution.MemberList.heading.plural = Select a member to report member contributions
+ReportContribution.MemberList.paragraph = You must tell us about all member contributions made by or for members of the scheme during the period of this return.
+ReportContribution.MemberList.radios = Have you finished reporting member contributions?
+ReportContribution.MemberList.radios.error.required = Select yes if you have finished reporting member contributions
+ReportContribution.MemberList.pagination.label = Showing {0} - {1} of {2} members
