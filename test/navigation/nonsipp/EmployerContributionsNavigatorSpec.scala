@@ -73,6 +73,17 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
     )
   }
 
+  "EmployerContributionsMemberListPage" - {
+    act.like(
+      normalmode
+        .navigateTo(
+          EmployerContributionsMemberListPage,
+          (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
+        )
+        .withName("go from employer contribution page to task list page")
+    )
+  }
+
   "EmployerNamePage" - {
     act.like(
       normalmode

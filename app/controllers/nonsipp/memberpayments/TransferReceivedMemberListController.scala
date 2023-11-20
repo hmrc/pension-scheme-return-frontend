@@ -132,7 +132,7 @@ object TransferReceivedMemberListController {
 
     val pagination = Pagination(
       currentPage = page,
-      pageSize = Constants.landOrPropertiesSize,
+      pageSize = Constants.transferInListSize,
       memberList.size,
       controllers.nonsipp.memberpayments.routes.TransferReceivedMemberListController.onPageLoad(srn, _, NormalMode)
     )

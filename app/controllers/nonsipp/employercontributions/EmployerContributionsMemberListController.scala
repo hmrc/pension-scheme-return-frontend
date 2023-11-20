@@ -114,7 +114,7 @@ object EmployerContributionsMemberListController {
                 memberName.fullName
               ),
               TableElem(
-                "No transfers in" //TODO We need to complete the "Add" Journey to be able to make this dynamic
+                "No employer contributions" //TODO We need to complete the "Add" Journey to be able to make this dynamic
               ),
               TableElem(
                 LinkMessage(
@@ -145,7 +145,7 @@ object EmployerContributionsMemberListController {
 
     val pagination = Pagination(
       currentPage = page,
-      pageSize = Constants.landOrPropertiesSize,
+      pageSize = Constants.employerContributionsMemberListSize,
       memberList.size,
       controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
         .onPageLoad(srn, _, NormalMode)
