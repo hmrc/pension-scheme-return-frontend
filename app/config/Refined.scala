@@ -34,7 +34,10 @@ object Refined {
   type OneTo5000 = Greater[0] And LessEqual[5000]
   type Max5000 = Int Refined OneTo5000
 
-  type Max50 = Int Refined Max50.Refined
+  type OneTo50 = Greater[0] And LessEqual[50]
+  type Max50 = Int Refined OneTo50
+
+//  type Max50 = Int Refined Max50.Refined
 
   implicit def indexReads[A](implicit ev: Validate[Int, A]): Reads[Refined[Int, A]] = {
     case JsNumber(value) =>
