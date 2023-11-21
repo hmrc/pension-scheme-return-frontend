@@ -32,6 +32,7 @@ import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.SaveService
+import utils.Country
 import viewmodels.InputWidth
 import viewmodels.implicits._
 import viewmodels.models.MultipleQuestionsViewModel.{QuintupleQuestion, SextupleQuestion}
@@ -51,6 +52,8 @@ class LandPropertyAddressManualController @Inject()(
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
+  private val internationalAddressFormWithCountries = internationalAddressForm(Country.countries)
+
   def onPageLoad(srn: Srn, index: Max5000, isUkAddress: Boolean, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val previousAnswer = request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, index))
@@ -61,12 +64,15 @@ class LandPropertyAddressManualController @Inject()(
         )
         Ok(view(viewModel(srn, index, ukPage(preparedForm), isUkAddress, mode)))
       } else {
-        val preparedForm = previousAnswer.fold(internationalAddressForm)(
+        val preparedForm = previousAnswer.fold(internationalAddressFormWithCountries)(
           address =>
-            if (address.isManualAddress) internationalAddressForm.fill(address.asInternationalAddressTuple)
-            else internationalAddressForm
+            if (address.isManualAddress) {
+              internationalAddressFormWithCountries.fill(address.asInternationalAddressTuple)
+            } else {
+              internationalAddressFormWithCountries
+            }
         )
-        Ok(view(viewModel(srn, index, internationalPage(preparedForm), isUkAddress, mode)))
+        Ok(view(viewModel(srn, index, internationalPage(preparedForm, Country.countries), isUkAddress, mode)))
       }
     }
 
@@ -102,12 +108,22 @@ class LandPropertyAddressManualController @Inject()(
   private def onSubmitInternationalAddress(srn: Srn, index: Max5000, mode: Mode)(
     implicit request: DataRequest[_]
   ): Future[Result] =
-    internationalAddressForm
+    internationalAddressFormWithCountries
       .bindFromRequest()
       .fold(
         formWithErrors => {
           Future.successful(
-            BadRequest(view(viewModel(srn, index, internationalPage(formWithErrors), isUkAddress = false, mode)))
+            BadRequest(
+              view(
+                viewModel(
+                  srn,
+                  index,
+                  internationalPage(formWithErrors, Country.countries),
+                  isUkAddress = false,
+                  mode
+                )
+              )
+            )
           )
         },
         value =>
@@ -115,7 +131,10 @@ class LandPropertyAddressManualController @Inject()(
             updatedAnswers <- Future
               .fromTry(
                 request.userAnswers
-                  .set(LandOrPropertyChosenAddressPage(srn, index), Address.fromManualInternationalAddress(value))
+                  .set(
+                    LandOrPropertyChosenAddressPage(srn, index),
+                    Address.fromManualInternationalAddress(value)
+                  )
               )
             _ <- saveService.save(updatedAnswers)
           } yield Redirect(navigator.nextPage(LandOrPropertyChosenAddressPage(srn, index), mode, updatedAnswers))
@@ -167,13 +186,6 @@ object LandPropertyAddressManualController {
       "landPropertyAddressManual.field5.error.max"
     )
 
-  private val field6Errors: InputFormErrors =
-    InputFormErrors.input(
-      "landPropertyAddressManual.field6.error.required",
-      "landPropertyAddressManual.field6.error.invalid",
-      "landPropertyAddressManual.field6.error.max"
-    )
-
   val ukAddressForm: Form[ManualUKAddressAnswers] =
     MultipleQuestionFormProvider(
       Mappings.input(field1Errors),
@@ -183,15 +195,20 @@ object LandPropertyAddressManualController {
       Mappings.optionalInput(field5Errors)
     )
 
-  private val internationalAddressForm: Form[ManualAddressAnswers] =
-    MultipleQuestionFormProvider(
-      Mappings.input(field1Errors),
-      Mappings.optionalInput(field2Errors),
-      Mappings.optionalInput(field3Errors),
-      Mappings.input(field4Errors),
-      Mappings.optionalInput(field5Errors),
-      Mappings.input(field6Errors)
-    )
+  private val internationalAddressForm: List[SelectInput] => Form[ManualAddressAnswers] =
+    countryOptions =>
+      MultipleQuestionFormProvider(
+        Mappings.input(field1Errors),
+        Mappings.optionalInput(field2Errors),
+        Mappings.optionalInput(field3Errors),
+        Mappings.input(field4Errors),
+        Mappings.optionalInput(field5Errors),
+        Mappings.select(
+          countryOptions,
+          "landPropertyAddressManual.field6.error.required",
+          "landPropertyAddressManual.field6.error.invalid"
+        )
+      )
 
   def viewModel[A](
     srn: Srn,
@@ -220,7 +237,10 @@ object LandPropertyAddressManualController {
       QuestionField.input("landPropertyAddressManual.field5.label.uk")
     )
 
-  def internationalPage(form: Form[ManualAddressAnswers]): ManualAddressQuestions =
+  private def internationalPage(
+    form: Form[ManualAddressAnswers],
+    countryOptions: Seq[SelectInput]
+  ): ManualAddressQuestions =
     SextupleQuestion(
       form,
       QuestionField.input("landPropertyAddressManual.field1.label").withWidth(InputWidth.TwoThirds),
@@ -228,7 +248,9 @@ object LandPropertyAddressManualController {
       QuestionField.input("landPropertyAddressManual.field3.label").withWidth(InputWidth.TwoThirds),
       QuestionField.input("landPropertyAddressManual.field4.label").withWidth(InputWidth.TwoThirds),
       QuestionField.input("landPropertyAddressManual.field5.label"),
-      QuestionField.input("landPropertyAddressManual.field6.label").withWidth(InputWidth.TwoThirds)
+      QuestionField
+        .select(label = "landPropertyAddressManual.field6.label", selectSource = countryOptions)
+        .withWidth(InputWidth.TwoThirds)
     )
 
 }

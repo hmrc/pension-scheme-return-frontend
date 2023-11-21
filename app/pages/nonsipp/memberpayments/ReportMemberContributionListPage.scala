@@ -14,17 +14,15 @@
  * limitations under the License.
  */
 
-package viewmodels.models
+package pages.nonsipp.memberpayments
 
-sealed trait FieldType
+import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-object FieldType {
-  case object Input extends FieldType
-  case object Currency extends FieldType
-  case object Date extends FieldType
-  case object Percentage extends FieldType
-  case object Textarea extends FieldType
+case class ReportMemberContributionListPage(srn: Srn) extends QuestionPage[Boolean] {
 
-  case object Security extends FieldType
-  case object Select extends FieldType
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "transferInListPage"
 }

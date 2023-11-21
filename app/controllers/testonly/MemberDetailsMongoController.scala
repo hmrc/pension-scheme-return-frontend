@@ -19,20 +19,18 @@ package controllers.testonly
 import cats.implicits._
 import config.Refined.{Max300, OneTo300}
 import controllers.actions.IdentifyAndRequireData
-import controllers.testonly.MemberDetailsMongoController.buildRandomNameDOB
 import eu.timepit.refined._
 import models.SchemeId.Srn
-import models.{NameDOB, UserAnswers}
+import models.UserAnswers
 import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsNinoPage, MemberDetailsPage, NoNINOPage}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
-import java.time.LocalDate
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Random, Try}
+import scala.util.Try
 
 class MemberDetailsMongoController @Inject()(
   sessionRepository: SessionRepository,
@@ -81,39 +79,4 @@ class MemberDetailsMongoController @Inject()(
       ua2 <- hasNinoPages.foldLeft(Try(ua1)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
       ua3 <- noNinoReasonPages.foldLeft(Try(ua2)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
     } yield ua3
-}
-
-object MemberDetailsMongoController {
-
-  private val firstNames = List(
-    "Nathalia",
-    "Kyro",
-    "Jesse",
-    "Mia",
-    "Bradley",
-    "Bonnie",
-    "Wesley",
-    "Alistair",
-    "Fiona",
-    "Victor"
-  )
-
-  private val lastNames = List(
-    "Vazquez",
-    "McMahon",
-    "Davis",
-    "Howell",
-    "Willis",
-    "Benjamin",
-    "Mathews",
-    "Sawyer",
-    "Payne",
-    "Gonzales"
-  )
-
-  def buildRandomNameDOB(): NameDOB = NameDOB(
-    firstNames(Random.nextInt(firstNames.size)),
-    lastNames(Random.nextInt(lastNames.size)),
-    LocalDate.of(1990, 12, 12)
-  )
 }

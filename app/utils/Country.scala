@@ -16,38 +16,44 @@
 
 package utils
 
-import play.api.libs.json.{Json, OFormat}
+import models.SelectInput
+import play.api.libs.json.Json
 
 import java.io.{File, FileInputStream, InputStream}
-import scala.collection.Map
 import scala.io.Source
 
 case class Country(countryCode: String, country: String)
 
 object Country {
 
-  implicit val formats: OFormat[Country] = Json.format[Country]
+  private val locationCanonicalList = "location-autocomplete-canonical-list.json"
 
-  private val countries: List[Country] = {
-    val jsonSchemaFile = new File(getClass.getClassLoader.getResource("country-code.json").toURI.getPath)
-    val inputStream = new FileInputStream(jsonSchemaFile)
-    val jsonFile = Json.parse(readStreamToString(inputStream))
-    jsonFile.validate[List[Country]].get
-  }
+  lazy val countries: List[SelectInput] = {
+    val jsonFile = new File(getClass.getClassLoader.getResource(locationCanonicalList).toURI.getPath)
+    val inputStream = new FileInputStream(jsonFile)
+    val locationJsValue = Json.parse(readStreamToString(inputStream))
 
-  private val countryCodesMap: Map[String, String] = {
-    countries.map(country => (country.countryCode, country.country)).toMap
-  }
-
-  private val countriesMap: Map[String, String] = {
-    countries.map(country => (country.country.toLowerCase, country.countryCode)).toMap
+    Json
+      .fromJson[Array[(String, String)]](locationJsValue)
+      .asOpt
+      .map {
+        _.map {
+          case (name, code) =>
+            SelectInput(code.split(":")(1).trim, name)
+        }.toList
+      }
+      .get
   }
 
   def getCountry(countryCode: String): Option[String] =
-    countryCodesMap.get(countryCode)
+    countries
+      .find(_.value == countryCode)
+      .map(_.label)
 
   def getCountryCode(country: String): Option[String] =
-    countriesMap.get(country.toLowerCase)
+    countries
+      .find(_.label == country)
+      .map(_.value)
 
   private def readStreamToString(is: InputStream): String =
     try Source.fromInputStream(is).mkString

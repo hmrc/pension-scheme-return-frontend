@@ -246,7 +246,7 @@ trait ViewModelGenerators extends BasicGenerators {
       hint <- Gen.option(nonEmptyInlineMessage)
       fieldType <- Gen.oneOf(FieldType.Input, FieldType.Date, FieldType.Currency)
     } yield {
-      QuestionField(label, hint, Some(InputWidth.Full), fieldType)
+      QuestionField(label, hint, Some(InputWidth.Full), Nil, fieldType)
     }
 
   def singleQuestionGen[A](form: Form[A]): Gen[SingleQuestion[A]] =
