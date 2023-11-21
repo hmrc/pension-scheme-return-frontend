@@ -14,33 +14,31 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.memberpayments
+package controllers.nonsipp.membercontributions
 
 import com.google.inject.Inject
-import config.{Constants, FrontendAppConfig}
 import config.Refined.OneTo300
+import config.{Constants, FrontendAppConfig}
 import controllers.PSRController
-import controllers.actions._
-import eu.timepit.refined.refineV
+import controllers.actions.IdentifyAndRequireData
+import eu.timepit.refined.{refineMV, refineV}
 import forms.YesNoPageFormProvider
-import models.CheckOrChange.Change
 import models.SchemeId.Srn
-import models._
+import models.{Mode, NameDOB, NormalMode, Pagination}
 import navigation.Navigator
 import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
-import pages.nonsipp.memberpayments.TransferReceivedMemberListPage
+import pages.nonsipp.memberpayments.ReportMemberContributionListPage
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import viewmodels.DisplayMessage
 import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
+import viewmodels.implicits._
 import viewmodels.models.{ActionTableViewModel, FormPageViewModel, PaginatedViewModel, TableElem}
 import views.html.TwoColumnsTripleAction
-import viewmodels.implicits._
 
 import javax.inject.Named
 
-class TransferReceivedMemberListController @Inject()(
+class ReportMemberContributionListController @Inject()(
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -50,14 +48,14 @@ class TransferReceivedMemberListController @Inject()(
   formProvider: YesNoPageFormProvider
 ) extends PSRController {
 
-  val form = TransferReceivedMemberListController.form(formProvider)
+  val form = ReportMemberContributionListController.form(formProvider)
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       val memberList = request.userAnswers.membersDetails(srn)
 
       if (memberList.nonEmpty) {
-        val viewModel = TransferReceivedMemberListController
+        val viewModel = ReportMemberContributionListController
           .viewModel(srn, page, mode, memberList)
         Ok(view(form, viewModel))
       } else {
@@ -70,11 +68,11 @@ class TransferReceivedMemberListController @Inject()(
 
     if (memberList.size > Constants.maxSchemeMembers) {
       Redirect(
-        navigator.nextPage(TransferReceivedMemberListPage(srn), mode, request.userAnswers)
+        navigator.nextPage(ReportMemberContributionListPage(srn), mode, request.userAnswers)
       )
     } else {
       val viewModel =
-        TransferReceivedMemberListController.viewModel(srn, page, mode, memberList)
+        ReportMemberContributionListController.viewModel(srn, page, mode, memberList)
 
       form
         .bindFromRequest()
@@ -83,17 +81,17 @@ class TransferReceivedMemberListController @Inject()(
           answer =>
             Redirect(
               navigator
-                .nextPage(TransferReceivedMemberListPage(srn), mode, request.userAnswers)
+                .nextPage(ReportMemberContributionListPage(srn), mode, request.userAnswers)
             )
         )
     }
   }
 }
 
-object TransferReceivedMemberListController {
+object ReportMemberContributionListController {
   def form(formProvider: YesNoPageFormProvider): Form[Boolean] =
     formProvider(
-      "TransferIn.MemberList.radios.error.required"
+      "ReportContribution.MemberList.radios.error.required"
     )
 
   private def rows(
@@ -111,10 +109,15 @@ object TransferReceivedMemberListController {
                 memberName.fullName
               ),
               TableElem(
-                "No transfers in" //TODO We need to complete the "Add" Journey to be able to make this dynamic
+                "No member contributions" //TODO We need to complete the "Add" Journey to be able to make this dynamic
               ),
               TableElem(
-                LinkMessage("Add", controllers.routes.UnauthorisedController.onPageLoad().url) //TODO we need the subsequent page in the Journey to add the right link
+                LinkMessage(
+                  "Add",
+                  controllers.nonsipp.membercontributions.routes.TotalMemberContributionController
+                    .onSubmit(srn, nextIndex, refineMV(1), mode)
+                    .url
+                ) //TODO we need the full journey to check or remove this contribution
               )
             )
         }
@@ -127,30 +130,34 @@ object TransferReceivedMemberListController {
     memberList: List[NameDOB]
   ): FormPageViewModel[ActionTableViewModel] = {
 
-    val title = if (memberList.size == 1) "TransferIn.MemberList.title" else "TransferIn.MemberList.title.plural"
-    val heading = if (memberList.size == 1) "TransferIn.MemberList.heading" else "TransferIn.MemberList.heading.plural"
+    val title =
+      if (memberList.size == 1) "ReportContribution.MemberList.title" else "ReportContribution.MemberList.title.plural"
+    val heading =
+      if (memberList.size == 1) "ReportContribution.MemberList.heading"
+      else "ReportContribution.MemberList.heading.plural"
 
     val pagination = Pagination(
       currentPage = page,
-      pageSize = Constants.transferInListSize,
+      pageSize = Constants.landOrPropertiesSize,
       memberList.size,
-      controllers.nonsipp.memberpayments.routes.TransferReceivedMemberListController.onPageLoad(srn, _, NormalMode)
+      controllers.nonsipp.membercontributions.routes.ReportMemberContributionListController
+        .onPageLoad(srn, _, NormalMode)
     )
 
     FormPageViewModel(
       title = Message(title, memberList.size),
       heading = Message(heading, memberList.size),
-      description = Some(ParagraphMessage("TransferIn.MemberList.paragraph")),
+      description = Some(ParagraphMessage("ReportContribution.MemberList.paragraph")),
       page = ActionTableViewModel(
-        inset = "TransferIn.MemberList.inset",
+        inset = "ReportContribution.MemberList.inset",
         head = Some(List(TableElem("Member Name"), TableElem("Status"))),
         rows = rows(srn, mode, memberList),
-        radioText = Message("TransferIn.MemberList.radios"),
+        radioText = Message("ReportContribution.MemberList.radios"),
         showRadios = memberList.length < 9999999,
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(
-              "TransferIn.MemberList.pagination.label",
+              "ReportContribution.MemberList.pagination.label",
               pagination.pageStart,
               pagination.pageEnd,
               pagination.totalSize
@@ -163,7 +170,7 @@ object TransferReceivedMemberListController {
       buttonText = "site.saveAndContinue",
       details = None,
       onSubmit =
-        controllers.nonsipp.memberpayments.routes.TransferReceivedMemberListController.onSubmit(srn, page, mode)
+        controllers.nonsipp.membercontributions.routes.ReportMemberContributionListController.onSubmit(srn, page, mode)
     )
   }
 }

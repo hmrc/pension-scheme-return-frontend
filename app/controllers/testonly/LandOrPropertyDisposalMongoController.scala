@@ -16,18 +16,25 @@
 
 package controllers.testonly
 
-import cats.implicits._
+import cats.implicits.{toBifunctorOps, toTraverseOps}
 import config.Refined.{Max50, Max5000}
 import controllers.actions.IdentifyAndRequireData
 import eu.timepit.refined._
 import models.SchemeId.Srn
 import models.{RecipientDetails, UserAnswers}
-import pages.nonsipp.landorpropertydisposal.{LandOrPropertyStillHeldPage, OtherBuyerDetailsPage}
+import pages.nonsipp.landorpropertydisposal.{
+  LandOrPropertyDisposalBuyerConnectedPartyPage,
+  LandOrPropertyStillHeldPage,
+  LandPropertyDisposalCompletedPage,
+  OtherBuyerDetailsPage
+}
 import play.api.i18n.I18nSupport
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import queries.Settable
 import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.models.SectionCompleted
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -82,10 +89,17 @@ class LandOrPropertyDisposalMongoController @Inject()(
       indexes <- buildIndexes(num)
       otherBuyer = indexes.map(disposalIndex => OtherBuyerDetailsPage(srn, index, disposalIndex) -> recipientDetails)
       stillHeld = indexes.map(disposalIndex => LandOrPropertyStillHeldPage(srn, index, disposalIndex) -> true)
+      connectedParty = indexes.map(
+        disposalIndex => LandOrPropertyDisposalBuyerConnectedPartyPage(srn, index, disposalIndex) -> true
+      )
+      sectionCompleted = indexes.map(
+        disposalIndex => LandPropertyDisposalCompletedPage(srn, index, disposalIndex) -> SectionCompleted
+      )
       ua1 <- otherBuyer.foldLeft(Try(userAnswers)) {
         case (ua, (page, value)) => ua.flatMap(_.set(page, value))
       }
       ua2 <- stillHeld.foldLeft(Try(ua1)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
-    } yield ua2
-
+      ua3 <- connectedParty.foldLeft(Try(ua2)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
+      ua4 <- sectionCompleted.foldLeft(Try(ua3)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
+    } yield ua4
 }

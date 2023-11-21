@@ -22,7 +22,7 @@ import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.membercontributions.{TotalMemberContributionPage, WhatYouWillNeedMemberContributionsPage}
-import pages.nonsipp.memberpayments.MemberContributionsPage
+import pages.nonsipp.memberpayments.{MemberContributionsPage, ReportMemberContributionListPage}
 import play.api.mvc.Call
 
 object MemberContributionsNavigator extends JourneyNavigator {
@@ -37,8 +37,11 @@ object MemberContributionsNavigator extends JourneyNavigator {
       }
 
     case WhatYouWillNeedMemberContributionsPage(srn) =>
-      controllers.nonsipp.membercontributions.routes.TotalMemberContributionController
-        .onPageLoad(srn, refineMV(1), refineMV(2), NormalMode)
+      controllers.nonsipp.membercontributions.routes.ReportMemberContributionListController
+        .onPageLoad(srn, page = 1, NormalMode)
+
+    case ReportMemberContributionListPage(srn) =>
+      controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
 
     case TotalMemberContributionPage(srn, index, secondaryIndex) =>
       controllers.routes.UnauthorisedController.onPageLoad()

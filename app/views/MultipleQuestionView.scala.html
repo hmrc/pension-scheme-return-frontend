@@ -14,6 +14,9 @@
  * limitations under the License.
  *@
 
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichSelect
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.accessibleautocomplete.AccessibleAutocomplete
+
 @this(
   layout: templates.Layout,
   formHelper: FormWithCSRF,
@@ -22,6 +25,7 @@
   govukDetails: GovukDetails,
   govukInput: GovukInput,
   govukDateInput: GovukDateInput,
+  govukSelect: GovukSelect
 )
 
 @(viewmodel: FormPageViewModel[MultipleQuestionsViewModel[_]])(implicit request: Request[_], messages: Messages)
@@ -48,10 +52,11 @@
 
       @{
           viewmodel.page.fields.zipWithIndex.map {
-            case (field @ QuestionField(_, _, width, FieldType.Input), index) => input(index, width, field)
-            case (field @ QuestionField(_, _, _, FieldType.Currency), index) => currency(index, field)
-            case (field @ QuestionField(_, _, _, FieldType.Percentage), index) => percentage(index, field)
-            case (field @ QuestionField(_, _, _, FieldType.Date), index) => date(index, field)
+            case (field @ QuestionField(_, _, width, _, FieldType.Input), index) => input(index, width, field)
+            case (field @ QuestionField(_, _, _,_, FieldType.Currency), index) => currency(index, field)
+            case (field @ QuestionField(_, _, _, _, FieldType.Percentage), index) => percentage(index, field)
+            case (field @ QuestionField(_, _, _, _, FieldType.Date), index) => date(index, field)
+            case (field @ QuestionField(_, _, _, _, FieldType.Select), index) => select(index, field)
           }
       }
     } else {
@@ -113,4 +118,28 @@
             legend = LegendViewModel(renderMessage(field.label))
         )
     )
+}
+
+@select(index: Int, field: QuestionField) = {
+    @govukSelect(Select(
+        id = s"value_${index + 1}",
+        name = s"value.${index + 1}",
+        attributes = Map("aria-labelledby" -> s"value_${index + 1}", "data-all-countries" -> ""),
+        label = Label(forAttr = Some(s"value_${index + 1}-select"), content = HtmlContent(renderMessage(field.label))),
+        items = Seq(SelectItem(value = Some(""))) ++
+                field.selectSource.map(selectInput =>
+                    SelectItem(
+                        value = Some(selectInput.value),
+                        text = selectInput.label,
+                        selected = viewmodel.page.form(s"value.${index + 1}").value.contains(selectInput.value)
+                    )
+                ),
+        errorMessage = viewmodel.page.form(s"value.${index + 1}").error.map(err => ErrorMessage(content = Text(messages(err.message, err.args:_*)))),
+        classes = s"${field.width.fold[InputWidth](InputWidth.Fixed10)(identity).toString} location-autocomplete"
+    ).asAccessibleAutocomplete(Some(
+        AccessibleAutocomplete(
+            showAllValues = false,
+            autoSelect = true
+        )
+    )).withFormField(viewmodel.page.form(s"value.${index + 1}")))
 }
