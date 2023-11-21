@@ -23,6 +23,7 @@ import models.{CheckMode, CheckOrChange, Mode, Money, NormalMode}
 import models.SchemeId.Srn
 import navigation.Navigator
 import pages.nonsipp.membercontributions.{CYAMemberContributionsPage, TotalMemberContributionPage}
+import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.PsrSubmissionService
@@ -59,16 +60,14 @@ class CYAMemberContributionsController @Inject()(
     identifyAndRequireData(srn) { implicit request =>
       (
         for {
-
           contribution <- request.userAnswers.get(TotalMemberContributionPage(srn, index, secondaryIndex))
-
-          schemeName = request.schemeDetails.schemeName
+          memberName = request.userAnswers.membersDetails(srn)
         } yield Ok(
           view(
             CYAMemberContributionsController.viewModel(
               ViewModelParameters(
                 srn,
-                schemeName,
+                memberName(index.value - 1).fullName,
                 index,
                 secondaryIndex,
                 contribution,
@@ -92,7 +91,7 @@ class CYAMemberContributionsController @Inject()(
 
 case class ViewModelParameters(
   srn: Srn,
-  schemeName: String,
+  memberName: String,
   index: Max300,
   secondaryIndex: Max50,
   unallocatedAmount: Money,
@@ -107,14 +106,14 @@ object CYAMemberContributionsController {
         check = "MemberContributionCYA.heading",
         change = Message(
           "MemberContributionCYA.change.heading",
-          parameters.schemeName
+          parameters.memberName
         )
       ),
       description = None,
       page = CheckYourAnswersViewModel(
         sections(
           parameters.srn,
-          parameters.schemeName,
+          parameters.memberName,
           parameters.index,
           parameters.secondaryIndex,
           parameters.unallocatedAmount,
@@ -129,7 +128,7 @@ object CYAMemberContributionsController {
 
   private def sections(
     srn: Srn,
-    schemeName: String,
+    memberName: String,
     index: Max300,
     secondaryIndex: Max50,
     unallocatedAmount: Money,
@@ -137,7 +136,7 @@ object CYAMemberContributionsController {
   ): List[CheckYourAnswersSection] =
     checkYourAnswerSection(
       srn,
-      schemeName,
+      memberName,
       index,
       secondaryIndex,
       unallocatedAmount,
@@ -146,7 +145,7 @@ object CYAMemberContributionsController {
 
   private def checkYourAnswerSection(
     srn: Srn,
-    schemeName: String,
+    memberName: String,
     index: Max300,
     secondaryIndex: Max50,
     unallocatedAmount: Money,
@@ -157,7 +156,11 @@ object CYAMemberContributionsController {
         None,
         List(
           CheckYourAnswersRowViewModel(
-            Message("MemberContributionCYA.section.memberName", schemeName),
+            Message("MemberContributionCYA.section.memberName.header"),
+            Message(memberName)
+          ),
+          CheckYourAnswersRowViewModel(
+            Message("MemberContributionCYA.section.memberName", memberName),
             Message("MemberContributionCYA.section.amount", unallocatedAmount.displayAs)
           ).withAction(
             SummaryAction(
@@ -165,7 +168,7 @@ object CYAMemberContributionsController {
               controllers.nonsipp.membercontributions.routes.TotalMemberContributionController
                 .onSubmit(srn, index, secondaryIndex, mode)
                 .url
-            ).withVisuallyHiddenContent(Message("MemberContributionCYA.section.hide", schemeName))
+            ).withVisuallyHiddenContent(Message("MemberContributionCYA.section.hide", memberName))
           )
         )
       )

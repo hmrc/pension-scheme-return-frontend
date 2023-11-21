@@ -23,12 +23,14 @@ import models.NormalMode
 import controllers.ControllerBaseSpec
 import forms.MoneyFormProvider
 import pages.nonsipp.membercontributions.TotalMemberContributionPage
+import pages.nonsipp.memberdetails.MemberDetailsPage
 import views.html.MoneyView
 
 class TotalMemberContributionControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[Max300.Refined](1)
   private val secondaryIndex = refineMV[Max50.Refined](1)
+  private val userAnswers = defaultUserAnswers.unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
 
   private lazy val onPageLoad =
     routes.TotalMemberContributionController.onPageLoad(srn, index, secondaryIndex, NormalMode)
@@ -38,13 +40,14 @@ class TotalMemberContributionControllerSpec extends ControllerBaseSpec {
 
   "TotalMemberContributionController" - {
 
-    act.like(renderView(onPageLoad) { implicit app => implicit request =>
+    act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
       injected[MoneyView]
         .apply(
           viewModel(
             srn,
             index,
             secondaryIndex,
+            memberDetails.fullName,
             form(injected[MoneyFormProvider]),
             NormalMode
           )
@@ -52,13 +55,14 @@ class TotalMemberContributionControllerSpec extends ControllerBaseSpec {
     })
 
     act.like(
-      renderPrePopView(onPageLoad, TotalMemberContributionPage(srn, index, secondaryIndex), money) {
+      renderPrePopView(onPageLoad, TotalMemberContributionPage(srn, index, secondaryIndex), money, userAnswers) {
         implicit app => implicit request =>
           injected[MoneyView].apply(
             viewModel(
               srn,
               index,
               secondaryIndex,
+              memberDetails.fullName,
               form(injected[MoneyFormProvider]).fill(money),
               NormalMode
             )
@@ -66,13 +70,13 @@ class TotalMemberContributionControllerSpec extends ControllerBaseSpec {
       }
     )
 
-    act.like(redirectNextPage(onSubmit, "value" -> "1"))
+    act.like(redirectNextPage(onSubmit, userAnswers, "value" -> "1"))
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
     act.like(saveAndContinue(onSubmit, "value" -> "1"))
 
-    act.like(invalidForm(onSubmit))
+    act.like(invalidForm(onSubmit, userAnswers))
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }
 }
