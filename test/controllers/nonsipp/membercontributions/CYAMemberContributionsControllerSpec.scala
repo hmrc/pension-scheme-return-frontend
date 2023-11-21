@@ -22,6 +22,7 @@ import eu.timepit.refined.refineMV
 import models.CheckOrChange
 import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.membercontributions.TotalMemberContributionPage
+import pages.nonsipp.memberdetails.MemberDetailsPage
 import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
 import services.PsrSubmissionService
@@ -48,6 +49,7 @@ class CYAMemberContributionsControllerSpec extends ControllerBaseSpec {
 
   private val filledUserAnswers = defaultUserAnswers
     .unsafeSet(TotalMemberContributionPage(srn, index, secondaryIndex), money)
+    .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
 
   "CYAMemberContributionsController" - {
 
@@ -58,7 +60,7 @@ class CYAMemberContributionsControllerSpec extends ControllerBaseSpec {
             CYAMemberContributionsController.viewModel(
               ViewModelParameters(
                 srn,
-                schemeName,
+                memberDetails.fullName,
                 index,
                 secondaryIndex,
                 money,
