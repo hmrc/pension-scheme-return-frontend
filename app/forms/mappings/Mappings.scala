@@ -17,7 +17,7 @@
 package forms.mappings
 
 import forms.mappings.errors._
-import models.{Crn, DateRange, Enumerable, Money, Percentage, Security, Utr}
+import models.{Crn, DateRange, Enumerable, Money, Percentage, Security, SelectInput, Utr}
 import play.api.data.Forms.{of, optional}
 import play.api.data.validation.{Constraint, Invalid, Valid}
 import play.api.data.{FieldMapping, Mapping}
@@ -192,6 +192,7 @@ trait Mappings extends Formatters with Constraints {
     text(requiredKey, args.toList)
       .verifying(verify[String](invalidKey, s => Utr.isValid(s.toUpperCase), args: _*))
       .transform[Utr](s => Utr(s.toUpperCase), _.utr.toUpperCase)
+
   def crn(requiredKey: String, invalidKey: String, minMaxLengthErrorKey: String, args: Any*): Mapping[Crn] =
     text(requiredKey, args.toList)
       .verifying(verify[String](invalidKey, s => Crn.isValid(s.toUpperCase), args: _*))
@@ -209,6 +210,18 @@ trait Mappings extends Formatters with Constraints {
       .verifying(verify[String](invalidKey, s => Nino.isValid(s.toUpperCase), args: _*))
       .verifying(verify[String](duplicateKey, !duplicates.map(_.nino).contains(_), args: _*))
       .transform[Nino](s => Nino(s.toUpperCase), _.nino.toUpperCase)
+
+  private def country(countryOptions: Seq[SelectInput], errorKey: String): Constraint[String] =
+    Constraint { input =>
+      countryOptions
+        .find(_.value == input)
+        .map(_ => Valid)
+        .getOrElse(Invalid(errorKey))
+    }
+
+  def select(countryOptions: Seq[SelectInput], requiredKey: String, invalidKey: String): Mapping[String] =
+    text(requiredKey)
+      .verifying(country(countryOptions, invalidKey))
 }
 
 object Mappings extends Mappings

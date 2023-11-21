@@ -14,17 +14,12 @@
  * limitations under the License.
  */
 
-package viewmodels.models
+package models
 
-sealed trait FieldType
+import play.api.libs.json.{Format, Json}
 
-object FieldType {
-  case object Input extends FieldType
-  case object Currency extends FieldType
-  case object Date extends FieldType
-  case object Percentage extends FieldType
-  case object Textarea extends FieldType
+case class SelectInput(value: String, label: String)
 
-  case object Security extends FieldType
-  case object Select extends FieldType
+object SelectInput {
+  implicit val format: Format[SelectInput] = Json.format[SelectInput]
 }
