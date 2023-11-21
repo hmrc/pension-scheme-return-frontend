@@ -16,22 +16,26 @@
 
 package controllers.nonsipp.employercontributions
 
+import cats.implicits.toTraverseOps
 import com.google.inject.Inject
 import config.{Constants, FrontendAppConfig}
-import config.Refined.OneTo300
+import config.Refined.{Max300, Max50, OneTo300}
 import controllers.PSRController
 import controllers.actions._
+import controllers.nonsipp.employercontributions.EmployerContributionsMemberListController.viewModel
+import eu.timepit.refined.api.Refined
 import eu.timepit.refined.{refineMV, refineV}
 import forms.YesNoPageFormProvider
 import models.CheckOrChange.Change
 import models.SchemeId.Srn
 import models._
+import models.requests.DataRequest
 import navigation.Navigator
-import pages.nonsipp.employercontributions.EmployerContributionsMemberListPage
+import pages.nonsipp.employercontributions.{EmployerContributionsMemberListPage, TotalEmployerContributionPages}
 import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
 import play.api.data.Form
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import viewmodels.DisplayMessage
 import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
 import viewmodels.models.{ActionTableViewModel, FormPageViewModel, PaginatedViewModel, TableElem}
@@ -55,42 +59,75 @@ class EmployerContributionsMemberListController @Inject()(
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       val memberList = request.userAnswers.membersDetails(srn)
+      val myList: Either[Result, List[MembersAndContributions]] =
+        buildMembersAndContributions(srn, memberList, request.userAnswers)
+      myList.map { memberData =>
+        if (memberData.nonEmpty) {
+          Ok(view(form, viewModel(srn, page = 1, mode, memberData)))
 
-      if (memberList.nonEmpty) {
-        val viewModel = EmployerContributionsMemberListController
-          .viewModel(srn, page, mode, memberList)
-        Ok(view(form, viewModel))
-      } else {
-        Redirect(
-          controllers.nonsipp.employercontributions.routes.EmployerNameController
-            .onSubmit(srn, refineMV(1), refineMV(2), mode)
-        )
-      }
+        } else {
+          Redirect(
+            controllers.nonsipp.employercontributions.routes.EmployerNameController
+              .onSubmit(srn, refineMV(1), refineMV(2), mode)
+          )
+        }
+      }.merge
   }
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     val memberList = request.userAnswers.membersDetails(srn)
-
-    if (memberList.size > Constants.maxSchemeMembers) {
-      Redirect(
-        navigator.nextPage(EmployerContributionsMemberListPage(srn), mode, request.userAnswers)
-      )
-    } else {
-      val viewModel =
-        EmployerContributionsMemberListController.viewModel(srn, page, mode, memberList)
-
-      form
-        .bindFromRequest()
-        .fold(
-          errors => BadRequest(view(errors, viewModel)),
-          answer =>
-            Redirect(
-              navigator
-                .nextPage(EmployerContributionsMemberListPage(srn), mode, request.userAnswers)
-            )
+    val myList: Either[Result, List[MembersAndContributions]] =
+      buildMembersAndContributions(srn, memberList, request.userAnswers)
+    myList.map { memberData =>
+      if (memberData.isEmpty) {
+        Redirect(
+          navigator.nextPage(EmployerContributionsMemberListPage(srn), mode, request.userAnswers)
         )
-    }
+      } else {
+        val viewModel =
+          EmployerContributionsMemberListController.viewModel(srn, page, mode, memberData)
+
+        form
+          .bindFromRequest()
+          .fold(
+            errors => BadRequest(view(errors, viewModel)),
+            answer =>
+              Redirect(
+                navigator
+                  .nextPage(EmployerContributionsMemberListPage(srn), mode, request.userAnswers)
+              )
+          )
+      }
+    }.merge
   }
+
+  private def buildMembersAndContributions(
+    srn: Srn,
+    memberList: List[NameDOB],
+    request: UserAnswers
+  ): Either[Result, List[MembersAndContributions]] =
+    memberList.zipWithIndex.traverse {
+      case (memberName, index) =>
+        refineV[OneTo300](index + 1) match {
+          case Left(_) => Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+          case Right(refinedIndex) => {
+            val res = request.get(TotalEmployerContributionPages(srn, refinedIndex)).map(_.keys.toList)
+            res match {
+
+              case Some(value) => {
+                val maybeContribs = value.traverse(_.toIntOption.map(refineV[Max50.Refined](_))).toList.flatten.sequence
+
+                maybeContribs match {
+                  case Right(value) => Right(MembersAndContributions(refinedIndex, memberName, value))
+                  case Left(_) => Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+                }
+              }
+              case _ => Right(MembersAndContributions(refinedIndex, memberName, Nil))
+            }
+          }
+        }
+    }
+
 }
 
 object EmployerContributionsMemberListController {
@@ -102,37 +139,24 @@ object EmployerContributionsMemberListController {
   private def rows(
     srn: Srn,
     mode: Mode,
-    memberList: List[NameDOB]
+    memberList: List[MembersAndContributions]
   ): List[List[TableElem]] =
-    memberList.zipWithIndex.map {
-      case (memberName, index) =>
-        refineV[OneTo300](index + 1) match {
-          case Left(_) => Nil
-          case Right(nextIndex) =>
-            List(
-              TableElem(
-                memberName.fullName
-              ),
-              TableElem(
-                "No employer contributions" //TODO We need to complete the "Add" Journey to be able to make this dynamic
-              ),
-              TableElem(
-                LinkMessage(
-                  "Add",
-                  controllers.nonsipp.employercontributions.routes.EmployerNameController
-                    .onSubmit(srn, nextIndex, refineMV(1), mode)
-                    .url
-                ) //TODO we need the subsequent page in the Journey to add the right link
-              )
-            )
-        }
+    memberList.map { aMember =>
+      List(
+        TableElem(
+          aMember.data.fullName
+        ),
+        TableElem(
+          "No employer contributions" //TODO We need to complete the "Add" Journey to be able to make this dynamic
+        )
+      ) ++ mutableAction(srn, aMember, mode)
     }
 
   def viewModel(
     srn: Srn,
     page: Int,
     mode: Mode,
-    memberList: List[NameDOB]
+    memberList: List[MembersAndContributions]
   ): FormPageViewModel[ActionTableViewModel] = {
 
     val title =
@@ -180,4 +204,43 @@ object EmployerContributionsMemberListController {
         .onSubmit(srn, page, mode)
     )
   }
+
+  def mutableAction(
+    srn: Srn,
+    member: MembersAndContributions,
+    mode: Mode
+  ): List[TableElem] =
+    if (member.contribs.size > 0) {
+      List(
+        TableElem(
+          LinkMessage(
+            "Change",
+            controllers.routes.UnauthorisedController
+              .onPageLoad()
+              .url //TODO once PSR-375 is done redirect to the PSR-375 page
+          )
+        ),
+        TableElem(
+          LinkMessage(
+            "Remove",
+            controllers.routes.UnauthorisedController.onPageLoad().url //TODO once we got the Remove pageS
+          )
+        )
+      )
+    } else {
+      List(addAction(srn, member.index, mode))
+    }
+
+  def addAction(srn: Srn, nextIndex: Refined[Int, OneTo300], mode: Mode): TableElem =
+    TableElem(
+      LinkMessage(
+        "Add",
+        controllers.nonsipp.employercontributions.routes.EmployerNameController
+          .onSubmit(srn, nextIndex, refineMV(1), mode)
+          .url
+      ) //TODO we need the subsequent page in the Journey to add the right link
+    )
+
 }
+
+case class MembersAndContributions(index: Max300, data: NameDOB, contribs: List[Max50])

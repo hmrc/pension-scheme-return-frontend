@@ -90,7 +90,8 @@ object EmployerContributionsNavigator extends JourneyNavigator {
               .onPageLoad(srn, secondaryIndex, nextIndex, NormalMode)
         }
       } else {
-        controllers.routes.UnauthorisedController.onPageLoad()
+        controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
+          .onPageLoad(srn, 1, NormalMode) //TODO Change this to CYA page
       }
 
   }
