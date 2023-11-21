@@ -94,17 +94,8 @@ object EmployerContributionsNavigator extends JourneyNavigator {
       }
 
     case RemoveEmployerContributionsPage(srn, memberIndex) =>
-      if (userAnswers
-          .get(TotalEmployerContributionPages(srn, memberIndex))
-          .getOrElse(Map.empty[String, Money])
-          .size > 1) {
-        controllers.nonsipp.employercontributions.routes.WhichEmployerContributionRemoveController
-          .onPageLoad(srn, memberIndex)
-      } else {
-        // TODO to list page
-        controllers.routes.UnauthorisedController.onPageLoad()
-      }
-
+      controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
+        .onPageLoad(srn, 1, NormalMode)
   }
 
   override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] = _ => _ => PartialFunction.empty
