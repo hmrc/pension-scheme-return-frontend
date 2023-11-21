@@ -16,13 +16,13 @@
 
 package controllers.nonsipp.membercontributions
 
+import config.Refined.{Max300, Max50}
 import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
 import models.{CheckMode, CheckOrChange, Mode, Money, NormalMode}
 import models.SchemeId.Srn
 import navigation.Navigator
-import pages.nonsipp.membercontributions.CYAMemberContributionsPage
-import pages.nonsipp.memberpayments.UnallocatedEmployerAmountPage
+import pages.nonsipp.membercontributions.{CYAMemberContributionsPage, TotalMemberContributionPage}
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.PsrSubmissionService
@@ -52,13 +52,15 @@ class CYAMemberContributionsController @Inject()(
 
   def onPageLoad(
     srn: Srn,
+    index: Max300,
+    secondaryIndex: Max50,
     checkOrChange: CheckOrChange
   ): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       (
         for {
 
-          unallocatedAmount <- Some(Money(123.4)) //TODO request the ACTUAL amount
+          contribution <- request.userAnswers.get(TotalMemberContributionPage(srn, index, secondaryIndex))
 
           schemeName = request.schemeDetails.schemeName
         } yield Ok(
@@ -67,7 +69,9 @@ class CYAMemberContributionsController @Inject()(
               ViewModelParameters(
                 srn,
                 schemeName,
-                unallocatedAmount,
+                index,
+                secondaryIndex,
+                contribution,
                 checkOrChange
               )
             )
@@ -89,6 +93,8 @@ class CYAMemberContributionsController @Inject()(
 case class ViewModelParameters(
   srn: Srn,
   schemeName: String,
+  index: Max300,
+  secondaryIndex: Max50,
   unallocatedAmount: Money,
   checkOrChange: CheckOrChange
 )
@@ -109,25 +115,31 @@ object CYAMemberContributionsController {
         sections(
           parameters.srn,
           parameters.schemeName,
+          parameters.index,
+          parameters.secondaryIndex,
           parameters.unallocatedAmount,
           CheckMode
         )
       ),
       refresh = None,
       buttonText = parameters.checkOrChange.fold(check = "site.saveAndContinue", change = "site.continue"),
-      onSubmit = controllers.nonsipp.membercontributions.routes.CYAMemberContributionsController
-        .onSubmit(parameters.srn, parameters.checkOrChange)
+      onSubmit = controllers.nonsipp.membercontributions.routes.ReportMemberContributionListController
+        .onPageLoad(parameters.srn, 1, NormalMode)
     )
 
   private def sections(
     srn: Srn,
     schemeName: String,
+    index: Max300,
+    secondaryIndex: Max50,
     unallocatedAmount: Money,
     mode: Mode
   ): List[CheckYourAnswersSection] =
     checkYourAnswerSection(
       srn,
       schemeName,
+      index,
+      secondaryIndex,
       unallocatedAmount,
       mode
     )
@@ -135,6 +147,8 @@ object CYAMemberContributionsController {
   private def checkYourAnswerSection(
     srn: Srn,
     schemeName: String,
+    index: Max300,
+    secondaryIndex: Max50,
     unallocatedAmount: Money,
     mode: Mode
   ): List[CheckYourAnswersSection] =
@@ -148,8 +162,8 @@ object CYAMemberContributionsController {
           ).withAction(
             SummaryAction(
               "site.change",
-              controllers.nonsipp.memberpayments.routes.UnallocatedEmployerAmountController
-                .onSubmit(srn, mode)
+              controllers.nonsipp.membercontributions.routes.TotalMemberContributionController
+                .onSubmit(srn, index, secondaryIndex, mode)
                 .url
             ).withVisuallyHiddenContent(Message("MemberContributionCYA.section.hide", schemeName))
           )

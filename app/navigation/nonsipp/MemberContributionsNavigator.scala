@@ -18,7 +18,7 @@ package navigation.nonsipp
 
 import controllers.nonsipp.memberpayments
 import eu.timepit.refined.refineMV
-import models.{NormalMode, UserAnswers}
+import models.{CheckOrChange, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.membercontributions.{TotalMemberContributionPage, WhatYouWillNeedMemberContributionsPage}
@@ -44,7 +44,9 @@ object MemberContributionsNavigator extends JourneyNavigator {
       controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
 
     case TotalMemberContributionPage(srn, index, secondaryIndex) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+      controllers.nonsipp.membercontributions.routes.CYAMemberContributionsController
+        .onPageLoad(srn, index, secondaryIndex, CheckOrChange.Check)
+
   }
 
   override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] =
@@ -56,5 +58,9 @@ object MemberContributionsNavigator extends JourneyNavigator {
           } else {
             memberpayments.routes.DidSchemeReceiveTransferController.onPageLoad(srn, NormalMode)
           }
+
+        case TotalMemberContributionPage(srn, index, secondaryIndex) =>
+          controllers.nonsipp.membercontributions.routes.CYAMemberContributionsController
+            .onPageLoad(srn, index, secondaryIndex, CheckOrChange.Check)
       }
 }
