@@ -40,6 +40,8 @@ object Constants {
   val loanPageSize = 25
   val landOrPropertiesSize = 25
   val landOrPropertyDisposalsSize = 25
+  val transferInListSize = 25
+  val employerContributionsMemberListSize = 25
 
   val maxLoans = 9999999
   val maxCurrencyValue = 999999999.99
