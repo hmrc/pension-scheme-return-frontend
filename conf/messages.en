@@ -3,6 +3,7 @@ service.title = Managing Pension Schemes
 
 site.back = Back
 site.back.aria-label = Return to previous page
+site.add = Add
 site.remove = Remove
 site.change = Change
 site.no = No
@@ -1554,6 +1555,11 @@ removeEmployerContributions.title = Are you sure you want to remove this employe
 removeEmployerContributions.heading = Are you sure you want to remove the contribution of £{0} by {1} for {2}?
 removeEmployerContributions.error.required = Select yes if you are sure you want to remove this employer contribution
 
+whichEmployerContributionRemove.title = Which employer contribution for this member do you want to remove?
+whichEmployerContributionRemove.heading = Which employer contribution for {0} do you want to remove?
+whichEmployerContributionRemove.radio.label = Contribution of £{0} by {1}
+whichEmployerContributionRemove.error.required = Select the employer contribution you want to remove
+
 employerCompanyCRN.title = Do you know the employer’s Company Registration Number (CRN)?
 employerCompanyCRN.heading = Do you know {0}’s Company Registration Number (CRN)?
 employerCompanyCRN.hint = This is 8 characters, like AB123456. It may also be called ‘company number’ or ‘Companies House number’.
@@ -1685,6 +1691,8 @@ employerContributions.MemberList.inset = You cannot add another member as you ha
 employerContributions.MemberList.radios = Have you finished reporting employer contributions?
 employerContributions.MemberList.pagination.label = Showing {0} - {1} of {2} members
 employerContributions.MemberList.radios.error.required = Select yes if you have finished reporting employer contributions
+employerContributions.MemberList.status.no.contributions = No employer contributions
+employerContributions.MemberList.status.some.contributions = {0} employer contributions
 
 ReportContribution.MemberList.title = Select a member to report member contributions
 ReportContribution.MemberList.title.plural = Select a member to report member contributions

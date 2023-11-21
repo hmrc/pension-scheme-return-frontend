@@ -217,4 +217,18 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
 
   }
 
+  "RemoveEmployerContributionsPage" - {
+    act.like(
+      normalmode
+        .navigateToWithIndex(
+          index,
+          RemoveEmployerContributionsPage,
+          (srn, _: Max300, _) =>
+            controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
+              .onPageLoad(srn, 1, NormalMode)
+        )
+        .withName("go from employer name page to employer type of business page")
+    )
+  }
+
 }

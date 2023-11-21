@@ -27,7 +27,7 @@ import models.CheckOrChange.Change
 import models.SchemeId.Srn
 import models._
 import navigation.Navigator
-import pages.nonsipp.employercontributions.EmployerContributionsMemberListPage
+import pages.nonsipp.employercontributions.{EmployerContributionsMemberListPage, EmployerNamePages}
 import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
 import play.api.data.Form
 import play.api.i18n.MessagesApi
@@ -58,7 +58,7 @@ class EmployerContributionsMemberListController @Inject()(
 
       if (memberList.nonEmpty) {
         val viewModel = EmployerContributionsMemberListController
-          .viewModel(srn, page, mode, memberList)
+          .viewModel(srn, page, mode, memberList, request.userAnswers)
         Ok(view(form, viewModel))
       } else {
         Redirect(
@@ -77,7 +77,7 @@ class EmployerContributionsMemberListController @Inject()(
       )
     } else {
       val viewModel =
-        EmployerContributionsMemberListController.viewModel(srn, page, mode, memberList)
+        EmployerContributionsMemberListController.viewModel(srn, page, mode, memberList, request.userAnswers)
 
       form
         .bindFromRequest()
@@ -102,29 +102,59 @@ object EmployerContributionsMemberListController {
   private def rows(
     srn: Srn,
     mode: Mode,
-    memberList: List[NameDOB]
+    memberList: List[NameDOB],
+    userAnswers: UserAnswers
   ): List[List[TableElem]] =
     memberList.zipWithIndex.map {
       case (memberName, index) =>
         refineV[OneTo300](index + 1) match {
           case Left(_) => Nil
           case Right(nextIndex) =>
-            List(
-              TableElem(
-                memberName.fullName
-              ),
-              TableElem(
-                "No employer contributions" //TODO We need to complete the "Add" Journey to be able to make this dynamic
-              ),
-              TableElem(
-                LinkMessage(
-                  "Add",
-                  controllers.nonsipp.employercontributions.routes.EmployerNameController
-                    .onSubmit(srn, nextIndex, refineMV(1), mode)
-                    .url
-                ) //TODO we need the subsequent page in the Journey to add the right link
+            val contributions = userAnswers.map(EmployerNamePages(srn, nextIndex))
+            if (contributions.isEmpty) {
+              List(
+                TableElem(
+                  memberName.fullName
+                ),
+                TableElem(
+                  Message("employerContributions.MemberList.status.no.contributions")
+                ),
+                TableElem(
+                  LinkMessage(
+                    Message("site.add"),
+                    controllers.nonsipp.employercontributions.routes.EmployerNameController
+                      .onSubmit(srn, nextIndex, refineMV(1), mode)
+                      .url
+                  )
+                ),
+                TableElem("")
               )
-            )
+            } else {
+              List(
+                TableElem(
+                  memberName.fullName
+                ),
+                TableElem(
+                  Message("employerContributions.MemberList.status.some.contributions", contributions.size)
+                ),
+                TableElem(
+                  LinkMessage(
+                    Message("site.change"),
+                    controllers.nonsipp.employercontributions.routes.EmployerNameController
+                      .onSubmit(srn, nextIndex, refineMV(1), mode)
+                      .url
+                  )
+                ),
+                TableElem(
+                  LinkMessage(
+                    Message("site.remove"),
+                    controllers.nonsipp.employercontributions.routes.WhichEmployerContributionRemoveController
+                      .onSubmit(srn, nextIndex)
+                      .url
+                  )
+                )
+              )
+            }
         }
     }
 
@@ -132,9 +162,9 @@ object EmployerContributionsMemberListController {
     srn: Srn,
     page: Int,
     mode: Mode,
-    memberList: List[NameDOB]
+    memberList: List[NameDOB],
+    userAnswers: UserAnswers
   ): FormPageViewModel[ActionTableViewModel] = {
-
     val title =
       if (memberList.size == 1) "employerContributions.MemberList.title"
       else "employerContributions.MemberList.title.plural"
@@ -158,7 +188,7 @@ object EmployerContributionsMemberListController {
       page = ActionTableViewModel(
         inset = "employerContributions.MemberList.inset",
         head = Some(List(TableElem("Member Name"), TableElem("Status"))),
-        rows = rows(srn, mode, memberList),
+        rows = rows(srn, mode, memberList, userAnswers),
         radioText = Message("employerContributions.MemberList.radios"),
         showRadios = memberList.length < 9999999,
         paginatedViewModel = Some(

@@ -158,12 +158,6 @@ POST        /:srn/member-contributions                                          
 GET         /:srn/change-member-contributions                                           controllers.nonsipp.memberpayments.MemberContributionsController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST        /:srn/change-member-contributions                                           controllers.nonsipp.memberpayments.MemberContributionsController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
-GET         /:srn/employer-contributions                                                controllers.nonsipp.memberpayments.EmployerContributionsController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST        /:srn/employer-contributions                                                controllers.nonsipp.memberpayments.EmployerContributionsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-
-GET         /:srn/change-employer-contributions                                         controllers.nonsipp.memberpayments.EmployerContributionsController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST        /:srn/change-employer-contributions                                         controllers.nonsipp.memberpayments.EmployerContributionsController.onSubmit(srn: Srn, mode: Mode = CheckMode)
-
 GET         /:srn/transfer-received                                                     controllers.nonsipp.memberpayments.DidSchemeReceiveTransferController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST        /:srn/transfer-received                                                     controllers.nonsipp.memberpayments.DidSchemeReceiveTransferController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 GET         /:srn/change-transfer-received                                              controllers.nonsipp.memberpayments.DidSchemeReceiveTransferController.onPageLoad(srn: Srn, mode: Mode = CheckMode)

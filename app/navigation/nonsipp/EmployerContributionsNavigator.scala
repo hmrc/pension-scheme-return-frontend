@@ -16,9 +16,9 @@
 
 package navigation.nonsipp
 
-import config.Refined.OneTo50
 import eu.timepit.refined.refineV
-import models.{IdentityType, NormalMode, UserAnswers}
+import config.Refined.OneTo50
+import models.{IdentityType, Money, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.employercontributions._
@@ -93,6 +93,9 @@ object EmployerContributionsNavigator extends JourneyNavigator {
         controllers.routes.UnauthorisedController.onPageLoad()
       }
 
+    case RemoveEmployerContributionsPage(srn, memberIndex) =>
+      controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
+        .onPageLoad(srn, 1, NormalMode)
   }
 
   override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] = _ => _ => PartialFunction.empty

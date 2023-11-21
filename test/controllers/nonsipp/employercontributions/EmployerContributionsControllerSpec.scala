@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.memberpayments
+package controllers.nonsipp.employercontributions
 
 import controllers.ControllerBaseSpec
-import EmployerContributionsController.viewModel
-import controllers.nonsipp.memberpayments.routes
+import controllers.nonsipp.employercontributions.EmployerContributionsController.viewModel
+import controllers.nonsipp.employercontributions.routes
 import forms.YesNoPageFormProvider
 import models.NormalMode
 import pages.nonsipp.memberpayments.EmployerContributionsPage

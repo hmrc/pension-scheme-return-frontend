@@ -46,7 +46,8 @@ class EmployerContributionsMemberListControllerSpec extends ControllerBaseSpec {
           srn,
           page = 1,
           NormalMode,
-          memberList: List[NameDOB]
+          memberList: List[NameDOB],
+          userAnswers
         )
       )
     })
@@ -62,7 +63,8 @@ class EmployerContributionsMemberListControllerSpec extends ControllerBaseSpec {
               srn,
               page = 1,
               NormalMode,
-              memberList: List[NameDOB]
+              memberList: List[NameDOB],
+              userAnswers
             )
           )
     })
