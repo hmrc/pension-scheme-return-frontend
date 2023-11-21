@@ -16,10 +16,9 @@
 
 package navigation.nonsipp
 
-import eu.timepit.refined.refineMV
+import eu.timepit.refined.refineV
 import config.Refined.OneTo50
 import models.{IdentityType, Money, NormalMode, UserAnswers}
-
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.employercontributions._

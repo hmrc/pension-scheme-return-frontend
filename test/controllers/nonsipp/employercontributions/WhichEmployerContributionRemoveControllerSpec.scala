@@ -32,7 +32,8 @@ class WhichEmployerContributionRemoveControllerSpec extends ControllerBaseSpec {
 
   private val memberDetail1: NameDOB = nameDobGen.sample.value
   private val memberDetail2: NameDOB = nameDobGen.sample.value
-  private val memberDetailsMap: Map[Int, (Money, String)] = Map(0 -> (money, employerName), 1 -> (money, employerName + "2"))
+  private val memberDetailsMap: Map[Int, (Money, String)] =
+    Map(0 -> (money, employerName), 1 -> (money, employerName + "2"))
 
   private val userAnswers = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetail1)
