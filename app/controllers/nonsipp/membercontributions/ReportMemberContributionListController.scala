@@ -109,7 +109,7 @@ object ReportMemberContributionListController {
                 memberName.fullName
               ),
               TableElem(
-                "No member contribution" //TODO We need to complete the "Add" Journey to be able to make this dynamic
+                "No member contributions" //TODO We need to complete the "Add" Journey to be able to make this dynamic
               ),
               TableElem(
                 LinkMessage(
@@ -150,7 +150,7 @@ object ReportMemberContributionListController {
       description = Some(ParagraphMessage("ReportContribution.MemberList.paragraph")),
       page = ActionTableViewModel(
         inset = "ReportContribution.MemberList.inset",
-        head = Some(List(TableElem("Member Name"), TableElem("status"))),
+        head = Some(List(TableElem("Member Name"), TableElem("Status"))),
         rows = rows(srn, mode, memberList),
         radioText = Message("ReportContribution.MemberList.radios"),
         showRadios = memberList.length < 9999999,
