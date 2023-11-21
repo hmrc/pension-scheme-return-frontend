@@ -27,6 +27,7 @@ import models.SchemeId.Srn
 import models.{Mode, Money}
 import navigation.Navigator
 import pages.nonsipp.membercontributions.TotalMemberContributionPage
+import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -55,18 +56,24 @@ class TotalMemberContributionController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
+      val memberNames = request.userAnswers.membersDetails(srn)
       val preparedForm =
         request.userAnswers.get(TotalMemberContributionPage(srn, index, secondaryIndex)).fold(form)(form.fill)
-      Ok(view(viewModel(srn, index, secondaryIndex, preparedForm, mode)))
+      Ok(view(viewModel(srn, index, secondaryIndex, memberNames(index.value - 1).fullName, preparedForm, mode)))
     }
 
   def onSubmit(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
+      val memberNames = request.userAnswers.membersDetails(srn)
       form
         .bindFromRequest()
         .fold(
           formWithErrors => {
-            Future.successful(BadRequest(view(viewModel(srn, index, secondaryIndex, formWithErrors, mode))))
+            Future.successful(
+              BadRequest(
+                view(viewModel(srn, index, secondaryIndex, memberNames(index.value - 1).fullName, formWithErrors, mode))
+              )
+            )
           },
           value =>
             for {
@@ -95,12 +102,13 @@ object TotalMemberContributionController {
     srn: Srn,
     index: Max300,
     secondaryIndex: Max50,
+    memberName: String,
     form: Form[Money],
     mode: Mode
   ): FormPageViewModel[SingleQuestion[Money]] =
     FormPageViewModel(
       "totalMemberContribution.title",
-      Message("totalMemberContribution.heading"),
+      Message("totalMemberContribution.heading", memberName),
       SingleQuestion(
         form,
         QuestionField.input(Empty, Some("totalMemberContribution.hint"))

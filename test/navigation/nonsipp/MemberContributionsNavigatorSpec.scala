@@ -18,7 +18,7 @@ package navigation.nonsipp
 
 import config.Refined.{Max300, Max50}
 import eu.timepit.refined.refineMV
-import models.NormalMode
+import models.{CheckOrChange, NormalMode}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.membercontributions.{TotalMemberContributionPage, WhatYouWillNeedMemberContributionsPage}
@@ -77,7 +77,9 @@ class MemberContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviours
           index,
           secondaryIndex,
           TotalMemberContributionPage,
-          (srn, index: Max300, secondaryIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          (srn, index: Max300, secondaryIndex: Max50, _) =>
+            controllers.nonsipp.membercontributions.routes.CYAMemberContributionsController
+              .onPageLoad(srn, index, secondaryIndex, CheckOrChange.Check)
         )
         .withName("go from total member contribution to unauthorised page")
     )

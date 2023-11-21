@@ -1632,7 +1632,7 @@ landPropertyAddressManual.field6.error.required = Enter a country
 landPropertyAddressManual.field6.error.invalid = Country must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
 
 totalMemberContribution.title = What was the total member contribution made by or for this member, in pounds and pence?
-totalMemberContribution.heading = What was the total member contribution made by or for Ainsley Clark, in pounds and pence?
+totalMemberContribution.heading = What was the total member contribution made by or for {0}, in pounds and pence?
 totalMemberContribution.hint = Enter the total member contribution made by or for this member in the period of this return, including both personal and third party contributions.
 totalMemberContribution.error.required = Enter the total amount of the member contribution, in pounds and pence
 totalMemberContribution.error.invalid = Total member contribution must be an amount of money, like 123 or 123.45
@@ -1694,3 +1694,12 @@ ReportContribution.MemberList.paragraph = You must tell us about all member cont
 ReportContribution.MemberList.radios = Have you finished reporting member contributions?
 ReportContribution.MemberList.radios.error.required = Select yes if you have finished reporting member contributions
 ReportContribution.MemberList.pagination.label = Showing {0} - {1} of {2} members
+
+MemberContributionCYA.title = Check your answers
+MemberContributionCYA.change.title = Check your answers
+MemberContributionCYA.heading = Check your answers
+MemberContributionCYA.change.heading = Check your answers
+MemberContributionCYA.section.memberName.header = Member’s name
+MemberContributionCYA.section.memberName = Total member contribution for {0}
+MemberContributionCYA.section.amount = £ {0}
+MemberContributionCYA.section.hide = total member contribution for {0}
