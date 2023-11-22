@@ -1703,7 +1703,7 @@ ReportContribution.MemberList.radios = Have you finished reporting member contri
 ReportContribution.MemberList.radios.error.required = Select yes if you have finished reporting member contributions
 ReportContribution.MemberList.pagination.label = Showing {0} - {1} of {2} members
 
-MemberContributionCYA.title = Check your answers test
+MemberContributionCYA.title = Check your answers
 MemberContributionCYA.change.title = Change details of member contributions
 MemberContributionCYA.heading = Check your answers
 MemberContributionCYA.change.heading = Change details of member contributions for {0}
