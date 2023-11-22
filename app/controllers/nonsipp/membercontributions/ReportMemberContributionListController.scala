@@ -197,7 +197,7 @@ object ReportMemberContributionListController {
             LinkMessage(
               "Change",
               controllers.nonsipp.membercontributions.routes.CYAMemberContributionsController
-                .onPageLoad(srn, nextIndex, refinedIndex, CheckOrChange.Check)
+                .onPageLoad(srn, nextIndex, refinedIndex, CheckOrChange.Change)
                 .url
             )
           ),
