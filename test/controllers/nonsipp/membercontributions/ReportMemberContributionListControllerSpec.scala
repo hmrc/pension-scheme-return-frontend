@@ -43,7 +43,8 @@ class ReportMemberContributionListControllerSpec extends ControllerBaseSpec {
           srn,
           page = 1,
           NormalMode,
-          memberList: List[NameDOB]
+          memberList: List[NameDOB],
+          userAnswers
         )
       )
     })
@@ -59,7 +60,8 @@ class ReportMemberContributionListControllerSpec extends ControllerBaseSpec {
               srn,
               page = 1,
               NormalMode,
-              memberList: List[NameDOB]
+              memberList: List[NameDOB],
+              userAnswers
             )
           )
     })
