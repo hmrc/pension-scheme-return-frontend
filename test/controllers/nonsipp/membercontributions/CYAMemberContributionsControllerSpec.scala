@@ -26,7 +26,8 @@ import pages.nonsipp.memberdetails.MemberDetailsPage
 import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
 import services.PsrSubmissionService
-import views.html.CYAWithRemove
+import views.html.CheckYourAnswersView
+
 class CYAMemberContributionsControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[Max300.Refined](1)
@@ -56,7 +57,7 @@ class CYAMemberContributionsControllerSpec extends ControllerBaseSpec {
     List(CheckOrChange.Check, CheckOrChange.Change).foreach { checkOrChange =>
       act.like(
         renderView(onPageLoad(checkOrChange), filledUserAnswers) { implicit app => implicit request =>
-          injected[CYAWithRemove].apply(
+          injected[CheckYourAnswersView].apply(
             CYAMemberContributionsController.viewModel(
               ViewModelParameters(
                 srn,
