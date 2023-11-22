@@ -94,7 +94,7 @@ case class ViewModelParameters(
   memberName: String,
   index: Max300,
   secondaryIndex: Max50,
-  unallocatedAmount: Money,
+  contributions: Money,
   checkOrChange: CheckOrChange
 )
 object CYAMemberContributionsController {
@@ -116,7 +116,7 @@ object CYAMemberContributionsController {
           parameters.memberName,
           parameters.index,
           parameters.secondaryIndex,
-          parameters.unallocatedAmount,
+          parameters.contributions,
           CheckMode
         )
       ),
