@@ -17,15 +17,17 @@
 package controllers.nonsipp.membercontributions
 
 import com.google.inject.Inject
-import config.Refined.OneTo300
+import config.Refined.{Max50, OneTo300, OneTo50}
 import config.{Constants, FrontendAppConfig}
 import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
+import eu.timepit.refined.api.Refined
 import eu.timepit.refined.{refineMV, refineV}
 import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
-import models.{Mode, NameDOB, NormalMode, Pagination}
+import models.{CheckOrChange, Mode, Money, NameDOB, NormalMode, Pagination, UserAnswers}
 import navigation.Navigator
+import pages.nonsipp.membercontributions.TotalMemberContributionPages
 import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
 import pages.nonsipp.memberpayments.ReportMemberContributionListPage
 import play.api.data.Form
@@ -52,11 +54,12 @@ class ReportMemberContributionListController @Inject()(
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      val memberList = request.userAnswers.membersDetails(srn)
+      val userAnswers = request.userAnswers
+      val memberList = userAnswers.membersDetails(srn)
 
       if (memberList.nonEmpty) {
         val viewModel = ReportMemberContributionListController
-          .viewModel(srn, page, mode, memberList)
+          .viewModel(srn, page, mode, memberList, userAnswers)
         Ok(view(form, viewModel))
       } else {
         Redirect(controllers.routes.UnauthorisedController.onPageLoad())
@@ -64,7 +67,8 @@ class ReportMemberContributionListController @Inject()(
   }
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    val memberList = request.userAnswers.membersDetails(srn)
+    val userAnswers = request.userAnswers
+    val memberList = userAnswers.membersDetails(srn)
 
     if (memberList.size > Constants.maxSchemeMembers) {
       Redirect(
@@ -72,7 +76,7 @@ class ReportMemberContributionListController @Inject()(
       )
     } else {
       val viewModel =
-        ReportMemberContributionListController.viewModel(srn, page, mode, memberList)
+        ReportMemberContributionListController.viewModel(srn, page, mode, memberList, userAnswers)
 
       form
         .bindFromRequest()
@@ -97,29 +101,28 @@ object ReportMemberContributionListController {
   private def rows(
     srn: Srn,
     mode: Mode,
-    memberList: List[NameDOB]
+    memberList: List[NameDOB],
+    userAnswers: UserAnswers
   ): List[List[TableElem]] =
     memberList.zipWithIndex.map {
       case (memberName, index) =>
         refineV[OneTo300](index + 1) match {
           case Left(_) => Nil
           case Right(nextIndex) =>
-            List(
-              TableElem(
-                memberName.fullName
-              ),
-              TableElem(
-                "No member contributions" //TODO We need to complete the "Add" Journey to be able to make this dynamic
-              ),
-              TableElem(
-                LinkMessage(
-                  "Add",
-                  controllers.nonsipp.membercontributions.routes.TotalMemberContributionController
-                    .onSubmit(srn, nextIndex, refineMV(1), mode)
-                    .url
-                ) //TODO we need the full journey to check or remove this contribution
-              )
-            )
+            val contributions = userAnswers.map(TotalMemberContributionPages(srn, nextIndex))
+            if (contributions.nonEmpty) {
+              List(
+                TableElem(
+                  memberName.fullName
+                )
+              ) ++ buildMutableTable(contributions, srn, nextIndex, mode)
+            } else {
+              List(
+                TableElem(
+                  memberName.fullName
+                )
+              ) ++ addOnlyTable(srn, nextIndex, mode)
+            }
         }
     }
 
@@ -127,7 +130,8 @@ object ReportMemberContributionListController {
     srn: Srn,
     page: Int,
     mode: Mode,
-    memberList: List[NameDOB]
+    memberList: List[NameDOB],
+    userAnswers: UserAnswers
   ): FormPageViewModel[ActionTableViewModel] = {
 
     val title =
@@ -151,7 +155,7 @@ object ReportMemberContributionListController {
       page = ActionTableViewModel(
         inset = "ReportContribution.MemberList.inset",
         head = Some(List(TableElem("Member Name"), TableElem("Status"))),
-        rows = rows(srn, mode, memberList),
+        rows = rows(srn, mode, memberList, userAnswers),
         radioText = Message("ReportContribution.MemberList.radios"),
         showRadios = memberList.length < 9999999,
         paginatedViewModel = Some(
@@ -173,4 +177,61 @@ object ReportMemberContributionListController {
         controllers.nonsipp.membercontributions.routes.ReportMemberContributionListController.onSubmit(srn, page, mode)
     )
   }
+
+  def buildMutableTable(
+    contribs: Map[String, Money],
+    srn: Srn,
+    nextIndex: Refined[Int, OneTo300],
+    mode: Mode
+  ): List[TableElem] = {
+
+    val intIndex = contribs.head._1.toInt
+    val index = refineV[OneTo50](intIndex + 1)
+    index match {
+      case Right(refinedIndex) =>
+        List(
+          TableElem(
+            "Member contributions Reported"
+          ),
+          TableElem(
+            LinkMessage(
+              "Change",
+              controllers.nonsipp.membercontributions.routes.CYAMemberContributionsController
+                .onPageLoad(srn, nextIndex, refinedIndex, CheckOrChange.Change)
+                .url
+            )
+          ),
+          TableElem(
+            LinkMessage(
+              "Remove",
+              controllers.routes.UnauthorisedController
+                .onPageLoad()
+                .url //TODO Once the Remove page is ready change this link
+            )
+          )
+        )
+      case Left(_) =>
+        addOnlyTable(srn, nextIndex, mode)
+    }
+  }
+
+  private def addOnlyTable(
+    srn: Srn,
+    nextIndex: Refined[Int, OneTo300],
+    mode: Mode
+  ): List[TableElem] =
+    List(
+      TableElem(
+        "No member contributions"
+      ),
+      TableElem(
+        LinkMessage(
+          "Add",
+          controllers.nonsipp.membercontributions.routes.TotalMemberContributionController
+            .onSubmit(srn, nextIndex, refineMV(1), mode)
+            .url
+        )
+      ),
+      TableElem("")
+    )
 }

@@ -36,7 +36,7 @@ import viewmodels.models.{
   FormPageViewModel,
   SummaryAction
 }
-import views.html.CYAWithRemove
+import views.html.CheckYourAnswersView
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.ExecutionContext
@@ -47,7 +47,7 @@ class CYAMemberContributionsController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   psrSubmissionService: PsrSubmissionService,
-  view: CYAWithRemove
+  view: CheckYourAnswersView
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
@@ -94,7 +94,7 @@ case class ViewModelParameters(
   memberName: String,
   index: Max300,
   secondaryIndex: Max50,
-  unallocatedAmount: Money,
+  contributions: Money,
   checkOrChange: CheckOrChange
 )
 object CYAMemberContributionsController {
@@ -116,7 +116,7 @@ object CYAMemberContributionsController {
           parameters.memberName,
           parameters.index,
           parameters.secondaryIndex,
-          parameters.unallocatedAmount,
+          parameters.contributions,
           CheckMode
         )
       ),
