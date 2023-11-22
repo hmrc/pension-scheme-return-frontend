@@ -231,6 +231,7 @@ object ReportMemberContributionListController {
             .onSubmit(srn, nextIndex, refineMV(1), mode)
             .url
         )
-      )
+      ),
+      TableElem("")
     )
 }
