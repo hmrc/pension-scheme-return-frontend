@@ -128,11 +128,11 @@ object TaskListController {
 
             if (checkReturnDates.isEmpty) {
               controllers.nonsipp.routes.CheckReturnDatesController.onPageLoad(srn, NormalMode).url
-            } else if (checkReturnDates.get == false && accountingPeriods.isEmpty) {
+            } else if (!checkReturnDates.get && accountingPeriods.isEmpty) {
               controllers.nonsipp.routes.CheckReturnDatesController.onPageLoad(srn, NormalMode).url
             } else if (activeBankAccount.isEmpty) {
               controllers.nonsipp.schemedesignatory.routes.ActiveBankAccountController.onPageLoad(srn, NormalMode).url
-            } else if (activeBankAccount.get == false && whyNoBankAccountPage.isEmpty) {
+            } else if (!activeBankAccount.get && whyNoBankAccountPage.isEmpty) {
               controllers.nonsipp.schemedesignatory.routes.WhyNoBankAccountController.onPageLoad(srn, NormalMode).url
             } else {
               controllers.nonsipp.schemedesignatory.routes.HowManyMembersController.onPageLoad(srn, NormalMode).url
@@ -499,7 +499,7 @@ object TaskListController {
     pensionSchemeId: PensionSchemeId
   ): PageViewModel[TaskListViewModel] = {
 
-    val viewmodel = TaskListViewModel(
+    val viewModel = TaskListViewModel(
       schemeDetailsSection(srn, schemeName, userAnswers, pensionSchemeId),
       membersSection(srn, schemeName, userAnswers),
       memberPaymentsSection(srn),
@@ -511,14 +511,14 @@ object TaskListController {
       declarationSection
     )
 
-    val items = viewmodel.sections.toList.flatMap(_.items.fold(_ => Nil, _.toList))
+    val items = viewModel.sections.toList.flatMap(_.items.fold(_ => Nil, _.toList))
     val completed = items.count(_.status == Completed)
     val total = items.length
 
     PageViewModel(
       Message("nonsipp.tasklist.title", startDate.show, endDate.show),
       Message("nonsipp.tasklist.heading", startDate.show, endDate.show),
-      viewmodel
+      viewModel
     ).withDescription(
       Heading2("nonsipp.tasklist.subheading") ++
         ParagraphMessage(Message("nonsipp.tasklist.description", completed, total))

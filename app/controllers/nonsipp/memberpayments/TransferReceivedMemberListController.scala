@@ -17,13 +17,12 @@
 package controllers.nonsipp.memberpayments
 
 import com.google.inject.Inject
-import config.{Constants, FrontendAppConfig}
 import config.Refined.OneTo300
+import config.{Constants, FrontendAppConfig}
 import controllers.PSRController
 import controllers.actions._
 import eu.timepit.refined.refineV
 import forms.YesNoPageFormProvider
-import models.CheckOrChange.Change
 import models.SchemeId.Srn
 import models._
 import navigation.Navigator
@@ -32,11 +31,10 @@ import pages.nonsipp.memberpayments.TransferReceivedMemberListPage
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import viewmodels.DisplayMessage
 import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
+import viewmodels.implicits._
 import viewmodels.models.{ActionTableViewModel, FormPageViewModel, PaginatedViewModel, TableElem}
 import views.html.TwoColumnsTripleAction
-import viewmodels.implicits._
 
 import javax.inject.Named
 

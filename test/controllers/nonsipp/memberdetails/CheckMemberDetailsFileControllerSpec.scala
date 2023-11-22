@@ -66,7 +66,7 @@ class CheckMemberDetailsFileControllerSpec extends ControllerBaseSpec {
     reset(mockAuditService)
     mockStream()
     mockSaveValidatedUpload()
-    mockValidateCSV(UploadFormatError, 0, 0L)
+    mockValidateCSV((UploadFormatError, 0, 0L))
   }
 
   "CheckMemberDetailsFileController" - {

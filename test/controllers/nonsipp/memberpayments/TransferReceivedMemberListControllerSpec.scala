@@ -24,10 +24,7 @@ import models.{NameDOB, NormalMode}
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
 import pages.nonsipp.memberpayments.TransferReceivedMemberListPage
-import play.api.libs.json.JsPath
 import views.html.TwoColumnsTripleAction
-
-import java.time.LocalDate
 
 class TransferReceivedMemberListControllerSpec extends ControllerBaseSpec {
 

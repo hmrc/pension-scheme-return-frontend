@@ -57,7 +57,7 @@ case class IdentityTypePage(srn: Srn, index: Max5000, identitySubject: IdentityS
   private def pagesSecondPart(srn: Srn): List[Removable[_]] =
     this.identitySubject match {
       case IdentitySubject.LoanRecipient =>
-        List(
+        val list = List(
           DatePeriodLoanPage(srn, index),
           AmountOfTheLoanPage(srn, index),
           AreRepaymentsInstalmentsPage(srn, index),
@@ -65,6 +65,8 @@ case class IdentityTypePage(srn: Srn, index: Max5000, identitySubject: IdentityS
           OutstandingArrearsOnLoanPage(srn, index),
           SecurityGivenForLoanPage(srn, index)
         )
+        if (index.value == 1) list :+ LoansMadeOrOutstandingPage(srn) else list
+
       case IdentitySubject.LandOrPropertySeller =>
         List().empty
     }
@@ -85,6 +87,7 @@ case class IdentityTypePage(srn: Srn, index: Max5000, identitySubject: IdentityS
           PartnershipRecipientNamePage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
           RecipientSponsoringEmployerConnectedPartyPage(srn, index)
         )
+
       case IdentitySubject.LandOrPropertySeller =>
         List(
           LandPropertyIndividualSellersNamePage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject

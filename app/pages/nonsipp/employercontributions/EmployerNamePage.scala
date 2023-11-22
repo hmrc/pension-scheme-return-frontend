@@ -20,6 +20,7 @@ import config.Refined.{Max300, Max50}
 import models.SchemeId.Srn
 import models.UserAnswers
 import pages.QuestionPage
+import pages.nonsipp.memberpayments.EmployerContributionsPage
 import play.api.libs.json.JsPath
 import queries.Removable
 import utils.PageUtils.removePages
@@ -41,14 +42,18 @@ case class EmployerNamePage(srn: Srn, memberIndex: Max300, index: Max50) extends
       case _ => Try(userAnswers)
     }
 
-  private def pages(srn: Srn): List[Removable[_]] = List(
-    EmployerTypeOfBusinessPage(srn, memberIndex, index),
-    TotalEmployerContributionPage(srn, memberIndex, index),
-    EmployerCompanyCrnPage(srn, memberIndex, index),
-    PartnershipEmployerUtrPage(srn, memberIndex, index),
-    OtherEmployeeDescriptionPage(srn, memberIndex, index),
-    ContributionsFromAnotherEmployerPage(srn, memberIndex, index)
-  )
+  private def pages(srn: Srn): List[Removable[_]] = {
+
+    val list = List(
+      EmployerTypeOfBusinessPage(srn, memberIndex, index),
+      TotalEmployerContributionPage(srn, memberIndex, index),
+      EmployerCompanyCrnPage(srn, memberIndex, index),
+      PartnershipEmployerUtrPage(srn, memberIndex, index),
+      OtherEmployeeDescriptionPage(srn, memberIndex, index),
+      ContributionsFromAnotherEmployerPage(srn, memberIndex, index)
+    )
+    if (index.value == 1) list :+ EmployerContributionsPage(srn) else list
+  }
 
 }
 

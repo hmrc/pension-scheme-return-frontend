@@ -17,7 +17,6 @@
 package navigation.nonsipp
 
 import controllers.nonsipp.memberpayments
-import eu.timepit.refined.refineMV
 import models.{CheckOrChange, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page

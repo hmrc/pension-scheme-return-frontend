@@ -26,8 +26,6 @@ import pages.nonsipp.memberdetails.MemberDetailsPage
 import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
 import views.html.TwoColumnsTripleAction
 
-import java.time.LocalDate
-
 class EmployerContributionsMemberListControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoad = routes.EmployerContributionsMemberListController.onPageLoad(srn, page = 1, NormalMode)

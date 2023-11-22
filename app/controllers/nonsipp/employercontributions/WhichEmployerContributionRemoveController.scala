@@ -23,10 +23,10 @@ import config.Refined._
 import controllers.PSRController
 import controllers.actions._
 import controllers.nonsipp.employercontributions.WhichEmployerContributionRemoveController._
-import eu.timepit.refined.{refineMV, refineV}
+import eu.timepit.refined.refineV
 import forms.RadioListFormProvider
-import models.SchemeId.Srn
 import models.Money
+import models.SchemeId.Srn
 import navigation.Navigator
 import pages.nonsipp.employercontributions.{EmployerNamePages, TotalEmployerContributionPages}
 import pages.nonsipp.memberdetails.MemberDetailsPage

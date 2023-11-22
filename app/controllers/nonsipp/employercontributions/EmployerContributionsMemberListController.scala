@@ -17,13 +17,12 @@
 package controllers.nonsipp.employercontributions
 
 import com.google.inject.Inject
-import config.{Constants, FrontendAppConfig}
+import config.Constants
 import config.Refined.OneTo300
 import controllers.PSRController
 import controllers.actions._
 import eu.timepit.refined.{refineMV, refineV}
 import forms.YesNoPageFormProvider
-import models.CheckOrChange.Change
 import models.SchemeId.Srn
 import models._
 import navigation.Navigator
@@ -32,11 +31,10 @@ import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import viewmodels.DisplayMessage
 import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
+import viewmodels.implicits._
 import viewmodels.models.{ActionTableViewModel, FormPageViewModel, PaginatedViewModel, TableElem}
 import views.html.TwoColumnsTripleAction
-import viewmodels.implicits._
 
 import javax.inject.Named
 
@@ -44,7 +42,6 @@ class EmployerContributionsMemberListController @Inject()(
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
-  appConfig: FrontendAppConfig,
   val controllerComponents: MessagesControllerComponents,
   view: TwoColumnsTripleAction,
   formProvider: YesNoPageFormProvider
@@ -83,7 +80,7 @@ class EmployerContributionsMemberListController @Inject()(
         .bindFromRequest()
         .fold(
           errors => BadRequest(view(errors, viewModel)),
-          answer =>
+          _ =>
             Redirect(
               navigator
                 .nextPage(EmployerContributionsMemberListPage(srn), mode, request.userAnswers)
