@@ -17,7 +17,7 @@
 package controllers.nonsipp.membercontributions
 
 import com.google.inject.Inject
-import config.Refined.{Max50, OneTo300}
+import config.Refined.{Max50, OneTo300, OneTo50}
 import config.{Constants, FrontendAppConfig}
 import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
@@ -25,7 +25,7 @@ import eu.timepit.refined.api.Refined
 import eu.timepit.refined.{refineMV, refineV}
 import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
-import models.{Mode, Money, NameDOB, NormalMode, Pagination, UserAnswers}
+import models.{CheckOrChange, Mode, Money, NameDOB, NormalMode, Pagination, UserAnswers}
 import navigation.Navigator
 import pages.nonsipp.membercontributions.TotalMemberContributionPages
 import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
@@ -120,19 +120,8 @@ object ReportMemberContributionListController {
               List(
                 TableElem(
                   memberName.fullName
-                ),
-                TableElem(
-                  "No member contributions"
-                ),
-                TableElem(
-                  LinkMessage(
-                    "Add",
-                    controllers.nonsipp.membercontributions.routes.TotalMemberContributionController
-                      .onSubmit(srn, nextIndex, refineMV(1), mode)
-                      .url
-                  )
                 )
-              )
+              ) ++ addOnlyTable(srn, nextIndex, mode)
             }
         }
     }
@@ -194,25 +183,53 @@ object ReportMemberContributionListController {
     srn: Srn,
     nextIndex: Refined[Int, OneTo300],
     mode: Mode
+  ): List[TableElem] = {
+
+    val intIndex = contribs.head._1.toInt
+    val index = refineV[OneTo50](intIndex + 1)
+    index match {
+      case Right(refinedIndex) =>
+        List(
+          TableElem(
+            "Member contributions Reported"
+          ),
+          TableElem(
+            LinkMessage(
+              "Change",
+              controllers.nonsipp.membercontributions.routes.CYAMemberContributionsController
+                .onPageLoad(srn, nextIndex, refinedIndex, CheckOrChange.Check)
+                .url
+            )
+          ),
+          TableElem(
+            LinkMessage(
+              "Remove",
+              controllers.routes.UnauthorisedController
+                .onPageLoad()
+                .url //TODO Once the Remove page is ready change this link
+            )
+          )
+        )
+      case Left(_) =>
+        addOnlyTable(srn, nextIndex, mode)
+    }
+  }
+
+  private def addOnlyTable(
+    srn: Srn,
+    nextIndex: Refined[Int, OneTo300],
+    mode: Mode
   ): List[TableElem] =
     List(
       TableElem(
-        "Member contributions Reported"
+        "No member contributions"
       ),
       TableElem(
         LinkMessage(
-          "Change",
-          controllers.routes.UnauthorisedController
-            .onPageLoad()
-            .url //TODO Once the Remove page is ready change this link
-        )
-      ),
-      TableElem(
-        LinkMessage(
-          "Remove",
-          controllers.routes.UnauthorisedController
-            .onPageLoad()
-            .url //TODO Once the Remove page is ready change this link
+          "Add",
+          controllers.nonsipp.membercontributions.routes.TotalMemberContributionController
+            .onSubmit(srn, nextIndex, refineMV(1), mode)
+            .url
         )
       )
     )
