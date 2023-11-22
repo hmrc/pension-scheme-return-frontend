@@ -22,7 +22,9 @@ import viewmodels.DisplayMessage.Message
 
 case class CheckYourAnswersViewModel(
   sections: List[CheckYourAnswersSection],
-  marginBottom: Option[Int] = None
+  marginBottom: Option[Int] = None,
+  inset: Option[DisplayMessage] = None,
+  paginatedViewModel: Option[PaginatedViewModel] = None
 ) {
   def withMarginBottom(margin: Int): CheckYourAnswersViewModel = copy(marginBottom = Some(margin))
 }

@@ -20,6 +20,8 @@
         layout: templates.Layout,
         formHelper: FormWithCSRF,
         govukSummaryList: GovukSummaryList,
+        govukInsetText: GovukInsetText,
+        govukPagination: GovukPagination,
         govukButton: GovukButton,
 )
 
@@ -29,22 +31,37 @@
 
         <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
 
-        @viewmodel.page.sections.map { section =>
-            @section.heading.map(renderMessage)
-            @govukSummaryList(
-                SummaryListViewModel(
-                    section.rows.map { row =>
-                        SummaryListRowViewModel(
-                            key = if(row.oneHalfWidth) KeyViewModel(row.key.toMessage).withOneHalfWidth() else KeyViewModel(row.key.toMessage),
-                            value = ValueViewModel(renderMessage(row.value)),
-                            actions = row.actions.map { a =>
-                                ActionItemViewModel(Text(a.content.toMessage), a.href)
-                                        .withVisuallyHiddenText(a.visuallyHiddenContent.toMessage)
-                            }
-                        )
-                    }
-                ).withMarginBottom(viewmodel.page.marginBottom)
-            )
+        @defining(viewmodel.page.paginatedViewModel.fold(viewmodel.page.sections)(paginatedViewModel =>
+            viewmodel.page.sections.paginate(paginatedViewModel.pagination.currentPage, paginatedViewModel.pagination.pageSize))
+        ) { sections =>
+            @sections.map { section =>
+                @section.heading.map(renderMessage)
+                @govukSummaryList(
+                    SummaryListViewModel(
+                        section.rows.map { row =>
+                            SummaryListRowViewModel(
+                                key = if(row.oneHalfWidth) KeyViewModel(row.key.toMessage).withOneHalfWidth() else KeyViewModel(row.key.toMessage),
+                                value = ValueViewModel(renderMessage(row.value)),
+                                actions = row.actions.map { a =>
+                                    ActionItemViewModel(Text(a.content.toMessage), a.href)
+                                            .withVisuallyHiddenText(a.visuallyHiddenContent.toMessage)
+                                }
+                            )
+                        }
+                    ).withMarginBottom(viewmodel.page.marginBottom)
+                )
+            }
+        }
+
+        @viewmodel.page.inset.map { inset =>
+            @govukInsetText(InsetTextViewModel(renderMessage(inset)))
+        }
+
+        @viewmodel.page.paginatedViewModel.map{ paginatedViewModel =>
+            @if(paginatedViewModel.pagination.totalPages > 1) {
+                <p id="pagination-label" class="govuk-body">@{renderMessage(paginatedViewModel.label)}</p>
+            }
+            @govukPagination(PaginationViewModel(paginatedViewModel.pagination))
         }
 
         @formHelper(action = viewmodel.onSubmit, Symbol("autocomplete") -> "off") {

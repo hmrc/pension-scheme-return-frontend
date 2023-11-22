@@ -90,7 +90,7 @@ class EmployerTypeOfBusinessController @Inject()(
             } yield Redirect(
               navigator.nextPage(
                 EmployerTypeOfBusinessPage(srn, memberIndex, index),
-                NormalMode,
+                mode,
                 updatedAnswers
               )
             )

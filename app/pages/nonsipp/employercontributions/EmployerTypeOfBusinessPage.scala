@@ -17,11 +17,13 @@
 package pages.nonsipp.employercontributions
 
 import config.Refined.{Max300, Max50}
-import models.IdentityType
+import models.{IdentityType, UserAnswers}
 import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
+
+import scala.util.Try
 
 case class EmployerTypeOfBusinessPage(srn: Srn, memberIndex: Max300, index: Max50) extends QuestionPage[IdentityType] {
 
@@ -29,4 +31,18 @@ case class EmployerTypeOfBusinessPage(srn: Srn, memberIndex: Max300, index: Max5
     Paths.memberEmpContribution \ toString \ memberIndex.arrayIndex.toString \ index.arrayIndex.toString
 
   override def toString: String = "orgType"
+
+  override def cleanup(value: Option[IdentityType], userAnswers: UserAnswers): Try[UserAnswers] =
+    (value, userAnswers.get(this)) match {
+      case (None, _) => Try(userAnswers) // delete handled by cleanup in EmployerNamePage
+      case (Some(_), None) => Try(userAnswers) // new value no need to delete anything
+      case (Some(IdentityType.UKCompany), Some(IdentityType.UKCompany)) => Try(userAnswers)
+      case (Some(IdentityType.UKPartnership), Some(IdentityType.UKPartnership)) => Try(userAnswers)
+      case (Some(IdentityType.Other), Some(IdentityType.Other)) => Try(userAnswers)
+      case _ =>
+        userAnswers
+          .remove(EmployerCompanyCrnPage(srn, memberIndex, index))
+          .flatMap(_.remove(PartnershipEmployerUtrPage(srn, memberIndex, index)))
+          .flatMap(_.remove(OtherEmployeeDescriptionPage(srn, memberIndex, index)))
+    }
 }

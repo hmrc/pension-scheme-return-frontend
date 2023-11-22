@@ -210,7 +210,9 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
           index,
           secondaryIndex,
           ContributionsFromAnotherEmployerPage,
-          (srn, index: Max300, secondaryIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          (srn, index: Max300, _: Max50, _) =>
+            controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
+              .onPageLoad(srn, index, page = 1, NormalMode)
         )
         .withName("go from contribution from another employer page to unauthorised page")
     )
@@ -231,4 +233,16 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
     )
   }
 
+  "EmployerContributionsCYAPage" - {
+    act.like(
+      normalmode
+        .navigateTo(
+          EmployerContributionsCYAPage,
+          (srn, _) =>
+            controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
+              .onPageLoad(srn, page = 1, NormalMode)
+        )
+        .withName("go from EmployerContributionsCYAPage to ??? page")
+    )
+  }
 }

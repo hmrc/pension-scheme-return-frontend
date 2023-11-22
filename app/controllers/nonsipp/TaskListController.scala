@@ -28,6 +28,7 @@ import models.ConditionalYesNo._
 import pages.nonsipp.CheckReturnDatesPage
 import pages.nonsipp.accountingperiod.AccountingPeriods
 import pages.nonsipp.common.IdentityTypes
+import pages.nonsipp.employercontributions.EmployerContributionsSectionStatus
 import pages.nonsipp.loansmadeoroutstanding.{
   IsIndividualRecipientConnectedPartyPages,
   OutstandingArrearsOnLoanPages,
@@ -45,7 +46,14 @@ import utils.nonsipp.TaskListStatusUtils._
 import viewmodels.DisplayMessage.{Heading2, LinkMessage, Message, ParagraphMessage}
 import viewmodels.implicits._
 import viewmodels.models.TaskListStatus.{Completed, InProgress, NotStarted, TaskListStatus, UnableToStart}
-import viewmodels.models.{PageViewModel, TaskListItemViewModel, TaskListSectionViewModel, TaskListViewModel}
+import viewmodels.models.{
+  PageViewModel,
+  SectionStatus,
+  TaskListItemViewModel,
+  TaskListSectionViewModel,
+  TaskListStatus,
+  TaskListViewModel
+}
 import views.html.TaskListView
 
 import java.time.LocalDate
@@ -282,19 +290,32 @@ object TaskListController {
     }
   }
 
-  private def memberPaymentsSection(srn: Srn) = {
+  private def memberPaymentsSection(srn: Srn, userAnswers: UserAnswers): TaskListSectionViewModel = {
     val prefix = "nonsipp.tasklist.memberpayments"
+
+    // change to check if members section is complete to start
+    val employerContributionStatus: TaskListStatus =
+      userAnswers
+        .get(EmployerContributionsSectionStatus(srn))
+        .fold[TaskListStatus](TaskListStatus.NotStarted) {
+          case SectionStatus.InProgress => TaskListStatus.InProgress
+          case SectionStatus.Completed => TaskListStatus.Completed
+        }
 
     TaskListSectionViewModel(
       s"$prefix.title",
       TaskListItemViewModel(
         LinkMessage(
-          messageKey(prefix, "employercontributions.title", UnableToStart),
-          controllers.nonsipp.employercontributions.routes.EmployerContributionsController
-            .onPageLoad(srn, NormalMode)
-            .url
+          messageKey(prefix, "employercontributions.title", employerContributionStatus),
+          employerContributionStatus match {
+            // change so Completed goes to member list page
+            case _ =>
+              controllers.nonsipp.employercontributions.routes.EmployerContributionsController
+                .onPageLoad(srn, NormalMode)
+                .url
+          }
         ),
-        NotStarted
+        employerContributionStatus
       ),
       TaskListItemViewModel(
         LinkMessage(
@@ -502,7 +523,7 @@ object TaskListController {
     val viewModel = TaskListViewModel(
       schemeDetailsSection(srn, schemeName, userAnswers, pensionSchemeId),
       membersSection(srn, schemeName, userAnswers),
-      memberPaymentsSection(srn),
+      memberPaymentsSection(srn, userAnswers),
       loansSection(srn, schemeName, userAnswers),
       sharesSection(srn),
       landOrPropertySection(srn, userAnswers),

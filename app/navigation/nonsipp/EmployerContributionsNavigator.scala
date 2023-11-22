@@ -17,8 +17,8 @@
 package navigation.nonsipp
 
 import config.Refined.OneTo50
-import eu.timepit.refined.refineV
-import models.{IdentityType, NormalMode, UserAnswers}
+import models._
+import eu.timepit.refined._
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.employercontributions._
@@ -80,23 +80,87 @@ object EmployerContributionsNavigator extends JourneyNavigator {
       controllers.nonsipp.employercontributions.routes.ContributionsFromAnotherEmployerController
         .onPageLoad(srn, index, secondaryIndex, NormalMode)
 
-    case page @ ContributionsFromAnotherEmployerPage(srn, secondaryIndex, index) =>
+    case page @ ContributionsFromAnotherEmployerPage(srn, index, secondaryIndex) =>
       if (userAnswers.get(page).contains(true)) {
-        val nextDataKey = index.value
-        refineV[OneTo50](nextDataKey + 1) match {
+        refineV[OneTo50](secondaryIndex.value + 1) match {
           case Left(_) => controllers.routes.UnauthorisedController.onPageLoad()
           case Right(nextIndex) =>
             controllers.nonsipp.employercontributions.routes.EmployerNameController
-              .onPageLoad(srn, secondaryIndex, nextIndex, NormalMode)
+              .onPageLoad(srn, index, nextIndex, NormalMode)
         }
       } else {
-        controllers.routes.UnauthorisedController.onPageLoad()
+        controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
+          .onPageLoad(srn, index, 1, NormalMode)
       }
 
     case RemoveEmployerContributionsPage(srn, memberIndex) =>
       controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
         .onPageLoad(srn, 1, NormalMode)
+
+    case EmployerContributionsCYAPage(srn) =>
+      controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
+        .onPageLoad(srn, 1, NormalMode)
   }
 
-  override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] = _ => _ => PartialFunction.empty
+  override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] =
+    oldUserAnswers =>
+      userAnswers => {
+
+        case EmployerNamePage(srn, index, _) =>
+          controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
+            .onPageLoad(srn, index, 1, NormalMode)
+
+        case EmployerTypeOfBusinessPage(srn, index, secondaryIndex) =>
+          (
+            oldUserAnswers.get(EmployerTypeOfBusinessPage(srn, index, secondaryIndex)),
+            userAnswers.get(EmployerTypeOfBusinessPage(srn, index, secondaryIndex))
+          ) match {
+
+            // same answer
+            case (Some(IdentityType.UKCompany), Some(IdentityType.UKCompany)) =>
+              controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
+                .onPageLoad(srn, index, 1, NormalMode)
+
+            case (Some(IdentityType.UKPartnership), Some(IdentityType.UKPartnership)) =>
+              controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
+                .onPageLoad(srn, index, 1, NormalMode)
+
+            case (Some(IdentityType.Other), Some(IdentityType.Other)) =>
+              controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
+                .onPageLoad(srn, index, 1, NormalMode)
+
+            // different answer
+            case (_, Some(IdentityType.UKCompany)) =>
+              controllers.nonsipp.employercontributions.routes.EmployerCompanyCrnController
+                .onPageLoad(srn, index, secondaryIndex, CheckMode)
+
+            case (_, Some(IdentityType.UKPartnership)) =>
+              controllers.nonsipp.employercontributions.routes.PartnershipEmployerUtrController
+                .onPageLoad(srn, index, secondaryIndex, CheckMode)
+
+            case (_, Some(IdentityType.Other)) =>
+              controllers.nonsipp.employercontributions.routes.OtherEmployeeDescriptionController
+                .onPageLoad(srn, index, secondaryIndex, CheckMode)
+          }
+
+        case EmployerCompanyCrnPage(srn, index, _) =>
+          controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
+            .onPageLoad(srn, index, 1, NormalMode)
+
+        case PartnershipEmployerUtrPage(srn, index, _) =>
+          controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
+            .onPageLoad(srn, index, 1, NormalMode)
+
+        case OtherEmployeeDescriptionPage(srn, index, _) =>
+          controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
+            .onPageLoad(srn, index, 1, NormalMode)
+
+        case TotalEmployerContributionPage(srn, index, secondaryIndex) =>
+          controllers.nonsipp.employercontributions.routes.ContributionsFromAnotherEmployerController
+            .onPageLoad(srn, index, secondaryIndex, NormalMode)
+
+        case EmployerContributionsCYAPage(srn) =>
+          controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
+            .onPageLoad(srn, 1, NormalMode)
+      }
 }

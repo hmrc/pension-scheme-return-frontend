@@ -56,3 +56,8 @@ POST        /:srn/select-member-employer-contributions/:page                    
 GET         /:srn/change-select-member-employer-contributions                                             controllers.nonsipp.employercontributions.EmployerContributionsMemberListController.onPageLoad(srn: Srn, page: Int = 1, mode: Mode = CheckMode)
 GET         /:srn/change-select-member-employer-contributions/:page                                       controllers.nonsipp.employercontributions.EmployerContributionsMemberListController.onPageLoad(srn: Srn, page: Int, mode: Mode = CheckMode)
 POST        /:srn/change-select-member-employer-contributions/:page                                       controllers.nonsipp.employercontributions.EmployerContributionsMemberListController.onSubmit(srn: Srn, page: Int, mode: Mode = CheckMode)
+
+GET        /:srn/check-answers-employer-contributions/:index/:page                 controllers.nonsipp.employercontributions.EmployerContributionsCYAController.onPageLoad(srn: Srn, index: Max300, page: Int, mode: Mode = NormalMode)
+POST       /:srn/check-answers-employer-contributions/:index/:page                 controllers.nonsipp.employercontributions.EmployerContributionsCYAController.onSubmit(srn: Srn, index: Max300, page: Int, mode: Mode = NormalMode)
+GET        /:srn/change-employer-contributions/:index/:page          controllers.nonsipp.employercontributions.EmployerContributionsCYAController.onPageLoad(srn: Srn, index: Max300, page: Int, mode: Mode = CheckMode)
+POST       /:srn/change-employer-contributions/:index/:page          controllers.nonsipp.employercontributions.EmployerContributionsCYAController.onSubmit(srn: Srn, index: Max300, page: Int, mode: Mode = CheckMode)
