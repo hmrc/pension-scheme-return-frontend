@@ -32,7 +32,7 @@ import services.{SaveService, UploadService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage._
 import viewmodels.implicits._
-import viewmodels.models.{ContentPageViewModel, FormPageViewModel}
+import viewmodels.models.{ContentPageViewModel, FormPageViewModel, MemberState}
 import views.html.ContentPageView
 
 import javax.inject.{Inject, Named}
@@ -93,7 +93,8 @@ class FileUploadSuccessController @Inject()(
           details.ninoOrNoNinoReason.fold(
             UserAnswers.set(NoNINOPage(srn, index), _),
             UserAnswers.set(MemberDetailsNinoPage(srn, index), _)
-          )
+          ),
+          UserAnswers.set(MemberStatus(srn, index), MemberState.Active)
         )
       }
     }.flatten

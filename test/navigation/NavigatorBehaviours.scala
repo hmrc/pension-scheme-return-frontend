@@ -276,6 +276,15 @@ trait NavigatorBehaviours extends ScalaCheckPropertyChecks with EitherValues wit
         maxDataNextPage,
         userAnswers
       )
+
+    def navigateToWithDoubleIndex[A, B](
+      index: Refined[Int, A],
+      secondIndex: Refined[Int, B],
+      page: (Srn, Refined[Int, A], Refined[Int, B]) => Page,
+      nextPage: (Srn, Refined[Int, A], Refined[Int, B], Mode) => Call,
+      userAnswers: Srn => UserAnswers = _ => defaultUserAnswers
+    ): Behaviours.BehaviourTest =
+      super.navigateTo(CheckMode)(page(_, index, secondIndex), nextPage(_, index, secondIndex, _), userAnswers)
   }
 
 }

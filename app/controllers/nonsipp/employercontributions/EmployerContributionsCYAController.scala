@@ -304,7 +304,7 @@ object EmployerContributionsCYAController {
               SummaryAction(
                 "site.change",
                 controllers.nonsipp.employercontributions.routes.ContributionsFromAnotherEmployerController
-                  .onPageLoad(srn, memberIndex, secondaryIndex, NormalMode)
+                  .onPageLoad(srn, memberIndex, secondaryIndex, CheckMode)
                   .url
               ).withVisuallyHiddenContent(
                 Message("employerContributionsCYA.row.contributionOtherEmployer.hidden", membersName)

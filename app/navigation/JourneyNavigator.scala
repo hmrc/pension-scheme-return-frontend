@@ -18,7 +18,7 @@ package navigation
 
 import models.UserAnswers
 import pages.Page
-import play.api.mvc.Call
+import play.api.mvc.{Call, Result}
 
 trait JourneyNavigator {
 
@@ -26,6 +26,11 @@ trait JourneyNavigator {
 
   implicit class OptionOps[A](opt: Option[A]) {
     def getOrRecoverJourney(f: A => Call): Call = opt.fold(recoverJourney)(f)
+
+    def getOrRecoverJourney: Either[Call, A] = opt match {
+      case Some(value) => Right(value)
+      case None => Left(recoverJourney)
+    }
   }
 
   def normalRoutes: UserAnswers => PartialFunction[Page, Call]

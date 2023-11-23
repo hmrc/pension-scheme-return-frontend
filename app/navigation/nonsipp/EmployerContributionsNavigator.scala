@@ -16,7 +16,9 @@
 
 package navigation.nonsipp
 
-import config.Refined.OneTo50
+import cats.implicits.toTraverseOps
+import config.Constants
+import config.Refined.{Max50, OneTo50}
 import models._
 import eu.timepit.refined._
 import navigation.JourneyNavigator
@@ -80,14 +82,16 @@ object EmployerContributionsNavigator extends JourneyNavigator {
       controllers.nonsipp.employercontributions.routes.ContributionsFromAnotherEmployerController
         .onPageLoad(srn, index, secondaryIndex, NormalMode)
 
-    case page @ ContributionsFromAnotherEmployerPage(srn, index, secondaryIndex) =>
+    case page @ ContributionsFromAnotherEmployerPage(srn, index, _) =>
       if (userAnswers.get(page).contains(true)) {
-        refineV[OneTo50](secondaryIndex.value + 1) match {
-          case Left(_) => controllers.routes.UnauthorisedController.onPageLoad()
-          case Right(nextIndex) =>
-            controllers.nonsipp.employercontributions.routes.EmployerNameController
-              .onPageLoad(srn, index, nextIndex, NormalMode)
-        }
+        (
+          for {
+            map <- userAnswers.get(TotalEmployerContributionPages(srn, index)).getOrRecoverJourney
+            indexes <- map.keys.toList.traverse(_.toIntOption).getOrRecoverJourney
+            nextIndex <- findNextOpenIndex[Max50.Refined](indexes).getOrRecoverJourney
+          } yield controllers.nonsipp.employercontributions.routes.EmployerNameController
+            .onPageLoad(srn, index, nextIndex, NormalMode)
+        ).merge
       } else {
         controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
           .onPageLoad(srn, index, 1, NormalMode)
@@ -106,9 +110,9 @@ object EmployerContributionsNavigator extends JourneyNavigator {
     oldUserAnswers =>
       userAnswers => {
 
-        case EmployerNamePage(srn, index, _) =>
+        case EmployerNamePage(srn, index, secondaryIndex) =>
           controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
-            .onPageLoad(srn, index, 1, NormalMode)
+            .onPageLoad(srn, index, getCYAPage(secondaryIndex.value), NormalMode)
 
         case EmployerTypeOfBusinessPage(srn, index, secondaryIndex) =>
           (
@@ -119,15 +123,15 @@ object EmployerContributionsNavigator extends JourneyNavigator {
             // same answer
             case (Some(IdentityType.UKCompany), Some(IdentityType.UKCompany)) =>
               controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
-                .onPageLoad(srn, index, 1, NormalMode)
+                .onPageLoad(srn, index, getCYAPage(secondaryIndex.value), NormalMode)
 
             case (Some(IdentityType.UKPartnership), Some(IdentityType.UKPartnership)) =>
               controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
-                .onPageLoad(srn, index, 1, NormalMode)
+                .onPageLoad(srn, index, getCYAPage(secondaryIndex.value), NormalMode)
 
             case (Some(IdentityType.Other), Some(IdentityType.Other)) =>
               controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
-                .onPageLoad(srn, index, 1, NormalMode)
+                .onPageLoad(srn, index, getCYAPage(secondaryIndex.value), NormalMode)
 
             // different answer
             case (_, Some(IdentityType.UKCompany)) =>
@@ -143,24 +147,42 @@ object EmployerContributionsNavigator extends JourneyNavigator {
                 .onPageLoad(srn, index, secondaryIndex, CheckMode)
           }
 
-        case EmployerCompanyCrnPage(srn, index, _) =>
+        case EmployerCompanyCrnPage(srn, index, secondaryIndex) =>
           controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
-            .onPageLoad(srn, index, 1, NormalMode)
+            .onPageLoad(srn, index, getCYAPage(secondaryIndex.value), NormalMode)
 
-        case PartnershipEmployerUtrPage(srn, index, _) =>
+        case PartnershipEmployerUtrPage(srn, index, secondaryIndex) =>
           controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
-            .onPageLoad(srn, index, 1, NormalMode)
+            .onPageLoad(srn, index, getCYAPage(secondaryIndex.value), NormalMode)
 
-        case OtherEmployeeDescriptionPage(srn, index, _) =>
+        case OtherEmployeeDescriptionPage(srn, index, secondaryIndex) =>
           controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
-            .onPageLoad(srn, index, 1, NormalMode)
+            .onPageLoad(srn, index, getCYAPage(secondaryIndex.value), NormalMode)
 
         case TotalEmployerContributionPage(srn, index, secondaryIndex) =>
           controllers.nonsipp.employercontributions.routes.ContributionsFromAnotherEmployerController
-            .onPageLoad(srn, index, secondaryIndex, NormalMode)
+            .onPageLoad(srn, index, secondaryIndex, CheckMode)
+
+        case page @ ContributionsFromAnotherEmployerPage(srn, index, secondaryIndex) =>
+          if (userAnswers.get(page).contains(true)) {
+            (
+              for {
+                map <- userAnswers.get(TotalEmployerContributionPages(srn, index)).getOrRecoverJourney
+                indexes <- map.keys.toList.traverse(_.toIntOption).getOrRecoverJourney
+                nextIndex <- findNextOpenIndex[Max50.Refined](indexes).getOrRecoverJourney
+              } yield controllers.nonsipp.employercontributions.routes.EmployerNameController
+                .onPageLoad(srn, index, nextIndex, NormalMode)
+            ).merge
+          } else {
+            controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
+              .onPageLoad(srn, index, getCYAPage(secondaryIndex.value), NormalMode)
+          }
 
         case EmployerContributionsCYAPage(srn) =>
           controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
             .onPageLoad(srn, 1, NormalMode)
       }
+
+  private def getCYAPage(index: Int): Int =
+    Math.ceil(index.toDouble / Constants.employerContributionsCYASize).toInt
 }

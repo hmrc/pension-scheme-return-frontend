@@ -19,6 +19,7 @@ package controllers.nonsipp.memberdetails
 import cats.implicits.{toShow, toTraverseOps}
 import com.google.inject.Inject
 import config.Refined.Max300
+import controllers.PSRController
 import controllers.actions._
 import controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController._
 import models.SchemeId.Srn
@@ -27,6 +28,7 @@ import navigation.Navigator
 import pages.nonsipp.memberdetails._
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.SaveService
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.DateTimeUtils.localDateShow
@@ -37,21 +39,20 @@ import viewmodels.models._
 import views.html.CheckYourAnswersView
 
 import javax.inject.Named
+import scala.concurrent.{ExecutionContext, Future}
 
 class SchemeMemberDetailsAnswersController @Inject()(
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
-  identify: IdentifierAction,
-  allowAccess: AllowAccessActionProvider,
-  getData: DataRetrievalAction,
-  requireData: DataRequiredAction,
+  identifyAndRequireData: IdentifyAndRequireData,
+  saveService: SaveService,
   val controllerComponents: MessagesControllerComponents,
   view: CheckYourAnswersView
-) extends FrontendBaseController
-    with I18nSupport {
+)(implicit ec: ExecutionContext)
+    extends PSRController {
 
   def onPageLoad(srn: Srn, index: Max300, checkOrChange: CheckOrChange): Action[AnyContent] =
-    identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData) { implicit request =>
+    identifyAndRequireData(srn) { implicit request =>
       val result = for {
         memberDetails <- request.userAnswers.get(MemberDetailsPage(srn, index))
         hasNINO <- request.userAnswers.get(DoesMemberHaveNinoPage(srn, index))
@@ -63,8 +64,11 @@ class SchemeMemberDetailsAnswersController @Inject()(
     }
 
   def onSubmit(srn: Srn, index: Max300, checkOrChange: CheckOrChange): Action[AnyContent] =
-    identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData) { implicit request =>
-      Redirect(navigator.nextPage(SchemeMemberDetailsAnswersPage(srn), NormalMode, request.userAnswers))
+    identifyAndRequireData(srn).async { implicit request =>
+      for {
+        updatedUserAnswers <- Future.fromTry(request.userAnswers.set(MemberStatus(srn, index), MemberState.Active))
+        _ <- saveService.save(updatedUserAnswers)
+      } yield Redirect(navigator.nextPage(SchemeMemberDetailsAnswersPage(srn), NormalMode, request.userAnswers))
     }
 }
 
