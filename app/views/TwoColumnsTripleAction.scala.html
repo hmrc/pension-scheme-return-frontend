@@ -35,18 +35,29 @@
           @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
+
         <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
 
         @defining(viewmodel.page.paginatedViewModel.fold(viewmodel.page.rows)(paginatedViewModel =>
             viewmodel.page.rows.paginate(paginatedViewModel.pagination.currentPage, paginatedViewModel.pagination.pageSize))
         ){ rows =>
             @govukTable(TableViewModel(
-                                viewmodel.page.head.fold(List.empty[HeadCell])(
-                                    heads =>
-                                    heads.map( aHead =>
-                                    HeadCell(HtmlContent(renderMessage(aHead.text)))
+                                if(rows.size > 3){
+                                    viewmodel.page.head.fold(List.empty[HeadCell])(
+                                        heads =>
+                                        heads.map( aHead =>
+                                        HeadCell(HtmlContent(renderMessage(aHead.text)))
                                     )
-                                ),
+                                ) ++  List(HeadCell(HtmlContent("""<span class="govuk-visually-hidden">Actions</span>""")), HeadCell(HtmlContent("""<span class="govuk-visually-hidden">Actions</span>""")))
+                                } else {
+                                    viewmodel.page.head.fold(List.empty[HeadCell])(
+                                        heads =>
+                                        heads.map( aHead =>
+                                        HeadCell(HtmlContent(renderMessage(aHead.text)))
+                                        )
+                                    ) ++ List(HeadCell(HtmlContent("""<span class="govuk-visually-hidden">Actions</span>""")))
+                                }
+                                 ,
                                 rows.map(
                                     otherRows =>
                                     otherRows.map( aRow =>
