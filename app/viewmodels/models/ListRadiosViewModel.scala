@@ -24,7 +24,7 @@ case class ListRadiosRow(
 )
 
 case class ListRadiosViewModel(
-  legend: DisplayMessage,
+  legend: Option[DisplayMessage],
   rows: List[ListRadiosRow],
   paginatedViewModel: Option[PaginatedViewModel] = None
 )

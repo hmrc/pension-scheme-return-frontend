@@ -145,7 +145,7 @@ object WhichEmployerContributionRemoveController {
       heading = Message("whichEmployerContributionRemove.heading", memberName),
       description = None,
       page = ListRadiosViewModel(
-        legend = "", //TODO check a11y
+        legend = None,
         rows = rows
       ),
       refresh = None,

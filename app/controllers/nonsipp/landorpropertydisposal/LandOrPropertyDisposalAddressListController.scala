@@ -171,7 +171,7 @@ object LandOrPropertyDisposalAddressListController {
           ParagraphMessage("landOrPropertyDisposalAddressList.paragraph2")
       ),
       page = ListRadiosViewModel(
-        legend = "landOrPropertyDisposalAddressList.legend",
+        legend = Some("landOrPropertyDisposalAddressList.legend"),
         rows = rows,
         paginatedViewModel = Some(
           PaginatedViewModel(

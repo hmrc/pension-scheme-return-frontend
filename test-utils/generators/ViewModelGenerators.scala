@@ -188,7 +188,7 @@ trait ViewModelGenerators extends BasicGenerators {
       rows <- rows.fold(Gen.choose(1, 10))(Gen.const).flatMap(Gen.listOfN(_, listRadiosRowGen))
       pagination <- if (paginate) Gen.option(paginationGen) else Gen.const(None)
     } yield ListRadiosViewModel(
-      legend,
+      Some(legend),
       rows,
       pagination
     )

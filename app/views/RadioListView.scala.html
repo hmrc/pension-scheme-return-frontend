@@ -59,7 +59,7 @@
                 },
                 legend = viewmodel.page.legend
                     .map(legend => LegendViewModel(legend.toMessage).withSize(LegendSize.Medium))
-                    .getOrElse(LegendViewModel(renderMessage(viewmodel.heading)).asPageHeading())
+                    .getOrElse(LegendViewModel(renderMessage(viewmodel.heading)).asPageHeading(LegendSize.Large))
             )
         )
 
