@@ -19,6 +19,7 @@ package views
 import forms.RadioListFormProvider
 import models.Enumerable
 import play.api.test.FakeRequest
+import viewmodels.DisplayMessage.Empty
 import viewmodels.models.{RadioListRowDivider, RadioListRowViewModel, RadioListViewModel}
 import views.html.RadioListView
 
@@ -61,9 +62,8 @@ class RadioListViewSpec extends ViewSpec {
       }
 
       "no have a legend when not present" in {
-
         forAll(viewModelGen) { viewmodel =>
-          legend(view(radioListForm, viewmodel.copy(page = viewmodel.page.copy(legend = None)))) mustBe Nil
+          legend(view(radioListForm, viewmodel.copy(heading = Empty, page = viewmodel.page.copy(legend = None)))) mustBe Nil
         }
       }
 
