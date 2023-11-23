@@ -31,7 +31,7 @@ import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
+import viewmodels.DisplayMessage.{Empty, LinkMessage, Message, ParagraphMessage}
 import viewmodels.implicits._
 import viewmodels.models.{ActionTableViewModel, FormPageViewModel, PaginatedViewModel, TableElem}
 import views.html.TwoColumnsTripleAction
@@ -132,7 +132,10 @@ object EmployerContributionsMemberListController {
                   memberName.fullName
                 ),
                 TableElem(
-                  Message("employerContributions.MemberList.status.some.contributions", contributions.size)
+                  if (contributions.size == 1)
+                    Message("employerContributions.MemberList.status.single.contribution", contributions.size)
+                  else
+                    Message("employerContributions.MemberList.status.some.contributions", contributions.size)
                 ),
                 TableElem(
                   LinkMessage(
@@ -184,7 +187,7 @@ object EmployerContributionsMemberListController {
       description = Some(ParagraphMessage("employerContributions.MemberList.paragraph")),
       page = ActionTableViewModel(
         inset = "employerContributions.MemberList.inset",
-        head = Some(List(TableElem("Member Name"), TableElem("Status"))),
+        head = Some(List(TableElem("Member name"), TableElem("Status"), TableElem(Empty), TableElem(Empty))),
         rows = rows(srn, mode, memberList, userAnswers),
         radioText = Message("employerContributions.MemberList.radios"),
         showRadios = memberList.length < 9999999,
