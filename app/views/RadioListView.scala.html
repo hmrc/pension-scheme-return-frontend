@@ -36,7 +36,9 @@
           @govukErrorSummary(ErrorSummaryViewModel(form))
          }
 
-        <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
+        @if(viewmodel.page.legend.nonEmpty) {
+            <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
+        }
 
         @viewmodel.description.map(renderMessage)
 
@@ -55,7 +57,9 @@
                             }
                         )
                 },
-                legend = viewmodel.page.legend.map(legend => LegendViewModel(legend.toMessage).withSize(LegendSize.Medium))
+                legend = viewmodel.page.legend
+                    .map(legend => LegendViewModel(legend.toMessage).withSize(LegendSize.Medium))
+                    .getOrElse(LegendViewModel(renderMessage(viewmodel.heading)).asPageHeading())
             )
         )
 
