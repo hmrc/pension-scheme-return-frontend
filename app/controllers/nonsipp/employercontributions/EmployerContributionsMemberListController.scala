@@ -31,7 +31,8 @@ import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import viewmodels.DisplayMessage.{Empty, LinkMessage, Message, ParagraphMessage}
+import viewmodels.DisplayMessage
+import viewmodels.DisplayMessage.{BlockMessage, Empty, LinkMessage, Message, ParagraphMessage}
 import viewmodels.implicits._
 import viewmodels.models.{ActionTableViewModel, FormPageViewModel, PaginatedViewModel, TableElem}
 import views.html.TwoColumnsTripleAction
@@ -140,8 +141,7 @@ object EmployerContributionsMemberListController {
                 TableElem(
                   LinkMessage(
                     Message("site.change"),
-                    controllers.nonsipp.employercontributions
-                      .routes.EmployerContributionsCYAController
+                    controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
                       .onSubmit(srn, nextIndex, page = 1, CheckMode)
                       .url
                   )
@@ -188,7 +188,7 @@ object EmployerContributionsMemberListController {
       description = Some(ParagraphMessage("employerContributions.MemberList.paragraph")),
       page = ActionTableViewModel(
         inset = "employerContributions.MemberList.inset",
-        head = Some(List(TableElem("Member name"), TableElem("Status"), TableElem(Empty), TableElem(Empty))),
+        head = Some(List(TableElem("Member name"), TableElem("Status"))),
         rows = rows(srn, mode, memberList, userAnswers),
         radioText = Message("employerContributions.MemberList.radios"),
         showRadios = memberList.length < 9999999,
