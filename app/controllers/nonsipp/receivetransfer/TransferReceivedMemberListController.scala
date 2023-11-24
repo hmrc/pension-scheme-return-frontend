@@ -118,8 +118,7 @@ object TransferReceivedMemberListController {
                 LinkMessage(
                   "site.add",
                   controllers.nonsipp.receivetransfer.routes.TransferringSchemeNameController
-                    .onSubmit(srn, refineMV(1), refineMV(2), mode)
-                    .url
+                    .onSubmit(srn, refineMV(1), refineMV(2), mode).url
                 ) //TODO we need the subsequent page in the Journey to add the right link
               )
             )
