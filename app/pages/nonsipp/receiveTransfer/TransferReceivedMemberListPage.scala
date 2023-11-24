@@ -14,19 +14,15 @@
  * limitations under the License.
  */
 
-package pages
+package pages.nonsipp.receiveTransfer
 
-import pages.behaviours.PageBehaviours
-import pages.nonsipp.memberpayments.DidSchemeReceiveTransferPage
+import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-class DidSchemeReceiveTransferPageSpec extends PageBehaviours {
+case class TransferReceivedMemberListPage(srn: Srn) extends QuestionPage[Boolean] {
 
-  "DidSchemeReceiveTransferPage" - {
+  override def path: JsPath = JsPath \ toString
 
-    beRetrievable[Boolean](DidSchemeReceiveTransferPage(srnGen.sample.value))
-
-    beSettable[Boolean](DidSchemeReceiveTransferPage(srnGen.sample.value))
-
-    beRemovable[Boolean](DidSchemeReceiveTransferPage(srnGen.sample.value))
-  }
+  override def toString: String = "transferInListPage"
 }

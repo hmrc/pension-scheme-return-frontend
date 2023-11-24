@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.memberpayments
+package pages.nonsipp
 
-import models.SchemeId.Srn
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import play.api.libs.json.{__, JsPath}
 
-case class TransferReceivedMemberListPage(srn: Srn) extends QuestionPage[Boolean] {
+package object receiveTransfer {
 
-  override def path: JsPath = JsPath \ toString
+  object Paths {
+    val membersPayments: JsPath = __ \ "membersPayments"
+    val memberDetails: JsPath = membersPayments \ "memberDetails"
+    val memberTransfersIn: JsPath = memberDetails \ "memberTransfersIn"
+  }
 
-  override def toString: String = "transferInListPage"
 }

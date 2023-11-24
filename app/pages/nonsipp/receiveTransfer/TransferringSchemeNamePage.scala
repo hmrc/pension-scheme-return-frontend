@@ -14,15 +14,18 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.memberpayments
+package pages.nonsipp.receiveTransfer
 
+import config.Refined.{Max300, Max50}
 import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
+import utils.RefinedUtils.RefinedIntOps
 
-case class DidSchemeReceiveTransferPage(srn: Srn) extends QuestionPage[Boolean] {
+case class TransferringSchemeNamePage(srn: Srn, memberIndex: Max300, index: Max50) extends QuestionPage[String] {
 
-  override def path: JsPath = MemberPaymentsPage.path \ toString
+  override def path: JsPath =
+    Paths.memberTransfersIn \ toString \ memberIndex.arrayIndex.toString \ index.arrayIndex.toString
 
-  override def toString: String = "schemeReceivedTransferIn"
+  override def toString: String = "schemeName"
 }

@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.memberpayments
+package controllers.nonsipp.receivetransfer
 
 import com.google.inject.Inject
 import config.Refined.OneTo300
 import config.{Constants, FrontendAppConfig}
 import controllers.PSRController
 import controllers.actions._
-import eu.timepit.refined.refineV
+import eu.timepit.refined.{refineMV, refineV}
 import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
 import models._
 import navigation.Navigator
+import pages.nonsipp.receiveTransfer.TransferReceivedMemberListPage
 import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
-import pages.nonsipp.memberpayments.TransferReceivedMemberListPage
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -59,7 +59,10 @@ class TransferReceivedMemberListController @Inject()(
           .viewModel(srn, page, mode, memberList)
         Ok(view(form, viewModel))
       } else {
-        Redirect(controllers.routes.UnauthorisedController.onPageLoad())
+        Redirect(
+          controllers.nonsipp.receivetransfer.routes.TransferringSchemeNameController
+            .onSubmit(srn, refineMV(1), refineMV(2), mode)
+        )
       }
   }
 
@@ -112,7 +115,12 @@ object TransferReceivedMemberListController {
                 "No transfers in" //TODO We need to complete the "Add" Journey to be able to make this dynamic
               ),
               TableElem(
-                LinkMessage("Add", controllers.routes.UnauthorisedController.onPageLoad().url) //TODO we need the subsequent page in the Journey to add the right link
+                LinkMessage(
+                  "site.add",
+                  controllers.nonsipp.receivetransfer.routes.TransferringSchemeNameController
+                    .onSubmit(srn, refineMV(1), refineMV(2), mode)
+                    .url
+                ) //TODO we need the subsequent page in the Journey to add the right link
               )
             )
         }
@@ -132,7 +140,7 @@ object TransferReceivedMemberListController {
       currentPage = page,
       pageSize = Constants.transferInListSize,
       memberList.size,
-      controllers.nonsipp.memberpayments.routes.TransferReceivedMemberListController.onPageLoad(srn, _, NormalMode)
+      controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController.onPageLoad(srn, _, NormalMode)
     )
 
     FormPageViewModel(
@@ -161,7 +169,7 @@ object TransferReceivedMemberListController {
       buttonText = "site.saveAndContinue",
       details = None,
       onSubmit =
-        controllers.nonsipp.memberpayments.routes.TransferReceivedMemberListController.onSubmit(srn, page, mode)
+        controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController.onSubmit(srn, page, mode)
     )
   }
 }

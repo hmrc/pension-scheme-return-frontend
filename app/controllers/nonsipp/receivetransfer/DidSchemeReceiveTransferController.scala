@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.memberpayments
+package controllers.nonsipp.receivetransfer
 
 import controllers.actions._
-import controllers.nonsipp.memberpayments.DidSchemeReceiveTransferController._
+import controllers.nonsipp.receivetransfer.DidSchemeReceiveTransferController._
+import controllers.nonsipp.memberpayments.routes
 import forms.YesNoPageFormProvider
 import models.Mode
 import models.SchemeId.Srn
 import navigation.Navigator
-import pages.nonsipp.memberpayments.DidSchemeReceiveTransferPage
+import pages.nonsipp.receiveTransfer.DidSchemeReceiveTransferPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -83,6 +84,6 @@ object DidSchemeReceiveTransferController {
   def viewModel(srn: Srn, schemeName: String, mode: Mode): FormPageViewModel[YesNoPageViewModel] = YesNoPageViewModel(
     "didSchemeReceiveTransfer.title",
     Message("didSchemeReceiveTransfer.heading", schemeName),
-    routes.DidSchemeReceiveTransferController.onSubmit(srn, mode)
+    controllers.nonsipp.receivetransfer.routes.DidSchemeReceiveTransferController.onSubmit(srn, mode)
   )
 }

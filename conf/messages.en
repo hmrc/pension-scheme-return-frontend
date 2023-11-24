@@ -1742,3 +1742,10 @@ employerContributionsCYA.row.contributionOtherEmployer.hidden =  if employer con
 employerContributionsCYA.inset = You cannot add any more employer contributions for this member as you have entered the maximum of 50. If you need to remove one, you can do this on the next page.
 employerContributionsCYA.title.change = Change details of employer contributions
 employerContributionsCYA.heading.change = Change details of employer contributions for {0}
+
+transferringSchemeName.title = What is the transferring scheme’s name?
+transferringSchemeName.heading = What is the transferring scheme’s name?
+transferringSchemeName.error.required = Enter the transferring scheme’s name
+transferringSchemeName.error.tooLong = Transferring scheme’s name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+transferringSchemeName.error.invalid = Transferring scheme’s name must be 160 characters or fewer
+

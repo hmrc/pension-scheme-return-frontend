@@ -55,7 +55,7 @@ object MemberContributionsNavigator extends JourneyNavigator {
           if (userAnswers.get(page).contains(true)) {
             controllers.routes.UnauthorisedController.onPageLoad()
           } else {
-            memberpayments.routes.DidSchemeReceiveTransferController.onPageLoad(srn, NormalMode)
+            controllers.nonsipp.receivetransfer.routes.DidSchemeReceiveTransferController.onPageLoad(srn, NormalMode)
           }
 
         case TotalMemberContributionPage(srn, index, secondaryIndex) =>
