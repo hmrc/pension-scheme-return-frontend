@@ -124,6 +124,7 @@
     @govukSelect(Select(
         id = s"value_${index + 1}",
         name = s"value.${index + 1}",
+        classes = s"${field.width.fold[InputWidth](InputWidth.Fixed10)(identity).toString} location-autocomplete",
         attributes = Map("aria-labelledby" -> s"value_${index + 1}", "data-all-countries" -> ""),
         label = Label(forAttr = Some(s"value_${index + 1}-select"), content = HtmlContent(renderMessage(field.label))),
         items = Seq(SelectItem(value = Some(""))) ++
@@ -134,8 +135,7 @@
                         selected = viewmodel.page.form(s"value.${index + 1}").value.contains(selectInput.value)
                     )
                 ),
-        errorMessage = viewmodel.page.form(s"value.${index + 1}").error.map(err => ErrorMessage(content = Text(messages(err.message, err.args:_*)))),
-        classes = s"${field.width.fold[InputWidth](InputWidth.Fixed10)(identity).toString} location-autocomplete"
+        errorMessage = viewmodel.page.form(s"value.${index + 1}").error.map(err => ErrorMessage(content = Text(messages(err.message, err.args:_*))))
     ).asAccessibleAutocomplete(Some(
         AccessibleAutocomplete(
             showAllValues = false,
