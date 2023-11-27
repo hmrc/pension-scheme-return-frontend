@@ -58,7 +58,8 @@
                     case (message, FieldType.Textarea) => textArea("value.no", message)
                     case (message, FieldType.Currency) => currency("value.no", message)
                 },
-                legend = viewmodel.page.legend
+                legend = viewmodel.page.legend,
+                heading = viewmodel.heading
             )
         )
 
