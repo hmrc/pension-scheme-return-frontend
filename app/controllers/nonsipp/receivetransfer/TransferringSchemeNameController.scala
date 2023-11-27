@@ -20,7 +20,6 @@ import config.Refined.{Max300, Max50}
 import controllers.PSRController
 import controllers.actions._
 import controllers.nonsipp.receivetransfer.TransferringSchemeNameController._
-import controllers.nonsipp.memberpayments.routes
 import forms.TextFormProvider
 import models.Mode
 import models.SchemeId.Srn
@@ -87,7 +86,6 @@ object TransferringSchemeNameController {
       "transferringSchemeName.title",
       "transferringSchemeName.heading",
       TextInputViewModel(),
-      controllers.nonsipp.receivetransfer.routes.TransferringSchemeNameController
-        .onSubmit(srn, memberIndex, index, mode)
+      routes.TransferringSchemeNameController.onSubmit(srn, memberIndex, index, mode)
     )
 }

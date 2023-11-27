@@ -21,7 +21,7 @@ import controllers.nonsipp.receivetransfer.routes
 import controllers.nonsipp.receivetransfer.TransferReceivedMemberListController.{form, viewModel}
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
-import models.{NameDOB, NormalMode}
+import models.{NameDOB, NormalMode, UserAnswers}
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
 import pages.nonsipp.receiveTransfer.TransferReceivedMemberListPage
@@ -45,7 +45,8 @@ class TransferReceivedMemberListControllerSpec extends ControllerBaseSpec {
           srn,
           page = 1,
           NormalMode,
-          memberList: List[NameDOB]
+          memberList: List[NameDOB],
+          userAnswers: UserAnswers
         )
       )
     })
@@ -61,7 +62,8 @@ class TransferReceivedMemberListControllerSpec extends ControllerBaseSpec {
               srn,
               page = 1,
               NormalMode,
-              memberList: List[NameDOB]
+              memberList: List[NameDOB],
+              userAnswers: UserAnswers
             )
           )
     })

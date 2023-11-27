@@ -29,3 +29,10 @@ case class TransferringSchemeNamePage(srn: Srn, memberIndex: Max300, index: Max5
 
   override def toString: String = "schemeName"
 }
+
+case class TransferringSchemeNamePages(srn: Srn, memberIndex: Max300) extends QuestionPage[Map[String, String]] {
+  override def path: JsPath =
+    Paths.memberTransfersIn \ toString \ memberIndex.arrayIndex.toString
+
+  override def toString: String = "schemeName"
+}
