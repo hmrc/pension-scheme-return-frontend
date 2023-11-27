@@ -18,12 +18,11 @@ package controllers.nonsipp.receivetransfer
 
 import controllers.actions._
 import controllers.nonsipp.receivetransfer.DidSchemeReceiveTransferController._
-import controllers.nonsipp.memberpayments.routes
 import forms.YesNoPageFormProvider
 import models.Mode
 import models.SchemeId.Srn
 import navigation.Navigator
-import pages.nonsipp.receiveTransfer.DidSchemeReceiveTransferPage
+import pages.nonsipp.receivetransfer.DidSchemeReceiveTransferPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}

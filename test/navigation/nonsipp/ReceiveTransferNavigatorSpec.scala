@@ -21,7 +21,7 @@ import eu.timepit.refined.refineMV
 import models.NormalMode
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.receiveTransfer.{
+import pages.nonsipp.receivetransfer.{
   DidSchemeReceiveTransferPage,
   TransferReceivedMemberListPage,
   TransferringSchemeNamePage,

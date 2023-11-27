@@ -27,7 +27,7 @@ import models.SchemeId.Srn
 import models._
 import navigation.Navigator
 import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
-import pages.nonsipp.receiveTransfer.{TransferReceivedMemberListPage, TransferringSchemeNamePages}
+import pages.nonsipp.receivetransfer.{TransferReceivedMemberListPage, TransferringSchemeNamePages}
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}

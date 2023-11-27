@@ -24,7 +24,7 @@ import forms.TextFormProvider
 import models.Mode
 import models.SchemeId.Srn
 import navigation.Navigator
-import pages.nonsipp.receiveTransfer.TransferringSchemeNamePage
+import pages.nonsipp.receivetransfer.TransferringSchemeNamePage
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}

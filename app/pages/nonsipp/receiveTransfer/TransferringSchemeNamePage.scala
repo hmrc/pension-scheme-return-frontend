@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.receiveTransfer
+package pages.nonsipp.receivetransfer
 
 import config.Refined.{Max300, Max50}
 import models.SchemeId.Srn

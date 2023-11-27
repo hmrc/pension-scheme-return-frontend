@@ -21,7 +21,7 @@ import controllers.ControllerBaseSpec
 import controllers.nonsipp.receivetransfer.routes
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import pages.nonsipp.receiveTransfer.DidSchemeReceiveTransferPage
+import pages.nonsipp.receivetransfer.DidSchemeReceiveTransferPage
 import play.api.libs.json.JsPath
 import views.html.YesNoPageView
 

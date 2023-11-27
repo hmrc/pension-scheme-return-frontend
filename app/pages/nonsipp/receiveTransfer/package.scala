@@ -18,7 +18,7 @@ package pages.nonsipp
 
 import play.api.libs.json.{__, JsPath}
 
-package object receiveTransfer {
+package object receivetransfer {
 
   object Paths {
     val membersPayments: JsPath = __ \ "membersPayments"

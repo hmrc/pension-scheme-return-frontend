@@ -17,7 +17,7 @@
 package pages.nonsipp.receivetransfer
 
 import pages.behaviours.PageBehaviours
-import pages.nonsipp.receiveTransfer.DidSchemeReceiveTransferPage
+import pages.nonsipp.receivetransfer.DidSchemeReceiveTransferPage
 
 class DidSchemeReceiveTransferPageSpec extends PageBehaviours {
 

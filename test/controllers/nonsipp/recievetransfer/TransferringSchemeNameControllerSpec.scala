@@ -22,7 +22,7 @@ import controllers.nonsipp.receivetransfer.TransferringSchemeNameController._
 import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import models.NormalMode
-import pages.nonsipp.receiveTransfer.TransferringSchemeNamePage
+import pages.nonsipp.receivetransfer.TransferringSchemeNamePage
 import views.html.TextInputView
 
 class TransferringSchemeNameControllerSpec extends ControllerBaseSpec {

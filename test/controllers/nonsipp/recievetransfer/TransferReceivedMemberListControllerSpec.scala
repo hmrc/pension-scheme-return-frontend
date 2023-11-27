@@ -24,7 +24,7 @@ import forms.YesNoPageFormProvider
 import models.{NameDOB, NormalMode, UserAnswers}
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
-import pages.nonsipp.receiveTransfer.TransferReceivedMemberListPage
+import pages.nonsipp.receivetransfer.TransferReceivedMemberListPage
 import views.html.TwoColumnsTripleAction
 
 class TransferReceivedMemberListControllerSpec extends ControllerBaseSpec {
