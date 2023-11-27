@@ -15,13 +15,18 @@ document.addEventListener('DOMContentLoaded', function (event) {
         });
     }
 
-    // handle country picker
     const locationElement = document.querySelector(".location-autocomplete");
     if (locationElement !== null) {
-        openregisterLocationPicker({
-            selectElement: locationElement,
-            url: '/pension-scheme-return/assets/location-autocomplete-graph.json'
+        accessibleAutocomplete.enhanceSelectElement({
+            defaultValue: "",
+            selectElement: locationElement
         })
+
+        document.querySelector('input[role="combobox"]').addEventListener('keydown', function (e) {
+            if (e.which !== 13 && e.which !== 9) {
+                locationElement.value = "";
+            }
+        });
     }
 
 });

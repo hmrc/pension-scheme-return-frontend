@@ -70,7 +70,7 @@ lazy val root = (project in file("."))
       "javascripts/application.js" ->
         group(
           Seq(
-            "javascripts/location-autocomplete.min.js",
+            "javascripts/accessible-autocomplete.min.js",
             "javascripts/app.js"
           )
         )

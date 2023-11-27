@@ -1,4 +1,4 @@
-@import 'location-autocomplete.min';
+@import 'accessible-autocomplete.min.css';
 
 .js-visible {
   display: none !important;
@@ -8,17 +8,16 @@
   display: inline-block !important;
 }
 
-.autocomplete__menu {
+.autocomplete__menu{
   font-family: "GDS Transport", Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-weight: 400;
-  font-size: 16px;
   font-size: 1rem;
   line-height: 1.25;
   color: #0b0c0c;
 }
 
-.autocomplete__input {
+.autocomplete__wrapper {
   width: 66.66% !important;
 }
