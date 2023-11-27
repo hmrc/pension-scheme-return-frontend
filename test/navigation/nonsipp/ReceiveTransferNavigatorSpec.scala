@@ -16,15 +16,25 @@
 
 package navigation.nonsipp
 
+import config.Refined.{Max300, Max50}
+import eu.timepit.refined.refineMV
 import models.NormalMode
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.memberpayments.{DidSchemeReceiveTransferPage, WhatYouWillNeedReceivedTransferPage}
+import pages.nonsipp.receivetransfer.{
+  DidSchemeReceiveTransferPage,
+  TransferReceivedMemberListPage,
+  TransferringSchemeNamePage,
+  WhatYouWillNeedReceivedTransferPage
+}
 import utils.BaseSpec
 
 class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
   val navigator: Navigator = new NonSippNavigator
+
+  private val index = refineMV[Max300.Refined](1)
+  private val secondaryIndex = refineMV[Max50.Refined](1)
 
   "ReceiveTransferNavigator" - {
 
@@ -34,7 +44,7 @@ class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           DidSchemeReceiveTransferPage,
           Gen.const(true),
           (srn, _) =>
-            controllers.nonsipp.memberpayments.routes.WhatYouWillNeedReceivedTransferController.onPageLoad(srn)
+            controllers.nonsipp.receivetransfer.routes.WhatYouWillNeedReceivedTransferController.onPageLoad(srn)
         )
         .withName("go from did scheme receive transfer page to unauthorised page when yes selected")
     )
@@ -57,9 +67,35 @@ class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateTo(
           WhatYouWillNeedReceivedTransferPage,
           (srn, _) =>
-            controllers.nonsipp.memberpayments.routes.TransferReceivedMemberListController
+            controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
               .onPageLoad(srn, 1, NormalMode)
         )
+    )
+  }
+
+  "TransferReceivedMemberListPage" - {
+
+    act.like(
+      normalmode
+        .navigateTo(
+          TransferReceivedMemberListPage,
+          (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
+        )
+        .withName("go from transfer received member list page to task list page")
+    )
+  }
+
+  "TransferringSchemeNamePage" - {
+
+    act.like(
+      normalmode
+        .navigateToWithDoubleIndex(
+          index,
+          secondaryIndex,
+          TransferringSchemeNamePage,
+          (srn, index: Max300, secondaryIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+        )
+        .withName("go from transferring scheme name page to unauthorised page")
     )
   }
 

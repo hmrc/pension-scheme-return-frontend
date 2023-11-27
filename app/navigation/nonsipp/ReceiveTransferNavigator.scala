@@ -20,7 +20,7 @@ import controllers.nonsipp.memberpayments
 import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.memberpayments._
+import pages.nonsipp.receivetransfer._
 import play.api.mvc.Call
 
 object ReceiveTransferNavigator extends JourneyNavigator {
@@ -29,14 +29,17 @@ object ReceiveTransferNavigator extends JourneyNavigator {
 
     case page @ DidSchemeReceiveTransferPage(srn) =>
       if (userAnswers.get(page).contains(true)) {
-        controllers.nonsipp.memberpayments.routes.WhatYouWillNeedReceivedTransferController.onPageLoad(srn)
+        controllers.nonsipp.receivetransfer.routes.WhatYouWillNeedReceivedTransferController.onPageLoad(srn)
 
       } else {
         controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
       }
 
     case WhatYouWillNeedReceivedTransferPage(srn) =>
-      controllers.nonsipp.memberpayments.routes.TransferReceivedMemberListController.onPageLoad(srn, 1, NormalMode)
+      controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController.onPageLoad(srn, 1, NormalMode)
+
+    case TransferringSchemeNamePage(srn, memberIndex, index) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
 
     case TransferReceivedMemberListPage(srn) =>
       controllers.nonsipp.routes.TaskListController.onPageLoad(srn)

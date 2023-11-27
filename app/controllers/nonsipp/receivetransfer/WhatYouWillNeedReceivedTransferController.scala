@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.memberpayments
+package controllers.nonsipp.receivetransfer
 
 import controllers.actions.{AllowAccessActionProvider, DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import models.NormalMode
 import models.SchemeId.Srn
 import navigation.Navigator
-import pages.nonsipp.memberpayments.WhatYouWillNeedReceivedTransferPage
+import pages.nonsipp.receivetransfer.WhatYouWillNeedReceivedTransferPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.{ListMessage, ListType, Message, ParagraphMessage}
+import viewmodels.implicits._
 import viewmodels.models.{ContentPageViewModel, FormPageViewModel}
 import views.html.ContentPageView
-import viewmodels.implicits._
 
 import javax.inject.{Inject, Named}
 
@@ -61,7 +61,7 @@ object WhatYouWillNeedReceivedTransferController {
       Message("WhatYouWillNeed.ReceivedTransfer.title"),
       Message("WhatYouWillNeed.ReceivedTransfer.heading", SchemeName),
       ContentPageViewModel(isLargeHeading = true),
-      controllers.nonsipp.memberpayments.routes.WhatYouWillNeedReceivedTransferController.onSubmit(srn)
+      controllers.nonsipp.receivetransfer.routes.WhatYouWillNeedReceivedTransferController.onSubmit(srn)
     ).withButtonText(Message("site.continue"))
       .withDescription(
         ParagraphMessage("WhatYouWillNeed.ReceivedTransfer.paragraph1") ++

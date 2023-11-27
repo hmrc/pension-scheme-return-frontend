@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.memberpayments
+package controllers.nonsipp.recievetransfer
 
 import controllers.ControllerBaseSpec
+import controllers.nonsipp.receivetransfer.routes
+import controllers.nonsipp.receivetransfer.WhatYouWillNeedReceivedTransferController
 import views.html.ContentPageView
 
 class WhatYouWillNeedReceivedTransferControllerSpec extends ControllerBaseSpec {
 
-  "WYWNeedReceivedTransferController" - {
+  "WhatYouWillNeedReceivedTransferController" - {
 
     lazy val viewModel = WhatYouWillNeedReceivedTransferController.viewModel(srn, schemeName)
 

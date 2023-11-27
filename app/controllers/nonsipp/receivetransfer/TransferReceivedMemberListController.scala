@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.memberpayments
+package controllers.nonsipp.receivetransfer
 
 import com.google.inject.Inject
+import config.Constants
 import config.Refined.OneTo300
-import config.{Constants, FrontendAppConfig}
 import controllers.PSRController
 import controllers.actions._
-import eu.timepit.refined.refineV
+import eu.timepit.refined.{refineMV, refineV}
 import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
 import models._
 import navigation.Navigator
 import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
-import pages.nonsipp.memberpayments.TransferReceivedMemberListPage
+import pages.nonsipp.receivetransfer._
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import viewmodels.DisplayMessage.{Empty, LinkMessage, Message, ParagraphMessage}
+import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
 import viewmodels.implicits._
 import viewmodels.models.{ActionTableViewModel, FormPageViewModel, PaginatedViewModel, TableElem}
 import views.html.TwoColumnsTripleAction
@@ -42,7 +42,6 @@ class TransferReceivedMemberListController @Inject()(
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
-  appConfig: FrontendAppConfig,
   val controllerComponents: MessagesControllerComponents,
   view: TwoColumnsTripleAction,
   formProvider: YesNoPageFormProvider
@@ -56,10 +55,13 @@ class TransferReceivedMemberListController @Inject()(
 
       if (memberList.nonEmpty) {
         val viewModel = TransferReceivedMemberListController
-          .viewModel(srn, page, mode, memberList)
+          .viewModel(srn, page, mode, memberList, request.userAnswers)
         Ok(view(form, viewModel))
       } else {
-        Redirect(controllers.routes.UnauthorisedController.onPageLoad())
+        Redirect(
+          controllers.nonsipp.receivetransfer.routes.TransferringSchemeNameController
+            .onSubmit(srn, refineMV(1), refineMV(2), mode)
+        )
       }
   }
 
@@ -72,13 +74,13 @@ class TransferReceivedMemberListController @Inject()(
       )
     } else {
       val viewModel =
-        TransferReceivedMemberListController.viewModel(srn, page, mode, memberList)
+        TransferReceivedMemberListController.viewModel(srn, page, mode, memberList, request.userAnswers)
 
       form
         .bindFromRequest()
         .fold(
           errors => BadRequest(view(errors, viewModel)),
-          answer =>
+          _ =>
             Redirect(
               navigator
                 .nextPage(TransferReceivedMemberListPage(srn), mode, request.userAnswers)
@@ -91,30 +93,64 @@ class TransferReceivedMemberListController @Inject()(
 object TransferReceivedMemberListController {
   def form(formProvider: YesNoPageFormProvider): Form[Boolean] =
     formProvider(
-      "TransferIn.MemberList.radios.error.required"
+      "transferIn.MemberList.radios.error.required"
     )
 
   private def rows(
     srn: Srn,
     mode: Mode,
-    memberList: List[NameDOB]
+    memberList: List[NameDOB],
+    userAnswers: UserAnswers
   ): List[List[TableElem]] =
     memberList.zipWithIndex.map {
       case (memberName, index) =>
         refineV[OneTo300](index + 1) match {
           case Left(_) => Nil
           case Right(nextIndex) =>
-            List(
-              TableElem(
-                memberName.fullName
-              ),
-              TableElem(
-                "No transfers in" //TODO We need to complete the "Add" Journey to be able to make this dynamic
-              ),
-              TableElem(
-                LinkMessage("Add", controllers.routes.UnauthorisedController.onPageLoad().url) //TODO we need the subsequent page in the Journey to add the right link
+            val contributions = userAnswers.map(TransferringSchemeNamePages(srn, nextIndex))
+            if (contributions.isEmpty) {
+              List(
+                TableElem(
+                  memberName.fullName
+                ),
+                TableElem(
+                  Message("transferIn.MemberList.status.no.contributions")
+                ),
+                TableElem(
+                  LinkMessage(
+                    Message("site.add"),
+                    controllers.nonsipp.receivetransfer.routes.TransferringSchemeNameController
+                      .onSubmit(srn, nextIndex, refineMV(1), mode)
+                      .url
+                  )
+                ),
+                TableElem("")
               )
-            )
+            } else {
+              List(
+                TableElem(
+                  memberName.fullName
+                ),
+                TableElem(
+                  if (contributions.size == 1)
+                    Message("transferIn.MemberList.singleStatus.some.contribution", contributions.size)
+                  else
+                    Message("transferIn.MemberList.status.some.contributions", contributions.size)
+                ),
+                TableElem(
+                  LinkMessage(
+                    Message("site.change"),
+                    controllers.routes.UnauthorisedController.onPageLoad().url
+                  )
+                ),
+                TableElem(
+                  LinkMessage(
+                    Message("site.remove"),
+                    controllers.routes.UnauthorisedController.onPageLoad().url
+                  )
+                )
+              )
+            }
         }
     }
 
@@ -122,33 +158,39 @@ object TransferReceivedMemberListController {
     srn: Srn,
     page: Int,
     mode: Mode,
-    memberList: List[NameDOB]
+    memberList: List[NameDOB],
+    userAnswers: UserAnswers
   ): FormPageViewModel[ActionTableViewModel] = {
+    val title =
+      if (memberList.size == 1) "transferIn.MemberList.title"
+      else "transferIn.MemberList.title.plural"
 
-    val title = if (memberList.size == 1) "TransferIn.MemberList.title" else "TransferIn.MemberList.title.plural"
-    val heading = if (memberList.size == 1) "TransferIn.MemberList.heading" else "TransferIn.MemberList.heading.plural"
+    val heading =
+      if (memberList.size == 1) "transferIn.MemberList.heading"
+      else "transferIn.MemberList.heading.plural"
 
     val pagination = Pagination(
       currentPage = page,
       pageSize = Constants.transferInListSize,
       memberList.size,
-      controllers.nonsipp.memberpayments.routes.TransferReceivedMemberListController.onPageLoad(srn, _, NormalMode)
+      controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
+        .onPageLoad(srn, _, NormalMode)
     )
 
     FormPageViewModel(
       title = Message(title, memberList.size),
       heading = Message(heading, memberList.size),
-      description = Some(ParagraphMessage("TransferIn.MemberList.paragraph")),
+      description = Some(ParagraphMessage("transferIn.MemberList.paragraph")),
       page = ActionTableViewModel(
-        inset = "TransferIn.MemberList.inset",
-        head = Some(List(TableElem("Member name"), TableElem("Status"))),
-        rows = rows(srn, mode, memberList),
-        radioText = Message("TransferIn.MemberList.radios"),
+        inset = "transferIn.MemberList.inset",
+        head = Some(List(TableElem("Member Name"), TableElem("Status"))),
+        rows = rows(srn, mode, memberList, userAnswers),
+        radioText = Message("transferIn.MemberList.radios"),
         showRadios = memberList.length < 9999999,
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(
-              "TransferIn.MemberList.pagination.label",
+              "transferIn.MemberList.pagination.label",
               pagination.pageStart,
               pagination.pageEnd,
               pagination.totalSize
@@ -160,8 +202,8 @@ object TransferReceivedMemberListController {
       refresh = None,
       buttonText = "site.saveAndContinue",
       details = None,
-      onSubmit =
-        controllers.nonsipp.memberpayments.routes.TransferReceivedMemberListController.onSubmit(srn, page, mode)
+      onSubmit = controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
+        .onSubmit(srn, page, mode)
     )
   }
 }

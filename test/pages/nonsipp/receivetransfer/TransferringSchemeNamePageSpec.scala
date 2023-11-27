@@ -14,19 +14,23 @@
  * limitations under the License.
  */
 
-package pages
-
+import config.Refined.{Max300, Max50}
+import eu.timepit.refined.refineMV
 import pages.behaviours.PageBehaviours
-import pages.nonsipp.memberpayments.DidSchemeReceiveTransferPage
+import pages.nonsipp.employercontributions.EmployerNamePage
 
-class DidSchemeReceiveTransferPageSpec extends PageBehaviours {
+class TransferringSchemeNamePageSpec extends PageBehaviours {
 
-  "DidSchemeReceiveTransferPage" - {
+  private val memberIndex = refineMV[Max300.Refined](1)
 
-    beRetrievable[Boolean](DidSchemeReceiveTransferPage(srnGen.sample.value))
+  "TransferringSchemeNamePage" - {
 
-    beSettable[Boolean](DidSchemeReceiveTransferPage(srnGen.sample.value))
+    val index = refineMV[Max50.Refined](1)
 
-    beRemovable[Boolean](DidSchemeReceiveTransferPage(srnGen.sample.value))
+    beRetrievable[String](EmployerNamePage(srnGen.sample.value, memberIndex, index))
+
+    beSettable[String](EmployerNamePage(srnGen.sample.value, memberIndex, index))
+
+    beRemovable[String](EmployerNamePage(srnGen.sample.value, memberIndex, index))
   }
 }

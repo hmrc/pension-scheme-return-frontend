@@ -14,9 +14,16 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.memberpayments
+package pages.nonsipp
 
-import models.SchemeId.Srn
-import pages.Page
+import play.api.libs.json.{__, JsPath}
 
-case class WhatYouWillNeedReceivedTransferPage(srn: Srn) extends Page
+package object receivetransfer {
+
+  object Paths {
+    val membersPayments: JsPath = __ \ "membersPayments"
+    val memberDetails: JsPath = membersPayments \ "memberDetails"
+    val memberTransfersIn: JsPath = memberDetails \ "memberTransfersIn"
+  }
+
+}

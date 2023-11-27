@@ -16,12 +16,12 @@
 
 package controllers.nonsipp.recievetransfer
 
-import controllers.nonsipp.memberpayments.DidSchemeReceiveTransferController.{form, viewModel}
+import controllers.nonsipp.receivetransfer.DidSchemeReceiveTransferController.{form, viewModel}
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.memberpayments.routes
+import controllers.nonsipp.receivetransfer.routes
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import pages.nonsipp.memberpayments.DidSchemeReceiveTransferPage
+import pages.nonsipp.receivetransfer.DidSchemeReceiveTransferPage
 import play.api.libs.json.JsPath
 import views.html.YesNoPageView
 

@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.memberpayments
+package controllers.nonsipp.recievetransfer
 
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.memberpayments.TransferReceivedMemberListController.{form, viewModel}
+import controllers.nonsipp.receivetransfer.routes
+import controllers.nonsipp.receivetransfer.TransferReceivedMemberListController._
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
-import models.{NameDOB, NormalMode}
+import models.{NameDOB, NormalMode, UserAnswers}
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
-import pages.nonsipp.memberpayments.TransferReceivedMemberListPage
+import pages.nonsipp.receivetransfer.TransferReceivedMemberListPage
 import views.html.TwoColumnsTripleAction
 
 class TransferReceivedMemberListControllerSpec extends ControllerBaseSpec {
@@ -44,7 +45,8 @@ class TransferReceivedMemberListControllerSpec extends ControllerBaseSpec {
           srn,
           page = 1,
           NormalMode,
-          memberList: List[NameDOB]
+          memberList: List[NameDOB],
+          userAnswers: UserAnswers
         )
       )
     })
@@ -60,7 +62,8 @@ class TransferReceivedMemberListControllerSpec extends ControllerBaseSpec {
               srn,
               page = 1,
               NormalMode,
-              memberList: List[NameDOB]
+              memberList: List[NameDOB],
+              userAnswers: UserAnswers
             )
           )
     })
