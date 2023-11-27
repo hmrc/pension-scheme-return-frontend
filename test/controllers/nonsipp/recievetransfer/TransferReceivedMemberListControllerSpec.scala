@@ -18,7 +18,7 @@ package controllers.nonsipp.recievetransfer
 
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.receivetransfer.routes
-import controllers.nonsipp.receivetransfer.TransferReceivedMemberListController.{form, viewModel}
+import controllers.nonsipp.receivetransfer.TransferReceivedMemberListController._
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.{NameDOB, NormalMode, UserAnswers}
