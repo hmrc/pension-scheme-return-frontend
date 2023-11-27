@@ -1742,3 +1742,9 @@ employerContributionsCYA.row.contributionOtherEmployer.hidden =  if employer con
 employerContributionsCYA.inset = You cannot add any more employer contributions for this member as you have entered the maximum of 50. If you need to remove one, you can do this on the next page.
 employerContributionsCYA.title.change = Change details of employer contributions
 employerContributionsCYA.heading.change = Change details of employer contributions for {0}
+
+transferring.pensionType.title = What type of scheme is the transferring scheme?
+transferring.pensionType.heading = What type of scheme is {0}?
+transferring.pensionType.registeredPS = Registered pension scheme
+transferring.pensionType.qualifyingRecognisedOverseasPS = Qualifying recognised overseas pension scheme (QROPS)
+transferring.pensionType.other = Other
