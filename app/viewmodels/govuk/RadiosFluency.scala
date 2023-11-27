@@ -23,7 +23,7 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{Content, HtmlContent,
 import uk.gov.hmrc.govukfrontend.views.viewmodels.fieldset.{Fieldset, Legend}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
 import uk.gov.hmrc.govukfrontend.views.viewmodels.radios.{RadioItem, Radios}
-import viewmodels.DisplayMessage.Message
+import viewmodels.DisplayMessage.{InlineMessage, Message}
 import viewmodels.models.{FieldType, ListRadiosRow, YesNoViewModel}
 import viewmodels.{ErrorMessageAwareness, LegendSize}
 import views.components.Components.renderMessage
@@ -163,12 +163,19 @@ trait RadiosFluency {
       no: YesNoViewModel,
       whenYes: (Message, FieldType) => Html,
       whenNo: (Message, FieldType) => Html,
-      legend: Option[Message]
+      legend: Option[Message],
+      heading: InlineMessage
     )(implicit messages: Messages): Radios =
       Radios(
         fieldset = Some(
           FieldsetViewModel(
-            legend.map(legend => LegendViewModel(legend.toMessage).withSize(LegendSize.Medium))
+            legend
+              .map(legend => LegendViewModel(legend.toMessage).withSize(LegendSize.Medium))
+              .getOrElse(
+                LegendViewModel(heading.toString)
+                  .asPageHeading(LegendSize.Large)
+                  .withCssClass("govuk-visually-hidden")
+              )
           )
         ),
         name = field.name,

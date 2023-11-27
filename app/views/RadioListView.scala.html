@@ -55,7 +55,9 @@
                             }
                         )
                 },
-                legend = viewmodel.page.legend.map(legend => LegendViewModel(legend.toMessage).withSize(LegendSize.Medium))
+                legend = viewmodel.page.legend
+                    .map(legend => LegendViewModel(legend.toMessage).withSize(LegendSize.Medium))
+                    .getOrElse(LegendViewModel(renderMessage(viewmodel.heading)).asPageHeading(LegendSize.Large).withCssClass("govuk-visually-hidden"))
             )
         )
 

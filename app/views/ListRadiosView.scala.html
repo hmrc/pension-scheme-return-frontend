@@ -45,7 +45,9 @@
                 RadiosViewModel.radioList(
                   field = form("value"),
                   items = rows,
-                  legend = Some(LegendViewModel(renderMessage(viewmodel.page.legend)).withSize(LegendSize.Small))
+                  legend = viewmodel.page.legend
+                    .map(legend => Some(LegendViewModel(renderMessage(legend)).withSize(LegendSize.Small)))
+                    .getOrElse(Some(LegendViewModel(renderMessage(viewmodel.heading)).asPageHeading(LegendSize.Large).withCssClass("govuk-visually-hidden")))
                 )
             )
         }
