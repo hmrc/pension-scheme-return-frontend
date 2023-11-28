@@ -16,11 +16,12 @@
 
 package controllers.nonsipp.memberpayments
 
-import config.Refined.{Max300, Max50, Max5000}
+import config.Refined.{Max300, Max50}
 import controllers.actions.IdentifyAndRequireData
-import forms.{RadioListFormProvider, TextFormProvider}
+import forms.mappings.errors.InputFormErrors
+import forms.RadioListFormProvider
 import models.SchemeId.Srn
-import models.{Mode, PensionSchemeType, UserAnswers}
+import models.{ConditionalRadioMapper, Mode, PensionSchemeType}
 import navigation.Navigator
 import pages.nonsipp.memberpayments.PensionSchemeTypePage
 import play.api.data.Form
@@ -28,6 +29,8 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import forms.mappings.Mappings
+import models.GenericFormMapper.ConditionalRadioMapper
 import utils.FormUtils.FormOps
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FieldType, FormPageViewModel, RadioItemConditional, RadioListRowViewModel, RadioListViewModel}
@@ -41,7 +44,7 @@ class TransferringSchemeType @Inject()(
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
-  formProvider: TextFormProvider,
+  formProvider: RadioListFormProvider,
   saveService: SaveService,
   val controllerComponents: MessagesControllerComponents,
   view: RadioListView
@@ -95,12 +98,34 @@ class TransferringSchemeType @Inject()(
 }
 
 object TransferringSchemeType {
+  implicit val formMapping: ConditionalRadioMapper[String, PensionSchemeType] =
+    ConditionalRadioMapper[String, PensionSchemeType](
+      to = (value, conditional) =>
+        ((value, conditional): @unchecked) match {
+          case (PensionSchemeType.RegisteredPS.name, Some(code)) => PensionSchemeType.RegisteredPS(code)
+          case (PensionSchemeType.QualifyingRecognisedOverseasPS.name, Some(code)) =>
+            PensionSchemeType.QualifyingRecognisedOverseasPS(code)
+          case (PensionSchemeType.Other.name, Some(details)) => PensionSchemeType.Other(details)
+        },
+      from = {
+        case PensionSchemeType.RegisteredPS(code) => Some((PensionSchemeType.RegisteredPS.name, Some(code)))
+        case PensionSchemeType.QualifyingRecognisedOverseasPS(code) =>
+          Some((PensionSchemeType.QualifyingRecognisedOverseasPS.name, Some(code)))
+        case PensionSchemeType.Other(details) => Some((PensionSchemeType.Other.name, Some(details)))
+      }
+    )
 
-  def form(formProvider: TextFormProvider): Form[String] = formProvider.text(
-    "companySellerName.error.required",
-    "companySellerName.error.tooLong",
-    "companySellerName.error.invalid"
+  private val formErrors = InputFormErrors.textArea(
+    "howWasDisposed.conditional.error.required",
+    "howWasDisposed.conditional.error.invalid",
+    "howWasDisposed.conditional.error.length"
   )
+  def form(formProvider: RadioListFormProvider): Form[PensionSchemeType] =
+    formProvider.singleConditional[PensionSchemeType, String](
+      "howWasDisposed.error.required",
+      PensionSchemeType.Other.name,
+      Mappings.input(formErrors)
+    )(formMapping)
 
   private def radioListItems(schemeName: String): List[RadioListRowViewModel] =
     PensionSchemeType.values.map { aType =>

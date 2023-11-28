@@ -16,7 +16,7 @@
 
 package models
 
-import play.api.libs.json.{JsString, Writes}
+import play.api.libs.json.{Format, JsString, Json, Writes}
 import play.api.mvc.JavascriptLiteral
 import utils.WithName
 
@@ -24,17 +24,22 @@ sealed trait PensionSchemeType {
   val name: String
 
   def fold[A](aRegisteredPS: => A, aQualifyingRecognisedOverseasPS: => A, other: => A): A = this match {
-    case PensionSchemeType.RegisteredPS => aRegisteredPS
-    case PensionSchemeType.QualifyingRecognisedOverseasPS => aQualifyingRecognisedOverseasPS
-    case PensionSchemeType.Other => other
+    case PensionSchemeType.RegisteredPS(_) => aRegisteredPS
+    case PensionSchemeType.QualifyingRecognisedOverseasPS(_) => aQualifyingRecognisedOverseasPS
+    case PensionSchemeType.Other(_) => other
 
   }
 }
 
 object PensionSchemeType extends Enumerable.Implicits {
 
+  case class RegisteredPS(code: String) extends WithName("registeredPS") with PensionSchemeType
   case object RegisteredPS extends WithName("registeredPS") with PensionSchemeType
+  case class QualifyingRecognisedOverseasPS(code: String)
+      extends WithName("qualifyingRecognisedOverseasPS")
+      with PensionSchemeType
   case object QualifyingRecognisedOverseasPS extends WithName("qualifyingRecognisedOverseasPS") with PensionSchemeType
+  case class Other(details: String) extends WithName("other") with PensionSchemeType
   case object Other extends WithName("other") with PensionSchemeType
 
   val values: List[PensionSchemeType] = List(RegisteredPS, QualifyingRecognisedOverseasPS, Other)
