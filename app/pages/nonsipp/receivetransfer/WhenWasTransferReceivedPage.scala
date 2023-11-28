@@ -29,5 +29,5 @@ case class WhenWasTransferReceivedPage(srn: Srn, index: Max300, secondaryIndex: 
 
   override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString \ secondaryIndex.arrayIndex.toString
 
-  override def toString: String = "transferReceived"
+  override def toString: String = "dateOfTransfer"
 }
