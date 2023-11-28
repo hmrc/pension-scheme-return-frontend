@@ -41,7 +41,7 @@ object ReceiveTransferNavigator extends JourneyNavigator {
     case TransferReceivedMemberListPage(srn) =>
       controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
 
-    case TransferringSchemeTypePage(srn,index,secondaryIndex ) =>
+    case TransferringSchemeTypePage(srn, index, secondaryIndex) =>
       controllers.routes.UnauthorisedController.onPageLoad()
   }
 

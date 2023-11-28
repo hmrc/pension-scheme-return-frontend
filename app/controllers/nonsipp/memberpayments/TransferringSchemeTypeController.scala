@@ -83,7 +83,10 @@ class TransferringSchemeTypeController @Inject()(
           Future
             .successful(
               BadRequest(
-                view(formWithErrors, TransferringSchemeTypeController.viewModel(srn, index, secondaryIndex, schemeName, mode))
+                view(
+                  formWithErrors,
+                  TransferringSchemeTypeController.viewModel(srn, index, secondaryIndex, schemeName, mode)
+                )
               )
             ),
         answer => {
@@ -91,7 +94,9 @@ class TransferringSchemeTypeController @Inject()(
             updatedAnswers <- Future
               .fromTry(request.userAnswers.set(TransferringSchemeTypePage(srn, index, secondaryIndex), answer))
             _ <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage(TransferringSchemeTypePage(srn, index, secondaryIndex), mode, updatedAnswers))
+          } yield Redirect(
+            navigator.nextPage(TransferringSchemeTypePage(srn, index, secondaryIndex), mode, updatedAnswers)
+          )
         }
       )
   }
@@ -163,6 +168,7 @@ object TransferringSchemeTypeController {
         None,
         radioListItems(schemeName)
       ),
-      controllers.nonsipp.memberpayments.routes.TransferringSchemeType.onPageLoad(srn, index, secondaryIndex, mode)
+      controllers.nonsipp.memberpayments.routes.TransferringSchemeTypeController
+        .onPageLoad(srn, index, secondaryIndex, mode)
     )
 }

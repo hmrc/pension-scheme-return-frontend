@@ -484,10 +484,10 @@ GET         /:srn/change-select-a-member                                        
 GET         /:srn/change-select-a-member/:page                                          controllers.nonsipp.memberpayments.TransferReceivedMemberListController.onPageLoad(srn: Srn, page: Int, mode: Mode = CheckMode)
 POST        /:srn/change-select-a-member/:page                                          controllers.nonsipp.memberpayments.TransferReceivedMemberListController.onSubmit(srn: Srn, page: Int, mode: Mode = CheckMode)
 
-GET         /:srn/transferring-scheme-type                                              controllers.nonsipp.memberpayments.TransferringSchemeType.onPageLoad(srn: Srn, index: Max300 = 1, secondaryIndex: Max50 = 1, mode: Mode = NormalMode)
-GET         /:srn/transferring-scheme-type/:index/:secondaryIndex                       controllers.nonsipp.memberpayments.TransferringSchemeType.onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode = NormalMode)
-POST        /:srn/transferring-scheme-type/:index/:secondaryIndex                       controllers.nonsipp.memberpayments.TransferringSchemeType.onSubmit(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode = NormalMode)
+GET         /:srn/transferring-scheme-type                                              controllers.nonsipp.memberpayments.TransferringSchemeTypeController.onPageLoad(srn: Srn, index: Max300 = 1, secondaryIndex: Max50 = 1, mode: Mode = NormalMode)
+GET         /:srn/transferring-scheme-type/:index/:secondaryIndex                       controllers.nonsipp.memberpayments.TransferringSchemeTypeController.onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode = NormalMode)
+POST        /:srn/transferring-scheme-type/:index/:secondaryIndex                       controllers.nonsipp.memberpayments.TransferringSchemeTypeController.onSubmit(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode = NormalMode)
 
-GET         /:srn/change-transferring-scheme-type                                       controllers.nonsipp.memberpayments.TransferringSchemeType.onPageLoad(srn: Srn, index: Max300 = 1, secondaryIndex: Max50 = 1, mode: Mode = CheckMode)
-GET         /:srn/change-transferring-scheme-type/:index/:secondaryIndex                controllers.nonsipp.memberpayments.TransferringSchemeType.onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode = CheckMode)
-POST        /:srn/change-transferring-scheme-type/:index/:secondaryIndex                controllers.nonsipp.memberpayments.TransferringSchemeType.onSubmit(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode = CheckMode)
+GET         /:srn/change-transferring-scheme-type                                       controllers.nonsipp.memberpayments.TransferringSchemeTypeController.onPageLoad(srn: Srn, index: Max300 = 1, secondaryIndex: Max50 = 1, mode: Mode = CheckMode)
+GET         /:srn/change-transferring-scheme-type/:index/:secondaryIndex                controllers.nonsipp.memberpayments.TransferringSchemeTypeController.onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode = CheckMode)
+POST        /:srn/change-transferring-scheme-type/:index/:secondaryIndex                controllers.nonsipp.memberpayments.TransferringSchemeTypeController.onSubmit(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode = CheckMode)
