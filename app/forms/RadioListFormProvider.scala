@@ -48,4 +48,15 @@ class RadioListFormProvider @Inject() extends Mappings {
       )((x, y) => ev.to((x, y)))(ev.from)
     )
   }
+
+  def tripleConditional[A, Conditional](
+    requiredKey: String,
+    conditionalKeys: List[String],
+    conditionalMapping: Mapping[Conditional]
+  )(implicit ev: ConditionalRadioMapper[Conditional, A]): Form[A] =
+
+    conditionalKeys.map{ aKey =>
+      val conditional: Map[String, String] => Boolean = _.get("value").contains(aKey)
+
+    }
 }
