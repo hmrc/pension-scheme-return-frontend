@@ -30,7 +30,7 @@ import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.FormUtils.FormOps
 import viewmodels.DisplayMessage.Message
-import viewmodels.models.{FormPageViewModel, RadioListRowViewModel, RadioListViewModel}
+import viewmodels.models.{FieldType, FormPageViewModel, RadioItemConditional, RadioListRowViewModel, RadioListViewModel}
 import views.html.RadioListView
 import viewmodels.implicits._
 
@@ -102,9 +102,26 @@ object TransferringSchemeType {
     "companySellerName.error.invalid"
   )
 
-  private def radioListItems(): List[RadioListRowViewModel] =
+  private def radioListItems(schemeName: String): List[RadioListRowViewModel] =
     PensionSchemeType.values.map { aType =>
-      RadioListRowViewModel(Message(s"transferring.pensionType.${aType.name}"), aType.name)
+      val conditionalField = if (aType.name == "other") {
+        RadioItemConditional(
+          FieldType.Textarea,
+          label = Some(Message(s"transferring.pensionType.${aType.name}.label", schemeName))
+        )
+      } else {
+        RadioItemConditional(
+          FieldType.Input,
+          label = Some(Message(s"transferring.pensionType.${aType.name}.label", schemeName))
+        )
+      }
+
+      RadioListRowViewModel.conditional(
+        content = Message(s"transferring.pensionType.${aType.name}"),
+        aType.name,
+        hint = None,
+        conditionalField
+      )
     }
 
   def viewModel(
@@ -119,7 +136,7 @@ object TransferringSchemeType {
       Message("transferring.pensionType.heading", schemeName),
       RadioListViewModel(
         None,
-        radioListItems()
+        radioListItems(schemeName)
       ),
       controllers.nonsipp.memberpayments.routes.TransferringSchemeType.onPageLoad(srn, index, secondaryIndex, mode)
     )
