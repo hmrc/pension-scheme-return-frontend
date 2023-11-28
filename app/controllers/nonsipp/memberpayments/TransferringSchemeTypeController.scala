@@ -23,7 +23,7 @@ import forms.RadioListFormProvider
 import models.SchemeId.Srn
 import models.{ConditionalRadioMapper, Mode, PensionSchemeType}
 import navigation.Navigator
-import pages.nonsipp.memberpayments.PensionSchemeTypePage
+import pages.nonsipp.memberpayments.TransferringSchemeTypePage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -40,7 +40,7 @@ import viewmodels.implicits._
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
-class TransferringSchemeType @Inject()(
+class TransferringSchemeTypeController @Inject()(
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -58,12 +58,12 @@ class TransferringSchemeType @Inject()(
     secondaryIndex: Max50,
     mode: Mode
   ): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    val form = TransferringSchemeType.form(formProvider)
+    val form = TransferringSchemeTypeController.form(formProvider)
     val schemeName = request.schemeDetails.schemeName
     Ok(
       view(
-        form.fromUserAnswers(PensionSchemeTypePage(srn, index, secondaryIndex)),
-        TransferringSchemeType.viewModel(srn, index, secondaryIndex, schemeName, mode)
+        form.fromUserAnswers(TransferringSchemeTypePage(srn, index, secondaryIndex)),
+        TransferringSchemeTypeController.viewModel(srn, index, secondaryIndex, schemeName, mode)
       )
     )
   }
@@ -74,7 +74,7 @@ class TransferringSchemeType @Inject()(
     secondaryIndex: Max50,
     mode: Mode
   ): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
-    val form = TransferringSchemeType.form(formProvider)
+    val form = TransferringSchemeTypeController.form(formProvider)
     val schemeName = request.schemeDetails.schemeName
     form
       .bindFromRequest()
@@ -83,21 +83,21 @@ class TransferringSchemeType @Inject()(
           Future
             .successful(
               BadRequest(
-                view(formWithErrors, TransferringSchemeType.viewModel(srn, index, secondaryIndex, schemeName, mode))
+                view(formWithErrors, TransferringSchemeTypeController.viewModel(srn, index, secondaryIndex, schemeName, mode))
               )
             ),
         answer => {
           for {
             updatedAnswers <- Future
-              .fromTry(request.userAnswers.set(PensionSchemeTypePage(srn, index, secondaryIndex), answer))
+              .fromTry(request.userAnswers.set(TransferringSchemeTypePage(srn, index, secondaryIndex), answer))
             _ <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage(PensionSchemeTypePage(srn, index, secondaryIndex), mode, updatedAnswers))
+          } yield Redirect(navigator.nextPage(TransferringSchemeTypePage(srn, index, secondaryIndex), mode, updatedAnswers))
         }
       )
   }
 }
 
-object TransferringSchemeType {
+object TransferringSchemeTypeController {
   implicit val formMapping: ConditionalRadioMapper[String, PensionSchemeType] =
     ConditionalRadioMapper[String, PensionSchemeType](
       to = (value, conditional) =>

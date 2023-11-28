@@ -27,7 +27,7 @@ import utils.RefinedUtils.RefinedIntOps
 
 import scala.util.Try
 
-case class PensionSchemeTypePage(srn: Srn, index: Max300, secondaryIndex: Max50)
+case class TransferringSchemeTypePage(srn: Srn, index: Max300, secondaryIndex: Max50)
     extends QuestionPage[PensionSchemeType] {
 
   override def path: JsPath = MemberPaymentsPage.path \ toString

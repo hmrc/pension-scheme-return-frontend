@@ -40,6 +40,9 @@ object ReceiveTransferNavigator extends JourneyNavigator {
 
     case TransferReceivedMemberListPage(srn) =>
       controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
+
+    case TransferringSchemeTypePage(srn,index,secondaryIndex ) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
   }
 
   override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] =
