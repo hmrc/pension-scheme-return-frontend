@@ -1753,3 +1753,14 @@ transferringSchemeName.error.required = Enter the transferring scheme’s name
 transferringSchemeName.error.tooLong = Transferring scheme’s name must be 160 characters or fewer
 transferringSchemeName.error.invalid = Transferring scheme’s name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
 
+transferReceived.title = When was this transfer for this member received?
+transferReceived.heading = When was the transfer from {0} for {1} received?
+transferReceived.error.required.day = Date the transfer was received must include day
+transferReceived.error.required.month = Date the transfer was received must include month
+transferReceived.error.required.year = Date the transfer was received must include year
+transferReceived.error.required.two = Date the transfer was received must include a {0} and {1}
+transferReceived.error.required.all = Enter the date the transfer was received
+transferReceived.error.date.before = Date the transfer was received must be after {0}
+transferReceived.error.date.after = Date the transfer was received must be before {0}
+transferReceived.error.invalid.date = Date the transfer was received must be a real date
+transferReceived.error.invalid.chars = Date the transfer was received must only include numbers 0 to 9

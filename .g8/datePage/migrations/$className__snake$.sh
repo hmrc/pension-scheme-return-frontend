@@ -1,54 +1,78 @@
 #!/bin/bash
 
+$! Generic !$
 echo ""
 echo "Applying migration $className;format="snake"$"
 
+$if(directory.empty)$
+DIR=../conf/app.routes
+PACKAGE="controllers.nonsipp"
+$else$
+DIR=../conf/$directory$.routes
+PACKAGE="controllers.nonsipp.$directory$"
+$endif$
+
 echo "Adding routes to conf/app.routes"
 
-echo "" >> ../conf/app.routes
-echo "GET        /$className;format="decap"$                  controllers.$className$Controller.onPageLoad(mode: Mode = NormalMode)" >> ../conf/app.routes
-echo "POST       /$className;format="decap"$                  controllers.$className$Controller.onSubmit(mode: Mode = NormalMode)" >> ../conf/app.routes
+echo -en "\n\n" >> ../conf/app.routes
+$if(index.empty)$
+echo "GET        /:srn/$urlPath$                        \${PACKAGE}.$className$Controller.onPageLoad(srn: Srn, mode: Mode = NormalMode)" >> \$DIR
+echo "POST       /:srn/$urlPath$                        \${PACKAGE}.$className$Controller.onSubmit(srn: Srn, mode: Mode = NormalMode)" >> \$DIR
 
-echo "GET        /change$className$                        controllers.$className$Controller.onPageLoad(mode: Mode = CheckMode)" >> ../conf/app.routes
-echo "POST       /change$className$                        controllers.$className$Controller.onSubmit(mode: Mode = CheckMode)" >> ../conf/app.routes
+echo "GET        /:srn/change-$urlPath$                 \${PACKAGE}.$className$Controller.onPageLoad(srn: Srn, mode: Mode = CheckMode)" >> \$DIR
+echo "POST       /:srn/change-$urlPath$                 \${PACKAGE}.$className$Controller.onSubmit(srn: Srn, mode: Mode = CheckMode)" >> \$DIR
+$else$
+  $if(secondaryIndex.empty)$
+  echo "GET        /:srn/$urlPath$/:index                 \${PACKAGE}.$className$Controller.onPageLoad(srn: Srn, index: $index$, mode: Mode = NormalMode)" >> \$DIR
+  echo "POST       /:srn/$urlPath$/:index                 \${PACKAGE}.$className$Controller.onSubmit(srn: Srn, index: $index$, mode: Mode = NormalMode)" >> \$DIR
+
+  echo "GET        /:srn/change-$urlPath$/:index          \${PACKAGE}.$className$Controller.onPageLoad(srn: Srn, index: $index$, mode: Mode = CheckMode)" >> \$DIR
+  echo "POST       /:srn/change-$urlPath$/:index          \${PACKAGE}.$className$Controller.onSubmit(srn: Srn, index: $index$, mode: Mode = CheckMode)" >> \$DIR
+  $else$
+  echo "GET        /:srn/$urlPath$/:index/:secondaryIndex                 \${PACKAGE}.$className$Controller.onPageLoad(srn: Srn, index: $index$, secondaryIndex: $secondaryIndex$, mode: Mode = NormalMode)" >> \$DIR
+  echo "POST       /:srn/$urlPath$/:index/:secondaryIndex                 \${PACKAGE}.$className$Controller.onSubmit(srn: Srn, index: $index$, secondaryIndex: $secondaryIndex$, mode: Mode = NormalMode)" >> \$DIR
+
+  echo "GET        /:srn/change-$urlPath$/:index/:secondaryIndex          \${PACKAGE}.$className$Controller.onPageLoad(srn: Srn, index: $index$, secondaryIndex: $secondaryIndex$, mode: Mode = CheckMode)" >> \$DIR
+  echo "POST       /:srn/change-$urlPath$/:index/:secondaryIndex          \${PACKAGE}.$className$Controller.onSubmit(srn: Srn, index: $index$, secondaryIndex: $secondaryIndex$, mode: Mode = CheckMode)" >> \$DIR
+  $endif$
+$endif$
+$! Generic end !$
 
 echo "Adding messages to conf.messages"
 echo "" >> ../conf/messages.en
-echo "$className;format="decap"$.title = $className$" >> ../conf/messages.en
-echo "$className;format="decap"$.heading = $className$" >> ../conf/messages.en
-echo "$className;format="decap"$.hint = For example, 12 11 2007" >> ../conf/messages.en
-echo "$className;format="decap"$.checkYourAnswersLabel = $className$" >> ../conf/messages.en
-echo "$className;format="decap"$.error.required.all = Enter the $className;format="decap"$" >> ../conf/messages.en
-echo "$className;format="decap"$.error.required.two = The $className;format="decap"$" must include {0} and {1} >> ../conf/messages.en
-echo "$className;format="decap"$.error.required = The $className;format="decap"$ must include {0}" >> ../conf/messages.en
-echo "$className;format="decap"$.error.invalid = Enter a real $className$" >> ../conf/messages.en
-echo "$className;format="decap"$.change.hidden = $className$" >> ../conf/messages.en
+echo "$className;format="decap"$.title = $title$" >> ../conf/messages.en
+echo "$className;format="decap"$.heading = $heading$" >> ../conf/messages.en
+$if(!hint.empty)$
+echo "$className;format="decap"$.hint = $hint$" >> ../conf/messages.en
+$endif$
+echo "$className;format="decap"$.error.required.day = $errorMissingDay$" >> ../conf/messages.en
+echo "$className;format="decap"$.error.required.month = $errorMissingMonth$" >> ../conf/messages.en
+echo "$className;format="decap"$.error.required.year = $errorMissingYear$" >> ../conf/messages.en
+echo "$className;format="decap"$.error.required.two = $errorMissingTwo$" >> ../conf/messages.en
+echo "$className;format="decap"$.error.required.all = $errorMissingAll$" >> ../conf/messages.en
+echo "$className;format="decap"$.error.date.before = $errorBefore$" >> ../conf/messages.en
+echo "$className;format="decap"$.error.date.after = $errorAfter$" >> ../conf/messages.en
+echo "$className;format="decap"$.error.invalid.date = $errorInvalidDate$" >> ../conf/messages.en
+echo "$className;format="decap"$.error.invalid.chars = $errorInvalidChars$" >> ../conf/messages.en
 
-echo "Adding to UserAnswersEntryGenerators"
-awk '/trait UserAnswersEntryGenerators/ {\
-    print;\
-    print "";\
-    print "  implicit lazy val arbitrary$className$UserAnswersEntry: Arbitrary[($className$Page.type, JsValue)] =";\
-    print "    Arbitrary {";\
-    print "      for {";\
-    print "        page  <- arbitrary[$className$Page.type]";\
-    print "        value <- arbitrary[Int].map(Json.toJson(_))";\
-    print "      } yield (page, value)";\
-    print "    }";\
-    next }1' ../test-utils/generators/UserAnswersEntryGenerators.scala > tmp && mv tmp ../test-utils/generators/UserAnswersEntryGenerators.scala
 
-echo "Adding to PageGenerators"
-awk '/trait PageGenerators/ {\
-    print;\
-    print "";\
-    print "  implicit lazy val arbitrary$className$Page: Arbitrary[$className$Page.type] =";\
-    print "    Arbitrary($className$Page)";\
-    next }1' ../test-utils/generators/PageGenerators.scala > tmp && mv tmp ../test-utils/generators/PageGenerators.scala
+$! Generic !$
+DIR="$directory$"
 
-echo "Adding to UserAnswersGenerator"
-awk '/val generators/ {\
-    print;\
-    print "    arbitrary[($className$Page.type, JsValue)] ::";\
-    next }1' ../test-utils/generators/UserAnswersGenerator.scala > tmp && mv tmp ../test-utils/generators/UserAnswersGenerator.scala
+if [ -z \$DIR ]; then
+  echo "DIR empty, skipping"
+else
+  echo "Add to navigator"
+  $if(index.empty)$
+  ../.g8/scripts/updateNavigator $className;format="cap"$Page $directory$
+  $else$
+    $if(secondaryIndex.empty)$
+    ../.g8/scripts/updateNavigator $className;format="cap"$Page $directory$ "$index$"
+    $else$
+    ../.g8/scripts/updateNavigator $className;format="cap"$Page $directory$ "$index$" "$secondaryIndex$"
+    $endif$
+  $endif$
+fi
 
 echo "Migration $className;format="snake"$ completed"
+$! Generic end !$

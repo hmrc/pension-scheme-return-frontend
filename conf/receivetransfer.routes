@@ -17,3 +17,8 @@ GET         /:srn/transferring-scheme-name/:memberIndex/:index                  
 POST        /:srn/transferring-scheme-name/:memberIndex/:index                               controllers.nonsipp.receivetransfer.TransferringSchemeNameController.onSubmit(srn: Srn, memberIndex: Max300, index: Max50, mode: Mode = NormalMode)
 GET         /:srn/change-transferring-scheme-name/:memberIndex/:index                        controllers.nonsipp.receivetransfer.TransferringSchemeNameController.onPageLoad(srn: Srn, memberIndex: Max300, index: Max50, mode: Mode = CheckMode)
 POST        /:srn/change-transferring-scheme-name/:memberIndex/:index                        controllers.nonsipp.receivetransfer.TransferringSchemeNameController.onSubmit(srn: Srn, memberIndex: Max300, index: Max50, mode: Mode = CheckMode)
+
+GET        /:srn/when-was-transfer-received/:index/:secondaryIndex                 controllers.nonsipp.receivetransfer.WhenWasTransferReceivedController.onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode = NormalMode)
+POST       /:srn/when-was-transfer-received/:index/:secondaryIndex                 controllers.nonsipp.receivetransfer.WhenWasTransferReceivedController.onSubmit(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode = NormalMode)
+GET        /:srn/change-when-was-transfer-received/:index/:secondaryIndex          controllers.nonsipp.receivetransfer.WhenWasTransferReceivedController.onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode = CheckMode)
+POST       /:srn/change-when-was-transfer-received/:index/:secondaryIndex          controllers.nonsipp.receivetransfer.WhenWasTransferReceivedController.onSubmit(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode = CheckMode)
