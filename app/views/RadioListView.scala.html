@@ -24,6 +24,7 @@
     govukRadios: GovukRadios,
     govukButton: GovukButton,
     govukTextarea: GovukTextarea,
+    govukInput: GovukInput
 )
 
 @(form: Form[_], viewmodel: FormPageViewModel[RadioListViewModel])(implicit request: Request[_], messages: Messages)
@@ -52,6 +53,7 @@
                             hint = row.hint.map(h => Hint(content = Text(h.toMessage))),
                             conditionalHtml = row.conditional.map{
                                 case RadioItemConditional(FieldType.Textarea, hint) => textArea(hint, row)
+                                case RadioItemConditional(FieldType.Input, hint) => input("value.schemeType", hint.get)
                             }
                         )
                 },
@@ -73,5 +75,12 @@
             .withLabel(label.map(l => renderMessage(l)))
             .withRows(5)
             .withError(form("conditional").errors.headOption)
+    )
+}
+
+@input(key: String, message: DisplayMessage) = @{
+    govukInput(
+        InputViewModel(form(key), LabelViewModel(renderMessage(message)))
+        .withId(key)
     )
 }
