@@ -43,45 +43,40 @@ class $className;format="cap"$Controller @Inject()(
 
   private val form = $className;format="cap"$Controller.form(formProvider)
 
-  $if(index.empty)$
-  def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
+  $! Generic functions (viewmodel might accept extra params) !$
+  def onPageLoad(srn: Srn, $if(!index.empty)$index: $index$, $endif$$if(!secondaryIndex.empty)$secondaryIndex: $secondaryIndex$, $endif$mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      val preparedForm = request.userAnswers.fillForm($className$Page(srn), form)
-      Ok(view(preparedForm, viewModel(srn, mode)))
+      val preparedForm = request.userAnswers.get($className$Page(srn$if(!index.empty) $, index$endif$$if(!secondaryIndex.empty) $, secondaryIndex$endif$)).fold(form)(form.fill)
+      $if(!requiredPage) $
+      request.userAnswers.get($requiredPage$(srn$if(!index.empty) $, index$endif$$if(!secondaryIndex.empty) $, secondaryIndex$endif$)).getOrRecoverJourney { requiredPage =>
+      $endif$
+      Ok(view(preparedForm, viewModel(srn, $if(!requiredPage) $requiredPage, $endif$$if(!index.empty) $index, $endif$$if(!secondaryIndex.empty) $secondaryIndex, $endif$mode)))
+      $if(!requiredPage.empty) $
+      }
+      $endif$
+      }
   }
-  $else$
-  def onPageLoad(srn: Srn, index: $index$, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
-    implicit request =>
-      val preparedForm = request.userAnswers.fillForm($className$Page(srn, index), form)
-      Ok(view(preparedForm, viewModel(srn, index, mode)))
-  }
-  $endif$
 
-  $if(index.empty)$
-  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+  def onSubmit(srn: Srn, $if(!index.empty)$index: $index$, $endif$$if(!secondaryIndex.empty)$secondaryIndex: $secondaryIndex$, $endif$mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       form.bindFromRequest().fold(
-        formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, mode)))),
+        formWithErrors => {
+          $if(!requiredPage) $
+            request.userAnswers.get($requiredPage$(srn$if(!index.empty) $, index$endif$$if(!secondaryIndex.empty) $, secondaryIndex$endif$)).getOrRecoverJourney { requiredPage =>
+          $endif$
+              Future.successful(BadRequest(view(formWithErrors, viewModel(srn, $if(!requiredPage) $requiredPage, $endif$$if(!index.empty) $index, $endif$$if(!secondaryIndex.empty) $secondaryIndex, $endif$mode))))
+          $if(!requiredPage) $
+            }
+          $endif$
+        },
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set($className$Page(srn), value))
-            _              <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage($className$Page(srn), mode, updatedAnswers))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set($className$Page(srn$if(!index.empty) $, index$endif$$if(!secondaryIndex.empty) $, secondaryIndex$endif$), value))
+            _ <- saveService.save(updatedAnswers)
+          } yield Redirect(navigator.nextPage($className$Page(srn$if(!index.empty) $, index$endif$$if(!secondaryIndex.empty) $, secondaryIndex$endif$), mode, updatedAnswers))
       )
   }
-  $else$
-  def onSubmit(srn: Srn, index: $index$, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
-    implicit request =>
-      form.bindFromRequest().fold(
-        formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, index, mode)))),
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set($className$Page(srn, index), value))
-            _              <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage($className$Page(srn, index), mode, updatedAnswers))
-      )
-  }
-  $endif$
+  $! Generic functions end !$
 }
 
 object $className;format="cap"$Controller {
@@ -89,25 +84,15 @@ object $className;format="cap"$Controller {
     "$className;format="decap"$.error.required"
   )
 
-  $if(index.empty)$
-  def viewModel(srn: Srn, mode: Mode): FormPageViewModel[YesNoPageViewModel] = YesNoPageViewModel(
-  $else$
-  def viewModel(srn: Srn, index: $index$, mode: Mode): FormPageViewModel[YesNoPageViewModel] = YesNoPageViewModel(
-  $endif$
+  def viewModel(srn: Srn, $if(!requiredPage.empty)$requiredPage: ???, $endif$$if(!index.empty)$index: $index$, $endif$$if(!secondaryIndex.empty)$secondaryIndex: $secondaryIndex$, $endif$mode: Mode): FormPageViewModel[YesNoPageViewModel] = YesNoPageViewModel(
     "$className;format="decap"$.title",
     "$className;format="decap"$.heading",
-    $if(index.empty)$
-      $if(directory.empty)$
-      controllers.nonsipp.routes.$className;format="cap"$Controller.onSubmit(srn, mode)
-      $else$
-      controllers.nonsipp.$directory$.routes.$className;format="cap"$Controller.onSubmit(srn, mode)
-      $endif$
-    $else$
+    $! Generic onSubmit !$
     $if(directory.empty)$
-      controllers.nonsipp.routes.$className;format="cap"$Controller.onSubmit(srn, index, mode)
-      $else$
-      controllers.nonsipp.$directory$.routes.$className;format="cap"$Controller.onSubmit(srn, index, mode)
-      $endif$
+    controllers.nonsipp.routes.$className;format="cap"$Controller.onSubmit(srn, $if(!index.empty)$index, $endif$$if(!secondaryIndex.empty)$secondaryIndex, $endif$mode)
+    $else$
+    controllers.nonsipp.$directory$.routes.$className;format="cap"$Controller.onSubmit(srn, $if(!index.empty)$index, $endif$$if(!secondaryIndex.empty)$secondaryIndex, $endif$mode)
     $endif$
+    $! Generic onSubmit end !$
   )
 }

@@ -32,3 +32,8 @@ GET        /:srn/when-was-transfer-received/:index/:secondaryIndex              
 POST       /:srn/when-was-transfer-received/:index/:secondaryIndex                 controllers.nonsipp.receivetransfer.WhenWasTransferReceivedController.onSubmit(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode = NormalMode)
 GET        /:srn/change-when-was-transfer-received/:index/:secondaryIndex          controllers.nonsipp.receivetransfer.WhenWasTransferReceivedController.onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode = CheckMode)
 POST       /:srn/change-when-was-transfer-received/:index/:secondaryIndex          controllers.nonsipp.receivetransfer.WhenWasTransferReceivedController.onSubmit(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode = CheckMode)
+
+GET        /:srn/did-transfer-include-asset/:index/:secondaryIndex                 controllers.nonsipp.receivetransfer.DidTransferIncludeAssetController.onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode = NormalMode)
+POST       /:srn/did-transfer-include-asset/:index/:secondaryIndex                 controllers.nonsipp.receivetransfer.DidTransferIncludeAssetController.onSubmit(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode = NormalMode)
+GET        /:srn/change-did-transfer-include-asset/:index/:secondaryIndex          controllers.nonsipp.receivetransfer.DidTransferIncludeAssetController.onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode = CheckMode)
+POST       /:srn/change-did-transfer-include-asset/:index/:secondaryIndex          controllers.nonsipp.receivetransfer.DidTransferIncludeAssetController.onSubmit(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode = CheckMode)

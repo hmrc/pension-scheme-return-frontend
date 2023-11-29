@@ -2,12 +2,10 @@
 
 set -e
 
+$! Generic !$
 echo ""
 echo "Applying migration $className;format="snake"$"
 
-echo "Adding routes to conf/app.routes"
-
-$! Generic !$
 $if(directory.empty)$
 DIR=../conf/app.routes
 PACKAGE="controllers.nonsipp"
@@ -66,6 +64,6 @@ else
     $endif$
   $endif$
 fi
-$! Generic end !$
 
 echo "Migration $className;format="snake"$ completed"
+$! Generic end !$

@@ -25,6 +25,10 @@ employercontributions)
   NAV_FILE="../app/navigation/nonsipp/EmployerContributionsNavigator.scala"
   NAV_SPEC="../test/navigation/nonsipp/EmployerContributionsNavigatorSpec.scala"
   ;;
+receivetransfer)
+  NAV_FILE="../app/navigation/nonsipp/ReceiveTransferNavigator.scala"
+  NAV_SPEC="../test/navigation/nonsipp/ReceiveTransferNavigatorSpec.scala"
+  ;;
 *)
   NAV_FILE=
   NAV_SPEC=
