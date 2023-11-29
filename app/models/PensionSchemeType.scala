@@ -16,12 +16,14 @@
 
 package models
 
-import play.api.libs.json.{JsString, Writes}
+import play.api.libs.functional.syntax._
+import play.api.libs.json.{__, Format, JsResult, JsString, JsValue, Json, Reads, Writes}
 import play.api.mvc.JavascriptLiteral
 import utils.WithName
 
 sealed trait PensionSchemeType {
   val name: String
+  val description: String
 
   def fold[A](aRegisteredPS: => A, aQualifyingRecognisedOverseasPS: => A, other: => A): A = this match {
     case PensionSchemeType.RegisteredPS(_) => aRegisteredPS
@@ -33,21 +35,45 @@ sealed trait PensionSchemeType {
 
 object PensionSchemeType extends Enumerable.Implicits {
 
-  case class RegisteredPS(code: String) extends WithName("registeredPS") with PensionSchemeType
-  case object RegisteredPS extends WithName("registeredPS") with PensionSchemeType
-  case class QualifyingRecognisedOverseasPS(code: String)
+  case class RegisteredPS(description: String) extends WithName("registeredPS") with PensionSchemeType
+
+  case object RegisteredPS extends WithName("registeredPS")
+
+  case class QualifyingRecognisedOverseasPS(description: String)
       extends WithName("qualifyingRecognisedOverseasPS")
       with PensionSchemeType
-  case object QualifyingRecognisedOverseasPS extends WithName("qualifyingRecognisedOverseasPS") with PensionSchemeType
-  case class Other(details: String) extends WithName("other") with PensionSchemeType
-  case object Other extends WithName("other") with PensionSchemeType
+
+  case object QualifyingRecognisedOverseasPS extends WithName("qualifyingRecognisedOverseasPS")
+
+  case class Other(description: String) extends WithName("other") with PensionSchemeType
+
+  case object Other extends WithName("other")
 
   val values: List[PensionSchemeType] = List(RegisteredPS, QualifyingRecognisedOverseasPS, Other)
 
-  implicit val enumerable: Enumerable[PensionSchemeType] = Enumerable(values.map(v => (v.toString, v)): _*)
-
   implicit val jsLiteral: JavascriptLiteral[PensionSchemeType] = (value: PensionSchemeType) => value.name
 
-  implicit val writes: Writes[PensionSchemeType] =
-    Writes(value => JsString(value.toString))
+  implicit val format = new Format[PensionSchemeType] {
+
+    override def reads(json: JsValue): JsResult[PensionSchemeType] =
+      (
+        (__ \ "name")
+          .read[String]
+          .and((__ \ "description").read[String])
+        )((a, b) => (a, b))
+        .flatMap {
+          case (Other.name, description) => Reads.pure(Other(description))
+          case (QualifyingRecognisedOverseasPS.name, description) =>
+            Reads.pure(QualifyingRecognisedOverseasPS(description))
+          case (RegisteredPS.name, description) => Reads.pure(RegisteredPS(description))
+          case (unknown, _) => Reads.failed(s"Failed to read PensionSchemeType with name $unknown")
+        }
+        .reads(json)
+
+    implicit def writes(o: PensionSchemeType): JsValue =
+      Json.obj(
+        "name" -> o.name,
+        "description" -> o.description
+      )
+  }
 }
