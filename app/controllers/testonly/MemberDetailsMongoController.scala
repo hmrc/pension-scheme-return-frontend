@@ -22,11 +22,18 @@ import controllers.actions.IdentifyAndRequireData
 import eu.timepit.refined._
 import models.SchemeId.Srn
 import models.UserAnswers
-import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsNinoPage, MemberDetailsPage, NoNINOPage}
+import pages.nonsipp.memberdetails.{
+  DoesMemberHaveNinoPage,
+  MemberDetailsNinoPage,
+  MemberDetailsPage,
+  MemberStatus,
+  NoNINOPage
+}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.models.MemberState
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -63,6 +70,7 @@ class MemberDetailsMongoController @Inject()(
             .flatMap(_.remove(DoesMemberHaveNinoPage(srn, index)))
             .flatMap(_.remove(MemberDetailsNinoPage(srn, index)))
             .flatMap(_.remove(NoNINOPage(srn, index)))
+            .flatMap(_.remove(MemberStatus(srn, index)))
       }
     } yield updatedUserAnswers
 
@@ -74,9 +82,11 @@ class MemberDetailsMongoController @Inject()(
       }
       hasNinoPages = indexes.map(index => DoesMemberHaveNinoPage(srn, index) -> false)
       noNinoReasonPages = indexes.map(index => NoNINOPage(srn, index) -> "test reason")
+      memberStates = indexes.map(index => MemberStatus(srn, index) -> MemberState.Active)
 
       ua1 <- memberDetails.foldLeft(Try(userAnswers)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
       ua2 <- hasNinoPages.foldLeft(Try(ua1)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
       ua3 <- noNinoReasonPages.foldLeft(Try(ua2)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
-    } yield ua3
+      ua4 <- memberStates.foldLeft(Try(ua3)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
+    } yield ua4
 }

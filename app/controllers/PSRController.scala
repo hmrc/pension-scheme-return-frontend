@@ -83,6 +83,13 @@ abstract class PSRController extends FrontendBaseController with I18nSupport {
     def toFuture: Future[A] = Future.fromTry(t)
   }
 
+  implicit class ListOps[A](l: List[A]) {
+    def zipWithIndexToMap: Map[String, A] =
+      l.zipWithIndex
+        .map(t => t._2.toString -> t._1)
+        .toMap
+  }
+
   implicit class TaxOrAccountingPeriodOps(o: Option[Either[DateRange, NonEmptyList[(DateRange, Max3)]]]) {
     def merge: Option[DateRange] = o.map(_.map(_.toList.map(_._1).sorted.head).merge)
   }
