@@ -17,3 +17,8 @@ GET         /:srn/transferring-scheme-name/:memberIndex/:index                  
 POST        /:srn/transferring-scheme-name/:memberIndex/:index                               controllers.nonsipp.receivetransfer.TransferringSchemeNameController.onSubmit(srn: Srn, memberIndex: Max300, index: Max50, mode: Mode = NormalMode)
 GET         /:srn/change-transferring-scheme-name/:memberIndex/:index                        controllers.nonsipp.receivetransfer.TransferringSchemeNameController.onPageLoad(srn: Srn, memberIndex: Max300, index: Max50, mode: Mode = CheckMode)
 POST        /:srn/change-transferring-scheme-name/:memberIndex/:index                        controllers.nonsipp.receivetransfer.TransferringSchemeNameController.onSubmit(srn: Srn, memberIndex: Max300, index: Max50, mode: Mode = CheckMode)
+
+GET         /:srn/report-another-transfer-in/:index/:secondaryIndex                 controllers.nonsipp.receivetransfer.ReportAnotherTransferInController.onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode = NormalMode)
+POST        /:srn/report-another-transfer-in/:index/:secondaryIndex                 controllers.nonsipp.receivetransfer.ReportAnotherTransferInController.onSubmit(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode = NormalMode)
+GET         /:srn/change-report-another-transfer-in/:index/:secondaryIndex          controllers.nonsipp.receivetransfer.ReportAnotherTransferInController.onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode = CheckMode)
+POST        /:srn/change-report-another-transfer-in/:index/:secondaryIndex          controllers.nonsipp.receivetransfer.ReportAnotherTransferInController.onSubmit(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode = CheckMode)

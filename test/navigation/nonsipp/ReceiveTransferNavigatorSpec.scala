@@ -23,11 +23,13 @@ import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.receivetransfer.{
   DidSchemeReceiveTransferPage,
+  ReportAnotherTransferInPage,
   TransferReceivedMemberListPage,
   TransferringSchemeNamePage,
   WhatYouWillNeedReceivedTransferPage
 }
 import utils.BaseSpec
+import utils.UserAnswersUtils.UserAnswersOps
 
 class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
@@ -97,6 +99,22 @@ class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         )
         .withName("go from transferring scheme name page to unauthorised page")
     )
+  }
+
+  "ReportAnotherTransferInPage" - {
+
+    act.like(
+      normalmode
+        .navigateToWithDoubleDataAndIndex(
+          index,
+          secondaryIndex,
+          ReportAnotherTransferInPage,
+          Gen.const(false),
+          (srn, index: Max300, secondaryIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+        )
+        .withName("go from report another transfer in page to unauthorised page")
+    )
+
   }
 
 }

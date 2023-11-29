@@ -16,7 +16,9 @@
 
 package navigation.nonsipp
 
+import config.Refined.OneTo50
 import controllers.nonsipp.memberpayments
+import eu.timepit.refined.refineV
 import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
@@ -43,6 +45,18 @@ object ReceiveTransferNavigator extends JourneyNavigator {
 
     case TransferReceivedMemberListPage(srn) =>
       controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
+
+    case page @ ReportAnotherTransferInPage(srn, index, secondaryIndex) =>
+      if (userAnswers.get(page).contains(true)) {
+        refineV[OneTo50](secondaryIndex.value + 1) match {
+          case Left(_) => controllers.routes.UnauthorisedController.onPageLoad()
+          case Right(nextIndex) =>
+            controllers.nonsipp.receivetransfer.routes.TransferringSchemeNameController
+              .onPageLoad(srn, index, nextIndex, NormalMode)
+        }
+      } else {
+        controllers.routes.UnauthorisedController.onPageLoad()
+      }
   }
 
   override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] =
