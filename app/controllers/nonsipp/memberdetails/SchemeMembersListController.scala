@@ -63,14 +63,18 @@ class SchemeMembersListController @Inject()(
     identifyAndRequireData(srn) { implicit request =>
       val membersDetails = request.userAnswers.membersDetails(srn)
       if (membersDetails.isEmpty) {
+        logger.error(s"no members found")
         Redirect(routes.PensionSchemeMembersController.onPageLoad(srn))
       } else {
-        Ok(
-          view(
-            form(manualOrUpload, membersDetails.size >= maxSchemeMembers),
-            viewModel(srn, page, manualOrUpload, mode, membersDetails.map(_.fullName))
+        filterDeletedMembers(srn).map { filteredMembers =>
+          val memberNames = filteredMembers.map { case (_, details, _) => details.fullName }
+          Ok(
+            view(
+              form(manualOrUpload, filteredMembers.size >= maxSchemeMembers),
+              viewModel(srn, page, manualOrUpload, mode, memberNames)
+            )
           )
-        )
+        }.merge
       }
     }
 
@@ -108,7 +112,11 @@ class SchemeMembersListController @Inject()(
     srn: Srn
   )(implicit request: DataRequest[_]): Either[Result, List[(Max300, NameDOB, MemberState)]] = {
     val maybeMembersDetails =
-      request.userAnswers.membersDetailsMap(srn).mapKeysToIndex[Max300.Refined].getOrRecoverJourney
+      request.userAnswers
+        .membersDetails(srn)
+        .zipWithIndexToMap
+        .mapKeysToIndex[Max300.Refined]
+        .getOrRecoverJourney
     val maybeMemberStates = request.userAnswers.memberStates(srn).mapKeysToIndex[Max300.Refined].getOrRecoverJourney
 
     maybeMembersDetails.flatMap { membersDetails =>

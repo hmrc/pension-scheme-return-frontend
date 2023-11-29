@@ -23,7 +23,8 @@ import eu.timepit.refined._
 import forms.YesNoPageFormProvider
 import models.ManualOrUpload.{Manual, Upload}
 import models.NormalMode
-import pages.nonsipp.memberdetails.MemberDetailsPage
+import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
+import viewmodels.models.MemberState
 import views.html.ListView
 
 class SchemeMembersListControllerSpec extends ControllerBaseSpec {
@@ -35,10 +36,13 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
 
   private val userAnswersWithMembersDetails = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+    .unsafeSet(MemberStatus(srn, refineMV(1)), MemberState.Active)
 
   private val userAnswersWith300MembersDetails =
     (1 to 300).foldLeft(defaultUserAnswers)(
-      (ua, i) => ua.unsafeSet(MemberDetailsPage(srn, refineV[OneTo300](i).value), memberDetails)
+      (ua, i) =>
+        ua.unsafeSet(MemberDetailsPage(srn, refineV[OneTo300](i).value), memberDetails)
+          .unsafeSet(MemberStatus(srn, refineV[OneTo300](i).value), MemberState.Active)
     )
 
   "SchemeMembersListController" - {

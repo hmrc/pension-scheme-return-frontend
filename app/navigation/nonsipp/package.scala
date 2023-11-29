@@ -17,34 +17,18 @@
 package navigation
 
 import eu.timepit.refined.api.{Refined, Validate}
-import eu.timepit.refined.refineV
+import eu.timepit.refined.{refineMV, refineV}
 
 package object nonsipp {
 
   // Given a list of indexes, this function will check for the next open index to start a new journey
   // Will return None if the the resulting index is out of bounds of the supplied refined type
-  def findNextOpenIndex[A](indexes: List[Int])(implicit ev: Validate[Int, A]): Option[Refined[Int, A]] = {
-    val sortedIndex = indexes.sorted
-    // Checks existing indexes to see if there is a gap
-    // (i.e. If one has been deleted between the first and last index)
-    val maybeGap = sortedIndex.zipWithIndex.collectFirst {
-      case (index, zipIndex) if index != zipIndex => index
-    }
-
-    // If there is a gap in the indexes, set the next index to first one in the gap
-    maybeGap match {
-      case Some(gapIndex) =>
-        // Check if the gap is the first index, if so this means that the original first index was deleted
-        if (sortedIndex.indexOf(gapIndex) == 0) {
-          refineV[A](1).toOption
-        } else {
-          // Checks the index prior to the gap index and increments that to get the next index
-          // This is done instead of just -1 the gap index in case the gap is larger than 1
-          val nextIndex = sortedIndex.applyOrElse(sortedIndex.indexOf(gapIndex) - 1, (_: Int) => gapIndex)
-          refineV[A](nextIndex + 2).toOption
-        }
-      case None =>
-        refineV[A](indexes.max + 2).toOption
+  def findNextOpenIndex[A](list: List[Int])(implicit ev: Validate[Int, A]): Option[Refined[Int, A]] = {
+    val sortedList = list.sorted
+    if (sortedList.isEmpty || sortedList.head != 0) {
+      refineV[A](1).toOption
+    } else {
+      LazyList.from(0).find(index => !sortedList.contains(index)).flatMap(i => refineV[A](i + 1).toOption)
     }
   }
 }
