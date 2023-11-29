@@ -17,9 +17,11 @@
 package forms.mappings
 
 import forms.mappings.errors._
-import models.{Enumerable, Money, Percentage, Security}
-import play.api.data.FormError
+import models.GenericFormMapper.StringFieldMapper
+import models.{Enumerable, GenericFormMapper, Money, Percentage, Security}
+import play.api.data.{FormError, Mapping}
 import play.api.data.format.Formatter
+import uk.gov.voa.play.form.Condition
 
 import java.text.DecimalFormat
 import scala.util.control.Exception.nonFatalCatch
@@ -29,15 +31,58 @@ trait Formatters {
   private[mappings] def stringFormatter(errorKey: String, args: Seq[Any] = Seq.empty): Formatter[String] =
     new Formatter[String] {
 
-      override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], String] =
+      override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], String] = {
+        println(s"======== sf: key: $key")
+
         data.get(key) match {
           case None => Left(Seq(FormError(key, errorKey, args)))
           case Some(s) if s.trim.isEmpty => Left(Seq(FormError(key, errorKey, args)))
           case Some(s) => Right(s)
         }
+      }
 
       override def unbind(key: String, value: String): Map[String, String] =
         Map(key -> value)
+    }
+
+  // like stringFormatter, but targets a specific field key
+  private[mappings] def stringFormatterWithKey(
+    fieldKey: String,
+    errorKey: String,
+    args: Seq[Any] = Seq.empty
+  ): Formatter[String] =
+    new Formatter[String] {
+
+      override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], String] = {
+        println(s"======== sf: key: $key")
+
+        data.get(fieldKey) match {
+          case None => Left(Seq(FormError(fieldKey, errorKey, args)))
+          case Some(s) if s.trim.isEmpty => Left(Seq(FormError(fieldKey, errorKey, args)))
+          case Some(s) => Right(s)
+        }
+      }
+
+      override def unbind(key: String, value: String): Map[String, String] =
+        Map(key -> value)
+    }
+
+  private[mappings] def conditionalFormatter[A](l: List[(Condition, Option[Mapping[A]])])(
+    implicit ev: StringFieldMapper[A]
+  ): Formatter[Option[A]] =
+    new Formatter[Option[A]] {
+
+      override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Option[A]] = {
+        val mappings: Option[Either[Seq[FormError], Option[A]]] = l.collectFirst {
+          case (condition, Some(mapping)) if condition(data) =>
+            mapping.bind(data).map(Some(_))
+        }
+
+        mappings.getOrElse(Right(None))
+      }
+
+      override def unbind(key: String, value: Option[A]): Map[String, String] =
+        value.flatMap(v => ev.from(v).map(vv => Map(key -> vv))).getOrElse(Map.empty)
     }
 
   private[mappings] def optionalStringFormatter(): Formatter[String] =
