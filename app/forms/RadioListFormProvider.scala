@@ -17,11 +17,12 @@
 package forms
 
 import forms.mappings.Mappings
-import models.Enumerable
-import models.GenericFormMapper.ConditionalRadioMapper
+import models.{Enumerable, GenericFormMapper}
+import models.GenericFormMapper.{ConditionalRadioMapper, StringFieldMapper}
 import play.api.data.Forms.mapping
 import play.api.data.{Form, Mapping}
-import uk.gov.voa.play.form.ConditionalMappings
+import uk.gov.voa.play.form.{Condition, ConditionalMappings}
+import viewmodels.models.YesNoViewModel.Conditional
 
 import javax.inject.Inject
 
@@ -49,14 +50,20 @@ class RadioListFormProvider @Inject() extends Mappings {
     )
   }
 
-  def tripleConditional[A, Conditional](
+  def conditionalM[A, Conditional](
     requiredKey: String,
-    conditionalKeys: List[String],
-    conditionalMapping: Mapping[Conditional]
-  )(implicit ev: ConditionalRadioMapper[Conditional, A]): Form[A] =
+    conditionalMappings: List[(String, Option[Mapping[Conditional]])]
+  )(implicit ev: ConditionalRadioMapper[Conditional, A], ev2: StringFieldMapper[Conditional]): Form[A] = {
 
-    conditionalKeys.map{ aKey =>
-      val conditional: Map[String, String] => Boolean = _.get("value").contains(aKey)
+    def conditionalF(key: String): Map[String, String] => Boolean = _.get("value").contains(key)
 
-    }
+    val c = conditionalMappings.map { case (key, mapping) => conditionalF(key) -> mapping }
+
+    Form(
+      mapping[A, String, Option[Conditional]](
+        "value" -> text(requiredKey),
+        "conditional" -> conditional[Conditional](c)
+      )((x, y) => ev.to((x, y)))(ev.from)
+    )
+  }
 }

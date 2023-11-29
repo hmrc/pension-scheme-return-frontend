@@ -70,6 +70,6 @@ else
     $endif$
   $endif$
 fi
-$! Generic end !$
 
 echo "Migration $className;format="snake"$ completed"
+$! Generic end !$

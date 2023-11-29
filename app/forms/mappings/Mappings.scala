@@ -17,11 +17,12 @@
 package forms.mappings
 
 import forms.mappings.errors._
-import models.{Crn, DateRange, Enumerable, Money, Percentage, Security, SelectInput, Utr}
+import models.{Crn, DateRange, Enumerable, GenericFormMapper, Money, Percentage, Security, SelectInput, Utr}
 import play.api.data.Forms.{of, optional}
 import play.api.data.validation.{Constraint, Invalid, Valid}
 import play.api.data.{FieldMapping, Mapping}
 import uk.gov.hmrc.domain.Nino
+import uk.gov.voa.play.form.Condition
 
 import java.time.LocalDate
 
@@ -29,6 +30,14 @@ trait Mappings extends Formatters with Constraints {
 
   def text(errorKey: String = "error.required", args: Seq[Any] = Seq.empty): Mapping[String] =
     of(stringFormatter(errorKey, args)).transform[String](_.trim, _.trim)
+
+  def textWithKey(key: String, errorKey: String = "error.required", args: Seq[Any] = Seq.empty): Mapping[String] =
+    of(stringFormatterWithKey(key, errorKey, args)).transform[String](_.trim, _.trim)
+
+  def conditional[A](
+    l: List[(Condition, Option[Mapping[A]])]
+  )(implicit ev: GenericFormMapper[String, A]): FieldMapping[Option[A]] =
+    of(conditionalFormatter[A](l))
 
   def optionalText(): Mapping[String] =
     of(optionalStringFormatter()).transform[String](_.trim, _.trim)
@@ -163,8 +172,33 @@ trait Mappings extends Formatters with Constraints {
       }
       .verifying(verify[String](maxLengthErrorKey, _.length <= maxLength, args: _*))
 
+  def validatedText(
+    fieldKey: String,
+    requiredKey: String,
+    regexChecks: List[(Regex, String)],
+    maxLength: Int,
+    maxLengthErrorKey: String,
+    args: Any*
+  ): Mapping[String] =
+    regexChecks
+      .foldLeft(textWithKey(fieldKey, requiredKey, args.toList)) {
+        case (mapping, (regex, key)) =>
+          mapping.verifying(verify[String](key, _.matches(regex), args: _*))
+      }
+      .verifying(verify[String](maxLengthErrorKey, _.length <= maxLength, args: _*))
+
   def input(formErrors: InputFormErrors): Mapping[String] =
     validatedText(
+      formErrors.requiredKey,
+      formErrors.regexChecks,
+      formErrors.max._1,
+      formErrors.max._2,
+      formErrors.args: _*
+    )
+
+  def input(key: String, formErrors: InputFormErrors): Mapping[String] =
+    validatedText(
+      key,
       formErrors.requiredKey,
       formErrors.regexChecks,
       formErrors.max._1,
