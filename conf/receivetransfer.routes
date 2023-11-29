@@ -22,3 +22,13 @@ GET         /:srn/report-another-transfer-in/:index/:secondaryIndex             
 POST        /:srn/report-another-transfer-in/:index/:secondaryIndex                 controllers.nonsipp.receivetransfer.ReportAnotherTransferInController.onSubmit(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode = NormalMode)
 GET         /:srn/change-report-another-transfer-in/:index/:secondaryIndex          controllers.nonsipp.receivetransfer.ReportAnotherTransferInController.onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode = CheckMode)
 POST        /:srn/change-report-another-transfer-in/:index/:secondaryIndex          controllers.nonsipp.receivetransfer.ReportAnotherTransferInController.onSubmit(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode = CheckMode)
+
+GET         /:srn/total-value-transfer/:index/:secondaryIndex                  controllers.nonsipp.receivetransfer.TotalValueTransferController.onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode = NormalMode)
+POST        /:srn/total-value-transfer/:index/:secondaryIndex                  controllers.nonsipp.receivetransfer.TotalValueTransferController.onSubmit(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode = NormalMode)
+GET         /:srn/change-total-value-transfer/:index/:secondaryIndex           controllers.nonsipp.receivetransfer.TotalValueTransferController.onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode = CheckMode)
+POST        /:srn/change-total-value-transfer/:index/:secondaryIndex           controllers.nonsipp.receivetransfer.TotalValueTransferController.onSubmit(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode = CheckMode)
+
+GET        /:srn/when-was-transfer-received/:index/:secondaryIndex                 controllers.nonsipp.receivetransfer.WhenWasTransferReceivedController.onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode = NormalMode)
+POST       /:srn/when-was-transfer-received/:index/:secondaryIndex                 controllers.nonsipp.receivetransfer.WhenWasTransferReceivedController.onSubmit(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode = NormalMode)
+GET        /:srn/change-when-was-transfer-received/:index/:secondaryIndex          controllers.nonsipp.receivetransfer.WhenWasTransferReceivedController.onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode = CheckMode)
+POST       /:srn/change-when-was-transfer-received/:index/:secondaryIndex          controllers.nonsipp.receivetransfer.WhenWasTransferReceivedController.onSubmit(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode = CheckMode)
