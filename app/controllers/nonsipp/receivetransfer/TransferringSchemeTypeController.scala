@@ -125,30 +125,33 @@ object TransferringSchemeTypeController {
     "howWasDisposed.conditional.error.invalid",
     "howWasDisposed.conditional.error.length"
   )
-  def form(formProvider: RadioListFormProvider): Form[PensionSchemeType] =
-    formProvider.singleConditional[PensionSchemeType, String](
+  def form(formProvider: RadioListFormProvider): Form[PensionSchemeType] = {
+    val valuesToMap = PensionSchemeType.values.map { aTypeName =>
+      (aTypeName, Some(Mappings.input("conditional", formErrors)))
+    }
+    formProvider.conditionalM[PensionSchemeType, String](
       "howWasDisposed.error.required",
-      PensionSchemeType.Other.name,
-      Mappings.input(formErrors)
-    )(formMapping)
+      valuesToMap
+    )
+  }
 
   private def radioListItems(schemeName: String): List[RadioListRowViewModel] =
     PensionSchemeType.values.map { aType =>
-      val conditionalField = if (aType.name == "other") {
+      val conditionalField = if (aType == "other") {
         RadioItemConditional(
           FieldType.Textarea,
-          label = Some(Message(s"transferring.pensionType.${aType.name}.label", schemeName))
+          label = Some(Message(s"transferring.pensionType.${aType}.label", schemeName))
         )
       } else {
         RadioItemConditional(
           FieldType.Input,
-          label = Some(Message(s"transferring.pensionType.${aType.name}.label", schemeName))
+          label = Some(Message(s"transferring.pensionType.${aType}.label", schemeName))
         )
       }
 
       RadioListRowViewModel.conditional(
-        content = Message(s"transferring.pensionType.${aType.name}"),
-        aType.name,
+        content = Message(s"transferring.pensionType.${aType}"),
+        aType,
         hint = None,
         conditionalField
       )

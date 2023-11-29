@@ -49,7 +49,7 @@ object PensionSchemeType extends Enumerable.Implicits {
 
   case object Other extends WithName("other")
 
-  val values: List[PensionSchemeType] = List(RegisteredPS, QualifyingRecognisedOverseasPS, Other)
+  val values: List[String] = List(RegisteredPS.name, QualifyingRecognisedOverseasPS.name, Other.name)
 
   implicit val jsLiteral: JavascriptLiteral[PensionSchemeType] = (value: PensionSchemeType) => value.name
 
