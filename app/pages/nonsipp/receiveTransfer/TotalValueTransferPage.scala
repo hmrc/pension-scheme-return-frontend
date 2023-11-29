@@ -25,7 +25,7 @@ import pages.QuestionPage
 
 import models.Money
 
-case class TotalValueTransferPage(srn: Srn, index: Max300, secondaryIndex: Max50) extends QuestionPage[Money] {
+case class TotalValueTransferPage(srn: Srn, index: Max300, secondaryIndex: Max5) extends QuestionPage[Money] {
 
   override def path: JsPath =
     Paths.memberTransfersIn \ toString \ index.arrayIndex.toString \ secondaryIndex.arrayIndex.toString

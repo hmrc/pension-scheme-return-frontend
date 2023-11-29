@@ -16,24 +16,17 @@
 
 package pages.nonsipp.receivetransfer
 
-import config.Refined._
-import eu.timepit.refined.refineMV
+import config.Refined.{Max300, Max5}
+import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
+import utils.RefinedUtils.RefinedIntOps
 
-import pages.behaviours.PageBehaviours
+case class ReportAnotherTransferInPage(srn: Srn, index: Max300, secondaryIndex: Max5) extends QuestionPage[Boolean] {
 
-import models.Money
+  override def path: JsPath =
+    Paths.memberTransfersIn \ toString \ index.arrayIndex.toString \ secondaryIndex.arrayIndex.toString
 
-class TotalValueTransferPageSpec extends PageBehaviours {
+  override def toString: String = "reportAnotherTransferIn"
 
-  "TotalValueTransferPage" - {
-
-    val index = refineMV[Max300.Refined](1)
-    val secondaryIndex = refineMV[Max5.Refined](1)
-
-    beRetrievable[Money](TotalValueTransferPage(srnGen.sample.value, index, secondaryIndex))
-
-    beSettable[Money](TotalValueTransferPage(srnGen.sample.value, index, secondaryIndex))
-
-    beRemovable[Money](TotalValueTransferPage(srnGen.sample.value, index, secondaryIndex))
-  }
 }

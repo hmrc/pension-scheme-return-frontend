@@ -34,7 +34,7 @@ import services.SchemeDateService
 class WhenWasTransferReceivedControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[Max300.Refined](1)
-  private val secondaryIndex = refineMV[Max50.Refined](1)
+  private val secondaryIndex = refineMV[Max5.Refined](1)
   private lazy val onPageLoad =
     routes.WhenWasTransferReceivedController.onPageLoad(srn, index, secondaryIndex, NormalMode)
   private lazy val onSubmit = routes.WhenWasTransferReceivedController.onSubmit(srn, index, secondaryIndex, NormalMode)

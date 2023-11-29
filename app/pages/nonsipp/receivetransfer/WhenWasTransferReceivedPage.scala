@@ -25,7 +25,7 @@ import pages.QuestionPage
 
 import java.time.LocalDate
 
-case class WhenWasTransferReceivedPage(srn: Srn, index: Max300, secondaryIndex: Max50) extends QuestionPage[LocalDate] {
+case class WhenWasTransferReceivedPage(srn: Srn, index: Max300, secondaryIndex: Max5) extends QuestionPage[LocalDate] {
 
   override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString \ secondaryIndex.arrayIndex.toString
 

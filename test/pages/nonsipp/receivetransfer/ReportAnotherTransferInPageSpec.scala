@@ -14,22 +14,26 @@
  * limitations under the License.
  */
 
+package pages.nonsipp.receivetransfer
+
 import config.Refined.{Max300, Max5}
 import eu.timepit.refined.refineMV
 import pages.behaviours.PageBehaviours
-import pages.nonsipp.receivetransfer.TransferringSchemeNamePage
 
-class TransferringSchemeNamePageSpec extends PageBehaviours {
+class ReportAnotherTransferInPageSpec extends PageBehaviours {
 
-  private val memberIndex = refineMV[Max300.Refined](1)
-  val index = refineMV[Max5.Refined](1)
+  private val index = refineMV[Max300.Refined](1)
+  private val secondaryIndex = refineMV[Max5.Refined](1)
 
-  "TransferringSchemeNamePage" - {
+  "ReportAnotherTransferInPage" - {
 
-    beRetrievable[String](TransferringSchemeNamePage(srnGen.sample.value, memberIndex, index))
+    val srn = srnGen.sample.value
 
-    beSettable[String](TransferringSchemeNamePage(srnGen.sample.value, memberIndex, index))
+    beRetrievable[Boolean](ReportAnotherTransferInPage(srn, index, secondaryIndex))
 
-    beRemovable[String](TransferringSchemeNamePage(srnGen.sample.value, memberIndex, index))
+    beSettable[Boolean](ReportAnotherTransferInPage(srn, index, secondaryIndex))
+
+    beRemovable[Boolean](ReportAnotherTransferInPage(srn, index, secondaryIndex))
   }
+
 }

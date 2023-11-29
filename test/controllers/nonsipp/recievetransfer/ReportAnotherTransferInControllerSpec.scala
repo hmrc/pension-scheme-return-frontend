@@ -16,69 +16,67 @@
 
 package controllers.nonsipp.receivetransfer
 
-import controllers.nonsipp.receivetransfer.TotalValueTransferController._
-import config.Refined._
-import eu.timepit.refined.refineMV
-import models.NormalMode
+import config.Refined.{Max300, Max5}
 import controllers.ControllerBaseSpec
-import forms.MoneyFormProvider
+import controllers.nonsipp.receivetransfer.ReportAnotherTransferInController.{form, viewModel}
+import eu.timepit.refined.refineMV
+import forms.YesNoPageFormProvider
+import models.NormalMode
 import pages.nonsipp.memberdetails.MemberDetailsPage
-import pages.nonsipp.receivetransfer.{TotalValueTransferPage, TransferringSchemeNamePage}
-import views.html.MoneyView
+import pages.nonsipp.receivetransfer.ReportAnotherTransferInPage
+import views.html.YesNoPageView
 
-class TotalValueTransferControllerSpec extends ControllerBaseSpec {
+class ReportAnotherTransferInControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[Max300.Refined](1)
   private val secondaryIndex = refineMV[Max5.Refined](1)
-  private val userAnswers = defaultUserAnswers
-    .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-    .unsafeSet(TransferringSchemeNamePage(srn, index, secondaryIndex), transferSchemeName)
 
   private lazy val onPageLoad =
-    routes.TotalValueTransferController.onPageLoad(srn, index, secondaryIndex, NormalMode)
-
+    routes.ReportAnotherTransferInController.onPageLoad(srn, index, secondaryIndex, NormalMode)
   private lazy val onSubmit =
-    routes.TotalValueTransferController.onSubmit(srn, index, secondaryIndex, NormalMode)
+    routes.ReportAnotherTransferInController.onSubmit(srn, index, secondaryIndex, NormalMode)
 
-  "TotalValueTransferController" - {
+  private val userAnswers = defaultUserAnswers
+    .unsafeSet(MemberDetailsPage(srn, index), memberDetails)
+
+  "ReportAnotherTransferInController" - {
 
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
-      injected[MoneyView]
+      injected[YesNoPageView]
         .apply(
+          form(injected[YesNoPageFormProvider]),
           viewModel(
             srn,
             index,
             secondaryIndex,
-            memberDetails.fullName,
-            transferSchemeName,
-            form(injected[MoneyFormProvider]),
-            NormalMode
+            NormalMode,
+            memberDetails.fullName
           )
         )
     })
 
     act.like(
-      renderPrePopView(onPageLoad, TotalValueTransferPage(srn, index, secondaryIndex), money, userAnswers) {
+      renderPrePopView(onPageLoad, ReportAnotherTransferInPage(srn, index, secondaryIndex), true, userAnswers) {
         implicit app => implicit request =>
-          injected[MoneyView].apply(
+          injected[YesNoPageView].apply(
+            form(injected[YesNoPageFormProvider]).fill(true),
             viewModel(
               srn,
               index,
               secondaryIndex,
-              memberDetails.fullName,
-              transferSchemeName,
-              form(injected[MoneyFormProvider]).fill(money),
-              NormalMode
+              NormalMode,
+              memberDetails.fullName
             )
           )
       }
     )
 
-    act.like(redirectNextPage(onSubmit, userAnswers, "value" -> "1"))
+    act.like(redirectNextPage(onSubmit, userAnswers, "value" -> "true"))
+    act.like(redirectNextPage(onSubmit, userAnswers, "value" -> "false"))
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
-    act.like(saveAndContinue(onSubmit, "value" -> "1"))
+    act.like(saveAndContinue(onSubmit, userAnswers, "value" -> "true"))
 
     act.like(invalidForm(onSubmit, userAnswers))
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
