@@ -16,13 +16,13 @@
 
 package pages.nonsipp.receivetransfer
 
-import config.Refined.{Max300, Max50}
+import config.Refined.{Max300, Max5}
 import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
 
-case class ReportAnotherTransferInPage(srn: Srn, index: Max300, secondaryIndex: Max50) extends QuestionPage[Boolean] {
+case class ReportAnotherTransferInPage(srn: Srn, index: Max300, secondaryIndex: Max5) extends QuestionPage[Boolean] {
 
   override def path: JsPath =
     Paths.memberTransfersIn \ toString \ index.arrayIndex.toString \ secondaryIndex.arrayIndex.toString

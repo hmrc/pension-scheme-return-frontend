@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.receivetransfer
 
-import config.Refined.{Max300, Max50}
+import config.Refined.{Max300, Max5}
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.receivetransfer.ReportAnotherTransferInController.{form, viewModel}
 import eu.timepit.refined.refineMV
@@ -29,7 +29,7 @@ import views.html.YesNoPageView
 class ReportAnotherTransferInControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[Max300.Refined](1)
-  private val secondaryIndex = refineMV[Max50.Refined](1)
+  private val secondaryIndex = refineMV[Max5.Refined](1)
 
   private lazy val onPageLoad =
     routes.ReportAnotherTransferInController.onPageLoad(srn, index, secondaryIndex, NormalMode)

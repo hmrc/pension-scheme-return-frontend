@@ -30,7 +30,7 @@ class WhenWasTransferReceivedPageSpec extends PageBehaviours {
   "TransferReceivedPage" - {
 
     val index = refineMV[Max300.Refined](1)
-    val secondaryIndex = refineMV[Max50.Refined](1)
+    val secondaryIndex = refineMV[Max5.Refined](1)
 
     beRetrievable[LocalDate](WhenWasTransferReceivedPage(srnGen.sample.value, index, secondaryIndex))
 

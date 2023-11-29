@@ -28,7 +28,7 @@ class TotalValueTransferPageSpec extends PageBehaviours {
   "TotalValueTransferPage" - {
 
     val index = refineMV[Max300.Refined](1)
-    val secondaryIndex = refineMV[Max50.Refined](1)
+    val secondaryIndex = refineMV[Max5.Refined](1)
 
     beRetrievable[Money](TotalValueTransferPage(srnGen.sample.value, index, secondaryIndex))
 

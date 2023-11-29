@@ -36,6 +36,9 @@ object Refined {
 
   type OneTo50 = Greater[0] And LessEqual[50]
   type Max50 = Int Refined OneTo50
+
+  type OneTo5 = Greater[0] And LessEqual[5]
+  type Max5 = Int Refined OneTo5
   implicit def indexReads[A](implicit ev: Validate[Int, A]): Reads[Refined[Int, A]] = {
     case JsNumber(value) =>
       refineV[A](value.toInt) match {
@@ -84,6 +87,22 @@ object Refined {
 
     implicit val enumerable: Enumerable[Max50] = Enumerable(
       (1 to 50).toList
+        .map(
+          i =>
+            refineV[Refined](i).fold(
+              err => throw new Exception(err),
+              index => index
+            )
+        )
+        .map(index => index.value.toString -> index): _*
+    )
+  }
+
+  object Max5 {
+    type Refined = Greater[0] And LessEqual[5]
+
+    implicit val enumerable: Enumerable[Max5] = Enumerable(
+      (1 to 5).toList
         .map(
           i =>
             refineV[Refined](i).fold(

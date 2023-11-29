@@ -62,7 +62,7 @@ class WhenWasTransferReceivedController @Inject()(
   private def form(date: DateRange)(implicit messages: Messages) =
     WhenWasTransferReceivedController.form(formProvider, date)
 
-  def onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       (
         for {
@@ -82,7 +82,7 @@ class WhenWasTransferReceivedController @Inject()(
       ).merge
     }
 
-  def onSubmit(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
         form(date)
@@ -139,7 +139,7 @@ object WhenWasTransferReceivedController {
   def viewModel(
     srn: Srn,
     index: Max300,
-    secondaryIndex: Max50,
+    secondaryIndex: Max5,
     schemeName: String,
     memberName: String,
     mode: Mode

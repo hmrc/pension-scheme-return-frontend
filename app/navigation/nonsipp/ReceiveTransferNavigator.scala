@@ -16,7 +16,7 @@
 
 package navigation.nonsipp
 
-import config.Refined.OneTo50
+import config.Refined.OneTo5
 import controllers.nonsipp.memberpayments
 import eu.timepit.refined.refineV
 import models.{NormalMode, UserAnswers}
@@ -55,7 +55,7 @@ object ReceiveTransferNavigator extends JourneyNavigator {
 
     case page @ ReportAnotherTransferInPage(srn, index, secondaryIndex) =>
       if (userAnswers.get(page).contains(true)) {
-        refineV[OneTo50](secondaryIndex.value + 1) match {
+        refineV[OneTo5](secondaryIndex.value + 1) match {
           case Left(_) => controllers.routes.UnauthorisedController.onPageLoad()
           case Right(nextIndex) =>
             controllers.nonsipp.receivetransfer.routes.TransferringSchemeNameController

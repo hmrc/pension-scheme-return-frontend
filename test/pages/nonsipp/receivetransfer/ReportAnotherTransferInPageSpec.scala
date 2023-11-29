@@ -16,14 +16,14 @@
 
 package pages.nonsipp.receivetransfer
 
-import config.Refined.{Max300, Max50}
+import config.Refined.{Max300, Max5}
 import eu.timepit.refined.refineMV
 import pages.behaviours.PageBehaviours
 
 class ReportAnotherTransferInPageSpec extends PageBehaviours {
 
   private val index = refineMV[Max300.Refined](1)
-  private val secondaryIndex = refineMV[Max50.Refined](1)
+  private val secondaryIndex = refineMV[Max5.Refined](1)
 
   "ReportAnotherTransferInPage" - {
 
