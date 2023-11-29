@@ -23,6 +23,7 @@ import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.receivetransfer.{
   DidSchemeReceiveTransferPage,
+  TotalValueTransferPage,
   TransferReceivedMemberListPage,
   TransferringSchemeNamePage,
   WhatYouWillNeedReceivedTransferPage
@@ -93,10 +94,27 @@ class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           index,
           secondaryIndex,
           TransferringSchemeNamePage,
+          (srn, index: Max300, secondaryIndex: Max50, _) =>
+            controllers.nonsipp.receivetransfer.routes.TotalValueTransferController
+              .onPageLoad(srn, index, secondaryIndex, NormalMode)
+        )
+        .withName("go from transferring scheme name page to total value transfer page")
+    )
+  }
+
+  "TotalValueTransferPage" - {
+
+    act.like(
+      normalmode
+        .navigateToWithDoubleIndex(
+          index,
+          secondaryIndex,
+          TotalValueTransferPage,
           (srn, index: Max300, secondaryIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
         )
-        .withName("go from transferring scheme name page to unauthorised page")
+        .withName("go from total value transfer page to unauthorised page")
     )
+
   }
 
 }

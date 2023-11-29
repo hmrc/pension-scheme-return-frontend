@@ -123,6 +123,7 @@ trait TestValues {
   val noCrnReason: String = "no crn reason"
   val recipientName = "testRecipientName"
   val employerName = "testEmployerName"
+  val transferSchemeName = "testTransferSchemeName"
   val individualRecipientName = "individual " + recipientName
   val companyRecipientName = "company " + recipientName
   val partnershipRecipientName = "partnership " + recipientName
