@@ -109,16 +109,20 @@ object TransferringSchemeTypeController {
       to = (value, conditional) =>
         ((value, conditional): @unchecked) match {
           case (PensionSchemeType.RegisteredPS.name, Some(code)) => PensionSchemeType.RegisteredPS(code)
-          case (PensionSchemeType.Other.name, Some(details)) => PensionSchemeType.Other(details)
+
           case (PensionSchemeType.QualifyingRecognisedOverseasPS.name, Some(code)) =>
             PensionSchemeType.QualifyingRecognisedOverseasPS(code)
+
+          case (PensionSchemeType.Other.name, Some(details)) => PensionSchemeType.Other(details)
 
         },
       from = {
         case PensionSchemeType.RegisteredPS(code) => Some((PensionSchemeType.RegisteredPS.name, Some(code)))
-        case PensionSchemeType.Other(details) => Some((PensionSchemeType.Other.name, Some(details)))
+
         case PensionSchemeType.QualifyingRecognisedOverseasPS(code) =>
           Some((PensionSchemeType.QualifyingRecognisedOverseasPS.name, Some(code)))
+
+        case PensionSchemeType.Other(details) => Some((PensionSchemeType.Other.name, Some(details)))
 
       }
     )

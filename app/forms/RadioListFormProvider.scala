@@ -45,7 +45,7 @@ class RadioListFormProvider @Inject() extends Mappings {
     Form(
       mapping[A, String, Option[Conditional]](
         "value" -> text(requiredKey),
-        "conditional" -> ConditionalMappings.mandatoryIf[Conditional](conditional, conditionalMapping)
+        "isRequired" -> ConditionalMappings.mandatoryIf[Conditional](conditional, conditionalMapping)
       )((x, y) => ev.to((x, y)))(ev.from)
     )
   }
@@ -56,25 +56,8 @@ class RadioListFormProvider @Inject() extends Mappings {
   )(implicit ev: ConditionalRadioMapper[Conditional, A], ev2: StringFieldMapper[Conditional]): Form[A] = {
 
     def conditionalF(key: String): Map[String, String] => Boolean = _.get("value").contains(key)
-    val aMap = Map("value" -> "qualifyingRecognisedOverseasPS")
 
-    val c = conditionalMappings.map {
-      case (key, mapping) =>
-        conditionalF(key) -> mapping
-    }
-
-    val fieldOptions = conditionalMappings.foldLeft(List[String]()) { (x, y) =>
-      x :+ y._1
-    }
-
-    val isSelected = c.flatMap { x =>
-      fieldOptions.map{y =>
-        val aMap = Map("value" -> y)
-        x._1.apply(aMap).self
-      }
-
-
-    }
+    val c = conditionalMappings.map { case (key, mapping) => conditionalF(key) -> mapping }
 
     Form(
       mapping[A, String, Option[Conditional]](

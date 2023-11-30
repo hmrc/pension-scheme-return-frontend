@@ -53,7 +53,7 @@
                             hint = row.hint.map(h => Hint(content = Text(h.toMessage))),
                             conditionalHtml = row.conditional.map{
                                 case RadioItemConditional(FieldType.Textarea, hint) => textArea(hint, row)
-                                case RadioItemConditional(FieldType.Input, hint) => input("value.schemeType", hint.get)
+                                case RadioItemConditional(FieldType.Input, hint) => input("conditional", hint.get)
                             }
                         )
                 },
