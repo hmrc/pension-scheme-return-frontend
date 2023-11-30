@@ -40,6 +40,7 @@ import viewmodels.implicits._
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
+import TransferringSchemeTypeController._
 
 class TransferringSchemeTypeController @Inject()(
   override val messagesApi: MessagesApi,
@@ -59,11 +60,14 @@ class TransferringSchemeTypeController @Inject()(
     secondaryIndex: Max50,
     mode: Mode
   ): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    val form = TransferringSchemeTypeController.form(formProvider)
+    val maybeAnswer = request.userAnswers.get(TransferringSchemeTypePage(srn, index, secondaryIndex))
+    val builtForm = maybeAnswer.fold(form(formProvider))(answer => form(formProvider, Some(answer.name)))
     val schemeName = request.schemeDetails.schemeName
+    val filledForm = maybeAnswer.fold(builtForm)(builtForm.fill)
+
     Ok(
       view(
-        form.fromUserAnswers(TransferringSchemeTypePage(srn, index, secondaryIndex)),
+        filledForm,
         TransferringSchemeTypeController.viewModel(srn, index, secondaryIndex, schemeName, mode)
       )
     )
@@ -75,9 +79,8 @@ class TransferringSchemeTypeController @Inject()(
     secondaryIndex: Max50,
     mode: Mode
   ): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
-    val form = TransferringSchemeTypeController.form(formProvider)
     val schemeName = request.schemeDetails.schemeName
-    form
+    form(formProvider)
       .bindFromRequest()
       .fold(
         formWithErrors =>
@@ -90,7 +93,7 @@ class TransferringSchemeTypeController @Inject()(
                 )
               )
             ),
-        answer => {
+        answer =>
           for {
             updatedAnswers <- Future
               .fromTry(request.userAnswers.set(TransferringSchemeTypePage(srn, index, secondaryIndex), answer))
@@ -98,7 +101,6 @@ class TransferringSchemeTypeController @Inject()(
           } yield Redirect(
             navigator.nextPage(TransferringSchemeTypePage(srn, index, secondaryIndex), mode, updatedAnswers)
           )
-        }
       )
   }
 }
@@ -108,22 +110,22 @@ object TransferringSchemeTypeController {
     ConditionalRadioMapper[String, PensionSchemeType](
       to = (value, conditional) =>
         ((value, conditional): @unchecked) match {
-          case (PensionSchemeType.RegisteredPS.name, Some(code)) => PensionSchemeType.RegisteredPS(code)
+          case (PensionSchemeType.RegisteredPS.name, Some(code)) =>
+            PensionSchemeType.RegisteredPS(code)
 
           case (PensionSchemeType.QualifyingRecognisedOverseasPS.name, Some(code)) =>
             PensionSchemeType.QualifyingRecognisedOverseasPS(code)
 
           case (PensionSchemeType.Other.name, Some(details)) => PensionSchemeType.Other(details)
-
         },
       from = {
-        case PensionSchemeType.RegisteredPS(code) => Some((PensionSchemeType.RegisteredPS.name, Some(code)))
+        case PensionSchemeType.RegisteredPS(code) =>
+          Some((PensionSchemeType.RegisteredPS.name, Some(code)))
 
         case PensionSchemeType.QualifyingRecognisedOverseasPS(code) =>
           Some((PensionSchemeType.QualifyingRecognisedOverseasPS.name, Some(code)))
 
         case PensionSchemeType.Other(details) => Some((PensionSchemeType.Other.name, Some(details)))
-
       }
     )
 
@@ -132,33 +134,35 @@ object TransferringSchemeTypeController {
     "howWasDisposed.conditional.error.invalid",
     "howWasDisposed.conditional.error.length"
   )
-  def form(formProvider: RadioListFormProvider): Form[PensionSchemeType] = {
-    val valuesToMap = PensionSchemeType.values.map { aTypeName =>
-      (aTypeName, Some(Mappings.input("conditional", formErrors)))
+
+  def form(formProvider: RadioListFormProvider, prePopKey: Option[String] = None): Form[PensionSchemeType] = {
+    val valuesToMap = PensionSchemeType.values.map { name =>
+      (name, Some(Mappings.input(s"$name-conditional", formErrors)))
     }
     formProvider.conditionalM[PensionSchemeType, String](
       "howWasDisposed.error.required",
-      valuesToMap
+      valuesToMap,
+      prePopKey
     )
   }
 
   private def radioListItems(schemeName: String): List[RadioListRowViewModel] =
-    PensionSchemeType.values.map { aType =>
-      val conditionalField = if (aType == "other") {
+    PensionSchemeType.values.map { name =>
+      val conditionalField = if (name == PensionSchemeType.Other.name) {
         RadioItemConditional(
-          FieldType.Textarea,
-          label = Some(Message(s"transferring.pensionType.${aType}.label", schemeName))
+          FieldType.ConditionalTextarea(name),
+          label = Some(Message(s"transferring.pensionType.$name.label", schemeName))
         )
       } else {
         RadioItemConditional(
-          FieldType.Input,
-          label = Some(Message(s"transferring.pensionType.${aType}.label", schemeName))
+          FieldType.ConditionalInput(name),
+          label = Some(Message(s"transferring.pensionType.$name.label", schemeName))
         )
       }
 
       RadioListRowViewModel.conditional(
-        content = Message(s"transferring.pensionType.${aType}"),
-        aType,
+        content = Message(s"transferring.pensionType.$name"),
+        name,
         hint = None,
         conditionalField
       )

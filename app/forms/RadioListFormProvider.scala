@@ -52,17 +52,19 @@ class RadioListFormProvider @Inject() extends Mappings {
 
   def conditionalM[A, Conditional](
     requiredKey: String,
-    conditionalMappings: List[(String, Option[Mapping[Conditional]])]
+    conditionalMappings: List[(String, Option[Mapping[Conditional]])],
+    prePopKey: Option[String] = None
   )(implicit ev: ConditionalRadioMapper[Conditional, A], ev2: StringFieldMapper[Conditional]): Form[A] = {
 
-    def conditionalF(key: String): Map[String, String] => Boolean = _.get("value").contains(key)
+    def conditionalF(key: String): Map[String, String] => Boolean =
+      m => m.get("value").contains(key) && m.contains(s"$key-conditional")
 
     val c = conditionalMappings.map { case (key, mapping) => conditionalF(key) -> mapping }
 
     Form(
       mapping[A, String, Option[Conditional]](
         "value" -> text(requiredKey),
-        "conditional" -> conditional[Conditional](c)
+        "conditional" -> conditional[Conditional](c, prePopKey)
       )((x, y) => ev.to((x, y)))(ev.from)
     )
   }

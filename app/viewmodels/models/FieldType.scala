@@ -20,10 +20,14 @@ sealed trait FieldType
 
 object FieldType {
   case object Input extends FieldType
+
+  case class ConditionalInput(prefix: String) extends FieldType
   case object Currency extends FieldType
   case object Date extends FieldType
   case object Percentage extends FieldType
   case object Textarea extends FieldType
+
+  case class ConditionalTextarea(prefix: String) extends FieldType
 
   case object Security extends FieldType
   case object Select extends FieldType

@@ -31,15 +31,12 @@ trait Formatters {
   private[mappings] def stringFormatter(errorKey: String, args: Seq[Any] = Seq.empty): Formatter[String] =
     new Formatter[String] {
 
-      override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], String] = {
-        println(s"======== sf: key: $key")
-
+      override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], String] =
         data.get(key) match {
           case None => Left(Seq(FormError(key, errorKey, args)))
           case Some(s) if s.trim.isEmpty => Left(Seq(FormError(key, errorKey, args)))
           case Some(s) => Right(s)
         }
-      }
 
       override def unbind(key: String, value: String): Map[String, String] =
         Map(key -> value)
@@ -53,36 +50,38 @@ trait Formatters {
   ): Formatter[String] =
     new Formatter[String] {
 
-      override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], String] = {
-        println(s"======== sf: key: $key")
-
+      override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], String] =
         data.get(fieldKey) match {
           case None => Left(Seq(FormError(fieldKey, errorKey, args)))
           case Some(s) if s.trim.isEmpty => Left(Seq(FormError(fieldKey, errorKey, args)))
           case Some(s) => Right(s)
         }
-      }
 
       override def unbind(key: String, value: String): Map[String, String] =
         Map(key -> value)
     }
 
-  private[mappings] def conditionalFormatter[A](l: List[(Condition, Option[Mapping[A]])])(
+  private[mappings] def conditionalFormatter[A](l: List[(Condition, Option[Mapping[A]])], prePopKey: Option[String])(
     implicit ev: StringFieldMapper[A]
   ): Formatter[Option[A]] =
     new Formatter[Option[A]] {
 
-      override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Option[A]] = {
-        val mappings: Option[Either[Seq[FormError], Option[A]]] = l.collectFirst {
-          case (condition, Some(mapping)) if condition(data) =>
-            mapping.bind(data).map(Some(_))
-        }
-
-        mappings.getOrElse(Right(None))
-      }
+      override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Option[A]] =
+        l.collectFirst {
+            case (condition, Some(mapping)) if condition(data) =>
+              mapping.bind(data).map(Some(_))
+          }
+          .getOrElse(Right(None))
 
       override def unbind(key: String, value: Option[A]): Map[String, String] =
-        value.flatMap(v => ev.from(v).map(vv => Map(key -> vv))).getOrElse(Map.empty)
+        value
+          .flatMap(
+            ev.from(_).map { value =>
+              val key = prePopKey.fold("conditional")(k => s"$k-conditional")
+              Map(key -> value)
+            }
+          )
+          .getOrElse(Map.empty)
     }
 
   private[mappings] def optionalStringFormatter(): Formatter[String] =

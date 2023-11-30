@@ -35,9 +35,10 @@ trait Mappings extends Formatters with Constraints {
     of(stringFormatterWithKey(key, errorKey, args)).transform[String](_.trim, _.trim)
 
   def conditional[A](
-    l: List[(Condition, Option[Mapping[A]])]
+    l: List[(Condition, Option[Mapping[A]])],
+    prePopKey: Option[String]
   )(implicit ev: GenericFormMapper[String, A]): FieldMapping[Option[A]] =
-    of(conditionalFormatter[A](l))
+    of(conditionalFormatter[A](l, prePopKey))
 
   def optionalText(): Mapping[String] =
     of(optionalStringFormatter()).transform[String](_.trim, _.trim)

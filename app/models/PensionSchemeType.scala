@@ -22,16 +22,20 @@ import utils.WithName
 
 object PensionSchemeType {
 
-  sealed trait PensionSchemeType
-  case class RegisteredPS(description: String) extends PensionSchemeType
+  sealed trait PensionSchemeType {
+    val name: String
+  }
+  case class RegisteredPS(description: String) extends WithName("registeredPS") with PensionSchemeType
 
   case object RegisteredPS extends WithName("registeredPS")
 
-  case class QualifyingRecognisedOverseasPS(description: String) extends PensionSchemeType
+  case class QualifyingRecognisedOverseasPS(description: String)
+      extends WithName("qualifyingRecognisedOverseasPS")
+      with PensionSchemeType
 
   case object QualifyingRecognisedOverseasPS extends WithName("qualifyingRecognisedOverseasPS")
 
-  case class Other(description: String) extends PensionSchemeType
+  case class Other(description: String) extends WithName("other") with PensionSchemeType
 
   case object Other extends WithName("other")
 
