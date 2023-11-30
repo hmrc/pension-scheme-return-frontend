@@ -1775,3 +1775,8 @@ transferReceived.error.date.before = Date the transfer was received must be afte
 transferReceived.error.date.after = Date the transfer was received must be before {0}
 transferReceived.error.invalid.date = Date the transfer was received must be a real date
 transferReceived.error.invalid.chars = Date the transfer was received must only include numbers 0 to 9
+
+
+didTransferIncludeAsset.title = Did this transfer for this member include an asset?
+didTransferIncludeAsset.heading = Did the transfer from {0} for {1} include an asset?
+didTransferIncludeAsset.error.required = Select yes if the transfer included an asset

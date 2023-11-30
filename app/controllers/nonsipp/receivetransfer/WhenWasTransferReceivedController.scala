@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.receivetransfer
 
-import pages.nonsipp.receivetransfer.WhenWasTransferReceivedPage
+import pages.nonsipp.receivetransfer.{TransferringSchemeNamePage, WhenWasTransferReceivedPage}
 import controllers.nonsipp.receivetransfer.WhenWasTransferReceivedController._
 import config.Refined._
 import controllers.actions._
@@ -68,6 +68,9 @@ class WhenWasTransferReceivedController @Inject()(
         for {
           member <- request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney
           date <- schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney
+          schemeName <- request.userAnswers
+            .get(TransferringSchemeNamePage(srn, index, secondaryIndex))
+            .getOrRecoverJourney
         } yield {
           val preparedForm = request.userAnswers
             .get(WhenWasTransferReceivedPage(srn, index, secondaryIndex))
@@ -75,7 +78,7 @@ class WhenWasTransferReceivedController @Inject()(
           Ok(
             view(
               preparedForm,
-              viewModel(srn, index, secondaryIndex, request.schemeDetails.schemeName, member.fullName, mode)
+              viewModel(srn, index, secondaryIndex, schemeName, member.fullName, mode)
             )
           )
         }
@@ -89,16 +92,23 @@ class WhenWasTransferReceivedController @Inject()(
           .bindFromRequest()
           .fold(
             formWithErrors => {
-              request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney { member =>
-                Future.successful(
-                  BadRequest(
-                    view(
-                      formWithErrors,
-                      viewModel(srn, index, secondaryIndex, request.schemeDetails.schemeName, member.fullName, mode)
+              Future.successful(
+                (
+                  for {
+                    member <- request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney
+                    schemeName <- request.userAnswers
+                      .get(TransferringSchemeNamePage(srn, index, secondaryIndex))
+                      .getOrRecoverJourney
+                  } yield {
+                    BadRequest(
+                      view(
+                        formWithErrors,
+                        viewModel(srn, index, secondaryIndex, schemeName, member.fullName, mode)
+                      )
                     )
-                  )
-                )
-              }
+                  }
+                ).merge
+              )
             },
             value =>
               for {

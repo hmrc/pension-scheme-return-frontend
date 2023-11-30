@@ -14,17 +14,27 @@ import utils.RefinedUtils._
 import eu.timepit.refined.refineMV
 $endif$
 
+$! Generic (change QuestionPage type) !$
 $if(index.empty)$
 case class $className;format="cap"$Page(srn: Srn) extends QuestionPage[Boolean] {
-$else$
-case class $className;format="cap"$Page(srn: Srn, index: $index$) extends QuestionPage[Boolean] {
-$endif$
-
-  $if(index.empty)$
-  override def path: JsPath = JsPath \ toString
   $else$
-  override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString
-  $endif$
+  $if(secondaryIndex.empty)$
+  case class $className;format="cap"$Page(srn: Srn, index: $index$) extends QuestionPage[Boolean] {
+    $else$
+    case class $className;format="cap"$Page(srn: Srn, index: $index$, secondaryIndex: $secondaryIndex$) extends QuestionPage[Boolean] {
+      $endif$
+      $endif$
 
-  override def toString: String = "$className;format="decap"$"
-}
+      $if(index.empty)$
+      override def path: JsPath = JsPath \ toString
+      $else$
+      $if(secondaryIndex.empty)$
+      override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString
+      $else$
+      override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString \ secondaryIndex.arrayIndex.toString
+      $endif$
+      $endif$
+
+      override def toString: String = "$className;format="decap"$"
+    }
+$! Generic end !$

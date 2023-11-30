@@ -73,7 +73,7 @@ class $className$Controller @Inject()(
 
   private def form(date: LocalDate)(implicit messages: Messages) = $className;format="cap"$Controller.form(formProvider, date)
 
-  $! Generic functions (viewmodel might accept extra params) !$
+  $! Not Geniric (form takes date) !$
   def onPageLoad(srn: Srn, $if(!index.empty)$index: $index$, $endif$$if(!secondaryIndex.empty)$secondaryIndex: $secondaryIndex$, $endif$mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
