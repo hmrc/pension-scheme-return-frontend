@@ -16,6 +16,9 @@
 
 package pages.nonsipp
 
+import config.Refined.{Max300, Max5}
+import models.SchemeId.Srn
+import pages.QuestionPage
 import play.api.libs.json.{__, JsPath}
 
 package object receivetransfer {
@@ -26,4 +29,13 @@ package object receivetransfer {
     val memberTransfersIn: JsPath = memberDetails \ "memberTransfersIn"
   }
 
+  def transferInPages(srn: Srn, index: Max300, secondaryIndex: Max5): List[QuestionPage[_]] = List(
+    DidTransferIncludeAssetPage(srn, index, secondaryIndex),
+    ReportAnotherTransferInPage(srn, index, secondaryIndex),
+    TotalValueTransferPage(srn, index, secondaryIndex),
+    TransferringSchemeNamePage(srn, index, secondaryIndex),
+    TransferringSchemeTypePage(srn, index, secondaryIndex),
+    TransfersInCompletedPage(srn, index, secondaryIndex),
+    WhenWasTransferReceivedPage(srn, index, secondaryIndex)
+  )
 }

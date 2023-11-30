@@ -85,6 +85,9 @@ final case class UserAnswers(
         _ => removeOnly(page)
       )
 
+  def remove(pages: List[Removable[_]]): Try[UserAnswers] =
+    pages.foldLeft(Try(this))((ua, page) => ua.flatMap(_.remove(page)))
+
   private def setOnly[A](page: Settable[A], value: A)(implicit writes: Writes[A]): Try[UserAnswers] = {
     val updatedData = data.decryptedValue.setObject(page.path, Json.toJson(value)) match {
       case JsSuccess(jsValue, _) =>

@@ -141,7 +141,9 @@ object TransferReceivedMemberListController {
                 TableElem(
                   LinkMessage(
                     Message("site.change"),
-                    controllers.routes.UnauthorisedController.onPageLoad().url
+                    controllers.nonsipp.receivetransfer.routes.TransfersInCYAController
+                      .onSubmit(srn, nextIndex, CheckMode)
+                      .url
                   )
                 ),
                 TableElem(

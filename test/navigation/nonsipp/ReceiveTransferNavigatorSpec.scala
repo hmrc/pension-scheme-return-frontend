@@ -117,13 +117,15 @@ class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
     act.like(
       normalmode
-        .navigateToWithDoubleIndex(
+        .navigateToWithDoubleDataAndIndex(
           index,
           secondaryIndex,
           ReportAnotherTransferInPage,
-          (srn, index: Max300, _: Max5, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          Gen.const(false),
+          (srn, index: Max300, _: Max5, _) =>
+            controllers.nonsipp.receivetransfer.routes.TransfersInCYAController.onPageLoad(srn, index, NormalMode)
         )
-        .withName("go from report another transfer in page to unauthorised page")
+        .withName("go from report another transfer in page to CYA page")
     )
 
     List(
@@ -184,6 +186,19 @@ class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               .onPageLoad(srn, 1, NormalMode)
         )
         .withName("go from remove transfer in page to transfer received member list page")
+    )
+  }
+
+  "TransfersInCYACompletedPage" - {
+    act.like(
+      normalmode
+        .navigateToWithDoubleIndex(
+          index,
+          secondaryIndex,
+          TransfersInCompletedPage,
+          (srn, index: Max300, secondaryIndex: Max5, _) => controllers.routes.UnauthorisedController.onPageLoad()
+        )
+        .withName("go from TransfersInCYACompletedPage to ??? page")
     )
   }
 }

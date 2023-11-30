@@ -18,7 +18,7 @@ package navigation.nonsipp
 
 import cats.implicits.toTraverseOps
 import config.Refined.Max5
-import models.{NormalMode, UserAnswers}
+import models.{CheckMode, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.receivetransfer._
@@ -27,6 +27,9 @@ import play.api.mvc.Call
 object ReceiveTransferNavigator extends JourneyNavigator {
 
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
+
+    case TransfersInCompletedPage(srn, index, secondaryIndex) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
 
     case page @ DidSchemeReceiveTransferPage(srn) =>
       if (userAnswers.get(page).contains(true)) {
@@ -65,7 +68,7 @@ object ReceiveTransferNavigator extends JourneyNavigator {
     case TransferReceivedMemberListPage(srn) =>
       controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
 
-    case page @ ReportAnotherTransferInPage(srn, index, secondaryIndex) =>
+    case page @ ReportAnotherTransferInPage(srn, index, _) =>
       if (userAnswers.get(page).contains(true)) {
         (
           for {
@@ -76,11 +79,15 @@ object ReceiveTransferNavigator extends JourneyNavigator {
             .onPageLoad(srn, index, nextIndex, NormalMode)
         ).merge
       } else {
-        controllers.routes.UnauthorisedController
-          .onPageLoad()
+        controllers.nonsipp.receivetransfer.routes.TransfersInCYAController
+          .onPageLoad(srn, index, NormalMode)
       }
 
     case RemoveTransferInPage(srn, memberIndex) =>
+      controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
+        .onPageLoad(srn, 1, NormalMode)
+
+    case TransfersInCYAPage(srn) =>
       controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
         .onPageLoad(srn, 1, NormalMode)
   }
@@ -88,11 +95,54 @@ object ReceiveTransferNavigator extends JourneyNavigator {
   override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] =
     _ =>
       userAnswers => {
+        case TransferringSchemeNamePage(srn, memberIndex, index) =>
+          controllers.nonsipp.receivetransfer.routes.TransfersInCYAController
+            .onPageLoad(srn, memberIndex, NormalMode)
+
         case page @ DidSchemeReceiveTransferPage(srn) =>
           if (userAnswers.get(page).contains(true)) {
             controllers.routes.UnauthorisedController.onPageLoad()
           } else {
             controllers.nonsipp.membertransferout.routes.SchemeTransferOutController.onPageLoad(srn, NormalMode)
           }
+
+        case TransferringSchemeNamePage(srn, index, _) =>
+          controllers.nonsipp.receivetransfer.routes.TransfersInCYAController
+            .onPageLoad(srn, index, NormalMode)
+
+        case TransferringSchemeTypePage(srn, index, _) =>
+          controllers.nonsipp.receivetransfer.routes.TransfersInCYAController
+            .onPageLoad(srn, index, NormalMode)
+
+        case TotalValueTransferPage(srn, index, secondaryIndex) =>
+          controllers.nonsipp.receivetransfer.routes.TransfersInCYAController
+            .onPageLoad(srn, index, NormalMode)
+
+        case WhenWasTransferReceivedPage(srn, index, secondaryIndex) =>
+          controllers.nonsipp.receivetransfer.routes.TransfersInCYAController
+            .onPageLoad(srn, index, NormalMode)
+
+        case DidTransferIncludeAssetPage(srn, index, secondaryIndex) =>
+          controllers.nonsipp.receivetransfer.routes.ReportAnotherTransferInController
+            .onPageLoad(srn, index, secondaryIndex, CheckMode)
+
+        case page @ ReportAnotherTransferInPage(srn, index, _) =>
+          if (userAnswers.get(page).contains(true)) {
+            (
+              for {
+                map <- userAnswers.get(TotalValueTransferPages(srn, index)).getOrRecoverJourney
+                indexes <- map.keys.toList.traverse(_.toIntOption).getOrRecoverJourney
+                nextIndex <- findNextOpenIndex[Max5.Refined](indexes).getOrRecoverJourney
+              } yield controllers.nonsipp.receivetransfer.routes.TransferringSchemeNameController
+                .onPageLoad(srn, index, nextIndex, NormalMode)
+            ).merge
+          } else {
+            controllers.nonsipp.receivetransfer.routes.TransfersInCYAController
+              .onPageLoad(srn, index, NormalMode)
+          }
+
+        case TransfersInCYAPage(srn) =>
+          controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
+            .onPageLoad(srn, 1, NormalMode)
       }
 }
