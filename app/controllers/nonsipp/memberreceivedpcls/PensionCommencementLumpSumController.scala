@@ -14,29 +14,28 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.memberpayments
+package controllers.nonsipp.memberreceivedpcls
 
 import controllers.actions._
-import controllers.nonsipp.memberpayments.PensionPaymentsReceivedController._
+import controllers.nonsipp.memberreceivedpcls.PensionCommencementLumpSumController.viewModel
 import forms.YesNoPageFormProvider
 import models.Mode
 import models.SchemeId.Srn
 import navigation.Navigator
-import pages.nonsipp.memberpayments.PensionPaymentsReceivedPage
+import pages.nonsipp.memberpayments.PensionCommencementLumpSumPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 import views.html.YesNoPageView
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
-class PensionPaymentsReceivedController @Inject()(
+class PensionCommencementLumpSumController @Inject()(
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -48,36 +47,37 @@ class PensionPaymentsReceivedController @Inject()(
     extends FrontendBaseController
     with I18nSupport {
 
-  private val form = PensionPaymentsReceivedController.form(formProvider)
+  private def form: Form[Boolean] =
+    PensionCommencementLumpSumController.form(formProvider)
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    val preparedForm = request.userAnswers.fillForm(PensionPaymentsReceivedPage(srn), form)
-    Ok(view(preparedForm, viewModel(srn, request.schemeDetails.schemeName, mode)))
+    val preparedForm = request.userAnswers.fillForm(PensionCommencementLumpSumPage(srn), form)
+    Ok(view(preparedForm, viewModel(srn, mode)))
   }
 
   def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
     form
       .bindFromRequest()
       .fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, viewModel(srn, request.schemeDetails.schemeName, mode)))),
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, mode)))),
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(PensionPaymentsReceivedPage(srn), value))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(PensionCommencementLumpSumPage(srn), value))
             _ <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage(PensionPaymentsReceivedPage(srn), mode, updatedAnswers))
+          } yield Redirect(navigator.nextPage(PensionCommencementLumpSumPage(srn), mode, updatedAnswers))
       )
   }
 }
 
-object PensionPaymentsReceivedController {
+object PensionCommencementLumpSumController {
   def form(formProvider: YesNoPageFormProvider): Form[Boolean] = formProvider(
-    "pensionPaymentsReceived.error.required"
+    "pensionCommencementLumpSum.error.required"
   )
 
-  def viewModel(srn: Srn, schemeName: String, mode: Mode): FormPageViewModel[YesNoPageViewModel] = YesNoPageViewModel(
-    "pensionPaymentsReceived.title",
-    Message("pensionPaymentsReceived.heading", schemeName),
-    routes.PensionPaymentsReceivedController.onSubmit(srn, mode)
-  )
+  def viewModel(srn: Srn, mode: Mode): FormPageViewModel[YesNoPageViewModel] =
+    YesNoPageViewModel(
+      Message("pensionCommencementLumpSum.title"),
+      Message("pensionCommencementLumpSum.heading"),
+      routes.PensionCommencementLumpSumController.onSubmit(srn, mode)
+    )
 }

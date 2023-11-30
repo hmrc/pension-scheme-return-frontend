@@ -43,9 +43,9 @@ class PensionPaymentsReceivedNavigatorSpec extends BaseSpec with NavigatorBehavi
         .navigateToWithData(
           PensionPaymentsReceivedPage,
           Gen.const(false),
-          controllers.nonsipp.memberpayments.routes.BenefitsSurrenderedController.onPageLoad
+          (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
         )
-        .withName("go from pension payments received page to benefits surrendered page on no selected")
+        .withName("go from pension payments received page to task list page son no selected")
     )
   }
 }

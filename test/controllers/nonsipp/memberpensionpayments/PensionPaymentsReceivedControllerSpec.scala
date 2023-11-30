@@ -14,28 +14,28 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.memberpayments
+package controllers.nonsipp.memberpensionpayments
 
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.memberpayments.BenefitsSurrenderedController._
+import controllers.nonsipp.memberpensionpayments.PensionPaymentsReceivedController.{form, viewModel}
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import pages.nonsipp.memberpayments.BenefitsSurrenderedPage
+import pages.nonsipp.memberpayments.PensionPaymentsReceivedPage
 import play.api.libs.json.JsPath
 import views.html.YesNoPageView
 
-class BenefitsSurrenderedControllerSpec extends ControllerBaseSpec {
+class PensionPaymentsReceivedControllerSpec extends ControllerBaseSpec {
 
-  private lazy val onPageLoad = routes.BenefitsSurrenderedController.onPageLoad(srn, NormalMode)
-  private lazy val onSubmit = routes.BenefitsSurrenderedController.onSubmit(srn, NormalMode)
+  private lazy val onPageLoad = routes.PensionPaymentsReceivedController.onPageLoad(srn, NormalMode)
+  private lazy val onSubmit = routes.PensionPaymentsReceivedController.onSubmit(srn, NormalMode)
 
-  "BenefitsSurrenderedController" - {
+  "PensionPaymentsReceivedController" - {
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       injected[YesNoPageView].apply(form(injected[YesNoPageFormProvider]), viewModel(srn, schemeName, NormalMode))
     })
 
-    act.like(renderPrePopView(onPageLoad, BenefitsSurrenderedPage(srn), true) { implicit app => implicit request =>
+    act.like(renderPrePopView(onPageLoad, PensionPaymentsReceivedPage(srn), true) { implicit app => implicit request =>
       injected[YesNoPageView]
         .apply(form(injected[YesNoPageFormProvider]).fill(true), viewModel(srn, schemeName, NormalMode))
     })
@@ -45,14 +45,7 @@ class BenefitsSurrenderedControllerSpec extends ControllerBaseSpec {
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
-    act.like(
-      saveAndContinue(
-        onSubmit,
-        defaultUserAnswers,
-        Some(JsPath \ "membersPayments" \ "surrenderMade"),
-        "value" -> "true"
-      )
-    )
+    act.like(saveAndContinue(onSubmit, Some(JsPath \ "membersPayments" \ "pensionReceived"), "value" -> "true"))
 
     act.like(invalidForm(onSubmit))
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))

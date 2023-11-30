@@ -43,7 +43,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
         .navigateToWithData(
           UnregulatedOrConnectedBondsHeldPage,
           Gen.const(false),
-          controllers.nonsipp.otherassetsheld.routes.OtherAssetsHeldController.onPageLoad
+          (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
         )
         .withName("go from unregulated Or connected bonds held page to other assets held page when no selected")
     )
