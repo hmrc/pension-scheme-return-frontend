@@ -50,7 +50,7 @@ object ReceiveTransferNavigator extends JourneyNavigator {
         .onPageLoad(srn, memberIndex, index, NormalMode)
 
     case TotalValueTransferPage(srn, index, secondaryIndex) =>
-      controllers.routes.UnauthorisedController.onPageLoad
+      controllers.routes.UnauthorisedController.onPageLoad()
   }
 
   override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] =

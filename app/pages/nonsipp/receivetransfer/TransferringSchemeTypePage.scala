@@ -17,7 +17,7 @@
 package pages.nonsipp.receivetransfer
 
 import config.Refined.{Max300, Max50}
-import models.PensionSchemeType
+import models.PensionSchemeType._
 import models.SchemeId.Srn
 import pages.QuestionPage
 import pages.nonsipp.memberpayments.MemberPaymentsPage

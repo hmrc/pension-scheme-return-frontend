@@ -124,9 +124,10 @@ object HowWasPropertyDisposedOfController {
   )
 
   def form(formProvider: RadioListFormProvider): Form[HowDisposed] =
-    formProvider.conditionalM[HowDisposed, String](
+    formProvider.singleConditional[HowDisposed, String](
       "howWasDisposed.error.required",
-      List((Other.name, Some(Mappings.input("conditional", formErrors))))
+      Other.name,
+      Mappings.input("conditional", formErrors)
     )
 
   def viewModel(
