@@ -16,14 +16,14 @@
 
 package pages.nonsipp.receivetransfer
 
-import config.Refined.{Max300, Max50}
+import config.Refined.{Max300, Max5}
 import models.PensionSchemeType._
 import models.SchemeId.Srn
 import pages.QuestionPage
 import pages.nonsipp.memberpayments.MemberPaymentsPage
 import play.api.libs.json.JsPath
 
-case class TransferringSchemeTypePage(srn: Srn, index: Max300, secondaryIndex: Max50)
+case class TransferringSchemeTypePage(srn: Srn, index: Max300, secondaryIndex: Max5)
     extends QuestionPage[PensionSchemeType] {
 
   override def path: JsPath = MemberPaymentsPage.path \ toString
