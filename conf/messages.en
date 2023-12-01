@@ -1780,3 +1780,12 @@ transferReceived.error.invalid.chars = Date the transfer was received must only 
 didTransferIncludeAsset.title = Did this transfer for this member include an asset?
 didTransferIncludeAsset.heading = Did the transfer from {0} for {1} include an asset?
 didTransferIncludeAsset.error.required = Select yes if the transfer included an asset
+
+whichTransferInRemove.title = Which transfer in for this member do you want to remove?
+whichTransferInRemove.heading = Which transfer in for {0} do you want to remove?
+whichTransferInRemove.error.required =  Select the transfer in you want to remove
+whichTransferInRemove.radio.label = Transfer of £{0} by {1}
+
+removeTransferIn.title = Are you sure you want to remove this transfer for this member?
+removeTransferIn.heading = Are you sure you want to remove the transfer from {0} for {1}?
+removeTransferIn.error.required = Select yes if you are sure you want to remove this transfer for this member

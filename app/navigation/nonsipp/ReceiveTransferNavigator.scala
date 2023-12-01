@@ -16,7 +16,8 @@
 
 package navigation.nonsipp
 
-import config.Refined.OneTo5
+import cats.implicits.toTraverseOps
+import config.Refined.{Max5, OneTo5}
 import controllers.nonsipp.memberpayments
 import eu.timepit.refined.refineV
 import models.{NormalMode, UserAnswers}
@@ -61,17 +62,24 @@ object ReceiveTransferNavigator extends JourneyNavigator {
     case TransferReceivedMemberListPage(srn) =>
       controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
 
-    case page @ ReportAnotherTransferInPage(srn, index, secondaryIndex) =>
+    case page @ ReportAnotherTransferInPage(srn, index, _) =>
       if (userAnswers.get(page).contains(true)) {
-        refineV[OneTo5](secondaryIndex.value + 1) match {
-          case Left(_) => controllers.routes.UnauthorisedController.onPageLoad()
-          case Right(nextIndex) =>
-            controllers.nonsipp.receivetransfer.routes.TransferringSchemeNameController
-              .onPageLoad(srn, index, nextIndex, NormalMode)
-        }
+        (
+          for {
+            map <- userAnswers.get(TotalValueTransferPages(srn, index)).getOrRecoverJourney
+            indexes <- map.keys.toList.traverse(_.toIntOption).getOrRecoverJourney
+            nextIndex <- findNextOpenIndex[Max5.Refined](indexes).getOrRecoverJourney
+          } yield controllers.nonsipp.receivetransfer.routes.TransferringSchemeNameController
+            .onPageLoad(srn, index, nextIndex, NormalMode)
+        ).merge
       } else {
-        controllers.routes.UnauthorisedController.onPageLoad()
+        controllers.routes.UnauthorisedController
+          .onPageLoad()
       }
+
+    case RemoveTransferInPage(srn, memberIndex) =>
+      controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
+        .onPageLoad(srn, 1, NormalMode)
   }
 
   override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] =

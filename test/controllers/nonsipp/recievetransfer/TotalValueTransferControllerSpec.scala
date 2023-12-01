@@ -32,7 +32,7 @@ class TotalValueTransferControllerSpec extends ControllerBaseSpec {
   private val secondaryIndex = refineMV[Max5.Refined](1)
   private val userAnswers = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
-    .unsafeSet(TransferringSchemeNamePage(srn, index, secondaryIndex), transferSchemeName)
+    .unsafeSet(TransferringSchemeNamePage(srn, index, secondaryIndex), transferringSchemeName)
 
   private lazy val onPageLoad =
     routes.TotalValueTransferController.onPageLoad(srn, index, secondaryIndex, NormalMode)
@@ -50,7 +50,7 @@ class TotalValueTransferControllerSpec extends ControllerBaseSpec {
             index,
             secondaryIndex,
             memberDetails.fullName,
-            transferSchemeName,
+            transferringSchemeName,
             form(injected[MoneyFormProvider]),
             NormalMode
           )
@@ -66,7 +66,7 @@ class TotalValueTransferControllerSpec extends ControllerBaseSpec {
               index,
               secondaryIndex,
               memberDetails.fullName,
-              transferSchemeName,
+              transferringSchemeName,
               form(injected[MoneyFormProvider]).fill(money),
               NormalMode
             )

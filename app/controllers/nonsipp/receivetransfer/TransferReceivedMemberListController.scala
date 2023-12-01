@@ -146,7 +146,9 @@ object TransferReceivedMemberListController {
                 TableElem(
                   LinkMessage(
                     Message("site.remove"),
-                    controllers.routes.UnauthorisedController.onPageLoad().url
+                    controllers.nonsipp.receivetransfer.routes.WhichTransferInRemoveController
+                      .onSubmit(srn, nextIndex)
+                      .url
                   )
                 )
               )
