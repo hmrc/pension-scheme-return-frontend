@@ -16,28 +16,27 @@
 
 package controllers.nonsipp.receivetransfer
 
+import config.Refined._
+import controllers.PSRController
 import controllers.actions._
+import controllers.nonsipp.receivetransfer.DidTransferIncludeAssetController._
 import forms.YesNoPageFormProvider
 import models.Mode
 import models.SchemeId.Srn
 import navigation.Navigator
-import play.api.data.Form
-import controllers.PSRController
-import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.YesNoPageView
-import services.SaveService
-import DidTransferIncludeAssetController._
-import viewmodels.implicits._
+import pages.nonsipp.memberdetails.MemberDetailsPage
 import pages.nonsipp.receivetransfer.{DidTransferIncludeAssetPage, TransferringSchemeNamePage}
+import play.api.data.Form
+import play.api.i18n.MessagesApi
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.SaveService
+import viewmodels.DisplayMessage.Message
+import viewmodels.implicits._
+import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
+import views.html.YesNoPageView
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
-import config.Refined._
-import pages.nonsipp.memberdetails.MemberDetailsPage
-import viewmodels.DisplayMessage.Message
 
 class DidTransferIncludeAssetController @Inject()(
   override val messagesApi: MessagesApi,

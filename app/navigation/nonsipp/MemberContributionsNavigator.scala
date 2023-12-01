@@ -16,7 +16,6 @@
 
 package navigation.nonsipp
 
-import controllers.nonsipp.memberpayments
 import models.{CheckOrChange, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page

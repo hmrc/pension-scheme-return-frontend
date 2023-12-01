@@ -31,8 +31,7 @@ import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import viewmodels.DisplayMessage
-import viewmodels.DisplayMessage.{BlockMessage, Empty, LinkMessage, Message, ParagraphMessage}
+import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
 import viewmodels.implicits._
 import viewmodels.models.{ActionTableViewModel, FormPageViewModel, PaginatedViewModel, TableElem}
 import views.html.TwoColumnsTripleAction

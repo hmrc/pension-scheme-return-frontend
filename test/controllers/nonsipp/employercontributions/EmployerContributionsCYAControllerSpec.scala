@@ -16,18 +16,17 @@
 
 package controllers.nonsipp.employercontributions
 
+import config.Refined._
+import controllers.ControllerBaseSpec
+import controllers.nonsipp.employercontributions.EmployerContributionsCYAController._
+import eu.timepit.refined.refineMV
+import models.{ConditionalYesNo, Crn, IdentityType, NormalMode}
 import pages.nonsipp.employercontributions.{
   EmployerCompanyCrnPage,
-  EmployerContributionsCompleted,
   EmployerNamePage,
   EmployerTypeOfBusinessPage,
   TotalEmployerContributionPage
 }
-import controllers.nonsipp.employercontributions.EmployerContributionsCYAController._
-import config.Refined._
-import eu.timepit.refined.refineMV
-import models.{ConditionalYesNo, Crn, IdentityType, NormalMode}
-import controllers.ControllerBaseSpec
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import views.html.CheckYourAnswersView
 

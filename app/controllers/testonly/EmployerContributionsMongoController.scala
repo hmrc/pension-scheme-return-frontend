@@ -17,20 +17,12 @@
 package controllers.testonly
 
 import cats.implicits._
-import config.Refined.{Max300, Max50, Max5000}
+import config.Refined.{Max300, Max50}
 import controllers.actions.IdentifyAndRequireData
 import eu.timepit.refined._
 import models.SchemeId.Srn
-import models.{ConditionalYesNo, Crn, IdentityType, Money, RecipientDetails, UserAnswers}
-import pages.nonsipp.employercontributions.{
-  EmployerCompanyCrnPage,
-  EmployerNamePage,
-  EmployerTypeOfBusinessPage,
-  OtherEmployeeDescriptionPage,
-  PartnershipEmployerUtrPage,
-  TotalEmployerContributionPage
-}
-import pages.nonsipp.landorpropertydisposal.{LandOrPropertyStillHeldPage, OtherBuyerDetailsPage}
+import models.{ConditionalYesNo, Crn, IdentityType, Money, UserAnswers}
+import pages.nonsipp.employercontributions._
 import play.api.i18n.I18nSupport
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}

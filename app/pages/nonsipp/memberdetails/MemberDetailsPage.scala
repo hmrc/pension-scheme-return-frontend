@@ -23,7 +23,6 @@ import pages.QuestionPage
 import play.api.libs.json.JsPath
 import queries.{Gettable, Removable}
 import utils.RefinedUtils.RefinedIntOps
-import viewmodels.models.MemberState
 
 import scala.util.Try
 

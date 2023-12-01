@@ -39,7 +39,7 @@ class AuthController @Inject()(
     sessionRepository
       .clear(request.getUserId)
       .map { _ =>
-        Redirect(config.urls.signOutUrl, Map("continue" -> Seq(config.exitSurveyUrl)))
+        Redirect(config.exitSurveyUrl).withNewSession
       }
   }
 

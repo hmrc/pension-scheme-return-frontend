@@ -16,36 +16,31 @@
 
 package controllers.nonsipp.receivetransfer
 
-import pages.nonsipp.receivetransfer.{TransferringSchemeNamePage, WhenWasTransferReceivedPage}
-import controllers.nonsipp.receivetransfer.WhenWasTransferReceivedController._
+import cats.implicits.toShow
 import config.Refined._
-import controllers.actions._
-import models._
-import models.SchemeId.Srn
-import navigation.Navigator
-import play.api.data.Form
-import viewmodels.models._
-import viewmodels.implicits._
-import services.SaveService
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import controllers.PSRController
-
-import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
+import controllers.actions._
+import controllers.nonsipp.receivetransfer.WhenWasTransferReceivedController._
 import forms.DatePageFormProvider
 import forms.mappings.errors.DateFormErrors
+import models.SchemeId.Srn
+import models._
+import navigation.Navigator
+import pages.nonsipp.memberdetails.MemberDetailsPage
+import pages.nonsipp.receivetransfer.{TransferringSchemeNamePage, WhenWasTransferReceivedPage}
+import play.api.data.Form
+import play.api.i18n.{Messages, MessagesApi}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.{SaveService, SchemeDateService}
+import utils.DateTimeUtils.localDateShow
+import viewmodels.DisplayMessage.Message
+import viewmodels.implicits._
+import viewmodels.models._
 import views.html.DatePageView
 
 import java.time.LocalDate
-import play.api.i18n.{Messages, MessagesApi}
-import config.Constants
-import cats.implicits.toShow
-import pages.nonsipp.memberdetails.MemberDetailsPage
-import services.SchemeDateService
-import utils.DateTimeUtils.localDateShow
-import viewmodels.DisplayMessage.Message
-
-import java.time.format.{DateTimeFormatter, FormatStyle}
+import javax.inject.{Inject, Named}
+import scala.concurrent.{ExecutionContext, Future}
 
 class WhenWasTransferReceivedController @Inject()(
   override val messagesApi: MessagesApi,

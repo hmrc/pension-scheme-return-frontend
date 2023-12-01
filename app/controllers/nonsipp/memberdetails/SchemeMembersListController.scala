@@ -32,7 +32,7 @@ import models.{ManualOrUpload, Mode, NameDOB, Pagination}
 import navigation.Navigator
 import pages.nonsipp.memberdetails.MemberStatusImplicits.MembersStatusOps
 import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
-import pages.nonsipp.memberdetails.{MembersDetailsPages, SchemeMembersListPage}
+import pages.nonsipp.memberdetails.SchemeMembersListPage
 import play.api.Logger
 import play.api.data.Form
 import play.api.i18n.MessagesApi

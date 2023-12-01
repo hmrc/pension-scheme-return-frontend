@@ -16,13 +16,11 @@
 
 package pages.nonsipp.receivetransfer
 
-import play.api.libs.json.JsPath
-import models.SchemeId.Srn
-import models.Money
-import pages.QuestionPage
 import config.Refined._
+import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 import utils.RefinedUtils._
-import eu.timepit.refined.refineMV
 
 case class DidTransferIncludeAssetPage(srn: Srn, index: Max300, secondaryIndex: Max5) extends QuestionPage[Boolean] {
 
