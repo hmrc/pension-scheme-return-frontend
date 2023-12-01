@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.receivetransfer
 
-import config.Refined.{Max300, Max50}
+import config.Refined.{Max300, Max5}
 import controllers.actions.IdentifyAndRequireData
 import forms.mappings.errors.InputFormErrors
 import forms.RadioListFormProvider
@@ -57,7 +57,7 @@ class TransferringSchemeTypeController @Inject()(
   def onPageLoad(
     srn: Srn,
     index: Max300,
-    secondaryIndex: Max50,
+    secondaryIndex: Max5,
     mode: Mode
   ): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     val maybeAnswer = request.userAnswers.get(TransferringSchemeTypePage(srn, index, secondaryIndex))
@@ -76,7 +76,7 @@ class TransferringSchemeTypeController @Inject()(
   def onSubmit(
     srn: Srn,
     index: Max300,
-    secondaryIndex: Max50,
+    secondaryIndex: Max5,
     mode: Mode
   ): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
     val schemeName = request.schemeDetails.schemeName
@@ -186,7 +186,7 @@ object TransferringSchemeTypeController {
   def viewModel(
     srn: Srn,
     index: Max300,
-    secondaryIndex: Max50,
+    secondaryIndex: Max5,
     schemeName: String,
     mode: Mode
   ): FormPageViewModel[RadioListViewModel] =

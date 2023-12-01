@@ -89,7 +89,7 @@ class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           secondaryIndex,
           TransferringSchemeNamePage,
           (srn, index: Max300, secondaryIndex: Max5, _) =>
-            controllers.nonsipp.receivetransfer.routes.TotalValueTransferController
+            controllers.nonsipp.receivetransfer.routes.TransferringSchemeTypeController
               .onPageLoad(srn, index, secondaryIndex, NormalMode)
         )
         .withName("go from transferring scheme name page to total value transfer page")
