@@ -32,7 +32,6 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import forms.mappings.Mappings
 import models.GenericFormMapper.ConditionalRadioMapper
 import models.PensionSchemeType._
-import utils.FormUtils.FormOps
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FieldType, FormPageViewModel, RadioItemConditional, RadioListRowViewModel, RadioListViewModel}
 import views.html.RadioListView
