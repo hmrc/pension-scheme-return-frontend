@@ -16,7 +16,6 @@
 
 package navigation.nonsipp
 
-import controllers.nonsipp.memberpayments
 import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
@@ -31,7 +30,7 @@ object TransferOutNavigator extends JourneyNavigator {
       if (userAnswers.get(page).contains(true)) {
         controllers.routes.UnauthorisedController.onPageLoad()
       } else {
-        memberpayments.routes.PensionCommencementLumpSumController.onPageLoad(srn, NormalMode)
+        controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
       }
   }
 
@@ -42,7 +41,8 @@ object TransferOutNavigator extends JourneyNavigator {
           if (userAnswers.get(page).contains(true)) {
             controllers.routes.UnauthorisedController.onPageLoad()
           } else {
-            memberpayments.routes.PensionCommencementLumpSumController.onPageLoad(srn, NormalMode)
+            controllers.nonsipp.memberreceivedpcls.routes.PensionCommencementLumpSumController
+              .onPageLoad(srn, NormalMode)
           }
       }
 }

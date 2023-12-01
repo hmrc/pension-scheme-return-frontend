@@ -16,9 +16,11 @@
 
 package navigation.nonsipp
 
+
 import cats.implicits.toTraverseOps
 import config.Refined.{Max5, OneTo5}
 import controllers.nonsipp.memberpayments
+import config.Refined.OneTo5
 import eu.timepit.refined.refineV
 import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
@@ -59,10 +61,11 @@ object ReceiveTransferNavigator extends JourneyNavigator {
     case DidTransferIncludeAssetPage(srn, index, secondaryIndex) =>
       controllers.routes.UnauthorisedController.onPageLoad()
 
+
     case TransferReceivedMemberListPage(srn) =>
       controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
 
-    case page @ ReportAnotherTransferInPage(srn, index, _) =>
+    case page @ ReportAnotherTransferInPage(srn, index, secondaryIndex) =>
       if (userAnswers.get(page).contains(true)) {
         (
           for {
@@ -89,7 +92,7 @@ object ReceiveTransferNavigator extends JourneyNavigator {
           if (userAnswers.get(page).contains(true)) {
             controllers.routes.UnauthorisedController.onPageLoad()
           } else {
-            memberpayments.routes.SchemeTransferOutController.onPageLoad(srn, NormalMode)
+            controllers.nonsipp.membertransferout.routes.SchemeTransferOutController.onPageLoad(srn, NormalMode)
           }
       }
 }

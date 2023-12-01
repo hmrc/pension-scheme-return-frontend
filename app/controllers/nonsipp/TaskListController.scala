@@ -345,32 +345,36 @@ object TaskListController {
       TaskListItemViewModel(
         LinkMessage(
           messageKey(prefix, "transfersout.title", UnableToStart),
-          controllers.nonsipp.memberpayments.routes.SchemeTransferOutController.onPageLoad(srn, NormalMode).url
+          controllers.nonsipp.membertransferout.routes.SchemeTransferOutController.onPageLoad(srn, NormalMode).url
         ),
-        UnableToStart
+        NotStarted
       ),
       TaskListItemViewModel(
         LinkMessage(
           messageKey(prefix, "pcls.title", UnableToStart),
-          controllers.nonsipp.memberpayments.routes.PensionCommencementLumpSumController
+          controllers.nonsipp.memberreceivedpcls.routes.PensionCommencementLumpSumController
             .onPageLoad(srn, NormalMode)
             .url
         ),
-        UnableToStart
+        NotStarted
       ),
       TaskListItemViewModel(
         LinkMessage(
           messageKey(prefix, "payments.title", UnableToStart),
-          controllers.nonsipp.memberpayments.routes.PensionPaymentsReceivedController.onPageLoad(srn, NormalMode).url
+          controllers.nonsipp.memberpensionpayments.routes.PensionPaymentsReceivedController
+            .onPageLoad(srn, NormalMode)
+            .url
         ),
-        UnableToStart
+        NotStarted
       ),
       TaskListItemViewModel(
         LinkMessage(
           messageKey(prefix, "surrenderedbenefits.title", UnableToStart),
-          controllers.nonsipp.memberpayments.routes.BenefitsSurrenderedController.onPageLoad(srn, NormalMode).url
+          controllers.nonsipp.membersurrenderedbenefits.routes.BenefitsSurrenderedController
+            .onPageLoad(srn, NormalMode)
+            .url
         ),
-        UnableToStart
+        NotStarted
       )
     )
   }
@@ -420,26 +424,26 @@ object TaskListController {
     )
   }
 
-  private def sharesSection(srn: Srn) = {
+  private def sharesSection(srn: Srn, userAnswers: UserAnswers) = {
     val prefix = "nonsipp.tasklist.shares"
+    val sharesStatusAndLink = getSharesTaskListStatusAndLink(userAnswers, srn)
+    val quotedSharesStatusAndLink = getQuotedSharesTaskListStatusAndLink(userAnswers, srn)
 
     TaskListSectionViewModel(
       s"$prefix.title",
       TaskListItemViewModel(
         LinkMessage(
-          messageKey(prefix, "sponsoringemployer.title", UnableToStart),
-          controllers.nonsipp.sharesinsponsoringemployer.routes.DidSchemeHoldSharesInSponsoringEmployerController
-            .onPageLoad(srn, NormalMode)
-            .url
+          messageKey(prefix, "sponsoringemployer.title", sharesStatusAndLink._1),
+          sharesStatusAndLink._2
         ),
-        NotStarted
+        sharesStatusAndLink._1
       ),
       TaskListItemViewModel(
         LinkMessage(
-          messageKey(prefix, "quotedshares.title", UnableToStart),
-          controllers.routes.UnauthorisedController.onPageLoad().url
+          messageKey(prefix, "quotedshares.title", quotedSharesStatusAndLink._1),
+          quotedSharesStatusAndLink._2
         ),
-        NotStarted
+        quotedSharesStatusAndLink._1
       )
     )
   }
@@ -469,34 +473,34 @@ object TaskListController {
     )
   }
 
-  private def bondsSection(srn: Srn) = {
+  private def bondsSection(srn: Srn, userAnswers: UserAnswers) = {
     val prefix = "nonsipp.tasklist.bonds"
+    val statusAndLink = getBondsTaskListStatusAndLink(userAnswers, srn)
 
     TaskListSectionViewModel(
       s"$prefix.title",
       TaskListItemViewModel(
         LinkMessage(
-          messageKey(prefix, "unregulatedorconnected.title", UnableToStart),
-          controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldController
-            .onPageLoad(srn, NormalMode)
-            .url
+          messageKey(prefix, "unregulatedorconnected.title", statusAndLink._1),
+          statusAndLink._2
         ),
-        NotStarted
+        statusAndLink._1
       )
     )
   }
 
-  private def otherAssetsSection(srn: Srn) = {
+  private def otherAssetsSection(srn: Srn, userAnswers: UserAnswers) = {
     val prefix = "nonsipp.tasklist.otherassets"
+    val statusAndLink = getOtherAssetsTaskListStatusAndLink(userAnswers, srn)
 
     TaskListSectionViewModel(
       s"$prefix.title",
       TaskListItemViewModel(
         LinkMessage(
-          messageKey(prefix, "title", UnableToStart),
-          controllers.nonsipp.otherassetsheld.routes.OtherAssetsHeldController.onPageLoad(srn, NormalMode).url
+          messageKey(prefix, "title", statusAndLink._1),
+          statusAndLink._2
         ),
-        NotStarted
+        statusAndLink._1
       )
     )
   }
@@ -525,10 +529,10 @@ object TaskListController {
       membersSection(srn, schemeName, userAnswers),
       memberPaymentsSection(srn, userAnswers),
       loansSection(srn, schemeName, userAnswers),
-      sharesSection(srn),
+      sharesSection(srn, userAnswers),
       landOrPropertySection(srn, userAnswers),
-      bondsSection(srn),
-      otherAssetsSection(srn),
+      bondsSection(srn, userAnswers),
+      otherAssetsSection(srn, userAnswers),
       declarationSection
     )
 

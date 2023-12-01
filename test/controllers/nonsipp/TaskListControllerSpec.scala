@@ -46,6 +46,7 @@ import pages.nonsipp.loansmadeoroutstanding.{
 }
 import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsNinoPage, MemberDetailsPage, NoNINOPage}
 import pages.nonsipp.moneyborrowed.{LenderNamePages, MoneyBorrowedPage}
+import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
 import pages.nonsipp.schemedesignatory.{
   ActiveBankAccountPage,
   FeesCommissionsWagesSalariesPage,
@@ -53,6 +54,9 @@ import pages.nonsipp.schemedesignatory.{
   HowMuchCashPage,
   ValueOfAssetsPage
 }
+import pages.nonsipp.sharesinsponsoringemployer.DidSchemeHoldSharesInSponsoringEmployerPage
+import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
+import pages.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldPage
 import play.api.inject
 import play.api.inject.guice.GuiceableModule
 import services.SchemeDateService
@@ -567,6 +571,145 @@ class TaskListControllerSpec extends ControllerBaseSpec {
         )
       }
     }
+
+    "shares section" - {
+      "notStarted" in {
+        testViewModel(
+          defaultUserAnswers,
+          4,
+          0,
+          expectedStatus = TaskListStatus.NotStarted,
+          expectedTitleKey = "nonsipp.tasklist.shares.title",
+          expectedLinkContentKey = "nonsipp.tasklist.shares.add.sponsoringemployer.title",
+          expectedLinkUrl =
+            controllers.nonsipp.sharesinsponsoringemployer.routes.DidSchemeHoldSharesInSponsoringEmployerController
+              .onPageLoad(srn, NormalMode)
+              .url
+        )
+      }
+
+      "completed" in {
+        val userAnswersWithData =
+          defaultUserAnswers
+            .unsafeSet(DidSchemeHoldSharesInSponsoringEmployerPage(srn), false)
+
+        testViewModel(
+          userAnswersWithData,
+          4,
+          0,
+          expectedStatus = TaskListStatus.Completed,
+          expectedTitleKey = "nonsipp.tasklist.shares.title",
+          expectedLinkContentKey = "nonsipp.tasklist.shares.change.sponsoringemployer.title",
+          expectedLinkUrl =
+            controllers.nonsipp.sharesinsponsoringemployer.routes.DidSchemeHoldSharesInSponsoringEmployerController
+              .onPageLoad(srn, NormalMode)
+              .url
+        )
+      }
+    }
+    "quotedSharesSection" - {
+      "notStarted" in {
+        testViewModel(
+          defaultUserAnswers,
+          4,
+          1,
+          expectedStatus = TaskListStatus.NotStarted,
+          expectedTitleKey = "nonsipp.tasklist.shares.title",
+          expectedLinkContentKey = "nonsipp.tasklist.shares.add.quotedshares.title",
+          expectedLinkUrl = controllers.nonsipp.totalvaluequotedshares.routes.TotalValueQuotedSharesController
+            .onPageLoad(srn, NormalMode)
+            .url
+        )
+      }
+
+      "completed" in {
+        val userAnswersWithData =
+          defaultUserAnswers
+            .unsafeSet(TotalValueQuotedSharesPage(srn), money)
+
+        testViewModel(
+          userAnswersWithData,
+          4,
+          1,
+          expectedStatus = TaskListStatus.Completed,
+          expectedTitleKey = "nonsipp.tasklist.shares.title",
+          expectedLinkContentKey = "nonsipp.tasklist.shares.change.quotedshares.title",
+          expectedLinkUrl = controllers.nonsipp.totalvaluequotedshares.routes.TotalValueQuotedSharesController
+            .onPageLoad(srn, NormalMode)
+            .url
+        )
+      }
+    }
+
+    "bonds section" - {
+      "notStarted" in {
+        testViewModel(
+          defaultUserAnswers,
+          6,
+          0,
+          expectedStatus = TaskListStatus.NotStarted,
+          expectedTitleKey = "nonsipp.tasklist.bonds.title",
+          expectedLinkContentKey = "nonsipp.tasklist.bonds.add.unregulatedorconnected.title",
+          expectedLinkUrl =
+            controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldController
+              .onPageLoad(srn, NormalMode)
+              .url
+        )
+      }
+
+      "completed" in {
+        val userAnswersWithData =
+          defaultUserAnswers
+            .unsafeSet(UnregulatedOrConnectedBondsHeldPage(srn), false)
+
+        testViewModel(
+          userAnswersWithData,
+          6,
+          0,
+          expectedStatus = TaskListStatus.Completed,
+          expectedTitleKey = "nonsipp.tasklist.bonds.title",
+          expectedLinkContentKey = "nonsipp.tasklist.bonds.change.unregulatedorconnected.title",
+          expectedLinkUrl =
+            controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldController
+              .onPageLoad(srn, NormalMode)
+              .url
+        )
+      }
+    }
+    "other assets section" - {
+      "notStarted" in {
+        testViewModel(
+          defaultUserAnswers,
+          7,
+          0,
+          expectedStatus = TaskListStatus.NotStarted,
+          expectedTitleKey = "nonsipp.tasklist.otherassets.title",
+          expectedLinkContentKey = "nonsipp.tasklist.otherassets.add.title",
+          expectedLinkUrl = controllers.nonsipp.otherassetsheld.routes.OtherAssetsHeldController
+            .onPageLoad(srn, NormalMode)
+            .url
+        )
+      }
+
+      "completed" in {
+        val userAnswersWithData =
+          defaultUserAnswers
+            .unsafeSet(OtherAssetsHeldPage(srn), false)
+
+        testViewModel(
+          userAnswersWithData,
+          7,
+          0,
+          expectedStatus = TaskListStatus.Completed,
+          expectedTitleKey = "nonsipp.tasklist.otherassets.title",
+          expectedLinkContentKey = "nonsipp.tasklist.otherassets.change.title",
+          expectedLinkUrl = controllers.nonsipp.otherassetsheld.routes.OtherAssetsHeldController
+            .onPageLoad(srn, NormalMode)
+            .url
+        )
+      }
+    }
+
   }
 
   private def testViewModel(

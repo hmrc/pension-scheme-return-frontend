@@ -59,10 +59,10 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
         .navigateToWithData(
           LoansMadeOrOutstandingPage,
           Gen.const(false),
-          controllers.nonsipp.sharesinsponsoringemployer.routes.DidSchemeHoldSharesInSponsoringEmployerController.onPageLoad
+          (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
         )
         .withName(
-          "go from loan made or outstanding page to did scheme hold shares in sponsoring employer page when no selected"
+          "go from loan made or outstanding page to task list page when no selected"
         )
     )
 

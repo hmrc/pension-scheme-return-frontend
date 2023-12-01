@@ -18,6 +18,7 @@ package utils.nonsipp
 
 import config.Refined.Max5000
 import controllers.TestValues
+import controllers.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldController
 import eu.timepit.refined.refineMV
 import models.{ConditionalYesNo, IdentitySubject, IdentityType, Money, NormalMode, SchemeHoldLandProperty}
 import org.scalatest.OptionValues
@@ -45,6 +46,10 @@ import pages.nonsipp.landorproperty.{
   WhyDoesSchemeHoldLandPropertyPage
 }
 import pages.nonsipp.moneyborrowed.{LenderNamePage, LenderNamePages, MoneyBorrowedPage, WhySchemeBorrowedMoneyPage}
+import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
+import pages.nonsipp.sharesinsponsoringemployer.DidSchemeHoldSharesInSponsoringEmployerPage
+import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
+import pages.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldPage
 
 class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValues with TestValues {
   "Loans status" - {
@@ -360,4 +365,91 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
       }
     }
   }
+
+  "Shares status" - {
+    val hadSharesPageUrl =
+      controllers.nonsipp.sharesinsponsoringemployer.routes.DidSchemeHoldSharesInSponsoringEmployerController
+        .onPageLoad(srn, NormalMode)
+        .url
+
+    "should be Not Started" - {
+      "when default data" in {
+        val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(defaultUserAnswers, srn)
+        result mustBe (NotStarted, hadSharesPageUrl)
+      }
+    }
+    "should be Complete" - {
+      "when only DidSchemeHoldSharesInSponsoringEmployerPage false is present" in {
+        val customUserAnswers = defaultUserAnswers
+          .unsafeSet(DidSchemeHoldSharesInSponsoringEmployerPage(srn), false)
+        val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn)
+        result mustBe (Completed, hadSharesPageUrl)
+      }
+    }
+  }
+  "Quoted shares status" - {
+    val totalSharesPageUrl =
+      controllers.nonsipp.totalvaluequotedshares.routes.TotalValueQuotedSharesController
+        .onPageLoad(srn, NormalMode)
+        .url
+
+    "should be Not Started" - {
+      "when default data" in {
+        val result = TaskListStatusUtils.getQuotedSharesTaskListStatusAndLink(defaultUserAnswers, srn)
+        result mustBe (NotStarted, totalSharesPageUrl)
+      }
+    }
+    "should be Complete" - {
+      "when TotalValueQuotedSharesPage is present" in {
+        val customUserAnswers = defaultUserAnswers
+          .unsafeSet(TotalValueQuotedSharesPage(srn), money)
+        val result = TaskListStatusUtils.getQuotedSharesTaskListStatusAndLink(customUserAnswers, srn)
+        result mustBe (Completed, totalSharesPageUrl)
+      }
+    }
+  }
+  "Bonds status" - {
+    val hadBondsPageUrl =
+      controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldController
+        .onPageLoad(srn, NormalMode)
+        .url
+
+    "should be Not Started" - {
+      "when default data" in {
+        val result = TaskListStatusUtils.getBondsTaskListStatusAndLink(defaultUserAnswers, srn)
+        result mustBe (NotStarted, hadBondsPageUrl)
+      }
+    }
+    "should be Complete" - {
+      "when only DidSchemeHoldSharesInSponsoringEmployerPage false is present" in {
+        val customUserAnswers = defaultUserAnswers
+          .unsafeSet(UnregulatedOrConnectedBondsHeldPage(srn), false)
+        val result = TaskListStatusUtils.getBondsTaskListStatusAndLink(customUserAnswers, srn)
+        result mustBe (Completed, hadBondsPageUrl)
+      }
+    }
+  }
+
+  "Other assets status" - {
+    val hadAssetsPageUrl =
+      controllers.nonsipp.otherassetsheld.routes.OtherAssetsHeldController
+        .onPageLoad(srn, NormalMode)
+        .url
+
+    "should be Not Started" - {
+      "when default data" in {
+        val result = TaskListStatusUtils.getOtherAssetsTaskListStatusAndLink(defaultUserAnswers, srn)
+        result mustBe (NotStarted, hadAssetsPageUrl)
+      }
+    }
+    "should be Complete" - {
+      "when only OtherAssetsHeldPage false is present" in {
+        val customUserAnswers = defaultUserAnswers
+          .unsafeSet(OtherAssetsHeldPage(srn), false)
+        val result = TaskListStatusUtils.getOtherAssetsTaskListStatusAndLink(customUserAnswers, srn)
+        result mustBe (Completed, hadAssetsPageUrl)
+      }
+    }
+  }
+
 }

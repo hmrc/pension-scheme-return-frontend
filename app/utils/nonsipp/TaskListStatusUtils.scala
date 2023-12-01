@@ -32,7 +32,11 @@ import pages.nonsipp.loansmadeoroutstanding.{
 }
 import pages.nonsipp.memberdetails.{MemberDetailsNinoPages, MembersDetailsPages, NoNinoPages}
 import pages.nonsipp.moneyborrowed.{LenderNamePages, MoneyBorrowedPage, WhySchemeBorrowedMoneyPages}
+import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
 import pages.nonsipp.schemedesignatory.{FeesCommissionsWagesSalariesPage, HowManyMembersPage, HowMuchCashPage}
+import pages.nonsipp.sharesinsponsoringemployer.DidSchemeHoldSharesInSponsoringEmployerPage
+import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
+import pages.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldPage
 import viewmodels.models.TaskListStatus
 import viewmodels.models.TaskListStatus.{Completed, InProgress, NotStarted, TaskListStatus}
 
@@ -320,4 +324,68 @@ object TaskListStatusUtils {
           }
         }
     }
+
+  def getSharesTaskListStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
+    val hadSharesPage = userAnswers.get(DidSchemeHoldSharesInSponsoringEmployerPage(srn))
+    val defaultLink =
+      controllers.nonsipp.sharesinsponsoringemployer.routes.DidSchemeHoldSharesInSponsoringEmployerController
+        .onPageLoad(srn, NormalMode)
+        .url
+    hadSharesPage match {
+      case None => (NotStarted, defaultLink)
+      case Some(hadShares) =>
+        if (!hadShares) {
+          (Completed, defaultLink)
+        } else {
+          (InProgress, defaultLink)
+        }
+    }
+  }
+
+  def getQuotedSharesTaskListStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
+    val totalSharesPage = userAnswers.get(TotalValueQuotedSharesPage(srn))
+    val defaultLink =
+      controllers.nonsipp.totalvaluequotedshares.routes.TotalValueQuotedSharesController
+        .onPageLoad(srn, NormalMode)
+        .url
+    totalSharesPage match {
+      case None => (NotStarted, defaultLink)
+      case Some(_) => (Completed, defaultLink)
+    }
+  }
+
+  def getBondsTaskListStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
+    val hadBondsPage = userAnswers.get(UnregulatedOrConnectedBondsHeldPage(srn))
+    val defaultLink =
+      controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldController
+        .onPageLoad(srn, NormalMode)
+        .url
+    hadBondsPage match {
+      case None => (NotStarted, defaultLink)
+      case Some(hadBonds) =>
+        if (!hadBonds) {
+          (Completed, defaultLink)
+        } else {
+          (InProgress, defaultLink)
+        }
+    }
+  }
+
+  def getOtherAssetsTaskListStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
+    val hadAssetsPage = userAnswers.get(OtherAssetsHeldPage(srn))
+    val defaultLink =
+      controllers.nonsipp.otherassetsheld.routes.OtherAssetsHeldController
+        .onPageLoad(srn, NormalMode)
+        .url
+    hadAssetsPage match {
+      case None => (NotStarted, defaultLink)
+      case Some(hadAssets) =>
+        if (!hadAssets) {
+          (Completed, defaultLink)
+        } else {
+          (InProgress, defaultLink)
+        }
+    }
+  }
+
 }

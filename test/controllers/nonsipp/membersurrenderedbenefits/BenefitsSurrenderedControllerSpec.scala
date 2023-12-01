@@ -14,28 +14,28 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.memberpayments
+package controllers.nonsipp.membersurrenderedbenefits
 
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.memberpayments.SchemeTransferOutController.{form, viewModel}
+import controllers.nonsipp.membersurrenderedbenefits.BenefitsSurrenderedController._
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import pages.nonsipp.memberpayments.SchemeTransferOutPage
+import pages.nonsipp.memberpayments.BenefitsSurrenderedPage
 import play.api.libs.json.JsPath
 import views.html.YesNoPageView
 
-class SchemeTransferOutControllerSpec extends ControllerBaseSpec {
+class BenefitsSurrenderedControllerSpec extends ControllerBaseSpec {
 
-  private lazy val onPageLoad = routes.SchemeTransferOutController.onPageLoad(srn, NormalMode)
-  private lazy val onSubmit = routes.SchemeTransferOutController.onSubmit(srn, NormalMode)
+  private lazy val onPageLoad = routes.BenefitsSurrenderedController.onPageLoad(srn, NormalMode)
+  private lazy val onSubmit = routes.BenefitsSurrenderedController.onSubmit(srn, NormalMode)
 
-  "SchemeTransferoutController" - {
+  "BenefitsSurrenderedController" - {
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       injected[YesNoPageView].apply(form(injected[YesNoPageFormProvider]), viewModel(srn, schemeName, NormalMode))
     })
 
-    act.like(renderPrePopView(onPageLoad, SchemeTransferOutPage(srn), true) { implicit app => implicit request =>
+    act.like(renderPrePopView(onPageLoad, BenefitsSurrenderedPage(srn), true) { implicit app => implicit request =>
       injected[YesNoPageView]
         .apply(form(injected[YesNoPageFormProvider]).fill(true), viewModel(srn, schemeName, NormalMode))
     })
@@ -45,7 +45,14 @@ class SchemeTransferOutControllerSpec extends ControllerBaseSpec {
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
-    act.like(saveAndContinue(onSubmit, Some(JsPath \ "membersPayments" \ "schemeMadeTransferOut"), "value" -> "true"))
+    act.like(
+      saveAndContinue(
+        onSubmit,
+        defaultUserAnswers,
+        Some(JsPath \ "membersPayments" \ "surrenderMade"),
+        "value" -> "true"
+      )
+    )
 
     act.like(invalidForm(onSubmit))
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
