@@ -29,7 +29,7 @@ import views.html.MoneyView
 class TotalValueTransferControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[Max300.Refined](1)
-  private val secondaryIndex = refineMV[Max50.Refined](1)
+  private val secondaryIndex = refineMV[Max5.Refined](1)
   private val userAnswers = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
     .unsafeSet(TransferringSchemeNamePage(srn, index, secondaryIndex), transferSchemeName)

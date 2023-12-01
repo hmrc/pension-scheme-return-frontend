@@ -23,6 +23,7 @@ import pages.QuestionPage
 import play.api.libs.json.JsPath
 import queries.{Gettable, Removable}
 import utils.RefinedUtils.RefinedIntOps
+import viewmodels.models.MemberState
 
 import scala.util.Try
 
@@ -43,8 +44,18 @@ case class MembersDetailsPages(srn: Srn) extends Gettable[List[NameDOB]] with Re
   override def toString: String = "nameDob"
 }
 
+case class MembersDetailsMapPages(srn: Srn)
+    extends Gettable[Map[String, NameDOB]]
+    with Removable[Map[String, NameDOB]] {
+
+  override def path: JsPath = Paths.personalDetails \ toString
+
+  override def toString: String = "nameDob"
+}
+
 object MembersDetailsPages {
   implicit class MembersDetailsOps(ua: UserAnswers) {
     def membersDetails(srn: Srn): List[NameDOB] = ua.get(MembersDetailsPages(srn)).toList.flatten
+    def membersDetailsMap(srn: Srn): Map[String, NameDOB] = ua.map(MembersDetailsMapPages(srn))
   }
 }

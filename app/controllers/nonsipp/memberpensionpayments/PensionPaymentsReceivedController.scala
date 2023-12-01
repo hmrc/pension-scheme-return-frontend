@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.memberpayments
+package controllers.nonsipp.memberpensionpayments
 
 import controllers.actions._
-import controllers.nonsipp.memberpayments.BenefitsSurrenderedController._
+import controllers.nonsipp.memberpensionpayments.PensionPaymentsReceivedController._
 import forms.YesNoPageFormProvider
 import models.Mode
 import models.SchemeId.Srn
 import navigation.Navigator
-import pages.nonsipp.memberpayments.BenefitsSurrenderedPage
+import pages.nonsipp.memberpayments.PensionPaymentsReceivedPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -36,7 +36,7 @@ import views.html.YesNoPageView
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
-class BenefitsSurrenderedController @Inject()(
+class PensionPaymentsReceivedController @Inject()(
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -48,10 +48,10 @@ class BenefitsSurrenderedController @Inject()(
     extends FrontendBaseController
     with I18nSupport {
 
-  private val form = BenefitsSurrenderedController.form(formProvider)
+  private val form = PensionPaymentsReceivedController.form(formProvider)
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    val preparedForm = request.userAnswers.fillForm(BenefitsSurrenderedPage(srn), form)
+    val preparedForm = request.userAnswers.fillForm(PensionPaymentsReceivedPage(srn), form)
     Ok(view(preparedForm, viewModel(srn, request.schemeDetails.schemeName, mode)))
   }
 
@@ -63,21 +63,21 @@ class BenefitsSurrenderedController @Inject()(
           Future.successful(BadRequest(view(formWithErrors, viewModel(srn, request.schemeDetails.schemeName, mode)))),
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(BenefitsSurrenderedPage(srn), value))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(PensionPaymentsReceivedPage(srn), value))
             _ <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage(BenefitsSurrenderedPage(srn), mode, updatedAnswers))
+          } yield Redirect(navigator.nextPage(PensionPaymentsReceivedPage(srn), mode, updatedAnswers))
       )
   }
 }
 
-object BenefitsSurrenderedController {
+object PensionPaymentsReceivedController {
   def form(formProvider: YesNoPageFormProvider): Form[Boolean] = formProvider(
-    "benefitsSurrendered.error.required"
+    "pensionPaymentsReceived.error.required"
   )
 
   def viewModel(srn: Srn, schemeName: String, mode: Mode): FormPageViewModel[YesNoPageViewModel] = YesNoPageViewModel(
-    "benefitsSurrendered.title",
-    Message("benefitsSurrendered.heading", schemeName),
-    routes.BenefitsSurrenderedController.onSubmit(srn, mode)
+    "pensionPaymentsReceived.title",
+    Message("pensionPaymentsReceived.heading", schemeName),
+    routes.PensionPaymentsReceivedController.onSubmit(srn, mode)
   )
 }

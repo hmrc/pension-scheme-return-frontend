@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.receivetransfer
 
-import pages.nonsipp.receivetransfer.WhenWasTransferReceivedPage
+import pages.nonsipp.receivetransfer.{TransferringSchemeNamePage, WhenWasTransferReceivedPage}
 import controllers.nonsipp.receivetransfer.WhenWasTransferReceivedController._
 import config.Refined._
 import eu.timepit.refined.refineMV
@@ -34,7 +34,7 @@ import services.SchemeDateService
 class WhenWasTransferReceivedControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[Max300.Refined](1)
-  private val secondaryIndex = refineMV[Max50.Refined](1)
+  private val secondaryIndex = refineMV[Max5.Refined](1)
   private lazy val onPageLoad =
     routes.WhenWasTransferReceivedController.onPageLoad(srn, index, secondaryIndex, NormalMode)
   private lazy val onSubmit = routes.WhenWasTransferReceivedController.onSubmit(srn, index, secondaryIndex, NormalMode)
@@ -49,7 +49,9 @@ class WhenWasTransferReceivedControllerSpec extends ControllerBaseSpec {
     MockSchemeDateService.taxYearOrAccountingPeriods(Some(Left(dateRange)))
   }
 
-  val userAnswers = defaultUserAnswers.unsafeSet(MemberDetailsPage(srn, index), memberDetails)
+  val userAnswers = defaultUserAnswers
+    .unsafeSet(MemberDetailsPage(srn, index), memberDetails)
+    .unsafeSet(TransferringSchemeNamePage(srn, index, secondaryIndex), transferringSchemeName)
 
   "TransferReceivedController" - {
 
@@ -57,7 +59,7 @@ class WhenWasTransferReceivedControllerSpec extends ControllerBaseSpec {
       injected[DatePageView]
         .apply(
           form(injected[DatePageFormProvider], dateRange),
-          viewModel(srn, index, secondaryIndex, schemeName, memberDetails.fullName, NormalMode)
+          viewModel(srn, index, secondaryIndex, transferringSchemeName, memberDetails.fullName, NormalMode)
         )
     })
 
@@ -66,7 +68,7 @@ class WhenWasTransferReceivedControllerSpec extends ControllerBaseSpec {
         implicit app => implicit request =>
           injected[DatePageView].apply(
             form(injected[DatePageFormProvider], dateRange).fill(dateRange.to),
-            viewModel(srn, index, secondaryIndex, schemeName, memberDetails.fullName, NormalMode)
+            viewModel(srn, index, secondaryIndex, transferringSchemeName, memberDetails.fullName, NormalMode)
           )
       }
     )

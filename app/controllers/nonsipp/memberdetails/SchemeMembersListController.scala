@@ -19,24 +19,28 @@ package controllers.nonsipp.memberdetails
 import com.google.inject.Inject
 import config.Constants
 import config.Constants.maxSchemeMembers
-import config.Refined.OneTo300
+import config.Refined.{Max300, OneTo300}
+import controllers.PSRController
 import controllers.actions._
 import controllers.nonsipp.memberdetails.SchemeMembersListController._
 import eu.timepit.refined._
 import forms.YesNoPageFormProvider
 import models.CheckOrChange.Change
 import models.SchemeId.Srn
-import models.{ManualOrUpload, Mode, Pagination}
+import models.requests.DataRequest
+import models.{ManualOrUpload, Mode, NameDOB, Pagination}
 import navigation.Navigator
+import pages.nonsipp.memberdetails.MemberStatusImplicits.MembersStatusOps
 import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
-import pages.nonsipp.memberdetails.SchemeMembersListPage
+import pages.nonsipp.memberdetails.{MembersDetailsPages, SchemeMembersListPage}
+import play.api.Logger
 import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import play.api.i18n.MessagesApi
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import utils.MapUtils.{MapOps, UserAnswersMapOps}
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, ListRow, ListViewModel, PaginatedViewModel}
+import viewmodels.models._
 import views.html.ListView
 
 import javax.inject.Named
@@ -48,8 +52,9 @@ class SchemeMembersListController @Inject()(
   val controllerComponents: MessagesControllerComponents,
   view: ListView,
   formProvider: YesNoPageFormProvider
-) extends FrontendBaseController
-    with I18nSupport {
+) extends PSRController {
+
+  private val logger: Logger = Logger(classOf[SchemeMembersListController])
 
   private def form(manualOrUpload: ManualOrUpload, maxNumberReached: Boolean = false): Form[Boolean] =
     SchemeMembersListController.form(formProvider, manualOrUpload, maxNumberReached)
@@ -58,14 +63,18 @@ class SchemeMembersListController @Inject()(
     identifyAndRequireData(srn) { implicit request =>
       val membersDetails = request.userAnswers.membersDetails(srn)
       if (membersDetails.isEmpty) {
+        logger.error(s"no members found")
         Redirect(routes.PensionSchemeMembersController.onPageLoad(srn))
       } else {
-        Ok(
-          view(
-            form(manualOrUpload, membersDetails.size >= maxSchemeMembers),
-            viewModel(srn, page, manualOrUpload, mode, membersDetails.map(_.fullName))
+        filterDeletedMembers(srn).map { filteredMembers =>
+          val memberNames = filteredMembers.map { case (_, details, _) => details.fullName }
+          Ok(
+            view(
+              form(manualOrUpload, filteredMembers.size >= maxSchemeMembers),
+              viewModel(srn, page, manualOrUpload, mode, memberNames)
+            )
           )
-        )
+        }.merge
       }
     }
 
@@ -75,19 +84,70 @@ class SchemeMembersListController @Inject()(
       form(manualOrUpload, membersDetails.size >= maxSchemeMembers)
         .bindFromRequest()
         .fold(
-          formWithErrors =>
-            BadRequest(
-              view(formWithErrors, viewModel(srn, page, manualOrUpload, mode, membersDetails.map(_.fullName)))
-            ),
+          formWithErrors => {
+            filterDeletedMembers(srn).map { filteredMembers =>
+              val memberNames = filteredMembers.map { case (_, details, _) => details.fullName }
+              BadRequest(
+                view(
+                  formWithErrors,
+                  viewModel(srn, page, manualOrUpload, mode, memberNames)
+                )
+              )
+            }
+          }.merge,
           value => {
-            if (membersDetails.length == maxSchemeMembers && value) {
+            if (membersDetails.size == maxSchemeMembers && value) {
               Redirect(routes.HowToUploadController.onPageLoad(srn))
             } else {
-              Redirect(navigator.nextPage(SchemeMembersListPage(srn, value, manualOrUpload), mode, request.userAnswers))
+              Redirect(
+                navigator.nextPage(SchemeMembersListPage(srn, value, manualOrUpload), mode, request.userAnswers)
+              )
             }
           }
         )
     }
+
+  // merges member details with member states and filters out any soft deleted members
+  private def filterDeletedMembers(
+    srn: Srn
+  )(implicit request: DataRequest[_]): Either[Result, List[(Max300, NameDOB, MemberState)]] = {
+    val maybeMembersDetails =
+      request.userAnswers
+        .membersDetails(srn)
+        .zipWithIndexToMap
+        .mapKeysToIndex[Max300.Refined]
+        .getOrRecoverJourney
+    val maybeMemberStates = request.userAnswers.memberStates(srn).mapKeysToIndex[Max300.Refined].getOrRecoverJourney
+
+    maybeMembersDetails.flatMap { membersDetails =>
+      maybeMemberStates.flatMap { memberStates =>
+        if (membersDetails.size != memberStates.size) {
+          logger.error(
+            s"member details of size ${membersDetails.size} was not the same as size of member states ${memberStates.size}"
+          )
+          Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+        } else {
+          val sortedMemberDetails = membersDetails.sort { case (a, b) => a.value.max(b.value) }
+          val sortedMemberStates = memberStates.sort { case (a, b) => a.value.max(b.value) }
+          val zippedMembers: List[((Max300, NameDOB), (Max300, MemberState))] =
+            sortedMemberDetails.zip(sortedMemberStates).toList
+          val memberWithStates = zippedMembers.collect {
+            case ((i1, details), (i2, state)) if i1.value == i2.value => Some((i1, details, state))
+            case _ => None
+          }.flatten
+
+          if (memberWithStates.size != sortedMemberStates.size) {
+            logger.error(
+              s"zipping member details with states has resulted in a mismatch, this means the indexes didn't align after sorting"
+            )
+            Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+          } else {
+            Right(memberWithStates.iterator.filter { case (_, _, state) => state == MemberState.Active }.toList)
+          }
+        }
+      }
+    }
+  }
 }
 
 object SchemeMembersListController {

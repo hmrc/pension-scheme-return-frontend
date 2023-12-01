@@ -17,7 +17,7 @@
 package controllers.nonsipp.receivetransfer
 
 import config.Constants
-import config.Refined.{Max300, Max50}
+import config.Refined.{Max300, Max5}
 import controllers.nonsipp.receivetransfer.TotalValueTransferController._
 import controllers.PSRController
 import controllers.actions._
@@ -54,7 +54,7 @@ class TotalValueTransferController @Inject()(
 
   private val form = TotalValueTransferController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val memberNames = request.userAnswers.membersDetails(srn)
       val transferSchemeName = request.userAnswers.get(TransferringSchemeNamePage(srn, index, secondaryIndex))
@@ -76,7 +76,7 @@ class TotalValueTransferController @Inject()(
       )
     }
 
-  def onSubmit(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       val memberNames = request.userAnswers.membersDetails(srn)
       val transferSchemeName = request.userAnswers.get(TransferringSchemeNamePage(srn, index, secondaryIndex))
@@ -126,7 +126,7 @@ object TotalValueTransferController {
   def viewModel(
     srn: Srn,
     index: Max300,
-    secondaryIndex: Max50,
+    secondaryIndex: Max5,
     memberName: String,
     transferSchemeName: String,
     form: Form[Money],

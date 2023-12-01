@@ -16,26 +16,17 @@
 
 package pages.nonsipp.receivetransfer
 
-import config.Refined._
-import utils.RefinedUtils._
-
 import play.api.libs.json.JsPath
 import models.SchemeId.Srn
-import pages.QuestionPage
-
 import models.Money
+import pages.QuestionPage
+import config.Refined._
+import utils.RefinedUtils._
+import eu.timepit.refined.refineMV
 
-case class TotalValueTransferPage(srn: Srn, index: Max300, secondaryIndex: Max50) extends QuestionPage[Money] {
+case class DidTransferIncludeAssetPage(srn: Srn, index: Max300, secondaryIndex: Max5) extends QuestionPage[Boolean] {
 
-  override def path: JsPath =
-    Paths.memberTransfersIn \ toString \ index.arrayIndex.toString \ secondaryIndex.arrayIndex.toString
+  override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString \ secondaryIndex.arrayIndex.toString
 
-  override def toString: String = "transferValue"
-}
-
-case class TotalValueTransferPages(srn: Srn, index: Max300) extends QuestionPage[Map[String, Money]] {
-
-  override def path: JsPath = Paths.memberTransfersIn \ toString \ index.arrayIndex.toString
-
-  override def toString: String = "transferValue"
+  override def toString: String = "transferIncludedAsset"
 }

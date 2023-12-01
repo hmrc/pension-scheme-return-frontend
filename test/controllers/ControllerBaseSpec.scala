@@ -136,6 +136,7 @@ trait TestValues {
   val lenderName = "testLenderName"
   val amountBorrowed: (Money, Percentage) = (money, percentage)
   val reasonBorrowed = "test reason borrowed"
+  val transferringSchemeName = "transferring scheme"
 
   val address: Address = Address(
     "test-id",

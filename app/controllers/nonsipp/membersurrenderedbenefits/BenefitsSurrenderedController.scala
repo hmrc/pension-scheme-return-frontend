@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.memberpayments
+package controllers.nonsipp.membersurrenderedbenefits
 
 import controllers.actions._
-import controllers.nonsipp.memberpayments.SchemeTransferOutController._
+import controllers.nonsipp.membersurrenderedbenefits.BenefitsSurrenderedController._
 import forms.YesNoPageFormProvider
 import models.Mode
 import models.SchemeId.Srn
 import navigation.Navigator
-import pages.nonsipp.memberpayments.SchemeTransferOutPage
+import pages.nonsipp.memberpayments.BenefitsSurrenderedPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -36,7 +36,7 @@ import views.html.YesNoPageView
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
-class SchemeTransferOutController @Inject()(
+class BenefitsSurrenderedController @Inject()(
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -48,10 +48,10 @@ class SchemeTransferOutController @Inject()(
     extends FrontendBaseController
     with I18nSupport {
 
-  private val form = SchemeTransferOutController.form(formProvider)
+  private val form = BenefitsSurrenderedController.form(formProvider)
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    val preparedForm = request.userAnswers.get(SchemeTransferOutPage(srn)).fold(form)(form.fill)
+    val preparedForm = request.userAnswers.fillForm(BenefitsSurrenderedPage(srn), form)
     Ok(view(preparedForm, viewModel(srn, request.schemeDetails.schemeName, mode)))
   }
 
@@ -63,21 +63,21 @@ class SchemeTransferOutController @Inject()(
           Future.successful(BadRequest(view(formWithErrors, viewModel(srn, request.schemeDetails.schemeName, mode)))),
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(SchemeTransferOutPage(srn), value))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(BenefitsSurrenderedPage(srn), value))
             _ <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage(SchemeTransferOutPage(srn), mode, updatedAnswers))
+          } yield Redirect(navigator.nextPage(BenefitsSurrenderedPage(srn), mode, updatedAnswers))
       )
   }
 }
 
-object SchemeTransferOutController {
+object BenefitsSurrenderedController {
   def form(formProvider: YesNoPageFormProvider): Form[Boolean] = formProvider(
-    "schemeTransferOut.error.required"
+    "benefitsSurrendered.error.required"
   )
 
   def viewModel(srn: Srn, schemeName: String, mode: Mode): FormPageViewModel[YesNoPageViewModel] = YesNoPageViewModel(
-    "schemeTransferOut.title",
-    Message("schemeTransferOut.heading", schemeName),
-    routes.SchemeTransferOutController.onSubmit(srn, mode)
+    "benefitsSurrendered.title",
+    Message("benefitsSurrendered.heading", schemeName),
+    routes.BenefitsSurrenderedController.onSubmit(srn, mode)
   )
 }

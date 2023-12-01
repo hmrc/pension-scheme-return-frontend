@@ -30,7 +30,7 @@ object OtherAssetsHeldNavigator extends JourneyNavigator {
       if (userAnswers.get(page).contains(true)) {
         routes.UnauthorisedController.onPageLoad()
       } else {
-        routes.UnauthorisedController.onPageLoad()
+        controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
       }
   }
 

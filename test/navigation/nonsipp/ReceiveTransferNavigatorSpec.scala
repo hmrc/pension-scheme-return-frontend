@@ -16,18 +16,12 @@
 
 package navigation.nonsipp
 
-import config.Refined.{Max300, Max50}
+import config.Refined.{Max300, Max5, Max50}
 import eu.timepit.refined.refineMV
 import models.NormalMode
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.receivetransfer.{
-  DidSchemeReceiveTransferPage,
-  TotalValueTransferPage,
-  TransferReceivedMemberListPage,
-  TransferringSchemeNamePage,
-  WhatYouWillNeedReceivedTransferPage
-}
+import pages.nonsipp.receivetransfer._
 import utils.BaseSpec
 
 class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
@@ -35,7 +29,7 @@ class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
   val navigator: Navigator = new NonSippNavigator
 
   private val index = refineMV[Max300.Refined](1)
-  private val secondaryIndex = refineMV[Max50.Refined](1)
+  private val secondaryIndex = refineMV[Max5.Refined](1)
 
   "ReceiveTransferNavigator" - {
 
@@ -94,7 +88,7 @@ class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           index,
           secondaryIndex,
           TransferringSchemeNamePage,
-          (srn, index: Max300, secondaryIndex: Max50, _) =>
+          (srn, index: Max300, secondaryIndex: Max5, _) =>
             controllers.nonsipp.receivetransfer.routes.TotalValueTransferController
               .onPageLoad(srn, index, secondaryIndex, NormalMode)
         )
@@ -110,11 +104,39 @@ class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           index,
           secondaryIndex,
           TotalValueTransferPage,
-          (srn, index: Max300, secondaryIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.receivetransfer.routes.WhenWasTransferReceivedController.onPageLoad
         )
-        .withName("go from total value transfer page to unauthorised page")
+        .withName("go from total value transfer page to when was transfer received page")
     )
 
   }
 
+  "ReportAnotherTransferInPage" - {
+
+    act.like(
+      normalmode
+        .navigateToWithDoubleDataAndIndex(
+          index,
+          secondaryIndex,
+          ReportAnotherTransferInPage,
+          Gen.const(false),
+          (srn, index: Max300, secondaryIndex: Max5, _) => controllers.routes.UnauthorisedController.onPageLoad()
+        )
+        .withName("go from report another transfer in page to unauthorised page")
+    )
+
+  }
+
+  "DidTransferIncludeAssetPage" - {
+    act.like(
+      normalmode
+        .navigateToWithDoubleIndex(
+          index,
+          secondaryIndex,
+          DidTransferIncludeAssetPage,
+          (srn, index: Max300, secondaryIndex: Max5, _) => controllers.routes.UnauthorisedController.onPageLoad()
+        )
+        .withName("go from DidTransferIncludeAssetPage to ??? page")
+    )
+  }
 }

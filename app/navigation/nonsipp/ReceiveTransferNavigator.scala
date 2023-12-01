@@ -16,7 +16,8 @@
 
 package navigation.nonsipp
 
-import controllers.nonsipp.memberpayments
+import config.Refined.OneTo5
+import eu.timepit.refined.refineV
 import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
@@ -50,7 +51,28 @@ object ReceiveTransferNavigator extends JourneyNavigator {
         .onPageLoad(srn, memberIndex, index, NormalMode)
 
     case TotalValueTransferPage(srn, index, secondaryIndex) =>
+      controllers.nonsipp.receivetransfer.routes.WhenWasTransferReceivedController
+        .onPageLoad(srn, index, secondaryIndex, NormalMode)
+
+    case WhenWasTransferReceivedPage(srn, index, secondaryIndex) =>
+      controllers.nonsipp.receivetransfer.routes.DidTransferIncludeAssetController
+        .onPageLoad(srn, index, secondaryIndex, NormalMode)
+
+    case DidTransferIncludeAssetPage(srn, index, secondaryIndex) =>
       controllers.routes.UnauthorisedController.onPageLoad()
+
+    case page @ ReportAnotherTransferInPage(srn, index, secondaryIndex) =>
+      if (userAnswers.get(page).contains(true)) {
+        refineV[OneTo5](secondaryIndex.value + 1) match {
+          case Left(_) => controllers.routes.UnauthorisedController.onPageLoad()
+          case Right(nextIndex) =>
+            controllers.nonsipp.receivetransfer.routes.TransferringSchemeNameController
+              .onPageLoad(srn, index, nextIndex, NormalMode)
+        }
+      } else {
+        controllers.routes.UnauthorisedController.onPageLoad()
+      }
+
   }
 
   override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] =
@@ -60,7 +82,7 @@ object ReceiveTransferNavigator extends JourneyNavigator {
           if (userAnswers.get(page).contains(true)) {
             controllers.routes.UnauthorisedController.onPageLoad()
           } else {
-            memberpayments.routes.SchemeTransferOutController.onPageLoad(srn, NormalMode)
+            controllers.nonsipp.membertransferout.routes.SchemeTransferOutController.onPageLoad(srn, NormalMode)
           }
       }
 }

@@ -14,28 +14,29 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.memberpayments
+package controllers.nonsipp.membertransferout
 
 import controllers.actions._
-import controllers.nonsipp.memberpayments.PensionCommencementLumpSumController.viewModel
+import controllers.nonsipp.membertransferout.SchemeTransferOutController._
 import forms.YesNoPageFormProvider
 import models.Mode
 import models.SchemeId.Srn
 import navigation.Navigator
-import pages.nonsipp.memberpayments.PensionCommencementLumpSumPage
+import pages.nonsipp.memberpayments.SchemeTransferOutPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
+import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 import views.html.YesNoPageView
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
-class PensionCommencementLumpSumController @Inject()(
+class SchemeTransferOutController @Inject()(
   override val messagesApi: MessagesApi,
   saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
@@ -47,37 +48,36 @@ class PensionCommencementLumpSumController @Inject()(
     extends FrontendBaseController
     with I18nSupport {
 
-  private def form: Form[Boolean] =
-    PensionCommencementLumpSumController.form(formProvider)
+  private val form = SchemeTransferOutController.form(formProvider)
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    val preparedForm = request.userAnswers.fillForm(PensionCommencementLumpSumPage(srn), form)
-    Ok(view(preparedForm, viewModel(srn, mode)))
+    val preparedForm = request.userAnswers.get(SchemeTransferOutPage(srn)).fold(form)(form.fill)
+    Ok(view(preparedForm, viewModel(srn, request.schemeDetails.schemeName, mode)))
   }
 
   def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
     form
       .bindFromRequest()
       .fold(
-        formWithErrors => Future.successful(BadRequest(view(formWithErrors, viewModel(srn, mode)))),
+        formWithErrors =>
+          Future.successful(BadRequest(view(formWithErrors, viewModel(srn, request.schemeDetails.schemeName, mode)))),
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(PensionCommencementLumpSumPage(srn), value))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(SchemeTransferOutPage(srn), value))
             _ <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage(PensionCommencementLumpSumPage(srn), mode, updatedAnswers))
+          } yield Redirect(navigator.nextPage(SchemeTransferOutPage(srn), mode, updatedAnswers))
       )
   }
 }
 
-object PensionCommencementLumpSumController {
+object SchemeTransferOutController {
   def form(formProvider: YesNoPageFormProvider): Form[Boolean] = formProvider(
-    "pensionCommencementLumpSum.error.required"
+    "schemeTransferOut.error.required"
   )
 
-  def viewModel(srn: Srn, mode: Mode): FormPageViewModel[YesNoPageViewModel] =
-    YesNoPageViewModel(
-      Message("pensionCommencementLumpSum.title"),
-      Message("pensionCommencementLumpSum.heading"),
-      routes.PensionCommencementLumpSumController.onSubmit(srn, mode)
-    )
+  def viewModel(srn: Srn, schemeName: String, mode: Mode): FormPageViewModel[YesNoPageViewModel] = YesNoPageViewModel(
+    "schemeTransferOut.title",
+    Message("schemeTransferOut.heading", schemeName),
+    routes.SchemeTransferOutController.onSubmit(srn, mode)
+  )
 }

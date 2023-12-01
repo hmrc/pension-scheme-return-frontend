@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.receivetransfer
 
-import pages.nonsipp.receivetransfer.WhenWasTransferReceivedPage
+import pages.nonsipp.receivetransfer.{TransferringSchemeNamePage, WhenWasTransferReceivedPage}
 import controllers.nonsipp.receivetransfer.WhenWasTransferReceivedController._
 import config.Refined._
 import controllers.actions._
@@ -62,12 +62,15 @@ class WhenWasTransferReceivedController @Inject()(
   private def form(date: DateRange)(implicit messages: Messages) =
     WhenWasTransferReceivedController.form(formProvider, date)
 
-  def onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       (
         for {
           member <- request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney
           date <- schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney
+          schemeName <- request.userAnswers
+            .get(TransferringSchemeNamePage(srn, index, secondaryIndex))
+            .getOrRecoverJourney
         } yield {
           val preparedForm = request.userAnswers
             .get(WhenWasTransferReceivedPage(srn, index, secondaryIndex))
@@ -75,30 +78,37 @@ class WhenWasTransferReceivedController @Inject()(
           Ok(
             view(
               preparedForm,
-              viewModel(srn, index, secondaryIndex, request.schemeDetails.schemeName, member.fullName, mode)
+              viewModel(srn, index, secondaryIndex, schemeName, member.fullName, mode)
             )
           )
         }
       ).merge
     }
 
-  def onSubmit(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
         form(date)
           .bindFromRequest()
           .fold(
             formWithErrors => {
-              request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney { member =>
-                Future.successful(
-                  BadRequest(
-                    view(
-                      formWithErrors,
-                      viewModel(srn, index, secondaryIndex, request.schemeDetails.schemeName, member.fullName, mode)
+              Future.successful(
+                (
+                  for {
+                    member <- request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney
+                    schemeName <- request.userAnswers
+                      .get(TransferringSchemeNamePage(srn, index, secondaryIndex))
+                      .getOrRecoverJourney
+                  } yield {
+                    BadRequest(
+                      view(
+                        formWithErrors,
+                        viewModel(srn, index, secondaryIndex, schemeName, member.fullName, mode)
+                      )
                     )
-                  )
-                )
-              }
+                  }
+                ).merge
+              )
             },
             value =>
               for {
@@ -139,7 +149,7 @@ object WhenWasTransferReceivedController {
   def viewModel(
     srn: Srn,
     index: Max300,
-    secondaryIndex: Max50,
+    secondaryIndex: Max5,
     schemeName: String,
     memberName: String,
     mode: Mode

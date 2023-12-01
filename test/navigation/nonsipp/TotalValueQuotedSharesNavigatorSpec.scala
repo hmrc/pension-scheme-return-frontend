@@ -31,9 +31,9 @@ class TotalValueQuotedSharesNavigatorSpec extends BaseSpec with NavigatorBehavio
         .navigateToWithData(
           TotalValueQuotedSharesPage,
           moneyGen,
-          controllers.nonsipp.landorproperty.routes.LandOrPropertyHeldController.onPageLoad
+          (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
         )
-        .withName("go from total value quoted shares page to land or property held page")
+        .withName("go from total value quoted shares page to task list page")
     )
   }
 }

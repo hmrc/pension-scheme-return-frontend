@@ -43,9 +43,9 @@ class BenefitsSurrenderedNavigatorSpec extends BaseSpec with NavigatorBehaviours
         .navigateToWithData(
           BenefitsSurrenderedPage,
           Gen.const(false),
-          controllers.nonsipp.loansmadeoroutstanding.routes.LoansMadeOrOutstandingController.onPageLoad
+          (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
         )
-        .withName("go from benefits surrendered page to loans made or outstanding when no selected")
+        .withName("go from benefits surrendered page to task list page  when no selected")
     )
 
   }
