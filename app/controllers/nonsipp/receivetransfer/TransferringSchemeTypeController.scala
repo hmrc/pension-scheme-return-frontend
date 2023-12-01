@@ -129,18 +129,33 @@ object TransferringSchemeTypeController {
       }
     )
 
-  private val formErrors = InputFormErrors.textArea(
-    "howWasDisposed.conditional.error.required",
-    "howWasDisposed.conditional.error.invalid",
-    "howWasDisposed.conditional.error.length"
-  )
+  private def formErrors(typeName: String) =
+    if (typeName == PensionSchemeType.RegisteredPS.name) {
+      InputFormErrors.inputPSTRandQROPS(
+        "transferring.conditional.PSTR.error.required",
+        "transferring.conditional.PSTR.error.invalid",
+        "transferring.conditional.PSTR.error.length"
+      )
+    } else if (typeName == PensionSchemeType.QualifyingRecognisedOverseasPS.name) {
+      InputFormErrors.inputPSTRandQROPS(
+        "transferring.conditional.QROPS.error.required",
+        "transferring.conditional.QROPS.error.invalid",
+        "transferring.conditional.QROPS.error.length"
+      )
+    } else {
+      InputFormErrors.textArea(
+        "transferring.conditional.Other.error.required",
+        "transferring.conditional.Other.error.invalid",
+        "transferring.conditional.Other.error.length"
+      )
+    }
 
   def form(formProvider: RadioListFormProvider, prePopKey: Option[String] = None): Form[PensionSchemeType] = {
     val valuesToMap = PensionSchemeType.values.map { name =>
-      (name, Some(Mappings.input(s"$name-conditional", formErrors)))
+      (name, Some(Mappings.input(s"$name-conditional", formErrors(name))))
     }
     formProvider.conditionalM[PensionSchemeType, String](
-      "howWasDisposed.error.required",
+      "transferring.error.required",
       valuesToMap,
       prePopKey
     )

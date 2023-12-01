@@ -40,6 +40,18 @@ object InputFormErrors {
     args: _*
   )
 
+  def inputPSTRandQROPS(
+    requiredKey: String,
+    invalidCharactersKey: String,
+    maxError: String,
+    args: Any*
+  ): InputFormErrors = InputFormErrors(
+    requiredKey,
+    List((inputRegexPSTRandQROPS, invalidCharactersKey)),
+    (maxInputLength, maxError),
+    args: _*
+  )
+
   def textArea(
     requiredKey: String,
     invalidCharactersKey: String,
