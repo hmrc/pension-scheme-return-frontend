@@ -43,8 +43,7 @@ object LoansMadeOrOutstandingNavigator extends JourneyNavigator {
       if (userAnswers.get(page).contains(true)) {
         controllers.nonsipp.loansmadeoroutstanding.routes.WhatYouWillNeedLoansController.onPageLoad(srn)
       } else {
-        controllers.nonsipp.sharesinsponsoringemployer.routes.DidSchemeHoldSharesInSponsoringEmployerController
-          .onPageLoad(srn, NormalMode)
+        controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
       }
 
     case WhatYouWillNeedLoansPage(srn) =>

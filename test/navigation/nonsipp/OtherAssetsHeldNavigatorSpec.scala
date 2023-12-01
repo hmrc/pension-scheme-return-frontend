@@ -43,9 +43,9 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateToWithData(
           OtherAssetsHeldPage,
           Gen.const(false),
-          (_, _) => routes.UnauthorisedController.onPageLoad()
+          (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
         )
-        .withName("go from other assets held page to unauthorised page when no selected")
+        .withName("go from other assets held page to task list page when no selected")
     )
   }
 }

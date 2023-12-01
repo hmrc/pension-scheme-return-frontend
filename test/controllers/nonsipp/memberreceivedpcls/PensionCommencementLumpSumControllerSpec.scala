@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.memberpayments
+package controllers.nonsipp.memberreceivedpcls
 
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.memberpayments.PensionCommencementLumpSumController.viewModel
-import controllers.nonsipp.memberpayments.routes
+import controllers.nonsipp.memberreceivedpcls.PensionCommencementLumpSumController.viewModel
 import forms.YesNoPageFormProvider
 import models.NormalMode
 import pages.nonsipp.memberpayments.PensionCommencementLumpSumPage
