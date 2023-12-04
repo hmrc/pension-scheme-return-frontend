@@ -14,21 +14,22 @@
  * limitations under the License.
  */
 
-package viewmodels.models
+package pages.nonsipp.receivetransfer
 
-sealed trait FieldType
+import config.Refined.{Max300, Max5}
+import models.PensionSchemeType._
+import models.SchemeId.Srn
+import pages.QuestionPage
+import pages.nonsipp.memberpayments.MemberPaymentsPage
+import play.api.libs.json.JsPath
+import utils.RefinedUtils.RefinedIntOps
 
-object FieldType {
-  case object Input extends FieldType
+case class TransferringSchemeTypePage(srn: Srn, index: Max300, secondaryIndex: Max5)
+    extends QuestionPage[PensionSchemeType] {
 
-  case class ConditionalInput(prefix: String) extends FieldType
-  case object Currency extends FieldType
-  case object Date extends FieldType
-  case object Percentage extends FieldType
-  case object Textarea extends FieldType
+  override def path: JsPath =
+    Paths.memberTransfersIn \ toString \ index.arrayIndex.toString \ secondaryIndex.arrayIndex.toString
 
-  case class ConditionalTextarea(prefix: String) extends FieldType
+  override def toString: String = "transferSchemeType"
 
-  case object Security extends FieldType
-  case object Select extends FieldType
 }

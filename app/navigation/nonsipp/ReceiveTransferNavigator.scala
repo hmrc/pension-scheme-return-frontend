@@ -43,6 +43,10 @@ object ReceiveTransferNavigator extends JourneyNavigator {
       controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
 
     case TransferringSchemeNamePage(srn, memberIndex, index) =>
+      controllers.nonsipp.receivetransfer.routes.TransferringSchemeTypeController
+        .onPageLoad(srn, memberIndex, index, NormalMode)
+
+    case TransferringSchemeTypePage(srn, memberIndex, index) =>
       controllers.nonsipp.receivetransfer.routes.TotalValueTransferController
         .onPageLoad(srn, memberIndex, index, NormalMode)
 
@@ -68,6 +72,7 @@ object ReceiveTransferNavigator extends JourneyNavigator {
       } else {
         controllers.routes.UnauthorisedController.onPageLoad()
       }
+
   }
 
   override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] =

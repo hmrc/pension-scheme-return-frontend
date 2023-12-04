@@ -127,7 +127,7 @@ object HowWasPropertyDisposedOfController {
     formProvider.singleConditional[HowDisposed, String](
       "howWasDisposed.error.required",
       Other.name,
-      Mappings.input(formErrors)
+      Mappings.input("conditional", formErrors)
     )
 
   def viewModel(
