@@ -23,7 +23,7 @@ import controllers.nonsipp.employercontributions.EmployerTypeOfBusinessControlle
 import forms.RadioListFormProvider
 import models.IdentityType.{Other, UKCompany, UKPartnership}
 import models.SchemeId.Srn
-import models.{IdentityType, Mode, NormalMode}
+import models.{IdentityType, Mode}
 import navigation.Navigator
 import pages.nonsipp.employercontributions.{EmployerNamePage, EmployerTypeOfBusinessPage}
 import play.api.data.Form

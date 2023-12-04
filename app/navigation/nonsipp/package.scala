@@ -17,7 +17,7 @@
 package navigation
 
 import eu.timepit.refined.api.{Refined, Validate}
-import eu.timepit.refined.{refineMV, refineV}
+import eu.timepit.refined.refineV
 
 package object nonsipp {
 

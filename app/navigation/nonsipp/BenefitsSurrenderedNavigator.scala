@@ -16,7 +16,7 @@
 
 package navigation.nonsipp
 
-import models.{NormalMode, UserAnswers}
+import models.UserAnswers
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.memberpayments.BenefitsSurrenderedPage

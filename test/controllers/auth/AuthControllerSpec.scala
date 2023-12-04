@@ -23,7 +23,6 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import repositories.SessionRepository
 
-import java.net.URLEncoder
 import scala.concurrent.Future
 
 class AuthControllerSpec extends ControllerBaseSpec {
@@ -47,8 +46,7 @@ class AuthControllerSpec extends ControllerBaseSpec {
 
         val result = route(application, request).value
 
-        val encodedContinueUrl = URLEncoder.encode(appConfig.exitSurveyUrl, "UTF-8")
-        val expectedRedirectUrl = s"${appConfig.urls.signOutUrl}?continue=$encodedContinueUrl"
+        val expectedRedirectUrl = appConfig.exitSurveyUrl
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual expectedRedirectUrl
@@ -76,8 +74,7 @@ class AuthControllerSpec extends ControllerBaseSpec {
 
         val result = route(application, request).value
 
-        val encodedContinueUrl = URLEncoder.encode(routes.SignedOutController.onPageLoad().url, "UTF-8")
-        val expectedRedirectUrl = s"${appConfig.urls.signOutUrl}?continue=$encodedContinueUrl"
+        val expectedRedirectUrl = s"${appConfig.urls.signOutNoSurveyUrl}"
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual expectedRedirectUrl

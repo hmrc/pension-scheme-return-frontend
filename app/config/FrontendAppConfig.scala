@@ -66,7 +66,7 @@ class FrontendAppConfig @Inject()(config: Configuration) { self =>
   object urls {
     val loginUrl: String = config.get[String]("urls.login")
     val loginContinueUrl: String = config.get[String]("urls.loginContinue")
-    val signOutUrl: String = config.get[String]("urls.signOut")
+    val signOutNoSurveyUrl: String = config.get[String]("urls.signOutNoSurvey")
     val pensionSchemeEnquiry: String = config.get[String]("urls.pensionSchemeEnquiry")
     val incomeTaxAct: String = config.get[String]("urls.incomeTaxAct")
 

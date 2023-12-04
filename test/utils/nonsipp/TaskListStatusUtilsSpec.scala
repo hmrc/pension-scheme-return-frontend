@@ -18,38 +18,28 @@ package utils.nonsipp
 
 import config.Refined.Max5000
 import controllers.TestValues
-import controllers.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldController
 import eu.timepit.refined.refineMV
+import models.ConditionalYesNo._
+import models.SponsoringOrConnectedParty.Sponsoring
 import models.{ConditionalYesNo, IdentitySubject, IdentityType, Money, NormalMode, SchemeHoldLandProperty}
 import org.scalatest.OptionValues
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import pages.nonsipp.common.{IdentityTypePage, IdentityTypes}
+import pages.nonsipp.landorproperty._
 import pages.nonsipp.loansmadeoroutstanding.{
   IsIndividualRecipientConnectedPartyPage,
   LoansMadeOrOutstandingPage,
   OutstandingArrearsOnLoanPage,
   RecipientSponsoringEmployerConnectedPartyPage
 }
-import viewmodels.models.TaskListStatus.{Completed, InProgress, NotStarted}
-import utils.UserAnswersUtils.UserAnswersOps
-import models.ConditionalYesNo._
-import models.SponsoringOrConnectedParty.Sponsoring
-import pages.nonsipp.landorproperty.{
-  IsLandPropertyLeasedPage,
-  IsLesseeConnectedPartyPage,
-  LandOrPropertyHeldPage,
-  LandOrPropertyTotalIncomePage,
-  LandPropertyInUKPage,
-  LandPropertyInUKPages,
-  LandPropertyIndependentValuationPage,
-  WhyDoesSchemeHoldLandPropertyPage
-}
 import pages.nonsipp.moneyborrowed.{LenderNamePage, LenderNamePages, MoneyBorrowedPage, WhySchemeBorrowedMoneyPage}
 import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
 import pages.nonsipp.sharesinsponsoringemployer.DidSchemeHoldSharesInSponsoringEmployerPage
 import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
 import pages.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldPage
+import utils.UserAnswersUtils.UserAnswersOps
+import viewmodels.models.TaskListStatus.{Completed, InProgress, NotStarted}
 
 class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValues with TestValues {
   "Loans status" - {

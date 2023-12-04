@@ -16,7 +16,7 @@
 
 package navigation.nonsipp
 
-import config.Refined.{Max300, Max5, Max50}
+import config.Refined.{Max300, Max5}
 import eu.timepit.refined.refineMV
 import models.NormalMode
 import navigation.{Navigator, NavigatorBehaviours}

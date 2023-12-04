@@ -26,11 +26,10 @@ import models.SchemeId.Srn
 import models.{CheckMode, CheckOrChange, NameDOB, NormalMode}
 import navigation.Navigator
 import pages.nonsipp.memberdetails._
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
 import uk.gov.hmrc.domain.Nino
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.DateTimeUtils.localDateShow
 import utils.MessageUtils.booleanToMessage
 import viewmodels.DisplayMessage.Message

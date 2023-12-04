@@ -18,9 +18,8 @@ package navigation.nonsipp
 
 import cats.implicits.toTraverseOps
 import config.Constants
-import config.Refined.{Max50, OneTo50}
+import config.Refined.Max50
 import models._
-import eu.timepit.refined._
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.employercontributions._

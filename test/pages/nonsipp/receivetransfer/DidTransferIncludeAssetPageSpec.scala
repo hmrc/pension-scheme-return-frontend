@@ -16,10 +16,9 @@
 
 package pages.nonsipp.receivetransfer
 
-import pages.behaviours.PageBehaviours
-import models.Money
 import config.Refined._
 import eu.timepit.refined.refineMV
+import pages.behaviours.PageBehaviours
 
 class DidTransferIncludeAssetPageSpec extends PageBehaviours {
 

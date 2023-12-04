@@ -16,7 +16,7 @@
 
 package viewmodels.models
 
-import play.api.libs.json.{Format, JsError, JsResult, JsString, JsSuccess, JsValue, Json}
+import play.api.libs.json._
 import utils.WithName
 
 sealed trait SectionStatus {
