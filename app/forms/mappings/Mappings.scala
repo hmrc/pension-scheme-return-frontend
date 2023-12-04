@@ -32,7 +32,7 @@ trait Mappings extends Formatters with Constraints {
     of(stringFormatter(errorKey, args)).transform[String](_.trim, _.trim)
 
   def textWithKey(key: String, errorKey: String = "error.required", args: Seq[Any] = Seq.empty): Mapping[String] =
-    of(stringFormatterWithKey(key, errorKey, args)).transform[String](_.trim, _.trim)
+    FieldMapping[String](key = key)(stringFormatterWithKey(key, errorKey, args)).transform[String](_.trim, _.trim)
 
   def conditional[A](
     l: List[(Condition, Option[Mapping[A]])],

@@ -129,7 +129,7 @@ object TransferringSchemeTypeController {
       }
     )
 
-  private def formErrors(typeName: String) =
+  private def formErrors(typeName: String): InputFormErrors =
     if (typeName == PensionSchemeType.RegisteredPS.name) {
       InputFormErrors.genericInput(
         "transferring.conditional.PSTR.error.required",
