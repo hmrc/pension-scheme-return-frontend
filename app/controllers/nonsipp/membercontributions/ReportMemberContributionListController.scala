@@ -17,6 +17,7 @@
 package controllers.nonsipp.membercontributions
 
 import com.google.inject.Inject
+import config.Constants.maxNotRelevant
 import config.Refined.{OneTo300, OneTo50}
 import config.{Constants, FrontendAppConfig}
 import controllers.PSRController
@@ -157,7 +158,7 @@ object ReportMemberContributionListController {
         head = Some(List(TableElem("Member name"), TableElem("Status"))),
         rows = rows(srn, mode, memberList, userAnswers),
         radioText = Message("ReportContribution.MemberList.radios"),
-        showRadios = memberList.length < 9999999,
+        showRadios = memberList.length < maxNotRelevant,
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(
