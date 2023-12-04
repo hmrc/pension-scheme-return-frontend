@@ -165,9 +165,11 @@ class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           index,
           secondaryIndex,
           DidTransferIncludeAssetPage,
-          (srn, index: Max300, secondaryIndex: Max5, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          (srn, index: Max300, secondaryIndex: Max5, _) =>
+            controllers.nonsipp.receivetransfer.routes.ReportAnotherTransferInController
+              .onPageLoad(srn, index, secondaryIndex, NormalMode)
         )
-        .withName("go from DidTransferIncludeAssetPage to ??? page")
+        .withName("go from DidTransferIncludeAssetPage to report another transfer in page")
     )
   }
 

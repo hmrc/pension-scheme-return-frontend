@@ -17,7 +17,10 @@
 package navigation.nonsipp
 
 import cats.implicits.toTraverseOps
-import config.Refined.Max5
+import config.Refined.{Max5, OneTo5}
+import controllers.nonsipp.memberpayments
+import config.Refined.OneTo5
+import eu.timepit.refined.refineV
 import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
@@ -55,7 +58,8 @@ object ReceiveTransferNavigator extends JourneyNavigator {
         .onPageLoad(srn, index, secondaryIndex, NormalMode)
 
     case DidTransferIncludeAssetPage(srn, index, secondaryIndex) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+      controllers.nonsipp.receivetransfer.routes.ReportAnotherTransferInController
+        .onPageLoad(srn, index, secondaryIndex, NormalMode)
 
     case TransferReceivedMemberListPage(srn) =>
       controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
