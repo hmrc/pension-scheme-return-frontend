@@ -28,6 +28,6 @@ case class TransferringSchemeTypePage(srn: Srn, index: Max300, secondaryIndex: M
 
   override def path: JsPath = MemberPaymentsPage.path \ toString
 
-  override def toString: String = "pensionType" //TODO double-check with the team for the actual value
+  override def toString: String = "memberTransfersIn"
 
 }
