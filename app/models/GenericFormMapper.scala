@@ -16,7 +16,7 @@
 
 package models
 
-import models.GenericFormMapper.ConditionalRadioMapper
+import models.GenericFormMapper.{ConditionalRadioMapper, StringFieldMapper}
 
 trait GenericFormMapper[From, To] {
   def to(a: From): To
@@ -25,11 +25,14 @@ trait GenericFormMapper[From, To] {
 
 object GenericFormMapper {
   type ConditionalRadioMapper[Conditional, A] = GenericFormMapper[(String, Option[Conditional]), A]
+  type StringFieldMapper[A] = GenericFormMapper[String, A]
 
   def apply[A, B](fa: A => B, fb: B => Option[A]): GenericFormMapper[A, B] = new GenericFormMapper[A, B] {
     override def to(a: A): B = fa(a)
     override def from(b: B): Option[A] = fb(b)
   }
+
+  implicit val stringMapperIdentity: StringFieldMapper[String] = StringMapper[String](identity, Some(_))
 }
 
 object ConditionalRadioMapper {
@@ -37,4 +40,11 @@ object ConditionalRadioMapper {
     to: (String, Option[A]) => B,
     from: B => Option[(String, Option[A])]
   ): ConditionalRadioMapper[A, B] = GenericFormMapper(to.tupled(_), from(_))
+}
+
+object StringMapper {
+  def apply[A](
+    to: String => A,
+    from: A => Option[String]
+  ): StringFieldMapper[A] = GenericFormMapper(to(_), from(_))
 }

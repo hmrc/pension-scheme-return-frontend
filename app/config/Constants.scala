@@ -44,7 +44,7 @@ object Constants {
   val employerContributionsMemberListSize = 25
   val employerContributionsCYASize = 5
 
-  val maxLoans = 9999999
+  val maxLoans = 5000
   val maxCurrencyValue = 999999999.99
   val maxCashInBank = 999999999.99
   val maxAssetValue = 999999999.99
@@ -71,6 +71,8 @@ object Constants {
 
   val textAreaRegex = """^[a-zA-Z0-9\-'" \t\r\n,.@/]+$"""
   val titleNumberRegex = """^[a-zA-Z]{2,3}[0-9]+$"""
+  val inputRegexQROPS = """^(Q[0-9]{6})$"""
+  val inputRegexPSTR = """^([0-9]{8}[A-Z]{2})$"""
 
   val postcodeCharsRegex = """^[a-zA-Z0-9 ]+$"""
   val postcodeFormatRegex =

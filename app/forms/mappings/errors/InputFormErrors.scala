@@ -40,6 +40,20 @@ object InputFormErrors {
     args: _*
   )
 
+  def genericInput(
+    requiredKey: String,
+    invalidCharactersKey: String,
+    maxError: String,
+    regex: String,
+    maxLength: Int,
+    args: Any*
+  ): InputFormErrors = InputFormErrors(
+    requiredKey,
+    List((regex, invalidCharactersKey)),
+    (maxLength, maxError),
+    args: _*
+  )
+
   def textArea(
     requiredKey: String,
     invalidCharactersKey: String,
