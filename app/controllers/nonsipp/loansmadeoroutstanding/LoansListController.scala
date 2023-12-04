@@ -173,7 +173,7 @@ object LoansListController {
         inset = "loansList.inset",
         rows(srn, mode, recipients),
         Message("loansList.radios"),
-        showRadios = recipients.length < 9999999,
+        showRadios = recipients.length < Constants.maxLoans,
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(

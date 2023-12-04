@@ -44,7 +44,7 @@ object Constants {
   val employerContributionsMemberListSize = 25
   val employerContributionsCYASize = 5
 
-  val maxLoans = 9999999
+  val maxLoans = 5000
   val maxCurrencyValue = 999999999.99
   val maxCashInBank = 999999999.99
   val maxAssetValue = 999999999.99
