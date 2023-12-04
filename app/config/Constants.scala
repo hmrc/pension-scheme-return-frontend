@@ -71,7 +71,8 @@ object Constants {
 
   val textAreaRegex = """^[a-zA-Z0-9\-'" \t\r\n,.@/]+$"""
   val titleNumberRegex = """^[a-zA-Z]{2,3}[0-9]+$"""
-  val inputRegexPSTRandQROPS = """^(Q[0-9]{6}|[0-9]{8}[A-Z]{2})$"""
+  val inputRegexQROPS = """^(Q[0-9]{6})$"""
+  val inputRegexPSTR = """^([0-9]{8}[A-Z]{2})$"""
 
   val postcodeCharsRegex = """^[a-zA-Z0-9 ]+$"""
   val postcodeFormatRegex =

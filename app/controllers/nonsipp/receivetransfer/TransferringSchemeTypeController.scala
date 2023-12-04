@@ -35,6 +35,7 @@ import models.PensionSchemeType._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FieldType, FormPageViewModel, RadioItemConditional, RadioListRowViewModel, RadioListViewModel}
 import views.html.RadioListView
+import config.Constants.{inputRegexPSTR, inputRegexQROPS, maxInputLength}
 import viewmodels.implicits._
 
 import javax.inject.{Inject, Named}
@@ -130,16 +131,20 @@ object TransferringSchemeTypeController {
 
   private def formErrors(typeName: String) =
     if (typeName == PensionSchemeType.RegisteredPS.name) {
-      InputFormErrors.inputPSTRandQROPS(
+      InputFormErrors.genericInput(
         "transferring.conditional.PSTR.error.required",
         "transferring.conditional.PSTR.error.invalid",
-        "transferring.conditional.PSTR.error.length"
+        "transferring.conditional.PSTR.error.length",
+        inputRegexPSTR,
+        maxLength = 10
       )
     } else if (typeName == PensionSchemeType.QualifyingRecognisedOverseasPS.name) {
-      InputFormErrors.inputPSTRandQROPS(
+      InputFormErrors.genericInput(
         "transferring.conditional.QROPS.error.required",
         "transferring.conditional.QROPS.error.invalid",
-        "transferring.conditional.QROPS.error.length"
+        "transferring.conditional.QROPS.error.length",
+        inputRegexQROPS,
+        maxLength = 7
       )
     } else {
       InputFormErrors.textArea(

@@ -40,15 +40,17 @@ object InputFormErrors {
     args: _*
   )
 
-  def inputPSTRandQROPS(
+  def genericInput(
     requiredKey: String,
     invalidCharactersKey: String,
     maxError: String,
+    regex: String,
+    maxLength: Int,
     args: Any*
   ): InputFormErrors = InputFormErrors(
     requiredKey,
-    List((inputRegexPSTRandQROPS, invalidCharactersKey)),
-    (maxInputLength, maxError),
+    List((regex, invalidCharactersKey)),
+    (maxLength, maxError),
     args: _*
   )
 
