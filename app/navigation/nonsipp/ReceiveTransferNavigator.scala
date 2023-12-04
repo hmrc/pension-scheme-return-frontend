@@ -83,7 +83,6 @@ object ReceiveTransferNavigator extends JourneyNavigator {
           .onPageLoad()
       }
 
-
     case RemoveTransferInPage(srn, memberIndex) =>
       controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
         .onPageLoad(srn, 1, NormalMode)

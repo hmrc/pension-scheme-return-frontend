@@ -18,6 +18,7 @@ package controllers.nonsipp.receivetransfer
 
 import com.google.inject.Inject
 import config.Constants
+import config.Constants.maxNotRelevant
 import config.Refined.OneTo300
 import controllers.PSRController
 import controllers.actions._
@@ -188,7 +189,7 @@ object TransferReceivedMemberListController {
         head = Some(List(TableElem("Member Name"), TableElem("Status"))),
         rows = rows(srn, mode, memberList, userAnswers),
         radioText = Message("transferIn.MemberList.radios"),
-        showRadios = memberList.length < 9999999,
+        showRadios = memberList.length < maxNotRelevant,
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(

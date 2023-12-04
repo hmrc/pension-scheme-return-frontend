@@ -18,6 +18,7 @@ package controllers.nonsipp.employercontributions
 
 import com.google.inject.Inject
 import config.Constants
+import config.Constants.maxNotRelevant
 import config.Refined.OneTo300
 import controllers.PSRController
 import controllers.actions._
@@ -190,7 +191,7 @@ object EmployerContributionsMemberListController {
         head = Some(List(TableElem("Member name"), TableElem("Status"))),
         rows = rows(srn, mode, memberList, userAnswers),
         radioText = Message("employerContributions.MemberList.radios"),
-        showRadios = memberList.length < 9999999,
+        showRadios = memberList.length < maxNotRelevant,
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(

@@ -68,6 +68,7 @@ object Constants {
   val maxInputLength = 35
   val maxTextAreaLength = 160
   val maxTitleNumberLength = 35
+  val maxNotRelevant = 9999999
 
   val textAreaRegex = """^[a-zA-Z0-9\-'" \t\r\n,.@/]+$"""
   val titleNumberRegex = """^[a-zA-Z]{2,3}[0-9]+$"""
