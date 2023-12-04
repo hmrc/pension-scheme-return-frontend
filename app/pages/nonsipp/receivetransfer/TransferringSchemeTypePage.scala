@@ -22,12 +22,14 @@ import models.SchemeId.Srn
 import pages.QuestionPage
 import pages.nonsipp.memberpayments.MemberPaymentsPage
 import play.api.libs.json.JsPath
+import utils.RefinedUtils.RefinedIntOps
 
 case class TransferringSchemeTypePage(srn: Srn, index: Max300, secondaryIndex: Max5)
     extends QuestionPage[PensionSchemeType] {
 
-  override def path: JsPath = MemberPaymentsPage.path \ toString
+  override def path: JsPath =
+    Paths.memberTransfersIn \ toString \ index.arrayIndex.toString \ secondaryIndex.arrayIndex.toString
 
-  override def toString: String = "memberTransfersIn"
+  override def toString: String = "transferSchemeType"
 
 }
