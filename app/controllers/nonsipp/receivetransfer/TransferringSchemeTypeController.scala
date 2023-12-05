@@ -16,10 +16,15 @@
 
 package controllers.nonsipp.receivetransfer
 
+import config.Constants.{inputRegexPSTR, inputRegexQROPS, maxNotRelevant}
 import config.Refined.{Max300, Max5}
 import controllers.actions.IdentifyAndRequireData
-import forms.mappings.errors.InputFormErrors
+import controllers.nonsipp.receivetransfer.TransferringSchemeTypeController._
 import forms.RadioListFormProvider
+import forms.mappings.Mappings
+import forms.mappings.errors.InputFormErrors
+import models.GenericFormMapper.ConditionalRadioMapper
+import models.PensionSchemeType._
 import models.SchemeId.Srn
 import models.{ConditionalRadioMapper, Mode, PensionSchemeType}
 import navigation.Navigator
@@ -29,18 +34,13 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import forms.mappings.Mappings
-import models.GenericFormMapper.ConditionalRadioMapper
-import models.PensionSchemeType._
 import viewmodels.DisplayMessage.Message
-import viewmodels.models.{FieldType, FormPageViewModel, RadioItemConditional, RadioListRowViewModel, RadioListViewModel}
-import views.html.RadioListView
-import config.Constants.{inputRegexPSTR, inputRegexQROPS, maxInputLength, maxNotRelevant}
 import viewmodels.implicits._
+import viewmodels.models._
+import views.html.RadioListView
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
-import TransferringSchemeTypeController._
 
 class TransferringSchemeTypeController @Inject()(
   override val messagesApi: MessagesApi,

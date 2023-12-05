@@ -92,7 +92,7 @@ class SchemeDetailsConnectorSpec extends BaseConnectorSpec {
 
     def stubGet(pensionSchemeId: PensionSchemeId, response: ResponseDefinitionBuilder): StubMapping = {
 
-      val idType = pensionSchemeId.fold(_ => "psaId", _ => "pspId")
+      val idType = pensionSchemeId.fold(_ => "psaid", _ => "pspid")
       val idValue = pensionSchemeId.fold(_.value, _.value)
 
       wireMockServer

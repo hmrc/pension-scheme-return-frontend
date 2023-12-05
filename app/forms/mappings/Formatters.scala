@@ -18,9 +18,9 @@ package forms.mappings
 
 import forms.mappings.errors._
 import models.GenericFormMapper.StringFieldMapper
-import models.{Enumerable, GenericFormMapper, Money, Percentage, Security}
-import play.api.data.{FormError, Mapping}
+import models.{Enumerable, Money, Percentage, Security}
 import play.api.data.format.Formatter
+import play.api.data.{FormError, Mapping}
 import uk.gov.voa.play.form.Condition
 
 import java.text.DecimalFormat

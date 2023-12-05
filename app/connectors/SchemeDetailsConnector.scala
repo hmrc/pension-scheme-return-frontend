@@ -112,12 +112,12 @@ class SchemeDetailsConnectorImpl @Inject()(appConfig: FrontendAppConfig, http: H
   def listSchemeDetails(
     psaId: PsaId
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[ListMinimalSchemeDetails]] =
-    listSchemeDetails(psaId.value, "psaId")
+    listSchemeDetails(psaId.value, "psaid")
 
   def listSchemeDetails(
     pspId: PspId
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[ListMinimalSchemeDetails]] =
-    listSchemeDetails(pspId.value, "pspId")
+    listSchemeDetails(pspId.value, "pspid")
 
   private def listSchemeDetails(
     idValue: String,

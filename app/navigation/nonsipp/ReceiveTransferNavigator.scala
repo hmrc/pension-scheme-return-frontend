@@ -17,10 +17,7 @@
 package navigation.nonsipp
 
 import cats.implicits.toTraverseOps
-import config.Refined.{Max5, OneTo5}
-import controllers.nonsipp.memberpayments
-import config.Refined.OneTo5
-import eu.timepit.refined.refineV
+import config.Refined.Max5
 import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
