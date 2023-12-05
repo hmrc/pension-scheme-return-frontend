@@ -20,7 +20,6 @@ import config.Refined.{Max300, Max5}
 import models.PensionSchemeType._
 import models.SchemeId.Srn
 import pages.QuestionPage
-import pages.nonsipp.memberpayments.MemberPaymentsPage
 import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
 
