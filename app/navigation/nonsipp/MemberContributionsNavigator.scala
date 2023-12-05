@@ -19,7 +19,11 @@ package navigation.nonsipp
 import models.{CheckOrChange, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.membercontributions.{TotalMemberContributionPage, WhatYouWillNeedMemberContributionsPage}
+import pages.nonsipp.membercontributions.{
+  RemoveMemberContributionPage,
+  TotalMemberContributionPage,
+  WhatYouWillNeedMemberContributionsPage
+}
 import pages.nonsipp.memberpayments.{MemberContributionsPage, ReportMemberContributionListPage}
 import play.api.mvc.Call
 
@@ -44,6 +48,10 @@ object MemberContributionsNavigator extends JourneyNavigator {
     case TotalMemberContributionPage(srn, index, secondaryIndex) =>
       controllers.nonsipp.membercontributions.routes.CYAMemberContributionsController
         .onPageLoad(srn, index, secondaryIndex, CheckOrChange.Check)
+
+    case RemoveMemberContributionPage(srn, memberIndex, index) =>
+      controllers.nonsipp.membercontributions.routes.ReportMemberContributionListController
+        .onPageLoad(srn, page = 1, NormalMode)
 
   }
 
