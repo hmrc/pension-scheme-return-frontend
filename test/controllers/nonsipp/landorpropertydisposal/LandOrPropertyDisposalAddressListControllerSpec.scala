@@ -41,7 +41,7 @@ class LandOrPropertyDisposalAddressListControllerSpec extends ControllerBaseSpec
 
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
       injected[ListRadiosView]
-        .apply(form(injected[RadioListFormProvider]), viewModel(srn, page = 1, addresses))
+        .apply(form(injected[RadioListFormProvider]), viewModel(srn, page = 1, addresses, userAnswers))
     })
 
     act.like(redirectNextPage(onSubmit, "value" -> "1"))
