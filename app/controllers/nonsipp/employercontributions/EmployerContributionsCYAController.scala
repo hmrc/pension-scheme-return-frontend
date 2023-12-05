@@ -307,7 +307,7 @@ object EmployerContributionsCYAController {
                   .onPageLoad(srn, memberIndex, secondaryIndex, CheckMode)
                   .url
               ).withVisuallyHiddenContent(
-                Message("employerContributionsCYA.row.contributionOtherEmployer.hidden", membersName)
+                Message("transfersInCYAController.rows.reportAnotherTransfer.hidden", membersName)
               )
             )
           )
