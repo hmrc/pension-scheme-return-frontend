@@ -298,7 +298,7 @@ object EmployerContributionsCYAController {
             // append "any contributions by other employers" row to final section
           ) :?+ Option.when(journeyIndex + 1 == employerCYAs.length)(
             CheckYourAnswersRowViewModel(
-              Message("transfersInCYAController.rows.reportAnotherTransfer", membersName),
+              Message("employerContributionsCYA.row.contributionOtherEmployer", membersName),
               "site.no"
             ).withAction(
               SummaryAction(
