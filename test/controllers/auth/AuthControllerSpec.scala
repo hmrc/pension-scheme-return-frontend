@@ -46,7 +46,7 @@ class AuthControllerSpec extends ControllerBaseSpec {
 
         val result = route(application, request).value
 
-        val expectedRedirectUrl = appConfig.exitSurveyUrl
+        val expectedRedirectUrl = appConfig.urls.signOutSurvey
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual expectedRedirectUrl

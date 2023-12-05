@@ -34,9 +34,6 @@ class FrontendAppConfig @Inject()(config: Configuration) { self =>
   def feedbackUrl(implicit request: RequestHeader): String =
     s"$contactHost/contact/beta-feedback?service=$contactFormServiceIdentifier&backUrl=${SafeRedirectUrl(host + request.uri).encodedUrl}"
 
-  private val exitSurveyBaseUrl: String = config.get[Service]("microservice.services.feedback-frontend").baseUrl
-  val exitSurveyUrl: String = s"$exitSurveyBaseUrl/feedback/pension-scheme-return-frontend"
-
   def languageMap: Map[String, Lang] = Map(
     "en" -> Lang("en"),
     "cy" -> Lang("cy")
@@ -66,6 +63,7 @@ class FrontendAppConfig @Inject()(config: Configuration) { self =>
   object urls {
     val loginUrl: String = config.get[String]("urls.login")
     val loginContinueUrl: String = config.get[String]("urls.loginContinue")
+    val signOutSurvey: String = config.get[String]("urls.signOutSurvey")
     val signOutNoSurveyUrl: String = config.get[String]("urls.signOutNoSurvey")
     val pensionSchemeEnquiry: String = config.get[String]("urls.pensionSchemeEnquiry")
     val incomeTaxAct: String = config.get[String]("urls.incomeTaxAct")
