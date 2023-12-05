@@ -79,7 +79,8 @@ class LandOrPropertyDisposalAddressListController @Inject()(
             sortedAddresses => BadRequest(view(errors, viewModel(srn, page, sortedAddresses, userAnswers)))
           ),
         answer =>
-          getNextDisposal(srn, answer, userAnswers)
+          LandOrPropertyDisposalAddressListController
+            .getDisposal(srn, answer, userAnswers, isNextDisposal = true)
             .getOrRecoverJourney(
               nextDisposal =>
                 Redirect(
@@ -106,34 +107,6 @@ class LandOrPropertyDisposalAddressListController @Inject()(
         f(sortedMap)
     }
   }
-
-  def getNextDisposal(srn: Srn, addressChoice: Max5000, userAnswers: UserAnswers): Option[Max50] =
-    userAnswers.get(LandPropertyDisposalCompletedPages(srn)) match {
-      case None => refineV[Max50.Refined](1).toOption
-      case Some(completedDisposals) =>
-        /**
-         * Indexes of completed disposals sorted in ascending order.
-         * We -1 from the address choice as the refined indexes is 1-based (e.g. 1 to 5000)
-         * while we are trying to fetch a completed disposal from a Map which is 0-based.
-         * We then +1 when we re-refine the index
-         */
-        val completedDisposalsForAddress =
-          completedDisposals
-            .get((addressChoice.value - 1).toString)
-            .map(_.keys.toList)
-            .flatMap(_.traverse(_.toIntOption))
-            .flatMap(_.traverse(index => refineV[Max50.Refined](index + 1).toOption))
-            .toList
-            .flatten
-            .sortBy(_.value)
-
-        completedDisposalsForAddress.lastOption match {
-          case None => refineV[Max50.Refined](1).toOption
-          case Some(lastCompletedDisposalForAddress) =>
-            refineV[Max50.Refined](lastCompletedDisposalForAddress.value + 1).toOption
-        }
-    }
-
 }
 
 object LandOrPropertyDisposalAddressListController {
@@ -142,7 +115,7 @@ object LandOrPropertyDisposalAddressListController {
       "landOrPropertyDisposalAddressList.radios.error.required"
     )
 
-  def getDisposal(srn: Srn, addressChoice: Max5000, userAnswers: UserAnswers): Option[Max50] =
+  def getDisposal(srn: Srn, addressChoice: Max5000, userAnswers: UserAnswers, isNextDisposal: Boolean): Option[Max50] =
     userAnswers.get(LandPropertyDisposalCompletedPages(srn)) match {
       case None => refineV[Max50.Refined](1).toOption
       case Some(completedDisposals) =>
@@ -165,7 +138,11 @@ object LandOrPropertyDisposalAddressListController {
         completedDisposalsForAddress.lastOption match {
           case None => refineV[Max50.Refined](1).toOption
           case Some(lastCompletedDisposalForAddress) =>
-            refineV[Max50.Refined](lastCompletedDisposalForAddress.value).toOption
+            if (isNextDisposal) {
+              refineV[Max50.Refined](lastCompletedDisposalForAddress.value + 1).toOption
+            } else {
+              refineV[Max50.Refined](lastCompletedDisposalForAddress.value).toOption
+            }
         }
     }
 
@@ -175,7 +152,7 @@ object LandOrPropertyDisposalAddressListController {
         refineV[Max5000.Refined](index + 1).fold(
           _ => Nil,
           nextIndex => {
-            val disposalIndex = getDisposal(srn, nextIndex, userAnswers).get
+            val disposalIndex = getDisposal(srn, nextIndex, userAnswers, isNextDisposal = false).get
             val isDisposed: Option[Boolean] = {
               userAnswers.get(LandOrPropertyStillHeldPage(srn, nextIndex, disposalIndex))
             }
