@@ -25,6 +25,7 @@ import models.PensionCommencementLumpSum._
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import pages.nonsipp.memberpayments.PensionCommencementLumpSumAmountPage
 import play.api.libs.json.JsPath
+import utils.RefinedUtils.RefinedIntOps
 import utils.Transform.TransformOps
 import views.html.MoneyView
 
@@ -70,15 +71,16 @@ class PensionCommencementLumpSumAmountControllerSpec extends ControllerBaseSpec 
     act.like(
       saveAndContinue(
         onSubmit,
-        Some(JsPath \ "membersPayments" \ "lumpSumAmountReceived" \ index.value),
+        userAnswers,
+        Some(JsPath \ "membersPayments" \ "lumpSumAmountReceived" \ index.arrayIndex.toString),
         formData(form, lumpSumData.from[(Money, Money)]): _*
       )
     )
 
-    act.like(invalidForm(onSubmit))
+    act.like(invalidForm(onSubmit, userAnswers))
 
     act.like(
-      invalidForm(onSubmit, "value" -> (maxAllowedAmount + 0.001).toString)
+      invalidForm(onSubmit, userAnswers, "value" -> (maxAllowedAmount + 0.001).toString)
         .withName("fail to submit when amount entered is greater than maximum allowed amount")
     )
   }
