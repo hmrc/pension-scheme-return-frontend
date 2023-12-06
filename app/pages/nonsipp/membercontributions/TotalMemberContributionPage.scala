@@ -16,20 +16,37 @@
 
 package pages.nonsipp.membercontributions
 
-import config.Refined._
+import config.Refined.{Max300, Max50}
 import utils.RefinedUtils._
-
 import play.api.libs.json.JsPath
 import models.SchemeId.Srn
 import pages.QuestionPage
+import models.{Money, UserAnswers}
+import queries.Removable
+import utils.PageUtils.removePages
 
-import models.Money
+import scala.util.Try
 
 case class TotalMemberContributionPage(srn: Srn, index: Max300, secondaryIndex: Max50) extends QuestionPage[Money] {
 
   override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString \ secondaryIndex.arrayIndex.toString
 
   override def toString: String = "totalMemberContribution"
+
+  override def cleanup(value: Option[Money], userAnswers: UserAnswers): Try[UserAnswers] =
+    (value, userAnswers.get(this)) match {
+      case (Some(_), _) => Try(userAnswers)
+      case (None, _) => removePages(userAnswers, pages(srn))
+      case _ => Try(userAnswers)
+    }
+
+  private def pages(srn: Srn): List[Removable[_]] = {
+
+    val list = List(
+      TotalMemberContributionPage(srn, index, secondaryIndex)
+    )
+    if (secondaryIndex.value == 1) list :+ MemberContributionsPage(srn) else list
+  }
 }
 
 case class TotalMemberContributionPages(srn: Srn, index: Max300) extends QuestionPage[Map[String, Money]] {
