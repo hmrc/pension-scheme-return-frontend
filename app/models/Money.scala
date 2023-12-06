@@ -43,3 +43,17 @@ object MoneyInPeriod {
   }
 
 }
+
+case class PensionCommencementLumpSum(receivedAmount: Money, relevantAmount: Money)
+
+object PensionCommencementLumpSum {
+  implicit val formats: Format[PensionCommencementLumpSum] = Json.format[PensionCommencementLumpSum]
+
+  implicit val transform: Transform[(Money, Money), PensionCommencementLumpSum] =
+    new Transform[(Money, Money), PensionCommencementLumpSum] {
+
+      override def to(a: (Money, Money)): PensionCommencementLumpSum = PensionCommencementLumpSum(a._1, a._2)
+
+      override def from(b: PensionCommencementLumpSum): (Money, Money) = (b.receivedAmount, b.relevantAmount)
+    }
+}

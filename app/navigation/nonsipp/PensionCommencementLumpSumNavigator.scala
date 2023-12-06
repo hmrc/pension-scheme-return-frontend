@@ -19,7 +19,7 @@ package navigation.nonsipp
 import models.UserAnswers
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.memberpayments.PensionCommencementLumpSumPage
+import pages.nonsipp.memberpayments.{PensionCommencementLumpSumAmountPage, PensionCommencementLumpSumPage}
 import play.api.mvc.Call
 
 object PensionCommencementLumpSumNavigator extends JourneyNavigator {
@@ -31,6 +31,9 @@ object PensionCommencementLumpSumNavigator extends JourneyNavigator {
       } else {
         controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
       }
+
+    case PensionCommencementLumpSumAmountPage(srn, _, _) =>
+      controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
   }
 
   override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] = _ => _ => PartialFunction.empty
