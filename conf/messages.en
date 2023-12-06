@@ -1724,6 +1724,10 @@ MemberContributionCYA.section.memberName = Total member contribution for {0}
 MemberContributionCYA.section.amount = £ {0}
 MemberContributionCYA.section.hide = total member contribution for {0}
 
+removeMemberContributions.title = Are you sure you want to remove the contribution for this member?
+removeMemberContributions.heading = Are you sure you want to remove the contribution of £{0} for {1}?
+removeMemberContributions.error.required = Select yes if you are sure you want to remove the contribution for this member
+
 employerContributionsCYA.section.heading = Employer {0}
 employerContributionsCYA.row.memberName = Member’s name
 employerContributionsCYA.row.employerName = Employer’s name

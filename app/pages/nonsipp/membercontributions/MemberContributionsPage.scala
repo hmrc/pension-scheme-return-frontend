@@ -14,21 +14,16 @@
  * limitations under the License.
  */
 
-package pages
+package pages.nonsipp.membercontributions
 
-import pages.behaviours.PageBehaviours
-import pages.nonsipp.membercontributions.MemberContributionsPage
+import models.SchemeId.Srn
+import pages.QuestionPage
+import pages.nonsipp.memberpayments.MemberPaymentsPage
+import play.api.libs.json.JsPath
 
-class MemberContributionsPageSpec extends PageBehaviours {
+case class MemberContributionsPage(srn: Srn) extends QuestionPage[Boolean] {
 
-  "MemberContributionsPage" - {
+  override def path: JsPath = MemberPaymentsPage.path \ toString
 
-    val srn = srnGen.sample.value
-
-    beRetrievable[Boolean](MemberContributionsPage(srn))
-
-    beSettable[Boolean](MemberContributionsPage(srn))
-
-    beRemovable[Boolean](MemberContributionsPage(srn))
-  }
+  override def toString: String = "memberContributionMade"
 }

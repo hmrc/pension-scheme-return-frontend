@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.memberpayments
+package pages.nonsipp.membercontributions
 
+import config.Refined.{Max300, Max50}
 import models.SchemeId.Srn
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import pages.Page
 
-case class MemberContributionsPage(srn: Srn) extends QuestionPage[Boolean] {
+case class RemoveMemberContributionPage(srn: Srn, index: Max300, secondaryIndex: Max50) extends Page {
 
-  override def path: JsPath = MemberPaymentsPage.path \ toString
-
-  override def toString: String = "memberContributionMade"
+  override def toString: String = "removeEmployerContributionsPage"
 }

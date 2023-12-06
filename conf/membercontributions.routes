@@ -1,3 +1,8 @@
+GET         /:srn/member-contributions                                              controllers.nonsipp.membercontributions.MemberContributionsController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/member-contributions                                              controllers.nonsipp.membercontributions.MemberContributionsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/change-member-contributions                                       controllers.nonsipp.membercontributions.MemberContributionsController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-member-contributions                                       controllers.nonsipp.membercontributions.MemberContributionsController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
 GET         /:srn/what-you-will-need-member-contributions                           controllers.nonsipp.membercontributions.WhatYouWillNeedMemberContributionsController.onPageLoad(srn: Srn)
 GET         /:srn/submit-what-you-will-need-member-contributions                    controllers.nonsipp.membercontributions.WhatYouWillNeedMemberContributionsController.onSubmit(srn: Srn)
 
@@ -18,3 +23,6 @@ POST        /:srn/submit-check-answers-member-contributions                     
 
 GET         /:srn/change-member-contributions/:index/:secondaryIndex                controllers.nonsipp.membercontributions.CYAMemberContributionsController.onPageLoad(srn: Srn,index: Max300, secondaryIndex: Max50 , checkOrChange: CheckOrChange = Change)
 POST        /:srn/submit-change-member-contributions                                controllers.nonsipp.membercontributions.CYAMemberContributionsController.onSubmit(srn: Srn, checkOrChange: CheckOrChange = Change)
+
+GET         /:srn/remove-member-contributions/:memberIndex/:index                   controllers.nonsipp.membercontributions.RemoveMemberContributionController.onPageLoad(srn: Srn, memberIndex: Max300, index: Max50)
+POST        /:srn/remove-member-contributions/:memberIndex/:index                   controllers.nonsipp.membercontributions.RemoveMemberContributionController.onSubmit(srn: Srn, memberIndex: Max300, index: Max50)

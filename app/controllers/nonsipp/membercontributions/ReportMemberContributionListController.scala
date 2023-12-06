@@ -205,9 +205,9 @@ object ReportMemberContributionListController {
           TableElem(
             LinkMessage(
               "Remove",
-              controllers.routes.UnauthorisedController
-                .onPageLoad()
-                .url //TODO Once the Remove page is ready change this link
+              controllers.nonsipp.membercontributions.routes.RemoveMemberContributionController
+                .onPageLoad(srn, nextIndex, refinedIndex)
+                .url
             )
           )
         )
