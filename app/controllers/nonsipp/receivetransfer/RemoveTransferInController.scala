@@ -25,7 +25,7 @@ import models.SchemeId.Srn
 import models.NormalMode
 import navigation.Navigator
 import pages.nonsipp.memberdetails.MemberDetailsPage
-import pages.nonsipp.receivetransfer.{RemoveTransferInPage, TransferringSchemeNamePage}
+import pages.nonsipp.receivetransfer.{transferInPages, RemoveTransferInPage, TransferringSchemeNamePage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -87,7 +87,7 @@ class RemoveTransferInController @Inject()(
             if (removeDetails) {
               for {
                 updatedAnswers <- Future
-                  .fromTry(request.userAnswers.remove(TransferringSchemeNamePage(srn, memberIndex, index)))
+                  .fromTry(request.userAnswers.remove(transferInPages(srn, memberIndex, index)))
                 _ <- saveService.save(updatedAnswers)
               } yield Redirect(
                 navigator

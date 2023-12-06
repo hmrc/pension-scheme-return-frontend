@@ -17,12 +17,11 @@
 package forms
 
 import forms.mappings.Mappings
-import models.{Enumerable, GenericFormMapper}
+import models.Enumerable
 import models.GenericFormMapper.{ConditionalRadioMapper, StringFieldMapper}
 import play.api.data.Forms.mapping
 import play.api.data.{Form, Mapping}
-import uk.gov.voa.play.form.{Condition, ConditionalMappings}
-import viewmodels.models.YesNoViewModel.Conditional
+import uk.gov.voa.play.form.ConditionalMappings
 
 import javax.inject.Inject
 

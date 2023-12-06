@@ -16,7 +16,7 @@
 
 package models
 
-import play.api.libs.json.{__, Format, Json}
+import play.api.libs.json.{Format, Json}
 import play.api.mvc.JavascriptLiteral
 import utils.WithName
 
