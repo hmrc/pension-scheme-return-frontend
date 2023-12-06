@@ -23,7 +23,12 @@ import forms.YesNoPageFormProvider
 import models.{Money, NormalMode}
 import models.SchemeId.Srn
 import navigation.Navigator
-import pages.nonsipp.membercontributions.{RemoveMemberContributionPage, TotalMemberContributionPage}
+import pages.nonsipp.membercontributions.{
+  MemberContributionsPage,
+  RemoveMemberContributionPage,
+  TotalMemberContributionPage,
+  TotalMemberContributionPages
+}
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -56,7 +61,7 @@ class RemoveMemberContributionController @Inject()(
       val nameDOB = request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).get
       val totalContrib = request.userAnswers.get(TotalMemberContributionPage(srn, memberIndex, index))
       totalContrib match {
-        case Some(value) => {
+        case Some(value) =>
           Ok(
             view(
               form,
@@ -70,7 +75,6 @@ class RemoveMemberContributionController @Inject()(
             )
           )
 
-        }
         case None =>
           Redirect(
             controllers.nonsipp.membercontributions.routes.WhatYouWillNeedMemberContributionsController
@@ -103,14 +107,32 @@ class RemoveMemberContributionController @Inject()(
           },
           removeDetails => {
             if (removeDetails) {
-              for {
-                updatedAnswers <- Future
-                  .fromTry(request.userAnswers.remove(TotalMemberContributionPage(srn, memberIndex, index)))
-                _ <- saveService.save(updatedAnswers)
-              } yield Redirect(
-                navigator
-                  .nextPage(RemoveMemberContributionPage(srn, memberIndex, index), NormalMode, updatedAnswers)
-              )
+              val contributions = request.userAnswers.map(TotalMemberContributionPages(srn, memberIndex))
+
+              if (contributions.size == 1) {
+                Future
+                  .fromTry(
+                    request.userAnswers
+                      .remove(TotalMemberContributionPage(srn, memberIndex, index))
+                      .set(MemberContributionsPage(srn), false)
+                  )
+                  .map { updatedAnswers =>
+                    saveService.save(updatedAnswers)
+                    Redirect(
+                      navigator
+                        .nextPage(RemoveMemberContributionPage(srn, memberIndex, index), NormalMode, updatedAnswers)
+                    )
+                  }
+              } else {
+                Future.fromTry(request.userAnswers.remove(TotalMemberContributionPage(srn, memberIndex, index))).map {
+                  updatedAnswers =>
+                    saveService.save(updatedAnswers)
+                    Redirect(
+                      navigator
+                        .nextPage(RemoveMemberContributionPage(srn, memberIndex, index), NormalMode, updatedAnswers)
+                    )
+                }
+              }
             } else {
               Future
                 .successful(
