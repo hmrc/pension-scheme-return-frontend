@@ -24,17 +24,13 @@ import config.Refined.{Max5000, _}
 import controllers.PSRController
 import controllers.actions._
 import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalAddressListController._
-import eu.timepit.refined.{refineMV, refineV}
+import eu.timepit.refined.refineV
 import forms.RadioListFormProvider
 import models.SchemeId.Srn
 import models.{Address, Mode, Pagination, UserAnswers}
 import navigation.Navigator
 import pages.nonsipp.landorproperty.LandOrPropertyAddressLookupPages
-import pages.nonsipp.landorpropertydisposal.{
-  LandOrPropertyDisposalAddressListPage,
-  LandOrPropertyStillHeldPage,
-  LandPropertyDisposalCompletedPages
-}
+import pages.nonsipp.landorpropertydisposal.{LandOrPropertyDisposalAddressListPage, LandOrPropertyStillHeldPage, LandPropertyDisposalCompletedPages}
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc._
@@ -115,7 +111,7 @@ object LandOrPropertyDisposalAddressListController {
       "landOrPropertyDisposalAddressList.radios.error.required"
     )
 
-  def getDisposal(srn: Srn, addressChoice: Max5000, userAnswers: UserAnswers, isNextDisposal: Boolean): Option[Max50] =
+  private def getDisposal(srn: Srn, addressChoice: Max5000, userAnswers: UserAnswers, isNextDisposal: Boolean): Option[Max50] =
     userAnswers.get(LandPropertyDisposalCompletedPages(srn)) match {
       case None => refineV[Max50.Refined](1).toOption
       case Some(completedDisposals) =>
@@ -157,7 +153,7 @@ object LandOrPropertyDisposalAddressListController {
               userAnswers.get(LandOrPropertyStillHeldPage(srn, nextIndex, disposalIndex))
             }
             isDisposed match {
-              case Some(value) => {
+              case Some(value) =>
                 if (value) {
                   List(
                     ListRadiosRow(
@@ -169,15 +165,13 @@ object LandOrPropertyDisposalAddressListController {
                   val empty: List[ListRadiosRow] = List()
                   empty
                 }
-              }
-              case _ => {
+              case _ =>
                 List(
                   ListRadiosRow(
                     nextIndex.value,
                     address.addressLine1
                   )
                 )
-              }
             }
           }
         )
