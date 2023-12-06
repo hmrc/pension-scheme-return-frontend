@@ -53,23 +53,32 @@ class RemoveMemberContributionController @Inject()(
 
   def onPageLoad(srn: Srn, memberIndex: Max300, index: Max50): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      (
-        for {
-          total <- request.userAnswers.get(TotalMemberContributionPage(srn, memberIndex, index)).getOrRecoverJourney
-          nameDOB <- request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).getOrRecoverJourney
-        } yield Ok(
-          view(
-            form,
-            RemoveMemberContributionController.viewModel(
-              srn,
-              memberIndex: Max300,
-              index: Max50,
-              total,
-              nameDOB.fullName
+      val nameDOB = request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).get
+      val totalContrib = request.userAnswers.get(TotalMemberContributionPage(srn, memberIndex, index))
+      totalContrib match {
+        case Some(value) => {
+          Ok(
+            view(
+              form,
+              RemoveMemberContributionController.viewModel(
+                srn,
+                memberIndex: Max300,
+                index: Max50,
+                value,
+                nameDOB.fullName
+              )
             )
           )
-        )
-      ).merge
+
+        }
+        case None =>
+          Redirect(
+            controllers.nonsipp.membercontributions.routes.WhatYouWillNeedMemberContributionsController
+              .onPageLoad(srn)
+              .url
+          )
+      }
+
     }
 
   def onSubmit(srn: Srn, memberIndex: Max300, index: Max50): Action[AnyContent] =
