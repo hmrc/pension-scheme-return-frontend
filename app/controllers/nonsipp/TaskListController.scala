@@ -329,7 +329,7 @@ object TaskListController {
       TaskListItemViewModel(
         LinkMessage(
           messageKey(prefix, "memberContributions.title", UnableToStart),
-          controllers.nonsipp.memberpayments.routes.MemberContributionsController
+          controllers.nonsipp.membercontributions.routes.MemberContributionsController
             .onPageLoad(srn, NormalMode)
             .url
         ),

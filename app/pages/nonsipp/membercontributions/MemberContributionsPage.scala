@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.memberpayments
+package pages.nonsipp.membercontributions
 
 import models.SchemeId.Srn
 import pages.QuestionPage
+import pages.nonsipp.memberpayments.MemberPaymentsPage
 import play.api.libs.json.JsPath
 
 case class MemberContributionsPage(srn: Srn) extends QuestionPage[Boolean] {

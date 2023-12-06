@@ -14,20 +14,22 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.memberpayments
+package controllers.nonsipp.membercontributions
 
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.memberpayments.MemberContributionsController._
+import controllers.nonsipp.membercontributions.MemberContributionsController._
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import pages.nonsipp.memberpayments.MemberContributionsPage
+import pages.nonsipp.membercontributions.MemberContributionsPage
 import play.api.libs.json.JsPath
 import views.html.YesNoPageView
 
 class MemberContributionsControllerSpec extends ControllerBaseSpec {
 
-  private lazy val onPageLoad = routes.MemberContributionsController.onPageLoad(srn, NormalMode)
-  private lazy val onSubmit = routes.MemberContributionsController.onSubmit(srn, NormalMode)
+  private lazy val onPageLoad =
+    controllers.nonsipp.membercontributions.routes.MemberContributionsController.onPageLoad(srn, NormalMode)
+  private lazy val onSubmit =
+    controllers.nonsipp.membercontributions.routes.MemberContributionsController.onSubmit(srn, NormalMode)
 
   "MemberContributionsController" - {
 

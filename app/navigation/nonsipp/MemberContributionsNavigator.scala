@@ -20,11 +20,12 @@ import models.{CheckOrChange, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.membercontributions.{
+  MemberContributionsPage,
   RemoveMemberContributionPage,
   TotalMemberContributionPage,
   WhatYouWillNeedMemberContributionsPage
 }
-import pages.nonsipp.memberpayments.{MemberContributionsPage, ReportMemberContributionListPage}
+import pages.nonsipp.memberpayments.ReportMemberContributionListPage
 import play.api.mvc.Call
 
 object MemberContributionsNavigator extends JourneyNavigator {
