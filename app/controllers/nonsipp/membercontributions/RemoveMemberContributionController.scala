@@ -73,8 +73,8 @@ class RemoveMemberContributionController @Inject()(
         }
         case None =>
           Redirect(
-            controllers.nonsipp.membercontributions.routes.WhatYouWillNeedMemberContributionsController
-              .onPageLoad(srn)
+            controllers.nonsipp.membercontributions.routes.MemberContributionsController
+              .onPageLoad(srn, NormalMode)
               .url
           )
       }
