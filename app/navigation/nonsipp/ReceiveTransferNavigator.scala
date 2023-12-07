@@ -17,7 +17,7 @@
 package navigation.nonsipp
 
 import cats.implicits.toTraverseOps
-import config.Refined.Max5
+import config.Refined.{Max300, Max5}
 import models.SchemeId.Srn
 import models.{CheckMode, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
@@ -67,7 +67,7 @@ object ReceiveTransferNavigator extends JourneyNavigator {
         for {
           map <- userAnswers.get(TotalValueTransferPages(srn, index)).getOrRecoverJourney
           indexes <- map.keys.toList.traverse(_.toIntOption).getOrRecoverJourney
-          _ <- navToMemberListOnMaxTransfersIn(srn, indexes)
+          _ <- navToCYAOnMaxTransfersIn(srn, index, indexes)
         } yield controllers.nonsipp.receivetransfer.routes.ReportAnotherTransferInController
           .onPageLoad(srn, index, secondaryIndex, NormalMode)
       ).merge
@@ -134,7 +134,7 @@ object ReceiveTransferNavigator extends JourneyNavigator {
             for {
               map <- userAnswers.get(TotalValueTransferPages(srn, index)).getOrRecoverJourney
               indexes <- map.keys.toList.traverse(_.toIntOption).getOrRecoverJourney
-              _ <- navToMemberListOnMaxTransfersIn(srn, indexes)
+              _ <- navToCYAOnMaxTransfersIn(srn, index, indexes)
             } yield controllers.nonsipp.receivetransfer.routes.ReportAnotherTransferInController
               .onPageLoad(srn, index, secondaryIndex, CheckMode)
           ).merge
@@ -159,11 +159,11 @@ object ReceiveTransferNavigator extends JourneyNavigator {
             .onPageLoad(srn, 1, NormalMode)
       }
 
-  private def navToMemberListOnMaxTransfersIn(srn: Srn, indexes: List[Int]): Either[Call, Unit] =
+  private def navToCYAOnMaxTransfersIn(srn: Srn, index: Max300, indexes: List[Int]): Either[Call, Unit] =
     if (indexes.size == 5) {
       Left(
-        controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
-          .onPageLoad(srn, 1, NormalMode)
+        controllers.nonsipp.receivetransfer.routes.TransfersInCYAController
+          .onPageLoad(srn, index, NormalMode)
       )
     } else {
       Right(())
