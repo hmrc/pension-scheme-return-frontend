@@ -185,13 +185,14 @@ object TransferReceivedMemberListController {
     FormPageViewModel(
       title = Message(title, memberList.size),
       heading = Message(heading, memberList.size),
-      description = Some(ParagraphMessage("transferIn.MemberList.paragraph")),
+      description = None,
       page = ActionTableViewModel(
-        inset = "transferIn.MemberList.inset",
+        inset = "transferIn.MemberList.paragraph",
         head = Some(List(TableElem("Member Name"), TableElem("Status"))),
         rows = rows(srn, mode, memberList, userAnswers),
         radioText = Message("transferIn.MemberList.radios"),
         showRadios = memberList.length < maxNotRelevant,
+        showInsetWithRadios = true,
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(
