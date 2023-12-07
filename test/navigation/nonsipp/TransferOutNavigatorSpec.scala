@@ -33,7 +33,7 @@ class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateToWithData(
           SchemeTransferOutPage,
           Gen.const(true),
-          (_, _) => routes.UnauthorisedController.onPageLoad()
+          (srn, _) => controllers.nonsipp.membertransferout.routes.WhatYouWillNeedTransferOutController.onPageLoad(srn)
         )
         .withName("go from did scheme transfer out page to unauthorised page when yes selected")
     )
