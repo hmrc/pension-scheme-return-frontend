@@ -19,7 +19,7 @@ package navigation.nonsipp
 import controllers.routes
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.memberpayments.SchemeTransferOutPage
+import pages.nonsipp.membertransferout.SchemeTransferOutPage
 import utils.BaseSpec
 
 class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
