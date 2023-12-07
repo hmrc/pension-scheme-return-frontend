@@ -27,6 +27,7 @@ object InputWidth {
   case object Fixed10 extends WithCssClass("govuk-input--width-10") with InputWidth
   case object Fixed20 extends WithCssClass("govuk-input--width-20") with InputWidth
   case object Fixed30 extends WithCssClass("govuk-input--width-30") with InputWidth
+  case object Fixed40 extends WithCssClass("govuk-input--width-40") with InputWidth
 
   case object Full extends WithCssClass("govuk-!-width-full") with InputWidth
   case object ThreeQuarters extends WithCssClass("govuk-!-width-three-quarters") with InputWidth

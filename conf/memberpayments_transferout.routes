@@ -6,3 +6,8 @@ POST        /:srn/change-transfer-out                                           
 
 GET         /:srn/what-you-will-need-transfers-out                                      controllers.nonsipp.membertransferout.WhatYouWillNeedTransferOutController.onPageLoad(srn: Srn)
 GET         /:srn/submit-what-you-will-need-transfers-out                               controllers.nonsipp.membertransferout.WhatYouWillNeedTransferOutController.onSubmit(srn: Srn)
+
+GET         /:srn/receiving-scheme-name/:index/:transferIndex                           controllers.nonsipp.membertransferout.ReceivingSchemeNameController.onPageLoad(srn: Srn, index: Max300, transferIndex: Max5, mode: Mode = NormalMode)
+POST        /:srn/receiving-scheme-name/:index/:transferIndex                           controllers.nonsipp.membertransferout.ReceivingSchemeNameController.onSubmit(srn: Srn, index: Max300, transferIndex: Max5, mode: Mode = NormalMode)
+GET         /:srn/change-receiving-scheme-name/:index/:transferIndex                    controllers.nonsipp.membertransferout.ReceivingSchemeNameController.onPageLoad(srn: Srn, index: Max300, transferIndex: Max5, mode: Mode = CheckMode)
+POST        /:srn/change-receiving-scheme-name/:index/:transferIndex                    controllers.nonsipp.membertransferout.ReceivingSchemeNameController.onSubmit(srn: Srn, index: Max300, transferIndex: Max5, mode: Mode = CheckMode)
