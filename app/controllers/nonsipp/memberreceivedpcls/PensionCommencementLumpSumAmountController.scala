@@ -17,16 +17,16 @@
 package controllers.nonsipp.memberreceivedpcls
 
 import com.google.inject.Inject
-import config.Constants.maxCashInBank
+import config.Constants.maxPCLSAmount
 import config.Refined.Max300
 import controllers.PSRController
 import controllers.actions._
 import controllers.nonsipp.memberreceivedpcls.PensionCommencementLumpSumAmountController._
 import forms.MoneyFormProvider
 import forms.mappings.errors.MoneyFormErrors
+import models.PensionCommencementLumpSum._
 import models.SchemeId.Srn
 import models.{Mode, Money}
-import models.PensionCommencementLumpSum._
 import navigation.Navigator
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import pages.nonsipp.memberpayments.PensionCommencementLumpSumAmountPage
@@ -97,12 +97,12 @@ object PensionCommencementLumpSumAmountController {
       MoneyFormErrors(
         "pensionCommencementLumpSumAmount.received.error.required",
         "pensionCommencementLumpSumAmount.received.error.nonNumeric",
-        maxCashInBank -> "pensionCommencementLumpSumAmount.received.error.tooLarge"
+        maxPCLSAmount -> "pensionCommencementLumpSumAmount.received.error.tooLarge"
       ),
       MoneyFormErrors(
         "pensionCommencementLumpSumAmount.relevant.error.required",
         "pensionCommencementLumpSumAmount.relevant.error.nonNumeric",
-        maxCashInBank -> "pensionCommencementLumpSumAmount.relevant.error.tooLarge"
+        maxPCLSAmount -> "pensionCommencementLumpSumAmount.relevant.error.tooLarge"
       )
     )
 
@@ -114,14 +114,14 @@ object PensionCommencementLumpSumAmountController {
     form: Form[(Money, Money)]
   ): FormPageViewModel[DoubleQuestion[Money]] =
     FormPageViewModel(
-      "pensionCommencementLumpSumAmount.title",
-      Message("pensionCommencementLumpSumAmount.heading", fullName),
+      title = "pensionCommencementLumpSumAmount.title",
+      heading = Message("pensionCommencementLumpSumAmount.heading", fullName),
       page = DoubleQuestion(
         form,
         QuestionField.input(Message("pensionCommencementLumpSumAmount.received", fullName)),
         QuestionField.input(Message("pensionCommencementLumpSumAmount.relevant", fullName))
       ),
-      Some(
+      details = Option(
         FurtherDetailsViewModel(
           Message("pensionCommencementLumpSumAmount.details.title"),
           ParagraphMessage("pensionCommencementLumpSumAmount.details")
