@@ -1675,6 +1675,14 @@ WhatYouWillNeed.ReceivedTransfer.tellUs7 = if the transfer included an asset
 WhatYouWillNeed.ReceivedTransfer.paragraph3 = On the next page, you will be able to select a member from a list of those whose details you have already provided. If you want to add a new member, you will need to provide their details using the ‘member details’ section of this pension scheme return.
 WhatYouWillNeed.ReceivedTransfer.paragraph4 = If the scheme received more than one transfer for any member, you must tell us about all of them. Answer the questions for one transfer at a time.
 
+WhatYouWillNeed.PensionCommencementLumpSum.title = Pension commencement lump sum details for members of {0}
+WhatYouWillNeed.PensionCommencementLumpSum.heading = Pension commencement lump sum details for members of {0}
+WhatYouWillNeed.PensionCommencementLumpSum.paragraph1 = You must tell us about all pension commencement lump sums (PCLS) received by members of the scheme during the period of this return.
+WhatYouWillNeed.PensionCommencementLumpSum.paragraph2 = For each member who received a PCLS, you need to tell us:
+WhatYouWillNeed.PensionCommencementLumpSum.totalAmount = the total amount of the PCLS
+WhatYouWillNeed.PensionCommencementLumpSum.relevantPension = the relevant pension in respect of this PCLS
+WhatYouWillNeed.PensionCommencementLumpSum.paragraph3 = On the next page, you will be able to select a member from a list of those whose details you have already provided. If you want to add a new member, you will need to provide their details using the ‘member details’ section of this pension scheme return.
+
 transferIn.MemberList.title = Select a member to report transfers in
 transferIn.MemberList.title.plural = Select a member to report transfers in
 transferIn.MemberList.heading = Select a member to report transfers in

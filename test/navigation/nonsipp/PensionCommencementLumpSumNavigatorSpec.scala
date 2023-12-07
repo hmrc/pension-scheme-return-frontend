@@ -19,7 +19,7 @@ package navigation.nonsipp
 import controllers.routes
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.memberpayments.PensionCommencementLumpSumPage
+import pages.nonsipp.memberpayments.{PensionCommencementLumpSumPage, WhatYouWillNeedPensionCommencementLumpSumPage}
 import utils.BaseSpec
 
 class PensionCommencementLumpSumNavigatorSpec extends BaseSpec with NavigatorBehaviours {
@@ -33,9 +33,13 @@ class PensionCommencementLumpSumNavigatorSpec extends BaseSpec with NavigatorBeh
         .navigateToWithData(
           PensionCommencementLumpSumPage,
           Gen.const(true),
-          (_, _) => routes.UnauthorisedController.onPageLoad()
+          (s, _) =>
+            controllers.nonsipp.memberreceivedpcls.routes.WhatYouWillNeedPensionCommencementLumpSumController
+              .onPageLoad(s)
         )
-        .withName("go from pension commencement lump sum page to unauthorised page when yes selected")
+        .withName(
+          "go from pension commencement lump sum page to what you will need pension commencement page when yes selected"
+        )
     )
 
     act.like(
@@ -46,6 +50,15 @@ class PensionCommencementLumpSumNavigatorSpec extends BaseSpec with NavigatorBeh
           (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
         )
         .withName("go from pension commencement lump sum page to task list page when no selected")
+    )
+
+    act.like(
+      normalmode
+        .navigateTo(
+          WhatYouWillNeedPensionCommencementLumpSumPage,
+          (_, _) => routes.UnauthorisedController.onPageLoad()
+        )
+        .withName("go from what you will need pension commencement page to unauthorised page when continue is selected")
     )
   }
 }

@@ -179,6 +179,8 @@ GET         /:srn/pension-commencement-lump-sum                                 
 POST        /:srn/pension-commencement-lump-sum                                         controllers.nonsipp.memberreceivedpcls.PensionCommencementLumpSumController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 GET         /:srn/change-pension-commencement-lump-sum                                  controllers.nonsipp.memberreceivedpcls.PensionCommencementLumpSumController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST        /:srn/change-pension-commencement-lump-sum                                  controllers.nonsipp.memberreceivedpcls.PensionCommencementLumpSumController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+GET         /:srn/what-you-will-need-pcls                                               controllers.nonsipp.memberreceivedpcls.WhatYouWillNeedPensionCommencementLumpSumController.onPageLoad(srn: Srn)
+GET         /:srn/submit-what-you-will-need-pcls                                        controllers.nonsipp.memberreceivedpcls.WhatYouWillNeedPensionCommencementLumpSumController.onSubmit(srn: Srn)
 
 GET         /:srn/fees-commissions-wages-salaries                                       controllers.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST        /:srn/fees-commissions-wages-salaries                                       controllers.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesController.onSubmit(srn: Srn, mode: Mode = NormalMode)
