@@ -35,6 +35,9 @@ object TransferOutNavigator extends JourneyNavigator {
 
     case WhatYouWillNeedTransferOutPage(srn) =>
       controllers.routes.UnauthorisedController.onPageLoad()
+
+    case ReceivingSchemeNamePage(srn, index, transferIndex) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
   }
 
   override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] =
