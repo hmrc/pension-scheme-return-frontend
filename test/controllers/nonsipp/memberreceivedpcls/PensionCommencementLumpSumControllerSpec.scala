@@ -20,7 +20,7 @@ import controllers.ControllerBaseSpec
 import controllers.nonsipp.memberreceivedpcls.PensionCommencementLumpSumController.viewModel
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import pages.nonsipp.memberpayments.PensionCommencementLumpSumPage
+import pages.nonsipp.memberreceivedpcls.PensionCommencementLumpSumPage
 import play.api.libs.json.JsPath
 import views.html.YesNoPageView
 

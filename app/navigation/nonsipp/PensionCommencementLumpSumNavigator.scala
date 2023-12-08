@@ -19,7 +19,7 @@ package navigation.nonsipp
 import models.UserAnswers
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.memberpayments.PensionCommencementLumpSumPage
+import pages.nonsipp.memberreceivedpcls.{PensionCommencementLumpSumPage, WhatYouWillNeedPensionCommencementLumpSumPage}
 import play.api.mvc.Call
 
 object PensionCommencementLumpSumNavigator extends JourneyNavigator {
@@ -27,10 +27,14 @@ object PensionCommencementLumpSumNavigator extends JourneyNavigator {
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
     case page @ PensionCommencementLumpSumPage(srn) =>
       if (userAnswers.get(page).contains(true)) {
-        controllers.routes.UnauthorisedController.onPageLoad()
+        controllers.nonsipp.memberreceivedpcls.routes.WhatYouWillNeedPensionCommencementLumpSumController
+          .onPageLoad(srn)
       } else {
         controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
       }
+
+    case WhatYouWillNeedPensionCommencementLumpSumPage(_) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
   }
 
   override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] = _ => _ => PartialFunction.empty

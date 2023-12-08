@@ -8,6 +8,7 @@
 ->          /                                                                           membercontributions.Routes
 ->          /                                                                           receivetransfer.Routes
 ->          /                                                                           memberpayments_transferout.Routes
+->          /                                                                           pcls.Routes
 
 GET         /                                                                           controllers.IndexController.onPageLoad()
 
@@ -170,11 +171,6 @@ GET         /:srn/shares-in-sponsoring-employer                                 
 POST        /:srn/shares-in-sponsoring-employer                                         controllers.nonsipp.sharesinsponsoringemployer.DidSchemeHoldSharesInSponsoringEmployerController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 GET         /:srn/change-shares-in-sponsoring-employer                                  controllers.nonsipp.sharesinsponsoringemployer.DidSchemeHoldSharesInSponsoringEmployerController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST        /:srn/change-shares-in-sponsoring-employer                                  controllers.nonsipp.sharesinsponsoringemployer.DidSchemeHoldSharesInSponsoringEmployerController.onSubmit(srn: Srn, mode: Mode = CheckMode)
-
-GET         /:srn/pension-commencement-lump-sum                                         controllers.nonsipp.memberreceivedpcls.PensionCommencementLumpSumController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST        /:srn/pension-commencement-lump-sum                                         controllers.nonsipp.memberreceivedpcls.PensionCommencementLumpSumController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-GET         /:srn/change-pension-commencement-lump-sum                                  controllers.nonsipp.memberreceivedpcls.PensionCommencementLumpSumController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST        /:srn/change-pension-commencement-lump-sum                                  controllers.nonsipp.memberreceivedpcls.PensionCommencementLumpSumController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
 GET         /:srn/fees-commissions-wages-salaries                                       controllers.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST        /:srn/fees-commissions-wages-salaries                                       controllers.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesController.onSubmit(srn: Srn, mode: Mode = NormalMode)

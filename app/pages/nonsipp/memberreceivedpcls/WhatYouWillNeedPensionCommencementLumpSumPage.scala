@@ -14,19 +14,9 @@
  * limitations under the License.
  */
 
-package pages
+package pages.nonsipp.memberreceivedpcls
 
-import pages.behaviours.PageBehaviours
-import pages.nonsipp.memberreceivedpcls.PensionCommencementLumpSumPage
+import models.SchemeId.Srn
+import pages.Page
 
-class PensionCommencementLumpSumPageSpec extends PageBehaviours {
-
-  "PensionCommencementLumpSumPage" - {
-
-    beRetrievable[Boolean](PensionCommencementLumpSumPage(srnGen.sample.value))
-
-    beSettable[Boolean](PensionCommencementLumpSumPage(srnGen.sample.value))
-
-    beRemovable[Boolean](PensionCommencementLumpSumPage(srnGen.sample.value))
-  }
-}
+case class WhatYouWillNeedPensionCommencementLumpSumPage(srn: Srn) extends Page
