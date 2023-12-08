@@ -25,14 +25,14 @@ import models.Mode
 import models.SchemeId.Srn
 import navigation.Navigator
 import pages.nonsipp.memberdetails.MemberDetailsPage
-import pages.nonsipp.receivetransfer.{DidTransferIncludeAssetPage, TransferringSchemeNamePage}
+import pages.nonsipp.receivetransfer.{DidTransferIncludeAssetPage, TransferringSchemeNamePage, TransfersInCompletedPage}
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
+import viewmodels.models.{FormPageViewModel, SectionCompleted, YesNoPageViewModel}
 import views.html.YesNoPageView
 
 import javax.inject.{Inject, Named}
@@ -100,7 +100,11 @@ class DidTransferIncludeAssetController @Inject()(
           value =>
             for {
               updatedAnswers <- Future
-                .fromTry(request.userAnswers.set(DidTransferIncludeAssetPage(srn, index, secondaryIndex), value))
+                .fromTry(
+                  request.userAnswers
+                    .set(DidTransferIncludeAssetPage(srn, index, secondaryIndex), value)
+                    .set(TransfersInCompletedPage(srn, index, secondaryIndex), SectionCompleted)
+                )
               _ <- saveService.save(updatedAnswers)
             } yield Redirect(
               navigator.nextPage(DidTransferIncludeAssetPage(srn, index, secondaryIndex), mode, updatedAnswers)

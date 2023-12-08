@@ -78,7 +78,6 @@ class ReportAnotherTransferInController @Inject()(
               updatedAnswers <- Future.fromTry(
                 request.userAnswers
                   .set(ReportAnotherTransferInPage(srn, index, secondaryIndex), value)
-                  .set(TransfersInCompletedPage(srn, index, secondaryIndex), SectionCompleted)
               )
               _ <- saveService.save(updatedAnswers)
             } yield Redirect(

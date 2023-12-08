@@ -29,7 +29,8 @@ import scala.util.Try
 
 case class TotalMemberContributionPage(srn: Srn, index: Max300, secondaryIndex: Max50) extends QuestionPage[Money] {
 
-  override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString \ secondaryIndex.arrayIndex.toString
+  override def path: JsPath =
+    Paths.memberDetails \ toString \ index.arrayIndex.toString \ secondaryIndex.arrayIndex.toString
 
   override def toString: String = "totalMemberContribution"
 
@@ -37,7 +38,8 @@ case class TotalMemberContributionPage(srn: Srn, index: Max300, secondaryIndex: 
 
 case class TotalMemberContributionPages(srn: Srn, index: Max300) extends QuestionPage[Map[String, Money]] {
 
-  override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString
+  override def path: JsPath =
+    Paths.memberDetails \ toString \ index.arrayIndex.toString
 
   override def toString: String = "totalMemberContribution"
 }

@@ -192,7 +192,7 @@ object ReportMemberContributionListController {
       case Right(refinedIndex) =>
         List(
           TableElem(
-            "Member contributions Reported"
+            "Member contributions reported"
           ),
           TableElem(
             LinkMessage(

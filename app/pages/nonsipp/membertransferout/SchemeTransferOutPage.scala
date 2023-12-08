@@ -14,19 +14,16 @@
  * limitations under the License.
  */
 
-package pages
+package pages.nonsipp.membertransferout
 
-import pages.behaviours.PageBehaviours
-import pages.nonsipp.memberpayments.SchemeTransferOutPage
+import models.SchemeId.Srn
+import pages.QuestionPage
+import pages.nonsipp.memberpayments.MemberPaymentsPage
+import play.api.libs.json.JsPath
 
-class SchemeTransferoutPageSpec extends PageBehaviours {
+case class SchemeTransferOutPage(srn: Srn) extends QuestionPage[Boolean] {
 
-  "SchemeTransferoutPage" - {
+  override def path: JsPath = MemberPaymentsPage.path \ toString
 
-    beRetrievable[Boolean](SchemeTransferOutPage(srnGen.sample.value))
-
-    beSettable[Boolean](SchemeTransferOutPage(srnGen.sample.value))
-
-    beRemovable[Boolean](SchemeTransferOutPage(srnGen.sample.value))
-  }
+  override def toString: String = "schemeMadeTransferOut"
 }
