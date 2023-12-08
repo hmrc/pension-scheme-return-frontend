@@ -17,9 +17,14 @@
 package navigation.nonsipp
 
 import controllers.routes
+import models.NormalMode
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.membertransferout.SchemeTransferOutPage
+import pages.nonsipp.membertransferout.{
+  SchemeTransferOutPage,
+  TransferOutMemberListPage,
+  WhatYouWillNeedTransferOutPage
+}
 import utils.BaseSpec
 
 class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
@@ -48,4 +53,31 @@ class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .withName("go from did scheme transfer out page to pension commencement lump sum page when no selected")
     )
   }
+
+  "WhatYouWillNeedTransferOutPage" - {
+
+    act.like(
+      normalmode
+        .navigateTo(
+          WhatYouWillNeedTransferOutPage,
+          (srn, _) =>
+            controllers.nonsipp.membertransferout.routes.TransferOutMemberListController
+              .onPageLoad(srn, 1, NormalMode)
+        )
+        .withName("go from what you will need transfer out to transfer out member list page")
+    )
+  }
+
+  "TransferOutMemberListPage" - {
+
+    act.like(
+      normalmode
+        .navigateTo(
+          TransferOutMemberListPage,
+          (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
+        )
+        .withName("go from transfer out member list page to task list page")
+    )
+  }
+
 }

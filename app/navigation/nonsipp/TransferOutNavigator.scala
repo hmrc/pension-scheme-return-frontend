@@ -34,7 +34,10 @@ object TransferOutNavigator extends JourneyNavigator {
       }
 
     case WhatYouWillNeedTransferOutPage(srn) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+      controllers.nonsipp.membertransferout.routes.TransferOutMemberListController.onPageLoad(srn, 1, NormalMode)
+
+    case TransferOutMemberListPage(srn) =>
+      controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
   }
 
   override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] =

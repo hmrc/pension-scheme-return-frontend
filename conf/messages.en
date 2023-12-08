@@ -1858,3 +1858,15 @@ WhatYouWillNeed.TransferOut.tellUs4 = the receiving scheme’s Pension Scheme Ta
 WhatYouWillNeed.TransferOut.tellUs5 = the date the transfer was made
 WhatYouWillNeed.TransferOut.paragraph3 = On the next page, you will be able to select a member from a list of those whose details you have already provided. If you want to add a new member, you will need to provide their details using the ‘member details’ section of this pension scheme return.
 WhatYouWillNeed.TransferOut.paragraph4 = If the scheme made more than one transfer out for any member, you must tell us about all of them. Answer the questions for one transfer at a time.
+
+transferOut.memberList.title = Select a member to report transfers out
+transferOut.memberList.title.plural = Select a member to report transfers out
+transferOut.memberList.heading = Select a member to report transfers out
+transferOut.memberList.heading.plural = Select a member to report transfers out
+transferOut.memberList.paragraph = You must tell us about all transfers out for members of the scheme during the period of this return.
+transferOut.memberList.radios = Have you finished reporting transfers out?
+transferOut.memberList.radios.error.required = Select yes if you have finished reporting transfers out
+transferOut.memberList.pagination.label = Showing {0} - {1} of {2} members
+transferOut.memberList.status.no.contributions =  No transfers out
+transferOut.memberList.singleStatus.some.contribution = {0} transfer out
+transferOut.memberList.status.some.contributions = {0} transfers out
