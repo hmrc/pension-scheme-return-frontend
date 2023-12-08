@@ -22,7 +22,7 @@ import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import models.NormalMode
 import pages.nonsipp.membertransferout.ReceivingSchemeNamePage
-import views.html.TexInputViewWidth40
+import views.html.TextInputView
 
 class ReceivingSchemeNameControllerSpec extends ControllerBaseSpec {
 
@@ -38,7 +38,7 @@ class ReceivingSchemeNameControllerSpec extends ControllerBaseSpec {
   "ReceivingSchemeNameController" - {
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
-      injected[TexInputViewWidth40].apply(
+      injected[TextInputView].apply(
         ReceivingSchemeNameController.form(injected[TextFormProvider]),
         ReceivingSchemeNameController.viewModel(srn, index, transferIndex, NormalMode)
       )
@@ -46,7 +46,7 @@ class ReceivingSchemeNameControllerSpec extends ControllerBaseSpec {
 
     act.like(renderPrePopView(onPageLoad, ReceivingSchemeNamePage(srn, index, transferIndex), "test") {
       implicit app => implicit request =>
-        injected[TexInputViewWidth40].apply(
+        injected[TextInputView].apply(
           ReceivingSchemeNameController.form(injected[TextFormProvider]).fill("test"),
           ReceivingSchemeNameController.viewModel(srn, index, transferIndex, NormalMode)
         )

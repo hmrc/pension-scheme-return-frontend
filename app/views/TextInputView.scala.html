@@ -40,13 +40,27 @@
 
     @if(viewmodel.page.isFixedLength){
     @govukInput(
-        InputViewModel(
-            field = form("value"),
-            label = viewmodel.page.label
+        viewmodel.page.inputWidth match{
+            case Some(value) =>{
+                InputViewModel(
+                field = form("value"),
+                label = viewmodel.page.label
                 .map(label => LabelViewModel(renderMessage(label)))
                 .getOrElse(LabelViewModel(renderMessage(viewmodel.heading)).asPageHeading())
-        )
-        .withWidth(Fixed20)
+                )
+                .withWidth(viewmodel.page.inputWidth.get)
+            }
+            case _ => {
+                InputViewModel(
+                field = form("value"),
+                label = viewmodel.page.label
+                .map(label => LabelViewModel(renderMessage(label)))
+                .getOrElse(LabelViewModel(renderMessage(viewmodel.heading)).asPageHeading())
+                )
+                .withWidth(Fixed20)
+            }
+        }
+
     )
 
 } else{

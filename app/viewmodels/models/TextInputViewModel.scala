@@ -16,17 +16,20 @@
 
 package viewmodels.models
 
-import viewmodels.DisplayMessage
+import viewmodels.{DisplayMessage, InputWidth}
 
 case class TextInputViewModel(
   label: Option[DisplayMessage],
-  isFixedLength: Boolean
+  isFixedLength: Boolean,
+  inputWidth: Option[InputWidth] = None
 )
 
 object TextInputViewModel {
 
-  def apply(): TextInputViewModel = TextInputViewModel(None, false)
+  def apply(): TextInputViewModel = TextInputViewModel(None, false, None)
 
   def apply(isFixedLength: Boolean): TextInputViewModel = TextInputViewModel(None, isFixedLength)
 
+  def withWidth(inputWidth: Option[InputWidth]): TextInputViewModel =
+    TextInputViewModel(None, true, inputWidth)
 }

@@ -28,8 +28,9 @@ import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
+import viewmodels.InputWidth
 import viewmodels.models.{FormPageViewModel, TextInputViewModel}
-import views.html.TexInputViewWidth40
+import views.html.TextInputView
 import viewmodels.implicits._
 
 import javax.inject.{Inject, Named}
@@ -42,7 +43,7 @@ class ReceivingSchemeNameController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   formProvider: TextFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: TexInputViewWidth40
+  view: TextInputView
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
@@ -89,7 +90,7 @@ object ReceivingSchemeNameController {
     FormPageViewModel(
       "TransferOut.receivingSchemeName.title",
       "TransferOut.receivingSchemeName.heading",
-      TextInputViewModel(isFixedLength = true),
+      TextInputViewModel.withWidth(Some(InputWidth.Fixed40)),
       controllers.nonsipp.membertransferout.routes.ReceivingSchemeNameController
         .onSubmit(srn, index, transferIndex, mode)
     )
