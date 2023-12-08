@@ -20,7 +20,7 @@ import controllers.ControllerBaseSpec
 import controllers.nonsipp.membertransferout.SchemeTransferOutController.{form, viewModel}
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import pages.nonsipp.memberpayments.SchemeTransferOutPage
+import pages.nonsipp.membertransferout.SchemeTransferOutPage
 import play.api.libs.json.JsPath
 import views.html.YesNoPageView
 

@@ -7,6 +7,7 @@
 ->          /                                                                           employercontributions.Routes
 ->          /                                                                           membercontributions.Routes
 ->          /                                                                           receivetransfer.Routes
+->          /                                                                           memberpayments_transferout.Routes
 
 GET         /                                                                           controllers.IndexController.onPageLoad()
 
@@ -153,11 +154,6 @@ POST        /:srn/did-scheme-have-bank-account                                  
 
 GET         /:srn/change-did-scheme-have-bank-account                                   controllers.nonsipp.schemedesignatory.ActiveBankAccountController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST        /:srn/change-did-scheme-have-bank-account                                   controllers.nonsipp.schemedesignatory.ActiveBankAccountController.onSubmit(srn: Srn, mode: Mode = CheckMode)
-
-GET         /:srn/transfer-out                                                          controllers.nonsipp.membertransferout.SchemeTransferOutController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST        /:srn/transfer-out                                                          controllers.nonsipp.membertransferout.SchemeTransferOutController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-GET         /:srn/change-transfer-out                                                   controllers.nonsipp.membertransferout.SchemeTransferOutController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST        /:srn/change-transfer-out                                                   controllers.nonsipp.membertransferout.SchemeTransferOutController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
 GET         /:srn/reason-for-no-bank-account                                            controllers.nonsipp.schemedesignatory.WhyNoBankAccountController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST        /:srn/reason-for-no-bank-account                                            controllers.nonsipp.schemedesignatory.WhyNoBankAccountController.onSubmit(srn: Srn, mode: Mode = NormalMode)

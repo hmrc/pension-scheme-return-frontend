@@ -19,7 +19,7 @@ package navigation.nonsipp
 import controllers.routes
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.memberpayments.SchemeTransferOutPage
+import pages.nonsipp.membertransferout.SchemeTransferOutPage
 import utils.BaseSpec
 
 class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
@@ -33,9 +33,9 @@ class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateToWithData(
           SchemeTransferOutPage,
           Gen.const(true),
-          (_, _) => routes.UnauthorisedController.onPageLoad()
+          (srn, _) => controllers.nonsipp.membertransferout.routes.WhatYouWillNeedTransferOutController.onPageLoad(srn)
         )
-        .withName("go from did scheme transfer out page to unauthorised page when yes selected")
+        .withName("go from did scheme transfer out page to What you Will need page")
     )
 
     act.like(

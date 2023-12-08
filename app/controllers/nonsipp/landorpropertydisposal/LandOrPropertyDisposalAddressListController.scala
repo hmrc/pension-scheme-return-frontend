@@ -30,7 +30,11 @@ import models.SchemeId.Srn
 import models.{Address, Mode, Pagination, UserAnswers}
 import navigation.Navigator
 import pages.nonsipp.landorproperty.LandOrPropertyAddressLookupPages
-import pages.nonsipp.landorpropertydisposal.{LandOrPropertyDisposalAddressListPage, LandOrPropertyStillHeldPage, LandPropertyDisposalCompletedPages}
+import pages.nonsipp.landorpropertydisposal.{
+  LandOrPropertyDisposalAddressListPage,
+  LandOrPropertyStillHeldPage,
+  LandPropertyDisposalCompletedPages
+}
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc._
@@ -111,7 +115,12 @@ object LandOrPropertyDisposalAddressListController {
       "landOrPropertyDisposalAddressList.radios.error.required"
     )
 
-  private def getDisposal(srn: Srn, addressChoice: Max5000, userAnswers: UserAnswers, isNextDisposal: Boolean): Option[Max50] =
+  private def getDisposal(
+    srn: Srn,
+    addressChoice: Max5000,
+    userAnswers: UserAnswers,
+    isNextDisposal: Boolean
+  ): Option[Max50] =
     userAnswers.get(LandPropertyDisposalCompletedPages(srn)) match {
       case None => refineV[Max50.Refined](1).toOption
       case Some(completedDisposals) =>

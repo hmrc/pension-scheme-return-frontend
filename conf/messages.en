@@ -1838,3 +1838,15 @@ transfersInCYAController.rows.transferIncludeAsset = Did the transfer from {0} f
 transfersInCYAController.rows.transferIncludeAsset.hidden = if the transfer from {0} for {1} included an asse
 transfersInCYAController.rows.reportAnotherTransfer = Do you need to report another transfer in for {0}?
 transfersInCYAController.rows.reportAnotherTransfer.hidden =  if you need to report another transfer in for {0}
+
+WhatYouWillNeed.TransferOut.title   = Transfers out for members of the scheme
+WhatYouWillNeed.TransferOut.heading = Transfers out for members of {0}
+WhatYouWillNeed.TransferOut.paragraph1 = You must tell us about all transfers out for members of the scheme during the period of this return.
+WhatYouWillNeed.TransferOut.paragraph2 = For each transfer out, you need to tell us:
+WhatYouWillNeed.TransferOut.tellUs1 = which member the transfer was made for
+WhatYouWillNeed.TransferOut.tellUs2 = the name of the receiving scheme
+WhatYouWillNeed.TransferOut.tellUs3 = if the receiving scheme is a registered pension scheme, qualifying recognised overseas pension scheme (QROPS) or other
+WhatYouWillNeed.TransferOut.tellUs4 = the receiving scheme’s Pension Scheme Tax Reference (PSTR), QROPS reference number, or a description of the receiving scheme – whichever applies
+WhatYouWillNeed.TransferOut.tellUs5 = the date the transfer was made
+WhatYouWillNeed.TransferOut.paragraph3 = On the next page, you will be able to select a member from a list of those whose details you have already provided. If you want to add a new member, you will need to provide their details using the ‘member details’ section of this pension scheme return.
+WhatYouWillNeed.TransferOut.paragraph4 = If the scheme made more than one transfer out for any member, you must tell us about all of them. Answer the questions for one transfer at a time.
