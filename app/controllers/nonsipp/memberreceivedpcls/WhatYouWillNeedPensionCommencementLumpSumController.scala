@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.memberreceivedpcls
 
-import controllers.actions.{AllowAccessActionProvider, DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import controllers.actions.IdentifyAndRequireData
 import models.NormalMode
 import models.SchemeId.Srn
 import navigation.Navigator
@@ -34,22 +34,19 @@ import javax.inject.{Inject, Named}
 class WhatYouWillNeedPensionCommencementLumpSumController @Inject()(
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
-  identify: IdentifierAction,
-  allowAccess: AllowAccessActionProvider,
-  getData: DataRetrievalAction,
-  requireData: DataRequiredAction,
+  identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   view: ContentPageView
 ) extends FrontendBaseController
     with I18nSupport {
 
   def onPageLoad(srn: Srn): Action[AnyContent] =
-    identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData) { implicit request =>
+    identifyAndRequireData(srn) { implicit request =>
       Ok(view(WhatYouWillNeedPensionCommencementLumpSumController.viewModel(srn, request.schemeDetails.schemeName)))
     }
 
   def onSubmit(srn: Srn): Action[AnyContent] =
-    identify.andThen(allowAccess(srn)).andThen(getData).andThen(requireData) { implicit request =>
+    identifyAndRequireData(srn) { implicit request =>
       Redirect(navigator.nextPage(WhatYouWillNeedPensionCommencementLumpSumPage(srn), NormalMode, request.userAnswers))
     }
 }
