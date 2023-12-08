@@ -28,7 +28,7 @@ import models.SchemeId.Srn
 import models._
 import navigation.Navigator
 import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
-import pages.nonsipp.membertransferout.TransferOutMemberListPage
+import pages.nonsipp.membertransferout.{ReceivingSchemeNamePages, TransferOutMemberListPage}
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -60,7 +60,8 @@ class TransferOutMemberListController @Inject()(
         Ok(view(form, viewModel))
       } else {
         Redirect(
-          controllers.routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.membertransferout.routes.ReceivingSchemeNameController
+            .onSubmit(srn, refineMV(1), refineMV(1), NormalMode)
         )
       }
   }
@@ -107,7 +108,7 @@ object TransferOutMemberListController {
         refineV[OneTo300](index + 1) match {
           case Left(_) => Nil
           case Right(nextIndex) =>
-            val contributions = ""
+            val contributions = userAnswers.map(ReceivingSchemeNamePages(srn, nextIndex))
             if (contributions.isEmpty) {
               List(
                 TableElem(

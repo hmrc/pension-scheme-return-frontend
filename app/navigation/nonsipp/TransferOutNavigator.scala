@@ -38,7 +38,6 @@ object TransferOutNavigator extends JourneyNavigator {
 
     case TransferOutMemberListPage(srn) =>
       controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
-  
 
     case ReceivingSchemeNamePage(srn, index, transferIndex) =>
       controllers.routes.UnauthorisedController.onPageLoad()
