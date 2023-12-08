@@ -14,9 +14,16 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.memberpayments
+package pages.nonsipp.memberreceivedpcls
 
 import models.SchemeId.Srn
-import pages.Page
+import pages.QuestionPage
+import pages.nonsipp.memberpayments.MemberPaymentsPage
+import play.api.libs.json.JsPath
 
-case class WhatYouWillNeedPensionCommencementLumpSumPage(srn: Srn) extends Page
+case class PensionCommencementLumpSumPage(srn: Srn) extends QuestionPage[Boolean] {
+
+  override def path: JsPath = MemberPaymentsPage.path \ toString
+
+  override def toString: String = "lumpSumReceived"
+}

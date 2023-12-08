@@ -17,7 +17,7 @@
 package pages
 
 import pages.behaviours.PageBehaviours
-import pages.nonsipp.memberpayments.PensionCommencementLumpSumPage
+import pages.nonsipp.memberreceivedpcls.PensionCommencementLumpSumPage
 
 class PensionCommencementLumpSumPageSpec extends PageBehaviours {
 
