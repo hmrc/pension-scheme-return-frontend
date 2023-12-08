@@ -5,3 +5,10 @@ POST        /:srn/change-pension-commencement-lump-sum                          
 
 GET         /:srn/what-you-will-need-pcls                                               controllers.nonsipp.memberreceivedpcls.WhatYouWillNeedPensionCommencementLumpSumController.onPageLoad(srn: Srn)
 GET         /:srn/submit-what-you-will-need-pcls                                        controllers.nonsipp.memberreceivedpcls.WhatYouWillNeedPensionCommencementLumpSumController.onSubmit(srn: Srn)
+
+GET         /:srn/select-a-member-pcls                                                  controllers.nonsipp.memberreceivedpcls.PclsMemberListController.onPageLoad(srn: Srn, page: Int = 1, mode: Mode = NormalMode)
+GET         /:srn/select-a-member-pcls/:page                                            controllers.nonsipp.memberreceivedpcls.PclsMemberListController.onPageLoad(srn: Srn, page: Int, mode: Mode = NormalMode)
+POST        /:srn/select-a-member-pcls/:page                                            controllers.nonsipp.memberreceivedpcls.PclsMemberListController.onSubmit(srn: Srn, page: Int, mode: Mode = NormalMode)
+GET         /:srn/change-select-a-member-pcls                                           controllers.nonsipp.memberreceivedpcls.PclsMemberListController.onPageLoad(srn: Srn, page: Int = 1, mode: Mode = CheckMode)
+GET         /:srn/change-select-a-member-pcls/:page                                     controllers.nonsipp.memberreceivedpcls.PclsMemberListController.onPageLoad(srn: Srn, page: Int, mode: Mode = CheckMode)
+POST        /:srn/change-select-a-member-pcls/:page                                     controllers.nonsipp.memberreceivedpcls.PclsMemberListController.onSubmit(srn: Srn, page: Int, mode: Mode = CheckMode)

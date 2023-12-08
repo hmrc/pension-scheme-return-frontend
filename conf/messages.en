@@ -407,6 +407,16 @@ pensionCommencementLumpSum.title = Did any member receive a pension commencement
 pensionCommencementLumpSum.heading = Did any member receive a pension commencement lump sum (PCLS) during the period of this return?
 pensionCommencementLumpSum.error.required = Select yes if any member received a Pension Commencement Lump Sum during the period of this return
 
+pcls.memberlist.title = Select a member to report PCLS
+pcls.memberlist.heading = Select a member to report PCLS
+pcls.memberlist.paragraph = You must tell us about all PCLS received by members of the scheme during the period of this return.
+pcls.memberlist.radios = Have you finished reporting PCLS?
+pcls.memberlist.radios.error.required = Select yes if you have finished reporting PCLS
+pcls.memberlist.pagination.label = Showing {0} - {1} of {2} members
+pcls.memberlist.status.no.items = No PCLS
+pcls.memberlist.status.some.items = {0} PCLS reported
+pcls.memberlist.status.some.items = {0} PCLS reported
+
 feesCommissionsWagesSalaries.title = How much did the scheme pay in fees, commissions, wages and salaries during the period of this return, in pounds and pence?
 feesCommissionsWagesSalaries.heading = How much did {0} pay in fees, commissions, wages and salaries during the period of this return, in pounds and pence?
 feesCommissionsWagesSalaries.hint = If there were none, enter 0.

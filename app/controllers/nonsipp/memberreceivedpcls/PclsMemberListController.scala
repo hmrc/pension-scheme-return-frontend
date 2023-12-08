@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.receivetransfer
+package controllers.nonsipp.memberreceivedpcls
 
 import com.google.inject.Inject
 import config.Constants
@@ -28,18 +28,19 @@ import models.SchemeId.Srn
 import models._
 import navigation.Navigator
 import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
+import pages.nonsipp.memberreceivedpcls._
 import pages.nonsipp.receivetransfer._
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
+import viewmodels.DisplayMessage.{LinkMessage, Message}
 import viewmodels.implicits._
 import viewmodels.models.{ActionTableViewModel, FormPageViewModel, PaginatedViewModel, TableElem}
 import views.html.TwoColumnsTripleAction
 
 import javax.inject.Named
 
-class TransferReceivedMemberListController @Inject()(
+class PclsMemberListController @Inject()(
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -48,14 +49,14 @@ class TransferReceivedMemberListController @Inject()(
   formProvider: YesNoPageFormProvider
 ) extends PSRController {
 
-  val form = TransferReceivedMemberListController.form(formProvider)
+  private val form = PclsMemberListController.form(formProvider)
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       val memberList = request.userAnswers.membersDetails(srn)
 
       if (memberList.nonEmpty) {
-        val viewModel = TransferReceivedMemberListController
+        val viewModel = PclsMemberListController
           .viewModel(srn, page, mode, memberList, request.userAnswers)
         Ok(view(form, viewModel))
       } else {
@@ -68,11 +69,11 @@ class TransferReceivedMemberListController @Inject()(
 
     if (memberList.size > Constants.maxSchemeMembers) {
       Redirect(
-        navigator.nextPage(TransferReceivedMemberListPage(srn), mode, request.userAnswers)
+        navigator.nextPage(PclsMemberListPage(srn), mode, request.userAnswers)
       )
     } else {
       val viewModel =
-        TransferReceivedMemberListController.viewModel(srn, page, mode, memberList, request.userAnswers)
+        PclsMemberListController.viewModel(srn, page, mode, memberList, request.userAnswers)
 
       form
         .bindFromRequest()
@@ -81,17 +82,17 @@ class TransferReceivedMemberListController @Inject()(
           _ =>
             Redirect(
               navigator
-                .nextPage(TransferReceivedMemberListPage(srn), mode, request.userAnswers)
+                .nextPage(PclsMemberListPage(srn), mode, request.userAnswers)
             )
         )
     }
   }
 }
 
-object TransferReceivedMemberListController {
+object PclsMemberListController {
   def form(formProvider: YesNoPageFormProvider): Form[Boolean] =
     formProvider(
-      "transferIn.MemberList.radios.error.required"
+      "pcls.memberlist.radios.error.required"
     )
 
   private def rows(
@@ -105,14 +106,14 @@ object TransferReceivedMemberListController {
         refineV[OneTo300](index + 1) match {
           case Left(_) => Nil
           case Right(nextIndex) =>
-            val contributions = userAnswers.map(TransferringSchemeNamePages(srn, nextIndex))
+            val contributions = userAnswers.map(TransferringSchemeNamePages(srn, nextIndex)) //TODO change these when the PCLS   page is done
             if (contributions.isEmpty) {
               List(
                 TableElem(
                   memberName.fullName
                 ),
                 TableElem(
-                  Message("transferIn.MemberList.status.no.contributions")
+                  Message("pcls.memberlist.status.no.items")
                 ),
                 TableElem(
                   LinkMessage(
@@ -130,10 +131,11 @@ object TransferReceivedMemberListController {
                   memberName.fullName
                 ),
                 TableElem(
-                  if (contributions.size == 1)
-                    Message("transferIn.MemberList.singleStatus.some.contribution", contributions.size)
-                  else
-                    Message("transferIn.MemberList.status.some.contributions", contributions.size)
+                  if (contributions.size == 1) {
+                    Message("pcls.memberlist.status.some.item", contributions.size)
+                  } else {
+                    Message("pcls.memberList.status.some.items", contributions.size)
+                  }
                 ),
                 TableElem(
                   LinkMessage(
@@ -163,19 +165,14 @@ object TransferReceivedMemberListController {
     memberList: List[NameDOB],
     userAnswers: UserAnswers
   ): FormPageViewModel[ActionTableViewModel] = {
-    val title =
-      if (memberList.size == 1) "transferIn.MemberList.title"
-      else "transferIn.MemberList.title.plural"
-
-    val heading =
-      if (memberList.size == 1) "transferIn.MemberList.heading"
-      else "transferIn.MemberList.heading.plural"
+    val title = "pcls.memberlist.title"
+    val heading = "pcls.memberlist.heading"
 
     val pagination = Pagination(
       currentPage = page,
-      pageSize = Constants.transferInListSize,
+      pageSize = Constants.pclsInListSize,
       memberList.size,
-      controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
+      controllers.nonsipp.memberreceivedpcls.routes.PclsMemberListController
         .onPageLoad(srn, _, NormalMode)
     )
 
@@ -184,16 +181,16 @@ object TransferReceivedMemberListController {
       heading = Message(heading, memberList.size),
       description = None,
       page = ActionTableViewModel(
-        inset = "transferIn.MemberList.paragraph",
-        head = Some(List(TableElem("Member Name"), TableElem("Status"))),
+        inset = "pcls.memberlist.paragraph",
+        head = Some(List(TableElem("Member name"), TableElem("Status"))),
         rows = rows(srn, mode, memberList, userAnswers),
-        radioText = Message("transferIn.MemberList.radios"),
+        radioText = Message("pcls.memberlist.radios"),
         showRadios = memberList.length < maxNotRelevant,
         showInsetWithRadios = true,
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(
-              "transferIn.MemberList.pagination.label",
+              "pcls.memberlist.pagination.label",
               pagination.pageStart,
               pagination.pageEnd,
               pagination.totalSize
@@ -205,7 +202,7 @@ object TransferReceivedMemberListController {
       refresh = None,
       buttonText = "site.saveAndContinue",
       details = None,
-      onSubmit = controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
+      onSubmit = controllers.nonsipp.memberreceivedpcls.routes.PclsMemberListController
         .onSubmit(srn, page, mode)
     )
   }

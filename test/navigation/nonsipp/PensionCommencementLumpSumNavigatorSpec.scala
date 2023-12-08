@@ -16,10 +16,14 @@
 
 package navigation.nonsipp
 
-import controllers.routes
+import models.NormalMode
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.memberreceivedpcls.{PensionCommencementLumpSumPage, WhatYouWillNeedPensionCommencementLumpSumPage}
+import pages.nonsipp.memberreceivedpcls.{
+  PclsMemberListPage,
+  PensionCommencementLumpSumPage,
+  WhatYouWillNeedPensionCommencementLumpSumPage
+}
 import utils.BaseSpec
 
 class PensionCommencementLumpSumNavigatorSpec extends BaseSpec with NavigatorBehaviours {
@@ -56,9 +60,20 @@ class PensionCommencementLumpSumNavigatorSpec extends BaseSpec with NavigatorBeh
       normalmode
         .navigateTo(
           WhatYouWillNeedPensionCommencementLumpSumPage,
-          (_, _) => routes.UnauthorisedController.onPageLoad()
+          (srn, _) =>
+            controllers.nonsipp.memberreceivedpcls.routes.PclsMemberListController
+              .onPageLoad(srn, 1, NormalMode)
         )
-        .withName("go from what you will need pension commencement page to unauthorised page when continue is selected")
+        .withName("go from what you will need pension commencement page to member list page when continue is selected")
+    )
+
+    act.like(
+      normalmode
+        .navigateTo(
+          PclsMemberListPage,
+          (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
+        )
+        .withName("go from pcls member list page page to task list page")
     )
   }
 }
