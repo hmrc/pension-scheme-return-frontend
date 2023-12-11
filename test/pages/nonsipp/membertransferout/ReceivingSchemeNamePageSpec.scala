@@ -14,19 +14,24 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.membertransfersout
+package pages.nonsipp.membertransferout
 
+import config.Refined.{OneTo300, OneTo5}
+import eu.timepit.refined.refineMV
 import pages.behaviours.PageBehaviours
-import pages.nonsipp.membertransferout.SchemeTransferOutPage
+import pages.nonsipp.membertransferout.ReceivingSchemeNamePage
 
-class SchemeTransferoutPageSpec extends PageBehaviours {
+class ReceivingSchemeNamePageSpec extends PageBehaviours {
 
-  "SchemeTransferoutPage" - {
+  "ReceivingSchemeNamePage" - {
 
-    beRetrievable[Boolean](SchemeTransferOutPage(srnGen.sample.value))
+    val index = refineMV[OneTo300](1)
+    val transferIndex = refineMV[OneTo5](1)
 
-    beSettable[Boolean](SchemeTransferOutPage(srnGen.sample.value))
+    beRetrievable[String](ReceivingSchemeNamePage(srnGen.sample.value, index, transferIndex))
 
-    beRemovable[Boolean](SchemeTransferOutPage(srnGen.sample.value))
+    beSettable[String](ReceivingSchemeNamePage(srnGen.sample.value, index, transferIndex))
+
+    beRemovable[String](ReceivingSchemeNamePage(srnGen.sample.value, index, transferIndex))
   }
 }

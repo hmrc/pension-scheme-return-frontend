@@ -1900,3 +1900,15 @@ TransferOut.receivingSchemeName.error.invalid = Receiving scheme’s name must o
 TransferOut.receivingSchemeName.error.tooLong = Receiving scheme’s name must be 160 characters or fewer
 
 transferOut.pensionType.title = What type of scheme is the receiving scheme?
+
+transferOut.transferMade.title = When was this transfer for this member made?
+transferOut.transferMade.heading = When was the transfer to {0} for {1} made?
+transferOut.transferMade.error.required.day = Date the transfer was made must include day
+transferOut.transferMade.error.required.month = Date the transfer was made must include month
+transferOut.transferMade.error.required.year = Date the transfer was made must include year
+transferOut.transferMade.error.required.two = Date the transfer was made must include a {0} and {1}
+transferOut.transferMade.error.required.all = Enter the date the transfer was made
+transferOut.transferMade.error.date.before = Date the transfer was made must be after {0}
+transferOut.transferMade.error.date.after = Date the transfer was made must be before {0}
+transferOut.transferMade.error.invalid.date = Date the transfer was made must be a real date
+transferOut.transferMade.error.invalid.chars = Date the transfer was made must only include numbers 0 to 9
