@@ -407,6 +407,28 @@ pensionCommencementLumpSum.title = Did any member receive a pension commencement
 pensionCommencementLumpSum.heading = Did any member receive a pension commencement lump sum (PCLS) during the period of this return?
 pensionCommencementLumpSum.error.required = Select yes if any member received a Pension Commencement Lump Sum during the period of this return
 
+pcls.memberlist.title = Select a member to report PCLS
+pcls.memberlist.heading = Select a member to report PCLS
+pcls.memberlist.paragraph = You must tell us about all PCLS received by members of the scheme during the period of this return.
+pcls.memberlist.radios = Have you finished reporting PCLS?
+pcls.memberlist.radios.error.required = Select yes if you have finished reporting PCLS
+pcls.memberlist.pagination.label = Showing {0} - {1} of {2} members
+pcls.memberlist.status.no.items = No PCLS
+pcls.memberlist.status.some.item = PCLS reported
+
+pensionCommencementLumpSumAmount.title = Amount of PCLS and relevant pension for this member
+pensionCommencementLumpSumAmount.heading = Amount of PCLS and relevant pension for {0}
+pensionCommencementLumpSumAmount.received = Total amount of the PCLS received by {0}, in pounds and pence
+pensionCommencementLumpSumAmount.relevant = Relevant pension in respect of the PCLS for {0}, in pounds and pence
+pensionCommencementLumpSumAmount.details.title = Help with PCLS
+pensionCommencementLumpSumAmount.details = Where a PCLS is taken, it should be connected to an arising entitlement to a relevant pension benefit under the same scheme. The PCLS is usually 25% of the relevant pension benefit. You must provide both the amount of the PCLS and the relevant pension in relation to this PCLS.
+pensionCommencementLumpSumAmount.received.error.required = Enter the total amount of the PCLS, in pounds and pence
+pensionCommencementLumpSumAmount.received.error.nonNumeric = Total amount of PCLS must be an amount of money, like 123 or 123.45
+pensionCommencementLumpSumAmount.received.error.tooLarge = Total amount of PCLS must be 999999999.99 or less
+pensionCommencementLumpSumAmount.relevant.error.required = Enter the relevant pension in respect of the PCLS, in pounds and pence
+pensionCommencementLumpSumAmount.relevant.error.nonNumeric = Relevant pension in respect of the PCLS must be an amount of money, like 123 or 123.45
+pensionCommencementLumpSumAmount.relevant.error.tooLarge = Relevant pension in respect of the PCLS must be 999999999.99 or less
+
 feesCommissionsWagesSalaries.title = How much did the scheme pay in fees, commissions, wages and salaries during the period of this return, in pounds and pence?
 feesCommissionsWagesSalaries.heading = How much did {0} pay in fees, commissions, wages and salaries during the period of this return, in pounds and pence?
 feesCommissionsWagesSalaries.hint = If there were none, enter 0.
@@ -1858,6 +1880,18 @@ WhatYouWillNeed.TransferOut.tellUs4 = the receiving scheme’s Pension Scheme Ta
 WhatYouWillNeed.TransferOut.tellUs5 = the date the transfer was made
 WhatYouWillNeed.TransferOut.paragraph3 = On the next page, you will be able to select a member from a list of those whose details you have already provided. If you want to add a new member, you will need to provide their details using the ‘member details’ section of this pension scheme return.
 WhatYouWillNeed.TransferOut.paragraph4 = If the scheme made more than one transfer out for any member, you must tell us about all of them. Answer the questions for one transfer at a time.
+
+transferOut.memberList.title = Select a member to report transfers out
+transferOut.memberList.title.plural = Select a member to report transfers out
+transferOut.memberList.heading = Select a member to report transfers out
+transferOut.memberList.heading.plural = Select a member to report transfers out
+transferOut.memberList.paragraph = You must tell us about all transfers out for members of the scheme during the period of this return.
+transferOut.memberList.radios = Have you finished reporting transfers out?
+transferOut.memberList.radios.error.required = Select yes if you have finished reporting transfers out
+transferOut.memberList.pagination.label = Showing {0} - {1} of {2} members
+transferOut.memberList.status.no.contributions =  No transfers out
+transferOut.memberList.singleStatus.some.contribution = {0} transfer out
+transferOut.memberList.status.some.contributions = {0} transfers out
 
 TransferOut.receivingSchemeName.title = What is the receiving scheme’s name?
 TransferOut.receivingSchemeName.heading = What is the receiving scheme’s name?

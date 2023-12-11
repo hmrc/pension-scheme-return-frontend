@@ -41,6 +41,8 @@ object Constants {
   val landOrPropertiesSize = 25
   val landOrPropertyDisposalsSize = 25
   val transferInListSize = 25
+  val transferOutListSize = 25
+  val pclsInListSize = 25
   val employerContributionsMemberListSize = 25
   val employerContributionsCYASize = 5
 
@@ -48,6 +50,7 @@ object Constants {
   val maxCurrencyValue = 999999999.99
   val maxCashInBank = 999999999.99
   val maxAssetValue = 999999999.99
+  val maxPCLSAmount = 999999999.99
   val minAssetValue = -999999999.99
   val maxMoneyValue = 999999999.99
   val minMoneyValue = -999999999.99

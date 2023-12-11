@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages.nonsipp.memberreceivedpcls
 
-import play.api.libs.json.{__, JsPath}
+import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-package object membertransferout {
-  object Paths {
-    val membersPayments: JsPath = __ \ "membersPayments"
-    val memberDetails: JsPath = membersPayments \ "memberDetails"
-    val memberTransfersOut: JsPath = memberDetails \ "memberTransfersOut"
-  }
+case class PclsMemberListPage(srn: Srn) extends QuestionPage[Boolean] {
+
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "pclsListPage"
 }

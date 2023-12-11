@@ -14,25 +14,20 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.membertransferout
+package pages.nonsipp.memberreceivedpcls
 
-import config.Refined.{Max300, Max5}
+import config.Refined.Max300
 import models.SchemeId.Srn
+import models.{Mode, PensionCommencementLumpSum}
 import pages.QuestionPage
+import pages.nonsipp.memberpayments.MemberPaymentsPage
 import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
 
-case class ReceivingSchemeNamePage(srn: Srn, index: Max300, transferIndex: Max5) extends QuestionPage[String] {
+case class PensionCommencementLumpSumAmountPage(srn: Srn, index: Max300, mode: Mode)
+    extends QuestionPage[PensionCommencementLumpSum] {
 
-  override def path: JsPath =
-    Paths.memberTransfersOut \ toString \ index.arrayIndex.toString \ transferIndex.arrayIndex.toString
+  override def path: JsPath = MemberPaymentsPage.path \ "memberDetails" \ toString \ index.arrayIndex.toString
 
-  override def toString: String = "schemeName"
-}
-
-case class ReceivingSchemeNamePages(srn: Srn, index: Max300) extends QuestionPage[Map[String, String]] {
-  override def path: JsPath =
-    Paths.memberTransfersOut \ toString \ index.arrayIndex.toString
-
-  override def toString: String = "schemeName"
+  override def toString: String = "memberLumpSumReceived"
 }

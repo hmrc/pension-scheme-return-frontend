@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages.nonsipp.membertransferout
 
-import play.api.libs.json.{__, JsPath}
+import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-package object membertransferout {
-  object Paths {
-    val membersPayments: JsPath = __ \ "membersPayments"
-    val memberDetails: JsPath = membersPayments \ "memberDetails"
-    val memberTransfersOut: JsPath = memberDetails \ "memberTransfersOut"
-  }
+case class TransferOutMemberListPage(srn: Srn) extends QuestionPage[Boolean] {
+
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "transferOutListPage"
 }

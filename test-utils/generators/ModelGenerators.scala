@@ -219,6 +219,13 @@ trait ModelGenerators extends BasicGenerators {
     MoneyInPeriod(moneyAtStart, moneyAtEnd)
   }
 
+  implicit val pensionCommencementLumpSumGen: Gen[PensionCommencementLumpSum] = for {
+    received <- moneyGen
+    relevant <- moneyGen
+  } yield {
+    PensionCommencementLumpSum(received, relevant)
+  }
+
   val ninoPrefix: Gen[String] = {
 
     (for {
