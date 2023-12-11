@@ -50,6 +50,7 @@ object Constants {
   val maxCurrencyValue = 999999999.99
   val maxCashInBank = 999999999.99
   val maxAssetValue = 999999999.99
+  val maxPCLSAmount = 999999999.99
   val minAssetValue = -999999999.99
   val maxMoneyValue = 999999999.99
   val minMoneyValue = -999999999.99
