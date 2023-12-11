@@ -25,14 +25,14 @@ import utils.RefinedUtils.RefinedIntOps
 case class ReceivingSchemeNamePage(srn: Srn, index: Max300, transferIndex: Max5) extends QuestionPage[String] {
 
   override def path: JsPath =
-    Paths.properties \ toString \ index.arrayIndex.toString \ transferIndex.arrayIndex.toString
+    Paths.memberTransfersOut \ toString \ index.arrayIndex.toString \ transferIndex.arrayIndex.toString
 
   override def toString: String = "schemeName"
 }
 
 case class ReceivingSchemeNamePages(srn: Srn, index: Max300) extends QuestionPage[Map[String, String]] {
   override def path: JsPath =
-    Paths.properties \ toString \ index.arrayIndex.toString
+    Paths.memberTransfersOut \ toString \ index.arrayIndex.toString
 
   override def toString: String = "schemeName"
 }

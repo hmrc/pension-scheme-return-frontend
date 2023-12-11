@@ -20,7 +20,8 @@ import play.api.libs.json.{__, JsPath}
 
 package object membertransferout {
   object Paths {
-    val transferOutDetails: JsPath = __ \ "transferOutDetailType"
-    val properties: JsPath = transferOutDetails \ "properties"
+    val membersPayments: JsPath = __ \ "membersPayments"
+    val memberDetails: JsPath = membersPayments \ "memberDetails"
+    val memberTransfersOut: JsPath = memberDetails \ "memberTransfersOut"
   }
 }
