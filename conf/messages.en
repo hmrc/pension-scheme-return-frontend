@@ -416,6 +416,19 @@ pcls.memberlist.pagination.label = Showing {0} - {1} of {2} members
 pcls.memberlist.status.no.items = No PCLS
 pcls.memberlist.status.some.item = PCLS reported
 
+pensionCommencementLumpSumAmount.title = Amount of PCLS and relevant pension for this member
+pensionCommencementLumpSumAmount.heading = Amount of PCLS and relevant pension for {0}
+pensionCommencementLumpSumAmount.received = Total amount of the PCLS received by {0}, in pounds and pence
+pensionCommencementLumpSumAmount.relevant = Relevant pension in respect of the PCLS for {0}, in pounds and pence
+pensionCommencementLumpSumAmount.details.title = Help with PCLS
+pensionCommencementLumpSumAmount.details = Where a PCLS is taken, it should be connected to an arising entitlement to a relevant pension benefit under the same scheme. The PCLS is usually 25% of the relevant pension benefit. You must provide both the amount of the PCLS and the relevant pension in relation to this PCLS.
+pensionCommencementLumpSumAmount.received.error.required = Enter the total amount of the PCLS, in pounds and pence
+pensionCommencementLumpSumAmount.received.error.nonNumeric = Total amount of PCLS must be an amount of money, like 123 or 123.45
+pensionCommencementLumpSumAmount.received.error.tooLarge = Total amount of PCLS must be 999999999.99 or less
+pensionCommencementLumpSumAmount.relevant.error.required = Enter the relevant pension in respect of the PCLS, in pounds and pence
+pensionCommencementLumpSumAmount.relevant.error.nonNumeric = Relevant pension in respect of the PCLS must be an amount of money, like 123 or 123.45
+pensionCommencementLumpSumAmount.relevant.error.tooLarge = Relevant pension in respect of the PCLS must be 999999999.99 or less
+
 feesCommissionsWagesSalaries.title = How much did the scheme pay in fees, commissions, wages and salaries during the period of this return, in pounds and pence?
 feesCommissionsWagesSalaries.heading = How much did {0} pay in fees, commissions, wages and salaries during the period of this return, in pounds and pence?
 feesCommissionsWagesSalaries.hint = If there were none, enter 0.

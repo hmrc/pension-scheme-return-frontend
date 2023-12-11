@@ -21,6 +21,7 @@ import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.memberreceivedpcls.{
   PclsMemberListPage,
+  PensionCommencementLumpSumAmountPage,
   PensionCommencementLumpSumPage,
   WhatYouWillNeedPensionCommencementLumpSumPage
 }
@@ -37,6 +38,8 @@ object PensionCommencementLumpSumNavigator extends JourneyNavigator {
         controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
       }
 
+    case PensionCommencementLumpSumAmountPage(srn, _, _) =>
+      controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
     case WhatYouWillNeedPensionCommencementLumpSumPage(srn) =>
       controllers.nonsipp.memberreceivedpcls.routes.PclsMemberListController
         .onPageLoad(srn, 1, NormalMode)
