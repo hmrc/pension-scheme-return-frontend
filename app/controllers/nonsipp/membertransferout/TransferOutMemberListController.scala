@@ -172,9 +172,9 @@ object TransferOutMemberListController {
 
     val pagination = Pagination(
       currentPage = page,
-      pageSize = Constants.transferInListSize,
+      pageSize = Constants.transferOutListSize,
       memberList.size,
-      controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
+      controllers.nonsipp.membertransferout.routes.TransferOutMemberListController
         .onPageLoad(srn, _, NormalMode)
     )
 
