@@ -1,0 +1,4 @@
+GET         /:srn/pension-commencement-lump-sum-amount/:index           controllers.nonsipp.memberreceivedpcls.PensionCommencementLumpSumAmountController.onPageLoad(srn: Srn, index: Max300, mode: Mode = NormalMode)
+POST        /:srn/pension-commencement-lump-sum-amount/:index           controllers.nonsipp.memberreceivedpcls.PensionCommencementLumpSumAmountController.onSubmit(srn: Srn, index: Max300, mode: Mode = NormalMode)
+GET         /:srn/change-pension-commencement-lump-sum-amount/:index    controllers.nonsipp.memberreceivedpcls.PensionCommencementLumpSumAmountController.onPageLoad(srn: Srn, index: Max300, mode: Mode = CheckMode)
+POST        /:srn/change-pension-commencement-lump-sum-amount/:index    controllers.nonsipp.memberreceivedpcls.PensionCommencementLumpSumAmountController.onSubmit(srn: Srn, index: Max300, mode: Mode = CheckMode)

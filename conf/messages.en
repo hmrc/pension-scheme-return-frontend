@@ -407,7 +407,7 @@ pensionCommencementLumpSum.title = Did any member receive a pension commencement
 pensionCommencementLumpSum.heading = Did any member receive a pension commencement lump sum (PCLS) during the period of this return?
 pensionCommencementLumpSum.error.required = Select yes if any member received a Pension Commencement Lump Sum during the period of this return
 
-pensionCommencementLumpSumAmount.title = Amount of PCLS and relevant pension for this member - Managing Pension Schemes - GOV.UK
+pensionCommencementLumpSumAmount.title = Amount of PCLS and relevant pension for this member
 pensionCommencementLumpSumAmount.heading = Amount of PCLS and relevant pension for {0}
 pensionCommencementLumpSumAmount.received = Total amount of the PCLS received by {0}, in pounds and pence
 pensionCommencementLumpSumAmount.relevant = Relevant pension in respect of the PCLS for {0}, in pounds and pence

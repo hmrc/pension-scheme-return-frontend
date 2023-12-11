@@ -19,7 +19,8 @@ package navigation.nonsipp
 import models.UserAnswers
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.memberpayments.{PensionCommencementLumpSumAmountPage, PensionCommencementLumpSumPage}
+import pages.nonsipp.memberpayments.PensionCommencementLumpSumPage
+import pages.nonsipp.memberreceivedpcls.PensionCommencementLumpSumAmountPage
 import play.api.mvc.Call
 
 object PensionCommencementLumpSumNavigator extends JourneyNavigator {

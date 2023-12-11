@@ -23,7 +23,7 @@ import forms.MoneyFormProvider
 import models.{Money, NormalMode}
 import models.PensionCommencementLumpSum._
 import pages.nonsipp.memberdetails.MemberDetailsPage
-import pages.nonsipp.memberpayments.PensionCommencementLumpSumAmountPage
+import pages.nonsipp.memberreceivedpcls.PensionCommencementLumpSumAmountPage
 import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
 import utils.Transform.TransformOps
@@ -72,7 +72,9 @@ class PensionCommencementLumpSumAmountControllerSpec extends ControllerBaseSpec 
       saveAndContinue(
         onSubmit,
         userAnswers,
-        Some(JsPath \ "membersPayments" \ "lumpSumAmountReceived" \ index.arrayIndex.toString),
+        Some(
+          JsPath \ "membersPayments" \ "memberDetails" \ "memberLumpSumReceived" \ "lumpSumAmountReceived" \ index.arrayIndex.toString
+        ),
         formData(form, lumpSumData.from[(Money, Money)]): _*
       )
     )

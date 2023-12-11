@@ -7,6 +7,7 @@
 ->          /                                                                           employercontributions.Routes
 ->          /                                                                           membercontributions.Routes
 ->          /                                                                           receivetransfer.Routes
+->          /                                                                           pcls.Routes
 
 GET         /                                                                           controllers.IndexController.onPageLoad()
 
@@ -185,11 +186,6 @@ GET         /:srn/pension-commencement-lump-sum                                 
 POST        /:srn/pension-commencement-lump-sum                                         controllers.nonsipp.memberreceivedpcls.PensionCommencementLumpSumController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 GET         /:srn/change-pension-commencement-lump-sum                                  controllers.nonsipp.memberreceivedpcls.PensionCommencementLumpSumController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST        /:srn/change-pension-commencement-lump-sum                                  controllers.nonsipp.memberreceivedpcls.PensionCommencementLumpSumController.onSubmit(srn: Srn, mode: Mode = CheckMode)
-
-GET         /:srn/pension-commencement-lump-sum-amount/:index                           controllers.nonsipp.memberreceivedpcls.PensionCommencementLumpSumAmountController.onPageLoad(srn: Srn, index: Max300, mode: Mode = NormalMode)
-POST        /:srn/pension-commencement-lump-sum-amount/:index                           controllers.nonsipp.memberreceivedpcls.PensionCommencementLumpSumAmountController.onSubmit(srn: Srn, index: Max300, mode: Mode = NormalMode)
-GET         /:srn/change-pension-commencement-lump-sum-amount/:index                    controllers.nonsipp.memberreceivedpcls.PensionCommencementLumpSumAmountController.onPageLoad(srn: Srn, index: Max300, mode: Mode = CheckMode)
-POST        /:srn/change-pension-commencement-lump-sum-amount/:index                    controllers.nonsipp.memberreceivedpcls.PensionCommencementLumpSumAmountController.onSubmit(srn: Srn, index: Max300, mode: Mode = CheckMode)
 
 GET         /:srn/fees-commissions-wages-salaries                                       controllers.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST        /:srn/fees-commissions-wages-salaries                                       controllers.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesController.onSubmit(srn: Srn, mode: Mode = NormalMode)
@@ -479,3 +475,8 @@ POST        /:srn/change-remove-unallocated-employer-contributions              
 
 
 
+
+GET        /g8Scaffold threeQuestionsPage                        controllers.g8Scaffold threeQuestionsPageController.onPageLoad(mode: Mode = NormalMode)
+POST       /g8Scaffold threeQuestionsPage                        controllers.g8Scaffold threeQuestionsPageController.onSubmit(mode: Mode = NormalMode)
+GET        /changeg8Scaffold threeQuestionsPage                  controllers.g8Scaffold threeQuestionsPageController.onPageLoad(mode: Mode = CheckMode)
+POST       /changeg8Scaffold threeQuestionsPage                  controllers.g8Scaffold threeQuestionsPageController.onSubmit(mode: Mode = CheckMode)

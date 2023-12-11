@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.memberpayments
+package pages.nonsipp.memberreceivedpcls
 
 import config.Refined.Max300
-import models.{Mode, PensionCommencementLumpSum}
 import models.SchemeId.Srn
+import models.{Mode, PensionCommencementLumpSum}
 import pages.QuestionPage
-import utils.RefinedUtils.RefinedIntOps
+import pages.nonsipp.memberpayments.MemberPaymentsPage
 import play.api.libs.json.JsPath
+import utils.RefinedUtils.RefinedIntOps
 
 case class PensionCommencementLumpSumAmountPage(srn: Srn, index: Max300, mode: Mode)
     extends QuestionPage[PensionCommencementLumpSum] {
 
-  override def path: JsPath = MemberPaymentsPage.path \ toString \ index.arrayIndex.toString
+  override def path: JsPath = MemberPaymentsPage.path \ "memberDetails" \ toString \ index.arrayIndex.toString
 
-  override def toString: String = "lumpSumAmountReceived"
+  override def toString: String = "memberLumpSumReceived"
 }

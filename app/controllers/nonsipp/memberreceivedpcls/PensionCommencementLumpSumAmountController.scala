@@ -29,7 +29,7 @@ import models.SchemeId.Srn
 import models.{Mode, Money}
 import navigation.Navigator
 import pages.nonsipp.memberdetails.MemberDetailsPage
-import pages.nonsipp.memberpayments.PensionCommencementLumpSumAmountPage
+import pages.nonsipp.memberreceivedpcls.PensionCommencementLumpSumAmountPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
