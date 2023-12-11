@@ -106,8 +106,10 @@ object PclsMemberListController {
         refineV[OneTo300](index + 1) match {
           case Left(_) => Nil
           case Right(nextIndex) =>
-            val contributions = userAnswers.map(TransferringSchemeNamePages(srn, nextIndex)) //TODO change these when the PCLS   page is done
-            if (contributions.isEmpty) {
+            //TODO change this when the PCLS amount page is done
+//            val items = userAnswers.map(TransferringSchemeNamePages(srn, nextIndex))
+            val items = Map[String, String]().empty
+            if (items.isEmpty) {
               List(
                 TableElem(
                   memberName.fullName
@@ -118,9 +120,11 @@ object PclsMemberListController {
                 TableElem(
                   LinkMessage(
                     Message("site.add"),
-                    controllers.nonsipp.receivetransfer.routes.TransferringSchemeNameController
-                      .onSubmit(srn, nextIndex, refineMV(1), mode)
-                      .url
+//                    TODO change this when the PCLS amount page is done
+//                    controllers.nonsipp.receivetransfer.routes.TransferringSchemeNameController
+//                      .onSubmit(srn, nextIndex, refineMV(1), mode)
+//                      .url
+                    controllers.routes.UnauthorisedController.onPageLoad().url
                   )
                 ),
                 TableElem("")
@@ -131,26 +135,26 @@ object PclsMemberListController {
                   memberName.fullName
                 ),
                 TableElem(
-                  if (contributions.size == 1) {
-                    Message("pcls.memberlist.status.some.item", contributions.size)
-                  } else {
-                    Message("pcls.memberList.status.some.items", contributions.size)
-                  }
+                  Message("pcls.memberlist.status.some.item", items.size)
                 ),
                 TableElem(
                   LinkMessage(
                     Message("site.change"),
+//                    TODO change this when the PCLS amount page is done
                     controllers.nonsipp.receivetransfer.routes.TransfersInCYAController
                       .onSubmit(srn, nextIndex, CheckMode)
                       .url
+//                    controllers.routes.UnauthorisedController.onPageLoad().url
                   )
                 ),
                 TableElem(
                   LinkMessage(
                     Message("site.remove"),
-                    controllers.nonsipp.receivetransfer.routes.WhichTransferInRemoveController
-                      .onSubmit(srn, nextIndex)
-                      .url
+//                    TODO change this when the PCLS removal page is done
+//                    controllers.nonsipp.receivetransfer.routes.WhichTransferInRemoveController
+//                      .onSubmit(srn, nextIndex)
+//                      .url
+                    controllers.routes.UnauthorisedController.onPageLoad().url
                   )
                 )
               )
