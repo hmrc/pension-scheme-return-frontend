@@ -120,7 +120,7 @@ object TransferOutMemberListController {
                 TableElem(
                   LinkMessage(
                     Message("site.add"),
-                    controllers.nonsipp.receivetransfer.routes.TransferringSchemeNameController
+                    controllers.nonsipp.membertransferout.routes.ReceivingSchemeNameController
                       .onSubmit(srn, nextIndex, refineMV(1), mode)
                       .url
                   )
@@ -184,7 +184,7 @@ object TransferOutMemberListController {
       description = None,
       page = ActionTableViewModel(
         inset = "transferOut.memberList.paragraph",
-        head = Some(List(TableElem("Member Name"), TableElem("Status"))),
+        head = Some(List(TableElem("Member name"), TableElem("Status"))),
         rows = rows(srn, mode, memberList, userAnswers),
         radioText = Message("transferOut.memberList.radios"),
         showRadios = memberList.length < maxNotRelevant,

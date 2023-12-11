@@ -30,7 +30,6 @@ case class ReceivingSchemeNamePage(srn: Srn, index: Max300, transferIndex: Max5)
   override def toString: String = "schemeName"
 }
 
-
 case class ReceivingSchemeNamePages(srn: Srn, index: Max300) extends QuestionPage[Map[String, String]] {
   override def path: JsPath =
     Paths.properties \ toString \ index.arrayIndex.toString
