@@ -41,6 +41,7 @@ object Constants {
   val landOrPropertiesSize = 25
   val landOrPropertyDisposalsSize = 25
   val transferInListSize = 25
+  val pclsInListSize = 25
   val employerContributionsMemberListSize = 25
   val employerContributionsCYASize = 5
 

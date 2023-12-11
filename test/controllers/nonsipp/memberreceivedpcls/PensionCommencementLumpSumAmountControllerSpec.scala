@@ -73,7 +73,7 @@ class PensionCommencementLumpSumAmountControllerSpec extends ControllerBaseSpec 
         onSubmit,
         userAnswers,
         Some(
-          JsPath \ "membersPayments" \ "memberDetails" \ "memberLumpSumReceived" \ "lumpSumAmountReceived" \ index.arrayIndex.toString
+          JsPath \ "membersPayments" \ "memberDetails" \ "memberLumpSumReceived" \ index.arrayIndex.toString
         ),
         formData(form, lumpSumData.from[(Money, Money)]): _*
       )

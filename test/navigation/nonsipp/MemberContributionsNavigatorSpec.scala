@@ -21,8 +21,11 @@ import eu.timepit.refined.refineMV
 import models.{CheckOrChange, NormalMode}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.membercontributions.{TotalMemberContributionPage, WhatYouWillNeedMemberContributionsPage}
-import pages.nonsipp.memberpayments.MemberContributionsPage
+import pages.nonsipp.membercontributions.{
+  MemberContributionsPage,
+  TotalMemberContributionPage,
+  WhatYouWillNeedMemberContributionsPage
+}
 import utils.BaseSpec
 
 class MemberContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviours {

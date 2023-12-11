@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-package pages
+package pages.nonsipp.membertransferout
 
-import pages.behaviours.PageBehaviours
-import pages.nonsipp.memberreceivedpcls.PensionCommencementLumpSumPage
+import config.Refined.{Max300, Max5}
+import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
+import utils.RefinedUtils.RefinedIntOps
 
-class PensionCommencementLumpSumPageSpec extends PageBehaviours {
+case class ReceivingSchemeNamePage(srn: Srn, index: Max300, transferIndex: Max5) extends QuestionPage[String] {
 
-  "PensionCommencementLumpSumPage" - {
+  override def path: JsPath =
+    Paths.properties \ toString \ index.arrayIndex.toString \ transferIndex.arrayIndex.toString
 
-    beRetrievable[Boolean](PensionCommencementLumpSumPage(srnGen.sample.value))
-
-    beSettable[Boolean](PensionCommencementLumpSumPage(srnGen.sample.value))
-
-    beRemovable[Boolean](PensionCommencementLumpSumPage(srnGen.sample.value))
-  }
+  override def toString: String = "schemeName"
 }

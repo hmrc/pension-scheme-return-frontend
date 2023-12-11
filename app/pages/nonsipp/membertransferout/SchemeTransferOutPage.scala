@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.memberpayments
+package pages.nonsipp.membertransferout
 
 import models.SchemeId.Srn
 import pages.QuestionPage
+import pages.nonsipp.memberpayments.MemberPaymentsPage
 import play.api.libs.json.JsPath
 
-case class MemberContributionsPage(srn: Srn) extends QuestionPage[Boolean] {
+case class SchemeTransferOutPage(srn: Srn) extends QuestionPage[Boolean] {
 
   override def path: JsPath = MemberPaymentsPage.path \ toString
 
-  override def toString: String = "memberContributionMade"
+  override def toString: String = "schemeMadeTransferOut"
 }

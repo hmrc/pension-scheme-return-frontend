@@ -14,19 +14,15 @@
  * limitations under the License.
  */
 
-package pages
+package pages.nonsipp.memberreceivedpcls
 
-import pages.behaviours.PageBehaviours
-import pages.nonsipp.memberreceivedpcls.PensionCommencementLumpSumPage
+import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-class PensionCommencementLumpSumPageSpec extends PageBehaviours {
+case class PclsMemberListPage(srn: Srn) extends QuestionPage[Boolean] {
 
-  "PensionCommencementLumpSumPage" - {
+  override def path: JsPath = JsPath \ toString
 
-    beRetrievable[Boolean](PensionCommencementLumpSumPage(srnGen.sample.value))
-
-    beSettable[Boolean](PensionCommencementLumpSumPage(srnGen.sample.value))
-
-    beRemovable[Boolean](PensionCommencementLumpSumPage(srnGen.sample.value))
-  }
+  override def toString: String = "pclsListPage"
 }

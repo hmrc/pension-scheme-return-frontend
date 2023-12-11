@@ -14,19 +14,9 @@
  * limitations under the License.
  */
 
-package pages
+package pages.nonsipp.memberreceivedpcls
 
-import pages.behaviours.PageBehaviours
-import pages.nonsipp.memberpayments.SchemeTransferOutPage
+import models.SchemeId.Srn
+import pages.Page
 
-class SchemeTransferoutPageSpec extends PageBehaviours {
-
-  "SchemeTransferoutPage" - {
-
-    beRetrievable[Boolean](SchemeTransferOutPage(srnGen.sample.value))
-
-    beSettable[Boolean](SchemeTransferOutPage(srnGen.sample.value))
-
-    beRemovable[Boolean](SchemeTransferOutPage(srnGen.sample.value))
-  }
-}
+case class WhatYouWillNeedPensionCommencementLumpSumPage(srn: Srn) extends Page

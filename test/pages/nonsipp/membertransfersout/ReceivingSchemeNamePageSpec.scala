@@ -14,19 +14,24 @@
  * limitations under the License.
  */
 
-package pages
+package pages.nonsipp.membertransfersout
 
+import config.Refined.{OneTo300, OneTo5}
+import eu.timepit.refined.refineMV
 import pages.behaviours.PageBehaviours
-import pages.nonsipp.memberreceivedpcls.PensionCommencementLumpSumPage
+import pages.nonsipp.membertransferout.ReceivingSchemeNamePage
 
-class PensionCommencementLumpSumPageSpec extends PageBehaviours {
+class ReceivingSchemeNamePageSpec extends PageBehaviours {
 
-  "PensionCommencementLumpSumPage" - {
+  "ReceivingSchemeNamePage" - {
 
-    beRetrievable[Boolean](PensionCommencementLumpSumPage(srnGen.sample.value))
+    val index = refineMV[OneTo300](1)
+    val transferIndex = refineMV[OneTo5](1)
 
-    beSettable[Boolean](PensionCommencementLumpSumPage(srnGen.sample.value))
+    beRetrievable[String](ReceivingSchemeNamePage(srnGen.sample.value, index, transferIndex))
 
-    beRemovable[Boolean](PensionCommencementLumpSumPage(srnGen.sample.value))
+    beSettable[String](ReceivingSchemeNamePage(srnGen.sample.value, index, transferIndex))
+
+    beRemovable[String](ReceivingSchemeNamePage(srnGen.sample.value, index, transferIndex))
   }
 }

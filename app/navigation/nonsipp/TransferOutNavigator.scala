@@ -19,7 +19,7 @@ package navigation.nonsipp
 import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.memberpayments.SchemeTransferOutPage
+import pages.nonsipp.membertransferout._
 import play.api.mvc.Call
 
 object TransferOutNavigator extends JourneyNavigator {
@@ -28,10 +28,16 @@ object TransferOutNavigator extends JourneyNavigator {
 
     case page @ SchemeTransferOutPage(srn) =>
       if (userAnswers.get(page).contains(true)) {
-        controllers.routes.UnauthorisedController.onPageLoad()
+        controllers.nonsipp.membertransferout.routes.WhatYouWillNeedTransferOutController.onPageLoad(srn)
       } else {
         controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
       }
+
+    case WhatYouWillNeedTransferOutPage(srn) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
+
+    case ReceivingSchemeNamePage(srn, index, transferIndex) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
   }
 
   override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] =

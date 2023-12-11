@@ -16,11 +16,15 @@
 
 package navigation.nonsipp
 
-import models.UserAnswers
+import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.memberpayments.PensionCommencementLumpSumPage
-import pages.nonsipp.memberreceivedpcls.PensionCommencementLumpSumAmountPage
+import pages.nonsipp.memberreceivedpcls.{
+  PclsMemberListPage,
+  PensionCommencementLumpSumAmountPage,
+  PensionCommencementLumpSumPage,
+  WhatYouWillNeedPensionCommencementLumpSumPage
+}
 import play.api.mvc.Call
 
 object PensionCommencementLumpSumNavigator extends JourneyNavigator {
@@ -28,12 +32,19 @@ object PensionCommencementLumpSumNavigator extends JourneyNavigator {
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
     case page @ PensionCommencementLumpSumPage(srn) =>
       if (userAnswers.get(page).contains(true)) {
-        controllers.routes.UnauthorisedController.onPageLoad()
+        controllers.nonsipp.memberreceivedpcls.routes.WhatYouWillNeedPensionCommencementLumpSumController
+          .onPageLoad(srn)
       } else {
         controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
       }
 
     case PensionCommencementLumpSumAmountPage(srn, _, _) =>
+      controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
+    case WhatYouWillNeedPensionCommencementLumpSumPage(srn) =>
+      controllers.nonsipp.memberreceivedpcls.routes.PclsMemberListController
+        .onPageLoad(srn, 1, NormalMode)
+
+    case PclsMemberListPage(srn) =>
       controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
   }
 

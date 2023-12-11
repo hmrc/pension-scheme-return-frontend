@@ -19,7 +19,7 @@ package models
 import play.api.libs.json.{Format, Json}
 import utils.Transform
 
-case class PensionCommencementLumpSum(receivedAmount: Money, relevantAmount: Money)
+case class PensionCommencementLumpSum(lumpSumAmount: Money, designatedPensionAmount: Money)
 
 object PensionCommencementLumpSum {
   implicit val formats: Format[PensionCommencementLumpSum] = Json.format[PensionCommencementLumpSum]
@@ -29,6 +29,6 @@ object PensionCommencementLumpSum {
 
       override def to(a: (Money, Money)): PensionCommencementLumpSum = PensionCommencementLumpSum(a._1, a._2)
 
-      override def from(b: PensionCommencementLumpSum): (Money, Money) = (b.receivedAmount, b.relevantAmount)
+      override def from(b: PensionCommencementLumpSum): (Money, Money) = (b.lumpSumAmount, b.designatedPensionAmount)
     }
 }

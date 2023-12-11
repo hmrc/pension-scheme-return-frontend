@@ -407,6 +407,15 @@ pensionCommencementLumpSum.title = Did any member receive a pension commencement
 pensionCommencementLumpSum.heading = Did any member receive a pension commencement lump sum (PCLS) during the period of this return?
 pensionCommencementLumpSum.error.required = Select yes if any member received a Pension Commencement Lump Sum during the period of this return
 
+pcls.memberlist.title = Select a member to report PCLS
+pcls.memberlist.heading = Select a member to report PCLS
+pcls.memberlist.paragraph = You must tell us about all PCLS received by members of the scheme during the period of this return.
+pcls.memberlist.radios = Have you finished reporting PCLS?
+pcls.memberlist.radios.error.required = Select yes if you have finished reporting PCLS
+pcls.memberlist.pagination.label = Showing {0} - {1} of {2} members
+pcls.memberlist.status.no.items = No PCLS
+pcls.memberlist.status.some.item = PCLS reported
+
 pensionCommencementLumpSumAmount.title = Amount of PCLS and relevant pension for this member
 pensionCommencementLumpSumAmount.heading = Amount of PCLS and relevant pension for {0}
 pensionCommencementLumpSumAmount.received = Total amount of the PCLS received by {0}, in pounds and pence
@@ -1688,6 +1697,14 @@ WhatYouWillNeed.ReceivedTransfer.tellUs7 = if the transfer included an asset
 WhatYouWillNeed.ReceivedTransfer.paragraph3 = On the next page, you will be able to select a member from a list of those whose details you have already provided. If you want to add a new member, you will need to provide their details using the ‘member details’ section of this pension scheme return.
 WhatYouWillNeed.ReceivedTransfer.paragraph4 = If the scheme received more than one transfer for any member, you must tell us about all of them. Answer the questions for one transfer at a time.
 
+WhatYouWillNeed.PensionCommencementLumpSum.title = Pension commencement lump sum details for members of the scheme
+WhatYouWillNeed.PensionCommencementLumpSum.heading = Pension commencement lump sum details for members of {0}
+WhatYouWillNeed.PensionCommencementLumpSum.paragraph1 = You must tell us about all pension commencement lump sums (PCLS) received by members of the scheme during the period of this return.
+WhatYouWillNeed.PensionCommencementLumpSum.paragraph2 = For each member who received a PCLS, you need to tell us:
+WhatYouWillNeed.PensionCommencementLumpSum.totalAmount = the total amount of the PCLS
+WhatYouWillNeed.PensionCommencementLumpSum.relevantPension = the relevant pension in respect of this PCLS
+WhatYouWillNeed.PensionCommencementLumpSum.paragraph3 = On the next page, you will be able to select a member from a list of those whose details you have already provided. If you want to add a new member, you will need to provide their details using the ‘member details’ section of this pension scheme return.
+
 transferIn.MemberList.title = Select a member to report transfers in
 transferIn.MemberList.title.plural = Select a member to report transfers in
 transferIn.MemberList.heading = Select a member to report transfers in
@@ -1736,6 +1753,10 @@ MemberContributionCYA.section.memberName.header = Member’s name
 MemberContributionCYA.section.memberName = Total member contribution for {0}
 MemberContributionCYA.section.amount = £ {0}
 MemberContributionCYA.section.hide = total member contribution for {0}
+
+removeMemberContributions.title = Are you sure you want to remove the contribution for this member?
+removeMemberContributions.heading = Are you sure you want to remove the contribution of £{0} for {1}?
+removeMemberContributions.error.required = Select yes if you are sure you want to remove the contribution for this member
 
 employerContributionsCYA.section.heading = Employer {0}
 employerContributionsCYA.row.memberName = Member’s name
@@ -1824,6 +1845,7 @@ removeTransferIn.error.required = Select yes if you are sure you want to remove 
 
 transfersInCYAController.heading.check = Change details of transfers in for {0}
 transfersInCYAController.section.heading = Transfer {0}
+transfersInCYAController.inset = You cannot add any more transfers in for this member as you have entered the maximum of 5. If you need to remove one, you can do this on the next page.
 transfersInCYAController.rows.membersName = Member’s name
 transfersInCYAController.rows.transferringScheme = Transferring scheme’s name
 transfersInCYAController.rows.transferringScheme.hidden = the transferring scheme’s name
@@ -1846,3 +1868,21 @@ transfersInCYAController.rows.transferIncludeAsset = Did the transfer from {0} f
 transfersInCYAController.rows.transferIncludeAsset.hidden = if the transfer from {0} for {1} included an asse
 transfersInCYAController.rows.reportAnotherTransfer = Do you need to report another transfer in for {0}?
 transfersInCYAController.rows.reportAnotherTransfer.hidden =  if you need to report another transfer in for {0}
+
+WhatYouWillNeed.TransferOut.title   = Transfers out for members of the scheme
+WhatYouWillNeed.TransferOut.heading = Transfers out for members of {0}
+WhatYouWillNeed.TransferOut.paragraph1 = You must tell us about all transfers out for members of the scheme during the period of this return.
+WhatYouWillNeed.TransferOut.paragraph2 = For each transfer out, you need to tell us:
+WhatYouWillNeed.TransferOut.tellUs1 = which member the transfer was made for
+WhatYouWillNeed.TransferOut.tellUs2 = the name of the receiving scheme
+WhatYouWillNeed.TransferOut.tellUs3 = if the receiving scheme is a registered pension scheme, qualifying recognised overseas pension scheme (QROPS) or other
+WhatYouWillNeed.TransferOut.tellUs4 = the receiving scheme’s Pension Scheme Tax Reference (PSTR), QROPS reference number, or a description of the receiving scheme – whichever applies
+WhatYouWillNeed.TransferOut.tellUs5 = the date the transfer was made
+WhatYouWillNeed.TransferOut.paragraph3 = On the next page, you will be able to select a member from a list of those whose details you have already provided. If you want to add a new member, you will need to provide their details using the ‘member details’ section of this pension scheme return.
+WhatYouWillNeed.TransferOut.paragraph4 = If the scheme made more than one transfer out for any member, you must tell us about all of them. Answer the questions for one transfer at a time.
+
+TransferOut.receivingSchemeName.title = What is the receiving scheme’s name?
+TransferOut.receivingSchemeName.heading = What is the receiving scheme’s name?
+TransferOut.receivingSchemeName.error.required = Enter the receiving scheme’s name
+TransferOut.receivingSchemeName.error.invalid = Receiving scheme’s name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+TransferOut.receivingSchemeName.error.tooLong = Receiving scheme’s name must be 160 characters or fewer

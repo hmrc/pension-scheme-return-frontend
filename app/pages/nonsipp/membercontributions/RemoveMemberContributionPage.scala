@@ -14,19 +14,13 @@
  * limitations under the License.
  */
 
-package pages
+package pages.nonsipp.membercontributions
 
-import pages.behaviours.PageBehaviours
-import pages.nonsipp.memberreceivedpcls.PensionCommencementLumpSumPage
+import config.Refined.{Max300, Max50}
+import models.SchemeId.Srn
+import pages.Page
 
-class PensionCommencementLumpSumPageSpec extends PageBehaviours {
+case class RemoveMemberContributionPage(srn: Srn, index: Max300, secondaryIndex: Max50) extends Page {
 
-  "PensionCommencementLumpSumPage" - {
-
-    beRetrievable[Boolean](PensionCommencementLumpSumPage(srnGen.sample.value))
-
-    beSettable[Boolean](PensionCommencementLumpSumPage(srnGen.sample.value))
-
-    beRemovable[Boolean](PensionCommencementLumpSumPage(srnGen.sample.value))
-  }
+  override def toString: String = "removeEmployerContributionsPage"
 }

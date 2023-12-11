@@ -17,7 +17,8 @@
 package navigation.nonsipp
 
 import cats.implicits.toTraverseOps
-import config.Refined.Max5
+import config.Refined.{Max300, Max5}
+import models.SchemeId.Srn
 import models.{CheckMode, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
@@ -62,8 +63,14 @@ object ReceiveTransferNavigator extends JourneyNavigator {
         .onPageLoad(srn, index, secondaryIndex, NormalMode)
 
     case DidTransferIncludeAssetPage(srn, index, secondaryIndex) =>
-      controllers.nonsipp.receivetransfer.routes.ReportAnotherTransferInController
-        .onPageLoad(srn, index, secondaryIndex, NormalMode)
+      (
+        for {
+          map <- userAnswers.get(TotalValueTransferPages(srn, index)).getOrRecoverJourney
+          indexes <- map.keys.toList.traverse(_.toIntOption).getOrRecoverJourney
+          _ <- navToCYAOnMaxTransfersIn(srn, index, indexes)
+        } yield controllers.nonsipp.receivetransfer.routes.ReportAnotherTransferInController
+          .onPageLoad(srn, index, secondaryIndex, NormalMode)
+      ).merge
 
     case TransferReceivedMemberListPage(srn) =>
       controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
@@ -123,8 +130,14 @@ object ReceiveTransferNavigator extends JourneyNavigator {
             .onPageLoad(srn, index, NormalMode)
 
         case DidTransferIncludeAssetPage(srn, index, secondaryIndex) =>
-          controllers.nonsipp.receivetransfer.routes.ReportAnotherTransferInController
-            .onPageLoad(srn, index, secondaryIndex, CheckMode)
+          (
+            for {
+              map <- userAnswers.get(TotalValueTransferPages(srn, index)).getOrRecoverJourney
+              indexes <- map.keys.toList.traverse(_.toIntOption).getOrRecoverJourney
+              _ <- navToCYAOnMaxTransfersIn(srn, index, indexes)
+            } yield controllers.nonsipp.receivetransfer.routes.ReportAnotherTransferInController
+              .onPageLoad(srn, index, secondaryIndex, CheckMode)
+          ).merge
 
         case page @ ReportAnotherTransferInPage(srn, index, _) =>
           if (userAnswers.get(page).contains(true)) {
@@ -145,4 +158,14 @@ object ReceiveTransferNavigator extends JourneyNavigator {
           controllers.nonsipp.receivetransfer.routes.TransferReceivedMemberListController
             .onPageLoad(srn, 1, NormalMode)
       }
+
+  private def navToCYAOnMaxTransfersIn(srn: Srn, index: Max300, indexes: List[Int]): Either[Call, Unit] =
+    if (indexes.size == 5) {
+      Left(
+        controllers.nonsipp.receivetransfer.routes.TransfersInCYAController
+          .onPageLoad(srn, index, NormalMode)
+      )
+    } else {
+      Right(())
+    }
 }

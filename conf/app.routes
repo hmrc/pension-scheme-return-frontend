@@ -7,6 +7,7 @@
 ->          /                                                                           employercontributions.Routes
 ->          /                                                                           membercontributions.Routes
 ->          /                                                                           receivetransfer.Routes
+->          /                                                                           memberpayments_transferout.Routes
 ->          /                                                                           pcls.Routes
 
 GET         /                                                                           controllers.IndexController.onPageLoad()
@@ -155,17 +156,6 @@ POST        /:srn/did-scheme-have-bank-account                                  
 GET         /:srn/change-did-scheme-have-bank-account                                   controllers.nonsipp.schemedesignatory.ActiveBankAccountController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST        /:srn/change-did-scheme-have-bank-account                                   controllers.nonsipp.schemedesignatory.ActiveBankAccountController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
-GET         /:srn/member-contributions                                                  controllers.nonsipp.memberpayments.MemberContributionsController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST        /:srn/member-contributions                                                  controllers.nonsipp.memberpayments.MemberContributionsController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-GET         /:srn/change-member-contributions                                           controllers.nonsipp.memberpayments.MemberContributionsController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST        /:srn/change-member-contributions                                           controllers.nonsipp.memberpayments.MemberContributionsController.onSubmit(srn: Srn, mode: Mode = CheckMode)
-
-
-GET         /:srn/transfer-out                                                          controllers.nonsipp.membertransferout.SchemeTransferOutController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST        /:srn/transfer-out                                                          controllers.nonsipp.membertransferout.SchemeTransferOutController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-GET         /:srn/change-transfer-out                                                   controllers.nonsipp.membertransferout.SchemeTransferOutController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST        /:srn/change-transfer-out                                                   controllers.nonsipp.membertransferout.SchemeTransferOutController.onSubmit(srn: Srn, mode: Mode = CheckMode)
-
 GET         /:srn/reason-for-no-bank-account                                            controllers.nonsipp.schemedesignatory.WhyNoBankAccountController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST        /:srn/reason-for-no-bank-account                                            controllers.nonsipp.schemedesignatory.WhyNoBankAccountController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 GET         /:srn/change-reason-for-no-bank-account                                     controllers.nonsipp.schemedesignatory.WhyNoBankAccountController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
@@ -181,11 +171,6 @@ GET         /:srn/shares-in-sponsoring-employer                                 
 POST        /:srn/shares-in-sponsoring-employer                                         controllers.nonsipp.sharesinsponsoringemployer.DidSchemeHoldSharesInSponsoringEmployerController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 GET         /:srn/change-shares-in-sponsoring-employer                                  controllers.nonsipp.sharesinsponsoringemployer.DidSchemeHoldSharesInSponsoringEmployerController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST        /:srn/change-shares-in-sponsoring-employer                                  controllers.nonsipp.sharesinsponsoringemployer.DidSchemeHoldSharesInSponsoringEmployerController.onSubmit(srn: Srn, mode: Mode = CheckMode)
-
-GET         /:srn/pension-commencement-lump-sum                                         controllers.nonsipp.memberreceivedpcls.PensionCommencementLumpSumController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST        /:srn/pension-commencement-lump-sum                                         controllers.nonsipp.memberreceivedpcls.PensionCommencementLumpSumController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-GET         /:srn/change-pension-commencement-lump-sum                                  controllers.nonsipp.memberreceivedpcls.PensionCommencementLumpSumController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST        /:srn/change-pension-commencement-lump-sum                                  controllers.nonsipp.memberreceivedpcls.PensionCommencementLumpSumController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
 GET         /:srn/fees-commissions-wages-salaries                                       controllers.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST        /:srn/fees-commissions-wages-salaries                                       controllers.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesController.onSubmit(srn: Srn, mode: Mode = NormalMode)
@@ -474,9 +459,3 @@ POST        /:srn/change-remove-unallocated-employer-contributions              
 
 
 
-
-
-GET        /g8Scaffold threeQuestionsPage                        controllers.g8Scaffold threeQuestionsPageController.onPageLoad(mode: Mode = NormalMode)
-POST       /g8Scaffold threeQuestionsPage                        controllers.g8Scaffold threeQuestionsPageController.onSubmit(mode: Mode = NormalMode)
-GET        /changeg8Scaffold threeQuestionsPage                  controllers.g8Scaffold threeQuestionsPageController.onPageLoad(mode: Mode = CheckMode)
-POST       /changeg8Scaffold threeQuestionsPage                  controllers.g8Scaffold threeQuestionsPageController.onSubmit(mode: Mode = CheckMode)

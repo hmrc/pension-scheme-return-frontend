@@ -42,26 +42,19 @@
             viewmodel.page.rows.paginate(paginatedViewModel.pagination.currentPage, paginatedViewModel.pagination.pageSize))
         ){ rows =>
             @govukTable(TableViewModel(
-                                if(rows.size > 3){
-                                    viewmodel.page.head.fold(List.empty[HeadCell])(
-                                        heads =>
-                                        heads.map( aHead =>
+
+                                viewmodel.page.head.fold(List.empty[HeadCell])(
+                                    heads =>
+                                    heads.map( aHead =>
                                         HeadCell(HtmlContent(renderMessage(aHead.text)))
                                     )
                                 ) ++  List(HeadCell(HtmlContent("""<span class="govuk-visually-hidden">Actions</span>""")), HeadCell(HtmlContent("""<span class="govuk-visually-hidden">Actions</span>""")))
-                                } else {
-                                    viewmodel.page.head.fold(List.empty[HeadCell])(
-                                        heads =>
-                                        heads.map( aHead =>
-                                        HeadCell(HtmlContent(renderMessage(aHead.text)))
-                                        )
-                                    ) ++ List(HeadCell(HtmlContent("""<span class="govuk-visually-hidden">Actions</span>""")))
-                                }
-                                 ,
+                               ,
+
                                 rows.map(
                                     otherRows =>
                                     otherRows.map( aRow =>
-                                    TableRow(HtmlContent(renderMessage(aRow.text)))
+                                        TableRow(HtmlContent(renderMessage(aRow.text)))
                                     )
                                 ),
                  )

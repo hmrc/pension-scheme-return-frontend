@@ -129,7 +129,10 @@ object TransfersInCYAController {
       title = "checkYourAnswers.title",
       heading = heading,
       description = Some(ParagraphMessage("transfersInCYA.paragraph")),
-      page = CheckYourAnswersViewModel(rows(srn, memberName, index, journeys)),
+      page = CheckYourAnswersViewModel(
+        sections = rows(srn, memberName, index, journeys),
+        inset = Option.when(journeys.size == 5)("transfersInCYAController.inset")
+      ),
       refresh = None,
       buttonText = "site.continue",
       onSubmit = routes.TransfersInCYAController.onSubmit(srn, index, mode)
@@ -231,7 +234,7 @@ object TransfersInCYAController {
                 Message("transfersInCYAController.rows.transferIncludeAsset.hidden", journey.schemeName, memberName)
               )
             )
-          ) :?+ Option.when(rowIndex + 1 == journeys.length)(
+          ) :?+ Option.when(rowIndex + 1 == journeys.length && rowIndex + 1 < 5)(
             CheckYourAnswersRowViewModel(
               Message("transfersInCYAController.rows.reportAnotherTransfer", memberName),
               "site.no"

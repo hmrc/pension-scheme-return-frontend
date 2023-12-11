@@ -14,19 +14,13 @@
  * limitations under the License.
  */
 
-package pages
+package pages.nonsipp
 
-import pages.behaviours.PageBehaviours
-import pages.nonsipp.memberreceivedpcls.PensionCommencementLumpSumPage
+import play.api.libs.json.{__, JsPath}
 
-class PensionCommencementLumpSumPageSpec extends PageBehaviours {
-
-  "PensionCommencementLumpSumPage" - {
-
-    beRetrievable[Boolean](PensionCommencementLumpSumPage(srnGen.sample.value))
-
-    beSettable[Boolean](PensionCommencementLumpSumPage(srnGen.sample.value))
-
-    beRemovable[Boolean](PensionCommencementLumpSumPage(srnGen.sample.value))
+package object membertransferout {
+  object Paths {
+    val transferOutDetails: JsPath = __ \ "transferOutDetailType"
+    val properties: JsPath = transferOutDetails \ "properties"
   }
 }
