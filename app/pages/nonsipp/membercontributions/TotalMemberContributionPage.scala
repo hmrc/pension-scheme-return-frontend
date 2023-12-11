@@ -17,15 +17,11 @@
 package pages.nonsipp.membercontributions
 
 import config.Refined.{Max300, Max50}
-import utils.RefinedUtils._
-import play.api.libs.json.JsPath
+import models.Money
 import models.SchemeId.Srn
 import pages.QuestionPage
-import models.{Money, UserAnswers}
-import queries.Removable
-import utils.PageUtils.removePages
-
-import scala.util.Try
+import play.api.libs.json.JsPath
+import utils.RefinedUtils._
 
 case class TotalMemberContributionPage(srn: Srn, index: Max300, secondaryIndex: Max50) extends QuestionPage[Money] {
 

@@ -104,7 +104,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
           Some(
             PsrSubmission(
               minimalRequiredSubmission,
-              false,
+              checkReturnDates = false,
               None,
               None,
               membersPayments = None
@@ -133,7 +133,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
           Some(
             PsrSubmission(
               minimalRequiredSubmission,
-              false,
+              checkReturnDates = false,
               Some(loans),
               None,
               membersPayments = None
@@ -164,7 +164,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
           Some(
             PsrSubmission(
               minimalRequiredSubmission,
-              false,
+              checkReturnDates = false,
               None,
               Some(assets),
               membersPayments = None
@@ -213,7 +213,7 @@ object PsrRetrievalServiceSpec {
   val assets: Assets = Assets(
     LandOrProperty(
       landOrPropertyHeld = true,
-      disposeAnyLandOrProperty = false,
+      disposeAnyLandOrProperty = true,
       landOrPropertyTransactions = Seq.empty
     ),
     Borrowing(moneyWasBorrowed = true, moneyBorrowed = Seq.empty)

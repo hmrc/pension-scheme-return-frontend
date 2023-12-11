@@ -67,7 +67,7 @@ class MinimalRequiredSubmissionTransformerSpec
     }
 
     "should return None when returnPeriods is None" in {
-      val userAnswers = defaultUserAnswers
+      val userAnswers = emptyUserAnswers
         .unsafeSet(HowManyMembersPage(srn, allowedAccessRequest.pensionSchemeId), SchemeMemberNumbers(2, 3, 4))
 
       val request = DataRequest(allowedAccessRequest, userAnswers)
@@ -80,7 +80,7 @@ class MinimalRequiredSubmissionTransformerSpec
     }
 
     "should returned transformed object" in {
-      val userAnswers = defaultUserAnswers
+      val userAnswers = emptyUserAnswers
         .unsafeSet(WhyNoBankAccountPage(srn), "reasonForNoBankAccount")
         .unsafeSet(WhichTaxYearPage(srn), dateRange)
         .unsafeSet(ValueOfAssetsPage(srn, NormalMode), MoneyInPeriod(money, money))
@@ -118,7 +118,7 @@ class MinimalRequiredSubmissionTransformerSpec
   "Transform from ETMP" - {
     "should transform minimal details" in {
 
-      val userAnswers = defaultUserAnswers
+      val userAnswers = emptyUserAnswers
       val minimalRequiredSubmission = MinimalRequiredSubmission(
         ReportDetails(request.schemeDetails.pstr, dateRange.from, dateRange.to),
         accountingPeriods,
@@ -163,7 +163,7 @@ class MinimalRequiredSubmissionTransformerSpec
     }
     "should transform minimal details with bank account" in {
 
-      val userAnswers = defaultUserAnswers
+      val userAnswers = emptyUserAnswers
       val minimalRequiredSubmission = MinimalRequiredSubmission(
         ReportDetails(request.schemeDetails.pstr, dateRange.from, dateRange.to),
         accountingPeriods,

@@ -32,7 +32,7 @@ import pages.nonsipp.receivetransfer._
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
+import viewmodels.DisplayMessage.{LinkMessage, Message}
 import viewmodels.implicits._
 import viewmodels.models.{ActionTableViewModel, FormPageViewModel, PaginatedViewModel, TableElem}
 import views.html.TwoColumnsTripleAction

@@ -25,14 +25,14 @@ import viewmodels.models.SectionCompleted
 case class LandPropertyDisposalCompletedPage(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50)
     extends QuestionPage[SectionCompleted.type] {
   override def path: JsPath =
-    JsPath \ toString \ landOrPropertyIndex.arrayIndex.toString \ disposalIndex.arrayIndex.toString
+    Paths.disposalPropertyTransaction \ toString \ landOrPropertyIndex.arrayIndex.toString \ disposalIndex.arrayIndex.toString
 
   override def toString: String = "disposalCompleted"
 }
 
 case class LandPropertyDisposalCompletedPages(srn: Srn)
     extends IndexedQuestionPage[Map[String, SectionCompleted.type]] {
-  override def path: JsPath = JsPath \ toString
+  override def path: JsPath = Paths.disposalPropertyTransaction \ toString
 
   override def toString: String = "disposalCompleted"
 }

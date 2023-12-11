@@ -23,7 +23,6 @@ package object landorpropertydisposal {
     val assets: JsPath = __ \ "assets"
     val landOrProperty: JsPath = assets \ "landOrProperty"
     val landOrPropertyTransactions: JsPath = landOrProperty \ "landOrPropertyTransactions"
-    val disposalPropertyTransaction
-      : JsPath = landOrPropertyTransactions \ "heldPropertyTransaction" \ "disposedPropertyTransaction"
+    val disposalPropertyTransaction: JsPath = landOrPropertyTransactions \ "disposedPropertyTransaction"
   }
 }

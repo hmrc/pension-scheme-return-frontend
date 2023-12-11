@@ -26,14 +26,13 @@ import models.SchemeId.Srn
 import navigation.Navigator
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import pages.nonsipp.membertransferout.ReportAnotherTransferOutPage
-import pages.nonsipp.receivetransfer.{ReportAnotherTransferInPage, TransfersInCompletedPage}
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, SectionCompleted, YesNoPageViewModel}
+import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 import views.html.YesNoPageView
 
 import javax.inject.{Inject, Named}

@@ -51,7 +51,7 @@ class MoneyBorrowedTransformerSpec
     }
 
     "should return empty List when index as string not a valid number" in {
-      val userAnswers = defaultUserAnswers
+      val userAnswers = emptyUserAnswers
         .unsafeSet(
           Paths.moneyBorrowed \ "borrowingFromName",
           Json.obj("InvalidIntValue" -> true)
@@ -64,7 +64,7 @@ class MoneyBorrowedTransformerSpec
     }
 
     "should return transformed List" in {
-      val userAnswers = defaultUserAnswers
+      val userAnswers = emptyUserAnswers
         .unsafeSet(LenderNamePage(srn, refineMV(1)), "borrowingFromName")
         .unsafeSet(IsLenderConnectedPartyPage(srn, refineMV(1)), true)
         .unsafeSet(BorrowedAmountAndRatePage(srn, refineMV(1)), (money, percentage))
@@ -92,7 +92,7 @@ class MoneyBorrowedTransformerSpec
   "MoneyBorrowedTransformerSpec - From Etmp" - {
     "should transform successfully" in {
       val result = transformer.transformFromEtmp(
-        defaultUserAnswers,
+        emptyUserAnswers,
         srn,
         Borrowing(
           moneyWasBorrowed = true,

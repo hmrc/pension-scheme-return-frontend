@@ -17,7 +17,7 @@
 package transformations
 
 import cats.implicits.{toBifunctorOps, toTraverseOps}
-import config.Refined.{Max5000, OneTo5000}
+import config.Refined.{Max50, Max5000, OneTo50, OneTo5000}
 import eu.timepit.refined.api.{Refined, Validate}
 import eu.timepit.refined.refineV
 
@@ -36,5 +36,8 @@ trait Transformer {
 
   protected def buildIndexesForMax5000(num: Int): Try[List[Max5000]] =
     (1 to num).map(i => refineV[OneTo5000](i).leftMap(new Exception(_)).toTry).toList.sequence
+
+  protected def buildIndexesForMax50(num: Int): Try[List[Max50]] =
+    (1 to num).map(i => refineV[OneTo50](i).leftMap(new Exception(_)).toTry).toList.sequence
 
 }
