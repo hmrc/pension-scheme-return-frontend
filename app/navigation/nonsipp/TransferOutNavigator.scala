@@ -49,9 +49,6 @@ object TransferOutNavigator extends JourneyNavigator {
       controllers.nonsipp.membertransferout.routes.ReportAnotherTransferOutController
         .onPageLoad(srn, index, transferIndex, NormalMode)
 
-//    case ReportAnotherTransferOutPage(srn, index, secondaryIndex) =>
-//      controllers.routes.UnauthorisedController.onPageLoad()
-
     case page @ ReportAnotherTransferOutPage(srn, index, _) =>
       if (userAnswers.get(page).contains(true)) {
         (
