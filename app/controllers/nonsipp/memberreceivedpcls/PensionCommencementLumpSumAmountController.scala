@@ -38,7 +38,7 @@ import viewmodels.DisplayMessage.{Message, ParagraphMessage}
 import viewmodels.implicits._
 import viewmodels.models.MultipleQuestionsViewModel.DoubleQuestion
 import viewmodels.models.{FormPageViewModel, FurtherDetailsViewModel, QuestionField}
-import views.html.MoneyView
+import views.html.MultipleQuestionView
 
 import javax.inject.Named
 import scala.concurrent.{ExecutionContext, Future}
@@ -50,7 +50,7 @@ class PensionCommencementLumpSumAmountController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   formProvider: MoneyFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: MoneyView
+  view: MultipleQuestionView
 )(implicit ec: ExecutionContext)
     extends PSRController
     with I18nSupport {
@@ -118,10 +118,10 @@ object PensionCommencementLumpSumAmountController {
       heading = Message("pensionCommencementLumpSumAmount.heading", fullName),
       page = DoubleQuestion(
         form,
-        QuestionField.input(Message("pensionCommencementLumpSumAmount.received", fullName)),
-        QuestionField.input(Message("pensionCommencementLumpSumAmount.relevant", fullName))
+        QuestionField.currency(Message("pensionCommencementLumpSumAmount.received", fullName)),
+        QuestionField.currency(Message("pensionCommencementLumpSumAmount.relevant", fullName))
       ),
-      details = Option(
+      Option(
         FurtherDetailsViewModel(
           Message("pensionCommencementLumpSumAmount.details.title"),
           ParagraphMessage("pensionCommencementLumpSumAmount.details")

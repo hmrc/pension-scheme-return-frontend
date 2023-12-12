@@ -39,7 +39,8 @@ object PensionCommencementLumpSumNavigator extends JourneyNavigator {
       }
 
     case PensionCommencementLumpSumAmountPage(srn, _, _) =>
-      controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
+      controllers.routes.UnauthorisedController.onPageLoad()
+
     case WhatYouWillNeedPensionCommencementLumpSumPage(srn) =>
       controllers.nonsipp.memberreceivedpcls.routes.PclsMemberListController
         .onPageLoad(srn, 1, NormalMode)

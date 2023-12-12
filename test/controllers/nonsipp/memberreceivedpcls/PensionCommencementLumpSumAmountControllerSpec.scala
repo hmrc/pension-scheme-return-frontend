@@ -27,7 +27,7 @@ import pages.nonsipp.memberreceivedpcls.PensionCommencementLumpSumAmountPage
 import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
 import utils.Transform.TransformOps
-import views.html.MoneyView
+import views.html.MultipleQuestionView
 
 class PensionCommencementLumpSumAmountControllerSpec extends ControllerBaseSpec {
 
@@ -49,7 +49,7 @@ class PensionCommencementLumpSumAmountControllerSpec extends ControllerBaseSpec 
     lazy val onSubmit = routes.PensionCommencementLumpSumAmountController.onSubmit(srn, index, NormalMode)
 
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
-      val view = injected[MoneyView]
+      val view = injected[MultipleQuestionView]
       view(viewModel(form))
     })
 
@@ -60,7 +60,7 @@ class PensionCommencementLumpSumAmountControllerSpec extends ControllerBaseSpec 
         lumpSumData,
         userAnswers
       ) { implicit app => implicit request =>
-        val view = injected[MoneyView]
+        val view = injected[MultipleQuestionView]
         view(viewModel(form.fill(lumpSumData.from[(Money, Money)])))
       }
     )
