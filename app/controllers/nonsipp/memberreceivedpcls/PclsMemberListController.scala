@@ -106,9 +106,7 @@ object PclsMemberListController {
         refineV[OneTo300](index + 1) match {
           case Left(_) => Nil
           case Right(nextIndex) =>
-            //TODO change this when the PCLS amount page is done
-//            val items = userAnswers.map(TransferringSchemeNamePages(srn, nextIndex))
-            val items = Map[String, String]().empty
+            val items = userAnswers.get(PensionCommencementLumpSumAmountPage(srn, nextIndex, NormalMode))
             if (items.isEmpty) {
               List(
                 TableElem(
@@ -120,11 +118,9 @@ object PclsMemberListController {
                 TableElem(
                   LinkMessage(
                     Message("site.add"),
-//                    TODO change this when the PCLS amount page is done
-//                    controllers.nonsipp.receivetransfer.routes.TransferringSchemeNameController
-//                      .onSubmit(srn, nextIndex, refineMV(1), mode)
-//                      .url
-                    controllers.routes.UnauthorisedController.onPageLoad().url
+                    controllers.nonsipp.memberreceivedpcls.routes.PensionCommencementLumpSumAmountController
+                      .onSubmit(srn, nextIndex, mode)
+                      .url
                   )
                 ),
                 TableElem("")
@@ -140,11 +136,9 @@ object PclsMemberListController {
                 TableElem(
                   LinkMessage(
                     Message("site.change"),
-//                    TODO change this when the PCLS amount page is done
-                    controllers.nonsipp.receivetransfer.routes.TransfersInCYAController
-                      .onSubmit(srn, nextIndex, CheckMode)
+                    controllers.nonsipp.memberreceivedpcls.routes.PensionCommencementLumpSumAmountController
+                      .onSubmit(srn, nextIndex, mode)
                       .url
-//                    controllers.routes.UnauthorisedController.onPageLoad().url
                   )
                 ),
                 TableElem(
