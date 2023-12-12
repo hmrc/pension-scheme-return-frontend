@@ -16,6 +16,8 @@
 
 package navigation.nonsipp
 
+import cats.implicits.toTraverseOps
+import config.Refined.Max5
 import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
@@ -44,7 +46,22 @@ object TransferOutNavigator extends JourneyNavigator {
         .onPageLoad(srn, index, transferIndex, NormalMode)
 
     case ReceivingSchemeTypePage(srn, index, transferIndex) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+      controllers.nonsipp.membertransferout.routes.ReportAnotherTransferOutController
+        .onPageLoad(srn, index, transferIndex, NormalMode)
+
+    case page @ ReportAnotherTransferOutPage(srn, index, _) =>
+      if (userAnswers.get(page).contains(true)) {
+        (
+          for {
+            map <- userAnswers.get(ReceivingSchemeTypePages(srn, index)).getOrRecoverJourney
+            indexes <- map.keys.toList.traverse(_.toIntOption).getOrRecoverJourney
+            nextIndex <- findNextOpenIndex[Max5.Refined](indexes).getOrRecoverJourney
+          } yield controllers.nonsipp.membertransferout.routes.ReceivingSchemeNameController
+            .onPageLoad(srn, index, nextIndex, NormalMode)
+        ).merge
+      } else {
+        controllers.routes.UnauthorisedController.onPageLoad()
+      }
 
   }
 

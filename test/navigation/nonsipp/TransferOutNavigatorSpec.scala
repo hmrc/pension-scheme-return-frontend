@@ -16,20 +16,23 @@
 
 package navigation.nonsipp
 
-import controllers.routes
-import models.NormalMode
+import config.Refined.{Max300, Max5}
+import eu.timepit.refined.refineMV
+import models.{NormalMode, PensionSchemeType}
+import models.PensionSchemeType.PensionSchemeType
+import models.SchemeId.Srn
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.membertransferout.{
-  SchemeTransferOutPage,
-  TransferOutMemberListPage,
-  WhatYouWillNeedTransferOutPage
-}
+import pages.nonsipp.membertransferout.{ReceivingSchemeTypePages, ReportAnotherTransferOutPage, SchemeTransferOutPage, TransferOutMemberListPage, WhatYouWillNeedTransferOutPage}
 import utils.BaseSpec
+import utils.UserAnswersUtils.UserAnswersOps
 
 class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
   val navigator: Navigator = new NonSippNavigator
+
+  private val index = refineMV[Max300.Refined](1)
+  private val secondaryIndex = refineMV[Max5.Refined](1)
 
   "TransferOutNavigator" - {
 
