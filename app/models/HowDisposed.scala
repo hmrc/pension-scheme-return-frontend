@@ -16,7 +16,9 @@
 
 package models
 
-import play.api.libs.json.{Format, Json}
+import models.HowDisposed.Sold
+import play.api.libs.json._
+import play.api.libs.functional.syntax._
 import play.api.mvc.JavascriptLiteral
 import utils.WithName
 object HowDisposed {
@@ -35,9 +37,24 @@ object HowDisposed {
     case Other(_) => Other.name
   }
 
-  private implicit val soldFormat: Format[HowDisposed.Sold.type] = Json.format[HowDisposed.Sold.type]
-  private implicit val transferredFormat: Format[HowDisposed.Transferred.type] =
-    Json.format[HowDisposed.Transferred.type]
-  private implicit val otherFormat: Format[HowDisposed.Other] = Json.format[HowDisposed.Other]
-  implicit val format: Format[HowDisposed] = Json.format[HowDisposed]
+  implicit val writes: Writes[HowDisposed] = {
+    case Sold => Json.obj("key" -> Sold.name)
+    case Transferred =>
+      Json.obj("key" -> Transferred.name)
+    case Other(description) => Json.obj("key" -> Other.name, "value" -> description)
+  }
+
+  implicit val reads: Reads[HowDisposed] =
+    (__ \ "key")
+      .read[String]
+      .and((__ \ "value").readNullable[String])
+      .tupled
+      .flatMap {
+        case (Sold.name, None) => Reads.pure(Sold)
+        case (Transferred.name, None) => Reads.pure(Transferred)
+        case (Other.name, value) => Reads.pure(Other(value.getOrElse("Error: description of Other not retrievable")))
+        case unknown => Reads.failed(s"Failed to read EmployerType with unknown pattern $unknown")
+      }
+
+  implicit val format: Format[HowDisposed] = Format(reads, writes)
 }

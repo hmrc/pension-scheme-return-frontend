@@ -16,7 +16,8 @@
 
 package models
 
-import play.api.libs.json.{Format, Json}
+import play.api.libs.json._
+import play.api.libs.functional.syntax._
 import play.api.mvc.JavascriptLiteral
 import utils.WithName
 
@@ -47,11 +48,24 @@ object PensionSchemeType {
     case Other(_) => Other.name
   }
 
-  private implicit val soldFormat: Format[PensionSchemeType.RegisteredPS] =
-    Json.format[PensionSchemeType.RegisteredPS]
-  private implicit val transferredFormat: Format[PensionSchemeType.QualifyingRecognisedOverseasPS] =
-    Json.format[PensionSchemeType.QualifyingRecognisedOverseasPS]
-  private implicit val otherFormat: Format[PensionSchemeType.Other] = Json.format[PensionSchemeType.Other]
+  implicit val writes: Writes[PensionSchemeType] = {
+    case RegisteredPS(description) => Json.obj("key" -> RegisteredPS.name, "value" -> description)
+    case QualifyingRecognisedOverseasPS(description) =>
+      Json.obj("key" -> QualifyingRecognisedOverseasPS.name, "value" -> description)
+    case Other(description) => Json.obj("key" -> Other.name, "value" -> description)
+  }
 
-  implicit val format: Format[PensionSchemeType] = Json.format[PensionSchemeType]
+  implicit val reads: Reads[PensionSchemeType] =
+    (__ \ "key")
+      .read[String]
+      .and((__ \ "value").read[String])
+      .tupled
+      .flatMap {
+        case (RegisteredPS.name, value) => Reads.pure(RegisteredPS(value))
+        case (QualifyingRecognisedOverseasPS.name, value) => Reads.pure(QualifyingRecognisedOverseasPS(value))
+        case (Other.name, value) => Reads.pure(Other(value))
+        case unknown => Reads.failed(s"Failed to read EmployerType with unknown pattern $unknown")
+      }
+
+  implicit val format: Format[PensionSchemeType] = Format(reads, writes)
 }
