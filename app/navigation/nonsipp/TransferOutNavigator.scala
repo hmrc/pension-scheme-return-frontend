@@ -16,6 +16,7 @@
 
 package navigation.nonsipp
 
+import config.Refined.Max5
 import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
@@ -40,6 +41,10 @@ object TransferOutNavigator extends JourneyNavigator {
       controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
 
     case ReceivingSchemeNamePage(srn, index, transferIndex) =>
+      controllers.nonsipp.membertransferout.routes.ReportAnotherTransferOutController
+        .onPageLoad(srn, index, transferIndex, NormalMode)
+
+    case ReportAnotherTransferOutPage(srn, index, secondaryIndex) =>
       controllers.routes.UnauthorisedController.onPageLoad()
 
   }

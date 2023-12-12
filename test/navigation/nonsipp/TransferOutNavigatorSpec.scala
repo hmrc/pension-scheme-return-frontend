@@ -16,7 +16,8 @@
 
 package navigation.nonsipp
 
-import controllers.routes
+import config.Refined.{Max300, Max5}
+import eu.timepit.refined.refineMV
 import models.NormalMode
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
@@ -30,6 +31,9 @@ import utils.BaseSpec
 class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
   val navigator: Navigator = new NonSippNavigator
+
+  private val index = refineMV[Max300.Refined](1)
+  private val secondaryIndex = refineMV[Max5.Refined](1)
 
   "TransferOutNavigator" - {
 
