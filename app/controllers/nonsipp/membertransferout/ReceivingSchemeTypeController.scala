@@ -197,7 +197,7 @@ object ReceivingSchemeTypeController {
     mode: Mode
   ): FormPageViewModel[RadioListViewModel] =
     FormPageViewModel(
-      Message("transferring.pensionType.title"),
+      Message("transferOut.pensionType.title"),
       Message("transferring.pensionType.heading", schemeName),
       RadioListViewModel(
         None,
