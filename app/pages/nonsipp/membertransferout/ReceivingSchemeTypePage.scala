@@ -32,3 +32,8 @@ case class ReceivingSchemeTypePage(srn: Srn, index: Max300, secondaryIndex: Max5
   override def toString: String = "transferSchemeType"
 
 }
+
+case class ReceivingSchemeTypePages(srn: Srn, index: Max300) extends QuestionPage[Map[String, PensionSchemeType]] {
+  override def path: JsPath = Paths.memberTransfersOut \ toString \ index.arrayIndex.toString
+  override def toString: String = "transferSchemeType"
+}

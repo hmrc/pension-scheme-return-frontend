@@ -18,15 +18,14 @@ package navigation.nonsipp
 
 import config.Refined.{Max300, Max5}
 import eu.timepit.refined.refineMV
-import models.NormalMode
+import models.{NormalMode, PensionSchemeType}
+import models.PensionSchemeType.PensionSchemeType
+import models.SchemeId.Srn
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.membertransferout.{
-  SchemeTransferOutPage,
-  TransferOutMemberListPage,
-  WhatYouWillNeedTransferOutPage
-}
+import pages.nonsipp.membertransferout.{ReceivingSchemeTypePages, ReportAnotherTransferOutPage, SchemeTransferOutPage, TransferOutMemberListPage, WhatYouWillNeedTransferOutPage}
 import utils.BaseSpec
+import utils.UserAnswersUtils.UserAnswersOps
 
 class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
