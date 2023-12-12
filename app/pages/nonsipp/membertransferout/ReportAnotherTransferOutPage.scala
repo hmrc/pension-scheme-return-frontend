@@ -17,23 +17,16 @@
 package pages.nonsipp.membertransferout
 
 import config.Refined.{Max300, Max5}
-import models.PensionSchemeType.PensionSchemeType
 import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
 
-case class ReceivingSchemeTypePage(srn: Srn, index: Max300, secondaryIndex: Max5)
-    extends QuestionPage[PensionSchemeType] {
+case class ReportAnotherTransferOutPage(srn: Srn, index: Max300, secondaryIndex: Max5) extends QuestionPage[Boolean] {
 
   override def path: JsPath =
     Paths.memberTransfersOut \ toString \ index.arrayIndex.toString \ secondaryIndex.arrayIndex.toString
 
-  override def toString: String = "transferSchemeType"
+  override def toString: String = "reportAnotherTransferOut"
 
-}
-
-case class ReceivingSchemeTypePages(srn: Srn, index: Max300) extends QuestionPage[Map[String, PensionSchemeType]] {
-  override def path: JsPath = Paths.memberTransfersOut \ toString \ index.arrayIndex.toString
-  override def toString: String = "transferSchemeType"
 }

@@ -1912,3 +1912,8 @@ transferOut.transferMade.error.date.before = Date the transfer was made must be 
 transferOut.transferMade.error.date.after = Date the transfer was made must be before {0}
 transferOut.transferMade.error.invalid.date = Date the transfer was made must be a real date
 transferOut.transferMade.error.invalid.chars = Date the transfer was made must only include numbers 0 to 9
+
+reportAnotherTransferOut.title = Do you need to report another transfer out for this member?
+reportAnotherTransferOut.heading = Do you need to report another transfer out for {0}?
+reportAnotherTransferOut.hint = If the scheme made more than one transfer out for this member, you must tell us about all of them.
+reportAnotherTransferOut.error.required = Select yes if you need to report another transfer out for this member
