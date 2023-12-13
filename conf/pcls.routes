@@ -22,3 +22,6 @@ GET         /:srn/pcls-amount-relevant-pension/:index                           
 POST        /:srn/pcls-amount-relevant-pension/:index                                   controllers.nonsipp.memberreceivedpcls.PensionCommencementLumpSumAmountController.onSubmit(srn: Srn, index: Max300, mode: Mode = NormalMode)
 GET         /:srn/change-pcls-amount-relevant-pension/:index                            controllers.nonsipp.memberreceivedpcls.PensionCommencementLumpSumAmountController.onPageLoad(srn: Srn, index: Max300, mode: Mode = CheckMode)
 POST        /:srn/change-pcls-amount-relevant-pension/:index                            controllers.nonsipp.memberreceivedpcls.PensionCommencementLumpSumAmountController.onSubmit(srn: Srn, index: Max300, mode: Mode = CheckMode)
+
+GET         /:srn/remove-pcls/:memberIndex                                              controllers.nonsipp.memberreceivedpcls.RemovePclsController.onPageLoad(srn: Srn, memberIndex: Max300)
+POST        /:srn/remove-pcls/:memberIndex                                              controllers.nonsipp.memberreceivedpcls.RemovePclsController.onSubmit(srn: Srn, memberIndex: Max300)
