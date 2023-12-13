@@ -46,6 +46,10 @@ object TransferOutNavigator extends JourneyNavigator {
         .onPageLoad(srn, index, transferIndex, NormalMode)
 
     case ReceivingSchemeTypePage(srn, index, transferIndex) =>
+      controllers.nonsipp.membertransferout.routes.WhenWasTransferMadeController
+        .onPageLoad(srn, index, transferIndex, NormalMode)
+
+    case WhenWasTransferMadePage(srn, index, transferIndex) =>
       controllers.nonsipp.membertransferout.routes.ReportAnotherTransferOutController
         .onPageLoad(srn, index, transferIndex, NormalMode)
 

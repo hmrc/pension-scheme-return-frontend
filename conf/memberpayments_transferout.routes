@@ -29,3 +29,8 @@ POST        /:srn/receiving-scheme-type/:index/:secondaryIndex                  
 
 GET         /:srn/change-receiving-scheme-type/:index/:secondaryIndex                   controllers.nonsipp.membertransferout.ReceivingSchemeTypeController.onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode = CheckMode)
 POST        /:srn/change-receiving-scheme-type/:index/:secondaryIndex                   controllers.nonsipp.membertransferout.ReceivingSchemeTypeController.onSubmit(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode = CheckMode)
+
+GET        /:srn/when-was-transfer-made/:index/:secondaryIndex                          controllers.nonsipp.membertransferout.WhenWasTransferMadeController.onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode = NormalMode)
+POST       /:srn/when-was-transfer-made/:index/:secondaryIndex                          controllers.nonsipp.membertransferout.WhenWasTransferMadeController.onSubmit(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode = NormalMode)
+GET        /:srn/change-when-was-transfer-made/:index/:secondaryIndex                   controllers.nonsipp.membertransferout.WhenWasTransferMadeController.onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode = CheckMode)
+POST       /:srn/change-when-was-transfer-made/:index/:secondaryIndex                   controllers.nonsipp.membertransferout.WhenWasTransferMadeController.onSubmit(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode = CheckMode)
