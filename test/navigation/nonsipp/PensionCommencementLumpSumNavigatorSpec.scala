@@ -16,19 +16,18 @@
 
 package navigation.nonsipp
 
-import models.NormalMode
+import config.Refined.{Max300, OneTo300}
+import eu.timepit.refined.refineMV
+import models.{CheckMode, NormalMode}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.memberreceivedpcls.{
-  PclsMemberListPage,
-  PensionCommencementLumpSumPage,
-  WhatYouWillNeedPensionCommencementLumpSumPage
-}
+import pages.nonsipp.memberreceivedpcls._
 import utils.BaseSpec
 
 class PensionCommencementLumpSumNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
   val navigator: Navigator = new NonSippNavigator
+  private val index = refineMV[OneTo300](1)
 
   "PensionCommencementLumpSumNavigator" - {
 
@@ -74,6 +73,53 @@ class PensionCommencementLumpSumNavigatorSpec extends BaseSpec with NavigatorBeh
           (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
         )
         .withName("go from pcls member list page page to task list page")
+    )
+
+    act.like(
+      normalmode
+        .navigateToWithIndex(
+          index,
+          (srn, index: Max300) => PensionCommencementLumpSumAmountPage(srn, index, NormalMode),
+          (srn, index, _) =>
+            controllers.nonsipp.memberreceivedpcls.routes.PclsCYAController.onPageLoad(srn, index, NormalMode)
+        )
+        .withName("go from pcls amount page to CYA page")
+    )
+
+    act.like(
+      normalmode
+        .navigateToWithIndex(
+          index,
+          (srn, index: Max300) => PclsCYAPage(srn, index),
+          (srn, _: Max300, _) =>
+            controllers.nonsipp.memberreceivedpcls.routes.PclsMemberListController
+              .onPageLoad(srn, 1, NormalMode)
+        )
+        .withName("go from pcls CYA page to members list page")
+    )
+
+  }
+
+  "PensionCommencementLumpSumNavigator in check mode" - {
+
+    act.like(
+      checkmode
+        .navigateTo(
+          srn => PensionCommencementLumpSumAmountPage(srn, index, CheckMode),
+          (srn, _) => controllers.nonsipp.memberreceivedpcls.routes.PclsCYAController.onPageLoad(srn, index, NormalMode)
+        )
+        .withName("go from pcls amount page in check mode to CYA page in normal mode")
+    )
+
+    act.like(
+      checkmode
+        .navigateTo(
+          srn => PclsCYAPage(srn, index),
+          (srn, _) =>
+            controllers.nonsipp.memberreceivedpcls.routes.PclsMemberListController
+              .onPageLoad(srn, 1, NormalMode)
+        )
+        .withName("go from pcls CYA page in check mode to members list page in normal mode")
     )
   }
 }

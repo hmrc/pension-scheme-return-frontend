@@ -119,7 +119,7 @@ object PclsMemberListController {
                   LinkMessage(
                     Message("site.add"),
                     controllers.nonsipp.memberreceivedpcls.routes.PensionCommencementLumpSumAmountController
-                      .onSubmit(srn, nextIndex, mode)
+                      .onSubmit(srn, nextIndex, NormalMode)
                       .url
                   )
                 ),
@@ -136,8 +136,8 @@ object PclsMemberListController {
                 TableElem(
                   LinkMessage(
                     Message("site.change"),
-                    controllers.nonsipp.memberreceivedpcls.routes.PensionCommencementLumpSumAmountController
-                      .onSubmit(srn, nextIndex, mode)
+                    controllers.nonsipp.memberreceivedpcls.routes.PclsCYAController
+                      .onSubmit(srn, nextIndex, CheckMode)
                       .url
                   )
                 ),

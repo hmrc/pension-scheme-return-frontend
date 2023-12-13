@@ -416,6 +416,14 @@ pcls.memberlist.pagination.label = Showing {0} - {1} of {2} members
 pcls.memberlist.status.no.items = No PCLS
 pcls.memberlist.status.some.item = PCLS reported
 
+pclsCYA.change.title.check = Change details of PCLS for this member
+pclsCYA.heading.check = Change details of PCLS for {0}
+pclsCYA.rows.membersName = Member’s name
+pclsCYA.rows.amount.received = Total amount of PCLS received by {0}
+pclsCYA.rows.amount.received.hidden = total amount of PCLS received by {0}
+pclsCYA.rows.amount.relevant = Relevant pension in respect of PCLS for {0}
+pclsCYA.rows.amount.relevant.hidden = relevant pension in respect of PCLS for {0}
+
 pensionCommencementLumpSumAmount.title = Amount of PCLS and relevant pension for this member
 pensionCommencementLumpSumAmount.heading = Amount of PCLS and relevant pension for {0}
 pensionCommencementLumpSumAmount.received = Total amount of the PCLS received by {0}, in pounds and pence
