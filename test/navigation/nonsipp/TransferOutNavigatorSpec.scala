@@ -23,7 +23,13 @@ import models.PensionSchemeType.PensionSchemeType
 import models.SchemeId.Srn
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.membertransferout.{ReceivingSchemeTypePages, ReportAnotherTransferOutPage, SchemeTransferOutPage, TransferOutMemberListPage, WhatYouWillNeedTransferOutPage}
+import pages.nonsipp.membertransferout.{
+  ReceivingSchemeTypePages,
+  ReportAnotherTransferOutPage,
+  SchemeTransferOutPage,
+  TransferOutMemberListPage,
+  WhatYouWillNeedTransferOutPage
+}
 import utils.BaseSpec
 import utils.UserAnswersUtils.UserAnswersOps
 
