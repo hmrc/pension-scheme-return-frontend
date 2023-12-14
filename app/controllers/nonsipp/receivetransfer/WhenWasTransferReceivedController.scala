@@ -152,7 +152,7 @@ object WhenWasTransferReceivedController {
     FormPageViewModel(
       "transferReceived.title",
       Message("transferReceived.heading", schemeName, memberName),
-      DatePageViewModel(),
+      DatePageViewModel(None, Message("transferReceived.heading", schemeName, memberName)),
       controllers.nonsipp.receivetransfer.routes.WhenWasTransferReceivedController
         .onSubmit(srn, index, secondaryIndex, mode)
     )

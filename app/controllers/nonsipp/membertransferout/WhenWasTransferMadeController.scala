@@ -152,7 +152,7 @@ object WhenWasTransferMadeController {
     FormPageViewModel(
       "transferOut.transferMade.title",
       Message("transferOut.transferMade.heading", schemeName, memberName),
-      DatePageViewModel(),
+      DatePageViewModel(None, Message("transferOut.transferMade.heading", schemeName, memberName)),
       controllers.nonsipp.membertransferout.routes.WhenWasTransferMadeController
         .onSubmit(srn, index, secondaryIndex, mode)
     )

@@ -142,7 +142,7 @@ object WhenWasPropertySoldController {
     FormPageViewModel(
       "whenWasPropertySold.title",
       Message("whenWasPropertySold.heading", addressLine1),
-      DatePageViewModel(),
+      DatePageViewModel(None, Message("whenWasPropertySold.heading", addressLine1)),
       routes.WhenWasPropertySoldController.onSubmit(srn, landOrPropertyIndex, disposalIndex, mode)
     )
 }

@@ -37,7 +37,9 @@
         @govukDateInput(
             DateViewModel(
                 field = form("value"),
-                legend = LegendViewModel("")
+                legend = viewModel.page.legend
+                    .map(legend => LegendViewModel(legend.toMessage).withSize(LegendSize.Medium))
+                    .getOrElse(LegendViewModel(renderMessage(viewModel.heading)).asPageHeading(LegendSize.Large).withCssClass("govuk-visually-hidden"))
             )
         )
 

@@ -16,4 +16,9 @@
 
 package viewmodels.models
 
-case class DatePageViewModel()
+import viewmodels.DisplayMessage.{InlineMessage, Message}
+
+case class DatePageViewModel(
+  legend: Option[Message],
+  header: InlineMessage
+)
