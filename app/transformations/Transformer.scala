@@ -18,11 +18,21 @@ package transformations
 
 import cats.implicits.{toBifunctorOps, toTraverseOps}
 import config.Refined.{Max5000, OneTo5000}
+import eu.timepit.refined.api.{Refined, Validate}
 import eu.timepit.refined.refineV
 
 import scala.util.Try
 
 trait Transformer {
+
+  protected def keysToIndex[A: Validate[Int, *]](map: Map[String, _]): List[Refined[Int, A]] =
+    map.keys.toList.flatMap(refineIndex[A])
+
+  protected def refineIndex[A: Validate[Int, *]](index: String): Option[Refined[Int, A]] =
+    index.toIntOption.flatMap(i => refineV[A](i + 1).leftMap(new Exception(_)).toOption)
+
+  protected def refineIndex[A: Validate[Int, *]](index: Int): Option[Refined[Int, A]] =
+    refineV[A](index + 1).leftMap(new Exception(_)).toOption
 
   protected def buildIndexesForMax5000(num: Int): Try[List[Max5000]] =
     (1 to num).map(i => refineV[OneTo5000](i).leftMap(new Exception(_)).toTry).toList.sequence

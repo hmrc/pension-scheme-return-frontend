@@ -14,20 +14,22 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.employercontributions
+package transformations
 
-import config.Refined.{Max300, Max50}
-import models.SchemeId.Srn
-import models.{ConditionalYesNo, Crn}
-import pages.QuestionPage
-import play.api.libs.json.JsPath
-import utils.RefinedUtils.RefinedIntOps
+import controllers.TestValues
+import org.scalatest.OptionValues
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.must.Matchers
 
-case class EmployerCompanyCrnPage(srn: Srn, memberIndex: Max300, index: Max50)
-    extends QuestionPage[ConditionalYesNo[String, Crn]] {
+class MemberPaymentsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues with TestValues {
 
-  override def path: JsPath =
-    Paths.memberEmpContribution \ toString \ memberIndex.arrayIndex.toString \ index.arrayIndex.toString
+  private val transformer = new MemberPaymentsTransformer()
 
-  override def toString: String = "idNumber"
+  "MemberPaymentsTransformer - To Etmp" - {
+    "should return empty List when userAnswer is empty" in {
+
+      val result = transformer.transformToEtmp(srn, defaultUserAnswers)
+      result mustBe None
+    }
+  }
 }

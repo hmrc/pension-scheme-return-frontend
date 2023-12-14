@@ -28,7 +28,7 @@ import navigation.Navigator
 import pages.nonsipp.memberdetails._
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
+import services.{PsrSubmissionService, SaveService}
 import uk.gov.hmrc.domain.Nino
 import utils.DateTimeUtils.localDateShow
 import utils.MessageUtils.booleanToMessage
@@ -46,7 +46,8 @@ class SchemeMemberDetailsAnswersController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   saveService: SaveService,
   val controllerComponents: MessagesControllerComponents,
-  view: CheckYourAnswersView
+  view: CheckYourAnswersView,
+  psrSubmissionService: PsrSubmissionService
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
@@ -67,7 +68,10 @@ class SchemeMemberDetailsAnswersController @Inject()(
       for {
         updatedUserAnswers <- Future.fromTry(request.userAnswers.set(MemberStatus(srn, index), MemberState.Active))
         _ <- saveService.save(updatedUserAnswers)
-      } yield Redirect(navigator.nextPage(SchemeMemberDetailsAnswersPage(srn), NormalMode, request.userAnswers))
+        submissionResult <- psrSubmissionService.submitPsrDetails(srn, updatedUserAnswers)
+      } yield submissionResult.fold(
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      )(_ => Redirect(navigator.nextPage(SchemeMemberDetailsAnswersPage(srn), NormalMode, request.userAnswers)))
     }
 }
 

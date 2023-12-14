@@ -162,4 +162,10 @@ object UserAnswers {
   }
 
   implicit def format(implicit crypto: Encrypter with Decrypter): OFormat[UserAnswers] = OFormat(reads, writes)
+
+  object implicits {
+    implicit class UserAnswersTryOps(ua: Try[UserAnswers]) {
+      def set[A: Writes](page: Settable[A], value: A): Try[UserAnswers] = ua.flatMap(_.set(page, value))
+    }
+  }
 }

@@ -17,7 +17,9 @@
 package utils
 
 import cats.data.NonEmptyList
-import play.api.libs.json.{JsObject, Json, Writes}
+import cats.syntax.either._
+import play.api.libs.functional.syntax._
+import play.api.libs.json._
 
 object JsonUtils {
   implicit def nelWrites[A: Writes]: Writes[NonEmptyList[A]] = Writes(nel => Json.toJson(nel.toList))
@@ -25,4 +27,15 @@ object JsonUtils {
   implicit class JsObjectOps(json: JsObject) {
     def +?(o: Option[JsObject]): JsObject = o.fold(json)(_ ++ json)
   }
+
+  // Creates a Json format for an either value type
+  def eitherFormat[A: Format, B: Format](leftName: String, rightName: String): Format[Either[A, B]] =
+    Format(
+      fjs = (__ \ leftName).read[A].map(_.asLeft[B]) |
+        (__ \ rightName).read[B].map(_.asRight[A]),
+      tjs = _.fold(
+        left => Json.obj(leftName -> left),
+        right => Json.obj(rightName -> right)
+      )
+    )
 }

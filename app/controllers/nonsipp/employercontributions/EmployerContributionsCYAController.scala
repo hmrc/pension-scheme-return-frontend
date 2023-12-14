@@ -31,7 +31,7 @@ import pages.nonsipp.employercontributions._
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import services.SaveService
+import services.{PsrSubmissionService, SaveService}
 import utils.ListUtils.ListOps
 import viewmodels.DisplayMessage.{Heading2, Message}
 import viewmodels.implicits._
@@ -48,7 +48,8 @@ class EmployerContributionsCYAController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   saveService: SaveService,
-  view: CheckYourAnswersView
+  view: CheckYourAnswersView,
+  psrSubmissionService: PsrSubmissionService
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
@@ -81,8 +82,9 @@ class EmployerContributionsCYAController @Inject()(
           userAnswers <- EitherT(userAnswersWithSectionCompleted.pure[Future])
           updatedAnswers <- Future.fromTry(userAnswers).liftF
           _ <- saveService.save(updatedAnswers).liftF
-        } yield Redirect(
-          navigator.nextPage(EmployerContributionsCYAPage(srn), mode, updatedAnswers)
+          submissionResult <- psrSubmissionService.submitPsrDetails(srn, updatedAnswers).liftF
+        } yield submissionResult.fold(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))(
+          _ => Redirect(navigator.nextPage(EmployerContributionsCYAPage(srn), mode, updatedAnswers))
         )
       ).merge
     }

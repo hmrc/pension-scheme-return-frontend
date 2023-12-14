@@ -1,0 +1,214 @@
+/*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package transformations
+
+import cats.syntax.traverse._
+import com.google.inject.Singleton
+import config.Refined.{Max300, Max50}
+import models.SchemeId.Srn
+import models.UserAnswers.implicits._
+import models.requests.psr._
+import models.{ConditionalYesNo, Crn, IdentityType, Money, NameDOB, UserAnswers, Utr}
+import pages.nonsipp.employercontributions._
+import pages.nonsipp.memberdetails.MembersDetailsPages._
+import pages.nonsipp.memberdetails.{
+  DoesMemberHaveNinoPage,
+  MemberDetailsNinoPage,
+  MemberDetailsPage,
+  MemberStatus,
+  NoNINOPage
+}
+import uk.gov.hmrc.domain.Nino
+import viewmodels.models.MemberState
+
+import javax.inject.Inject
+import scala.util.Try
+
+@Singleton()
+class MemberPaymentsTransformer @Inject()() extends Transformer {
+
+  def transformToEtmp(srn: Srn, userAnswers: UserAnswers): Option[MemberPayments] = {
+
+    val refinedMemberDetails: Map[Max300, NameDOB] = userAnswers
+      .membersDetails(srn)
+      .zipWithIndex
+      .flatMap {
+        case (details, index) =>
+          refineIndex[Max300.Refined](index).map(_ -> details).toList
+      }
+      .toMap
+
+    val memberDetails = refinedMemberDetails
+      .map {
+        case (index, memberDetails) =>
+          val secondaryIndexes =
+            keysToIndex[Max50.Refined](userAnswers.map(EmployerContributionsCompletedForMember(srn, index)))
+
+          for {
+            employerContributions <- buildEmployerContributions(srn, index, secondaryIndexes, userAnswers)
+          } yield MemberDetails(
+            personalDetails = buildMemberPersonalDetails(srn, index, memberDetails, userAnswers),
+            employerContributions = employerContributions
+          )
+      }
+      .toList
+      .sequence
+
+    memberDetails.map(MemberPayments(_))
+  }
+
+  def transformFromEtmp(userAnswers: UserAnswers, srn: Srn, memberPayments: MemberPayments): Try[UserAnswers] =
+    memberPayments.memberDetails.zipWithIndex
+      .traverse { case (memberDetails, index) => refineIndex[Max300.Refined](index).map(memberDetails -> _) }
+      .getOrElse(Nil)
+      .foldLeft(Try(userAnswers)) {
+        case (ua, (memberDetails, index)) =>
+          val pages: List[Try[UserAnswers] => Try[UserAnswers]] =
+            memberPersonalDetailsPages(srn, index, memberDetails.personalDetails) ++
+              employerContributionsPages(srn, index, memberDetails.employerContributions)
+
+          pages.foldLeft(ua)((userAnswers, f) => f(userAnswers))
+      }
+
+  private def buildMemberPersonalDetails(
+    srn: Srn,
+    index: Max300,
+    nameDob: NameDOB,
+    userAnswers: UserAnswers
+  ): MemberPersonalDetails = {
+    val maybeNino = userAnswers.get(MemberDetailsNinoPage(srn, index)).map(_.value)
+    val maybeNoNinoReason = userAnswers.get(NoNINOPage(srn, index))
+
+    MemberPersonalDetails(
+      firstName = nameDob.firstName,
+      lastName = nameDob.lastName,
+      nino = maybeNino,
+      reasonNoNINO = maybeNoNinoReason,
+      dateOfBirth = nameDob.dob
+    )
+  }
+
+  private def memberPersonalDetailsPages(
+    srn: Srn,
+    index: Max300,
+    personalDetails: MemberPersonalDetails
+  ): List[Try[UserAnswers] => Try[UserAnswers]] = {
+    println(s"=============== p ${personalDetails}")
+    List(
+      _.set(
+        MemberDetailsPage(srn, index),
+        NameDOB(
+          personalDetails.firstName,
+          personalDetails.lastName,
+          personalDetails.dateOfBirth
+        )
+      ),
+      _.set(DoesMemberHaveNinoPage(srn, index), personalDetails.nino.nonEmpty),
+      ua =>
+        personalDetails.reasonNoNINO
+          .map(noNinoReason => ua.set(NoNINOPage(srn, index), noNinoReason))
+          .getOrElse(ua),
+      ua =>
+        personalDetails.nino
+          .map(nino => ua.set(MemberDetailsNinoPage(srn, index), Nino(nino)))
+          .getOrElse(ua),
+      _.set(MemberStatus(srn, index), MemberState.Active)
+    )
+  }
+
+  private def buildEmployerContributions(
+    srn: Srn,
+    index: Max300,
+    secondaryIndexes: List[Max50],
+    userAnswers: UserAnswers
+  ): Option[List[EmployerContributions]] =
+    secondaryIndexes.traverse(
+      secondaryIndex =>
+        for {
+          employerName <- userAnswers.get(EmployerNamePage(srn, index, secondaryIndex))
+          identityType <- userAnswers.get(EmployerTypeOfBusinessPage(srn, index, secondaryIndex))
+          employerType <- toEmployerType(srn, identityType, index, secondaryIndex, userAnswers)
+          total <- userAnswers.get(TotalEmployerContributionPage(srn, index, secondaryIndex))
+        } yield EmployerContributions(
+          employerName,
+          employerType,
+          totalTransferValue = total.value
+        )
+    )
+
+  private def employerContributionsPages(
+    srn: Srn,
+    index: Max300,
+    employerContributions: List[EmployerContributions]
+  ): List[Try[UserAnswers] => Try[UserAnswers]] = {
+    val secondaryIndexes: List[(Max50, EmployerContributions)] = employerContributions.zipWithIndex
+      .traverse {
+        case (employerContributions, index) =>
+          refineIndex[Max50.Refined](index).map(_ -> employerContributions)
+      }
+      .toList
+      .flatten
+
+    println(s"=============== ${employerContributions}")
+
+    secondaryIndexes.flatMap {
+      case (secondaryIndex, employerContributions) =>
+        List[Try[UserAnswers] => Try[UserAnswers]](
+          _.set(EmployerNamePage(srn, index, secondaryIndex), employerContributions.employerName),
+          _.set(
+            TotalEmployerContributionPage(srn, index, secondaryIndex),
+            Money(employerContributions.totalTransferValue)
+          )
+        ) ++ List(
+          employerContributions.employerType match {
+            case EmployerType.UKCompany(idOrReason) =>
+              _.set(EmployerTypeOfBusinessPage(srn, index, secondaryIndex), IdentityType.UKCompany)
+                .set(EmployerCompanyCrnPage(srn, index, secondaryIndex), ConditionalYesNo(idOrReason.map(Crn(_))))
+            case EmployerType.UKPartnership(idOrReason) =>
+              _.set(EmployerTypeOfBusinessPage(srn, index, secondaryIndex), IdentityType.UKPartnership)
+                .set(PartnershipEmployerUtrPage(srn, index, secondaryIndex), ConditionalYesNo(idOrReason.map(Utr(_))))
+            case EmployerType.Other(description) =>
+              _.set(EmployerTypeOfBusinessPage(srn, index, secondaryIndex), IdentityType.Other)
+                .set(OtherEmployeeDescriptionPage(srn, index, secondaryIndex), description)
+          }
+        )
+    }
+  }
+
+  private def toEmployerType(
+    srn: Srn,
+    identityType: IdentityType,
+    index: Max300,
+    secondaryIndex: Max50,
+    userAnswers: UserAnswers
+  ): Option[EmployerType] =
+    identityType match {
+      case IdentityType.Individual => None
+      case IdentityType.UKCompany =>
+        userAnswers
+          .get(EmployerCompanyCrnPage(srn, index, secondaryIndex))
+          .map(v => EmployerType.UKCompany(v.value.map(_.value)))
+      case IdentityType.UKPartnership =>
+        userAnswers
+          .get(PartnershipEmployerUtrPage(srn, index, secondaryIndex))
+          .map(v => EmployerType.UKPartnership(v.value.map(_.value)))
+      case IdentityType.Other =>
+        userAnswers
+          .get(OtherEmployeeDescriptionPage(srn, index, secondaryIndex))
+          .map(EmployerType.Other)
+    }
+}
