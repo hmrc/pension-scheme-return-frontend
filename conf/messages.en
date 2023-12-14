@@ -463,7 +463,7 @@ benefitsSurrendered.error.required = Select yes if any member surrendered benefi
 otherAssetsHeld.title = Did the scheme hold any other assets during the period of this return?
 otherAssetsHeld.heading = Did {0} hold any other assets during the period of this return?
 otherAssetsHeld.error.required = Select yes if the scheme held any other assets during the period of this return
-otherAssetsHeld.hint = This should not include shares, bonds, land or property. If your scheme holds any of these assets, report them in the relevant section of this pension scheme return.
+otherAssetsHeld.hint = This does not include shares, bonds, land or property. If your scheme holds any of these assets, report them in the relevant section of this pension scheme return.
 
 returnSubmitted.title = Return submitted
 returnSubmitted.panel.heading = Return submitted
@@ -922,7 +922,7 @@ securityGivenForLoan.securityGiven.yes.conditional = Provide details of the secu
 securityGivenForLoan.securityGiven.yes.hint = You can enter a maximum of 160 characters.
 securityGivenForLoan.securityGiven.error.required = Select yes if security has been given for this loan
 securityGivenForLoan.securityGiven.yes.conditional.error.required = Enter details of the security
-securityGivenForLoan.securityGiven.yes.conditional.error.invalid = Details of the security must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, full stops, hyphens, slashes, speech marks and spaces
+securityGivenForLoan.securityGiven.yes.conditional.error.invalid = Details of the security must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hashes (#), hyphens, speech marks and spaces
 securityGivenForLoan.securityGiven.yes.conditional.error.length = Details of the security must be 160 characters or fewer
 
 loansList.title = You have added {0} loan
