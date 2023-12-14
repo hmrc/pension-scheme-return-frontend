@@ -14,18 +14,22 @@
  * limitations under the License.
  */
 
-package models.requests.psr
+package transformations
 
-import play.api.libs.json.{Json, OFormat}
+import controllers.TestValues
+import org.scalatest.OptionValues
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.must.Matchers
 
-case class PsrSubmission(
-  minimalRequiredSubmission: MinimalRequiredSubmission,
-  checkReturnDates: Boolean,
-  loans: Option[Loans],
-  assets: Option[Assets],
-  memberPayments: Option[MemberPayments]
-)
+class MemberPaymentsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues with TestValues {
 
-object PsrSubmission {
-  implicit val format: OFormat[PsrSubmission] = Json.format[PsrSubmission]
+  private val transformer = new MemberPaymentsTransformer()
+
+  "MemberPaymentsTransformer - To Etmp" - {
+    "should return empty List when userAnswer is empty" in {
+
+      val result = transformer.transformToEtmp(srn, defaultUserAnswers)
+      result mustBe None
+    }
+  }
 }
