@@ -60,7 +60,7 @@ class LandOrPropertyMongoController @Inject()(
         removedUserAnswers <- Future.fromTry(removeAllLandOrProperties(srn, request.userAnswers))
         updatedUserAnswers <- Future.fromTry(updateUserAnswersWithLandOrProperties(num.value, srn, removedUserAnswers))
         _ <- saveService.save(updatedUserAnswers)
-      } yield Ok(s"Added ${num.value} loan details to UserAnswers")
+      } yield Ok(s"Added ${num.value} land and properties to UserAnswers")
   }
 
   private def buildIndexes(num: Int): Try[List[Max5000]] =
