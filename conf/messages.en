@@ -437,6 +437,10 @@ pensionCommencementLumpSumAmount.relevant.error.required = Enter the relevant pe
 pensionCommencementLumpSumAmount.relevant.error.nonNumeric = Relevant pension in respect of the PCLS must be an amount of money, like 123 or 123.45
 pensionCommencementLumpSumAmount.relevant.error.tooLarge = Relevant pension in respect of the PCLS must be 999999999.99 or less
 
+pcls.removePcls.title = Are you sure you want to remove the PCLS for this member?
+pcls.removePcls.heading = Are you sure you want to remove the PCLS of £{0} for {1}?
+pcls.removePcls.error.required = Select yes if you are sure you want to remove the PCLS for this member
+
 feesCommissionsWagesSalaries.title = How much did the scheme pay in fees, commissions, wages and salaries during the period of this return, in pounds and pence?
 feesCommissionsWagesSalaries.heading = How much did {0} pay in fees, commissions, wages and salaries during the period of this return, in pounds and pence?
 feesCommissionsWagesSalaries.hint = If there were none, enter 0.

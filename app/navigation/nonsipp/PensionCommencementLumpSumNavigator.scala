@@ -48,6 +48,10 @@ object PensionCommencementLumpSumNavigator extends JourneyNavigator {
       controllers.nonsipp.memberreceivedpcls.routes.PclsMemberListController
         .onPageLoad(srn, 1, NormalMode)
 
+    case RemovePclsPage(srn, index) =>
+      controllers.nonsipp.memberreceivedpcls.routes.PclsMemberListController
+        .onPageLoad(srn, page = 1, NormalMode)
+
   }
 
   override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] =
