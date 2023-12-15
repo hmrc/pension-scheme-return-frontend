@@ -14,11 +14,17 @@
  * limitations under the License.
  */
 
-package viewmodels.models
+package pages.nonsipp.memberreceivedpcls
 
-import viewmodels.DisplayMessage.{InlineMessage, Message}
+import config.Refined.Max300
+import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
+import utils.RefinedUtils.RefinedIntOps
 
-case class DatePageViewModel(
-  legend: Option[Message],
-  header: InlineMessage
-)
+case class RemovePclsPage(srn: Srn, index: Max300) extends QuestionPage[Boolean] {
+
+  override def path: JsPath = Paths.memberDetails \ toString \ index.arrayIndex.toString
+
+  override def toString: String = "removePcls"
+}

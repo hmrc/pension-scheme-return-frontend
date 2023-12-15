@@ -416,6 +416,14 @@ pcls.memberlist.pagination.label = Showing {0} - {1} of {2} members
 pcls.memberlist.status.no.items = No PCLS
 pcls.memberlist.status.some.item = PCLS reported
 
+pclsCYA.change.title.check = Change details of PCLS for this member
+pclsCYA.heading.check = Change details of PCLS for {0}
+pclsCYA.rows.membersName = Member’s name
+pclsCYA.rows.amount.received = Total amount of PCLS received by {0}
+pclsCYA.rows.amount.received.hidden = total amount of PCLS received by {0}
+pclsCYA.rows.amount.relevant = Relevant pension in respect of PCLS for {0}
+pclsCYA.rows.amount.relevant.hidden = relevant pension in respect of PCLS for {0}
+
 pensionCommencementLumpSumAmount.title = Amount of PCLS and relevant pension for this member
 pensionCommencementLumpSumAmount.heading = Amount of PCLS and relevant pension for {0}
 pensionCommencementLumpSumAmount.received = Total amount of the PCLS received by {0}, in pounds and pence
@@ -428,6 +436,10 @@ pensionCommencementLumpSumAmount.received.error.tooLarge = Total amount of PCLS 
 pensionCommencementLumpSumAmount.relevant.error.required = Enter the relevant pension in respect of the PCLS, in pounds and pence
 pensionCommencementLumpSumAmount.relevant.error.nonNumeric = Relevant pension in respect of the PCLS must be an amount of money, like 123 or 123.45
 pensionCommencementLumpSumAmount.relevant.error.tooLarge = Relevant pension in respect of the PCLS must be 999999999.99 or less
+
+pcls.removePcls.title = Are you sure you want to remove the PCLS for this member?
+pcls.removePcls.heading = Are you sure you want to remove the PCLS of £{0} for {1}?
+pcls.removePcls.error.required = Select yes if you are sure you want to remove the PCLS for this member
 
 feesCommissionsWagesSalaries.title = How much did the scheme pay in fees, commissions, wages and salaries during the period of this return, in pounds and pence?
 feesCommissionsWagesSalaries.heading = How much did {0} pay in fees, commissions, wages and salaries during the period of this return, in pounds and pence?
@@ -455,7 +467,7 @@ benefitsSurrendered.error.required = Select yes if any member surrendered benefi
 otherAssetsHeld.title = Did the scheme hold any other assets during the period of this return?
 otherAssetsHeld.heading = Did {0} hold any other assets during the period of this return?
 otherAssetsHeld.error.required = Select yes if the scheme held any other assets during the period of this return
-otherAssetsHeld.hint = This should not include shares, bonds, land or property. If your scheme holds any of these assets, report them in the relevant section of this pension scheme return.
+otherAssetsHeld.hint = This does not include shares, bonds, land or property. If your scheme holds any of these assets, report them in the relevant section of this pension scheme return.
 
 returnSubmitted.title = Return submitted
 returnSubmitted.panel.heading = Return submitted
@@ -914,7 +926,7 @@ securityGivenForLoan.securityGiven.yes.conditional = Provide details of the secu
 securityGivenForLoan.securityGiven.yes.hint = You can enter a maximum of 160 characters.
 securityGivenForLoan.securityGiven.error.required = Select yes if security has been given for this loan
 securityGivenForLoan.securityGiven.yes.conditional.error.required = Enter details of the security
-securityGivenForLoan.securityGiven.yes.conditional.error.invalid = Details of the security must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, full stops, hyphens, slashes, speech marks and spaces
+securityGivenForLoan.securityGiven.yes.conditional.error.invalid = Details of the security must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hashes (#), hyphens, speech marks and spaces
 securityGivenForLoan.securityGiven.yes.conditional.error.length = Details of the security must be 160 characters or fewer
 
 loansList.title = You have added {0} loan

@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
-package viewmodels.models
+package pages.nonsipp
 
-import viewmodels.DisplayMessage.{InlineMessage, Message}
+import play.api.libs.json.{__, JsPath}
 
-case class DatePageViewModel(
-  legend: Option[Message],
-  header: InlineMessage
-)
+package object memberreceivedpcls {
+
+  object Paths {
+    val membersPayments: JsPath = __ \ "membersPayments"
+    val memberDetails: JsPath = membersPayments \ "memberDetails"
+  }
+}

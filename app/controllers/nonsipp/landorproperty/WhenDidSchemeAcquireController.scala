@@ -138,7 +138,7 @@ object WhenDidSchemeAcquireController {
     FormPageViewModel(
       "whenDidSchemeAcquireLandOrProperty.title",
       Message("whenDidSchemeAcquireLandOrProperty.heading", schemeName, propertyAddress),
-      DatePageViewModel(),
+      DatePageViewModel(None, Message("whenDidSchemeAcquireLandOrProperty.heading", schemeName, propertyAddress)),
       routes.WhenDidSchemeAcquireController.onSubmit(srn, index, mode)
     )
 }

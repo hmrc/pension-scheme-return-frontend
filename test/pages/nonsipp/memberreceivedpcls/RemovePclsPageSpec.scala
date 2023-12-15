@@ -14,11 +14,22 @@
  * limitations under the License.
  */
 
-package viewmodels.models
+package pages.nonsipp.memberreceivedpcls
 
-import viewmodels.DisplayMessage.{InlineMessage, Message}
+import config.Refined.OneTo300
+import eu.timepit.refined.refineMV
+import pages.behaviours.PageBehaviours
 
-case class DatePageViewModel(
-  legend: Option[Message],
-  header: InlineMessage
-)
+class RemovePclsPageSpec extends PageBehaviours {
+
+  "RemovePclsPage" - {
+
+    val index = refineMV[OneTo300](1)
+
+    beRetrievable[Boolean](RemovePclsPage(srnGen.sample.value, index))
+
+    beSettable[Boolean](RemovePclsPage(srnGen.sample.value, index))
+
+    beRemovable[Boolean](RemovePclsPage(srnGen.sample.value, index))
+  }
+}

@@ -137,6 +137,7 @@ trait TestValues {
   val reasonBorrowed = "test reason borrowed"
   val transferringSchemeName = "transferring scheme"
   val receivingSchemeName = "receiving scheme"
+  val pcls: PensionCommencementLumpSum = PensionCommencementLumpSum(money, money)
 
   val address: Address = Address(
     "test-id",

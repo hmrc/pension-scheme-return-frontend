@@ -119,7 +119,7 @@ object PclsMemberListController {
                   LinkMessage(
                     Message("site.add"),
                     controllers.nonsipp.memberreceivedpcls.routes.PensionCommencementLumpSumAmountController
-                      .onSubmit(srn, nextIndex, mode)
+                      .onSubmit(srn, nextIndex, NormalMode)
                       .url
                   )
                 ),
@@ -136,19 +136,17 @@ object PclsMemberListController {
                 TableElem(
                   LinkMessage(
                     Message("site.change"),
-                    controllers.nonsipp.memberreceivedpcls.routes.PensionCommencementLumpSumAmountController
-                      .onSubmit(srn, nextIndex, mode)
+                    controllers.nonsipp.memberreceivedpcls.routes.PclsCYAController
+                      .onSubmit(srn, nextIndex, CheckMode)
                       .url
                   )
                 ),
                 TableElem(
                   LinkMessage(
                     Message("site.remove"),
-//                    TODO change this when the PCLS removal page is done
-//                    controllers.nonsipp.receivetransfer.routes.WhichTransferInRemoveController
-//                      .onSubmit(srn, nextIndex)
-//                      .url
-                    controllers.routes.UnauthorisedController.onPageLoad().url
+                    controllers.nonsipp.memberreceivedpcls.routes.RemovePclsController
+                      .onSubmit(srn, nextIndex)
+                      .url
                   )
                 )
               )

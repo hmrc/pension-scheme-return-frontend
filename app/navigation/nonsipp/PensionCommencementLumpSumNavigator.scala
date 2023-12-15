@@ -16,15 +16,10 @@
 
 package navigation.nonsipp
 
-import models.{NormalMode, UserAnswers}
+import models.{CheckMode, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.memberreceivedpcls.{
-  PclsMemberListPage,
-  PensionCommencementLumpSumAmountPage,
-  PensionCommencementLumpSumPage,
-  WhatYouWillNeedPensionCommencementLumpSumPage
-}
+import pages.nonsipp.memberreceivedpcls._
 import play.api.mvc.Call
 
 object PensionCommencementLumpSumNavigator extends JourneyNavigator {
@@ -38,8 +33,9 @@ object PensionCommencementLumpSumNavigator extends JourneyNavigator {
         controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
       }
 
-    case PensionCommencementLumpSumAmountPage(srn, _, _) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+    case PensionCommencementLumpSumAmountPage(srn, index, NormalMode) =>
+      controllers.nonsipp.memberreceivedpcls.routes.PclsCYAController
+        .onPageLoad(srn, index, NormalMode)
 
     case WhatYouWillNeedPensionCommencementLumpSumPage(srn) =>
       controllers.nonsipp.memberreceivedpcls.routes.PclsMemberListController
@@ -47,7 +43,26 @@ object PensionCommencementLumpSumNavigator extends JourneyNavigator {
 
     case PclsMemberListPage(srn) =>
       controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
+
+    case PclsCYAPage(srn, _) =>
+      controllers.nonsipp.memberreceivedpcls.routes.PclsMemberListController
+        .onPageLoad(srn, 1, NormalMode)
+
+    case RemovePclsPage(srn, index) =>
+      controllers.nonsipp.memberreceivedpcls.routes.PclsMemberListController
+        .onPageLoad(srn, page = 1, NormalMode)
+
   }
 
-  override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] = _ => _ => PartialFunction.empty
+  override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] =
+    _ =>
+      _ => {
+        case PensionCommencementLumpSumAmountPage(srn, memberIndex, CheckMode) =>
+          controllers.nonsipp.memberreceivedpcls.routes.PclsCYAController
+            .onPageLoad(srn, memberIndex, NormalMode)
+
+        case PclsCYAPage(srn, _) =>
+          controllers.nonsipp.memberreceivedpcls.routes.PclsMemberListController
+            .onPageLoad(srn, 1, NormalMode)
+      }
 }

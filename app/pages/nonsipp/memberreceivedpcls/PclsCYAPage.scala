@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package viewmodels.models
+package pages.nonsipp.memberreceivedpcls
 
-import viewmodels.DisplayMessage.{InlineMessage, Message}
+import config.Refined.Max300
+import models.SchemeId.Srn
+import pages.Page
 
-case class DatePageViewModel(
-  legend: Option[Message],
-  header: InlineMessage
-)
+case class PclsCYAPage(srn: Srn, index: Max300) extends Page
