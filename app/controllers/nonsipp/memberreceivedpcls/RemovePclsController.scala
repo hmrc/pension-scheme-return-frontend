@@ -53,16 +53,28 @@ class RemovePclsController @Inject()(
 
   def onPageLoad(srn: Srn, memberIndex: Max300): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      (
-        for {
-          total <- request.userAnswers
-            .get(PensionCommencementLumpSumAmountPage(srn, memberIndex, NormalMode))
-            .getOrRecoverJourney
-          nameDOB <- request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).getOrRecoverJourney
-        } yield Ok(
-          view(form, RemovePclsController.viewModel(srn, memberIndex, total.lumpSumAmount, nameDOB.fullName))
-        )
-      ).merge
+      val nameDOB = request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).get
+      val total = request.userAnswers.get(PensionCommencementLumpSumAmountPage(srn, memberIndex, NormalMode))
+      total match {
+        case Some(value) =>
+          Ok(
+            view(
+              form,
+              RemovePclsController.viewModel(
+                srn,
+                memberIndex: Max300,
+                value.lumpSumAmount,
+                nameDOB.fullName
+              )
+            )
+          )
+        case None =>
+          Redirect(
+            controllers.nonsipp.memberreceivedpcls.routes.PensionCommencementLumpSumController
+              .onPageLoad(srn, NormalMode)
+              .url
+          )
+      }
     }
 
   def onSubmit(srn: Srn, memberIndex: Max300): Action[AnyContent] =
