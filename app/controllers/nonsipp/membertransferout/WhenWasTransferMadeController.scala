@@ -26,14 +26,14 @@ import models.{DateRange, Mode}
 import models.SchemeId.Srn
 import navigation.Navigator
 import pages.nonsipp.memberdetails.MemberDetailsPage
-import pages.nonsipp.membertransferout.{ReceivingSchemeNamePage, WhenWasTransferMadePage}
+import pages.nonsipp.membertransferout.{ReceivingSchemeNamePage, TransfersOutCompletedPage, WhenWasTransferMadePage}
 import play.api.data.Form
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{SaveService, SchemeDateService}
 import utils.DateTimeUtils.localDateShow
 import viewmodels.DisplayMessage.Message
-import viewmodels.models.{DatePageViewModel, FormPageViewModel}
+import viewmodels.models.{DatePageViewModel, FormPageViewModel, SectionCompleted}
 import views.html.DatePageView
 import viewmodels.implicits._
 
@@ -108,7 +108,11 @@ class WhenWasTransferMadeController @Inject()(
             value =>
               for {
                 updatedAnswers <- Future
-                  .fromTry(request.userAnswers.set(WhenWasTransferMadePage(srn, index, secondaryIndex), value))
+                  .fromTry(
+                    request.userAnswers
+                      .set(WhenWasTransferMadePage(srn, index, secondaryIndex), value)
+                      .set(TransfersOutCompletedPage(srn, index, secondaryIndex), SectionCompleted)
+                  )
                 _ <- saveService.save(updatedAnswers)
               } yield Redirect(
                 navigator.nextPage(WhenWasTransferMadePage(srn, index, secondaryIndex), mode, updatedAnswers)

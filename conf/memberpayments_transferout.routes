@@ -34,3 +34,8 @@ GET        /:srn/when-was-transfer-made/:index/:secondaryIndex                  
 POST       /:srn/when-was-transfer-made/:index/:secondaryIndex                          controllers.nonsipp.membertransferout.WhenWasTransferMadeController.onSubmit(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode = NormalMode)
 GET        /:srn/change-when-was-transfer-made/:index/:secondaryIndex                   controllers.nonsipp.membertransferout.WhenWasTransferMadeController.onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode = CheckMode)
 POST       /:srn/change-when-was-transfer-made/:index/:secondaryIndex                   controllers.nonsipp.membertransferout.WhenWasTransferMadeController.onSubmit(srn: Srn, index: Max300, secondaryIndex: Max5, mode: Mode = CheckMode)
+
+GET        /:srn/check-answers-transfers-out/:index                 controllers.nonsipp.membertransferout.TransfersOutCYAController.onPageLoad(srn: Srn, index: Max300, mode: Mode = NormalMode)
+POST       /:srn/check-answers-transfers-out/:index                 controllers.nonsipp.membertransferout.TransfersOutCYAController.onSubmit(srn: Srn, index: Max300, mode: Mode = NormalMode)
+GET        /:srn/change-check-answers-transfers-out/:index          controllers.nonsipp.membertransferout.TransfersOutCYAController.onPageLoad(srn: Srn, index: Max300, mode: Mode = CheckMode)
+POST       /:srn/change-check-answers-transfers-out/:index          controllers.nonsipp.membertransferout.TransfersOutCYAController.onSubmit(srn: Srn, index: Max300, mode: Mode = CheckMode)

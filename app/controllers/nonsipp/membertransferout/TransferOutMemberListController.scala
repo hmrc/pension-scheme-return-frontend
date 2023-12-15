@@ -141,7 +141,9 @@ object TransferOutMemberListController {
                 TableElem(
                   LinkMessage(
                     Message("site.change"),
-                    controllers.routes.UnauthorisedController.onPageLoad().url
+                    controllers.nonsipp.membertransferout.routes.TransfersOutCYAController
+                      .onPageLoad(srn, nextIndex, CheckMode)
+                      .url
                   )
                 ),
                 TableElem(
