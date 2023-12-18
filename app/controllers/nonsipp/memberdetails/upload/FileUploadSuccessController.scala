@@ -28,7 +28,7 @@ import pages.nonsipp.memberdetails._
 import pages.nonsipp.memberdetails.upload.FileUploadSuccessPage
 import play.api.i18n._
 import play.api.mvc._
-import services.{SaveService, UploadService}
+import services.{PsrSubmissionService, SaveService, UploadService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage._
 import viewmodels.implicits._
@@ -46,7 +46,8 @@ class FileUploadSuccessController @Inject()(
   saveService: SaveService,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
-  view: ContentPageView
+  view: ContentPageView,
+  psrSubmissionService: PsrSubmissionService
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
@@ -64,7 +65,10 @@ class FileUploadSuccessController @Inject()(
         for {
           updatedUserAnswers <- Future.fromTry(memberDetailsToUserAnswers(srn, sortAlphabetically(memberDetails)))
           _ <- saveService.save(updatedUserAnswers)
-        } yield Redirect(navigator.nextPage(FileUploadSuccessPage(srn), mode, updatedUserAnswers))
+          submissionResult <- psrSubmissionService.submitPsrDetails(srn, updatedUserAnswers)
+        } yield submissionResult.fold(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))(
+          _ => Redirect(navigator.nextPage(FileUploadSuccessPage(srn), mode, updatedUserAnswers))
+        )
       case _ => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
     }
   }

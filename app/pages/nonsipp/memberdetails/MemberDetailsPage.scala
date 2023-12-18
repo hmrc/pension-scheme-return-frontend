@@ -28,6 +28,7 @@ import scala.util.Try
 
 case class MemberDetailsPage(srn: Srn, index: Max300) extends QuestionPage[NameDOB] {
 
+  // won't work with a get all pages as Map as the arrayIndex must be a string
   override def path: JsPath = Paths.personalDetails \ toString \ index.arrayIndex
 
   override def cleanup(value: Option[NameDOB], userAnswers: UserAnswers): Try[UserAnswers] =

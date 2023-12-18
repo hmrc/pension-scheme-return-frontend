@@ -33,6 +33,7 @@ import services.PsrSubmissionServiceSpec.{captor, minimalRequiredSubmission}
 import transformations.{
   LandOrPropertyTransactionsTransformer,
   LoanTransactionsTransformer,
+  MemberPaymentsTransformer,
   MinimalRequiredSubmissionTransformer,
   MoneyBorrowedTransformer
 }
@@ -52,6 +53,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
     reset(mockLoanTransactionsTransformer)
     reset(mockLandOrPropertyTransactionsTransformer)
     reset(mockMoneyBorrowedTransformer)
+    reset(mockMemberPaymentsTransformerTransformer)
   }
 
   val allowedAccessRequest
@@ -63,6 +65,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
   private val mockLoanTransactionsTransformer = mock[LoanTransactionsTransformer]
   private val mockLandOrPropertyTransactionsTransformer = mock[LandOrPropertyTransactionsTransformer]
   private val mockMoneyBorrowedTransformer = mock[MoneyBorrowedTransformer]
+  private val mockMemberPaymentsTransformerTransformer = mock[MemberPaymentsTransformer]
 
   private val service =
     new PsrSubmissionService(
@@ -70,6 +73,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
       mockMinimalRequiredSubmissionTransformer,
       mockLoanTransactionsTransformer,
       mockLandOrPropertyTransactionsTransformer,
+      mockMemberPaymentsTransformerTransformer,
       mockMoneyBorrowedTransformer
     )
 
@@ -151,7 +155,9 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
         captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
         captor.getValue.checkReturnDates mustBe false
         captor.getValue.loans mustBe None
-        captor.getValue.assets mustBe Some(Assets(LandOrProperty(true, List.empty), Borrowing(false, List.empty)))
+        captor.getValue.assets mustBe Some(
+          Assets(LandOrProperty(true, false, List.empty), Borrowing(false, List.empty))
+        )
         result mustBe Some(())
       }
     }
@@ -178,7 +184,9 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
         captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
         captor.getValue.checkReturnDates mustBe false
         captor.getValue.loans mustBe None
-        captor.getValue.assets mustBe Some(Assets(LandOrProperty(false, List.empty), Borrowing(true, List.empty)))
+        captor.getValue.assets mustBe Some(
+          Assets(LandOrProperty(false, false, List.empty), Borrowing(true, List.empty))
+        )
         result mustBe Some(())
       }
     }

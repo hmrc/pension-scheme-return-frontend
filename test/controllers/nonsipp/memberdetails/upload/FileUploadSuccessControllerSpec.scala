@@ -37,10 +37,10 @@ import models.{
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsNinoPage, MemberDetailsPage, NoNINOPage}
-import play.api.inject
+import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
 import play.api.test.FakeRequest
-import services.{SaveService, UploadService}
+import services.{PsrSubmissionService, SaveService, UploadService}
 import uk.gov.hmrc.domain.Nino
 import views.html.ContentPageView
 
@@ -54,10 +54,12 @@ class FileUploadSuccessControllerSpec extends ControllerBaseSpec {
 
   private val mockUploadService = mock[UploadService]
   private val mockSaveService = mock[SaveService]
+  private val mockPsrSubmissionService = mock[PsrSubmissionService]
 
   override val additionalBindings: List[GuiceableModule] = List(
-    inject.bind[UploadService].toInstance(mockUploadService),
-    inject.bind[SaveService].toInstance(mockSaveService)
+    bind[UploadService].toInstance(mockUploadService),
+    bind[SaveService].toInstance(mockSaveService),
+    bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
   )
 
   def addMemberDetails(userAnswers: UserAnswers, srn: Srn, total: Int): UserAnswers = {
@@ -82,6 +84,8 @@ class FileUploadSuccessControllerSpec extends ControllerBaseSpec {
     reset(mockUploadService)
     reset(mockSaveService)
     when(mockSaveService.save(any())(any(), any())).thenReturn(Future.successful(()))
+    when(mockPsrSubmissionService.submitPsrDetails(any(), any())(any(), any(), any()))
+      .thenReturn(Future.successful(Some(())))
   }
 
   "FileUploadSuccessController" - {

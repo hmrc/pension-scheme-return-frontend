@@ -25,6 +25,7 @@ case class Assets(landOrProperty: LandOrProperty, borrowing: Borrowing)
 
 case class LandOrProperty(
   landOrPropertyHeld: Boolean,
+  disposeAnyLandOrProperty: Boolean,
   landOrPropertyTransactions: Seq[LandOrPropertyTransactions]
 )
 

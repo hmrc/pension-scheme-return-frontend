@@ -21,6 +21,7 @@ import controllers.ControllerBaseSpec
 import controllers.nonsipp.employercontributions.EmployerContributionsCYAController._
 import eu.timepit.refined.refineMV
 import models.{ConditionalYesNo, Crn, IdentityType, NormalMode}
+import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.employercontributions.{
   EmployerCompanyCrnPage,
   EmployerNamePage,
@@ -28,7 +29,12 @@ import pages.nonsipp.employercontributions.{
   TotalEmployerContributionPage
 }
 import pages.nonsipp.memberdetails.MemberDetailsPage
+import play.api.inject.bind
+import play.api.inject.guice.GuiceableModule
+import services.{PsrSubmissionService, SaveService, UploadService}
 import views.html.CheckYourAnswersView
+
+import scala.concurrent.Future
 
 class EmployerContributionsCYAControllerSpec extends ControllerBaseSpec {
 
@@ -44,12 +50,24 @@ class EmployerContributionsCYAControllerSpec extends ControllerBaseSpec {
     routes.EmployerContributionsCYAController.onPageLoad(srn, index, page, NormalMode)
   private lazy val onSubmit = routes.EmployerContributionsCYAController.onSubmit(srn, index, page, NormalMode)
 
+  private val mockPsrSubmissionService = mock[PsrSubmissionService]
+
+  override val additionalBindings: List[GuiceableModule] = List(
+    bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
+  )
+
   private val userAnswers = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, index), memberDetails)
     .unsafeSet(EmployerNamePage(srn, index, secondaryIndex), employerName)
     .unsafeSet(EmployerTypeOfBusinessPage(srn, index, secondaryIndex), IdentityType.UKCompany)
     .unsafeSet(TotalEmployerContributionPage(srn, index, secondaryIndex), money)
     .unsafeSet(EmployerCompanyCrnPage(srn, index, secondaryIndex), ConditionalYesNo.yes[String, Crn](crn))
+
+  override def beforeEach(): Unit = {
+    reset(mockPsrSubmissionService)
+    when(mockPsrSubmissionService.submitPsrDetails(any(), any())(any(), any(), any()))
+      .thenReturn(Future.successful(Some(())))
+  }
 
   "EmployerContributionsCYAController" - {
 

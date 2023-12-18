@@ -22,7 +22,8 @@ case class PsrSubmission(
   minimalRequiredSubmission: MinimalRequiredSubmission,
   checkReturnDates: Boolean,
   loans: Option[Loans],
-  assets: Option[Assets]
+  assets: Option[Assets],
+  membersPayments: Option[MemberPayments]
 )
 
 object PsrSubmission {

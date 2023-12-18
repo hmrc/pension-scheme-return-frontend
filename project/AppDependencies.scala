@@ -32,7 +32,8 @@ object AppDependencies {
     "org.jsoup"               %  "jsoup"                   % "1.15.4",
     "org.mockito"             %% "mockito-scala"           % "1.17.12",
     "org.scalacheck"          %% "scalacheck"              % "1.17.0",
-    "com.vladsch.flexmark"    %  "flexmark-all"            % "0.64.6"
+    "com.vladsch.flexmark"    %  "flexmark-all"            % "0.64.6",
+    "com.softwaremill.diffx"  %% "diffx-scalatest-should"  % "0.9.0",
   ).map(_ % "test, it")
 
   def apply(): Seq[ModuleID] = compile ++ test

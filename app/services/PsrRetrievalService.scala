@@ -23,6 +23,7 @@ import play.api.mvc.AnyContent
 import transformations.{
   LandOrPropertyTransactionsTransformer,
   LoanTransactionsTransformer,
+  MemberPaymentsTransformer,
   MinimalRequiredSubmissionTransformer,
   MoneyBorrowedTransformer
 }
@@ -37,7 +38,8 @@ class PsrRetrievalService @Inject()(
   minimalRequiredSubmissionTransformer: MinimalRequiredSubmissionTransformer,
   loanTransactionsTransformer: LoanTransactionsTransformer,
   landOrPropertyTransactionsTransformer: LandOrPropertyTransactionsTransformer,
-  moneyBorrowedTransformer: MoneyBorrowedTransformer
+  moneyBorrowedTransformer: MoneyBorrowedTransformer,
+  memberPaymentsTransformer: MemberPaymentsTransformer
 ) {
 
   def getStandardPsrDetails(
@@ -115,8 +117,15 @@ class PsrRetrievalService @Inject()(
                   }
               )
               .getOrElse(Try(transformedLandOrPropertyAssetsUa))
+
+            transformedMemberDetails <- psrDetails.membersPayments
+              .map(
+                memberPayments =>
+                  memberPaymentsTransformer.transformFromEtmp(transformedMoneyBorrowingAssets, srn, memberPayments)
+              )
+              .getOrElse(Try(transformedMoneyBorrowingAssets))
           } yield {
-            transformedMoneyBorrowingAssets
+            transformedMemberDetails
           }
           Future.fromTry(result)
         case _ => Future(emptyUserAnswers)

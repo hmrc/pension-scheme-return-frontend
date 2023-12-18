@@ -19,18 +19,14 @@ package services
 import cats.implicits._
 import connectors.PSRConnector
 import models.SchemeId.Srn
+import models.UserAnswers
 import models.requests.DataRequest
 import models.requests.psr._
 import pages.nonsipp.CheckReturnDatesPage
 import pages.nonsipp.landorproperty.LandOrPropertyHeldPage
 import pages.nonsipp.loansmadeoroutstanding._
 import pages.nonsipp.moneyborrowed.MoneyBorrowedPage
-import transformations.{
-  LandOrPropertyTransactionsTransformer,
-  LoanTransactionsTransformer,
-  MinimalRequiredSubmissionTransformer,
-  MoneyBorrowedTransformer
-}
+import transformations._
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
@@ -41,8 +37,15 @@ class PsrSubmissionService @Inject()(
   minimalRequiredSubmissionTransformer: MinimalRequiredSubmissionTransformer,
   loanTransactionsTransformer: LoanTransactionsTransformer,
   landOrPropertyTransactionsTransformer: LandOrPropertyTransactionsTransformer,
+  memberPaymentsTransformer: MemberPaymentsTransformer,
   moneyBorrowedTransformer: MoneyBorrowedTransformer
 ) {
+
+  def submitPsrDetails(
+    srn: Srn,
+    userAnswers: UserAnswers
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext, request: DataRequest[_]): Future[Option[Unit]] =
+    submitPsrDetails(srn)(implicitly, implicitly, DataRequest(request.request, userAnswers))
 
   def submitPsrDetails(
     srn: Srn
@@ -64,6 +67,7 @@ class PsrSubmissionService @Inject()(
             Assets(
               landOrProperty = LandOrProperty(
                 landOrPropertyHeld = landOrPropertyHeld,
+                disposeAnyLandOrProperty = false,
                 landOrPropertyTransactions = landOrPropertyTransactionsTransformer.transformToEtmp(srn)
               ),
               borrowing = Borrowing(
@@ -71,7 +75,8 @@ class PsrSubmissionService @Inject()(
                 moneyBorrowed = moneyBorrowedTransformer.transformToEtmp(srn)
               )
             )
-          )
+          ),
+          membersPayments = memberPaymentsTransformer.transformToEtmp(srn, request.userAnswers)
         )
       )
     }.sequence

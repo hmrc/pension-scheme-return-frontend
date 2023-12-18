@@ -32,6 +32,7 @@ import services.PsrSubmissionServiceSpec.minimalRequiredSubmission
 import transformations.{
   LandOrPropertyTransactionsTransformer,
   LoanTransactionsTransformer,
+  MemberPaymentsTransformer,
   MinimalRequiredSubmissionTransformer,
   MoneyBorrowedTransformer
 }
@@ -65,6 +66,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
   private val mockLoanTransactionsTransformer = mock[LoanTransactionsTransformer]
   private val mockLandOrPropertyTransactionsTransformer = mock[LandOrPropertyTransactionsTransformer]
   private val mockMoneyBorrowedTransformer = mock[MoneyBorrowedTransformer]
+  private val mockMemberPaymentsTransformer = mock[MemberPaymentsTransformer]
   private val mockReq = mock[DataRequest[AnyContent]]
 
   private val service =
@@ -73,7 +75,8 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
       mockMinimalRequiredSubmissionTransformer,
       mockLoanTransactionsTransformer,
       mockLandOrPropertyTransactionsTransformer,
-      mockMoneyBorrowedTransformer
+      mockMoneyBorrowedTransformer,
+      mockMemberPaymentsTransformer
     )
 
   private implicit val hc: HeaderCarrier = HeaderCarrier()
@@ -103,7 +106,8 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
               minimalRequiredSubmission,
               false,
               None,
-              None
+              None,
+              membersPayments = None
             )
           )
         )
@@ -131,7 +135,8 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
               minimalRequiredSubmission,
               false,
               Some(loans),
-              None
+              None,
+              membersPayments = None
             )
           )
         )
@@ -161,7 +166,8 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
               minimalRequiredSubmission,
               false,
               None,
-              Some(assets)
+              Some(assets),
+              membersPayments = None
             )
           )
         )
@@ -205,7 +211,11 @@ object PsrRetrievalServiceSpec {
   )
 
   val assets: Assets = Assets(
-    LandOrProperty(landOrPropertyHeld = true, landOrPropertyTransactions = Seq.empty),
+    LandOrProperty(
+      landOrPropertyHeld = true,
+      disposeAnyLandOrProperty = false,
+      landOrPropertyTransactions = Seq.empty
+    ),
     Borrowing(moneyWasBorrowed = true, moneyBorrowed = Seq.empty)
   )
 }
