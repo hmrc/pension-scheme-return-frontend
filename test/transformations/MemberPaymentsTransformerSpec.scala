@@ -29,7 +29,11 @@ import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import pages.nonsipp.employercontributions._
 import pages.nonsipp.memberdetails._
-import pages.nonsipp.memberpayments.EmployerContributionsPage
+import pages.nonsipp.memberpayments.{
+  EmployerContributionsPage,
+  UnallocatedEmployerAmountPage,
+  UnallocatedEmployerContributionsPage
+}
 import utils.UserAnswersUtils.UserAnswersOps
 import viewmodels.models.{MemberState, SectionCompleted, SectionStatus}
 
@@ -64,7 +68,9 @@ class MemberPaymentsTransformerSpec
         )
       )
     ),
-    employerContributionsCompleted = true
+    employerContributionsCompleted = true,
+    unallocatedContribsMade = true,
+    unallocatedContribAmount = Some(money.value)
   )
 
   private val index = refineMV[Max300.Refined](1)
@@ -82,6 +88,8 @@ class MemberPaymentsTransformerSpec
     .unsafeSet(TotalEmployerContributionPage(srn, index, secondaryIndex), money)
     .unsafeSet(EmployerContributionsCompleted(srn, index, secondaryIndex), SectionCompleted)
     .unsafeSet(EmployerContributionsPage(srn), true)
+    .unsafeSet(UnallocatedEmployerContributionsPage(srn), true)
+    .unsafeSet(UnallocatedEmployerAmountPage(srn), money)
 
   "MemberPaymentsTransformer - To Etmp" - {
     "should return empty List when userAnswer is empty" in {
