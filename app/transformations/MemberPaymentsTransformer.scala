@@ -25,15 +25,10 @@ import models.requests.psr._
 import models.{ConditionalYesNo, Crn, IdentityType, Money, NameDOB, UserAnswers, Utr}
 import pages.nonsipp.employercontributions._
 import pages.nonsipp.memberdetails.MembersDetailsPages._
-import pages.nonsipp.memberdetails.{
-  DoesMemberHaveNinoPage,
-  MemberDetailsNinoPage,
-  MemberDetailsPage,
-  MemberStatus,
-  NoNINOPage
-}
+import pages.nonsipp.memberdetails._
+import pages.nonsipp.memberpayments.EmployerContributionsPage
 import uk.gov.hmrc.domain.Nino
-import viewmodels.models.MemberState
+import viewmodels.models.{MemberState, SectionCompleted, SectionStatus}
 
 import javax.inject.Inject
 import scala.util.Try
@@ -43,32 +38,37 @@ class MemberPaymentsTransformer @Inject()() extends Transformer {
 
   def transformToEtmp(srn: Srn, userAnswers: UserAnswers): Option[MemberPayments] = {
 
-    val refinedMemberDetails: Map[Max300, NameDOB] = userAnswers
+    val refinedMemberDetails: List[(Max300, NameDOB)] = userAnswers
       .membersDetails(srn)
       .zipWithIndex
       .flatMap {
         case (details, index) =>
           refineIndex[Max300.Refined](index).map(_ -> details).toList
       }
-      .toMap
 
-    val memberDetails = refinedMemberDetails
-      .map {
-        case (index, memberDetails) =>
-          val secondaryIndexes =
-            keysToIndex[Max50.Refined](userAnswers.map(EmployerContributionsCompletedForMember(srn, index)))
+    val memberDetails: List[MemberDetails] = refinedMemberDetails.flatMap {
+      case (index, memberDetails) =>
+        val secondaryIndexes =
+          keysToIndex[Max50.Refined](userAnswers.map(EmployerContributionsCompletedForMember(srn, index)))
 
-          for {
-            employerContributions <- buildEmployerContributions(srn, index, secondaryIndexes, userAnswers)
-          } yield MemberDetails(
-            personalDetails = buildMemberPersonalDetails(srn, index, memberDetails, userAnswers),
-            employerContributions = employerContributions
+        for {
+          employerContributions <- buildEmployerContributions(srn, index, secondaryIndexes, userAnswers)
+        } yield MemberDetails(
+          personalDetails = buildMemberPersonalDetails(srn, index, memberDetails, userAnswers),
+          employerContributions = employerContributions
+        )
+    }
+
+    memberDetails match {
+      case Nil => None
+      case list =>
+        Some(
+          MemberPayments(
+            memberDetails = list,
+            employerContributionsCompleted = userAnswers.get(EmployerContributionsSectionStatus(srn)).nonEmpty
           )
-      }
-      .toList
-      .sequence
-
-    memberDetails.map(MemberPayments(_))
+        )
+    }
   }
 
   def transformFromEtmp(userAnswers: UserAnswers, srn: Srn, memberPayments: MemberPayments): Try[UserAnswers] =
@@ -79,7 +79,12 @@ class MemberPaymentsTransformer @Inject()() extends Transformer {
         case (ua, (memberDetails, index)) =>
           val pages: List[Try[UserAnswers] => Try[UserAnswers]] =
             memberPersonalDetailsPages(srn, index, memberDetails.personalDetails) ++
-              employerContributionsPages(srn, index, memberDetails.employerContributions)
+              employerContributionsPages(
+                srn,
+                index,
+                memberPayments.employerContributionsCompleted,
+                memberDetails.employerContributions
+              )
 
           pages.foldLeft(ua)((userAnswers, f) => f(userAnswers))
       }
@@ -106,8 +111,7 @@ class MemberPaymentsTransformer @Inject()() extends Transformer {
     srn: Srn,
     index: Max300,
     personalDetails: MemberPersonalDetails
-  ): List[Try[UserAnswers] => Try[UserAnswers]] = {
-    println(s"=============== p ${personalDetails}")
+  ): List[Try[UserAnswers] => Try[UserAnswers]] =
     List(
       _.set(
         MemberDetailsPage(srn, index),
@@ -128,7 +132,6 @@ class MemberPaymentsTransformer @Inject()() extends Transformer {
           .getOrElse(ua),
       _.set(MemberStatus(srn, index), MemberState.Active)
     )
-  }
 
   private def buildEmployerContributions(
     srn: Srn,
@@ -153,17 +156,16 @@ class MemberPaymentsTransformer @Inject()() extends Transformer {
   private def employerContributionsPages(
     srn: Srn,
     index: Max300,
-    employerContributions: List[EmployerContributions]
+    employerContributionsCompleted: Boolean,
+    employerContributionsList: List[EmployerContributions]
   ): List[Try[UserAnswers] => Try[UserAnswers]] = {
-    val secondaryIndexes: List[(Max50, EmployerContributions)] = employerContributions.zipWithIndex
+    val secondaryIndexes: List[(Max50, EmployerContributions)] = employerContributionsList.zipWithIndex
       .traverse {
         case (employerContributions, index) =>
           refineIndex[Max50.Refined](index).map(_ -> employerContributions)
       }
       .toList
       .flatten
-
-    println(s"=============== ${employerContributions}")
 
     secondaryIndexes.flatMap {
       case (secondaryIndex, employerContributions) =>
@@ -172,7 +174,13 @@ class MemberPaymentsTransformer @Inject()() extends Transformer {
           _.set(
             TotalEmployerContributionPage(srn, index, secondaryIndex),
             Money(employerContributions.totalTransferValue)
-          )
+          ),
+          _.set(
+            EmployerContributionsSectionStatus(srn),
+            if (employerContributionsCompleted) SectionStatus.Completed else SectionStatus.InProgress
+          ),
+          _.set(EmployerContributionsCompleted(srn, index, secondaryIndex), SectionCompleted),
+          _.set(EmployerContributionsPage(srn), employerContributionsList.nonEmpty)
         ) ++ List(
           employerContributions.employerType match {
             case EmployerType.UKCompany(idOrReason) =>

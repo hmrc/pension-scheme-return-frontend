@@ -21,9 +21,15 @@ import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.NameDOB
 import controllers.nonsipp.employercontributions.RemoveEmployerContributionsController._
+import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.employercontributions.{EmployerNamePage, TotalEmployerContributionPage}
 import pages.nonsipp.memberdetails.MemberDetailsPage
+import play.api.inject.guice.GuiceableModule
+import services.PsrSubmissionService
 import views.html.YesNoPageView
+import play.api.inject.bind
+
+import scala.concurrent.Future
 
 class RemoveEmployerContributionsControllerSpec extends ControllerBaseSpec {
 
@@ -32,11 +38,23 @@ class RemoveEmployerContributionsControllerSpec extends ControllerBaseSpec {
 
   override val memberDetails: NameDOB = nameDobGen.sample.value
 
+  private val mockPsrSubmissionService = mock[PsrSubmissionService]
+
   private val userAnswers = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
     .unsafeSet(MemberDetailsPage(srn, refineMV(2)), memberDetails)
     .unsafeSet(TotalEmployerContributionPage(srn, refineMV(1), refineMV(1)), money)
     .unsafeSet(EmployerNamePage(srn, refineMV(1), refineMV(1)), employerName)
+
+  override protected val additionalBindings: List[GuiceableModule] = List(
+    bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
+  )
+
+  override protected def beforeEach(): Unit = {
+    reset(mockPsrSubmissionService)
+    when(mockPsrSubmissionService.submitPsrDetails(any(), any())(any(), any(), any()))
+      .thenReturn(Future.successful(Some(())))
+  }
 
   "RemoveEmployerContributionsController" - {
 
@@ -57,5 +75,4 @@ class RemoveEmployerContributionsControllerSpec extends ControllerBaseSpec {
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
 
   }
-
 }

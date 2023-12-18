@@ -22,7 +22,10 @@ import play.api.libs.json._
 
 import java.time.LocalDate
 
-case class MemberPayments(memberDetails: List[MemberDetails])
+case class MemberPayments(
+  memberDetails: List[MemberDetails],
+  employerContributionsCompleted: Boolean
+)
 
 case class MemberDetails(
   personalDetails: MemberPersonalDetails,

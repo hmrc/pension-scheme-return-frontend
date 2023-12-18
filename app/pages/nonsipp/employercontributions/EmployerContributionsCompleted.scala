@@ -28,7 +28,7 @@ case class EmployerContributionsCompleted(srn: Srn, memberIndex: Max300, seconda
 
   override def path: JsPath = JsPath \ toString \ memberIndex.arrayIndex.toString \ secondaryIndex.arrayIndex.toString
 
-  override def toString: String = "employerContributionsCYA"
+  override def toString: String = "employerContributionsCompleted"
 }
 
 case class EmployerContributionsCompletedForMember(srn: Srn, memberIndex: Max300)
@@ -36,5 +36,5 @@ case class EmployerContributionsCompletedForMember(srn: Srn, memberIndex: Max300
 
   override def path: JsPath = JsPath \ toString \ memberIndex.arrayIndex.toString
 
-  override def toString: String = "employerContributionsCYA"
+  override def toString: String = "employerContributionsCompleted"
 }

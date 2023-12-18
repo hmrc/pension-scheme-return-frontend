@@ -65,7 +65,6 @@ class PsrRetrievalService @Inject()(
       )
       .flatMap {
         case Some(psrDetails) =>
-          println(s"========== dd ${psrDetails.membersPayments}")
           val result = for {
             transformedMinimalUa <- minimalRequiredSubmissionTransformer
               .transformFromEtmp(

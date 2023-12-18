@@ -370,6 +370,7 @@ class LandOrPropertyTransactionsTransformerSpec extends AnyFreeSpec with Matcher
   def buildLandOrProperty(name: String, propertyAcquiredFrom: PropertyAcquiredFrom): LandOrProperty =
     LandOrProperty(
       landOrPropertyHeld = true,
+      disposeAnyLandOrProperty = false,
       landOrPropertyTransactions = Seq(
         LandOrPropertyTransactions(
           PropertyDetails(
