@@ -149,7 +149,9 @@ object TransferOutMemberListController {
                 TableElem(
                   LinkMessage(
                     Message("site.remove"),
-                    controllers.routes.UnauthorisedController.onPageLoad().url
+                    controllers.nonsipp.membertransferout.routes.WhichTransferOutRemoveController
+                      .onSubmit(srn, nextIndex)
+                      .url
                   )
                 )
               )

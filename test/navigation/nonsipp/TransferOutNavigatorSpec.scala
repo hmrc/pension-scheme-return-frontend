@@ -242,4 +242,18 @@ class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
     }
   }
 
+  "RemoveTransferOutPage" - {
+
+    act.like(
+      normalmode
+        .navigateToWithIndex(
+          index,
+          RemoveTransferOutPage,
+          (srn, _: Max300, _) =>
+            controllers.nonsipp.membertransferout.routes.TransferOutMemberListController.onPageLoad(srn, 1, NormalMode)
+        )
+        .withName("go from remove transfer out page to transfer out member list page")
+    )
+  }
+
 }
