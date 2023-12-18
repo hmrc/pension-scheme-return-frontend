@@ -80,7 +80,8 @@ class DatePeriodLoanControllerSpec extends ControllerBaseSpec {
         "value.1.year" -> "2020",
         "value.2" -> moneyNegative.value.toString,
         "value.3" -> "12"
-      ).before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear))
+      ).withName("save and continue")
+        .before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear))
     )
 
     act.like(

@@ -65,7 +65,10 @@ class WhichTaxYearControllerSpec extends ControllerBaseSpec {
 
     act.like(invalidForm(onSubmit, "value" -> "invalid data"))
 
-    act.like(saveAndContinue(onSubmit, Some(JsPath \ "reportDetails"), "value" -> testDate.toString))
+    act.like(
+      saveAndContinue(onSubmit, Some(JsPath \ "reportDetails"), "value" -> testDate.toString)
+        .withName("save and continue")
+    )
 
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }

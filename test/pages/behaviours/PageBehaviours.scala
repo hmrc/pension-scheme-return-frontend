@@ -22,14 +22,14 @@ import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
-import org.scalatest.{OptionValues, TryValues}
+import org.scalatest.{OptionValues, ParallelSuite, TryValues}
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import pages.QuestionPage
 import play.api.libs.json._
 import queries.{Gettable, Removable, Settable}
 
 trait PageBehaviours
-    extends AnyFreeSpec
+    extends ParallelSuite
     with Matchers
     with ScalaCheckPropertyChecks
     with Generators

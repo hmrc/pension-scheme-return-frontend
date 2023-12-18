@@ -41,10 +41,8 @@ class DisposalIndependentValuationControllerSpec extends ControllerBaseSpec {
 
   "must bind validation errors when invalid data is submitted" in {
 
-    val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-
-    running(application) {
-      val formProvider = application.injector.instanceOf[YesNoPageFormProvider]
+    running(_ => applicationBuilder(userAnswers = Some(emptyUserAnswers))) { app =>
+      val formProvider = app.injector.instanceOf[YesNoPageFormProvider]
       val testForm = DisposalIndependentValuationController.form(formProvider)
       val boundForm = testForm.bind(Map("value" -> ""))
       boundForm.errors must contain(FormError("value", "disposalIndependentValuation.error.required"))
@@ -78,12 +76,12 @@ class DisposalIndependentValuationControllerSpec extends ControllerBaseSpec {
       }
     )
 
-    act.like(redirectNextPage(onSubmit, userAnswers, "value" -> "true"))
-    act.like(redirectNextPage(onSubmit, "value" -> "false"))
+    act.like(redirectNextPage(onSubmit, userAnswers, "value" -> "true").withName("redirect on yes"))
+    act.like(redirectNextPage(onSubmit, "value" -> "false").withName("redirect on no"))
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
-    act.like(saveAndContinue(onSubmit, userAnswers, "value" -> "true"))
+    act.like(saveAndContinue(onSubmit, userAnswers, "value" -> "true").withName("save and continue"))
 
     act.like(invalidForm(onSubmit, userAnswers))
 

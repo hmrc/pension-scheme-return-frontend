@@ -16,6 +16,7 @@
 
 package utils
 
+import controllers.BaseFixture
 import org.scalatest.freespec.AnyFreeSpecLike
 
 trait ActsLikeSpec { _: AnyFreeSpecLike =>
@@ -66,6 +67,29 @@ trait ActsLikeSpec { _: AnyFreeSpecLike =>
         }
     }
 
+    case class BehaviourFixtureTest[A <: BaseFixture](
+      name: String,
+      fixture: A,
+      test: () => Unit,
+      beforeTest: A => Unit = (_: A) => (),
+      afterTest: A => Unit = (_: A) => ()
+    ) extends Behaviours {
+      def withName(name: String): BehaviourFixtureTest[A] = copy(name = name)
+
+      def updateName(update: String => String): BehaviourFixtureTest[A] = copy(name = update(name))
+
+      def before(f: A => Unit): BehaviourFixtureTest[A] = copy(beforeTest = f)
+
+      def after(f: A => Unit): BehaviourFixtureTest[A] = copy(afterTest = f)
+
+      def run(): Unit =
+        name in {
+          beforeTest(fixture)
+          test()
+          afterTest(fixture)
+        }
+    }
+
     case class MultipleBehaviourTests(
       name: String,
       behaviours: List[BehaviourTest],
@@ -95,5 +119,8 @@ trait ActsLikeSpec { _: AnyFreeSpecLike =>
 
     def hasBehaviour(behaviour: => Unit): BehaviourTest =
       BehaviourTest(name, () => behaviour)
+
+    def hasFixtureBehaviour[A <: BaseFixture](fixture: A, behaviour: => Unit): BehaviourFixtureTest[A] =
+      BehaviourFixtureTest(name, fixture, () => behaviour)
   }
 }

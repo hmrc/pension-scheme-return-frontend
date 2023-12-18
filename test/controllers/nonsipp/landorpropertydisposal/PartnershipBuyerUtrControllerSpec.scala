@@ -68,12 +68,12 @@ class PartnershipBuyerUtrControllerSpec extends ControllerBaseSpec {
       }
     )
 
-    act.like(redirectNextPage(onSubmit, "value" -> "true", "value.yes" -> utr.value))
-    act.like(redirectNextPage(onSubmit, "value" -> "false", "value.no" -> "reason"))
+    act.like(redirectNextPage(onSubmit, "value" -> "true", "value.yes" -> utr.value).withName("redirect yes"))
+    act.like(redirectNextPage(onSubmit, "value" -> "false", "value.no" -> "reason").withName("redirect no"))
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
-    act.like(saveAndContinue(onSubmit, "value" -> "true", "value.yes" -> utr.value))
+    act.like(saveAndContinue(onSubmit, "value" -> "true", "value.yes" -> utr.value).withName("save and continue"))
 
     act.like(invalidForm(onSubmit, userAnswersCompanyName))
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))

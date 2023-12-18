@@ -16,51 +16,37 @@
 
 package utils
 
-import akka.actor.ActorSystem
-import akka.stream.Materializer
 import generators.Generators
 import models.ModelSerializers
 import org.mockito.MockitoSugar
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.time.{Millis, Span}
 import org.scalatest.verbs.BehaveWord
-import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, OptionValues}
+import org.scalatest._
 import play.api.Application
 import play.api.i18n.{Messages, MessagesApi}
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.FakeRequest
-import play.api.test.Helpers.running
 
 import java.net.URLEncoder
 import scala.annotation.nowarn
 import scala.reflect.ClassTag
 
 abstract class BaseSpec
-    extends AnyFreeSpec
+    extends ParallelSuite
     with ActsLikeSpec
     with Matchers
     with ScalaFutures
     with MockitoSugar
     with BeforeAndAfterEach
     with BeforeAndAfterAll
+    with ParallelTestExecution
     with OptionValues
     with Generators
     with ModelSerializers {
 
-  implicit val actorSystem: ActorSystem = ActorSystem("unit-tests")
-  implicit val mat: Materializer = Materializer.createMaterializer(actorSystem)
-
   override implicit val patienceConfig: PatienceConfig =
     PatienceConfig(timeout = scaled(Span(1000, Millis)), interval = scaled(Span(50, Millis)))
-
-  protected def applicationBuilder: GuiceApplicationBuilder =
-    new GuiceApplicationBuilder()
-      .configure(
-        "auditing.enabled" -> false,
-        "metric.enabled" -> false
-      )
 
   implicit def createMessages(implicit app: Application): Messages =
     app.injector.instanceOf[MessagesApi].preferred(FakeRequest())

@@ -20,8 +20,9 @@ import controllers.ControllerBaseSpec
 import controllers.nonsipp.memberdetails.routes
 import eu.timepit.refined.refineMV
 import forms.TextFormProvider
-import models.NormalMode
+import models.{NormalMode, UserAnswers}
 import pages.nonsipp.memberdetails.{MemberDetailsNinoPage, MemberDetailsPage}
+import uk.gov.hmrc.domain.Nino
 import views.html.TextInputView
 
 class MemberDetailsNinoControllerSpec extends ControllerBaseSpec {
@@ -36,6 +37,14 @@ class MemberDetailsNinoControllerSpec extends ControllerBaseSpec {
 
     val validNino = ninoGen.sample.value
     val otherValidNino = ninoGen.sample.value
+
+    val userAnswersWithNino: UserAnswers =
+      populatedUserAnswers.unsafeSet(MemberDetailsNinoPage(srn, refineMV(1)), validNino)
+
+    val userAnswersWithDuplicateNino =
+      populatedUserAnswers
+        .unsafeSet(MemberDetailsNinoPage(srn, refineMV(1)), otherValidNino)
+        .unsafeSet(MemberDetailsNinoPage(srn, refineMV(2)), validNino)
 
     lazy val onPageLoad = routes.MemberDetailsNinoController.onPageLoad(srn, refineMV(1), NormalMode)
     lazy val onSubmit = routes.MemberDetailsNinoController.onSubmit(srn, refineMV(1), NormalMode)
@@ -63,24 +72,22 @@ class MemberDetailsNinoControllerSpec extends ControllerBaseSpec {
         .withName("onSubmit should redirect to journey recovery page when no member details exist")
     )
 
-    act.like(saveAndContinue(onSubmit, populatedUserAnswers, formData(form, validNino): _*))
+    act.like(
+      saveAndContinue(onSubmit, populatedUserAnswers, formData(form, validNino): _*).withName("save and continue")
+    )
 
     act.like(invalidForm(onSubmit, populatedUserAnswers))
 
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
 
-    "allow nino to be updated" - {
-      val userAnswers = populatedUserAnswers.set(MemberDetailsNinoPage(srn, refineMV(1)), validNino).get
-      act.like(saveAndContinue(onSubmit, userAnswers, formData(form, validNino): _*))
-    }
+    act.like(
+      saveAndContinue(onSubmit, userAnswersWithNino, formData(form, validNino): _*)
+        .withName("allow nino to be updated")
+    )
 
-    "return a 400 if nino has already been entered" - {
-      val userAnswers =
-        populatedUserAnswers
-          .unsafeSet(MemberDetailsNinoPage(srn, refineMV(1)), otherValidNino)
-          .unsafeSet(MemberDetailsNinoPage(srn, refineMV(2)), validNino)
-
-      act.like(invalidForm(onSubmit, userAnswers, formData(form, validNino): _*))
-    }
+    act.like(
+      invalidForm(onSubmit, userAnswersWithDuplicateNino, formData(form, validNino): _*)
+        .withName("return a 400 if nino has already been entered")
+    )
   }
 }
