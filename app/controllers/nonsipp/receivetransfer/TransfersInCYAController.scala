@@ -177,7 +177,7 @@ object TransfersInCYAController {
                 "site.change",
                 controllers.nonsipp.receivetransfer.routes.TransferringSchemeTypeController
                   .onPageLoad(srn, index, journey.secondaryIndex, CheckMode)
-                  .url
+                  .url + "#schemeType"
               ).withVisuallyHiddenContent(
                 Message("transfersInCYAController.rows.schemeType.hidden", journey.schemeName)
               )
@@ -190,7 +190,7 @@ object TransfersInCYAController {
                 "site.change",
                 controllers.nonsipp.receivetransfer.routes.TransferringSchemeTypeController
                   .onPageLoad(srn, index, journey.secondaryIndex, CheckMode)
-                  .url
+                  .url + "#schemeReference"
               ).withVisuallyHiddenContent(
                 Message(s"transfersInCYAController.rows.schemeRef.$transferTypeKey.hidden", journey.schemeName)
               )
