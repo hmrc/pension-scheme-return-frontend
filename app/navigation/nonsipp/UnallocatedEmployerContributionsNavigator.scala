@@ -41,16 +41,12 @@ object UnallocatedEmployerContributionsNavigator extends JourneyNavigator {
       controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
 
     case RemoveUnallocatedAmountPage(srn) =>
-      userAnswers.data.decryptedValue.value("membersPayments") match {
-        case value =>
-          if (value.toString != "{}") {
-            controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController
-              .onPageLoad(srn, CheckOrChange.Check)
-          } else {
-            controllers.nonsipp.memberpayments.routes.UnallocatedEmployerContributionsController
-              .onPageLoad(srn, NormalMode)
-          }
-        case _ => controllers.routes.JourneyRecoveryController.onPageLoad()
+      if (userAnswers.get(UnallocatedEmployerContributionsPage(srn)).isEmpty) {
+        controllers.nonsipp.memberpayments.routes.UnallocatedEmployerContributionsController
+          .onPageLoad(srn, NormalMode)
+      } else {
+        controllers.nonsipp.memberpayments.routes.UnallocatedContributionCYAController
+          .onPageLoad(srn, CheckOrChange.Check)
       }
   }
 

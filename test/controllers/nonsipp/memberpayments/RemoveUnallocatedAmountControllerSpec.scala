@@ -19,17 +19,34 @@ package controllers.nonsipp.memberpayments
 import controllers.ControllerBaseSpec
 import forms.YesNoPageFormProvider
 import models.NormalMode
+import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.memberpayments.{UnallocatedEmployerAmountPage, UnallocatedEmployerContributionsPage}
+import play.api.inject.guice.GuiceableModule
+import play.api.inject.bind
+import services.PsrSubmissionService
 import views.html.YesNoPageView
+
+import scala.concurrent.Future
 
 class RemoveUnallocatedAmountControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoad = routes.RemoveUnallocatedAmountController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.RemoveUnallocatedAmountController.onSubmit(srn, NormalMode)
+  private val mockPsrSubmissionService = mock[PsrSubmissionService]
 
   private val filledUserAnswers = defaultUserAnswers
     .unsafeSet(UnallocatedEmployerContributionsPage(srn), true)
     .unsafeSet(UnallocatedEmployerAmountPage(srn), money)
+
+  override protected val additionalBindings: List[GuiceableModule] = List(
+    bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
+  )
+
+  override protected def beforeEach(): Unit = {
+    reset(mockPsrSubmissionService)
+    when(mockPsrSubmissionService.submitPsrDetails(any(), any())(any(), any(), any()))
+      .thenReturn(Future.successful(Some(())))
+  }
 
   "RemoveUnallocatedAmountController" - {
 

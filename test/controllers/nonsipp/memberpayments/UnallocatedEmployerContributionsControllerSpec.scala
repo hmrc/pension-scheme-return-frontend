@@ -18,17 +18,28 @@ package controllers.nonsipp.memberpayments
 
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.memberpayments.UnallocatedEmployerContributionsController.{form, viewModel}
-import controllers.nonsipp.memberpayments.routes
 import forms.YesNoPageFormProvider
 import models.NormalMode
+import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.memberpayments.UnallocatedEmployerContributionsPage
+import play.api.inject.bind
+import play.api.inject.guice.GuiceableModule
 import play.api.libs.json.JsPath
+import services.PsrSubmissionService
 import views.html.YesNoPageView
 
 class UnallocatedEmployerContributionsControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoad = routes.UnallocatedEmployerContributionsController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.UnallocatedEmployerContributionsController.onSubmit(srn, NormalMode)
+  private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
+
+  override protected val additionalBindings: List[GuiceableModule] = List(
+    bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
+  )
+
+  override protected def beforeAll(): Unit =
+    reset(mockPsrSubmissionService)
 
   "UnallocatedEmployerContributionsController" - {
 
@@ -42,8 +53,22 @@ class UnallocatedEmployerContributionsControllerSpec extends ControllerBaseSpec 
           .apply(form(injected[YesNoPageFormProvider]).fill(true), viewModel(srn, schemeName, NormalMode))
     })
 
-    act.like(redirectNextPage(onSubmit, "value" -> "true"))
-    act.like(redirectNextPage(onSubmit, "value" -> "false"))
+    act.like(
+      redirectNextPage(onSubmit, "value" -> "true")
+        .before(MockPSRSubmissionService.submitPsrDetails())
+        .after({
+          verify(mockPsrSubmissionService, never).submitPsrDetails(any())(any(), any(), any())
+          reset(mockPsrSubmissionService)
+        })
+    )
+    act.like(
+      redirectNextPage(onSubmit, "value" -> "false")
+        .before(MockPSRSubmissionService.submitPsrDetails())
+        .after({
+          verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any())(any(), any(), any())
+          reset(mockPsrSubmissionService)
+        })
+    )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 

@@ -27,7 +27,7 @@ import pages.nonsipp.memberpayments._
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
+import services.{PsrSubmissionService, SaveService}
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
@@ -44,7 +44,8 @@ class RemoveUnallocatedAmountController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   formProvider: YesNoPageFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: YesNoPageView
+  view: YesNoPageView,
+  psrSubmissionService: PsrSubmissionService
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
@@ -91,9 +92,14 @@ class RemoveUnallocatedAmountController @Inject()(
               updatedAnswers <- Future
                 .fromTry(removeUnallocatedAmountPage(srn, request.userAnswers))
               _ <- saveService.save(updatedAnswers)
-            } yield {
-              Redirect(navigator.nextPage(RemoveUnallocatedAmountPage(srn), NormalMode, updatedAnswers))
-            }
+              submissionResult <- psrSubmissionService.submitPsrDetails(srn, updatedAnswers)
+            } yield submissionResult.fold(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))(
+              _ =>
+                Redirect(
+                  navigator
+                    .nextPage(RemoveUnallocatedAmountPage(srn), NormalMode, updatedAnswers)
+                )
+            )
           } else {
             Future
               .successful(

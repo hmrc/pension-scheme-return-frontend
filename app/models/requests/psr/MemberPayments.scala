@@ -24,7 +24,9 @@ import java.time.LocalDate
 
 case class MemberPayments(
   memberDetails: List[MemberDetails],
-  employerContributionsCompleted: Boolean
+  employerContributionsCompleted: Boolean,
+  unallocatedContribsMade: Boolean,
+  unallocatedContribAmount: Option[Double]
 )
 
 case class MemberDetails(

@@ -26,7 +26,11 @@ import models.{ConditionalYesNo, Crn, IdentityType, Money, NameDOB, UserAnswers,
 import pages.nonsipp.employercontributions._
 import pages.nonsipp.memberdetails.MembersDetailsPages._
 import pages.nonsipp.memberdetails._
-import pages.nonsipp.memberpayments.EmployerContributionsPage
+import pages.nonsipp.memberpayments.{
+  EmployerContributionsPage,
+  UnallocatedEmployerAmountPage,
+  UnallocatedEmployerContributionsPage
+}
 import uk.gov.hmrc.domain.Nino
 import viewmodels.models.{MemberState, SectionCompleted, SectionStatus}
 
@@ -65,29 +69,41 @@ class MemberPaymentsTransformer @Inject()() extends Transformer {
         Some(
           MemberPayments(
             memberDetails = list,
-            employerContributionsCompleted = userAnswers.get(EmployerContributionsSectionStatus(srn)).nonEmpty
+            employerContributionsCompleted = userAnswers.get(EmployerContributionsSectionStatus(srn)).nonEmpty,
+            unallocatedContribsMade = userAnswers.get(UnallocatedEmployerContributionsPage(srn)).getOrElse(false),
+            unallocatedContribAmount = userAnswers.get(UnallocatedEmployerAmountPage(srn)) match {
+              case Some(x) => Some(x.value)
+              case None => None
+            }
           )
         )
     }
   }
 
   def transformFromEtmp(userAnswers: UserAnswers, srn: Srn, memberPayments: MemberPayments): Try[UserAnswers] =
-    memberPayments.memberDetails.zipWithIndex
-      .traverse { case (memberDetails, index) => refineIndex[Max300.Refined](index).map(memberDetails -> _) }
-      .getOrElse(Nil)
-      .foldLeft(Try(userAnswers)) {
-        case (ua, (memberDetails, index)) =>
-          val pages: List[Try[UserAnswers] => Try[UserAnswers]] =
-            memberPersonalDetailsPages(srn, index, memberDetails.personalDetails) ++
-              employerContributionsPages(
-                srn,
-                index,
-                memberPayments.employerContributionsCompleted,
-                memberDetails.employerContributions
-              )
-
-          pages.foldLeft(ua)((userAnswers, f) => f(userAnswers))
+    for {
+      ua1 <- userAnswers.set(UnallocatedEmployerContributionsPage(srn), memberPayments.unallocatedContribsMade)
+      ua2 <- memberPayments.unallocatedContribAmount match {
+        case Some(value) => ua1.set(UnallocatedEmployerAmountPage(srn), Money(value))
+        case None => Try(ua1)
       }
+      ua3 <- memberPayments.memberDetails.zipWithIndex
+        .traverse { case (memberDetails, index) => refineIndex[Max300.Refined](index).map(memberDetails -> _) }
+        .getOrElse(Nil)
+        .foldLeft(Try(ua2)) {
+          case (ua, (memberDetails, index)) =>
+            val pages: List[Try[UserAnswers] => Try[UserAnswers]] =
+              memberPersonalDetailsPages(srn, index, memberDetails.personalDetails) ++
+                employerContributionsPages(
+                  srn,
+                  index,
+                  memberPayments.employerContributionsCompleted,
+                  memberDetails.employerContributions
+                )
+
+            pages.foldLeft(ua)((userAnswers, f) => f(userAnswers))
+        }
+    } yield ua3
 
   private def buildMemberPersonalDetails(
     srn: Srn,
