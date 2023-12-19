@@ -59,10 +59,7 @@ class TransferOutMemberListController @Inject()(
           .viewModel(srn, page, mode, memberList, request.userAnswers)
         Ok(view(form, viewModel))
       } else {
-        Redirect(
-          controllers.nonsipp.membertransferout.routes.ReceivingSchemeNameController
-            .onSubmit(srn, refineMV(1), refineMV(1), NormalMode)
-        )
+        Redirect(controllers.routes.UnauthorisedController.onPageLoad())
       }
   }
 
