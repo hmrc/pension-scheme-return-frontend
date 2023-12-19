@@ -14,27 +14,20 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.receivetransfer
+package controllers.nonsipp.membertransferout
 
 import cats.implicits.{toShow, toTraverseOps}
 import config.Refined._
 import controllers.PSRController
 import controllers.actions._
-import controllers.nonsipp.receivetransfer.TransfersInCYAController._
+import controllers.nonsipp.membertransferout.TransfersOutCYAController.TransfersOutCYA
+import controllers.nonsipp.membertransferout.TransfersOutCYAController._
 import models.PensionSchemeType.PensionSchemeType
 import models.SchemeId.Srn
 import models._
 import navigation.Navigator
 import pages.nonsipp.memberdetails.MemberDetailsPage
-import pages.nonsipp.receivetransfer.{
-  DidTransferIncludeAssetPage,
-  TotalValueTransferPage,
-  TransferringSchemeNamePage,
-  TransferringSchemeTypePage,
-  TransfersInCYAPage,
-  TransfersInCompletedPages,
-  WhenWasTransferReceivedPage
-}
+import pages.nonsipp.membertransferout._
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import utils.DateTimeUtils.localDateShow
@@ -48,7 +41,7 @@ import java.time.LocalDate
 import javax.inject.{Inject, Named}
 import scala.concurrent.ExecutionContext
 
-class TransfersInCYAController @Inject()(
+class TransfersOutCYAController @Inject()(
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -63,7 +56,7 @@ class TransfersInCYAController @Inject()(
         for {
           memberDetails <- request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney
           secondaryIndexes <- request.userAnswers
-            .get(TransfersInCompletedPages(srn, index))
+            .get(TransfersOutCompletedPages(srn, index))
             .map(_.keys.toList.flatMap(refineStringIndex[Max5.Refined]))
             .getOrRecoverJourney
         } yield {
@@ -72,27 +65,20 @@ class TransfersInCYAController @Inject()(
               journeyIndex =>
                 for {
                   schemeName <- request.userAnswers
-                    .get(TransferringSchemeNamePage(srn, index, journeyIndex))
+                    .get(ReceivingSchemeNamePage(srn, index, journeyIndex))
                     .getOrRecoverJourney
-                  transferType <- request.userAnswers
-                    .get(TransferringSchemeTypePage(srn, index, journeyIndex))
+                  receiveType <- request.userAnswers
+                    .get(ReceivingSchemeTypePage(srn, index, journeyIndex))
                     .getOrRecoverJourney
-                  totalValue <- request.userAnswers
-                    .get(TotalValueTransferPage(srn, index, journeyIndex))
+                  transferOut <- request.userAnswers
+                    .get(WhenWasTransferMadePage(srn, index, journeyIndex))
                     .getOrRecoverJourney
-                  transferReceived <- request.userAnswers
-                    .get(WhenWasTransferReceivedPage(srn, index, journeyIndex))
-                    .getOrRecoverJourney
-                  transferIncludeAsset <- request.userAnswers
-                    .get(DidTransferIncludeAssetPage(srn, index, journeyIndex))
-                    .getOrRecoverJourney
-                } yield TransfersInCYA(
+
+                } yield TransfersOutCYA(
                   journeyIndex,
                   schemeName,
-                  transferType,
-                  totalValue,
-                  transferReceived,
-                  transferIncludeAsset
+                  receiveType,
+                  transferOut
                 )
             )
             .map {
@@ -107,35 +93,35 @@ class TransfersInCYAController @Inject()(
   def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       Redirect(
-        navigator.nextPage(TransfersInCYAPage(srn), mode, request.userAnswers)
+        navigator.nextPage(TransfersOutCYAPage(srn), mode, request.userAnswers)
       )
     }
 }
 
-object TransfersInCYAController {
+object TransfersOutCYAController {
   def viewModel(
     srn: Srn,
     memberName: String,
     index: Max300,
-    journeys: List[TransfersInCYA],
+    journeys: List[TransfersOutCYA],
     mode: Mode
   ): FormPageViewModel[CheckYourAnswersViewModel] = {
     val heading: InlineMessage = mode.fold(
       normal = "checkYourAnswers.heading",
-      check = Message("transfersInCYAController.heading.check", memberName)
+      check = Message("transfersOutCYAController.heading.check", memberName)
     )
 
     FormPageViewModel[CheckYourAnswersViewModel](
       title = "checkYourAnswers.title",
       heading = heading,
-      description = Some(ParagraphMessage("transfersInCYA.paragraph")),
+      description = Some(ParagraphMessage("transfersOutCYA.paragraph")),
       page = CheckYourAnswersViewModel(
         sections = rows(srn, memberName, index, journeys),
-        inset = Option.when(journeys.size == 5)("transfersInCYAController.inset")
+        inset = Option.when(journeys.size == 5)("transfersOutCYAController.inset")
       ),
       refresh = None,
       buttonText = "site.continue",
-      onSubmit = routes.TransfersInCYAController.onSubmit(srn, index, mode)
+      onSubmit = routes.TransfersOutCYAController.onSubmit(srn, index, mode)
     )
   }
 
@@ -143,11 +129,11 @@ object TransfersInCYAController {
     srn: Srn,
     memberName: String,
     index: Max300,
-    journeys: List[TransfersInCYA]
+    journeys: List[TransfersOutCYA]
   ): List[CheckYourAnswersSection] =
     journeys.zipWithIndex.map {
       case (journey, rowIndex) =>
-        val (transferTypeKey, transferTypeValue) = journey.transferType match {
+        val (receiveTypeKey, receiveTypeValue) = journey.receiveType match {
           case PensionSchemeType.RegisteredPS(description) => ("pstr", description)
           case PensionSchemeType.QualifyingRecognisedOverseasPS(description) => ("qrops", description)
           case PensionSchemeType.Other(description) => ("other", description)
@@ -156,108 +142,80 @@ object TransfersInCYAController {
           if (journeys.length == 1) None
           else
             Some(
-              Heading2.medium(Message("transfersInCYAController.section.heading", rowIndex + 1))
+              Heading2.medium(Message("transfersOutCYAController.section.heading", rowIndex + 1))
             ),
           List(
-            CheckYourAnswersRowViewModel("transfersInCYAController.rows.membersName", memberName),
-            CheckYourAnswersRowViewModel("transfersInCYAController.rows.transferringScheme", journey.schemeName)
+            CheckYourAnswersRowViewModel("transfersOutCYAController.rows.membersName", memberName),
+            CheckYourAnswersRowViewModel("transfersOutCYAController.rows.receivingScheme", journey.schemeName)
               .withAction(
                 SummaryAction(
                   "site.change",
-                  controllers.nonsipp.receivetransfer.routes.TransferringSchemeNameController
+                  controllers.nonsipp.membertransferout.routes.ReceivingSchemeNameController
                     .onPageLoad(srn, index, journey.secondaryIndex, CheckMode)
                     .url
-                ).withVisuallyHiddenContent("transfersInCYAController.rows.transferringScheme")
+                ).withVisuallyHiddenContent("transfersOutCYAController.rows.receivingScheme")
               ),
             CheckYourAnswersRowViewModel(
-              Message("transfersInCYAController.rows.schemeType", journey.schemeName),
-              s"transfersInCYAController.rows.schemeRef.$transferTypeKey.name"
+              Message("transfersOutCYAController.rows.schemeType", journey.schemeName),
+              s"transfersOutCYAController.rows.schemeRef.$receiveTypeKey.name"
             ).withAction(
               SummaryAction(
                 "site.change",
-                controllers.nonsipp.receivetransfer.routes.TransferringSchemeTypeController
+                controllers.nonsipp.membertransferout.routes.ReceivingSchemeTypeController
                   .onPageLoad(srn, index, journey.secondaryIndex, CheckMode)
-                  .url + "#schemeType"
+                  .url + "#schemeRe"
               ).withVisuallyHiddenContent(
-                Message("transfersInCYAController.rows.schemeType.hidden", journey.schemeName)
+                Message("transfersOutCYAController.rows.schemeType.hidden", journey.schemeName)
               )
             ),
             CheckYourAnswersRowViewModel(
-              Message(s"transfersInCYAController.rows.schemeRef.$transferTypeKey", journey.schemeName),
-              transferTypeValue
+              Message(s"transfersOutCYAController.rows.schemeRef.$receiveTypeKey", journey.schemeName),
+              receiveTypeValue
             ).withAction(
               SummaryAction(
                 "site.change",
-                controllers.nonsipp.receivetransfer.routes.TransferringSchemeTypeController
+                controllers.nonsipp.membertransferout.routes.ReceivingSchemeTypeController
                   .onPageLoad(srn, index, journey.secondaryIndex, CheckMode)
-                  .url + "#schemeReference"
+                  .url + "#schemeRef"
               ).withVisuallyHiddenContent(
-                Message(s"transfersInCYAController.rows.schemeRef.$transferTypeKey.hidden", journey.schemeName)
+                Message(s"transfersOutCYAController.rows.schemeRef.$receiveTypeKey.hidden", journey.schemeName)
               )
             ),
             CheckYourAnswersRowViewModel(
-              Message("transfersInCYAController.rows.totalValue", journey.schemeName, memberName),
-              s"£${journey.totalValue.displayAs}"
+              Message("transfersOutCYAController.rows.dateOfTransfer", journey.schemeName, memberName),
+              journey.transferOut.show
             ).withAction(
               SummaryAction(
                 "site.change",
-                controllers.nonsipp.receivetransfer.routes.TotalValueTransferController
+                controllers.nonsipp.membertransferout.routes.WhenWasTransferMadeController
                   .onPageLoad(srn, index, journey.secondaryIndex, CheckMode)
                   .url
               ).withVisuallyHiddenContent(
-                Message("transfersInCYAController.rows.totalValue.hidden", journey.schemeName, memberName)
-              )
-            ),
-            CheckYourAnswersRowViewModel(
-              Message("transfersInCYAController.rows.dateOfTransfer", journey.schemeName, memberName),
-              journey.transferReceived.show
-            ).withAction(
-              SummaryAction(
-                "site.change",
-                controllers.nonsipp.receivetransfer.routes.WhenWasTransferReceivedController
-                  .onPageLoad(srn, index, journey.secondaryIndex, CheckMode)
-                  .url
-              ).withVisuallyHiddenContent(
-                Message("transfersInCYAController.rows.dateOfTransfer.hidden", journey.schemeName, memberName)
-              )
-            ),
-            CheckYourAnswersRowViewModel(
-              Message("transfersInCYAController.rows.transferIncludeAsset", journey.schemeName, memberName),
-              if (journey.transferIncludeAsset) "site.yes" else "site.no"
-            ).withAction(
-              SummaryAction(
-                "site.change",
-                controllers.nonsipp.receivetransfer.routes.DidTransferIncludeAssetController
-                  .onPageLoad(srn, index, journey.secondaryIndex, CheckMode)
-                  .url
-              ).withVisuallyHiddenContent(
-                Message("transfersInCYAController.rows.transferIncludeAsset.hidden", journey.schemeName, memberName)
+                Message("transfersOutCYAController.rows.dateOfTransfer.hidden", journey.schemeName, memberName)
               )
             )
           ) :?+ Option.when(rowIndex + 1 == journeys.length && rowIndex + 1 < 5)(
             CheckYourAnswersRowViewModel(
-              Message("transfersInCYAController.rows.reportAnotherTransfer", memberName),
+              Message("transfersOutCYAController.rows.reportAnotherTransfer", memberName),
               "site.no"
             ).withAction(
               SummaryAction(
                 "site.change",
-                controllers.nonsipp.receivetransfer.routes.ReportAnotherTransferInController
+                controllers.nonsipp.membertransferout.routes.ReportAnotherTransferOutController
                   .onPageLoad(srn, index, journey.secondaryIndex, CheckMode)
                   .url
               ).withVisuallyHiddenContent(
-                Message("transfersInCYAController.rows.reportAnotherTransfer.hidden", memberName)
+                Message("transfersOutCYAController.rows.reportAnotherTransfer.hidden", memberName)
               )
             )
           )
         )
     }
 
-  case class TransfersInCYA(
+  case class TransfersOutCYA(
     secondaryIndex: Max5,
     schemeName: String,
-    transferType: PensionSchemeType,
-    totalValue: Money,
-    transferReceived: LocalDate,
-    transferIncludeAsset: Boolean
+    receiveType: PensionSchemeType,
+    transferOut: LocalDate
   )
 }

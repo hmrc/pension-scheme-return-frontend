@@ -17,7 +17,8 @@
 package navigation.nonsipp
 
 import cats.implicits.toTraverseOps
-import config.Refined.Max5
+import config.Refined.{Max300, Max5}
+import models.SchemeId.Srn
 import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
@@ -50,22 +51,33 @@ object TransferOutNavigator extends JourneyNavigator {
         .onPageLoad(srn, index, transferIndex, NormalMode)
 
     case WhenWasTransferMadePage(srn, index, transferIndex) =>
-      controllers.nonsipp.membertransferout.routes.ReportAnotherTransferOutController
-        .onPageLoad(srn, index, transferIndex, NormalMode)
+      (
+        for {
+          map <- userAnswers.get(WhenWasTransferMadePages(srn, index)).getOrRecoverJourney
+          indexes <- map.keys.toList.traverse(_.toIntOption).getOrRecoverJourney
+          _ <- navToCYAOnMaxTransfersOut(srn, index, indexes)
+        } yield controllers.nonsipp.membertransferout.routes.ReportAnotherTransferOutController
+          .onPageLoad(srn, index, transferIndex, NormalMode)
+      ).merge
 
     case page @ ReportAnotherTransferOutPage(srn, index, _) =>
       if (userAnswers.get(page).contains(true)) {
         (
           for {
-            map <- userAnswers.get(ReceivingSchemeTypePages(srn, index)).getOrRecoverJourney
+            map <- userAnswers.get(WhenWasTransferMadePages(srn, index)).getOrRecoverJourney
             indexes <- map.keys.toList.traverse(_.toIntOption).getOrRecoverJourney
             nextIndex <- findNextOpenIndex[Max5.Refined](indexes).getOrRecoverJourney
           } yield controllers.nonsipp.membertransferout.routes.ReceivingSchemeNameController
             .onPageLoad(srn, index, nextIndex, NormalMode)
         ).merge
       } else {
-        controllers.routes.UnauthorisedController.onPageLoad()
+        controllers.nonsipp.membertransferout.routes.TransfersOutCYAController
+          .onPageLoad(srn, index, NormalMode)
       }
+
+    case TransfersOutCYAPage(srn) =>
+      controllers.nonsipp.membertransferout.routes.TransferOutMemberListController
+        .onPageLoad(srn, 1, NormalMode)
 
   }
 
@@ -79,5 +91,53 @@ object TransferOutNavigator extends JourneyNavigator {
             controllers.nonsipp.memberreceivedpcls.routes.PensionCommencementLumpSumController
               .onPageLoad(srn, NormalMode)
           }
+
+        case ReceivingSchemeNamePage(srn, index, _) =>
+          controllers.nonsipp.membertransferout.routes.TransfersOutCYAController
+            .onPageLoad(srn, index, NormalMode)
+
+        case ReceivingSchemeTypePage(srn, index, _) =>
+          controllers.nonsipp.membertransferout.routes.TransfersOutCYAController
+            .onPageLoad(srn, index, NormalMode)
+
+        case WhenWasTransferMadePage(srn, index, transferIndex) =>
+          (
+            for {
+              map <- userAnswers.get(WhenWasTransferMadePages(srn, index)).getOrRecoverJourney
+              indexes <- map.keys.toList.traverse(_.toIntOption).getOrRecoverJourney
+              _ <- navToCYAOnMaxTransfersOut(srn, index, indexes)
+            } yield controllers.nonsipp.membertransferout.routes.ReportAnotherTransferOutController
+              .onPageLoad(srn, index, transferIndex, NormalMode)
+          ).merge
+
+        case page @ ReportAnotherTransferOutPage(srn, index, _) =>
+          if (userAnswers.get(page).contains(true)) {
+            (
+              for {
+                map <- userAnswers.get(WhenWasTransferMadePages(srn, index)).getOrRecoverJourney
+                indexes <- map.keys.toList.traverse(_.toIntOption).getOrRecoverJourney
+                nextIndex <- findNextOpenIndex[Max5.Refined](indexes).getOrRecoverJourney
+              } yield controllers.nonsipp.membertransferout.routes.ReceivingSchemeNameController
+                .onPageLoad(srn, index, nextIndex, NormalMode)
+            ).merge
+          } else {
+            controllers.nonsipp.membertransferout.routes.TransfersOutCYAController
+              .onPageLoad(srn, index, NormalMode)
+          }
+
+        case TransfersOutCYAPage(srn) =>
+          controllers.nonsipp.membertransferout.routes.TransferOutMemberListController
+            .onPageLoad(srn, 1, NormalMode)
+
       }
+
+  private def navToCYAOnMaxTransfersOut(srn: Srn, index: Max300, indexes: List[Int]): Either[Call, Unit] =
+    if (indexes.size == 5) {
+      Left(
+        controllers.nonsipp.membertransferout.routes.TransfersOutCYAController
+          .onPageLoad(srn, index, NormalMode)
+      )
+    } else {
+      Right(())
+    }
 }
