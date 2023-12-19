@@ -27,26 +27,35 @@ import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
 import models._
 import navigation.Navigator
-import pages.nonsipp.employercontributions.{EmployerContributionsMemberListPage, EmployerNamePages}
+import pages.nonsipp.employercontributions.{
+  EmployerContributionsMemberListPage,
+  EmployerContributionsSectionStatus,
+  EmployerNamePages
+}
 import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.{PsrSubmissionService, SaveService}
 import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
 import viewmodels.implicits._
-import viewmodels.models.{ActionTableViewModel, FormPageViewModel, PaginatedViewModel, TableElem}
+import viewmodels.models.{ActionTableViewModel, FormPageViewModel, PaginatedViewModel, SectionStatus, TableElem}
 import views.html.TwoColumnsTripleAction
 
 import javax.inject.Named
+import scala.concurrent.{ExecutionContext, Future}
 
 class EmployerContributionsMemberListController @Inject()(
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
+  saveService: SaveService,
   view: TwoColumnsTripleAction,
+  psrSubmissionService: PsrSubmissionService,
   formProvider: YesNoPageFormProvider
-) extends PSRController {
+)(implicit ec: ExecutionContext)
+    extends PSRController {
 
   val form = EmployerContributionsMemberListController.form(formProvider)
 
@@ -66,28 +75,45 @@ class EmployerContributionsMemberListController @Inject()(
       }
   }
 
-  def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    val memberList = request.userAnswers.membersDetails(srn)
+  def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+    implicit request =>
+      val memberList = request.userAnswers.membersDetails(srn)
 
-    if (memberList.size > Constants.maxSchemeMembers) {
-      Redirect(
-        navigator.nextPage(EmployerContributionsMemberListPage(srn), mode, request.userAnswers)
-      )
-    } else {
-      val viewModel =
-        EmployerContributionsMemberListController.viewModel(srn, page, mode, memberList, request.userAnswers)
-
-      form
-        .bindFromRequest()
-        .fold(
-          errors => BadRequest(view(errors, viewModel)),
-          _ =>
-            Redirect(
-              navigator
-                .nextPage(EmployerContributionsMemberListPage(srn), mode, request.userAnswers)
-            )
+      if (memberList.size > Constants.maxSchemeMembers) {
+        Future.successful(
+          Redirect(
+            navigator.nextPage(EmployerContributionsMemberListPage(srn), mode, request.userAnswers)
+          )
         )
-    }
+      } else {
+        val viewModel =
+          EmployerContributionsMemberListController.viewModel(srn, page, mode, memberList, request.userAnswers)
+
+        form
+          .bindFromRequest()
+          .fold(
+            errors => Future.successful(BadRequest(view(errors, viewModel))),
+            value =>
+              for {
+                updatedUserAnswers <- Future.fromTry(
+                  request.userAnswers.set(
+                    EmployerContributionsSectionStatus(srn),
+                    if (value) SectionStatus.Completed
+                    else SectionStatus.InProgress
+                  )
+                )
+                _ <- saveService.save(updatedUserAnswers)
+                submissionResult <- if (value) psrSubmissionService.submitPsrDetails(srn, updatedUserAnswers)
+                else Future.successful(Some(()))
+              } yield submissionResult.getOrRecoverJourney(
+                _ =>
+                  Redirect(
+                    navigator
+                      .nextPage(EmployerContributionsMemberListPage(srn), mode, request.userAnswers)
+                  )
+              )
+          )
+      }
   }
 }
 

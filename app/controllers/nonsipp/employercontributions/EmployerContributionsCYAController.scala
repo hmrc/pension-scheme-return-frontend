@@ -80,7 +80,9 @@ class EmployerContributionsCYAController @Inject()(
       (
         for {
           userAnswers <- EitherT(userAnswersWithSectionCompleted.pure[Future])
-          updatedAnswers <- Future.fromTry(userAnswers).liftF
+          updatedAnswers <- Future
+            .fromTry(userAnswers.set(EmployerContributionsSectionStatus(srn), SectionStatus.InProgress))
+            .liftF
           _ <- saveService.save(updatedAnswers).liftF
           submissionResult <- psrSubmissionService.submitPsrDetails(srn, updatedAnswers).liftF
         } yield submissionResult.fold(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))(

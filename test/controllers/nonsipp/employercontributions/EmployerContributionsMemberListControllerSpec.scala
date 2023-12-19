@@ -21,10 +21,16 @@ import controllers.nonsipp.employercontributions.EmployerContributionsMemberList
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.{NameDOB, NormalMode}
+import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.employercontributions.EmployerContributionsMemberListPage
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
+import play.api.inject.guice.GuiceableModule
 import views.html.TwoColumnsTripleAction
+import play.api.inject.bind
+import services.PsrSubmissionService
+
+import scala.concurrent.Future
 
 class EmployerContributionsMemberListControllerSpec extends ControllerBaseSpec {
 
@@ -32,6 +38,18 @@ class EmployerContributionsMemberListControllerSpec extends ControllerBaseSpec {
   private lazy val onSubmit = routes.EmployerContributionsMemberListController.onSubmit(srn, page = 1, NormalMode)
 
   val userAnswers = defaultUserAnswers.unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+
+  private val mockPsrSubmissionService = mock[PsrSubmissionService]
+
+  override def beforeEach(): Unit = {
+    reset(mockPsrSubmissionService)
+    when(mockPsrSubmissionService.submitPsrDetails(any(), any())(any(), any(), any()))
+      .thenReturn(Future.successful(Some(())))
+  }
+
+  override protected val additionalBindings: List[GuiceableModule] = List(
+    bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
+  )
 
   "EmployerContributionsMemberListController" - {
 
