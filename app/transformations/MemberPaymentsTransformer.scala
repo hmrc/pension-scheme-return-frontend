@@ -69,7 +69,10 @@ class MemberPaymentsTransformer @Inject()() extends Transformer {
         Some(
           MemberPayments(
             memberDetails = list,
-            employerContributionsCompleted = userAnswers.get(EmployerContributionsSectionStatus(srn)).nonEmpty,
+            employerContributionsCompleted = userAnswers.get(EmployerContributionsSectionStatus(srn)).exists {
+              case SectionStatus.InProgress => false
+              case SectionStatus.Completed => true
+            },
             unallocatedContribsMade = userAnswers.get(UnallocatedEmployerContributionsPage(srn)).getOrElse(false),
             unallocatedContribAmount = userAnswers.get(UnallocatedEmployerAmountPage(srn)) match {
               case Some(x) => Some(x.value)

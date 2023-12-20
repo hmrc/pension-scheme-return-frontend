@@ -16,6 +16,7 @@
 
 package controllers.nonsipp.memberdetails
 
+import cats.implicits.catsSyntaxApplicativeId
 import com.google.inject.Inject
 import config.Constants
 import config.Constants.maxSchemeMembers
@@ -37,6 +38,7 @@ import play.api.Logger
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import services.PsrSubmissionService
 import utils.MapUtils.{MapOps, UserAnswersMapOps}
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
@@ -44,6 +46,7 @@ import viewmodels.models._
 import views.html.ListView
 
 import javax.inject.Named
+import scala.concurrent.{ExecutionContext, Future}
 
 class SchemeMembersListController @Inject()(
   override val messagesApi: MessagesApi,
@@ -51,8 +54,10 @@ class SchemeMembersListController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   view: ListView,
+  psrSubmissionService: PsrSubmissionService,
   formProvider: YesNoPageFormProvider
-) extends PSRController {
+)(implicit ec: ExecutionContext)
+    extends PSRController {
 
   private val logger: Logger = Logger(classOf[SchemeMembersListController])
 
@@ -79,7 +84,7 @@ class SchemeMembersListController @Inject()(
     }
 
   def onSubmit(srn: Srn, page: Int, manualOrUpload: ManualOrUpload, mode: Mode): Action[AnyContent] =
-    identifyAndRequireData(srn) { implicit request =>
+    identifyAndRequireData(srn).async { implicit request =>
       val membersDetails = request.userAnswers.membersDetails(srn)
       form(manualOrUpload, membersDetails.size >= maxSchemeMembers)
         .bindFromRequest()
@@ -94,12 +99,15 @@ class SchemeMembersListController @Inject()(
                 )
               )
             }
-          }.merge,
+          }.merge.pure[Future],
           value => {
             if (membersDetails.size == maxSchemeMembers && value) {
-              Redirect(routes.HowToUploadController.onPageLoad(srn))
+              Future.successful(Redirect(routes.HowToUploadController.onPageLoad(srn)))
             } else {
-              Redirect(
+              for {
+                _ <- if (!value) psrSubmissionService.submitPsrDetails(srn, request.userAnswers)
+                else Future.successful(Some(()))
+              } yield Redirect(
                 navigator.nextPage(SchemeMembersListPage(srn, value, manualOrUpload), mode, request.userAnswers)
               )
             }
