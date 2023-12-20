@@ -809,6 +809,7 @@ datePeriodLoan.field3 = Total period of loan, in months
 datePeriodLoan.field3.error.required = Enter the total period of the loan, in months
 datePeriodLoan.field3.error.invalid = Total period of loan in months must be a number, like 36
 datePeriodLoan.field3.error.max = Total period of the loan must be 999 months or fewer
+datePeriodLoan.field3.error.min = Total period of the loan must be one month or more
 datePeriodLoan.field3.hint = Enter a number, like 36
 
 amountOfTheLoan.title = Amount of the loan and payments
