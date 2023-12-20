@@ -16,6 +16,9 @@
 
 package pages.nonsipp
 
+import config.Refined.{Max300, Max5}
+import models.SchemeId.Srn
+import pages.QuestionPage
 import play.api.libs.json.{__, JsPath}
 
 package object membertransferout {
@@ -24,4 +27,12 @@ package object membertransferout {
     val memberDetails: JsPath = membersPayments \ "memberDetails"
     val memberTransfersOut: JsPath = memberDetails \ "memberTransfersOut"
   }
+
+  def transferOutPages(srn: Srn, index: Max300, secondaryIndex: Max5): List[QuestionPage[_]] = List(
+    ReceivingSchemeNamePage(srn, index, secondaryIndex),
+    ReceivingSchemeTypePage(srn, index, secondaryIndex),
+    ReportAnotherTransferOutPage(srn, index, secondaryIndex),
+    TransfersOutCompletedPage(srn, index, secondaryIndex),
+    WhenWasTransferMadePage(srn, index, secondaryIndex)
+  )
 }

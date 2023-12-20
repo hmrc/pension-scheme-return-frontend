@@ -39,3 +39,9 @@ GET        /:srn/check-answers-transfers-out/:index                 controllers.
 POST       /:srn/check-answers-transfers-out/:index                 controllers.nonsipp.membertransferout.TransfersOutCYAController.onSubmit(srn: Srn, index: Max300, mode: Mode = NormalMode)
 GET        /:srn/change-check-answers-transfers-out/:index          controllers.nonsipp.membertransferout.TransfersOutCYAController.onPageLoad(srn: Srn, index: Max300, mode: Mode = CheckMode)
 POST       /:srn/change-check-answers-transfers-out/:index          controllers.nonsipp.membertransferout.TransfersOutCYAController.onSubmit(srn: Srn, index: Max300, mode: Mode = CheckMode)
+
+GET        /:srn/remove-transfer-out/:index/:secondaryIndex                             controllers.nonsipp.membertransferout.RemoveTransferOutController.onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max5)
+POST       /:srn/remove-transfer-out/:index/:secondaryIndex                             controllers.nonsipp.membertransferout.RemoveTransferOutController.onSubmit(srn: Srn, index: Max300, secondaryIndex: Max5)
+
+GET        /:srn/which-transfer-out-remove/:index                                       controllers.nonsipp.membertransferout.WhichTransferOutRemoveController.onPageLoad(srn: Srn, index: Max300)
+POST       /:srn/which-transfer-out-remove/:index                                       controllers.nonsipp.membertransferout.WhichTransferOutRemoveController.onSubmit(srn: Srn, index: Max300)

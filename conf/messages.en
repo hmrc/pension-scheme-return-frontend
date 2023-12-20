@@ -1952,3 +1952,12 @@ transfersOutCYAController.rows.dateOfTransfer = Date the transfer to {0} for {1}
 transfersOutCYAController.rows.dateOfTransfer.hidden = date the transfer to {0} for {1} was made
 transfersOutCYAController.rows.reportAnotherTransfer = Do you need to report another transfer out for {0}?
 transfersOutCYAController.rows.reportAnotherTransfer.hidden =  if you need to report another transfer out for {0}
+
+transferOut.removeTransferOut.title = Are you sure you want to remove this transfer for this member?
+transferOut.removeTransferOut.heading = Are you sure you want to remove the transfer to {0} for {1}?
+transferOut.removeTransferOut.error.required = Select yes if you are sure you want to remove this transfer for this member
+
+transferOut.whichTransferOutRemove.title = Which transfer out for this member do you want to remove?
+transferOut.whichTransferOutRemove.heading = Which transfer out for {0} do you want to remove?
+transferOut.whichTransferOutRemove.error.required =  Select the transfer out you want to remove
+transferOut.whichTransferOutRemove.radio.label = Transfer out to {0} on {1}
