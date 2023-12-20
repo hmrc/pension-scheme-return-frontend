@@ -16,22 +16,13 @@
 
 package controllers.nonsipp.receivetransfer
 
-import pages.nonsipp.receivetransfer.{
-  DidTransferIncludeAssetPage,
-  TotalValueTransferPage,
-  TransferringSchemeNamePage,
-  TransferringSchemeTypePage,
-  TransfersInCompletedPage,
-  TransfersInCompletedPages,
-  WhenWasTransferReceivedPage
-}
-import controllers.nonsipp.receivetransfer.TransfersInCYAController._
 import config.Refined._
-import eu.timepit.refined.{refineMV, refineV}
-import models.{NormalMode, PensionSchemeType}
 import controllers.ControllerBaseSpec
-import models.PensionSchemeType.PensionSchemeType
+import controllers.nonsipp.receivetransfer.TransfersInCYAController._
+import eu.timepit.refined.refineMV
+import models.{NormalMode, PensionSchemeType}
 import pages.nonsipp.memberdetails.MemberDetailsPage
+import pages.nonsipp.receivetransfer._
 import viewmodels.models.SectionCompleted
 import views.html.CheckYourAnswersView
 

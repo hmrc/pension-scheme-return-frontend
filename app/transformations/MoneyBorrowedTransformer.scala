@@ -35,35 +35,32 @@ class MoneyBorrowedTransformer @Inject()() extends Transformer {
     request.userAnswers
       .get(LenderNamePages(srn))
       .map { value =>
-        value.keys
-          .map { key =>
-            key.toIntOption.flatMap(i => refineV[OneTo5000](i + 1).toOption) match {
-              case None => None
-              case Some(index) =>
-                for {
-                  lenderName <- request.userAnswers.get(LenderNamePage(srn, index))
-                  isLenderConnectedParty <- request.userAnswers.get(IsLenderConnectedPartyPage(srn, index))
-                  borrowedAmountAndRate <- request.userAnswers.get(BorrowedAmountAndRatePage(srn, index))
-                  whenBorrowed <- request.userAnswers.get(WhenBorrowedPage(srn, index))
-                  valueOfSchemeAssetsWhenMoneyBorrowed <- request.userAnswers.get(
-                    ValueOfSchemeAssetsWhenMoneyBorrowedPage(srn, index)
-                  )
-                  whySchemeBorrowedMoney <- request.userAnswers.get(WhySchemeBorrowedMoneyPage(srn, index))
-                } yield {
-                  MoneyBorrowed(
-                    dateOfBorrow = whenBorrowed,
-                    schemeAssetsValue = valueOfSchemeAssetsWhenMoneyBorrowed.value,
-                    amountBorrowed = borrowedAmountAndRate._1.value,
-                    interestRate = borrowedAmountAndRate._2.value,
-                    borrowingFromName = lenderName,
-                    connectedPartyStatus = isLenderConnectedParty,
-                    reasonForBorrow = whySchemeBorrowedMoney
-                  )
-                }
-            }
+        value.keys.toList.flatMap { key =>
+          key.toIntOption.flatMap(i => refineV[OneTo5000](i + 1).toOption) match {
+            case None => None
+            case Some(index) =>
+              for {
+                lenderName <- request.userAnswers.get(LenderNamePage(srn, index))
+                isLenderConnectedParty <- request.userAnswers.get(IsLenderConnectedPartyPage(srn, index))
+                borrowedAmountAndRate <- request.userAnswers.get(BorrowedAmountAndRatePage(srn, index))
+                whenBorrowed <- request.userAnswers.get(WhenBorrowedPage(srn, index))
+                valueOfSchemeAssetsWhenMoneyBorrowed <- request.userAnswers.get(
+                  ValueOfSchemeAssetsWhenMoneyBorrowedPage(srn, index)
+                )
+                whySchemeBorrowedMoney <- request.userAnswers.get(WhySchemeBorrowedMoneyPage(srn, index))
+              } yield {
+                MoneyBorrowed(
+                  dateOfBorrow = whenBorrowed,
+                  schemeAssetsValue = valueOfSchemeAssetsWhenMoneyBorrowed.value,
+                  amountBorrowed = borrowedAmountAndRate._1.value,
+                  interestRate = borrowedAmountAndRate._2.value,
+                  borrowingFromName = lenderName,
+                  connectedPartyStatus = isLenderConnectedParty,
+                  reasonForBorrow = whySchemeBorrowedMoney
+                )
+              }
           }
-          .toList
-          .flatten
+        }
       }
       .getOrElse(List.empty)
 

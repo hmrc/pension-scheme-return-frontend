@@ -85,6 +85,14 @@ class RemoveLandPropertyDisposalController @Inject()(
       .flatMap(_.remove(RemoveLandPropertyDisposalPage(srn, landOrPropertyIndex, disposalIndex)))
       .flatMap(_.remove(WhoPurchasedLandOrPropertyPage(srn, landOrPropertyIndex, disposalIndex)))
       .flatMap(_.remove(LandPropertyDisposalCompletedPage(srn, landOrPropertyIndex, disposalIndex)))
+      .flatMap(_.remove(CompanyBuyerNamePage(srn, landOrPropertyIndex, disposalIndex)))
+      .flatMap(_.remove(PartnershipBuyerNamePage(srn, landOrPropertyIndex, disposalIndex)))
+      .flatMap(_.remove(LandOrPropertyIndividualBuyerNamePage(srn, landOrPropertyIndex, disposalIndex)))
+      .flatMap(_.remove(CompanyBuyerCrnPage(srn, landOrPropertyIndex, disposalIndex)))
+      .flatMap(_.remove(PartnershipBuyerUtrPage(srn, landOrPropertyIndex, disposalIndex)))
+      .flatMap(_.remove(IndividualBuyerNinoNumberPage(srn, landOrPropertyIndex, disposalIndex)))
+      .flatMap(_.remove(OtherBuyerDetailsPage(srn, landOrPropertyIndex, disposalIndex)))
+
     if (disposalIndex.value == 1) mustRemovedUa.flatMap(_.remove(LandOrPropertyDisposalPage(srn))) else mustRemovedUa
   }
 

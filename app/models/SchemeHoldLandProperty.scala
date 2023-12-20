@@ -16,7 +16,6 @@
 
 package models
 
-import play.api.libs.json._
 import play.api.mvc.JavascriptLiteral
 import utils.WithName
 
@@ -37,7 +36,4 @@ object SchemeHoldLandProperty extends Enumerable.Implicits {
   implicit val enumerable: Enumerable[SchemeHoldLandProperty] = Enumerable(values.map(v => (v.toString, v)): _*)
 
   implicit val jsLiteral: JavascriptLiteral[SchemeHoldLandProperty] = (value: SchemeHoldLandProperty) => value.name
-
-  implicit val writes: Writes[SchemeHoldLandProperty] =
-    Writes(value => JsString(value.toString))
 }

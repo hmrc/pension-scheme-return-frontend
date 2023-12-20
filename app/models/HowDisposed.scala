@@ -16,18 +16,19 @@
 
 package models
 
-import models.HowDisposed.Sold
-import play.api.libs.json._
 import play.api.libs.functional.syntax._
+import play.api.libs.json._
 import play.api.mvc.JavascriptLiteral
 import utils.WithName
 object HowDisposed {
 
-  sealed trait HowDisposed
+  sealed trait HowDisposed {
+    val name: String
+  }
 
   case object Sold extends WithName("Sold") with HowDisposed
   case object Transferred extends WithName("Transferred") with HowDisposed
-  case class Other(details: String) extends HowDisposed
+  case class Other(details: String) extends WithName("Other") with HowDisposed
 
   case object Other extends WithName("Other")
 

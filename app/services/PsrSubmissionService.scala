@@ -24,6 +24,7 @@ import models.requests.DataRequest
 import models.requests.psr._
 import pages.nonsipp.CheckReturnDatesPage
 import pages.nonsipp.landorproperty.LandOrPropertyHeldPage
+import pages.nonsipp.landorpropertydisposal.LandOrPropertyDisposalPage
 import pages.nonsipp.loansmadeoroutstanding._
 import pages.nonsipp.moneyborrowed.MoneyBorrowedPage
 import transformations._
@@ -54,6 +55,7 @@ class PsrSubmissionService @Inject()(
     val schemeHadLoans = request.userAnswers.get(LoansMadeOrOutstandingPage(srn)).getOrElse(false)
     val landOrPropertyHeld = request.userAnswers.get(LandOrPropertyHeldPage(srn)).getOrElse(false)
     val moneyWasBorrowed = request.userAnswers.get(MoneyBorrowedPage(srn)).getOrElse(false)
+    val disposeAnyLandOrProperty = request.userAnswers.get(LandOrPropertyDisposalPage(srn)).getOrElse(false)
     (
       minimalRequiredSubmissionTransformer.transformToEtmp(srn),
       request.userAnswers.get(CheckReturnDatesPage(srn))
@@ -63,12 +65,13 @@ class PsrSubmissionService @Inject()(
           minimalRequiredSubmission = minimalRequiredSubmission,
           checkReturnDates = checkReturnDates,
           loans = Option.when(schemeHadLoans)(Loans(schemeHadLoans, loanTransactionsTransformer.transformToEtmp(srn))),
-          assets = Option.when(landOrPropertyHeld || moneyWasBorrowed)(
+          assets = Option.when(landOrPropertyHeld || moneyWasBorrowed || disposeAnyLandOrProperty)(
             Assets(
               landOrProperty = LandOrProperty(
                 landOrPropertyHeld = landOrPropertyHeld,
-                disposeAnyLandOrProperty = false,
-                landOrPropertyTransactions = landOrPropertyTransactionsTransformer.transformToEtmp(srn)
+                disposeAnyLandOrProperty = disposeAnyLandOrProperty,
+                landOrPropertyTransactions =
+                  landOrPropertyTransactionsTransformer.transformToEtmp(srn, disposeAnyLandOrProperty)
               ),
               borrowing = Borrowing(
                 moneyWasBorrowed = moneyWasBorrowed,

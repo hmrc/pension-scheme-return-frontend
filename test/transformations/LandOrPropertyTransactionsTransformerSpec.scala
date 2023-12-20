@@ -19,6 +19,7 @@ package transformations
 import controllers.TestValues
 import eu.timepit.refined.refineMV
 import generators.ModelGenerators.allowedAccessRequestGen
+import models.HowDisposed.Sold
 import models.SchemeHoldLandProperty.Acquisition
 import models.requests.psr._
 import models.requests.{AllowedAccessRequest, DataRequest}
@@ -33,10 +34,12 @@ import pages.nonsipp.common.{
   PartnershipRecipientUtrPage
 }
 import pages.nonsipp.landorproperty._
+import pages.nonsipp.landorpropertydisposal.{Paths, _}
 import play.api.libs.json.Json
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import utils.UserAnswersUtils.UserAnswersOps
+import viewmodels.models.SectionCompleted
 
 class LandOrPropertyTransactionsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues with TestValues {
 
@@ -49,12 +52,12 @@ class LandOrPropertyTransactionsTransformerSpec extends AnyFreeSpec with Matcher
   "LandOrPropertyTransactionsTransformer - To Etmp" - {
     "should return empty List when userAnswer is empty" in {
 
-      val result = transformer.transformToEtmp(srn)
+      val result = transformer.transformToEtmp(srn, disposeAnyLandOrProperty = false)
       result mustBe List.empty
     }
 
     "should return empty List when index as string not a valid number" in {
-      val userAnswers = defaultUserAnswers
+      val userAnswers = emptyUserAnswers
         .unsafeSet(
           Paths.landOrPropertyTransactions \ "propertyDetails" \ "landOrPropertyInUK",
           Json.obj("InvalidIntValue" -> true)
@@ -62,7 +65,7 @@ class LandOrPropertyTransactionsTransformerSpec extends AnyFreeSpec with Matcher
 
       val request = DataRequest(allowedAccessRequest, userAnswers)
 
-      val result = transformer.transformToEtmp(srn)(request)
+      val result = transformer.transformToEtmp(srn, disposeAnyLandOrProperty = false)(request)
       result mustBe List.empty
     }
   }
@@ -71,7 +74,7 @@ class LandOrPropertyTransactionsTransformerSpec extends AnyFreeSpec with Matcher
     "when Individual has nino" in {
 
       val result = transformer.transformFromEtmp(
-        defaultUserAnswers,
+        emptyUserAnswers,
         srn,
         buildLandOrProperty(
           individualRecipientName,
@@ -105,6 +108,27 @@ class LandOrPropertyTransactionsTransformerSpec extends AnyFreeSpec with Matcher
           )
           userAnswers.get(IsLesseeConnectedPartyPage(srn, refineMV(1))) mustBe Some(false)
           userAnswers.get(LandOrPropertySellerConnectedPartyPage(srn, refineMV(1))) mustBe Some(true)
+          userAnswers.get(LandPropertyDisposalCompletedPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+            SectionCompleted
+          )
+          userAnswers.get(LandOrPropertyDisposalPage(srn)) mustBe Some(true)
+          userAnswers.get(HowWasPropertyDisposedOfPage(srn, refineMV(1), refineMV(1))) mustBe Some(Sold)
+          userAnswers.get(LandOrPropertyStillHeldPage(srn, refineMV(1), refineMV(1))) mustBe Some(true)
+          userAnswers.get(WhenWasPropertySoldPage(srn, refineMV(1), refineMV(1))) mustBe Some(localDate)
+          userAnswers.get(LandOrPropertyDisposalBuyerConnectedPartyPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+            true
+          )
+          userAnswers.get(TotalProceedsSaleLandPropertyPage(srn, refineMV(1), refineMV(1))) mustBe Some(money)
+          userAnswers.get(DisposalIndependentValuationPage(srn, refineMV(1), refineMV(1))) mustBe Some(true)
+          userAnswers.get(WhoPurchasedLandOrPropertyPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+            IdentityType.Individual
+          )
+          userAnswers.get(LandOrPropertyIndividualBuyerNamePage(srn, refineMV(1), refineMV(1))) mustBe Some(
+            individualRecipientName
+          )
+          userAnswers.get(IndividualBuyerNinoNumberPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+            ConditionalYesNo.yes(nino)
+          )
         }
       )
     }
@@ -112,7 +136,7 @@ class LandOrPropertyTransactionsTransformerSpec extends AnyFreeSpec with Matcher
     "when Individual has no nino" in {
 
       val result = transformer.transformFromEtmp(
-        defaultUserAnswers,
+        emptyUserAnswers,
         srn,
         buildLandOrProperty(
           individualRecipientName,
@@ -146,13 +170,36 @@ class LandOrPropertyTransactionsTransformerSpec extends AnyFreeSpec with Matcher
           )
           userAnswers.get(IsLesseeConnectedPartyPage(srn, refineMV(1))) mustBe Some(false)
           userAnswers.get(LandOrPropertySellerConnectedPartyPage(srn, refineMV(1))) mustBe Some(true)
+
+          userAnswers.get(LandPropertyDisposalCompletedPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+            SectionCompleted
+          )
+          userAnswers.get(LandOrPropertyDisposalPage(srn)) mustBe Some(true)
+          userAnswers.get(HowWasPropertyDisposedOfPage(srn, refineMV(1), refineMV(1))) mustBe Some(Sold)
+          userAnswers.get(LandOrPropertyStillHeldPage(srn, refineMV(1), refineMV(1))) mustBe Some(true)
+          userAnswers.get(WhenWasPropertySoldPage(srn, refineMV(1), refineMV(1))) mustBe Some(localDate)
+          userAnswers.get(LandOrPropertyDisposalBuyerConnectedPartyPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+            true
+          )
+          userAnswers.get(TotalProceedsSaleLandPropertyPage(srn, refineMV(1), refineMV(1))) mustBe Some(money)
+          userAnswers.get(DisposalIndependentValuationPage(srn, refineMV(1), refineMV(1))) mustBe Some(true)
+          userAnswers.get(WhoPurchasedLandOrPropertyPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+            IdentityType.Individual
+          )
+          userAnswers.get(LandOrPropertyIndividualBuyerNamePage(srn, refineMV(1), refineMV(1))) mustBe Some(
+            individualRecipientName
+          )
+          userAnswers.get(IndividualBuyerNinoNumberPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+            ConditionalYesNo.no(noninoReason)
+          )
         }
       )
     }
+
     "when UKCompany has crn" in {
 
       val result = transformer.transformFromEtmp(
-        defaultUserAnswers,
+        emptyUserAnswers,
         srn,
         buildLandOrProperty(
           companyRecipientName,
@@ -188,6 +235,27 @@ class LandOrPropertyTransactionsTransformerSpec extends AnyFreeSpec with Matcher
           )
           userAnswers.get(IsLesseeConnectedPartyPage(srn, refineMV(1))) mustBe Some(false)
           userAnswers.get(LandOrPropertySellerConnectedPartyPage(srn, refineMV(1))) mustBe Some(true)
+          userAnswers.get(LandPropertyDisposalCompletedPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+            SectionCompleted
+          )
+          userAnswers.get(LandOrPropertyDisposalPage(srn)) mustBe Some(true)
+          userAnswers.get(HowWasPropertyDisposedOfPage(srn, refineMV(1), refineMV(1))) mustBe Some(Sold)
+          userAnswers.get(LandOrPropertyStillHeldPage(srn, refineMV(1), refineMV(1))) mustBe Some(true)
+          userAnswers.get(WhenWasPropertySoldPage(srn, refineMV(1), refineMV(1))) mustBe Some(localDate)
+          userAnswers.get(LandOrPropertyDisposalBuyerConnectedPartyPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+            true
+          )
+          userAnswers.get(TotalProceedsSaleLandPropertyPage(srn, refineMV(1), refineMV(1))) mustBe Some(money)
+          userAnswers.get(DisposalIndependentValuationPage(srn, refineMV(1), refineMV(1))) mustBe Some(true)
+          userAnswers.get(WhoPurchasedLandOrPropertyPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+            IdentityType.UKCompany
+          )
+          userAnswers.get(CompanyBuyerNamePage(srn, refineMV(1), refineMV(1))) mustBe Some(
+            companyRecipientName
+          )
+          userAnswers.get(CompanyBuyerCrnPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+            ConditionalYesNo.yes(crn)
+          )
         }
       )
     }
@@ -195,7 +263,7 @@ class LandOrPropertyTransactionsTransformerSpec extends AnyFreeSpec with Matcher
     "when UKCompany has no crn" in {
 
       val result = transformer.transformFromEtmp(
-        defaultUserAnswers,
+        emptyUserAnswers,
         srn,
         buildLandOrProperty(
           companyRecipientName,
@@ -231,6 +299,27 @@ class LandOrPropertyTransactionsTransformerSpec extends AnyFreeSpec with Matcher
           )
           userAnswers.get(IsLesseeConnectedPartyPage(srn, refineMV(1))) mustBe Some(false)
           userAnswers.get(LandOrPropertySellerConnectedPartyPage(srn, refineMV(1))) mustBe Some(true)
+          userAnswers.get(LandPropertyDisposalCompletedPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+            SectionCompleted
+          )
+          userAnswers.get(LandOrPropertyDisposalPage(srn)) mustBe Some(true)
+          userAnswers.get(HowWasPropertyDisposedOfPage(srn, refineMV(1), refineMV(1))) mustBe Some(Sold)
+          userAnswers.get(LandOrPropertyStillHeldPage(srn, refineMV(1), refineMV(1))) mustBe Some(true)
+          userAnswers.get(WhenWasPropertySoldPage(srn, refineMV(1), refineMV(1))) mustBe Some(localDate)
+          userAnswers.get(LandOrPropertyDisposalBuyerConnectedPartyPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+            true
+          )
+          userAnswers.get(TotalProceedsSaleLandPropertyPage(srn, refineMV(1), refineMV(1))) mustBe Some(money)
+          userAnswers.get(DisposalIndependentValuationPage(srn, refineMV(1), refineMV(1))) mustBe Some(true)
+          userAnswers.get(WhoPurchasedLandOrPropertyPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+            IdentityType.UKCompany
+          )
+          userAnswers.get(CompanyBuyerNamePage(srn, refineMV(1), refineMV(1))) mustBe Some(
+            companyRecipientName
+          )
+          userAnswers.get(CompanyBuyerCrnPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+            ConditionalYesNo.no(noCrnReason)
+          )
         }
       )
     }
@@ -238,7 +327,7 @@ class LandOrPropertyTransactionsTransformerSpec extends AnyFreeSpec with Matcher
     "when UKPartnership has utr" in {
 
       val result = transformer.transformFromEtmp(
-        defaultUserAnswers,
+        emptyUserAnswers,
         srn,
         buildLandOrProperty(
           partnershipRecipientName,
@@ -275,6 +364,27 @@ class LandOrPropertyTransactionsTransformerSpec extends AnyFreeSpec with Matcher
           )
           userAnswers.get(IsLesseeConnectedPartyPage(srn, refineMV(1))) mustBe Some(false)
           userAnswers.get(LandOrPropertySellerConnectedPartyPage(srn, refineMV(1))) mustBe Some(true)
+          userAnswers.get(LandPropertyDisposalCompletedPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+            SectionCompleted
+          )
+          userAnswers.get(LandOrPropertyDisposalPage(srn)) mustBe Some(true)
+          userAnswers.get(HowWasPropertyDisposedOfPage(srn, refineMV(1), refineMV(1))) mustBe Some(Sold)
+          userAnswers.get(LandOrPropertyStillHeldPage(srn, refineMV(1), refineMV(1))) mustBe Some(true)
+          userAnswers.get(WhenWasPropertySoldPage(srn, refineMV(1), refineMV(1))) mustBe Some(localDate)
+          userAnswers.get(LandOrPropertyDisposalBuyerConnectedPartyPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+            true
+          )
+          userAnswers.get(TotalProceedsSaleLandPropertyPage(srn, refineMV(1), refineMV(1))) mustBe Some(money)
+          userAnswers.get(DisposalIndependentValuationPage(srn, refineMV(1), refineMV(1))) mustBe Some(true)
+          userAnswers.get(WhoPurchasedLandOrPropertyPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+            IdentityType.UKPartnership
+          )
+          userAnswers.get(PartnershipBuyerNamePage(srn, refineMV(1), refineMV(1))) mustBe Some(
+            partnershipRecipientName
+          )
+          userAnswers.get(PartnershipBuyerUtrPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+            ConditionalYesNo.yes(utr)
+          )
         }
       )
     }
@@ -282,7 +392,7 @@ class LandOrPropertyTransactionsTransformerSpec extends AnyFreeSpec with Matcher
     "when UKPartnership has no utr" in {
 
       val result = transformer.transformFromEtmp(
-        defaultUserAnswers,
+        emptyUserAnswers,
         srn,
         buildLandOrProperty(
           partnershipRecipientName,
@@ -319,6 +429,27 @@ class LandOrPropertyTransactionsTransformerSpec extends AnyFreeSpec with Matcher
           )
           userAnswers.get(IsLesseeConnectedPartyPage(srn, refineMV(1))) mustBe Some(false)
           userAnswers.get(LandOrPropertySellerConnectedPartyPage(srn, refineMV(1))) mustBe Some(true)
+          userAnswers.get(LandPropertyDisposalCompletedPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+            SectionCompleted
+          )
+          userAnswers.get(LandOrPropertyDisposalPage(srn)) mustBe Some(true)
+          userAnswers.get(HowWasPropertyDisposedOfPage(srn, refineMV(1), refineMV(1))) mustBe Some(Sold)
+          userAnswers.get(LandOrPropertyStillHeldPage(srn, refineMV(1), refineMV(1))) mustBe Some(true)
+          userAnswers.get(WhenWasPropertySoldPage(srn, refineMV(1), refineMV(1))) mustBe Some(localDate)
+          userAnswers.get(LandOrPropertyDisposalBuyerConnectedPartyPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+            true
+          )
+          userAnswers.get(TotalProceedsSaleLandPropertyPage(srn, refineMV(1), refineMV(1))) mustBe Some(money)
+          userAnswers.get(DisposalIndependentValuationPage(srn, refineMV(1), refineMV(1))) mustBe Some(true)
+          userAnswers.get(WhoPurchasedLandOrPropertyPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+            IdentityType.UKPartnership
+          )
+          userAnswers.get(PartnershipBuyerNamePage(srn, refineMV(1), refineMV(1))) mustBe Some(
+            partnershipRecipientName
+          )
+          userAnswers.get(PartnershipBuyerUtrPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+            ConditionalYesNo.no(noUtrReason)
+          )
         }
       )
     }
@@ -326,7 +457,7 @@ class LandOrPropertyTransactionsTransformerSpec extends AnyFreeSpec with Matcher
     "when Other" in {
 
       val result = transformer.transformFromEtmp(
-        defaultUserAnswers,
+        emptyUserAnswers,
         srn,
         buildLandOrProperty(
           otherRecipientName,
@@ -362,6 +493,25 @@ class LandOrPropertyTransactionsTransformerSpec extends AnyFreeSpec with Matcher
           )
           userAnswers.get(IsLesseeConnectedPartyPage(srn, refineMV(1))) mustBe Some(false)
           userAnswers.get(LandOrPropertySellerConnectedPartyPage(srn, refineMV(1))) mustBe Some(true)
+          userAnswers.get(LandPropertyDisposalCompletedPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+            SectionCompleted
+          )
+          userAnswers.get(LandOrPropertyDisposalPage(srn)) mustBe Some(true)
+          userAnswers.get(HowWasPropertyDisposedOfPage(srn, refineMV(1), refineMV(1))) mustBe Some(Sold)
+          userAnswers.get(LandOrPropertyStillHeldPage(srn, refineMV(1), refineMV(1))) mustBe Some(true)
+          userAnswers.get(WhenWasPropertySoldPage(srn, refineMV(1), refineMV(1))) mustBe Some(localDate)
+          userAnswers.get(LandOrPropertyDisposalBuyerConnectedPartyPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+            true
+          )
+          userAnswers.get(TotalProceedsSaleLandPropertyPage(srn, refineMV(1), refineMV(1))) mustBe Some(money)
+          userAnswers.get(DisposalIndependentValuationPage(srn, refineMV(1), refineMV(1))) mustBe Some(true)
+          userAnswers.get(WhoPurchasedLandOrPropertyPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+            IdentityType.Other
+          )
+          userAnswers
+            .get(OtherBuyerDetailsPage(srn, refineMV(1), refineMV(1))) mustBe Some(
+            RecipientDetails(otherRecipientName, otherRecipientDescription)
+          )
         }
       )
     }
@@ -370,16 +520,16 @@ class LandOrPropertyTransactionsTransformerSpec extends AnyFreeSpec with Matcher
   def buildLandOrProperty(name: String, propertyAcquiredFrom: PropertyAcquiredFrom): LandOrProperty =
     LandOrProperty(
       landOrPropertyHeld = true,
-      disposeAnyLandOrProperty = false,
+      disposeAnyLandOrProperty = true,
       landOrPropertyTransactions = Seq(
         LandOrPropertyTransactions(
-          PropertyDetails(
+          propertyDetails = PropertyDetails(
             landOrPropertyInUK = true,
             addressDetails = address,
             landRegistryTitleNumberKey = true,
             landRegistryTitleNumberValue = "landRegistryTitleNumberValue"
           ),
-          HeldPropertyTransaction(
+          heldPropertyTransaction = HeldPropertyTransaction(
             methodOfHolding = Acquisition,
             dateOfAcquisitionOrContribution = Some(localDate),
             optPropertyAcquiredFromName = Some(name),
@@ -398,6 +548,21 @@ class LandOrPropertyTransactionsTransformerSpec extends AnyFreeSpec with Matcher
             ),
             landOrPropertyLeased = true,
             totalIncomeOrReceipts = money.value
+          ),
+          optDisposedPropertyTransaction = Some(
+            Seq(
+              DisposedPropertyTransaction(
+                methodOfDisposal = Sold.name,
+                optOtherMethod = None,
+                optDateOfSale = Some(localDate),
+                optNameOfPurchaser = Some(name),
+                optPropertyAcquiredFrom = Some(propertyAcquiredFrom),
+                optSaleProceeds = Some(money.value),
+                optConnectedPartyStatus = Some(true),
+                optIndepValuationSupport = Some(true),
+                portionStillHeld = true
+              )
+            )
           )
         )
       )

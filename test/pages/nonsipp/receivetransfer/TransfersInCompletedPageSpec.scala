@@ -16,13 +16,9 @@
 
 package pages.nonsipp.receivetransfer
 
-import pages.nonsipp.receivetransfer.TransfersInCYAPage
-
 import config.Refined._
 import eu.timepit.refined.refineMV
-
 import pages.behaviours.PageBehaviours
-
 import viewmodels.models.SectionCompleted
 
 class TransfersInCompletedPageSpec extends PageBehaviours {

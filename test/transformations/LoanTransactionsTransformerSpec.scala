@@ -60,7 +60,7 @@ class LoanTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
     }
 
     "should return empty List when index as string not a valid number" in {
-      val userAnswers = defaultUserAnswers
+      val userAnswers = emptyUserAnswers
         .unsafeSet(IdentityTypes(srn, IdentitySubject.LoanRecipient), Map("InvalidIntValue" -> IdentityType.Individual))
 
       val request = DataRequest(allowedAccessRequest, userAnswers)
@@ -70,7 +70,7 @@ class LoanTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
     }
 
     "should return transformed object when IdentityType is Individual with Nino" in {
-      val userAnswers = defaultUserAnswers
+      val userAnswers = emptyUserAnswers
         .unsafeSet(IdentityTypes(srn, IdentitySubject.LoanRecipient), Map("0" -> IdentityType.Individual))
         .unsafeSet(IndividualRecipientNamePage(srn, refineMV(1)), "IndividualRecipientName")
         .unsafeSet(IndividualRecipientNinoPage(srn, refineMV(1)), ConditionalYesNo.yes[String, Nino](nino))
@@ -102,7 +102,7 @@ class LoanTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
     }
 
     "should return transformed object when IdentityType is Individual without Nino" in {
-      val userAnswers = defaultUserAnswers
+      val userAnswers = emptyUserAnswers
         .unsafeSet(IdentityTypes(srn, IdentitySubject.LoanRecipient), Map("0" -> IdentityType.Individual))
         .unsafeSet(IndividualRecipientNamePage(srn, refineMV(1)), "IndividualRecipientName")
         .unsafeSet(IndividualRecipientNinoPage(srn, refineMV(1)), ConditionalYesNo.no[String, Nino]("noNinoReason"))
@@ -134,7 +134,7 @@ class LoanTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
     }
 
     "should return transformed object when IdentityType is UKCompany with Crn" in {
-      val userAnswers = defaultUserAnswers
+      val userAnswers = emptyUserAnswers
         .unsafeSet(IdentityTypes(srn, IdentitySubject.LoanRecipient), Map("0" -> IdentityType.UKCompany))
         .unsafeSet(CompanyRecipientNamePage(srn, refineMV(1)), "CompanyRecipientName")
         .unsafeSet(
@@ -169,7 +169,7 @@ class LoanTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
     }
 
     "should return transformed object when IdentityType is UKCompany without Crn" in {
-      val userAnswers = defaultUserAnswers
+      val userAnswers = emptyUserAnswers
         .unsafeSet(IdentityTypes(srn, IdentitySubject.LoanRecipient), Map("0" -> IdentityType.UKCompany))
         .unsafeSet(CompanyRecipientNamePage(srn, refineMV(1)), "CompanyRecipientName")
         .unsafeSet(
@@ -203,7 +203,7 @@ class LoanTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
     }
 
     "should return transformed object when IdentityType is UKPartnership with Utr" in {
-      val userAnswers = defaultUserAnswers
+      val userAnswers = emptyUserAnswers
         .unsafeSet(IdentityTypes(srn, IdentitySubject.LoanRecipient), Map("0" -> IdentityType.UKPartnership))
         .unsafeSet(PartnershipRecipientNamePage(srn, refineMV(1)), "PartnershipRecipientName")
         .unsafeSet(
@@ -238,7 +238,7 @@ class LoanTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
     }
 
     "should return transformed object when IdentityType is UKPartnership without Utr" in {
-      val userAnswers = defaultUserAnswers
+      val userAnswers = emptyUserAnswers
         .unsafeSet(IdentityTypes(srn, IdentitySubject.LoanRecipient), Map("0" -> IdentityType.UKPartnership))
         .unsafeSet(PartnershipRecipientNamePage(srn, refineMV(1)), "PartnershipRecipientName")
         .unsafeSet(
@@ -273,7 +273,7 @@ class LoanTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
     }
 
     "should return transformed object when IdentityType is Other" in {
-      val userAnswers = defaultUserAnswers
+      val userAnswers = emptyUserAnswers
         .unsafeSet(IdentityTypes(srn, IdentitySubject.LoanRecipient), Map("0" -> IdentityType.Other))
         .unsafeSet(
           OtherRecipientDetailsPage(srn, refineMV(1), IdentitySubject.LoanRecipient),
@@ -310,7 +310,7 @@ class LoanTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
   "Should transform loan details from ETMP" - {
     "when individual nino" in {
 
-      val userAnswers = defaultUserAnswers
+      val userAnswers = emptyUserAnswers
 
       val result = transformer.transformFromEtmp(
         userAnswers,
@@ -339,7 +339,7 @@ class LoanTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
     }
     "when individual no nino" in {
 
-      val userAnswers = defaultUserAnswers
+      val userAnswers = emptyUserAnswers
 
       val result = transformer.transformFromEtmp(
         userAnswers,
@@ -360,7 +360,7 @@ class LoanTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
     }
     "when company crn" in {
 
-      val userAnswers = defaultUserAnswers
+      val userAnswers = emptyUserAnswers
 
       val result = transformer.transformFromEtmp(
         userAnswers,
@@ -386,7 +386,7 @@ class LoanTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
     }
     "when company no crn" in {
 
-      val userAnswers = defaultUserAnswers
+      val userAnswers = emptyUserAnswers
 
       val result = transformer.transformFromEtmp(
         userAnswers,
@@ -412,7 +412,7 @@ class LoanTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
     }
     "when partnership utr" in {
 
-      val userAnswers = defaultUserAnswers
+      val userAnswers = emptyUserAnswers
 
       val result = transformer.transformFromEtmp(
         userAnswers,
@@ -435,7 +435,7 @@ class LoanTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
     }
     "when partnership no utr" in {
 
-      val userAnswers = defaultUserAnswers
+      val userAnswers = emptyUserAnswers
 
       val result = transformer.transformFromEtmp(
         userAnswers,
@@ -461,7 +461,7 @@ class LoanTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
     }
     "when other" in {
 
-      val userAnswers = defaultUserAnswers
+      val userAnswers = emptyUserAnswers
 
       val result = transformer.transformFromEtmp(
         userAnswers,

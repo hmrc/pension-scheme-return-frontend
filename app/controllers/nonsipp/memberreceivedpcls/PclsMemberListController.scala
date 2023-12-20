@@ -22,14 +22,13 @@ import config.Constants.maxNotRelevant
 import config.Refined.OneTo300
 import controllers.PSRController
 import controllers.actions._
-import eu.timepit.refined.{refineMV, refineV}
+import eu.timepit.refined.refineV
 import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
 import models._
 import navigation.Navigator
 import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
 import pages.nonsipp.memberreceivedpcls._
-import pages.nonsipp.receivetransfer._
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}

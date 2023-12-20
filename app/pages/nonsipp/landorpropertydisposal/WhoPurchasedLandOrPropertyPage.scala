@@ -17,8 +17,8 @@
 package pages.nonsipp.landorpropertydisposal
 
 import config.Refined.{Max50, Max5000}
-import models.{IdentityType, UserAnswers}
 import models.SchemeId.Srn
+import models.{IdentityType, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import queries.Removable
@@ -36,14 +36,14 @@ case class WhoPurchasedLandOrPropertyPage(srn: Srn, landOrPropertyIndex: Max5000
   override def toString: String = "purchasedLandOrProperty"
 
   private def pages(srn: Srn): List[Removable[_]] = List(
-    LandOrPropertyIndividualBuyerNamePage(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50),
-    IndividualBuyerNinoNumberPage(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50),
-    CompanyBuyerNamePage(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50),
-    CompanyBuyerCrnPage(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50),
-    PartnershipBuyerNamePage(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50),
-    PartnershipBuyerUtrPage(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50),
-    OtherBuyerDetailsPage(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50),
-    LandOrPropertyDisposalBuyerConnectedPartyPage(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50)
+    LandOrPropertyIndividualBuyerNamePage(srn, landOrPropertyIndex, disposalIndex),
+    IndividualBuyerNinoNumberPage(srn, landOrPropertyIndex, disposalIndex),
+    CompanyBuyerNamePage(srn, landOrPropertyIndex, disposalIndex),
+    CompanyBuyerCrnPage(srn, landOrPropertyIndex, disposalIndex),
+    PartnershipBuyerNamePage(srn, landOrPropertyIndex, disposalIndex),
+    PartnershipBuyerUtrPage(srn, landOrPropertyIndex, disposalIndex),
+    OtherBuyerDetailsPage(srn, landOrPropertyIndex, disposalIndex),
+    LandOrPropertyDisposalBuyerConnectedPartyPage(srn, landOrPropertyIndex, disposalIndex)
   )
   override def cleanup(value: Option[IdentityType], userAnswers: UserAnswers): Try[UserAnswers] =
     (value, userAnswers.get(this)) match {
