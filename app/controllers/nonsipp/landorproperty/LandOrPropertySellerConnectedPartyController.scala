@@ -36,9 +36,9 @@ import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
 import utils.FormUtils.FormOps
-import viewmodels.DisplayMessage.Message
+import viewmodels.DisplayMessage.{LinkMessage, ListMessage, ListType, Message, ParagraphMessage}
 import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
+import viewmodels.models.{FormPageViewModel, FurtherDetailsViewModel, YesNoPageViewModel}
 import views.html.YesNoPageView
 
 import javax.inject.{Inject, Named}
@@ -118,8 +118,30 @@ object LandOrPropertySellerConnectedPartyController {
 
   def viewModel(srn: Srn, index: Max5000, individualName: String, mode: Mode): FormPageViewModel[YesNoPageViewModel] =
     YesNoPageViewModel(
-      "landOrPropertySellerConnectedParty.title",
+      Message("landOrPropertySellerConnectedParty.title"),
       Message("landOrPropertySellerConnectedParty.heading", individualName),
+      Option(
+        FurtherDetailsViewModel(
+          Message("landOrPropertySellerConnectedParty.content"),
+          ParagraphMessage("landOrPropertySellerConnectedParty.paragraph1") ++
+            ParagraphMessage("landOrPropertySellerConnectedParty.paragraph2") ++
+            ParagraphMessage("landOrPropertySellerConnectedParty.paragraph3") ++
+            ListMessage(
+              ListType.Bullet,
+              "landOrPropertySellerConnectedParty.bullet1",
+              "landOrPropertySellerConnectedParty.bullet2"
+            ) ++
+            ParagraphMessage(
+              "landOrPropertySellerConnectedParty.paragraph4",
+              LinkMessage(
+                "landOrPropertySellerConnectedParty.paragraph4.link",
+                "https://www.legislation.gov.uk/ukpga/2007/3/section/993"
+                //TODO: implement open in new tab functionality
+                // also abstract this URL away - maybe FrontendAppConfig?
+              )
+            )
+        )
+      ),
       controllers.nonsipp.landorproperty.routes.LandOrPropertySellerConnectedPartyController.onSubmit(srn, index, mode)
     )
 }

@@ -1093,6 +1093,14 @@ landPropertyIndividualSellersName.error.invalid = Seller’s name must only incl
 
 landOrPropertySellerConnectedParty.title = Is the seller a connected party?
 landOrPropertySellerConnectedParty.heading = Is {0} a connected party?
+landOrPropertySellerConnectedParty.content = What is a connected party?
+landOrPropertySellerConnectedParty.paragraph1 = A connected party is an individual, company or partnership that is connected to either a member of the scheme or the sponsoring employer of the scheme.
+landOrPropertySellerConnectedParty.paragraph2 = A connected party of a member is usually their spouse, civil partner or close relative (for example their parent, sibling, child or grandchild).
+landOrPropertySellerConnectedParty.paragraph3 = A connected party of a sponsoring employer can be:
+landOrPropertySellerConnectedParty.bullet1 = someone who has control over the company
+landOrPropertySellerConnectedParty.bullet2 = another company, where the same person has control of both
+landOrPropertySellerConnectedParty.paragraph4 = See a
+landOrPropertySellerConnectedParty.paragraph4.link = full list of circumstances where an individual, company or partnership might be a connected party (opens in new tab).
 landOrPropertySellerConnectedParty.error.required = Select yes if the seller is a connected party
 
 individualSellerNi.title = Do you know the seller’s National Insurance number?
