@@ -20,15 +20,14 @@ import controllers.ControllerBaseSpec
 import controllers.nonsipp.employercontributions.EmployerContributionsMemberListController._
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
-import models.{NameDOB, NormalMode}
+import models.NormalMode
 import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.employercontributions.EmployerContributionsMemberListPage
 import pages.nonsipp.memberdetails.MemberDetailsPage
-import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
-import play.api.inject.guice.GuiceableModule
-import views.html.TwoColumnsTripleAction
 import play.api.inject.bind
+import play.api.inject.guice.GuiceableModule
 import services.PsrSubmissionService
+import views.html.TwoColumnsTripleAction
 
 import scala.concurrent.Future
 
@@ -37,7 +36,8 @@ class EmployerContributionsMemberListControllerSpec extends ControllerBaseSpec {
   private lazy val onPageLoad = routes.EmployerContributionsMemberListController.onPageLoad(srn, page = 1, NormalMode)
   private lazy val onSubmit = routes.EmployerContributionsMemberListController.onSubmit(srn, page = 1, NormalMode)
 
-  val userAnswers = defaultUserAnswers.unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+  val userAnswers = defaultUserAnswers
+    .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
 
   private val mockPsrSubmissionService = mock[PsrSubmissionService]
 
@@ -54,34 +54,18 @@ class EmployerContributionsMemberListControllerSpec extends ControllerBaseSpec {
   "EmployerContributionsMemberListController" - {
 
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
-      val memberList = userAnswers.membersDetails(srn)
-
       injected[TwoColumnsTripleAction].apply(
         form(injected[YesNoPageFormProvider]),
-        viewModel(
-          srn,
-          page = 1,
-          NormalMode,
-          memberList: List[NameDOB],
-          userAnswers
-        )
+        viewModel(srn, page = 1, NormalMode, List(memberDetails), userAnswers)
       )
     })
 
     act.like(renderPrePopView(onPageLoad, EmployerContributionsMemberListPage(srn), true, userAnswers) {
       implicit app => implicit request =>
-        val memberList = userAnswers.membersDetails(srn)
-
         injected[TwoColumnsTripleAction]
           .apply(
-            form(injected[YesNoPageFormProvider]),
-            viewModel(
-              srn,
-              page = 1,
-              NormalMode,
-              memberList: List[NameDOB],
-              userAnswers
-            )
+            form(injected[YesNoPageFormProvider]).fill(true),
+            viewModel(srn, page = 1, NormalMode, List(memberDetails), userAnswers)
           )
     })
 

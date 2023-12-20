@@ -36,11 +36,12 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{PsrSubmissionService, SaveService}
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
+import viewmodels.models.{FormPageViewModel, SectionStatus, YesNoPageViewModel}
 import views.html.YesNoPageView
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
+import pages.nonsipp.employercontributions._
 
 class RemoveEmployerContributionsController @Inject()(
   override val messagesApi: MessagesApi,
@@ -91,7 +92,13 @@ class RemoveEmployerContributionsController @Inject()(
           removeDetails => {
             if (removeDetails) {
               for {
-                updatedAnswers <- Future.fromTry(request.userAnswers.remove(EmployerNamePage(srn, memberIndex, index)))
+                updatedAnswers <- Future.fromTry(
+                  request.userAnswers
+                    .removePages(
+                      journeyPages(srn, memberIndex, index) :+ EmployerContributionsCompleted(srn, memberIndex, index)
+                    )
+                    .set(EmployerContributionsSectionStatus(srn), SectionStatus.InProgress)
+                )
                 _ <- saveService.save(updatedAnswers)
                 submissionResult <- psrSubmissionService.submitPsrDetails(srn, updatedAnswers)
               } yield submissionResult.fold(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))(

@@ -194,13 +194,8 @@ class MemberPaymentsTransformer @Inject()() extends Transformer {
             TotalEmployerContributionPage(srn, index, secondaryIndex),
             Money(employerContributions.totalTransferValue)
           ),
-          _.set(
-            EmployerContributionsSectionStatus(srn),
-            if (employerContributionsCompleted) SectionStatus.Completed else SectionStatus.InProgress
-          ),
-          _.set(EmployerContributionsCompleted(srn, index, secondaryIndex), SectionCompleted),
-          _.set(EmployerContributionsPage(srn), employerContributionsList.nonEmpty)
-        ) ++ List(
+          _.set(EmployerContributionsCompleted(srn, index, secondaryIndex), SectionCompleted)
+        ) ++ List[Try[UserAnswers] => Try[UserAnswers]](
           employerContributions.employerType match {
             case EmployerType.UKCompany(idOrReason) =>
               _.set(EmployerTypeOfBusinessPage(srn, index, secondaryIndex), IdentityType.UKCompany)
@@ -213,7 +208,14 @@ class MemberPaymentsTransformer @Inject()() extends Transformer {
                 .set(OtherEmployeeDescriptionPage(srn, index, secondaryIndex), description)
           }
         )
-    }
+    } ++ List[Try[UserAnswers] => Try[UserAnswers]](
+      _.set(EmployerContributionsPage(srn), employerContributionsList.nonEmpty),
+      _.set(EmployerContributionsMemberListPage(srn), employerContributionsCompleted),
+      _.set(
+        EmployerContributionsSectionStatus(srn),
+        if (employerContributionsCompleted) SectionStatus.Completed else SectionStatus.InProgress
+      )
+    )
   }
 
   private def toEmployerType(
