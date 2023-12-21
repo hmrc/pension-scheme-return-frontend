@@ -14,19 +14,9 @@
  * limitations under the License.
  */
 
-package pages
+package pages.nonsipp.memberpensionpayments
 
-import pages.behaviours.PageBehaviours
-import pages.nonsipp.memberpayments.PensionPaymentsReceivedPage
+import models.SchemeId.Srn
+import pages.Page
 
-class PensionPaymentsReceivedPageSpec extends PageBehaviours {
-
-  "PensionPaymentsReceivedPage" - {
-
-    beRetrievable[Boolean](PensionPaymentsReceivedPage(srnGen.sample.value))
-
-    beSettable[Boolean](PensionPaymentsReceivedPage(srnGen.sample.value))
-
-    beRemovable[Boolean](PensionPaymentsReceivedPage(srnGen.sample.value))
-  }
-}
+case class WhatYouWillNeedPensionPaymentsPage(srn: Srn) extends Page

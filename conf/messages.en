@@ -1961,3 +1961,9 @@ transferOut.whichTransferOutRemove.title = Which transfer out for this member do
 transferOut.whichTransferOutRemove.heading = Which transfer out for {0} do you want to remove?
 transferOut.whichTransferOutRemove.error.required =  Select the transfer out you want to remove
 transferOut.whichTransferOutRemove.radio.label = Transfer out to {0} on {1}
+
+whatYouWillNeed.pensionPayments.title = Pension payments for members of the scheme
+whatYouWillNeed.pensionPayments.heading = Pension payments for members of {0}
+whatYouWillNeed.pensionPayments.paragraph1 = You must tell us about all pension payments received by members of the scheme during the period of this return.
+whatYouWillNeed.pensionPayments.paragraph2 = If a member received pension payments, you must tell us the total amount they received.
+whatYouWillNeed.pensionPayments.paragraph3 = On the next page, you will be able to select a member from a list of those whose details you have already provided. If you want to add a new member, you will need to provide their details using the ‘member details’ section of this pension scheme return.

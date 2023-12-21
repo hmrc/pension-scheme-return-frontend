@@ -19,7 +19,7 @@ package navigation.nonsipp
 import models.UserAnswers
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.memberpayments.PensionPaymentsReceivedPage
+import pages.nonsipp.memberpensionpayments.{PensionPaymentsReceivedPage, WhatYouWillNeedPensionPaymentsPage}
 import play.api.mvc.Call
 
 object PensionPaymentsReceivedNavigator extends JourneyNavigator {
@@ -27,10 +27,14 @@ object PensionPaymentsReceivedNavigator extends JourneyNavigator {
   val normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
     case page @ PensionPaymentsReceivedPage(srn) =>
       if (userAnswers.get(page).contains(true)) {
-        controllers.routes.UnauthorisedController.onPageLoad()
+        controllers.nonsipp.memberpensionpayments.routes.WhatYouWillNeedPensionPaymentsController.onPageLoad(srn)
       } else {
         controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
       }
+
+    case WhatYouWillNeedPensionPaymentsPage(srn) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
+
   }
 
   val checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] = _ => _ => PartialFunction.empty

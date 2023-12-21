@@ -163,7 +163,7 @@ object TransfersOutCYAController {
                 "site.change",
                 controllers.nonsipp.membertransferout.routes.ReceivingSchemeTypeController
                   .onPageLoad(srn, index, journey.secondaryIndex, CheckMode)
-                  .url + "#schemeRe"
+                  .url + "#schemeType"
               ).withVisuallyHiddenContent(
                 Message("transfersOutCYAController.rows.schemeType.hidden", journey.schemeName)
               )
@@ -176,7 +176,7 @@ object TransfersOutCYAController {
                 "site.change",
                 controllers.nonsipp.membertransferout.routes.ReceivingSchemeTypeController
                   .onPageLoad(srn, index, journey.secondaryIndex, CheckMode)
-                  .url + "#schemeRef"
+                  .url + "#schemeReference"
               ).withVisuallyHiddenContent(
                 Message(s"transfersOutCYAController.rows.schemeRef.$receiveTypeKey.hidden", journey.schemeName)
               )
