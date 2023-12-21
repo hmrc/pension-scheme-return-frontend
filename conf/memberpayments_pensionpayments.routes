@@ -1,0 +1,8 @@
+GET         /:srn/pension-payments-received                                             controllers.nonsipp.memberpensionpayments.PensionPaymentsReceivedController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/pension-payments-received                                             controllers.nonsipp.memberpensionpayments.PensionPaymentsReceivedController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+
+GET         /:srn/change-pension-payments-received                                      controllers.nonsipp.memberpensionpayments.PensionPaymentsReceivedController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-pension-payments-received                                      controllers.nonsipp.memberpensionpayments.PensionPaymentsReceivedController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET         /:srn/what-you-will-need-pension-payments                                     controllers.nonsipp.memberpensionpayments.WhatYouWillNeedPensionPaymentsController.onPageLoad(srn: Srn)
+GET         /:srn/submit-what-you-will-need-pension-payments                              controllers.nonsipp.memberpensionpayments.WhatYouWillNeedPensionPaymentsController.onSubmit(srn: Srn)

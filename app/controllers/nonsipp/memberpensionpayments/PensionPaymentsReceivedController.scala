@@ -22,7 +22,7 @@ import forms.YesNoPageFormProvider
 import models.Mode
 import models.SchemeId.Srn
 import navigation.Navigator
-import pages.nonsipp.memberpayments.PensionPaymentsReceivedPage
+import pages.nonsipp.memberpensionpayments.PensionPaymentsReceivedPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}

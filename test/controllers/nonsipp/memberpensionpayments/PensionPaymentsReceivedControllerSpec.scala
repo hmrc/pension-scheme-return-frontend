@@ -20,7 +20,7 @@ import controllers.ControllerBaseSpec
 import controllers.nonsipp.memberpensionpayments.PensionPaymentsReceivedController.{form, viewModel}
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import pages.nonsipp.memberpayments.PensionPaymentsReceivedPage
+import pages.nonsipp.memberpensionpayments.PensionPaymentsReceivedPage
 import play.api.libs.json.JsPath
 import views.html.YesNoPageView
 

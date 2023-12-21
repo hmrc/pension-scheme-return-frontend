@@ -19,7 +19,7 @@ package navigation.nonsipp
 import controllers.routes
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.memberpayments.PensionPaymentsReceivedPage
+import pages.nonsipp.memberpensionpayments.{PensionPaymentsReceivedPage, WhatYouWillNeedPensionPaymentsPage}
 import utils.BaseSpec
 
 class PensionPaymentsReceivedNavigatorSpec extends BaseSpec with NavigatorBehaviours {
@@ -33,9 +33,10 @@ class PensionPaymentsReceivedNavigatorSpec extends BaseSpec with NavigatorBehavi
         .navigateToWithData(
           PensionPaymentsReceivedPage,
           Gen.const(true),
-          (_, _) => routes.UnauthorisedController.onPageLoad()
+          (srn, _) =>
+            controllers.nonsipp.memberpensionpayments.routes.WhatYouWillNeedPensionPaymentsController.onPageLoad(srn)
         )
-        .withName("go from pension payments received page to unauthorised page on yes selected")
+        .withName("go from pension payments received page to what you will need pension payments page on yes selected")
     )
 
     act.like(
@@ -48,4 +49,18 @@ class PensionPaymentsReceivedNavigatorSpec extends BaseSpec with NavigatorBehavi
         .withName("go from pension payments received page to task list page son no selected")
     )
   }
+
+  "WhatYouWillNeedPensionPaymentsPage" - {
+
+    act.like(
+      normalmode
+        .navigateTo(
+          WhatYouWillNeedPensionPaymentsPage,
+          (_, _) => controllers.routes.UnauthorisedController.onPageLoad()
+        )
+        .withName("go from what you will need pension payments page to unauthorised page")
+    )
+
+  }
+
 }
