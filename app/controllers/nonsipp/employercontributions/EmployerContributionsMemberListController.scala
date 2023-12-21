@@ -66,11 +66,12 @@ class EmployerContributionsMemberListController @Inject()(
       if (memberList.nonEmpty) {
         val viewModel = EmployerContributionsMemberListController
           .viewModel(srn, page, mode, memberList, request.userAnswers)
-        Ok(view(form, viewModel))
+        val filledForm =
+          request.userAnswers.get(EmployerContributionsMemberListPage(srn)).fold(form)(form.fill)
+        Ok(view(filledForm, viewModel))
       } else {
         Redirect(
-          controllers.nonsipp.employercontributions.routes.EmployerNameController
-            .onSubmit(srn, refineMV(1), refineMV(2), mode)
+          controllers.routes.JourneyRecoveryController.onPageLoad()
         )
       }
   }
@@ -96,11 +97,13 @@ class EmployerContributionsMemberListController @Inject()(
             value =>
               for {
                 updatedUserAnswers <- Future.fromTry(
-                  request.userAnswers.set(
-                    EmployerContributionsSectionStatus(srn),
-                    if (value) SectionStatus.Completed
-                    else SectionStatus.InProgress
-                  )
+                  request.userAnswers
+                    .set(
+                      EmployerContributionsSectionStatus(srn),
+                      if (value) SectionStatus.Completed
+                      else SectionStatus.InProgress
+                    )
+                    .set(EmployerContributionsMemberListPage(srn), value)
                 )
                 _ <- saveService.save(updatedUserAnswers)
                 submissionResult <- if (value) psrSubmissionService.submitPsrDetails(srn, updatedUserAnswers)

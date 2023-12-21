@@ -90,6 +90,7 @@ class MemberPaymentsTransformerSpec
     .unsafeSet(EmployerContributionsPage(srn), true)
     .unsafeSet(UnallocatedEmployerContributionsPage(srn), true)
     .unsafeSet(UnallocatedEmployerAmountPage(srn), money)
+    .unsafeSet(EmployerContributionsMemberListPage(srn), true)
 
   "MemberPaymentsTransformer - To Etmp" - {
     "should return empty List when userAnswer is empty" in {

@@ -48,8 +48,7 @@ class EmployerContributionsCYAController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   saveService: SaveService,
-  view: CheckYourAnswersView,
-  psrSubmissionService: PsrSubmissionService
+  view: CheckYourAnswersView
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
@@ -84,10 +83,7 @@ class EmployerContributionsCYAController @Inject()(
             .fromTry(userAnswers.set(EmployerContributionsSectionStatus(srn), SectionStatus.InProgress))
             .liftF
           _ <- saveService.save(updatedAnswers).liftF
-          submissionResult <- psrSubmissionService.submitPsrDetails(srn, updatedAnswers).liftF
-        } yield submissionResult.fold(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))(
-          _ => Redirect(navigator.nextPage(EmployerContributionsCYAPage(srn), mode, updatedAnswers))
-        )
+        } yield Redirect(navigator.nextPage(EmployerContributionsCYAPage(srn), mode, updatedAnswers))
       ).merge
     }
 

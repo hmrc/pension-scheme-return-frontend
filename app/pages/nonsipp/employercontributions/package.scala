@@ -16,7 +16,10 @@
 
 package pages.nonsipp
 
+import config.Refined._
+import models.SchemeId.Srn
 import play.api.libs.json.{__, JsPath}
+import queries.Removable
 
 package object employercontributions {
 
@@ -26,4 +29,13 @@ package object employercontributions {
     val memberEmpContribution: JsPath = memberDetails \ "memberEmpContribution"
   }
 
+  def journeyPages(srn: Srn, index: Max300, secondaryIndex: Max50): List[Removable[_]] = List(
+    EmployerNamePage(srn, index, secondaryIndex),
+    EmployerTypeOfBusinessPage(srn, index, secondaryIndex),
+    TotalEmployerContributionPage(srn, index, secondaryIndex),
+    EmployerCompanyCrnPage(srn, index, secondaryIndex),
+    PartnershipEmployerUtrPage(srn, index, secondaryIndex),
+    OtherEmployeeDescriptionPage(srn, index, secondaryIndex),
+    ContributionsFromAnotherEmployerPage(srn, index, secondaryIndex)
+  )
 }

@@ -22,14 +22,22 @@ import controllers.nonsipp.employercontributions.ContributionsFromAnotherEmploye
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.NormalMode
+import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.employercontributions.ContributionsFromAnotherEmployerPage
 import pages.nonsipp.memberdetails.MemberDetailsPage
+import play.api.inject.bind
+import play.api.inject.guice.GuiceableModule
+import services.PsrSubmissionService
 import views.html.YesNoPageView
+
+import scala.concurrent.Future
 
 class ContributionsFromAnotherEmployerControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[Max300.Refined](1)
   private val secondaryIndex = refineMV[Max50.Refined](1)
+
+  private val mockPsrSubmissionService = mock[PsrSubmissionService]
 
   private lazy val onPageLoad =
     routes.ContributionsFromAnotherEmployerController.onPageLoad(srn, index, secondaryIndex, NormalMode)
@@ -38,6 +46,16 @@ class ContributionsFromAnotherEmployerControllerSpec extends ControllerBaseSpec 
 
   private val userAnswers = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, index), memberDetails)
+
+  override def beforeEach(): Unit = {
+    reset(mockPsrSubmissionService)
+    when(mockPsrSubmissionService.submitPsrDetails(any(), any())(any(), any(), any()))
+      .thenReturn(Future.successful(Some(())))
+  }
+
+  override protected val additionalBindings: List[GuiceableModule] = List(
+    bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
+  )
 
   "ContributionsFromAnotherEmployerController" - {
 

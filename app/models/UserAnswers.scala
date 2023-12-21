@@ -85,6 +85,10 @@ final case class UserAnswers(
         _ => removeOnly(page)
       )
 
+  // Don't trigger cleanup
+  def removePages(pages: List[Removable[_]]): Try[UserAnswers] =
+    pages.foldLeft(Try(this))((ua, page) => ua.transform(_.removeOnly(page), _ => removeOnly(page)))
+
   def remove(pages: List[Removable[_]]): Try[UserAnswers] =
     pages.foldLeft(Try(this))((ua, page) => ua.flatMap(_.remove(page)))
 
