@@ -16,26 +16,18 @@
 
 package pages.nonsipp.membercontributions
 
-import config.Refined.{Max300, Max50}
+import config.Refined.Max300
 import models.Money
 import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import utils.RefinedUtils._
 
-case class TotalMemberContributionPage(srn: Srn, index: Max300, secondaryIndex: Max50) extends QuestionPage[Money] {
-
-  override def path: JsPath =
-    Paths.memberDetails \ toString \ index.arrayIndex.toString \ secondaryIndex.arrayIndex.toString
-
-  override def toString: String = "totalMemberContribution"
-
-}
-
-case class TotalMemberContributionPages(srn: Srn, index: Max300) extends QuestionPage[Map[String, Money]] {
+case class TotalMemberContributionPage(srn: Srn, index: Max300) extends QuestionPage[Money] {
 
   override def path: JsPath =
     Paths.memberDetails \ toString \ index.arrayIndex.toString
 
   override def toString: String = "totalMemberContribution"
+
 }

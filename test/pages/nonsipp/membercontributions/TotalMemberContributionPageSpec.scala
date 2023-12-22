@@ -18,22 +18,19 @@ package pages.nonsipp.membercontributions
 
 import config.Refined._
 import eu.timepit.refined.refineMV
-
-import pages.behaviours.PageBehaviours
-
 import models.Money
+import pages.behaviours.PageBehaviours
 
 class TotalMemberContributionPageSpec extends PageBehaviours {
 
   "TotalMemberContributionPage" - {
 
     val index = refineMV[Max300.Refined](1)
-    val secondaryIndex = refineMV[Max50.Refined](1)
 
-    beRetrievable[Money](TotalMemberContributionPage(srnGen.sample.value, index, secondaryIndex))
+    beRetrievable[Money](TotalMemberContributionPage(srnGen.sample.value, index))
 
-    beSettable[Money](TotalMemberContributionPage(srnGen.sample.value, index, secondaryIndex))
+    beSettable[Money](TotalMemberContributionPage(srnGen.sample.value, index))
 
-    beRemovable[Money](TotalMemberContributionPage(srnGen.sample.value, index, secondaryIndex))
+    beRemovable[Money](TotalMemberContributionPage(srnGen.sample.value, index))
   }
 }

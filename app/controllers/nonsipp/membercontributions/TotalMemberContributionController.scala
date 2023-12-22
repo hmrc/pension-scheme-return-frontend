@@ -17,10 +17,10 @@
 package controllers.nonsipp.membercontributions
 
 import config.Constants
-import config.Refined.{Max300, Max50}
-import controllers.nonsipp.membercontributions.TotalMemberContributionController._
+import config.Refined.Max300
 import controllers.PSRController
 import controllers.actions._
+import controllers.nonsipp.membercontributions.TotalMemberContributionController._
 import forms.MoneyFormProvider
 import forms.mappings.errors.MoneyFormErrors
 import models.SchemeId.Srn
@@ -54,15 +54,15 @@ class TotalMemberContributionController @Inject()(
 
   private val form = TotalMemberContributionController.form(formProvider)
 
-  def onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val memberNames = request.userAnswers.membersDetails(srn)
       val preparedForm =
-        request.userAnswers.get(TotalMemberContributionPage(srn, index, secondaryIndex)).fold(form)(form.fill)
-      Ok(view(viewModel(srn, index, secondaryIndex, memberNames(index.value - 1).fullName, preparedForm, mode)))
+        request.userAnswers.get(TotalMemberContributionPage(srn, index)).fold(form)(form.fill)
+      Ok(view(viewModel(srn, index, memberNames(index.value - 1).fullName, preparedForm, mode)))
     }
 
-  def onSubmit(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       val memberNames = request.userAnswers.membersDetails(srn)
       form
@@ -71,7 +71,7 @@ class TotalMemberContributionController @Inject()(
           formWithErrors => {
             Future.successful(
               BadRequest(
-                view(viewModel(srn, index, secondaryIndex, memberNames(index.value - 1).fullName, formWithErrors, mode))
+                view(viewModel(srn, index, memberNames(index.value - 1).fullName, formWithErrors, mode))
               )
             )
           },
@@ -79,11 +79,11 @@ class TotalMemberContributionController @Inject()(
             for {
               updatedAnswers <- Future
                 .fromTry(
-                  request.userAnswers.transformAndSet(TotalMemberContributionPage(srn, index, secondaryIndex), value)
+                  request.userAnswers.transformAndSet(TotalMemberContributionPage(srn, index), value)
                 )
               _ <- saveService.save(updatedAnswers)
             } yield Redirect(
-              navigator.nextPage(TotalMemberContributionPage(srn, index, secondaryIndex), mode, updatedAnswers)
+              navigator.nextPage(TotalMemberContributionPage(srn, index), mode, updatedAnswers)
             )
         )
     }
@@ -101,7 +101,6 @@ object TotalMemberContributionController {
   def viewModel(
     srn: Srn,
     index: Max300,
-    secondaryIndex: Max50,
     memberName: String,
     form: Form[Money],
     mode: Mode
@@ -114,6 +113,6 @@ object TotalMemberContributionController {
         QuestionField.input(Empty, Some("totalMemberContribution.hint"))
       ),
       controllers.nonsipp.membercontributions.routes.TotalMemberContributionController
-        .onSubmit(srn, index, secondaryIndex, mode)
+        .onSubmit(srn, index, mode)
     )
 }

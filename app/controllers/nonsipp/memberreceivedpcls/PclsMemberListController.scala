@@ -71,13 +71,14 @@ class PclsMemberListController @Inject()(
         navigator.nextPage(PclsMemberListPage(srn), mode, request.userAnswers)
       )
     } else {
-      val viewModel =
-        PclsMemberListController.viewModel(srn, page, mode, memberList, request.userAnswers)
 
       form
         .bindFromRequest()
         .fold(
-          errors => BadRequest(view(errors, viewModel)),
+          errors =>
+            BadRequest(
+              view(errors, PclsMemberListController.viewModel(srn, page, mode, memberList, request.userAnswers))
+            ),
           _ =>
             Redirect(
               navigator

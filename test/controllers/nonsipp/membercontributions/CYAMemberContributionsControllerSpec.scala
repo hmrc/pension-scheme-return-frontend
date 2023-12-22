@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.membercontributions
 
-import config.Refined.{Max300, Max50}
+import config.Refined.Max300
 import controllers.ControllerBaseSpec
 import eu.timepit.refined.refineMV
 import models.CheckOrChange
@@ -31,7 +31,6 @@ import views.html.CheckYourAnswersView
 class CYAMemberContributionsControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[Max300.Refined](1)
-  private val secondaryIndex = refineMV[Max50.Refined](1)
 
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
 
@@ -43,13 +42,13 @@ class CYAMemberContributionsControllerSpec extends ControllerBaseSpec {
     reset(mockPsrSubmissionService)
 
   private def onPageLoad(checkOrChange: CheckOrChange) =
-    routes.CYAMemberContributionsController.onPageLoad(srn, index, secondaryIndex, checkOrChange)
+    routes.CYAMemberContributionsController.onPageLoad(srn, index, checkOrChange)
 
   private def onSubmit(checkOrChange: CheckOrChange) =
     routes.CYAMemberContributionsController.onSubmit(srn, checkOrChange)
 
   private val filledUserAnswers = defaultUserAnswers
-    .unsafeSet(TotalMemberContributionPage(srn, index, secondaryIndex), money)
+    .unsafeSet(TotalMemberContributionPage(srn, index), money)
     .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
 
   "CYAMemberContributionsController" - {
@@ -63,7 +62,6 @@ class CYAMemberContributionsControllerSpec extends ControllerBaseSpec {
                 srn,
                 memberDetails.fullName,
                 index,
-                secondaryIndex,
                 money,
                 checkOrChange
               )

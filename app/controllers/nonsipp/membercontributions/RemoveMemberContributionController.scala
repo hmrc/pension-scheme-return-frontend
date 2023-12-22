@@ -16,12 +16,12 @@
 
 package controllers.nonsipp.membercontributions
 
-import config.Refined.{Max300, Max50}
+import config.Refined.Max300
 import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
 import forms.YesNoPageFormProvider
-import models.{Money, NormalMode}
 import models.SchemeId.Srn
+import models.{Money, NormalMode}
 import navigation.Navigator
 import pages.nonsipp.membercontributions.{RemoveMemberContributionPage, TotalMemberContributionPage}
 import pages.nonsipp.memberdetails.MemberDetailsPage
@@ -30,9 +30,9 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
 import viewmodels.DisplayMessage.Message
+import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 import views.html.YesNoPageView
-import viewmodels.implicits._
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
@@ -51,26 +51,23 @@ class RemoveMemberContributionController @Inject()(
 
   private val form = RemoveMemberContributionController.form(formProvider)
 
-  def onPageLoad(srn: Srn, memberIndex: Max300, index: Max50): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Max300): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      val nameDOB = request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).get
-      val totalContrib = request.userAnswers.get(TotalMemberContributionPage(srn, memberIndex, index))
+      val nameDOB = request.userAnswers.get(MemberDetailsPage(srn, index)).get
+      val totalContrib = request.userAnswers.get(TotalMemberContributionPage(srn, index))
       totalContrib match {
-        case Some(value) => {
+        case Some(value) =>
           Ok(
             view(
               form,
               RemoveMemberContributionController.viewModel(
                 srn,
-                memberIndex: Max300,
-                index: Max50,
+                index: Max300,
                 value,
                 nameDOB.fullName
               )
             )
           )
-
-        }
         case None =>
           Redirect(
             controllers.nonsipp.membercontributions.routes.MemberContributionsController
@@ -81,7 +78,7 @@ class RemoveMemberContributionController @Inject()(
 
     }
 
-  def onSubmit(srn: Srn, memberIndex: Max300, index: Max50): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Max300): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
@@ -90,13 +87,13 @@ class RemoveMemberContributionController @Inject()(
             (
               for {
                 total <- request.userAnswers
-                  .get(TotalMemberContributionPage(srn, memberIndex, index))
+                  .get(TotalMemberContributionPage(srn, index))
                   .getOrRecoverJourneyT
-                nameDOB <- request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).getOrRecoverJourneyT
+                nameDOB <- request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourneyT
               } yield BadRequest(
                 view(
                   formWithErrors,
-                  RemoveMemberContributionController.viewModel(srn, memberIndex, index, total, nameDOB.fullName)
+                  RemoveMemberContributionController.viewModel(srn, index, total, nameDOB.fullName)
                 )
               )
             ).merge
@@ -105,18 +102,18 @@ class RemoveMemberContributionController @Inject()(
             if (removeDetails) {
               for {
                 updatedAnswers <- Future
-                  .fromTry(request.userAnswers.remove(TotalMemberContributionPage(srn, memberIndex, index)))
+                  .fromTry(request.userAnswers.remove(TotalMemberContributionPage(srn, index)))
                 _ <- saveService.save(updatedAnswers)
               } yield Redirect(
                 navigator
-                  .nextPage(RemoveMemberContributionPage(srn, memberIndex, index), NormalMode, updatedAnswers)
+                  .nextPage(RemoveMemberContributionPage(srn, index), NormalMode, updatedAnswers)
               )
             } else {
               Future
                 .successful(
                   Redirect(
                     navigator
-                      .nextPage(RemoveMemberContributionPage(srn, memberIndex, index), NormalMode, request.userAnswers)
+                      .nextPage(RemoveMemberContributionPage(srn, index), NormalMode, request.userAnswers)
                   )
                 )
             }
@@ -132,14 +129,13 @@ object RemoveMemberContributionController {
 
   def viewModel(
     srn: Srn,
-    memberIndex: Max300,
-    index: Max50,
+    index: Max300,
     total: Money,
     fullName: String
   ): FormPageViewModel[YesNoPageViewModel] =
     YesNoPageViewModel(
       Message("removeMemberContributions.title"),
       Message("removeMemberContributions.heading", total.displayAs, fullName),
-      routes.RemoveMemberContributionController.onSubmit(srn, memberIndex, index)
+      routes.RemoveMemberContributionController.onSubmit(srn, index)
     )
 }
