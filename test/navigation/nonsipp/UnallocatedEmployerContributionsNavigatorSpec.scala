@@ -19,7 +19,6 @@ package navigation.nonsipp
 import models.CheckOrChange
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.landorproperty.LandOrPropertyTotalIncomePage
 import pages.nonsipp.memberpayments._
 import utils.BaseSpec
 import utils.UserAnswersUtils.UserAnswersOps

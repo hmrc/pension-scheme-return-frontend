@@ -16,7 +16,7 @@
 
 package navigation.nonsipp
 
-import config.Refined.{Max300, Max50}
+import config.Refined.Max300
 import eu.timepit.refined.refineMV
 import models.{CheckOrChange, NormalMode}
 import navigation.{Navigator, NavigatorBehaviours}
@@ -33,7 +33,6 @@ class MemberContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviours
   val navigator: Navigator = new NonSippNavigator
 
   private val index = refineMV[Max300.Refined](1)
-  private val secondaryIndex = refineMV[Max50.Refined](1)
 
   "MemberContributionsNavigator" - {
 
@@ -76,15 +75,14 @@ class MemberContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviours
   "TotalMemberContributionPage" - {
     act.like(
       normalmode
-        .navigateToWithDoubleIndex(
+        .navigateToWithIndex(
           index,
-          secondaryIndex,
           TotalMemberContributionPage,
-          (srn, index: Max300, secondaryIndex: Max50, _) =>
+          (srn, index: Max300, _) =>
             controllers.nonsipp.membercontributions.routes.CYAMemberContributionsController
-              .onPageLoad(srn, index, secondaryIndex, CheckOrChange.Check)
+              .onPageLoad(srn, index, CheckOrChange.Check)
         )
-        .withName("go from total member contribution to unauthorised page")
+        .withName("go from total member contribution to CYAMemberContributions page")
     )
   }
 

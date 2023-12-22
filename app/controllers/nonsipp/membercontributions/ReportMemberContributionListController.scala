@@ -17,18 +17,18 @@
 package controllers.nonsipp.membercontributions
 
 import com.google.inject.Inject
+import config.Constants
 import config.Constants.maxNotRelevant
-import config.Refined.{OneTo300, OneTo50}
-import config.{Constants, FrontendAppConfig}
+import config.Refined.OneTo300
 import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
 import eu.timepit.refined.api.Refined
-import eu.timepit.refined.{refineMV, refineV}
+import eu.timepit.refined.refineV
 import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
 import models.{CheckOrChange, Mode, Money, NameDOB, NormalMode, Pagination, UserAnswers}
 import navigation.Navigator
-import pages.nonsipp.membercontributions.TotalMemberContributionPages
+import pages.nonsipp.membercontributions.TotalMemberContributionPage
 import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
 import pages.nonsipp.memberpayments.ReportMemberContributionListPage
 import play.api.data.Form
@@ -45,13 +45,12 @@ class ReportMemberContributionListController @Inject()(
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
-  appConfig: FrontendAppConfig,
   val controllerComponents: MessagesControllerComponents,
   view: TwoColumnsTripleAction,
   formProvider: YesNoPageFormProvider
 ) extends PSRController {
 
-  val form = ReportMemberContributionListController.form(formProvider)
+  val form: Form[Boolean] = ReportMemberContributionListController.form(formProvider)
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
@@ -76,14 +75,15 @@ class ReportMemberContributionListController @Inject()(
         navigator.nextPage(ReportMemberContributionListPage(srn), mode, request.userAnswers)
       )
     } else {
-      val viewModel =
-        ReportMemberContributionListController.viewModel(srn, page, mode, memberList, userAnswers)
 
       form
         .bindFromRequest()
         .fold(
-          errors => BadRequest(view(errors, viewModel)),
-          answer =>
+          errors =>
+            BadRequest(
+              view(errors, ReportMemberContributionListController.viewModel(srn, page, mode, memberList, userAnswers))
+            ),
+          _ =>
             Redirect(
               navigator
                 .nextPage(ReportMemberContributionListPage(srn), mode, request.userAnswers)
@@ -110,7 +110,7 @@ object ReportMemberContributionListController {
         refineV[OneTo300](index + 1) match {
           case Left(_) => Nil
           case Right(nextIndex) =>
-            val contributions = userAnswers.map(TotalMemberContributionPages(srn, nextIndex))
+            val contributions = userAnswers.get(TotalMemberContributionPage(srn, nextIndex))
             if (contributions.nonEmpty) {
               List(
                 TableElem(
@@ -135,11 +135,12 @@ object ReportMemberContributionListController {
     userAnswers: UserAnswers
   ): FormPageViewModel[ActionTableViewModel] = {
 
-    val title =
-      if (memberList.size == 1) "ReportContribution.MemberList.title" else "ReportContribution.MemberList.title.plural"
-    val heading =
-      if (memberList.size == 1) "ReportContribution.MemberList.heading"
-      else "ReportContribution.MemberList.heading.plural"
+    val (title, heading) =
+      if (memberList.size == 1) {
+        ("ReportContribution.MemberList.title", "ReportContribution.MemberList.heading")
+      } else {
+        ("ReportContribution.MemberList.title.plural", "ReportContribution.MemberList.heading.plural")
+      }
 
     val pagination = Pagination(
       currentPage = page,
@@ -179,42 +180,33 @@ object ReportMemberContributionListController {
     )
   }
 
-  def buildMutableTable(
-    contribs: Map[String, Money],
+  private def buildMutableTable(
+    contribs: Option[Money],
     srn: Srn,
     nextIndex: Refined[Int, OneTo300],
     mode: Mode
-  ): List[TableElem] = {
-
-    val intIndex = contribs.head._1.toInt
-    val index = refineV[OneTo50](intIndex + 1)
-    index match {
-      case Right(refinedIndex) =>
-        List(
-          TableElem(
-            "Member contributions reported"
-          ),
-          TableElem(
-            LinkMessage(
-              "Change",
-              controllers.nonsipp.membercontributions.routes.CYAMemberContributionsController
-                .onPageLoad(srn, nextIndex, refinedIndex, CheckOrChange.Change)
-                .url
-            )
-          ),
-          TableElem(
-            LinkMessage(
-              "Remove",
-              controllers.nonsipp.membercontributions.routes.RemoveMemberContributionController
-                .onPageLoad(srn, nextIndex, refinedIndex)
-                .url
-            )
-          )
+  ): List[TableElem] =
+    List(
+      TableElem(
+        "Member contributions reported"
+      ),
+      TableElem(
+        LinkMessage(
+          "Change",
+          controllers.nonsipp.membercontributions.routes.CYAMemberContributionsController
+            .onPageLoad(srn, nextIndex, CheckOrChange.Change)
+            .url
         )
-      case Left(_) =>
-        addOnlyTable(srn, nextIndex, mode)
-    }
-  }
+      ),
+      TableElem(
+        LinkMessage(
+          "Remove",
+          controllers.nonsipp.membercontributions.routes.RemoveMemberContributionController
+            .onPageLoad(srn, nextIndex)
+            .url
+        )
+      )
+    )
 
   private def addOnlyTable(
     srn: Srn,
@@ -229,7 +221,7 @@ object ReportMemberContributionListController {
         LinkMessage(
           "Add",
           controllers.nonsipp.membercontributions.routes.TotalMemberContributionController
-            .onSubmit(srn, nextIndex, refineMV(1), mode)
+            .onSubmit(srn, nextIndex, mode)
             .url
         )
       ),

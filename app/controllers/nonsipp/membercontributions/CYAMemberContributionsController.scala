@@ -16,11 +16,11 @@
 
 package controllers.nonsipp.membercontributions
 
-import config.Refined.{Max300, Max50}
+import config.Refined.Max300
 import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
-import models.{CheckMode, CheckOrChange, Mode, Money, NormalMode}
 import models.SchemeId.Srn
+import models.{CheckMode, CheckOrChange, Mode, Money, NormalMode}
 import navigation.Navigator
 import pages.nonsipp.membercontributions.{CYAMemberContributionsPage, TotalMemberContributionPage}
 import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
@@ -29,13 +29,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.PsrSubmissionService
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
-import viewmodels.models.{
-  CheckYourAnswersRowViewModel,
-  CheckYourAnswersSection,
-  CheckYourAnswersViewModel,
-  FormPageViewModel,
-  SummaryAction
-}
+import viewmodels.models._
 import views.html.CheckYourAnswersView
 
 import javax.inject.{Inject, Named}
@@ -54,13 +48,12 @@ class CYAMemberContributionsController @Inject()(
   def onPageLoad(
     srn: Srn,
     index: Max300,
-    secondaryIndex: Max50,
     checkOrChange: CheckOrChange
   ): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       (
         for {
-          contribution <- request.userAnswers.get(TotalMemberContributionPage(srn, index, secondaryIndex))
+          contribution <- request.userAnswers.get(TotalMemberContributionPage(srn, index))
           memberName = request.userAnswers.membersDetails(srn)
         } yield Ok(
           view(
@@ -69,7 +62,6 @@ class CYAMemberContributionsController @Inject()(
                 srn,
                 memberName(index.value - 1).fullName,
                 index,
-                secondaryIndex,
                 contribution,
                 checkOrChange
               )
@@ -93,7 +85,6 @@ case class ViewModelParameters(
   srn: Srn,
   memberName: String,
   index: Max300,
-  secondaryIndex: Max50,
   contributions: Money,
   checkOrChange: CheckOrChange
 )
@@ -115,7 +106,6 @@ object CYAMemberContributionsController {
           parameters.srn,
           parameters.memberName,
           parameters.index,
-          parameters.secondaryIndex,
           parameters.contributions,
           CheckMode
         )
@@ -130,7 +120,6 @@ object CYAMemberContributionsController {
     srn: Srn,
     memberName: String,
     index: Max300,
-    secondaryIndex: Max50,
     unallocatedAmount: Money,
     mode: Mode
   ): List[CheckYourAnswersSection] =
@@ -138,7 +127,6 @@ object CYAMemberContributionsController {
       srn,
       memberName,
       index,
-      secondaryIndex,
       unallocatedAmount,
       mode
     )
@@ -147,7 +135,6 @@ object CYAMemberContributionsController {
     srn: Srn,
     memberName: String,
     index: Max300,
-    secondaryIndex: Max50,
     unallocatedAmount: Money,
     mode: Mode
   ): List[CheckYourAnswersSection] =
@@ -166,7 +153,7 @@ object CYAMemberContributionsController {
             SummaryAction(
               "site.change",
               controllers.nonsipp.membercontributions.routes.TotalMemberContributionController
-                .onSubmit(srn, index, secondaryIndex, mode)
+                .onSubmit(srn, index, mode)
                 .url
             ).withVisuallyHiddenContent(Message("MemberContributionCYA.section.hide", memberName))
           )

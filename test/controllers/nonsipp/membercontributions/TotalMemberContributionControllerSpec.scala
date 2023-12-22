@@ -16,12 +16,12 @@
 
 package controllers.nonsipp.membercontributions
 
-import controllers.nonsipp.membercontributions.TotalMemberContributionController._
 import config.Refined._
-import eu.timepit.refined.refineMV
-import models.NormalMode
 import controllers.ControllerBaseSpec
+import controllers.nonsipp.membercontributions.TotalMemberContributionController._
+import eu.timepit.refined.refineMV
 import forms.MoneyFormProvider
+import models.NormalMode
 import pages.nonsipp.membercontributions.TotalMemberContributionPage
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import views.html.MoneyView
@@ -29,14 +29,13 @@ import views.html.MoneyView
 class TotalMemberContributionControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[Max300.Refined](1)
-  private val secondaryIndex = refineMV[Max50.Refined](1)
   private val userAnswers = defaultUserAnswers.unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
 
   private lazy val onPageLoad =
-    routes.TotalMemberContributionController.onPageLoad(srn, index, secondaryIndex, NormalMode)
+    routes.TotalMemberContributionController.onPageLoad(srn, index, NormalMode)
 
   private lazy val onSubmit =
-    routes.TotalMemberContributionController.onSubmit(srn, index, secondaryIndex, NormalMode)
+    routes.TotalMemberContributionController.onSubmit(srn, index, NormalMode)
 
   "TotalMemberContributionController" - {
 
@@ -46,7 +45,6 @@ class TotalMemberContributionControllerSpec extends ControllerBaseSpec {
           viewModel(
             srn,
             index,
-            secondaryIndex,
             memberDetails.fullName,
             form(injected[MoneyFormProvider]),
             NormalMode
@@ -55,13 +53,12 @@ class TotalMemberContributionControllerSpec extends ControllerBaseSpec {
     })
 
     act.like(
-      renderPrePopView(onPageLoad, TotalMemberContributionPage(srn, index, secondaryIndex), money, userAnswers) {
+      renderPrePopView(onPageLoad, TotalMemberContributionPage(srn, index), money, userAnswers) {
         implicit app => implicit request =>
           injected[MoneyView].apply(
             viewModel(
               srn,
               index,
-              secondaryIndex,
               memberDetails.fullName,
               form(injected[MoneyFormProvider]).fill(money),
               NormalMode

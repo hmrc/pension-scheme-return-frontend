@@ -22,8 +22,8 @@ import com.softwaremill.diffx.scalatest.DiffShouldMatcher
 import config.Refined.{Max300, Max50}
 import controllers.TestValues
 import eu.timepit.refined.refineMV
-import models.{ConditionalYesNo, IdentityType}
 import models.requests.psr._
+import models.{ConditionalYesNo, IdentityType}
 import org.scalatest.OptionValues
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers

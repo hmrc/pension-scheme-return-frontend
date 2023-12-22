@@ -46,11 +46,11 @@ object MemberContributionsNavigator extends JourneyNavigator {
     case ReportMemberContributionListPage(srn) =>
       controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
 
-    case TotalMemberContributionPage(srn, index, secondaryIndex) =>
+    case TotalMemberContributionPage(srn, index) =>
       controllers.nonsipp.membercontributions.routes.CYAMemberContributionsController
-        .onPageLoad(srn, index, secondaryIndex, CheckOrChange.Check)
+        .onPageLoad(srn, index, CheckOrChange.Check)
 
-    case RemoveMemberContributionPage(srn, memberIndex, index) =>
+    case RemoveMemberContributionPage(srn, index) =>
       controllers.nonsipp.membercontributions.routes.ReportMemberContributionListController
         .onPageLoad(srn, page = 1, NormalMode)
 
@@ -66,8 +66,8 @@ object MemberContributionsNavigator extends JourneyNavigator {
             controllers.nonsipp.receivetransfer.routes.DidSchemeReceiveTransferController.onPageLoad(srn, NormalMode)
           }
 
-        case TotalMemberContributionPage(srn, index, secondaryIndex) =>
+        case TotalMemberContributionPage(srn, index) =>
           controllers.nonsipp.membercontributions.routes.CYAMemberContributionsController
-            .onPageLoad(srn, index, secondaryIndex, CheckOrChange.Check)
+            .onPageLoad(srn, index, CheckOrChange.Check)
       }
 }

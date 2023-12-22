@@ -39,7 +39,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{PsrSubmissionService, SaveService}
 import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
 import viewmodels.implicits._
-import viewmodels.models.{ActionTableViewModel, FormPageViewModel, PaginatedViewModel, SectionStatus, TableElem}
+import viewmodels.models._
 import views.html.TwoColumnsTripleAction
 
 import javax.inject.Named
@@ -57,7 +57,7 @@ class EmployerContributionsMemberListController @Inject()(
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
-  val form = EmployerContributionsMemberListController.form(formProvider)
+  val form: Form[Boolean] = EmployerContributionsMemberListController.form(formProvider)
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
@@ -87,13 +87,20 @@ class EmployerContributionsMemberListController @Inject()(
           )
         )
       } else {
-        val viewModel =
-          EmployerContributionsMemberListController.viewModel(srn, page, mode, memberList, request.userAnswers)
 
         form
           .bindFromRequest()
           .fold(
-            errors => Future.successful(BadRequest(view(errors, viewModel))),
+            errors =>
+              Future.successful(
+                BadRequest(
+                  view(
+                    errors,
+                    EmployerContributionsMemberListController
+                      .viewModel(srn, page, mode, memberList, request.userAnswers)
+                  )
+                )
+              ),
             value =>
               for {
                 updatedUserAnswers <- Future.fromTry(

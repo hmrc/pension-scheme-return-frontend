@@ -26,15 +26,15 @@ import views.html.YesNoPageView
 
 class RemoveMemberContributionControllerSpec extends ControllerBaseSpec {
 
-  private lazy val onPageLoad = routes.RemoveMemberContributionController.onPageLoad(srn, refineMV(1), refineMV(1))
-  private lazy val onSubmit = routes.RemoveMemberContributionController.onSubmit(srn, refineMV(1), refineMV(1))
+  private lazy val onPageLoad = routes.RemoveMemberContributionController.onPageLoad(srn, refineMV(1))
+  private lazy val onSubmit = routes.RemoveMemberContributionController.onSubmit(srn, refineMV(1))
 
   override val memberDetails: NameDOB = nameDobGen.sample.value
 
   private val userAnswers = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
     .unsafeSet(MemberDetailsPage(srn, refineMV(2)), memberDetails)
-    .unsafeSet(TotalMemberContributionPage(srn, refineMV(1), refineMV(1)), money)
+    .unsafeSet(TotalMemberContributionPage(srn, refineMV(1)), money)
 
   "RemoveMemberContributionController" - {
 
@@ -43,7 +43,7 @@ class RemoveMemberContributionControllerSpec extends ControllerBaseSpec {
 
       view(
         RemoveMemberContributionController.form(injected[YesNoPageFormProvider]),
-        RemoveMemberContributionController.viewModel(srn, refineMV(1), refineMV(1), money, memberDetails.fullName)
+        RemoveMemberContributionController.viewModel(srn, refineMV(1), money, memberDetails.fullName)
       )
     })
 

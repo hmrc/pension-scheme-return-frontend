@@ -16,7 +16,6 @@
 
 package controllers.nonsipp.membertransferout
 
-import config.Refined.{Max300, Max5}
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.membertransferout.WhichTransferOutRemoveController._
 import eu.timepit.refined.refineMV
