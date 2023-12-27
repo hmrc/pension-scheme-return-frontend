@@ -23,8 +23,7 @@ import models.Mode
 import models.SchemeId.Srn
 import models.UserAnswers.implicits.UserAnswersTryOps
 import navigation.Navigator
-import pages.nonsipp.employercontributions.EmployerContributionsSectionStatus
-import pages.nonsipp.memberpayments.EmployerContributionsPage
+import pages.nonsipp.employercontributions.{EmployerContributionsPage, EmployerContributionsSectionStatus}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -69,8 +68,11 @@ class EmployerContributionsController @Inject()(
                 .set(EmployerContributionsPage(srn), value)
                 .set(
                   EmployerContributionsSectionStatus(srn),
-                  if (value) SectionStatus.InProgress
-                  else SectionStatus.Completed
+                  if (value) {
+                    SectionStatus.InProgress
+                  } else {
+                    SectionStatus.Completed
+                  }
                 )
             )
             _ <- saveService.save(updatedAnswers)

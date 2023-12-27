@@ -28,7 +28,7 @@ import pages.nonsipp.memberdetails.MemberDetailsPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
+import services.{PsrSubmissionService, SaveService}
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
@@ -44,7 +44,8 @@ class RemoveMemberContributionController @Inject()(
   formProvider: YesNoPageFormProvider,
   saveService: SaveService,
   val controllerComponents: MessagesControllerComponents,
-  view: YesNoPageView
+  view: YesNoPageView,
+  psrSubmissionService: PsrSubmissionService
 )(implicit ec: ExecutionContext)
     extends PSRController
     with I18nSupport {
@@ -104,9 +105,13 @@ class RemoveMemberContributionController @Inject()(
                 updatedAnswers <- Future
                   .fromTry(request.userAnswers.remove(TotalMemberContributionPage(srn, index)))
                 _ <- saveService.save(updatedAnswers)
-              } yield Redirect(
-                navigator
-                  .nextPage(RemoveMemberContributionPage(srn, index), NormalMode, updatedAnswers)
+                submissionResult <- psrSubmissionService.submitPsrDetails(srn, updatedAnswers)
+              } yield submissionResult.fold(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))(
+                _ =>
+                  Redirect(
+                    navigator
+                      .nextPage(RemoveMemberContributionPage(srn, index), NormalMode, updatedAnswers)
+                  )
               )
             } else {
               Future

@@ -34,6 +34,7 @@ import pages.nonsipp.loansmadeoroutstanding.{
   OutstandingArrearsOnLoanPages,
   RecipientSponsoringEmployerConnectedPartyPages
 }
+import pages.nonsipp.membercontributions.MemberContributionsListPage
 import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsNinoPages, MembersDetailsPages, NoNinoPages}
 import pages.nonsipp.receivetransfer.TransfersInJourneyStatus
 import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, ValueOfAssetsPage, WhyNoBankAccountPage}
@@ -243,7 +244,7 @@ object TaskListController {
         if (memberDetails.isEmpty) {
           1
         } else {
-          val memberDetailsIndexes = (0 to memberDetails.size - 1).toList
+          val memberDetailsIndexes = memberDetails.indices.toList
           val ninoIndexes = ninos.getOrElse(List.empty).map(_._1.toInt).toList
           val noninoIndexes = noNinos.getOrElse(List.empty).map(_._1.toInt).toList
           val finishedIndexes = ninoIndexes ++ noninoIndexes
@@ -270,7 +271,7 @@ object TaskListController {
         if (whoReceived.isEmpty) {
           1
         } else {
-          val whoReceivedIndexes = (0 to whoReceived.size - 1).toList
+          val whoReceivedIndexes = (0 until whoReceived.size).toList
           val arrearsIndexes = arrears.getOrElse(List.empty).map(_._1.toInt).toList
           val sponsoringAndConnectedIndexes = sponsoring.getOrElse(List.empty).map(_._1.toInt).toList ++ connected
             .getOrElse(List.empty)
@@ -311,6 +312,14 @@ object TaskListController {
           case SectionStatus.Completed => TaskListStatus.Completed
         }
 
+    val memberContributionStatus: TaskListStatus =
+      userAnswers
+        .get(MemberContributionsListPage(srn))
+        .fold[TaskListStatus](TaskListStatus.NotStarted) {
+          case false => TaskListStatus.InProgress
+          case true => TaskListStatus.Completed
+        }
+
     TaskListSectionViewModel(
       s"$prefix.title",
       TaskListItemViewModel(
@@ -337,12 +346,12 @@ object TaskListController {
       ),
       TaskListItemViewModel(
         LinkMessage(
-          messageKey(prefix, "memberContributions.title", UnableToStart),
+          messageKey(prefix, "memberContributions.title", memberContributionStatus),
           controllers.nonsipp.membercontributions.routes.MemberContributionsController
             .onPageLoad(srn, NormalMode)
             .url
         ),
-        NotStarted
+        memberContributionStatus
       ),
       TaskListItemViewModel(
         LinkMessage(

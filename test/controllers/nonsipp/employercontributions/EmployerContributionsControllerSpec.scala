@@ -18,10 +18,9 @@ package controllers.nonsipp.employercontributions
 
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.employercontributions.EmployerContributionsController.viewModel
-import controllers.nonsipp.employercontributions.routes
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import pages.nonsipp.memberpayments.EmployerContributionsPage
+import pages.nonsipp.employercontributions.EmployerContributionsPage
 import play.api.libs.json.JsPath
 import views.html.YesNoPageView
 

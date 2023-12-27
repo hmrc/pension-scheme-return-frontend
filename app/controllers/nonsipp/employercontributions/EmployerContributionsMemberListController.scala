@@ -107,14 +107,20 @@ class EmployerContributionsMemberListController @Inject()(
                   request.userAnswers
                     .set(
                       EmployerContributionsSectionStatus(srn),
-                      if (value) SectionStatus.Completed
-                      else SectionStatus.InProgress
+                      if (value) {
+                        SectionStatus.Completed
+                      } else {
+                        SectionStatus.InProgress
+                      }
                     )
                     .set(EmployerContributionsMemberListPage(srn), value)
                 )
                 _ <- saveService.save(updatedUserAnswers)
-                submissionResult <- if (value) psrSubmissionService.submitPsrDetails(srn, updatedUserAnswers)
-                else Future.successful(Some(()))
+                submissionResult <- if (value) {
+                  psrSubmissionService.submitPsrDetails(srn, updatedUserAnswers)
+                } else {
+                  Future.successful(Some(()))
+                }
               } yield submissionResult.getOrRecoverJourney(
                 _ =>
                   Redirect(
@@ -169,10 +175,11 @@ object EmployerContributionsMemberListController {
                   memberName.fullName
                 ),
                 TableElem(
-                  if (contributions.size == 1)
+                  if (contributions.size == 1) {
                     Message("employerContributions.MemberList.status.single.contribution", contributions.size)
-                  else
+                  } else {
                     Message("employerContributions.MemberList.status.some.contributions", contributions.size)
+                  }
                 ),
                 TableElem(
                   LinkMessage(
@@ -202,13 +209,12 @@ object EmployerContributionsMemberListController {
     memberList: List[NameDOB],
     userAnswers: UserAnswers
   ): FormPageViewModel[ActionTableViewModel] = {
-    val title =
-      if (memberList.size == 1) "employerContributions.MemberList.title"
-      else "employerContributions.MemberList.title.plural"
 
-    val heading =
-      if (memberList.size == 1) "employerContributions.MemberList.heading"
-      else "employerContributions.MemberList.heading.plural"
+    val (title, heading) = if (memberList.size == 1) {
+      ("employerContributions.MemberList.title", "employerContributions.MemberList.heading")
+    } else {
+      ("employerContributions.MemberList.title.plural", "employerContributions.MemberList.heading.plural")
+    }
 
     val pagination = Pagination(
       currentPage = page,

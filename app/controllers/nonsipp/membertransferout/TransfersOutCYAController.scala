@@ -20,7 +20,6 @@ import cats.implicits.{toShow, toTraverseOps}
 import config.Refined._
 import controllers.PSRController
 import controllers.actions._
-import controllers.nonsipp.membertransferout.TransfersOutCYAController.TransfersOutCYA
 import controllers.nonsipp.membertransferout.TransfersOutCYAController._
 import models.PensionSchemeType.PensionSchemeType
 import models.SchemeId.Srn
@@ -39,7 +38,6 @@ import views.html.CheckYourAnswersView
 
 import java.time.LocalDate
 import javax.inject.{Inject, Named}
-import scala.concurrent.ExecutionContext
 
 class TransfersOutCYAController @Inject()(
   override val messagesApi: MessagesApi,
@@ -47,8 +45,7 @@ class TransfersOutCYAController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   view: CheckYourAnswersView
-)(implicit ec: ExecutionContext)
-    extends PSRController {
+) extends PSRController {
 
   def onPageLoad(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>

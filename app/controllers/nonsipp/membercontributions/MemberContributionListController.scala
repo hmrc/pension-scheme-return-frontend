@@ -16,6 +16,7 @@
 
 package controllers.nonsipp.membercontributions
 
+import cats.implicits.{toBifunctorOps, toTraverseOps}
 import com.google.inject.Inject
 import config.Constants
 import config.Constants.maxNotRelevant
@@ -26,31 +27,37 @@ import eu.timepit.refined.api.Refined
 import eu.timepit.refined.refineV
 import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
-import models.{CheckOrChange, Mode, Money, NameDOB, NormalMode, Pagination, UserAnswers}
+import models.requests.DataRequest
+import models.{CheckMode, Mode, Money, NameDOB, NormalMode, Pagination, UserAnswers}
 import navigation.Navigator
-import pages.nonsipp.membercontributions.TotalMemberContributionPage
+import pages.nonsipp.employercontributions.EmployerContributionsMemberListPage
+import pages.nonsipp.membercontributions.{MemberContributionsListPage, TotalMemberContributionPage}
 import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
-import pages.nonsipp.memberpayments.ReportMemberContributionListPage
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.{PsrSubmissionService, SaveService}
 import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
 import viewmodels.implicits._
-import viewmodels.models.{ActionTableViewModel, FormPageViewModel, PaginatedViewModel, TableElem}
+import viewmodels.models._
 import views.html.TwoColumnsTripleAction
 
 import javax.inject.Named
+import scala.concurrent.{ExecutionContext, Future}
 
-class ReportMemberContributionListController @Inject()(
+class MemberContributionListController @Inject()(
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   view: TwoColumnsTripleAction,
+  saveService: SaveService,
+  psrSubmissionService: PsrSubmissionService,
   formProvider: YesNoPageFormProvider
-) extends PSRController {
+)(implicit ec: ExecutionContext)
+    extends PSRController {
 
-  val form: Form[Boolean] = ReportMemberContributionListController.form(formProvider)
+  val form: Form[Boolean] = MemberContributionListController.form(formProvider)
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
@@ -58,42 +65,100 @@ class ReportMemberContributionListController @Inject()(
       val memberList = userAnswers.membersDetails(srn)
 
       if (memberList.nonEmpty) {
-        val viewModel = ReportMemberContributionListController
+        val viewModel = MemberContributionListController
           .viewModel(srn, page, mode, memberList, userAnswers)
-        Ok(view(form, viewModel))
+        val filledForm =
+          request.userAnswers.get(MemberContributionsListPage(srn)).fold(form)(form.fill)
+        Ok(view(filledForm, viewModel))
       } else {
-        Redirect(controllers.routes.UnauthorisedController.onPageLoad())
+        Redirect(
+          controllers.routes.JourneyRecoveryController.onPageLoad()
+        )
       }
   }
 
-  def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    val userAnswers = request.userAnswers
-    val memberList = userAnswers.membersDetails(srn)
+  def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+    implicit request =>
+      val userAnswers = request.userAnswers
+      val memberList = userAnswers.membersDetails(srn)
+      val memberListSize = memberList.size
 
-    if (memberList.size > Constants.maxSchemeMembers) {
-      Redirect(
-        navigator.nextPage(ReportMemberContributionListPage(srn), mode, request.userAnswers)
+      if (memberListSize > Constants.maxSchemeMembers) {
+        Future.successful(
+          Redirect(
+            navigator.nextPage(MemberContributionsListPage(srn), mode, request.userAnswers)
+          )
+        )
+      } else {
+
+        form
+          .bindFromRequest()
+          .fold(
+            errors =>
+              Future.successful(
+                BadRequest(
+                  view(
+                    errors,
+                    MemberContributionListController.viewModel(srn, page, mode, memberList, userAnswers)
+                  )
+                )
+              ),
+            value =>
+              for {
+                updatedUserAnswers <- buildUserAnswerBySelection(srn, value, memberListSize)
+                _ <- saveService.save(updatedUserAnswers)
+                submissionResult <- if (value) {
+                  psrSubmissionService.submitPsrDetails(srn)(
+                    implicitly,
+                    implicitly,
+                    request = DataRequest(request.request, updatedUserAnswers)
+                  )
+                } else {
+                  Future.successful(Some(()))
+                }
+              } yield submissionResult.getOrRecoverJourney(
+                _ =>
+                  Redirect(
+                    navigator
+                      .nextPage(EmployerContributionsMemberListPage(srn), mode, request.userAnswers)
+                  )
+              )
+          )
+      }
+  }
+
+  private def buildUserAnswerBySelection(srn: Srn, selection: Boolean, memberListSize: Int)(
+    implicit request: DataRequest[_]
+  ): Future[UserAnswers] = {
+    val userAnswerWithMemberContList = request.userAnswers.set(MemberContributionsListPage(srn), selection)
+
+    if (selection) {
+      val indexes = (1 to memberListSize)
+        .map(i => refineV[OneTo300](i).leftMap(new Exception(_)).toTry)
+        .toList
+        .sequence
+
+      Future.fromTry(
+        indexes.fold(
+          _ => userAnswerWithMemberContList,
+          index =>
+            index.foldLeft(userAnswerWithMemberContList) {
+              case (uaTry, index) =>
+                val optTotalMemberContribution = request.userAnswers.get(TotalMemberContributionPage(srn, index))
+                for {
+                  ua <- uaTry
+                  ua1 <- ua.set(TotalMemberContributionPage(srn, index), optTotalMemberContribution.getOrElse(Money(0)))
+                } yield ua1
+            }
+        )
       )
     } else {
-
-      form
-        .bindFromRequest()
-        .fold(
-          errors =>
-            BadRequest(
-              view(errors, ReportMemberContributionListController.viewModel(srn, page, mode, memberList, userAnswers))
-            ),
-          _ =>
-            Redirect(
-              navigator
-                .nextPage(ReportMemberContributionListPage(srn), mode, request.userAnswers)
-            )
-        )
+      Future.fromTry(userAnswerWithMemberContList)
     }
   }
 }
 
-object ReportMemberContributionListController {
+object MemberContributionListController {
   def form(formProvider: YesNoPageFormProvider): Form[Boolean] =
     formProvider(
       "ReportContribution.MemberList.radios.error.required"
@@ -116,7 +181,7 @@ object ReportMemberContributionListController {
                 TableElem(
                   memberName.fullName
                 )
-              ) ++ buildMutableTable(contributions, srn, nextIndex, mode)
+              ) ++ buildMutableTable(srn, nextIndex)
             } else {
               List(
                 TableElem(
@@ -146,7 +211,7 @@ object ReportMemberContributionListController {
       currentPage = page,
       pageSize = Constants.landOrPropertiesSize,
       memberList.size,
-      controllers.nonsipp.membercontributions.routes.ReportMemberContributionListController
+      controllers.nonsipp.membercontributions.routes.MemberContributionListController
         .onPageLoad(srn, _, NormalMode)
     )
 
@@ -176,15 +241,13 @@ object ReportMemberContributionListController {
       buttonText = "site.saveAndContinue",
       details = None,
       onSubmit =
-        controllers.nonsipp.membercontributions.routes.ReportMemberContributionListController.onSubmit(srn, page, mode)
+        controllers.nonsipp.membercontributions.routes.MemberContributionListController.onSubmit(srn, page, mode)
     )
   }
 
   private def buildMutableTable(
-    contribs: Option[Money],
     srn: Srn,
-    nextIndex: Refined[Int, OneTo300],
-    mode: Mode
+    nextIndex: Refined[Int, OneTo300]
   ): List[TableElem] =
     List(
       TableElem(
@@ -193,8 +256,8 @@ object ReportMemberContributionListController {
       TableElem(
         LinkMessage(
           "Change",
-          controllers.nonsipp.membercontributions.routes.CYAMemberContributionsController
-            .onPageLoad(srn, nextIndex, CheckOrChange.Change)
+          controllers.nonsipp.membercontributions.routes.MemberContributionsCYAController
+            .onPageLoad(srn, nextIndex, CheckMode)
             .url
         )
       ),

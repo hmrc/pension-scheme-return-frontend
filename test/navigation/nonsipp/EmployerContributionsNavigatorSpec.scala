@@ -23,7 +23,6 @@ import models.{IdentityType, NormalMode, UserAnswers}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.employercontributions._
-import pages.nonsipp.memberpayments.EmployerContributionsPage
 import utils.BaseSpec
 import utils.UserAnswersUtils.UserAnswersOps
 

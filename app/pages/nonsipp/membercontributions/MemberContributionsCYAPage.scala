@@ -14,15 +14,9 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.memberpayments
+package pages.nonsipp.membercontributions
 
 import models.SchemeId.Srn
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import pages.Page
 
-case class ReportMemberContributionListPage(srn: Srn) extends QuestionPage[Boolean] {
-
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "transferInListPage"
-}
+case class MemberContributionsCYAPage(srn: Srn) extends Page

@@ -19,10 +19,11 @@ package controllers.nonsipp.membercontributions
 import config.Refined.Max300
 import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
+import controllers.nonsipp.membercontributions.MemberContributionsCYAController._
 import models.SchemeId.Srn
-import models.{CheckMode, CheckOrChange, Mode, Money, NormalMode}
+import models.{CheckMode, Mode, Money, NormalMode}
 import navigation.Navigator
-import pages.nonsipp.membercontributions.{CYAMemberContributionsPage, TotalMemberContributionPage}
+import pages.nonsipp.membercontributions.{MemberContributionsCYAPage, TotalMemberContributionPage}
 import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -35,7 +36,7 @@ import views.html.CheckYourAnswersView
 import javax.inject.{Inject, Named}
 import scala.concurrent.ExecutionContext
 
-class CYAMemberContributionsController @Inject()(
+class MemberContributionsCYAController @Inject()(
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -48,7 +49,7 @@ class CYAMemberContributionsController @Inject()(
   def onPageLoad(
     srn: Srn,
     index: Max300,
-    checkOrChange: CheckOrChange
+    mode: Mode
   ): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       (
@@ -57,13 +58,13 @@ class CYAMemberContributionsController @Inject()(
           memberName = request.userAnswers.membersDetails(srn)
         } yield Ok(
           view(
-            CYAMemberContributionsController.viewModel(
+            viewModel(
               ViewModelParameters(
                 srn,
                 memberName(index.value - 1).fullName,
                 index,
                 contribution,
-                checkOrChange
+                mode
               )
             )
           )
@@ -71,12 +72,12 @@ class CYAMemberContributionsController @Inject()(
       ).get
     }
 
-  def onSubmit(srn: Srn, checkOrChange: CheckOrChange): Action[AnyContent] =
+  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       psrSubmissionService.submitPsrDetails(srn).map {
         case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         case Some(_) =>
-          Redirect(navigator.nextPage(CYAMemberContributionsPage(srn), NormalMode, request.userAnswers))
+          Redirect(navigator.nextPage(MemberContributionsCYAPage(srn), mode, request.userAnswers))
       }
     }
 }
@@ -86,16 +87,16 @@ case class ViewModelParameters(
   memberName: String,
   index: Max300,
   contributions: Money,
-  checkOrChange: CheckOrChange
+  mode: Mode
 )
-object CYAMemberContributionsController {
+object MemberContributionsCYAController {
   def viewModel(parameters: ViewModelParameters): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](
-      title = parameters.checkOrChange
-        .fold(check = "MemberContributionCYA.title", change = "MemberContributionCYA.change.title"),
-      heading = parameters.checkOrChange.fold(
-        check = "MemberContributionCYA.heading",
-        change = Message(
+      title = parameters.mode
+        .fold(normal = "MemberContributionCYA.title", check = "MemberContributionCYA.change.title"),
+      heading = parameters.mode.fold(
+        normal = "MemberContributionCYA.heading",
+        check = Message(
           "MemberContributionCYA.change.heading",
           parameters.memberName
         )
@@ -111,31 +112,16 @@ object CYAMemberContributionsController {
         )
       ),
       refresh = None,
-      buttonText = parameters.checkOrChange.fold(check = "site.saveAndContinue", change = "site.continue"),
-      onSubmit = controllers.nonsipp.membercontributions.routes.ReportMemberContributionListController
-        .onPageLoad(parameters.srn, 1, NormalMode)
+      buttonText = parameters.mode.fold(normal = "site.saveAndContinue", check = "site.continue"),
+      onSubmit = controllers.nonsipp.membercontributions.routes.MemberContributionsCYAController
+        .onSubmit(parameters.srn, NormalMode)
     )
 
   private def sections(
     srn: Srn,
     memberName: String,
     index: Max300,
-    unallocatedAmount: Money,
-    mode: Mode
-  ): List[CheckYourAnswersSection] =
-    checkYourAnswerSection(
-      srn,
-      memberName,
-      index,
-      unallocatedAmount,
-      mode
-    )
-
-  private def checkYourAnswerSection(
-    srn: Srn,
-    memberName: String,
-    index: Max300,
-    unallocatedAmount: Money,
+    contributions: Money,
     mode: Mode
   ): List[CheckYourAnswersSection] =
     List(
@@ -148,7 +134,7 @@ object CYAMemberContributionsController {
           ),
           CheckYourAnswersRowViewModel(
             Message("MemberContributionCYA.section.memberName", memberName),
-            Message("MemberContributionCYA.section.amount", unallocatedAmount.displayAs)
+            Message("MemberContributionCYA.section.amount", contributions.displayAs)
           ).withAction(
             SummaryAction(
               "site.change",

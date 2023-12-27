@@ -20,7 +20,6 @@ import config.Refined.{Max300, Max50}
 import models.SchemeId.Srn
 import models.UserAnswers
 import pages.QuestionPage
-import pages.nonsipp.memberpayments.EmployerContributionsPage
 import play.api.libs.json.JsPath
 import queries.Removable
 import utils.PageUtils.removePages
