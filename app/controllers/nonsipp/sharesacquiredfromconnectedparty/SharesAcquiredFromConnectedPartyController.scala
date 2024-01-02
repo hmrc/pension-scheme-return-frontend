@@ -94,7 +94,11 @@ object SharesAcquiredFromConnectedPartyController {
               ++ ParagraphMessage("sharesAcquiredFromConnectedParty.details.paragraph2")
               ++ ParagraphMessage(
                 "sharesAcquiredFromConnectedParty.details.paragraph3",
-                LinkMessage("sharesAcquiredFromConnectedParty.details.paragraph3.link", incomeTaxAct)
+                LinkMessage(
+                  "sharesAcquiredFromConnectedParty.details.paragraph3.link",
+                  incomeTaxAct,
+                  Map("rel" -> "noreferrer noopener", "target" -> "_blank")
+                )
               )
           )
         )

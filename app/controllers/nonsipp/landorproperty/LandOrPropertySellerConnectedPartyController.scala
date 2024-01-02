@@ -16,6 +16,7 @@
 
 package controllers.nonsipp.landorproperty
 
+import config.FrontendAppConfig
 import config.Refined.Max5000
 import controllers.PSRController
 import controllers.actions._
@@ -50,6 +51,7 @@ class LandOrPropertySellerConnectedPartyController @Inject()(
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   formProvider: YesNoPageFormProvider,
+  config: FrontendAppConfig,
   val controllerComponents: MessagesControllerComponents,
   view: YesNoPageView
 )(implicit ec: ExecutionContext)
@@ -64,7 +66,8 @@ class LandOrPropertySellerConnectedPartyController @Inject()(
           Ok(
             view(
               form.fromUserAnswers(LandOrPropertySellerConnectedPartyPage(srn, index)),
-              LandOrPropertySellerConnectedPartyController.viewModel(srn, index, recipientName, mode)
+              LandOrPropertySellerConnectedPartyController
+                .viewModel(srn, index, recipientName, config.urls.incomeTaxAct, mode)
             )
           )
         }
@@ -83,7 +86,8 @@ class LandOrPropertySellerConnectedPartyController @Inject()(
                   BadRequest(
                     view(
                       formWithErrors,
-                      LandOrPropertySellerConnectedPartyController.viewModel(srn, index, recipientName, mode)
+                      LandOrPropertySellerConnectedPartyController
+                        .viewModel(srn, index, recipientName, config.urls.incomeTaxAct, mode)
                     )
                   )
                 )
@@ -116,7 +120,13 @@ object LandOrPropertySellerConnectedPartyController {
     "landOrPropertySellerConnectedParty.error.required"
   )
 
-  def viewModel(srn: Srn, index: Max5000, individualName: String, mode: Mode): FormPageViewModel[YesNoPageViewModel] =
+  def viewModel(
+    srn: Srn,
+    index: Max5000,
+    individualName: String,
+    incomeTaxAct: String,
+    mode: Mode
+  ): FormPageViewModel[YesNoPageViewModel] =
     YesNoPageViewModel(
       Message("landOrPropertySellerConnectedParty.title"),
       Message("landOrPropertySellerConnectedParty.heading", individualName),
@@ -135,9 +145,8 @@ object LandOrPropertySellerConnectedPartyController {
               "landOrPropertySellerConnectedParty.paragraph4",
               LinkMessage(
                 "landOrPropertySellerConnectedParty.paragraph4.link",
-                "https://www.legislation.gov.uk/ukpga/2007/3/section/993"
-                //TODO: implement open in new tab functionality
-                // also abstract this URL away - maybe FrontendAppConfig?
+                incomeTaxAct,
+                Map("rel" -> "noreferrer noopener", "target" -> "_blank")
               )
             )
         )
