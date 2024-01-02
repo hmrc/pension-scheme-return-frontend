@@ -25,7 +25,11 @@ import models.Mode
 import models.SchemeId.Srn
 import navigation.Navigator
 import pages.nonsipp.memberdetails.MemberDetailsPage
-import pages.nonsipp.receivetransfer.{DidTransferIncludeAssetPage, TransferringSchemeNamePage, TransfersInCompletedPage}
+import pages.nonsipp.receivetransfer.{
+  DidTransferIncludeAssetPage,
+  TransferringSchemeNamePage,
+  TransfersInSectionCompleted
+}
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -103,7 +107,7 @@ class DidTransferIncludeAssetController @Inject()(
                 .fromTry(
                   request.userAnswers
                     .set(DidTransferIncludeAssetPage(srn, index, secondaryIndex), value)
-                    .set(TransfersInCompletedPage(srn, index, secondaryIndex), SectionCompleted)
+                    .set(TransfersInSectionCompleted(srn, index, secondaryIndex), SectionCompleted)
                 )
               _ <- saveService.save(updatedAnswers)
             } yield Redirect(

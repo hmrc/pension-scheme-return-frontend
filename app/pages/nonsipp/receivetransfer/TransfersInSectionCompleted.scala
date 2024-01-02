@@ -23,7 +23,7 @@ import models.SchemeId.Srn
 import pages.{IndexedQuestionPage, QuestionPage}
 import viewmodels.models.SectionCompleted
 
-case class TransfersInCompletedPage(srn: Srn, index: Max300, secondaryIndex: Max5)
+case class TransfersInSectionCompleted(srn: Srn, index: Max300, secondaryIndex: Max5)
     extends QuestionPage[SectionCompleted.type] {
 
   override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString \ secondaryIndex.arrayIndex.toString
@@ -31,7 +31,8 @@ case class TransfersInCompletedPage(srn: Srn, index: Max300, secondaryIndex: Max
   override def toString: String = "transfersInCYA"
 }
 
-case class TransfersInCompletedPages(srn: Srn, index: Max300) extends IndexedQuestionPage[SectionCompleted.type] {
+case class TransfersInSectionCompletedForMember(srn: Srn, index: Max300)
+    extends IndexedQuestionPage[SectionCompleted.type] {
 
   override def path: JsPath = JsPath \ toString \ index.arrayIndex.toString
 

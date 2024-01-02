@@ -19,21 +19,19 @@ package transformations
 import cats.implicits.catsSyntaxEitherId
 import com.softwaremill.diffx.generic.AutoDerivation
 import com.softwaremill.diffx.scalatest.DiffShouldMatcher
-import config.Refined.{Max300, Max50}
+import config.Refined.{Max300, Max5, Max50}
 import controllers.TestValues
 import eu.timepit.refined.refineMV
+import models.PensionSchemeType.PensionSchemeType
+import models.{ConditionalYesNo, IdentityType, PensionSchemeType}
 import models.requests.psr._
-import models.{ConditionalYesNo, IdentityType}
 import org.scalatest.OptionValues
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import pages.nonsipp.employercontributions._
 import pages.nonsipp.memberdetails._
-import pages.nonsipp.memberpayments.{
-  EmployerContributionsPage,
-  UnallocatedEmployerAmountPage,
-  UnallocatedEmployerContributionsPage
-}
+import pages.nonsipp.memberpayments._
+import pages.nonsipp.receivetransfer._
 import utils.UserAnswersUtils.UserAnswersOps
 import viewmodels.models.{MemberState, SectionCompleted, SectionStatus}
 
@@ -47,7 +45,8 @@ class MemberPaymentsTransformerSpec
     with DiffShouldMatcher
     with AutoDerivation {
 
-  private val transformer = new MemberPaymentsTransformer()
+  private val transfersInTransformer = new TransfersInTransformer()
+  private val transformer = new MemberPaymentsTransformer(transfersInTransformer)
 
   private val memberPayments = MemberPayments(
     memberDetails = List(
@@ -65,16 +64,28 @@ class MemberPaymentsTransformerSpec
             employerType = EmployerType.UKCompany(Right(crn.value)),
             totalTransferValue = money.value
           )
+        ),
+        transfersIn = List(
+          TransfersIn(
+            schemeName = schemeName,
+            dateOfTransfer = localDate,
+            transferSchemeType = PensionSchemeType.RegisteredPS("123"),
+            transferValue = money.value,
+            transferIncludedAsset = true
+          )
         )
       )
     ),
     employerContributionsCompleted = true,
+    transfersInCompleted = false,
     unallocatedContribsMade = true,
+    memberContributionMade = false,
     unallocatedContribAmount = Some(money.value)
   )
 
   private val index = refineMV[Max300.Refined](1)
-  private val secondaryIndex = refineMV[Max50.Refined](1)
+  private val employerContribsIndex = refineMV[Max50.Refined](1)
+  private val transfersInIndex = refineMV[Max5.Refined](1)
 
   private val userAnswers = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, index), memberDetails)
@@ -82,25 +93,31 @@ class MemberPaymentsTransformerSpec
     .unsafeSet(MemberDetailsNinoPage(srn, index), nino)
     .unsafeSet(MemberStatus(srn, index), MemberState.Active)
     .unsafeSet(EmployerContributionsSectionStatus(srn), SectionStatus.Completed)
-    .unsafeSet(EmployerNamePage(srn, index, secondaryIndex), employerName)
-    .unsafeSet(EmployerTypeOfBusinessPage(srn, index, secondaryIndex), IdentityType.UKCompany)
-    .unsafeSet(EmployerCompanyCrnPage(srn, index, secondaryIndex), ConditionalYesNo(crn.asRight[String]))
-    .unsafeSet(TotalEmployerContributionPage(srn, index, secondaryIndex), money)
-    .unsafeSet(EmployerContributionsCompleted(srn, index, secondaryIndex), SectionCompleted)
+    .unsafeSet(EmployerNamePage(srn, index, employerContribsIndex), employerName)
+    .unsafeSet(EmployerTypeOfBusinessPage(srn, index, employerContribsIndex), IdentityType.UKCompany)
+    .unsafeSet(EmployerCompanyCrnPage(srn, index, employerContribsIndex), ConditionalYesNo(crn.asRight[String]))
+    .unsafeSet(TotalEmployerContributionPage(srn, index, employerContribsIndex), money)
+    .unsafeSet(EmployerContributionsCompleted(srn, index, employerContribsIndex), SectionCompleted)
     .unsafeSet(EmployerContributionsPage(srn), true)
     .unsafeSet(UnallocatedEmployerContributionsPage(srn), true)
     .unsafeSet(UnallocatedEmployerAmountPage(srn), money)
     .unsafeSet(EmployerContributionsMemberListPage(srn), true)
+    // transfers in
+    .unsafeSet(TransfersInSectionCompleted(srn, index, transfersInIndex), SectionCompleted)
+    .unsafeSet(TransfersInJourneyStatus(srn), SectionStatus.InProgress)
+    .unsafeSet(TransferringSchemeNamePage(srn, index, transfersInIndex), schemeName)
+    .unsafeSet(WhenWasTransferReceivedPage(srn, index, transfersInIndex), localDate)
+    .unsafeSet(TotalValueTransferPage(srn, index, transfersInIndex), money)
+    .unsafeSet(DidTransferIncludeAssetPage(srn, index, transfersInIndex), true)
+    .unsafeSet(TransferringSchemeTypePage(srn, index, transfersInIndex), PensionSchemeType.RegisteredPS("123"))
 
   "MemberPaymentsTransformer - To Etmp" - {
     "should return empty List when userAnswer is empty" in {
-
       val result = transformer.transformToEtmp(srn, defaultUserAnswers)
       result shouldMatchTo None
     }
 
     "should return member payments" in {
-
       val result = transformer.transformToEtmp(srn, userAnswers)
       result shouldMatchTo Some(memberPayments)
     }
@@ -108,7 +125,6 @@ class MemberPaymentsTransformerSpec
 
   "MemberPaymentsTransformer - From Etmp" - {
     "should return correct user answers" in {
-
       val result = transformer.transformFromEtmp(defaultUserAnswers, srn, memberPayments)
       result shouldMatchTo Try(userAnswers)
     }

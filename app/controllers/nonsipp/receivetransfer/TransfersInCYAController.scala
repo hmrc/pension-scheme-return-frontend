@@ -26,17 +26,10 @@ import models.SchemeId.Srn
 import models._
 import navigation.Navigator
 import pages.nonsipp.memberdetails.MemberDetailsPage
-import pages.nonsipp.receivetransfer.{
-  DidTransferIncludeAssetPage,
-  TotalValueTransferPage,
-  TransferringSchemeNamePage,
-  TransferringSchemeTypePage,
-  TransfersInCYAPage,
-  TransfersInCompletedPages,
-  WhenWasTransferReceivedPage
-}
+import pages.nonsipp.receivetransfer._
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.{PsrSubmissionService, SaveService}
 import utils.DateTimeUtils.localDateShow
 import utils.ListUtils.ListOps
 import viewmodels.DisplayMessage.{Heading2, InlineMessage, Message, ParagraphMessage}
@@ -46,14 +39,16 @@ import views.html.CheckYourAnswersView
 
 import java.time.LocalDate
 import javax.inject.{Inject, Named}
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class TransfersInCYAController @Inject()(
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
-  view: CheckYourAnswersView
+  view: CheckYourAnswersView,
+  saveService: SaveService,
+  psrSubmissionService: PsrSubmissionService
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
@@ -63,7 +58,7 @@ class TransfersInCYAController @Inject()(
         for {
           memberDetails <- request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney
           secondaryIndexes <- request.userAnswers
-            .get(TransfersInCompletedPages(srn, index))
+            .get(TransfersInSectionCompletedForMember(srn, index))
             .map(_.keys.toList.flatMap(refineStringIndex[Max5.Refined]))
             .getOrRecoverJourney
         } yield {
@@ -105,9 +100,15 @@ class TransfersInCYAController @Inject()(
     }
 
   def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
-    identifyAndRequireData(srn) { implicit request =>
-      Redirect(
-        navigator.nextPage(TransfersInCYAPage(srn), mode, request.userAnswers)
+    identifyAndRequireData(srn).async { implicit request =>
+      for {
+        updatedUserAnswers <- Future.fromTry(
+          request.userAnswers.set(TransfersInJourneyStatus(srn), SectionStatus.InProgress)
+        )
+        _ <- saveService.save(updatedUserAnswers)
+        submissionResult <- psrSubmissionService.submitPsrDetails(srn, updatedUserAnswers)
+      } yield submissionResult.getOrRecoverJourney(
+        _ => Redirect(navigator.nextPage(TransfersInCYAPage(srn), mode, updatedUserAnswers))
       )
     }
 }

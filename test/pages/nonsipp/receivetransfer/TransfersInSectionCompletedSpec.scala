@@ -21,17 +21,17 @@ import eu.timepit.refined.refineMV
 import pages.behaviours.PageBehaviours
 import viewmodels.models.SectionCompleted
 
-class TransfersInCompletedPageSpec extends PageBehaviours {
+class TransfersInSectionCompletedSpec extends PageBehaviours {
 
   "TransfersInCompletedPage" - {
 
     val index = refineMV[Max300.Refined](1)
     val secondaryIndex = refineMV[Max5.Refined](1)
 
-    beRetrievable[SectionCompleted.type](TransfersInCompletedPage(srnGen.sample.value, index, secondaryIndex))
+    beRetrievable[SectionCompleted.type](TransfersInSectionCompleted(srnGen.sample.value, index, secondaryIndex))
 
-    beSettable[SectionCompleted.type](TransfersInCompletedPage(srnGen.sample.value, index, secondaryIndex))
+    beSettable[SectionCompleted.type](TransfersInSectionCompleted(srnGen.sample.value, index, secondaryIndex))
 
-    beRemovable[SectionCompleted.type](TransfersInCompletedPage(srnGen.sample.value, index, secondaryIndex))
+    beRemovable[SectionCompleted.type](TransfersInSectionCompleted(srnGen.sample.value, index, secondaryIndex))
   }
 }

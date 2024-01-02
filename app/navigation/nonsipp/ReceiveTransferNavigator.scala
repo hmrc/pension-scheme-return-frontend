@@ -29,7 +29,7 @@ object ReceiveTransferNavigator extends JourneyNavigator {
 
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
 
-    case TransfersInCompletedPage(srn, index, secondaryIndex) =>
+    case TransfersInSectionCompleted(srn, index, secondaryIndex) =>
       controllers.routes.UnauthorisedController.onPageLoad()
 
     case page @ DidSchemeReceiveTransferPage(srn) =>

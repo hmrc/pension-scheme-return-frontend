@@ -29,7 +29,7 @@ import pages.nonsipp.receivetransfer.ReportAnotherTransferInPage
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
+import services.{PsrSubmissionService, SaveService}
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
@@ -45,7 +45,8 @@ class ReportAnotherTransferInController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   formProvider: YesNoPageFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: YesNoPageView
+  view: YesNoPageView,
+  psrSubmissionService: PsrSubmissionService
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
@@ -80,9 +81,13 @@ class ReportAnotherTransferInController @Inject()(
                   .set(ReportAnotherTransferInPage(srn, index, secondaryIndex), value)
               )
               _ <- saveService.save(updatedAnswers)
-            } yield Redirect(
-              navigator
-                .nextPage(ReportAnotherTransferInPage(srn, index, secondaryIndex), mode, updatedAnswers)
+              submissionResult <- psrSubmissionService.submitPsrDetails(srn, updatedAnswers)
+            } yield submissionResult.getOrRecoverJourney(
+              _ =>
+                Redirect(
+                  navigator
+                    .nextPage(ReportAnotherTransferInPage(srn, index, secondaryIndex), mode, updatedAnswers)
+                )
             )
         )
     }

@@ -21,10 +21,16 @@ import controllers.ControllerBaseSpec
 import controllers.nonsipp.receivetransfer.TransfersInCYAController._
 import eu.timepit.refined.refineMV
 import models.{NormalMode, PensionSchemeType}
+import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import pages.nonsipp.receivetransfer._
+import play.api.inject.bind
+import play.api.inject.guice.GuiceableModule
+import services.PsrSubmissionService
 import viewmodels.models.SectionCompleted
 import views.html.CheckYourAnswersView
+
+import scala.concurrent.Future
 
 class TransfersInCYAControllerSpec extends ControllerBaseSpec {
 
@@ -33,16 +39,28 @@ class TransfersInCYAControllerSpec extends ControllerBaseSpec {
   private lazy val onPageLoad = routes.TransfersInCYAController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.TransfersInCYAController.onSubmit(srn, index, NormalMode)
 
+  private val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
+
   private val pensionSchemeType = PensionSchemeType.Other("other")
 
   private val userAnswers = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, index), memberDetails)
-    .unsafeSet(TransfersInCompletedPage(srn, index, secondaryIndex), SectionCompleted)
+    .unsafeSet(TransfersInSectionCompleted(srn, index, secondaryIndex), SectionCompleted)
     .unsafeSet(TransferringSchemeNamePage(srn, index, secondaryIndex), transferringSchemeName)
     .unsafeSet(TransferringSchemeTypePage(srn, index, secondaryIndex), pensionSchemeType)
     .unsafeSet(TotalValueTransferPage(srn, index, secondaryIndex), money)
     .unsafeSet(WhenWasTransferReceivedPage(srn, index, secondaryIndex), localDate)
     .unsafeSet(DidTransferIncludeAssetPage(srn, index, secondaryIndex), true)
+
+  override protected val additionalBindings: List[GuiceableModule] = List(
+    bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
+  )
+
+  override protected def beforeEach(): Unit = {
+    reset(mockPsrSubmissionService)
+    when(mockPsrSubmissionService.submitPsrDetails(any(), any())(any(), any(), any()))
+      .thenReturn(Future.successful(Some(())))
+  }
 
   "TransfersInCYAController" - {
 
