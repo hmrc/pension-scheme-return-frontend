@@ -97,7 +97,8 @@ class BasicDetailsCheckYourAnswersController @Inject()(
             for {
               taxYear <- schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney
               schemeMemberNumbers <- requiredPage(HowManyMembersPage(srn, request.pensionSchemeId))
-              _ = auditService.sendEvent(buildAuditEvent(taxYear, schemeMemberNumbers))
+              userName <- loggedInUserNameOrRedirect
+              _ = auditService.sendEvent(buildAuditEvent(taxYear, schemeMemberNumbers, userName))
             } yield {
               mode match {
                 case NormalMode =>
@@ -115,11 +116,11 @@ class BasicDetailsCheckYourAnswersController @Inject()(
       }
   }
 
-  private def buildAuditEvent(taxYear: DateRange, schemeMemberNumbers: SchemeMemberNumbers)(
+  private def buildAuditEvent(taxYear: DateRange, schemeMemberNumbers: SchemeMemberNumbers, userName: String)(
     implicit req: DataRequest[_]
   ) = PSRStartAuditEvent(
     schemeName = req.schemeDetails.schemeName,
-    schemeAdministratorName = req.schemeDetails.establishers.headOption.get.name,
+    req.schemeDetails.establishers.headOption.fold(userName)(e => e.name),
     psaOrPspId = req.pensionSchemeId.value,
     schemeTaxReference = req.schemeDetails.pstr,
     affinityGroup = if (req.minimalDetails.organisationName.nonEmpty) "Organisation" else "Individual",
