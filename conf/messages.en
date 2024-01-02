@@ -688,6 +688,7 @@ basicDetailsCheckYourAnswersController.schemeDetails.pstr = Pension Scheme Tax R
 basicDetailsCheckYourAnswersController.schemeDetails.schemeAdminName = Scheme administrator name
 basicDetailsCheckYourAnswersController.schemeDetails.schemePractitionerName = Scheme practitioner name
 basicDetailsCheckYourAnswersController.schemeDetails.adminId = Administrator ID
+basicDetailsCheckYourAnswersController.schemeDetails.practitionerId = Practitioner ID
 basicDetailsCheckYourAnswersController.schemeDetails.taxYear = Tax year
 basicDetailsCheckYourAnswersController.schemeDetails.accountingPeriod = Accounting periods
 basicDetailsCheckYourAnswersController.schemeDetails.accountingPeriod.hidden = accounting period

@@ -214,7 +214,11 @@ object BasicDetailsCheckYourAnswersController {
           schemeAdminName
         ).withOneHalfWidth(),
         CheckYourAnswersRowViewModel(
-          "basicDetailsCheckYourAnswersController.schemeDetails.adminId",
+          if (isPSP) {
+            "basicDetailsCheckYourAnswersController.schemeDetails.practitionerId"
+          } else {
+            "basicDetailsCheckYourAnswersController.schemeDetails.adminId"
+          },
           pensionSchemeId
         ).withOneHalfWidth()
       ) ++
