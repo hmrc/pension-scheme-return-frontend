@@ -686,6 +686,7 @@ basicDetailsCheckYourAnswersController.schemeDetails.heading = Scheme details
 basicDetailsCheckYourAnswersController.schemeDetails.schemeName = Scheme name
 basicDetailsCheckYourAnswersController.schemeDetails.pstr = Pension Scheme Tax Reference (PSTR)
 basicDetailsCheckYourAnswersController.schemeDetails.schemeAdminName = Scheme administrator name
+basicDetailsCheckYourAnswersController.schemeDetails.schemePractitionerName = Scheme practitioner name
 basicDetailsCheckYourAnswersController.schemeDetails.adminId = Administrator ID
 basicDetailsCheckYourAnswersController.schemeDetails.taxYear = Tax year
 basicDetailsCheckYourAnswersController.schemeDetails.accountingPeriod = Accounting periods

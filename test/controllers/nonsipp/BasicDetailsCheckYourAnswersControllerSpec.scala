@@ -23,7 +23,7 @@ import controllers.{nonsipp, ControllerBaseSpec}
 import controllers.nonsipp.BasicDetailsCheckYourAnswersController._
 import eu.timepit.refined.refineMV
 import models.SchemeId.Srn
-import models.{CheckMode, DateRange, Mode, NormalMode, SchemeDetails, SchemeMemberNumbers}
+import models.{CheckMode, DateRange, Mode, NormalMode, PensionSchemeId, SchemeDetails, SchemeMemberNumbers}
 import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.WhichTaxYearPage
 import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, HowManyMembersPage}
@@ -73,7 +73,8 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec {
           Left(dateRange),
           individualDetails.fullName,
           defaultSchemeDetails,
-          psaId.value
+          psaId.value,
+          psaId.isPSP
         )
       )
     }.before(mockTaxYear(dateRange)))
@@ -230,7 +231,7 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec {
     taxYearOrAccountingPeriods: Either[DateRange, NonEmptyList[(DateRange, Max3)]] = Left(dateRange),
     schemeAdminName: String = individualDetails.fullName,
     schemeDetails: SchemeDetails = defaultSchemeDetails,
-    pensionSchemeId: String = pensionSchemeIdGen.sample.value.value
+    pensionSchemeId: PensionSchemeId = pensionSchemeIdGen.sample.value
   )(implicit messages: Messages): FormPageViewModel[CheckYourAnswersViewModel] = viewModel(
     srn,
     mode,
@@ -241,7 +242,8 @@ class BasicDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec {
     taxYearOrAccountingPeriods,
     schemeAdminName,
     schemeDetails,
-    pensionSchemeId
+    pensionSchemeId.value,
+    pensionSchemeId.isPSP
   )
 
   private def mockTaxYear(taxYear: DateRange) =

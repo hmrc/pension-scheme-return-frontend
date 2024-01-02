@@ -77,7 +77,8 @@ class BasicDetailsCheckYourAnswersController @Inject()(
                 periods,
                 userName,
                 request.schemeDetails,
-                request.pensionSchemeId.value
+                request.pensionSchemeId.value,
+                request.pensionSchemeId.isPSP
               )
             )
           )
@@ -151,7 +152,8 @@ object BasicDetailsCheckYourAnswersController {
     taxYearOrAccountingPeriods: Either[DateRange, NonEmptyList[(DateRange, Max3)]],
     schemeAdminName: String,
     schemeDetails: SchemeDetails,
-    pensionSchemeId: String
+    pensionSchemeId: String,
+    isPSP: Boolean
   )(implicit messages: Messages): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](
       title = "checkYourAnswers.title",
@@ -168,7 +170,8 @@ object BasicDetailsCheckYourAnswersController {
           schemeMemberNumbers,
           schemeAdminName,
           schemeDetails,
-          pensionSchemeId
+          pensionSchemeId,
+          isPSP
         )
       ).withMarginBottom(9),
       refresh = None,
@@ -186,7 +189,8 @@ object BasicDetailsCheckYourAnswersController {
     schemeMemberNumbers: SchemeMemberNumbers,
     schemeAdminName: String,
     schemeDetails: SchemeDetails,
-    pensionSchemeId: String
+    pensionSchemeId: String,
+    isPSP: Boolean
   )(
     implicit messages: Messages
   ): List[CheckYourAnswersSection] = List(
@@ -202,7 +206,11 @@ object BasicDetailsCheckYourAnswersController {
           schemeDetails.pstr
         ).withOneHalfWidth(),
         CheckYourAnswersRowViewModel(
-          "basicDetailsCheckYourAnswersController.schemeDetails.schemeAdminName",
+          if (isPSP) {
+            "basicDetailsCheckYourAnswersController.schemeDetails.schemePractitionerName"
+          } else {
+            "basicDetailsCheckYourAnswersController.schemeDetails.schemeAdminName"
+          },
           schemeAdminName
         ).withOneHalfWidth(),
         CheckYourAnswersRowViewModel(
