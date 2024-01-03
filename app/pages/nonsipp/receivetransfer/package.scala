@@ -35,7 +35,7 @@ package object receivetransfer {
     TotalValueTransferPage(srn, index, secondaryIndex),
     TransferringSchemeNamePage(srn, index, secondaryIndex),
     TransferringSchemeTypePage(srn, index, secondaryIndex),
-    TransfersInCompletedPage(srn, index, secondaryIndex),
+    TransfersInSectionCompleted(srn, index, secondaryIndex),
     WhenWasTransferReceivedPage(srn, index, secondaryIndex)
   )
 }

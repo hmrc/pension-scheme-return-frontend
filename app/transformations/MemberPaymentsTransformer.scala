@@ -31,6 +31,7 @@ import pages.nonsipp.memberpayments.{
   UnallocatedEmployerAmountPage,
   UnallocatedEmployerContributionsPage
 }
+import pages.nonsipp.receivetransfer.TransfersInJourneyStatus
 import uk.gov.hmrc.domain.Nino
 import viewmodels.models.{MemberState, SectionCompleted, SectionStatus}
 
@@ -38,7 +39,9 @@ import javax.inject.Inject
 import scala.util.Try
 
 @Singleton()
-class MemberPaymentsTransformer @Inject()() extends Transformer {
+class MemberPaymentsTransformer @Inject()(
+  transfersInTransformer: TransfersInTransformer
+) extends Transformer {
 
   def transformToEtmp(srn: Srn, userAnswers: UserAnswers): Option[MemberPayments] = {
 
@@ -52,14 +55,13 @@ class MemberPaymentsTransformer @Inject()() extends Transformer {
 
     val memberDetails: List[MemberDetails] = refinedMemberDetails.flatMap {
       case (index, memberDetails) =>
-        val secondaryIndexes =
-          keysToIndex[Max50.Refined](userAnswers.map(EmployerContributionsCompletedForMember(srn, index)))
-
         for {
-          employerContributions <- buildEmployerContributions(srn, index, secondaryIndexes, userAnswers)
+          employerContributions <- buildEmployerContributions(srn, index, userAnswers)
+          transfersIn <- transfersInTransformer.transformToEtmp(srn, index, userAnswers)
         } yield MemberDetails(
           personalDetails = buildMemberPersonalDetails(srn, index, memberDetails, userAnswers),
-          employerContributions = employerContributions
+          employerContributions = employerContributions,
+          transfersIn = transfersIn
         )
     }
 
@@ -73,6 +75,11 @@ class MemberPaymentsTransformer @Inject()() extends Transformer {
               case SectionStatus.InProgress => false
               case SectionStatus.Completed => true
             },
+            transfersInCompleted = userAnswers.get(TransfersInJourneyStatus(srn)).exists {
+              case SectionStatus.InProgress => false
+              case SectionStatus.Completed => true
+            },
+            memberContributionMade = false,
             unallocatedContribsMade = userAnswers.get(UnallocatedEmployerContributionsPage(srn)).getOrElse(false),
             unallocatedContribAmount = userAnswers.get(UnallocatedEmployerAmountPage(srn)) match {
               case Some(x) => Some(x.value)
@@ -102,7 +109,12 @@ class MemberPaymentsTransformer @Inject()() extends Transformer {
                   index,
                   memberPayments.employerContributionsCompleted,
                   memberDetails.employerContributions
-                )
+                ) ++ transfersInTransformer.transformFromEtmp(
+                srn,
+                index,
+                memberDetails.transfersIn,
+                memberPayments.transfersInCompleted
+              )
 
             pages.foldLeft(ua)((userAnswers, f) => f(userAnswers))
         }
@@ -155,9 +167,11 @@ class MemberPaymentsTransformer @Inject()() extends Transformer {
   private def buildEmployerContributions(
     srn: Srn,
     index: Max300,
-    secondaryIndexes: List[Max50],
     userAnswers: UserAnswers
-  ): Option[List[EmployerContributions]] =
+  ): Option[List[EmployerContributions]] = {
+    val secondaryIndexes =
+      keysToIndex[Max50.Refined](userAnswers.map(EmployerContributionsCompletedForMember(srn, index)))
+
     secondaryIndexes.traverse(
       secondaryIndex =>
         for {
@@ -171,6 +185,7 @@ class MemberPaymentsTransformer @Inject()() extends Transformer {
           totalTransferValue = total.value
         )
     )
+  }
 
   private def employerContributionsPages(
     srn: Srn,

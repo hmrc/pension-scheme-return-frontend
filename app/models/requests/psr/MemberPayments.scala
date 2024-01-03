@@ -25,13 +25,16 @@ import java.time.LocalDate
 case class MemberPayments(
   memberDetails: List[MemberDetails],
   employerContributionsCompleted: Boolean,
+  transfersInCompleted: Boolean,
   unallocatedContribsMade: Boolean,
+  memberContributionMade: Boolean,
   unallocatedContribAmount: Option[Double]
 )
 
 case class MemberDetails(
   personalDetails: MemberPersonalDetails,
-  employerContributions: List[EmployerContributions]
+  employerContributions: List[EmployerContributions],
+  transfersIn: List[TransfersIn]
 )
 
 case class MemberPersonalDetails(

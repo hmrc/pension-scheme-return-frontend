@@ -196,7 +196,7 @@ class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateToWithDoubleIndex(
           index,
           secondaryIndex,
-          TransfersInCompletedPage,
+          TransfersInSectionCompleted,
           (srn, index: Max300, secondaryIndex: Max5, _) => controllers.routes.UnauthorisedController.onPageLoad()
         )
         .withName("go from TransfersInCYACompletedPage to ??? page")

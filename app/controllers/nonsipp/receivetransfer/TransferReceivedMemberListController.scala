@@ -32,12 +32,14 @@ import pages.nonsipp.receivetransfer._
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.{PsrSubmissionService, SaveService}
 import viewmodels.DisplayMessage.{LinkMessage, Message}
 import viewmodels.implicits._
-import viewmodels.models.{ActionTableViewModel, FormPageViewModel, PaginatedViewModel, TableElem}
+import viewmodels.models._
 import views.html.TwoColumnsTripleAction
 
 import javax.inject.Named
+import scala.concurrent.{ExecutionContext, Future}
 
 class TransferReceivedMemberListController @Inject()(
   override val messagesApi: MessagesApi,
@@ -45,8 +47,11 @@ class TransferReceivedMemberListController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   view: TwoColumnsTripleAction,
-  formProvider: YesNoPageFormProvider
-) extends PSRController {
+  saveService: SaveService,
+  formProvider: YesNoPageFormProvider,
+  psrSubmissionService: PsrSubmissionService
+)(implicit ec: ExecutionContext)
+    extends PSRController {
 
   val form = TransferReceivedMemberListController.form(formProvider)
 
@@ -63,28 +68,44 @@ class TransferReceivedMemberListController @Inject()(
       }
   }
 
-  def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    val memberList = request.userAnswers.membersDetails(srn)
+  def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+    implicit request =>
+      val memberList = request.userAnswers.membersDetails(srn)
 
-    if (memberList.size > Constants.maxSchemeMembers) {
-      Redirect(
-        navigator.nextPage(TransferReceivedMemberListPage(srn), mode, request.userAnswers)
-      )
-    } else {
-      val viewModel =
-        TransferReceivedMemberListController.viewModel(srn, page, mode, memberList, request.userAnswers)
-
-      form
-        .bindFromRequest()
-        .fold(
-          errors => BadRequest(view(errors, viewModel)),
-          _ =>
-            Redirect(
-              navigator
-                .nextPage(TransferReceivedMemberListPage(srn), mode, request.userAnswers)
-            )
+      if (memberList.size > Constants.maxSchemeMembers) {
+        Future.successful(
+          Redirect(
+            navigator.nextPage(TransferReceivedMemberListPage(srn), mode, request.userAnswers)
+          )
         )
-    }
+      } else {
+        val viewModel =
+          TransferReceivedMemberListController.viewModel(srn, page, mode, memberList, request.userAnswers)
+
+        form
+          .bindFromRequest()
+          .fold(
+            errors => Future.successful(BadRequest(view(errors, viewModel))),
+            finishedAddingTransfers =>
+              for {
+                updatedUserAnswers <- Future
+                  .fromTry(
+                    request.userAnswers
+                      .set(
+                        TransfersInJourneyStatus(srn),
+                        if (finishedAddingTransfers) SectionStatus.Completed
+                        else SectionStatus.InProgress
+                      )
+                  )
+                _ <- saveService.save(updatedUserAnswers)
+                _ <- if (finishedAddingTransfers) psrSubmissionService.submitPsrDetails(srn, updatedUserAnswers)
+                else Future.successful(Some(()))
+              } yield Redirect(
+                navigator
+                  .nextPage(TransferReceivedMemberListPage(srn), mode, updatedUserAnswers)
+              )
+          )
+      }
   }
 }
 
@@ -105,7 +126,7 @@ object TransferReceivedMemberListController {
         refineV[OneTo300](index + 1) match {
           case Left(_) => Nil
           case Right(nextIndex) =>
-            val contributions = userAnswers.map(TransferringSchemeNamePages(srn, nextIndex))
+            val contributions = userAnswers.map(TransfersInSectionCompletedForMember(srn, nextIndex))
             if (contributions.isEmpty) {
               List(
                 TableElem(

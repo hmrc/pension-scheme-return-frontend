@@ -17,13 +17,25 @@
 package transformations
 
 import cats.implicits.{toBifunctorOps, toTraverseOps}
-import config.Refined.{Max50, Max5000, OneTo50, OneTo5000}
+import config.Refined.{Max300, Max50, Max5000, OneTo50, OneTo5000}
 import eu.timepit.refined.api.{Refined, Validate}
 import eu.timepit.refined.refineV
+import models.{NameDOB, UserAnswers}
+import models.SchemeId.Srn
+import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
 
 import scala.util.Try
 
 trait Transformer {
+
+  protected def refinedMembers(srn: Srn, userAnswers: UserAnswers): List[(Max300, NameDOB)] =
+    userAnswers
+      .membersDetails(srn)
+      .zipWithIndex
+      .flatMap {
+        case (details, index) =>
+          refineIndex[Max300.Refined](index).map(_ -> details).toList
+      }
 
   protected def keysToIndex[A: Validate[Int, *]](map: Map[String, _]): List[Refined[Int, A]] =
     map.keys.toList.flatMap(refineIndex[A])

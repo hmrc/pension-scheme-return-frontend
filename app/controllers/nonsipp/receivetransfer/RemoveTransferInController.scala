@@ -21,15 +21,15 @@ import controllers.PSRController
 import controllers.actions._
 import controllers.nonsipp.receivetransfer.RemoveTransferInController._
 import forms.YesNoPageFormProvider
-import models.SchemeId.Srn
 import models.NormalMode
+import models.SchemeId.Srn
 import navigation.Navigator
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import pages.nonsipp.receivetransfer.{transferInPages, RemoveTransferInPage, TransferringSchemeNamePage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
+import services.{PsrSubmissionService, SaveService}
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
@@ -45,7 +45,8 @@ class RemoveTransferInController @Inject()(
   formProvider: YesNoPageFormProvider,
   saveService: SaveService,
   val controllerComponents: MessagesControllerComponents,
-  view: YesNoPageView
+  view: YesNoPageView,
+  psrSubmissionService: PsrSubmissionService
 )(implicit ec: ExecutionContext)
     extends PSRController
     with I18nSupport {
@@ -87,11 +88,20 @@ class RemoveTransferInController @Inject()(
             if (removeDetails) {
               for {
                 updatedAnswers <- Future
-                  .fromTry(request.userAnswers.remove(transferInPages(srn, memberIndex, index)))
+                  .fromTry(
+                    request.userAnswers
+                      .removePages(
+                        transferInPages(srn, memberIndex, index)
+                      )
+                  )
                 _ <- saveService.save(updatedAnswers)
-              } yield Redirect(
-                navigator
-                  .nextPage(RemoveTransferInPage(srn, memberIndex), NormalMode, updatedAnswers)
+                submissionResult <- psrSubmissionService.submitPsrDetails(srn, updatedAnswers)
+              } yield submissionResult.getOrRecoverJourney(
+                _ =>
+                  Redirect(
+                    navigator
+                      .nextPage(RemoveTransferInPage(srn, memberIndex), NormalMode, updatedAnswers)
+                  )
               )
             } else {
               Future

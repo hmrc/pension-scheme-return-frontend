@@ -21,14 +21,22 @@ import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.NameDOB
 import controllers.nonsipp.receivetransfer.RemoveTransferInController._
+import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import pages.nonsipp.receivetransfer.TransferringSchemeNamePage
+import play.api.inject.guice.GuiceableModule
 import views.html.YesNoPageView
+import play.api.inject.bind
+import services.PsrSubmissionService
+
+import scala.concurrent.Future
 
 class RemoveTransferInControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoad = routes.RemoveTransferInController.onPageLoad(srn, refineMV(1), refineMV(1))
   private lazy val onSubmit = routes.RemoveTransferInController.onSubmit(srn, refineMV(1), refineMV(1))
+
+  private val mockPsrSubmissionService = mock[PsrSubmissionService]
 
   override val memberDetails: NameDOB = nameDobGen.sample.value
 
@@ -36,6 +44,16 @@ class RemoveTransferInControllerSpec extends ControllerBaseSpec {
     .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
     .unsafeSet(MemberDetailsPage(srn, refineMV(2)), memberDetails)
     .unsafeSet(TransferringSchemeNamePage(srn, refineMV(1), refineMV(1)), transferringSchemeName)
+
+  override protected val additionalBindings: List[GuiceableModule] = List(
+    bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
+  )
+
+  override protected def beforeEach(): Unit = {
+    reset(mockPsrSubmissionService)
+    when(mockPsrSubmissionService.submitPsrDetails(any(), any())(any(), any(), any()))
+      .thenReturn(Future.successful(Some(())))
+  }
 
   "RemoveTransferInController" - {
 
@@ -56,5 +74,4 @@ class RemoveTransferInControllerSpec extends ControllerBaseSpec {
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
 
   }
-
 }

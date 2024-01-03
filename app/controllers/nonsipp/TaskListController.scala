@@ -35,6 +35,7 @@ import pages.nonsipp.loansmadeoroutstanding.{
   RecipientSponsoringEmployerConnectedPartyPages
 }
 import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsNinoPages, MembersDetailsPages, NoNinoPages}
+import pages.nonsipp.receivetransfer.TransfersInJourneyStatus
 import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, ValueOfAssetsPage, WhyNoBankAccountPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -302,6 +303,14 @@ object TaskListController {
           case SectionStatus.Completed => TaskListStatus.Completed
         }
 
+    val transferInStatus: TaskListStatus =
+      userAnswers
+        .get(TransfersInJourneyStatus(srn))
+        .fold[TaskListStatus](TaskListStatus.NotStarted) {
+          case SectionStatus.InProgress => TaskListStatus.InProgress
+          case SectionStatus.Completed => TaskListStatus.Completed
+        }
+
     TaskListSectionViewModel(
       s"$prefix.title",
       TaskListItemViewModel(
@@ -337,10 +346,10 @@ object TaskListController {
       ),
       TaskListItemViewModel(
         LinkMessage(
-          messageKey(prefix, "transfersreceived.title", UnableToStart),
+          messageKey(prefix, "transfersreceived.title", transferInStatus),
           controllers.nonsipp.receivetransfer.routes.DidSchemeReceiveTransferController.onPageLoad(srn, NormalMode).url
         ),
-        NotStarted
+        transferInStatus
       ),
       TaskListItemViewModel(
         LinkMessage(
