@@ -73,7 +73,7 @@ class AuditServiceSpec extends BaseSpec with TestValues {
       val dataEvent = captor.getValue
       val expectedDataEvent = Map(
         "SchemeName" -> schemeName,
-        "SchemeAdministratorName" -> "testAdminName",
+        "SchemeAdministratorOrPractitionerName" -> "testAdminName",
         "PensionSchemeAdministratorOrPensionSchemePractitionerId" -> psaId.value,
         "PensionSchemeTaxReference" -> pstr,
         "AffinityGroup" -> "testAffinity",
