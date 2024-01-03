@@ -20,7 +20,7 @@ import models.DateRange
 
 case class PSRStartAuditEvent(
   schemeName: String,
-  schemeAdministratorName: String,
+  schemeAdministratorOrPractitionerName: String,
   psaOrPspId: String,
   schemeTaxReference: String,
   affinityGroup: String,
@@ -35,7 +35,7 @@ case class PSRStartAuditEvent(
 
   override def details: Map[String, String] = Map(
     "SchemeName" -> schemeName,
-    "SchemeAdministratorName" -> schemeAdministratorName,
+    "SchemeAdministratorOrPractitionerName" -> schemeAdministratorOrPractitionerName,
     "PensionSchemeAdministratorOrPensionSchemePractitionerId" -> psaOrPspId,
     "PensionSchemeTaxReference" -> schemeTaxReference,
     "AffinityGroup" -> affinityGroup,

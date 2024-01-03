@@ -77,7 +77,8 @@ class BasicDetailsCheckYourAnswersController @Inject()(
                 periods,
                 userName,
                 request.schemeDetails,
-                request.pensionSchemeId.value
+                request.pensionSchemeId.value,
+                request.pensionSchemeId.isPSP
               )
             )
           )
@@ -96,7 +97,8 @@ class BasicDetailsCheckYourAnswersController @Inject()(
             for {
               taxYear <- schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney
               schemeMemberNumbers <- requiredPage(HowManyMembersPage(srn, request.pensionSchemeId))
-              _ = auditService.sendEvent(buildAuditEvent(taxYear, schemeMemberNumbers))
+              userName <- loggedInUserNameOrRedirect
+              _ = auditService.sendEvent(buildAuditEvent(taxYear, schemeMemberNumbers, userName))
             } yield {
               mode match {
                 case NormalMode =>
@@ -114,11 +116,11 @@ class BasicDetailsCheckYourAnswersController @Inject()(
       }
   }
 
-  private def buildAuditEvent(taxYear: DateRange, schemeMemberNumbers: SchemeMemberNumbers)(
+  private def buildAuditEvent(taxYear: DateRange, schemeMemberNumbers: SchemeMemberNumbers, userName: String)(
     implicit req: DataRequest[_]
   ) = PSRStartAuditEvent(
     schemeName = req.schemeDetails.schemeName,
-    schemeAdministratorName = req.schemeDetails.establishers.headOption.get.name,
+    req.schemeDetails.establishers.headOption.fold(userName)(e => e.name),
     psaOrPspId = req.pensionSchemeId.value,
     schemeTaxReference = req.schemeDetails.pstr,
     affinityGroup = if (req.minimalDetails.organisationName.nonEmpty) "Organisation" else "Individual",
@@ -151,7 +153,8 @@ object BasicDetailsCheckYourAnswersController {
     taxYearOrAccountingPeriods: Either[DateRange, NonEmptyList[(DateRange, Max3)]],
     schemeAdminName: String,
     schemeDetails: SchemeDetails,
-    pensionSchemeId: String
+    pensionSchemeId: String,
+    isPSP: Boolean
   )(implicit messages: Messages): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](
       title = "checkYourAnswers.title",
@@ -168,7 +171,8 @@ object BasicDetailsCheckYourAnswersController {
           schemeMemberNumbers,
           schemeAdminName,
           schemeDetails,
-          pensionSchemeId
+          pensionSchemeId,
+          isPSP
         )
       ).withMarginBottom(9),
       refresh = None,
@@ -186,7 +190,8 @@ object BasicDetailsCheckYourAnswersController {
     schemeMemberNumbers: SchemeMemberNumbers,
     schemeAdminName: String,
     schemeDetails: SchemeDetails,
-    pensionSchemeId: String
+    pensionSchemeId: String,
+    isPSP: Boolean
   )(
     implicit messages: Messages
   ): List[CheckYourAnswersSection] = List(
@@ -202,11 +207,19 @@ object BasicDetailsCheckYourAnswersController {
           schemeDetails.pstr
         ).withOneHalfWidth(),
         CheckYourAnswersRowViewModel(
-          "basicDetailsCheckYourAnswersController.schemeDetails.schemeAdminName",
+          if (isPSP) {
+            "basicDetailsCheckYourAnswersController.schemeDetails.schemePractitionerName"
+          } else {
+            "basicDetailsCheckYourAnswersController.schemeDetails.schemeAdminName"
+          },
           schemeAdminName
         ).withOneHalfWidth(),
         CheckYourAnswersRowViewModel(
-          "basicDetailsCheckYourAnswersController.schemeDetails.adminId",
+          if (isPSP) {
+            "basicDetailsCheckYourAnswersController.schemeDetails.practitionerId"
+          } else {
+            "basicDetailsCheckYourAnswersController.schemeDetails.adminId"
+          },
           pensionSchemeId
         ).withOneHalfWidth()
       ) ++

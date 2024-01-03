@@ -111,7 +111,11 @@ object IsIndividualRecipientConnectedPartyController {
             ParagraphMessage("isIndividualRecipientConnectedParty.paragraph2") ++
             ParagraphMessage(
               "isIndividualRecipientConnectedParty.paragraph3",
-              LinkMessage("isIndividualRecipientConnectedParty.paragraph3.link", incomeTaxAct)
+              LinkMessage(
+                "isIndividualRecipientConnectedParty.paragraph3.link",
+                incomeTaxAct,
+                Map("rel" -> "noreferrer noopener", "target" -> "_blank")
+              )
             )
         )
       ),

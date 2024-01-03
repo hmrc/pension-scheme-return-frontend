@@ -31,6 +31,7 @@ class LandOrPropertySellerConnectedPartyControllerSpec extends ControllerBaseSpe
   private val index = refineMV[OneTo5000](1)
   private lazy val onPageLoad = routes.LandOrPropertySellerConnectedPartyController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.LandOrPropertySellerConnectedPartyController.onSubmit(srn, index, NormalMode)
+  private val incomeTaxAct = "https://www.legislation.gov.uk/ukpga/2007/3/section/993"
 
   val userServicesWithIndividualName: UserAnswers =
     defaultUserAnswers
@@ -41,7 +42,7 @@ class LandOrPropertySellerConnectedPartyControllerSpec extends ControllerBaseSpe
 
     act.like(renderView(onPageLoad, userServicesWithIndividualName) { implicit app => implicit request =>
       injected[YesNoPageView]
-        .apply(form(injected[YesNoPageFormProvider]), viewModel(srn, index, individualName, NormalMode))
+        .apply(form(injected[YesNoPageFormProvider]), viewModel(srn, index, individualName, incomeTaxAct, NormalMode))
     })
 
     act.like(
@@ -52,7 +53,10 @@ class LandOrPropertySellerConnectedPartyControllerSpec extends ControllerBaseSpe
         userServicesWithIndividualName
       ) { implicit app => implicit request =>
         injected[YesNoPageView]
-          .apply(form(injected[YesNoPageFormProvider]).fill(true), viewModel(srn, index, individualName, NormalMode))
+          .apply(
+            form(injected[YesNoPageFormProvider]).fill(true),
+            viewModel(srn, index, individualName, incomeTaxAct, NormalMode)
+          )
       }
     )
 

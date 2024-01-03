@@ -16,6 +16,7 @@
 
 package controllers.nonsipp.landorproperty
 
+import config.FrontendAppConfig
 import config.Refined.Max5000
 import controllers.PSRController
 import controllers.actions._
@@ -36,9 +37,9 @@ import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
 import utils.FormUtils.FormOps
-import viewmodels.DisplayMessage.Message
+import viewmodels.DisplayMessage.{LinkMessage, ListMessage, ListType, Message, ParagraphMessage}
 import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
+import viewmodels.models.{FormPageViewModel, FurtherDetailsViewModel, YesNoPageViewModel}
 import views.html.YesNoPageView
 
 import javax.inject.{Inject, Named}
@@ -50,6 +51,7 @@ class LandOrPropertySellerConnectedPartyController @Inject()(
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   formProvider: YesNoPageFormProvider,
+  config: FrontendAppConfig,
   val controllerComponents: MessagesControllerComponents,
   view: YesNoPageView
 )(implicit ec: ExecutionContext)
@@ -64,7 +66,8 @@ class LandOrPropertySellerConnectedPartyController @Inject()(
           Ok(
             view(
               form.fromUserAnswers(LandOrPropertySellerConnectedPartyPage(srn, index)),
-              LandOrPropertySellerConnectedPartyController.viewModel(srn, index, recipientName, mode)
+              LandOrPropertySellerConnectedPartyController
+                .viewModel(srn, index, recipientName, config.urls.incomeTaxAct, mode)
             )
           )
         }
@@ -83,7 +86,8 @@ class LandOrPropertySellerConnectedPartyController @Inject()(
                   BadRequest(
                     view(
                       formWithErrors,
-                      LandOrPropertySellerConnectedPartyController.viewModel(srn, index, recipientName, mode)
+                      LandOrPropertySellerConnectedPartyController
+                        .viewModel(srn, index, recipientName, config.urls.incomeTaxAct, mode)
                     )
                   )
                 )
@@ -116,10 +120,37 @@ object LandOrPropertySellerConnectedPartyController {
     "landOrPropertySellerConnectedParty.error.required"
   )
 
-  def viewModel(srn: Srn, index: Max5000, individualName: String, mode: Mode): FormPageViewModel[YesNoPageViewModel] =
+  def viewModel(
+    srn: Srn,
+    index: Max5000,
+    individualName: String,
+    incomeTaxAct: String,
+    mode: Mode
+  ): FormPageViewModel[YesNoPageViewModel] =
     YesNoPageViewModel(
-      "landOrPropertySellerConnectedParty.title",
+      Message("landOrPropertySellerConnectedParty.title"),
       Message("landOrPropertySellerConnectedParty.heading", individualName),
+      Option(
+        FurtherDetailsViewModel(
+          Message("landOrPropertySellerConnectedParty.content"),
+          ParagraphMessage("landOrPropertySellerConnectedParty.paragraph1") ++
+            ParagraphMessage("landOrPropertySellerConnectedParty.paragraph2") ++
+            ParagraphMessage("landOrPropertySellerConnectedParty.paragraph3") ++
+            ListMessage(
+              ListType.Bullet,
+              "landOrPropertySellerConnectedParty.bullet1",
+              "landOrPropertySellerConnectedParty.bullet2"
+            ) ++
+            ParagraphMessage(
+              "landOrPropertySellerConnectedParty.paragraph4",
+              LinkMessage(
+                "landOrPropertySellerConnectedParty.paragraph4.link",
+                incomeTaxAct,
+                Map("rel" -> "noreferrer noopener", "target" -> "_blank")
+              )
+            )
+        )
+      ),
       controllers.nonsipp.landorproperty.routes.LandOrPropertySellerConnectedPartyController.onSubmit(srn, index, mode)
     )
 }

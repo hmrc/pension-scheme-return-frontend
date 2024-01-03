@@ -686,7 +686,9 @@ basicDetailsCheckYourAnswersController.schemeDetails.heading = Scheme details
 basicDetailsCheckYourAnswersController.schemeDetails.schemeName = Scheme name
 basicDetailsCheckYourAnswersController.schemeDetails.pstr = Pension Scheme Tax Reference (PSTR)
 basicDetailsCheckYourAnswersController.schemeDetails.schemeAdminName = Scheme administrator name
+basicDetailsCheckYourAnswersController.schemeDetails.schemePractitionerName = Scheme practitioner name
 basicDetailsCheckYourAnswersController.schemeDetails.adminId = Administrator ID
+basicDetailsCheckYourAnswersController.schemeDetails.practitionerId = Practitioner ID
 basicDetailsCheckYourAnswersController.schemeDetails.taxYear = Tax year
 basicDetailsCheckYourAnswersController.schemeDetails.accountingPeriod = Accounting periods
 basicDetailsCheckYourAnswersController.schemeDetails.accountingPeriod.hidden = accounting period
@@ -809,6 +811,7 @@ datePeriodLoan.field3 = Total period of loan, in months
 datePeriodLoan.field3.error.required = Enter the total period of the loan, in months
 datePeriodLoan.field3.error.invalid = Total period of loan in months must be a number, like 36
 datePeriodLoan.field3.error.max = Total period of the loan must be 999 months or fewer
+datePeriodLoan.field3.error.min = Total period of the loan must be one month or more
 datePeriodLoan.field3.hint = Enter a number, like 36
 
 amountOfTheLoan.title = Amount of the loan and payments
@@ -1092,6 +1095,14 @@ landPropertyIndividualSellersName.error.invalid = Seller’s name must only incl
 
 landOrPropertySellerConnectedParty.title = Is the seller a connected party?
 landOrPropertySellerConnectedParty.heading = Is {0} a connected party?
+landOrPropertySellerConnectedParty.content = What is a connected party?
+landOrPropertySellerConnectedParty.paragraph1 = A connected party is an individual, company or partnership that is connected to either a member of the scheme or the sponsoring employer of the scheme.
+landOrPropertySellerConnectedParty.paragraph2 = A connected party of a member is usually their spouse, civil partner or close relative (for example their parent, sibling, child or grandchild).
+landOrPropertySellerConnectedParty.paragraph3 = A connected party of a sponsoring employer can be:
+landOrPropertySellerConnectedParty.bullet1 = someone who has control over the company
+landOrPropertySellerConnectedParty.bullet2 = another company, where the same person has control of both
+landOrPropertySellerConnectedParty.paragraph4 = See a
+landOrPropertySellerConnectedParty.paragraph4.link = full list of circumstances where an individual, company or partnership might be a connected party (opens in new tab).
 landOrPropertySellerConnectedParty.error.required = Select yes if the seller is a connected party
 
 individualSellerNi.title = Do you know the seller’s National Insurance number?

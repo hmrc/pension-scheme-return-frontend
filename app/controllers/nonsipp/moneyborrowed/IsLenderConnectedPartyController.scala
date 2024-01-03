@@ -112,7 +112,11 @@ object IsLenderConnectedPartyController {
             ParagraphMessage("isLenderConnectedParty.paragraph2") ++
             ParagraphMessage(
               "isLenderConnectedParty.paragraph3",
-              LinkMessage("isLenderConnectedParty.paragraph3.link", incomeTaxAct)
+              LinkMessage(
+                "isLenderConnectedParty.paragraph3.link",
+                incomeTaxAct,
+                Map("rel" -> "noreferrer noopener", "target" -> "_blank")
+              )
             )
         )
       ),
