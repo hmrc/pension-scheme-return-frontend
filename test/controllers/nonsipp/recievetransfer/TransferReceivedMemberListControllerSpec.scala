@@ -22,17 +22,35 @@ import controllers.nonsipp.receivetransfer.TransferReceivedMemberListController.
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.{NameDOB, NormalMode, UserAnswers}
+import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
 import pages.nonsipp.receivetransfer.TransferReceivedMemberListPage
+import play.api.inject.guice.GuiceableModule
+import services.PsrSubmissionService
 import views.html.TwoColumnsTripleAction
+import play.api.inject.bind
+
+import scala.concurrent.Future
 
 class TransferReceivedMemberListControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoad = routes.TransferReceivedMemberListController.onPageLoad(srn, page = 1, NormalMode)
   private lazy val onSubmit = routes.TransferReceivedMemberListController.onSubmit(srn, page = 1, NormalMode)
 
+  private val mockPsrSubmissionService = mock[PsrSubmissionService]
+
   val userAnswers = defaultUserAnswers.unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+
+  override protected val additionalBindings: List[GuiceableModule] = List(
+    bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
+  )
+
+  override protected def beforeEach(): Unit = {
+    reset(mockPsrSubmissionService)
+    when(mockPsrSubmissionService.submitPsrDetails(any(), any())(any(), any(), any()))
+      .thenReturn(Future.successful(Some(())))
+  }
 
   "TransferReceivedMemberListController" - {
 
@@ -57,7 +75,7 @@ class TransferReceivedMemberListControllerSpec extends ControllerBaseSpec {
 
         injected[TwoColumnsTripleAction]
           .apply(
-            form(injected[YesNoPageFormProvider]),
+            form(injected[YesNoPageFormProvider]).fill(true),
             viewModel(
               srn,
               page = 1,

@@ -103,7 +103,9 @@ class TransfersInCYAController @Inject()(
     identifyAndRequireData(srn).async { implicit request =>
       for {
         updatedUserAnswers <- Future.fromTry(
-          request.userAnswers.set(TransfersInJourneyStatus(srn), SectionStatus.InProgress)
+          request.userAnswers
+            .set(TransfersInJourneyStatus(srn), SectionStatus.InProgress)
+            .remove(TransferReceivedMemberListPage(srn))
         )
         _ <- saveService.save(updatedUserAnswers)
         submissionResult <- psrSubmissionService.submitPsrDetails(srn, updatedUserAnswers)

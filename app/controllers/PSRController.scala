@@ -28,7 +28,7 @@ import models.requests.DataRequest
 import play.api.i18n.I18nSupport
 import play.api.libs.json.{Reads, Writes}
 import play.api.mvc.Result
-import queries.{Gettable, Settable}
+import queries.{Gettable, Removable, Settable}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -101,5 +101,6 @@ abstract class PSRController extends FrontendBaseController with I18nSupport {
 
   implicit class UserAnswersTryOps(userAnswers: Try[UserAnswers]) {
     def set[A: Writes](page: Settable[A], value: A): Try[UserAnswers] = userAnswers.flatMap(_.set(page, value))
+    def remove[A: Writes](page: Removable[A]): Try[UserAnswers] = userAnswers.flatMap(_.removePages(List(page)))
   }
 }
