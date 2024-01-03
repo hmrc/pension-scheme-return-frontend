@@ -24,14 +24,19 @@ import models.NormalMode
 import models.SchemeId.Srn
 import navigation.Navigator
 import pages.nonsipp.memberdetails.MemberDetailsPage
-import pages.nonsipp.membertransferout.{transferOutPages, ReceivingSchemeNamePage, RemoveTransferOutPage}
+import pages.nonsipp.membertransferout.{
+  transferOutPages,
+  ReceivingSchemeNamePage,
+  RemoveTransferOutPage,
+  TransfersOutJourneyStatus
+}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
+import services.{PsrSubmissionService, SaveService}
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
+import viewmodels.models.{FormPageViewModel, SectionStatus, YesNoPageViewModel}
 import views.html.YesNoPageView
 
 import javax.inject.{Inject, Named}
@@ -44,7 +49,8 @@ class RemoveTransferOutController @Inject()(
   formProvider: YesNoPageFormProvider,
   saveService: SaveService,
   val controllerComponents: MessagesControllerComponents,
-  view: YesNoPageView
+  view: YesNoPageView,
+  psrSubmissionService: PsrSubmissionService
 )(implicit ec: ExecutionContext)
     extends PSRController
     with I18nSupport {
@@ -95,11 +101,19 @@ class RemoveTransferOutController @Inject()(
             if (removeDetails) {
               for {
                 updatedAnswers <- Future
-                  .fromTry(request.userAnswers.remove(transferOutPages(srn, memberIndex, index)))
+                  .fromTry(
+                    request.userAnswers
+                      .removePages(transferOutPages(srn, memberIndex, index))
+                      .set(TransfersOutJourneyStatus(srn), SectionStatus.InProgress)
+                  )
                 _ <- saveService.save(updatedAnswers)
-              } yield Redirect(
-                navigator
-                  .nextPage(RemoveTransferOutPage(srn, memberIndex), NormalMode, updatedAnswers)
+                submissionResult <- psrSubmissionService.submitPsrDetails(srn, updatedAnswers)
+              } yield submissionResult.getOrRecoverJourney(
+                _ =>
+                  Redirect(
+                    navigator
+                      .nextPage(RemoveTransferOutPage(srn, memberIndex), NormalMode, updatedAnswers)
+                  )
               )
             } else {
               Future

@@ -21,6 +21,7 @@ import config.Refined._
 import eu.timepit.refined.refineMV
 import models.{NormalMode, PensionSchemeType}
 import controllers.ControllerBaseSpec
+import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import pages.nonsipp.membertransferout.{
   ReceivingSchemeNamePage,
@@ -28,8 +29,13 @@ import pages.nonsipp.membertransferout.{
   TransfersOutCompletedPage,
   WhenWasTransferMadePage
 }
+import play.api.inject.bind
+import play.api.inject.guice.GuiceableModule
+import services.PsrSubmissionService
 import viewmodels.models.SectionCompleted
 import views.html.CheckYourAnswersView
+
+import scala.concurrent.Future
 
 class TransfersOutCYAControllerSpec extends ControllerBaseSpec {
 
@@ -37,6 +43,8 @@ class TransfersOutCYAControllerSpec extends ControllerBaseSpec {
   private val secondaryIndex = refineMV[Max5.Refined](1)
   private lazy val onPageLoad = routes.TransfersOutCYAController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.TransfersOutCYAController.onSubmit(srn, index, NormalMode)
+
+  private val mockPsrSubmissionService = mock[PsrSubmissionService]
 
   private val pensionSchemeType = PensionSchemeType.Other("other")
 
@@ -46,6 +54,16 @@ class TransfersOutCYAControllerSpec extends ControllerBaseSpec {
     .unsafeSet(ReceivingSchemeNamePage(srn, index, secondaryIndex), receivingSchemeName)
     .unsafeSet(ReceivingSchemeTypePage(srn, index, secondaryIndex), pensionSchemeType)
     .unsafeSet(WhenWasTransferMadePage(srn, index, secondaryIndex), localDate)
+
+  override protected val additionalBindings: List[GuiceableModule] = List(
+    bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
+  )
+
+  override protected def beforeEach(): Unit = {
+    reset(mockPsrSubmissionService)
+    when(mockPsrSubmissionService.submitPsrDetails(any(), any())(any(), any(), any()))
+      .thenReturn(Future.successful(Some(())))
+  }
 
   "TransfersOutCYAController" - {
 

@@ -16,6 +16,7 @@
 
 package controllers.nonsipp.membertransferout
 
+import cats.implicits.catsSyntaxApplicativeId
 import com.google.inject.Inject
 import config.Constants
 import config.Constants.maxNotRelevant
@@ -30,15 +31,18 @@ import navigation.Navigator
 import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
 import pages.nonsipp.membertransferout.{ReceivingSchemeNamePages, TransferOutMemberListPage}
 import pages.nonsipp.receivetransfer.TransfersInJourneyStatus
+import pages.nonsipp.membertransferout.{ReceivingSchemeNamePages, TransferOutMemberListPage, TransfersOutJourneyStatus}
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.{PsrSubmissionService, SaveService}
 import viewmodels.DisplayMessage.{LinkMessage, Message}
 import viewmodels.implicits._
-import viewmodels.models.{ActionTableViewModel, FormPageViewModel, PaginatedViewModel, TableElem}
+import viewmodels.models.{ActionTableViewModel, FormPageViewModel, PaginatedViewModel, SectionStatus, TableElem}
 import views.html.TwoColumnsTripleAction
 
 import javax.inject.Named
+import scala.concurrent.{ExecutionContext, Future}
 
 class TransferOutMemberListController @Inject()(
   override val messagesApi: MessagesApi,
@@ -46,8 +50,11 @@ class TransferOutMemberListController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   view: TwoColumnsTripleAction,
-  formProvider: YesNoPageFormProvider
-) extends PSRController {
+  formProvider: YesNoPageFormProvider,
+  saveService: SaveService,
+  psrSubmissionService: PsrSubmissionService
+)(implicit ec: ExecutionContext)
+    extends PSRController {
 
   val form = TransferOutMemberListController.form(formProvider)
 
@@ -58,34 +65,56 @@ class TransferOutMemberListController @Inject()(
       if (memberList.nonEmpty) {
         val viewModel = TransferOutMemberListController
           .viewModel(srn, page, mode, memberList, request.userAnswers)
-        Ok(view(form, viewModel))
+        val filledForm = request.userAnswers.fillForm(TransferOutMemberListPage(srn), form)
+        Ok(view(filledForm, viewModel))
       } else {
         Redirect(controllers.routes.UnauthorisedController.onPageLoad())
       }
   }
 
-  def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    val memberList = request.userAnswers.membersDetails(srn)
+  def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+    implicit request =>
+      val memberList = request.userAnswers.membersDetails(srn)
 
-    if (memberList.size > Constants.maxSchemeMembers) {
-      Redirect(
-        navigator.nextPage(TransferOutMemberListPage(srn), mode, request.userAnswers)
-      )
-    } else {
-      val viewModel =
-        TransferOutMemberListController.viewModel(srn, page, mode, memberList, request.userAnswers)
-
-      form
-        .bindFromRequest()
-        .fold(
-          errors => BadRequest(view(errors, viewModel)),
-          _ =>
-            Redirect(
-              navigator
-                .nextPage(TransferOutMemberListPage(srn), mode, request.userAnswers)
-            )
+      if (memberList.size > Constants.maxSchemeMembers) {
+        Future.successful(
+          Redirect(
+            navigator.nextPage(TransferOutMemberListPage(srn), mode, request.userAnswers)
+          )
         )
-    }
+      } else {
+        val viewModel =
+          TransferOutMemberListController.viewModel(srn, page, mode, memberList, request.userAnswers)
+
+        form
+          .bindFromRequest()
+          .fold(
+            errors => Future.successful(BadRequest(view(errors, viewModel))),
+            finishedAddingTransfers =>
+              for {
+                updatedUserAnswers <- Future
+                  .fromTry(
+                    request.userAnswers
+                      .set(
+                        TransfersOutJourneyStatus(srn),
+                        if (finishedAddingTransfers) SectionStatus.Completed
+                        else SectionStatus.InProgress
+                      )
+                      .set(TransferOutMemberListPage(srn), finishedAddingTransfers)
+                  )
+                _ <- saveService.save(updatedUserAnswers)
+                submissionResult <- if (finishedAddingTransfers)
+                  psrSubmissionService.submitPsrDetails(srn, updatedUserAnswers)
+                else Future.successful(Some(()))
+              } yield submissionResult.getOrRecoverJourney(
+                _ =>
+                  Redirect(
+                    navigator
+                      .nextPage(TransferOutMemberListPage(srn), mode, request.userAnswers)
+                  )
+              )
+          )
+      }
   }
 }
 

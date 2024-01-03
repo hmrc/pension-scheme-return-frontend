@@ -29,6 +29,7 @@ import pages.nonsipp.memberdetails.MemberDetailsPage
 import pages.nonsipp.membertransferout._
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.{PsrSubmissionService, SaveService}
 import utils.DateTimeUtils.localDateShow
 import utils.ListUtils.ListOps
 import viewmodels.DisplayMessage.{Heading2, InlineMessage, Message, ParagraphMessage}
@@ -38,14 +39,18 @@ import views.html.CheckYourAnswersView
 
 import java.time.LocalDate
 import javax.inject.{Inject, Named}
+import scala.concurrent.{ExecutionContext, Future}
 
 class TransfersOutCYAController @Inject()(
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
-  view: CheckYourAnswersView
-) extends PSRController {
+  view: CheckYourAnswersView,
+  psrSubmissionService: PsrSubmissionService,
+  saveService: SaveService
+)(implicit ec: ExecutionContext)
+    extends PSRController {
 
   def onPageLoad(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
@@ -88,9 +93,20 @@ class TransfersOutCYAController @Inject()(
     }
 
   def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
-    identifyAndRequireData(srn) { implicit request =>
-      Redirect(
-        navigator.nextPage(TransfersOutCYAPage(srn), mode, request.userAnswers)
+    identifyAndRequireData(srn).async { implicit request =>
+      for {
+        updatedUserAnswers <- Future.fromTry(
+          request.userAnswers
+            .set(TransfersOutJourneyStatus(srn), SectionStatus.InProgress)
+            .remove(TransferOutMemberListPage(srn))
+        )
+        _ <- saveService.save(updatedUserAnswers)
+        submissionResult <- psrSubmissionService.submitPsrDetails(srn, updatedUserAnswers)
+      } yield submissionResult.getOrRecoverJourney(
+        _ =>
+          Redirect(
+            navigator.nextPage(TransfersOutCYAPage(srn), mode, request.userAnswers)
+          )
       )
     }
 }

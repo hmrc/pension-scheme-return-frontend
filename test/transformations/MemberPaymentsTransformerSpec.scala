@@ -40,6 +40,7 @@ import pages.nonsipp.memberreceivedpcls.{
   PensionCommencementLumpSumAmountPage,
   PensionCommencementLumpSumPage
 }
+import pages.nonsipp.membertransferout._
 import pages.nonsipp.receivetransfer._
 import utils.UserAnswersUtils.UserAnswersOps
 import viewmodels.models.{MemberState, SectionCompleted, SectionStatus}
@@ -55,7 +56,8 @@ class MemberPaymentsTransformerSpec
     with AutoDerivation {
 
   private val transfersInTransformer = new TransfersInTransformer()
-  private val transformer = new MemberPaymentsTransformer(transfersInTransformer)
+  private val transfersOutTransformer = new TransfersOutTransformer()
+  private val memberPaymentsTransformer = new MemberPaymentsTransformer(transfersInTransformer, transfersOutTransformer)
 
   private val memberPayments = MemberPayments(
     memberDetails = List(
@@ -84,11 +86,19 @@ class MemberPaymentsTransformerSpec
           )
         ),
         totalContributions = Some(money.value),
-        memberLumpSumReceived = Some(MemberLumpSumReceived(money.value, money.value))
+        memberLumpSumReceived = Some(MemberLumpSumReceived(money.value, money.value)),
+        transfersOut = List(
+          TransfersOut(
+            schemeName = schemeName,
+            dateOfTransfer = localDate,
+            transferSchemeType = PensionSchemeType.RegisteredPS("456")
+          )
+        )
       )
     ),
     employerContributionsCompleted = true,
     transfersInCompleted = false,
+    transfersOutCompleted = false,
     unallocatedContribsMade = true,
     unallocatedContribAmount = Some(money.value),
     memberContributionMade = true,
@@ -98,6 +108,7 @@ class MemberPaymentsTransformerSpec
   private val index = refineMV[Max300.Refined](1)
   private val employerContribsIndex = refineMV[Max50.Refined](1)
   private val transfersInIndex = refineMV[Max5.Refined](1)
+  private val transfersOutIndex = refineMV[Max5.Refined](1)
 
   private val userAnswers = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, index), memberDetails)
@@ -128,25 +139,34 @@ class MemberPaymentsTransformerSpec
     .unsafeSet(DidSchemeReceiveTransferPage(srn), true)
     .unsafeSet(TransferReceivedMemberListPage(srn), false)
     .unsafeSet(ReportAnotherTransferInPage(srn, index, transfersInIndex), false)
+    // pcls
     .unsafeSet(PensionCommencementLumpSumPage(srn), true)
     .unsafeSet(PclsMemberListPage(srn), true)
     .unsafeSet(PensionCommencementLumpSumAmountPage(srn, index), PensionCommencementLumpSum(money, money))
+    // transfers out
+    .unsafeSet(SchemeTransferOutPage(srn), true)
+    .unsafeSet(TransferOutMemberListPage(srn), false)
+    .unsafeSet(TransfersOutJourneyStatus(srn), SectionStatus.InProgress)
+    .unsafeSet(TransfersOutCompletedPage(srn, index, transfersOutIndex), SectionCompleted)
+    .unsafeSet(ReceivingSchemeNamePage(srn, index, transfersOutIndex), schemeName)
+    .unsafeSet(WhenWasTransferMadePage(srn, index, transfersOutIndex), localDate)
+    .unsafeSet(ReceivingSchemeTypePage(srn, index, transfersOutIndex), PensionSchemeType.RegisteredPS("456"))
 
   "MemberPaymentsTransformer - To Etmp" - {
     "should return empty List when userAnswer is empty" in {
-      val result = transformer.transformToEtmp(srn, defaultUserAnswers)
+      val result = memberPaymentsTransformer.transformToEtmp(srn, defaultUserAnswers)
       result shouldMatchTo None
     }
 
     "should return member payments" in {
-      val result = transformer.transformToEtmp(srn, userAnswers)
+      val result = memberPaymentsTransformer.transformToEtmp(srn, userAnswers)
       result shouldMatchTo Some(memberPayments)
     }
   }
 
   "MemberPaymentsTransformer - From Etmp" - {
     "should return correct user answers" in {
-      val result = transformer.transformFromEtmp(defaultUserAnswers, srn, memberPayments)
+      val result = memberPaymentsTransformer.transformFromEtmp(defaultUserAnswers, srn, memberPayments)
       result shouldMatchTo Try(userAnswers)
     }
   }
