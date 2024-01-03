@@ -27,7 +27,6 @@ import eu.timepit.refined.refineV
 import forms.RadioListFormProvider
 import models.Money
 import models.SchemeId.Srn
-import navigation.Navigator
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import pages.nonsipp.receivetransfer.{TotalValueTransferPages, TransferringSchemeNamePages}
 import play.api.data.Form
@@ -38,19 +37,15 @@ import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, ListRadiosRow, ListRadiosViewModel}
 import views.html.ListRadiosView
 
-import javax.inject.Named
 import scala.collection.immutable.SortedMap
-import scala.concurrent.ExecutionContext
 
 class WhichTransferInRemoveController @Inject()(
   override val messagesApi: MessagesApi,
-  @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   view: ListRadiosView,
   formProvider: RadioListFormProvider
-)(implicit ec: ExecutionContext)
-    extends PSRController {
+) extends PSRController {
 
   val form = WhichTransferInRemoveController.form(formProvider)
 

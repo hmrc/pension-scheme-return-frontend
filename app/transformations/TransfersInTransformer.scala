@@ -18,14 +18,11 @@ package transformations
 
 import cats.syntax.traverse._
 import com.google.inject.Singleton
-import config.Refined.Max5.Refined
 import config.Refined.{Max300, Max5}
-import eu.timepit.refined.api.Refined
-import models.PensionSchemeType.PensionSchemeType
 import models.SchemeId.Srn
-import models.{Money, PensionSchemeType, UserAnswers}
 import models.UserAnswers.implicits.UserAnswersTryOps
 import models.requests.psr._
+import models.{Money, UserAnswers}
 import pages.nonsipp.receivetransfer._
 import viewmodels.models.{SectionCompleted, SectionStatus}
 

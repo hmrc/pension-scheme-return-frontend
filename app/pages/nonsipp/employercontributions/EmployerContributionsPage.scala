@@ -14,9 +14,16 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.membercontributions
+package pages.nonsipp.employercontributions
 
 import models.SchemeId.Srn
-import pages.Page
+import pages.QuestionPage
+import pages.nonsipp.memberpayments.MemberPaymentsPage
+import play.api.libs.json.JsPath
 
-case class CYAMemberContributionsPage(srn: Srn) extends Page
+case class EmployerContributionsPage(srn: Srn) extends QuestionPage[Boolean] {
+
+  override def path: JsPath = MemberPaymentsPage.path \ toString
+
+  override def toString: String = "employerContributionMade"
+}

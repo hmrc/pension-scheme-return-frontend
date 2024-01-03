@@ -19,7 +19,7 @@ package controllers.nonsipp.membercontributions
 import config.Refined.Max300
 import controllers.ControllerBaseSpec
 import eu.timepit.refined.refineMV
-import models.CheckOrChange
+import models.{CheckMode, Mode, NormalMode}
 import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.membercontributions.TotalMemberContributionPage
 import pages.nonsipp.memberdetails.MemberDetailsPage
@@ -28,7 +28,7 @@ import play.api.inject.guice.GuiceableModule
 import services.PsrSubmissionService
 import views.html.CheckYourAnswersView
 
-class CYAMemberContributionsControllerSpec extends ControllerBaseSpec {
+class MemberContributionsCYAControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[Max300.Refined](1)
 
@@ -41,11 +41,11 @@ class CYAMemberContributionsControllerSpec extends ControllerBaseSpec {
   override protected def beforeAll(): Unit =
     reset(mockPsrSubmissionService)
 
-  private def onPageLoad(checkOrChange: CheckOrChange) =
-    routes.CYAMemberContributionsController.onPageLoad(srn, index, checkOrChange)
+  private def onPageLoad(mode: Mode) =
+    routes.MemberContributionsCYAController.onPageLoad(srn, index, mode)
 
-  private def onSubmit(checkOrChange: CheckOrChange) =
-    routes.CYAMemberContributionsController.onSubmit(srn, checkOrChange)
+  private def onSubmit(mode: Mode) =
+    routes.MemberContributionsCYAController.onSubmit(srn, mode)
 
   private val filledUserAnswers = defaultUserAnswers
     .unsafeSet(TotalMemberContributionPage(srn, index), money)
@@ -53,27 +53,27 @@ class CYAMemberContributionsControllerSpec extends ControllerBaseSpec {
 
   "CYAMemberContributionsController" - {
 
-    List(CheckOrChange.Check, CheckOrChange.Change).foreach { checkOrChange =>
+    List(NormalMode, CheckMode).foreach { mode =>
       act.like(
-        renderView(onPageLoad(checkOrChange), filledUserAnswers) { implicit app => implicit request =>
+        renderView(onPageLoad(mode), filledUserAnswers) { implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
-            CYAMemberContributionsController.viewModel(
+            MemberContributionsCYAController.viewModel(
               ViewModelParameters(
                 srn,
                 memberDetails.fullName,
                 index,
                 money,
-                checkOrChange
+                mode
               )
             )
           )
-        }.withName(s"render correct ${checkOrChange.name} view")
+        }.withName(s"render correct $mode view")
       )
 
       act.like(
-        redirectNextPage(onSubmit(checkOrChange))
+        redirectNextPage(onSubmit(mode))
           .before(MockPSRSubmissionService.submitPsrDetails())
-          .withName(s"redirect to next page when in ${checkOrChange.name} mode")
+          .withName(s"redirect to next page when in $mode mode")
           .after({
             verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any())(any(), any(), any())
             reset(mockPsrSubmissionService)
@@ -81,15 +81,15 @@ class CYAMemberContributionsControllerSpec extends ControllerBaseSpec {
       )
 
       act.like(
-        journeyRecoveryPage(onPageLoad(checkOrChange))
+        journeyRecoveryPage(onPageLoad(mode))
           .updateName("onPageLoad" + _)
-          .withName(s"redirect to journey recovery page on page load when in ${checkOrChange.name} mode")
+          .withName(s"redirect to journey recovery page on page load when in $mode mode")
       )
 
       act.like(
-        journeyRecoveryPage(onSubmit(checkOrChange))
+        journeyRecoveryPage(onSubmit(mode))
           .updateName("onSubmit" + _)
-          .withName(s"redirect to journey recovery page on submit when in ${checkOrChange.name} mode")
+          .withName(s"redirect to journey recovery page on submit when in $mode mode")
       )
     }
   }

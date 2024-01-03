@@ -20,9 +20,15 @@ import controllers.ControllerBaseSpec
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.NameDOB
+import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.membercontributions.TotalMemberContributionPage
 import pages.nonsipp.memberdetails.MemberDetailsPage
+import play.api.inject.bind
+import play.api.inject.guice.GuiceableModule
+import services.PsrSubmissionService
 import views.html.YesNoPageView
+
+import scala.concurrent.Future
 
 class RemoveMemberContributionControllerSpec extends ControllerBaseSpec {
 
@@ -31,10 +37,22 @@ class RemoveMemberContributionControllerSpec extends ControllerBaseSpec {
 
   override val memberDetails: NameDOB = nameDobGen.sample.value
 
+  private val mockPsrSubmissionService = mock[PsrSubmissionService]
+
   private val userAnswers = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
     .unsafeSet(MemberDetailsPage(srn, refineMV(2)), memberDetails)
     .unsafeSet(TotalMemberContributionPage(srn, refineMV(1)), money)
+
+  override protected val additionalBindings: List[GuiceableModule] = List(
+    bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
+  )
+
+  override protected def beforeEach(): Unit = {
+    reset(mockPsrSubmissionService)
+    when(mockPsrSubmissionService.submitPsrDetails(any(), any())(any(), any(), any()))
+      .thenReturn(Future.successful(Some(())))
+  }
 
   "RemoveMemberContributionController" - {
 

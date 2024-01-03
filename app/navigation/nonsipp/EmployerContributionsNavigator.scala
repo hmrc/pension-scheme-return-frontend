@@ -23,7 +23,6 @@ import models._
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.employercontributions._
-import pages.nonsipp.memberpayments.EmployerContributionsPage
 import play.api.mvc.Call
 
 object EmployerContributionsNavigator extends JourneyNavigator {
@@ -96,7 +95,7 @@ object EmployerContributionsNavigator extends JourneyNavigator {
           .onPageLoad(srn, index, 1, NormalMode)
       }
 
-    case RemoveEmployerContributionsPage(srn, memberIndex) =>
+    case RemoveEmployerContributionsPage(srn, _) =>
       controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
         .onPageLoad(srn, 1, NormalMode)
 

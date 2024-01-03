@@ -24,13 +24,14 @@ import models.UserAnswers.implicits._
 import models.requests.psr._
 import models.{ConditionalYesNo, Crn, IdentityType, Money, NameDOB, UserAnswers, Utr}
 import pages.nonsipp.employercontributions._
+import pages.nonsipp.membercontributions.{
+  MemberContributionsListPage,
+  MemberContributionsPage,
+  TotalMemberContributionPage
+}
 import pages.nonsipp.memberdetails.MembersDetailsPages._
 import pages.nonsipp.memberdetails._
-import pages.nonsipp.memberpayments.{
-  EmployerContributionsPage,
-  UnallocatedEmployerAmountPage,
-  UnallocatedEmployerContributionsPage
-}
+import pages.nonsipp.memberpayments.{UnallocatedEmployerAmountPage, UnallocatedEmployerContributionsPage}
 import pages.nonsipp.receivetransfer.TransfersInJourneyStatus
 import uk.gov.hmrc.domain.Nino
 import viewmodels.models.{MemberState, SectionCompleted, SectionStatus}
@@ -61,7 +62,8 @@ class MemberPaymentsTransformer @Inject()(
         } yield MemberDetails(
           personalDetails = buildMemberPersonalDetails(srn, index, memberDetails, userAnswers),
           employerContributions = employerContributions,
-          transfersIn = transfersIn
+          transfersIn = transfersIn,
+          totalContributions = userAnswers.get(TotalMemberContributionPage(srn, index)).map(_.value)
         )
     }
 
@@ -79,12 +81,9 @@ class MemberPaymentsTransformer @Inject()(
               case SectionStatus.InProgress => false
               case SectionStatus.Completed => true
             },
-            memberContributionMade = false,
             unallocatedContribsMade = userAnswers.get(UnallocatedEmployerContributionsPage(srn)).getOrElse(false),
-            unallocatedContribAmount = userAnswers.get(UnallocatedEmployerAmountPage(srn)) match {
-              case Some(x) => Some(x.value)
-              case None => None
-            }
+            unallocatedContribAmount = userAnswers.get(UnallocatedEmployerAmountPage(srn)).map(_.value),
+            memberContributionMade = userAnswers.get(MemberContributionsPage(srn)).getOrElse(false)
           )
         )
     }
@@ -114,11 +113,19 @@ class MemberPaymentsTransformer @Inject()(
                 index,
                 memberDetails.transfersIn,
                 memberPayments.transfersInCompleted
+              ) ++ memberContributionsPages(
+                srn,
+                index,
+                memberPayments.memberContributionMade,
+                memberDetails.totalContributions
               )
 
             pages.foldLeft(ua)((userAnswers, f) => f(userAnswers))
         }
-    } yield ua3
+      emptyTotalContributionNotExist = !memberPayments.memberDetails.exists(_.totalContributions.isEmpty)
+      ua4 <- ua3.set(MemberContributionsListPage(srn), emptyTotalContributionNotExist)
+
+    } yield ua4
 
   private def buildMemberPersonalDetails(
     srn: Srn,
@@ -232,6 +239,20 @@ class MemberPaymentsTransformer @Inject()(
       )
     )
   }
+
+  private def memberContributionsPages(
+    srn: Srn,
+    index: Max300,
+    memberContributionMade: Boolean,
+    memberTotalContributions: Option[Double]
+  ): List[Try[UserAnswers] => Try[UserAnswers]] =
+    List(
+      ua =>
+        memberTotalContributions
+          .map(t => ua.set(TotalMemberContributionPage(srn, index), Money(t)))
+          .getOrElse(ua),
+      _.set(MemberContributionsPage(srn), memberContributionMade)
+    )
 
   private def toEmployerType(
     srn: Srn,

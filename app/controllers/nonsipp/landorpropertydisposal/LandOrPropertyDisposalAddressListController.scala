@@ -45,7 +45,6 @@ import views.html.ListRadiosView
 
 import javax.inject.Named
 import scala.collection.immutable.SortedMap
-import scala.concurrent.ExecutionContext
 
 class LandOrPropertyDisposalAddressListController @Inject()(
   override val messagesApi: MessagesApi,
@@ -54,8 +53,7 @@ class LandOrPropertyDisposalAddressListController @Inject()(
   val controllerComponents: MessagesControllerComponents,
   view: ListRadiosView,
   formProvider: RadioListFormProvider
-)(implicit ec: ExecutionContext)
-    extends PSRController {
+) extends PSRController {
 
   val form = LandOrPropertyDisposalAddressListController.form(formProvider)
 

@@ -20,8 +20,12 @@ import controllers.ControllerBaseSpec
 import controllers.nonsipp.membercontributions.MemberContributionsController._
 import forms.YesNoPageFormProvider
 import models.NormalMode
+import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.membercontributions.MemberContributionsPage
+import play.api.inject.bind
+import play.api.inject.guice.GuiceableModule
 import play.api.libs.json.JsPath
+import services.PsrSubmissionService
 import views.html.YesNoPageView
 
 class MemberContributionsControllerSpec extends ControllerBaseSpec {
@@ -30,6 +34,11 @@ class MemberContributionsControllerSpec extends ControllerBaseSpec {
     controllers.nonsipp.membercontributions.routes.MemberContributionsController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit =
     controllers.nonsipp.membercontributions.routes.MemberContributionsController.onSubmit(srn, NormalMode)
+  private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
+
+  override protected val additionalBindings: List[GuiceableModule] = List(
+    bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
+  )
 
   "MemberContributionsController" - {
 
@@ -41,8 +50,23 @@ class MemberContributionsControllerSpec extends ControllerBaseSpec {
       injected[YesNoPageView].apply(form(injected[YesNoPageFormProvider]).fill(true), viewModel(srn, NormalMode))
     })
 
-    act.like(redirectNextPage(onSubmit, "value" -> "true"))
-    act.like(redirectNextPage(onSubmit, "value" -> "false"))
+    act.like(
+      redirectNextPage(onSubmit, "value" -> "true")
+        .before(MockPSRSubmissionService.submitPsrDetails())
+        .after({
+          verify(mockPsrSubmissionService, never).submitPsrDetails(any())(any(), any(), any())
+          reset(mockPsrSubmissionService)
+        })
+    )
+
+    act.like(
+      redirectNextPage(onSubmit, "value" -> "false")
+        .before(MockPSRSubmissionService.submitPsrDetails())
+        .after({
+          verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any())(any(), any(), any())
+          reset(mockPsrSubmissionService)
+        })
+    )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 

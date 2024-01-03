@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.memberpayments
+package pages.nonsipp.membercontributions
 
 import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case class EmployerContributionsPage(srn: Srn) extends QuestionPage[Boolean] {
+case class MemberContributionsListPage(srn: Srn) extends QuestionPage[Boolean] {
 
-  override def path: JsPath = MemberPaymentsPage.path \ toString
+  override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "employerContributionMade"
+  override def toString: String = "memberContributionsListPage"
 }

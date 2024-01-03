@@ -22,13 +22,13 @@ import com.softwaremill.diffx.scalatest.DiffShouldMatcher
 import config.Refined.{Max300, Max5, Max50}
 import controllers.TestValues
 import eu.timepit.refined.refineMV
-import models.PensionSchemeType.PensionSchemeType
-import models.{ConditionalYesNo, IdentityType, PensionSchemeType}
 import models.requests.psr._
+import models.{ConditionalYesNo, IdentityType, PensionSchemeType}
 import org.scalatest.OptionValues
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import pages.nonsipp.employercontributions._
+import pages.nonsipp.membercontributions.{MemberContributionsListPage, MemberContributionsPage, TotalMemberContributionPage}
 import pages.nonsipp.memberdetails._
 import pages.nonsipp.memberpayments._
 import pages.nonsipp.receivetransfer._
@@ -73,14 +73,15 @@ class MemberPaymentsTransformerSpec
             transferValue = money.value,
             transferIncludedAsset = true
           )
-        )
+        ),
+        totalContributions = Some(money.value)
       )
     ),
     employerContributionsCompleted = true,
     transfersInCompleted = false,
     unallocatedContribsMade = true,
-    memberContributionMade = false,
-    unallocatedContribAmount = Some(money.value)
+    unallocatedContribAmount = Some(money.value),
+    memberContributionMade = true
   )
 
   private val index = refineMV[Max300.Refined](1)
@@ -110,6 +111,9 @@ class MemberPaymentsTransformerSpec
     .unsafeSet(TotalValueTransferPage(srn, index, transfersInIndex), money)
     .unsafeSet(DidTransferIncludeAssetPage(srn, index, transfersInIndex), true)
     .unsafeSet(TransferringSchemeTypePage(srn, index, transfersInIndex), PensionSchemeType.RegisteredPS("123"))
+    .unsafeSet(MemberContributionsPage(srn), true)
+    .unsafeSet(MemberContributionsListPage(srn), true)
+    .unsafeSet(TotalMemberContributionPage(srn, index), money)
 
   "MemberPaymentsTransformer - To Etmp" - {
     "should return empty List when userAnswer is empty" in {

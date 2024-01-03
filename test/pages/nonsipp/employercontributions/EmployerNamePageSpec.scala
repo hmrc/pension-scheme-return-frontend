@@ -22,7 +22,6 @@ import eu.timepit.refined.refineMV
 import models.{ConditionalYesNo, Crn}
 import pages.behaviours.PageBehaviours
 import pages.nonsipp.memberdetails.MemberDetailsPage
-import pages.nonsipp.memberpayments.EmployerContributionsPage
 import utils.UserAnswersUtils.UserAnswersOps
 
 class EmployerNamePageSpec extends PageBehaviours with TestValues {

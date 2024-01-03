@@ -16,16 +16,10 @@
 
 package navigation.nonsipp
 
-import models.{CheckOrChange, NormalMode, UserAnswers}
+import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.membercontributions.{
-  MemberContributionsPage,
-  RemoveMemberContributionPage,
-  TotalMemberContributionPage,
-  WhatYouWillNeedMemberContributionsPage
-}
-import pages.nonsipp.memberpayments.ReportMemberContributionListPage
+import pages.nonsipp.membercontributions._
 import play.api.mvc.Call
 
 object MemberContributionsNavigator extends JourneyNavigator {
@@ -40,18 +34,22 @@ object MemberContributionsNavigator extends JourneyNavigator {
       }
 
     case WhatYouWillNeedMemberContributionsPage(srn) =>
-      controllers.nonsipp.membercontributions.routes.ReportMemberContributionListController
+      controllers.nonsipp.membercontributions.routes.MemberContributionListController
         .onPageLoad(srn, page = 1, NormalMode)
 
-    case ReportMemberContributionListPage(srn) =>
+    case MemberContributionsListPage(srn) =>
       controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
 
     case TotalMemberContributionPage(srn, index) =>
-      controllers.nonsipp.membercontributions.routes.CYAMemberContributionsController
-        .onPageLoad(srn, index, CheckOrChange.Check)
+      controllers.nonsipp.membercontributions.routes.MemberContributionsCYAController
+        .onPageLoad(srn, index, NormalMode)
 
-    case RemoveMemberContributionPage(srn, index) =>
-      controllers.nonsipp.membercontributions.routes.ReportMemberContributionListController
+    case RemoveMemberContributionPage(srn, _) =>
+      controllers.nonsipp.membercontributions.routes.MemberContributionListController
+        .onPageLoad(srn, page = 1, NormalMode)
+
+    case MemberContributionsCYAPage(srn) =>
+      controllers.nonsipp.membercontributions.routes.MemberContributionListController
         .onPageLoad(srn, page = 1, NormalMode)
 
   }
@@ -67,7 +65,11 @@ object MemberContributionsNavigator extends JourneyNavigator {
           }
 
         case TotalMemberContributionPage(srn, index) =>
-          controllers.nonsipp.membercontributions.routes.CYAMemberContributionsController
-            .onPageLoad(srn, index, CheckOrChange.Check)
+          controllers.nonsipp.membercontributions.routes.MemberContributionsCYAController
+            .onPageLoad(srn, index, NormalMode)
+
+        case MemberContributionsCYAPage(srn) =>
+          controllers.nonsipp.membercontributions.routes.MemberContributionListController
+            .onPageLoad(srn, page = 1, NormalMode)
       }
 }
