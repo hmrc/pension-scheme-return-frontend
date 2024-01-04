@@ -460,9 +460,16 @@ pensionPaymentsReceived.title = Did any member receive pension payments from the
 pensionPaymentsReceived.heading = Did any member receive pension payments from {0} during the period of this return?
 pensionPaymentsReceived.error.required = Select yes if any member received pension payments from the scheme during the period of this return
 
-benefitsSurrendered.title = Did any member surrender benefits within the scheme during the period of this return?
-benefitsSurrendered.heading = Did any member surrender benefits within {0} during the period of this return?
-benefitsSurrendered.error.required = Select yes if any member surrendered benefits within the scheme during the period of this return
+surrenderedBenefits.title = Did any member surrender benefits within the scheme during the period of this return?
+surrenderedBenefits.heading = Did any member surrender benefits within {0} during the period of this return?
+surrenderedBenefits.error.required = Select yes if any member surrendered benefits within the scheme during the period of this return
+
+surrenderedBenefits.whatYouWillNeed.title = Surrendered benefits for members of the scheme
+surrenderedBenefits.whatYouWillNeed.heading = Surrendered benefits for members of {0}
+surrenderedBenefits.whatYouWillNeed.paragraph1 = For each member who surrendered benefits, you need to tell us:
+surrenderedBenefits.whatYouWillNeed.tellUs1 = the total amount surrendered
+surrenderedBenefits.whatYouWillNeed.tellUs2 = the date the member surrendered their benefits
+surrenderedBenefits.whatYouWillNeed.tellUs3 = why the member surrendered their benefits
 
 otherAssetsHeld.title = Did the scheme hold any other assets during the period of this return?
 otherAssetsHeld.heading = Did {0} hold any other assets during the period of this return?

@@ -28,7 +28,11 @@ import org.scalatest.OptionValues
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import pages.nonsipp.employercontributions._
-import pages.nonsipp.membercontributions.{MemberContributionsListPage, MemberContributionsPage, TotalMemberContributionPage}
+import pages.nonsipp.membercontributions.{
+  MemberContributionsListPage,
+  MemberContributionsPage,
+  TotalMemberContributionPage
+}
 import pages.nonsipp.memberdetails._
 import pages.nonsipp.memberpayments._
 import pages.nonsipp.receivetransfer._

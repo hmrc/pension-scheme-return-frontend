@@ -14,15 +14,18 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.memberpayments
+package pages.nonsipp.membersurrenderedbenefits
 
-import models.SchemeId.Srn
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import pages.behaviours.PageBehaviours
 
-case class BenefitsSurrenderedPage(srn: Srn) extends QuestionPage[Boolean] {
+class SurrenderedBenefitsPageSpec extends PageBehaviours {
 
-  override def path: JsPath = MemberPaymentsPage.path \ toString
+  "SurrenderedBenefitsPage" - {
 
-  override def toString: String = "surrenderMade"
+    beRetrievable[Boolean](SurrenderedBenefitsPage(srnGen.sample.value))
+
+    beSettable[Boolean](SurrenderedBenefitsPage(srnGen.sample.value))
+
+    beRemovable[Boolean](SurrenderedBenefitsPage(srnGen.sample.value))
+  }
 }

@@ -14,19 +14,9 @@
  * limitations under the License.
  */
 
-package pages
+package pages.nonsipp.membersurrenderedbenefits
 
-import pages.behaviours.PageBehaviours
-import pages.nonsipp.memberpayments.BenefitsSurrenderedPage
+import models.SchemeId.Srn
+import pages.Page
 
-class BenefitsSurrenderedPageSpec extends PageBehaviours {
-
-  "BenefitsSurrenderedPage" - {
-
-    beRetrievable[Boolean](BenefitsSurrenderedPage(srnGen.sample.value))
-
-    beSettable[Boolean](BenefitsSurrenderedPage(srnGen.sample.value))
-
-    beRemovable[Boolean](BenefitsSurrenderedPage(srnGen.sample.value))
-  }
-}
+case class WhatYouWillNeedSurrenderedBenefitsPage(srn: Srn) extends Page
