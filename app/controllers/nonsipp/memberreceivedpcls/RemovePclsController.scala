@@ -20,15 +20,15 @@ import config.Refined.Max300
 import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
 import forms.YesNoPageFormProvider
-import models.{Money, NormalMode}
 import models.SchemeId.Srn
+import models.{Money, NormalMode}
 import navigation.Navigator
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import pages.nonsipp.memberreceivedpcls.{PensionCommencementLumpSumAmountPage, RemovePclsPage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
+import services.{PsrSubmissionService, SaveService}
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
@@ -44,7 +44,8 @@ class RemovePclsController @Inject()(
   formProvider: YesNoPageFormProvider,
   saveService: SaveService,
   val controllerComponents: MessagesControllerComponents,
-  view: YesNoPageView
+  view: YesNoPageView,
+  psrSubmissionService: PsrSubmissionService
 )(implicit ec: ExecutionContext)
     extends PSRController
     with I18nSupport {
@@ -54,7 +55,7 @@ class RemovePclsController @Inject()(
   def onPageLoad(srn: Srn, memberIndex: Max300): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val nameDOB = request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).get
-      val total = request.userAnswers.get(PensionCommencementLumpSumAmountPage(srn, memberIndex, NormalMode))
+      val total = request.userAnswers.get(PensionCommencementLumpSumAmountPage(srn, memberIndex))
       total match {
         case Some(value) =>
           Ok(
@@ -86,7 +87,7 @@ class RemovePclsController @Inject()(
             (
               for {
                 total <- request.userAnswers
-                  .get(PensionCommencementLumpSumAmountPage(srn, memberIndex, NormalMode))
+                  .get(PensionCommencementLumpSumAmountPage(srn, memberIndex))
                   .getOrRecoverJourneyT
                 nameDOB <- request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).getOrRecoverJourneyT
               } yield BadRequest(
@@ -101,12 +102,16 @@ class RemovePclsController @Inject()(
             if (removeDetails) {
               for {
                 updatedAnswers <- Future.fromTry(
-                  request.userAnswers.remove(PensionCommencementLumpSumAmountPage(srn, memberIndex, NormalMode))
+                  request.userAnswers.remove(PensionCommencementLumpSumAmountPage(srn, memberIndex))
                 )
                 _ <- saveService.save(updatedAnswers)
-              } yield Redirect(
-                navigator
-                  .nextPage(RemovePclsPage(srn, memberIndex), NormalMode, updatedAnswers)
+                submissionResult <- psrSubmissionService.submitPsrDetails(srn, updatedAnswers)
+              } yield submissionResult.fold(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))(
+                _ =>
+                  Redirect(
+                    navigator
+                      .nextPage(RemovePclsPage(srn, memberIndex), NormalMode, updatedAnswers)
+                  )
               )
             } else {
               Future

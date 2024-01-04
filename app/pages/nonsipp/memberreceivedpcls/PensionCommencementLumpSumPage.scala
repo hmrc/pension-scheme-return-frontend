@@ -18,12 +18,12 @@ package pages.nonsipp.memberreceivedpcls
 
 import models.SchemeId.Srn
 import pages.QuestionPage
-import pages.nonsipp.memberpayments.MemberPaymentsPage
+import pages.nonsipp.memberreceivedpcls.Paths.memberDetails
 import play.api.libs.json.JsPath
 
 case class PensionCommencementLumpSumPage(srn: Srn) extends QuestionPage[Boolean] {
 
-  override def path: JsPath = MemberPaymentsPage.path \ toString
+  override def path: JsPath = memberDetails \ toString
 
   override def toString: String = "lumpSumReceived"
 }

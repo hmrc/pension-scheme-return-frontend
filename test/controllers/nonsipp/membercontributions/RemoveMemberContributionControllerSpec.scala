@@ -67,8 +67,15 @@ class RemoveMemberContributionControllerSpec extends ControllerBaseSpec {
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
-    act.like(continueNoSave(onSubmit, userAnswers, "value" -> "false"))
-    act.like(saveAndContinue(onSubmit, userAnswers, "value" -> "true"))
+    act.like(
+      continueNoSave(onSubmit, userAnswers, "value" -> "false")
+        .after(verify(mockPsrSubmissionService, never).submitPsrDetails(any(), any())(any(), any(), any()))
+    )
+
+    act.like(
+      saveAndContinue(onSubmit, userAnswers, "value" -> "true")
+        .after(verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any())(any(), any(), any()))
+    )
 
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
 
