@@ -18,7 +18,7 @@ package navigation.nonsipp
 
 import config.Refined.{Max300, OneTo300}
 import eu.timepit.refined.refineMV
-import models.{CheckMode, NormalMode}
+import models.NormalMode
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.memberreceivedpcls._
@@ -79,7 +79,7 @@ class PensionCommencementLumpSumNavigatorSpec extends BaseSpec with NavigatorBeh
       normalmode
         .navigateToWithIndex(
           index,
-          (srn, index: Max300) => PensionCommencementLumpSumAmountPage(srn, index, NormalMode),
+          (srn, index: Max300) => PensionCommencementLumpSumAmountPage(srn, index),
           (srn, index, _) =>
             controllers.nonsipp.memberreceivedpcls.routes.PclsCYAController.onPageLoad(srn, index, NormalMode)
         )
@@ -105,7 +105,7 @@ class PensionCommencementLumpSumNavigatorSpec extends BaseSpec with NavigatorBeh
     act.like(
       checkmode
         .navigateTo(
-          srn => PensionCommencementLumpSumAmountPage(srn, index, CheckMode),
+          srn => PensionCommencementLumpSumAmountPage(srn, index),
           (srn, _) => controllers.nonsipp.memberreceivedpcls.routes.PclsCYAController.onPageLoad(srn, index, NormalMode)
         )
         .withName("go from pcls amount page in check mode to CYA page in normal mode")

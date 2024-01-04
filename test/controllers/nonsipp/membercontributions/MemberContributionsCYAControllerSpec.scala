@@ -38,7 +38,7 @@ class MemberContributionsCYAControllerSpec extends ControllerBaseSpec {
     bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
   )
 
-  override protected def beforeAll(): Unit =
+  override def beforeEach(): Unit =
     reset(mockPsrSubmissionService)
 
   private def onPageLoad(mode: Mode) =

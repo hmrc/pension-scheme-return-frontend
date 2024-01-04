@@ -62,7 +62,7 @@ class PensionCommencementLumpSumAmountController @Inject()(
     identifyAndRequireData(srn) { implicit request =>
       request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney { memberName =>
         val preparedForm =
-          request.userAnswers.fillForm(PensionCommencementLumpSumAmountPage(srn, index, mode), form)
+          request.userAnswers.fillForm(PensionCommencementLumpSumAmountPage(srn, index), form)
 
         Ok(view(viewModel(srn, index, memberName.fullName, mode, preparedForm)))
       }
@@ -80,11 +80,11 @@ class PensionCommencementLumpSumAmountController @Inject()(
               for {
                 updatedAnswers <- Future
                   .fromTry(
-                    request.userAnswers.transformAndSet(PensionCommencementLumpSumAmountPage(srn, index, mode), value)
+                    request.userAnswers.transformAndSet(PensionCommencementLumpSumAmountPage(srn, index), value)
                   )
                 _ <- saveService.save(updatedAnswers)
               } yield Redirect(
-                navigator.nextPage(PensionCommencementLumpSumAmountPage(srn, index, mode), mode, updatedAnswers)
+                navigator.nextPage(PensionCommencementLumpSumAmountPage(srn, index), mode, updatedAnswers)
               )
           )
       }

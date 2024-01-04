@@ -22,7 +22,7 @@ import config.Refined.{Max300, Max50}
 import models.SchemeId.Srn
 import models.UserAnswers.implicits._
 import models.requests.psr._
-import models.{ConditionalYesNo, Crn, IdentityType, Money, NameDOB, UserAnswers, Utr}
+import models.{ConditionalYesNo, Crn, IdentityType, Money, NameDOB, PensionCommencementLumpSum, UserAnswers, Utr}
 import pages.nonsipp.employercontributions._
 import pages.nonsipp.membercontributions.{
   MemberContributionsListPage,
@@ -32,6 +32,11 @@ import pages.nonsipp.membercontributions.{
 import pages.nonsipp.memberdetails.MembersDetailsPages._
 import pages.nonsipp.memberdetails._
 import pages.nonsipp.memberpayments.{UnallocatedEmployerAmountPage, UnallocatedEmployerContributionsPage}
+import pages.nonsipp.memberreceivedpcls.{
+  PclsMemberListPage,
+  PensionCommencementLumpSumAmountPage,
+  PensionCommencementLumpSumPage
+}
 import pages.nonsipp.receivetransfer.TransfersInJourneyStatus
 import uk.gov.hmrc.domain.Nino
 import viewmodels.models.{MemberState, SectionCompleted, SectionStatus}
@@ -63,7 +68,8 @@ class MemberPaymentsTransformer @Inject()(
           personalDetails = buildMemberPersonalDetails(srn, index, memberDetails, userAnswers),
           employerContributions = employerContributions,
           transfersIn = transfersIn,
-          totalContributions = userAnswers.get(TotalMemberContributionPage(srn, index)).map(_.value)
+          totalContributions = userAnswers.get(TotalMemberContributionPage(srn, index)).map(_.value),
+          memberLumpSumReceived = buildMemberLumpSumReceived(srn, index, userAnswers)
         )
     }
 
@@ -83,7 +89,8 @@ class MemberPaymentsTransformer @Inject()(
             },
             unallocatedContribsMade = userAnswers.get(UnallocatedEmployerContributionsPage(srn)).getOrElse(false),
             unallocatedContribAmount = userAnswers.get(UnallocatedEmployerAmountPage(srn)).map(_.value),
-            memberContributionMade = userAnswers.get(MemberContributionsPage(srn)).getOrElse(false)
+            memberContributionMade = userAnswers.get(MemberContributionsPage(srn)).getOrElse(false),
+            lumpSumReceived = userAnswers.get(PensionCommencementLumpSumPage(srn)).getOrElse(false)
           )
         )
     }
@@ -118,6 +125,11 @@ class MemberPaymentsTransformer @Inject()(
                 index,
                 memberPayments.memberContributionMade,
                 memberDetails.totalContributions
+              ) ++ memberLumpSumReceivedPages(
+                srn,
+                index,
+                memberPayments.lumpSumReceived,
+                memberDetails.memberLumpSumReceived
               )
 
             pages.foldLeft(ua)((userAnswers, f) => f(userAnswers))
@@ -125,7 +137,10 @@ class MemberPaymentsTransformer @Inject()(
       emptyTotalContributionNotExist = !memberPayments.memberDetails.exists(_.totalContributions.isEmpty)
       ua4 <- ua3.set(MemberContributionsListPage(srn), emptyTotalContributionNotExist)
 
-    } yield ua4
+      emptyMemberLumpSumReceivedNotExist = !memberPayments.memberDetails.exists(_.memberLumpSumReceived.isEmpty)
+      ua5 <- ua4.set(PclsMemberListPage(srn), emptyMemberLumpSumReceivedNotExist)
+
+    } yield ua5
 
   private def buildMemberPersonalDetails(
     srn: Srn,
@@ -194,6 +209,18 @@ class MemberPaymentsTransformer @Inject()(
     )
   }
 
+  private def buildMemberLumpSumReceived(
+    srn: Srn,
+    index: Max300,
+    userAnswers: UserAnswers
+  ): Option[MemberLumpSumReceived] =
+    for {
+      pensionCommencementLumpSum <- userAnswers.get(PensionCommencementLumpSumAmountPage(srn, index))
+    } yield MemberLumpSumReceived(
+      pensionCommencementLumpSum.lumpSumAmount.value,
+      pensionCommencementLumpSum.designatedPensionAmount.value
+    )
+
   private def employerContributionsPages(
     srn: Srn,
     index: Max300,
@@ -252,6 +279,25 @@ class MemberPaymentsTransformer @Inject()(
           .map(t => ua.set(TotalMemberContributionPage(srn, index), Money(t)))
           .getOrElse(ua),
       _.set(MemberContributionsPage(srn), memberContributionMade)
+    )
+
+  private def memberLumpSumReceivedPages(
+    srn: Srn,
+    index: Max300,
+    lumpSumReceived: Boolean,
+    memberLumpSumReceived: Option[MemberLumpSumReceived]
+  ): List[Try[UserAnswers] => Try[UserAnswers]] =
+    List(
+      ua =>
+        memberLumpSumReceived
+          .map(t => {
+            ua.set(
+              PensionCommencementLumpSumAmountPage(srn, index),
+              PensionCommencementLumpSum(Money(t.lumpSumAmount), Money(t.designatedPensionAmount))
+            )
+          })
+          .getOrElse(ua),
+      _.set(PensionCommencementLumpSumPage(srn), lumpSumReceived)
     )
 
   private def toEmployerType(

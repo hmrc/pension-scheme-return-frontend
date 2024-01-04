@@ -20,16 +20,34 @@ import controllers.ControllerBaseSpec
 import controllers.nonsipp.memberreceivedpcls.PensionCommencementLumpSumController.viewModel
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import pages.nonsipp.memberreceivedpcls.PensionCommencementLumpSumPage
-import play.api.libs.json.JsPath
+import org.mockito.ArgumentMatchers.any
+import pages.nonsipp.memberreceivedpcls.{Paths, PensionCommencementLumpSumPage}
+import play.api.data.Form
+import play.api.inject.bind
+import play.api.inject.guice.GuiceableModule
+import services.PsrSubmissionService
 import views.html.YesNoPageView
+
+import scala.concurrent.Future
 
 class PensionCommencementLumpSumControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoad = routes.PensionCommencementLumpSumController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.PensionCommencementLumpSumController.onSubmit(srn, NormalMode)
 
-  val form = PensionCommencementLumpSumController.form(new YesNoPageFormProvider())
+  private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
+
+  override protected val additionalBindings: List[GuiceableModule] = List(
+    bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
+  )
+
+  override protected def beforeEach(): Unit = {
+    reset(mockPsrSubmissionService)
+    when(mockPsrSubmissionService.submitPsrDetails(any())(any(), any(), any()))
+      .thenReturn(Future.successful(Some(())))
+  }
+
+  private val form: Form[Boolean] = PensionCommencementLumpSumController.form(new YesNoPageFormProvider())
 
   "PensionCommencementLumpSumController" - {
 
@@ -43,13 +61,24 @@ class PensionCommencementLumpSumControllerSpec extends ControllerBaseSpec {
         injected[YesNoPageView].apply(preparedForm, viewModel(srn, NormalMode))
     })
 
-    act.like(redirectNextPage(onSubmit, "value" -> "true"))
-    act.like(redirectNextPage(onSubmit, "value" -> "false"))
+    act.like(
+      redirectNextPage(onSubmit, "value" -> "true")
+        .after({
+          verify(mockPsrSubmissionService, never).submitPsrDetails(any())(any(), any(), any())
+        })
+    )
+
+    act.like(
+      redirectNextPage(onSubmit, "value" -> "false")
+        .after({
+          verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any())(any(), any(), any())
+        })
+    )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit " + _))
 
-    act.like(saveAndContinue(onSubmit, Some(JsPath \ "membersPayments" \ "lumpSumReceived"), "value" -> "true"))
+    act.like(saveAndContinue(onSubmit, Some(Paths.memberDetails \ "lumpSumReceived"), "value" -> "true"))
 
     act.like(invalidForm(onSubmit))
   }

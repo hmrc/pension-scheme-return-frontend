@@ -28,14 +28,16 @@ case class MemberPayments(
   transfersInCompleted: Boolean,
   unallocatedContribsMade: Boolean,
   unallocatedContribAmount: Option[Double],
-  memberContributionMade: Boolean
+  memberContributionMade: Boolean,
+  lumpSumReceived: Boolean
 )
 
 case class MemberDetails(
   personalDetails: MemberPersonalDetails,
   employerContributions: List[EmployerContributions],
   transfersIn: List[TransfersIn],
-  totalContributions: Option[Double]
+  totalContributions: Option[Double],
+  memberLumpSumReceived: Option[MemberLumpSumReceived]
 )
 
 case class MemberPersonalDetails(
@@ -50,6 +52,11 @@ case class EmployerContributions(
   employerName: String,
   employerType: EmployerType,
   totalTransferValue: Double
+)
+
+case class MemberLumpSumReceived(
+  lumpSumAmount: Double,
+  designatedPensionAmount: Double
 )
 
 sealed trait EmployerType
@@ -109,6 +116,7 @@ object MemberPersonalDetails {
 }
 
 object MemberPayments {
+  private implicit val formatMemberLumpSumReceived: Format[MemberLumpSumReceived] = Json.format[MemberLumpSumReceived]
   private implicit val formatEmployerContributions: Format[EmployerContributions] = Json.format[EmployerContributions]
   private implicit val formatMemberPersonalDetails: Format[MemberPersonalDetails] = Json.format[MemberPersonalDetails]
   private implicit val formatMemberDetails: Format[MemberDetails] = Json.format[MemberDetails]

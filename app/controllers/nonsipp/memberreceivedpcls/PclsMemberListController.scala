@@ -16,6 +16,7 @@
 
 package controllers.nonsipp.memberreceivedpcls
 
+import cats.implicits.{toBifunctorOps, toTraverseOps}
 import com.google.inject.Inject
 import config.Constants
 import config.Constants.maxNotRelevant
@@ -26,18 +27,21 @@ import eu.timepit.refined.refineV
 import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
 import models._
+import models.requests.DataRequest
 import navigation.Navigator
 import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
 import pages.nonsipp.memberreceivedpcls._
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.{PsrSubmissionService, SaveService}
 import viewmodels.DisplayMessage.{LinkMessage, Message}
 import viewmodels.implicits._
 import viewmodels.models.{ActionTableViewModel, FormPageViewModel, PaginatedViewModel, TableElem}
 import views.html.TwoColumnsTripleAction
 
 import javax.inject.Named
+import scala.concurrent.{ExecutionContext, Future}
 
 class PclsMemberListController @Inject()(
   override val messagesApi: MessagesApi,
@@ -45,46 +49,108 @@ class PclsMemberListController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   view: TwoColumnsTripleAction,
-  formProvider: YesNoPageFormProvider
-) extends PSRController {
+  formProvider: YesNoPageFormProvider,
+  saveService: SaveService,
+  psrSubmissionService: PsrSubmissionService
+)(implicit ec: ExecutionContext)
+    extends PSRController {
 
   private val form = PclsMemberListController.form(formProvider)
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      val memberList = request.userAnswers.membersDetails(srn)
+      val ua = request.userAnswers
+      val memberList = ua.membersDetails(srn)
 
       if (memberList.nonEmpty) {
         val viewModel = PclsMemberListController
-          .viewModel(srn, page, mode, memberList, request.userAnswers)
-        Ok(view(form, viewModel))
+          .viewModel(srn, page, mode, memberList, ua)
+        val filledForm =
+          request.userAnswers.get(PclsMemberListPage(srn)).fold(form)(form.fill)
+        Ok(view(filledForm, viewModel))
       } else {
-        Redirect(controllers.routes.UnauthorisedController.onPageLoad())
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
       }
   }
 
-  def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    val memberList = request.userAnswers.membersDetails(srn)
+  def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+    implicit request =>
+      val ua = request.userAnswers
+      val memberList = ua.membersDetails(srn)
+      val memberListSize = memberList.size
 
-    if (memberList.size > Constants.maxSchemeMembers) {
-      Redirect(
-        navigator.nextPage(PclsMemberListPage(srn), mode, request.userAnswers)
+      if (memberListSize > Constants.maxSchemeMembers) {
+        Future.successful(
+          Redirect(
+            navigator.nextPage(PclsMemberListPage(srn), mode, ua)
+          )
+        )
+      } else {
+
+        form
+          .bindFromRequest()
+          .fold(
+            errors =>
+              Future.successful(
+                BadRequest(
+                  view(errors, PclsMemberListController.viewModel(srn, page, mode, memberList, ua))
+                )
+              ),
+            value =>
+              for {
+                updatedUserAnswers <- buildUserAnswerBySelection(srn, value, memberListSize)
+                _ <- saveService.save(updatedUserAnswers)
+                submissionResult <- if (value) {
+                  psrSubmissionService.submitPsrDetails(srn)(
+                    implicitly,
+                    implicitly,
+                    request = DataRequest(request.request, updatedUserAnswers)
+                  )
+                } else {
+                  Future.successful(Some(()))
+                }
+              } yield submissionResult.getOrRecoverJourney(
+                _ =>
+                  Redirect(
+                    navigator
+                      .nextPage(PclsMemberListPage(srn), mode, request.userAnswers)
+                  )
+              )
+          )
+      }
+  }
+
+  private def buildUserAnswerBySelection(srn: Srn, selection: Boolean, memberListSize: Int)(
+    implicit request: DataRequest[_]
+  ): Future[UserAnswers] = {
+    val userAnswerWithPclsMemberList = request.userAnswers.set(PclsMemberListPage(srn), selection)
+
+    if (selection) {
+      val indexes = (1 to memberListSize)
+        .map(i => refineV[OneTo300](i).leftMap(new Exception(_)).toTry)
+        .toList
+        .sequence
+
+      Future.fromTry(
+        indexes.fold(
+          _ => userAnswerWithPclsMemberList,
+          index =>
+            index.foldLeft(userAnswerWithPclsMemberList) {
+              case (uaTry, index) =>
+                val optCommencementLumpSumAmount =
+                  request.userAnswers.get(PensionCommencementLumpSumAmountPage(srn, index))
+                for {
+                  ua <- uaTry
+                  ua1 <- ua.set(
+                    PensionCommencementLumpSumAmountPage(srn, index),
+                    optCommencementLumpSumAmount.getOrElse(PensionCommencementLumpSum(Money(0), Money(0)))
+                  )
+                } yield ua1
+            }
+        )
       )
     } else {
-
-      form
-        .bindFromRequest()
-        .fold(
-          errors =>
-            BadRequest(
-              view(errors, PclsMemberListController.viewModel(srn, page, mode, memberList, request.userAnswers))
-            ),
-          _ =>
-            Redirect(
-              navigator
-                .nextPage(PclsMemberListPage(srn), mode, request.userAnswers)
-            )
-        )
+      Future.fromTry(userAnswerWithPclsMemberList)
     }
   }
 }
@@ -97,7 +163,6 @@ object PclsMemberListController {
 
   private def rows(
     srn: Srn,
-    mode: Mode,
     memberList: List[NameDOB],
     userAnswers: UserAnswers
   ): List[List[TableElem]] =
@@ -106,7 +171,7 @@ object PclsMemberListController {
         refineV[OneTo300](index + 1) match {
           case Left(_) => Nil
           case Right(nextIndex) =>
-            val items = userAnswers.get(PensionCommencementLumpSumAmountPage(srn, nextIndex, NormalMode))
+            val items = userAnswers.get(PensionCommencementLumpSumAmountPage(srn, nextIndex))
             if (items.isEmpty) {
               List(
                 TableElem(
@@ -179,7 +244,7 @@ object PclsMemberListController {
       page = ActionTableViewModel(
         inset = "pcls.memberlist.paragraph",
         head = Some(List(TableElem("Member name"), TableElem("Status"))),
-        rows = rows(srn, mode, memberList, userAnswers),
+        rows = rows(srn, memberList, userAnswers),
         radioText = Message("pcls.memberlist.radios"),
         showRadios = memberList.length < maxNotRelevant,
         showInsetWithRadios = true,

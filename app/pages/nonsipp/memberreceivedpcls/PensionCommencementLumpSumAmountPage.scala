@@ -17,17 +17,17 @@
 package pages.nonsipp.memberreceivedpcls
 
 import config.Refined.Max300
+import models.PensionCommencementLumpSum
 import models.SchemeId.Srn
-import models.{Mode, PensionCommencementLumpSum}
 import pages.QuestionPage
-import pages.nonsipp.memberpayments.MemberPaymentsPage
+import pages.nonsipp.memberreceivedpcls.Paths.memberDetails
 import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
 
-case class PensionCommencementLumpSumAmountPage(srn: Srn, index: Max300, mode: Mode)
+case class PensionCommencementLumpSumAmountPage(srn: Srn, index: Max300)
     extends QuestionPage[PensionCommencementLumpSum] {
 
-  override def path: JsPath = MemberPaymentsPage.path \ "memberDetails" \ toString \ index.arrayIndex.toString
+  override def path: JsPath = memberDetails \ toString \ index.arrayIndex.toString
 
   override def toString: String = "memberLumpSumReceived"
 }
