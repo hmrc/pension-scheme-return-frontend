@@ -25,14 +25,19 @@ import models.NormalMode
 import models.SchemeId.Srn
 import navigation.Navigator
 import pages.nonsipp.memberdetails.MemberDetailsPage
-import pages.nonsipp.receivetransfer.{transferInPages, RemoveTransferInPage, TransferringSchemeNamePage}
+import pages.nonsipp.receivetransfer.{
+  transferInPages,
+  RemoveTransferInPage,
+  TransferringSchemeNamePage,
+  TransfersInJourneyStatus
+}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{PsrSubmissionService, SaveService}
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
+import viewmodels.models.{FormPageViewModel, SectionStatus, YesNoPageViewModel}
 import views.html.YesNoPageView
 
 import javax.inject.{Inject, Named}
@@ -93,6 +98,7 @@ class RemoveTransferInController @Inject()(
                       .removePages(
                         transferInPages(srn, memberIndex, index)
                       )
+                      .set(TransfersInJourneyStatus(srn), SectionStatus.InProgress)
                   )
                 _ <- saveService.save(updatedAnswers)
                 submissionResult <- psrSubmissionService.submitPsrDetails(srn, updatedAnswers)

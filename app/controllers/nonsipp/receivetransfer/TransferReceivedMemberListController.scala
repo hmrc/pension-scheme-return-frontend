@@ -62,7 +62,9 @@ class TransferReceivedMemberListController @Inject()(
       if (memberList.nonEmpty) {
         val viewModel = TransferReceivedMemberListController
           .viewModel(srn, page, mode, memberList, request.userAnswers)
-        Ok(view(form, viewModel))
+        val filledForm =
+          request.userAnswers.get(TransferReceivedMemberListPage(srn)).fold(form)(form.fill)
+        Ok(view(filledForm, viewModel))
       } else {
         Redirect(controllers.routes.UnauthorisedController.onPageLoad())
       }
@@ -96,6 +98,7 @@ class TransferReceivedMemberListController @Inject()(
                         if (finishedAddingTransfers) SectionStatus.Completed
                         else SectionStatus.InProgress
                       )
+                      .set(TransferReceivedMemberListPage(srn), finishedAddingTransfers)
                   )
                 _ <- saveService.save(updatedUserAnswers)
                 _ <- if (finishedAddingTransfers) psrSubmissionService.submitPsrDetails(srn, updatedUserAnswers)

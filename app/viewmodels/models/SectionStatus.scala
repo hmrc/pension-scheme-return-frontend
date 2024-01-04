@@ -21,12 +21,17 @@ import utils.WithName
 
 sealed trait SectionStatus {
   val name: String
+  val isCompleted: Boolean
 }
 
 object SectionStatus {
-  case object InProgress extends WithName("InProgress") with SectionStatus
+  case object InProgress extends WithName("InProgress") with SectionStatus {
+    val isCompleted: Boolean = false
+  }
 
-  case object Completed extends WithName("Completed") with SectionStatus
+  case object Completed extends WithName("Completed") with SectionStatus {
+    val isCompleted: Boolean = true
+  }
 
   implicit val format: Format[SectionStatus] = new Format[SectionStatus] {
     override def reads(json: JsValue): JsResult[SectionStatus] = json match {
