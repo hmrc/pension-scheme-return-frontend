@@ -11,6 +11,7 @@
 ->          /                                                                           pcls.Routes
 ->          /                                                                           memberpayments_pensionpayments.Routes
 ->          /                                                                           membersurrenderedbenefits.Routes
+->          /                                                                           shares.Routes
 
 GET         /                                                                           controllers.IndexController.onPageLoad()
 
@@ -169,11 +170,6 @@ POST        /:srn/loans-made-or-outstanding                                     
 GET         /:srn/change-loans-made-or-outstanding                                      controllers.nonsipp.loansmadeoroutstanding.LoansMadeOrOutstandingController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST        /:srn/change-loans-made-or-outstanding                                      controllers.nonsipp.loansmadeoroutstanding.LoansMadeOrOutstandingController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
-GET         /:srn/shares-in-sponsoring-employer                                         controllers.nonsipp.sharesinsponsoringemployer.DidSchemeHoldSharesInSponsoringEmployerController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST        /:srn/shares-in-sponsoring-employer                                         controllers.nonsipp.sharesinsponsoringemployer.DidSchemeHoldSharesInSponsoringEmployerController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-GET         /:srn/change-shares-in-sponsoring-employer                                  controllers.nonsipp.sharesinsponsoringemployer.DidSchemeHoldSharesInSponsoringEmployerController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST        /:srn/change-shares-in-sponsoring-employer                                  controllers.nonsipp.sharesinsponsoringemployer.DidSchemeHoldSharesInSponsoringEmployerController.onSubmit(srn: Srn, mode: Mode = CheckMode)
-
 GET         /:srn/fees-commissions-wages-salaries                                       controllers.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST        /:srn/fees-commissions-wages-salaries                                       controllers.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 GET         /:srn/change-fees-commissions-wages-salaries                                controllers.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
@@ -205,16 +201,6 @@ POST        /:srn/check-member-details-file                                     
 GET         /:srn/change-check-member-details-file                                      controllers.nonsipp.memberdetails.CheckMemberDetailsFileController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST        /:srn/change-check-member-details-file                                      controllers.nonsipp.memberdetails.CheckMemberDetailsFileController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
-GET         /:srn/shares-acquired-from-connected-party                                  controllers.nonsipp.sharesacquiredfromconnectedparty.SharesAcquiredFromConnectedPartyController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST        /:srn/shares-acquired-from-connected-party                                  controllers.nonsipp.sharesacquiredfromconnectedparty.SharesAcquiredFromConnectedPartyController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-GET         /:srn/change-shares-acquired-from-connected-party                           controllers.nonsipp.sharesacquiredfromconnectedparty.SharesAcquiredFromConnectedPartyController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST        /:srn/change-shares-acquired-from-connected-party                           controllers.nonsipp.sharesacquiredfromconnectedparty.SharesAcquiredFromConnectedPartyController.onSubmit(srn: Srn, mode: Mode = CheckMode)
-
-GET         /:srn/unquoted-shares                                                       controllers.nonsipp.unquotedshares.UnquotedSharesController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST        /:srn/unquoted-shares                                                       controllers.nonsipp.unquotedshares.UnquotedSharesController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-GET         /:srn/change-unquoted-shares                                                controllers.nonsipp.unquotedshares.UnquotedSharesController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST        /:srn/change-unquoted-shares                                                controllers.nonsipp.unquotedshares.UnquotedSharesController.onSubmit(srn: Srn, mode: Mode = CheckMode)
-
 GET         /:srn/checking-member-details-file                                          controllers.nonsipp.memberdetails.upload.CheckingMemberDetailsFileController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 GET         /:srn/submit-checking-member-details-file                                   controllers.nonsipp.memberdetails.upload.CheckingMemberDetailsFileController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 GET         /:srn/change-checking-member-details-file                                   controllers.nonsipp.memberdetails.upload.CheckingMemberDetailsFileController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
@@ -231,11 +217,6 @@ GET         /:srn/change-file-upload-success                                    
 GET         /:srn/submit-change-file-upload-success                                     controllers.nonsipp.memberdetails.upload.FileUploadSuccessController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
 GET         /:srn/pension-scheme-return-task-list                                       controllers.nonsipp.TaskListController.onPageLoad(srn: Srn)
-
-GET         /:srn/total-value-quoted-shares                                             controllers.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST        /:srn/total-value-quoted-shares                                             controllers.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-GET         /:srn/change-total-value-quoted-shares                                      controllers.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST        /:srn/change-total-value-quoted-shares                                      controllers.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
 GET         /:srn/file-upload-error-missing-information                                 controllers.nonsipp.memberdetails.upload.FileUploadErrorMissingInformationController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 GET         /:srn/submit-file-upload-error-missing-information                          controllers.nonsipp.memberdetails.upload.FileUploadErrorMissingInformationController.onSubmit(srn: Srn, mode: Mode = NormalMode)

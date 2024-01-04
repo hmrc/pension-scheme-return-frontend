@@ -17,16 +17,18 @@
 package pages
 
 import pages.behaviours.PageBehaviours
-import pages.nonsipp.sharesacquiredfromconnectedparty.SharesAcquiredFromConnectedPartyPage
+import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
 
-class SharesAcquiredFromConnectedPartyPageSpec extends PageBehaviours {
+class DidSchemeHoldAnySharesPageSpec extends PageBehaviours {
 
-  "SharesAcquiredFromConnectedPartyPage" - {
+  "DidSchemeHoldAnySharesPage" - {
 
-    beRetrievable[Boolean](SharesAcquiredFromConnectedPartyPage(srnGen.sample.value))
+    val srn = srnGen.sample.value
 
-    beSettable[Boolean](SharesAcquiredFromConnectedPartyPage(srnGen.sample.value))
+    beRetrievable[Boolean](DidSchemeHoldAnySharesPage(srn))
 
-    beRemovable[Boolean](SharesAcquiredFromConnectedPartyPage(srnGen.sample.value))
+    beSettable[Boolean](DidSchemeHoldAnySharesPage(srn))
+
+    beRemovable[Boolean](DidSchemeHoldAnySharesPage(srn))
   }
 }

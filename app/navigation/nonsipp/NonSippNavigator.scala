@@ -122,14 +122,12 @@ class NonSippNavigator @Inject()() extends Navigator {
       LandOrPropertyDisposalNavigator,
       LoansMadeOrOutstandingNavigator,
       PensionCommencementLumpSumNavigator,
-      SharesInSponsoringEmployerNavigator,
+      SharesNavigator,
       MoneyBorrowedNavigator,
       PensionPaymentsReceivedNavigator,
       SurrenderedBenefitsNavigator,
       OtherAssetsHeldNavigator,
       UnallocatedEmployerContributionsNavigator,
-      SharesAcquiredFromConnectedPartyNavigator,
-      UnquotedSharesNavigator,
       TotalValueQuotedSharesNavigator
     )
 

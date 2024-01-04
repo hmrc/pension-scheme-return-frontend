@@ -16,22 +16,18 @@
 
 package navigation.nonsipp
 
-import models.{NormalMode, UserAnswers}
+import models.UserAnswers
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.sharesinsponsoringemployer.DidSchemeHoldSharesInSponsoringEmployerPage
+import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
 import play.api.mvc.Call
 
-object SharesInSponsoringEmployerNavigator extends JourneyNavigator {
+object SharesNavigator extends JourneyNavigator {
 
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
 
-    case page @ DidSchemeHoldSharesInSponsoringEmployerPage(srn) =>
-      if (userAnswers.get(page).contains(true)) {
-        controllers.nonsipp.unquotedshares.routes.UnquotedSharesController.onPageLoad(srn, NormalMode)
-      } else {
-        controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
-      }
+    case page @ DidSchemeHoldAnySharesPage(srn) =>
+      controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
   }
 
   val checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] = _ => _ => PartialFunction.empty

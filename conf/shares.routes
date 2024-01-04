@@ -1,0 +1,10 @@
+GET         /:srn/which-shares-held                                                     controllers.nonsipp.shares.DidSchemeHoldAnySharesController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/which-shares-held                                                     controllers.nonsipp.shares.DidSchemeHoldAnySharesController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/change-which-shares-held                                              controllers.nonsipp.shares.DidSchemeHoldAnySharesController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-which-shares-held                                              controllers.nonsipp.shares.DidSchemeHoldAnySharesController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET         /:srn/total-value-quoted-shares                                             controllers.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/total-value-quoted-shares                                             controllers.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/change-total-value-quoted-shares                                      controllers.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-total-value-quoted-shares                                      controllers.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+

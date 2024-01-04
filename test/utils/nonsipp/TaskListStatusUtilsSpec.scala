@@ -35,7 +35,7 @@ import pages.nonsipp.loansmadeoroutstanding.{
 }
 import pages.nonsipp.moneyborrowed.{LenderNamePage, LenderNamePages, MoneyBorrowedPage, WhySchemeBorrowedMoneyPage}
 import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
-import pages.nonsipp.sharesinsponsoringemployer.DidSchemeHoldSharesInSponsoringEmployerPage
+import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
 import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
 import pages.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldPage
 import utils.UserAnswersUtils.UserAnswersOps
@@ -358,7 +358,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
 
   "Shares status" - {
     val hadSharesPageUrl =
-      controllers.nonsipp.sharesinsponsoringemployer.routes.DidSchemeHoldSharesInSponsoringEmployerController
+      controllers.nonsipp.shares.routes.DidSchemeHoldAnySharesController
         .onPageLoad(srn, NormalMode)
         .url
 
@@ -369,9 +369,9 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
       }
     }
     "should be Complete" - {
-      "when only DidSchemeHoldSharesInSponsoringEmployerPage false is present" in {
+      "when only DidSchemeHoldAnyShares false is present" in {
         val customUserAnswers = defaultUserAnswers
-          .unsafeSet(DidSchemeHoldSharesInSponsoringEmployerPage(srn), false)
+          .unsafeSet(DidSchemeHoldAnySharesPage(srn), false)
         val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn)
         result mustBe (Completed, hadSharesPageUrl)
       }
@@ -411,7 +411,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
       }
     }
     "should be Complete" - {
-      "when only DidSchemeHoldSharesInSponsoringEmployerPage false is present" in {
+      "when only DidSchemeHoldAnySharesPage false is present" in {
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(UnregulatedOrConnectedBondsHeldPage(srn), false)
         val result = TaskListStatusUtils.getBondsTaskListStatusAndLink(customUserAnswers, srn)
