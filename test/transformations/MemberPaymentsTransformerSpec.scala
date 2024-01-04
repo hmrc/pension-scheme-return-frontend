@@ -23,14 +23,23 @@ import config.Refined.{Max300, Max5, Max50}
 import controllers.TestValues
 import eu.timepit.refined.refineMV
 import models.requests.psr._
-import models.{ConditionalYesNo, IdentityType, PensionSchemeType}
+import models.{ConditionalYesNo, IdentityType, PensionCommencementLumpSum, PensionSchemeType}
 import org.scalatest.OptionValues
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import pages.nonsipp.employercontributions._
-import pages.nonsipp.membercontributions.{MemberContributionsListPage, MemberContributionsPage, TotalMemberContributionPage}
+import pages.nonsipp.membercontributions.{
+  MemberContributionsListPage,
+  MemberContributionsPage,
+  TotalMemberContributionPage
+}
 import pages.nonsipp.memberdetails._
 import pages.nonsipp.memberpayments._
+import pages.nonsipp.memberreceivedpcls.{
+  PclsMemberListPage,
+  PensionCommencementLumpSumAmountPage,
+  PensionCommencementLumpSumPage
+}
 import pages.nonsipp.receivetransfer._
 import utils.UserAnswersUtils.UserAnswersOps
 import viewmodels.models.{MemberState, SectionCompleted, SectionStatus}
@@ -74,14 +83,16 @@ class MemberPaymentsTransformerSpec
             transferIncludedAsset = true
           )
         ),
-        totalContributions = Some(money.value)
+        totalContributions = Some(money.value),
+        memberLumpSumReceived = Some(MemberLumpSumReceived(money.value, money.value))
       )
     ),
     employerContributionsCompleted = true,
     transfersInCompleted = false,
     unallocatedContribsMade = true,
     unallocatedContribAmount = Some(money.value),
-    memberContributionMade = true
+    memberContributionMade = true,
+    lumpSumReceived = true
   )
 
   private val index = refineMV[Max300.Refined](1)
@@ -114,6 +125,9 @@ class MemberPaymentsTransformerSpec
     .unsafeSet(MemberContributionsPage(srn), true)
     .unsafeSet(MemberContributionsListPage(srn), true)
     .unsafeSet(TotalMemberContributionPage(srn, index), money)
+    .unsafeSet(PensionCommencementLumpSumPage(srn), true)
+    .unsafeSet(PclsMemberListPage(srn), true)
+    .unsafeSet(PensionCommencementLumpSumAmountPage(srn, index), PensionCommencementLumpSum(money, money))
 
   "MemberPaymentsTransformer - To Etmp" - {
     "should return empty List when userAnswer is empty" in {

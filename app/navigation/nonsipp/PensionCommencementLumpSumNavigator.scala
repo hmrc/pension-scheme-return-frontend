@@ -16,7 +16,7 @@
 
 package navigation.nonsipp
 
-import models.{CheckMode, NormalMode, UserAnswers}
+import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.memberreceivedpcls._
@@ -33,7 +33,7 @@ object PensionCommencementLumpSumNavigator extends JourneyNavigator {
         controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
       }
 
-    case PensionCommencementLumpSumAmountPage(srn, index, NormalMode) =>
+    case PensionCommencementLumpSumAmountPage(srn, index) =>
       controllers.nonsipp.memberreceivedpcls.routes.PclsCYAController
         .onPageLoad(srn, index, NormalMode)
 
@@ -48,7 +48,7 @@ object PensionCommencementLumpSumNavigator extends JourneyNavigator {
       controllers.nonsipp.memberreceivedpcls.routes.PclsMemberListController
         .onPageLoad(srn, 1, NormalMode)
 
-    case RemovePclsPage(srn, index) =>
+    case RemovePclsPage(srn, _) =>
       controllers.nonsipp.memberreceivedpcls.routes.PclsMemberListController
         .onPageLoad(srn, page = 1, NormalMode)
 
@@ -57,7 +57,7 @@ object PensionCommencementLumpSumNavigator extends JourneyNavigator {
   override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] =
     _ =>
       _ => {
-        case PensionCommencementLumpSumAmountPage(srn, memberIndex, CheckMode) =>
+        case PensionCommencementLumpSumAmountPage(srn, memberIndex) =>
           controllers.nonsipp.memberreceivedpcls.routes.PclsCYAController
             .onPageLoad(srn, memberIndex, NormalMode)
 

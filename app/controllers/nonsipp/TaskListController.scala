@@ -36,6 +36,7 @@ import pages.nonsipp.loansmadeoroutstanding.{
 }
 import pages.nonsipp.membercontributions.MemberContributionsListPage
 import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsNinoPages, MembersDetailsPages, NoNinoPages}
+import pages.nonsipp.memberreceivedpcls.PclsMemberListPage
 import pages.nonsipp.receivetransfer.TransfersInJourneyStatus
 import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, ValueOfAssetsPage, WhyNoBankAccountPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -320,6 +321,14 @@ object TaskListController {
           case true => TaskListStatus.Completed
         }
 
+    val pclsMemberStatus: TaskListStatus =
+      userAnswers
+        .get(PclsMemberListPage(srn))
+        .fold[TaskListStatus](TaskListStatus.NotStarted) {
+          case false => TaskListStatus.InProgress
+          case true => TaskListStatus.Completed
+        }
+
     TaskListSectionViewModel(
       s"$prefix.title",
       TaskListItemViewModel(
@@ -369,12 +378,12 @@ object TaskListController {
       ),
       TaskListItemViewModel(
         LinkMessage(
-          messageKey(prefix, "pcls.title", UnableToStart),
+          messageKey(prefix, "pcls.title", pclsMemberStatus),
           controllers.nonsipp.memberreceivedpcls.routes.PensionCommencementLumpSumController
             .onPageLoad(srn, NormalMode)
             .url
         ),
-        NotStarted
+        pclsMemberStatus
       ),
       TaskListItemViewModel(
         LinkMessage(

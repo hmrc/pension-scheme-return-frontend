@@ -20,8 +20,8 @@ import config.Refined.Max300
 import controllers.ControllerBaseSpec
 import eu.timepit.refined.refineMV
 import forms.MoneyFormProvider
-import models.{Money, NormalMode}
 import models.PensionCommencementLumpSum._
+import models.{Money, NormalMode}
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import pages.nonsipp.memberreceivedpcls.PensionCommencementLumpSumAmountPage
 import play.api.libs.json.JsPath
@@ -56,7 +56,7 @@ class PensionCommencementLumpSumAmountControllerSpec extends ControllerBaseSpec 
     act.like(
       renderPrePopView(
         onPageLoad,
-        PensionCommencementLumpSumAmountPage(srn, index, NormalMode),
+        PensionCommencementLumpSumAmountPage(srn, index),
         lumpSumData,
         userAnswers
       ) { implicit app => implicit request =>

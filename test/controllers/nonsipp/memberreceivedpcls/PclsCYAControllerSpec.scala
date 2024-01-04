@@ -20,10 +20,16 @@ import config.Refined._
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.memberreceivedpcls.PclsCYAController._
 import eu.timepit.refined.refineMV
-import models.{NormalMode, PensionSchemeType}
+import models.NormalMode
+import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import pages.nonsipp.memberreceivedpcls.PensionCommencementLumpSumAmountPage
+import play.api.inject.bind
+import play.api.inject.guice.GuiceableModule
+import services.PsrSubmissionService
 import views.html.CheckYourAnswersView
+
+import scala.concurrent.Future
 
 class PclsCYAControllerSpec extends ControllerBaseSpec {
 
@@ -31,12 +37,23 @@ class PclsCYAControllerSpec extends ControllerBaseSpec {
   private lazy val onPageLoad = routes.PclsCYAController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.PclsCYAController.onSubmit(srn, index, NormalMode)
 
-  private val pensionSchemeType = PensionSchemeType.Other("other")
+  private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
+
+  override protected val additionalBindings: List[GuiceableModule] = List(
+    bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
+  )
+
+  override protected def beforeEach(): Unit = {
+    reset(mockPsrSubmissionService)
+    when(mockPsrSubmissionService.submitPsrDetails(any())(any(), any(), any()))
+      .thenReturn(Future.successful(Some(())))
+  }
+
   private val lumpSumAmounts = pensionCommencementLumpSumGen.sample.value
 
   private val userAnswers = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, index), memberDetails)
-    .unsafeSet(PensionCommencementLumpSumAmountPage(srn, index, NormalMode), lumpSumAmounts)
+    .unsafeSet(PensionCommencementLumpSumAmountPage(srn, index), lumpSumAmounts)
 
   "PclsCYAController" - {
 
@@ -46,7 +63,10 @@ class PclsCYAControllerSpec extends ControllerBaseSpec {
       )
     })
 
-    act.like(redirectNextPage(onSubmit))
+    act.like(
+      redirectNextPage(onSubmit)
+        .after(verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any())(any(), any(), any()))
+    )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 

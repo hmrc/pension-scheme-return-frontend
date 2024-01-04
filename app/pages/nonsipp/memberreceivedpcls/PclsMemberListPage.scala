@@ -18,11 +18,12 @@ package pages.nonsipp.memberreceivedpcls
 
 import models.SchemeId.Srn
 import pages.QuestionPage
+import pages.nonsipp.memberreceivedpcls.Paths.memberDetails
 import play.api.libs.json.JsPath
 
 case class PclsMemberListPage(srn: Srn) extends QuestionPage[Boolean] {
 
-  override def path: JsPath = JsPath \ toString
+  override def path: JsPath = memberDetails \ toString
 
   override def toString: String = "pclsListPage"
 }

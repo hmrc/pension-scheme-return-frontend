@@ -21,17 +21,36 @@ import controllers.nonsipp.memberreceivedpcls.PclsMemberListController._
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.{NameDOB, NormalMode, UserAnswers}
+import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
 import pages.nonsipp.memberreceivedpcls.PclsMemberListPage
+import play.api.inject.bind
+import play.api.inject.guice.GuiceableModule
+import services.PsrSubmissionService
 import views.html.TwoColumnsTripleAction
+
+import scala.concurrent.Future
 
 class PclsMemberListControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoad = routes.PclsMemberListController.onPageLoad(srn, page = 1, NormalMode)
   private lazy val onSubmit = routes.PclsMemberListController.onSubmit(srn, page = 1, NormalMode)
 
-  val userAnswers = defaultUserAnswers.unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+  private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
+
+  override protected val additionalBindings: List[GuiceableModule] = List(
+    bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
+  )
+
+  override protected def beforeEach(): Unit = {
+    reset(mockPsrSubmissionService)
+    when(mockPsrSubmissionService.submitPsrDetails(any())(any(), any(), any()))
+      .thenReturn(Future.successful(Some(())))
+  }
+
+  private val userAnswers: UserAnswers =
+    defaultUserAnswers.unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
 
   "PclsMemberListController" - {
 
@@ -56,7 +75,7 @@ class PclsMemberListControllerSpec extends ControllerBaseSpec {
 
         injected[TwoColumnsTripleAction]
           .apply(
-            form(injected[YesNoPageFormProvider]),
+            form(injected[YesNoPageFormProvider]).fill(true),
             viewModel(
               srn,
               page = 1,
@@ -67,8 +86,19 @@ class PclsMemberListControllerSpec extends ControllerBaseSpec {
           )
     })
 
-    act.like(redirectNextPage(onSubmit, userAnswers, "value" -> "true"))
-    act.like(redirectNextPage(onSubmit, userAnswers, "value" -> "false"))
+    act.like(
+      redirectNextPage(onSubmit, "value" -> "true")
+        .after({
+          verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any())(any(), any(), any())
+        })
+    )
+
+    act.like(
+      redirectNextPage(onSubmit, "value" -> "false")
+        .after({
+          verify(mockPsrSubmissionService, never).submitPsrDetails(any())(any(), any(), any())
+        })
+    )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 

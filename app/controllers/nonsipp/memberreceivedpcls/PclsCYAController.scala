@@ -27,20 +27,24 @@ import pages.nonsipp.memberdetails.MemberDetailsPage
 import pages.nonsipp.memberreceivedpcls.{PclsCYAPage, PensionCommencementLumpSumAmountPage}
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.PsrSubmissionService
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
 import viewmodels.models._
 import views.html.CheckYourAnswersView
 
 import javax.inject.{Inject, Named}
+import scala.concurrent.ExecutionContext
 
 class PclsCYAController @Inject()(
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
-  view: CheckYourAnswersView
-) extends PSRController {
+  view: CheckYourAnswersView,
+  psrSubmissionService: PsrSubmissionService
+)(implicit ec: ExecutionContext)
+    extends PSRController {
 
   def onPageLoad(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
@@ -48,7 +52,7 @@ class PclsCYAController @Inject()(
         for {
           memberDetails <- request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney
           amounts <- request.userAnswers
-            .get(PensionCommencementLumpSumAmountPage(srn, index, NormalMode))
+            .get(PensionCommencementLumpSumAmountPage(srn, index))
             .getOrRecoverJourney
         } yield {
           Ok(view(viewModel(srn, memberDetails.fullName, index, amounts, mode)))
@@ -57,10 +61,12 @@ class PclsCYAController @Inject()(
     }
 
   def onSubmit(srn: Srn, index: Max300, mode: Mode): Action[AnyContent] =
-    identifyAndRequireData(srn) { implicit request =>
-      Redirect(
-        navigator.nextPage(PclsCYAPage(srn, index), mode, request.userAnswers)
-      )
+    identifyAndRequireData(srn).async { implicit request =>
+      psrSubmissionService.submitPsrDetails(srn).map {
+        case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        case Some(_) =>
+          Redirect(navigator.nextPage(PclsCYAPage(srn, index), mode, request.userAnswers))
+      }
     }
 }
 
@@ -83,7 +89,7 @@ object PclsCYAController {
       ),
       description = None,
       page = CheckYourAnswersViewModel(
-        sections = rows(srn, memberName, index, amounts)
+        sections = rows(srn, memberName, index, amounts, mode)
       ),
       refresh = None,
       buttonText = "site.saveAndContinue",
@@ -94,7 +100,8 @@ object PclsCYAController {
     srn: Srn,
     memberName: String,
     index: Max300,
-    amounts: PensionCommencementLumpSum
+    amounts: PensionCommencementLumpSum,
+    mode: Mode
   ): List[CheckYourAnswersSection] =
     List(
       CheckYourAnswersSection(
@@ -122,7 +129,7 @@ object PclsCYAController {
             SummaryAction(
               "site.change",
               controllers.nonsipp.memberreceivedpcls.routes.PensionCommencementLumpSumAmountController
-                .onPageLoad(srn, index, CheckMode)
+                .onPageLoad(srn, index, mode)
                 .url + "#relevant"
             ).withVisuallyHiddenContent(Message("pclsCYA.rows.amount.relevant.hidden", memberName))
           )

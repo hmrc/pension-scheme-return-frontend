@@ -21,12 +21,13 @@ import controllers.nonsipp.memberreceivedpcls.PensionCommencementLumpSumControll
 import forms.YesNoPageFormProvider
 import models.Mode
 import models.SchemeId.Srn
+import models.requests.DataRequest
 import navigation.Navigator
 import pages.nonsipp.memberreceivedpcls.PensionCommencementLumpSumPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
+import services.{PsrSubmissionService, SaveService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
@@ -42,6 +43,7 @@ class PensionCommencementLumpSumController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   formProvider: YesNoPageFormProvider,
   val controllerComponents: MessagesControllerComponents,
+  psrSubmissionService: PsrSubmissionService,
   view: YesNoPageView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
@@ -64,7 +66,20 @@ class PensionCommencementLumpSumController @Inject()(
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(PensionCommencementLumpSumPage(srn), value))
             _ <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage(PensionCommencementLumpSumPage(srn), mode, updatedAnswers))
+            redirectTo <- if (value) {
+              Future.successful(Redirect(navigator.nextPage(PensionCommencementLumpSumPage(srn), mode, updatedAnswers)))
+            } else {
+              {
+                psrSubmissionService
+                  .submitPsrDetails(srn)(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
+                  .map {
+                    case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+                    case Some(_) =>
+                      Redirect(navigator.nextPage(PensionCommencementLumpSumPage(srn), mode, updatedAnswers))
+                  }
+              }
+            }
+          } yield redirectTo
       )
   }
 }
