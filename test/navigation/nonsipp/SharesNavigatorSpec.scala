@@ -25,7 +25,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
   val navigator: Navigator = new NonSippNavigator
 
-  "SharesInSponsoringEmployerNavigator" - {
+  "SharesNavigator" - {
 
     act.like(
       normalmode
@@ -35,8 +35,21 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
         )
         .withName(
-          "go from id scheme hold shares in sponsoring employer page to task list page when no selected"
+          "go from scheme hold any shares to task list page when no is selected"
         )
     )
+
+    act.like(
+      normalmode
+        .navigateToWithData(
+          DidSchemeHoldAnySharesPage,
+          Gen.const(true),
+          (srn, _) => controllers.nonsipp.shares.routes.WhatYouWillNeedSharesController.onPageLoad(srn)
+        )
+        .withName(
+          "go from scheme hold any shares to what you will need page when yes is selected"
+        )
+    )
+
   }
 }

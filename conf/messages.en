@@ -411,6 +411,31 @@ didSchemeHoldAnyShares.paragraph3 = A connected party is an individual, company 
 didSchemeHoldAnyShares.paragraph3.link = full list of connected parties (opens in new tab).
 didSchemeHoldAnyShares.legend = Did the scheme hold any of these types of shares during the period of this return?
 
+shares.whatYouWillNeed.title = Shares in a sponsoring employer, acquired from a connected party, or unquoted shares held by the scheme
+shares.whatYouWillNeed.heading = Shares in a sponsoring employer, acquired from a connected party, or unquoted shares held by {0}
+shares.whatYouWillNeed.paragraph1 = Answer these questions for one share transaction at a time. If you need to add more shares, you will be able to do this later.
+shares.whatYouWillNeed.paragraph2 = You must tell us about all shares in a sponsoring employer, unquoted shares, or any other shares acquired from a connected party held by the pension scheme at any point during the period of this return.
+shares.whatYouWillNeed.paragraph3 = For each share transaction, you need to tell us:
+shares.whatYouWillNeed.paragraph3.listItem1 = if the pension scheme holds these shares as a result of acquisition (purchase), contribution or transfer
+shares.whatYouWillNeed.paragraph3.listItem2 = the name of the company to which the shares relate
+shares.whatYouWillNeed.paragraph3.listItem3 = the company’s Company Registration Number, or why it does not have one
+shares.whatYouWillNeed.paragraph3.listItem4 = the class of the shares
+shares.whatYouWillNeed.paragraph3.listItem5 = the number of shares acquired in the transaction
+shares.whatYouWillNeed.paragraph3.listItem6 = if the shares were acquired from a connected party (for unquoted shares only)
+shares.whatYouWillNeed.paragraph3.listItem7 = the total cost or value of the shares
+shares.whatYouWillNeed.paragraph3.listItem8 = if the transaction was supported by an independent valuation
+shares.whatYouWillNeed.paragraph3.listItem9 = the total dividends or other receipts received from the shares during the period of this return
+
+shares.whatYouWillNeed.paragraph4 = If the shares are held as a result of acquisition or contribution, you need to tell us:
+shares.whatYouWillNeed.paragraph4.listItem1 = the date they were acquired or contributed
+
+shares.whatYouWillNeed.paragraph5 = If the shares are held as a result of acquisition, you also need to tell us:
+shares.whatYouWillNeed.paragraph5.listItem1 = if they were acquired from an individual, company, partnership or other
+shares.whatYouWillNeed.paragraph5.listItem2 = the seller’s name
+shares.whatYouWillNeed.paragraph5.listItem3 = the seller’s National Insurance number, Company Registration Number, Unique Taxpayer Reference or a description of the seller – whichever applies – or the reason you cannot provide it
+shares.whatYouWillNeed.paragraph5.listItem4 = the total value of the pension scheme’s assets on the date the shares were acquired (for shares held in a sponsoring employer only)
+
+
 pensionCommencementLumpSum.title = Did any member receive a pension commencement lump sum (PCLS) during the period of this return?
 pensionCommencementLumpSum.heading = Did any member receive a pension commencement lump sum (PCLS) during the period of this return?
 pensionCommencementLumpSum.error.required = Select yes if any member received a Pension Commencement Lump Sum during the period of this return

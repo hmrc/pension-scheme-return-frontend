@@ -8,3 +8,5 @@ POST        /:srn/total-value-quoted-shares                                     
 GET         /:srn/change-total-value-quoted-shares                                      controllers.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST        /:srn/change-total-value-quoted-shares                                      controllers.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
+GET         /:srn/what-you-will-need-shares                                             controllers.nonsipp.shares.WhatYouWillNeedSharesController.onPageLoad(srn: Srn)
+GET         /:srn/submit-what-you-will-need-shares                                      controllers.nonsipp.shares.WhatYouWillNeedSharesController.onSubmit(srn: Srn)
