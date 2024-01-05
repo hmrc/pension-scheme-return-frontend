@@ -24,7 +24,7 @@ import play.api.data.Forms.mapping
 
 import javax.inject.Inject
 
-class AddressLookupFormProvider @Inject()() {
+class AddressLookupFormProvider @Inject() {
 
   def apply(
     postCodeFormErrors: InputFormErrors,
@@ -32,7 +32,7 @@ class AddressLookupFormProvider @Inject()() {
   ): Form[PostcodeLookup] =
     Form(
       mapping(
-        "postcode" -> Mappings.input(postCodeFormErrors),
+        "postcode" -> Mappings.postCode(postCodeFormErrors),
         "filter" -> Mappings.optionalInput(filterFormErrors)
       )(PostcodeLookup(_, _))(a => Some((a.postcode, a.filter)))
     )
