@@ -14,44 +14,41 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.sharesacquiredfromconnectedparty
+package controllers.nonsipp.shares
 
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.sharesacquiredfromconnectedparty.SharesAcquiredFromConnectedPartyController.{form, viewModel}
+import controllers.nonsipp.shares.DidSchemeHoldAnySharesController._
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import pages.nonsipp.sharesacquiredfromconnectedparty.SharesAcquiredFromConnectedPartyPage
+import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
 import views.html.YesNoPageView
 
-class SharesAcquiredFromConnectedPartyControllerSpec extends ControllerBaseSpec {
+class DidSchemeHoldAnySharesControllerSpec extends ControllerBaseSpec {
 
-  private lazy val onPageLoad = routes.SharesAcquiredFromConnectedPartyController.onPageLoad(srn, NormalMode)
-  private lazy val onSubmit = routes.SharesAcquiredFromConnectedPartyController.onSubmit(srn, NormalMode)
-
+  private lazy val onPageLoad = routes.DidSchemeHoldAnySharesController.onPageLoad(srn, NormalMode)
+  private lazy val onSubmit = routes.DidSchemeHoldAnySharesController.onSubmit(srn, NormalMode)
   private val incomeTaxAct = "https://www.legislation.gov.uk/ukpga/2007/3/section/993"
 
-  "SharesAcquiredFromConnectedParty" - {
+  "DidSchemeHoldAnySharesController" - {
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       injected[YesNoPageView]
         .apply(form(injected[YesNoPageFormProvider]), viewModel(srn, schemeName, incomeTaxAct, NormalMode))
     })
 
-    act.like(renderPrePopView(onPageLoad, SharesAcquiredFromConnectedPartyPage(srn), true) {
-      implicit app => implicit request =>
-        injected[YesNoPageView]
-          .apply(form(injected[YesNoPageFormProvider]).fill(true), viewModel(srn, schemeName, incomeTaxAct, NormalMode))
+    act.like(renderPrePopView(onPageLoad, DidSchemeHoldAnySharesPage(srn), true) { implicit app => implicit request =>
+      injected[YesNoPageView]
+        .apply(form(injected[YesNoPageFormProvider]).fill(true), viewModel(srn, schemeName, incomeTaxAct, NormalMode))
     })
 
     act.like(redirectNextPage(onSubmit, "value" -> "true"))
     act.like(redirectNextPage(onSubmit, "value" -> "false"))
 
-    act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
+    act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
     act.like(saveAndContinue(onSubmit, "value" -> "true"))
 
     act.like(invalidForm(onSubmit))
-
-    act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit " + _))
+    act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }
 }

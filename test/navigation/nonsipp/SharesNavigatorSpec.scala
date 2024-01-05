@@ -16,37 +16,26 @@
 
 package navigation.nonsipp
 
-import controllers.routes
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.sharesacquiredfromconnectedparty.SharesAcquiredFromConnectedPartyPage
+import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
 import utils.BaseSpec
 
-class SharesAcquiredFromConnectedPartyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
+class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
   val navigator: Navigator = new NonSippNavigator
 
-  "SharesAcquiredFromConnectedPartyNavigator" - {
+  "SharesInSponsoringEmployerNavigator" - {
 
     act.like(
       normalmode
         .navigateToWithData(
-          SharesAcquiredFromConnectedPartyPage,
-          Gen.const(true),
-          (_, _) => routes.UnauthorisedController.onPageLoad()
-        )
-        .withName("go from shares acquired from connected party page to unauthorised page when yes selected")
-    )
-
-    act.like(
-      normalmode
-        .navigateToWithData(
-          SharesAcquiredFromConnectedPartyPage,
+          DidSchemeHoldAnySharesPage,
           Gen.const(false),
-          controllers.nonsipp.totalvaluequotedshares.routes.TotalValueQuotedSharesController.onPageLoad
+          (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
         )
         .withName(
-          "go from shares acquired from connected party page to total value quoted shares page when no selected"
+          "go from id scheme hold shares in sponsoring employer page to task list page when no selected"
         )
     )
   }

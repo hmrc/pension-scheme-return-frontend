@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.sharesacquiredfromconnectedparty
+package pages.nonsipp.shares
 
 import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 
-case class SharesAcquiredFromConnectedPartyPage(srn: Srn) extends QuestionPage[Boolean] {
+case class DidSchemeHoldAnySharesPage(srn: Srn) extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "sharesAcquiredFromConnectedParty"
-
+  override def toString: String = "didSchemeHoldAnyShares"
 }

@@ -34,7 +34,7 @@ import pages.nonsipp.memberdetails.{MemberDetailsNinoPages, MembersDetailsPages,
 import pages.nonsipp.moneyborrowed.{LenderNamePages, MoneyBorrowedPage, WhySchemeBorrowedMoneyPages}
 import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
 import pages.nonsipp.schemedesignatory.{FeesCommissionsWagesSalariesPage, HowManyMembersPage, HowMuchCashPage}
-import pages.nonsipp.sharesinsponsoringemployer.DidSchemeHoldSharesInSponsoringEmployerPage
+import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
 import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
 import pages.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldPage
 import viewmodels.models.TaskListStatus
@@ -326,9 +326,9 @@ object TaskListStatusUtils {
     }
 
   def getSharesTaskListStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
-    val hadSharesPage = userAnswers.get(DidSchemeHoldSharesInSponsoringEmployerPage(srn))
+    val hadSharesPage = userAnswers.get(DidSchemeHoldAnySharesPage(srn))
     val defaultLink =
-      controllers.nonsipp.sharesinsponsoringemployer.routes.DidSchemeHoldSharesInSponsoringEmployerController
+      controllers.nonsipp.shares.routes.DidSchemeHoldAnySharesController
         .onPageLoad(srn, NormalMode)
         .url
     hadSharesPage match {

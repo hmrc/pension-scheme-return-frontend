@@ -399,9 +399,17 @@ loansMadeOrOutstanding.title = Did the scheme make any loans, or have any loans 
 loansMadeOrOutstanding.heading = Did {0} make any loans, or have any loans outstanding, during the period of this return?
 loansMadeOrOutstanding.error.required = Select yes if the scheme made any loans, or had any loans outstanding, during the period of this return
 
-didSchemeHoldSharesInSponsoringEmployer.title = Did the scheme hold any shares in a sponsoring employer during the period of this return?
-didSchemeHoldSharesInSponsoringEmployer.heading = Did {0} hold any shares in a sponsoring employer during the period of this return?
-didSchemeHoldSharesInSponsoringEmployer.error.required = Select yes if the scheme held any shares in a sponsoring employer during the period of this return
+didSchemeHoldAnyShares.title = Tell us if the scheme held any shares in a sponsoring employer, acquired from a connected party, or unquoted shares
+didSchemeHoldAnyShares.heading = Tell us if {0} held any shares in a sponsoring employer, acquired from a connected party, or unquoted shares
+didSchemeHoldAnyShares.error.required = Select yes if the scheme held any of these types of shares during the period of this return
+didSchemeHoldAnyShares.paragraph1 = You must tell us if the scheme held any of these types of shares at any point during the period of this return:
+didSchemeHoldAnyShares.listItem1 = shares in a sponsoring employer
+didSchemeHoldAnyShares.listItem2 = unquoted shares
+didSchemeHoldAnyShares.listItem3 = any other shares acquired from a connected party
+didSchemeHoldAnyShares.paragraph2 = Unquoted shares are those in companies not listed by a recognised stock exchange.
+didSchemeHoldAnyShares.paragraph3 = A connected party is an individual, company or partnership that is connected to either a member of the scheme or the sponsoring employer of the scheme. See a
+didSchemeHoldAnyShares.paragraph3.link = full list of connected parties (opens in new tab).
+didSchemeHoldAnyShares.legend = Did the scheme hold any of these types of shares during the period of this return?
 
 pensionCommencementLumpSum.title = Did any member receive a pension commencement lump sum (PCLS) during the period of this return?
 pensionCommencementLumpSum.heading = Did any member receive a pension commencement lump sum (PCLS) during the period of this return?
@@ -520,21 +528,6 @@ checkMemberDetailsFile.legend = Is this file correct?
 checkMemberDetailsFile.yes = Yes, add this file to my return
 checkMemberDetailsFile.no = No, I want to select a different file
 checkMemberDetailsFile.error.required = Select yes if you want to add this file to your return
-
-sharesAcquiredFromConnectedParty.title = Did the scheme hold any shares acquired from a connected party during the period of this return?
-sharesAcquiredFromConnectedParty.heading = Did {0} hold any shares acquired from a connected party during the period of this return?
-sharesAcquiredFromConnectedParty.error.required = Select yes if the scheme held any shares acquired from a connected party during the period of this return
-sharesAcquiredFromConnectedParty.hint = This should not include any shares in a sponsoring employer or unquoted shares. If your scheme holds any of these shares, report them in the relevant section of this pension scheme return.
-sharesAcquiredFromConnectedParty.details.paragraph1 = A connected party is an individual, company or partnership that is connected to either a member of the scheme or the sponsoring employer of the scheme.
-sharesAcquiredFromConnectedParty.details.paragraph2 = A connected party of a member is usually their spouse, civil partner or close relative (for example their parent, sibling, child or grandchild). A connected party of a sponsoring employer can be someone who has control over the company; it can also be another company, where the same person has control of both.
-sharesAcquiredFromConnectedParty.details.paragraph3 = There are other circumstances where an individual, company or partnership might be a connected party. You can read a full list in
-sharesAcquiredFromConnectedParty.detailsComponentTitle = What is a connected party?
-sharesAcquiredFromConnectedParty.details.paragraph3.link = Section 993 of the Income Tax Act 2007.
-
-unquotedShares.title = Did the scheme hold any unquoted shares during the period of this return?
-unquotedShares.heading = Did {0} hold any unquoted shares during the period of this return?
-unquotedShares.hint = Unquoted shares are those in companies not listed by a recognised stock exchange.
-unquotedShares.error.required = Select yes if the scheme held any unquoted shares during the period of this return
 
 checkingMemberDetailsFile.title = We are checking your member details file
 checkingMemberDetailsFile.heading = We are checking your member details file
