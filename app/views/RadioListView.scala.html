@@ -39,6 +39,10 @@
 
         <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
 
+        @if(viewmodel.page.hint.nonEmpty) {
+            <div class="govuk-hint">@viewmodel.page.hint.map(renderMessage)</div>
+        }
+
         @viewmodel.description.map(renderMessage)
 
         @govukRadios(

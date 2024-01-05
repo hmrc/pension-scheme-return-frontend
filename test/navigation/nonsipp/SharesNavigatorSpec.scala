@@ -16,14 +16,18 @@
 
 package navigation.nonsipp
 
+import config.Refined.OneTo5000
+import eu.timepit.refined.refineMV
+import models.NormalMode
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
+import pages.nonsipp.shares.{DidSchemeHoldAnySharesPage, WhatYouWillNeedSharesPage}
 import utils.BaseSpec
 
 class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
   val navigator: Navigator = new NonSippNavigator
+  private val index = refineMV[OneTo5000](1)
 
   "SharesNavigator" - {
 
@@ -48,6 +52,17 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         )
         .withName(
           "go from scheme hold any shares to what you will need page when yes is selected"
+        )
+    )
+
+    act.like(
+      normalmode
+        .navigateTo(
+          WhatYouWillNeedSharesPage,
+          (srn, _) => controllers.nonsipp.shares.routes.TypeOfSharesHeldController.onPageLoad(srn, index, NormalMode)
+        )
+        .withName(
+          "go from WhatYouWillNeedSharesPage to type of shares page"
         )
     )
 

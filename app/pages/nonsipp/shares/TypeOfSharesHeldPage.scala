@@ -16,13 +16,17 @@
 
 package pages.nonsipp.shares
 
+import config.Refined.Max5000
 import models.SchemeId.Srn
+import models.TypeOfShares
 import pages.QuestionPage
 import play.api.libs.json.JsPath
+import utils.RefinedUtils.RefinedIntOps
 
-case class DidSchemeHoldAnySharesPage(srn: Srn) extends QuestionPage[Boolean] {
+case class TypeOfSharesHeldPage(srn: Srn, index: Max5000) extends QuestionPage[TypeOfShares] {
 
-  override def path: JsPath = Paths.shares \ toString
+  override def path: JsPath =
+    Paths.shareTransactions \ toString \ index.arrayIndex.toString
 
-  override def toString: String = "didSchemeHoldAnyShares"
+  override def toString: String = "typeOfSharesHeld"
 }
