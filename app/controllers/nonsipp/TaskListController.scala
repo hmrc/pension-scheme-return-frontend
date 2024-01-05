@@ -37,6 +37,7 @@ import pages.nonsipp.loansmadeoroutstanding.{
 import pages.nonsipp.membercontributions.MemberContributionsListPage
 import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsNinoPages, MembersDetailsPages, NoNinoPages}
 import pages.nonsipp.memberreceivedpcls.PclsMemberListPage
+import pages.nonsipp.membertransferout.TransfersOutJourneyStatus
 import pages.nonsipp.receivetransfer.TransfersInJourneyStatus
 import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, ValueOfAssetsPage, WhyNoBankAccountPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -313,6 +314,14 @@ object TaskListController {
           case SectionStatus.Completed => TaskListStatus.Completed
         }
 
+    val transferOutStatus: TaskListStatus =
+      userAnswers
+        .get(TransfersOutJourneyStatus(srn))
+        .fold[TaskListStatus](TaskListStatus.NotStarted) {
+          case SectionStatus.InProgress => TaskListStatus.InProgress
+          case SectionStatus.Completed => TaskListStatus.Completed
+        }
+
     val memberContributionStatus: TaskListStatus =
       userAnswers
         .get(MemberContributionsListPage(srn))
@@ -371,10 +380,10 @@ object TaskListController {
       ),
       TaskListItemViewModel(
         LinkMessage(
-          messageKey(prefix, "transfersout.title", UnableToStart),
+          messageKey(prefix, "transfersout.title", transferOutStatus),
           controllers.nonsipp.membertransferout.routes.SchemeTransferOutController.onPageLoad(srn, NormalMode).url
         ),
-        NotStarted
+        transferOutStatus
       ),
       TaskListItemViewModel(
         LinkMessage(

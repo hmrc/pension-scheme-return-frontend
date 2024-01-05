@@ -37,6 +37,7 @@ import pages.nonsipp.memberreceivedpcls.{
   PensionCommencementLumpSumAmountPage,
   PensionCommencementLumpSumPage
 }
+import pages.nonsipp.membertransferout.TransfersOutJourneyStatus
 import pages.nonsipp.receivetransfer.TransfersInJourneyStatus
 import uk.gov.hmrc.domain.Nino
 import viewmodels.models.{MemberState, SectionCompleted, SectionStatus}
@@ -46,7 +47,8 @@ import scala.util.Try
 
 @Singleton()
 class MemberPaymentsTransformer @Inject()(
-  transfersInTransformer: TransfersInTransformer
+  transfersInTransformer: TransfersInTransformer,
+  transfersOutTransformer: TransfersOutTransformer
 ) extends Transformer {
 
   def transformToEtmp(srn: Srn, userAnswers: UserAnswers): Option[MemberPayments] = {
@@ -64,12 +66,14 @@ class MemberPaymentsTransformer @Inject()(
         for {
           employerContributions <- buildEmployerContributions(srn, index, userAnswers)
           transfersIn <- transfersInTransformer.transformToEtmp(srn, index, userAnswers)
+          transfersOut <- transfersOutTransformer.transformToEtmp(srn, index, userAnswers)
         } yield MemberDetails(
           personalDetails = buildMemberPersonalDetails(srn, index, memberDetails, userAnswers),
           employerContributions = employerContributions,
           transfersIn = transfersIn,
           totalContributions = userAnswers.get(TotalMemberContributionPage(srn, index)).map(_.value),
-          memberLumpSumReceived = buildMemberLumpSumReceived(srn, index, userAnswers)
+          memberLumpSumReceived = buildMemberLumpSumReceived(srn, index, userAnswers),
+          transfersOut = transfersOut
         )
     }
 
@@ -84,6 +88,10 @@ class MemberPaymentsTransformer @Inject()(
               case SectionStatus.Completed => true
             },
             transfersInCompleted = userAnswers.get(TransfersInJourneyStatus(srn)).exists {
+              case SectionStatus.InProgress => false
+              case SectionStatus.Completed => true
+            },
+            transfersOutCompleted = userAnswers.get(TransfersOutJourneyStatus(srn)).exists {
               case SectionStatus.InProgress => false
               case SectionStatus.Completed => true
             },
@@ -119,6 +127,11 @@ class MemberPaymentsTransformer @Inject()(
                 srn,
                 index,
                 memberDetails.transfersIn,
+                memberPayments.transfersInCompleted
+              ) ++ transfersOutTransformer.transformFromEtmp(
+                srn,
+                index,
+                memberDetails.transfersOut,
                 memberPayments.transfersInCompleted
               ) ++ memberContributionsPages(
                 srn,
