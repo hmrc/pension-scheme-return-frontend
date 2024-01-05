@@ -257,6 +257,16 @@ trait Mappings extends Formatters with Constraints {
   def select(countryOptions: Seq[SelectInput], requiredKey: String, invalidKey: String): Mapping[String] =
     text(requiredKey)
       .verifying(country(countryOptions, invalidKey))
+
+  def postCode(inputFormErrors: InputFormErrors): Mapping[String] =
+    inputFormErrors.regexChecks
+      .foldLeft(text(inputFormErrors.requiredKey, inputFormErrors.args.toList)) {
+        case (mapping, (regex, key)) =>
+          mapping.verifying(verify[String](key, _.toUpperCase.matches(regex), inputFormErrors.args: _*))
+      }
+      .verifying(verify[String](inputFormErrors.max._2, _.length <= inputFormErrors.max._1, inputFormErrors.args: _*))
+      .transform[String](_.toUpperCase, _.toUpperCase)
+
 }
 
 object Mappings extends Mappings

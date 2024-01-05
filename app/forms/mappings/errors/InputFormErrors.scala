@@ -71,7 +71,7 @@ object InputFormErrors {
     invalidCharactersKey: String,
     invalidFormatKey: String,
     args: Any*
-  ) =
+  ): InputFormErrors =
     InputFormErrors(
       requiredKey,
       List(
