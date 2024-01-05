@@ -27,7 +27,11 @@ object SharesNavigator extends JourneyNavigator {
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
 
     case page @ DidSchemeHoldAnySharesPage(srn) =>
-      controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
+      if (userAnswers.get(page).contains(true)) {
+        controllers.nonsipp.shares.routes.WhatYouWillNeedSharesController.onPageLoad(srn)
+      } else {
+        controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
+      }
   }
 
   val checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] = _ => _ => PartialFunction.empty
