@@ -16,10 +16,14 @@
 
 package navigation.nonsipp
 
-import models.UserAnswers
+import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.memberpensionpayments.{PensionPaymentsReceivedPage, WhatYouWillNeedPensionPaymentsPage}
+import pages.nonsipp.memberpensionpayments.{
+  MemberPensionPaymentsListPage,
+  PensionPaymentsReceivedPage,
+  WhatYouWillNeedPensionPaymentsPage
+}
 import play.api.mvc.Call
 
 object PensionPaymentsReceivedNavigator extends JourneyNavigator {
@@ -33,7 +37,11 @@ object PensionPaymentsReceivedNavigator extends JourneyNavigator {
       }
 
     case WhatYouWillNeedPensionPaymentsPage(srn) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+      controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsListController
+        .onPageLoad(srn, page = 1, NormalMode)
+
+    case MemberPensionPaymentsListPage(srn) =>
+      controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
 
   }
 

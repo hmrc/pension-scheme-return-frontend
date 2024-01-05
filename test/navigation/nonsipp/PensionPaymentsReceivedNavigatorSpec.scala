@@ -16,6 +16,7 @@
 
 package navigation.nonsipp
 
+import models.NormalMode
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.memberpensionpayments.{PensionPaymentsReceivedPage, WhatYouWillNeedPensionPaymentsPage}
@@ -55,9 +56,11 @@ class PensionPaymentsReceivedNavigatorSpec extends BaseSpec with NavigatorBehavi
       normalmode
         .navigateTo(
           WhatYouWillNeedPensionPaymentsPage,
-          (_, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          (srn, _) =>
+            controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsListController
+              .onPageLoad(srn, page = 1, NormalMode)
         )
-        .withName("go from what you will need pension payments page to unauthorised page")
+        .withName("go from what you will need pension payments page to member pension payments list page")
     )
 
   }
