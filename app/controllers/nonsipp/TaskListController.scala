@@ -397,7 +397,7 @@ object TaskListController {
       TaskListItemViewModel(
         LinkMessage(
           messageKey(prefix, "surrenderedbenefits.title", UnableToStart),
-          controllers.nonsipp.membersurrenderedbenefits.routes.BenefitsSurrenderedController
+          controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsController
             .onPageLoad(srn, NormalMode)
             .url
         ),
