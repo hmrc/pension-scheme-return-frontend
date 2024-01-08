@@ -20,16 +20,15 @@ import cats.implicits.catsSyntaxApplicativeId
 import com.google.inject.Inject
 import config.Constants
 import config.Constants.maxSchemeMembers
-import config.Refined.{Max300, OneTo300}
+import config.Refined.Max300
 import controllers.PSRController
 import controllers.actions._
 import controllers.nonsipp.memberdetails.SchemeMembersListController._
-import eu.timepit.refined._
 import forms.YesNoPageFormProvider
 import models.CheckOrChange.Change
 import models.SchemeId.Srn
 import models.requests.DataRequest
-import models.{ManualOrUpload, Mode, NameDOB, Pagination}
+import models.{ManualOrUpload, Mode, Pagination}
 import navigation.Navigator
 import pages.nonsipp.memberdetails.MemberStatusImplicits.MembersStatusOps
 import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
@@ -61,7 +60,7 @@ class SchemeMembersListController @Inject()(
 
   private val logger: Logger = Logger(classOf[SchemeMembersListController])
 
-  private def form(manualOrUpload: ManualOrUpload, maxNumberReached: Boolean = false): Form[Boolean] =
+  private def form(manualOrUpload: ManualOrUpload, maxNumberReached: Boolean): Form[Boolean] =
     SchemeMembersListController.form(formProvider, manualOrUpload, maxNumberReached)
 
   def onPageLoad(srn: Srn, page: Int, manualOrUpload: ManualOrUpload, mode: Mode): Action[AnyContent] =
@@ -71,12 +70,13 @@ class SchemeMembersListController @Inject()(
         logger.error(s"no members found")
         Redirect(routes.PensionSchemeMembersController.onPageLoad(srn))
       } else {
-        filterDeletedMembers(srn).map { filteredMembers =>
-          val memberNames = filteredMembers.map { case (_, details, _) => details.fullName }
+
+        val listOfFullName = membersDetails.map(_.fullName)
+        filterDeletedMembers(listOfFullName, srn).map { filteredMembers =>
           Ok(
             view(
               form(manualOrUpload, filteredMembers.size >= maxSchemeMembers),
-              viewModel(srn, page, manualOrUpload, mode, memberNames)
+              viewModel(srn, page, manualOrUpload, mode, filteredMembers)
             )
           )
         }.merge
@@ -86,27 +86,32 @@ class SchemeMembersListController @Inject()(
   def onSubmit(srn: Srn, page: Int, manualOrUpload: ManualOrUpload, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       val membersDetails = request.userAnswers.membersDetails(srn)
-      form(manualOrUpload, membersDetails.size >= maxSchemeMembers)
+      val lengthOfMembersDetails = membersDetails.length
+      val listOfFullName = membersDetails.map(_.fullName)
+
+      form(manualOrUpload, lengthOfMembersDetails >= maxSchemeMembers)
         .bindFromRequest()
         .fold(
           formWithErrors => {
-            filterDeletedMembers(srn).map { filteredMembers =>
-              val memberNames = filteredMembers.map { case (_, details, _) => details.fullName }
+            filterDeletedMembers(listOfFullName, srn).map { filteredMembers =>
               BadRequest(
                 view(
                   formWithErrors,
-                  viewModel(srn, page, manualOrUpload, mode, memberNames)
+                  viewModel(srn, page, manualOrUpload, mode, filteredMembers)
                 )
               )
             }
           }.merge.pure[Future],
           value => {
-            if (membersDetails.size == maxSchemeMembers && value) {
+            if (lengthOfMembersDetails == maxSchemeMembers && value) {
               Future.successful(Redirect(routes.HowToUploadController.onPageLoad(srn)))
             } else {
               for {
-                _ <- if (!value) psrSubmissionService.submitPsrDetails(srn, request.userAnswers)
-                else Future.successful(Some(()))
+                _ <- if (!value) {
+                  psrSubmissionService.submitPsrDetails(srn, request.userAnswers)
+                } else {
+                  Future.successful(Some(()))
+                }
               } yield Redirect(
                 navigator.nextPage(SchemeMembersListPage(srn, value, manualOrUpload), mode, request.userAnswers)
               )
@@ -117,14 +122,15 @@ class SchemeMembersListController @Inject()(
 
   // merges member details with member states and filters out any soft deleted members
   private def filterDeletedMembers(
+    nameList: List[String],
     srn: Srn
-  )(implicit request: DataRequest[_]): Either[Result, List[(Max300, NameDOB, MemberState)]] = {
+  )(implicit request: DataRequest[_]): Either[Result, List[(Max300, String, MemberState)]] = {
+
     val maybeMembersDetails =
-      request.userAnswers
-        .membersDetails(srn)
-        .zipWithIndexToMap
+      nameList.zipWithIndexToMap
         .mapKeysToIndex[Max300.Refined]
         .getOrRecoverJourney
+
     val maybeMemberStates = request.userAnswers.memberStates(srn).mapKeysToIndex[Max300.Refined].getOrRecoverJourney
 
     maybeMembersDetails.flatMap { membersDetails =>
@@ -135,9 +141,9 @@ class SchemeMembersListController @Inject()(
           )
           Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
         } else {
-          val sortedMemberDetails = membersDetails.sort { case (a, b) => a.value.max(b.value) }
-          val sortedMemberStates = memberStates.sort { case (a, b) => a.value.max(b.value) }
-          val zippedMembers: List[((Max300, NameDOB), (Max300, MemberState))] =
+          val sortedMemberDetails = membersDetails.sort({ Ordering.by(_.value) })
+          val sortedMemberStates = memberStates.sort { Ordering.by(_.value) }
+          val zippedMembers: List[((Max300, String), (Max300, MemberState))] =
             sortedMemberDetails.zip(sortedMemberStates).toList
           val memberWithStates = zippedMembers.collect {
             case ((i1, details), (i2, state)) if i1.value == i2.value => Some((i1, details, state))
@@ -175,30 +181,29 @@ object SchemeMembersListController {
     page: Int,
     manualOrUpload: ManualOrUpload,
     mode: Mode,
-    memberNames: List[String]
+    filteredMembers: List[(Max300, String, MemberState)]
   ): FormPageViewModel[ListViewModel] = {
 
-    val rows: List[ListRow] = memberNames.zipWithIndex.flatMap {
-      case (memberName, index) =>
-        refineV[OneTo300](index + 1) match {
-          case Left(_) => Nil
-          case Right(nextIndex) =>
-            List(
-              ListRow(
-                memberName,
-                changeUrl = routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, nextIndex, Change).url,
-                changeHiddenText = Message("schemeMembersList.change.hidden", memberName),
-                removeUrl = routes.RemoveMemberDetailsController.onPageLoad(srn, nextIndex, mode).url,
-                removeHiddenText = Message("schemeMembersList.remove.hidden", memberName)
-              )
-            )
-        }
-    }
+    val lengthOfFilteredMembers = filteredMembers.length
 
-    val titleKey =
-      if (memberNames.length > 1) "schemeMembersList.title.plural" else "schemeMembersList.title"
-    val headingKey =
-      if (memberNames.length > 1) "schemeMembersList.heading.plural" else "schemeMembersList.heading"
+    val rows: List[ListRow] = filteredMembers
+      .sortBy(_._2)
+      .map {
+        case (index, memberFullName, _) =>
+          ListRow(
+            memberFullName,
+            changeUrl = routes.SchemeMemberDetailsAnswersController.onPageLoad(srn, index, Change).url,
+            changeHiddenText = Message("schemeMembersList.change.hidden", memberFullName),
+            removeUrl = routes.RemoveMemberDetailsController.onPageLoad(srn, index, mode).url,
+            removeHiddenText = Message("schemeMembersList.remove.hidden", memberFullName)
+          )
+      }
+
+    val (title, heading) = if (lengthOfFilteredMembers > 1) {
+      ("schemeMembersList.title.plural", "schemeMembersList.heading.plural")
+    } else {
+      ("schemeMembersList.title", "schemeMembersList.heading")
+    }
 
     val pagination = Pagination(
       currentPage = page,
@@ -210,27 +215,26 @@ object SchemeMembersListController {
     val radioText = manualOrUpload.fold(
       upload = "membersUploaded.radio",
       manual =
-        if (memberNames.length < Constants.maxSchemeMembers) "schemeMembersList.radio" else "membersUploaded.radio"
+        if (lengthOfFilteredMembers < Constants.maxSchemeMembers) "schemeMembersList.radio" else "membersUploaded.radio"
     )
     val yesHintText = manualOrUpload.fold(
       upload = Some(Message("membersUploaded.radio.yes.hint")),
-      manual =
-        if (memberNames.length < Constants.maxSchemeMembers) None else Some(Message("membersUploaded.radio.yes.hint"))
+      manual = if (lengthOfFilteredMembers < Constants.maxSchemeMembers) {
+        None
+      } else {
+        Some(Message("membersUploaded.radio.yes.hint"))
+      }
     )
 
     FormPageViewModel(
-      Message(titleKey, memberNames.length),
-      Message(headingKey, memberNames.length),
+      Message(title, lengthOfFilteredMembers),
+      Message(heading, lengthOfFilteredMembers),
       ListViewModel(
         inset = "schemeMembersList.inset",
         rows,
         radioText,
-        showRadios = if (memberNames.length < Constants.maxSchemeMembers) {
-          memberNames.length < Constants.maxSchemeMembers
-        } else {
-          true
-        },
-        showInsetWithRadios = memberNames.length == Constants.maxSchemeMembers,
+        showRadios = lengthOfFilteredMembers < Constants.maxSchemeMembers,
+        showInsetWithRadios = lengthOfFilteredMembers == Constants.maxSchemeMembers,
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(

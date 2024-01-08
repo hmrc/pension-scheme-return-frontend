@@ -24,7 +24,7 @@ import scala.collection.immutable.SortedMap
 
 object MapUtils {
   implicit class MapOps[A, B](m: Map[A, B]) {
-    def sort(f: (A, A) => Int): SortedMap[A, B] = SortedMap.from[A, B](m.toList)(f(_, _))
+    def sort(implicit refinedOrdering: Ordering[A]): SortedMap[A, B] = SortedMap.from[A, B](m.toList)
   }
 
   implicit class UserAnswersMapOps[A](m: Map[String, A]) {

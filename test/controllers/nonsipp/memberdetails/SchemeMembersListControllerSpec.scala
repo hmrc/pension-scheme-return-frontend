@@ -24,15 +24,17 @@ import forms.YesNoPageFormProvider
 import models.ManualOrUpload.{Manual, Upload}
 import models.NormalMode
 import pages.nonsipp.memberdetails.{MemberDetailsPage, MemberStatus}
+import play.api.mvc.Call
 import viewmodels.models.MemberState
+import viewmodels.models.MemberState.Active
 import views.html.ListView
 
 class SchemeMembersListControllerSpec extends ControllerBaseSpec {
 
-  lazy val onPageLoadManual = routes.SchemeMembersListController.onPageLoad(srn, 1, Manual)
-  lazy val onPageLoadUpload = routes.SchemeMembersListController.onPageLoad(srn, 1, Upload)
-  lazy val onSubmitManual = routes.SchemeMembersListController.onSubmit(srn, 1, Manual)
-  lazy val onSubmitUpload = routes.SchemeMembersListController.onSubmit(srn, 1, Upload)
+  lazy val onPageLoadManual: Call = routes.SchemeMembersListController.onPageLoad(srn, 1, Manual)
+  lazy val onPageLoadUpload: Call = routes.SchemeMembersListController.onPageLoad(srn, 1, Upload)
+  lazy val onSubmitManual: Call = routes.SchemeMembersListController.onSubmit(srn, 1, Manual)
+  lazy val onSubmitUpload: Call = routes.SchemeMembersListController.onSubmit(srn, 1, Upload)
 
   private val userAnswersWithMembersDetails = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
@@ -53,7 +55,7 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
             implicit request =>
               injected[ListView].apply(
                 form(injected[YesNoPageFormProvider], Manual),
-                viewModel(srn, 1, Manual, NormalMode, List(memberDetails.fullName))
+                viewModel(srn, 1, Manual, NormalMode, List((refineMV(1), memberDetails.fullName, Active)))
               )
         )
       )
@@ -100,7 +102,7 @@ class SchemeMembersListControllerSpec extends ControllerBaseSpec {
             implicit request =>
               injected[ListView].apply(
                 form(injected[YesNoPageFormProvider], Upload),
-                viewModel(srn, 1, Upload, NormalMode, List(memberDetails.fullName))
+                viewModel(srn, 1, Upload, NormalMode, List((refineMV(1), memberDetails.fullName, Active)))
               )
         )
       )
