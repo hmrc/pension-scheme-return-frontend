@@ -23,7 +23,7 @@ import config.Refined.OneTo300
 import controllers.PSRController
 import controllers.actions._
 import eu.timepit.refined.api.Refined
-import eu.timepit.refined.{refineMV, refineV}
+import eu.timepit.refined.refineV
 import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
 import models._
@@ -49,7 +49,7 @@ class MemberPensionPaymentsListController @Inject()(
   formProvider: YesNoPageFormProvider
 ) extends PSRController {
 
-  val form = MemberPensionPaymentsListController.form(formProvider)
+  private val form = MemberPensionPaymentsListController.form(formProvider)
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
@@ -142,7 +142,7 @@ object MemberPensionPaymentsListController {
 
     val pagination = Pagination(
       currentPage = page,
-      pageSize = Constants.landOrPropertiesSize,
+      pageSize = Constants.memberPensionPayments,
       memberList.size,
       controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsListController
         .onPageLoad(srn, _, NormalMode)
@@ -190,7 +190,7 @@ object MemberPensionPaymentsListController {
   ): List[TableElem] =
     List(
       TableElem(
-        "Pension payments reported"
+        "memberPensionPayments.memberList.pensionPaymentsReported"
       ),
       TableElem(
         LinkMessage(
@@ -217,7 +217,7 @@ object MemberPensionPaymentsListController {
   ): List[TableElem] =
     List(
       TableElem(
-        "No pension payments"
+        "memberPensionPayments.memberList.noPensionPayments"
       ),
       TableElem(
         LinkMessage(
