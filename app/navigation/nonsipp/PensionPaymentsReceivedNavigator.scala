@@ -22,6 +22,7 @@ import pages.Page
 import pages.nonsipp.memberpensionpayments.{
   MemberPensionPaymentsListPage,
   PensionPaymentsReceivedPage,
+  TotalAmountPensionPaymentsPage,
   WhatYouWillNeedPensionPaymentsPage
 }
 import play.api.mvc.Call
@@ -42,6 +43,9 @@ object PensionPaymentsReceivedNavigator extends JourneyNavigator {
 
     case MemberPensionPaymentsListPage(srn) =>
       controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
+
+    case TotalAmountPensionPaymentsPage(srn, index) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
 
   }
 

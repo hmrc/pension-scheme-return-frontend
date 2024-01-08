@@ -2015,3 +2015,9 @@ memberPensionPayments.memberList.radios.error.required = Select yes if you have 
 memberPensionPayments.memberList.pagination.label = Showing {0} - {1} of {2} members
 memberPensionPayments.memberList.pensionPaymentsReported = Pension payments reported
 memberPensionPayments.memberList.noPensionPayments = No pension payments
+
+totalAmountPensionPayments.title = What was the total amount of pension payments received by the member during the period of this return, in pounds and pence?
+totalAmountPensionPayments.heading = What was the total amount of pension payments received by {0} during the period of this return, in pounds and pence?
+totalAmountPensionPayments.error.required = Enter the total amount of pension payments, in pounds and pence
+totalAmountPensionPayments.error.invalid = Total amount of pension payments must be an amount of money, like 123 or 123.45
+totalAmountPensionPayments.error.tooLarge = Total amount of pension payments must be 999999999.99 or less
