@@ -2003,3 +2003,15 @@ whatYouWillNeed.pensionPayments.heading = Pension payments for members of {0}
 whatYouWillNeed.pensionPayments.paragraph1 = You must tell us about all pension payments received by members of the scheme during the period of this return.
 whatYouWillNeed.pensionPayments.paragraph2 = If a member received pension payments, you must tell us the total amount they received.
 whatYouWillNeed.pensionPayments.paragraph3 = On the next page, you will be able to select a member from a list of those whose details you have already provided. If you want to add a new member, you will need to provide their details using the ‘member details’ section of this pension scheme return.
+
+memberPensionPayments.memberList.title = Select a member to report pension payments
+memberPensionPayments.memberList.title.plural = Select a member to report pension payments
+memberPensionPayments.memberList.heading = Select a member to report pension payments
+memberPensionPayments.memberList.heading.plural = Select a member to report pension payments
+memberPensionPayments.memberList.paragraphOne = You must tell us about all pension payments received by members of the scheme during the period of this return.
+memberPensionPayments.memberList.paragraphTwo = If you need to add a new member, go to the ‘Change details of members’ section of this return.
+memberPensionPayments.memberList.radios = Have you finished reporting pension payments?
+memberPensionPayments.memberList.radios.error.required = Select yes if you have finished reporting pension payments
+memberPensionPayments.memberList.pagination.label = Showing {0} - {1} of {2} members
+memberPensionPayments.memberList.pensionPaymentsReported = Pension payments reported
+memberPensionPayments.memberList.noPensionPayments = No pension payments
