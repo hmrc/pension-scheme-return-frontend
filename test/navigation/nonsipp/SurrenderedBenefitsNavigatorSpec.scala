@@ -17,6 +17,7 @@
 package navigation.nonsipp
 
 import controllers.routes
+import models.NormalMode
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.membersurrenderedbenefits._
@@ -60,9 +61,23 @@ class SurrenderedBenefitsNavigatorSpec extends BaseSpec with NavigatorBehaviours
         normalmode
           .navigateTo(
             WhatYouWillNeedSurrenderedBenefitsPage,
-            (_, _) => routes.UnauthorisedController.onPageLoad()
+            (srn, _) =>
+              controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsMemberListController
+                .onPageLoad(srn, 1, NormalMode)
           )
           .withName("go from What You Will Need page to Surrendered Benefits Member List page")
+      )
+    }
+
+    "SurrenderedBenefitsMemberListPage" - {
+
+      act.like(
+        normalmode
+          .navigateTo(
+            SurrenderedBenefitsMemberListPage,
+            (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
+          )
+          .withName("go from Surrendered Benefits Member List page to Task List page")
       )
     }
   }

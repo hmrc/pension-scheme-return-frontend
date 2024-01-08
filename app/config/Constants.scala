@@ -43,6 +43,7 @@ object Constants {
   val transferInListSize = 25
   val transferOutListSize = 25
   val pclsInListSize = 25
+  val surrenderedBenefitsListSize = 25
   val employerContributionsMemberListSize = 25
   val employerContributionsCYASize = 5
   val memberPensionPayments = 25

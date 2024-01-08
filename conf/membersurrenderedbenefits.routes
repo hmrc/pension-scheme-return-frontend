@@ -5,3 +5,10 @@ POST        /:srn/change-benefits-surrendered                                   
 
 GET         /:srn/what-you-will-need-surrendered-benefits                               controllers.nonsipp.membersurrenderedbenefits.WhatYouWillNeedSurrenderedBenefitsController.onPageLoad(srn: Srn)
 GET         /:srn/submit-what-you-will-need-surrendered-benefits                        controllers.nonsipp.membersurrenderedbenefits.WhatYouWillNeedSurrenderedBenefitsController.onSubmit(srn: Srn)
+
+GET         /:srn/select-member-surrendered-benefits                                    controllers.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsMemberListController.onPageLoad(srn: Srn, page: Int = 1, mode: Mode = NormalMode)
+GET         /:srn/select-member-surrendered-benefits/:page                              controllers.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsMemberListController.onPageLoad(srn: Srn, page: Int, mode: Mode = NormalMode)
+POST        /:srn/select-member-surrendered-benefits/:page                              controllers.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsMemberListController.onSubmit(srn: Srn, page: Int, mode: Mode = NormalMode)
+GET         /:srn/change-select-member-surrendered-benefits                             controllers.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsMemberListController.onPageLoad(srn: Srn, page: Int = 1, mode: Mode = CheckMode)
+GET         /:srn/change-select-member-surrendered-benefits/:page                       controllers.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsMemberListController.onPageLoad(srn: Srn, page: Int, mode: Mode = CheckMode)
+POST        /:srn/change-select-member-surrendered-benefits/:page                       controllers.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsMemberListController.onSubmit(srn: Srn, page: Int, mode: Mode = CheckMode)
