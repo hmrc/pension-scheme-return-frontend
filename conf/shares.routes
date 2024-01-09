@@ -16,7 +16,12 @@ POST        /:srn/which-shares-held-transaction/:index                          
 GET         /:srn/change-which-shares-held-transaction/:index                           controllers.nonsipp.shares.TypeOfSharesHeldController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 POST        /:srn/change-which-shares-held-transaction/:index                           controllers.nonsipp.shares.TypeOfSharesHeldController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 
-GET         /:srn/why-does-scheme-hold-shares/:index                                  controllers.nonsipp.shares.WhyDoesSchemeHoldSharesController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
-POST        /:srn/why-does-scheme-hold-shares/:index                                  controllers.nonsipp.shares.WhyDoesSchemeHoldSharesController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
-GET         /:srn/change-why-does-scheme-hold-sharesn/:index                           controllers.nonsipp.shares.WhyDoesSchemeHoldSharesController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
-POST        /:srn/change-why-does-scheme-hold-shares/:index                           controllers.nonsipp.shares.WhyDoesSchemeHoldSharesController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+GET         /:srn/why-does-scheme-hold-shares/:index                                    controllers.nonsipp.shares.WhyDoesSchemeHoldSharesController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/why-does-scheme-hold-shares/:index                                    controllers.nonsipp.shares.WhyDoesSchemeHoldSharesController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/change-why-does-scheme-hold-shares/:index                            controllers.nonsipp.shares.WhyDoesSchemeHoldSharesController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-why-does-scheme-hold-shares/:index                             controllers.nonsipp.shares.WhyDoesSchemeHoldSharesController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET         /:srn/when-did-scheme-acquire-shares/:index                                 controllers.nonsipp.shares.WhenDidSchemeAcquireSharesController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/when-did-scheme-acquire-shares/:index                                 controllers.nonsipp.shares.WhenDidSchemeAcquireSharesController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/change-when-did-scheme-acquire-shares/:index                          controllers.nonsipp.shares.WhenDidSchemeAcquireSharesController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-when-did-scheme-acquire-shares/:index                          controllers.nonsipp.shares.WhenDidSchemeAcquireSharesController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)

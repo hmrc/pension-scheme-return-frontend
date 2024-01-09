@@ -452,6 +452,21 @@ whyDoesSchemeHoldShares.radioList1.hint = This can be a purchase.
 whyDoesSchemeHoldShares.radioList2 = Contribution by an employer or member
 whyDoesSchemeHoldShares.radioList3 = Transfer from another scheme
 
+whenDidSchemeAcquireShares.title = When did the scheme acquire these shares?
+whenDidSchemeAcquireShares.heading = When did {0} acquire these {1}?
+whenDidSchemeAcquireShares.heading.type.01 = shares in a sponsoring employer
+whenDidSchemeAcquireShares.heading.type.02 = unquoted shares
+whenDidSchemeAcquireShares.heading.type.03 = shares acquired from a connected party
+whenDidSchemeAcquireShares.dateOfAcquired.error.required.all = Enter the date the scheme acquired these shares
+whenDidSchemeAcquireShares.dateOfAcquired.error.required.day = Date the scheme acquired these shares must include a day
+whenDidSchemeAcquireShares.dateOfAcquired.error.required.month = Date the scheme acquired these shares must include a month
+whenDidSchemeAcquireShares.dateOfAcquired.error.required.year = Date the scheme acquired these shares must include a year
+whenDidSchemeAcquireShares.dateOfAcquired.error.required.two = Date the scheme acquired these shares must include a {0} and {1}
+whenDidSchemeAcquireShares.dateOfAcquired.error.invalid.date = Date the scheme acquired these shares must be a real date
+whenDidSchemeAcquireShares.dateOfAcquired.error.invalid.characters = Date the scheme acquired these shares must only include numbers 0 to 9
+whenDidSchemeAcquireShares.dateOfAcquired.error.future = Date the scheme acquired these shares must be the same as or before {0}
+whenDidSchemeAcquireShares.dateOfAcquired.error.after = Date the scheme acquired these shares must be after {0}
+
 pensionCommencementLumpSum.title = Did any member receive a pension commencement lump sum (PCLS) during the period of this return?
 pensionCommencementLumpSum.heading = Did any member receive a pension commencement lump sum (PCLS) during the period of this return?
 pensionCommencementLumpSum.error.required = Select yes if any member received a Pension Commencement Lump Sum during the period of this return
