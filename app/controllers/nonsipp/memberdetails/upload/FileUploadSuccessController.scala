@@ -86,7 +86,8 @@ class FileUploadSuccessController @Inject()(
       UserAnswers.remove(MembersDetailsPages(srn)),
       UserAnswers.remove(DoesMemberHaveNinoPages(srn)),
       UserAnswers.remove(MemberDetailsNinoPages(srn)),
-      UserAnswers.remove(NoNinoPages(srn))
+      UserAnswers.remove(NoNinoPages(srn)),
+      UserAnswers.remove(MemberStatuses(srn))
     )
 
     val insertions = memberDetails.flatMap { details =>
