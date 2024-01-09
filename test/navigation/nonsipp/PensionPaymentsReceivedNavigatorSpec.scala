@@ -16,15 +16,23 @@
 
 package navigation.nonsipp
 
+import config.Refined.Max300
+import eu.timepit.refined.refineMV
 import models.NormalMode
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.memberpensionpayments.{PensionPaymentsReceivedPage, WhatYouWillNeedPensionPaymentsPage}
+import pages.nonsipp.memberpensionpayments.{
+  PensionPaymentsReceivedPage,
+  TotalAmountPensionPaymentsPage,
+  WhatYouWillNeedPensionPaymentsPage
+}
 import utils.BaseSpec
 
 class PensionPaymentsReceivedNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
   val navigator: Navigator = new NonSippNavigator
+
+  private val index = refineMV[Max300.Refined](1)
 
   "PensionPaymentsReceivedNavigator" - {
 
@@ -63,6 +71,19 @@ class PensionPaymentsReceivedNavigatorSpec extends BaseSpec with NavigatorBehavi
         .withName("go from what you will need pension payments page to member pension payments list page")
     )
 
+  }
+
+  "TotalAmountPensionPaymentsPage" - {
+
+    act.like(
+      normalmode
+        .navigateToWithIndex(
+          index,
+          TotalAmountPensionPaymentsPage,
+          (srn, index: Max300, _) => controllers.routes.UnauthorisedController.onPageLoad()
+        )
+        .withName("go from total amount pension payments page to unauthorised page")
+    )
   }
 
 }

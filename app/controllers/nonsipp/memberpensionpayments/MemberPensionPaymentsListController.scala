@@ -23,7 +23,7 @@ import config.Refined.OneTo300
 import controllers.PSRController
 import controllers.actions._
 import eu.timepit.refined.api.Refined
-import eu.timepit.refined.refineV
+import eu.timepit.refined.{refineMV, refineV}
 import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
 import models._
@@ -222,7 +222,9 @@ object MemberPensionPaymentsListController {
       TableElem(
         LinkMessage(
           "Add",
-          controllers.routes.UnauthorisedController.onPageLoad().url
+          controllers.nonsipp.memberpensionpayments.routes.TotalAmountPensionPaymentsController
+            .onSubmit(srn, nextIndex, mode)
+            .url
         )
       ),
       TableElem("")

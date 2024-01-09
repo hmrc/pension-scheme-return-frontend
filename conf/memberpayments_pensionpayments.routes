@@ -13,3 +13,8 @@ POST        /:srn/select-member-pension-payments/:page                     contr
 GET         /:srn/change-select-member-pension-payments                    controllers.nonsipp.memberpensionpayments.MemberPensionPaymentsListController.onPageLoad(srn: Srn, page: Int = 1, mode: Mode = CheckMode)
 GET         /:srn/change-select-member-pension-payments/:page              controllers.nonsipp.memberpensionpayments.MemberPensionPaymentsListController.onPageLoad(srn: Srn, page: Int, mode: Mode = CheckMode)
 POST        /:srn/change-select-member-pension-payments/:page              controllers.nonsipp.memberpensionpayments.MemberPensionPaymentsListController.onSubmit(srn: Srn, page: Int, mode: Mode = CheckMode)
+
+GET         /:srn/total-amount-pension-payments/:index                      controllers.nonsipp.memberpensionpayments.TotalAmountPensionPaymentsController.onPageLoad(srn: Srn, index: Max300, mode: Mode = NormalMode)
+POST        /:srn/total-amount-pension-payments/:index                      controllers.nonsipp.memberpensionpayments.TotalAmountPensionPaymentsController.onSubmit(srn: Srn, index: Max300, mode: Mode = NormalMode)
+GET         /:srn/change-total-amount-pension-payments/:index               controllers.nonsipp.memberpensionpayments.TotalAmountPensionPaymentsController.onPageLoad(srn: Srn, index: Max300, mode: Mode = CheckMode)
+POST        /:srn/change-total-amount-pension-payments/:index               controllers.nonsipp.memberpensionpayments.TotalAmountPensionPaymentsController.onSubmit(srn: Srn, index: Max300, mode: Mode = CheckMode)
