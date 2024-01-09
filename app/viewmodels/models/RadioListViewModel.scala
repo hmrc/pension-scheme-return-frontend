@@ -22,8 +22,12 @@ import viewmodels.DisplayMessage.{InlineMessage, Message}
 
 case class RadioListViewModel(
   legend: Option[Message],
-  items: List[RadioListRow]
-)
+  items: List[RadioListRow],
+  hint: Option[Message] = None
+) {
+  def withHint(message: Message): RadioListViewModel =
+    copy(hint = Some(message))
+}
 
 object RadioListViewModel {
 

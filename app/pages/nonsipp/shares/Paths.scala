@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,9 @@
 
 package pages.nonsipp.shares
 
-import models.SchemeId.Srn
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import play.api.libs.json.{__, JsPath}
 
-case class DidSchemeHoldAnySharesPage(srn: Srn) extends QuestionPage[Boolean] {
-
-  override def path: JsPath = Paths.shares \ toString
-
-  override def toString: String = "didSchemeHoldAnyShares"
+object Paths {
+  val shares: JsPath = __ \ "shares"
+  val shareTransactions: JsPath = shares \ "shareTransactions"
 }

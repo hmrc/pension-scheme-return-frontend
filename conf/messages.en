@@ -425,16 +425,21 @@ shares.whatYouWillNeed.paragraph3.listItem6 = if the shares were acquired from a
 shares.whatYouWillNeed.paragraph3.listItem7 = the total cost or value of the shares
 shares.whatYouWillNeed.paragraph3.listItem8 = if the transaction was supported by an independent valuation
 shares.whatYouWillNeed.paragraph3.listItem9 = the total dividends or other receipts received from the shares during the period of this return
-
 shares.whatYouWillNeed.paragraph4 = If the shares are held as a result of acquisition or contribution, you need to tell us:
 shares.whatYouWillNeed.paragraph4.listItem1 = the date they were acquired or contributed
-
 shares.whatYouWillNeed.paragraph5 = If the shares are held as a result of acquisition, you also need to tell us:
 shares.whatYouWillNeed.paragraph5.listItem1 = if they were acquired from an individual, company, partnership or other
 shares.whatYouWillNeed.paragraph5.listItem2 = the seller’s name
 shares.whatYouWillNeed.paragraph5.listItem3 = the seller’s National Insurance number, Company Registration Number, Unique Taxpayer Reference or a description of the seller – whichever applies – or the reason you cannot provide it
 shares.whatYouWillNeed.paragraph5.listItem4 = the total value of the pension scheme’s assets on the date the shares were acquired (for shares held in a sponsoring employer only)
 
+typeOfShares.title = Which type of shares were held in this transaction?
+typeOfShares.heading = Which type of shares were held in this transaction?
+typeOfShares.hint = Answer these questions for one share transaction at a time. If you need to add more shares, you will be able to do this later.
+typeOfShares.error.required = Select the type of shares held in this transaction
+typeOfShares.radioList1 = Shares in a sponsoring employer
+typeOfShares.radioList2 = Unquoted shares
+typeOfShares.radioList3 = Any other shares acquired from a connected party
 
 pensionCommencementLumpSum.title = Did any member receive a pension commencement lump sum (PCLS) during the period of this return?
 pensionCommencementLumpSum.heading = Did any member receive a pension commencement lump sum (PCLS) during the period of this return?
