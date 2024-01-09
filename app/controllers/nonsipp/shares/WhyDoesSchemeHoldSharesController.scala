@@ -19,26 +19,27 @@ package controllers.nonsipp.shares
 import config.Refined.Max5000
 import controllers.PSRController
 import controllers.actions._
-import controllers.nonsipp.shares.TypeOfSharesHeldController._
+import controllers.nonsipp.shares.WhyDoesSchemeHoldSharesController._
 import forms.RadioListFormProvider
 import models.SchemeId.Srn
-import models.TypeOfShares.{ConnectedParty, SponsoringEmployer, Unquoted}
-import models.{Mode, TypeOfShares}
+import models.SchemeHoldShare._
+import models.{Mode, SchemeHoldShare}
 import navigation.Navigator
-import pages.nonsipp.shares.TypeOfSharesHeldPage
+import pages.nonsipp.shares.{TypeOfSharesHeldPage, WhyDoesSchemeHoldSharesPage}
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
 import utils.FormUtils.FormOps
 import viewmodels.DisplayMessage.Message
+import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, RadioListRowViewModel, RadioListViewModel}
 import views.html.RadioListView
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
-class TypeOfSharesHeldController @Inject()(
+class WhyDoesSchemeHoldSharesController @Inject()(
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -49,16 +50,18 @@ class TypeOfSharesHeldController @Inject()(
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
-  private val form = TypeOfSharesHeldController.form(formProvider)
+  private val form = WhyDoesSchemeHoldSharesController.form(formProvider)
 
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      Ok(
-        view(
-          form.fromUserAnswers(TypeOfSharesHeldPage(srn, index)),
-          viewModel(srn, index, mode)
+      request.userAnswers.get(TypeOfSharesHeldPage(srn, index)).getOrRecoverJourney { typeOfShares =>
+        Ok(
+          view(
+            form.fromUserAnswers(WhyDoesSchemeHoldSharesPage(srn, index)),
+            viewModel(srn, index, request.schemeDetails.schemeName, typeOfShares.name, mode)
+          )
         )
-      )
+      }
     }
 
   def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
@@ -67,24 +70,26 @@ class TypeOfSharesHeldController @Inject()(
         .bindFromRequest()
         .fold(
           formWithErrors =>
-            Future
-              .successful(
-                BadRequest(
-                  view(
-                    formWithErrors,
-                    viewModel(srn, index, mode)
+            request.userAnswers.get(TypeOfSharesHeldPage(srn, index)).getOrRecoverJourney { typeOfShares =>
+              Future
+                .successful(
+                  BadRequest(
+                    view(
+                      formWithErrors,
+                      viewModel(srn, index, request.schemeDetails.schemeName, typeOfShares.name, mode)
+                    )
                   )
                 )
-              ),
+            },
           answer => {
             for {
               updatedAnswers <- Future.fromTry(
-                request.userAnswers.set(TypeOfSharesHeldPage(srn, index), answer)
+                request.userAnswers.set(WhyDoesSchemeHoldSharesPage(srn, index), answer)
               )
               _ <- saveService.save(updatedAnswers)
             } yield Redirect(
               navigator.nextPage(
-                TypeOfSharesHeldPage(srn, index),
+                WhyDoesSchemeHoldSharesPage(srn, index),
                 mode,
                 updatedAnswers
               )
@@ -94,32 +99,41 @@ class TypeOfSharesHeldController @Inject()(
     }
 }
 
-object TypeOfSharesHeldController {
+object WhyDoesSchemeHoldSharesController {
 
-  def form(formProvider: RadioListFormProvider): Form[TypeOfShares] = formProvider[TypeOfShares](
-    "typeOfShares.error.required"
+  def form(formProvider: RadioListFormProvider): Form[SchemeHoldShare] = formProvider[SchemeHoldShare](
+    "whyDoesSchemeHoldShares.error.required"
   )
 
   private val radioListItems: List[RadioListRowViewModel] =
     List(
-      RadioListRowViewModel(Message("typeOfShares.radioList1"), SponsoringEmployer.name),
-      RadioListRowViewModel(Message("typeOfShares.radioList2"), Unquoted.name),
-      RadioListRowViewModel(Message("typeOfShares.radioList3"), ConnectedParty.name)
+      RadioListRowViewModel(
+        Message("whyDoesSchemeHoldShares.radioList1"),
+        Acquisition.name,
+        Message("whyDoesSchemeHoldShares.radioList1.hint")
+      ),
+      RadioListRowViewModel(Message("whyDoesSchemeHoldShares.radioList2"), Contribution.name),
+      RadioListRowViewModel(Message("whyDoesSchemeHoldShares.radioList3"), Transfer.name)
     )
 
   def viewModel(
     srn: Srn,
     index: Max5000,
+    schemeName: String,
+    typeOfShares: String,
     mode: Mode
   ): FormPageViewModel[RadioListViewModel] =
     FormPageViewModel(
-      Message("typeOfShares.title"),
-      Message("typeOfShares.heading"),
+      Message("whyDoesSchemeHoldShares.title"),
+      Message(
+        "whyDoesSchemeHoldShares.heading",
+        schemeName,
+        Message(s"whyDoesSchemeHoldShares.heading.type.$typeOfShares")
+      ),
       RadioListViewModel(
         None,
-        radioListItems,
-        hint = Some(Message("typeOfShares.hint"))
+        radioListItems
       ),
-      routes.TypeOfSharesHeldController.onSubmit(srn, index, mode)
+      routes.WhyDoesSchemeHoldSharesController.onSubmit(srn, index, mode)
     )
 }
