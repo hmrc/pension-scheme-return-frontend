@@ -18,3 +18,8 @@ GET         /:srn/total-amount-pension-payments/:index                      cont
 POST        /:srn/total-amount-pension-payments/:index                      controllers.nonsipp.memberpensionpayments.TotalAmountPensionPaymentsController.onSubmit(srn: Srn, index: Max300, mode: Mode = NormalMode)
 GET         /:srn/change-total-amount-pension-payments/:index               controllers.nonsipp.memberpensionpayments.TotalAmountPensionPaymentsController.onPageLoad(srn: Srn, index: Max300, mode: Mode = CheckMode)
 POST        /:srn/change-total-amount-pension-payments/:index               controllers.nonsipp.memberpensionpayments.TotalAmountPensionPaymentsController.onSubmit(srn: Srn, index: Max300, mode: Mode = CheckMode)
+
+GET         /:srn/check-answers-pension-payments/:index             controllers.nonsipp.memberpensionpayments.MemberPensionPaymentsCYAController.onPageLoad(srn: Srn,index: Max300, mode: Mode = NormalMode)
+POST        /:srn/submit-check-answers-pension-payments             controllers.nonsipp.memberpensionpayments.MemberPensionPaymentsCYAController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/change-pension-payments/:index                    controllers.nonsipp.memberpensionpayments.MemberPensionPaymentsCYAController.onPageLoad(srn: Srn,index: Max300, mode: Mode = CheckMode)
+POST        /:srn/submit-change-pension-payments                    controllers.nonsipp.memberpensionpayments.MemberPensionPaymentsCYAController.onSubmit(srn: Srn, mode: Mode = CheckMode)

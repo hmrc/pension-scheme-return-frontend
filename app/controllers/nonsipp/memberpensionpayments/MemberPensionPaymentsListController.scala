@@ -16,6 +16,7 @@
 
 package controllers.nonsipp.memberpensionpayments
 
+import cats.implicits.{toBifunctorOps, toTraverseOps}
 import com.google.inject.Inject
 import config.Constants
 import config.Constants.maxNotRelevant
@@ -23,22 +24,25 @@ import config.Refined.OneTo300
 import controllers.PSRController
 import controllers.actions._
 import eu.timepit.refined.api.Refined
-import eu.timepit.refined.{refineMV, refineV}
+import eu.timepit.refined.refineV
 import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
 import models._
+import models.requests.DataRequest
 import navigation.Navigator
 import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
-import pages.nonsipp.memberpensionpayments.MemberPensionPaymentsListPage
+import pages.nonsipp.memberpensionpayments.{MemberPensionPaymentsListPage, TotalAmountPensionPaymentsPage}
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.{PsrSubmissionService, SaveService}
 import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
 import viewmodels.implicits._
 import viewmodels.models.{ActionTableViewModel, FormPageViewModel, PaginatedViewModel, TableElem}
 import views.html.TwoColumnsTripleAction
 
 import javax.inject.Named
+import scala.concurrent.{ExecutionContext, Future}
 
 class MemberPensionPaymentsListController @Inject()(
   override val messagesApi: MessagesApi,
@@ -46,49 +50,113 @@ class MemberPensionPaymentsListController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   view: TwoColumnsTripleAction,
+  saveService: SaveService,
+  psrSubmissionService: PsrSubmissionService,
   formProvider: YesNoPageFormProvider
-) extends PSRController {
+)(implicit ec: ExecutionContext)
+    extends PSRController {
 
   private val form = MemberPensionPaymentsListController.form(formProvider)
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      val memberList = request.userAnswers.membersDetails(srn)
+      val userAnswers = request.userAnswers
+      val memberList = userAnswers.membersDetails(srn)
 
       if (memberList.nonEmpty) {
         val viewModel = MemberPensionPaymentsListController
-          .viewModel(srn, page, mode, memberList, request.userAnswers)
-        Ok(view(form, viewModel))
+          .viewModel(srn, page, mode, memberList, userAnswers)
+        val filledForm =
+          request.userAnswers.get(MemberPensionPaymentsListPage(srn)).fold(form)(form.fill)
+        Ok(view(filledForm, viewModel))
       } else {
         Redirect(
-          controllers.routes.UnauthorisedController.onPageLoad()
+          controllers.routes.JourneyRecoveryController.onPageLoad()
         )
       }
   }
 
-  def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    val memberList = request.userAnswers.membersDetails(srn)
+  def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
+    implicit request =>
+      val userAnswers = request.userAnswers
+      val memberList = userAnswers.membersDetails(srn)
+      val memberListSize = memberList.size
 
-    if (memberList.size > Constants.maxSchemeMembers) {
-      Redirect(
-        navigator.nextPage(MemberPensionPaymentsListPage(srn), mode, request.userAnswers)
+      if (memberListSize > Constants.maxSchemeMembers) {
+        Future.successful(
+          Redirect(
+            navigator.nextPage(MemberPensionPaymentsListPage(srn), mode, request.userAnswers)
+          )
+        )
+      } else {
+
+        form
+          .bindFromRequest()
+          .fold(
+            errors =>
+              Future.successful(
+                BadRequest(
+                  view(
+                    errors,
+                    MemberPensionPaymentsListController.viewModel(srn, page, mode, memberList, userAnswers)
+                  )
+                )
+              ),
+            value =>
+              for {
+                updatedUserAnswers <- buildUserAnswerBySelection(srn, value, memberListSize)
+                _ <- saveService.save(updatedUserAnswers)
+                submissionResult <- if (value) {
+                  psrSubmissionService.submitPsrDetails(srn)(
+                    implicitly,
+                    implicitly,
+                    request = DataRequest(request.request, updatedUserAnswers)
+                  )
+                } else {
+                  Future.successful(Some(()))
+                }
+              } yield submissionResult.getOrRecoverJourney(
+                _ =>
+                  Redirect(
+                    navigator
+                      .nextPage(MemberPensionPaymentsListPage(srn), mode, request.userAnswers)
+                  )
+              )
+          )
+      }
+  }
+
+  private def buildUserAnswerBySelection(srn: Srn, selection: Boolean, memberListSize: Int)(
+    implicit request: DataRequest[_]
+  ): Future[UserAnswers] = {
+    val userAnswerWithMemberContList = request.userAnswers.set(MemberPensionPaymentsListPage(srn), selection)
+
+    if (selection) {
+      val indexes = (1 to memberListSize)
+        .map(i => refineV[OneTo300](i).leftMap(new Exception(_)).toTry)
+        .toList
+        .sequence
+
+      Future.fromTry(
+        indexes.fold(
+          _ => userAnswerWithMemberContList,
+          index =>
+            index.foldLeft(userAnswerWithMemberContList) {
+              case (uaTry, index) =>
+                val optTotalMemberContribution = request.userAnswers.get(TotalAmountPensionPaymentsPage(srn, index))
+                for {
+                  ua <- uaTry
+                  ua1 <- ua
+                    .set(TotalAmountPensionPaymentsPage(srn, index), optTotalMemberContribution.getOrElse(Money(0)))
+                } yield ua1
+            }
+        )
       )
     } else {
-      val viewModel =
-        MemberPensionPaymentsListController.viewModel(srn, page, mode, memberList, request.userAnswers)
-
-      form
-        .bindFromRequest()
-        .fold(
-          errors => BadRequest(view(errors, viewModel)),
-          _ =>
-            Redirect(
-              navigator
-                .nextPage(MemberPensionPaymentsListPage(srn), mode, request.userAnswers)
-            )
-        )
+      Future.fromTry(userAnswerWithMemberContList)
     }
   }
+
 }
 
 object MemberPensionPaymentsListController {
@@ -108,8 +176,8 @@ object MemberPensionPaymentsListController {
         refineV[OneTo300](index + 1) match {
           case Left(_) => Nil
           case Right(nextIndex) =>
-            val contributions = userAnswers.get(MemberPensionPaymentsListPage(srn))
-            if (contributions.nonEmpty) {
+            val pensionPayments = userAnswers.get(TotalAmountPensionPaymentsPage(srn, nextIndex))
+            if (pensionPayments.nonEmpty) {
               List(
                 TableElem(
                   memberName.fullName
@@ -194,15 +262,15 @@ object MemberPensionPaymentsListController {
       ),
       TableElem(
         LinkMessage(
-          "Change",
-          controllers.routes.UnauthorisedController
-            .onPageLoad()
+          Message("site.change"),
+          controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsCYAController
+            .onPageLoad(srn, nextIndex, CheckMode)
             .url
         )
       ),
       TableElem(
         LinkMessage(
-          "Remove",
+          Message("site.remove"),
           controllers.routes.UnauthorisedController
             .onPageLoad()
             .url

@@ -20,8 +20,10 @@ import controllers.ControllerBaseSpec
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.{NameDOB, NormalMode, UserAnswers}
+import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
+import pages.nonsipp.memberpensionpayments.MemberPensionPaymentsListPage
 import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
 import services.PsrSubmissionService
@@ -55,6 +57,41 @@ class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec {
         )
       )
     })
+
+    act.like(renderPrePopView(onPageLoad, MemberPensionPaymentsListPage(srn), true, userAnswers) {
+      implicit app => implicit request =>
+        val memberList = userAnswers.membersDetails(srn)
+
+        injected[TwoColumnsTripleAction]
+          .apply(
+            MemberPensionPaymentsListController.form(injected[YesNoPageFormProvider]).fill(true),
+            MemberPensionPaymentsListController.viewModel(
+              srn,
+              page = 1,
+              NormalMode,
+              memberList: List[NameDOB],
+              userAnswers
+            )
+          )
+    })
+
+    act.like(
+      redirectNextPage(onSubmit, "value" -> "true")
+        .before(MockPSRSubmissionService.submitPsrDetails())
+        .after({
+          verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any())(any(), any(), any())
+          reset(mockPsrSubmissionService)
+        })
+    )
+
+    act.like(
+      redirectNextPage(onSubmit, "value" -> "false")
+        .before(MockPSRSubmissionService.submitPsrDetails())
+        .after({
+          verify(mockPsrSubmissionService, never).submitPsrDetails(any())(any(), any(), any())
+          reset(mockPsrSubmissionService)
+        })
+    )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
