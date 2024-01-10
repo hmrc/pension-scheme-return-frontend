@@ -168,7 +168,7 @@ object SchemeMembersListController {
   def form(
     formProvider: YesNoPageFormProvider,
     manualOrUpload: ManualOrUpload,
-    maxNumberReached: Boolean = false
+    maxNumberReached: Boolean
   ): Form[Boolean] = formProvider(
     manualOrUpload.fold(
       manual = if (maxNumberReached) "membersUploaded.error.required" else "schemeMembersList.error.required",
@@ -233,7 +233,7 @@ object SchemeMembersListController {
         inset = "schemeMembersList.inset",
         rows,
         radioText,
-        showRadios = lengthOfFilteredMembers < Constants.maxSchemeMembers,
+        showRadios = true,
         showInsetWithRadios = lengthOfFilteredMembers == Constants.maxSchemeMembers,
         paginatedViewModel = Some(
           PaginatedViewModel(
