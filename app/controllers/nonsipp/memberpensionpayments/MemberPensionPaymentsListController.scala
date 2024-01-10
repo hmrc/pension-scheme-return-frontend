@@ -23,7 +23,7 @@ import config.Refined.OneTo300
 import controllers.PSRController
 import controllers.actions._
 import eu.timepit.refined.api.Refined
-import eu.timepit.refined.{refineMV, refineV}
+import eu.timepit.refined.refineV
 import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
 import models._

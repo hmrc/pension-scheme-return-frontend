@@ -23,12 +23,14 @@ import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
 import models.SchemeHoldShare.{Acquisition, Contribution, Transfer}
 import models.{NormalMode, TypeOfShares}
-import pages.nonsipp.shares.TypeOfSharesHeldPage
+import pages.nonsipp.shares.{TypeOfSharesHeldPage, WhyDoesSchemeHoldSharesPage}
 import views.html.RadioListView
 
 class WhyDoesSchemeHoldSharesControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[Max5000.Refined](1)
+  private val typeOfShares = typeOfSharesGen.sample.value
+  private val schemeHoldShares = schemeHoldSharesGen.sample.value
 
   private lazy val onPageLoad =
     routes.WhyDoesSchemeHoldSharesController.onPageLoad(srn, index, NormalMode)
@@ -48,6 +50,23 @@ class WhyDoesSchemeHoldSharesControllerSpec extends ControllerBaseSpec {
         viewModel(srn, index, schemeName, TypeOfShares.ConnectedParty.name, NormalMode)
       )
     })
+
+    act.like(
+      renderPrePopView(
+        onPageLoad,
+        TypeOfSharesHeldPage(srn, index),
+        typeOfShares,
+        defaultUserAnswers
+          .unsafeSet(TypeOfSharesHeldPage(srn, index), typeOfShares)
+          .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, index), schemeHoldShares)
+      ) { implicit app => implicit request =>
+        injected[RadioListView]
+          .apply(
+            form(injected[RadioListFormProvider]).fill(schemeHoldShares),
+            viewModel(srn, index, schemeName, typeOfShares.name, NormalMode)
+          )
+      }
+    )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 

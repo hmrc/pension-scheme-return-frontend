@@ -45,7 +45,5 @@ case class WhyDoesSchemeHoldSharesPage(srn: Srn, index: Max5000) extends Questio
     }
 
   private def dependantPages(srn: Srn): List[Removable[_]] =
-    List(
-      //TODO add acquire date page here
-    )
+    List(WhenDidSchemeAcquireSharesPage(srn, index))
 }
