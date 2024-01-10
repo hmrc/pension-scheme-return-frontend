@@ -441,6 +441,17 @@ typeOfShares.radioList1 = Shares in a sponsoring employer
 typeOfShares.radioList2 = Unquoted shares
 typeOfShares.radioList3 = Any other shares acquired from a connected party
 
+whyDoesSchemeHoldShares.title = Why does the scheme hold these shares?
+whyDoesSchemeHoldShares.heading = Why does {0} hold these {1}?
+whyDoesSchemeHoldShares.heading.type.01 = shares in a sponsoring employer
+whyDoesSchemeHoldShares.heading.type.02 = unquoted shares
+whyDoesSchemeHoldShares.heading.type.03 = shares acquired from a connected party
+whyDoesSchemeHoldShares.error.required = Select why the scheme holds these shares
+whyDoesSchemeHoldShares.radioList1 = Acquisition
+whyDoesSchemeHoldShares.radioList1.hint = This can be a purchase.
+whyDoesSchemeHoldShares.radioList2 = Contribution by an employer or member
+whyDoesSchemeHoldShares.radioList3 = Transfer from another scheme
+
 pensionCommencementLumpSum.title = Did any member receive a pension commencement lump sum (PCLS) during the period of this return?
 pensionCommencementLumpSum.heading = Did any member receive a pension commencement lump sum (PCLS) during the period of this return?
 pensionCommencementLumpSum.error.required = Select yes if any member received a Pension Commencement Lump Sum during the period of this return

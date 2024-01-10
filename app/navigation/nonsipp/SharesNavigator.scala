@@ -20,7 +20,7 @@ import eu.timepit.refined.refineMV
 import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.shares.{DidSchemeHoldAnySharesPage, WhatYouWillNeedSharesPage}
+import pages.nonsipp.shares.{DidSchemeHoldAnySharesPage, TypeOfSharesHeldPage, WhatYouWillNeedSharesPage}
 import play.api.mvc.Call
 
 object SharesNavigator extends JourneyNavigator {
@@ -36,6 +36,9 @@ object SharesNavigator extends JourneyNavigator {
 
     case WhatYouWillNeedSharesPage(srn) =>
       controllers.nonsipp.shares.routes.TypeOfSharesHeldController.onPageLoad(srn, refineMV(1), NormalMode)
+
+    case TypeOfSharesHeldPage(srn, index) =>
+      controllers.nonsipp.shares.routes.WhyDoesSchemeHoldSharesController.onPageLoad(srn, index, NormalMode)
   }
 
   val checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] = _ => _ => PartialFunction.empty

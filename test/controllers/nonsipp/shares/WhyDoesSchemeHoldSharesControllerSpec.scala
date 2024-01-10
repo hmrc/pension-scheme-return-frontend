@@ -18,45 +18,49 @@ package controllers.nonsipp.shares
 
 import config.Refined.Max5000
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.shares.TypeOfSharesHeldController._
+import controllers.nonsipp.shares.WhyDoesSchemeHoldSharesController._
 import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
-import models.NormalMode
-import models.TypeOfShares.{ConnectedParty, SponsoringEmployer, Unquoted}
+import models.SchemeHoldShare.{Acquisition, Contribution, Transfer}
+import models.{NormalMode, TypeOfShares}
+import pages.nonsipp.shares.TypeOfSharesHeldPage
 import views.html.RadioListView
 
-class TypeOfSharesControllerSpec extends ControllerBaseSpec {
+class WhyDoesSchemeHoldSharesControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[Max5000.Refined](1)
 
   private lazy val onPageLoad =
-    routes.TypeOfSharesHeldController.onPageLoad(srn, index, NormalMode)
+    routes.WhyDoesSchemeHoldSharesController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit =
-    routes.TypeOfSharesHeldController.onSubmit(srn, index, NormalMode)
+    routes.WhyDoesSchemeHoldSharesController.onSubmit(srn, index, NormalMode)
 
-  "typeOfSharesController" - {
+  private val userAnswers =
+    defaultUserAnswers.unsafeSet(TypeOfSharesHeldPage(srn, index), TypeOfShares.ConnectedParty)
 
-    act.like(renderView(onPageLoad, defaultUserAnswers) { implicit app => implicit request =>
+  "WhyDoesSchemeHoldSharesController" - {
+
+    act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
       val view = injected[RadioListView]
 
       view(
         form(injected[RadioListFormProvider]),
-        viewModel(srn, index, NormalMode)
+        viewModel(srn, index, schemeName, TypeOfShares.ConnectedParty.name, NormalMode)
       )
     })
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
-    "SponsoringEmployer data is submitted" - {
-      act.like(saveAndContinue(onSubmit, defaultUserAnswers, "value" -> SponsoringEmployer.name))
+    "Acquisition data is submitted" - {
+      act.like(saveAndContinue(onSubmit, userAnswers, "value" -> Acquisition.name))
     }
 
-    "Unquoted data is submitted" - {
-      act.like(saveAndContinue(onSubmit, defaultUserAnswers, "value" -> Unquoted.name))
+    "Contribution data is submitted" - {
+      act.like(saveAndContinue(onSubmit, userAnswers, "value" -> Contribution.name))
     }
 
-    "ConnectedParty data is submitted" - {
-      act.like(saveAndContinue(onSubmit, defaultUserAnswers, "value" -> ConnectedParty.name))
+    "Transfer data is submitted" - {
+      act.like(saveAndContinue(onSubmit, userAnswers, "value" -> Transfer.name))
     }
 
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))

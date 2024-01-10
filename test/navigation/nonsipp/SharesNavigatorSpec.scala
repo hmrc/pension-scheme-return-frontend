@@ -16,12 +16,12 @@
 
 package navigation.nonsipp
 
-import config.Refined.OneTo5000
+import config.Refined.{Max5000, OneTo5000}
 import eu.timepit.refined.refineMV
 import models.NormalMode
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.shares.{DidSchemeHoldAnySharesPage, WhatYouWillNeedSharesPage}
+import pages.nonsipp.shares.{DidSchemeHoldAnySharesPage, TypeOfSharesHeldPage, WhatYouWillNeedSharesPage}
 import utils.BaseSpec
 
 class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
@@ -66,5 +66,17 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         )
     )
 
+    act.like(
+      normalmode
+        .navigateToWithIndex(
+          index,
+          TypeOfSharesHeldPage,
+          (srn, _: Max5000, _) =>
+            controllers.nonsipp.shares.routes.WhyDoesSchemeHoldSharesController.onPageLoad(srn, index, NormalMode)
+        )
+        .withName(
+          "go from TypeOfSharesHeldPage to WhyDoesSchemeHoldShares page"
+        )
+    )
   }
 }
