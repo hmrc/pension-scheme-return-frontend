@@ -16,7 +16,8 @@
 
 package navigation.nonsipp
 
-import controllers.routes
+import config.Refined.Max300
+import eu.timepit.refined.refineMV
 import models.NormalMode
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
@@ -26,6 +27,8 @@ import utils.BaseSpec
 class SurrenderedBenefitsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
   val navigator: Navigator = new NonSippNavigator
+
+  private val memberIndex = refineMV[Max300.Refined](1)
 
   "SurrenderedBenefitsNavigator" - {
 
@@ -79,6 +82,19 @@ class SurrenderedBenefitsNavigatorSpec extends BaseSpec with NavigatorBehaviours
           )
           .withName("go from Surrendered Benefits Member List page to Task List page")
       )
+    }
+
+    "SurrenderedBenefitsAmountPage" - {
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            memberIndex,
+            SurrenderedBenefitsAmountPage,
+            (srn, memberIndex: Max300, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          )
+          .withName("go from Surrendered Benefits Amount page to When Surrendered Benefits page")
+      )
+
     }
   }
 }

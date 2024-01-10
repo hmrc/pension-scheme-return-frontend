@@ -29,7 +29,7 @@ import models.requests.DataRequest
 import models.{Mode, NameDOB, NormalMode, Pagination, UserAnswers}
 import navigation.Navigator
 import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
-import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsMemberListPage
+import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsAmountPages, SurrenderedBenefitsMemberListPage}
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -175,9 +175,7 @@ object SurrenderedBenefitsMemberListController {
         refineV[OneTo300](index + 1) match {
           case Left(_) => Nil
           case Right(nextIndex) =>
-            //TODO: update this once SurrenderedBenefitsAmount has been implemented
-            val items = Map[String, String]().empty
-//            val items = userAnswers.map(SurrenderedBenefitsAmountPage(srn, nextIndex))
+            val items = userAnswers.map(SurrenderedBenefitsAmountPages(srn, nextIndex))
             if (items.isEmpty) {
               List(
                 TableElem(
@@ -189,11 +187,9 @@ object SurrenderedBenefitsMemberListController {
                 TableElem(
                   LinkMessage(
                     Message("site.add"),
-                    //TODO: update this once SurrenderedBenefitsAmount has been implemented
-                    controllers.routes.UnauthorisedController.onPageLoad().url
-//                    controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsAmountController
-//                      .onSubmit(srn, nextIndex, mode)
-//                      .url
+                    controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsAmountController
+                      .onSubmit(srn, nextIndex, mode)
+                      .url
                   )
                 ),
                 TableElem("")
