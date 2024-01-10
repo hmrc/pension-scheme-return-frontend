@@ -520,6 +520,16 @@ surrenderedBenefits.whatYouWillNeed.tellUs1 = the total amount surrendered
 surrenderedBenefits.whatYouWillNeed.tellUs2 = the date the member surrendered their benefits
 surrenderedBenefits.whatYouWillNeed.tellUs3 = why the member surrendered their benefits
 
+surrenderedBenefits.memberList.title = Select a member to report surrendered benefits
+surrenderedBenefits.memberList.heading = Select a member to report surrendered benefits
+surrenderedBenefits.memberList.inset1 = You must tell us about all benefits surrendered by members of the scheme during the period of this return.
+surrenderedBenefits.memberList.inset2 = If you need to add a new member, go to the ‘Change details of members’ section of this return.
+surrenderedBenefits.memberList.radios = Have you finished reporting surrendered benefits?
+surrenderedBenefits.memberList.radios.error.required = Select yes if you have finished reporting surrendered benefits
+surrenderedBenefits.memberList.pagination.label = Showing {0} - {1} of {2} members
+surrenderedBenefits.memberList.status.no.items = No surrendered benefits
+surrenderedBenefits.memberList.status.some.item = Surrendered benefits reported
+
 otherAssetsHeld.title = Did the scheme hold any other assets during the period of this return?
 otherAssetsHeld.heading = Did {0} hold any other assets during the period of this return?
 otherAssetsHeld.error.required = Select yes if the scheme held any other assets during the period of this return
