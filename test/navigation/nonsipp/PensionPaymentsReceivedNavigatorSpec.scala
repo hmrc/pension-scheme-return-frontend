@@ -21,11 +21,7 @@ import eu.timepit.refined.refineMV
 import models.NormalMode
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.memberpensionpayments.{
-  PensionPaymentsReceivedPage,
-  TotalAmountPensionPaymentsPage,
-  WhatYouWillNeedPensionPaymentsPage
-}
+import pages.nonsipp.memberpensionpayments._
 import utils.BaseSpec
 
 class PensionPaymentsReceivedNavigatorSpec extends BaseSpec with NavigatorBehaviours {
@@ -80,9 +76,24 @@ class PensionPaymentsReceivedNavigatorSpec extends BaseSpec with NavigatorBehavi
         .navigateToWithIndex(
           index,
           TotalAmountPensionPaymentsPage,
-          (srn, index: Max300, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          (srn, index: Max300, _) =>
+            controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsCYAController
+              .onPageLoad(srn, index, NormalMode)
         )
-        .withName("go from total amount pension payments page to unauthorised page")
+        .withName("go from total amount pension payments page to member pension payments CYA page")
+    )
+  }
+
+  "MemberPensionPaymentsCYAPage" - {
+    act.like(
+      normalmode
+        .navigateTo(
+          MemberPensionPaymentsCYAPage,
+          (srn, _) =>
+            controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsListController
+              .onPageLoad(srn, page = 1, NormalMode)
+        )
+        .withName("go from member pension payments CYA page to member pension payments list page")
     )
   }
 
