@@ -25,6 +25,6 @@ case class Pagination(
   call: Int => Call
 ) {
   val totalPages: Int = Math.ceil(totalSize.toDouble / pageSize.toDouble).toInt
-  val pageStart: Int = if (currentPage == 1) 1 else (currentPage * pageSize) - pageSize
+  val pageStart: Int = if (currentPage == 1) 1 else pageSize * (currentPage - 1)
   val pageEnd: Int = if (currentPage == totalPages) totalSize else currentPage * pageSize
 }
