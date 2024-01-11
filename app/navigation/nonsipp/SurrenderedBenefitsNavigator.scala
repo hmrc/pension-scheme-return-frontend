@@ -41,6 +41,10 @@ object SurrenderedBenefitsNavigator extends JourneyNavigator {
       controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
 
     case SurrenderedBenefitsAmountPage(srn, memberIndex) =>
+      controllers.nonsipp.membersurrenderedbenefits.routes.WhenDidMemberSurrenderBenefitsController
+        .onPageLoad(srn, memberIndex, NormalMode)
+
+    case WhenDidMemberSurrenderBenefitsPage(srn, memberIndex) =>
       controllers.routes.UnauthorisedController.onPageLoad()
 
   }
