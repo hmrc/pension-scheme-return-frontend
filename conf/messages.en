@@ -535,6 +535,12 @@ surrenderedBenefits.whatYouWillNeed.tellUs1 = the total amount surrendered
 surrenderedBenefits.whatYouWillNeed.tellUs2 = the date the member surrendered their benefits
 surrenderedBenefits.whatYouWillNeed.tellUs3 = why the member surrendered their benefits
 
+surrenderedBenefits.whyDidMemberSurrenderBenefits.title = Why did the member surrender their pension benefits?
+surrenderedBenefits.whyDidMemberSurrenderBenefits.heading = Why did {0} surrender their pension benefits of £{2}?
+surrenderedBenefits.whyDidMemberSurrenderBenefits.error.required = Enter the reason the member surrendered these benefits
+surrenderedBenefits.whyDidMemberSurrenderBenefits.error.invalid = The reason the member surrendered these benefits must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+surrenderedBenefits.whyDidMemberSurrenderBenefits.error.length = The reason the member surrendered these benefits must be 160 characters or fewer
+
 surrenderedBenefits.memberList.title = Select a member to report surrendered benefits
 surrenderedBenefits.memberList.heading = Select a member to report surrendered benefits
 surrenderedBenefits.memberList.inset1 = You must tell us about all benefits surrendered by members of the scheme during the period of this return.

@@ -138,6 +138,7 @@ trait TestValues {
   val transferringSchemeName = "transferring scheme"
   val receivingSchemeName = "receiving scheme"
   val pcls: PensionCommencementLumpSum = PensionCommencementLumpSum(money, money)
+  val surrenderedBenefitsAmount = money
 
   val address: Address = Address(
     "test-id",
