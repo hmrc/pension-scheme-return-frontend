@@ -21,12 +21,7 @@ import models.SchemeHoldShare.{Acquisition, Contribution, Transfer}
 import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.shares.{
-  DidSchemeHoldAnySharesPage,
-  TypeOfSharesHeldPage,
-  WhatYouWillNeedSharesPage,
-  WhyDoesSchemeHoldSharesPage
-}
+import pages.nonsipp.shares._
 import play.api.mvc.Call
 
 object SharesNavigator extends JourneyNavigator {
@@ -53,9 +48,15 @@ object SharesNavigator extends JourneyNavigator {
         case Some(Contribution) =>
           controllers.nonsipp.shares.routes.WhenDidSchemeAcquireSharesController.onPageLoad(srn, index, NormalMode)
         case Some(Transfer) =>
-          controllers.routes.UnauthorisedController.onPageLoad() // TODO change this when company name page is developed
+          controllers.nonsipp.shares.routes.CompanyNameRelatedSharesController.onPageLoad(srn, index, NormalMode)
         case _ => controllers.routes.UnauthorisedController.onPageLoad()
       }
+
+    case WhenDidSchemeAcquireSharesPage(srn, index) =>
+      controllers.nonsipp.shares.routes.CompanyNameRelatedSharesController.onPageLoad(srn, index, NormalMode)
+
+    case CompanyNameRelatedSharesPage(srn, index) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
   }
 
   val checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] = _ => _ => PartialFunction.empty
