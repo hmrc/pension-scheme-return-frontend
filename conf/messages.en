@@ -227,7 +227,7 @@ pensionSchemeMembers.description1 = You can enter the details manually, or uploa
 pensionSchemeMembers.legend = How do you want to add member details?
 pensionSchemeMembers.manualEntry = Manually enter the details
 pensionSchemeMembers.upload = Upload a file
-pensionSchemeMembers.upload.hint = Uploading a file will overwrite any details you have previously added about scheme members
+pensionSchemeMembers.upload.hint = This will overwrite any member details and payments for them you have previously added
 pensionSchemeMembers.error.required = Select how you want to add member details
 
 memberDetails.title = Member’s details
@@ -348,6 +348,7 @@ schemeMembersList.title = You have added {0} member
 schemeMembersList.title.plural = You have added {0} members
 schemeMembersList.heading = You have added {0} member
 schemeMembersList.heading.plural = You have added {0} members
+schemeMembersList.paragraph = You must tell us about everyone who was a member of the scheme during the period of this return.
 schemeMembersList.radio = Do you need to add more members?
 schemeMembersList.inset = You cannot add more members as you have entered the maximum of 300.
 schemeMembersList.change.hidden = Change {0}
@@ -578,7 +579,7 @@ unallocatedEmployerContributions.error.required = Select yes if any unallocated 
 
 uploadMemberDetails.title = Upload your member details file
 uploadMemberDetails.heading = Upload your member details file
-uploadMemberDetails.paragraph = Uploading a file will overwrite any details you have previously added about scheme members.
+uploadMemberDetails.paragraph = This will overwrite any member details and payments for them you have previously added.
 uploadMemberDetails.details.paragraph = Include the following information for each member of the scheme:
 uploadMemberDetails.list1 = their first and last name
 uploadMemberDetails.list2 = their National Insurance number, in the format QQ 12 34 56 C, or the reason they do not have one
@@ -614,9 +615,9 @@ fileUploadError.title = There was a problem
 fileUploadError.heading = There was a problem
 fileUploadError.paragraph = Select continue to find out more.
 
-membersUploaded.radio = Do you want to upload another member details file?
-membersUploaded.radio.yes.hint = Uploading a file will overwrite any details you have previously added about scheme members.
-membersUploaded.error.required = Select yes if you want to upload another member details file
+membersUploaded.radio = Do you want to upload a member details file?
+membersUploaded.radio.yes.hint = This will overwrite any member details and payments for them you have previously added.
+membersUploaded.error.required = Select yes if you want to upload a member details file
 
 nonsipp.tasklist.title = Pension scheme return for {0} to {1}
 nonsipp.tasklist.heading = Pension scheme return for {0} to {1}
