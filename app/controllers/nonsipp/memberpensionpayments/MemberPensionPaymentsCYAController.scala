@@ -54,7 +54,7 @@ class MemberPensionPaymentsCYAController @Inject()(
     identifyAndRequireData(srn) { implicit request =>
       (
         for {
-          contribution <- request.userAnswers.get(TotalAmountPensionPaymentsPage(srn, index))
+          pensionPayment <- request.userAnswers.get(TotalAmountPensionPaymentsPage(srn, index))
           memberName = request.userAnswers.membersDetails(srn)
         } yield Ok(
           view(
@@ -63,7 +63,7 @@ class MemberPensionPaymentsCYAController @Inject()(
                 srn,
                 memberName(index.value - 1).fullName,
                 index,
-                contribution,
+                pensionPayment,
                 mode
               )
             )
@@ -86,7 +86,7 @@ case class ViewModelParameters(
   srn: Srn,
   memberName: String,
   index: Max300,
-  contributions: Money,
+  pensionPayments: Money,
   mode: Mode
 )
 object MemberPensionPaymentsCYAController {
@@ -107,7 +107,7 @@ object MemberPensionPaymentsCYAController {
           parameters.srn,
           parameters.memberName,
           parameters.index,
-          parameters.contributions,
+          parameters.pensionPayments,
           CheckMode
         )
       ),
@@ -121,7 +121,7 @@ object MemberPensionPaymentsCYAController {
     srn: Srn,
     memberName: String,
     index: Max300,
-    contributions: Money,
+    pensionPayments: Money,
     mode: Mode
   ): List[CheckYourAnswersSection] =
     List(
@@ -134,7 +134,7 @@ object MemberPensionPaymentsCYAController {
           ),
           CheckYourAnswersRowViewModel(
             Message("MemberPensionPaymentsCYA.section.memberName", memberName),
-            Message("MemberPensionPaymentsCYA.section.amount", contributions.displayAs)
+            Message("MemberPensionPaymentsCYA.section.amount", pensionPayments.displayAs)
           ).withAction(
             SummaryAction(
               "site.change",
