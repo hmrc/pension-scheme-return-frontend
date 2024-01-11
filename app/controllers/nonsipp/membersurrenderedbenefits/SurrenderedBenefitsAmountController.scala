@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.membersurrenderedbenefits
 
-import config.Constants.{maxInputAmount, minInputAmount}
+import config.Constants.{maxSurrenderedBenefitAmount, minSurrenderedBenefitAmount}
 import config.Refined.Max300
 import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
@@ -91,8 +91,8 @@ object SurrenderedBenefitsAmountController {
     MoneyFormErrors(
       requiredKey = "surrenderedBenefits.amount.error.required",
       nonNumericKey = "surrenderedBenefits.amount.error.invalid",
-      min = (minInputAmount, "surrenderedBenefits.amount.error.tooSmall"),
-      max = (maxInputAmount, "surrenderedBenefits.amount.error.tooLarge")
+      min = (minSurrenderedBenefitAmount, "surrenderedBenefits.amount.error.tooSmall"),
+      max = (maxSurrenderedBenefitAmount, "surrenderedBenefits.amount.error.tooLarge")
     )
   )
 
