@@ -16,4 +16,13 @@
 
 package pages.nonsipp
 
-package object membersurrenderedbenefits {}
+import play.api.libs.json.{__, JsPath}
+
+package object membersurrenderedbenefits {
+
+  object Paths {
+    val membersPayments: JsPath = __ \ "membersPayments"
+    val memberDetails: JsPath = membersPayments \ "memberDetails"
+    val memberPensionSurrender: JsPath = memberDetails \ "memberPensionSurrender"
+  }
+}

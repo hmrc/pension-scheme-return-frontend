@@ -545,6 +545,13 @@ surrenderedBenefits.memberList.pagination.label = Showing {0} - {1} of {2} membe
 surrenderedBenefits.memberList.status.no.items = No surrendered benefits
 surrenderedBenefits.memberList.status.some.item = Surrendered benefits reported
 
+surrenderedBenefits.amount.title = What was the total amount surrendered by the member, in pounds and pence?
+surrenderedBenefits.amount.heading = What was the total amount surrendered by {0}, in pounds and pence?
+surrenderedBenefits.amount.error.required = Enter the total amount surrendered, in pounds and pence
+surrenderedBenefits.amount.error.invalid = Total amount surrendered must be an amount of money, like 123 or 123.45
+surrenderedBenefits.amount.error.tooSmall = Total amount surrendered must be 1 or more
+surrenderedBenefits.amount.error.tooLarge = Total amount surrendered must be 999999999.99 or less
+
 otherAssetsHeld.title = Did the scheme hold any other assets during the period of this return?
 otherAssetsHeld.heading = Did {0} hold any other assets during the period of this return?
 otherAssetsHeld.error.required = Select yes if the scheme held any other assets during the period of this return

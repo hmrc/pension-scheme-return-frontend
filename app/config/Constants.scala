@@ -58,6 +58,8 @@ object Constants {
   val minMoneyValue = -999999999.99
 
   val unallocatedContributionMin = 0.01
+  val minSurrenderedBenefitAmount = 1
+  val maxSurrenderedBenefitAmount = 999999999.99
 
   val maxMembers = 99999999
 
