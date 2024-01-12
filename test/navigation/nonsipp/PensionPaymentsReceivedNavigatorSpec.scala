@@ -69,6 +69,17 @@ class PensionPaymentsReceivedNavigatorSpec extends BaseSpec with NavigatorBehavi
 
   }
 
+  "MemberPensionPaymentsListPage" - {
+    act.like(
+      normalmode
+        .navigateTo(
+          MemberPensionPaymentsListPage,
+          (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
+        )
+        .withName("go from  member pension payments list page to task list page")
+    )
+  }
+
   "TotalAmountPensionPaymentsPage" - {
 
     act.like(
@@ -94,6 +105,20 @@ class PensionPaymentsReceivedNavigatorSpec extends BaseSpec with NavigatorBehavi
               .onPageLoad(srn, page = 1, NormalMode)
         )
         .withName("go from member pension payments CYA page to member pension payments list page")
+    )
+  }
+
+  "RemovePensionPaymentsPage" - {
+    act.like(
+      normalmode
+        .navigateToWithIndex(
+          index,
+          RemovePensionPaymentsPage,
+          (srn, _: Max300, _) =>
+            controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsListController
+              .onPageLoad(srn, 1, NormalMode)
+        )
+        .withName("go from remove pension payments page to member pension payments list page")
     )
   }
 

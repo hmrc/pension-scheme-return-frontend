@@ -16,6 +16,7 @@
 
 package navigation.nonsipp
 
+import controllers.nonsipp.memberpensionpayments.RemovePensionPaymentsController
 import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
@@ -23,6 +24,7 @@ import pages.nonsipp.memberpensionpayments.{
   MemberPensionPaymentsCYAPage,
   MemberPensionPaymentsListPage,
   PensionPaymentsReceivedPage,
+  RemovePensionPaymentsPage,
   TotalAmountPensionPaymentsPage,
   WhatYouWillNeedPensionPaymentsPage
 }
@@ -50,6 +52,10 @@ object PensionPaymentsReceivedNavigator extends JourneyNavigator {
         .onPageLoad(srn, index, NormalMode)
 
     case MemberPensionPaymentsCYAPage(srn) =>
+      controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsListController
+        .onPageLoad(srn, page = 1, NormalMode)
+
+    case RemovePensionPaymentsPage(srn, _) =>
       controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsListController
         .onPageLoad(srn, page = 1, NormalMode)
 

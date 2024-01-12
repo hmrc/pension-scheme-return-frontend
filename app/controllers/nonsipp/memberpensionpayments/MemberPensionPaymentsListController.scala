@@ -143,11 +143,11 @@ class MemberPensionPaymentsListController @Inject()(
           index =>
             index.foldLeft(userAnswerWithMemberContList) {
               case (uaTry, index) =>
-                val optTotalMemberContribution = request.userAnswers.get(TotalAmountPensionPaymentsPage(srn, index))
+                val optTotalAmountPensionPayments = request.userAnswers.get(TotalAmountPensionPaymentsPage(srn, index))
                 for {
                   ua <- uaTry
                   ua1 <- ua
-                    .set(TotalAmountPensionPaymentsPage(srn, index), optTotalMemberContribution.getOrElse(Money(0)))
+                    .set(TotalAmountPensionPaymentsPage(srn, index), optTotalAmountPensionPayments.getOrElse(Money(0)))
                 } yield ua1
             }
         )
@@ -271,8 +271,8 @@ object MemberPensionPaymentsListController {
       TableElem(
         LinkMessage(
           Message("site.remove"),
-          controllers.routes.UnauthorisedController
-            .onPageLoad()
+          controllers.nonsipp.memberpensionpayments.routes.RemovePensionPaymentsController
+            .onPageLoad(srn, nextIndex)
             .url
         )
       )
