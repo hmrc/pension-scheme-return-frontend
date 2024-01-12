@@ -581,6 +581,19 @@ surrenderedBenefits.when.error.date.after = Date the member surrendered their pe
 surrenderedBenefits.when.error.invalid.date = Date the member surrendered their pension benefits must be a real date
 surrenderedBenefits.when.error.invalid.characters = Date the member surrendered their pension benefits must only include numbers 0 to 9
 
+surrenderedBenefits.cya.title = Check your answers
+surrenderedBenefits.cya.heading = Check your answers
+surrenderedBenefits.cya.section.memberName =  Member’s name
+surrenderedBenefits.cya.section.amount = Total amount surrendered by {0}
+surrenderedBenefits.cya.section.amount.hidden = the total amount surrendered by {0}
+surrenderedBenefits.cya.section.date = Date {0} surrendered their benefits
+surrenderedBenefits.cya.section.date.hidden = date {0} surrendered their benefits
+surrenderedBenefits.cya.section.reason = Reason {0} surrendered their benefits
+surrenderedBenefits.cya.section.reason.hidden = reason {0} surrendered their benefits
+
+surrenderedBenefits.change.title = Change details of surrendered benefits for this member
+surrenderedBenefits.change.heading = Change details of surrendered benefits for {0}
+
 otherAssetsHeld.title = Did the scheme hold any other assets during the period of this return?
 otherAssetsHeld.heading = Did {0} hold any other assets during the period of this return?
 otherAssetsHeld.error.required = Select yes if the scheme held any other assets during the period of this return
@@ -1896,7 +1909,7 @@ employerContributionsCYA.row.employerId.company.hidden = {0}’s Company Registr
 employerContributionsCYA.row.employerId.company.reason = Reason you cannot provide {0}’s Company Registration Number (CRN)
 employerContributionsCYA.row.employerId.company.reason.hidden = reason you cannot provide {0}’s Company Registration Number
 employerContributionsCYA.row.employerId.partnership = {0}’s Unique Taxpayer Reference (UTR)
-employerContributionsCYA.row.employerId.partnership.hidden = {0}'s Unique Taxpayer Reference
+employerContributionsCYA.row.employerId.partnership.hidden = {0}’s Unique Taxpayer Reference
 employerContributionsCYA.row.employerId.partnership.reason = Reason you cannot provide {0}’s Unique Taxpayer Reference (UTR)
 employerContributionsCYA.row.employerId.partnership.reason.hidden = reason you cannot provide {0}’s Unique Taxpayer Reference
 employerContributionsCYA.row.employerId.other = Description of {0}

@@ -28,5 +28,10 @@ POST       /:srn/when-did-member-surrender-benefits/:index                      
 GET        /:srn/change-when-did-member-surrender-benefits/:index                       controllers.nonsipp.membersurrenderedbenefits.WhenDidMemberSurrenderBenefitsController.onPageLoad(srn: Srn, index: Max300, mode: Mode = CheckMode)
 POST       /:srn/change-when-did-member-surrender-benefits/:index                       controllers.nonsipp.membersurrenderedbenefits.WhenDidMemberSurrenderBenefitsController.onSubmit(srn: Srn, index: Max300, mode: Mode = CheckMode)
 
+GET         /:srn/check-answers-surrendered-benefits/:index                             controllers.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsCYAController.onPageLoad(srn: Srn, index: Max300, mode: Mode = NormalMode)
+POST        /:srn/submit-check-answers-surrendered-benefits/:index                      controllers.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsCYAController.onSubmit(srn: Srn, index: Max300, mode: Mode = NormalMode)
+GET         /:srn/change-surrendered-benefits/:index                                    controllers.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsCYAController.onPageLoad(srn: Srn, index: Max300, mode: Mode = CheckMode)
+POST        /:srn/submit-change-surrendered-benefits/:index                             controllers.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsCYAController.onSubmit(srn: Srn, index: Max300, mode: Mode = CheckMode)
+
 GET         /:srn/remove-surrendered-benefits/:index                                    controllers.nonsipp.membersurrenderedbenefits.RemoveSurrenderedBenefitsController.onPageLoad(srn: Srn, index: Max300)
 POST        /:srn/remove-surrendered-benefits/:index                                    controllers.nonsipp.membersurrenderedbenefits.RemoveSurrenderedBenefitsController.onSubmit(srn: Srn, index: Max300)

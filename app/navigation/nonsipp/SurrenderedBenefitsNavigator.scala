@@ -25,6 +25,7 @@ import play.api.mvc.Call
 object SurrenderedBenefitsNavigator extends JourneyNavigator {
 
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
+
     case page @ SurrenderedBenefitsPage(srn) =>
       if (userAnswers.get(page).contains(true)) {
         controllers.nonsipp.membersurrenderedbenefits.routes.WhatYouWillNeedSurrenderedBenefitsController
@@ -49,7 +50,12 @@ object SurrenderedBenefitsNavigator extends JourneyNavigator {
         .onPageLoad(srn, memberIndex, NormalMode)
 
     case WhyDidMemberSurrenderBenefitsPage(srn, memberIndex) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+      controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsCYAController
+        .onPageLoad(srn, memberIndex, NormalMode)
+
+    case SurrenderedBenefitsCYAPage(srn, memberIndex) =>
+      controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsMemberListController
+        .onPageLoad(srn, page = 1, NormalMode)
 
     case RemoveSurrenderedBenefitsPage(srn, _) =>
       controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsMemberListController
@@ -57,5 +63,25 @@ object SurrenderedBenefitsNavigator extends JourneyNavigator {
 
   }
 
-  override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] = _ => _ => PartialFunction.empty
+  override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] =
+    _ =>
+      _ => {
+
+        case SurrenderedBenefitsAmountPage(srn, memberIndex) =>
+          controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsCYAController
+            .onPageLoad(srn, memberIndex, NormalMode)
+
+        case WhenDidMemberSurrenderBenefitsPage(srn, memberIndex) =>
+          controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsCYAController
+            .onPageLoad(srn, memberIndex, NormalMode)
+
+        case WhyDidMemberSurrenderBenefitsPage(srn, memberIndex) =>
+          controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsCYAController
+            .onPageLoad(srn, memberIndex, NormalMode)
+
+        case SurrenderedBenefitsCYAPage(srn, memberIndex) =>
+          controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsMemberListController
+            .onPageLoad(srn, page = 1, NormalMode)
+
+      }
 }
