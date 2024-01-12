@@ -23,3 +23,6 @@ GET         /:srn/check-answers-pension-payments/:index             controllers.
 POST        /:srn/submit-check-answers-pension-payments             controllers.nonsipp.memberpensionpayments.MemberPensionPaymentsCYAController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 GET         /:srn/change-pension-payments/:index                    controllers.nonsipp.memberpensionpayments.MemberPensionPaymentsCYAController.onPageLoad(srn: Srn,index: Max300, mode: Mode = CheckMode)
 POST        /:srn/submit-change-pension-payments                    controllers.nonsipp.memberpensionpayments.MemberPensionPaymentsCYAController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET         /:srn/remove-pension-payments/:index                    controllers.nonsipp.memberpensionpayments.RemovePensionPaymentsController.onPageLoad(srn: Srn, index: Max300)
+POST        /:srn/remove-pension-payments/:index                     controllers.nonsipp.memberpensionpayments.RemovePensionPaymentsController.onSubmit(srn: Srn, index: Max300)

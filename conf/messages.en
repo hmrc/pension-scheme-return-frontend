@@ -2096,3 +2096,7 @@ MemberPensionPaymentsCYA.section.memberName.header = Member’s name
 MemberPensionPaymentsCYA.section.memberName = Total amount of pension payments received by {0}
 MemberPensionPaymentsCYA.section.amount = £ {0}
 MemberPensionPaymentsCYA.section.hide = total amount of pension payments received by {0}
+
+removePensionPayments.title = Are you sure you want to remove the pension payments for this member?
+removePensionPayments.heading = Are you sure you want to remove the pension payments of £{0} for {1}?
+removePensionPayments.error.required = Select yes if you are sure you want to remove the pension payments for this member
