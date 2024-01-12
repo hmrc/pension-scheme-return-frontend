@@ -55,8 +55,8 @@ class RemovePensionPaymentsController @Inject()(
   def onPageLoad(srn: Srn, index: Max300): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val nameDOB = request.userAnswers.get(MemberDetailsPage(srn, index)).get
-      val totalContrib = request.userAnswers.get(TotalAmountPensionPaymentsPage(srn, index))
-      totalContrib match {
+      val totalAmountPensionPayment = request.userAnswers.get(TotalAmountPensionPaymentsPage(srn, index))
+      totalAmountPensionPayment match {
         case Some(value) =>
           Ok(
             view(

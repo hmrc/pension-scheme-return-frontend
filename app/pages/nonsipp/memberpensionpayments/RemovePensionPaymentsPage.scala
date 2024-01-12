@@ -20,7 +20,4 @@ import config.Refined.Max300
 import models.SchemeId.Srn
 import pages.Page
 
-case class RemovePensionPaymentsPage(srn: Srn, index: Max300) extends Page {
-
-  override def toString: String = "removePensionPayments"
-}
+case class RemovePensionPaymentsPage(srn: Srn, index: Max300) extends Page

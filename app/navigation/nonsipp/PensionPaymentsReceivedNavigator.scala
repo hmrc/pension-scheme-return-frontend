@@ -16,7 +16,6 @@
 
 package navigation.nonsipp
 
-import controllers.nonsipp.memberpensionpayments.RemovePensionPaymentsController
 import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
