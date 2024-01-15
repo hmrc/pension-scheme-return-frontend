@@ -54,7 +54,7 @@ class RemoveSurrenderedBenefitsControllerSpec extends ControllerBaseSpec {
       .thenReturn(Future.successful(Some(())))
   }
 
-  "RemovePensionPaymentsController" - {
+  "RemoveSurrenderedBenefitsController" - {
 
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
       val view = injected[YesNoPageView]

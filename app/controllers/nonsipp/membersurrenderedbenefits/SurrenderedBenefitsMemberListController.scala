@@ -102,8 +102,6 @@ class SurrenderedBenefitsMemberListController @Inject()(
               for {
                 updatedUserAnswers <- buildUserAnswersBySelection(srn, value, memberListSize)
                 _ <- saveService.save(updatedUserAnswers)
-                //TODO: update once Surrendered Benefits journey is complete/as part of transformation work
-                submissionResult <- Future.successful(Some(()))
                 submissionResult <- if (value) {
                   psrSubmissionService.submitPsrDetails(srn)(
                     implicitly,
@@ -130,8 +128,6 @@ class SurrenderedBenefitsMemberListController @Inject()(
     val userAnswersWithSurrenderedBenefitsMemberList =
       request.userAnswers.set(SurrenderedBenefitsMemberListPage(srn), selection)
 
-    //TODO: complete once Surrendered Benefits journey is complete/as part of transformation work
-    Future.fromTry(userAnswersWithSurrenderedBenefitsMemberList)
     if (selection) {
       val indexes = (1 to memberListSize)
         .map(i => refineV[OneTo300](i).leftMap(new Exception(_)).toTry)
