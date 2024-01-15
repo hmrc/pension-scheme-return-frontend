@@ -24,14 +24,19 @@ import models.SchemeId.Srn
 import models.{Money, NormalMode}
 import navigation.Navigator
 import pages.nonsipp.memberdetails.MemberDetailsPage
-import pages.nonsipp.membersurrenderedbenefits.{RemoveSurrenderedBenefitsPage, SurrenderedBenefitsAmountPage}
+import pages.nonsipp.membersurrenderedbenefits.{
+  surrenderBenefitsPages,
+  RemoveSurrenderedBenefitsPage,
+  SurrenderedBenefitsAmountPage,
+  SurrenderedBenefitsJourneyStatus
+}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{PsrSubmissionService, SaveService}
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
+import viewmodels.models.{FormPageViewModel, SectionStatus, YesNoPageViewModel}
 import views.html.YesNoPageView
 
 import javax.inject.{Inject, Named}
@@ -103,7 +108,13 @@ class RemoveSurrenderedBenefitsController @Inject()(
             if (removeDetails) {
               for {
                 updatedAnswers <- Future
-                  .fromTry(request.userAnswers.remove(SurrenderedBenefitsAmountPage(srn, index)))
+                  .fromTry(
+                    request.userAnswers
+                      .removePages(
+                        surrenderBenefitsPages(srn, index)
+                      )
+                      .set(SurrenderedBenefitsJourneyStatus(srn), SectionStatus.InProgress)
+                  )
                 _ <- saveService.save(updatedAnswers)
                 submissionResult <- psrSubmissionService.submitPsrDetails(srn, updatedAnswers)
               } yield submissionResult.fold(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))(
