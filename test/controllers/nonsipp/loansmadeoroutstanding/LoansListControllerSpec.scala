@@ -16,43 +16,88 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
-import config.Refined.Max5000
+import config.Refined.{Max5000, OneTo5000}
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.loansmadeoroutstanding.LoansListController._
+import eu.timepit.refined.api.Refined
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
-import models.{IdentitySubject, IdentityType, Money, NormalMode}
-import pages.nonsipp.common.IdentityTypePage
+import models.ConditionalYesNo._
+import models.{
+  ConditionalYesNo,
+  Crn,
+  IdentitySubject,
+  IdentityType,
+  Money,
+  NormalMode,
+  Security,
+  SponsoringOrConnectedParty,
+  Utr
+}
+import pages.nonsipp.common.{CompanyRecipientCrnPage, IdentityTypePage, PartnershipRecipientUtrPage}
 import pages.nonsipp.loansmadeoroutstanding._
+import uk.gov.hmrc.domain.Nino
 import views.html.ListView
 
 class LoansListControllerSpec extends ControllerBaseSpec {
   private val subject = IdentitySubject.LoanRecipient
 
-  private val filledUserAnswers = defaultUserAnswers
-    .unsafeSet(IdentityTypePage(srn, refineMV(1), subject), IdentityType.UKCompany)
-    .unsafeSet(CompanyRecipientNamePage(srn, refineMV(1)), "recipientName1")
-    .unsafeSet(AmountOfTheLoanPage(srn, refineMV(1)), (money, money, money))
-    .unsafeSet(IdentityTypePage(srn, refineMV(2), subject), IdentityType.UKPartnership)
-    .unsafeSet(PartnershipRecipientNamePage(srn, refineMV(2)), "recipientName2")
-    .unsafeSet(AmountOfTheLoanPage(srn, refineMV(2)), (money, money, money))
-    .unsafeSet(IdentityTypePage(srn, refineMV(3), subject), IdentityType.Individual)
-    .unsafeSet(IndividualRecipientNamePage(srn, refineMV(3)), "recipientName3")
-    .unsafeSet(AmountOfTheLoanPage(srn, refineMV(3)), (money, money, money))
+  val indexOne: Refined[Int, OneTo5000] = refineMV[OneTo5000](1)
+  val indexTwo: Refined[Int, OneTo5000] = refineMV[OneTo5000](2)
+  val indexThree: Refined[Int, OneTo5000] = refineMV[OneTo5000](3)
+
+  private val completedUserAnswers = defaultUserAnswers
+    .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
+    .unsafeSet(IdentityTypePage(srn, indexOne, subject), IdentityType.UKCompany)
+    .unsafeSet(CompanyRecipientNamePage(srn, indexOne), "recipientName1")
+    .unsafeSet(
+      CompanyRecipientCrnPage(srn, indexOne, IdentitySubject.LoanRecipient),
+      ConditionalYesNo.yes[String, Crn](crnGen.sample.value)
+    )
+    .unsafeSet(RecipientSponsoringEmployerConnectedPartyPage(srn, indexOne), SponsoringOrConnectedParty.ConnectedParty)
+    .unsafeSet(DatePeriodLoanPage(srn, indexOne), (localDate, money, loanPeriod))
+    .unsafeSet(AmountOfTheLoanPage(srn, indexOne), (money, money, money))
+    .unsafeSet(AreRepaymentsInstalmentsPage(srn, indexOne), false)
+    .unsafeSet(InterestOnLoanPage(srn, indexOne), (money, percentage, money))
+    .unsafeSet(SecurityGivenForLoanPage(srn, indexOne), ConditionalYesNo.yes[Unit, Security](security))
+    .unsafeSet(OutstandingArrearsOnLoanPage(srn, indexOne), ConditionalYesNo.yes[Unit, Money](money))
+    .unsafeSet(IdentityTypePage(srn, indexTwo, subject), IdentityType.UKPartnership)
+    .unsafeSet(PartnershipRecipientNamePage(srn, indexTwo), "recipientName2")
+    .unsafeSet(
+      PartnershipRecipientUtrPage(srn, indexTwo, IdentitySubject.LoanRecipient),
+      ConditionalYesNo.yes[String, Utr](utrGen.sample.value)
+    )
+    .unsafeSet(RecipientSponsoringEmployerConnectedPartyPage(srn, indexTwo), SponsoringOrConnectedParty.Neither)
+    .unsafeSet(DatePeriodLoanPage(srn, indexTwo), (localDate, money, loanPeriod))
+    .unsafeSet(AmountOfTheLoanPage(srn, indexTwo), (money, money, money))
+    .unsafeSet(AreRepaymentsInstalmentsPage(srn, indexTwo), false)
+    .unsafeSet(InterestOnLoanPage(srn, indexTwo), (money, percentage, money))
+    .unsafeSet(SecurityGivenForLoanPage(srn, indexTwo), ConditionalYesNo.no[Unit, Security](()))
+    .unsafeSet(OutstandingArrearsOnLoanPage(srn, indexTwo), ConditionalYesNo.no[Unit, Money](()))
+    .unsafeSet(IdentityTypePage(srn, indexThree, subject), IdentityType.Individual)
+    .unsafeSet(IndividualRecipientNamePage(srn, indexThree), "recipientName3")
+    .unsafeSet(IndividualRecipientNinoPage(srn, indexThree), ConditionalYesNo.yes[String, Nino](ninoGen.sample.value))
+    .unsafeSet(IsIndividualRecipientConnectedPartyPage(srn, indexThree), false)
+    .unsafeSet(DatePeriodLoanPage(srn, indexThree), (localDate, money, loanPeriod))
+    .unsafeSet(AmountOfTheLoanPage(srn, indexThree), (money, money, money))
+    .unsafeSet(AreRepaymentsInstalmentsPage(srn, indexThree), false)
+    .unsafeSet(InterestOnLoanPage(srn, indexThree), (money, percentage, money))
+    .unsafeSet(SecurityGivenForLoanPage(srn, indexThree), ConditionalYesNo.yes[Unit, Security](security))
+    .unsafeSet(OutstandingArrearsOnLoanPage(srn, indexThree), ConditionalYesNo.yes[Unit, Money](money))
 
   private lazy val onPageLoad = routes.LoansListController.onPageLoad(srn, page = 1, NormalMode)
   private lazy val onSubmit = routes.LoansListController.onSubmit(srn, page = 1, NormalMode)
   private lazy val onLoansMadePageLoad = routes.LoansMadeOrOutstandingController.onPageLoad(srn, NormalMode)
 
   private val recipients: List[(Max5000, String, Money)] = List(
-    (refineMV(1), "recipientName1", money),
-    (refineMV(2), "recipientName2", money),
-    (refineMV(3), "recipientName3", money)
+    (indexOne, "recipientName1", money),
+    (indexTwo, "recipientName2", money),
+    (indexThree, "recipientName3", money)
   )
 
   "LandOrPropertyDisposalListController" - {
 
-    act.like(renderView(onPageLoad, filledUserAnswers) { implicit app => implicit request =>
+    act.like(renderView(onPageLoad, completedUserAnswers) { implicit app => implicit request =>
       injected[ListView].apply(
         form(new YesNoPageFormProvider()),
         viewModel(
@@ -62,14 +107,23 @@ class LoansListControllerSpec extends ControllerBaseSpec {
           recipients
         )
       )
-    })
+    }.withName("Completed Journey"))
+
+    act.like(
+      redirectToPage(
+        onPageLoad,
+        controllers.nonsipp.common.routes.IdentityTypeController
+          .onPageLoad(srn, indexThree, NormalMode, IdentitySubject.LoanRecipient),
+        completedUserAnswers.remove(OutstandingArrearsOnLoanPage(srn, indexThree)).get
+      ).withName("Incomplete Journey")
+    )
 
     act.like(
       redirectToPage(
         onPageLoad,
         onLoansMadePageLoad,
         defaultUserAnswers
-      )
+      ).withName("Not Started Journey")
     )
 
     act.like(redirectNextPage(onSubmit, "value" -> "true"))

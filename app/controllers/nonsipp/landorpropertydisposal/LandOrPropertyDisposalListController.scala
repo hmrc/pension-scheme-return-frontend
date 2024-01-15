@@ -34,9 +34,10 @@ import pages.nonsipp.landorpropertydisposal._
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import utils.nonsipp.TaskListStatusUtils.getDisposalsTaskListStatusWithLink
 import viewmodels.DisplayMessage.{Message, ParagraphMessage}
 import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, ListRow, ListViewModel, PaginatedViewModel}
+import viewmodels.models._
 import views.html.ListView
 
 import javax.inject.Named
@@ -54,12 +55,11 @@ class LandOrPropertyDisposalListController @Inject()(
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      getDisposals(srn).map { disposals =>
-        val numberOfDisposal = disposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
-        if (numberOfDisposal == 0) {
-          Redirect(routes.LandOrPropertyDisposalController.onPageLoad(srn, NormalMode))
-        } else {
+      val (status, incompleteDisposalUrl) = getDisposalsTaskListStatusWithLink(request.userAnswers, srn)
 
+      if (status == TaskListStatus.Completed) {
+        getDisposals(srn).map { disposals =>
+          val numberOfDisposal = disposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
           val numberOfAddresses = request.userAnswers.map(LandOrPropertyAddressLookupPages(srn)).size
           val maxPossibleNumberOfDisposals = maxLandOrPropertyDisposals * numberOfAddresses
           getAddressesWithIndexes(srn, disposals)
@@ -68,8 +68,12 @@ class LandOrPropertyDisposalListController @Inject()(
                 Ok(view(form, viewModel(srn, mode, page, indexes, numberOfDisposal, maxPossibleNumberOfDisposals)))
             )
             .merge
-        }
-      }.merge
+        }.merge
+      } else if (status == TaskListStatus.InProgress) {
+        Redirect(incompleteDisposalUrl)
+      } else {
+        Redirect(routes.LandOrPropertyDisposalController.onPageLoad(srn, NormalMode))
+      }
   }
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>

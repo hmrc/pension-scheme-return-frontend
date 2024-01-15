@@ -10,7 +10,7 @@ lazy val appName: String = "pension-scheme-return-frontend"
 addCompilerPlugin("org.typelevel" % "kind-projector" % "0.13.2" cross CrossVersion.full)
 
 lazy val root = (project in file("."))
-  .enablePlugins(PlayScala, SbtAutoBuildPlugin, SbtDistributablesPlugin)
+  .enablePlugins(PlayScala, SbtDistributablesPlugin)
   .disablePlugins(JUnitXmlReportPlugin) //Required to prevent https://github.com/scalatest/scalatest/issues/1427
   .settings(inConfig(Test)(testSettings) *)
   .configs(IntegrationTest)
@@ -96,7 +96,7 @@ lazy val root = (project in file("."))
   )
 
 lazy val testSettings: Seq[Def.Setting[?]] = Seq(
-  fork := false,
+  fork := true,
   unmanagedSourceDirectories += baseDirectory.value / "test-utils"
 )
 
@@ -109,5 +109,5 @@ lazy val itSettings = Defaults.itSettings ++ Seq(
     baseDirectory.value / "it" / "resources"
   ),
   parallelExecution := false,
-  fork := false
+  fork := true
 )

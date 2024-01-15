@@ -34,9 +34,10 @@ import pages.nonsipp.moneyborrowed.{BorrowInstancesListPage, BorrowedAmountAndRa
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import utils.nonsipp.TaskListStatusUtils.getBorrowingTaskListStatusAndLink
 import viewmodels.DisplayMessage.{Message, ParagraphMessage}
 import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, ListRow, ListViewModel, PaginatedViewModel}
+import viewmodels.models._
 import views.html.ListView
 
 import javax.inject.Named
@@ -51,18 +52,21 @@ class BorrowInstancesListController @Inject()(
 ) extends PSRController
     with I18nSupport {
 
-  val form = BorrowInstancesListController.form(formProvider)
+  val form: Form[Boolean] = BorrowInstancesListController.form(formProvider)
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      borrowDetails(srn).map { instances =>
-        if (instances.isEmpty) {
-          Redirect(controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedController.onPageLoad(srn, mode))
-        } else {
-          val viewModel = BorrowInstancesListController.viewModel(srn, mode, page, instances)
-          Ok(view(form, viewModel))
-        }
-      }.merge
+      val (borrowingStatus, incompleteBorrowingUrl) = getBorrowingTaskListStatusAndLink(request.userAnswers, srn)
+
+      if (borrowingStatus == TaskListStatus.Completed) {
+        borrowDetails(srn)
+          .map(instances => Ok(view(form, BorrowInstancesListController.viewModel(srn, mode, page, instances))))
+          .merge
+      } else if (borrowingStatus == TaskListStatus.InProgress) {
+        Redirect(incompleteBorrowingUrl)
+      } else {
+        Redirect(controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedController.onPageLoad(srn, mode))
+      }
   }
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
