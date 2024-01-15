@@ -38,9 +38,10 @@ import pages.nonsipp.loansmadeoroutstanding._
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import utils.nonsipp.TaskListStatusUtils.getLoansTaskListStatus
 import viewmodels.DisplayMessage.{Message, ParagraphMessage}
 import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, ListRow, ListViewModel, PaginatedViewModel}
+import viewmodels.models._
 import views.html.ListView
 
 import javax.inject.Named
@@ -54,17 +55,17 @@ class LoansListController @Inject()(
   formProvider: YesNoPageFormProvider
 ) extends PSRController {
 
-  val form = LoansListController.form(formProvider)
+  val form: Form[Boolean] = LoansListController.form(formProvider)
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       loanRecipients(srn)
         .map(
           recipients =>
-            if (recipients.isEmpty) {
-              Redirect(routes.LoansMadeOrOutstandingController.onPageLoad(srn, NormalMode))
-            } else {
+            if (getLoansTaskListStatus(request.userAnswers, srn) == TaskListStatus.Completed) {
               Ok(view(form, viewModel(srn, page, mode, recipients)))
+            } else {
+              Redirect(routes.LoansMadeOrOutstandingController.onPageLoad(srn, NormalMode))
             }
         )
         .merge
@@ -73,7 +74,6 @@ class LoansListController @Inject()(
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     loanRecipients(srn).map { recipients =>
       if (recipients.length == maxLoans) {
-
         Redirect(navigator.nextPage(AccountingPeriodListPage(srn, addPeriod = false, mode), mode, request.userAnswers))
       } else {
 
