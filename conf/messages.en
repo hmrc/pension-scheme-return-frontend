@@ -433,6 +433,15 @@ shares.whatYouWillNeed.paragraph5.listItem2 = the seller’s name
 shares.whatYouWillNeed.paragraph5.listItem3 = the seller’s National Insurance number, Company Registration Number, Unique Taxpayer Reference or a description of the seller – whichever applies – or the reason you cannot provide it
 shares.whatYouWillNeed.paragraph5.listItem4 = the total value of the pension scheme’s assets on the date the shares were acquired (for shares held in a sponsoring employer only)
 
+shares.companyName.title = What is the name of the company to which these shares relate?
+shares.companyName.heading = What is the name of the company to which these {0} relate?
+shares.companyName.heading.type.01 = shares in a sponsoring employer
+shares.companyName.heading.type.02 = unquoted shares
+shares.companyName.heading.type.03 = shares acquired from a connected party
+shares.companyName.error.required = Enter the name of the company to which these shares relate
+shares.companyName.error.invalid.characters = Name of company must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+shares.companyName.error.length = Name of company must be 160 characters or fewer
+
 typeOfShares.title = Which type of shares were held in this transaction?
 typeOfShares.heading = Which type of shares were held in this transaction?
 typeOfShares.hint = Answer these questions for one share transaction at a time. If you need to add more shares, you will be able to do this later.

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,20 @@
 
 package pages.nonsipp.shares
 
-import play.api.libs.json.{__, JsPath}
+import config.Refined.OneTo5000
+import eu.timepit.refined.refineMV
+import pages.behaviours.PageBehaviours
 
-object Paths {
-  val shares: JsPath = __ \ "shares"
-  val shareTransactions: JsPath = shares \ "shareTransactions"
-  val heldSharesTransaction: JsPath = shareTransactions \ "heldSharesTransaction"
-  val shareIdentification: JsPath = shareTransactions \ "shareIdentification"
+class CompanyNameRelatedSharesPageSpec extends PageBehaviours {
+
+  "CompanyNameRelatedSharesPage" - {
+    val srn = srnGen.sample.value
+    val index = refineMV[OneTo5000](1)
+
+    beRetrievable[String](CompanyNameRelatedSharesPage(srn, index))
+
+    beSettable[String](CompanyNameRelatedSharesPage(srn, index))
+
+    beRemovable[String](CompanyNameRelatedSharesPage(srn, index))
+  }
 }
