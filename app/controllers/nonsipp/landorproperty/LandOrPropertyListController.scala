@@ -31,8 +31,10 @@ import pages.nonsipp.landorproperty.{LandOrPropertyAddressLookupPages, LandOrPro
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import utils.nonsipp.TaskListStatusUtils.getLandOrPropertyTaskListStatusAndLink
 import viewmodels.DisplayMessage.{Message, ParagraphMessage}
 import viewmodels.implicits._
+import viewmodels.models.TaskListStatus.Completed
 import viewmodels.models.{FormPageViewModel, ListRow, ListViewModel, PaginatedViewModel}
 import views.html.ListView
 
@@ -47,13 +49,15 @@ class LandOrPropertyListController @Inject()(
   formProvider: YesNoPageFormProvider
 ) extends PSRController {
 
-  val form = LandOrPropertyListController.form(formProvider)
+  val form: Form[Boolean] = LandOrPropertyListController.form(formProvider)
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      val addresses = request.userAnswers.map(LandOrPropertyAddressLookupPages(srn))
+      val userAnswers = request.userAnswers
+      val (status, _) = getLandOrPropertyTaskListStatusAndLink(userAnswers, srn)
 
-      if (addresses.nonEmpty) {
+      if (status == Completed) {
+        val addresses = userAnswers.map(LandOrPropertyAddressLookupPages(srn))
         val viewModel = LandOrPropertyListController.viewModel(srn, page, mode, addresses)
         Ok(view(form, viewModel))
       } else {
