@@ -1697,9 +1697,9 @@ removeBorrowInstances.title = Are you sure you want to remove this instance of b
 removeBorrowInstances.heading = Are you sure you want to remove £{0} borrowed from {1}?
 removeBorrowInstances.error.required = Select yes if you are sure you want to remove this instance of borrowing
 
-totalEmployerContribution.title = What was the total contribution by this employer for the member, in pounds and pence?
-totalEmployerContribution.heading = What was the total contribution by {0} for {1}, in pounds and pence?
-totalEmployerContribution.hint = Enter the total contribution made by this employer for this member during the period of this return.
+totalEmployerContribution.title = What was the total contribution made by this employer for the member, in pounds and pence?
+totalEmployerContribution.heading = What was the total contribution made by {0} for {1}, in pounds and pence?
+totalEmployerContribution.hint = During the period of this return
 totalEmployerContribution.error.required = Enter the total amount of the contribution, in pounds and pence
 totalEmployerContribution.error.invalid = Total contribution must be an amount of money, like 123 or 123.45
 totalEmployerContribution.error.tooSmall = Total contribution must be 0.01 or more
@@ -1844,7 +1844,7 @@ transferIn.MemberList.status.some.contributions = {0} transfers in
 
 contributionsFromAnotherEmployer.title = Were employer contributions made for the member by any other employer?
 contributionsFromAnotherEmployer.heading = Were employer contributions made for {0} by any other employer?
-contributionsFromAnotherEmployer.hint =  If employer contributions were made for this member by more than one employer, you must tell us about all of them.
+contributionsFromAnotherEmployer.hint =  You must tell us about all employers who made a contribution into this pension scheme for this member.
 contributionsFromAnotherEmployer.error.required = Select yes if employer contributions were made for the member by any other employer
 
 employerContributions.MemberList.title = Select a member to report employer contributions
@@ -1898,8 +1898,8 @@ employerContributionsCYA.row.employerId.partnership.reason = Reason you cannot p
 employerContributionsCYA.row.employerId.partnership.reason.hidden = reason you cannot provide {0}’s Unique Taxpayer Reference
 employerContributionsCYA.row.employerId.other = Description of {0}
 employerContributionsCYA.row.employerId.other.hidden = description of {0}
-employerContributionsCYA.row.contribution = Total contribution by {0} for {1}
-employerContributionsCYA.row.contribution.hidden = total contribution by {0} for {1}
+employerContributionsCYA.row.contribution = Total contribution made by {0} for {1}
+employerContributionsCYA.row.contribution.hidden = total contribution made by {0} for {1}
 employerContributionsCYA.row.contributionOtherEmployer = Were employer contributions made for {0} by any other employer?
 employerContributionsCYA.row.contributionOtherEmployer.hidden =  if employer contributions were made for {0} by any other employer
 employerContributionsCYA.inset = You cannot add any more employer contributions for this member as you have entered the maximum of 50. If you need to remove one, you can do this on the next page.
