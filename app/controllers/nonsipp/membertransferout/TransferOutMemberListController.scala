@@ -16,7 +16,6 @@
 
 package controllers.nonsipp.membertransferout
 
-import cats.implicits.catsSyntaxApplicativeId
 import com.google.inject.Inject
 import config.Constants
 import config.Constants.maxNotRelevant
@@ -29,16 +28,14 @@ import models.SchemeId.Srn
 import models._
 import navigation.Navigator
 import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
-import pages.nonsipp.membertransferout.{ReceivingSchemeNamePages, TransferOutMemberListPage}
-import pages.nonsipp.receivetransfer.TransfersInJourneyStatus
 import pages.nonsipp.membertransferout.{ReceivingSchemeNamePages, TransferOutMemberListPage, TransfersOutJourneyStatus}
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{PsrSubmissionService, SaveService}
-import viewmodels.DisplayMessage.{LinkMessage, Message}
+import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
 import viewmodels.implicits._
-import viewmodels.models.{ActionTableViewModel, FormPageViewModel, PaginatedViewModel, SectionStatus, TableElem}
+import viewmodels.models._
 import views.html.TwoColumnsTripleAction
 
 import javax.inject.Named
@@ -214,7 +211,12 @@ object TransferOutMemberListController {
       heading = Message(heading, memberList.size),
       description = None,
       page = ActionTableViewModel(
-        inset = "transferOut.memberList.paragraph",
+        inset = ParagraphMessage(
+          "transferOut.memberList.paragraph1"
+        ) ++
+          ParagraphMessage(
+            "transferOut.memberList.paragraph2"
+          ),
         head = Some(List(TableElem("Member name"), TableElem("Status"))),
         rows = rows(srn, mode, memberList, userAnswers),
         radioText = Message("transferOut.memberList.radios"),

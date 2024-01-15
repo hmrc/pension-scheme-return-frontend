@@ -19,7 +19,6 @@ package controllers.nonsipp.memberreceivedpcls
 import cats.implicits.{toBifunctorOps, toTraverseOps}
 import com.google.inject.Inject
 import config.Constants
-import config.Constants.maxNotRelevant
 import config.Refined.OneTo300
 import controllers.PSRController
 import controllers.actions._
@@ -35,7 +34,7 @@ import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{PsrSubmissionService, SaveService}
-import viewmodels.DisplayMessage.{LinkMessage, Message}
+import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
 import viewmodels.implicits._
 import viewmodels.models.{ActionTableViewModel, FormPageViewModel, PaginatedViewModel, TableElem}
 import views.html.TwoColumnsTripleAction
@@ -242,11 +241,15 @@ object PclsMemberListController {
       heading = Message(heading, memberList.size),
       description = None,
       page = ActionTableViewModel(
-        inset = "pcls.memberlist.paragraph",
+        inset = ParagraphMessage(
+          "pcls.memberlist.paragraph1"
+        ) ++
+          ParagraphMessage(
+            "pcls.memberlist.paragraph2"
+          ),
         head = Some(List(TableElem("Member name"), TableElem("Status"))),
         rows = rows(srn, memberList, userAnswers),
         radioText = Message("pcls.memberlist.radios"),
-        showRadios = memberList.length < maxNotRelevant,
         showInsetWithRadios = true,
         paginatedViewModel = Some(
           PaginatedViewModel(
