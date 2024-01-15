@@ -20,19 +20,9 @@ import config.Refined.Max5000
 import models.SchemeId.Srn
 import models.{IdentitySubject, IdentityType, UserAnswers}
 import pages.QuestionPage
-import pages.nonsipp.landorproperty.{
-  CompanySellerNamePage,
-  IndividualSellerNiPage,
-  LandOrPropertySellerConnectedPartyPage,
-  LandPropertyIndividualSellersNamePage,
-  PartnershipSellerNamePage
-}
-import pages.nonsipp.loansmadeoroutstanding.{
-  DatePeriodLoanPage,
-  IsIndividualRecipientConnectedPartyPage,
-  RecipientSponsoringEmployerConnectedPartyPage,
-  _
-}
+import pages.nonsipp.landorproperty._
+import pages.nonsipp.loansmadeoroutstanding
+import pages.nonsipp.loansmadeoroutstanding._
 import play.api.libs.json.JsPath
 import queries.Removable
 import utils.PageUtils._
@@ -45,7 +35,7 @@ case class IdentityTypePage(srn: Srn, index: Max5000, identitySubject: IdentityS
 
   override def path: JsPath = identitySubject match {
     case IdentitySubject.LoanRecipient =>
-      Paths.loanTransactions \ "recipientIdentityType" \ toString \ index.arrayIndex.toString
+      loansmadeoroutstanding.Paths.loanTransactions \ "recipientIdentityType" \ toString \ index.arrayIndex.toString
     case IdentitySubject.LandOrPropertySeller =>
       pages.nonsipp.landorproperty.Paths.heldPropertyTransactions \ "propertyAcquiredFrom" \ "sellerIdentityType" \ toString \ index.arrayIndex.toString
     case IdentitySubject.SharesSeller =>
@@ -54,10 +44,13 @@ case class IdentityTypePage(srn: Srn, index: Max5000, identitySubject: IdentityS
 
   override def toString: String = "identityTypes"
 
-  private def allPages(srn: Srn): List[Removable[_]] =
-    pagesDependentOnIdentitySubject(srn) ++ pagesNotDependentOnIdentitySubject(srn)
+  private def allPages(srn: Srn, userAnswers: UserAnswers): List[Removable[_]] =
+    pagesDependentOnIdentitySubject(srn) ++ pagesNotDependentOnIdentitySubject(
+      srn,
+      userAnswers.map(IdentityTypes(srn, IdentitySubject.LoanRecipient)).size == 1
+    )
 
-  private def pagesNotDependentOnIdentitySubject(srn: Srn): List[Removable[_]] =
+  private def pagesNotDependentOnIdentitySubject(srn: Srn, isLastRecord: Boolean): List[Removable[_]] =
     this.identitySubject match {
       // only for loans for now, as this is the first question in the journey
       case IdentitySubject.LoanRecipient =>
@@ -69,7 +62,7 @@ case class IdentityTypePage(srn: Srn, index: Max5000, identitySubject: IdentityS
           OutstandingArrearsOnLoanPage(srn, index),
           SecurityGivenForLoanPage(srn, index)
         )
-        if (index.value == 1) list :+ LoansMadeOrOutstandingPage(srn) else list
+        if (isLastRecord) list :+ LoansMadeOrOutstandingPage(srn) else list
       case IdentitySubject.LandOrPropertySeller =>
         List().empty
       case IdentitySubject.SharesSeller =>
@@ -121,14 +114,15 @@ case class IdentityTypePage(srn: Srn, index: Max5000, identitySubject: IdentityS
       case (Some(IdentityType.UKCompany), _) => removePages(userAnswers, pagesDependentOnIdentitySubject(srn))
       case (Some(IdentityType.UKPartnership), _) => removePages(userAnswers, pagesDependentOnIdentitySubject(srn))
       case (Some(IdentityType.Other), _) => removePages(userAnswers, pagesDependentOnIdentitySubject(srn))
-      case (None, _) => removePages(userAnswers, allPages(srn))
+      case (None, _) => removePages(userAnswers, allPages(srn, userAnswers))
       case _ => Try(userAnswers)
     }
 }
 
 case class IdentityTypes(srn: Srn, identitySubject: IdentitySubject) extends QuestionPage[Map[String, IdentityType]] {
   override def path: JsPath = identitySubject match {
-    case IdentitySubject.LoanRecipient => Paths.loanTransactions \ "recipientIdentityType" \ toString
+    case IdentitySubject.LoanRecipient =>
+      loansmadeoroutstanding.Paths.loanTransactions \ "recipientIdentityType" \ toString
     case IdentitySubject.LandOrPropertySeller =>
       pages.nonsipp.landorproperty.Paths.heldPropertyTransactions \ "propertyAcquiredFrom" \ "sellerIdentityType" \ toString
     case IdentitySubject.SharesSeller =>

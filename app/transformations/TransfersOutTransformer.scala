@@ -20,11 +20,10 @@ import cats.syntax.traverse._
 import com.google.inject.Singleton
 import config.Refined.{Max300, Max5}
 import models.SchemeId.Srn
+import models.UserAnswers
 import models.UserAnswers.implicits.UserAnswersTryOps
 import models.requests.psr._
-import models.{Money, UserAnswers}
 import pages.nonsipp.membertransferout._
-import pages.nonsipp.receivetransfer._
 import viewmodels.models.{SectionCompleted, SectionStatus}
 
 import javax.inject.Inject

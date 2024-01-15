@@ -93,7 +93,11 @@ class RemoveLandPropertyDisposalController @Inject()(
       .flatMap(_.remove(IndividualBuyerNinoNumberPage(srn, landOrPropertyIndex, disposalIndex)))
       .flatMap(_.remove(OtherBuyerDetailsPage(srn, landOrPropertyIndex, disposalIndex)))
 
-    if (disposalIndex.value == 1) mustRemovedUa.flatMap(_.remove(LandOrPropertyDisposalPage(srn))) else mustRemovedUa
+    if (userAnswers.map(LandPropertyDisposalCompletedPages(srn)).size == 1) {
+      mustRemovedUa.flatMap(_.remove(LandOrPropertyDisposalPage(srn)))
+    } else {
+      mustRemovedUa
+    }
   }
 
   def onSubmit(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
