@@ -29,7 +29,7 @@ import models.SchemeId.Srn
 import models.requests.DataRequest
 import models.{Address, Mode, NormalMode, Pagination}
 import navigation.Navigator
-import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
+import pages.nonsipp.landorproperty.{LandOrPropertyAddressLookupPages, LandOrPropertyChosenAddressPage}
 import pages.nonsipp.landorpropertydisposal._
 import play.api.data.Form
 import play.api.i18n.MessagesApi
@@ -50,17 +50,23 @@ class LandOrPropertyDisposalListController @Inject()(
   formProvider: YesNoPageFormProvider
 ) extends PSRController {
 
-  val form = LandOrPropertyDisposalListController.form(formProvider)
+  val form: Form[Boolean] = LandOrPropertyDisposalListController.form(formProvider)
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       getDisposals(srn).map { disposals =>
-        val disposalAmount = disposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
-        if (disposalAmount == 0) {
+        val numberOfDisposal = disposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
+        if (numberOfDisposal == 0) {
           Redirect(routes.LandOrPropertyDisposalController.onPageLoad(srn, NormalMode))
         } else {
+
+          val numberOfAddresses = request.userAnswers.map(LandOrPropertyAddressLookupPages(srn)).size
+          val maxPossibleNumberOfDisposals = maxLandOrPropertyDisposals * numberOfAddresses
           getAddressesWithIndexes(srn, disposals)
-            .map(indexes => Ok(view(form, viewModel(srn, mode, page, indexes))))
+            .map(
+              indexes =>
+                Ok(view(form, viewModel(srn, mode, page, indexes, numberOfDisposal, maxPossibleNumberOfDisposals)))
+            )
             .merge
         }
       }.merge
@@ -68,7 +74,10 @@ class LandOrPropertyDisposalListController @Inject()(
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     getDisposals(srn).map { disposals =>
-      if (disposals.size == maxLandOrPropertyDisposals) {
+      val numberOfDisposals = disposals.map { case (_, disposalIndexes) => disposalIndexes.size }.sum
+      val numberOfAddresses = request.userAnswers.map(LandOrPropertyAddressLookupPages(srn)).size
+      val maxPossibleNumberOfDisposals = maxLandOrPropertyDisposals * numberOfAddresses
+      if (numberOfDisposals == maxPossibleNumberOfDisposals) {
         Redirect(
           navigator.nextPage(LandOrPropertyDisposalListPage(srn, addDisposal = false), mode, request.userAnswers)
         )
@@ -78,7 +87,12 @@ class LandOrPropertyDisposalListController @Inject()(
           .fold(
             errors =>
               getAddressesWithIndexes(srn, disposals)
-                .map(indexes => BadRequest(view(errors, viewModel(srn, mode, page, indexes))))
+                .map(
+                  indexes =>
+                    BadRequest(
+                      view(errors, viewModel(srn, mode, page, indexes, numberOfDisposals, maxPossibleNumberOfDisposals))
+                    )
+                )
                 .merge,
             answer =>
               Redirect(navigator.nextPage(LandOrPropertyDisposalListPage(srn, answer), mode, request.userAnswers))
@@ -153,34 +167,35 @@ object LandOrPropertyDisposalListController {
     srn: Srn,
     mode: Mode,
     page: Int,
-    addressesWithIndexes: List[((Max5000, List[Max50]), Address)]
+    addressesWithIndexes: List[((Max5000, List[Max50]), Address)],
+    numberOfDisposals: Int,
+    maxPossibleNumberOfDisposals: Int
   ): FormPageViewModel[ListViewModel] = {
 
-    val disposalAmount = addressesWithIndexes.map { case ((_, disposalIndexes), _) => disposalIndexes.size }.sum
-
-    val title =
-      if (disposalAmount == 1) "landOrPropertyDisposalList.title"
-      else "landOrPropertyDisposalList.title.plural"
-    val heading =
-      if (disposalAmount == 1) "landOrPropertyDisposalList.heading"
-      else "landOrPropertyDisposalList.heading.plural"
+    val (title, heading) = if (numberOfDisposals == 1) {
+      ("landOrPropertyDisposalList.title", "landOrPropertyDisposalList.heading")
+    } else {
+      ("landOrPropertyDisposalList.title.plural", "landOrPropertyDisposalList.heading.plural")
+    }
 
     val pagination = Pagination(
       currentPage = page,
       pageSize = Constants.landOrPropertyDisposalsSize,
-      disposalAmount,
+      numberOfDisposals,
       routes.LandOrPropertyDisposalListController.onPageLoad(srn, _)
     )
 
     FormPageViewModel(
-      title = Message(title, disposalAmount),
-      heading = Message(heading, disposalAmount),
-      description = Some(ParagraphMessage("landOrPropertyDisposalList.description")),
+      title = Message(title, numberOfDisposals),
+      heading = Message(heading, numberOfDisposals),
+      description = Option.when(numberOfDisposals < maxPossibleNumberOfDisposals)(
+        ParagraphMessage("landOrPropertyDisposalList.description")
+      ),
       page = ListViewModel(
         inset = "landOrPropertyDisposalList.inset",
         rows(srn, mode, addressesWithIndexes),
         Message("landOrPropertyDisposalList.radios"),
-        showRadios = disposalAmount < maxLandOrPropertyDisposals,
+        showRadios = numberOfDisposals < maxPossibleNumberOfDisposals,
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(

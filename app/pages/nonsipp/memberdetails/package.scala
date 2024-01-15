@@ -16,10 +16,10 @@
 
 package pages.nonsipp
 
-import play.api.libs.json.__
+import play.api.libs.json.{__, JsPath}
 
 package object memberdetails {
   object Paths {
-    val personalDetails = __ \ "membersPayments" \ "memberDetails" \ "personalDetails"
+    val personalDetails: JsPath = __ \ "membersPayments" \ "memberDetails" \ "personalDetails"
   }
 }
