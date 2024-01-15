@@ -31,17 +31,56 @@ trait PaginationFluency {
 
       val showPreviousPageLink: Boolean = currentPage > 1
       val showNextPageLink: Boolean = (currentPage * pageSize) < totalSize
-      val pageItems: List[PaginationItem] =
-        List.tabulate(totalPages)(
-          i => {
-            val arrayIndex = i + 1
-            PaginationItem(
-              href = call(arrayIndex).url,
-              number = Some(arrayIndex.toString),
-              current = Option.when(arrayIndex == currentPage)(true)
-            )
-          }
+
+      val firstItem: Option[PaginationItem] = Option.when(currentPage > 1)(
+        PaginationItem(
+          href = call(1).url,
+          number = Some("1")
         )
+      )
+
+      val previousEllipses: Option[PaginationItem] = Option.when(currentPage > 3)(ellipsePaginationItem)
+
+      val previousItem: Option[PaginationItem] = Option.when(currentPage > 2)(
+        PaginationItem(
+          href = call(currentPage - 1).url,
+          number = Some((currentPage - 1).toString)
+        )
+      )
+
+      val currentItem: Option[PaginationItem] = Some(
+        PaginationItem(
+          href = call(currentPage).url,
+          number = Some(currentPage.toString),
+          current = Some(true)
+        )
+      )
+
+      val nextItem: Option[PaginationItem] = Option.when((totalPages - currentPage) > 1)(
+        PaginationItem(
+          href = call(currentPage + 1).url,
+          number = Some((currentPage + 1).toString)
+        )
+      )
+
+      val nextEllipses: Option[PaginationItem] = Option.when((totalPages - currentPage) > 2)(ellipsePaginationItem)
+
+      val lastItem: Option[PaginationItem] = Option.when(currentPage < totalPages)(
+        PaginationItem(
+          href = call(totalPages).url,
+          number = Some(totalPages.toString)
+        )
+      )
+
+      val pageItems = Seq(
+        firstItem,
+        previousEllipses,
+        previousItem,
+        currentItem,
+        nextItem,
+        nextEllipses,
+        lastItem
+      ).flatten
 
       Pagination(
         items = Option.when(totalSize > pageSize)(pageItems),
@@ -51,4 +90,9 @@ trait PaginationFluency {
       )
     }
   }
+
+  private val ellipsePaginationItem = PaginationItem(
+    href = "",
+    ellipsis = Some(true)
+  )
 }

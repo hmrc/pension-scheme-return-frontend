@@ -39,7 +39,7 @@ import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.PsrSubmissionService
 import utils.MapUtils.{MapOps, UserAnswersMapOps}
-import viewmodels.DisplayMessage.Message
+import viewmodels.DisplayMessage.{Message, ParagraphMessage}
 import viewmodels.implicits._
 import viewmodels.models._
 import views.html.ListView
@@ -227,13 +227,14 @@ object SchemeMembersListController {
     )
 
     FormPageViewModel(
-      Message(title, lengthOfFilteredMembers),
-      Message(heading, lengthOfFilteredMembers),
-      ListViewModel(
+      title = Message(title, lengthOfFilteredMembers),
+      heading = Message(heading, lengthOfFilteredMembers),
+      description = Option
+        .when(lengthOfFilteredMembers < Constants.maxSchemeMembers)(ParagraphMessage("schemeMembersList.paragraph")),
+      page = ListViewModel(
         inset = "schemeMembersList.inset",
         rows,
         radioText,
-        showRadios = lengthOfFilteredMembers < Constants.maxSchemeMembers,
         showInsetWithRadios = lengthOfFilteredMembers == Constants.maxSchemeMembers,
         paginatedViewModel = Some(
           PaginatedViewModel(
@@ -248,6 +249,9 @@ object SchemeMembersListController {
         ),
         yesHintText = yesHintText
       ),
+      refresh = None,
+      Message("site.saveAndContinue"),
+      None,
       onSubmit = routes.SchemeMembersListController.onSubmit(srn, page, manualOrUpload)
     )
   }

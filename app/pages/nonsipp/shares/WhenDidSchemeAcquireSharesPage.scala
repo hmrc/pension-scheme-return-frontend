@@ -14,12 +14,20 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages.nonsipp.shares
 
-import play.api.libs.json.{__, JsPath}
+import config.Refined.Max5000
+import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
+import utils.RefinedUtils.RefinedIntOps
 
-package object memberdetails {
-  object Paths {
-    val personalDetails: JsPath = __ \ "membersPayments" \ "memberDetails" \ "personalDetails"
-  }
+import java.time.LocalDate
+
+case class WhenDidSchemeAcquireSharesPage(srn: Srn, index: Max5000) extends QuestionPage[LocalDate] {
+
+  override def path: JsPath =
+    Paths.heldSharesTransaction \ toString \ index.arrayIndex.toString
+
+  override def toString: String = "dateOfAcqOrContrib"
 }

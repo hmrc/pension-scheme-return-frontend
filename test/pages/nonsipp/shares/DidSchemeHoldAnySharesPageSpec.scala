@@ -14,12 +14,20 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages.nonsipp.shares
 
-import play.api.libs.json.{__, JsPath}
+import pages.behaviours.PageBehaviours
 
-package object memberdetails {
-  object Paths {
-    val personalDetails: JsPath = __ \ "membersPayments" \ "memberDetails" \ "personalDetails"
+class DidSchemeHoldAnySharesPageSpec extends PageBehaviours {
+
+  "DidSchemeHoldAnySharesPage" - {
+
+    val srn = srnGen.sample.value
+
+    beRetrievable[Boolean](DidSchemeHoldAnySharesPage(srn))
+
+    beSettable[Boolean](DidSchemeHoldAnySharesPage(srn))
+
+    beRemovable[Boolean](DidSchemeHoldAnySharesPage(srn))
   }
 }

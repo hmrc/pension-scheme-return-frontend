@@ -227,7 +227,7 @@ pensionSchemeMembers.description1 = You can enter the details manually, or uploa
 pensionSchemeMembers.legend = How do you want to add member details?
 pensionSchemeMembers.manualEntry = Manually enter the details
 pensionSchemeMembers.upload = Upload a file
-pensionSchemeMembers.upload.hint = Uploading a file will overwrite any details you have previously added about scheme members
+pensionSchemeMembers.upload.hint = This will overwrite any member details and payments for them you have previously added
 pensionSchemeMembers.error.required = Select how you want to add member details
 
 memberDetails.title = Member’s details
@@ -348,6 +348,7 @@ schemeMembersList.title = You have added {0} member
 schemeMembersList.title.plural = You have added {0} members
 schemeMembersList.heading = You have added {0} member
 schemeMembersList.heading.plural = You have added {0} members
+schemeMembersList.paragraph = You must tell us about everyone who was a member of the scheme during the period of this return.
 schemeMembersList.radio = Do you need to add more members?
 schemeMembersList.inset = You cannot add more members as you have entered the maximum of 300.
 schemeMembersList.change.hidden = Change {0}
@@ -433,6 +434,15 @@ shares.whatYouWillNeed.paragraph5.listItem2 = the seller’s name
 shares.whatYouWillNeed.paragraph5.listItem3 = the seller’s National Insurance number, Company Registration Number, Unique Taxpayer Reference or a description of the seller – whichever applies – or the reason you cannot provide it
 shares.whatYouWillNeed.paragraph5.listItem4 = the total value of the pension scheme’s assets on the date the shares were acquired (for shares held in a sponsoring employer only)
 
+shares.companyName.title = What is the name of the company to which these shares relate?
+shares.companyName.heading = What is the name of the company to which these {0} relate?
+shares.companyName.heading.type.01 = shares in a sponsoring employer
+shares.companyName.heading.type.02 = unquoted shares
+shares.companyName.heading.type.03 = shares acquired from a connected party
+shares.companyName.error.required = Enter the name of the company to which these shares relate
+shares.companyName.error.invalid.characters = Name of company must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+shares.companyName.error.length = Name of company must be 160 characters or fewer
+
 typeOfShares.title = Which type of shares were held in this transaction?
 typeOfShares.heading = Which type of shares were held in this transaction?
 typeOfShares.hint = Answer these questions for one share transaction at a time. If you need to add more shares, you will be able to do this later.
@@ -440,6 +450,32 @@ typeOfShares.error.required = Select the type of shares held in this transaction
 typeOfShares.radioList1 = Shares in a sponsoring employer
 typeOfShares.radioList2 = Unquoted shares
 typeOfShares.radioList3 = Any other shares acquired from a connected party
+
+whyDoesSchemeHoldShares.title = Why does the scheme hold these shares?
+whyDoesSchemeHoldShares.heading = Why does {0} hold these {1}?
+whyDoesSchemeHoldShares.heading.type.01 = shares in a sponsoring employer
+whyDoesSchemeHoldShares.heading.type.02 = unquoted shares
+whyDoesSchemeHoldShares.heading.type.03 = shares acquired from a connected party
+whyDoesSchemeHoldShares.error.required = Select why the scheme holds these shares
+whyDoesSchemeHoldShares.radioList1 = Acquisition
+whyDoesSchemeHoldShares.radioList1.hint = This can be a purchase.
+whyDoesSchemeHoldShares.radioList2 = Contribution by an employer or member
+whyDoesSchemeHoldShares.radioList3 = Transfer from another scheme
+
+whenDidSchemeAcquireShares.title = When did the scheme acquire these shares?
+whenDidSchemeAcquireShares.heading = When did {0} acquire these {1}?
+whenDidSchemeAcquireShares.heading.type.01 = shares in a sponsoring employer
+whenDidSchemeAcquireShares.heading.type.02 = unquoted shares
+whenDidSchemeAcquireShares.heading.type.03 = shares acquired from a connected party
+whenDidSchemeAcquireShares.dateOfAcquired.error.required.all = Enter the date the scheme acquired these shares
+whenDidSchemeAcquireShares.dateOfAcquired.error.required.day = Date the scheme acquired these shares must include a day
+whenDidSchemeAcquireShares.dateOfAcquired.error.required.month = Date the scheme acquired these shares must include a month
+whenDidSchemeAcquireShares.dateOfAcquired.error.required.year = Date the scheme acquired these shares must include a year
+whenDidSchemeAcquireShares.dateOfAcquired.error.required.two = Date the scheme acquired these shares must include a {0} and {1}
+whenDidSchemeAcquireShares.dateOfAcquired.error.invalid.date = Date the scheme acquired these shares must be a real date
+whenDidSchemeAcquireShares.dateOfAcquired.error.invalid.characters = Date the scheme acquired these shares must only include numbers 0 to 9
+whenDidSchemeAcquireShares.dateOfAcquired.error.future = Date the scheme acquired these shares must be the same as or before {0}
+whenDidSchemeAcquireShares.dateOfAcquired.error.after = Date the scheme acquired these shares must be after {0}
 
 pensionCommencementLumpSum.title = Did any member receive a pension commencement lump sum (PCLS) during the period of this return?
 pensionCommencementLumpSum.heading = Did any member receive a pension commencement lump sum (PCLS) during the period of this return?
@@ -509,6 +545,41 @@ surrenderedBenefits.whatYouWillNeed.tellUs1 = the total amount surrendered
 surrenderedBenefits.whatYouWillNeed.tellUs2 = the date the member surrendered their benefits
 surrenderedBenefits.whatYouWillNeed.tellUs3 = why the member surrendered their benefits
 
+surrenderedBenefits.whyDidMemberSurrenderBenefits.title = Why did the member surrender their pension benefits?
+surrenderedBenefits.whyDidMemberSurrenderBenefits.heading = Why did {0} surrender their pension benefits of £{2}?
+surrenderedBenefits.whyDidMemberSurrenderBenefits.error.required = Enter the reason the member surrendered these benefits
+surrenderedBenefits.whyDidMemberSurrenderBenefits.error.invalid = The reason the member surrendered these benefits must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+surrenderedBenefits.whyDidMemberSurrenderBenefits.error.length = The reason the member surrendered these benefits must be 160 characters or fewer
+
+surrenderedBenefits.memberList.title = Select a member to report surrendered benefits
+surrenderedBenefits.memberList.heading = Select a member to report surrendered benefits
+surrenderedBenefits.memberList.inset1 = You must tell us about all benefits surrendered by members of the scheme during the period of this return.
+surrenderedBenefits.memberList.inset2 = If you need to add a new member, go to the ‘Change details of members’ section of this return.
+surrenderedBenefits.memberList.radios = Have you finished reporting surrendered benefits?
+surrenderedBenefits.memberList.radios.error.required = Select yes if you have finished reporting surrendered benefits
+surrenderedBenefits.memberList.pagination.label = Showing {0} - {1} of {2} members
+surrenderedBenefits.memberList.status.no.items = No surrendered benefits
+surrenderedBenefits.memberList.status.some.item = Surrendered benefits reported
+
+surrenderedBenefits.amount.title = What was the total amount surrendered by the member, in pounds and pence?
+surrenderedBenefits.amount.heading = What was the total amount surrendered by {0}, in pounds and pence?
+surrenderedBenefits.amount.error.required = Enter the total amount surrendered, in pounds and pence
+surrenderedBenefits.amount.error.invalid = Total amount surrendered must be an amount of money, like 123 or 123.45
+surrenderedBenefits.amount.error.tooSmall = Total amount surrendered must be 1 or more
+surrenderedBenefits.amount.error.tooLarge = Total amount surrendered must be 999999999.99 or less
+
+surrenderedBenefits.when.title = When did the member surrender their pension benefits?
+surrenderedBenefits.when.heading = When did {0} surrender their pension benefits of £{1}?
+surrenderedBenefits.when.error.required.day = Date the member surrendered their pension benefits must include a day
+surrenderedBenefits.when.error.required.month = Date the member surrendered their pension benefits must include a month
+surrenderedBenefits.when.error.required.year = Date the member surrendered their pension benefits must include a year
+surrenderedBenefits.when.error.required.two = Date the member surrendered their pension benefits must include a {0} and {1}
+surrenderedBenefits.when.error.required.all = Enter the date the member surrendered their pension benefits
+surrenderedBenefits.when.error.date.before = Date the member surrendered their pension benefits must be after {0}
+surrenderedBenefits.when.error.date.after = Date the member surrendered their pension benefits must be before {0}
+surrenderedBenefits.when.error.invalid.date = Date the member surrendered their pension benefits must be a real date
+surrenderedBenefits.when.error.invalid.characters = Date the member surrendered their pension benefits must only include numbers 0 to 9
+
 otherAssetsHeld.title = Did the scheme hold any other assets during the period of this return?
 otherAssetsHeld.heading = Did {0} hold any other assets during the period of this return?
 otherAssetsHeld.error.required = Select yes if the scheme held any other assets during the period of this return
@@ -535,7 +606,7 @@ unallocatedEmployerContributions.error.required = Select yes if any unallocated 
 
 uploadMemberDetails.title = Upload your member details file
 uploadMemberDetails.heading = Upload your member details file
-uploadMemberDetails.paragraph = Uploading a file will overwrite any details you have previously added about scheme members.
+uploadMemberDetails.paragraph = This will overwrite any member details and payments for them you have previously added.
 uploadMemberDetails.details.paragraph = Include the following information for each member of the scheme:
 uploadMemberDetails.list1 = their first and last name
 uploadMemberDetails.list2 = their National Insurance number, in the format QQ 12 34 56 C, or the reason they do not have one
@@ -571,9 +642,9 @@ fileUploadError.title = There was a problem
 fileUploadError.heading = There was a problem
 fileUploadError.paragraph = Select continue to find out more.
 
-membersUploaded.radio = Do you want to upload another member details file?
-membersUploaded.radio.yes.hint = Uploading a file will overwrite any details you have previously added about scheme members.
-membersUploaded.error.required = Select yes if you want to upload another member details file
+membersUploaded.radio = Do you want to upload a member details file?
+membersUploaded.radio.yes.hint = This will overwrite any member details and payments for them you have previously added.
+membersUploaded.error.required = Select yes if you want to upload a member details file
 
 nonsipp.tasklist.title = Pension scheme return for {0} to {1}
 nonsipp.tasklist.heading = Pension scheme return for {0} to {1}
@@ -2026,3 +2097,16 @@ totalAmountPensionPayments.heading = What was the total amount of pension paymen
 totalAmountPensionPayments.error.required = Enter the total amount of pension payments, in pounds and pence
 totalAmountPensionPayments.error.invalid = Total amount of pension payments must be an amount of money, like 123 or 123.45
 totalAmountPensionPayments.error.tooLarge = Total amount of pension payments must be 999999999.99 or less
+
+MemberPensionPaymentsCYA.title = Check your answers
+MemberPensionPaymentsCYA.change.title = Change details of pension payments for this member
+MemberPensionPaymentsCYA.heading = Check your answers
+MemberPensionPaymentsCYA.change.heading = Change details of pension payments for {0}
+MemberPensionPaymentsCYA.section.memberName.header = Member’s name
+MemberPensionPaymentsCYA.section.memberName = Total amount of pension payments received by {0}
+MemberPensionPaymentsCYA.section.amount = £ {0}
+MemberPensionPaymentsCYA.section.hide = total amount of pension payments received by {0}
+
+removePensionPayments.title = Are you sure you want to remove the pension payments for this member?
+removePensionPayments.heading = Are you sure you want to remove the pension payments of £{0} for {1}?
+removePensionPayments.error.required = Select yes if you are sure you want to remove the pension payments for this member

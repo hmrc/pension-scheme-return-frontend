@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages.nonsipp.memberpensionpayments
 
-import play.api.libs.json.{__, JsPath}
+import config.Refined.Max300
+import models.SchemeId.Srn
+import pages.Page
 
-package object memberdetails {
-  object Paths {
-    val personalDetails: JsPath = __ \ "membersPayments" \ "memberDetails" \ "personalDetails"
-  }
-}
+case class RemovePensionPaymentsPage(srn: Srn, index: Max300) extends Page

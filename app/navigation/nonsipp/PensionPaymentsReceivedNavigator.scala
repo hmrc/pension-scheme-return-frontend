@@ -20,8 +20,10 @@ import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.memberpensionpayments.{
+  MemberPensionPaymentsCYAPage,
   MemberPensionPaymentsListPage,
   PensionPaymentsReceivedPage,
+  RemovePensionPaymentsPage,
   TotalAmountPensionPaymentsPage,
   WhatYouWillNeedPensionPaymentsPage
 }
@@ -45,9 +47,35 @@ object PensionPaymentsReceivedNavigator extends JourneyNavigator {
       controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
 
     case TotalAmountPensionPaymentsPage(srn, index) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+      controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsCYAController
+        .onPageLoad(srn, index, NormalMode)
+
+    case MemberPensionPaymentsCYAPage(srn) =>
+      controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsListController
+        .onPageLoad(srn, page = 1, NormalMode)
+
+    case RemovePensionPaymentsPage(srn, _) =>
+      controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsListController
+        .onPageLoad(srn, page = 1, NormalMode)
 
   }
 
-  val checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] = _ => _ => PartialFunction.empty
+  val checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] = _ =>
+    userAnswers => {
+
+      case page @ PensionPaymentsReceivedPage(srn) =>
+        if (userAnswers.get(page).contains(true)) {
+          controllers.nonsipp.memberpensionpayments.routes.WhatYouWillNeedPensionPaymentsController.onPageLoad(srn)
+        } else {
+          controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
+        }
+      case TotalAmountPensionPaymentsPage(srn, index) =>
+        controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsCYAController
+          .onPageLoad(srn, index, NormalMode)
+
+      case MemberPensionPaymentsCYAPage(srn) =>
+        controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsListController
+          .onPageLoad(srn, page = 1, NormalMode)
+    }
+
 }

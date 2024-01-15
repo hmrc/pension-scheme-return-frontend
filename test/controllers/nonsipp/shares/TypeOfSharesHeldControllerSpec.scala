@@ -25,7 +25,7 @@ import models.NormalMode
 import models.TypeOfShares.{ConnectedParty, SponsoringEmployer, Unquoted}
 import views.html.RadioListView
 
-class TypeOfSharesControllerSpec extends ControllerBaseSpec {
+class TypeOfSharesHeldControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[Max5000.Refined](1)
 
@@ -34,7 +34,7 @@ class TypeOfSharesControllerSpec extends ControllerBaseSpec {
   private lazy val onSubmit =
     routes.TypeOfSharesHeldController.onSubmit(srn, index, NormalMode)
 
-  "typeOfSharesController" - {
+  "TypeOfSharesHeldController" - {
 
     act.like(renderView(onPageLoad, defaultUserAnswers) { implicit app => implicit request =>
       val view = injected[RadioListView]

@@ -14,12 +14,19 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages.nonsipp.membersurrenderedbenefits
 
-import play.api.libs.json.{__, JsPath}
+import config.Refined.Max300
+import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
+import utils.RefinedUtils.RefinedIntOps
 
-package object memberdetails {
-  object Paths {
-    val personalDetails: JsPath = __ \ "membersPayments" \ "memberDetails" \ "personalDetails"
-  }
+import java.time.LocalDate
+
+case class WhenDidMemberSurrenderBenefitsPage(srn: Srn, memberIndex: Max300) extends QuestionPage[LocalDate] {
+
+  override def path: JsPath = Paths.memberPensionSurrender \ toString \ memberIndex.arrayIndex.toString
+
+  override def toString: String = "dateOfSurrender"
 }

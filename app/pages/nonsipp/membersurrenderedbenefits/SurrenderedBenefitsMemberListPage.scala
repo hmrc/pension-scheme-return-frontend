@@ -14,12 +14,16 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages.nonsipp.membersurrenderedbenefits
 
-import play.api.libs.json.{__, JsPath}
+import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-package object memberdetails {
-  object Paths {
-    val personalDetails: JsPath = __ \ "membersPayments" \ "memberDetails" \ "personalDetails"
-  }
+case class SurrenderedBenefitsMemberListPage(srn: Srn) extends QuestionPage[Boolean] {
+
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "surrenderedBenefitsListPage"
+
 }

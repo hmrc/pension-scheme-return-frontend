@@ -14,88 +14,98 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.memberpensionpayments
+package controllers.nonsipp.membersurrenderedbenefits
 
 import controllers.ControllerBaseSpec
+import controllers.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsMemberListController._
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.{NameDOB, NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
-import pages.nonsipp.memberpensionpayments.MemberPensionPaymentsListPage
+import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsMemberListPage
 import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
 import services.PsrSubmissionService
 import views.html.TwoColumnsTripleAction
 
-class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec {
+import scala.concurrent.Future
 
-  private lazy val onPageLoad = routes.MemberPensionPaymentsListController.onPageLoad(srn, page = 1, NormalMode)
-  private lazy val onSubmit = routes.MemberPensionPaymentsListController.onSubmit(srn, page = 1, NormalMode)
+class SurrenderedBenefitsMemberListControllerSpec extends ControllerBaseSpec {
+
+  private lazy val onPageLoad = routes.SurrenderedBenefitsMemberListController.onPageLoad(srn, page = 1, NormalMode)
+  private lazy val onSubmit = routes.SurrenderedBenefitsMemberListController.onSubmit(srn, page = 1, NormalMode)
 
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
 
   override protected val additionalBindings: List[GuiceableModule] = List(
     bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
   )
-  val userAnswers: UserAnswers = defaultUserAnswers.unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
 
-  "MemberPensionPaymentsListController" - {
+  override protected def beforeEach(): Unit = {
+    reset(mockPsrSubmissionService)
+    when(mockPsrSubmissionService.submitPsrDetails(any())(any(), any(), any()))
+      .thenReturn(Future.successful(Some(())))
+  }
+
+  private val userAnswers: UserAnswers =
+    defaultUserAnswers.unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+
+  "SurrenderedBenefitsMemberListController" - {
 
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
       val memberList = userAnswers.membersDetails(srn)
 
       injected[TwoColumnsTripleAction].apply(
-        MemberPensionPaymentsListController.form(injected[YesNoPageFormProvider]),
-        MemberPensionPaymentsListController.viewModel(
+        form(injected[YesNoPageFormProvider]),
+        viewModel(
           srn,
           page = 1,
           NormalMode,
           memberList: List[NameDOB],
-          userAnswers
+          userAnswers: UserAnswers
         )
       )
     })
 
-    act.like(renderPrePopView(onPageLoad, MemberPensionPaymentsListPage(srn), true, userAnswers) {
+    act.like(renderPrePopView(onPageLoad, SurrenderedBenefitsMemberListPage(srn), true, userAnswers) {
       implicit app => implicit request =>
         val memberList = userAnswers.membersDetails(srn)
 
         injected[TwoColumnsTripleAction]
           .apply(
-            MemberPensionPaymentsListController.form(injected[YesNoPageFormProvider]).fill(true),
-            MemberPensionPaymentsListController.viewModel(
+            form(injected[YesNoPageFormProvider]).fill(true),
+            viewModel(
               srn,
               page = 1,
               NormalMode,
               memberList: List[NameDOB],
-              userAnswers
+              userAnswers: UserAnswers
             )
           )
     })
 
     act.like(
       redirectNextPage(onSubmit, "value" -> "true")
-        .before(MockPSRSubmissionService.submitPsrDetails())
-        .after({
-          verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any())(any(), any(), any())
-          reset(mockPsrSubmissionService)
-        })
+      //TODO: update once transformation work is implemented
+//        .after({
+//          verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any())(any(), any(), any())
+//        })
     )
 
     act.like(
       redirectNextPage(onSubmit, "value" -> "false")
-        .before(MockPSRSubmissionService.submitPsrDetails())
-        .after({
-          verify(mockPsrSubmissionService, never).submitPsrDetails(any())(any(), any(), any())
-          reset(mockPsrSubmissionService)
-        })
+      //TODO: update once transformation work is implemented
+//        .after({
+//          verify(mockPsrSubmissionService, never).submitPsrDetails(any())(any(), any(), any())
+//        })
     )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
     act.like(invalidForm(onSubmit, userAnswers))
+
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }
 }

@@ -14,12 +14,24 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages.nonsipp.shares
 
-import play.api.libs.json.{__, JsPath}
+import config.Refined.OneTo5000
+import eu.timepit.refined.refineMV
+import models.TypeOfShares
+import pages.behaviours.PageBehaviours
 
-package object memberdetails {
-  object Paths {
-    val personalDetails: JsPath = __ \ "membersPayments" \ "memberDetails" \ "personalDetails"
+class TypeOfSharesHeldPageSpec extends PageBehaviours {
+
+  "DidSchemeHoldAnySharesPage" - {
+
+    val srn = srnGen.sample.value
+    val index = refineMV[OneTo5000](1)
+
+    beRetrievable[TypeOfShares](TypeOfSharesHeldPage(srn, index))
+
+    beSettable[TypeOfShares](TypeOfSharesHeldPage(srn, index))
+
+    beRemovable[TypeOfShares](TypeOfSharesHeldPage(srn, index))
   }
 }

@@ -16,13 +16,14 @@
 
 package navigation.nonsipp
 
-import config.Refined.OneTo5000
+import config.Refined.{Max5000, OneTo5000}
 import eu.timepit.refined.refineMV
-import models.NormalMode
+import models.{NormalMode, SchemeHoldShare}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.shares.{DidSchemeHoldAnySharesPage, WhatYouWillNeedSharesPage}
+import pages.nonsipp.shares._
 import utils.BaseSpec
+import utils.UserAnswersUtils.UserAnswersOps
 
 class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
@@ -66,5 +67,100 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         )
     )
 
+    act.like(
+      normalmode
+        .navigateToWithIndex(
+          index,
+          TypeOfSharesHeldPage,
+          (srn, _: Max5000, _) =>
+            controllers.nonsipp.shares.routes.WhyDoesSchemeHoldSharesController.onPageLoad(srn, index, NormalMode)
+        )
+        .withName(
+          "go from TypeOfSharesHeldPage to WhyDoesSchemeHoldShares page"
+        )
+    )
+
+    act.like(
+      normalmode
+        .navigateToWithIndex(
+          index,
+          WhyDoesSchemeHoldSharesPage,
+          (srn, _: Max5000, _) =>
+            controllers.nonsipp.shares.routes.WhenDidSchemeAcquireSharesController.onPageLoad(srn, index, NormalMode),
+          srn =>
+            defaultUserAnswers.unsafeSet(
+              WhyDoesSchemeHoldSharesPage(srn, index),
+              SchemeHoldShare.Acquisition
+            )
+        )
+        .withName(
+          "go from WhyDoesSchemeHoldSharesPage to WhenDidSchemeAcquireShares page when holding is acquisition"
+        )
+    )
+
+    act.like(
+      normalmode
+        .navigateToWithIndex(
+          index,
+          WhyDoesSchemeHoldSharesPage,
+          (srn, _: Max5000, _) =>
+            controllers.nonsipp.shares.routes.WhenDidSchemeAcquireSharesController.onPageLoad(srn, index, NormalMode),
+          srn =>
+            defaultUserAnswers.unsafeSet(
+              WhyDoesSchemeHoldSharesPage(srn, index),
+              SchemeHoldShare.Contribution
+            )
+        )
+        .withName(
+          "go from WhyDoesSchemeHoldSharesPage to WhenDidSchemeAcquireShares page when holding is contribution"
+        )
+    )
+
+    act.like(
+      normalmode
+        .navigateToWithIndex(
+          index,
+          WhyDoesSchemeHoldSharesPage,
+          (srn, _: Max5000, _) =>
+            controllers.nonsipp.shares.routes.CompanyNameRelatedSharesController.onPageLoad(srn, index, NormalMode),
+          srn =>
+            defaultUserAnswers.unsafeSet(
+              WhyDoesSchemeHoldSharesPage(srn, index),
+              SchemeHoldShare.Transfer
+            )
+        )
+        .withName(
+          "go from WhyDoesSchemeHoldSharesPage to CompanyNameRelatedSharesPage when holding is transfer"
+        )
+    )
+
+    "WhenDidSchemeAcquireSharesPage" - {
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            WhenDidSchemeAcquireSharesPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.CompanyNameRelatedSharesController.onPageLoad(srn, index, NormalMode)
+          )
+          .withName(
+            "go from WhenDidSchemeAcquireShares to CompanyNameRelatedShares page"
+          )
+      )
+    }
+
+    "CompanyNameRelatedSharesPage" - {
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            CompanyNameRelatedSharesPage,
+            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          )
+          .withName(
+            "go from CompanyNameRelatedShares to unauthorised page"
+          )
+      )
+    }
   }
 }

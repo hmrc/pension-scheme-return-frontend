@@ -14,13 +14,24 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.shares
+package pages.nonsipp.membersurrenderedbenefits
 
-import play.api.libs.json.{__, JsPath}
+import config.Refined.Max300
+import eu.timepit.refined.refineMV
+import models.Money
+import pages.behaviours.PageBehaviours
 
-object Paths {
-  val shares: JsPath = __ \ "shares"
-  val shareTransactions: JsPath = shares \ "shareTransactions"
-  val heldSharesTransaction: JsPath = shareTransactions \ "heldSharesTransaction"
-  val shareIdentification: JsPath = shareTransactions \ "shareIdentification"
+class SurrenderedBenefitsAmountPageSpec extends PageBehaviours {
+
+  "SurrenderedBenefitsAmountPage" - {
+
+    val index = refineMV[Max300.Refined](1)
+
+    beRetrievable[Money](SurrenderedBenefitsAmountPage(srnGen.sample.value, index))
+
+    beSettable[Money](SurrenderedBenefitsAmountPage(srnGen.sample.value, index))
+
+    beRemovable[Money](SurrenderedBenefitsAmountPage(srnGen.sample.value, index))
+
+  }
 }

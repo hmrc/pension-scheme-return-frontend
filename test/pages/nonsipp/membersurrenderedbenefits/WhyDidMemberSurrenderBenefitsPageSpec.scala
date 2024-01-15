@@ -14,12 +14,21 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages.nonsipp.membersurrenderedbenefits
 
-import play.api.libs.json.{__, JsPath}
+import config.Refined.OneTo300
+import eu.timepit.refined.refineMV
+import pages.behaviours.PageBehaviours
 
-package object memberdetails {
-  object Paths {
-    val personalDetails: JsPath = __ \ "membersPayments" \ "memberDetails" \ "personalDetails"
+class WhyDidMemberSurrenderBenefitsPageSpec extends PageBehaviours {
+
+  "WhyDidMemberSurrenderBenefitsPage" - {
+    val index = refineMV[OneTo300](1)
+
+    beRetrievable[String](WhyDidMemberSurrenderBenefitsPage(srnGen.sample.value, index))
+
+    beSettable[String](WhyDidMemberSurrenderBenefitsPage(srnGen.sample.value, index))
+
+    beRemovable[String](WhyDidMemberSurrenderBenefitsPage(srnGen.sample.value, index))
   }
 }

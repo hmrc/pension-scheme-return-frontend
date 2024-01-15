@@ -16,7 +16,7 @@
 
 package navigation.nonsipp
 
-import models.UserAnswers
+import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.membersurrenderedbenefits._
@@ -34,6 +34,17 @@ object SurrenderedBenefitsNavigator extends JourneyNavigator {
       }
 
     case WhatYouWillNeedSurrenderedBenefitsPage(srn) =>
+      controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsMemberListController
+        .onPageLoad(srn, 1, NormalMode)
+
+    case SurrenderedBenefitsMemberListPage(srn) =>
+      controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
+
+    case SurrenderedBenefitsAmountPage(srn, memberIndex) =>
+      controllers.nonsipp.membersurrenderedbenefits.routes.WhenDidMemberSurrenderBenefitsController
+        .onPageLoad(srn, memberIndex, NormalMode)
+
+    case WhenDidMemberSurrenderBenefitsPage(srn, memberIndex) =>
       controllers.routes.UnauthorisedController.onPageLoad()
 
   }

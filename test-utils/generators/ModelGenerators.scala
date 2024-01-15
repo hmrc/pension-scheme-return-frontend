@@ -299,6 +299,9 @@ trait ModelGenerators extends BasicGenerators {
   implicit val schemeHoldLandPropertyGen: Gen[SchemeHoldLandProperty] =
     Gen.oneOf(SchemeHoldLandProperty.Acquisition, SchemeHoldLandProperty.Contribution, SchemeHoldLandProperty.Transfer)
 
+  implicit val schemeHoldSharesGen: Gen[SchemeHoldShare] =
+    Gen.oneOf(SchemeHoldShare.Acquisition, SchemeHoldShare.Contribution, SchemeHoldShare.Transfer)
+
   implicit val sponsoringOrConnectedPartyGen: Gen[SponsoringOrConnectedParty] =
     Gen.oneOf(
       SponsoringOrConnectedParty.Sponsoring,
@@ -319,6 +322,13 @@ trait ModelGenerators extends BasicGenerators {
       HowDisposed.Sold,
       HowDisposed.Transferred,
       HowDisposed.Other("test details")
+    )
+
+  implicit val typeOfSharesGen: Gen[TypeOfShares] =
+    Gen.oneOf(
+      TypeOfShares.SponsoringEmployer,
+      TypeOfShares.Unquoted,
+      TypeOfShares.ConnectedParty
     )
 
   implicit val Max5000Gen: Gen[Refined[Int, OneTo5000]] =
