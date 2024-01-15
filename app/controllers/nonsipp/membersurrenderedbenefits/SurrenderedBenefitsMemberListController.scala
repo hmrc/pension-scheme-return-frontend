@@ -16,6 +16,7 @@
 
 package controllers.nonsipp.membersurrenderedbenefits
 
+import cats.implicits.{toBifunctorOps, toTraverseOps}
 import com.google.inject.Inject
 import config.Constants
 import config.Constants.maxNotRelevant
@@ -26,14 +27,14 @@ import eu.timepit.refined.refineV
 import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
 import models.requests.DataRequest
-import models.{Mode, NameDOB, NormalMode, Pagination, UserAnswers}
+import models.{Mode, Money, NameDOB, NormalMode, Pagination, UserAnswers}
 import navigation.Navigator
 import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
-import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsAmountPages, SurrenderedBenefitsMemberListPage}
+import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsAmountPage, SurrenderedBenefitsMemberListPage}
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
+import services.{PsrSubmissionService, SaveService}
 import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
 import viewmodels.implicits._
 import viewmodels.models.{ActionTableViewModel, FormPageViewModel, PaginatedViewModel, TableElem}
@@ -48,6 +49,7 @@ class SurrenderedBenefitsMemberListController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   view: TwoColumnsTripleAction,
+  psrSubmissionService: PsrSubmissionService,
   formProvider: YesNoPageFormProvider,
   saveService: SaveService
 )(implicit ec: ExecutionContext)
@@ -102,17 +104,15 @@ class SurrenderedBenefitsMemberListController @Inject()(
                 _ <- saveService.save(updatedUserAnswers)
                 //TODO: update once Surrendered Benefits journey is complete/as part of transformation work
                 submissionResult <- Future.successful(Some(()))
-//              submissionResult <- if (value)
-//              {
-//                psrSubmissionService.submitPsrDetails(srn)(
-//                  implicitly,
-//                  implicitly,
-//                  request = DataRequest(request.request, updatedUserAnswers)
-//                )
-//              }
-//              else {
-//                Future.successful(Some(()))
-//              }
+                submissionResult <- if (value) {
+                  psrSubmissionService.submitPsrDetails(srn)(
+                    implicitly,
+                    implicitly,
+                    request = DataRequest(request.request, updatedUserAnswers)
+                  )
+                } else {
+                  Future.successful(Some(()))
+                }
               } yield submissionResult.getOrRecoverJourney(
                 _ =>
                   Redirect(
@@ -132,29 +132,30 @@ class SurrenderedBenefitsMemberListController @Inject()(
 
     //TODO: complete once Surrendered Benefits journey is complete/as part of transformation work
     Future.fromTry(userAnswersWithSurrenderedBenefitsMemberList)
-//    if (selection) {
-//      val indexes = (1 to memberListSize)
-//        .map(i => refineV[OneTo300](i).leftMap(new Exception(_)).toTry)
-//        .toList
-//        .sequence
-//
-//      Future.fromTry(
-//        indexes.fold(
-//          _ => userAnswersWithSurrenderedBenefitsMemberList,
-//          index =>
-//            index.foldLeft(userAnswersWithSurrenderedBenefitsMemberList) {
-//              case (userAnswersTry, index) =>
-//                val optSurrenderedBenefitsAmount = request.userAnswers.get(SurrenderedBenefitsAmountPage(srn, index))
-//                for {
-//                  ua <- userAnswersTry
-//                  ua1 <- ua.set(SurrenderedBenefitsAmountPage(srn, index), optSurrenderedBenefitsAmount.getOrElse(Money(0)))
-//                } yield ua1
-//            }
-//        )
-//      )
-//    } else {
-//      Future.fromTry(userAnswersWithSurrenderedBenefitsMemberList)
-//    }
+    if (selection) {
+      val indexes = (1 to memberListSize)
+        .map(i => refineV[OneTo300](i).leftMap(new Exception(_)).toTry)
+        .toList
+        .sequence
+
+      Future.fromTry(
+        indexes.fold(
+          _ => userAnswersWithSurrenderedBenefitsMemberList,
+          index =>
+            index.foldLeft(userAnswersWithSurrenderedBenefitsMemberList) {
+              case (userAnswersTry, index) =>
+                val optSurrenderedBenefitsAmount = request.userAnswers.get(SurrenderedBenefitsAmountPage(srn, index))
+                for {
+                  ua <- userAnswersTry
+                  ua1 <- ua
+                    .set(SurrenderedBenefitsAmountPage(srn, index), optSurrenderedBenefitsAmount.getOrElse(Money(0)))
+                } yield ua1
+            }
+        )
+      )
+    } else {
+      Future.fromTry(userAnswersWithSurrenderedBenefitsMemberList)
+    }
   }
 }
 
@@ -175,7 +176,7 @@ object SurrenderedBenefitsMemberListController {
         refineV[OneTo300](index + 1) match {
           case Left(_) => Nil
           case Right(nextIndex) =>
-            val items = userAnswers.map(SurrenderedBenefitsAmountPages(srn, nextIndex))
+            val items = userAnswers.get(SurrenderedBenefitsAmountPage(srn, nextIndex))
             if (items.isEmpty) {
               List(
                 TableElem(
@@ -215,11 +216,9 @@ object SurrenderedBenefitsMemberListController {
                 TableElem(
                   LinkMessage(
                     Message("site.remove"),
-                    //TODO: update this once RemoveSurrenderedBenefits has been implemented
-                    controllers.routes.UnauthorisedController.onPageLoad().url
-//                    controllers.nonsipp.membersurrenderedbenefits.routes.RemoveSurrenderedBenefitsController
-//                      .onSubmit(srn, nextIndex)
-//                      .url
+                    controllers.nonsipp.membersurrenderedbenefits.routes.RemoveSurrenderedBenefitsController
+                      .onSubmit(srn, nextIndex)
+                      .url
                   )
                 )
               )

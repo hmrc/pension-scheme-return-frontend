@@ -109,5 +109,21 @@ class SurrenderedBenefitsNavigatorSpec extends BaseSpec with NavigatorBehaviours
           .withName("go from When Did Member Surrender Benefits page to Why Did Member Surrender Benefits page")
       )
     }
+
+    "RemoveSurrenderedBenefitsPage" - {
+
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            memberIndex,
+            RemoveSurrenderedBenefitsPage,
+            (srn, _: Max300, _) =>
+              controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsMemberListController
+                .onPageLoad(srn, 1, NormalMode)
+          )
+          .withName("go from remove surrendered benefits page to surrendered benefits member list page")
+      )
+    }
+
   }
 }

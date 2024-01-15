@@ -47,6 +47,10 @@ object SurrenderedBenefitsNavigator extends JourneyNavigator {
     case WhenDidMemberSurrenderBenefitsPage(srn, memberIndex) =>
       controllers.routes.UnauthorisedController.onPageLoad()
 
+    case RemoveSurrenderedBenefitsPage(srn, _) =>
+      controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsMemberListController
+        .onPageLoad(srn, page = 1, NormalMode)
+
   }
 
   override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] = _ => _ => PartialFunction.empty

@@ -17,16 +17,7 @@
 package pages.nonsipp.membersurrenderedbenefits
 
 import config.Refined.Max300
-import models.Money
 import models.SchemeId.Srn
-import pages.QuestionPage
-import play.api.libs.json.JsPath
-import utils.RefinedUtils.RefinedIntOps
+import pages.Page
 
-case class SurrenderedBenefitsAmountPage(srn: Srn, memberIndex: Max300) extends QuestionPage[Money] {
-
-  override def path: JsPath = Paths.memberPensionSurrender \ toString \ memberIndex.arrayIndex.toString
-
-  override def toString: String = "totalSurrendered"
-
-}
+case class RemoveSurrenderedBenefitsPage(srn: Srn, index: Max300) extends Page
