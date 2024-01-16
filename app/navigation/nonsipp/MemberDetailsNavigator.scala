@@ -64,7 +64,7 @@ object MemberDetailsNavigator extends JourneyNavigator {
     case SchemeMembersListPage(srn, true, Manual) =>
       refineV[OneTo300](userAnswers.membersDetails(srn).length + 1).fold(
         _ => controllers.nonsipp.routes.TaskListController.onPageLoad(srn),
-        index => routes.PensionSchemeMembersController.onPageLoad(srn)
+        _ => routes.PensionSchemeMembersController.onPageLoad(srn)
       )
 
     case SchemeMembersListPage(srn, true, Upload) => routes.PensionSchemeMembersController.onPageLoad(srn)
@@ -92,7 +92,7 @@ object MemberDetailsNavigator extends JourneyNavigator {
 
     case FileUploadSuccessPage(srn) =>
       controllers.nonsipp.memberdetails.routes.SchemeMembersListController
-        .onPageLoad(srn, 1, Manual)
+        .onPageLoad(srn, 1, Upload)
 
     case FileUploadErrorPage(srn, UploadFormatError) =>
       controllers.nonsipp.memberdetails.upload.routes.FileUploadErrorMissingInformationController

@@ -19,7 +19,6 @@ package controllers.nonsipp.membercontributions
 import cats.implicits.{toBifunctorOps, toTraverseOps}
 import com.google.inject.Inject
 import config.Constants
-import config.Constants.maxNotRelevant
 import config.Refined.OneTo300
 import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
@@ -218,13 +217,18 @@ object MemberContributionListController {
     FormPageViewModel(
       title = Message(title, memberList.size),
       heading = Message(heading, memberList.size),
-      description = Some(ParagraphMessage("ReportContribution.MemberList.paragraph")),
+      description = None,
       page = ActionTableViewModel(
-        inset = "ReportContribution.MemberList.inset",
+        inset = ParagraphMessage(
+          "ReportContribution.MemberList.paragraph1"
+        ) ++
+          ParagraphMessage(
+            "ReportContribution.MemberList.paragraph2"
+          ),
+        showInsetWithRadios = true,
         head = Some(List(TableElem("Member name"), TableElem("Status"))),
         rows = rows(srn, mode, memberList, userAnswers),
         radioText = Message("ReportContribution.MemberList.radios"),
-        showRadios = memberList.length < maxNotRelevant,
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(

@@ -14,25 +14,16 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages.nonsipp.shares
 
-import config.Refined.Max300
+import config.Refined.Max5000
 import models.SchemeId.Srn
 import pages.QuestionPage
-import play.api.libs.json.{__, JsPath}
+import play.api.libs.json.JsPath
 
-package object membersurrenderedbenefits {
+case class CompanyNameRelatedSharesPage(srn: Srn, index: Max5000) extends QuestionPage[String] {
 
-  object Paths {
-    val membersPayments: JsPath = __ \ "membersPayments"
-    val memberDetails: JsPath = membersPayments \ "memberDetails"
-    val memberPensionSurrender: JsPath = memberDetails \ "memberPensionSurrender"
-  }
+  override def path: JsPath = Paths.shareIdentification \ toString
 
-  def surrenderBenefitsPages(srn: Srn, index: Max300): List[QuestionPage[_]] = List(
-    SurrenderedBenefitsAmountPage(srn, index),
-    WhenDidMemberSurrenderBenefitsPage(srn, index),
-    WhyDidMemberSurrenderBenefitsPage(srn, index)
-  )
-
+  override def toString: String = "nameOfSharesCompany"
 }

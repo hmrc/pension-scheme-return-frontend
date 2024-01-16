@@ -18,7 +18,6 @@ package controllers.nonsipp.employercontributions
 
 import com.google.inject.Inject
 import config.Constants
-import config.Constants.maxNotRelevant
 import config.Refined.OneTo300
 import controllers.PSRController
 import controllers.actions._
@@ -227,13 +226,18 @@ object EmployerContributionsMemberListController {
     FormPageViewModel(
       title = Message(title, memberList.size),
       heading = Message(heading, memberList.size),
-      description = Some(ParagraphMessage("employerContributions.MemberList.paragraph")),
+      description = None,
       page = ActionTableViewModel(
-        inset = "employerContributions.MemberList.inset",
+        inset = ParagraphMessage(
+          "employerContributions.MemberList.paragraph1"
+        ) ++
+          ParagraphMessage(
+            "employerContributions.MemberList.paragraph2"
+          ),
         head = Some(List(TableElem("Member name"), TableElem("Status"))),
         rows = rows(srn, mode, memberList, userAnswers),
         radioText = Message("employerContributions.MemberList.radios"),
-        showRadios = memberList.length < maxNotRelevant,
+        showInsetWithRadios = true,
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(

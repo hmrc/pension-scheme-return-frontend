@@ -21,12 +21,7 @@ import eu.timepit.refined.refineMV
 import models.{NormalMode, SchemeHoldShare}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.shares.{
-  DidSchemeHoldAnySharesPage,
-  TypeOfSharesHeldPage,
-  WhatYouWillNeedSharesPage,
-  WhyDoesSchemeHoldSharesPage
-}
+import pages.nonsipp.shares._
 import utils.BaseSpec
 import utils.UserAnswersUtils.UserAnswersOps
 
@@ -126,7 +121,8 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateToWithIndex(
           index,
           WhyDoesSchemeHoldSharesPage,
-          (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad(), // TODO change this when company name page is developed
+          (srn, _: Max5000, _) =>
+            controllers.nonsipp.shares.routes.CompanyNameRelatedSharesController.onPageLoad(srn, index, NormalMode),
           srn =>
             defaultUserAnswers.unsafeSet(
               WhyDoesSchemeHoldSharesPage(srn, index),
@@ -134,9 +130,37 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             )
         )
         .withName(
-          "go from WhyDoesSchemeHoldSharesPage to unauthorised page when holding is transfer"
+          "go from WhyDoesSchemeHoldSharesPage to CompanyNameRelatedSharesPage when holding is transfer"
         )
     )
 
+    "WhenDidSchemeAcquireSharesPage" - {
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            WhenDidSchemeAcquireSharesPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.CompanyNameRelatedSharesController.onPageLoad(srn, index, NormalMode)
+          )
+          .withName(
+            "go from WhenDidSchemeAcquireShares to CompanyNameRelatedShares page"
+          )
+      )
+    }
+
+    "CompanyNameRelatedSharesPage" - {
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            CompanyNameRelatedSharesPage,
+            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          )
+          .withName(
+            "go from CompanyNameRelatedShares to unauthorised page"
+          )
+      )
+    }
   }
 }

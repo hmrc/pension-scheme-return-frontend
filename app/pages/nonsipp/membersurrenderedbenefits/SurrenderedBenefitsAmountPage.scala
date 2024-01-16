@@ -30,11 +30,3 @@ case class SurrenderedBenefitsAmountPage(srn: Srn, memberIndex: Max300) extends 
   override def toString: String = "totalSurrendered"
 
 }
-
-case class SurrenderedBenefitsAmountPages(srn: Srn, memberIndex: Max300) extends QuestionPage[Map[String, Money]] {
-
-  override def path: JsPath = Paths.memberPensionSurrender \ toString \ memberIndex.arrayIndex.toString
-
-  override def toString: String = "totalSurrendered"
-
-}

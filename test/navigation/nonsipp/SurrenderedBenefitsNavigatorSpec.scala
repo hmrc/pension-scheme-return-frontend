@@ -104,10 +104,41 @@ class SurrenderedBenefitsNavigatorSpec extends BaseSpec with NavigatorBehaviours
           .navigateToWithIndex(
             memberIndex,
             WhenDidMemberSurrenderBenefitsPage,
-            (srn, memberIndex: Max300, _) => controllers.routes.UnauthorisedController.onPageLoad()
+            (srn, memberIndex: Max300, _) =>
+              controllers.nonsipp.membersurrenderedbenefits.routes.WhyDidMemberSurrenderBenefitsController
+                .onPageLoad(srn, memberIndex, NormalMode)
           )
           .withName("go from When Did Member Surrender Benefits page to Why Did Member Surrender Benefits page")
       )
     }
+
+    "WhyDidMemberSurrenderBenefitsPage" - {
+
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            memberIndex,
+            WhyDidMemberSurrenderBenefitsPage,
+            (srn, memberIndex: Max300, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          )
+          .withName("go from When Did Member Surrender Benefits page to unauthorised page")
+      )
+    }
+
+    "RemoveSurrenderedBenefitsPage" - {
+
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            memberIndex,
+            RemoveSurrenderedBenefitsPage,
+            (srn, _: Max300, _) =>
+              controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsMemberListController
+                .onPageLoad(srn, 1, NormalMode)
+          )
+          .withName("go from remove surrendered benefits page to surrendered benefits member list page")
+      )
+    }
+
   }
 }

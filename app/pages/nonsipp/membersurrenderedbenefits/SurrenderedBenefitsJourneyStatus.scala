@@ -14,25 +14,16 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages.nonsipp.membersurrenderedbenefits
 
-import config.Refined.Max300
 import models.SchemeId.Srn
 import pages.QuestionPage
-import play.api.libs.json.{__, JsPath}
+import play.api.libs.json.JsPath
+import viewmodels.models.SectionStatus
 
-package object membersurrenderedbenefits {
+case class SurrenderedBenefitsJourneyStatus(srn: Srn) extends QuestionPage[SectionStatus] {
 
-  object Paths {
-    val membersPayments: JsPath = __ \ "membersPayments"
-    val memberDetails: JsPath = membersPayments \ "memberDetails"
-    val memberPensionSurrender: JsPath = memberDetails \ "memberPensionSurrender"
-  }
+  override def path: JsPath = JsPath \ toString
 
-  def surrenderBenefitsPages(srn: Srn, index: Max300): List[QuestionPage[_]] = List(
-    SurrenderedBenefitsAmountPage(srn, index),
-    WhenDidMemberSurrenderBenefitsPage(srn, index),
-    WhyDidMemberSurrenderBenefitsPage(srn, index)
-  )
-
+  override def toString: String = "surrenderedBenefitsJourneyCompleted"
 }
