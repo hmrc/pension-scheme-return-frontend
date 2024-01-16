@@ -58,7 +58,7 @@ class WhatYouWillNeedController @Inject()(
       for {
         updatedUserAnswers <- psrRetrievalService.getStandardPsrDetails(
           None,
-          Some("2023-04-06"), // TODO determine the tax year start based on the routing from the dashboard and/or GET report overview or GET report versions API calls
+          Some("2022-04-06"), // TODO determine the tax year start based on the routing from the dashboard and/or GET report overview or GET report versions API calls
           Some("001")
         )
         _ <- saveService.save(updatedUserAnswers)
