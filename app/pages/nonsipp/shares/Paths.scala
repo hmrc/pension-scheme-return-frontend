@@ -22,4 +22,5 @@ object Paths {
   val shares: JsPath = __ \ "shares"
   val shareTransactions: JsPath = shares \ "shareTransactions"
   val heldSharesTransaction: JsPath = shareTransactions \ "heldSharesTransaction"
+  val shareIdentification: JsPath = shareTransactions \ "shareIdentification"
 }

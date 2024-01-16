@@ -14,12 +14,16 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages.nonsipp.shares
 
-import play.api.libs.json.{__, JsPath}
+import config.Refined.Max5000
+import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-package object memberdetails {
-  object Paths {
-    val personalDetails: JsPath = __ \ "membersPayments" \ "memberDetails" \ "personalDetails"
-  }
+case class CompanyNameRelatedSharesPage(srn: Srn, index: Max5000) extends QuestionPage[String] {
+
+  override def path: JsPath = Paths.shareIdentification \ toString
+
+  override def toString: String = "nameOfSharesCompany"
 }
