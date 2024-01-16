@@ -2110,3 +2110,7 @@ MemberPensionPaymentsCYA.section.hide = total amount of pension payments receive
 removePensionPayments.title = Are you sure you want to remove the pension payments for this member?
 removePensionPayments.heading = Are you sure you want to remove the pension payments of £{0} for {1}?
 removePensionPayments.error.required = Select yes if you are sure you want to remove the pension payments for this member
+
+removeSurrenderedBenefits.title = Are you sure you want to remove the surrender for this member?
+removeSurrenderedBenefits.heading = Are you sure you want to remove the surrender of £{0} for {1}?
+removeSurrenderedBenefits.error.required = Select yes if you are sure you want to remove the surrender for this member
