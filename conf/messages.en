@@ -1917,7 +1917,7 @@ transferringSchemeName.error.invalid = Transferring scheme’s name must only in
 
 reportAnotherTransferIn.title = Do you need to report another transfer in for this member?
 reportAnotherTransferIn.heading = Do you need to report another transfer in for {0}?
-reportAnotherTransferIn.hint = If the scheme received more than one transfer for this member, you must tell us about all of them.
+reportAnotherTransferIn.hint = You must tell us about all transfers received for this member during the period of this return.
 reportAnotherTransferIn.error.required = Select yes if you need to report another transfer in for this member
 
 totalValueTransfer.title = What was the total value of this transfer for this member, in pounds and pence?
@@ -2043,7 +2043,7 @@ transferOut.transferMade.error.invalid.chars = Date the transfer was made must o
 
 reportAnotherTransferOut.title = Do you need to report another transfer out for this member?
 reportAnotherTransferOut.heading = Do you need to report another transfer out for {0}?
-reportAnotherTransferOut.hint = If the scheme made more than one transfer out for this member, you must tell us about all of them.
+reportAnotherTransferOut.hint = You must tell us about all transfers out for this member during the period of this return.
 reportAnotherTransferOut.error.required = Select yes if you need to report another transfer out for this member
 
 
