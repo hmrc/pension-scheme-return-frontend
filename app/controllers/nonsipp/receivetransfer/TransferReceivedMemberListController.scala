@@ -33,7 +33,7 @@ import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{PsrSubmissionService, SaveService}
-import viewmodels.DisplayMessage.{LinkMessage, Message}
+import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
 import viewmodels.implicits._
 import viewmodels.models._
 import views.html.TwoColumnsTripleAction
@@ -208,7 +208,12 @@ object TransferReceivedMemberListController {
       heading = Message(heading, memberList.size),
       description = None,
       page = ActionTableViewModel(
-        inset = "transferIn.MemberList.paragraph",
+        inset = ParagraphMessage(
+          "transferIn.MemberList.paragraph1"
+        ) ++
+          ParagraphMessage(
+            "transferIn.MemberList.paragraph2"
+          ),
         head = Some(List(TableElem("Member name"), TableElem("Status"))),
         rows = rows(srn, mode, memberList, userAnswers),
         radioText = Message("transferIn.MemberList.radios"),
