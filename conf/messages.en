@@ -610,8 +610,8 @@ uploadMemberDetails.heading = Upload your member details file
 uploadMemberDetails.paragraph = This will overwrite any member details and payments for them you have previously added.
 uploadMemberDetails.details.paragraph = Include the following information for each member of the scheme:
 uploadMemberDetails.list1 = their first and last name
-uploadMemberDetails.list2 = their National Insurance number, in the format QQ 12 34 56 C, or the reason they do not have one
-uploadMemberDetails.list3 = their date of birth, in the format 01/08/1970
+uploadMemberDetails.list2 = their date of birth, in the format 1/8/1980
+uploadMemberDetails.list3 = their National Insurance number, in the format QQ123456C, or the reason they do not have one
 uploadMemberDetails.error.required = Select a file
 uploadMemberDetails.error.size = The selected file must be smaller than {0}
 
