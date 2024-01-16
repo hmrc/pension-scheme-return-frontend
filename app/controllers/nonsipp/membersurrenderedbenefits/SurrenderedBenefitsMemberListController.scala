@@ -27,7 +27,7 @@ import eu.timepit.refined.refineV
 import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
 import models.requests.DataRequest
-import models.{Mode, Money, NameDOB, NormalMode, Pagination, UserAnswers}
+import models.{CheckMode, Mode, Money, NameDOB, NormalMode, Pagination, UserAnswers}
 import navigation.Navigator
 import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
 import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsAmountPage, SurrenderedBenefitsMemberListPage}
@@ -49,13 +49,13 @@ class SurrenderedBenefitsMemberListController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   view: TwoColumnsTripleAction,
-  psrSubmissionService: PsrSubmissionService,
   formProvider: YesNoPageFormProvider,
+  psrSubmissionService: PsrSubmissionService,
   saveService: SaveService
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
-  val form = SurrenderedBenefitsMemberListController.form(formProvider)
+  val form: Form[Boolean] = SurrenderedBenefitsMemberListController.form(formProvider)
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
@@ -202,11 +202,9 @@ object SurrenderedBenefitsMemberListController {
                 TableElem(
                   LinkMessage(
                     Message("site.change"),
-                    //TODO: update this once SurrenderedBenefitsCYA has been implemented
-                    controllers.routes.UnauthorisedController.onPageLoad().url
-//                    controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsAmountController
-//                      .onSubmit(srn, nextIndex, CheckMode)
-//                      .url
+                    controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsCYAController
+                      .onPageLoad(srn, nextIndex, CheckMode)
+                      .url
                   )
                 ),
                 TableElem(

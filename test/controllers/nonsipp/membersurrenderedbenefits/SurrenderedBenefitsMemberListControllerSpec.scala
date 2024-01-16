@@ -88,18 +88,16 @@ class SurrenderedBenefitsMemberListControllerSpec extends ControllerBaseSpec {
 
     act.like(
       redirectNextPage(onSubmit, "value" -> "true")
-      //TODO: update once transformation work is implemented
-//        .after({
-//          verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any())(any(), any(), any())
-//        })
+        .after({
+          verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any())(any(), any(), any())
+        })
     )
 
     act.like(
       redirectNextPage(onSubmit, "value" -> "false")
-      //TODO: update once transformation work is implemented
-//        .after({
-//          verify(mockPsrSubmissionService, never).submitPsrDetails(any())(any(), any(), any())
-//        })
+        .after({
+          verify(mockPsrSubmissionService, never).submitPsrDetails(any())(any(), any(), any())
+        })
     )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
