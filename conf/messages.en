@@ -220,13 +220,13 @@ howMuchCash.end.error.tooLarge = Total cash held in all bank accounts on {1} mus
 pensionSchemeMembers.title = Tell us about the scheme’s members
 pensionSchemeMembers.heading = Tell us about {0}’s members
 pensionSchemeMembers.description = For everyone who was a member of the scheme during the period of this return, you need to tell us each member’s:
-pensionSchemeMembers.description.name = name
-pensionSchemeMembers.description.dob = date of birth
-pensionSchemeMembers.description.nino = National Insurance number, or reason why they do not have one
+pensionSchemeMembers.description.name = first and last name
+pensionSchemeMembers.description.dob = date of birth, in the format 1/8/1980
+pensionSchemeMembers.description.nino = National Insurance number, in the format QQ123456C, or the reason they do not have one
 pensionSchemeMembers.description1 = You can enter the details manually, or upload a file. If you choose to upload a file, you can download a template on the next page.
 pensionSchemeMembers.legend = How do you want to add member details?
 pensionSchemeMembers.manualEntry = Manually enter the details
-pensionSchemeMembers.upload = Upload a file
+pensionSchemeMembers.upload = Upload a .csv file
 pensionSchemeMembers.upload.hint = This will overwrite any member details and payments for them you have previously added
 pensionSchemeMembers.error.required = Select how you want to add member details
 
