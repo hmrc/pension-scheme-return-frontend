@@ -37,6 +37,7 @@ import pages.nonsipp.loansmadeoroutstanding.{
 import pages.nonsipp.membercontributions.MemberContributionsListPage
 import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsNinoPages, MembersDetailsPages, NoNinoPages}
 import pages.nonsipp.memberreceivedpcls.PclsMemberListPage
+import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsJourneyStatus
 import pages.nonsipp.membertransferout.TransfersOutJourneyStatus
 import pages.nonsipp.receivetransfer.TransfersInJourneyStatus
 import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, ValueOfAssetsPage, WhyNoBankAccountPage}
@@ -337,6 +338,13 @@ object TaskListController {
           case false => TaskListStatus.InProgress
           case true => TaskListStatus.Completed
         }
+    val surrenderedBenefitsStatus: TaskListStatus =
+      userAnswers
+        .get(SurrenderedBenefitsJourneyStatus(srn))
+        .fold[TaskListStatus](TaskListStatus.NotStarted) {
+          case SectionStatus.InProgress => TaskListStatus.InProgress
+          case SectionStatus.Completed => TaskListStatus.Completed
+        }
 
     TaskListSectionViewModel(
       s"$prefix.title",
@@ -405,12 +413,12 @@ object TaskListController {
       ),
       TaskListItemViewModel(
         LinkMessage(
-          messageKey(prefix, "surrenderedbenefits.title", UnableToStart),
+          messageKey(prefix, "surrenderedbenefits.title", surrenderedBenefitsStatus),
           controllers.nonsipp.membersurrenderedbenefits.routes.SurrenderedBenefitsController
             .onPageLoad(srn, NormalMode)
             .url
         ),
-        NotStarted
+        surrenderedBenefitsStatus
       )
     )
   }

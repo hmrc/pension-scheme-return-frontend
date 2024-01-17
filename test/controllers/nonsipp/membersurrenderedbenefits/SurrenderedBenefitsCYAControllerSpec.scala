@@ -29,6 +29,8 @@ import play.api.inject.guice.GuiceableModule
 import services.PsrSubmissionService
 import views.html.CheckYourAnswersView
 
+import scala.concurrent.Future
+
 class SurrenderedBenefitsCYAControllerSpec extends ControllerBaseSpec {
 
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
@@ -36,8 +38,11 @@ class SurrenderedBenefitsCYAControllerSpec extends ControllerBaseSpec {
   override protected val additionalBindings: List[GuiceableModule] =
     List(bind[PsrSubmissionService].toInstance(mockPsrSubmissionService))
 
-  override protected def beforeAll(): Unit = reset(mockPsrSubmissionService)
-
+  override protected def beforeEach(): Unit = {
+    reset(mockPsrSubmissionService)
+    when(mockPsrSubmissionService.submitPsrDetails(any(), any())(any(), any(), any()))
+      .thenReturn(Future.successful(Some(())))
+  }
   private val memberIndex = refineMV[OneTo300](1)
   private val whenSurrenderedBenefits = localDate
 
@@ -75,7 +80,7 @@ class SurrenderedBenefitsCYAControllerSpec extends ControllerBaseSpec {
         redirectNextPage(onSubmit(mode))
           .before(MockPSRSubmissionService.submitPsrDetails())
           .after({
-            verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any())(any(), any(), any())
+            verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any())(any(), any(), any())
             reset(mockPsrSubmissionService)
           })
           .withName(s"redirect to next page when in ${mode} mode")
