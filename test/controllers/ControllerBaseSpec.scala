@@ -140,6 +140,7 @@ trait TestValues {
   val pcls: PensionCommencementLumpSum = PensionCommencementLumpSum(money, money)
   val surrenderedBenefitsAmount: Money = money
   val classOfShares = "testSharesClass"
+  val reasonSurrenderedBenefits = "test reason surrendered benefits"
 
   val address: Address = Address(
     "test-id",
