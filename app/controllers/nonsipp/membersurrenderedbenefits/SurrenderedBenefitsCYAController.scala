@@ -28,7 +28,7 @@ import pages.nonsipp.memberdetails.MemberDetailsPage
 import pages.nonsipp.membersurrenderedbenefits._
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.PsrSubmissionService
+import services.{PsrSubmissionService, SaveService}
 import utils.DateTimeUtils.localDateShow
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
@@ -37,7 +37,7 @@ import views.html.CheckYourAnswersView
 
 import java.time.LocalDate
 import javax.inject.{Inject, Named}
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class SurrenderedBenefitsCYAController @Inject()(
   override val messagesApi: MessagesApi,
@@ -45,6 +45,7 @@ class SurrenderedBenefitsCYAController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   psrSubmissionService: PsrSubmissionService,
+  saveService: SaveService,
   view: CheckYourAnswersView
 )(implicit ec: ExecutionContext)
     extends PSRController {
@@ -83,12 +84,20 @@ class SurrenderedBenefitsCYAController @Inject()(
 
   def onSubmit(srn: Srn, memberIndex: Max300, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      psrSubmissionService.submitPsrDetails(srn).map {
-        case None =>
-          Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-        case Some(_) =>
-          Redirect(navigator.nextPage(SurrenderedBenefitsCYAPage(srn, memberIndex), mode, request.userAnswers))
-      }
+      for {
+        updatedUserAnswers <- Future.fromTry(
+          request.userAnswers
+            .set(SurrenderedBenefitsJourneyStatus(srn), SectionStatus.InProgress)
+            .remove(SurrenderedBenefitsMemberListPage(srn))
+        )
+        _ <- saveService.save(updatedUserAnswers)
+        submissionResult <- psrSubmissionService.submitPsrDetails(srn, updatedUserAnswers)
+      } yield submissionResult.getOrRecoverJourney(
+        _ =>
+          Redirect(
+            navigator.nextPage(SurrenderedBenefitsCYAPage(srn, memberIndex), mode, request.userAnswers)
+          )
+      )
     }
 }
 

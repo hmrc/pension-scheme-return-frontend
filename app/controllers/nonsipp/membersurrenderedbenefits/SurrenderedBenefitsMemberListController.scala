@@ -16,7 +16,6 @@
 
 package controllers.nonsipp.membersurrenderedbenefits
 
-import cats.implicits.{toBifunctorOps, toTraverseOps}
 import com.google.inject.Inject
 import config.Constants
 import config.Constants.maxNotRelevant
@@ -26,18 +25,21 @@ import controllers.actions.IdentifyAndRequireData
 import eu.timepit.refined.refineV
 import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
-import models.requests.DataRequest
-import models.{CheckMode, Mode, Money, NameDOB, NormalMode, Pagination, UserAnswers}
+import models.{CheckMode, Mode, NameDOB, NormalMode, Pagination, UserAnswers}
 import navigation.Navigator
 import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
-import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsAmountPage, SurrenderedBenefitsMemberListPage}
+import pages.nonsipp.membersurrenderedbenefits.{
+  SurrenderedBenefitsAmountPage,
+  SurrenderedBenefitsJourneyStatus,
+  SurrenderedBenefitsMemberListPage
+}
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{PsrSubmissionService, SaveService}
 import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
 import viewmodels.implicits._
-import viewmodels.models.{ActionTableViewModel, FormPageViewModel, PaginatedViewModel, TableElem}
+import viewmodels.models.{ActionTableViewModel, FormPageViewModel, PaginatedViewModel, SectionStatus, TableElem}
 import views.html.TwoColumnsTripleAction
 
 import javax.inject.Named
@@ -75,39 +77,40 @@ class SurrenderedBenefitsMemberListController @Inject()(
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
-      val userAnswers = request.userAnswers
-      val memberList = userAnswers.membersDetails(srn)
-      val memberListSize = memberList.size
+      val memberList = request.userAnswers.membersDetails(srn)
 
-      if (memberListSize > Constants.maxSchemeMembers) {
+      if (memberList.size > Constants.maxSchemeMembers) {
         Future.successful(
           Redirect(
-            navigator.nextPage(SurrenderedBenefitsMemberListPage(srn), mode, userAnswers)
+            navigator.nextPage(SurrenderedBenefitsMemberListPage(srn), mode, request.userAnswers)
           )
         )
       } else {
         val viewModel =
-          SurrenderedBenefitsMemberListController.viewModel(srn, page, mode, memberList, userAnswers)
+          SurrenderedBenefitsMemberListController.viewModel(srn, page, mode, memberList, request.userAnswers)
 
         form
           .bindFromRequest()
           .fold(
-            errors =>
-              Future.successful(
-                BadRequest(
-                  view(errors, viewModel)
-                )
-              ),
-            value =>
+            errors => Future.successful(BadRequest(view(errors, viewModel))),
+            finishedAddingSurrenderedBenefits =>
               for {
-                updatedUserAnswers <- buildUserAnswersBySelection(srn, value, memberListSize)
-                _ <- saveService.save(updatedUserAnswers)
-                submissionResult <- if (value) {
-                  psrSubmissionService.submitPsrDetails(srn)(
-                    implicitly,
-                    implicitly,
-                    request = DataRequest(request.request, updatedUserAnswers)
+                updatedUserAnswers <- Future
+                  .fromTry(
+                    request.userAnswers
+                      .set(
+                        SurrenderedBenefitsJourneyStatus(srn),
+                        if (finishedAddingSurrenderedBenefits) {
+                          SectionStatus.Completed
+                        } else {
+                          SectionStatus.InProgress
+                        }
+                      )
+                      .set(SurrenderedBenefitsMemberListPage(srn), finishedAddingSurrenderedBenefits)
                   )
+                _ <- saveService.save(updatedUserAnswers)
+                submissionResult <- if (finishedAddingSurrenderedBenefits) {
+                  psrSubmissionService.submitPsrDetails(srn, updatedUserAnswers)
                 } else {
                   Future.successful(Some(()))
                 }
@@ -120,38 +123,6 @@ class SurrenderedBenefitsMemberListController @Inject()(
               )
           )
       }
-  }
-
-  private def buildUserAnswersBySelection(srn: Srn, selection: Boolean, memberListSize: Int)(
-    implicit request: DataRequest[_]
-  ): Future[UserAnswers] = {
-    val userAnswersWithSurrenderedBenefitsMemberList =
-      request.userAnswers.set(SurrenderedBenefitsMemberListPage(srn), selection)
-
-    if (selection) {
-      val indexes = (1 to memberListSize)
-        .map(i => refineV[OneTo300](i).leftMap(new Exception(_)).toTry)
-        .toList
-        .sequence
-
-      Future.fromTry(
-        indexes.fold(
-          _ => userAnswersWithSurrenderedBenefitsMemberList,
-          index =>
-            index.foldLeft(userAnswersWithSurrenderedBenefitsMemberList) {
-              case (userAnswersTry, index) =>
-                val optSurrenderedBenefitsAmount = request.userAnswers.get(SurrenderedBenefitsAmountPage(srn, index))
-                for {
-                  ua <- userAnswersTry
-                  ua1 <- ua
-                    .set(SurrenderedBenefitsAmountPage(srn, index), optSurrenderedBenefitsAmount.getOrElse(Money(0)))
-                } yield ua1
-            }
-        )
-      )
-    } else {
-      Future.fromTry(userAnswersWithSurrenderedBenefitsMemberList)
-    }
   }
 }
 
