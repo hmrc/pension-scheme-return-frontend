@@ -477,6 +477,12 @@ whenDidSchemeAcquireShares.dateOfAcquired.error.invalid.characters = Date the sc
 whenDidSchemeAcquireShares.dateOfAcquired.error.future = Date the scheme acquired these shares must be the same as or before {0}
 whenDidSchemeAcquireShares.dateOfAcquired.error.after = Date the scheme acquired these shares must be after {0}
 
+shares.classOfShares.title = What is the class of the shares held in this company?
+shares.classOfShares.heading = What is the class of the shares held in {0}?
+shares.classOfShares.error.required = Enter the class of the shares held in this company
+shares.classOfShares.error.invalid.characters = The class of the shares held in this company must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+shares.classOfShares.error.length = The class of the shares held in this company must be 160 characters or fewer
+
 pensionCommencementLumpSum.title = Did any member receive a pension commencement lump sum (PCLS) during the period of this return?
 pensionCommencementLumpSum.heading = Did any member receive a pension commencement lump sum (PCLS) during the period of this return?
 pensionCommencementLumpSum.error.required = Select yes if any member received a Pension Commencement Lump Sum during the period of this return
