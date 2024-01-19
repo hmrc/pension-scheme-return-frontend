@@ -26,7 +26,7 @@ import utils.RefinedUtils.RefinedIntOps
 case class SharesCompanyCrnPage(srn: Srn, index: Max5000) extends QuestionPage[ConditionalYesNo[String, Crn]] {
 
   override def path: JsPath =
-    Paths.heldSharesTransaction \ toString \ index.arrayIndex.toString
+    Paths.shareIdentification \ toString \ index.arrayIndex.toString
 
   override def toString: String = "crnNumber"
 }
