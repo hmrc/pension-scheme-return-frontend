@@ -56,10 +56,14 @@ object SharesNavigator extends JourneyNavigator {
       controllers.nonsipp.shares.routes.CompanyNameRelatedSharesController.onPageLoad(srn, index, NormalMode)
 
     case CompanyNameRelatedSharesPage(srn, index) =>
+      controllers.nonsipp.shares.routes.SharesCompanyCrnController.onPageLoad(srn, index, NormalMode)
+
+    case SharesCompanyCrnPage(srn, index) =>
       controllers.nonsipp.shares.routes.ClassOfSharesController.onPageLoad(srn, index, NormalMode)
 
     case ClassOfSharesPage(srn, index) =>
       controllers.routes.UnauthorisedController.onPageLoad()
+
   }
 
   val checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] = _ => _ => PartialFunction.empty

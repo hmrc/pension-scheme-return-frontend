@@ -43,3 +43,8 @@ GET         /:srn/when-did-scheme-acquire-shares/:index                         
 POST        /:srn/when-did-scheme-acquire-shares/:index                                 controllers.nonsipp.shares.WhenDidSchemeAcquireSharesController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
 GET         /:srn/change-when-did-scheme-acquire-shares/:index                          controllers.nonsipp.shares.WhenDidSchemeAcquireSharesController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 POST        /:srn/change-when-did-scheme-acquire-shares/:index                          controllers.nonsipp.shares.WhenDidSchemeAcquireSharesController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET         /:srn/shares-company-crn/:index                                             controllers.nonsipp.shares.SharesCompanyCrnController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/shares-company-crn/:index                                             controllers.nonsipp.shares.SharesCompanyCrnController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/change-shares-company-crn/:index                                      controllers.nonsipp.shares.SharesCompanyCrnController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-shares-company-crn/:index                                      controllers.nonsipp.shares.SharesCompanyCrnController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
