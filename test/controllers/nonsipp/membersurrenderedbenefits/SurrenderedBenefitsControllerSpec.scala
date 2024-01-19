@@ -20,14 +20,32 @@ import controllers.ControllerBaseSpec
 import controllers.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsController._
 import forms.YesNoPageFormProvider
 import models.NormalMode
+import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsPage
+import play.api.inject.guice.GuiceableModule
 import play.api.libs.json.JsPath
 import views.html.YesNoPageView
+import play.api.inject.bind
+import services.PsrSubmissionService
+
+import scala.concurrent.Future
 
 class SurrenderedBenefitsControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoad = routes.SurrenderedBenefitsController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.SurrenderedBenefitsController.onSubmit(srn, NormalMode)
+
+  private val mockPsrSubmissionService = mock[PsrSubmissionService]
+
+  override protected val additionalBindings: List[GuiceableModule] = List(
+    bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
+  )
+
+  override protected def beforeEach(): Unit = {
+    reset(mockPsrSubmissionService)
+    when(mockPsrSubmissionService.submitPsrDetails(any(), any())(any(), any(), any()))
+      .thenReturn(Future.successful(Some(())))
+  }
 
   "SurrenderedBenefitsController" - {
 

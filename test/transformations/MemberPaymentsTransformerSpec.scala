@@ -23,28 +23,22 @@ import config.Refined.{Max300, Max5, Max50}
 import controllers.TestValues
 import eu.timepit.refined.refineMV
 import models.requests.psr._
-import models.{ConditionalYesNo, IdentityType, PensionCommencementLumpSum, PensionSchemeType}
+import models.{ConditionalYesNo, IdentityType, Money, PensionCommencementLumpSum, PensionSchemeType}
 import org.scalatest.OptionValues
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import pages.nonsipp.employercontributions._
-import pages.nonsipp.membercontributions.{
-  MemberContributionsListPage,
-  MemberContributionsPage,
-  TotalMemberContributionPage
-}
+import pages.nonsipp.membercontributions._
 import pages.nonsipp.memberdetails._
 import pages.nonsipp.memberpayments._
-import pages.nonsipp.memberreceivedpcls.{
-  PclsMemberListPage,
-  PensionCommencementLumpSumAmountPage,
-  PensionCommencementLumpSumPage
-}
+import pages.nonsipp.memberreceivedpcls._
+import pages.nonsipp.membersurrenderedbenefits._
 import pages.nonsipp.membertransferout._
 import pages.nonsipp.receivetransfer._
 import utils.UserAnswersUtils.UserAnswersOps
 import viewmodels.models.{MemberState, SectionCompleted, SectionStatus}
 
+import java.time.LocalDate
 import scala.util.Try
 
 class MemberPaymentsTransformerSpec
@@ -57,7 +51,9 @@ class MemberPaymentsTransformerSpec
 
   private val transfersInTransformer = new TransfersInTransformer()
   private val transfersOutTransformer = new TransfersOutTransformer()
-  private val memberPaymentsTransformer = new MemberPaymentsTransformer(transfersInTransformer, transfersOutTransformer)
+  private val pensionSurrenderTransformer = new PensionSurrenderTransformer()
+  private val memberPaymentsTransformer =
+    new MemberPaymentsTransformer(transfersInTransformer, transfersOutTransformer, pensionSurrenderTransformer)
 
   private val memberPayments = MemberPayments(
     memberDetails = List(
@@ -93,6 +89,13 @@ class MemberPaymentsTransformerSpec
             dateOfTransfer = localDate,
             transferSchemeType = PensionSchemeType.RegisteredPS("456")
           )
+        ),
+        benefitsSurrendered = Some(
+          PensionSurrender(
+            totalSurrendered = 12.34,
+            dateOfSurrender = LocalDate.of(2022, 12, 12),
+            surrenderReason = "some reason"
+          )
         )
       )
     ),
@@ -102,7 +105,8 @@ class MemberPaymentsTransformerSpec
     unallocatedContribsMade = true,
     unallocatedContribAmount = Some(money.value),
     memberContributionMade = true,
-    lumpSumReceived = true
+    lumpSumReceived = true,
+    benefitsSurrenderedDetails = SectionDetails(made = true, completed = true)
   )
 
   private val index = refineMV[Max300.Refined](1)
@@ -151,6 +155,14 @@ class MemberPaymentsTransformerSpec
     .unsafeSet(ReceivingSchemeNamePage(srn, index, transfersOutIndex), schemeName)
     .unsafeSet(WhenWasTransferMadePage(srn, index, transfersOutIndex), localDate)
     .unsafeSet(ReceivingSchemeTypePage(srn, index, transfersOutIndex), PensionSchemeType.RegisteredPS("456"))
+    // pension surrender
+    .unsafeSet(SurrenderedBenefitsCompletedPage(srn, index), SectionCompleted)
+    .unsafeSet(SurrenderedBenefitsJourneyStatus(srn), SectionStatus.Completed)
+    .unsafeSet(SurrenderedBenefitsMemberListPage(srn), true)
+    .unsafeSet(SurrenderedBenefitsPage(srn), true)
+    .unsafeSet(SurrenderedBenefitsAmountPage(srn, index), Money(12.34))
+    .unsafeSet(WhenDidMemberSurrenderBenefitsPage(srn, index), LocalDate.of(2022, 12, 12))
+    .unsafeSet(WhyDidMemberSurrenderBenefitsPage(srn, index), "some reason")
 
   "MemberPaymentsTransformer - To Etmp" - {
     "should return empty List when userAnswer is empty" in {
