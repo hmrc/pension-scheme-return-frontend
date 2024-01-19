@@ -99,7 +99,7 @@ class SharesCompanyCrnController @Inject()(
 
 object SharesCompanyCrnController {
 
-  private val noFormErrors = InputFormErrors.input(
+  private val noFormErrors = InputFormErrors.textArea(
     "sharesCompanyCrn.no.conditional.error.required",
     "sharesCompanyCrn.no.conditional.error.invalid",
     "sharesCompanyCrn.no.conditional.error.length"
