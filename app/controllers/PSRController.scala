@@ -25,6 +25,7 @@ import eu.timepit.refined.api.{Refined, Validate}
 import eu.timepit.refined.refineV
 import models.{DateRange, UserAnswers}
 import models.requests.DataRequest
+import org.slf4j.LoggerFactory
 import play.api.i18n.I18nSupport
 import play.api.libs.json.{Reads, Writes}
 import play.api.mvc.Result
@@ -36,12 +37,16 @@ import scala.util.Try
 
 abstract class PSRController extends FrontendBaseController with I18nSupport {
 
+  private val logger = LoggerFactory.getLogger("PSRController")
+
   implicit def requestToUserAnswers(implicit req: DataRequest[_]): UserAnswers = req.userAnswers
 
   def requiredPage[A: Reads](page: Gettable[A])(implicit request: DataRequest[_]): Either[Result, A] =
     request.userAnswers.get(page) match {
       case Some(value) => Right(value)
-      case None => Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+      case None =>
+        logger.error(s"Required page ${page.getClass.getSimpleName} missing")
+        Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
     }
 
   // Used to specifically refine an index retrieved from user answers

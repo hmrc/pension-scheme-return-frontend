@@ -26,7 +26,7 @@ import pages.nonsipp.receivetransfer._
 import play.api.mvc.MessagesControllerComponents
 import services.SaveService
 import shapeless._
-import viewmodels.models.SectionCompleted
+import viewmodels.models.{SectionCompleted, SectionStatus}
 
 import java.time.LocalDate
 import javax.inject.Inject
@@ -48,6 +48,7 @@ class TransferInMongoController @Inject()(
       PageWithValue[LocalDate] ::
       PageWithValue[Boolean] ::
       PageWithValue[SectionCompleted.type] ::
+      PageWithValue[SectionStatus] ::
       HNil
 
   override def pages(srn: Srn, index: Max300, secondaryIndex: Max5): Pages = HList(
@@ -56,6 +57,7 @@ class TransferInMongoController @Inject()(
     PageWithValue(TotalValueTransferPage(srn, index, secondaryIndex), Money(12.34)),
     PageWithValue(WhenWasTransferReceivedPage(srn, index, secondaryIndex), LocalDate.now()),
     PageWithValue(DidTransferIncludeAssetPage(srn, index, secondaryIndex), true),
-    PageWithValue(TransfersInCompletedPage(srn, index, secondaryIndex), SectionCompleted)
+    PageWithValue(TransfersInSectionCompleted(srn, index, secondaryIndex), SectionCompleted),
+    PageWithValue(TransfersInJourneyStatus(srn), SectionStatus.Completed)
   )
 }
