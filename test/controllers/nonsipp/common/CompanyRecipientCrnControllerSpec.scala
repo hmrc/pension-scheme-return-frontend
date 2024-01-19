@@ -36,30 +36,30 @@ class CompanyRecipientCrnControllerSpec extends ControllerBaseSpec {
   val conditionalYes: ConditionalYesNo[String, Crn] = ConditionalYesNo.yes(crn)
 
   "CompanyRecipientCrnController" - {
-    "loans journey" - {
-      val identitySubject: IdentitySubject = IdentitySubject.LoanRecipient
-      lazy val onPageLoad =
-        controllers.nonsipp.common.routes.CompanyRecipientCrnController
-          .onPageLoad(srn, index, NormalMode, identitySubject)
-      lazy val onSubmit =
-        controllers.nonsipp.common.routes.CompanyRecipientCrnController
-          .onSubmit(srn, index, NormalMode, identitySubject)
-      val userAnswersWithCompanyName = defaultUserAnswers.unsafeSet(CompanyRecipientNamePage(srn, index), companyName)
+    IdentitySubject.values.foreach {
+      case identitySubject =>
+        lazy val onPageLoad =
+          controllers.nonsipp.common.routes.CompanyRecipientCrnController
+            .onPageLoad(srn, index, NormalMode, identitySubject)
+        lazy val onSubmit =
+          controllers.nonsipp.common.routes.CompanyRecipientCrnController
+            .onSubmit(srn, index, NormalMode, identitySubject)
+        val userAnswersWithData = defaultUserAnswers
+          .unsafeSet(CompanyRecipientNamePage(srn, index), companyName)
+          .unsafeSet(CompanySellerNamePage(srn, index), companyName)
 
-      testCrnController(identitySubject, onPageLoad, onSubmit, userAnswersWithCompanyName)
+        testCrnController(identitySubject, onPageLoad, onSubmit, userAnswersWithData)
     }
-    "land or property journey" - {
-      val identitySubject: IdentitySubject = IdentitySubject.LandOrPropertySeller
+
+    "Unknown" - {
       lazy val onPageLoad =
         controllers.nonsipp.common.routes.CompanyRecipientCrnController
-          .onPageLoad(srn, index, NormalMode, identitySubject)
-      lazy val onSubmit =
-        controllers.nonsipp.common.routes.CompanyRecipientCrnController
-          .onSubmit(srn, index, NormalMode, identitySubject)
-      val userAnswersWithCompanySellerName =
-        defaultUserAnswers.unsafeSet(CompanySellerNamePage(srn, index), companyName)
+          .onPageLoad(srn, index, NormalMode, IdentitySubject.Unknown)
 
-      testCrnController(identitySubject, onPageLoad, onSubmit, userAnswersWithCompanySellerName)
+      act.like(
+        unauthorisedPage(onPageLoad, Some(defaultUserAnswers))
+          .updateName("onPageLoad " + _)
+      )
     }
   }
 
@@ -75,7 +75,7 @@ class CompanyRecipientCrnControllerSpec extends ControllerBaseSpec {
           form(injected[YesNoPageFormProvider], identitySubject),
           viewModel(srn, index, NormalMode, identitySubject, userAnswersWithCompanyName)
         )
-    })
+    }.withName(s"should render testCrnController for $identitySubject"))
 
     act.like(
       renderPrePopView(
@@ -89,17 +89,41 @@ class CompanyRecipientCrnControllerSpec extends ControllerBaseSpec {
             form(injected[YesNoPageFormProvider], identitySubject).fill(conditionalNo.value),
             viewModel(srn, index, NormalMode, identitySubject, userAnswersWithCompanyName)
           )
-      }
+      }.withName(s"should render pre-populated testCrnController for $identitySubject")
     )
 
-    act.like(redirectNextPage(onSubmit, "value" -> "true", "value.yes" -> crn.value))
-    act.like(redirectNextPage(onSubmit, "value" -> "false", "value.no" -> "reason"))
+    act.like(
+      redirectNextPage(onSubmit, "value" -> "true", "value.yes" -> crn.value)
+        .withName(s"should redirect to next page value yes, for $identitySubject")
+    )
 
-    act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
+    act.like(
+      redirectNextPage(onSubmit, "value" -> "false", "value.no" -> "reason")
+        .withName(s"should redirect to next page value no, for $identitySubject")
+    )
 
-    act.like(saveAndContinue(onSubmit, "value" -> "true", "value.yes" -> crn.value))
+    act.like(
+      journeyRecoveryPage(onPageLoad)
+        .updateName("onPageLoad" + _)
+        .withName(s"should redirect to Journey Recovery if no existing data is found, for $identitySubject")
+    )
 
-    act.like(invalidForm(onSubmit, userAnswersWithCompanyName))
-    act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
+    act.like(
+      saveAndContinue(onSubmit, "value" -> "true", "value.yes" -> crn.value)
+        .withName(s"should save data and continue to next page with for $identitySubject")
+    )
+
+    act.like(
+      invalidForm(onSubmit, userAnswersWithCompanyName)
+        .withName(s"should return BAD_REQUEST for a POST with invalid form for $identitySubject")
+    )
+
+    act.like(
+      journeyRecoveryPage(onSubmit)
+        .updateName("onSubmit" + _)
+        .withName(
+          s"should redirect to Journey Recovery if no existing data is found when submitting, for $identitySubject"
+        )
+    )
   }
 }

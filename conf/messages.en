@@ -477,6 +477,19 @@ whenDidSchemeAcquireShares.dateOfAcquired.error.invalid.characters = Date the sc
 whenDidSchemeAcquireShares.dateOfAcquired.error.future = Date the scheme acquired these shares must be the same as or before {0}
 whenDidSchemeAcquireShares.dateOfAcquired.error.after = Date the scheme acquired these shares must be after {0}
 
+sharesSeller.companyRecipientCrn.title = Do you know the company’s Company Registration Number (CRN)
+sharesSeller.companyRecipientCrn.heading = Do you know {0}’s Company Registration Number (CRN)?
+sharesSeller.companyRecipientCrn.hint = This is 8 characters, like AB123456. It may also be called ‘company number’ or ‘Companies House number’.
+sharesSeller.companyRecipientCrn.yes.conditional = What is {0}’s CRN?
+sharesSeller.companyRecipientCrn.yes.conditional.error.required = Enter the company’s CRN
+sharesSeller.companyRecipientCrn.yes.conditional.error.length = CRN must be 8 characters
+sharesSeller.companyRecipientCrn.yes.conditional.error.invalid = CRN must only include letters and numbers
+sharesSeller.companyRecipientCrn.no.conditional = Tell us why you cannot provide {0}’s CRN
+sharesSeller.companyRecipientCrn.no.conditional.error.required = Enter the reason you cannot provide the company’s CRN
+sharesSeller.companyRecipientCrn.no.conditional.error.invalid = The reason you cannot provide the company’s CRN must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+sharesSeller.companyRecipientCrn.no.conditional.error.length = The reason you cannot provide the company’s CRN must be 160 characters or fewer
+sharesSeller.companyRecipientCrn.error.required = Select yes if you know the company’s Company Registration Number (CRN)
+
 shares.classOfShares.title = What is the class of the shares held in this company?
 shares.classOfShares.heading = What is the class of the shares held in {0}?
 shares.classOfShares.error.required = Enter the class of the shares held in this company

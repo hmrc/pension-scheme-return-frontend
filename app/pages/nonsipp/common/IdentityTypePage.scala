@@ -47,9 +47,9 @@ case class IdentityTypePage(srn: Srn, index: Max5000, identitySubject: IdentityS
     case IdentitySubject.LoanRecipient =>
       Paths.loanTransactions \ "recipientIdentityType" \ toString \ index.arrayIndex.toString
     case IdentitySubject.LandOrPropertySeller =>
-      JsPath \ "assets" \ "landOrProperty" \ "landOrPropertyTransactions" \ "heldPropertyTransaction" \ "propertyAcquiredFrom" \ "sellerIdentityType" \ toString \ index.arrayIndex.toString
+      pages.nonsipp.landorproperty.Paths.heldPropertyTransactions \ "propertyAcquiredFrom" \ "sellerIdentityType" \ toString \ index.arrayIndex.toString
     case IdentitySubject.SharesSeller =>
-      JsPath \ "shares" \ "shareTransactions" \ "heldSharesTransaction" \ "shareAcquiredFrom" \ "sellerIdentityType" \ toString \ index.arrayIndex.toString
+      pages.nonsipp.shares.Paths.heldSharesTransaction \ "shareAcquiredFrom" \ "sellerIdentityType" \ toString \ index.arrayIndex.toString
   }
 
   override def toString: String = "identityTypes"
@@ -130,7 +130,9 @@ case class IdentityTypes(srn: Srn, identitySubject: IdentitySubject) extends Que
   override def path: JsPath = identitySubject match {
     case IdentitySubject.LoanRecipient => Paths.loanTransactions \ "recipientIdentityType" \ toString
     case IdentitySubject.LandOrPropertySeller =>
-      pages.nonsipp.landorproperty.Paths.landOrPropertyTransactions \ "heldPropertyTransaction" \ "propertyAcquiredFrom" \ "sellerIdentityType" \ toString
+      pages.nonsipp.landorproperty.Paths.heldPropertyTransactions \ "propertyAcquiredFrom" \ "sellerIdentityType" \ toString
+    case IdentitySubject.SharesSeller =>
+      pages.nonsipp.shares.Paths.heldSharesTransaction \ "shareAcquiredFrom" \ "sellerIdentityType" \ toString
   }
   override def toString: String = "identityTypes"
 }

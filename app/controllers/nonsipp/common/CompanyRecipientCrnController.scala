@@ -28,6 +28,7 @@ import navigation.Navigator
 import pages.nonsipp.common.CompanyRecipientCrnPage
 import pages.nonsipp.landorproperty.CompanySellerNamePage
 import pages.nonsipp.loansmadeoroutstanding.CompanyRecipientNamePage
+import pages.nonsipp.shares.CompanyNameRelatedSharesPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -55,9 +56,13 @@ class CompanyRecipientCrnController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode, subject: IdentitySubject): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      val form: Form[Either[String, Crn]] = CompanyRecipientCrnController.form(formProvider, subject)
-      val preparedForm = request.userAnswers.fillForm(CompanyRecipientCrnPage(srn, index, subject), form)
-      Ok(view(preparedForm, viewModel(srn, index, mode, subject, request.userAnswers)))
+      subject match {
+        case IdentitySubject.Unknown => Redirect(controllers.routes.UnauthorisedController.onPageLoad())
+        case _ =>
+          val form: Form[Either[String, Crn]] = CompanyRecipientCrnController.form(formProvider, subject)
+          val preparedForm = request.userAnswers.fillForm(CompanyRecipientCrnPage(srn, index, subject), form)
+          Ok(view(preparedForm, viewModel(srn, index, mode, subject, request.userAnswers)))
+      }
     }
 
   def onSubmit(srn: Srn, index: Max5000, mode: Mode, subject: IdentitySubject): Action[AnyContent] =
@@ -116,6 +121,12 @@ object CompanyRecipientCrnController {
           case Some(value) => value
           case None => ""
         }
+      case IdentitySubject.SharesSeller =>
+        userAnswers.get(CompanyNameRelatedSharesPage(srn, index)) match {
+          case Some(value) => value
+          case None => ""
+        }
+      case _ => ""
     }
     FormPageViewModel[ConditionalYesNoPageViewModel](
       Message(s"${subject.key}.companyRecipientCrn.title"),
