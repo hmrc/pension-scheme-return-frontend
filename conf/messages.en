@@ -753,6 +753,14 @@ landOrPropertySeller.identityType.pageContent2 = A UK partnership
 landOrPropertySeller.identityType.pageContent3 = Other
 landOrPropertySeller.identityType.error.required = Select who the land or property was acquired from
 
+sharesSeller.identityType.title = Who were the shares in this company acquired from?
+sharesSeller.identityType.heading = Who were the shares in {0} acquired from?
+sharesSeller.identityType.pageContent = An individual
+sharesSeller.identityType.pageContent1 = A UK company
+sharesSeller.identityType.pageContent2 = A UK partnership
+sharesSeller.identityType.pageContent3 = Other
+sharesSeller.identityType.error.required = Select who the shares were acquired from
+
 fileUploadErrorSummary.title = There is a problem with your member details file
 fileUploadErrorSummary.heading = There is a problem with your member details file
 fileUploadErrorSummary.paragraph = Correct the errors and upload it again, or upload a different file.

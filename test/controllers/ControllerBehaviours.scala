@@ -90,6 +90,19 @@ trait ControllerBehaviours {
   def journeyRecoveryPage(call: => Call): BehaviourTest =
     journeyRecoveryPage(call, None)
 
+  def unauthorisedPage(call: => Call, userAnswers: Option[UserAnswers]): BehaviourTest =
+    s"must redirect to unauthorised".hasBehaviour {
+      val application = applicationBuilder(userAnswers = userAnswers).build()
+
+      running(application) {
+
+        val result = route(application, FakeRequest(call)).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual controllers.routes.UnauthorisedController.onPageLoad().url
+      }
+    }
+
   private def render(appBuilder: GuiceApplicationBuilder, call: => Call)(
     view: Application => Request[_] => Html
   ): Unit =
