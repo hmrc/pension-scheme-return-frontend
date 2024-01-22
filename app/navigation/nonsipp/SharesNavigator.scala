@@ -65,6 +65,9 @@ object SharesNavigator extends JourneyNavigator {
       controllers.routes.UnauthorisedController.onPageLoad()
 
     case IndividualNameOfSharesSellerPage(srn, index) =>
+      controllers.nonsipp.shares.routes.SharesIndividualSellerNINumberController.onPageLoad(srn, index, NormalMode)
+
+    case SharesIndividualSellerNINumberPage(srn, index) =>
       controllers.routes.UnauthorisedController.onPageLoad()
 
   }
