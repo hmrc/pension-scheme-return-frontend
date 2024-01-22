@@ -2150,3 +2150,9 @@ sharesCompanyCrn.yes.conditional.error.length = CRN must be 8 characters
 sharesCompanyCrn.no.conditional.error.required = Enter the reason you cannot provide the company’s CRN
 sharesCompanyCrn.no.conditional.error.invalid = The reason you cannot provide the company’s CRN must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
 sharesCompanyCrn.no.conditional.error.length = The reason you cannot provide the company’s CRN must be 160 characters or fewer
+
+individualNameOfSharesSeller.title = What is the seller’s name?
+individualNameOfSharesSeller.heading = What is the seller’s name?
+individualNameOfSharesSeller.error.required =  Enter the seller’s name
+individualNameOfSharesSeller.error.tooLong = Seller’s name must be 160 characters or fewer
+individualNameOfSharesSeller.error.invalid = Seller’s name must only include letters a to z, hyphens, apostrophes and spaces
