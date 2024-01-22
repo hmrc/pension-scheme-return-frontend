@@ -64,6 +64,9 @@ object SharesNavigator extends JourneyNavigator {
     case ClassOfSharesPage(srn, index) =>
       controllers.routes.UnauthorisedController.onPageLoad()
 
+    case IndividualNameOfSharesSellerPage(srn, index) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
+
   }
 
   val checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] = _ => _ => PartialFunction.empty
