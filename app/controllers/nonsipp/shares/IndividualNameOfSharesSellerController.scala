@@ -78,8 +78,7 @@ object IndividualNameOfSharesSellerController {
     "individualNameOfSharesSeller.error.invalid"
   )
 
-  def viewModel(srn: Srn, index: Max5000, mode: Mode):
-  FormPageViewModel[TextInputViewModel] =
+  def viewModel(srn: Srn, index: Max5000, mode: Mode): FormPageViewModel[TextInputViewModel] =
     FormPageViewModel(
       "individualNameOfSharesSeller.title",
       "individualNameOfSharesSeller.heading",

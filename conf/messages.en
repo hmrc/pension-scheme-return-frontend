@@ -2154,5 +2154,5 @@ sharesCompanyCrn.no.conditional.error.length = The reason you cannot provide the
 individualNameOfSharesSeller.title = What is the seller’s name?
 individualNameOfSharesSeller.heading = What is the seller’s name?
 individualNameOfSharesSeller.error.required =  Enter the seller’s name
-individualNameOfSharesSeller.error.tooLong = Seller’s name must only include letters a to z, hyphens, apostrophes and spaces
-individualNameOfSharesSeller.error.invalid = Seller’s name must be 160 characters or fewer
+individualNameOfSharesSeller.error.tooLong = Seller’s name must be 160 characters or fewer
+individualNameOfSharesSeller.error.invalid = Seller’s name must only include letters a to z, hyphens, apostrophes and spaces
