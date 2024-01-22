@@ -29,8 +29,11 @@ class IndividualNameOfSharesSellerControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[Max5000.Refined](1)
 
-  private lazy val onPageLoad = routes.IndividualNameOfSharesSellerController.onPageLoad(srn, index, NormalMode)
-  private lazy val onSubmit = routes.IndividualNameOfSharesSellerController.onSubmit(srn, index, NormalMode)
+  private lazy val onPageLoad =
+    routes.IndividualNameOfSharesSellerController.onPageLoad(srn, index, NormalMode)
+
+  private lazy val onSubmit =
+    routes.IndividualNameOfSharesSellerController.onSubmit(srn, index, NormalMode)
 
   "IndividualNameOfSharesSellerController" - {
 
@@ -51,6 +54,7 @@ class IndividualNameOfSharesSellerControllerSpec extends ControllerBaseSpec {
     act.like(saveAndContinue(onSubmit, "value" -> "test"))
 
     act.like(invalidForm(onSubmit))
+
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }
 }

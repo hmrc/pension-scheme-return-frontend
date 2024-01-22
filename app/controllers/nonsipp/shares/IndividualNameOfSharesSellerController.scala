@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.shares
 
-import config.Refined.{Max300, Max5000}
+import config.Refined.Max5000
 import controllers.PSRController
 import controllers.actions._
 import controllers.nonsipp.shares.IndividualNameOfSharesSellerController._
@@ -78,7 +78,8 @@ object IndividualNameOfSharesSellerController {
     "individualNameOfSharesSeller.error.invalid"
   )
 
-  def viewModel(srn: Srn, index: Max5000, mode: Mode): FormPageViewModel[TextInputViewModel] =
+  def viewModel(srn: Srn, index: Max5000, mode: Mode):
+  FormPageViewModel[TextInputViewModel] =
     FormPageViewModel(
       "individualNameOfSharesSeller.title",
       "individualNameOfSharesSeller.heading",
