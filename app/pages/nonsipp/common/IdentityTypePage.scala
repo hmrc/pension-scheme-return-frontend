@@ -48,14 +48,18 @@ case class IdentityTypePage(srn: Srn, index: Max5000, identitySubject: IdentityS
       Paths.loanTransactions \ "recipientIdentityType" \ toString \ index.arrayIndex.toString
     case IdentitySubject.LandOrPropertySeller =>
       JsPath \ "assets" \ "landOrProperty" \ "landOrPropertyTransactions" \ "heldPropertyTransaction" \ "propertyAcquiredFrom" \ "sellerIdentityType" \ toString \ index.arrayIndex.toString
+    case IdentitySubject.SharesSeller =>
+      JsPath \ "shares" \ "shareTransactions" \ "heldSharesTransaction" \ "shareAcquiredFrom" \ "sellerIdentityType" \ toString \ index.arrayIndex.toString
   }
 
   override def toString: String = "identityTypes"
 
-  private def pages(srn: Srn): List[Removable[_]] = pagesFirstPart(srn) ++ pagesSecondPart(srn)
+  private def allPages(srn: Srn): List[Removable[_]] =
+    pagesDependentOnIdentitySubject(srn) ++ pagesNotDependentOnIdentitySubject(srn)
 
-  private def pagesSecondPart(srn: Srn): List[Removable[_]] =
+  private def pagesNotDependentOnIdentitySubject(srn: Srn): List[Removable[_]] =
     this.identitySubject match {
+      // only for loans for now, as this is the first question in the journey
       case IdentitySubject.LoanRecipient =>
         val list = List(
           DatePeriodLoanPage(srn, index),
@@ -66,38 +70,46 @@ case class IdentityTypePage(srn: Srn, index: Max5000, identitySubject: IdentityS
           SecurityGivenForLoanPage(srn, index)
         )
         if (index.value == 1) list :+ LoansMadeOrOutstandingPage(srn) else list
-
       case IdentitySubject.LandOrPropertySeller =>
         List().empty
+      case IdentitySubject.SharesSeller =>
+        List().empty
     }
-  private def pagesFirstPartGeneric(srn: Srn): List[Removable[_]] =
+  private def genericPagesDependentOnIdentitySubject(srn: Srn): List[Removable[_]] =
     List(
       IsIndividualRecipientConnectedPartyPage(srn, index),
       CompanyRecipientCrnPage(srn, index, this.identitySubject),
       PartnershipRecipientUtrPage(srn, index, this.identitySubject),
       OtherRecipientDetailsPage(srn, index, this.identitySubject)
     )
-  private def pagesFirstPartSpecific(srn: Srn): List[Removable[_]] =
+  private def pagesNotUsingIdentitySubject(srn: Srn): List[Removable[_]] =
     this.identitySubject match {
       case IdentitySubject.LoanRecipient =>
         List(
-          IndividualRecipientNamePage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
-          IndividualRecipientNinoPage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
-          CompanyRecipientNamePage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
-          PartnershipRecipientNamePage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
+          IndividualRecipientNamePage(srn, index),
+          IndividualRecipientNinoPage(srn, index),
+          CompanyRecipientNamePage(srn, index),
+          PartnershipRecipientNamePage(srn, index),
           RecipientSponsoringEmployerConnectedPartyPage(srn, index)
         )
 
       case IdentitySubject.LandOrPropertySeller =>
         List(
-          LandPropertyIndividualSellersNamePage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
-          IndividualSellerNiPage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
-          CompanySellerNamePage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
-          PartnershipSellerNamePage(srn, index), // TODO move this to generic page (with subject) and pass in this.identitySubject
+          LandPropertyIndividualSellersNamePage(srn, index),
+          IndividualSellerNiPage(srn, index),
+          CompanySellerNamePage(srn, index),
+          PartnershipSellerNamePage(srn, index),
           LandOrPropertySellerConnectedPartyPage(srn, index)
         )
+
+      case IdentitySubject.SharesSeller =>
+        List().empty //TODO list pages not using identity subject but need to be cleaned up here
+
+      case _ =>
+        List().empty
     }
-  private def pagesFirstPart(srn: Srn): List[Removable[_]] = pagesFirstPartGeneric(srn) ++ pagesFirstPartSpecific(srn)
+  private def pagesDependentOnIdentitySubject(srn: Srn): List[Removable[_]] =
+    genericPagesDependentOnIdentitySubject(srn) ++ pagesNotUsingIdentitySubject(srn)
 
   override def cleanup(value: Option[IdentityType], userAnswers: UserAnswers): Try[UserAnswers] =
     (value, userAnswers.get(this)) match {
@@ -105,11 +117,11 @@ case class IdentityTypePage(srn: Srn, index: Max5000, identitySubject: IdentityS
       case (Some(IdentityType.UKCompany), Some(IdentityType.UKCompany)) => Try(userAnswers)
       case (Some(IdentityType.UKPartnership), Some(IdentityType.UKPartnership)) => Try(userAnswers)
       case (Some(IdentityType.Other), Some(IdentityType.Other)) => Try(userAnswers)
-      case (Some(IdentityType.Individual), _) => removePages(userAnswers, pagesFirstPart(srn))
-      case (Some(IdentityType.UKCompany), _) => removePages(userAnswers, pagesFirstPart(srn))
-      case (Some(IdentityType.UKPartnership), _) => removePages(userAnswers, pagesFirstPart(srn))
-      case (Some(IdentityType.Other), _) => removePages(userAnswers, pagesFirstPart(srn))
-      case (None, _) => removePages(userAnswers, pages(srn))
+      case (Some(IdentityType.Individual), _) => removePages(userAnswers, pagesDependentOnIdentitySubject(srn))
+      case (Some(IdentityType.UKCompany), _) => removePages(userAnswers, pagesDependentOnIdentitySubject(srn))
+      case (Some(IdentityType.UKPartnership), _) => removePages(userAnswers, pagesDependentOnIdentitySubject(srn))
+      case (Some(IdentityType.Other), _) => removePages(userAnswers, pagesDependentOnIdentitySubject(srn))
+      case (None, _) => removePages(userAnswers, allPages(srn))
       case _ => Try(userAnswers)
     }
 }

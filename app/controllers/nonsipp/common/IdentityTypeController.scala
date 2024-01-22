@@ -26,6 +26,7 @@ import models.{IdentitySubject, IdentityType, Mode, UserAnswers}
 import navigation.Navigator
 import pages.nonsipp.common.IdentityTypePage
 import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
+import pages.nonsipp.shares.CompanyNameRelatedSharesPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -58,13 +59,17 @@ class IdentityTypeController @Inject()(
     mode: Mode,
     subject: IdentitySubject
   ): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    val form = IdentityTypeController.form(formProvider, subject)
-    Ok(
-      view(
-        form.fromUserAnswers(IdentityTypePage(srn, index, subject)),
-        viewModel(srn, index, mode, subject, request.userAnswers)
-      )
-    )
+    subject match {
+      case IdentitySubject.Unknown => Redirect(controllers.routes.UnauthorisedController.onPageLoad())
+      case _ =>
+        val form = IdentityTypeController.form(formProvider, subject)
+        Ok(
+          view(
+            form.fromUserAnswers(IdentityTypePage(srn, index, subject)),
+            viewModel(srn, index, mode, subject, request.userAnswers)
+          )
+        )
+    }
   }
 
   def onSubmit(
@@ -113,12 +118,17 @@ object IdentityTypeController {
   ): FormPageViewModel[RadioListViewModel] = {
     val text = subject match {
       case IdentitySubject.LoanRecipient => ""
-      case IdentitySubject.LandOrPropertySeller => {
+      case IdentitySubject.LandOrPropertySeller =>
         userAnswers.get(LandOrPropertyChosenAddressPage(srn, index)) match {
           case Some(value) => value.addressLine1
           case None => ""
         }
-      }
+      case IdentitySubject.SharesSeller =>
+        userAnswers.get(CompanyNameRelatedSharesPage(srn, index)) match {
+          case Some(value) => value
+          case None => ""
+        }
+      case _ => ""
     }
     FormPageViewModel(
       Message(s"${subject.key}.identityType.title"),
