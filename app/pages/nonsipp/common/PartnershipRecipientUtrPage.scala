@@ -30,7 +30,9 @@ case class PartnershipRecipientUtrPage(srn: Srn, index: Max5000, identitySubject
     case IdentitySubject.LoanRecipient =>
       pages.nonsipp.loansmadeoroutstanding.Paths.loanTransactions \ "recipientIdentityType" \ toString \ index.arrayIndex.toString
     case IdentitySubject.LandOrPropertySeller =>
-      pages.nonsipp.landorproperty.Paths.landOrPropertyTransactions \ "heldPropertyTransaction" \ "propertyAcquiredFromName" \ "sellerIdentityType" \ toString \ index.arrayIndex.toString
+      pages.nonsipp.landorproperty.Paths.heldPropertyTransactions \ "propertyAcquiredFrom" \ "sellerIdentityType" \ toString \ index.arrayIndex.toString
+    case IdentitySubject.SharesSeller =>
+      pages.nonsipp.shares.Paths.heldSharesTransaction \ "acquiredFromType" \ "sellerIdentityType" \ toString \ index.arrayIndex.toString
   }
 
   override def toString: String = "utr"

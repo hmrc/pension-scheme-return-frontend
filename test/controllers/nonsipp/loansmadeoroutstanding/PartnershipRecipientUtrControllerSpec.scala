@@ -23,59 +23,90 @@ import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.{ConditionalYesNo, IdentitySubject, NormalMode, Utr}
 import pages.nonsipp.common.PartnershipRecipientUtrPage
-import pages.nonsipp.loansmadeoroutstanding.PartnershipRecipientNamePage
 import views.html.ConditionalYesNoPageView
 
 class PartnershipRecipientUtrControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[OneTo5000](1)
 
-  private lazy val onPageLoad =
-    controllers.nonsipp.common.routes.PartnershipRecipientUtrController
-      .onPageLoad(srn, index, NormalMode, IdentitySubject.LoanRecipient)
-  private lazy val onSubmit =
-    controllers.nonsipp.common.routes.PartnershipRecipientUtrController
-      .onSubmit(srn, index, NormalMode, IdentitySubject.LoanRecipient)
-
-  val userAnswersWithPartnershipRecipientName =
-    defaultUserAnswers.unsafeSet(PartnershipRecipientNamePage(srn, index), partnershipName)
-
   val conditionalNo: ConditionalYesNo[String, Utr] = ConditionalYesNo.no("reason")
   val conditionalYes: ConditionalYesNo[String, Utr] = ConditionalYesNo.yes(utr)
 
   "PartnershipRecipientUtrController" - {
+    IdentitySubject.values.foreach { identitySubject =>
+      lazy val onPageLoad =
+        controllers.nonsipp.common.routes.PartnershipRecipientUtrController
+          .onPageLoad(srn, index, NormalMode, identitySubject)
+      lazy val onSubmit =
+        controllers.nonsipp.common.routes.PartnershipRecipientUtrController
+          .onSubmit(srn, index, NormalMode, identitySubject)
 
-    act.like(renderView(onPageLoad, userAnswersWithPartnershipRecipientName) { implicit app => implicit request =>
-      injected[ConditionalYesNoPageView]
-        .apply(
-          form(injected[YesNoPageFormProvider], IdentitySubject.LoanRecipient),
-          viewModel(srn, index, NormalMode, IdentitySubject.LoanRecipient, userAnswersWithPartnershipRecipientName)
-        )
-    })
-
-    act.like(
-      renderPrePopView(
-        onPageLoad,
-        PartnershipRecipientUtrPage(srn, index, IdentitySubject.LoanRecipient),
-        conditionalNo,
-        userAnswersWithPartnershipRecipientName
-      ) { implicit app => implicit request =>
+      act.like(renderView(onPageLoad, defaultUserAnswers) { implicit app => implicit request =>
         injected[ConditionalYesNoPageView]
           .apply(
-            form(injected[YesNoPageFormProvider], IdentitySubject.LoanRecipient).fill(conditionalNo.value),
-            viewModel(srn, index, NormalMode, IdentitySubject.LoanRecipient, userAnswersWithPartnershipRecipientName)
+            form(injected[YesNoPageFormProvider], identitySubject),
+            viewModel(srn, index, NormalMode, identitySubject, defaultUserAnswers)
           )
-      }
-    )
+      }.withName(s"should render PartnershipRecipientUtrController for $identitySubject"))
 
-    act.like(redirectNextPage(onSubmit, "value" -> "true", "value.yes" -> utr.value))
-    act.like(redirectNextPage(onSubmit, "value" -> "false", "value.no" -> "reason"))
+      act.like(
+        renderPrePopView(
+          onPageLoad,
+          PartnershipRecipientUtrPage(srn, index, identitySubject),
+          conditionalNo,
+          defaultUserAnswers
+        ) { implicit app => implicit request =>
+          injected[ConditionalYesNoPageView]
+            .apply(
+              form(injected[YesNoPageFormProvider], identitySubject).fill(conditionalNo.value),
+              viewModel(srn, index, NormalMode, identitySubject, defaultUserAnswers)
+            )
+        }.withName(s"should render PartnershipRecipientUtrController with pre populated view for $identitySubject")
+      )
 
-    act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
+      act.like(
+        redirectNextPage(onSubmit, "value" -> "true", "value.yes" -> utr.value)
+          .withName(s"should redirect to next page when value is true for $identitySubject")
+      )
+      act.like(
+        redirectNextPage(onSubmit, "value" -> "false", "value.no" -> "reason")
+          .withName(s"should redirect to next page when value is false for $identitySubject")
+      )
 
-    act.like(saveAndContinue(onSubmit, "value" -> "true", "value.yes" -> utr.value))
+      act.like(
+        journeyRecoveryPage(onPageLoad)
+          .updateName("onPageLoad" + _)
+          .withName(s"should redirect to Journey Recovery if no existing data is found, for $identitySubject")
+      )
 
-    act.like(invalidForm(onSubmit, userAnswersWithPartnershipRecipientName))
-    act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
+      act.like(
+        saveAndContinue(onSubmit, "value" -> "true", "value.yes" -> utr.value)
+          .withName(s"should save data and continue to next page with for $identitySubject")
+      )
+
+      act.like(
+        invalidForm(onSubmit, defaultUserAnswers)
+          .withName(s"should return BAD_REQUEST for a POST with invalid form for $identitySubject")
+      )
+      act.like(
+        journeyRecoveryPage(onSubmit)
+          .updateName("onSubmit" + _)
+          .withName(
+            s"should redirect to Journey Recovery if no existing data is found when submitting, for $identitySubject"
+          )
+      )
+    }
+
+    "Unknown" - {
+      lazy val onPageLoad =
+        controllers.nonsipp.common.routes.PartnershipRecipientUtrController
+          .onPageLoad(srn, index, NormalMode, IdentitySubject.Unknown)
+
+      act.like(
+        unauthorisedPage(onPageLoad, Some(defaultUserAnswers))
+          .updateName("onPageLoad " + _)
+      )
+    }
+
   }
 }

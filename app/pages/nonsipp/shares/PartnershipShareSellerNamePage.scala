@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,13 +20,12 @@ import config.Refined.Max5000
 import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
-import utils.RefinedUtils.RefinedIntOps
+import utils.RefinedUtils._
 
-case class IndividualNameOfSharesSellerPage(srn: Srn, index: Max5000) extends QuestionPage[String] {
+case class PartnershipShareSellerNamePage(srn: Srn, index: Max5000) extends QuestionPage[String] {
 
   override def path: JsPath =
-    Paths.heldSharesTransaction \ toString \ index.arrayIndex.toString
+    Paths.heldSharesTransaction \ "acquiredFrom" \ toString \ index.arrayIndex.toString
 
-  override def toString: String = "individualSellerName"
-
+  override def toString: String = "partnershipSellerName"
 }

@@ -27,22 +27,21 @@ class CompanyRecipientCrnPageSpec extends PageBehaviours {
 
     val index = refineMV[OneTo5000](1)
 
-    IdentitySubject.values.foreach {
-      case identitySubject =>
-        s"CompanyRecipientCrnPage for $identitySubject" - {
+    IdentitySubject.values.foreach { identitySubject =>
+      s"for $identitySubject" - {
 
-          beRetrievable[ConditionalYesNo[String, Crn]](
-            CompanyRecipientCrnPage(srnGen.sample.value, index, identitySubject)
-          )
+        beRetrievable[ConditionalYesNo[String, Crn]](
+          CompanyRecipientCrnPage(srnGen.sample.value, index, identitySubject)
+        )
 
-          beSettable[ConditionalYesNo[String, Crn]](
-            CompanyRecipientCrnPage(srnGen.sample.value, index, identitySubject)
-          )
+        beSettable[ConditionalYesNo[String, Crn]](
+          CompanyRecipientCrnPage(srnGen.sample.value, index, identitySubject)
+        )
 
-          beRemovable[ConditionalYesNo[String, Crn]](
-            CompanyRecipientCrnPage(srnGen.sample.value, index, identitySubject)
-          )
-        }
+        beRemovable[ConditionalYesNo[String, Crn]](
+          CompanyRecipientCrnPage(srnGen.sample.value, index, identitySubject)
+        )
+      }
     }
   }
 }

@@ -30,6 +30,6 @@ case class SharesIndividualSellerNINumberPage(srn: Srn, index: Max5000)
   override def path: JsPath =
     Paths.heldSharesTransaction \ toString \ index.arrayIndex.toString
 
-  override def toString: String = "SharesIndividualSellerNINumber"
+  override def toString: String = "individualSellerNINumber"
 
 }
