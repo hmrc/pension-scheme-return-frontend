@@ -197,9 +197,23 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           .navigateToWithIndex(
             index,
             IndividualNameOfSharesSellerPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.SharesIndividualSellerNINumberController
+                .onPageLoad(srn, index, NormalMode)
+          )
+          .withName("go from individual name of shares seller page to shares individual seller NI number page")
+      )
+    }
+
+    "SharesIndividualSellerNINumberPage" - {
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            SharesIndividualSellerNINumberPage,
             (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
           )
-          .withName("go from individual name of shares seller page to unauthorised page")
+          .withName("go from class of shares individual seller NI number page to unauthorised page")
       )
     }
 

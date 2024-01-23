@@ -17,16 +17,19 @@
 package pages.nonsipp.shares
 
 import config.Refined.Max5000
+import models.ConditionalYesNo
 import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
+import uk.gov.hmrc.domain.Nino
 import utils.RefinedUtils.RefinedIntOps
 
-case class IndividualNameOfSharesSellerPage(srn: Srn, index: Max5000) extends QuestionPage[String] {
+case class SharesIndividualSellerNINumberPage(srn: Srn, index: Max5000)
+    extends QuestionPage[ConditionalYesNo[String, Nino]] {
 
   override def path: JsPath =
     Paths.heldSharesTransaction \ toString \ index.arrayIndex.toString
 
-  override def toString: String = "acquiredFromName"
+  override def toString: String = "SharesIndividualSellerNINumber"
 
 }
