@@ -472,6 +472,8 @@ object TaskListController {
     val prefix = "nonsipp.tasklist.shares"
     val sharesStatusAndLink = getSharesTaskListStatusAndLink(userAnswers, srn)
     val quotedSharesStatusAndLink = getQuotedSharesTaskListStatusAndLink(userAnswers, srn)
+    val (sharesDisposalsStatus, sharesDisposalsLinkUrl) =
+      TaskListStatusUtils.getSharesDisposalsTaskListStatusWithLink(userAnswers, srn)
 
     TaskListSectionViewModel(
       s"$prefix.title",
@@ -481,6 +483,13 @@ object TaskListController {
           sharesStatusAndLink._2
         ),
         sharesStatusAndLink._1
+      ),
+      TaskListItemViewModel(
+        LinkMessage(
+          messageKey("nonsipp.tasklist.sharesdisposal", "title", sharesDisposalsStatus),
+          sharesDisposalsLinkUrl
+        ),
+        sharesDisposalsStatus
       ),
       TaskListItemViewModel(
         LinkMessage(
@@ -496,7 +505,8 @@ object TaskListController {
     val prefix = "nonsipp.tasklist.landorproperty"
 
     val landOrPropertyStatus = TaskListStatusUtils.getLandOrPropertyTaskListStatusAndLink(userAnswers, srn)
-    val (disposalsStatus, disposalLinkUrl) = TaskListStatusUtils.getDisposalsTaskListStatusWithLink(userAnswers, srn)
+    val (landOrPropertyDisposalsStatus, landOrPropertyDisposalsLinkUrl) =
+      TaskListStatusUtils.getLandOrPropertyDisposalsTaskListStatusWithLink(userAnswers, srn)
 
     TaskListSectionViewModel(
       s"$prefix.title",
@@ -510,9 +520,9 @@ object TaskListController {
       TaskListItemViewModel(
         LinkMessage(
           messageKey("nonsipp.tasklist.landorpropertydisposal", "title", UnableToStart),
-          disposalLinkUrl
+          landOrPropertyDisposalsLinkUrl
         ),
-        disposalsStatus
+        landOrPropertyDisposalsStatus
       )
     )
   }
