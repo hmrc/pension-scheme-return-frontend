@@ -25,8 +25,8 @@ import utils.RefinedUtils.RefinedIntOps
 case class IndividualNameOfSharesSellerPage(srn: Srn, index: Max5000) extends QuestionPage[String] {
 
   override def path: JsPath =
-    Paths.shareIdentification \ toString \ index.arrayIndex.toString
+    Paths.heldSharesTransaction \ toString \ index.arrayIndex.toString
 
-  override def toString: String = "individualNameOfSharesSeller"
+  override def toString: String = "acquiredFromName"
 
 }

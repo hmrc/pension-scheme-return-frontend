@@ -25,7 +25,6 @@ import forms.mappings.errors.InputFormErrors
 import models.SchemeId.Srn
 import models.{ConditionalYesNo, Mode}
 import navigation.Navigator
-import pages.nonsipp.landorpropertydisposal.{IndividualBuyerNinoNumberPage, LandOrPropertyIndividualBuyerNamePage}
 import pages.nonsipp.shares.{IndividualNameOfSharesSellerPage, SharesIndividualSellerNINumberPage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}

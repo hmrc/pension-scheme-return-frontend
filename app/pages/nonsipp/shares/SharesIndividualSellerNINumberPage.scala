@@ -28,7 +28,7 @@ case class SharesIndividualSellerNINumberPage(srn: Srn, index: Max5000)
     extends QuestionPage[ConditionalYesNo[String, Nino]] {
 
   override def path: JsPath =
-    Paths.shareTransactions \ toString \ index.arrayIndex.toString
+    Paths.heldSharesTransaction \ toString \ index.arrayIndex.toString
 
   override def toString: String = "SharesIndividualSellerNINumber"
 
