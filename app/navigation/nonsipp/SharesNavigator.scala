@@ -16,6 +16,7 @@
 
 package navigation.nonsipp
 
+import controllers.nonsipp.shares.CompanyNameOfSharesSellerPage
 import eu.timepit.refined.refineMV
 import models.SchemeHoldShare.{Acquisition, Contribution, Transfer}
 import models.{NormalMode, UserAnswers}
@@ -68,6 +69,9 @@ object SharesNavigator extends JourneyNavigator {
       controllers.nonsipp.shares.routes.SharesIndividualSellerNINumberController.onPageLoad(srn, index, NormalMode)
 
     case SharesIndividualSellerNINumberPage(srn, index) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
+
+    case CompanyNameOfSharesSellerPage(srn, index) =>
       controllers.routes.UnauthorisedController.onPageLoad()
 
   }
