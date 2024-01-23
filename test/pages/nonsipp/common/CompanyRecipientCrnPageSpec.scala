@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.loansmadeoroutstanding
+package pages.nonsipp.common
 
 import config.Refined.OneTo5000
 import eu.timepit.refined.refineMV
-import models.ConditionalYesNo
+import models.{ConditionalYesNo, Crn, IdentitySubject}
 import pages.behaviours.PageBehaviours
-import uk.gov.hmrc.domain.Nino
 
 class CompanyRecipientCrnPageSpec extends PageBehaviours {
 
@@ -28,10 +27,22 @@ class CompanyRecipientCrnPageSpec extends PageBehaviours {
 
     val index = refineMV[OneTo5000](1)
 
-    beRetrievable[ConditionalYesNo[String, Nino]](IndividualRecipientNinoPage(srnGen.sample.value, index))
+    IdentitySubject.values.foreach {
+      case identitySubject =>
+        s"CompanyRecipientCrnPage for $identitySubject" - {
 
-    beSettable[ConditionalYesNo[String, Nino]](IndividualRecipientNinoPage(srnGen.sample.value, index))
+          beRetrievable[ConditionalYesNo[String, Crn]](
+            CompanyRecipientCrnPage(srnGen.sample.value, index, identitySubject)
+          )
 
-    beRemovable[ConditionalYesNo[String, Nino]](IndividualRecipientNinoPage(srnGen.sample.value, index))
+          beSettable[ConditionalYesNo[String, Crn]](
+            CompanyRecipientCrnPage(srnGen.sample.value, index, identitySubject)
+          )
+
+          beRemovable[ConditionalYesNo[String, Crn]](
+            CompanyRecipientCrnPage(srnGen.sample.value, index, identitySubject)
+          )
+        }
+    }
   }
 }
