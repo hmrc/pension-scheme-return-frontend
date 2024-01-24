@@ -38,7 +38,7 @@ case class LandPropertyInUKPage(srn: Srn, index: Max5000) extends QuestionPage[B
     (value, userAnswers.get(this)) match {
       case (Some(true), Some(false)) => removePages(userAnswers, addressPages(srn))
       case (Some(false), Some(true)) => removePages(userAnswers, addressPages(srn))
-      case (None, _) => removePages(userAnswers, pages(srn))
+      case (None, _) => removePages(userAnswers, pages(srn, userAnswers.map(LandPropertyInUKPages(srn)).size == 1))
       case _ => Try(userAnswers)
     }
 
@@ -49,7 +49,7 @@ case class LandPropertyInUKPage(srn: Srn, index: Max5000) extends QuestionPage[B
       AddressLookupResultsPage(srn, index)
     )
 
-  private def pages(srn: Srn): List[Removable[_]] = {
+  private def pages(srn: Srn, isLastRecord: Boolean): List[Removable[_]] = {
     val list = List(
       LandOrPropertyChosenAddressPage(srn, index),
       LandRegistryTitleNumberPage(srn, index),
@@ -61,7 +61,7 @@ case class LandPropertyInUKPage(srn: Srn, index: Max5000) extends QuestionPage[B
       LandOrPropertyTotalIncomePage(srn, index),
       RemovePropertyPage(srn, index)
     )
-    if (index.value == 1) list :+ LandOrPropertyHeldPage(srn) else list
+    if (isLastRecord) list :+ LandOrPropertyHeldPage(srn) else list
   }
 }
 

@@ -135,7 +135,7 @@ object LoansMadeOrOutstandingNavigator extends JourneyNavigator {
 
     case LoansListPage(srn, addLoan @ true) =>
       val answers = userAnswers.map(IdentityTypes(srn, IdentitySubject.LoanRecipient))
-      val nextDataKey = if (answers.isEmpty) 1 else answers.maxBy(_._1)._1.toIntOption.orElse(Some(0)).get + 1
+      val nextDataKey = if (answers.isEmpty) 1 else answers.keys.map(_.toIntOption.getOrElse(0)).max + 1
       refineV[OneTo5000](nextDataKey + 1) match {
         case Left(_) => controllers.routes.JourneyRecoveryController.onPageLoad()
         case Right(nextIndex) =>
