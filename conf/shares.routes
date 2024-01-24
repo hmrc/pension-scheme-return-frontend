@@ -58,3 +58,8 @@ GET         /:srn/shares-individual-seller-ni-number/:index                     
 POST        /:srn/shares-individual-seller-ni-number/:index                                             controllers.nonsipp.shares.SharesIndividualSellerNINumberController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
 GET         /:srn/change-shares-individual-seller-ni-number/:index                                      controllers.nonsipp.shares.SharesIndividualSellerNINumberController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 POST        /:srn/change-shares-individual-seller-ni-number/:index                                      controllers.nonsipp.shares.SharesIndividualSellerNINumberController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET         /:srn/company-name-of-shares-seller/:index                                             controllers.nonsipp.shares.CompanyNameOfSharesSellerController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/company-name-of-shares-seller/:index                                             controllers.nonsipp.shares.CompanyNameOfSharesSellerController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/change-company-name-of-shares-seller/:index                                      controllers.nonsipp.shares.CompanyNameOfSharesSellerController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-company-name-of-shares-seller/:index                                      controllers.nonsipp.shares.CompanyNameOfSharesSellerController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)

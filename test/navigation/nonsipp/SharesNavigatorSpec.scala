@@ -17,6 +17,7 @@
 package navigation.nonsipp
 
 import config.Refined.{indexReads, Max5000, OneTo5000}
+import controllers.nonsipp.shares.CompanyNameOfSharesSellerPage
 import eu.timepit.refined.refineMV
 import models.{NormalMode, SchemeHoldShare}
 import navigation.{Navigator, NavigatorBehaviours}
@@ -214,6 +215,18 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
           )
           .withName("go from class of shares individual seller NI number page to unauthorised page")
+      )
+    }
+
+    "CompanyNameOfSharesSellerPage" - {
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            CompanyNameOfSharesSellerPage,
+            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          )
+          .withName("go from  company name of shares seller page to unauthorised page")
       )
     }
 
