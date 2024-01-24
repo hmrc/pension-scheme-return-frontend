@@ -37,7 +37,7 @@ class TransferInMongoController @Inject()(
   val identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents
 )(implicit val ec: ExecutionContext)
-    extends TestDataController[Max300.Refined, Max5.Refined] {
+    extends TestDataDoubleIndexController[Max300.Refined, Max5.Refined] {
 
   override val max: Max5 = refineMV(5)
 

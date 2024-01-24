@@ -14,7 +14,7 @@
 
 GET        /pension-scheme-return/test-only/:srn/add-member-details/:num                         controllers.testonly.MemberDetailsMongoController.addMemberDetails(srn: Srn, num: Max300)
 GET        /pension-scheme-return/test-only/:srn/add-loan-details/:num                           controllers.testonly.LoanDetailsMongoController.addLoanDetails(srn: Srn, num: Max5000)
-GET        /pension-scheme-return/test-only/:srn/add-land-or-property/:num                       controllers.testonly.LandOrPropertyMongoController.addLandOrProperty(srn: Srn, num: Max5000)
+GET        /pension-scheme-return/test-only/:srn/add-land-or-property/:num                       controllers.testonly.LandOrPropertyMongoController.addTestData(srn: Srn, num: Max5000)
 GET        /pension-scheme-return/test-only/:srn/add-land-or-property-disposals/:index/:num      controllers.testonly.LandOrPropertyDisposalMongoController.addTestData(srn: Srn, index: Max5000, num: Max50)
 GET        /pension-scheme-return/test-only/:srn/add-borrow-details/:num                         controllers.testonly.BorrowingInstancesMongoController.addBorrowDetails(srn: Srn, num: Max5000)
 GET        /pension-scheme-return/test-only/:srn/add-employer-contributions/:index/:num          controllers.testonly.EmployerContributionsMongoController.addEmployerContributions(srn: Srn, index: Max300, num: Max50)

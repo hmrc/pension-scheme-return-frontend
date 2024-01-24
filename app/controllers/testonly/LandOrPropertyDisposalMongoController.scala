@@ -37,7 +37,7 @@ class LandOrPropertyDisposalMongoController @Inject()(
   val identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents
 )(implicit val ec: ExecutionContext)
-    extends TestDataController[Max5000.Refined, Max50.Refined] {
+    extends TestDataDoubleIndexController[Max5000.Refined, Max50.Refined] {
 
   override type Pages =
     PageWithValue[RecipientDetails] ::
