@@ -154,6 +154,9 @@ object SharesNavigator extends JourneyNavigator {
           controllers.routes.UnauthorisedController.onPageLoad()
       }
 
+    case CostOfSharesPage(srn, index) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
+
     case SharesIndependentValuationPage(srn, index) =>
       controllers.routes.UnauthorisedController.onPageLoad()
   }

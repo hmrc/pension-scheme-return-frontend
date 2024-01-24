@@ -314,6 +314,18 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       )
     }
 
+    "CostOfSharesPage" - {
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            CostOfSharesPage,
+            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          )
+          .withName("go from cost of shares page to unauthorised page")
+      )
+    }
+
     "PartnershipShareSellerNamePage" - {
       act.like(
         normalmode

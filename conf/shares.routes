@@ -83,6 +83,15 @@ POST        /:srn/shares-from-connected-party/:index                            
 GET         /:srn/change-shares-from-connected-party/:index                    controllers.nonsipp.shares.SharesFromConnectedPartyController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 POST        /:srn/change-shares-from-connected-party/:index                     controllers.nonsipp.shares.SharesFromConnectedPartyController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 
+GET         /:srn/shares-total-cost-value                                               controllers.nonsipp.shares.CostOfSharesController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
+GET         /:srn/shares-total-cost-value/:index                                        controllers.nonsipp.shares.CostOfSharesController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/shares-total-cost-value                                               controllers.nonsipp.shares.CostOfSharesController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
+POST        /:srn/shares-total-cost-value/:index                                        controllers.nonsipp.shares.CostOfSharesController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/change-shares-total-cost-value                                        controllers.nonsipp.shares.CostOfSharesController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
+GET         /:srn/change-shares-total-cost-value/:index                                 controllers.nonsipp.shares.CostOfSharesController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-shares-total-cost-value                                        controllers.nonsipp.shares.CostOfSharesController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
+POST        /:srn/change-shares-total-cost-value/:index                                 controllers.nonsipp.shares.CostOfSharesController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
 GET        /:srn/shares-independent-valuation/:index                 controllers.nonsipp.shares.SharesIndependentValuationController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
 POST       /:srn/shares-independent-valuation/:index                 controllers.nonsipp.shares.SharesIndependentValuationController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
 GET        /:srn/change-shares-independent-valuation/:index          controllers.nonsipp.shares.SharesIndependentValuationController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)

@@ -496,6 +496,14 @@ shares.classOfShares.error.required = Enter the class of the shares held in this
 shares.classOfShares.error.invalid.characters = The class of the shares held in this company must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
 shares.classOfShares.error.length = The class of the shares held in this company must be 160 characters or fewer
 
+shares.costOfShares.title = What was the total cost of the shares in this company, in pounds and pence?
+shares.costOfShares.heading = What was the total cost of the shares in {0}, in pounds and pence?
+shares.costOfShares.hint = Include all costs related to the transaction. If the shares were not acquired or subscribed for, provide the total value.
+shares.costOfShares.error.required = Enter the total cost of the shares, in pounds and pence
+shares.costOfShares.error.invalid = Total cost of the shares must be an amount of money, like 123 or 123.45
+shares.costOfShares.error.tooSmall = Total cost of the shares must be 0.01 or more
+shares.costOfShares.error.tooLarge = Total cost of the shares must be 999999999.99 or less
+
 shares.totalShares.title = How many shares in this company were acquired in this transaction?
 shares.totalShares.heading = How many shares in {0} were acquired in this transaction?
 shares.totalShares.error.required = Enter the number of shares acquired in this transaction
