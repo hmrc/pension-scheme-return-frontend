@@ -12,6 +12,7 @@
 ->          /                                                                           memberpayments_pensionpayments.Routes
 ->          /                                                                           membersurrenderedbenefits.Routes
 ->          /                                                                           shares.Routes
+->          /                                                                           sharesdisposal.Routes
 
 GET         /                                                                           controllers.IndexController.onPageLoad()
 

@@ -496,6 +496,10 @@ shares.classOfShares.error.required = Enter the class of the shares held in this
 shares.classOfShares.error.invalid.characters = The class of the shares held in this company must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
 shares.classOfShares.error.length = The class of the shares held in this company must be 160 characters or fewer
 
+sharesDisposal.title = Did the scheme dispose of any shares in a sponsoring employer, shares acquired from a connected party, or unquoted shares during the period of this return?
+sharesDisposal.heading = Did {0} dispose of any shares in a sponsoring employer, shares acquired from a connected party, or unquoted shares during the period of this return?
+sharesDisposal.error.required = Select yes if the scheme disposed of any shares in a sponsoring employer, shares acquired from a connected party, or unquoted shares during the period of this return
+
 pensionCommencementLumpSum.title = Did any member receive a pension commencement lump sum (PCLS) during the period of this return?
 pensionCommencementLumpSum.heading = Did any member receive a pension commencement lump sum (PCLS) during the period of this return?
 pensionCommencementLumpSum.error.required = Select yes if any member received a Pension Commencement Lump Sum during the period of this return
@@ -715,6 +719,8 @@ nonsipp.tasklist.loans.change.moneyborrowed.title =  Change details of money bor
 nonsipp.tasklist.shares.title = Shares
 nonsipp.tasklist.shares.add.sponsoringemployer.title = Add shares held in a sponsoring employer, acquired from a connected party, or unquoted shares
 nonsipp.tasklist.shares.change.sponsoringemployer.title = Change shares held in a sponsoring employer, acquired from a connected party, or unquoted shares
+nonsipp.tasklist.sharesdisposal.add.title = Report disposal of shares held in a sponsoring employer, acquired from a connected party, or unquoted shares
+nonsipp.tasklist.sharesdisposal.change.title = Change disposal of shares held in a sponsoring employer, acquired from a connected party, or unquoted shares
 nonsipp.tasklist.shares.add.quotedshares.title = Add value of quoted shares
 nonsipp.tasklist.shares.change.quotedshares.title = Change value of quoted shares
 nonsipp.tasklist.landorproperty.title = Land or property

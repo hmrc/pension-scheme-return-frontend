@@ -35,6 +35,7 @@ import pages.nonsipp.moneyborrowed.{LenderNamePages, MoneyBorrowedPage, WhySchem
 import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
 import pages.nonsipp.schemedesignatory.{FeesCommissionsWagesSalariesPage, HowManyMembersPage, HowMuchCashPage}
 import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
+import pages.nonsipp.sharesdisposal.{SharesDisposalCompletedPages, SharesDisposalPage}
 import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
 import pages.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldPage
 import viewmodels.models.TaskListStatus
@@ -236,7 +237,7 @@ object TaskListStatusUtils {
         }
     }
 
-  def getDisposalsTaskListStatusWithLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
+  def getLandOrPropertyDisposalsTaskListStatusWithLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
     val atLeastOneCompleted =
       userAnswers.get(LandPropertyDisposalCompletedPages(srn)).exists(_.values.exists(_.values.nonEmpty))
     val started = userAnswers.get(LandOrPropertyDisposalPage(srn)).contains(true)
@@ -339,6 +340,33 @@ object TaskListStatusUtils {
         } else {
           (InProgress, defaultLink)
         }
+    }
+  }
+
+  def getSharesDisposalsTaskListStatusWithLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
+    val atLeastOneCompleted =
+      userAnswers.get(SharesDisposalCompletedPages(srn)).exists(_.values.exists(_.values.nonEmpty))
+    val started = userAnswers.get(SharesDisposalPage(srn)).contains(true)
+    val completedNoDisposals = userAnswers.get(SharesDisposalPage(srn)).contains(false)
+
+    val initialDisposalUrl = controllers.nonsipp.sharesdisposal.routes.SharesDisposalController
+      .onPageLoad(srn, NormalMode)
+      .url
+
+    //TODO: dependent on SharesDisposalList implementation
+    val disposalListPage = controllers.routes.UnauthorisedController.onPageLoad().url
+    //    val disposalListPage = controllers.nonsipp.sharesdisposal.routes.SharesDisposalListController
+    //      .onPageLoad(srn, page = 1)
+    //      .url
+
+    if (atLeastOneCompleted) {
+      (TaskListStatus.Completed, disposalListPage)
+    } else if (completedNoDisposals) {
+      (TaskListStatus.Completed, initialDisposalUrl)
+    } else if (started) {
+      (TaskListStatus.InProgress, initialDisposalUrl)
+    } else {
+      (TaskListStatus.NotStarted, initialDisposalUrl)
     }
   }
 
