@@ -500,6 +500,27 @@ sharesDisposal.title = Did the scheme dispose of any shares in a sponsoring empl
 sharesDisposal.heading = Did {0} dispose of any shares in a sponsoring employer, shares acquired from a connected party, or unquoted shares during the period of this return?
 sharesDisposal.error.required = Select yes if the scheme disposed of any shares in a sponsoring employer, shares acquired from a connected party, or unquoted shares during the period of this return
 
+sharesDisposal.whatYouWillNeed.title = Shares disposed of by the scheme
+sharesDisposal.whatYouWillNeed.heading = Shares disposed of by {0}
+sharesDisposal.whatYouWillNeed.paragraph1 = You must tell us about all shares in a sponsoring employer, shares acquired from a connected party, or unquoted shares disposed of by the scheme during the period of this return.
+sharesDisposal.whatYouWillNeed.paragraph2 = You must tell us:
+sharesDisposal.whatYouWillNeed.bullet1 = which shares were disposed of
+sharesDisposal.whatYouWillNeed.bullet2 = if they were disposed of by sale, redemption, transfer out or other
+sharesDisposal.whatYouWillNeed.bullet3 = if any of the shares are still held, and if so, how many
+sharesDisposal.whatYouWillNeed.paragraph3 = If any shares were sold, you must tell us:
+sharesDisposal.whatYouWillNeed.bullet4 = the date of the sale
+sharesDisposal.whatYouWillNeed.bullet5 = the number of shares sold
+sharesDisposal.whatYouWillNeed.bullet6 = the total consideration received for the sale
+sharesDisposal.whatYouWillNeed.bullet7 = if the buyer was an individual, company, partnership or other
+sharesDisposal.whatYouWillNeed.bullet8 = the buyer’s name
+sharesDisposal.whatYouWillNeed.bullet9 = the buyer’s National Insurance number, Company Registration Number, Unique Taxpayer Reference or a description of the buyer – whichever applies – or the reason you cannot provide it
+sharesDisposal.whatYouWillNeed.bullet10 = if the buyer was a connected party
+sharesDisposal.whatYouWillNeed.bullet11 = if the sale was supported by an independent valuation
+sharesDisposal.whatYouWillNeed.paragraph4 = If any shares were redeemed, you must tell us:
+sharesDisposal.whatYouWillNeed.bullet12 = the date of the redemption
+sharesDisposal.whatYouWillNeed.bullet13 = the number of shares redeemed
+sharesDisposal.whatYouWillNeed.bullet14 = the total consideration received for the redemption
+
 pensionCommencementLumpSum.title = Did any member receive a pension commencement lump sum (PCLS) during the period of this return?
 pensionCommencementLumpSum.heading = Did any member receive a pension commencement lump sum (PCLS) during the period of this return?
 pensionCommencementLumpSum.error.required = Select yes if any member received a Pension Commencement Lump Sum during the period of this return

@@ -36,7 +36,8 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithData(
               SharesDisposalPage,
               Gen.const(true),
-              (srn, _) => controllers.routes.UnauthorisedController.onPageLoad()
+              (srn, _) =>
+                controllers.nonsipp.sharesdisposal.routes.WhatYouWillNeedSharesDisposalController.onPageLoad(srn)
             )
             .withName("go from Shares Disposal page to What You Will Need page when yes selected")
         )
@@ -49,6 +50,18 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
             )
             .withName("go from Shares Disposal page to Task List page when no selected")
+        )
+      }
+
+      "WhatYouWillNeedSharesDisposalPage" - {
+
+        act.like(
+          normalmode
+            .navigateTo(
+              WhatYouWillNeedSharesDisposalPage,
+              (srn, _) => controllers.routes.UnauthorisedController.onPageLoad()
+            )
+            .withName("go from What You Will Need page to Shares Disposal Member List page")
         )
       }
     }

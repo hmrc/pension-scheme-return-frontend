@@ -28,10 +28,13 @@ object SharesDisposalNavigator extends JourneyNavigator {
 
     case page @ SharesDisposalPage(srn) =>
       if (userAnswers.get(page).contains(true)) {
-        controllers.routes.UnauthorisedController.onPageLoad()
+        controllers.nonsipp.sharesdisposal.routes.WhatYouWillNeedSharesDisposalController.onPageLoad(srn)
       } else {
         controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
       }
+
+    case WhatYouWillNeedSharesDisposalPage(srn) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
 
   }
 
