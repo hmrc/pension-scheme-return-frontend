@@ -24,7 +24,7 @@ import eu.timepit.refined.api.{Refined, Validate}
 import eu.timepit.refined.refineV
 import models.SchemeId.Srn
 import models.UserAnswers
-import play.api.libs.json.Writes
+import play.api.libs.json.{Json, Writes}
 import play.api.mvc.{Action, AnyContent}
 import services.SaveService
 import shapeless.PolyDefns.Case2
@@ -63,7 +63,9 @@ trait TestDataController[Index, SecondaryIndex] extends PSRController {
         removedUserAnswers <- Future.fromTry(removeAllPages(srn, index, request.userAnswers))
         updatedUserAnswers <- Future.fromTry(updateUserAnswers(num.value, srn, index, removedUserAnswers))
         _ <- saveService.save(updatedUserAnswers)
-      } yield Ok(s"Added ${num.value} entries to UserAnswers for index ${index.value}")
+      } yield Ok(
+        s"Added ${num.value} entries to UserAnswers for index ${index.value}\n${Json.prettyPrint(updatedUserAnswers.data.decryptedValue)}"
+      )
     }
 
   private def buildSecondaryIndexes(
@@ -102,11 +104,11 @@ trait TestDataController[Index, SecondaryIndex] extends PSRController {
 
   object RemovePages extends Poly {
     implicit def polyRemovePage[A: Writes]: Case2.Aux[this.type, Try[UserAnswers], PageWithValue[A], Try[UserAnswers]] =
-      Case2.apply((ua, p) => ua.flatMap(_.remove(p.page)))
+      Case2.apply((ua, p) => ua.flatMap(_.removeOnly(p.page)))
   }
 
   object SetPages extends Poly {
     implicit def polySetPage[A: Writes]: Case2.Aux[this.type, Try[UserAnswers], PageWithValue[A], Try[UserAnswers]] =
-      Case2.apply((ua, p) => ua.flatMap(_.set(p.page, p.value)))
+      Case2.apply((ua, p) => ua.flatMap(_.setOnly(p.page, p.value)))
   }
 }

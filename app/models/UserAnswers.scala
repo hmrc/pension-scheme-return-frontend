@@ -92,7 +92,7 @@ final case class UserAnswers(
   def remove(pages: List[Removable[_]]): Try[UserAnswers] =
     pages.foldLeft(Try(this))((ua, page) => ua.flatMap(_.remove(page)))
 
-  private def setOnly[A](page: Settable[A], value: A)(implicit writes: Writes[A]): Try[UserAnswers] = {
+  def setOnly[A](page: Settable[A], value: A)(implicit writes: Writes[A]): Try[UserAnswers] = {
     val updatedData = data.decryptedValue.setObject(page.path, Json.toJson(value)) match {
       case JsSuccess(jsValue, _) =>
         Success(jsValue)
@@ -103,7 +103,7 @@ final case class UserAnswers(
     updatedData.map(d => copy(data = SensitiveJsObject(d)))
   }
 
-  private def removeOnly[A](page: Removable[A]): Try[UserAnswers] = {
+  def removeOnly[A](page: Removable[A]): Try[UserAnswers] = {
     val updatedData =
       data.decryptedValue.removeObject(page.path) match {
         case JsSuccess(jsValue, _) =>
