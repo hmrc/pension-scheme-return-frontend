@@ -49,7 +49,7 @@ case class IdentityTypePage(srn: Srn, index: Max5000, identitySubject: IdentityS
     case IdentitySubject.LandOrPropertySeller =>
       pages.nonsipp.landorproperty.Paths.heldPropertyTransactions \ "propertyAcquiredFrom" \ "sellerIdentityType" \ toString \ index.arrayIndex.toString
     case IdentitySubject.SharesSeller =>
-      pages.nonsipp.shares.Paths.heldSharesTransaction \ "shareAcquiredFrom" \ "sellerIdentityType" \ toString \ index.arrayIndex.toString
+      pages.nonsipp.shares.Paths.heldSharesTransaction \ "acquiredFromType" \ "sellerIdentityType" \ toString \ index.arrayIndex.toString
   }
 
   override def toString: String = "identityTypes"
@@ -132,7 +132,7 @@ case class IdentityTypes(srn: Srn, identitySubject: IdentitySubject) extends Que
     case IdentitySubject.LandOrPropertySeller =>
       pages.nonsipp.landorproperty.Paths.heldPropertyTransactions \ "propertyAcquiredFrom" \ "sellerIdentityType" \ toString
     case IdentitySubject.SharesSeller =>
-      pages.nonsipp.shares.Paths.heldSharesTransaction \ "shareAcquiredFrom" \ "sellerIdentityType" \ toString
+      pages.nonsipp.shares.Paths.heldSharesTransaction \ "acquiredFromType" \ "sellerIdentityType" \ toString
   }
   override def toString: String = "identityTypes"
 }
