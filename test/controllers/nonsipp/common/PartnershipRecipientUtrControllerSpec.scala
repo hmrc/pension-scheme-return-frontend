@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.loansmadeoroutstanding
+package controllers.nonsipp.common
 
 import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec

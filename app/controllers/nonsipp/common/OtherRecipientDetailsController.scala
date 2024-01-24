@@ -26,6 +26,7 @@ import models.{IdentitySubject, Mode, RecipientDetails, UserAnswers}
 import navigation.Navigator
 import pages.nonsipp.common.OtherRecipientDetailsPage
 import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
+import pages.nonsipp.shares.CompanyNameRelatedSharesPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -53,13 +54,17 @@ class OtherRecipientDetailsController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode, subject: IdentitySubject): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      val form = OtherRecipientDetailsController.form(formProvider, subject)
-      Ok(
-        view(
-          form.fromUserAnswers(OtherRecipientDetailsPage(srn, index, subject)),
-          viewModel(srn, index, mode, subject, request.userAnswers)
-        )
-      )
+      subject match {
+        case IdentitySubject.Unknown => Redirect(controllers.routes.UnauthorisedController.onPageLoad())
+        case _ =>
+          val form = OtherRecipientDetailsController.form(formProvider, subject)
+          Ok(
+            view(
+              form.fromUserAnswers(OtherRecipientDetailsPage(srn, index, subject)),
+              viewModel(srn, index, mode, subject, request.userAnswers)
+            )
+          )
+      }
     }
 
   def onSubmit(srn: Srn, index: Max5000, mode: Mode, subject: IdentitySubject): Action[AnyContent] =
@@ -106,6 +111,12 @@ object OtherRecipientDetailsController {
           case Some(value) => value.addressLine1
           case None => ""
         }
+      case IdentitySubject.SharesSeller =>
+        userAnswers.get(CompanyNameRelatedSharesPage(srn, index)) match {
+          case Some(value) => value
+          case None => ""
+        }
+      case _ => ""
     }
     FormPageViewModel(
       Message(s"${subject.key}.otherRecipientDetails.title"),

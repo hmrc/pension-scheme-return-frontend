@@ -127,6 +127,7 @@ object PartnershipRecipientUtrController {
           case Some(value) => value
           case None => ""
         }
+      case _ => ""
     }
     FormPageViewModel[ConditionalYesNoPageViewModel](
       s"${subject.key}.partnershipRecipientUtr.title",

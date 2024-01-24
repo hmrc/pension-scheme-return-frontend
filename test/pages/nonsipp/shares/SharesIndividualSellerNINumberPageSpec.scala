@@ -16,7 +16,7 @@
 
 package pages.nonsipp.shares
 
-import config.Refined.{Max50, Max5000}
+import config.Refined.Max5000
 import eu.timepit.refined.refineMV
 import models.ConditionalYesNo
 import pages.behaviours.PageBehaviours

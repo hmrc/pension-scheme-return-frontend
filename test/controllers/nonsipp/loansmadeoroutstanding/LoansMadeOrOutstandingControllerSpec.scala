@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.common
+package controllers.nonsipp.loansmadeoroutstanding
 
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.loansmadeoroutstanding.LoansMadeOrOutstandingController._
-import controllers.nonsipp.loansmadeoroutstanding.routes
 import forms.YesNoPageFormProvider
 import models.NormalMode
 import org.mockito.ArgumentMatchers.any
