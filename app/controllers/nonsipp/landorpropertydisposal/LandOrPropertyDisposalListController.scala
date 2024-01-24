@@ -34,7 +34,7 @@ import pages.nonsipp.landorpropertydisposal._
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import utils.nonsipp.TaskListStatusUtils.getDisposalsTaskListStatusWithLink
+import utils.nonsipp.TaskListStatusUtils.getLandOrPropertyDisposalsTaskListStatusWithLink
 import viewmodels.DisplayMessage.{Message, ParagraphMessage}
 import viewmodels.implicits._
 import viewmodels.models._
@@ -55,7 +55,7 @@ class LandOrPropertyDisposalListController @Inject()(
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      val (status, incompleteDisposalUrl) = getDisposalsTaskListStatusWithLink(request.userAnswers, srn)
+      val (status, incompleteDisposalUrl) = getLandOrPropertyDisposalsTaskListStatusWithLink(request.userAnswers, srn)
 
       if (status == TaskListStatus.Completed) {
         getDisposals(srn).map { disposals =>
