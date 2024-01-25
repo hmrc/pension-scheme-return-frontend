@@ -34,24 +34,67 @@ import shapeless.{HList, Poly}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
-trait TestDataController[Index, SecondaryIndex] extends PSRController {
+trait TestDataSingleIndexController[Index] extends TestDataController {
 
   // override
-  type Pages <: HList
+  val max: Refined[Int, Index]
+  def pages(srn: Srn, index: RefinedIndex): Pages
+
+  // implementation
+  protected type RefinedIndex = Refined[Int, Index]
+
+  def addTestData(srn: Srn, num: RefinedIndex)(
+    implicit remover: UserAnswersRemover,
+    setter: UserAnswersSetter,
+    ev: Validate[Int, Index]
+  ): Action[AnyContent] =
+    identifyAndRequireData(srn).async { implicit request =>
+      for {
+        removedUserAnswers <- Future.fromTry(removeAllPages(srn, request.userAnswers))
+        updatedUserAnswers <- Future.fromTry(updateUserAnswers(srn, num.value, removedUserAnswers))
+        _ <- saveService.save(updatedUserAnswers)
+      } yield Ok(
+        s"Added ${num.value} entries to UserAnswers for index ${num.value}\n${Json.prettyPrint(updatedUserAnswers.data.decryptedValue)}"
+      )
+    }
+
+  private def removeAllPages(srn: Srn, userAnswers: UserAnswers)(
+    implicit remover: UserAnswersRemover,
+    ev: Validate[Int, Index]
+  ): Try[UserAnswers] =
+    for {
+      indexes <- buildIndexes[Index](max.value)
+      updatedUserAnswers <- indexes.foldLeft(Try(userAnswers)) {
+        case (ua, index) =>
+          pages(srn, index).foldLeft(ua)(RemovePages)
+      }
+    } yield updatedUserAnswers
+
+  private def updateUserAnswers(
+    srn: Srn,
+    num: Int,
+    userAnswers: UserAnswers
+  )(
+    implicit setter: UserAnswersSetter,
+    ev: Validate[Int, Index]
+  ): Try[UserAnswers] =
+    for {
+      indexes <- buildIndexes[Index](num)
+      updatedUserAnswers <- indexes.foldLeft(Try(userAnswers)) {
+        case (ua, index) => pages(srn, index).foldLeft(ua)(SetPages)
+      }
+    } yield updatedUserAnswers
+}
+
+trait TestDataDoubleIndexController[Index, SecondaryIndex] extends TestDataController {
+
+  // override
   val max: Refined[Int, SecondaryIndex]
   def pages(srn: Srn, index: RefinedIndex, secondaryIndex: RefinedSecondaryIndex): Pages
-
-  // public inject
-  val saveService: SaveService
-  val identifyAndRequireData: IdentifyAndRequireData
-  implicit val ec: ExecutionContext
 
   // implementation
   private type RefinedIndex = Refined[Int, Index]
   private type RefinedSecondaryIndex = Refined[Int, SecondaryIndex]
-
-  private type UserAnswersRemover = LeftFolder.Aux[Pages, Try[UserAnswers], RemovePages.type, Try[UserAnswers]]
-  private type UserAnswersSetter = LeftFolder.Aux[Pages, Try[UserAnswers], SetPages.type, Try[UserAnswers]]
 
   def addTestData(srn: Srn, index: RefinedIndex, num: RefinedSecondaryIndex)(
     implicit remover: UserAnswersRemover,
@@ -68,17 +111,12 @@ trait TestDataController[Index, SecondaryIndex] extends PSRController {
       )
     }
 
-  private def buildSecondaryIndexes(
-    num: Int
-  )(implicit ev: Validate[Int, SecondaryIndex]): Try[List[RefinedSecondaryIndex]] =
-    (1 to num).map(i => refineV[SecondaryIndex](i).leftMap(new Exception(_)).toTry).toList.sequence
-
   private def removeAllPages(srn: Srn, index: RefinedIndex, userAnswers: UserAnswers)(
     implicit remover: UserAnswersRemover,
     ev: Validate[Int, SecondaryIndex]
   ): Try[UserAnswers] =
     for {
-      indexes <- buildSecondaryIndexes(max.value)
+      indexes <- buildIndexes[SecondaryIndex](max.value)
       updatedUserAnswers <- indexes.foldLeft(Try(userAnswers)) {
         case (ua, disposalIndex) =>
           pages(srn, index, disposalIndex).foldLeft(ua)(RemovePages)
@@ -95,12 +133,31 @@ trait TestDataController[Index, SecondaryIndex] extends PSRController {
     ev: Validate[Int, SecondaryIndex]
   ): Try[UserAnswers] =
     for {
-      indexes <- buildSecondaryIndexes(num)
+      indexes <- buildIndexes[SecondaryIndex](num)
       updatedUserAnswers <- indexes.foldLeft(Try(userAnswers)) {
         case (ua, secondaryIndex) =>
           pages(srn, index, secondaryIndex).foldLeft(ua)(SetPages)
       }
     } yield updatedUserAnswers
+}
+
+trait TestDataController extends PSRController {
+
+  // override
+  type Pages <: HList
+
+  // public inject
+  val saveService: SaveService
+  val identifyAndRequireData: IdentifyAndRequireData
+  implicit val ec: ExecutionContext
+
+  protected type UserAnswersRemover = LeftFolder.Aux[Pages, Try[UserAnswers], RemovePages.type, Try[UserAnswers]]
+  protected type UserAnswersSetter = LeftFolder.Aux[Pages, Try[UserAnswers], SetPages.type, Try[UserAnswers]]
+
+  protected def buildIndexes[A](
+    num: Int
+  )(implicit ev: Validate[Int, A]): Try[List[Refined[Int, A]]] =
+    (1 to num).map(i => refineV[A](i).leftMap(new Exception(_)).toTry).toList.sequence
 
   object RemovePages extends Poly {
     implicit def polyRemovePage[A: Writes]: Case2.Aux[this.type, Try[UserAnswers], PageWithValue[A], Try[UserAnswers]] =

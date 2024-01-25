@@ -16,31 +16,61 @@
 
 package controllers.testonly
 
-import cats.implicits._
-import config.Refined.{Max5000, OneTo5000}
+import config.Refined.Max5000
 import controllers.actions.IdentifyAndRequireData
 import eu.timepit.refined._
 import models.SchemeId.Srn
-import models.{Address, ManualAddress, UserAnswers}
-import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandPropertyInUKPage}
-import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import models.{Address, ConditionalYesNo, ManualAddress, Money, SchemeHoldLandProperty}
+import pages.nonsipp.landorproperty.{
+  IsLandOrPropertyResidentialPage,
+  IsLandPropertyLeasedPage,
+  LandOrPropertyChosenAddressPage,
+  LandOrPropertyHeldPage,
+  LandOrPropertyTotalCostPage,
+  LandOrPropertyTotalIncomePage,
+  LandPropertyInUKPage,
+  LandRegistryTitleNumberPage,
+  WhyDoesSchemeHoldLandPropertyPage
+}
+import play.api.mvc.MessagesControllerComponents
 import services.SaveService
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import shapeless._
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Try
+import scala.concurrent.ExecutionContext
 
 class LandOrPropertyMongoController @Inject()(
-  saveService: SaveService,
-  identifyAndRequireData: IdentifyAndRequireData,
+  val saveService: SaveService,
+  val identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents
-)(implicit ec: ExecutionContext)
-    extends FrontendBaseController
-    with I18nSupport {
+)(implicit val ec: ExecutionContext)
+    extends TestDataSingleIndexController[Max5000.Refined] {
 
-  private val max: Max5000 = refineMV(5000)
+  override val max: Max5000 = refineMV(5000)
+
+  override def pages(srn: Srn, index: Max5000): Pages = HList(
+    PageWithValue(LandOrPropertyHeldPage(srn), false),
+    PageWithValue(LandPropertyInUKPage(srn, index), true),
+    PageWithValue(LandRegistryTitleNumberPage(srn, index), ConditionalYesNo.yes[String, String]("title number")),
+    PageWithValue(LandOrPropertyChosenAddressPage(srn, index), address(index.value)),
+    PageWithValue(WhyDoesSchemeHoldLandPropertyPage(srn, index), SchemeHoldLandProperty.Transfer),
+    PageWithValue(LandOrPropertyTotalCostPage(srn, index), Money(12.34)),
+    PageWithValue(LandOrPropertyTotalIncomePage(srn, index), Money(12.34)),
+    PageWithValue(IsLandOrPropertyResidentialPage(srn, index), true),
+    PageWithValue(IsLandPropertyLeasedPage(srn, index), false)
+  )
+
+  override type Pages =
+    PageWithValue[Boolean] ::
+      PageWithValue[Boolean] ::
+      PageWithValue[ConditionalYesNo[String, String]] ::
+      PageWithValue[Address] ::
+      PageWithValue[SchemeHoldLandProperty] ::
+      PageWithValue[Money] ::
+      PageWithValue[Money] ::
+      PageWithValue[Boolean] ::
+      PageWithValue[Boolean] ::
+      HNil
 
   private def address(index: Int) = Address(
     "123",
@@ -53,38 +83,4 @@ class LandOrPropertyMongoController @Inject()(
     countryCode = "GB",
     ManualAddress
   )
-
-  def addLandOrProperty(srn: Srn, num: Max5000): Action[AnyContent] = identifyAndRequireData(srn).async {
-    implicit request =>
-      for {
-        removedUserAnswers <- Future.fromTry(removeAllLandOrProperties(srn, request.userAnswers))
-        updatedUserAnswers <- Future.fromTry(updateUserAnswersWithLandOrProperties(num.value, srn, removedUserAnswers))
-        _ <- saveService.save(updatedUserAnswers)
-      } yield Ok(s"Added ${num.value} land and properties to UserAnswers")
-  }
-
-  private def buildIndexes(num: Int): Try[List[Max5000]] =
-    (1 to num).map(i => refineV[OneTo5000](i).leftMap(new Exception(_)).toTry).toList.sequence
-
-  private def removeAllLandOrProperties(srn: Srn, userAnswers: UserAnswers): Try[UserAnswers] =
-    for {
-      indexes <- buildIndexes(max.value)
-      updatedUserAnswers <- indexes.foldLeft(Try(userAnswers)) {
-        case (ua, index) =>
-          ua.flatMap(_.remove(LandPropertyInUKPage(srn, index)))
-            .flatMap(_.remove(LandOrPropertyChosenAddressPage(srn, index)))
-      }
-    } yield updatedUserAnswers
-
-  private def updateUserAnswersWithLandOrProperties(num: Int, srn: Srn, userAnswers: UserAnswers): Try[UserAnswers] =
-    for {
-      indexes <- buildIndexes(num)
-      landOrPropertyInUK = indexes.map(index => LandPropertyInUKPage(srn, index) -> true)
-      addressLookup = indexes.map(index => LandOrPropertyChosenAddressPage(srn, index) -> address(index.value))
-      ua1 <- landOrPropertyInUK.foldLeft(Try(userAnswers)) {
-        case (ua, (page, value)) => ua.flatMap(_.set(page, value))
-      }
-      ua2 <- addressLookup.foldLeft(Try(ua1)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
-    } yield ua2
-
 }
