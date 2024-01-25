@@ -266,9 +266,13 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           .navigateToWithIndex(
             index,
             SharesIndividualSellerNINumberPage,
-            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.SharesIndividualSellerNINumberController
+                .onPageLoad(srn, index, NormalMode)
           )
-          .withName("go from class of shares individual seller NI number page to unauthorised page")
+          .withName(
+            "go from class of shares individual seller NI number page to Shares individual seller NI number page"
+          )
       )
     }
 
@@ -278,9 +282,25 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           .navigateToWithIndex(
             index,
             CompanyNameOfSharesSellerPage,
-            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.common.routes.CompanyRecipientCrnController
+                .onPageLoad(srn, index, NormalMode, IdentitySubject.SharesSeller)
           )
-          .withName("go from  company name of shares seller page to unauthorised page")
+          .withName("go from  company name of shares seller page to company recipient Crn page")
+      )
+    }
+
+    "PartnershipShareSellerNamePage" - {
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            PartnershipShareSellerNamePage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.common.routes.PartnershipRecipientUtrController
+                .onPageLoad(srn, index, NormalMode, IdentitySubject.SharesSeller)
+          )
+          .withName("go from  company name of shares seller page to partnership recipient Utr page")
       )
     }
 

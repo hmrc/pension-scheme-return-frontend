@@ -87,10 +87,15 @@ object SharesNavigator extends JourneyNavigator {
       controllers.nonsipp.shares.routes.SharesIndividualSellerNINumberController.onPageLoad(srn, index, NormalMode)
 
     case SharesIndividualSellerNINumberPage(srn, index) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+      controllers.nonsipp.shares.routes.SharesIndividualSellerNINumberController.onPageLoad(srn, index, NormalMode)
 
     case CompanyNameOfSharesSellerPage(srn, index) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+      controllers.nonsipp.common.routes.CompanyRecipientCrnController
+        .onPageLoad(srn, index, NormalMode, IdentitySubject.SharesSeller)
+
+    case PartnershipShareSellerNamePage(srn, index) =>
+      controllers.nonsipp.common.routes.PartnershipRecipientUtrController
+        .onPageLoad(srn, index, NormalMode, IdentitySubject.SharesSeller)
 
   }
 
