@@ -20,10 +20,11 @@ import config.Refined.Max5000
 import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
+import utils.RefinedUtils.RefinedIntOps
 
 case class ClassOfSharesPage(srn: Srn, index: Max5000) extends QuestionPage[String] {
 
-  override def path: JsPath = Paths.shareIdentification \ toString
+  override def path: JsPath = Paths.shareIdentification \ toString \ index.arrayIndex.toString
 
   override def toString: String = "classOfShares"
 }

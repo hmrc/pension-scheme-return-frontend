@@ -38,7 +38,6 @@ class AddressLookupConnector @Inject()(http: HttpClient, appConfig: FrontendAppC
         addressLookupUrl,
         Json.obj("postcode" -> postcode) +? filter.map(f => Json.obj("filter" -> f)),
         headers = List(
-          "User-Agent" -> "pension-scheme-return-frontend",
           "Content-Type" -> "application/json"
         )
       )

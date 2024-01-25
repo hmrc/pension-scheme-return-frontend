@@ -35,6 +35,7 @@ import pages.nonsipp.moneyborrowed.{LenderNamePages, MoneyBorrowedPage, WhySchem
 import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
 import pages.nonsipp.schemedesignatory.{FeesCommissionsWagesSalariesPage, HowManyMembersPage, HowMuchCashPage}
 import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
+import pages.nonsipp.sharesdisposal.{SharesDisposalCompletedPages, SharesDisposalPage}
 import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
 import pages.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldPage
 import viewmodels.models.TaskListStatus
@@ -119,6 +120,52 @@ object TaskListStatusUtils {
           }
         }
     }
+  }
+
+  def getIncompleteLoansLink(userAnswers: UserAnswers, srn: Srn): String = {
+    val whoReceivedTheLoanPages = userAnswers.get(IdentityTypes(srn, IdentitySubject.LoanRecipient))
+    val outstandingArrearsOnLoanPages = userAnswers.get(OutstandingArrearsOnLoanPages(srn))
+    val sponsoringPages = userAnswers.get(RecipientSponsoringEmployerConnectedPartyPages(srn))
+    val connectedPartyPages = userAnswers.get(IsIndividualRecipientConnectedPartyPages(srn))
+
+    val incompleteIndex =
+      (whoReceivedTheLoanPages, outstandingArrearsOnLoanPages, sponsoringPages, connectedPartyPages) match {
+        case (None, _, _, _) => 1
+        case (Some(_), None, _, _) => 1
+        case (Some(whoReceived), arrears, sponsoring, connected) =>
+          if (whoReceived.isEmpty) {
+            1
+          } else {
+            val whoReceivedIndexes = (0 until whoReceived.size).toList
+            val arrearsIndexes = arrears.getOrElse(List.empty).map(_._1.toInt).toList
+            val sponsoringAndConnectedIndexes = sponsoring.getOrElse(List.empty).map(_._1.toInt).toList ++ connected
+              .getOrElse(List.empty)
+              .map(_._1.toInt)
+              .toList
+            val filtered = whoReceivedIndexes.filter(arrearsIndexes.indexOf(_) < 0)
+            val filteredSC = whoReceivedIndexes.filter(sponsoringAndConnectedIndexes.indexOf(_) < 0)
+            if (filtered.isEmpty && filteredSC.isEmpty) {
+              1
+            } else {
+              if (filteredSC.isEmpty) {
+                filtered.head + 1 // index based on arrears page missing
+              } else {
+                filteredSC.head + 1 // index based on sponsoring employer or individual connected party
+              }
+            }
+          }
+      }
+
+    refineV[OneTo5000](incompleteIndex).fold(
+      _ =>
+        controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController
+          .onPageLoad(srn, 1, NormalMode)
+          .url,
+      index =>
+        controllers.nonsipp.common.routes.IdentityTypeController
+          .onPageLoad(srn, index, NormalMode, IdentitySubject.LoanRecipient)
+          .url
+    )
   }
 
   def getLandOrPropertyTaskListStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
@@ -226,17 +273,17 @@ object TaskListStatusUtils {
             1
           } else {
             if (filtered.nonEmpty) {
-              filtered(0) + 1 // index based on last page missing
+              filtered.head + 1 // index based on last page missing
             } else if (filteredWhyHeld.nonEmpty) {
-              filteredWhyHeld(0) + 1 // index based on whyHeld and indepVal indexes
+              filteredWhyHeld.head + 1 // index based on whyHeld and indepVal indexes
             } else {
-              filteredLessee(0) + 1 // index based on lessee and indepVal indexes
+              filteredLessee.head + 1 // index based on lessee and indepVal indexes
             }
           }
         }
     }
 
-  def getDisposalsTaskListStatusWithLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
+  def getLandOrPropertyDisposalsTaskListStatusWithLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
     val atLeastOneCompleted =
       userAnswers.get(LandPropertyDisposalCompletedPages(srn)).exists(_.values.exists(_.values.nonEmpty))
     val started = userAnswers.get(LandOrPropertyDisposalPage(srn)).contains(true)
@@ -320,7 +367,7 @@ object TaskListStatusUtils {
           if (filtered.isEmpty) {
             1
           } else {
-            filtered(0) + 1
+            filtered.head + 1
           }
         }
     }
@@ -339,6 +386,33 @@ object TaskListStatusUtils {
         } else {
           (InProgress, defaultLink)
         }
+    }
+  }
+
+  def getSharesDisposalsTaskListStatusWithLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
+    val atLeastOneCompleted =
+      userAnswers.get(SharesDisposalCompletedPages(srn)).exists(_.values.exists(_.values.nonEmpty))
+    val started = userAnswers.get(SharesDisposalPage(srn)).contains(true)
+    val completedNoDisposals = userAnswers.get(SharesDisposalPage(srn)).contains(false)
+
+    val initialDisposalUrl = controllers.nonsipp.sharesdisposal.routes.SharesDisposalController
+      .onPageLoad(srn, NormalMode)
+      .url
+
+    //TODO: dependent on SharesDisposalList implementation
+    val disposalListPage = controllers.routes.UnauthorisedController.onPageLoad().url
+    //    val disposalListPage = controllers.nonsipp.sharesdisposal.routes.SharesDisposalListController
+    //      .onPageLoad(srn, page = 1)
+    //      .url
+
+    if (atLeastOneCompleted) {
+      (TaskListStatus.Completed, disposalListPage)
+    } else if (completedNoDisposals) {
+      (TaskListStatus.Completed, initialDisposalUrl)
+    } else if (started) {
+      (TaskListStatus.InProgress, initialDisposalUrl)
+    } else {
+      (TaskListStatus.NotStarted, initialDisposalUrl)
     }
   }
 

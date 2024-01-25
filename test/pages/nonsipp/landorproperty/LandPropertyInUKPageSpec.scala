@@ -19,18 +19,8 @@ package pages.nonsipp.landorproperty
 import config.Refined.OneTo5000
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.refineMV
-import models.{
-  ConditionalYesNo,
-  Crn,
-  IdentitySubject,
-  IdentityType,
-  Money,
-  SchemeHoldLandProperty,
-  SchemeId,
-  UserAnswers
-}
+import models.{ConditionalYesNo, Money, SchemeHoldLandProperty, SchemeId, UserAnswers}
 import pages.behaviours.PageBehaviours
-import pages.nonsipp.common.{CompanyRecipientCrnPage, IdentityTypePage}
 import utils.UserAnswersUtils.UserAnswersOps
 
 import java.time.LocalDate
@@ -52,69 +42,108 @@ class LandPropertyInUKPageSpec extends PageBehaviours {
     beRemovable[Boolean](LandPropertyInUKPage(srnGen.sample.value, index))
   }
 
-  "cleanup with index-1" - {
+  "cleanup with list size 1" - {
     val leaseName = "testLeaseName"
     val money: Money = Money(123456)
     val localDate: LocalDate = LocalDate.of(1989, 10, 6)
 
     val userAnswers =
       UserAnswers("id")
-        .unsafeSet(IdentityTypePage(srn, indexOne, IdentitySubject.LandOrPropertySeller), IdentityType.Individual)
-        .unsafeSet(WhyDoesSchemeHoldLandPropertyPage(srn, indexOne), SchemeHoldLandProperty.Acquisition)
-        .unsafeSet(
-          CompanyRecipientCrnPage(srn, indexOne, IdentitySubject.LandOrPropertySeller),
-          ConditionalYesNo.yes[String, Crn](crnGen.sample.value)
-        )
+        .unsafeSet(LandPropertyInUKPage(srn, indexOne), true)
+        .unsafeSet(LandOrPropertyChosenAddressPage(srn, indexOne), addressGen.sample.value)
+        .unsafeSet(LandRegistryTitleNumberPage(srn, indexOne), ConditionalYesNo.yes[String, String]("some-number"))
+        .unsafeSet(WhyDoesSchemeHoldLandPropertyPage(srn, indexOne), SchemeHoldLandProperty.Transfer)
+        .unsafeSet(LandOrPropertyTotalCostPage(srn, indexOne), money)
+        .unsafeSet(IsLandOrPropertyResidentialPage(srn, indexOne), true)
         .unsafeSet(IsLandPropertyLeasedPage(srn, indexOne), true)
+        .unsafeSet(LandOrPropertySellerConnectedPartyPage(srn, indexOne), true)
         .unsafeSet(LandOrPropertyLeaseDetailsPage(srn, indexOne), (leaseName, money, localDate))
         .unsafeSet(IsLesseeConnectedPartyPage(srn, indexOne), true)
         .unsafeSet(LandOrPropertyTotalIncomePage(srn, indexOne), money)
+        .unsafeSet(RemovePropertyPage(srn, indexOne), true)
         .unsafeSet(LandOrPropertyHeldPage(srn), true)
 
     s"remove dependant values when current answer is None" in {
 
       val result = LandPropertyInUKPage(srn, indexOne).cleanup(None, userAnswers).toOption.value
 
+      result.get(LandOrPropertyChosenAddressPage(srn, indexOne)) mustBe None
+      result.get(LandRegistryTitleNumberPage(srn, indexOne)) mustBe None
+      result.get(WhyDoesSchemeHoldLandPropertyPage(srn, indexOne)) mustBe None
+      result.get(LandOrPropertyTotalCostPage(srn, indexOne)) mustBe None
+      result.get(IsLandOrPropertyResidentialPage(srn, indexOne)) mustBe None
+      result.get(IsLandPropertyLeasedPage(srn, indexOne)) mustBe None
+      result.get(LandOrPropertySellerConnectedPartyPage(srn, indexOne)) mustBe None
       result.get(LandOrPropertyLeaseDetailsPage(srn, indexOne)) mustBe None
       result.get(IsLesseeConnectedPartyPage(srn, indexOne)) mustBe None
-      result.get(IdentityTypePage(srn, indexOne, IdentitySubject.LandOrPropertySeller)) mustBe None
-      result.get(CompanyRecipientCrnPage(srn, indexOne, IdentitySubject.LandOrPropertySeller)) mustBe None
-      result.get(WhyDoesSchemeHoldLandPropertyPage(srn, indexOne)) mustBe None
       result.get(LandOrPropertyTotalIncomePage(srn, indexOne)) mustBe None
-      result.get(LandOrPropertyTotalIncomePage(srn, indexOne)) mustBe None
+      result.get(RemovePropertyPage(srn, indexOne)) mustBe None
+      result.get(LandOrPropertyHeldPage(srn)) mustBe None
     }
 
   }
 
-  "cleanup with index bigger than 1" - {
+  "cleanup with list size more than 1" - {
     val leaseName = "testLeaseName"
     val money: Money = Money(123456)
     val localDate: LocalDate = LocalDate.of(1989, 10, 6)
 
     val userAnswers =
       UserAnswers("id")
-        .unsafeSet(IdentityTypePage(srn, indexTwo, IdentitySubject.LandOrPropertySeller), IdentityType.Individual)
-        .unsafeSet(WhyDoesSchemeHoldLandPropertyPage(srn, indexTwo), SchemeHoldLandProperty.Acquisition)
-        .unsafeSet(
-          CompanyRecipientCrnPage(srn, indexTwo, IdentitySubject.LandOrPropertySeller),
-          ConditionalYesNo.yes[String, Crn](crnGen.sample.value)
-        )
+        .unsafeSet(LandPropertyInUKPage(srn, indexOne), true)
+        .unsafeSet(LandOrPropertyChosenAddressPage(srn, indexOne), addressGen.sample.value)
+        .unsafeSet(LandRegistryTitleNumberPage(srn, indexOne), ConditionalYesNo.yes[String, String]("some-number"))
+        .unsafeSet(WhyDoesSchemeHoldLandPropertyPage(srn, indexOne), SchemeHoldLandProperty.Transfer)
+        .unsafeSet(LandOrPropertyTotalCostPage(srn, indexOne), money)
+        .unsafeSet(IsLandOrPropertyResidentialPage(srn, indexOne), true)
+        .unsafeSet(IsLandPropertyLeasedPage(srn, indexOne), true)
+        .unsafeSet(LandOrPropertySellerConnectedPartyPage(srn, indexOne), true)
+        .unsafeSet(LandOrPropertyLeaseDetailsPage(srn, indexOne), (leaseName, money, localDate))
+        .unsafeSet(IsLesseeConnectedPartyPage(srn, indexOne), true)
+        .unsafeSet(LandOrPropertyTotalIncomePage(srn, indexOne), money)
+        .unsafeSet(RemovePropertyPage(srn, indexOne), true)
+        .unsafeSet(LandPropertyInUKPage(srn, indexTwo), true)
+        .unsafeSet(LandOrPropertyChosenAddressPage(srn, indexTwo), addressGen.sample.value)
+        .unsafeSet(LandRegistryTitleNumberPage(srn, indexTwo), ConditionalYesNo.yes[String, String]("some-number"))
+        .unsafeSet(WhyDoesSchemeHoldLandPropertyPage(srn, indexTwo), SchemeHoldLandProperty.Transfer)
+        .unsafeSet(LandOrPropertyTotalCostPage(srn, indexTwo), money)
+        .unsafeSet(IsLandOrPropertyResidentialPage(srn, indexTwo), true)
         .unsafeSet(IsLandPropertyLeasedPage(srn, indexTwo), true)
+        .unsafeSet(LandOrPropertySellerConnectedPartyPage(srn, indexTwo), true)
         .unsafeSet(LandOrPropertyLeaseDetailsPage(srn, indexTwo), (leaseName, money, localDate))
         .unsafeSet(IsLesseeConnectedPartyPage(srn, indexTwo), true)
         .unsafeSet(LandOrPropertyTotalIncomePage(srn, indexTwo), money)
+        .unsafeSet(RemovePropertyPage(srn, indexTwo), true)
         .unsafeSet(LandOrPropertyHeldPage(srn), true)
 
     s"remove dependant values when current answer is None" in {
 
-      val result = LandPropertyInUKPage(srn, indexTwo).cleanup(None, userAnswers).toOption.value
+      val result = LandPropertyInUKPage(srn, indexOne).cleanup(None, userAnswers).toOption.value
 
-      result.get(LandOrPropertyLeaseDetailsPage(srn, indexTwo)) mustBe None
-      result.get(IsLesseeConnectedPartyPage(srn, indexTwo)) mustBe None
-      result.get(IdentityTypePage(srn, indexTwo, IdentitySubject.LandOrPropertySeller)) mustBe None
-      result.get(CompanyRecipientCrnPage(srn, indexTwo, IdentitySubject.LandOrPropertySeller)) mustBe None
-      result.get(WhyDoesSchemeHoldLandPropertyPage(srn, indexTwo)) mustBe None
-      result.get(LandOrPropertyTotalIncomePage(srn, indexTwo)) mustBe None
+      result.get(LandOrPropertyChosenAddressPage(srn, indexOne)) mustBe None
+      result.get(LandRegistryTitleNumberPage(srn, indexOne)) mustBe None
+      result.get(WhyDoesSchemeHoldLandPropertyPage(srn, indexOne)) mustBe None
+      result.get(LandOrPropertyTotalCostPage(srn, indexOne)) mustBe None
+      result.get(IsLandOrPropertyResidentialPage(srn, indexOne)) mustBe None
+      result.get(IsLandPropertyLeasedPage(srn, indexOne)) mustBe None
+      result.get(LandOrPropertySellerConnectedPartyPage(srn, indexOne)) mustBe None
+      result.get(LandOrPropertyLeaseDetailsPage(srn, indexOne)) mustBe None
+      result.get(IsLesseeConnectedPartyPage(srn, indexOne)) mustBe None
+      result.get(LandOrPropertyTotalIncomePage(srn, indexOne)) mustBe None
+      result.get(RemovePropertyPage(srn, indexOne)) mustBe None
+
+      result.get(LandOrPropertyChosenAddressPage(srn, indexTwo)) must not be None
+      result.get(LandRegistryTitleNumberPage(srn, indexTwo)) must not be None
+      result.get(WhyDoesSchemeHoldLandPropertyPage(srn, indexTwo)) must not be None
+      result.get(LandOrPropertyTotalCostPage(srn, indexTwo)) must not be None
+      result.get(IsLandOrPropertyResidentialPage(srn, indexTwo)) must not be None
+      result.get(IsLandPropertyLeasedPage(srn, indexTwo)) must not be None
+      result.get(LandOrPropertySellerConnectedPartyPage(srn, indexTwo)) must not be None
+      result.get(LandOrPropertyLeaseDetailsPage(srn, indexTwo)) must not be None
+      result.get(IsLesseeConnectedPartyPage(srn, indexTwo)) must not be None
+      result.get(LandOrPropertyTotalIncomePage(srn, indexTwo)) must not be None
+      result.get(RemovePropertyPage(srn, indexTwo)) must not be None
+
       result.get(LandOrPropertyHeldPage(srn)) mustBe Some(true)
     }
 

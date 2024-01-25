@@ -18,22 +18,15 @@ package controllers.nonsipp
 
 import cats.implicits.toShow
 import com.google.inject.Inject
-import config.Refined.{OneTo300, OneTo5000}
+import config.Refined.OneTo300
 import controllers.actions._
 import eu.timepit.refined.refineV
 import models.SchemeId.Srn
 import models.requests.DataRequest
-import models.{DateRange, IdentitySubject, ManualOrUpload, NormalMode, PensionSchemeId, UserAnswers}
-import models.ConditionalYesNo._
+import models.{DateRange, ManualOrUpload, NormalMode, PensionSchemeId, UserAnswers}
 import pages.nonsipp.CheckReturnDatesPage
 import pages.nonsipp.accountingperiod.AccountingPeriods
-import pages.nonsipp.common.IdentityTypes
 import pages.nonsipp.employercontributions.EmployerContributionsSectionStatus
-import pages.nonsipp.loansmadeoroutstanding.{
-  IsIndividualRecipientConnectedPartyPages,
-  OutstandingArrearsOnLoanPages,
-  RecipientSponsoringEmployerConnectedPartyPages
-}
 import pages.nonsipp.membercontributions.MemberContributionsListPage
 import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsNinoPages, MembersDetailsPages, NoNinoPages}
 import pages.nonsipp.memberreceivedpcls.PclsMemberListPage
@@ -50,15 +43,8 @@ import utils.nonsipp.TaskListStatusUtils
 import utils.nonsipp.TaskListStatusUtils._
 import viewmodels.DisplayMessage.{Heading2, LinkMessage, Message, ParagraphMessage}
 import viewmodels.implicits._
-import viewmodels.models.TaskListStatus.{Completed, InProgress, NotStarted, TaskListStatus, UnableToStart}
-import viewmodels.models.{
-  PageViewModel,
-  SectionStatus,
-  TaskListItemViewModel,
-  TaskListSectionViewModel,
-  TaskListStatus,
-  TaskListViewModel
-}
+import viewmodels.models.TaskListStatus._
+import viewmodels.models.{TaskListStatus, _}
 import views.html.TaskListView
 
 import java.time.LocalDate
@@ -255,41 +241,7 @@ object TaskListController {
           if (filtered.isEmpty) {
             1
           } else {
-            filtered(0) + 1
-          }
-        }
-    }
-  }
-
-  private def getIncompleteLoansIndex(userAnswers: UserAnswers, srn: Srn) = {
-    val whoReceivedTheLoanPages = userAnswers.get(IdentityTypes(srn, IdentitySubject.LoanRecipient))
-    val outstandingArrearsOnLoanPages = userAnswers.get(OutstandingArrearsOnLoanPages(srn))
-    val sponsoringPages = userAnswers.get(RecipientSponsoringEmployerConnectedPartyPages(srn))
-    val connectedPartyPages = userAnswers.get(IsIndividualRecipientConnectedPartyPages(srn))
-
-    (whoReceivedTheLoanPages, outstandingArrearsOnLoanPages, sponsoringPages, connectedPartyPages) match {
-      case (None, _, _, _) => 1
-      case (Some(_), None, _, _) => 1
-      case (Some(whoReceived), arrears, sponsoring, connected) =>
-        if (whoReceived.isEmpty) {
-          1
-        } else {
-          val whoReceivedIndexes = (0 until whoReceived.size).toList
-          val arrearsIndexes = arrears.getOrElse(List.empty).map(_._1.toInt).toList
-          val sponsoringAndConnectedIndexes = sponsoring.getOrElse(List.empty).map(_._1.toInt).toList ++ connected
-            .getOrElse(List.empty)
-            .map(_._1.toInt)
-            .toList
-          val filtered = whoReceivedIndexes.filter(arrearsIndexes.indexOf(_) < 0)
-          val filteredSC = whoReceivedIndexes.filter(sponsoringAndConnectedIndexes.indexOf(_) < 0)
-          if (filtered.isEmpty && filteredSC.isEmpty) {
-            1
-          } else {
-            if (filteredSC.isEmpty) {
-              filtered(0) + 1 // index based on arrears page missing
-            } else {
-              filteredSC(0) + 1 // index based on sponsoring employer or individual connected party
-            }
+            filtered.head + 1
           }
         }
     }
@@ -423,10 +375,10 @@ object TaskListController {
     )
   }
 
-  private def loansSection(srn: Srn, schemeName: String, userAnswers: UserAnswers) = {
+  private def loansSection(srn: Srn, schemeName: String, userAnswers: UserAnswers): TaskListSectionViewModel = {
     val prefix = s"nonsipp.tasklist.loans"
     val taskListStatus: TaskListStatus = getLoansTaskListStatus(userAnswers, srn)
-    val borrowingStatus = TaskListStatusUtils.getBorrowingTaskListStatusAndLink(userAnswers, srn)
+    val borrowingStatus = getBorrowingTaskListStatusAndLink(userAnswers, srn)
 
     TaskListSectionViewModel(
       s"$prefix.title",
@@ -442,18 +394,7 @@ object TaskListController {
               controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController
                 .onPageLoad(srn, 1, NormalMode)
                 .url
-            case InProgress =>
-              val incompleteIndex: Int = getIncompleteLoansIndex(userAnswers, srn)
-              refineV[OneTo5000](incompleteIndex).fold(
-                _ =>
-                  controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController
-                    .onPageLoad(srn, 1, NormalMode)
-                    .url,
-                index =>
-                  controllers.nonsipp.common.routes.IdentityTypeController
-                    .onPageLoad(srn, index, NormalMode, IdentitySubject.LoanRecipient)
-                    .url
-              )
+            case InProgress => getIncompleteLoansLink(userAnswers, srn)
           }
         ),
         taskListStatus
@@ -472,6 +413,8 @@ object TaskListController {
     val prefix = "nonsipp.tasklist.shares"
     val sharesStatusAndLink = getSharesTaskListStatusAndLink(userAnswers, srn)
     val quotedSharesStatusAndLink = getQuotedSharesTaskListStatusAndLink(userAnswers, srn)
+    val (sharesDisposalsStatus, sharesDisposalsLinkUrl) =
+      TaskListStatusUtils.getSharesDisposalsTaskListStatusWithLink(userAnswers, srn)
 
     TaskListSectionViewModel(
       s"$prefix.title",
@@ -481,6 +424,13 @@ object TaskListController {
           sharesStatusAndLink._2
         ),
         sharesStatusAndLink._1
+      ),
+      TaskListItemViewModel(
+        LinkMessage(
+          messageKey("nonsipp.tasklist.sharesdisposal", "title", sharesDisposalsStatus),
+          sharesDisposalsLinkUrl
+        ),
+        sharesDisposalsStatus
       ),
       TaskListItemViewModel(
         LinkMessage(
@@ -496,7 +446,8 @@ object TaskListController {
     val prefix = "nonsipp.tasklist.landorproperty"
 
     val landOrPropertyStatus = TaskListStatusUtils.getLandOrPropertyTaskListStatusAndLink(userAnswers, srn)
-    val (disposalsStatus, disposalLinkUrl) = TaskListStatusUtils.getDisposalsTaskListStatusWithLink(userAnswers, srn)
+    val (landOrPropertyDisposalsStatus, landOrPropertyDisposalsLinkUrl) =
+      TaskListStatusUtils.getLandOrPropertyDisposalsTaskListStatusWithLink(userAnswers, srn)
 
     TaskListSectionViewModel(
       s"$prefix.title",
@@ -510,9 +461,9 @@ object TaskListController {
       TaskListItemViewModel(
         LinkMessage(
           messageKey("nonsipp.tasklist.landorpropertydisposal", "title", UnableToStart),
-          disposalLinkUrl
+          landOrPropertyDisposalsLinkUrl
         ),
-        disposalsStatus
+        landOrPropertyDisposalsStatus
       )
     )
   }

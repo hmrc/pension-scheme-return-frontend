@@ -1,0 +1,7 @@
+GET         /:srn/shares-disposal                                               controllers.nonsipp.sharesdisposal.SharesDisposalController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/shares-disposal                                               controllers.nonsipp.sharesdisposal.SharesDisposalController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/change-shares-disposal                                        controllers.nonsipp.sharesdisposal.SharesDisposalController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-shares-disposal                                        controllers.nonsipp.sharesdisposal.SharesDisposalController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET         /:srn/what-you-will-need-shares-disposal                               controllers.nonsipp.sharesdisposal.WhatYouWillNeedSharesDisposalController.onPageLoad(srn: Srn)
+GET         /:srn/submit-what-you-will-need-shares-disposal                        controllers.nonsipp.sharesdisposal.WhatYouWillNeedSharesDisposalController.onSubmit(srn: Srn)

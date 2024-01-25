@@ -31,9 +31,10 @@ import pages.nonsipp.landorproperty.{LandOrPropertyAddressLookupPages, LandOrPro
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import utils.nonsipp.TaskListStatusUtils.getLandOrPropertyTaskListStatusAndLink
 import viewmodels.DisplayMessage.{Message, ParagraphMessage}
 import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, ListRow, ListViewModel, PaginatedViewModel}
+import viewmodels.models._
 import views.html.ListView
 
 import javax.inject.Named
@@ -47,15 +48,18 @@ class LandOrPropertyListController @Inject()(
   formProvider: YesNoPageFormProvider
 ) extends PSRController {
 
-  val form = LandOrPropertyListController.form(formProvider)
+  val form: Form[Boolean] = LandOrPropertyListController.form(formProvider)
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      val addresses = request.userAnswers.map(LandOrPropertyAddressLookupPages(srn))
-
-      if (addresses.nonEmpty) {
+      val userAnswers = request.userAnswers
+      val (status, incompleteLandOrPropertyUrl) = getLandOrPropertyTaskListStatusAndLink(userAnswers, srn)
+      if (status == TaskListStatus.Completed) {
+        val addresses = userAnswers.map(LandOrPropertyAddressLookupPages(srn))
         val viewModel = LandOrPropertyListController.viewModel(srn, page, mode, addresses)
         Ok(view(form, viewModel))
+      } else if (status == TaskListStatus.InProgress) {
+        Redirect(incompleteLandOrPropertyUrl)
       } else {
         Redirect(controllers.nonsipp.landorproperty.routes.LandOrPropertyHeldController.onPageLoad(srn, mode))
       }

@@ -28,6 +28,7 @@ import navigation.Navigator
 import pages.nonsipp.common.PartnershipRecipientUtrPage
 import pages.nonsipp.landorproperty.PartnershipSellerNamePage
 import pages.nonsipp.loansmadeoroutstanding.PartnershipRecipientNamePage
+import pages.nonsipp.shares.PartnershipShareSellerNamePage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -55,11 +56,13 @@ class PartnershipRecipientUtrController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode, subject: IdentitySubject): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      val form: Form[Either[String, Utr]] = PartnershipRecipientUtrController.form(formProvider, subject)
-
-      val preparedForm = request.userAnswers.fillForm(PartnershipRecipientUtrPage(srn, index, subject), form)
-
-      Ok(view(preparedForm, viewModel(srn, index, mode, subject, request.userAnswers)))
+      subject match {
+        case IdentitySubject.Unknown => Redirect(controllers.routes.UnauthorisedController.onPageLoad())
+        case _ =>
+          val form: Form[Either[String, Utr]] = PartnershipRecipientUtrController.form(formProvider, subject)
+          val preparedForm = request.userAnswers.fillForm(PartnershipRecipientUtrPage(srn, index, subject), form)
+          Ok(view(preparedForm, viewModel(srn, index, mode, subject, request.userAnswers)))
+      }
     }
 
   def onSubmit(srn: Srn, index: Max5000, mode: Mode, subject: IdentitySubject): Action[AnyContent] =
@@ -110,15 +113,21 @@ object PartnershipRecipientUtrController {
   ): FormPageViewModel[ConditionalYesNoPageViewModel] = {
     val partnershipRecipientName = subject match {
       case IdentitySubject.LoanRecipient =>
-        userAnswers.get(PartnershipRecipientNamePage(srn, index)) match { //loan
+        userAnswers.get(PartnershipRecipientNamePage(srn, index)) match {
           case Some(value) => value
           case None => ""
         }
       case IdentitySubject.LandOrPropertySeller =>
-        userAnswers.get(PartnershipSellerNamePage(srn, index)) match { //property
+        userAnswers.get(PartnershipSellerNamePage(srn, index)) match {
           case Some(value) => value
           case None => ""
         }
+      case IdentitySubject.SharesSeller =>
+        userAnswers.get(PartnershipShareSellerNamePage(srn, index)) match {
+          case Some(value) => value
+          case None => ""
+        }
+      case _ => ""
     }
     FormPageViewModel[ConditionalYesNoPageViewModel](
       s"${subject.key}.partnershipRecipientUtr.title",

@@ -55,6 +55,7 @@ import pages.nonsipp.schemedesignatory.{
   ValueOfAssetsPage
 }
 import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
+import pages.nonsipp.sharesdisposal.SharesDisposalPage
 import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
 import pages.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldPage
 import play.api.inject
@@ -605,12 +606,65 @@ class TaskListControllerSpec extends ControllerBaseSpec {
         )
       }
     }
-    "quotedSharesSection" - {
+
+    "sharesDisposalSection" - {
       "notStarted" in {
         testViewModel(
           defaultUserAnswers,
           4,
           1,
+          expectedStatus = TaskListStatus.NotStarted,
+          expectedTitleKey = "nonsipp.tasklist.shares.title",
+          expectedLinkContentKey = "nonsipp.tasklist.sharesdisposal.add.title",
+          expectedLinkUrl = controllers.nonsipp.sharesdisposal.routes.SharesDisposalController
+            .onPageLoad(srn, NormalMode)
+            .url
+        )
+      }
+
+      "inProgress" in {
+        val userAnswersWithData = defaultUserAnswers.unsafeSet(SharesDisposalPage(srn), true)
+
+        testViewModel(
+          userAnswersWithData,
+          4,
+          1,
+          expectedStatus = TaskListStatus.InProgress,
+          expectedTitleKey = "nonsipp.tasklist.shares.title",
+          expectedLinkContentKey = "nonsipp.tasklist.sharesdisposal.change.title",
+          expectedLinkUrl = controllers.nonsipp.sharesdisposal.routes.SharesDisposalController
+            .onPageLoad(srn, NormalMode)
+            .url
+        )
+      }
+
+      "completed (with no shares disposals)" in {
+        val userAnswersWithData = defaultUserAnswers.unsafeSet(SharesDisposalPage(srn), false)
+
+        testViewModel(
+          userAnswersWithData,
+          4,
+          1,
+          expectedStatus = TaskListStatus.Completed,
+          expectedTitleKey = "nonsipp.tasklist.shares.title",
+          expectedLinkContentKey = "nonsipp.tasklist.sharesdisposal.change.title",
+          expectedLinkUrl = controllers.nonsipp.sharesdisposal.routes.SharesDisposalController
+            .onPageLoad(srn, NormalMode)
+            .url
+        )
+      }
+
+      "completed (with at least one completed shares disposal)" in {
+        //TODO: dependent on SharesDisposalList and SharesDisposalCYA implementations
+      }
+    }
+
+    "quotedSharesSection" - {
+      "notStarted" in {
+        testViewModel(
+          defaultUserAnswers,
+          4,
+          2,
           expectedStatus = TaskListStatus.NotStarted,
           expectedTitleKey = "nonsipp.tasklist.shares.title",
           expectedLinkContentKey = "nonsipp.tasklist.shares.add.quotedshares.title",
@@ -628,7 +682,7 @@ class TaskListControllerSpec extends ControllerBaseSpec {
         testViewModel(
           userAnswersWithData,
           4,
-          1,
+          2,
           expectedStatus = TaskListStatus.Completed,
           expectedTitleKey = "nonsipp.tasklist.shares.title",
           expectedLinkContentKey = "nonsipp.tasklist.shares.change.quotedshares.title",

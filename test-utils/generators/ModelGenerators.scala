@@ -333,6 +333,11 @@ trait ModelGenerators extends BasicGenerators {
 
   implicit val Max5000Gen: Gen[Refined[Int, OneTo5000]] =
     Gen.choose(1, 9999999).map(refineV[OneTo5000](_).value)
+
+  implicit val recipientDetailsGen: Gen[RecipientDetails] = for {
+    name <- nonEmptyString
+    description <- nonEmptyString
+  } yield RecipientDetails(name, description)
 }
 
 object ModelGenerators extends ModelGenerators
