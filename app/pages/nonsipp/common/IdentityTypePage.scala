@@ -102,7 +102,7 @@ case class IdentityTypePage(srn: Srn, index: Max5000, identitySubject: IdentityS
           IndividualNameOfSharesSellerPage(srn, index),
           SharesIndividualSellerNINumberPage(srn, index),
           CompanyNameOfSharesSellerPage(srn, index),
-          PartnershipSellerNamePage(srn, index)
+          PartnershipShareSellerNamePage(srn, index)
         )
 
       case _ =>
