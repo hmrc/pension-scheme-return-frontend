@@ -19,10 +19,15 @@ package navigation.nonsipp
 import config.Refined.{Max5000, OneTo5000}
 import controllers.nonsipp.shares.CompanyNameOfSharesSellerPage
 import eu.timepit.refined.refineMV
-import models.{IdentitySubject, IdentityType, NormalMode, SchemeHoldShare}
+import models.{IdentitySubject, IdentityType, NormalMode, RecipientDetails, SchemeHoldShare}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.common.IdentityTypePage
+import pages.nonsipp.common.{
+  CompanyRecipientCrnPage,
+  IdentityTypePage,
+  OtherRecipientDetailsPage,
+  PartnershipRecipientUtrPage
+}
 import pages.nonsipp.shares._
 import utils.BaseSpec
 import utils.UserAnswersUtils.UserAnswersOps
@@ -174,18 +179,17 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .withName("go from identity type page to company seller name page")
         )
 
-//        TODO when partnership name page is done
-//        act.like(
-//          normalmode
-//            .navigateToWithDataIndexAndSubject(
-//              index,
-//              subject,
-//              IdentityTypePage,
-//              Gen.const(IdentityType.UKPartnership),
-//              controllers.nonsipp.shares.routes.PartnershipSellerNameController.onPageLoad
-//            )
-//            .withName("go from identity type page to UKPartnership to partnership seller name page")
-//        )
+        act.like(
+          normalmode
+            .navigateToWithDataIndexAndSubject(
+              index,
+              subject,
+              IdentityTypePage,
+              Gen.const(IdentityType.UKPartnership),
+              controllers.nonsipp.shares.routes.PartnershipNameOfSharesSellerController.onPageLoad
+            )
+            .withName("go from identity type page to UKPartnership to partnership name of shares seller name page")
+        )
       }
     }
 
@@ -240,9 +244,11 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           .navigateToWithIndex(
             index,
             ClassOfSharesPage,
-            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.common.routes.IdentityTypeController
+                .onPageLoad(srn, index, NormalMode, IdentitySubject.SharesSeller)
           )
-          .withName("go from class of shares to unauthorised page")
+          .withName("go from class of shares to identity subject shares seller page")
       )
     }
 
@@ -266,12 +272,10 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           .navigateToWithIndex(
             index,
             SharesIndividualSellerNINumberPage,
-            (srn, _: Max5000, _) =>
-              controllers.nonsipp.shares.routes.SharesIndividualSellerNINumberController
-                .onPageLoad(srn, index, NormalMode)
+            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
           )
           .withName(
-            "go from class of shares individual seller NI number page to Shares individual seller NI number page"
+            "go from class of shares individual seller NI number page to Unauthorised page"
           )
       )
     }
@@ -301,6 +305,52 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
                 .onPageLoad(srn, index, NormalMode, IdentitySubject.SharesSeller)
           )
           .withName("go from  company name of shares seller page to partnership recipient Utr page")
+      )
+    }
+
+    "PartnershipRecipientUtrPage" - {
+      act.like(
+        normalmode
+          .navigateToWithIndexAndSubject(
+            index,
+            subject,
+            PartnershipRecipientUtrPage,
+            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          )
+          .withName("go from partnership recipient Utr page to Unauthorised page")
+      )
+    }
+
+    "CompanyRecipientCrnPage" - {
+      act.like(
+        normalmode
+          .navigateToWithIndexAndSubject(
+            index,
+            subject,
+            CompanyRecipientCrnPage,
+            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          )
+          .withName("go from company recipient CRN page to Unauthorised page")
+      )
+    }
+
+    "OtherRecipientDetailsPage" - {
+
+      val shareDetails = RecipientDetails(
+        "testName",
+        "testDescription"
+      )
+
+      act.like(
+        normalmode
+          .navigateToWithDataIndexAndSubject(
+            index,
+            subject,
+            OtherRecipientDetailsPage,
+            Gen.const(shareDetails),
+            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          )
+          .withName("go from other recipient details page to Unauthorised page")
       )
     }
 
