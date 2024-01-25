@@ -75,6 +75,7 @@ object Constants {
 
   val maxInputLength = 35
   val maxTextAreaLength = 160
+  val maxOtherDescriptionLength = 35
   val maxTitleNumberLength = 35
   val maxNotRelevant = 9999999
 

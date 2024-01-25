@@ -16,12 +16,13 @@
 
 package navigation.nonsipp
 
-import config.Refined.{indexReads, Max5000, OneTo5000}
+import config.Refined.{Max5000, OneTo5000}
 import controllers.nonsipp.shares.CompanyNameOfSharesSellerPage
 import eu.timepit.refined.refineMV
-import models.{NormalMode, SchemeHoldShare}
+import models.{IdentitySubject, IdentityType, NormalMode, SchemeHoldShare}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
+import pages.nonsipp.common.IdentityTypePage
 import pages.nonsipp.shares._
 import utils.BaseSpec
 import utils.UserAnswersUtils.UserAnswersOps
@@ -30,6 +31,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
   val navigator: Navigator = new NonSippNavigator
   private val index = refineMV[OneTo5000](1)
+  private val subject = IdentitySubject.SharesSeller
 
   "SharesNavigator" - {
 
@@ -134,6 +136,58 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           "go from WhyDoesSchemeHoldSharesPage to CompanyNameRelatedSharesPage when holding is transfer"
         )
     )
+    "IdentityType navigation" - {
+      "NormalMode" - {
+        act.like(
+          normalmode
+            .navigateToWithDataIndexAndSubjectBoth(
+              index,
+              subject,
+              IdentityTypePage,
+              Gen.const(IdentityType.Other),
+              controllers.nonsipp.common.routes.OtherRecipientDetailsController.onPageLoad
+            )
+            .withName("go from identity type page to other seller details page")
+        )
+
+        act.like(
+          normalmode
+            .navigateToWithDataIndexAndSubject(
+              index,
+              subject,
+              IdentityTypePage,
+              Gen.const(IdentityType.Individual),
+              controllers.nonsipp.shares.routes.IndividualNameOfSharesSellerController.onPageLoad
+            )
+            .withName("go from identity type page to individual seller name page")
+        )
+
+        act.like(
+          normalmode
+            .navigateToWithDataIndexAndSubject(
+              index,
+              subject,
+              IdentityTypePage,
+              Gen.const(IdentityType.UKCompany),
+              controllers.nonsipp.shares.routes.CompanyNameOfSharesSellerController.onPageLoad
+            )
+            .withName("go from identity type page to company seller name page")
+        )
+
+//        TODO when partnership name page is done
+//        act.like(
+//          normalmode
+//            .navigateToWithDataIndexAndSubject(
+//              index,
+//              subject,
+//              IdentityTypePage,
+//              Gen.const(IdentityType.UKPartnership),
+//              controllers.nonsipp.shares.routes.PartnershipSellerNameController.onPageLoad
+//            )
+//            .withName("go from identity type page to UKPartnership to partnership seller name page")
+//        )
+      }
+    }
 
     "WhenDidSchemeAcquireSharesPage" - {
       act.like(

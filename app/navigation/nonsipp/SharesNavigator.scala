@@ -19,9 +19,10 @@ package navigation.nonsipp
 import controllers.nonsipp.shares.CompanyNameOfSharesSellerPage
 import eu.timepit.refined.refineMV
 import models.SchemeHoldShare.{Acquisition, Contribution, Transfer}
-import models.{NormalMode, UserAnswers}
+import models.{IdentitySubject, IdentityType, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
+import pages.nonsipp.common.IdentityTypePage
 import pages.nonsipp.shares._
 import play.api.mvc.Call
 
@@ -64,6 +65,23 @@ object SharesNavigator extends JourneyNavigator {
 
     case ClassOfSharesPage(srn, index) =>
       controllers.routes.UnauthorisedController.onPageLoad()
+
+    case IdentityTypePage(srn, index, IdentitySubject.SharesSeller) =>
+      userAnswers.get(IdentityTypePage(srn, index, IdentitySubject.SharesSeller)) match {
+        case Some(IdentityType.Other) =>
+          controllers.nonsipp.common.routes.OtherRecipientDetailsController
+            .onPageLoad(srn, index, NormalMode, IdentitySubject.SharesSeller)
+        case Some(IdentityType.Individual) =>
+          controllers.nonsipp.shares.routes.IndividualNameOfSharesSellerController
+            .onPageLoad(srn, index, NormalMode)
+        case Some(IdentityType.UKCompany) =>
+          controllers.nonsipp.shares.routes.CompanyNameOfSharesSellerController
+            .onPageLoad(srn, index, NormalMode)
+        case Some(IdentityType.UKPartnership) =>
+          controllers.routes.UnauthorisedController.onPageLoad() //TODO when partnership name page is done
+        case _ =>
+          controllers.routes.UnauthorisedController.onPageLoad()
+      }
 
     case IndividualNameOfSharesSellerPage(srn, index) =>
       controllers.nonsipp.shares.routes.SharesIndividualSellerNINumberController.onPageLoad(srn, index, NormalMode)

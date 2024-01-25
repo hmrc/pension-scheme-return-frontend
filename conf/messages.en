@@ -814,7 +814,7 @@ loanRecipient.otherRecipientDetails.name.error.required = Enter the recipient’
 loanRecipient.otherRecipientDetails.name.error.invalid = Recipient’s name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
 loanRecipient.otherRecipientDetails.name.error.length =  Recipient’s name must be 160 characters or fewer
 loanRecipient.otherRecipientDetails.description.error.invalid = The brief description of the recipient must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
-loanRecipient.otherRecipientDetails.description.error.length = The brief description of the recipient must be 160 characters or fewer
+loanRecipient.otherRecipientDetails.description.error.length = The brief description of the recipient must be 35 characters or fewer
 
 fileUploadTooManyErrors.title = There is a problem with your member details file
 fileUploadTooManyErrors.heading = There is a problem with your member details file
@@ -1328,9 +1328,19 @@ landOrPropertySeller.otherRecipientDetails.name = Seller’s name
 landOrPropertySeller.otherRecipientDetails.description = Brief description of seller (optional)
 landOrPropertySeller.otherRecipientDetails.name.error.required = Enter the seller’s name
 landOrPropertySeller.otherRecipientDetails.name.error.invalid = Seller’s name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
-landOrPropertySeller.otherRecipientDetails.name.error.length =  Seller’s name must be 160 characters or fewer
+landOrPropertySeller.otherRecipientDetails.name.error.length = Seller’s name must be 35 characters or fewer
 landOrPropertySeller.otherRecipientDetails.description.error.invalid = The description of the seller must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
-landOrPropertySeller.otherRecipientDetails.description.error.length = The description of the seller must be 160 characters or fewer
+landOrPropertySeller.otherRecipientDetails.description.error.length = The description of the seller must be 35 characters or fewer
+
+sharesSeller.otherRecipientDetails.title = Seller’s details
+sharesSeller.otherRecipientDetails.heading = Seller’s details for shares in {0}
+sharesSeller.otherRecipientDetails.name = Seller’s name
+sharesSeller.otherRecipientDetails.description = Brief description of seller (optional)
+sharesSeller.otherRecipientDetails.name.error.required = Enter the seller’s name
+sharesSeller.otherRecipientDetails.name.error.invalid = Seller’s name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+sharesSeller.otherRecipientDetails.name.error.length = Seller’s name must be 160 characters or fewer
+sharesSeller.otherRecipientDetails.description.error.invalid = The description of the seller must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+sharesSeller.otherRecipientDetails.description.error.length = The description of the seller must be 35 characters or fewer
 
 partnershipSellerName.title = What is the seller’s partnership name?
 partnershipSellerName.heading = What is the seller’s partnership name?
@@ -1514,7 +1524,7 @@ otherBuyerDetails.name.error.invalid = Buyer’s name must only include letters 
 otherBuyerDetails.name.error.length =  Buyer’s name must be 160 characters or fewer
 otherBuyerDetails.description.error.required = Enter a brief description of the buyer
 otherBuyerDetails.description.error.invalid = The brief description of the buyer must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
-otherBuyerDetails.description.error.length = The description of the buyer must be 160 characters or fewer
+otherBuyerDetails.description.error.length = The description of the buyer must be 35 characters or fewer
 
 partnershipBuyerUtr.title = Do you know the buyer’s Unique Taxpayer Reference (UTR)?
 partnershipBuyerUtr.heading = Do you know {0}’s Unique Taxpayer Reference (UTR)?
