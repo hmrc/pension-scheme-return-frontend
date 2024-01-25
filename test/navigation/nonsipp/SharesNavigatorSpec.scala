@@ -240,7 +240,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           .navigateToWithIndex(
             index,
             ClassOfSharesPage,
-            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+            (srn, _: Max5000, _) => controllers.nonsipp.shares.routes.HowManySharesController.onPageLoad(srn, index, NormalMode)
           )
           .withName("go from class of shares to unauthorised page")
       )
@@ -284,5 +284,65 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       )
     }
 
+    "HowManySharesPage" - {
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            HowManySharesPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.common.routes.IdentityTypeController
+                .onPageLoad(srn, index, NormalMode, IdentitySubject.SharesSeller),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                WhyDoesSchemeHoldSharesPage(srn, index),
+                SchemeHoldShare.Acquisition
+              )
+          )
+          .withName(
+            "go from HowManySharesPage to IdentityType page when holding is acquisition"
+          )
+      )
+    }
+
+    "HowManySharesPage" - {
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            HowManySharesPage,
+            (srn, _: Max5000, _) =>
+              controllers.routes.UnauthorisedController.onPageLoad(),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                WhyDoesSchemeHoldSharesPage(srn, index),
+                SchemeHoldShare.Contribution
+              )
+          )
+          .withName(
+            "go from HowManySharesPage to Unauthorised page when holding is contribution"
+          )
+      )
+    }
+
+    "HowManySharesPage" - {
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            HowManySharesPage,
+            (srn, _: Max5000, _) =>
+              controllers.routes.UnauthorisedController.onPageLoad(),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                WhyDoesSchemeHoldSharesPage(srn, index),
+                SchemeHoldShare.Transfer
+              )
+          )
+          .withName(
+            "go from HowManySharesPage to Unauthorised page when holding is transfer"
+          )
+      )
+    }
   }
 }

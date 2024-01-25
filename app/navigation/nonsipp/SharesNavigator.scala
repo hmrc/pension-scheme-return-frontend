@@ -67,7 +67,12 @@ object SharesNavigator extends JourneyNavigator {
       controllers.nonsipp.shares.routes.HowManySharesController.onPageLoad(srn, index, NormalMode)
 
     case HowManySharesPage(srn, index) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+      userAnswers.get(WhyDoesSchemeHoldSharesPage(srn, index)) match {
+        case Some(Acquisition) =>
+          controllers.nonsipp.common.routes.IdentityTypeController
+            .onPageLoad(srn, index, NormalMode, IdentitySubject.SharesSeller)
+        case _ => controllers.routes.UnauthorisedController.onPageLoad()
+      }
 
     case IdentityTypePage(srn, index, IdentitySubject.SharesSeller) =>
       userAnswers.get(IdentityTypePage(srn, index, IdentitySubject.SharesSeller)) match {
