@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.shares
 
-import config.Constants.{borrowMinPercentage, maxNotRelevant}
+import config.Constants.{maxShares, minShares}
 import config.Refined.Max5000
 import controllers.PSRController
 import controllers.actions._
@@ -92,13 +92,13 @@ class HowManySharesController @Inject()(
 }
 
 object HowManySharesController {
-  def form(formProvider: IntFormProvider): Form[Int] = formProvider(
+  def form(formProvider: IntFormProvider): Form[Int] = formProvider.singleQuestion(
     IntFormErrors(
       "shares.totalShares.error.required",
       "shares.totalShares.error.decimal",
       "shares.totalShares.error.invalid.characters",
-      (maxNotRelevant, "shares.totalShares.error.size"), // TODO - Find suitable max
-      (borrowMinPercentage, "shares.totalShares.error.zero") // TODO - Find suitable min
+      (maxShares, "shares.totalShares.error.size"),
+      (minShares, "shares.totalShares.error.zero")
     )
   )
 

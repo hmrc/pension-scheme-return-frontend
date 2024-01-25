@@ -29,6 +29,14 @@ abstract class FormProvider[E, A](fieldMapping: (E, Seq[String]) => FieldMapping
       mapping("value" -> fieldMapping(errors, args))(identity)(a => Some(identity(a)))
     )
 
+  def singleQuestion(
+    errors: E,
+    args: Seq[String] = Nil
+  ): Form[A] =
+    Form(
+      mapping("value.1" -> fieldMapping(errors, args))(identity)(a => Some(identity(a)))
+    )
+
   def apply(errors: E): Form[A] =
     apply(errors, Seq())
 
