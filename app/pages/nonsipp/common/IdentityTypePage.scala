@@ -24,7 +24,7 @@ import pages.QuestionPage
 import pages.nonsipp.landorproperty._
 import pages.nonsipp.loansmadeoroutstanding
 import pages.nonsipp.loansmadeoroutstanding._
-import pages.nonsipp.shares.{IndividualNameOfSharesSellerPage, SharesIndividualSellerNINumberPage}
+import pages.nonsipp.shares._
 import play.api.libs.json.JsPath
 import queries.Removable
 import utils.PageUtils._
