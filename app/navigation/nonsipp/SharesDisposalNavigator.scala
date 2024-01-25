@@ -16,7 +16,7 @@
 
 package navigation.nonsipp
 
-import models.UserAnswers
+import models.{HowSharesDisposed, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.sharesdisposal._
@@ -35,6 +35,30 @@ object SharesDisposalNavigator extends JourneyNavigator {
 
     case WhatYouWillNeedSharesDisposalPage(srn) =>
       controllers.routes.UnauthorisedController.onPageLoad()
+//      controllers.nonsipp.sharesdisposal.routes.SharesDisposalListController
+//        .onPageLoad(srn, page = 1)
+
+//    case SharesDisposalListPage(srn, shareIndex, disposalIndex) =>
+//      controllers.nonsipp.sharesdisposal.routes.HowWereSharesDisposedController
+//        .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
+
+    case page @ HowWereSharesDisposedPage(srn, shareIndex, disposalIndex, _) =>
+      userAnswers.get(page) match {
+        case None =>
+          controllers.routes.UnauthorisedController.onPageLoad()
+        case Some(HowSharesDisposed.Sold) =>
+          controllers.routes.UnauthorisedController.onPageLoad()
+//          controllers.nonsipp.sharesdisposal.routes.WhenWereSharesSoldController
+//            .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
+        case Some(HowSharesDisposed.Redeemed) =>
+          controllers.routes.UnauthorisedController.onPageLoad()
+//          controllers.nonsipp.sharesdisposal.routes.WhenWereSharesRedeemedController
+//            .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
+        case Some(HowSharesDisposed.Transferred) | Some(HowSharesDisposed.Other(_)) =>
+          controllers.routes.UnauthorisedController.onPageLoad()
+//          controllers.nonsipp.sharesdisposal.routes.HowManySharesHeldController
+//            .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
+      }
 
   }
 
