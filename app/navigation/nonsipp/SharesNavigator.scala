@@ -22,7 +22,13 @@ import models.SchemeHoldShare.{Acquisition, Contribution, Transfer}
 import models.{IdentitySubject, IdentityType, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.common.IdentityTypePage
+import pages.nonsipp.common.{
+  CompanyRecipientCrnPage,
+  IdentityTypePage,
+  OtherRecipientDetailsPage,
+  PartnershipRecipientUtrPage
+}
+import pages.nonsipp.loansmadeoroutstanding.PartnershipRecipientNamePage
 import pages.nonsipp.shares._
 import play.api.mvc.Call
 
@@ -86,7 +92,8 @@ object SharesNavigator extends JourneyNavigator {
           controllers.nonsipp.shares.routes.CompanyNameOfSharesSellerController
             .onPageLoad(srn, index, NormalMode)
         case Some(IdentityType.UKPartnership) =>
-          controllers.routes.UnauthorisedController.onPageLoad() //TODO when partnership name page is done
+          controllers.nonsipp.shares.routes.PartnershipNameOfSharesSellerController
+            .onPageLoad(srn, index, NormalMode)
         case _ =>
           controllers.routes.UnauthorisedController.onPageLoad()
       }
@@ -94,10 +101,24 @@ object SharesNavigator extends JourneyNavigator {
     case IndividualNameOfSharesSellerPage(srn, index) =>
       controllers.nonsipp.shares.routes.SharesIndividualSellerNINumberController.onPageLoad(srn, index, NormalMode)
 
+    case CompanyNameOfSharesSellerPage(srn, index) =>
+      controllers.nonsipp.common.routes.CompanyRecipientCrnController
+        .onPageLoad(srn, index, NormalMode, IdentitySubject.SharesSeller)
+
+    case PartnershipShareSellerNamePage(srn, index) =>
+      controllers.nonsipp.common.routes.PartnershipRecipientUtrController
+        .onPageLoad(srn, index, NormalMode, IdentitySubject.SharesSeller)
+
     case SharesIndividualSellerNINumberPage(srn, index) =>
       controllers.routes.UnauthorisedController.onPageLoad()
 
-    case CompanyNameOfSharesSellerPage(srn, index) =>
+    case CompanyRecipientCrnPage(srn, index, IdentitySubject.SharesSeller) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
+
+    case PartnershipRecipientUtrPage(srn, index, IdentitySubject.SharesSeller) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
+
+    case OtherRecipientDetailsPage(srn, index, IdentitySubject.SharesSeller) =>
       controllers.routes.UnauthorisedController.onPageLoad()
 
   }
