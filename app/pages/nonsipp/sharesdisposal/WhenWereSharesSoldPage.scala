@@ -14,17 +14,20 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages.nonsipp.sharesdisposal
 
-import play.api.libs.json.{__, JsPath}
+import config.Refined.{Max50, Max5000}
+import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
+import utils.RefinedUtils.RefinedIntOps
 
-package object sharesdisposal {
+import java.time.LocalDate
 
-  object Paths {
-    val shares: JsPath = __ \ "shares"
-    val shareTransactions: JsPath = shares \ "shareTransactions"
-    val disposedSharesTransaction: JsPath = shareTransactions \ "disposedSharesTransaction"
-    val salesQuestions: JsPath = disposedSharesTransaction \ "salesQuestions"
-  }
+case class WhenWereSharesSoldPage(srn: Srn, shareIndex: Max5000, disposalIndex: Max50) extends QuestionPage[LocalDate] {
 
+  override def path: JsPath =
+    Paths.salesQuestions \ toString \ shareIndex.arrayIndex.toString \ disposalIndex.arrayIndex.toString
+
+  override def toString: String = "dateOfSale"
 }

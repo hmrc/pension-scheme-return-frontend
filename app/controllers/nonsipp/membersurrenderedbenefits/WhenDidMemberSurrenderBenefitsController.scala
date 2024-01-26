@@ -143,7 +143,7 @@ object WhenDidMemberSurrenderBenefitsController {
       heading = Message("surrenderedBenefits.when.heading", memberName, surrenderedBenefitsAmount),
       page = DatePageViewModel(
         None,
-        Message("whenDidSchemeAcquireShares.heading", memberName, surrenderedBenefitsAmount)
+        Message("surrenderedBenefits.when.heading", memberName, surrenderedBenefitsAmount)
       ),
       onSubmit = routes.WhenDidMemberSurrenderBenefitsController.onSubmit(srn, index, mode)
     )
