@@ -17,12 +17,14 @@
 package pages.nonsipp.common
 
 import config.Refined.Max5000
+import controllers.nonsipp.shares.CompanyNameOfSharesSellerPage
 import models.SchemeId.Srn
 import models.{IdentitySubject, IdentityType, UserAnswers}
 import pages.QuestionPage
 import pages.nonsipp.landorproperty._
 import pages.nonsipp.loansmadeoroutstanding
 import pages.nonsipp.loansmadeoroutstanding._
+import pages.nonsipp.shares._
 import play.api.libs.json.JsPath
 import queries.Removable
 import utils.PageUtils._
@@ -96,7 +98,12 @@ case class IdentityTypePage(srn: Srn, index: Max5000, identitySubject: IdentityS
         )
 
       case IdentitySubject.SharesSeller =>
-        List().empty //TODO list pages not using identity subject but need to be cleaned up here
+        List(
+          IndividualNameOfSharesSellerPage(srn, index),
+          SharesIndividualSellerNINumberPage(srn, index),
+          CompanyNameOfSharesSellerPage(srn, index),
+          PartnershipShareSellerNamePage(srn, index)
+        )
 
       case _ =>
         List().empty
