@@ -26,6 +26,9 @@ object Constants {
   val psaIdKey = "PSAID"
   val pspIdKey = "PSPID"
 
+  val PSA = "PSA"
+  val PSP = "PSP"
+
   val delimitedPSA = "DELIMITED_PSAID"
   val detailsNotFound = "no match found"
 

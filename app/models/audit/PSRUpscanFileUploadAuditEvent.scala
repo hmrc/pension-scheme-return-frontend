@@ -21,7 +21,7 @@ import models.{DateRange, UploadStatus}
 
 case class PSRUpscanFileUploadAuditEvent(
   schemeName: String,
-  schemeAdministratorName: String,
+  schemeAdministratorOrPractitionerName: String,
   psaOrPspId: String,
   schemeTaxReference: String,
   affinityGroup: String,
@@ -34,10 +34,9 @@ case class PSRUpscanFileUploadAuditEvent(
   override def auditType: String = "PensionSchemeReturnFileUpscanUploadCheck"
 
   override def details: Map[String, String] = {
+
     val common = Map(
       "SchemeName" -> schemeName,
-      "SchemeAdministratorName" -> schemeAdministratorName,
-      "PensionSchemeAdministratorOrPensionSchemePractitionerId" -> psaOrPspId,
       "PensionSchemeTaxReference" -> schemeTaxReference,
       "AffinityGroup" -> affinityGroup,
       "CredentialRole(PSA/PSP)" -> credentialRole,
@@ -52,7 +51,7 @@ case class PSRUpscanFileUploadAuditEvent(
           "FailureMessage" -> failure.message
         )
 
-      case UploadStatus.Success(name, mimeType, downloadUrl, size) =>
+      case UploadStatus.Success(_, _, _, size) =>
         Map(
           "UploadStatus" -> "Success",
           "FileSize" -> size.getOrElse(0L).toString,
@@ -60,6 +59,6 @@ case class PSRUpscanFileUploadAuditEvent(
         )
     }
 
-    common ++ outcomeMap
+    psaOrPspIdDetails(credentialRole, psaOrPspId, schemeAdministratorOrPractitionerName) ++ common ++ outcomeMap
   }
 }
