@@ -24,6 +24,7 @@ import play.api.libs.json.JsPath
 import queries.Removable
 import utils.PageUtils.removePages
 import utils.RefinedUtils._
+import viewmodels.models.SectionStatus
 
 import scala.util.Try
 
@@ -36,8 +37,27 @@ case class EmployerNamePage(srn: Srn, memberIndex: Max300, index: Max50) extends
 
   override def cleanup(value: Option[String], userAnswers: UserAnswers): Try[UserAnswers] =
     (value, userAnswers.get(this)) match {
-      case (Some(_), _) => Try(userAnswers)
-      case (None, _) => removePages(userAnswers, pages(srn))
+      case (Some(_), None) =>
+        // create
+        userAnswers
+          .set(EmployerContributionsSectionStatus(srn), SectionStatus.InProgress)
+          .flatMap(_.remove(EmployerContributionsMemberListPage(srn)))
+      case (Some(x), Some(y)) =>
+        // update
+        if (x == y) {
+          // value not changed
+          Try(userAnswers)
+        } else {
+          // value changed
+          userAnswers
+            .set(EmployerContributionsSectionStatus(srn), SectionStatus.InProgress)
+            .flatMap(_.remove(EmployerContributionsMemberListPage(srn)))
+        }
+      case (None, _) =>
+        //deletion
+        removePages(userAnswers, pages(srn))
+          .flatMap(_.set(EmployerContributionsSectionStatus(srn), SectionStatus.InProgress))
+          .flatMap(_.remove(EmployerContributionsMemberListPage(srn)))
       case _ => Try(userAnswers)
     }
 
@@ -59,6 +79,13 @@ case class EmployerNamePage(srn: Srn, memberIndex: Max300, index: Max50) extends
 case class EmployerNamePages(srn: Srn, memberIndex: Max300) extends QuestionPage[Map[String, String]] {
   override def path: JsPath =
     Paths.memberEmpContribution \ toString \ memberIndex.arrayIndex.toString
+
+  override def toString: String = "orgName"
+}
+
+case class AllEmployerNamePages(srn: Srn) extends QuestionPage[Map[String, Map[String, String]]] {
+  override def path: JsPath =
+    Paths.memberEmpContribution \ toString
 
   override def toString: String = "orgName"
 }

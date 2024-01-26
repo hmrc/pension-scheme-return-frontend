@@ -80,7 +80,7 @@ class EmployerContributionsCYAController @Inject()(
         for {
           userAnswers <- EitherT(userAnswersWithSectionCompleted.pure[Future])
           updatedAnswers <- Future
-            .fromTry(userAnswers.set(EmployerContributionsSectionStatus(srn), SectionStatus.InProgress))
+            .fromTry(userAnswers)
             .liftF
           _ <- saveService.save(updatedAnswers).liftF
         } yield Redirect(navigator.nextPage(EmployerContributionsCYAPage(srn), mode, updatedAnswers))

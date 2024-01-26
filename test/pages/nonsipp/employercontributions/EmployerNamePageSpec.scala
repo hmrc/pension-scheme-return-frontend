@@ -23,6 +23,7 @@ import models.{ConditionalYesNo, Crn}
 import pages.behaviours.PageBehaviours
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import utils.UserAnswersUtils.UserAnswersOps
+import viewmodels.models.SectionStatus
 
 class EmployerNamePageSpec extends PageBehaviours with TestValues {
 
@@ -42,15 +43,13 @@ class EmployerNamePageSpec extends PageBehaviours with TestValues {
   }
 
   "cleanup other fields when removed with index-1" in {
-    val srn = srnGen.sample.value
-
     val userAnswers = defaultUserAnswers
+      .unsafeSet(EmployerContributionsPage(srn), true)
       .unsafeSet(MemberDetailsPage(srn, memberIndex), memberDetails)
       .unsafeSet(EmployerNamePage(srn, memberIndex, indexOne), employerName)
       .unsafeSet(TotalEmployerContributionPage(srn, memberIndex, indexOne), money)
       .unsafeSet(EmployerCompanyCrnPage(srn, memberIndex, indexOne), ConditionalYesNo.yes[String, Crn](crn))
       .unsafeSet(ContributionsFromAnotherEmployerPage(srn, memberIndex, indexOne), true)
-      .unsafeSet(EmployerContributionsPage(srn), true)
 
     val result = userAnswers.remove(EmployerNamePage(srn, memberIndex, indexOne)).success.value
 
@@ -62,8 +61,6 @@ class EmployerNamePageSpec extends PageBehaviours with TestValues {
   }
 
   "cleanup other fields when removed with index bigger than 1" in {
-    val srn = srnGen.sample.value
-
     val userAnswers = defaultUserAnswers
       .unsafeSet(MemberDetailsPage(srn, memberIndex), memberDetails)
       .unsafeSet(EmployerNamePage(srn, memberIndex, indexTwo), employerName)
@@ -80,4 +77,64 @@ class EmployerNamePageSpec extends PageBehaviours with TestValues {
     result.get(ContributionsFromAnotherEmployerPage(srn, memberIndex, indexTwo)) must be(empty)
     result.get(EmployerContributionsPage(srn)) must be(Some(true))
   }
+
+  "Dependent values: section status and were employer contributions made are" - {
+
+    "changing when employer name added" in {
+      val userAnswers = defaultUserAnswers
+        .unsafeSet(EmployerContributionsPage(srn), true)
+        .unsafeSet(EmployerContributionsSectionStatus(srn), SectionStatus.Completed)
+
+      val result = userAnswers.set(EmployerNamePage(srn, memberIndex, indexOne), employerName).success.value
+
+      result.get(EmployerContributionsPage(srn)) must be(Some(true))
+      result.get(EmployerNamePage(srn, memberIndex, indexOne)) must be(Some(employerName))
+      result.get(EmployerContributionsSectionStatus(srn)) must be(Some(SectionStatus.InProgress))
+      result.get(EmployerContributionsMemberListPage(srn)) must be(empty)
+    }
+
+    "not changing when value stays the same" in {
+      val userAnswers = defaultUserAnswers
+        .unsafeSet(EmployerContributionsPage(srn), true)
+        .unsafeSet(EmployerNamePage(srn, memberIndex, indexOne), employerName)
+        .unsafeSet(EmployerContributionsSectionStatus(srn), SectionStatus.Completed)
+        .unsafeSet(EmployerContributionsMemberListPage(srn), true)
+
+      val result = userAnswers.set(EmployerNamePage(srn, memberIndex, indexOne), employerName).success.value
+
+      result.get(EmployerContributionsPage(srn)) must be(Some(true))
+      result.get(EmployerNamePage(srn, memberIndex, indexOne)) must be(Some(employerName))
+      result.get(EmployerContributionsSectionStatus(srn)) must be(Some(SectionStatus.Completed))
+      result.get(EmployerContributionsMemberListPage(srn)) must be(Some(true))
+    }
+
+    "changing when value is different" in {
+      val userAnswers = defaultUserAnswers
+        .unsafeSet(EmployerContributionsPage(srn), true)
+        .unsafeSet(EmployerNamePage(srn, memberIndex, indexOne), employerName)
+        .unsafeSet(EmployerContributionsSectionStatus(srn), SectionStatus.Completed)
+        .unsafeSet(EmployerContributionsMemberListPage(srn), true)
+
+      val result = userAnswers.set(EmployerNamePage(srn, memberIndex, indexOne), employerName + "changed").success.value
+
+      result.get(EmployerNamePage(srn, memberIndex, indexOne)) must be(Some(employerName + "changed"))
+      result.get(EmployerContributionsSectionStatus(srn)) must be(Some(SectionStatus.InProgress))
+      result.get(EmployerContributionsMemberListPage(srn)) must be(empty)
+    }
+
+    "changing when employer name is removed" in {
+      val userAnswers = defaultUserAnswers
+        .unsafeSet(EmployerContributionsPage(srn), true)
+        .unsafeSet(EmployerNamePage(srn, memberIndex, indexOne), employerName)
+        .unsafeSet(EmployerContributionsSectionStatus(srn), SectionStatus.Completed)
+        .unsafeSet(EmployerContributionsMemberListPage(srn), true)
+
+      val result = userAnswers.remove(EmployerNamePage(srn, memberIndex, indexOne)).success.value
+
+      result.get(EmployerNamePage(srn, memberIndex, indexOne)) must be(empty)
+      result.get(EmployerContributionsSectionStatus(srn)) must be(Some(SectionStatus.InProgress))
+      result.get(EmployerContributionsMemberListPage(srn)) must be(empty)
+    }
+  }
+
 }

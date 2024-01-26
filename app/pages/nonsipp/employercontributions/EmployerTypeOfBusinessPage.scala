@@ -22,6 +22,7 @@ import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
+import viewmodels.models.SectionStatus
 
 import scala.util.Try
 
@@ -35,7 +36,11 @@ case class EmployerTypeOfBusinessPage(srn: Srn, memberIndex: Max300, index: Max5
   override def cleanup(value: Option[IdentityType], userAnswers: UserAnswers): Try[UserAnswers] =
     (value, userAnswers.get(this)) match {
       case (None, _) => Try(userAnswers) // delete handled by cleanup in EmployerNamePage
-      case (Some(_), None) => Try(userAnswers) // new value no need to delete anything
+      case (Some(_), None) =>
+        // new value / create
+        userAnswers
+          .set(EmployerContributionsSectionStatus(srn), SectionStatus.InProgress)
+          .flatMap(_.remove(EmployerContributionsMemberListPage(srn)))
       case (Some(IdentityType.UKCompany), Some(IdentityType.UKCompany)) => Try(userAnswers)
       case (Some(IdentityType.UKPartnership), Some(IdentityType.UKPartnership)) => Try(userAnswers)
       case (Some(IdentityType.Other), Some(IdentityType.Other)) => Try(userAnswers)
@@ -44,5 +49,7 @@ case class EmployerTypeOfBusinessPage(srn: Srn, memberIndex: Max300, index: Max5
           .remove(EmployerCompanyCrnPage(srn, memberIndex, index))
           .flatMap(_.remove(PartnershipEmployerUtrPage(srn, memberIndex, index)))
           .flatMap(_.remove(OtherEmployeeDescriptionPage(srn, memberIndex, index)))
+          .flatMap(_.set(EmployerContributionsSectionStatus(srn), SectionStatus.InProgress))
+          .flatMap(_.remove(EmployerContributionsMemberListPage(srn)))
     }
 }

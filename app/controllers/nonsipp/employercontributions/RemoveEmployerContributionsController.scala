@@ -36,7 +36,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{PsrSubmissionService, SaveService}
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, SectionStatus, YesNoPageViewModel}
+import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 import views.html.YesNoPageView
 
 import javax.inject.{Inject, Named}
@@ -97,7 +97,6 @@ class RemoveEmployerContributionsController @Inject()(
                     .removePages(
                       journeyPages(srn, memberIndex, index) :+ EmployerContributionsCompleted(srn, memberIndex, index)
                     )
-                    .set(EmployerContributionsSectionStatus(srn), SectionStatus.InProgress)
                 )
                 _ <- saveService.save(updatedAnswers)
                 submissionResult <- psrSubmissionService.submitPsrDetails(srn, updatedAnswers)

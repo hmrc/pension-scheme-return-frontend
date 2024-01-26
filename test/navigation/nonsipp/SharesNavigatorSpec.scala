@@ -244,8 +244,8 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           .navigateToWithIndex(
             index,
             ClassOfSharesPage,
-
-            (srn, _: Max5000, _) => controllers.nonsipp.shares.routes.HowManySharesController.onPageLoad(srn, index, NormalMode)
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.HowManySharesController.onPageLoad(srn, index, NormalMode)
           )
           .withName("go from class of shares to identity subject shares seller page")
       )
@@ -380,8 +380,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           .navigateToWithIndex(
             index,
             HowManySharesPage,
-            (srn, _: Max5000, _) =>
-              controllers.routes.UnauthorisedController.onPageLoad(),
+            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad(),
             srn =>
               defaultUserAnswers.unsafeSet(
                 WhyDoesSchemeHoldSharesPage(srn, index),
@@ -400,8 +399,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           .navigateToWithIndex(
             index,
             HowManySharesPage,
-            (srn, _: Max5000, _) =>
-              controllers.routes.UnauthorisedController.onPageLoad(),
+            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad(),
             srn =>
               defaultUserAnswers.unsafeSet(
                 WhyDoesSchemeHoldSharesPage(srn, index),
