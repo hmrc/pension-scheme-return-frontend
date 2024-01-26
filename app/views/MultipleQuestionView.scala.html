@@ -38,8 +38,8 @@
       @govukErrorSummary(ErrorSummaryViewModel(viewmodel.page.form))
     }
 
-    @if(viewmodel.page.fields.length > 1) {
-      <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
+
+      <h1 class="govuk-heading-l govuk-!-margin-bottom-3">@renderMessage(viewmodel.heading)</h1>
 
       @viewmodel.details.map { detail =>
         @govukDetails(
@@ -59,14 +59,7 @@
             case (field @ QuestionField(_, _, _, _, FieldType.Select), index) => select(index, field)
           }
       }
-    } else {
-      @govukInput(
-        InputViewModel(
-          field = viewmodel.page.form("value"),
-          label = LabelViewModel(renderMessage(viewmodel.heading)).asPageHeading()
-        ).withWidth(InputWidth.Fixed10)
-      )
-    }
+
 
     @govukButton(
       ButtonViewModel(renderMessage(viewmodel.buttonText))

@@ -29,6 +29,15 @@ GET         /:srn/change-class-of-shares/:index                                 
 POST        /:srn/change-class-of-shares                                                controllers.nonsipp.shares.ClassOfSharesController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
 POST        /:srn/change-class-of-shares/:index                                         controllers.nonsipp.shares.ClassOfSharesController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 
+GET         /:srn/how-many-shares-transaction                                           controllers.nonsipp.shares.HowManySharesController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
+GET         /:srn/how-many-shares-transaction/:index                                    controllers.nonsipp.shares.HowManySharesController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/how-many-shares-transaction                                           controllers.nonsipp.shares.HowManySharesController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
+POST        /:srn/how-many-shares-transaction/:index                                    controllers.nonsipp.shares.HowManySharesController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/change-how-many-shares-transaction                                    controllers.nonsipp.shares.HowManySharesController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
+GET         /:srn/change-how-many-shares-transaction/:index                             controllers.nonsipp.shares.HowManySharesController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-how-many-shares-transaction                                    controllers.nonsipp.shares.HowManySharesController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
+POST        /:srn/change-how-many-shares-transaction/:index                             controllers.nonsipp.shares.HowManySharesController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
 GET         /:srn/which-shares-held-transaction/:index                                  controllers.nonsipp.shares.TypeOfSharesHeldController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
 POST        /:srn/which-shares-held-transaction/:index                                  controllers.nonsipp.shares.TypeOfSharesHeldController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
 GET         /:srn/change-which-shares-held-transaction/:index                           controllers.nonsipp.shares.TypeOfSharesHeldController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
