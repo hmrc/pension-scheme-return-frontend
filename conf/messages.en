@@ -541,6 +541,18 @@ sharesDisposal.howWereSharesDisposed.conditional.error.required = Enter details 
 sharesDisposal.howWereSharesDisposed.conditional.error.invalid = Details of the disposal must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
 sharesDisposal.howWereSharesDisposed.conditional.error.length = Details of the disposal must be 160 characters or fewer
 
+sharesDisposal.whenWereSharesSold.title = When were the shares in this company sold?
+sharesDisposal.whenWereSharesSold.heading = When were the shares in {0} sold?
+sharesDisposal.whenWereSharesSold.error.required.all = Enter the date these shares were sold
+sharesDisposal.whenWereSharesSold.error.required.day = Date these shares were sold must include a day
+sharesDisposal.whenWereSharesSold.error.required.month = Date these shares were sold must include a month
+sharesDisposal.whenWereSharesSold.error.required.year = Date these shares were sold must include a year
+sharesDisposal.whenWereSharesSold.error.required.two = Date these shares were sold must include a {0} and {1}
+sharesDisposal.whenWereSharesSold.error.invalid.date = Date these shares were sold must be a real date
+sharesDisposal.whenWereSharesSold.error.date.before = Date these shares were sold must be the same as or after {0}
+sharesDisposal.whenWereSharesSold.error.date.after = Date these shares were sold must be the same as or before {0}
+sharesDisposal.whenWereSharesSold.error.invalid.characters = Date these shares were sold must only include numbers 0 to 9
+
 pensionCommencementLumpSum.title = Did any member receive a pension commencement lump sum (PCLS) during the period of this return?
 pensionCommencementLumpSum.heading = Did any member receive a pension commencement lump sum (PCLS) during the period of this return?
 pensionCommencementLumpSum.error.required = Select yes if any member received a Pension Commencement Lump Sum during the period of this return

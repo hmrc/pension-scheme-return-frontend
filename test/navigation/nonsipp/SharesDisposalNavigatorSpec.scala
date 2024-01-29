@@ -18,7 +18,7 @@ package navigation.nonsipp
 
 import config.Refined.{Max50, Max5000}
 import eu.timepit.refined.refineMV
-import models.HowSharesDisposed
+import models.{HowSharesDisposed, NormalMode}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.sharesdisposal._
@@ -89,9 +89,8 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               HowWereSharesDisposedPage.apply,
               Gen.const(HowSharesDisposed.Sold),
               (srn, shareIndex: Max5000, disposalIndex: Max50, _) =>
-                controllers.routes.UnauthorisedController.onPageLoad()
-              //              controllers.nonsipp.sharesdisposal.routes.WhenWereSharesSoldController
-              //                .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
+                controllers.nonsipp.sharesdisposal.routes.WhenWereSharesSoldController
+                  .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
             )
             .withName("go from How Were Shares Disposed page to When Were Shares Sold page")
         )
@@ -139,6 +138,23 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               //                .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
             )
             .withName("go from How Were Shares Disposed page to How Many Shares Held page (Other)")
+        )
+      }
+
+      "WhenWereSharesSoldPage" - {
+
+        act.like(
+          normalmode
+            .navigateToWithDoubleIndex(
+              shareIndex,
+              disposalIndex,
+              WhenWereSharesSoldPage,
+              (srn, shareIndex: Max5000, disposalIndex: Max50, _) =>
+                controllers.routes.UnauthorisedController.onPageLoad()
+//                controllers.nonsipp.sharesdisposal.routes.HowManySharesSoldController
+//                  .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
+            )
+            .withName("go from When Were Shares Sold page to How Many Shares Sold page")
         )
       }
     }

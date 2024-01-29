@@ -16,7 +16,7 @@
 
 package navigation.nonsipp
 
-import models.{HowSharesDisposed, UserAnswers}
+import models.{HowSharesDisposed, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.sharesdisposal._
@@ -47,9 +47,8 @@ object SharesDisposalNavigator extends JourneyNavigator {
         case None =>
           controllers.routes.UnauthorisedController.onPageLoad()
         case Some(HowSharesDisposed.Sold) =>
-          controllers.routes.UnauthorisedController.onPageLoad()
-//          controllers.nonsipp.sharesdisposal.routes.WhenWereSharesSoldController
-//            .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
+          controllers.nonsipp.sharesdisposal.routes.WhenWereSharesSoldController
+            .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
         case Some(HowSharesDisposed.Redeemed) =>
           controllers.routes.UnauthorisedController.onPageLoad()
 //          controllers.nonsipp.sharesdisposal.routes.WhenWereSharesRedeemedController
@@ -59,6 +58,11 @@ object SharesDisposalNavigator extends JourneyNavigator {
 //          controllers.nonsipp.sharesdisposal.routes.HowManySharesHeldController
 //            .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
       }
+
+    case WhenWereSharesSoldPage(srn, shareIndex, disposalIndex) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
+//      controllers.nonsipp.sharesdisposal.routes.HowManySharesSoldController
+//        .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
 
   }
 
