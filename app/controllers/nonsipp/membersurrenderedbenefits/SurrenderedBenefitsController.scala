@@ -16,6 +16,7 @@
 
 package controllers.nonsipp.membersurrenderedbenefits
 
+import controllers.PSRController
 import controllers.actions._
 import controllers.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsController._
 import forms.YesNoPageFormProvider
@@ -24,10 +25,9 @@ import models.SchemeId.Srn
 import navigation.Navigator
 import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsPage
 import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import services.{PsrSubmissionService, SaveService}
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
@@ -43,10 +43,10 @@ class SurrenderedBenefitsController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   formProvider: YesNoPageFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: YesNoPageView
+  view: YesNoPageView,
+  psrSubmissionService: PsrSubmissionService
 )(implicit ec: ExecutionContext)
-    extends FrontendBaseController
-    with I18nSupport {
+    extends PSRController {
 
   private val form = SurrenderedBenefitsController.form(formProvider)
 
@@ -65,7 +65,10 @@ class SurrenderedBenefitsController @Inject()(
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(SurrenderedBenefitsPage(srn), value))
             _ <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage(SurrenderedBenefitsPage(srn), mode, updatedAnswers))
+            submissionResult <- if (!value) psrSubmissionService.submitPsrDetails(srn, updatedAnswers)
+            else Future.successful(Some(()))
+          } yield submissionResult
+            .getOrRecoverJourney(_ => Redirect(navigator.nextPage(SurrenderedBenefitsPage(srn), mode, updatedAnswers)))
       )
   }
 }
