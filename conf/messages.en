@@ -551,7 +551,7 @@ sharesDisposal.whenWereSharesSold.error.required.two = Date these shares were so
 sharesDisposal.whenWereSharesSold.error.invalid.date = Date these shares were sold must be a real date
 sharesDisposal.whenWereSharesSold.error.date.before = Date these shares were sold must be the same as or after {0}
 sharesDisposal.whenWereSharesSold.error.date.after = Date these shares were sold must be the same as or before {0}
-surrenderedBenefits.when.error.invalid.characters = Date these shares were sold must only include numbers 0 to 9
+sharesDisposal.whenWereSharesSold.error.invalid.characters = Date these shares were sold must only include numbers 0 to 9
 
 pensionCommencementLumpSum.title = Did any member receive a pension commencement lump sum (PCLS) during the period of this return?
 pensionCommencementLumpSum.heading = Did any member receive a pension commencement lump sum (PCLS) during the period of this return?
