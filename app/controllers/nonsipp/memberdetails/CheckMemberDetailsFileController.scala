@@ -17,6 +17,7 @@
 package controllers.nonsipp.memberdetails
 
 import akka.stream.Materializer
+import config.Constants.{PSA, PSP}
 import controllers.PSRController
 import controllers.actions._
 import controllers.nonsipp.memberdetails.CheckMemberDetailsFileController._
@@ -132,11 +133,11 @@ class CheckMemberDetailsFileController @Inject()(
     implicit req: DataRequest[_]
   ) = PSRUpscanFileUploadAuditEvent(
     schemeName = req.schemeDetails.schemeName,
-    schemeAdministratorName = req.schemeDetails.establishers.head.name,
+    schemeAdministratorOrPractitionerName = req.schemeDetails.establishers.head.name,
     psaOrPspId = req.pensionSchemeId.value,
     schemeTaxReference = req.schemeDetails.pstr,
     affinityGroup = if (req.minimalDetails.organisationName.nonEmpty) "Organisation" else "Individual",
-    credentialRole = if (req.pensionSchemeId.isPSP) "PSP" else "PSA",
+    credentialRole = if (req.pensionSchemeId.isPSP) PSP else PSA,
     taxYear = taxYear,
     uploadStatus,
     duration
@@ -160,11 +161,11 @@ class CheckMemberDetailsFileController @Inject()(
     implicit req: DataRequest[_]
   ) = PSRUpscanFileDownloadAuditEvent(
     schemeName = req.schemeDetails.schemeName,
-    schemeAdministratorName = req.schemeDetails.establishers.head.name,
+    schemeAdministratorOrPractitionerName = req.schemeDetails.establishers.head.name,
     psaOrPspId = req.pensionSchemeId.value,
     schemeTaxReference = req.schemeDetails.pstr,
     affinityGroup = if (req.minimalDetails.organisationName.nonEmpty) "Organisation" else "Individual",
-    credentialRole = if (req.pensionSchemeId.isPSP) "PSP" else "PSA",
+    credentialRole = if (req.pensionSchemeId.isPSP) PSP else PSA,
     taxYear = taxYear,
     downloadStatus = responseStatus match {
       case 200 => "Success"
@@ -197,11 +198,11 @@ class CheckMemberDetailsFileController @Inject()(
     implicit req: DataRequest[_]
   ) = PSRFileValidationAuditEvent(
     schemeName = req.schemeDetails.schemeName,
-    schemeAdministratorName = req.schemeDetails.establishers.head.name,
+    schemeAdministratorOrPractitionerName = req.schemeDetails.establishers.head.name,
     psaOrPspId = req.pensionSchemeId.value,
     schemeTaxReference = req.schemeDetails.pstr,
     affinityGroup = if (req.minimalDetails.organisationName.nonEmpty) "Organisation" else "Individual",
-    credentialRole = if (req.pensionSchemeId.isPSP) "PSP" else "PSA",
+    credentialRole = if (req.pensionSchemeId.isPSP) PSP else PSA,
     taxYear = taxYear,
     validationCheckStatus = outcome._1 match {
       case _: UploadSuccess => "Success"

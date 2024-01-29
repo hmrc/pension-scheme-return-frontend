@@ -16,6 +16,7 @@
 
 package services
 
+import config.Constants.{PSA, PSP}
 import config.FrontendAppConfig
 import controllers.TestValues
 import models.audit.PSRStartAuditEvent
@@ -48,7 +49,7 @@ class AuditServiceSpec extends BaseSpec with TestValues {
   }
 
   "AuditService" - {
-    "PSRStartAuditEvent" in {
+    "PSRStartAuditEvent for PSA" in {
 
       val captor: ArgumentCaptor[DataEvent] = ArgumentCaptor.forClass(classOf[DataEvent])
 
@@ -61,7 +62,7 @@ class AuditServiceSpec extends BaseSpec with TestValues {
         psaId.value,
         pstr,
         "testAffinity",
-        "testCredentialRole",
+        PSA,
         dateRange,
         1,
         2,
@@ -73,11 +74,52 @@ class AuditServiceSpec extends BaseSpec with TestValues {
       val dataEvent = captor.getValue
       val expectedDataEvent = Map(
         "SchemeName" -> schemeName,
-        "SchemeAdministratorOrPractitionerName" -> "testAdminName",
-        "PensionSchemeAdministratorOrPensionSchemePractitionerId" -> psaId.value,
+        "SchemeAdministratorName" -> "testAdminName",
+        "PensionSchemeAdministratorId" -> psaId.value,
         "PensionSchemeTaxReference" -> pstr,
         "AffinityGroup" -> "testAffinity",
-        "CredentialRole(PSA/PSP)" -> "testCredentialRole",
+        "CredentialRole(PSA/PSP)" -> PSA,
+        "TaxYear" -> s"${dateRange.from.getYear}-${dateRange.to.getYear}",
+        "HowManyMembers" -> "1",
+        "HowManyDeferredMembers" -> "2",
+        "HowManyPensionerMembers" -> "3"
+      )
+
+      dataEvent.auditSource mustEqual testAppName
+      dataEvent.auditType mustEqual "PensionSchemeReturnStart"
+      dataEvent.detail mustEqual expectedDataEvent
+    }
+
+    "PSRStartAuditEvent for PSP" in {
+
+      val captor: ArgumentCaptor[DataEvent] = ArgumentCaptor.forClass(classOf[DataEvent])
+
+      when(mockAuditConnector.sendEvent(captor.capture())(any(), any()))
+        .thenReturn(Future.successful(AuditResult.Success))
+
+      val auditEvent = PSRStartAuditEvent(
+        schemeName,
+        "testAdminName",
+        pspId.value,
+        pstr,
+        "testAffinity",
+        PSP,
+        dateRange,
+        1,
+        2,
+        3
+      )
+
+      service.sendEvent(auditEvent).futureValue
+
+      val dataEvent = captor.getValue
+      val expectedDataEvent = Map(
+        "SchemeName" -> schemeName,
+        "SchemePractitionerName" -> "testAdminName",
+        "PensionSchemePractitionerId" -> pspId.value,
+        "PensionSchemeTaxReference" -> pstr,
+        "AffinityGroup" -> "testAffinity",
+        "CredentialRole(PSA/PSP)" -> PSP,
         "TaxYear" -> s"${dateRange.from.getYear}-${dateRange.to.getYear}",
         "HowManyMembers" -> "1",
         "HowManyDeferredMembers" -> "2",

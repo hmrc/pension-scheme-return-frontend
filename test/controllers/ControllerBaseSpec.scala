@@ -104,6 +104,7 @@ trait TestValues {
   val reference: Reference = Reference("test-ref")
   val uploadFileName = "test-file-name"
   val psaId: PsaId = PsaId("testPSAId")
+  val pspId: PsaId = PsaId("testPSPId")
   val individualName = "testIndividualName"
   val nino: Nino = ninoGen.sample.get
   val noninoReason: String = "reason"
