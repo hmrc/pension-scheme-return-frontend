@@ -29,6 +29,7 @@ import pages.nonsipp.accountingperiod.AccountingPeriods
 import pages.nonsipp.employercontributions.EmployerContributionsSectionStatus
 import pages.nonsipp.membercontributions.MemberContributionsListPage
 import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsNinoPages, MembersDetailsPages, NoNinoPages}
+import pages.nonsipp.memberpensionpayments.PensionPaymentsJourneyStatus
 import pages.nonsipp.memberreceivedpcls.PclsMemberListPage
 import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsJourneyStatus
 import pages.nonsipp.membertransferout.TransfersOutJourneyStatus
@@ -298,6 +299,14 @@ object TaskListController {
           case SectionStatus.Completed => TaskListStatus.Completed
         }
 
+    val pensionPaymentsStatus: TaskListStatus =
+      userAnswers
+        .get(PensionPaymentsJourneyStatus(srn))
+        .fold[TaskListStatus](TaskListStatus.NotStarted) {
+          case SectionStatus.InProgress => TaskListStatus.InProgress
+          case SectionStatus.Completed => TaskListStatus.Completed
+        }
+
     TaskListSectionViewModel(
       s"$prefix.title",
       TaskListItemViewModel(
@@ -356,12 +365,12 @@ object TaskListController {
       ),
       TaskListItemViewModel(
         LinkMessage(
-          messageKey(prefix, "payments.title", UnableToStart),
+          messageKey(prefix, "payments.title", pensionPaymentsStatus),
           controllers.nonsipp.memberpensionpayments.routes.PensionPaymentsReceivedController
             .onPageLoad(srn, NormalMode)
             .url
         ),
-        NotStarted
+        pensionPaymentsStatus
       ),
       TaskListItemViewModel(
         LinkMessage(

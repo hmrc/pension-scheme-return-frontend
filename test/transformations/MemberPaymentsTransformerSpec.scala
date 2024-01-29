@@ -31,6 +31,12 @@ import pages.nonsipp.employercontributions._
 import pages.nonsipp.membercontributions._
 import pages.nonsipp.memberdetails._
 import pages.nonsipp.memberpayments._
+import pages.nonsipp.memberpensionpayments.{
+  MemberPensionPaymentsListPage,
+  PensionPaymentsJourneyStatus,
+  PensionPaymentsReceivedPage,
+  TotalAmountPensionPaymentsPage
+}
 import pages.nonsipp.memberreceivedpcls._
 import pages.nonsipp.membersurrenderedbenefits._
 import pages.nonsipp.membertransferout._
@@ -96,7 +102,8 @@ class MemberPaymentsTransformerSpec
             dateOfSurrender = LocalDate.of(2022, 12, 12),
             surrenderReason = "some reason"
           )
-        )
+        ),
+        pensionAmountReceived = Some(12.34)
       )
     ),
     employerContributionsCompleted = true,
@@ -106,7 +113,8 @@ class MemberPaymentsTransformerSpec
     unallocatedContribAmount = Some(money.value),
     memberContributionMade = true,
     lumpSumReceived = true,
-    benefitsSurrenderedDetails = SectionDetails(made = true, completed = true)
+    benefitsSurrenderedDetails = SectionDetails(made = true, completed = true),
+    pensionReceived = true
   )
 
   private val index = refineMV[Max300.Refined](1)
@@ -163,6 +171,11 @@ class MemberPaymentsTransformerSpec
     .unsafeSet(SurrenderedBenefitsAmountPage(srn, index), Money(12.34))
     .unsafeSet(WhenDidMemberSurrenderBenefitsPage(srn, index), LocalDate.of(2022, 12, 12))
     .unsafeSet(WhyDidMemberSurrenderBenefitsPage(srn, index), "some reason")
+    // pension payments
+    .unsafeSet(PensionPaymentsReceivedPage(srn), true)
+    .unsafeSet(TotalAmountPensionPaymentsPage(srn, index), Money(12.34))
+    .unsafeSet(PensionPaymentsJourneyStatus(srn), SectionStatus.Completed)
+    .unsafeSet(MemberPensionPaymentsListPage(srn), true)
 
   "MemberPaymentsTransformer - To Etmp" - {
     "should return empty List when userAnswer is empty" in {

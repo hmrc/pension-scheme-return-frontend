@@ -32,6 +32,12 @@ import pages.nonsipp.membercontributions.{
 import pages.nonsipp.memberdetails.MembersDetailsPages._
 import pages.nonsipp.memberdetails._
 import pages.nonsipp.memberpayments.{UnallocatedEmployerAmountPage, UnallocatedEmployerContributionsPage}
+import pages.nonsipp.memberpensionpayments.{
+  MemberPensionPaymentsListPage,
+  PensionPaymentsJourneyStatus,
+  PensionPaymentsReceivedPage,
+  TotalAmountPensionPaymentsPage
+}
 import pages.nonsipp.memberreceivedpcls.{
   PclsMemberListPage,
   PensionCommencementLumpSumAmountPage,
@@ -41,6 +47,7 @@ import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsJourneyStatus
 import pages.nonsipp.membertransferout.TransfersOutJourneyStatus
 import pages.nonsipp.receivetransfer.TransfersInJourneyStatus
 import uk.gov.hmrc.domain.Nino
+import utils.WithName
 import viewmodels.models.{MemberState, SectionCompleted, SectionStatus}
 
 import javax.inject.Inject
@@ -79,7 +86,8 @@ class MemberPaymentsTransformer @Inject()(
           totalContributions = userAnswers.get(TotalMemberContributionPage(srn, index)).map(_.value),
           memberLumpSumReceived = buildMemberLumpSumReceived(srn, index, userAnswers),
           transfersOut = transfersOut,
-          benefitsSurrendered = benefitsSurrendered
+          benefitsSurrendered = benefitsSurrendered,
+          pensionAmountReceived = userAnswers.get(TotalAmountPensionPaymentsPage(srn, index)).map(_.value)
         )
     }
 
@@ -114,6 +122,7 @@ class MemberPaymentsTransformer @Inject()(
             unallocatedContribAmount = userAnswers.get(UnallocatedEmployerAmountPage(srn)).map(_.value),
             memberContributionMade = userAnswers.get(MemberContributionsPage(srn)).getOrElse(false),
             lumpSumReceived = userAnswers.get(PensionCommencementLumpSumPage(srn)).getOrElse(false),
+            pensionReceived = userAnswers.get(PensionPaymentsReceivedPage(srn)).getOrElse(false),
             benefitsSurrenderedDetails = benefitsSurrenderedDetails(userAnswers)
           )
         )
@@ -167,6 +176,8 @@ class MemberPaymentsTransformer @Inject()(
                     benefitsSurrendered,
                     memberPayments.benefitsSurrenderedDetails
                   )
+              ) ++ memberDetails.pensionAmountReceived.fold(noUpdate)(
+                pensionAmountReceivedPages(srn, index, _)
               )
 
             pages.foldLeft(ua)((userAnswers, f) => f(userAnswers))
@@ -177,7 +188,17 @@ class MemberPaymentsTransformer @Inject()(
       emptyMemberLumpSumReceivedNotExist = !memberPayments.memberDetails.exists(_.memberLumpSumReceived.isEmpty)
       ua5 <- ua4.set(PclsMemberListPage(srn), emptyMemberLumpSumReceivedNotExist)
 
-    } yield ua5
+      ua6 <- pensionAmountReceivedStatus(memberPayments).fold(Try(ua5))(
+        status =>
+          ua5
+            .set(PensionPaymentsJourneyStatus(srn), status)
+            .set(MemberPensionPaymentsListPage(srn), if (status.isCompleted) true else false)
+      )
+
+      pensionPaymentsReceived = !memberPayments.memberDetails.forall(_.pensionAmountReceived.contains(0))
+
+      ua7 <- ua6.set(PensionPaymentsReceivedPage(srn), pensionPaymentsReceived)
+    } yield ua7
 
   private def buildMemberPersonalDetails(
     srn: Srn,
@@ -336,6 +357,29 @@ class MemberPaymentsTransformer @Inject()(
           .getOrElse(ua),
       _.set(PensionCommencementLumpSumPage(srn), lumpSumReceived)
     )
+
+  private def pensionAmountReceivedPages(
+    srn: Srn,
+    index: Max300,
+    pensionReceived: Double
+  ): List[Try[UserAnswers] => Try[UserAnswers]] =
+    List(
+      _.set(TotalAmountPensionPaymentsPage(srn, index), Money(pensionReceived))
+    )
+
+  private def pensionAmountReceivedStatus(memberPayments: MemberPayments): Option[SectionStatus] = {
+    val pensionAmountReceived = memberPayments.memberDetails.map(_.pensionAmountReceived)
+
+    if (pensionAmountReceived.nonEmpty) {
+      if (pensionAmountReceived.exists(_.exists(_ == 0))) {
+        Some(SectionStatus.InProgress)
+      } else {
+        Some(SectionStatus.Completed)
+      }
+    } else {
+      None
+    }
+  }
 
   private def toEmployerType(
     srn: Srn,

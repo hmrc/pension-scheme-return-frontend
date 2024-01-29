@@ -16,18 +16,20 @@
 
 package controllers.nonsipp.memberpensionpayments
 
+import config.Refined.Max300
+import controllers.PSRController
 import controllers.actions._
 import controllers.nonsipp.memberpensionpayments.PensionPaymentsReceivedController._
 import forms.YesNoPageFormProvider
-import models.Mode
 import models.SchemeId.Srn
+import models.{Mode, Money, UserAnswers}
 import navigation.Navigator
-import pages.nonsipp.memberpensionpayments.PensionPaymentsReceivedPage
+import pages.nonsipp.memberdetails.MembersDetailsPages._
+import pages.nonsipp.memberpensionpayments.{PensionPaymentsReceivedPage, TotalAmountPensionPaymentsPage}
 import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import services.{PsrSubmissionService, SaveService}
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
@@ -43,10 +45,10 @@ class PensionPaymentsReceivedController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   formProvider: YesNoPageFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: YesNoPageView
+  view: YesNoPageView,
+  psrSubmissionService: PsrSubmissionService
 )(implicit ec: ExecutionContext)
-    extends FrontendBaseController
-    with I18nSupport {
+    extends PSRController {
 
   private val form = PensionPaymentsReceivedController.form(formProvider)
 
@@ -62,10 +64,28 @@ class PensionPaymentsReceivedController @Inject()(
         formWithErrors =>
           Future.successful(BadRequest(view(formWithErrors, viewModel(srn, request.schemeDetails.schemeName, mode)))),
         value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(PensionPaymentsReceivedPage(srn), value))
-            _ <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage(PensionPaymentsReceivedPage(srn), mode, updatedAnswers))
+          if (value) {
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(PensionPaymentsReceivedPage(srn), value))
+              _ <- saveService.save(updatedAnswers)
+            } yield Redirect(navigator.nextPage(PensionPaymentsReceivedPage(srn), mode, updatedAnswers))
+          } else {
+            val pensionPaymentsPages: List[UserAnswers.Compose] = request.userAnswers
+              .membersDetails(srn)
+              .zipWithRefinedIndex[Max300.Refined]
+              .map {
+                case (index, _) => _.set(TotalAmountPensionPaymentsPage(srn, index), Money(0))
+              }
+            for {
+              updatedAnswers <- Future.fromTry(
+                request.userAnswers.set(PensionPaymentsReceivedPage(srn), value).compose(pensionPaymentsPages)
+              )
+              _ <- saveService.save(updatedAnswers)
+              submissionResult <- psrSubmissionService.submitPsrDetails(srn, updatedAnswers)
+            } yield submissionResult.getOrRecoverJourney(
+              _ => Redirect(navigator.nextPage(PensionPaymentsReceivedPage(srn), mode, updatedAnswers))
+            )
+          }
       )
   }
 }

@@ -77,6 +77,8 @@ final case class UserAnswers(
     }
   }
 
+  def compose(c: List[UserAnswers.Compose]): Try[UserAnswers] = c.foldLeft(Try(this))((ua, next) => next(ua))
+
   def remove(page: Removable[_]): Try[UserAnswers] =
     page
       .cleanup(None, self)
@@ -117,6 +119,8 @@ final case class UserAnswers(
 }
 
 object UserAnswers {
+
+  type Compose = Try[UserAnswers] => Try[UserAnswers]
 
   def compose(
     fs: (UserAnswers => Try[UserAnswers])*

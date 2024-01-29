@@ -22,20 +22,38 @@ import controllers.nonsipp.memberpensionpayments.TotalAmountPensionPaymentsContr
 import eu.timepit.refined.refineMV
 import forms.MoneyFormProvider
 import models.NormalMode
+import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import pages.nonsipp.memberpensionpayments.TotalAmountPensionPaymentsPage
+import play.api.inject.bind
+import play.api.inject.guice.GuiceableModule
+import services.PsrSubmissionService
 import views.html.MoneyView
+
+import scala.concurrent.Future
 
 class TotalAmountPensionPaymentsControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[Max300.Refined](1)
   private val userAnswers = defaultUserAnswers.unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
 
+  private val mockPSRSubmissionService = mock[PsrSubmissionService]
+
   private lazy val onPageLoad =
     routes.TotalAmountPensionPaymentsController.onPageLoad(srn, index, NormalMode)
 
   private lazy val onSubmit =
     routes.TotalAmountPensionPaymentsController.onSubmit(srn, index, NormalMode)
+
+  override protected val additionalBindings: List[GuiceableModule] = List(
+    bind[PsrSubmissionService].toInstance(mockPSRSubmissionService)
+  )
+
+  override protected def beforeEach(): Unit = {
+    reset(mockPSRSubmissionService)
+    when(mockPSRSubmissionService.submitPsrDetails(any(), any())(any(), any(), any()))
+      .thenReturn(Future.successful(Some(())))
+  }
 
   "TotalAmountPensionPaymentsController" - {
 
