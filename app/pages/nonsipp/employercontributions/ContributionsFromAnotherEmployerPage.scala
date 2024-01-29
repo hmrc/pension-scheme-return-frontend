@@ -42,16 +42,14 @@ case class ContributionsFromAnotherEmployerPage(srn: Srn, index: Max300, seconda
         userAnswers
           .set(EmployerContributionsSectionStatus(srn), SectionStatus.InProgress)
           .flatMap(_.remove(EmployerContributionsMemberListPage(srn)))
-      case (Some(x), Some(y)) =>
-        if (x != y) {
-          // value updated
-          userAnswers
-            .set(EmployerContributionsSectionStatus(srn), SectionStatus.InProgress)
-            .flatMap(_.remove(EmployerContributionsMemberListPage(srn)))
-        } else {
-          // value stays the same
-          Try(userAnswers)
-        }
+      case (Some(x), Some(y)) if x == y =>
+        // value stays the same
+        Try(userAnswers)
+      case (Some(x), Some(y)) if x != y =>
+        // value updated
+        userAnswers
+          .set(EmployerContributionsSectionStatus(srn), SectionStatus.InProgress)
+          .flatMap(_.remove(EmployerContributionsMemberListPage(srn)))
       case _ => Try(userAnswers)
     }
 

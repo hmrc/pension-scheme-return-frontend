@@ -69,7 +69,8 @@ case class EmployerNamePage(srn: Srn, memberIndex: Max300, index: Max50) extends
       EmployerCompanyCrnPage(srn, memberIndex, index),
       PartnershipEmployerUtrPage(srn, memberIndex, index),
       OtherEmployeeDescriptionPage(srn, memberIndex, index),
-      ContributionsFromAnotherEmployerPage(srn, memberIndex, index)
+      ContributionsFromAnotherEmployerPage(srn, memberIndex, index),
+      EmployerContributionsCompleted(srn, memberIndex, index)
     )
     if (index.value == 1) list :+ EmployerContributionsPage(srn) else list
   }

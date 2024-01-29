@@ -94,9 +94,7 @@ class RemoveEmployerContributionsController @Inject()(
               for {
                 updatedAnswers <- Future.fromTry(
                   request.userAnswers
-                    .removePages(
-                      journeyPages(srn, memberIndex, index) :+ EmployerContributionsCompleted(srn, memberIndex, index)
-                    )
+                    .remove(EmployerNamePage(srn, memberIndex, index))
                 )
                 _ <- saveService.save(updatedAnswers)
                 submissionResult <- psrSubmissionService.submitPsrDetails(srn, updatedAnswers)
