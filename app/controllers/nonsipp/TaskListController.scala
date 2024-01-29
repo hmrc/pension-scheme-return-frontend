@@ -251,7 +251,7 @@ object TaskListController {
     val prefix = "nonsipp.tasklist.memberpayments"
 
     // change to check if members section is complete to start
-    val employerContributionStatusAndLink = getEmployerContributionStatusAndLink(userAnswers, srn)
+    val (employerContributionStatus, employerContributionLink) = getEmployerContributionStatusAndLink(userAnswers, srn)
 
     val transferInStatus: TaskListStatus =
       userAnswers
@@ -296,10 +296,10 @@ object TaskListController {
       s"$prefix.title",
       TaskListItemViewModel(
         LinkMessage(
-          messageKey(prefix, "employercontributions.title", employerContributionStatusAndLink._1),
-          employerContributionStatusAndLink._2
+          messageKey(prefix, "employercontributions.title", employerContributionStatus),
+          employerContributionLink
         ),
-        employerContributionStatusAndLink._1
+        employerContributionStatus
       ),
       TaskListItemViewModel(
         LinkMessage(

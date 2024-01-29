@@ -115,7 +115,6 @@ class MemberPaymentsTransformerSpec
     .unsafeSet(DoesMemberHaveNinoPage(srn, index), true)
     .unsafeSet(MemberDetailsNinoPage(srn, index), nino)
     .unsafeSet(MemberStatus(srn, index), MemberState.Active)
-
     .unsafeSet(EmployerContributionsPage(srn), true)
     .unsafeSet(EmployerNamePage(srn, index, employerContribsIndex), employerName)
     .unsafeSet(EmployerTypeOfBusinessPage(srn, index, employerContribsIndex), IdentityType.UKCompany)
@@ -123,7 +122,6 @@ class MemberPaymentsTransformerSpec
     .unsafeSet(TotalEmployerContributionPage(srn, index, employerContribsIndex), money)
     .unsafeSet(EmployerContributionsSectionStatus(srn), SectionStatus.Completed)
     .unsafeSet(EmployerContributionsCompleted(srn, index, employerContribsIndex), SectionCompleted)
-
     .unsafeSet(UnallocatedEmployerContributionsPage(srn), true)
     .unsafeSet(UnallocatedEmployerAmountPage(srn), money)
     .unsafeSet(EmployerContributionsMemberListPage(srn), true)

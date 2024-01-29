@@ -102,7 +102,7 @@ object EmployerContributionsNavigator extends JourneyNavigator {
           controllers.nonsipp.employercontributions.routes.EmployerContributionsController
             .onPageLoad(srn, NormalMode)
         case Some(names) =>
-          if (!names.values.exists(!_.isEmpty)) {
+          if (!names.values.exists(_.nonEmpty)) {
             controllers.nonsipp.employercontributions.routes.EmployerContributionsController
               .onPageLoad(srn, NormalMode)
           } else {
