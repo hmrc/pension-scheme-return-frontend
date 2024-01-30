@@ -64,8 +64,8 @@ class SharesFromConnectedPartyController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      request.usingAnswer(WhyDoesSchemeHoldSharesPage(srn, index)).sync { typeOfShare =>
-        if (typeOfShare.name.equals("02")) {
+      request.usingAnswer(WhyDoesSchemeHoldSharesPage(srn, index)).sync { schemeHoldShare =>
+        if (!schemeHoldShare.name.equals("01")) {
           request
             .usingAnswer(CompanyNameRelatedSharesPage(srn, index))
             .sync { companyName =>
@@ -73,13 +73,13 @@ class SharesFromConnectedPartyController @Inject()(
                 view(
                   form.fromUserAnswers(SharesFromConnectedPartyPage(srn, index)),
                   SharesFromConnectedPartyController
-                    .viewModel(srn, index, "", companyName, typeOfShare, config.urls.incomeTaxAct, mode)
+                    .viewModel(srn, index, "", companyName, schemeHoldShare, config.urls.incomeTaxAct, mode)
                 )
               )
             }
 
         } else {
-          request.usingAnswer(WhyDoesSchemeHoldSharesPage(srn, index)).sync { typeOfShare =>
+          request.usingAnswer(WhyDoesSchemeHoldSharesPage(srn, index)).sync { schemeHoldShare =>
             recipientName(srn, index)
               .map { recipientName =>
                 Ok(
@@ -91,7 +91,7 @@ class SharesFromConnectedPartyController @Inject()(
                         index,
                         recipientName,
                         "",
-                        typeOfShare,
+                        schemeHoldShare,
                         config.urls.incomeTaxAct,
                         mode
                       )
@@ -108,7 +108,7 @@ class SharesFromConnectedPartyController @Inject()(
 
   def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
-      request.usingAnswer(WhyDoesSchemeHoldSharesPage(srn, index)).async { typeOfShare =>
+      request.usingAnswer(WhyDoesSchemeHoldSharesPage(srn, index)).async { schemeHoldShare =>
         request.usingAnswer(CompanyNameRelatedSharesPage(srn, index)).async { companyName =>
           form
             .bindFromRequest()
@@ -126,7 +126,7 @@ class SharesFromConnectedPartyController @Inject()(
                               index,
                               recipientName,
                               companyName,
-                              typeOfShare,
+                              schemeHoldShare,
                               config.urls.incomeTaxAct,
                               mode
                             )
@@ -172,11 +172,11 @@ object SharesFromConnectedPartyController {
     index: Max5000,
     individualName: String,
     companyName: String,
-    typeOfShare: SchemeHoldShare,
+    schemeHoldShare: SchemeHoldShare,
     incomeTaxAct: String,
     mode: Mode
   ): FormPageViewModel[YesNoPageViewModel] =
-    if (typeOfShare.name.equals("01")) {
+    if (schemeHoldShare.name.equals("01")) {
 
       YesNoPageViewModel(
         Message("sharesFromConnectedParty.acquisitionTitle"),
@@ -206,8 +206,8 @@ object SharesFromConnectedPartyController {
       )
 
     } else {
-      (typeOfShare.name.equals("02"))
-      (typeOfShare.name.equals("03"))
+      (schemeHoldShare.name.equals("02"))
+      (schemeHoldShare.name.equals("03"))
       YesNoPageViewModel(
         Message("sharesFromConnectedParty.title1"),
         Message("sharesFromConnectedParty.heading1", companyName),
