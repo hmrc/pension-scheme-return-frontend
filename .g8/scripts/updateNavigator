@@ -29,6 +29,10 @@ receivetransfer)
   NAV_FILE="../app/navigation/nonsipp/ReceiveTransferNavigator.scala"
   NAV_SPEC="../test/navigation/nonsipp/ReceiveTransferNavigatorSpec.scala"
   ;;
+shares)
+  NAV_FILE="../app/navigation/nonsipp/SharesNavigator.scala"
+  NAV_SPEC="../test/navigation/nonsipp/SharesNavigatorSpec.scala"
+  ;;
 *)
   NAV_FILE=
   NAV_SPEC=

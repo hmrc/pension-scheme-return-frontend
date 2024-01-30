@@ -82,3 +82,8 @@ GET         /:srn/shares-from-connected-party/:index                           c
 POST        /:srn/shares-from-connected-party/:index                            controllers.nonsipp.shares.SharesFromConnectedPartyController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
 GET         /:srn/change-shares-from-connected-party/:index                    controllers.nonsipp.shares.SharesFromConnectedPartyController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 POST        /:srn/change-shares-from-connected-party/:index                     controllers.nonsipp.shares.SharesFromConnectedPartyController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET        /:srn/shares-independent-valuation/:index                 controllers.nonsipp.shares.SharesIndependentValuationController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST       /:srn/shares-independent-valuation/:index                 controllers.nonsipp.shares.SharesIndependentValuationController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET        /:srn/change-shares-independent-valuation/:index          controllers.nonsipp.shares.SharesIndependentValuationController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST       /:srn/change-shares-independent-valuation/:index          controllers.nonsipp.shares.SharesIndependentValuationController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)

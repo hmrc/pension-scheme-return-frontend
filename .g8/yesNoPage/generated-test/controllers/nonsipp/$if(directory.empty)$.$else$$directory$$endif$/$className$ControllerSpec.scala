@@ -15,17 +15,26 @@ import forms.YesNoPageFormProvider
 import views.html.YesNoPageView
 import controllers.ControllerBaseSpec
 import $className;format="cap"$Controller._
+import scala.concurrent.Future
+
 $if(directory.empty)$
-import pages.nonsipp.$className$Page
+import pages.nonsipp.$className;format="cap"$Page
 $else$
 import pages.nonsipp.$directory$.$className$Page
 $endif$
+
 $if(!index.empty)$
 import config.Refined._
 import eu.timepit.refined.refineMV
 $endif$
 
-import scala.concurrent.Future
+$if(!requiredPage.empty)$
+  $if(directory.empty)$
+  import pages.nonsipp.$requiredPage$
+  $else$
+  import pages.nonsipp.$directory$.$requiredPage$
+  $endif$
+$endif$
 
 class $className;format="cap"$ControllerSpec extends ControllerBaseSpec {
 
@@ -45,15 +54,19 @@ class $className;format="cap"$ControllerSpec extends ControllerBaseSpec {
   $endif$
   $endif$
 
+  $if(!requiredPage.empty)$
+  private val userAnswers = defaultUserAnswers.unsafeSet($requiredPage$(srn, index), ???)
+  $endif$
+
   "$className;format="cap"$Controller" - {
 
     $! Generic (change view and form value) !$
     act like renderView(onPageLoad$if(!requiredPage.empty)$, userAnswers$endif$) { implicit app => implicit request =>
-      injected[YesNoPageView].apply(form(injected[YesNoPageFormProvider]), viewModel(srn, $if(!index.empty)$index, $endif$$if(!secondaryIndex.empty)$secondaryIndex, $endif$NormalMode))
+      injected[YesNoPageView].apply(form(injected[YesNoPageFormProvider]), viewModel(srn, $if(!requiredPage.empty)$???, $endif$$if(!index.empty)$index, $endif$$if(!secondaryIndex.empty)$secondaryIndex, $endif$NormalMode))
     }
 
     act like renderPrePopView(onPageLoad, $className;format="cap"$Page(srn$if(!index.empty)$, index$endif$$if(!secondaryIndex.empty)$, secondaryIndex$endif$), true$if(!requiredPage.empty)$, userAnswers$endif$) { implicit app => implicit request =>
-      injected[YesNoPageView].apply(form(injected[YesNoPageFormProvider]).fill(true), viewModel(srn, $if(!index.empty)$index, $endif$$if(!secondaryIndex.empty)$secondaryIndex, $endif$NormalMode))
+      injected[YesNoPageView].apply(form(injected[YesNoPageFormProvider]).fill(true), viewModel(srn, $if(!requiredPage.empty)$???, $endif$$if(!index.empty)$index, $endif$$if(!secondaryIndex.empty)$secondaryIndex, $endif$NormalMode))
     }
     $! Generic end !$
 
