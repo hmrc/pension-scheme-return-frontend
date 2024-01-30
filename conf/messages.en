@@ -797,6 +797,7 @@ nonsipp.tasklist.otherassets.add.title = Add other assets
 nonsipp.tasklist.otherassets.change.title = Change other assets
 nonsipp.tasklist.declaration.title = Declaration
 nonsipp.tasklist.declaration.incomplete = You must complete every section before you can declare.
+nonsipp.tasklist.declaration.complete = Read declaration and send details to HMRC
 nonsipp.tasklist.declaration.saveandreturn = Save and return to Managing Pension Schemes
 
 totalValueQuotedShares.title = What was the total value of all quoted shares held by the scheme on {0}, in pounds and pence?

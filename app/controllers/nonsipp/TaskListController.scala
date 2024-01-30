@@ -26,10 +26,10 @@ import models.requests.DataRequest
 import models.{DateRange, ManualOrUpload, NormalMode, PensionSchemeId, UserAnswers}
 import pages.nonsipp.CheckReturnDatesPage
 import pages.nonsipp.accountingperiod.AccountingPeriods
-import pages.nonsipp.employercontributions.EmployerContributionsSectionStatus
 import pages.nonsipp.membercontributions.MemberContributionsListPage
 import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsNinoPages, MembersDetailsPages, NoNinoPages}
-import pages.nonsipp.memberpensionpayments.PensionPaymentsJourneyStatus
+import pages.nonsipp.memberpayments.UnallocatedEmployerContributionsPage
+import pages.nonsipp.memberpensionpayments.{PensionPaymentsJourneyStatus, PensionPaymentsReceivedPage}
 import pages.nonsipp.memberreceivedpcls.PclsMemberListPage
 import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsJourneyStatus
 import pages.nonsipp.membertransferout.TransfersOutJourneyStatus
@@ -497,14 +497,34 @@ object TaskListController {
     )
   }
 
-  private val declarationSection = {
+  private def declarationSection(srn: Srn, isPsp: Boolean, isLinkActive: Boolean): TaskListSectionViewModel = {
     val prefix = "nonsipp.tasklist.declaration"
 
     TaskListSectionViewModel(
       s"$prefix.title",
-      Message(s"$prefix.incomplete"),
+      if (isLinkActive) {
+        val psaOrPspDeclarationUrl =
+          if (isPsp) {
+            controllers.nonsipp.declaration.routes.PspDeclarationController.onPageLoad(srn).url
+          } else {
+            controllers.nonsipp.declaration.routes.PsaDeclarationController.onPageLoad(srn).url
+          }
+        LinkMessage(
+          s"$prefix.complete",
+          psaOrPspDeclarationUrl
+        )
+      } else {
+        Message(s"$prefix.incomplete")
+      },
       LinkMessage(s"$prefix.saveandreturn", controllers.routes.UnauthorisedController.onPageLoad().url)
     )
+  }
+
+  private def evaluateCompletedTotalTuple(sections: List[TaskListSectionViewModel]): (Int, Int) = {
+    val items = sections.flatMap(_.items.fold(_ => Nil, _.toList))
+    val numberOfCompleted = items.count(_.status == Completed)
+    val numberOfTotal = items.length
+    (numberOfCompleted, numberOfTotal)
   }
 
   def viewModel(
@@ -516,7 +536,7 @@ object TaskListController {
     pensionSchemeId: PensionSchemeId
   ): PageViewModel[TaskListViewModel] = {
 
-    val viewModel = TaskListViewModel(
+    val sectionListWithoutDeclaration = List(
       schemeDetailsSection(srn, schemeName, userAnswers, pensionSchemeId),
       membersSection(srn, schemeName, userAnswers),
       memberPaymentsSection(srn, userAnswers),
@@ -524,13 +544,40 @@ object TaskListController {
       sharesSection(srn, userAnswers),
       landOrPropertySection(srn, userAnswers),
       bondsSection(srn, userAnswers),
-      otherAssetsSection(srn, userAnswers),
-      declarationSection
+      otherAssetsSection(srn, userAnswers)
     )
 
-    val items = viewModel.sections.toList.flatMap(_.items.fold(_ => Nil, _.toList))
-    val completed = items.count(_.status == Completed)
-    val total = items.length
+    val (numberOfCompletedWithoutDeclaration, numberOfTotalWithoutDeclaration) = evaluateCompletedTotalTuple(
+      sectionListWithoutDeclaration
+    )
+
+    // TODO:
+    //  isUnallocatedEmployerAnsweredAsNo and isPensionPaymentsReceivedAnsweredAsNo must be removed once tasklist status logic implemented for them properly.
+    //  Now we're just checking whether user selected no in the beginning of the journey (using shortcut).
+    val isUnallocatedEmployerAnsweredAsNo = userAnswers
+      .get(UnallocatedEmployerContributionsPage(srn))
+      .fold(0)(x => if (x) 0 else 1)
+
+    val isPensionPaymentsReceivedAnsweredAsNo = userAnswers
+      .get(PensionPaymentsReceivedPage(srn))
+      .fold(0)(x => if (x) 0 else 1)
+
+    val numberOfCompletedPages = numberOfCompletedWithoutDeclaration + isUnallocatedEmployerAnsweredAsNo + isPensionPaymentsReceivedAnsweredAsNo
+    val isLinkActive = numberOfTotalWithoutDeclaration == numberOfCompletedPages
+
+    val declarationSectionViewModel =
+      declarationSection(
+        srn,
+        pensionSchemeId.isPSP,
+        isLinkActive
+      )
+
+    val viewModel = TaskListViewModel(
+      sectionListWithoutDeclaration.head,
+      sectionListWithoutDeclaration.tail :+ declarationSectionViewModel: _*
+    )
+
+    val (numberOfCompleted, numberOfTotal) = evaluateCompletedTotalTuple(viewModel.sections.toList)
 
     PageViewModel(
       Message("nonsipp.tasklist.title", startDate.show, endDate.show),
@@ -538,7 +585,7 @@ object TaskListController {
       viewModel
     ).withDescription(
       Heading2("nonsipp.tasklist.subheading") ++
-        ParagraphMessage(Message("nonsipp.tasklist.description", completed, total))
+        ParagraphMessage(Message("nonsipp.tasklist.description", numberOfCompleted, numberOfTotal))
     )
   }
 }
