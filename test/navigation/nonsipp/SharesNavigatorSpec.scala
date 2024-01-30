@@ -329,18 +329,6 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       )
     }
 
-//    "PartnershipRecipientUtrPage" - {
-//      act.like(
-//        normalmode
-//          .navigateToWithIndexAndSubject(
-//            index,
-//            subject,
-//            PartnershipRecipientUtrPage,
-//            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
-//          )
-//          .withName("go from partnership recipient Utr page to Unauthorised page")
-//      )
-//    }
 
     "PartnershipRecipientUtrPage" - {
       act.like(
@@ -416,18 +404,6 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       )
     }
 
-//    "CompanyRecipientCrnPage" - {
-//      act.like(
-//        normalmode
-//          .navigateToWithIndexAndSubject(
-//            index,
-//            subject,
-//            CompanyRecipientCrnPage,
-//            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
-//          )
-//          .withName("go from company recipient CRN page to Unauthorised page")
-//      )
-//    }
 
     "OtherRecipientDetailsPage" - {
 

@@ -18,12 +18,13 @@ package pages.nonsipp.employercontributions
 
 import config.Refined._
 import utils.RefinedUtils._
-
 import play.api.libs.json.JsPath
 import models.SchemeId.Srn
 import pages.QuestionPage
+import models.{Money, UserAnswers}
+import viewmodels.models.SectionStatus
 
-import models.Money
+import scala.util.Try
 
 case class TotalEmployerContributionPage(srn: Srn, index: Max300, secondaryIndex: Max50) extends QuestionPage[Money] {
 
@@ -31,6 +32,25 @@ case class TotalEmployerContributionPage(srn: Srn, index: Max300, secondaryIndex
     Paths.memberEmpContribution \ toString \ index.arrayIndex.toString \ secondaryIndex.arrayIndex.toString
 
   override def toString: String = "totalContribution"
+
+  override def cleanup(value: Option[Money], userAnswers: UserAnswers): Try[UserAnswers] =
+    (value, userAnswers.get(this)) match {
+      case (None, _) => Try(userAnswers) // delete handled by cleanup in EmployerNamePage
+      case (Some(_), None) =>
+        // create
+        userAnswers
+          .set(EmployerContributionsSectionStatus(srn), SectionStatus.InProgress)
+          .flatMap(_.remove(EmployerContributionsMemberListPage(srn)))
+      case (Some(x), Some(y)) if x == y =>
+        // update - no changes
+        Try(userAnswers)
+      case (Some(x), Some(y)) if x != y =>
+        // update
+        userAnswers
+          .set(EmployerContributionsSectionStatus(srn), SectionStatus.InProgress)
+          .flatMap(_.remove(EmployerContributionsMemberListPage(srn)))
+      case _ => Try(userAnswers)
+    }
 }
 
 case class TotalEmployerContributionPages(srn: Srn, index: Max300) extends QuestionPage[Map[String, Money]] {

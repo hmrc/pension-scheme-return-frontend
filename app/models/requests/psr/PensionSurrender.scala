@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package models.requests.psr
 
-import play.api.libs.json.{__, JsPath}
+import play.api.libs.json.{Format, Json}
 
-package object sharesdisposal {
+import java.time.LocalDate
 
-  object Paths {
-    val shares: JsPath = __ \ "shares"
-    val shareTransactions: JsPath = shares \ "shareTransactions"
-    val disposedSharesTransaction: JsPath = shareTransactions \ "disposedSharesTransaction"
-    val salesQuestions: JsPath = disposedSharesTransaction \ "salesQuestions"
-  }
+case class PensionSurrender(
+  totalSurrendered: Double,
+  dateOfSurrender: LocalDate,
+  surrenderReason: String
+)
 
+object PensionSurrender {
+  implicit val formats: Format[PensionSurrender] = Json.format[PensionSurrender]
 }

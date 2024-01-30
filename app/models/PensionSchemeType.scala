@@ -64,7 +64,7 @@ object PensionSchemeType {
         case (RegisteredPS.name, value) => Reads.pure(RegisteredPS(value))
         case (QualifyingRecognisedOverseasPS.name, value) => Reads.pure(QualifyingRecognisedOverseasPS(value))
         case (Other.name, value) => Reads.pure(Other(value))
-        case unknown => Reads.failed(s"Failed to read EmployerType with unknown pattern $unknown")
+        case unknown => Reads.failed(s"Failed to read PensionSchemeType with unknown pattern $unknown")
       }
 
   implicit val format: Format[PensionSchemeType] = Format(reads, writes)

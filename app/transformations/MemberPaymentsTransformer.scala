@@ -37,6 +37,7 @@ import pages.nonsipp.memberreceivedpcls.{
   PensionCommencementLumpSumAmountPage,
   PensionCommencementLumpSumPage
 }
+import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsJourneyStatus, SurrenderedBenefitsPage}
 import pages.nonsipp.membertransferout.TransfersOutJourneyStatus
 import pages.nonsipp.receivetransfer.TransfersInJourneyStatus
 import uk.gov.hmrc.domain.Nino
@@ -48,8 +49,11 @@ import scala.util.Try
 @Singleton()
 class MemberPaymentsTransformer @Inject()(
   transfersInTransformer: TransfersInTransformer,
-  transfersOutTransformer: TransfersOutTransformer
+  transfersOutTransformer: TransfersOutTransformer,
+  pensionSurrenderTransformer: PensionSurrenderTransformer
 ) extends Transformer {
+
+  private val noUpdate: List[Try[UserAnswers] => Try[UserAnswers]] = Nil
 
   def transformToEtmp(srn: Srn, userAnswers: UserAnswers): Option[MemberPayments] = {
 
@@ -67,15 +71,26 @@ class MemberPaymentsTransformer @Inject()(
           employerContributions <- buildEmployerContributions(srn, index, userAnswers)
           transfersIn <- transfersInTransformer.transformToEtmp(srn, index, userAnswers)
           transfersOut <- transfersOutTransformer.transformToEtmp(srn, index, userAnswers)
+          benefitsSurrendered = pensionSurrenderTransformer.transformToEtmp(srn, index, userAnswers)
         } yield MemberDetails(
           personalDetails = buildMemberPersonalDetails(srn, index, memberDetails, userAnswers),
           employerContributions = employerContributions,
           transfersIn = transfersIn,
           totalContributions = userAnswers.get(TotalMemberContributionPage(srn, index)).map(_.value),
           memberLumpSumReceived = buildMemberLumpSumReceived(srn, index, userAnswers),
-          transfersOut = transfersOut
+          transfersOut = transfersOut,
+          benefitsSurrendered = benefitsSurrendered
         )
     }
+
+    val benefitsSurrenderedDetails: UserAnswers => SectionDetails = ua =>
+      SectionDetails(
+        made = ua.get(SurrenderedBenefitsPage(srn)).getOrElse(false),
+        completed = ua.get(SurrenderedBenefitsJourneyStatus(srn)).exists {
+          case SectionStatus.InProgress => false
+          case SectionStatus.Completed => true
+        }
+      )
 
     memberDetails match {
       case Nil => None
@@ -98,7 +113,8 @@ class MemberPaymentsTransformer @Inject()(
             unallocatedContribsMade = userAnswers.get(UnallocatedEmployerContributionsPage(srn)).getOrElse(false),
             unallocatedContribAmount = userAnswers.get(UnallocatedEmployerAmountPage(srn)).map(_.value),
             memberContributionMade = userAnswers.get(MemberContributionsPage(srn)).getOrElse(false),
-            lumpSumReceived = userAnswers.get(PensionCommencementLumpSumPage(srn)).getOrElse(false)
+            lumpSumReceived = userAnswers.get(PensionCommencementLumpSumPage(srn)).getOrElse(false),
+            benefitsSurrenderedDetails = benefitsSurrenderedDetails(userAnswers)
           )
         )
     }
@@ -143,6 +159,14 @@ class MemberPaymentsTransformer @Inject()(
                 index,
                 memberPayments.lumpSumReceived,
                 memberDetails.memberLumpSumReceived
+              ) ++ memberDetails.benefitsSurrendered.fold(noUpdate)(
+                benefitsSurrendered =>
+                  pensionSurrenderTransformer.transformFromEtmp(
+                    srn,
+                    index,
+                    benefitsSurrendered,
+                    memberPayments.benefitsSurrenderedDetails
+                  )
               )
 
             pages.foldLeft(ua)((userAnswers, f) => f(userAnswers))

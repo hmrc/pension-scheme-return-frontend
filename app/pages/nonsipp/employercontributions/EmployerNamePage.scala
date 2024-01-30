@@ -24,6 +24,7 @@ import play.api.libs.json.JsPath
 import queries.Removable
 import utils.PageUtils.removePages
 import utils.RefinedUtils._
+import viewmodels.models.SectionStatus
 
 import scala.util.Try
 
@@ -36,29 +37,49 @@ case class EmployerNamePage(srn: Srn, memberIndex: Max300, index: Max50) extends
 
   override def cleanup(value: Option[String], userAnswers: UserAnswers): Try[UserAnswers] =
     (value, userAnswers.get(this)) match {
-      case (Some(_), _) => Try(userAnswers)
-      case (None, _) => removePages(userAnswers, pages(srn))
+      case (Some(_), None) =>
+        // create
+        userAnswers
+          .set(EmployerContributionsSectionStatus(srn), SectionStatus.InProgress)
+          .flatMap(_.remove(EmployerContributionsMemberListPage(srn)))
+      case (Some(x), Some(y)) if (x == y) =>
+        // value not changed
+        Try(userAnswers)
+      case (Some(x), Some(y)) if (x != y) =>
+        // value changed
+        userAnswers
+          .set(EmployerContributionsSectionStatus(srn), SectionStatus.InProgress)
+          .flatMap(_.remove(EmployerContributionsMemberListPage(srn)))
+      case (None, _) =>
+        //deletion
+        removePages(userAnswers, pages(srn, userAnswers))
+          .flatMap(_.set(EmployerContributionsSectionStatus(srn), SectionStatus.InProgress))
       case _ => Try(userAnswers)
     }
 
-  private def pages(srn: Srn): List[Removable[_]] = {
-
-    val list = List(
+  private def pages(srn: Srn, userAnswers: UserAnswers): List[Removable[_]] =
+    List(
       EmployerTypeOfBusinessPage(srn, memberIndex, index),
       TotalEmployerContributionPage(srn, memberIndex, index),
       EmployerCompanyCrnPage(srn, memberIndex, index),
       PartnershipEmployerUtrPage(srn, memberIndex, index),
       OtherEmployeeDescriptionPage(srn, memberIndex, index),
-      ContributionsFromAnotherEmployerPage(srn, memberIndex, index)
+      ContributionsFromAnotherEmployerPage(srn, memberIndex, index),
+      EmployerContributionsCompleted(srn, memberIndex, index),
+      EmployerContributionsMemberListPage(srn)
     )
-    if (index.value == 1) list :+ EmployerContributionsPage(srn) else list
-  }
-
 }
 
 case class EmployerNamePages(srn: Srn, memberIndex: Max300) extends QuestionPage[Map[String, String]] {
   override def path: JsPath =
     Paths.memberEmpContribution \ toString \ memberIndex.arrayIndex.toString
+
+  override def toString: String = "orgName"
+}
+
+case class AllEmployerNamePages(srn: Srn) extends QuestionPage[Map[String, Map[String, String]]] {
+  override def path: JsPath =
+    Paths.memberEmpContribution \ toString
 
   override def toString: String = "orgName"
 }

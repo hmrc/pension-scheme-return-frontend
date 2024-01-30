@@ -96,8 +96,20 @@ object EmployerContributionsNavigator extends JourneyNavigator {
       }
 
     case RemoveEmployerContributionsPage(srn, _) =>
-      controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
-        .onPageLoad(srn, 1, NormalMode)
+      val allCompanyNamePages = userAnswers.get(AllEmployerNamePages(srn)).orElse(None)
+      allCompanyNamePages match {
+        case None =>
+          controllers.nonsipp.employercontributions.routes.EmployerContributionsController
+            .onPageLoad(srn, NormalMode)
+        case Some(names) =>
+          if (!names.values.exists(_.nonEmpty)) {
+            controllers.nonsipp.employercontributions.routes.EmployerContributionsController
+              .onPageLoad(srn, NormalMode)
+          } else {
+            controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
+              .onPageLoad(srn, 1, NormalMode)
+          }
+      }
 
     case EmployerContributionsCYAPage(srn) =>
       controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController

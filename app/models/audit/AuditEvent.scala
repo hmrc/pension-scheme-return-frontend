@@ -16,9 +16,29 @@
 
 package models.audit
 
+import config.Constants.PSA
+
 trait AuditEvent {
 
   def auditType: String
 
   def details: Map[String, String]
+
+  def psaOrPspIdDetails(
+    credentialRole: String,
+    psaOrPspId: String,
+    schemeAdministratorOrPractitionerName: String
+  ): Map[String, String] =
+    credentialRole match {
+      case PSA =>
+        Map(
+          "PensionSchemeAdministratorId" -> psaOrPspId,
+          "SchemeAdministratorName" -> schemeAdministratorOrPractitionerName
+        )
+      case _ =>
+        Map(
+          "PensionSchemePractitionerId" -> psaOrPspId,
+          "SchemePractitionerName" -> schemeAdministratorOrPractitionerName
+        )
+    }
 }

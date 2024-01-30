@@ -18,10 +18,11 @@ package controllers.nonsipp
 
 import cats.data.NonEmptyList
 import cats.implicits.toShow
+import config.Constants.{PSA, PSP}
 import config.Refined.Max3
-import controllers.{nonsipp, PSRController}
 import controllers.actions._
 import controllers.nonsipp.BasicDetailsCheckYourAnswersController._
+import controllers.{nonsipp, PSRController}
 import models.SchemeId.Srn
 import models.audit.PSRStartAuditEvent
 import models.requests.DataRequest
@@ -124,7 +125,7 @@ class BasicDetailsCheckYourAnswersController @Inject()(
     psaOrPspId = req.pensionSchemeId.value,
     schemeTaxReference = req.schemeDetails.pstr,
     affinityGroup = if (req.minimalDetails.organisationName.nonEmpty) "Organisation" else "Individual",
-    credentialRole = if (req.pensionSchemeId.isPSP) "PSP" else "PSA",
+    credentialRole = if (req.pensionSchemeId.isPSP) PSP else PSA,
     taxYear = taxYear,
     howManyMembers = schemeMemberNumbers.noOfActiveMembers,
     howManyDeferredMembers = schemeMemberNumbers.noOfDeferredMembers,

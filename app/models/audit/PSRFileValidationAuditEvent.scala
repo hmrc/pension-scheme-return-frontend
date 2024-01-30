@@ -20,7 +20,7 @@ import models.DateRange
 
 case class PSRFileValidationAuditEvent(
   schemeName: String,
-  schemeAdministratorName: String,
+  schemeAdministratorOrPractitionerName: String,
   psaOrPspId: String,
   schemeTaxReference: String,
   affinityGroup: String,
@@ -35,22 +35,19 @@ case class PSRFileValidationAuditEvent(
   override def auditType: String = "PensionSchemeReturnFileValidationCheck"
 
   override def details: Map[String, String] = {
+
     val common = Map(
       "SchemeName" -> schemeName,
-      "SchemeAdministratorName" -> schemeAdministratorName,
-      "PensionSchemeAdministratorOrPensionSchemePractitionerId" -> psaOrPspId,
       "PensionSchemeTaxReference" -> schemeTaxReference,
       "AffinityGroup" -> affinityGroup,
       "CredentialRole(PSA/PSP)" -> credentialRole,
-      "TaxYear" -> s"${taxYear.from.getYear}-${taxYear.to.getYear}"
+      "TaxYear" -> s"${taxYear.from.getYear}-${taxYear.to.getYear}",
+      "ValidationCheckStatus" -> validationCheckStatus,
+      "FileValidationTimeInMilliSeconds" -> fileValidationTimeInMilliSeconds.toString,
+      "NumberOfEntries" -> numberOfEntries.toString,
+      "NumberOfFailures" -> numberOfFailures.toString
     )
 
-    common ++
-      Map(
-        "ValidationCheckStatus" -> validationCheckStatus,
-        "FileValidationTimeInMilliSeconds" -> fileValidationTimeInMilliSeconds.toString,
-        "NumberOfEntries" -> numberOfEntries.toString,
-        "NumberOfFailures" -> numberOfFailures.toString
-      )
+    psaOrPspIdDetails(credentialRole, psaOrPspId, schemeAdministratorOrPractitionerName) ++ common
   }
 }

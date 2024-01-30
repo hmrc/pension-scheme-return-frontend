@@ -22,6 +22,7 @@ import models.ConditionalYesNo._
 import models.SchemeId.Srn
 import models.{IdentitySubject, Money, NormalMode, PensionSchemeId, SchemeHoldLandProperty, UserAnswers}
 import pages.nonsipp.common.IdentityTypes
+import pages.nonsipp.employercontributions.{EmployerContributionsPage, EmployerContributionsSectionStatus}
 import pages.nonsipp.landorproperty._
 import pages.nonsipp.landorpropertydisposal.{LandOrPropertyDisposalPage, LandPropertyDisposalCompletedPages}
 import pages.nonsipp.loansmadeoroutstanding.{
@@ -38,7 +39,7 @@ import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
 import pages.nonsipp.sharesdisposal.{SharesDisposalCompletedPages, SharesDisposalPage}
 import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
 import pages.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldPage
-import viewmodels.models.TaskListStatus
+import viewmodels.models.{SectionStatus, TaskListStatus}
 import viewmodels.models.TaskListStatus.{Completed, InProgress, NotStarted, TaskListStatus}
 
 object TaskListStatusUtils {
@@ -167,7 +168,39 @@ object TaskListStatusUtils {
           .url
     )
   }
+  def getNotStartedOrCannotStartYetStatus(userAnswers: UserAnswers, srn: Srn): TaskListStatus =
+    getMembersTaskListStatus(userAnswers, srn) match {
+      case TaskListStatus.InProgress => TaskListStatus.NotStarted
+      case TaskListStatus.Completed => TaskListStatus.NotStarted
+      case TaskListStatus.UnableToStart => TaskListStatus.UnableToStart
+      case TaskListStatus.NotStarted => TaskListStatus.UnableToStart
+    }
 
+  def getEmployerContributionStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
+    val status = userAnswers
+      .get(EmployerContributionsSectionStatus(srn))
+      .fold[TaskListStatus](getNotStartedOrCannotStartYetStatus(userAnswers, srn)) {
+        case SectionStatus.InProgress => TaskListStatus.InProgress
+        case SectionStatus.Completed => TaskListStatus.Completed
+      }
+    val wereContributions = userAnswers.get(EmployerContributionsPage(srn))
+    val link = (status, wereContributions) match {
+      case (TaskListStatus.InProgress, Some(true)) =>
+        controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
+          .onPageLoad(srn, 1, NormalMode)
+          .url
+      case (TaskListStatus.Completed, Some(true)) =>
+        controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
+          .onPageLoad(srn, 1, NormalMode)
+          .url
+      case _ =>
+        controllers.nonsipp.employercontributions.routes.EmployerContributionsController
+          .onPageLoad(srn, NormalMode)
+          .url
+
+    }
+    (status, link)
+  }
   def getLandOrPropertyTaskListStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
     val heldPageUrl =
       controllers.nonsipp.landorproperty.routes.LandOrPropertyHeldController.onPageLoad(srn, NormalMode).url

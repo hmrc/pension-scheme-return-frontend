@@ -16,6 +16,7 @@
 
 package controllers.nonsipp.memberdetails
 
+import config.Constants.{PSA, PSP}
 import config.FrontendAppConfig
 import controllers.PSRController
 import controllers.actions._
@@ -100,11 +101,11 @@ class UploadMemberDetailsController @Inject()(
     implicit req: DataRequest[_]
   ) = PSRUpscanFileUploadAuditEvent(
     schemeName = req.schemeDetails.schemeName,
-    schemeAdministratorName = req.schemeDetails.establishers.headOption.get.name,
+    schemeAdministratorOrPractitionerName = req.schemeDetails.establishers.headOption.get.name,
     psaOrPspId = req.pensionSchemeId.value,
     schemeTaxReference = req.schemeDetails.pstr,
     affinityGroup = if (req.minimalDetails.organisationName.nonEmpty) "Organisation" else "Individual",
-    credentialRole = if (req.pensionSchemeId.isPSP) "PSP" else "PSA",
+    credentialRole = if (req.pensionSchemeId.isPSP) PSP else PSA,
     taxYear = taxYear,
     uploadStatus,
     duration

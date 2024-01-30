@@ -20,6 +20,7 @@ import config.Refined.OneTo5000
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.refineV
 import models.HowDisposed.HowDisposed
+import models.HowSharesDisposed.HowSharesDisposed
 import models.PensionSchemeId.{PsaId, PspId}
 import models.SchemeId.{Pstr, Srn}
 import models.SchemeStatus._
@@ -322,6 +323,14 @@ trait ModelGenerators extends BasicGenerators {
       HowDisposed.Sold,
       HowDisposed.Transferred,
       HowDisposed.Other("test details")
+    )
+
+  implicit val howSharesDisposedGen: Gen[HowSharesDisposed] =
+    Gen.oneOf(
+      HowSharesDisposed.Sold,
+      HowSharesDisposed.Redeemed,
+      HowSharesDisposed.Transferred,
+      HowSharesDisposed.Other("test details")
     )
 
   implicit val typeOfSharesGen: Gen[TypeOfShares] =

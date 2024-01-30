@@ -20,7 +20,7 @@ import models.DateRange
 
 case class PSRUpscanFileDownloadAuditEvent(
   schemeName: String,
-  schemeAdministratorName: String,
+  schemeAdministratorOrPractitionerName: String,
   psaOrPspId: String,
   schemeTaxReference: String,
   affinityGroup: String,
@@ -33,20 +33,17 @@ case class PSRUpscanFileDownloadAuditEvent(
   override def auditType: String = "PensionSchemeReturnFileUpscanDownloadCheck"
 
   override def details: Map[String, String] = {
+
     val common = Map(
       "SchemeName" -> schemeName,
-      "SchemeAdministratorName" -> schemeAdministratorName,
-      "PensionSchemeAdministratorOrPensionSchemePractitionerId" -> psaOrPspId,
       "PensionSchemeTaxReference" -> schemeTaxReference,
       "AffinityGroup" -> affinityGroup,
       "CredentialRole(PSA/PSP)" -> credentialRole,
-      "TaxYear" -> s"${taxYear.from.getYear}-${taxYear.to.getYear}"
+      "TaxYear" -> s"${taxYear.from.getYear}-${taxYear.to.getYear}",
+      "DownloadStatus" -> downloadStatus,
+      "DownloadTime" -> downloadTimeInMilliSeconds.toString
     )
 
-    common ++
-      Map(
-        "DownloadStatus" -> downloadStatus,
-        "DownloadTime" -> downloadTimeInMilliSeconds.toString
-      )
+    psaOrPspIdDetails(credentialRole, psaOrPspId, schemeAdministratorOrPractitionerName) ++ common
   }
 }

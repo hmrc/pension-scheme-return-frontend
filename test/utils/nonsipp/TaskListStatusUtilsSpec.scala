@@ -26,6 +26,7 @@ import org.scalatest.OptionValues
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import pages.nonsipp.common.{IdentityTypePage, IdentityTypes}
+import pages.nonsipp.employercontributions.{EmployerContributionsPage, EmployerContributionsSectionStatus}
 import pages.nonsipp.landorproperty._
 import pages.nonsipp.loansmadeoroutstanding.{
   IsIndividualRecipientConnectedPartyPage,
@@ -33,13 +34,15 @@ import pages.nonsipp.loansmadeoroutstanding.{
   OutstandingArrearsOnLoanPage,
   RecipientSponsoringEmployerConnectedPartyPage
 }
+import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsPage, NoNINOPage}
 import pages.nonsipp.moneyborrowed.{LenderNamePage, LenderNamePages, MoneyBorrowedPage, WhySchemeBorrowedMoneyPage}
 import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
 import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
 import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
 import pages.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldPage
 import utils.UserAnswersUtils.UserAnswersOps
-import viewmodels.models.TaskListStatus.{Completed, InProgress, NotStarted}
+import viewmodels.models.SectionStatus
+import viewmodels.models.TaskListStatus.{Completed, InProgress, NotStarted, UnableToStart}
 
 class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValues with TestValues {
   "Loans status" - {
@@ -438,6 +441,62 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
           .unsafeSet(OtherAssetsHeldPage(srn), false)
         val result = TaskListStatusUtils.getOtherAssetsTaskListStatusAndLink(customUserAnswers, srn)
         result mustBe (Completed, hadAssetsPageUrl)
+      }
+    }
+  }
+
+  "Employer contributions" - {
+    val wereContributions =
+      controllers.nonsipp.employercontributions.routes.EmployerContributionsController
+        .onPageLoad(srn, NormalMode)
+        .url
+    val selectMember =
+      controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
+        .onPageLoad(srn, 1, NormalMode)
+        .url
+
+    "should be Unable to start" - {
+      "when default data" in {
+        val result = TaskListStatusUtils.getEmployerContributionStatusAndLink(defaultUserAnswers, srn)
+        result mustBe (UnableToStart, wereContributions)
+      }
+    }
+    "should be Not Started" - {
+      "when members are added" in {
+        val result = TaskListStatusUtils.getEmployerContributionStatusAndLink(
+          defaultUserAnswers
+            .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+            .unsafeSet(DoesMemberHaveNinoPage(srn, refineMV(1)), false)
+            .unsafeSet(NoNINOPage(srn, refineMV(1)), noninoReason),
+          srn
+        )
+        result mustBe (NotStarted, wereContributions)
+      }
+    }
+
+    "should be In Progress" - {
+      "when only were section status is progress and employer contributions true is present" in {
+        val customUserAnswers = defaultUserAnswers
+          .unsafeSet(EmployerContributionsPage(srn), true)
+          .unsafeSet(EmployerContributionsSectionStatus(srn), SectionStatus.InProgress)
+        val result = TaskListStatusUtils.getEmployerContributionStatusAndLink(customUserAnswers, srn)
+        result mustBe (InProgress, selectMember)
+      }
+    }
+    "should be Complete" - {
+      "when section status is complete and employer contributions false is present" in {
+        val customUserAnswers = defaultUserAnswers
+          .unsafeSet(EmployerContributionsPage(srn), false)
+          .unsafeSet(EmployerContributionsSectionStatus(srn), SectionStatus.Completed)
+        val result = TaskListStatusUtils.getEmployerContributionStatusAndLink(customUserAnswers, srn)
+        result mustBe (Completed, wereContributions)
+      }
+      "when section status is complete and employer contributions true is present" in {
+        val customUserAnswers = defaultUserAnswers
+          .unsafeSet(EmployerContributionsPage(srn), true)
+          .unsafeSet(EmployerContributionsSectionStatus(srn), SectionStatus.Completed)
+        val result = TaskListStatusUtils.getEmployerContributionStatusAndLink(customUserAnswers, srn)
+        result mustBe (Completed, selectMember)
       }
     }
   }

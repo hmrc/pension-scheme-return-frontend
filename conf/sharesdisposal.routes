@@ -1,7 +1,17 @@
-GET         /:srn/shares-disposal                                               controllers.nonsipp.sharesdisposal.SharesDisposalController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST        /:srn/shares-disposal                                               controllers.nonsipp.sharesdisposal.SharesDisposalController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-GET         /:srn/change-shares-disposal                                        controllers.nonsipp.sharesdisposal.SharesDisposalController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST        /:srn/change-shares-disposal                                        controllers.nonsipp.sharesdisposal.SharesDisposalController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+GET         /:srn/shares-disposal                                                                   controllers.nonsipp.sharesdisposal.SharesDisposalController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/shares-disposal                                                                   controllers.nonsipp.sharesdisposal.SharesDisposalController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/change-shares-disposal                                                            controllers.nonsipp.sharesdisposal.SharesDisposalController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-shares-disposal                                                            controllers.nonsipp.sharesdisposal.SharesDisposalController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
-GET         /:srn/what-you-will-need-shares-disposal                               controllers.nonsipp.sharesdisposal.WhatYouWillNeedSharesDisposalController.onPageLoad(srn: Srn)
-GET         /:srn/submit-what-you-will-need-shares-disposal                        controllers.nonsipp.sharesdisposal.WhatYouWillNeedSharesDisposalController.onSubmit(srn: Srn)
+GET         /:srn/what-you-will-need-shares-disposal                                                controllers.nonsipp.sharesdisposal.WhatYouWillNeedSharesDisposalController.onPageLoad(srn: Srn)
+GET         /:srn/submit-what-you-will-need-shares-disposal                                         controllers.nonsipp.sharesdisposal.WhatYouWillNeedSharesDisposalController.onSubmit(srn: Srn)
+
+GET         /:srn/how-were-shares-disposed-of/:shareIndex/:disposalIndex                            controllers.nonsipp.sharesdisposal.HowWereSharesDisposedController.onPageLoad(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, mode: Mode = NormalMode)
+POST        /:srn/how-were-shares-disposed-of/:shareIndex/:disposalIndex                            controllers.nonsipp.sharesdisposal.HowWereSharesDisposedController.onSubmit(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, mode: Mode = NormalMode)
+GET         /:srn/change-how-were-shares-disposed-of/:shareIndex/:disposalIndex                     controllers.nonsipp.sharesdisposal.HowWereSharesDisposedController.onPageLoad(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, mode: Mode = CheckMode)
+POST        /:srn/change-how-were-shares-disposed-of/:shareIndex/:disposalIndex                     controllers.nonsipp.sharesdisposal.HowWereSharesDisposedController.onSubmit(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, mode: Mode = CheckMode)
+
+GET        /:srn/when-were-shares-sold/:shareIndex/:disposalIndex                                   controllers.nonsipp.sharesdisposal.WhenWereSharesSoldController.onPageLoad(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, mode: Mode = NormalMode)
+POST       /:srn/when-were-shares-sold/:shareIndex/:disposalIndex                                   controllers.nonsipp.sharesdisposal.WhenWereSharesSoldController.onSubmit(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, mode: Mode = NormalMode)
+GET        /:srn/change-when-were-shares-sold/:shareIndex/:disposalIndex                            controllers.nonsipp.sharesdisposal.WhenWereSharesSoldController.onPageLoad(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, mode: Mode = CheckMode)
+POST       /:srn/change-when-were-shares-sold/:shareIndex/:disposalIndex                            controllers.nonsipp.sharesdisposal.WhenWereSharesSoldController.onSubmit(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, mode: Mode = CheckMode)

@@ -22,6 +22,11 @@ import play.api.libs.json._
 
 import java.time.LocalDate
 
+case class SectionDetails(
+  made: Boolean,
+  completed: Boolean
+)
+
 case class MemberPayments(
   memberDetails: List[MemberDetails],
   employerContributionsCompleted: Boolean,
@@ -30,7 +35,8 @@ case class MemberPayments(
   unallocatedContribsMade: Boolean,
   unallocatedContribAmount: Option[Double],
   memberContributionMade: Boolean,
-  lumpSumReceived: Boolean
+  lumpSumReceived: Boolean,
+  benefitsSurrenderedDetails: SectionDetails
 )
 
 case class MemberDetails(
@@ -39,7 +45,8 @@ case class MemberDetails(
   transfersIn: List[TransfersIn],
   totalContributions: Option[Double],
   memberLumpSumReceived: Option[MemberLumpSumReceived],
-  transfersOut: List[TransfersOut]
+  transfersOut: List[TransfersOut],
+  benefitsSurrendered: Option[PensionSurrender]
 )
 
 case class MemberPersonalDetails(
@@ -118,6 +125,7 @@ object MemberPersonalDetails {
 }
 
 object MemberPayments {
+  private implicit val formatSectionDetails: Format[SectionDetails] = Json.format[SectionDetails]
   private implicit val formatMemberLumpSumReceived: Format[MemberLumpSumReceived] = Json.format[MemberLumpSumReceived]
   private implicit val formatEmployerContributions: Format[EmployerContributions] = Json.format[EmployerContributions]
   private implicit val formatMemberPersonalDetails: Format[MemberPersonalDetails] = Json.format[MemberPersonalDetails]
