@@ -28,7 +28,6 @@ import pages.nonsipp.common.{
   OtherRecipientDetailsPage,
   PartnershipRecipientUtrPage
 }
-import pages.nonsipp.loansmadeoroutstanding.PartnershipRecipientNamePage
 import pages.nonsipp.shares._
 import play.api.mvc.Call
 
@@ -77,7 +76,15 @@ object SharesNavigator extends JourneyNavigator {
         case Some(Acquisition) =>
           controllers.nonsipp.common.routes.IdentityTypeController
             .onPageLoad(srn, index, NormalMode, IdentitySubject.SharesSeller)
-        case _ => controllers.routes.UnauthorisedController.onPageLoad()
+
+        case Some(Contribution) =>
+          controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onPageLoad(srn, index, NormalMode)
+
+        case Some(Transfer) =>
+          controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onPageLoad(srn, index, NormalMode)
+
+//        case _ =>
+//          controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onPageLoad(srn, index, NormalMode)
       }
 
     case IdentityTypePage(srn, index, IdentitySubject.SharesSeller) =>
@@ -110,16 +117,16 @@ object SharesNavigator extends JourneyNavigator {
         .onPageLoad(srn, index, NormalMode, IdentitySubject.SharesSeller)
 
     case SharesIndividualSellerNINumberPage(srn, index) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+      controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onSubmit(srn, index, NormalMode)
 
     case CompanyRecipientCrnPage(srn, index, IdentitySubject.SharesSeller) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+      controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onSubmit(srn, index, NormalMode)
 
     case PartnershipRecipientUtrPage(srn, index, IdentitySubject.SharesSeller) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+      controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onSubmit(srn, index, NormalMode)
 
     case OtherRecipientDetailsPage(srn, index, IdentitySubject.SharesSeller) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+      controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onSubmit(srn, index, NormalMode)
 
   }
 

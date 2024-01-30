@@ -2256,3 +2256,27 @@ partnershipNameOfSharesSeller.heading = What is the seller’s partnership name?
 partnershipNameOfSharesSeller.error.required = Enter the seller’s partnership name
 partnershipNameOfSharesSeller.error.tooLong = Seller’s partnership name must be 160 characters or fewer
 partnershipNameOfSharesSeller.error.invalid = Seller’s partnership name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+
+sharesFromConnectedParty.acquisitionTitle = Are shares from a connected party?
+sharesFromConnectedParty.acquisitionHeading = Is {0} a connected party?
+sharesFromConnectedParty.error.required = Select yes if the shares in this company were acquired from a connected party
+sharesFromConnectedParty.acquisitionContent= What is a connected party?
+sharesFromConnectedParty.acquisitionParagraph1 = A connected party is an individual, company or partnership that is connected to either a member of the scheme or the sponsoring employer of the scheme.
+sharesFromConnectedParty.acquisitionParagraph2 = A connected party of a member is usually their spouse, civil partner or close relative (for example their parent, sibling, child or grandchild).
+sharesFromConnectedParty.acquisitionParagraph3 = A connected party of a sponsoring employer can be:
+sharesFromConnectedParty.acquisitionBullet1 = someone who has control over the company
+sharesFromConnectedParty.acquisitionBullet2 = another company, where the same person has control of both
+sharesFromConnectedParty.acquisitionParagraph4 = See a
+sharesFromConnectedParty.acquisitionParagraph4.link = full list of circumstances where an individual, company or partnership might be a connected party (opens in new tab).
+
+sharesFromConnectedParty.title1 = Are shares from a connected party?
+sharesFromConnectedParty.heading1 = Were the shares in {0} acquired from a connected party?
+sharesFromConnectedParty.error.required = Select yes if the shares in this company were acquired from a connected party
+sharesFromConnectedParty.content1 = What is a connected party?
+sharesFromConnectedParty.paragraph1 = A connected party is an individual, company or partnership that is connected to either a member of the scheme or the sponsoring employer of the scheme.
+sharesFromConnectedParty.paragraph2 = A connected party of a member is usually their spouse, civil partner or close relative (for example their parent, sibling, child or grandchild).
+sharesFromConnectedParty.paragraph3 = A connected party of a sponsoring employer can be:
+sharesFromConnectedParty.bullet1 = someone who has control over the company
+sharesFromConnectedParty.bullet2 = another company, where the same person has control of both
+sharesFromConnectedParty.paragraph4 = See a
+sharesFromConnectedParty.paragraph4.link = full list of circumstances where an individual, company or partnership might be a connected party (opens in new tab).
