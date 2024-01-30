@@ -23,7 +23,6 @@ import controllers.PSRController
 import controllers.actions._
 import controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController._
 import models.SchemeId.Srn
-import models.requests.DataRequest
 import models.{CheckMode, DateRange, Mode, Money, MoneyInPeriod, SchemeDetails}
 import navigation.Navigator
 import pages.nonsipp.schemedesignatory._
@@ -56,27 +55,22 @@ class FinancialDetailsCheckYourAnswersController @Inject()(
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     schemeDateService.taxYearOrAccountingPeriods(srn) match {
       case Some(periods) =>
-        (
-          for {
-            schemeMemberNumbers <- requiredPage(HowManyMembersPage(srn, request.pensionSchemeId))
-            howMuchCashPage = request.userAnswers.get(HowMuchCashPage(srn, mode))
-            valueOfAssetsPage = request.userAnswers.get(ValueOfAssetsPage(srn, mode))
-            feesCommissionsWagesSalariesPage = request.userAnswers.get(FeesCommissionsWagesSalariesPage(srn, mode))
-            userName <- loggedInUserNameOrRedirect
-          } yield Ok(
-            view(
-              viewModel(
-                srn,
-                mode,
-                howMuchCashPage,
-                valueOfAssetsPage,
-                feesCommissionsWagesSalariesPage,
-                periods,
-                request.schemeDetails
-              )
+        val howMuchCashPage = request.userAnswers.get(HowMuchCashPage(srn, mode))
+        val valueOfAssetsPage = request.userAnswers.get(ValueOfAssetsPage(srn, mode))
+        val feesCommissionsWagesSalariesPage = request.userAnswers.get(FeesCommissionsWagesSalariesPage(srn, mode))
+        Ok(
+          view(
+            viewModel(
+              srn,
+              mode,
+              howMuchCashPage,
+              valueOfAssetsPage,
+              feesCommissionsWagesSalariesPage,
+              periods,
+              request.schemeDetails
             )
           )
-        ).merge
+        )
       case _ => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
     }
   }
@@ -87,16 +81,6 @@ class FinancialDetailsCheckYourAnswersController @Inject()(
       case Some(_) => Redirect(navigator.nextPage(FinancialDetailsCheckYourAnswersPage(srn), mode, request.userAnswers))
     }
   }
-
-  private def loggedInUserNameOrRedirect(implicit request: DataRequest[_]): Either[Result, String] =
-    request.minimalDetails.individualDetails match {
-      case Some(individual) => Right(individual.fullName)
-      case None =>
-        request.minimalDetails.organisationName match {
-          case Some(orgName) => Right(orgName)
-          case None => Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-        }
-    }
 }
 
 object FinancialDetailsCheckYourAnswersController {

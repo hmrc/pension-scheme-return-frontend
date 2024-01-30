@@ -131,16 +131,6 @@ class BasicDetailsCheckYourAnswersController @Inject()(
     howManyDeferredMembers = schemeMemberNumbers.noOfDeferredMembers,
     howManyPensionerMembers = schemeMemberNumbers.noOfPensionerMembers
   )
-
-  private def loggedInUserNameOrRedirect(implicit request: DataRequest[_]): Either[Result, String] =
-    request.minimalDetails.individualDetails match {
-      case Some(individual) => Right(individual.fullName)
-      case None =>
-        request.minimalDetails.organisationName match {
-          case Some(orgName) => Right(orgName)
-          case None => Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-        }
-    }
 }
 
 object BasicDetailsCheckYourAnswersController {

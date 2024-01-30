@@ -23,8 +23,8 @@ import cats.syntax.either._
 import config.Refined.Max3
 import eu.timepit.refined.api.{Refined, Validate}
 import eu.timepit.refined.refineV
-import models.{DateRange, UserAnswers}
 import models.requests.DataRequest
+import models.{DateRange, UserAnswers}
 import org.slf4j.LoggerFactory
 import play.api.i18n.I18nSupport
 import play.api.libs.json.{Reads, Writes}
@@ -47,6 +47,16 @@ abstract class PSRController extends FrontendBaseController with I18nSupport {
       case None =>
         logger.error(s"Required page ${page.getClass.getSimpleName} missing")
         Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+    }
+
+  def loggedInUserNameOrRedirect(implicit request: DataRequest[_]): Either[Result, String] =
+    request.minimalDetails.individualDetails match {
+      case Some(individual) => Right(individual.fullName)
+      case None =>
+        request.minimalDetails.organisationName match {
+          case Some(orgName) => Right(orgName)
+          case None => Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+        }
     }
 
   // Used to specifically refine an index retrieved from user answers
