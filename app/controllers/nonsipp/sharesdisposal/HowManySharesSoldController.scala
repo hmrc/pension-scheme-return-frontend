@@ -38,7 +38,7 @@ import viewmodels.InputWidth
 import viewmodels.implicits._
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import viewmodels.models.{FormPageViewModel, QuestionField}
-import views.html.MultipleQuestionView
+import views.html.IntView
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
@@ -50,7 +50,7 @@ class HowManySharesSoldController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   formProvider: IntFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: MultipleQuestionView
+  view: IntView
 )(implicit ec: ExecutionContext)
     extends PSRController
     with I18nSupport {
@@ -125,7 +125,7 @@ object HowManySharesSoldController {
     FormPageViewModel(
       title = Message("sharesDisposal.howManySharesSold.title"),
       heading = Message("sharesDisposal.howManySharesSold.heading", companyName),
-      page = SingleQuestion(form, QuestionField.input(Empty).withWidth(InputWidth.Fixed5)),
+      page = SingleQuestion(form, QuestionField.input(Empty).withWidth(InputWidth.Fixed10)),
       onSubmit = routes.HowManySharesSoldController.onSubmit(srn, shareIndex, disposalIndex, mode)
     )
 }

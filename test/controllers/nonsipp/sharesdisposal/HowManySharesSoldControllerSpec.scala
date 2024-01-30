@@ -24,7 +24,7 @@ import forms.IntFormProvider
 import models.NormalMode
 import pages.nonsipp.shares.CompanyNameRelatedSharesPage
 import pages.nonsipp.sharesdisposal.HowManySharesSoldPage
-import views.html.MultipleQuestionView
+import views.html.IntView
 
 class HowManySharesSoldControllerSpec extends ControllerBaseSpec {
 
@@ -42,7 +42,7 @@ class HowManySharesSoldControllerSpec extends ControllerBaseSpec {
 
     act.like(
       renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
-        injected[MultipleQuestionView].apply(
+        injected[IntView].apply(
           viewModel(
             srn,
             shareIndex,
@@ -58,7 +58,7 @@ class HowManySharesSoldControllerSpec extends ControllerBaseSpec {
     act.like(
       renderPrePopView(onPageLoad, HowManySharesSoldPage(srn, shareIndex, disposalIndex), totalShares, userAnswers) {
         implicit app => implicit request =>
-          injected[MultipleQuestionView]
+          injected[IntView]
             .apply(
               viewModel(
                 srn,

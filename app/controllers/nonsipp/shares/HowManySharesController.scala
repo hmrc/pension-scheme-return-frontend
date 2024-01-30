@@ -36,7 +36,7 @@ import viewmodels.DisplayMessage.{Empty, Message}
 import viewmodels.InputWidth
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import viewmodels.models.{FormPageViewModel, QuestionField}
-import views.html.MultipleQuestionView
+import views.html.IntView
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
@@ -48,7 +48,7 @@ class HowManySharesController @Inject()(
   saveService: SaveService,
   formProvider: IntFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: MultipleQuestionView
+  view: IntView
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
@@ -92,7 +92,7 @@ class HowManySharesController @Inject()(
 }
 
 object HowManySharesController {
-  def form(formProvider: IntFormProvider): Form[Int] = formProvider.singleQuestion(
+  def form(formProvider: IntFormProvider): Form[Int] = formProvider(
     IntFormErrors(
       "shares.totalShares.error.required",
       "shares.totalShares.error.decimal",
@@ -115,7 +115,7 @@ object HowManySharesController {
         "shares.totalShares.heading",
         Message(s"$nameOfSharesCompany")
       ),
-      SingleQuestion(form, QuestionField.input(Empty).withWidth(InputWidth.Fixed4)),
+      SingleQuestion(form, QuestionField.input(Empty).withWidth(InputWidth.Fixed10)),
       routes.HowManySharesController.onSubmit(srn, index, mode)
     )
 }

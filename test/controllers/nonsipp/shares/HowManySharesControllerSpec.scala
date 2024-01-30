@@ -23,7 +23,7 @@ import eu.timepit.refined.refineMV
 import forms.IntFormProvider
 import models.NormalMode
 import pages.nonsipp.shares.{CompanyNameRelatedSharesPage, HowManySharesPage}
-import views.html.MultipleQuestionView
+import views.html.IntView
 
 class HowManySharesControllerSpec extends ControllerBaseSpec {
 
@@ -38,19 +38,19 @@ class HowManySharesControllerSpec extends ControllerBaseSpec {
     lazy val onSubmit = routes.HowManySharesController.onSubmit(srn, index, NormalMode)
 
     act.like(renderView(onPageLoad, populatedUserAnswers) { implicit app => implicit request =>
-      injected[MultipleQuestionView]
+      injected[IntView]
         .apply(viewModel(srn, index, companyName, NormalMode, form(injected[IntFormProvider])))
     })
 
     act.like(renderPrePopView(onPageLoad, HowManySharesPage(srn, index), totalShares, populatedUserAnswers) {
       implicit app => implicit request =>
-        injected[MultipleQuestionView]
+        injected[IntView]
           .apply(viewModel(srn, index, companyName, NormalMode, form(injected[IntFormProvider]).fill(totalShares)))
     })
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad " + _))
 
-    act.like(saveAndContinue(onSubmit, populatedUserAnswers, "value.1" -> totalShares.toString))
+    act.like(saveAndContinue(onSubmit, populatedUserAnswers, "value" -> totalShares.toString))
     act.like(invalidForm(onSubmit, populatedUserAnswers))
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }
