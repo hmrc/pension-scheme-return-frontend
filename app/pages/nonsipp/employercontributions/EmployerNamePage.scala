@@ -42,39 +42,32 @@ case class EmployerNamePage(srn: Srn, memberIndex: Max300, index: Max50) extends
         userAnswers
           .set(EmployerContributionsSectionStatus(srn), SectionStatus.InProgress)
           .flatMap(_.remove(EmployerContributionsMemberListPage(srn)))
-      case (Some(x), Some(y)) =>
-        // update
-        if (x == y) {
-          // value not changed
-          Try(userAnswers)
-        } else {
-          // value changed
-          userAnswers
-            .set(EmployerContributionsSectionStatus(srn), SectionStatus.InProgress)
-            .flatMap(_.remove(EmployerContributionsMemberListPage(srn)))
-        }
+      case (Some(x), Some(y)) if (x == y) =>
+        // value not changed
+        Try(userAnswers)
+      case (Some(x), Some(y)) if (x != y) =>
+        // value changed
+        userAnswers
+          .set(EmployerContributionsSectionStatus(srn), SectionStatus.InProgress)
+          .flatMap(_.remove(EmployerContributionsMemberListPage(srn)))
       case (None, _) =>
         //deletion
-        removePages(userAnswers, pages(srn))
+        removePages(userAnswers, pages(srn, userAnswers))
           .flatMap(_.set(EmployerContributionsSectionStatus(srn), SectionStatus.InProgress))
-          .flatMap(_.remove(EmployerContributionsMemberListPage(srn)))
       case _ => Try(userAnswers)
     }
 
-  private def pages(srn: Srn): List[Removable[_]] = {
-
-    val list = List(
+  private def pages(srn: Srn, userAnswers: UserAnswers): List[Removable[_]] =
+    List(
       EmployerTypeOfBusinessPage(srn, memberIndex, index),
       TotalEmployerContributionPage(srn, memberIndex, index),
       EmployerCompanyCrnPage(srn, memberIndex, index),
       PartnershipEmployerUtrPage(srn, memberIndex, index),
       OtherEmployeeDescriptionPage(srn, memberIndex, index),
       ContributionsFromAnotherEmployerPage(srn, memberIndex, index),
-      EmployerContributionsCompleted(srn, memberIndex, index)
+      EmployerContributionsCompleted(srn, memberIndex, index),
+      EmployerContributionsMemberListPage(srn)
     )
-    if (index.value == 1) list :+ EmployerContributionsPage(srn) else list
-  }
-
 }
 
 case class EmployerNamePages(srn: Srn, memberIndex: Max300) extends QuestionPage[Map[String, String]] {

@@ -57,7 +57,7 @@ class EmployerNamePageSpec extends PageBehaviours with TestValues {
     result.get(TotalEmployerContributionPage(srn, memberIndex, indexOne)) must be(empty)
     result.get(EmployerCompanyCrnPage(srn, memberIndex, indexOne)) must be(empty)
     result.get(ContributionsFromAnotherEmployerPage(srn, memberIndex, indexOne)) must be(empty)
-    result.get(EmployerContributionsPage(srn)) must be(empty)
+    result.get(EmployerContributionsPage(srn)) must be(Some(true)) // this stays as per agreement with design
   }
 
   "cleanup other fields when removed with index bigger than 1" in {
