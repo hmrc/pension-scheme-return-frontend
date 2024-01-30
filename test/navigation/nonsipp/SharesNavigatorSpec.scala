@@ -17,9 +17,10 @@
 package navigation.nonsipp
 
 import config.Refined.{Max5000, OneTo5000}
+import controllers.nonsipp.TaskListController
 import controllers.nonsipp.shares.CompanyNameOfSharesSellerPage
 import eu.timepit.refined.refineMV
-import models.{IdentitySubject, IdentityType, NormalMode, RecipientDetails, SchemeHoldShare}
+import models.{IdentitySubject, IdentityType, NormalMode, RecipientDetails, SchemeHoldShare, TypeOfShares}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.common.{
@@ -271,11 +272,32 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           .navigateToWithIndex(
             index,
             SharesIndividualSellerNINumberPage,
-            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.SharesFromConnectedPartyController
+                .onPageLoad(srn, index, NormalMode),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                TypeOfSharesHeldPage(srn, index),
+                TypeOfShares.Unquoted
+              )
           )
           .withName(
-            "go from class of shares individual seller NI number page to Unauthorised page"
+            "go from SharesIndividualSellerNINumberPage to SharesFromConnectedParty page when Unquoted is selected"
           )
+      )
+    }
+
+    "SharesIndividualSellerNINumberPage" - {
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            SharesIndividualSellerNINumberPage,
+            (srn, _: Max5000, _) =>
+              controllers.routes.UnauthorisedController
+                .onPageLoad()
+          )
+          .withName("go from SharesIndividualSellerNINumber page to Unauthorised page")
       )
     }
 
@@ -307,6 +329,19 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       )
     }
 
+//    "PartnershipRecipientUtrPage" - {
+//      act.like(
+//        normalmode
+//          .navigateToWithIndexAndSubject(
+//            index,
+//            subject,
+//            PartnershipRecipientUtrPage,
+//            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+//          )
+//          .withName("go from partnership recipient Utr page to Unauthorised page")
+//      )
+//    }
+
     "PartnershipRecipientUtrPage" - {
       act.like(
         normalmode
@@ -314,9 +349,33 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             index,
             subject,
             PartnershipRecipientUtrPage,
-            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.SharesFromConnectedPartyController
+                .onPageLoad(srn, index, NormalMode),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                TypeOfSharesHeldPage(srn, index),
+                TypeOfShares.Unquoted
+              )
           )
-          .withName("go from partnership recipient Utr page to Unauthorised page")
+          .withName(
+            "go from PartnershipRecipientUtrPage to SharesFromConnectedParty page when Unquoted is selected"
+          )
+      )
+    }
+
+    "PartnershipRecipientUtrPage" - {
+      act.like(
+        normalmode
+          .navigateToWithIndexAndSubject(
+            index,
+            subject,
+            PartnershipRecipientUtrPage,
+            (srn, _: Max5000, _) =>
+              controllers.routes.UnauthorisedController
+                .onPageLoad()
+          )
+          .withName("go from PartnershipRecipientUtrPage page to Unauthorised page")
       )
     }
 
@@ -327,11 +386,48 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             index,
             subject,
             CompanyRecipientCrnPage,
-            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.SharesFromConnectedPartyController
+                .onPageLoad(srn, index, NormalMode),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                TypeOfSharesHeldPage(srn, index),
+                TypeOfShares.Unquoted
+              )
           )
-          .withName("go from company recipient CRN page to Unauthorised page")
+          .withName(
+            "go from CompanyRecipientCrnPage to SharesFromConnectedParty page when Unquoted is selected"
+          )
       )
     }
+
+    "CompanyRecipientCrnPage" - {
+      act.like(
+        normalmode
+          .navigateToWithIndexAndSubject(
+            index,
+            subject,
+            CompanyRecipientCrnPage,
+            (srn, _: Max5000, _) =>
+              controllers.routes.UnauthorisedController
+                .onPageLoad()
+          )
+          .withName("go from CompanyRecipientCrnPage page to Unauthorised page")
+      )
+    }
+
+//    "CompanyRecipientCrnPage" - {
+//      act.like(
+//        normalmode
+//          .navigateToWithIndexAndSubject(
+//            index,
+//            subject,
+//            CompanyRecipientCrnPage,
+//            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+//          )
+//          .withName("go from company recipient CRN page to Unauthorised page")
+//      )
+//    }
 
     "OtherRecipientDetailsPage" - {
 
@@ -380,15 +476,17 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           .navigateToWithIndex(
             index,
             HowManySharesPage,
-            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad(),
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.SharesFromConnectedPartyController
+                .onPageLoad(srn, index, NormalMode),
             srn =>
               defaultUserAnswers.unsafeSet(
-                WhyDoesSchemeHoldSharesPage(srn, index),
-                SchemeHoldShare.Contribution
+                TypeOfSharesHeldPage(srn, index),
+                TypeOfShares.Unquoted
               )
           )
           .withName(
-            "go from HowManySharesPage to Unauthorised page when holding is contribution"
+            "go from HowManySharesPage to shares from connected party when unquoted shares selected "
           )
       )
     }
@@ -402,14 +500,34 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad(),
             srn =>
               defaultUserAnswers.unsafeSet(
-                WhyDoesSchemeHoldSharesPage(srn, index),
-                SchemeHoldShare.Transfer
+                TypeOfSharesHeldPage(srn, index),
+                TypeOfShares.SponsoringEmployer
               )
           )
           .withName(
-            "go from HowManySharesPage to Unauthorised page when holding is transfer"
+            "go from how many shares page to Unauthorised page when SponsoringEmployer is selected"
           )
       )
     }
+
+    "HowManySharesPage" - {
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            HowManySharesPage,
+            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad(),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                TypeOfSharesHeldPage(srn, index),
+                TypeOfShares.ConnectedParty
+              )
+          )
+          .withName(
+            "go from how many shares page to Unauthorised page when ConnectedParty is selected"
+          )
+      )
+    }
+
   }
 }

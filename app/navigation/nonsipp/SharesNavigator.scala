@@ -19,6 +19,7 @@ package navigation.nonsipp
 import controllers.nonsipp.shares.CompanyNameOfSharesSellerPage
 import eu.timepit.refined.refineMV
 import models.SchemeHoldShare.{Acquisition, Contribution, Transfer}
+import models.TypeOfShares.Unquoted
 import models.{IdentitySubject, IdentityType, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
@@ -73,18 +74,18 @@ object SharesNavigator extends JourneyNavigator {
 
     case HowManySharesPage(srn, index) =>
       userAnswers.get(WhyDoesSchemeHoldSharesPage(srn, index)) match {
+
         case Some(Acquisition) =>
           controllers.nonsipp.common.routes.IdentityTypeController
             .onPageLoad(srn, index, NormalMode, IdentitySubject.SharesSeller)
+        case _ =>
+          userAnswers.get(TypeOfSharesHeldPage(srn, index)) match {
+            case Some(Unquoted) =>
+              controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onPageLoad(srn, index, NormalMode)
+            case _ =>
+              controllers.routes.UnauthorisedController.onPageLoad()
+          }
 
-        case Some(Contribution) =>
-          controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onPageLoad(srn, index, NormalMode)
-
-        case Some(Transfer) =>
-          controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onPageLoad(srn, index, NormalMode)
-
-//        case _ =>
-//          controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onPageLoad(srn, index, NormalMode)
       }
 
     case IdentityTypePage(srn, index, IdentitySubject.SharesSeller) =>
@@ -117,16 +118,41 @@ object SharesNavigator extends JourneyNavigator {
         .onPageLoad(srn, index, NormalMode, IdentitySubject.SharesSeller)
 
     case SharesIndividualSellerNINumberPage(srn, index) =>
-      controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onSubmit(srn, index, NormalMode)
+      userAnswers.get(TypeOfSharesHeldPage(srn, index)) match {
+        case Some(Unquoted) =>
+          controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onPageLoad(srn, index, NormalMode)
+
+        case _ =>
+          controllers.routes.UnauthorisedController.onPageLoad()
+
+      }
 
     case CompanyRecipientCrnPage(srn, index, IdentitySubject.SharesSeller) =>
-      controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onSubmit(srn, index, NormalMode)
+      userAnswers.get(TypeOfSharesHeldPage(srn, index)) match {
+        case Some(Unquoted) =>
+          controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onPageLoad(srn, index, NormalMode)
+
+        case _ =>
+          controllers.routes.UnauthorisedController.onPageLoad()
+      }
 
     case PartnershipRecipientUtrPage(srn, index, IdentitySubject.SharesSeller) =>
-      controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onSubmit(srn, index, NormalMode)
+      userAnswers.get(TypeOfSharesHeldPage(srn, index)) match {
+        case Some(Unquoted) =>
+          controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onPageLoad(srn, index, NormalMode)
+
+        case _ =>
+          controllers.routes.UnauthorisedController.onPageLoad()
+      }
 
     case OtherRecipientDetailsPage(srn, index, IdentitySubject.SharesSeller) =>
-      controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onSubmit(srn, index, NormalMode)
+      userAnswers.get(TypeOfSharesHeldPage(srn, index)) match {
+        case Some(Unquoted) =>
+          controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onPageLoad(srn, index, NormalMode)
+
+        case _ =>
+          controllers.routes.UnauthorisedController.onPageLoad()
+      }
 
   }
 

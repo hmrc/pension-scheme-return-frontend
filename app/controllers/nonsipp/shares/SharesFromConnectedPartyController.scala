@@ -21,10 +21,9 @@ import config.Refined.Max5000
 import controllers.PSRController
 import controllers.actions._
 import forms.YesNoPageFormProvider
-import models.SchemeHoldLandProperty.Acquisition
 import models.SchemeId.Srn
 import models.requests.DataRequest
-import models.{IdentitySubject, IdentityType, Mode, SchemeHoldShare, TypeOfShares}
+import models.{IdentitySubject, IdentityType, Mode, SchemeHoldShare}
 import navigation.Navigator
 import pages.nonsipp.common.{IdentityTypePage, OtherRecipientDetailsPage}
 import pages.nonsipp.shares.{
@@ -32,7 +31,6 @@ import pages.nonsipp.shares.{
   IndividualNameOfSharesSellerPage,
   PartnershipShareSellerNamePage,
   SharesFromConnectedPartyPage,
-  TypeOfSharesHeldPage,
   WhyDoesSchemeHoldSharesPage
 }
 import play.api.data.Form
