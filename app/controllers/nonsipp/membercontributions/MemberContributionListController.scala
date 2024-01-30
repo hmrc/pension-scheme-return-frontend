@@ -29,7 +29,6 @@ import models.SchemeId.Srn
 import models.requests.DataRequest
 import models.{CheckMode, Mode, Money, NameDOB, NormalMode, Pagination, UserAnswers}
 import navigation.Navigator
-import pages.nonsipp.employercontributions.EmployerContributionsMemberListPage
 import pages.nonsipp.membercontributions.{MemberContributionsListPage, TotalMemberContributionPage}
 import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
 import play.api.data.Form
@@ -119,7 +118,7 @@ class MemberContributionListController @Inject()(
                 _ =>
                   Redirect(
                     navigator
-                      .nextPage(EmployerContributionsMemberListPage(srn), mode, request.userAnswers)
+                      .nextPage(MemberContributionsListPage(srn), mode, request.userAnswers)
                   )
               )
           )

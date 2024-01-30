@@ -21,16 +21,15 @@ import controllers.nonsipp.employercontributions.EmployerContributionsController
 import forms.YesNoPageFormProvider
 import models.Mode
 import models.SchemeId.Srn
-import models.UserAnswers.implicits.UserAnswersTryOps
 import navigation.Navigator
-import pages.nonsipp.employercontributions.{EmployerContributionsPage, EmployerContributionsSectionStatus}
+import pages.nonsipp.employercontributions.EmployerContributionsPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
-import viewmodels.models.{FormPageViewModel, SectionStatus, YesNoPageViewModel}
+import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 import views.html.YesNoPageView
 
 import javax.inject.{Inject, Named}
@@ -66,14 +65,6 @@ class EmployerContributionsController @Inject()(
             updatedAnswers <- Future.fromTry(
               request.userAnswers
                 .set(EmployerContributionsPage(srn), value)
-                .set(
-                  EmployerContributionsSectionStatus(srn),
-                  if (value) {
-                    SectionStatus.InProgress
-                  } else {
-                    SectionStatus.Completed
-                  }
-                )
             )
             _ <- saveService.save(updatedAnswers)
           } yield Redirect(navigator.nextPage(EmployerContributionsPage(srn), mode, updatedAnswers))

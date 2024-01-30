@@ -16,24 +16,86 @@
 
 package pages.nonsipp.employercontributions
 
-import pages.nonsipp.employercontributions.OtherEmployeeDescriptionPage
-
 import config.Refined._
+import controllers.TestValues
 import eu.timepit.refined.refineMV
-
 import pages.behaviours.PageBehaviours
+import utils.UserAnswersUtils.UserAnswersOps
+import viewmodels.models.SectionStatus
 
-class OtherEmployeeDescriptionPageSpec extends PageBehaviours {
+class OtherEmployeeDescriptionPageSpec extends PageBehaviours with TestValues {
 
   "OtherEmployeeDescriptionPage" - {
 
-    val index = refineMV[Max300.Refined](1)
+    val memberIndex = refineMV[Max300.Refined](1)
     val secondaryIndex = refineMV[Max50.Refined](1)
 
-    beRetrievable[String](OtherEmployeeDescriptionPage(srnGen.sample.value, index, secondaryIndex))
+    beRetrievable[String](OtherEmployeeDescriptionPage(srnGen.sample.value, memberIndex, secondaryIndex))
 
-    beSettable[String](OtherEmployeeDescriptionPage(srnGen.sample.value, index, secondaryIndex))
+    beSettable[String](OtherEmployeeDescriptionPage(srnGen.sample.value, memberIndex, secondaryIndex))
 
-    beRemovable[String](OtherEmployeeDescriptionPage(srnGen.sample.value, index, secondaryIndex))
+    beRemovable[String](OtherEmployeeDescriptionPage(srnGen.sample.value, memberIndex, secondaryIndex))
+
+    "Dependent values: section status and were employer contributions made are" - {
+
+      "changing when type of business added" in {
+        val userAnswers = defaultUserAnswers
+          .unsafeSet(EmployerContributionsPage(srn), true)
+          .unsafeSet(EmployerContributionsSectionStatus(srn), SectionStatus.Completed)
+
+        val result = userAnswers
+          .set(OtherEmployeeDescriptionPage(srn, memberIndex, secondaryIndex), otherRecipientDescription)
+          .success
+          .value
+
+        result.get(EmployerContributionsPage(srn)) must be(Some(true))
+        result.get(OtherEmployeeDescriptionPage(srn, memberIndex, secondaryIndex)) must be(
+          Some(otherRecipientDescription)
+        )
+        result.get(EmployerContributionsSectionStatus(srn)) must be(Some(SectionStatus.InProgress))
+        result.get(EmployerContributionsMemberListPage(srn)) must be(empty)
+      }
+
+      "not changing when value stays the same" in {
+        val userAnswers = defaultUserAnswers
+          .unsafeSet(EmployerContributionsPage(srn), true)
+          .unsafeSet(EmployerNamePage(srn, memberIndex, secondaryIndex), employerName)
+          .unsafeSet(OtherEmployeeDescriptionPage(srn, memberIndex, secondaryIndex), otherRecipientDescription)
+          .unsafeSet(EmployerContributionsSectionStatus(srn), SectionStatus.Completed)
+          .unsafeSet(EmployerContributionsMemberListPage(srn), true)
+
+        val result = userAnswers
+          .set(OtherEmployeeDescriptionPage(srn, memberIndex, secondaryIndex), otherRecipientDescription)
+          .success
+          .value
+
+        result.get(EmployerContributionsPage(srn)) must be(Some(true))
+        result.get(OtherEmployeeDescriptionPage(srn, memberIndex, secondaryIndex)) must be(
+          Some(otherRecipientDescription)
+        )
+        result.get(EmployerContributionsSectionStatus(srn)) must be(Some(SectionStatus.Completed))
+        result.get(EmployerContributionsMemberListPage(srn)) must be(Some(true))
+      }
+
+      "changing when value is different" in {
+        val userAnswers = defaultUserAnswers
+          .unsafeSet(EmployerContributionsPage(srn), true)
+          .unsafeSet(OtherEmployeeDescriptionPage(srn, memberIndex, secondaryIndex), otherRecipientDescription)
+          .unsafeSet(EmployerContributionsSectionStatus(srn), SectionStatus.Completed)
+          .unsafeSet(EmployerContributionsMemberListPage(srn), true)
+
+        val result =
+          userAnswers
+            .set(OtherEmployeeDescriptionPage(srn, memberIndex, secondaryIndex), otherRecipientDescription + "change")
+            .success
+            .value
+
+        result.get(OtherEmployeeDescriptionPage(srn, memberIndex, secondaryIndex)) must be(
+          Some(otherRecipientDescription + "change")
+        )
+        result.get(EmployerContributionsSectionStatus(srn)) must be(Some(SectionStatus.InProgress))
+        result.get(EmployerContributionsMemberListPage(srn)) must be(empty)
+      }
+    }
   }
 }

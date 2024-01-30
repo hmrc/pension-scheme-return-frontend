@@ -28,14 +28,4 @@ package object employercontributions {
     val memberDetails: JsPath = membersPayments \ "memberDetails"
     val memberEmpContribution: JsPath = memberDetails \ "memberEmpContribution"
   }
-
-  def journeyPages(srn: Srn, index: Max300, secondaryIndex: Max50): List[Removable[_]] = List(
-    EmployerNamePage(srn, index, secondaryIndex),
-    EmployerTypeOfBusinessPage(srn, index, secondaryIndex),
-    TotalEmployerContributionPage(srn, index, secondaryIndex),
-    EmployerCompanyCrnPage(srn, index, secondaryIndex),
-    PartnershipEmployerUtrPage(srn, index, secondaryIndex),
-    OtherEmployeeDescriptionPage(srn, index, secondaryIndex),
-    ContributionsFromAnotherEmployerPage(srn, index, secondaryIndex)
-  )
 }

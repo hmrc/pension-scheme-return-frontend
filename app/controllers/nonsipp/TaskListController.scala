@@ -251,13 +251,7 @@ object TaskListController {
     val prefix = "nonsipp.tasklist.memberpayments"
 
     // change to check if members section is complete to start
-    val employerContributionStatus: TaskListStatus =
-      userAnswers
-        .get(EmployerContributionsSectionStatus(srn))
-        .fold[TaskListStatus](TaskListStatus.NotStarted) {
-          case SectionStatus.InProgress => TaskListStatus.InProgress
-          case SectionStatus.Completed => TaskListStatus.Completed
-        }
+    val (employerContributionStatus, employerContributionLink) = getEmployerContributionStatusAndLink(userAnswers, srn)
 
     val transferInStatus: TaskListStatus =
       userAnswers
@@ -303,13 +297,7 @@ object TaskListController {
       TaskListItemViewModel(
         LinkMessage(
           messageKey(prefix, "employercontributions.title", employerContributionStatus),
-          employerContributionStatus match {
-            // change so Completed goes to member list page
-            case _ =>
-              controllers.nonsipp.employercontributions.routes.EmployerContributionsController
-                .onPageLoad(srn, NormalMode)
-                .url
-          }
+          employerContributionLink
         ),
         employerContributionStatus
       ),

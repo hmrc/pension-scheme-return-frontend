@@ -288,17 +288,33 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
   }
 
   "RemoveEmployerContributionsPage" - {
-    act.like(
-      normalmode
-        .navigateToWithIndex(
-          index,
-          RemoveEmployerContributionsPage,
-          (srn, _: Max300, _) =>
-            controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
-              .onPageLoad(srn, 1, NormalMode)
-        )
-        .withName("go from employer name page to employer type of business page")
-    )
+    "with no employer names in user answers" - {
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            RemoveEmployerContributionsPage,
+            (srn, _: Max300, _) =>
+              controllers.nonsipp.employercontributions.routes.EmployerContributionsController
+                .onPageLoad(srn, NormalMode)
+          )
+          .withName("go from remove employer page to were there any employer contributions page")
+      )
+    }
+    "with employer names in user answers" - {
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            RemoveEmployerContributionsPage,
+            (srn, _: Max300, _) =>
+              controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
+                .onPageLoad(srn, 1, NormalMode),
+            srn => defaultUserAnswers.unsafeSet(EmployerNamePage(srn, refineMV(1), refineMV(1)), employerName)
+          )
+          .withName("go from remove employer page to contributions list page")
+      )
+    }
   }
 
   "EmployerContributionsCYAPage" - {

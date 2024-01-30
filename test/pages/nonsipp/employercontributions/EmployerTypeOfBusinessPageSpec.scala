@@ -19,24 +19,27 @@ package pages.nonsipp.employercontributions
 import config.Refined.{Max300, Max50}
 import controllers.TestValues
 import eu.timepit.refined.refineMV
+import models.IdentityType
 import pages.behaviours.PageBehaviours
 import utils.UserAnswersUtils.UserAnswersOps
 import viewmodels.models.SectionStatus
 
-class ContributionsFromAnotherEmployerPageSpec extends PageBehaviours with TestValues {
+class EmployerTypeOfBusinessPageSpec extends PageBehaviours with TestValues {
 
   private val memberIndex = refineMV[Max300.Refined](1)
-  private val secondaryIndex = refineMV[Max50.Refined](1)
+  private val indexOne = refineMV[Max50.Refined](1)
+  private val typeOfBusiness = IdentityType.UKCompany
+  private val otherTypeOfBusiness = IdentityType.UKPartnership
 
-  "ContributionsFromAnotherEmployerPage" - {
+  "EmployerTypeOfBusinessPage" - {
 
-    val srn = srnGen.sample.value
+    val index = refineMV[Max50.Refined](1)
 
-    beRetrievable[Boolean](ContributionsFromAnotherEmployerPage(srn, memberIndex, secondaryIndex))
+    beRetrievable[IdentityType](EmployerTypeOfBusinessPage(srnGen.sample.value, memberIndex, index))
 
-    beSettable[Boolean](ContributionsFromAnotherEmployerPage(srn, memberIndex, secondaryIndex))
+    beSettable[IdentityType](EmployerTypeOfBusinessPage(srnGen.sample.value, memberIndex, index))
 
-    beRemovable[Boolean](ContributionsFromAnotherEmployerPage(srn, memberIndex, secondaryIndex))
+    beRemovable[IdentityType](EmployerTypeOfBusinessPage(srnGen.sample.value, memberIndex, index))
 
     "Dependent values: section status and were employer contributions made are" - {
 
@@ -45,13 +48,11 @@ class ContributionsFromAnotherEmployerPageSpec extends PageBehaviours with TestV
           .unsafeSet(EmployerContributionsPage(srn), true)
           .unsafeSet(EmployerContributionsSectionStatus(srn), SectionStatus.Completed)
 
-        val result = userAnswers
-          .set(ContributionsFromAnotherEmployerPage(srn, memberIndex, secondaryIndex), false)
-          .success
-          .value
+        val result =
+          userAnswers.set(EmployerTypeOfBusinessPage(srn, memberIndex, indexOne), typeOfBusiness).success.value
 
         result.get(EmployerContributionsPage(srn)) must be(Some(true))
-        result.get(ContributionsFromAnotherEmployerPage(srn, memberIndex, secondaryIndex)) must be(Some(false))
+        result.get(EmployerTypeOfBusinessPage(srn, memberIndex, indexOne)) must be(Some(typeOfBusiness))
         result.get(EmployerContributionsSectionStatus(srn)) must be(Some(SectionStatus.InProgress))
         result.get(EmployerContributionsMemberListPage(srn)) must be(empty)
       }
@@ -59,18 +60,16 @@ class ContributionsFromAnotherEmployerPageSpec extends PageBehaviours with TestV
       "not changing when value stays the same" in {
         val userAnswers = defaultUserAnswers
           .unsafeSet(EmployerContributionsPage(srn), true)
-          .unsafeSet(EmployerNamePage(srn, memberIndex, secondaryIndex), employerName)
-          .unsafeSet(ContributionsFromAnotherEmployerPage(srn, memberIndex, secondaryIndex), false)
+          .unsafeSet(EmployerNamePage(srn, memberIndex, indexOne), employerName)
+          .unsafeSet(EmployerTypeOfBusinessPage(srn, memberIndex, indexOne), typeOfBusiness)
           .unsafeSet(EmployerContributionsSectionStatus(srn), SectionStatus.Completed)
           .unsafeSet(EmployerContributionsMemberListPage(srn), true)
 
-        val result = userAnswers
-          .set(ContributionsFromAnotherEmployerPage(srn, memberIndex, secondaryIndex), false)
-          .success
-          .value
+        val result =
+          userAnswers.set(EmployerTypeOfBusinessPage(srn, memberIndex, indexOne), typeOfBusiness).success.value
 
         result.get(EmployerContributionsPage(srn)) must be(Some(true))
-        result.get(ContributionsFromAnotherEmployerPage(srn, memberIndex, secondaryIndex)) must be(Some(false))
+        result.get(EmployerTypeOfBusinessPage(srn, memberIndex, indexOne)) must be(Some(typeOfBusiness))
         result.get(EmployerContributionsSectionStatus(srn)) must be(Some(SectionStatus.Completed))
         result.get(EmployerContributionsMemberListPage(srn)) must be(Some(true))
       }
@@ -78,17 +77,14 @@ class ContributionsFromAnotherEmployerPageSpec extends PageBehaviours with TestV
       "changing when value is different" in {
         val userAnswers = defaultUserAnswers
           .unsafeSet(EmployerContributionsPage(srn), true)
-          .unsafeSet(ContributionsFromAnotherEmployerPage(srn, memberIndex, secondaryIndex), false)
+          .unsafeSet(EmployerNamePage(srn, memberIndex, indexOne), employerName)
           .unsafeSet(EmployerContributionsSectionStatus(srn), SectionStatus.Completed)
           .unsafeSet(EmployerContributionsMemberListPage(srn), true)
 
         val result =
-          userAnswers
-            .set(ContributionsFromAnotherEmployerPage(srn, memberIndex, secondaryIndex), true)
-            .success
-            .value
+          userAnswers.set(EmployerTypeOfBusinessPage(srn, memberIndex, indexOne), otherTypeOfBusiness).success.value
 
-        result.get(ContributionsFromAnotherEmployerPage(srn, memberIndex, secondaryIndex)) must be(Some(true))
+        result.get(EmployerTypeOfBusinessPage(srn, memberIndex, indexOne)) must be(Some(otherTypeOfBusiness))
         result.get(EmployerContributionsSectionStatus(srn)) must be(Some(SectionStatus.InProgress))
         result.get(EmployerContributionsMemberListPage(srn)) must be(empty)
       }
