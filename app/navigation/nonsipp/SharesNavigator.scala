@@ -158,7 +158,7 @@ object SharesNavigator extends JourneyNavigator {
       controllers.nonsipp.shares.routes.CostOfSharesController.onPageLoad(srn, index, NormalMode)
 
     case CostOfSharesPage(srn, index) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+      controllers.nonsipp.shares.routes.SharesIndependentValuationController.onPageLoad(srn, index, NormalMode)
 
     case SharesIndependentValuationPage(srn, index) =>
       controllers.routes.UnauthorisedController.onPageLoad()
