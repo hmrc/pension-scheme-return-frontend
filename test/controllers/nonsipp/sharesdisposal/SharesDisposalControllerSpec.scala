@@ -48,6 +48,7 @@ class SharesDisposalControllerSpec extends ControllerBaseSpec {
     act.like(saveAndContinue(onSubmit, "value" -> "true"))
 
     act.like(invalidForm(onSubmit))
+
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
   }
 }

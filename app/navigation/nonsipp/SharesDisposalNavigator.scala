@@ -35,12 +35,6 @@ object SharesDisposalNavigator extends JourneyNavigator {
 
     case WhatYouWillNeedSharesDisposalPage(srn) =>
       controllers.routes.UnauthorisedController.onPageLoad()
-//      controllers.nonsipp.sharesdisposal.routes.SharesDisposalListController
-//        .onPageLoad(srn, page = 1)
-
-//    case SharesDisposalListPage(srn, shareIndex, disposalIndex) =>
-//      controllers.nonsipp.sharesdisposal.routes.HowWereSharesDisposedController
-//        .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
 
     case page @ HowWereSharesDisposedPage(srn, shareIndex, disposalIndex, _) =>
       userAnswers.get(page) match {
@@ -51,12 +45,8 @@ object SharesDisposalNavigator extends JourneyNavigator {
             .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
         case Some(HowSharesDisposed.Redeemed) =>
           controllers.routes.UnauthorisedController.onPageLoad()
-//          controllers.nonsipp.sharesdisposal.routes.WhenWereSharesRedeemedController
-//            .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
         case Some(HowSharesDisposed.Transferred) | Some(HowSharesDisposed.Other(_)) =>
           controllers.routes.UnauthorisedController.onPageLoad()
-//          controllers.nonsipp.sharesdisposal.routes.HowManySharesHeldController
-//            .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
       }
 
     case WhenWereSharesSoldPage(srn, shareIndex, disposalIndex) =>
@@ -65,8 +55,6 @@ object SharesDisposalNavigator extends JourneyNavigator {
 
     case HowManySharesSoldPage(srn, shareIndex, disposalIndex) =>
       controllers.routes.UnauthorisedController.onPageLoad()
-//      controllers.nonsipp.sharesdisposal.routes.TotalConsiderationSharesSoldController
-//        .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
 
   }
 

@@ -66,8 +66,6 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateTo(
               WhatYouWillNeedSharesDisposalPage,
               (srn, _) => controllers.routes.UnauthorisedController.onPageLoad()
-//                controllers.nonsipp.sharesdisposal.routes.SharesDisposalListController
-//                  .onPageLoad(srn, 1, NormalMode)
             )
             .withName("go from What You Will Need page to Shares Disposal List page")
         )
@@ -83,7 +81,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
         act.like(
           normalmode
-            .navigateToWithDoubleDataAndIndex(
+            .navigateToWithDoubleIndexAndData(
               shareIndex,
               disposalIndex,
               HowWereSharesDisposedPage.apply,
@@ -97,45 +95,39 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
         act.like(
           normalmode
-            .navigateToWithDoubleDataAndIndex(
+            .navigateToWithDoubleIndexAndData(
               shareIndex,
               disposalIndex,
               HowWereSharesDisposedPage.apply,
               Gen.const(HowSharesDisposed.Redeemed),
               (srn, shareIndex: Max5000, disposalIndex: Max50, _) =>
                 controllers.routes.UnauthorisedController.onPageLoad()
-//                controllers.nonsipp.sharesdisposal.routes.WhenWereSharesRedeemedController
-//                  .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
             )
             .withName("go from How Were Shares Disposed page to When Were Shares Redeemed page")
         )
 
         act.like(
           normalmode
-            .navigateToWithDoubleDataAndIndex(
+            .navigateToWithDoubleIndexAndData(
               shareIndex,
               disposalIndex,
               HowWereSharesDisposedPage.apply,
               Gen.const(HowSharesDisposed.Transferred),
               (srn, shareIndex: Max5000, disposalIndex: Max50, _) =>
                 controllers.routes.UnauthorisedController.onPageLoad()
-//                controllers.nonsipp.sharesdisposal.routes.HowManySharesHeldController
-//                  .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
             )
             .withName("go from How Were Shares Disposed page to How Many Shares Held page (Transferred)")
         )
 
         act.like(
           normalmode
-            .navigateToWithDoubleDataAndIndex(
+            .navigateToWithDoubleIndexAndData(
               shareIndex,
               disposalIndex,
               HowWereSharesDisposedPage.apply,
               Gen.const(HowSharesDisposed.Other("test details")),
               (srn, shareIndex: Max5000, disposalIndex: Max50, _) =>
                 controllers.routes.UnauthorisedController.onPageLoad()
-//                controllers.nonsipp.sharesdisposal.routes.HowManySharesHeldController
-//                  .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
             )
             .withName("go from How Were Shares Disposed page to How Many Shares Held page (Other)")
         )
@@ -167,8 +159,6 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               HowManySharesSoldPage,
               (srn, shareIndex: Max5000, disposalIndex: Max50, _) =>
                 controllers.routes.UnauthorisedController.onPageLoad()
-//                controllers.nonsipp.sharesdisposal.routes.TotalConsiderationSharesSoldController
-//                  .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
             )
             .withName("go from How Many Shares Sold page to Total Consideration Shares Sold page")
         )

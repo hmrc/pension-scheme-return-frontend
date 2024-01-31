@@ -158,7 +158,7 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
 
     act.like(
       normalmode
-        .navigateToWithDoubleDataAndIndex(
+        .navigateToWithDoubleIndexAndData(
           index,
           disposalIndex,
           WhoPurchasedLandOrPropertyPage,
@@ -172,7 +172,7 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
 
     act.like(
       normalmode
-        .navigateToWithDoubleDataAndIndex(
+        .navigateToWithDoubleIndexAndData(
           index,
           disposalIndex,
           WhoPurchasedLandOrPropertyPage,
@@ -186,7 +186,7 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
 
     act.like(
       normalmode
-        .navigateToWithDoubleDataAndIndex(
+        .navigateToWithDoubleIndexAndData(
           index,
           disposalIndex,
           WhoPurchasedLandOrPropertyPage,
@@ -200,7 +200,7 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
 
     act.like(
       normalmode
-        .navigateToWithDoubleDataAndIndex(
+        .navigateToWithDoubleIndexAndData(
           index,
           disposalIndex,
           WhoPurchasedLandOrPropertyPage,

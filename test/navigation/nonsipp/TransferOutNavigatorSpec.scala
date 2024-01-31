@@ -119,7 +119,7 @@ class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
     act.like(
       normalmode
-        .navigateToWithDoubleDataAndIndex(
+        .navigateToWithDoubleIndexAndData(
           index,
           secondaryIndex,
           ReportAnotherTransferOutPage,
@@ -199,7 +199,7 @@ class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
     act.like(
       normalmode
-        .navigateToWithDoubleDataAndIndex(
+        .navigateToWithDoubleIndexAndData(
           index,
           secondaryIndex,
           ReportAnotherTransferOutPage,

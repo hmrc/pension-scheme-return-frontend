@@ -25,14 +25,14 @@ import java.time.LocalDate
 class WhenWereSharesSoldPageSpec extends PageBehaviours {
 
   "WhenWereSharesSoldPage" - {
-
+    val srn = srnGen.sample.value
     val shareIndex = refineMV[Max5000.Refined](1)
     val disposalIndex = refineMV[Max50.Refined](1)
 
-    beRetrievable[LocalDate](WhenWereSharesSoldPage(srnGen.sample.value, shareIndex, disposalIndex))
+    beRetrievable[LocalDate](WhenWereSharesSoldPage(srn, shareIndex, disposalIndex))
 
-    beSettable[LocalDate](WhenWereSharesSoldPage(srnGen.sample.value, shareIndex, disposalIndex))
+    beSettable[LocalDate](WhenWereSharesSoldPage(srn, shareIndex, disposalIndex))
 
-    beRemovable[LocalDate](WhenWereSharesSoldPage(srnGen.sample.value, shareIndex, disposalIndex))
+    beRemovable[LocalDate](WhenWereSharesSoldPage(srn, shareIndex, disposalIndex))
   }
 }

@@ -24,14 +24,14 @@ import pages.behaviours.PageBehaviours
 class HowWereSharesDisposedPageSpec extends PageBehaviours {
 
   "HowWereSharesDisposedPage" - {
-
+    val srn = srnGen.sample.value
     val shareIndex = refineMV[Max5000.Refined](1)
     val disposalIndex = refineMV[Max50.Refined](1)
 
-    beRetrievable[HowSharesDisposed](HowWereSharesDisposedPage(srnGen.sample.value, shareIndex, disposalIndex))
+    beRetrievable[HowSharesDisposed](HowWereSharesDisposedPage(srn, shareIndex, disposalIndex))
 
-    beSettable[HowSharesDisposed](HowWereSharesDisposedPage(srnGen.sample.value, shareIndex, disposalIndex))
+    beSettable[HowSharesDisposed](HowWereSharesDisposedPage(srn, shareIndex, disposalIndex))
 
-    beRemovable[HowSharesDisposed](HowWereSharesDisposedPage(srnGen.sample.value, shareIndex, disposalIndex))
+    beRemovable[HowSharesDisposed](HowWereSharesDisposedPage(srn, shareIndex, disposalIndex))
   }
 }

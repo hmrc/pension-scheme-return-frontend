@@ -21,11 +21,12 @@ import pages.behaviours.PageBehaviours
 class SharesDisposalPageSpec extends PageBehaviours {
 
   "SharesDisposalPage" - {
+    val srn = srnGen.sample.value
 
-    beRetrievable[Boolean](SharesDisposalPage(srnGen.sample.value))
+    beRetrievable[Boolean](SharesDisposalPage(srn))
 
-    beSettable[Boolean](SharesDisposalPage(srnGen.sample.value))
+    beSettable[Boolean](SharesDisposalPage(srn))
 
-    beRemovable[Boolean](SharesDisposalPage(srnGen.sample.value))
+    beRemovable[Boolean](SharesDisposalPage(srn))
   }
 }
