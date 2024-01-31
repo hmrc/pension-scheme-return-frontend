@@ -329,7 +329,6 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       )
     }
 
-
     "PartnershipRecipientUtrPage" - {
       act.like(
         normalmode
@@ -403,7 +402,6 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           .withName("go from CompanyRecipientCrnPage page to Unauthorised page")
       )
     }
-
 
     "OtherRecipientDetailsPage" - {
 
@@ -505,5 +503,18 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       )
     }
 
+    "SharesIndependentValuationPage" - {
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            SharesIndependentValuationPage,
+            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          )
+          .withName(
+            "go from SharesIndependentValuationPage to Unauthorised page"
+          )
+      )
+    }
   }
 }

@@ -2312,3 +2312,7 @@ sharesFromConnectedParty.bullet1 = someone who has control over the company
 sharesFromConnectedParty.bullet2 = another company, where the same person has control of both
 sharesFromConnectedParty.paragraph4 = See a
 sharesFromConnectedParty.paragraph4.link = full list of circumstances where an individual, company or partnership might be a connected party (opens in new tab).
+
+sharesIndependentValuation.title = Was the transaction for these shares supported by an independent valuation?
+sharesIndependentValuation.heading = Was the transaction for these shares in {0} supported by an independent valuation?
+sharesIndependentValuation.error.required = Select yes if the transaction was supported by an independent valuation
