@@ -434,9 +434,6 @@ object TaskListStatusUtils {
 
     //TODO: dependent on SharesDisposalList implementation
     val disposalListPage = controllers.routes.UnauthorisedController.onPageLoad().url
-    //    val disposalListPage = controllers.nonsipp.sharesdisposal.routes.SharesDisposalListController
-    //      .onPageLoad(srn, page = 1)
-    //      .url
 
     if (atLeastOneCompleted) {
       (TaskListStatus.Completed, disposalListPage)

@@ -140,7 +140,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
   "EmployerTypeOfBusinessPage" - {
     act.like(
       normalmode
-        .navigateToWithDoubleDataAndIndex(
+        .navigateToWithDoubleIndexAndData(
           index,
           secondaryIndex,
           EmployerTypeOfBusinessPage,
@@ -154,7 +154,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
 
     act.like(
       normalmode
-        .navigateToWithDoubleDataAndIndex(
+        .navigateToWithDoubleIndexAndData(
           index,
           secondaryIndex,
           EmployerTypeOfBusinessPage,
@@ -168,7 +168,7 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
 
     act.like(
       normalmode
-        .navigateToWithDoubleDataAndIndex(
+        .navigateToWithDoubleIndexAndData(
           index,
           secondaryIndex,
           EmployerTypeOfBusinessPage,

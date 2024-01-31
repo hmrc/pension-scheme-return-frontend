@@ -33,7 +33,7 @@ case class HowWereSharesDisposedPage(
   override def path: JsPath =
     Paths.disposedSharesTransaction \ toString \ shareIndex.arrayIndex.toString \ disposalIndex.arrayIndex.toString
 
-  override def toString: String = "sharesDisposed"
+  override def toString: String = "methodOfDisposal"
 
 }
 

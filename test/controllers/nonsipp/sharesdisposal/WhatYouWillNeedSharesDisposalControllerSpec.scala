@@ -38,6 +38,5 @@ class WhatYouWillNeedSharesDisposalControllerSpec extends ControllerBaseSpec {
     act.like(continue(onSubmit))
 
     act.like(journeyRecoveryPage(onSubmit).updateName("onSubmit" + _))
-
   }
 }

@@ -117,7 +117,7 @@ class ReceiveTransferNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
     act.like(
       normalmode
-        .navigateToWithDoubleDataAndIndex(
+        .navigateToWithDoubleIndexAndData(
           index,
           secondaryIndex,
           ReportAnotherTransferInPage,

@@ -33,7 +33,7 @@ case class HowWasPropertyDisposedOfPage(
   override def path: JsPath =
     Paths.disposalPropertyTransaction \ toString \ landOrPropertyIndex.arrayIndex.toString \ disposalIndex.arrayIndex.toString
 
-  override def toString: String = "disposedOf"
+  override def toString: String = "methodOfDisposal"
 }
 
 object HowWasPropertyDisposedOfPage {
