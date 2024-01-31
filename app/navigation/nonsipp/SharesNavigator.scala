@@ -83,7 +83,7 @@ object SharesNavigator extends JourneyNavigator {
             case Some(Unquoted) =>
               controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onPageLoad(srn, index, NormalMode)
             case _ =>
-              controllers.routes.UnauthorisedController.onPageLoad()
+              controllers.nonsipp.shares.routes.CostOfSharesController.onPageLoad(srn, index, NormalMode)
           }
 
       }
@@ -123,7 +123,7 @@ object SharesNavigator extends JourneyNavigator {
           controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onPageLoad(srn, index, NormalMode)
 
         case _ =>
-          controllers.routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.shares.routes.CostOfSharesController.onPageLoad(srn, index, NormalMode)
 
       }
 
@@ -133,7 +133,7 @@ object SharesNavigator extends JourneyNavigator {
           controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onPageLoad(srn, index, NormalMode)
 
         case _ =>
-          controllers.routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.shares.routes.CostOfSharesController.onPageLoad(srn, index, NormalMode)
       }
 
     case PartnershipRecipientUtrPage(srn, index, IdentitySubject.SharesSeller) =>
@@ -142,7 +142,7 @@ object SharesNavigator extends JourneyNavigator {
           controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onPageLoad(srn, index, NormalMode)
 
         case _ =>
-          controllers.routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.shares.routes.CostOfSharesController.onPageLoad(srn, index, NormalMode)
       }
 
     case OtherRecipientDetailsPage(srn, index, IdentitySubject.SharesSeller) =>
@@ -151,8 +151,14 @@ object SharesNavigator extends JourneyNavigator {
           controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onPageLoad(srn, index, NormalMode)
 
         case _ =>
-          controllers.routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.shares.routes.CostOfSharesController.onPageLoad(srn, index, NormalMode)
       }
+
+    case SharesFromConnectedPartyPage(srn, index) =>
+      controllers.nonsipp.shares.routes.CostOfSharesController.onPageLoad(srn, index, NormalMode)
+
+    case CostOfSharesPage(srn, index) =>
+      controllers.nonsipp.shares.routes.SharesIndependentValuationController.onPageLoad(srn, index, NormalMode)
 
     case SharesIndependentValuationPage(srn, index) =>
       controllers.routes.UnauthorisedController.onPageLoad()
