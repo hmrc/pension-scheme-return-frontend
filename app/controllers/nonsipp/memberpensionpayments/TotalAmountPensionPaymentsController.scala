@@ -31,7 +31,7 @@ import pages.nonsipp.memberpensionpayments.TotalAmountPensionPaymentsPage
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
+import services.{PsrSubmissionService, SaveService}
 import viewmodels.DisplayMessage.{Empty, Message}
 import viewmodels.implicits._
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
@@ -48,7 +48,8 @@ class TotalAmountPensionPaymentsController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   formProvider: MoneyFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: MoneyView
+  view: MoneyView,
+  psrSubmissionService: PsrSubmissionService
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
@@ -82,8 +83,12 @@ class TotalAmountPensionPaymentsController @Inject()(
                   request.userAnswers.transformAndSet(TotalAmountPensionPaymentsPage(srn, index), value)
                 )
               _ <- saveService.save(updatedAnswers)
-            } yield Redirect(
-              navigator.nextPage(TotalAmountPensionPaymentsPage(srn, index), mode, updatedAnswers)
+              submissionResult <- psrSubmissionService.submitPsrDetails(srn, updatedAnswers)
+            } yield submissionResult.getOrRecoverJourney(
+              _ =>
+                Redirect(
+                  navigator.nextPage(TotalAmountPensionPaymentsPage(srn, index), mode, updatedAnswers)
+                )
             )
         )
     }

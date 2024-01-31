@@ -52,7 +52,10 @@ abstract class PSRController extends FrontendBaseController with I18nSupport {
   // Used to specifically refine an index retrieved from user answers
   // These indexes will be strings and 0 based so we need to add 1 before refining
   def refineStringIndex[A](indexAsString: String)(implicit ev: Validate[Int, A]): Option[Refined[Int, A]] =
-    indexAsString.toIntOption.flatMap(index => refineV[A](index + 1).toOption)
+    indexAsString.toIntOption.flatMap(refineIndex[A])
+
+  def refineIndex[A](index: Int)(implicit ev: Validate[Int, A]): Option[Refined[Int, A]] =
+    refineV[A](index + 1).toOption
 
   implicit class OptionOps[A](maybe: Option[A]) {
     def getOrRecoverJourney[F[_]: Applicative](f: A => F[Result]): F[Result] = maybe match {
@@ -93,6 +96,9 @@ abstract class PSRController extends FrontendBaseController with I18nSupport {
       l.zipWithIndex
         .map(t => t._2.toString -> t._1)
         .toMap
+
+    def zipWithRefinedIndex[I: Validate[Int, *]]: List[(Refined[Int, I], A)] =
+      l.zipWithIndex.flatMap { case (a, index) => refineIndex(index).map(_ -> a) }
   }
 
   implicit class TaxOrAccountingPeriodOps(o: Option[Either[DateRange, NonEmptyList[(DateRange, Max3)]]]) {
@@ -106,6 +112,7 @@ abstract class PSRController extends FrontendBaseController with I18nSupport {
 
   implicit class UserAnswersTryOps(userAnswers: Try[UserAnswers]) {
     def set[A: Writes](page: Settable[A], value: A): Try[UserAnswers] = userAnswers.flatMap(_.set(page, value))
+    def compose(c: List[UserAnswers.Compose]): Try[UserAnswers] = userAnswers.flatMap(_.compose(c))
     def remove[A: Writes](page: Removable[A]): Try[UserAnswers] = userAnswers.flatMap(_.removePages(List(page)))
   }
 }

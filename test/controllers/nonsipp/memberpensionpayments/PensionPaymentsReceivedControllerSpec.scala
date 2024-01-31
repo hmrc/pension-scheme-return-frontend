@@ -20,14 +20,32 @@ import controllers.ControllerBaseSpec
 import controllers.nonsipp.memberpensionpayments.PensionPaymentsReceivedController.{form, viewModel}
 import forms.YesNoPageFormProvider
 import models.NormalMode
+import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.memberpensionpayments.PensionPaymentsReceivedPage
+import play.api.inject.bind
+import play.api.inject.guice.GuiceableModule
 import play.api.libs.json.JsPath
+import services.PsrSubmissionService
 import views.html.YesNoPageView
+
+import scala.concurrent.Future
 
 class PensionPaymentsReceivedControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoad = routes.PensionPaymentsReceivedController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.PensionPaymentsReceivedController.onSubmit(srn, NormalMode)
+
+  private val mockPSRSubmissionService = mock[PsrSubmissionService]
+
+  override protected val additionalBindings: List[GuiceableModule] = List(
+    bind[PsrSubmissionService].toInstance(mockPSRSubmissionService)
+  )
+
+  override protected def beforeEach(): Unit = {
+    reset(mockPSRSubmissionService)
+    when(mockPSRSubmissionService.submitPsrDetails(any(), any())(any(), any(), any()))
+      .thenReturn(Future.successful(Some(())))
+  }
 
   "PensionPaymentsReceivedController" - {
 
