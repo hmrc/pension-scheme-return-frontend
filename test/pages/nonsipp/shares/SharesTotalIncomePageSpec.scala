@@ -16,16 +16,22 @@
 
 package pages.nonsipp.shares
 
-import config.Refined.Max5000
-import models.SchemeId.Srn
-import pages.QuestionPage
-import play.api.libs.json.JsPath
-import utils.RefinedUtils._
+import config.Refined._
+import eu.timepit.refined.refineMV
+import models.Money
+import pages.behaviours.PageBehaviours
 
-case class SharesFromConnectedPartyPage(srn: Srn, index: Max5000) extends QuestionPage[Boolean] {
+class SharesTotalIncomePageSpec extends PageBehaviours {
 
-  override def path: JsPath =
-    Paths.heldSharesTransaction \ toString \ index.arrayIndex.toString
+  "SharesTotalIncomePage" - {
 
-  override def toString: String = "connectedPartyStatus"
+    val srn = srnGen.sample.value
+    val index = refineMV[OneTo5000](1)
+
+    beRetrievable[Money](SharesTotalIncomePage(srn, index))
+
+    beSettable[Money](SharesTotalIncomePage(srn, index))
+
+    beRemovable[Money](SharesTotalIncomePage(srn, index))
+  }
 }

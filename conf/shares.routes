@@ -96,3 +96,8 @@ GET        /:srn/shares-independent-valuation/:index                 controllers
 POST       /:srn/shares-independent-valuation/:index                 controllers.nonsipp.shares.SharesIndependentValuationController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
 GET        /:srn/change-shares-independent-valuation/:index          controllers.nonsipp.shares.SharesIndependentValuationController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 POST       /:srn/change-shares-independent-valuation/:index          controllers.nonsipp.shares.SharesIndependentValuationController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET        /:srn/shares-total-income/:index                 controllers.nonsipp.shares.SharesTotalIncomeController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST       /:srn/shares-total-income/:index                 controllers.nonsipp.shares.SharesTotalIncomeController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET        /:srn/change-shares-total-income/:index          controllers.nonsipp.shares.SharesTotalIncomeController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST       /:srn/change-shares-total-income/:index          controllers.nonsipp.shares.SharesTotalIncomeController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)

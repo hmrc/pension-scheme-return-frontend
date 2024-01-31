@@ -19,7 +19,7 @@ package navigation.nonsipp
 import controllers.nonsipp.shares.CompanyNameOfSharesSellerPage
 import eu.timepit.refined.refineMV
 import models.SchemeHoldShare.{Acquisition, Contribution, Transfer}
-import models.TypeOfShares.Unquoted
+import models.TypeOfShares.{ConnectedParty, SponsoringEmployer, Unquoted}
 import models.{IdentitySubject, IdentityType, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
@@ -29,7 +29,7 @@ import pages.nonsipp.common.{
   OtherRecipientDetailsPage,
   PartnershipRecipientUtrPage
 }
-import pages.nonsipp.shares._
+import pages.nonsipp.shares.{TypeOfSharesHeldPage, _}
 import play.api.mvc.Call
 
 object SharesNavigator extends JourneyNavigator {
@@ -161,7 +161,22 @@ object SharesNavigator extends JourneyNavigator {
       controllers.nonsipp.shares.routes.SharesIndependentValuationController.onPageLoad(srn, index, NormalMode)
 
     case SharesIndependentValuationPage(srn, index) =>
+      userAnswers.get(WhyDoesSchemeHoldSharesPage(srn, index)) match {
+        case Some(Acquisition) =>
+          userAnswers.get(TypeOfSharesHeldPage(srn, index)) match {
+            case Some(SponsoringEmployer) =>
+              controllers.routes.UnauthorisedController.onPageLoad()
+            case _ =>
+              controllers.nonsipp.shares.routes.SharesTotalIncomeController.onPageLoad(srn, index, NormalMode)
+          }
+        case _ =>
+          controllers.nonsipp.shares.routes.SharesTotalIncomeController.onPageLoad(srn, index, NormalMode)
+
+      }
+
+    case SharesTotalIncomePage(srn, index) =>
       controllers.routes.UnauthorisedController.onPageLoad()
+
   }
 
   val checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] = _ => _ => PartialFunction.empty

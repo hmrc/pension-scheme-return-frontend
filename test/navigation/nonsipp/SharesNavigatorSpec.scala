@@ -516,18 +516,120 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       )
     }
 
+    "SharesFromConnectedPartyPage" - {
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            SharesFromConnectedPartyPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.CostOfSharesController
+                .onPageLoad(srn, index, NormalMode)
+          )
+          .withName("go from  shares from connected party page to cost of shares page")
+      )
+    }
+
     "SharesIndependentValuationPage" - {
       act.like(
         normalmode
           .navigateToWithIndex(
             index,
             SharesIndependentValuationPage,
-            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.SharesTotalIncomeController.onPageLoad(srn, index, NormalMode),
+            srn =>
+              defaultUserAnswers
+                .unsafeSet(
+                  WhyDoesSchemeHoldSharesPage(srn, index),
+                  SchemeHoldShare.Acquisition
+                )
+                .unsafeSet(
+                  TypeOfSharesHeldPage(srn, index),
+                  TypeOfShares.Unquoted
+                )
           )
           .withName(
-            "go from SharesIndependentValuationPage to Unauthorised page"
+            "go from shares independent valuation page to SharesTotalIncome page when holding is acquisition"
           )
       )
     }
+
+    "SharesIndependentValuationPage" - {
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            SharesIndependentValuationPage,
+            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad(),
+            srn =>
+              defaultUserAnswers
+                .unsafeSet(
+                  WhyDoesSchemeHoldSharesPage(srn, index),
+                  SchemeHoldShare.Acquisition
+                )
+                .unsafeSet(
+                  TypeOfSharesHeldPage(srn, index),
+                  TypeOfShares.SponsoringEmployer
+                )
+          )
+          .withName(
+            "go from shares independent valuation page to unauthorised page when holding is acquisition"
+          )
+      )
+    }
+
+    "SharesIndependentValuationPage" - {
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            SharesIndependentValuationPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.SharesTotalIncomeController
+                .onPageLoad(srn, index, NormalMode),
+            srn =>
+              defaultUserAnswers
+                .unsafeSet(
+                  TypeOfSharesHeldPage(srn, index),
+                  TypeOfShares.Unquoted
+                )
+                .unsafeSet(
+                  WhyDoesSchemeHoldSharesPage(srn, index),
+                  SchemeHoldShare.Contribution
+                )
+          )
+          .withName(
+            "go from shares independent valuation page to shares total income when unquoted shares selected "
+          )
+      )
+    }
+
+    "SharesIndependentValuationPage" - {
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            SharesIndependentValuationPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.SharesTotalIncomeController
+                .onPageLoad(srn, index, NormalMode),
+            srn =>
+              defaultUserAnswers
+                .unsafeSet(
+                  TypeOfSharesHeldPage(srn, index),
+                  TypeOfShares.ConnectedParty
+                )
+                .unsafeSet(
+                  WhyDoesSchemeHoldSharesPage(srn, index),
+                  SchemeHoldShare.Transfer
+                )
+          )
+          .withName(
+            "go from how many shares page to shares total income page  page when ConnectedParty is selected"
+          )
+      )
+    }
+
   }
 }
