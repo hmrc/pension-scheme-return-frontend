@@ -19,6 +19,7 @@ package navigation.nonsipp
 import controllers.nonsipp.shares.CompanyNameOfSharesSellerPage
 import eu.timepit.refined.refineMV
 import models.SchemeHoldShare.{Acquisition, Contribution, Transfer}
+import models.TypeOfShares.Unquoted
 import models.{IdentitySubject, IdentityType, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
@@ -28,7 +29,6 @@ import pages.nonsipp.common.{
   OtherRecipientDetailsPage,
   PartnershipRecipientUtrPage
 }
-import pages.nonsipp.loansmadeoroutstanding.PartnershipRecipientNamePage
 import pages.nonsipp.shares._
 import play.api.mvc.Call
 
@@ -74,10 +74,18 @@ object SharesNavigator extends JourneyNavigator {
 
     case HowManySharesPage(srn, index) =>
       userAnswers.get(WhyDoesSchemeHoldSharesPage(srn, index)) match {
+
         case Some(Acquisition) =>
           controllers.nonsipp.common.routes.IdentityTypeController
             .onPageLoad(srn, index, NormalMode, IdentitySubject.SharesSeller)
-        case _ => controllers.routes.UnauthorisedController.onPageLoad()
+        case _ =>
+          userAnswers.get(TypeOfSharesHeldPage(srn, index)) match {
+            case Some(Unquoted) =>
+              controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onPageLoad(srn, index, NormalMode)
+            case _ =>
+              controllers.routes.UnauthorisedController.onPageLoad()
+          }
+
       }
 
     case IdentityTypePage(srn, index, IdentitySubject.SharesSeller) =>
@@ -110,16 +118,41 @@ object SharesNavigator extends JourneyNavigator {
         .onPageLoad(srn, index, NormalMode, IdentitySubject.SharesSeller)
 
     case SharesIndividualSellerNINumberPage(srn, index) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+      userAnswers.get(TypeOfSharesHeldPage(srn, index)) match {
+        case Some(Unquoted) =>
+          controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onPageLoad(srn, index, NormalMode)
+
+        case _ =>
+          controllers.routes.UnauthorisedController.onPageLoad()
+
+      }
 
     case CompanyRecipientCrnPage(srn, index, IdentitySubject.SharesSeller) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+      userAnswers.get(TypeOfSharesHeldPage(srn, index)) match {
+        case Some(Unquoted) =>
+          controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onPageLoad(srn, index, NormalMode)
+
+        case _ =>
+          controllers.routes.UnauthorisedController.onPageLoad()
+      }
 
     case PartnershipRecipientUtrPage(srn, index, IdentitySubject.SharesSeller) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+      userAnswers.get(TypeOfSharesHeldPage(srn, index)) match {
+        case Some(Unquoted) =>
+          controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onPageLoad(srn, index, NormalMode)
+
+        case _ =>
+          controllers.routes.UnauthorisedController.onPageLoad()
+      }
 
     case OtherRecipientDetailsPage(srn, index, IdentitySubject.SharesSeller) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+      userAnswers.get(TypeOfSharesHeldPage(srn, index)) match {
+        case Some(Unquoted) =>
+          controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onPageLoad(srn, index, NormalMode)
+
+        case _ =>
+          controllers.routes.UnauthorisedController.onPageLoad()
+      }
 
   }
 

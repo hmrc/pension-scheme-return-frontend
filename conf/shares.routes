@@ -77,3 +77,8 @@ GET         /:srn/partnership-name-of-shares-seller/:index                      
 POST        /:srn/partnership-name-of-shares-seller/:index                                             controllers.nonsipp.shares.PartnershipNameOfSharesSellerController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
 GET         /:srn/change-partnership-name-of-shares-seller/:index                                      controllers.nonsipp.shares.PartnershipNameOfSharesSellerController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 POST        /:srn/change-partnership-name-of-shares-seller/:index                                      controllers.nonsipp.shares.PartnershipNameOfSharesSellerController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET         /:srn/shares-from-connected-party/:index                           controllers.nonsipp.shares.SharesFromConnectedPartyController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/shares-from-connected-party/:index                            controllers.nonsipp.shares.SharesFromConnectedPartyController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/change-shares-from-connected-party/:index                    controllers.nonsipp.shares.SharesFromConnectedPartyController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-shares-from-connected-party/:index                     controllers.nonsipp.shares.SharesFromConnectedPartyController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
