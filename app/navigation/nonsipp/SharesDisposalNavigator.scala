@@ -60,8 +60,12 @@ object SharesDisposalNavigator extends JourneyNavigator {
       }
 
     case WhenWereSharesSoldPage(srn, shareIndex, disposalIndex) =>
+      controllers.nonsipp.sharesdisposal.routes.HowManySharesSoldController
+        .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
+
+    case HowManySharesSoldPage(srn, shareIndex, disposalIndex) =>
       controllers.routes.UnauthorisedController.onPageLoad()
-//      controllers.nonsipp.sharesdisposal.routes.HowManySharesSoldController
+//      controllers.nonsipp.sharesdisposal.routes.TotalConsiderationSharesSoldController
 //        .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
 
   }
