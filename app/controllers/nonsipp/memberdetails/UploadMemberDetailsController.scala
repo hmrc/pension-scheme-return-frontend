@@ -97,11 +97,11 @@ class UploadMemberDetailsController @Inject()(
       case _ => None
     }
 
-  private def buildAuditEvent(taxYear: DateRange, uploadStatus: UploadStatus, duration: Long)(
+  private def buildAuditEvent(taxYear: DateRange, uploadStatus: UploadStatus, duration: Long, userName: String)(
     implicit req: DataRequest[_]
   ) = PSRUpscanFileUploadAuditEvent(
     schemeName = req.schemeDetails.schemeName,
-    schemeAdministratorOrPractitionerName = req.schemeDetails.establishers.headOption.get.name,
+    schemeAdministratorOrPractitionerName = req.schemeDetails.establishers.headOption.fold(userName)(e => e.name),
     psaOrPspId = req.pensionSchemeId.value,
     schemeTaxReference = req.schemeDetails.pstr,
     affinityGroup = if (req.minimalDetails.organisationName.nonEmpty) "Organisation" else "Individual",
@@ -119,7 +119,8 @@ class UploadMemberDetailsController @Inject()(
         val x = schemeDateService.taxYearOrAccountingPeriods(srn)
         x.merge.getOrRecoverJourney
       }
-      _ = auditService.sendEvent(buildAuditEvent(taxYear, uploadStatus, duration))
+      userName <- loggedInUserNameOrRedirect
+      _ = auditService.sendEvent(buildAuditEvent(taxYear, uploadStatus, duration, userName))
     } yield taxYear
   }
 }
