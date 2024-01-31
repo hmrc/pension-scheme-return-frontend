@@ -16,6 +16,11 @@
 
 package viewmodels
 
-abstract class WithCssClass(val className: String) {
-  override val toString: String = className
+sealed trait Margin {
+  val className: String
+}
+
+object Margin {
+
+  case object Fixed60Bottom extends WithCssClass("govuk-!-static-margin-bottom-9") with Margin
 }

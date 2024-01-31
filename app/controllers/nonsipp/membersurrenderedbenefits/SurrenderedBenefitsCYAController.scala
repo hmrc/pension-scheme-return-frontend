@@ -31,6 +31,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{PsrSubmissionService, SaveService}
 import utils.DateTimeUtils.localDateShow
 import viewmodels.DisplayMessage.Message
+import viewmodels.Margin
 import viewmodels.implicits._
 import viewmodels.models._
 import views.html.CheckYourAnswersView
@@ -130,7 +131,7 @@ object SurrenderedBenefitsCYAController {
           whenSurrenderedBenefits,
           whySurrenderedBenefits
         )
-      ),
+      ).withMarginBottom(Margin.Fixed60Bottom),
       refresh = None,
       buttonText = mode.fold(
         normal = "site.saveAndContinue",
