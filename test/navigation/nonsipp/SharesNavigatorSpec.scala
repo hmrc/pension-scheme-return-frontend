@@ -293,10 +293,9 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             index,
             SharesIndividualSellerNINumberPage,
             (srn, _: Max5000, _) =>
-              controllers.routes.UnauthorisedController
-                .onPageLoad()
+              controllers.nonsipp.shares.routes.CostOfSharesController.onPageLoad(srn, index, NormalMode)
           )
-          .withName("go from SharesIndividualSellerNINumber page to Unauthorised page")
+          .withName("go from SharesIndividualSellerNINumber page to CostOfShares page")
       )
     }
 
@@ -370,10 +369,9 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             subject,
             PartnershipRecipientUtrPage,
             (srn, _: Max5000, _) =>
-              controllers.routes.UnauthorisedController
-                .onPageLoad()
+              controllers.nonsipp.shares.routes.CostOfSharesController.onPageLoad(srn, index, NormalMode)
           )
-          .withName("go from PartnershipRecipientUtrPage page to Unauthorised page")
+          .withName("go from PartnershipRecipientUtrPage page to CostOfShares page")
       )
     }
 
@@ -407,10 +405,9 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             subject,
             CompanyRecipientCrnPage,
             (srn, _: Max5000, _) =>
-              controllers.routes.UnauthorisedController
-                .onPageLoad()
+              controllers.nonsipp.shares.routes.CostOfSharesController.onPageLoad(srn, index, NormalMode)
           )
-          .withName("go from CompanyRecipientCrnPage page to Unauthorised page")
+          .withName("go from CompanyRecipientCrnPage page to CostOfShares page")
       )
     }
 
@@ -428,9 +425,10 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             subject,
             OtherRecipientDetailsPage,
             Gen.const(shareDetails),
-            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.CostOfSharesController.onPageLoad(srn, index, NormalMode)
           )
-          .withName("go from other recipient details page to Unauthorised page")
+          .withName("go from other recipient details page to CostOfShares page")
       )
     }
 
@@ -482,7 +480,8 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           .navigateToWithIndex(
             index,
             HowManySharesPage,
-            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad(),
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.CostOfSharesController.onPageLoad(srn, index, NormalMode),
             srn =>
               defaultUserAnswers.unsafeSet(
                 TypeOfSharesHeldPage(srn, index),
@@ -490,7 +489,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               )
           )
           .withName(
-            "go from how many shares page to Unauthorised page when SponsoringEmployer is selected"
+            "go from how many shares page to CostOfShares page when SponsoringEmployer is selected"
           )
       )
     }
@@ -501,7 +500,8 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           .navigateToWithIndex(
             index,
             HowManySharesPage,
-            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad(),
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.CostOfSharesController.onPageLoad(srn, index, NormalMode),
             srn =>
               defaultUserAnswers.unsafeSet(
                 TypeOfSharesHeldPage(srn, index),
@@ -509,7 +509,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               )
           )
           .withName(
-            "go from how many shares page to Unauthorised page when ConnectedParty is selected"
+            "go from how many shares page to CostOfShares page when ConnectedParty is selected"
           )
       )
     }
