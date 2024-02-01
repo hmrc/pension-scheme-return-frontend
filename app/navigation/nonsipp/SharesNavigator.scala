@@ -29,7 +29,7 @@ import pages.nonsipp.common.{
   OtherRecipientDetailsPage,
   PartnershipRecipientUtrPage
 }
-import pages.nonsipp.shares.{TypeOfSharesHeldPage, _}
+import pages.nonsipp.shares._
 import play.api.mvc.Call
 
 object SharesNavigator extends JourneyNavigator {
