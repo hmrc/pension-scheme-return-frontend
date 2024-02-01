@@ -17,17 +17,20 @@
 package pages.nonsipp.sharesdisposal
 
 import config.Refined.{Max50, Max5000}
-import models.SchemeId.Srn
-import pages.QuestionPage
-import play.api.libs.json.JsPath
-import utils.RefinedUtils.RefinedIntOps
+import eu.timepit.refined.refineMV
+import pages.behaviours.PageBehaviours
 
-import java.time.LocalDate
+class SharesIndividualBuyerNamePageSpec extends PageBehaviours {
+  private val srn = srnGen.sample.value
+  private val index = refineMV[Max5000.Refined](1)
+  private val disposalIndex = refineMV[Max50.Refined](1)
 
-case class WhenWereSharesSoldPage(srn: Srn, index: Max5000, disposalIndex: Max50) extends QuestionPage[LocalDate] {
+  "Share disposal - SharesIndividualBuyerNamePage" - {
 
-  override def path: JsPath =
-    Paths.salesQuestions \ toString \ index.arrayIndex.toString \ disposalIndex.arrayIndex.toString
+    beRetrievable[String](SharesIndividualBuyerNamePage(srn, index, disposalIndex))
 
-  override def toString: String = "dateOfSale"
+    beSettable[String](SharesIndividualBuyerNamePage(srn, index, disposalIndex))
+
+    beRemovable[String](SharesIndividualBuyerNamePage(srn, index, disposalIndex))
+  }
 }

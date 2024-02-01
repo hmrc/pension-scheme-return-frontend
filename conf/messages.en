@@ -512,6 +512,14 @@ shares.totalShares.error.decimal = Number of shares acquired in this transaction
 shares.totalShares.error.zero = Number of shares acquired in this transaction must be 1 or more
 shares.totalShares.error.size = Number of shares acquired in this transaction must be 9,999,999 or fewer
 
+sharesDisposal.whoWereTheSharesSoldTo.title = Who were the shares in this company sold to?
+sharesDisposal.whoWereTheSharesSoldTo.heading = Who were the shares in {0} sold to?
+sharesDisposal.whoWereTheSharesSoldTo.radioList1 = An individual
+sharesDisposal.whoWereTheSharesSoldTo.radioList2 = A UK company
+sharesDisposal.whoWereTheSharesSoldTo.radioList3 = A UK partnership
+sharesDisposal.whoWereTheSharesSoldTo.radioList4 = Other
+sharesDisposal.whoWereTheSharesSoldTo.error.required = Select who the shares were sold to
+
 sharesDisposal.title = Did the scheme dispose of any shares in a sponsoring employer, shares acquired from a connected party, or unquoted shares during the period of this return?
 sharesDisposal.heading = Did {0} dispose of any shares in a sponsoring employer, shares acquired from a connected party, or unquoted shares during the period of this return?
 sharesDisposal.error.required = Select yes if the scheme disposed of any shares in a sponsoring employer, shares acquired from a connected party, or unquoted shares during the period of this return
@@ -1534,7 +1542,7 @@ whoPurchasedLandOrProperty.radioList1 = An individual
 whoPurchasedLandOrProperty.radioList2 = A UK company
 whoPurchasedLandOrProperty.radioList3 = A UK partnership
 whoPurchasedLandOrProperty.radioList4 = Other
-whoReceivedLoan.error.required = Select who purchased the land or property
+whoPurchasedLandOrProperty.error.required = Select who purchased the land or property
 
 companyBuyerName.title = What is the buyer’s company name?
 companyBuyerName.heading = What is the buyer’s company name?

@@ -17,17 +17,17 @@
 package pages.nonsipp.sharesdisposal
 
 import config.Refined.{Max50, Max5000}
+import models.RecipientDetails
 import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
 
-import java.time.LocalDate
-
-case class WhenWereSharesSoldPage(srn: Srn, index: Max5000, disposalIndex: Max50) extends QuestionPage[LocalDate] {
+case class OtherBuyerDetailsPage(srn: Srn, index: Max5000, disposalIndex: Max50)
+    extends QuestionPage[RecipientDetails] {
 
   override def path: JsPath =
-    Paths.salesQuestions \ toString \ index.arrayIndex.toString \ disposalIndex.arrayIndex.toString
+    Paths.disposedSharesTransaction \ toString \ index.arrayIndex.toString \ disposalIndex.arrayIndex.toString
 
-  override def toString: String = "dateOfSale"
+  override def toString: String = "otherDescription"
 }

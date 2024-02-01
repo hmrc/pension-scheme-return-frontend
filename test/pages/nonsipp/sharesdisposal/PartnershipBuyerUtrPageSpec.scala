@@ -17,17 +17,23 @@
 package pages.nonsipp.sharesdisposal
 
 import config.Refined.{Max50, Max5000}
-import models.SchemeId.Srn
-import pages.QuestionPage
-import play.api.libs.json.JsPath
-import utils.RefinedUtils.RefinedIntOps
+import eu.timepit.refined.refineMV
+import models.{ConditionalYesNo, Utr}
+import pages.behaviours.PageBehaviours
 
-import java.time.LocalDate
+class PartnershipBuyerUtrPageSpec extends PageBehaviours {
+  private val srn = srnGen.sample.value
 
-case class WhenWereSharesSoldPage(srn: Srn, index: Max5000, disposalIndex: Max50) extends QuestionPage[LocalDate] {
+  "Share disposal - PartnershipBuyerUtrPage" - {
 
-  override def path: JsPath =
-    Paths.salesQuestions \ toString \ index.arrayIndex.toString \ disposalIndex.arrayIndex.toString
+    val index = refineMV[Max5000.Refined](1)
+    val disposalIndex = refineMV[Max50.Refined](1)
 
-  override def toString: String = "dateOfSale"
+    beRetrievable[ConditionalYesNo[String, Utr]](PartnershipBuyerUtrPage(srn, index, disposalIndex))
+
+    beSettable[ConditionalYesNo[String, Utr]](PartnershipBuyerUtrPage(srn, index, disposalIndex))
+
+    beRemovable[ConditionalYesNo[String, Utr]](PartnershipBuyerUtrPage(srn, index, disposalIndex))
+  }
+
 }

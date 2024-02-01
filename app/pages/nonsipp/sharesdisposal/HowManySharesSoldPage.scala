@@ -25,7 +25,7 @@ import utils.RefinedUtils.RefinedIntOps
 case class HowManySharesSoldPage(srn: Srn, shareIndex: Max5000, disposalIndex: Max50) extends QuestionPage[Int] {
 
   override def path: JsPath =
-    Paths.salesQuestions \ toString \ shareIndex.arrayIndex.toString \ disposalIndex.arrayIndex.toString
+    Paths.disposedSharesTransaction \ toString \ shareIndex.arrayIndex.toString \ disposalIndex.arrayIndex.toString
 
   override def toString: String = "noOfSharesSold"
 }
