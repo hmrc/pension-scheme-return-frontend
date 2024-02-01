@@ -16,6 +16,8 @@
 
 package utils
 
+import eu.timepit.refined.api.{Refined, Validate}
+import eu.timepit.refined.refineV
 import viewmodels.DisplayMessage.Message
 
 object ListUtils {
@@ -47,6 +49,9 @@ object ListUtils {
     def toOption: Option[List[A]] =
       if (list.isEmpty) None
       else Some(list)
+
+    def refine[I: Validate[Int, *]](implicit ev: A <:< String): List[Refined[Int, I]] =
+      list.flatMap(a => ev(a).toIntOption.flatMap(index => refineV[I](index + 1).toOption))
   }
 
   implicit class ListTupStringOps(list: List[(String, String)]) {

@@ -101,7 +101,7 @@ abstract class PSRController extends FrontendBaseController with I18nSupport {
     def toFuture: Future[A] = Future.fromTry(t)
   }
 
-  implicit class ListOps[A](l: List[A]) {
+  implicit class ListIndexOps[A](l: List[A]) {
     def zipWithIndexToMap: Map[String, A] =
       l.zipWithIndex
         .map(t => t._2.toString -> t._1)
