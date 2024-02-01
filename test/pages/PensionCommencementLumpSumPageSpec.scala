@@ -21,12 +21,14 @@ import pages.nonsipp.memberreceivedpcls.PensionCommencementLumpSumPage
 
 class PensionCommencementLumpSumPageSpec extends PageBehaviours {
 
+  private val srn = srnGen.sample.value
+
   "PensionCommencementLumpSumPage" - {
 
-    beRetrievable[Boolean](PensionCommencementLumpSumPage(srnGen.sample.value))
+    beRetrievable[Boolean](PensionCommencementLumpSumPage(srn))
 
-    beSettable[Boolean](PensionCommencementLumpSumPage(srnGen.sample.value))
+    beSettable[Boolean](PensionCommencementLumpSumPage(srn))
 
-    beRemovable[Boolean](PensionCommencementLumpSumPage(srnGen.sample.value))
+    beRemovable[Boolean](PensionCommencementLumpSumPage(srn))
   }
 }

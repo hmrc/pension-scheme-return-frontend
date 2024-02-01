@@ -17,16 +17,17 @@
 package pages.nonsipp.membertransferout
 
 import pages.behaviours.PageBehaviours
-import pages.nonsipp.membertransferout.SchemeTransferOutPage
 
 class SchemeTransferoutPageSpec extends PageBehaviours {
 
+  private val srn = srnGen.sample.value
+
   "SchemeTransferoutPage" - {
 
-    beRetrievable[Boolean](SchemeTransferOutPage(srnGen.sample.value))
+    beRetrievable[Boolean](SchemeTransferOutPage(srn))
 
-    beSettable[Boolean](SchemeTransferOutPage(srnGen.sample.value))
+    beSettable[Boolean](SchemeTransferOutPage(srn))
 
-    beRemovable[Boolean](SchemeTransferOutPage(srnGen.sample.value))
+    beRemovable[Boolean](SchemeTransferOutPage(srn))
   }
 }

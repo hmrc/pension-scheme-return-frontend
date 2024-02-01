@@ -16,15 +16,15 @@
 
 package forms
 
-import config.Constants.{maxOtherDescriptionLength, maxTextAreaLength, textAreaRegex}
+import config.Constants.{maxOtherDescriptionLength, textAreaRegex}
+import forms.mappings.Mappings
 import models.RecipientDetails
 import play.api.data.Form
 import play.api.data.Forms._
-import forms.mappings.Mappings
 
 import javax.inject.Inject
 
-class RecipientDetailsFormProvider @Inject()() extends Mappings {
+class RecipientDetailsFormProvider @Inject() extends Mappings {
 
   val nameMaxLength = 160
   val nameRegex = """^[a-zA-Z0-9 \-'".@/]+$"""

@@ -21,12 +21,14 @@ import pages.nonsipp.schemedesignatory.WhyNoBankAccountPage
 
 class WhyNoBankAccountPageSpec extends PageBehaviours {
 
+  private val srn = srnGen.sample.value
+
   "WhyNoBankAccountPage" - {
 
-    beRetrievable[String](WhyNoBankAccountPage(srnGen.sample.value))
+    beRetrievable[String](WhyNoBankAccountPage(srn))
 
-    beSettable[String](WhyNoBankAccountPage(srnGen.sample.value))
+    beSettable[String](WhyNoBankAccountPage(srn))
 
-    beRemovable[String](WhyNoBankAccountPage(srnGen.sample.value))
+    beRemovable[String](WhyNoBankAccountPage(srn))
   }
 }

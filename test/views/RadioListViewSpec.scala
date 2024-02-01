@@ -18,6 +18,7 @@ package views
 
 import forms.RadioListFormProvider
 import models.Enumerable
+import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import viewmodels.DisplayMessage.Empty
 import viewmodels.models.{RadioListRowDivider, RadioListRowViewModel, RadioListViewModel}
@@ -25,14 +26,14 @@ import views.html.RadioListView
 
 class RadioListViewSpec extends ViewSpec {
 
-  implicit val enumerable = Enumerable(
+  implicit val enumerable: Enumerable[Int] = Enumerable(
     ("1", 1),
     ("2", 2),
     ("3", 3)
   )
 
   runningApplication { implicit app =>
-    implicit val request = FakeRequest()
+    implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
     val view = injected[RadioListView]
 

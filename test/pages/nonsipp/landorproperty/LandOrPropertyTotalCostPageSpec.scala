@@ -23,14 +23,16 @@ import pages.behaviours.PageBehaviours
 
 class LandOrPropertyTotalCostPageSpec extends PageBehaviours {
 
+  private val srn = srnGen.sample.value
+
   "LandOrPropertyTotalCostPage" - {
 
     val index = refineMV[OneTo5000](1)
 
-    beRetrievable[Money](LandOrPropertyTotalCostPage(srnGen.sample.value, index))
+    beRetrievable[Money](LandOrPropertyTotalCostPage(srn, index))
 
-    beSettable[Money](LandOrPropertyTotalCostPage(srnGen.sample.value, index))
+    beSettable[Money](LandOrPropertyTotalCostPage(srn, index))
 
-    beRemovable[Money](LandOrPropertyTotalCostPage(srnGen.sample.value, index))
+    beRemovable[Money](LandOrPropertyTotalCostPage(srn, index))
   }
 }

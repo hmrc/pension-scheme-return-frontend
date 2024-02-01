@@ -16,20 +16,22 @@
 
 package pages.nonsipp.shares
 
-import pages.behaviours.PageBehaviours
-import models.Money
 import config.Refined._
 import eu.timepit.refined.refineMV
+import pages.behaviours.PageBehaviours
 
 class SharesIndependentValuationPageSpec extends PageBehaviours {
+
+  private val srn = srnGen.sample.value
 
   "SharesIndependentValuationPage" - {
 
     val index = refineMV[Max5000.Refined](1)
-    beRetrievable[Boolean](SharesIndependentValuationPage(srnGen.sample.value, index))
 
-    beSettable[Boolean](SharesIndependentValuationPage(srnGen.sample.value, index))
+    beRetrievable[Boolean](SharesIndependentValuationPage(srn, index))
 
-    beRemovable[Boolean](SharesIndependentValuationPage(srnGen.sample.value, index))
+    beSettable[Boolean](SharesIndependentValuationPage(srn, index))
+
+    beRemovable[Boolean](SharesIndependentValuationPage(srn, index))
   }
 }

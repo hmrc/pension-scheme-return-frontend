@@ -25,14 +25,16 @@ import java.time.LocalDate
 
 class LandOrPropertyLeaseDetailsPageSpec extends PageBehaviours {
 
+  private val srn = srnGen.sample.value
+
   "LandOrPropertyLeaseDetailsPage" - {
 
     val index = refineMV[OneTo5000](1)
 
-    beRetrievable[(String, Money, LocalDate)](LandOrPropertyLeaseDetailsPage(srnGen.sample.value, index))
+    beRetrievable[(String, Money, LocalDate)](LandOrPropertyLeaseDetailsPage(srn, index))
 
-    beSettable[(String, Money, LocalDate)](LandOrPropertyLeaseDetailsPage(srnGen.sample.value, index))
+    beSettable[(String, Money, LocalDate)](LandOrPropertyLeaseDetailsPage(srn, index))
 
-    beRemovable[(String, Money, LocalDate)](LandOrPropertyLeaseDetailsPage(srnGen.sample.value, index))
+    beRemovable[(String, Money, LocalDate)](LandOrPropertyLeaseDetailsPage(srn, index))
   }
 }

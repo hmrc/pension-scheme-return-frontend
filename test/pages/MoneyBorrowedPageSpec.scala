@@ -21,12 +21,13 @@ import pages.nonsipp.moneyborrowed.MoneyBorrowedPage
 
 class MoneyBorrowedPageSpec extends PageBehaviours {
 
+  private val srn = srnGen.sample.value
+
   "MoneyBorrowedPage" - {
+    beRetrievable[Boolean](MoneyBorrowedPage(srn))
 
-    beRetrievable[Boolean](MoneyBorrowedPage(srnGen.sample.value))
+    beSettable[Boolean](MoneyBorrowedPage(srn))
 
-    beSettable[Boolean](MoneyBorrowedPage(srnGen.sample.value))
-
-    beRemovable[Boolean](MoneyBorrowedPage(srnGen.sample.value))
+    beRemovable[Boolean](MoneyBorrowedPage(srn))
   }
 }

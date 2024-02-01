@@ -22,14 +22,16 @@ import pages.behaviours.PageBehaviours
 
 class IsLenderConnectedPartyPageSpec extends PageBehaviours {
 
+  private val srn = srnGen.sample.value
+
   "IsLenderConnectedPartyPage" - {
 
     val index = refineMV[OneTo5000](1)
 
-    beRetrievable[Boolean](IsLenderConnectedPartyPage(srnGen.sample.value, index))
+    beRetrievable[Boolean](IsLenderConnectedPartyPage(srn, index))
 
-    beSettable[Boolean](IsLenderConnectedPartyPage(srnGen.sample.value, index))
+    beSettable[Boolean](IsLenderConnectedPartyPage(srn, index))
 
-    beRemovable[Boolean](IsLenderConnectedPartyPage(srnGen.sample.value, index))
+    beRemovable[Boolean](IsLenderConnectedPartyPage(srn, index))
   }
 }

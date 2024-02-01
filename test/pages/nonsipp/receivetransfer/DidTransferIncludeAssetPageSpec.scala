@@ -22,15 +22,16 @@ import pages.behaviours.PageBehaviours
 
 class DidTransferIncludeAssetPageSpec extends PageBehaviours {
 
+  private val srn = srnGen.sample.value
   "DidTransferIncludeAssetPage" - {
 
     val index = refineMV[Max300.Refined](1)
     val secondaryIndex = refineMV[Max5.Refined](1)
 
-    beRetrievable[Boolean](DidTransferIncludeAssetPage(srnGen.sample.value, index, secondaryIndex))
+    beRetrievable[Boolean](DidTransferIncludeAssetPage(srn, index, secondaryIndex))
 
-    beSettable[Boolean](DidTransferIncludeAssetPage(srnGen.sample.value, index, secondaryIndex))
+    beSettable[Boolean](DidTransferIncludeAssetPage(srn, index, secondaryIndex))
 
-    beRemovable[Boolean](DidTransferIncludeAssetPage(srnGen.sample.value, index, secondaryIndex))
+    beRemovable[Boolean](DidTransferIncludeAssetPage(srn, index, secondaryIndex))
   }
 }

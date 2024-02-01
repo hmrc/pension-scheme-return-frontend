@@ -22,14 +22,16 @@ import pages.behaviours.PageBehaviours
 
 class CompanySellerNamePageSpec extends PageBehaviours {
 
+  private val srn = srnGen.sample.value
+
   "CompanySellerNamePage" - {
 
     val index = refineMV[OneTo5000](1)
 
-    beRetrievable[String](CompanySellerNamePage(srnGen.sample.value, index))
+    beRetrievable[String](CompanySellerNamePage(srn, index))
 
-    beSettable[String](CompanySellerNamePage(srnGen.sample.value, index))
+    beSettable[String](CompanySellerNamePage(srn, index))
 
-    beRemovable[String](CompanySellerNamePage(srnGen.sample.value, index))
+    beRemovable[String](CompanySellerNamePage(srn, index))
   }
 }

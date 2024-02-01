@@ -17,16 +17,17 @@
 package pages.nonsipp.receivetransfer
 
 import pages.behaviours.PageBehaviours
-import pages.nonsipp.receivetransfer.DidSchemeReceiveTransferPage
 
 class DidSchemeReceiveTransferPageSpec extends PageBehaviours {
 
+  private val srn = srnGen.sample.value
+
   "DidSchemeReceiveTransferPage" - {
 
-    beRetrievable[Boolean](DidSchemeReceiveTransferPage(srnGen.sample.value))
+    beRetrievable[Boolean](DidSchemeReceiveTransferPage(srn))
 
-    beSettable[Boolean](DidSchemeReceiveTransferPage(srnGen.sample.value))
+    beSettable[Boolean](DidSchemeReceiveTransferPage(srn))
 
-    beRemovable[Boolean](DidSchemeReceiveTransferPage(srnGen.sample.value))
+    beRemovable[Boolean](DidSchemeReceiveTransferPage(srn))
   }
 }

@@ -16,13 +16,11 @@
 
 package pages.nonsipp.shares
 
-import play.api.libs.json.JsPath
-import models.SchemeId.Srn
-import models.Money
-import pages.QuestionPage
 import config.Refined._
+import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 import utils.RefinedUtils._
-import eu.timepit.refined.refineMV
 
 case class SharesIndependentValuationPage(srn: Srn, index: Max5000) extends QuestionPage[Boolean] {
   override def path: JsPath = Paths.shareTransactions \ toString \ index.arrayIndex.toString

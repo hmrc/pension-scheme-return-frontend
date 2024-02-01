@@ -20,12 +20,14 @@ import pages.behaviours.PageBehaviours
 
 class LandOrPropertyDisposalPageSpec extends PageBehaviours {
 
+  private val srn = srnGen.sample.value
+
   "LandOrPropertyDisposalPage" - {
 
-    beRetrievable[Boolean](LandOrPropertyDisposalPage(srnGen.sample.value))
+    beRetrievable[Boolean](LandOrPropertyDisposalPage(srn))
 
-    beSettable[Boolean](LandOrPropertyDisposalPage(srnGen.sample.value))
+    beSettable[Boolean](LandOrPropertyDisposalPage(srn))
 
-    beRemovable[Boolean](LandOrPropertyDisposalPage(srnGen.sample.value))
+    beRemovable[Boolean](LandOrPropertyDisposalPage(srn))
   }
 }

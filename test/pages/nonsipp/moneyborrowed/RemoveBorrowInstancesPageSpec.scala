@@ -22,13 +22,15 @@ import pages.behaviours.PageBehaviours
 
 class RemoveBorrowInstancesPageSpec extends PageBehaviours {
 
+  private val srn = srnGen.sample.value
+
   "RemoveBorrowInstancesPage" - {
     val index = refineMV[OneTo5000](1)
 
-    beRetrievable[Boolean](RemoveBorrowInstancesPage(srnGen.sample.value, index))
+    beRetrievable[Boolean](RemoveBorrowInstancesPage(srn, index))
 
-    beSettable[Boolean](RemoveBorrowInstancesPage(srnGen.sample.value, index))
+    beSettable[Boolean](RemoveBorrowInstancesPage(srn, index))
 
-    beRemovable[Boolean](RemoveBorrowInstancesPage(srnGen.sample.value, index))
+    beRemovable[Boolean](RemoveBorrowInstancesPage(srn, index))
   }
 }

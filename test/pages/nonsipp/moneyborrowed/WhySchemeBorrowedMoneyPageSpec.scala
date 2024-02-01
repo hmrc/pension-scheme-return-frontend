@@ -22,13 +22,15 @@ import pages.behaviours.PageBehaviours
 
 class WhySchemeBorrowedMoneyPageSpec extends PageBehaviours {
 
+  private val srn = srnGen.sample.value
+
   "WhySchemeBorrowedMoneyPage" - {
     val index = refineMV[OneTo5000](1)
 
-    beRetrievable[String](WhySchemeBorrowedMoneyPage(srnGen.sample.value, index))
+    beRetrievable[String](WhySchemeBorrowedMoneyPage(srn, index))
 
-    beSettable[String](WhySchemeBorrowedMoneyPage(srnGen.sample.value, index))
+    beSettable[String](WhySchemeBorrowedMoneyPage(srn, index))
 
-    beRemovable[String](WhySchemeBorrowedMoneyPage(srnGen.sample.value, index))
+    beRemovable[String](WhySchemeBorrowedMoneyPage(srn, index))
   }
 }

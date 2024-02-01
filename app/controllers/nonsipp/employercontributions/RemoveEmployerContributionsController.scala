@@ -41,7 +41,6 @@ import views.html.YesNoPageView
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
-import pages.nonsipp.employercontributions._
 
 class RemoveEmployerContributionsController @Inject()(
   override val messagesApi: MessagesApi,

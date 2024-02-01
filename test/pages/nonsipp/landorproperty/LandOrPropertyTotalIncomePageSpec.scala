@@ -16,21 +16,23 @@
 
 package pages.nonsipp.landorproperty
 
-import pages.behaviours.PageBehaviours
-import models.Money
 import config.Refined.Max5000
 import eu.timepit.refined.refineMV
+import models.Money
+import pages.behaviours.PageBehaviours
 
 class LandOrPropertyTotalIncomePageSpec extends PageBehaviours {
+
+  private val srn = srnGen.sample.value
 
   "LandOrPropertyTotalIncomePage" - {
 
     val index = refineMV[Max5000.Refined](1)
 
-    beRetrievable[Money](LandOrPropertyTotalIncomePage(srnGen.sample.value, index))
+    beRetrievable[Money](LandOrPropertyTotalIncomePage(srn, index))
 
-    beSettable[Money](LandOrPropertyTotalIncomePage(srnGen.sample.value, index))
+    beSettable[Money](LandOrPropertyTotalIncomePage(srn, index))
 
-    beRemovable[Money](LandOrPropertyTotalIncomePage(srnGen.sample.value, index))
+    beRemovable[Money](LandOrPropertyTotalIncomePage(srn, index))
   }
 }

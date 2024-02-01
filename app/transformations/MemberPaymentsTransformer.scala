@@ -47,7 +47,6 @@ import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsJourneyStatus
 import pages.nonsipp.membertransferout.TransfersOutJourneyStatus
 import pages.nonsipp.receivetransfer.TransfersInJourneyStatus
 import uk.gov.hmrc.domain.Nino
-import utils.WithName
 import viewmodels.models.{MemberState, SectionCompleted, SectionStatus}
 
 import javax.inject.Inject

@@ -23,14 +23,16 @@ import pages.nonsipp.landorproperty.IsLesseeConnectedPartyPage
 
 class IsLesseeConnectedPartyPageSpec extends PageBehaviours {
 
+  private val srn = srnGen.sample.value
+
   "IsLesseeConnectedPartyPage" - {
 
     val index = refineMV[OneTo5000](1)
 
-    beRetrievable[Boolean](IsLesseeConnectedPartyPage(srnGen.sample.value, index))
+    beRetrievable[Boolean](IsLesseeConnectedPartyPage(srn, index))
 
-    beSettable[Boolean](IsLesseeConnectedPartyPage(srnGen.sample.value, index))
+    beSettable[Boolean](IsLesseeConnectedPartyPage(srn, index))
 
-    beRemovable[Boolean](IsLesseeConnectedPartyPage(srnGen.sample.value, index))
+    beRemovable[Boolean](IsLesseeConnectedPartyPage(srn, index))
   }
 }

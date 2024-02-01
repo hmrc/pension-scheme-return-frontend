@@ -40,6 +40,8 @@ import viewmodels.models.SectionCompleted
 $! Generic (change page type) !$
 class $className$PageSpec extends PageBehaviours {
 
+  private val srn = srnGen.sample.value
+
   "$className$Page" - {
 
     $if(!index.empty)$
@@ -47,24 +49,24 @@ class $className$PageSpec extends PageBehaviours {
     $if(!secondaryIndex.empty)$
     val secondaryIndex = refineMV[$secondaryIndex$.Refined](1)
 
-    beRetrievable[SectionCompleted.type]($className;format="cap"$Page(srnGen.sample.value, index, secondaryIndex))
+    beRetrievable[SectionCompleted.type]($className;format="cap"$Page(srn, index, secondaryIndex))
 
-    beSettable[SectionCompleted.type]($className;format="cap"$Page(srnGen.sample.value, index, secondaryIndex))
+    beSettable[SectionCompleted.type]($className;format="cap"$Page(srn, index, secondaryIndex))
 
-    beRemovable[SectionCompleted.type]($className;format="cap"$Page(srnGen.sample.value, index, secondaryIndex))
+    beRemovable[SectionCompleted.type]($className;format="cap"$Page(srn, index, secondaryIndex))
     $else$
-    beRetrievable[SectionCompleted.type]($className;format="cap"$Page(srnGen.sample.value, index))
+    beRetrievable[SectionCompleted.type]($className;format="cap"$Page(srn, index))
 
-    beSettable[SectionCompleted.type]($className;format="cap"$Page(srnGen.sample.value, index))
+    beSettable[SectionCompleted.type]($className;format="cap"$Page(srn, index))
 
-    beRemovable[SectionCompleted.type]($className;format="cap"$Page(srnGen.sample.value, index))
+    beRemovable[SectionCompleted.type]($className;format="cap"$Page(srn, index))
     $endif$
     $else$
-    beRetrievable[SectionCompleted.type]($className;format="cap"$Page(srnGen.sample.value))
+    beRetrievable[SectionCompleted.type]($className;format="cap"$Page(srn))
 
-    beSettable[SectionCompleted.type]($className;format="cap"$Page(srnGen.sample.value))
+    beSettable[SectionCompleted.type]($className;format="cap"$Page(srn))
 
-    beRemovable[SectionCompleted.type]($className;format="cap"$Page(srnGen.sample.value))
+    beRemovable[SectionCompleted.type]($className;format="cap"$Page(srn))
     $endif$
   }
 }
