@@ -19,6 +19,7 @@ package viewmodels.govuk
 import play.twirl.api.Html
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{Content, HtmlContent, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist._
+import viewmodels.Margin
 
 object summarylist extends SummaryListFluency
 
@@ -41,8 +42,8 @@ trait SummaryListFluency {
     def withAttribute(attribute: (String, String)): SummaryList =
       list.copy(attributes = list.attributes + attribute)
 
-    def withMarginBottom(maybeMargin: Option[Int]): SummaryList =
-      maybeMargin.fold(list)(margin => list.withCssClass(s"govuk-!-margin-bottom-${margin.toString}"))
+    def withMarginBottom(maybeMargin: Option[Margin]): SummaryList =
+      maybeMargin.fold(list)(margin => list.withCssClass(margin.className))
   }
 
   object SummaryListRowViewModel {

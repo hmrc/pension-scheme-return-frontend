@@ -17,16 +17,16 @@
 package viewmodels.models
 
 import play.api.mvc.Call
-import viewmodels.DisplayMessage
+import viewmodels.{DisplayMessage, Margin}
 import viewmodels.DisplayMessage.Message
 
 case class CheckYourAnswersViewModel(
   sections: List[CheckYourAnswersSection],
-  marginBottom: Option[Int] = None,
+  marginBottom: Option[Margin] = Some(Margin.Fixed60Bottom),
   inset: Option[DisplayMessage] = None,
   paginatedViewModel: Option[PaginatedViewModel] = None
 ) {
-  def withMarginBottom(margin: Int): CheckYourAnswersViewModel = copy(marginBottom = Some(margin))
+  def withMarginBottom(margin: Margin): CheckYourAnswersViewModel = copy(marginBottom = Some(margin))
 }
 
 case class CheckYourAnswersSection(

@@ -36,6 +36,7 @@ import services.{AuditService, PsrSubmissionService, SchemeDateService}
 import utils.DateTimeUtils.localDateShow
 import utils.ListUtils.ListOps
 import viewmodels.DisplayMessage._
+import viewmodels.Margin
 import viewmodels.implicits._
 import viewmodels.models._
 import views.html.CheckYourAnswersView
@@ -165,7 +166,7 @@ object BasicDetailsCheckYourAnswersController {
           pensionSchemeId,
           isPSP
         )
-      ).withMarginBottom(9),
+      ).withMarginBottom(Margin.Fixed60Bottom),
       refresh = None,
       buttonText = "site.saveAndContinue",
       onSubmit = routes.BasicDetailsCheckYourAnswersController.onSubmit(srn, mode)

@@ -18,7 +18,9 @@ package viewmodels.govuk
 
 import play.twirl.api.Html
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{Content, HtmlContent}
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
 import uk.gov.hmrc.govukfrontend.views.viewmodels.table._
+import viewmodels.Margin
 
 object table extends TableFluency
 
@@ -40,6 +42,9 @@ trait TableFluency {
 
     def withAttribute(attribute: (String, String)): Table =
       list.copy(attributes = list.attributes + attribute)
+
+    def withMarginBottom(maybeMargin: Option[Margin]): Table =
+      maybeMargin.fold(list)(margin => list.withCssClass(margin.className))
   }
 
   object TableRowViewModel {
