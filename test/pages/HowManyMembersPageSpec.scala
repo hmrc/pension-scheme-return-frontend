@@ -22,12 +22,14 @@ import pages.nonsipp.schemedesignatory.HowManyMembersPage
 
 class HowManyMembersPageSpec extends PageBehaviours {
 
+  private val srn = srnGen.sample.value
+
   "howManyMembersPage" - {
 
-    beRetrievable[SchemeMemberNumbers](HowManyMembersPage(srnGen.sample.value, pensionSchemeIdGen.sample.value))
+    beRetrievable[SchemeMemberNumbers](HowManyMembersPage(srn, pensionSchemeIdGen.sample.value))
 
-    beSettable[SchemeMemberNumbers](HowManyMembersPage(srnGen.sample.value, pensionSchemeIdGen.sample.value))
+    beSettable[SchemeMemberNumbers](HowManyMembersPage(srn, pensionSchemeIdGen.sample.value))
 
-    beRemovable[SchemeMemberNumbers](HowManyMembersPage(srnGen.sample.value, pensionSchemeIdGen.sample.value))
+    beRemovable[SchemeMemberNumbers](HowManyMembersPage(srn, pensionSchemeIdGen.sample.value))
   }
 }

@@ -23,15 +23,15 @@ import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.BaseSpec
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 import scala.util.Random
 
 class SchemeDetailsServiceSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
-  implicit val hc = HeaderCarrier()
+  implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  val mockSchemeDetailsConnector = mock[SchemeDetailsConnector]
+  val mockSchemeDetailsConnector: SchemeDetailsConnector = mock[SchemeDetailsConnector]
   val service = new SchemeDetailsServiceImpl(mockSchemeDetailsConnector)
 
   override def beforeEach(): Unit = {

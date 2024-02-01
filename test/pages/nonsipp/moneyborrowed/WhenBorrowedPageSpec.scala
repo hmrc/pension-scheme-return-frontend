@@ -24,14 +24,16 @@ import java.time.LocalDate
 
 class WhenBorrowedPageSpec extends PageBehaviours {
 
+  private val srn = srnGen.sample.value
+
   "WhenBorrowedPage" - {
 
     val index = refineMV[OneTo5000](1)
 
-    beRetrievable[LocalDate](WhenBorrowedPage(srnGen.sample.value, index))
+    beRetrievable[LocalDate](WhenBorrowedPage(srn, index))
 
-    beSettable[LocalDate](WhenBorrowedPage(srnGen.sample.value, index))
+    beSettable[LocalDate](WhenBorrowedPage(srn, index))
 
-    beRemovable[LocalDate](WhenBorrowedPage(srnGen.sample.value, index))
+    beRemovable[LocalDate](WhenBorrowedPage(srn, index))
   }
 }

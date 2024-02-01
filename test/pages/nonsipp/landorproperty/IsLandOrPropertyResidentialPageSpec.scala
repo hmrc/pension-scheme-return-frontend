@@ -22,14 +22,16 @@ import pages.behaviours.PageBehaviours
 
 class IsLandOrPropertyResidentialPageSpec extends PageBehaviours {
 
+  private val srn = srnGen.sample.value
+
   "IsLandOrPropertyResidentialPage" - {
 
     val index = refineMV[OneTo5000](1)
 
-    beRetrievable[Boolean](IsLandOrPropertyResidentialPage(srnGen.sample.value, index))
+    beRetrievable[Boolean](IsLandOrPropertyResidentialPage(srn, index))
 
-    beSettable[Boolean](IsLandOrPropertyResidentialPage(srnGen.sample.value, index))
+    beSettable[Boolean](IsLandOrPropertyResidentialPage(srn, index))
 
-    beRemovable[Boolean](IsLandOrPropertyResidentialPage(srnGen.sample.value, index))
+    beRemovable[Boolean](IsLandOrPropertyResidentialPage(srn, index))
   }
 }

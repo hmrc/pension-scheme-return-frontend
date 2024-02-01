@@ -16,22 +16,14 @@
 
 package controllers.nonsipp.shares
 
-import models.{NormalMode, UserAnswers}
-import navigation.{FakeNavigator, Navigator}
-import play.api.inject.bind
-import play.api.mvc.Call
-import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import repositories.SessionRepository
-import forms.YesNoPageFormProvider
-import views.html.YesNoPageView
-import controllers.ControllerBaseSpec
-import SharesIndependentValuationController._
-import pages.nonsipp.shares.{CompanyNameRelatedSharesPage, SharesIndependentValuationPage}
 import config.Refined._
+import controllers.ControllerBaseSpec
+import controllers.nonsipp.shares.SharesIndependentValuationController._
 import eu.timepit.refined.refineMV
-
-import scala.concurrent.Future
+import forms.YesNoPageFormProvider
+import models.NormalMode
+import pages.nonsipp.shares.{CompanyNameRelatedSharesPage, SharesIndependentValuationPage}
+import views.html.YesNoPageView
 
 class SharesIndependentValuationControllerSpec extends ControllerBaseSpec {
 

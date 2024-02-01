@@ -40,6 +40,8 @@ import models.Money
 $! Generic (change page type) !$
 class $className$PageSpec extends PageBehaviours {
 
+  private val srn = srnGen.sample.value
+
   "$className$Page" - {
 
     $if(!index.empty)$
@@ -47,24 +49,24 @@ class $className$PageSpec extends PageBehaviours {
     $if(!secondaryIndex.empty)$
     val secondaryIndex = refineMV[$secondaryIndex$.Refined](1)
 
-    beRetrievable[Money]($className;format="cap"$Page(srnGen.sample.value, index, secondaryIndex))
+    beRetrievable[Money]($className;format="cap"$Page(srn, index, secondaryIndex))
 
-    beSettable[Money]($className;format="cap"$Page(srnGen.sample.value, index, secondaryIndex))
+    beSettable[Money]($className;format="cap"$Page(srn, index, secondaryIndex))
 
-    beRemovable[Money]($className;format="cap"$Page(srnGen.sample.value, index, secondaryIndex))
+    beRemovable[Money]($className;format="cap"$Page(srn, index, secondaryIndex))
     $else$
-    beRetrievable[Money]($className;format="cap"$Page(srnGen.sample.value, index))
+    beRetrievable[Money]($className;format="cap"$Page(srn, index))
 
-    beSettable[Money]($className;format="cap"$Page(srnGen.sample.value, index))
+    beSettable[Money]($className;format="cap"$Page(srn, index))
 
-    beRemovable[Money]($className;format="cap"$Page(srnGen.sample.value, index))
+    beRemovable[Money]($className;format="cap"$Page(srn, index))
     $endif$
     $else$
-    beRetrievable[Money]($className;format="cap"$Page(srnGen.sample.value))
+    beRetrievable[Money]($className;format="cap"$Page(srn))
 
-    beSettable[Money]($className;format="cap"$Page(srnGen.sample.value))
+    beSettable[Money]($className;format="cap"$Page(srn))
 
-    beRemovable[Money]($className;format="cap"$Page(srnGen.sample.value))
+    beRemovable[Money]($className;format="cap"$Page(srn))
     $endif$
   }
 }

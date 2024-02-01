@@ -21,12 +21,14 @@ import pages.nonsipp.memberdetails.CheckMemberDetailsFilePage
 
 class CheckMemberDetailsFilePageSpec extends PageBehaviours {
 
+  private val srn = srnGen.sample.value
+
   "CheckMemberDetailsFilePage" - {
 
-    beRetrievable[Boolean](CheckMemberDetailsFilePage(srnGen.sample.value))
+    beRetrievable[Boolean](CheckMemberDetailsFilePage(srn))
 
-    beSettable[Boolean](CheckMemberDetailsFilePage(srnGen.sample.value))
+    beSettable[Boolean](CheckMemberDetailsFilePage(srn))
 
-    beRemovable[Boolean](CheckMemberDetailsFilePage(srnGen.sample.value))
+    beRemovable[Boolean](CheckMemberDetailsFilePage(srn))
   }
 }

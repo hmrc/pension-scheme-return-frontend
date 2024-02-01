@@ -20,12 +20,14 @@ import pages.behaviours.PageBehaviours
 
 class PensionPaymentsReceivedPageSpec extends PageBehaviours {
 
+  private val srn = srnGen.sample.value
+
   "PensionPaymentsReceivedPage" - {
 
-    beRetrievable[Boolean](PensionPaymentsReceivedPage(srnGen.sample.value))
+    beRetrievable[Boolean](PensionPaymentsReceivedPage(srn))
 
-    beSettable[Boolean](PensionPaymentsReceivedPage(srnGen.sample.value))
+    beSettable[Boolean](PensionPaymentsReceivedPage(srn))
 
-    beRemovable[Boolean](PensionPaymentsReceivedPage(srnGen.sample.value))
+    beRemovable[Boolean](PensionPaymentsReceivedPage(srn))
   }
 }

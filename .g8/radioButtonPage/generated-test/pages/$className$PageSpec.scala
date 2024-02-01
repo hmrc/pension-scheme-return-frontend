@@ -4,12 +4,14 @@ import pages.behaviours.PageBehaviours
 
 class $className$PageSpec extends PageBehaviours {
 
+  private val srn = srnGen.sample.value
+
   "$className$Page" - {
 
-    beRetrievable[???]($className$Page(srnGen.sample.value))
+    beRetrievable[???]($className$Page(srn))
 
-    beSettable[???]($className$Page(srnGen.sample.value))
+    beSettable[???]($className$Page(srn))
 
-    beRemovable[???]($className$Page(srnGen.sample.value))
+    beRemovable[???]($className$Page(srn))
   }
 }

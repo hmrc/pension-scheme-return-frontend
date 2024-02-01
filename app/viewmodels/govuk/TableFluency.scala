@@ -18,7 +18,6 @@ package viewmodels.govuk
 
 import play.twirl.api.Html
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{Content, HtmlContent}
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
 import uk.gov.hmrc.govukfrontend.views.viewmodels.table._
 import viewmodels.Margin
 

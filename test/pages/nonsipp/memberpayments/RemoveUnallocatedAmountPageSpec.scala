@@ -20,12 +20,14 @@ import pages.behaviours.PageBehaviours
 
 class RemoveUnallocatedAmountPageSpec extends PageBehaviours {
 
+  private val srn = srnGen.sample.value
+
   "RemoveUnallocatedAmountPage" - {
 
-    beRetrievable[Boolean](RemoveUnallocatedAmountPage(srnGen.sample.value))
+    beRetrievable[Boolean](RemoveUnallocatedAmountPage(srn))
 
-    beSettable[Boolean](RemoveUnallocatedAmountPage(srnGen.sample.value))
+    beSettable[Boolean](RemoveUnallocatedAmountPage(srn))
 
-    beRemovable[Boolean](RemoveUnallocatedAmountPage(srnGen.sample.value))
+    beRemovable[Boolean](RemoveUnallocatedAmountPage(srn))
   }
 }

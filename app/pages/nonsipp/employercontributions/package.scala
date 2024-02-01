@@ -16,10 +16,7 @@
 
 package pages.nonsipp
 
-import config.Refined._
-import models.SchemeId.Srn
 import play.api.libs.json.{__, JsPath}
-import queries.Removable
 
 package object employercontributions {
 

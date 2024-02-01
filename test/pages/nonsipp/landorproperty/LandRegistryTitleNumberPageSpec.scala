@@ -23,14 +23,16 @@ import pages.behaviours.PageBehaviours
 
 class LandRegistryTitleNumberPageSpec extends PageBehaviours {
 
+  private val srn = srnGen.sample.value
+
   "LandRegistryTitleNumberPage" - {
 
     val index = refineMV[OneTo5000](1)
 
-    beRetrievable[ConditionalYesNo[String, String]](LandRegistryTitleNumberPage(srnGen.sample.value, index))
+    beRetrievable[ConditionalYesNo[String, String]](LandRegistryTitleNumberPage(srn, index))
 
-    beSettable[ConditionalYesNo[String, String]](LandRegistryTitleNumberPage(srnGen.sample.value, index))
+    beSettable[ConditionalYesNo[String, String]](LandRegistryTitleNumberPage(srn, index))
 
-    beRemovable[ConditionalYesNo[String, String]](LandRegistryTitleNumberPage(srnGen.sample.value, index))
+    beRemovable[ConditionalYesNo[String, String]](LandRegistryTitleNumberPage(srn, index))
   }
 }

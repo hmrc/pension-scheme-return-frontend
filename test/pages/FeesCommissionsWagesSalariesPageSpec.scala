@@ -22,9 +22,9 @@ import pages.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesPage
 
 class FeesCommissionsWagesSalariesPageSpec extends PageBehaviours {
 
-  "FeesCommissionsWagesSalariesPage" - {
+  private val srn = srnGen.sample.value
 
-    val srn = srnGen.sample.value
+  "FeesCommissionsWagesSalariesPage" - {
 
     beRetrievable[Money](FeesCommissionsWagesSalariesPage(srn, NormalMode))
 

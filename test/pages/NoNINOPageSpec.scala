@@ -23,14 +23,16 @@ import pages.nonsipp.memberdetails.NoNINOPage
 
 class NoNINOPageSpec extends PageBehaviours {
 
+  private val srn = srnGen.sample.value
+
   "NoNINOPage" - {
 
-    beRetrievable[String](NoNINOPage(srnGen.sample.value, refineMV(1)))
+    beRetrievable[String](NoNINOPage(srn, refineMV(1)))
 
-    beSettable[String](NoNINOPage(srnGen.sample.value, refineMV(1)))
+    beSettable[String](NoNINOPage(srn, refineMV(1)))
 
-    beSettableWithIndex[String, Max300](i => NoNINOPage(srnGen.sample.value, i))
+    beSettableWithIndex[String, Max300](i => NoNINOPage(srn, i))
 
-    beRemovable[String](NoNINOPage(srnGen.sample.value, refineMV(1)))
+    beRemovable[String](NoNINOPage(srn, refineMV(1)))
   }
 }

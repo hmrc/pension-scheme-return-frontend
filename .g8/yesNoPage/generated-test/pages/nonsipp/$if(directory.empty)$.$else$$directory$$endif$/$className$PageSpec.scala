@@ -14,6 +14,8 @@ $endif$
 $! Generic (change page type) !$
 class $className$PageSpec extends PageBehaviours {
 
+  private val srn = srnGen.sample.value
+
   "$className$Page" - {
 
     $if(!index.empty)$
@@ -21,24 +23,24 @@ class $className$PageSpec extends PageBehaviours {
     $if(!secondaryIndex.empty)$
     val secondaryIndex = refineMV[$secondaryIndex$.Refined](1)
 
-    beRetrievable[Boolean]($className;format="cap"$Page(srnGen.sample.value, index, secondaryIndex))
+    beRetrievable[Boolean]($className;format="cap"$Page(srn, index, secondaryIndex))
 
-    beSettable[Boolean]($className;format="cap"$Page(srnGen.sample.value, index, secondaryIndex))
+    beSettable[Boolean]($className;format="cap"$Page(srn, index, secondaryIndex))
 
-    beRemovable[Boolean]($className;format="cap"$Page(srnGen.sample.value, index, secondaryIndex))
+    beRemovable[Boolean]($className;format="cap"$Page(srn, index, secondaryIndex))
     $else$
-    beRetrievable[Boolean]($className;format="cap"$Page(srnGen.sample.value, index))
+    beRetrievable[Boolean]($className;format="cap"$Page(srn, index))
 
-    beSettable[Boolean]($className;format="cap"$Page(srnGen.sample.value, index))
+    beSettable[Boolean]($className;format="cap"$Page(srn, index))
 
-    beRemovable[Boolean]($className;format="cap"$Page(srnGen.sample.value, index))
+    beRemovable[Boolean]($className;format="cap"$Page(srn, index))
     $endif$
     $else$
-    beRetrievable[Boolean]($className;format="cap"$Page(srnGen.sample.value))
+    beRetrievable[Boolean]($className;format="cap"$Page(srn))
 
-    beSettable[Boolean]($className;format="cap"$Page(srnGen.sample.value))
+    beSettable[Boolean]($className;format="cap"$Page(srn))
 
-    beRemovable[Boolean]($className;format="cap"$Page(srnGen.sample.value))
+    beRemovable[Boolean]($className;format="cap"$Page(srn))
     $endif$
   }
 }

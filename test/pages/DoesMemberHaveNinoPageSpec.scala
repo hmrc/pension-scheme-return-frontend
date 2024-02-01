@@ -25,17 +25,18 @@ import uk.gov.hmrc.domain.Nino
 
 class DoesMemberHaveNinoPageSpec extends PageBehaviours {
 
+  val srn = srnGen.sample.value
+
   "DoesMemberHaveNinoPage" - {
 
-    beRetrievable[Boolean](DoesMemberHaveNinoPage(srnGen.sample.value, refineMV(1)))
+    beRetrievable[Boolean](DoesMemberHaveNinoPage(srn, refineMV(1)))
 
-    beSettable[Boolean](DoesMemberHaveNinoPage(srnGen.sample.value, refineMV(1)))
+    beSettable[Boolean](DoesMemberHaveNinoPage(srn, refineMV(1)))
 
-    beRemovable[Boolean](DoesMemberHaveNinoPage(srnGen.sample.value, refineMV(1)))
+    beRemovable[Boolean](DoesMemberHaveNinoPage(srn, refineMV(1)))
 
     "cleanup no NINO page if page value is true" in {
 
-      val srn = srnGen.sample.value
       val userAnswers = UserAnswers("test").set(NoNINOPage(srn, refineMV(1)), "test reason").success.value
       userAnswers.get(NoNINOPage(srn, refineMV(1))) must be(Some("test reason"))
 
@@ -45,7 +46,6 @@ class DoesMemberHaveNinoPageSpec extends PageBehaviours {
 
     "cleanup enter NINO page if page value is false" in {
 
-      val srn = srnGen.sample.value
       val nino = Nino("AB123456A")
       val userAnswers = UserAnswers("test").set(MemberDetailsNinoPage(srn, refineMV(1)), nino).success.value
       userAnswers.get(MemberDetailsNinoPage(srn, refineMV(1))) must be(Some(nino))
@@ -56,7 +56,6 @@ class DoesMemberHaveNinoPageSpec extends PageBehaviours {
 
     "cleanup both enter NINO page and no NINO page if page value is missing" in {
 
-      val srn = srnGen.sample.value
       val nino = Nino("AB123456A")
       val userAnswers = UserAnswers("test")
         .set(MemberDetailsNinoPage(srn, refineMV(1)), nino)

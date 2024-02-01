@@ -21,12 +21,14 @@ import pages.behaviours.PageBehaviours
 
 class UnallocatedEmployerAmountPageSpec extends PageBehaviours {
 
+  private val srn = srnGen.sample.value
+
   "TotalEmployerContributionPage" - {
 
-    beRetrievable[Money](UnallocatedEmployerAmountPage(srnGen.sample.value))
+    beRetrievable[Money](UnallocatedEmployerAmountPage(srn))
 
-    beSettable[Money](UnallocatedEmployerAmountPage(srnGen.sample.value))
+    beSettable[Money](UnallocatedEmployerAmountPage(srn))
 
-    beRemovable[Money](UnallocatedEmployerAmountPage(srnGen.sample.value))
+    beRemovable[Money](UnallocatedEmployerAmountPage(srn))
   }
 }

@@ -13,22 +13,24 @@ $endif$
 
 class $className;format="cap"$PageSpec extends PageBehaviours {
 
+  private val srn = srnGen.sample.value
+
   "$className$Page" - {
 
     $if(!index.empty) $
     val index = refineMV[$index$.Refined](1)
 
-    beRetrievable[ConditionalYesNo[String, String]]($className;format="cap"$Page(srnGen.sample.value, index))
+    beRetrievable[ConditionalYesNo[String, String]]($className;format="cap"$Page(srn, index))
 
-    beSettable[ConditionalYesNo[String, String]]($className;format="cap"$Page(srnGen.sample.value, index))
+    beSettable[ConditionalYesNo[String, String]]($className;format="cap"$Page(srn, index))
 
-    beRemovable[ConditionalYesNo[String, String]]($className;format="cap"$Page(srnGen.sample.value, index))
+    beRemovable[ConditionalYesNo[String, String]]($className;format="cap"$Page(srn, index))
     $else$
-    beRetrievable[ConditionalYesNo[String, String]]($className;format="cap"$Page(srnGen.sample.value))
+    beRetrievable[ConditionalYesNo[String, String]]($className;format="cap"$Page(srn))
 
-    beSettable[ConditionalYesNo[String, String]]($className;format="cap"$Page(srnGen.sample.value))
+    beSettable[ConditionalYesNo[String, String]]($className;format="cap"$Page(srn))
 
-    beRemovable[ConditionalYesNo[String, String]]($className;format="cap"$Page(srnGen.sample.value))
+    beRemovable[ConditionalYesNo[String, String]]($className;format="cap"$Page(srn))
     $endif$
   }
 }

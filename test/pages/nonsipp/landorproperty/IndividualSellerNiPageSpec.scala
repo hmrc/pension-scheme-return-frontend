@@ -24,20 +24,22 @@ import uk.gov.hmrc.domain.Nino
 
 class IndividualSellerNiPageSpec extends PageBehaviours {
 
+  private val srn = srnGen.sample.value
+
   "IndividualSellerNiPage" - {
 
     val index = refineMV[OneTo5000](1)
 
     beRetrievable[ConditionalYesNo[String, Nino]](
-      IndividualSellerNiPage(srnGen.sample.value, index)
+      IndividualSellerNiPage(srn, index)
     )
 
     beSettable[ConditionalYesNo[String, Nino]](
-      IndividualSellerNiPage(srnGen.sample.value, index)
+      IndividualSellerNiPage(srn, index)
     )
 
     beRemovable[ConditionalYesNo[String, Nino]](
-      IndividualSellerNiPage(srnGen.sample.value, index)
+      IndividualSellerNiPage(srn, index)
     )
   }
 }

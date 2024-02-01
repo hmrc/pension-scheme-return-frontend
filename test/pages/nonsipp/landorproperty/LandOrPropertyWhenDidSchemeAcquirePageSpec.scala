@@ -24,14 +24,16 @@ import java.time.LocalDate
 
 class LandOrPropertyWhenDidSchemeAcquirePageSpec extends PageBehaviours {
 
+  private val srn = srnGen.sample.value
+
   "LandOrPropertyWhenDidSchemeAcquirePage" - {
 
     val index = refineMV[OneTo5000](1)
 
-    beRetrievable[LocalDate](LandOrPropertyWhenDidSchemeAcquirePage(srnGen.sample.value, index))
+    beRetrievable[LocalDate](LandOrPropertyWhenDidSchemeAcquirePage(srn, index))
 
-    beSettable[LocalDate](LandOrPropertyWhenDidSchemeAcquirePage(srnGen.sample.value, index))
+    beSettable[LocalDate](LandOrPropertyWhenDidSchemeAcquirePage(srn, index))
 
-    beRemovable[LocalDate](LandOrPropertyWhenDidSchemeAcquirePage(srnGen.sample.value, index))
+    beRemovable[LocalDate](LandOrPropertyWhenDidSchemeAcquirePage(srn, index))
   }
 }

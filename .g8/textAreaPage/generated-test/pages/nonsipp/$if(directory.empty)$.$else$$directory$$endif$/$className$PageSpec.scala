@@ -38,6 +38,8 @@ $! Generic end !$
 $! Generic (change page type) !$
 class $className$PageSpec extends PageBehaviours {
 
+  private val srn = srnGen.sample.value
+
   "$className$Page" - {
 
     $if(!index.empty)$
@@ -45,24 +47,24 @@ class $className$PageSpec extends PageBehaviours {
     $if(!secondaryIndex.empty)$
     val secondaryIndex = refineMV[$secondaryIndex$.Refined](1)
 
-    beRetrievable[String]($className;format="cap"$Page(srnGen.sample.value, index, secondaryIndex))
+    beRetrievable[String]($className;format="cap"$Page(srn, index, secondaryIndex))
 
-    beSettable[String]($className;format="cap"$Page(srnGen.sample.value, index, secondaryIndex))
+    beSettable[String]($className;format="cap"$Page(srn, index, secondaryIndex))
 
-    beRemovable[String]($className;format="cap"$Page(srnGen.sample.value, index, secondaryIndex))
+    beRemovable[String]($className;format="cap"$Page(srn, index, secondaryIndex))
     $else$
-    beRetrievable[String]($className;format="cap"$Page(srnGen.sample.value, index))
+    beRetrievable[String]($className;format="cap"$Page(srn, index))
 
-    beSettable[String]($className;format="cap"$Page(srnGen.sample.value, index))
+    beSettable[String]($className;format="cap"$Page(srn, index))
 
-    beRemovable[String]($className;format="cap"$Page(srnGen.sample.value, index))
+    beRemovable[String]($className;format="cap"$Page(srn, index))
     $endif$
     $else$
-    beRetrievable[String]($className;format="cap"$Page(srnGen.sample.value))
+    beRetrievable[String]($className;format="cap"$Page(srn))
 
-    beSettable[String]($className;format="cap"$Page(srnGen.sample.value))
+    beSettable[String]($className;format="cap"$Page(srn))
 
-    beRemovable[String]($className;format="cap"$Page(srnGen.sample.value))
+    beRemovable[String]($className;format="cap"$Page(srn))
     $endif$
   }
 }

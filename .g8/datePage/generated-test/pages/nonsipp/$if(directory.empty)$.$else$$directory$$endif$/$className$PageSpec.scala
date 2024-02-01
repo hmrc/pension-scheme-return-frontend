@@ -40,6 +40,8 @@ import java.time.LocalDate
 $! Generic (change page type) !$
 class $className$PageSpec extends PageBehaviours {
 
+  private val srn = srnGen.sample.value
+
   "$className$Page" - {
 
     $if(!index.empty)$
@@ -47,24 +49,24 @@ class $className$PageSpec extends PageBehaviours {
     $if(!secondaryIndex.empty)$
     val secondaryIndex = refineMV[$secondaryIndex$.Refined](1)
 
-    beRetrievable[LocalDate]($className;format="cap"$Page(srnGen.sample.value, index, secondaryIndex))
+    beRetrievable[LocalDate]($className;format="cap"$Page(srn, index, secondaryIndex))
 
-    beSettable[LocalDate]($className;format="cap"$Page(srnGen.sample.value, index, secondaryIndex))
+    beSettable[LocalDate]($className;format="cap"$Page(srn, index, secondaryIndex))
 
-    beRemovable[LocalDate]($className;format="cap"$Page(srnGen.sample.value, index, secondaryIndex))
+    beRemovable[LocalDate]($className;format="cap"$Page(srn, index, secondaryIndex))
     $else$
-    beRetrievable[LocalDate]($className;format="cap"$Page(srnGen.sample.value, index))
+    beRetrievable[LocalDate]($className;format="cap"$Page(srn, index))
 
-    beSettable[LocalDate]($className;format="cap"$Page(srnGen.sample.value, index))
+    beSettable[LocalDate]($className;format="cap"$Page(srn, index))
 
-    beRemovable[LocalDate]($className;format="cap"$Page(srnGen.sample.value, index))
+    beRemovable[LocalDate]($className;format="cap"$Page(srn, index))
     $endif$
     $else$
-    beRetrievable[LocalDate]($className;format="cap"$Page(srnGen.sample.value))
+    beRetrievable[LocalDate]($className;format="cap"$Page(srn))
 
-    beSettable[LocalDate]($className;format="cap"$Page(srnGen.sample.value))
+    beSettable[LocalDate]($className;format="cap"$Page(srn))
 
-    beRemovable[LocalDate]($className;format="cap"$Page(srnGen.sample.value))
+    beRemovable[LocalDate]($className;format="cap"$Page(srn))
     $endif$
   }
 }

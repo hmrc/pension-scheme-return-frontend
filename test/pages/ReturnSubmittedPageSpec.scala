@@ -23,12 +23,14 @@ import java.time.LocalDateTime
 
 class ReturnSubmittedPageSpec extends PageBehaviours {
 
+  private val srn = srnGen.sample.value
+
   "ReturnSubmittedPage" - {
 
-    beRetrievable[LocalDateTime](ReturnSubmittedPage(srnGen.sample.value))
+    beRetrievable[LocalDateTime](ReturnSubmittedPage(srn))
 
-    beSettable[LocalDateTime](ReturnSubmittedPage(srnGen.sample.value))
+    beSettable[LocalDateTime](ReturnSubmittedPage(srn))
 
-    beRemovable[LocalDateTime](ReturnSubmittedPage(srnGen.sample.value))
+    beRemovable[LocalDateTime](ReturnSubmittedPage(srn))
   }
 }

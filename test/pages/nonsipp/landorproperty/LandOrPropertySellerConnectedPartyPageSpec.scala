@@ -22,14 +22,16 @@ import pages.behaviours.PageBehaviours
 
 class LandOrPropertySellerConnectedPartyPageSpec extends PageBehaviours {
 
+  private val srn = srnGen.sample.value
+
   "LandOrPropertySellerConnectedPartyPage" - {
 
     val index = refineMV[OneTo5000](1)
 
-    beRetrievable[Boolean](LandOrPropertySellerConnectedPartyPage(srnGen.sample.value, index))
+    beRetrievable[Boolean](LandOrPropertySellerConnectedPartyPage(srn, index))
 
-    beSettable[Boolean](LandOrPropertySellerConnectedPartyPage(srnGen.sample.value, index))
+    beSettable[Boolean](LandOrPropertySellerConnectedPartyPage(srn, index))
 
-    beRemovable[Boolean](LandOrPropertySellerConnectedPartyPage(srnGen.sample.value, index))
+    beRemovable[Boolean](LandOrPropertySellerConnectedPartyPage(srn, index))
   }
 }

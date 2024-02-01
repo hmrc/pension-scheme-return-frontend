@@ -20,12 +20,14 @@ import pages.behaviours.PageBehaviours
 
 class SurrenderedBenefitsPageSpec extends PageBehaviours {
 
+  private val srn = srnGen.sample.value
+
   "SurrenderedBenefitsPage" - {
 
-    beRetrievable[Boolean](SurrenderedBenefitsPage(srnGen.sample.value))
+    beRetrievable[Boolean](SurrenderedBenefitsPage(srn))
 
-    beSettable[Boolean](SurrenderedBenefitsPage(srnGen.sample.value))
+    beSettable[Boolean](SurrenderedBenefitsPage(srn))
 
-    beRemovable[Boolean](SurrenderedBenefitsPage(srnGen.sample.value))
+    beRemovable[Boolean](SurrenderedBenefitsPage(srn))
   }
 }

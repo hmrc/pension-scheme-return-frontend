@@ -35,11 +35,11 @@ class LandPropertyInUKPageSpec extends PageBehaviours {
 
     val index = refineMV[OneTo5000](1)
 
-    beRetrievable[Boolean](LandPropertyInUKPage(srnGen.sample.value, index))
+    beRetrievable[Boolean](LandPropertyInUKPage(srn, index))
 
-    beSettable[Boolean](LandPropertyInUKPage(srnGen.sample.value, index))
+    beSettable[Boolean](LandPropertyInUKPage(srn, index))
 
-    beRemovable[Boolean](LandPropertyInUKPage(srnGen.sample.value, index))
+    beRemovable[Boolean](LandPropertyInUKPage(srn, index))
   }
 
   "cleanup with list size 1" - {

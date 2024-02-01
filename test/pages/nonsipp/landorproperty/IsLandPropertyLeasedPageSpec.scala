@@ -31,11 +31,11 @@ class IsLandPropertyLeasedPageSpec extends PageBehaviours {
 
     val index = refineMV[OneTo5000](1)
 
-    beRetrievable[Boolean](IsLandPropertyLeasedPage(srnGen.sample.value, index))
+    beRetrievable[Boolean](IsLandPropertyLeasedPage(srn, index))
 
-    beSettable[Boolean](IsLandPropertyLeasedPage(srnGen.sample.value, index))
+    beSettable[Boolean](IsLandPropertyLeasedPage(srn, index))
 
-    beRemovable[Boolean](IsLandPropertyLeasedPage(srnGen.sample.value, index))
+    beRemovable[Boolean](IsLandPropertyLeasedPage(srn, index))
 
     "cleanup" - {
       val leaseName = "testLeaseName"
