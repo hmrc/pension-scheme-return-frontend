@@ -16,7 +16,7 @@
 
 package navigation.nonsipp
 
-import models.{HowSharesDisposed, NormalMode, UserAnswers}
+import models.{HowSharesDisposed, IdentityType, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.sharesdisposal._
@@ -25,6 +25,56 @@ import play.api.mvc.Call
 object SharesDisposalNavigator extends JourneyNavigator {
 
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
+    case WhoWereTheSharesSoldToPage(srn, index, disposalIndex) =>
+      userAnswers.get(WhoWereTheSharesSoldToPage(srn, index, disposalIndex)) match {
+
+        case Some(IdentityType.Individual) =>
+          controllers.nonsipp.sharesdisposal.routes.SharesIndividualBuyerNameController
+            .onPageLoad(srn, index, disposalIndex, NormalMode)
+
+// TODO uncomment as these controllers are introduced:
+
+//        case Some(IdentityType.UKCompany) =>
+//          controllers.nonsipp.sharesdisposal.routes.CompanyBuyerNameController
+//            .onPageLoad(srn, index, disposalIndex, NormalMode)
+//
+//        case Some(IdentityType.UKPartnership) =>
+//          controllers.nonsipp.sharesdisposal.routes.PartnershipBuyerNameController
+//            .onPageLoad(srn, index, disposalIndex, NormalMode)
+//
+//        case Some(IdentityType.Other) =>
+//          controllers.nonsipp.sharesdisposal.routes.OtherBuyerDetailsController
+//            .onPageLoad(srn, index, disposalIndex, NormalMode)
+      }
+
+    case SharesIndividualBuyerNamePage(srn, index, disposalIndex) =>
+      controllers.nonsipp.sharesdisposal.routes.IndividualBuyerNinoNumberController
+        .onPageLoad(srn, index, disposalIndex, NormalMode)
+
+    // TODO uncomment as these controllers are introduced:
+//    case CompanyBuyerNamePage(srn, index, disposalIndex) =>
+//      controllers.nonsipp.sharesdisposal.routes.CompanyBuyerCrnController
+//        .onPageLoad(srn, index, disposalIndex, NormalMode)
+//
+//    case PartnershipBuyerNamePage(srn, index, disposalIndex) =>
+//      controllers.nonsipp.sharesdisposal.routes.PartnershipBuyerUtrController
+//        .onPageLoad(srn, index, disposalIndex, NormalMode)
+//
+//    case IndividualBuyerNinoNumberPage(srn, index, disposalIndex) =>
+//      controllers.nonsipp.sharesdisposal.routes.ShareslBuyerConnectedPartyController
+//        .onPageLoad(srn, index, disposalIndex, NormalMode)
+//
+//    case CompanyBuyerCrnPage(srn, index, disposalIndex) =>
+//      controllers.nonsipp.sharesdisposal.routes.SharesBuyerConnectedPartyController
+//        .onPageLoad(srn, index, disposalIndex, NormalMode)
+//
+//    case PartnershipBuyerUtrPage(srn, index, disposalIndex) =>
+//      controllers.nonsipp.sharesdisposal.routes.SharesDisposalBuyerConnectedPartyController
+//        .onPageLoad(srn, index, disposalIndex, NormalMode)
+//
+//    case OtherBuyerDetailsPage(srn, index, disposalIndex) =>
+//      controllers.nonsipp.sharesdisposal.routes.SharesBuyerConnectedPartyController
+//        .onPageLoad(srn, index, disposalIndex, NormalMode)
 
     case page @ SharesDisposalPage(srn) =>
       if (userAnswers.get(page).contains(true)) {

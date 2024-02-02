@@ -527,6 +527,12 @@ sharesDisposal.whoWereTheSharesSoldTo.radioList3 = A UK partnership
 sharesDisposal.whoWereTheSharesSoldTo.radioList4 = Other
 sharesDisposal.whoWereTheSharesSoldTo.error.required = Select who the shares were sold to
 
+sharesDisposal.individualBuyerName.title = What is the buyer’s name?
+sharesDisposal.individualBuyerName.heading = What is the buyer’s name?
+sharesDisposal.individualBuyerName.error.required = Enter the buyer’s name
+sharesDisposal.individualBuyerName.error.length = Buyer’s name must be 160 characters or fewer
+sharesDisposal.individualBuyerName.error.invalid.characters = Buyer’s name must only include letters a to z, hyphens, apostrophes and spaces
+
 sharesDisposal.title = Did the scheme dispose of any shares in a sponsoring employer, shares acquired from a connected party, or unquoted shares during the period of this return?
 sharesDisposal.heading = Did {0} dispose of any shares in a sponsoring employer, shares acquired from a connected party, or unquoted shares during the period of this return?
 sharesDisposal.error.required = Select yes if the scheme disposed of any shares in a sponsoring employer, shares acquired from a connected party, or unquoted shares during the period of this return
