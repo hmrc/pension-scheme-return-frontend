@@ -561,7 +561,8 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           .navigateToWithIndex(
             index,
             SharesIndependentValuationPage,
-            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad(),
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.TotalAssetValueController.onPageLoad(srn, index, NormalMode),
             srn =>
               defaultUserAnswers
                 .unsafeSet(
@@ -574,7 +575,7 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
                 )
           )
           .withName(
-            "go from shares independent valuation page to unauthorised page when holding is acquisition"
+            "go from shares independent valuation page to total asset value page when holding is acquisition"
           )
       )
     }
@@ -631,5 +632,20 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       )
     }
 
+    "TotalAssetValuePage" - {
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            TotalAssetValuePage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.SharesTotalIncomeController
+                .onPageLoad(srn, index, NormalMode)
+          )
+          .withName(
+            "go from TotalAssetValuePage to SharesTotalIncomePage"
+          )
+      )
+    }
   }
 }
