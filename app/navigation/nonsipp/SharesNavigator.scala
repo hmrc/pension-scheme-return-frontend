@@ -29,7 +29,7 @@ import pages.nonsipp.common.{
   OtherRecipientDetailsPage,
   PartnershipRecipientUtrPage
 }
-import pages.nonsipp.shares.{TypeOfSharesHeldPage, _}
+import pages.nonsipp.shares._
 import play.api.mvc.Call
 
 object SharesNavigator extends JourneyNavigator {
@@ -165,7 +165,7 @@ object SharesNavigator extends JourneyNavigator {
         case Some(Acquisition) =>
           userAnswers.get(TypeOfSharesHeldPage(srn, index)) match {
             case Some(SponsoringEmployer) =>
-              controllers.routes.UnauthorisedController.onPageLoad()
+              controllers.nonsipp.shares.routes.TotalAssetValueController.onPageLoad(srn, index, NormalMode)
             case _ =>
               controllers.nonsipp.shares.routes.SharesTotalIncomeController.onPageLoad(srn, index, NormalMode)
           }
@@ -173,6 +173,9 @@ object SharesNavigator extends JourneyNavigator {
           controllers.nonsipp.shares.routes.SharesTotalIncomeController.onPageLoad(srn, index, NormalMode)
 
       }
+
+    case TotalAssetValuePage(srn, index) =>
+      controllers.nonsipp.shares.routes.SharesTotalIncomeController.onPageLoad(srn, index, NormalMode)
 
     case SharesTotalIncomePage(srn, index) =>
       controllers.routes.UnauthorisedController.onPageLoad()
