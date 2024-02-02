@@ -25,6 +25,7 @@ import play.api.data.FormError
 import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
 import play.api.mvc.Call
+import play.api.test.CSRFTokenHelper.CSRFRequest
 import play.api.test.FakeRequest
 import services.{AuditService, SchemeDateService, UploadService}
 import views.html.UploadView
@@ -69,7 +70,7 @@ class UploadMemberDetailsControllerSpec extends ControllerBaseSpec {
 
       val successCaptor: ArgumentCaptor[String] = ArgumentCaptor.forClass(classOf[String])
       val failureCaptor: ArgumentCaptor[String] = ArgumentCaptor.forClass(classOf[String])
-      val request = FakeRequest(onPageLoad)
+      val request = FakeRequest(onPageLoad).withCSRFToken
       route(app, request).value.futureValue
 
       verify(mockUploadService).initiateUpscan(any(), successCaptor.capture(), failureCaptor.capture())(any())

@@ -14,9 +14,10 @@
  * limitations under the License.
  *@
 
+@import views.html.helper.CSRF
+
 @this(
         layout: templates.Layout,
-        formHelper: FormWithCSRF,
         govukErrorSummary: GovukErrorSummary,
         govukButton: GovukButton,
         govukDetails: GovukDetails,
@@ -31,7 +32,7 @@
     <h1 class="govuk-heading-l">@renderMessage(viewmodel.heading)</h1>
 
     <form action="@viewmodel.onSubmit.url" method="@viewmodel.onSubmit.method" enctype="multipart/form-data">
-
+        @CSRF.formField
         @for(field <- viewmodel.page.formFields) {
             <input type="hidden" name="@field._1" value="@field._2"/>
         }

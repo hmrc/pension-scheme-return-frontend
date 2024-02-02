@@ -25,10 +25,12 @@ import play.api.inject.bind
 import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
 import play.api.libs.json.{JsPath, Writes}
 import play.api.mvc.{Call, Request}
+import play.api.test.CSRFTokenHelper.CSRFRequest
 import play.api.test.FakeRequest
 import play.twirl.api.Html
 import queries.Settable
 import services.SaveService
+
 import scala.concurrent.Future
 
 trait ControllerBehaviours {
@@ -107,7 +109,7 @@ trait ControllerBehaviours {
     view: Application => Request[_] => Html
   ): Unit =
     running(_ => appBuilder) { app =>
-      val request = FakeRequest(call)
+      val request = FakeRequest(call).withCSRFToken
       val result = route(app, request).value
       val expectedView = view(app)(request)
 
