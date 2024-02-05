@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.landorpropertydisposal
+package controllers.nonsipp.sharesdisposal
 
 import config.Refined.{Max50, Max5000}
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.landorpropertydisposal.LandOrPropertyIndividualBuyerNameController._
+import controllers.nonsipp.sharesdisposal.SharesIndividualBuyerNameController._
 import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import models.NormalMode
-import pages.nonsipp.landorpropertydisposal.LandOrPropertyIndividualBuyerNamePage
+import pages.nonsipp.sharesdisposal.SharesIndividualBuyerNamePage
 import views.html.TextInputView
 
-class LandOrPropertyIndividualBuyerNameControllerSpec extends ControllerBaseSpec {
+class SharesIndividualBuyerNameControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[Max5000.Refined](1)
   private val disposalIndex = refineMV[Max50.Refined](1)
@@ -33,16 +33,16 @@ class LandOrPropertyIndividualBuyerNameControllerSpec extends ControllerBaseSpec
   "IndividualRecipientNameController" - {
 
     lazy val onPageLoad =
-      routes.LandOrPropertyIndividualBuyerNameController.onPageLoad(srn, index, disposalIndex, NormalMode)
+      routes.SharesIndividualBuyerNameController.onPageLoad(srn, index, disposalIndex, NormalMode)
     lazy val onSubmit =
-      routes.LandOrPropertyIndividualBuyerNameController.onSubmit(srn, index, disposalIndex, NormalMode)
+      routes.SharesIndividualBuyerNameController.onSubmit(srn, index, disposalIndex, NormalMode)
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       injected[TextInputView].apply(form(injected[TextFormProvider]), viewModel(srn, index, disposalIndex, NormalMode))
     })
 
     act.like(
-      renderPrePopView(onPageLoad, LandOrPropertyIndividualBuyerNamePage(srn, index, disposalIndex), recipientName) {
+      renderPrePopView(onPageLoad, SharesIndividualBuyerNamePage(srn, index, disposalIndex), recipientName) {
         implicit app => implicit request =>
           val preparedForm = form(injected[TextFormProvider]).fill(recipientName)
           injected[TextInputView].apply(preparedForm, viewModel(srn, index, disposalIndex, NormalMode))
