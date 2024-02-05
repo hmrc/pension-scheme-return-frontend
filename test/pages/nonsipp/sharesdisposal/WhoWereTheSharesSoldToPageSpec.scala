@@ -83,7 +83,7 @@ class WhoWereTheSharesSoldToPageSpec extends PageBehaviours with TestValues {
         .unsafeSet(CompanyBuyerCrnPage(srn, index, disposalIndexTwo), conditionalCrnYes)
         .unsafeSet(SharesDisposalBuyerConnectedPartyPage(srn, index, disposalIndexTwo), false)
 
-      s"remove dependant loan values when current answer is None (removal) and existing answers are present" in {
+      s"remove dependant values when current answer is None (removal) and existing answers are present" in {
 
         val result = WhoWereTheSharesSoldToPage(srn, index, disposalIndexOne)
           .cleanup(None, userAnswers)
@@ -101,7 +101,7 @@ class WhoWereTheSharesSoldToPageSpec extends PageBehaviours with TestValues {
         result.get(SharesDisposalBuyerConnectedPartyPage(srn, index, disposalIndexTwo)) must not be None
       }
 
-      s"remove dependant loan values when current answer is Partnership and existing answer is UKCompany (update)" in {
+      s"remove dependant values when current answer is Partnership and existing answer is UKCompany (update)" in {
 
         val result = WhoWereTheSharesSoldToPage(srn, index, disposalIndexOne)
           .cleanup(Some(IdentityType.UKPartnership), userAnswers)
@@ -112,6 +112,12 @@ class WhoWereTheSharesSoldToPageSpec extends PageBehaviours with TestValues {
         result.get(CompanyBuyerNamePage(srn, index, disposalIndexOne)) mustBe None
         result.get(CompanyBuyerCrnPage(srn, index, disposalIndexOne)) mustBe None
         result.get(SharesDisposalBuyerConnectedPartyPage(srn, index, disposalIndexOne)) mustBe None
+
+        result.get(WhoWereTheSharesSoldToPage(srn, index, disposalIndexTwo)) must not be None
+        result.get(CompanyBuyerNamePage(srn, index, disposalIndexTwo)) must not be None
+        result.get(CompanyBuyerCrnPage(srn, index, disposalIndexTwo)) must not be None
+        result.get(SharesDisposalBuyerConnectedPartyPage(srn, index, disposalIndexTwo)) must not be None
+
       }
     }
   }

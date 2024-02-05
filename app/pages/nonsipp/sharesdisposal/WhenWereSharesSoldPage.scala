@@ -24,10 +24,10 @@ import utils.RefinedUtils.RefinedIntOps
 
 import java.time.LocalDate
 
-case class WhenWereSharesSoldPage(srn: Srn, index: Max5000, disposalIndex: Max50) extends QuestionPage[LocalDate] {
+case class WhenWereSharesSoldPage(srn: Srn, shareIndex: Max5000, disposalIndex: Max50) extends QuestionPage[LocalDate] {
 
   override def path: JsPath =
-    Paths.salesQuestions \ toString \ index.arrayIndex.toString \ disposalIndex.arrayIndex.toString
+    Paths.salesQuestions \ toString \ shareIndex.arrayIndex.toString \ disposalIndex.arrayIndex.toString
 
   override def toString: String = "dateOfSale"
 }

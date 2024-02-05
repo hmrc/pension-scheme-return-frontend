@@ -31,7 +31,7 @@ case class WhoWereTheSharesSoldToPage(srn: Srn, index: Max5000, disposalIndex: M
     extends QuestionPage[IdentityType] {
 
   override def path: JsPath =
-    Paths.disposedSharesTransaction \ toString \ index.arrayIndex.toString \ disposalIndex.arrayIndex.toString
+    Paths.salesQuestions \ toString \ index.arrayIndex.toString \ disposalIndex.arrayIndex.toString
 
   override def toString: String = "purchaserType"
 

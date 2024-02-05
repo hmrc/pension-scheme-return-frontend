@@ -26,7 +26,7 @@ case class SharesDisposalBuyerConnectedPartyPage(srn: Srn, index: Max5000, dispo
     extends QuestionPage[Boolean] {
 
   override def path: JsPath =
-    Paths.disposedSharesTransaction \ toString \ index.arrayIndex.toString \ disposalIndex.arrayIndex.toString
+    Paths.salesQuestions \ toString \ index.arrayIndex.toString \ disposalIndex.arrayIndex.toString
 
-  override def toString: String = "isBuyerConnectedParty"
+  override def toString: String = "connectedPartyStatus"
 }

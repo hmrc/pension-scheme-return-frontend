@@ -25,7 +25,7 @@ import utils.RefinedUtils.RefinedIntOps
 case class SharesIndividualBuyerNamePage(srn: Srn, index: Max5000, disposalIndex: Max50) extends QuestionPage[String] {
 
   override def path: JsPath =
-    Paths.disposedSharesTransaction \ toString \ index.arrayIndex.toString \ disposalIndex.arrayIndex.toString
+    Paths.salesQuestions \ toString \ index.arrayIndex.toString \ disposalIndex.arrayIndex.toString
 
   override def toString: String = "individualBuyerName"
 

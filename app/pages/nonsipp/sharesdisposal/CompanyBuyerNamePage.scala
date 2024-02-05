@@ -25,7 +25,7 @@ import utils.RefinedUtils.RefinedIntOps
 case class CompanyBuyerNamePage(srn: Srn, index: Max5000, disposalIndex: Max50) extends QuestionPage[String] {
 
   override def path: JsPath =
-    Paths.disposedSharesTransaction \ toString \ index.arrayIndex.toString \ disposalIndex.arrayIndex.toString
+    Paths.salesQuestions \ toString \ index.arrayIndex.toString \ disposalIndex.arrayIndex.toString
 
   override def toString: String = "nameOfPurchaser"
 }
@@ -33,7 +33,7 @@ case class CompanyBuyerNamePage(srn: Srn, index: Max5000, disposalIndex: Max50) 
 case class CompanyBuyerNamePages(srn: Srn, index: Max5000) extends IndexedQuestionPage[String] {
 
   override def path: JsPath =
-    Paths.disposedSharesTransaction \ toString \ index.arrayIndex.toString
+    Paths.salesQuestions \ toString \ index.arrayIndex.toString
 
   override def toString: String = "nameOfPurchaser"
 }

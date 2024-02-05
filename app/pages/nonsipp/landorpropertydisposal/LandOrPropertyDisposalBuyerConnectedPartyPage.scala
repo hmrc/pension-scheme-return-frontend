@@ -28,5 +28,5 @@ case class LandOrPropertyDisposalBuyerConnectedPartyPage(srn: Srn, landOrPropert
   override def path: JsPath =
     Paths.disposalPropertyTransaction \ toString \ landOrPropertyIndex.arrayIndex.toString \ disposalIndex.arrayIndex.toString
 
-  override def toString: String = "isBuyerConnectedParty"
+  override def toString: String = "connectedPartyStatus"
 }

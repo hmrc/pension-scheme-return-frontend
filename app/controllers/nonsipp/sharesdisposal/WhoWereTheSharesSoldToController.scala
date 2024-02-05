@@ -71,17 +71,16 @@ class WhoWereTheSharesSoldToController @Inject()(
         .bindFromRequest()
         .fold(
           formWithErrors =>
-            request.userAnswers.get(CompanyNameRelatedSharesPage(srn, index)).getOrRecoverJourney {
-              company =>
-                Future
-                  .successful(
-                    BadRequest(
-                      view(
-                        formWithErrors,
-                        viewModel(srn, index, disposalIndex, company, mode)
-                      )
+            request.userAnswers.get(CompanyNameRelatedSharesPage(srn, index)).getOrRecoverJourney { company =>
+              Future
+                .successful(
+                  BadRequest(
+                    view(
+                      formWithErrors,
+                      viewModel(srn, index, disposalIndex, company, mode)
                     )
                   )
+                )
             },
           answer => {
             for {
