@@ -101,7 +101,8 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               HowWereSharesDisposedPage.apply,
               Gen.const(HowSharesDisposed.Redeemed),
               (srn, shareIndex: Max5000, disposalIndex: Max50, _) =>
-                controllers.routes.UnauthorisedController.onPageLoad()
+                controllers.nonsipp.sharesdisposal.routes.WhenWereSharesRedeemedController
+                  .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
             )
             .withName("go from How Were Shares Disposed page to When Were Shares Redeemed page")
         )
@@ -161,6 +162,21 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
                 controllers.routes.UnauthorisedController.onPageLoad()
             )
             .withName("go from How Many Shares Sold page to Total Consideration Shares Sold page")
+        )
+      }
+
+      "WhenWereSharesRedeemedPage" - {
+
+        act.like(
+          normalmode
+            .navigateToWithDoubleIndex(
+              shareIndex,
+              disposalIndex,
+              WhenWereSharesRedeemedPage,
+              (srn, shareIndex: Max5000, disposalIndex: Max50, _) =>
+                controllers.routes.UnauthorisedController.onPageLoad()
+            )
+            .withName("go from When Were Shares Redeemed page to Unauthorised page")
         )
       }
 
