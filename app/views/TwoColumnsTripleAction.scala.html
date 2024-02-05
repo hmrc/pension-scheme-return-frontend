@@ -42,21 +42,15 @@
             viewmodel.page.rows.paginate(paginatedViewModel.pagination.currentPage, paginatedViewModel.pagination.pageSize))
         ){ rows =>
             @govukTable(TableViewModel(
-
-                                viewmodel.page.head.fold(List.empty[HeadCell])(
-                                    heads =>
-                                    heads.map( aHead =>
-                                        HeadCell(HtmlContent(renderMessage(aHead.text)))
-                                    )
-                                ) ++  List(HeadCell(HtmlContent("""<span class="govuk-visually-hidden">Actions</span>""")), HeadCell(HtmlContent("""<span class="govuk-visually-hidden">Actions</span>""")))
-                               ,
-
-                                rows.map(
-                                    otherRows =>
-                                    otherRows.map( aRow =>
-                                        TableRow(HtmlContent(renderMessage(aRow.text)))
-                                    )
-                                ),
+                head = viewmodel.page.head.fold(List.empty[HeadCell])(heads =>
+                    heads.map( head => HeadCell(HtmlContent(renderMessage(head.text))))
+                ),
+                rows = rows.map(
+                    otherRows =>
+                    otherRows.map( aRow =>
+                        TableRow(HtmlContent(renderMessage(aRow.text)))
+                    )
+                ),
                  )
             )
         }
@@ -66,11 +60,15 @@
         @viewmodel.page.paginatedViewModel.map{ paginatedViewModel =>
             @if(paginatedViewModel.pagination.totalPages > 1) {
                 <p id="pagination-label" class="govuk-body">@{renderMessage(paginatedViewModel.label)}</p>
+                @govukPagination(PaginationViewModel(paginatedViewModel.pagination))
             }
-            @govukPagination(PaginationViewModel(paginatedViewModel.pagination))
         }
 
         @viewmodel.description.map(renderMessage)
+
+        @if(viewmodel.page.showInset) {
+            @govukInsetText(InsetTextViewModel(renderMessage(viewmodel.page.inset)))
+        }
 
         @if(viewmodel.page.showRadios && viewmodel.page.showInsetWithRadios) {
             @govukInsetText(InsetTextViewModel(renderMessage(viewmodel.page.inset)))

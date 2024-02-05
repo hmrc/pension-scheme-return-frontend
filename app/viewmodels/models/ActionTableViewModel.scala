@@ -24,6 +24,10 @@ case class TableElem(
   hiddenText: Option[Message] = None
 )
 
+object TableElem {
+  val empty: TableElem = TableElem(DisplayMessage.Empty)
+}
+
 case class ActionTableViewModel(
   inset: DisplayMessage,
   head: Option[List[TableElem]],
@@ -33,5 +37,7 @@ case class ActionTableViewModel(
   showRadios: Boolean = true,
   paginatedViewModel: Option[PaginatedViewModel] = None,
   yesHintText: Option[Message] = None,
-  showInsetWithRadios: Boolean = false
+  showInsetWithRadios: Boolean = false,
+  // whether to render the inset text
+  showInset: Boolean = false
 )

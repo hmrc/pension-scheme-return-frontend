@@ -24,6 +24,7 @@ import eu.timepit.refined.api.{Refined, Validate}
 import eu.timepit.refined.refineV
 import models.SchemeId.Srn
 import models.UserAnswers
+import org.slf4j.LoggerFactory
 import play.api.libs.json.{Json, Writes}
 import play.api.mvc.{Action, AnyContent}
 import services.SaveService
@@ -43,19 +44,24 @@ trait TestDataSingleIndexController[Index] extends TestDataController {
   // implementation
   protected type RefinedIndex = Refined[Int, Index]
 
+  private val logger = LoggerFactory.getLogger(this.getClass.getSimpleName)
+
   def addTestData(srn: Srn, num: RefinedIndex)(
     implicit remover: UserAnswersRemover,
     setter: UserAnswersSetter,
     ev: Validate[Int, Index]
   ): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      for {
+      (for {
         removedUserAnswers <- Future.fromTry(removeAllPages(srn, request.userAnswers))
         updatedUserAnswers <- Future.fromTry(updateUserAnswers(srn, num.value, removedUserAnswers))
         _ <- saveService.save(updatedUserAnswers)
       } yield Ok(
         s"Added ${num.value} entries to UserAnswers for index ${num.value}\n${Json.prettyPrint(updatedUserAnswers.data.decryptedValue)}"
-      )
+      )).recover { err =>
+        logger.error(s"Error when calling test endpoint: ${err.getMessage}")
+        throw err
+      }
     }
 
   private def removeAllPages(srn: Srn, userAnswers: UserAnswers)(

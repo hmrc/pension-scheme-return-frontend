@@ -16,6 +16,8 @@
 
 package navigation.nonsipp
 
+import cats.implicits.toTraverseOps
+import config.Refined.Max5000
 import controllers.nonsipp.shares.CompanyNameOfSharesSellerPage
 import eu.timepit.refined.refineMV
 import models.SchemeHoldShare.{Acquisition, Contribution, Transfer}
@@ -31,6 +33,7 @@ import pages.nonsipp.common.{
 }
 import pages.nonsipp.shares._
 import play.api.mvc.Call
+import utils.ListUtils.ListOps
 
 object SharesNavigator extends JourneyNavigator {
 
@@ -180,6 +183,21 @@ object SharesNavigator extends JourneyNavigator {
     case SharesTotalIncomePage(srn, index) =>
       controllers.routes.UnauthorisedController.onPageLoad()
 
+    case page @ SharesListPage(srn) =>
+      userAnswers.get(page) match {
+        case None => controllers.routes.JourneyRecoveryController.onPageLoad()
+        case Some(true) =>
+          (
+            for {
+              map <- userAnswers.get(SharesCompleted.all(srn)).getOrRecoverJourney
+              indexes <- map.keys.toList.traverse(_.toIntOption).getOrRecoverJourney
+              _ <- if (indexes.size >= 5000) Left(controllers.nonsipp.routes.TaskListController.onPageLoad(srn))
+              else Right(())
+              nextIndex <- findNextOpenIndex[Max5000.Refined](indexes).getOrRecoverJourney
+            } yield controllers.nonsipp.shares.routes.TypeOfSharesHeldController.onPageLoad(srn, nextIndex, NormalMode)
+          ).merge
+        case Some(false) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
+      }
   }
 
   val checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] = _ => _ => PartialFunction.empty
