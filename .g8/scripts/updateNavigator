@@ -33,6 +33,10 @@ shares)
   NAV_FILE="../app/navigation/nonsipp/SharesNavigator.scala"
   NAV_SPEC="../test/navigation/nonsipp/SharesNavigatorSpec.scala"
   ;;
+sharesdisposal)
+  NAV_FILE="../app/navigation/nonsipp/SharesDisposalNavigator.scala"
+  NAV_SPEC="../test/navigation/nonsipp/SharesDisposalNavigatorSpec.scala"
+  ;;
 *)
   NAV_FILE=
   NAV_SPEC=
