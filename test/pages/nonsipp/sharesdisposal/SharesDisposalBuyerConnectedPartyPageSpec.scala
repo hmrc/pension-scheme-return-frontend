@@ -14,19 +14,24 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.landorpropertydisposal
+package pages.nonsipp.sharesdisposal
 
 import config.Refined.{Max50, Max5000}
-import models.SchemeId.Srn
-import pages.QuestionPage
-import play.api.libs.json.JsPath
-import utils.RefinedUtils._
+import eu.timepit.refined.refineMV
+import pages.behaviours.PageBehaviours
 
-case class LandOrPropertyDisposalBuyerConnectedPartyPage(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50)
-    extends QuestionPage[Boolean] {
+class SharesDisposalBuyerConnectedPartyPageSpec extends PageBehaviours {
+  private val srn = srnGen.sample.value
 
-  override def path: JsPath =
-    Paths.disposalPropertyTransaction \ toString \ landOrPropertyIndex.arrayIndex.toString \ disposalIndex.arrayIndex.toString
+  "SharesDisposalBuyerConnectedPartyPage" - {
 
-  override def toString: String = "connectedPartyStatus"
+    val index = refineMV[Max5000.Refined](1)
+    val disposalIndex = refineMV[Max50.Refined](1)
+
+    beRetrievable[Boolean](SharesDisposalBuyerConnectedPartyPage(srn, index, disposalIndex))
+
+    beSettable[Boolean](SharesDisposalBuyerConnectedPartyPage(srn, index, disposalIndex))
+
+    beRemovable[Boolean](SharesDisposalBuyerConnectedPartyPage(srn, index, disposalIndex))
+  }
 }

@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.landorpropertydisposal
+package controllers.nonsipp.sharesdisposal
 
 import config.Refined.{Max50, Max5000}
 import controllers.PSRController
 import controllers.actions._
-import controllers.nonsipp.landorpropertydisposal.WhoPurchasedLandOrPropertyController._
 import forms.RadioListFormProvider
 import models.IdentityType.{Individual, Other, UKCompany, UKPartnership}
 import models.SchemeId.Srn
 import models.{IdentityType, Mode, NormalMode}
 import navigation.Navigator
-import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
-import pages.nonsipp.landorpropertydisposal.WhoPurchasedLandOrPropertyPage
+import pages.nonsipp.shares.CompanyNameRelatedSharesPage
+import pages.nonsipp.sharesdisposal.WhoWereTheSharesSoldToPage
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -35,12 +34,13 @@ import utils.FormUtils.FormOps
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, RadioListRowViewModel, RadioListViewModel}
+import controllers.nonsipp.sharesdisposal.WhoWereTheSharesSoldToController._
 import views.html.RadioListView
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
-class WhoPurchasedLandOrPropertyController @Inject()(
+class WhoWereTheSharesSoldToController @Inject()(
   override val messagesApi: MessagesApi,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
@@ -51,48 +51,46 @@ class WhoPurchasedLandOrPropertyController @Inject()(
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
-  private val form = WhoPurchasedLandOrPropertyController.form(formProvider)
+  private val form = WhoWereTheSharesSoldToController.form(formProvider)
 
-  def onPageLoad(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onPageLoad(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
-      request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, landOrPropertyIndex)).getOrRecoverJourney {
-        address =>
-          Ok(
-            view(
-              form.fromUserAnswers(WhoPurchasedLandOrPropertyPage(srn, landOrPropertyIndex, disposalIndex)),
-              viewModel(srn, landOrPropertyIndex, disposalIndex, address.addressLine1, mode)
-            )
+      request.userAnswers.get(CompanyNameRelatedSharesPage(srn, index)).getOrRecoverJourney { company =>
+        Ok(
+          view(
+            form.fromUserAnswers(WhoWereTheSharesSoldToPage(srn, index, disposalIndex)),
+            viewModel(srn, index, disposalIndex, company, mode)
           )
+        )
       }
     }
 
-  def onSubmit(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
         .bindFromRequest()
         .fold(
           formWithErrors =>
-            request.userAnswers.get(LandOrPropertyChosenAddressPage(srn, landOrPropertyIndex)).getOrRecoverJourney {
-              address =>
-                Future
-                  .successful(
-                    BadRequest(
-                      view(
-                        formWithErrors,
-                        viewModel(srn, landOrPropertyIndex, disposalIndex, address.addressLine1, mode)
-                      )
+            request.userAnswers.get(CompanyNameRelatedSharesPage(srn, index)).getOrRecoverJourney { company =>
+              Future
+                .successful(
+                  BadRequest(
+                    view(
+                      formWithErrors,
+                      viewModel(srn, index, disposalIndex, company, mode)
                     )
                   )
+                )
             },
           answer => {
             for {
               updatedAnswers <- Future.fromTry(
-                request.userAnswers.set(WhoPurchasedLandOrPropertyPage(srn, landOrPropertyIndex, disposalIndex), answer)
+                request.userAnswers.set(WhoWereTheSharesSoldToPage(srn, index, disposalIndex), answer)
               )
               _ <- saveService.save(updatedAnswers)
             } yield Redirect(
               navigator.nextPage(
-                WhoPurchasedLandOrPropertyPage(srn, landOrPropertyIndex, disposalIndex),
+                WhoWereTheSharesSoldToPage(srn, index, disposalIndex),
                 NormalMode,
                 updatedAnswers
               )
@@ -102,34 +100,34 @@ class WhoPurchasedLandOrPropertyController @Inject()(
     }
 }
 
-object WhoPurchasedLandOrPropertyController {
+object WhoWereTheSharesSoldToController {
 
   def form(formProvider: RadioListFormProvider): Form[IdentityType] = formProvider(
-    "whoPurchasedLandOrProperty.error.required"
+    "sharesDisposal.whoWereTheSharesSoldTo.error.required"
   )
 
   private val radioListItems: List[RadioListRowViewModel] =
     List(
-      RadioListRowViewModel(Message("whoPurchasedLandOrProperty.radioList1"), Individual.name),
-      RadioListRowViewModel(Message("whoPurchasedLandOrProperty.radioList2"), UKCompany.name),
-      RadioListRowViewModel(Message("whoPurchasedLandOrProperty.radioList3"), UKPartnership.name),
-      RadioListRowViewModel(Message("whoPurchasedLandOrProperty.radioList4"), Other.name)
+      RadioListRowViewModel(Message("sharesDisposal.whoWereTheSharesSoldTo.radioList1"), Individual.name),
+      RadioListRowViewModel(Message("sharesDisposal.whoWereTheSharesSoldTo.radioList2"), UKCompany.name),
+      RadioListRowViewModel(Message("sharesDisposal.whoWereTheSharesSoldTo.radioList3"), UKPartnership.name),
+      RadioListRowViewModel(Message("sharesDisposal.whoWereTheSharesSoldTo.radioList4"), Other.name)
     )
 
   def viewModel(
     srn: Srn,
-    landOrPropertyIndex: Max5000,
+    index: Max5000,
     disposalIndex: Max50,
-    addressLine1: String,
+    companyName: String,
     mode: Mode
   ): FormPageViewModel[RadioListViewModel] =
     FormPageViewModel(
-      Message("whoPurchasedLandOrProperty.title"),
-      Message("whoPurchasedLandOrProperty.heading", addressLine1),
+      Message("sharesDisposal.whoWereTheSharesSoldTo.title"),
+      Message("sharesDisposal.whoWereTheSharesSoldTo.heading", companyName),
       RadioListViewModel(
         None,
         radioListItems
       ),
-      routes.WhoPurchasedLandOrPropertyController.onSubmit(srn, landOrPropertyIndex, disposalIndex, mode)
+      routes.WhoWereTheSharesSoldToController.onSubmit(srn, index, disposalIndex, mode)
     )
 }

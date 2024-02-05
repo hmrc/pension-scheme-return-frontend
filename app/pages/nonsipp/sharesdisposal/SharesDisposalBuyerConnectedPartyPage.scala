@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.landorpropertydisposal
+package pages.nonsipp.sharesdisposal
 
 import config.Refined.{Max50, Max5000}
 import models.SchemeId.Srn
@@ -22,11 +22,11 @@ import pages.QuestionPage
 import play.api.libs.json.JsPath
 import utils.RefinedUtils._
 
-case class LandOrPropertyDisposalBuyerConnectedPartyPage(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50)
+case class SharesDisposalBuyerConnectedPartyPage(srn: Srn, index: Max5000, disposalIndex: Max50)
     extends QuestionPage[Boolean] {
 
   override def path: JsPath =
-    Paths.disposalPropertyTransaction \ toString \ landOrPropertyIndex.arrayIndex.toString \ disposalIndex.arrayIndex.toString
+    Paths.salesQuestions \ toString \ index.arrayIndex.toString \ disposalIndex.arrayIndex.toString
 
   override def toString: String = "connectedPartyStatus"
 }
