@@ -59,7 +59,9 @@ class TotalAmountPensionPaymentsController @Inject()(
     identifyAndRequireData(srn) { implicit request =>
       val memberNames = request.userAnswers.membersDetails(srn)
       val preparedForm =
-        request.userAnswers.get(TotalAmountPensionPaymentsPage(srn, index)).fold(form)(form.fill)
+        request.userAnswers
+          .get(TotalAmountPensionPaymentsPage(srn, index))
+          .fold(form)(value => if (value.isZero) form else form.fill(value))
       Ok(view(viewModel(srn, index, memberNames(index.value - 1).fullName, preparedForm, mode)))
     }
 
