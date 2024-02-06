@@ -17,7 +17,9 @@
 package views
 
 import forms.mappings.Mappings
+import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
+import utils.FakeRequestCSRFSupport.CSRFFakeRequest
 import viewmodels.models.UploadViewModel
 import views.html.UploadView
 
@@ -26,7 +28,7 @@ class UploadViewSpec extends ViewSpec with Mappings {
   runningApplication { implicit app =>
     val view = injected[UploadView]
 
-    implicit val request = FakeRequest()
+    implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest().withCSRFToken
 
     val viewModelGen = formPageViewModelGen[UploadViewModel]
 
