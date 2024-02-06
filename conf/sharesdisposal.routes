@@ -51,6 +51,11 @@ POST       /:srn/how-many-shares-redeemed/:shareIndex/:disposalIndex            
 GET        /:srn/change-how-many-shares-redeemed/:shareIndex/:disposalIndex                         controllers.nonsipp.sharesdisposal.HowManySharesRedeemedController.onPageLoad(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, mode: Mode = CheckMode)
 POST       /:srn/change-how-many-shares-redeemed/:shareIndex/:disposalIndex                         controllers.nonsipp.sharesdisposal.HowManySharesRedeemedController.onSubmit(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, mode: Mode = CheckMode)
 
+GET        /:srn/total-consideration-redemption-shares/:shareIndex/:disposalIndex                   controllers.nonsipp.sharesdisposal.TotalConsiderationSharesRedeemedController.onPageLoad(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, mode: Mode = NormalMode)
+POST       /:srn/total-consideration-redemption-shares/:shareIndex/:disposalIndex                   controllers.nonsipp.sharesdisposal.TotalConsiderationSharesRedeemedController.onSubmit(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, mode: Mode = NormalMode)
+GET        /:srn/change-total-consideration-redemption-shares/:shareIndex/:disposalIndex            controllers.nonsipp.sharesdisposal.TotalConsiderationSharesRedeemedController.onPageLoad(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, mode: Mode = CheckMode)
+POST       /:srn/change-total-consideration-redemption-shares/:shareIndex/:disposalIndex            controllers.nonsipp.sharesdisposal.TotalConsiderationSharesRedeemedController.onSubmit(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, mode: Mode = CheckMode)
+
 GET        /:srn/company-name-of-shares-buyer/:index/:secondaryIndex                 controllers.nonsipp.sharesdisposal.CompanyNameOfSharesBuyerController.onPageLoad(srn: Srn, index: Max5000, secondaryIndex: Max50, mode: Mode = NormalMode)
 POST       /:srn/company-name-of-shares-buyer/:index/:secondaryIndex                 controllers.nonsipp.sharesdisposal.CompanyNameOfSharesBuyerController.onSubmit(srn: Srn, index: Max5000, secondaryIndex: Max50, mode: Mode = NormalMode)
 GET        /:srn/change-company-name-of-shares-buyer/:index/:secondaryIndex          controllers.nonsipp.sharesdisposal.CompanyNameOfSharesBuyerController.onPageLoad(srn: Srn, index: Max5000, secondaryIndex: Max50, mode: Mode = CheckMode)
