@@ -89,7 +89,7 @@ object CompanyNameOfSharesBuyerController {
       title = "companyNameOfSharesBuyer.title",
       heading = "companyNameOfSharesBuyer.heading",
       description = None,
-      page = TextInputViewModel(),
+      page = TextInputViewModel(true),
       refresh = None,
       buttonText = "site.saveAndContinue",
       details = None,
