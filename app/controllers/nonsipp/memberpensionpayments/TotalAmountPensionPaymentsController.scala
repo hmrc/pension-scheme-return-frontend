@@ -99,7 +99,8 @@ object TotalAmountPensionPaymentsController {
     MoneyFormErrors(
       "totalAmountPensionPayments.error.required",
       "totalAmountPensionPayments.error.invalid",
-      (Constants.maxMoneyValue, "totalAmountPensionPayments.error.tooLarge")
+      (Constants.maxMoneyValue, "totalAmountPensionPayments.error.tooLarge"),
+      (Constants.minPosMoneyValue, "totalAmountPensionPayments.error.tooSmall")
     )
   )
 

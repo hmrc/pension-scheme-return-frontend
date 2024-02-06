@@ -99,7 +99,8 @@ object TotalEmployerContributionController {
     MoneyFormErrors(
       requiredKey = "totalEmployerContribution.error.required",
       nonNumericKey = "totalEmployerContribution.error.invalid",
-      max = (Constants.maxMoneyValue, "totalEmployerContribution.error.tooLarge")
+      max = (Constants.maxMoneyValue, "totalEmployerContribution.error.tooLarge"),
+      min = (Constants.minPosMoneyValue, "totalEmployerContribution.error.tooSmall")
     )
   )
 
