@@ -177,18 +177,37 @@ object MemberPensionPaymentsListController {
           case Left(_) => Nil
           case Right(nextIndex) =>
             val pensionPayments = userAnswers.get(TotalAmountPensionPaymentsPage(srn, nextIndex))
-            if (pensionPayments.nonEmpty) {
+            if (pensionPayments.nonEmpty && !pensionPayments.exists(_.isZero)) {
               List(
                 TableElem(
                   memberName.fullName
+                ),
+                TableElem(
+                  "memberPensionPayments.memberList.pensionPaymentsReported"
+                ),
+                TableElem.change(
+                  controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsCYAController
+                    .onPageLoad(srn, nextIndex, CheckMode)
+                ),
+                TableElem.remove(
+                  controllers.nonsipp.memberpensionpayments.routes.RemovePensionPaymentsController
+                    .onPageLoad(srn, nextIndex)
                 )
-              ) ++ buildMutableTable(srn, nextIndex)
+              )
             } else {
               List(
                 TableElem(
                   memberName.fullName
-                )
-              ) ++ addOnlyTable(srn, nextIndex, mode)
+                ),
+                TableElem(
+                  "memberPensionPayments.memberList.noPensionPayments"
+                ),
+                TableElem.add(
+                  controllers.nonsipp.memberpensionpayments.routes.TotalAmountPensionPaymentsController
+                    .onSubmit(srn, nextIndex, mode)
+                ),
+                TableElem.empty
+              )
             }
         }
     }
@@ -227,7 +246,7 @@ object MemberPensionPaymentsListController {
           ParagraphMessage(
             "memberPensionPayments.memberList.paragraphTwo"
           ),
-        head = Some(List(TableElem("Member name"), TableElem("Status"))),
+        head = Some(List(TableElem("Member name"), TableElem("Status"), TableElem.empty, TableElem.empty)),
         rows = rows(srn, mode, memberList, userAnswers),
         radioText = Message("memberPensionPayments.memberList.radios"),
         showRadios = memberList.length < maxNotRelevant,
@@ -251,50 +270,4 @@ object MemberPensionPaymentsListController {
         controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsListController.onSubmit(srn, page, mode)
     )
   }
-
-  private def buildMutableTable(
-    srn: Srn,
-    nextIndex: Refined[Int, OneTo300]
-  ): List[TableElem] =
-    List(
-      TableElem(
-        "memberPensionPayments.memberList.pensionPaymentsReported"
-      ),
-      TableElem(
-        LinkMessage(
-          Message("site.change"),
-          controllers.nonsipp.memberpensionpayments.routes.MemberPensionPaymentsCYAController
-            .onPageLoad(srn, nextIndex, CheckMode)
-            .url
-        )
-      ),
-      TableElem(
-        LinkMessage(
-          Message("site.remove"),
-          controllers.nonsipp.memberpensionpayments.routes.RemovePensionPaymentsController
-            .onPageLoad(srn, nextIndex)
-            .url
-        )
-      )
-    )
-
-  private def addOnlyTable(
-    srn: Srn,
-    nextIndex: Refined[Int, OneTo300],
-    mode: Mode
-  ): List[TableElem] =
-    List(
-      TableElem(
-        "memberPensionPayments.memberList.noPensionPayments"
-      ),
-      TableElem(
-        LinkMessage(
-          "Add",
-          controllers.nonsipp.memberpensionpayments.routes.TotalAmountPensionPaymentsController
-            .onSubmit(srn, nextIndex, mode)
-            .url
-        )
-      ),
-      TableElem("")
-    )
 }

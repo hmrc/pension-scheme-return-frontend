@@ -21,13 +21,16 @@ import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.{NameDOB, NormalMode, UserAnswers}
 import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.membercontributions.MemberContributionsListPage
+import org.mockito.MockitoSugar.when
+import pages.nonsipp.membercontributions.{MemberContributionsListPage, TotalMemberContributionPage}
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
 import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
 import services.PsrSubmissionService
 import views.html.TwoColumnsTripleAction
+
+import scala.concurrent.Future
 
 class MemberContributionListControllerSpec extends ControllerBaseSpec {
 
@@ -77,18 +80,24 @@ class MemberContributionListControllerSpec extends ControllerBaseSpec {
 
     act.like(
       redirectNextPage(onSubmit, "value" -> "true")
-        .before(MockPSRSubmissionService.submitPsrDetails())
+        .before(
+          when(mockPsrSubmissionService.submitPsrDetails(any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(())))
+        )
         .after({
-          verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any())(any(), any(), any())
+          verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any())(any(), any(), any())
           reset(mockPsrSubmissionService)
         })
     )
 
     act.like(
       redirectNextPage(onSubmit, "value" -> "false")
-        .before(MockPSRSubmissionService.submitPsrDetails())
+        .before(
+          when(mockPsrSubmissionService.submitPsrDetails(any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(())))
+        )
         .after({
-          verify(mockPsrSubmissionService, never).submitPsrDetails(any())(any(), any(), any())
+          verify(mockPsrSubmissionService, never).submitPsrDetails(any(), any())(any(), any(), any())
           reset(mockPsrSubmissionService)
         })
     )
