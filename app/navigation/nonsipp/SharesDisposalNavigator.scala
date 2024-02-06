@@ -25,11 +25,19 @@ import play.api.mvc.Call
 object SharesDisposalNavigator extends JourneyNavigator {
 
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
+
+    case CompanyBuyerNamePage(srn, index, secondaryIndex) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
+
     case WhoWereTheSharesSoldToPage(srn, index, disposalIndex) =>
       userAnswers.get(WhoWereTheSharesSoldToPage(srn, index, disposalIndex)) match {
 
         case Some(IdentityType.Individual) =>
           controllers.nonsipp.sharesdisposal.routes.SharesIndividualBuyerNameController
+            .onPageLoad(srn, index, disposalIndex, NormalMode)
+
+        case Some(IdentityType.UKCompany) =>
+          controllers.nonsipp.sharesdisposal.routes.CompanyNameOfSharesBuyerController
             .onPageLoad(srn, index, disposalIndex, NormalMode)
 
 // TODO uncomment as these controllers are introduced:
