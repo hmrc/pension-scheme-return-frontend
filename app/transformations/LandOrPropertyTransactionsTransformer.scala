@@ -34,6 +34,7 @@ import models.{
   IdentitySubject,
   IdentityType,
   Money,
+  PropertyAcquiredFrom,
   RecipientDetails,
   SchemeHoldLandProperty,
   UserAnswers,

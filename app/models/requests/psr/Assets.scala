@@ -16,7 +16,7 @@
 
 package models.requests.psr
 
-import models.{Address, IdentityType, SchemeHoldLandProperty}
+import models.{Address, PropertyAcquiredFrom, SchemeHoldLandProperty}
 import play.api.libs.json._
 
 import java.time.LocalDate
@@ -68,13 +68,6 @@ case class DisposedPropertyTransaction(
   portionStillHeld: Boolean
 )
 
-case class PropertyAcquiredFrom(
-  identityType: IdentityType,
-  idNumber: Option[String],
-  reasonNoIdNumber: Option[String],
-  otherDescription: Option[String]
-)
-
 case class LeaseDetails(
   lesseeName: String,
   leaseGrantDate: LocalDate,
@@ -99,7 +92,6 @@ object Assets {
   private implicit val formatBorrowing: OFormat[Borrowing] = Json.format[Borrowing]
 
   private implicit val formatLeaseDetails: OFormat[LeaseDetails] = Json.format[LeaseDetails]
-  private implicit val formatPropertyAcquiredFrom: OFormat[PropertyAcquiredFrom] = Json.format[PropertyAcquiredFrom]
   private implicit val formatHeldPropertyTransaction: OFormat[HeldPropertyTransaction] =
     Json.format[HeldPropertyTransaction]
   private implicit val formatDisposedPropertyTransaction: OFormat[DisposedPropertyTransaction] =

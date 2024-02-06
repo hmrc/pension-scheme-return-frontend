@@ -20,13 +20,7 @@ import connectors.PSRConnector
 import models.UserAnswers
 import models.requests.DataRequest
 import play.api.mvc.AnyContent
-import transformations.{
-  LandOrPropertyTransactionsTransformer,
-  LoanTransactionsTransformer,
-  MemberPaymentsTransformer,
-  MinimalRequiredSubmissionTransformer,
-  MoneyBorrowedTransformer
-}
+import transformations._
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
@@ -39,7 +33,8 @@ class PsrRetrievalService @Inject()(
   loanTransactionsTransformer: LoanTransactionsTransformer,
   landOrPropertyTransactionsTransformer: LandOrPropertyTransactionsTransformer,
   moneyBorrowedTransformer: MoneyBorrowedTransformer,
-  memberPaymentsTransformer: MemberPaymentsTransformer
+  memberPaymentsTransformer: MemberPaymentsTransformer,
+  sharesTransformer: SharesTransformer
 ) {
 
   def getStandardPsrDetails(
@@ -124,8 +119,13 @@ class PsrRetrievalService @Inject()(
                   memberPaymentsTransformer.transformFromEtmp(transformedMoneyBorrowingAssets, srn, memberPayments)
               )
               .getOrElse(Try(transformedMoneyBorrowingAssets))
+
+            transformedShares <- psrDetails.shares
+              .map(sh => sharesTransformer.transformFromEtmp(transformedMemberDetails, srn, sh))
+              .getOrElse(Try(transformedMemberDetails))
+
           } yield {
-            transformedMemberDetails
+            transformedShares
           }
           Future.fromTry(result)
         case _ => Future(emptyUserAnswers)
