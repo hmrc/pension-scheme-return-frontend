@@ -16,8 +16,9 @@
 
 package viewmodels.models
 
+import play.api.mvc.Call
 import viewmodels.DisplayMessage
-import viewmodels.DisplayMessage.Message
+import viewmodels.DisplayMessage.{LinkMessage, Message}
 
 case class TableElem(
   text: DisplayMessage,
@@ -26,6 +27,9 @@ case class TableElem(
 
 object TableElem {
   val empty: TableElem = TableElem(DisplayMessage.Empty)
+  def add(call: Call): TableElem = TableElem(LinkMessage(Message("site.add"), call.url))
+  def change(call: Call): TableElem = TableElem(LinkMessage(Message("site.change"), call.url))
+  def remove(call: Call): TableElem = TableElem(LinkMessage(Message("site.remove"), call.url))
 }
 
 case class ActionTableViewModel(

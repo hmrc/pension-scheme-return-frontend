@@ -19,7 +19,9 @@ package models
 import play.api.libs.json.{Format, Json}
 import utils.Transform
 
-case class Money(value: Double, displayAs: String)
+case class Money(value: Double, displayAs: String) {
+  val isZero: Boolean = value == 0d
+}
 
 object Money {
 

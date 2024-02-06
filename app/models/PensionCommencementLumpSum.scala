@@ -19,7 +19,10 @@ package models
 import play.api.libs.json.{Format, Json}
 import utils.Transform
 
-case class PensionCommencementLumpSum(lumpSumAmount: Money, designatedPensionAmount: Money)
+case class PensionCommencementLumpSum(lumpSumAmount: Money, designatedPensionAmount: Money) {
+  val isZero: Boolean = lumpSumAmount.isZero && designatedPensionAmount.isZero
+  val tuple: (Money, Money) = (lumpSumAmount, designatedPensionAmount)
+}
 
 object PensionCommencementLumpSum {
   implicit val formats: Format[PensionCommencementLumpSum] = Json.format[PensionCommencementLumpSum]

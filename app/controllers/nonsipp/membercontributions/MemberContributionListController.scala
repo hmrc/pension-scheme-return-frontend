@@ -22,7 +22,7 @@ import config.Constants
 import config.Refined.OneTo300
 import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
-import eu.timepit.refined.api.Refined
+import controllers.nonsipp.membercontributions.MemberContributionListController._
 import eu.timepit.refined.refineV
 import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
@@ -35,7 +35,7 @@ import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{PsrSubmissionService, SaveService}
-import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
+import viewmodels.DisplayMessage.{Message, ParagraphMessage}
 import viewmodels.implicits._
 import viewmodels.models._
 import views.html.TwoColumnsTripleAction
@@ -59,19 +59,13 @@ class MemberContributionListController @Inject()(
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      val userAnswers = request.userAnswers
-      val memberList = userAnswers.membersDetails(srn)
+      val memberList = request.userAnswers.membersDetails(srn)
 
       if (memberList.nonEmpty) {
-        val viewModel = MemberContributionListController
-          .viewModel(srn, page, mode, memberList, userAnswers)
-        val filledForm =
-          request.userAnswers.get(MemberContributionsListPage(srn)).fold(form)(form.fill)
-        Ok(view(filledForm, viewModel))
+        val filledForm = request.userAnswers.get(MemberContributionsListPage(srn)).fold(form)(form.fill)
+        Ok(view(filledForm, viewModel(srn, page, mode, memberList, request.userAnswers)))
       } else {
-        Redirect(
-          controllers.routes.JourneyRecoveryController.onPageLoad()
-        )
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
       }
   }
 
@@ -106,11 +100,7 @@ class MemberContributionListController @Inject()(
                 updatedUserAnswers <- buildUserAnswerBySelection(srn, value, memberListSize)
                 _ <- saveService.save(updatedUserAnswers)
                 submissionResult <- if (value) {
-                  psrSubmissionService.submitPsrDetails(srn)(
-                    implicitly,
-                    implicitly,
-                    request = DataRequest(request.request, updatedUserAnswers)
-                  )
+                  psrSubmissionService.submitPsrDetails(srn, updatedUserAnswers)
                 } else {
                   Future.successful(Some(()))
                 }
@@ -172,20 +162,31 @@ object MemberContributionListController {
       case (memberName, index) =>
         refineV[OneTo300](index + 1) match {
           case Left(_) => Nil
-          case Right(nextIndex) =>
-            val contributions = userAnswers.get(TotalMemberContributionPage(srn, nextIndex))
-            if (contributions.nonEmpty) {
+          case Right(index) =>
+            val contributions = userAnswers.get(TotalMemberContributionPage(srn, index))
+            if (contributions.nonEmpty && !contributions.exists(_.isZero)) {
               List(
-                TableElem(
-                  memberName.fullName
+                TableElem(memberName.fullName),
+                TableElem("Member contributions reported"),
+                TableElem.change(
+                  controllers.nonsipp.membercontributions.routes.MemberContributionsCYAController
+                    .onPageLoad(srn, index, CheckMode)
+                ),
+                TableElem.remove(
+                  controllers.nonsipp.membercontributions.routes.RemoveMemberContributionController
+                    .onPageLoad(srn, index)
                 )
-              ) ++ buildMutableTable(srn, nextIndex)
+              )
             } else {
               List(
-                TableElem(
-                  memberName.fullName
-                )
-              ) ++ addOnlyTable(srn, nextIndex, mode)
+                TableElem(memberName.fullName),
+                TableElem("No member contributions"),
+                TableElem.add(
+                  controllers.nonsipp.membercontributions.routes.TotalMemberContributionController
+                    .onSubmit(srn, index, mode)
+                ),
+                TableElem.empty
+              )
             }
         }
     }
@@ -225,7 +226,7 @@ object MemberContributionListController {
             "ReportContribution.MemberList.paragraph2"
           ),
         showInsetWithRadios = true,
-        head = Some(List(TableElem("Member name"), TableElem("Status"))),
+        head = Some(List(TableElem("Member name"), TableElem("Status"), TableElem.empty, TableElem.empty)),
         rows = rows(srn, mode, memberList, userAnswers),
         radioText = Message("ReportContribution.MemberList.radios"),
         paginatedViewModel = Some(
@@ -247,50 +248,4 @@ object MemberContributionListController {
         controllers.nonsipp.membercontributions.routes.MemberContributionListController.onSubmit(srn, page, mode)
     )
   }
-
-  private def buildMutableTable(
-    srn: Srn,
-    nextIndex: Refined[Int, OneTo300]
-  ): List[TableElem] =
-    List(
-      TableElem(
-        "Member contributions reported"
-      ),
-      TableElem(
-        LinkMessage(
-          "Change",
-          controllers.nonsipp.membercontributions.routes.MemberContributionsCYAController
-            .onPageLoad(srn, nextIndex, CheckMode)
-            .url
-        )
-      ),
-      TableElem(
-        LinkMessage(
-          "Remove",
-          controllers.nonsipp.membercontributions.routes.RemoveMemberContributionController
-            .onPageLoad(srn, nextIndex)
-            .url
-        )
-      )
-    )
-
-  private def addOnlyTable(
-    srn: Srn,
-    nextIndex: Refined[Int, OneTo300],
-    mode: Mode
-  ): List[TableElem] =
-    List(
-      TableElem(
-        "No member contributions"
-      ),
-      TableElem(
-        LinkMessage(
-          "Add",
-          controllers.nonsipp.membercontributions.routes.TotalMemberContributionController
-            .onSubmit(srn, nextIndex, mode)
-            .url
-        )
-      ),
-      TableElem("")
-    )
 }
