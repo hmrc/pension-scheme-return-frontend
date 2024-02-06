@@ -113,9 +113,13 @@ object SharesDisposalNavigator extends JourneyNavigator {
         .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
 
     case WhenWereSharesRedeemedPage(srn, shareIndex, disposalIndex) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+      controllers.nonsipp.sharesdisposal.routes.HowManySharesRedeemedController
+        .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
 
     case HowManySharesSoldPage(srn, shareIndex, disposalIndex) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
+
+    case HowManySharesRedeemedPage(srn, shareIndex, disposalIndex) =>
       controllers.routes.UnauthorisedController.onPageLoad()
 
   }

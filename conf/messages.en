@@ -602,6 +602,14 @@ sharesDisposal.whenWereSharesRedeemed.error.date.before = Date these shares were
 sharesDisposal.whenWereSharesRedeemed.error.date.after = Date these shares were redeemed must be the same as or before {0}
 sharesDisposal.whenWereSharesRedeemed.error.invalid.characters = Date these shares were redeemed must only include numbers 0 to 9
 
+sharesDisposal.howManySharesRedeemed.title = How many shares in this company were redeemed?
+sharesDisposal.howManySharesRedeemed.heading = How many shares in {0} were redeemed?
+sharesDisposal.howManySharesRedeemed.error.required = Enter the number of shares redeemed
+sharesDisposal.howManySharesRedeemed.error.invalid.characters = Number of shares redeemed must be a number, like 100
+sharesDisposal.howManySharesRedeemed.error.decimal = Number of shares redeemed must be a whole number, like 100
+sharesDisposal.howManySharesRedeemed.error.zero = Number of shares redeemed must be 1 or more
+sharesDisposal.howManySharesRedeemed.error.size = Number of shares redeemed must be 9,999,999 or fewer
+
 pensionCommencementLumpSum.title = Did any member receive a pension commencement lump sum (PCLS) during the period of this return?
 pensionCommencementLumpSum.heading = Did any member receive a pension commencement lump sum (PCLS) during the period of this return?
 pensionCommencementLumpSum.error.required = Select yes if any member received a Pension Commencement Lump Sum during the period of this return
