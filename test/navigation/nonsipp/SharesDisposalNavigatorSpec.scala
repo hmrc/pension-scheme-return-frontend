@@ -159,12 +159,28 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               disposalIndex,
               HowManySharesSoldPage,
               (srn, shareIndex: Max5000, disposalIndex: Max50, _) =>
-                controllers.routes.UnauthorisedController.onPageLoad()
+                controllers.nonsipp.sharesdisposal.routes.TotalConsiderationSharesSoldController
+                  .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
             )
             .withName("go from How Many Shares Sold page to Total Consideration Shares Sold page")
         )
       }
 
+      "TotalConsiderationSharesSoldPage" - {
+
+        act.like(
+          normalmode
+            .navigateToWithDoubleIndex(
+              shareIndex,
+              disposalIndex,
+              TotalConsiderationSharesSoldPage,
+              (srn, shareIndex: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.WhoWereTheSharesSoldToController
+                  .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
+            )
+            .withName("go from Total Consideration Shares Sold page to Who Shares Sold To page")
+        )
+      }
       "WhenWereSharesRedeemedPage" - {
 
         act.like(
@@ -196,49 +212,49 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .withName("go from who where the shares sold to individual buyer name page")
         )
 
-// TODO uncomment as these journeys are implemented:
+        // TODO uncomment as these journeys are implemented:
 
-//        act.like(
-//          normalmode
-//            .navigateToWithDoubleIndexAndData(
-//              shareIndex,
-//              disposalIndex,
-//              WhoWereTheSharesSoldToPage,
-//              Gen.const(IdentityType.UKCompany),
-//              (srn, index: Max5000, disposalIndex: Max50, _) =>
-//                controllers.nonsipp.sharesdisposal.routes.CompanyBuyerNameController
-//                  .onPageLoad(srn, index, disposalIndex, NormalMode)
-//            )
-//            .withName("go from who where the shares sold to company buyer name page")
-//        )
-//
-//        act.like(
-//          normalmode
-//            .navigateToWithDoubleIndexAndData(
-//              shareIndex,
-//              disposalIndex,
-//              WhoWereTheSharesSoldToPage,
-//              Gen.const(IdentityType.UKPartnership),
-//              (srn, index: Max5000, disposalIndex: Max50, _) =>
-//                controllers.nonsipp.sharesdisposal.routes.PartnershipBuyerNameController
-//                  .onPageLoad(srn, index, disposalIndex, NormalMode)
-//            )
-//            .withName("go from who where the shares sold to partnership buyer name page")
-//        )
-//
-//        act.like(
-//          normalmode
-//            .navigateToWithDoubleIndexAndData(
-//              shareIndex,
-//              disposalIndex,
-//              WhoWereTheSharesSoldToPage,
-//              Gen.const(IdentityType.Other),
-//              (srn, index: Max5000, disposalIndex: Max50, _) =>
-//                controllers.nonsipp.sharesdisposal.routes.OtherBuyerDetailsController
-//                  .onPageLoad(srn, index, disposalIndex, NormalMode)
-//            )
-//            .withName("go from who where the shares sold to unauthorised page")
-//        )
+        //        act.like(
+        //          normalmode
+        //            .navigateToWithDoubleIndexAndData(
+        //              shareIndex,
+        //              disposalIndex,
+        //              WhoWereTheSharesSoldToPage,
+        //              Gen.const(IdentityType.UKCompany),
+        //              (srn, index: Max5000, disposalIndex: Max50, _) =>
+        //                controllers.nonsipp.sharesdisposal.routes.CompanyBuyerNameController
+        //                  .onPageLoad(srn, index, disposalIndex, NormalMode)
+        //            )
+        //            .withName("go from who where the shares sold to company buyer name page")
+        //        )
+        //
+        //        act.like(
+        //          normalmode
+        //            .navigateToWithDoubleIndexAndData(
+        //              shareIndex,
+        //              disposalIndex,
+        //              WhoWereTheSharesSoldToPage,
+        //              Gen.const(IdentityType.UKPartnership),
+        //              (srn, index: Max5000, disposalIndex: Max50, _) =>
+        //                controllers.nonsipp.sharesdisposal.routes.PartnershipBuyerNameController
+        //                  .onPageLoad(srn, index, disposalIndex, NormalMode)
+        //            )
+        //            .withName("go from who where the shares sold to partnership buyer name page")
+        //        )
+        //
+        //        act.like(
+        //          normalmode
+        //            .navigateToWithDoubleIndexAndData(
+        //              shareIndex,
+        //              disposalIndex,
+        //              WhoWereTheSharesSoldToPage,
+        //              Gen.const(IdentityType.Other),
+        //              (srn, index: Max5000, disposalIndex: Max50, _) =>
+        //                controllers.nonsipp.sharesdisposal.routes.OtherBuyerDetailsController
+        //                  .onPageLoad(srn, index, disposalIndex, NormalMode)
+        //            )
+        //            .withName("go from who where the shares sold to unauthorised page")
+        //        )
       }
 
       "SharesIndividualBuyerNamePage" - {
@@ -268,7 +284,6 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .withName("go from CompanyNameOfSharesBuyerPage to ??? page")
         )
       }
-
     }
 
     "in CheckMode" - {}
