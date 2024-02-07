@@ -17,7 +17,7 @@
 package controllers.nonsipp.memberreceivedpcls
 
 import com.google.inject.Inject
-import config.Constants.maxPCLSAmount
+import config.Constants.{maxPCLSAmount, minPosMoneyValue}
 import config.Refined.Max300
 import controllers.PSRController
 import controllers.actions._
@@ -97,12 +97,14 @@ object PensionCommencementLumpSumAmountController {
       MoneyFormErrors(
         "pensionCommencementLumpSumAmount.received.error.required",
         "pensionCommencementLumpSumAmount.received.error.nonNumeric",
-        maxPCLSAmount -> "pensionCommencementLumpSumAmount.received.error.tooLarge"
+        maxPCLSAmount -> "pensionCommencementLumpSumAmount.received.error.tooLarge",
+        minPosMoneyValue -> "pensionCommencementLumpSumAmount.received.error.tooSmall"
       ),
       MoneyFormErrors(
         "pensionCommencementLumpSumAmount.relevant.error.required",
         "pensionCommencementLumpSumAmount.relevant.error.nonNumeric",
-        maxPCLSAmount -> "pensionCommencementLumpSumAmount.relevant.error.tooLarge"
+        maxPCLSAmount -> "pensionCommencementLumpSumAmount.relevant.error.tooLarge",
+        minPosMoneyValue -> "pensionCommencementLumpSumAmount.relevant.error.tooSmall"
       )
     )
 

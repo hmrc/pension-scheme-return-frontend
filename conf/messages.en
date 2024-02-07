@@ -648,9 +648,11 @@ pensionCommencementLumpSumAmount.details = Where a PCLS is taken, it should be c
 pensionCommencementLumpSumAmount.received.error.required = Enter the total amount of the PCLS, in pounds and pence
 pensionCommencementLumpSumAmount.received.error.nonNumeric = Total amount of PCLS must be an amount of money, like 123 or 123.45
 pensionCommencementLumpSumAmount.received.error.tooLarge = Total amount of PCLS must be 999999999.99 or less
+pensionCommencementLumpSumAmount.received.error.tooSmall = Total amount of PCLS must be 0.01 or more
 pensionCommencementLumpSumAmount.relevant.error.required = Enter the relevant pension in respect of the PCLS, in pounds and pence
 pensionCommencementLumpSumAmount.relevant.error.nonNumeric = Relevant pension in respect of the PCLS must be an amount of money, like 123 or 123.45
 pensionCommencementLumpSumAmount.relevant.error.tooLarge = Relevant pension in respect of the PCLS must be 999999999.99 or less
+pensionCommencementLumpSumAmount.relevant.error.tooSmall = Relevant pension in respect of the PCLS must be 0.01 or more
 
 pcls.removePcls.title = Are you sure you want to remove the PCLS for this member?
 pcls.removePcls.heading = Are you sure you want to remove the PCLS of £{0} for {1}?
@@ -706,7 +708,7 @@ surrenderedBenefits.amount.title = What was the total amount surrendered by the 
 surrenderedBenefits.amount.heading = What was the total amount surrendered by {0}, in pounds and pence?
 surrenderedBenefits.amount.error.required = Enter the total amount surrendered, in pounds and pence
 surrenderedBenefits.amount.error.invalid = Total amount surrendered must be an amount of money, like 123 or 123.45
-surrenderedBenefits.amount.error.tooSmall = Total amount surrendered must be 1 or more
+surrenderedBenefits.amount.error.tooSmall = Total amount surrendered must be 0.01 or more
 surrenderedBenefits.amount.error.tooLarge = Total amount surrendered must be 999999999.99 or less
 
 surrenderedBenefits.when.title = When did the member surrender their pension benefits?
@@ -1323,6 +1325,7 @@ landOrPropertyTotalCost.heading = What was the total cost or value of {0}, in po
 landOrPropertyTotalCost.hint = If the land or property was acquired, provide the total cost. If the land or property was held for another reason, provide the total value.
 landOrPropertyTotalCost.error.required = Enter the total cost or value of the land or property, in pounds and pence
 landOrPropertyTotalCost.error.invalid = Total cost or value of the land or property must be an amount of money, like 123 or 123.45
+landOrPropertyTotalCost.error.tooSmall = Total cost or value of the land or property must be 0.01 or more
 landOrPropertyTotalCost.error.tooLarge = Total cost or value of the land or property must be 999999999.99 or less
 
 isLandOrPropertyResidential.title = Is any part of the land or property residential property?
@@ -1982,6 +1985,7 @@ totalMemberContribution.heading = What was the total member contribution made by
 totalMemberContribution.hint = Enter the total member contribution made by or for this member in the period of this return, including both personal and third party contributions.
 totalMemberContribution.error.required = Enter the total amount of the member contribution, in pounds and pence
 totalMemberContribution.error.invalid = Total member contribution must be an amount of money, like 123 or 123.45
+totalMemberContribution.error.tooSmall = Total member contribution must be 0.01 or more
 totalMemberContribution.error.tooLarge = Total member contribution must be 999999999.99 or less
 
 WhatYouWillNeed.MemberContributions.title = Member contributions for members of {0}
@@ -2109,6 +2113,7 @@ totalValueTransfer.title = What was the total value of this transfer for this me
 totalValueTransfer.heading = What was the total value of the transfer from {0} for {1}, in pounds and pence?
 totalValueTransfer.error.required = Enter the total value of the transfer, in pounds and pence
 totalValueTransfer.error.invalid = Total value of the transfer must be an amount of money, like 123 or 123.45
+totalValueTransfer.error.tooSmall = Total value of the transfer must be 0.01 or more
 totalValueTransfer.error.tooLarge = Total value of the transfer must be 999999999.99 or less
 
 transferReceived.title = When was this transfer for this member received?
@@ -2285,6 +2290,7 @@ totalAmountPensionPayments.title = What was the total amount of pension payments
 totalAmountPensionPayments.heading = What was the total amount of pension payments received by {0} during the period of this return, in pounds and pence?
 totalAmountPensionPayments.error.required = Enter the total amount of pension payments, in pounds and pence
 totalAmountPensionPayments.error.invalid = Total amount of pension payments must be an amount of money, like 123 or 123.45
+totalAmountPensionPayments.error.tooSmall = Total amount of pension payments must be 0.01 or more
 totalAmountPensionPayments.error.tooLarge = Total amount of pension payments must be 999999999.99 or less
 
 MemberPensionPaymentsCYA.title = Check your answers

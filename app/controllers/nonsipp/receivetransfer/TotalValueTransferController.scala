@@ -119,7 +119,8 @@ object TotalValueTransferController {
     MoneyFormErrors(
       "totalValueTransfer.error.required",
       "totalValueTransfer.error.invalid",
-      (Constants.maxMoneyValue, "totalValueTransfer.error.tooLarge")
+      (Constants.maxMoneyValue, "totalValueTransfer.error.tooLarge"),
+      (Constants.minPosMoneyValue, "totalValueTransfer.error.tooSmall")
     )
   )
 

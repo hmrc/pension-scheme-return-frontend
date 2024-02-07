@@ -94,7 +94,8 @@ object TotalMemberContributionController {
     MoneyFormErrors(
       "totalMemberContribution.error.required",
       "totalMemberContribution.error.invalid",
-      (Constants.maxMoneyValue, "totalMemberContribution.error.tooLarge")
+      (Constants.maxMoneyValue, "totalMemberContribution.error.tooLarge"),
+      (Constants.minPosMoneyValue, "totalMemberContribution.error.tooSmall")
     )
   )
 
