@@ -181,7 +181,7 @@ object SharesNavigator extends JourneyNavigator {
       controllers.nonsipp.shares.routes.SharesTotalIncomeController.onPageLoad(srn, index, NormalMode)
 
     case SharesTotalIncomePage(srn, index) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+      controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, NormalMode)
 
     case page @ SharesListPage(srn) =>
       userAnswers.get(page) match {
@@ -200,5 +200,62 @@ object SharesNavigator extends JourneyNavigator {
       }
   }
 
-  val checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] = _ => _ => PartialFunction.empty
+  val checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] = _ =>
+    userAnswers => {
+
+      case WhenDidSchemeAcquireSharesPage(srn, index) =>
+        controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, NormalMode)
+
+      case CompanyNameRelatedSharesPage(srn, index) =>
+        controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, NormalMode)
+
+      case SharesCompanyCrnPage(srn, index) =>
+        controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, NormalMode)
+
+      case ClassOfSharesPage(srn, index) =>
+        controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, NormalMode)
+
+      case HowManySharesPage(srn, index) =>
+        userAnswers.get(WhyDoesSchemeHoldSharesPage(srn, index)) match {
+
+          case Some(Acquisition) =>
+            controllers.nonsipp.common.routes.IdentityTypeController
+              .onPageLoad(srn, index, NormalMode, IdentitySubject.SharesSeller)
+          case _ =>
+            userAnswers.get(TypeOfSharesHeldPage(srn, index)) match {
+              case Some(Unquoted) =>
+                controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, NormalMode)
+              case _ =>
+                controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, NormalMode)
+            }
+        }
+
+      case SharesFromConnectedPartyPage(srn, index) =>
+        controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, NormalMode)
+
+      case CostOfSharesPage(srn, index) =>
+        controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, NormalMode)
+
+      case SharesIndependentValuationPage(srn, index) =>
+        userAnswers.get(WhyDoesSchemeHoldSharesPage(srn, index)) match {
+          case Some(Acquisition) =>
+            userAnswers.get(TypeOfSharesHeldPage(srn, index)) match {
+              case Some(SponsoringEmployer) =>
+                controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, NormalMode)
+              case _ =>
+                controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, NormalMode)
+            }
+          case _ =>
+            controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, NormalMode)
+
+        }
+
+      case TotalAssetValuePage(srn, index) =>
+        controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, NormalMode)
+
+      case SharesTotalIncomePage(srn, index) =>
+        controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, NormalMode)
+
+    }
+
 }
