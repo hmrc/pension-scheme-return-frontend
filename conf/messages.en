@@ -570,6 +570,22 @@ sharesDisposal.whatYouWillNeed.bullet12 = the date of the redemption
 sharesDisposal.whatYouWillNeed.bullet13 = the number of shares redeemed
 sharesDisposal.whatYouWillNeed.bullet14 = the total consideration received for the redemption
 
+sharesDisposal.sharesDisposalList.title = Start reporting a share disposal
+sharesDisposal.sharesDisposalList.heading = Start reporting a share disposal
+sharesDisposal.sharesDisposalList.paragraph1 = Select one option to start reporting disposal. If you need to report more, you will be able to do this later.
+sharesDisposal.sharesDisposalList.paragraph2 = You can report disposal of shares whose details you have already provided. If the shares do not appear here, add them using the ‘Change shares held in a sponsoring employer, acquired from a connected party, or unquoted shares’ section of this return.
+sharesDisposal.sharesDisposalList.legend = Which shares were disposed of?
+sharesDisposal.sharesDisposalList.radios.error.required = Select the shares that were disposed of
+sharesDisposal.sharesDisposalList.pagination.label = Showing {0} - {1} of {2} shares
+sharesDisposal.sharesDisposalList.typeOfShares.sponsoringEmployer = Shares in a sponsoring employer
+sharesDisposal.sharesDisposalList.typeOfShares.unquoted = Unquoted shares
+sharesDisposal.sharesDisposalList.typeOfShares.connectedParty = Shares acquired from a connected party
+sharesDisposal.sharesDisposalList.methodOfAcquisition.acquired = acquired
+sharesDisposal.sharesDisposalList.methodOfAcquisition.contributed = contributed
+sharesDisposal.sharesDisposalList.methodOfAcquisition.transferred = transferred in
+sharesDisposal.sharesDisposalList.row.withDate = {0} in {1} {2} on {3}
+sharesDisposal.sharesDisposalList.row = {0} in {1} {2}
+
 sharesDisposal.howWereSharesDisposed.title = How were the shares in this company disposed of?
 sharesDisposal.howWereSharesDisposed.heading = How were the shares in {0} disposed of?
 sharesDisposal.howWereSharesDisposed.option1 = Sold
