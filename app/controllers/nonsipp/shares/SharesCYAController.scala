@@ -609,15 +609,17 @@ object SharesCYAController {
       CheckYourAnswersSection(
         Some(Heading2.medium("sharesCYA.section3.heading")),
         List(
-          CheckYourAnswersRowViewModel(Message("sharesCYA.section3.whoWereSharesAcquired"), companyNameRelatedShares)
-            .withAction(
-              SummaryAction(
-                "site.change",
-                controllers.nonsipp.common.routes.IdentityTypeController
-                  .onPageLoad(srn, index, mode, IdentitySubject.SharesSeller)
-                  .url
-              ).withVisuallyHiddenContent("sharesCYA.section3.whoWereSharesAcquired.hidden", companyNameRelatedShares)
-            ),
+          CheckYourAnswersRowViewModel(
+            Message("sharesCYA.section3.whoWereSharesAcquired", companyNameRelatedShares),
+            receivedLoan
+          ).withAction(
+            SummaryAction(
+              "site.change",
+              controllers.nonsipp.common.routes.IdentityTypeController
+                .onPageLoad(srn, index, mode, IdentitySubject.SharesSeller)
+                .url
+            ).withVisuallyHiddenContent("sharesCYA.section3.whoWereSharesAcquired.hidden", companyNameRelatedShares)
+          ),
           CheckYourAnswersRowViewModel("sharesCYA.section3.recipientName", recipientName)
             .withAction(
               SummaryAction("site.change", recipientNameUrl)

@@ -25,9 +25,10 @@ import controllers.actions.IdentifyAndRequireData
 import controllers.nonsipp.shares.SharesListController._
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
+import models.CheckOrChange.Change
 import models.SchemeId.Srn
 import models.requests.DataRequest
-import models.{CheckMode, CheckOrChange, Mode, Pagination, SchemeHoldShare, TypeOfShares}
+import models.{Mode, Pagination, SchemeHoldShare, TypeOfShares}
 import navigation.Navigator
 import pages.nonsipp.shares._
 import play.api.data.Form
@@ -172,7 +173,7 @@ object SharesListController {
           TableElem(
             LinkMessage(
               Message("site.change"),
-              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckOrChange.Check).url
+              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, Change).url
             )
           ),
           TableElem(
