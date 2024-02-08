@@ -2415,9 +2415,9 @@ companyNameOfSharesBuyer.error.tooLong = Buyer’s company name must be 160 char
 
 
 checkYourAnswers.title = Check your answers
-sharesCYA.change.title = Check your answers
+sharesCYA.change.title = Change details of this share transaction
 checkYourAnswers.heading = Check your answers
-sharesCYA.change.heading = Check your answers
+sharesCYA.change.heading = Change details of the share transaction for {0}
 sharesCYA.section1.heading = Type of shares
 sharesCYA.section1.typeOfShare = Which type of shares were held in this transaction?
 sharesCYA.section1.typeOfShare.hidden = which type of shares were held in this transaction
@@ -2429,7 +2429,6 @@ sharesCYA.section1.ConnectedParty = ConnectedParty
 sharesCYA.section1.Acquisition = Acquisition
 sharesCYA.section1.Contribution = Contribution
 sharesCYA.section1.Transfer = Transfer
-
 sharesCYA.section2.heading =  Details of the transaction
 sharesCYA.section2.whenDidSchemeAcquire = Date {0} acquired these {1}
 sharesCYA.section2.whenDidSchemeAcquire.hidden = date {0} acquired these {1}
@@ -2447,7 +2446,6 @@ sharesCYA.section2.howManyShares = Number of shares in {0} acquired in this tran
 sharesCYA.section2.howManyShares.hidden = number of shares in {0} acquired in this transaction]
 sharesCYA.section2.sharesFromConnectedParty = Were the shares in {0} acquired from a connected party?
 sharesCYA.section2.sharesFromConnectedParty.hidden =  if the shares in {0} were acquired from a connected party
-
 sharesCYA.section3.heading= Details of the acquisition
 sharesCYA.section3.whoWereSharesAcquired =   Who were the shares in {0} acquired from?
 sharesCYA.section3.whoWereSharesAcquired.hidden = who the shares in {0} were acquired from
@@ -2470,7 +2468,6 @@ sharesCYA.section3.recipientDetails.other= Other reason
 sharesCYA.section3.recipientDetails.other.hidden = seller’s details
 sharesCYA.section3.sharesFromConnectedParty =  Is {0} a connected party?
 sharesCYA.section3.sharesFromConnectedParty.hidden =  if {0} is a connected party
-
 sharesCYA.section4.heading = Value of and income from shares in {0}
 sharesCYA.section4.costOfShares = Total cost of the shares
 sharesCYA.section4.costOfShares.hidden =  total cost of the shares

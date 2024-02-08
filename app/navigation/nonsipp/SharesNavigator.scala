@@ -20,9 +20,10 @@ import cats.implicits.toTraverseOps
 import config.Refined.Max5000
 import controllers.nonsipp.shares.CompanyNameOfSharesSellerPage
 import eu.timepit.refined.refineMV
+import models.CheckOrChange.Check
 import models.SchemeHoldShare.{Acquisition, Contribution, Transfer}
 import models.TypeOfShares.{ConnectedParty, SponsoringEmployer, Unquoted}
-import models.{IdentitySubject, IdentityType, NormalMode, UserAnswers}
+import models.{CheckOrChange, IdentitySubject, IdentityType, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.common.{
@@ -181,7 +182,7 @@ object SharesNavigator extends JourneyNavigator {
       controllers.nonsipp.shares.routes.SharesTotalIncomeController.onPageLoad(srn, index, NormalMode)
 
     case SharesTotalIncomePage(srn, index) =>
-      controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, NormalMode)
+      controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckOrChange.Check)
 
     case page @ SharesListPage(srn) =>
       userAnswers.get(page) match {
@@ -204,57 +205,120 @@ object SharesNavigator extends JourneyNavigator {
     userAnswers => {
 
       case WhenDidSchemeAcquireSharesPage(srn, index) =>
-        controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, NormalMode)
+        controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, Check)
 
       case CompanyNameRelatedSharesPage(srn, index) =>
-        controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, NormalMode)
+        controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, Check)
 
       case SharesCompanyCrnPage(srn, index) =>
-        controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, NormalMode)
+        controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, Check)
 
       case ClassOfSharesPage(srn, index) =>
-        controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, NormalMode)
+        controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, Check)
 
       case HowManySharesPage(srn, index) =>
         userAnswers.get(WhyDoesSchemeHoldSharesPage(srn, index)) match {
-
           case Some(Acquisition) =>
             controllers.nonsipp.common.routes.IdentityTypeController
               .onPageLoad(srn, index, NormalMode, IdentitySubject.SharesSeller)
           case _ =>
             userAnswers.get(TypeOfSharesHeldPage(srn, index)) match {
               case Some(Unquoted) =>
-                controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, NormalMode)
+                controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, Check)
               case _ =>
-                controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, NormalMode)
+                controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, Check)
             }
         }
 
+      case IdentityTypePage(srn, index, IdentitySubject.SharesSeller) =>
+        userAnswers.get(IdentityTypePage(srn, index, IdentitySubject.SharesSeller)) match {
+          case Some(IdentityType.Other) =>
+            controllers.nonsipp.common.routes.OtherRecipientDetailsController
+              .onPageLoad(srn, index, NormalMode, IdentitySubject.SharesSeller)
+          case Some(IdentityType.Individual) =>
+            controllers.nonsipp.shares.routes.IndividualNameOfSharesSellerController
+              .onPageLoad(srn, index, NormalMode)
+          case Some(IdentityType.UKCompany) =>
+            controllers.nonsipp.shares.routes.CompanyNameOfSharesSellerController
+              .onPageLoad(srn, index, NormalMode)
+          case Some(IdentityType.UKPartnership) =>
+            controllers.nonsipp.shares.routes.PartnershipNameOfSharesSellerController
+              .onPageLoad(srn, index, NormalMode)
+          case _ =>
+            controllers.routes.UnauthorisedController.onPageLoad()
+        }
+
+      case IndividualNameOfSharesSellerPage(srn, index) =>
+        controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, Check)
+
+      case CompanyNameOfSharesSellerPage(srn, index) =>
+        controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, Check)
+
+      case PartnershipShareSellerNamePage(srn, index) =>
+        controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, Check)
+
+      case SharesIndividualSellerNINumberPage(srn, index) =>
+        userAnswers.get(TypeOfSharesHeldPage(srn, index)) match {
+          case Some(Unquoted) =>
+            controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onPageLoad(srn, index, NormalMode)
+
+          case _ =>
+            controllers.nonsipp.shares.routes.CostOfSharesController.onPageLoad(srn, index, NormalMode)
+
+        }
+
+      case CompanyRecipientCrnPage(srn, index, IdentitySubject.SharesSeller) =>
+        userAnswers.get(TypeOfSharesHeldPage(srn, index)) match {
+          case Some(Unquoted) =>
+            controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onPageLoad(srn, index, NormalMode)
+
+          case _ =>
+            controllers.nonsipp.shares.routes.CostOfSharesController.onPageLoad(srn, index, NormalMode)
+        }
+
+      case PartnershipRecipientUtrPage(srn, index, IdentitySubject.SharesSeller) =>
+        userAnswers.get(TypeOfSharesHeldPage(srn, index)) match {
+          case Some(Unquoted) =>
+            controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onPageLoad(srn, index, NormalMode)
+
+          case _ =>
+            controllers.nonsipp.shares.routes.CostOfSharesController.onPageLoad(srn, index, NormalMode)
+        }
+
+      case OtherRecipientDetailsPage(srn, index, IdentitySubject.SharesSeller) =>
+        userAnswers.get(TypeOfSharesHeldPage(srn, index)) match {
+          case Some(Unquoted) =>
+            controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onPageLoad(srn, index, NormalMode)
+
+          case _ =>
+            controllers.nonsipp.shares.routes.CostOfSharesController.onPageLoad(srn, index, NormalMode)
+        }
+
       case SharesFromConnectedPartyPage(srn, index) =>
-        controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, NormalMode)
+        controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, Check)
 
       case CostOfSharesPage(srn, index) =>
-        controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, NormalMode)
+        controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, Check)
 
       case SharesIndependentValuationPage(srn, index) =>
         userAnswers.get(WhyDoesSchemeHoldSharesPage(srn, index)) match {
           case Some(Acquisition) =>
             userAnswers.get(TypeOfSharesHeldPage(srn, index)) match {
               case Some(SponsoringEmployer) =>
-                controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, NormalMode)
+                controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, Check)
               case _ =>
-                controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, NormalMode)
+                controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, Check)
             }
           case _ =>
-            controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, NormalMode)
+            controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, Check)
 
         }
 
       case TotalAssetValuePage(srn, index) =>
-        controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, NormalMode)
+        controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, Check)
 
       case SharesTotalIncomePage(srn, index) =>
-        controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, NormalMode)
+        controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, Check)
 
     }
 

@@ -72,7 +72,7 @@ class SharesCYAController @Inject()(
   def onPageLoad(
     srn: Srn,
     index: Max5000,
-    mode: Mode
+    checkOrChange: CheckOrChange
   ): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       (
@@ -175,7 +175,7 @@ class SharesCYAController @Inject()(
                 shareIndependentValue,
                 totalAssetValue,
                 sharesTotalIncome,
-                mode
+                checkOrChange
               )
             )
           )
@@ -184,7 +184,7 @@ class SharesCYAController @Inject()(
 
     }
 
-  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, checkOrChange: CheckOrChange): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       psrSubmissionService.submitPsrDetails(srn).map {
         case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
@@ -213,15 +213,15 @@ case class ViewModelParameters(
   shareIndependentValue: Boolean,
   totalAssetValue: Option[Money],
   sharesTotalIncome: Money,
-  mode: Mode
+  checkOrChange: CheckOrChange
 )
 object SharesCYAController {
   def viewModel(parameters: ViewModelParameters): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](
-      title = parameters.mode.fold(normal = "checkYourAnswers.title", check = "sharesCYA.change.title"),
-      heading = parameters.mode.fold(
-        normal = "checkYourAnswers.heading",
-        check = Message("sharesCYA.change.heading", parameters.companyNameRelatedShares)
+      title = parameters.checkOrChange.fold(check = "checkYourAnswers.title", change = "sharesCYA.change.title"),
+      heading = parameters.checkOrChange.fold(
+        check = "checkYourAnswers.heading",
+        change = Message("sharesCYA.change.heading", parameters.companyNameRelatedShares)
       ),
       description = Some(ParagraphMessage("sharesCYA.paragraph")),
       page = CheckYourAnswersViewModel(
@@ -249,8 +249,8 @@ object SharesCYAController {
         )
       ),
       refresh = None,
-      buttonText = parameters.mode.fold(normal = "site.saveAndContinue", check = "site.continue"),
-      onSubmit = routes.SharesCYAController.onSubmit(parameters.srn, parameters.mode)
+      buttonText = parameters.checkOrChange.fold(check = "site.saveAndContinue", change = "site.continue"),
+      onSubmit = routes.SharesCYAController.onSubmit(parameters.srn, parameters.checkOrChange)
     )
 
   private def sections(

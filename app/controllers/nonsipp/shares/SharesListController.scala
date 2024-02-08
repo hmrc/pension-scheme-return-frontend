@@ -27,7 +27,7 @@ import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
 import models.requests.DataRequest
-import models.{Mode, Pagination, SchemeHoldShare, TypeOfShares}
+import models.{CheckMode, CheckOrChange, Mode, Pagination, SchemeHoldShare, TypeOfShares}
 import navigation.Navigator
 import pages.nonsipp.shares._
 import play.api.data.Form
@@ -172,7 +172,7 @@ object SharesListController {
           TableElem(
             LinkMessage(
               Message("site.change"),
-              controllers.routes.UnauthorisedController.onPageLoad().url
+              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckOrChange.Check).url
             )
           ),
           TableElem(
