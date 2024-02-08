@@ -617,6 +617,13 @@ sharesDisposal.howManySharesRedeemed.error.decimal = Number of shares redeemed m
 sharesDisposal.howManySharesRedeemed.error.zero = Number of shares redeemed must be 1 or more
 sharesDisposal.howManySharesRedeemed.error.size = Number of shares redeemed must be 9,999,999 or fewer
 
+sharesDisposal.totalConsiderationSharesRedeemed.title = What was the total consideration received for the redemption of shares in this company, in pounds and pence?
+sharesDisposal.totalConsiderationSharesRedeemed.heading = What was the total consideration received for the redemption of {0} shares in {1}, in pounds and pence?
+sharesDisposal.totalConsiderationSharesRedeemed.error.required = Enter the total consideration received for the redemption of shares, in pounds and pence
+sharesDisposal.totalConsiderationSharesRedeemed.error.invalid.characters = Total consideration received for the redemption of shares must be an amount of money, like 123 or 123.45
+sharesDisposal.totalConsiderationSharesRedeemed.error.tooSmall = Total consideration received for the redemption of shares must be 0.01 or more
+sharesDisposal.totalConsiderationSharesRedeemed.error.tooLarge = Total consideration received for the redemption of shares must be 999999999.99 or less
+
 pensionCommencementLumpSum.title = Did any member receive a pension commencement lump sum (PCLS) during the period of this return?
 pensionCommencementLumpSum.heading = Did any member receive a pension commencement lump sum (PCLS) during the period of this return?
 pensionCommencementLumpSum.error.required = Select yes if any member received a Pension Commencement Lump Sum during the period of this return
