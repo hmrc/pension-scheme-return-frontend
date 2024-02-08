@@ -49,18 +49,18 @@ class WhatYouWillNeedController @Inject()(
     extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(srn: Srn): Action[AnyContent] = identify.andThen(allowAccess(srn)) { implicit request =>
-    Ok(view(WhatYouWillNeedController.viewModel(srn)))
-  }
+  def onPageLoad(srn: Srn, fbNumber: String, taxYear: String, version: String): Action[AnyContent] =
+    identify.andThen(allowAccess(srn)) { implicit request =>
+      Ok(view(WhatYouWillNeedController.viewModel(srn, fbNumber, taxYear, version)))
+    }
 
-  def onSubmit(srn: Srn): Action[AnyContent] =
+  def onSubmit(srn: Srn, fbNumber: String, taxYear: String, version: String): Action[AnyContent] =
     identify.andThen(allowAccess(srn)).andThen(getData).andThen(createData).async { implicit request =>
       for {
-        updatedUserAnswers <- psrRetrievalService.getStandardPsrDetails(
-          None,
-          Some("2022-04-06"), // TODO determine the tax year start based on the routing from the dashboard and/or GET report overview or GET report versions API calls
-          Some("001")
-        )
+        updatedUserAnswers <- fbNumber match {
+          case fb if !fb.isBlank => psrRetrievalService.getStandardPsrDetails(Some(fb), None, None)
+          case _ => psrRetrievalService.getStandardPsrDetails(None, Some(taxYear), Some(version))
+        }
         _ <- saveService.save(updatedUserAnswers)
       } yield {
         val members = updatedUserAnswers.get(HowManyMembersPage(srn, request.pensionSchemeId))
@@ -75,12 +75,12 @@ class WhatYouWillNeedController @Inject()(
 
 object WhatYouWillNeedController {
 
-  def viewModel(srn: Srn): FormPageViewModel[ContentPageViewModel] =
+  def viewModel(srn: Srn, fbNumber: String, taxYear: String, version: String): FormPageViewModel[ContentPageViewModel] =
     FormPageViewModel(
       Message("whatYouWillNeed.title"),
       Message("whatYouWillNeed.heading"),
       ContentPageViewModel(isStartButton = true, isLargeHeading = false),
-      routes.WhatYouWillNeedController.onSubmit(srn)
+      routes.WhatYouWillNeedController.onSubmit(srn, fbNumber, taxYear, version)
     ).withButtonText(Message("site.continue"))
       .withDescription(
         ParagraphMessage("whatYouWillNeed.paragraph") ++

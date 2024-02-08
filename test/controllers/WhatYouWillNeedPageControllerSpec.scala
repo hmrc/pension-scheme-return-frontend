@@ -33,8 +33,8 @@ class WhatYouWillNeedPageControllerSpec extends ControllerBaseSpec {
 
   def onwardRoute = Call("GET", "/foo")
 
-  lazy val onPageLoad = routes.WhatYouWillNeedController.onPageLoad(srn).url
-  lazy val onSubmit = routes.WhatYouWillNeedController.onSubmit(srn).url
+  lazy val onPageLoad = routes.WhatYouWillNeedController.onPageLoad(srn, fbNumber, "", "").url
+  lazy val onSubmit = routes.WhatYouWillNeedController.onSubmit(srn, fbNumber, "", "").url
 
   private implicit val mockPsrRetrievalService: PsrRetrievalService = mock[PsrRetrievalService]
 
@@ -52,7 +52,7 @@ class WhatYouWillNeedPageControllerSpec extends ControllerBaseSpec {
       val request = FakeRequest(GET, onPageLoad)
 
       val result = route(app, request).value
-      val expectedView = view(WhatYouWillNeedController.viewModel(srn))(request, createMessages(app))
+      val expectedView = view(WhatYouWillNeedController.viewModel(srn, fbNumber, "", ""))(request, createMessages(app))
 
       status(result) mustEqual OK
       contentAsString(result) mustEqual expectedView.toString

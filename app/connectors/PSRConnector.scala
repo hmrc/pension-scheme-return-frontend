@@ -17,18 +17,24 @@
 package connectors
 
 import config.FrontendAppConfig
+import models.backend.responses.{PsrVersionsForYearsResponse, PsrVersionsResponse}
 import models.requests.psr.PsrSubmission
+import play.api.Logger
 import play.api.http.Status.{NOT_FOUND, OK}
 import play.api.libs.json.{JsError, JsResultException, JsSuccess, Json}
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClient) {
 
   private val baseUrl = appConfig.pensionSchemeReturn.baseUrl
+  protected val logger: Logger = Logger(classOf[PSRConnector])
+  val inputFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
   def submitPsrDetails(
     psrSubmission: PsrSubmission
@@ -67,4 +73,37 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClient) {
         }
       }
   }
+
+  def getVersionsForYears(pstr: String, startDates: Seq[String])(
+    implicit hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[Seq[PsrVersionsForYearsResponse]] =
+    http
+      .GET[HttpResponse](
+        s"$baseUrl/pension-scheme-return/psr/versions/years/$pstr?startDates=${startDates.mkString("&startDates=")}"
+      )
+      .map { response =>
+        response.status match {
+          case OK =>
+            Json.parse(response.body).validate[Seq[PsrVersionsForYearsResponse]] match {
+              case JsSuccess(data, _) =>
+                response.json
+                  .as[Seq[PsrVersionsForYearsResponse]]
+              case JsError(errors) =>
+                logger.error(
+                  s"getVersions for $pstr and $startDates returned http response 200 but could not parse the body $response.body"
+                )
+                throw JsResultException(errors)
+            }
+          case NOT_FOUND =>
+            logger.error(s"getVersions for $pstr and $startDates returned http response 404 - returning empty Seq")
+            Seq.empty[PsrVersionsForYearsResponse]
+          case _ =>
+            // just logging errors to be able to continue on QA env
+            logger.error(
+              s"getVersions for $pstr and $startDates returned http response $response.status - returning empty Seq"
+            )
+            Seq.empty[PsrVersionsForYearsResponse]
+        }
+      }
 }
