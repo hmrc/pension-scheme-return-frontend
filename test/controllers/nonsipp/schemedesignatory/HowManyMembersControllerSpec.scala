@@ -37,6 +37,7 @@ class HowManyMembersControllerSpec extends ControllerBaseSpec {
   private val submissionEndDate = date.sample.value
   private val pensionSchemeId = pensionSchemeIdGen.sample.value
   private val mockSchemeDateService = mock[SchemeDateService]
+  private val pensionsTaxManual = "https://www.gov.uk/hmrc-internal-manuals/pensions-tax-manual/ptm025400"
 
   override val additionalBindings: List[GuiceableModule] =
     List(bind[SchemeDateService].toInstance(mockSchemeDateService))
@@ -55,7 +56,7 @@ class HowManyMembersControllerSpec extends ControllerBaseSpec {
       val viewForm = form(injected[IntFormProvider])
 
       view(
-        viewModel(srn, defaultSchemeDetails.schemeName, submissionEndDate, NormalMode, viewForm)
+        viewModel(srn, defaultSchemeDetails.schemeName, submissionEndDate, pensionsTaxManual, NormalMode, viewForm)
       )
     })
 
@@ -65,7 +66,14 @@ class HowManyMembersControllerSpec extends ControllerBaseSpec {
         val populatedForm = form(injected[IntFormProvider]).fill((1, 2, 3))
 
         view(
-          viewModel(srn, defaultSchemeDetails.schemeName, submissionEndDate, NormalMode, populatedForm)
+          viewModel(
+            srn,
+            defaultSchemeDetails.schemeName,
+            submissionEndDate,
+            pensionsTaxManual,
+            NormalMode,
+            populatedForm
+          )
         )
     })
 

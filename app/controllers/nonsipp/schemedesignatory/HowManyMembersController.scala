@@ -18,6 +18,7 @@ package controllers.nonsipp.schemedesignatory
 
 import cats.implicits.toShow
 import config.Constants.maxMembers
+import config.FrontendAppConfig
 import controllers.actions._
 import controllers.nonsipp.schemedesignatory.HowManyMembersController._
 import forms.IntFormProvider
@@ -33,7 +34,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.{SaveService, SchemeDateService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.DateTimeUtils.localDateShow
-import viewmodels.DisplayMessage.{ListMessage, ListType, Message}
+import viewmodels.DisplayMessage.{LinkMessage, ListMessage, ListType, Message, ParagraphMessage}
 import viewmodels.implicits._
 import viewmodels.models.MultipleQuestionsViewModel.TripleQuestion
 import viewmodels.models.{FormPageViewModel, FurtherDetailsViewModel, QuestionField}
@@ -46,6 +47,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class HowManyMembersController @Inject()(
   override val messagesApi: MessagesApi,
   saveService: SaveService,
+  config: FrontendAppConfig,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   formProvider: IntFormProvider,
@@ -63,7 +65,18 @@ class HowManyMembersController @Inject()(
       val page = HowManyMembersPage(srn, request.pensionSchemeId)
       val schemeName = request.schemeDetails.schemeName
 
-      Ok(view(viewModel(srn, schemeName, submissionEndDate, mode, request.userAnswers.fillForm(page, form))))
+      Ok(
+        view(
+          viewModel(
+            srn,
+            schemeName,
+            submissionEndDate,
+            config.urls.pensionsTaxManual,
+            mode,
+            request.userAnswers.fillForm(page, form)
+          )
+        )
+      )
     }
   }
 
@@ -77,7 +90,9 @@ class HowManyMembersController @Inject()(
         formWithErrors =>
           Future.successful {
             usingSubmissionEndDate(srn) { submissionEndDate =>
-              BadRequest(view(viewModel(srn, schemeName, submissionEndDate, mode, formWithErrors)))
+              BadRequest(
+                view(viewModel(srn, schemeName, submissionEndDate, config.urls.pensionsTaxManual, mode, formWithErrors))
+              )
             }
           },
         value =>
@@ -129,6 +144,7 @@ object HowManyMembersController {
     srn: Srn,
     schemeName: String,
     endDate: LocalDate,
+    pensionsTaxManual: String,
     mode: Mode,
     form: Form[(Int, Int, Int)]
   ): FormPageViewModel[TripleQuestion[Int, Int, Int]] = FormPageViewModel(
@@ -148,7 +164,15 @@ object HowManyMembersController {
           "howManyMembers.List1",
           "howManyMembers.List2",
           "howManyMembers.List3"
-        )
+        ) ++
+          ParagraphMessage(
+            "howManyMembers.paragraph4",
+            LinkMessage(
+              "howManyMembers.paragraph4.link",
+              pensionsTaxManual,
+              Map("rel" -> "noreferrer noopener", "target" -> "_blank")
+            )
+          )
       )
     ),
     routes.HowManyMembersController.onSubmit(srn, mode)
