@@ -17,7 +17,7 @@
 package services
 
 import connectors.PSRConnector
-import models.backend.responses.{PsrVersionsForYearsResponse, PsrVersionsResponse}
+import models.backend.responses.PsrVersionsForYearsResponse
 import models.requests.OptionalDataRequest
 import play.api.mvc.AnyContent
 import uk.gov.hmrc.http.HeaderCarrier
