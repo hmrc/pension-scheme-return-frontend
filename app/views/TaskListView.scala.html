@@ -14,11 +14,11 @@
  * limitations under the License.
  *@
 
-@import views.html.components.TaskListItemsView
+@import views.html.components.TaskListItems
 
 @this(
  layout: templates.Layout,
- taskListItemsView: TaskListItemsView
+ taskListItems: TaskListItems
 )
 
 @(viewmodel: PageViewModel[TaskListViewModel])(implicit request: Request[_], messages: Messages)
@@ -47,7 +47,7 @@
      <ul class="app-task-list__items">
       @section.items.fold(
         msg => item(renderMessage(msg)),
-        items => taskListItemsView(items, index)
+        items => taskListItems(items, index)
       )
       @section.postActionLink.map { link =>
         <li>
