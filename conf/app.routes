@@ -32,8 +32,9 @@ GET         /account/signed-out                                                 
 
 GET         /unauthorised                                                               controllers.UnauthorisedController.onPageLoad()
 
-GET         /:srn/what-you-will-need                                                    controllers.WhatYouWillNeedController.onPageLoad(srn: Srn)
-GET         /:srn/what-you-will-need-next-page                                          controllers.WhatYouWillNeedController.onSubmit(srn: Srn)
+GET         /:srn/what-you-will-need/:fbNumber                                          controllers.WhatYouWillNeedController.onPageLoad(srn: Srn, fbNumber: String, taxYear: String = "", version: String = "")
+GET         /:srn/what-you-will-need                                                    controllers.WhatYouWillNeedController.onPageLoad(srn: Srn, fbNumber: String = "", taxYear: String = "2022-04-06", version: String = "001")
+GET         /:srn/what-you-will-need-next-page                                          controllers.WhatYouWillNeedController.onSubmit(srn: Srn, taxYear: String, fbNumber: String,  version: String)
 
 GET         /:srn/which-tax-year                                                        controllers.nonsipp.WhichTaxYearController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST        /:srn/which-tax-year                                                        controllers.nonsipp.WhichTaxYearController.onSubmit(srn: Srn, mode: Mode = NormalMode)
@@ -429,6 +430,8 @@ POST        /:srn/remove-unallocated-employer-contributions                     
 GET         /:srn/change-remove-unallocated-employer-contributions                      controllers.nonsipp.memberpayments.RemoveUnallocatedAmountController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST        /:srn/change-remove-unallocated-employer-contributions                      controllers.nonsipp.memberpayments.RemoveUnallocatedAmountController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
+GET         /:srn/return-history                                                        controllers.ReturnHistoryController.onPageLoad(srn: Srn)
+GET         /:srn/select-return-history                                                 controllers.ReturnHistoryController.onSelect(srn: Srn, version: String)
 
 
 

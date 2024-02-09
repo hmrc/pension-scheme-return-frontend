@@ -206,9 +206,25 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               disposalIndex,
               HowManySharesRedeemedPage,
               (srn, shareIndex: Max5000, disposalIndex: Max50, _) =>
-                controllers.routes.UnauthorisedController.onPageLoad()
+                controllers.nonsipp.sharesdisposal.routes.TotalConsiderationSharesRedeemedController
+                  .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
             )
             .withName("go from How Many Shares Redeemed page to Unauthorised page")
+        )
+      }
+
+      "TotalConsiderationSharesRedeemedPage" - {
+
+        act.like(
+          normalmode
+            .navigateToWithDoubleIndex(
+              shareIndex,
+              disposalIndex,
+              TotalConsiderationSharesRedeemedPage,
+              (srn, shareIndex: Max5000, disposalIndex: Max50, _) =>
+                controllers.routes.UnauthorisedController.onPageLoad()
+            )
+            .withName("go from Total Consideration Shares Sold page to Unauthorised page")
         )
       }
 
@@ -257,20 +273,20 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         //            )
         //            .withName("go from who where the shares sold to partnership buyer name page")
         //        )
-        //
-        //        act.like(
-        //          normalmode
-        //            .navigateToWithDoubleIndexAndData(
-        //              shareIndex,
-        //              disposalIndex,
-        //              WhoWereTheSharesSoldToPage,
-        //              Gen.const(IdentityType.Other),
-        //              (srn, index: Max5000, disposalIndex: Max50, _) =>
-        //                controllers.nonsipp.sharesdisposal.routes.OtherBuyerDetailsController
-        //                  .onPageLoad(srn, index, disposalIndex, NormalMode)
-        //            )
-        //            .withName("go from who where the shares sold to unauthorised page")
-        //        )
+
+                act.like(
+                  normalmode
+                    .navigateToWithDoubleIndexAndData(
+                      shareIndex,
+                      disposalIndex,
+                      WhoWereTheSharesSoldToPage,
+                      Gen.const(IdentityType.Other),
+                      (srn, index: Max5000, disposalIndex: Max50, _) =>
+                        controllers.nonsipp.sharesdisposal.routes.OtherBuyerDetailsController
+                          .onPageLoad(srn, index, disposalIndex, NormalMode)
+                    )
+                    .withName("go from who where the shares sold to other buyer details page")
+                )
       }
 
       "SharesIndividualBuyerNamePage" - {

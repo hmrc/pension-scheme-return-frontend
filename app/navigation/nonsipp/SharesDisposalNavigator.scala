@@ -49,10 +49,10 @@ object SharesDisposalNavigator extends JourneyNavigator {
 //        case Some(IdentityType.UKPartnership) =>
 //          controllers.nonsipp.sharesdisposal.routes.PartnershipBuyerNameController
 //            .onPageLoad(srn, index, disposalIndex, NormalMode)
-//
-//        case Some(IdentityType.Other) =>
-//          controllers.nonsipp.sharesdisposal.routes.OtherBuyerDetailsController
-//            .onPageLoad(srn, index, disposalIndex, NormalMode)
+
+        case Some(IdentityType.Other) =>
+          controllers.nonsipp.sharesdisposal.routes.OtherBuyerDetailsController
+            .onPageLoad(srn, index, disposalIndex, NormalMode)
       }
 
     case SharesIndividualBuyerNamePage(srn, index, disposalIndex) =>
@@ -125,6 +125,10 @@ object SharesDisposalNavigator extends JourneyNavigator {
         .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
 
     case HowManySharesRedeemedPage(srn, shareIndex, disposalIndex) =>
+      controllers.nonsipp.sharesdisposal.routes.TotalConsiderationSharesRedeemedController
+        .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
+
+    case TotalConsiderationSharesRedeemedPage(srn, shareIndex, disposalIndex) =>
       controllers.routes.UnauthorisedController.onPageLoad()
 
   }

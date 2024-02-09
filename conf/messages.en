@@ -10,6 +10,8 @@ site.no = No
 site.yes = Yes
 site.next = Next
 site.previous = Previous
+site.view = View
+site.viewOrChange = View or change
 
 site.continue = Continue
 site.saveAndContinue = Save and continue
@@ -533,6 +535,16 @@ sharesDisposal.individualBuyerName.error.required = Enter the buyer’s name
 sharesDisposal.individualBuyerName.error.length = Buyer’s name must be 160 characters or fewer
 sharesDisposal.individualBuyerName.error.invalid.characters = Buyer’s name must only include letters a to z, hyphens, apostrophes and spaces
 
+sharesDisposal.otherBuyerDetails.title = Buyer’s details
+sharesDisposal.otherBuyerDetails.heading = Buyer’s details for shares in {0}
+sharesDisposal.otherBuyerDetails.name = Buyer’s name
+sharesDisposal.otherBuyerDetails.description = Brief description of buyer (optional)
+sharesDisposal.otherBuyerDetails.name.error.required = Enter the buyer’s name
+sharesDisposal.otherBuyerDetails.name.error.invalid = Buyer’s name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+sharesDisposal.otherBuyerDetails.name.error.length = Buyer’s name must be 160 characters or fewer
+sharesDisposal.otherBuyerDetails.description.error.invalid = The description of the buyer must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+sharesDisposal.otherBuyerDetails.description.error.length = The description of the buyer must be 35 characters or fewer
+
 sharesDisposal.title = Did the scheme dispose of any shares in a sponsoring employer, shares acquired from a connected party, or unquoted shares during the period of this return?
 sharesDisposal.heading = Did {0} dispose of any shares in a sponsoring employer, shares acquired from a connected party, or unquoted shares during the period of this return?
 sharesDisposal.error.required = Select yes if the scheme disposed of any shares in a sponsoring employer, shares acquired from a connected party, or unquoted shares during the period of this return
@@ -616,6 +628,13 @@ sharesDisposal.howManySharesRedeemed.error.invalid.characters = Number of shares
 sharesDisposal.howManySharesRedeemed.error.decimal = Number of shares redeemed must be a whole number, like 100
 sharesDisposal.howManySharesRedeemed.error.zero = Number of shares redeemed must be 1 or more
 sharesDisposal.howManySharesRedeemed.error.size = Number of shares redeemed must be 9,999,999 or fewer
+
+sharesDisposal.totalConsiderationSharesRedeemed.title = What was the total consideration received for the redemption of shares in this company, in pounds and pence?
+sharesDisposal.totalConsiderationSharesRedeemed.heading = What was the total consideration received for the redemption of {0} shares in {1}, in pounds and pence?
+sharesDisposal.totalConsiderationSharesRedeemed.error.required = Enter the total consideration received for the redemption of shares, in pounds and pence
+sharesDisposal.totalConsiderationSharesRedeemed.error.invalid.characters = Total consideration received for the redemption of shares must be an amount of money, like 123 or 123.45
+sharesDisposal.totalConsiderationSharesRedeemed.error.tooSmall = Total consideration received for the redemption of shares must be 0.01 or more
+sharesDisposal.totalConsiderationSharesRedeemed.error.tooLarge = Total consideration received for the redemption of shares must be 999999999.99 or less
 
 pensionCommencementLumpSum.title = Did any member receive a pension commencement lump sum (PCLS) during the period of this return?
 pensionCommencementLumpSum.heading = Did any member receive a pension commencement lump sum (PCLS) during the period of this return?
@@ -2413,7 +2432,6 @@ companyNameOfSharesBuyer.error.required = Enter the buyer’s company name
 companyNameOfSharesBuyer.error.invalid = Buyer’s company name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
 companyNameOfSharesBuyer.error.tooLong = Buyer’s company name must be 160 characters or fewer
 
-
 checkYourAnswers.title = Check your answers
 sharesCYA.change.title = Change details of this share transaction
 checkYourAnswers.heading = Check your answers
@@ -2479,3 +2497,11 @@ sharesCYA.section4.totalAssetValue = Total value of {0}’s assets on the date t
 sharesCYA.section4.totalAssetValue.hidden =  total value of {0}’s assets on the date these shares were acquired
 sharesCYA.section4.sharesTotalIncome = Total income from these shares in the period of this return
 sharesCYA.section4.sharesTotalIncome.hidden =  total income from these shares in the period of this return
+
+returnHistory.title = Pension scheme return overview
+returnHistory.heading = Pension scheme return overview
+returnHistory.table.header1 = TaxYearStart
+returnHistory.table.header2 = Version
+returnHistory.table.header3 = FormBundleNumber
+returnHistory.table.header4 = Status
+returnHistory.table.header5 = SubmittedBy
