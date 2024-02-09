@@ -62,15 +62,13 @@ class SharesListController @Inject()(
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      // remove once last page is developed
-      val userAnswers = request.userAnswers.set(SharesCompleted(srn, refineMV(1)), SectionCompleted).get
 
-      val indexes: List[Max5000] = userAnswers.map(SharesCompleted.all(srn)).keys.toList.refine[Max5000.Refined]
+      val indexes: List[Max5000] = request.userAnswers.map(SharesCompleted.all(srn)).keys.toList.refine[Max5000.Refined]
 
       if (indexes.nonEmpty) {
         sharesData(srn, indexes).map { data =>
           val filledForm =
-            userAnswers.get(SharesListPage(srn)).fold(form)(form.fill)
+            request.userAnswers.get(SharesListPage(srn)).fold(form)(form.fill)
           Ok(view(filledForm, viewModel(srn, page, mode, data)))
         }.merge
       } else {

@@ -302,6 +302,7 @@ object SharesCYAController {
           index,
           receivedLandType.get,
           recipientName.get,
+          holdShares,
           companyNameRelatedShares,
           recipientDetails,
           recipientReasonNoDetails,
@@ -491,22 +492,38 @@ object SharesCYAController {
               routes.HowManySharesController.onPageLoad(srn, index, mode).url + "#howManyShares"
             ).withVisuallyHiddenContent("sharesCYA.section2.howManyShares.hidden", companyNameRelatedShares)
           )
-        ) :?+ sharesFromConnectedParty.map { _ =>
-          CheckYourAnswersRowViewModel(
-            Message("sharesCYA.section2.sharesFromConnectedParty", companyNameRelatedShares),
-            if (sharesFromConnectedParty.getOrElse(false)) "site.yes" else "site.no"
-          ).withAction(
-            SummaryAction(
-              "site.change",
-              (TypeOfShares, SchemeHoldShare, SchemeHoldShare) match {
-                case (TypeOfShares, SchemeHoldShare, SchemeHoldShare)
-                    if TypeOfShares == "02" && (SchemeHoldShare == "02" || SchemeHoldShare == "03") =>
-                  routes.SharesFromConnectedPartyController.onPageLoad(srn, index, mode).url
-                case _ =>
-                  routes.CostOfSharesController.onPageLoad(srn, index, mode).url
-              }
-            ).withVisuallyHiddenContent("sharesCYA.section2.sharesFromConnectedParty.hidden")
-          )
+        ) :?+ sharesFromConnectedParty.flatMap { connectedParty =>
+          holdShares match {
+            case SchemeHoldShare.Contribution =>
+              Some(
+                CheckYourAnswersRowViewModel(
+                  Message("sharesCYA.sectionContribution.sharesFromConnectedParty", companyNameRelatedShares),
+                  if (connectedParty) "site.yes" else "site.no"
+                ).withAction(
+                  SummaryAction(
+                    "site.change",
+                    routes.SharesFromConnectedPartyController.onPageLoad(srn, index, mode).url
+                  ).withVisuallyHiddenContent("sharesCYA.sectionContribution.sharesFromConnectedParty.hidden")
+                )
+              )
+            case _ => None
+          }
+        } :?+ sharesFromConnectedParty.flatMap { connectedParty =>
+          holdShares match {
+            case SchemeHoldShare.Transfer =>
+              Some(
+                CheckYourAnswersRowViewModel(
+                  Message("sharesCYA.sectionTransfer.sharesFromConnectedParty", companyNameRelatedShares),
+                  if (connectedParty) "site.yes" else "site.no"
+                ).withAction(
+                  SummaryAction(
+                    "site.change",
+                    routes.SharesFromConnectedPartyController.onPageLoad(srn, index, mode).url
+                  ).withVisuallyHiddenContent("sharesCYA.sectionTransfer.sharesFromConnectedParty.hidden")
+                )
+              )
+            case _ => None
+          }
         }
       )
     )
@@ -516,6 +533,7 @@ object SharesCYAController {
     index: Max5000,
     receivedLandType: IdentityType,
     recipientName: String,
+    holdShares: SchemeHoldShare,
     companyNameRelatedShares: String,
     optRecipientDetails: Option[String],
     optRecipientReasonNoDetails: Option[String],
@@ -637,21 +655,22 @@ object SharesCYAController {
               SummaryAction("site.change", recipientNoDetailsUrl)
                 .withVisuallyHiddenContent(recipientDetailsNoIdChangeHiddenKey)
             )
-        } :?+ sharesFromConnectedParty.map { _ =>
-          CheckYourAnswersRowViewModel(
-            Message("sharesCYA.section2.sharesFromConnectedParty", companyNameRelatedShares),
-            if (sharesFromConnectedParty.getOrElse(false)) "site.yes" else "site.no"
-          ).withAction(
-            SummaryAction(
-              "site.change",
-              (TypeOfShares, SchemeHoldShare) match {
-                case (TypeOfShares, SchemeHoldShare) if TypeOfShares == "02" && SchemeHoldShare == "01" =>
-                  routes.SharesFromConnectedPartyController.onPageLoad(srn, index, mode).url
-                case _ =>
-                  routes.CostOfSharesController.onPageLoad(srn, index, mode).url
-              }
-            ).withVisuallyHiddenContent("sharesCYA.section2.sharesFromConnectedParty.hidden")
-          )
+        } :?+ sharesFromConnectedParty.flatMap { connectedParty =>
+          holdShares match {
+            case SchemeHoldShare.Acquisition =>
+              Some(
+                CheckYourAnswersRowViewModel(
+                  Message("sharesCYA.section3.sharesFromConnectedParty", recipientName),
+                  if (connectedParty) "site.yes" else "site.no"
+                ).withAction(
+                  SummaryAction(
+                    "site.change",
+                    routes.SharesFromConnectedPartyController.onPageLoad(srn, index, mode).url
+                  ).withVisuallyHiddenContent("sharesCYA.section3.sharesFromConnectedParty.hidden")
+                )
+              )
+            case _ => None
+          }
         }
       )
     )
@@ -701,9 +720,9 @@ object SharesCYAController {
               "site.change",
               (TypeOfShares, SchemeHoldShare) match {
                 case (TypeOfShares, SchemeHoldShare) if TypeOfShares == "01" || SchemeHoldShare == "01" =>
-                  routes.TotalAssetValueController.onPageLoad(srn, index, mode).url + "#totalAssetValue"
-                case _ =>
                   routes.SharesTotalIncomeController.onPageLoad(srn, index, mode).url
+                case _ =>
+                  routes.TotalAssetValueController.onPageLoad(srn, index, mode).url
               }
             ).withVisuallyHiddenContent("sharesCYA.section4.totalAssetValue.hidden")
           )
@@ -713,7 +732,7 @@ object SharesCYAController {
         ).withAction(
           SummaryAction(
             "site.change",
-            routes.SharesTotalIncomeController.onPageLoad(srn, index, mode).url + "#sharesTotalIncome"
+            routes.SharesTotalIncomeController.onPageLoad(srn, index, mode).url
           ).withVisuallyHiddenContent("sharesCYA.section4.sharesTotalIncome.hidden")
         )
       )

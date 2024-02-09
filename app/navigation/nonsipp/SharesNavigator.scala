@@ -184,6 +184,9 @@ object SharesNavigator extends JourneyNavigator {
     case SharesTotalIncomePage(srn, index) =>
       controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckOrChange.Check)
 
+    case SharesCYAPage(srn) =>
+      controllers.nonsipp.shares.routes.SharesListController.onPageLoad(srn, 1, NormalMode)
+
     case page @ SharesListPage(srn) =>
       userAnswers.get(page) match {
         case None => controllers.routes.JourneyRecoveryController.onPageLoad()
@@ -219,8 +222,7 @@ object SharesNavigator extends JourneyNavigator {
       case HowManySharesPage(srn, index) =>
         userAnswers.get(WhyDoesSchemeHoldSharesPage(srn, index)) match {
           case Some(Acquisition) =>
-            controllers.nonsipp.common.routes.IdentityTypeController
-              .onPageLoad(srn, index, NormalMode, IdentitySubject.SharesSeller)
+            controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, Check)
           case _ =>
             userAnswers.get(TypeOfSharesHeldPage(srn, index)) match {
               case Some(Unquoted) =>
@@ -260,7 +262,7 @@ object SharesNavigator extends JourneyNavigator {
       case SharesIndividualSellerNINumberPage(srn, index) =>
         userAnswers.get(TypeOfSharesHeldPage(srn, index)) match {
           case Some(Unquoted) =>
-            controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onPageLoad(srn, index, NormalMode)
+            controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, Check)
 
           case _ =>
             controllers.nonsipp.shares.routes.CostOfSharesController.onPageLoad(srn, index, NormalMode)
@@ -270,7 +272,7 @@ object SharesNavigator extends JourneyNavigator {
       case CompanyRecipientCrnPage(srn, index, IdentitySubject.SharesSeller) =>
         userAnswers.get(TypeOfSharesHeldPage(srn, index)) match {
           case Some(Unquoted) =>
-            controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onPageLoad(srn, index, NormalMode)
+            controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, Check)
 
           case _ =>
             controllers.nonsipp.shares.routes.CostOfSharesController.onPageLoad(srn, index, NormalMode)
@@ -279,7 +281,7 @@ object SharesNavigator extends JourneyNavigator {
       case PartnershipRecipientUtrPage(srn, index, IdentitySubject.SharesSeller) =>
         userAnswers.get(TypeOfSharesHeldPage(srn, index)) match {
           case Some(Unquoted) =>
-            controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onPageLoad(srn, index, NormalMode)
+            controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, Check)
 
           case _ =>
             controllers.nonsipp.shares.routes.CostOfSharesController.onPageLoad(srn, index, NormalMode)
@@ -288,7 +290,7 @@ object SharesNavigator extends JourneyNavigator {
       case OtherRecipientDetailsPage(srn, index, IdentitySubject.SharesSeller) =>
         userAnswers.get(TypeOfSharesHeldPage(srn, index)) match {
           case Some(Unquoted) =>
-            controllers.nonsipp.shares.routes.SharesFromConnectedPartyController.onPageLoad(srn, index, NormalMode)
+            controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, Check)
 
           case _ =>
             controllers.nonsipp.shares.routes.CostOfSharesController.onPageLoad(srn, index, NormalMode)
