@@ -18,7 +18,6 @@ package navigation.nonsipp
 
 import cats.implicits.toTraverseOps
 import config.Refined.Max5000
-import controllers.nonsipp.shares.CompanyNameOfSharesSellerPage
 import eu.timepit.refined.refineMV
 import models.CheckOrChange.Check
 import models.SchemeHoldShare.{Acquisition, Contribution, Transfer}

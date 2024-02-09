@@ -27,6 +27,7 @@ import models.{IdentitySubject, IdentityType, Mode, SchemeHoldShare}
 import navigation.Navigator
 import pages.nonsipp.common.{IdentityTypePage, OtherRecipientDetailsPage}
 import pages.nonsipp.shares.{
+  CompanyNameOfSharesSellerPage,
   CompanyNameRelatedSharesPage,
   IndividualNameOfSharesSellerPage,
   PartnershipShareSellerNamePage,

@@ -17,7 +17,6 @@
 package pages.nonsipp.common
 
 import config.Refined.Max5000
-import controllers.nonsipp.shares.CompanyNameOfSharesSellerPage
 import models.SchemeId.Srn
 import models.{IdentitySubject, IdentityType, UserAnswers}
 import pages.QuestionPage
