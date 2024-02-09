@@ -10,6 +10,8 @@ site.no = No
 site.yes = Yes
 site.next = Next
 site.previous = Previous
+site.view = View
+site.viewOrChange = View or change
 
 site.continue = Continue
 site.saveAndContinue = Save and continue
@@ -2429,3 +2431,11 @@ companyNameOfSharesBuyer.heading = What is the buyer’s company name?
 companyNameOfSharesBuyer.error.required = Enter the buyer’s company name
 companyNameOfSharesBuyer.error.invalid = Buyer’s company name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
 companyNameOfSharesBuyer.error.tooLong = Buyer’s company name must be 160 characters or fewer
+
+returnHistory.title = Pension scheme return overview
+returnHistory.heading = Pension scheme return overview
+returnHistory.table.header1 = TaxYearStart
+returnHistory.table.header2 = Version
+returnHistory.table.header3 = FormBundleNumber
+returnHistory.table.header4 = Status
+returnHistory.table.header5 = SubmittedBy

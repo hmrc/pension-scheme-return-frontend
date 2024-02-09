@@ -1,0 +1,57 @@
+@*
+ * Copyright 2024 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import viewmodels.ReturnHistorySummary
+
+@(rows: Seq[ReturnHistorySummary], colOne: String, colTwo: String, colThree: String, colFour: String, colFive: String, caption: String)(implicit messages: Messages)
+
+<table class="govuk-table" role="table">
+    <caption class="govuk-visually-hidden">@caption</caption>
+    <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header">@colOne</th>
+            <th scope="col" class="govuk-table__header">@colTwo</th>
+            <th scope="col" class="govuk-table__header">@colThree</th>
+            <th scope="col" class="govuk-table__header">@colFour</th>
+            <th scope="col" class="govuk-table__header">@colFive</th>
+            <th scope="col" class="govuk-table__header"></th>
+        </tr>
+    </thead>
+    <tbody class="govuk-table__body">
+    @rows.map { summaryListRow =>
+        <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header govuk-!-font-weight-regular">@summaryListRow.key</th>
+            <td class="govuk-table__cell">@summaryListRow.firstValue</td>
+            <td class="govuk-table__cell">@summaryListRow.secondValue</td>
+            <td class="govuk-table__cell">@summaryListRow.thirdValue</td>
+            <td class="govuk-table__cell">@summaryListRow.fourthValue</td>
+            @summaryListRow.actions.map { actions =>
+                <td class="govuk-table__cell govuk-table__cell--numeric whitespace-nowrap">
+                    <ul class="govuk-summary-list__actions-list">
+                        @actions.items.map { item =>
+                            <li class="govuk-summary-list__actions-list-item">
+                                <a class="govuk-link" href="@item.href">
+                                    @item.content.asHtml <span class="govuk-visually-hidden">@summaryListRow.key.content.asHtml</span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </td>
+            }
+        </tr>
+    }
+    </tbody>
+</table>
