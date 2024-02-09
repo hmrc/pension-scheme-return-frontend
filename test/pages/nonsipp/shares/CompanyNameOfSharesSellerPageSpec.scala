@@ -17,7 +17,6 @@
 package pages.nonsipp.shares
 
 import config.Refined.Max5000
-import controllers.nonsipp.shares.CompanyNameOfSharesSellerPage
 import eu.timepit.refined.refineMV
 import pages.behaviours.PageBehaviours
 

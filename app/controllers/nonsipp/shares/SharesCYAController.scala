@@ -29,6 +29,7 @@ import navigation.Navigator
 import pages.nonsipp.common._
 import pages.nonsipp.shares.{
   ClassOfSharesPage,
+  CompanyNameOfSharesSellerPage,
   CompanyNameRelatedSharesPage,
   CostOfSharesPage,
   HowManySharesPage,

@@ -22,6 +22,7 @@ import controllers.nonsipp.shares.CompanyNameOfSharesSellerController.{form, vie
 import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import models.NormalMode
+import pages.nonsipp.shares.CompanyNameOfSharesSellerPage
 import views.html.TextInputView
 
 class CompanyNameOfSharesSellerControllerSpec extends ControllerBaseSpec {
