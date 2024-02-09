@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.shares
+package pages.nonsipp.shares
 
 import config.Refined.Max5000
 import models.SchemeId.Srn
