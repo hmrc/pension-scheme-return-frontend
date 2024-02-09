@@ -274,19 +274,19 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         //            .withName("go from who where the shares sold to partnership buyer name page")
         //        )
 
-                act.like(
-                  normalmode
-                    .navigateToWithDoubleIndexAndData(
-                      shareIndex,
-                      disposalIndex,
-                      WhoWereTheSharesSoldToPage,
-                      Gen.const(IdentityType.Other),
-                      (srn, index: Max5000, disposalIndex: Max50, _) =>
-                        controllers.nonsipp.sharesdisposal.routes.OtherBuyerDetailsController
-                          .onPageLoad(srn, index, disposalIndex, NormalMode)
-                    )
-                    .withName("go from who where the shares sold to other buyer details page")
-                )
+        act.like(
+          normalmode
+            .navigateToWithDoubleIndexAndData(
+              shareIndex,
+              disposalIndex,
+              WhoWereTheSharesSoldToPage,
+              Gen.const(IdentityType.Other),
+              (srn, index: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.OtherBuyerDetailsController
+                  .onPageLoad(srn, index, disposalIndex, NormalMode)
+            )
+            .withName("go from who where the shares sold to other buyer details page")
+        )
       }
 
       "SharesIndividualBuyerNamePage" - {
