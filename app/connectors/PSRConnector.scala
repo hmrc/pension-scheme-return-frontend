@@ -17,7 +17,7 @@
 package connectors
 
 import config.FrontendAppConfig
-import models.backend.responses.{PsrVersionsForYearsResponse, PsrVersionsResponse}
+import models.backend.responses.PsrVersionsForYearsResponse
 import models.requests.psr.PsrSubmission
 import play.api.Logger
 import play.api.http.Status.{NOT_FOUND, OK}
@@ -25,7 +25,6 @@ import play.api.libs.json.{JsError, JsResultException, JsSuccess, Json}
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 
-import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}

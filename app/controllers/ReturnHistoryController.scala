@@ -69,8 +69,7 @@ class ReturnHistoryController @Inject()(
               firstValue = v.reportVersion.toString,
               secondValue = v.reportFormBundleNumber,
               thirdValue = v.reportStatus.toString.capitalize,
-              fourthValue =
-                v.reportSubmitterDetails.individualDetails.getOrElse(IndividualDetails("", None, "")).lastName, // TODO
+              fourthValue = "", // TODO
               actions = Some(
                 Actions(
                   items = Seq(
