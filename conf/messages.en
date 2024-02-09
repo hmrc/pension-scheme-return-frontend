@@ -572,7 +572,7 @@ sharesDisposal.whatYouWillNeed.bullet14 = the total consideration received for t
 
 sharesDisposal.sharesDisposalList.title = Start reporting a share disposal
 sharesDisposal.sharesDisposalList.heading = Start reporting a share disposal
-sharesDisposal.sharesDisposalList.paragraph1 = Select one option to start reporting disposal. If you need to report more, you will be able to do this later.
+sharesDisposal.sharesDisposalList.paragraph1 = Select one option to start reporting a disposal. If you need to report more, you will be able to do this later.
 sharesDisposal.sharesDisposalList.paragraph2 = You can report disposal of shares whose details you have already provided. If the shares do not appear here, add them using the ‘Change shares held in a sponsoring employer, acquired from a connected party, or unquoted shares’ section of this return.
 sharesDisposal.sharesDisposalList.legend = Which shares were disposed of?
 sharesDisposal.sharesDisposalList.radios.error.required = Select the shares that were disposed of
@@ -1644,7 +1644,7 @@ companyBuyerCrn.error.required = Select yes if you know the buyer’s Company Re
 
 landOrPropertyDisposalAddressList.title = Start reporting a land or property disposal
 landOrPropertyDisposalAddressList.heading = Start reporting a land or property disposal
-landOrPropertyDisposalAddressList.paragraph1 = Select one option to start reporting disposal. If you need to report more, you will be able to do this later.
+landOrPropertyDisposalAddressList.paragraph1 = Select one option to start reporting a disposal. If you need to report more, you will be able to do this later.
 landOrPropertyDisposalAddressList.paragraph2 = You can only report disposal of land or property you have told us is held by your scheme. If the land or property does not appear here, add it using the ‘Change land or property’ section of this return.
 landOrPropertyDisposalAddressList.legend = Which land or property was disposed of?
 landOrPropertyDisposalAddressList.radios.error.required = Select the land or property that was disposed of
