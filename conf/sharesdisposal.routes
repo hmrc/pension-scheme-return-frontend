@@ -65,3 +65,9 @@ GET        /:srn/company-name-of-shares-buyer/:index/:secondaryIndex            
 POST       /:srn/company-name-of-shares-buyer/:index/:secondaryIndex                 controllers.nonsipp.sharesdisposal.CompanyNameOfSharesBuyerController.onSubmit(srn: Srn, index: Max5000, secondaryIndex: Max50, mode: Mode = NormalMode)
 GET        /:srn/change-company-name-of-shares-buyer/:index/:secondaryIndex          controllers.nonsipp.sharesdisposal.CompanyNameOfSharesBuyerController.onPageLoad(srn: Srn, index: Max5000, secondaryIndex: Max50, mode: Mode = CheckMode)
 POST       /:srn/change-company-name-of-shares-buyer/:index/:secondaryIndex          controllers.nonsipp.sharesdisposal.CompanyNameOfSharesBuyerController.onSubmit(srn: Srn, index: Max5000, secondaryIndex: Max50, mode: Mode = CheckMode)
+
+GET        /:srn/shares-company-buyer-crn/:index/:secondaryIndex                                    controllers.nonsipp.sharesdisposal.CompanyBuyerCrnController.onPageLoad(srn: Srn, index: Max5000, secondaryIndex: Max50, mode: Mode = NormalMode)
+POST       /:srn/shares-company-buyer-crn/:index/:secondaryIndex                                    controllers.nonsipp.sharesdisposal.CompanyBuyerCrnController.onSubmit(srn: Srn, index: Max5000, secondaryIndex: Max50, mode: Mode = NormalMode)
+GET        /:srn/change-shares-company-buyer-crn/:index/:secondaryIndex                             controllers.nonsipp.sharesdisposal.CompanyBuyerCrnController.onPageLoad(srn: Srn, index: Max5000, secondaryIndex: Max50, mode: Mode = CheckMode)
+POST       /:srn/change-shares-company-buyer-crn/:index/:secondaryIndex                             controllers.nonsipp.sharesdisposal.CompanyBuyerCrnController.onSubmit(srn: Srn, index: Max5000, secondaryIndex: Max50, mode: Mode = CheckMode)
+
