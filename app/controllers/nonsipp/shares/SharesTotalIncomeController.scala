@@ -21,12 +21,13 @@ import config.Refined.Max5000
 import controllers.PSRController
 import controllers.actions._
 import controllers.nonsipp.shares.SharesTotalIncomeController._
+import eu.timepit.refined.refineMV
 import forms.MoneyFormProvider
 import forms.mappings.errors.MoneyFormErrors
 import models.SchemeId.Srn
 import models.{Mode, Money}
 import navigation.Navigator
-import pages.nonsipp.shares.{CompanyNameRelatedSharesPage, SharesTotalIncomePage}
+import pages.nonsipp.shares.{CompanyNameRelatedSharesPage, SharesCompleted, SharesTotalIncomePage}
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -34,7 +35,7 @@ import services.SaveService
 import viewmodels.DisplayMessage.{Empty, Message}
 import viewmodels.implicits._
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
-import viewmodels.models.{FormPageViewModel, QuestionField}
+import viewmodels.models.{FormPageViewModel, QuestionField, SectionCompleted}
 import views.html.MoneyView
 
 import javax.inject.{Inject, Named}
@@ -74,7 +75,11 @@ class SharesTotalIncomeController @Inject()(
           value =>
             for {
               updatedAnswers <- Future
-                .fromTry(request.userAnswers.transformAndSet(SharesTotalIncomePage(srn, index), value))
+                .fromTry(
+                  request.userAnswers
+                    .transformAndSet(SharesTotalIncomePage(srn, index), value)
+                    .set(SharesCompleted(srn, index), SectionCompleted)
+                )
               _ <- saveService.save(updatedAnswers)
             } yield Redirect(navigator.nextPage(SharesTotalIncomePage(srn, index), mode, updatedAnswers))
         )

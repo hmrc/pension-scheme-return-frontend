@@ -111,3 +111,10 @@ GET        /:srn/shares-list/:page                                          cont
 POST       /:srn/shares-list/:page                                          controllers.nonsipp.shares.SharesListController.onSubmit(srn: Srn, page: Int, mode: Mode = NormalMode)
 GET        /:srn/change-shares-list/:page                                   controllers.nonsipp.shares.SharesListController.onPageLoad(srn: Srn, page: Int, mode: Mode = CheckMode)
 POST       /:srn/change-shares-list/:page                                   controllers.nonsipp.shares.SharesListController.onSubmit(srn: Srn, page: Int, mode: Mode = CheckMode)
+
+GET         /:srn/check-answers-shares                                controllers.nonsipp.shares.SharesCYAController.onPageLoad(srn: Srn, index: Max5000 = 1, checkOrChange: CheckOrChange = Check)
+GET         /:srn/check-answers-shares/:index                         controllers.nonsipp.shares.SharesCYAController.onPageLoad(srn: Srn, index: Max5000, checkOrChange: CheckOrChange = Check)
+POST        /:srn/submit-check-answers-shares                         controllers.nonsipp.shares.SharesCYAController.onSubmit(srn: Srn, checkOrChange: CheckOrChange = Check)
+GET         /:srn/change-check-answers-shares                         controllers.nonsipp.shares.SharesCYAController.onPageLoad(srn: Srn, index: Max5000 = 1, checkOrChange: CheckOrChange = Change)
+GET         /:srn/change-check-answers-shares/:index                  controllers.nonsipp.shares.SharesCYAController.onPageLoad(srn: Srn, index: Max5000, checkOrChange: CheckOrChange = Change)
+POST        /:srn/change-submit-check-answers-shares                  controllers.nonsipp.shares.SharesCYAController.onSubmit(srn: Srn, checkOrChange: CheckOrChange = Change)

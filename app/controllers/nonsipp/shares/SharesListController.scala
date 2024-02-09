@@ -25,6 +25,7 @@ import controllers.actions.IdentifyAndRequireData
 import controllers.nonsipp.shares.SharesListController._
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
+import models.CheckOrChange.Change
 import models.SchemeId.Srn
 import models.requests.DataRequest
 import models.{Mode, Pagination, SchemeHoldShare, TypeOfShares}
@@ -61,15 +62,13 @@ class SharesListController @Inject()(
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      // remove once last page is developed
-      val userAnswers = request.userAnswers.set(SharesCompleted(srn, refineMV(1)), SectionCompleted).get
 
-      val indexes: List[Max5000] = userAnswers.map(SharesCompleted.all(srn)).keys.toList.refine[Max5000.Refined]
+      val indexes: List[Max5000] = request.userAnswers.map(SharesCompleted.all(srn)).keys.toList.refine[Max5000.Refined]
 
       if (indexes.nonEmpty) {
         sharesData(srn, indexes).map { data =>
           val filledForm =
-            userAnswers.get(SharesListPage(srn)).fold(form)(form.fill)
+            request.userAnswers.get(SharesListPage(srn)).fold(form)(form.fill)
           Ok(view(filledForm, viewModel(srn, page, mode, data)))
         }.merge
       } else {
@@ -172,7 +171,7 @@ object SharesListController {
           TableElem(
             LinkMessage(
               Message("site.change"),
-              controllers.routes.UnauthorisedController.onPageLoad().url
+              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, Change).url
             )
           ),
           TableElem(
