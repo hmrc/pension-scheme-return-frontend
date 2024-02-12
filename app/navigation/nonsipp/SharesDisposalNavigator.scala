@@ -85,7 +85,12 @@ object SharesDisposalNavigator extends JourneyNavigator {
       }
 
     case WhatYouWillNeedSharesDisposalPage(srn) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+      controllers.nonsipp.sharesdisposal.routes.SharesDisposalListController
+        .onPageLoad(srn, page = 1)
+
+    case page @ SharesDisposalListPage(srn, shareIndex, disposalIndex) =>
+      controllers.nonsipp.sharesdisposal.routes.HowWereSharesDisposedController
+        .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
 
     case page @ HowWereSharesDisposedPage(srn, shareIndex, disposalIndex, _) =>
       userAnswers.get(page) match {

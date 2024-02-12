@@ -65,7 +65,9 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           normalmode
             .navigateTo(
               WhatYouWillNeedSharesDisposalPage,
-              (srn, _) => controllers.routes.UnauthorisedController.onPageLoad()
+              (srn, _) =>
+                controllers.nonsipp.sharesdisposal.routes.SharesDisposalListController
+                  .onPageLoad(srn, 1)
             )
             .withName("go from What You Will Need page to Shares Disposal List page")
         )
@@ -73,8 +75,18 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
       "SharesDisposalListPage" - {
 
-        //TODO: dependent on SharesDisposalList implementation; use navigateFromListPage method
-
+        act.like(
+          normalmode
+            .navigateToWithDoubleIndex(
+              shareIndex,
+              disposalIndex,
+              SharesDisposalListPage,
+              (srn, shareIndex: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.HowWereSharesDisposedController
+                  .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
+            )
+            .withName("go from Shares Disposal List page to How Were Shares Disposed page")
+        )
       }
 
       "HowWereSharesDisposedPage" - {
