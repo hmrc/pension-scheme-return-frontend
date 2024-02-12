@@ -62,7 +62,9 @@ class PensionCommencementLumpSumAmountController @Inject()(
     identifyAndRequireData(srn) { implicit request =>
       request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney { memberName =>
         val preparedForm =
-          request.userAnswers.fillForm(PensionCommencementLumpSumAmountPage(srn, index), form)
+          request.userAnswers
+            .get(PensionCommencementLumpSumAmountPage(srn, index))
+            .fold(form)(value => if (value.isZero) form else form.fill(value.tuple))
 
         Ok(view(viewModel(srn, index, memberName.fullName, mode, preparedForm)))
       }

@@ -34,7 +34,7 @@ import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{PsrSubmissionService, SaveService}
-import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
+import viewmodels.DisplayMessage.{Message, ParagraphMessage}
 import viewmodels.implicits._
 import viewmodels.models.{ActionTableViewModel, FormPageViewModel, PaginatedViewModel, TableElem}
 import views.html.TwoColumnsTripleAction
@@ -171,7 +171,7 @@ object PclsMemberListController {
           case Left(_) => Nil
           case Right(nextIndex) =>
             val items = userAnswers.get(PensionCommencementLumpSumAmountPage(srn, nextIndex))
-            if (items.isEmpty) {
+            if (items.isEmpty || items.exists(_.isZero)) {
               List(
                 TableElem(
                   memberName.fullName
@@ -179,15 +179,11 @@ object PclsMemberListController {
                 TableElem(
                   Message("pcls.memberlist.status.no.items")
                 ),
-                TableElem(
-                  LinkMessage(
-                    Message("site.add"),
-                    controllers.nonsipp.memberreceivedpcls.routes.PensionCommencementLumpSumAmountController
-                      .onSubmit(srn, nextIndex, NormalMode)
-                      .url
-                  )
+                TableElem.add(
+                  controllers.nonsipp.memberreceivedpcls.routes.PensionCommencementLumpSumAmountController
+                    .onSubmit(srn, nextIndex, NormalMode)
                 ),
-                TableElem("")
+                TableElem.empty
               )
             } else {
               List(
@@ -197,21 +193,13 @@ object PclsMemberListController {
                 TableElem(
                   Message("pcls.memberlist.status.some.item", items.size)
                 ),
-                TableElem(
-                  LinkMessage(
-                    Message("site.change"),
-                    controllers.nonsipp.memberreceivedpcls.routes.PclsCYAController
-                      .onSubmit(srn, nextIndex, CheckMode)
-                      .url
-                  )
+                TableElem.change(
+                  controllers.nonsipp.memberreceivedpcls.routes.PclsCYAController
+                    .onSubmit(srn, nextIndex, CheckMode)
                 ),
-                TableElem(
-                  LinkMessage(
-                    Message("site.remove"),
-                    controllers.nonsipp.memberreceivedpcls.routes.RemovePclsController
-                      .onSubmit(srn, nextIndex)
-                      .url
-                  )
+                TableElem.remove(
+                  controllers.nonsipp.memberreceivedpcls.routes.RemovePclsController
+                    .onSubmit(srn, nextIndex)
                 )
               )
             }
@@ -247,7 +235,7 @@ object PclsMemberListController {
           ParagraphMessage(
             "pcls.memberlist.paragraph2"
           ),
-        head = Some(List(TableElem("Member name"), TableElem("Status"))),
+        head = Some(List(TableElem("Member name"), TableElem("Status"), TableElem.empty, TableElem.empty)),
         rows = rows(srn, memberList, userAnswers),
         radioText = Message("pcls.memberlist.radios"),
         showInsetWithRadios = true,

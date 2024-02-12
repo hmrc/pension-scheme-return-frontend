@@ -18,7 +18,6 @@ package controllers
 
 import controllers.actions.{AllowAccessActionProvider, DataRetrievalAction, IdentifierAction}
 import models.SchemeId.Srn
-import models.backend.responses.IndividualDetails
 import models.{DateRange, Enumerable}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -54,7 +53,7 @@ class ReturnHistoryController @Inject()(
     identify.andThen(allowAccess(srn)).andThen(getData).async { implicit request =>
       val currentTaxYear = 2022 // TODO
       val response = psrVersionsService
-        .getVersionsForYears(request.schemeDetails.pstr, allDates.toList.map((dates) => dates._2.from.toString))
+        .getVersionsForYears(request.schemeDetails.pstr, allDates.toList.map(dates => dates._2.from.toString))
       response.map { years =>
         val seqRetHistorySummary = years.flatMap { year =>
           year.data.map { v =>
