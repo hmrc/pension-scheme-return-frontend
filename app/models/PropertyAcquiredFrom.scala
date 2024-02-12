@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-package models.requests.psr
+package models
 
 import play.api.libs.json.{Json, OFormat}
 
-case class PsrSubmission(
-  minimalRequiredSubmission: MinimalRequiredSubmission,
-  checkReturnDates: Boolean,
-  loans: Option[Loans],
-  assets: Option[Assets],
-  membersPayments: Option[MemberPayments],
-  shares: Option[Shares]
+case class PropertyAcquiredFrom(
+  identityType: IdentityType,
+  idNumber: Option[String],
+  reasonNoIdNumber: Option[String],
+  otherDescription: Option[String]
 )
 
-object PsrSubmission {
-  implicit val format: OFormat[PsrSubmission] = Json.format[PsrSubmission]
+object PropertyAcquiredFrom {
+  implicit val format: OFormat[PropertyAcquiredFrom] = Json.format[PropertyAcquiredFrom]
 }

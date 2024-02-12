@@ -48,7 +48,7 @@ import javax.inject.Inject
 import scala.util.Try
 
 @Singleton()
-class LoanTransactionsTransformer @Inject()() extends Transformer {
+class LoanTransactionsTransformer @Inject() extends Transformer {
 
   private type OptionalRecipientDetails = Option[(String, RecipientIdentityType, Boolean, Option[String])]
 

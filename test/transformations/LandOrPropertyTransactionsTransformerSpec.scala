@@ -23,7 +23,14 @@ import models.HowDisposed.Sold
 import models.SchemeHoldLandProperty.Acquisition
 import models.requests.psr._
 import models.requests.{AllowedAccessRequest, DataRequest}
-import models.{ConditionalYesNo, IdentitySubject, IdentityType, RecipientDetails, SchemeHoldLandProperty}
+import models.{
+  ConditionalYesNo,
+  IdentitySubject,
+  IdentityType,
+  PropertyAcquiredFrom,
+  RecipientDetails,
+  SchemeHoldLandProperty
+}
 import org.scalatest.OptionValues
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers

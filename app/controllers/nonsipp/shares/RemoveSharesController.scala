@@ -21,11 +21,16 @@ import controllers.PSRController
 import controllers.actions._
 import controllers.nonsipp.shares.RemoveSharesController._
 import forms.YesNoPageFormProvider
-import models.{Mode, NormalMode}
 import models.SchemeId.Srn
+import models.{Mode, NormalMode}
 import navigation.Navigator
-import pages.nonsipp.shares.Paths.sharesPages
-import pages.nonsipp.shares.{CompanyNameRelatedSharesPage, RemoveSharesPage, SharesJourneyStatus}
+import pages.nonsipp
+import pages.nonsipp.shares.{
+  CompanyNameRelatedSharesPage,
+  CompanyNameRelatedSharesPages,
+  RemoveSharesPage,
+  SharesJourneyStatus
+}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -80,12 +85,13 @@ class RemoveSharesController @Inject()(
           },
           removeDetails => {
             if (removeDetails) {
+              val isLast = request.userAnswers.map(CompanyNameRelatedSharesPages(srn)).size == 1
               for {
                 updatedAnswers <- Future
                   .fromTry(
                     request.userAnswers
                       .removePages(
-                        sharesPages(srn, index)
+                        nonsipp.shares.sharesPages(srn, index, isLast)
                       )
                       .set(SharesJourneyStatus(srn), SectionStatus.InProgress)
                   )

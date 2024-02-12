@@ -22,12 +22,13 @@ import controllers.nonsipp.shares.DidSchemeHoldAnySharesController.viewModel
 import forms.YesNoPageFormProvider
 import models.Mode
 import models.SchemeId.Srn
+import models.requests.DataRequest
 import navigation.Navigator
 import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
+import services.{PsrSubmissionService, SaveService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.{LinkMessage, ListMessage, ListType, Message, ParagraphMessage}
 import viewmodels.implicits._
@@ -43,6 +44,7 @@ class DidSchemeHoldAnySharesController @Inject()(
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   formProvider: YesNoPageFormProvider,
+  psrSubmissionService: PsrSubmissionService,
   config: FrontendAppConfig,
   val controllerComponents: MessagesControllerComponents,
   view: YesNoPageView
@@ -74,7 +76,17 @@ class DidSchemeHoldAnySharesController @Inject()(
               updatedAnswers <- Future
                 .fromTry(request.userAnswers.set(DidSchemeHoldAnySharesPage(srn), value))
               _ <- saveService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(DidSchemeHoldAnySharesPage(srn), mode, updatedAnswers))
+              redirectTo <- if (value) {
+                Future.successful(Redirect(navigator.nextPage(DidSchemeHoldAnySharesPage(srn), mode, updatedAnswers)))
+              } else {
+                psrSubmissionService
+                  .submitPsrDetails(srn)(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
+                  .map {
+                    case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+                    case Some(_) => Redirect(navigator.nextPage(DidSchemeHoldAnySharesPage(srn), mode, updatedAnswers))
+                  }
+              }
+            } yield redirectTo
         )
     }
 }
