@@ -29,6 +29,7 @@ import navigation.Navigator
 import pages.nonsipp.common._
 import pages.nonsipp.shares.{
   ClassOfSharesPage,
+  CompanyNameOfSharesSellerPage,
   CompanyNameRelatedSharesPage,
   CostOfSharesPage,
   HowManySharesPage,
@@ -395,6 +396,9 @@ object SharesCYAController {
               }
             ),
             holdShares match {
+
+            Message("sharesCYA.section1.holdShares", schemeName, typeOfShare.name),
+            (holdShares) match {
               case Acquisition => "sharesCYA.section1.Acquisition"
               case Contribution => "sharesCYA.section1.Contribution"
               case Transfer => "sharesCYA.section1.Transfer"
@@ -437,6 +441,9 @@ object SharesCYAController {
                 case ConnectedParty => "sharesCYA.section1.ConnectedParty"
               }
             ),
+
+            Message("sharesCYA.section4.totalAssetValue", schemeName),
+
             s"${whenDidSchemeAcquire.get.show}"
           ).withAction(
             SummaryAction(
@@ -449,7 +456,9 @@ object SharesCYAController {
                     .onPageLoad(srn, index, mode)
                     .url + "#whenDidSchemeAcquire"
               }
+
             ).withVisuallyHiddenContent("sharesCYA.section2.whenDidSchemeAcquire.hidden")
+
           )
         }.toList ++ List(
           CheckYourAnswersRowViewModel(

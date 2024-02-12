@@ -1,0 +1,44 @@
+@*
+ * Copyright 2024 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import viewmodels.ReturnHistorySummary
+
+@this(
+        layout: templates.Layout,
+        govukButton: GovukButton,
+        govukTable: GovukTable
+)
+
+
+
+@(seqOfReturnHistorySummary:Seq[ReturnHistorySummary], taxYearStart: String, taxYearEnd: String, schemeName: String)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = titleNoForm(messages("returnHistory.title", taxYearStart, taxYearEnd))) {
+
+    <span class="govuk-caption-xl">@schemeName</span>
+
+    <h1 class="govuk-heading-l">@messages("returnHistory.heading", taxYearStart, taxYearEnd)</h1>
+
+    @components.ReturnHistoryTable(
+        seqOfReturnHistorySummary,
+        messages("returnHistory.table.header1"),
+        messages("returnHistory.table.header2"),
+        messages("returnHistory.table.header3"),
+        messages("returnHistory.table.header4"),
+        messages("returnHistory.table.header5"),
+        caption = messages("returnHistory.heading", taxYearStart, taxYearEnd)
+    )
+}

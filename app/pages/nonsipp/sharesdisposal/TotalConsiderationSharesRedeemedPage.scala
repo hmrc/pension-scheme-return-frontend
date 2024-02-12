@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.shares
+package pages.nonsipp.sharesdisposal
 
-import config.Refined.Max5000
+import config.Refined.{Max50, Max5000}
+import models.Money
 import models.SchemeId.Srn
 import pages.QuestionPage
-import pages.nonsipp.shares.Paths
 import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
 
-case class CompanyNameOfSharesSellerPage(srn: Srn, index: Max5000) extends QuestionPage[String] {
+case class TotalConsiderationSharesRedeemedPage(srn: Srn, shareIndex: Max5000, disposalIndex: Max50)
+    extends QuestionPage[Money] {
 
   override def path: JsPath =
-    Paths.heldSharesTransaction \ toString \ index.arrayIndex.toString
+    Paths.redemptionQuestions \ toString \ shareIndex.arrayIndex.toString \ disposalIndex.arrayIndex.toString
 
-  override def toString: String = "companyNameOfSharesSeller"
+  override def toString: String = "amountReceived"
 }

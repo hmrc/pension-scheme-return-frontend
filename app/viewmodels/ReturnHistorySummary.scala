@@ -14,19 +14,15 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.shares
+package viewmodels
 
-import config.Refined.Max5000
-import models.SchemeId.Srn
-import pages.QuestionPage
-import pages.nonsipp.shares.Paths
-import play.api.libs.json.JsPath
-import utils.RefinedUtils.RefinedIntOps
+import uk.gov.hmrc.govukfrontend.views.Aliases.Actions
 
-case class CompanyNameOfSharesSellerPage(srn: Srn, index: Max5000) extends QuestionPage[String] {
-
-  override def path: JsPath =
-    Paths.heldSharesTransaction \ toString \ index.arrayIndex.toString
-
-  override def toString: String = "companyNameOfSharesSeller"
-}
+case class ReturnHistorySummary(
+  key: String,
+  firstValue: String,
+  secondValue: String,
+  thirdValue: String,
+  fourthValue: String,
+  actions: Option[Actions]
+)

@@ -10,6 +10,8 @@ site.no = No
 site.yes = Yes
 site.next = Next
 site.previous = Previous
+site.view = View
+site.viewOrChange = View or change
 
 site.continue = Continue
 site.saveAndContinue = Save and continue
@@ -533,6 +535,16 @@ sharesDisposal.individualBuyerName.error.required = Enter the buyer’s name
 sharesDisposal.individualBuyerName.error.length = Buyer’s name must be 160 characters or fewer
 sharesDisposal.individualBuyerName.error.invalid.characters = Buyer’s name must only include letters a to z, hyphens, apostrophes and spaces
 
+sharesDisposal.otherBuyerDetails.title = Buyer’s details
+sharesDisposal.otherBuyerDetails.heading = Buyer’s details for shares in {0}
+sharesDisposal.otherBuyerDetails.name = Buyer’s name
+sharesDisposal.otherBuyerDetails.description = Brief description of buyer (optional)
+sharesDisposal.otherBuyerDetails.name.error.required = Enter the buyer’s name
+sharesDisposal.otherBuyerDetails.name.error.invalid = Buyer’s name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+sharesDisposal.otherBuyerDetails.name.error.length = Buyer’s name must be 160 characters or fewer
+sharesDisposal.otherBuyerDetails.description.error.invalid = The description of the buyer must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+sharesDisposal.otherBuyerDetails.description.error.length = The description of the buyer must be 35 characters or fewer
+
 sharesDisposal.title = Did the scheme dispose of any shares in a sponsoring employer, shares acquired from a connected party, or unquoted shares during the period of this return?
 sharesDisposal.heading = Did {0} dispose of any shares in a sponsoring employer, shares acquired from a connected party, or unquoted shares during the period of this return?
 sharesDisposal.error.required = Select yes if the scheme disposed of any shares in a sponsoring employer, shares acquired from a connected party, or unquoted shares during the period of this return
@@ -616,6 +628,13 @@ sharesDisposal.howManySharesRedeemed.error.invalid.characters = Number of shares
 sharesDisposal.howManySharesRedeemed.error.decimal = Number of shares redeemed must be a whole number, like 100
 sharesDisposal.howManySharesRedeemed.error.zero = Number of shares redeemed must be 1 or more
 sharesDisposal.howManySharesRedeemed.error.size = Number of shares redeemed must be 9,999,999 or fewer
+
+sharesDisposal.totalConsiderationSharesRedeemed.title = What was the total consideration received for the redemption of shares in this company, in pounds and pence?
+sharesDisposal.totalConsiderationSharesRedeemed.heading = What was the total consideration received for the redemption of {0} shares in {1}, in pounds and pence?
+sharesDisposal.totalConsiderationSharesRedeemed.error.required = Enter the total consideration received for the redemption of shares, in pounds and pence
+sharesDisposal.totalConsiderationSharesRedeemed.error.invalid.characters = Total consideration received for the redemption of shares must be an amount of money, like 123 or 123.45
+sharesDisposal.totalConsiderationSharesRedeemed.error.tooSmall = Total consideration received for the redemption of shares must be 0.01 or more
+sharesDisposal.totalConsiderationSharesRedeemed.error.tooLarge = Total consideration received for the redemption of shares must be 999999999.99 or less
 
 pensionCommencementLumpSum.title = Did any member receive a pension commencement lump sum (PCLS) during the period of this return?
 pensionCommencementLumpSum.heading = Did any member receive a pension commencement lump sum (PCLS) during the period of this return?
@@ -2414,6 +2433,19 @@ companyNameOfSharesBuyer.error.invalid = Buyer’s company name must only includ
 companyNameOfSharesBuyer.error.tooLong = Buyer’s company name must be 160 characters or fewer
 
 
+companyBuyerCrn.title = Do you know the buyer’s Company Registration Number (CRN)?
+companyBuyerCrn.heading = Do you know {0}’s Company Registration Number (CRN)?
+companyBuyerCrn.yes.conditional = What is {0}’s CRN?
+companyBuyerCrn.no.conditional = Tell us why you cannot provide {0}’s CRN
+companyBuyerCrn.hint = This is 8 characters, like AB123456. It may also be called ‘company number’ or ‘Companies House number’.
+companyBuyerCrn.error.required = Select yes if you know the buyer’s Company Registration Number (CRN)
+companyBuyerCrn.yes.conditional.error.required = Enter the buyer’s CRN
+companyBuyerCrn.yes.conditional.error.invalid = CRN must only include letters and numbers
+companyBuyerCrn.yes.conditional.error.length = CRN must be 8 characters
+companyBuyerCrn.no.conditional.error.required = Enter the reason you cannot provide the buyer’s CRN
+companyBuyerCrn.no.conditional.error.invalid = The reason you cannot provide the buyer’s CRN must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+companyBuyerCrn.no.conditional.error.length = The reason you cannot provide the buyer’s CRN must be 160 characters or fewer
+
 checkYourAnswers.title = Check your answers
 sharesCYA.change.title = Change details of this share transaction
 checkYourAnswers.heading = Check your answers
@@ -2426,6 +2458,9 @@ sharesCYA.section1.holdShares.hidden =  why {0} holds these {1}
 sharesCYA.section1.SponsoringEmployer = Shares in a sponsoring employer
 sharesCYA.section1.Unquoted = Unquoted shares
 sharesCYA.section1.ConnectedParty = Any other shares acquired from a connected party
+sharesCYA.section1.SponsoringEmployer = SponsoringEmployer
+sharesCYA.section1.Unquoted = Unquoted
+sharesCYA.section1.ConnectedParty = ConnectedParty
 sharesCYA.section1.Acquisition = Acquisition
 sharesCYA.section1.Contribution = Contribution
 sharesCYA.section1.Transfer = Transfer
@@ -2467,6 +2502,12 @@ sharesCYA.section3.recipientDetails.noCrnReason = Reason you cannot provide {0}�
 sharesCYA.section3.recipientDetails.noCrnReason.hidden = reason you cannot provide recipient’s Company Registration Number
 sharesCYA.section3.recipientDetails.noUtrReason = Reason you cannot provide {0}’s Unique Taxpayer Reference (UTR)
 sharesCYA.section3.recipientDetails.noUtrReason.hidden = reason you cannot provide recipient’s Unique Taxpayer Reference
+sharesCYA.section3.recipientDetails.noNinoReason = Reason you cannot provide {0}’s National Insurance number
+sharesCYA.section3.recipientDetails.noNinoReason.hidden = reason you cannot provide recipient’s National Insurance number
+sharesCYA.section3.recipientDetails.noCrnReason = Reason you cannot provide {0}’s Company Reference Number (CRN)
+sharesCYA.section3.recipientDetails.noCrnReason.hidden = reason you cannot provide recipient’s Company Reference Number
+sharesCYA.section3.recipientDetails.noUtrReason = Reason you cannot provide {0}’s Unique Taxpayer Reference (UTR)
+sharesCYA.section3.recipientDetails.noUtrReason.hidden = reason you cannot provide recipient’s Unique Taxpayer Reference
 sharesCYA.section3.sharesFromConnectedParty =  Is {0} a connected party?
 sharesCYA.section3.sharesFromConnectedParty.hidden =  if {0} is a connected party
 sharesCYA.section4.heading = Value of and income from shares in {0}
@@ -2478,3 +2519,11 @@ sharesCYA.section4.totalAssetValue = Total value of {0}’s assets on the date t
 sharesCYA.section4.totalAssetValue.hidden =  total value of {0}’s assets on the date these shares were acquired
 sharesCYA.section4.sharesTotalIncome = Total income from these shares in the period of this return
 sharesCYA.section4.sharesTotalIncome.hidden =  total income from these shares in the period of this return
+
+returnHistory.title = Pension scheme return overview
+returnHistory.heading = Pension scheme return overview
+returnHistory.table.header1 = TaxYearStart
+returnHistory.table.header2 = Version
+returnHistory.table.header3 = FormBundleNumber
+returnHistory.table.header4 = Status
+returnHistory.table.header5 = SubmittedBy

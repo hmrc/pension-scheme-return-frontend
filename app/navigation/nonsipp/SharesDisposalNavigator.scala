@@ -26,9 +26,6 @@ object SharesDisposalNavigator extends JourneyNavigator {
 
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
 
-    case CompanyBuyerNamePage(srn, index, secondaryIndex) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
-
     case WhoWereTheSharesSoldToPage(srn, index, disposalIndex) =>
       userAnswers.get(WhoWereTheSharesSoldToPage(srn, index, disposalIndex)) match {
 
@@ -42,28 +39,24 @@ object SharesDisposalNavigator extends JourneyNavigator {
 
 // TODO uncomment as these controllers are introduced:
 
-//        case Some(IdentityType.UKCompany) =>
-//          controllers.nonsipp.sharesdisposal.routes.CompanyBuyerNameController
-//            .onPageLoad(srn, index, disposalIndex, NormalMode)
-//
 //        case Some(IdentityType.UKPartnership) =>
 //          controllers.nonsipp.sharesdisposal.routes.PartnershipBuyerNameController
 //            .onPageLoad(srn, index, disposalIndex, NormalMode)
-//
-//        case Some(IdentityType.Other) =>
-//          controllers.nonsipp.sharesdisposal.routes.OtherBuyerDetailsController
-//            .onPageLoad(srn, index, disposalIndex, NormalMode)
+
+        case Some(IdentityType.Other) =>
+          controllers.nonsipp.sharesdisposal.routes.OtherBuyerDetailsController
+            .onPageLoad(srn, index, disposalIndex, NormalMode)
       }
 
     case SharesIndividualBuyerNamePage(srn, index, disposalIndex) =>
       controllers.nonsipp.sharesdisposal.routes.IndividualBuyerNinoNumberController
         .onPageLoad(srn, index, disposalIndex, NormalMode)
 
+    case CompanyBuyerNamePage(srn, index, disposalIndex) =>
+      controllers.nonsipp.sharesdisposal.routes.CompanyBuyerCrnController
+        .onPageLoad(srn, index, disposalIndex, NormalMode)
+
     // TODO uncomment as these controllers are introduced:
-//    case CompanyBuyerNamePage(srn, index, disposalIndex) =>
-//      controllers.nonsipp.sharesdisposal.routes.CompanyBuyerCrnController
-//        .onPageLoad(srn, index, disposalIndex, NormalMode)
-//
 //    case PartnershipBuyerNamePage(srn, index, disposalIndex) =>
 //      controllers.nonsipp.sharesdisposal.routes.PartnershipBuyerUtrController
 //        .onPageLoad(srn, index, disposalIndex, NormalMode)
@@ -125,6 +118,10 @@ object SharesDisposalNavigator extends JourneyNavigator {
         .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
 
     case HowManySharesRedeemedPage(srn, shareIndex, disposalIndex) =>
+      controllers.nonsipp.sharesdisposal.routes.TotalConsiderationSharesRedeemedController
+        .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
+
+    case TotalConsiderationSharesRedeemedPage(srn, shareIndex, disposalIndex) =>
       controllers.routes.UnauthorisedController.onPageLoad()
 
   }

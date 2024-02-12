@@ -14,23 +14,24 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.shares
+package pages.nonsipp.sharesdisposal
 
-import config.Refined.Max5000
+import config.Refined.{Max50, Max5000}
 import eu.timepit.refined.refineMV
+import models.Money
 import pages.behaviours.PageBehaviours
 
-class CompanyNameOfSharesSellerPageSpec extends PageBehaviours {
+class TotalConsiderationSharesRedeemedPageSpec extends PageBehaviours {
 
-  "CompanyNameOfSharesSellerPage" - {
+  "TotalConsiderationSharesRedeemedPage" - {
+    val srn = srnGen.sample.value
+    val shareIndex = refineMV[Max5000.Refined](1)
+    val disposalIndex = refineMV[Max50.Refined](1)
 
-    val index = refineMV[Max5000.Refined](1)
+    beRetrievable[Money](TotalConsiderationSharesRedeemedPage(srn, shareIndex, disposalIndex))
 
-    beRetrievable[String](CompanyNameOfSharesSellerPage(srnGen.sample.value, index))
+    beSettable[Money](TotalConsiderationSharesRedeemedPage(srn, shareIndex, disposalIndex))
 
-    beSettable[String](CompanyNameOfSharesSellerPage(srnGen.sample.value, index))
-
-    beRemovable[String](CompanyNameOfSharesSellerPage(srnGen.sample.value, index))
+    beRemovable[Money](TotalConsiderationSharesRedeemedPage(srn, shareIndex, disposalIndex))
   }
-
 }
