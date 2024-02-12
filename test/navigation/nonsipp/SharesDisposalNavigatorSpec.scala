@@ -328,6 +328,20 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .withName("go from CompanyNameOfSharesBuyerPage to company buyer crn page")
         )
       }
+
+      "IndependentValuationPage" - {
+        act.like(
+          normalmode
+            .navigateToWithDoubleIndex(
+              shareIndex,
+              disposalIndex,
+              IndependentValuationPage,
+              (srn, index: Max5000, disposalIndex: Max50, _) =>
+                controllers.routes.UnauthorisedController.onPageLoad()
+            )
+            .withName("go from IndependentValuationPage to Unauthorised")
+        )
+      }
     }
 
     "in CheckMode" - {}
