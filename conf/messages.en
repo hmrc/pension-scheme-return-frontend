@@ -545,6 +545,24 @@ sharesDisposal.otherBuyerDetails.name.error.length = Buyer’s name must be 160 
 sharesDisposal.otherBuyerDetails.description.error.invalid = The description of the buyer must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
 sharesDisposal.otherBuyerDetails.description.error.length = The description of the buyer must be 35 characters or fewer
 
+sharesDisposal.partnershipBuyerName.title = What is the buyer’s partnership name?
+sharesDisposal.partnershipBuyerName.heading = What is the buyer’s partnership name?
+sharesDisposal.partnershipBuyerName.error.required = Enter the buyer’s partnership name
+sharesDisposal.partnershipBuyerName.error.length = Buyer’s partnership name must be 160 characters or fewer
+sharesDisposal.partnershipBuyerName.error.invalid.characters = Buyer’s partnership name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+
+sharesDisposal.partnershipBuyerUtr.title = Do you know the buyer’s Unique Taxpayer Reference (UTR)?
+sharesDisposal.partnershipBuyerUtr.heading = Do you know {0}’s Unique Taxpayer Reference (UTR)?
+sharesDisposal.partnershipBuyerUtr.yes.conditional = What is {0}’s UTR?
+sharesDisposal.partnershipBuyerUtr.yes.conditional.error.required = Enter the buyer’s UTR
+sharesDisposal.partnershipBuyerUtr.yes.conditional.error.length = Enter a Unique Taxpayer Reference that is 10 numbers, like 1234567890 or 12345 67890
+sharesDisposal.partnershipBuyerUtr.yes.conditional.error.invalid = Enter a Unique Taxpayer Reference that is 10 numbers, like 1234567890 or 12345 67890
+sharesDisposal.partnershipBuyerUtr.no.conditional = Tell us why you cannot provide {0}’s UTR
+sharesDisposal.partnershipBuyerUtr.no.conditional.error.required = Enter the reason you cannot provide the buyer’s UTR
+sharesDisposal.partnershipBuyerUtr.no.conditional.error.invalid = The reason you cannot provide the buyer’s UTR must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+sharesDisposal.partnershipBuyerUtr.no.conditional.error.length = The reason you cannot provide the buyer’s UTR must be 160 characters or fewer
+sharesDisposal.partnershipBuyerUtr.error.required = Select yes if you know the buyer’s Unique Taxpayer Reference (UTR)
+
 sharesDisposal.title = Did the scheme dispose of any shares in a sponsoring employer, shares acquired from a connected party, or unquoted shares during the period of this return?
 sharesDisposal.heading = Did {0} dispose of any shares in a sponsoring employer, shares acquired from a connected party, or unquoted shares during the period of this return?
 sharesDisposal.error.required = Select yes if the scheme disposed of any shares in a sponsoring employer, shares acquired from a connected party, or unquoted shares during the period of this return
