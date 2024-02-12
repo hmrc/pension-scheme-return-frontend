@@ -71,3 +71,12 @@ POST       /:srn/shares-company-buyer-crn/:index/:secondaryIndex                
 GET        /:srn/change-shares-company-buyer-crn/:index/:secondaryIndex                             controllers.nonsipp.sharesdisposal.CompanyBuyerCrnController.onPageLoad(srn: Srn, index: Max5000, secondaryIndex: Max50, mode: Mode = CheckMode)
 POST       /:srn/change-shares-company-buyer-crn/:index/:secondaryIndex                             controllers.nonsipp.sharesdisposal.CompanyBuyerCrnController.onSubmit(srn: Srn, index: Max5000, secondaryIndex: Max50, mode: Mode = CheckMode)
 
+GET        /:srn/partnership-name-of-shares-buyer/:index/:secondaryIndex                            controllers.nonsipp.sharesdisposal.PartnershipBuyerNameController.onPageLoad(srn: Srn, index: Max5000, secondaryIndex: Max50, mode: Mode = NormalMode)
+POST       /:srn/partnership-name-of-shares-buyer/:index/:secondaryIndex                            controllers.nonsipp.sharesdisposal.PartnershipBuyerNameController.onSubmit(srn: Srn, index: Max5000, secondaryIndex: Max50, mode: Mode = NormalMode)
+GET        /:srn/change-partnership-name-of-shares-buyer/:index/:secondaryIndex                     controllers.nonsipp.sharesdisposal.PartnershipBuyerNameController.onPageLoad(srn: Srn, index: Max5000, secondaryIndex: Max50, mode: Mode = CheckMode)
+POST       /:srn/change-partnership-name-of-shares-buyer/:index/:secondaryIndex                     controllers.nonsipp.sharesdisposal.PartnershipBuyerNameController.onSubmit(srn: Srn, index: Max5000, secondaryIndex: Max50, mode: Mode = CheckMode)
+
+GET        /:srn/shares-partnership-buyer-utr/:index/:secondaryIndex                                controllers.nonsipp.sharesdisposal.PartnershipBuyerUtrController.onPageLoad(srn: Srn, index: Max5000, secondaryIndex: Max50, mode: Mode = NormalMode)
+POST       /:srn/shares-partnership-buyer-utr/:index/:secondaryIndex                                controllers.nonsipp.sharesdisposal.PartnershipBuyerUtrController.onSubmit(srn: Srn, index: Max5000, secondaryIndex: Max50, mode: Mode = NormalMode)
+GET        /:srn/change-shares-partnership-buyer-utr/:index/:secondaryIndex                         controllers.nonsipp.sharesdisposal.PartnershipBuyerUtrController.onPageLoad(srn: Srn, index: Max5000, secondaryIndex: Max50, mode: Mode = CheckMode)
+POST       /:srn/change-shares-partnership-buyer-utr/:index/:secondaryIndex                         controllers.nonsipp.sharesdisposal.PartnershipBuyerUtrController.onSubmit(srn: Srn, index: Max5000, secondaryIndex: Max50, mode: Mode = CheckMode)

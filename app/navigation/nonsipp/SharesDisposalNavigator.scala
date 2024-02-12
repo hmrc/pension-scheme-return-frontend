@@ -37,11 +37,9 @@ object SharesDisposalNavigator extends JourneyNavigator {
           controllers.nonsipp.sharesdisposal.routes.CompanyNameOfSharesBuyerController
             .onPageLoad(srn, index, disposalIndex, NormalMode)
 
-// TODO uncomment as these controllers are introduced:
-
-//        case Some(IdentityType.UKPartnership) =>
-//          controllers.nonsipp.sharesdisposal.routes.PartnershipBuyerNameController
-//            .onPageLoad(srn, index, disposalIndex, NormalMode)
+        case Some(IdentityType.UKPartnership) =>
+          controllers.nonsipp.sharesdisposal.routes.PartnershipBuyerNameController
+            .onPageLoad(srn, index, disposalIndex, NormalMode)
 
         case Some(IdentityType.Other) =>
           controllers.nonsipp.sharesdisposal.routes.OtherBuyerDetailsController
@@ -56,10 +54,11 @@ object SharesDisposalNavigator extends JourneyNavigator {
       controllers.nonsipp.sharesdisposal.routes.CompanyBuyerCrnController
         .onPageLoad(srn, index, disposalIndex, NormalMode)
 
+    case PartnershipBuyerNamePage(srn, index, disposalIndex) =>
+      controllers.nonsipp.sharesdisposal.routes.PartnershipBuyerUtrController
+        .onPageLoad(srn, index, disposalIndex, NormalMode)
+
     // TODO uncomment as these controllers are introduced:
-//    case PartnershipBuyerNamePage(srn, index, disposalIndex) =>
-//      controllers.nonsipp.sharesdisposal.routes.PartnershipBuyerUtrController
-//        .onPageLoad(srn, index, disposalIndex, NormalMode)
 //
 //    case IndividualBuyerNinoNumberPage(srn, index, disposalIndex) =>
 //      controllers.nonsipp.sharesdisposal.routes.ShareslBuyerConnectedPartyController
