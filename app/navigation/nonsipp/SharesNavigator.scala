@@ -21,7 +21,7 @@ import config.Refined.Max5000
 import eu.timepit.refined.refineMV
 import models.CheckOrChange.Check
 import models.SchemeHoldShare.{Acquisition, Contribution, Transfer}
-import models.TypeOfShares.{ConnectedParty, SponsoringEmployer, Unquoted}
+import models.TypeOfShares.{SponsoringEmployer, Unquoted}
 import models.{CheckOrChange, IdentitySubject, IdentityType, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
@@ -33,7 +33,6 @@ import pages.nonsipp.common.{
 }
 import pages.nonsipp.shares._
 import play.api.mvc.Call
-import utils.ListUtils.ListOps
 
 object SharesNavigator extends JourneyNavigator {
 

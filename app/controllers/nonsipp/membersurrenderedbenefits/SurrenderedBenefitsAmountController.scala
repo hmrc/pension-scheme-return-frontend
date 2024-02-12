@@ -16,14 +16,14 @@
 
 package controllers.nonsipp.membersurrenderedbenefits
 
-import config.Constants.{maxSurrenderedBenefitAmount, minPosMoneyValue, minSurrenderedBenefitAmount}
+import config.Constants.{maxSurrenderedBenefitAmount, minPosMoneyValue}
 import config.Refined.Max300
 import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
 import controllers.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsAmountController._
 import forms.mappings.errors.{MoneyFormErrorProvider, MoneyFormErrors}
-import models.{Mode, Money}
 import models.SchemeId.Srn
+import models.{Mode, Money}
 import navigation.Navigator
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsAmountPage
