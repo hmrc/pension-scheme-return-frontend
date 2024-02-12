@@ -385,8 +385,16 @@ object SharesCYAController {
           )
         ) ++ List(
           CheckYourAnswersRowViewModel(
-            Message("sharesCYA.section1.holdShares", schemeName, typeOfShare.name),
-            (holdShares) match {
+            Message(
+              "sharesCYA.section1.holdShares",
+              schemeName,
+              typeOfShare match {
+                case SponsoringEmployer => "sharesCYA.section1.SponsoringEmployer"
+                case Unquoted => "sharesCYA.section1.Unquoted"
+                case ConnectedParty => "sharesCYA.section1.ConnectedParty"
+              }
+            ),
+            holdShares match {
               case Acquisition => "sharesCYA.section1.Acquisition"
               case Contribution => "sharesCYA.section1.Contribution"
               case Transfer => "sharesCYA.section1.Transfer"
@@ -420,7 +428,15 @@ object SharesCYAController {
         Some(Heading2.medium("sharesCYA.section2.heading")),
         whenDidSchemeAcquire.map { _ =>
           CheckYourAnswersRowViewModel(
-            Message("sharesCYA.section4.totalAssetValue", schemeName),
+            Message(
+              "sharesCYA.section2.whenDidSchemeAcquire",
+              schemeName,
+              typeOfShare match {
+                case SponsoringEmployer => "sharesCYA.section1.SponsoringEmployer"
+                case Unquoted => "sharesCYA.section1.Unquoted"
+                case ConnectedParty => "sharesCYA.section1.ConnectedParty"
+              }
+            ),
             s"${whenDidSchemeAcquire.get.show}"
           ).withAction(
             SummaryAction(
@@ -433,7 +449,7 @@ object SharesCYAController {
                     .onPageLoad(srn, index, mode)
                     .url + "#whenDidSchemeAcquire"
               }
-            ).withVisuallyHiddenContent("sharesCYA.section4.totalAssetValue.hidden")
+            ).withVisuallyHiddenContent("sharesCYA.section2.whenDidSchemeAcquire.hidden")
           )
         }.toList ++ List(
           CheckYourAnswersRowViewModel(
@@ -596,7 +612,7 @@ object SharesCYAController {
             Message("sharesCYA.section3.recipientDetails.other", recipientName),
             controllers.nonsipp.common.routes.OtherRecipientDetailsController
               .onPageLoad(srn, index, mode, IdentitySubject.SharesSeller)
-              .url,
+              .url + "#other",
             "sharesCYA.section3.recipientDetails.other.hidden",
             ""
           )
