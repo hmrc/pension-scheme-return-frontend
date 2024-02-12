@@ -58,23 +58,25 @@ object SharesDisposalNavigator extends JourneyNavigator {
       controllers.nonsipp.sharesdisposal.routes.PartnershipBuyerUtrController
         .onPageLoad(srn, index, disposalIndex, NormalMode)
 
-    // TODO uncomment as these controllers are introduced:
-//
-//    case IndividualBuyerNinoNumberPage(srn, index, disposalIndex) =>
-//      controllers.nonsipp.sharesdisposal.routes.ShareslBuyerConnectedPartyController
-//        .onPageLoad(srn, index, disposalIndex, NormalMode)
-//
-//    case CompanyBuyerCrnPage(srn, index, disposalIndex) =>
-//      controllers.nonsipp.sharesdisposal.routes.SharesBuyerConnectedPartyController
-//        .onPageLoad(srn, index, disposalIndex, NormalMode)
-//
-//    case PartnershipBuyerUtrPage(srn, index, disposalIndex) =>
-//      controllers.nonsipp.sharesdisposal.routes.SharesDisposalBuyerConnectedPartyController
-//        .onPageLoad(srn, index, disposalIndex, NormalMode)
-//
-//    case OtherBuyerDetailsPage(srn, index, disposalIndex) =>
-//      controllers.nonsipp.sharesdisposal.routes.SharesBuyerConnectedPartyController
-//        .onPageLoad(srn, index, disposalIndex, NormalMode)
+    case IndividualBuyerNinoNumberPage(srn, index, disposalIndex) =>
+      controllers.nonsipp.sharesdisposal.routes.IsBuyerConnectedPartyController
+        .onPageLoad(srn, index, disposalIndex, NormalMode)
+
+    case CompanyBuyerCrnPage(srn, index, disposalIndex) =>
+      controllers.nonsipp.sharesdisposal.routes.IsBuyerConnectedPartyController
+        .onPageLoad(srn, index, disposalIndex, NormalMode)
+
+    case PartnershipBuyerUtrPage(srn, index, disposalIndex) =>
+      controllers.nonsipp.sharesdisposal.routes.IsBuyerConnectedPartyController
+        .onPageLoad(srn, index, disposalIndex, NormalMode)
+
+    case OtherBuyerDetailsPage(srn, index, disposalIndex) =>
+      controllers.nonsipp.sharesdisposal.routes.IsBuyerConnectedPartyController
+        .onPageLoad(srn, index, disposalIndex, NormalMode)
+
+    case IsBuyerConnectedPartyPage(srn, shareIndex, disposalIndex) =>
+      controllers.nonsipp.sharesdisposal.routes.IndependentValuationController
+        .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
 
     case page @ SharesDisposalPage(srn) =>
       if (userAnswers.get(page).contains(true)) {

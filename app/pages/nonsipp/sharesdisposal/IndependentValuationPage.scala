@@ -23,6 +23,7 @@ import play.api.libs.json.JsPath
 import utils.RefinedUtils._
 
 case class IndependentValuationPage(srn: Srn, index: Max5000, disposalIndex: Max50) extends QuestionPage[Boolean] {
-  override def path: JsPath = Paths.disposedSharesTransaction \ toString \ index.arrayIndex.toString \ disposalIndex.arrayIndex.toString
+  override def path: JsPath =
+    Paths.disposedSharesTransaction \ toString \ index.arrayIndex.toString \ disposalIndex.arrayIndex.toString
   override def toString: String = "supportedByIndepValuation"
 }

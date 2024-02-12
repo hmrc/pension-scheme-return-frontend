@@ -45,7 +45,10 @@ class IndependentValuationControllerSpec extends ControllerBaseSpec {
     act.like(renderPrePopView(onPageLoad, IndependentValuationPage(srn, index, disposalIndex), true, userAnswers) {
       implicit app => implicit request =>
         injected[YesNoPageView]
-          .apply(form(injected[YesNoPageFormProvider]).fill(true), viewModel(srn, companyName, index, disposalIndex, NormalMode))
+          .apply(
+            form(injected[YesNoPageFormProvider]).fill(true),
+            viewModel(srn, companyName, index, disposalIndex, NormalMode)
+          )
     })
 
     act.like(redirectNextPage(onSubmit, "value" -> "true"))
