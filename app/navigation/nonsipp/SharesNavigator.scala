@@ -200,6 +200,14 @@ object SharesNavigator extends JourneyNavigator {
           ).merge
         case Some(false) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
       }
+
+    case RemoveSharesPage(srn, _) =>
+      if (userAnswers.map(CompanyNameRelatedSharesPages(srn)).isEmpty) {
+        controllers.nonsipp.shares.routes.DidSchemeHoldAnySharesController.onPageLoad(srn, NormalMode)
+      } else {
+        controllers.nonsipp.shares.routes.SharesListController.onPageLoad(srn, page = 1, NormalMode)
+      }
+
   }
 
   val checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] = _ =>

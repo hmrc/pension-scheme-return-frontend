@@ -175,7 +175,7 @@ object SharesListController {
           TableElem(
             LinkMessage(
               Message("site.remove"),
-              controllers.routes.UnauthorisedController.onPageLoad().url
+              routes.RemoveSharesController.onPageLoad(srn, index, mode).url
             )
           )
         )

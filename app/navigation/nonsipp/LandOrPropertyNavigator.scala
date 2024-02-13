@@ -190,7 +190,7 @@ object LandOrPropertyNavigator extends JourneyNavigator {
     case LandOrPropertyCYAPage(srn) =>
       controllers.nonsipp.landorproperty.routes.LandOrPropertyListController.onPageLoad(srn, page = 1, NormalMode)
 
-    case RemovePropertyPage(srn, index) =>
+    case RemovePropertyPage(srn, _) =>
       if (userAnswers.map(LandOrPropertyAddressLookupPages(srn)).isEmpty) {
         controllers.nonsipp.landorproperty.routes.LandOrPropertyHeldController.onPageLoad(srn, NormalMode)
       } else {

@@ -22,16 +22,10 @@ import pages.QuestionPage
 import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
 
-case class CompanyNameRelatedSharesPage(srn: Srn, index: Max5000) extends QuestionPage[String] {
+case class RemoveSharesPage(srn: Srn, index: Max5000) extends QuestionPage[Boolean] {
 
-  override def path: JsPath = Paths.shareIdentification \ toString \ index.arrayIndex.toString
+  override def path: JsPath =
+    Paths.shareIdentification \ toString \ index.arrayIndex.toString
 
-  override def toString: String = "nameOfSharesCompany"
-}
-
-case class CompanyNameRelatedSharesPages(srn: Srn) extends QuestionPage[Map[String, String]] {
-
-  override def path: JsPath = Paths.shareIdentification \ toString
-
-  override def toString: String = "nameOfSharesCompany"
+  override def toString: String = "removeShares"
 }

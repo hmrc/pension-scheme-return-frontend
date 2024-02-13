@@ -118,3 +118,8 @@ POST        /:srn/submit-check-answers-shares                         controller
 GET         /:srn/change-check-answers-shares                         controllers.nonsipp.shares.SharesCYAController.onPageLoad(srn: Srn, index: Max5000 = 1, checkOrChange: CheckOrChange = Change)
 GET         /:srn/change-check-answers-shares/:index                  controllers.nonsipp.shares.SharesCYAController.onPageLoad(srn: Srn, index: Max5000, checkOrChange: CheckOrChange = Change)
 POST        /:srn/change-submit-check-answers-shares                  controllers.nonsipp.shares.SharesCYAController.onSubmit(srn: Srn, checkOrChange: CheckOrChange = Change)
+
+GET         /:srn/remove-shares/:index                                    controllers.nonsipp.shares.RemoveSharesController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/remove-shares/:index                                    controllers.nonsipp.shares.RemoveSharesController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/change-remove-shares/:index                             controllers.nonsipp.shares.RemoveSharesController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-remove-shares/:index                             controllers.nonsipp.shares.RemoveSharesController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)

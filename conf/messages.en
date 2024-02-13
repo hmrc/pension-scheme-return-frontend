@@ -2492,9 +2492,6 @@ sharesCYA.section1.holdShares.hidden =  why {0} holds these {1}
 sharesCYA.section1.SponsoringEmployer = Shares in a sponsoring employer
 sharesCYA.section1.Unquoted = Unquoted shares
 sharesCYA.section1.ConnectedParty = Any other shares acquired from a connected party
-sharesCYA.section1.SponsoringEmployer = Shares in a sponsoring employer
-sharesCYA.section1.Unquoted = Unquoted shares
-sharesCYA.section1.ConnectedParty = Any other shares acquired from a connected party
 sharesCYA.section1.Acquisition = Acquisition
 sharesCYA.section1.Contribution = Contribution
 sharesCYA.section1.Transfer = Transfer
@@ -2561,3 +2558,7 @@ returnHistory.table.header2 = Version
 returnHistory.table.header3 = FormBundleNumber
 returnHistory.table.header4 = Status
 returnHistory.table.header5 = SubmittedBy
+
+removeShares.title = Are you sure you want to remove this share transaction?
+removeShares.heading = Are you sure you want to remove the share transaction for {0}?
+removeShares.error.required = Select yes if you are sure you want to remove this share transaction
