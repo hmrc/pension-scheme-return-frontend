@@ -43,7 +43,7 @@ class WhoWereTheSharesSoldToPageSpec extends PageBehaviours with TestValues {
           .unsafeSet(WhoWereTheSharesSoldToPage(srn, index, disposalIndexOne), IdentityType.UKCompany)
           .unsafeSet(CompanyBuyerNamePage(srn, index, disposalIndexOne), companyName)
           .unsafeSet(CompanyBuyerCrnPage(srn, index, disposalIndexOne), conditionalCrnYes)
-          .unsafeSet(SharesDisposalBuyerConnectedPartyPage(srn, index, disposalIndexOne), false)
+          .unsafeSet(IsBuyerConnectedPartyPage(srn, index, disposalIndexOne), false)
 
       s"remove dependant values when current answer is None (removal) and existing answers are present" in {
 
@@ -55,7 +55,7 @@ class WhoWereTheSharesSoldToPageSpec extends PageBehaviours with TestValues {
         result.get(WhoWereTheSharesSoldToPage(srn, index, disposalIndexOne)) must not be None
         result.get(CompanyBuyerNamePage(srn, index, disposalIndexOne)) mustBe None
         result.get(CompanyBuyerCrnPage(srn, index, disposalIndexOne)) mustBe None
-        result.get(SharesDisposalBuyerConnectedPartyPage(srn, index, disposalIndexOne)) mustBe None
+        result.get(IsBuyerConnectedPartyPage(srn, index, disposalIndexOne)) mustBe None
       }
 
       s"remove dependant values when current answer is Partnership and existing answer is UKCompany (update)" in {
@@ -68,7 +68,7 @@ class WhoWereTheSharesSoldToPageSpec extends PageBehaviours with TestValues {
         result.get(WhoWereTheSharesSoldToPage(srn, index, disposalIndexOne)) must not be None
         result.get(CompanyBuyerNamePage(srn, index, disposalIndexOne)) mustBe None
         result.get(CompanyBuyerCrnPage(srn, index, disposalIndexOne)) mustBe None
-        result.get(SharesDisposalBuyerConnectedPartyPage(srn, index, disposalIndexOne)) mustBe None
+        result.get(IsBuyerConnectedPartyPage(srn, index, disposalIndexOne)) mustBe None
       }
     }
 
@@ -77,11 +77,11 @@ class WhoWereTheSharesSoldToPageSpec extends PageBehaviours with TestValues {
         .unsafeSet(WhoWereTheSharesSoldToPage(srn, index, disposalIndexOne), IdentityType.UKCompany)
         .unsafeSet(CompanyBuyerNamePage(srn, index, disposalIndexOne), companyName)
         .unsafeSet(CompanyBuyerCrnPage(srn, index, disposalIndexOne), conditionalCrnYes)
-        .unsafeSet(SharesDisposalBuyerConnectedPartyPage(srn, index, disposalIndexOne), false)
+        .unsafeSet(IsBuyerConnectedPartyPage(srn, index, disposalIndexOne), false)
         .unsafeSet(WhoWereTheSharesSoldToPage(srn, index, disposalIndexTwo), IdentityType.UKCompany)
         .unsafeSet(CompanyBuyerNamePage(srn, index, disposalIndexTwo), companyName)
         .unsafeSet(CompanyBuyerCrnPage(srn, index, disposalIndexTwo), conditionalCrnYes)
-        .unsafeSet(SharesDisposalBuyerConnectedPartyPage(srn, index, disposalIndexTwo), false)
+        .unsafeSet(IsBuyerConnectedPartyPage(srn, index, disposalIndexTwo), false)
 
       s"remove dependant values when current answer is None (removal) and existing answers are present" in {
 
@@ -93,12 +93,12 @@ class WhoWereTheSharesSoldToPageSpec extends PageBehaviours with TestValues {
         result.get(WhoWereTheSharesSoldToPage(srn, index, disposalIndexOne)) must not be None
         result.get(CompanyBuyerNamePage(srn, index, disposalIndexOne)) mustBe None
         result.get(CompanyBuyerCrnPage(srn, index, disposalIndexOne)) mustBe None
-        result.get(SharesDisposalBuyerConnectedPartyPage(srn, index, disposalIndexOne)) mustBe None
+        result.get(IsBuyerConnectedPartyPage(srn, index, disposalIndexOne)) mustBe None
 
         result.get(WhoWereTheSharesSoldToPage(srn, index, disposalIndexTwo)) must not be None
         result.get(CompanyBuyerNamePage(srn, index, disposalIndexTwo)) must not be None
         result.get(CompanyBuyerCrnPage(srn, index, disposalIndexTwo)) must not be None
-        result.get(SharesDisposalBuyerConnectedPartyPage(srn, index, disposalIndexTwo)) must not be None
+        result.get(IsBuyerConnectedPartyPage(srn, index, disposalIndexTwo)) must not be None
       }
 
       s"remove dependant values when current answer is Partnership and existing answer is UKCompany (update)" in {
@@ -111,12 +111,12 @@ class WhoWereTheSharesSoldToPageSpec extends PageBehaviours with TestValues {
         result.get(WhoWereTheSharesSoldToPage(srn, index, disposalIndexOne)) must not be None
         result.get(CompanyBuyerNamePage(srn, index, disposalIndexOne)) mustBe None
         result.get(CompanyBuyerCrnPage(srn, index, disposalIndexOne)) mustBe None
-        result.get(SharesDisposalBuyerConnectedPartyPage(srn, index, disposalIndexOne)) mustBe None
+        result.get(IsBuyerConnectedPartyPage(srn, index, disposalIndexOne)) mustBe None
 
         result.get(WhoWereTheSharesSoldToPage(srn, index, disposalIndexTwo)) must not be None
         result.get(CompanyBuyerNamePage(srn, index, disposalIndexTwo)) must not be None
         result.get(CompanyBuyerCrnPage(srn, index, disposalIndexTwo)) must not be None
-        result.get(SharesDisposalBuyerConnectedPartyPage(srn, index, disposalIndexTwo)) must not be None
+        result.get(IsBuyerConnectedPartyPage(srn, index, disposalIndexTwo)) must not be None
 
       }
     }

@@ -17,21 +17,16 @@
 package pages.nonsipp.sharesdisposal
 
 import config.Refined.{Max50, Max5000}
-import eu.timepit.refined.refineMV
-import pages.behaviours.PageBehaviours
+import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
+import utils.RefinedUtils.RefinedIntOps
 
-class SharesDisposalBuyerConnectedPartyPageSpec extends PageBehaviours {
-  private val srn = srnGen.sample.value
+case class IsBuyerConnectedPartyPage(srn: Srn, shareIndex: Max5000, disposalIndex: Max50)
+    extends QuestionPage[Boolean] {
 
-  "SharesDisposalBuyerConnectedPartyPage" - {
+  override def path: JsPath =
+    Paths.salesQuestions \ toString \ shareIndex.arrayIndex.toString \ disposalIndex.arrayIndex.toString
 
-    val index = refineMV[Max5000.Refined](1)
-    val disposalIndex = refineMV[Max50.Refined](1)
-
-    beRetrievable[Boolean](SharesDisposalBuyerConnectedPartyPage(srn, index, disposalIndex))
-
-    beSettable[Boolean](SharesDisposalBuyerConnectedPartyPage(srn, index, disposalIndex))
-
-    beRemovable[Boolean](SharesDisposalBuyerConnectedPartyPage(srn, index, disposalIndex))
-  }
+  override def toString: String = "connectedPartyStatus"
 }

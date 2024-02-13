@@ -314,7 +314,22 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         )
       }
 
-      "CompanyNameOfSharesBuyerPage" - {
+      "IndividualBuyerNinoNumberPage" - {
+        act.like(
+          normalmode
+            .navigateToWithDoubleIndex(
+              shareIndex,
+              disposalIndex,
+              IndividualBuyerNinoNumberPage,
+              (srn, index: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.IsBuyerConnectedPartyController
+                  .onPageLoad(srn, index, disposalIndex, NormalMode)
+            )
+            .withName("go from individual buyer nino number page to Is Buyer Connected Party page")
+        )
+      }
+
+      "CompanyBuyerNamePage" - {
         act.like(
           normalmode
             .navigateToWithDoubleIndex(
@@ -329,6 +344,83 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         )
       }
 
+      "CompanyBuyerCrnPage" - {
+        act.like(
+          normalmode
+            .navigateToWithDoubleIndex(
+              shareIndex,
+              disposalIndex,
+              CompanyBuyerCrnPage,
+              (srn, index: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.IsBuyerConnectedPartyController
+                  .onPageLoad(srn, index, disposalIndex, NormalMode)
+            )
+            .withName("go from company buyer crn page to Is Buyer Connected Party page")
+        )
+      }
+
+      "PartnershipBuyerNamePage" - {
+
+        act.like(
+          normalmode
+            .navigateToWithDoubleIndex(
+              shareIndex,
+              disposalIndex,
+              PartnershipBuyerNamePage,
+              (srn, index: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.PartnershipBuyerUtrController
+                  .onPageLoad(srn, index, disposalIndex, NormalMode)
+            )
+            .withName("go from partnership buyer name page to Partnership Buyer UTR page")
+        )
+
+      }
+
+      "PartnershipBuyerUtrPage" - {
+        act.like(
+          normalmode
+            .navigateToWithDoubleIndex(
+              shareIndex,
+              disposalIndex,
+              PartnershipBuyerUtrPage,
+              (srn, index: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.IsBuyerConnectedPartyController
+                  .onPageLoad(srn, index, disposalIndex, NormalMode)
+            )
+            .withName("go from Partnership Buyer UTR page to Is Buyer Connected Party page")
+        )
+      }
+
+      "OtherBuyerDetailsPage" - {
+        act.like(
+          normalmode
+            .navigateToWithDoubleIndex(
+              shareIndex,
+              disposalIndex,
+              OtherBuyerDetailsPage,
+              (srn, index: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.IsBuyerConnectedPartyController
+                  .onPageLoad(srn, index, disposalIndex, NormalMode)
+            )
+            .withName("go from Other Buyer Details page to Is Buyer Connected Party page")
+        )
+      }
+
+      "IsBuyerConnectedPartyPage" - {
+        act.like(
+          normalmode
+            .navigateToWithDoubleIndex(
+              shareIndex,
+              disposalIndex,
+              IsBuyerConnectedPartyPage,
+              (srn, index: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.IndependentValuationController
+                  .onPageLoad(srn, index, disposalIndex, NormalMode)
+            )
+            .withName("go from Is Buyer Connected Party page to Independent Valuation page")
+        )
+      }
+
       "IndependentValuationPage" - {
         act.like(
           normalmode
@@ -336,8 +428,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               shareIndex,
               disposalIndex,
               IndependentValuationPage,
-              (srn, index: Max5000, disposalIndex: Max50, _) =>
-                controllers.routes.UnauthorisedController.onPageLoad()
+              (srn, index: Max5000, disposalIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
             )
             .withName("go from IndependentValuationPage to Unauthorised")
         )

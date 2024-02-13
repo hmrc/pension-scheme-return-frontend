@@ -132,7 +132,7 @@ trait TestValues {
   val pstr = "testPstr"
   val version = "001"
   val titleNumber = "AB123456"
-  val buyersName = "testBuyersName"
+  val buyerName = "testBuyerName"
   val lenderName = "testLenderName"
   val amountBorrowed: (Money, Percentage) = (money, percentage)
   val reasonBorrowed = "test reason borrowed"

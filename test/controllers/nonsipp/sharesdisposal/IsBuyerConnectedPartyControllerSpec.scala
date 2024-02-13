@@ -14,40 +14,40 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.landorpropertydisposal
+package controllers.nonsipp.sharesdisposal
 
 import config.Refined.{Max50, Max5000}
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalBuyerConnectedPartyController._
+import controllers.nonsipp.sharesdisposal.IsBuyerConnectedPartyController._
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.{IdentityType, NormalMode}
-import pages.nonsipp.landorpropertydisposal._
+import pages.nonsipp.sharesdisposal._
 import views.html.YesNoPageView
 
-class LandOrPropertyDisposalBuyerConnectedPartyControllerSpec extends ControllerBaseSpec {
+class IsBuyerConnectedPartyControllerSpec extends ControllerBaseSpec {
 
-  private val index = refineMV[Max5000.Refined](1)
+  private val shareIndex = refineMV[Max5000.Refined](1)
   private val disposalIndex = refineMV[Max50.Refined](1)
 
   private lazy val onPageLoad =
-    routes.LandOrPropertyDisposalBuyerConnectedPartyController.onPageLoad(srn, index, disposalIndex, NormalMode)
+    routes.IsBuyerConnectedPartyController.onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
   private lazy val onSubmit =
-    routes.LandOrPropertyDisposalBuyerConnectedPartyController.onSubmit(srn, index, disposalIndex, NormalMode)
+    routes.IsBuyerConnectedPartyController.onSubmit(srn, shareIndex, disposalIndex, NormalMode)
 
-  "LandOrPropertyDisposalSellerConnectedPartyController" - {
+  "IsBuyerConnectedPartyController" - {
 
     val individualUserAnswers = defaultUserAnswers
-      .unsafeSet(WhoPurchasedLandOrPropertyPage(srn, index, disposalIndex), IdentityType.Individual)
-      .unsafeSet(LandOrPropertyIndividualBuyerNamePage(srn, index, disposalIndex), buyerName)
+      .unsafeSet(WhoWereTheSharesSoldToPage(srn, shareIndex, disposalIndex), IdentityType.Individual)
+      .unsafeSet(SharesIndividualBuyerNamePage(srn, shareIndex, disposalIndex), buyerName)
 
     val companyUserAnswers = defaultUserAnswers
-      .unsafeSet(WhoPurchasedLandOrPropertyPage(srn, index, disposalIndex), IdentityType.UKCompany)
-      .unsafeSet(CompanyBuyerNamePage(srn, index, disposalIndex), buyerName)
+      .unsafeSet(WhoWereTheSharesSoldToPage(srn, shareIndex, disposalIndex), IdentityType.UKCompany)
+      .unsafeSet(CompanyBuyerNamePage(srn, shareIndex, disposalIndex), buyerName)
 
     val partnershipUserAnswers = defaultUserAnswers
-      .unsafeSet(WhoPurchasedLandOrPropertyPage(srn, index, disposalIndex), IdentityType.UKPartnership)
-      .unsafeSet(PartnershipBuyerNamePage(srn, index, disposalIndex), buyerName)
+      .unsafeSet(WhoWereTheSharesSoldToPage(srn, shareIndex, disposalIndex), IdentityType.UKPartnership)
+      .unsafeSet(PartnershipBuyerNamePage(srn, shareIndex, disposalIndex), buyerName)
 
     List(
       ("individual", individualUserAnswers),
@@ -57,20 +57,23 @@ class LandOrPropertyDisposalBuyerConnectedPartyControllerSpec extends Controller
       case (testScenario, userAnswers) =>
         act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
           injected[YesNoPageView]
-            .apply(form(injected[YesNoPageFormProvider]), viewModel(srn, buyerName, index, disposalIndex, NormalMode))
+            .apply(
+              form(injected[YesNoPageFormProvider]),
+              viewModel(srn, shareIndex, disposalIndex, buyerName, NormalMode)
+            )
         }.updateName(_ + s" as $testScenario"))
 
         act.like(
           renderPrePopView(
             onPageLoad,
-            LandOrPropertyDisposalBuyerConnectedPartyPage(srn, index, disposalIndex),
+            IsBuyerConnectedPartyPage(srn, shareIndex, disposalIndex),
             true,
             userAnswers
           ) { implicit app => implicit request =>
             injected[YesNoPageView]
               .apply(
                 form(injected[YesNoPageFormProvider]).fill(true),
-                viewModel(srn, buyerName, index, disposalIndex, NormalMode)
+                viewModel(srn, shareIndex, disposalIndex, buyerName, NormalMode)
               )
           }.updateName(_ + s" as $testScenario")
         )
