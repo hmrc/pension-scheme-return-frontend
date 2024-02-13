@@ -128,6 +128,9 @@ object SharesDisposalNavigator extends JourneyNavigator {
     case TotalConsiderationSharesRedeemedPage(srn, shareIndex, disposalIndex) =>
       controllers.routes.UnauthorisedController.onPageLoad()
 
+    case IndependentValuationPage(srn, shareIndex, disposalIndex) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
+
   }
 
   override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] =
