@@ -16,6 +16,9 @@
 
 package pages.nonsipp.shares
 
+import config.Refined.Max5000
+import models.SchemeId.Srn
+import pages.QuestionPage
 import play.api.libs.json.{__, JsPath}
 
 object Paths {
@@ -23,4 +26,27 @@ object Paths {
   val shareTransactions: JsPath = shares \ "shareTransactions"
   val heldSharesTransaction: JsPath = shareTransactions \ "heldSharesTransaction"
   val shareIdentification: JsPath = shareTransactions \ "shareIdentification"
+
+  def sharesPages(srn: Srn, index: Max5000): List[QuestionPage[_]] = List(
+    ClassOfSharesPage(srn, index),
+    CompanyNameOfSharesSellerPage(srn, index),
+    CompanyNameRelatedSharesPage(srn, index),
+    CostOfSharesPage(srn, index),
+    DidSchemeHoldAnySharesPage(srn),
+    HowManySharesPage(srn, index),
+    IndividualNameOfSharesSellerPage(srn, index),
+    PartnershipShareSellerNamePage(srn, index),
+    RemoveSharesPage(srn, index),
+    SharesCompanyCrnPage(srn, index),
+    SharesFromConnectedPartyPage(srn, index),
+    SharesIndependentValuationPage(srn, index),
+    SharesIndividualSellerNINumberPage(srn, index),
+    SharesTotalIncomePage(srn, index),
+    TotalAssetValuePage(srn, index),
+    TypeOfSharesHeldPage(srn, index),
+    WhenDidSchemeAcquireSharesPage(srn, index),
+    WhyDoesSchemeHoldSharesPage(srn, index),
+    SharesCompleted(srn, index)
+  )
+
 }

@@ -647,5 +647,28 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           )
       )
     }
+
+    "SharesCYAPage" - {
+      act.like(
+        normalmode
+          .navigateTo(
+            srn => SharesCYAPage(srn),
+            (srn, _) => controllers.nonsipp.shares.routes.SharesListController.onPageLoad(srn, 1, NormalMode)
+          )
+          .withName("go from shares CYA page to shares list page")
+      )
+    }
+
+    "RemoveSharesPage" - {
+      act.like(
+        normalmode
+          .navigateTo(
+            srn => RemoveSharesPage(srn, index),
+            controllers.nonsipp.shares.routes.DidSchemeHoldAnySharesController.onPageLoad
+          )
+          .withName("go from remove shares page to did scheme hold any shares page")
+      )
+    }
+
   }
 }
