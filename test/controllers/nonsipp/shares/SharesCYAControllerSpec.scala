@@ -86,7 +86,7 @@ class SharesCYAControllerSpec extends ControllerBaseSpec {
                 companySharesCrn = ConditionalYesNo.yes[String, Crn](crn),
                 companyName,
                 howManyShares = totalShares,
-                receivedLandType = Some(IdentityType.UKPartnership),
+                identityType = Some(IdentityType.UKPartnership),
                 recipientName = Some(companyName),
                 recipientDetails = None,
                 recipientReasonNoDetails = None,

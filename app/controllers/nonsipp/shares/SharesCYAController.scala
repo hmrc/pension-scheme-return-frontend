@@ -92,7 +92,7 @@ class SharesCYAController @Inject()(
 
           howManyShares <- requiredPage(HowManySharesPage(srn, index))
 
-          receivedLandType = Option.when(holdShares == Acquisition)(
+          identityType = Option.when(holdShares == Acquisition)(
             request.userAnswers.get(IdentityTypePage(srn, index, IdentitySubject.SharesSeller)).get
           )
 
@@ -167,7 +167,7 @@ class SharesCYAController @Inject()(
                 companySharesCrn,
                 classOfShares,
                 howManyShares,
-                receivedLandType,
+                identityType,
                 recipientName,
                 recipientDetails.flatten,
                 recipientReasonNoDetails.flatten,
@@ -205,7 +205,7 @@ case class ViewModelParameters(
   companySharesCrn: ConditionalYesNo[String, Crn],
   classOfShares: String,
   howManyShares: Int,
-  receivedLandType: Option[IdentityType],
+  identityType: Option[IdentityType],
   recipientName: Option[String],
   recipientDetails: Option[String],
   recipientReasonNoDetails: Option[String],
@@ -237,7 +237,7 @@ object SharesCYAController {
           parameters.companySharesCrn,
           parameters.classOfShares,
           parameters.howManyShares,
-          parameters.receivedLandType,
+          parameters.identityType,
           parameters.recipientName,
           parameters.recipientDetails,
           parameters.recipientReasonNoDetails,
@@ -265,7 +265,7 @@ object SharesCYAController {
     companySharesCrn: ConditionalYesNo[String, Crn],
     classOfShares: String,
     howManyShares: Int,
-    receivedLandType: Option[IdentityType],
+    identityType: Option[IdentityType],
     recipientName: Option[String],
     recipientDetails: Option[String],
     recipientReasonNoDetails: Option[String],
@@ -301,7 +301,7 @@ object SharesCYAController {
         ) ++ detailsOfTheAcquisition(
           srn,
           index,
-          receivedLandType.get,
+          identityType.get,
           recipientName.get,
           holdShares,
           companyNameRelatedShares,
@@ -558,6 +558,24 @@ object SharesCYAController {
           )
         ) :?+ sharesFromConnectedParty.flatMap { connectedParty =>
           holdShares match {
+            case SchemeHoldShare.Transfer =>
+              Some(
+                CheckYourAnswersRowViewModel(
+                  Message("sharesCYA.sectionTransfer.sharesFromConnectedParty", companyNameRelatedShares),
+                  if (connectedParty) "site.yes" else "site.no"
+                ).withAction(
+                  SummaryAction(
+                    "site.change",
+                    routes.SharesFromConnectedPartyController.onPageLoad(srn, index, mode).url
+                  ).withVisuallyHiddenContent(
+                    Message(
+                      "sharesCYA.sectionTransfer.sharesFromConnectedParty.hidden",
+                      companyNameRelatedShares,
+                      if (connectedParty) "site.yes" else "site.no"
+                    )
+                  )
+                )
+              )
             case SchemeHoldShare.Contribution =>
               Some(
                 CheckYourAnswersRowViewModel(
@@ -578,28 +596,6 @@ object SharesCYAController {
               )
             case _ => None
           }
-        } :?+ sharesFromConnectedParty.flatMap { connectedParty =>
-          holdShares match {
-            case SchemeHoldShare.Transfer =>
-              Some(
-                CheckYourAnswersRowViewModel(
-                  Message("sharesCYA.sectionTransfer.sharesFromConnectedParty", companyNameRelatedShares),
-                  if (connectedParty) "site.yes" else "site.no"
-                ).withAction(
-                  SummaryAction(
-                    "site.change",
-                    routes.SharesFromConnectedPartyController.onPageLoad(srn, index, mode).url
-                  ).withVisuallyHiddenContent(
-                    Message(
-                      "sharesCYA.sectionTransfer.sharesFromConnectedParty.hidden",
-                      companyNameRelatedShares,
-                      if (connectedParty) "site.yes" else "site.no"
-                    )
-                  )
-                )
-              )
-            case _ => None
-          }
         }
       )
     )
@@ -607,7 +603,7 @@ object SharesCYAController {
   private def detailsOfTheAcquisition(
     srn: Srn,
     index: Max5000,
-    receivedLandType: IdentityType,
+    identityType: IdentityType,
     recipientName: String,
     holdShares: SchemeHoldShare,
     companyNameRelatedShares: String,
@@ -617,14 +613,14 @@ object SharesCYAController {
     mode: Mode
   ): List[CheckYourAnswersSection] = {
 
-    val receivedLoan = receivedLandType match {
+    val sharesType = identityType match {
       case IdentityType.Individual => "landOrPropertySeller.identityType.pageContent"
       case IdentityType.UKCompany => "landOrPropertySeller.identityType.pageContent1"
       case IdentityType.UKPartnership => "landOrPropertySeller.identityType.pageContent2"
       case IdentityType.Other => "landOrPropertySeller.identityType.pageContent3"
     }
 
-    val recipientNameUrl = receivedLandType match {
+    val recipientNameUrl = identityType match {
       case IdentityType.Individual =>
         routes.IndividualNameOfSharesSellerController.onPageLoad(srn, index, mode).url
       case IdentityType.UKCompany => routes.CompanyNameOfSharesSellerController.onPageLoad(srn, index, mode).url
@@ -641,7 +637,7 @@ object SharesCYAController {
       recipientDetailsIdChangeHiddenKey,
       recipientDetailsNoIdChangeHiddenKey
     ): (Message, String, String, String) =
-      receivedLandType match {
+      identityType match {
         case IdentityType.Individual =>
           (
             Message("sharesCYA.section3.recipientDetails.nino", recipientName),
@@ -678,7 +674,7 @@ object SharesCYAController {
           )
       }
 
-    val (recipientNoDetailsReasonKey, recipientNoDetailsUrl): (Message, String) = receivedLandType match {
+    val (recipientNoDetailsReasonKey, recipientNoDetailsUrl): (Message, String) = identityType match {
       case IdentityType.Individual =>
         Message("sharesCYA.section3.recipientDetails.noNinoReason", recipientName) ->
           routes.SharesIndividualSellerNINumberController.onPageLoad(srn, index, mode).url
@@ -705,7 +701,7 @@ object SharesCYAController {
         List(
           CheckYourAnswersRowViewModel(
             Message("sharesCYA.section3.whoWereSharesAcquired", companyNameRelatedShares),
-            receivedLoan
+            sharesType
           ).withAction(
             SummaryAction(
               "site.change",
@@ -751,7 +747,6 @@ object SharesCYAController {
                   )
                 )
               )
-            case _ => None
           }
         }
       )
