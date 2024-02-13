@@ -517,7 +517,13 @@ object SharesCYAController {
                 SummaryAction(
                   "site.change",
                   routes.SharesCompanyCrnController.onPageLoad(srn, index, mode).url + "#companySharesCrn"
-                ).withVisuallyHiddenContent("sharesCYA.section2.companySharesCrn.yes.hidden")
+                ).withVisuallyHiddenContent(
+                  Message(
+                    "sharesCYA.section2.companySharesCrn.yes.hidden",
+                    companyNameRelatedShares,
+                    companySharesCrn.value
+                  )
+                )
               )
             case Left(reason) =>
               CheckYourAnswersRowViewModel(
@@ -527,7 +533,9 @@ object SharesCYAController {
                 SummaryAction(
                   "site.change",
                   routes.SharesCompanyCrnController.onPageLoad(srn, index, mode).url + "#companySharesCrn"
-                ).withVisuallyHiddenContent("sharesCYA.section2.companySharesCrn.no.hidden")
+                ).withVisuallyHiddenContent(
+                  Message("sharesCYA.section2.companySharesCrn.no.hidden", companyNameRelatedShares, reason)
+                )
               )
           },
           CheckYourAnswersRowViewModel(
@@ -560,8 +568,11 @@ object SharesCYAController {
                     "site.change",
                     routes.SharesFromConnectedPartyController.onPageLoad(srn, index, mode).url
                   ).withVisuallyHiddenContent(
-                    "sharesCYA.sectionContribution.sharesFromConnectedParty.hidden",
-                    companyNameRelatedShares
+                    Message(
+                      "sharesCYA.sectionContribution.sharesFromConnectedParty.hidden",
+                      companyNameRelatedShares,
+                      if (connectedParty) "site.yes" else "site.no"
+                    )
                   )
                 )
               )
@@ -579,8 +590,11 @@ object SharesCYAController {
                     "site.change",
                     routes.SharesFromConnectedPartyController.onPageLoad(srn, index, mode).url
                   ).withVisuallyHiddenContent(
-                    "sharesCYA.sectionTransfer.sharesFromConnectedParty.hidden",
-                    companyNameRelatedShares
+                    Message(
+                      "sharesCYA.sectionTransfer.sharesFromConnectedParty.hidden",
+                      companyNameRelatedShares,
+                      if (connectedParty) "site.yes" else "site.no"
+                    )
                   )
                 )
               )
@@ -728,7 +742,13 @@ object SharesCYAController {
                   SummaryAction(
                     "site.change",
                     routes.SharesFromConnectedPartyController.onPageLoad(srn, index, mode).url
-                  ).withVisuallyHiddenContent("sharesCYA.section3.sharesFromConnectedParty.hidden")
+                  ).withVisuallyHiddenContent(
+                    Message(
+                      "sharesCYA.section3.sharesFromConnectedParty.hidden",
+                      recipientName,
+                      if (connectedParty) "site.yes" else "site.no"
+                    )
+                  )
                 )
               )
             case _ => None
