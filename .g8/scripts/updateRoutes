@@ -1,0 +1,54 @@
+#!/bin/bash
+
+# Updates the correct routes file
+
+set -e
+
+[ -z "$1" ] && echo "missing first param CLASS_NAME" && exit 1
+[ -z "$2" ] && echo "missing first param URL_PATH" && exit 1
+[ -z "$3" ] && echo "missing first param DIR" && exit 1
+
+CLASS_NAME=$1
+URL_PATH=$2
+DIR=$3
+
+INDEX=$4
+SECONDARY_INDEX=$5
+
+if [ -z "$DIR" ]; then
+  ROUTES_FILE="../conf/app.routes"
+  PACKAGE="controllers.nonsipp"
+else
+  ROUTES_FILE="../conf/$DIR.routes"
+  PACKAGE="controllers.nonsipp.$DIR"
+fi
+
+# checks that INDEX exists if SECONDARY_INDEX exists
+if [ -n "$SECONDARY_INDEX" ] && [ -z "$INDEX" ]; then
+  echo "Error: Secondary index is specified without a primary index"
+  exit 1
+fi
+
+echo "Adding routes to conf/$ROUTES_FILE"
+
+echo -en "\n" >> "../conf/$ROUTES_FILE"
+
+if [ -n "$INDEX" ] && [ -n "$SECONDARY_INDEX" ]; then
+  echo "GET        /:srn/${URL_PATH}/:index/:secondaryIndex                 ${PACKAGE}.${CLASS_NAME}Controller.onPageLoad(srn: Srn, index: ${INDEX}, secondaryIndex: ${SECONDARY_INDEX}, mode: Mode = NormalMode)" >> $ROUTES_FILE
+  echo "POST       /:srn/${URL_PATH}/:index/:secondaryIndex                 ${PACKAGE}.${CLASS_NAME}Controller.onSubmit(srn: Srn, index: ${INDEX}, secondaryIndex: ${SECONDARY_INDEX}, mode: Mode = NormalMode)" >> $ROUTES_FILE
+
+  echo "GET        /:srn/change-${URL_PATH}/:index/:secondaryIndex          ${PACKAGE}.${CLASS_NAME}Controller.onPageLoad(srn: Srn, index: ${INDEX}, secondaryIndex: ${SECONDARY_INDEX}, mode: Mode = CheckMode)" >> $ROUTES_FILE
+  echo "POST       /:srn/change-${URL_PATH}/:index/:secondaryIndex          ${PACKAGE}.${CLASS_NAME}Controller.onSubmit(srn: Srn, index: ${INDEX}, secondaryIndex: ${SECONDARY_INDEX}, mode: Mode = CheckMode)" >> $ROUTES_FILE
+elif [ -n "$INDEX" ]; then
+  echo "GET        /:srn/${URL_PATH}/:index                                 ${PACKAGE}.${CLASS_NAME}Controller.onPageLoad(srn: Srn, index: ${INDEX}, mode: Mode = NormalMode)" >> $ROUTES_FILE
+  echo "POST       /:srn/${URL_PATH}/:index                                 ${PACKAGE}.${CLASS_NAME}Controller.onSubmit(srn: Srn, index: ${INDEX}, mode: Mode = NormalMode)" >> $ROUTES_FILE
+
+  echo "GET        /:srn/change-${URL_PATH}/:index                          ${PACKAGE}.${CLASS_NAME}Controller.onPageLoad(srn: Srn, index: ${INDEX}, mode: Mode = CheckMode)" >> $ROUTES_FILE
+  echo "POST       /:srn/change-${URL_PATH}/:index                          ${PACKAGE}.${CLASS_NAME}Controller.onSubmit(srn: Srn, index: ${INDEX}, mode: Mode = CheckMode)" >> $ROUTES_FILE
+else
+  echo "GET        /:srn/${URL_PATH}                                        ${PACKAGE}.${CLASS_NAME}Controller.onPageLoad(srn: Srn, mode: Mode = NormalMode)" >> $ROUTES_FILE
+  echo "POST       /:srn/${URL_PATH}                                        ${PACKAGE}.${CLASS_NAME}Controller.onSubmit(srn: Srn, mode: Mode = NormalMode)" >> $ROUTES_FILE
+
+  echo "GET        /:srn/change-${URL_PATH}                                 ${PACKAGE}.${CLASS_NAME}Controller.onPageLoad(srn: Srn, mode: Mode = CheckMode)" >> $ROUTES_FILE
+  echo "POST       /:srn/change-${URL_PATH}                                 ${PACKAGE}.${CLASS_NAME}Controller.onSubmit(srn: Srn, mode: Mode = CheckMode)" >> $ROUTES_FILE
+fi

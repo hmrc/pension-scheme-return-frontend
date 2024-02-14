@@ -41,7 +41,8 @@ trait NavigatorBehaviours extends ScalaCheckPropertyChecks with EitherValues wit
 
     import Behaviours._
 
-    implicit val req: DataRequest[AnyContentAsEmpty.type] = DataRequest(allowedAccessRequestGen(FakeRequest()).sample.value, defaultUserAnswers)
+    implicit val req: DataRequest[AnyContentAsEmpty.type] =
+      DataRequest(allowedAccessRequestGen(FakeRequest()).sample.value, defaultUserAnswers)
 
     protected def navigateTo(mode: Mode)(
       page: Srn => Page,

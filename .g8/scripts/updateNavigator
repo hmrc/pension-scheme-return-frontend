@@ -1,6 +1,9 @@
 #!/bin/bash
 
-# uses sed to insert route to supplied navigator file and update navigator spec
+# Uses sed to insert route to supplied navigator file and update navigator spec
+
+# todo
+# - check EOF of routes file and if it doesn't have a newline, create one
 
 set -e
 
@@ -8,6 +11,7 @@ set -e
 [ -z "$2" ] && echo "missing first param DIR" && exit 1
 
 PAGE=$1
+
 DIR=$2
 INDEX="$3"
 SECONDARY_INDEX="$4"
@@ -36,6 +40,14 @@ shares)
 sharesdisposal)
   NAV_FILE="../app/navigation/nonsipp/SharesDisposalNavigator.scala"
   NAV_SPEC="../test/navigation/nonsipp/SharesDisposalNavigatorSpec.scala"
+  ;;
+unregulatedorconnectedbonds)
+  NAV_FILE="../app/navigation/nonsipp/UnregulatedOrConnectedBondsNavigator.scala"
+  NAV_SPEC="../test/navigation/nonsipp/UnregulatedOrConnectedBondsNavigatorSpec.scala"
+  ;;
+bondsdisposal)
+  NAV_FILE="../app/navigation/nonsipp/BondsDisposalNavigator.scala"
+  NAV_SPEC="../test/navigation/nonsipp/BondsDisposalNavigatorSpec.scala"
   ;;
 *)
   NAV_FILE=

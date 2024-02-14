@@ -2658,3 +2658,7 @@ bonds.incomeFromBonds.hint = This includes income and any other receipts.
 bonds.incomeFromBonds.error.required = Enter the total income from these bonds in the period of this return, in pounds and pence
 bonds.incomeFromBonds.error.invalid = Total income from these bonds in the period of this return must be an amount of money that is 0 or more, like 123 or 123.45
 bonds.incomeFromBonds.error.tooLarge = Total income from these bonds in the period of this return must be 999999999.99 or less
+
+bondsDisposal.title = Did the scheme dispose of any unregulated bonds, or bonds acquired from a connected party, during the period of this return?
+bondsDisposal.heading = Did {0} dispose of any unregulated bonds, or bonds acquired from a connected party, during the period of this return?
+bondsDisposal.error.required = Select yes if the scheme disposed of any unregulated bonds, or bonds acquired from a connected party, during the period of this return
