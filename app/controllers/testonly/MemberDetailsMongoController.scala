@@ -22,13 +22,7 @@ import controllers.actions.IdentifyAndRequireData
 import eu.timepit.refined._
 import models.SchemeId.Srn
 import models.UserAnswers
-import pages.nonsipp.memberdetails.{
-  DoesMemberHaveNinoPage,
-  MemberDetailsNinoPage,
-  MemberDetailsPage,
-  MemberStatus,
-  NoNINOPage
-}
+import pages.nonsipp.memberdetails._
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -47,7 +41,7 @@ class MemberDetailsMongoController @Inject()(
     extends FrontendBaseController
     with I18nSupport {
 
-  private val max: Max300 = refineMV(99)
+  private val max: Max300 = refineMV(300)
 
   def addMemberDetails(srn: Srn, num: Max300): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>

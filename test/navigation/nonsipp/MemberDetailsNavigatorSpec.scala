@@ -236,7 +236,7 @@ class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         normalmode
           .navigateTo(
             FileUploadSuccessPage,
-            (srn, _) => controllers.nonsipp.memberdetails.routes.SchemeMembersListController.onPageLoad(srn, 1, Upload)
+            (srn, _) => controllers.nonsipp.memberdetails.routes.SchemeMembersListController.onPageLoad(srn, 1, Manual)
           )
           .withName("go from file upload success page to scheme members list page")
       )
