@@ -797,9 +797,9 @@ object SharesCYAController {
               "site.change",
               (typeOfShare, holdShares) match {
                 case (typeOfShare, holdShares) if typeOfShare == SponsoringEmployer || holdShares == Acquisition =>
-                  routes.SharesTotalIncomeController.onPageLoad(srn, index, mode).url
-                case _ =>
                   routes.TotalAssetValueController.onPageLoad(srn, index, mode).url
+                case _ =>
+                  routes.SharesTotalIncomeController.onPageLoad(srn, index, mode).url
               }
             ).withVisuallyHiddenContent("sharesCYA.section4.totalAssetValue.hidden", schemeName)
           )
