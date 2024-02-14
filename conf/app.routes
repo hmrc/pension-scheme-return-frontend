@@ -33,6 +33,7 @@ GET         /account/signed-out                                                 
 GET         /unauthorised                                                               controllers.UnauthorisedController.onPageLoad()
 
 GET         /:srn/what-you-will-need/:fbNumber                                          controllers.WhatYouWillNeedController.onPageLoad(srn: Srn, fbNumber: String, taxYear: String = "", version: String = "")
+GET         /:srn/what-you-will-need/:taxYear/:version                                     controllers.WhatYouWillNeedController.onPageLoad(srn: Srn, fbNumber: String = "", taxYear: String, version: String)
 GET         /:srn/what-you-will-need                                                    controllers.WhatYouWillNeedController.onPageLoad(srn: Srn, fbNumber: String = "", taxYear: String = "2022-04-06", version: String = "001")
 GET         /:srn/what-you-will-need-next-page                                          controllers.WhatYouWillNeedController.onSubmit(srn: Srn, taxYear: String, fbNumber: String,  version: String)
 
