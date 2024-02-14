@@ -2,33 +2,12 @@
 
 set -e
 
+$! Generic !$
 echo ""
-echo "Applying migration $className;format="snake"$"
+echo "Applying migration $className;format="cap"$"
 
-echo "Adding routes to conf/app.routes"
-
-$if(directory.empty)$
-DIR=../conf/app.routes
-PACKAGE="controllers.nonsipp"
-$else$
-DIR=../conf/$directory$.routes
-PACKAGE="controllers.nonsipp.$directory$"
-$endif$
-
-echo -en "\n\n" >> \$DIR
-$if(index.empty)$
-echo "GET        /:srn/$urlPath$                        \${PACKAGE}.$className$Controller.onPageLoad(srn: Srn, mode: Mode = NormalMode)" >> \$DIR
-echo "POST       /:srn/$urlPath$                        \${PACKAGE}.$className$Controller.onSubmit(srn: Srn, mode: Mode = NormalMode)" >> \$DIR
-
-echo "GET        /:srn/change-$urlPath$                 \${PACKAGE}.$className$Controller.onPageLoad(srn: Srn, mode: Mode = CheckMode)" >> \$DIR
-echo "POST       /:srn/change-$urlPath$                 \${PACKAGE}.$className$Controller.onSubmit(srn: Srn, mode: Mode = CheckMode)" >> \$DIR
-$else$
-echo "GET        /:srn/$urlPath$/:index                 \${PACKAGE}.$className$Controller.onPageLoad(srn: Srn, index: $index$, mode: Mode = NormalMode)" >> \$DIR
-echo "POST       /:srn/$urlPath$/:index                 \${PACKAGE}.$className$Controller.onSubmit(srn: Srn, index: $index$, mode: Mode = NormalMode)" >> \$DIR
-
-echo "GET        /:srn/change-$urlPath$/:index          \${PACKAGE}.$className$Controller.onPageLoad(srn: Srn, index: $index$, mode: Mode = CheckMode)" >> \$DIR
-echo "POST       /:srn/change-$urlPath$/:index          \${PACKAGE}.$className$Controller.onSubmit(srn: Srn, index: $index$, mode: Mode = CheckMode)" >> \$DIR
-$endif$
+../.g8/scripts/updateRoutes "$className;format="cap"$" "$urlPath$" $if(!directory.empty)$"$directory$"$endif$ $if(!index.empty)$"$index$"$endif$ $if(!secondaryIndex.empty)$"$secondaryIndex$"$endif$
+$! Generic end !$
 
 echo "Adding messages to conf.messages"
 
@@ -48,8 +27,13 @@ echo "$className;format="decap"$.no.conditional.error.required = $noErrorRequire
 echo "$className;format="decap"$.no.conditional.error.invalid = $noErrorInvalid$"  >> ../conf/messages.en
 echo "$className;format="decap"$.no.conditional.error.length = $noErrorLength$"  >> ../conf/messages.en
 
-echo "Add to navigator"
+$! Generic !$
 
-echo "case $className;format="cap"$Page(srn) => controllers.routes.UnauthorisedController.onPageLoad()"
+if [ -z "$directory$" ]; then
+  echo "\$directory\$ empty, skipping"
+else
+  ../.g8/scripts/updateNavigator "$className;format="cap"$Page" "$directory$" $if(!index.empty)$"$index$"$endif$ $if(!secondaryIndex.empty)$"$secondaryIndex$"$endif$
+fi
 
-echo "Migration $className;format="snake"$ completed"
+echo "Migration $className;format="cap"$ completed"
+$! Generic end !$
