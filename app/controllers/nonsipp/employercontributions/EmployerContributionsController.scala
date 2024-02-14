@@ -16,6 +16,7 @@
 
 package controllers.nonsipp.employercontributions
 
+import controllers.PSRController
 import controllers.actions._
 import controllers.nonsipp.employercontributions.EmployerContributionsController.viewModel
 import forms.YesNoPageFormProvider
@@ -26,7 +27,7 @@ import pages.nonsipp.employercontributions.EmployerContributionsPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
+import services.{PsrSubmissionService, SaveService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
@@ -42,10 +43,10 @@ class EmployerContributionsController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   formProvider: YesNoPageFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: YesNoPageView
+  view: YesNoPageView,
+  psrSubmissionService: PsrSubmissionService
 )(implicit ec: ExecutionContext)
-    extends FrontendBaseController
-    with I18nSupport {
+    extends PSRController {
 
   private def form: Form[Boolean] =
     EmployerContributionsController.form(formProvider)
@@ -67,7 +68,11 @@ class EmployerContributionsController @Inject()(
                 .set(EmployerContributionsPage(srn), value)
             )
             _ <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage(EmployerContributionsPage(srn), mode, updatedAnswers))
+            submissionResult <- if (value) Future.successful(Some(()))
+            else psrSubmissionService.submitPsrDetails(srn, updatedAnswers)
+          } yield submissionResult.getOrRecoverJourney(
+            _ => Redirect(navigator.nextPage(EmployerContributionsPage(srn), mode, updatedAnswers))
+          )
       )
   }
 }

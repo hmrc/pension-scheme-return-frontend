@@ -294,7 +294,7 @@ object PsrRetrievalServiceSpec {
 
   val memberPayments: MemberPayments = MemberPayments(
     memberDetails = List.empty,
-    employerContributionsCompleted = true,
+    employerContributionsDetails = SectionDetails(made = true, completed = true),
     transfersInCompleted = true,
     transfersOutCompleted = true,
     unallocatedContribsMade = true,
