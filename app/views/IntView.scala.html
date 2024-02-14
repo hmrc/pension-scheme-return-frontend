@@ -57,12 +57,16 @@
         )
       }
     } else {
-      @govukInput(
-        InputViewModel(
-          field = viewmodel.page.form("value"),
-          label = LabelViewModel(renderMessage(viewmodel.heading)).asPageHeading()
-        ).withWidth(InputWidth.Fixed10)
-      )
+        @viewmodel.page.fields.map { case (field) =>
+            @govukInput(
+                InputViewModel(
+                    field = viewmodel.page.form("value"),
+                    label = LabelViewModel(renderMessage(viewmodel.heading)).asPageHeading()
+                )
+                .withHint(field.hint.map(h => Hint(content = HtmlContent(renderMessage(h)))))
+                .withWidth(InputWidth.Fixed10)
+            )
+        }
     }
 
     @govukButton(
