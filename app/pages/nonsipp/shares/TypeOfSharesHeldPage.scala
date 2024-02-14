@@ -30,3 +30,9 @@ case class TypeOfSharesHeldPage(srn: Srn, index: Max5000) extends QuestionPage[T
 
   override def toString: String = "typeOfSharesHeld"
 }
+
+case class TypeOfSharesHeldPages(srn: Srn) extends QuestionPage[Map[String, TypeOfShares]] {
+  override def path: JsPath =
+    Paths.shareTransactions \ toString
+  override def toString: String = "typeOfSharesHeld"
+}

@@ -27,6 +27,7 @@ import pages.nonsipp.landorproperty.LandOrPropertyHeldPage
 import pages.nonsipp.landorpropertydisposal.LandOrPropertyDisposalPage
 import pages.nonsipp.loansmadeoroutstanding._
 import pages.nonsipp.moneyborrowed.MoneyBorrowedPage
+import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
 import transformations._
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -39,7 +40,8 @@ class PsrSubmissionService @Inject()(
   loanTransactionsTransformer: LoanTransactionsTransformer,
   landOrPropertyTransactionsTransformer: LandOrPropertyTransactionsTransformer,
   memberPaymentsTransformer: MemberPaymentsTransformer,
-  moneyBorrowedTransformer: MoneyBorrowedTransformer
+  moneyBorrowedTransformer: MoneyBorrowedTransformer,
+  sharesTransformer: SharesTransformer
 ) {
 
   def submitPsrDetails(
@@ -56,6 +58,8 @@ class PsrSubmissionService @Inject()(
     val landOrPropertyHeld = request.userAnswers.get(LandOrPropertyHeldPage(srn)).getOrElse(false)
     val moneyWasBorrowed = request.userAnswers.get(MoneyBorrowedPage(srn)).getOrElse(false)
     val disposeAnyLandOrProperty = request.userAnswers.get(LandOrPropertyDisposalPage(srn)).getOrElse(false)
+    val didSchemeHoldAnyShares = request.userAnswers.get(DidSchemeHoldAnySharesPage(srn)).getOrElse(false)
+
     (
       minimalRequiredSubmissionTransformer.transformToEtmp(srn),
       request.userAnswers.get(CheckReturnDatesPage(srn))
@@ -79,7 +83,8 @@ class PsrSubmissionService @Inject()(
               )
             )
           ),
-          membersPayments = memberPaymentsTransformer.transformToEtmp(srn, request.userAnswers)
+          membersPayments = memberPaymentsTransformer.transformToEtmp(srn, request.userAnswers),
+          shares = Option.when(didSchemeHoldAnyShares)(sharesTransformer.transformToEtmp(srn))
         )
       )
     }.sequence
