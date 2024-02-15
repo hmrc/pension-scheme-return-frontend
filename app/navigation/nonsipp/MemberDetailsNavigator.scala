@@ -92,7 +92,7 @@ object MemberDetailsNavigator extends JourneyNavigator {
 
     case FileUploadSuccessPage(srn) =>
       controllers.nonsipp.memberdetails.routes.SchemeMembersListController
-        .onPageLoad(srn, 1, Upload)
+        .onPageLoad(srn, 1, Manual)
 
     case FileUploadErrorPage(srn, UploadFormatError) =>
       controllers.nonsipp.memberdetails.upload.routes.FileUploadErrorMissingInformationController

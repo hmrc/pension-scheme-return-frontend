@@ -28,7 +28,7 @@ import scala.util.Try
 
 case class DoesMemberHaveNinoPage(srn: Srn, index: Max300) extends QuestionPage[Boolean] {
 
-  override def path: JsPath = JsPath \ toString \ index.arrayIndex
+  override def path: JsPath = Paths.personalDetails \ toString \ index.arrayIndex
 
   override def toString: String = "nationalInsuranceNumber"
 
@@ -45,5 +45,5 @@ case class DoesMemberHaveNinoPage(srn: Srn, index: Max300) extends QuestionPage[
 
 case class DoesMemberHaveNinoPages(srn: Srn) extends Removable[List[Boolean]] {
 
-  override def path: JsPath = JsPath \ "nationalInsuranceNumber"
+  override def path: JsPath = Paths.personalDetails \ "nationalInsuranceNumber"
 }

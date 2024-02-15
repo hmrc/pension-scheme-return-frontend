@@ -18,7 +18,7 @@ package pages.nonsipp.landorpropertydisposal
 
 import config.Refined.{Max50, Max5000}
 import models.SchemeId.Srn
-import pages.{IndexedQuestionPage, QuestionPage}
+import pages.QuestionPage
 import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
 
@@ -27,14 +27,6 @@ case class CompanyBuyerNamePage(srn: Srn, landOrPropertyIndex: Max5000, disposal
 
   override def path: JsPath =
     Paths.disposalPropertyTransaction \ toString \ landOrPropertyIndex.arrayIndex.toString \ disposalIndex.arrayIndex.toString
-
-  override def toString: String = "nameOfPurchaser"
-}
-
-case class CompanyBuyerNamePages(srn: Srn, landOrPropertyIndex: Max5000) extends IndexedQuestionPage[String] {
-
-  override def path: JsPath =
-    Paths.disposalPropertyTransaction \ toString \ landOrPropertyIndex.arrayIndex.toString
 
   override def toString: String = "nameOfPurchaser"
 }
