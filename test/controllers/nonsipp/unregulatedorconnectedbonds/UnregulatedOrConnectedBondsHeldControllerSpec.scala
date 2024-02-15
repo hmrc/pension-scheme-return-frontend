@@ -32,7 +32,8 @@ class UnregulatedOrConnectedBondsHeldControllerSpec extends ControllerBaseSpec {
   "UnregulatedOrConnectedBondsHeldController" - {
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
-      injected[YesNoPageView].apply(form(injected[YesNoPageFormProvider]), viewModel(srn, schemeName, incomeTaxAct, NormalMode))
+      injected[YesNoPageView]
+        .apply(form(injected[YesNoPageFormProvider]), viewModel(srn, schemeName, incomeTaxAct, NormalMode))
     })
 
     act.like(renderPrePopView(onPageLoad, UnregulatedOrConnectedBondsHeldPage(srn), true) {

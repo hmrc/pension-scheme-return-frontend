@@ -97,11 +97,10 @@ object UnregulatedOrConnectedBondsHeldController {
           "unregulatedOrConnectedBondsHeld.listItem1",
           "unregulatedOrConnectedBondsHeld.listItem2"
         ) ++
-        ParagraphMessage("unregulatedOrConnectedBondsHeld.paragraph2") ++
         ParagraphMessage(
-          "unregulatedOrConnectedBondsHeld.paragraph3",
+          "unregulatedOrConnectedBondsHeld.paragraph2",
           LinkMessage(
-            "unregulatedOrConnectedBondsHeld.paragraph3.link",
+            "unregulatedOrConnectedBondsHeld.paragraph2.link",
             incomeTaxAct,
             Map("rel" -> "noreferrer noopener", "target" -> "_blank")
           )
