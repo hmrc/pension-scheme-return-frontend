@@ -5,3 +5,12 @@ POST        /:srn/change-unregulated-connected-party-bonds-held                 
 
 GET         /:srn/what-you-will-need-bonds                                              controllers.nonsipp.unregulatedorconnectedbonds.WhatYouWillNeedBondsController.onPageLoad(srn: Srn)
 GET         /:srn/submit-what-you-will-need-bonds                                       controllers.nonsipp.unregulatedorconnectedbonds.WhatYouWillNeedBondsController.onSubmit(srn: Srn)
+
+GET         /:srn/name-of-bonds                                                         controllers.nonsipp.unregulatedorconnectedbonds.NameOfBondsController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
+GET         /:srn/name-of-bonds/:index                                                  controllers.nonsipp.unregulatedorconnectedbonds.NameOfBondsController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/name-of-bonds                                                         controllers.nonsipp.unregulatedorconnectedbonds.NameOfBondsController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
+POST        /:srn/name-of-bonds/:index                                                  controllers.nonsipp.unregulatedorconnectedbonds.NameOfBondsController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/change-name-of-bonds                                                  controllers.nonsipp.unregulatedorconnectedbonds.NameOfBondsController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
+GET         /:srn/change-name-of-bonds/:index                                           controllers.nonsipp.unregulatedorconnectedbonds.NameOfBondsController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-name-of-bonds                                                  controllers.nonsipp.unregulatedorconnectedbonds.NameOfBondsController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
+POST        /:srn/change-name-of-bonds/:index                                           controllers.nonsipp.unregulatedorconnectedbonds.NameOfBondsController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)

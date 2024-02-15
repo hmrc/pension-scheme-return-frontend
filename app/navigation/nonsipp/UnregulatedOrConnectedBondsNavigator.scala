@@ -16,7 +16,8 @@
 
 package navigation.nonsipp
 
-import models.UserAnswers
+import eu.timepit.refined.refineMV
+import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.unregulatedorconnectedbonds._
@@ -33,6 +34,10 @@ object UnregulatedOrConnectedBondsNavigator extends JourneyNavigator {
       }
 
     case WhatYouWillNeedBondsPage(srn) =>
+      controllers.nonsipp.unregulatedorconnectedbonds.routes.NameOfBondsController
+        .onPageLoad(srn, refineMV(1), NormalMode)
+
+    case NameOfBondsPage(srn, index) =>
       controllers.routes.UnauthorisedController.onPageLoad()
   }
 

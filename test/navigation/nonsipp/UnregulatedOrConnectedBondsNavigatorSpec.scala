@@ -16,6 +16,9 @@
 
 package navigation.nonsipp
 
+import config.Refined.{Max5000, OneTo5000}
+import eu.timepit.refined.refineMV
+import models.NormalMode
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.unregulatedorconnectedbonds._
@@ -24,6 +27,7 @@ import utils.BaseSpec
 class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
   val navigator: Navigator = new NonSippNavigator
+  private val index = refineMV[OneTo5000](1)
 
   "UnregulatedOrConnectedBondsNavigator" - {
 
@@ -53,10 +57,26 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
         normalmode
           .navigateTo(
             WhatYouWillNeedBondsPage,
-            (srn, _) => controllers.routes.UnauthorisedController.onPageLoad()
+            (srn, _) =>
+              controllers.nonsipp.unregulatedorconnectedbonds.routes.NameOfBondsController
+                .onPageLoad(srn, index, NormalMode)
           )
           .withName(
-            "go from WhatYouWillNeedBondsPage to Unauthorised"
+            "go from WhatYouWillNeedBondsPage to NameOfBondsPage"
+          )
+      )
+    }
+
+    "NameOfBondsPage" - {
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            NameOfBondsPage,
+            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          )
+          .withName(
+            "go from NameOfBondsPage to WhyDoesSchemeHoldShares page"
           )
       )
     }
