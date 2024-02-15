@@ -16,7 +16,8 @@
 
 package navigation.nonsipp
 
-import models.{HowSharesDisposed, IdentityType, NormalMode, UserAnswers}
+import models.PointOfEntry._
+import models.{CheckMode, HowSharesDisposed, IdentityType, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.sharesdisposal._
@@ -107,7 +108,7 @@ object SharesDisposalNavigator extends JourneyNavigator {
     case page @ HowWereSharesDisposedPage(srn, shareIndex, disposalIndex, _) =>
       userAnswers.get(page) match {
         case None =>
-          controllers.routes.UnauthorisedController.onPageLoad()
+          controllers.routes.JourneyRecoveryController.onPageLoad()
         case Some(HowSharesDisposed.Sold) =>
           controllers.nonsipp.sharesdisposal.routes.WhenWereSharesSoldController
             .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
@@ -148,13 +149,190 @@ object SharesDisposalNavigator extends JourneyNavigator {
         .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
 
     case HowManySharesPage(srn, shareIndex, disposalIndex) =>
+      controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
+        .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
+
+    case SharesDisposalCompletedPage(srn, shareIndex, disposalIndex) =>
       controllers.routes.UnauthorisedController.onPageLoad()
 
   }
 
   override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] =
     _ =>
-      _ => {
-        PartialFunction.empty
+      userAnswers => {
+
+        case page @ HowWereSharesDisposedPage(srn, shareIndex, disposalIndex, _) => //c
+          userAnswers.get(page) match {
+            case None =>
+              controllers.routes.JourneyRecoveryController.onPageLoad()
+            case Some(HowSharesDisposed.Sold) =>
+              controllers.nonsipp.sharesdisposal.routes.WhenWereSharesSoldController //d
+                .onPageLoad(srn, shareIndex, disposalIndex, CheckMode)
+            case Some(HowSharesDisposed.Redeemed) =>
+              controllers.nonsipp.sharesdisposal.routes.WhenWereSharesRedeemedController //l
+                .onPageLoad(srn, shareIndex, disposalIndex, CheckMode)
+            case Some(HowSharesDisposed.Transferred) | Some(HowSharesDisposed.Other(_)) =>
+              controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
+                .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
+          }
+
+        case WhenWereSharesSoldPage(srn, shareIndex, disposalIndex) => //d
+          userAnswers.get(SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex)) match {
+            case Some(NoPointOfEntry) =>
+              controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
+                .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
+            case Some(HowWereSharesDisposedPointOfEntry) =>
+              controllers.nonsipp.sharesdisposal.routes.HowManySharesSoldController //e
+                .onPageLoad(srn, shareIndex, disposalIndex, CheckMode)
+          }
+
+        case HowManySharesSoldPage(srn, shareIndex, disposalIndex) => //e
+          userAnswers.get(SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex)) match {
+            case Some(NoPointOfEntry) =>
+              controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
+                .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
+            case Some(HowWereSharesDisposedPointOfEntry) =>
+              controllers.nonsipp.sharesdisposal.routes.TotalConsiderationSharesSoldController //f
+                .onPageLoad(srn, shareIndex, disposalIndex, CheckMode)
+          }
+
+        case TotalConsiderationSharesSoldPage(srn, shareIndex, disposalIndex) => //f
+          userAnswers.get(SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex)) match {
+            case Some(NoPointOfEntry) =>
+              controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
+                .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
+            case Some(HowWereSharesDisposedPointOfEntry) =>
+              controllers.nonsipp.sharesdisposal.routes.WhoWereTheSharesSoldToController //g
+                .onPageLoad(srn, shareIndex, disposalIndex, CheckMode)
+          }
+
+        case WhoWereTheSharesSoldToPage(srn, shareIndex, disposalIndex) => //g
+          // Ignore PointOfEntry here, as the next page in CheckMode is always the 'BuyerNamePage' for that IdentityType
+          userAnswers.get(WhoWereTheSharesSoldToPage(srn, shareIndex, disposalIndex)) match {
+            case Some(IdentityType.Individual) =>
+              controllers.nonsipp.sharesdisposal.routes.SharesIndividualBuyerNameController //h
+                .onPageLoad(srn, shareIndex, disposalIndex, CheckMode)
+            case Some(IdentityType.UKCompany) =>
+              controllers.nonsipp.sharesdisposal.routes.CompanyNameOfSharesBuyerController //i
+                .onPageLoad(srn, shareIndex, disposalIndex, CheckMode)
+            case Some(IdentityType.UKPartnership) =>
+              controllers.nonsipp.sharesdisposal.routes.PartnershipBuyerNameController //j
+                .onPageLoad(srn, shareIndex, disposalIndex, CheckMode)
+            case Some(IdentityType.Other) =>
+              controllers.nonsipp.sharesdisposal.routes.OtherBuyerDetailsController //k
+                .onPageLoad(srn, shareIndex, disposalIndex, CheckMode)
+          }
+
+        case SharesIndividualBuyerNamePage(srn, shareIndex, disposalIndex) => //h
+          userAnswers.get(SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex)) match {
+            case Some(NoPointOfEntry) =>
+              controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
+                .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
+            case Some(HowWereSharesDisposedPointOfEntry) | Some(WhoWereTheSharesSoldToPointOfEntry) =>
+              controllers.nonsipp.sharesdisposal.routes.IndividualBuyerNinoNumberController //h1
+                .onPageLoad(srn, shareIndex, disposalIndex, CheckMode)
+          }
+
+        case CompanyBuyerNamePage(srn, shareIndex, disposalIndex) => //i
+          userAnswers.get(SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex)) match {
+            case Some(NoPointOfEntry) =>
+              controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
+                .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
+            case Some(HowWereSharesDisposedPointOfEntry) | Some(WhoWereTheSharesSoldToPointOfEntry) =>
+              controllers.nonsipp.sharesdisposal.routes.CompanyBuyerCrnController //i1
+                .onPageLoad(srn, shareIndex, disposalIndex, CheckMode)
+          }
+
+        case PartnershipBuyerNamePage(srn, shareIndex, disposalIndex) => //j
+          userAnswers.get(SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex)) match {
+            case Some(NoPointOfEntry) =>
+              controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
+                .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
+            case Some(HowWereSharesDisposedPointOfEntry) | Some(WhoWereTheSharesSoldToPointOfEntry) =>
+              controllers.nonsipp.sharesdisposal.routes.PartnershipBuyerUtrController //j1
+                .onPageLoad(srn, shareIndex, disposalIndex, CheckMode)
+          }
+
+        case OtherBuyerDetailsPage(srn, shareIndex, disposalIndex) => //k
+          userAnswers.get(SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex)) match {
+            case Some(NoPointOfEntry) | Some(WhoWereTheSharesSoldToPointOfEntry) =>
+              controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
+                .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
+            case Some(HowWereSharesDisposedPointOfEntry) =>
+              controllers.nonsipp.sharesdisposal.routes.IsBuyerConnectedPartyController //o
+                .onPageLoad(srn, shareIndex, disposalIndex, CheckMode)
+          }
+
+        case IndividualBuyerNinoNumberPage(srn, shareIndex, disposalIndex) => //h1
+          userAnswers.get(SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex)) match {
+            case Some(NoPointOfEntry) | Some(WhoWereTheSharesSoldToPointOfEntry) =>
+              controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
+                .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
+            case Some(HowWereSharesDisposedPointOfEntry) =>
+              controllers.nonsipp.sharesdisposal.routes.IsBuyerConnectedPartyController //o
+                .onPageLoad(srn, shareIndex, disposalIndex, CheckMode)
+          }
+
+        case CompanyBuyerCrnPage(srn, shareIndex, disposalIndex) => //i1
+          userAnswers.get(SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex)) match {
+            case Some(NoPointOfEntry) | Some(WhoWereTheSharesSoldToPointOfEntry) =>
+              controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
+                .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
+            case Some(HowWereSharesDisposedPointOfEntry) =>
+              controllers.nonsipp.sharesdisposal.routes.IsBuyerConnectedPartyController //o
+                .onPageLoad(srn, shareIndex, disposalIndex, CheckMode)
+          }
+
+        case PartnershipBuyerUtrPage(srn, shareIndex, disposalIndex) => //j1
+          userAnswers.get(SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex)) match {
+            case Some(NoPointOfEntry) | Some(WhoWereTheSharesSoldToPointOfEntry) =>
+              controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
+                .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
+            case Some(HowWereSharesDisposedPointOfEntry) =>
+              controllers.nonsipp.sharesdisposal.routes.IsBuyerConnectedPartyController //o
+                .onPageLoad(srn, shareIndex, disposalIndex, CheckMode)
+          }
+
+        case IsBuyerConnectedPartyPage(srn, shareIndex, disposalIndex) => //o
+          userAnswers.get(SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex)) match {
+            case Some(NoPointOfEntry) | Some(WhoWereTheSharesSoldToPointOfEntry) =>
+              controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
+                .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
+            case Some(HowWereSharesDisposedPointOfEntry) =>
+              controllers.nonsipp.sharesdisposal.routes.IndependentValuationController //p
+                .onPageLoad(srn, shareIndex, disposalIndex, CheckMode)
+          }
+
+        case IndependentValuationPage(srn, shareIndex, disposalIndex) => //p
+          controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
+            .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
+
+        case WhenWereSharesRedeemedPage(srn, shareIndex, disposalIndex) => //l
+          userAnswers.get(SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex)) match {
+            case Some(NoPointOfEntry) =>
+              controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
+                .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
+            case Some(HowWereSharesDisposedPointOfEntry) =>
+              controllers.nonsipp.sharesdisposal.routes.HowManySharesRedeemedController //m
+                .onPageLoad(srn, shareIndex, disposalIndex, CheckMode)
+          }
+
+        case HowManySharesRedeemedPage(srn, shareIndex, disposalIndex) => //m
+          userAnswers.get(SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex)) match {
+            case Some(NoPointOfEntry) =>
+              controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
+                .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
+            case Some(HowWereSharesDisposedPointOfEntry) =>
+              controllers.nonsipp.sharesdisposal.routes.TotalConsiderationSharesRedeemedController //n
+                .onPageLoad(srn, shareIndex, disposalIndex, CheckMode)
+          }
+
+        case TotalConsiderationSharesRedeemedPage(srn, shareIndex, disposalIndex) => //n
+          controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
+            .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
+
+        case HowManySharesPage(srn, shareIndex, disposalIndex) => //q
+          controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
+            .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
       }
 }

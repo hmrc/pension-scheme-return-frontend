@@ -506,13 +506,25 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               shareIndex,
               disposalIndex,
               HowManySharesPage,
-              (srn, index: Max5000, disposalIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+              (srn, index: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
+                  .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
             )
-            .withName("go from HowManySharesPage to Unauthorised")
+            .withName("go from HowManySharesPage to Shares Disposal CYA page")
         )
+      }
+
+      "SharesDisposalCYAPage" - {
+
+        //TODO:
+
       }
     }
 
-    "in CheckMode" - {}
+    "in CheckMode" - {
+
+      //TODO:
+
+    }
   }
 }

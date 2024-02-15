@@ -17,24 +17,19 @@
 package pages.nonsipp.sharesdisposal
 
 import config.Refined.{Max50, Max5000}
+import models.PointOfEntry
 import models.SchemeId.Srn
-import pages.{IndexedQuestionPage, QuestionPage}
+import pages.QuestionPage
+import pages.nonsipp.sharesdisposal.Paths.disposedSharesTransaction
 import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
-import viewmodels.models.SectionCompleted
 
-case class SharesDisposalCompletedPage(srn: Srn, shareIndex: Max5000, disposalIndex: Max50)
-    extends QuestionPage[SectionCompleted.type] {
+case class SharesDisposalCYAPointOfEntry(srn: Srn, shareIndex: Max5000, disposalIndex: Max50)
+    extends QuestionPage[PointOfEntry] {
 
   override def path: JsPath =
-    Paths.disposedSharesTransaction \ toString \ shareIndex.arrayIndex.toString \ disposalIndex.arrayIndex.toString
+    disposedSharesTransaction \ toString \ shareIndex.arrayIndex.toString \ disposalIndex.arrayIndex.toString
 
-  override def toString: String = "sharesDisposalCompleted"
-}
+  override def toString: String = "sharesDisposalCYAPointOfEntry"
 
-case class SharesDisposalCompletedPages(srn: Srn) extends IndexedQuestionPage[Map[String, SectionCompleted.type]] {
-
-  override def path: JsPath = Paths.disposedSharesTransaction \ toString
-
-  override def toString: String = "sharesDisposalCompleted"
 }
