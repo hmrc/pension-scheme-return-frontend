@@ -16,10 +16,12 @@
 
 package navigation.nonsipp
 
-import models.UserAnswers
+import eu.timepit.refined.refineMV
+import models.SchemeHoldBond.{Acquisition, Contribution, Transfer}
+import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldPage
+import pages.nonsipp.unregulatedorconnectedbonds._
 import play.api.mvc.Call
 
 object UnregulatedOrConnectedBondsNavigator extends JourneyNavigator {
@@ -27,10 +29,34 @@ object UnregulatedOrConnectedBondsNavigator extends JourneyNavigator {
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
     case page @ UnregulatedOrConnectedBondsHeldPage(srn) =>
       if (userAnswers.get(page).contains(true)) {
-        controllers.routes.UnauthorisedController.onPageLoad()
+        controllers.nonsipp.unregulatedorconnectedbonds.routes.WhatYouWillNeedBondsController.onPageLoad(srn)
       } else {
         controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
       }
+
+    case WhatYouWillNeedBondsPage(srn) =>
+      controllers.nonsipp.unregulatedorconnectedbonds.routes.NameOfBondsController
+        .onPageLoad(srn, refineMV(1), NormalMode)
+
+    case NameOfBondsPage(srn, index) =>
+      controllers.nonsipp.unregulatedorconnectedbonds.routes.WhyDoesSchemeHoldBondsController
+        .onPageLoad(srn, index, NormalMode)
+
+    case WhyDoesSchemeHoldBondsPage(srn, index) =>
+      userAnswers.get(WhyDoesSchemeHoldBondsPage(srn, index)) match {
+        case Some(Acquisition) =>
+          controllers.nonsipp.unregulatedorconnectedbonds.routes.WhenDidSchemeAcquireBondsController
+            .onPageLoad(srn, index, NormalMode)
+        case Some(Contribution) =>
+          controllers.nonsipp.unregulatedorconnectedbonds.routes.WhenDidSchemeAcquireBondsController
+            .onPageLoad(srn, index, NormalMode)
+        case Some(Transfer) =>
+          controllers.routes.UnauthorisedController.onPageLoad()
+        case _ => controllers.routes.UnauthorisedController.onPageLoad()
+      }
+
+    case WhenDidSchemeAcquireBondsPage(srn, index) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
   }
 
   override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] = _ => _ => PartialFunction.empty

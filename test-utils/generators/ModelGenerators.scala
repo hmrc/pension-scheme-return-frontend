@@ -303,6 +303,9 @@ trait ModelGenerators extends BasicGenerators {
   implicit val schemeHoldSharesGen: Gen[SchemeHoldShare] =
     Gen.oneOf(SchemeHoldShare.Acquisition, SchemeHoldShare.Contribution, SchemeHoldShare.Transfer)
 
+  implicit val schemeHoldBondsGen: Gen[SchemeHoldBond] =
+    Gen.oneOf(SchemeHoldBond.Acquisition, SchemeHoldBond.Contribution, SchemeHoldBond.Transfer)
+
   implicit val sponsoringOrConnectedPartyGen: Gen[SponsoringOrConnectedParty] =
     Gen.oneOf(
       SponsoringOrConnectedParty.Sponsoring,

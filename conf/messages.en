@@ -2570,3 +2570,42 @@ returnHistory.table.header5 = SubmittedBy
 removeShares.title = Are you sure you want to remove this share transaction?
 removeShares.heading = Are you sure you want to remove the share transaction for {0}?
 removeShares.error.required = Select yes if you are sure you want to remove this share transaction
+
+bonds.whatYouWillNeed.title = Unregulated bonds, or bonds acquired from a connected party, held by the scheme
+bonds.whatYouWillNeed.heading = Unregulated bonds, or bonds acquired from a connected party, held by {0}
+bonds.whatYouWillNeed.paragraph1 = Answer these questions for one bond transaction at a time. If you need to add more, you will be able to do this later.
+bonds.whatYouWillNeed.paragraph2 = You must tell us about all unregulated bonds, or bonds acquired from a connected party, held by the pension scheme at any point during the period of this return.
+bonds.whatYouWillNeed.paragraph3 = For each bond transaction, you need to tell us:
+bonds.whatYouWillNeed.paragraph3.listItem1 = the name of the bonds
+bonds.whatYouWillNeed.paragraph3.listItem2 = if the pension scheme holds these bonds as a result of acquisition (purchase), contribution or transfer
+bonds.whatYouWillNeed.paragraph3.listItem3 = the total cost of the bonds
+bonds.whatYouWillNeed.paragraph3.listItem4 = if the bonds are unregulated
+bonds.whatYouWillNeed.paragraph3.listItem5 = the total income or other receipts received from the bonds during the period of this return
+bonds.whatYouWillNeed.paragraph4 = If the bonds are held as a result of acquisition, you need to tell us the date they were acquired and if they were acquired from a connected party.
+bonds.whatYouWillNeed.paragraph5 = If the bonds are held as a result of contribution, you need to tell us the date they were acquired.
+
+bonds.nameOfBonds.title = What is the name of the bonds acquired in this transaction?
+bonds.nameOfBonds.heading = What is the name of the bonds acquired in this transaction?
+bonds.nameOfBonds.error.required = Enter the name of the bonds acquired in this transaction
+bonds.nameOfBonds.error.length = The name of the bonds acquired in this transaction must be 160 characters or fewer
+bonds.nameOfBonds.error.invalid = The name of the bonds acquired in this transaction must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+
+whyDoesSchemeHoldBonds.title = Why does the scheme hold these bonds?
+whyDoesSchemeHoldBonds.heading = Why does {0} hold these bonds?
+whyDoesSchemeHoldBonds.error.required = Select why the scheme holds these bonds
+whyDoesSchemeHoldBonds.radioList1 = Acquisition
+whyDoesSchemeHoldBonds.radioList1.hint = This can be a purchase.
+whyDoesSchemeHoldBonds.radioList2 = Contribution by an employer or member
+whyDoesSchemeHoldBonds.radioList3 = Transfer from another scheme
+
+whenDidSchemeAcquireBonds.title = When did the scheme acquire these bonds?
+whenDidSchemeAcquireBonds.heading = When did {0} acquire these bonds?
+whenDidSchemeAcquireBonds.dateOfAcquired.error.required.all = Enter the date the scheme acquired these bonds
+whenDidSchemeAcquireBonds.dateOfAcquired.error.required.day = Date the scheme acquired these bonds must include a day
+whenDidSchemeAcquireBonds.dateOfAcquired.error.required.month = Date the scheme acquired these bonds must include a month
+whenDidSchemeAcquireBonds.dateOfAcquired.error.required.year = Date the scheme acquired these bonds must include a year
+whenDidSchemeAcquireBonds.dateOfAcquired.error.required.two = Date the scheme acquired these bonds must include a {0} and {1}
+whenDidSchemeAcquireBonds.dateOfAcquired.error.invalid.date = Date the scheme acquired these bonds must be a real date
+whenDidSchemeAcquireBonds.dateOfAcquired.error.invalid.characters = Date the scheme acquired these bonds must only include numbers 0 to 9
+whenDidSchemeAcquireBonds.dateOfAcquired.error.future = Date the scheme acquired these bonds must be the same as or before {0}
+whenDidSchemeAcquireBonds.dateOfAcquired.error.after = Date the scheme acquired these bonds must be after {0}
