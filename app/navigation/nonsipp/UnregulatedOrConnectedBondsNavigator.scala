@@ -17,6 +17,7 @@
 package navigation.nonsipp
 
 import eu.timepit.refined.refineMV
+import models.SchemeHoldBond.{Acquisition, Contribution, Transfer}
 import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
@@ -38,7 +39,19 @@ object UnregulatedOrConnectedBondsNavigator extends JourneyNavigator {
         .onPageLoad(srn, refineMV(1), NormalMode)
 
     case NameOfBondsPage(srn, index) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+      controllers.nonsipp.unregulatedorconnectedbonds.routes.WhyDoesSchemeHoldBondsController
+        .onPageLoad(srn, index, NormalMode)
+
+    case WhyDoesSchemeHoldBondsPage(srn, index) =>
+      userAnswers.get(WhyDoesSchemeHoldBondsPage(srn, index)) match {
+        case Some(Acquisition) =>
+          controllers.routes.UnauthorisedController.onPageLoad()
+        case Some(Contribution) =>
+          controllers.routes.UnauthorisedController.onPageLoad()
+        case Some(Transfer) =>
+          controllers.routes.UnauthorisedController.onPageLoad()
+        case _ => controllers.routes.UnauthorisedController.onPageLoad()
+      }
   }
 
   override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] = _ => _ => PartialFunction.empty

@@ -2589,3 +2589,11 @@ bonds.nameOfBonds.heading = What is the name of the bonds acquired in this trans
 bonds.nameOfBonds.error.required = Enter the name of the bonds acquired in this transaction
 bonds.nameOfBonds.error.length = The name of the bonds acquired in this transaction must be 160 characters or fewer
 bonds.nameOfBonds.error.invalid = The name of the bonds acquired in this transaction must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+
+whyDoesSchemeHoldBonds.title = Why does the scheme hold these bonds?
+whyDoesSchemeHoldBonds.heading = Why does {0} hold these bonds?
+whyDoesSchemeHoldBonds.error.required = Select why the scheme holds these bonds
+whyDoesSchemeHoldBonds.radioList1 = Acquisition
+whyDoesSchemeHoldBonds.radioList1.hint = This can be a purchase.
+whyDoesSchemeHoldBonds.radioList2 = Contribution by an employer or member
+whyDoesSchemeHoldBonds.radioList3 = Transfer from another scheme

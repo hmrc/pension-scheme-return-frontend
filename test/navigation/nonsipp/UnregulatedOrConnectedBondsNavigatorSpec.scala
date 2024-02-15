@@ -18,11 +18,12 @@ package navigation.nonsipp
 
 import config.Refined.{Max5000, OneTo5000}
 import eu.timepit.refined.refineMV
-import models.NormalMode
+import models.{NormalMode, SchemeHoldBond}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.unregulatedorconnectedbonds._
 import utils.BaseSpec
+import utils.UserAnswersUtils.UserAnswersOps
 
 class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
@@ -73,10 +74,65 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
           .navigateToWithIndex(
             index,
             NameOfBondsPage,
-            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.unregulatedorconnectedbonds.routes.WhyDoesSchemeHoldBondsController
+                .onPageLoad(srn, index, NormalMode)
           )
           .withName(
-            "go from NameOfBondsPage to WhyDoesSchemeHoldShares page"
+            "go from NameOfBondsPage to WhyDoesSchemeHoldBonds page"
+          )
+      )
+    }
+
+    "WhyDoesSchemeHoldBondsPage" - {
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            WhyDoesSchemeHoldBondsPage,
+            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad(),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                WhyDoesSchemeHoldBondsPage(srn, index),
+                SchemeHoldBond.Acquisition
+              )
+          )
+          .withName(
+            "go from WhyDoesSchemeHoldBondsPage to Unauthorised page when holding is acquisition"
+          )
+      )
+
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            WhyDoesSchemeHoldBondsPage,
+            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad(),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                WhyDoesSchemeHoldBondsPage(srn, index),
+                SchemeHoldBond.Contribution
+              )
+          )
+          .withName(
+            "go from WhyDoesSchemeHoldBondsPage to Unauthorised page when holding is contribution"
+          )
+      )
+
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            WhyDoesSchemeHoldBondsPage,
+            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad(),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                WhyDoesSchemeHoldBondsPage(srn, index),
+                SchemeHoldBond.Transfer
+              )
+          )
+          .withName(
+            "go from WhyDoesSchemeHoldBondsPage to Unauthorised when holding is transfer"
           )
       )
     }

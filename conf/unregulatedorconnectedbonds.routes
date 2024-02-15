@@ -14,3 +14,8 @@ GET         /:srn/change-name-of-bonds                                          
 GET         /:srn/change-name-of-bonds/:index                                           controllers.nonsipp.unregulatedorconnectedbonds.NameOfBondsController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 POST        /:srn/change-name-of-bonds                                                  controllers.nonsipp.unregulatedorconnectedbonds.NameOfBondsController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
 POST        /:srn/change-name-of-bonds/:index                                           controllers.nonsipp.unregulatedorconnectedbonds.NameOfBondsController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET         /:srn/why-does-scheme-hold-bonds/:index                                    controllers.nonsipp.unregulatedorconnectedbonds.WhyDoesSchemeHoldBondsController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/why-does-scheme-hold-bonds/:index                                    controllers.nonsipp.unregulatedorconnectedbonds.WhyDoesSchemeHoldBondsController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/change-why-does-scheme-hold-bonds/:index                             controllers.nonsipp.unregulatedorconnectedbonds.WhyDoesSchemeHoldBondsController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-why-does-scheme-hold-bonds/:index                             controllers.nonsipp.unregulatedorconnectedbonds.WhyDoesSchemeHoldBondsController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
