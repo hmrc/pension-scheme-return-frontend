@@ -16,10 +16,9 @@
 
 package navigation.nonsipp
 
-import controllers.routes
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldPage
+import pages.nonsipp.unregulatedorconnectedbonds._
 import utils.BaseSpec
 
 class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
@@ -33,9 +32,10 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
         .navigateToWithData(
           UnregulatedOrConnectedBondsHeldPage,
           Gen.const(true),
-          (_, _) => routes.UnauthorisedController.onPageLoad()
+          (srn, _) =>
+            controllers.nonsipp.unregulatedorconnectedbonds.routes.WhatYouWillNeedBondsController.onPageLoad(srn)
         )
-        .withName("go from unregulated Or connected bonds held page to unauthorised page when yes selected")
+        .withName("go from unregulated Or connected bonds held page to WhatYouWillNeedBonds when yes selected")
     )
 
     act.like(
@@ -47,5 +47,18 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
         )
         .withName("go from unregulated Or connected bonds held page to other assets held page when no selected")
     )
+
+    "WhatYouWillNeedBondsPage" - {
+      act.like(
+        normalmode
+          .navigateTo(
+            WhatYouWillNeedBondsPage,
+            (srn, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          )
+          .withName(
+            "go from WhatYouWillNeedBondsPage to Unauthorised"
+          )
+      )
+    }
   }
 }

@@ -13,6 +13,7 @@
 ->          /                                                                           membersurrenderedbenefits.Routes
 ->          /                                                                           shares.Routes
 ->          /                                                                           sharesdisposal.Routes
+->          /                                                                           unregulatedorconnectedbonds.Routes
 
 GET         /                                                                           controllers.IndexController.onPageLoad()
 
@@ -174,11 +175,6 @@ GET         /:srn/fees-commissions-wages-salaries                               
 POST        /:srn/fees-commissions-wages-salaries                                       controllers.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 GET         /:srn/change-fees-commissions-wages-salaries                                controllers.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST        /:srn/change-fees-commissions-wages-salaries                                controllers.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesController.onSubmit(srn: Srn, mode: Mode = CheckMode)
-
-GET         /:srn/unregulated-connected-party-bonds-held                                controllers.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST        /:srn/unregulated-connected-party-bonds-held                                controllers.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-GET         /:srn/change-unregulated-connected-party-bonds-held                         controllers.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST        /:srn/change-unregulated-connected-party-bonds-held                         controllers.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
 GET         /:srn/other-assets-held                                                     controllers.nonsipp.otherassetsheld.OtherAssetsHeldController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 POST        /:srn/other-assets-held                                                     controllers.nonsipp.otherassetsheld.OtherAssetsHeldController.onSubmit(srn: Srn, mode: Mode = NormalMode)
