@@ -16,6 +16,7 @@
 
 package controllers.nonsipp.unregulatedorconnectedbonds
 
+import config.FrontendAppConfig
 import controllers.actions._
 import controllers.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldController._
 import forms.YesNoPageFormProvider
@@ -28,7 +29,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.DisplayMessage.Message
+import viewmodels.DisplayMessage.{LinkMessage, ListMessage, ListType, Message, ParagraphMessage}
 import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 import views.html.YesNoPageView
@@ -42,6 +43,7 @@ class UnregulatedOrConnectedBondsHeldController @Inject()(
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   formProvider: YesNoPageFormProvider,
+  config: FrontendAppConfig,
   val controllerComponents: MessagesControllerComponents,
   view: YesNoPageView
 )(implicit ec: ExecutionContext)
@@ -52,7 +54,7 @@ class UnregulatedOrConnectedBondsHeldController @Inject()(
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     val preparedForm = request.userAnswers.fillForm(UnregulatedOrConnectedBondsHeldPage(srn), form)
-    Ok(view(preparedForm, viewModel(srn, request.schemeDetails.schemeName, mode)))
+    Ok(view(preparedForm, viewModel(srn, request.schemeDetails.schemeName, config.urls.incomeTaxAct, mode)))
   }
 
   def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
@@ -60,7 +62,11 @@ class UnregulatedOrConnectedBondsHeldController @Inject()(
       .bindFromRequest()
       .fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, viewModel(srn, request.schemeDetails.schemeName, mode)))),
+          Future.successful(
+            BadRequest(
+              view(formWithErrors, viewModel(srn, request.schemeDetails.schemeName, config.urls.incomeTaxAct, mode))
+            )
+          ),
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(UnregulatedOrConnectedBondsHeldPage(srn), value))
@@ -75,9 +81,29 @@ object UnregulatedOrConnectedBondsHeldController {
     "unregulatedOrConnectedBondsHeld.error.required"
   )
 
-  def viewModel(srn: Srn, schemeName: String, mode: Mode): FormPageViewModel[YesNoPageViewModel] = YesNoPageViewModel(
-    "unregulatedOrConnectedBondsHeld.title",
-    Message("unregulatedOrConnectedBondsHeld.heading", schemeName),
-    routes.UnregulatedOrConnectedBondsHeldController.onSubmit(srn, mode)
-  )
+  def viewModel(srn: Srn, schemeName: String, incomeTaxAct: String, mode: Mode): FormPageViewModel[YesNoPageViewModel] =
+    FormPageViewModel(
+      "unregulatedOrConnectedBondsHeld.title",
+      Message("unregulatedOrConnectedBondsHeld.heading", schemeName),
+      YesNoPageViewModel(
+        legend = Some(Message("unregulatedOrConnectedBondsHeld.heading2"))
+      ),
+      controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldController
+        .onSubmit(srn, mode)
+    ).withDescription(
+      ParagraphMessage("unregulatedOrConnectedBondsHeld.paragraph1") ++
+        ListMessage(
+          ListType.Bullet,
+          "unregulatedOrConnectedBondsHeld.listItem1",
+          "unregulatedOrConnectedBondsHeld.listItem2"
+        ) ++
+        ParagraphMessage(
+          "unregulatedOrConnectedBondsHeld.paragraph2",
+          LinkMessage(
+            "unregulatedOrConnectedBondsHeld.paragraph2.link",
+            incomeTaxAct,
+            Map("rel" -> "noreferrer noopener", "target" -> "_blank")
+          )
+        )
+    )
 }

@@ -726,9 +726,15 @@ feesCommissionsWagesSalaries.error.required = Enter the amount the scheme paid i
 feesCommissionsWagesSalaries.error.invalid = Total of fees, commissions, wages and salaries must be an amount of money, like 123.45 or 156
 feesCommissionsWagesSalaries.error.tooLarge = Total of fees, commissions, wages and salaries must be 999999999.99 or less
 
-unregulatedOrConnectedBondsHeld.title = Did the scheme hold any unregulated bonds, or bonds acquired from a connected party, during the period of this return?
-unregulatedOrConnectedBondsHeld.heading = Did {0} hold any unregulated bonds, or bonds acquired from a connected party,  during the period of this return?
-unregulatedOrConnectedBondsHeld.error.required = Select yes if the scheme held any hold any unregulated bonds, or bonds acquired from a connected party, during the period of this return
+unregulatedOrConnectedBondsHeld.title = Tell us if the scheme held any unregulated bonds, or bonds acquired from a connected party
+unregulatedOrConnectedBondsHeld.heading = Tell us if {0} held any unregulated bonds, or bonds acquired from a connected party
+unregulatedOrConnectedBondsHeld.error.required = Select yes if the scheme held any of these types of bonds during the period of this return
+unregulatedOrConnectedBondsHeld.paragraph1 = You must tell us if the scheme held any of these types of bonds at any point during the period of this return:
+unregulatedOrConnectedBondsHeld.listItem1 = unregulated bonds that are not on the Financial Conduct Authority (FCA) Official List
+unregulatedOrConnectedBondsHeld.listItem2 = bonds acquired from a connected party
+unregulatedOrConnectedBondsHeld.paragraph2 = A connected party is an individual, company or partnership that is connected to either a member of the scheme or the sponsoring employer of the scheme. See a
+unregulatedOrConnectedBondsHeld.paragraph2.link = full list of connected parties (opens in new tab).
+unregulatedOrConnectedBondsHeld.heading2 = Did the scheme hold any of these types of bonds during the period of this return?
 
 moneyBorrowed.title = Did the scheme borrow any money during the period of this return?
 moneyBorrowed.heading = Did {0} borrow any money during the period of this return?
