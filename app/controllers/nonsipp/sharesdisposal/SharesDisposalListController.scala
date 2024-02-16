@@ -19,13 +19,15 @@ package controllers.nonsipp.sharesdisposal
 import cats.implicits.{toShow, toTraverseOps}
 import com.google.inject.Inject
 import config.Constants
+import config.Refined.Max50.Refined
 import config.Refined.Max5000.enumerable
 import config.Refined.{Max50, Max5000}
 import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
 import controllers.nonsipp.shares.SharesListController.SharesData
 import controllers.nonsipp.sharesdisposal.SharesDisposalListController._
-import eu.timepit.refined.refineV
+import eu.timepit.refined.api.Refined
+import eu.timepit.refined.{refineMV, refineV}
 import forms.RadioListFormProvider
 import models.SchemeId.Srn
 import models.requests.DataRequest
@@ -122,7 +124,7 @@ object SharesDisposalListController {
     isNextDisposal: Boolean
   ): Option[Max50] =
     userAnswers.get(SharesDisposalCompletedPages(srn)) match {
-      case None => refineV[Max50.Refined](1).toOption
+      case None => Some(refineMV[Max50.Refined](1))
       case Some(completedDisposals) =>
         /**
          * Indexes of completed disposals sorted in ascending order.
@@ -130,7 +132,7 @@ object SharesDisposalListController {
          * while we are trying to fetch a completed disposal from a Map which is 0-based.
          * We then +1 when we re-refine the index
          */
-        val completedDisposalsForShares =
+        val completedDisposalsForShares: List[Max50] =
           completedDisposals
             .get((shareIndex.value - 1).toString)
             .map(_.keys.toList)
@@ -141,50 +143,42 @@ object SharesDisposalListController {
             .sortBy(_.value)
 
         completedDisposalsForShares.lastOption match {
-          case None => refineV[Max50.Refined](1).toOption
+          case None => Some(refineMV[Max50.Refined](1))
           case Some(lastCompletedDisposalForShares) =>
             if (isNextDisposal) {
               refineV[Max50.Refined](lastCompletedDisposalForShares.value + 1).toOption
             } else {
-              refineV[Max50.Refined](lastCompletedDisposalForShares.value).toOption
+              Some(lastCompletedDisposalForShares)
             }
         }
     }
 
-  private def buildRows(srn: Srn, shares: Map[Int, SharesData], userAnswers: UserAnswers): List[ListRadiosRow] =
-    shares.flatMap {
-      case (index, sharesData) =>
-        refineV[Max5000.Refined](index + 1).fold(
-          _ => Nil,
-          nextIndex => {
-            val disposalIndex = getDisposal(srn, nextIndex, userAnswers, isNextDisposal = false).get
-            val totalSharesNowHeld: Option[Int] = {
-              userAnswers.get(TotalSharesNowHeldPage(srn, nextIndex, disposalIndex))
-            }
-            totalSharesNowHeld match {
-              case Some(sharesRemaining) =>
-                if (sharesRemaining > 0) {
-                  List(
-                    ListRadiosRow(
-                      nextIndex.value,
-                      buildMessage(sharesData)
-                    )
-                  )
-                } else {
-                  val empty: List[ListRadiosRow] = List()
-                  empty
-                }
-              case _ =>
-                List(
-                  ListRadiosRow(
-                    nextIndex.value,
-                    buildMessage(sharesData)
-                  )
-                )
-            }
+  private def buildRows(srn: Srn, shares: List[SharesData], userAnswers: UserAnswers): List[ListRadiosRow] =
+    shares.flatMap { sharesData =>
+      val disposalIndex = getDisposal(srn, sharesData.index, userAnswers, isNextDisposal = false).get
+      val totalSharesNowHeld: Option[Int] =
+        userAnswers.get(TotalSharesNowHeldPage(srn, sharesData.index, disposalIndex))
+      totalSharesNowHeld match {
+        case Some(sharesRemaining) =>
+          if (sharesRemaining > 0) {
+            List(
+              ListRadiosRow(
+                sharesData.index.value,
+                buildMessage(sharesData)
+              )
+            )
+          } else {
+            Nil
           }
-        )
-    }.toList
+        case _ =>
+          List(
+            ListRadiosRow(
+              sharesData.index.value,
+              buildMessage(sharesData)
+            )
+          )
+      }
+    }
 
   private def buildMessage(sharesData: SharesData): Message =
     sharesData match {
@@ -219,12 +213,13 @@ object SharesDisposalListController {
     sharesList: List[SharesData],
     userAnswers: UserAnswers
   ): FormPageViewModel[ListRadiosViewModel] = {
-    val sharesMap = Iterator.from(0).zip(sharesList).toMap
+
+    val sortedSharesList = sharesList.sortBy(_.index.value)
 
     val pagination = Pagination(
       currentPage = page,
       pageSize = Constants.sharesDisposalListSize,
-      totalSize = sharesList.size,
+      totalSize = sortedSharesList.size,
       page => routes.SharesDisposalListController.onPageLoad(srn, page)
     )
 
@@ -237,7 +232,7 @@ object SharesDisposalListController {
       ),
       page = ListRadiosViewModel(
         legend = Some("sharesDisposal.sharesDisposalList.legend"),
-        rows = buildRows(srn, sharesMap, userAnswers),
+        rows = buildRows(srn, sortedSharesList, userAnswers),
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(
