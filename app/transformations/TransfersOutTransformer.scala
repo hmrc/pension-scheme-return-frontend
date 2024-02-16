@@ -30,7 +30,7 @@ import javax.inject.Inject
 import scala.util.Try
 
 @Singleton()
-class TransfersOutTransformer @Inject()() extends Transformer {
+class TransfersOutTransformer @Inject() extends Transformer {
 
   def transformToEtmp(srn: Srn, index: Max300, userAnswers: UserAnswers): Option[List[TransfersOut]] = {
     val secondaryIndexes =

@@ -29,7 +29,7 @@ import javax.inject.Inject
 import scala.util.Try
 
 @Singleton()
-class MoneyBorrowedTransformer @Inject()() extends Transformer {
+class MoneyBorrowedTransformer @Inject() extends Transformer {
 
   def transformToEtmp(srn: Srn)(implicit request: DataRequest[_]): List[MoneyBorrowed] =
     request.userAnswers
