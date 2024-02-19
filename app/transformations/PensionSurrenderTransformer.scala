@@ -29,7 +29,7 @@ import javax.inject.Inject
 import scala.util.Try
 
 @Singleton()
-class PensionSurrenderTransformer @Inject()() extends Transformer {
+class PensionSurrenderTransformer @Inject() extends Transformer {
 
   def transformToEtmp(srn: Srn, index: Max300, userAnswers: UserAnswers): Option[PensionSurrender] =
     for {
