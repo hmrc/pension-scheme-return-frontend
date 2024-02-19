@@ -19,14 +19,12 @@ package controllers.nonsipp.sharesdisposal
 import cats.implicits.{toShow, toTraverseOps}
 import com.google.inject.Inject
 import config.Constants
-import config.Refined.Max50.Refined
 import config.Refined.Max5000.enumerable
 import config.Refined.{Max50, Max5000}
 import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
 import controllers.nonsipp.shares.SharesListController.SharesData
 import controllers.nonsipp.sharesdisposal.SharesDisposalListController._
-import eu.timepit.refined.api.Refined
 import eu.timepit.refined.{refineMV, refineV}
 import forms.RadioListFormProvider
 import models.SchemeId.Srn
