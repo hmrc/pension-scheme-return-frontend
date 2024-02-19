@@ -116,7 +116,7 @@ object HowManySharesController {
       "sharesDisposal.totalShares.error.decimal",
       "sharesDisposal.totalShares.error.invalid.characters",
       (maxShares, "sharesDisposal.totalShares.error.tooLarge"),
-      (minSharesHeld, "sharesDisposal.totalShares.error.negative")
+      (minSharesHeld, "sharesDisposal.totalShares.error.invalid.characters")
     )
   )
 
