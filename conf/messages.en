@@ -678,6 +678,14 @@ sharesDisposal.independentValuation.title = Was the sale of shares in this compa
 sharesDisposal.independentValuation.heading = Was the sale of shares in {0} supported by an independent valuation?
 sharesDisposal.independentValuation.error.required = Select yes if the sale of shares was supported by an independent valuation
 
+sharesDisposal.totalShares.title = How many shares in this company were held by the scheme after this disposal?
+sharesDisposal.totalShares.heading = How many shares in {0} were held by {1} after this disposal?
+sharesDisposal.totalShares.hint = If there were none, enter 0.
+sharesDisposal.totalShares.error.required = Enter the number of shares held after this disposal
+sharesDisposal.totalShares.error.decimal = Number of shares held after this disposal must be a whole number, like 100
+sharesDisposal.totalShares.error.invalid.characters = Number of shares held after this disposal must be a number that is 0 or more, like 100
+sharesDisposal.totalShares.error.tooLarge = Number of shares held after this disposal must be 9,999,999 or fewer
+
 pensionCommencementLumpSum.title = Did any member receive a pension commencement lump sum (PCLS) during the period of this return?
 pensionCommencementLumpSum.heading = Did any member receive a pension commencement lump sum (PCLS) during the period of this return?
 pensionCommencementLumpSum.error.required = Select yes if any member received a Pension Commencement Lump Sum during the period of this return

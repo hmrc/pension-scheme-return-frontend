@@ -65,6 +65,7 @@ object Constants {
   val minMoneyValue = -999999999.99
   val minPosMoneyValue = 0.01
 
+  val minSharesHeld = 0
   val minShares = 1
   val maxShares = 9999999
 
