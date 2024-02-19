@@ -51,7 +51,8 @@ case class WhoPurchasedLandOrPropertyPage(srn: Srn, landOrPropertyIndex: Max5000
       case (Some(IdentityType.UKCompany), Some(IdentityType.UKCompany)) => Try(userAnswers)
       case (Some(IdentityType.UKPartnership), Some(IdentityType.UKPartnership)) => Try(userAnswers)
       case (Some(IdentityType.Other), Some(IdentityType.Other)) => Try(userAnswers)
-      case (None, _) => Try(userAnswers)
-      case _ => removePages(userAnswers, pages(srn))
+      case (None, _) => removePages(userAnswers, pages(srn)) // delete
+      case (Some(_), None) => Try(userAnswers) // create
+      case _ => removePages(userAnswers, pages(srn)) // update - where values were changed
     }
 }

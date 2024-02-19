@@ -236,7 +236,7 @@ object TaskListStatusUtils {
           indepValPages
           ) =>
         if (!landOrPropertyHeld) {
-          (Completed, listPageUrl)
+          (Completed, heldPageUrl)
         } else {
           val countFirstPages = firstPages.getOrElse(List.empty).size
           val countLastPages = lastPages.getOrElse(List.empty).size

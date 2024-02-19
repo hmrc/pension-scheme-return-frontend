@@ -254,7 +254,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(LandOrPropertyHeldPage(srn), false)
         val result = TaskListStatusUtils.getLandOrPropertyTaskListStatusAndLink(customUserAnswers, srn)
-        result mustBe (Completed, listPageUrl)
+        result mustBe (Completed, heldPageUrl)
       }
       "when landOrPropertyHeldPage true and equal number of first pages and last pages and intermediate sub journey last pages are present" in {
         val customUserAnswers = defaultUserAnswers
