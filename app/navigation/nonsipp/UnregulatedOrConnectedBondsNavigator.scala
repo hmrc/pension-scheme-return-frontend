@@ -51,11 +51,16 @@ object UnregulatedOrConnectedBondsNavigator extends JourneyNavigator {
           controllers.nonsipp.unregulatedorconnectedbonds.routes.WhenDidSchemeAcquireBondsController
             .onPageLoad(srn, index, NormalMode)
         case Some(Transfer) =>
-          controllers.routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.unregulatedorconnectedbonds.routes.CostOfBondsController
+            .onPageLoad(srn, index, NormalMode)
         case _ => controllers.routes.UnauthorisedController.onPageLoad()
       }
 
     case WhenDidSchemeAcquireBondsPage(srn, index) =>
+      controllers.nonsipp.unregulatedorconnectedbonds.routes.CostOfBondsController
+        .onPageLoad(srn, index, NormalMode)
+
+    case CostOfBondsPage(srn, index) =>
       controllers.routes.UnauthorisedController.onPageLoad()
   }
 

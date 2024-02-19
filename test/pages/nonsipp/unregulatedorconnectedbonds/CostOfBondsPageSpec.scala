@@ -14,15 +14,23 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages.nonsipp.unregulatedorconnectedbonds
 
-import play.api.libs.json.{__, JsPath}
+import config.Refined._
+import eu.timepit.refined.refineMV
+import models.Money
+import pages.behaviours.PageBehaviours
 
-package object unregulatedorconnectedbonds {
+class CostOfBondsPageSpec extends PageBehaviours {
 
-  object Paths {
-    val bonds: JsPath = __ \ "bonds"
-    val bondTransactions: JsPath = bonds \ "bondTransactions"
+  "CostOfBondsPage" - {
+    val srn = srnGen.sample.value
+    val index = refineMV[OneTo5000](1)
+
+    beRetrievable[Money](CostOfBondsPage(srn, index))
+
+    beSettable[Money](CostOfBondsPage(srn, index))
+
+    beRemovable[Money](CostOfBondsPage(srn, index))
   }
-
 }
