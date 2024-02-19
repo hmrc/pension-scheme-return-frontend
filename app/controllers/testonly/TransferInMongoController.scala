@@ -19,9 +19,9 @@ package controllers.testonly
 import config.Refined.{Max300, Max5}
 import controllers.actions.IdentifyAndRequireData
 import eu.timepit.refined._
-import models.{Money, PensionSchemeType}
 import models.PensionSchemeType.PensionSchemeType
 import models.SchemeId.Srn
+import models.{Money, PensionSchemeType}
 import pages.nonsipp.receivetransfer._
 import play.api.mvc.MessagesControllerComponents
 import services.SaveService
@@ -52,12 +52,17 @@ class TransferInMongoController @Inject()(
       HNil
 
   override def pages(srn: Srn, index: Max300, secondaryIndex: Max5): Pages = HList(
-    PageWithValue(TransferringSchemeNamePage(srn, index, secondaryIndex), "test scheme"),
-    PageWithValue(TransferringSchemeTypePage(srn, index, secondaryIndex), PensionSchemeType.Other("some description")),
-    PageWithValue(TotalValueTransferPage(srn, index, secondaryIndex), Money(12.34)),
-    PageWithValue(WhenWasTransferReceivedPage(srn, index, secondaryIndex), LocalDate.now()),
-    PageWithValue(DidTransferIncludeAssetPage(srn, index, secondaryIndex), true),
-    PageWithValue(TransfersInSectionCompleted(srn, index, secondaryIndex), SectionCompleted),
-    PageWithValue(TransfersInJourneyStatus(srn), SectionStatus.Completed)
+    (
+      PageWithValue(TransferringSchemeNamePage(srn, index, secondaryIndex), "test scheme"),
+      PageWithValue(
+        TransferringSchemeTypePage(srn, index, secondaryIndex),
+        PensionSchemeType.Other("some description")
+      ),
+      PageWithValue(TotalValueTransferPage(srn, index, secondaryIndex), Money(12.34)),
+      PageWithValue(WhenWasTransferReceivedPage(srn, index, secondaryIndex), LocalDate.now()),
+      PageWithValue(DidTransferIncludeAssetPage(srn, index, secondaryIndex), true),
+      PageWithValue(TransfersInSectionCompleted(srn, index, secondaryIndex), SectionCompleted),
+      PageWithValue(TransfersInJourneyStatus(srn), SectionStatus.Completed)
+    )
   )
 }

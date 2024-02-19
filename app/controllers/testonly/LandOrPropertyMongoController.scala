@@ -21,17 +21,7 @@ import controllers.actions.IdentifyAndRequireData
 import eu.timepit.refined._
 import models.SchemeId.Srn
 import models.{Address, ConditionalYesNo, ManualAddress, Money, SchemeHoldLandProperty}
-import pages.nonsipp.landorproperty.{
-  IsLandOrPropertyResidentialPage,
-  IsLandPropertyLeasedPage,
-  LandOrPropertyChosenAddressPage,
-  LandOrPropertyHeldPage,
-  LandOrPropertyTotalCostPage,
-  LandOrPropertyTotalIncomePage,
-  LandPropertyInUKPage,
-  LandRegistryTitleNumberPage,
-  WhyDoesSchemeHoldLandPropertyPage
-}
+import pages.nonsipp.landorproperty._
 import play.api.mvc.MessagesControllerComponents
 import services.SaveService
 import shapeless._
@@ -49,15 +39,17 @@ class LandOrPropertyMongoController @Inject()(
   override val max: Max5000 = refineMV(5000)
 
   override def pages(srn: Srn, index: Max5000): Pages = HList(
-    PageWithValue(LandOrPropertyHeldPage(srn), false),
-    PageWithValue(LandPropertyInUKPage(srn, index), true),
-    PageWithValue(LandRegistryTitleNumberPage(srn, index), ConditionalYesNo.yes[String, String]("title number")),
-    PageWithValue(LandOrPropertyChosenAddressPage(srn, index), address(index.value)),
-    PageWithValue(WhyDoesSchemeHoldLandPropertyPage(srn, index), SchemeHoldLandProperty.Transfer),
-    PageWithValue(LandOrPropertyTotalCostPage(srn, index), Money(12.34)),
-    PageWithValue(LandOrPropertyTotalIncomePage(srn, index), Money(12.34)),
-    PageWithValue(IsLandOrPropertyResidentialPage(srn, index), true),
-    PageWithValue(IsLandPropertyLeasedPage(srn, index), false)
+    (
+      PageWithValue(LandOrPropertyHeldPage(srn), false),
+      PageWithValue(LandPropertyInUKPage(srn, index), true),
+      PageWithValue(LandRegistryTitleNumberPage(srn, index), ConditionalYesNo.yes[String, String]("title number")),
+      PageWithValue(LandOrPropertyChosenAddressPage(srn, index), address(index.value)),
+      PageWithValue(WhyDoesSchemeHoldLandPropertyPage(srn, index), SchemeHoldLandProperty.Transfer),
+      PageWithValue(LandOrPropertyTotalCostPage(srn, index), Money(12.34)),
+      PageWithValue(LandOrPropertyTotalIncomePage(srn, index), Money(12.34)),
+      PageWithValue(IsLandOrPropertyResidentialPage(srn, index), true),
+      PageWithValue(IsLandPropertyLeasedPage(srn, index), false)
+    )
   )
 
   override type Pages =

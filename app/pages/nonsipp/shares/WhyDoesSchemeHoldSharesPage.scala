@@ -18,12 +18,13 @@ package pages.nonsipp.shares
 
 import config.Refined.Max5000
 import models.SchemeId.Srn
-import models.{SchemeHoldShare, UserAnswers}
+import models.{IdentitySubject, SchemeHoldShare, UserAnswers}
 import pages.QuestionPage
+import pages.nonsipp.common
 import play.api.libs.json.JsPath
 import queries.Removable
-import utils.RefinedUtils.RefinedIntOps
 import utils.PageUtils.removePages
+import utils.RefinedUtils.RefinedIntOps
 
 import scala.util.Try
 
@@ -45,5 +46,9 @@ case class WhyDoesSchemeHoldSharesPage(srn: Srn, index: Max5000) extends Questio
     }
 
   private def dependantPages(srn: Srn): List[Removable[_]] =
-    List(WhenDidSchemeAcquireSharesPage(srn, index))
+    List(
+      WhenDidSchemeAcquireSharesPage(srn, index),
+      common.IdentityTypePage(srn, index, IdentitySubject.SharesSeller),
+      TotalAssetValuePage(srn, index)
+    )
 }

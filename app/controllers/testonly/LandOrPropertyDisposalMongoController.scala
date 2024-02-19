@@ -54,17 +54,19 @@ class LandOrPropertyDisposalMongoController @Inject()(
   override val max: Max50 = refineMV(50)
 
   override def pages(srn: Srn, index: Max5000, secondaryIndex: Max50): Pages = HList(
-    PageWithValue(
-      OtherBuyerDetailsPage(srn, index, secondaryIndex),
-      RecipientDetails("test recipient", "test description")
-    ),
-    PageWithValue(LandOrPropertyStillHeldPage(srn, index, secondaryIndex), true),
-    PageWithValue(HowWasPropertyDisposedOfPage(srn, index, secondaryIndex), HowDisposed.Sold),
-    PageWithValue(LandOrPropertyDisposalBuyerConnectedPartyPage(srn, index, secondaryIndex), true),
-    PageWithValue(TotalProceedsSaleLandPropertyPage(srn, index, secondaryIndex), Money(123.45)),
-    PageWithValue(DisposalIndependentValuationPage(srn, index, secondaryIndex), true),
-    PageWithValue(WhoPurchasedLandOrPropertyPage(srn, index, secondaryIndex), IdentityType.Other),
-    PageWithValue(WhenWasPropertySoldPage(srn, index, secondaryIndex), LocalDate.of(2024, 12, 12)),
-    PageWithValue(LandPropertyDisposalCompletedPage(srn, index, secondaryIndex), SectionCompleted)
+    (
+      PageWithValue(
+        OtherBuyerDetailsPage(srn, index, secondaryIndex),
+        RecipientDetails("test recipient", "test description")
+      ),
+      PageWithValue(LandOrPropertyStillHeldPage(srn, index, secondaryIndex), true),
+      PageWithValue(HowWasPropertyDisposedOfPage(srn, index, secondaryIndex), HowDisposed.Sold),
+      PageWithValue(LandOrPropertyDisposalBuyerConnectedPartyPage(srn, index, secondaryIndex), true),
+      PageWithValue(TotalProceedsSaleLandPropertyPage(srn, index, secondaryIndex), Money(123.45)),
+      PageWithValue(DisposalIndependentValuationPage(srn, index, secondaryIndex), true),
+      PageWithValue(WhoPurchasedLandOrPropertyPage(srn, index, secondaryIndex), IdentityType.Other),
+      PageWithValue(WhenWasPropertySoldPage(srn, index, secondaryIndex), LocalDate.of(2024, 12, 12)),
+      PageWithValue(LandPropertyDisposalCompletedPage(srn, index, secondaryIndex), SectionCompleted)
+    )
   )
 }

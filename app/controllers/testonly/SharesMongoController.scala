@@ -41,11 +41,13 @@ class SharesMongoController @Inject()(
   override val max: Max5000 = refineMV(5000)
 
   override def pages(srn: Srn, index: Max5000): Pages = HList(
-    PageWithValue(SharesCompleted(srn, index), SectionCompleted),
-    PageWithValue(TypeOfSharesHeldPage(srn, index), TypeOfShares.Unquoted),
-    PageWithValue(CompanyNameRelatedSharesPage(srn, index), "test ltd"),
-    PageWithValue(WhyDoesSchemeHoldSharesPage(srn, index), SchemeHoldShare.Acquisition),
-    PageWithValue(WhenDidSchemeAcquireSharesPage(srn, index), LocalDate.of(2022, 12, 12))
+    (
+      PageWithValue(SharesCompleted(srn, index), SectionCompleted),
+      PageWithValue(TypeOfSharesHeldPage(srn, index), TypeOfShares.Unquoted),
+      PageWithValue(CompanyNameRelatedSharesPage(srn, index), "test ltd"),
+      PageWithValue(WhyDoesSchemeHoldSharesPage(srn, index), SchemeHoldShare.Acquisition),
+      PageWithValue(WhenDidSchemeAcquireSharesPage(srn, index), LocalDate.of(2022, 12, 12))
+    )
   )
 
   override type Pages =

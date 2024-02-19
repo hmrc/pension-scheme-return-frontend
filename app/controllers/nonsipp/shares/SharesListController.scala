@@ -24,10 +24,9 @@ import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
 import controllers.nonsipp.shares.SharesListController._
 import forms.YesNoPageFormProvider
-import models.CheckOrChange.Change
 import models.SchemeId.Srn
 import models.requests.DataRequest
-import models.{Mode, Pagination, SchemeHoldShare, TypeOfShares}
+import models.{CheckMode, Mode, Pagination, SchemeHoldShare, TypeOfShares}
 import navigation.Navigator
 import pages.nonsipp.shares._
 import play.api.data.Form
@@ -169,7 +168,7 @@ object SharesListController {
           TableElem(
             LinkMessage(
               Message("site.change"),
-              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, Change).url
+              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode).url
             )
           ),
           TableElem(

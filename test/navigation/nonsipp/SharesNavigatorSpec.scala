@@ -17,9 +17,20 @@
 package navigation.nonsipp
 
 import config.Refined.{Max5000, OneTo5000}
-import pages.nonsipp.shares.CompanyNameOfSharesSellerPage
 import eu.timepit.refined.refineMV
-import models.{IdentitySubject, IdentityType, NormalMode, RecipientDetails, SchemeHoldShare, TypeOfShares}
+import models.IdentitySubject.SharesSeller
+import models.{
+  CheckMode,
+  ConditionalYesNo,
+  Crn,
+  IdentitySubject,
+  IdentityType,
+  NormalMode,
+  RecipientDetails,
+  SchemeHoldShare,
+  TypeOfShares,
+  Utr
+}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.common.{
@@ -29,6 +40,7 @@ import pages.nonsipp.common.{
   PartnershipRecipientUtrPage
 }
 import pages.nonsipp.shares._
+import uk.gov.hmrc.domain.Nino
 import utils.BaseSpec
 import utils.UserAnswersUtils.UserAnswersOps
 
@@ -667,6 +679,957 @@ class SharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             controllers.nonsipp.shares.routes.DidSchemeHoldAnySharesController.onPageLoad
           )
           .withName("go from remove shares page to did scheme hold any shares page")
+      )
+    }
+
+  }
+
+  "CheckMode" - {
+
+    "TypeOfSharesHeldPage" - {
+
+      act.like(
+        checkmode
+          .navigateToWithIndex(
+            index,
+            TypeOfSharesHeldPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.WhyDoesSchemeHoldSharesController.onPageLoad(srn, index, CheckMode),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                TypeOfSharesHeldPage(srn, index),
+                TypeOfShares.SponsoringEmployer
+              )
+          )
+          .withName(
+            "go from TypeOfSharesHeldPage to WhyDoesSchemeHoldSharesPage page when holding is SponsoringEmployer"
+          )
+      )
+
+      act.like(
+        checkmode
+          .navigateToWithIndex(
+            index,
+            TypeOfSharesHeldPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.WhyDoesSchemeHoldSharesController.onPageLoad(srn, index, CheckMode),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                TypeOfSharesHeldPage(srn, index),
+                TypeOfShares.Unquoted
+              )
+          )
+          .withName(
+            "go from TypeOfSharesHeldPage to WhyDoesSchemeHoldSharesPage page when holding is Unquoted"
+          )
+      )
+
+      act.like(
+        checkmode
+          .navigateToWithIndex(
+            index,
+            TypeOfSharesHeldPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                TypeOfSharesHeldPage(srn, index),
+                TypeOfShares.ConnectedParty
+              )
+          )
+          .withName(
+            "go from TypeOfSharesHeldPage to WhyDoesSchemeHoldSharesPage page when holding is ConnectedParty"
+          )
+      )
+    }
+
+    "WhyDoesSchemeHoldSharesPage" - {
+
+      act.like(
+        checkmode
+          .navigateToWithIndex(
+            index,
+            WhyDoesSchemeHoldSharesPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.WhenDidSchemeAcquireSharesController.onPageLoad(srn, index, CheckMode),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                WhyDoesSchemeHoldSharesPage(srn, index),
+                SchemeHoldShare.Acquisition
+              )
+          )
+          .withName(
+            "go from WhyDoesSchemeHoldSharesPage to WhenDidSchemeAcquireShares page when holding is acquisition"
+          )
+      )
+
+      act.like(
+        checkmode
+          .navigateToWithIndex(
+            index,
+            WhyDoesSchemeHoldSharesPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.WhenDidSchemeAcquireSharesController.onPageLoad(srn, index, CheckMode),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                WhyDoesSchemeHoldSharesPage(srn, index),
+                SchemeHoldShare.Contribution
+              )
+          )
+          .withName(
+            "go from WhyDoesSchemeHoldSharesPage to WhenDidSchemeAcquireShares page when holding is contribution"
+          )
+      )
+
+      act.like(
+        checkmode
+          .navigateToWithIndex(
+            index,
+            WhyDoesSchemeHoldSharesPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                WhyDoesSchemeHoldSharesPage(srn, index),
+                SchemeHoldShare.Transfer
+              )
+          )
+          .withName("go from WhyDoesSchemeHoldSharesPage to SharesCYA Page when holding is transfer")
+      )
+    }
+
+    "CompanyNameRelatedSharesPage" - {
+      act.like(
+        checkmode
+          .navigateToWithIndex(
+            index,
+            CompanyNameRelatedSharesPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode)
+          )
+          .withName(
+            "go from company name related shares page to sharesCYA page"
+          )
+      )
+    }
+
+    "SharesCompanyCrnPage" - {
+      act.like(
+        checkmode
+          .navigateToWithIndex(
+            index,
+            SharesCompanyCrnPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode)
+          )
+          .withName(
+            "go from shares company Crn page to class of sharesCYA page"
+          )
+      )
+    }
+
+    "ClassOfSharesPage" - {
+      act.like(
+        checkmode
+          .navigateToWithIndex(
+            index,
+            ClassOfSharesPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode)
+          )
+          .withName("go from class of shares to identity subject sharesCYA page")
+      )
+    }
+
+    "HowManySharesPage" - {
+      act.like(
+        checkmode
+          .navigateToWithIndex(
+            index,
+            HowManySharesPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                WhyDoesSchemeHoldSharesPage(srn, index),
+                SchemeHoldShare.Acquisition
+              )
+          )
+          .withName(
+            "go from HowManySharesPage to SharesCYA page when holding is acquisition"
+          )
+      )
+    }
+
+    "HowManySharesPage" - {
+      act.like(
+        checkmode
+          .navigateToWithIndex(
+            index,
+            HowManySharesPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                TypeOfSharesHeldPage(srn, index),
+                TypeOfShares.Unquoted
+              )
+          )
+          .withName(
+            "go from HowManySharesPage to sharesCYA page when unquoted shares selected "
+          )
+      )
+    }
+
+    "HowManySharesPage" - {
+      act.like(
+        checkmode
+          .navigateToWithIndex(
+            index,
+            HowManySharesPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                TypeOfSharesHeldPage(srn, index),
+                TypeOfShares.SponsoringEmployer
+              )
+          )
+          .withName(
+            "go from how many shares page to sharesCYA page when SponsoringEmployer is selected"
+          )
+      )
+    }
+
+    "HowManySharesPage" - {
+      act.like(
+        checkmode
+          .navigateToWithIndex(
+            index,
+            HowManySharesPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                TypeOfSharesHeldPage(srn, index),
+                TypeOfShares.ConnectedParty
+              )
+          )
+          .withName(
+            "go from how many shares page to sharesCYA page when ConnectedParty is selected"
+          )
+      )
+    }
+
+    "IdentityType navigation" - {
+      act.like(
+        checkmode
+          .navigateToWithDataIndexAndSubjectBoth(
+            index,
+            subject,
+            IdentityTypePage,
+            Gen.const(IdentityType.Other),
+            controllers.nonsipp.common.routes.OtherRecipientDetailsController.onPageLoad
+          )
+          .withName("go from identity type page to other seller details page")
+      )
+
+      act.like(
+        checkmode
+          .navigateToWithDataIndexAndSubject(
+            index,
+            subject,
+            IdentityTypePage,
+            Gen.const(IdentityType.Individual),
+            controllers.nonsipp.shares.routes.IndividualNameOfSharesSellerController.onPageLoad
+          )
+          .withName("go from identity type page to individual seller name page")
+      )
+
+      act.like(
+        checkmode
+          .navigateToWithDataIndexAndSubject(
+            index,
+            subject,
+            IdentityTypePage,
+            Gen.const(IdentityType.UKCompany),
+            controllers.nonsipp.shares.routes.CompanyNameOfSharesSellerController.onPageLoad
+          )
+          .withName("go from identity type page to company seller name page")
+      )
+
+      act.like(
+        checkmode
+          .navigateToWithDataIndexAndSubject(
+            index,
+            subject,
+            IdentityTypePage,
+            Gen.const(IdentityType.UKPartnership),
+            controllers.nonsipp.shares.routes.PartnershipNameOfSharesSellerController.onPageLoad
+          )
+          .withName("go from identity type page to UKPartnership to partnership name of shares seller name page")
+      )
+    }
+
+    "IndividualNameOfSharesSellerPage" - {
+      act.like(
+        checkmode
+          .navigateToWithIndex(
+            index,
+            IndividualNameOfSharesSellerPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.SharesIndividualSellerNINumberController
+                .onPageLoad(srn, index, CheckMode)
+          )
+          .withName("go from individual name of shares seller page to shares individual seller NI number page")
+      )
+
+      act.like(
+        checkmode
+          .navigateToWithIndex(
+            index,
+            IndividualNameOfSharesSellerPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.SharesCYAController
+                .onPageLoad(srn, index, CheckMode),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                SharesIndividualSellerNINumberPage(srn, index),
+                ConditionalYesNo.no[String, Nino]("Reason")
+              )
+          )
+          .withName("go from individual name of shares seller page to Shares CYA page")
+      )
+    }
+
+    "WhenDidSchemeAcquireSharesPage" - {
+      act.like(
+        checkmode
+          .navigateToWithIndex(
+            index,
+            WhenDidSchemeAcquireSharesPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.common.routes.IdentityTypeController
+                .onPageLoad(srn, index, CheckMode, IdentitySubject.SharesSeller),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                WhyDoesSchemeHoldSharesPage(srn, index),
+                SchemeHoldShare.Acquisition
+              )
+          )
+          .withName(
+            "go from When Did Scheme Acquire Shares Page to Identity Type page when WhyDoesSchemeHoldShares is Acquisition"
+          )
+      )
+
+      act.like(
+        checkmode
+          .navigateToWithIndex(
+            index,
+            WhenDidSchemeAcquireSharesPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                TypeOfSharesHeldPage(srn, index),
+                TypeOfShares.ConnectedParty
+              )
+          )
+          .withName("go from When Did Scheme Acquire Shares Page to Shares CYA page when Type Of Shares not Unquoted")
+      )
+
+      act.like(
+        checkmode
+          .navigateToWithIndex(
+            index,
+            WhenDidSchemeAcquireSharesPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.SharesFromConnectedPartyController
+                .onPageLoad(srn, index, CheckMode),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                TypeOfSharesHeldPage(srn, index),
+                TypeOfShares.Unquoted
+              )
+          )
+          .withName(
+            "go from When Did Scheme Acquire Shares Page to Shares From Connected Party page when Type Of Shares Unquoted but SharesFromConnectedParty is empty"
+          )
+      )
+
+      act.like(
+        checkmode
+          .navigateToWithIndex(
+            index,
+            WhenDidSchemeAcquireSharesPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.SharesCYAController
+                .onPageLoad(srn, index, CheckMode),
+            srn =>
+              defaultUserAnswers
+                .unsafeSet(
+                  TypeOfSharesHeldPage(srn, index),
+                  TypeOfShares.Unquoted
+                )
+                .unsafeSet(SharesFromConnectedPartyPage(srn, index), true)
+          )
+          .withName(
+            "go from When Did Scheme Acquire Shares Page to Shares CYA page when Type Of Shares Unquoted and SharesFromConnectedParty is not empty"
+          )
+      )
+    }
+
+    "CompanyNameOfSharesSellerPage" - {
+      act.like(
+        checkmode
+          .navigateToWithIndex(
+            index,
+            CompanyNameOfSharesSellerPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.common.routes.CompanyRecipientCrnController
+                .onPageLoad(srn, index, CheckMode, SharesSeller)
+          )
+          .withName("go from company name of shares seller page to company recipient crn page")
+      )
+
+      act.like(
+        checkmode
+          .navigateToWithIndex(
+            index,
+            CompanyNameOfSharesSellerPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.SharesCYAController
+                .onPageLoad(srn, index, CheckMode),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                CompanyRecipientCrnPage(srn, index, SharesSeller),
+                ConditionalYesNo.no[String, Crn]("reason")
+              )
+          )
+          .withName("go from company name of shares seller page to Shares CYA page")
+      )
+    }
+
+    "PartnershipShareSellerNamePage" - {
+      act.like(
+        checkmode
+          .navigateToWithIndex(
+            index,
+            PartnershipShareSellerNamePage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.common.routes.PartnershipRecipientUtrController
+                .onPageLoad(srn, index, CheckMode, SharesSeller)
+          )
+          .withName("go from Partnership Share Seller Name Page to partnership recipient utr page")
+      )
+
+      act.like(
+        checkmode
+          .navigateToWithIndex(
+            index,
+            PartnershipShareSellerNamePage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.SharesCYAController
+                .onPageLoad(srn, index, CheckMode),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                PartnershipRecipientUtrPage(srn, index, SharesSeller),
+                ConditionalYesNo.no[String, Utr]("reason")
+              )
+          )
+          .withName("go from Partnership Share Seller Name Page to Shares CYA page")
+      )
+    }
+
+    "OtherRecipientDetailsPage" - {
+
+      val shareDetails = RecipientDetails(
+        "testName",
+        "testDescription"
+      )
+
+      act.like(
+        checkmode
+          .navigateToWithDataIndexAndSubject(
+            index,
+            subject,
+            OtherRecipientDetailsPage,
+            Gen.const(shareDetails),
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.SharesFromConnectedPartyController
+                .onPageLoad(srn, index, CheckMode),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                TypeOfSharesHeldPage(srn, index),
+                TypeOfShares.Unquoted
+              )
+          )
+          .withName(
+            "go from other recipient details page to Shares From Connected Party page when Type Of Shares Unquoted"
+          )
+      )
+
+      act.like(
+        checkmode
+          .navigateToWithDataIndexAndSubject(
+            index,
+            subject,
+            OtherRecipientDetailsPage,
+            Gen.const(shareDetails),
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.SharesCYAController
+                .onPageLoad(srn, index, CheckMode),
+            srn =>
+              defaultUserAnswers
+                .unsafeSet(
+                  TypeOfSharesHeldPage(srn, index),
+                  TypeOfShares.Unquoted
+                )
+                .unsafeSet(SharesFromConnectedPartyPage(srn, index), true)
+          )
+          .withName(
+            "go from other recipient details page to Shares CYA page when Type Of Shares Unquoted and SharesFromConnectedParty is not empty"
+          )
+      )
+
+      act.like(
+        checkmode
+          .navigateToWithDataIndexAndSubject(
+            index,
+            subject,
+            OtherRecipientDetailsPage,
+            Gen.const(shareDetails),
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.TotalAssetValueController.onPageLoad(srn, index, CheckMode),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                TypeOfSharesHeldPage(srn, index),
+                TypeOfShares.SponsoringEmployer
+              )
+          )
+          .withName(
+            "go from other recipient details page to Total asset value page when Type Of Shares SponsoringEmployer"
+          )
+      )
+
+      act.like(
+        checkmode
+          .navigateToWithDataIndexAndSubject(
+            index,
+            subject,
+            OtherRecipientDetailsPage,
+            Gen.const(shareDetails),
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                TypeOfSharesHeldPage(srn, index),
+                TypeOfShares.ConnectedParty
+              )
+          )
+          .withName("go from other recipient details page to Shares CYA page when Type Of Shares not Unquoted")
+      )
+
+    }
+
+    "SharesIndividualSellerNINumberPage" - {
+
+      act.like(
+        checkmode
+          .navigateToWithIndex(
+            index,
+            SharesIndividualSellerNINumberPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.SharesFromConnectedPartyController
+                .onPageLoad(srn, index, CheckMode),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                TypeOfSharesHeldPage(srn, index),
+                TypeOfShares.Unquoted
+              )
+          )
+          .withName(
+            "go from SharesIndividualSellerNINumberPage to Shares From Connected Party page when Type Of Shares Unquoted but SharesFromConnectedParty is empty"
+          )
+      )
+
+      act.like(
+        checkmode
+          .navigateToWithIndex(
+            index,
+            SharesIndividualSellerNINumberPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.SharesCYAController
+                .onPageLoad(srn, index, CheckMode),
+            srn =>
+              defaultUserAnswers
+                .unsafeSet(
+                  TypeOfSharesHeldPage(srn, index),
+                  TypeOfShares.Unquoted
+                )
+                .unsafeSet(SharesFromConnectedPartyPage(srn, index), true)
+          )
+          .withName(
+            "go from SharesIndividualSellerNINumberPage to Shares CYA page when Type Of Shares Unquoted and SharesFromConnectedParty is not empty"
+          )
+      )
+
+      act.like(
+        checkmode
+          .navigateToWithIndex(
+            index,
+            SharesIndividualSellerNINumberPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.TotalAssetValueController.onPageLoad(srn, index, CheckMode),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                TypeOfSharesHeldPage(srn, index),
+                TypeOfShares.SponsoringEmployer
+              )
+          )
+          .withName(
+            "go from SharesIndividualSellerNINumberPage to Total asset value page when Type Of Shares SponsoringEmployer"
+          )
+      )
+
+      act.like(
+        checkmode
+          .navigateToWithIndex(
+            index,
+            SharesIndividualSellerNINumberPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                TypeOfSharesHeldPage(srn, index),
+                TypeOfShares.ConnectedParty
+              )
+          )
+          .withName("go from SharesIndividualSellerNINumberPage to Shares CYA page when Type Of Shares not Unquoted")
+      )
+    }
+
+    "CompanyRecipientCrnPage" - {
+      act.like(
+        checkmode
+          .navigateToWithIndexAndSubject(
+            index,
+            subject,
+            CompanyRecipientCrnPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.SharesFromConnectedPartyController
+                .onPageLoad(srn, index, CheckMode),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                TypeOfSharesHeldPage(srn, index),
+                TypeOfShares.Unquoted
+              )
+          )
+          .withName(
+            "go from CompanyRecipientCrnPage to Shares From Connected Party page when Type Of Shares Unquoted but SharesFromConnectedParty is empty"
+          )
+      )
+
+      act.like(
+        checkmode
+          .navigateToWithIndexAndSubject(
+            index,
+            subject,
+            CompanyRecipientCrnPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.SharesCYAController
+                .onPageLoad(srn, index, CheckMode),
+            srn =>
+              defaultUserAnswers
+                .unsafeSet(
+                  TypeOfSharesHeldPage(srn, index),
+                  TypeOfShares.Unquoted
+                )
+                .unsafeSet(SharesFromConnectedPartyPage(srn, index), true)
+          )
+          .withName(
+            "go from CompanyRecipientCrnPage to Shares CYA page when Type Of Shares Unquoted and SharesFromConnectedParty is not empty"
+          )
+      )
+
+      act.like(
+        checkmode
+          .navigateToWithIndexAndSubject(
+            index,
+            subject,
+            CompanyRecipientCrnPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.TotalAssetValueController.onPageLoad(srn, index, CheckMode),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                TypeOfSharesHeldPage(srn, index),
+                TypeOfShares.SponsoringEmployer
+              )
+          )
+          .withName(
+            "go from CompanyRecipientCrnPage to Total asset value page when Type Of Shares SponsoringEmployer"
+          )
+      )
+
+      act.like(
+        checkmode
+          .navigateToWithIndexAndSubject(
+            index,
+            subject,
+            CompanyRecipientCrnPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                TypeOfSharesHeldPage(srn, index),
+                TypeOfShares.ConnectedParty
+              )
+          )
+          .withName("go from CompanyRecipientCrnPage to Shares CYA page when Type Of Shares not Unquoted")
+      )
+    }
+
+    "PartnershipRecipientUtrPage" - {
+      act.like(
+        checkmode
+          .navigateToWithIndexAndSubject(
+            index,
+            subject,
+            PartnershipRecipientUtrPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.SharesFromConnectedPartyController
+                .onPageLoad(srn, index, CheckMode),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                TypeOfSharesHeldPage(srn, index),
+                TypeOfShares.Unquoted
+              )
+          )
+          .withName(
+            "go from PartnershipRecipientUtrPage to Shares From Connected Party page when Type Of Shares Unquoted but SharesFromConnectedParty is empty"
+          )
+      )
+
+      act.like(
+        checkmode
+          .navigateToWithIndexAndSubject(
+            index,
+            subject,
+            PartnershipRecipientUtrPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.SharesCYAController
+                .onPageLoad(srn, index, CheckMode),
+            srn =>
+              defaultUserAnswers
+                .unsafeSet(
+                  TypeOfSharesHeldPage(srn, index),
+                  TypeOfShares.Unquoted
+                )
+                .unsafeSet(SharesFromConnectedPartyPage(srn, index), true)
+          )
+          .withName(
+            "go from PartnershipRecipientUtrPage to Shares CYA page when Type Of Shares Unquoted and SharesFromConnectedParty is not empty"
+          )
+      )
+
+      act.like(
+        checkmode
+          .navigateToWithIndexAndSubject(
+            index,
+            subject,
+            PartnershipRecipientUtrPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.TotalAssetValueController.onPageLoad(srn, index, CheckMode),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                TypeOfSharesHeldPage(srn, index),
+                TypeOfShares.SponsoringEmployer
+              )
+          )
+          .withName(
+            "go from PartnershipRecipientUtrPage to Total asset value page when Type Of Shares SponsoringEmployer"
+          )
+      )
+
+      act.like(
+        checkmode
+          .navigateToWithIndexAndSubject(
+            index,
+            subject,
+            PartnershipRecipientUtrPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                TypeOfSharesHeldPage(srn, index),
+                TypeOfShares.ConnectedParty
+              )
+          )
+          .withName("go from PartnershipRecipientUtrPage to Shares CYA page when Type Of Shares not Unquoted")
+      )
+    }
+
+    "SharesFromConnectedPartyPage" - {
+      act.like(
+        checkmode
+          .navigateToWithIndex(
+            index,
+            SharesFromConnectedPartyPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode)
+          )
+          .withName("go from  shares from connected party page to  sharesCYA page")
+      )
+    }
+
+    "SharesFromConnectedPartyPage" - {
+      act.like(
+        checkmode
+          .navigateToWithIndex(
+            index,
+            SharesFromConnectedPartyPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.TotalAssetValueController.onPageLoad(srn, index, CheckMode),
+            srn =>
+              defaultUserAnswers
+                .unsafeSet(
+                  WhyDoesSchemeHoldSharesPage(srn, index),
+                  SchemeHoldShare.Acquisition
+                )
+                .unsafeSet(
+                  TypeOfSharesHeldPage(srn, index),
+                  TypeOfShares.SponsoringEmployer
+                )
+          )
+          .withName("go from  shares from connected party page to TotalAssetValue page")
+      )
+    }
+
+    "CostOfSharesPage" - {
+      act.like(
+        checkmode
+          .navigateToWithIndex(
+            index,
+            CostOfSharesPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode)
+          )
+          .withName("go from cost of shares page to SharesCYA page")
+      )
+    }
+
+    "SharesIndependentValuationPage" - {
+      act.like(
+        checkmode
+          .navigateToWithIndex(
+            index,
+            SharesIndependentValuationPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode),
+            srn =>
+              defaultUserAnswers
+                .unsafeSet(
+                  WhyDoesSchemeHoldSharesPage(srn, index),
+                  SchemeHoldShare.Acquisition
+                )
+                .unsafeSet(
+                  TypeOfSharesHeldPage(srn, index),
+                  TypeOfShares.Unquoted
+                )
+          )
+          .withName(
+            "go from shares independent valuation page to SharesTotalIncome page when holding is acquisition"
+          )
+      )
+    }
+
+    "SharesIndependentValuationPage" - {
+      act.like(
+        checkmode
+          .navigateToWithIndex(
+            index,
+            SharesIndependentValuationPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.TotalAssetValueController.onPageLoad(srn, index, CheckMode),
+            srn =>
+              defaultUserAnswers
+                .unsafeSet(
+                  WhyDoesSchemeHoldSharesPage(srn, index),
+                  SchemeHoldShare.Acquisition
+                )
+                .unsafeSet(
+                  TypeOfSharesHeldPage(srn, index),
+                  TypeOfShares.SponsoringEmployer
+                )
+          )
+          .withName(
+            "go from shares independent valuation page to total asset value page when holding is acquisition"
+          )
+      )
+    }
+
+    "SharesIndependentValuationPage" - {
+      act.like(
+        checkmode
+          .navigateToWithIndex(
+            index,
+            SharesIndependentValuationPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode),
+            srn =>
+              defaultUserAnswers
+                .unsafeSet(
+                  TypeOfSharesHeldPage(srn, index),
+                  TypeOfShares.Unquoted
+                )
+                .unsafeSet(
+                  WhyDoesSchemeHoldSharesPage(srn, index),
+                  SchemeHoldShare.Contribution
+                )
+          )
+          .withName(
+            "go from shares independent valuation page to shares total income when unquoted shares selected "
+          )
+      )
+    }
+
+    "SharesIndependentValuationPage" - {
+      act.like(
+        checkmode
+          .navigateToWithIndex(
+            index,
+            SharesIndependentValuationPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode),
+            srn =>
+              defaultUserAnswers
+                .unsafeSet(
+                  TypeOfSharesHeldPage(srn, index),
+                  TypeOfShares.ConnectedParty
+                )
+                .unsafeSet(
+                  WhyDoesSchemeHoldSharesPage(srn, index),
+                  SchemeHoldShare.Transfer
+                )
+          )
+          .withName(
+            "go from how many shares page to shares total income page  page when ConnectedParty is selected"
+          )
+      )
+    }
+
+    "TotalAssetValuePage" - {
+      act.like(
+        checkmode
+          .navigateToWithIndex(
+            index,
+            TotalAssetValuePage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.shares.routes.SharesCYAController.onPageLoad(srn, index, CheckMode)
+          )
+          .withName(
+            "go from TotalAssetValuePage to SharesCYA Page"
+          )
       )
     }
 
