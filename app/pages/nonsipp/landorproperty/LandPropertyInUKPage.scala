@@ -75,7 +75,8 @@ case class LandPropertyInUKPage(srn: Srn, index: Max5000) extends QuestionPage[B
       IsLandPropertyLeasedPage(srn, index),
       LandOrPropertySellerConnectedPartyPage(srn, index),
       LandOrPropertyTotalIncomePage(srn, index),
-      RemovePropertyPage(srn, index)
+      RemovePropertyPage(srn, index),
+      LandOrPropertyCompleted(srn, index)
     )
     val list1 = list ++ dependentPages
     if (isLastRecord) list1 :+ LandOrPropertyHeldPage(srn) else list1

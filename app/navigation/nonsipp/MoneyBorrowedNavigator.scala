@@ -16,6 +16,7 @@
 
 package navigation.nonsipp
 
+import cats.implicits.toTraverseOps
 import config.Refined.Max5000
 import eu.timepit.refined.{refineMV, refineV}
 import models.{CheckOrChange, NormalMode, UserAnswers}
@@ -61,13 +62,17 @@ object MoneyBorrowedNavigator extends JourneyNavigator {
 
     case BorrowInstancesListPage(srn, addBorrow) =>
       if (addBorrow) {
-        val answers = userAnswers.map(BorrowedAmountAndRatePages(srn))
-        val nextDataKey = if (answers.isEmpty) 1 else answers.maxBy(_._1)._1.toIntOption.orElse(Some(0)).get + 1
-        refineV[Max5000.Refined](nextDataKey + 1).fold(
-          err => controllers.routes.JourneyRecoveryController.onPageLoad(),
-          nextIndex =>
-            controllers.nonsipp.moneyborrowed.routes.LenderNameController.onPageLoad(srn, nextIndex, NormalMode)
-        )
+        (
+          for {
+            indexes <- userAnswers
+              .map(BorrowedAmountAndRatePages(srn))
+              .keys
+              .toList
+              .traverse(_.toIntOption)
+              .getOrRecoverJourney
+            nextIndex <- findNextOpenIndex[Max5000.Refined](indexes).getOrRecoverJourney
+          } yield controllers.nonsipp.moneyborrowed.routes.LenderNameController.onPageLoad(srn, nextIndex, NormalMode)
+        ).merge
       } else {
         controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
       }

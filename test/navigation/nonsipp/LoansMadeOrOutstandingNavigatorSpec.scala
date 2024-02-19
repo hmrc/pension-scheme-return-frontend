@@ -317,7 +317,7 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
             srn => LoansListPage(srn, true),
             (srn, _) =>
               controllers.nonsipp.common.routes.IdentityTypeController
-                .onPageLoad(srn, refineMV(3), NormalMode, IdentitySubject.LoanRecipient),
+                .onPageLoad(srn, refineMV(1), NormalMode, IdentitySubject.LoanRecipient),
             srn =>
               defaultUserAnswers
                 .unsafeSet(IdentityTypePage(srn, refineMV(2), IdentitySubject.LoanRecipient), IdentityType.Individual)
@@ -333,7 +333,7 @@ class LoansMadeOrOutstandingNavigatorSpec extends BaseSpec with NavigatorBehavio
             srn => LoansListPage(srn, true),
             (srn, _) =>
               controllers.nonsipp.common.routes.IdentityTypeController
-                .onPageLoad(srn, refineMV(2), NormalMode, IdentitySubject.LoanRecipient),
+                .onPageLoad(srn, refineMV(1), NormalMode, IdentitySubject.LoanRecipient),
             _ => defaultUserAnswers
           )
           .withName("go to who received the loan at index 1")

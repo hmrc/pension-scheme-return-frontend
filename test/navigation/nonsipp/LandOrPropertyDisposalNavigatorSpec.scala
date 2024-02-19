@@ -23,6 +23,8 @@ import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.landorpropertydisposal._
 import utils.BaseSpec
+import utils.UserAnswersUtils.UserAnswersOps
+import viewmodels.models.SectionCompleted
 
 class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
@@ -261,5 +263,52 @@ class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehavio
         )
         .withName("go from total proceeds sale land property page to land or property still held page")
     )
+  }
+
+  "Add Land or property disposal" - {
+    "Record at index 1" - {
+      act.like(
+        normalmode
+          .navigateTo(
+            srn => LandOrPropertyDisposalAddressListPage(srn, refineMV(1), refineMV(1)),
+            (srn, mode) =>
+              controllers.nonsipp.landorpropertydisposal.routes.HowWasPropertyDisposedOfController
+                .onPageLoad(srn, refineMV(1), refineMV(2), mode),
+            srn =>
+              defaultUserAnswers
+                .unsafeSet(LandPropertyDisposalCompletedPage(srn, refineMV(1), refineMV(1)), SectionCompleted)
+          )
+          .withName("Add Land or property disposal with a record at index 1")
+      )
+    }
+
+    "Record at index 2" - {
+      act.like(
+        normalmode
+          .navigateTo(
+            srn => LandOrPropertyDisposalAddressListPage(srn, refineMV(1), refineMV(2)),
+            (srn, mode) =>
+              controllers.nonsipp.landorpropertydisposal.routes.HowWasPropertyDisposedOfController
+                .onPageLoad(srn, refineMV(1), refineMV(1), mode),
+            srn =>
+              defaultUserAnswers
+                .unsafeSet(LandPropertyDisposalCompletedPage(srn, refineMV(1), refineMV(2)), SectionCompleted)
+          )
+          .withName("Add Land or property disposal with a record at index 2")
+      )
+    }
+
+    "No records" - {
+      act.like(
+        normalmode
+          .navigateTo(
+            srn => LandOrPropertyDisposalAddressListPage(srn, refineMV(1), refineMV(1)),
+            (srn, mode) =>
+              controllers.nonsipp.landorpropertydisposal.routes.HowWasPropertyDisposedOfController
+                .onPageLoad(srn, refineMV(1), refineMV(1), mode)
+          )
+          .withName("Add Land or property disposal with no records")
+      )
+    }
   }
 }
