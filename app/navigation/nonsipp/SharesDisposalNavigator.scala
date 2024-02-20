@@ -46,6 +46,17 @@ object SharesDisposalNavigator extends JourneyNavigator {
             .onPageLoad(srn, index, disposalIndex, NormalMode)
       }
 
+    case RemoveShareDisposalPage(srn, index, disposalIndex) =>
+      if (userAnswers
+          .map(HowWereSharesDisposedPages(srn))
+          .filter(_._2.nonEmpty)
+          .isEmpty) {
+        controllers.nonsipp.sharesdisposal.routes.SharesDisposalController.onPageLoad(srn, NormalMode)
+      } else {
+        // TODO when you have reported [number] share disposals page is done
+        controllers.routes.UnauthorisedController.onPageLoad()
+      }
+
     case SharesIndividualBuyerNamePage(srn, index, disposalIndex) =>
       controllers.nonsipp.sharesdisposal.routes.IndividualBuyerNinoNumberController
         .onPageLoad(srn, index, disposalIndex, NormalMode)

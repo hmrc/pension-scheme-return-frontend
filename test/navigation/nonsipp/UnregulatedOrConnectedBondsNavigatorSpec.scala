@@ -226,7 +226,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
             BondsFromConnectedPartyPage,
             (srn, _: Max5000, _) =>
               controllers.nonsipp.unregulatedorconnectedbonds.routes.AreBondsUnregulatedController
-                .onPageLoad(srn, index, NormalMode),
+                .onPageLoad(srn, index, NormalMode)
           )
           .withName(
             "go from BondsFromConnectedPartyPage to AreBondsUnregulatedPage"

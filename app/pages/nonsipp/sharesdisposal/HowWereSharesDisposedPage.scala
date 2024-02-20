@@ -19,9 +19,13 @@ package pages.nonsipp.sharesdisposal
 import config.Refined.{Max50, Max5000}
 import models.HowSharesDisposed.HowSharesDisposed
 import models.SchemeId.Srn
+import models.{HowSharesDisposed, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
+import queries.Removable
+import utils.PageUtils.removePages
 import utils.RefinedUtils.RefinedIntOps
+import scala.util.Try
 
 case class HowWereSharesDisposedPage(
   srn: Srn,
@@ -35,9 +39,51 @@ case class HowWereSharesDisposedPage(
 
   override def toString: String = "methodOfDisposal"
 
+  override def cleanup(value: Option[HowSharesDisposed], userAnswers: UserAnswers): Try[UserAnswers] =
+    (value, userAnswers.get(this)) match {
+      case (Some(HowSharesDisposed.Sold), Some(HowSharesDisposed.Sold)) => Try(userAnswers)
+      case (Some(HowSharesDisposed.Transferred), Some(HowSharesDisposed.Transferred)) => Try(userAnswers)
+      case (Some(HowSharesDisposed.Redeemed), Some(HowSharesDisposed.Redeemed)) => Try(userAnswers)
+      case (Some(HowSharesDisposed.Other(_)), Some(HowSharesDisposed.Other(_))) => Try(userAnswers)
+      case (Some(_), Some(_)) => removePages(userAnswers, pages(srn, shareIndex, disposalIndex, isLastRecord = false))
+      case (None, _) =>
+        val completedPages = userAnswers.map(SharesDisposalCompletedPages(srn))
+        removePages(
+          userAnswers,
+          pages(
+            srn,
+            shareIndex,
+            disposalIndex,
+            completedPages.flatten(_._2).size == 1
+          )
+        )
+      case _ => Try(userAnswers)
+    }
+
+  private def pages(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, isLastRecord: Boolean): List[Removable[_]] = {
+    val list = List(
+      WhenWereSharesRedeemedPage(srn, shareIndex, disposalIndex),
+      HowManySharesRedeemedPage(srn, shareIndex, disposalIndex),
+      TotalConsiderationSharesRedeemedPage(srn, shareIndex, disposalIndex),
+      HowManySharesPage(srn, shareIndex, disposalIndex),
+      WhenWereSharesSoldPage(srn, shareIndex, disposalIndex),
+      HowManySharesSoldPage(srn, shareIndex, disposalIndex),
+      TotalConsiderationSharesSoldPage(srn, shareIndex, disposalIndex),
+      WhoWereTheSharesSoldToPage(srn, shareIndex, disposalIndex), // has it's own cleanup
+      IndependentValuationPage(srn, shareIndex, disposalIndex)
+    )
+    if (isLastRecord) list :+ SharesDisposalPage(srn) else list
+  }
 }
 
 object HowWereSharesDisposedPage {
   def apply(srn: Srn, shareIndex: Max5000, disposalIndex: Max50): HowWereSharesDisposedPage =
     HowWereSharesDisposedPage(srn, shareIndex, disposalIndex, answerChanged = false)
+}
+
+case class HowWereSharesDisposedPages(srn: Srn) extends QuestionPage[Map[String, Map[String, HowSharesDisposed]]] {
+  override def path: JsPath =
+    Paths.disposedSharesTransaction \ toString
+
+  override def toString: String = "methodOfDisposal"
 }
