@@ -110,6 +110,7 @@ class LandOrPropertyDisposalListController @Inject()(
   )(implicit request: DataRequest[_]): Either[Result, Map[Max5000, List[Max50]]] =
     request.userAnswers
       .map(LandPropertyDisposalCompletedPages(srn))
+      .filter(_._2.nonEmpty)
       .map {
         case (key, sectionCompleted) =>
           val maybeLandOrPropertyIndex: Either[Result, Max5000] =

@@ -19,9 +19,14 @@ package pages.nonsipp.landorpropertydisposal
 import config.Refined.{Max50, Max5000}
 import models.HowDisposed.HowDisposed
 import models.SchemeId.Srn
+import models.{HowDisposed, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
+import queries.Removable
 import utils.RefinedUtils.RefinedIntOps
+import utils.PageUtils.removePages
+
+import scala.util.Try
 
 case class HowWasPropertyDisposedOfPage(
   srn: Srn,
@@ -34,6 +39,44 @@ case class HowWasPropertyDisposedOfPage(
     Paths.disposalPropertyTransaction \ toString \ landOrPropertyIndex.arrayIndex.toString \ disposalIndex.arrayIndex.toString
 
   override def toString: String = "methodOfDisposal"
+
+  override def cleanup(value: Option[HowDisposed], userAnswers: UserAnswers): Try[UserAnswers] =
+    (value, userAnswers.get(this)) match {
+      case (Some(HowDisposed.Sold), Some(HowDisposed.Sold)) => Try(userAnswers)
+      case (Some(HowDisposed.Transferred), Some(HowDisposed.Transferred)) => Try(userAnswers)
+      case (Some(HowDisposed.Other(_)), Some(HowDisposed.Other(_))) => Try(userAnswers)
+      case (Some(_), Some(_)) => removePages(userAnswers, pages(srn, landOrPropertyIndex, disposalIndex, false))
+      case (None, _) =>
+        val completedPages = userAnswers.map(LandPropertyDisposalCompletedPages(srn))
+        removePages(
+          userAnswers,
+          pages(
+            srn,
+            landOrPropertyIndex,
+            disposalIndex,
+            completedPages.flatten(_._2).size == 1
+          )
+        )
+      case _ => Try(userAnswers)
+    }
+
+  private def pages(
+    srn: Srn,
+    landOrPropertyIndex: Max5000,
+    disposalIndex: Max50,
+    isLastRecord: Boolean
+  ): List[Removable[_]] = {
+    val list = List(
+      LandOrPropertyStillHeldPage(srn, landOrPropertyIndex, disposalIndex),
+      WhoPurchasedLandOrPropertyPage(srn, landOrPropertyIndex, disposalIndex),
+      LandPropertyDisposalCompletedPage(srn, landOrPropertyIndex, disposalIndex),
+      RemoveLandPropertyDisposalPage(srn, landOrPropertyIndex, disposalIndex),
+      WhenWasPropertySoldPage(srn, landOrPropertyIndex, disposalIndex),
+      DisposalIndependentValuationPage(srn, landOrPropertyIndex, disposalIndex),
+      TotalProceedsSaleLandPropertyPage(srn, landOrPropertyIndex, disposalIndex)
+    )
+    if (isLastRecord) list :+ LandOrPropertyDisposalPage(srn) else list
+  }
 }
 
 case class HowWasPropertyDisposedOfPages(

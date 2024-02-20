@@ -17,11 +17,19 @@
 package pages.nonsipp.landorpropertydisposal
 
 import config.Refined.{Max50, Max5000}
+import controllers.TestValues
 import eu.timepit.refined.refineMV
+import models.{HowDisposed, IdentityType}
 import models.HowDisposed.HowDisposed
 import pages.behaviours.PageBehaviours
+import utils.UserAnswersUtils.UserAnswersOps
+import viewmodels.models.SectionCompleted
 
-class HowWasPropertyDisposedOfPageSpec extends PageBehaviours {
+class HowWasPropertyDisposedOfPageSpec extends PageBehaviours with TestValues {
+  private val landOrPropertyIndexOne = refineMV[Max5000.Refined](1)
+  private val landOrPropertyIndexTwo = refineMV[Max5000.Refined](2)
+  private val indexOne = refineMV[Max50.Refined](1)
+  private val indexTwo = refineMV[Max50.Refined](2)
 
   "HowWasPropertyDisposedOfPage" - {
 
@@ -33,5 +41,72 @@ class HowWasPropertyDisposedOfPageSpec extends PageBehaviours {
     beSettable[HowDisposed](HowWasPropertyDisposedOfPage(srnGen.sample.value, index, disposalIndex))
 
     beRemovable[HowDisposed](HowWasPropertyDisposedOfPage(srnGen.sample.value, index, disposalIndex))
+
+    "cleanup other fields when removing the last disposal of all properties" in {
+      val userAnswers = defaultUserAnswers
+        .unsafeSet(LandOrPropertyDisposalPage(srn), true)
+        .unsafeSet(HowWasPropertyDisposedOfPage(srn, landOrPropertyIndexOne, indexOne), HowDisposed.Sold)
+        .unsafeSet(WhoPurchasedLandOrPropertyPage(srn, landOrPropertyIndexOne, indexOne), IdentityType.Individual)
+        .unsafeSet(LandOrPropertyIndividualBuyerNamePage(srn, landOrPropertyIndexOne, indexOne), individualName)
+        .unsafeSet(LandOrPropertyStillHeldPage(srn, landOrPropertyIndexOne, indexOne), true)
+        .unsafeSet(RemoveLandPropertyDisposalPage(srn, landOrPropertyIndexOne, disposalIndex), true)
+        .unsafeSet(WhenWasPropertySoldPage(srn, landOrPropertyIndexOne, disposalIndex), localDate)
+        .unsafeSet(DisposalIndependentValuationPage(srn, landOrPropertyIndexOne, disposalIndex), true)
+        .unsafeSet(TotalProceedsSaleLandPropertyPage(srn, landOrPropertyIndexOne, disposalIndex), money)
+        .unsafeSet(LandPropertyDisposalCompletedPage(srn, landOrPropertyIndexOne, indexOne), SectionCompleted)
+
+      val result = userAnswers.remove(HowWasPropertyDisposedOfPage(srn, landOrPropertyIndexOne, indexOne)).success.value
+
+      result.get(LandOrPropertyStillHeldPage(srn, landOrPropertyIndexOne, indexOne)) must be(empty)
+      result.get(WhoPurchasedLandOrPropertyPage(srn, landOrPropertyIndexOne, indexOne)) must be(empty)
+      result.get(LandOrPropertyIndividualBuyerNamePage(srn, landOrPropertyIndexOne, indexOne)) must be(empty)
+
+      result.get(RemoveLandPropertyDisposalPage(srn, landOrPropertyIndexOne, disposalIndex)) must be(empty)
+      result.get(WhenWasPropertySoldPage(srn, landOrPropertyIndexOne, disposalIndex)) must be(empty)
+      result.get(DisposalIndependentValuationPage(srn, landOrPropertyIndexOne, disposalIndex)) must be(empty)
+      result.get(TotalProceedsSaleLandPropertyPage(srn, landOrPropertyIndexOne, disposalIndex)) must be(empty)
+      result.get(RemoveLandPropertyDisposalPage(srn, landOrPropertyIndexOne, disposalIndex)) must be(empty)
+
+      result.get(LandPropertyDisposalCompletedPage(srn, landOrPropertyIndexOne, indexOne)) must be(empty)
+      result.get(LandOrPropertyDisposalPage(srn)) must be(empty)
+
+    }
+
+    "cleanup other fields when removing a disposal but there are disposals for the same property" in {
+      val userAnswers = defaultUserAnswers
+        .unsafeSet(LandOrPropertyDisposalPage(srn), true)
+        .unsafeSet(HowWasPropertyDisposedOfPage(srn, landOrPropertyIndexOne, indexOne), HowDisposed.Sold)
+        .unsafeSet(LandOrPropertyStillHeldPage(srn, landOrPropertyIndexOne, indexOne), true)
+        .unsafeSet(LandPropertyDisposalCompletedPage(srn, landOrPropertyIndexOne, indexOne), SectionCompleted)
+        .unsafeSet(HowWasPropertyDisposedOfPage(srn, landOrPropertyIndexOne, indexTwo), HowDisposed.Sold)
+        .unsafeSet(LandOrPropertyStillHeldPage(srn, landOrPropertyIndexOne, indexTwo), true)
+        .unsafeSet(LandPropertyDisposalCompletedPage(srn, landOrPropertyIndexOne, indexTwo), SectionCompleted)
+
+      val result = userAnswers.remove(HowWasPropertyDisposedOfPage(srn, landOrPropertyIndexOne, indexOne)).success.value
+
+      result.get(LandOrPropertyStillHeldPage(srn, landOrPropertyIndexOne, indexOne)) must be(empty)
+      result.get(LandPropertyDisposalCompletedPage(srn, landOrPropertyIndexOne, indexOne)) must be(empty)
+      result.get(LandOrPropertyDisposalPage(srn)) must not be (empty)
+    }
+
+    "cleanup other fields when removing a disposal but there are disposals for other properties" in {
+      val userAnswers = defaultUserAnswers
+        .unsafeSet(LandOrPropertyDisposalPage(srn), true)
+        .unsafeSet(HowWasPropertyDisposedOfPage(srn, landOrPropertyIndexOne, indexOne), HowDisposed.Sold)
+        .unsafeSet(LandOrPropertyStillHeldPage(srn, landOrPropertyIndexOne, indexOne), true)
+        .unsafeSet(LandPropertyDisposalCompletedPage(srn, landOrPropertyIndexOne, indexOne), SectionCompleted)
+        .unsafeSet(HowWasPropertyDisposedOfPage(srn, landOrPropertyIndexOne, indexTwo), HowDisposed.Sold)
+        .unsafeSet(LandOrPropertyStillHeldPage(srn, landOrPropertyIndexOne, indexTwo), true)
+        .unsafeSet(LandPropertyDisposalCompletedPage(srn, landOrPropertyIndexOne, indexTwo), SectionCompleted)
+        .unsafeSet(HowWasPropertyDisposedOfPage(srn, landOrPropertyIndexTwo, indexOne), HowDisposed.Sold)
+        .unsafeSet(LandOrPropertyStillHeldPage(srn, landOrPropertyIndexTwo, indexOne), true)
+        .unsafeSet(LandPropertyDisposalCompletedPage(srn, landOrPropertyIndexTwo, indexOne), SectionCompleted)
+
+      val result = userAnswers.remove(HowWasPropertyDisposedOfPage(srn, landOrPropertyIndexOne, indexOne)).success.value
+
+      result.get(LandOrPropertyStillHeldPage(srn, landOrPropertyIndexOne, indexOne)) must be(empty)
+      result.get(LandPropertyDisposalCompletedPage(srn, landOrPropertyIndexOne, indexOne)) must be(empty)
+      result.get(LandOrPropertyDisposalPage(srn)) must not be (empty)
+    }
   }
 }

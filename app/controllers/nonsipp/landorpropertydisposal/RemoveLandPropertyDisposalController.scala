@@ -69,37 +69,6 @@ class RemoveLandPropertyDisposalController @Inject()(
       }
     }
 
-  private def removeAllLandOrProperty(
-    srn: Srn,
-    landOrPropertyIndex: Max5000,
-    disposalIndex: Max50,
-    userAnswers: UserAnswers
-  ): Try[UserAnswers] = {
-    val mustRemovedUa = userAnswers
-      .remove(HowWasPropertyDisposedOfPage(srn, landOrPropertyIndex, disposalIndex))
-      .flatMap(_.remove(LandOrPropertyStillHeldPage(srn, landOrPropertyIndex, disposalIndex)))
-      .flatMap(_.remove(WhenWasPropertySoldPage(srn, landOrPropertyIndex, disposalIndex)))
-      .flatMap(_.remove(LandOrPropertyDisposalBuyerConnectedPartyPage(srn, landOrPropertyIndex, disposalIndex)))
-      .flatMap(_.remove(DisposalIndependentValuationPage(srn, landOrPropertyIndex, disposalIndex)))
-      .flatMap(_.remove(TotalProceedsSaleLandPropertyPage(srn, landOrPropertyIndex, disposalIndex)))
-      .flatMap(_.remove(RemoveLandPropertyDisposalPage(srn, landOrPropertyIndex, disposalIndex)))
-      .flatMap(_.remove(WhoPurchasedLandOrPropertyPage(srn, landOrPropertyIndex, disposalIndex)))
-      .flatMap(_.remove(LandPropertyDisposalCompletedPage(srn, landOrPropertyIndex, disposalIndex)))
-      .flatMap(_.remove(CompanyBuyerNamePage(srn, landOrPropertyIndex, disposalIndex)))
-      .flatMap(_.remove(PartnershipBuyerNamePage(srn, landOrPropertyIndex, disposalIndex)))
-      .flatMap(_.remove(LandOrPropertyIndividualBuyerNamePage(srn, landOrPropertyIndex, disposalIndex)))
-      .flatMap(_.remove(CompanyBuyerCrnPage(srn, landOrPropertyIndex, disposalIndex)))
-      .flatMap(_.remove(PartnershipBuyerUtrPage(srn, landOrPropertyIndex, disposalIndex)))
-      .flatMap(_.remove(IndividualBuyerNinoNumberPage(srn, landOrPropertyIndex, disposalIndex)))
-      .flatMap(_.remove(OtherBuyerDetailsPage(srn, landOrPropertyIndex, disposalIndex)))
-
-    if (userAnswers.map(LandPropertyDisposalCompletedPages(srn)).size == 1) {
-      mustRemovedUa.flatMap(_.remove(LandOrPropertyDisposalPage(srn)))
-    } else {
-      mustRemovedUa
-    }
-  }
-
   def onSubmit(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       form
@@ -122,7 +91,10 @@ class RemoveLandPropertyDisposalController @Inject()(
             if (value) {
               for {
                 removedUserAnswers <- Future
-                  .fromTry(removeAllLandOrProperty(srn, landOrPropertyIndex, disposalIndex, request.userAnswers))
+                  .fromTry(
+                    // remove the first page in the journey only
+                    request.userAnswers.remove(HowWasPropertyDisposedOfPage(srn, landOrPropertyIndex, disposalIndex))
+                  )
 
                 _ <- saveService.save(removedUserAnswers)
                 redirectTo <- psrSubmissionService

@@ -16,10 +16,12 @@
 
 package pages.nonsipp.landorproperty
 
-import config.Refined.Max5000
+import config.Refined.{Max5000, OneTo50}
+import eu.timepit.refined.refineV
 import models.SchemeId.Srn
 import models.UserAnswers
 import pages.QuestionPage
+import pages.nonsipp.landorpropertydisposal.{HowWasPropertyDisposedOfPage, HowWasPropertyDisposedOfPages}
 import play.api.libs.json.JsPath
 import queries.Removable
 import utils.PageUtils.removePages
@@ -38,7 +40,11 @@ case class LandPropertyInUKPage(srn: Srn, index: Max5000) extends QuestionPage[B
     (value, userAnswers.get(this)) match {
       case (Some(true), Some(false)) => removePages(userAnswers, addressPages(srn))
       case (Some(false), Some(true)) => removePages(userAnswers, addressPages(srn))
-      case (None, _) => removePages(userAnswers, pages(srn, userAnswers.map(LandPropertyInUKPages(srn)).size == 1))
+      case (None, _) =>
+        removePages(
+          userAnswers,
+          pages(srn, userAnswers.map(LandPropertyInUKPages(srn)).size == 1, dependantPages(srn, userAnswers))
+        )
       case _ => Try(userAnswers)
     }
 
@@ -48,8 +54,18 @@ case class LandPropertyInUKPage(srn: Srn, index: Max5000) extends QuestionPage[B
       LandOrPropertyChosenAddressPage(srn, index),
       AddressLookupResultsPage(srn, index)
     )
+  private def dependantPages(srn: Srn, userAnswers: UserAnswers): List[Removable[_]] =
+    userAnswers
+      .map(HowWasPropertyDisposedOfPages(srn, index))
+      .keys
+      .toList
+      .flatMap(
+        key =>
+          refineV[OneTo50](key.toInt + 1)
+            .fold(_ => Nil, ind => List(HowWasPropertyDisposedOfPage(srn, index, ind)))
+      )
 
-  private def pages(srn: Srn, isLastRecord: Boolean): List[Removable[_]] = {
+  private def pages(srn: Srn, isLastRecord: Boolean, dependentPages: List[Removable[_]]): List[Removable[_]] = {
     val list = List(
       LandOrPropertyChosenAddressPage(srn, index),
       LandRegistryTitleNumberPage(srn, index),
@@ -61,7 +77,8 @@ case class LandPropertyInUKPage(srn: Srn, index: Max5000) extends QuestionPage[B
       LandOrPropertyTotalIncomePage(srn, index),
       RemovePropertyPage(srn, index)
     )
-    if (isLastRecord) list :+ LandOrPropertyHeldPage(srn) else list
+    val list1 = list ++ dependentPages
+    if (isLastRecord) list1 :+ LandOrPropertyHeldPage(srn) else list1
   }
 }
 

@@ -16,11 +16,12 @@
 
 package pages.nonsipp.landorproperty
 
-import config.Refined.OneTo5000
+import config.Refined.{OneTo50, OneTo5000}
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.refineMV
-import models.{ConditionalYesNo, Money, SchemeHoldLandProperty, SchemeId, UserAnswers}
+import models.{ConditionalYesNo, HowDisposed, Money, SchemeHoldLandProperty, SchemeId, UserAnswers}
 import pages.behaviours.PageBehaviours
+import pages.nonsipp.landorpropertydisposal.{HowWasPropertyDisposedOfPage, LandOrPropertyDisposalPage}
 import utils.UserAnswersUtils.UserAnswersOps
 
 import java.time.LocalDate
@@ -30,6 +31,8 @@ class LandPropertyInUKPageSpec extends PageBehaviours {
   private val srn: SchemeId.Srn = srnGen.sample.value
   val indexOne: Refined[Int, OneTo5000] = refineMV[OneTo5000](1)
   val indexTwo: Refined[Int, OneTo5000] = refineMV[OneTo5000](2)
+  val disposalIndexOne: Refined[Int, OneTo50] = refineMV[OneTo50](1)
+  val disposalIndexTwo: Refined[Int, OneTo50] = refineMV[OneTo50](2)
 
   "LandPropertyInUKPage" - {
 
@@ -115,6 +118,11 @@ class LandPropertyInUKPageSpec extends PageBehaviours {
         .unsafeSet(LandOrPropertyTotalIncomePage(srn, indexTwo), money)
         .unsafeSet(RemovePropertyPage(srn, indexTwo), true)
         .unsafeSet(LandOrPropertyHeldPage(srn), true)
+        // dependant disposal data:
+        .unsafeSet(LandOrPropertyDisposalPage(srn), true)
+        .unsafeSet(HowWasPropertyDisposedOfPage(srn, indexOne, disposalIndexOne), HowDisposed.Sold)
+        .unsafeSet(HowWasPropertyDisposedOfPage(srn, indexOne, disposalIndexTwo), HowDisposed.Sold)
+        .unsafeSet(HowWasPropertyDisposedOfPage(srn, indexTwo, disposalIndexOne), HowDisposed.Sold)
 
     s"remove dependant values when current answer is None" in {
 
@@ -147,5 +155,16 @@ class LandPropertyInUKPageSpec extends PageBehaviours {
       result.get(LandOrPropertyHeldPage(srn)) mustBe Some(true)
     }
 
+    s"remove dependant disposal values when current answer is None" in {
+
+      val result = LandPropertyInUKPage(srn, indexOne).cleanup(None, userAnswers).toOption.value
+
+      result.get(LandOrPropertyDisposalPage(srn)) mustBe Some(true)
+      result.get(HowWasPropertyDisposedOfPage(srn, indexOne, disposalIndexOne)) mustBe None
+      result.get(HowWasPropertyDisposedOfPage(srn, indexOne, disposalIndexTwo)) mustBe None
+      result.get(HowWasPropertyDisposedOfPage(srn, indexTwo, disposalIndexOne)) must not be None
+      result.get(LandOrPropertyDisposalPage(srn)) must not be None
+
+    }
   }
 }
