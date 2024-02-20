@@ -151,7 +151,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
             WhenDidSchemeAcquireBondsPage,
             (srn, _: Max5000, _) =>
               controllers.nonsipp.unregulatedorconnectedbonds.routes.CostOfBondsController
-              .onPageLoad(srn, index, NormalMode)
+                .onPageLoad(srn, index, NormalMode)
           )
           .withName(
             "go from WhenDidSchemeAcquireBondsPage to CostOfBondsPage"
@@ -165,10 +165,85 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
           .navigateToWithIndex(
             index,
             CostOfBondsPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.unregulatedorconnectedbonds.routes.BondsFromConnectedPartyController
+                .onPageLoad(srn, index, NormalMode),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                WhyDoesSchemeHoldBondsPage(srn, index),
+                SchemeHoldBond.Acquisition
+              )
+          )
+          .withName(
+            "go from CostOfBondsPage to BondsFromConnectedPartyPage when holding is acquisition"
+          )
+      )
+
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            CostOfBondsPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.unregulatedorconnectedbonds.routes.AreBondsUnregulatedController
+                .onPageLoad(srn, index, NormalMode),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                WhyDoesSchemeHoldBondsPage(srn, index),
+                SchemeHoldBond.Contribution
+              )
+          )
+          .withName(
+            "go from CostOfBondsPage to AreBondsUnregulatedPage when holding is contribution"
+          )
+      )
+
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            CostOfBondsPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.unregulatedorconnectedbonds.routes.AreBondsUnregulatedController
+                .onPageLoad(srn, index, NormalMode),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                WhyDoesSchemeHoldBondsPage(srn, index),
+                SchemeHoldBond.Transfer
+              )
+          )
+          .withName(
+            "go from CostOfBondsPage to AreBondsUnregulatedPage when holding is transfer"
+          )
+      )
+    }
+
+    "BondsFromConnectedPartyPage" - {
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            BondsFromConnectedPartyPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.unregulatedorconnectedbonds.routes.AreBondsUnregulatedController
+                .onPageLoad(srn, index, NormalMode),
+          )
+          .withName(
+            "go from BondsFromConnectedPartyPage to AreBondsUnregulatedPage"
+          )
+      )
+    }
+
+    "AreBondsUnregulatedPage" - {
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            AreBondsUnregulatedPage,
             (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
           )
           .withName(
-            "go from CostOfBondsPage to Unauthorised"
+            "go from AreBondsUnregulatedPage to Unauthorised"
           )
       )
     }

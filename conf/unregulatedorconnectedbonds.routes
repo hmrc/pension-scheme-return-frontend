@@ -29,3 +29,13 @@ GET         /:srn/bonds-total-cost-value/:index                                 
 POST        /:srn/bonds-total-cost-value/:index                                         controllers.nonsipp.unregulatedorconnectedbonds.CostOfBondsController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
 GET         /:srn/change-bonds-total-cost-value/:index                                  controllers.nonsipp.unregulatedorconnectedbonds.CostOfBondsController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 POST        /:srn/change-bonds-total-cost-value/:index                                  controllers.nonsipp.unregulatedorconnectedbonds.CostOfBondsController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET         /:srn/were-bonds-acquired-from-connected-party/:index                       controllers.nonsipp.unregulatedorconnectedbonds.BondsFromConnectedPartyController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/were-bonds-acquired-from-connected-party/:index                       controllers.nonsipp.unregulatedorconnectedbonds.BondsFromConnectedPartyController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/change-were-bonds-acquired-from-connected-party/:index                controllers.nonsipp.unregulatedorconnectedbonds.BondsFromConnectedPartyController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-were-bonds-acquired-from-connected-party/:index                controllers.nonsipp.unregulatedorconnectedbonds.BondsFromConnectedPartyController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET         /:srn/bonds-fca-list/:index                                                 controllers.nonsipp.unregulatedorconnectedbonds.AreBondsUnregulatedController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/bonds-fca-list/:index                                                 controllers.nonsipp.unregulatedorconnectedbonds.AreBondsUnregulatedController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/change-bonds-fca-list/:index                                          controllers.nonsipp.unregulatedorconnectedbonds.AreBondsUnregulatedController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-bonds-fca-list/:index                                          controllers.nonsipp.unregulatedorconnectedbonds.AreBondsUnregulatedController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
