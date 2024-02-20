@@ -75,6 +75,10 @@ object UnregulatedOrConnectedBondsNavigator extends JourneyNavigator {
         .onPageLoad(srn, index, NormalMode)
 
     case AreBondsUnregulatedPage(srn, index) =>
+      controllers.nonsipp.unregulatedorconnectedbonds.routes.IncomeFromBondsController
+        .onPageLoad(srn, index, NormalMode)
+
+    case IncomeFromBondsPage(srn, index) =>
       controllers.routes.UnauthorisedController.onPageLoad()
   }
 
