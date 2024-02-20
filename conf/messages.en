@@ -2643,3 +2643,7 @@ bonds.connectedParty.bullet2 = another company, where the same person has contro
 bonds.connectedParty.paragraph4 = See a
 bonds.connectedParty.paragraph4.link = full list of circumstances where an individual, company or partnership might be a connected party (opens in new tab).
 bonds.connectedParty.error.required = Select yes if these bonds were acquired from a connected party
+
+bonds.areBondsUnregulated.title = Are these bonds on the FCA Official List?
+bonds.areBondsUnregulated.heading = Are these bonds on the Financial Conduct Authority (FCA) Official List?
+bonds.areBondsUnregulated.error.required = Select yes if these bonds are on the Financial Conduct Authority (FCA) Official List
