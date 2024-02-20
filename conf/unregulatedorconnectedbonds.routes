@@ -39,3 +39,8 @@ GET         /:srn/bonds-fca-list/:index                                         
 POST        /:srn/bonds-fca-list/:index                                                 controllers.nonsipp.unregulatedorconnectedbonds.AreBondsUnregulatedController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
 GET         /:srn/change-bonds-fca-list/:index                                          controllers.nonsipp.unregulatedorconnectedbonds.AreBondsUnregulatedController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 POST        /:srn/change-bonds-fca-list/:index                                          controllers.nonsipp.unregulatedorconnectedbonds.AreBondsUnregulatedController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET         /:srn/bonds-total-income/:index                                             controllers.nonsipp.unregulatedorconnectedbonds.IncomeFromBondsController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/bonds-total-income/:index                                             controllers.nonsipp.unregulatedorconnectedbonds.IncomeFromBondsController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/change-bonds-total-income/:index                                      controllers.nonsipp.unregulatedorconnectedbonds.IncomeFromBondsController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-bonds-total-income/:index                                      controllers.nonsipp.unregulatedorconnectedbonds.IncomeFromBondsController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)

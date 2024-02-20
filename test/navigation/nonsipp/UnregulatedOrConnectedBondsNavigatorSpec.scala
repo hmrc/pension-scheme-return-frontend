@@ -226,7 +226,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
             BondsFromConnectedPartyPage,
             (srn, _: Max5000, _) =>
               controllers.nonsipp.unregulatedorconnectedbonds.routes.AreBondsUnregulatedController
-                .onPageLoad(srn, index, NormalMode),
+                .onPageLoad(srn, index, NormalMode)
           )
           .withName(
             "go from BondsFromConnectedPartyPage to AreBondsUnregulatedPage"
@@ -240,10 +240,26 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
           .navigateToWithIndex(
             index,
             AreBondsUnregulatedPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.unregulatedorconnectedbonds.routes.IncomeFromBondsController
+                .onPageLoad(srn, index, NormalMode)
+          )
+          .withName(
+            "go from AreBondsUnregulatedPage to IncomeFromBondsPage"
+          )
+      )
+    }
+
+    "IncomeFromBondsPage" - {
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            IncomeFromBondsPage,
             (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
           )
           .withName(
-            "go from AreBondsUnregulatedPage to Unauthorised"
+            "go from IncomeFromBondsPage to Unauthorised"
           )
       )
     }
