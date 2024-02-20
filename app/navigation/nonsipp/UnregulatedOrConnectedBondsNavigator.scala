@@ -61,6 +61,15 @@ object UnregulatedOrConnectedBondsNavigator extends JourneyNavigator {
         .onPageLoad(srn, index, NormalMode)
 
     case CostOfBondsPage(srn, index) =>
+      userAnswers.get(WhyDoesSchemeHoldBondsPage(srn, index)) match {
+        case Some(Acquisition) =>
+          controllers.nonsipp.unregulatedorconnectedbonds.routes.BondsFromConnectedPartyController
+            .onPageLoad(srn, index, NormalMode)
+        case _ =>
+          controllers.routes.UnauthorisedController.onPageLoad()
+      }
+
+    case BondsFromConnectedPartyPage(srn, index) =>
       controllers.routes.UnauthorisedController.onPageLoad()
   }
 

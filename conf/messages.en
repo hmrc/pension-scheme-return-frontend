@@ -2631,3 +2631,15 @@ bonds.costOfBonds.error.required = Enter the total cost of the bonds, in pounds 
 bonds.costOfBonds.error.invalid = Total cost of the bonds must be an amount of money, like 123 or 123.45
 bonds.costOfBonds.error.tooSmall = Total cost of the bonds must be 0.01 or more
 bonds.costOfBonds.error.tooLarge = Total cost of the bonds must be 999999999.99 or less
+
+bonds.connectedParty.title = Were these bonds acquired from a connected party?
+bonds.connectedParty.heading = Were these bonds acquired from a connected party?
+bonds.connectedParty.content = What is a connected party?
+bonds.connectedParty.paragraph1 = A connected party is an individual, company or partnership that is connected to either a member of the scheme or the sponsoring employer of the scheme.
+bonds.connectedParty.paragraph2 = A connected party of a member is usually their spouse, civil partner or close relative (for example their parent, sibling, child or grandchild).
+bonds.connectedParty.paragraph3 = A connected party of a sponsoring employer can be:
+bonds.connectedParty.bullet1 = someone who has control over the company
+bonds.connectedParty.bullet2 = another company, where the same person has control of both
+bonds.connectedParty.paragraph4 = See a
+bonds.connectedParty.paragraph4.link = full list of circumstances where an individual, company or partnership might be a connected party (opens in new tab).
+bonds.connectedParty.error.required = Select yes if these bonds were acquired from a connected party
