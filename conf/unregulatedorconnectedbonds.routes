@@ -24,3 +24,8 @@ GET         /:srn/when-did-scheme-acquire-bonds/:index                          
 POST        /:srn/when-did-scheme-acquire-bonds/:index                                  controllers.nonsipp.unregulatedorconnectedbonds.WhenDidSchemeAcquireBondsController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
 GET         /:srn/change-when-did-scheme-acquire-bonds/:index                           controllers.nonsipp.unregulatedorconnectedbonds.WhenDidSchemeAcquireBondsController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 POST        /:srn/change-when-did-scheme-acquire-bonds/:index                           controllers.nonsipp.unregulatedorconnectedbonds.WhenDidSchemeAcquireBondsController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET         /:srn/bonds-total-cost-value/:index                                         controllers.nonsipp.unregulatedorconnectedbonds.CostOfBondsController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/bonds-total-cost-value/:index                                         controllers.nonsipp.unregulatedorconnectedbonds.CostOfBondsController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/change-bonds-total-cost-value/:index                                  controllers.nonsipp.unregulatedorconnectedbonds.CostOfBondsController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-bonds-total-cost-value/:index                                  controllers.nonsipp.unregulatedorconnectedbonds.CostOfBondsController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)

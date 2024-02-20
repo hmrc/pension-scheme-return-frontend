@@ -2623,3 +2623,11 @@ whenDidSchemeAcquireBonds.dateOfAcquired.error.invalid.date = Date the scheme ac
 whenDidSchemeAcquireBonds.dateOfAcquired.error.invalid.characters = Date the scheme acquired these bonds must only include numbers 0 to 9
 whenDidSchemeAcquireBonds.dateOfAcquired.error.future = Date the scheme acquired these bonds must be the same as or before {0}
 whenDidSchemeAcquireBonds.dateOfAcquired.error.after = Date the scheme acquired these bonds must be after {0}
+
+bonds.costOfBonds.title = What was the total cost of these bonds, in pounds and pence?
+bonds.costOfBonds.heading = What was the total cost of these bonds, in pounds and pence?
+bonds.costOfBonds.hint = Include all costs related to the transaction. If the bonds were not acquired, provide the total value.
+bonds.costOfBonds.error.required = Enter the total cost of the bonds, in pounds and pence
+bonds.costOfBonds.error.invalid = Total cost of the bonds must be an amount of money, like 123 or 123.45
+bonds.costOfBonds.error.tooSmall = Total cost of the bonds must be 0.01 or more
+bonds.costOfBonds.error.tooLarge = Total cost of the bonds must be 999999999.99 or less

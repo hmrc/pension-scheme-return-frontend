@@ -14,15 +14,18 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages.nonsipp.unregulatedorconnectedbonds
 
-import play.api.libs.json.{__, JsPath}
+import config.Refined.Max5000
+import models.Money
+import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
+import utils.RefinedUtils.RefinedIntOps
 
-package object unregulatedorconnectedbonds {
+case class CostOfBondsPage(srn: Srn, index: Max5000) extends QuestionPage[Money] {
 
-  object Paths {
-    val bonds: JsPath = __ \ "bonds"
-    val bondTransactions: JsPath = bonds \ "bondTransactions"
-  }
+  override def path: JsPath = Paths.bondTransactions \ toString \ index.arrayIndex.toString
 
+  override def toString: String = "costOfBonds"
 }

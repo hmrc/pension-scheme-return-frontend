@@ -128,7 +128,9 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
           .navigateToWithIndex(
             index,
             WhyDoesSchemeHoldBondsPage,
-            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad(),
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.unregulatedorconnectedbonds.routes.CostOfBondsController
+                .onPageLoad(srn, index, NormalMode),
             srn =>
               defaultUserAnswers.unsafeSet(
                 WhyDoesSchemeHoldBondsPage(srn, index),
@@ -136,7 +138,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
               )
           )
           .withName(
-            "go from WhyDoesSchemeHoldBondsPage to Unauthorised when holding is transfer"
+            "go from WhyDoesSchemeHoldBondsPage to CostOfBondsPage when holding is transfer"
           )
       )
     }
@@ -147,10 +149,26 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
           .navigateToWithIndex(
             index,
             WhenDidSchemeAcquireBondsPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.unregulatedorconnectedbonds.routes.CostOfBondsController
+              .onPageLoad(srn, index, NormalMode)
+          )
+          .withName(
+            "go from WhenDidSchemeAcquireBondsPage to CostOfBondsPage"
+          )
+      )
+    }
+
+    "CostOfBondsPage" - {
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            CostOfBondsPage,
             (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
           )
           .withName(
-            "go from WhenDidSchemeAcquireBondsPage to Unauthorised"
+            "go from CostOfBondsPage to Unauthorised"
           )
       )
     }
