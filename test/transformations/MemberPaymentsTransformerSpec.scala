@@ -106,7 +106,7 @@ class MemberPaymentsTransformerSpec
         pensionAmountReceived = Some(12.34)
       )
     ),
-    employerContributionsCompleted = true,
+    employerContributionsDetails = SectionDetails(made = true, completed = true),
     transfersInCompleted = false,
     transfersOutCompleted = false,
     unallocatedContribsMade = true,

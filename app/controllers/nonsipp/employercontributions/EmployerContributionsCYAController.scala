@@ -31,7 +31,7 @@ import pages.nonsipp.employercontributions._
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import services.SaveService
+import services.{PsrSubmissionService, SaveService}
 import utils.ListUtils.ListOps
 import viewmodels.DisplayMessage.{Heading2, Message}
 import viewmodels.implicits._
@@ -48,7 +48,8 @@ class EmployerContributionsCYAController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
   saveService: SaveService,
-  view: CheckYourAnswersView
+  view: CheckYourAnswersView,
+  psrSubmissionService: PsrSubmissionService
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
@@ -69,21 +70,21 @@ class EmployerContributionsCYAController @Inject()(
   def onSubmit(srn: Srn, index: Max300, page: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       val userAnswersWithSectionCompleted = buildSecondaryIndexes(srn, index).map(
-        indexes =>
-          indexes.foldLeft(Try(request.userAnswers))(
-            (userAnswers, secondaryIndex) =>
-              userAnswers.set(EmployerContributionsCompleted(srn, index, secondaryIndex), SectionCompleted)
-          )
+        _.foldLeft(Try(request.userAnswers))(
+          (userAnswers, secondaryIndex) =>
+            userAnswers.set(EmployerContributionsCompleted(srn, index, secondaryIndex), SectionCompleted)
+        )
       )
 
       (
         for {
           userAnswers <- EitherT(userAnswersWithSectionCompleted.pure[Future])
-          updatedAnswers <- Future
-            .fromTry(userAnswers)
-            .liftF
+          updatedAnswers <- Future.fromTry(userAnswers).liftF
           _ <- saveService.save(updatedAnswers).liftF
-        } yield Redirect(navigator.nextPage(EmployerContributionsCYAPage(srn), mode, updatedAnswers))
+          submissionResult <- psrSubmissionService.submitPsrDetails(srn, updatedAnswers).liftF
+        } yield submissionResult.getOrRecoverJourney(
+          _ => Redirect(navigator.nextPage(EmployerContributionsCYAPage(srn), mode, updatedAnswers))
+        )
       ).merge
     }
 

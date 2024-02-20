@@ -20,9 +20,15 @@ import controllers.ControllerBaseSpec
 import controllers.nonsipp.employercontributions.EmployerContributionsController.viewModel
 import forms.YesNoPageFormProvider
 import models.NormalMode
+import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.employercontributions.EmployerContributionsPage
+import play.api.inject.bind
+import play.api.inject.guice.GuiceableModule
 import play.api.libs.json.JsPath
+import services.PsrSubmissionService
 import views.html.YesNoPageView
+
+import scala.concurrent.Future
 
 class EmployerContributionsControllerSpec extends ControllerBaseSpec {
 
@@ -30,6 +36,18 @@ class EmployerContributionsControllerSpec extends ControllerBaseSpec {
   private lazy val onSubmit = routes.EmployerContributionsController.onSubmit(srn, NormalMode)
 
   val form = EmployerContributionsController.form(new YesNoPageFormProvider())
+
+  private val mockPsrSubmissionService = mock[PsrSubmissionService]
+
+  override val additionalBindings: List[GuiceableModule] = List(
+    bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
+  )
+
+  override def beforeEach(): Unit = {
+    reset(mockPsrSubmissionService)
+    when(mockPsrSubmissionService.submitPsrDetails(any(), any())(any(), any(), any()))
+      .thenReturn(Future.successful(Some(())))
+  }
 
   "EmployerContributionsController" - {
 

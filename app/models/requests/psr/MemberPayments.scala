@@ -29,7 +29,7 @@ case class SectionDetails(
 
 case class MemberPayments(
   memberDetails: List[MemberDetails],
-  employerContributionsCompleted: Boolean,
+  employerContributionsDetails: SectionDetails,
   transfersInCompleted: Boolean,
   transfersOutCompleted: Boolean,
   unallocatedContribsMade: Boolean,

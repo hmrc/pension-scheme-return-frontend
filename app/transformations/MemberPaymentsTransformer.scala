@@ -105,10 +105,13 @@ class MemberPaymentsTransformer @Inject()(
         Some(
           MemberPayments(
             memberDetails = list,
-            employerContributionsCompleted = userAnswers.get(EmployerContributionsSectionStatus(srn)).exists {
-              case SectionStatus.InProgress => false
-              case SectionStatus.Completed => true
-            },
+            employerContributionsDetails = SectionDetails(
+              made = userAnswers.get(EmployerContributionsPage(srn)).getOrElse(false),
+              completed = userAnswers.get(EmployerContributionsSectionStatus(srn)).exists {
+                case SectionStatus.InProgress => false
+                case SectionStatus.Completed => true
+              }
+            ),
             transfersInCompleted = userAnswers.get(TransfersInJourneyStatus(srn)).exists {
               case SectionStatus.InProgress => false
               case SectionStatus.Completed => true
@@ -145,7 +148,7 @@ class MemberPaymentsTransformer @Inject()(
                 employerContributionsPages(
                   srn,
                   index,
-                  memberPayments.employerContributionsCompleted,
+                  memberPayments.employerContributionsDetails,
                   memberDetails.employerContributions
                 ) ++ transfersInTransformer.transformFromEtmp(
                 srn,
@@ -281,7 +284,7 @@ class MemberPaymentsTransformer @Inject()(
   private def employerContributionsPages(
     srn: Srn,
     index: Max300,
-    employerContributionsCompleted: Boolean,
+    employerContributionsDetails: SectionDetails,
     employerContributionsList: List[EmployerContributions]
   ): List[Try[UserAnswers] => Try[UserAnswers]] = {
     val secondaryIndexes: List[(Max50, EmployerContributions)] = employerContributionsList.zipWithIndex
@@ -315,11 +318,11 @@ class MemberPaymentsTransformer @Inject()(
           }
         )
     } ++ List[Try[UserAnswers] => Try[UserAnswers]](
-      _.set(EmployerContributionsPage(srn), employerContributionsList.nonEmpty),
-      _.set(EmployerContributionsMemberListPage(srn), employerContributionsCompleted),
+      _.set(EmployerContributionsPage(srn), employerContributionsDetails.made),
+      _.set(EmployerContributionsMemberListPage(srn), employerContributionsDetails.completed),
       _.set(
         EmployerContributionsSectionStatus(srn),
-        if (employerContributionsCompleted) SectionStatus.Completed else SectionStatus.InProgress
+        if (employerContributionsDetails.completed) SectionStatus.Completed else SectionStatus.InProgress
       )
     )
   }
