@@ -23,7 +23,7 @@ import eu.timepit.refined.refineMV
 import models.ConditionalYesNo._
 import models.SchemeHoldShare.Contribution
 import models.TypeOfShares.ConnectedParty
-import models.{CheckOrChange, ConditionalYesNo, Crn, IdentitySubject, IdentityType}
+import models.{CheckMode, ConditionalYesNo, Crn, IdentitySubject, IdentityType, Mode, NormalMode}
 import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.common.IdentityTypePage
 import pages.nonsipp.shares._
@@ -49,9 +49,9 @@ class SharesCYAControllerSpec extends ControllerBaseSpec {
   private val taxYear = Some(Left(dateRange))
   private val subject = IdentitySubject.SharesSeller
 
-  private def onPageLoad(checkOrChange: CheckOrChange) =
-    routes.SharesCYAController.onPageLoad(srn, index, checkOrChange)
-  private def onSubmit(checkOrChange: CheckOrChange) = routes.SharesCYAController.onSubmit(srn, checkOrChange)
+  private def onPageLoad(mode: Mode) =
+    routes.SharesCYAController.onPageLoad(srn, index, mode)
+  private def onSubmit(mode: Mode) = routes.SharesCYAController.onSubmit(srn, mode)
 
   private val filledUserAnswers = defaultUserAnswers
     .unsafeSet(TypeOfSharesHeldPage(srn, index), ConnectedParty)
@@ -70,9 +70,9 @@ class SharesCYAControllerSpec extends ControllerBaseSpec {
     .unsafeSet(SharesTotalIncomePage(srn, index), money)
 
   "SharesCYAController" - {
-    List(CheckOrChange.Check, CheckOrChange.Change).foreach { checkOrChange =>
+    List(NormalMode, CheckMode).foreach { mode =>
       act.like(
-        renderView(onPageLoad(checkOrChange), filledUserAnswers) { implicit app => implicit request =>
+        renderView(onPageLoad(mode), filledUserAnswers) { implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
             viewModel(
               ViewModelParameters(
@@ -95,31 +95,31 @@ class SharesCYAControllerSpec extends ControllerBaseSpec {
                 shareIndependentValue = true,
                 totalAssetValue = None,
                 sharesTotalIncome = money,
-                checkOrChange
+                mode = mode
               )
             )
           )
         }.before(MockSchemeDateService.taxYearOrAccountingPeriods(taxYear))
-          .withName(s"render correct ${checkOrChange.name} view")
+          .withName(s"render correct ${mode.toString} view")
       )
       act.like(
-        redirectNextPage(onSubmit(checkOrChange))
+        redirectNextPage(onSubmit(mode))
           .before(MockPSRSubmissionService.submitPsrDetails())
           .after({
             verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any())(any(), any(), any())
             reset(mockPsrSubmissionService)
           })
-          .withName(s"redirect to next page when in ${checkOrChange.name} mode")
+          .withName(s"redirect to next page when in ${mode} mode")
       )
       act.like(
-        journeyRecoveryPage(onPageLoad(checkOrChange))
+        journeyRecoveryPage(onPageLoad(mode))
           .updateName("onPageLoad" + _)
-          .withName(s"redirect to journey recovery page on page load when in ${checkOrChange.name} mode")
+          .withName(s"redirect to journey recovery page on page load when in ${mode} mode")
       )
       act.like(
-        journeyRecoveryPage(onSubmit(checkOrChange))
+        journeyRecoveryPage(onSubmit(mode))
           .updateName("onSubmit" + _)
-          .withName(s"redirect to journey recovery page on submit when in ${checkOrChange.name} mode")
+          .withName(s"redirect to journey recovery page on submit when in ${mode} mode")
       )
     }
   }

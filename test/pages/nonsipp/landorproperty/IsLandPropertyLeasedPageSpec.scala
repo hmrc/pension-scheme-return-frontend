@@ -85,8 +85,8 @@ class IsLandPropertyLeasedPageSpec extends PageBehaviours {
         }
       }
 
-      List(true, false, None).foreach { existingAnswer =>
-        s"remove dependant values when current answer is None and existing answer is ${existingAnswer}" in {
+      List(Some(true), Some(false), None).foreach { existingAnswer =>
+        s"remove dependant values when current answer is None and existing answer is $existingAnswer" in {
 
           val answer = userAnswers.unsafeSet(IsLandPropertyLeasedPage(srn, index), true)
 

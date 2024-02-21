@@ -27,25 +27,7 @@ import models.TypeOfShares.{ConnectedParty, SponsoringEmployer, Unquoted}
 import models.{SchemeHoldShare, _}
 import navigation.Navigator
 import pages.nonsipp.common._
-import pages.nonsipp.shares.{
-  ClassOfSharesPage,
-  CompanyNameOfSharesSellerPage,
-  CompanyNameRelatedSharesPage,
-  CostOfSharesPage,
-  HowManySharesPage,
-  IndividualNameOfSharesSellerPage,
-  PartnershipShareSellerNamePage,
-  SharesCYAPage,
-  SharesCompanyCrnPage,
-  SharesFromConnectedPartyPage,
-  SharesIndependentValuationPage,
-  SharesIndividualSellerNINumberPage,
-  SharesTotalIncomePage,
-  TotalAssetValuePage,
-  TypeOfSharesHeldPage,
-  WhenDidSchemeAcquireSharesPage,
-  WhyDoesSchemeHoldSharesPage
-}
+import pages.nonsipp.shares._
 import play.api.i18n._
 import play.api.mvc._
 import services.PsrSubmissionService
@@ -73,7 +55,7 @@ class SharesCYAController @Inject()(
   def onPageLoad(
     srn: Srn,
     index: Max5000,
-    checkOrChange: CheckOrChange
+    mode: Mode
   ): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       (
@@ -176,7 +158,7 @@ class SharesCYAController @Inject()(
                 shareIndependentValue,
                 totalAssetValue,
                 sharesTotalIncome,
-                checkOrChange
+                mode
               )
             )
           )
@@ -185,7 +167,7 @@ class SharesCYAController @Inject()(
 
     }
 
-  def onSubmit(srn: Srn, checkOrChange: CheckOrChange): Action[AnyContent] =
+  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
       psrSubmissionService.submitPsrDetails(srn).map {
         case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
@@ -214,15 +196,15 @@ case class ViewModelParameters(
   shareIndependentValue: Boolean,
   totalAssetValue: Option[Money],
   sharesTotalIncome: Money,
-  checkOrChange: CheckOrChange
+  mode: Mode
 )
 object SharesCYAController {
   def viewModel(parameters: ViewModelParameters): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](
-      title = parameters.checkOrChange.fold(check = "checkYourAnswers.title", change = "sharesCYA.change.title"),
-      heading = parameters.checkOrChange.fold(
-        check = "checkYourAnswers.heading",
-        change = Message("sharesCYA.change.heading", parameters.companyNameRelatedShares)
+      title = parameters.mode.fold(normal = "checkYourAnswers.title", check = "sharesCYA.change.title"),
+      heading = parameters.mode.fold(
+        normal = "checkYourAnswers.heading",
+        check = Message("sharesCYA.change.heading", parameters.companyNameRelatedShares)
       ),
       description = Some(ParagraphMessage("sharesCYA.paragraph")),
       page = CheckYourAnswersViewModel(
@@ -250,8 +232,8 @@ object SharesCYAController {
         )
       ),
       refresh = None,
-      buttonText = parameters.checkOrChange.fold(check = "site.saveAndContinue", change = "site.continue"),
-      onSubmit = routes.SharesCYAController.onSubmit(parameters.srn, parameters.checkOrChange)
+      buttonText = parameters.mode.fold(normal = "site.saveAndContinue", check = "site.continue"),
+      onSubmit = routes.SharesCYAController.onSubmit(parameters.srn, parameters.mode)
     )
 
   private def sections(
@@ -373,22 +355,21 @@ object SharesCYAController {
         List(
           CheckYourAnswersRowViewModel(
             Message("sharesCYA.section1.typeOfShare"),
-            (typeOfShare) match {
+            typeOfShare match {
               case SponsoringEmployer => "sharesCYA.section1.SponsoringEmployer"
               case Unquoted => "sharesCYA.section1.Unquoted"
               case ConnectedParty => "sharesCYA.section1.ConnectedParty"
             }
           ).withAction(
             SummaryAction(
-              "",
+              "site.change",
               routes.TypeOfSharesHeldController.onPageLoad(srn, index, mode).url + "#typeOfShare"
             ).withVisuallyHiddenContent(
-              "sharesCYA.section1.typeOfShare.hidden",
-              typeOfShare match {
+              ("sharesCYA.section1.typeOfShare.hidden", typeOfShare match {
                 case SponsoringEmployer => "sharesCYA.section1.SponsoringEmployer"
                 case Unquoted => "sharesCYA.section1.Unquoted"
                 case ConnectedParty => "sharesCYA.section1.ConnectedParty"
-              }
+              })
             )
           )
         ) ++ List(
@@ -409,7 +390,7 @@ object SharesCYAController {
             }
           ).withAction(
             SummaryAction(
-              "",
+              "site.change",
               routes.WhyDoesSchemeHoldSharesController.onPageLoad(srn, index, mode).url + "#holdShares"
             ).withVisuallyHiddenContent(
               Message(
@@ -500,12 +481,11 @@ object SharesCYAController {
               "site.change",
               routes.CompanyNameRelatedSharesController.onPageLoad(srn, index, mode).url + "#companyNameRelatedShares"
             ).withVisuallyHiddenContent(
-              "sharesCYA.section2.companyNameRelatedShares.hidden",
-              typeOfShare match {
+              ("sharesCYA.section2.companyNameRelatedShares.hidden", typeOfShare match {
                 case SponsoringEmployer => "sharesCYA.section1.SponsoringEmployer"
                 case Unquoted => "sharesCYA.section1.Unquoted"
                 case ConnectedParty => "sharesCYA.section1.ConnectedParty"
-              }
+              })
             )
           ),
           companySharesCrn.value match {
@@ -545,7 +525,7 @@ object SharesCYAController {
             SummaryAction(
               "site.change",
               routes.ClassOfSharesController.onPageLoad(srn, index, mode).url + "#classOfShares"
-            ).withVisuallyHiddenContent("sharesCYA.section2.classOfShares.hidden", companyNameRelatedShares)
+            ).withVisuallyHiddenContent(("sharesCYA.section2.classOfShares.hidden", companyNameRelatedShares))
           ),
           CheckYourAnswersRowViewModel(
             Message("sharesCYA.section2.howManyShares", companyNameRelatedShares),
@@ -554,7 +534,7 @@ object SharesCYAController {
             SummaryAction(
               "site.change",
               routes.HowManySharesController.onPageLoad(srn, index, mode).url + "#howManyShares"
-            ).withVisuallyHiddenContent("sharesCYA.section2.howManyShares.hidden", companyNameRelatedShares)
+            ).withVisuallyHiddenContent(("sharesCYA.section2.howManyShares.hidden", companyNameRelatedShares))
           )
         ) :?+ sharesFromConnectedParty.flatMap { connectedParty =>
           holdShares match {
@@ -708,7 +688,7 @@ object SharesCYAController {
               controllers.nonsipp.common.routes.IdentityTypeController
                 .onPageLoad(srn, index, mode, IdentitySubject.SharesSeller)
                 .url
-            ).withVisuallyHiddenContent("sharesCYA.section3.whoWereSharesAcquired.hidden", companyNameRelatedShares)
+            ).withVisuallyHiddenContent(("sharesCYA.section3.whoWereSharesAcquired.hidden", companyNameRelatedShares))
           ),
           CheckYourAnswersRowViewModel("sharesCYA.section3.recipientName", recipientName)
             .withAction(
@@ -801,7 +781,7 @@ object SharesCYAController {
                 case _ =>
                   routes.SharesTotalIncomeController.onPageLoad(srn, index, mode).url
               }
-            ).withVisuallyHiddenContent("sharesCYA.section4.totalAssetValue.hidden", schemeName)
+            ).withVisuallyHiddenContent(("sharesCYA.section4.totalAssetValue.hidden", schemeName))
           )
         } :+ CheckYourAnswersRowViewModel(
           Message("sharesCYA.section4.sharesTotalIncome"),
