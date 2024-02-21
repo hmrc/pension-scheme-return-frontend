@@ -16,14 +16,14 @@
 
 package navigation.nonsipp
 
-import config.Refined.OneTo5000
+import cats.implicits.toTraverseOps
+import config.Refined.{Max5000, OneTo5000}
 import eu.timepit.refined.{refineMV, refineV}
 import models.CheckOrChange.Check
 import models.ConditionalYesNo._
 import models.{CheckOrChange, IdentitySubject, IdentityType, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-
 import pages.nonsipp.common.{
   CompanyRecipientCrnPage,
   IdentityTypePage,
@@ -31,7 +31,6 @@ import pages.nonsipp.common.{
   OtherRecipientDetailsPage,
   PartnershipRecipientUtrPage
 }
-
 import pages.nonsipp.loansmadeoroutstanding._
 import play.api.mvc.Call
 
@@ -134,14 +133,18 @@ object LoansMadeOrOutstandingNavigator extends JourneyNavigator {
       controllers.nonsipp.loansmadeoroutstanding.routes.LoansListController.onPageLoad(srn, page = 1, NormalMode)
 
     case LoansListPage(srn, addLoan @ true) =>
-      val answers = userAnswers.map(IdentityTypes(srn, IdentitySubject.LoanRecipient))
-      val nextDataKey = if (answers.isEmpty) 1 else answers.keys.map(_.toIntOption.getOrElse(0)).max + 1
-      refineV[OneTo5000](nextDataKey + 1) match {
-        case Left(_) => controllers.routes.JourneyRecoveryController.onPageLoad()
-        case Right(nextIndex) =>
-          controllers.nonsipp.common.routes.IdentityTypeController
-            .onPageLoad(srn, nextIndex, NormalMode, IdentitySubject.LoanRecipient)
-      }
+      (
+        for {
+          indexes <- userAnswers
+            .map(IdentityTypes(srn, IdentitySubject.LoanRecipient))
+            .keys
+            .toList
+            .traverse(_.toIntOption)
+            .getOrRecoverJourney
+          nextIndex <- findNextOpenIndex[Max5000.Refined](indexes).getOrRecoverJourney
+        } yield controllers.nonsipp.common.routes.IdentityTypeController
+          .onPageLoad(srn, nextIndex, NormalMode, IdentitySubject.LoanRecipient)
+      ).merge
 
     case LoansListPage(srn, addLoan @ false) =>
       controllers.nonsipp.routes.TaskListController.onPageLoad(srn)

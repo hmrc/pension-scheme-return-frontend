@@ -20,6 +20,7 @@ import config.Constants
 import config.Refined.Max5000
 import controllers.PSRController
 import controllers.actions._
+import controllers.nonsipp.landorproperty.LandOrPropertyTotalIncomeController._
 import forms.MoneyFormProvider
 import forms.mappings.errors.MoneyFormErrors
 import models.SchemeId.Srn
@@ -33,8 +34,7 @@ import services.SaveService
 import viewmodels.DisplayMessage.{Empty, Message}
 import viewmodels.implicits._
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
-import viewmodels.models.{FormPageViewModel, QuestionField}
-import LandOrPropertyTotalIncomeController._
+import viewmodels.models.{FormPageViewModel, QuestionField, SectionCompleted}
 import views.html.MoneyView
 
 import javax.inject.{Inject, Named}
@@ -74,7 +74,11 @@ class LandOrPropertyTotalIncomeController @Inject()(
           value =>
             for {
               updatedAnswers <- Future
-                .fromTry(request.userAnswers.transformAndSet(LandOrPropertyTotalIncomePage(srn, index), value))
+                .fromTry(
+                  request.userAnswers
+                    .set(LandOrPropertyTotalIncomePage(srn, index), value)
+                    .set(LandOrPropertyCompleted(srn, index), SectionCompleted)
+                )
               _ <- saveService.save(updatedAnswers)
             } yield Redirect(navigator.nextPage(LandOrPropertyTotalIncomePage(srn, index), mode, updatedAnswers))
         )

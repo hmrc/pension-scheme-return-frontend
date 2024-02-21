@@ -30,6 +30,18 @@ case class LandPropertyDisposalCompletedPage(srn: Srn, landOrPropertyIndex: Max5
   override def toString: String = "disposalCompleted"
 }
 
+object LandPropertyDisposalCompleted {
+  def all(
+    srn: Srn,
+    landOrPropertyIndex: Max5000
+  ): IndexedQuestionPage[SectionCompleted.type] = new IndexedQuestionPage[SectionCompleted.type] {
+    override def path: JsPath =
+      Paths.disposalPropertyTransaction \ toString \ landOrPropertyIndex.arrayIndex.toString
+
+    override def toString: String = "disposalCompleted"
+  }
+}
+
 case class LandPropertyDisposalCompletedPages(srn: Srn)
     extends IndexedQuestionPage[Map[String, SectionCompleted.type]] {
   override def path: JsPath = Paths.disposalPropertyTransaction \ toString

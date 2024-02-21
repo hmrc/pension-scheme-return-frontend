@@ -25,6 +25,7 @@ import models.HowDisposed.{HowDisposed, Other, Sold}
 import models.IdentitySubject.LandOrPropertySeller
 import models.SchemeHoldLandProperty.{Acquisition, Transfer}
 import models.SchemeId.Srn
+import models.UserAnswers.implicits.UserAnswersTryOps
 import models.requests.DataRequest
 import models.requests.psr._
 import models.{
@@ -229,7 +230,9 @@ class LandOrPropertyTransactionsTransformer @Inject() extends Transformer {
             ua6 <- ua5.set(totalCostOfLandOrProperty._1, totalCostOfLandOrProperty._2)
             ua7 <- ua6.set(isLandOrPropertyResidential._1, isLandOrPropertyResidential._2)
             ua8 <- ua7.set(landOrPropertyLeased._1, landOrPropertyLeased._2)
-            ua9 <- ua8.set(totalIncomeOrReceipts._1, totalIncomeOrReceipts._2)
+            ua9 <- ua8
+              .set(totalIncomeOrReceipts._1, totalIncomeOrReceipts._2)
+              .set(LandOrPropertyCompleted(srn, index), SectionCompleted)
 
             ua10 <- optDateOfAcquisitionOrContribution.map(t => ua9.set(t._1, t._2)).getOrElse(Try(ua9))
             ua11 <- optIndepValuationSupport.map(t => ua10.set(t._1, t._2)).getOrElse(Try(ua10))

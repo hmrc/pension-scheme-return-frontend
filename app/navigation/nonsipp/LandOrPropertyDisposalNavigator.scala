@@ -16,6 +16,8 @@
 
 package navigation.nonsipp
 
+import cats.implicits.toTraverseOps
+import config.Refined.Max50
 import models._
 import navigation.JourneyNavigator
 import pages.Page
@@ -93,9 +95,19 @@ object LandOrPropertyDisposalNavigator extends JourneyNavigator {
       controllers.nonsipp.landorpropertydisposal.routes.IndividualBuyerNinoNumberController
         .onPageLoad(srn, landOrPropertyIndex, disposalIndex, NormalMode)
 
-    case page @ LandOrPropertyDisposalAddressListPage(srn, addressChoice, disposalChoice) =>
-      controllers.nonsipp.landorpropertydisposal.routes.HowWasPropertyDisposedOfController
-        .onPageLoad(srn, addressChoice, disposalChoice, NormalMode)
+    case page @ LandOrPropertyDisposalAddressListPage(srn, addressChoice, _) =>
+      (
+        for {
+          indexes <- userAnswers
+            .map(LandPropertyDisposalCompleted.all(srn, addressChoice))
+            .keys
+            .toList
+            .traverse(_.toIntOption)
+            .getOrRecoverJourney
+          nextIndex <- findNextOpenIndex[Max50.Refined](indexes).getOrRecoverJourney
+        } yield controllers.nonsipp.landorpropertydisposal.routes.HowWasPropertyDisposedOfController
+          .onPageLoad(srn, addressChoice, nextIndex, NormalMode)
+      ).merge
 
     case PartnershipBuyerNamePage(srn, landOrPropertyIndex, disposalIndex) =>
       controllers.nonsipp.landorpropertydisposal.routes.PartnershipBuyerUtrController

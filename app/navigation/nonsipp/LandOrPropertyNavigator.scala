@@ -16,7 +16,8 @@
 
 package navigation.nonsipp
 
-import config.Refined.Max5000
+import cats.implicits.toTraverseOps
+import config.Refined.{Max50, Max5000}
 import eu.timepit.refined.{refineMV, refineV}
 import models.{CheckMode, IdentitySubject, IdentityType, NormalMode, SchemeHoldLandProperty, UserAnswers}
 import navigation.JourneyNavigator
@@ -28,6 +29,7 @@ import pages.nonsipp.common.{
   PartnershipRecipientUtrPage
 }
 import pages.nonsipp.landorproperty._
+import pages.nonsipp.landorpropertydisposal.LandPropertyDisposalCompleted
 import play.api.mvc.Call
 
 object LandOrPropertyNavigator extends JourneyNavigator {
@@ -199,13 +201,18 @@ object LandOrPropertyNavigator extends JourneyNavigator {
 
     case LandOrPropertyListPage(srn, addLandOrProperty) =>
       if (addLandOrProperty) {
-        val answers = userAnswers.map(LandOrPropertyAddressLookupPages(srn))
-        val nextDataKey = if (answers.isEmpty) 1 else answers.maxBy(_._1)._1.toIntOption.orElse(Some(0)).get + 1
-        refineV[Max5000.Refined](nextDataKey + 1).fold(
-          err => controllers.routes.JourneyRecoveryController.onPageLoad(),
-          nextIndex =>
-            controllers.nonsipp.landorproperty.routes.LandPropertyInUKController.onPageLoad(srn, nextIndex, NormalMode)
-        )
+        (
+          for {
+            indexes <- userAnswers
+              .map(LandOrPropertyCompleted.all(srn))
+              .keys
+              .toList
+              .traverse(_.toIntOption)
+              .getOrRecoverJourney
+            nextIndex <- findNextOpenIndex[Max5000.Refined](indexes).getOrRecoverJourney
+          } yield controllers.nonsipp.landorproperty.routes.LandPropertyInUKController
+            .onPageLoad(srn, nextIndex, NormalMode)
+        ).merge
       } else {
         controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
       }

@@ -31,6 +31,7 @@ import pages.nonsipp.common.{
 import pages.nonsipp.landorproperty._
 import utils.BaseSpec
 import utils.UserAnswersUtils.UserAnswersOps
+import viewmodels.models.SectionCompleted
 
 class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
@@ -489,6 +490,46 @@ class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         )
         .withName("go from remove page to LandOrPropertyHeldPage page")
     )
+  }
+
+  "Add Land or Property" - {
+    "Record at index 1" - {
+      act.like(
+        normalmode
+          .navigateTo(
+            srn => LandOrPropertyListPage(srn, addLandOrProperty = true),
+            (srn, mode) =>
+              controllers.nonsipp.landorproperty.routes.LandPropertyInUKController.onPageLoad(srn, refineMV(2), mode),
+            srn => defaultUserAnswers.unsafeSet(LandOrPropertyCompleted(srn, refineMV(1)), SectionCompleted)
+          )
+          .withName("Add Land or property with a record at index 1")
+      )
+    }
+
+    "Record at index 2" - {
+      act.like(
+        normalmode
+          .navigateTo(
+            srn => LandOrPropertyListPage(srn, addLandOrProperty = true),
+            (srn, mode) =>
+              controllers.nonsipp.landorproperty.routes.LandPropertyInUKController.onPageLoad(srn, refineMV(1), mode),
+            srn => defaultUserAnswers.unsafeSet(LandOrPropertyCompleted(srn, refineMV(2)), SectionCompleted)
+          )
+          .withName("Add Land or property with a record at index 2")
+      )
+    }
+
+    "No records" - {
+      act.like(
+        normalmode
+          .navigateTo(
+            srn => LandOrPropertyListPage(srn, addLandOrProperty = true),
+            (srn, mode) =>
+              controllers.nonsipp.landorproperty.routes.LandPropertyInUKController.onPageLoad(srn, refineMV(1), mode)
+          )
+          .withName("Add Land or property with no records")
+      )
+    }
   }
 
   "CheckMode" - {
