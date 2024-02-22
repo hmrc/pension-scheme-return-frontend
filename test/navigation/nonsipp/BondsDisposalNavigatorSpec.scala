@@ -35,9 +35,34 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateToWithData(
           BondsDisposalPage,
           Gen.const(true),
-          (_, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          (srn, _) => controllers.nonsipp.bondsdisposal.routes.WhatYouWillNeedBondsDisposalController.onPageLoad(srn)
         )
-        .withName("go from bank account page to members page when yes selected")
+        .withName("go from bonds disposal page to what you will need bonds disposal page when yes selected")
     )
+
+    act.like(
+      normalmode
+        .navigateToWithData(
+          BondsDisposalPage,
+          Gen.const(false),
+          (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
+        )
+        .withName("go from bonds disposal page to taskList when no selected")
+    )
+
+    "WhatYouWillNeedBondsDisposalPage" - {
+
+      act.like(
+        normalmode
+          .navigateTo(
+            WhatYouWillNeedBondsDisposalPage,
+            (_, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          )
+          .withName(
+            "go from what you will need bonds disposal page to unauthorised page"
+          )
+      )
+    }
   }
+
 }
