@@ -2661,6 +2661,29 @@ bonds.incomeFromBonds.error.required = Enter the total income from these bonds i
 bonds.incomeFromBonds.error.invalid = Total income from these bonds in the period of this return must be an amount of money that is 0 or more, like 123 or 123.45
 bonds.incomeFromBonds.error.tooLarge = Total income from these bonds in the period of this return must be 999999999.99 or less
 
+bonds.checkYourAnswers.title = Check your answers
+bonds.checkYourAnswers.heading = Check your answers
+bonds.checkYourAnswers.section.nameOfBonds = Name of bonds
+bonds.checkYourAnswers.section.nameOfBonds.hidden = name of bonds
+bonds.checkYourAnswers.section.whyDoesSchemeHoldBonds = Why does {0} hold these bonds?
+bonds.checkYourAnswers.section.whyDoesSchemeHoldBonds.hidden = why {0} holds these bonds
+bonds.checkYourAnswers.acquisition = Acquisition
+bonds.checkYourAnswers.contribution = Contribution
+bonds.checkYourAnswers.transfer = Transfer
+bonds.checkYourAnswers.section.whenDidSchemeAcquireBonds = Date {0} acquired these bonds
+bonds.checkYourAnswers.section.whenDidSchemeAcquireBonds.hidden = date {0} acquired these bonds
+bonds.checkYourAnswers.section.costOfBonds = Total cost of the bonds
+bonds.checkYourAnswers.section.costOfBonds.hidden = total cost of the bonds
+bonds.checkYourAnswers.section.bondsFromConnectedParty = Were the bonds acquired from a connected party?
+bonds.checkYourAnswers.section.bondsFromConnectedParty.hidden = if the bonds were acquired from a connected party
+bonds.checkYourAnswers.section.areBondsUnregulated = Are the bonds on the Financial Conduct Authority (FCA) Official List?
+bonds.checkYourAnswers.section.areBondsUnregulated.hidden = if the bonds are on the Financial Conduct Authority (FCA) Official List
+bonds.checkYourAnswers.section.incomeFromBonds = Total income from these bonds in the period of this return
+bonds.checkYourAnswers.section.incomeFromBonds.hidden = total income from these bonds in the period of this return
+
+bonds.checkYourAnswers.change.title = Change your answers
+bonds.checkYourAnswers.change.heading = Change your answers
+
 bondsDisposal.title = Did the scheme dispose of any unregulated bonds, or bonds acquired from a connected party, during the period of this return?
 bondsDisposal.heading = Did {0} dispose of any unregulated bonds, or bonds acquired from a connected party, during the period of this return?
 bondsDisposal.error.required = Select yes if the scheme disposed of any unregulated bonds, or bonds acquired from a connected party, during the period of this return

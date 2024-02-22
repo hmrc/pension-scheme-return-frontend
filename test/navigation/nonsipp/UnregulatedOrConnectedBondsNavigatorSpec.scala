@@ -18,7 +18,7 @@ package navigation.nonsipp
 
 import config.Refined.{Max5000, OneTo5000}
 import eu.timepit.refined.refineMV
-import models.{NormalMode, SchemeHoldBond}
+import models.{CheckMode, NormalMode, SchemeHoldBond}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.unregulatedorconnectedbonds._
@@ -256,12 +256,215 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
           .navigateToWithIndex(
             index,
             IncomeFromBondsPage,
-            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldCYAController
+                .onPageLoad(srn, index, NormalMode)
           )
           .withName(
-            "go from IncomeFromBondsPage to Unauthorised"
+            "go from IncomeFromBondsPage to BondsCYAPage"
           )
       )
+    }
+
+    "Check Mode" - {
+
+      "NameOfBondsPage" - {
+        act.like(
+          checkmode
+            .navigateToWithIndex(
+              index,
+              NameOfBondsPage,
+              (srn, _: Max5000, _) =>
+                controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldCYAController
+                  .onPageLoad(srn, index, CheckMode)
+            )
+            .withName(
+              "go from NameOfBondsPage to BondsCYAPage when in checkmode"
+            )
+        )
+      }
+
+      "WhyDoesSchemeHoldBondsPage" - {
+        act.like(
+          checkmode
+            .navigateToWithIndex(
+              index,
+              WhyDoesSchemeHoldBondsPage,
+              (srn, _: Max5000, _) =>
+                controllers.nonsipp.unregulatedorconnectedbonds.routes.WhenDidSchemeAcquireBondsController
+                  .onPageLoad(srn, index, CheckMode),
+              srn =>
+                defaultUserAnswers.unsafeSet(
+                  WhyDoesSchemeHoldBondsPage(srn, index),
+                  SchemeHoldBond.Acquisition
+                )
+            )
+            .withName(
+              "go from WhyDoesSchemeHoldBondsPage to WhenDidSchemeAcquireBondsPage when holding is acquisition in checkmode"
+            )
+        )
+
+        act.like(
+          checkmode
+            .navigateToWithIndex(
+              index,
+              WhyDoesSchemeHoldBondsPage,
+              (srn, _: Max5000, _) =>
+                controllers.nonsipp.unregulatedorconnectedbonds.routes.WhenDidSchemeAcquireBondsController
+                  .onPageLoad(srn, index, CheckMode),
+              srn =>
+                defaultUserAnswers.unsafeSet(
+                  WhyDoesSchemeHoldBondsPage(srn, index),
+                  SchemeHoldBond.Contribution
+                )
+            )
+            .withName(
+              "go from WhyDoesSchemeHoldBondsPage to WhenDidSchemeAcquireBondsPage when holding is contribution in checkmode"
+            )
+        )
+
+        act.like(
+          checkmode
+            .navigateToWithIndex(
+              index,
+              WhyDoesSchemeHoldBondsPage,
+              (srn, _: Max5000, _) =>
+                controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldCYAController
+                  .onPageLoad(srn, index, CheckMode),
+              srn =>
+                defaultUserAnswers.unsafeSet(
+                  WhyDoesSchemeHoldBondsPage(srn, index),
+                  SchemeHoldBond.Transfer
+                )
+            )
+            .withName(
+              "go from WhyDoesSchemeHoldBondsPage to BondsCYAPage when holding is transfer in checkmode"
+            )
+        )
+      }
+
+      "WhenDidSchemeAcquireBondsPage" - {
+        act.like(
+          checkmode
+            .navigateToWithIndex(
+              index,
+              WhenDidSchemeAcquireBondsPage,
+              (srn, _: Max5000, _) =>
+                controllers.nonsipp.unregulatedorconnectedbonds.routes.BondsFromConnectedPartyController
+                  .onPageLoad(srn, index, CheckMode),
+              srn =>
+                defaultUserAnswers.unsafeSet(
+                  WhyDoesSchemeHoldBondsPage(srn, index),
+                  SchemeHoldBond.Acquisition
+                )
+            )
+            .withName(
+              "go from WhenDidSchemeAcquireBondsPage to BondsFromConnectedPartyPage when holding is acquisition in checkmode"
+            )
+        )
+
+        act.like(
+          checkmode
+            .navigateToWithIndex(
+              index,
+              WhenDidSchemeAcquireBondsPage,
+              (srn, _: Max5000, _) =>
+                controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldCYAController
+                  .onPageLoad(srn, index, CheckMode),
+              srn =>
+                defaultUserAnswers.unsafeSet(
+                  WhyDoesSchemeHoldBondsPage(srn, index),
+                  SchemeHoldBond.Contribution
+                )
+            )
+            .withName(
+              "go from WhenDidSchemeAcquireBondsPage to BondsCYAPage when holding is contribution in checkmode"
+            )
+        )
+
+        act.like(
+          checkmode
+            .navigateToWithIndex(
+              index,
+              WhenDidSchemeAcquireBondsPage,
+              (srn, _: Max5000, _) =>
+                controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldCYAController
+                  .onPageLoad(srn, index, CheckMode),
+              srn =>
+                defaultUserAnswers.unsafeSet(
+                  WhyDoesSchemeHoldBondsPage(srn, index),
+                  SchemeHoldBond.Transfer
+                )
+            )
+            .withName(
+              "go from WhenDidSchemeAcquireBondsPage to BondsCYAPage when holding is transfer in checkmode"
+            )
+        )
+      }
+
+      "CostOfBondsPage" - {
+        act.like(
+          checkmode
+            .navigateToWithIndex(
+              index,
+              CostOfBondsPage,
+              (srn, _: Max5000, _) =>
+                controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldCYAController
+                  .onPageLoad(srn, index, CheckMode)
+            )
+            .withName(
+              "go from CostOfBondsPage to BondsCYAPage when in checkmode"
+            )
+        )
+      }
+
+      "BondsFromConnectedPartyPage" - {
+        act.like(
+          checkmode
+            .navigateToWithIndex(
+              index,
+              BondsFromConnectedPartyPage,
+              (srn, _: Max5000, _) =>
+                controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldCYAController
+                  .onPageLoad(srn, index, CheckMode)
+            )
+            .withName(
+              "go from BondsFromConnectedPartyPage to BondsCYAPage when in checkmode"
+            )
+        )
+      }
+
+      "AreBondsUnregulatedPage" - {
+        act.like(
+          checkmode
+            .navigateToWithIndex(
+              index,
+              AreBondsUnregulatedPage,
+              (srn, _: Max5000, _) =>
+                controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldCYAController
+                  .onPageLoad(srn, index, CheckMode)
+            )
+            .withName(
+              "go from AreBondsUnregulatedPage to BondsCYAPage when in checkmode"
+            )
+        )
+      }
+
+      "IncomeFromBondsPage" - {
+        act.like(
+          checkmode
+            .navigateToWithIndex(
+              index,
+              IncomeFromBondsPage,
+              (srn, _: Max5000, _) =>
+                controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldCYAController
+                  .onPageLoad(srn, index, CheckMode)
+            )
+            .withName(
+              "go from IncomeFromBondsPage to BondsCYAPage when in checkmode"
+            )
+        )
+      }
     }
   }
 }
