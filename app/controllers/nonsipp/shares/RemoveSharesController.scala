@@ -90,7 +90,7 @@ class RemoveSharesController @Inject()(
                 updatedAnswers <- Future
                   .fromTry(
                     request.userAnswers
-                      .removePages(
+                      .remove(
                         nonsipp.shares.sharesPages(srn, index, isLast)
                       )
                       .set(SharesJourneyStatus(srn), SectionStatus.InProgress)

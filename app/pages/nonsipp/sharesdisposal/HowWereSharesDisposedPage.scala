@@ -81,6 +81,14 @@ object HowWereSharesDisposedPage {
     HowWereSharesDisposedPage(srn, shareIndex, disposalIndex, answerChanged = false)
 }
 
+case class HowWereSharesDisposedPagesForShare(srn: Srn, shareIndex: Max5000)
+    extends QuestionPage[Map[String, HowSharesDisposed]] {
+  override def path: JsPath =
+    Paths.disposedSharesTransaction \ toString \ shareIndex.arrayIndex.toString
+
+  override def toString: String = "methodOfDisposal"
+}
+
 case class HowWereSharesDisposedPages(srn: Srn) extends QuestionPage[Map[String, Map[String, HowSharesDisposed]]] {
   override def path: JsPath =
     Paths.disposedSharesTransaction \ toString

@@ -16,15 +16,43 @@
 
 package pages.nonsipp.shares
 
-import config.Refined.Max5000
+import config.Refined.{Max5000, OneTo50}
+import eu.timepit.refined.refineV
 import models.SchemeId.Srn
+import models.UserAnswers
 import pages.QuestionPage
+import pages.nonsipp.sharesdisposal.{HowWereSharesDisposedPage, HowWereSharesDisposedPagesForShare}
 import play.api.libs.json.JsPath
+import queries.Removable
+import utils.PageUtils.removePages
 import utils.RefinedUtils.RefinedIntOps
+
+import scala.util.Try
 
 case class ClassOfSharesPage(srn: Srn, index: Max5000) extends QuestionPage[String] {
 
   override def path: JsPath = Paths.shareIdentification \ toString \ index.arrayIndex.toString
 
   override def toString: String = "classOfShares"
+
+  override def cleanup(value: Option[String], userAnswers: UserAnswers): Try[UserAnswers] =
+    (value, userAnswers.get(this)) match {
+      case (None, _) => // deletion
+        removePages(
+          userAnswers,
+          dependantPages(srn, userAnswers)
+        )
+      case _ => Try(userAnswers) // everything else
+    }
+
+  private def dependantPages(srn: Srn, userAnswers: UserAnswers): List[Removable[_]] =
+    userAnswers
+      .map(HowWereSharesDisposedPagesForShare(srn, index))
+      .keys
+      .toList
+      .flatMap(
+        key =>
+          refineV[OneTo50](key.toInt + 1)
+            .fold(_ => Nil, ind => List(HowWereSharesDisposedPage(srn, index, ind)))
+      )
 }

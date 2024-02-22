@@ -16,20 +16,53 @@
 
 package pages.nonsipp.shares
 
-import config.Refined.OneTo5000
+import config.Refined.{OneTo50, OneTo5000}
+import controllers.TestValues
 import eu.timepit.refined.refineMV
+import models.HowSharesDisposed
 import pages.behaviours.PageBehaviours
+import pages.nonsipp.sharesdisposal.HowWereSharesDisposedPage
+import utils.UserAnswersUtils.UserAnswersOps
 
-class ClassOfSharesPageSpec extends PageBehaviours {
+class ClassOfSharesPageSpec extends PageBehaviours with TestValues {
 
   "ClassOfSharesPage" - {
     val srn = srnGen.sample.value
-    val index = refineMV[OneTo5000](1)
+    val indexOne = refineMV[OneTo5000](1)
+    val indexTwo = refineMV[OneTo5000](2)
+    val disposalIndexOne = refineMV[OneTo50](1)
+    val disposalIndexTwo = refineMV[OneTo50](2)
 
-    beRetrievable[String](ClassOfSharesPage(srn, index))
+    beRetrievable[String](ClassOfSharesPage(srn, indexOne))
 
-    beSettable[String](ClassOfSharesPage(srn, index))
+    beSettable[String](ClassOfSharesPage(srn, indexOne))
 
-    beRemovable[String](ClassOfSharesPage(srn, index))
+    beRemovable[String](ClassOfSharesPage(srn, indexOne))
+
+    "cleanup" - {
+      val userAnswers =
+        defaultUserAnswers
+          .unsafeSet(ClassOfSharesPage(srn, indexOne), classOfShares)
+          .unsafeSet(ClassOfSharesPage(srn, indexTwo), classOfShares)
+          .unsafeSet(HowWereSharesDisposedPage(srn, indexOne, disposalIndexOne), HowSharesDisposed.Transferred)
+          .unsafeSet(HowWereSharesDisposedPage(srn, indexOne, disposalIndexTwo), HowSharesDisposed.Transferred)
+          .unsafeSet(HowWereSharesDisposedPage(srn, indexTwo, disposalIndexOne), HowSharesDisposed.Transferred)
+
+      s"retain dependant values when this is not a deletion" in {
+        val result = ClassOfSharesPage(srn, indexOne).cleanup(Some(""), userAnswers).toOption.value
+
+        result.get(HowWereSharesDisposedPage(srn, indexOne, disposalIndexOne)) must not be None
+        result.get(HowWereSharesDisposedPage(srn, indexOne, disposalIndexTwo)) must not be None
+        result.get(HowWereSharesDisposedPage(srn, indexTwo, disposalIndexOne)) must not be None
+      }
+
+      s"remove dependant values when this page is deleted" in {
+        val result = ClassOfSharesPage(srn, indexOne).cleanup(None, userAnswers).toOption.value
+
+        result.get(HowWereSharesDisposedPage(srn, indexOne, disposalIndexOne)) mustBe None
+        result.get(HowWereSharesDisposedPage(srn, indexOne, disposalIndexTwo)) mustBe None
+        result.get(HowWereSharesDisposedPage(srn, indexTwo, disposalIndexOne)) must not be None
+      }
+    }
   }
 }
