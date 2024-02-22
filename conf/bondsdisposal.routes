@@ -1,0 +1,4 @@
+GET        /:srn/bonds-disposal                        controllers.nonsipp.bondsdisposal.BondsDisposalController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST       /:srn/bonds-disposal                        controllers.nonsipp.bondsdisposal.BondsDisposalController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET        /:srn/change-bonds-disposal                 controllers.nonsipp.bondsdisposal.BondsDisposalController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST       /:srn/change-bonds-disposal                 controllers.nonsipp.bondsdisposal.BondsDisposalController.onSubmit(srn: Srn, mode: Mode = CheckMode)

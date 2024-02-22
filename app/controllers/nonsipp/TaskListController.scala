@@ -477,6 +477,13 @@ object TaskListController {
           statusAndLink._2
         ),
         statusAndLink._1
+      ),
+      TaskListItemViewModel(
+        LinkMessage(
+          messageKey(prefix, "bondsdisposal.title", NotStarted),
+          controllers.nonsipp.bondsdisposal.routes.BondsDisposalController.onPageLoad(srn, NormalMode).url
+        ),
+        NotStarted
       )
     )
   }

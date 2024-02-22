@@ -58,7 +58,7 @@ class $className;format="cap"$Controller @Inject()(
       $if(!requiredPage.empty)$
       request.userAnswers.get($requiredPage$(srn$if(!index.empty) $, index$endif$$if(!secondaryIndex.empty) $, secondaryIndex$endif$)).getOrRecoverJourney { requiredPage =>
       $endif$
-        Ok(view(preparedForm, viewModel(srn, requiredPage, $if(!requiredPage) $requiredPage, $endif$$if(!index.empty) $index, $endif$$if(!secondaryIndex.empty) $secondaryIndex, $endif$mode)))
+        Ok(view(preparedForm, viewModel(srn, $if(!requiredPage.empty) $requiredPage, $endif$$if(!index.empty) $index, $endif$$if(!secondaryIndex.empty) $secondaryIndex, $endif$mode)))
       $if(!requiredPage.empty)$
       }
       $endif$
@@ -71,7 +71,7 @@ class $className;format="cap"$Controller @Inject()(
           $if(!requiredPage.empty) $
             request.userAnswers.get($requiredPage$(srn$if(!index.empty) $, index$endif$$if(!secondaryIndex.empty) $, secondaryIndex$endif$)).getOrRecoverJourney { requiredPage =>
           $endif$
-              Future.successful(BadRequest(view(formWithErrors, viewModel(srn, requiredPage, $if(!requiredPage) $requiredPage, $endif$$if(!index.empty) $index, $endif$$if(!secondaryIndex.empty) $secondaryIndex, $endif$mode))))
+              Future.successful(BadRequest(view(formWithErrors, viewModel(srn, $if(!requiredPage.empty) $requiredPage, $endif$$if(!index.empty) $index, $endif$$if(!secondaryIndex.empty) $secondaryIndex, $endif$mode))))
           $if(!requiredPage.empty) $
             }
           $endif$

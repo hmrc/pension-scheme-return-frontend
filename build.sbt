@@ -4,10 +4,12 @@ import scoverage.ScoverageKeys
 import uk.gov.hmrc.versioning.SbtGitVersioning.autoImport.majorVersion
 
 import scala.sys.process.*
+import complete._
+import complete.DefaultParsers._
 
 lazy val appName: String = "pension-scheme-return-frontend"
 
-addCompilerPlugin("org.typelevel" % "kind-projector" % "0.13.2" cross CrossVersion.full)
+addCompilerPlugin(("org.typelevel" % "kind-projector" % "0.13.2").cross(CrossVersion.full))
 
 lazy val root = (project in file("."))
   .enablePlugins(PlayScala, SbtDistributablesPlugin)
@@ -86,7 +88,7 @@ lazy val root = (project in file("."))
     uglify / includeFilter := GlobFilter("application.js"),
     // auto-run migrate script after g8Scaffold task
     g8Scaffold := {
-      g8Scaffold.evaluated
+      scaffoldTask.evaluated
       streams.value.log.info("Running migrate script")
       val scriptPath = baseDirectory.value.getCanonicalPath + "/migrate.sh"
       s"bash -c $scriptPath".!
@@ -111,3 +113,38 @@ lazy val itSettings = Defaults.itSettings ++ Seq(
   parallelExecution := false,
   fork := false
 )
+
+lazy val scaffoldParser: Def.Initialize[State => Parser[(String, List[String])]] =
+  Def.setting {
+    val dir = g8ScaffoldTemplatesDirectory.value
+    (state: State) =>
+      val templateFiles: List[String] = Option(dir.listFiles).toList.flatten
+        .filter(f => f.isDirectory && !f.isHidden && f.name != "scripts")
+        .map(_.getName)
+
+      val templates: List[Parser[String]] = templateFiles.map(s => s: Parser[String])
+
+      // optionally captures a --key=value arg
+      val optionalTemplateArgs = StringBasic.examples(
+        FixedSetExamples(List("--key=value")),
+        maxNumberOfExamples = 0,
+        removeInvalidExamples = true
+      )
+
+      (Space ~> templates.reduce(_ | _).examples(templateFiles: _*) ~
+        (Space ~> optionalTemplateArgs).*).map {
+        case tmp ~ args => (tmp, args.toList)
+      }
+  }
+
+lazy val scaffoldTask =
+  Def.inputTask {
+    val (name, args) = scaffoldParser.parsed
+    val folder = g8ScaffoldTemplatesDirectory.value
+    giter8.G8
+      .fromDirectoryRaw(folder / name, baseDirectory.value, args, forceOverwrite = false)
+      .fold(
+        e => sys.error(e),
+        r => println(s"Success : $r)")
+      )
+  }

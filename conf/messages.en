@@ -929,6 +929,8 @@ nonsipp.tasklist.landorpropertydisposal.change.title = Change disposal of land o
 nonsipp.tasklist.bonds.title = Unregulated or connected party bonds
 nonsipp.tasklist.bonds.add.unregulatedorconnected.title = Add unregulated or connected party bonds
 nonsipp.tasklist.bonds.change.unregulatedorconnected.title = Add unregulated or connected party bonds
+nonsipp.tasklist.bonds.add.bondsdisposal.title = Report disposal of unregulated or connected party bonds
+nonsipp.tasklist.bonds.change.bondsdisposal.title = Report disposal of unregulated or connected party bonds
 nonsipp.tasklist.otherassets.title = Other assets
 nonsipp.tasklist.otherassets.add.title = Add other assets
 nonsipp.tasklist.otherassets.change.title = Change other assets
@@ -2658,3 +2660,7 @@ bonds.incomeFromBonds.hint = This includes income and any other receipts.
 bonds.incomeFromBonds.error.required = Enter the total income from these bonds in the period of this return, in pounds and pence
 bonds.incomeFromBonds.error.invalid = Total income from these bonds in the period of this return must be an amount of money that is 0 or more, like 123 or 123.45
 bonds.incomeFromBonds.error.tooLarge = Total income from these bonds in the period of this return must be 999999999.99 or less
+
+bondsDisposal.title = Did the scheme dispose of any unregulated bonds, or bonds acquired from a connected party, during the period of this return?
+bondsDisposal.heading = Did {0} dispose of any unregulated bonds, or bonds acquired from a connected party, during the period of this return?
+bondsDisposal.error.required = Select yes if the scheme disposed of any unregulated bonds, or bonds acquired from a connected party, during the period of this return
