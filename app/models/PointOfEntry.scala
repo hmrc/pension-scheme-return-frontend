@@ -24,16 +24,20 @@ sealed trait PointOfEntry {
 }
 
 object PointOfEntry {
-  case object HowWereSharesDisposedPointOfEntry extends WithName("HowWereSharesDisposed") with PointOfEntry {
-    val pointOfEntry = "HowWereSharesDisposedPage"
+  case object HowWereSharesDisposedPointOfEntry
+      extends WithName("HowWereSharesDisposedPointOfEntry")
+      with PointOfEntry {
+    val pointOfEntry = "HowWereSharesDisposedPointOfEntry"
   }
 
-  case object WhoWereTheSharesSoldToPointOfEntry extends WithName("WhoWereTheSharesSoldTo") with PointOfEntry {
-    val pointOfEntry = "WhoWereTheSharesSoldToPage"
+  case object WhoWereTheSharesSoldToPointOfEntry
+      extends WithName("WhoWereTheSharesSoldToPointOfEntry")
+      with PointOfEntry {
+    val pointOfEntry = "WhoWereTheSharesSoldToPointOfEntry"
   }
 
   case object NoPointOfEntry extends WithName("NoPointOfEntry") with PointOfEntry {
-    val pointOfEntry = "No PointOfEntry set"
+    val pointOfEntry = "NoPointOfEntry"
   }
 
   implicit val format: Format[PointOfEntry] = new Format[PointOfEntry] {

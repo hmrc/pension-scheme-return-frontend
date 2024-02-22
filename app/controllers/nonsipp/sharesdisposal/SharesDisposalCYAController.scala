@@ -162,7 +162,7 @@ class SharesDisposalCYAController @Inject()(
 
           // Last row
           sharesStillHeld <- request.userAnswers
-            .get(TotalSharesNowHeldPage(srn, shareIndex, disposalIndex))
+            .get(HowManySharesPage(srn, shareIndex, disposalIndex))
             .getOrRecoverJourney
 
           schemeName = request.schemeDetails.schemeName
