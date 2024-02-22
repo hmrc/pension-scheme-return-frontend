@@ -21,7 +21,7 @@ import play.api.libs.json._
 
 import java.time.LocalDate
 
-case class Assets(landOrProperty: LandOrProperty, borrowing: Borrowing)
+case class Assets(optLandOrProperty: Option[LandOrProperty], optBorrowing: Option[Borrowing])
 
 case class LandOrProperty(
   landOrPropertyHeld: Boolean,

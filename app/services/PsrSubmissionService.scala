@@ -54,11 +54,11 @@ class PsrSubmissionService @Inject()(
     srn: Srn
   )(implicit hc: HeaderCarrier, ec: ExecutionContext, request: DataRequest[_]): Future[Option[Unit]] = {
 
-    val schemeHadLoans = request.userAnswers.get(LoansMadeOrOutstandingPage(srn)).getOrElse(false)
-    val landOrPropertyHeld = request.userAnswers.get(LandOrPropertyHeldPage(srn)).getOrElse(false)
-    val moneyWasBorrowed = request.userAnswers.get(MoneyBorrowedPage(srn)).getOrElse(false)
-    val disposeAnyLandOrProperty = request.userAnswers.get(LandOrPropertyDisposalPage(srn)).getOrElse(false)
-    val didSchemeHoldAnyShares = request.userAnswers.get(DidSchemeHoldAnySharesPage(srn)).getOrElse(false)
+    val optSchemeHadLoans = request.userAnswers.get(LoansMadeOrOutstandingPage(srn))
+    val optLandOrPropertyHeld = request.userAnswers.get(LandOrPropertyHeldPage(srn))
+    val optMoneyWasBorrowed = request.userAnswers.get(MoneyBorrowedPage(srn))
+    val optDisposeAnyLandOrProperty = request.userAnswers.get(LandOrPropertyDisposalPage(srn))
+    val optDidSchemeHoldAnyShares = request.userAnswers.get(DidSchemeHoldAnySharesPage(srn))
 
     (
       minimalRequiredSubmissionTransformer.transformToEtmp(srn),
@@ -68,25 +68,55 @@ class PsrSubmissionService @Inject()(
         PsrSubmission(
           minimalRequiredSubmission = minimalRequiredSubmission,
           checkReturnDates = checkReturnDates,
-          loans = Option.when(schemeHadLoans)(Loans(schemeHadLoans, loanTransactionsTransformer.transformToEtmp(srn))),
-          assets = Option.when(landOrPropertyHeld || moneyWasBorrowed || disposeAnyLandOrProperty)(
-            Assets(
-              landOrProperty = LandOrProperty(
-                landOrPropertyHeld = landOrPropertyHeld,
-                disposeAnyLandOrProperty = disposeAnyLandOrProperty,
-                landOrPropertyTransactions =
-                  landOrPropertyTransactionsTransformer.transformToEtmp(srn, disposeAnyLandOrProperty)
-              ),
-              borrowing = Borrowing(
-                moneyWasBorrowed = moneyWasBorrowed,
-                moneyBorrowed = moneyBorrowedTransformer.transformToEtmp(srn)
-              )
-            )
-          ),
+          loans = buildLoans(srn)(optSchemeHadLoans),
+          assets = buildAssets(srn)(optLandOrPropertyHeld, optMoneyWasBorrowed, optDisposeAnyLandOrProperty),
           membersPayments = memberPaymentsTransformer.transformToEtmp(srn, request.userAnswers),
-          shares = Option.when(didSchemeHoldAnyShares)(sharesTransformer.transformToEtmp(srn))
+          shares = buildShares(srn)(optDidSchemeHoldAnyShares)
         )
       )
     }.sequence
   }
+
+  private def buildLoans(
+    srn: Srn
+  )(optSchemeHadLoans: Option[Boolean])(implicit request: DataRequest[_]): Option[Loans] =
+    optSchemeHadLoans.map(
+      schemeHadLoans => Loans(schemeHadLoans, loanTransactionsTransformer.transformToEtmp(srn))
+    )
+
+  private def buildAssets(srn: Srn)(
+    optLandOrPropertyHeld: Option[Boolean],
+    optMoneyWasBorrowed: Option[Boolean],
+    optDisposeAnyLandOrProperty: Option[Boolean]
+  )(implicit request: DataRequest[_]): Option[Assets] =
+    Option.when(List(optLandOrPropertyHeld, optMoneyWasBorrowed, optDisposeAnyLandOrProperty).flatten.nonEmpty)(
+      Assets(
+        optLandOrProperty = optLandOrPropertyHeld.map(landOrPropertyHeld => {
+          val disposeAnyLandOrProperty = optDisposeAnyLandOrProperty.getOrElse(false)
+          LandOrProperty(
+            landOrPropertyHeld = landOrPropertyHeld,
+            disposeAnyLandOrProperty = disposeAnyLandOrProperty,
+            landOrPropertyTransactions =
+              landOrPropertyTransactionsTransformer.transformToEtmp(srn, disposeAnyLandOrProperty)
+          )
+        }),
+        optBorrowing = optMoneyWasBorrowed.map(
+          moneyWasBorrowed =>
+            Borrowing(
+              moneyWasBorrowed = moneyWasBorrowed,
+              moneyBorrowed = moneyBorrowedTransformer.transformToEtmp(srn)
+            )
+        )
+      )
+    )
+
+  private def buildShares(srn: Srn)(
+    optDidSchemeHoldAnyShares: Option[Boolean]
+  )(implicit request: DataRequest[_]): Option[Shares] =
+    optDidSchemeHoldAnyShares.map(
+      _ =>
+        Shares(
+          optShareTransactions = sharesTransformer.transformToEtmp(srn)
+        )
+    )
 }

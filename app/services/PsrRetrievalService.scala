@@ -71,46 +71,46 @@ class PsrRetrievalService @Inject()(
 
             transformedLoansUa <- psrDetails.loans
               .map(
-                l =>
+                loans =>
                   loanTransactionsTransformer
                     .transformFromEtmp(
                       transformedMinimalUa,
                       srn,
-                      l.loanTransactions.toList
+                      loans
                     )
               )
               .getOrElse(Try(transformedMinimalUa))
 
             transformedLandOrPropertyAssetsUa <- psrDetails.assets
-              .map(
-                a =>
-                  if (a.landOrProperty.landOrPropertyHeld) {
-                    landOrPropertyTransactionsTransformer
-                      .transformFromEtmp(
-                        transformedLoansUa,
-                        srn,
-                        a.landOrProperty
-                      )
-                  } else {
-                    Try(transformedLoansUa)
-                  }
-              )
+              .map { assets =>
+                assets.optLandOrProperty
+                  .map(
+                    landOrProperty =>
+                      landOrPropertyTransactionsTransformer
+                        .transformFromEtmp(
+                          transformedLoansUa,
+                          srn,
+                          landOrProperty
+                        )
+                  )
+                  .getOrElse(Try(transformedLoansUa))
+              }
               .getOrElse(Try(transformedLoansUa))
 
             transformedMoneyBorrowingAssets <- psrDetails.assets
-              .map(
-                a =>
-                  if (a.borrowing.moneyWasBorrowed) {
-                    moneyBorrowedTransformer
-                      .transformFromEtmp(
-                        transformedLandOrPropertyAssetsUa,
-                        srn,
-                        a.borrowing
-                      )
-                  } else {
-                    Try(transformedLandOrPropertyAssetsUa)
-                  }
-              )
+              .map { asset =>
+                asset.optBorrowing
+                  .map(
+                    borrowing =>
+                      moneyBorrowedTransformer
+                        .transformFromEtmp(
+                          transformedLandOrPropertyAssetsUa,
+                          srn,
+                          borrowing
+                        )
+                  )
+                  .getOrElse(Try(transformedLandOrPropertyAssetsUa))
+              }
               .getOrElse(Try(transformedLandOrPropertyAssetsUa))
 
             transformedMemberDetails <- psrDetails.membersPayments
