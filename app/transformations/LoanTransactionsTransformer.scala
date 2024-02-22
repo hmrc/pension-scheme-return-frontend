@@ -195,8 +195,10 @@ class LoanTransactionsTransformer @Inject() extends Transformer {
   def transformFromEtmp(
     userAnswers: UserAnswers,
     srn: Srn,
-    loanTransactions: List[LoanTransactions]
+    loans: Loans
   ): Try[UserAnswers] = {
+
+    val loanTransactions = loans.loanTransactions.toList
 
     for {
       indexes <- buildIndexesForMax5000(loanTransactions.size)
@@ -411,7 +413,7 @@ class LoanTransactionsTransformer @Inject() extends Transformer {
           index => OutstandingArrearsOnLoanPage(srn, index) -> ConditionalYesNo.no[Unit, Money](())
         )
 
-      ua1 <- userAnswers.set(LoansMadeOrOutstandingPage(srn), true)
+      ua1 <- userAnswers.set(LoansMadeOrOutstandingPage(srn), loans.schemeHadLoans)
       ua2 <- identityTypes.foldLeft(Try(ua1)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
       ua3 <- loanRecipientName.foldLeft(Try(ua2)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }
       ua31 <- otherRecipientName.foldLeft(Try(ua3)) { case (ua, (page, value)) => ua.flatMap(_.set(page, value)) }

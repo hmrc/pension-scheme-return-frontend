@@ -65,10 +65,13 @@ class MoneyBorrowedTransformer @Inject() extends Transformer {
       .getOrElse(List.empty)
 
   def transformFromEtmp(userAnswers: UserAnswers, srn: Srn, borrowing: Borrowing): Try[UserAnswers] = {
+
+    val initialUserAnswersForBorrowing = userAnswers.set(MoneyBorrowedPage(srn), borrowing.moneyWasBorrowed)
+
     val moneyBorrowedList = borrowing.moneyBorrowed
     for {
       indexes <- buildIndexesForMax5000(moneyBorrowedList.size)
-      resultUA <- indexes.foldLeft(Try(userAnswers)) {
+      resultUA <- indexes.foldLeft(initialUserAnswersForBorrowing) {
         case (ua, index) =>
           val moneyBorrowed = moneyBorrowedList(index.value - 1)
           val whenBorrowed = WhenBorrowedPage(srn, index) -> moneyBorrowed.dateOfBorrow
@@ -84,15 +87,14 @@ class MoneyBorrowedTransformer @Inject() extends Transformer {
 
           for {
             ua0 <- ua
-            ua1 <- ua0.set(MoneyBorrowedPage(srn), true)
-            ua2 <- ua1.set(whenBorrowed._1, whenBorrowed._2)
-            ua3 <- ua2.set(borrowedAmountAndRate._1, borrowedAmountAndRate._2)
-            ua4 <- ua3.set(lenderName._1, lenderName._2)
-            ua5 <- ua4.set(whySchemeBorrowedMoney._1, whySchemeBorrowedMoney._2)
-            ua6 <- ua5.set(isLenderConnectedParty._1, isLenderConnectedParty._2)
-            ua7 <- ua6.set(valueOfSchemeAssetsWhenMoneyBorrowed._1, valueOfSchemeAssetsWhenMoneyBorrowed._2)
+            ua1 <- ua0.set(whenBorrowed._1, whenBorrowed._2)
+            ua2 <- ua1.set(borrowedAmountAndRate._1, borrowedAmountAndRate._2)
+            ua3 <- ua2.set(lenderName._1, lenderName._2)
+            ua4 <- ua3.set(whySchemeBorrowedMoney._1, whySchemeBorrowedMoney._2)
+            ua5 <- ua4.set(isLenderConnectedParty._1, isLenderConnectedParty._2)
+            ua6 <- ua5.set(valueOfSchemeAssetsWhenMoneyBorrowed._1, valueOfSchemeAssetsWhenMoneyBorrowed._2)
 
-          } yield ua7
+          } yield ua6
       }
 
     } yield resultUA

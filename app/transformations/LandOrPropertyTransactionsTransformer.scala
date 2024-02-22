@@ -117,7 +117,7 @@ class LandOrPropertyTransactionsTransformer @Inject() extends Transformer {
 
     for {
       indexes <- buildIndexesForMax5000(landOrPropertyTransactions.size)
-      resultUA <- indexes.foldLeft(Try(userAnswers)) {
+      resultUA <- indexes.foldLeft(userAnswers.set(LandOrPropertyHeldPage(srn), landOrProperty.landOrPropertyHeld)) {
         case (ua, index) =>
           val propertyDetails = landOrPropertyTransactions(index.value - 1).propertyDetails
           val heldPropertyTransaction = landOrPropertyTransactions(index.value - 1).heldPropertyTransaction
@@ -222,44 +222,40 @@ class LandOrPropertyTransactionsTransformer @Inject() extends Transformer {
 
           val triedUA = for {
             ua0 <- ua
-            ua1 <- ua0.set(LandOrPropertyHeldPage(srn), true)
-            ua2 <- ua1.set(landOrPropertyInUK._1, landOrPropertyInUK._2)
-            ua3 <- ua2.set(addressDetails._1, addressDetails._2)
-            ua4 <- ua3.set(landRegistryTitleNumber._1, landRegistryTitleNumber._2)
-            ua5 <- ua4.set(methodOfHolding._1, methodOfHolding._2)
-            ua6 <- ua5.set(totalCostOfLandOrProperty._1, totalCostOfLandOrProperty._2)
-            ua7 <- ua6.set(isLandOrPropertyResidential._1, isLandOrPropertyResidential._2)
-            ua8 <- ua7.set(landOrPropertyLeased._1, landOrPropertyLeased._2)
-            ua9 <- ua8
+            ua1 <- ua0.set(landOrPropertyInUK._1, landOrPropertyInUK._2)
+            ua2 <- ua1.set(addressDetails._1, addressDetails._2)
+            ua3 <- ua2.set(landRegistryTitleNumber._1, landRegistryTitleNumber._2)
+            ua4 <- ua3.set(methodOfHolding._1, methodOfHolding._2)
+            ua5 <- ua4.set(totalCostOfLandOrProperty._1, totalCostOfLandOrProperty._2)
+            ua6 <- ua5.set(isLandOrPropertyResidential._1, isLandOrPropertyResidential._2)
+            ua7 <- ua6.set(landOrPropertyLeased._1, landOrPropertyLeased._2)
+            ua8 <- ua7
               .set(totalIncomeOrReceipts._1, totalIncomeOrReceipts._2)
               .set(LandOrPropertyCompleted(srn, index), SectionCompleted)
 
-            ua10 <- optDateOfAcquisitionOrContribution.map(t => ua9.set(t._1, t._2)).getOrElse(Try(ua9))
-            ua11 <- optIndepValuationSupport.map(t => ua10.set(t._1, t._2)).getOrElse(Try(ua10))
-            ua12 <- optReceivedLandType.map(t => ua11.set(t._1, t._2)).getOrElse(Try(ua11))
+            ua9 <- optDateOfAcquisitionOrContribution.map(t => ua8.set(t._1, t._2)).getOrElse(Try(ua8))
+            ua10 <- optIndepValuationSupport.map(t => ua9.set(t._1, t._2)).getOrElse(Try(ua9))
+            ua11 <- optReceivedLandType.map(t => ua10.set(t._1, t._2)).getOrElse(Try(ua10))
 
-            ua13 <- optIndividualTuple.map(t => ua12.set(t._1._1, t._1._2)).getOrElse(Try(ua12))
-            ua14 <- optIndividualTuple.map(t => ua13.set(t._2._1, t._2._2)).getOrElse(Try(ua13))
-            ua15 <- optUKCompanyTuple.map(t => ua14.set(t._1._1, t._1._2)).getOrElse(Try(ua14))
-            ua16 <- optUKCompanyTuple.map(t => ua15.set(t._2._1, t._2._2)).getOrElse(Try(ua15))
-            ua17 <- optUKPartnershipTuple.map(t => ua16.set(t._1._1, t._1._2)).getOrElse(Try(ua16))
-            ua18 <- optUKPartnershipTuple.map(t => ua17.set(t._2._1, t._2._2)).getOrElse(Try(ua17))
-            ua19 <- optOther.map(t => ua18.set(t._1, t._2)).getOrElse(Try(ua18))
+            ua12 <- optIndividualTuple.map(t => ua11.set(t._1._1, t._1._2)).getOrElse(Try(ua11))
+            ua13 <- optIndividualTuple.map(t => ua12.set(t._2._1, t._2._2)).getOrElse(Try(ua12))
+            ua14 <- optUKCompanyTuple.map(t => ua13.set(t._1._1, t._1._2)).getOrElse(Try(ua13))
+            ua15 <- optUKCompanyTuple.map(t => ua14.set(t._2._1, t._2._2)).getOrElse(Try(ua14))
+            ua16 <- optUKPartnershipTuple.map(t => ua15.set(t._1._1, t._1._2)).getOrElse(Try(ua15))
+            ua17 <- optUKPartnershipTuple.map(t => ua16.set(t._2._1, t._2._2)).getOrElse(Try(ua16))
+            ua18 <- optOther.map(t => ua17.set(t._1, t._2)).getOrElse(Try(ua17))
 
-            ua20 <- optLeaseTuple.map(t => ua19.set(t._1._1, t._1._2)).getOrElse(Try(ua19))
-            ua21 <- optLeaseTuple.map(t => ua20.set(t._2._1, t._2._2)).getOrElse(Try(ua20))
-            ua22 <- optSellerConnectedParty.map(t => ua21.set(t._1, t._2)).getOrElse(Try(ua21))
+            ua19 <- optLeaseTuple.map(t => ua18.set(t._1._1, t._1._2)).getOrElse(Try(ua18))
+            ua20 <- optLeaseTuple.map(t => ua19.set(t._2._1, t._2._2)).getOrElse(Try(ua19))
+            ua21 <- optSellerConnectedParty.map(t => ua20.set(t._1, t._2)).getOrElse(Try(ua20))
           } yield {
-            Option
-              .when(landOrProperty.disposeAnyLandOrProperty)(
-                buildOptDisposedTransactionUA(
-                  index,
-                  srn,
-                  ua22,
-                  landOrPropertyTransactions(index.value - 1).optDisposedPropertyTransaction
-                )
-              )
-              .getOrElse(Try(ua22))
+            buildOptDisposedTransactionUA(
+              index,
+              srn,
+              ua21,
+              landOrPropertyTransactions(index.value - 1).optDisposedPropertyTransaction,
+              landOrProperty.disposeAnyLandOrProperty
+            )
           }
           triedUA.flatten
       }
@@ -270,15 +266,18 @@ class LandOrPropertyTransactionsTransformer @Inject() extends Transformer {
     index: Max5000,
     srn: Srn,
     userAnswers: UserAnswers,
-    optDisposedPropertyTransaction: Option[Seq[DisposedPropertyTransaction]]
+    optDisposedPropertyTransaction: Option[Seq[DisposedPropertyTransaction]],
+    disposeAnyLandOrProperty: Boolean
   ): Try[UserAnswers] = {
+
+    val initialUserAnswersOfDisposal = userAnswers.set(LandOrPropertyDisposalPage(srn), disposeAnyLandOrProperty)
 
     optDisposedPropertyTransaction
       .map(
         disposedPropertyTransactions => {
           for {
             disposalIndexes <- buildIndexesForMax50(disposedPropertyTransactions.size)
-            resultDisposalUA <- disposalIndexes.foldLeft(Try(userAnswers)) {
+            resultDisposalUA <- disposalIndexes.foldLeft(initialUserAnswersOfDisposal) {
               case (disposalUA, disposalIndex) =>
                 val disposedPropertyTransaction = disposedPropertyTransactions(disposalIndex.value - 1)
                 val methodOfDisposal = disposedPropertyTransaction.methodOfDisposal match {
@@ -373,53 +372,52 @@ class LandOrPropertyTransactionsTransformer @Inject() extends Transformer {
                   disposalUA0 <- disposalUA
                   disposalUA1 <- disposalUA0
                     .set(LandPropertyDisposalCompletedPage(srn, index, disposalIndex), SectionCompleted)
-                  disposalUA2 <- disposalUA1.set(LandOrPropertyDisposalPage(srn), true)
-                  disposalUA3 <- disposalUA2.set(howWasPropertyDisposed._1, howWasPropertyDisposed._2)
-                  disposalUA4 <- disposalUA3.set(portionStillHeld._1, portionStillHeld._2)
-                  disposalUA5 <- optWhenWasPropertySold
+                  disposalUA2 <- disposalUA1.set(howWasPropertyDisposed._1, howWasPropertyDisposed._2)
+                  disposalUA3 <- disposalUA2.set(portionStillHeld._1, portionStillHeld._2)
+                  disposalUA4 <- optWhenWasPropertySold
+                    .map(t => disposalUA3.set(t._1, t._2))
+                    .getOrElse(Try(disposalUA3))
+                  disposalUA5 <- optSaleProceeds
                     .map(t => disposalUA4.set(t._1, t._2))
                     .getOrElse(Try(disposalUA4))
-                  disposalUA6 <- optSaleProceeds
+
+                  disposalUA6 <- optIndepValuation
                     .map(t => disposalUA5.set(t._1, t._2))
                     .getOrElse(Try(disposalUA5))
-
-                  disposalUA7 <- optIndepValuation
+                  disposalUA7 <- optLandOrPropertyDisposedType
                     .map(t => disposalUA6.set(t._1, t._2))
                     .getOrElse(Try(disposalUA6))
-                  disposalUA8 <- optLandOrPropertyDisposedType
-                    .map(t => disposalUA7.set(t._1, t._2))
+
+                  disposalUA8 <- optIndividualTuple
+                    .map(t => disposalUA7.set(t._1._1, t._1._2))
                     .getOrElse(Try(disposalUA7))
-
                   disposalUA9 <- optIndividualTuple
-                    .map(t => disposalUA8.set(t._1._1, t._1._2))
+                    .map(t => disposalUA8.set(t._2._1, t._2._2))
                     .getOrElse(Try(disposalUA8))
-                  disposalUA10 <- optIndividualTuple
-                    .map(t => disposalUA9.set(t._2._1, t._2._2))
+
+                  disposalUA10 <- optUKCompanyTuple
+                    .map(t => disposalUA9.set(t._1._1, t._1._2))
                     .getOrElse(Try(disposalUA9))
-
                   disposalUA11 <- optUKCompanyTuple
-                    .map(t => disposalUA10.set(t._1._1, t._1._2))
+                    .map(t => disposalUA10.set(t._2._1, t._2._2))
                     .getOrElse(Try(disposalUA10))
-                  disposalUA12 <- optUKCompanyTuple
-                    .map(t => disposalUA11.set(t._2._1, t._2._2))
-                    .getOrElse(Try(disposalUA11))
 
+                  disposalUA12 <- optUKPartnershipTuple
+                    .map(t => disposalUA11.set(t._1._1, t._1._2))
+                    .getOrElse(Try(disposalUA11))
                   disposalUA13 <- optUKPartnershipTuple
-                    .map(t => disposalUA12.set(t._1._1, t._1._2))
+                    .map(t => disposalUA12.set(t._2._1, t._2._2))
                     .getOrElse(Try(disposalUA12))
-                  disposalUA14 <- optUKPartnershipTuple
-                    .map(t => disposalUA13.set(t._2._1, t._2._2))
+                  disposalUA14 <- optConnectedParty
+                    .map(t => disposalUA13.set(t._1, t._2))
                     .getOrElse(Try(disposalUA13))
-                  disposalUA15 <- optConnectedParty
-                    .map(t => disposalUA14.set(t._1, t._2))
-                    .getOrElse(Try(disposalUA14))
-                  disposalUA16 <- optOther.map(t => disposalUA15.set(t._1, t._2)).getOrElse(Try(disposalUA15))
-                } yield disposalUA16
+                  disposalUA15 <- optOther.map(t => disposalUA14.set(t._1, t._2)).getOrElse(Try(disposalUA14))
+                } yield disposalUA15
             }
           } yield resultDisposalUA
         }
       )
-      .getOrElse(Try(userAnswers))
+      .getOrElse(initialUserAnswersOfDisposal)
   }
 
   private def buildLandRegistryTitleNumberDetail(srn: Srn, index: Max5000, propertyDetails: PropertyDetails) = {

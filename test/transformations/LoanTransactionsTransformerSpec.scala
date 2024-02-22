@@ -87,16 +87,16 @@ class LoanTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
       val result = transformer.transformToEtmp(srn)(request)
       result mustBe List(
         LoanTransactions(
-          RecipientIdentityType(IdentityType.Individual, Some(nino.value), None, None),
-          "IndividualRecipientName",
-          true,
-          None,
-          LoanPeriod(localDate, Double.MinPositiveValue, Int.MaxValue),
-          LoanAmountDetails(money.value, money.value, money.value),
-          false,
-          LoanInterestDetails(money.value, percentage.value, money.value),
-          Some(security.value),
-          Some(money.value)
+          recipientIdentityType = RecipientIdentityType(IdentityType.Individual, Some(nino.value), None, None),
+          loanRecipientName = "IndividualRecipientName",
+          connectedPartyStatus = true,
+          optRecipientSponsoringEmployer = None,
+          datePeriodLoanDetails = LoanPeriod(localDate, Double.MinPositiveValue, Int.MaxValue),
+          loanAmountDetails = LoanAmountDetails(money.value, money.value, money.value),
+          equalInstallments = false,
+          loanInterestDetails = LoanInterestDetails(money.value, percentage.value, money.value),
+          optSecurityGivenDetails = Some(security.value),
+          optOutstandingArrearsOnLoan = Some(money.value)
         )
       )
     }
@@ -119,16 +119,16 @@ class LoanTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
       val result = transformer.transformToEtmp(srn)(request)
       result mustBe List(
         LoanTransactions(
-          RecipientIdentityType(IdentityType.Individual, None, Some("noNinoReason"), None),
-          "IndividualRecipientName",
-          false,
-          None,
-          LoanPeriod(localDate, Double.MinPositiveValue, Int.MaxValue),
-          LoanAmountDetails(money.value, money.value, money.value),
-          true,
-          LoanInterestDetails(money.value, percentage.value, money.value),
-          Some(security.value),
-          Some(money.value)
+          recipientIdentityType = RecipientIdentityType(IdentityType.Individual, None, Some("noNinoReason"), None),
+          loanRecipientName = "IndividualRecipientName",
+          connectedPartyStatus = false,
+          optRecipientSponsoringEmployer = None,
+          datePeriodLoanDetails = LoanPeriod(localDate, Double.MinPositiveValue, Int.MaxValue),
+          loanAmountDetails = LoanAmountDetails(money.value, money.value, money.value),
+          equalInstallments = true,
+          loanInterestDetails = LoanInterestDetails(money.value, percentage.value, money.value),
+          optSecurityGivenDetails = Some(security.value),
+          optOutstandingArrearsOnLoan = Some(money.value)
         )
       )
     }
@@ -154,16 +154,16 @@ class LoanTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
       val result = transformer.transformToEtmp(srn)(request)
       result mustBe List(
         LoanTransactions(
-          RecipientIdentityType(IdentityType.UKCompany, Some(crn.value), None, None),
-          "CompanyRecipientName",
-          false,
-          Some(Sponsoring.name),
-          LoanPeriod(localDate, Double.MinPositiveValue, Int.MaxValue),
-          LoanAmountDetails(money.value, money.value, money.value),
-          false,
-          LoanInterestDetails(money.value, percentage.value, money.value),
-          Some(security.value),
-          Some(money.value)
+          recipientIdentityType = RecipientIdentityType(IdentityType.UKCompany, Some(crn.value), None, None),
+          loanRecipientName = "CompanyRecipientName",
+          connectedPartyStatus = false,
+          optRecipientSponsoringEmployer = Some(Sponsoring.name),
+          datePeriodLoanDetails = LoanPeriod(localDate, Double.MinPositiveValue, Int.MaxValue),
+          loanAmountDetails = LoanAmountDetails(money.value, money.value, money.value),
+          equalInstallments = false,
+          loanInterestDetails = LoanInterestDetails(money.value, percentage.value, money.value),
+          optSecurityGivenDetails = Some(security.value),
+          optOutstandingArrearsOnLoan = Some(money.value)
         )
       )
     }
@@ -188,16 +188,16 @@ class LoanTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
       val result = transformer.transformToEtmp(srn)(request)
       result mustBe List(
         LoanTransactions(
-          RecipientIdentityType(IdentityType.UKCompany, None, Some("noCrnReason"), None),
-          "CompanyRecipientName",
-          false,
-          None,
-          LoanPeriod(localDate, Double.MinPositiveValue, Int.MaxValue),
-          LoanAmountDetails(money.value, money.value, money.value),
-          true,
-          LoanInterestDetails(money.value, percentage.value, money.value),
-          Some(security.value),
-          Some(money.value)
+          recipientIdentityType = RecipientIdentityType(IdentityType.UKCompany, None, Some("noCrnReason"), None),
+          loanRecipientName = "CompanyRecipientName",
+          connectedPartyStatus = false,
+          optRecipientSponsoringEmployer = None,
+          datePeriodLoanDetails = LoanPeriod(localDate, Double.MinPositiveValue, Int.MaxValue),
+          loanAmountDetails = LoanAmountDetails(money.value, money.value, money.value),
+          equalInstallments = true,
+          loanInterestDetails = LoanInterestDetails(money.value, percentage.value, money.value),
+          optSecurityGivenDetails = Some(security.value),
+          optOutstandingArrearsOnLoan = Some(money.value)
         )
       )
     }
@@ -223,16 +223,16 @@ class LoanTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
       val result = transformer.transformToEtmp(srn)(request)
       result mustBe List(
         LoanTransactions(
-          RecipientIdentityType(IdentityType.UKPartnership, Some(utr.value), None, None),
-          "PartnershipRecipientName",
-          true,
-          Some(ConnectedParty.name),
-          LoanPeriod(localDate, Double.MinPositiveValue, Int.MaxValue),
-          LoanAmountDetails(money.value, money.value, money.value),
-          false,
-          LoanInterestDetails(money.value, percentage.value, money.value),
-          Some(security.value),
-          Some(money.value)
+          recipientIdentityType = RecipientIdentityType(IdentityType.UKPartnership, Some(utr.value), None, None),
+          loanRecipientName = "PartnershipRecipientName",
+          connectedPartyStatus = true,
+          optRecipientSponsoringEmployer = Some(ConnectedParty.name),
+          datePeriodLoanDetails = LoanPeriod(localDate, Double.MinPositiveValue, Int.MaxValue),
+          loanAmountDetails = LoanAmountDetails(money.value, money.value, money.value),
+          equalInstallments = false,
+          loanInterestDetails = LoanInterestDetails(money.value, percentage.value, money.value),
+          optSecurityGivenDetails = Some(security.value),
+          optOutstandingArrearsOnLoan = Some(money.value)
         )
       )
     }
@@ -258,16 +258,16 @@ class LoanTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
       val result = transformer.transformToEtmp(srn)(request)
       result mustBe List(
         LoanTransactions(
-          RecipientIdentityType(IdentityType.UKPartnership, None, Some("noUtrReason"), None),
-          "PartnershipRecipientName",
-          false,
-          Some(Neither.name),
-          LoanPeriod(localDate, Double.MinPositiveValue, Int.MaxValue),
-          LoanAmountDetails(money.value, money.value, money.value),
-          true,
-          LoanInterestDetails(money.value, percentage.value, money.value),
-          Some(security.value),
-          Some(money.value)
+          recipientIdentityType = RecipientIdentityType(IdentityType.UKPartnership, None, Some("noUtrReason"), None),
+          loanRecipientName = "PartnershipRecipientName",
+          connectedPartyStatus = false,
+          optRecipientSponsoringEmployer = Some(Neither.name),
+          datePeriodLoanDetails = LoanPeriod(localDate, Double.MinPositiveValue, Int.MaxValue),
+          loanAmountDetails = LoanAmountDetails(money.value, money.value, money.value),
+          equalInstallments = true,
+          loanInterestDetails = LoanInterestDetails(money.value, percentage.value, money.value),
+          optSecurityGivenDetails = Some(security.value),
+          optOutstandingArrearsOnLoan = Some(money.value)
         )
       )
     }
@@ -292,22 +292,51 @@ class LoanTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
       val result = transformer.transformToEtmp(srn)(request)
       result mustBe List(
         LoanTransactions(
-          RecipientIdentityType(IdentityType.Other, None, None, Some("otherDescription")),
-          "OtherRecipientDetailsName",
-          false,
-          Some(Neither.name),
-          LoanPeriod(localDate, Double.MinPositiveValue, Int.MaxValue),
-          LoanAmountDetails(money.value, money.value, money.value),
-          true,
-          LoanInterestDetails(money.value, percentage.value, money.value),
-          Some(security.value),
-          Some(money.value)
+          recipientIdentityType = RecipientIdentityType(IdentityType.Other, None, None, Some("otherDescription")),
+          loanRecipientName = "OtherRecipientDetailsName",
+          connectedPartyStatus = false,
+          optRecipientSponsoringEmployer = Some(Neither.name),
+          datePeriodLoanDetails = LoanPeriod(localDate, Double.MinPositiveValue, Int.MaxValue),
+          loanAmountDetails = LoanAmountDetails(money.value, money.value, money.value),
+          equalInstallments = true,
+          loanInterestDetails = LoanInterestDetails(money.value, percentage.value, money.value),
+          optSecurityGivenDetails = Some(security.value),
+          optOutstandingArrearsOnLoan = Some(money.value)
         )
       )
     }
   }
 
   "Should transform loan details from ETMP" - {
+
+    "when schemeHadLoans is false" in {
+
+      val userAnswers = emptyUserAnswers
+
+      val result = transformer.transformFromEtmp(
+        userAnswers,
+        allowedAccessRequest.srn,
+        Loans(schemeHadLoans = false, loanTransactions = List.empty)
+      )
+
+      result.fold(
+        ex => fail(ex.getMessage),
+        userAnswers => {
+          userAnswers.get(LoansMadeOrOutstandingPage(srn)) mustBe Some(false)
+          userAnswers.get(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient)) mustBe None
+          userAnswers.get(IndividualRecipientNamePage(srn, refineMV(1))) mustBe None
+          userAnswers.get(IndividualRecipientNinoPage(srn, refineMV(1))) mustBe None
+          userAnswers.get(IsIndividualRecipientConnectedPartyPage(srn, refineMV(1))) mustBe None
+          userAnswers.get(DatePeriodLoanPage(srn, refineMV(1))) mustBe None
+          userAnswers.get(AmountOfTheLoanPage(srn, refineMV(1))) mustBe None
+          userAnswers.get(AreRepaymentsInstalmentsPage(srn, refineMV(1))) mustBe None
+          userAnswers.get(InterestOnLoanPage(srn, refineMV(1))) mustBe None
+          userAnswers.get(SecurityGivenForLoanPage(srn, refineMV(1))) mustBe None
+          userAnswers.get(OutstandingArrearsOnLoanPage(srn, refineMV(1))) mustBe None
+        }
+      )
+    }
+
     "when individual nino" in {
 
       val userAnswers = emptyUserAnswers
@@ -315,11 +344,12 @@ class LoanTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
       val result = transformer.transformFromEtmp(
         userAnswers,
         allowedAccessRequest.srn,
-        loans(individualRecipientName, RecipientIdentityType(IdentityType.Individual, Some(nino.value), None, None)).loanTransactions.toList
+        loans(individualRecipientName, RecipientIdentityType(IdentityType.Individual, Some(nino.value), None, None))
       )
       result.fold(
-        ex => fail(ex.getMessage()),
+        ex => fail(ex.getMessage),
         userAnswers => {
+          userAnswers.get(LoansMadeOrOutstandingPage(srn)) mustBe Some(true)
           userAnswers.get(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient)) mustBe Some(
             IdentityType.Individual
           )
@@ -337,6 +367,7 @@ class LoanTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
         }
       )
     }
+
     "when individual no nino" in {
 
       val userAnswers = emptyUserAnswers
@@ -344,11 +375,12 @@ class LoanTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
       val result = transformer.transformFromEtmp(
         userAnswers,
         allowedAccessRequest.srn,
-        loans(individualRecipientName, RecipientIdentityType(IdentityType.Individual, None, Some(noninoReason), None)).loanTransactions.toList
+        loans(individualRecipientName, RecipientIdentityType(IdentityType.Individual, None, Some(noninoReason), None))
       )
       result.fold(
-        ex => fail(ex.getMessage()),
+        ex => fail(ex.getMessage),
         userAnswers => {
+          userAnswers.get(LoansMadeOrOutstandingPage(srn)) mustBe Some(true)
           userAnswers.get(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient)) mustBe Some(
             IdentityType.Individual
           )
@@ -365,11 +397,12 @@ class LoanTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
       val result = transformer.transformFromEtmp(
         userAnswers,
         allowedAccessRequest.srn,
-        loans(companyRecipientName, RecipientIdentityType(IdentityType.UKCompany, Some(crn.value), None, None), true).loanTransactions.toList
+        loans(companyRecipientName, RecipientIdentityType(IdentityType.UKCompany, Some(crn.value), None, None), sponsoringEmployer = true)
       )
       result.fold(
-        ex => fail(ex.getMessage()),
+        ex => fail(ex.getMessage),
         userAnswers => {
+          userAnswers.get(LoansMadeOrOutstandingPage(srn)) mustBe Some(true)
           userAnswers.get(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient)) mustBe Some(
             IdentityType.UKCompany
           )
@@ -391,11 +424,12 @@ class LoanTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
       val result = transformer.transformFromEtmp(
         userAnswers,
         allowedAccessRequest.srn,
-        loans(companyRecipientName, RecipientIdentityType(IdentityType.UKCompany, None, Some(noCrnReason), None)).loanTransactions.toList
+        loans(companyRecipientName, RecipientIdentityType(IdentityType.UKCompany, None, Some(noCrnReason), None))
       )
       result.fold(
-        ex => fail(ex.getMessage()),
+        ex => fail(ex.getMessage),
         userAnswers => {
+          userAnswers.get(LoansMadeOrOutstandingPage(srn)) mustBe Some(true)
           userAnswers.get(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient)) mustBe Some(
             IdentityType.UKCompany
           )
@@ -417,11 +451,12 @@ class LoanTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
       val result = transformer.transformFromEtmp(
         userAnswers,
         allowedAccessRequest.srn,
-        loans(partnershipRecipientName, RecipientIdentityType(IdentityType.UKPartnership, Some(utr.value), None, None)).loanTransactions.toList
+        loans(partnershipRecipientName, RecipientIdentityType(IdentityType.UKPartnership, Some(utr.value), None, None))
       )
       result.fold(
-        ex => fail(ex.getMessage()),
+        ex => fail(ex.getMessage),
         userAnswers => {
+          userAnswers.get(LoansMadeOrOutstandingPage(srn)) mustBe Some(true)
           userAnswers.get(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient)) mustBe Some(
             IdentityType.UKPartnership
           )
@@ -443,11 +478,12 @@ class LoanTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
         loans(
           "partnership " + recipientName,
           RecipientIdentityType(IdentityType.UKPartnership, None, Some(noUtrReason), None)
-        ).loanTransactions.toList
+        )
       )
       result.fold(
-        ex => fail(ex.getMessage()),
+        ex => fail(ex.getMessage),
         userAnswers => {
+          userAnswers.get(LoansMadeOrOutstandingPage(srn)) mustBe Some(true)
           userAnswers.get(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient)) mustBe Some(
             IdentityType.UKPartnership
           )
@@ -469,11 +505,12 @@ class LoanTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
         loans(
           otherRecipientName,
           RecipientIdentityType(IdentityType.Other, None, None, Some(otherRecipientDescription))
-        ).loanTransactions.toList
+        )
       )
       result.fold(
-        ex => fail(ex.getMessage()),
+        ex => fail(ex.getMessage),
         userAnswers => {
+          userAnswers.get(LoansMadeOrOutstandingPage(srn)) mustBe Some(true)
           userAnswers.get(IdentityTypePage(srn, refineMV(1), IdentitySubject.LoanRecipient)) mustBe Some(
             IdentityType.Other
           )
@@ -487,19 +524,19 @@ class LoanTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
 
     def loans(name: String, recipientIdentityType: RecipientIdentityType, sponsoringEmployer: Boolean = false): Loans =
       Loans(
-        true,
+        schemeHadLoans = true,
         Seq(
           LoanTransactions(
-            recipientIdentityType,
-            name,
-            true,
-            if (sponsoringEmployer) Some("Yes") else None,
-            LoanPeriod(localDate, Double.MinPositiveValue, Int.MaxValue),
-            LoanAmountDetails(money.value, money.value, money.value),
-            false,
-            LoanInterestDetails(money.value, percentage.value, money.value),
-            Some(security.value),
-            Some(money.value)
+            recipientIdentityType = recipientIdentityType,
+            loanRecipientName = name,
+            connectedPartyStatus = true,
+            optRecipientSponsoringEmployer = if (sponsoringEmployer) Some("Yes") else None,
+            datePeriodLoanDetails = LoanPeriod(localDate, Double.MinPositiveValue, Int.MaxValue),
+            loanAmountDetails = LoanAmountDetails(money.value, money.value, money.value),
+            equalInstallments = false,
+            loanInterestDetails = LoanInterestDetails(money.value, percentage.value, money.value),
+            optSecurityGivenDetails = Some(security.value),
+            optOutstandingArrearsOnLoan = Some(money.value)
           )
         )
       )

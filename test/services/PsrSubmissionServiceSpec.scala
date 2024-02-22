@@ -80,196 +80,219 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
 
   "PSRSubmissionService" - {
 
-    "should submitPsrDetails request when only minimalRequiredSubmission object is exist" in {
-      val userAnswers = defaultUserAnswers
-        .unsafeSet(CheckReturnDatesPage(srn), false)
-        .unsafeSet(LoansMadeOrOutstandingPage(srn), false)
-        .unsafeSet(LandOrPropertyHeldPage(srn), false)
-        .unsafeSet(LandOrPropertyDisposalPage(srn), false)
-        .unsafeSet(MoneyBorrowedPage(srn), false)
-        .unsafeSet(DidSchemeHoldAnySharesPage(srn), false)
-      val request = DataRequest(allowedAccessRequest, userAnswers)
-      when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any())(any()))
-        .thenReturn(Some(minimalRequiredSubmission))
-      when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(()))
+    List(true, false).foreach(
+      checkReturnDatesAnswer =>
+        s"should submitPsrDetails request when only minimalRequiredSubmission object is exist and checkReturnDates is $checkReturnDatesAnswer" in {
+          val userAnswers = defaultUserAnswers
+            .unsafeSet(CheckReturnDatesPage(srn), checkReturnDatesAnswer)
+          val request = DataRequest(allowedAccessRequest, userAnswers)
+          when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any())(any()))
+            .thenReturn(Some(minimalRequiredSubmission))
+          when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(()))
 
-      whenReady(service.submitPsrDetails(srn)(implicitly, implicitly, request)) { result: Option[Unit] =>
-        verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
-        verify(mockLoanTransactionsTransformer, never).transformToEtmp(any())(any())
-        verify(mockLandOrPropertyTransactionsTransformer, never).transformToEtmp(any(), any())(any())
-        verify(mockMoneyBorrowedTransformer, never).transformToEtmp(any())(any())
-        verify(mockSharesTransformer, never).transformToEtmp(any())(any())
-        verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
+          whenReady(service.submitPsrDetails(srn)(implicitly, implicitly, request)) { result: Option[Unit] =>
+            verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
+            verify(mockLoanTransactionsTransformer, never).transformToEtmp(any())(any())
+            verify(mockLandOrPropertyTransactionsTransformer, never).transformToEtmp(any(), any())(any())
+            verify(mockMoneyBorrowedTransformer, never).transformToEtmp(any())(any())
+            verify(mockSharesTransformer, never).transformToEtmp(any())(any())
+            verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
 
-        captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
-        captor.getValue.checkReturnDates mustBe false
-        captor.getValue.loans mustBe None
-        captor.getValue.assets mustBe None
-        captor.getValue.shares mustBe None
-        result mustBe Some(())
-      }
-    }
+            captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
+            captor.getValue.checkReturnDates mustBe checkReturnDatesAnswer
+            captor.getValue.loans mustBe None
+            captor.getValue.assets mustBe None
+            captor.getValue.shares mustBe None
+            result mustBe Some(())
+          }
+        }
+    )
 
-    "submitPsrDetails request successfully when LoansMadeOrOutstandingPage is true" in {
-      val userAnswers = defaultUserAnswers
-        .unsafeSet(CheckReturnDatesPage(srn), false)
-        .unsafeSet(LoansMadeOrOutstandingPage(srn), true)
-      val request = DataRequest(allowedAccessRequest, userAnswers)
+    List(true, false).foreach(
+      loansMadeOrOutstanding =>
+        s"submitPsrDetails request successfully when LoansMadeOrOutstandingPage is $loansMadeOrOutstanding" in {
+          val userAnswers = defaultUserAnswers
+            .unsafeSet(CheckReturnDatesPage(srn), false)
+            .unsafeSet(LoansMadeOrOutstandingPage(srn), loansMadeOrOutstanding)
+          val request = DataRequest(allowedAccessRequest, userAnswers)
 
-      when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any())(any()))
-        .thenReturn(Some(minimalRequiredSubmission))
-      when(mockLoanTransactionsTransformer.transformToEtmp(any())(any())).thenReturn(List.empty)
-      when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(()))
+          when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any())(any()))
+            .thenReturn(Some(minimalRequiredSubmission))
+          when(mockLoanTransactionsTransformer.transformToEtmp(any())(any())).thenReturn(List.empty)
+          when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(()))
 
-      whenReady(service.submitPsrDetails(srn)(implicitly, implicitly, request)) { result: Option[Unit] =>
-        verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
-        verify(mockLoanTransactionsTransformer, times(1)).transformToEtmp(any())(any())
-        verify(mockLandOrPropertyTransactionsTransformer, never).transformToEtmp(any(), any())(any())
-        verify(mockMoneyBorrowedTransformer, never).transformToEtmp(any())(any())
-        verify(mockSharesTransformer, never).transformToEtmp(any())(any())
-        verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
+          whenReady(service.submitPsrDetails(srn)(implicitly, implicitly, request)) { result: Option[Unit] =>
+            verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
+            verify(mockLoanTransactionsTransformer, times(1)).transformToEtmp(any())(any())
+            verify(mockLandOrPropertyTransactionsTransformer, never).transformToEtmp(any(), any())(any())
+            verify(mockMoneyBorrowedTransformer, never).transformToEtmp(any())(any())
+            verify(mockSharesTransformer, never).transformToEtmp(any())(any())
+            verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
 
-        captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
-        captor.getValue.checkReturnDates mustBe false
-        captor.getValue.loans mustBe Some(Loans(schemeHadLoans = true, List.empty))
-        captor.getValue.assets mustBe None
-        captor.getValue.shares mustBe None
-        result mustBe Some(())
-      }
-    }
+            captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
+            captor.getValue.checkReturnDates mustBe false
+            captor.getValue.loans mustBe Some(Loans(schemeHadLoans = loansMadeOrOutstanding, List.empty))
+            captor.getValue.assets mustBe None
+            captor.getValue.shares mustBe None
+            result mustBe Some(())
+          }
+        }
+    )
 
-    "submitPsrDetails request successfully when LandOrPropertyHeldPage is true" in {
-      val userAnswers = defaultUserAnswers
-        .unsafeSet(CheckReturnDatesPage(srn), false)
-        .unsafeSet(LandOrPropertyHeldPage(srn), true)
-        .unsafeSet(LandOrPropertyDisposalPage(srn), false)
-      val request = DataRequest(allowedAccessRequest, userAnswers)
+    List(true, false).foreach(
+      landOrPropertyHeld =>
+        s"submitPsrDetails request successfully when LandOrPropertyHeldPage is $landOrPropertyHeld" in {
+          val userAnswers = defaultUserAnswers
+            .unsafeSet(CheckReturnDatesPage(srn), false)
+            .unsafeSet(LandOrPropertyHeldPage(srn), landOrPropertyHeld)
+          val request = DataRequest(allowedAccessRequest, userAnswers)
 
-      when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any())(any()))
-        .thenReturn(Some(minimalRequiredSubmission))
-      when(mockLandOrPropertyTransactionsTransformer.transformToEtmp(any(), any())(any())).thenReturn(List.empty)
-      when(mockMoneyBorrowedTransformer.transformToEtmp(any())(any())).thenReturn(List.empty)
-      when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(()))
+          when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any())(any()))
+            .thenReturn(Some(minimalRequiredSubmission))
+          when(mockLandOrPropertyTransactionsTransformer.transformToEtmp(any(), any())(any())).thenReturn(List.empty)
+          when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(()))
 
-      whenReady(service.submitPsrDetails(srn)(implicitly, implicitly, request)) { result: Option[Unit] =>
-        verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
-        verify(mockLandOrPropertyTransactionsTransformer, times(1)).transformToEtmp(any(), any())(any())
-        verify(mockLoanTransactionsTransformer, never).transformToEtmp(any())(any())
-        verify(mockSharesTransformer, never).transformToEtmp(any())(any())
-        verify(mockMoneyBorrowedTransformer, times(1)).transformToEtmp(any())(any())
-        verify(mockMoneyBorrowedTransformer, times(1)).transformToEtmp(any())(any())
-        verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
+          whenReady(service.submitPsrDetails(srn)(implicitly, implicitly, request)) {
+            result: Option[Unit] =>
+              verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
+              verify(mockLandOrPropertyTransactionsTransformer, times(1)).transformToEtmp(any(), any())(any())
+              verify(mockLoanTransactionsTransformer, never).transformToEtmp(any())(any())
+              verify(mockSharesTransformer, never).transformToEtmp(any())(any())
+              verify(mockMoneyBorrowedTransformer, never).transformToEtmp(any())(any())
+              verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
 
-        captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
-        captor.getValue.checkReturnDates mustBe false
-        captor.getValue.loans mustBe None
-        captor.getValue.assets mustBe Some(
-          Assets(
-            LandOrProperty(landOrPropertyHeld = true, disposeAnyLandOrProperty = false, List.empty),
-            Borrowing(moneyWasBorrowed = false, List.empty)
-          )
-        )
-        captor.getValue.shares mustBe None
-        result mustBe Some(())
-      }
-    }
+              captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
+              captor.getValue.checkReturnDates mustBe false
+              captor.getValue.loans mustBe None
+              captor.getValue.assets mustBe Some(
+                Assets(
+                  optLandOrProperty = Some(
+                    LandOrProperty(
+                      landOrPropertyHeld = landOrPropertyHeld,
+                      disposeAnyLandOrProperty = false,
+                      List.empty
+                    )
+                  ),
+                  optBorrowing = None
+                )
+              )
+              captor.getValue.shares mustBe None
+              result mustBe Some(())
+          }
+        }
+    )
 
-    "submitPsrDetails request successfully when LandOrPropertyDisposalPage is true" in {
-      val userAnswers = defaultUserAnswers
-        .unsafeSet(CheckReturnDatesPage(srn), false)
-        .unsafeSet(LandOrPropertyHeldPage(srn), false)
-        .unsafeSet(LandOrPropertyDisposalPage(srn), true)
-      val request = DataRequest(allowedAccessRequest, userAnswers)
+    List(true, false).foreach(
+      landOrPropertyDisposal =>
+        s"submitPsrDetails request successfully when LandOrPropertyDisposalPage is $landOrPropertyDisposal" in {
+          val userAnswers = defaultUserAnswers
+            .unsafeSet(CheckReturnDatesPage(srn), false)
+            .unsafeSet(LandOrPropertyHeldPage(srn), true)
+            .unsafeSet(LandOrPropertyDisposalPage(srn), landOrPropertyDisposal)
+          val request = DataRequest(allowedAccessRequest, userAnswers)
 
-      when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any())(any()))
-        .thenReturn(Some(minimalRequiredSubmission))
-      when(mockLandOrPropertyTransactionsTransformer.transformToEtmp(any(), any())(any())).thenReturn(List.empty)
-      when(mockMoneyBorrowedTransformer.transformToEtmp(any())(any())).thenReturn(List.empty)
-      when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(()))
+          when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any())(any()))
+            .thenReturn(Some(minimalRequiredSubmission))
+          when(mockLandOrPropertyTransactionsTransformer.transformToEtmp(any(), any())(any())).thenReturn(List.empty)
+          when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(()))
 
-      whenReady(service.submitPsrDetails(srn)(implicitly, implicitly, request)) { result: Option[Unit] =>
-        verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
-        verify(mockLandOrPropertyTransactionsTransformer, times(1)).transformToEtmp(any(), any())(any())
-        verify(mockLoanTransactionsTransformer, never).transformToEtmp(any())(any())
-        verify(mockSharesTransformer, never).transformToEtmp(any())(any())
-        verify(mockMoneyBorrowedTransformer, times(1)).transformToEtmp(any())(any())
-        verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
+          whenReady(service.submitPsrDetails(srn)(implicitly, implicitly, request)) {
+            result: Option[Unit] =>
+              verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
+              verify(mockLandOrPropertyTransactionsTransformer, times(1)).transformToEtmp(any(), any())(any())
+              verify(mockLoanTransactionsTransformer, never).transformToEtmp(any())(any())
+              verify(mockSharesTransformer, never).transformToEtmp(any())(any())
+              verify(mockMoneyBorrowedTransformer, never).transformToEtmp(any())(any())
+              verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
 
-        captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
-        captor.getValue.checkReturnDates mustBe false
-        captor.getValue.loans mustBe None
-        captor.getValue.assets mustBe Some(
-          Assets(
-            LandOrProperty(landOrPropertyHeld = false, disposeAnyLandOrProperty = true, List.empty),
-            Borrowing(moneyWasBorrowed = false, List.empty)
-          )
-        )
-        captor.getValue.shares mustBe None
-        result mustBe Some(())
-      }
-    }
+              captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
+              captor.getValue.checkReturnDates mustBe false
+              captor.getValue.loans mustBe None
+              captor.getValue.assets mustBe Some(
+                Assets(
+                  optLandOrProperty = Some(
+                    LandOrProperty(
+                      landOrPropertyHeld = true,
+                      disposeAnyLandOrProperty = landOrPropertyDisposal,
+                      List.empty
+                    )
+                  ),
+                  optBorrowing = None
+                )
+              )
+              captor.getValue.shares mustBe None
+              result mustBe Some(())
+          }
+        }
+    )
 
-    "submitPsrDetails request successfully when MoneyBorrowedPage is true" in {
-      val userAnswers = defaultUserAnswers
-        .unsafeSet(CheckReturnDatesPage(srn), false)
-        .unsafeSet(MoneyBorrowedPage(srn), true)
-      val request = DataRequest(allowedAccessRequest, userAnswers)
+    List(true, false).foreach(
+      moneyBorrowed =>
+        s"submitPsrDetails request successfully when MoneyBorrowedPage is $moneyBorrowed" in {
+          val userAnswers = defaultUserAnswers
+            .unsafeSet(CheckReturnDatesPage(srn), false)
+            .unsafeSet(MoneyBorrowedPage(srn), moneyBorrowed)
+          val request = DataRequest(allowedAccessRequest, userAnswers)
 
-      when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any())(any()))
-        .thenReturn(Some(minimalRequiredSubmission))
-      when(mockMoneyBorrowedTransformer.transformToEtmp(any())(any())).thenReturn(List.empty)
-      when(mockLandOrPropertyTransactionsTransformer.transformToEtmp(any(), any())(any())).thenReturn(List.empty)
-      when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(()))
+          when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any())(any()))
+            .thenReturn(Some(minimalRequiredSubmission))
+          when(mockMoneyBorrowedTransformer.transformToEtmp(any())(any())).thenReturn(List.empty)
+          when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(()))
 
-      whenReady(service.submitPsrDetails(srn)(implicitly, implicitly, request)) { result: Option[Unit] =>
-        verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
-        verify(mockLoanTransactionsTransformer, never).transformToEtmp(any())(any())
-        verify(mockSharesTransformer, never).transformToEtmp(any())(any())
-        verify(mockLandOrPropertyTransactionsTransformer, times(1)).transformToEtmp(any(), any())(any())
-        verify(mockMoneyBorrowedTransformer, times(1)).transformToEtmp(any())(any())
-        verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
+          whenReady(service.submitPsrDetails(srn)(implicitly, implicitly, request)) {
+            result: Option[Unit] =>
+              verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
+              verify(mockLoanTransactionsTransformer, never).transformToEtmp(any())(any())
+              verify(mockSharesTransformer, never).transformToEtmp(any())(any())
+              verify(mockLandOrPropertyTransactionsTransformer, never).transformToEtmp(any(), any())(any())
+              verify(mockMoneyBorrowedTransformer, times(1)).transformToEtmp(any())(any())
+              verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
 
-        captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
-        captor.getValue.checkReturnDates mustBe false
-        captor.getValue.loans mustBe None
-        captor.getValue.assets mustBe Some(
-          Assets(
-            LandOrProperty(landOrPropertyHeld = false, disposeAnyLandOrProperty = false, List.empty),
-            Borrowing(moneyWasBorrowed = true, List.empty)
-          )
-        )
-        captor.getValue.shares mustBe None
-        result mustBe Some(())
-      }
-    }
+              captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
+              captor.getValue.checkReturnDates mustBe false
+              captor.getValue.loans mustBe None
+              captor.getValue.assets mustBe Some(
+                Assets(
+                  optLandOrProperty = None,
+                  optBorrowing = Some(Borrowing(moneyWasBorrowed = moneyBorrowed, List.empty))
+                )
+              )
+              captor.getValue.shares mustBe None
+              result mustBe Some(())
+          }
+        }
+    )
 
-    "submitPsrDetails request successfully when DidSchemeHoldAnySharesPage is true" in {
-      val userAnswers = defaultUserAnswers
-        .unsafeSet(CheckReturnDatesPage(srn), false)
-        .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
-      val request = DataRequest(allowedAccessRequest, userAnswers)
+    List(true, false).foreach(
+      didSchemeHoldAnyShares =>
+        s"submitPsrDetails request successfully when DidSchemeHoldAnySharesPage is $didSchemeHoldAnyShares" in {
+          val userAnswers = defaultUserAnswers
+            .unsafeSet(CheckReturnDatesPage(srn), false)
+            .unsafeSet(DidSchemeHoldAnySharesPage(srn), didSchemeHoldAnyShares)
+          val request = DataRequest(allowedAccessRequest, userAnswers)
 
-      when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any())(any()))
-        .thenReturn(Some(minimalRequiredSubmission))
-      when(mockSharesTransformer.transformToEtmp(any())(any())).thenReturn(Shares(optShareTransactions = None))
-      when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(()))
+          when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any())(any()))
+            .thenReturn(Some(minimalRequiredSubmission))
+          when(mockSharesTransformer.transformToEtmp(any())(any())).thenReturn(None)
+          when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(()))
 
-      whenReady(service.submitPsrDetails(srn)(implicitly, implicitly, request)) { result: Option[Unit] =>
-        verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
-        verify(mockLoanTransactionsTransformer, never).transformToEtmp(any())(any())
-        verify(mockSharesTransformer, times(1)).transformToEtmp(any())(any())
-        verify(mockLandOrPropertyTransactionsTransformer, never).transformToEtmp(any(), any())(any())
-        verify(mockMoneyBorrowedTransformer, never).transformToEtmp(any())(any())
-        verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
+          whenReady(service.submitPsrDetails(srn)(implicitly, implicitly, request)) { result: Option[Unit] =>
+            verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
+            verify(mockLoanTransactionsTransformer, never).transformToEtmp(any())(any())
+            verify(mockSharesTransformer, times(1)).transformToEtmp(any())(any())
+            verify(mockLandOrPropertyTransactionsTransformer, never).transformToEtmp(any(), any())(any())
+            verify(mockMoneyBorrowedTransformer, never).transformToEtmp(any())(any())
+            verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
 
-        captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
-        captor.getValue.checkReturnDates mustBe false
-        captor.getValue.loans mustBe None
-        captor.getValue.assets mustBe None
-        captor.getValue.shares mustBe Some(Shares(optShareTransactions = None))
-        result mustBe Some(())
-      }
-    }
+            captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
+            captor.getValue.checkReturnDates mustBe false
+            captor.getValue.loans mustBe None
+            captor.getValue.assets mustBe None
+            captor.getValue.shares mustBe Some(Shares(optShareTransactions = None))
+            result mustBe Some(())
+          }
+        }
+    )
 
     "shouldn't submitPsrDetails request when userAnswer is empty" in {
 

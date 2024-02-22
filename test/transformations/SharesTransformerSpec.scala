@@ -24,42 +24,28 @@ import models.TypeOfShares.{ConnectedParty, SponsoringEmployer, Unquoted}
 import models.requests.psr._
 import models.requests.{AllowedAccessRequest, DataRequest}
 import models.{ConditionalYesNo, IdentitySubject, IdentityType, PropertyAcquiredFrom, SchemeHoldShare, TypeOfShares}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{times, verify}
-import org.mockito.MockitoSugar.{mock, reset, when}
+import org.scalatest.OptionValues
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
-import org.scalatest.{BeforeAndAfterEach, OptionValues}
 import pages.nonsipp.common.IdentityTypePage
 import pages.nonsipp.shares._
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import viewmodels.models.SectionCompleted
 
-class SharesTransformerSpec
-    extends AnyFreeSpec
-    with Matchers
-    with OptionValues
-    with TestValues
-    with BeforeAndAfterEach {
-
-  override def beforeEach(): Unit =
-    reset(mockShareTransactionTransformer)
+class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues with TestValues {
 
   val allowedAccessRequest
     : AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(FakeRequest()).sample.value
   implicit val request: DataRequest[AnyContentAsEmpty.type] = DataRequest(allowedAccessRequest, defaultUserAnswers)
 
-  private val mockShareTransactionTransformer: ShareTransactionTransformer = mock[ShareTransactionTransformer]
-  private val transformer = new SharesTransformer(mockShareTransactionTransformer)
+  private val transformer = new SharesTransformer
 
-  "SharesTransformer - To Etmp" - {
-    "should call shareTransactionTransformer" in {
-      when(mockShareTransactionTransformer.transformToEtmp(any())(any()))
-        .thenReturn(Some(List.empty))
-      val result: Shares = transformer.transformToEtmp(srn)
-      result mustBe Shares(Some(List.empty))
-      verify(mockShareTransactionTransformer, times(1)).transformToEtmp(any())(any())
+  "ShareTransactionTransformer - To Etmp" - {
+    "should return empty List when userAnswer is empty" in {
+
+      val result = transformer.transformToEtmp(srn)
+      result mustBe None
     }
   }
 

@@ -27,7 +27,7 @@ import org.mockito.ArgumentMatchers.any
 import play.api.libs.json.JsObject
 import play.api.mvc.{AnyContent, AnyContentAsEmpty}
 import play.api.test.FakeRequest
-import services.PsrRetrievalServiceSpec.{assets, loans, memberPayments, shares}
+import services.PsrRetrievalServiceSpec._
 import services.PsrSubmissionServiceSpec.minimalRequiredSubmission
 import transformations._
 import uk.gov.hmrc.http.HeaderCarrier
@@ -157,12 +157,10 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
       }
     }
 
-    "should getPsrDetails return data when minimal data and assets data were found in etmp" in {
+    "should getPsrDetails return data when minimal data and assets With only LandOrProperty data were found in etmp" in {
       when(mockMinimalRequiredSubmissionTransformer.transformFromEtmp(any(), any(), any(), any()))
         .thenReturn(Try(defaultUserAnswers))
       when(mockLandOrPropertyTransactionsTransformer.transformFromEtmp(any(), any(), any()))
-        .thenReturn(Try(defaultUserAnswers))
-      when(mockMoneyBorrowedTransformer.transformFromEtmp(any(), any(), any()))
         .thenReturn(Try(defaultUserAnswers))
       when(mockConnector.getStandardPsrDetails(any(), any(), any(), any())(any(), any())).thenReturn(
         Future.successful(
@@ -171,7 +169,7 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
               minimalRequiredSubmission = minimalRequiredSubmission,
               checkReturnDates = false,
               loans = None,
-              assets = Some(assets),
+              assets = Some(assetsWithLandOrProperty),
               membersPayments = None,
               shares = None
             )
@@ -182,6 +180,38 @@ class PsrRetrievalServiceSpec extends BaseSpec with TestValues {
         result: UserAnswers =>
           verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformFromEtmp(any(), any(), any(), any())
           verify(mockLandOrPropertyTransactionsTransformer, times(1)).transformFromEtmp(any(), any(), any())
+          verify(mockMoneyBorrowedTransformer, never).transformFromEtmp(any(), any(), any())
+          verify(mockLoanTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
+          verify(mockMemberPaymentsTransformer, never).transformFromEtmp(any(), any(), any())
+          verify(mockSharesTransformer, never).transformFromEtmp(any(), any(), any())
+          result mustBe a[UserAnswers]
+          result.data.decryptedValue must not be JsObject.empty
+      }
+    }
+
+    "should getPsrDetails return data when minimal data and assets data were found in etmp" in {
+      when(mockMinimalRequiredSubmissionTransformer.transformFromEtmp(any(), any(), any(), any()))
+        .thenReturn(Try(defaultUserAnswers))
+      when(mockMoneyBorrowedTransformer.transformFromEtmp(any(), any(), any()))
+        .thenReturn(Try(defaultUserAnswers))
+      when(mockConnector.getStandardPsrDetails(any(), any(), any(), any())(any(), any())).thenReturn(
+        Future.successful(
+          Some(
+            PsrSubmission(
+              minimalRequiredSubmission = minimalRequiredSubmission,
+              checkReturnDates = false,
+              loans = None,
+              assets = Some(assetsWithBorrowing),
+              membersPayments = None,
+              shares = None
+            )
+          )
+        )
+      )
+      whenReady(service.getStandardPsrDetails(None, Some(pstr), Some(version))(mockReq, implicitly, implicitly)) {
+        result: UserAnswers =>
+          verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformFromEtmp(any(), any(), any(), any())
+          verify(mockLandOrPropertyTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
           verify(mockMoneyBorrowedTransformer, times(1)).transformFromEtmp(any(), any(), any())
           verify(mockLoanTransactionsTransformer, never).transformFromEtmp(any(), any(), any())
           verify(mockMemberPaymentsTransformer, never).transformFromEtmp(any(), any(), any())
@@ -283,13 +313,20 @@ object PsrRetrievalServiceSpec {
     loanTransactions = Seq.empty
   )
 
-  val assets: Assets = Assets(
-    LandOrProperty(
-      landOrPropertyHeld = true,
-      disposeAnyLandOrProperty = true,
-      landOrPropertyTransactions = Seq.empty
+  val assetsWithLandOrProperty: Assets = Assets(
+    optLandOrProperty = Some(
+      LandOrProperty(
+        landOrPropertyHeld = true,
+        disposeAnyLandOrProperty = true,
+        landOrPropertyTransactions = Seq.empty
+      )
     ),
-    Borrowing(moneyWasBorrowed = true, moneyBorrowed = Seq.empty)
+    optBorrowing = None
+  )
+
+  val assetsWithBorrowing: Assets = Assets(
+    optLandOrProperty = None,
+    optBorrowing = Some(Borrowing(moneyWasBorrowed = true, moneyBorrowed = Seq.empty))
   )
 
   val memberPayments: MemberPayments = MemberPayments(
