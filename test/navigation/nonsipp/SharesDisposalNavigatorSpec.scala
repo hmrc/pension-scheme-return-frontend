@@ -18,11 +18,14 @@ package navigation.nonsipp
 
 import config.Refined.{Max50, Max5000}
 import eu.timepit.refined.refineMV
-import models.{HowSharesDisposed, IdentityType, NormalMode}
+import models.{HowSharesDisposed, IdentityType, NormalMode, UserAnswers}
+import models.HowSharesDisposed._
+import models.SchemeId.Srn
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.sharesdisposal._
 import utils.BaseSpec
+import utils.UserAnswersUtils.UserAnswersOps
 
 class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
@@ -30,6 +33,8 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
   private val shareIndex = refineMV[Max5000.Refined](1)
   private val disposalIndex = refineMV[Max50.Refined](1)
+  private val shareIndexTwo = refineMV[Max5000.Refined](2)
+  private val disposalIndexTwo = refineMV[Max50.Refined](1)
 
   "SharesDisposalNavigator" - {
 
@@ -87,6 +92,61 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             )
             .withName("go from Shares Disposal List page to How Were Shares Disposed page")
         )
+      }
+
+      "RemoveShareDisposalPage" - {
+        "When there are no other share disposals" - {
+          act.like(
+            normalmode
+              .navigateToWithDoubleIndex(
+                shareIndex,
+                disposalIndex,
+                RemoveShareDisposalPage,
+                (srn, shareIndex: Max5000, disposalIndex: Max50, _) =>
+                  controllers.nonsipp.sharesdisposal.routes.SharesDisposalController
+                    .onPageLoad(srn, NormalMode)
+              )
+              .withName("go from RemoveShareDisposalPage to Shares Disposal page")
+          )
+        }
+        "When there is a disposal for the same share" - {
+          val customUserAnswers: Srn => UserAnswers = srn =>
+            defaultUserAnswers.unsafeSet(
+              HowWereSharesDisposedPage(srn, shareIndex, disposalIndex),
+              HowSharesDisposed.Transferred
+            )
+          act.like(
+            normalmode
+              .navigateToWithDoubleIndex(
+                shareIndex,
+                disposalIndex,
+                RemoveShareDisposalPage,
+                // TODO replace with share disposal list page
+                (srn, index: Max5000, disposalIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad(),
+                customUserAnswers
+              )
+              .withName("go from RemoveShareDisposalPage to Shares Disposal page")
+          )
+        }
+        "When there is a disposal for other share" - {
+          val customUserAnswers: Srn => UserAnswers = srn =>
+            defaultUserAnswers.unsafeSet(
+              HowWereSharesDisposedPage(srn, shareIndexTwo, disposalIndex),
+              HowSharesDisposed.Transferred
+            )
+          act.like(
+            normalmode
+              .navigateToWithDoubleIndex(
+                shareIndex,
+                disposalIndex,
+                RemoveShareDisposalPage,
+                // TODO replace with share disposal list page
+                (srn, index: Max5000, disposalIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad(),
+                customUserAnswers
+              )
+              .withName("go from RemoveShareDisposalPage to Shares Disposal page")
+          )
+        }
       }
 
       "HowWereSharesDisposedPage" - {
