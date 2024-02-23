@@ -2681,8 +2681,8 @@ bonds.checkYourAnswers.section.areBondsUnregulated.hidden = if the bonds are on 
 bonds.checkYourAnswers.section.incomeFromBonds = Total income from these bonds in the period of this return
 bonds.checkYourAnswers.section.incomeFromBonds.hidden = total income from these bonds in the period of this return
 
-bonds.checkYourAnswers.change.title = Change your answers
-bonds.checkYourAnswers.change.heading = Change your answers
+bonds.checkYourAnswers.change.title = Change details of bond transaction
+bonds.checkYourAnswers.change.heading = Change details of bond transaction
 
 bondsDisposal.title = Did the scheme dispose of any unregulated bonds, or bonds acquired from a connected party, during the period of this return?
 bondsDisposal.heading = Did {0} dispose of any unregulated bonds, or bonds acquired from a connected party, during the period of this return?
