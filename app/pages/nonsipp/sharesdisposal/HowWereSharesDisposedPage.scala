@@ -25,6 +25,7 @@ import play.api.libs.json.JsPath
 import queries.Removable
 import utils.PageUtils.removePages
 import utils.RefinedUtils.RefinedIntOps
+
 import scala.util.Try
 
 case class HowWereSharesDisposedPage(
