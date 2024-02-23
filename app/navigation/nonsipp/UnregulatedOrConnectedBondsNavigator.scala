@@ -18,7 +18,7 @@ package navigation.nonsipp
 
 import eu.timepit.refined.refineMV
 import models.SchemeHoldBond.{Acquisition, Contribution, Transfer}
-import models.{NormalMode, UserAnswers}
+import models.{CheckMode, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.unregulatedorconnectedbonds._
@@ -79,8 +79,58 @@ object UnregulatedOrConnectedBondsNavigator extends JourneyNavigator {
         .onPageLoad(srn, index, NormalMode)
 
     case IncomeFromBondsPage(srn, index) =>
+      controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldCYAController
+        .onPageLoad(srn, index, NormalMode)
+
+    case UnregulatedOrConnectedBondsHeldCYAPage(srn) =>
       controllers.routes.UnauthorisedController.onPageLoad()
   }
 
-  override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] = _ => _ => PartialFunction.empty
+  override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] =
+    _ =>
+      userAnswers => {
+        case NameOfBondsPage(srn, index) =>
+          controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldCYAController
+            .onPageLoad(srn, index, CheckMode)
+
+        case WhyDoesSchemeHoldBondsPage(srn, index) =>
+          userAnswers.get(WhyDoesSchemeHoldBondsPage(srn, index)) match {
+            case Some(Acquisition) =>
+              controllers.nonsipp.unregulatedorconnectedbonds.routes.WhenDidSchemeAcquireBondsController
+                .onPageLoad(srn, index, CheckMode)
+            case Some(Contribution) =>
+              controllers.nonsipp.unregulatedorconnectedbonds.routes.WhenDidSchemeAcquireBondsController
+                .onPageLoad(srn, index, CheckMode)
+            case Some(Transfer) =>
+              controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldCYAController
+                .onPageLoad(srn, index, CheckMode)
+            case _ => controllers.routes.UnauthorisedController.onPageLoad()
+          }
+
+        case WhenDidSchemeAcquireBondsPage(srn, index) =>
+          userAnswers.get(WhyDoesSchemeHoldBondsPage(srn, index)) match {
+            case Some(Acquisition) =>
+              controllers.nonsipp.unregulatedorconnectedbonds.routes.BondsFromConnectedPartyController
+                .onPageLoad(srn, index, CheckMode)
+            case _ =>
+              controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldCYAController
+                .onPageLoad(srn, index, CheckMode)
+          }
+
+        case CostOfBondsPage(srn, index) =>
+          controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldCYAController
+            .onPageLoad(srn, index, CheckMode)
+
+        case BondsFromConnectedPartyPage(srn, index) =>
+          controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldCYAController
+            .onPageLoad(srn, index, CheckMode)
+
+        case AreBondsUnregulatedPage(srn, index) =>
+          controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldCYAController
+            .onPageLoad(srn, index, CheckMode)
+
+        case IncomeFromBondsPage(srn, index) =>
+          controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldCYAController
+            .onPageLoad(srn, index, CheckMode)
+      }
 }
