@@ -66,14 +66,14 @@ case class HowWereSharesDisposedPage(
       WhenWereSharesRedeemedPage(srn, shareIndex, disposalIndex),
       HowManySharesRedeemedPage(srn, shareIndex, disposalIndex),
       TotalConsiderationSharesRedeemedPage(srn, shareIndex, disposalIndex),
-      HowManySharesPage(srn, shareIndex, disposalIndex),
       WhenWereSharesSoldPage(srn, shareIndex, disposalIndex),
       HowManySharesSoldPage(srn, shareIndex, disposalIndex),
       TotalConsiderationSharesSoldPage(srn, shareIndex, disposalIndex),
       WhoWereTheSharesSoldToPage(srn, shareIndex, disposalIndex), // has it's own cleanup
+      IsBuyerConnectedPartyPage(srn, shareIndex, disposalIndex),
       IndependentValuationPage(srn, shareIndex, disposalIndex)
     )
-    if (isLastRecord) list :+ SharesDisposalPage(srn) else list
+    if (isLastRecord) list :+ SharesDisposalPage(srn) :+ HowManySharesPage(srn, shareIndex, disposalIndex) else list
   }
 }
 
