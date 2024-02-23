@@ -26,7 +26,15 @@ object BondsDisposalNavigator extends JourneyNavigator {
 
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
 
-    case BondsDisposalPage(srn) => controllers.routes.UnauthorisedController.onPageLoad()
+    case page @ BondsDisposalPage(srn) =>
+      if (userAnswers.get(page).contains(true)) {
+        controllers.nonsipp.bondsdisposal.routes.WhatYouWillNeedBondsDisposalController.onPageLoad(srn)
+      } else {
+        controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
+      }
+
+    case WhatYouWillNeedBondsDisposalPage(srn) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
 
   }
 

@@ -2664,3 +2664,16 @@ bonds.incomeFromBonds.error.tooLarge = Total income from these bonds in the peri
 bondsDisposal.title = Did the scheme dispose of any unregulated bonds, or bonds acquired from a connected party, during the period of this return?
 bondsDisposal.heading = Did {0} dispose of any unregulated bonds, or bonds acquired from a connected party, during the period of this return?
 bondsDisposal.error.required = Select yes if the scheme disposed of any unregulated bonds, or bonds acquired from a connected party, during the period of this return
+
+whatYouWillNeedBondsDisposal.title = Bonds disposed of by the scheme
+whatYouWillNeedBondsDisposal.heading = Bonds disposed of by {0}
+whatYouWillNeedBondsDisposal.paragraph1 = You must tell us about all unregulated bonds, or bonds acquired from a connected party, disposed of by the scheme during the period of this return.
+whatYouWillNeedBondsDisposal.paragraph2 = You must tell us:
+whatYouWillNeedBondsDisposal.paragraph2.listItem1 = which bonds were disposed of
+whatYouWillNeedBondsDisposal.paragraph2.listItem2 = if they were disposed of by sale, transfer out or other
+whatYouWillNeedBondsDisposal.paragraph2.listItem3 = if any of the bonds are still held, and if so, how many
+whatYouWillNeedBondsDisposal.paragraph3 = If any bonds were sold, you must tell us:
+whatYouWillNeedBondsDisposal.paragraph3.listItem1 = the date of the sale
+whatYouWillNeedBondsDisposal.paragraph3.listItem2 = the total consideration received for the sale
+whatYouWillNeedBondsDisposal.paragraph3.listItem3 = the buyer’s name
+whatYouWillNeedBondsDisposal.paragraph3.listItem4 = if the buyer was a connected party
