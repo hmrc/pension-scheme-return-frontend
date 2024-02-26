@@ -235,7 +235,14 @@ object PclsMemberListController {
           ParagraphMessage(
             "pcls.memberlist.paragraph2"
           ),
-        head = Some(List(TableElem("Member name"), TableElem("Status"), TableElem.empty, TableElem.empty)),
+        head = Some(
+          List(
+            TableElem("memberList.memberName"),
+            TableElem("memberList.status"),
+            TableElem.empty,
+            TableElem.empty
+          )
+        ),
         rows = rows(srn, memberList, userAnswers),
         radioText = Message("pcls.memberlist.radios"),
         showInsetWithRadios = true,

@@ -43,7 +43,13 @@
         ){ rows =>
             @govukTable(TableViewModel(
                 head = viewmodel.page.head.fold(List.empty[HeadCell])(heads =>
-                    heads.map( head => HeadCell(HtmlContent(renderMessage(head.text))))
+                    heads.map( head =>
+                        if (head.text == DisplayMessage.Empty) {
+                            HeadCell(HtmlContent("<span class='govuk-visually-hidden'>Actions</span>"))
+                        } else {
+                            HeadCell(HtmlContent(renderMessage(head.text)))
+                        }
+                    )
                 ),
                 rows = rows.map(
                     otherRows =>
