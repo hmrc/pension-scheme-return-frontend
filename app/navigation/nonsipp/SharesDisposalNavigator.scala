@@ -53,8 +53,8 @@ object SharesDisposalNavigator extends JourneyNavigator {
           .exists(_._2.nonEmpty)) {
         controllers.nonsipp.sharesdisposal.routes.SharesDisposalController.onPageLoad(srn, NormalMode)
       } else {
-        // TODO when you have reported [number] share disposals page is done
-        controllers.routes.UnauthorisedController.onPageLoad()
+        controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController
+          .onPageLoad(srn, page = 1)
       }
 
     case SharesIndividualBuyerNamePage(srn, index, disposalIndex) =>
@@ -152,8 +152,14 @@ object SharesDisposalNavigator extends JourneyNavigator {
         .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
 
     case SharesDisposalCompletedPage(srn, shareIndex, disposalIndex) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+      controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController
+        .onPageLoad(srn, page = 1)
 
+    case ReportedSharesDisposalListPage(srn, addDisposal @ true) =>
+      controllers.nonsipp.sharesdisposal.routes.SharesDisposalListController.onPageLoad(srn, 1)
+
+    case ReportedSharesDisposalListPage(srn, addDisposal @ false) =>
+      controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
   }
 
   override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] =
@@ -333,5 +339,9 @@ object SharesDisposalNavigator extends JourneyNavigator {
         case HowManyDisposalSharesPage(srn, shareIndex, disposalIndex) => //q
           controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
             .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
+
+        case SharesDisposalCompletedPage(srn, shareIndex, disposalIndex) =>
+          controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController
+            .onPageLoad(srn, page = 1)
       }
 }

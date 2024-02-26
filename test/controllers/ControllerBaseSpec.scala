@@ -144,6 +144,7 @@ trait TestValues {
   val totalShares = 5
   val reasonSurrenderedBenefits = "test reason surrendered benefits"
   val fbNumber = "123456785011"
+  val otherDetails = "other details"
 
   val address: Address = Address(
     "test-id",

@@ -122,11 +122,12 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
                 shareIndex,
                 disposalIndex,
                 RemoveShareDisposalPage,
-                // TODO replace with share disposal list page
-                (srn, index: Max5000, disposalIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad(),
+                (srn, index: Max5000, disposalIndex: Max50, _) =>
+                  controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController
+                    .onPageLoad(srn, page = 1),
                 customUserAnswers
               )
-              .withName("go from RemoveShareDisposalPage to Shares Disposal page")
+              .withName("go from RemoveShareDisposalPage to ReportedSharesDisposalList")
           )
         }
         "When there is a disposal for other share" - {
@@ -141,11 +142,12 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
                 shareIndex,
                 disposalIndex,
                 RemoveShareDisposalPage,
-                // TODO replace with share disposal list page
-                (srn, index: Max5000, disposalIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad(),
+                (srn, index: Max5000, disposalIndex: Max50, _) =>
+                  controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController
+                    .onPageLoad(srn, page = 1),
                 customUserAnswers
               )
-              .withName("go from RemoveShareDisposalPage to Shares Disposal page")
+              .withName("go from RemoveShareDisposalPage to ReportedSharesDisposalList")
           )
         }
       }
@@ -525,9 +527,10 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               disposalIndex,
               SharesDisposalCompletedPage,
               (srn, shareIndex: Max5000, disposalIndex: Max50, _) =>
-                controllers.routes.UnauthorisedController.onPageLoad()
+                controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController
+                  .onPageLoad(srn, page = 1)
             )
-            .withName("go from Shares Disposal CYA page to Reported Shares Disposals page")
+            .withName("go from SharesDisposalCYA to ReportedSharesDisposalList")
         )
       }
     }
@@ -1354,6 +1357,22 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
                   .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
             )
             .withName("go from HowManySharesPage to Shares Disposal CYA page")
+        )
+      }
+
+      "SharesDisposalCompletedPage" - {
+
+        act.like(
+          checkmode
+            .navigateToWithDoubleIndex(
+              shareIndex,
+              disposalIndex,
+              SharesDisposalCompletedPage,
+              (srn, shareIndex: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController
+                  .onPageLoad(srn, page = 1)
+            )
+            .withName("go from SharesDisposalCYA to ReportedSharesDisposalList")
         )
       }
     }
