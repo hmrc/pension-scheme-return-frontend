@@ -226,7 +226,14 @@ object MemberContributionListController {
             "ReportContribution.MemberList.paragraph2"
           ),
         showInsetWithRadios = true,
-        head = Some(List(TableElem("Member name"), TableElem("Status"), TableElem.empty, TableElem.empty)),
+        head = Some(
+          List(
+            TableElem("memberList.memberName"),
+            TableElem("memberList.status"),
+            TableElem.empty,
+            TableElem.empty
+          )
+        ),
         rows = rows(srn, mode, memberList, userAnswers),
         radioText = Message("ReportContribution.MemberList.radios"),
         paginatedViewModel = Some(

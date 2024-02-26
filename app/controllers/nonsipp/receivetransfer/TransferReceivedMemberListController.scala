@@ -214,7 +214,14 @@ object TransferReceivedMemberListController {
           ParagraphMessage(
             "transferIn.MemberList.paragraph2"
           ),
-        head = Some(List(TableElem("Member name"), TableElem("Status"))),
+        head = Some(
+          List(
+            TableElem("memberList.memberName"),
+            TableElem("memberList.status"),
+            TableElem.empty,
+            TableElem.empty
+          )
+        ),
         rows = rows(srn, mode, memberList, userAnswers),
         radioText = Message("transferIn.MemberList.radios"),
         showRadios = memberList.length < maxNotRelevant,

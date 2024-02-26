@@ -217,7 +217,14 @@ object TransferOutMemberListController {
           ParagraphMessage(
             "transferOut.memberList.paragraph2"
           ),
-        head = Some(List(TableElem("Member name"), TableElem("Status"))),
+        head = Some(
+          List(
+            TableElem("memberList.memberName"),
+            TableElem("memberList.status"),
+            TableElem.empty,
+            TableElem.empty
+          )
+        ),
         rows = rows(srn, mode, memberList, userAnswers),
         radioText = Message("transferOut.memberList.radios"),
         showRadios = memberList.length < maxNotRelevant,

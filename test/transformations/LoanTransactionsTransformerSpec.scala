@@ -397,7 +397,11 @@ class LoanTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
       val result = transformer.transformFromEtmp(
         userAnswers,
         allowedAccessRequest.srn,
-        loans(companyRecipientName, RecipientIdentityType(IdentityType.UKCompany, Some(crn.value), None, None), sponsoringEmployer = true)
+        loans(
+          companyRecipientName,
+          RecipientIdentityType(IdentityType.UKCompany, Some(crn.value), None, None),
+          sponsoringEmployer = true
+        )
       )
       result.fold(
         ex => fail(ex.getMessage),

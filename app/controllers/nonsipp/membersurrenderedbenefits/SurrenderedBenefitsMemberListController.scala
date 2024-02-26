@@ -216,7 +216,14 @@ object SurrenderedBenefitsMemberListController {
       page = ActionTableViewModel(
         inset = ParagraphMessage("surrenderedBenefits.memberList.inset1") ++
           ParagraphMessage("surrenderedBenefits.memberList.inset2"),
-        head = Some(List(TableElem("Member name"), TableElem("Status"))),
+        head = Some(
+          List(
+            TableElem("memberList.memberName"),
+            TableElem("memberList.status"),
+            TableElem.empty,
+            TableElem.empty
+          )
+        ),
         rows = rows(srn, mode, memberList, userAnswers),
         radioText = Message("surrenderedBenefits.memberList.radios"),
         showRadios = memberList.length < maxNotRelevant,
