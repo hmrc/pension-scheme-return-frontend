@@ -23,11 +23,11 @@ import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
 import viewmodels.models.SectionCompleted
 
-case class SharesDisposalCompletedPage(srn: Srn, shareIndex: Max5000, sharesDisposalIndex: Max50)
+case class SharesDisposalCompletedPage(srn: Srn, shareIndex: Max5000, disposalIndex: Max50)
     extends QuestionPage[SectionCompleted.type] {
 
   override def path: JsPath =
-    Paths.disposedSharesTransaction \ toString \ shareIndex.arrayIndex.toString \ sharesDisposalIndex.arrayIndex.toString
+    Paths.disposedSharesTransaction \ toString \ shareIndex.arrayIndex.toString \ disposalIndex.arrayIndex.toString
 
   override def toString: String = "sharesDisposalCompleted"
 }

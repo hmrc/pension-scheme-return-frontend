@@ -22,10 +22,10 @@ import controllers.actions._
 import forms.RadioListFormProvider
 import models.IdentityType.{Individual, Other, UKCompany, UKPartnership}
 import models.SchemeId.Srn
-import models.{IdentityType, Mode, NormalMode}
+import models.{CheckMode, IdentityType, Mode}
 import navigation.Navigator
 import pages.nonsipp.shares.CompanyNameRelatedSharesPage
-import pages.nonsipp.sharesdisposal.WhoWereTheSharesSoldToPage
+import pages.nonsipp.sharesdisposal.{SharesDisposalCYAPointOfEntry, WhoWereTheSharesSoldToPage}
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -35,6 +35,7 @@ import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, RadioListRowViewModel, RadioListViewModel}
 import controllers.nonsipp.sharesdisposal.WhoWereTheSharesSoldToController._
+import models.PointOfEntry.{NoPointOfEntry, WhoWereTheSharesSoldToPointOfEntry}
 import views.html.RadioListView
 
 import javax.inject.{Inject, Named}
@@ -55,6 +56,18 @@ class WhoWereTheSharesSoldToController @Inject()(
 
   def onPageLoad(srn: Srn, index: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
+      // If this page is reached in CheckMode and there is no PointOfEntry set
+      if (mode == CheckMode && request.userAnswers
+          .get(SharesDisposalCYAPointOfEntry(srn, index, disposalIndex))
+          .contains(NoPointOfEntry)) {
+        // Set this page as the PointOfEntry
+        saveService.save(
+          request.userAnswers
+            .set(SharesDisposalCYAPointOfEntry(srn, index, disposalIndex), WhoWereTheSharesSoldToPointOfEntry)
+            .getOrElse(request.userAnswers)
+        )
+      }
+
       request.userAnswers.get(CompanyNameRelatedSharesPage(srn, index)).getOrRecoverJourney { company =>
         Ok(
           view(
@@ -91,7 +104,7 @@ class WhoWereTheSharesSoldToController @Inject()(
             } yield Redirect(
               navigator.nextPage(
                 WhoWereTheSharesSoldToPage(srn, index, disposalIndex),
-                NormalMode,
+                mode,
                 updatedAnswers
               )
             )

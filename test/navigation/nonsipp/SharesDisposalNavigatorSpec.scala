@@ -18,6 +18,7 @@ package navigation.nonsipp
 
 import config.Refined.{Max50, Max5000}
 import eu.timepit.refined.refineMV
+import models.{CheckMode, HowSharesDisposed, IdentityType, NormalMode, PointOfEntry}
 import models.{HowSharesDisposed, IdentityType, NormalMode, UserAnswers}
 import models.HowSharesDisposed._
 import models.SchemeId.Srn
@@ -255,6 +256,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .withName("go from Total Consideration Shares Sold page to Who Shares Sold To page")
         )
       }
+
       "WhenWereSharesRedeemedPage" - {
 
         act.like(
@@ -506,13 +508,854 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               shareIndex,
               disposalIndex,
               HowManySharesPage,
-              (srn, index: Max5000, disposalIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+              (srn, index: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
+                  .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
             )
-            .withName("go from HowManySharesPage to Unauthorised")
+            .withName("go from HowManySharesPage to Shares Disposal CYA page")
+        )
+      }
+
+      "SharesDisposalCompletedPage" - {
+
+        act.like(
+          normalmode
+            .navigateToWithDoubleIndex(
+              shareIndex,
+              disposalIndex,
+              SharesDisposalCompletedPage,
+              (srn, shareIndex: Max5000, disposalIndex: Max50, _) =>
+                controllers.routes.UnauthorisedController.onPageLoad()
+            )
+            .withName("go from Shares Disposal CYA page to Reported Shares Disposals page")
         )
       }
     }
 
-    "in CheckMode" - {}
+    "in CheckMode" - {
+
+      "HowWereSharesDisposedPage" - {
+        // No PointOfEntry tests required here, as the page that follows HowWereSharesDisposedPage in CheckMode depends
+        // only on the selection made on this page
+
+        act.like(
+          checkmode
+            .navigateToWithDoubleIndexAndData(
+              shareIndex,
+              disposalIndex,
+              HowWereSharesDisposedPage.apply,
+              Gen.const(HowSharesDisposed.Sold),
+              (srn, shareIndex: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.WhenWereSharesSoldController
+                  .onPageLoad(srn, shareIndex, disposalIndex, CheckMode)
+            )
+            .withName("go from HowWereSharesDisposed to WhenWereSharesSold (POE N/A)")
+        )
+
+        act.like(
+          checkmode
+            .navigateToWithDoubleIndexAndData(
+              shareIndex,
+              disposalIndex,
+              HowWereSharesDisposedPage.apply,
+              Gen.const(HowSharesDisposed.Redeemed),
+              (srn, shareIndex: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.WhenWereSharesRedeemedController
+                  .onPageLoad(srn, shareIndex, disposalIndex, CheckMode)
+            )
+            .withName("go from HowWereSharesDisposed to WhenWereSharesRedeemed (POE N/A)")
+        )
+
+        act.like(
+          checkmode
+            .navigateToWithDoubleIndexAndData(
+              shareIndex,
+              disposalIndex,
+              HowWereSharesDisposedPage.apply,
+              Gen.const(HowSharesDisposed.Transferred),
+              (srn, shareIndex: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
+                  .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
+            )
+            .withName("go from HowWereSharesDisposed to CYA (Transferred) (POE N/A)")
+        )
+
+        act.like(
+          checkmode
+            .navigateToWithDoubleIndexAndData(
+              shareIndex,
+              disposalIndex,
+              HowWereSharesDisposedPage.apply,
+              Gen.const(HowSharesDisposed.Other("test details")),
+              (srn, shareIndex: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
+                  .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
+            )
+            .withName("go from HowWereSharesDisposed to CYA (Other) (POE N/A)")
+        )
+      }
+
+      "WhenWereSharesSoldPage" - {
+
+        act.like(
+          checkmode
+            .navigateToWithDoubleIndex(
+              shareIndex,
+              disposalIndex,
+              WhenWereSharesSoldPage,
+              (srn, shareIndex: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
+                  .onPageLoad(srn, shareIndex, disposalIndex, NormalMode),
+              srn =>
+                defaultUserAnswers.unsafeSet(
+                  SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex),
+                  PointOfEntry.NoPointOfEntry
+                )
+            )
+            .withName("go from WhenWereSharesSold to CYA (NoPOE)")
+        )
+
+        act.like(
+          checkmode
+            .navigateToWithDoubleIndex(
+              shareIndex,
+              disposalIndex,
+              WhenWereSharesSoldPage,
+              (srn, shareIndex: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.HowManySharesSoldController
+                  .onPageLoad(srn, shareIndex, disposalIndex, CheckMode),
+              srn =>
+                defaultUserAnswers.unsafeSet(
+                  SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex),
+                  PointOfEntry.HowWereSharesDisposedPointOfEntry
+                )
+            )
+            .withName("go from WhenWereSharesSold to HowManySharesSold (HowWereSharesDisposedPOE)")
+        )
+      }
+
+      "HowManySharesSoldPage" - {
+
+        act.like(
+          checkmode
+            .navigateToWithDoubleIndex(
+              shareIndex,
+              disposalIndex,
+              HowManySharesSoldPage,
+              (srn, shareIndex: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
+                  .onPageLoad(srn, shareIndex, disposalIndex, NormalMode),
+              srn =>
+                defaultUserAnswers.unsafeSet(
+                  SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex),
+                  PointOfEntry.NoPointOfEntry
+                )
+            )
+            .withName("go from HowManySharesSold to CYA (NoPOE)")
+        )
+
+        act.like(
+          checkmode
+            .navigateToWithDoubleIndex(
+              shareIndex,
+              disposalIndex,
+              HowManySharesSoldPage,
+              (srn, shareIndex: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.TotalConsiderationSharesSoldController
+                  .onPageLoad(srn, shareIndex, disposalIndex, CheckMode),
+              srn =>
+                defaultUserAnswers.unsafeSet(
+                  SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex),
+                  PointOfEntry.HowWereSharesDisposedPointOfEntry
+                )
+            )
+            .withName("go from WhenWereSharesSold to TotalConsiderationSharesSold (HowWereSharesDisposedPOE)")
+        )
+      }
+
+      "TotalConsiderationSharesSoldPage" - {
+
+        act.like(
+          checkmode
+            .navigateToWithDoubleIndex(
+              shareIndex,
+              disposalIndex,
+              TotalConsiderationSharesSoldPage,
+              (srn, shareIndex: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
+                  .onPageLoad(srn, shareIndex, disposalIndex, NormalMode),
+              srn =>
+                defaultUserAnswers.unsafeSet(
+                  SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex),
+                  PointOfEntry.NoPointOfEntry
+                )
+            )
+            .withName("go from TotalConsiderationSharesSold to CYA (NoPOE)")
+        )
+
+        act.like(
+          checkmode
+            .navigateToWithDoubleIndex(
+              shareIndex,
+              disposalIndex,
+              TotalConsiderationSharesSoldPage,
+              (srn, shareIndex: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.WhoWereTheSharesSoldToController
+                  .onPageLoad(srn, shareIndex, disposalIndex, CheckMode),
+              srn =>
+                defaultUserAnswers.unsafeSet(
+                  SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex),
+                  PointOfEntry.HowWereSharesDisposedPointOfEntry
+                )
+            )
+            .withName("go from WhenWereSharesSold to WhoWereTheSharesSoldTo (HowWereSharesDisposedPOE)")
+        )
+      }
+
+      "WhoWereTheSharesSoldToPage" - {
+        // No PointOfEntry tests required here, as the page that follows WhoWereTheSharesSoldToPage in CheckMode is
+        // always the 'BuyerNamePage' for that IdentityType
+
+        act.like(
+          checkmode
+            .navigateToWithDoubleIndexAndData(
+              shareIndex,
+              disposalIndex,
+              WhoWereTheSharesSoldToPage,
+              Gen.const(IdentityType.Individual),
+              (srn, index: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.SharesIndividualBuyerNameController
+                  .onPageLoad(srn, index, disposalIndex, CheckMode)
+            )
+            .withName("go from WhoWereTheSharesSold to IndividualBuyerName (POE N/A)")
+        )
+
+        act.like(
+          checkmode
+            .navigateToWithDoubleIndexAndData(
+              shareIndex,
+              disposalIndex,
+              WhoWereTheSharesSoldToPage,
+              Gen.const(IdentityType.UKCompany),
+              (srn, index: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.CompanyNameOfSharesBuyerController
+                  .onPageLoad(srn, index, disposalIndex, CheckMode)
+            )
+            .withName("go from WhoWereTheSharesSold to CompanyBuyerName")
+        )
+
+        act.like(
+          checkmode
+            .navigateToWithDoubleIndexAndData(
+              shareIndex,
+              disposalIndex,
+              WhoWereTheSharesSoldToPage,
+              Gen.const(IdentityType.UKPartnership),
+              (srn, index: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.PartnershipBuyerNameController
+                  .onPageLoad(srn, index, disposalIndex, CheckMode)
+            )
+            .withName("go from WhoWereTheSharesSold to PartnershipBuyerName")
+        )
+
+        act.like(
+          checkmode
+            .navigateToWithDoubleIndexAndData(
+              shareIndex,
+              disposalIndex,
+              WhoWereTheSharesSoldToPage,
+              Gen.const(IdentityType.Other),
+              (srn, index: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.OtherBuyerDetailsController
+                  .onPageLoad(srn, index, disposalIndex, CheckMode)
+            )
+            .withName("go from WhoWereTheSharesSold to OtherBuyerDetails")
+        )
+      }
+
+      "SharesIndividualBuyerNamePage" - {
+
+        act.like(
+          checkmode
+            .navigateToWithDoubleIndex(
+              shareIndex,
+              disposalIndex,
+              SharesIndividualBuyerNamePage,
+              (srn, index: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
+                  .onPageLoad(srn, index, disposalIndex, NormalMode),
+              srn =>
+                defaultUserAnswers.unsafeSet(
+                  SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex),
+                  PointOfEntry.NoPointOfEntry
+                )
+            )
+            .withName("go from IndividualBuyerName to CYA (noPOE)")
+        )
+
+        act.like(
+          checkmode
+            .navigateToWithDoubleIndex(
+              shareIndex,
+              disposalIndex,
+              SharesIndividualBuyerNamePage,
+              (srn, index: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.IndividualBuyerNinoNumberController
+                  .onPageLoad(srn, index, disposalIndex, CheckMode),
+              srn =>
+                defaultUserAnswers.unsafeSet(
+                  SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex),
+                  PointOfEntry.HowWereSharesDisposedPointOfEntry
+                )
+            )
+            .withName("go from IndividualBuyerName to IndividualBuyerDetails (HowWereSharesDisposedPOE)")
+        )
+
+        act.like(
+          checkmode
+            .navigateToWithDoubleIndex(
+              shareIndex,
+              disposalIndex,
+              SharesIndividualBuyerNamePage,
+              (srn, index: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.IndividualBuyerNinoNumberController
+                  .onPageLoad(srn, index, disposalIndex, CheckMode),
+              srn =>
+                defaultUserAnswers.unsafeSet(
+                  SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex),
+                  PointOfEntry.WhoWereTheSharesSoldToPointOfEntry
+                )
+            )
+            .withName("go from IndividualBuyerName to IndividualBuyerDetails (WhoWereTheSharesSoldToPOE)")
+        )
+      }
+
+      "IndividualBuyerNinoNumberPage" - {
+
+        act.like(
+          checkmode
+            .navigateToWithDoubleIndex(
+              shareIndex,
+              disposalIndex,
+              IndividualBuyerNinoNumberPage,
+              (srn, index: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
+                  .onPageLoad(srn, index, disposalIndex, NormalMode),
+              srn =>
+                defaultUserAnswers.unsafeSet(
+                  SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex),
+                  PointOfEntry.NoPointOfEntry
+                )
+            )
+            .withName("go from IndividualBuyerDetails to CYA (NoPOE)")
+        )
+
+        act.like(
+          checkmode
+            .navigateToWithDoubleIndex(
+              shareIndex,
+              disposalIndex,
+              IndividualBuyerNinoNumberPage,
+              (srn, index: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.IsBuyerConnectedPartyController
+                  .onPageLoad(srn, index, disposalIndex, CheckMode),
+              srn =>
+                defaultUserAnswers.unsafeSet(
+                  SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex),
+                  PointOfEntry.HowWereSharesDisposedPointOfEntry
+                )
+            )
+            .withName("go from IndividualBuyerDetails to IsBuyerConnectedParty (HowWereSharesDisposedPOE)")
+        )
+
+        act.like(
+          checkmode
+            .navigateToWithDoubleIndex(
+              shareIndex,
+              disposalIndex,
+              IndividualBuyerNinoNumberPage,
+              (srn, index: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
+                  .onPageLoad(srn, index, disposalIndex, NormalMode),
+              srn =>
+                defaultUserAnswers.unsafeSet(
+                  SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex),
+                  PointOfEntry.WhoWereTheSharesSoldToPointOfEntry
+                )
+            )
+            .withName("go from IndividualBuyerDetails to CYA (WhoWereTheSharesSoldToPOE)")
+        )
+      }
+
+      "CompanyBuyerNamePage" - {
+
+        act.like(
+          checkmode
+            .navigateToWithDoubleIndex(
+              shareIndex,
+              disposalIndex,
+              CompanyBuyerNamePage,
+              (srn, index: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
+                  .onPageLoad(srn, index, disposalIndex, NormalMode),
+              srn =>
+                defaultUserAnswers.unsafeSet(
+                  SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex),
+                  PointOfEntry.NoPointOfEntry
+                )
+            )
+            .withName("go from CompanyBuyerName to CYA (NoPOE)")
+        )
+
+        act.like(
+          checkmode
+            .navigateToWithDoubleIndex(
+              shareIndex,
+              disposalIndex,
+              CompanyBuyerNamePage,
+              (srn, index: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.CompanyBuyerCrnController
+                  .onPageLoad(srn, index, disposalIndex, CheckMode),
+              srn =>
+                defaultUserAnswers.unsafeSet(
+                  SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex),
+                  PointOfEntry.HowWereSharesDisposedPointOfEntry
+                )
+            )
+            .withName("go from CompanyBuyerName to CompanyBuyerDetails (HowWereSharesDisposedPOE)")
+        )
+
+        act.like(
+          checkmode
+            .navigateToWithDoubleIndex(
+              shareIndex,
+              disposalIndex,
+              CompanyBuyerNamePage,
+              (srn, index: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.CompanyBuyerCrnController
+                  .onPageLoad(srn, index, disposalIndex, CheckMode),
+              srn =>
+                defaultUserAnswers.unsafeSet(
+                  SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex),
+                  PointOfEntry.WhoWereTheSharesSoldToPointOfEntry
+                )
+            )
+            .withName("go from CompanyBuyerName to CompanyBuyerDetails (WhoWereTheSharesSoldToPOE)")
+        )
+      }
+
+      "CompanyBuyerCrnPage" - {
+
+        act.like(
+          checkmode
+            .navigateToWithDoubleIndex(
+              shareIndex,
+              disposalIndex,
+              CompanyBuyerCrnPage,
+              (srn, index: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
+                  .onPageLoad(srn, index, disposalIndex, NormalMode),
+              srn =>
+                defaultUserAnswers.unsafeSet(
+                  SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex),
+                  PointOfEntry.NoPointOfEntry
+                )
+            )
+            .withName("go from CompanyBuyerDetails to CYA (NoPOE)")
+        )
+
+        act.like(
+          checkmode
+            .navigateToWithDoubleIndex(
+              shareIndex,
+              disposalIndex,
+              CompanyBuyerCrnPage,
+              (srn, index: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.IsBuyerConnectedPartyController
+                  .onPageLoad(srn, index, disposalIndex, CheckMode),
+              srn =>
+                defaultUserAnswers.unsafeSet(
+                  SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex),
+                  PointOfEntry.HowWereSharesDisposedPointOfEntry
+                )
+            )
+            .withName("go from CompanyBuyerDetails to IsBuyerConnectedParty (HowWereSharesDisposedPOE)")
+        )
+
+        act.like(
+          checkmode
+            .navigateToWithDoubleIndex(
+              shareIndex,
+              disposalIndex,
+              CompanyBuyerCrnPage,
+              (srn, index: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
+                  .onPageLoad(srn, index, disposalIndex, NormalMode),
+              srn =>
+                defaultUserAnswers.unsafeSet(
+                  SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex),
+                  PointOfEntry.WhoWereTheSharesSoldToPointOfEntry
+                )
+            )
+            .withName("go from CompanyBuyerDetails to IsBuyerConnectedParty (WhoWereTheSharesSoldToPOE)")
+        )
+      }
+
+      "PartnershipBuyerNamePage" - {
+
+        act.like(
+          checkmode
+            .navigateToWithDoubleIndex(
+              shareIndex,
+              disposalIndex,
+              PartnershipBuyerNamePage,
+              (srn, index: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
+                  .onPageLoad(srn, index, disposalIndex, NormalMode),
+              srn =>
+                defaultUserAnswers.unsafeSet(
+                  SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex),
+                  PointOfEntry.NoPointOfEntry
+                )
+            )
+            .withName("go from PartnershipBuyerName to CYA (NoPOE)")
+        )
+
+        act.like(
+          checkmode
+            .navigateToWithDoubleIndex(
+              shareIndex,
+              disposalIndex,
+              PartnershipBuyerNamePage,
+              (srn, index: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.PartnershipBuyerUtrController
+                  .onPageLoad(srn, index, disposalIndex, CheckMode),
+              srn =>
+                defaultUserAnswers.unsafeSet(
+                  SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex),
+                  PointOfEntry.HowWereSharesDisposedPointOfEntry
+                )
+            )
+            .withName("go from PartnershipBuyerName to PartnershipBuyerDetails (HowWereSharesDisposedPOE)")
+        )
+
+        act.like(
+          checkmode
+            .navigateToWithDoubleIndex(
+              shareIndex,
+              disposalIndex,
+              PartnershipBuyerNamePage,
+              (srn, index: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.PartnershipBuyerUtrController
+                  .onPageLoad(srn, index, disposalIndex, CheckMode),
+              srn =>
+                defaultUserAnswers.unsafeSet(
+                  SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex),
+                  PointOfEntry.WhoWereTheSharesSoldToPointOfEntry
+                )
+            )
+            .withName("go from PartnershipBuyerName to PartnershipBuyerDetails (WhoWereTheSharesSoldToPOE)")
+        )
+      }
+
+      "PartnershipBuyerUtrPage" - {
+
+        act.like(
+          checkmode
+            .navigateToWithDoubleIndex(
+              shareIndex,
+              disposalIndex,
+              PartnershipBuyerUtrPage,
+              (srn, index: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
+                  .onPageLoad(srn, index, disposalIndex, NormalMode),
+              srn =>
+                defaultUserAnswers.unsafeSet(
+                  SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex),
+                  PointOfEntry.NoPointOfEntry
+                )
+            )
+            .withName("go from PartnershipBuyerDetails to CYA (NoPOE)")
+        )
+
+        act.like(
+          checkmode
+            .navigateToWithDoubleIndex(
+              shareIndex,
+              disposalIndex,
+              PartnershipBuyerUtrPage,
+              (srn, index: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.IsBuyerConnectedPartyController
+                  .onPageLoad(srn, index, disposalIndex, CheckMode),
+              srn =>
+                defaultUserAnswers.unsafeSet(
+                  SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex),
+                  PointOfEntry.HowWereSharesDisposedPointOfEntry
+                )
+            )
+            .withName("go from PartnershipBuyerDetails to IsBuyerConnectedParty (HowWereSharesDisposedPOE)")
+        )
+
+        act.like(
+          checkmode
+            .navigateToWithDoubleIndex(
+              shareIndex,
+              disposalIndex,
+              PartnershipBuyerUtrPage,
+              (srn, index: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
+                  .onPageLoad(srn, index, disposalIndex, NormalMode),
+              srn =>
+                defaultUserAnswers.unsafeSet(
+                  SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex),
+                  PointOfEntry.WhoWereTheSharesSoldToPointOfEntry
+                )
+            )
+            .withName("go from PartnershipBuyerDetails to CYA (WhoWereTheSharesSoldToPOE)")
+        )
+      }
+
+      "OtherBuyerDetailsPage" - {
+        act.like(
+          checkmode
+            .navigateToWithDoubleIndex(
+              shareIndex,
+              disposalIndex,
+              OtherBuyerDetailsPage,
+              (srn, index: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
+                  .onPageLoad(srn, index, disposalIndex, NormalMode),
+              srn =>
+                defaultUserAnswers.unsafeSet(
+                  SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex),
+                  PointOfEntry.NoPointOfEntry
+                )
+            )
+            .withName("go from OtherBuyerDetails to CYA (NoPOE)")
+        )
+
+        act.like(
+          checkmode
+            .navigateToWithDoubleIndex(
+              shareIndex,
+              disposalIndex,
+              OtherBuyerDetailsPage,
+              (srn, index: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.IsBuyerConnectedPartyController
+                  .onPageLoad(srn, index, disposalIndex, CheckMode),
+              srn =>
+                defaultUserAnswers.unsafeSet(
+                  SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex),
+                  PointOfEntry.HowWereSharesDisposedPointOfEntry
+                )
+            )
+            .withName("go from OtherBuyerDetails to IsBuyerConnectedParty (HowWereSharesDisposedPOE)")
+        )
+
+        act.like(
+          checkmode
+            .navigateToWithDoubleIndex(
+              shareIndex,
+              disposalIndex,
+              OtherBuyerDetailsPage,
+              (srn, index: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
+                  .onPageLoad(srn, index, disposalIndex, NormalMode),
+              srn =>
+                defaultUserAnswers.unsafeSet(
+                  SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex),
+                  PointOfEntry.WhoWereTheSharesSoldToPointOfEntry
+                )
+            )
+            .withName("go from OtherBuyerDetails to CYA (WhoWereTheSharesSoldToPOE)")
+        )
+      }
+
+      "IsBuyerConnectedPartyPage" - {
+
+        act.like(
+          checkmode
+            .navigateToWithDoubleIndex(
+              shareIndex,
+              disposalIndex,
+              IsBuyerConnectedPartyPage,
+              (srn, index: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
+                  .onPageLoad(srn, index, disposalIndex, NormalMode),
+              srn =>
+                defaultUserAnswers.unsafeSet(
+                  SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex),
+                  PointOfEntry.NoPointOfEntry
+                )
+            )
+            .withName("go from IsBuyerConnectedParty to CYA (NoPOE)")
+        )
+
+        act.like(
+          checkmode
+            .navigateToWithDoubleIndex(
+              shareIndex,
+              disposalIndex,
+              IsBuyerConnectedPartyPage,
+              (srn, index: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.IndependentValuationController
+                  .onPageLoad(srn, index, disposalIndex, CheckMode),
+              srn =>
+                defaultUserAnswers.unsafeSet(
+                  SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex),
+                  PointOfEntry.HowWereSharesDisposedPointOfEntry
+                )
+            )
+            .withName("go from IsBuyerConnectedParty to IndependentValuation (HowWereSharesDisposedPOE)")
+        )
+
+        act.like(
+          checkmode
+            .navigateToWithDoubleIndex(
+              shareIndex,
+              disposalIndex,
+              IsBuyerConnectedPartyPage,
+              (srn, index: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
+                  .onPageLoad(srn, index, disposalIndex, NormalMode),
+              srn =>
+                defaultUserAnswers.unsafeSet(
+                  SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex),
+                  PointOfEntry.WhoWereTheSharesSoldToPointOfEntry
+                )
+            )
+            .withName("go from IsBuyerConnectedParty to CYA (WhoWereTheSharesRedeemedToPOE)")
+        )
+      }
+
+      "IndependentValuationPage" - {
+        // In CheckMode, CYA page always follows this page, so no PointOfEntry tests required
+
+        act.like(
+          checkmode
+            .navigateToWithDoubleIndex(
+              shareIndex,
+              disposalIndex,
+              IndependentValuationPage,
+              (srn, index: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
+                  .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
+            )
+            .withName("go from IndependentValuationPage to CYA page")
+        )
+      }
+
+      "WhenWereSharesRedeemedPage" - {
+
+        act.like(
+          checkmode
+            .navigateToWithDoubleIndex(
+              shareIndex,
+              disposalIndex,
+              WhenWereSharesRedeemedPage,
+              (srn, shareIndex: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
+                  .onPageLoad(srn, shareIndex, disposalIndex, NormalMode),
+              srn =>
+                defaultUserAnswers.unsafeSet(
+                  SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex),
+                  PointOfEntry.NoPointOfEntry
+                )
+            )
+            .withName("go from WhenWereSharesRedeemed to CYA (NoPOE)")
+        )
+
+        act.like(
+          checkmode
+            .navigateToWithDoubleIndex(
+              shareIndex,
+              disposalIndex,
+              WhenWereSharesRedeemedPage,
+              (srn, shareIndex: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.HowManySharesRedeemedController
+                  .onPageLoad(srn, shareIndex, disposalIndex, CheckMode),
+              srn =>
+                defaultUserAnswers.unsafeSet(
+                  SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex),
+                  PointOfEntry.HowWereSharesDisposedPointOfEntry
+                )
+            )
+            .withName("go from WhenWereSharesRedeemed to HowManySharesRedeemed (HowWereSharesDisposedPOE)")
+        )
+      }
+
+      "HowManySharesRedeemedPage" - {
+
+        act.like(
+          checkmode
+            .navigateToWithDoubleIndex(
+              shareIndex,
+              disposalIndex,
+              HowManySharesRedeemedPage,
+              (srn, shareIndex: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
+                  .onPageLoad(srn, shareIndex, disposalIndex, NormalMode),
+              srn =>
+                defaultUserAnswers.unsafeSet(
+                  SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex),
+                  PointOfEntry.NoPointOfEntry
+                )
+            )
+            .withName("go from HowManySharesRedeemed to CYA (NoPOE)")
+        )
+
+        act.like(
+          checkmode
+            .navigateToWithDoubleIndex(
+              shareIndex,
+              disposalIndex,
+              HowManySharesRedeemedPage,
+              (srn, shareIndex: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.TotalConsiderationSharesRedeemedController
+                  .onPageLoad(srn, shareIndex, disposalIndex, CheckMode),
+              srn =>
+                defaultUserAnswers.unsafeSet(
+                  SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex),
+                  PointOfEntry.HowWereSharesDisposedPointOfEntry
+                )
+            )
+            .withName("go from WhenWereSharesRedeemed to TotalConsiderationSharesRedeemed (HowWereSharesDisposedPOE)")
+        )
+      }
+
+      "TotalConsiderationSharesRedeemedPage" - {
+        // In CheckMode, CYA page always follows this page, so no PointOfEntry tests required
+
+        act.like(
+          checkmode
+            .navigateToWithDoubleIndex(
+              shareIndex,
+              disposalIndex,
+              TotalConsiderationSharesRedeemedPage,
+              (srn, shareIndex: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
+                  .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
+            )
+            .withName("go from Total Consideration Shares Redeemed page to CYA page")
+        )
+      }
+
+      "HowManySharesPage" - {
+        // In CheckMode, CYA page always follows this page, so no PointOfEntry tests required
+
+        act.like(
+          checkmode
+            .navigateToWithDoubleIndex(
+              shareIndex,
+              disposalIndex,
+              HowManySharesPage,
+              (srn, index: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
+                  .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
+            )
+            .withName("go from HowManySharesPage to Shares Disposal CYA page")
+        )
+      }
+    }
   }
 }

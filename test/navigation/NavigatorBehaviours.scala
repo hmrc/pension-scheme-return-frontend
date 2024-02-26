@@ -295,6 +295,21 @@ trait NavigatorBehaviours extends ScalaCheckPropertyChecks with EitherValues wit
     ): Behaviours.BehaviourTest =
       super.navigateTo(CheckMode)(page(_, index, secondIndex), nextPage(_, index, secondIndex, _), userAnswers)
 
+    def navigateToWithDoubleIndexAndData[A: Writes, I1, I2](
+      index: Refined[Int, I1],
+      secondIndex: Refined[Int, I2],
+      page: (Srn, Refined[Int, I1], Refined[Int, I2]) => QuestionPage[A],
+      data: Gen[A],
+      nextPage: (Srn, Refined[Int, I1], Refined[Int, I2], Mode) => Call,
+      userAnswers: Srn => UserAnswers = _ => defaultUserAnswers
+    ): Behaviours.BehaviourTest =
+      navigateToWithData(CheckMode)(
+        page(_, index, secondIndex),
+        data,
+        nextPage(_, index, secondIndex, _),
+        userAnswers
+      )
+
     def navigateToWithIndexAndSubject[A: Writes, B](
       index: Refined[Int, B],
       subject: IdentitySubject,

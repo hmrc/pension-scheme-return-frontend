@@ -54,7 +54,7 @@ class IsBuyerConnectedPartyController @Inject()(
   def onPageLoad(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       val preparedForm =
-        request.userAnswers.fillForm(SharesDisposalBuyerConnectedPartyPage(srn, shareIndex, disposalIndex), form)
+        request.userAnswers.fillForm(IsBuyerConnectedPartyPage(srn, shareIndex, disposalIndex), form)
       getBuyerName(srn, shareIndex, disposalIndex)
         .map(buyerName => Ok(view(preparedForm, viewModel(srn, shareIndex, disposalIndex, buyerName, mode))))
         .merge

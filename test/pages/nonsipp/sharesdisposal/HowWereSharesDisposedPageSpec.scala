@@ -55,7 +55,7 @@ class HowWereSharesDisposedPageSpec extends PageBehaviours with TestValues {
         .unsafeSet(TotalConsiderationSharesSoldPage(srn, shareIndexOne, indexOne), money)
         .unsafeSet(WhoWereTheSharesSoldToPage(srn, shareIndexOne, indexOne), IdentityType.Individual)
         .unsafeSet(SharesIndividualBuyerNamePage(srn, shareIndexOne, indexOne), buyerName)
-        .unsafeSet(SharesDisposalBuyerConnectedPartyPage(srn, shareIndexOne, indexOne), true)
+        .unsafeSet(IsBuyerConnectedPartyPage(srn, shareIndexOne, indexOne), true)
         .unsafeSet(IndependentValuationPage(srn, shareIndexOne, indexOne), true)
         .unsafeSet(SharesDisposalCompletedPage(srn, shareIndexOne, indexOne), SectionCompleted)
 
@@ -74,7 +74,7 @@ class HowWereSharesDisposedPageSpec extends PageBehaviours with TestValues {
       result.get(WhoWereTheSharesSoldToPage(srn, shareIndexOne, indexOne)) must be(empty)
       result.get(TotalConsiderationSharesSoldPage(srn, shareIndexOne, indexOne)) must be(empty)
       result.get(SharesIndividualBuyerNamePage(srn, shareIndexOne, indexOne)) must be(empty)
-      result.get(SharesDisposalBuyerConnectedPartyPage(srn, shareIndexOne, indexOne)) must be(empty)
+      result.get(IsBuyerConnectedPartyPage(srn, shareIndexOne, indexOne)) must be(empty)
       result.get(IndependentValuationPage(srn, shareIndexOne, indexOne)) must be(empty)
 
       result.get(HowManySharesPage(srn, shareIndexOne, indexOne)) must be(empty)

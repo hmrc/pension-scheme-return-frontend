@@ -42,8 +42,7 @@ case class WhoWereTheSharesSoldToPage(srn: Srn, index: Max5000, disposalIndex: M
     CompanyBuyerCrnPage(srn, index, disposalIndex),
     PartnershipBuyerNamePage(srn, index, disposalIndex),
     PartnershipBuyerUtrPage(srn, index, disposalIndex),
-    OtherBuyerDetailsPage(srn, index, disposalIndex),
-    IsBuyerConnectedPartyPage(srn, index, disposalIndex)
+    OtherBuyerDetailsPage(srn, index, disposalIndex)
   )
   override def cleanup(value: Option[IdentityType], userAnswers: UserAnswers): Try[UserAnswers] =
     (value, userAnswers.get(this)) match {
