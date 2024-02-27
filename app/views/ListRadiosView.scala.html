@@ -46,7 +46,7 @@
                   field = form("value"),
                   items = rows,
                   legend = viewmodel.page.legend
-                    .map(legend => Some(LegendViewModel(renderMessage(legend)).withSize(LegendSize.Small)))
+                    .map(legend => Some(LegendViewModel(renderMessage(legend)).withSize(viewmodel.page.legendSize.getOrElse(LegendSize.Small))))
                     .getOrElse(Some(LegendViewModel(renderMessage(viewmodel.heading)).asPageHeading(LegendSize.Large).withCssClass("govuk-visually-hidden")))
                 )
             )
@@ -55,8 +55,8 @@
         @viewmodel.page.paginatedViewModel.map{ paginatedViewModel =>
             @if(paginatedViewModel.pagination.totalPages > 1) {
                 <p id="pagination-label" class="govuk-body">@{renderMessage(paginatedViewModel.label)}</p>
+                @govukPagination(PaginationViewModel(paginatedViewModel.pagination))
             }
-            @govukPagination(PaginationViewModel(paginatedViewModel.pagination))
         }
 
         @govukButton(

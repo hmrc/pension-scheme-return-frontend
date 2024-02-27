@@ -19,7 +19,7 @@ package pages.nonsipp.unregulatedorconnectedbonds
 import config.Refined.Max5000
 import models.Money
 import models.SchemeId.Srn
-import pages.QuestionPage
+import pages.{IndexedQuestionPage, QuestionPage}
 import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
 
@@ -28,4 +28,13 @@ case class IncomeFromBondsPage(srn: Srn, index: Max5000) extends QuestionPage[Mo
   override def path: JsPath = Paths.bondTransactions \ toString \ index.arrayIndex.toString
 
   override def toString: String = "totalIncomeOrReceipts"
+}
+
+// todo remove once BondsCompleted has been added
+object IncomeFromBondsPage {
+  def all(srn: Srn): IndexedQuestionPage[Money] = new IndexedQuestionPage[Money] {
+    override def path: JsPath = Paths.bondTransactions \ toString
+
+    override def toString: String = "totalIncomeOrReceipts"
+  }
 }

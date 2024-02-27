@@ -54,63 +54,24 @@ object Refined {
   object Max300 {
     type Refined = Greater[0] And LessEqual[300]
 
-    implicit val enumerable: Enumerable[Max300] = Enumerable(
-      (1 to 300).toList
-        .map(
-          i =>
-            refineV[Refined](i).fold(
-              err => throw new Exception(err),
-              index => index
-            )
-        )
-        .map(index => index.value.toString -> index): _*
-    )
+    implicit val enumerable: Enumerable[Max300] = Enumerable.index(1 to 300)
   }
+
   object Max5000 {
     type Refined = Greater[0] And LessEqual[5000]
 
-    implicit val enumerable: Enumerable[Max5000] = Enumerable(
-      (1 to 5000).toList
-        .map(
-          i =>
-            refineV[Refined](i).fold(
-              err => throw new Exception(err),
-              index => index
-            )
-        )
-        .map(index => index.value.toString -> index): _*
-    )
+    implicit val enumerable: Enumerable[Max5000] = Enumerable.index(1 to 5000)
   }
 
   object Max50 {
     type Refined = Greater[0] And LessEqual[50]
 
-    implicit val enumerable: Enumerable[Max50] = Enumerable(
-      (1 to 50).toList
-        .map(
-          i =>
-            refineV[Refined](i).fold(
-              err => throw new Exception(err),
-              index => index
-            )
-        )
-        .map(index => index.value.toString -> index): _*
-    )
+    implicit val enumerable: Enumerable[Max50] = Enumerable.index(1 to 50)
   }
 
   object Max5 {
     type Refined = Greater[0] And LessEqual[5]
 
-    implicit val enumerable: Enumerable[Max5] = Enumerable(
-      (1 to 5).toList
-        .map(
-          i =>
-            refineV[Refined](i).fold(
-              err => throw new Exception(err),
-              index => index
-            )
-        )
-        .map(index => index.value.toString -> index): _*
-    )
+    implicit val enumerable: Enumerable[Max5] = Enumerable.index(1 to 5)
   }
 }

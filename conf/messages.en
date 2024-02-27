@@ -2769,3 +2769,16 @@ bondsList.radios = Do you need to add another bond transaction?
 bondsList.inset = You cannot add another bond transaction as you have entered the maximum of 5,000.
 bondsList.error.required = Select yes if you need to add another bond transaction
 bondsList.pagination.label = Showing {0} - {1} of {2} bonds
+
+bondsDisposalList.title = Start reporting a bond disposal
+bondsDisposalList.heading = Start reporting a bond disposal
+bondsDisposalList.row = {0} {1} with value of £{2}
+bondsDisposalList.acquired = acquired
+bondsDisposalList.contributed = contributed
+bondsDisposalList.transferred = transferred in
+bondsDisposalList.legend = Which bonds were disposed of?
+bondsDisposalList.error.required = Select the bonds that were disposed of
+bondsDisposalList.error.max = Show 10 bond transactions per page, and paginate if there are more than 10
+bondsDisposalList.pagination.label = Showing {0} - {1} of {2} bonds
+bondsDisposalList.paragraph1 = Select one option to start reporting a disposal. If you need to report more, you will be able to do this later.
+bondsDisposalList.paragraph2 = You can report disposal of bonds whose details you have already provided. If the bonds do not appear here, add them using the ‘Change unregulated or connected party bonds’ section of this return
