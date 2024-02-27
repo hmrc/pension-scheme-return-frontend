@@ -16,16 +16,15 @@
 
 package controllers.nonsipp.sharesdisposal
 
-import config.Refined.{Max50, Max5000, OneTo50, OneTo5000}
+import config.Refined.{OneTo50, OneTo5000}
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.sharesdisposal.SharesDisposalCYAController._
 import eu.timepit.refined.refineMV
-import models.HowSharesDisposed.{HowSharesDisposed, Sold}
+import models.HowSharesDisposed.Sold
 import models.IdentityType.Individual
 import models.SchemeHoldShare.Acquisition
-import models.SchemeId.Srn
 import models.TypeOfShares._
-import models.{CheckMode, ConditionalYesNo, IdentityType, Mode, Money, NormalMode, SchemeHoldShare, TypeOfShares}
+import models.{CheckMode, ConditionalYesNo, Mode, NormalMode}
 import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.shares.{
   CompanyNameRelatedSharesPage,
@@ -40,7 +39,6 @@ import services.PsrSubmissionService
 import uk.gov.hmrc.domain.Nino
 import views.html.CheckYourAnswersView
 
-import java.time.LocalDate
 import scala.concurrent.Future
 
 class SharesDisposalCYAControllerSpec extends ControllerBaseSpec {
@@ -75,8 +73,6 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec {
   private val considerationSharesSold = Some(money)
   private val buyerIdentity = Some(Individual)
   private val nameOfBuyer = Some(buyerName)
-//  private val buyerDetails = Some(nino)
-//  private val buyerDetails = None
   private val buyerReasonNoDetails = Some(noninoReason)
   private val isBuyerConnectedParty = Some(true)
   private val isIndependentValuation = Some(true)
@@ -111,7 +107,7 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec {
     .unsafeSet(WhenWereSharesRedeemedPage(srn, shareIndex, disposalIndex), dateSharesSold.get)
     .unsafeSet(HowManySharesRedeemedPage(srn, shareIndex, disposalIndex), numberSharesSold.get)
     .unsafeSet(TotalConsiderationSharesRedeemedPage(srn, shareIndex, disposalIndex), considerationSharesSold.get)
-    .unsafeSet(HowManySharesPage(srn, shareIndex, disposalIndex), sharesStillHeld)
+    .unsafeSet(HowManyDisposalSharesPage(srn, shareIndex, disposalIndex), sharesStillHeld)
 
   "SharesDisposalCYAController" - {
 
@@ -121,34 +117,33 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec {
           injected[CheckYourAnswersView].apply(
             viewModel(
               ViewModelParameters(
-                srn: Srn,
-                shareIndex: Max5000,
-                disposalIndex: Max50,
-                sharesType: TypeOfShares,
-                companyName: String,
-                acquisitionType: SchemeHoldShare,
-                acquisitionDate: Option[LocalDate],
-                howSharesDisposed: HowSharesDisposed,
-                dateSharesSold: Option[LocalDate],
-                numberSharesSold: Option[Int],
-                considerationSharesSold: Option[Money],
-                buyerIdentity: Option[IdentityType],
-                nameOfBuyer: Option[String],
-//                buyerDetails.map(_.toString): Option[String],
-                None: Option[String],
-                buyerReasonNoDetails: Option[String],
-                isBuyerConnectedParty: Option[Boolean],
-                isIndependentValuation: Option[Boolean],
-                dateSharesRedeemed: Option[LocalDate],
-                numberSharesRedeemed: Option[Int],
-                considerationSharesRedeemed: Option[Money],
-                sharesStillHeld: Int,
-                schemeName: String,
-                mode: Mode
+                srn,
+                shareIndex,
+                disposalIndex,
+                sharesType,
+                companyName,
+                acquisitionType,
+                acquisitionDate,
+                howSharesDisposed,
+                dateSharesSold,
+                numberSharesSold,
+                considerationSharesSold,
+                buyerIdentity,
+                nameOfBuyer,
+                None,
+                buyerReasonNoDetails,
+                isBuyerConnectedParty,
+                isIndependentValuation,
+                dateSharesRedeemed,
+                numberSharesRedeemed,
+                considerationSharesRedeemed,
+                sharesStillHeld,
+                schemeName,
+                mode
               )
             )
           )
-        }.withName(s"render correct ${mode} view")
+        }.withName(s"render correct $mode view")
       )
 
       act.like(
@@ -158,19 +153,19 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec {
             verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any(), any())(any(), any(), any())
             reset(mockPsrSubmissionService)
           })
-          .withName(s"redirect to next page when in ${mode} mode")
+          .withName(s"redirect to next page when in $mode mode")
       )
 
       act.like(
         journeyRecoveryPage(onPageLoad(mode))
           .updateName("onPageLoad" + _)
-          .withName(s"redirect to journey recovery page on page load when in ${mode} mode")
+          .withName(s"redirect to journey recovery page on page load when in $mode mode")
       )
 
       act.like(
         journeyRecoveryPage(onSubmit(mode))
           .updateName("onSubmit" + _)
-          .withName(s"redirect to journey recovery page on submit when in ${mode} mode")
+          .withName(s"redirect to journey recovery page on submit when in $mode mode")
       )
     }
   }

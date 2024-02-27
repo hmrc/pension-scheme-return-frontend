@@ -25,7 +25,6 @@ import play.api.libs.json.{JsError, JsResultException, JsSuccess, Json}
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 
-import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -33,7 +32,6 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClient) {
 
   private val baseUrl = appConfig.pensionSchemeReturn.baseUrl
   protected val logger: Logger = Logger(classOf[PSRConnector])
-  val inputFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
   def submitPsrDetails(
     psrSubmission: PsrSubmission
@@ -85,7 +83,7 @@ class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClient) {
         response.status match {
           case OK =>
             Json.parse(response.body).validate[Seq[PsrVersionsForYearsResponse]] match {
-              case JsSuccess(data, _) =>
+              case JsSuccess(_, _) =>
                 response.json
                   .as[Seq[PsrVersionsForYearsResponse]]
               case JsError(errors) =>

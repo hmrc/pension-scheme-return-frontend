@@ -73,7 +73,11 @@ case class HowWereSharesDisposedPage(
       IsBuyerConnectedPartyPage(srn, shareIndex, disposalIndex),
       IndependentValuationPage(srn, shareIndex, disposalIndex)
     )
-    if (isLastRecord) list :+ SharesDisposalPage(srn) :+ HowManySharesPage(srn, shareIndex, disposalIndex) else list
+    if (isLastRecord) {
+      list :+ SharesDisposalPage(srn) :+ HowManyDisposalSharesPage(srn, shareIndex, disposalIndex)
+    } else {
+      list
+    }
   }
 }
 

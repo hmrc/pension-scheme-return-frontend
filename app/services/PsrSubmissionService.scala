@@ -28,6 +28,7 @@ import pages.nonsipp.landorpropertydisposal.LandOrPropertyDisposalPage
 import pages.nonsipp.loansmadeoroutstanding._
 import pages.nonsipp.moneyborrowed.MoneyBorrowedPage
 import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
+import pages.nonsipp.sharesdisposal.SharesDisposalPage
 import transformations._
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -59,6 +60,7 @@ class PsrSubmissionService @Inject()(
     val optMoneyWasBorrowed = request.userAnswers.get(MoneyBorrowedPage(srn))
     val optDisposeAnyLandOrProperty = request.userAnswers.get(LandOrPropertyDisposalPage(srn))
     val optDidSchemeHoldAnyShares = request.userAnswers.get(DidSchemeHoldAnySharesPage(srn))
+    val optSharesDisposal = request.userAnswers.get(SharesDisposalPage(srn))
 
     (
       minimalRequiredSubmissionTransformer.transformToEtmp(srn),
@@ -71,7 +73,7 @@ class PsrSubmissionService @Inject()(
           loans = buildLoans(srn)(optSchemeHadLoans),
           assets = buildAssets(srn)(optLandOrPropertyHeld, optMoneyWasBorrowed, optDisposeAnyLandOrProperty),
           membersPayments = memberPaymentsTransformer.transformToEtmp(srn, request.userAnswers),
-          shares = buildShares(srn)(optDidSchemeHoldAnyShares)
+          shares = buildShares(srn)(optDidSchemeHoldAnyShares, optSharesDisposal)
         )
       )
     }.sequence
@@ -89,7 +91,7 @@ class PsrSubmissionService @Inject()(
     optMoneyWasBorrowed: Option[Boolean],
     optDisposeAnyLandOrProperty: Option[Boolean]
   )(implicit request: DataRequest[_]): Option[Assets] =
-    Option.when(List(optLandOrPropertyHeld, optMoneyWasBorrowed, optDisposeAnyLandOrProperty).flatten.nonEmpty)(
+    Option.when(List(optLandOrPropertyHeld, optMoneyWasBorrowed).flatten.nonEmpty)(
       Assets(
         optLandOrProperty = optLandOrPropertyHeld.map(landOrPropertyHeld => {
           val disposeAnyLandOrProperty = optDisposeAnyLandOrProperty.getOrElse(false)
@@ -111,12 +113,13 @@ class PsrSubmissionService @Inject()(
     )
 
   private def buildShares(srn: Srn)(
-    optDidSchemeHoldAnyShares: Option[Boolean]
+    optDidSchemeHoldAnyShares: Option[Boolean],
+    optSharesDisposal: Option[Boolean]
   )(implicit request: DataRequest[_]): Option[Shares] =
-    optDidSchemeHoldAnyShares.map(
-      _ =>
-        Shares(
-          optShareTransactions = sharesTransformer.transformToEtmp(srn)
-        )
-    )
+    optDidSchemeHoldAnyShares.map { _ =>
+      val sharesDisposal = optSharesDisposal.getOrElse(false)
+      Shares(
+        optShareTransactions = sharesTransformer.transformToEtmp(srn, sharesDisposal)
+      )
+    }
 }

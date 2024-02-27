@@ -38,7 +38,7 @@ import pages.nonsipp.shares.{
   WhenDidSchemeAcquireSharesPage,
   WhyDoesSchemeHoldSharesPage
 }
-import pages.nonsipp.sharesdisposal.{HowManySharesPage, SharesDisposalCompletedPages, SharesDisposalListPage}
+import pages.nonsipp.sharesdisposal.{HowManyDisposalSharesPage, SharesDisposalCompletedPages, SharesDisposalListPage}
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -160,7 +160,8 @@ object SharesDisposalListController {
   private def buildRows(srn: Srn, shares: List[SharesData], userAnswers: UserAnswers): List[ListRadiosRow] =
     shares.flatMap { sharesData =>
       val disposalIndex = getDisposal(srn, sharesData.index, userAnswers, isNextDisposal = false).get
-      val totalSharesNowHeld: Option[Int] = userAnswers.get(HowManySharesPage(srn, sharesData.index, disposalIndex))
+      val totalSharesNowHeld: Option[Int] =
+        userAnswers.get(HowManyDisposalSharesPage(srn, sharesData.index, disposalIndex))
       totalSharesNowHeld match {
         case Some(sharesRemaining) =>
           if (sharesRemaining > 0) {

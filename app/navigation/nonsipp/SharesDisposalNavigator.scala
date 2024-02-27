@@ -48,10 +48,9 @@ object SharesDisposalNavigator extends JourneyNavigator {
       }
 
     case RemoveShareDisposalPage(srn, index, disposalIndex) =>
-      if (userAnswers
+      if (!userAnswers
           .map(HowWereSharesDisposedPages(srn))
-          .filter(_._2.nonEmpty)
-          .isEmpty) {
+          .exists(_._2.nonEmpty)) {
         controllers.nonsipp.sharesdisposal.routes.SharesDisposalController.onPageLoad(srn, NormalMode)
       } else {
         // TODO when you have reported [number] share disposals page is done
@@ -148,7 +147,7 @@ object SharesDisposalNavigator extends JourneyNavigator {
       controllers.nonsipp.sharesdisposal.routes.HowManySharesController
         .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
 
-    case HowManySharesPage(srn, shareIndex, disposalIndex) =>
+    case HowManyDisposalSharesPage(srn, shareIndex, disposalIndex) =>
       controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
         .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
 
@@ -331,7 +330,7 @@ object SharesDisposalNavigator extends JourneyNavigator {
           controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
             .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
 
-        case HowManySharesPage(srn, shareIndex, disposalIndex) => //q
+        case HowManyDisposalSharesPage(srn, shareIndex, disposalIndex) => //q
           controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
             .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
       }
