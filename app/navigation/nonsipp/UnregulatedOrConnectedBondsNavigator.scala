@@ -16,6 +16,8 @@
 
 package navigation.nonsipp
 
+import cats.implicits.toTraverseOps
+import config.Refined.Max5000
 import eu.timepit.refined.refineMV
 import models.SchemeHoldBond.{Acquisition, Contribution, Transfer}
 import models.{CheckMode, NormalMode, UserAnswers}
@@ -83,7 +85,24 @@ object UnregulatedOrConnectedBondsNavigator extends JourneyNavigator {
         .onPageLoad(srn, index, NormalMode)
 
     case UnregulatedOrConnectedBondsHeldCYAPage(srn) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+      controllers.nonsipp.unregulatedorconnectedbonds.routes.BondsListController.onPageLoad(srn, 1, NormalMode)
+
+    case page @ BondsListPage(srn) =>
+      userAnswers.get(page) match {
+        case None => controllers.routes.JourneyRecoveryController.onPageLoad()
+        case Some(true) =>
+          (
+            for {
+              map <- userAnswers.get(BondsCompleted.all(srn)).getOrRecoverJourney
+              indexes <- map.keys.toList.traverse(_.toIntOption).getOrRecoverJourney
+              _ <- if (indexes.size >= 5000) Left(controllers.nonsipp.routes.TaskListController.onPageLoad(srn))
+              else Right(())
+              nextIndex <- findNextOpenIndex[Max5000.Refined](indexes).getOrRecoverJourney
+            } yield controllers.nonsipp.unregulatedorconnectedbonds.routes.NameOfBondsController
+              .onPageLoad(srn, nextIndex, NormalMode)
+          ).merge
+        case Some(false) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
+      }
   }
 
   override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] =

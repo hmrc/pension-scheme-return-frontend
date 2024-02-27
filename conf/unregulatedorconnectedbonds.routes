@@ -51,3 +51,8 @@ POST        /:srn/submit-check-answers-bonds                                    
 GET         /:srn/change-check-answers-bonds                                            controllers.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldCYAController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
 GET         /:srn/change-check-answers-bonds/:index                                     controllers.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldCYAController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 POST        /:srn/change-submit-check-answers-bonds                                     controllers.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldCYAController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET         /:srn/bonds-list/:page                                                controllers.nonsipp.unregulatedorconnectedbonds.BondsListController.onPageLoad(srn: Srn, page: Int, mode: Mode = NormalMode)
+POST        /:srn/bonds-list/:page                                               controllers.nonsipp.unregulatedorconnectedbonds.BondsListController.onSubmit(srn: Srn, page: Int, mode: Mode = NormalMode)
+GET         /:srn/change-bonds-list/:page                                         controllers.nonsipp.unregulatedorconnectedbonds.BondsListController.onPageLoad(srn: Srn, page: Int, mode: Mode = CheckMode)
+POST        /:srn/change-bonds-list/:page                                         controllers.nonsipp.unregulatedorconnectedbonds.BondsListController.onSubmit(srn: Srn, page: Int, mode: Mode = CheckMode)
