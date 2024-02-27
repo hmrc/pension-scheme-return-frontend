@@ -22,12 +22,9 @@ import controllers.nonsipp.bondsdisposal.BondsDisposalListController._
 import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
 import models.{NormalMode, SchemeHoldBond}
-import pages.nonsipp.unregulatedorconnectedbonds.{
-  CostOfBondsPage,
-  IncomeFromBondsPage,
-  NameOfBondsPage,
-  WhyDoesSchemeHoldBondsPage
-}
+import pages.nonsipp.shares.SharesCompleted
+import pages.nonsipp.unregulatedorconnectedbonds.{BondsCompleted, CostOfBondsPage, IncomeFromBondsPage, NameOfBondsPage, WhyDoesSchemeHoldBondsPage}
+import viewmodels.models.SectionCompleted
 import views.html.ListRadiosView
 
 class BondsDisposalListControllerSpec extends ControllerBaseSpec {
@@ -46,14 +43,17 @@ class BondsDisposalListControllerSpec extends ControllerBaseSpec {
       .unsafeSet(NameOfBondsPage(srn, indexOne), "bonds one")
       .unsafeSet(WhyDoesSchemeHoldBondsPage(srn, indexOne), SchemeHoldBond.Transfer)
       .unsafeSet(CostOfBondsPage(srn, indexOne), money)
+      .unsafeSet(BondsCompleted(srn, indexOne), SectionCompleted)
       .unsafeSet(IncomeFromBondsPage(srn, indexTwo), money)
       .unsafeSet(NameOfBondsPage(srn, indexTwo), "bonds two")
       .unsafeSet(WhyDoesSchemeHoldBondsPage(srn, indexTwo), SchemeHoldBond.Acquisition)
       .unsafeSet(CostOfBondsPage(srn, indexTwo), money)
+      .unsafeSet(BondsCompleted(srn, indexTwo), SectionCompleted)
       .unsafeSet(IncomeFromBondsPage(srn, indexThree), money)
       .unsafeSet(NameOfBondsPage(srn, indexThree), "bonds three")
       .unsafeSet(WhyDoesSchemeHoldBondsPage(srn, indexThree), SchemeHoldBond.Contribution)
       .unsafeSet(CostOfBondsPage(srn, indexThree), money)
+      .unsafeSet(BondsCompleted(srn, indexThree), SectionCompleted)
 
   private val bondsData = List(
     BondsDisposalData(

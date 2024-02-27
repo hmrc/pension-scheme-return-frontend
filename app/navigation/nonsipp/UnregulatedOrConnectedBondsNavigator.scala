@@ -103,6 +103,16 @@ object UnregulatedOrConnectedBondsNavigator extends JourneyNavigator {
           ).merge
         case Some(false) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
       }
+
+    case RemoveBondsPage(srn, index) =>
+      if (userAnswers
+          .map(NameOfBondsPages(srn))
+          .isEmpty) {
+        controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldController
+          .onPageLoad(srn, NormalMode)
+      } else {
+        controllers.nonsipp.unregulatedorconnectedbonds.routes.BondsListController.onPageLoad(srn, 1, NormalMode)
+      }
   }
 
   override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] =

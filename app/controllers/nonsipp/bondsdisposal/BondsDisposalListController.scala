@@ -30,7 +30,13 @@ import models.requests.DataRequest
 import models.{Mode, Money, Pagination, SchemeHoldBond}
 import navigation.Navigator
 import pages.nonsipp.bondsdisposal.BondsDisposalListPage
-import pages.nonsipp.unregulatedorconnectedbonds.{CostOfBondsPage, IncomeFromBondsPage, NameOfBondsPage, WhyDoesSchemeHoldBondsPage}
+import pages.nonsipp.unregulatedorconnectedbonds.{
+  BondsCompleted,
+  CostOfBondsPage,
+  IncomeFromBondsPage,
+  NameOfBondsPage,
+  WhyDoesSchemeHoldBondsPage
+}
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -56,9 +62,7 @@ class BondsDisposalListController @Inject()(
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      // todo swap when BondsCompleted has been added
-//      val indexes = request.userAnswers.map(BondsCompleted.all(srn)).keys.toList.refine[Max5000.Refined]
-      val indexes = request.userAnswers.map(IncomeFromBondsPage.all(srn)).keys.toList.refine[Max5000.Refined]
+      val indexes = request.userAnswers.map(BondsCompleted.all(srn)).keys.toList.refine[Max5000.Refined]
 
       if (indexes.nonEmpty) {
         bondsData(srn, indexes).map { data =>
@@ -71,7 +75,7 @@ class BondsDisposalListController @Inject()(
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     val indexes: List[Max5000] =
-      request.userAnswers.map(IncomeFromBondsPage.all(srn)).keys.toList.refine[Max5000.Refined]
+      request.userAnswers.map(BondsCompleted.all(srn)).keys.toList.refine[Max5000.Refined]
 
     form
       .bindFromRequest()

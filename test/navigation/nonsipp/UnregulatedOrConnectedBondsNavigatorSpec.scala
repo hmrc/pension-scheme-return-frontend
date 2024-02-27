@@ -18,7 +18,8 @@ package navigation.nonsipp
 
 import config.Refined.{Max5000, OneTo5000}
 import eu.timepit.refined.refineMV
-import models.{CheckMode, NormalMode, SchemeHoldBond}
+import models.SchemeId.Srn
+import models.{CheckMode, NormalMode, SchemeHoldBond, UserAnswers}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.unregulatedorconnectedbonds._
@@ -29,6 +30,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
 
   val navigator: Navigator = new NonSippNavigator
   private val index = refineMV[OneTo5000](1)
+  private val index2 = refineMV[OneTo5000](2)
 
   "UnregulatedOrConnectedBondsNavigator" - {
 
@@ -264,6 +266,42 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
             "go from IncomeFromBondsPage to BondsCYAPage"
           )
       )
+    }
+
+    "RemoveBondPage" - {
+      "When there are no other bonds" - {
+        act.like(
+          normalmode
+            .navigateToWithIndex(
+              index,
+              RemoveBondsPage,
+              (srn, _: Max5000, _) =>
+                controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldController
+                  .onPageLoad(srn, NormalMode)
+            )
+            .withName("go from RemoveBondsPage to Bonds page")
+        )
+      }
+
+      "When there is another bond" - {
+        val customUserAnswers: Srn => UserAnswers = srn =>
+          defaultUserAnswers.unsafeSet(
+            NameOfBondsPage(srn, index2),
+            otherName
+          )
+        act.like(
+          normalmode
+            .navigateToWithIndex(
+              index,
+              RemoveBondsPage,
+              (srn, _: Max5000, _) =>
+                controllers.nonsipp.unregulatedorconnectedbonds.routes.BondsListController
+                  .onPageLoad(srn, 1, NormalMode),
+              customUserAnswers
+            )
+            .withName("go from RemoveBondsPage to Bonds list page")
+        )
+      }
     }
 
     "Check Mode" - {
