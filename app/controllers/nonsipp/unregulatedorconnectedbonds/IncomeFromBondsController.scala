@@ -26,7 +26,7 @@ import forms.mappings.errors.MoneyFormErrors
 import models.SchemeId.Srn
 import models.{Mode, Money}
 import navigation.Navigator
-import pages.nonsipp.unregulatedorconnectedbonds.IncomeFromBondsPage
+import pages.nonsipp.unregulatedorconnectedbonds.{BondsCompleted, IncomeFromBondsPage}
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -35,7 +35,7 @@ import utils.FormUtils._
 import viewmodels.DisplayMessage.{Empty, Message}
 import viewmodels.implicits._
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
-import viewmodels.models.{FormPageViewModel, QuestionField}
+import viewmodels.models.{FormPageViewModel, QuestionField, SectionCompleted}
 import views.html.MoneyView
 
 import javax.inject.{Inject, Named}
@@ -80,7 +80,11 @@ class IncomeFromBondsController @Inject()(
           answer => {
             for {
               updatedAnswers <- Future
-                .fromTry(request.userAnswers.set(IncomeFromBondsPage(srn, index), answer))
+                .fromTry(
+                  request.userAnswers
+                    .set(IncomeFromBondsPage(srn, index), answer)
+                    .set(BondsCompleted(srn, index), SectionCompleted)
+                )
               _ <- saveService.save(updatedAnswers)
             } yield Redirect(navigator.nextPage(IncomeFromBondsPage(srn, index), mode, updatedAnswers))
           }

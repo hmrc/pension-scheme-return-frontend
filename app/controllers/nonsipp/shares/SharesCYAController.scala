@@ -378,9 +378,9 @@ object SharesCYAController {
               "sharesCYA.section1.holdShares",
               schemeName,
               typeOfShare match {
-                case SponsoringEmployer => "sharesCYA.section1.SponsoringEmployer"
-                case Unquoted => "sharesCYA.section1.Unquoted"
-                case ConnectedParty => "sharesCYA.section1.ConnectedParty"
+                case SponsoringEmployer => "sharesCYA.section1.typeOfShares.SponsoringEmployer"
+                case Unquoted => "sharesCYA.section1.typeOfShares.Unquoted"
+                case ConnectedParty => "sharesCYA.section1.typeOfShares.ConnectedParty"
               }
             ),
             holdShares match {
@@ -397,9 +397,9 @@ object SharesCYAController {
                 "sharesCYA.section1.holdShares.hidden",
                 schemeName,
                 typeOfShare match {
-                  case SponsoringEmployer => "sharesCYA.section1.SponsoringEmployer"
-                  case Unquoted => "sharesCYA.section1.Unquoted"
-                  case ConnectedParty => "sharesCYA.section1.ConnectedParty"
+                  case SponsoringEmployer => "sharesCYA.section1.typeOfShares.SponsoringEmployer"
+                  case Unquoted => "sharesCYA.section1.typeOfShares.Unquoted"
+                  case ConnectedParty => "sharesCYA.section1.typeOfShares.ConnectedParty"
                 },
                 holdShares match {
                   case Acquisition => "sharesCYA.section1.Acquisition"
@@ -436,9 +436,9 @@ object SharesCYAController {
               "sharesCYA.section2.whenDidSchemeAcquire",
               schemeName,
               typeOfShare match {
-                case SponsoringEmployer => "sharesCYA.section1.SponsoringEmployer"
-                case Unquoted => "sharesCYA.section1.Unquoted"
-                case ConnectedParty => "sharesCYA.section1.ConnectedParty"
+                case SponsoringEmployer => "sharesCYA.section1.typeOfShares.SponsoringEmployer"
+                case Unquoted => "sharesCYA.section1.typeOfShares.Unquoted"
+                case ConnectedParty => "sharesCYA.section1.typeOfShares.ConnectedParty"
               }
             ),
             s"${whenDidSchemeAcquire.get.show}"
@@ -458,9 +458,9 @@ object SharesCYAController {
                 "sharesCYA.section2.whenDidSchemeAcquire.hidden",
                 schemeName,
                 typeOfShare match {
-                  case SponsoringEmployer => "sharesCYA.section1.SponsoringEmployer"
-                  case Unquoted => "sharesCYA.section1.Unquoted"
-                  case ConnectedParty => "sharesCYA.section1.ConnectedParty"
+                  case SponsoringEmployer => "sharesCYA.section1.typeOfShares.SponsoringEmployer"
+                  case Unquoted => "sharesCYA.section1.typeOfShares.Unquoted"
+                  case ConnectedParty => "sharesCYA.section1.typeOfShares.ConnectedParty"
                 }
               )
             )
@@ -470,9 +470,9 @@ object SharesCYAController {
             Message(
               "sharesCYA.section2.companyNameRelatedShares",
               typeOfShare match {
-                case SponsoringEmployer => "sharesCYA.section1.SponsoringEmployer"
-                case Unquoted => "sharesCYA.section1.Unquoted"
-                case ConnectedParty => "sharesCYA.section1.ConnectedParty"
+                case SponsoringEmployer => "sharesCYA.section1.typeOfShares.SponsoringEmployer"
+                case Unquoted => "sharesCYA.section1.typeOfShares.Unquoted"
+                case ConnectedParty => "sharesCYA.section1.typeOfShares.ConnectedParty"
               }
             ),
             companyNameRelatedShares.show
@@ -482,9 +482,9 @@ object SharesCYAController {
               routes.CompanyNameRelatedSharesController.onPageLoad(srn, index, mode).url + "#companyNameRelatedShares"
             ).withVisuallyHiddenContent(
               ("sharesCYA.section2.companyNameRelatedShares.hidden", typeOfShare match {
-                case SponsoringEmployer => "sharesCYA.section1.SponsoringEmployer"
-                case Unquoted => "sharesCYA.section1.Unquoted"
-                case ConnectedParty => "sharesCYA.section1.ConnectedParty"
+                case SponsoringEmployer => "sharesCYA.section1.typeOfShares.SponsoringEmployer"
+                case Unquoted => "sharesCYA.section1.typeOfShares.Unquoted"
+                case ConnectedParty => "sharesCYA.section1.typeOfShares.ConnectedParty"
               })
             )
           ),
