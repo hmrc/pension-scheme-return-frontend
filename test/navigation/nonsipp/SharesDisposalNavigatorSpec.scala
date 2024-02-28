@@ -507,7 +507,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              HowManySharesPage,
+              HowManyDisposalSharesPage,
               (srn, index: Max5000, disposalIndex: Max50, _) =>
                 controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
                   .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
@@ -1348,7 +1348,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .navigateToWithDoubleIndex(
               shareIndex,
               disposalIndex,
-              HowManySharesPage,
+              HowManyDisposalSharesPage,
               (srn, index: Max5000, disposalIndex: Max50, _) =>
                 controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
                   .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)

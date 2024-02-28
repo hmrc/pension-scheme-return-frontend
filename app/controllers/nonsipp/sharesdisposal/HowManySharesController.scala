@@ -27,7 +27,7 @@ import models.Mode
 import models.SchemeId.Srn
 import navigation.Navigator
 import pages.nonsipp.shares.CompanyNameRelatedSharesPage
-import pages.nonsipp.sharesdisposal.HowManySharesPage
+import pages.nonsipp.sharesdisposal.HowManyDisposalSharesPage
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -67,7 +67,7 @@ class HowManySharesController @Inject()(
               nameOfSharesCompany,
               request.schemeDetails.schemeName,
               mode,
-              form.fromUserAnswers(HowManySharesPage(srn, index, disposalIndex))
+              form.fromUserAnswers(HowManyDisposalSharesPage(srn, index, disposalIndex))
             )
           )
         )
@@ -100,9 +100,11 @@ class HowManySharesController @Inject()(
             answer => {
               for {
                 updatedAnswers <- Future
-                  .fromTry(request.userAnswers.set(HowManySharesPage(srn, index, disposalIndex), answer))
+                  .fromTry(request.userAnswers.set(HowManyDisposalSharesPage(srn, index, disposalIndex), answer))
                 _ <- saveService.save(updatedAnswers)
-              } yield Redirect(navigator.nextPage(HowManySharesPage(srn, index, disposalIndex), mode, updatedAnswers))
+              } yield Redirect(
+                navigator.nextPage(HowManyDisposalSharesPage(srn, index, disposalIndex), mode, updatedAnswers)
+              )
             }
           )
       }

@@ -22,7 +22,7 @@ import pages.QuestionPage
 import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
 
-case class HowManySharesPage(srn: Srn, index: Max5000, disposalIndex: Max50) extends QuestionPage[Int] {
+case class HowManyDisposalSharesPage(srn: Srn, index: Max5000, disposalIndex: Max50) extends QuestionPage[Int] {
 
   override def path: JsPath =
     Paths.disposedSharesTransaction \ toString \ index.arrayIndex.toString \ disposalIndex.arrayIndex.toString

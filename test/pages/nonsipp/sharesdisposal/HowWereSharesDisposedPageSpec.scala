@@ -49,7 +49,7 @@ class HowWereSharesDisposedPageSpec extends PageBehaviours with TestValues {
         .unsafeSet(WhenWereSharesRedeemedPage(srn, shareIndexOne, indexOne), localDate)
         .unsafeSet(HowManySharesRedeemedPage(srn, shareIndexOne, indexOne), 1)
         .unsafeSet(TotalConsiderationSharesRedeemedPage(srn, shareIndexOne, indexOne), money)
-        .unsafeSet(HowManySharesPage(srn, shareIndexOne, indexOne), 1)
+        .unsafeSet(HowManyDisposalSharesPage(srn, shareIndexOne, indexOne), 1)
         .unsafeSet(WhenWereSharesSoldPage(srn, shareIndexOne, indexOne), localDate)
         .unsafeSet(HowManySharesSoldPage(srn, shareIndexOne, indexOne), 1)
         .unsafeSet(TotalConsiderationSharesSoldPage(srn, shareIndexOne, indexOne), money)
@@ -77,7 +77,7 @@ class HowWereSharesDisposedPageSpec extends PageBehaviours with TestValues {
       result.get(IsBuyerConnectedPartyPage(srn, shareIndexOne, indexOne)) must be(empty)
       result.get(IndependentValuationPage(srn, shareIndexOne, indexOne)) must be(empty)
 
-      result.get(HowManySharesPage(srn, shareIndexOne, indexOne)) must be(empty)
+      result.get(HowManyDisposalSharesPage(srn, shareIndexOne, indexOne)) must be(empty)
 
     }
 
@@ -95,7 +95,7 @@ class HowWereSharesDisposedPageSpec extends PageBehaviours with TestValues {
 
       result.get(HowWereSharesDisposedPage(srn, shareIndexOne, indexOne)) must be(empty)
       result.get(WhenWereSharesRedeemedPage(srn, shareIndexOne, indexOne)) must be(empty)
-      result.get(SharesDisposalPage(srn)) must not be (empty)
+      result.get(SharesDisposalPage(srn)) must not be empty
     }
 
     "cleanup other fields when removing a disposal but there are disposals for other shares" in {
@@ -112,9 +112,9 @@ class HowWereSharesDisposedPageSpec extends PageBehaviours with TestValues {
 
       result.get(HowWereSharesDisposedPage(srn, shareIndexOne, indexOne)) must be(empty)
       result.get(WhenWereSharesRedeemedPage(srn, shareIndexOne, indexOne)) must be(empty)
-      result.get(HowWereSharesDisposedPage(srn, shareIndexTwo, indexOne)) must not be (empty)
-      result.get(WhenWereSharesRedeemedPage(srn, shareIndexTwo, indexOne)) must not be (empty)
-      result.get(SharesDisposalPage(srn)) must not be (empty)
+      result.get(HowWereSharesDisposedPage(srn, shareIndexTwo, indexOne)) must not be empty
+      result.get(WhenWereSharesRedeemedPage(srn, shareIndexTwo, indexOne)) must not be empty
+      result.get(SharesDisposalPage(srn)) must not be empty
     }
   }
 }

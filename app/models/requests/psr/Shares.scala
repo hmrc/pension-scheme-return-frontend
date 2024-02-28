@@ -28,7 +28,8 @@ case class Shares(
 case class ShareTransaction(
   typeOfSharesHeld: TypeOfShares,
   shareIdentification: ShareIdentification,
-  heldSharesTransaction: HeldSharesTransaction
+  heldSharesTransaction: HeldSharesTransaction,
+  optDisposedSharesTransaction: Option[Seq[DisposedSharesTransaction]]
 )
 
 case class ShareIdentification(
@@ -51,7 +52,37 @@ case class HeldSharesTransaction(
   totalDividendsOrReceipts: Double
 )
 
+case class DisposedSharesTransaction(
+  methodOfDisposal: String,
+  optOtherMethod: Option[String],
+  optSalesQuestions: Option[SalesQuestions],
+  optRedemptionQuestions: Option[RedemptionQuestions],
+  totalSharesNowHeld: Int
+)
+
+case class SalesQuestions(
+  dateOfSale: LocalDate,
+  noOfSharesSold: Int,
+  amountReceived: Double,
+  nameOfPurchaser: String,
+  purchaserType: PropertyAcquiredFrom,
+  connectedPartyStatus: Boolean,
+  supportedByIndepValuation: Boolean
+)
+
+case class RedemptionQuestions(
+  dateOfRedemption: LocalDate,
+  noOfSharesRedeemed: Int,
+  amountReceived: Double
+)
+
 object Shares {
+  private implicit val formatRedemptionQuestions: Format[RedemptionQuestions] =
+    Json.format[RedemptionQuestions]
+  private implicit val formatSalesQuestions: Format[SalesQuestions] =
+    Json.format[SalesQuestions]
+  private implicit val formatDisposedSharesTransaction: Format[DisposedSharesTransaction] =
+    Json.format[DisposedSharesTransaction]
   private implicit val formatHeldSharesTransaction: Format[HeldSharesTransaction] = Json.format[HeldSharesTransaction]
   private implicit val formatShareIdentification: Format[ShareIdentification] = Json.format[ShareIdentification]
   private implicit val formatShareTransaction: Format[ShareTransaction] = Json.format[ShareTransaction]

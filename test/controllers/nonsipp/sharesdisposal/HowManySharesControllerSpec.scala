@@ -23,7 +23,7 @@ import eu.timepit.refined.refineMV
 import forms.IntFormProvider
 import models.NormalMode
 import pages.nonsipp.shares.CompanyNameRelatedSharesPage
-import pages.nonsipp.sharesdisposal.HowManySharesPage
+import pages.nonsipp.sharesdisposal.HowManyDisposalSharesPage
 import views.html.IntView
 
 class HowManySharesControllerSpec extends ControllerBaseSpec {
@@ -57,7 +57,7 @@ class HowManySharesControllerSpec extends ControllerBaseSpec {
     )
 
     act.like(
-      renderPrePopView(onPageLoad, HowManySharesPage(srn, shareIndex, disposalIndex), totalShares, userAnswers) {
+      renderPrePopView(onPageLoad, HowManyDisposalSharesPage(srn, shareIndex, disposalIndex), totalShares, userAnswers) {
         implicit app => implicit request =>
           injected[IntView]
             .apply(

@@ -21,12 +21,13 @@ import controllers.nonsipp.sharesdisposal.SharesDisposalController._
 import forms.YesNoPageFormProvider
 import models.Mode
 import models.SchemeId.Srn
+import models.requests.DataRequest
 import navigation.Navigator
 import pages.nonsipp.sharesdisposal.SharesDisposalPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
+import services.{PsrSubmissionService, SaveService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
@@ -43,7 +44,8 @@ class SharesDisposalController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   formProvider: YesNoPageFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: YesNoPageView
+  view: YesNoPageView,
+  psrSubmissionService: PsrSubmissionService
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
@@ -65,7 +67,17 @@ class SharesDisposalController @Inject()(
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(SharesDisposalPage(srn), value))
             _ <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage(SharesDisposalPage(srn), mode, updatedAnswers))
+            redirectTo <- if (value) {
+              Future.successful(Redirect(navigator.nextPage(SharesDisposalPage(srn), mode, updatedAnswers)))
+            } else {
+              psrSubmissionService
+                .submitPsrDetails(srn)(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
+                .map {
+                  case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+                  case Some(_) => Redirect(navigator.nextPage(SharesDisposalPage(srn), mode, updatedAnswers))
+                }
+            }
+          } yield redirectTo
       )
   }
 }

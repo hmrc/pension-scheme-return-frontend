@@ -20,17 +20,17 @@ import config.Refined.{Max50, Max5000}
 import eu.timepit.refined.refineMV
 import pages.behaviours.PageBehaviours
 
-class HowManySharesPageSpec extends PageBehaviours {
+class HowManyDisposalSharesPageSpec extends PageBehaviours {
 
-  "HowManySharesPage" - {
+  "HowManyDisposalSharesPage" - {
     val srn = srnGen.sample.value
     val shareIndex = refineMV[Max5000.Refined](1)
     val disposalIndex = refineMV[Max50.Refined](1)
 
-    beRetrievable[Int](HowManySharesPage(srn, shareIndex, disposalIndex))
+    beRetrievable[Int](HowManyDisposalSharesPage(srn, shareIndex, disposalIndex))
 
-    beSettable[Int](HowManySharesPage(srn, shareIndex, disposalIndex))
+    beSettable[Int](HowManyDisposalSharesPage(srn, shareIndex, disposalIndex))
 
-    beRemovable[Int](HowManySharesPage(srn, shareIndex, disposalIndex))
+    beRemovable[Int](HowManyDisposalSharesPage(srn, shareIndex, disposalIndex))
   }
 }
