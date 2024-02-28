@@ -56,10 +56,10 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         normalmode
           .navigateTo(
             WhatYouWillNeedBondsDisposalPage,
-            (_, _) => controllers.routes.UnauthorisedController.onPageLoad()
+            controllers.nonsipp.bondsdisposal.routes.BondsDisposalListController.onPageLoad(_, 1, _)
           )
           .withName(
-            "go from what you will need bonds disposal page to unauthorised page"
+            "go from what you will need bonds disposal page to bonds disposal list page"
           )
       )
     }

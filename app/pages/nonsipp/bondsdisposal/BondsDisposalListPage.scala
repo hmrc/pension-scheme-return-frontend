@@ -14,18 +14,10 @@
  * limitations under the License.
  */
 
-package viewmodels.models
+package pages.nonsipp.bondsdisposal
 
-import viewmodels.{DisplayMessage, LegendSize}
+import config.Refined.Max5000
+import models.SchemeId.Srn
+import pages.Page
 
-case class ListRadiosRow(
-  index: Int,
-  text: DisplayMessage
-)
-
-case class ListRadiosViewModel(
-  legend: Option[DisplayMessage],
-  rows: List[ListRadiosRow],
-  paginatedViewModel: Option[PaginatedViewModel] = None,
-  legendSize: Option[LegendSize] = None
-)
+case class BondsDisposalListPage(srn: Srn, bondIndex: Max5000) extends Page

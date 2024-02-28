@@ -255,7 +255,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
         normalmode
           .navigateToWithIndex(
             index,
-            IncomeFromBondsPage,
+            IncomeFromBondsPage(_, _),
             (srn, _: Max5000, _) =>
               controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldCYAController
                 .onPageLoad(srn, index, NormalMode)
@@ -455,7 +455,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
           checkmode
             .navigateToWithIndex(
               index,
-              IncomeFromBondsPage,
+              IncomeFromBondsPage(_, _),
               (srn, _: Max5000, _) =>
                 controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldCYAController
                   .onPageLoad(srn, index, CheckMode)

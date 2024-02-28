@@ -16,6 +16,8 @@
 
 package models
 
+import eu.timepit.refined.api.{Refined, Validate}
+import eu.timepit.refined.refineV
 import play.api.libs.json._
 
 trait Enumerable[A] {
@@ -37,6 +39,18 @@ object Enumerable {
 
       override def toList: List[(String, A)] = entries.toList
     }
+
+  def index[A](range: Range.Inclusive)(implicit ev: Validate[Int, A]): Enumerable[Refined[Int, A]] =
+    Enumerable(
+      range.toList
+        .map(
+          refineV[A](_).fold(
+            err => throw new Exception(err),
+            index => index
+          )
+        )
+        .map(index => index.value.toString -> index): _*
+    )
 
   trait Implicits {
 

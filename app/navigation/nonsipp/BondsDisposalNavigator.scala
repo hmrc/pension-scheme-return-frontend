@@ -16,7 +16,7 @@
 
 package navigation.nonsipp
 
-import models.UserAnswers
+import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.bondsdisposal._
@@ -34,6 +34,9 @@ object BondsDisposalNavigator extends JourneyNavigator {
       }
 
     case WhatYouWillNeedBondsDisposalPage(srn) =>
+      controllers.nonsipp.bondsdisposal.routes.BondsDisposalListController.onPageLoad(srn, 1, NormalMode)
+
+    case BondsDisposalListPage(srn, _) =>
       controllers.routes.UnauthorisedController.onPageLoad()
 
   }

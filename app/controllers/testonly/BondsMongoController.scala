@@ -19,19 +19,18 @@ package controllers.testonly
 import config.Refined.Max5000
 import controllers.actions.IdentifyAndRequireData
 import eu.timepit.refined._
+import models.{Money, SchemeHoldBond}
 import models.SchemeId.Srn
-import models._
-import pages.nonsipp.shares._
+import pages.nonsipp.unregulatedorconnectedbonds._
 import play.api.mvc.MessagesControllerComponents
 import services.SaveService
 import shapeless._
-import viewmodels.models.SectionCompleted
 
 import java.time.LocalDate
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class SharesMongoController @Inject()(
+class BondsMongoController @Inject()(
   val saveService: SaveService,
   val identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents
@@ -41,18 +40,24 @@ class SharesMongoController @Inject()(
   override val max: Max5000 = refineMV(5000)
 
   override def pages(srn: Srn, index: Max5000): Pages = HList(
-    PageWithValue(SharesCompleted(srn, index), SectionCompleted),
-    PageWithValue(TypeOfSharesHeldPage(srn, index), TypeOfShares.Unquoted),
-    PageWithValue(CompanyNameRelatedSharesPage(srn, index), "test ltd"),
-    PageWithValue(WhyDoesSchemeHoldSharesPage(srn, index), SchemeHoldShare.Acquisition),
-    PageWithValue(WhenDidSchemeAcquireSharesPage(srn, index), LocalDate.of(2022, 12, 12))
+    PageWithValue(AreBondsUnregulatedPage(srn, index), false),
+    PageWithValue(BondsFromConnectedPartyPage(srn, index), false),
+    PageWithValue(CostOfBondsPage(srn, index), Money(12.34)),
+    PageWithValue(IncomeFromBondsPage(srn, index), Money(34.56)),
+    PageWithValue(NameOfBondsPage(srn, index), "test bonds"),
+    PageWithValue(UnregulatedOrConnectedBondsHeldPage(srn), true),
+    PageWithValue(WhenDidSchemeAcquireBondsPage(srn, index), LocalDate.of(2023, 12, 12)),
+    PageWithValue(WhyDoesSchemeHoldBondsPage(srn, index), SchemeHoldBond.Transfer)
   )
 
   override type Pages =
-    PageWithValue[SectionCompleted] ::
-      PageWithValue[TypeOfShares] ::
+    PageWithValue[Boolean] ::
+      PageWithValue[Boolean] ::
+      PageWithValue[Money] ::
+      PageWithValue[Money] ::
       PageWithValue[String] ::
-      PageWithValue[SchemeHoldShare] ::
+      PageWithValue[Boolean] ::
       PageWithValue[LocalDate] ::
+      PageWithValue[SchemeHoldBond] ::
       HNil
 }
