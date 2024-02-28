@@ -56,3 +56,8 @@ GET         /:srn/bonds-list/:page                                              
 POST        /:srn/bonds-list/:page                                               controllers.nonsipp.unregulatedorconnectedbonds.BondsListController.onSubmit(srn: Srn, page: Int, mode: Mode = NormalMode)
 GET         /:srn/change-bonds-list/:page                                         controllers.nonsipp.unregulatedorconnectedbonds.BondsListController.onPageLoad(srn: Srn, page: Int, mode: Mode = CheckMode)
 POST        /:srn/change-bonds-list/:page                                         controllers.nonsipp.unregulatedorconnectedbonds.BondsListController.onSubmit(srn: Srn, page: Int, mode: Mode = CheckMode)
+
+GET         /:srn/remove-bonds/:index                                                   controllers.nonsipp.unregulatedorconnectedbonds.RemoveBondsController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/remove-bonds/:index                                                   controllers.nonsipp.unregulatedorconnectedbonds.RemoveBondsController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/change-remove-bonds/:index                                            controllers.nonsipp.unregulatedorconnectedbonds.RemoveBondsController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-remove-bonds/:index                                            controllers.nonsipp.unregulatedorconnectedbonds.RemoveBondsController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)

@@ -2743,6 +2743,10 @@ bondsDisposal.title = Did the scheme dispose of any unregulated bonds, or bonds 
 bondsDisposal.heading = Did {0} dispose of any unregulated bonds, or bonds acquired from a connected party, during the period of this return?
 bondsDisposal.error.required = Select yes if the scheme disposed of any unregulated bonds, or bonds acquired from a connected party, during the period of this return
 
+bonds.removeBond.title = Are you sure you want to remove this bond transaction?
+bonds.removeBond.heading = Are you sure you want to remove the transaction for {0}?
+bonds.removeBond.required = Select yes if you are sure you want to remove this bond transaction
+
 whatYouWillNeedBondsDisposal.title = Bonds disposed of by the scheme
 whatYouWillNeedBondsDisposal.heading = Bonds disposed of by {0}
 whatYouWillNeedBondsDisposal.paragraph1 = You must tell us about all unregulated bonds, or bonds acquired from a connected party, disposed of by the scheme during the period of this return.

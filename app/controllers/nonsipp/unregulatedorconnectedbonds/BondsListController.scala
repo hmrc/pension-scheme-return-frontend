@@ -26,7 +26,7 @@ import controllers.nonsipp.unregulatedorconnectedbonds.BondsListController._
 import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
 import models.requests.DataRequest
-import models.{CheckMode, Mode, Money, Pagination, SchemeHoldBond}
+import models.{CheckMode, Mode, Money, NormalMode, Pagination, SchemeHoldBond}
 import navigation.Navigator
 import pages.nonsipp.unregulatedorconnectedbonds._
 import play.api.data.Form
@@ -167,7 +167,9 @@ object BondsListController {
           TableElem(
             LinkMessage(
               Message("site.remove"),
-              ""
+              controllers.nonsipp.unregulatedorconnectedbonds.routes.RemoveBondsController
+                .onPageLoad(srn, index, NormalMode)
+                .url
             )
           )
         )
