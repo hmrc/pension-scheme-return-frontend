@@ -106,8 +106,8 @@ POST       /:srn/change-shares-held-after-disposal/:index/:secondaryIndex       
 
 GET         /:srn/check-answers-share-disposal/:shareIndex/:disposalIndex                           controllers.nonsipp.sharesdisposal.SharesDisposalCYAController.onPageLoad(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, mode: Mode = NormalMode)
 POST        /:srn/check-answers-share-disposal/:shareIndex/:disposalIndex                           controllers.nonsipp.sharesdisposal.SharesDisposalCYAController.onSubmit(srn: Srn, shareIndex: Max5000, disposalIndex: Max50,mode: Mode = NormalMode)
-GET         /:srn/change-check-answers-share-disposal/:shareIndex/:disposalIndex                    controllers.nonsipp.sharesdisposal.SharesDisposalCYAController.onPageLoad(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, mode: Mode = CheckMode)
-POST        /:srn/change-check-answers-share-disposal/:shareIndex/:disposalIndex                    controllers.nonsipp.sharesdisposal.SharesDisposalCYAController.onSubmit(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, mode: Mode = CheckMode)
+GET         /:srn/change-share-disposal/:shareIndex/:disposalIndex                                  controllers.nonsipp.sharesdisposal.SharesDisposalCYAController.onPageLoad(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, mode: Mode = CheckMode)
+POST        /:srn/change-share-disposal/:shareIndex/:disposalIndex                                  controllers.nonsipp.sharesdisposal.SharesDisposalCYAController.onSubmit(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, mode: Mode = CheckMode)
 
 GET         /:srn/share-disposal-list/:page                                                         controllers.nonsipp.sharesdisposal.ReportedSharesDisposalListController.onPageLoad(srn: Srn, page: Int, mode: Mode = NormalMode)
 POST        /:srn/share-disposal-list/:page                                                         controllers.nonsipp.sharesdisposal.ReportedSharesDisposalListController.onSubmit(srn: Srn, page: Int, mode: Mode = NormalMode)

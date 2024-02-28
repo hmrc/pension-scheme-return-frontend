@@ -46,7 +46,11 @@ case class HowWereSharesDisposedPage(
       case (Some(HowSharesDisposed.Transferred), Some(HowSharesDisposed.Transferred)) => Try(userAnswers)
       case (Some(HowSharesDisposed.Redeemed), Some(HowSharesDisposed.Redeemed)) => Try(userAnswers)
       case (Some(HowSharesDisposed.Other(_)), Some(HowSharesDisposed.Other(_))) => Try(userAnswers)
-      case (Some(_), Some(_)) => removePages(userAnswers, pages(srn, shareIndex, disposalIndex, isLastRecord = false))
+      case (Some(_), Some(_)) =>
+        removePages(
+          userAnswers,
+          pages(srn, shareIndex, disposalIndex, removeHowManyDisposalSharesPage = false, isLastRecord = false)
+        )
       case (None, _) =>
         val completedPages = userAnswers.map(SharesDisposalCompletedPages(srn))
         removePages(
@@ -55,13 +59,20 @@ case class HowWereSharesDisposedPage(
             srn,
             shareIndex,
             disposalIndex,
-            completedPages.flatten(_._2).size == 1
+            removeHowManyDisposalSharesPage = true,
+            isLastRecord = completedPages.flatten(_._2).size == 1
           )
         )
       case _ => Try(userAnswers)
     }
 
-  private def pages(srn: Srn, shareIndex: Max5000, disposalIndex: Max50, isLastRecord: Boolean): List[Removable[_]] = {
+  private def pages(
+    srn: Srn,
+    shareIndex: Max5000,
+    disposalIndex: Max50,
+    removeHowManyDisposalSharesPage: Boolean,
+    isLastRecord: Boolean
+  ): List[Removable[_]] = {
     val list = List(
       WhenWereSharesRedeemedPage(srn, shareIndex, disposalIndex),
       HowManySharesRedeemedPage(srn, shareIndex, disposalIndex),
@@ -71,12 +82,15 @@ case class HowWereSharesDisposedPage(
       TotalConsiderationSharesSoldPage(srn, shareIndex, disposalIndex),
       WhoWereTheSharesSoldToPage(srn, shareIndex, disposalIndex), // has it's own cleanup
       IsBuyerConnectedPartyPage(srn, shareIndex, disposalIndex),
-      IndependentValuationPage(srn, shareIndex, disposalIndex)
+      IndependentValuationPage(srn, shareIndex, disposalIndex),
+      SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex),
+      SharesDisposalCompletedPage(srn, shareIndex, disposalIndex)
     )
-    if (isLastRecord) {
-      list :+ SharesDisposalPage(srn) :+ HowManyDisposalSharesPage(srn, shareIndex, disposalIndex)
-    } else {
-      list
+
+    (removeHowManyDisposalSharesPage, isLastRecord) match {
+      case (true, true) => list :+ HowManyDisposalSharesPage(srn, shareIndex, disposalIndex) :+ SharesDisposalPage(srn)
+      case (true, false) => list :+ HowManyDisposalSharesPage(srn, shareIndex, disposalIndex)
+      case (false, false) => list
     }
   }
 }

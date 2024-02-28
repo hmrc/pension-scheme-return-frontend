@@ -499,11 +499,11 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
                 controllers.nonsipp.sharesdisposal.routes.HowManySharesController
                   .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
             )
-            .withName("go from IndependentValuationPage to HowManySharesPage")
+            .withName("go from IndependentValuationPage to HowManyDisposalSharesPage")
         )
       }
 
-      "HowManySharesPage" - {
+      "HowManyDisposalSharesPage" - {
         act.like(
           normalmode
             .navigateToWithDoubleIndex(
@@ -514,7 +514,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
                 controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
                   .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
             )
-            .withName("go from HowManySharesPage to Shares Disposal CYA page")
+            .withName("go from HowManyDisposalSharesPage to Shares Disposal CYA page")
         )
       }
 
@@ -1343,7 +1343,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         )
       }
 
-      "HowManySharesPage" - {
+      "HowManyDisposalSharesPage" - {
         // In CheckMode, CYA page always follows this page, so no PointOfEntry tests required
 
         act.like(
@@ -1356,7 +1356,7 @@ class SharesDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
                 controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
                   .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
             )
-            .withName("go from HowManySharesPage to Shares Disposal CYA page")
+            .withName("go from HowManyDisposalSharesPage to Shares Disposal CYA page")
         )
       }
 
