@@ -33,6 +33,9 @@ case class CompanyRecipientCrnPage(srn: Srn, index: Max5000, identitySubject: Id
       pages.nonsipp.landorproperty.Paths.heldPropertyTransactions \ "propertyAcquiredFrom" \ "sellerIdentityType" \ toString \ index.arrayIndex.toString
     case IdentitySubject.SharesSeller =>
       pages.nonsipp.shares.Paths.heldSharesTransaction \ "acquiredFromType" \ "sellerIdentityType" \ toString \ index.arrayIndex.toString
+    case IdentitySubject.OtherAssetSeller =>
+      pages.nonsipp.otherassetsheld.Paths.otherAssetsTransactions \ "acquiredFromType" \ "sellerIdentityType" \ toString \ index.arrayIndex.toString
+    case IdentitySubject.Unknown => JsPath \ "unknown" \ toString \ index.arrayIndex.toString
   }
 
   override def toString: String = "crn"

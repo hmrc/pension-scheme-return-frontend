@@ -41,6 +41,8 @@ case class IdentityTypePage(srn: Srn, index: Max5000, identitySubject: IdentityS
       pages.nonsipp.landorproperty.Paths.heldPropertyTransactions \ "propertyAcquiredFrom" \ "sellerIdentityType" \ toString \ index.arrayIndex.toString
     case IdentitySubject.SharesSeller =>
       pages.nonsipp.shares.Paths.heldSharesTransaction \ "acquiredFromType" \ "sellerIdentityType" \ toString \ index.arrayIndex.toString
+    case IdentitySubject.OtherAssetSeller =>
+      pages.nonsipp.otherassetsheld.Paths.otherAssetsTransactions \ "acquiredFromType" \ "sellerIdentityType" \ toString \ index.arrayIndex.toString
   }
 
   override def toString: String = "identityTypes"
@@ -64,9 +66,7 @@ case class IdentityTypePage(srn: Srn, index: Max5000, identitySubject: IdentityS
           SecurityGivenForLoanPage(srn, index)
         )
         if (isLastRecord) list :+ LoansMadeOrOutstandingPage(srn) else list
-      case IdentitySubject.LandOrPropertySeller =>
-        List().empty
-      case IdentitySubject.SharesSeller =>
+      case _ =>
         List().empty
     }
   private def genericPagesDependentOnIdentitySubject(srn: Srn): List[Removable[_]] =
@@ -103,6 +103,8 @@ case class IdentityTypePage(srn: Srn, index: Max5000, identitySubject: IdentityS
           CompanyNameOfSharesSellerPage(srn, index),
           PartnershipShareSellerNamePage(srn, index)
         )
+      case IdentitySubject.OtherAssetSeller =>
+        List().empty // TODO build up this list as other asset identity pages are introduced
 
       case _ =>
         List().empty
@@ -133,6 +135,9 @@ case class IdentityTypes(srn: Srn, identitySubject: IdentitySubject) extends Que
       pages.nonsipp.landorproperty.Paths.heldPropertyTransactions \ "propertyAcquiredFrom" \ "sellerIdentityType" \ toString
     case IdentitySubject.SharesSeller =>
       pages.nonsipp.shares.Paths.heldSharesTransaction \ "acquiredFromType" \ "sellerIdentityType" \ toString
+    case IdentitySubject.OtherAssetSeller =>
+      pages.nonsipp.otherassetsheld.Paths.otherAssetsTransactions \ "acquiredFromType" \ "sellerIdentityType" \ toString
+    case IdentitySubject.Unknown => JsPath \ "unknown" \ toString
   }
   override def toString: String = "identityTypes"
 }
