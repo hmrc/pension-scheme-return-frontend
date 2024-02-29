@@ -34,11 +34,14 @@ object IdentitySubject extends Enumerable.Implicits {
   case object SharesSeller extends WithName("shares-seller") with IdentitySubject {
     override val key: String = "sharesSeller"
   }
+  case object OtherAssetSeller extends WithName("asset-seller") with IdentitySubject {
+    override val key: String = "otherAssetSeller"
+  }
   case object Unknown extends WithName("unknown") with IdentitySubject {
     override val key: String = "unknown"
   }
 
-  val values: List[IdentitySubject] = List(LoanRecipient, LandOrPropertySeller, SharesSeller)
+  val values: List[IdentitySubject] = List(LoanRecipient, LandOrPropertySeller, SharesSeller, OtherAssetSeller)
 
   def withNameWithDefault(name: String): IdentitySubject =
     values.find(_.toString.toLowerCase() == name.toLowerCase()).getOrElse(Unknown)
