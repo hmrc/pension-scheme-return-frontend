@@ -17,9 +17,10 @@
 package navigation.nonsipp
 
 import controllers.routes
+import models.NormalMode
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
+import pages.nonsipp.otherassetsheld._
 import utils.BaseSpec
 
 class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
@@ -33,9 +34,20 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         .navigateToWithData(
           OtherAssetsHeldPage,
           Gen.const(true),
-          (_, _) => routes.UnauthorisedController.onPageLoad()
+          (_, _) => controllers.nonsipp.otherassetsheld.routes.WhatYouWillNeedOtherAssetsController.onPageLoad(srn)
         )
-        .withName("go from other assets held page to unauthorised page when yes selected")
+        .withName("go from other assets held page to WhatYouWillNeedOtherAssets page when yes selected")
+    )
+
+    act.like(
+      normalmode
+        .navigateTo(
+          WhatYouWillNeedOtherAssetsPage,
+          (srn, _) => controllers.routes.UnauthorisedController.onPageLoad()
+        )
+        .withName(
+          "go from WhatYouWillNeedOtherAssets page to Unauthorised page"
+        )
     )
 
     act.like(

@@ -16,11 +16,11 @@
 
 package navigation.nonsipp
 
-import controllers.routes
-import models.UserAnswers
+import eu.timepit.refined.refineMV
+import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
+import pages.nonsipp.otherassetsheld._
 import play.api.mvc.Call
 
 object OtherAssetsHeldNavigator extends JourneyNavigator {
@@ -28,10 +28,13 @@ object OtherAssetsHeldNavigator extends JourneyNavigator {
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
     case page @ OtherAssetsHeldPage(srn) =>
       if (userAnswers.get(page).contains(true)) {
-        routes.UnauthorisedController.onPageLoad()
+        controllers.nonsipp.otherassetsheld.routes.WhatYouWillNeedOtherAssetsController.onPageLoad(srn)
       } else {
         controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
       }
+
+    case WhatYouWillNeedOtherAssetsPage(srn) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
   }
 
   override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] = _ => _ => PartialFunction.empty
