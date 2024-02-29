@@ -29,7 +29,7 @@ import scala.util.Try
 
 case class WhatIsOtherAssetPage(srn: Srn, index: Max5000) extends QuestionPage[String] {
 
-  override def path: JsPath = Paths.otherAssetTransactions \ toString \ index.arrayIndex.toString
+  override def path: JsPath = Paths.otherAssetsTransactions \ toString \ index.arrayIndex.toString
 
   override def toString: String = "assetDescription"
 }
