@@ -15,6 +15,7 @@
 ->          /                                                                           sharesdisposal.Routes
 ->          /                                                                           unregulatedorconnectedbonds.Routes
 ->          /                                                                           bondsdisposal.Routes
+->          /                                                                           otherassetsheld.Routes
 
 GET         /                                                                           controllers.IndexController.onPageLoad()
 
@@ -177,11 +178,6 @@ GET         /:srn/fees-commissions-wages-salaries                               
 POST        /:srn/fees-commissions-wages-salaries                                       controllers.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 GET         /:srn/change-fees-commissions-wages-salaries                                controllers.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST        /:srn/change-fees-commissions-wages-salaries                                controllers.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesController.onSubmit(srn: Srn, mode: Mode = CheckMode)
-
-GET         /:srn/other-assets-held                                                     controllers.nonsipp.otherassetsheld.OtherAssetsHeldController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
-POST        /:srn/other-assets-held                                                     controllers.nonsipp.otherassetsheld.OtherAssetsHeldController.onSubmit(srn: Srn, mode: Mode = NormalMode)
-GET         /:srn/change-other-assets-held                                              controllers.nonsipp.otherassetsheld.OtherAssetsHeldController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
-POST        /:srn/change-other-assets-held                                              controllers.nonsipp.otherassetsheld.OtherAssetsHeldController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
 GET         /:srn/return-submitted                                                      controllers.nonsipp.ReturnSubmittedController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 
