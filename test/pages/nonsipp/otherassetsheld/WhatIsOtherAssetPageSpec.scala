@@ -14,14 +14,20 @@
  * limitations under the License.
  */
 
-package viewmodels.models
+package pages.nonsipp.otherassetsheld
 
-import viewmodels.DisplayMessage.Message
+import controllers.TestValues
+import eu.timepit.refined.refineMV
+import pages.behaviours.PageBehaviours
 
-case class TextAreaViewModel(
-  rows: Int = 5,
-  hint: Option[Message] = None
-) {
-  def withHint(message: Message): TextAreaViewModel =
-    copy(hint = Some(message))
+class WhatIsOtherAssetPageSpec extends PageBehaviours with TestValues {
+
+  "WhatIsOtherAssetPage" - {
+
+    beRetrievable[String](WhatIsOtherAssetPage(srn, refineMV(1)))
+
+    beSettable[String](WhatIsOtherAssetPage(srn, refineMV(1)))
+
+    beRemovable[String](WhatIsOtherAssetPage(srn, refineMV(1)))
+  }
 }

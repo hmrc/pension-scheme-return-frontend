@@ -14,14 +14,9 @@
  * limitations under the License.
  */
 
-package viewmodels.models
+package pages.nonsipp.otherassetsheld
 
-import viewmodels.DisplayMessage.Message
+import models.SchemeId.Srn
+import pages.Page
 
-case class TextAreaViewModel(
-  rows: Int = 5,
-  hint: Option[Message] = None
-) {
-  def withHint(message: Message): TextAreaViewModel =
-    copy(hint = Some(message))
-}
+case class WhatYouWillNeedOtherAssetsPage(srn: Srn) extends Page

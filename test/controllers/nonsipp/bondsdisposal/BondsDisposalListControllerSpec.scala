@@ -23,7 +23,13 @@ import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
 import models.{NormalMode, SchemeHoldBond}
 import pages.nonsipp.shares.SharesCompleted
-import pages.nonsipp.unregulatedorconnectedbonds.{BondsCompleted, CostOfBondsPage, IncomeFromBondsPage, NameOfBondsPage, WhyDoesSchemeHoldBondsPage}
+import pages.nonsipp.unregulatedorconnectedbonds.{
+  BondsCompleted,
+  CostOfBondsPage,
+  IncomeFromBondsPage,
+  NameOfBondsPage,
+  WhyDoesSchemeHoldBondsPage
+}
 import viewmodels.models.SectionCompleted
 import views.html.ListRadiosView
 

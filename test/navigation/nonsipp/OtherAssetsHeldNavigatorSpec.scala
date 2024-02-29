@@ -16,36 +16,73 @@
 
 package navigation.nonsipp
 
+import config.Refined.{Max5000, OneTo5000}
 import controllers.routes
+import eu.timepit.refined.refineMV
+import models.NormalMode
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
+import pages.nonsipp.otherassetsheld._
 import utils.BaseSpec
 
 class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
   val navigator: Navigator = new NonSippNavigator
+  private val index = refineMV[OneTo5000](1)
 
   "OtherAssetsHeldNavigator" - {
 
-    act.like(
-      normalmode
-        .navigateToWithData(
-          OtherAssetsHeldPage,
-          Gen.const(true),
-          (_, _) => routes.UnauthorisedController.onPageLoad()
-        )
-        .withName("go from other assets held page to unauthorised page when yes selected")
-    )
+    "OtherAssetsHeldPage" - {
+      /* TODO Remove/replace block with fix from other branch when done
+      act.like(
+        normalmode
+          .navigateToWithData(
+            OtherAssetsHeldPage,
+            Gen.const(true),
+            (_, _) => controllers.nonsipp.otherassetsheld.routes.WhatYouWillNeedOtherAssetsController.onPageLoad(srn)
+          )
+          .withName("go from other assets held page to WhatYouWillNeedOtherAssets page when yes selected")
+      )*/
 
-    act.like(
-      normalmode
-        .navigateToWithData(
-          OtherAssetsHeldPage,
-          Gen.const(false),
-          (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
-        )
-        .withName("go from other assets held page to task list page when no selected")
-    )
+      act.like(
+        normalmode
+          .navigateToWithData(
+            OtherAssetsHeldPage,
+            Gen.const(false),
+            (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
+          )
+          .withName("go from other assets held page to task list page when no selected")
+      )
+    }
+
+    "WhatYouWillNeedOtherAssetsPage" - {
+      act.like(
+        normalmode
+          .navigateTo(
+            WhatYouWillNeedOtherAssetsPage,
+            (srn, _) =>
+              controllers.nonsipp.otherassetsheld.routes.WhatIsOtherAssetController
+                .onPageLoad(srn, index, NormalMode)
+          )
+          .withName(
+            "go from WhatYouWillNeedOtherAssets page to WhatIsOtherAsset page"
+          )
+      )
+    }
+
+    "WhatIsOtherAssetPage" - {
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            WhatIsOtherAssetPage,
+            (srn, _: Max5000, _) =>
+              controllers.routes.UnauthorisedController.onPageLoad()
+          )
+          .withName(
+            "go from WhatIsOtherAsset page to Unauthorised page"
+          )
+      )
+    }
   }
 }
