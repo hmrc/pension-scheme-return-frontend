@@ -5,3 +5,12 @@ POST        /:srn/change-other-assets-held                                      
 
 GET         /:srn/what-you-will-need-other-assets                                       controllers.nonsipp.otherassetsheld.WhatYouWillNeedOtherAssetsController.onPageLoad(srn: Srn)
 GET         /:srn/submit-what-you-will-need-other-assets                                controllers.nonsipp.otherassetsheld.WhatYouWillNeedOtherAssetsController.onSubmit(srn: Srn)
+
+GET         /:srn/what-is-other-asset                                                   controllers.nonsipp.otherassetsheld.WhatIsOtherAssetController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
+GET         /:srn/what-is-other-asset/:index                                            controllers.nonsipp.otherassetsheld.WhatIsOtherAssetController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/what-is-other-asset                                                   controllers.nonsipp.otherassetsheld.WhatIsOtherAssetController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
+POST        /:srn/what-is-other-asset/:index                                            controllers.nonsipp.otherassetsheld.WhatIsOtherAssetController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/change-what-is-other-asset                                            controllers.nonsipp.otherassetsheld.WhatIsOtherAssetController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
+GET         /:srn/change-what-is-other-asset/:index                                     controllers.nonsipp.otherassetsheld.WhatIsOtherAssetController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-what-is-other-asset                                            controllers.nonsipp.otherassetsheld.WhatIsOtherAssetController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
+POST        /:srn/change-what-is-other-asset/:index                                     controllers.nonsipp.otherassetsheld.WhatIsOtherAssetController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)

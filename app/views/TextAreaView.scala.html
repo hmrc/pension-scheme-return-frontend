@@ -33,9 +33,16 @@
         }
 
         @defining(
-            TextareaViewModel("value", form("value").value)
+            if(viewmodel.page.hint) {
+                TextareaViewModel("value", form("value").value)
                 .withLabelAsHeading(renderMessage(viewmodel.heading))
                 .withRows(viewmodel.page.rows)
+                .withHint(HintViewModel(renderMessage(viewmodel.page.hint.get)))
+            } else {
+                TextareaViewModel("value", form("value").value)
+                .withLabelAsHeading(renderMessage(viewmodel.heading))
+                .withRows(viewmodel.page.rows)
+            }
         ) { component =>
             @govukTextarea(
                 form("value").errors.headOption.fold(component)(error =>

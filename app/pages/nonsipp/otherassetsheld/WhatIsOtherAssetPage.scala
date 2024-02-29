@@ -14,14 +14,22 @@
  * limitations under the License.
  */
 
-package viewmodels.models
+package pages.nonsipp.otherassetsheld
 
-import viewmodels.DisplayMessage.Message
+import config.Refined.Max5000
+import models.SchemeId.Srn
+import models.UserAnswers
+import pages.QuestionPage
+import play.api.libs.json.JsPath
+import queries.Removable
+import utils.PageUtils.removePages
+import utils.RefinedUtils.RefinedIntOps
 
-case class TextAreaViewModel(
-  rows: Int = 5,
-  hint: Option[Message] = None
-) {
-  def withHint(message: Message): TextAreaViewModel =
-    copy(hint = Some(message))
+import scala.util.Try
+
+case class WhatIsOtherAssetPage(srn: Srn, index: Max5000) extends QuestionPage[String] {
+
+  override def path: JsPath = Paths.otherAssetTransactions \ toString \ index.arrayIndex.toString
+
+  override def toString: String = "assetDescription"
 }

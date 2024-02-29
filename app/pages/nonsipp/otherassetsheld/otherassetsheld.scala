@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package viewmodels.models
+package pages.nonsipp
 
-import viewmodels.DisplayMessage.Message
+import play.api.libs.json.{__, JsPath}
 
-case class TextAreaViewModel(
-  rows: Int = 5,
-  hint: Option[Message] = None
-) {
-  def withHint(message: Message): TextAreaViewModel =
-    copy(hint = Some(message))
+package object otherassetsheld {
+
+  object Paths {
+    val otherAssets: JsPath = __ \ "otherAssets"
+    val otherAssetTransactions: JsPath = otherAssets \ "otherAssetTransactions"
+  }
+
 }
