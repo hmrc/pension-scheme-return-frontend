@@ -2789,3 +2789,10 @@ otherAssets.whatIsOtherAsset.hint = Provide a short description of the asset. Yo
 otherAssets.whatIsOtherAsset.error.required = Enter a description of the asset
 otherAssets.whatIsOtherAsset.error.length = Description of the asset must be 160 characters or fewer
 otherAssets.whatIsOtherAsset.error.invalid = Description of the asset must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+
+otherAssets.tangibleMoveableProperty.title = Is the asset tangible moveable property?
+otherAssets.tangibleMoveableProperty.heading = Is the asset tangible moveable property?
+otherAssets.tangibleMoveableProperty.content = What is tangible moveable property?
+otherAssets.tangibleMoveableProperty.paragraph.link = Tangible moveable property (opens in new tab)
+otherAssets.tangibleMoveableProperty.paragraph = means things that can be touched and moved. For example, art, antiques, classic cars and plant and machinery.
+otherAssets.tangibleMoveableProperty.error.required = Select yes if the asset is tangible moveable property
