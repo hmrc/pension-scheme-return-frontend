@@ -16,7 +16,6 @@
 
 package navigation.nonsipp
 
-import cats.implicits.toTraverseOps
 import config.Refined.Max5000
 import eu.timepit.refined.refineMV
 import models.{NormalMode, UserAnswers}
@@ -39,6 +38,10 @@ object OtherAssetsHeldNavigator extends JourneyNavigator {
       controllers.nonsipp.otherassetsheld.routes.WhatIsOtherAssetController.onPageLoad(srn, refineMV(1), NormalMode)
 
     case WhatIsOtherAssetPage(srn, index) =>
+      controllers.nonsipp.otherassetsheld.routes.IsAssetTangibleMoveablePropertyController
+        .onPageLoad(srn, index, NormalMode)
+
+    case IsAssetTangibleMoveablePropertyPage(srn, index) =>
       controllers.routes.UnauthorisedController.onPageLoad()
   }
 
