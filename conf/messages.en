@@ -495,6 +495,19 @@ sharesSeller.companyRecipientCrn.no.conditional.error.invalid = The reason you c
 sharesSeller.companyRecipientCrn.no.conditional.error.length = The reason you cannot provide the company’s CRN must be 160 characters or fewer
 sharesSeller.companyRecipientCrn.error.required = Select yes if you know the company’s Company Registration Number (CRN)
 
+otherAssetSeller.companyRecipientCrn.title = Do you know the seller’s Company Registration Number (CRN)?
+otherAssetSeller.companyRecipientCrn.heading = Do you know {0}’s Company Registration Number (CRN)?
+otherAssetSeller.companyRecipientCrn.hint = This is 8 characters, like AB123456. It may also be called ‘company number’ or ‘Companies House number’.
+otherAssetSeller.companyRecipientCrn.yes.conditional = What is {0}’s CRN?
+otherAssetSeller.companyRecipientCrn.yes.conditional.error.required = Enter the seller’s CRN
+otherAssetSeller.companyRecipientCrn.yes.conditional.error.length = CRN must be 8 characters
+otherAssetSeller.companyRecipientCrn.yes.conditional.error.invalid = CRN must only include letters and numbers
+otherAssetSeller.companyRecipientCrn.no.conditional = Tell us why you cannot provide {0}’s CRN
+otherAssetSeller.companyRecipientCrn.no.conditional.error.required = Enter the reason you cannot provide the seller’s CRN
+otherAssetSeller.companyRecipientCrn.no.conditional.error.invalid = The reason you cannot provide the seller’s CRN must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+otherAssetSeller.companyRecipientCrn.no.conditional.error.length = The reason you cannot provide the seller’s CRN must be 160 characters or fewer
+otherAssetSeller.companyRecipientCrn.error.required = Select yes if you know the seller’s Company Registration Number (CRN)
+
 shares.classOfShares.title = What is the class of the shares held in this company?
 shares.classOfShares.heading = What is the class of the shares held in {0}?
 shares.classOfShares.error.required = Enter the class of the shares held in this company
@@ -1227,6 +1240,17 @@ sharesSeller.partnershipRecipientUtr.no.conditional.error.invalid = The reason y
 sharesSeller.partnershipRecipientUtr.no.conditional.error.length = The reason you cannot provide the seller’s UTR must be 160 characters or fewer
 sharesSeller.partnershipRecipientUtr.error.required = Select yes if you know the seller’s Unique Taxpayer Reference (UTR)
 
+otherAssetSeller.partnershipRecipientUtr.title = Do you know the seller’s Unique Taxpayer Reference (UTR)?
+otherAssetSeller.partnershipRecipientUtr.heading = Do you know {0}’s Unique Taxpayer Reference (UTR)?
+otherAssetSeller.partnershipRecipientUtr.yes.conditional = What is {0}’s UTR?
+otherAssetSeller.partnershipRecipientUtr.yes.conditional.error.required = Enter the seller’s UTR
+otherAssetSeller.partnershipRecipientUtr.yes.conditional.error.invalid = Enter a Unique Taxpayer Reference that is 10 numbers, like 1234567890 or 12345 67890
+otherAssetSeller.partnershipRecipientUtr.no.conditional = Tell us why you cannot provide {0}’s UTR
+otherAssetSeller.partnershipRecipientUtr.no.conditional.error.required = Enter the reason you cannot provide the seller’s UTR
+otherAssetSeller.partnershipRecipientUtr.no.conditional.error.invalid = The reason you cannot provide the seller’s UTR must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+otherAssetSeller.partnershipRecipientUtr.no.conditional.error.length = The reason you cannot provide the seller’s UTR must be 160 characters or fewer
+otherAssetSeller.partnershipRecipientUtr.error.required = Select yes if you know the seller’s Unique Taxpayer Reference (UTR)
+
 recipientSponsoringEmployerConnectedParty.title = Is the recipient a sponsoring employer or a connected party?
 recipientSponsoringEmployerConnectedParty.heading = Is {0} a sponsoring employer or a connected party?
 recipientSponsoringEmployerConnectedParty.option1 = Sponsoring employer
@@ -1575,6 +1599,16 @@ sharesSeller.otherRecipientDetails.name.error.invalid = Seller’s name must onl
 sharesSeller.otherRecipientDetails.name.error.length = Seller’s name must be 160 characters or fewer
 sharesSeller.otherRecipientDetails.description.error.invalid = The description of the seller must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
 sharesSeller.otherRecipientDetails.description.error.length = The description of the seller must be 35 characters or fewer
+
+otherAssetSeller.otherRecipientDetails.title = Seller’s details
+otherAssetSeller.otherRecipientDetails.heading = Seller’s details for shares in {0}
+otherAssetSeller.otherRecipientDetails.name = Seller’s name
+otherAssetSeller.otherRecipientDetails.description = Brief description of seller (optional)
+otherAssetSeller.otherRecipientDetails.name.error.required = Enter the seller’s name
+otherAssetSeller.otherRecipientDetails.name.error.invalid = Seller’s name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+otherAssetSeller.otherRecipientDetails.name.error.length = Seller’s name must be 160 characters or fewer
+otherAssetSeller.otherRecipientDetails.description.error.invalid = The description of the seller must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+otherAssetSeller.otherRecipientDetails.description.error.length = The description of the seller must be 35 characters or fewer
 
 partnershipSellerName.title = What is the seller’s partnership name?
 partnershipSellerName.heading = What is the seller’s partnership name?
