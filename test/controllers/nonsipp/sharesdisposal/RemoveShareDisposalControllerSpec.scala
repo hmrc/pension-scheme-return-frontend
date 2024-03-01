@@ -40,7 +40,7 @@ class RemoveShareDisposalControllerSpec extends ControllerBaseSpec {
   private lazy val onPageLoad = routes.RemoveShareDisposalController.onPageLoad(srn, index, disposalIndex, NormalMode)
   private lazy val onSubmit = routes.RemoveShareDisposalController.onSubmit(srn, index, disposalIndex, NormalMode)
 
-  private implicit val mockPsrSubmissionService = mock[PsrSubmissionService]
+  private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
 
   private val userAnswers = defaultUserAnswers
     .unsafeSet(CompanyNameRelatedSharesPage(srn, index), companyName)

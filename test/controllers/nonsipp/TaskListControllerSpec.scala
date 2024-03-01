@@ -55,13 +55,13 @@ import pages.nonsipp.schemedesignatory.{
   ValueOfAssetsPage
 }
 import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
-import pages.nonsipp.sharesdisposal.SharesDisposalPage
+import pages.nonsipp.sharesdisposal.{SharesDisposalCompletedPage, SharesDisposalPage}
 import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
 import pages.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldPage
 import play.api.inject
 import play.api.inject.guice.GuiceableModule
 import services.SchemeDateService
-import viewmodels.models.TaskListStatus
+import viewmodels.models.{SectionCompleted, TaskListStatus}
 import viewmodels.models.TaskListStatus.TaskListStatus
 import views.html.TaskListView
 
@@ -655,7 +655,21 @@ class TaskListControllerSpec extends ControllerBaseSpec {
       }
 
       "completed (with at least one completed shares disposal)" in {
-        //TODO: dependent on SharesDisposalList and SharesDisposalCYA implementations
+        val userAnswersWithData = defaultUserAnswers
+          .unsafeSet(SharesDisposalPage(srn), true)
+          .unsafeSet(SharesDisposalCompletedPage(srn, refineMV(1), refineMV(1)), SectionCompleted)
+
+        testViewModel(
+          userAnswersWithData,
+          4,
+          1,
+          expectedStatus = TaskListStatus.Completed,
+          expectedTitleKey = "nonsipp.tasklist.shares.title",
+          expectedLinkContentKey = "nonsipp.tasklist.sharesdisposal.change.title",
+          expectedLinkUrl = controllers.nonsipp.sharesdisposal.routes.SharesDisposalListController
+            .onPageLoad(srn, 1)
+            .url
+        )
       }
     }
 

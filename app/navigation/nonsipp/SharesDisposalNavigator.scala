@@ -16,6 +16,8 @@
 
 package navigation.nonsipp
 
+import cats.implicits.toTraverseOps
+import config.Refined.Max50
 import models.PointOfEntry._
 import models.{CheckMode, HowSharesDisposed, IdentityType, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
@@ -29,22 +31,20 @@ object SharesDisposalNavigator extends JourneyNavigator {
 
     case WhoWereTheSharesSoldToPage(srn, index, disposalIndex) =>
       userAnswers.get(WhoWereTheSharesSoldToPage(srn, index, disposalIndex)) match {
-
         case Some(IdentityType.Individual) =>
           controllers.nonsipp.sharesdisposal.routes.SharesIndividualBuyerNameController
             .onPageLoad(srn, index, disposalIndex, NormalMode)
-
         case Some(IdentityType.UKCompany) =>
           controllers.nonsipp.sharesdisposal.routes.CompanyNameOfSharesBuyerController
             .onPageLoad(srn, index, disposalIndex, NormalMode)
-
         case Some(IdentityType.UKPartnership) =>
           controllers.nonsipp.sharesdisposal.routes.PartnershipBuyerNameController
             .onPageLoad(srn, index, disposalIndex, NormalMode)
-
         case Some(IdentityType.Other) =>
           controllers.nonsipp.sharesdisposal.routes.OtherBuyerDetailsController
             .onPageLoad(srn, index, disposalIndex, NormalMode)
+        case None =>
+          controllers.routes.JourneyRecoveryController.onPageLoad()
       }
 
     case RemoveShareDisposalPage(srn, index, disposalIndex) =>
@@ -101,13 +101,21 @@ object SharesDisposalNavigator extends JourneyNavigator {
         .onPageLoad(srn, page = 1)
 
     case page @ SharesDisposalListPage(srn, shareIndex, disposalIndex) =>
-      controllers.nonsipp.sharesdisposal.routes.HowWereSharesDisposedController
-        .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
+      (
+        for {
+          indexes <- userAnswers
+            .map(SharesDisposalCompleted.all(srn, shareIndex))
+            .keys
+            .toList
+            .traverse(_.toIntOption)
+            .getOrRecoverJourney
+          nextIndex <- findNextOpenIndex[Max50.Refined](indexes).getOrRecoverJourney
+        } yield controllers.nonsipp.sharesdisposal.routes.HowWereSharesDisposedController
+          .onPageLoad(srn, shareIndex, nextIndex, NormalMode)
+      ).merge
 
     case page @ HowWereSharesDisposedPage(srn, shareIndex, disposalIndex, _) =>
       userAnswers.get(page) match {
-        case None =>
-          controllers.routes.JourneyRecoveryController.onPageLoad()
         case Some(HowSharesDisposed.Sold) =>
           controllers.nonsipp.sharesdisposal.routes.WhenWereSharesSoldController
             .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
@@ -117,6 +125,8 @@ object SharesDisposalNavigator extends JourneyNavigator {
         case Some(HowSharesDisposed.Transferred) | Some(HowSharesDisposed.Other(_)) =>
           controllers.nonsipp.sharesdisposal.routes.HowManySharesController
             .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
+        case None =>
+          controllers.routes.JourneyRecoveryController.onPageLoad()
       }
 
     case WhenWereSharesSoldPage(srn, shareIndex, disposalIndex) =>
@@ -168,8 +178,6 @@ object SharesDisposalNavigator extends JourneyNavigator {
 
         case page @ HowWereSharesDisposedPage(srn, shareIndex, disposalIndex, _) => //c
           userAnswers.get(page) match {
-            case None =>
-              controllers.routes.JourneyRecoveryController.onPageLoad()
             case Some(HowSharesDisposed.Sold) =>
               controllers.nonsipp.sharesdisposal.routes.WhenWereSharesSoldController //d
                 .onPageLoad(srn, shareIndex, disposalIndex, CheckMode)
@@ -179,6 +187,8 @@ object SharesDisposalNavigator extends JourneyNavigator {
             case Some(HowSharesDisposed.Transferred) | Some(HowSharesDisposed.Other(_)) =>
               controllers.nonsipp.sharesdisposal.routes.SharesDisposalCYAController
                 .onPageLoad(srn, shareIndex, disposalIndex, NormalMode)
+            case None =>
+              controllers.routes.JourneyRecoveryController.onPageLoad()
           }
 
         case WhenWereSharesSoldPage(srn, shareIndex, disposalIndex) => //d
@@ -189,6 +199,8 @@ object SharesDisposalNavigator extends JourneyNavigator {
             case Some(HowWereSharesDisposedPointOfEntry) =>
               controllers.nonsipp.sharesdisposal.routes.HowManySharesSoldController //e
                 .onPageLoad(srn, shareIndex, disposalIndex, CheckMode)
+            case _ =>
+              controllers.routes.JourneyRecoveryController.onPageLoad()
           }
 
         case HowManySharesSoldPage(srn, shareIndex, disposalIndex) => //e
@@ -199,6 +211,8 @@ object SharesDisposalNavigator extends JourneyNavigator {
             case Some(HowWereSharesDisposedPointOfEntry) =>
               controllers.nonsipp.sharesdisposal.routes.TotalConsiderationSharesSoldController //f
                 .onPageLoad(srn, shareIndex, disposalIndex, CheckMode)
+            case _ =>
+              controllers.routes.JourneyRecoveryController.onPageLoad()
           }
 
         case TotalConsiderationSharesSoldPage(srn, shareIndex, disposalIndex) => //f
@@ -209,6 +223,8 @@ object SharesDisposalNavigator extends JourneyNavigator {
             case Some(HowWereSharesDisposedPointOfEntry) =>
               controllers.nonsipp.sharesdisposal.routes.WhoWereTheSharesSoldToController //g
                 .onPageLoad(srn, shareIndex, disposalIndex, CheckMode)
+            case _ =>
+              controllers.routes.JourneyRecoveryController.onPageLoad()
           }
 
         case WhoWereTheSharesSoldToPage(srn, shareIndex, disposalIndex) => //g
@@ -226,6 +242,8 @@ object SharesDisposalNavigator extends JourneyNavigator {
             case Some(IdentityType.Other) =>
               controllers.nonsipp.sharesdisposal.routes.OtherBuyerDetailsController //k
                 .onPageLoad(srn, shareIndex, disposalIndex, CheckMode)
+            case None =>
+              controllers.routes.JourneyRecoveryController.onPageLoad()
           }
 
         case SharesIndividualBuyerNamePage(srn, shareIndex, disposalIndex) => //h
@@ -236,6 +254,8 @@ object SharesDisposalNavigator extends JourneyNavigator {
             case Some(HowWereSharesDisposedPointOfEntry) | Some(WhoWereTheSharesSoldToPointOfEntry) =>
               controllers.nonsipp.sharesdisposal.routes.IndividualBuyerNinoNumberController //h1
                 .onPageLoad(srn, shareIndex, disposalIndex, CheckMode)
+            case _ =>
+              controllers.routes.JourneyRecoveryController.onPageLoad()
           }
 
         case CompanyBuyerNamePage(srn, shareIndex, disposalIndex) => //i
@@ -246,6 +266,8 @@ object SharesDisposalNavigator extends JourneyNavigator {
             case Some(HowWereSharesDisposedPointOfEntry) | Some(WhoWereTheSharesSoldToPointOfEntry) =>
               controllers.nonsipp.sharesdisposal.routes.CompanyBuyerCrnController //i1
                 .onPageLoad(srn, shareIndex, disposalIndex, CheckMode)
+            case _ =>
+              controllers.routes.JourneyRecoveryController.onPageLoad()
           }
 
         case PartnershipBuyerNamePage(srn, shareIndex, disposalIndex) => //j
@@ -256,6 +278,8 @@ object SharesDisposalNavigator extends JourneyNavigator {
             case Some(HowWereSharesDisposedPointOfEntry) | Some(WhoWereTheSharesSoldToPointOfEntry) =>
               controllers.nonsipp.sharesdisposal.routes.PartnershipBuyerUtrController //j1
                 .onPageLoad(srn, shareIndex, disposalIndex, CheckMode)
+            case _ =>
+              controllers.routes.JourneyRecoveryController.onPageLoad()
           }
 
         case OtherBuyerDetailsPage(srn, shareIndex, disposalIndex) => //k
@@ -266,6 +290,8 @@ object SharesDisposalNavigator extends JourneyNavigator {
             case Some(HowWereSharesDisposedPointOfEntry) =>
               controllers.nonsipp.sharesdisposal.routes.IsBuyerConnectedPartyController //o
                 .onPageLoad(srn, shareIndex, disposalIndex, CheckMode)
+            case _ =>
+              controllers.routes.JourneyRecoveryController.onPageLoad()
           }
 
         case IndividualBuyerNinoNumberPage(srn, shareIndex, disposalIndex) => //h1
@@ -276,6 +302,8 @@ object SharesDisposalNavigator extends JourneyNavigator {
             case Some(HowWereSharesDisposedPointOfEntry) =>
               controllers.nonsipp.sharesdisposal.routes.IsBuyerConnectedPartyController //o
                 .onPageLoad(srn, shareIndex, disposalIndex, CheckMode)
+            case _ =>
+              controllers.routes.JourneyRecoveryController.onPageLoad()
           }
 
         case CompanyBuyerCrnPage(srn, shareIndex, disposalIndex) => //i1
@@ -286,6 +314,8 @@ object SharesDisposalNavigator extends JourneyNavigator {
             case Some(HowWereSharesDisposedPointOfEntry) =>
               controllers.nonsipp.sharesdisposal.routes.IsBuyerConnectedPartyController //o
                 .onPageLoad(srn, shareIndex, disposalIndex, CheckMode)
+            case _ =>
+              controllers.routes.JourneyRecoveryController.onPageLoad()
           }
 
         case PartnershipBuyerUtrPage(srn, shareIndex, disposalIndex) => //j1
@@ -296,6 +326,8 @@ object SharesDisposalNavigator extends JourneyNavigator {
             case Some(HowWereSharesDisposedPointOfEntry) =>
               controllers.nonsipp.sharesdisposal.routes.IsBuyerConnectedPartyController //o
                 .onPageLoad(srn, shareIndex, disposalIndex, CheckMode)
+            case _ =>
+              controllers.routes.JourneyRecoveryController.onPageLoad()
           }
 
         case IsBuyerConnectedPartyPage(srn, shareIndex, disposalIndex) => //o
@@ -306,6 +338,8 @@ object SharesDisposalNavigator extends JourneyNavigator {
             case Some(HowWereSharesDisposedPointOfEntry) =>
               controllers.nonsipp.sharesdisposal.routes.IndependentValuationController //p
                 .onPageLoad(srn, shareIndex, disposalIndex, CheckMode)
+            case _ =>
+              controllers.routes.JourneyRecoveryController.onPageLoad()
           }
 
         case IndependentValuationPage(srn, shareIndex, disposalIndex) => //p
@@ -320,6 +354,8 @@ object SharesDisposalNavigator extends JourneyNavigator {
             case Some(HowWereSharesDisposedPointOfEntry) =>
               controllers.nonsipp.sharesdisposal.routes.HowManySharesRedeemedController //m
                 .onPageLoad(srn, shareIndex, disposalIndex, CheckMode)
+            case _ =>
+              controllers.routes.JourneyRecoveryController.onPageLoad()
           }
 
         case HowManySharesRedeemedPage(srn, shareIndex, disposalIndex) => //m
@@ -330,6 +366,8 @@ object SharesDisposalNavigator extends JourneyNavigator {
             case Some(HowWereSharesDisposedPointOfEntry) =>
               controllers.nonsipp.sharesdisposal.routes.TotalConsiderationSharesRedeemedController //n
                 .onPageLoad(srn, shareIndex, disposalIndex, CheckMode)
+            case _ =>
+              controllers.routes.JourneyRecoveryController.onPageLoad()
           }
 
         case TotalConsiderationSharesRedeemedPage(srn, shareIndex, disposalIndex) => //n
