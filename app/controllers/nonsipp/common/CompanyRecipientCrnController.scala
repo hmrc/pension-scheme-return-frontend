@@ -28,6 +28,7 @@ import navigation.Navigator
 import pages.nonsipp.common.CompanyRecipientCrnPage
 import pages.nonsipp.landorproperty.CompanySellerNamePage
 import pages.nonsipp.loansmadeoroutstanding.CompanyRecipientNamePage
+import pages.nonsipp.otherassetsheld.CompanyNameOfOtherAssetSellerPage
 import pages.nonsipp.shares.CompanyNameOfSharesSellerPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -123,6 +124,11 @@ object CompanyRecipientCrnController {
         }
       case IdentitySubject.SharesSeller =>
         userAnswers.get(CompanyNameOfSharesSellerPage(srn, index)) match {
+          case Some(value) => value
+          case None => ""
+        }
+      case IdentitySubject.OtherAssetSeller =>
+        userAnswers.get(CompanyNameOfOtherAssetSellerPage(srn, index)) match {
           case Some(value) => value
           case None => ""
         }
