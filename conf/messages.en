@@ -742,6 +742,30 @@ sharesDisposal.cya.details = details
 sharesDisposal.change.title = Change details of the disposal of shares in this company
 sharesDisposal.change.heading = Change details of the disposal of shares in {0}
 
+sharesDisposal.reportedSharesDisposalList.title = You have reported {0} share disposal
+sharesDisposal.reportedSharesDisposalList.title.plural = You have reported {0} share disposals
+sharesDisposal.reportedSharesDisposalList.heading = You have reported {0} share disposal
+sharesDisposal.reportedSharesDisposalList.heading.plural = You have reported {0} share disposals
+sharesDisposal.reportedSharesDisposalList.row = Disposal of {0} in {1} by {2}
+sharesDisposal.reportedSharesDisposalList.row.change.hidden = details of the disposal of {0} in {1} by {2}
+sharesDisposal.reportedSharesDisposalList.row.remove.hidden = the disposal of {0} in {1} by {2} from the list
+sharesDisposal.reportedSharesDisposalList.description = You must tell us about all shares in a sponsoring employer, shares acquired from a connected party, or unquoted shares disposed of by the scheme during the period of this return.
+sharesDisposal.reportedSharesDisposalList.radios = Do you need to report another share disposal?
+sharesDisposal.reportedSharesDisposalList.inset.maximumReached = You cannot add another share disposal as you have entered the maximum of 5,000.
+sharesDisposal.reportedSharesDisposalList.inset.allSharesDisposed.paragraph1 = You have disposed of all the shares that you told us about.
+sharesDisposal.reportedSharesDisposalList.inset.allSharesDisposed.paragraph2 = If you need to add more shares, go to the ‘Change shares held in a sponsoring employer, acquired from a connected party, or unquoted shares’ section of this return.
+sharesDisposal.reportedSharesDisposalList.pagination.label = Showing {0} - {1} of {2} share disposals
+sharesDisposal.reportedSharesDisposalList.radios.error.required = Select yes if you need to report another share disposal
+
+sharesDisposal.reportedSharesDisposalList.typeOfShares.sponsoringEmployer = shares in a sponsoring employer
+sharesDisposal.reportedSharesDisposalList.typeOfShares.unquoted = unquoted shares
+sharesDisposal.reportedSharesDisposalList.typeOfShares.connectedParty = shares acquired from a connected party
+
+sharesDisposal.reportedSharesDisposalList.methodOfDisposal.sold = sale
+sharesDisposal.reportedSharesDisposalList.methodOfDisposal.redeemed = redemption
+sharesDisposal.reportedSharesDisposalList.methodOfDisposal.transferred = transfer out
+sharesDisposal.reportedSharesDisposalList.methodOfDisposal.other = another method
+
 pensionCommencementLumpSum.title = Did any member receive a pension commencement lump sum (PCLS) during the period of this return?
 pensionCommencementLumpSum.heading = Did any member receive a pension commencement lump sum (PCLS) during the period of this return?
 pensionCommencementLumpSum.error.required = Select yes if any member received a Pension Commencement Lump Sum during the period of this return
