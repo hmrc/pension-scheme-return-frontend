@@ -19,21 +19,21 @@ package controllers.nonsipp.bondsdisposal
 import cats.implicits.toTraverseOps
 import com.google.inject.Inject
 import config.Constants
-import config.Refined.Max5000
+import config.Refined.{Max50, Max5000}
 import config.Refined.Max5000.enumerable
 import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
 import controllers.nonsipp.bondsdisposal.BondsDisposalListController._
+import eu.timepit.refined.{refineMV, refineV}
 import forms.RadioListFormProvider
 import models.SchemeId.Srn
 import models.requests.DataRequest
-import models.{Mode, Money, Pagination, SchemeHoldBond}
+import models.{Mode, Money, Pagination, SchemeHoldBond, UserAnswers}
 import navigation.Navigator
-import pages.nonsipp.bondsdisposal.BondsDisposalListPage
+import pages.nonsipp.bondsdisposal.{BondsDisposalCompletedPages, BondsDisposalListPage}
 import pages.nonsipp.unregulatedorconnectedbonds.{
   BondsCompleted,
   CostOfBondsPage,
-  IncomeFromBondsPage,
   NameOfBondsPage,
   WhyDoesSchemeHoldBondsPage
 }
@@ -86,13 +86,18 @@ class BondsDisposalListController @Inject()(
           }.merge
         },
         answer =>
-          Redirect(
-            navigator.nextPage(
-              BondsDisposalListPage(srn, answer),
-              mode,
-              request.userAnswers
+          BondsDisposalListController
+            .getDisposal(srn, answer, request.userAnswers, isNextDisposal = true)
+            .getOrRecoverJourney(
+              nextDisposal =>
+                Redirect(
+                  navigator.nextPage(
+                    BondsDisposalListPage(srn, answer, nextDisposal),
+                    mode,
+                    request.userAnswers
+                  )
+                )
             )
-          )
       )
   }
 
@@ -111,6 +116,42 @@ class BondsDisposalListController @Inject()(
 object BondsDisposalListController {
   def form(formProvider: RadioListFormProvider): Form[Max5000] =
     formProvider("bondsDisposalList.error.required")
+
+  private def getDisposal(
+    srn: Srn,
+    bondIndex: Max5000,
+    userAnswers: UserAnswers,
+    isNextDisposal: Boolean
+  ): Option[Max50] =
+    userAnswers.get(BondsDisposalCompletedPages(srn)) match {
+      case None => Some(refineMV[Max50.Refined](1))
+      case Some(completedDisposals) =>
+        /**
+         * Indexes of completed disposals sorted in ascending order.
+         * We -1 from the bond index as the refined indexes is 1-based (e.g. 1 to 5000)
+         * while we are trying to fetch a completed disposal from a Map which is 0-based.
+         * We then +1 when we re-refine the index
+         */
+        val completedDisposalsForBonds: List[Max50] =
+          completedDisposals
+            .get((bondIndex.value - 1).toString)
+            .map(_.keys.toList)
+            .flatMap(_.traverse(_.toIntOption))
+            .flatMap(_.traverse(index => refineV[Max50.Refined](index + 1).toOption))
+            .toList
+            .flatten
+            .sortBy(_.value)
+
+        completedDisposalsForBonds.lastOption match {
+          case None => Some(refineMV[Max50.Refined](1))
+          case Some(lastCompletedDisposalForBonds) =>
+            if (isNextDisposal) {
+              refineV[Max50.Refined](lastCompletedDisposalForBonds.value + 1).toOption
+            } else {
+              Some(lastCompletedDisposalForBonds)
+            }
+        }
+    }
 
   private def buildRows(bondsData: List[BondsDisposalData]): List[ListRadiosRow] =
     bondsData.flatMap { bonds =>

@@ -76,8 +76,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           .navigateToWithIndex(
             index,
             WhatIsOtherAssetPage,
-            (srn, _: Max5000, _) =>
-              controllers.routes.UnauthorisedController.onPageLoad()
+            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
           )
           .withName(
             "go from WhatIsOtherAsset page to Unauthorised page"

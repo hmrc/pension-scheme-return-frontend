@@ -18,14 +18,9 @@ package pages.nonsipp.otherassetsheld
 
 import config.Refined.Max5000
 import models.SchemeId.Srn
-import models.UserAnswers
 import pages.QuestionPage
 import play.api.libs.json.JsPath
-import queries.Removable
-import utils.PageUtils.removePages
 import utils.RefinedUtils.RefinedIntOps
-
-import scala.util.Try
 
 case class WhatIsOtherAssetPage(srn: Srn, index: Max5000) extends QuestionPage[String] {
 

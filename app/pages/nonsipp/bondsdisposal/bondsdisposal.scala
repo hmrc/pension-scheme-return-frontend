@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,15 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.bondsdisposal
+package pages.nonsipp
 
-import config.Refined.{Max50, Max5000}
-import models.SchemeId.Srn
-import pages.Page
+import play.api.libs.json.{__, JsPath}
 
-case class BondsDisposalListPage(srn: Srn, bondIndex: Max5000, disposalIndex: Max50) extends Page
+package object bondsdisposal {
+
+  object Paths {
+    val bonds: JsPath = __ \ "bonds"
+    val bondTransactions: JsPath = bonds \ "bondTransactions"
+    val bondsDisposed: JsPath = bondTransactions \ "bondsDisposed"
+  }
+}

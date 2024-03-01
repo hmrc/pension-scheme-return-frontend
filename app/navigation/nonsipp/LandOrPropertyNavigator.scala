@@ -17,8 +17,8 @@
 package navigation.nonsipp
 
 import cats.implicits.toTraverseOps
-import config.Refined.{Max50, Max5000}
-import eu.timepit.refined.{refineMV, refineV}
+import config.Refined.Max5000
+import eu.timepit.refined.refineMV
 import models.{CheckMode, IdentitySubject, IdentityType, NormalMode, SchemeHoldLandProperty, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
@@ -29,7 +29,6 @@ import pages.nonsipp.common.{
   PartnershipRecipientUtrPage
 }
 import pages.nonsipp.landorproperty._
-import pages.nonsipp.landorpropertydisposal.LandPropertyDisposalCompleted
 import play.api.mvc.Call
 
 object LandOrPropertyNavigator extends JourneyNavigator {
