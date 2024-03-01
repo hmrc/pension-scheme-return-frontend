@@ -19,7 +19,7 @@ package navigation.nonsipp
 import config.Refined.Max5000
 import eu.timepit.refined.refineMV
 import models.SchemeHoldAsset.{Acquisition, Contribution, Transfer}
-import models.{NormalMode, UserAnswers}
+import models.{IdentitySubject, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.otherassetsheld._
@@ -49,11 +49,22 @@ object OtherAssetsHeldNavigator extends JourneyNavigator {
     case WhyDoesSchemeHoldAssetsPage(srn, index) =>
       userAnswers.get(WhyDoesSchemeHoldAssetsPage(srn, index)) match {
         case Some(Acquisition) =>
-          controllers.routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.otherassetsheld.routes.WhenDidSchemeAcquireAssetsController
+            .onPageLoad(srn, index, NormalMode)
         case Some(Contribution) =>
-          controllers.routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.otherassetsheld.routes.WhenDidSchemeAcquireAssetsController
+            .onPageLoad(srn, index, NormalMode)
         case Some(Transfer) =>
           controllers.routes.UnauthorisedController.onPageLoad()
+        case _ =>
+          controllers.routes.UnauthorisedController.onPageLoad()
+      }
+
+    case WhenDidSchemeAcquireAssetsPage(srn, index) =>
+      userAnswers.get(WhyDoesSchemeHoldAssetsPage(srn, index)) match {
+        case Some(Acquisition) =>
+          controllers.nonsipp.common.routes.IdentityTypeController
+            .onPageLoad(srn, index, NormalMode, IdentitySubject.OtherAssetSeller)
         case _ =>
           controllers.routes.UnauthorisedController.onPageLoad()
       }
