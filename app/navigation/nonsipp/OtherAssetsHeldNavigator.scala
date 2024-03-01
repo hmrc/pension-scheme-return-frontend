@@ -18,6 +18,7 @@ package navigation.nonsipp
 
 import config.Refined.Max5000
 import eu.timepit.refined.refineMV
+import models.SchemeHoldAsset.{Acquisition, Contribution, Transfer}
 import models.{NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
@@ -42,7 +43,20 @@ object OtherAssetsHeldNavigator extends JourneyNavigator {
         .onPageLoad(srn, index, NormalMode)
 
     case IsAssetTangibleMoveablePropertyPage(srn, index) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+      controllers.nonsipp.otherassetsheld.routes.WhyDoesSchemeHoldAssetsController
+        .onPageLoad(srn, index, NormalMode)
+
+    case WhyDoesSchemeHoldAssetsPage(srn, index) =>
+      userAnswers.get(WhyDoesSchemeHoldAssetsPage(srn, index)) match {
+        case Some(Acquisition) =>
+          controllers.routes.UnauthorisedController.onPageLoad()
+        case Some(Contribution) =>
+          controllers.routes.UnauthorisedController.onPageLoad()
+        case Some(Transfer) =>
+          controllers.routes.UnauthorisedController.onPageLoad()
+        case _ =>
+          controllers.routes.UnauthorisedController.onPageLoad()
+      }
   }
 
   override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] = _ => _ => PartialFunction.empty
