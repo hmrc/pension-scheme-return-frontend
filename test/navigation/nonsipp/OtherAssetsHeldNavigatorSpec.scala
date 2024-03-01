@@ -33,16 +33,15 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
   "OtherAssetsHeldNavigator" - {
 
     "OtherAssetsHeldPage" - {
-      /* TODO Remove/replace block with fix from other branch when done
       act.like(
         normalmode
           .navigateToWithData(
             OtherAssetsHeldPage,
             Gen.const(true),
-            (_, _) => controllers.nonsipp.otherassetsheld.routes.WhatYouWillNeedOtherAssetsController.onPageLoad(srn)
+            (srn, _) => controllers.nonsipp.otherassetsheld.routes.WhatYouWillNeedOtherAssetsController.onPageLoad(srn)
           )
           .withName("go from other assets held page to WhatYouWillNeedOtherAssets page when yes selected")
-      )*/
+      )
 
       act.like(
         normalmode
@@ -76,10 +75,26 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           .navigateToWithIndex(
             index,
             WhatIsOtherAssetPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.otherassetsheld.routes.IsAssetTangibleMoveablePropertyController
+                .onPageLoad(srn, index, NormalMode)
+          )
+          .withName(
+            "go from WhatIsOtherAsset page to IsAssetTangibleMoveableProperty page"
+          )
+      )
+    }
+
+    "IsAssetTangibleMoveablePropertyPage" - {
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            IsAssetTangibleMoveablePropertyPage,
             (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
           )
           .withName(
-            "go from WhatIsOtherAsset page to Unauthorised page"
+            "go from IsAssetTangibleMoveablePropertyPage to Unauthorised"
           )
       )
     }

@@ -71,6 +71,7 @@ class FrontendAppConfig @Inject()(config: Configuration) { self =>
     val signOutNoSurveyUrl: String = config.get[String]("urls.signOutNoSurvey")
     val pensionSchemeEnquiry: String = config.get[String]("urls.pensionSchemeEnquiry")
     val incomeTaxAct: String = config.get[String]("urls.incomeTaxAct")
+    val tangibleMoveableProperty: String = config.get[String]("urls.tangibleMoveableProperty")
 
     object managePensionsSchemes {
       val baseUrl: String = config.get[String]("urls.manage-pension-schemes.baseUrl")
