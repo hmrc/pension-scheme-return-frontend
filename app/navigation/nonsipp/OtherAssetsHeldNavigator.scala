@@ -19,15 +19,26 @@ package navigation.nonsipp
 import config.Refined.Max5000
 import eu.timepit.refined.refineMV
 import models.SchemeHoldAsset.{Acquisition, Contribution, Transfer}
-import models.{IdentitySubject, NormalMode, UserAnswers}
+import models.{IdentitySubject, IdentityType, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
+import pages.nonsipp.common.IdentityTypePage
 import pages.nonsipp.otherassetsheld._
 import play.api.mvc.Call
 
 object OtherAssetsHeldNavigator extends JourneyNavigator {
 
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
+    case IdentityTypePage(srn, index, IdentitySubject.OtherAssetSeller) =>
+      userAnswers.get(IdentityTypePage(srn, index, IdentitySubject.OtherAssetSeller)) match {
+        case Some(IdentityType.Other) =>
+          controllers.nonsipp.common.routes.OtherRecipientDetailsController
+            .onPageLoad(srn, index, NormalMode, IdentitySubject.OtherAssetSeller)
+        //TODO when other identity pagers are done.
+        case _ =>
+          controllers.routes.UnauthorisedController.onPageLoad()
+      }
+
     case page @ OtherAssetsHeldPage(srn) =>
       if (userAnswers.get(page).contains(true)) {
         controllers.nonsipp.otherassetsheld.routes.WhatYouWillNeedOtherAssetsController.onPageLoad(srn)

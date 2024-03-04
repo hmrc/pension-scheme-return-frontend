@@ -96,8 +96,8 @@ class RemoveShareDisposalController @Inject()(
               for {
                 removedUserAnswers <- Future
                   .fromTry(
-                    // remove the first page in the journey only
-                    request.userAnswers.remove(HowWereSharesDisposedPage(srn, shareIndex, disposalIndex))
+                    request.userAnswers
+                      .remove(HowWereSharesDisposedPage(srn, shareIndex, disposalIndex))
                   )
 
                 _ <- saveService.save(removedUserAnswers)

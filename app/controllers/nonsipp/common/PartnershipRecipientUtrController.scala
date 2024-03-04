@@ -28,6 +28,7 @@ import navigation.Navigator
 import pages.nonsipp.common.PartnershipRecipientUtrPage
 import pages.nonsipp.landorproperty.PartnershipSellerNamePage
 import pages.nonsipp.loansmadeoroutstanding.PartnershipRecipientNamePage
+import pages.nonsipp.otherassetsheld.PartnershipOtherAssetSellerNamePage
 import pages.nonsipp.shares.PartnershipShareSellerNamePage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -124,6 +125,11 @@ object PartnershipRecipientUtrController {
         }
       case IdentitySubject.SharesSeller =>
         userAnswers.get(PartnershipShareSellerNamePage(srn, index)) match {
+          case Some(value) => value
+          case None => ""
+        }
+      case IdentitySubject.OtherAssetSeller =>
+        userAnswers.get(PartnershipOtherAssetSellerNamePage(srn, index)) match {
           case Some(value) => value
           case None => ""
         }

@@ -17,11 +17,11 @@
 package navigation.nonsipp
 
 import config.Refined.{Max5000, OneTo5000}
-import controllers.routes
 import eu.timepit.refined.refineMV
-import models.{IdentitySubject, NormalMode, SchemeHoldAsset}
+import models.{IdentitySubject, IdentityType, NormalMode, SchemeHoldAsset}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
+import pages.nonsipp.common.IdentityTypePage
 import pages.nonsipp.otherassetsheld._
 import utils.BaseSpec
 import utils.UserAnswersUtils.UserAnswersOps
@@ -33,6 +33,21 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
   private val subject = IdentitySubject.OtherAssetSeller
 
   "OtherAssetsHeldNavigator" - {
+    "IdentityType navigation" - {
+      "NormalMode" - {
+        act.like(
+          normalmode
+            .navigateToWithDataIndexAndSubjectBoth(
+              index,
+              subject,
+              IdentityTypePage,
+              Gen.const(IdentityType.Other),
+              controllers.nonsipp.common.routes.OtherRecipientDetailsController.onPageLoad
+            )
+            .withName("go from identity type page to other seller details page")
+        )
+      }
+    }
 
     "OtherAssetsHeldPage" - {
       act.like(
