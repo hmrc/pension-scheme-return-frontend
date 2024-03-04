@@ -22,7 +22,7 @@ import controllers.actions._
 import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
 import models.requests.DataRequest
-import models.{Mode, UserAnswers}
+import models.Mode
 import navigation.Navigator
 import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import pages.nonsipp.landorpropertydisposal._
@@ -37,7 +37,6 @@ import views.html.YesNoPageView
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Try
 
 class RemoveLandPropertyDisposalController @Inject()(
   override val messagesApi: MessagesApi,

@@ -16,7 +16,7 @@
 
 package controllers.nonsipp.unregulatedorconnectedbonds
 
-import config.Refined.{Max50, Max5000}
+import config.Refined.Max5000
 import controllers.PSRController
 import controllers.actions._
 import forms.YesNoPageFormProvider

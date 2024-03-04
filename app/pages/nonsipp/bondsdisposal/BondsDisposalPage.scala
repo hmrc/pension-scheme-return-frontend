@@ -18,7 +18,6 @@ package pages.nonsipp.bondsdisposal
 
 import play.api.libs.json.JsPath
 import models.SchemeId.Srn
-import models.Money
 import pages.QuestionPage
 case class BondsDisposalPage(srn: Srn) extends QuestionPage[Boolean] {
   override def path: JsPath = JsPath \ toString

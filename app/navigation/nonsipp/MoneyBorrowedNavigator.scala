@@ -18,7 +18,7 @@ package navigation.nonsipp
 
 import cats.implicits.toTraverseOps
 import config.Refined.Max5000
-import eu.timepit.refined.{refineMV, refineV}
+import eu.timepit.refined.refineMV
 import models.{CheckOrChange, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page

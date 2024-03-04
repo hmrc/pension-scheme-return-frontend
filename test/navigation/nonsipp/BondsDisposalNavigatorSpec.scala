@@ -16,8 +16,9 @@
 
 package navigation.nonsipp
 
-import config.Refined.OneTo5000
+import config.Refined.{Max50, Max5000}
 import eu.timepit.refined.refineMV
+import models.{HowDisposed, NormalMode}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.bondsdisposal._
@@ -26,7 +27,8 @@ import utils.BaseSpec
 class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
   val navigator: Navigator = new NonSippNavigator
-  private val index = refineMV[OneTo5000](1)
+  private val bondIndex = refineMV[Max5000.Refined](1)
+  private val disposalIndex = refineMV[Max50.Refined](1)
 
   "BondsDisposalNavigator" - {
 
@@ -63,6 +65,65 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           )
       )
     }
+
+    "BondsDisposalListPage" - {
+
+      act.like(
+        normalmode
+          .navigateToWithDoubleIndex(
+            bondIndex,
+            disposalIndex,
+            BondsDisposalListPage,
+            (srn, bondIndex: Max5000, disposalIndex: Max50, _) =>
+              controllers.nonsipp.bondsdisposal.routes.HowWereBondsDisposedOfController
+                .onPageLoad(srn, bondIndex, disposalIndex, NormalMode)
+          )
+          .withName("go from bonds disposal list page to how were bonds disposed page")
+      )
+    }
+
+    "HowWereBondsDisposedOfPage" - {
+
+      act.like(
+        normalmode
+          .navigateToWithDoubleIndexAndData(
+            bondIndex,
+            disposalIndex,
+            HowWereBondsDisposedOfPage.apply,
+            Gen.const(HowDisposed.Sold),
+            (srn, shareIndex: Max5000, disposalIndex: Max50, _) =>
+              controllers.routes.UnauthorisedController.onPageLoad()
+          )
+          .withName("go from how were bonds disposed page to unauthorised page")
+      )
+
+      act.like(
+        normalmode
+          .navigateToWithDoubleIndexAndData(
+            bondIndex,
+            disposalIndex,
+            HowWereBondsDisposedOfPage.apply,
+            Gen.const(HowDisposed.Transferred),
+            (srn, shareIndex: Max5000, disposalIndex: Max50, _) =>
+              controllers.routes.UnauthorisedController.onPageLoad()
+          )
+          .withName("go from how were bonds disposed page to unauthorised page(Transferred)")
+      )
+
+      act.like(
+        normalmode
+          .navigateToWithDoubleIndexAndData(
+            bondIndex,
+            disposalIndex,
+            HowWereBondsDisposedOfPage.apply,
+            Gen.const(HowDisposed.Other("test details")),
+            (srn, shareIndex: Max5000, disposalIndex: Max50, _) =>
+              controllers.routes.UnauthorisedController.onPageLoad()
+          )
+          .withName("go from how were bonds disposed page to unauthorised page(Other)")
+      )
+    }
+
   }
 
 }
