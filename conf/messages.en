@@ -2854,3 +2854,23 @@ otherAssets.tangibleMoveableProperty.content = What is tangible moveable propert
 otherAssets.tangibleMoveableProperty.paragraph.link = Tangible moveable property (opens in new tab)
 otherAssets.tangibleMoveableProperty.paragraph = means things that can be touched and moved. For example, art, antiques, classic cars and plant and machinery.
 otherAssets.tangibleMoveableProperty.error.required = Select yes if the asset is tangible moveable property
+
+otherAssets.whyDoesSchemeHoldAssets.title = Why does the scheme hold this asset?
+otherAssets.whyDoesSchemeHoldAssets.heading = Why does {0} hold this asset?
+otherAssets.whyDoesSchemeHoldAssets.error.required = Select why the scheme holds this asset
+otherAssets.whyDoesSchemeHoldAssets.radioList1 = Acquisition
+otherAssets.whyDoesSchemeHoldAssets.radioList1.hint = This can be a purchase.
+otherAssets.whyDoesSchemeHoldAssets.radioList2 = Contribution by an employer or member
+otherAssets.whyDoesSchemeHoldAssets.radioList3 = Transfer from another scheme
+
+otherAssets.whenDidSchemeAcquireAssets.title = When did the scheme acquire this asset?
+otherAssets.whenDidSchemeAcquireAssets.heading = When did {0} acquire this asset?
+otherAssets.whenDidSchemeAcquireAssets.error.required.all = Enter the date the scheme acquired this asset
+otherAssets.whenDidSchemeAcquireAssets.error.required.day = Date the scheme acquired this asset must include a day
+otherAssets.whenDidSchemeAcquireAssets.error.required.month = Date the scheme acquired this asset must include a month
+otherAssets.whenDidSchemeAcquireAssets.error.required.year = Date the scheme acquired this asset must include a year
+otherAssets.whenDidSchemeAcquireAssets.error.required.two = Date the scheme acquired this asset must include a {0} and {1}
+otherAssets.whenDidSchemeAcquireAssets.error.invalid.date = Date the scheme acquired this asset must be a real date
+otherAssets.whenDidSchemeAcquireAssets.error.invalid.characters = Date the scheme acquired this asset must only include numbers 0 to 9
+otherAssets.whenDidSchemeAcquireAssets.error.future = Date the scheme acquired this asset must be the same as or before {0}
+otherAssets.whenDidSchemeAcquireAssets.error.after = Date the scheme acquired this asset must be after {0}
