@@ -17,20 +17,37 @@
 package navigation.nonsipp
 
 import config.Refined.{Max5000, OneTo5000}
-import controllers.routes
 import eu.timepit.refined.refineMV
-import models.NormalMode
+import models.{IdentitySubject, IdentityType, NormalMode, SchemeHoldAsset}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
+import pages.nonsipp.common.IdentityTypePage
 import pages.nonsipp.otherassetsheld._
 import utils.BaseSpec
+import utils.UserAnswersUtils.UserAnswersOps
 
 class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
   val navigator: Navigator = new NonSippNavigator
   private val index = refineMV[OneTo5000](1)
+  private val subject = IdentitySubject.OtherAssetSeller
 
   "OtherAssetsHeldNavigator" - {
+    "IdentityType navigation" - {
+      "NormalMode" - {
+        act.like(
+          normalmode
+            .navigateToWithDataIndexAndSubjectBoth(
+              index,
+              subject,
+              IdentityTypePage,
+              Gen.const(IdentityType.Other),
+              controllers.nonsipp.common.routes.OtherRecipientDetailsController.onPageLoad
+            )
+            .withName("go from identity type page to other seller details page")
+        )
+      }
+    }
 
     "OtherAssetsHeldPage" - {
       act.like(
@@ -91,10 +108,124 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           .navigateToWithIndex(
             index,
             IsAssetTangibleMoveablePropertyPage,
-            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.otherassetsheld.routes.WhyDoesSchemeHoldAssetsController
+                .onPageLoad(srn, index, NormalMode)
           )
           .withName(
-            "go from IsAssetTangibleMoveablePropertyPage to Unauthorised"
+            "go from IsAssetTangibleMoveablePropertyPage to WhyDoesSchemeHoldAssetsPage"
+          )
+      )
+    }
+
+    "WhyDoesSchemeHoldAssetsPage" - {
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            WhyDoesSchemeHoldAssetsPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.otherassetsheld.routes.WhenDidSchemeAcquireAssetsController
+                .onPageLoad(srn, index, NormalMode),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                WhyDoesSchemeHoldAssetsPage(srn, index),
+                SchemeHoldAsset.Acquisition
+              )
+          )
+          .withName(
+            "go from WhyDoesSchemeHoldAssets page to WhenDidSchemeAcquireAssets page when holding is acquisition"
+          )
+      )
+
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            WhyDoesSchemeHoldAssetsPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.otherassetsheld.routes.WhenDidSchemeAcquireAssetsController
+                .onPageLoad(srn, index, NormalMode),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                WhyDoesSchemeHoldAssetsPage(srn, index),
+                SchemeHoldAsset.Contribution
+              )
+          )
+          .withName(
+            "go from WhyDoesSchemeHoldAssets page to WhenDidSchemeAcquireAssets page when holding is contribution"
+          )
+      )
+
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            WhyDoesSchemeHoldAssetsPage,
+            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad(),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                WhyDoesSchemeHoldAssetsPage(srn, index),
+                SchemeHoldAsset.Transfer
+              )
+          )
+          .withName(
+            "go from WhyDoesSchemeHoldAssets page to Unauthorised page when holding is transfer"
+          )
+      )
+    }
+
+    "WhenDidSchemeAcquireAssetsPage" - {
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            WhenDidSchemeAcquireAssetsPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.common.routes.IdentityTypeController
+                .onPageLoad(srn, index, NormalMode, IdentitySubject.OtherAssetSeller),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                WhyDoesSchemeHoldAssetsPage(srn, index),
+                SchemeHoldAsset.Acquisition
+              )
+          )
+          .withName(
+            "go from WhenDidSchemeAcquireAssets page to IdentityType page when holding is acquisition"
+          )
+      )
+
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            WhenDidSchemeAcquireAssetsPage,
+            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad(),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                WhyDoesSchemeHoldAssetsPage(srn, index),
+                SchemeHoldAsset.Contribution
+              )
+          )
+          .withName(
+            "go from WhenDidSchemeAcquireAssets page to Unauthorised page when holding is contribution"
+          )
+      )
+
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            WhenDidSchemeAcquireAssetsPage,
+            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad(),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                WhyDoesSchemeHoldAssetsPage(srn, index),
+                SchemeHoldAsset.Transfer
+              )
+          )
+          .withName(
+            "go from WhenDidSchemeAcquireAssets page to Unauthorised page when holding is transfer"
           )
       )
     }
