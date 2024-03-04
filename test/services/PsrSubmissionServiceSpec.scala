@@ -30,6 +30,7 @@ import pages.nonsipp.loansmadeoroutstanding.LoansMadeOrOutstandingPage
 import pages.nonsipp.moneyborrowed.MoneyBorrowedPage
 import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
 import pages.nonsipp.sharesdisposal.SharesDisposalPage
+import pages.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldPage
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import services.PsrSubmissionServiceSpec.{captor, minimalRequiredSubmission}
@@ -52,6 +53,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
     reset(mockMoneyBorrowedTransformer)
     reset(mockMemberPaymentsTransformerTransformer)
     reset(mockSharesTransformer)
+    reset(mockBondTransactionsTransformer)
   }
 
   val allowedAccessRequest
@@ -65,6 +67,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
   private val mockMoneyBorrowedTransformer = mock[MoneyBorrowedTransformer]
   private val mockMemberPaymentsTransformerTransformer = mock[MemberPaymentsTransformer]
   private val mockSharesTransformer = mock[SharesTransformer]
+  private val mockBondTransactionsTransformer = mock[BondTransactionsTransformer]
 
   private val service =
     new PsrSubmissionService(
@@ -74,7 +77,8 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
       mockLandOrPropertyTransactionsTransformer,
       mockMemberPaymentsTransformerTransformer,
       mockMoneyBorrowedTransformer,
-      mockSharesTransformer
+      mockSharesTransformer,
+      mockBondTransactionsTransformer
     )
 
   private implicit val hc: HeaderCarrier = HeaderCarrier()
@@ -97,6 +101,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
             verify(mockLandOrPropertyTransactionsTransformer, never).transformToEtmp(any(), any())(any())
             verify(mockMoneyBorrowedTransformer, never).transformToEtmp(any())(any())
             verify(mockSharesTransformer, never).transformToEtmp(any(), any())(any())
+            verify(mockBondTransactionsTransformer, never).transformToEtmp(any())(any())
             verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
 
             captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
@@ -128,6 +133,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
             verify(mockLandOrPropertyTransactionsTransformer, never).transformToEtmp(any(), any())(any())
             verify(mockMoneyBorrowedTransformer, never).transformToEtmp(any())(any())
             verify(mockSharesTransformer, never).transformToEtmp(any(), any())(any())
+            verify(mockBondTransactionsTransformer, never).transformToEtmp(any())(any())
             verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
 
             captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
@@ -160,6 +166,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
               verify(mockLoanTransactionsTransformer, never).transformToEtmp(any())(any())
               verify(mockSharesTransformer, never).transformToEtmp(any(), any())(any())
               verify(mockMoneyBorrowedTransformer, never).transformToEtmp(any())(any())
+              verify(mockBondTransactionsTransformer, never).transformToEtmp(any())(any())
               verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
 
               captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
@@ -174,7 +181,8 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
                       List.empty
                     )
                   ),
-                  optBorrowing = None
+                  optBorrowing = None,
+                  optBonds = None
                 )
               )
               captor.getValue.shares mustBe None
@@ -204,6 +212,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
               verify(mockLoanTransactionsTransformer, never).transformToEtmp(any())(any())
               verify(mockSharesTransformer, never).transformToEtmp(any(), any())(any())
               verify(mockMoneyBorrowedTransformer, never).transformToEtmp(any())(any())
+              verify(mockBondTransactionsTransformer, never).transformToEtmp(any())(any())
               verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
 
               captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
@@ -218,7 +227,8 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
                       List.empty
                     )
                   ),
-                  optBorrowing = None
+                  optBorrowing = None,
+                  optBonds = None
                 )
               )
               captor.getValue.shares mustBe None
@@ -247,6 +257,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
               verify(mockSharesTransformer, never).transformToEtmp(any(), any())(any())
               verify(mockLandOrPropertyTransactionsTransformer, never).transformToEtmp(any(), any())(any())
               verify(mockMoneyBorrowedTransformer, times(1)).transformToEtmp(any())(any())
+              verify(mockBondTransactionsTransformer, never).transformToEtmp(any())(any())
               verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
 
               captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
@@ -255,7 +266,8 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
               captor.getValue.assets mustBe Some(
                 Assets(
                   optLandOrProperty = None,
-                  optBorrowing = Some(Borrowing(moneyWasBorrowed = moneyBorrowed, List.empty))
+                  optBorrowing = Some(Borrowing(moneyWasBorrowed = moneyBorrowed, List.empty)),
+                  optBonds = None
                 )
               )
               captor.getValue.shares mustBe None
@@ -283,6 +295,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
             verify(mockSharesTransformer, times(1)).transformToEtmp(srn, sharesDisposal = false)(request)
             verify(mockLandOrPropertyTransactionsTransformer, never).transformToEtmp(any(), any())(any())
             verify(mockMoneyBorrowedTransformer, never).transformToEtmp(any())(any())
+            verify(mockBondTransactionsTransformer, never).transformToEtmp(any())(any())
             verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
 
             captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
@@ -318,6 +331,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
                 .transformToEtmp(srn, didSchemeDisposeAnyShares)(request)
               verify(mockLandOrPropertyTransactionsTransformer, never).transformToEtmp(any(), any())(any())
               verify(mockMoneyBorrowedTransformer, never).transformToEtmp(any())(any())
+              verify(mockBondTransactionsTransformer, never).transformToEtmp(any())(any())
               verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
 
               captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
@@ -325,6 +339,51 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
               captor.getValue.loans mustBe None
               captor.getValue.assets mustBe None
               captor.getValue.shares mustBe Some(Shares(optShareTransactions = None))
+              result mustBe Some(())
+          }
+        }
+    )
+
+    List(true, false).foreach(
+      unregulatedOrConnectedBondsHeld =>
+        s"submitPsrDetails request successfully when UnregulatedOrConnectedBondsHeldPage is $unregulatedOrConnectedBondsHeld" in {
+          val userAnswers = defaultUserAnswers
+            .unsafeSet(CheckReturnDatesPage(srn), false)
+            .unsafeSet(UnregulatedOrConnectedBondsHeldPage(srn), unregulatedOrConnectedBondsHeld)
+          val request = DataRequest(allowedAccessRequest, userAnswers)
+
+          when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any())(any()))
+            .thenReturn(Some(minimalRequiredSubmission))
+          when(mockBondTransactionsTransformer.transformToEtmp(any())(any())).thenReturn(List.empty)
+          when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(()))
+
+          whenReady(service.submitPsrDetails(srn)(implicitly, implicitly, request)) {
+            result: Option[Unit] =>
+              verify(mockMinimalRequiredSubmissionTransformer, times(1)).transformToEtmp(any())(any())
+              verify(mockLandOrPropertyTransactionsTransformer, never).transformToEtmp(any(), any())(any())
+              verify(mockLoanTransactionsTransformer, never).transformToEtmp(any())(any())
+              verify(mockSharesTransformer, never).transformToEtmp(any(), any())(any())
+              verify(mockMoneyBorrowedTransformer, never).transformToEtmp(any())(any())
+              verify(mockBondTransactionsTransformer, times(1)).transformToEtmp(any())(any())
+              verify(mockConnector, times(1)).submitPsrDetails(captor.capture())(any(), any())
+
+              captor.getValue.minimalRequiredSubmission mustBe minimalRequiredSubmission
+              captor.getValue.checkReturnDates mustBe false
+              captor.getValue.loans mustBe None
+              captor.getValue.assets mustBe Some(
+                Assets(
+                  optLandOrProperty = None,
+                  optBorrowing = None,
+                  optBonds = Some(
+                    Bonds(
+                      bondsWereAdded = unregulatedOrConnectedBondsHeld,
+                      bondsWereDisposed = false,
+                      bondTransactions = List.empty
+                    )
+                  )
+                )
+              )
+              captor.getValue.shares mustBe None
               result mustBe Some(())
           }
         }
@@ -339,6 +398,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
         verify(mockMoneyBorrowedTransformer, never).transformToEtmp(any())(any())
         verify(mockSharesTransformer, never).transformToEtmp(any(), any())(any())
         verify(mockMemberPaymentsTransformerTransformer, never).transformToEtmp(any(), any())
+        verify(mockBondTransactionsTransformer, never).transformToEtmp(any())(any())
         verify(mockConnector, never).submitPsrDetails(any())(any(), any())
         result mustBe None
       }

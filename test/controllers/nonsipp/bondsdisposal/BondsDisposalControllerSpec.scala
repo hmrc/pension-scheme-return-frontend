@@ -16,20 +16,12 @@
 
 package controllers.nonsipp.bondsdisposal
 
-import models.{NormalMode, UserAnswers}
-import navigation.{FakeNavigator, Navigator}
-import play.api.inject.bind
-import play.api.mvc.Call
-import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import repositories.SessionRepository
-import forms.YesNoPageFormProvider
-import views.html.YesNoPageView
 import controllers.ControllerBaseSpec
-import BondsDisposalController._
-import scala.concurrent.Future
-
+import controllers.nonsipp.bondsdisposal.BondsDisposalController._
+import forms.YesNoPageFormProvider
+import models.NormalMode
 import pages.nonsipp.bondsdisposal.BondsDisposalPage
+import views.html.YesNoPageView
 
 class BondsDisposalControllerSpec extends ControllerBaseSpec {
 

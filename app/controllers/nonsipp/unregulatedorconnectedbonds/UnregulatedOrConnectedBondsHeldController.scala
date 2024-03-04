@@ -22,12 +22,13 @@ import controllers.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBon
 import forms.YesNoPageFormProvider
 import models.Mode
 import models.SchemeId.Srn
+import models.requests.DataRequest
 import navigation.Navigator
 import pages.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
+import services.{PsrSubmissionService, SaveService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.{LinkMessage, ListMessage, ListType, Message, ParagraphMessage}
 import viewmodels.implicits._
@@ -45,7 +46,8 @@ class UnregulatedOrConnectedBondsHeldController @Inject()(
   formProvider: YesNoPageFormProvider,
   config: FrontendAppConfig,
   val controllerComponents: MessagesControllerComponents,
-  view: YesNoPageView
+  view: YesNoPageView,
+  psrSubmissionService: PsrSubmissionService
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
@@ -71,7 +73,20 @@ class UnregulatedOrConnectedBondsHeldController @Inject()(
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(UnregulatedOrConnectedBondsHeldPage(srn), value))
             _ <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage(UnregulatedOrConnectedBondsHeldPage(srn), mode, updatedAnswers))
+            redirectTo <- if (value) {
+              Future.successful(
+                Redirect(navigator.nextPage(UnregulatedOrConnectedBondsHeldPage(srn), mode, updatedAnswers))
+              )
+            } else {
+              psrSubmissionService
+                .submitPsrDetails(srn)(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
+                .map {
+                  case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+                  case Some(_) =>
+                    Redirect(navigator.nextPage(UnregulatedOrConnectedBondsHeldPage(srn), mode, updatedAnswers))
+                }
+            }
+          } yield redirectTo
       )
   }
 }

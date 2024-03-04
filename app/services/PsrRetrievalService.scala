@@ -34,7 +34,8 @@ class PsrRetrievalService @Inject()(
   landOrPropertyTransactionsTransformer: LandOrPropertyTransactionsTransformer,
   moneyBorrowedTransformer: MoneyBorrowedTransformer,
   memberPaymentsTransformer: MemberPaymentsTransformer,
-  sharesTransformer: SharesTransformer
+  sharesTransformer: SharesTransformer,
+  bondTransactionsTransformer: BondTransactionsTransformer
 ) {
 
   def getStandardPsrDetails(
@@ -97,7 +98,7 @@ class PsrRetrievalService @Inject()(
               }
               .getOrElse(Try(transformedLoansUa))
 
-            transformedMoneyBorrowingAssets <- psrDetails.assets
+            transformedMoneyBorrowingAssetsUa <- psrDetails.assets
               .map { asset =>
                 asset.optBorrowing
                   .map(
@@ -113,19 +114,35 @@ class PsrRetrievalService @Inject()(
               }
               .getOrElse(Try(transformedLandOrPropertyAssetsUa))
 
-            transformedMemberDetails <- psrDetails.membersPayments
+            transformedBondsAssetsUa <- psrDetails.assets
+              .map { asset =>
+                asset.optBonds
+                  .map(
+                    bonds =>
+                      bondTransactionsTransformer
+                        .transformFromEtmp(
+                          transformedMoneyBorrowingAssetsUa,
+                          srn,
+                          bonds
+                        )
+                  )
+                  .getOrElse(Try(transformedMoneyBorrowingAssetsUa))
+              }
+              .getOrElse(Try(transformedMoneyBorrowingAssetsUa))
+
+            transformedMemberDetailsUa <- psrDetails.membersPayments
               .map(
                 memberPayments =>
-                  memberPaymentsTransformer.transformFromEtmp(transformedMoneyBorrowingAssets, srn, memberPayments)
+                  memberPaymentsTransformer.transformFromEtmp(transformedBondsAssetsUa, srn, memberPayments)
               )
-              .getOrElse(Try(transformedMoneyBorrowingAssets))
+              .getOrElse(Try(transformedBondsAssetsUa))
 
-            transformedShares <- psrDetails.shares
-              .map(sh => sharesTransformer.transformFromEtmp(transformedMemberDetails, srn, sh))
-              .getOrElse(Try(transformedMemberDetails))
+            transformedSharesUa <- psrDetails.shares
+              .map(sh => sharesTransformer.transformFromEtmp(transformedMemberDetailsUa, srn, sh))
+              .getOrElse(Try(transformedMemberDetailsUa))
 
           } yield {
-            transformedShares
+            transformedSharesUa
           }
           Future.fromTry(result)
         case _ => Future(emptyUserAnswers)

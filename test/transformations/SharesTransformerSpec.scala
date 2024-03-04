@@ -31,22 +31,7 @@ import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import pages.nonsipp.common.IdentityTypePage
 import pages.nonsipp.shares._
-import pages.nonsipp.sharesdisposal.{
-  CompanyBuyerCrnPage,
-  CompanyBuyerNamePage,
-  HowManyDisposalSharesPage,
-  HowManySharesRedeemedPage,
-  HowManySharesSoldPage,
-  HowWereSharesDisposedPage,
-  IndependentValuationPage,
-  IsBuyerConnectedPartyPage,
-  SharesDisposalCompletedPage,
-  TotalConsiderationSharesRedeemedPage,
-  TotalConsiderationSharesSoldPage,
-  WhenWereSharesRedeemedPage,
-  WhenWereSharesSoldPage,
-  WhoWereTheSharesSoldToPage
-}
+import pages.nonsipp.sharesdisposal._
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import viewmodels.models.SectionCompleted
@@ -59,8 +44,8 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
 
   private val transformer = new SharesTransformer
 
-  "ShareTransactionTransformer - To Etmp" - {
-    "should return empty List when userAnswer is empty" in {
+  "SharesTransformer - To Etmp" - {
+    "should return None when userAnswer is empty" in {
 
       val result = transformer.transformToEtmp(srn = srn, sharesDisposal = false)
       result mustBe None
@@ -68,7 +53,7 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
   }
 
   "SharesTransformer - From Etmp" - {
-    "when shareTransactionList Empty" in {
+    "when shareTransactionList None" in {
       val userAnswers = emptyUserAnswers
       val result = transformer.transformFromEtmp(
         userAnswers,

@@ -20,7 +20,11 @@ import controllers.ControllerBaseSpec
 import controllers.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldController._
 import forms.YesNoPageFormProvider
 import models.NormalMode
+import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldPage
+import play.api.inject.bind
+import play.api.inject.guice.GuiceableModule
+import services.PsrSubmissionService
 import views.html.YesNoPageView
 
 class UnregulatedOrConnectedBondsHeldControllerSpec extends ControllerBaseSpec {
@@ -28,6 +32,11 @@ class UnregulatedOrConnectedBondsHeldControllerSpec extends ControllerBaseSpec {
   private lazy val onPageLoad = routes.UnregulatedOrConnectedBondsHeldController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.UnregulatedOrConnectedBondsHeldController.onSubmit(srn, NormalMode)
   private lazy val incomeTaxAct = "https://www.legislation.gov.uk/ukpga/2007/3/section/993"
+  private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
+
+  override protected val additionalBindings: List[GuiceableModule] = List(
+    bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
+  )
 
   "UnregulatedOrConnectedBondsHeldController" - {
 
@@ -42,8 +51,23 @@ class UnregulatedOrConnectedBondsHeldControllerSpec extends ControllerBaseSpec {
           .apply(form(injected[YesNoPageFormProvider]).fill(true), viewModel(srn, schemeName, incomeTaxAct, NormalMode))
     })
 
-    act.like(redirectNextPage(onSubmit, "value" -> "true"))
-    act.like(redirectNextPage(onSubmit, "value" -> "false"))
+    act.like(
+      redirectNextPage(onSubmit, "value" -> "true")
+        .before(MockPSRSubmissionService.submitPsrDetails())
+        .after({
+          verify(mockPsrSubmissionService, never).submitPsrDetails(any())(any(), any(), any())
+          reset(mockPsrSubmissionService)
+        })
+    )
+
+    act.like(
+      redirectNextPage(onSubmit, "value" -> "false")
+        .before(MockPSRSubmissionService.submitPsrDetails())
+        .after({
+          verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any())(any(), any(), any())
+          reset(mockPsrSubmissionService)
+        })
+    )
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 

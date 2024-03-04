@@ -16,7 +16,6 @@
 
 package pages.nonsipp.unregulatedorconnectedbonds
 
-import config.Refined.Max5000
 import models.SchemeId.Srn
 import pages.Page
 
