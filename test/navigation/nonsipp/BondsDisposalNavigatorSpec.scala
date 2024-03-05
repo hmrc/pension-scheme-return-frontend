@@ -91,7 +91,7 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             disposalIndex,
             HowWereBondsDisposedOfPage.apply,
             Gen.const(HowDisposed.Sold),
-            (srn, shareIndex: Max5000, disposalIndex: Max50, _) =>
+            (srn, bondIndex: Max5000, disposalIndex: Max50, _) =>
               controllers.nonsipp.bondsdisposal.routes.WhenWereBondsSoldController
                 .onSubmit(srn, bondIndex, disposalIndex, NormalMode)
           )
@@ -105,8 +105,7 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             disposalIndex,
             HowWereBondsDisposedOfPage.apply,
             Gen.const(HowDisposed.Transferred),
-            (srn, shareIndex: Max5000, disposalIndex: Max50, _) =>
-              controllers.routes.UnauthorisedController.onPageLoad()
+            (srn, bondIndex: Max5000, disposalIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
           )
           .withName("go from how were bonds disposed page to unauthorised page(Transferred)")
       )
@@ -118,8 +117,7 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             disposalIndex,
             HowWereBondsDisposedOfPage.apply,
             Gen.const(HowDisposed.Other("test details")),
-            (srn, shareIndex: Max5000, disposalIndex: Max50, _) =>
-              controllers.routes.UnauthorisedController.onPageLoad()
+            (srn, bondIndex: Max5000, disposalIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
           )
           .withName("go from how were bonds disposed page to unauthorised page(Other)")
       )
@@ -133,12 +131,24 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             bondIndex,
             disposalIndex,
             WhenWereBondsSoldPage,
-            (srn, shareIndex: Max5000, disposalIndex: Max50, _) =>
-              controllers.routes.UnauthorisedController.onPageLoad()
+            (srn, bondIndex: Max5000, disposalIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
           )
           .withName("go from when were bonds sold page to unauthorised page")
       )
 
+    }
+
+    "BuyerNamePage" - {
+      act.like(
+        normalmode
+          .navigateToWithDoubleIndex(
+            bondIndex,
+            disposalIndex,
+            BuyerNamePage,
+            (srn, bondIndex: Max5000, disposalIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          )
+          .withName("go from buyer name page to unauthorised page")
+      )
     }
   }
 
