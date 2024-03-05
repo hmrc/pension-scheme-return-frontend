@@ -2822,6 +2822,12 @@ bondsDisposalList.pagination.label = Showing {0} - {1} of {2} bonds
 bondsDisposalList.paragraph1 = Select one option to start reporting a disposal. If you need to report more, you will be able to do this later.
 bondsDisposalList.paragraph2 = You can report disposal of bonds whose details you have already provided. If the bonds do not appear here, add them using the ‘Change unregulated or connected party bonds’ section of this return
 
+bondsDisposal.buyerName.title = What is the buyer’s name?
+bondsDisposal.buyerName.heading = What is the buyer’s name?
+bondsDisposal.buyerName.error.required = Enter the buyer’s name
+bondsDisposal.buyerName.error.length = Buyer’s name must be 160 characters or fewer
+bondsDisposal.buyerName.error.invalid.characters = Buyer’s name must only include letters a to z, hyphens, apostrophes and spaces
+
 otherAssets.whatYouWillNeed.title = Other assets held by the scheme
 otherAssets.whatYouWillNeed.heading = Other assets held by {0}
 otherAssets.whatYouWillNeed.paragraph1 = Answer these questions for one asset at a time. If you need to add more, you will be able to do this later.

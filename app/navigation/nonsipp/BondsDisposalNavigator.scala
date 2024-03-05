@@ -53,6 +53,9 @@ object BondsDisposalNavigator extends JourneyNavigator {
     case WhenWereBondsSoldPage(srn, bondIndex, disposalIndex) =>
       controllers.routes.UnauthorisedController.onPageLoad()
 
+    case BuyerNamePage(srn, bondIndex, disposalIndex) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
+
   }
 
   override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] = _ => _ => PartialFunction.empty
