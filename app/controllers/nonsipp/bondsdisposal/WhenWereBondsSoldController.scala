@@ -1,0 +1,138 @@
+/*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package controllers.nonsipp.bondsdisposal
+
+import cats.implicits.toShow
+import config.Refined.{Max50, Max5000}
+import controllers.PSRController
+import controllers.actions.IdentifyAndRequireData
+import controllers.nonsipp.bondsdisposal.WhenWereBondsSoldController._
+import forms.DatePageFormProvider
+import forms.mappings.errors.DateFormErrors
+import models.{DateRange, Mode}
+import models.SchemeId.Srn
+import navigation.Navigator
+import pages.nonsipp.bondsdisposal.WhenWereBondsSoldPage
+import play.api.data.Form
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.{SaveService, SchemeDateService}
+import utils.DateTimeUtils.localDateShow
+import viewmodels.DisplayMessage.Message
+import viewmodels.implicits._
+import viewmodels.models.{DatePageViewModel, FormPageViewModel}
+import views.html.DatePageView
+
+import java.time.LocalDate
+import javax.inject.{Inject, Named}
+import scala.concurrent.{ExecutionContext, Future}
+
+class WhenWereBondsSoldController @Inject()(
+  override val messagesApi: MessagesApi,
+  saveService: SaveService,
+  @Named("non-sipp") navigator: Navigator,
+  identifyAndRequireData: IdentifyAndRequireData,
+  formProvider: DatePageFormProvider,
+  schemeDateService: SchemeDateService,
+  val controllerComponents: MessagesControllerComponents,
+  view: DatePageView
+)(implicit ec: ExecutionContext)
+    extends PSRController
+    with I18nSupport {
+
+  private def form(date: DateRange)(implicit messages: Messages): Form[LocalDate] =
+    WhenWereBondsSoldController.form(formProvider, date)
+
+  def onPageLoad(srn: Srn, bondIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+    identifyAndRequireData(srn) { implicit request =>
+      schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
+        val preparedForm = request.userAnswers
+          .get(WhenWereBondsSoldPage(srn, bondIndex, disposalIndex))
+          .fold(form(date))(form(date).fill)
+        Ok(
+          view(
+            preparedForm,
+            viewModel(srn, bondIndex, disposalIndex, mode)
+          )
+        )
+      }
+    }
+
+  def onSubmit(srn: Srn, bondIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
+    identifyAndRequireData(srn).async { implicit request =>
+      schemeDateService.taxYearOrAccountingPeriods(srn).merge.getOrRecoverJourney { date =>
+        form(date)
+          .bindFromRequest()
+          .fold(
+            formWithErrors =>
+              Future.successful(
+                BadRequest(
+                  view(
+                    formWithErrors,
+                    viewModel(srn, bondIndex, disposalIndex, mode)
+                  )
+                )
+              ),
+            value =>
+              for {
+                updatedAnswers <- Future
+                  .fromTry(request.userAnswers.set(WhenWereBondsSoldPage(srn, bondIndex, disposalIndex), value))
+                _ <- saveService.save(updatedAnswers)
+              } yield Redirect(
+                navigator.nextPage(WhenWereBondsSoldPage(srn, bondIndex, disposalIndex), mode, updatedAnswers)
+              )
+          )
+      }
+    }
+}
+
+object WhenWereBondsSoldController {
+  def form(formProvider: DatePageFormProvider, date: DateRange)(implicit messages: Messages): Form[LocalDate] =
+    formProvider(
+      DateFormErrors(
+        required = "bondsDisposal.whenWereBondsSold.error.required.all",
+        requiredDay = "bondsDisposal.whenWereBondsSold.error.required.day",
+        requiredMonth = "bondsDisposal.whenWereBondsSold.error.required.month",
+        requiredYear = "bondsDisposal.whenWereBondsSold.error.required.year",
+        requiredTwo = "bondsDisposal.whenWereBondsSold.error.required.two",
+        invalidDate = "bondsDisposal.whenWereBondsSold.error.invalid.date",
+        invalidCharacters = "bondsDisposal.whenWereBondsSold.error.invalid.characters",
+        validators = List(
+          DateFormErrors
+            .failIfDateAfter(date.to, messages("bondsDisposal.whenWereBondsSold.error.date.after", date.to.show)),
+          DateFormErrors
+            .failIfDateBefore(
+              date.from,
+              messages("bondsDisposal.whenWereBondsSold.error.date.before", date.from.show)
+            )
+        )
+      )
+    )
+
+  def viewModel(
+    srn: Srn,
+    bondIndex: Max5000,
+    disposalIndex: Max50,
+    mode: Mode
+  ): FormPageViewModel[DatePageViewModel] =
+    FormPageViewModel(
+      title = Message("bondsDisposal.whenWereBondsSold.title"),
+      heading = Message("bondsDisposal.whenWereBondsSold.heading"),
+      page = DatePageViewModel(None, Message("bondsDisposal.whenWereBondsSold.heading")),
+      onSubmit = routes.WhenWereBondsSoldController.onSubmit(srn, bondIndex, disposalIndex, mode)
+    )
+}

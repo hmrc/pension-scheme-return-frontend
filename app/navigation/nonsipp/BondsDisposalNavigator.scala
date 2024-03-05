@@ -40,14 +40,18 @@ object BondsDisposalNavigator extends JourneyNavigator {
       controllers.nonsipp.bondsdisposal.routes.HowWereBondsDisposedOfController
         .onPageLoad(srn, bondIndex, disposalIndex, NormalMode)
 
-    case page @ HowWereBondsDisposedOfPage(srn, _, _, _) =>
+    case page @ HowWereBondsDisposedOfPage(srn, bondIndex, disposalIndex, _) =>
       userAnswers.get(page) match {
         case None => controllers.routes.UnauthorisedController.onPageLoad()
         case Some(HowDisposed.Sold) =>
-          controllers.routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.bondsdisposal.routes.WhenWereBondsSoldController
+            .onSubmit(srn, bondIndex, disposalIndex, NormalMode)
         case Some(HowDisposed.Transferred) | Some(HowDisposed.Other(_)) =>
           controllers.routes.UnauthorisedController.onPageLoad()
       }
+
+    case WhenWereBondsSoldPage(srn, bondIndex, disposalIndex) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
 
   }
 
