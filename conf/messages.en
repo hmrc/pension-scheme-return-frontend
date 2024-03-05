@@ -2885,3 +2885,15 @@ otherAssets.whenDidSchemeAcquireAssets.error.invalid.date = Date the scheme acqu
 otherAssets.whenDidSchemeAcquireAssets.error.invalid.characters = Date the scheme acquired this asset must only include numbers 0 to 9
 otherAssets.whenDidSchemeAcquireAssets.error.future = Date the scheme acquired this asset must be the same as or before {0}
 otherAssets.whenDidSchemeAcquireAssets.error.after = Date the scheme acquired this asset must be after {0}
+
+bondsDisposal.whenWereBondsSold.title = When were these bonds sold?
+bondsDisposal.whenWereBondsSold.heading = When were these bonds sold?
+bondsDisposal.whenWereBondsSold.error.required.all = Enter the date these bonds were sold
+bondsDisposal.whenWereBondsSold.error.required.day = Date these bonds were sold must include a day
+bondsDisposal.whenWereBondsSold.error.required.month = Date these bonds were sold must include a month
+bondsDisposal.whenWereBondsSold.error.required.year = Date these bonds were sold must include a year
+bondsDisposal.whenWereBondsSold.error.required.two = Date these bonds were sold must include a {0} and {1}
+bondsDisposal.whenWereBondsSold.error.invalid.date = Date these bonds were sold must be a real date
+bondsDisposal.whenWereBondsSold.error.date.before = Date these bonds were sold must be the same as or after {0}
+bondsDisposal.whenWereBondsSold.error.date.after = Date these bonds were sold must be the same as or before {0}
+bondsDisposal.whenWereBondsSold.error.invalid.characters = Date these bonds were sold must only include numbers 0 to 9

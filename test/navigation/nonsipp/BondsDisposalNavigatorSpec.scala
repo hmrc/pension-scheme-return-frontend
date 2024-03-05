@@ -92,9 +92,10 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             HowWereBondsDisposedOfPage.apply,
             Gen.const(HowDisposed.Sold),
             (srn, shareIndex: Max5000, disposalIndex: Max50, _) =>
-              controllers.routes.UnauthorisedController.onPageLoad()
+              controllers.nonsipp.bondsdisposal.routes.WhenWereBondsSoldController
+                .onSubmit(srn, bondIndex, disposalIndex, NormalMode)
           )
-          .withName("go from how were bonds disposed page to unauthorised page")
+          .withName("go from how were bonds disposed page to when were bonds sold page")
       )
 
       act.like(
@@ -124,6 +125,21 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       )
     }
 
+    "WhenWereBondsSoldPage" - {
+
+      act.like(
+        normalmode
+          .navigateToWithDoubleIndex(
+            bondIndex,
+            disposalIndex,
+            WhenWereBondsSoldPage,
+            (srn, shareIndex: Max5000, disposalIndex: Max50, _) =>
+              controllers.routes.UnauthorisedController.onPageLoad()
+          )
+          .withName("go from when were bonds sold page to unauthorised page")
+      )
+
+    }
   }
 
 }
