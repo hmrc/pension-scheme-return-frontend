@@ -2828,6 +2828,10 @@ bondsDisposal.buyerName.error.required = Enter the buyer’s name
 bondsDisposal.buyerName.error.length = Buyer’s name must be 160 characters or fewer
 bondsDisposal.buyerName.error.invalid.characters = Buyer’s name must only include letters a to z, hyphens, apostrophes and spaces
 
+bondsDisposal.isBuyerConnectedParty.title = Is the buyer a connected party?
+bondsDisposal.isBuyerConnectedParty.heading = Is {0} a connected party?
+bondsDisposal.isBuyerConnectedParty.error.required = Select yes if the buyer is a connected party
+
 otherAssets.whatYouWillNeed.title = Other assets held by the scheme
 otherAssets.whatYouWillNeed.heading = Other assets held by {0}
 otherAssets.whatYouWillNeed.paragraph1 = Answer these questions for one asset at a time. If you need to add more, you will be able to do this later.

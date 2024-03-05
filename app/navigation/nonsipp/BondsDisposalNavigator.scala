@@ -54,6 +54,10 @@ object BondsDisposalNavigator extends JourneyNavigator {
       controllers.routes.UnauthorisedController.onPageLoad()
 
     case BuyerNamePage(srn, bondIndex, disposalIndex) =>
+      controllers.nonsipp.bondsdisposal.routes.IsBuyerConnectedPartyController
+        .onPageLoad(srn, bondIndex, disposalIndex, NormalMode)
+
+    case IsBuyerConnectedPartyPage(srn, bondIndex, disposalIndex) =>
       controllers.routes.UnauthorisedController.onPageLoad()
 
   }

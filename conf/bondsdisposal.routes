@@ -25,3 +25,8 @@ GET         /:srn/buyers-name-bonds/:bondIndex/:disposalIndex                   
 POST        /:srn/buyers-name-bonds/:bondIndex/:disposalIndex                           controllers.nonsipp.bondsdisposal.BuyerNameController.onSubmit(srn: Srn, bondIndex: Max5000, disposalIndex: Max50, mode: Mode = NormalMode)
 GET         /:srn/change-buyers-name-bonds/:bondIndex/:disposalIndex                    controllers.nonsipp.bondsdisposal.BuyerNameController.onPageLoad(srn: Srn, bondIndex: Max5000, disposalIndex: Max50, mode: Mode = CheckMode)
 POST        /:srn/change-buyers-name-bonds/:bondIndex/:disposalIndex                    controllers.nonsipp.bondsdisposal.BuyerNameController.onSubmit(srn: Srn, bondIndex: Max5000, disposalIndex: Max50, mode: Mode = CheckMode)
+
+GET         /:srn/is-bonds-buyer-connected-party/:bondIndex/:disposalIndex              controllers.nonsipp.bondsdisposal.IsBuyerConnectedPartyController.onPageLoad(srn: Srn, bondIndex: Max5000, disposalIndex: Max50, mode: Mode = NormalMode)
+POST        /:srn/is-bonds-buyer-connected-party/:bondIndex/:disposalIndex              controllers.nonsipp.bondsdisposal.IsBuyerConnectedPartyController.onSubmit(srn: Srn, bondIndex: Max5000, disposalIndex: Max50, mode: Mode = NormalMode)
+GET         /:srn/change-is-bonds-buyer-connected-party/:bondIndex/:disposalIndex       controllers.nonsipp.bondsdisposal.IsBuyerConnectedPartyController.onPageLoad(srn: Srn, bondIndex: Max5000, disposalIndex: Max50, mode: Mode = CheckMode)
+POST        /:srn/change-is-bonds-buyer-connected-party/:bondIndex/:disposalIndex       controllers.nonsipp.bondsdisposal.IsBuyerConnectedPartyController.onSubmit(srn: Srn, bondIndex: Max5000, disposalIndex: Max50, mode: Mode = CheckMode)
