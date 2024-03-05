@@ -16,12 +16,12 @@
 
 package models.requests.psr
 
-import models.{Address, PropertyAcquiredFrom, SchemeHoldLandProperty}
+import models.{Address, PropertyAcquiredFrom, SchemeHoldBond, SchemeHoldLandProperty}
 import play.api.libs.json._
 
 import java.time.LocalDate
 
-case class Assets(optLandOrProperty: Option[LandOrProperty], optBorrowing: Option[Borrowing])
+case class Assets(optLandOrProperty: Option[LandOrProperty], optBorrowing: Option[Borrowing], optBonds: Option[Bonds])
 
 case class LandOrProperty(
   landOrPropertyHeld: Boolean,
@@ -87,7 +87,25 @@ case class MoneyBorrowed(
   reasonForBorrow: String
 )
 
+case class Bonds(
+  bondsWereAdded: Boolean,
+  bondsWereDisposed: Boolean,
+  bondTransactions: Seq[BondTransactions]
+)
+
+case class BondTransactions(
+  nameOfBonds: String,
+  methodOfHolding: SchemeHoldBond,
+  optDateOfAcqOrContrib: Option[LocalDate],
+  costOfBonds: Double,
+  optConnectedPartyStatus: Option[Boolean],
+  bondsUnregulated: Boolean,
+  totalIncomeOrReceipts: Double
+)
+
 object Assets {
+  private implicit val formatBondTransactions: OFormat[BondTransactions] = Json.format[BondTransactions]
+  private implicit val formatBonds: OFormat[Bonds] = Json.format[Bonds]
   private implicit val formatMoneyBorrowed: OFormat[MoneyBorrowed] = Json.format[MoneyBorrowed]
   private implicit val formatBorrowing: OFormat[Borrowing] = Json.format[Borrowing]
 

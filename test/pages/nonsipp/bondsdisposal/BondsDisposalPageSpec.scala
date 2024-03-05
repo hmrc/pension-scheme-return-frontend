@@ -17,7 +17,6 @@
 package pages.nonsipp.bondsdisposal
 
 import pages.behaviours.PageBehaviours
-import models.Money
 class BondsDisposalPageSpec extends PageBehaviours {
 
   private val srn = srnGen.sample.value

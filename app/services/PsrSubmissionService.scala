@@ -29,6 +29,7 @@ import pages.nonsipp.loansmadeoroutstanding._
 import pages.nonsipp.moneyborrowed.MoneyBorrowedPage
 import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
 import pages.nonsipp.sharesdisposal.SharesDisposalPage
+import pages.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldPage
 import transformations._
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -42,7 +43,8 @@ class PsrSubmissionService @Inject()(
   landOrPropertyTransactionsTransformer: LandOrPropertyTransactionsTransformer,
   memberPaymentsTransformer: MemberPaymentsTransformer,
   moneyBorrowedTransformer: MoneyBorrowedTransformer,
-  sharesTransformer: SharesTransformer
+  sharesTransformer: SharesTransformer,
+  bondTransactionsTransformer: BondTransactionsTransformer
 ) {
 
   def submitPsrDetails(
@@ -61,6 +63,7 @@ class PsrSubmissionService @Inject()(
     val optDisposeAnyLandOrProperty = request.userAnswers.get(LandOrPropertyDisposalPage(srn))
     val optDidSchemeHoldAnyShares = request.userAnswers.get(DidSchemeHoldAnySharesPage(srn))
     val optSharesDisposal = request.userAnswers.get(SharesDisposalPage(srn))
+    val optUnregulatedOrConnectedBondsHeld = request.userAnswers.get(UnregulatedOrConnectedBondsHeldPage(srn))
 
     (
       minimalRequiredSubmissionTransformer.transformToEtmp(srn),
@@ -71,7 +74,12 @@ class PsrSubmissionService @Inject()(
           minimalRequiredSubmission = minimalRequiredSubmission,
           checkReturnDates = checkReturnDates,
           loans = buildLoans(srn)(optSchemeHadLoans),
-          assets = buildAssets(srn)(optLandOrPropertyHeld, optMoneyWasBorrowed, optDisposeAnyLandOrProperty),
+          assets = buildAssets(srn)(
+            optLandOrPropertyHeld,
+            optMoneyWasBorrowed,
+            optDisposeAnyLandOrProperty,
+            optUnregulatedOrConnectedBondsHeld
+          ),
           membersPayments = memberPaymentsTransformer.transformToEtmp(srn, request.userAnswers),
           shares = buildShares(srn)(optDidSchemeHoldAnyShares, optSharesDisposal)
         )
@@ -89,9 +97,10 @@ class PsrSubmissionService @Inject()(
   private def buildAssets(srn: Srn)(
     optLandOrPropertyHeld: Option[Boolean],
     optMoneyWasBorrowed: Option[Boolean],
-    optDisposeAnyLandOrProperty: Option[Boolean]
+    optDisposeAnyLandOrProperty: Option[Boolean],
+    optUnregulatedOrConnectedBondsHeld: Option[Boolean]
   )(implicit request: DataRequest[_]): Option[Assets] =
-    Option.when(List(optLandOrPropertyHeld, optMoneyWasBorrowed).flatten.nonEmpty)(
+    Option.when(List(optLandOrPropertyHeld, optMoneyWasBorrowed, optUnregulatedOrConnectedBondsHeld).flatten.nonEmpty)(
       Assets(
         optLandOrProperty = optLandOrPropertyHeld.map(landOrPropertyHeld => {
           val disposeAnyLandOrProperty = optDisposeAnyLandOrProperty.getOrElse(false)
@@ -107,6 +116,14 @@ class PsrSubmissionService @Inject()(
             Borrowing(
               moneyWasBorrowed = moneyWasBorrowed,
               moneyBorrowed = moneyBorrowedTransformer.transformToEtmp(srn)
+            )
+        ),
+        optBonds = optUnregulatedOrConnectedBondsHeld.map(
+          bondsWereAdded =>
+            Bonds(
+              bondsWereAdded = bondsWereAdded,
+              bondsWereDisposed = false,
+              bondTransactions = bondTransactionsTransformer.transformToEtmp(srn)
             )
         )
       )
