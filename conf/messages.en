@@ -2907,3 +2907,10 @@ bondsDisposal.whenWereBondsSold.error.invalid.date = Date these bonds were sold 
 bondsDisposal.whenWereBondsSold.error.date.before = Date these bonds were sold must be the same as or after {0}
 bondsDisposal.whenWereBondsSold.error.date.after = Date these bonds were sold must be the same as or before {0}
 bondsDisposal.whenWereBondsSold.error.invalid.characters = Date these bonds were sold must only include numbers 0 to 9
+
+bondsDisposal.totalConsiderationBondsSold.title = What was the total consideration received for the sale of these bonds, in pounds and pence?
+bondsDisposal.totalConsiderationBondsSold.heading = What was the total consideration received for the sale of these bonds, in pounds and pence?
+bondsDisposal.totalConsiderationBondsSold.error.required = Enter the total consideration received for the sale of bonds, in pounds and pence
+bondsDisposal.totalConsiderationBondsSold.error.invalid.characters = Total consideration received for the sale of bonds must be an amount of money, like 123 or 123.45
+bondsDisposal.totalConsiderationBondsSold.error.tooSmall = Total consideration received for the sale of bonds must be 0.01 or more
+bondsDisposal.totalConsiderationBondsSold.error.tooLarge = Total consideration received for the sale of bonds must be 999999999.99 or less
