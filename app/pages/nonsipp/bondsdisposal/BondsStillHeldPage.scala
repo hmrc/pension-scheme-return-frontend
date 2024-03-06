@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,18 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages.nonsipp.bondsdisposal
 
-import play.api.libs.json.{__, JsPath}
+import config.Refined.{Max50, Max5000}
+import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
+import utils.RefinedUtils.RefinedIntOps
 
-package object bondsdisposal {
+case class BondsStillHeldPage(srn: Srn, bondIndex: Max5000, disposalIndex: Max50) extends QuestionPage[Int] {
 
-  object Paths {
-    val assets: JsPath = __ \ "assets"
-    val bonds: JsPath = assets \ "bonds"
-    val bondTransactions: JsPath = bonds \ "bondTransactions"
-    val bondsDisposed: JsPath = bondTransactions \ "bondsDisposed"
-  }
+  override def path: JsPath =
+    Paths.bondsDisposed \ toString \ bondIndex.arrayIndex.toString \ disposalIndex.arrayIndex.toString
+
+  override def toString: String = "totalNowHeld"
 }

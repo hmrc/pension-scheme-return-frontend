@@ -14,16 +14,24 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages.nonsipp.bondsdisposal
 
-import play.api.libs.json.{__, JsPath}
+import config.Refined.{Max50, Max5000}
+import eu.timepit.refined.refineMV
+import pages.behaviours.PageBehaviours
 
-package object unregulatedorconnectedbonds {
+class BondsStillHeldPageSpec extends PageBehaviours {
 
-  object Paths {
-    val assets: JsPath = __ \ "assets"
-    val bonds: JsPath = assets \ "bonds"
-    val bondTransactions: JsPath = bonds \ "bondTransactions"
+  "BondsStillHeldPage" - {
+
+    val srn = srnGen.sample.value
+    val bondIndex = refineMV[Max5000.Refined](1)
+    val disposalIndex = refineMV[Max50.Refined](1)
+
+    beRetrievable[Int](BondsStillHeldPage(srn, bondIndex, disposalIndex))
+
+    beSettable[Int](BondsStillHeldPage(srn, bondIndex, disposalIndex))
+
+    beRemovable[Int](BondsStillHeldPage(srn, bondIndex, disposalIndex))
   }
-
 }

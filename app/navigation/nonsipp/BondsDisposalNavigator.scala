@@ -42,12 +42,13 @@ object BondsDisposalNavigator extends JourneyNavigator {
 
     case page @ HowWereBondsDisposedOfPage(srn, bondIndex, disposalIndex, _) =>
       userAnswers.get(page) match {
-        case None => controllers.routes.UnauthorisedController.onPageLoad()
+        case None => controllers.routes.JourneyRecoveryController.onPageLoad()
         case Some(HowDisposed.Sold) =>
           controllers.nonsipp.bondsdisposal.routes.WhenWereBondsSoldController
             .onSubmit(srn, bondIndex, disposalIndex, NormalMode)
         case Some(HowDisposed.Transferred) | Some(HowDisposed.Other(_)) =>
-          controllers.routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.bondsdisposal.routes.BondsStillHeldController
+            .onSubmit(srn, bondIndex, disposalIndex, NormalMode)
       }
 
     case WhenWereBondsSoldPage(srn, bondIndex, disposalIndex) =>
@@ -62,6 +63,10 @@ object BondsDisposalNavigator extends JourneyNavigator {
         .onPageLoad(srn, bondIndex, disposalIndex, NormalMode)
 
     case IsBuyerConnectedPartyPage(srn, bondIndex, disposalIndex) =>
+      controllers.nonsipp.bondsdisposal.routes.BondsStillHeldController
+        .onPageLoad(srn, bondIndex, disposalIndex, NormalMode)
+
+    case BondsStillHeldPage(srn, bondIndex, disposalIndex) =>
       controllers.routes.UnauthorisedController.onPageLoad()
 
   }

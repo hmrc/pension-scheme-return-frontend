@@ -2914,3 +2914,11 @@ bondsDisposal.totalConsiderationBondsSold.error.required = Enter the total consi
 bondsDisposal.totalConsiderationBondsSold.error.invalid.characters = Total consideration received for the sale of bonds must be an amount of money, like 123 or 123.45
 bondsDisposal.totalConsiderationBondsSold.error.tooSmall = Total consideration received for the sale of bonds must be 0.01 or more
 bondsDisposal.totalConsiderationBondsSold.error.tooLarge = Total consideration received for the sale of bonds must be 999999999.99 or less
+
+bondsDisposal.bondsStillHeld.title = How many bonds from the original transaction were held by the scheme after this disposal?
+bondsDisposal.bondsStillHeld.heading = How many bonds from the original transaction were held by {0} after this disposal?
+bondsDisposal.bondsStillHeld.hint = If there were none, enter 0.
+bondsDisposal.bondsStillHeld.error.required = Enter the number of bonds from the original transaction held after this disposal
+bondsDisposal.bondsStillHeld.error.decimal = Number of bonds from the original transaction held after this disposal must be a whole number, like 100
+bondsDisposal.bondsStillHeld.error.invalid.characters = Number of bonds from the original transaction held after this disposal must be a number that is 0 or more, like 100
+bondsDisposal.bondsStillHeld.error.tooLarge = Number of bonds from the original transaction held after this disposal must be 9,999,999 or fewer
