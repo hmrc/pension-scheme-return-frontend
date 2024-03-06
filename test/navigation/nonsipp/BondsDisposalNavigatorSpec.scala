@@ -145,9 +145,24 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             bondIndex,
             disposalIndex,
             BuyerNamePage,
+            (srn, bondIndex: Max5000, disposalIndex: Max50, _) =>
+              controllers.nonsipp.bondsdisposal.routes.IsBuyerConnectedPartyController
+                .onPageLoad(srn, bondIndex, disposalIndex, NormalMode)
+          )
+          .withName("go from buyer name page to is buyer connected party page")
+      )
+    }
+
+    "IsBuyerConnectedPartyPage" - {
+      act.like(
+        normalmode
+          .navigateToWithDoubleIndex(
+            bondIndex,
+            disposalIndex,
+            IsBuyerConnectedPartyPage,
             (srn, bondIndex: Max5000, disposalIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
           )
-          .withName("go from buyer name page to unauthorised page")
+          .withName("go from buyer connected party page to unauthorised page")
       )
     }
   }
