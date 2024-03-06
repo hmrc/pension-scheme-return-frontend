@@ -20,10 +20,10 @@ import config.Refined.{OneTo50, OneTo5000}
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.sharesdisposal.SharesDisposalCYAController._
 import eu.timepit.refined.refineMV
-import models.HowSharesDisposed.Sold
-import models.IdentityType.Individual
-import models.SchemeHoldShare.Acquisition
-import models.TypeOfShares._
+import models.HowSharesDisposed
+import models.IdentityType
+import models.SchemeHoldShare
+import models.TypeOfShares
 import models.{CheckMode, ConditionalYesNo, Mode, NormalMode}
 import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.shares.{
@@ -62,78 +62,140 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec {
   private val shareIndex = refineMV[OneTo5000](1)
   private val disposalIndex = refineMV[OneTo50](1)
 
-  private val sharesType = SponsoringEmployer
-  private val acquisitionType = Acquisition
+  // Shares parameters
+  private val nameOfCompany = Some(companyName)
   private val acquisitionDate = Some(localDate)
-
-  private val howSharesDisposed = Sold
-
+  // Sold-specific parameters
   private val dateSharesSold = Some(localDate)
   private val numberSharesSold = Some(totalShares)
   private val considerationSharesSold = Some(money)
-  private val buyerIdentity = Some(Individual)
+  private val buyerIdentity = Some(IdentityType.Individual)
   private val nameOfBuyer = Some(buyerName)
-  private val buyerReasonNoDetails = Some(noninoReason)
+  private val buyerDetails = nino
+  private val buyerReasonNoDetails = None
   private val isBuyerConnectedParty = Some(true)
   private val isIndependentValuation = Some(true)
-
+  // Redeemed-specific parameters
   private val dateSharesRedeemed = Some(localDate)
   private val numberSharesRedeemed = Some(totalShares)
   private val considerationSharesRedeemed = Some(money)
-
+  // Final parameter
   private val sharesStillHeld = totalShares - 1
 
-  private val filledUserAnswers = defaultUserAnswers
-    .unsafeSet(TypeOfSharesHeldPage(srn, shareIndex), sharesType)
-    .unsafeSet(CompanyNameRelatedSharesPage(srn, shareIndex), companyName)
-    .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, shareIndex), acquisitionType)
-    .unsafeSet(WhenDidSchemeAcquireSharesPage(srn, shareIndex), localDate)
-    .unsafeSet(HowWereSharesDisposedPage(srn, shareIndex, disposalIndex), howSharesDisposed)
+  private val soldUserAnswers = defaultUserAnswers
+  // Shares pages
+    .unsafeSet(TypeOfSharesHeldPage(srn, shareIndex), TypeOfShares.SponsoringEmployer)
+    .unsafeSet(CompanyNameRelatedSharesPage(srn, shareIndex), nameOfCompany.get)
+    .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, shareIndex), SchemeHoldShare.Acquisition)
+    .unsafeSet(WhenDidSchemeAcquireSharesPage(srn, shareIndex), acquisitionDate.get)
+    // Shares Disposal pages
+    .unsafeSet(HowWereSharesDisposedPage(srn, shareIndex, disposalIndex), HowSharesDisposed.Sold)
     .unsafeSet(WhenWereSharesSoldPage(srn, shareIndex, disposalIndex), dateSharesSold.get)
     .unsafeSet(HowManySharesSoldPage(srn, shareIndex, disposalIndex), numberSharesSold.get)
     .unsafeSet(TotalConsiderationSharesSoldPage(srn, shareIndex, disposalIndex), considerationSharesSold.get)
     .unsafeSet(WhoWereTheSharesSoldToPage(srn, shareIndex, disposalIndex), buyerIdentity.get)
     .unsafeSet(SharesIndividualBuyerNamePage(srn, shareIndex, disposalIndex), nameOfBuyer.get)
-//    .unsafeSet(
-//      IndividualBuyerNinoNumberPage(srn, shareIndex, disposalIndex),
-//      ConditionalYesNo.yes[String, Nino](buyerDetails.get)
-//    )
     .unsafeSet(
       IndividualBuyerNinoNumberPage(srn, shareIndex, disposalIndex),
-      ConditionalYesNo.no[String, Nino](buyerReasonNoDetails.get)
+      ConditionalYesNo.yes[String, Nino](buyerDetails)
     )
     .unsafeSet(IsBuyerConnectedPartyPage(srn, shareIndex, disposalIndex), isBuyerConnectedParty.get)
     .unsafeSet(IndependentValuationPage(srn, shareIndex, disposalIndex), isIndependentValuation.get)
-    .unsafeSet(WhenWereSharesRedeemedPage(srn, shareIndex, disposalIndex), dateSharesSold.get)
-    .unsafeSet(HowManySharesRedeemedPage(srn, shareIndex, disposalIndex), numberSharesSold.get)
-    .unsafeSet(TotalConsiderationSharesRedeemedPage(srn, shareIndex, disposalIndex), considerationSharesSold.get)
+    .unsafeSet(HowManyDisposalSharesPage(srn, shareIndex, disposalIndex), sharesStillHeld)
+
+  private val redeemedUserAnswers = defaultUserAnswers
+  // Shares pages
+    .unsafeSet(TypeOfSharesHeldPage(srn, shareIndex), TypeOfShares.Unquoted)
+    .unsafeSet(CompanyNameRelatedSharesPage(srn, shareIndex), nameOfCompany.get)
+    .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, shareIndex), SchemeHoldShare.Contribution)
+    .unsafeSet(WhenDidSchemeAcquireSharesPage(srn, shareIndex), acquisitionDate.get)
+    // Shares Disposal pages
+    .unsafeSet(HowWereSharesDisposedPage(srn, shareIndex, disposalIndex), HowSharesDisposed.Redeemed)
+    .unsafeSet(WhenWereSharesRedeemedPage(srn, shareIndex, disposalIndex), dateSharesRedeemed.get)
+    .unsafeSet(HowManySharesRedeemedPage(srn, shareIndex, disposalIndex), numberSharesRedeemed.get)
+    .unsafeSet(TotalConsiderationSharesRedeemedPage(srn, shareIndex, disposalIndex), considerationSharesRedeemed.get)
+    .unsafeSet(HowManyDisposalSharesPage(srn, shareIndex, disposalIndex), sharesStillHeld)
+
+  private val transferredUserAnswers = defaultUserAnswers
+  // Shares pages
+    .unsafeSet(TypeOfSharesHeldPage(srn, shareIndex), TypeOfShares.ConnectedParty)
+    .unsafeSet(CompanyNameRelatedSharesPage(srn, shareIndex), nameOfCompany.get)
+    .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, shareIndex), SchemeHoldShare.Transfer)
+    // Shares Disposal pages
+    .unsafeSet(HowWereSharesDisposedPage(srn, shareIndex, disposalIndex), HowSharesDisposed.Transferred)
+    .unsafeSet(HowManyDisposalSharesPage(srn, shareIndex, disposalIndex), sharesStillHeld)
+
+  private val otherUserAnswers = defaultUserAnswers
+  // Shares pages
+    .unsafeSet(TypeOfSharesHeldPage(srn, shareIndex), TypeOfShares.SponsoringEmployer)
+    .unsafeSet(CompanyNameRelatedSharesPage(srn, shareIndex), nameOfCompany.get)
+    .unsafeSet(WhyDoesSchemeHoldSharesPage(srn, shareIndex), SchemeHoldShare.Acquisition)
+    .unsafeSet(WhenDidSchemeAcquireSharesPage(srn, shareIndex), acquisitionDate.get)
+    // Shares Disposal pages
+    .unsafeSet(HowWereSharesDisposedPage(srn, shareIndex, disposalIndex), HowSharesDisposed.Other(otherDetails))
     .unsafeSet(HowManyDisposalSharesPage(srn, shareIndex, disposalIndex), sharesStillHeld)
 
   "SharesDisposalCYAController" - {
 
     List(NormalMode, CheckMode).foreach { mode =>
+      // Sold
       act.like(
-        renderView(onPageLoad(mode), filledUserAnswers) { implicit app => implicit request =>
+        renderView(onPageLoad(mode), soldUserAnswers) { implicit app => implicit request =>
           injected[CheckYourAnswersView].apply(
             viewModel(
               ViewModelParameters(
                 srn,
                 shareIndex,
                 disposalIndex,
-                sharesType,
+                TypeOfShares.SponsoringEmployer,
                 companyName,
-                acquisitionType,
+                SchemeHoldShare.Acquisition,
                 acquisitionDate,
-                howSharesDisposed,
+                HowSharesDisposed.Sold,
                 dateSharesSold,
                 numberSharesSold,
                 considerationSharesSold,
                 buyerIdentity,
-                nameOfBuyer,
-                None,
+                Some(buyerName),
+                Some(buyerDetails.toString),
                 buyerReasonNoDetails,
                 isBuyerConnectedParty,
                 isIndependentValuation,
+                None,
+                None,
+                None,
+                sharesStillHeld,
+                schemeName,
+                mode
+              )
+            )
+          )
+        }.withName(s"render correct $mode view for Sold journey")
+      )
+
+      // Redeemed
+      act.like(
+        renderView(onPageLoad(mode), redeemedUserAnswers) { implicit app => implicit request =>
+          injected[CheckYourAnswersView].apply(
+            viewModel(
+              ViewModelParameters(
+                srn,
+                shareIndex,
+                disposalIndex,
+                TypeOfShares.Unquoted,
+                companyName,
+                SchemeHoldShare.Contribution,
+                acquisitionDate,
+                HowSharesDisposed.Redeemed,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
                 dateSharesRedeemed,
                 numberSharesRedeemed,
                 considerationSharesRedeemed,
@@ -143,7 +205,77 @@ class SharesDisposalCYAControllerSpec extends ControllerBaseSpec {
               )
             )
           )
-        }.withName(s"render correct $mode view")
+        }.withName(s"render correct $mode view for Redeemed journey")
+      )
+
+      // Transferred
+      act.like(
+        renderView(onPageLoad(mode), transferredUserAnswers) { implicit app => implicit request =>
+          injected[CheckYourAnswersView].apply(
+            viewModel(
+              ViewModelParameters(
+                srn,
+                shareIndex,
+                disposalIndex,
+                TypeOfShares.ConnectedParty,
+                companyName,
+                SchemeHoldShare.Transfer,
+                None,
+                HowSharesDisposed.Transferred,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                sharesStillHeld,
+                schemeName,
+                mode
+              )
+            )
+          )
+        }.withName(s"render correct $mode view for Transferred journey")
+      )
+
+      // Other
+      act.like(
+        renderView(onPageLoad(mode), otherUserAnswers) { implicit app => implicit request =>
+          injected[CheckYourAnswersView].apply(
+            viewModel(
+              ViewModelParameters(
+                srn,
+                shareIndex,
+                disposalIndex,
+                TypeOfShares.SponsoringEmployer,
+                companyName,
+                SchemeHoldShare.Acquisition,
+                acquisitionDate,
+                HowSharesDisposed.Other(otherDetails),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                sharesStillHeld,
+                schemeName,
+                mode
+              )
+            )
+          )
+        }.withName(s"render correct $mode view for Other journey")
       )
 
       act.like(

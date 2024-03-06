@@ -32,6 +32,19 @@ case class SharesDisposalCompletedPage(srn: Srn, shareIndex: Max5000, disposalIn
   override def toString: String = "sharesDisposalCompleted"
 }
 
+object SharesDisposalCompleted {
+  def all(
+    srn: Srn,
+    shareIndex: Max5000
+  ): IndexedQuestionPage[SectionCompleted.type] = new IndexedQuestionPage[SectionCompleted.type] {
+
+    override def path: JsPath =
+      Paths.disposedSharesTransaction \ toString \ shareIndex.arrayIndex.toString
+
+    override def toString: String = "sharesDisposalCompleted"
+  }
+}
+
 case class SharesDisposalCompletedPages(srn: Srn) extends IndexedQuestionPage[Map[String, SectionCompleted.type]] {
 
   override def path: JsPath = Paths.disposedSharesTransaction \ toString

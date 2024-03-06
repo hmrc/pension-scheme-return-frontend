@@ -46,8 +46,10 @@ class SharesDisposalMongoController @Inject()(
   override val max: Max50 = refineMV(50)
 
   override def pages(srn: Srn, index: Max5000, secondaryIndex: Max50): Pages = HList(
-    PageWithValue(SharesDisposalCompletedPage(srn, index, secondaryIndex), SectionCompleted),
-    PageWithValue(HowWereSharesDisposedPage(srn, index, secondaryIndex), Transferred),
-    PageWithValue(HowManyDisposalSharesPage(srn, index, secondaryIndex), 3)
+    (
+      PageWithValue(SharesDisposalCompletedPage(srn, index, secondaryIndex), SectionCompleted),
+      PageWithValue(HowWereSharesDisposedPage(srn, index, secondaryIndex), Transferred),
+      PageWithValue(HowManyDisposalSharesPage(srn, index, secondaryIndex), 3)
+    )
   )
 }

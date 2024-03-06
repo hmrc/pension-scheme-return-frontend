@@ -49,7 +49,7 @@ case class HowWereSharesDisposedPage(
       case (Some(_), Some(_)) =>
         removePages(
           userAnswers,
-          pages(srn, shareIndex, disposalIndex, removeHowManyDisposalSharesPage = false, isLastRecord = false)
+          pages(srn, shareIndex, disposalIndex, removeExtraPages = false, isLastRecord = false)
         )
       case (None, _) =>
         val completedPages = userAnswers.map(SharesDisposalCompletedPages(srn))
@@ -59,7 +59,7 @@ case class HowWereSharesDisposedPage(
             srn,
             shareIndex,
             disposalIndex,
-            removeHowManyDisposalSharesPage = true,
+            removeExtraPages = true,
             isLastRecord = completedPages.flatten(_._2).size == 1
           )
         )
@@ -70,7 +70,7 @@ case class HowWereSharesDisposedPage(
     srn: Srn,
     shareIndex: Max5000,
     disposalIndex: Max50,
-    removeHowManyDisposalSharesPage: Boolean,
+    removeExtraPages: Boolean,
     isLastRecord: Boolean
   ): List[Removable[_]] = {
     val list = List(
@@ -82,15 +82,41 @@ case class HowWereSharesDisposedPage(
       TotalConsiderationSharesSoldPage(srn, shareIndex, disposalIndex),
       WhoWereTheSharesSoldToPage(srn, shareIndex, disposalIndex), // has it's own cleanup
       IsBuyerConnectedPartyPage(srn, shareIndex, disposalIndex),
-      IndependentValuationPage(srn, shareIndex, disposalIndex),
-      SharesDisposalCYAPointOfEntry(srn, shareIndex, disposalIndex),
-      SharesDisposalCompletedPage(srn, shareIndex, disposalIndex)
+      IndependentValuationPage(srn, shareIndex, disposalIndex)
     )
 
-    (removeHowManyDisposalSharesPage, isLastRecord) match {
-      case (true, true) => list :+ HowManyDisposalSharesPage(srn, shareIndex, disposalIndex) :+ SharesDisposalPage(srn)
-      case (true, false) => list :+ HowManyDisposalSharesPage(srn, shareIndex, disposalIndex)
-      case (false, false) => list
+    (removeExtraPages, isLastRecord) match {
+      case (true, true) =>
+        list :+ SharesDisposalPage(
+          srn
+        ) :+ HowManyDisposalSharesPage(
+          srn,
+          shareIndex,
+          disposalIndex
+        ) :+ SharesDisposalCYAPointOfEntry(
+          srn,
+          shareIndex,
+          disposalIndex
+        ) :+ SharesDisposalCompletedPage(
+          srn,
+          shareIndex,
+          disposalIndex
+        )
+      case (true, false) =>
+        list :+ HowManyDisposalSharesPage(
+          srn,
+          shareIndex,
+          disposalIndex
+        ) :+ SharesDisposalCYAPointOfEntry(
+          srn,
+          shareIndex,
+          disposalIndex
+        ) :+ SharesDisposalCompletedPage(
+          srn,
+          shareIndex,
+          disposalIndex
+        )
+      case (_, _) => list
     }
   }
 }

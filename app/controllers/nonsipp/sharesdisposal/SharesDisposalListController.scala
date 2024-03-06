@@ -220,10 +220,12 @@ object SharesDisposalListController {
 
     val sortedSharesList = sharesList.sortBy(_.index.value)
 
+    val rows = buildRows(srn, sortedSharesList, userAnswers)
+
     val pagination = Pagination(
       currentPage = page,
       pageSize = Constants.sharesDisposalListSize,
-      totalSize = sortedSharesList.size,
+      totalSize = rows.size,
       page => routes.SharesDisposalListController.onPageLoad(srn, page)
     )
 
@@ -236,7 +238,7 @@ object SharesDisposalListController {
       ),
       page = ListRadiosViewModel(
         legend = Some("sharesDisposal.sharesDisposalList.legend"),
-        rows = buildRows(srn, sortedSharesList, userAnswers),
+        rows = rows,
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(

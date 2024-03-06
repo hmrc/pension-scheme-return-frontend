@@ -21,6 +21,7 @@ import controllers.TestValues
 import eu.timepit.refined.refineMV
 import models.{HowSharesDisposed, IdentityType}
 import models.HowSharesDisposed.HowSharesDisposed
+import models.PointOfEntry
 import pages.behaviours.PageBehaviours
 import utils.UserAnswersUtils.UserAnswersOps
 import viewmodels.models.SectionCompleted
@@ -43,6 +44,7 @@ class HowWereSharesDisposedPageSpec extends PageBehaviours with TestValues {
     beRemovable[HowSharesDisposed](HowWereSharesDisposedPage(srn, shareIndex, disposalIndex))
 
     "cleanup other fields when removing the last disposal of all shares" in {
+      // This test covers case (true, true) in the HowWereSharesDisposedPage.pages method
       val userAnswers = defaultUserAnswers
         .unsafeSet(SharesDisposalPage(srn), true)
         .unsafeSet(HowWereSharesDisposedPage(srn, shareIndexOne, indexOne), HowSharesDisposed.Sold)
@@ -57,6 +59,7 @@ class HowWereSharesDisposedPageSpec extends PageBehaviours with TestValues {
         .unsafeSet(SharesIndividualBuyerNamePage(srn, shareIndexOne, indexOne), buyerName)
         .unsafeSet(IsBuyerConnectedPartyPage(srn, shareIndexOne, indexOne), true)
         .unsafeSet(IndependentValuationPage(srn, shareIndexOne, indexOne), true)
+        .unsafeSet(SharesDisposalCYAPointOfEntry(srn, shareIndexOne, indexOne), PointOfEntry.NoPointOfEntry)
         .unsafeSet(SharesDisposalCompletedPage(srn, shareIndexOne, indexOne), SectionCompleted)
 
       val result = userAnswers.remove(HowWereSharesDisposedPage(srn, shareIndexOne, indexOne)).success.value
@@ -78,24 +81,45 @@ class HowWereSharesDisposedPageSpec extends PageBehaviours with TestValues {
       result.get(IndependentValuationPage(srn, shareIndexOne, indexOne)) must be(empty)
 
       result.get(HowManyDisposalSharesPage(srn, shareIndexOne, indexOne)) must be(empty)
+      result.get(SharesDisposalCYAPointOfEntry(srn, shareIndexOne, indexOne)) must be(empty)
+      result.get(SharesDisposalCompletedPage(srn, shareIndexOne, indexOne)) must be(empty)
 
     }
 
     "cleanup other fields when removing a disposal but there are disposals of the same share" in {
+      // This test covers case (true, false) in the HowWereSharesDisposedPage.pages method
       val userAnswers = defaultUserAnswers
         .unsafeSet(SharesDisposalPage(srn), true)
+        // Disposal 1
         .unsafeSet(HowWereSharesDisposedPage(srn, shareIndexOne, indexOne), HowSharesDisposed.Sold)
         .unsafeSet(WhenWereSharesRedeemedPage(srn, shareIndexOne, indexOne), localDate)
         .unsafeSet(SharesDisposalCompletedPage(srn, shareIndexOne, indexOne), SectionCompleted)
+        .unsafeSet(HowManyDisposalSharesPage(srn, shareIndexOne, indexOne), 1)
+        .unsafeSet(SharesDisposalCYAPointOfEntry(srn, shareIndexOne, indexOne), PointOfEntry.NoPointOfEntry)
+        .unsafeSet(SharesDisposalCompletedPage(srn, shareIndexOne, indexOne), SectionCompleted)
+        // Disposal 2
         .unsafeSet(HowWereSharesDisposedPage(srn, shareIndexOne, indexTwo), HowSharesDisposed.Sold)
         .unsafeSet(WhenWereSharesRedeemedPage(srn, shareIndexOne, indexTwo), localDate)
+        .unsafeSet(SharesDisposalCompletedPage(srn, shareIndexOne, indexTwo), SectionCompleted)
+        .unsafeSet(HowManyDisposalSharesPage(srn, shareIndexOne, indexTwo), 1)
+        .unsafeSet(SharesDisposalCYAPointOfEntry(srn, shareIndexOne, indexTwo), PointOfEntry.NoPointOfEntry)
         .unsafeSet(SharesDisposalCompletedPage(srn, shareIndexOne, indexTwo), SectionCompleted)
 
       val result = userAnswers.remove(HowWereSharesDisposedPage(srn, shareIndexOne, indexOne)).success.value
 
+      result.get(SharesDisposalPage(srn)) must not be empty
+      // Disposal 1
       result.get(HowWereSharesDisposedPage(srn, shareIndexOne, indexOne)) must be(empty)
       result.get(WhenWereSharesRedeemedPage(srn, shareIndexOne, indexOne)) must be(empty)
-      result.get(SharesDisposalPage(srn)) must not be empty
+      result.get(HowManyDisposalSharesPage(srn, shareIndexOne, indexOne)) must be(empty)
+      result.get(SharesDisposalCYAPointOfEntry(srn, shareIndexOne, indexOne)) must be(empty)
+      result.get(SharesDisposalCompletedPage(srn, shareIndexOne, indexOne)) must be(empty)
+      // Disposal 2
+      result.get(HowWereSharesDisposedPage(srn, shareIndexOne, indexTwo)) must not be empty
+      result.get(WhenWereSharesRedeemedPage(srn, shareIndexOne, indexTwo)) must not be empty
+      result.get(HowManyDisposalSharesPage(srn, shareIndexOne, indexTwo)) must not be empty
+      result.get(SharesDisposalCYAPointOfEntry(srn, shareIndexOne, indexTwo)) must not be empty
+      result.get(SharesDisposalCompletedPage(srn, shareIndexOne, indexTwo)) must not be empty
     }
 
     "cleanup other fields when removing a disposal but there are disposals for other shares" in {
@@ -115,6 +139,31 @@ class HowWereSharesDisposedPageSpec extends PageBehaviours with TestValues {
       result.get(HowWereSharesDisposedPage(srn, shareIndexTwo, indexOne)) must not be empty
       result.get(WhenWereSharesRedeemedPage(srn, shareIndexTwo, indexOne)) must not be empty
       result.get(SharesDisposalPage(srn)) must not be empty
+    }
+
+    "cleanup relevant fields when changing the answer on this page in CheckMode" in {
+      // This test covers case (_, _) in the HowWereSharesDisposedPage.pages method
+      val userAnswers = defaultUserAnswers
+        .unsafeSet(SharesDisposalPage(srn), true)
+        .unsafeSet(HowWereSharesDisposedPage(srn, shareIndexOne, indexOne), HowSharesDisposed.Redeemed)
+        .unsafeSet(WhenWereSharesRedeemedPage(srn, shareIndexOne, indexOne), localDate)
+        .unsafeSet(HowManySharesRedeemedPage(srn, shareIndexOne, indexOne), 1)
+        .unsafeSet(TotalConsiderationSharesRedeemedPage(srn, shareIndexOne, indexOne), money)
+        .unsafeSet(HowManyDisposalSharesPage(srn, shareIndexOne, indexOne), 1)
+        .unsafeSet(SharesDisposalCYAPointOfEntry(srn, shareIndexOne, indexOne), PointOfEntry.NoPointOfEntry)
+        .unsafeSet(SharesDisposalCompletedPage(srn, shareIndexOne, indexOne), SectionCompleted)
+
+      userAnswers.set(HowWereSharesDisposedPage(srn, shareIndexOne, indexOne), HowSharesDisposed.Transferred)
+
+      userAnswers.get(SharesDisposalPage(srn)) must not be empty
+      userAnswers.get(HowWereSharesDisposedPage(srn, shareIndexOne, indexOne)) must not be empty
+      userAnswers.get(HowManyDisposalSharesPage(srn, shareIndexOne, indexOne)) must not be empty
+      userAnswers.get(SharesDisposalCYAPointOfEntry(srn, shareIndexOne, indexOne)) must not be empty
+      userAnswers.get(SharesDisposalCompletedPage(srn, shareIndexOne, indexOne)) must not be empty
+
+      userAnswers.get(WhenWereSharesRedeemedPage(srn, shareIndexOne, indexOne)) must not be empty
+      userAnswers.get(HowManySharesRedeemedPage(srn, shareIndexOne, indexOne)) must not be empty
+      userAnswers.get(TotalConsiderationSharesRedeemedPage(srn, shareIndexOne, indexOne)) must not be empty
     }
   }
 }

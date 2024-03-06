@@ -38,6 +38,7 @@ import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{PsrSubmissionService, SaveService}
 import utils.DateTimeUtils.localDateShow
+import utils.ListUtils.ListOps
 import viewmodels.DisplayMessage.Message
 import viewmodels.Margin
 import viewmodels.implicits._
@@ -390,7 +391,7 @@ object SharesDisposalCYAController {
           "site.change",
           controllers.nonsipp.sharesdisposal.routes.HowWereSharesDisposedController
             .onSubmit(srn, shareIndex, disposalIndex, CheckMode)
-            .url
+            .url + "#howWereSharesDisposed"
         ).withVisuallyHiddenContent("sharesDisposal.cya.baseRow2.hidden")
       )
     )
@@ -427,7 +428,30 @@ object SharesDisposalCYAController {
       case IdentityType.UKPartnership =>
         routes.PartnershipBuyerNameController.onSubmit(srn, shareIndex, disposalIndex, CheckMode).url
       case IdentityType.Other =>
-        routes.OtherBuyerDetailsController.onSubmit(srn, shareIndex, disposalIndex, CheckMode).url
+        routes.OtherBuyerDetailsController.onSubmit(srn, shareIndex, disposalIndex, CheckMode).url + "#buyerName"
+    }
+
+    val buyerDetailsUrl = buyerIdentity match {
+      case IdentityType.Individual =>
+        routes.IndividualBuyerNinoNumberController.onSubmit(srn, shareIndex, disposalIndex, CheckMode).url
+      case IdentityType.UKCompany =>
+        routes.CompanyBuyerCrnController.onSubmit(srn, shareIndex, disposalIndex, CheckMode).url
+      case IdentityType.UKPartnership =>
+        routes.PartnershipBuyerUtrController.onSubmit(srn, shareIndex, disposalIndex, CheckMode).url
+      case IdentityType.Other =>
+        routes.OtherBuyerDetailsController.onSubmit(srn, shareIndex, disposalIndex, CheckMode).url + "#buyerDetails"
+    }
+
+    val buyerDetailsType = buyerIdentity match {
+      case IdentityType.Individual => Message("sharesDisposal.cya.nino")
+      case IdentityType.UKCompany => Message("sharesDisposal.cya.crn")
+      case IdentityType.UKPartnership => Message("sharesDisposal.cya.utr")
+      case IdentityType.Other => Message("sharesDisposal.cya.details")
+    }
+
+    val buyerNoDetailsHidden = buyerIdentity match {
+      case IdentityType.Other => Message("")
+      case _ => Message("sharesDisposal.cya.conditionalSoldRow6.noDetails.hidden", buyerDetailsType)
     }
 
     List(
@@ -483,16 +507,28 @@ object SharesDisposalCYAController {
           "site.change",
           buyerNameUrl
         ).withVisuallyHiddenContent("sharesDisposal.cya.conditionalSoldRow5.hidden")
-      ),
-      conditionalSoldRow6(
-        srn,
-        shareIndex,
-        disposalIndex,
-        buyerIdentity,
-        buyerName,
-        buyerDetails,
-        buyerReasonNoDetails
-      ),
+      )
+    ) :?+ buyerDetails.map(
+      details =>
+        CheckYourAnswersRowViewModel(
+          Message("sharesDisposal.cya.conditionalSoldRow6.details.key", buyerName, buyerDetailsType),
+          details
+        ).withAction(
+          SummaryAction("site.change", buyerDetailsUrl)
+            .withVisuallyHiddenContent(
+              Message("sharesDisposal.cya.conditionalSoldRow6.details.hidden", buyerDetailsType)
+            )
+        )
+    ) :?+ buyerReasonNoDetails.map(
+      reasonNoDetails =>
+        CheckYourAnswersRowViewModel(
+          Message("sharesDisposal.cya.conditionalSoldRow6.noDetails.key", buyerName, buyerDetailsType),
+          reasonNoDetails
+        ).withAction(
+          SummaryAction("site.change", buyerDetailsUrl)
+            .withVisuallyHiddenContent(buyerNoDetailsHidden)
+        )
+    ) :+
       CheckYourAnswersRowViewModel(
         Message("sharesDisposal.cya.conditionalSoldRow7.key", buyerName),
         if (isBuyerConnectedParty) "site.yes" else "site.no"
@@ -503,7 +539,7 @@ object SharesDisposalCYAController {
             .onSubmit(srn, shareIndex, disposalIndex, CheckMode)
             .url
         ).withVisuallyHiddenContent(Message("sharesDisposal.cya.conditionalSoldRow7.hidden", buyerName))
-      ),
+      ) :+
       CheckYourAnswersRowViewModel(
         Message("sharesDisposal.cya.conditionalSoldRow8.key", companyName),
         if (isIndependentValuation) "site.yes" else "site.no"
@@ -514,149 +550,6 @@ object SharesDisposalCYAController {
             .onSubmit(srn, shareIndex, disposalIndex, CheckMode)
             .url
         ).withVisuallyHiddenContent(Message("sharesDisposal.cya.conditionalSoldRow8.hidden", companyName))
-      )
-    )
-  }
-
-  private def conditionalSoldRow6(
-    srn: Srn,
-    shareIndex: Max5000,
-    disposalIndex: Max50,
-    buyerIdentity: IdentityType,
-    buyerName: String,
-    buyerDetails: Option[String],
-    buyerReasonNoDetails: Option[String]
-  ): CheckYourAnswersRowViewModel = buyerIdentity match {
-    // Individual
-    case IdentityType.Individual =>
-      (buyerDetails, buyerReasonNoDetails) match {
-        // NINO provided
-        case (Some(details), None) =>
-          CheckYourAnswersRowViewModel(
-            Message(
-              "sharesDisposal.cya.conditionalSoldRow6.details.key",
-              buyerName,
-              Message("sharesDisposal.cya.nino")
-            ),
-            details
-          ).withAction(
-            SummaryAction(
-              "site.change",
-              routes.IndividualBuyerNinoNumberController.onSubmit(srn, shareIndex, disposalIndex, CheckMode).url
-            ).withVisuallyHiddenContent(
-              Message("sharesDisposal.cya.conditionalSoldRow6.details.hidden", "sharesDisposal.cya.nino")
-            )
-          )
-        // NINO not provided
-        case (None, Some(reason)) =>
-          CheckYourAnswersRowViewModel(
-            Message(
-              "sharesDisposal.cya.conditionalSoldRow6.noDetails.key",
-              buyerName,
-              Message("sharesDisposal.cya.nino")
-            ),
-            reason
-          ).withAction(
-            SummaryAction(
-              "site.change",
-              routes.IndividualBuyerNinoNumberController.onSubmit(srn, shareIndex, disposalIndex, CheckMode).url
-            ).withVisuallyHiddenContent(
-              Message("sharesDisposal.cya.conditionalSoldRow6.noDetails.hidden", "sharesDisposal.cya.nino")
-            )
-          )
-      }
-    // Company
-    case IdentityType.UKCompany =>
-      (buyerDetails, buyerReasonNoDetails) match {
-        // CRN provided
-        case (Some(details), None) =>
-          CheckYourAnswersRowViewModel(
-            Message(
-              "sharesDisposal.cya.conditionalSoldRow6.details.key",
-              buyerName,
-              Message("sharesDisposal.cya.crn")
-            ),
-            details
-          ).withAction(
-            SummaryAction(
-              "site.change",
-              routes.CompanyBuyerCrnController.onSubmit(srn, shareIndex, disposalIndex, CheckMode).url
-            ).withVisuallyHiddenContent(
-              Message("sharesDisposal.cya.conditionalSoldRow6.details.hidden", "sharesDisposal.cya.crn")
-            )
-          )
-        // CRN not provided
-        case (None, Some(reason)) =>
-          CheckYourAnswersRowViewModel(
-            Message(
-              "sharesDisposal.cya.conditionalSoldRow6.noDetails.key",
-              buyerName,
-              Message("sharesDisposal.cya.crn")
-            ),
-            reason
-          ).withAction(
-            SummaryAction(
-              "site.change",
-              routes.CompanyBuyerCrnController.onSubmit(srn, shareIndex, disposalIndex, CheckMode).url
-            ).withVisuallyHiddenContent(
-              Message("sharesDisposal.cya.conditionalSoldRow6.noDetails.hidden", "sharesDisposal.cya.crn")
-            )
-          )
-      }
-    // Partnership
-    case IdentityType.UKPartnership =>
-      (buyerDetails, buyerReasonNoDetails) match {
-        // UTR provided
-        case (Some(details), None) =>
-          CheckYourAnswersRowViewModel(
-            Message(
-              "sharesDisposal.cya.conditionalSoldRow6.details.key",
-              buyerName,
-              Message("sharesDisposal.cya.utr")
-            ),
-            details
-          ).withAction(
-            SummaryAction(
-              "site.change",
-              routes.PartnershipBuyerUtrController.onSubmit(srn, shareIndex, disposalIndex, CheckMode).url
-            ).withVisuallyHiddenContent(
-              Message("sharesDisposal.cya.conditionalSoldRow6.details.hidden", "sharesDisposal.cya.utr")
-            )
-          )
-        // UTR not provided
-        case (None, Some(reason)) =>
-          CheckYourAnswersRowViewModel(
-            Message(
-              "sharesDisposal.cya.conditionalSoldRow6.noDetails.key",
-              buyerName,
-              Message("sharesDisposal.cya.utr")
-            ),
-            reason
-          ).withAction(
-            SummaryAction(
-              "site.change",
-              routes.PartnershipBuyerUtrController.onSubmit(srn, shareIndex, disposalIndex, CheckMode).url
-            ).withVisuallyHiddenContent(
-              Message("sharesDisposal.cya.conditionalSoldRow6.noDetails.hidden", "sharesDisposal.cya.utr")
-            )
-          )
-      }
-    // Other
-    case IdentityType.Other =>
-      CheckYourAnswersRowViewModel(
-        Message(
-          "sharesDisposal.cya.conditionalSoldRow6.details.key",
-          buyerName,
-          Message("sharesDisposal.cya.details")
-        ),
-        buyerDetails.get
-      ).withAction(
-        SummaryAction(
-          "site.change",
-          routes.OtherBuyerDetailsController.onSubmit(srn, shareIndex, disposalIndex, CheckMode).url
-        ).withVisuallyHiddenContent(
-          Message("sharesDisposal.cya.conditionalSoldRow6.details.hidden", "sharesDisposal.cya.details")
-        )
       )
   }
 
@@ -720,7 +613,7 @@ object SharesDisposalCYAController {
           "site.change",
           controllers.nonsipp.sharesdisposal.routes.HowWereSharesDisposedController
             .onSubmit(srn, shareIndex, disposalIndex, CheckMode)
-            .url
+            .url + "#otherDetails"
         ).withVisuallyHiddenContent("sharesDisposal.cya.conditionalOtherRow1.hidden")
       )
     )
