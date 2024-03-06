@@ -131,9 +131,28 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             bondIndex,
             disposalIndex,
             WhenWereBondsSoldPage,
-            (srn, bondIndex: Max5000, disposalIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+            (srn, bondIndex: Max5000, disposalIndex: Max50, _) =>
+              controllers.nonsipp.bondsdisposal.routes.TotalConsiderationSaleBondsController
+                .onPageLoad(srn, bondIndex, disposalIndex, NormalMode)
           )
-          .withName("go from when were bonds sold page to unauthorised page")
+          .withName("go from when were bonds sold page to total consideration sale bonds page")
+      )
+
+    }
+
+    "TotalConsiderationSaleBondsPage" - {
+
+      act.like(
+        normalmode
+          .navigateToWithDoubleIndex(
+            bondIndex,
+            disposalIndex,
+            TotalConsiderationSaleBondsPage,
+            (srn, bondIndex: Max5000, disposalIndex: Max50, _) =>
+              controllers.nonsipp.bondsdisposal.routes.BuyerNameController
+                .onPageLoad(srn, bondIndex, disposalIndex, NormalMode)
+          )
+          .withName("go from total consideration sale bonds page to buyer name page")
       )
 
     }
