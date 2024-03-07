@@ -1601,7 +1601,7 @@ sharesSeller.otherRecipientDetails.description.error.invalid = The description o
 sharesSeller.otherRecipientDetails.description.error.length = The description of the seller must be 35 characters or fewer
 
 otherAssetSeller.otherRecipientDetails.title = Seller’s details
-otherAssetSeller.otherRecipientDetails.heading = Seller’s details for shares in {0}
+otherAssetSeller.otherRecipientDetails.heading = Seller’s details
 otherAssetSeller.otherRecipientDetails.name = Seller’s name
 otherAssetSeller.otherRecipientDetails.description = Brief description of seller (optional)
 otherAssetSeller.otherRecipientDetails.name.error.required = Enter the seller’s name
@@ -2895,6 +2895,18 @@ otherAssets.whenDidSchemeAcquireAssets.error.invalid.date = Date the scheme acqu
 otherAssets.whenDidSchemeAcquireAssets.error.invalid.characters = Date the scheme acquired this asset must only include numbers 0 to 9
 otherAssets.whenDidSchemeAcquireAssets.error.future = Date the scheme acquired this asset must be the same as or before {0}
 otherAssets.whenDidSchemeAcquireAssets.error.after = Date the scheme acquired this asset must be after {0}
+
+companyNameOfOtherAssetsSeller.title = What is the seller’s company name?
+companyNameOfOtherAssetsSeller.heading = What is the seller’s company name?
+companyNameOfOtherAssetsSeller.error.required = Enter the seller’s company name
+companyNameOfOtherAssetsSeller.error.tooLong = Seller’s company name must be 160 characters or fewer
+companyNameOfOtherAssetsSeller.error.invalid = Seller’s company name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+
+partnershipNameOfOtherAssetsSeller.title = What is the seller’s partnership name?
+partnershipNameOfOtherAssetsSeller.heading = What is the seller’s partnership name?
+partnershipNameOfOtherAssetsSeller.error.required = Enter the seller’s partnership name
+partnershipNameOfOtherAssetsSeller.error.tooLong = Seller’s partnership name must be 160 characters or fewer
+partnershipNameOfOtherAssetsSeller.error.invalid = Seller’s partnership name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
 
 bondsDisposal.whenWereBondsSold.title = When were these bonds sold?
 bondsDisposal.whenWereBondsSold.heading = When were these bonds sold?

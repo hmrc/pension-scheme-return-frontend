@@ -21,7 +21,12 @@ import eu.timepit.refined.refineMV
 import models.{IdentitySubject, IdentityType, NormalMode, SchemeHoldAsset}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.common.IdentityTypePage
+import pages.nonsipp.common.{
+  CompanyRecipientCrnPage,
+  IdentityTypePage,
+  OtherRecipientDetailsPage,
+  PartnershipRecipientUtrPage
+}
 import pages.nonsipp.otherassetsheld._
 import utils.BaseSpec
 import utils.UserAnswersUtils.UserAnswersOps
@@ -33,22 +38,6 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
   private val subject = IdentitySubject.OtherAssetSeller
 
   "OtherAssetsHeldNavigator" - {
-    "IdentityType navigation" - {
-      "NormalMode" - {
-        act.like(
-          normalmode
-            .navigateToWithDataIndexAndSubjectBoth(
-              index,
-              subject,
-              IdentityTypePage,
-              Gen.const(IdentityType.Other),
-              controllers.nonsipp.common.routes.OtherRecipientDetailsController.onPageLoad
-            )
-            .withName("go from identity type page to other seller details page")
-        )
-      }
-    }
-
     "OtherAssetsHeldPage" - {
       act.like(
         normalmode
@@ -229,5 +218,123 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           )
       )
     }
+
+    "IdentityType navigation" - {
+      "NormalMode" - {
+        act.like(
+          normalmode
+            .navigateToWithDataIndexAndSubjectBoth(
+              index,
+              subject,
+              IdentityTypePage,
+              Gen.const(IdentityType.Other),
+              controllers.nonsipp.common.routes.OtherRecipientDetailsController.onPageLoad
+            )
+            .withName("go from identity type page to other seller details page")
+        )
+
+        act.like(
+          normalmode
+            .navigateToWithDataIndexAndSubject(
+              index,
+              subject,
+              IdentityTypePage,
+              Gen.const(IdentityType.UKCompany),
+              controllers.nonsipp.otherassetsheld.routes.CompanyNameOfOtherAssetSellerController.onPageLoad
+            )
+            .withName("go from identity type page to company seller name page")
+        )
+
+        act.like(
+          normalmode
+            .navigateToWithDataIndexAndSubject(
+              index,
+              subject,
+              IdentityTypePage,
+              Gen.const(IdentityType.UKPartnership),
+              controllers.nonsipp.otherassetsheld.routes.PartnershipNameOfOtherAssetsSellerController.onPageLoad
+            )
+            .withName("go from identity type page to UKPartnership to partnership name of seller name page")
+        )
+      }
+    }
+
+    "CompanyNameOfOtherAssetSellerPage" - {
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            CompanyNameOfOtherAssetSellerPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.common.routes.CompanyRecipientCrnController
+                .onPageLoad(srn, index, NormalMode, IdentitySubject.OtherAssetSeller)
+          )
+          .withName(
+            "go from CompanyNameOfOtherAssetSellerPage to CompanyRecipientCrnPage"
+          )
+      )
+    }
+
+    "PartnershipOtherAssetSellerNamePage" - {
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            PartnershipOtherAssetSellerNamePage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.common.routes.PartnershipRecipientUtrController
+                .onPageLoad(srn, index, NormalMode, IdentitySubject.OtherAssetSeller)
+          )
+          .withName(
+            "go from PartnershipOtherAssetSellerNamePage to PartnershipRecipientUtrPage"
+          )
+      )
+    }
+
+    "CompanyRecipientCrnPage" - {
+      act.like(
+        normalmode
+          .navigateToWithIndexAndSubject(
+            index,
+            subject,
+            CompanyRecipientCrnPage,
+            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          )
+          .withName(
+            "go from CompanyRecipientCrnPage to Unauthorised"
+          )
+      )
+    }
+
+    "PartnershipRecipientUtrPage" - {
+      act.like(
+        normalmode
+          .navigateToWithIndexAndSubject(
+            index,
+            subject,
+            PartnershipRecipientUtrPage,
+            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          )
+          .withName(
+            "go from PartnershipRecipientUtrPage to Unauthorised"
+          )
+      )
+    }
+
+    "OtherRecipientDetailsPage" - {
+      act.like(
+        normalmode
+          .navigateToWithIndexAndSubject(
+            index,
+            subject,
+            OtherRecipientDetailsPage,
+            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          )
+          .withName(
+            "go from OtherRecipientDetailsPage to Unauthorised"
+          )
+      )
+    }
+
   }
 }
