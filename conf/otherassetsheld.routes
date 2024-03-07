@@ -29,3 +29,13 @@ GET         /:srn/when-did-scheme-acquire-asset/:index                          
 POST        /:srn/when-did-scheme-acquire-asset/:index                                  controllers.nonsipp.otherassetsheld.WhenDidSchemeAcquireAssetsController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
 GET         /:srn/change-when-did-scheme-acquire-asset/:index                           controllers.nonsipp.otherassetsheld.WhenDidSchemeAcquireAssetsController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 POST        /:srn/change-when-did-scheme-acquire-asset/:index                           controllers.nonsipp.otherassetsheld.WhenDidSchemeAcquireAssetsController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET         /:srn/company-name-of-asset-seller/:index                                   controllers.nonsipp.otherassetsheld.CompanyNameOfOtherAssetSellerController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/company-name-of-asset-seller/:index                                   controllers.nonsipp.otherassetsheld.CompanyNameOfOtherAssetSellerController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/change-company-name-of-asset-seller/:index                            controllers.nonsipp.otherassetsheld.CompanyNameOfOtherAssetSellerController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-company-name-of-asset-seller/:index                            controllers.nonsipp.otherassetsheld.CompanyNameOfOtherAssetSellerController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET         /:srn/partnership-name-of-asset-seller/:index                               controllers.nonsipp.otherassetsheld.PartnershipNameOfOtherAssetsSellerController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/partnership-name-of-asset-seller/:index                               controllers.nonsipp.otherassetsheld.PartnershipNameOfOtherAssetsSellerController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/change-partnership-name-of-asset-seller/:index                        controllers.nonsipp.otherassetsheld.PartnershipNameOfOtherAssetsSellerController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-partnership-name-of-asset-seller/:index                        controllers.nonsipp.otherassetsheld.PartnershipNameOfOtherAssetsSellerController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
