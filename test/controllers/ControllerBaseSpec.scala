@@ -145,6 +145,7 @@ trait TestValues {
   val reasonSurrenderedBenefits = "test reason surrendered benefits"
   val fbNumber = "123456785011"
   val otherDetails = "other details"
+  val bondsStillHeld = 5
 
   val address: Address = Address(
     "test-id",

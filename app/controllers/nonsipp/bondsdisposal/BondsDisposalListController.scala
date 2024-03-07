@@ -30,7 +30,7 @@ import models.SchemeId.Srn
 import models.requests.DataRequest
 import models.{Mode, Money, Pagination, SchemeHoldBond, UserAnswers}
 import navigation.Navigator
-import pages.nonsipp.bondsdisposal.{BondsDisposalCompletedPages, BondsDisposalListPage}
+import pages.nonsipp.bondsdisposal.{BondsDisposalCompletedPages, BondsDisposalListPage, BondsStillHeldPage}
 import pages.nonsipp.unregulatedorconnectedbonds.{
   BondsCompleted,
   CostOfBondsPage,
@@ -66,7 +66,7 @@ class BondsDisposalListController @Inject()(
 
       if (indexes.nonEmpty) {
         bondsData(srn, indexes).map { data =>
-          Ok(view(form, viewModel(srn, page, data, mode)))
+          Ok(view(form, viewModel(srn, page, data, mode, request.userAnswers)))
         }.merge
       } else {
         Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
@@ -82,7 +82,7 @@ class BondsDisposalListController @Inject()(
       .fold(
         errors => {
           bondsData(srn, indexes).map { bondsList =>
-            BadRequest(view(errors, viewModel(srn, page, bondsList, mode)))
+            BadRequest(view(errors, viewModel(srn, page, bondsList, mode, request.userAnswers)))
           }.merge
         },
         answer =>
@@ -103,13 +103,13 @@ class BondsDisposalListController @Inject()(
 
   private def bondsData(srn: Srn, indexes: List[Max5000])(
     implicit req: DataRequest[_]
-  ): Either[Result, List[BondsDisposalData]] =
+  ): Either[Result, List[BondsData]] =
     indexes.map { index =>
       for {
         nameOfBonds <- requiredPage(NameOfBondsPage(srn, index))
         heldBondsType <- requiredPage(WhyDoesSchemeHoldBondsPage(srn, index))
         bondsValue <- requiredPage(CostOfBondsPage(srn, index))
-      } yield BondsDisposalData(index, nameOfBonds, heldBondsType, bondsValue)
+      } yield BondsData(index, nameOfBonds, heldBondsType, bondsValue)
     }.sequence
 }
 
@@ -153,34 +153,58 @@ object BondsDisposalListController {
         }
     }
 
-  private def buildRows(bondsData: List[BondsDisposalData]): List[ListRadiosRow] =
-    bondsData.flatMap { bonds =>
-      val heldBonds = bonds.heldBondsType match {
-        case SchemeHoldBond.Acquisition => "bondsDisposalList.acquired"
-        case SchemeHoldBond.Contribution => "bondsDisposalList.contributed"
-        case SchemeHoldBond.Transfer => "bondsDisposalList.transferred"
+  private def buildRows(srn: Srn, bondsList: List[BondsData], userAnswers: UserAnswers): List[ListRadiosRow] =
+    bondsList.flatMap { bondsData =>
+      val disposalIndex = getDisposal(srn, bondsData.index, userAnswers, isNextDisposal = false).get
+      val totalBondsNowHeld: Option[Int] = userAnswers.get(BondsStillHeldPage(srn, bondsData.index, disposalIndex))
+
+      totalBondsNowHeld match {
+        case Some(sharesRemaining) =>
+          if (sharesRemaining > 0) {
+            List(
+              ListRadiosRow(
+                bondsData.index.value,
+                buildMessage(bondsData)
+              )
+            )
+          } else {
+            Nil
+          }
+        case _ =>
+          List(
+            ListRadiosRow(
+              bondsData.index.value,
+              buildMessage(bondsData)
+            )
+          )
       }
-      List(
-        ListRadiosRow(
-          bonds.index.value,
-          Message("bondsDisposalList.row", bonds.nameOfBonds, heldBonds, bonds.bondsValue.displayAs)
-        )
-      )
     }
+
+  private def buildMessage(bondsData: BondsData): Message = {
+    val heldBondsMessage = bondsData.heldBondsType match {
+      case SchemeHoldBond.Acquisition => "bondsDisposalList.acquired"
+      case SchemeHoldBond.Contribution => "bondsDisposalList.contributed"
+      case SchemeHoldBond.Transfer => "bondsDisposalList.transferred"
+    }
+    Message("bondsDisposalList.row", bondsData.nameOfBonds, heldBondsMessage, bondsData.bondsValue.displayAs)
+  }
 
   def viewModel(
     srn: Srn,
     page: Int,
-    bondsList: List[BondsDisposalData],
-    mode: Mode
+    bondsList: List[BondsData],
+    mode: Mode,
+    userAnswers: UserAnswers
   ): FormPageViewModel[ListRadiosViewModel] = {
 
     val sortedBondsList = bondsList.sortBy(_.index.value)
 
+    val rows = buildRows(srn, sortedBondsList, userAnswers)
+
     val pagination = Pagination(
       currentPage = page,
       pageSize = Constants.bondsDisposalListSize,
-      totalSize = sortedBondsList.size,
+      totalSize = rows.size,
       page => routes.BondsDisposalListController.onPageLoad(srn, page, mode)
     )
 
@@ -194,7 +218,7 @@ object BondsDisposalListController {
       page = ListRadiosViewModel(
         legend = Some("bondsDisposalList.legend"),
         legendSize = Some(LegendSize.Medium),
-        rows = buildRows(sortedBondsList),
+        rows = rows,
         paginatedViewModel = Some(
           PaginatedViewModel(
             Message(
@@ -214,7 +238,7 @@ object BondsDisposalListController {
     )
   }
 
-  case class BondsDisposalData(
+  case class BondsData(
     index: Max5000,
     nameOfBonds: String,
     heldBondsType: SchemeHoldBond,

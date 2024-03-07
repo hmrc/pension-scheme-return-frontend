@@ -62,19 +62,19 @@ class BondsDisposalListControllerSpec extends ControllerBaseSpec {
       .unsafeSet(BondsCompleted(srn, indexThree), SectionCompleted)
 
   private val bondsData = List(
-    BondsDisposalData(
+    BondsData(
       indexOne,
       nameOfBonds = "bonds one",
       heldBondsType = SchemeHoldBond.Transfer,
       bondsValue = money
     ),
-    BondsDisposalData(
+    BondsData(
       indexTwo,
       nameOfBonds = "bonds two",
       heldBondsType = SchemeHoldBond.Acquisition,
       bondsValue = money
     ),
-    BondsDisposalData(
+    BondsData(
       indexThree,
       nameOfBonds = "bonds three",
       heldBondsType = SchemeHoldBond.Contribution,
@@ -86,7 +86,7 @@ class BondsDisposalListControllerSpec extends ControllerBaseSpec {
 
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
       injected[ListRadiosView]
-        .apply(form(injected[RadioListFormProvider]), viewModel(srn, page = 1, bondsData, NormalMode))
+        .apply(form(injected[RadioListFormProvider]), viewModel(srn, page = 1, bondsData, NormalMode, userAnswers))
     })
 
     act.like(redirectNextPage(onSubmit, "value" -> "1"))

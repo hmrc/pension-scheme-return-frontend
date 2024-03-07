@@ -105,9 +105,11 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             disposalIndex,
             HowWereBondsDisposedOfPage.apply,
             Gen.const(HowDisposed.Transferred),
-            (srn, bondIndex: Max5000, disposalIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+            (srn, bondIndex: Max5000, disposalIndex: Max50, _) =>
+              controllers.nonsipp.bondsdisposal.routes.BondsStillHeldController
+                .onSubmit(srn, bondIndex, disposalIndex, NormalMode)
           )
-          .withName("go from how were bonds disposed page to unauthorised page(Transferred)")
+          .withName("go from how were bonds disposed page to BondsStillHeld (Transferred)")
       )
 
       act.like(
@@ -117,9 +119,11 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             disposalIndex,
             HowWereBondsDisposedOfPage.apply,
             Gen.const(HowDisposed.Other("test details")),
-            (srn, bondIndex: Max5000, disposalIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+            (srn, bondIndex: Max5000, disposalIndex: Max50, _) =>
+              controllers.nonsipp.bondsdisposal.routes.BondsStillHeldController
+                .onSubmit(srn, bondIndex, disposalIndex, NormalMode)
           )
-          .withName("go from how were bonds disposed page to unauthorised page(Other)")
+          .withName("go from how were bonds disposed page to BondsStillHeld (Other)")
       )
     }
 
@@ -179,9 +183,24 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             bondIndex,
             disposalIndex,
             IsBuyerConnectedPartyPage,
+            (srn, bondIndex: Max5000, disposalIndex: Max50, _) =>
+              controllers.nonsipp.bondsdisposal.routes.BondsStillHeldController
+                .onPageLoad(srn, bondIndex, disposalIndex, NormalMode)
+          )
+          .withName("go from buyer connected party page to BondsStillHeld")
+      )
+    }
+
+    "BondsStillHeldPage" - {
+      act.like(
+        normalmode
+          .navigateToWithDoubleIndex(
+            bondIndex,
+            disposalIndex,
+            BondsStillHeldPage,
             (srn, bondIndex: Max5000, disposalIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
           )
-          .withName("go from buyer connected party page to unauthorised page")
+          .withName("go from BondsStillHeld to Unauthorised")
       )
     }
   }
