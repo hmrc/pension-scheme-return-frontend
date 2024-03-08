@@ -1,4 +1,4 @@
-# App name
+# pension-scheme-return-frontend
 
 Pension Scheme Return Frontend is the frontend interface for the pension scheme return service.
 The pension scheme return service sits under the manage pension scheme service and is a yearly
@@ -46,6 +46,31 @@ You can execute the [runtests.sh](runtests.sh) file to run the tests and generat
 ```bash
 /bin/bash ./runtests.sh
 ```
+
+***
+
+### Common Issues & Fixes
+
+#### Issue:
+
+sbt compilation warning `"node.js detection failed"`
+
+#### Fix:
+
+```bash
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+source ~/.zshrc
+nvm install 18
+nvm use 18
+```
+
+You can then verify which version of node.js you have by running:
+
+```bash
+node -v
+```
+
+At the time of writing, v18.19.0 is being used.
 
 ***
 
