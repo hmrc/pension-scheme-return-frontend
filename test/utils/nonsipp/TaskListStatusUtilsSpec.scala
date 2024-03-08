@@ -21,7 +21,7 @@ import controllers.TestValues
 import eu.timepit.refined.refineMV
 import models.ConditionalYesNo._
 import models.SponsoringOrConnectedParty.Sponsoring
-import models.{ConditionalYesNo, IdentitySubject, IdentityType, Money, NormalMode, SchemeHoldLandProperty}
+import models.{ConditionalYesNo, IdentitySubject, IdentityType, Money, NormalMode, SchemeHoldLandProperty, TypeOfShares}
 import org.scalatest.OptionValues
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
@@ -37,11 +37,11 @@ import pages.nonsipp.loansmadeoroutstanding.{
 import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsPage, NoNINOPage}
 import pages.nonsipp.moneyborrowed.{LenderNamePage, LenderNamePages, MoneyBorrowedPage, WhySchemeBorrowedMoneyPage}
 import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
-import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
+import pages.nonsipp.shares.{DidSchemeHoldAnySharesPage, SharesCompleted, SharesJourneyStatus, TypeOfSharesHeldPage}
 import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
 import pages.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldPage
 import utils.UserAnswersUtils.UserAnswersOps
-import viewmodels.models.SectionStatus
+import viewmodels.models.{SectionCompleted, SectionStatus}
 import viewmodels.models.TaskListStatus.{Completed, InProgress, NotStarted, UnableToStart}
 
 class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValues with TestValues {
@@ -364,6 +364,18 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
       controllers.nonsipp.shares.routes.DidSchemeHoldAnySharesController
         .onPageLoad(srn, NormalMode)
         .url
+    val sharesListPageUrl =
+      controllers.nonsipp.shares.routes.SharesListController
+        .onPageLoad(srn, 1, NormalMode)
+        .url
+    val typeOfSharesHeldPageOneUrl =
+      controllers.nonsipp.shares.routes.TypeOfSharesHeldController
+        .onPageLoad(srn, refineMV(1), NormalMode)
+        .url
+    val typeOfSharesHeldPageTwoUrl =
+      controllers.nonsipp.shares.routes.TypeOfSharesHeldController
+        .onPageLoad(srn, refineMV(2), NormalMode)
+        .url
 
     "should be Not Started" - {
       "when default data" in {
@@ -378,8 +390,67 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
         val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn)
         result mustBe (Completed, hadSharesPageUrl)
       }
+      "when DidSchemeHoldAnyShares is true and status is completed" in {
+        val customUserAnswers = defaultUserAnswers
+          .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
+          .unsafeSet(SharesJourneyStatus(srn), SectionStatus.Completed)
+        val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn)
+        result mustBe (Completed, sharesListPageUrl)
+      }
+    }
+    "should be InProgress" - {
+      "when only DidSchemeHoldAnyShares true is present" in {
+        val customUserAnswers = defaultUserAnswers
+          .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
+        val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn)
+        result mustBe (InProgress, typeOfSharesHeldPageOneUrl)
+      }
+      "when DidSchemeHoldAnyShares is true and status is InProgress" in {
+        val customUserAnswers = defaultUserAnswers
+          .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
+          .unsafeSet(SharesJourneyStatus(srn), SectionStatus.InProgress)
+        val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn)
+        result mustBe (InProgress, typeOfSharesHeldPageOneUrl)
+      }
+      "when DidSchemeHoldAnyShares is true and status is InProgress - first incomplete" in {
+        val customUserAnswers = defaultUserAnswers
+          .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
+          .unsafeSet(SharesJourneyStatus(srn), SectionStatus.InProgress)
+          // first share:
+          .unsafeSet(TypeOfSharesHeldPage(srn, refineMV(1)), TypeOfShares.Unquoted)
+          // second share:
+          .unsafeSet(TypeOfSharesHeldPage(srn, refineMV(2)), TypeOfShares.Unquoted)
+          .unsafeSet(SharesCompleted(srn, refineMV(2)), SectionCompleted)
+
+        val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn)
+        result mustBe (InProgress, typeOfSharesHeldPageOneUrl)
+      }
+      "when DidSchemeHoldAnyShares is true and status is InProgress - second incomplete" in {
+        val customUserAnswers = defaultUserAnswers
+          .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
+          .unsafeSet(SharesJourneyStatus(srn), SectionStatus.InProgress)
+          // first share:
+          .unsafeSet(TypeOfSharesHeldPage(srn, refineMV(1)), TypeOfShares.Unquoted)
+          .unsafeSet(SharesCompleted(srn, refineMV(1)), SectionCompleted)
+          // second share:
+          .unsafeSet(TypeOfSharesHeldPage(srn, refineMV(2)), TypeOfShares.Unquoted)
+
+        val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn)
+        result mustBe (InProgress, typeOfSharesHeldPageTwoUrl)
+      }
+      "when DidSchemeHoldAnyShares is true and only second exist " in {
+        val customUserAnswers = defaultUserAnswers
+          .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
+          // nothing for first share
+          // second share:
+          .unsafeSet(TypeOfSharesHeldPage(srn, refineMV(2)), TypeOfShares.Unquoted)
+
+        val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn)
+        result mustBe (InProgress, typeOfSharesHeldPageTwoUrl)
+      }
     }
   }
+
   "Quoted shares status" - {
     val totalSharesPageUrl =
       controllers.nonsipp.totalvaluequotedshares.routes.TotalValueQuotedSharesController

@@ -51,7 +51,7 @@ class SharesCYAControllerSpec extends ControllerBaseSpec {
 
   private def onPageLoad(mode: Mode) =
     routes.SharesCYAController.onPageLoad(srn, index, mode)
-  private def onSubmit(mode: Mode) = routes.SharesCYAController.onSubmit(srn, mode)
+  private def onSubmit(mode: Mode) = routes.SharesCYAController.onSubmit(srn, index, mode)
 
   private val filledUserAnswers = defaultUserAnswers
     .unsafeSet(TypeOfSharesHeldPage(srn, index), ConnectedParty)

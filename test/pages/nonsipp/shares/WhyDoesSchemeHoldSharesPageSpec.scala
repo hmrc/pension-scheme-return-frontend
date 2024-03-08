@@ -22,6 +22,7 @@ import models.{IdentitySubject, IdentityType, SchemeHoldShare, UserAnswers}
 import pages.behaviours.PageBehaviours
 import pages.nonsipp.common
 import utils.UserAnswersUtils.UserAnswersOps
+import viewmodels.models.SectionCompleted
 
 import java.time.LocalDate
 
@@ -48,6 +49,7 @@ class WhyDoesSchemeHoldSharesPageSpec extends PageBehaviours {
           .unsafeSet(WhenDidSchemeAcquireSharesPage(srn, index), localDate)
           .unsafeSet(common.IdentityTypePage(srn, index, IdentitySubject.SharesSeller), IdentityType.Individual)
           .unsafeSet(TotalAssetValuePage(srn, index), money)
+          .unsafeSet(SharesCompleted(srn, index), SectionCompleted)
 
       s"remove dependant values when current answer is different than the existing answer" in {
         val result =
@@ -55,6 +57,7 @@ class WhyDoesSchemeHoldSharesPageSpec extends PageBehaviours {
         result.get(WhenDidSchemeAcquireSharesPage(srn, index)) mustBe None
         result.get(common.IdentityTypePage(srn, index, IdentitySubject.SharesSeller)) mustBe None
         result.get(TotalAssetValuePage(srn, index)) mustBe None
+        result.get(SharesCompleted(srn, index)) mustBe None
       }
 
       s"retain dependant values when current answer is the same as the existing answer" in {
@@ -63,6 +66,7 @@ class WhyDoesSchemeHoldSharesPageSpec extends PageBehaviours {
         result.get(WhenDidSchemeAcquireSharesPage(srn, index)) must not be None
         result.get(common.IdentityTypePage(srn, index, IdentitySubject.SharesSeller)) must not be None
         result.get(TotalAssetValuePage(srn, index)) must not be None
+        result.get(SharesCompleted(srn, index)) must not be None
       }
 
       s"remove dependant values when we call Remove operation" in {
@@ -71,6 +75,7 @@ class WhyDoesSchemeHoldSharesPageSpec extends PageBehaviours {
         result.get(WhenDidSchemeAcquireSharesPage(srn, index)) mustBe None
         result.get(common.IdentityTypePage(srn, index, IdentitySubject.SharesSeller)) mustBe None
         result.get(TotalAssetValuePage(srn, index)) mustBe None
+        result.get(SharesCompleted(srn, index)) mustBe None
       }
     }
   }

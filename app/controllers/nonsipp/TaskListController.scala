@@ -408,7 +408,7 @@ object TaskListController {
 
   private def sharesSection(srn: Srn, userAnswers: UserAnswers) = {
     val prefix = "nonsipp.tasklist.shares"
-    val sharesStatusAndLink = getSharesTaskListStatusAndLink(userAnswers, srn)
+    val (sharesStatus, sharesLink) = getSharesTaskListStatusAndLink(userAnswers, srn)
     val quotedSharesStatusAndLink = getQuotedSharesTaskListStatusAndLink(userAnswers, srn)
     val (sharesDisposalsStatus, sharesDisposalsLinkUrl) =
       TaskListStatusUtils.getSharesDisposalsTaskListStatusWithLink(userAnswers, srn)
@@ -417,10 +417,10 @@ object TaskListController {
       s"$prefix.title",
       TaskListItemViewModel(
         LinkMessage(
-          messageKey(prefix, "sponsoringemployer.title", sharesStatusAndLink._1),
-          sharesStatusAndLink._2
+          messageKey(prefix, "sponsoringemployer.title", sharesStatus),
+          sharesLink
         ),
-        sharesStatusAndLink._1
+        sharesStatus
       ),
       TaskListItemViewModel(
         LinkMessage(

@@ -23,7 +23,8 @@ import pages.QuestionPage
 import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
 
-  case class TotalConsiderationSaleBondsPage(srn: Srn, bondIndex: Max5000, disposalIndex: Max50) extends QuestionPage[Money] {
+case class TotalConsiderationSaleBondsPage(srn: Srn, bondIndex: Max5000, disposalIndex: Max50)
+    extends QuestionPage[Money] {
 
   override def path: JsPath =
     Paths.bondsDisposed \ toString \ bondIndex.arrayIndex.toString \ disposalIndex.arrayIndex.toString

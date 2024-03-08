@@ -20,7 +20,7 @@ import config.Refined.{Max5000, OneTo5000}
 import eu.timepit.refined.{refineMV, refineV}
 import models.ConditionalYesNo._
 import models.SchemeId.Srn
-import models.{IdentitySubject, Money, NormalMode, PensionSchemeId, SchemeHoldLandProperty, UserAnswers}
+import models.{IdentitySubject, Money, NormalMode, PensionSchemeId, SchemeHoldLandProperty, TypeOfShares, UserAnswers}
 import pages.nonsipp.common.IdentityTypes
 import pages.nonsipp.employercontributions.{EmployerContributionsPage, EmployerContributionsSectionStatus}
 import pages.nonsipp.landorproperty._
@@ -35,11 +35,17 @@ import pages.nonsipp.memberdetails.{MemberDetailsNinoPages, MembersDetailsPages,
 import pages.nonsipp.moneyborrowed.{LenderNamePages, MoneyBorrowedPage, WhySchemeBorrowedMoneyPages}
 import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
 import pages.nonsipp.schemedesignatory.{FeesCommissionsWagesSalariesPage, HowManyMembersPage, HowMuchCashPage}
-import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
+import pages.nonsipp.shares.{
+  sharesPages,
+  DidSchemeHoldAnySharesPage,
+  SharesCompleted,
+  SharesJourneyStatus,
+  TypeOfSharesHeldPages
+}
 import pages.nonsipp.sharesdisposal.{SharesDisposalCompletedPages, SharesDisposalPage}
 import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
 import pages.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldPage
-import viewmodels.models.{SectionStatus, TaskListStatus}
+import viewmodels.models.{SectionCompleted, SectionStatus, TaskListStatus}
 import viewmodels.models.TaskListStatus.{Completed, InProgress, NotStarted, TaskListStatus}
 
 object TaskListStatusUtils {
@@ -365,7 +371,7 @@ object TaskListStatusUtils {
           val countFirstPages = firstPages.getOrElse(List.empty).size
           val countLastPages = lastPages.getOrElse(List.empty).size
 
-          val incompleteIndex: Int = getBorrowingIncompleteIndex(firstPages, lastPages)
+          val incompleteIndex: Int = getIncompleteIndex(firstPages, lastPages)
           val inProgressCalculatedUrl = refineV[OneTo5000](incompleteIndex).fold(
             _ => listPageUrl,
             index => lenderNamePageUrl(index)
@@ -382,23 +388,23 @@ object TaskListStatusUtils {
     }
   }
 
-  private def getBorrowingIncompleteIndex(
-    firstPages: Option[Map[String, String]],
-    lastPages: Option[Map[String, String]]
+  private def getIncompleteIndex[A, B](
+    firstPages: Option[Map[String, A]],
+    lastPages: Option[Map[String, B]]
   ): Int =
     (firstPages, lastPages) match {
       case (None, _) => 1
       case (Some(_), None) => 1
-      case (Some(first), last) =>
+      case (Some(first), Some(last)) =>
         if (first.isEmpty) {
           1
         } else {
-          val firstIndexes = (0 until first.size).toList
-          val lastIndexes = last.getOrElse(List.empty).map(_._1.toInt).toList
+          val firstIndexes = first.map(_._1.toInt)
+          val lastIndexes = last.map(_._1.toInt).toList
 
           val filtered = firstIndexes.filter(lastIndexes.indexOf(_) < 0)
           if (filtered.isEmpty) {
-            1
+            0
           } else {
             filtered.head + 1
           }
@@ -406,19 +412,35 @@ object TaskListStatusUtils {
     }
 
   def getSharesTaskListStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
-    val hadSharesPage = userAnswers.get(DidSchemeHoldAnySharesPage(srn))
     val defaultLink =
       controllers.nonsipp.shares.routes.DidSchemeHoldAnySharesController
         .onPageLoad(srn, NormalMode)
         .url
-    hadSharesPage match {
-      case None => (NotStarted, defaultLink)
-      case Some(hadShares) =>
-        if (!hadShares) {
-          (Completed, defaultLink)
-        } else {
-          (InProgress, defaultLink)
-        }
+    val sharesListPageUrl =
+      controllers.nonsipp.shares.routes.SharesListController
+        .onPageLoad(srn, 1, NormalMode)
+        .url
+
+    def typeOfSharesHeldPageUrl(index: Max5000) =
+      controllers.nonsipp.shares.routes.TypeOfSharesHeldController.onPageLoad(srn, index, NormalMode).url
+
+    val hadSharesPage = userAnswers.get(DidSchemeHoldAnySharesPage(srn))
+    val shareStatusPage = userAnswers.get(SharesJourneyStatus(srn))
+    val firstPages = userAnswers.get(TypeOfSharesHeldPages(srn))
+    val lastPages = userAnswers.map(SharesCompleted.all(srn))
+    // TODO
+    val incompleteIndex: Int = getIncompleteIndex(firstPages, Some(lastPages))
+    val inProgressCalculatedUrl = refineV[OneTo5000](incompleteIndex).fold(
+      _ => sharesListPageUrl,
+      index => typeOfSharesHeldPageUrl(index)
+    )
+
+    (hadSharesPage, shareStatusPage) match {
+      case (None, _) => (NotStarted, defaultLink)
+      case (Some(false), _) => (Completed, defaultLink)
+      case (Some(true), None) => (InProgress, inProgressCalculatedUrl)
+      case (Some(true), Some(SectionStatus.Completed)) => (Completed, sharesListPageUrl)
+      case (Some(true), Some(SectionStatus.InProgress)) => (InProgress, inProgressCalculatedUrl)
     }
   }
 
