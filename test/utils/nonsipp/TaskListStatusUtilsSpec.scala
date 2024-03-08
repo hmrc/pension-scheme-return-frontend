@@ -28,12 +28,7 @@ import org.scalatest.matchers.must.Matchers
 import pages.nonsipp.common.{IdentityTypePage, IdentityTypes}
 import pages.nonsipp.employercontributions.{EmployerContributionsPage, EmployerContributionsSectionStatus}
 import pages.nonsipp.landorproperty._
-import pages.nonsipp.loansmadeoroutstanding.{
-  IsIndividualRecipientConnectedPartyPage,
-  LoansMadeOrOutstandingPage,
-  OutstandingArrearsOnLoanPage,
-  RecipientSponsoringEmployerConnectedPartyPage
-}
+import pages.nonsipp.loansmadeoroutstanding._
 import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsPage, NoNINOPage}
 import pages.nonsipp.moneyborrowed.{LenderNamePage, LenderNamePages, MoneyBorrowedPage, WhySchemeBorrowedMoneyPage}
 import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
@@ -383,7 +378,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
   "Quoted shares status" - {
     val totalSharesPageUrl =
       controllers.nonsipp.totalvaluequotedshares.routes.TotalValueQuotedSharesController
-        .onPageLoad(srn, NormalMode)
+        .onPageLoad(srn)
         .url
 
     "should be Not Started" - {

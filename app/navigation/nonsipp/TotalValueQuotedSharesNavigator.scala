@@ -19,16 +19,22 @@ package navigation.nonsipp
 import models.UserAnswers
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
+import pages.nonsipp.totalvaluequotedshares._
 import play.api.mvc.Call
 
 object TotalValueQuotedSharesNavigator extends JourneyNavigator {
 
-  override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
+  override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = _ => {
 
     case TotalValueQuotedSharesPage(srn) =>
+      controllers.nonsipp.totalvaluequotedshares.routes.TotalValueQuotedSharesCYAController.onPageLoad(srn)
+
+    case TotalValueQuotedSharesCYAPage(srn) =>
       controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
+
   }
 
-  override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] = _ => _ => PartialFunction.empty
+  override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] =
+    _ => _ => PartialFunction.empty
+
 }

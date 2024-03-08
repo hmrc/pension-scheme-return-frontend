@@ -19,7 +19,7 @@ package controllers.nonsipp.totalvaluequotedshares
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesController.viewModel
 import forms.MoneyFormProvider
-import models.{DateRange, NormalMode}
+import models.DateRange
 import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
 import play.api.inject.bind
@@ -51,16 +51,16 @@ class TotalValueQuotedSharesControllerSpec extends ControllerBaseSpec {
 
     val form = TotalValueQuotedSharesController.form(new MoneyFormProvider(), schemeDatePeriod)
 
-    lazy val onPageLoad = routes.TotalValueQuotedSharesController.onPageLoad(srn, NormalMode)
-    lazy val onSubmit = routes.TotalValueQuotedSharesController.onSubmit(srn, NormalMode)
+    lazy val onPageLoad = routes.TotalValueQuotedSharesController.onPageLoad(srn)
+    lazy val onSubmit = routes.TotalValueQuotedSharesController.onSubmit(srn)
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
-      injected[MoneyView].apply(viewModel(srn, schemeName, form, schemeDatePeriod, NormalMode))
+      injected[MoneyView].apply(viewModel(srn, schemeName, form, schemeDatePeriod))
     })
 
     act.like(renderPrePopView(onPageLoad, TotalValueQuotedSharesPage(srn), validMoney) {
       implicit app => implicit request =>
-        injected[MoneyView].apply(viewModel(srn, schemeName, form.fill(validMoney), schemeDatePeriod, NormalMode))
+        injected[MoneyView].apply(viewModel(srn, schemeName, form.fill(validMoney), schemeDatePeriod))
     })
 
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,9 @@
  * limitations under the License.
  */
 
-package pages
+package pages.nonsipp.totalvaluequotedshares
 
-import models.Money
-import pages.behaviours.PageBehaviours
-import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
+import models.SchemeId.Srn
+import pages.Page
 
-class TotalValueQuotedSharesPageSpec extends PageBehaviours {
-
-  "TotalValueQuotedSharesPage" - {
-
-    val srn = srnGen.sample.value
-
-    beRetrievable[Money](TotalValueQuotedSharesPage(srn))
-
-    beSettable[Money](TotalValueQuotedSharesPage(srn))
-
-    beRemovable[Money](TotalValueQuotedSharesPage(srn))
-  }
-}
+case class TotalValueQuotedSharesCYAPage(srn: Srn) extends Page

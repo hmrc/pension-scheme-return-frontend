@@ -25,12 +25,7 @@ import pages.nonsipp.common.IdentityTypes
 import pages.nonsipp.employercontributions.{EmployerContributionsPage, EmployerContributionsSectionStatus}
 import pages.nonsipp.landorproperty._
 import pages.nonsipp.landorpropertydisposal.{LandOrPropertyDisposalPage, LandPropertyDisposalCompletedPages}
-import pages.nonsipp.loansmadeoroutstanding.{
-  IsIndividualRecipientConnectedPartyPages,
-  LoansMadeOrOutstandingPage,
-  OutstandingArrearsOnLoanPages,
-  RecipientSponsoringEmployerConnectedPartyPages
-}
+import pages.nonsipp.loansmadeoroutstanding._
 import pages.nonsipp.memberdetails.{MemberDetailsNinoPages, MembersDetailsPages, NoNinoPages}
 import pages.nonsipp.moneyborrowed.{LenderNamePages, MoneyBorrowedPage, WhySchemeBorrowedMoneyPages}
 import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
@@ -39,8 +34,8 @@ import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
 import pages.nonsipp.sharesdisposal.{SharesDisposalCompletedPages, SharesDisposalPage}
 import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
 import pages.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldPage
-import viewmodels.models.{SectionStatus, TaskListStatus}
 import viewmodels.models.TaskListStatus.{Completed, InProgress, NotStarted, TaskListStatus}
+import viewmodels.models.{SectionStatus, TaskListStatus}
 
 object TaskListStatusUtils {
 
@@ -451,7 +446,7 @@ object TaskListStatusUtils {
     val totalSharesPage = userAnswers.get(TotalValueQuotedSharesPage(srn))
     val defaultLink =
       controllers.nonsipp.totalvaluequotedshares.routes.TotalValueQuotedSharesController
-        .onPageLoad(srn, NormalMode)
+        .onPageLoad(srn)
         .url
     totalSharesPage match {
       case None => (NotStarted, defaultLink)
