@@ -71,6 +71,16 @@ object BondsDisposalNavigator extends JourneyNavigator {
       controllers.nonsipp.bondsdisposal.routes.BondsDisposalCYAController
         .onPageLoad(srn, bondIndex, disposalIndex, NormalMode)
 
+    case RemoveBondsDisposalPage(srn, bondIndex, disposalIndex) =>
+      if (!userAnswers
+          .map(HowWereBondsDisposedOfPages(srn))
+          .exists(_._2.nonEmpty)) {
+        controllers.nonsipp.bondsdisposal.routes.BondsDisposalController.onPageLoad(srn, NormalMode)
+      } else {
+        // TODO replace with ReportedBondsDisposalListController
+        controllers.routes.UnauthorisedController.onPageLoad()
+      }
+
   }
 
   override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] =
