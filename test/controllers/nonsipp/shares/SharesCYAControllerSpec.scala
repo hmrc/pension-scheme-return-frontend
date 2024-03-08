@@ -29,17 +29,21 @@ import pages.nonsipp.common.IdentityTypePage
 import pages.nonsipp.shares._
 import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
-import services.{PsrSubmissionService, SchemeDateService}
+import services.{PsrSubmissionService, SaveService, SchemeDateService}
 import views.html.CheckYourAnswersView
+
+import scala.concurrent.Future
 
 class SharesCYAControllerSpec extends ControllerBaseSpec {
 
   private implicit val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
   private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
+  private implicit val mockSaveService: SaveService = mock[SaveService]
 
   override protected val additionalBindings: List[GuiceableModule] = List(
     bind[SchemeDateService].toInstance(mockSchemeDateService),
-    bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
+    bind[PsrSubmissionService].toInstance(mockPsrSubmissionService),
+    bind[SaveService].toInstance(mockSaveService)
   )
 
   override protected def beforeAll(): Unit =
@@ -51,7 +55,7 @@ class SharesCYAControllerSpec extends ControllerBaseSpec {
 
   private def onPageLoad(mode: Mode) =
     routes.SharesCYAController.onPageLoad(srn, index, mode)
-  private def onSubmit(mode: Mode) = routes.SharesCYAController.onSubmit(srn, mode)
+  private def onSubmit(mode: Mode) = routes.SharesCYAController.onSubmit(srn, index, mode)
 
   private val filledUserAnswers = defaultUserAnswers
     .unsafeSet(TypeOfSharesHeldPage(srn, index), ConnectedParty)
@@ -104,10 +108,15 @@ class SharesCYAControllerSpec extends ControllerBaseSpec {
       )
       act.like(
         redirectNextPage(onSubmit(mode))
-          .before(MockPSRSubmissionService.submitPsrDetails())
+          .before({
+            when(mockSaveService.save(any())(any(), any())).thenReturn(Future.successful(()))
+            MockPSRSubmissionService.submitPsrDetails()
+          })
           .after({
             verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any())(any(), any(), any())
+            verify(mockSaveService, times(1)).save(any())(any(), any())
             reset(mockPsrSubmissionService)
+            reset(mockSaveService)
           })
           .withName(s"redirect to next page when in ${mode} mode")
       )
