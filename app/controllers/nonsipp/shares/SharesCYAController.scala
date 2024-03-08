@@ -30,7 +30,7 @@ import pages.nonsipp.common._
 import pages.nonsipp.shares._
 import play.api.i18n._
 import play.api.mvc._
-import services.PsrSubmissionService
+import services.{PsrSubmissionService, SaveService}
 import utils.DateTimeUtils.localDateShow
 import utils.ListUtils.ListOps
 import viewmodels.DisplayMessage._
@@ -40,10 +40,11 @@ import views.html.CheckYourAnswersView
 
 import java.time.LocalDate
 import javax.inject.{Inject, Named}
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class SharesCYAController @Inject()(
   override val messagesApi: MessagesApi,
+  saveService: SaveService,
   @Named("non-sipp") navigator: Navigator,
   identifyAndRequireData: IdentifyAndRequireData,
   val controllerComponents: MessagesControllerComponents,
@@ -167,12 +168,20 @@ class SharesCYAController @Inject()(
 
     }
 
-  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] =
+  def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn).async { implicit request =>
-      psrSubmissionService.submitPsrDetails(srn).map {
-        case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-        case Some(_) => Redirect(navigator.nextPage(SharesCYAPage(srn), NormalMode, request.userAnswers))
-      }
+      for {
+        updatedAnswers <- Future
+          .fromTry(
+            request.userAnswers
+              .set(SharesCompleted(srn, index), SectionCompleted)
+          )
+        _ <- saveService.save(updatedAnswers)
+        redirectTo <- psrSubmissionService.submitPsrDetails(srn).map {
+          case None => (controllers.routes.JourneyRecoveryController.onPageLoad())
+          case Some(_) => (navigator.nextPage(SharesCYAPage(srn), NormalMode, request.userAnswers))
+        }
+      } yield Redirect(redirectTo)
     }
 }
 
@@ -233,7 +242,7 @@ object SharesCYAController {
       ),
       refresh = None,
       buttonText = parameters.mode.fold(normal = "site.saveAndContinue", check = "site.continue"),
-      onSubmit = routes.SharesCYAController.onSubmit(parameters.srn, parameters.mode)
+      onSubmit = routes.SharesCYAController.onSubmit(parameters.srn, parameters.index, parameters.mode)
     )
 
   private def sections(

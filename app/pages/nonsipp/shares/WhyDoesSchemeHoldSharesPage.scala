@@ -49,6 +49,7 @@ case class WhyDoesSchemeHoldSharesPage(srn: Srn, index: Max5000) extends Questio
     List(
       WhenDidSchemeAcquireSharesPage(srn, index),
       common.IdentityTypePage(srn, index, IdentitySubject.SharesSeller),
-      TotalAssetValuePage(srn, index)
+      TotalAssetValuePage(srn, index),
+      SharesCompleted(srn, index)
     )
 }
