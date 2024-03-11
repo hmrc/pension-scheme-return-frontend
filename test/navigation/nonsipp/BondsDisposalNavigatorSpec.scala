@@ -226,10 +226,57 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           .withName("go from how were bonds disposed page to when were bonds sold page")
       )
 
+      act.like(
+        checkmode
+          .navigateToWithDoubleIndexAndData(
+            bondIndex,
+            disposalIndex,
+            HowWereBondsDisposedOfPage.apply,
+            Gen.const(HowDisposed.Transferred),
+            (srn, bondIndex, disposalIndex, _) =>
+              controllers.nonsipp.bondsdisposal.routes.BondsDisposalCYAController
+                .onPageLoad(srn, bondIndex, disposalIndex, CheckMode)
+          )
+          .withName("go from How were disposed bond page to bond disposal CYA page when select transferred")
+      )
+
+      act.like(
+        checkmode
+          .navigateToWithDoubleIndexAndData(
+            bondIndex,
+            disposalIndex,
+            HowWereBondsDisposedOfPage.apply,
+            Gen.const(HowDisposed.Other("other details")),
+            (srn, bondIndex, disposalIndex, _) =>
+              controllers.nonsipp.bondsdisposal.routes.BondsDisposalCYAController
+                .onPageLoad(srn, bondIndex, disposalIndex, CheckMode)
+          )
+          .withName("go from How were disposed bond page to bond disposal CYA page when select other")
+      )
+
 
     }
 
     "WhenWereBondsSoldPage" - {
+
+      act.like(
+        checkmode
+          .navigateToWithDoubleIndex(
+            bondIndex,
+            disposalIndex,
+            WhenWereBondsSoldPage,
+            (srn, bondIndex: Max5000, disposalIndex: Max50, _) =>
+              controllers.nonsipp.bondsdisposal.routes.BondsDisposalCYAController
+                .onPageLoad(srn, bondIndex, disposalIndex, CheckMode),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                BondsDisposalCYAPointOfEntry(srn, bondIndex, disposalIndex),
+                PointOfEntry.NoPointOfEntry
+              )
+          )
+          .withName("go from when were bonds sale page to bonds disposal CYA")
+      )
+
 
       act.like(
         checkmode
