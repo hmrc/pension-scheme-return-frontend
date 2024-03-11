@@ -1035,6 +1035,9 @@ totalValueQuotedShares.error.required = Enter the total value of all quoted shar
 totalValueQuotedShares.error.invalid = Total value of all quoted shares must be an amount of money, like 123.45 or 156
 totalValueQuotedShares.error.tooLarge = Total value of all quoted shares must be 999999999.99 or less
 
+totalValueQuotedSharesCYA.section.totalCost = Total value of all quoted shares held by {0} on {1}
+totalValueQuotedSharesCYA.section.totalCost.hidden = total value of all quoted shares held by {0} on {1}
+
 fileUploadErrorMissingInformation.title = Your member details file is missing information or incorrectly formatted
 fileUploadErrorMissingInformation.heading = Your member details file is missing information or incorrectly formatted
 fileUploadErrorMissingInformation.paragraph1 = Your file might be empty, or has a header row (row 1) that is:

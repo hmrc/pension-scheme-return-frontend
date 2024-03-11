@@ -18,42 +18,17 @@ package controllers.nonsipp
 
 import controllers.ControllerBaseSpec
 import eu.timepit.refined.refineMV
-import models.{
-  ConditionalYesNo,
-  DateRange,
-  IdentitySubject,
-  IdentityType,
-  ManualOrUpload,
-  Money,
-  MoneyInPeriod,
-  NormalMode,
-  PensionSchemeId,
-  SchemeMemberNumbers,
-  UserAnswers
-}
 import models.ConditionalYesNo._
 import models.SponsoringOrConnectedParty.Sponsoring
+import models._
 import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.CheckReturnDatesPage
 import pages.nonsipp.common.IdentityTypePage
-import pages.nonsipp.loansmadeoroutstanding.{
-  CompanyRecipientNamePage,
-  IndividualRecipientNamePage,
-  IsIndividualRecipientConnectedPartyPage,
-  LoansMadeOrOutstandingPage,
-  OutstandingArrearsOnLoanPage,
-  RecipientSponsoringEmployerConnectedPartyPage
-}
+import pages.nonsipp.loansmadeoroutstanding._
 import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsNinoPage, MemberDetailsPage, NoNINOPage}
 import pages.nonsipp.moneyborrowed.{LenderNamePages, MoneyBorrowedPage}
 import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
-import pages.nonsipp.schemedesignatory.{
-  ActiveBankAccountPage,
-  FeesCommissionsWagesSalariesPage,
-  HowManyMembersPage,
-  HowMuchCashPage,
-  ValueOfAssetsPage
-}
+import pages.nonsipp.schemedesignatory._
 import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
 import pages.nonsipp.sharesdisposal.{SharesDisposalCompletedPage, SharesDisposalPage}
 import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
@@ -683,7 +658,7 @@ class TaskListControllerSpec extends ControllerBaseSpec {
           expectedTitleKey = "nonsipp.tasklist.shares.title",
           expectedLinkContentKey = "nonsipp.tasklist.shares.add.quotedshares.title",
           expectedLinkUrl = controllers.nonsipp.totalvaluequotedshares.routes.TotalValueQuotedSharesController
-            .onPageLoad(srn, NormalMode)
+            .onPageLoad(srn)
             .url
         )
       }
@@ -701,7 +676,7 @@ class TaskListControllerSpec extends ControllerBaseSpec {
           expectedTitleKey = "nonsipp.tasklist.shares.title",
           expectedLinkContentKey = "nonsipp.tasklist.shares.change.quotedshares.title",
           expectedLinkUrl = controllers.nonsipp.totalvaluequotedshares.routes.TotalValueQuotedSharesController
-            .onPageLoad(srn, NormalMode)
+            .onPageLoad(srn)
             .url
         )
       }

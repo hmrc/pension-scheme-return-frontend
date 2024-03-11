@@ -25,7 +25,7 @@ import forms.MoneyFormProvider
 import forms.mappings.errors.MoneyFormErrors
 import models.SchemeId.Srn
 import models.requests.DataRequest
-import models.{DateRange, Mode, Money}
+import models.{DateRange, Money, NormalMode}
 import navigation.Navigator
 import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
 import play.api.data.Form
@@ -56,15 +56,15 @@ class TotalValueQuotedSharesController @Inject()(
     extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
+  def onPageLoad(srn: Srn): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     usingSchemeDate[Id](srn) { period =>
       val form = TotalValueQuotedSharesController.form(formProvider, period)
       val preparedForm = request.userAnswers.fillForm(TotalValueQuotedSharesPage(srn), form)
-      Ok(view(viewModel(srn, request.schemeDetails.schemeName, preparedForm, period, mode)))
+      Ok(view(viewModel(srn, request.schemeDetails.schemeName, preparedForm, period)))
     }
   }
 
-  def onSubmit(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
+  def onSubmit(srn: Srn): Action[AnyContent] = identifyAndRequireData(srn).async { implicit request =>
     usingSchemeDate(srn) { period =>
       val form = TotalValueQuotedSharesController.form(formProvider, period)
       form
@@ -73,7 +73,7 @@ class TotalValueQuotedSharesController @Inject()(
           formWithErrors => {
             val viewModel =
               TotalValueQuotedSharesController
-                .viewModel(srn, request.schemeDetails.schemeName, formWithErrors, period, mode)
+                .viewModel(srn, request.schemeDetails.schemeName, formWithErrors, period)
 
             Future.successful(BadRequest(view(viewModel)))
           },
@@ -82,7 +82,7 @@ class TotalValueQuotedSharesController @Inject()(
               updatedAnswers <- Future
                 .fromTry(request.userAnswers.transformAndSet(TotalValueQuotedSharesPage(srn), value))
               _ <- saveService.save(updatedAnswers)
-            } yield Redirect(navigator.nextPage(TotalValueQuotedSharesPage(srn), mode, updatedAnswers))
+            } yield Redirect(navigator.nextPage(TotalValueQuotedSharesPage(srn), NormalMode, updatedAnswers))
         )
     }
   }
@@ -110,8 +110,7 @@ object TotalValueQuotedSharesController {
     srn: Srn,
     schemeName: String,
     form: Form[Money],
-    period: DateRange,
-    mode: Mode
+    period: DateRange
   ): FormPageViewModel[SingleQuestion[Money]] =
     FormPageViewModel(
       Message("totalValueQuotedShares.title", period.to.show),
@@ -120,6 +119,6 @@ object TotalValueQuotedSharesController {
         form,
         QuestionField.input(Empty, Some("totalValueQuotedShares.hint"))
       ),
-      routes.TotalValueQuotedSharesController.onSubmit(srn, mode)
+      routes.TotalValueQuotedSharesController.onSubmit(srn)
     )
 }

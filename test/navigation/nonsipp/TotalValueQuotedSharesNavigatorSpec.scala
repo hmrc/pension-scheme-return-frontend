@@ -17,7 +17,7 @@
 package navigation.nonsipp
 
 import navigation.{Navigator, NavigatorBehaviours}
-import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
+import pages.nonsipp.totalvaluequotedshares._
 import utils.BaseSpec
 
 class TotalValueQuotedSharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
@@ -31,9 +31,12 @@ class TotalValueQuotedSharesNavigatorSpec extends BaseSpec with NavigatorBehavio
         .navigateToWithData(
           TotalValueQuotedSharesPage,
           moneyGen,
-          (srn, _) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
+          (srn, _) =>
+            controllers.nonsipp.totalvaluequotedshares.routes.TotalValueQuotedSharesCYAController
+              .onPageLoad(srn)
         )
-        .withName("go from total value quoted shares page to task list page")
+        .withName("go from total value quoted shares page to check your answers page")
     )
   }
+
 }
