@@ -19,9 +19,14 @@ package pages.nonsipp.bondsdisposal
 import config.Refined.{Max50, Max5000}
 import models.HowDisposed.HowDisposed
 import models.SchemeId.Srn
+import models.{HowDisposed, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
+import queries.Removable
+import utils.PageUtils.removePages
 import utils.RefinedUtils.RefinedIntOps
+
+import scala.util.Try
 
 case class HowWereBondsDisposedOfPage(
   srn: Srn,
@@ -34,6 +39,27 @@ case class HowWereBondsDisposedOfPage(
     Paths.bondsDisposed \ toString \ bondIndex.arrayIndex.toString \ disposalIndex.arrayIndex.toString
 
   override def toString: String = "methodOfDisposal"
+
+  override def cleanup(value: Option[HowDisposed], userAnswers: UserAnswers): Try[UserAnswers] =
+    (value, userAnswers.get(this)) match {
+      case (Some(HowDisposed.Sold), Some(HowDisposed.Sold)) => Try(userAnswers)
+      case (Some(HowDisposed.Transferred), Some(HowDisposed.Transferred)) => Try(userAnswers)
+      case (Some(HowDisposed.Other(_)), Some(HowDisposed.Other(_))) => Try(userAnswers)
+      case (Some(_), Some(_)) =>
+        removePages(
+          userAnswers,
+          pages(srn)
+        )
+      case _ => Try(userAnswers)
+    }
+
+  private def pages(srn: Srn): List[Removable[_]] =
+    List(
+      WhenWereBondsSoldPage(srn, bondIndex, disposalIndex),
+      TotalConsiderationSaleBondsPage(srn, bondIndex, disposalIndex),
+      BuyerNamePage(srn, bondIndex, disposalIndex),
+      IsBuyerConnectedPartyPage(srn, bondIndex, disposalIndex)
+    )
 
 }
 

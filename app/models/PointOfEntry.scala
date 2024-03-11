@@ -30,6 +30,10 @@ object PointOfEntry {
     val pointOfEntry = "HowWereSharesDisposedPointOfEntry"
   }
 
+  case object HowWereBondsDisposedPointOfEntry extends WithName("HowWereBondsDisposedPointOfEntry") with PointOfEntry {
+    val pointOfEntry = "HowWereBondsDisposedPointOfEntry"
+  }
+
   case object WhoWereTheSharesSoldToPointOfEntry
       extends WithName("WhoWereTheSharesSoldToPointOfEntry")
       with PointOfEntry {
@@ -44,6 +48,7 @@ object PointOfEntry {
     override def reads(json: JsValue): JsResult[PointOfEntry] = json match {
       case JsString(HowWereSharesDisposedPointOfEntry.name) => JsSuccess(HowWereSharesDisposedPointOfEntry)
       case JsString(WhoWereTheSharesSoldToPointOfEntry.name) => JsSuccess(WhoWereTheSharesSoldToPointOfEntry)
+      case JsString(HowWereBondsDisposedPointOfEntry.name) => JsSuccess(HowWereBondsDisposedPointOfEntry)
       case JsString(NoPointOfEntry.name) => JsSuccess(NoPointOfEntry)
       case unknown => JsError(s"Unknown PointOfEntry value: $unknown")
     }

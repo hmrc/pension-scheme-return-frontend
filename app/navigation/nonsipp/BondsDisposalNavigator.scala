@@ -16,7 +16,8 @@
 
 package navigation.nonsipp
 
-import models.{HowDisposed, NormalMode, UserAnswers}
+import models.PointOfEntry.{HowWereBondsDisposedPointOfEntry, NoPointOfEntry}
+import models.{CheckMode, HowDisposed, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
 import pages.nonsipp.bondsdisposal._
@@ -67,9 +68,70 @@ object BondsDisposalNavigator extends JourneyNavigator {
         .onPageLoad(srn, bondIndex, disposalIndex, NormalMode)
 
     case BondsStillHeldPage(srn, bondIndex, disposalIndex) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+      controllers.nonsipp.bondsdisposal.routes.BondsDisposalCYAController
+        .onPageLoad(srn, bondIndex, disposalIndex, NormalMode)
 
   }
 
-  override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] = _ => _ => PartialFunction.empty
+  override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] =
+    _ =>
+      userAnswers => {
+
+        case page @ HowWereBondsDisposedOfPage(srn, bondIndex, disposalIndex, _) =>
+          userAnswers.get(page) match {
+            case Some(HowDisposed.Sold) =>
+              controllers.nonsipp.bondsdisposal.routes.WhenWereBondsSoldController
+                .onPageLoad(srn, bondIndex, disposalIndex, CheckMode)
+            case Some(HowDisposed.Transferred) | Some(HowDisposed.Other(_)) =>
+              controllers.nonsipp.bondsdisposal.routes.BondsDisposalCYAController
+                .onPageLoad(srn, bondIndex, disposalIndex, CheckMode)
+            case None =>
+              controllers.routes.JourneyRecoveryController.onPageLoad()
+          }
+
+        case WhenWereBondsSoldPage(srn, bondIndex, disposalIndex) =>
+          userAnswers.get(BondsDisposalCYAPointOfEntry(srn, bondIndex, disposalIndex)) match {
+            case Some(NoPointOfEntry) =>
+              controllers.nonsipp.bondsdisposal.routes.BondsDisposalCYAController
+                .onPageLoad(srn, bondIndex, disposalIndex, CheckMode)
+            case Some(HowWereBondsDisposedPointOfEntry) =>
+              controllers.nonsipp.bondsdisposal.routes.TotalConsiderationSaleBondsController
+                .onPageLoad(srn, bondIndex, disposalIndex, CheckMode)
+            case _ =>
+              controllers.routes.JourneyRecoveryController.onPageLoad()
+          }
+
+        case TotalConsiderationSaleBondsPage(srn, bondIndex, disposalIndex) =>
+          userAnswers.get(BondsDisposalCYAPointOfEntry(srn, bondIndex, disposalIndex)) match {
+            case Some(NoPointOfEntry) =>
+              controllers.nonsipp.bondsdisposal.routes.BondsDisposalCYAController
+                .onPageLoad(srn, bondIndex, disposalIndex, CheckMode)
+            case Some(HowWereBondsDisposedPointOfEntry) =>
+              controllers.nonsipp.bondsdisposal.routes.BuyerNameController
+                .onPageLoad(srn, bondIndex, disposalIndex, CheckMode)
+            case _ =>
+              controllers.routes.JourneyRecoveryController.onPageLoad()
+          }
+
+        case BuyerNamePage(srn, bondIndex, disposalIndex) =>
+          userAnswers.get(BondsDisposalCYAPointOfEntry(srn, bondIndex, disposalIndex)) match {
+            case Some(NoPointOfEntry) =>
+              controllers.nonsipp.bondsdisposal.routes.BondsDisposalCYAController
+                .onPageLoad(srn, bondIndex, disposalIndex, CheckMode)
+            case Some(HowWereBondsDisposedPointOfEntry) =>
+              controllers.nonsipp.bondsdisposal.routes.IsBuyerConnectedPartyController
+                .onPageLoad(srn, bondIndex, disposalIndex, CheckMode)
+            case _ =>
+              controllers.routes.JourneyRecoveryController.onPageLoad()
+          }
+
+        case IsBuyerConnectedPartyPage(srn, bondIndex, disposalIndex) =>
+          controllers.nonsipp.bondsdisposal.routes.BondsDisposalCYAController
+            .onPageLoad(srn, bondIndex, disposalIndex, CheckMode)
+
+        case BondsStillHeldPage(srn, bondIndex, disposalIndex) =>
+          controllers.nonsipp.bondsdisposal.routes.BondsDisposalCYAController
+            .onPageLoad(srn, bondIndex, disposalIndex, CheckMode)
+
+      }
 }
