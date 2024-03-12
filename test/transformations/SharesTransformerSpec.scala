@@ -32,8 +32,10 @@ import org.scalatest.matchers.must.Matchers
 import pages.nonsipp.common.IdentityTypePage
 import pages.nonsipp.shares._
 import pages.nonsipp.sharesdisposal._
+import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
+import utils.UserAnswersUtils.UserAnswersOps
 import viewmodels.models.SectionCompleted
 
 class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues with TestValues {
@@ -45,10 +47,20 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
   private val transformer = new SharesTransformer
 
   "SharesTransformer - To Etmp" - {
-    "should return None when userAnswer is empty" in {
+    "should return None values when userAnswer is empty" in {
 
       val result = transformer.transformToEtmp(srn = srn, sharesDisposal = false)
-      result mustBe None
+      result.optShareTransactions mustBe None
+      result.optTotalValueQuotedShares mustBe None
+    }
+
+    "should return Quoted share value when quoted share is in userAnswers" in {
+      val userAnswers = emptyUserAnswers
+        .unsafeSet(TotalValueQuotedSharesPage(srn), money)
+
+      val request = DataRequest(allowedAccessRequest, userAnswers)
+      val result = transformer.transformToEtmp(srn = srn, sharesDisposal = false)(request)
+      result mustBe Shares(optShareTransactions = None, optTotalValueQuotedShares = Some(money.value))
     }
   }
 
@@ -58,7 +70,7 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
       val result = transformer.transformFromEtmp(
         userAnswers,
         srn,
-        Shares(optShareTransactions = None)
+        Shares(optShareTransactions = None, optTotalValueQuotedShares = None)
       )
       result.fold(ex => fail(ex.getMessage), userAnswers => userAnswers mustBe userAnswers)
     }
@@ -194,7 +206,8 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
                 optDisposedSharesTransaction = None
               )
             )
-          )
+          ),
+          optTotalValueQuotedShares = Some(money.value)
         )
       )
 
@@ -289,6 +302,7 @@ class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues 
           userAnswers.get(SharesIndependentValuationPage(srn, refineMV(3))) mustBe Some(false)
           userAnswers.get(TotalAssetValuePage(srn, refineMV(3))) mustBe None
           userAnswers.get(SharesTotalIncomePage(srn, refineMV(3))) mustBe Some(money)
+          userAnswers.get(TotalValueQuotedSharesPage(srn)) mustBe Some(money)
         }
       )
     }

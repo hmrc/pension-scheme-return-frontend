@@ -22,7 +22,8 @@ import play.api.libs.json._
 import java.time.LocalDate
 
 case class Shares(
-  optShareTransactions: Option[List[ShareTransaction]]
+  optShareTransactions: Option[List[ShareTransaction]],
+  optTotalValueQuotedShares: Option[Double]
 )
 
 case class ShareTransaction(

@@ -395,5 +395,5 @@ object PsrRetrievalServiceSpec {
     benefitsSurrenderedDetails = SectionDetails(made = true, completed = true)
   )
 
-  val shares: Shares = Shares(optShareTransactions = None)
+  val shares: Shares = Shares(optShareTransactions = None, optTotalValueQuotedShares = None)
 }

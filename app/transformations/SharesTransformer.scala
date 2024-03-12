@@ -26,21 +26,10 @@ import models.IdentitySubject.SharesSeller
 import models.SchemeHoldShare.{Acquisition, Transfer}
 import models.SchemeId.Srn
 import models.TypeOfShares.{SponsoringEmployer, Unquoted}
+import models.UserAnswers.implicits.UserAnswersTryOps
+import models._
 import models.requests.DataRequest
 import models.requests.psr._
-import models.{
-  ConditionalYesNo,
-  Crn,
-  HowSharesDisposed,
-  IdentitySubject,
-  IdentityType,
-  Money,
-  PropertyAcquiredFrom,
-  RecipientDetails,
-  SchemeHoldShare,
-  UserAnswers,
-  Utr
-}
 import pages.nonsipp.common.{
   CompanyRecipientCrnPage,
   IdentityTypePage,
@@ -49,6 +38,7 @@ import pages.nonsipp.common.{
 }
 import pages.nonsipp.shares._
 import pages.nonsipp.sharesdisposal._
+import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
 import uk.gov.hmrc.domain.Nino
 import viewmodels.models.SectionCompleted
 
@@ -59,6 +49,20 @@ import scala.util.Try
 class SharesTransformer @Inject() extends Transformer {
 
   def transformToEtmp(
+    srn: Srn,
+    sharesDisposal: Boolean
+  )(implicit request: DataRequest[_]): Shares =
+    Shares(
+      optShareTransactions = buildOptShareTransactions(srn, sharesDisposal),
+      optTotalValueQuotedShares = buildOptQuotedShares(srn)
+    )
+
+  private def buildOptQuotedShares(srn: Srn)(implicit request: DataRequest[_]): Option[Double] = {
+    val totalValueQuotedSharesPage = request.userAnswers.get(TotalValueQuotedSharesPage(srn))
+    totalValueQuotedSharesPage.map(money => money.value)
+  }
+
+  private def buildOptShareTransactions(
     srn: Srn,
     sharesDisposal: Boolean
   )(implicit request: DataRequest[_]): Option[List[ShareTransaction]] =
@@ -438,11 +442,14 @@ class SharesTransformer @Inject() extends Transformer {
   ): Try[UserAnswers] = {
 
     val userAnswersOfShares = userAnswers.set(DidSchemeHoldAnySharesPage(srn), shares.optShareTransactions.isDefined)
+    val userAnswersWithQuotedShares = shares.optTotalValueQuotedShares.fold(userAnswersOfShares)(
+      totalValueQuotedShares => userAnswersOfShares.set(TotalValueQuotedSharesPage(srn), Money(totalValueQuotedShares))
+    )
 
-    shares.optShareTransactions.fold(userAnswersOfShares) { shareTransactions =>
+    shares.optShareTransactions.fold(userAnswersWithQuotedShares) { shareTransactions =>
       for {
         indexes <- buildIndexesForMax5000(shareTransactions.size)
-        resultUA <- indexes.foldLeft(userAnswersOfShares) {
+        resultUA <- indexes.foldLeft(userAnswersWithQuotedShares) {
           case (ua, index) =>
             val shareTransaction = shareTransactions(index.value - 1)
 
