@@ -18,11 +18,12 @@ package navigation.nonsipp
 
 import config.Refined.{Max50, Max5000}
 import eu.timepit.refined.refineMV
-import models.{HowDisposed, NormalMode}
+import models.{CheckMode, HowDisposed, NormalMode, PointOfEntry}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.bondsdisposal._
 import utils.BaseSpec
+import utils.UserAnswersUtils.UserAnswersOps
 
 class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
@@ -198,11 +199,213 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             bondIndex,
             disposalIndex,
             BondsStillHeldPage,
-            (srn, bondIndex: Max5000, disposalIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+            (srn, bondIndex: Max5000, disposalIndex: Max50, _) =>
+              controllers.nonsipp.bondsdisposal.routes.BondsDisposalCYAController
+                .onPageLoad(srn, bondIndex, disposalIndex, NormalMode)
           )
-          .withName("go from BondsStillHeld to Unauthorised")
+          .withName("go from BondsStillHeld to BondsDisposalCYA")
       )
     }
+  }
+
+  "CheckMode" - {
+
+    "HowWereBondsDisposedOfPage" - {
+
+      act.like(
+        checkmode
+          .navigateToWithDoubleIndexAndData(
+            bondIndex,
+            disposalIndex,
+            HowWereBondsDisposedOfPage.apply,
+            Gen.const(HowDisposed.Sold),
+            (srn, bondIndex: Max5000, disposalIndex: Max50, _) =>
+              controllers.nonsipp.bondsdisposal.routes.WhenWereBondsSoldController
+                .onPageLoad(srn, bondIndex, disposalIndex, CheckMode)
+          )
+          .withName("go from how were bonds disposed page to when were bonds sold page")
+      )
+
+      act.like(
+        checkmode
+          .navigateToWithDoubleIndexAndData(
+            bondIndex,
+            disposalIndex,
+            HowWereBondsDisposedOfPage.apply,
+            Gen.const(HowDisposed.Transferred),
+            (srn, bondIndex, disposalIndex, _) =>
+              controllers.nonsipp.bondsdisposal.routes.BondsDisposalCYAController
+                .onPageLoad(srn, bondIndex, disposalIndex, CheckMode)
+          )
+          .withName("go from How were disposed bond page to bond disposal CYA page when select transferred")
+      )
+
+      act.like(
+        checkmode
+          .navigateToWithDoubleIndexAndData(
+            bondIndex,
+            disposalIndex,
+            HowWereBondsDisposedOfPage.apply,
+            Gen.const(HowDisposed.Other("other details")),
+            (srn, bondIndex, disposalIndex, _) =>
+              controllers.nonsipp.bondsdisposal.routes.BondsDisposalCYAController
+                .onPageLoad(srn, bondIndex, disposalIndex, CheckMode)
+          )
+          .withName("go from How were disposed bond page to bond disposal CYA page when select other")
+      )
+
+
+    }
+
+    "WhenWereBondsSoldPage" - {
+
+      act.like(
+        checkmode
+          .navigateToWithDoubleIndex(
+            bondIndex,
+            disposalIndex,
+            WhenWereBondsSoldPage,
+            (srn, bondIndex: Max5000, disposalIndex: Max50, _) =>
+              controllers.nonsipp.bondsdisposal.routes.BondsDisposalCYAController
+                .onPageLoad(srn, bondIndex, disposalIndex, CheckMode),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                BondsDisposalCYAPointOfEntry(srn, bondIndex, disposalIndex),
+                PointOfEntry.NoPointOfEntry
+              )
+          )
+          .withName("go from when were bonds sale page to bonds disposal CYA")
+      )
+
+
+      act.like(
+        checkmode
+          .navigateToWithDoubleIndex(
+            bondIndex,
+            disposalIndex,
+            WhenWereBondsSoldPage,
+            (srn, bondIndex: Max5000, disposalIndex: Max50, _) =>
+              controllers.nonsipp.bondsdisposal.routes.TotalConsiderationSaleBondsController
+                .onPageLoad(srn, bondIndex, disposalIndex, CheckMode),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                BondsDisposalCYAPointOfEntry(srn, bondIndex, disposalIndex),
+                PointOfEntry.HowWereBondsDisposedPointOfEntry
+              )
+          )
+          .withName("go from WhenWereBondsSoldPage to TotalConsiderationSaleBonds (HowWereSharesDisposedPOE)")
+      )
+    }
+
+    "TotalConsiderationSaleBondsPage" - {
+
+      act.like(
+        checkmode
+          .navigateToWithDoubleIndex(
+            bondIndex,
+            disposalIndex,
+            TotalConsiderationSaleBondsPage,
+            (srn, bondIndex: Max5000, disposalIndex: Max50, _) =>
+              controllers.nonsipp.bondsdisposal.routes.BondsDisposalCYAController
+                .onPageLoad(srn, bondIndex, disposalIndex, CheckMode),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                BondsDisposalCYAPointOfEntry(srn, bondIndex, disposalIndex),
+                PointOfEntry.NoPointOfEntry
+              )
+          )
+          .withName("go from TotalConsiderationSaleBondsPage to CYA")
+      )
+
+      act.like(
+        checkmode
+          .navigateToWithDoubleIndex(
+            bondIndex,
+            disposalIndex,
+            TotalConsiderationSaleBondsPage,
+            (srn, bondIndex: Max5000, disposalIndex: Max50, _) =>
+              controllers.nonsipp.bondsdisposal.routes.BuyerNameController
+                .onPageLoad(srn, bondIndex, disposalIndex, CheckMode),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                BondsDisposalCYAPointOfEntry(srn, bondIndex, disposalIndex),
+                PointOfEntry.HowWereBondsDisposedPointOfEntry
+              )
+          )
+          .withName("go from TotalConsiderationSaleBondsPage to BuyerName (HowWereBondsDisposedPOE)")
+      )
+    }
+
+    "BuyerNamePage" - {
+
+      act.like(
+        checkmode
+          .navigateToWithDoubleIndex(
+            bondIndex,
+            disposalIndex,
+            BuyerNamePage,
+            (srn, bondIndex: Max5000, disposalIndex: Max50, _) =>
+              controllers.nonsipp.bondsdisposal.routes.BondsDisposalCYAController
+                .onPageLoad(srn, bondIndex, disposalIndex, CheckMode),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                BondsDisposalCYAPointOfEntry(srn, bondIndex, disposalIndex),
+                PointOfEntry.NoPointOfEntry
+              )
+          )
+          .withName("go from BuyerNamePage to CYA")
+      )
+
+      act.like(
+        checkmode
+          .navigateToWithDoubleIndex(
+            bondIndex,
+            disposalIndex,
+            BuyerNamePage,
+            (srn, bondIndex: Max5000, disposalIndex: Max50, _) =>
+              controllers.nonsipp.bondsdisposal.routes.IsBuyerConnectedPartyController
+                .onPageLoad(srn, bondIndex, disposalIndex, CheckMode),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                BondsDisposalCYAPointOfEntry(srn, bondIndex, disposalIndex),
+                PointOfEntry.HowWereBondsDisposedPointOfEntry
+              )
+          )
+          .withName("go from BuyerNamePage to IsBuyerConnectedParty (HowWereBondsDisposedPOE)")
+      )
+    }
+
+    "IsBuyerConnectedPartyPage" - {
+
+      act.like(
+        checkmode
+          .navigateToWithDoubleIndex(
+            bondIndex,
+            disposalIndex,
+            IsBuyerConnectedPartyPage,
+            (srn, bondIndex: Max5000, disposalIndex: Max50, _) =>
+              controllers.nonsipp.bondsdisposal.routes.BondsDisposalCYAController
+                .onPageLoad(srn, bondIndex, disposalIndex, CheckMode)
+          )
+          .withName("go from buyer connected party page to BondsDisposalCYA")
+      )
+    }
+
+    "BondsStillHeldPage" - {
+      act.like(
+        checkmode
+          .navigateToWithDoubleIndex(
+            bondIndex,
+            disposalIndex,
+            BondsStillHeldPage,
+            (srn, bondIndex: Max5000, disposalIndex: Max50, _) =>
+              controllers.nonsipp.bondsdisposal.routes.BondsDisposalCYAController
+                .onPageLoad(srn, bondIndex, disposalIndex, CheckMode)
+          )
+          .withName("go from BondsStillHeld to BondsDisposalCYA")
+      )
+    }
+
   }
 
 }

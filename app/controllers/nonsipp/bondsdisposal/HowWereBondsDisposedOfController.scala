@@ -25,10 +25,11 @@ import forms.mappings.Mappings
 import forms.mappings.errors.InputFormErrors
 import models.GenericFormMapper.ConditionalRadioMapper
 import models.HowDisposed._
+import models.PointOfEntry.{HowWereBondsDisposedPointOfEntry, NoPointOfEntry}
 import models.SchemeId.Srn
-import models.{ConditionalRadioMapper, HowDisposed, Mode}
+import models.{CheckMode, ConditionalRadioMapper, HowDisposed, Mode}
 import navigation.Navigator
-import pages.nonsipp.bondsdisposal.HowWereBondsDisposedOfPage
+import pages.nonsipp.bondsdisposal.{BondsDisposalCYAPointOfEntry, HowWereBondsDisposedOfPage}
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -56,6 +57,18 @@ class HowWereBondsDisposedOfController @Inject()(
 
   def onPageLoad(srn: Srn, bondIndex: Max5000, disposalIndex: Max50, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
+      // If this page is reached in CheckMode and there is no PointOfEntry set
+      if (mode == CheckMode && request.userAnswers
+          .get(BondsDisposalCYAPointOfEntry(srn, bondIndex, disposalIndex))
+          .contains(NoPointOfEntry)) {
+        // Set this page as the PointOfEntry
+        saveService.save(
+          request.userAnswers
+            .set(BondsDisposalCYAPointOfEntry(srn, bondIndex, disposalIndex), HowWereBondsDisposedPointOfEntry)
+            .getOrElse(request.userAnswers)
+        )
+      }
+
       val preparedForm =
         request.userAnswers.fillForm(
           HowWereBondsDisposedOfPage(srn, bondIndex, disposalIndex),
