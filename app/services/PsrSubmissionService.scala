@@ -135,8 +135,6 @@ class PsrSubmissionService @Inject()(
   )(implicit request: DataRequest[_]): Option[Shares] =
     optDidSchemeHoldAnyShares.map { _ =>
       val sharesDisposal = optSharesDisposal.getOrElse(false)
-      Shares(
-        optShareTransactions = sharesTransformer.transformToEtmp(srn, sharesDisposal)
-      )
+      sharesTransformer.transformToEtmp(srn, sharesDisposal)
     }
 }

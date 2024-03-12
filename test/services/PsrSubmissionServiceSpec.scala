@@ -286,7 +286,8 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
 
           when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any())(any()))
             .thenReturn(Some(minimalRequiredSubmission))
-          when(mockSharesTransformer.transformToEtmp(any(), any())(any())).thenReturn(None)
+          when(mockSharesTransformer.transformToEtmp(any(), any())(any()))
+            .thenReturn(Shares(optShareTransactions = None, optTotalValueQuotedShares = None))
           when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(()))
 
           whenReady(service.submitPsrDetails(srn)(implicitly, implicitly, request)) { result: Option[Unit] =>
@@ -302,7 +303,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
             captor.getValue.checkReturnDates mustBe false
             captor.getValue.loans mustBe None
             captor.getValue.assets mustBe None
-            captor.getValue.shares mustBe Some(Shares(optShareTransactions = None))
+            captor.getValue.shares mustBe Some(Shares(optShareTransactions = None, optTotalValueQuotedShares = None))
             result mustBe Some(())
           }
         }
@@ -320,7 +321,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
           when(mockMinimalRequiredSubmissionTransformer.transformToEtmp(any())(any()))
             .thenReturn(Some(minimalRequiredSubmission))
           when(mockSharesTransformer.transformToEtmp(any(), any())(any()))
-            .thenReturn(None)
+            .thenReturn(Shares(optShareTransactions = None, optTotalValueQuotedShares = None))
           when(mockConnector.submitPsrDetails(any())(any(), any())).thenReturn(Future.successful(()))
 
           whenReady(service.submitPsrDetails(srn)(implicitly, implicitly, request)) {
@@ -338,7 +339,7 @@ class PsrSubmissionServiceSpec extends BaseSpec with TestValues {
               captor.getValue.checkReturnDates mustBe false
               captor.getValue.loans mustBe None
               captor.getValue.assets mustBe None
-              captor.getValue.shares mustBe Some(Shares(optShareTransactions = None))
+              captor.getValue.shares mustBe Some(Shares(optShareTransactions = None, optTotalValueQuotedShares = None))
               result mustBe Some(())
           }
         }
