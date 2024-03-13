@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.unregulatedorconnectedbonds
+package controllers.nonsipp.bonds
 
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldController._
+import controllers.nonsipp.bonds.UnregulatedOrConnectedBondsHeldController._
 import forms.YesNoPageFormProvider
 import models.NormalMode
 import org.mockito.ArgumentMatchers.any

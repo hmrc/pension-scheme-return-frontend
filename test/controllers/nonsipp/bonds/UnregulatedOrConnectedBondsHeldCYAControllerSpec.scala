@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.unregulatedorconnectedbonds
+package controllers.nonsipp.bonds
 
 import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldCYAController._
+import controllers.nonsipp.bonds.UnregulatedOrConnectedBondsHeldCYAController._
 import eu.timepit.refined.refineMV
 import models.SchemeHoldBond.Acquisition
 import models.{CheckMode, Mode, NormalMode}

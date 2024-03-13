@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.unregulatedorconnectedbonds
+package controllers.nonsipp.bonds
 
 import controllers.actions.{AllowAccessActionProvider, DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import models.NormalMode
@@ -61,7 +61,7 @@ object WhatYouWillNeedBondsController {
       Message("bonds.whatYouWillNeed.title"),
       Message("bonds.whatYouWillNeed.heading", SchemeName),
       ContentPageViewModel(isLargeHeading = true),
-      controllers.nonsipp.unregulatedorconnectedbonds.routes.WhatYouWillNeedBondsController.onSubmit(srn)
+      controllers.nonsipp.bonds.routes.WhatYouWillNeedBondsController.onSubmit(srn)
     ).withButtonText(Message("site.continue"))
       .withDescription(
         ParagraphMessage("bonds.whatYouWillNeed.paragraph1") ++

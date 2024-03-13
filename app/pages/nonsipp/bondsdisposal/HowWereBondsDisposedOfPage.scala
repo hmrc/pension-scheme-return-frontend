@@ -120,6 +120,17 @@ object HowWereBondsDisposedOfPage {
     HowWereBondsDisposedOfPage(srn, bondIndex, disposalIndex, answerChanged = false)
 }
 
+case class HowWereBondsDisposedOfPagesForEachBond(
+  srn: Srn,
+  bondIndex: Max5000
+) extends QuestionPage[Map[String, HowDisposed]] {
+
+  override def path: JsPath =
+    Paths.bondsDisposed \ toString \ bondIndex.arrayIndex.toString
+
+  override def toString: String = "methodOfDisposal"
+}
+
 case class HowWereBondsDisposedOfPages(srn: Srn) extends QuestionPage[Map[String, Map[String, HowDisposed]]] {
 
   override def path: JsPath = Paths.bondsDisposed \ toString

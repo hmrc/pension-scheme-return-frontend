@@ -1,0 +1,63 @@
+GET         /:srn/unregulated-connected-party-bonds-held                        controllers.nonsipp.bonds.UnregulatedOrConnectedBondsHeldController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
+POST        /:srn/unregulated-connected-party-bonds-held                        controllers.nonsipp.bonds.UnregulatedOrConnectedBondsHeldController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/change-unregulated-connected-party-bonds-held                 controllers.nonsipp.bonds.UnregulatedOrConnectedBondsHeldController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
+POST        /:srn/change-unregulated-connected-party-bonds-held                 controllers.nonsipp.bonds.UnregulatedOrConnectedBondsHeldController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET         /:srn/what-you-will-need-bonds                                      controllers.nonsipp.bonds.WhatYouWillNeedBondsController.onPageLoad(srn: Srn)
+GET         /:srn/submit-what-you-will-need-bonds                               controllers.nonsipp.bonds.WhatYouWillNeedBondsController.onSubmit(srn: Srn)
+
+GET         /:srn/name-of-bonds                                                 controllers.nonsipp.bonds.NameOfBondsController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
+GET         /:srn/name-of-bonds/:index                                          controllers.nonsipp.bonds.NameOfBondsController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/name-of-bonds                                                 controllers.nonsipp.bonds.NameOfBondsController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
+POST        /:srn/name-of-bonds/:index                                          controllers.nonsipp.bonds.NameOfBondsController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/change-name-of-bonds                                          controllers.nonsipp.bonds.NameOfBondsController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
+GET         /:srn/change-name-of-bonds/:index                                   controllers.nonsipp.bonds.NameOfBondsController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-name-of-bonds                                          controllers.nonsipp.bonds.NameOfBondsController.onSubmit(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
+POST        /:srn/change-name-of-bonds/:index                                   controllers.nonsipp.bonds.NameOfBondsController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET         /:srn/why-does-scheme-hold-bonds/:index                             controllers.nonsipp.bonds.WhyDoesSchemeHoldBondsController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/why-does-scheme-hold-bonds/:index                             controllers.nonsipp.bonds.WhyDoesSchemeHoldBondsController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/change-why-does-scheme-hold-bonds/:index                      controllers.nonsipp.bonds.WhyDoesSchemeHoldBondsController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-why-does-scheme-hold-bonds/:index                      controllers.nonsipp.bonds.WhyDoesSchemeHoldBondsController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET         /:srn/when-did-scheme-acquire-bonds/:index                          controllers.nonsipp.bonds.WhenDidSchemeAcquireBondsController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/when-did-scheme-acquire-bonds/:index                          controllers.nonsipp.bonds.WhenDidSchemeAcquireBondsController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/change-when-did-scheme-acquire-bonds/:index                   controllers.nonsipp.bonds.WhenDidSchemeAcquireBondsController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-when-did-scheme-acquire-bonds/:index                   controllers.nonsipp.bonds.WhenDidSchemeAcquireBondsController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET         /:srn/bonds-total-cost-value/:index                                 controllers.nonsipp.bonds.CostOfBondsController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/bonds-total-cost-value/:index                                 controllers.nonsipp.bonds.CostOfBondsController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/change-bonds-total-cost-value/:index                          controllers.nonsipp.bonds.CostOfBondsController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-bonds-total-cost-value/:index                          controllers.nonsipp.bonds.CostOfBondsController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET         /:srn/were-bonds-acquired-from-connected-party/:index               controllers.nonsipp.bonds.BondsFromConnectedPartyController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/were-bonds-acquired-from-connected-party/:index               controllers.nonsipp.bonds.BondsFromConnectedPartyController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/change-were-bonds-acquired-from-connected-party/:index        controllers.nonsipp.bonds.BondsFromConnectedPartyController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-were-bonds-acquired-from-connected-party/:index        controllers.nonsipp.bonds.BondsFromConnectedPartyController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET         /:srn/bonds-fca-list/:index                                         controllers.nonsipp.bonds.AreBondsUnregulatedController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/bonds-fca-list/:index                                         controllers.nonsipp.bonds.AreBondsUnregulatedController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/change-bonds-fca-list/:index                                  controllers.nonsipp.bonds.AreBondsUnregulatedController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-bonds-fca-list/:index                                  controllers.nonsipp.bonds.AreBondsUnregulatedController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET         /:srn/bonds-total-income/:index                                     controllers.nonsipp.bonds.IncomeFromBondsController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/bonds-total-income/:index                                     controllers.nonsipp.bonds.IncomeFromBondsController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/change-bonds-total-income/:index                              controllers.nonsipp.bonds.IncomeFromBondsController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-bonds-total-income/:index                              controllers.nonsipp.bonds.IncomeFromBondsController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET         /:srn/check-answers-bonds                                           controllers.nonsipp.bonds.UnregulatedOrConnectedBondsHeldCYAController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = NormalMode)
+GET         /:srn/check-answers-bonds/:index                                    controllers.nonsipp.bonds.UnregulatedOrConnectedBondsHeldCYAController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/submit-check-answers-bonds                                    controllers.nonsipp.bonds.UnregulatedOrConnectedBondsHeldCYAController.onSubmit(srn: Srn, mode: Mode = NormalMode)
+GET         /:srn/change-check-answers-bonds                                    controllers.nonsipp.bonds.UnregulatedOrConnectedBondsHeldCYAController.onPageLoad(srn: Srn, index: Max5000 = 1, mode: Mode = CheckMode)
+GET         /:srn/change-check-answers-bonds/:index                             controllers.nonsipp.bonds.UnregulatedOrConnectedBondsHeldCYAController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-submit-check-answers-bonds                             controllers.nonsipp.bonds.UnregulatedOrConnectedBondsHeldCYAController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET         /:srn/bonds-list/:page                                              controllers.nonsipp.bonds.BondsListController.onPageLoad(srn: Srn, page: Int, mode: Mode = NormalMode)
+POST        /:srn/bonds-list/:page                                              controllers.nonsipp.bonds.BondsListController.onSubmit(srn: Srn, page: Int, mode: Mode = NormalMode)
+GET         /:srn/change-bonds-list/:page                                       controllers.nonsipp.bonds.BondsListController.onPageLoad(srn: Srn, page: Int, mode: Mode = CheckMode)
+POST        /:srn/change-bonds-list/:page                                       controllers.nonsipp.bonds.BondsListController.onSubmit(srn: Srn, page: Int, mode: Mode = CheckMode)
+
+GET         /:srn/remove-bonds/:index                                           controllers.nonsipp.bonds.RemoveBondsController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/remove-bonds/:index                                           controllers.nonsipp.bonds.RemoveBondsController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/change-remove-bonds/:index                                    controllers.nonsipp.bonds.RemoveBondsController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-remove-bonds/:index                                    controllers.nonsipp.bonds.RemoveBondsController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)

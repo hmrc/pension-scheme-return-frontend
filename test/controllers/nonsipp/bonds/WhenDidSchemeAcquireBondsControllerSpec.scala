@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.unregulatedorconnectedbonds
+package controllers.nonsipp.bonds
 
 import config.Refined.Max5000
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.unregulatedorconnectedbonds.WhenDidSchemeAcquireBondsController._
+import controllers.nonsipp.bonds.WhenDidSchemeAcquireBondsController._
 import eu.timepit.refined.refineMV
 import forms.DatePageFormProvider
 import models.NormalMode

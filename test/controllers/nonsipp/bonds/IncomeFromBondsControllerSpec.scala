@@ -14,25 +14,25 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.unregulatedorconnectedbonds
+package controllers.nonsipp.bonds
 
 import config.Refined._
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.unregulatedorconnectedbonds.CostOfBondsController._
+import controllers.nonsipp.bonds.IncomeFromBondsController._
 import eu.timepit.refined.refineMV
 import forms.MoneyFormProvider
 import models.NormalMode
-import pages.nonsipp.bonds.CostOfBondsPage
+import pages.nonsipp.bonds.IncomeFromBondsPage
 import views.html.MoneyView
 
-class CostOfBondsControllerSpec extends ControllerBaseSpec {
+class IncomeFromBondsControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[OneTo5000](1)
 
-  "CostOfBondsController" - {
+  "IncomeFromBondsController" - {
 
-    lazy val onPageLoad = routes.CostOfBondsController.onPageLoad(srn, index, NormalMode)
-    lazy val onSubmit = routes.CostOfBondsController.onSubmit(srn, index, NormalMode)
+    lazy val onPageLoad = routes.IncomeFromBondsController.onPageLoad(srn, index, NormalMode)
+    lazy val onSubmit = routes.IncomeFromBondsController.onSubmit(srn, index, NormalMode)
 
     act.like(renderView(onPageLoad, defaultUserAnswers) { implicit app => implicit request =>
       injected[MoneyView]
@@ -47,7 +47,7 @@ class CostOfBondsControllerSpec extends ControllerBaseSpec {
     })
 
     act.like(
-      renderPrePopView(onPageLoad, CostOfBondsPage(srn, index), money, defaultUserAnswers) {
+      renderPrePopView(onPageLoad, IncomeFromBondsPage(srn, index), money, defaultUserAnswers) {
         implicit app => implicit request =>
           injected[MoneyView].apply(
             viewModel(

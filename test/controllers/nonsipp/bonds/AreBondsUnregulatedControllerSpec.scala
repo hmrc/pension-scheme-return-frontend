@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.unregulatedorconnectedbonds
+package controllers.nonsipp.bonds
 
 import config.Refined._
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.unregulatedorconnectedbonds.AreBondsUnregulatedController._
+import controllers.nonsipp.bonds.AreBondsUnregulatedController._
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.NormalMode

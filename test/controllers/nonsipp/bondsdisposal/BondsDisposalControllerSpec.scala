@@ -20,13 +20,23 @@ import controllers.ControllerBaseSpec
 import controllers.nonsipp.bondsdisposal.BondsDisposalController._
 import forms.YesNoPageFormProvider
 import models.NormalMode
+import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.bondsdisposal.BondsDisposalPage
+import play.api.inject.bind
+import play.api.inject.guice.GuiceableModule
+import services.PsrSubmissionService
 import views.html.YesNoPageView
 
 class BondsDisposalControllerSpec extends ControllerBaseSpec {
 
   private lazy val onPageLoad = routes.BondsDisposalController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.BondsDisposalController.onSubmit(srn, NormalMode)
+  private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
+
+  override protected val additionalBindings: List[GuiceableModule] = List(
+    bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)
+  )
+
   "BondsDisposalController" - {
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
@@ -38,9 +48,23 @@ class BondsDisposalControllerSpec extends ControllerBaseSpec {
         .apply(form(injected[YesNoPageFormProvider]).fill(true), viewModel(srn, schemeName, NormalMode))
     })
 
-    act.like(redirectNextPage(onSubmit, "value" -> "true"))
-    act.like(redirectNextPage(onSubmit, "value" -> "false"))
+    act.like(
+      redirectNextPage(onSubmit, "value" -> "true")
+        .before(MockPSRSubmissionService.submitPsrDetails())
+        .after({
+          verify(mockPsrSubmissionService, never).submitPsrDetails(any())(any(), any(), any())
+          reset(mockPsrSubmissionService)
+        })
+    )
 
+    act.like(
+      redirectNextPage(onSubmit, "value" -> "false")
+        .before(MockPSRSubmissionService.submitPsrDetails())
+        .after({
+          verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any())(any(), any(), any())
+          reset(mockPsrSubmissionService)
+        })
+    )
     act.like(journeyRecoveryPage(onPageLoad).updateName("onPageLoad" + _))
 
     act.like(saveAndContinue(onSubmit, "value" -> "true"))

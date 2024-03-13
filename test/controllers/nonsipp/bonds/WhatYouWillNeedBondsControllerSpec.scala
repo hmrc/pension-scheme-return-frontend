@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.unregulatedorconnectedbonds
+package controllers.nonsipp.bonds
 
 import controllers.ControllerBaseSpec
 import views.html.ContentPageView

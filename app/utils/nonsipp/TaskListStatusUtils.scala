@@ -473,7 +473,7 @@ object TaskListStatusUtils {
   def getBondsTaskListStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
     val hadBondsPage = userAnswers.get(UnregulatedOrConnectedBondsHeldPage(srn))
     val defaultLink =
-      controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldController
+      controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldController
         .onPageLoad(srn, NormalMode)
         .url
     hadBondsPage match {

@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.unregulatedorconnectedbonds
+package controllers.nonsipp.bonds
 
 import config.Refined.Max5000
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.unregulatedorconnectedbonds.BondsListController._
-import controllers.nonsipp.unregulatedorconnectedbonds.BondsListController.BondsData
+import controllers.nonsipp.bonds.BondsListController._
+import controllers.nonsipp.bonds.BondsListController.BondsData
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models._
@@ -40,10 +40,10 @@ class BondsListControllerSpec extends ControllerBaseSpec {
   private val mockPsrSubmissionService = mock[PsrSubmissionService]
 
   private lazy val onPageLoad =
-    controllers.nonsipp.unregulatedorconnectedbonds.routes.BondsListController.onPageLoad(srn, page, NormalMode)
+    controllers.nonsipp.bonds.routes.BondsListController.onPageLoad(srn, page, NormalMode)
 
   private lazy val onSubmit =
-    controllers.nonsipp.unregulatedorconnectedbonds.routes.BondsListController.onSubmit(srn, page, NormalMode)
+    controllers.nonsipp.bonds.routes.BondsListController.onSubmit(srn, page, NormalMode)
 
   private val userAnswers =
     defaultUserAnswers
