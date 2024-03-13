@@ -218,7 +218,7 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         act.like(
           normalmode
             .navigateToWithDoubleIndex(
-              bondIndex,
+              bondIndexOne,
               disposalIndex,
               BondsDisposalCompletedPage,
               (srn, bondIndex: Max5000, disposalIndex: Max50, _) =>
