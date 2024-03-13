@@ -42,6 +42,7 @@ object Constants {
   val maxSharesTransactions = 5000
   val maxDisposalsPerShare = 50
   val maxBondsTransactions = 5000
+  val maxDisposalPerBond = 50
 
   val pageSize = 25
 

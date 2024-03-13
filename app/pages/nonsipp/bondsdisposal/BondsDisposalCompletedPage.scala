@@ -32,6 +32,19 @@ case class BondsDisposalCompletedPage(srn: Srn, bondIndex: Max5000, disposalInde
   override def toString: String = "bondsDisposalCompleted"
 }
 
+object BondsDisposalCompleted {
+  def all(
+    srn: Srn,
+    bondIndex: Max5000
+  ): IndexedQuestionPage[SectionCompleted.type] = new IndexedQuestionPage[SectionCompleted.type] {
+
+    override def path: JsPath =
+      Paths.bondsDisposed \ toString \ bondIndex.arrayIndex.toString
+
+    override def toString: String = "bondsDisposalCompleted"
+  }
+}
+
 case class BondsDisposalCompletedPages(srn: Srn) extends IndexedQuestionPage[Map[String, SectionCompleted.type]] {
 
   override def path: JsPath = Paths.bondsDisposed \ toString

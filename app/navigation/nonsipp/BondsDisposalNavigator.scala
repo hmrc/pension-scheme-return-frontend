@@ -71,14 +71,23 @@ object BondsDisposalNavigator extends JourneyNavigator {
       controllers.nonsipp.bondsdisposal.routes.BondsDisposalCYAController
         .onPageLoad(srn, bondIndex, disposalIndex, NormalMode)
 
+    case BondsDisposalCompletedPage(srn, _, _) =>
+      controllers.nonsipp.bondsdisposal.routes.ReportBondsDisposalListController
+        .onPageLoad(srn, page = 1)
+
+    case ReportBondsDisposalListPage(srn, addDisposal @ true) =>
+      controllers.nonsipp.bondsdisposal.routes.BondsDisposalListController.onPageLoad(srn, 1, NormalMode)
+
+    case ReportBondsDisposalListPage(srn, addDisposal @ false) =>
+      controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
+
     case RemoveBondsDisposalPage(srn, bondIndex, disposalIndex) =>
       if (!userAnswers
           .map(HowWereBondsDisposedOfPages(srn))
           .exists(_._2.nonEmpty)) {
         controllers.nonsipp.bondsdisposal.routes.BondsDisposalController.onPageLoad(srn, NormalMode)
       } else {
-        // TODO replace with ReportedBondsDisposalListController
-        controllers.routes.UnauthorisedController.onPageLoad()
+        controllers.nonsipp.bondsdisposal.routes.ReportBondsDisposalListController.onPageLoad(srn, page = 1)
       }
 
   }
@@ -142,6 +151,10 @@ object BondsDisposalNavigator extends JourneyNavigator {
         case BondsStillHeldPage(srn, bondIndex, disposalIndex) =>
           controllers.nonsipp.bondsdisposal.routes.BondsDisposalCYAController
             .onPageLoad(srn, bondIndex, disposalIndex, CheckMode)
+
+        case BondsDisposalCompletedPage(srn, _, _) =>
+          controllers.nonsipp.bondsdisposal.routes.ReportBondsDisposalListController
+            .onPageLoad(srn, page = 1)
 
       }
 }

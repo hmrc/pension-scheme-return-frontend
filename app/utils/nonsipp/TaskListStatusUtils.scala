@@ -20,7 +20,8 @@ import config.Refined.{Max5000, OneTo5000}
 import eu.timepit.refined.{refineMV, refineV}
 import models.ConditionalYesNo._
 import models.SchemeId.Srn
-import models.{IdentitySubject, Money, NormalMode, PensionSchemeId, SchemeHoldLandProperty, UserAnswers}
+import models.{IdentitySubject, Mode, Money, NormalMode, PensionSchemeId, SchemeHoldLandProperty, UserAnswers}
+import pages.nonsipp.bondsdisposal.{BondsDisposalCompletedPages, BondsDisposalPage}
 import pages.nonsipp.common.IdentityTypes
 import pages.nonsipp.employercontributions.{EmployerContributionsPage, EmployerContributionsSectionStatus}
 import pages.nonsipp.landorproperty._
@@ -483,6 +484,35 @@ object TaskListStatusUtils {
         } else {
           (InProgress, defaultLink)
         }
+    }
+  }
+
+  def getBondsDisposalsTaskListStatusWithLink(
+    userAnswers: UserAnswers,
+    srn: Srn,
+    mode: Mode
+  ): (TaskListStatus, String) = {
+    val atLeastOneCompleted =
+      userAnswers.get(BondsDisposalCompletedPages(srn)).exists(_.values.exists(_.values.nonEmpty))
+    val started = userAnswers.get(BondsDisposalPage(srn)).contains(true)
+    val completedNoDisposals = userAnswers.get(BondsDisposalPage(srn)).contains(false)
+
+    val initialDisposalUrl = controllers.nonsipp.bondsdisposal.routes.BondsDisposalController
+      .onPageLoad(srn, NormalMode)
+      .url
+
+    val disposalListPage = controllers.nonsipp.bondsdisposal.routes.BondsDisposalListController
+      .onPageLoad(srn, page = 1, mode)
+      .url
+
+    if (atLeastOneCompleted) {
+      (TaskListStatus.Completed, disposalListPage)
+    } else if (completedNoDisposals) {
+      (TaskListStatus.Completed, initialDisposalUrl)
+    } else if (started) {
+      (TaskListStatus.InProgress, initialDisposalUrl)
+    } else {
+      (TaskListStatus.NotStarted, initialDisposalUrl)
     }
   }
 

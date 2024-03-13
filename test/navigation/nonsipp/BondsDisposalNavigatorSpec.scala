@@ -213,6 +213,22 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         )
       }
 
+      "BondsDisposalCompletedPage" - {
+
+        act.like(
+          normalmode
+            .navigateToWithDoubleIndex(
+              bondIndexOne,
+              disposalIndex,
+              BondsDisposalCompletedPage,
+              (srn, bondIndex: Max5000, disposalIndex: Max50, _) =>
+                controllers.nonsipp.bondsdisposal.routes.ReportBondsDisposalListController
+                  .onPageLoad(srn, page = 1)
+            )
+            .withName("go from BondsDisposalCYA to ReportBondsDisposalList")
+        )
+      }
+
       "RemoveBondsDisposalPage" - {
 
         "When there are no other bonds disposals" - {
@@ -244,9 +260,8 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
                 bondIndexOne,
                 disposalIndex,
                 RemoveBondsDisposalPage,
-                // TODO replace with ReportedBondsDisposalListController
                 (srn, bondIndex: Max5000, disposalIndex: Max50, _) =>
-                  controllers.routes.UnauthorisedController.onPageLoad(),
+                  controllers.nonsipp.bondsdisposal.routes.ReportBondsDisposalListController.onPageLoad(srn, 1),
                 customUserAnswers
               )
               .withName("go from RemoveBondsDisposalPage to ReportedBondsDisposalList")
@@ -267,9 +282,8 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
                 bondIndexOne,
                 disposalIndex,
                 RemoveBondsDisposalPage,
-                // TODO replace with ReportedBondsDisposalListController
                 (srn, bondIndex: Max5000, disposalIndex: Max50, _) =>
-                  controllers.routes.UnauthorisedController.onPageLoad(),
+                  controllers.nonsipp.bondsdisposal.routes.ReportBondsDisposalListController.onPageLoad(srn, 1),
                 customUserAnswers
               )
               .withName("go from RemoveBondsDisposalPage to ReportedBondsDisposalList")
@@ -473,5 +487,22 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
         )
       }
     }
+
+    "BondsDisposalCompletedPage" - {
+
+      act.like(
+        checkmode
+          .navigateToWithDoubleIndex(
+            bondIndexOne,
+            disposalIndex,
+            BondsDisposalCompletedPage,
+            (srn, bondIndex: Max5000, disposalIndex: Max50, _) =>
+              controllers.nonsipp.bondsdisposal.routes.ReportBondsDisposalListController
+                .onPageLoad(srn, page = 1)
+          )
+          .withName("go from BondsDisposalCYA to ReportBondsDisposalList")
+      )
+    }
+
   }
 }

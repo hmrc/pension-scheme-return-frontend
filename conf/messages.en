@@ -2963,6 +2963,25 @@ bondsDisposal.BondsDisposalCYA.transferred= transferred in
 bondsDisposalCYA.change.title= Change details of bond disposal
 bondsDisposalCYA.change.heading = Change details of bond disposal
 
+bondsDisposal.reportBondsDisposalList.title = You have reported {0} bond disposal
+bondsDisposal.reportBondsDisposalList.title.plural = You have reported {0} bond disposals
+bondsDisposal.reportBondsDisposalList.heading = You have reported {0} bond disposal
+bondsDisposal.reportBondsDisposalList.heading.plural = You have reported {0} bond disposals
+bondsDisposal.reportBondsDisposalList.row = Disposal of {0} by {1}
+bondsDisposal.reportBondsDisposalList.row.change.hidden = details of the disposal of {0} by {1}
+bondsDisposal.reportBondsDisposalList.row.remove.hidden= the disposal of {0} by {1} from the list
+bondsDisposal.reportBondsDisposalList.description = You must tell us about all unregulated bonds, or bonds acquired from a connected party, disposed of by the scheme during the period of this return.
+bondsDisposal.reportBondsDisposalList.radios = Do you need to report another bond disposal?
+bondsDisposal.reportBondsDisposalList.inset.maximumReached = You cannot add another bond disposal as you have entered the maximum of 5,000.
+bondsDisposal.reportBondsDisposalList.inset.allBondsDisposed.paragraph1 = You have reported disposal of all the bonds that you told us about.
+bondsDisposal.reportBondsDisposalList.inset.allBondsDisposed.paragraph2 = If you need to add more bonds, go to the ‘Change unregulated or connected party bonds’ section of this return.
+bondsDisposal.reportBondsDisposalList.pagination.label = Showing {0} - {1} of {2} bond disposals
+bondsDisposal.reportBondsDisposalList.radios.error.required = Select yes if you need to report another bond disposal
+
+bondsDisposal.reportBondsDisposalList.methodOfDisposal.sold = sale
+bondsDisposal.reportBondsDisposalList.methodOfDisposal.transferred = transfer out
+bondsDisposal.reportBondsDisposalList.methodOfDisposal.other = another method
+
 bondsDisposal.removeBondsDisposal.title = Are you sure you want to remove details of the disposal of these bonds?
 bondsDisposal.removeBondsDisposal.heading = Are you sure you want to remove details of the disposal of {0}?
 bondsDisposal.removeBondsDisposal.error.required = Select yes if you are sure you want to remove this bond disposal
