@@ -22,4 +22,5 @@ GET        /pension-scheme-return/test-only/:srn/add-transfers-in/:index/:num   
 GET        /pension-scheme-return/test-only/:srn/add-shares/:num                                 controllers.testonly.SharesMongoController.addTestData(srn: Srn, num: Max5000)
 GET        /pension-scheme-return/test-only/:srn/add-shares-disposals/:index/:num                controllers.testonly.SharesDisposalMongoController.addTestData(srn: Srn, index: Max5000, num: Max50)
 GET        /pension-scheme-return/test-only/:srn/add-bonds/:num                                  controllers.testonly.BondsMongoController.addTestData(srn: Srn, num: Max5000)
+GET        /pension-scheme-return/test-only/:srn/add-bonds-disposal/:index:num                   controllers.testonly.SharesDisposalMongoController.addTestData(srn: Srn, index: Max5000, num: Max50)
 GET        /pension-scheme-return/test-only/:srn/print-user-answers                              controllers.testonly.PrintsUserAnswersController.printUserAnswers(srn: Srn)

@@ -48,3 +48,6 @@ POST        /:srn/change-bond-disposal/:bondIndex/:disposalIndex                
 
 GET         /:srn/remove-bond-disposal/:bondIndex/:disposalIndex                                    controllers.nonsipp.bondsdisposal.RemoveBondsDisposalController.onPageLoad(srn: Srn, bondIndex: Max5000, disposalIndex: Max50)
 POST        /:srn/remove-bond-disposal/:bondIndex/:disposalIndex                                    controllers.nonsipp.bondsdisposal.RemoveBondsDisposalController.onSubmit(srn: Srn, bondIndex: Max5000, disposalIndex: Max50)
+
+GET         /:srn/bond-disposal-list/:page                                                         controllers.nonsipp.bondsdisposal.ReportBondsDisposalListController.onPageLoad(srn: Srn, page: Int, mode: Mode = NormalMode)
+POST        /:srn/bond-disposal-list/:page                                                         controllers.nonsipp.bondsdisposal.ReportBondsDisposalListController.onSubmit(srn: Srn, page: Int, mode: Mode = NormalMode)
