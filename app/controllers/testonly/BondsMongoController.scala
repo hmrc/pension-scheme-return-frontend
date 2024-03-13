@@ -25,6 +25,7 @@ import pages.nonsipp.unregulatedorconnectedbonds._
 import play.api.mvc.MessagesControllerComponents
 import services.SaveService
 import shapeless._
+import viewmodels.models.SectionCompleted
 
 import java.time.LocalDate
 import javax.inject.Inject
@@ -40,6 +41,7 @@ class BondsMongoController @Inject()(
   override val max: Max5000 = refineMV(5000)
 
   override def pages(srn: Srn, index: Max5000): Pages = HList(
+    PageWithValue(BondsCompleted(srn, index), SectionCompleted),
     PageWithValue(AreBondsUnregulatedPage(srn, index), false),
     PageWithValue(BondsFromConnectedPartyPage(srn, index), false),
     PageWithValue(CostOfBondsPage(srn, index), Money(12.34)),
@@ -51,7 +53,8 @@ class BondsMongoController @Inject()(
   )
 
   override type Pages =
-    PageWithValue[Boolean] ::
+    PageWithValue[SectionCompleted] ::
+      PageWithValue[Boolean] ::
       PageWithValue[Boolean] ::
       PageWithValue[Money] ::
       PageWithValue[Money] ::
