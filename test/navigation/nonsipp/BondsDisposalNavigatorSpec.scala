@@ -260,9 +260,8 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
                 bondIndexOne,
                 disposalIndex,
                 RemoveBondsDisposalPage,
-                // TODO replace with ReportedBondsDisposalListController
                 (srn, bondIndex: Max5000, disposalIndex: Max50, _) =>
-                  controllers.routes.UnauthorisedController.onPageLoad(),
+                  controllers.nonsipp.bondsdisposal.routes.ReportBondsDisposalListController.onPageLoad(srn, 1),
                 customUserAnswers
               )
               .withName("go from RemoveBondsDisposalPage to ReportedBondsDisposalList")
@@ -283,9 +282,8 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
                 bondIndexOne,
                 disposalIndex,
                 RemoveBondsDisposalPage,
-                // TODO replace with ReportedBondsDisposalListController
                 (srn, bondIndex: Max5000, disposalIndex: Max50, _) =>
-                  controllers.routes.UnauthorisedController.onPageLoad(),
+                  controllers.nonsipp.bondsdisposal.routes.ReportBondsDisposalListController.onPageLoad(srn, 1),
                 customUserAnswers
               )
               .withName("go from RemoveBondsDisposalPage to ReportedBondsDisposalList")

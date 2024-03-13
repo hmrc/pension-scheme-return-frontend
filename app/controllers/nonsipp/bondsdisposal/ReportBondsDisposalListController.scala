@@ -203,7 +203,9 @@ object ReportBondsDisposalListController {
               "bondsDisposal.reportBondsDisposalList.row.change.hidden",
               bondsDisposalData
             ),
-            removeUrl = "",
+            removeUrl = routes.RemoveBondsDisposalController
+              .onPageLoad(srn, bondIndex, disposalIndex)
+              .url,
             removeHiddenText = buildMessage(
               "bondsDisposal.reportBondsDisposalList.row.remove.hidden",
               bondsDisposalData

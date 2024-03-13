@@ -87,8 +87,7 @@ object BondsDisposalNavigator extends JourneyNavigator {
           .exists(_._2.nonEmpty)) {
         controllers.nonsipp.bondsdisposal.routes.BondsDisposalController.onPageLoad(srn, NormalMode)
       } else {
-        // TODO replace with ReportedBondsDisposalListController
-        controllers.routes.UnauthorisedController.onPageLoad()
+        controllers.nonsipp.bondsdisposal.routes.ReportBondsDisposalListController.onPageLoad(srn, page = 1)
       }
 
   }
