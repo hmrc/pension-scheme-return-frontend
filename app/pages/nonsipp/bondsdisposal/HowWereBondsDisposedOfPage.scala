@@ -48,22 +48,81 @@ case class HowWereBondsDisposedOfPage(
       case (Some(_), Some(_)) =>
         removePages(
           userAnswers,
-          pages(srn)
+          pages(srn, bondIndex, disposalIndex, removeExtraPages = false, isLastRecord = false)
+        )
+      case (None, _) =>
+        val completedPages = userAnswers.map(BondsDisposalCompletedPages(srn))
+        removePages(
+          userAnswers,
+          pages(
+            srn,
+            bondIndex,
+            disposalIndex,
+            removeExtraPages = true,
+            isLastRecord = completedPages.flatten(_._2).size == 1
+          )
         )
       case _ => Try(userAnswers)
     }
 
-  private def pages(srn: Srn): List[Removable[_]] =
-    List(
+  private def pages(
+    srn: Srn,
+    bondIndex: Max5000,
+    disposalIndex: Max50,
+    removeExtraPages: Boolean,
+    isLastRecord: Boolean
+  ): List[Removable[_]] = {
+    val list = List(
       WhenWereBondsSoldPage(srn, bondIndex, disposalIndex),
       TotalConsiderationSaleBondsPage(srn, bondIndex, disposalIndex),
       BuyerNamePage(srn, bondIndex, disposalIndex),
       IsBuyerConnectedPartyPage(srn, bondIndex, disposalIndex)
     )
 
+    (removeExtraPages, isLastRecord) match {
+      case (true, true) =>
+        list :+ BondsDisposalPage(
+          srn
+        ) :+ BondsStillHeldPage(
+          srn,
+          bondIndex,
+          disposalIndex
+        ) :+ BondsDisposalCYAPointOfEntry(
+          srn,
+          bondIndex,
+          disposalIndex
+        ) :+ BondsDisposalCompletedPage(
+          srn,
+          bondIndex,
+          disposalIndex
+        )
+      case (true, false) =>
+        list :+ BondsStillHeldPage(
+          srn,
+          bondIndex,
+          disposalIndex
+        ) :+ BondsDisposalCYAPointOfEntry(
+          srn,
+          bondIndex,
+          disposalIndex
+        ) :+ BondsDisposalCompletedPage(
+          srn,
+          bondIndex,
+          disposalIndex
+        )
+      case (_, _) => list
+    }
+  }
 }
 
 object HowWereBondsDisposedOfPage {
   def apply(srn: Srn, bondIndex: Max5000, disposalIndex: Max50): HowWereBondsDisposedOfPage =
     HowWereBondsDisposedOfPage(srn, bondIndex, disposalIndex, answerChanged = false)
+}
+
+case class HowWereBondsDisposedOfPages(srn: Srn) extends QuestionPage[Map[String, Map[String, HowDisposed]]] {
+
+  override def path: JsPath = Paths.bondsDisposed \ toString
+
+  override def toString: String = "methodOfDisposal"
 }

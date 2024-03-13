@@ -146,6 +146,7 @@ trait TestValues {
   val fbNumber = "123456785011"
   val otherDetails = "other details"
   val bondsStillHeld = 5
+  val nameOfBonds = "name of bonds"
 
   val address: Address = Address(
     "test-id",

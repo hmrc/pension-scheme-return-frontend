@@ -1129,7 +1129,7 @@ whatYouWillNeedLoans.loansFor5 = the total amount of the loan outstanding at the
 whatYouWillNeedLoans.paragraph7 = Details of any security given on the loan.
 whatYouWillNeedLoans.security = details of the security, if applicable
 whatYouWillNeedLoans.paragraph8 = Amount of any outstanding arrears on the loan at the end of the period of this return.
-whatYouWillNeedLoans.arrears = the amount of the arrears, if applicable 
+whatYouWillNeedLoans.arrears = the amount of the arrears, if applicable
 
 basicDetailsCheckYourAnswersController.schemeDetails.heading = Scheme details
 basicDetailsCheckYourAnswersController.schemeDetails.schemeName = Scheme name
@@ -2962,3 +2962,7 @@ bondsDisposal.BondsDisposalCYA.transferred= transferred in
 
 bondsDisposalCYA.change.title= Change details of bond disposal
 bondsDisposalCYA.change.heading = Change details of bond disposal
+
+bondsDisposal.removeBondsDisposal.title = Are you sure you want to remove details of the disposal of these bonds?
+bondsDisposal.removeBondsDisposal.heading = Are you sure you want to remove details of the disposal of {0}?
+bondsDisposal.removeBondsDisposal.error.required = Select yes if you are sure you want to remove this bond disposal
