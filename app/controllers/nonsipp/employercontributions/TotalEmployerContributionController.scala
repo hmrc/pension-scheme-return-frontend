@@ -16,6 +16,7 @@
 
 package controllers.nonsipp.employercontributions
 
+import cats.implicits.catsSyntaxApplicativeId
 import config.Constants
 import config.Refined._
 import controllers.PSRController
@@ -25,12 +26,17 @@ import forms.mappings.errors.{MoneyFormErrorProvider, MoneyFormErrors}
 import models.SchemeId.Srn
 import models._
 import navigation.Navigator
-import pages.nonsipp.employercontributions.{EmployerNamePage, TotalEmployerContributionPage}
+import pages.nonsipp.employercontributions.{
+  EmployerContributionsProgress,
+  EmployerNamePage,
+  TotalEmployerContributionPage
+}
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage._
 import viewmodels.implicits._
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
@@ -73,23 +79,32 @@ class TotalEmployerContributionController @Inject()(
           formWithErrors => {
             (
               for {
-                memberName <- request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourneyT
+                memberName <- request.userAnswers.get(MemberDetailsPage(srn, index)).getOrRecoverJourney
                 employerName <- request.userAnswers
                   .get(EmployerNamePage(srn, index, secondaryIndex))
-                  .getOrRecoverJourneyT
+                  .getOrRecoverJourney
               } yield BadRequest(
                 view(viewModel(srn, employerName, memberName.fullName, index, secondaryIndex, formWithErrors, mode))
               )
-            ).merge
+            ).merge.pure[Future]
           },
           value =>
             for {
-              updatedAnswers <- Future
-                .fromTry(request.userAnswers.set(TotalEmployerContributionPage(srn, index, secondaryIndex), value))
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(
-              navigator.nextPage(TotalEmployerContributionPage(srn, index, secondaryIndex), mode, updatedAnswers)
-            )
+              updatedAnswers <- request.userAnswers
+                .set(TotalEmployerContributionPage(srn, index, secondaryIndex), value)
+                .mapK
+              nextPage = navigator
+                .nextPage(TotalEmployerContributionPage(srn, index, secondaryIndex), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(
+                srn,
+                index,
+                secondaryIndex,
+                updatedAnswers,
+                nextPage,
+                alwaysCompleted = true
+              )
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
         )
     }
 }

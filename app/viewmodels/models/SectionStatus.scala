@@ -17,8 +17,15 @@
 package viewmodels.models
 
 import play.api.libs.json._
+import play.api.mvc.Call
 import utils.WithName
 
+/**
+ * Defines the completion state of a section on the PSR task list page
+ *
+ * `NotStarted` is not defined as this value will be saved in UserAnswers;
+ * The absence of a `SectionStatus` value will indicate `Not Started`
+ */
 sealed trait SectionStatus {
   val name: String
   val isCompleted: Boolean
@@ -41,5 +48,54 @@ object SectionStatus {
     }
 
     override def writes(o: SectionStatus): JsValue = JsString(o.name)
+  }
+}
+
+/**
+ * Defines the completion state of a journey within a section
+ */
+sealed trait SectionJourneyStatus extends Product with Serializable {
+  val name: String
+  val inProgress: Boolean
+  val completed: Boolean
+}
+
+object SectionJourneyStatus {
+  case class InProgress(url: String) extends WithName(InProgress.name) with SectionJourneyStatus {
+    val inProgress: Boolean = true
+    val completed: Boolean = false
+  }
+
+  object InProgress extends WithName("JourneyInProgress") {
+    def apply(call: Call) = new InProgress(call.url)
+  }
+
+  case object Completed extends WithName("JourneyCompleted") with SectionJourneyStatus {
+    val inProgress: Boolean = false
+    val completed: Boolean = true
+  }
+
+  implicit val format: Format[SectionJourneyStatus] = new Format[SectionJourneyStatus] {
+    override def reads(json: JsValue): JsResult[SectionJourneyStatus] =
+      (__ \ "status")
+        .read[String]
+        .flatMap[SectionJourneyStatus] {
+          case InProgress.name => (__ \ "url").read[String].map(SectionJourneyStatus.InProgress(_))
+          case Completed.name => Reads.pure(SectionJourneyStatus.Completed)
+          case _ => Reads(_ => JsError("Unknown status"))
+        }
+        .reads(json)
+
+    override def writes(o: SectionJourneyStatus): JsValue = o match {
+      case InProgress(current) =>
+        Json.obj(
+          "status" -> Json.toJson(SectionJourneyStatus.InProgress.name),
+          "url" -> Json.toJson(current)
+        )
+      case Completed =>
+        Json.obj(
+          "status" -> Json.toJson(SectionJourneyStatus.Completed.name)
+        )
+    }
   }
 }

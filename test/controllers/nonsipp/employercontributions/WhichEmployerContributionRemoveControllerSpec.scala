@@ -16,13 +16,19 @@
 
 package controllers.nonsipp.employercontributions
 
+import config.Refined.Max50
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.employercontributions.WhichEmployerContributionRemoveController._
 import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
 import models.{Money, NameDOB}
-import pages.nonsipp.employercontributions.{EmployerNamePage, TotalEmployerContributionPage}
+import pages.nonsipp.employercontributions.{
+  EmployerContributionsProgress,
+  EmployerNamePage,
+  TotalEmployerContributionPage
+}
 import pages.nonsipp.memberdetails.MemberDetailsPage
+import viewmodels.models.SectionJourneyStatus
 import views.html.ListRadiosView
 
 class WhichEmployerContributionRemoveControllerSpec extends ControllerBaseSpec {
@@ -32,29 +38,30 @@ class WhichEmployerContributionRemoveControllerSpec extends ControllerBaseSpec {
 
   private val memberDetail1: NameDOB = nameDobGen.sample.value
   private val memberDetail2: NameDOB = nameDobGen.sample.value
-  private val memberDetailsMap: Map[Int, (Money, String)] =
-    Map(0 -> (money, employerName), 1 -> (money, employerName + "2"))
+  private val memberDetailsMap: List[(Max50, Money, String)] =
+    List((refineMV(1), money, employerName), (refineMV(2), money, employerName + "2"))
 
   private val userAnswers = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetail1)
     .unsafeSet(MemberDetailsPage(srn, refineMV(2)), memberDetail2)
     .unsafeSet(TotalEmployerContributionPage(srn, refineMV(1), refineMV(1)), money)
     .unsafeSet(EmployerNamePage(srn, refineMV(1), refineMV(1)), employerName)
+    .unsafeSet(EmployerContributionsProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.Completed)
     .unsafeSet(TotalEmployerContributionPage(srn, refineMV(1), refineMV(2)), money)
     .unsafeSet(EmployerNamePage(srn, refineMV(1), refineMV(2)), employerName + "2")
+    .unsafeSet(EmployerContributionsProgress(srn, refineMV(1), refineMV(2)), SectionJourneyStatus.Completed)
 
   private val userAnswersWithOneContributionOnly = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetail1)
     .unsafeSet(MemberDetailsPage(srn, refineMV(2)), memberDetail2)
     .unsafeSet(TotalEmployerContributionPage(srn, refineMV(1), refineMV(1)), money)
     .unsafeSet(EmployerNamePage(srn, refineMV(1), refineMV(1)), employerName)
+    .unsafeSet(EmployerContributionsProgress(srn, refineMV(1), refineMV(1)), SectionJourneyStatus.Completed)
 
   "WhichEmployerContributionRemoveController" - {
 
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
-      val view = injected[ListRadiosView]
-
-      view(
+      injected[ListRadiosView].apply(
         form(injected[RadioListFormProvider]),
         viewModel(srn, refineMV(1), memberDetail1.fullName, memberDetailsMap)
       )

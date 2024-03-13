@@ -47,7 +47,7 @@ import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsJourneyStatus
 import pages.nonsipp.membertransferout.TransfersOutJourneyStatus
 import pages.nonsipp.receivetransfer.TransfersInJourneyStatus
 import uk.gov.hmrc.domain.Nino
-import viewmodels.models.{MemberState, SectionCompleted, SectionStatus}
+import viewmodels.models.{MemberState, SectionCompleted, SectionJourneyStatus, SectionStatus}
 
 import javax.inject.Inject
 import scala.util.Try
@@ -252,7 +252,7 @@ class MemberPaymentsTransformer @Inject()(
     userAnswers: UserAnswers
   ): Option[List[EmployerContributions]] = {
     val secondaryIndexes =
-      keysToIndex[Max50.Refined](userAnswers.map(EmployerContributionsCompletedForMember(srn, index)))
+      keysToIndex[Max50.Refined](userAnswers.map(EmployerContributionsCompleted.all(srn, index)))
 
     secondaryIndexes.traverse(
       secondaryIndex =>
@@ -297,14 +297,14 @@ class MemberPaymentsTransformer @Inject()(
 
     secondaryIndexes.flatMap {
       case (secondaryIndex, employerContributions) =>
-        List[Try[UserAnswers] => Try[UserAnswers]](
+        List[UserAnswers.Compose](
           _.set(EmployerNamePage(srn, index, secondaryIndex), employerContributions.employerName),
           _.set(
             TotalEmployerContributionPage(srn, index, secondaryIndex),
             Money(employerContributions.totalTransferValue)
           ),
           _.set(EmployerContributionsCompleted(srn, index, secondaryIndex), SectionCompleted)
-        ) ++ List[Try[UserAnswers] => Try[UserAnswers]](
+        ) ++ List[UserAnswers.Compose](
           employerContributions.employerType match {
             case EmployerType.UKCompany(idOrReason) =>
               _.set(EmployerTypeOfBusinessPage(srn, index, secondaryIndex), IdentityType.UKCompany)
@@ -316,7 +316,11 @@ class MemberPaymentsTransformer @Inject()(
               _.set(EmployerTypeOfBusinessPage(srn, index, secondaryIndex), IdentityType.Other)
                 .set(OtherEmployeeDescriptionPage(srn, index, secondaryIndex), description)
           }
-        )
+        ) ++ Option
+          .when[UserAnswers.Compose](employerContributionsDetails.completed)(
+            _.set(EmployerContributionsProgress(srn, index, secondaryIndex), SectionJourneyStatus.Completed)
+          )
+          .toList
     } ++ List[Try[UserAnswers] => Try[UserAnswers]](
       _.set(EmployerContributionsPage(srn), employerContributionsDetails.made),
       _.set(EmployerContributionsMemberListPage(srn), employerContributionsDetails.completed),

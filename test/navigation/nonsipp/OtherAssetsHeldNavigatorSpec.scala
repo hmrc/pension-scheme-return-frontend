@@ -22,7 +22,12 @@ import models.SchemeId.Srn
 import models.{IdentitySubject, IdentityType, NormalMode, SchemeHoldAsset, UserAnswers}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.common.{CompanyRecipientCrnPage, IdentityTypePage, OtherRecipientDetailsPage, PartnershipRecipientUtrPage}
+import pages.nonsipp.common.{
+  CompanyRecipientCrnPage,
+  IdentityTypePage,
+  OtherRecipientDetailsPage,
+  PartnershipRecipientUtrPage
+}
 import pages.nonsipp.otherassetsheld._
 import utils.BaseSpec
 import utils.UserAnswersUtils.UserAnswersOps

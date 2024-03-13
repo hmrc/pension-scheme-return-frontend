@@ -42,7 +42,7 @@ import pages.nonsipp.membersurrenderedbenefits._
 import pages.nonsipp.membertransferout._
 import pages.nonsipp.receivetransfer._
 import utils.UserAnswersUtils.UserAnswersOps
-import viewmodels.models.{MemberState, SectionCompleted, SectionStatus}
+import viewmodels.models.{MemberState, SectionCompleted, SectionJourneyStatus, SectionStatus}
 
 import java.time.LocalDate
 import scala.util.Try
@@ -127,6 +127,7 @@ class MemberPaymentsTransformerSpec
     .unsafeSet(DoesMemberHaveNinoPage(srn, index), true)
     .unsafeSet(MemberDetailsNinoPage(srn, index), nino)
     .unsafeSet(MemberStatus(srn, index), MemberState.Active)
+    // employer contributions
     .unsafeSet(EmployerContributionsPage(srn), true)
     .unsafeSet(EmployerNamePage(srn, index, employerContribsIndex), employerName)
     .unsafeSet(EmployerTypeOfBusinessPage(srn, index, employerContribsIndex), IdentityType.UKCompany)
@@ -137,6 +138,7 @@ class MemberPaymentsTransformerSpec
     .unsafeSet(UnallocatedEmployerContributionsPage(srn), true)
     .unsafeSet(UnallocatedEmployerAmountPage(srn), money)
     .unsafeSet(EmployerContributionsMemberListPage(srn), true)
+    .unsafeSet(EmployerContributionsProgress(srn, index, employerContribsIndex), SectionJourneyStatus.Completed)
     // transfers in
     .unsafeSet(TransfersInSectionCompleted(srn, index, transfersInIndex), SectionCompleted)
     .unsafeSet(TransfersInJourneyStatus(srn), SectionStatus.InProgress)

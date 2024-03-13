@@ -17,6 +17,7 @@
 package controllers.nonsipp.employercontributions
 
 import config.Refined.{Max300, Max50}
+import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
 import forms.YesNoPageFormProvider
 import forms.mappings.Mappings
@@ -24,15 +25,17 @@ import forms.mappings.errors.InputFormErrors
 import models.SchemeId.Srn
 import models.{ConditionalYesNo, Crn, Mode}
 import navigation.Navigator
-import pages.nonsipp.employercontributions.{EmployerCompanyCrnPage, EmployerNamePage}
+import pages.nonsipp.employercontributions.{EmployerCompanyCrnPage, EmployerContributionsProgress, EmployerNamePage}
 import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
-import viewmodels.models.{ConditionalYesNoPageViewModel, FieldType, FormPageViewModel, YesNoViewModel}
+import viewmodels.models._
+import EmployerCompanyCrnController._
+import cats.implicits.catsSyntaxApplicativeId
 import views.html.ConditionalYesNoPageView
 
 import javax.inject.{Inject, Named}
@@ -47,20 +50,16 @@ class EmployerCompanyCrnController @Inject()(
   val controllerComponents: MessagesControllerComponents,
   view: ConditionalYesNoPageView
 )(implicit ec: ExecutionContext)
-    extends FrontendBaseController
-    with I18nSupport {
+    extends PSRController {
+
   val form: Form[Either[String, Crn]] = EmployerCompanyCrnController.form(formProvider)
+
   def onPageLoad(srn: Srn, memberIndex: Max300, index: Max50, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       request.usingAnswer(EmployerNamePage(srn, memberIndex, index)).sync { companyName =>
         val preparedForm =
           request.userAnswers.fillForm(EmployerCompanyCrnPage(srn, memberIndex, index), form)
-        Ok(
-          view(
-            preparedForm,
-            EmployerCompanyCrnController.viewModel(srn, memberIndex, index, mode, companyName)
-          )
-        )
+        Ok(view(preparedForm, viewModel(srn, memberIndex, index, mode, companyName)))
       }
     }
 
@@ -70,29 +69,21 @@ class EmployerCompanyCrnController @Inject()(
         .bindFromRequest()
         .fold(
           formWithErrors =>
-            request.usingAnswer(EmployerNamePage(srn, memberIndex, index)).async { companyName =>
-              Future
-                .successful(
-                  BadRequest(
-                    view(
-                      formWithErrors,
-                      EmployerCompanyCrnController
-                        .viewModel(srn, memberIndex, index, mode, companyName)
-                    )
-                  )
-                )
-            },
+            request.userAnswers
+              .get(EmployerNamePage(srn, memberIndex, index))
+              .getOrRecoverJourney(
+                companyName => BadRequest(view(formWithErrors, viewModel(srn, memberIndex, index, mode, companyName)))
+              )
+              .pure[Future],
           value =>
             for {
-              updatedAnswers <- Future
-                .fromTry(
-                  request.userAnswers
-                    .set(EmployerCompanyCrnPage(srn, memberIndex, index), ConditionalYesNo(value))
-                )
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(
-              navigator.nextPage(EmployerCompanyCrnPage(srn, memberIndex, index), mode, updatedAnswers)
-            )
+              updatedAnswers <- request.userAnswers
+                .set(EmployerCompanyCrnPage(srn, memberIndex, index), ConditionalYesNo(value))
+                .mapK
+              nextPage = navigator.nextPage(EmployerCompanyCrnPage(srn, memberIndex, index), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, memberIndex, index, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
         )
     }
 }

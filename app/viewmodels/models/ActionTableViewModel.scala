@@ -27,7 +27,8 @@ case class TableElem(
 
 object TableElem {
   val empty: TableElem = TableElem(DisplayMessage.Empty)
-  def add(call: Call): TableElem = TableElem(LinkMessage(Message("site.add"), call.url))
+  def add(call: Call): TableElem = add(call.url)
+  def add(url: String): TableElem = TableElem(LinkMessage(Message("site.add"), url))
   def change(call: Call): TableElem = TableElem(LinkMessage(Message("site.change"), call.url))
   def remove(call: Call): TableElem = TableElem(LinkMessage(Message("site.remove"), call.url))
 }

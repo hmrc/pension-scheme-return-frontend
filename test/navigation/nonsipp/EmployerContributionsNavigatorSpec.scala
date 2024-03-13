@@ -25,6 +25,7 @@ import org.scalacheck.Gen
 import pages.nonsipp.employercontributions._
 import utils.BaseSpec
 import utils.UserAnswersUtils.UserAnswersOps
+import viewmodels.models.SectionJourneyStatus
 
 class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
@@ -268,6 +269,10 @@ class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviou
           defaultUserAnswers
             .unsafeSet(ContributionsFromAnotherEmployerPage(srn, index, secondaryIndex), true)
             .unsafeSet(TotalEmployerContributionPages(srn, index), existingIndexes.map(_ -> money).toMap)
+            .unsafeSet(
+              EmployerContributionsProgress.all(srn, index),
+              existingIndexes.map(_ -> SectionJourneyStatus.Completed).toMap
+            )
 
         act.like(
           normalmode

@@ -84,8 +84,9 @@ object EmployerContributionsNavigator extends JourneyNavigator {
       if (userAnswers.get(page).contains(true)) {
         (
           for {
-            map <- userAnswers.get(TotalEmployerContributionPages(srn, index)).getOrRecoverJourney
-            indexes <- map.keys.toList.traverse(_.toIntOption).getOrRecoverJourney
+            map <- userAnswers.get(EmployerContributionsProgress.all(srn, index)).getOrRecoverJourney
+            filtered = map.filter { case (_, status) => status.completed }
+            indexes <- filtered.keys.toList.traverse(_.toIntOption).getOrRecoverJourney
             nextIndex <- findNextOpenIndex[Max50.Refined](indexes).getOrRecoverJourney
           } yield controllers.nonsipp.employercontributions.routes.EmployerNameController
             .onPageLoad(srn, index, nextIndex, NormalMode)
@@ -132,16 +133,31 @@ object EmployerContributionsNavigator extends JourneyNavigator {
 
             // same answer
             case (Some(IdentityType.UKCompany), Some(IdentityType.UKCompany)) =>
-              controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
-                .onPageLoad(srn, index, getCYAPage(secondaryIndex.value), NormalMode)
+              if (userAnswers.get(EmployerCompanyCrnPage(srn, index, secondaryIndex)).isEmpty) {
+                controllers.nonsipp.employercontributions.routes.EmployerCompanyCrnController
+                  .onPageLoad(srn, index, secondaryIndex, CheckMode)
+              } else {
+                controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
+                  .onPageLoad(srn, index, getCYAPage(secondaryIndex.value), NormalMode)
+              }
 
             case (Some(IdentityType.UKPartnership), Some(IdentityType.UKPartnership)) =>
-              controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
-                .onPageLoad(srn, index, getCYAPage(secondaryIndex.value), NormalMode)
+              if (userAnswers.get(PartnershipEmployerUtrPage(srn, index, secondaryIndex)).isEmpty) {
+                controllers.nonsipp.employercontributions.routes.PartnershipEmployerUtrController
+                  .onPageLoad(srn, index, secondaryIndex, CheckMode)
+              } else {
+                controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
+                  .onPageLoad(srn, index, getCYAPage(secondaryIndex.value), NormalMode)
+              }
 
             case (Some(IdentityType.Other), Some(IdentityType.Other)) =>
-              controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
-                .onPageLoad(srn, index, getCYAPage(secondaryIndex.value), NormalMode)
+              if (userAnswers.get(OtherEmployeeDescriptionPage(srn, index, secondaryIndex)).isEmpty) {
+                controllers.nonsipp.employercontributions.routes.OtherEmployeeDescriptionController
+                  .onPageLoad(srn, index, secondaryIndex, CheckMode)
+              } else {
+                controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
+                  .onPageLoad(srn, index, getCYAPage(secondaryIndex.value), NormalMode)
+              }
 
             // different answer
             case (_, Some(IdentityType.UKCompany)) =>
@@ -177,8 +193,9 @@ object EmployerContributionsNavigator extends JourneyNavigator {
           if (userAnswers.get(page).contains(true)) {
             (
               for {
-                map <- userAnswers.get(TotalEmployerContributionPages(srn, index)).getOrRecoverJourney
-                indexes <- map.keys.toList.traverse(_.toIntOption).getOrRecoverJourney
+                map <- userAnswers.get(EmployerContributionsProgress.all(srn, index)).getOrRecoverJourney
+                filtered = map.filter { case (_, status) => status.completed }
+                indexes <- filtered.keys.toList.traverse(_.toIntOption).getOrRecoverJourney
                 nextIndex <- findNextOpenIndex[Max50.Refined](indexes).getOrRecoverJourney
               } yield controllers.nonsipp.employercontributions.routes.EmployerNameController
                 .onPageLoad(srn, index, nextIndex, NormalMode)
