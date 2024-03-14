@@ -417,8 +417,8 @@ object TaskListStatusUtils {
     }
 
   private def getIncompleteDoubleIndex[A, B](
-    firstPages: Option[Map[String, A]],
-    lastPages: Option[Map[String, B]]
+    firstPages: List[A],
+    lastPages: List[B]
   ): (Int, Int) =
     (getIncompleteIndex(firstPages, lastPages), 1) // Temporarily only finding first index, and going to 1st diposal for that index
   /*(firstPages, lastPages) match {
@@ -541,7 +541,7 @@ object TaskListStatusUtils {
         .onPageLoad(srn, index, disposalIndex, NormalMode)
         .url
 
-    val firstPages = userAnswers.get(HowWereSharesDisposedPages(srn))
+    val firstPages = userAnswers.map(HowWereSharesDisposedPages(srn)).map()
     val lastPages = userAnswers.map(SharesDisposalCompletedPages(srn))
     val (incompleteFirstIndex, incompleteSecondIndex): (Int, Int) =
       getIncompleteDoubleIndex(firstPages, Some(lastPages))
