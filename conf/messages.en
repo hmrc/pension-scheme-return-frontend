@@ -2916,6 +2916,18 @@ otherAssets.otherAssetIndividualSellerNINumber.no.conditional.error.required = E
 otherAssets.otherAssetIndividualSellerNINumber.no.conditional.error.invalid = The reason you cannot provide the seller’s National Insurance number must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
 otherAssets.otherAssetIndividualSellerNINumber.no.conditional.error.length = The reason you cannot provide the seller’s National Insurance number must be 160 characters or fewer
 
+otherAssets.sellerConnectedParty.title = Is the seller a connected party?
+otherAssets.sellerConnectedParty.heading = Is {0} a connected party?
+otherAssets.sellerConnectedParty.content = What is a connected party?
+otherAssets.sellerConnectedParty.paragraph1 = A connected party is an individual, company or partnership that is connected to either a member of the scheme or the sponsoring employer of the scheme.
+otherAssets.sellerConnectedParty.paragraph2 = A connected party of a member is usually their spouse, civil partner or close relative (for example their parent, sibling, child or grandchild).
+otherAssets.sellerConnectedParty.paragraph3 = A connected party of a sponsoring employer can be:
+otherAssets.sellerConnectedParty.bullet1 = someone who has control over the company
+otherAssets.sellerConnectedParty.bullet2 = another company, where the same person has control of both
+otherAssets.sellerConnectedParty.paragraph4 = See a
+otherAssets.sellerConnectedParty.paragraph4.link = full list of circumstances where an individual, company or partnership might be a connected party (opens in new tab).
+otherAssets.sellerConnectedParty.error.required = Select yes if the seller is a connected party
+
 companyNameOfOtherAssetsSeller.title = What is the seller’s company name?
 companyNameOfOtherAssetsSeller.heading = What is the seller’s company name?
 companyNameOfOtherAssetsSeller.error.required = Enter the seller’s company name

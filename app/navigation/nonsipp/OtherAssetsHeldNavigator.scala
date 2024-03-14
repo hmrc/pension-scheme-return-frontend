@@ -106,15 +106,22 @@ object OtherAssetsHeldNavigator extends JourneyNavigator {
         .onPageLoad(srn, index, NormalMode, IdentitySubject.OtherAssetSeller)
 
     case OtherAssetIndividualSellerNINumberPage(srn, index) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+      controllers.nonsipp.otherassetsheld.routes.OtherAssetSellerConnectedPartyController
+        .onPageLoad(srn, index, NormalMode)
 
     case CompanyRecipientCrnPage(srn, index, IdentitySubject.OtherAssetSeller) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+      controllers.nonsipp.otherassetsheld.routes.OtherAssetSellerConnectedPartyController
+        .onPageLoad(srn, index, NormalMode)
 
     case PartnershipRecipientUtrPage(srn, index, IdentitySubject.OtherAssetSeller) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+      controllers.nonsipp.otherassetsheld.routes.OtherAssetSellerConnectedPartyController
+        .onPageLoad(srn, index, NormalMode)
 
     case OtherRecipientDetailsPage(srn, index, IdentitySubject.OtherAssetSeller) =>
+      controllers.nonsipp.otherassetsheld.routes.OtherAssetSellerConnectedPartyController
+        .onPageLoad(srn, index, NormalMode)
+
+    case OtherAssetSellerConnectedPartyPage(srn, index) =>
       controllers.routes.UnauthorisedController.onPageLoad()
   }
 

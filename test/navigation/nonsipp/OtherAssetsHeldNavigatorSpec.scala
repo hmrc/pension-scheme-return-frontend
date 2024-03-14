@@ -327,10 +327,12 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           .navigateToWithIndex(
             index,
             OtherAssetIndividualSellerNINumberPage,
-            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.otherassetsheld.routes.OtherAssetSellerConnectedPartyController
+                .onPageLoad(srn, index, NormalMode)
           )
           .withName(
-            "go from OtherAssetIndividualSellerNINumberPage to Unauthorised"
+            "go from OtherAssetIndividualSellerNINumberPage to OtherAssetSellerConnectedPartyPage"
           )
       )
     }
@@ -342,10 +344,12 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             index,
             subject,
             CompanyRecipientCrnPage,
-            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.otherassetsheld.routes.OtherAssetSellerConnectedPartyController
+                .onPageLoad(srn, index, NormalMode)
           )
           .withName(
-            "go from CompanyRecipientCrnPage to Unauthorised"
+            "go from CompanyRecipientCrnPage to OtherAssetSellerConnectedPartyPage"
           )
       )
     }
@@ -357,10 +361,12 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             index,
             subject,
             PartnershipRecipientUtrPage,
-            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.otherassetsheld.routes.OtherAssetSellerConnectedPartyController
+                .onPageLoad(srn, index, NormalMode)
           )
           .withName(
-            "go from PartnershipRecipientUtrPage to Unauthorised"
+            "go from PartnershipRecipientUtrPage to OtherAssetSellerConnectedPartyPage"
           )
       )
     }
@@ -372,10 +378,27 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             index,
             subject,
             OtherRecipientDetailsPage,
-            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.otherassetsheld.routes.OtherAssetSellerConnectedPartyController
+                .onPageLoad(srn, index, NormalMode)
           )
           .withName(
-            "go from OtherRecipientDetailsPage to Unauthorised"
+            "go from OtherRecipientDetailsPage to OtherAssetSellerConnectedPartyPage"
+          )
+      )
+    }
+
+    "OtherAssetSellerConnectedPartyPage" - {
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            OtherAssetSellerConnectedPartyPage,
+            (srn, _: Max5000, _) =>
+              controllers.routes.UnauthorisedController.onPageLoad()
+          )
+          .withName(
+            "go from OtherAssetSellerConnectedPartyPage to Unauthorised"
           )
       )
     }
