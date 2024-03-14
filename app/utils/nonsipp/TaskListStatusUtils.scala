@@ -20,7 +20,7 @@ import config.Refined.{Max50, Max5000, OneTo50, OneTo5000}
 import eu.timepit.refined.{refineMV, refineV}
 import models.ConditionalYesNo._
 import models.SchemeId.Srn
-import models.{IdentitySubject, Money, NormalMode, PensionSchemeId, SchemeHoldLandProperty, TypeOfShares, UserAnswers}
+import models.{IdentitySubject, Money, NormalMode, PensionSchemeId, SchemeHoldLandProperty, UserAnswers}
 import pages.nonsipp.common.IdentityTypes
 import pages.nonsipp.employercontributions.{EmployerContributionsPage, EmployerContributionsSectionStatus}
 import pages.nonsipp.landorproperty._
@@ -35,13 +35,7 @@ import pages.nonsipp.memberdetails.{MemberDetailsNinoPages, MembersDetailsPages,
 import pages.nonsipp.moneyborrowed.{LenderNamePages, MoneyBorrowedPage, WhySchemeBorrowedMoneyPages}
 import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
 import pages.nonsipp.schemedesignatory.{FeesCommissionsWagesSalariesPage, HowManyMembersPage, HowMuchCashPage}
-import pages.nonsipp.shares.{
-  sharesPages,
-  DidSchemeHoldAnySharesPage,
-  SharesCompleted,
-  SharesJourneyStatus,
-  TypeOfSharesHeldPages
-}
+import pages.nonsipp.shares.{DidSchemeHoldAnySharesPage, SharesCompleted, SharesJourneyStatus, TypeOfSharesHeldPages}
 import pages.nonsipp.sharesdisposal.{
   HowManyDisposalSharesPage,
   HowWereSharesDisposedPages,
@@ -50,8 +44,8 @@ import pages.nonsipp.sharesdisposal.{
 }
 import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
 import pages.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldPage
-import viewmodels.models.{SectionCompleted, SectionStatus, TaskListStatus}
 import viewmodels.models.TaskListStatus.{Completed, InProgress, NotStarted, TaskListStatus}
+import viewmodels.models.{SectionStatus, TaskListStatus}
 
 object TaskListStatusUtils {
 
@@ -416,30 +410,34 @@ object TaskListStatusUtils {
         }
     }
 
-  private def getIncompleteDoubleIndex[A, B](
-    firstPages: List[A],
-    lastPages: List[B]
-  ): (Int, Int) =
-    (getIncompleteIndex(firstPages, lastPages), 1) // Temporarily only finding first index, and going to 1st diposal for that index
-  /*(firstPages, lastPages) match {
-      case (None, _) => 1
-      case (Some(_), None) => 1
-      case (Some(first), Some(last)) =>
-        if (first.isEmpty) {
-          1
-        } else {
-          val firstPagesIndexes = first.map(_._1.toInt)
-          val lastPagesIndexes = last.map(_._1.toInt).toList
-
-          val filtered = firstPagesIndexes.filter(lastPagesIndexes.indexOf(_) < 0)
-          if (filtered.isEmpty) {
-            0
-          } else {
-            filtered.head + 1
-          }
-        }
+  private def getIncompleteIndex_(
+    firstPages: List[Int],
+    lastPages: List[Int]
+  ): Option[Int] = {
+    val filtered: List[Int] = firstPages.filter(lastPages.indexOf(_) < 0)
+    if (filtered.isEmpty) {
+      None
+    } else {
+      Some(filtered.head + 1)
     }
-   */
+  }
+
+  private def getIncompleteDoubleIndex(
+    firstPages: Map[Int, List[Int]],
+    lastPages: Map[Int, List[Int]]
+  ): Option[(Int, Int)] =
+    firstPages
+      .flatMap {
+        case (indexKey, value) =>
+          lastPages.map {
+            case (indexKey2, value2) if indexKey == indexKey2 =>
+              getIncompleteIndex_(value, value2).map(secondaryIndex => (indexKey, secondaryIndex))
+            case _ => None
+          }
+      }
+      .toList
+      .headOption
+      .flatten
 
   // Once this is working, merge into getIncompleteDoubleIndex
   // Try to access the disposal index, view the word document for info on the data structure
@@ -536,24 +534,31 @@ object TaskListStatusUtils {
       .onPageLoad(srn, page = 1)
       .url
 
-    def howWereSharesDisposedPageUrl(index: Max5000, disposalIndex: Max50) =
-      controllers.nonsipp.sharesdisposal.routes.HowWereSharesDisposedController
-        .onPageLoad(srn, index, disposalIndex, NormalMode)
-        .url
+    val firstPages: Map[Int, List[Int]] =
+      userAnswers
+        .map(HowWereSharesDisposedPages(srn))
+        .view
+        .map { case (k, v) => (k.toInt, v.keys.toList.map(_.toInt)) }
+        .toMap
 
-    val firstPages = userAnswers.map(HowWereSharesDisposedPages(srn)).map()
-    val lastPages = userAnswers.map(SharesDisposalCompletedPages(srn))
-    val (incompleteFirstIndex, incompleteSecondIndex): (Int, Int) =
-      getIncompleteDoubleIndex(firstPages, Some(lastPages))
+    val lastPages: Map[Int, List[Int]] =
+      userAnswers
+        .map(SharesDisposalCompletedPages(srn))
+        .view
+        .map { case (k, v) => (k.toInt, v.keys.toList.map(_.toInt)) }
+        .toMap
 
-    val refinedShareIndex = refineV[OneTo5000](incompleteFirstIndex).getOrElse(0)
-
-    val refinedDisposalIndex = refineV[OneTo50](incompleteSecondIndex).getOrElse(0)
-
-    val inProgressCalculatedUrl = (refinedShareIndex, refinedDisposalIndex) match {
-      case (checkedShareIndex: Max5000, checkedDisposalIndex: Max50) =>
-        howWereSharesDisposedPageUrl(checkedShareIndex, checkedDisposalIndex)
-      case _ => reportedDisposalListPage
+    val inProgressCalculatedUrl: String = getIncompleteDoubleIndex(firstPages, lastPages) match {
+      case None => reportedDisposalListPage
+      case Some((index, secondaryIndex)) =>
+        (
+          for {
+            sharesIndex <- refineV[OneTo5000](index)
+            sharesDisposalIndex <- refineV[OneTo50](secondaryIndex)
+          } yield controllers.nonsipp.sharesdisposal.routes.HowWereSharesDisposedController
+            .onPageLoad(srn, sharesIndex, sharesDisposalIndex, NormalMode)
+            .url
+        ).merge
     }
 
     if (atLeastOneCompleted) {
