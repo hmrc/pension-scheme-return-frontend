@@ -16,7 +16,7 @@
 
 package utils.nonsipp
 
-import config.Refined.Max5000
+import config.Refined.{Max50, Max5000}
 import controllers.TestValues
 import eu.timepit.refined.refineMV
 import models.ConditionalYesNo._
@@ -38,11 +38,12 @@ import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsPage, N
 import pages.nonsipp.moneyborrowed.{LenderNamePage, LenderNamePages, MoneyBorrowedPage, WhySchemeBorrowedMoneyPage}
 import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
 import pages.nonsipp.shares.{DidSchemeHoldAnySharesPage, SharesCompleted, SharesJourneyStatus, TypeOfSharesHeldPage}
+import pages.nonsipp.sharesdisposal.{HowManyDisposalSharesPage, SharesDisposalCompletedPage, SharesDisposalPage}
 import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
 import pages.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldPage
 import utils.UserAnswersUtils.UserAnswersOps
-import viewmodels.models.{SectionCompleted, SectionStatus}
 import viewmodels.models.TaskListStatus.{Completed, InProgress, NotStarted, UnableToStart}
+import viewmodels.models.{SectionCompleted, SectionStatus}
 
 class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValues with TestValues {
   "Loans status" - {
@@ -447,6 +448,64 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
 
         val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn)
         result mustBe (InProgress, typeOfSharesHeldPageTwoUrl)
+      }
+    }
+  }
+
+  "Shares disposal status" - {
+    val hadSharesDisposalsPageUrl =
+      controllers.nonsipp.sharesdisposal.routes.SharesDisposalController
+        .onPageLoad(srn, NormalMode)
+        .url
+    val sharesDisposalsListPageUrl =
+      controllers.nonsipp.sharesdisposal.routes.SharesDisposalListController
+        .onPageLoad(srn, 1)
+        .url
+    val reportedSharesDisposalsListPageUrl =
+      controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController
+        .onPageLoad(srn, 1)
+        .url
+
+    "should be Not Started" - {
+      "when default data" in {
+        val result = TaskListStatusUtils.getSharesDisposalsTaskListStatusWithLink(defaultUserAnswers, srn)
+        result mustBe (NotStarted, hadSharesDisposalsPageUrl)
+      }
+    }
+    "should be Complete" - {
+      "when only DidSchemeDisposeAnyShares false is present" in {
+        val customUserAnswers = defaultUserAnswers
+          .unsafeSet(SharesDisposalPage(srn), false)
+        val result = TaskListStatusUtils.getSharesDisposalsTaskListStatusWithLink(customUserAnswers, srn)
+        result mustBe (Completed, hadSharesDisposalsPageUrl)
+      }
+      "when DidSchemeDisposeAnyShares is true and status is completed" in {
+        val customUserAnswers = defaultUserAnswers
+          .unsafeSet(SharesDisposalPage(srn), true)
+          .unsafeSet(
+            SharesDisposalCompletedPage(srn, refineMV[Max5000.Refined](1), refineMV[Max50.Refined](1)),
+            SectionCompleted
+          )
+        val result = TaskListStatusUtils.getSharesDisposalsTaskListStatusWithLink(customUserAnswers, srn)
+        result mustBe (Completed, reportedSharesDisposalsListPageUrl)
+      }
+    }
+    "should be InProgress" - {
+      "when only DidSchemeDisposeAnyShares true is present" in {
+        val customUserAnswers = defaultUserAnswers
+          .unsafeSet(SharesDisposalPage(srn), true)
+        val result = TaskListStatusUtils.getSharesDisposalsTaskListStatusWithLink(customUserAnswers, srn)
+        result mustBe (InProgress, sharesDisposalsListPageUrl)
+      }
+      "when DidSchemeDisposeAnyShares true is present and last page is reached" in {
+        val customUserAnswers = defaultUserAnswers
+          .unsafeSet(SharesDisposalPage(srn), true)
+          .unsafeSet(
+            HowManyDisposalSharesPage(srn, refineMV[Max5000.Refined](1), refineMV[Max50.Refined](1)),
+            totalShares
+          )
+        val result = TaskListStatusUtils.getSharesDisposalsTaskListStatusWithLink(customUserAnswers, srn)
+        result mustBe (InProgress, reportedSharesDisposalsListPageUrl)
       }
     }
   }

@@ -424,7 +424,7 @@ object TaskListController {
       ),
       TaskListItemViewModel(
         LinkMessage(
-          messageKey("nonsipp.tasklist.sharesdisposal", "title", sharesDisposalsStatus),
+          "nonsipp.tasklist.sharesdisposal.add.title",
           sharesDisposalsLinkUrl
         ),
         sharesDisposalsStatus

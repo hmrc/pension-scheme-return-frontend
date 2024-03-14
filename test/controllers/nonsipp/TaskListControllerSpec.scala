@@ -631,7 +631,7 @@ class TaskListControllerSpec extends ControllerBaseSpec {
           1,
           expectedStatus = TaskListStatus.InProgress,
           expectedTitleKey = "nonsipp.tasklist.shares.title",
-          expectedLinkContentKey = "nonsipp.tasklist.sharesdisposal.change.title",
+          expectedLinkContentKey = "nonsipp.tasklist.sharesdisposal.add.title",
           expectedLinkUrl = controllers.nonsipp.sharesdisposal.routes.SharesDisposalController
             .onPageLoad(srn, NormalMode)
             .url
@@ -647,7 +647,7 @@ class TaskListControllerSpec extends ControllerBaseSpec {
           1,
           expectedStatus = TaskListStatus.Completed,
           expectedTitleKey = "nonsipp.tasklist.shares.title",
-          expectedLinkContentKey = "nonsipp.tasklist.sharesdisposal.change.title",
+          expectedLinkContentKey = "nonsipp.tasklist.sharesdisposal.add.title",
           expectedLinkUrl = controllers.nonsipp.sharesdisposal.routes.SharesDisposalController
             .onPageLoad(srn, NormalMode)
             .url
@@ -665,7 +665,7 @@ class TaskListControllerSpec extends ControllerBaseSpec {
           1,
           expectedStatus = TaskListStatus.Completed,
           expectedTitleKey = "nonsipp.tasklist.shares.title",
-          expectedLinkContentKey = "nonsipp.tasklist.sharesdisposal.change.title",
+          expectedLinkContentKey = "nonsipp.tasklist.sharesdisposal.add.title",
           expectedLinkUrl = controllers.nonsipp.sharesdisposal.routes.SharesDisposalListController
             .onPageLoad(srn, 1)
             .url

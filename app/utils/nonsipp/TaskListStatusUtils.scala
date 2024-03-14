@@ -16,7 +16,7 @@
 
 package utils.nonsipp
 
-import config.Refined.{Max5000, OneTo5000}
+import config.Refined.{Max50, Max5000, OneTo50, OneTo5000}
 import eu.timepit.refined.{refineMV, refineV}
 import models.ConditionalYesNo._
 import models.SchemeId.Srn
@@ -42,7 +42,12 @@ import pages.nonsipp.shares.{
   SharesJourneyStatus,
   TypeOfSharesHeldPages
 }
-import pages.nonsipp.sharesdisposal.{SharesDisposalCompletedPages, SharesDisposalPage}
+import pages.nonsipp.sharesdisposal.{
+  HowManyDisposalSharesPage,
+  HowWereSharesDisposedPages,
+  SharesDisposalCompletedPages,
+  SharesDisposalPage
+}
 import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
 import pages.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldPage
 import viewmodels.models.{SectionCompleted, SectionStatus, TaskListStatus}
@@ -411,6 +416,56 @@ object TaskListStatusUtils {
         }
     }
 
+  private def getIncompleteDoubleIndex[A, B](
+    firstPages: Option[Map[String, A]],
+    lastPages: Option[Map[String, B]]
+  ): (Int, Int) =
+    (getIncompleteIndex(firstPages, lastPages), 1) // Temporarily only finding first index, and going to 1st diposal for that index
+  /*(firstPages, lastPages) match {
+      case (None, _) => 1
+      case (Some(_), None) => 1
+      case (Some(first), Some(last)) =>
+        if (first.isEmpty) {
+          1
+        } else {
+          val firstPagesIndexes = first.map(_._1.toInt)
+          val lastPagesIndexes = last.map(_._1.toInt).toList
+
+          val filtered = firstPagesIndexes.filter(lastPagesIndexes.indexOf(_) < 0)
+          if (filtered.isEmpty) {
+            0
+          } else {
+            filtered.head + 1
+          }
+        }
+    }
+   */
+
+  // Once this is working, merge into getIncompleteDoubleIndex
+  // Try to access the disposal index, view the word document for info on the data structure
+  private def getIncompleteDisposalIndex[A, B](
+    firstPages: Option[Map[String, A]],
+    lastPages: Option[Map[String, B]]
+  ): Int =
+    (firstPages, lastPages) match {
+      case (None, _) => 1
+      case (Some(_), None) => 1
+      case (Some(first), Some(last)) =>
+        if (first.isEmpty) {
+          1
+        } else {
+          val firstPagesDisposalIndexes = first.map(_._1.toInt)
+          val lastPagesDisposalIndexes = last.map(_._1.toInt).toList
+
+          val filtered = firstPagesDisposalIndexes.filter(lastPagesDisposalIndexes.indexOf(_) < 0)
+          if (filtered.isEmpty) {
+            0
+          } else {
+            filtered.head + 1
+          }
+        }
+    }
+
   def getSharesTaskListStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
     val defaultLink =
       controllers.nonsipp.shares.routes.DidSchemeHoldAnySharesController
@@ -428,7 +483,6 @@ object TaskListStatusUtils {
     val shareStatusPage = userAnswers.get(SharesJourneyStatus(srn))
     val firstPages = userAnswers.get(TypeOfSharesHeldPages(srn))
     val lastPages = userAnswers.map(SharesCompleted.all(srn))
-    // TODO
     val incompleteIndex: Int = getIncompleteIndex(firstPages, Some(lastPages))
     val inProgressCalculatedUrl = refineV[OneTo5000](incompleteIndex).fold(
       _ => sharesListPageUrl,
@@ -447,7 +501,27 @@ object TaskListStatusUtils {
   def getSharesDisposalsTaskListStatusWithLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
     val atLeastOneCompleted =
       userAnswers.get(SharesDisposalCompletedPages(srn)).exists(_.values.exists(_.values.nonEmpty))
-    val started = userAnswers.get(SharesDisposalPage(srn)).contains(true)
+
+    val started =
+      userAnswers
+        .get(SharesDisposalPage(srn))
+        .contains(true)
+        .&&(
+          userAnswers
+            .get(HowManyDisposalSharesPage(srn, refineMV[Max5000.Refined](1), refineMV[Max50.Refined](1)))
+            .isEmpty
+        )
+
+    val lastPageReached =
+      userAnswers
+        .get(SharesDisposalPage(srn))
+        .contains(true)
+        .&&(
+          userAnswers
+            .get(HowManyDisposalSharesPage(srn, refineMV[Max5000.Refined](1), refineMV[Max50.Refined](1)))
+            .nonEmpty
+        )
+
     val completedNoDisposals = userAnswers.get(SharesDisposalPage(srn)).contains(false)
 
     val initialDisposalUrl = controllers.nonsipp.sharesdisposal.routes.SharesDisposalController
@@ -458,12 +532,38 @@ object TaskListStatusUtils {
       .onPageLoad(srn, page = 1)
       .url
 
+    val reportedDisposalListPage = controllers.nonsipp.sharesdisposal.routes.ReportedSharesDisposalListController
+      .onPageLoad(srn, page = 1)
+      .url
+
+    def howWereSharesDisposedPageUrl(index: Max5000, disposalIndex: Max50) =
+      controllers.nonsipp.sharesdisposal.routes.HowWereSharesDisposedController
+        .onPageLoad(srn, index, disposalIndex, NormalMode)
+        .url
+
+    val firstPages = userAnswers.get(HowWereSharesDisposedPages(srn))
+    val lastPages = userAnswers.map(SharesDisposalCompletedPages(srn))
+    val (incompleteFirstIndex, incompleteSecondIndex): (Int, Int) =
+      getIncompleteDoubleIndex(firstPages, Some(lastPages))
+
+    val refinedShareIndex = refineV[OneTo5000](incompleteFirstIndex).getOrElse(0)
+
+    val refinedDisposalIndex = refineV[OneTo50](incompleteSecondIndex).getOrElse(0)
+
+    val inProgressCalculatedUrl = (refinedShareIndex, refinedDisposalIndex) match {
+      case (checkedShareIndex: Max5000, checkedDisposalIndex: Max50) =>
+        howWereSharesDisposedPageUrl(checkedShareIndex, checkedDisposalIndex)
+      case _ => reportedDisposalListPage
+    }
+
     if (atLeastOneCompleted) {
-      (TaskListStatus.Completed, disposalListPage)
+      (TaskListStatus.Completed, inProgressCalculatedUrl) // Should not ALWAYS be completed when there is at least one completed
     } else if (completedNoDisposals) {
       (TaskListStatus.Completed, initialDisposalUrl)
     } else if (started) {
-      (TaskListStatus.InProgress, initialDisposalUrl)
+      (TaskListStatus.InProgress, inProgressCalculatedUrl)
+    } else if (lastPageReached) {
+      (TaskListStatus.InProgress, inProgressCalculatedUrl)
     } else {
       (TaskListStatus.NotStarted, initialDisposalUrl)
     }
