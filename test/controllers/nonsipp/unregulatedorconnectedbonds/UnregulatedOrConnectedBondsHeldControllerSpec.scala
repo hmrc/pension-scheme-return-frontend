@@ -21,7 +21,7 @@ import controllers.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBon
 import forms.YesNoPageFormProvider
 import models.NormalMode
 import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldPage
+import pages.nonsipp.bonds.UnregulatedOrConnectedBondsHeldPage
 import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
 import services.PsrSubmissionService

@@ -31,12 +31,7 @@ import models.requests.DataRequest
 import models.{Mode, Money, Pagination, SchemeHoldBond, UserAnswers}
 import navigation.Navigator
 import pages.nonsipp.bondsdisposal.{BondsDisposalCompletedPages, BondsDisposalListPage, BondsStillHeldPage}
-import pages.nonsipp.unregulatedorconnectedbonds.{
-  BondsCompleted,
-  CostOfBondsPage,
-  NameOfBondsPage,
-  WhyDoesSchemeHoldBondsPage
-}
+import pages.nonsipp.bonds.{BondsCompleted, CostOfBondsPage, NameOfBondsPage, WhyDoesSchemeHoldBondsPage}
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}

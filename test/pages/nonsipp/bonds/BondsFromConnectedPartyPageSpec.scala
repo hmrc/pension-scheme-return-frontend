@@ -14,9 +14,24 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.unregulatedorconnectedbonds
+package pages.nonsipp.bonds
 
-import models.SchemeId.Srn
-import pages.Page
+import config.Refined.OneTo5000
+import eu.timepit.refined.refineMV
+import pages.behaviours.PageBehaviours
 
-case class WhatYouWillNeedBondsPage(srn: Srn) extends Page
+class BondsFromConnectedPartyPageSpec extends PageBehaviours {
+
+  private val srn = srnGen.sample.value
+
+  "BondsFromConnectedPartyPage" - {
+
+    val index = refineMV[OneTo5000](1)
+
+    beRetrievable[Boolean](BondsFromConnectedPartyPage(srn, index))
+
+    beSettable[Boolean](BondsFromConnectedPartyPage(srn, index))
+
+    beRemovable[Boolean](BondsFromConnectedPartyPage(srn, index))
+  }
+}

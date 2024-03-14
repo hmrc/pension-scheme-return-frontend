@@ -21,7 +21,7 @@ import controllers.ControllerBaseSpec
 import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import models.NormalMode
-import pages.nonsipp.unregulatedorconnectedbonds.NameOfBondsPage
+import pages.nonsipp.bonds.NameOfBondsPage
 import views.html.TextAreaView
 
 class NameOfBondsControllerSpec extends ControllerBaseSpec {

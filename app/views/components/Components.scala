@@ -98,7 +98,7 @@ object Components {
       case m @ Message(_, _) => HtmlFormat.escape(m.toMessage)
       case LinkMessage(content, url, attrs) => anchor(renderMessage(content), url, attrs)
       case DownloadLinkMessage(content, url) => anchorDownload(renderMessage(content), url)
-      case ParagraphMessage(content) => paragraph(content.map(renderMessage).reduce(combine))
+      case ParagraphMessage(content) => paragraph(content.map(renderMessage).reduce(combine(_, _)))
       case ListMessage(content, Bullet) => unorderedList(content.map(renderMessage))
       case ListMessage(content, NewLine) => simpleList(content.map(renderMessage))
       case TableMessage(content, heading) =>

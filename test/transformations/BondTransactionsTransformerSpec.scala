@@ -25,7 +25,7 @@ import models.requests.{AllowedAccessRequest, DataRequest}
 import org.scalatest.OptionValues
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
-import pages.nonsipp.unregulatedorconnectedbonds._
+import pages.nonsipp.bonds._
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import utils.UserAnswersUtils.UserAnswersOps

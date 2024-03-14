@@ -21,7 +21,7 @@ import controllers.ControllerBaseSpec
 import controllers.nonsipp.receivetransfer.WhenWasTransferReceivedController._
 import eu.timepit.refined.refineMV
 import forms.DatePageFormProvider
-import models.NormalMode
+import models.{NormalMode, UserAnswers}
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import pages.nonsipp.receivetransfer.{TransferringSchemeNamePage, WhenWasTransferReceivedPage}
 import play.api.inject
@@ -37,7 +37,7 @@ class WhenWasTransferReceivedControllerSpec extends ControllerBaseSpec {
     routes.WhenWasTransferReceivedController.onPageLoad(srn, index, secondaryIndex, NormalMode)
   private lazy val onSubmit = routes.WhenWasTransferReceivedController.onSubmit(srn, index, secondaryIndex, NormalMode)
 
-  private implicit val mockSchemeDateService = mock[SchemeDateService]
+  private implicit val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
 
   override val additionalBindings: List[GuiceableModule] =
     List(inject.bind[SchemeDateService].toInstance(mockSchemeDateService))
@@ -47,7 +47,7 @@ class WhenWasTransferReceivedControllerSpec extends ControllerBaseSpec {
     MockSchemeDateService.taxYearOrAccountingPeriods(Some(Left(dateRange)))
   }
 
-  val userAnswers = defaultUserAnswers
+  val userAnswers: UserAnswers = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, index), memberDetails)
     .unsafeSet(TransferringSchemeNamePage(srn, index, secondaryIndex), transferringSchemeName)
 

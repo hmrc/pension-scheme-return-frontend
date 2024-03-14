@@ -23,7 +23,7 @@ import eu.timepit.refined.refineMV
 import models.{CheckMode, HowDisposed, Mode, NormalMode, SchemeHoldBond}
 import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.bondsdisposal._
-import pages.nonsipp.unregulatedorconnectedbonds.{CostOfBondsPage, NameOfBondsPage, WhyDoesSchemeHoldBondsPage}
+import pages.nonsipp.bonds.{CostOfBondsPage, NameOfBondsPage, WhyDoesSchemeHoldBondsPage}
 import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
 import services.PsrSubmissionService

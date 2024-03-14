@@ -24,7 +24,7 @@ import models.SchemeId.Srn
 import models.requests.DataRequest
 import models.requests.psr.{BondTransactions, Bonds}
 import models.{Money, UserAnswers}
-import pages.nonsipp.unregulatedorconnectedbonds.{BondsCompleted, _}
+import pages.nonsipp.bonds._
 import viewmodels.models.SectionCompleted
 
 import javax.inject.Inject

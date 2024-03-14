@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,24 +14,9 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.unregulatedorconnectedbonds
+package pages.nonsipp.bonds
 
-import config.Refined.Max5000
-import eu.timepit.refined.refineMV
-import pages.behaviours.PageBehaviours
+import models.SchemeId.Srn
+import pages.Page
 
-class AreBondsUnregulatedPageSpec extends PageBehaviours {
-
-  private val srn = srnGen.sample.value
-
-  "AreBondsUnregulatedPage" - {
-
-    val index = refineMV[Max5000.Refined](1)
-
-    beRetrievable[Boolean](AreBondsUnregulatedPage(srn, index))
-
-    beSettable[Boolean](AreBondsUnregulatedPage(srn, index))
-
-    beRemovable[Boolean](AreBondsUnregulatedPage(srn, index))
-  }
-}
+case class UnregulatedOrConnectedBondsHeldCYAPage(srn: Srn) extends Page

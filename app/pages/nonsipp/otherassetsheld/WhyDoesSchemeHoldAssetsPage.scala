@@ -17,15 +17,11 @@
 package pages.nonsipp.otherassetsheld
 
 import config.Refined.Max5000
+import models.SchemeHoldAsset
 import models.SchemeId.Srn
-import models.{SchemeHoldAsset, UserAnswers}
 import pages.QuestionPage
 import play.api.libs.json.JsPath
-import queries.Removable
-import utils.PageUtils.removePages
 import utils.RefinedUtils.RefinedIntOps
-
-import scala.util.Try
 
 case class WhyDoesSchemeHoldAssetsPage(srn: Srn, index: Max5000) extends QuestionPage[SchemeHoldAsset] {
 

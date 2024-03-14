@@ -17,7 +17,7 @@
 package pages
 
 import pages.behaviours.PageBehaviours
-import pages.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldPage
+import pages.nonsipp.bonds.UnregulatedOrConnectedBondsHeldPage
 
 class UnregulatedOrConnectedBondsHeldPageSpec extends PageBehaviours {
 

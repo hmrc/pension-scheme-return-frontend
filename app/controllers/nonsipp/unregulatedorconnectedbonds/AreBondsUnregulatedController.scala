@@ -24,7 +24,7 @@ import forms.YesNoPageFormProvider
 import models.Mode
 import models.SchemeId.Srn
 import navigation.Navigator
-import pages.nonsipp.unregulatedorconnectedbonds.AreBondsUnregulatedPage
+import pages.nonsipp.bonds.AreBondsUnregulatedPage
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}

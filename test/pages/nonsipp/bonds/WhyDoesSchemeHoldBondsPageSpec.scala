@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.unregulatedorconnectedbonds
+package pages.nonsipp.bonds
 
 import config.Refined.OneTo5000
 import eu.timepit.refined.refineMV

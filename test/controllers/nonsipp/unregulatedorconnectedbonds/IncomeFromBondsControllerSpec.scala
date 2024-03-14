@@ -22,7 +22,7 @@ import controllers.nonsipp.unregulatedorconnectedbonds.IncomeFromBondsController
 import eu.timepit.refined.refineMV
 import forms.MoneyFormProvider
 import models.NormalMode
-import pages.nonsipp.unregulatedorconnectedbonds.IncomeFromBondsPage
+import pages.nonsipp.bonds.IncomeFromBondsPage
 import views.html.MoneyView
 
 class IncomeFromBondsControllerSpec extends ControllerBaseSpec {

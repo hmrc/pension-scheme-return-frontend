@@ -23,8 +23,8 @@ import controllers.actions.IdentifyAndRequireData
 import controllers.nonsipp.bondsdisposal.WhenWereBondsSoldController._
 import forms.DatePageFormProvider
 import forms.mappings.errors.DateFormErrors
-import models.{DateRange, Mode}
 import models.SchemeId.Srn
+import models.{DateRange, Mode}
 import navigation.Navigator
 import pages.nonsipp.bondsdisposal.WhenWereBondsSoldPage
 import play.api.data.Form
@@ -33,7 +33,6 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{SaveService, SchemeDateService}
 import utils.DateTimeUtils.localDateShow
 import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
 import viewmodels.models.{DatePageViewModel, FormPageViewModel}
 import views.html.DatePageView
 

@@ -14,23 +14,14 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.unregulatedorconnectedbonds
+package pages.nonsipp.bonds
 
-import config.Refined._
-import eu.timepit.refined.refineMV
-import models.Money
-import pages.behaviours.PageBehaviours
+import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-class CostOfBondsPageSpec extends PageBehaviours {
+case class UnregulatedOrConnectedBondsHeldPage(srn: Srn) extends QuestionPage[Boolean] {
+  override def path: JsPath = JsPath \ toString
 
-  "CostOfBondsPage" - {
-    val srn = srnGen.sample.value
-    val index = refineMV[OneTo5000](1)
-
-    beRetrievable[Money](CostOfBondsPage(srn, index))
-
-    beSettable[Money](CostOfBondsPage(srn, index))
-
-    beRemovable[Money](CostOfBondsPage(srn, index))
-  }
+  override def toString: String = "unregulatedOrConnectedBondsHeld"
 }

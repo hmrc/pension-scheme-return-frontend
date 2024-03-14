@@ -21,7 +21,7 @@ import controllers.ControllerBaseSpec
 import controllers.nonsipp.landorpropertydisposal.IndividualBuyerNinoNumberController._
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
-import models.{ConditionalYesNo, NormalMode}
+import models.{ConditionalYesNo, NormalMode, UserAnswers}
 import pages.nonsipp.landorpropertydisposal.{IndividualBuyerNinoNumberPage, LandOrPropertyIndividualBuyerNamePage}
 import uk.gov.hmrc.domain.Nino
 import views.html.ConditionalYesNoPageView
@@ -38,11 +38,10 @@ class IndividualBuyerNinoNumberControllerSpec extends ControllerBaseSpec {
     controllers.nonsipp.landorpropertydisposal.routes.IndividualBuyerNinoNumberController
       .onSubmit(srn, index, disposalIndex, NormalMode)
 
-  val userAnswersWithIndividualName =
+  val userAnswersWithIndividualName: UserAnswers =
     defaultUserAnswers.unsafeSet(LandOrPropertyIndividualBuyerNamePage(srn, index, disposalIndex), individualName)
 
   val conditionalNo: ConditionalYesNo[String, Nino] = ConditionalYesNo.no("reason")
-  val conditionalYes: ConditionalYesNo[String, Nino] = ConditionalYesNo.yes(nino)
 
   "IndividualBuyerNinoNumberController" - {
 

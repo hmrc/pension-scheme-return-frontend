@@ -20,7 +20,7 @@ import config.Refined.Max300
 import controllers.ControllerBaseSpec
 import eu.timepit.refined.refineMV
 import forms.DatePageFormProvider
-import models.NormalMode
+import models.{NormalMode, UserAnswers}
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsAmountPage, WhenDidMemberSurrenderBenefitsPage}
 import play.api.inject
@@ -35,7 +35,7 @@ class WhenDidMemberSurrenderBenefitsControllerSpec extends ControllerBaseSpec {
   private lazy val onPageLoad = routes.WhenDidMemberSurrenderBenefitsController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.WhenDidMemberSurrenderBenefitsController.onSubmit(srn, index, NormalMode)
 
-  private implicit val mockSchemeDateService = mock[SchemeDateService]
+  private implicit val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
 
   override val additionalBindings: List[GuiceableModule] =
     List(inject.bind[SchemeDateService].toInstance(mockSchemeDateService))
@@ -45,7 +45,7 @@ class WhenDidMemberSurrenderBenefitsControllerSpec extends ControllerBaseSpec {
     MockSchemeDateService.taxYearOrAccountingPeriods(Some(Left(dateRange)))
   }
 
-  val userAnswers = defaultUserAnswers
+  val userAnswers: UserAnswers = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, index), memberDetails)
     .unsafeSet(SurrenderedBenefitsAmountPage(srn, index), surrenderedBenefitsAmount)
 

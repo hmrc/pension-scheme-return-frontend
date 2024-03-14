@@ -42,7 +42,6 @@ class IndividualBuyerNinoNumberControllerSpec extends ControllerBaseSpec {
     defaultUserAnswers.unsafeSet(SharesIndividualBuyerNamePage(srn, index, disposalIndex), individualName)
 
   private val conditionalNo: ConditionalYesNo[String, Nino] = ConditionalYesNo.no("reason")
-  private val conditionalYes: ConditionalYesNo[String, Nino] = ConditionalYesNo.yes(nino)
 
   "Share disposal - IndividualBuyerNinoNumberController" - {
 

@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages.nonsipp.bonds
 
-import play.api.libs.json.{__, JsPath}
+import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
+import viewmodels.models.SectionStatus
 
-package object unregulatedorconnectedbonds {
+case class BondsJourneyStatus(srn: Srn) extends QuestionPage[SectionStatus] {
 
-  object Paths {
-    val assets: JsPath = __ \ "assets"
-    val bonds: JsPath = assets \ "bonds"
-    val bondTransactions: JsPath = bonds \ "bondTransactions"
-  }
+  override def path: JsPath = JsPath \ toString
 
+  override def toString: String = "bondsJourneyCompleted"
 }

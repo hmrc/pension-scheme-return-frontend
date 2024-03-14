@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,20 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.unregulatedorconnectedbonds
+package pages.nonsipp.bonds
 
-import config.Refined._
+import config.Refined.Max5000
 import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
-import utils.RefinedUtils._
+import utils.RefinedUtils.RefinedIntOps
 
-case class AreBondsUnregulatedPage(srn: Srn, index: Max5000) extends QuestionPage[Boolean] {
+import java.time.LocalDate
+
+case class WhenDidSchemeAcquireBondsPage(srn: Srn, index: Max5000) extends QuestionPage[LocalDate] {
+
   override def path: JsPath =
     Paths.bondTransactions \ toString \ index.arrayIndex.toString
-  override def toString: String = "bondsUnregulated"
+
+  override def toString: String = "dateOfAcqOrContrib"
 }

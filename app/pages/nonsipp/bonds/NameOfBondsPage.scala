@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.unregulatedorconnectedbonds
+package pages.nonsipp.bonds
 
 import config.Refined.Max5000
 import models.SchemeId.Srn

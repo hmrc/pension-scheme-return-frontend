@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,16 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.unregulatedorconnectedbonds
+package pages.nonsipp
 
-import models.SchemeId.Srn
-import pages.Page
+import play.api.libs.json.{__, JsPath}
 
-case class UnregulatedOrConnectedBondsHeldCYAPage(srn: Srn) extends Page
+package object bonds {
+
+  object Paths {
+    val assets: JsPath = __ \ "assets"
+    val bonds: JsPath = assets \ "bonds"
+    val bondTransactions: JsPath = bonds \ "bondTransactions"
+  }
+
+}

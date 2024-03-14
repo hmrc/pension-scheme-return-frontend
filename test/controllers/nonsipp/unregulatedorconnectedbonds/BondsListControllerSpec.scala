@@ -24,7 +24,7 @@ import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models._
 import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.unregulatedorconnectedbonds._
+import pages.nonsipp.bonds._
 import play.api.inject
 import play.api.inject.guice.GuiceableModule
 import services.PsrSubmissionService

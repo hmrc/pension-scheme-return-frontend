@@ -22,7 +22,7 @@ import models.SchemeId.Srn
 import models.{CheckMode, NormalMode, SchemeHoldBond, UserAnswers}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.unregulatedorconnectedbonds._
+import pages.nonsipp.bonds._
 import utils.BaseSpec
 import utils.UserAnswersUtils.UserAnswersOps
 
@@ -257,7 +257,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
         normalmode
           .navigateToWithIndex(
             index,
-            IncomeFromBondsPage(_, _),
+            IncomeFromBondsPage,
             (srn, _: Max5000, _) =>
               controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldCYAController
                 .onPageLoad(srn, index, NormalMode)
@@ -493,7 +493,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
           checkmode
             .navigateToWithIndex(
               index,
-              IncomeFromBondsPage(_, _),
+              IncomeFromBondsPage,
               (srn, _: Max5000, _) =>
                 controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldCYAController
                   .onPageLoad(srn, index, CheckMode)

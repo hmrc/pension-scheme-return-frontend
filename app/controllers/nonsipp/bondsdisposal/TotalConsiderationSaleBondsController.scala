@@ -22,8 +22,8 @@ import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
 import controllers.nonsipp.bondsdisposal.TotalConsiderationSaleBondsController._
 import forms.mappings.errors.{MoneyFormErrorProvider, MoneyFormErrors}
-import models.{Mode, Money}
 import models.SchemeId.Srn
+import models.{Mode, Money}
 import navigation.Navigator
 import pages.nonsipp.bondsdisposal.TotalConsiderationSaleBondsPage
 import play.api.data.Form
@@ -31,7 +31,6 @@ import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
 import viewmodels.DisplayMessage.{Empty, Message}
-import viewmodels.implicits._
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import viewmodels.models.{FormPageViewModel, QuestionField}
 import views.html.MoneyView

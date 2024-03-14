@@ -22,8 +22,8 @@ import controllers.nonsipp.unregulatedorconnectedbonds.WhyDoesSchemeHoldBondsCon
 import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
 import models.SchemeHoldBond.{Acquisition, Contribution, Transfer}
-import models.{NormalMode}
-import pages.nonsipp.unregulatedorconnectedbonds.{WhyDoesSchemeHoldBondsPage}
+import models.NormalMode
+import pages.nonsipp.bonds.WhyDoesSchemeHoldBondsPage
 import views.html.RadioListView
 
 class WhyDoesSchemeHoldBondsControllerSpec extends ControllerBaseSpec {

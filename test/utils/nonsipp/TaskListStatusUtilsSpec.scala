@@ -34,7 +34,7 @@ import pages.nonsipp.moneyborrowed.{LenderNamePage, LenderNamePages, MoneyBorrow
 import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
 import pages.nonsipp.shares.{DidSchemeHoldAnySharesPage, SharesCompleted, SharesJourneyStatus, TypeOfSharesHeldPage}
 import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
-import pages.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldPage
+import pages.nonsipp.bonds.UnregulatedOrConnectedBondsHeldPage
 import utils.UserAnswersUtils.UserAnswersOps
 import viewmodels.models.{SectionCompleted, SectionStatus}
 import viewmodels.models.TaskListStatus.{Completed, InProgress, NotStarted, UnableToStart}

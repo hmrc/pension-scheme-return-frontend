@@ -22,7 +22,7 @@ import controllers.nonsipp.unregulatedorconnectedbonds.WhenDidSchemeAcquireBonds
 import eu.timepit.refined.refineMV
 import forms.DatePageFormProvider
 import models.NormalMode
-import pages.nonsipp.unregulatedorconnectedbonds.WhenDidSchemeAcquireBondsPage
+import pages.nonsipp.bonds.WhenDidSchemeAcquireBondsPage
 import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
 import services.SchemeDateService

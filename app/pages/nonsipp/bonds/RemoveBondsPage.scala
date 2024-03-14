@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,30 +14,17 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.unregulatedorconnectedbonds
+package pages.nonsipp.bonds
 
 import config.Refined.Max5000
 import models.SchemeId.Srn
-import pages.{IndexedQuestionPage, QuestionPage}
+import pages.QuestionPage
 import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
-import viewmodels.models.SectionCompleted
 
-case class BondsCompleted(srn: Srn, index: Max5000) extends QuestionPage[SectionCompleted] {
+case class RemoveBondsPage(srn: Srn, index: Max5000) extends QuestionPage[Boolean] {
 
-  override def path: JsPath =
-    Paths.bondTransactions \ toString \ index.arrayIndex.toString
+  override def path: JsPath = Paths.bondTransactions \ toString \ index.arrayIndex.toString
 
-  override def toString: String = "bondsCompleted"
-}
-
-object BondsCompleted {
-  def all(srn: Srn): IndexedQuestionPage[SectionCompleted] =
-    new IndexedQuestionPage[SectionCompleted] {
-
-      override def path: JsPath =
-        Paths.bondTransactions \ toString
-
-      override def toString: String = "bondsCompleted"
-    }
+  override def toString: String = "removeBonds"
 }

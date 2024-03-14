@@ -22,7 +22,7 @@ import controllers.nonsipp.bondsdisposal.RemoveBondsDisposalController._
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.unregulatedorconnectedbonds.NameOfBondsPage
+import pages.nonsipp.bonds.NameOfBondsPage
 import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
 import services.PsrSubmissionService

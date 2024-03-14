@@ -14,24 +14,25 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.unregulatedorconnectedbonds
+package pages.nonsipp.bonds
 
 import config.Refined.Max5000
-import eu.timepit.refined.refineMV
-import pages.behaviours.PageBehaviours
+import models.Money
+import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
+import utils.RefinedUtils.RefinedIntOps
 
-import java.time.LocalDate
+case class IncomeFromBondsPage(srn: Srn, index: Max5000) extends QuestionPage[Money] {
 
-class WhenDidSchemeAcquireBondsPageSpec extends PageBehaviours {
+  override def path: JsPath = Paths.bondTransactions \ toString \ index.arrayIndex.toString
 
-  "WhenDidSchemeAcquireBondsPage" - {
-    val srn = srnGen.sample.value
-    val shareIndex = refineMV[Max5000.Refined](1)
+  override def toString: String = "totalIncomeOrReceipts"
+}
 
-    beRetrievable[LocalDate](WhenDidSchemeAcquireBondsPage(srn, shareIndex))
+case class IncomeFromBondsPages(srn: Srn) extends QuestionPage[Map[String, Money]] {
 
-    beSettable[LocalDate](WhenDidSchemeAcquireBondsPage(srn, shareIndex))
+  override def path: JsPath = Paths.bondTransactions \ toString
 
-    beRemovable[LocalDate](WhenDidSchemeAcquireBondsPage(srn, shareIndex))
-  }
+  override def toString: String = "totalIncomeOrReceipts"
 }

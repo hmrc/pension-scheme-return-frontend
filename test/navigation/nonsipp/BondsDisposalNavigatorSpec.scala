@@ -18,9 +18,8 @@ package navigation.nonsipp
 
 import config.Refined.{Max50, Max5000}
 import eu.timepit.refined.refineMV
-import models.{CheckMode, HowDisposed, NormalMode, PointOfEntry}
 import models.SchemeId.Srn
-import models.{HowDisposed, NormalMode, UserAnswers}
+import models.{CheckMode, HowDisposed, NormalMode, PointOfEntry, UserAnswers}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.bondsdisposal._
