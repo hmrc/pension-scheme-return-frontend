@@ -32,7 +32,7 @@ import pages.nonsipp.schemedesignatory._
 import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
 import pages.nonsipp.sharesdisposal.{SharesDisposalCompletedPage, SharesDisposalPage}
 import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
-import pages.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldPage
+import pages.nonsipp.bonds.UnregulatedOrConnectedBondsHeldPage
 import play.api.inject
 import play.api.inject.guice.GuiceableModule
 import services.SchemeDateService

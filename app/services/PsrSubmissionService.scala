@@ -29,7 +29,7 @@ import pages.nonsipp.loansmadeoroutstanding._
 import pages.nonsipp.moneyborrowed.MoneyBorrowedPage
 import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
 import pages.nonsipp.sharesdisposal.SharesDisposalPage
-import pages.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldPage
+import pages.nonsipp.bonds.UnregulatedOrConnectedBondsHeldPage
 import transformations._
 import uk.gov.hmrc.http.HeaderCarrier
 

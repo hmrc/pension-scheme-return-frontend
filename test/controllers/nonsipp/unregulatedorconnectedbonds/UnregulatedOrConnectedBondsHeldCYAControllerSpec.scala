@@ -23,7 +23,7 @@ import eu.timepit.refined.refineMV
 import models.SchemeHoldBond.Acquisition
 import models.{CheckMode, Mode, NormalMode}
 import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.unregulatedorconnectedbonds._
+import pages.nonsipp.bonds._
 import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
 import services.PsrSubmissionService
@@ -71,13 +71,13 @@ class UnregulatedOrConnectedBondsHeldCYAControllerSpec extends ControllerBaseSpe
                 Some(localDate),
                 money,
                 Some(true),
-                true,
+                areBondsUnregulated = true,
                 money,
                 mode
               )
             )
           )
-        }.withName(s"render correct ${mode} view")
+        }.withName(s"render correct $mode view")
       )
 
       act.like(
@@ -87,19 +87,19 @@ class UnregulatedOrConnectedBondsHeldCYAControllerSpec extends ControllerBaseSpe
             verify(mockPsrSubmissionService, times(1)).submitPsrDetails(any())(any(), any(), any())
             reset(mockPsrSubmissionService)
           })
-          .withName(s"redirect to next page when in ${mode} mode")
+          .withName(s"redirect to next page when in $mode mode")
       )
 
       act.like(
         journeyRecoveryPage(onPageLoad(mode))
           .updateName("onPageLoad" + _)
-          .withName(s"redirect to journey recovery page on page load when in ${mode} mode")
+          .withName(s"redirect to journey recovery page on page load when in $mode mode")
       )
 
       act.like(
         journeyRecoveryPage(onSubmit(mode))
           .updateName("onSubmit" + _)
-          .withName(s"redirect to journey recovery page on submit when in ${mode} mode")
+          .withName(s"redirect to journey recovery page on submit when in $mode mode")
       )
     }
   }

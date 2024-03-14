@@ -35,7 +35,7 @@ import pages.nonsipp.bondsdisposal.{
   HowWereBondsDisposedOfPage,
   ReportBondsDisposalListPage
 }
-import pages.nonsipp.unregulatedorconnectedbonds.{BondsCompleted, NameOfBondsPage}
+import pages.nonsipp.bonds.{BondsCompleted, NameOfBondsPage}
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}

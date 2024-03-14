@@ -14,23 +14,24 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.unregulatedorconnectedbonds
+package pages.nonsipp.bonds
 
-import config.Refined._
+import config.Refined.Max5000
 import eu.timepit.refined.refineMV
-import models.Money
 import pages.behaviours.PageBehaviours
 
-class IncomeFromBondsPageSpec extends PageBehaviours {
+import java.time.LocalDate
 
-  "IncomeFromBondsPage" - {
+class WhenDidSchemeAcquireBondsPageSpec extends PageBehaviours {
+
+  "WhenDidSchemeAcquireBondsPage" - {
     val srn = srnGen.sample.value
-    val index = refineMV[OneTo5000](1)
+    val shareIndex = refineMV[Max5000.Refined](1)
 
-    beRetrievable[Money](IncomeFromBondsPage(srn, index))
+    beRetrievable[LocalDate](WhenDidSchemeAcquireBondsPage(srn, shareIndex))
 
-    beSettable[Money](IncomeFromBondsPage(srn, index))
+    beSettable[LocalDate](WhenDidSchemeAcquireBondsPage(srn, shareIndex))
 
-    beRemovable[Money](IncomeFromBondsPage(srn, index))
+    beRemovable[LocalDate](WhenDidSchemeAcquireBondsPage(srn, shareIndex))
   }
 }

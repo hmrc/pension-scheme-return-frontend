@@ -16,7 +16,6 @@
 
 package navigation.nonsipp
 
-import config.Refined.Max5000
 import eu.timepit.refined.refineMV
 import models.SchemeHoldAsset.{Acquisition, Contribution, Transfer}
 import models.{IdentitySubject, IdentityType, NormalMode, UserAnswers}

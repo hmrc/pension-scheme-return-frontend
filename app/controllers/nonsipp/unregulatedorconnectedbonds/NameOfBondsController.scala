@@ -23,7 +23,7 @@ import forms.TextFormProvider
 import models.Mode
 import models.SchemeId.Srn
 import navigation.Navigator
-import pages.nonsipp.unregulatedorconnectedbonds.NameOfBondsPage
+import pages.nonsipp.bonds.NameOfBondsPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}

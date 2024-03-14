@@ -23,20 +23,20 @@ import controllers.actions.IdentifyAndRequireData
 import forms.MultipleQuestionFormProvider
 import forms.mappings.Mappings
 import forms.mappings.errors.{MoneyFormErrors, PercentageFormErrors}
-import models.{Mode, Money, Percentage}
 import models.SchemeId.Srn
+import models.{Mode, Money, Percentage}
 import navigation.Navigator
 import pages.nonsipp.moneyborrowed.BorrowedAmountAndRatePage
 import play.api.data.Form
-import play.api.i18n.{I18nSupport, Messages, MessagesApi}
+import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
+import viewmodels.implicits._
 import viewmodels.models.MultipleQuestionsViewModel.DoubleDifferentQuestion
 import viewmodels.models.{FormPageViewModel, QuestionField}
 import views.html.MultipleQuestionView
-import viewmodels.implicits._
 
 import javax.inject.Named
 import scala.concurrent.{ExecutionContext, Future}
@@ -55,7 +55,7 @@ class BorrowedAmountAndRateController @Inject()(
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       {
-        val form = BorrowedAmountAndRateController.form
+        val form = BorrowedAmountAndRateController.form()
         val viewModel = BorrowedAmountAndRateController.viewModel(
           srn,
           index,
@@ -70,7 +70,7 @@ class BorrowedAmountAndRateController @Inject()(
 
   def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
-      val form = BorrowedAmountAndRateController.form
+      val form = BorrowedAmountAndRateController.form()
 
       form
         .bindFromRequest()
@@ -107,7 +107,7 @@ object BorrowedAmountAndRateController {
       (borrowMaxPercentage, "moneyBorrowed.borrowedAmountAndRate.borrowInterestRate.error.tooHigh"),
       (borrowMinPercentage, "moneyBorrowed.borrowedAmountAndRate.borrowInterestRate.error.tooLow")
     )
-  def form(implicit messages: Messages): Form[(Money, Percentage)] =
+  def form(): Form[(Money, Percentage)] =
     MultipleQuestionFormProvider(Mappings.money(field1Errors), Mappings.percentage(field2Errors))
 
   def viewModel(

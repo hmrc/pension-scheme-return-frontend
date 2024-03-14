@@ -26,7 +26,7 @@ import forms.mappings.errors.MoneyFormErrors
 import models.SchemeId.Srn
 import models.{Mode, Money}
 import navigation.Navigator
-import pages.nonsipp.unregulatedorconnectedbonds.{BondsCompleted, IncomeFromBondsPage}
+import pages.nonsipp.bonds.{BondsCompleted, IncomeFromBondsPage}
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}

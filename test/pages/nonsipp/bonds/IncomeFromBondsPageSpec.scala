@@ -14,18 +14,23 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.unregulatedorconnectedbonds
+package pages.nonsipp.bonds
 
-import config.Refined.Max5000
+import config.Refined._
+import eu.timepit.refined.refineMV
 import models.Money
-import models.SchemeId.Srn
-import pages.QuestionPage
-import play.api.libs.json.JsPath
-import utils.RefinedUtils.RefinedIntOps
+import pages.behaviours.PageBehaviours
 
-case class CostOfBondsPage(srn: Srn, index: Max5000) extends QuestionPage[Money] {
+class IncomeFromBondsPageSpec extends PageBehaviours {
 
-  override def path: JsPath = Paths.bondTransactions \ toString \ index.arrayIndex.toString
+  "IncomeFromBondsPage" - {
+    val srn = srnGen.sample.value
+    val index = refineMV[OneTo5000](1)
 
-  override def toString: String = "costOfBonds"
+    beRetrievable[Money](IncomeFromBondsPage(srn, index))
+
+    beSettable[Money](IncomeFromBondsPage(srn, index))
+
+    beRemovable[Money](IncomeFromBondsPage(srn, index))
+  }
 }

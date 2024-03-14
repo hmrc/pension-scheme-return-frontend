@@ -25,7 +25,7 @@ import models.SchemeHoldBond.{Acquisition, Contribution, Transfer}
 import models.SchemeId.Srn
 import models.{CheckMode, Mode, Money, NormalMode, SchemeHoldBond}
 import navigation.Navigator
-import pages.nonsipp.unregulatedorconnectedbonds._
+import pages.nonsipp.bonds._
 import play.api.i18n._
 import play.api.mvc._
 import services.PsrSubmissionService

@@ -23,7 +23,7 @@ import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.NormalMode
 import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.unregulatedorconnectedbonds.NameOfBondsPage
+import pages.nonsipp.bonds.NameOfBondsPage
 import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
 import services.PsrSubmissionService
@@ -38,7 +38,7 @@ class RemoveBondsControllerSpec extends ControllerBaseSpec {
   private lazy val onPageLoad = routes.RemoveBondsController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.RemoveBondsController.onSubmit(srn, index, NormalMode)
 
-  private implicit val mockPsrSubmissionService = mock[PsrSubmissionService]
+  private implicit val mockPsrSubmissionService: PsrSubmissionService = mock[PsrSubmissionService]
 
   private val userAnswers = defaultUserAnswers
     .unsafeSet(NameOfBondsPage(srn, index), otherName)

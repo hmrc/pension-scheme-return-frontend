@@ -28,7 +28,7 @@ import models.{Mode, Money, Percentage}
 import navigation.Navigator
 import pages.nonsipp.loansmadeoroutstanding.InterestOnLoanPage
 import play.api.data.Form
-import play.api.i18n.{I18nSupport, Messages, MessagesApi}
+import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -55,7 +55,7 @@ class InterestOnLoanController @Inject()(
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
       {
-        val form = InterestOnLoanController.form
+        val form = InterestOnLoanController.form()
         val viewModel = InterestOnLoanController.viewModel(
           srn,
           index,
@@ -70,7 +70,7 @@ class InterestOnLoanController @Inject()(
 
   def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn).async {
     implicit request =>
-      val form = InterestOnLoanController.form
+      val form = InterestOnLoanController.form()
 
       form
         .bindFromRequest()
@@ -115,7 +115,7 @@ object InterestOnLoanController {
       (maxCurrencyValue, "interestOnLoan.intReceivedCY.error.max")
     )
 
-  def form(implicit messages: Messages): Form[(Money, Percentage, Money)] =
+  def form(): Form[(Money, Percentage, Money)] =
     MultipleQuestionFormProvider(
       Mappings.money(field1Errors),
       Mappings.percentage(field2Errors),

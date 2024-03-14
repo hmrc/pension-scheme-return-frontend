@@ -23,7 +23,7 @@ import scala.util.Try
 
 object HttpUrlFormat {
 
-  implicit val format = new Format[URL] {
+  implicit val format: Format[URL] = new Format[URL] {
 
     override def reads(json: JsValue): JsResult[URL] =
       json match {

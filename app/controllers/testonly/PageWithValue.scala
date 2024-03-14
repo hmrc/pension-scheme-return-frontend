@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,8 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.unregulatedorconnectedbonds
+package controllers.testonly
 
-import models.SchemeId.Srn
-import pages.QuestionPage
-import play.api.libs.json.JsPath
+import queries.{Removable, Settable}
 
-case class UnregulatedOrConnectedBondsHeldPage(srn: Srn) extends QuestionPage[Boolean] {
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "unregulatedOrConnectedBondsHeld"
-}
+case class PageWithValue[A](page: Settable[A] with Removable[A], value: A)

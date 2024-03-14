@@ -22,7 +22,7 @@ import controllers.nonsipp.unregulatedorconnectedbonds.BondsFromConnectedPartyCo
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import pages.nonsipp.unregulatedorconnectedbonds.BondsFromConnectedPartyPage
+import pages.nonsipp.bonds.BondsFromConnectedPartyPage
 import views.html.YesNoPageView
 
 class BondsFromConnectedPartyControllerSpec extends ControllerBaseSpec {

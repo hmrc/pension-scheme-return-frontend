@@ -23,7 +23,7 @@ import models.SchemeHoldBond.{Acquisition, Contribution, Transfer}
 import models.{CheckMode, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
 import pages.Page
-import pages.nonsipp.unregulatedorconnectedbonds._
+import pages.nonsipp.bonds._
 import play.api.mvc.Call
 
 object UnregulatedOrConnectedBondsNavigator extends JourneyNavigator {

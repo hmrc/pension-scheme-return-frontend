@@ -25,7 +25,7 @@ import models.SchemeHoldBond._
 import models.SchemeId.Srn
 import models.{Mode, SchemeHoldBond}
 import navigation.Navigator
-import pages.nonsipp.unregulatedorconnectedbonds.WhyDoesSchemeHoldBondsPage
+import pages.nonsipp.bonds.WhyDoesSchemeHoldBondsPage
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}

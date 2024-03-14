@@ -17,13 +17,12 @@
 package controllers
 
 import models.NameDOB
-import queries.{Removable, Settable}
 
 import java.time.LocalDate
 import scala.util.Random
 
 package object testonly {
-  val firstNames = List(
+  private val firstNames = List(
     "Nathalia",
     "Kyro",
     "Jesse",
@@ -36,7 +35,7 @@ package object testonly {
     "Victor"
   )
 
-  val lastNames = List(
+  private val lastNames = List(
     "Vazquez",
     "McMahon",
     "Davis",
@@ -54,6 +53,4 @@ package object testonly {
     lastNames(Random.nextInt(lastNames.size)),
     LocalDate.of(1990, 12, 12)
   )
-
-  case class PageWithValue[A](page: Settable[A] with Removable[A], value: A)
 }

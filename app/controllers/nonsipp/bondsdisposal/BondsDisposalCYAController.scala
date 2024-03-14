@@ -21,13 +21,13 @@ import config.Refined.{Max50, Max5000}
 import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
 import controllers.nonsipp.bondsdisposal.BondsDisposalCYAController._
-import models.HowDisposed.{HowDisposed, _}
+import models.HowDisposed._
 import models.PointOfEntry.NoPointOfEntry
 import models.SchemeId.Srn
 import models.{CheckMode, HowDisposed, Mode, Money, SchemeHoldBond}
 import navigation.Navigator
 import pages.nonsipp.bondsdisposal._
-import pages.nonsipp.unregulatedorconnectedbonds.{CostOfBondsPage, NameOfBondsPage, WhyDoesSchemeHoldBondsPage}
+import pages.nonsipp.bonds.{CostOfBondsPage, NameOfBondsPage, WhyDoesSchemeHoldBondsPage}
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{PsrSubmissionService, SaveService}

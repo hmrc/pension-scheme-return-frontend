@@ -22,8 +22,7 @@ import controllers.nonsipp.bondsdisposal.BondsDisposalListController._
 import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
 import models.{NormalMode, SchemeHoldBond}
-import pages.nonsipp.shares.SharesCompleted
-import pages.nonsipp.unregulatedorconnectedbonds.{
+import pages.nonsipp.bonds.{
   BondsCompleted,
   CostOfBondsPage,
   IncomeFromBondsPage,

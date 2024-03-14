@@ -93,7 +93,7 @@ object FinancialDetailsCheckYourAnswersController {
     feesCommissionsWagesSalariesPage: Option[Money],
     taxYearOrAccountingPeriods: Either[DateRange, NonEmptyList[(DateRange, Max3)]],
     schemeDetails: SchemeDetails
-  )(implicit messages: Messages): FormPageViewModel[CheckYourAnswersViewModel] =
+  ): FormPageViewModel[CheckYourAnswersViewModel] =
     FormPageViewModel[CheckYourAnswersViewModel](
       title = "financialDetailsCheckYourAnswersController.title",
       heading = "financialDetailsCheckYourAnswersController.heading",
@@ -123,8 +123,6 @@ object FinancialDetailsCheckYourAnswersController {
     feesCommissionsWagesSalariesPage: Option[Money],
     taxYearOrAccountingPeriods: Either[DateRange, NonEmptyList[(DateRange, Max3)]],
     schemeDetails: SchemeDetails
-  )(
-    implicit messages: Messages
   ): List[CheckYourAnswersSection] = List(
     CheckYourAnswersSection(
       None,

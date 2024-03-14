@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.unregulatedorconnectedbonds
+package pages.nonsipp.bonds
 
-import config.Refined.Max5000
 import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
-import utils.RefinedUtils.RefinedIntOps
 
-case class RemoveBondsPage(srn: Srn, index: Max5000) extends QuestionPage[Boolean] {
+case class BondsListPage(srn: Srn) extends QuestionPage[Boolean] {
 
-  override def path: JsPath = Paths.bondTransactions \ toString \ index.arrayIndex.toString
+  override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "removeBonds"
+  override def toString: String = "bondsListPage"
+
 }

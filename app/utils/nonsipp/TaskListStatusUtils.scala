@@ -34,7 +34,7 @@ import pages.nonsipp.schemedesignatory.{FeesCommissionsWagesSalariesPage, HowMan
 import pages.nonsipp.shares.{DidSchemeHoldAnySharesPage, SharesCompleted, SharesJourneyStatus, TypeOfSharesHeldPages}
 import pages.nonsipp.sharesdisposal.{SharesDisposalCompletedPages, SharesDisposalPage}
 import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
-import pages.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldPage
+import pages.nonsipp.bonds.UnregulatedOrConnectedBondsHeldPage
 import viewmodels.models.TaskListStatus.{Completed, InProgress, NotStarted, TaskListStatus}
 import viewmodels.models.{SectionStatus, TaskListStatus}
 

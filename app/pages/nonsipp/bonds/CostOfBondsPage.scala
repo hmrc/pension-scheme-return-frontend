@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package pages.nonsipp.unregulatedorconnectedbonds
+package pages.nonsipp.bonds
 
 import config.Refined.Max5000
 import models.Money
@@ -23,16 +23,9 @@ import pages.QuestionPage
 import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
 
-case class IncomeFromBondsPage(srn: Srn, index: Max5000) extends QuestionPage[Money] {
+case class CostOfBondsPage(srn: Srn, index: Max5000) extends QuestionPage[Money] {
 
   override def path: JsPath = Paths.bondTransactions \ toString \ index.arrayIndex.toString
 
-  override def toString: String = "totalIncomeOrReceipts"
-}
-
-case class IncomeFromBondsPages(srn: Srn) extends QuestionPage[Map[String, Money]] {
-
-  override def path: JsPath = Paths.bondTransactions \ toString
-
-  override def toString: String = "totalIncomeOrReceipts"
+  override def toString: String = "costOfBonds"
 }

@@ -14,20 +14,17 @@
  * limitations under the License.
  */
 
-package services
+package pages.nonsipp.bonds
 
-import connectors.PSRConnector
-import models.backend.responses.PsrVersionsForYearsResponse
-import uk.gov.hmrc.http.HeaderCarrier
+import config.Refined.Max5000
+import models.SchemeId.Srn
+import pages.QuestionPage
+import play.api.libs.json.JsPath
+import utils.RefinedUtils._
 
-import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+case class BondsFromConnectedPartyPage(srn: Srn, index: Max5000) extends QuestionPage[Boolean] {
 
-class PsrVersionsService @Inject()(psrConnector: PSRConnector) {
-  def getVersionsForYears(pstr: String, startDates: Seq[String])(
-    implicit hc: HeaderCarrier,
-    ec: ExecutionContext
-  ): Future[Seq[PsrVersionsForYearsResponse]] =
-    psrConnector.getVersionsForYears(pstr, startDates)
+  override def path: JsPath = Paths.bondTransactions \ toString \ index.arrayIndex.toString
 
+  override def toString: String = "connectedPartyStatus"
 }

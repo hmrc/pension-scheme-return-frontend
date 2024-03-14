@@ -18,11 +18,8 @@ package pages.nonsipp.otherassetsheld
 
 import config.Refined.OneTo5000
 import eu.timepit.refined.refineMV
-import models.{SchemeHoldAsset, UserAnswers}
+import models.SchemeHoldAsset
 import pages.behaviours.PageBehaviours
-import utils.UserAnswersUtils.UserAnswersOps
-
-import java.time.LocalDate
 
 class WhyDoesSchemeHoldAssetsPageSpec extends PageBehaviours {
 
