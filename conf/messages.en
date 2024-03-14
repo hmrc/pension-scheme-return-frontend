@@ -2899,6 +2899,23 @@ otherAssets.whenDidSchemeAcquireAssets.error.invalid.characters = Date the schem
 otherAssets.whenDidSchemeAcquireAssets.error.future = Date the scheme acquired this asset must be the same as or before {0}
 otherAssets.whenDidSchemeAcquireAssets.error.after = Date the scheme acquired this asset must be after {0}
 
+otherAssets.individualNameOfOtherAssetSeller.title = What is the seller’s name?
+otherAssets.individualNameOfOtherAssetSeller.heading = What is the seller’s name?
+otherAssets.individualNameOfOtherAssetSeller.error.required =  Enter the seller’s name
+otherAssets.individualNameOfOtherAssetSeller.error.tooLong = Seller’s name must be 160 characters or fewer
+otherAssets.individualNameOfOtherAssetSeller.error.invalid = Seller’s name must only include letters a to z, hyphens, apostrophes and spaces
+
+otherAssets.otherAssetIndividualSellerNINumber.title = Do you know the seller’s National Insurance number?
+otherAssets.otherAssetIndividualSellerNINumber.heading = Do you know {0}’s National Insurance number?
+otherAssets.otherAssetIndividualSellerNINumber.yes.conditional = What is {0}’s National Insurance number?
+otherAssets.otherAssetIndividualSellerNINumber.no.conditional = Tell us why you cannot provide {0}’s National Insurance number
+otherAssets.otherAssetIndividualSellerNINumber.error.required = Select yes if you know the seller’s National Insurance number
+otherAssets.otherAssetIndividualSellerNINumber.yes.conditional.error.required = Enter the seller’s National Insurance number
+otherAssets.otherAssetIndividualSellerNINumber.yes.conditional.error.invalid = Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C
+otherAssets.otherAssetIndividualSellerNINumber.no.conditional.error.required = Enter the reason you cannot provide the seller’s National Insurance number
+otherAssets.otherAssetIndividualSellerNINumber.no.conditional.error.invalid = The reason you cannot provide the seller’s National Insurance number must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+otherAssets.otherAssetIndividualSellerNINumber.no.conditional.error.length = The reason you cannot provide the seller’s National Insurance number must be 160 characters or fewer
+
 companyNameOfOtherAssetsSeller.title = What is the seller’s company name?
 companyNameOfOtherAssetsSeller.heading = What is the seller’s company name?
 companyNameOfOtherAssetsSeller.error.required = Enter the seller’s company name

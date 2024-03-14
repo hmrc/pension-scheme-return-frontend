@@ -23,6 +23,7 @@ import pages.QuestionPage
 import pages.nonsipp.landorproperty._
 import pages.nonsipp.loansmadeoroutstanding
 import pages.nonsipp.loansmadeoroutstanding._
+import pages.nonsipp.otherassetsheld._
 import pages.nonsipp.shares._
 import play.api.libs.json.JsPath
 import queries.Removable
@@ -104,7 +105,12 @@ case class IdentityTypePage(srn: Srn, index: Max5000, identitySubject: IdentityS
           PartnershipShareSellerNamePage(srn, index)
         )
       case IdentitySubject.OtherAssetSeller =>
-        List().empty // TODO build up this list as other asset identity pages are introduced
+        List(
+          IndividualNameOfOtherAssetSellerPage(srn, index),
+          OtherAssetIndividualSellerNINumberPage(srn, index),
+          CompanyNameOfOtherAssetSellerPage(srn, index),
+          PartnershipOtherAssetSellerNamePage(srn, index)
+        )
 
       case _ =>
         List().empty

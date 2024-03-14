@@ -227,6 +227,20 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               index,
               subject,
               IdentityTypePage,
+              Gen.const(IdentityType.Individual),
+              (srn, _: Max5000, _, _) =>
+                controllers.nonsipp.otherassetsheld.routes.IndividualNameOfOtherAssetSellerController
+                  .onPageLoad(srn, index, NormalMode)
+            )
+            .withName("go from identity type page to individual seller details page")
+        )
+
+        act.like(
+          normalmode
+            .navigateToWithDataIndexAndSubjectBoth(
+              index,
+              subject,
+              IdentityTypePage,
               Gen.const(IdentityType.Other),
               controllers.nonsipp.common.routes.OtherRecipientDetailsController.onPageLoad
             )
@@ -259,6 +273,22 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       }
     }
 
+    "IndividualNameOfOtherAssetSellerPage" - {
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            IndividualNameOfOtherAssetSellerPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.otherassetsheld.routes.OtherAssetIndividualSellerNINumberController
+                .onPageLoad(srn, index, NormalMode)
+          )
+          .withName(
+            "go from IndividualNameOfOtherAssetSellerPage to OtherAssetIndividualSellerNINumberPage"
+          )
+      )
+    }
+
     "CompanyNameOfOtherAssetSellerPage" - {
       act.like(
         normalmode
@@ -287,6 +317,20 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           )
           .withName(
             "go from PartnershipOtherAssetSellerNamePage to PartnershipRecipientUtrPage"
+          )
+      )
+    }
+
+    "IndividualNameOfOtherAssetSellerPage" - {
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            OtherAssetIndividualSellerNINumberPage,
+            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          )
+          .withName(
+            "go from OtherAssetIndividualSellerNINumberPage to Unauthorised"
           )
       )
     }

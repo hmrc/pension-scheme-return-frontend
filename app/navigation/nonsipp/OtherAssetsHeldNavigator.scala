@@ -81,7 +81,8 @@ object OtherAssetsHeldNavigator extends JourneyNavigator {
           controllers.nonsipp.common.routes.OtherRecipientDetailsController
             .onPageLoad(srn, index, NormalMode, IdentitySubject.OtherAssetSeller)
         case Some(IdentityType.Individual) =>
-          controllers.routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.otherassetsheld.routes.IndividualNameOfOtherAssetSellerController
+            .onPageLoad(srn, index, NormalMode)
         case Some(IdentityType.UKCompany) =>
           controllers.nonsipp.otherassetsheld.routes.CompanyNameOfOtherAssetSellerController
             .onPageLoad(srn, index, NormalMode)
@@ -92,6 +93,10 @@ object OtherAssetsHeldNavigator extends JourneyNavigator {
           controllers.routes.UnauthorisedController.onPageLoad()
       }
 
+    case IndividualNameOfOtherAssetSellerPage(srn, index) =>
+      controllers.nonsipp.otherassetsheld.routes.OtherAssetIndividualSellerNINumberController
+        .onPageLoad(srn, index, NormalMode)
+
     case CompanyNameOfOtherAssetSellerPage(srn, index) =>
       controllers.nonsipp.common.routes.CompanyRecipientCrnController
         .onPageLoad(srn, index, NormalMode, IdentitySubject.OtherAssetSeller)
@@ -99,6 +104,9 @@ object OtherAssetsHeldNavigator extends JourneyNavigator {
     case PartnershipOtherAssetSellerNamePage(srn, index) =>
       controllers.nonsipp.common.routes.PartnershipRecipientUtrController
         .onPageLoad(srn, index, NormalMode, IdentitySubject.OtherAssetSeller)
+
+    case OtherAssetIndividualSellerNINumberPage(srn, index) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
 
     case CompanyRecipientCrnPage(srn, index, IdentitySubject.OtherAssetSeller) =>
       controllers.routes.UnauthorisedController.onPageLoad()
