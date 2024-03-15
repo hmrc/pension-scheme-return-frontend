@@ -480,7 +480,7 @@ whenDidSchemeAcquireShares.dateOfAcquired.error.required.two = Date the scheme a
 whenDidSchemeAcquireShares.dateOfAcquired.error.invalid.date = Date the scheme acquired these shares must be a real date
 whenDidSchemeAcquireShares.dateOfAcquired.error.invalid.characters = Date the scheme acquired these shares must only include numbers 0 to 9
 whenDidSchemeAcquireShares.dateOfAcquired.error.future = Date the scheme acquired these shares must be the same as or before {0}
-whenDidSchemeAcquireShares.dateOfAcquired.error.after = Date the scheme acquired these shares must be after {0}
+whenDidSchemeAcquireShares.dateOfAcquired.error.after = Date the scheme acquired these shares must be the same as or after {0}
 
 sharesSeller.companyRecipientCrn.title = Do you know the company’s Company Registration Number (CRN)
 sharesSeller.companyRecipientCrn.heading = Do you know {0}’s Company Registration Number (CRN)?
@@ -1349,7 +1349,7 @@ loanCheckYourAnswers.section1.sponsoringOrConnectedParty.hidden =  if the recipi
 loanCheckYourAnswers.section1.sponsoringOrConnectedParty.sponsoring = Sponsoring employer
 loanCheckYourAnswers.section1.sponsoringOrConnectedParty.connectedParty = Connected party
 loanCheckYourAnswers.section1.sponsoringOrConnectedParty.neither = Neither of these
-loanCheckYourAnswers.section2.heading = Date and period of the loan
+loanCheckYourAnswers.section2.heading = Date and term of the loan
 loanCheckYourAnswers.section2.loanDate = Date the loan was made
 loanCheckYourAnswers.section2.loanDate.hidden = date the loan was made
 loanCheckYourAnswers.section2.assetsValue = Total value of {0}’s assets on the date the loan was made
@@ -2469,9 +2469,9 @@ MemberPensionPaymentsCYA.change.title = Change details of taxable pension paymen
 MemberPensionPaymentsCYA.heading = Check your answers
 MemberPensionPaymentsCYA.change.heading = Change details of taxable pension payments for {0}
 MemberPensionPaymentsCYA.section.memberName.header = Member’s name
-MemberPensionPaymentsCYA.section.memberName = Amount of taxable pension payments received by {0}
+MemberPensionPaymentsCYA.section.memberName = Taxable amount of pension payments received by {0}
 MemberPensionPaymentsCYA.section.amount = £ {0}
-MemberPensionPaymentsCYA.section.hide = Amount of taxable pension payments received by {0}
+MemberPensionPaymentsCYA.section.hide = Taxable amount of pension payments received by {0}
 
 removePensionPayments.title = Are you sure you want to remove the pension payments for this member?
 removePensionPayments.heading = Are you sure you want to remove the pension payments of £{0} for {1}?
@@ -2721,7 +2721,7 @@ whenDidSchemeAcquireBonds.dateOfAcquired.error.required.two = Date the scheme ac
 whenDidSchemeAcquireBonds.dateOfAcquired.error.invalid.date = Date the scheme acquired these bonds must be a real date
 whenDidSchemeAcquireBonds.dateOfAcquired.error.invalid.characters = Date the scheme acquired these bonds must only include numbers 0 to 9
 whenDidSchemeAcquireBonds.dateOfAcquired.error.future = Date the scheme acquired these bonds must be the same as or before {0}
-whenDidSchemeAcquireBonds.dateOfAcquired.error.after = Date the scheme acquired these bonds must be after {0}
+whenDidSchemeAcquireBonds.dateOfAcquired.error.after = Date the scheme acquired these bonds must be the same as or after {0}
 
 bonds.costOfBonds.title = What was the total cost of these bonds, in pounds and pence?
 bonds.costOfBonds.heading = What was the total cost of these bonds, in pounds and pence?
@@ -2897,7 +2897,7 @@ otherAssets.whenDidSchemeAcquireAssets.error.required.two = Date the scheme acqu
 otherAssets.whenDidSchemeAcquireAssets.error.invalid.date = Date the scheme acquired this asset must be a real date
 otherAssets.whenDidSchemeAcquireAssets.error.invalid.characters = Date the scheme acquired this asset must only include numbers 0 to 9
 otherAssets.whenDidSchemeAcquireAssets.error.future = Date the scheme acquired this asset must be the same as or before {0}
-otherAssets.whenDidSchemeAcquireAssets.error.after = Date the scheme acquired this asset must be after {0}
+otherAssets.whenDidSchemeAcquireAssets.error.after = Date the scheme acquired this asset must be the same as or after {0}
 
 companyNameOfOtherAssetsSeller.title = What is the seller’s company name?
 companyNameOfOtherAssetsSeller.heading = What is the seller’s company name?
