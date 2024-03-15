@@ -2928,6 +2928,14 @@ otherAssets.sellerConnectedParty.paragraph4 = See a
 otherAssets.sellerConnectedParty.paragraph4.link = full list of circumstances where an individual, company or partnership might be a connected party (opens in new tab).
 otherAssets.sellerConnectedParty.error.required = Select yes if the seller is a connected party
 
+otherAssets.costOfOtherAsset.title = What was the total cost of the asset, in pounds and pence?
+otherAssets.costOfOtherAsset.heading = What was the total cost of the asset, in pounds and pence?
+otherAssets.costOfOtherAsset.hint = Include all costs related to the transaction. If the asset was not acquired, provide the total value.
+otherAssets.costOfOtherAsset.error.required = Enter the total cost of the asset, in pounds and pence
+otherAssets.costOfOtherAsset.error.invalid = Total cost of the asset must be an amount of money, like 123 or 123.45
+otherAssets.costOfOtherAsset.error.tooSmall = Total cost of the asset must be 0.01 or more
+otherAssets.costOfOtherAsset.error.tooLarge = Total cost of the asset must be 999999999.99 or less
+
 companyNameOfOtherAssetsSeller.title = What is the seller’s company name?
 companyNameOfOtherAssetsSeller.heading = What is the seller’s company name?
 companyNameOfOtherAssetsSeller.error.required = Enter the seller’s company name

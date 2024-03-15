@@ -151,7 +151,9 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           .navigateToWithIndex(
             index,
             WhyDoesSchemeHoldAssetsPage,
-            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad(),
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.otherassetsheld.routes.CostOfOtherAssetController
+                .onPageLoad(srn, index, NormalMode),
             srn =>
               defaultUserAnswers.unsafeSet(
                 WhyDoesSchemeHoldAssetsPage(srn, index),
@@ -159,7 +161,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               )
           )
           .withName(
-            "go from WhyDoesSchemeHoldAssets page to Unauthorised page when holding is transfer"
+            "go from WhyDoesSchemeHoldAssets page to CostOfOtherAsset page when holding is transfer"
           )
       )
     }
@@ -189,7 +191,9 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           .navigateToWithIndex(
             index,
             WhenDidSchemeAcquireAssetsPage,
-            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad(),
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.otherassetsheld.routes.CostOfOtherAssetController
+                .onPageLoad(srn, index, NormalMode),
             srn =>
               defaultUserAnswers.unsafeSet(
                 WhyDoesSchemeHoldAssetsPage(srn, index),
@@ -197,24 +201,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               )
           )
           .withName(
-            "go from WhenDidSchemeAcquireAssets page to Unauthorised page when holding is contribution"
-          )
-      )
-
-      act.like(
-        normalmode
-          .navigateToWithIndex(
-            index,
-            WhenDidSchemeAcquireAssetsPage,
-            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad(),
-            srn =>
-              defaultUserAnswers.unsafeSet(
-                WhyDoesSchemeHoldAssetsPage(srn, index),
-                SchemeHoldAsset.Transfer
-              )
-          )
-          .withName(
-            "go from WhenDidSchemeAcquireAssets page to Unauthorised page when holding is transfer"
+            "go from WhenDidSchemeAcquireAssets page to CostOfOtherAsset page when holding is contribution"
           )
       )
     }
@@ -395,10 +382,25 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             index,
             OtherAssetSellerConnectedPartyPage,
             (srn, _: Max5000, _) =>
-              controllers.routes.UnauthorisedController.onPageLoad()
+              controllers.nonsipp.otherassetsheld.routes.CostOfOtherAssetController
+                .onPageLoad(srn, index, NormalMode),
           )
           .withName(
-            "go from OtherAssetSellerConnectedPartyPage to Unauthorised"
+            "go from OtherAssetSellerConnectedPartyPage to CostOfOtherAsset page"
+          )
+      )
+    }
+
+    "CostOfOtherAssetPage" - {
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            CostOfOtherAssetPage,
+            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          )
+          .withName(
+            "go from CostOfOtherAssetPage to Unauthorised"
           )
       )
     }

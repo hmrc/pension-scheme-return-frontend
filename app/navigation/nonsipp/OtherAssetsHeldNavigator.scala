@@ -60,7 +60,8 @@ object OtherAssetsHeldNavigator extends JourneyNavigator {
           controllers.nonsipp.otherassetsheld.routes.WhenDidSchemeAcquireAssetsController
             .onPageLoad(srn, index, NormalMode)
         case Some(Transfer) =>
-          controllers.routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.otherassetsheld.routes.CostOfOtherAssetController
+            .onPageLoad(srn, index, NormalMode)
         case _ =>
           controllers.routes.UnauthorisedController.onPageLoad()
       }
@@ -71,7 +72,8 @@ object OtherAssetsHeldNavigator extends JourneyNavigator {
           controllers.nonsipp.common.routes.IdentityTypeController
             .onPageLoad(srn, index, NormalMode, IdentitySubject.OtherAssetSeller)
         case _ =>
-          controllers.routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.otherassetsheld.routes.CostOfOtherAssetController
+            .onPageLoad(srn, index, NormalMode)
       }
 
     case IdentityTypePage(srn, index, IdentitySubject.OtherAssetSeller) =>
@@ -121,6 +123,10 @@ object OtherAssetsHeldNavigator extends JourneyNavigator {
         .onPageLoad(srn, index, NormalMode)
 
     case OtherAssetSellerConnectedPartyPage(srn, index) =>
+      controllers.nonsipp.otherassetsheld.routes.CostOfOtherAssetController
+        .onPageLoad(srn, index, NormalMode)
+
+    case CostOfOtherAssetPage(srn, index) =>
       controllers.routes.UnauthorisedController.onPageLoad()
   }
 
