@@ -227,6 +227,20 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               index,
               subject,
               IdentityTypePage,
+              Gen.const(IdentityType.Individual),
+              (srn, _: Max5000, _, _) =>
+                controllers.nonsipp.otherassetsheld.routes.IndividualNameOfOtherAssetSellerController
+                  .onPageLoad(srn, index, NormalMode)
+            )
+            .withName("go from identity type page to individual seller details page")
+        )
+
+        act.like(
+          normalmode
+            .navigateToWithDataIndexAndSubjectBoth(
+              index,
+              subject,
+              IdentityTypePage,
               Gen.const(IdentityType.Other),
               controllers.nonsipp.common.routes.OtherRecipientDetailsController.onPageLoad
             )
@@ -257,6 +271,22 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             .withName("go from identity type page to UKPartnership to partnership name of seller name page")
         )
       }
+    }
+
+    "IndividualNameOfOtherAssetSellerPage" - {
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            IndividualNameOfOtherAssetSellerPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.otherassetsheld.routes.OtherAssetIndividualSellerNINumberController
+                .onPageLoad(srn, index, NormalMode)
+          )
+          .withName(
+            "go from IndividualNameOfOtherAssetSellerPage to OtherAssetIndividualSellerNINumberPage"
+          )
+      )
     }
 
     "CompanyNameOfOtherAssetSellerPage" - {
@@ -291,6 +321,22 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
       )
     }
 
+    "IndividualNameOfOtherAssetSellerPage" - {
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            OtherAssetIndividualSellerNINumberPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.otherassetsheld.routes.OtherAssetSellerConnectedPartyController
+                .onPageLoad(srn, index, NormalMode)
+          )
+          .withName(
+            "go from OtherAssetIndividualSellerNINumberPage to OtherAssetSellerConnectedPartyPage"
+          )
+      )
+    }
+
     "CompanyRecipientCrnPage" - {
       act.like(
         normalmode
@@ -298,10 +344,12 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             index,
             subject,
             CompanyRecipientCrnPage,
-            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.otherassetsheld.routes.OtherAssetSellerConnectedPartyController
+                .onPageLoad(srn, index, NormalMode)
           )
           .withName(
-            "go from CompanyRecipientCrnPage to Unauthorised"
+            "go from CompanyRecipientCrnPage to OtherAssetSellerConnectedPartyPage"
           )
       )
     }
@@ -313,10 +361,12 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             index,
             subject,
             PartnershipRecipientUtrPage,
-            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.otherassetsheld.routes.OtherAssetSellerConnectedPartyController
+                .onPageLoad(srn, index, NormalMode)
           )
           .withName(
-            "go from PartnershipRecipientUtrPage to Unauthorised"
+            "go from PartnershipRecipientUtrPage to OtherAssetSellerConnectedPartyPage"
           )
       )
     }
@@ -328,10 +378,27 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             index,
             subject,
             OtherRecipientDetailsPage,
-            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.otherassetsheld.routes.OtherAssetSellerConnectedPartyController
+                .onPageLoad(srn, index, NormalMode)
           )
           .withName(
-            "go from OtherRecipientDetailsPage to Unauthorised"
+            "go from OtherRecipientDetailsPage to OtherAssetSellerConnectedPartyPage"
+          )
+      )
+    }
+
+    "OtherAssetSellerConnectedPartyPage" - {
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            OtherAssetSellerConnectedPartyPage,
+            (srn, _: Max5000, _) =>
+              controllers.routes.UnauthorisedController.onPageLoad()
+          )
+          .withName(
+            "go from OtherAssetSellerConnectedPartyPage to Unauthorised"
           )
       )
     }
