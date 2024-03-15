@@ -383,7 +383,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             OtherAssetSellerConnectedPartyPage,
             (srn, _: Max5000, _) =>
               controllers.nonsipp.otherassetsheld.routes.CostOfOtherAssetController
-                .onPageLoad(srn, index, NormalMode),
+                .onPageLoad(srn, index, NormalMode)
           )
           .withName(
             "go from OtherAssetSellerConnectedPartyPage to CostOfOtherAsset page"
@@ -397,10 +397,68 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           .navigateToWithIndex(
             index,
             CostOfOtherAssetPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.otherassetsheld.routes.IndependentValuationController
+                .onPageLoad(srn, index, NormalMode),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                WhyDoesSchemeHoldAssetsPage(srn, index),
+                SchemeHoldAsset.Acquisition
+              )
+          )
+          .withName(
+            "go from CostOfOtherAssetPage to IndependentValuationPage when holding is acquisition"
+          )
+      )
+
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            CostOfOtherAssetPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.otherassetsheld.routes.IndependentValuationController
+                .onPageLoad(srn, index, NormalMode),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                WhyDoesSchemeHoldAssetsPage(srn, index),
+                SchemeHoldAsset.Contribution
+              )
+          )
+          .withName(
+            "go from CostOfOtherAssetPage to IndependentValuationPage when holding is contribution"
+          )
+      )
+
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            CostOfOtherAssetPage,
+            (srn, _: Max5000, _) =>
+              controllers.routes.UnauthorisedController.onPageLoad(),
+            srn =>
+              defaultUserAnswers.unsafeSet(
+                WhyDoesSchemeHoldAssetsPage(srn, index),
+                SchemeHoldAsset.Transfer
+              )
+          )
+          .withName(
+            "go from CostOfOtherAssetPage to Unauthorised when holding is transfer"
+          )
+      )
+    }
+
+    "IndependentValuationPage" - {
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            IndependentValuationPage,
             (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
           )
           .withName(
-            "go from CostOfOtherAssetPage to Unauthorised"
+            "go from IndependentValuationPage to Unauthorised"
           )
       )
     }

@@ -2936,6 +2936,10 @@ otherAssets.costOfOtherAsset.error.invalid = Total cost of the asset must be an 
 otherAssets.costOfOtherAsset.error.tooSmall = Total cost of the asset must be 0.01 or more
 otherAssets.costOfOtherAsset.error.tooLarge = Total cost of the asset must be 999999999.99 or less
 
+otherAssets.independentValuation.title = Was the transaction supported by an independent valuation?
+otherAssets.independentValuation.heading = Was the transaction supported by an independent valuation?
+otherAssets.independentValuation.error.required = Select yes if the transaction was supported by an independent valuation
+
 companyNameOfOtherAssetsSeller.title = What is the seller’s company name?
 companyNameOfOtherAssetsSeller.heading = What is the seller’s company name?
 companyNameOfOtherAssetsSeller.error.required = Enter the seller’s company name
