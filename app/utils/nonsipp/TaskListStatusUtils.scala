@@ -439,31 +439,6 @@ object TaskListStatusUtils {
       .headOption
       .flatten
 
-  // Once this is working, merge into getIncompleteDoubleIndex
-  // Try to access the disposal index, view the word document for info on the data structure
-  private def getIncompleteDisposalIndex[A, B](
-    firstPages: Option[Map[String, A]],
-    lastPages: Option[Map[String, B]]
-  ): Int =
-    (firstPages, lastPages) match {
-      case (None, _) => 1
-      case (Some(_), None) => 1
-      case (Some(first), Some(last)) =>
-        if (first.isEmpty) {
-          1
-        } else {
-          val firstPagesDisposalIndexes = first.map(_._1.toInt)
-          val lastPagesDisposalIndexes = last.map(_._1.toInt).toList
-
-          val filtered = firstPagesDisposalIndexes.filter(lastPagesDisposalIndexes.indexOf(_) < 0)
-          if (filtered.isEmpty) {
-            0
-          } else {
-            filtered.head + 1
-          }
-        }
-    }
-
   def getSharesTaskListStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
     val defaultLink =
       controllers.nonsipp.shares.routes.DidSchemeHoldAnySharesController
@@ -538,27 +513,34 @@ object TaskListStatusUtils {
       userAnswers
         .map(HowWereSharesDisposedPages(srn))
         .view
-        .map { case (k, v) => (k.toInt, v.keys.toList.map(_.toInt)) }
+        .map { case (k, v) => (k.toInt + 1, v.keys.toList.map(_.toInt)) }
         .toMap
 
     val lastPages: Map[Int, List[Int]] =
       userAnswers
         .map(SharesDisposalCompletedPages(srn))
         .view
-        .map { case (k, v) => (k.toInt, v.keys.toList.map(_.toInt)) }
+        .map { case (k, v) => (k.toInt + 1, v.keys.toList.map(_.toInt)) }
         .toMap
 
     val inProgressCalculatedUrl: String = getIncompleteDoubleIndex(firstPages, lastPages) match {
       case None => reportedDisposalListPage
       case Some((index, secondaryIndex)) =>
-        (
-          for {
-            sharesIndex <- refineV[OneTo5000](index)
-            sharesDisposalIndex <- refineV[OneTo50](secondaryIndex)
-          } yield controllers.nonsipp.sharesdisposal.routes.HowWereSharesDisposedController
-            .onPageLoad(srn, sharesIndex, sharesDisposalIndex, NormalMode)
-            .url
-        ).merge
+        val refinedResult = for {
+          sharesIndex <- refineV[OneTo5000](index).left
+            .map(_ => controllers.routes.JourneyRecoveryController.onPageLoad().url)
+          sharesDisposalIndex <- refineV[OneTo50](secondaryIndex).left
+            .map(_ => controllers.routes.JourneyRecoveryController.onPageLoad().url)
+        } yield (sharesIndex, sharesDisposalIndex)
+
+        refinedResult.fold(
+          _ => controllers.routes.JourneyRecoveryController.onPageLoad().url, {
+            case (sharesIndex, sharesDisposalIndex) =>
+              controllers.nonsipp.sharesdisposal.routes.HowWereSharesDisposedController
+                .onPageLoad(srn, sharesIndex, sharesDisposalIndex, NormalMode)
+                .url
+          }
+        )
     }
 
     if (atLeastOneCompleted) {
