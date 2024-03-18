@@ -16,6 +16,9 @@
 
 package navigation.nonsipp
 
+import config.Refined.{Max50, Max5000}
+import eu.timepit.refined.refineMV
+import models.HowDisposed
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.otherassetsdisposal._
@@ -25,7 +28,11 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
 
   override val navigator: Navigator = new NonSippNavigator
 
+  private val assetIndex = refineMV[Max5000.Refined](1)
+  private val disposalIndex = refineMV[Max50.Refined](1)
+
   "OtherAssetsDisposalNavigator" - {
+
     "OtherAssetsDisposalPage" - {
       act.like(
         normalmode
@@ -54,6 +61,7 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
               " when no is selected"
           )
       )
+
     }
 
     "WhatYouWillNeedOtherAssetsDisposalPage" - {
@@ -68,5 +76,48 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
           )
       )
     }
+
+    "HowWasAssetDisposedOfPage" - {
+
+      act.like(
+        normalmode
+          .navigateToWithDoubleIndexAndData(
+            assetIndex,
+            disposalIndex,
+            HowWasAssetDisposedOfPage.apply,
+            Gen.const(HowDisposed.Sold),
+            (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
+              controllers.routes.UnauthorisedController.onPageLoad()
+          )
+          .withName("go from HowWasAssetDisposedOfPage to Unauthorised page")
+      )
+
+      act.like(
+        normalmode
+          .navigateToWithDoubleIndexAndData(
+            assetIndex,
+            disposalIndex,
+            HowWasAssetDisposedOfPage.apply,
+            Gen.const(HowDisposed.Transferred),
+            (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
+              controllers.routes.UnauthorisedController.onPageLoad()
+          )
+          .withName("go from HowWasAssetDisposedOfPage to Unauthorised page (Transferred)")
+      )
+
+      act.like(
+        normalmode
+          .navigateToWithDoubleIndexAndData(
+            assetIndex,
+            disposalIndex,
+            HowWasAssetDisposedOfPage.apply,
+            Gen.const(HowDisposed.Other("test details")),
+            (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
+              controllers.routes.UnauthorisedController.onPageLoad()
+          )
+          .withName("go from HowWasAssetDisposedOfPage to Unauthorised page (Other)")
+      )
+    }
+
   }
 }

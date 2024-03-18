@@ -5,3 +5,8 @@ POST        /:srn/change-other-assets-disposal                                  
 
 GET         /:srn/what-you-will-need-other-assets-disposal                              controllers.nonsipp.otherassetsdisposal.WhatYouWillNeedOtherAssetsDisposalController.onPageLoad(srn: Srn)
 GET         /:srn/submit-what-you-will-need-other-assets-disposal                       controllers.nonsipp.otherassetsdisposal.WhatYouWillNeedOtherAssetsDisposalController.onSubmit(srn: Srn)
+
+GET         /:srn/how-was-asset-disposed-of/:assetIndex/:disposalIndex                              controllers.nonsipp.otherassetsdisposal.HowWasAssetDisposedOfController.onPageLoad(srn: Srn, assetIndex: Max5000, disposalIndex: Max50, mode: Mode = NormalMode)
+POST        /:srn/how-was-asset-disposed-of/:assetIndex/:disposalIndex                              controllers.nonsipp.otherassetsdisposal.HowWasAssetDisposedOfController.onSubmit(srn: Srn, assetIndex: Max5000, disposalIndex: Max50, mode: Mode = NormalMode)
+GET         /:srn/change-how-was-asset-disposed-of/:assetIndex/:disposalIndex                       controllers.nonsipp.otherassetsdisposal.HowWasAssetDisposedOfController.onPageLoad(srn: Srn, assetIndex: Max5000, disposalIndex: Max50, mode: Mode = CheckMode)
+POST        /:srn/change-how-was-asset-disposed-of/:assetIndex/:disposalIndex                       controllers.nonsipp.otherassetsdisposal.HowWasAssetDisposedOfController.onSubmit(srn: Srn, assetIndex: Max5000, disposalIndex: Max50, mode: Mode = CheckMode)
