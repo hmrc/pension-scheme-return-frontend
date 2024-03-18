@@ -16,6 +16,7 @@
 ->          /                                                                           unregulatedorconnectedbonds.Routes
 ->          /                                                                           bondsdisposal.Routes
 ->          /                                                                           otherassetsheld.Routes
+->          /                                                                           otherassetsdisposal.Routes
 
 GET         /                                                                           controllers.IndexController.onPageLoad()
 

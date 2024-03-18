@@ -909,6 +909,11 @@ otherAssetsHeld.heading = Did {0} hold any other assets during the period of thi
 otherAssetsHeld.error.required = Select yes if the scheme held any other assets during the period of this return
 otherAssetsHeld.hint = This does not include shares, bonds, land or property. If your scheme holds any of these assets, report them in the relevant section of this pension scheme return.
 
+otherAssetsDisposal.title = Did the scheme dispose of any other assets during the period of this return?
+otherAssetsDisposal.heading = Did {0} dispose of any other assets during the period of this return?
+otherAssetsDisposal.error.required = Select yes if the scheme disposed of any other assets during the period of this return
+otherAssetsDisposal.hint = This does not include loans, shares, third party managed funds, bonds, land or property. If your scheme disposed of any of these assets, report them in the relevant section of this pension scheme return.
+
 returnSubmitted.title = Return submitted
 returnSubmitted.panel.heading = Return submitted
 returnSubmitted.panel.content = Pension scheme return
@@ -1023,6 +1028,9 @@ nonsipp.tasklist.bonds.change.bondsdisposal.title = Report disposal of unregulat
 nonsipp.tasklist.otherassets.title = Other assets
 nonsipp.tasklist.otherassets.add.title = Add other assets
 nonsipp.tasklist.otherassets.change.title = Change other assets
+nonsipp.tasklist.otherassetsdisposal.title = Report disposal of other assets
+nonsipp.tasklist.otherassetsdisposal.add.title = Report disposal of other assets
+nonsipp.tasklist.otherassetsdisposal.change.title = Report disposal of other assets
 nonsipp.tasklist.declaration.title = Declaration
 nonsipp.tasklist.declaration.incomplete = You must complete every section before you can declare.
 nonsipp.tasklist.declaration.complete = Read declaration and submit

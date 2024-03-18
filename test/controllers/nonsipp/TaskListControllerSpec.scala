@@ -27,6 +27,7 @@ import pages.nonsipp.common.IdentityTypePage
 import pages.nonsipp.loansmadeoroutstanding._
 import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsNinoPage, MemberDetailsPage, NoNINOPage}
 import pages.nonsipp.moneyborrowed.{LenderNamePages, MoneyBorrowedPage}
+import pages.nonsipp.otherassetsdisposal.OtherAssetsDisposalPage
 import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
 import pages.nonsipp.schemedesignatory._
 import pages.nonsipp.shares.DidSchemeHoldAnySharesPage

@@ -500,6 +500,13 @@ object TaskListController {
           statusAndLink._2
         ),
         statusAndLink._1
+      ),
+      TaskListItemViewModel(
+        LinkMessage(
+          messageKey("nonsipp.tasklist.otherassetsdisposal", "title", NotStarted),
+          controllers.nonsipp.otherassetsdisposal.routes.OtherAssetsDisposalController.onPageLoad(srn, NormalMode).url
+        ),
+        NotStarted
       )
     )
   }
