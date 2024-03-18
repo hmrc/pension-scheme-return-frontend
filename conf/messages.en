@@ -914,6 +914,7 @@ otherAssetsDisposal.heading = Did {0} dispose of any other assets during the per
 otherAssetsDisposal.error.required = Select yes if the scheme disposed of any other assets during the period of this return
 otherAssetsDisposal.hint = This does not include loans, shares, third party managed funds, bonds, land or property. If your scheme disposed of any of these assets, report them in the relevant section of this pension scheme return.
 
+
 returnSubmitted.title = Return submitted
 returnSubmitted.panel.heading = Return submitted
 returnSubmitted.panel.content = Pension scheme return
@@ -3041,3 +3042,19 @@ bondsDisposal.reportBondsDisposalList.methodOfDisposal.other = another method
 bondsDisposal.removeBondsDisposal.title = Are you sure you want to remove details of the disposal of these bonds?
 bondsDisposal.removeBondsDisposal.heading = Are you sure you want to remove details of the disposal of {0}?
 bondsDisposal.removeBondsDisposal.error.required = Select yes if you are sure you want to remove this bond disposal
+
+otherAssetsDisposal.whatYouWillNeed.title = Other assets disposed of by the scheme
+otherAssetsDisposal.whatYouWillNeed.heading = Other assets disposed of by {0}
+otherAssetsDisposal.whatYouWillNeed.paragraph1 = You must tell us about all other assets disposed of by the scheme during the period of this return.
+otherAssetsDisposal.whatYouWillNeed.paragraph2 = You must tell us:
+otherAssetsDisposal.whatYouWillNeed.paragraph2.listItem1 = which asset was disposed of
+otherAssetsDisposal.whatYouWillNeed.paragraph2.listItem2 = if it was disposed of by sale, transfer out or other
+otherAssetsDisposal.whatYouWillNeed.paragraph2.listItem3 = if any part of the asset is still held
+otherAssetsDisposal.whatYouWillNeed.paragraph3 = If an asset was sold, you must tell us:
+otherAssetsDisposal.whatYouWillNeed.paragraph3.listItem1 = the date it was sold
+otherAssetsDisposal.whatYouWillNeed.paragraph3.listItem2 = the total consideration received for the sale
+otherAssetsDisposal.whatYouWillNeed.paragraph3.listItem3 = if the buyer was an individual, company, partnership or other
+otherAssetsDisposal.whatYouWillNeed.paragraph3.listItem4 = the buyer’s name
+otherAssetsDisposal.whatYouWillNeed.paragraph3.listItem5 = the buyer’s National Insurance number, Company Registration Number, Unique Taxpayer Reference or a description of the buyer – whichever applies – or the reason you cannot provide it
+otherAssetsDisposal.whatYouWillNeed.paragraph3.listItem6 = if the buyer was a connected party
+otherAssetsDisposal.whatYouWillNeed.paragraph3.listItem7 = if the sale was supported by an independent valuation

@@ -20,18 +20,21 @@ import navigation.JourneyNavigator
 import pages.Page
 import play.api.mvc.Call
 import models._
-import pages.nonsipp.otherassetsdisposal.OtherAssetsDisposalPage
+import pages.nonsipp.otherassetsdisposal.{OtherAssetsDisposalPage, WhatYouWillNeedOtherAssetsDisposalPage}
 
 object OtherAssetsDisposalNavigator extends JourneyNavigator {
 
   override def normalRoutes: UserAnswers => PartialFunction[Page, Call] = userAnswers => {
 
-    case page@OtherAssetsDisposalPage(srn) =>
+    case page @ OtherAssetsDisposalPage(srn) =>
       if (userAnswers.get(page).contains(true)) {
-        controllers.routes.UnauthorisedController.onPageLoad()
+        controllers.nonsipp.otherassetsdisposal.routes.WhatYouWillNeedOtherAssetsDisposalController.onPageLoad(srn)
       } else {
         controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
       }
+
+    case WhatYouWillNeedOtherAssetsDisposalPage(_) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
   }
 
   override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] = _ => _ => PartialFunction.empty
