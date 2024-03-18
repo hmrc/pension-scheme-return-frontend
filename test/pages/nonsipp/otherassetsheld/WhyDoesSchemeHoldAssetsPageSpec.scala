@@ -22,7 +22,12 @@ import eu.timepit.refined.refineMV
 import generators.ModelGenerators.ninoGen
 import models.{IdentitySubject, SchemeHoldAsset, UserAnswers}
 import pages.behaviours.PageBehaviours
-import pages.nonsipp.common.{CompanyRecipientCrnPage, IdentityTypePage, OtherRecipientDetailsPage, PartnershipRecipientUtrPage}
+import pages.nonsipp.common.{
+  CompanyRecipientCrnPage,
+  IdentityTypePage,
+  OtherRecipientDetailsPage,
+  PartnershipRecipientUtrPage
+}
 import utils.UserAnswersUtils.UserAnswersOps
 
 import java.time.LocalDate
