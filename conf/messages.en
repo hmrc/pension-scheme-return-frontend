@@ -3069,3 +3069,15 @@ howWasAssetDisposedOf.conditional.error.required = Enter details of the disposal
 howWasAssetDisposedOf.conditional.error.invalid = Details of the disposal must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
 howWasAssetDisposedOf.conditional.error.length =  Details of the disposal must be 160 characters or fewer
 howWasAssetDisposedOf.error.required = Select how the asset was disposed of
+
+whenWasAssetSold.title = When was the asset sold?
+whenWasAssetSold.heading = When was the asset sold?
+whenWasAssetSold.error.required.all =  Enter the date this asset was sold
+whenWasAssetSold.error.required.day = Date this asset was sold must include a day
+whenWasAssetSold.error.required.month = Date this asset was sold must include  a month
+whenWasAssetSold.error.required.year = Date this asset was sold must include  a year
+whenWasAssetSold.error.required.two = Date this asset was sold must include  a {0} and {1}
+whenWasAssetSold.error.invalid.date = Date these bonds were sold must be a real date
+whenWasAssetSold.error.date.before = Date this asset was sold must be the same as or after {0}
+whenWasAssetSold.error.date.after = Date this asset was sold must be the same as or before {0}
+whenWasAssetSold.error.invalid.characters = Date this asset was sold must only include numbers 0 to 9

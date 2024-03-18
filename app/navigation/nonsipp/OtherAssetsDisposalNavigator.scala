@@ -16,6 +16,7 @@
 
 package navigation.nonsipp
 
+import eu.timepit.refined.refineMV
 import navigation.JourneyNavigator
 import pages.Page
 import play.api.mvc.Call
@@ -33,17 +34,21 @@ object OtherAssetsDisposalNavigator extends JourneyNavigator {
         controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
       }
 
-    case WhatYouWillNeedOtherAssetsDisposalPage(_) =>
+    case WhatYouWillNeedOtherAssetsDisposalPage(srn) =>
       controllers.routes.UnauthorisedController.onPageLoad()
 
     case page @ HowWasAssetDisposedOfPage(srn, assetIndex, disposalIndex, _) =>
       userAnswers.get(page) match {
         case None => controllers.routes.JourneyRecoveryController.onPageLoad()
         case Some(HowDisposed.Sold) =>
-          controllers.routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.otherassetsdisposal.routes.WhenWasAssetSoldController
+            .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
         case Some(HowDisposed.Transferred) | Some(HowDisposed.Other(_)) =>
           controllers.routes.UnauthorisedController.onPageLoad()
       }
+
+    case WhenWasAssetSoldPage(srn, assetIndex, disposalIndex) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
 
   }
 
