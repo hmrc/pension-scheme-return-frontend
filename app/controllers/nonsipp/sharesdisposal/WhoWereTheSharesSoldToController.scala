@@ -16,30 +16,31 @@
 
 package controllers.nonsipp.sharesdisposal
 
+import services.SaveService
+import viewmodels.implicits._
+import utils.FormUtils.FormOps
+import models.PointOfEntry.{NoPointOfEntry, WhoWereTheSharesSoldToPointOfEntry}
+import models.IdentityType._
 import config.Refined.{Max50, Max5000}
 import controllers.PSRController
 import controllers.actions._
-import forms.RadioListFormProvider
-import models.IdentityType.{Individual, Other, UKCompany, UKPartnership}
-import models.SchemeId.Srn
-import models.{CheckMode, IdentityType, Mode}
-import navigation.Navigator
-import pages.nonsipp.shares.CompanyNameRelatedSharesPage
-import pages.nonsipp.sharesdisposal.{SharesDisposalCYAPointOfEntry, WhoWereTheSharesSoldToPage}
-import play.api.data.Form
-import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
-import utils.FormUtils.FormOps
-import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, RadioListRowViewModel, RadioListViewModel}
 import controllers.nonsipp.sharesdisposal.WhoWereTheSharesSoldToController._
-import models.PointOfEntry.{NoPointOfEntry, WhoWereTheSharesSoldToPointOfEntry}
+import pages.nonsipp.sharesdisposal.{SharesDisposalCYAPointOfEntry, WhoWereTheSharesSoldToPage}
+import navigation.Navigator
+import forms.RadioListFormProvider
+import models.{CheckMode, IdentityType, Mode}
+import play.api.i18n.MessagesApi
+import play.api.data.Form
+import pages.nonsipp.shares.CompanyNameRelatedSharesPage
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import views.html.RadioListView
+import models.SchemeId.Srn
+import viewmodels.DisplayMessage.Message
+import viewmodels.models.{FormPageViewModel, RadioListRowViewModel, RadioListViewModel}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class WhoWereTheSharesSoldToController @Inject()(
   override val messagesApi: MessagesApi,

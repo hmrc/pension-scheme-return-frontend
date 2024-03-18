@@ -16,13 +16,13 @@
 
 package pages.nonsipp.bondsdisposal
 
-import config.Refined.{Max50, Max5000}
-import models.PointOfEntry
-import models.SchemeId.Srn
-import pages.QuestionPage
-import pages.nonsipp.bondsdisposal.Paths.bondsDisposed
-import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
+import pages.nonsipp.bondsdisposal.Paths.bondsDisposed
+import models.SchemeId.Srn
+import play.api.libs.json.JsPath
+import models.PointOfEntry
+import config.Refined.{Max50, Max5000}
+import pages.QuestionPage
 
 case class BondsDisposalCYAPointOfEntry(srn: Srn, bondIndex: Max5000, disposalIndex: Max50)
     extends QuestionPage[PointOfEntry] {

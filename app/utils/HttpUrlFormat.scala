@@ -18,8 +18,9 @@ package utils
 
 import play.api.libs.json._
 
-import java.net.URL
 import scala.util.Try
+
+import java.net.URL
 
 object HttpUrlFormat {
 

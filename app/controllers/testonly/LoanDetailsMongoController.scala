@@ -16,25 +16,26 @@
 
 package controllers.testonly
 
-import cats.implicits._
-import config.Refined.{Max5000, OneTo5000}
-import controllers.actions.IdentifyAndRequireData
-import eu.timepit.refined._
 import models.ConditionalYesNo._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import config.Refined.{Max5000, OneTo5000}
 import models.SchemeId.Srn
-import models.{ConditionalYesNo, IdentitySubject, IdentityType, Money, Percentage, Security, UserAnswers}
+import cats.implicits._
+import uk.gov.hmrc.domain.Nino
+import repositories.SessionRepository
+import models._
 import pages.nonsipp.common.IdentityTypePage
 import pages.nonsipp.loansmadeoroutstanding._
+import controllers.actions.IdentifyAndRequireData
+import eu.timepit.refined._
 import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import repositories.SessionRepository
-import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Try
 
 import java.time.LocalDate
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Try
 
 class LoanDetailsMongoController @Inject()(
   sessionRepository: SessionRepository,

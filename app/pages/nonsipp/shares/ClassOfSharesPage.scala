@@ -16,16 +16,16 @@
 
 package pages.nonsipp.shares
 
-import config.Refined.{Max5000, OneTo50}
-import eu.timepit.refined.refineV
+import utils.RefinedUtils.RefinedIntOps
+import utils.PageUtils.removePages
+import queries.Removable
 import models.SchemeId.Srn
-import models.UserAnswers
-import pages.QuestionPage
+import eu.timepit.refined.refineV
 import pages.nonsipp.sharesdisposal.{HowWereSharesDisposedPage, HowWereSharesDisposedPagesForShare}
 import play.api.libs.json.JsPath
-import queries.Removable
-import utils.PageUtils.removePages
-import utils.RefinedUtils.RefinedIntOps
+import models.UserAnswers
+import config.Refined.{Max5000, OneTo50}
+import pages.QuestionPage
 
 import scala.util.Try
 

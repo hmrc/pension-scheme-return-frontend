@@ -16,25 +16,26 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
+import services.SaveService
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Refined.Max5000
 import controllers.actions._
-import controllers.nonsipp.loansmadeoroutstanding.AreRepaymentsInstalmentsController.viewModel
 import forms.YesNoPageFormProvider
 import models.Mode
-import models.SchemeId.Srn
-import navigation.Navigator
 import pages.nonsipp.loansmadeoroutstanding.AreRepaymentsInstalmentsPage
 import play.api.data.Form
+import views.html.YesNoPageView
+import models.SchemeId.Srn
+import navigation.Navigator
+import controllers.nonsipp.loansmadeoroutstanding.AreRepaymentsInstalmentsController.viewModel
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
-import views.html.YesNoPageView
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class AreRepaymentsInstalmentsController @Inject()(
   override val messagesApi: MessagesApi,

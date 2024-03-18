@@ -16,8 +16,8 @@
 
 package forms.mappings.errors
 
-import config.Constants._
 import forms.mappings.Regex
+import config.Constants._
 
 case class InputFormErrors(
   requiredKey: String,

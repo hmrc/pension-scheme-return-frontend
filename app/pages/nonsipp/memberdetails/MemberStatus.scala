@@ -16,13 +16,13 @@
 
 package pages.nonsipp.memberdetails
 
-import config.Refined.Max300
-import models.SchemeId.Srn
-import models.UserAnswers
-import pages.QuestionPage
-import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
+import models.SchemeId.Srn
+import play.api.libs.json.JsPath
+import models.UserAnswers
 import viewmodels.models.MemberState
+import config.Refined.Max300
+import pages.QuestionPage
 
 case class MemberStatus(srn: Srn, index: Max300) extends QuestionPage[MemberState] {
 

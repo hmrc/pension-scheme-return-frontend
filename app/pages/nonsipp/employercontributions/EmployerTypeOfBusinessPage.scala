@@ -16,14 +16,14 @@
 
 package pages.nonsipp.employercontributions
 
-import config.Refined.{Max300, Max50}
-import models.{IdentityType, UserAnswers}
+import utils.RefinedUtils.RefinedIntOps
 import models.SchemeId.Srn
 import models.UserAnswers.implicits.UserAnswersTryOps
-import pages.QuestionPage
 import play.api.libs.json.JsPath
-import utils.RefinedUtils.RefinedIntOps
-import viewmodels.models.{SectionJourneyStatus, SectionStatus}
+import models.{IdentityType, UserAnswers}
+import viewmodels.models.SectionStatus
+import config.Refined.{Max300, Max50}
+import pages.QuestionPage
 
 import scala.util.Try
 

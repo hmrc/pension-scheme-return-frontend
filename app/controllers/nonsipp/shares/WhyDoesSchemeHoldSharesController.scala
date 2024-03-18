@@ -16,28 +16,29 @@
 
 package controllers.nonsipp.shares
 
+import services.SaveService
+import viewmodels.implicits._
+import utils.FormUtils.FormOps
 import config.Refined.Max5000
 import controllers.PSRController
 import controllers.actions._
-import controllers.nonsipp.shares.WhyDoesSchemeHoldSharesController._
-import forms.RadioListFormProvider
-import models.SchemeId.Srn
-import models.SchemeHoldShare._
-import models.{Mode, SchemeHoldShare}
 import navigation.Navigator
-import pages.nonsipp.shares.{TypeOfSharesHeldPage, WhyDoesSchemeHoldSharesPage}
-import play.api.data.Form
+import forms.RadioListFormProvider
+import models.{Mode, SchemeHoldShare}
 import play.api.i18n.MessagesApi
+import play.api.data.Form
+import pages.nonsipp.shares.{TypeOfSharesHeldPage, WhyDoesSchemeHoldSharesPage}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
-import utils.FormUtils.FormOps
-import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, RadioListRowViewModel, RadioListViewModel}
+import models.SchemeHoldShare._
+import controllers.nonsipp.shares.WhyDoesSchemeHoldSharesController._
 import views.html.RadioListView
+import models.SchemeId.Srn
+import viewmodels.DisplayMessage.Message
+import viewmodels.models.{FormPageViewModel, RadioListRowViewModel, RadioListViewModel}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class WhyDoesSchemeHoldSharesController @Inject()(
   override val messagesApi: MessagesApi,

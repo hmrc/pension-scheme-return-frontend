@@ -16,31 +16,32 @@
 
 package controllers.nonsipp.landorpropertydisposal
 
-import cats.implicits.toShow
+import services.{PsrSubmissionService, SaveService}
+import viewmodels.implicits._
+import play.api.mvc._
+import models.HowDisposed._
+import utils.ListUtils.ListOps
 import config.Refined.{Max50, Max5000}
 import controllers.PSRController
-import controllers.actions._
-import controllers.nonsipp.landorpropertydisposal.LandPropertyDisposalCYAController._
-import models.HowDisposed.{HowDisposed, Other, Sold, Transferred}
-import models.SchemeId.Srn
-import models._
-import models.requests.DataRequest
-import navigation.Navigator
 import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import pages.nonsipp.landorpropertydisposal._
+import controllers.actions._
+import navigation.Navigator
 import play.api.i18n._
-import play.api.mvc._
-import services.{PsrSubmissionService, SaveService}
-import utils.DateTimeUtils.localDateShow
-import utils.ListUtils.ListOps
-import viewmodels.DisplayMessage._
-import viewmodels.implicits._
-import viewmodels.models._
+import models.requests.DataRequest
 import views.html.CheckYourAnswersView
+import models.SchemeId.Srn
+import cats.implicits.toShow
+import controllers.nonsipp.landorpropertydisposal.LandPropertyDisposalCYAController._
+import utils.DateTimeUtils.localDateShow
+import models._
+import viewmodels.DisplayMessage._
+import viewmodels.models._
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import java.time.LocalDate
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class LandPropertyDisposalCYAController @Inject()(
   override val messagesApi: MessagesApi,

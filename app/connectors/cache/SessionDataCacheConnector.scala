@@ -16,16 +16,17 @@
 
 package connectors.cache
 
+import uk.gov.hmrc.http.HttpReads.Implicits.{readFromJson, readOptionOfNotFound, readUnit}
 import com.google.inject.ImplementedBy
 import config.FrontendAppConfig
 import models.cache.SessionData
 import play.api.Logger
-import uk.gov.hmrc.http.HttpReads.Implicits.{readFromJson, readOptionOfNotFound, readUnit}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import utils.FutureUtils.FutureOps
 
-import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+
+import javax.inject.Inject
 
 class SessionDataCacheConnectorImpl @Inject()(config: FrontendAppConfig, http: HttpClient)
     extends SessionDataCacheConnector {
@@ -47,7 +48,7 @@ class SessionDataCacheConnectorImpl @Inject()(config: FrontendAppConfig, http: H
 @ImplementedBy(classOf[SessionDataCacheConnectorImpl])
 trait SessionDataCacheConnector {
 
-  protected val logger = Logger(classOf[SessionDataCacheConnector])
+  protected val logger: Logger = Logger(classOf[SessionDataCacheConnector])
 
   def fetch(cacheId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[SessionData]]
 

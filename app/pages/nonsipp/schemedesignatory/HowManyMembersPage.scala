@@ -16,10 +16,10 @@
 
 package pages.nonsipp.schemedesignatory
 
-import models.SchemeId.Srn
-import models.{PensionSchemeId, SchemeMemberNumbers}
 import pages.QuestionPage
+import models.SchemeId.Srn
 import play.api.libs.json.JsPath
+import models.{PensionSchemeId, SchemeMemberNumbers}
 
 case class HowManyMembersPage(srn: Srn, request: PensionSchemeId) extends QuestionPage[SchemeMemberNumbers] {
 

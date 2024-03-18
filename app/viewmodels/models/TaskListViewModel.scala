@@ -16,10 +16,10 @@
 
 package viewmodels.models
 
-import cats.data.NonEmptyList
-import viewmodels.DisplayMessage._
 import viewmodels.implicits._
+import cats.data.NonEmptyList
 import viewmodels.models.TaskListStatus.TaskListStatus
+import viewmodels.DisplayMessage._
 
 case class TaskListItemViewModel(
   link: LinkMessage,

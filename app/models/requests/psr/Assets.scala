@@ -16,8 +16,8 @@
 
 package models.requests.psr
 
-import models.{Address, PropertyAcquiredFrom, SchemeHoldBond, SchemeHoldLandProperty}
 import play.api.libs.json._
+import models._
 
 import java.time.LocalDate
 

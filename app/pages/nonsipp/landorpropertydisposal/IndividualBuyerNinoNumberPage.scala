@@ -16,13 +16,13 @@
 
 package pages.nonsipp.landorpropertydisposal
 
-import config.Refined.{Max50, Max5000}
-import models.ConditionalYesNo
-import models.SchemeId.Srn
-import pages.QuestionPage
-import play.api.libs.json.JsPath
-import uk.gov.hmrc.domain.Nino
 import utils.RefinedUtils.RefinedIntOps
+import models.SchemeId.Srn
+import models.ConditionalYesNo
+import config.Refined.{Max50, Max5000}
+import pages.QuestionPage
+import uk.gov.hmrc.domain.Nino
+import play.api.libs.json.JsPath
 
 case class IndividualBuyerNinoNumberPage(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50)
     extends QuestionPage[ConditionalYesNo[String, Nino]] {

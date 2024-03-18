@@ -32,27 +32,28 @@
 
 package controllers.nonsipp.memberdetails
 
-import controllers.actions._
-import controllers.nonsipp.memberdetails.PensionSchemeMembersController._
-import forms.RadioListFormProvider
-import models.ManualOrUpload.{Manual, Upload}
-import models.SchemeId.Srn
-import models.{ManualOrUpload, NormalMode}
-import navigation.Navigator
-import pages.nonsipp.memberdetails.PensionSchemeMembersPage
-import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.FormUtils.FormOps
-import viewmodels.DisplayMessage.{ListMessage, ListType, Message, ParagraphMessage}
+import pages.nonsipp.memberdetails.PensionSchemeMembersPage
 import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, RadioListRowViewModel, RadioListViewModel}
+import utils.FormUtils.FormOps
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import models.ManualOrUpload.{Manual, Upload}
+import controllers.actions._
+import navigation.Navigator
+import forms.RadioListFormProvider
+import controllers.nonsipp.memberdetails.PensionSchemeMembersController._
+import models.{ManualOrUpload, NormalMode}
+import play.api.data.Form
 import views.html.RadioListView
+import models.SchemeId.Srn
+import play.api.i18n.{I18nSupport, MessagesApi}
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.DisplayMessage._
+import viewmodels.models.{FormPageViewModel, RadioListRowViewModel, RadioListViewModel}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class PensionSchemeMembersController @Inject()(
   override val messagesApi: MessagesApi,

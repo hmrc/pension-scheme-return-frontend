@@ -16,28 +16,29 @@
 
 package controllers.nonsipp.landorpropertydisposal
 
+import services.SaveService
+import viewmodels.implicits._
+import utils.FormUtils.FormOps
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Refined.{Max50, Max5000}
 import controllers.PSRController
-import controllers.actions.IdentifyAndRequireData
-import forms.RecipientDetailsFormProvider
-import models.SchemeId.Srn
-import models.{Mode, RecipientDetails}
-import navigation.Navigator
-import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
-import utils.FormUtils.FormOps
-import viewmodels.models.{FormPageViewModel, RecipientDetailsViewModel}
-import views.html.RecipientDetailsView
-import controllers.nonsipp.landorpropertydisposal.OtherBuyerDetailsController._
 import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
+import controllers.nonsipp.landorpropertydisposal.OtherBuyerDetailsController._
 import pages.nonsipp.landorpropertydisposal.OtherBuyerDetailsPage
+import controllers.actions.IdentifyAndRequireData
+import navigation.Navigator
+import forms.RecipientDetailsFormProvider
+import models.{Mode, RecipientDetails}
+import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.data.Form
+import views.html.RecipientDetailsView
+import models.SchemeId.Srn
 import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
+import viewmodels.models.{FormPageViewModel, RecipientDetailsViewModel}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class OtherBuyerDetailsController @Inject()(
   override val messagesApi: MessagesApi,

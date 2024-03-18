@@ -16,27 +16,28 @@
 
 package controllers.nonsipp.memberpensionpayments
 
+import services.{PsrSubmissionService, SaveService}
+import viewmodels.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Refined.Max300
 import controllers.PSRController
-import controllers.actions._
-import controllers.nonsipp.memberpensionpayments.PensionPaymentsReceivedController._
-import forms.YesNoPageFormProvider
-import models.SchemeId.Srn
-import models.{Mode, Money, UserAnswers}
 import navigation.Navigator
-import pages.nonsipp.memberdetails.MembersDetailsPages._
-import pages.nonsipp.memberpensionpayments.{PensionPaymentsReceivedPage, TotalAmountPensionPaymentsPage}
+import forms.YesNoPageFormProvider
+import models.{Mode, Money, UserAnswers}
 import play.api.data.Form
-import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.{PsrSubmissionService, SaveService}
-import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
+import controllers.nonsipp.memberpensionpayments.PensionPaymentsReceivedController._
 import views.html.YesNoPageView
+import models.SchemeId.Srn
+import pages.nonsipp.memberpensionpayments.{PensionPaymentsReceivedPage, TotalAmountPensionPaymentsPage}
+import controllers.actions._
+import play.api.i18n.MessagesApi
+import pages.nonsipp.memberdetails.MembersDetailsPages._
+import viewmodels.DisplayMessage.Message
+import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class PensionPaymentsReceivedController @Inject()(
   override val messagesApi: MessagesApi,

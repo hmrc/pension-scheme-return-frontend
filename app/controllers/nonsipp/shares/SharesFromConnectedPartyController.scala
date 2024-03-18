@@ -16,36 +16,30 @@
 
 package controllers.nonsipp.shares
 
-import config.FrontendAppConfig
+import services.SaveService
+import viewmodels.implicits._
+import utils.FormUtils.FormOps
 import config.Refined.Max5000
 import controllers.PSRController
+import config.FrontendAppConfig
 import controllers.actions._
-import forms.YesNoPageFormProvider
-import models.SchemeId.Srn
-import models.requests.DataRequest
-import models.{IdentitySubject, IdentityType, Mode, SchemeHoldShare}
 import navigation.Navigator
+import forms.YesNoPageFormProvider
+import models._
 import pages.nonsipp.common.{IdentityTypePage, OtherRecipientDetailsPage}
-import pages.nonsipp.shares.{
-  CompanyNameOfSharesSellerPage,
-  CompanyNameRelatedSharesPage,
-  IndividualNameOfSharesSellerPage,
-  PartnershipShareSellerNamePage,
-  SharesFromConnectedPartyPage,
-  WhyDoesSchemeHoldSharesPage
-}
-import play.api.data.Form
 import play.api.i18n.MessagesApi
+import pages.nonsipp.shares._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
-import utils.FormUtils.FormOps
-import viewmodels.DisplayMessage.{LinkMessage, ListMessage, ListType, Message, ParagraphMessage}
-import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, FurtherDetailsViewModel, YesNoPageViewModel}
 import views.html.YesNoPageView
+import models.SchemeId.Srn
+import viewmodels.DisplayMessage._
+import viewmodels.models.{FormPageViewModel, FurtherDetailsViewModel, YesNoPageViewModel}
+import models.requests.DataRequest
+import play.api.data.Form
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class SharesFromConnectedPartyController @Inject()(
   override val messagesApi: MessagesApi,

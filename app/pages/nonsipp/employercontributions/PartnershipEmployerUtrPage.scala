@@ -16,13 +16,13 @@
 
 package pages.nonsipp.employercontributions
 
-import config.Refined.{Max300, Max50}
-import models.{ConditionalYesNo, UserAnswers, Utr}
-import models.SchemeId.Srn
-import pages.QuestionPage
-import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
+import models.SchemeId.Srn
+import play.api.libs.json.JsPath
+import models.{ConditionalYesNo, UserAnswers, Utr}
 import viewmodels.models.SectionStatus
+import config.Refined.{Max300, Max50}
+import pages.QuestionPage
 
 import scala.util.Try
 

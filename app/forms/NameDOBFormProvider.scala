@@ -17,10 +17,10 @@
 package forms
 
 import forms.mappings.Mappings
-import forms.mappings.errors.DateFormErrors
+import play.api.data.Forms.mapping
 import models.NameDOB
 import play.api.data.Form
-import play.api.data.Forms.mapping
+import forms.mappings.errors.DateFormErrors
 
 import javax.inject.Inject
 

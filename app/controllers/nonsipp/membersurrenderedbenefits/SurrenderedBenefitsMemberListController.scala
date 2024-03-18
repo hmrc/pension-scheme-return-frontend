@@ -16,34 +16,35 @@
 
 package controllers.nonsipp.membersurrenderedbenefits
 
+import services.{PsrSubmissionService, SaveService}
+import viewmodels.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import com.google.inject.Inject
-import config.Constants
-import config.Constants.maxNotRelevant
 import config.Refined.OneTo300
 import controllers.PSRController
-import controllers.actions.IdentifyAndRequireData
-import eu.timepit.refined.refineV
-import forms.YesNoPageFormProvider
-import models.SchemeId.Srn
-import models.{CheckMode, Mode, NameDOB, NormalMode, Pagination, UserAnswers}
+import config.Constants
+import config.Constants.maxNotRelevant
 import navigation.Navigator
-import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
+import forms.YesNoPageFormProvider
 import pages.nonsipp.membersurrenderedbenefits.{
   SurrenderedBenefitsAmountPage,
   SurrenderedBenefitsJourneyStatus,
   SurrenderedBenefitsMemberListPage
 }
+import models._
 import play.api.data.Form
-import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.{PsrSubmissionService, SaveService}
-import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
-import viewmodels.implicits._
-import viewmodels.models.{ActionTableViewModel, FormPageViewModel, PaginatedViewModel, SectionStatus, TableElem}
 import views.html.TwoColumnsTripleAction
+import models.SchemeId.Srn
+import controllers.actions.IdentifyAndRequireData
+import eu.timepit.refined.refineV
+import play.api.i18n.MessagesApi
+import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
+import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
+import viewmodels.models._
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.Named
-import scala.concurrent.{ExecutionContext, Future}
 
 class SurrenderedBenefitsMemberListController @Inject()(
   override val messagesApi: MessagesApi,

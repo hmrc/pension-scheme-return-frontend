@@ -16,12 +16,12 @@
 
 package forms
 
-import forms.mappings.Mappings
-import models.Enumerable
 import models.GenericFormMapper.{ConditionalRadioMapper, StringFieldMapper}
+import forms.mappings.Mappings
 import play.api.data.Forms.mapping
-import play.api.data.{Form, Mapping}
 import uk.gov.voa.play.form.ConditionalMappings
+import models.Enumerable
+import play.api.data.{Form, Mapping}
 
 import javax.inject.Inject
 

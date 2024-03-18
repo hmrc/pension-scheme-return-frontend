@@ -16,12 +16,12 @@
 
 package pages.nonsipp.shares
 
-import config.Refined.Max5000
-import models.SchemeId.Srn
-import pages.QuestionPage
-import pages.nonsipp.shares.Paths
-import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
+import pages.nonsipp.shares.Paths
+import models.SchemeId.Srn
+import play.api.libs.json.JsPath
+import config.Refined.Max5000
+import pages.QuestionPage
 
 case class CompanyNameOfSharesSellerPage(srn: Srn, index: Max5000) extends QuestionPage[String] {
 

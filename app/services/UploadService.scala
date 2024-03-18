@@ -16,17 +16,18 @@
 
 package services
 
-import akka.stream.scaladsl.Source
 import akka.util.ByteString
+import akka.stream.scaladsl.Source
 import connectors.UpscanConnector
-import models.UploadStatus.UploadStatus
 import models._
+import models.UploadStatus.UploadStatus
 import repositories.UploadRepository
 import uk.gov.hmrc.http.HeaderCarrier
 
+import scala.concurrent.{ExecutionContext, Future}
+
 import java.time.{Clock, Instant}
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
 
 class UploadService @Inject()(
   upscanConnector: UpscanConnector,

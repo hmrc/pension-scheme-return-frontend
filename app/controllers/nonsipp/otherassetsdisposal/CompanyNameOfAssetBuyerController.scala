@@ -16,25 +16,26 @@
 
 package controllers.nonsipp.otherassetsdisposal
 
+import services.SaveService
+import pages.nonsipp.otherassetsdisposal.CompanyNameOfAssetBuyerPage
+import viewmodels.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Refined._
 import controllers.PSRController
-import controllers.actions._
 import controllers.nonsipp.otherassetsdisposal.CompanyNameOfAssetBuyerController._
+import controllers.actions._
+import navigation.Navigator
 import forms.TextFormProvider
 import models.Mode
-import models.SchemeId.Srn
-import navigation.Navigator
-import pages.nonsipp.otherassetsdisposal.CompanyNameOfAssetBuyerPage
-import play.api.data.Form
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
-import viewmodels.implicits._
 import viewmodels.models._
+import play.api.data.Form
 import views.html.TextInputView
+import models.SchemeId.Srn
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class CompanyNameOfAssetBuyerController @Inject()(
   override val messagesApi: MessagesApi,

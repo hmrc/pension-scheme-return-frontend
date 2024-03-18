@@ -16,15 +16,16 @@
 
 package forms.mappings
 
-import forms.mappings.errors._
-import models.GenericFormMapper.StringFieldMapper
-import models.{Enumerable, Money, Percentage, Security}
 import play.api.data.format.Formatter
-import play.api.data.{FormError, Mapping}
+import models.GenericFormMapper.StringFieldMapper
 import uk.gov.voa.play.form.Condition
+import models._
+import play.api.data.{FormError, Mapping}
+import forms.mappings.errors._
+
+import scala.util.control.Exception.nonFatalCatch
 
 import java.text.DecimalFormat
-import scala.util.control.Exception.nonFatalCatch
 
 trait Formatters {
 

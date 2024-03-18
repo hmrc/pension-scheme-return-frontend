@@ -16,8 +16,8 @@
 
 package models.requests.psr
 
-import models.IdentityType
 import play.api.libs.json.{Json, OFormat}
+import models.IdentityType
 
 import java.time.LocalDate
 

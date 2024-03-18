@@ -16,10 +16,10 @@
 
 package pages.nonsipp
 
-import config.Refined.{Max300, Max5}
 import models.SchemeId.Srn
-import pages.QuestionPage
 import play.api.libs.json.{__, JsPath}
+import config.Refined.{Max300, Max5}
+import pages.QuestionPage
 
 package object membertransferout {
   object Paths {

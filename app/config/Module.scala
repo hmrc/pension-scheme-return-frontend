@@ -16,12 +16,12 @@
 
 package config
 
-import com.google.inject.name.Names
-import controllers.actions._
-import navigation.nonsipp.NonSippNavigator
-import navigation.{Navigator, RootNavigator}
 import play.api.inject.Binding
+import navigation.nonsipp.NonSippNavigator
+import controllers.actions._
+import com.google.inject.name.Names
 import play.api.{Configuration, Environment}
+import navigation.{Navigator, RootNavigator}
 
 import java.time.{Clock, ZoneOffset}
 

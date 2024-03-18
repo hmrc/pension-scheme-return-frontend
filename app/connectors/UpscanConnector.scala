@@ -16,14 +16,15 @@
 
 package connectors
 
-import config.FrontendAppConfig
-import models.{PreparedUpload, UpscanFileReference, UpscanInitiateRequest, UpscanInitiateResponse}
-import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.http.HttpReads.Implicits._
+import config.FrontendAppConfig
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
+import models._
+import play.mvc.Http.HeaderNames
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
 
 class UpscanConnector @Inject()(httpClient: HttpClient, appConfig: FrontendAppConfig)(
   implicit ec: ExecutionContext

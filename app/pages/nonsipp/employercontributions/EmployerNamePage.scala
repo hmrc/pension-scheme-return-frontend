@@ -16,15 +16,15 @@
 
 package pages.nonsipp.employercontributions
 
-import config.Refined.{Max300, Max50}
-import models.SchemeId.Srn
-import models.UserAnswers
-import pages.QuestionPage
-import play.api.libs.json.JsPath
-import queries.Removable
-import utils.PageUtils.removePages
 import utils.RefinedUtils._
+import utils.PageUtils.removePages
+import queries.Removable
+import models.SchemeId.Srn
+import play.api.libs.json.JsPath
+import models.UserAnswers
 import viewmodels.models.SectionStatus
+import config.Refined.{Max300, Max50}
+import pages.QuestionPage
 
 import scala.util.Try
 

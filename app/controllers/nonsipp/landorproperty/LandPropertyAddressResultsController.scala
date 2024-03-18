@@ -16,26 +16,27 @@
 
 package controllers.nonsipp.landorproperty
 
+import services.SaveService
+import viewmodels.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Refined._
 import controllers.PSRController
-import controllers.actions._
-import controllers.nonsipp.landorproperty.LandPropertyAddressResultsController._
-import forms.TextFormProvider
-import models.SchemeId.Srn
-import models.{Address, Mode}
-import navigation.Navigator
 import pages.nonsipp.landorproperty.{AddressLookupResultsPage, LandOrPropertyChosenAddressPage}
+import controllers.actions._
+import navigation.Navigator
+import forms.TextFormProvider
+import models.{Address, Mode}
 import play.api.data.Form
-import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
-import viewmodels.DisplayMessage.{LinkMessage, ParagraphMessage}
-import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, RadioListRowViewModel, RadioListViewModel}
 import views.html.RadioListView
+import models.SchemeId.Srn
+import play.api.i18n.MessagesApi
+import controllers.nonsipp.landorproperty.LandPropertyAddressResultsController._
+import viewmodels.DisplayMessage.{LinkMessage, ParagraphMessage}
+import viewmodels.models.{FormPageViewModel, RadioListRowViewModel, RadioListViewModel}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class LandPropertyAddressResultsController @Inject()(
   override val messagesApi: MessagesApi,

@@ -16,30 +16,31 @@
 
 package controllers.nonsipp.bonds
 
-import config.Constants
-import config.Refined.Max5000
+import services.SaveService
+import pages.nonsipp.bonds.{BondsCompleted, IncomeFromBondsPage}
+import viewmodels.implicits._
+import utils.FormUtils._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import controllers.PSRController
+import config.Constants
 import controllers.actions._
 import controllers.nonsipp.bonds.IncomeFromBondsController._
-import forms.MoneyFormProvider
-import forms.mappings.errors.MoneyFormErrors
-import models.SchemeId.Srn
-import models.{Mode, Money}
 import navigation.Navigator
-import pages.nonsipp.bonds.{BondsCompleted, IncomeFromBondsPage}
-import play.api.data.Form
+import forms.MoneyFormProvider
+import models.{Mode, Money}
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
-import utils.FormUtils._
-import viewmodels.DisplayMessage.{Empty, Message}
-import viewmodels.implicits._
+import play.api.data.Form
+import forms.mappings.errors.MoneyFormErrors
+import config.Refined.Max5000
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
-import viewmodels.models.{FormPageViewModel, QuestionField, SectionCompleted}
 import views.html.MoneyView
+import models.SchemeId.Srn
+import viewmodels.DisplayMessage.{Empty, Message}
+import viewmodels.models.{FormPageViewModel, QuestionField, SectionCompleted}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class IncomeFromBondsController @Inject()(
   override val messagesApi: MessagesApi,

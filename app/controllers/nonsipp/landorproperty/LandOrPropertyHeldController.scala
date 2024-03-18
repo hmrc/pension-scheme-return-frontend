@@ -16,26 +16,27 @@
 
 package controllers.nonsipp.landorproperty
 
+import services.{PsrSubmissionService, SaveService}
+import viewmodels.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import pages.nonsipp.landorproperty.LandOrPropertyHeldPage
 import controllers.actions._
-import controllers.nonsipp.landorproperty.LandOrPropertyHeldController._
+import navigation.Navigator
 import forms.YesNoPageFormProvider
 import models.Mode
+import views.html.YesNoPageView
 import models.SchemeId.Srn
-import models.requests.DataRequest
-import navigation.Navigator
-import pages.nonsipp.landorproperty.LandOrPropertyHeldPage
-import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.{PsrSubmissionService, SaveService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
-import views.html.YesNoPageView
+import controllers.nonsipp.landorproperty.LandOrPropertyHeldController._
+import models.requests.DataRequest
+import play.api.data.Form
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class LandOrPropertyHeldController @Inject()(
   override val messagesApi: MessagesApi,

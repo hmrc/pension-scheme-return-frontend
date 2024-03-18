@@ -16,30 +16,31 @@
 
 package controllers.nonsipp.receivetransfer
 
-import config.Constants
-import config.Refined.{Max300, Max5}
-import controllers.nonsipp.receivetransfer.TotalValueTransferController._
-import controllers.PSRController
-import controllers.actions._
-import forms.MoneyFormProvider
-import forms.mappings.errors.MoneyFormErrors
-import models.SchemeId.Srn
-import models.{Mode, Money}
-import navigation.Navigator
-import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
-import pages.nonsipp.receivetransfer.{TotalValueTransferPage, TransferringSchemeNamePage}
-import play.api.data.Form
-import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
-import viewmodels.DisplayMessage.{Empty, Message}
 import viewmodels.implicits._
+import controllers.nonsipp.receivetransfer.TotalValueTransferController._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import controllers.PSRController
+import config.Constants
+import pages.nonsipp.receivetransfer.{TotalValueTransferPage, TransferringSchemeNamePage}
+import controllers.actions._
+import navigation.Navigator
+import forms.MoneyFormProvider
+import models.{Mode, Money}
+import play.api.data.Form
+import forms.mappings.errors.MoneyFormErrors
+import config.Refined.{Max300, Max5}
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
-import viewmodels.models.{FormPageViewModel, QuestionField}
 import views.html.MoneyView
+import models.SchemeId.Srn
+import play.api.i18n.MessagesApi
+import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
+import viewmodels.DisplayMessage.{Empty, Message}
+import viewmodels.models.{FormPageViewModel, QuestionField}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class TotalValueTransferController @Inject()(
   override val messagesApi: MessagesApi,

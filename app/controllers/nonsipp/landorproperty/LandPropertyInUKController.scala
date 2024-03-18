@@ -16,25 +16,26 @@
 
 package controllers.nonsipp.landorproperty
 
-import config.Refined.Max5000
-import controllers.actions._
+import services.SaveService
 import controllers.nonsipp.landorproperty.LandPropertyInUKController._
+import viewmodels.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import config.Refined.Max5000
+import pages.nonsipp.landorproperty.LandPropertyInUKPage
+import controllers.actions._
+import navigation.Navigator
 import forms.YesNoPageFormProvider
 import models.Mode
-import models.SchemeId.Srn
-import navigation.Navigator
-import pages.nonsipp.landorproperty.LandPropertyInUKPage
-import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
+import play.api.data.Form
 import views.html.YesNoPageView
+import models.SchemeId.Srn
+import play.api.i18n.{I18nSupport, MessagesApi}
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class LandPropertyInUKController @Inject()(
   override val messagesApi: MessagesApi,

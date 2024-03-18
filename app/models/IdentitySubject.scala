@@ -16,8 +16,8 @@
 
 package models
 
-import play.api.mvc.JavascriptLiteral
 import utils.WithName
+import play.api.mvc.JavascriptLiteral
 
 sealed trait IdentitySubject {
   val name: String

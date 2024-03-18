@@ -16,26 +16,27 @@
 
 package controllers.nonsipp.memberpayments
 
+import services.{PsrSubmissionService, SaveService}
+import viewmodels.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import com.google.inject.Inject
 import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
-import forms.YesNoPageFormProvider
-import models.SchemeId.Srn
-import models.{Mode, NormalMode, UserAnswers}
 import navigation.Navigator
-import pages.nonsipp.memberpayments._
-import play.api.data.Form
+import forms.YesNoPageFormProvider
+import models.{Mode, NormalMode, UserAnswers}
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.{PsrSubmissionService, SaveService}
-import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
+import play.api.data.Form
 import views.html.YesNoPageView
+import models.SchemeId.Srn
+import pages.nonsipp.memberpayments._
+import viewmodels.DisplayMessage.Message
+import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 
-import javax.inject.Named
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
+
+import javax.inject.Named
 
 class RemoveUnallocatedAmountController @Inject()(
   override val messagesApi: MessagesApi,

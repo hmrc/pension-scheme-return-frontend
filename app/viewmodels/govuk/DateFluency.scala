@@ -16,11 +16,11 @@
 
 package viewmodels.govuk
 
-import play.api.data.{Field, FormError}
-import play.api.i18n.Messages
-import uk.gov.hmrc.govukfrontend.views.viewmodels.dateinput.{DateInput, InputItem}
-import uk.gov.hmrc.govukfrontend.views.viewmodels.fieldset.{Fieldset, Legend}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
+import uk.gov.hmrc.govukfrontend.views.viewmodels.fieldset.{Fieldset, Legend}
+import play.api.data.{Field, FormError}
+import uk.gov.hmrc.govukfrontend.views.viewmodels.dateinput.{DateInput, InputItem}
+import play.api.i18n.Messages
 import viewmodels.ErrorMessageAwareness
 
 object date extends DateFluency

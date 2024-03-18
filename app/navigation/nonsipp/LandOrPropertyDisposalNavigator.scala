@@ -16,14 +16,14 @@
 
 package navigation.nonsipp
 
-import cats.implicits.toTraverseOps
-import config.Refined.Max50
-import models._
-import navigation.JourneyNavigator
-import pages.Page
-import pages.nonsipp.landorproperty.LandOrPropertyAddressLookupPages
-import pages.nonsipp.landorpropertydisposal._
 import play.api.mvc.Call
+import pages.nonsipp.landorproperty.LandOrPropertyAddressLookupPages
+import cats.implicits.toTraverseOps
+import pages.nonsipp.landorpropertydisposal._
+import navigation.JourneyNavigator
+import models._
+import config.Refined.Max50
+import pages.Page
 
 object LandOrPropertyDisposalNavigator extends JourneyNavigator {
 

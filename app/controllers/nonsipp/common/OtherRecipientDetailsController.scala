@@ -16,29 +16,30 @@
 
 package controllers.nonsipp.common
 
+import services.SaveService
+import controllers.nonsipp.common.OtherRecipientDetailsController.viewModel
+import viewmodels.implicits._
+import utils.FormUtils._
 import config.Refined.Max5000
 import controllers.PSRController
-import controllers.actions._
-import controllers.nonsipp.common.OtherRecipientDetailsController.viewModel
-import forms.RecipientDetailsFormProvider
-import models.SchemeId.Srn
-import models.{IdentitySubject, Mode, RecipientDetails, UserAnswers}
-import navigation.Navigator
-import pages.nonsipp.common.OtherRecipientDetailsPage
 import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
-import pages.nonsipp.shares.CompanyNameRelatedSharesPage
-import play.api.data.Form
+import controllers.actions._
+import navigation.Navigator
+import forms.RecipientDetailsFormProvider
+import models._
+import pages.nonsipp.common.OtherRecipientDetailsPage
 import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.data.Form
+import pages.nonsipp.shares.CompanyNameRelatedSharesPage
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
-import utils.FormUtils._
-import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, RecipientDetailsViewModel}
 import views.html.RecipientDetailsView
+import models.SchemeId.Srn
+import viewmodels.DisplayMessage.Message
+import viewmodels.models.{FormPageViewModel, RecipientDetailsViewModel}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class OtherRecipientDetailsController @Inject()(
   override val messagesApi: MessagesApi,

@@ -16,27 +16,28 @@
 
 package controllers.nonsipp.shares
 
+import services.SaveService
 import config.Refined.Max5000
 import controllers.PSRController
 import controllers.actions._
-import controllers.nonsipp.shares.TypeOfSharesHeldController._
-import forms.RadioListFormProvider
-import models.SchemeId.Srn
-import models.TypeOfShares.{ConnectedParty, SponsoringEmployer, Unquoted}
-import models.{Mode, TypeOfShares}
 import navigation.Navigator
-import pages.nonsipp.shares.TypeOfSharesHeldPage
-import play.api.data.Form
+import forms.RadioListFormProvider
+import models.{Mode, TypeOfShares}
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
+import play.api.data.Form
+import controllers.nonsipp.shares.TypeOfSharesHeldController._
 import utils.FormUtils.FormOps
+import pages.nonsipp.shares.TypeOfSharesHeldPage
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import views.html.RadioListView
+import models.TypeOfShares.{ConnectedParty, SponsoringEmployer, Unquoted}
+import models.SchemeId.Srn
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, RadioListRowViewModel, RadioListViewModel}
-import views.html.RadioListView
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class TypeOfSharesHeldController @Inject()(
   override val messagesApi: MessagesApi,

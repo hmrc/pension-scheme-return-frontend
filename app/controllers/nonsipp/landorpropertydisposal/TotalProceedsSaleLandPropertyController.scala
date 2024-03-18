@@ -16,30 +16,31 @@
 
 package controllers.nonsipp.landorpropertydisposal
 
-import config.Constants
-import config.Refined.{Max50, Max5000}
-import controllers.PSRController
-import controllers.actions._
+import services.SaveService
+import viewmodels.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import controllers.nonsipp.landorpropertydisposal.TotalProceedsSaleLandPropertyController._
-import forms.MoneyFormProvider
-import forms.mappings.errors.MoneyFormErrors
-import models.SchemeId.Srn
-import models.{Mode, Money}
-import navigation.Navigator
+import controllers.PSRController
+import config.Constants
 import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import pages.nonsipp.landorpropertydisposal.TotalProceedsSaleLandPropertyPage
-import play.api.data.Form
+import controllers.actions._
+import navigation.Navigator
+import forms.MoneyFormProvider
+import models.{Mode, Money}
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
-import viewmodels.DisplayMessage.{Empty, ListMessage, ListType, Message, ParagraphMessage}
-import viewmodels.implicits._
+import play.api.data.Form
+import forms.mappings.errors.MoneyFormErrors
+import config.Refined.{Max50, Max5000}
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
-import viewmodels.models.{FormPageViewModel, QuestionField}
 import views.html.MoneyView
+import models.SchemeId.Srn
+import viewmodels.DisplayMessage._
+import viewmodels.models.{FormPageViewModel, QuestionField}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class TotalProceedsSaleLandPropertyController @Inject()(
   override val messagesApi: MessagesApi,

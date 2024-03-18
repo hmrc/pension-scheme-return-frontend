@@ -16,10 +16,10 @@
 
 package models
 
-import cats.data.NonEmptyList
-import play.api.libs.functional.syntax.toFunctionalBuilderOps
-import play.api.libs.json._
 import utils.Country
+import cats.data.NonEmptyList
+import play.api.libs.json._
+import play.api.libs.functional.syntax.toFunctionalBuilderOps
 
 case class ALFCountry(code: String, name: String)
 

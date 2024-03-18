@@ -16,17 +16,18 @@
 
 package models
 
-import models.UserAnswers.SensitiveJsObject
-import play.api.data.Form
-import play.api.libs.json._
-import queries.{Gettable, Removable, Settable}
-import uk.gov.hmrc.crypto.json.JsonEncryption
-import uk.gov.hmrc.crypto.{Decrypter, Encrypter, Sensitive}
-import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 import utils.Transform
+import queries.{Gettable, Removable, Settable}
+import models.UserAnswers.SensitiveJsObject
+import uk.gov.hmrc.crypto.{Decrypter, Encrypter, Sensitive}
+import play.api.libs.json._
+import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
+import play.api.data.Form
+import uk.gov.hmrc.crypto.json.JsonEncryption
+
+import scala.util.{Failure, Success, Try}
 
 import java.time.Instant
-import scala.util.{Failure, Success, Try}
 
 final case class UserAnswers(
   id: String,

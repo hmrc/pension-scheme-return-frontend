@@ -16,31 +16,32 @@
 
 package controllers.nonsipp.bonds
 
-import cats.implicits.{catsSyntaxApplicativeId, toShow, toTraverseOps}
+import services.{PsrSubmissionService, SaveService}
+import pages.nonsipp.bonds._
+import viewmodels.implicits._
+import play.api.mvc._
 import com.google.inject.Inject
-import config.Constants
+import utils.ListUtils._
 import config.Refined.Max5000
 import controllers.PSRController
+import cats.implicits.{catsSyntaxApplicativeId, toShow, toTraverseOps}
 import controllers.actions.IdentifyAndRequireData
-import controllers.nonsipp.bonds.BondsListController._
-import forms.YesNoPageFormProvider
-import models.SchemeId.Srn
-import models.requests.DataRequest
-import models.{CheckMode, Mode, Money, NormalMode, Pagination, SchemeHoldBond}
 import navigation.Navigator
-import pages.nonsipp.bonds._
-import play.api.data.Form
+import forms.YesNoPageFormProvider
+import models._
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import services.{PsrSubmissionService, SaveService}
-import utils.ListUtils._
-import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
-import viewmodels.implicits._
-import viewmodels.models._
+import controllers.nonsipp.bonds.BondsListController._
+import config.Constants
 import views.html.TwoColumnsTripleAction
+import models.SchemeId.Srn
+import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
+import viewmodels.models._
+import models.requests.DataRequest
+import play.api.data.Form
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.Named
-import scala.concurrent.{ExecutionContext, Future}
 
 class BondsListController @Inject()(
   override val messagesApi: MessagesApi,

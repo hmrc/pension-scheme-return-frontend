@@ -16,27 +16,28 @@
 
 package controllers.nonsipp.otherassetsdisposal
 
+import services.SaveService
+import pages.nonsipp.otherassetsdisposal.{AssetCompanyBuyerCrnPage, CompanyNameOfAssetBuyerPage}
+import viewmodels.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import forms.mappings.Mappings
 import config.Refined.{Max50, Max5000}
 import controllers.actions.IdentifyAndRequireData
-import forms.YesNoPageFormProvider
-import forms.mappings.Mappings
-import forms.mappings.errors.InputFormErrors
-import models.SchemeId.Srn
-import models.{ConditionalYesNo, Crn, Mode}
 import navigation.Navigator
-import pages.nonsipp.otherassetsdisposal.{AssetCompanyBuyerCrnPage, CompanyNameOfAssetBuyerPage}
+import forms.YesNoPageFormProvider
+import models.{ConditionalYesNo, Crn, Mode}
 import play.api.data.Form
+import forms.mappings.errors.InputFormErrors
+import views.html.ConditionalYesNoPageView
+import models.SchemeId.Srn
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
-import viewmodels.models.{ConditionalYesNoPageViewModel, FieldType, FormPageViewModel, YesNoViewModel}
-import views.html.ConditionalYesNoPageView
+import viewmodels.models._
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class AssetCompanyBuyerCrnController @Inject()(
   override val messagesApi: MessagesApi,

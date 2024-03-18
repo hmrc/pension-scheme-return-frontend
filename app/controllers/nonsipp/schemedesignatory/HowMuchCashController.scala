@@ -16,32 +16,33 @@
 
 package controllers.nonsipp.schemedesignatory
 
-import cats.implicits.toShow
-import cats.{Id, Monad}
+import services.{SaveService, SchemeDateService}
+import pages.nonsipp.schemedesignatory.{FinancialDetailsCheckYourAnswersPage, HowMuchCashPage}
+import viewmodels.implicits._
+import play.api.mvc._
 import com.google.inject.Inject
+import viewmodels.models.MultipleQuestionsViewModel.DoubleQuestion
+import cats.implicits.toShow
 import config.Constants.maxCashInBank
 import controllers.actions._
-import forms.MoneyFormProvider
-import forms.mappings.errors.MoneyFormErrors
-import models.SchemeId.Srn
-import models.requests.DataRequest
-import models.{CheckMode, DateRange, Mode, Money, NormalMode}
 import navigation.Navigator
-import pages.nonsipp.schemedesignatory.{FinancialDetailsCheckYourAnswersPage, HowMuchCashPage}
-import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import services.{SaveService, SchemeDateService}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.DateTimeUtils.localDateShow
-import viewmodels.DisplayMessage.{Message, ParagraphMessage}
-import viewmodels.implicits._
-import viewmodels.models.MultipleQuestionsViewModel.DoubleQuestion
-import viewmodels.models.{FormPageViewModel, QuestionField}
+import forms.MoneyFormProvider
+import cats.{Id, Monad}
+import forms.mappings.errors.MoneyFormErrors
 import views.html.MoneyView
+import models.SchemeId.Srn
+import utils.DateTimeUtils.localDateShow
+import models._
+import play.api.i18n.{I18nSupport, MessagesApi}
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.DisplayMessage.{Message, ParagraphMessage}
+import viewmodels.models.{FormPageViewModel, QuestionField}
+import models.requests.DataRequest
+import play.api.data.Form
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.Named
-import scala.concurrent.{ExecutionContext, Future}
 
 class HowMuchCashController @Inject()(
   override val messagesApi: MessagesApi,

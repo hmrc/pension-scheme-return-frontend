@@ -16,15 +16,15 @@
 
 package navigation.nonsipp
 
-import cats.implicits.toTraverseOps
-import config.Refined.Max5000
-import eu.timepit.refined.refineMV
-import models.SchemeHoldBond.{Acquisition, Contribution, Transfer}
-import models.{CheckMode, NormalMode, UserAnswers}
-import navigation.JourneyNavigator
-import pages.Page
 import pages.nonsipp.bonds._
 import play.api.mvc.Call
+import models.SchemeHoldBond.{Acquisition, Contribution, Transfer}
+import cats.implicits.toTraverseOps
+import eu.timepit.refined.refineMV
+import navigation.JourneyNavigator
+import models.{CheckMode, NormalMode, UserAnswers}
+import config.Refined.Max5000
+import pages.Page
 
 object UnregulatedOrConnectedBondsNavigator extends JourneyNavigator {
 

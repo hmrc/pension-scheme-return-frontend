@@ -16,12 +16,12 @@
 
 package config
 
-import com.google.inject.{Inject, Singleton}
-import play.api.Configuration
-import play.api.i18n.Lang
 import play.api.mvc.RequestHeader
+import com.google.inject.{Inject, Singleton}
 import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl._
 import uk.gov.hmrc.play.bootstrap.binders.{AbsoluteWithHostnameFromAllowlist, OnlyRelative, RedirectUrl}
+import play.api.Configuration
+import play.api.i18n.Lang
 
 @Singleton
 class FrontendAppConfig @Inject()(config: Configuration) { self =>
@@ -81,7 +81,7 @@ class FrontendAppConfig @Inject()(config: Configuration) { self =>
       val contactHmrc: String = baseUrl + config.get[String]("urls.manage-pension-schemes.contactHmrc")
       val cannotAccessDeregistered: String =
         baseUrl + config.get[String]("urls.manage-pension-schemes.cannotAccessDeregistered")
-      val dashboard = baseUrl + config.get[String]("urls.manage-pension-schemes.overview")
+      val dashboard: String = baseUrl + config.get[String]("urls.manage-pension-schemes.overview")
     }
 
     object pensionAdministrator {

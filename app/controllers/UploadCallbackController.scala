@@ -16,14 +16,15 @@
 
 package controllers
 
-import models._
-import play.api.libs.json.JsValue
-import play.api.mvc.{Action, MessagesControllerComponents}
 import services.UploadService
+import play.api.mvc.{Action, MessagesControllerComponents}
+import play.api.libs.json.JsValue
+import models._
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
-import javax.inject.Inject
 import scala.concurrent.ExecutionContext
+
+import javax.inject.Inject
 
 class UploadCallbackController @Inject()(
   uploadService: UploadService,

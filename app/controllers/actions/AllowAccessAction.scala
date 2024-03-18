@@ -16,22 +16,23 @@
 
 package controllers.actions
 
+import play.api.mvc.{ActionFunction, Result}
 import com.google.inject.ImplementedBy
-import config.FrontendAppConfig
-import connectors.MinimalDetailsError.DelimitedAdmin
 import connectors.{MinimalDetailsConnector, MinimalDetailsError, SchemeDetailsConnector}
 import controllers.routes
+import config.FrontendAppConfig
 import models.SchemeId.Srn
-import models.SchemeStatus.{Deregistered, Open, WoundUp}
-import models.requests.{AllowedAccessRequest, IdentifierRequest}
+import uk.gov.hmrc.http.HeaderCarrier
 import models.{MinimalDetails, SchemeDetails, SchemeStatus}
 import play.api.mvc.Results.Redirect
-import play.api.mvc.{ActionFunction, Result}
-import uk.gov.hmrc.http.HeaderCarrier
+import connectors.MinimalDetailsError.DelimitedAdmin
+import models.SchemeStatus.{Deregistered, Open, WoundUp}
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
+import models.requests.{AllowedAccessRequest, IdentifierRequest}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
 
 class AllowAccessAction(
   srn: Srn,

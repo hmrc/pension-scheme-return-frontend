@@ -16,32 +16,33 @@
 
 package controllers.nonsipp.common
 
-import config.Refined.Max5000
-import controllers.actions._
-import controllers.nonsipp.common.IdentityTypeController._
-import forms.RadioListFormProvider
-import models.IdentityType.{Individual, Other, UKCompany, UKPartnership}
-import models.PointOfEntry.{NoPointOfEntry, WhoWasAssetAcquiredFromPointOfEntry}
-import models.SchemeId.Srn
-import models.{CheckMode, IdentitySubject, IdentityType, Mode, UserAnswers}
-import navigation.Navigator
-import pages.nonsipp.common.IdentityTypePage
-import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
-import pages.nonsipp.otherassetsheld.OtherAssetsCYAPointOfEntry
-import pages.nonsipp.shares.CompanyNameRelatedSharesPage
-import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.FormUtils.FormOps
-import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, RadioListRowViewModel, RadioListViewModel}
+import utils.FormUtils.FormOps
+import models.IdentityType._
+import config.Refined.Max5000
+import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
+import controllers.actions._
+import navigation.Navigator
+import forms.RadioListFormProvider
+import models._
+import play.api.data.Form
+import pages.nonsipp.shares.CompanyNameRelatedSharesPage
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import pages.nonsipp.otherassetsheld.OtherAssetsCYAPointOfEntry
+import models.PointOfEntry.{NoPointOfEntry, WhoWasAssetAcquiredFromPointOfEntry}
 import views.html.RadioListView
+import models.SchemeId.Srn
+import controllers.nonsipp.common.IdentityTypeController._
+import pages.nonsipp.common.IdentityTypePage
+import play.api.i18n.{I18nSupport, MessagesApi}
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.DisplayMessage.Message
+import viewmodels.models.{FormPageViewModel, RadioListRowViewModel, RadioListViewModel}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class IdentityTypeController @Inject()(
   override val messagesApi: MessagesApi,

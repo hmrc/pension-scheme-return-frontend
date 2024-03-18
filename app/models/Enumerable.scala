@@ -16,9 +16,9 @@
 
 package models
 
-import eu.timepit.refined.api.{Refined, Validate}
 import eu.timepit.refined.refineV
 import play.api.libs.json._
+import eu.timepit.refined.api.{Refined, Validate}
 
 trait Enumerable[A] {
 

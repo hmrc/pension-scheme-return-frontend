@@ -16,12 +16,12 @@
 
 package pages.nonsipp.common
 
-import config.Refined.Max5000
-import models.SchemeId.Srn
-import models.{ConditionalYesNo, IdentitySubject, Utr}
-import pages.QuestionPage
-import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
+import models.SchemeId.Srn
+import play.api.libs.json.JsPath
+import models.{ConditionalYesNo, IdentitySubject, Utr}
+import config.Refined.Max5000
+import pages.QuestionPage
 
 case class PartnershipRecipientUtrPage(srn: Srn, index: Max5000, identitySubject: IdentitySubject)
     extends QuestionPage[ConditionalYesNo[String, Utr]] {

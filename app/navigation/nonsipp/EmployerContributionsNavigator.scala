@@ -16,14 +16,14 @@
 
 package navigation.nonsipp
 
-import cats.implicits.toTraverseOps
-import config.Constants
-import config.Refined.Max50
-import models._
-import navigation.JourneyNavigator
-import pages.Page
 import pages.nonsipp.employercontributions._
 import play.api.mvc.Call
+import config.Constants
+import cats.implicits.toTraverseOps
+import navigation.JourneyNavigator
+import models._
+import config.Refined.Max50
+import pages.Page
 
 object EmployerContributionsNavigator extends JourneyNavigator {
 

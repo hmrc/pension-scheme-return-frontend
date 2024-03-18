@@ -16,7 +16,7 @@
 
 package pages.nonsipp.shares
 
-import models.SchemeId.Srn
 import pages.Page
+import models.SchemeId.Srn
 
 case class SharesCYAPage(srn: Srn) extends Page

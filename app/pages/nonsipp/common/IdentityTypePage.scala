@@ -16,19 +16,19 @@
 
 package pages.nonsipp.common
 
-import config.Refined.Max5000
-import models.SchemeId.Srn
-import models.{IdentitySubject, IdentityType, UserAnswers}
-import pages.QuestionPage
-import pages.nonsipp.landorproperty._
-import pages.nonsipp.loansmadeoroutstanding
-import pages.nonsipp.loansmadeoroutstanding._
-import pages.nonsipp.otherassetsheld._
-import pages.nonsipp.shares._
-import play.api.libs.json.JsPath
-import queries.Removable
-import utils.PageUtils._
 import utils.RefinedUtils.RefinedIntOps
+import utils.PageUtils._
+import queries.Removable
+import pages.nonsipp.shares._
+import pages.nonsipp.otherassetsheld._
+import models.SchemeId.Srn
+import pages.nonsipp.landorproperty._
+import models.{IdentitySubject, IdentityType, UserAnswers}
+import pages.nonsipp.loansmadeoroutstanding._
+import config.Refined.Max5000
+import pages.QuestionPage
+import pages.nonsipp.loansmadeoroutstanding
+import play.api.libs.json.JsPath
 
 import scala.util.Try
 

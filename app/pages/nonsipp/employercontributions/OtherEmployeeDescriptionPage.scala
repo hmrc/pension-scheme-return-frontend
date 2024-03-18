@@ -16,13 +16,13 @@
 
 package pages.nonsipp.employercontributions
 
-import config.Refined._
 import utils.RefinedUtils._
-import play.api.libs.json.JsPath
 import models.SchemeId.Srn
+import play.api.libs.json.JsPath
 import models.UserAnswers
-import pages.QuestionPage
 import viewmodels.models.SectionStatus
+import config.Refined._
+import pages.QuestionPage
 
 import scala.util.Try
 

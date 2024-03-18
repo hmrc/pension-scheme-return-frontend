@@ -16,25 +16,26 @@
 
 package controllers.nonsipp.otherassetsdisposal
 
+import services.SaveService
+import pages.nonsipp.otherassetsdisposal.PartnershipBuyerNamePage
+import utils.FormUtils._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Refined.{Max50, Max5000}
 import controllers.actions._
+import navigation.Navigator
 import forms.TextFormProvider
 import models.Mode
-import models.SchemeId.Srn
-import navigation.Navigator
-import pages.nonsipp.otherassetsdisposal.PartnershipBuyerNamePage
 import play.api.data.Form
+import views.html.TextInputView
+import models.SchemeId.Srn
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.FormUtils._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, TextInputViewModel}
-import views.html.TextInputView
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class PartnershipBuyerNameController @Inject()(
   override val messagesApi: MessagesApi,

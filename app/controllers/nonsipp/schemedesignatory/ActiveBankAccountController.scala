@@ -16,25 +16,26 @@
 
 package controllers.nonsipp.schemedesignatory
 
+import services.SaveService
+import pages.nonsipp.schemedesignatory.ActiveBankAccountPage
+import viewmodels.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import controllers.actions._
-import controllers.nonsipp.schemedesignatory.ActiveBankAccountController.viewModel
+import navigation.Navigator
 import forms.YesNoPageFormProvider
 import models.Mode
-import models.SchemeId.Srn
-import navigation.Navigator
-import pages.nonsipp.schemedesignatory.ActiveBankAccountPage
+import controllers.nonsipp.schemedesignatory.ActiveBankAccountController.viewModel
 import play.api.data.Form
+import views.html.YesNoPageView
+import models.SchemeId.Srn
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
-import views.html.YesNoPageView
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class ActiveBankAccountController @Inject()(
   override val messagesApi: MessagesApi,

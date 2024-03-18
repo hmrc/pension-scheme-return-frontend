@@ -16,29 +16,30 @@
 
 package controllers.nonsipp.memberdetails
 
-import cats.implicits.{toShow, toTraverseOps}
+import services.{PsrSubmissionService, SaveService}
+import controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController._
+import pages.nonsipp.memberdetails._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import com.google.inject.Inject
 import config.Refined.Max300
 import controllers.PSRController
+import cats.implicits.{toShow, toTraverseOps}
 import controllers.actions._
-import controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController._
-import models.SchemeId.Srn
-import models.{CheckMode, CheckOrChange, NameDOB, NormalMode}
-import navigation.Navigator
-import pages.nonsipp.memberdetails._
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.{PsrSubmissionService, SaveService}
+import viewmodels.implicits._
+import utils.MessageUtils.booleanToMessage
+import views.html.CheckYourAnswersView
+import models.SchemeId.Srn
+import navigation.Navigator
 import uk.gov.hmrc.domain.Nino
 import utils.DateTimeUtils.localDateShow
-import utils.MessageUtils.booleanToMessage
+import models._
 import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
 import viewmodels.models._
-import views.html.CheckYourAnswersView
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.Named
-import scala.concurrent.{ExecutionContext, Future}
 
 class SchemeMemberDetailsAnswersController @Inject()(
   override val messagesApi: MessagesApi,

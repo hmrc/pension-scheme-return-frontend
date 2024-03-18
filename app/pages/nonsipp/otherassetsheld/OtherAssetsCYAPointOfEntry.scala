@@ -16,12 +16,12 @@
 
 package pages.nonsipp.otherassetsheld
 
-import config.Refined.Max5000
-import models.PointOfEntry
-import models.SchemeId.Srn
-import pages.QuestionPage
-import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
+import models.SchemeId.Srn
+import play.api.libs.json.JsPath
+import models.PointOfEntry
+import config.Refined.Max5000
+import pages.QuestionPage
 
 case class OtherAssetsCYAPointOfEntry(srn: Srn, index: Max5000) extends QuestionPage[PointOfEntry] {
 

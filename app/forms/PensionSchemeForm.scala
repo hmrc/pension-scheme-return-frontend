@@ -17,8 +17,8 @@
 package forms
 
 import forms.mappings.Mappings
-import play.api.data.Form
 import play.api.data.validation.Constraint
+import play.api.data.Form
 
 import javax.inject.Inject
 

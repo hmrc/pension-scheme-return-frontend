@@ -16,9 +16,9 @@
 
 package viewmodels
 
-import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.Key
+import play.api.i18n.Messages
 import viewmodels.DisplayMessage.Message
 
 import scala.language.implicitConversions

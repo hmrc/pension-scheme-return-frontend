@@ -16,14 +16,12 @@
 
 package pages.nonsipp.receivetransfer
 
-import config.Refined._
 import utils.RefinedUtils._
-
-import play.api.libs.json.JsPath
 import models.SchemeId.Srn
-import pages.QuestionPage
-
+import play.api.libs.json.JsPath
 import models.Money
+import config.Refined._
+import pages.QuestionPage
 
 case class TotalValueTransferPage(srn: Srn, index: Max300, secondaryIndex: Max5) extends QuestionPage[Money] {
 

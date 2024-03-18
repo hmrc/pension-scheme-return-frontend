@@ -16,28 +16,29 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
+import services.SaveService
+import viewmodels.implicits._
+import utils.FormUtils.FormOps
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Refined.Max5000
 import controllers.actions._
-import forms.RadioListFormProvider
-import models.SchemeId.Srn
-import models.requests.DataRequest
-import models.{IdentitySubject, IdentityType, Mode, SponsoringOrConnectedParty}
 import navigation.Navigator
+import forms.RadioListFormProvider
+import models._
 import pages.nonsipp.common.{IdentityTypePage, OtherRecipientDetailsPage}
 import pages.nonsipp.loansmadeoroutstanding._
-import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.FormUtils.FormOps
-import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
-import viewmodels.models._
 import views.html.RadioListView
+import models.SchemeId.Srn
+import play.api.i18n.{I18nSupport, MessagesApi}
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.DisplayMessage.Message
+import viewmodels.models._
+import models.requests.DataRequest
+import play.api.data.Form
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class RecipientSponsoringEmployerConnectedPartyController @Inject()(
   override val messagesApi: MessagesApi,
@@ -51,7 +52,7 @@ class RecipientSponsoringEmployerConnectedPartyController @Inject()(
     extends FrontendBaseController
     with I18nSupport {
 
-  val form = RecipientSponsoringEmployerConnectedPartyController.form(formProvider)
+  val form: Form[SponsoringOrConnectedParty] = RecipientSponsoringEmployerConnectedPartyController.form(formProvider)
 
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>

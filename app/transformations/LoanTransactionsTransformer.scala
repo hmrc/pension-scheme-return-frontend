@@ -16,36 +16,25 @@
 
 package transformations
 
-import cats.implicits.{catsSyntaxTuple2Semigroupal, catsSyntaxTuple3Semigroupal}
-import com.google.inject.Singleton
-import config.Refined.OneTo5000
-import eu.timepit.refined.refineV
 import models.ConditionalYesNo._
+import com.google.inject.Singleton
 import models.IdentityType.reads
-import models.RecipientDetails.format
+import config.Refined.OneTo5000
 import models.SchemeId.Srn
-import models.SponsoringOrConnectedParty.ConnectedParty
-import models.requests.DataRequest
+import cats.implicits.{catsSyntaxTuple2Semigroupal, catsSyntaxTuple3Semigroupal}
 import models.requests.psr._
-import models.{
-  ConditionalYesNo,
-  Crn,
-  IdentitySubject,
-  IdentityType,
-  Money,
-  Percentage,
-  RecipientDetails,
-  Security,
-  SponsoringOrConnectedParty,
-  UserAnswers,
-  Utr
-}
+import uk.gov.hmrc.domain.Nino
+import models._
 import pages.nonsipp.common._
 import pages.nonsipp.loansmadeoroutstanding._
-import uk.gov.hmrc.domain.Nino
+import models.RecipientDetails.format
+import eu.timepit.refined.refineV
+import models.SponsoringOrConnectedParty.ConnectedParty
+import models.requests.DataRequest
+
+import scala.util.Try
 
 import javax.inject.Inject
-import scala.util.Try
 
 @Singleton()
 class LoanTransactionsTransformer @Inject() extends Transformer {

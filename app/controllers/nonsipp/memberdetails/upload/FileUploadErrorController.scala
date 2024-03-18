@@ -16,24 +16,25 @@
 
 package controllers.nonsipp.memberdetails.upload
 
+import services.UploadService
+import viewmodels.implicits._
+import play.api.mvc._
 import controllers.actions._
 import controllers.nonsipp.memberdetails.upload.FileUploadErrorController._
-import models.SchemeId.Srn
-import models.requests.DataRequest
-import models.{Mode, UploadError, UploadErrors, UploadFormatError, UploadKey, UploadMaxRowsError}
 import navigation.Navigator
 import pages.nonsipp.memberdetails.upload.FileUploadErrorPage
+import models._
+import models.requests.DataRequest
+import views.html.ContentPageView
+import models.SchemeId.Srn
 import play.api.i18n._
-import play.api.mvc._
-import services.UploadService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage._
-import viewmodels.implicits._
 import viewmodels.models.{ContentPageViewModel, FormPageViewModel}
-import views.html.ContentPageView
+
+import scala.concurrent.ExecutionContext
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.ExecutionContext
 
 class FileUploadErrorController @Inject()(
   override val messagesApi: MessagesApi,

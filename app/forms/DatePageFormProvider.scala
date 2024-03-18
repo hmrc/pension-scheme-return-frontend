@@ -17,9 +17,9 @@
 package forms
 
 import forms.mappings.Mappings
-import forms.mappings.errors.DateFormErrors
-import play.api.data.Form
 import play.api.data.Forms.mapping
+import play.api.data.Form
+import forms.mappings.errors.DateFormErrors
 
 import java.time.LocalDate
 import javax.inject.Inject

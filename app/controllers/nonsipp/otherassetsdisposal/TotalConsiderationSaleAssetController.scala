@@ -16,27 +16,28 @@
 
 package controllers.nonsipp.otherassetsdisposal
 
-import config.Constants.{maxTotalConsiderationAmount, minTotalConsiderationAmount}
-import config.Refined.{Max50, Max5000}
-import controllers.PSRController
-import controllers.actions.IdentifyAndRequireData
-import controllers.nonsipp.otherassetsdisposal.TotalConsiderationSaleAssetController._
-import forms.mappings.errors.{MoneyFormErrorProvider, MoneyFormErrors}
-import models.SchemeId.Srn
-import models.{Mode, Money}
-import navigation.Navigator
-import pages.nonsipp.otherassetsdisposal.TotalConsiderationSaleAssetPage
-import play.api.data.Form
-import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
-import viewmodels.DisplayMessage.{Empty, Message}
+import pages.nonsipp.otherassetsdisposal.TotalConsiderationSaleAssetPage
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import controllers.PSRController
+import config.Constants.{maxTotalConsiderationAmount, minTotalConsiderationAmount}
+import controllers.actions.IdentifyAndRequireData
+import navigation.Navigator
+import controllers.nonsipp.otherassetsdisposal.TotalConsiderationSaleAssetController._
+import models.{Mode, Money}
+import play.api.i18n.MessagesApi
+import play.api.data.Form
+import forms.mappings.errors.{MoneyFormErrorProvider, MoneyFormErrors}
+import config.Refined.{Max50, Max5000}
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
-import viewmodels.models.{FormPageViewModel, QuestionField}
 import views.html.MoneyView
+import models.SchemeId.Srn
+import viewmodels.DisplayMessage.{Empty, Message}
+import viewmodels.models.{FormPageViewModel, QuestionField}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class TotalConsiderationSaleAssetController @Inject()(
   override val messagesApi: MessagesApi,

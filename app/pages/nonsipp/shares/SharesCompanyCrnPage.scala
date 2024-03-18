@@ -16,12 +16,12 @@
 
 package pages.nonsipp.shares
 
-import config.Refined.Max5000
-import models.{ConditionalYesNo, Crn}
-import models.SchemeId.Srn
-import pages.QuestionPage
-import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
+import models.SchemeId.Srn
+import play.api.libs.json.JsPath
+import models.{ConditionalYesNo, Crn}
+import config.Refined.Max5000
+import pages.QuestionPage
 
 case class SharesCompanyCrnPage(srn: Srn, index: Max5000) extends QuestionPage[ConditionalYesNo[String, Crn]] {
 

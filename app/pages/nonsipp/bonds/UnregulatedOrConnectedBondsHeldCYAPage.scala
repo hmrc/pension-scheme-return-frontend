@@ -16,7 +16,7 @@
 
 package pages.nonsipp.bonds
 
-import models.SchemeId.Srn
 import pages.Page
+import models.SchemeId.Srn
 
 case class UnregulatedOrConnectedBondsHeldCYAPage(srn: Srn) extends Page

@@ -16,26 +16,27 @@
 
 package services
 
-import cats.implicits._
+import pages.nonsipp.bonds.UnregulatedOrConnectedBondsHeldPage
+import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
 import connectors.PSRConnector
 import models.SchemeId.Srn
+import pages.nonsipp.landorproperty.LandOrPropertyHeldPage
+import cats.implicits._
+import transformations._
+import pages.nonsipp.sharesdisposal.SharesDisposalPage
+import pages.nonsipp.CheckReturnDatesPage
+import uk.gov.hmrc.http.HeaderCarrier
 import models.UserAnswers
+import pages.nonsipp.loansmadeoroutstanding._
 import models.requests.DataRequest
 import models.requests.psr._
-import pages.nonsipp.CheckReturnDatesPage
-import pages.nonsipp.bondsdisposal.BondsDisposalPage
-import pages.nonsipp.landorproperty.LandOrPropertyHeldPage
 import pages.nonsipp.landorpropertydisposal.LandOrPropertyDisposalPage
-import pages.nonsipp.loansmadeoroutstanding._
 import pages.nonsipp.moneyborrowed.MoneyBorrowedPage
-import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
-import pages.nonsipp.sharesdisposal.SharesDisposalPage
-import pages.nonsipp.bonds.UnregulatedOrConnectedBondsHeldPage
-import transformations._
-import uk.gov.hmrc.http.HeaderCarrier
+import pages.nonsipp.bondsdisposal.BondsDisposalPage
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
 
 class PsrSubmissionService @Inject()(
   psrConnector: PSRConnector,

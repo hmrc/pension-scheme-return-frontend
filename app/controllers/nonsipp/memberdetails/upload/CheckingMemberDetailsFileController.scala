@@ -16,24 +16,25 @@
 
 package controllers.nonsipp.memberdetails.upload
 
-import controllers.actions._
-import controllers.nonsipp.memberdetails.upload.CheckingMemberDetailsFileController._
-import models.SchemeId.Srn
-import models.requests.DataRequest
-import models.{Mode, UploadError, UploadKey, UploadSuccess}
-import navigation.Navigator
-import pages.CheckingMemberDetailsFilePage
-import play.api.i18n._
-import play.api.mvc._
 import services.UploadService
+import viewmodels.implicits._
+import play.api.mvc._
+import pages.CheckingMemberDetailsFilePage
+import controllers.actions._
+import navigation.Navigator
+import models.requests.DataRequest
+import views.html.ContentPageView
+import models.SchemeId.Srn
+import models._
+import controllers.nonsipp.memberdetails.upload.CheckingMemberDetailsFileController._
+import play.api.i18n._
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage._
-import viewmodels.implicits._
 import viewmodels.models.{ContentPageViewModel, FormPageViewModel}
-import views.html.ContentPageView
+
+import scala.concurrent.ExecutionContext
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.ExecutionContext
 
 class CheckingMemberDetailsFileController @Inject()(
   override val messagesApi: MessagesApi,

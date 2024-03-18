@@ -16,20 +16,21 @@
 
 package connectors
 
+import uk.gov.hmrc.http.HttpReads.Implicits.{readFromJson, readOptionOfNotFound}
 import com.google.inject.ImplementedBy
 import config.FrontendAppConfig
-import models.PensionSchemeId.{PsaId, PspId}
 import models.SchemeId.Srn
-import models.{ListMinimalSchemeDetails, SchemeDetails, SchemeId}
-import play.api.Logger
-import play.api.http.Status.NOT_FOUND
-import uk.gov.hmrc.http.HttpReads.Implicits.{readFromJson, readOptionOfNotFound}
 import uk.gov.hmrc.http.UpstreamErrorResponse.WithStatusCode
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import models.PensionSchemeId.{PsaId, PspId}
+import play.api.Logger
+import models.{ListMinimalSchemeDetails, SchemeDetails, SchemeId}
 import utils.FutureUtils.FutureOps
+import play.api.http.Status.NOT_FOUND
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
 
 class SchemeDetailsConnectorImpl @Inject()(appConfig: FrontendAppConfig, http: HttpClient)
     extends SchemeDetailsConnector {

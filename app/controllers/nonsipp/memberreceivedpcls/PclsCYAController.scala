@@ -16,25 +16,26 @@
 
 package controllers.nonsipp.memberreceivedpcls
 
+import services.PsrSubmissionService
+import pages.nonsipp.memberdetails.MemberDetailsPage
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Refined._
 import controllers.PSRController
-import controllers.actions._
 import controllers.nonsipp.memberreceivedpcls.PclsCYAController._
-import models.SchemeId.Srn
-import models._
+import controllers.actions._
 import navigation.Navigator
-import pages.nonsipp.memberdetails.MemberDetailsPage
-import pages.nonsipp.memberreceivedpcls.{PclsCYAPage, PensionCommencementLumpSumAmountPage}
+import models._
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.PsrSubmissionService
-import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
-import viewmodels.models._
+import pages.nonsipp.memberreceivedpcls.{PclsCYAPage, PensionCommencementLumpSumAmountPage}
 import views.html.CheckYourAnswersView
+import models.SchemeId.Srn
+import viewmodels.DisplayMessage.Message
+import viewmodels.models._
+
+import scala.concurrent.ExecutionContext
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.ExecutionContext
 
 class PclsCYAController @Inject()(
   override val messagesApi: MessagesApi,

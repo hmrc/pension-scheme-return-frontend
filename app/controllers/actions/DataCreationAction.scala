@@ -16,13 +16,14 @@
 
 package controllers.actions
 
-import models.UserAnswers
-import models.requests.{DataRequest, OptionalDataRequest}
 import play.api.mvc.ActionTransformer
 import repositories.SessionRepository
+import models.UserAnswers
+import models.requests.{DataRequest, OptionalDataRequest}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
 
 class DataCreationActionImpl @Inject()(sessionRepository: SessionRepository)(
   implicit val executionContext: ExecutionContext

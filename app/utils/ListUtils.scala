@@ -16,9 +16,9 @@
 
 package utils
 
-import eu.timepit.refined.api.{Refined, Validate}
 import eu.timepit.refined.refineV
 import viewmodels.DisplayMessage.Message
+import eu.timepit.refined.api.{Refined, Validate}
 
 object ListUtils {
 

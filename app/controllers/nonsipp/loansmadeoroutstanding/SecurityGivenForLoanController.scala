@@ -16,27 +16,29 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
+import services.SaveService
+import viewmodels.implicits._
+import models.ConditionalYesNo._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import forms.mappings.Mappings
 import config.Refined.Max5000
 import controllers.actions._
-import controllers.nonsipp.loansmadeoroutstanding.SecurityGivenForLoanController._
-import forms.YesNoPageFormProvider
-import forms.mappings.Mappings
-import models.ConditionalYesNo._
-import models.SchemeId.Srn
-import models.{ConditionalYesNo, Mode, Security}
 import navigation.Navigator
+import forms.YesNoPageFormProvider
+import models.{ConditionalYesNo, Mode, Security}
 import pages.nonsipp.loansmadeoroutstanding.SecurityGivenForLoanPage
+import controllers.nonsipp.loansmadeoroutstanding.SecurityGivenForLoanController._
+import views.html.ConditionalYesNoPageView
+import models.SchemeId.Srn
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
-import viewmodels.models.{ConditionalYesNoPageViewModel, FieldType, FormPageViewModel, YesNoViewModel}
-import views.html.ConditionalYesNoPageView
+import viewmodels.models._
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
+import play.api.data.Form
 
 class SecurityGivenForLoanController @Inject()(
   override val messagesApi: MessagesApi,
@@ -81,7 +83,7 @@ class SecurityGivenForLoanController @Inject()(
 }
 
 object SecurityGivenForLoanController {
-  def form(formProvider: YesNoPageFormProvider) = formProvider.conditionalYes[Security](
+  def form(formProvider: YesNoPageFormProvider): Form[Either[Unit,Security]] = formProvider.conditionalYes[Security](
     "securityGivenForLoan.securityGiven.error.required",
     mappingYes = Mappings
       .security(

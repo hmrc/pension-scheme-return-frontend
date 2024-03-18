@@ -16,29 +16,30 @@
 
 package controllers.nonsipp.otherassetsheld
 
+import services.SaveService
+import viewmodels.implicits._
+import utils.FormUtils.FormOps
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Refined.Max5000
-import controllers.PSRController
 import controllers.actions._
-import controllers.nonsipp.otherassetsheld.WhyDoesSchemeHoldAssetsController._
+import navigation.Navigator
 import forms.RadioListFormProvider
+import play.api.i18n.MessagesApi
+import play.api.data.Form
+import pages.nonsipp.otherassetsheld.{OtherAssetsCYAPointOfEntry, WhyDoesSchemeHoldAssetsPage}
 import models.PointOfEntry._
-import models.SchemeHoldAsset._
+import controllers.nonsipp.otherassetsheld.WhyDoesSchemeHoldAssetsController._
+import controllers.PSRController
+import views.html.RadioListView
 import models.SchemeId.Srn
 import models.{Mode, NormalMode, SchemeHoldAsset}
-import navigation.Navigator
-import pages.nonsipp.otherassetsheld.{OtherAssetsCYAPointOfEntry, WhyDoesSchemeHoldAssetsPage}
-import play.api.data.Form
-import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
-import utils.FormUtils.FormOps
+import models.SchemeHoldAsset._
 import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, RadioListRowViewModel, RadioListViewModel}
-import views.html.RadioListView
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class WhyDoesSchemeHoldAssetsController @Inject()(
   override val messagesApi: MessagesApi,

@@ -16,22 +16,17 @@
 
 package navigation.nonsipp
 
+import pages.nonsipp.schemedesignatory._
+import play.api.mvc.Call
 import com.google.inject.Singleton
+import pages.Page
 import controllers.nonsipp
 import controllers.nonsipp.routes
 import eu.timepit.refined.refineMV
 import models.PensionSchemeId.{PsaId, PspId}
 import models.{CheckMode, NormalMode, UserAnswers}
-import navigation.{JourneyNavigator, Navigator}
-import pages.Page
 import pages.nonsipp._
-import pages.nonsipp.schemedesignatory.{
-  FinancialDetailsCheckYourAnswersPage,
-  HowManyMembersPage,
-  HowMuchCashPage,
-  ValueOfAssetsPage
-}
-import play.api.mvc.Call
+import navigation.{JourneyNavigator, Navigator}
 
 import javax.inject.Inject
 

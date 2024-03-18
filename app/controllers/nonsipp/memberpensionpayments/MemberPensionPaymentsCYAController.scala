@@ -16,25 +16,26 @@
 
 package controllers.nonsipp.memberpensionpayments
 
+import services.PsrSubmissionService
+import viewmodels.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import controllers.nonsipp.memberpensionpayments.MemberPensionPaymentsCYAController._
 import config.Refined.Max300
 import controllers.PSRController
-import controllers.actions.IdentifyAndRequireData
-import controllers.nonsipp.memberpensionpayments.MemberPensionPaymentsCYAController._
-import models.SchemeId.Srn
-import models.{CheckMode, Mode, Money, NormalMode}
 import navigation.Navigator
-import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
-import pages.nonsipp.memberpensionpayments.{MemberPensionPaymentsCYAPage, TotalAmountPensionPaymentsPage}
-import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.PsrSubmissionService
-import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
-import viewmodels.models._
+import models._
 import views.html.CheckYourAnswersView
+import models.SchemeId.Srn
+import pages.nonsipp.memberpensionpayments.{MemberPensionPaymentsCYAPage, TotalAmountPensionPaymentsPage}
+import controllers.actions.IdentifyAndRequireData
+import play.api.i18n.MessagesApi
+import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
+import viewmodels.DisplayMessage.Message
+import viewmodels.models._
+
+import scala.concurrent.ExecutionContext
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.ExecutionContext
 
 class MemberPensionPaymentsCYAController @Inject()(
   override val messagesApi: MessagesApi,

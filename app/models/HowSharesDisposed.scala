@@ -16,10 +16,10 @@
 
 package models
 
-import play.api.libs.functional.syntax._
-import play.api.libs.json._
-import play.api.mvc.JavascriptLiteral
 import utils.WithName
+import play.api.mvc.JavascriptLiteral
+import play.api.libs.json._
+import play.api.libs.functional.syntax._
 
 object HowSharesDisposed {
 

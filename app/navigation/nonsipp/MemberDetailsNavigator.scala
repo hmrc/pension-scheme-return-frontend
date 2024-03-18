@@ -16,19 +16,19 @@
 
 package navigation.nonsipp
 
-import config.Refined.OneTo300
+import pages.nonsipp.memberdetails._
+import play.api.mvc.Call
+import models.ManualOrUpload.{Manual, Upload}
 import controllers.nonsipp.memberdetails.routes
 import eu.timepit.refined.refineV
-import models.CheckOrChange.Check
-import models.ManualOrUpload.{Manual, Upload}
+import pages.nonsipp.memberdetails.upload.{FileUploadErrorPage, FileUploadSuccessPage}
 import models._
-import navigation.JourneyNavigator
+import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
+import models.CheckOrChange.Check
+import config.Refined.OneTo300
 import pages._
 import pages.nonsipp.BasicDetailsCheckYourAnswersPage
-import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
-import pages.nonsipp.memberdetails._
-import pages.nonsipp.memberdetails.upload.{FileUploadErrorPage, FileUploadSuccessPage}
-import play.api.mvc.Call
+import navigation.JourneyNavigator
 
 object MemberDetailsNavigator extends JourneyNavigator {
 

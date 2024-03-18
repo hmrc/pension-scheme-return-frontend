@@ -16,31 +16,32 @@
 
 package controllers.nonsipp.receivetransfer
 
+import services.SaveService
+import pages.nonsipp.memberdetails.MemberDetailsPage
+import viewmodels.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Refined._
 import controllers.PSRController
-import controllers.actions._
-import controllers.nonsipp.receivetransfer.DidTransferIncludeAssetController._
-import forms.YesNoPageFormProvider
-import models.Mode
-import models.SchemeId.Srn
-import navigation.Navigator
-import pages.nonsipp.memberdetails.MemberDetailsPage
 import pages.nonsipp.receivetransfer.{
   DidTransferIncludeAssetPage,
   TransferringSchemeNamePage,
   TransfersInSectionCompleted
 }
-import play.api.data.Form
+import navigation.Navigator
+import forms.YesNoPageFormProvider
+import models.Mode
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
-import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, SectionCompleted, YesNoPageViewModel}
+import play.api.data.Form
 import views.html.YesNoPageView
+import models.SchemeId.Srn
+import controllers.actions._
+import controllers.nonsipp.receivetransfer.DidTransferIncludeAssetController._
+import viewmodels.DisplayMessage.Message
+import viewmodels.models.{FormPageViewModel, SectionCompleted, YesNoPageViewModel}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class DidTransferIncludeAssetController @Inject()(
   override val messagesApi: MessagesApi,

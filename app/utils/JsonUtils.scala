@@ -18,8 +18,8 @@ package utils
 
 import cats.data.NonEmptyList
 import cats.syntax.either._
-import play.api.libs.functional.syntax._
 import play.api.libs.json._
+import play.api.libs.functional.syntax._
 
 object JsonUtils {
   implicit def nelWrites[A: Writes]: Writes[NonEmptyList[A]] = Writes(nel => Json.toJson(nel.toList))

@@ -16,27 +16,28 @@
 
 package controllers.nonsipp.landorpropertydisposal
 
+import services.SaveService
+import viewmodels.implicits._
+import play.api.mvc._
+import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalBuyerConnectedPartyController._
 import config.Refined.{Max50, Max5000}
 import controllers.PSRController
-import controllers.actions._
-import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalBuyerConnectedPartyController._
-import forms.YesNoPageFormProvider
-import models.SchemeId.Srn
-import models.requests.DataRequest
-import models.{IdentityType, Mode}
-import navigation.Navigator
 import pages.nonsipp.landorpropertydisposal._
-import play.api.data.Form
+import controllers.actions._
+import navigation.Navigator
+import forms.YesNoPageFormProvider
+import models.{IdentityType, Mode}
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import services.SaveService
-import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 import views.html.YesNoPageView
+import models.SchemeId.Srn
+import viewmodels.DisplayMessage.Message
+import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
+import models.requests.DataRequest
+import play.api.data.Form
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class LandOrPropertyDisposalBuyerConnectedPartyController @Inject()(
   override val messagesApi: MessagesApi,

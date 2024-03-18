@@ -16,11 +16,11 @@
 
 package navigation.nonsipp
 
-import models.UserAnswers
-import navigation.JourneyNavigator
-import pages.Page
 import pages.nonsipp.totalvaluequotedshares._
 import play.api.mvc.Call
+import pages.Page
+import navigation.JourneyNavigator
+import models.UserAnswers
 
 object TotalValueQuotedSharesNavigator extends JourneyNavigator {
 

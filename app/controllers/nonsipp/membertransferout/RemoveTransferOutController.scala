@@ -16,31 +16,27 @@
 
 package controllers.nonsipp.membertransferout
 
+import services.{PsrSubmissionService, SaveService}
+import pages.nonsipp.memberdetails.MemberDetailsPage
+import viewmodels.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Refined.{Max300, Max5}
 import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
+import navigation.Navigator
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import models.SchemeId.Srn
-import navigation.Navigator
-import pages.nonsipp.memberdetails.MemberDetailsPage
-import pages.nonsipp.membertransferout.{
-  transferOutPages,
-  ReceivingSchemeNamePage,
-  RemoveTransferOutPage,
-  TransfersOutJourneyStatus
-}
 import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.{PsrSubmissionService, SaveService}
-import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, SectionStatus, YesNoPageViewModel}
 import views.html.YesNoPageView
+import models.SchemeId.Srn
+import pages.nonsipp.membertransferout._
+import play.api.i18n.{I18nSupport, MessagesApi}
+import viewmodels.DisplayMessage.Message
+import viewmodels.models.{FormPageViewModel, SectionStatus, YesNoPageViewModel}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class RemoveTransferOutController @Inject()(
   override val messagesApi: MessagesApi,

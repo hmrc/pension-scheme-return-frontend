@@ -16,32 +16,28 @@
 
 package controllers.nonsipp.receivetransfer
 
+import services.{PsrSubmissionService, SaveService}
+import pages.nonsipp.memberdetails.MemberDetailsPage
+import viewmodels.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Refined.{Max300, Max5}
 import controllers.PSRController
+import pages.nonsipp.receivetransfer._
 import controllers.actions._
-import controllers.nonsipp.receivetransfer.RemoveTransferInController._
-import forms.YesNoPageFormProvider
-import models.NormalMode
-import models.SchemeId.Srn
 import navigation.Navigator
-import pages.nonsipp.memberdetails.MemberDetailsPage
-import pages.nonsipp.receivetransfer.{
-  transferInPages,
-  RemoveTransferInPage,
-  TransferringSchemeNamePage,
-  TransfersInJourneyStatus
-}
-import play.api.data.Form
+import forms.YesNoPageFormProvider
+import controllers.nonsipp.receivetransfer.RemoveTransferInController._
+import models.NormalMode
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.{PsrSubmissionService, SaveService}
-import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, SectionStatus, YesNoPageViewModel}
+import play.api.data.Form
 import views.html.YesNoPageView
+import models.SchemeId.Srn
+import viewmodels.DisplayMessage.Message
+import viewmodels.models.{FormPageViewModel, SectionStatus, YesNoPageViewModel}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class RemoveTransferInController @Inject()(
   override val messagesApi: MessagesApi,

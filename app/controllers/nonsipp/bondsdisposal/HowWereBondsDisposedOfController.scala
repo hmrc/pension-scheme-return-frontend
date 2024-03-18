@@ -16,31 +16,32 @@
 
 package controllers.nonsipp.bondsdisposal
 
+import controllers.nonsipp.bondsdisposal.HowWereBondsDisposedOfController._
+import services.SaveService
+import viewmodels.implicits._
 import config.Refined.{Max50, Max5000}
 import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
-import controllers.nonsipp.bondsdisposal.HowWereBondsDisposedOfController._
+import navigation.Navigator
 import forms.RadioListFormProvider
-import forms.mappings.Mappings
+import models._
+import play.api.data.Form
 import forms.mappings.errors.InputFormErrors
 import models.GenericFormMapper.ConditionalRadioMapper
-import models.HowDisposed._
-import models.PointOfEntry.{HowWereBondsDisposedPointOfEntry, NoPointOfEntry}
-import models.SchemeId.Srn
-import models.{CheckMode, ConditionalRadioMapper, HowDisposed, Mode}
-import navigation.Navigator
-import pages.nonsipp.bondsdisposal.{BondsDisposalCYAPointOfEntry, HowWereBondsDisposedOfPage}
-import play.api.data.Form
-import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
-import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
-import viewmodels.models._
+import forms.mappings.Mappings
+import models.PointOfEntry.{HowWereBondsDisposedPointOfEntry, NoPointOfEntry}
+import models.HowDisposed._
 import views.html.RadioListView
+import models.SchemeId.Srn
+import play.api.i18n.MessagesApi
+import pages.nonsipp.bondsdisposal.{BondsDisposalCYAPointOfEntry, HowWereBondsDisposedOfPage}
+import viewmodels.DisplayMessage.Message
+import viewmodels.models._
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class HowWereBondsDisposedOfController @Inject()(
   override val messagesApi: MessagesApi,

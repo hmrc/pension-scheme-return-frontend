@@ -16,28 +16,23 @@
 
 package controllers.nonsipp.memberpayments
 
+import services.PsrSubmissionService
+import viewmodels.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
-import models.{CheckMode, CheckOrChange, Mode, Money, NormalMode}
-import models.SchemeId.Srn
 import navigation.Navigator
-import pages.nonsipp.memberpayments.{UnallocatedContributionCYAPage, UnallocatedEmployerAmountPage}
+import models._
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.PsrSubmissionService
-import viewmodels.DisplayMessage.Message
-import viewmodels.models.{
-  CheckYourAnswersRowViewModel,
-  CheckYourAnswersSection,
-  CheckYourAnswersViewModel,
-  FormPageViewModel,
-  SummaryAction
-}
 import views.html.CYAWithRemove
-import viewmodels.implicits._
+import models.SchemeId.Srn
+import pages.nonsipp.memberpayments.{UnallocatedContributionCYAPage, UnallocatedEmployerAmountPage}
+import viewmodels.DisplayMessage.Message
+import viewmodels.models._
+
+import scala.concurrent.ExecutionContext
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.ExecutionContext
 
 class UnallocatedContributionCYAController @Inject()(
   override val messagesApi: MessagesApi,

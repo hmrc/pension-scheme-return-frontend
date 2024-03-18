@@ -16,34 +16,35 @@
 
 package controllers.nonsipp
 
-import cats.data.NonEmptyList
+import services.{AuditService, PsrSubmissionService, SchemeDateService}
+import viewmodels.implicits._
+import play.api.mvc._
+import utils.ListUtils.ListOps
+import config.Refined.Max3
+import controllers.{nonsipp, PSRController}
 import cats.implicits.toShow
 import config.Constants.{PSA, PSP}
-import config.Refined.Max3
 import controllers.actions._
 import controllers.nonsipp.BasicDetailsCheckYourAnswersController._
-import controllers.{nonsipp, PSRController}
-import models.SchemeId.Srn
-import models.audit.PSRStartAuditEvent
 import models.requests.DataRequest
-import models.{CheckMode, DateRange, Mode, NormalMode, SchemeDetails, SchemeMemberNumbers}
-import navigation.Navigator
+import models.audit.PSRStartAuditEvent
 import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, HowManyMembersPage, WhyNoBankAccountPage}
-import pages.nonsipp.{BasicDetailsCheckYourAnswersPage, WhichTaxYearPage}
-import play.api.i18n._
-import play.api.mvc._
-import services.{AuditService, PsrSubmissionService, SchemeDateService}
-import utils.DateTimeUtils.localDateShow
-import utils.ListUtils.ListOps
-import viewmodels.DisplayMessage._
-import viewmodels.Margin
-import viewmodels.implicits._
-import viewmodels.models._
+import cats.data.NonEmptyList
 import views.html.CheckYourAnswersView
+import models.SchemeId.Srn
+import pages.nonsipp.{BasicDetailsCheckYourAnswersPage, WhichTaxYearPage}
+import navigation.Navigator
+import utils.DateTimeUtils.localDateShow
+import models._
+import play.api.i18n._
+import viewmodels.Margin
+import viewmodels.DisplayMessage._
+import viewmodels.models._
+
+import scala.concurrent.ExecutionContext
 
 import java.time.LocalDate
 import javax.inject.{Inject, Named}
-import scala.concurrent.ExecutionContext
 
 class BasicDetailsCheckYourAnswersController @Inject()(
   override val messagesApi: MessagesApi,

@@ -16,41 +16,37 @@
 
 package transformations
 
-import cats.syntax.traverse._
+import pages.nonsipp.memberdetails._
 import com.google.inject.Singleton
 import config.Refined.{Max300, Max50}
 import models.SchemeId.Srn
-import models.UserAnswers.implicits._
-import models.requests.psr._
-import models.{ConditionalYesNo, Crn, IdentityType, Money, NameDOB, PensionCommencementLumpSum, UserAnswers, Utr}
+import pages.nonsipp.receivetransfer.TransfersInJourneyStatus
+import pages.nonsipp.memberpensionpayments._
+import uk.gov.hmrc.domain.Nino
+import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsJourneyStatus, SurrenderedBenefitsPage}
+import models._
+import cats.syntax.traverse._
 import pages.nonsipp.employercontributions._
 import pages.nonsipp.membercontributions.{
   MemberContributionsListPage,
   MemberContributionsPage,
   TotalMemberContributionPage
 }
-import pages.nonsipp.memberdetails.MembersDetailsPages._
-import pages.nonsipp.memberdetails._
-import pages.nonsipp.memberpayments.{UnallocatedEmployerAmountPage, UnallocatedEmployerContributionsPage}
-import pages.nonsipp.memberpensionpayments.{
-  MemberPensionPaymentsListPage,
-  PensionPaymentsJourneyStatus,
-  PensionPaymentsReceivedPage,
-  TotalAmountPensionPaymentsPage
-}
 import pages.nonsipp.memberreceivedpcls.{
   PclsMemberListPage,
   PensionCommencementLumpSumAmountPage,
   PensionCommencementLumpSumPage
 }
-import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsJourneyStatus, SurrenderedBenefitsPage}
+import models.requests.psr._
+import models.UserAnswers.implicits._
 import pages.nonsipp.membertransferout.TransfersOutJourneyStatus
-import pages.nonsipp.receivetransfer.TransfersInJourneyStatus
-import uk.gov.hmrc.domain.Nino
-import viewmodels.models.{MemberState, SectionCompleted, SectionJourneyStatus, SectionStatus}
+import pages.nonsipp.memberdetails.MembersDetailsPages._
+import pages.nonsipp.memberpayments.{UnallocatedEmployerAmountPage, UnallocatedEmployerContributionsPage}
+import viewmodels.models._
+
+import scala.util.Try
 
 import javax.inject.Inject
-import scala.util.Try
 
 @Singleton()
 class MemberPaymentsTransformer @Inject()(

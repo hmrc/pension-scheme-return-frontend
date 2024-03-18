@@ -16,7 +16,7 @@
 
 package pages.nonsipp.membercontributions
 
-import models.SchemeId.Srn
 import pages.Page
+import models.SchemeId.Srn
 
 case class MemberContributionsCYAPage(srn: Srn) extends Page

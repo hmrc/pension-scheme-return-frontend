@@ -16,32 +16,33 @@
 
 package controllers.nonsipp.employercontributions
 
-import cats.data.EitherT
-import cats.implicits.{catsSyntaxApplicativeId, toTraverseOps}
-import config.Constants
+import pages.nonsipp.memberdetails.MemberDetailsPage
+import viewmodels.implicits._
+import play.api.mvc._
 import config.Refined._
 import controllers.PSRController
+import config.Constants
+import cats.implicits.{catsSyntaxApplicativeId, toTraverseOps}
 import controllers.actions._
-import controllers.nonsipp.employercontributions.EmployerContributionsCYAController._
-import models.SchemeId.Srn
-import models._
-import models.requests.DataRequest
 import navigation.Navigator
-import org.slf4j.LoggerFactory
-import pages.nonsipp.employercontributions._
-import pages.nonsipp.memberdetails.MemberDetailsPage
+import models._
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import models.requests.DataRequest
+import pages.nonsipp.employercontributions._
 import services.{PsrSubmissionService, SaveService}
 import utils.ListUtils.ListOps
-import viewmodels.DisplayMessage.{Heading2, Message}
-import viewmodels.implicits._
-import viewmodels.models._
+import org.slf4j.LoggerFactory
+import cats.data.EitherT
+import controllers.nonsipp.employercontributions.EmployerContributionsCYAController._
 import views.html.CheckYourAnswersView
+import models.SchemeId.Srn
+import viewmodels.DisplayMessage.{Heading2, Message}
+import viewmodels.models._
 
-import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
+
+import javax.inject.{Inject, Named}
 
 class EmployerContributionsCYAController @Inject()(
   override val messagesApi: MessagesApi,

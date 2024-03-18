@@ -16,22 +16,23 @@
 
 package controllers
 
-import controllers.actions.{AllowAccessActionProvider, DataRetrievalAction, IdentifierAction}
-import models.SchemeId.Srn
-import models.{DateRange, Enumerable}
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{PsrVersionsService, TaxYearService}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.govukfrontend.views.Aliases.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{ActionItem, Actions}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import controllers.actions.{AllowAccessActionProvider, DataRetrievalAction, IdentifierAction}
+import models.{DateRange, Enumerable}
 import uk.gov.hmrc.time.TaxYear
-import viewmodels.ReturnHistorySummary
 import views.html.ReturnHistoryView
+import models.SchemeId.Srn
+import play.api.i18n.{I18nSupport, MessagesApi}
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.ReturnHistorySummary
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
 
 class ReturnHistoryController @Inject()(
   override val messagesApi: MessagesApi,

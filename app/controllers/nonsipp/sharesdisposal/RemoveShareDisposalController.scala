@@ -16,27 +16,28 @@
 
 package controllers.nonsipp.sharesdisposal
 
+import services.{PsrSubmissionService, SaveService}
+import viewmodels.implicits._
 import config.Refined.{Max50, Max5000}
 import controllers.PSRController
 import controllers.actions._
+import pages.nonsipp.sharesdisposal.{HowWereSharesDisposedPage, RemoveShareDisposalPage}
+import navigation.Navigator
 import forms.YesNoPageFormProvider
 import models.Mode
-import models.SchemeId.Srn
-import models.requests.DataRequest
-import navigation.Navigator
-import pages.nonsipp.shares.CompanyNameRelatedSharesPage
-import pages.nonsipp.sharesdisposal.{HowWereSharesDisposedPage, RemoveShareDisposalPage}
-import play.api.data.Form
 import play.api.i18n.MessagesApi
+import pages.nonsipp.shares.CompanyNameRelatedSharesPage
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.{PsrSubmissionService, SaveService}
-import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 import views.html.YesNoPageView
+import models.SchemeId.Srn
+import viewmodels.DisplayMessage.Message
+import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
+import models.requests.DataRequest
+import play.api.data.Form
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class RemoveShareDisposalController @Inject()(
   override val messagesApi: MessagesApi,

@@ -16,30 +16,31 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
-import com.google.inject.Inject
+import services.SaveService
+import viewmodels.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Constants.{maxCurrencyValue, maxPercentage, minPercentage}
-import config.Refined.Max5000
 import controllers.actions._
-import forms.MultipleQuestionFormProvider
-import forms.mappings.Mappings
-import forms.mappings.errors.{MoneyFormErrors, PercentageFormErrors}
-import models.SchemeId.Srn
-import models.{Mode, Money, Percentage}
 import navigation.Navigator
+import forms.MultipleQuestionFormProvider
+import models.{Mode, Money, Percentage}
 import pages.nonsipp.loansmadeoroutstanding.InterestOnLoanPage
 import play.api.data.Form
+import forms.mappings.errors.{MoneyFormErrors, PercentageFormErrors}
+import forms.mappings.Mappings
+import com.google.inject.Inject
+import config.Refined.Max5000
+import viewmodels.models.MultipleQuestionsViewModel.TripleQuestion
+import views.html.MultipleQuestionView
+import models.SchemeId.Srn
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
-import viewmodels.models.MultipleQuestionsViewModel.TripleQuestion
 import viewmodels.models.{FormPageViewModel, QuestionField}
-import views.html.MultipleQuestionView
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.Named
-import scala.concurrent.{ExecutionContext, Future}
 
 class InterestOnLoanController @Inject()(
   override val messagesApi: MessagesApi,

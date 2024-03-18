@@ -16,22 +16,23 @@
 
 package transformations
 
-import com.google.inject.Singleton
+import pages.nonsipp.bonds._
 import config.Refined.{Max5000, OneTo50, OneTo5000}
-import eu.timepit.refined.api.Refined
-import eu.timepit.refined.refineV
-import models.HowDisposed.{Other, Sold}
 import models.SchemeHoldBond.{Acquisition, Transfer}
 import models.SchemeId.Srn
-import models.requests.DataRequest
 import models.requests.psr.{BondDisposed, BondTransactions, Bonds}
+import eu.timepit.refined.refineV
 import models.{HowDisposed, Money, UserAnswers}
-import pages.nonsipp.bonds._
 import pages.nonsipp.bondsdisposal._
 import viewmodels.models.SectionCompleted
+import models.requests.DataRequest
+import eu.timepit.refined.api.Refined
+import models.HowDisposed.{Other, Sold}
+import com.google.inject.Singleton
+
+import scala.util.Try
 
 import javax.inject.Inject
-import scala.util.Try
 
 @Singleton()
 class BondTransactionsTransformer @Inject() extends Transformer {

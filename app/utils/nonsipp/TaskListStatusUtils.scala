@@ -16,27 +16,27 @@
 
 package utils.nonsipp
 
-import config.Refined.{Max5000, OneTo5000}
-import eu.timepit.refined.{refineMV, refineV}
-import models.ConditionalYesNo._
-import models.SchemeId.Srn
-import models.{IdentitySubject, Mode, Money, NormalMode, PensionSchemeId, SchemeHoldLandProperty, UserAnswers}
-import pages.nonsipp.bonds.{BondsCompleted, BondsJourneyStatus, NameOfBondsPages, UnregulatedOrConnectedBondsHeldPage}
-import pages.nonsipp.bondsdisposal.{BondsDisposalCompletedPages, BondsDisposalPage}
-import pages.nonsipp.common.IdentityTypes
 import pages.nonsipp.employercontributions.{EmployerContributionsPage, EmployerContributionsSectionStatus}
+import pages.nonsipp.schemedesignatory.{FeesCommissionsWagesSalariesPage, HowManyMembersPage, HowMuchCashPage}
+import models.ConditionalYesNo._
+import pages.nonsipp.shares._
+import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
+import config.Refined.{Max5000, OneTo5000}
+import models.SchemeId.Srn
 import pages.nonsipp.landorproperty._
 import pages.nonsipp.landorpropertydisposal.{LandOrPropertyDisposalPage, LandPropertyDisposalCompletedPages}
-import pages.nonsipp.loansmadeoroutstanding._
-import pages.nonsipp.memberdetails.{MemberDetailsNinoPages, MembersDetailsPages, NoNinoPages}
-import pages.nonsipp.moneyborrowed.{LenderNamePages, MoneyBorrowedPage, WhySchemeBorrowedMoneyPages}
-import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
-import pages.nonsipp.schemedesignatory.{FeesCommissionsWagesSalariesPage, HowManyMembersPage, HowMuchCashPage}
-import pages.nonsipp.shares.{DidSchemeHoldAnySharesPage, SharesCompleted, SharesJourneyStatus, TypeOfSharesHeldPages}
+import eu.timepit.refined.{refineMV, refineV}
 import pages.nonsipp.sharesdisposal.{SharesDisposalCompletedPages, SharesDisposalPage}
-import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
-import viewmodels.models.TaskListStatus.{Completed, InProgress, NotStarted, TaskListStatus}
+import models._
+import pages.nonsipp.loansmadeoroutstanding._
 import viewmodels.models.{SectionStatus, TaskListStatus}
+import pages.nonsipp.bonds._
+import pages.nonsipp.memberdetails.{MemberDetailsNinoPages, MembersDetailsPages, NoNinoPages}
+import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
+import viewmodels.models.TaskListStatus._
+import pages.nonsipp.common.IdentityTypes
+import pages.nonsipp.moneyborrowed.{LenderNamePages, MoneyBorrowedPage, WhySchemeBorrowedMoneyPages}
+import pages.nonsipp.bondsdisposal.{BondsDisposalCompletedPages, BondsDisposalPage}
 
 object TaskListStatusUtils {
 

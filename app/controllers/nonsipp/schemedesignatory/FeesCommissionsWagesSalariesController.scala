@@ -16,28 +16,29 @@
 
 package controllers.nonsipp.schemedesignatory
 
+import services.SaveService
+import pages.nonsipp.schemedesignatory.{FeesCommissionsWagesSalariesPage, FinancialDetailsCheckYourAnswersPage}
+import viewmodels.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
+import controllers.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesController._
 import config.Constants.maxMoneyValue
 import controllers.actions._
-import controllers.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesController._
-import forms.MoneyFormProvider
-import forms.mappings.errors.MoneyFormErrors
-import models.SchemeId.Srn
-import models.{CheckMode, Mode, Money, NormalMode}
 import navigation.Navigator
-import pages.nonsipp.schemedesignatory.{FeesCommissionsWagesSalariesPage, FinancialDetailsCheckYourAnswersPage}
+import forms.MoneyFormProvider
+import models._
 import play.api.data.Form
+import forms.mappings.errors.MoneyFormErrors
+import views.html.MoneyView
+import models.SchemeId.Srn
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.{Empty, Message}
-import viewmodels.implicits._
-import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import viewmodels.models.{FormPageViewModel, QuestionField}
-import views.html.MoneyView
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class FeesCommissionsWagesSalariesController @Inject()(
   override val messagesApi: MessagesApi,

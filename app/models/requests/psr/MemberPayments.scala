@@ -17,8 +17,8 @@
 package models.requests.psr
 
 import cats.syntax.either._
-import play.api.libs.functional.syntax._
 import play.api.libs.json._
+import play.api.libs.functional.syntax._
 
 import java.time.LocalDate
 

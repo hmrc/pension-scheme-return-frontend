@@ -16,45 +16,29 @@
 
 package transformations
 
+import models.SchemeId.Srn
+import pages.nonsipp.landorproperty._
 import cats.implicits.catsSyntaxTuple2Semigroupal
+import eu.timepit.refined.refineV
+import uk.gov.hmrc.domain.Nino
+import models._
+import pages.nonsipp.common._
+import models.IdentitySubject.LandOrPropertySeller
+import viewmodels.models.SectionCompleted
+import models.requests.DataRequest
+import eu.timepit.refined.api.Refined
+import models.HowDisposed.{HowDisposed, Other, Sold}
 import com.google.inject.Singleton
 import config.Refined.{Max5000, OneTo50, OneTo5000}
-import eu.timepit.refined.api.Refined
-import eu.timepit.refined.refineV
-import models.HowDisposed.{HowDisposed, Other, Sold}
-import models.IdentitySubject.LandOrPropertySeller
 import models.SchemeHoldLandProperty.{Acquisition, Transfer}
-import models.SchemeId.Srn
-import models.UserAnswers.implicits.UserAnswersTryOps
-import models.requests.DataRequest
 import models.requests.psr._
-import models.{
-  ConditionalYesNo,
-  Crn,
-  HowDisposed,
-  IdentitySubject,
-  IdentityType,
-  Money,
-  PropertyAcquiredFrom,
-  RecipientDetails,
-  SchemeHoldLandProperty,
-  UserAnswers,
-  Utr
-}
-import pages.nonsipp.common.{
-  CompanyRecipientCrnPage,
-  IdentityTypePage,
-  OtherRecipientDetailsPage,
-  PartnershipRecipientUtrPage
-}
-import pages.nonsipp.landorproperty._
 import pages.nonsipp.landorpropertydisposal._
-import uk.gov.hmrc.domain.Nino
-import viewmodels.models.SectionCompleted
+import models.UserAnswers.implicits.UserAnswersTryOps
+
+import scala.util.Try
 
 import java.time.LocalDate
 import javax.inject.Inject
-import scala.util.Try
 
 @Singleton()
 class LandOrPropertyTransactionsTransformer @Inject() extends Transformer {

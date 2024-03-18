@@ -16,7 +16,7 @@
 
 package pages.nonsipp.otherassetsheld
 
-import models.SchemeId.Srn
 import pages.Page
+import models.SchemeId.Srn
 
 case class OtherAssetsCYAPage(srn: Srn) extends Page

@@ -37,7 +37,7 @@ case class IndividualDetails(
   middleName: Option[String],
   lastName: String
 ) {
-  val fullName = s"$firstName ${middleName.fold("")(identity)} $lastName"
+  val fullName: String = s"$firstName ${middleName.fold("")(identity)} $lastName"
 }
 
 object IndividualDetails {

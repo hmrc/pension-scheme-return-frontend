@@ -16,38 +16,34 @@
 
 package controllers.nonsipp.sharesdisposal
 
-import cats.implicits.toShow
+import services.{PsrSubmissionService, SaveService}
+import viewmodels.implicits._
+import models.PointOfEntry.NoPointOfEntry
+import utils.ListUtils.ListOps
+import controllers.nonsipp.sharesdisposal.SharesDisposalCYAController._
 import config.Refined.{Max50, Max5000}
 import controllers.PSRController
-import controllers.actions.IdentifyAndRequireData
-import controllers.nonsipp.sharesdisposal.SharesDisposalCYAController._
-import models.HowSharesDisposed._
-import models.PointOfEntry.NoPointOfEntry
 import models.SchemeHoldShare.Transfer
-import models.{CheckMode, IdentityType, Mode, Money, SchemeHoldShare, TypeOfShares}
+import cats.implicits.toShow
+import controllers.actions.IdentifyAndRequireData
+import pages.nonsipp.sharesdisposal._
+import pages.nonsipp.shares._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import views.html.CheckYourAnswersView
 import models.SchemeId.Srn
 import navigation.Navigator
-import pages.nonsipp.shares.{
-  CompanyNameRelatedSharesPage,
-  TypeOfSharesHeldPage,
-  WhenDidSchemeAcquireSharesPage,
-  WhyDoesSchemeHoldSharesPage
-}
-import pages.nonsipp.sharesdisposal._
-import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.{PsrSubmissionService, SaveService}
+import models.HowSharesDisposed._
 import utils.DateTimeUtils.localDateShow
-import utils.ListUtils.ListOps
-import viewmodels.DisplayMessage.Message
+import models._
+import play.api.i18n.MessagesApi
 import viewmodels.Margin
-import viewmodels.implicits._
+import viewmodels.DisplayMessage.Message
 import viewmodels.models._
-import views.html.CheckYourAnswersView
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import java.time.LocalDate
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class SharesDisposalCYAController @Inject()(
   override val messagesApi: MessagesApi,

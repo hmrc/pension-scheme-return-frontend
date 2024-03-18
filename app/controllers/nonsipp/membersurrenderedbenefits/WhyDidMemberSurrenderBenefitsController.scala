@@ -16,26 +16,27 @@
 
 package controllers.nonsipp.membersurrenderedbenefits
 
+import services.SaveService
+import pages.nonsipp.memberdetails.MemberDetailsPage
+import viewmodels.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Refined.Max300
 import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
-import forms.TextFormProvider
-import models.Mode
-import models.SchemeId.Srn
 import navigation.Navigator
-import pages.nonsipp.memberdetails.MemberDetailsPage
+import forms.TextFormProvider
 import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsAmountPage, WhyDidMemberSurrenderBenefitsPage}
-import play.api.data.Form
+import models.Mode
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
-import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, TextAreaViewModel}
+import play.api.data.Form
 import views.html.TextAreaView
+import models.SchemeId.Srn
+import viewmodels.DisplayMessage.Message
+import viewmodels.models.{FormPageViewModel, TextAreaViewModel}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class WhyDidMemberSurrenderBenefitsController @Inject()(
   override val messagesApi: MessagesApi,

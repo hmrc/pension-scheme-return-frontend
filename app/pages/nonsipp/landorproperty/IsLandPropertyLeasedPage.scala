@@ -16,16 +16,16 @@
 
 package pages.nonsipp.landorproperty
 
-import config.Refined.Max5000
-import models.SchemeId.Srn
-import models.UserAnswers
-import pages.QuestionPage
-import play.api.libs.json.JsPath
-import queries.Removable
 import utils.RefinedUtils.RefinedIntOps
+import utils.PageUtils._
+import queries.Removable
+import models.SchemeId.Srn
+import play.api.libs.json.JsPath
+import models.UserAnswers
+import config.Refined.Max5000
+import pages.QuestionPage
 
 import scala.util.Try
-import utils.PageUtils._
 case class IsLandPropertyLeasedPage(srn: Srn, index: Max5000) extends QuestionPage[Boolean] {
 
   override def path: JsPath = Paths.heldPropertyTransactions \ toString \ index.arrayIndex.toString

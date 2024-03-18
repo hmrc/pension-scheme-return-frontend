@@ -16,18 +16,18 @@
 
 package controllers.nonsipp.moneyborrowed
 
-import controllers.actions.{AllowAccessActionProvider, DataRequiredAction, DataRetrievalAction, IdentifierAction}
-import models.NormalMode
-import models.SchemeId.Srn
-import navigation.Navigator
-import pages.nonsipp.moneyborrowed.WhatYouWillNeedMoneyBorrowedPage
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.DisplayMessage.{ListMessage, ListType, Message, ParagraphMessage}
 import viewmodels.implicits._
-import viewmodels.models.{ContentPageViewModel, FormPageViewModel}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import controllers.actions._
+import navigation.Navigator
+import models.NormalMode
 import views.html.ContentPageView
+import models.SchemeId.Srn
+import play.api.i18n.{I18nSupport, MessagesApi}
+import pages.nonsipp.moneyborrowed.WhatYouWillNeedMoneyBorrowedPage
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.DisplayMessage._
+import viewmodels.models.{ContentPageViewModel, FormPageViewModel}
 
 import javax.inject.{Inject, Named}
 

@@ -16,29 +16,29 @@
 
 package controllers.nonsipp.landorpropertydisposal
 
-import cats.implicits._
+import viewmodels.implicits._
+import play.api.mvc._
 import com.google.inject.Inject
-import config.Constants
-import config.Constants.maxLandOrPropertyDisposals
 import config.Refined.{Max50, Max5000}
 import controllers.PSRController
+import cats.implicits._
 import controllers.actions._
-import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalListController._
-import forms.YesNoPageFormProvider
-import models.SchemeId.Srn
-import models.requests.DataRequest
-import models.{Address, Mode, NormalMode, Pagination}
 import navigation.Navigator
-import pages.nonsipp.landorproperty.{LandOrPropertyAddressLookupPages, LandOrPropertyChosenAddressPage}
-import pages.nonsipp.landorpropertydisposal._
-import play.api.data.Form
+import forms.YesNoPageFormProvider
+import models._
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import utils.nonsipp.TaskListStatusUtils.getLandOrPropertyDisposalsTaskListStatusWithLink
-import viewmodels.DisplayMessage.{Message, ParagraphMessage}
-import viewmodels.implicits._
-import viewmodels.models._
+import config.Constants
 import views.html.ListView
+import models.SchemeId.Srn
+import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalListController._
+import pages.nonsipp.landorproperty.{LandOrPropertyAddressLookupPages, LandOrPropertyChosenAddressPage}
+import config.Constants.maxLandOrPropertyDisposals
+import pages.nonsipp.landorpropertydisposal._
+import viewmodels.DisplayMessage.{Message, ParagraphMessage}
+import viewmodels.models._
+import models.requests.DataRequest
+import play.api.data.Form
 
 import javax.inject.Named
 

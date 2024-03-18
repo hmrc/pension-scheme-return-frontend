@@ -16,12 +16,12 @@
 
 package pages.nonsipp.membertransferout
 
-import config.Refined._
 import utils.RefinedUtils._
-import play.api.libs.json.JsPath
 import models.SchemeId.Srn
-import pages.{IndexedQuestionPage, QuestionPage}
+import play.api.libs.json.JsPath
 import viewmodels.models.SectionCompleted
+import config.Refined._
+import pages.{IndexedQuestionPage, QuestionPage}
 
 case class TransfersOutCompletedPage(srn: Srn, index: Max300, secondaryIndex: Max5)
     extends QuestionPage[SectionCompleted.type] {

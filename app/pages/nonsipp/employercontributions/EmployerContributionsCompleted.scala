@@ -16,16 +16,14 @@
 
 package pages.nonsipp.employercontributions
 
-import config.Refined.Max50.Refined
-import config.Refined.{Max300, Max50}
-import eu.timepit.refined.api.Refined
-import models.SchemeId.Srn
-import models.UserAnswers
-import pages.{IndexedQuestionPage, QuestionPage}
-import play.api.libs.json.JsPath
-import utils.ListUtils.ListOps
 import utils.RefinedUtils.RefinedIntOps
+import utils.ListUtils.ListOps
+import models.SchemeId.Srn
+import play.api.libs.json.JsPath
+import models.UserAnswers
 import viewmodels.models.SectionCompleted
+import config.Refined.{Max300, Max50}
+import pages.{IndexedQuestionPage, QuestionPage}
 
 // TODO: deprecated in favour of EmployerContributionsProgress
 case class EmployerContributionsCompleted(srn: Srn, memberIndex: Max300, secondaryIndex: Max50)

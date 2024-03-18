@@ -16,26 +16,27 @@
 
 package controllers.nonsipp.landorpropertydisposal
 
-import controllers.PSRController
-import controllers.actions._
-import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalController._
-import forms.YesNoPageFormProvider
-import models.Mode
-import models.SchemeId.Srn
-import models.requests.DataRequest
-import navigation.Navigator
-import pages.nonsipp.landorpropertydisposal.LandOrPropertyDisposalPage
-import play.api.data.Form
-import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{PsrSubmissionService, SaveService}
-import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import controllers.PSRController
+import pages.nonsipp.landorpropertydisposal.LandOrPropertyDisposalPage
+import controllers.actions._
+import navigation.Navigator
+import forms.YesNoPageFormProvider
+import play.api.i18n.MessagesApi
 import views.html.YesNoPageView
+import models.SchemeId.Srn
+import models.Mode
+import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalController._
+import viewmodels.DisplayMessage.Message
+import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
+import models.requests.DataRequest
+import play.api.data.Form
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class LandOrPropertyDisposalController @Inject()(
   override val messagesApi: MessagesApi,

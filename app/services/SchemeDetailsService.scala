@@ -18,12 +18,13 @@ package services
 
 import com.google.inject.ImplementedBy
 import connectors.SchemeDetailsConnector
-import models.{MinimalSchemeDetails, PensionSchemeId}
 import models.SchemeId.Srn
 import uk.gov.hmrc.http.HeaderCarrier
+import models.{MinimalSchemeDetails, PensionSchemeId}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
 
 class SchemeDetailsServiceImpl @Inject()(schemeDetailsConnector: SchemeDetailsConnector) extends SchemeDetailsService {
 

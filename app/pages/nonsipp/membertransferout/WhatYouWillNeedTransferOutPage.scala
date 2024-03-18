@@ -16,7 +16,7 @@
 
 package pages.nonsipp.membertransferout
 
-import models.SchemeId.Srn
 import pages.Page
+import models.SchemeId.Srn
 
 case class WhatYouWillNeedTransferOutPage(srn: Srn) extends Page

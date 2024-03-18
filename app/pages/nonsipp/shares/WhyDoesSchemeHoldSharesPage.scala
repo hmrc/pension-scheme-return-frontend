@@ -16,15 +16,15 @@
 
 package pages.nonsipp.shares
 
-import config.Refined.Max5000
+import utils.RefinedUtils.RefinedIntOps
+import utils.PageUtils.removePages
+import queries.Removable
 import models.SchemeId.Srn
 import models.{IdentitySubject, SchemeHoldShare, UserAnswers}
+import config.Refined.Max5000
 import pages.QuestionPage
 import pages.nonsipp.common
 import play.api.libs.json.JsPath
-import queries.Removable
-import utils.PageUtils.removePages
-import utils.RefinedUtils.RefinedIntOps
 
 import scala.util.Try
 

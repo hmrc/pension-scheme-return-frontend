@@ -16,14 +16,15 @@
 
 package forms.mappings
 
+import play.api.data.format.Formatter
 import cats.data.Validated._
 import cats.syntax.all._
-import forms.mappings.errors.{DateFormErrors, IntFormErrors}
 import play.api.data.FormError
-import play.api.data.format.Formatter
+import forms.mappings.errors.{DateFormErrors, IntFormErrors}
+
+import scala.util.{Failure, Success, Try}
 
 import java.time.LocalDate
-import scala.util.{Failure, Success, Try}
 
 private[mappings] class LocalDateFormatter(
   dateFormErrors: DateFormErrors,

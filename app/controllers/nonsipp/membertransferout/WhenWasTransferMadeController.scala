@@ -16,30 +16,31 @@
 
 package controllers.nonsipp.membertransferout
 
-import cats.implicits.toShow
+import services.{SaveService, SchemeDateService}
+import pages.nonsipp.memberdetails.MemberDetailsPage
+import viewmodels.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Refined.{Max300, Max5}
 import controllers.PSRController
+import cats.implicits.toShow
 import controllers.actions.IdentifyAndRequireData
-import forms.DatePageFormProvider
-import forms.mappings.errors.DateFormErrors
-import models.{DateRange, Mode}
-import models.SchemeId.Srn
 import navigation.Navigator
-import pages.nonsipp.memberdetails.MemberDetailsPage
-import pages.nonsipp.membertransferout.{ReceivingSchemeNamePage, TransfersOutCompletedPage, WhenWasTransferMadePage}
+import forms.DatePageFormProvider
 import play.api.data.Form
-import play.api.i18n.{Messages, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.{SaveService, SchemeDateService}
+import forms.mappings.errors.DateFormErrors
+import views.html.DatePageView
+import models.SchemeId.Srn
 import utils.DateTimeUtils.localDateShow
+import models.{DateRange, Mode}
+import pages.nonsipp.membertransferout.{ReceivingSchemeNamePage, TransfersOutCompletedPage, WhenWasTransferMadePage}
+import play.api.i18n.{Messages, MessagesApi}
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{DatePageViewModel, FormPageViewModel, SectionCompleted}
-import views.html.DatePageView
-import viewmodels.implicits._
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import java.time.LocalDate
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class WhenWasTransferMadeController @Inject()(
   override val messagesApi: MessagesApi,

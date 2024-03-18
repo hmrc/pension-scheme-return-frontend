@@ -16,33 +16,34 @@
 
 package controllers.nonsipp.accountingperiod
 
+import utils.RefinedUtils.RefinedIntOps
+import services.SaveService
+import viewmodels.implicits._
+import utils.FormUtils._
+import play.api.mvc._
 import com.google.inject.Inject
+import utils.ListUtils.ListOps
 import config.Refined.Max3
 import controllers.actions._
-import forms.DateRangeFormProvider
-import forms.mappings.errors.DateFormErrors
-import models.SchemeId.Srn
-import models.requests.DataRequest
-import models.{DateRange, Mode}
-import navigation.Navigator
-import pages.nonsipp.WhichTaxYearPage
 import pages.nonsipp.accountingperiod.{AccountingPeriodPage, AccountingPeriods}
-import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import services.SaveService
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import forms.DateRangeFormProvider
+import models.{DateRange, Mode}
 import uk.gov.hmrc.time.TaxYear
-import utils.FormUtils._
-import utils.ListUtils.ListOps
-import utils.RefinedUtils.RefinedIntOps
-import viewmodels.DisplayMessage.ParagraphMessage
-import viewmodels.implicits._
-import viewmodels.models.{DateRangeViewModel, FormPageViewModel}
+import forms.mappings.errors.DateFormErrors
 import views.html.DateRangeView
+import models.SchemeId.Srn
+import pages.nonsipp.WhichTaxYearPage
+import navigation.Navigator
+import play.api.i18n.{I18nSupport, MessagesApi}
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.DisplayMessage.ParagraphMessage
+import viewmodels.models.{DateRangeViewModel, FormPageViewModel}
+import models.requests.DataRequest
+import play.api.data.Form
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.Named
-import scala.concurrent.{ExecutionContext, Future}
 
 class AccountingPeriodController @Inject()(
   override val messagesApi: MessagesApi,

@@ -16,12 +16,12 @@
 
 package pages.nonsipp.common
 
-import config.Refined.Max5000
-import models.{IdentitySubject, RecipientDetails}
-import models.SchemeId.Srn
-import pages.QuestionPage
-import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
+import models.SchemeId.Srn
+import play.api.libs.json.JsPath
+import models.{IdentitySubject, RecipientDetails}
+import config.Refined.Max5000
+import pages.QuestionPage
 
 case class OtherRecipientDetailsPage(srn: Srn, index: Max5000, identitySubject: IdentitySubject)
     extends QuestionPage[RecipientDetails] {

@@ -16,30 +16,31 @@
 
 package controllers.nonsipp.membertransferout
 
-import cats.implicits.{toShow, toTraverseOps}
-import config.Refined._
-import controllers.PSRController
-import controllers.actions._
-import controllers.nonsipp.membertransferout.TransfersOutCYAController._
-import models.PensionSchemeType.PensionSchemeType
-import models.SchemeId.Srn
-import models._
-import navigation.Navigator
+import services.{PsrSubmissionService, SaveService}
 import pages.nonsipp.memberdetails.MemberDetailsPage
+import viewmodels.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import config.Refined._
+import cats.implicits.{toShow, toTraverseOps}
+import controllers.actions._
+import navigation.Navigator
+import utils.ListUtils.ListOps
+import models.PensionSchemeType.PensionSchemeType
+import controllers.PSRController
+import controllers.nonsipp.membertransferout.TransfersOutCYAController._
+import views.html.CheckYourAnswersView
+import models.SchemeId.Srn
+import utils.DateTimeUtils.localDateShow
+import models._
 import pages.nonsipp.membertransferout._
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.{PsrSubmissionService, SaveService}
-import utils.DateTimeUtils.localDateShow
-import utils.ListUtils.ListOps
-import viewmodels.DisplayMessage.{Heading2, InlineMessage, Message, ParagraphMessage}
-import viewmodels.implicits._
+import viewmodels.DisplayMessage._
 import viewmodels.models._
-import views.html.CheckYourAnswersView
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import java.time.LocalDate
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class TransfersOutCYAController @Inject()(
   override val messagesApi: MessagesApi,

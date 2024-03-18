@@ -16,30 +16,31 @@
 
 package controllers.nonsipp.memberdetails
 
+import utils.RefinedUtils.RefinedIntOps
+import services.SaveService
+import pages.nonsipp.memberdetails.{MemberDetailsNinoPage, MemberDetailsNinoPages, MemberDetailsPage}
+import viewmodels.implicits._
+import utils.FormUtils._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Refined.Max300
 import controllers.actions._
-import controllers.nonsipp.memberdetails.MemberDetailsNinoController._
 import forms.TextFormProvider
-import models.SchemeId.Srn
-import models.requests.DataRequest
 import models.{Mode, NameDOB}
-import navigation.Navigator
-import pages.nonsipp.memberdetails.{MemberDetailsNinoPage, MemberDetailsNinoPages, MemberDetailsPage}
-import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
-import uk.gov.hmrc.domain.Nino
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.FormUtils._
-import utils.RefinedUtils.RefinedIntOps
-import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, TextInputViewModel}
+import controllers.nonsipp.memberdetails.MemberDetailsNinoController._
 import views.html.TextInputView
+import models.SchemeId.Srn
+import navigation.Navigator
+import uk.gov.hmrc.domain.Nino
+import play.api.i18n.{I18nSupport, MessagesApi}
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.DisplayMessage.Message
+import viewmodels.models.{FormPageViewModel, TextInputViewModel}
+import models.requests.DataRequest
+import play.api.data.Form
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class MemberDetailsNinoController @Inject()(
   override val messagesApi: MessagesApi,

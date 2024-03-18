@@ -16,8 +16,9 @@
 
 package controllers.nonsipp.memberdetails
 
+import play.api.mvc._
 import play.api.Configuration
-import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
+
 import scala.concurrent.ExecutionContext
 
 import javax.inject.Inject

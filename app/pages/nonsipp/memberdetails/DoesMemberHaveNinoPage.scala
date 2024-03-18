@@ -16,13 +16,13 @@
 
 package pages.nonsipp.memberdetails
 
-import config.Refined.Max300
-import models.SchemeId.Srn
-import models.UserAnswers
-import pages.QuestionPage
-import play.api.libs.json.JsPath
-import queries.Removable
 import utils.RefinedUtils.RefinedIntOps
+import queries.Removable
+import models.SchemeId.Srn
+import play.api.libs.json.JsPath
+import models.UserAnswers
+import config.Refined.Max300
+import pages.QuestionPage
 
 import scala.util.Try
 

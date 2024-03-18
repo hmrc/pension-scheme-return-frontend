@@ -16,27 +16,28 @@
 
 package controllers.nonsipp.receivetransfer
 
-import config.Refined.{Max300, Max5}
+import services.{PsrSubmissionService, SaveService}
+import pages.nonsipp.memberdetails.MemberDetailsPage
+import viewmodels.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import controllers.PSRController
+import pages.nonsipp.receivetransfer.ReportAnotherTransferInPage
 import controllers.actions._
-import controllers.nonsipp.receivetransfer.ReportAnotherTransferInController._
+import navigation.Navigator
 import forms.YesNoPageFormProvider
 import models.Mode
-import models.SchemeId.Srn
-import navigation.Navigator
-import pages.nonsipp.memberdetails.MemberDetailsPage
-import pages.nonsipp.receivetransfer.ReportAnotherTransferInPage
-import play.api.data.Form
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.{PsrSubmissionService, SaveService}
-import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
+import play.api.data.Form
+import controllers.nonsipp.receivetransfer.ReportAnotherTransferInController._
+import config.Refined.{Max300, Max5}
 import views.html.YesNoPageView
+import models.SchemeId.Srn
+import viewmodels.DisplayMessage.Message
+import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class ReportAnotherTransferInController @Inject()(
   override val messagesApi: MessagesApi,

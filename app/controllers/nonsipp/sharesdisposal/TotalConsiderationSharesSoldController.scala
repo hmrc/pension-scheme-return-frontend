@@ -16,29 +16,30 @@
 
 package controllers.nonsipp.sharesdisposal
 
-import config.Constants.{maxTotalConsiderationAmount, minTotalConsiderationAmount}
-import config.Refined.{Max50, Max5000}
-import controllers.PSRController
-import controllers.actions.IdentifyAndRequireData
-import controllers.nonsipp.sharesdisposal.TotalConsiderationSharesSoldController._
-import forms.mappings.errors.{MoneyFormErrorProvider, MoneyFormErrors}
-import models.{Mode, Money}
-import models.SchemeId.Srn
-import navigation.Navigator
-import pages.nonsipp.shares.CompanyNameRelatedSharesPage
-import pages.nonsipp.sharesdisposal.{HowManySharesSoldPage, TotalConsiderationSharesSoldPage}
-import play.api.data.Form
-import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
-import viewmodels.DisplayMessage.{Empty, Message}
 import viewmodels.implicits._
+import controllers.PSRController
+import config.Constants.{maxTotalConsiderationAmount, minTotalConsiderationAmount}
+import controllers.actions.IdentifyAndRequireData
+import pages.nonsipp.sharesdisposal.{HowManySharesSoldPage, TotalConsiderationSharesSoldPage}
+import navigation.Navigator
+import models.{Mode, Money}
+import play.api.i18n.MessagesApi
+import forms.mappings.errors.{MoneyFormErrorProvider, MoneyFormErrors}
+import pages.nonsipp.shares.CompanyNameRelatedSharesPage
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import config.Refined.{Max50, Max5000}
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
-import viewmodels.models.{FormPageViewModel, QuestionField}
 import views.html.MoneyView
+import models.SchemeId.Srn
+import viewmodels.DisplayMessage.{Empty, Message}
+import viewmodels.models.{FormPageViewModel, QuestionField}
+import controllers.nonsipp.sharesdisposal.TotalConsiderationSharesSoldController._
+import play.api.data.Form
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class TotalConsiderationSharesSoldController @Inject()(
   override val messagesApi: MessagesApi,

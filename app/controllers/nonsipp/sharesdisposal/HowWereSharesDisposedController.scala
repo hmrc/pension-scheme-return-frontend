@@ -16,32 +16,33 @@
 
 package controllers.nonsipp.sharesdisposal
 
+import services.SaveService
+import viewmodels.implicits._
 import config.Refined.{Max50, Max5000}
 import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
-import controllers.nonsipp.sharesdisposal.HowWereSharesDisposedController._
+import pages.nonsipp.sharesdisposal.{HowWereSharesDisposedPage, SharesDisposalCYAPointOfEntry}
 import forms.RadioListFormProvider
-import forms.mappings.Mappings
+import models._
+import play.api.i18n.MessagesApi
+import play.api.data.Form
 import forms.mappings.errors.InputFormErrors
 import models.GenericFormMapper.ConditionalRadioMapper
-import models.HowSharesDisposed._
+import controllers.nonsipp.sharesdisposal.HowWereSharesDisposedController._
+import pages.nonsipp.shares.CompanyNameRelatedSharesPage
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import forms.mappings.Mappings
 import models.PointOfEntry.{HowWereSharesDisposedPointOfEntry, NoPointOfEntry}
-import models.{CheckMode, ConditionalRadioMapper, HowSharesDisposed, Mode}
+import views.html.RadioListView
 import models.SchemeId.Srn
 import navigation.Navigator
-import pages.nonsipp.shares.CompanyNameRelatedSharesPage
-import pages.nonsipp.sharesdisposal.{HowWereSharesDisposedPage, SharesDisposalCYAPointOfEntry}
-import play.api.data.Form
-import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
+import models.HowSharesDisposed._
 import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
-import viewmodels.models.{FieldType, FormPageViewModel, RadioItemConditional, RadioListRowViewModel, RadioListViewModel}
-import views.html.RadioListView
+import viewmodels.models._
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class HowWereSharesDisposedController @Inject()(
   override val messagesApi: MessagesApi,

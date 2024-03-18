@@ -16,10 +16,10 @@
 
 package pages.nonsipp.membertransferout
 
-import models.SchemeId.Srn
 import pages.QuestionPage
-import pages.nonsipp.memberpayments.MemberPaymentsPage
+import models.SchemeId.Srn
 import play.api.libs.json.JsPath
+import pages.nonsipp.memberpayments.MemberPaymentsPage
 
 case class SchemeTransferOutPage(srn: Srn) extends QuestionPage[Boolean] {
 

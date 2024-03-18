@@ -16,26 +16,27 @@
 
 package controllers.nonsipp.memberdetails.upload
 
-import cats.data.NonEmptyList
-import controllers.actions._
-import controllers.nonsipp.memberdetails.upload.FileUploadTooManyErrorsController._
-import models.SchemeId.Srn
-import models.ValidationErrorType.ValidationErrorType
-import models.{Mode, UploadErrors, UploadKey, ValidationErrorType}
-import navigation.Navigator
-import pages.FileUploadTooManyErrorsPage
-import play.api.i18n._
-import play.api.mvc._
 import services.UploadService
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.DisplayMessage._
-import viewmodels.LabelSize
 import viewmodels.implicits._
-import viewmodels.models.{ContentPageViewModel, FormPageViewModel}
+import play.api.mvc._
+import controllers.nonsipp.memberdetails.upload.FileUploadTooManyErrorsController._
+import pages.FileUploadTooManyErrorsPage
+import controllers.actions._
+import navigation.Navigator
+import models.ValidationErrorType.ValidationErrorType
+import models._
+import cats.data.NonEmptyList
 import views.html.ContentPageView
+import models.SchemeId.Srn
+import play.api.i18n._
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.LabelSize
+import viewmodels.DisplayMessage._
+import viewmodels.models.{ContentPageViewModel, FormPageViewModel}
+
+import scala.concurrent.ExecutionContext
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.ExecutionContext
 
 class FileUploadTooManyErrorsController @Inject()(
   override val messagesApi: MessagesApi,

@@ -16,12 +16,12 @@
 
 package pages.nonsipp.landorpropertydisposal
 
-import config.Refined.{Max50, Max5000}
-import models.Money
-import models.SchemeId.Srn
-import pages.QuestionPage
-import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
+import models.SchemeId.Srn
+import play.api.libs.json.JsPath
+import models.Money
+import config.Refined.{Max50, Max5000}
+import pages.QuestionPage
 
 case class TotalProceedsSaleLandPropertyPage(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50)
     extends QuestionPage[Money] {

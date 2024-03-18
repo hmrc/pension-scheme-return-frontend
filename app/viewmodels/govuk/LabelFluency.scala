@@ -16,10 +16,10 @@
 
 package viewmodels.govuk
 
-import play.twirl.api.Html
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{Content, HtmlContent}
-import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
 import viewmodels.LabelSize
+import uk.gov.hmrc.govukfrontend.views.viewmodels.label.Label
+import play.twirl.api.Html
 
 object label extends LabelFluency
 

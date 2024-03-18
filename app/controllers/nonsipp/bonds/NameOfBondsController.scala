@@ -16,25 +16,26 @@
 
 package controllers.nonsipp.bonds
 
+import pages.nonsipp.bonds.NameOfBondsPage
+import viewmodels.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Refined.Max5000
 import controllers.actions.IdentifyAndRequireData
-import controllers.nonsipp.bonds.NameOfBondsController._
+import navigation.Navigator
 import forms.TextFormProvider
 import models.Mode
-import models.SchemeId.Srn
-import navigation.Navigator
-import pages.nonsipp.bonds.NameOfBondsPage
-import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, TextAreaViewModel}
+import play.api.data.Form
+import services.SaveService
+import controllers.nonsipp.bonds.NameOfBondsController._
 import views.html.TextAreaView
+import models.SchemeId.Srn
+import play.api.i18n.{I18nSupport, MessagesApi}
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class NameOfBondsController @Inject()(
   override val messagesApi: MessagesApi,

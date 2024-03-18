@@ -16,10 +16,10 @@
 
 package pages.nonsipp.totalvaluequotedshares
 
-import models.Money
-import models.SchemeId.Srn
 import pages.QuestionPage
+import models.SchemeId.Srn
 import play.api.libs.json.JsPath
+import models.Money
 
 case class TotalValueQuotedSharesPage(srn: Srn) extends QuestionPage[Money] {
 

@@ -16,10 +16,10 @@
 
 package models.requests
 
-import models.PensionSchemeId
-import models.PensionSchemeId.{PsaId, PspId}
-import models.requests.IdentifierRequest.{AdministratorRequest, PractitionerRequest}
 import play.api.mvc.{Request, WrappedRequest}
+import models.requests.IdentifierRequest.{AdministratorRequest, PractitionerRequest}
+import models.PensionSchemeId.{PsaId, PspId}
+import models.PensionSchemeId
 
 sealed abstract class IdentifierRequest[A](request: Request[A]) extends WrappedRequest[A](request) { self =>
 

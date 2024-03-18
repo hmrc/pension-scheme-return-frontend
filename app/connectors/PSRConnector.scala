@@ -16,17 +16,18 @@
 
 package connectors
 
+import uk.gov.hmrc.http.HttpReads.Implicits._
 import config.FrontendAppConfig
-import models.backend.responses.PsrVersionsForYearsResponse
 import models.requests.psr.PsrSubmission
 import play.api.Logger
+import play.api.libs.json._
+import models.backend.responses.PsrVersionsForYearsResponse
 import play.api.http.Status.{NOT_FOUND, OK}
-import play.api.libs.json.{JsError, JsResultException, JsSuccess, Json}
-import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 
-import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+
+import javax.inject.Inject
 
 class PSRConnector @Inject()(appConfig: FrontendAppConfig, http: HttpClient) {
 

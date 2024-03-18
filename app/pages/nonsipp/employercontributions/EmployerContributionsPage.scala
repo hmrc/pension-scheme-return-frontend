@@ -16,11 +16,11 @@
 
 package pages.nonsipp.employercontributions
 
-import models.SchemeId.Srn
-import models.UserAnswers
 import pages.QuestionPage
-import pages.nonsipp.memberpayments.MemberPaymentsPage
+import models.SchemeId.Srn
 import play.api.libs.json.JsPath
+import models.UserAnswers
+import pages.nonsipp.memberpayments.MemberPaymentsPage
 import viewmodels.models.SectionStatus
 
 import scala.util.Try

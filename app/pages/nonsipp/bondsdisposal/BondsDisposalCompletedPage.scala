@@ -16,12 +16,12 @@
 
 package pages.nonsipp.bondsdisposal
 
-import config.Refined.{Max50, Max5000}
-import models.SchemeId.Srn
-import pages.{IndexedQuestionPage, QuestionPage}
-import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
+import models.SchemeId.Srn
+import play.api.libs.json.JsPath
 import viewmodels.models.SectionCompleted
+import config.Refined.{Max50, Max5000}
+import pages.{IndexedQuestionPage, QuestionPage}
 
 case class BondsDisposalCompletedPage(srn: Srn, bondIndex: Max5000, disposalIndex: Max50)
     extends QuestionPage[SectionCompleted.type] {

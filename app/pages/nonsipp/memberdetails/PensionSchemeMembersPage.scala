@@ -16,10 +16,10 @@
 
 package pages.nonsipp.memberdetails
 
-import models.ManualOrUpload
-import models.SchemeId.Srn
 import pages.QuestionPage
+import models.SchemeId.Srn
 import play.api.libs.json.JsPath
+import models.ManualOrUpload
 
 case class PensionSchemeMembersPage(srn: Srn) extends QuestionPage[ManualOrUpload] {
   override def path: JsPath = JsPath \ toString

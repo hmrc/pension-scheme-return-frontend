@@ -16,35 +16,35 @@
 
 package controllers.nonsipp.bondsdisposal
 
-import cats.implicits._
-import com.google.inject.Inject
-import config.Constants
-import config.Constants.{maxBondsTransactions, maxDisposalPerBond}
+import pages.nonsipp.bonds.{BondsCompleted, NameOfBondsPage}
+import viewmodels.implicits._
+import play.api.mvc._
 import config.Refined.{Max50, Max5000}
 import controllers.PSRController
+import cats.implicits._
+import config.Constants.{maxBondsTransactions, maxDisposalPerBond}
 import controllers.actions.IdentifyAndRequireData
+import navigation.Navigator
+import models._
+import models.HowDisposed.HowDisposed
+import com.google.inject.Inject
+import utils.nonsipp.TaskListStatusUtils.getBondsDisposalsTaskListStatusWithLink
+import config.Constants
+import views.html.ListView
+import models.SchemeId.Srn
 import controllers.nonsipp.bondsdisposal.ReportBondsDisposalListController._
 import forms.YesNoPageFormProvider
-import models.HowDisposed.HowDisposed
-import models.SchemeId.Srn
-import models.requests.DataRequest
-import models.{CheckMode, HowDisposed, Mode, NormalMode, Pagination, UserAnswers}
-import navigation.Navigator
+import play.api.i18n.MessagesApi
 import pages.nonsipp.bondsdisposal.{
   BondsDisposalCompletedPages,
   HowWereBondsDisposedOfPage,
   ReportBondsDisposalListPage
 }
-import pages.nonsipp.bonds.{BondsCompleted, NameOfBondsPage}
-import play.api.data.Form
-import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import utils.nonsipp.TaskListStatusUtils.getBondsDisposalsTaskListStatusWithLink
 import viewmodels.DisplayMessage
 import viewmodels.DisplayMessage.{Message, ParagraphMessage}
-import viewmodels.implicits._
 import viewmodels.models._
-import views.html.ListView
+import models.requests.DataRequest
+import play.api.data.Form
 
 import javax.inject.Named
 

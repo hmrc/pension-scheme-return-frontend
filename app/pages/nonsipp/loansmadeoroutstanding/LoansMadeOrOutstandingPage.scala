@@ -16,8 +16,8 @@
 
 package pages.nonsipp.loansmadeoroutstanding
 
-import models.SchemeId.Srn
 import pages.QuestionPage
+import models.SchemeId.Srn
 import play.api.libs.json.JsPath
 
 case class LoansMadeOrOutstandingPage(srn: Srn) extends QuestionPage[Boolean] {

@@ -16,15 +16,16 @@
 
 package connectors
 
-import config.FrontendAppConfig
-import models._
-import play.api.libs.json._
 import uk.gov.hmrc.http.HttpReads.Implicits._
+import config.FrontendAppConfig
+import play.api.libs.json._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import models._
 import utils.JsonUtils._
 
-import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+
+import javax.inject.Inject
 
 class AddressLookupConnector @Inject()(http: HttpClient, appConfig: FrontendAppConfig)(
   implicit ec: ExecutionContext

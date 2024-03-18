@@ -16,12 +16,12 @@
 
 package pages.nonsipp.landorproperty
 
-import config.Refined.Max5000
-import models.SchemeId.Srn
-import models.{PostcodeLookup, UserAnswers}
-import pages.QuestionPage
-import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
+import models.SchemeId.Srn
+import play.api.libs.json.JsPath
+import models.{PostcodeLookup, UserAnswers}
+import config.Refined.Max5000
+import pages.QuestionPage
 
 import scala.util.Try
 

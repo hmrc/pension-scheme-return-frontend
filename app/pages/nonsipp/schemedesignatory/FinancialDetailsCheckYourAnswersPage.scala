@@ -16,7 +16,7 @@
 
 package pages.nonsipp.schemedesignatory
 
-import models.SchemeId.Srn
 import pages.Page
+import models.SchemeId.Srn
 
 case class FinancialDetailsCheckYourAnswersPage(srn: Srn) extends Page

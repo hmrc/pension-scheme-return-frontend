@@ -16,26 +16,26 @@
 
 package controllers.nonsipp.landorproperty
 
+import viewmodels.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import com.google.inject.Inject
-import config.Constants
-import config.Constants.maxLandOrProperties
 import config.Refined.Max5000
 import controllers.PSRController
+import pages.nonsipp.landorproperty.{LandOrPropertyAddressLookupPages, LandOrPropertyListPage}
+import config.Constants.maxLandOrProperties
+import navigation.Navigator
+import forms.YesNoPageFormProvider
+import models._
+import play.api.i18n.MessagesApi
+import play.api.data.Form
+import utils.nonsipp.TaskListStatusUtils.getLandOrPropertyTaskListStatusAndLink
+import config.Constants
+import views.html.ListView
+import models.SchemeId.Srn
 import controllers.actions._
 import eu.timepit.refined.refineV
-import forms.YesNoPageFormProvider
-import models.SchemeId.Srn
-import models._
-import navigation.Navigator
-import pages.nonsipp.landorproperty.{LandOrPropertyAddressLookupPages, LandOrPropertyListPage}
-import play.api.data.Form
-import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import utils.nonsipp.TaskListStatusUtils.getLandOrPropertyTaskListStatusAndLink
 import viewmodels.DisplayMessage.{Message, ParagraphMessage}
-import viewmodels.implicits._
 import viewmodels.models._
-import views.html.ListView
 
 import javax.inject.Named
 

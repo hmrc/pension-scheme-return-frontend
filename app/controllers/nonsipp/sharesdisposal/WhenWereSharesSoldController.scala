@@ -16,31 +16,32 @@
 
 package controllers.nonsipp.sharesdisposal
 
-import cats.implicits.toShow
+import viewmodels.implicits._
 import config.Refined.{Max50, Max5000}
 import controllers.PSRController
+import cats.implicits.toShow
 import controllers.actions.IdentifyAndRequireData
-import controllers.nonsipp.sharesdisposal.WhenWereSharesSoldController._
-import forms.DatePageFormProvider
-import forms.mappings.errors.DateFormErrors
-import models.{DateRange, Mode}
-import models.SchemeId.Srn
-import navigation.Navigator
-import pages.nonsipp.shares.CompanyNameRelatedSharesPage
 import pages.nonsipp.sharesdisposal.WhenWereSharesSoldPage
-import play.api.data.Form
+import navigation.Navigator
+import forms.DatePageFormProvider
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.data.Form
+import forms.mappings.errors.DateFormErrors
 import services.{SaveService, SchemeDateService}
-import utils.DateTimeUtils.localDateShow
-import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
-import viewmodels.models.{DatePageViewModel, FormPageViewModel}
+import controllers.nonsipp.sharesdisposal.WhenWereSharesSoldController._
+import pages.nonsipp.shares.CompanyNameRelatedSharesPage
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import views.html.DatePageView
+import models.SchemeId.Srn
+import utils.DateTimeUtils.localDateShow
+import models.{DateRange, Mode}
+import viewmodels.DisplayMessage.Message
+import viewmodels.models.{DatePageViewModel, FormPageViewModel}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import java.time.LocalDate
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class WhenWereSharesSoldController @Inject()(
   override val messagesApi: MessagesApi,

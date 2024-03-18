@@ -16,7 +16,7 @@
 
 package pages.nonsipp.memberdetails
 
-import models.SchemeId.Srn
 import pages.Page
+import models.SchemeId.Srn
 
 case class HowToUploadPage(srn: Srn) extends Page

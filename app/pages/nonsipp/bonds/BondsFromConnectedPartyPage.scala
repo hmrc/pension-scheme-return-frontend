@@ -16,11 +16,11 @@
 
 package pages.nonsipp.bonds
 
-import config.Refined.Max5000
-import models.SchemeId.Srn
-import pages.QuestionPage
-import play.api.libs.json.JsPath
 import utils.RefinedUtils._
+import models.SchemeId.Srn
+import play.api.libs.json.JsPath
+import config.Refined.Max5000
+import pages.QuestionPage
 
 case class BondsFromConnectedPartyPage(srn: Srn, index: Max5000) extends QuestionPage[Boolean] {
 

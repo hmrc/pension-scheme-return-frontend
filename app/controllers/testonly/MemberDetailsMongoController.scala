@@ -16,22 +16,23 @@
 
 package controllers.testonly
 
-import cats.implicits._
+import pages.nonsipp.memberdetails._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Refined.{Max300, OneTo300}
+import models.SchemeId.Srn
+import cats.implicits._
+import repositories.SessionRepository
+import models.UserAnswers
+import viewmodels.models.MemberState
 import controllers.actions.IdentifyAndRequireData
 import eu.timepit.refined._
-import models.SchemeId.Srn
-import models.UserAnswers
-import pages.nonsipp.memberdetails._
 import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.models.MemberState
 
-import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
+
+import javax.inject.Inject
 
 class MemberDetailsMongoController @Inject()(
   sessionRepository: SessionRepository,

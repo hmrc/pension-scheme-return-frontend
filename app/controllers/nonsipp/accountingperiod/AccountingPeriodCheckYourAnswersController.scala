@@ -16,21 +16,21 @@
 
 package controllers.nonsipp.accountingperiod
 
-import cats.implicits.toShow
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import com.google.inject.Inject
 import config.Refined.Max3
-import controllers.actions.{AllowAccessActionProvider, DataRequiredAction, DataRetrievalAction, IdentifierAction}
-import controllers.nonsipp.accountingperiod.AccountingPeriodCheckYourAnswersController.viewModel
-import models.SchemeId.Srn
-import models.{DateRange, Mode}
-import navigation.Navigator
+import cats.implicits.toShow
+import controllers.actions._
 import pages.nonsipp.accountingperiod.{AccountingPeriodCheckYourAnswersPage, AccountingPeriodPage}
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.DateTimeUtils.localDateShow
-import viewmodels.models.{CheckYourAnswersRowViewModel, CheckYourAnswersViewModel, FormPageViewModel, SummaryAction}
+import navigation.Navigator
+import viewmodels.models._
 import views.html.CheckYourAnswersView
+import models.SchemeId.Srn
+import utils.DateTimeUtils.localDateShow
+import models.{DateRange, Mode}
+import controllers.nonsipp.accountingperiod.AccountingPeriodCheckYourAnswersController.viewModel
+import play.api.i18n.{I18nSupport, MessagesApi}
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Named
 

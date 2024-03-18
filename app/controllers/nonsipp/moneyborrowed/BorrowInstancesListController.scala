@@ -16,29 +16,29 @@
 
 package controllers.nonsipp.moneyborrowed
 
-import cats.implicits._
+import viewmodels.implicits._
+import play.api.mvc._
 import com.google.inject.Inject
-import config.Constants
-import config.Constants.maxBorrows
 import config.Refined.{Max5000, OneTo5000}
 import controllers.PSRController
-import controllers.actions.IdentifyAndRequireData
-import eu.timepit.refined.api.Refined
-import eu.timepit.refined.refineV
-import forms.YesNoPageFormProvider
-import models.SchemeId.Srn
-import models.requests.DataRequest
-import models.{CheckOrChange, Mode, Money, NormalMode, Pagination}
+import cats.implicits._
+import config.Constants.maxBorrows
 import navigation.Navigator
-import pages.nonsipp.moneyborrowed.{BorrowInstancesListPage, BorrowedAmountAndRatePage, LenderNamePages}
-import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import forms.YesNoPageFormProvider
+import models._
+import eu.timepit.refined.api.Refined
 import utils.nonsipp.TaskListStatusUtils.getBorrowingTaskListStatusAndLink
-import viewmodels.DisplayMessage.{Message, ParagraphMessage}
-import viewmodels.implicits._
-import viewmodels.models._
+import config.Constants
 import views.html.ListView
+import models.SchemeId.Srn
+import controllers.actions.IdentifyAndRequireData
+import eu.timepit.refined.refineV
+import play.api.i18n.{I18nSupport, MessagesApi}
+import pages.nonsipp.moneyborrowed.{BorrowInstancesListPage, BorrowedAmountAndRatePage, LenderNamePages}
+import viewmodels.DisplayMessage.{Message, ParagraphMessage}
+import viewmodels.models._
+import models.requests.DataRequest
+import play.api.data.Form
 
 import javax.inject.Named
 

@@ -16,35 +16,36 @@
 
 package controllers.nonsipp.landorpropertydisposal
 
-import cats.implicits._
+import viewmodels.implicits._
+import play.api.mvc._
 import com.google.inject.Inject
-import config.Constants
-import config.Refined.Max5000._
 import config.Refined.{Max5000, _}
 import controllers.PSRController
-import controllers.actions._
-import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalAddressListController._
-import eu.timepit.refined.refineV
-import forms.RadioListFormProvider
-import models.SchemeId.Srn
-import models.{Address, Mode, Pagination, UserAnswers}
-import navigation.Navigator
-import pages.nonsipp.landorproperty.LandOrPropertyAddressLookupPages
+import config.Constants
+import cats.implicits._
 import pages.nonsipp.landorpropertydisposal.{
   LandOrPropertyDisposalAddressListPage,
   LandOrPropertyStillHeldPage,
   LandPropertyDisposalCompletedPages
 }
-import play.api.data.Form
+import config.Refined.Max5000._
+import navigation.Navigator
+import forms.RadioListFormProvider
+import models._
 import play.api.i18n.MessagesApi
-import play.api.mvc._
-import viewmodels.DisplayMessage.{Message, ParagraphMessage}
-import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, ListRadiosRow, ListRadiosViewModel, PaginatedViewModel}
+import play.api.data.Form
 import views.html.ListRadiosView
+import models.SchemeId.Srn
+import controllers.nonsipp.landorpropertydisposal.LandOrPropertyDisposalAddressListController._
+import pages.nonsipp.landorproperty.LandOrPropertyAddressLookupPages
+import controllers.actions._
+import eu.timepit.refined.refineV
+import viewmodels.DisplayMessage.{Message, ParagraphMessage}
+import viewmodels.models._
+
+import scala.collection.immutable.SortedMap
 
 import javax.inject.Named
-import scala.collection.immutable.SortedMap
 
 class LandOrPropertyDisposalAddressListController @Inject()(
   override val messagesApi: MessagesApi,
@@ -55,7 +56,7 @@ class LandOrPropertyDisposalAddressListController @Inject()(
   formProvider: RadioListFormProvider
 ) extends PSRController {
 
-  val form = LandOrPropertyDisposalAddressListController.form(formProvider)
+  val form: Form[Max5000] = LandOrPropertyDisposalAddressListController.form(formProvider)
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>

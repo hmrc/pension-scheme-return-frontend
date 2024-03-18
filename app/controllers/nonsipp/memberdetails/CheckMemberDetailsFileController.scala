@@ -16,40 +16,31 @@
 
 package controllers.nonsipp.memberdetails
 
-import akka.stream.Materializer
-import config.Constants.{PSA, PSP}
+import models.audit.{PSRFileValidationAuditEvent, PSRUpscanFileDownloadAuditEvent, PSRUpscanFileUploadAuditEvent}
+import viewmodels.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import controllers.PSRController
+import config.Constants.{PSA, PSP}
 import controllers.actions._
-import controllers.nonsipp.memberdetails.CheckMemberDetailsFileController._
+import navigation.Navigator
 import forms.YesNoPageFormProvider
+import models._
+import akka.stream.Materializer
+import services._
+import pages.nonsipp.memberdetails.CheckMemberDetailsFilePage
+import controllers.nonsipp.memberdetails.CheckMemberDetailsFileController._
+import views.html.YesNoPageView
 import models.SchemeId.Srn
 import models.UploadStatus.UploadStatus
-import models.audit.{PSRFileValidationAuditEvent, PSRUpscanFileDownloadAuditEvent, PSRUpscanFileUploadAuditEvent}
-import models.requests.DataRequest
-import models.{
-  DateRange,
-  Mode,
-  Upload,
-  UploadErrors,
-  UploadFormatError,
-  UploadKey,
-  UploadMaxRowsError,
-  UploadStatus,
-  UploadSuccess
-}
-import navigation.Navigator
-import pages.nonsipp.memberdetails.CheckMemberDetailsFilePage
-import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services._
 import viewmodels.DisplayMessage.ParagraphMessage
-import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
-import views.html.YesNoPageView
+import models.requests.DataRequest
+import play.api.data.Form
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class CheckMemberDetailsFileController @Inject()(
   override val messagesApi: MessagesApi,

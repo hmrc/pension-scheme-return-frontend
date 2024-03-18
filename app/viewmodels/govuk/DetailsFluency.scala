@@ -17,8 +17,8 @@
 package viewmodels.govuk
 
 import play.twirl.api.Html
-import uk.gov.hmrc.govukfrontend.views.Aliases.Details
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
+import uk.gov.hmrc.govukfrontend.views.Aliases.Details
 
 object details extends DetailsFluency
 

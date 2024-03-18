@@ -17,8 +17,8 @@
 package utils
 
 import cats.syntax.traverse._
-import eu.timepit.refined.api.{Refined, Validate}
 import eu.timepit.refined.refineV
+import eu.timepit.refined.api.{Refined, Validate}
 
 import scala.collection.immutable.SortedMap
 

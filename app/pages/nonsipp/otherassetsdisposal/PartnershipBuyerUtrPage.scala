@@ -16,12 +16,12 @@
 
 package pages.nonsipp.otherassetsdisposal
 
-import config.Refined.{Max50, Max5000}
-import models.SchemeId.Srn
-import models.{ConditionalYesNo, Utr}
-import pages.QuestionPage
-import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
+import models.SchemeId.Srn
+import play.api.libs.json.JsPath
+import models.{ConditionalYesNo, Utr}
+import config.Refined.{Max50, Max5000}
+import pages.QuestionPage
 
 case class PartnershipBuyerUtrPage(srn: Srn, index: Max5000, disposalIndex: Max50)
     extends QuestionPage[ConditionalYesNo[String, Utr]] {

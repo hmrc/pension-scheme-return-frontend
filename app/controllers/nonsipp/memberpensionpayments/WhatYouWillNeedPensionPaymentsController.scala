@@ -16,18 +16,18 @@
 
 package controllers.nonsipp.memberpensionpayments
 
-import controllers.actions.{AllowAccessActionProvider, DataRequiredAction, DataRetrievalAction, IdentifierAction}
-import models.NormalMode
-import models.SchemeId.Srn
-import navigation.Navigator
-import pages.nonsipp.memberpensionpayments.WhatYouWillNeedPensionPaymentsPage
-import play.api.i18n.{I18nSupport, MessagesApi}
+import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import navigation.Navigator
+import models.NormalMode
+import views.html.ContentPageView
+import models.SchemeId.Srn
+import pages.nonsipp.memberpensionpayments.WhatYouWillNeedPensionPaymentsPage
+import controllers.actions._
+import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.{Message, ParagraphMessage}
 import viewmodels.models.{ContentPageViewModel, FormPageViewModel}
-import views.html.ContentPageView
-import viewmodels.implicits._
 
 import javax.inject.{Inject, Named}
 

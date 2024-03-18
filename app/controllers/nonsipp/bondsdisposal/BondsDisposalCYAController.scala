@@ -16,31 +16,32 @@
 
 package controllers.nonsipp.bondsdisposal
 
-import cats.implicits.toShow
+import services.{PsrSubmissionService, SaveService}
+import pages.nonsipp.bonds.{CostOfBondsPage, NameOfBondsPage, WhyDoesSchemeHoldBondsPage}
+import viewmodels.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Refined.{Max50, Max5000}
 import controllers.PSRController
+import cats.implicits.toShow
 import controllers.actions.IdentifyAndRequireData
-import controllers.nonsipp.bondsdisposal.BondsDisposalCYAController._
-import models.HowDisposed._
-import models.PointOfEntry.NoPointOfEntry
-import models.SchemeId.Srn
-import models.{CheckMode, HowDisposed, Mode, Money, SchemeHoldBond}
 import navigation.Navigator
-import pages.nonsipp.bondsdisposal._
-import pages.nonsipp.bonds.{CostOfBondsPage, NameOfBondsPage, WhyDoesSchemeHoldBondsPage}
-import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.{PsrSubmissionService, SaveService}
-import utils.DateTimeUtils.localDateShow
-import viewmodels.DisplayMessage.Message
-import viewmodels.Margin
-import viewmodels.implicits._
-import viewmodels.models._
+import controllers.nonsipp.bondsdisposal.BondsDisposalCYAController._
+import models.PointOfEntry.NoPointOfEntry
+import models.HowDisposed._
 import views.html.CheckYourAnswersView
+import models.SchemeId.Srn
+import utils.DateTimeUtils.localDateShow
+import models._
+import play.api.i18n.MessagesApi
+import pages.nonsipp.bondsdisposal._
+import viewmodels.Margin
+import viewmodels.DisplayMessage.Message
+import viewmodels.models._
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import java.time.LocalDate
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class BondsDisposalCYAController @Inject()(
   override val messagesApi: MessagesApi,

@@ -16,30 +16,31 @@
 
 package controllers.nonsipp.landorproperty
 
-import cats.data.EitherT
+import viewmodels.implicits._
+import utils.FormUtils.FormOps
+import play.api.mvc._
 import config.Refined.Max5000
 import controllers.PSRController
-import controllers.actions._
-import controllers.nonsipp.landorproperty.LandOrPropertyPostcodeLookupController.viewModel
-import forms.AddressLookupFormProvider
-import forms.mappings.errors.InputFormErrors
-import models.SchemeId.Srn
-import models.requests.DataRequest
-import models.{Address, Mode, PostcodeLookup}
-import navigation.Navigator
 import pages.nonsipp.landorproperty.{AddressLookupResultsPage, LandOrPropertyPostcodeLookupPage}
-import play.api.data.Form
+import controllers.actions._
+import navigation.Navigator
+import forms.AddressLookupFormProvider
+import models.{Address, Mode, PostcodeLookup}
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import forms.mappings.errors.InputFormErrors
 import services.{AddressService, SaveService}
-import utils.FormUtils.FormOps
-import viewmodels.DisplayMessage.{LinkMessage, ParagraphMessage}
-import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, PostcodeLookupViewModel}
+import controllers.nonsipp.landorproperty.LandOrPropertyPostcodeLookupController.viewModel
+import cats.data.EitherT
 import views.html.PostcodeLookupView
+import models.SchemeId.Srn
+import viewmodels.DisplayMessage.{LinkMessage, ParagraphMessage}
+import viewmodels.models.{FormPageViewModel, PostcodeLookupViewModel}
+import models.requests.DataRequest
+import play.api.data.Form
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class LandOrPropertyPostcodeLookupController @Inject()(
   override val messagesApi: MessagesApi,

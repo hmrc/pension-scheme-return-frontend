@@ -16,12 +16,12 @@
 
 package config
 
-import eu.timepit.refined.api.{Refined, Validate}
 import eu.timepit.refined.boolean.And
-import eu.timepit.refined.numeric.{Greater, LessEqual}
 import eu.timepit.refined.refineV
-import models.Enumerable
 import play.api.libs.json._
+import models.Enumerable
+import eu.timepit.refined.numeric.{Greater, LessEqual}
+import eu.timepit.refined.api.{Refined, Validate}
 
 object Refined {
 

@@ -16,21 +16,21 @@
 
 package controllers.testonly
 
-import cats.syntax.bifunctor._
-import cats.syntax.traverse._
-import controllers.PSRController
-import controllers.actions.IdentifyAndRequireData
-import eu.timepit.refined.api.{Refined, Validate}
-import eu.timepit.refined.refineV
-import models.SchemeId.Srn
-import models.UserAnswers
-import org.slf4j.LoggerFactory
-import play.api.libs.json.{Json, Writes}
 import play.api.mvc.{Action, AnyContent}
-import services.SaveService
-import shapeless.PolyDefns.Case2
-import shapeless.ops.hlist._
+import org.slf4j.LoggerFactory
+import controllers.PSRController
+import models.SchemeId.Srn
+import play.api.libs.json.{Json, Writes}
 import shapeless.{HList, Poly}
+import eu.timepit.refined.api.{Refined, Validate}
+import cats.syntax.traverse._
+import services.SaveService
+import shapeless.ops.hlist._
+import cats.syntax.bifunctor._
+import controllers.actions.IdentifyAndRequireData
+import eu.timepit.refined.refineV
+import models.UserAnswers
+import shapeless.PolyDefns.Case2
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try

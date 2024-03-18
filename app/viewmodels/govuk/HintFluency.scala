@@ -17,8 +17,8 @@
 package viewmodels.govuk
 
 import play.twirl.api.Html
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{Content, HtmlContent}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{Content, HtmlContent}
 
 object hint extends HintFluency
 

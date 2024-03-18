@@ -16,11 +16,11 @@
 
 package navigation.nonsipp
 
-import models.UserAnswers
-import navigation.JourneyNavigator
-import pages.Page
-import pages.nonsipp.declaration.{PsaDeclarationPage, PspDeclarationPage}
 import play.api.mvc.Call
+import pages.Page
+import navigation.JourneyNavigator
+import models.UserAnswers
+import pages.nonsipp.declaration.{PsaDeclarationPage, PspDeclarationPage}
 
 object DeclarationNavigator extends JourneyNavigator {
 

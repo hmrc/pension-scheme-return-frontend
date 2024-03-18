@@ -16,14 +16,14 @@
 
 package viewmodels.govuk
 
-import play.api.data.FormError
-import play.api.i18n.Messages
-import play.twirl.api.Html
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
-import uk.gov.hmrc.govukfrontend.views.viewmodels.errormessage.ErrorMessage
-import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
 import uk.gov.hmrc.govukfrontend.views.viewmodels.textarea.Textarea
+import play.twirl.api.Html
+import uk.gov.hmrc.govukfrontend.views.viewmodels.hint.Hint
 import viewmodels.govuk.label._
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.{HtmlContent, Text}
+import play.api.i18n.Messages
+import uk.gov.hmrc.govukfrontend.views.viewmodels.errormessage.ErrorMessage
+import play.api.data.FormError
 
 object textarea extends TextAreaFluency
 

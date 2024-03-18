@@ -16,12 +16,12 @@
 
 package pages.nonsipp.membersurrenderedbenefits
 
-import config.Refined._
-import models.SchemeId.Srn
-import pages.{IndexedQuestionPage, QuestionPage}
-import play.api.libs.json.JsPath
 import utils.RefinedUtils._
+import models.SchemeId.Srn
+import play.api.libs.json.JsPath
 import viewmodels.models.SectionCompleted
+import config.Refined._
+import pages.{IndexedQuestionPage, QuestionPage}
 
 case class SurrenderedBenefitsCompletedPage(srn: Srn, index: Max300) extends QuestionPage[SectionCompleted.type] {
 

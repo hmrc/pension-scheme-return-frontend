@@ -16,19 +16,20 @@
 
 package controllers.testonly
 
+import services.SaveService
+import play.api.mvc.MessagesControllerComponents
 import config.Refined.{Max50, Max5000}
-import controllers.actions.IdentifyAndRequireData
-import eu.timepit.refined.refineMV
-import models.HowSharesDisposed._
 import models.SchemeId.Srn
 import pages.nonsipp.sharesdisposal.{HowManyDisposalSharesPage, HowWereSharesDisposedPage, SharesDisposalCompletedPage}
-import play.api.mvc.MessagesControllerComponents
-import services.SaveService
+import models.HowSharesDisposed._
 import shapeless.{::, HList, HNil}
 import viewmodels.models.SectionCompleted
+import controllers.actions.IdentifyAndRequireData
+import eu.timepit.refined.refineMV
+
+import scala.concurrent.ExecutionContext
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
 
 class SharesDisposalMongoController @Inject()(
   val saveService: SaveService,

@@ -16,8 +16,8 @@
 
 package viewmodels.models
 
-import play.api.data.FormError
 import viewmodels.DisplayMessage
+import play.api.data.FormError
 
 case class UploadViewModel(
   detailsContent: DisplayMessage,

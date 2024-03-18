@@ -16,32 +16,28 @@
 
 package controllers.nonsipp.employercontributions
 
-import cats.implicits.catsSyntaxApplicativeId
+import viewmodels.implicits._
+import play.api.mvc._
 import config.Refined._
 import controllers.PSRController
 import controllers.actions._
-import controllers.nonsipp.employercontributions.OtherEmployeeDescriptionController._
+import navigation.Navigator
 import forms.TextFormProvider
 import models.Mode
-import models.SchemeId.Srn
-import navigation.Navigator
-import pages.nonsipp.employercontributions.{
-  EmployerContributionsProgress,
-  EmployerNamePage,
-  OtherEmployeeDescriptionPage
-}
-import play.api.data.Form
 import play.api.i18n.MessagesApi
-import play.api.mvc._
+import play.api.data.Form
+import controllers.nonsipp.employercontributions.OtherEmployeeDescriptionController._
+import pages.nonsipp.employercontributions.{EmployerNamePage, OtherEmployeeDescriptionPage}
 import services.SaveService
+import views.html.TextAreaView
+import models.SchemeId.Srn
 import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
 import viewmodels.models._
-import views.html.TextAreaView
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class OtherEmployeeDescriptionController @Inject()(
   override val messagesApi: MessagesApi,

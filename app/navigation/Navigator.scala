@@ -16,12 +16,12 @@
 
 package navigation
 
+import play.api.mvc.Call
+import pages._
 import controllers.nonsipp.routes
+import play.api.libs.json.JsObject
 import models._
 import models.requests.DataRequest
-import pages._
-import play.api.libs.json.JsObject
-import play.api.mvc.Call
 
 import javax.inject.{Inject, Singleton}
 

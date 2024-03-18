@@ -16,32 +16,33 @@
 
 package controllers.nonsipp.totalvaluequotedshares
 
+import services.{SaveService, SchemeDateService}
+import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
+import viewmodels.implicits._
+import play.api.mvc._
+import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import cats.implicits.toShow
-import cats.{Id, Monad}
 import config.Constants.maxMoneyValue
 import controllers.actions._
 import controllers.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesController._
-import forms.MoneyFormProvider
-import forms.mappings.errors.MoneyFormErrors
-import models.SchemeId.Srn
-import models.requests.DataRequest
-import models.{DateRange, Money, NormalMode}
 import navigation.Navigator
-import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
-import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import services.{SaveService, SchemeDateService}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.DateTimeUtils.localDateShow
-import viewmodels.DisplayMessage.{Empty, Message}
-import viewmodels.implicits._
-import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
-import viewmodels.models.{FormPageViewModel, QuestionField}
+import forms.MoneyFormProvider
+import cats.{Id, Monad}
+import forms.mappings.errors.MoneyFormErrors
 import views.html.MoneyView
+import models.SchemeId.Srn
+import utils.DateTimeUtils.localDateShow
+import models.{DateRange, Money, NormalMode}
+import play.api.i18n.{I18nSupport, MessagesApi}
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.DisplayMessage.{Empty, Message}
+import viewmodels.models.{FormPageViewModel, QuestionField}
+import models.requests.DataRequest
+import play.api.data.Form
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class TotalValueQuotedSharesController @Inject()(
   override val messagesApi: MessagesApi,

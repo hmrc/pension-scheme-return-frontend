@@ -16,9 +16,9 @@
 
 package models
 
-import play.api.libs.functional.syntax._
-import play.api.libs.json._
 import utils.Transform
+import play.api.libs.json._
+import play.api.libs.functional.syntax._
 
 case class ConditionalYesNo[No, Yes](value: Either[No, Yes])
 

@@ -16,32 +16,33 @@
 
 package controllers.nonsipp.common
 
-import config.Refined.Max5000
-import controllers.actions._
-import controllers.nonsipp.common.CompanyRecipientCrnController._
-import forms.YesNoPageFormProvider
-import forms.mappings.Mappings
-import forms.mappings.errors.InputFormErrors
-import models.SchemeId.Srn
-import models.{ConditionalYesNo, Crn, IdentitySubject, Mode, UserAnswers}
-import navigation.Navigator
-import pages.nonsipp.common.CompanyRecipientCrnPage
-import pages.nonsipp.landorproperty.CompanySellerNamePage
-import pages.nonsipp.loansmadeoroutstanding.CompanyRecipientNamePage
-import pages.nonsipp.otherassetsheld.CompanyNameOfOtherAssetSellerPage
-import pages.nonsipp.shares.CompanyNameOfSharesSellerPage
-import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
+import viewmodels.implicits._
+import config.Refined.Max5000
+import controllers.nonsipp.common.CompanyRecipientCrnController._
+import pages.nonsipp.landorproperty.CompanySellerNamePage
+import controllers.actions._
+import navigation.Navigator
+import forms.YesNoPageFormProvider
+import models._
+import pages.nonsipp.common.CompanyRecipientCrnPage
+import pages.nonsipp.loansmadeoroutstanding.CompanyRecipientNamePage
+import play.api.data.Form
+import forms.mappings.errors.InputFormErrors
+import pages.nonsipp.shares.CompanyNameOfSharesSellerPage
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import forms.mappings.Mappings
+import pages.nonsipp.otherassetsheld.CompanyNameOfOtherAssetSellerPage
+import views.html.ConditionalYesNoPageView
+import models.SchemeId.Srn
+import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
-import viewmodels.models.{ConditionalYesNoPageViewModel, FieldType, FormPageViewModel, YesNoViewModel}
-import views.html.ConditionalYesNoPageView
+import viewmodels.models._
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class CompanyRecipientCrnController @Inject()(
   override val messagesApi: MessagesApi,

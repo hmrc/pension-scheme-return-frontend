@@ -16,28 +16,29 @@
 
 package controllers.nonsipp.sharesdisposal
 
+import services.SaveService
+import viewmodels.implicits._
+import utils.FormUtils._
 import config.Refined.{Max50, Max5000}
 import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
-import controllers.nonsipp.sharesdisposal.OtherBuyerDetailsController._
-import forms.RecipientDetailsFormProvider
-import models.SchemeId.Srn
-import models.{Mode, RecipientDetails}
-import navigation.Navigator
-import pages.nonsipp.shares.CompanyNameRelatedSharesPage
 import pages.nonsipp.sharesdisposal.OtherBuyerDetailsPage
-import play.api.data.Form
+import navigation.Navigator
+import forms.RecipientDetailsFormProvider
+import models.{Mode, RecipientDetails}
 import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.data.Form
+import controllers.nonsipp.sharesdisposal.OtherBuyerDetailsController._
+import pages.nonsipp.shares.CompanyNameRelatedSharesPage
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
-import utils.FormUtils._
-import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, RecipientDetailsViewModel}
 import views.html.RecipientDetailsView
+import models.SchemeId.Srn
+import viewmodels.DisplayMessage.Message
+import viewmodels.models.{FormPageViewModel, RecipientDetailsViewModel}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class OtherBuyerDetailsController @Inject()(
   override val messagesApi: MessagesApi,

@@ -16,7 +16,7 @@
 
 package pages.nonsipp.sharesdisposal
 
-import models.SchemeId.Srn
 import pages.Page
+import models.SchemeId.Srn
 
 case class ReportedSharesDisposalListPage(srn: Srn, addDisposal: Boolean) extends Page

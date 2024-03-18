@@ -16,30 +16,31 @@
 
 package controllers.nonsipp.receivetransfer
 
-import cats.implicits.{toShow, toTraverseOps}
+import services.{PsrSubmissionService, SaveService}
+import pages.nonsipp.memberdetails.MemberDetailsPage
+import viewmodels.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Refined._
 import controllers.PSRController
 import controllers.actions._
-import controllers.nonsipp.receivetransfer.TransfersInCYAController._
-import models.PensionSchemeType.PensionSchemeType
-import models.SchemeId.Srn
-import models._
 import navigation.Navigator
-import pages.nonsipp.memberdetails.MemberDetailsPage
-import pages.nonsipp.receivetransfer._
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.{PsrSubmissionService, SaveService}
-import utils.DateTimeUtils.localDateShow
+import controllers.nonsipp.receivetransfer.TransfersInCYAController._
 import utils.ListUtils.ListOps
-import viewmodels.DisplayMessage.{Heading2, InlineMessage, Message, ParagraphMessage}
-import viewmodels.implicits._
-import viewmodels.models._
+import models.PensionSchemeType.PensionSchemeType
 import views.html.CheckYourAnswersView
+import models.SchemeId.Srn
+import cats.implicits.{toShow, toTraverseOps}
+import pages.nonsipp.receivetransfer._
+import utils.DateTimeUtils.localDateShow
+import models._
+import viewmodels.DisplayMessage._
+import viewmodels.models._
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import java.time.LocalDate
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class TransfersInCYAController @Inject()(
   override val messagesApi: MessagesApi,

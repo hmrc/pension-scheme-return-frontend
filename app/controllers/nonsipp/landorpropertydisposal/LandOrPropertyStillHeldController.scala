@@ -16,27 +16,28 @@
 
 package controllers.nonsipp.landorpropertydisposal
 
+import controllers.nonsipp.landorpropertydisposal.LandOrPropertyStillHeldController._
+import services.SaveService
+import viewmodels.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Refined.{Max50, Max5000}
 import controllers.PSRController
-import controllers.actions._
-import controllers.nonsipp.landorpropertydisposal.LandOrPropertyStillHeldController._
-import forms.YesNoPageFormProvider
-import models.SchemeId.Srn
-import models.{HowDisposed, Mode}
-import navigation.Navigator
 import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import pages.nonsipp.landorpropertydisposal.{HowWasPropertyDisposedOfPage, LandOrPropertyStillHeldPage}
-import play.api.data.Form
+import controllers.actions._
+import navigation.Navigator
+import forms.YesNoPageFormProvider
+import models.{HowDisposed, Mode}
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
-import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
+import play.api.data.Form
 import views.html.YesNoPageView
+import models.SchemeId.Srn
+import viewmodels.DisplayMessage.Message
+import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class LandOrPropertyStillHeldController @Inject()(
   override val messagesApi: MessagesApi,

@@ -16,32 +16,33 @@
 
 package controllers.nonsipp.memberpensionpayments
 
-import cats.implicits.{toBifunctorOps, toTraverseOps}
+import services.{PsrSubmissionService, SaveService}
+import viewmodels.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import com.google.inject.Inject
-import config.Constants
-import config.Constants.maxNotRelevant
 import config.Refined.OneTo300
 import controllers.PSRController
+import config.Constants
+import cats.implicits.{toBifunctorOps, toTraverseOps}
+import config.Constants.maxNotRelevant
+import navigation.Navigator
+import forms.YesNoPageFormProvider
+import models._
+import views.html.TwoColumnsTripleAction
+import models.SchemeId.Srn
+import pages.nonsipp.memberpensionpayments.{MemberPensionPaymentsListPage, TotalAmountPensionPaymentsPage}
 import controllers.actions._
 import eu.timepit.refined.refineV
-import forms.YesNoPageFormProvider
-import models.SchemeId.Srn
-import models._
-import models.requests.DataRequest
-import navigation.Navigator
-import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
-import pages.nonsipp.memberpensionpayments.{MemberPensionPaymentsListPage, TotalAmountPensionPaymentsPage}
-import play.api.data.Form
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.{PsrSubmissionService, SaveService}
+import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
 import viewmodels.DisplayMessage.{Message, ParagraphMessage}
-import viewmodels.implicits._
-import viewmodels.models.{ActionTableViewModel, FormPageViewModel, PaginatedViewModel, TableElem}
-import views.html.TwoColumnsTripleAction
+import viewmodels.models._
+import models.requests.DataRequest
+import play.api.data.Form
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.Named
-import scala.concurrent.{ExecutionContext, Future}
 
 class MemberPensionPaymentsListController @Inject()(
   override val messagesApi: MessagesApi,

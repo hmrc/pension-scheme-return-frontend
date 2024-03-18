@@ -16,29 +16,30 @@
 
 package controllers.nonsipp.membersurrenderedbenefits
 
-import config.Constants.{maxSurrenderedBenefitAmount, minPosMoneyValue}
-import config.Refined.Max300
-import controllers.PSRController
-import controllers.actions.IdentifyAndRequireData
-import controllers.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsAmountController._
-import forms.mappings.errors.{MoneyFormErrorProvider, MoneyFormErrors}
-import models.SchemeId.Srn
-import models.{Mode, Money}
-import navigation.Navigator
-import pages.nonsipp.memberdetails.MemberDetailsPage
-import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsAmountPage
-import play.api.data.Form
-import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
-import viewmodels.DisplayMessage.{Empty, Message}
+import pages.nonsipp.memberdetails.MemberDetailsPage
 import viewmodels.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import controllers.PSRController
+import config.Constants.{maxSurrenderedBenefitAmount, minPosMoneyValue}
+import controllers.actions.IdentifyAndRequireData
+import navigation.Navigator
+import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsAmountPage
+import models.{Mode, Money}
+import play.api.i18n.MessagesApi
+import play.api.data.Form
+import forms.mappings.errors.{MoneyFormErrorProvider, MoneyFormErrors}
+import config.Refined.Max300
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
-import viewmodels.models.{FormPageViewModel, QuestionField}
 import views.html.MoneyView
+import models.SchemeId.Srn
+import controllers.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsAmountController._
+import viewmodels.DisplayMessage.{Empty, Message}
+import viewmodels.models.{FormPageViewModel, QuestionField}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class SurrenderedBenefitsAmountController @Inject()(
   override val messagesApi: MessagesApi,

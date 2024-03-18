@@ -16,34 +16,30 @@
 
 package controllers.nonsipp.landorproperty
 
-import config.FrontendAppConfig
+import services.SaveService
+import viewmodels.implicits._
+import utils.FormUtils.FormOps
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Refined.Max5000
 import controllers.PSRController
+import config.FrontendAppConfig
+import pages.nonsipp.landorproperty._
 import controllers.actions._
-import forms.YesNoPageFormProvider
-import models.SchemeId.Srn
-import models.requests.DataRequest
-import models.{IdentitySubject, IdentityType, Mode}
 import navigation.Navigator
+import forms.YesNoPageFormProvider
+import models.{IdentitySubject, IdentityType, Mode}
 import pages.nonsipp.common.{IdentityTypePage, OtherRecipientDetailsPage}
-import pages.nonsipp.landorproperty.{
-  CompanySellerNamePage,
-  LandOrPropertySellerConnectedPartyPage,
-  LandPropertyIndividualSellersNamePage,
-  PartnershipSellerNamePage
-}
-import play.api.data.Form
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
-import utils.FormUtils.FormOps
-import viewmodels.DisplayMessage.{LinkMessage, ListMessage, ListType, Message, ParagraphMessage}
-import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, FurtherDetailsViewModel, YesNoPageViewModel}
 import views.html.YesNoPageView
+import models.SchemeId.Srn
+import viewmodels.DisplayMessage._
+import viewmodels.models.{FormPageViewModel, FurtherDetailsViewModel, YesNoPageViewModel}
+import models.requests.DataRequest
+import play.api.data.Form
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class LandOrPropertySellerConnectedPartyController @Inject()(
   override val messagesApi: MessagesApi,

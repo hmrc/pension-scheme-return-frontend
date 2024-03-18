@@ -16,27 +16,28 @@
 
 package controllers.nonsipp.bondsdisposal
 
-import config.Constants.{maxTotalConsiderationAmount, minTotalConsiderationAmount}
-import config.Refined.{Max50, Max5000}
-import controllers.PSRController
-import controllers.actions.IdentifyAndRequireData
-import controllers.nonsipp.bondsdisposal.TotalConsiderationSaleBondsController._
-import forms.mappings.errors.{MoneyFormErrorProvider, MoneyFormErrors}
-import models.SchemeId.Srn
-import models.{Mode, Money}
-import navigation.Navigator
-import pages.nonsipp.bondsdisposal.TotalConsiderationSaleBondsPage
-import play.api.data.Form
-import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
-import viewmodels.DisplayMessage.{Empty, Message}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import controllers.PSRController
+import config.Constants.{maxTotalConsiderationAmount, minTotalConsiderationAmount}
+import controllers.actions.IdentifyAndRequireData
+import models.{Mode, Money}
+import play.api.data.Form
+import forms.mappings.errors.{MoneyFormErrorProvider, MoneyFormErrors}
+import config.Refined.{Max50, Max5000}
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
-import viewmodels.models.{FormPageViewModel, QuestionField}
 import views.html.MoneyView
+import models.SchemeId.Srn
+import controllers.nonsipp.bondsdisposal.TotalConsiderationSaleBondsController._
+import navigation.Navigator
+import play.api.i18n.MessagesApi
+import pages.nonsipp.bondsdisposal.TotalConsiderationSaleBondsPage
+import viewmodels.DisplayMessage.{Empty, Message}
+import viewmodels.models.{FormPageViewModel, QuestionField}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class TotalConsiderationSaleBondsController @Inject()(
   override val messagesApi: MessagesApi,

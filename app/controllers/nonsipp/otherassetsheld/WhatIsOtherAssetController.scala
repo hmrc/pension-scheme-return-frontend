@@ -16,26 +16,27 @@
 
 package controllers.nonsipp.otherassetsheld
 
+import services.SaveService
+import viewmodels.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import pages.nonsipp.otherassetsheld.WhatIsOtherAssetPage
 import config.Refined.Max5000
-import controllers.actions.IdentifyAndRequireData
 import controllers.nonsipp.otherassetsheld.WhatIsOtherAssetController._
+import controllers.actions.IdentifyAndRequireData
+import navigation.Navigator
 import forms.TextFormProvider
 import models.Mode
-import models.SchemeId.Srn
-import navigation.Navigator
-import pages.nonsipp.otherassetsheld.WhatIsOtherAssetPage
 import play.api.data.Form
+import views.html.TextAreaView
+import models.SchemeId.Srn
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, TextAreaViewModel}
-import views.html.TextAreaView
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class WhatIsOtherAssetController @Inject()(
   override val messagesApi: MessagesApi,

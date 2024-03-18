@@ -16,8 +16,8 @@
 
 package models
 
-import play.api.mvc.JavascriptLiteral
 import utils.WithName
+import play.api.mvc.JavascriptLiteral
 
 // TODO deprecated - use Mode instead
 sealed trait CheckOrChange extends Product with Serializable {

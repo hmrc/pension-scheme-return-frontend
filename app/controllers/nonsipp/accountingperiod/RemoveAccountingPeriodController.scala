@@ -16,29 +16,30 @@
 
 package controllers.nonsipp.accountingperiod
 
-import cats.implicits.toShow
-import config.Refined.Max3
-import controllers.actions._
-import controllers.nonsipp.accountingperiod.RemoveAccountingPeriodController._
-import forms.YesNoPageFormProvider
-import models.SchemeId.Srn
-import models.requests.DataRequest
-import models.{DateRange, Mode}
-import navigation.Navigator
-import pages.nonsipp.accountingperiod.{AccountingPeriodPage, RemoveAccountingPeriodPage}
-import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.SaveService
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.DateTimeUtils.localDateShow
-import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
+import play.api.mvc._
+import config.Refined.Max3
+import controllers.nonsipp.accountingperiod.RemoveAccountingPeriodController._
+import cats.implicits.toShow
+import controllers.actions._
+import pages.nonsipp.accountingperiod.{AccountingPeriodPage, RemoveAccountingPeriodPage}
+import navigation.Navigator
+import forms.YesNoPageFormProvider
 import views.html.YesNoPageView
+import models.SchemeId.Srn
+import utils.DateTimeUtils.localDateShow
+import models.{DateRange, Mode}
+import play.api.i18n.{I18nSupport, MessagesApi}
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.DisplayMessage.Message
+import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
+import models.requests.DataRequest
+import play.api.data.Form
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class RemoveAccountingPeriodController @Inject()(
   override val messagesApi: MessagesApi,

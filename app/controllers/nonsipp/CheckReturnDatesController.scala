@@ -16,29 +16,30 @@
 
 package controllers.nonsipp
 
+import services.{SaveService, SchemeDetailsService, TaxYearService}
+import viewmodels.implicits._
+import play.api.mvc._
 import cats.implicits.toShow
 import controllers.actions._
-import forms.YesNoPageFormProvider
-import models.SchemeId.Srn
-import models.requests.DataRequest
-import models.{DateRange, MinimalSchemeDetails, Mode, PensionSchemeId}
-import navigation.Navigator
-import pages.nonsipp._
-import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import services.{SaveService, SchemeDetailsService, TaxYearService}
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.DateTimeUtils.localDateShow
-import viewmodels.DisplayMessage.{Message, ParagraphMessage}
-import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 import views.html.YesNoPageView
+import models.SchemeId.Srn
+import pages.nonsipp._
+import navigation.Navigator
+import forms.YesNoPageFormProvider
+import uk.gov.hmrc.http.HeaderCarrier
+import utils.DateTimeUtils.localDateShow
+import models._
+import play.api.i18n.{I18nSupport, MessagesApi}
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.DisplayMessage.{Message, ParagraphMessage}
+import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
+import models.requests.DataRequest
+import play.api.data.Form
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import java.time.LocalDate
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class CheckReturnDatesController @Inject()(
   override val messagesApi: MessagesApi,

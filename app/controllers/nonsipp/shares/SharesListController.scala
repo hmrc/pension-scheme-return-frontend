@@ -16,33 +16,34 @@
 
 package controllers.nonsipp.shares
 
-import cats.implicits.{catsSyntaxApplicativeId, toShow, toTraverseOps}
+import services.{PsrSubmissionService, SaveService}
+import viewmodels.implicits._
 import com.google.inject.Inject
-import config.Constants
+import utils.ListUtils._
 import config.Refined.Max5000
 import controllers.PSRController
+import config.Constants
 import controllers.actions.IdentifyAndRequireData
-import controllers.nonsipp.shares.SharesListController._
-import forms.YesNoPageFormProvider
-import models.SchemeId.Srn
-import models.requests.DataRequest
-import models.{CheckMode, Mode, Pagination, SchemeHoldShare, TypeOfShares}
 import navigation.Navigator
-import pages.nonsipp.shares._
-import play.api.data.Form
+import forms.YesNoPageFormProvider
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import services.{PsrSubmissionService, SaveService}
-import utils.DateTimeUtils.localDateShow
-import utils.ListUtils._
-import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
-import viewmodels.implicits._
-import viewmodels.models._
+import pages.nonsipp.shares._
+import play.api.mvc._
 import views.html.TwoColumnsTripleAction
+import models.SchemeId.Srn
+import cats.implicits.{catsSyntaxApplicativeId, toShow, toTraverseOps}
+import controllers.nonsipp.shares.SharesListController._
+import utils.DateTimeUtils.localDateShow
+import models._
+import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
+import viewmodels.models._
+import models.requests.DataRequest
+import play.api.data.Form
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import java.time.LocalDate
 import javax.inject.Named
-import scala.concurrent.{ExecutionContext, Future}
 
 class SharesListController @Inject()(
   override val messagesApi: MessagesApi,

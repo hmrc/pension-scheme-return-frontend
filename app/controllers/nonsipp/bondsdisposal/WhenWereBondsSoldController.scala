@@ -16,29 +16,30 @@
 
 package controllers.nonsipp.bondsdisposal
 
-import cats.implicits.toShow
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Refined.{Max50, Max5000}
 import controllers.PSRController
+import cats.implicits.toShow
 import controllers.actions.IdentifyAndRequireData
-import controllers.nonsipp.bondsdisposal.WhenWereBondsSoldController._
-import forms.DatePageFormProvider
-import forms.mappings.errors.DateFormErrors
-import models.SchemeId.Srn
-import models.{DateRange, Mode}
 import navigation.Navigator
-import pages.nonsipp.bondsdisposal.WhenWereBondsSoldPage
+import forms.DatePageFormProvider
 import play.api.data.Form
-import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import forms.mappings.errors.DateFormErrors
 import services.{SaveService, SchemeDateService}
+import controllers.nonsipp.bondsdisposal.WhenWereBondsSoldController._
+import views.html.DatePageView
+import models.SchemeId.Srn
 import utils.DateTimeUtils.localDateShow
+import models.{DateRange, Mode}
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
+import pages.nonsipp.bondsdisposal.WhenWereBondsSoldPage
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{DatePageViewModel, FormPageViewModel}
-import views.html.DatePageView
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import java.time.LocalDate
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class WhenWereBondsSoldController @Inject()(
   override val messagesApi: MessagesApi,

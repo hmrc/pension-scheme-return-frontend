@@ -16,33 +16,34 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
-import cats.implicits.toShow
-import cats.{Id, Monad}
+import services.{SaveService, SchemeDateService}
+import viewmodels.implicits._
+import play.api.mvc._
 import com.google.inject.Inject
+import cats.implicits.toShow
 import config.Constants.maxCurrencyValue
-import config.Refined.Max5000
 import controllers.actions._
+import navigation.Navigator
 import forms.MoneyFormProvider
 import forms.mappings.errors.MoneyFormErrors
-import models.SchemeId.Srn
-import models.requests.DataRequest
-import models.{DateRange, Mode, Money}
-import navigation.Navigator
-import pages.nonsipp.loansmadeoroutstanding.AmountOfTheLoanPage
-import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import services.{SaveService, SchemeDateService}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.DateTimeUtils.localDateShow
-import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
+import config.Refined.Max5000
 import viewmodels.models.MultipleQuestionsViewModel.TripleQuestion
-import viewmodels.models.{FormPageViewModel, QuestionField}
 import views.html.MoneyView
+import models.SchemeId.Srn
+import utils.DateTimeUtils.localDateShow
+import models.{DateRange, Mode, Money}
+import pages.nonsipp.loansmadeoroutstanding.AmountOfTheLoanPage
+import cats.{Id, Monad}
+import play.api.i18n.{I18nSupport, MessagesApi}
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.DisplayMessage.Message
+import viewmodels.models.{FormPageViewModel, QuestionField}
+import models.requests.DataRequest
+import play.api.data.Form
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.Named
-import scala.concurrent.{ExecutionContext, Future}
 
 class AmountOfTheLoanController @Inject()(
   override val messagesApi: MessagesApi,

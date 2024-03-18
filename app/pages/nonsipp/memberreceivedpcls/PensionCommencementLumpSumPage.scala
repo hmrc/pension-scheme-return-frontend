@@ -17,9 +17,9 @@
 package pages.nonsipp.memberreceivedpcls
 
 import models.SchemeId.Srn
+import play.api.libs.json.JsPath
 import pages.QuestionPage
 import pages.nonsipp.memberreceivedpcls.Paths.memberDetails
-import play.api.libs.json.JsPath
 
 case class PensionCommencementLumpSumPage(srn: Srn) extends QuestionPage[Boolean] {
 

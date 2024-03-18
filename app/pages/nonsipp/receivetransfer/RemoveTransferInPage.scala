@@ -16,8 +16,8 @@
 
 package pages.nonsipp.receivetransfer
 
-import config.Refined.Max300
 import models.SchemeId.Srn
+import config.Refined.Max300
 import pages.Page
 
 case class RemoveTransferInPage(srn: Srn, memberIndex: Max300) extends Page {

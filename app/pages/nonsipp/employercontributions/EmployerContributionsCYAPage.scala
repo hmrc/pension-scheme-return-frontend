@@ -16,7 +16,7 @@
 
 package pages.nonsipp.employercontributions
 
-import models.SchemeId.Srn
 import pages.Page
+import models.SchemeId.Srn
 
 case class EmployerContributionsCYAPage(srn: Srn) extends Page
