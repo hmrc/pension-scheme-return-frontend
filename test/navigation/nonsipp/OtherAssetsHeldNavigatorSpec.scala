@@ -436,7 +436,8 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
             index,
             CostOfOtherAssetPage,
             (srn, _: Max5000, _) =>
-              controllers.routes.UnauthorisedController.onPageLoad(),
+              controllers.nonsipp.otherassetsheld.routes.IncomeFromAssetController
+                .onPageLoad(srn, index, NormalMode),
             srn =>
               defaultUserAnswers.unsafeSet(
                 WhyDoesSchemeHoldAssetsPage(srn, index),
@@ -444,7 +445,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
               )
           )
           .withName(
-            "go from CostOfOtherAssetPage to Unauthorised when holding is transfer"
+            "go from CostOfOtherAssetPage to IncomeFromAssetPage when holding is transfer"
           )
       )
     }
@@ -455,13 +456,28 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           .navigateToWithIndex(
             index,
             IndependentValuationPage,
-            (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.otherassetsheld.routes.IncomeFromAssetController
+                .onPageLoad(srn, index, NormalMode)
           )
           .withName(
-            "go from IndependentValuationPage to Unauthorised"
+            "go from IndependentValuationPage to IncomeFromAssetPage"
           )
       )
     }
+  }
 
+  "IncomeFromAssetPage" - {
+    act.like(
+      normalmode
+        .navigateToWithIndex(
+          index,
+          IncomeFromAssetPage,
+          (srn, _: Max5000, _) => controllers.routes.UnauthorisedController.onPageLoad()
+        )
+        .withName(
+          "go from IncomeFromAssetPage to Unauthorised"
+        )
+    )
   }
 }

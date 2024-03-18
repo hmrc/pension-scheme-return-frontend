@@ -16,10 +16,16 @@
 
 package pages.nonsipp.otherassetsheld
 
+import controllers.TestValues
 import config.Refined.OneTo5000
 import eu.timepit.refined.refineMV
-import models.SchemeHoldAsset
+import generators.ModelGenerators.ninoGen
+import models.{IdentitySubject, SchemeHoldAsset, UserAnswers}
 import pages.behaviours.PageBehaviours
+import pages.nonsipp.common.{CompanyRecipientCrnPage, IdentityTypePage, OtherRecipientDetailsPage, PartnershipRecipientUtrPage}
+import utils.UserAnswersUtils.UserAnswersOps
+
+import java.time.LocalDate
 
 class WhyDoesSchemeHoldAssetsPageSpec extends PageBehaviours {
 
@@ -34,15 +40,20 @@ class WhyDoesSchemeHoldAssetsPageSpec extends PageBehaviours {
 
     beRemovable[SchemeHoldAsset](WhyDoesSchemeHoldAssetsPage(srn, index))
 
-    /*
-    TODO Uncomment and adjust cleanup for subsequent pages when created
     "cleanup" - {
       val localDate: LocalDate = LocalDate.of(1989, 10, 6)
+      val name: String = "name"
+      val nino = ninoGen.sample.get
 
       val userAnswers =
         UserAnswers("id")
           .unsafeSet(WhyDoesSchemeHoldAssetsPage(srn, index), SchemeHoldAsset.Acquisition)
           .unsafeSet(WhenDidSchemeAcquireAssetsPage(srn, index), localDate)
+          .unsafeSet(IndividualNameOfOtherAssetSellerPage(srn, index), name)
+          .unsafeSet(CompanyNameOfOtherAssetSellerPage(srn, index), name)
+          .unsafeSet(PartnershipOtherAssetSellerNamePage(srn, index), name)
+          .unsafeSet(OtherAssetSellerConnectedPartyPage(srn, index), true)
+          .unsafeSet(IndependentValuationPage(srn, index), true)
 
       s"remove dependant values when current answer is different than the existing answer" in {
         val result =
@@ -55,6 +66,6 @@ class WhyDoesSchemeHoldAssetsPageSpec extends PageBehaviours {
           WhyDoesSchemeHoldAssetsPage(srn, index).cleanup(Some(SchemeHoldAsset.Acquisition), userAnswers).toOption.value
         result.get(WhenDidSchemeAcquireAssetsPage(srn, index)) must not be None
       }
-    }*/
+    }
   }
 }

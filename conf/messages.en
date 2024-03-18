@@ -2948,6 +2948,13 @@ otherAssets.independentValuation.title = Was the transaction supported by an ind
 otherAssets.independentValuation.heading = Was the transaction supported by an independent valuation?
 otherAssets.independentValuation.error.required = Select yes if the transaction was supported by an independent valuation
 
+otherAssets.incomeFromAsset.title = What was the total income from the asset in the period of this return, in pounds and pence?
+otherAssets.incomeFromAsset.heading = What was the total income from the asset in the period of this return, in pounds and pence?
+otherAssets.incomeFromAsset.hint = This includes income and all other receipts received in respect of this asset.
+otherAssets.incomeFromAsset.error.required = Enter the total income from the asset in the period of this return, in pounds and pence
+otherAssets.incomeFromAsset.error.invalid = Total income from the asset in the period of this return must be an amount of money that is 0 or more, like 123 or 123.45
+otherAssets.incomeFromAsset.error.tooLarge = Total income from the asset in the period of this return must be 999999999.99 or less
+
 companyNameOfOtherAssetsSeller.title = What is the seller’s company name?
 companyNameOfOtherAssetsSeller.heading = What is the seller’s company name?
 companyNameOfOtherAssetsSeller.error.required = Enter the seller’s company name
