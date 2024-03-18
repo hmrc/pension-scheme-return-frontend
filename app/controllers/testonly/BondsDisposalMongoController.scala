@@ -21,7 +21,12 @@ import controllers.actions.IdentifyAndRequireData
 import eu.timepit.refined.refineMV
 import models.HowDisposed._
 import models.SchemeId.Srn
-import pages.nonsipp.bondsdisposal.{BondsDisposalCompletedPage, BondsStillHeldPage, HowWereBondsDisposedOfPage}
+import pages.nonsipp.bondsdisposal.{
+  BondsDisposalCompletedPage,
+  BondsDisposalPage,
+  BondsStillHeldPage,
+  HowWereBondsDisposedOfPage
+}
 import play.api.mvc.MessagesControllerComponents
 import services.SaveService
 import shapeless.{::, HList, HNil}
@@ -38,7 +43,8 @@ class BondsDisposalMongoController @Inject()(
     extends TestDataDoubleIndexController[Max5000.Refined, Max50.Refined] {
 
   override type Pages =
-    PageWithValue[SectionCompleted] ::
+    PageWithValue[Boolean] ::
+      PageWithValue[SectionCompleted] ::
       PageWithValue[HowDisposed] ::
       PageWithValue[Int] ::
       HNil
@@ -47,6 +53,7 @@ class BondsDisposalMongoController @Inject()(
 
   override def pages(srn: Srn, index: Max5000, secondaryIndex: Max50): Pages = HList(
     (
+      PageWithValue(BondsDisposalPage(srn), true),
       PageWithValue(BondsDisposalCompletedPage(srn, index, secondaryIndex), SectionCompleted),
       PageWithValue(HowWereBondsDisposedOfPage(srn, index, secondaryIndex), Transferred),
       PageWithValue(BondsStillHeldPage(srn, index, secondaryIndex), 3)

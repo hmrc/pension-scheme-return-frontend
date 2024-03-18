@@ -48,7 +48,7 @@ class BondsMongoController @Inject()(
         PageWithValue(BondsFromConnectedPartyPage(srn, index), false),
         PageWithValue(CostOfBondsPage(srn, index), Money(12.34)),
         PageWithValue(IncomeFromBondsPage(srn, index), Money(34.56)),
-        PageWithValue(NameOfBondsPage(srn, index), "test bonds"),
+        PageWithValue(NameOfBondsPage(srn, index), s"test bonds ${index.value}"),
         PageWithValue(UnregulatedOrConnectedBondsHeldPage(srn), true),
         PageWithValue(WhenDidSchemeAcquireBondsPage(srn, index), LocalDate.of(2023, 12, 12)),
         PageWithValue(WhyDoesSchemeHoldBondsPage(srn, index), SchemeHoldBond.Transfer)

@@ -112,7 +112,7 @@ abstract class PSRController extends FrontendBaseController with I18nSupport {
   }
 
   implicit class TaxOrAccountingPeriodOps(o: Option[Either[DateRange, NonEmptyList[(DateRange, Max3)]]]) {
-    def merge: Option[DateRange] = o.map(_.map(_.toList.map(_._1).sorted.head).merge)
+    def merge: Option[DateRange] = o.map(_.map(_.toList.map(_._1).min).merge)
   }
 
   implicit class UserAnswersOps(userAnswers: UserAnswers) {

@@ -19,19 +19,20 @@ package controllers.nonsipp.bondsdisposal
 import cats.implicits.toTraverseOps
 import com.google.inject.Inject
 import config.Constants
-import config.Refined.{Max50, Max5000}
+import config.Constants.maxDisposalPerBond
 import config.Refined.Max5000.enumerable
+import config.Refined.{Max50, Max5000}
 import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
 import controllers.nonsipp.bondsdisposal.BondsDisposalListController._
-import eu.timepit.refined.{refineMV, refineV}
+import eu.timepit.refined.refineV
 import forms.RadioListFormProvider
 import models.SchemeId.Srn
 import models.requests.DataRequest
 import models.{Mode, Money, Pagination, SchemeHoldBond, UserAnswers}
 import navigation.Navigator
-import pages.nonsipp.bondsdisposal.{BondsDisposalCompletedPages, BondsDisposalListPage, BondsStillHeldPage}
 import pages.nonsipp.bonds.{BondsCompleted, CostOfBondsPage, NameOfBondsPage, WhyDoesSchemeHoldBondsPage}
+import pages.nonsipp.bondsdisposal.{BondsDisposalCompleted, BondsDisposalListPage, BondsStillHeldPage}
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -57,10 +58,10 @@ class BondsDisposalListController @Inject()(
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      val indexes = request.userAnswers.map(BondsCompleted.all(srn)).keys.toList.refine[Max5000.Refined]
+      val completedBonds = request.userAnswers.map(BondsCompleted.all(srn))
 
-      if (indexes.nonEmpty) {
-        bondsData(srn, indexes).map { data =>
+      if (completedBonds.nonEmpty) {
+        bondsData(srn, completedBonds.keys.toList.refine[Max5000.Refined]).map { data =>
           Ok(view(form, viewModel(srn, page, data, mode, request.userAnswers)))
         }.merge
       } else {
@@ -69,30 +70,26 @@ class BondsDisposalListController @Inject()(
   }
 
   def onSubmit(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    val indexes: List[Max5000] =
-      request.userAnswers.map(BondsCompleted.all(srn)).keys.toList.refine[Max5000.Refined]
-
     form
       .bindFromRequest()
       .fold(
         errors => {
-          bondsData(srn, indexes).map { bondsList =>
+
+          val completedBondIndexes: List[Max5000] =
+            request.userAnswers.map(BondsCompleted.all(srn)).keys.toList.refine[Max5000.Refined]
+          bondsData(srn, completedBondIndexes).map { bondsList =>
             BadRequest(view(errors, viewModel(srn, page, bondsList, mode, request.userAnswers)))
+
           }.merge
         },
         answer =>
-          BondsDisposalListController
-            .getDisposal(srn, answer, request.userAnswers, isNextDisposal = true)
-            .getOrRecoverJourney(
-              nextDisposal =>
-                Redirect(
-                  navigator.nextPage(
-                    BondsDisposalListPage(srn, answer, nextDisposal),
-                    mode,
-                    request.userAnswers
-                  )
-                )
+          Redirect(
+            navigator.nextPage(
+              BondsDisposalListPage(srn, answer),
+              mode,
+              request.userAnswers
             )
+          )
       )
   }
 
@@ -112,66 +109,32 @@ object BondsDisposalListController {
   def form(formProvider: RadioListFormProvider): Form[Max5000] =
     formProvider("bondsDisposalList.error.required")
 
-  private def getDisposal(
-    srn: Srn,
-    bondIndex: Max5000,
-    userAnswers: UserAnswers,
-    isNextDisposal: Boolean
-  ): Option[Max50] =
-    userAnswers.get(BondsDisposalCompletedPages(srn)) match {
-      case None => Some(refineMV[Max50.Refined](1))
-      case Some(completedDisposals) =>
-        /**
-         * Indexes of completed disposals sorted in ascending order.
-         * We -1 from the bond index as the refined indexes is 1-based (e.g. 1 to 5000)
-         * while we are trying to fetch a completed disposal from a Map which is 0-based.
-         * We then +1 when we re-refine the index
-         */
-        val completedDisposalsForBonds: List[Max50] =
-          completedDisposals
-            .get((bondIndex.value - 1).toString)
-            .map(_.keys.toList)
-            .flatMap(_.traverse(_.toIntOption))
-            .flatMap(_.traverse(index => refineV[Max50.Refined](index + 1).toOption))
-            .toList
-            .flatten
-            .sortBy(_.value)
-
-        completedDisposalsForBonds.lastOption match {
-          case None => Some(refineMV[Max50.Refined](1))
-          case Some(lastCompletedDisposalForBonds) =>
-            if (isNextDisposal) {
-              refineV[Max50.Refined](lastCompletedDisposalForBonds.value + 1).toOption
-            } else {
-              Some(lastCompletedDisposalForBonds)
-            }
-        }
-    }
-
   private def buildRows(srn: Srn, bondsList: List[BondsData], userAnswers: UserAnswers): List[ListRadiosRow] =
     bondsList.flatMap { bondsData =>
-      val disposalIndex = getDisposal(srn, bondsData.index, userAnswers, isNextDisposal = false).get
-      val totalBondsNowHeld: Option[Int] = userAnswers.get(BondsStillHeldPage(srn, bondsData.index, disposalIndex))
+      val completedDisposalsPerBondKeys = userAnswers
+        .map(BondsDisposalCompleted.all(srn, bondsData.index))
+        .keys
 
-      totalBondsNowHeld match {
-        case Some(sharesRemaining) =>
-          if (sharesRemaining > 0) {
-            List(
-              ListRadiosRow(
-                bondsData.index.value,
-                buildMessage(bondsData)
-              )
-            )
-          } else {
-            Nil
-          }
-        case _ =>
+      if (maxDisposalPerBond == completedDisposalsPerBondKeys.size) {
+        List[ListRadiosRow]().empty
+      } else {
+
+        val isBondShouldBeRemovedFromList = completedDisposalsPerBondKeys.toList
+          .map(_.toIntOption)
+          .flatMap(_.traverse(index => refineV[Max50.Refined](index + 1).toOption))
+          .flatMap(_.map(disposalIndex => userAnswers.get(BondsStillHeldPage(srn, bondsData.index, disposalIndex))))
+          .exists(optValue => optValue.fold(false)(value => value == 0))
+
+        if (isBondShouldBeRemovedFromList) {
+          List[ListRadiosRow]().empty
+        } else {
           List(
             ListRadiosRow(
               bondsData.index.value,
               buildMessage(bondsData)
             )
           )
+        }
       }
     }
 
