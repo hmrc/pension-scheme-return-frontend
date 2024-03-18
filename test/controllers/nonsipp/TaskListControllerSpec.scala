@@ -692,10 +692,9 @@ class TaskListControllerSpec extends ControllerBaseSpec {
           expectedStatus = TaskListStatus.NotStarted,
           expectedTitleKey = "nonsipp.tasklist.bonds.title",
           expectedLinkContentKey = "nonsipp.tasklist.bonds.add.unregulatedorconnected.title",
-          expectedLinkUrl =
-            controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldController
-              .onPageLoad(srn, NormalMode)
-              .url
+          expectedLinkUrl = controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldController
+            .onPageLoad(srn, NormalMode)
+            .url
         )
       }
 
@@ -711,10 +710,9 @@ class TaskListControllerSpec extends ControllerBaseSpec {
           expectedStatus = TaskListStatus.Completed,
           expectedTitleKey = "nonsipp.tasklist.bonds.title",
           expectedLinkContentKey = "nonsipp.tasklist.bonds.change.unregulatedorconnected.title",
-          expectedLinkUrl =
-            controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldController
-              .onPageLoad(srn, NormalMode)
-              .url
+          expectedLinkUrl = controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldController
+            .onPageLoad(srn, NormalMode)
+            .url
         )
       }
     }

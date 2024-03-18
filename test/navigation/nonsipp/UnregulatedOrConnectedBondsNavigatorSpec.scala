@@ -39,8 +39,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
         .navigateToWithData(
           UnregulatedOrConnectedBondsHeldPage,
           Gen.const(true),
-          (srn, _) =>
-            controllers.nonsipp.unregulatedorconnectedbonds.routes.WhatYouWillNeedBondsController.onPageLoad(srn)
+          (srn, _) => controllers.nonsipp.bonds.routes.WhatYouWillNeedBondsController.onPageLoad(srn)
         )
         .withName("go from unregulated Or connected bonds held page to WhatYouWillNeedBonds when yes selected")
     )
@@ -61,7 +60,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
           .navigateTo(
             WhatYouWillNeedBondsPage,
             (srn, _) =>
-              controllers.nonsipp.unregulatedorconnectedbonds.routes.NameOfBondsController
+              controllers.nonsipp.bonds.routes.NameOfBondsController
                 .onPageLoad(srn, index, NormalMode)
           )
           .withName(
@@ -77,7 +76,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
             index,
             NameOfBondsPage,
             (srn, _: Max5000, _) =>
-              controllers.nonsipp.unregulatedorconnectedbonds.routes.WhyDoesSchemeHoldBondsController
+              controllers.nonsipp.bonds.routes.WhyDoesSchemeHoldBondsController
                 .onPageLoad(srn, index, NormalMode)
           )
           .withName(
@@ -93,7 +92,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
             index,
             WhyDoesSchemeHoldBondsPage,
             (srn, _: Max5000, _) =>
-              controllers.nonsipp.unregulatedorconnectedbonds.routes.WhenDidSchemeAcquireBondsController
+              controllers.nonsipp.bonds.routes.WhenDidSchemeAcquireBondsController
                 .onPageLoad(srn, index, NormalMode),
             srn =>
               defaultUserAnswers.unsafeSet(
@@ -112,7 +111,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
             index,
             WhyDoesSchemeHoldBondsPage,
             (srn, _: Max5000, _) =>
-              controllers.nonsipp.unregulatedorconnectedbonds.routes.WhenDidSchemeAcquireBondsController
+              controllers.nonsipp.bonds.routes.WhenDidSchemeAcquireBondsController
                 .onPageLoad(srn, index, NormalMode),
             srn =>
               defaultUserAnswers.unsafeSet(
@@ -131,7 +130,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
             index,
             WhyDoesSchemeHoldBondsPage,
             (srn, _: Max5000, _) =>
-              controllers.nonsipp.unregulatedorconnectedbonds.routes.CostOfBondsController
+              controllers.nonsipp.bonds.routes.CostOfBondsController
                 .onPageLoad(srn, index, NormalMode),
             srn =>
               defaultUserAnswers.unsafeSet(
@@ -152,7 +151,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
             index,
             WhenDidSchemeAcquireBondsPage,
             (srn, _: Max5000, _) =>
-              controllers.nonsipp.unregulatedorconnectedbonds.routes.CostOfBondsController
+              controllers.nonsipp.bonds.routes.CostOfBondsController
                 .onPageLoad(srn, index, NormalMode)
           )
           .withName(
@@ -168,7 +167,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
             index,
             CostOfBondsPage,
             (srn, _: Max5000, _) =>
-              controllers.nonsipp.unregulatedorconnectedbonds.routes.BondsFromConnectedPartyController
+              controllers.nonsipp.bonds.routes.BondsFromConnectedPartyController
                 .onPageLoad(srn, index, NormalMode),
             srn =>
               defaultUserAnswers.unsafeSet(
@@ -187,7 +186,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
             index,
             CostOfBondsPage,
             (srn, _: Max5000, _) =>
-              controllers.nonsipp.unregulatedorconnectedbonds.routes.AreBondsUnregulatedController
+              controllers.nonsipp.bonds.routes.AreBondsUnregulatedController
                 .onPageLoad(srn, index, NormalMode),
             srn =>
               defaultUserAnswers.unsafeSet(
@@ -206,7 +205,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
             index,
             CostOfBondsPage,
             (srn, _: Max5000, _) =>
-              controllers.nonsipp.unregulatedorconnectedbonds.routes.AreBondsUnregulatedController
+              controllers.nonsipp.bonds.routes.AreBondsUnregulatedController
                 .onPageLoad(srn, index, NormalMode),
             srn =>
               defaultUserAnswers.unsafeSet(
@@ -227,7 +226,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
             index,
             BondsFromConnectedPartyPage,
             (srn, _: Max5000, _) =>
-              controllers.nonsipp.unregulatedorconnectedbonds.routes.AreBondsUnregulatedController
+              controllers.nonsipp.bonds.routes.AreBondsUnregulatedController
                 .onPageLoad(srn, index, NormalMode)
           )
           .withName(
@@ -243,7 +242,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
             index,
             AreBondsUnregulatedPage,
             (srn, _: Max5000, _) =>
-              controllers.nonsipp.unregulatedorconnectedbonds.routes.IncomeFromBondsController
+              controllers.nonsipp.bonds.routes.IncomeFromBondsController
                 .onPageLoad(srn, index, NormalMode)
           )
           .withName(
@@ -259,7 +258,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
             index,
             IncomeFromBondsPage,
             (srn, _: Max5000, _) =>
-              controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldCYAController
+              controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldCYAController
                 .onPageLoad(srn, index, NormalMode)
           )
           .withName(
@@ -276,7 +275,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
               index,
               RemoveBondsPage,
               (srn, _: Max5000, _) =>
-                controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldController
+                controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldController
                   .onPageLoad(srn, NormalMode)
             )
             .withName("go from RemoveBondsPage to Bonds page")
@@ -295,7 +294,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
               index,
               RemoveBondsPage,
               (srn, _: Max5000, _) =>
-                controllers.nonsipp.unregulatedorconnectedbonds.routes.BondsListController
+                controllers.nonsipp.bonds.routes.BondsListController
                   .onPageLoad(srn, 1, NormalMode),
               customUserAnswers
             )
@@ -313,7 +312,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
               index,
               NameOfBondsPage,
               (srn, _: Max5000, _) =>
-                controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldCYAController
+                controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldCYAController
                   .onPageLoad(srn, index, CheckMode)
             )
             .withName(
@@ -329,7 +328,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
               index,
               WhyDoesSchemeHoldBondsPage,
               (srn, _: Max5000, _) =>
-                controllers.nonsipp.unregulatedorconnectedbonds.routes.WhenDidSchemeAcquireBondsController
+                controllers.nonsipp.bonds.routes.WhenDidSchemeAcquireBondsController
                   .onPageLoad(srn, index, CheckMode),
               srn =>
                 defaultUserAnswers.unsafeSet(
@@ -348,7 +347,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
               index,
               WhyDoesSchemeHoldBondsPage,
               (srn, _: Max5000, _) =>
-                controllers.nonsipp.unregulatedorconnectedbonds.routes.WhenDidSchemeAcquireBondsController
+                controllers.nonsipp.bonds.routes.WhenDidSchemeAcquireBondsController
                   .onPageLoad(srn, index, CheckMode),
               srn =>
                 defaultUserAnswers.unsafeSet(
@@ -367,7 +366,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
               index,
               WhyDoesSchemeHoldBondsPage,
               (srn, _: Max5000, _) =>
-                controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldCYAController
+                controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldCYAController
                   .onPageLoad(srn, index, CheckMode),
               srn =>
                 defaultUserAnswers.unsafeSet(
@@ -388,7 +387,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
               index,
               WhenDidSchemeAcquireBondsPage,
               (srn, _: Max5000, _) =>
-                controllers.nonsipp.unregulatedorconnectedbonds.routes.BondsFromConnectedPartyController
+                controllers.nonsipp.bonds.routes.BondsFromConnectedPartyController
                   .onPageLoad(srn, index, CheckMode),
               srn =>
                 defaultUserAnswers.unsafeSet(
@@ -407,7 +406,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
               index,
               WhenDidSchemeAcquireBondsPage,
               (srn, _: Max5000, _) =>
-                controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldCYAController
+                controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldCYAController
                   .onPageLoad(srn, index, CheckMode),
               srn =>
                 defaultUserAnswers.unsafeSet(
@@ -426,7 +425,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
               index,
               WhenDidSchemeAcquireBondsPage,
               (srn, _: Max5000, _) =>
-                controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldCYAController
+                controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldCYAController
                   .onPageLoad(srn, index, CheckMode),
               srn =>
                 defaultUserAnswers.unsafeSet(
@@ -447,7 +446,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
               index,
               CostOfBondsPage,
               (srn, _: Max5000, _) =>
-                controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldCYAController
+                controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldCYAController
                   .onPageLoad(srn, index, CheckMode)
             )
             .withName(
@@ -463,7 +462,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
               index,
               BondsFromConnectedPartyPage,
               (srn, _: Max5000, _) =>
-                controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldCYAController
+                controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldCYAController
                   .onPageLoad(srn, index, CheckMode)
             )
             .withName(
@@ -479,7 +478,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
               index,
               AreBondsUnregulatedPage,
               (srn, _: Max5000, _) =>
-                controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldCYAController
+                controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldCYAController
                   .onPageLoad(srn, index, CheckMode)
             )
             .withName(
@@ -495,7 +494,7 @@ class UnregulatedOrConnectedBondsNavigatorSpec extends BaseSpec with NavigatorBe
               index,
               IncomeFromBondsPage,
               (srn, _: Max5000, _) =>
-                controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldCYAController
+                controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldCYAController
                   .onPageLoad(srn, index, CheckMode)
             )
             .withName(

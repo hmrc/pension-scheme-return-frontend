@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.unregulatedorconnectedbonds
+package controllers.nonsipp.bonds
 
 import config.Refined.Max5000
 import controllers.PSRController
 import controllers.actions._
-import controllers.nonsipp.unregulatedorconnectedbonds.WhyDoesSchemeHoldBondsController._
+import controllers.nonsipp.bonds.WhyDoesSchemeHoldBondsController._
 import forms.RadioListFormProvider
 import models.SchemeHoldBond._
 import models.SchemeId.Srn

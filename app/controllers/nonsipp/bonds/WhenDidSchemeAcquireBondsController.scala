@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.unregulatedorconnectedbonds
+package controllers.nonsipp.bonds
 
 import cats.implicits.toShow
 import config.Constants
 import config.Refined.Max5000
 import controllers.PSRController
 import controllers.actions._
-import controllers.nonsipp.unregulatedorconnectedbonds.WhenDidSchemeAcquireBondsController._
+import controllers.nonsipp.bonds.WhenDidSchemeAcquireBondsController._
 import forms.DatePageFormProvider
 import forms.mappings.errors.DateFormErrors
 import models.Mode

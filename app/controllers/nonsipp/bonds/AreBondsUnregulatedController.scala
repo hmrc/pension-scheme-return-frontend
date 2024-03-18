@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.unregulatedorconnectedbonds
+package controllers.nonsipp.bonds
 
 import config.Refined._
 import controllers.PSRController
 import controllers.actions._
-import controllers.nonsipp.unregulatedorconnectedbonds.AreBondsUnregulatedController._
+import controllers.nonsipp.bonds.AreBondsUnregulatedController._
 import forms.YesNoPageFormProvider
 import models.Mode
 import models.SchemeId.Srn
@@ -92,6 +92,6 @@ object AreBondsUnregulatedController {
     YesNoPageViewModel(
       "bonds.areBondsUnregulated.title",
       Message("bonds.areBondsUnregulated.heading"),
-      controllers.nonsipp.unregulatedorconnectedbonds.routes.AreBondsUnregulatedController.onSubmit(srn, index, mode)
+      controllers.nonsipp.bonds.routes.AreBondsUnregulatedController.onSubmit(srn, index, mode)
     )
 }

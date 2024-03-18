@@ -19,6 +19,7 @@ package transformations
 import controllers.TestValues
 import eu.timepit.refined.refineMV
 import generators.ModelGenerators.allowedAccessRequestGen
+import models.HowDisposed.{Other, Sold, Transferred}
 import models.SchemeHoldBond.{Acquisition, Contribution}
 import models.requests.psr._
 import models.requests.{AllowedAccessRequest, DataRequest}
@@ -26,6 +27,7 @@ import org.scalatest.OptionValues
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import pages.nonsipp.bonds._
+import pages.nonsipp.bondsdisposal._
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import utils.UserAnswersUtils.UserAnswersOps
@@ -42,11 +44,11 @@ class BondTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
   "BondTransactionsTransformer - To Etmp" - {
     "should return empty List when userAnswer is empty" in {
 
-      val result = transformer.transformToEtmp(srn = srn)
+      val result = transformer.transformToEtmp(srn = srn, bondsDisposal = false)
       result mustBe List.empty
     }
 
-    "should return transformed List" in {
+    "should return transformed List without disposed bonds" in {
       val userAnswers = emptyUserAnswers
         .unsafeSet(NameOfBondsPage(srn, refineMV(1)), "nameOfBonds")
         .unsafeSet(WhyDoesSchemeHoldBondsPage(srn, refineMV(1)), Acquisition)
@@ -58,7 +60,7 @@ class BondTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
 
       val request = DataRequest(allowedAccessRequest, userAnswers)
 
-      val result = transformer.transformToEtmp(srn)(request)
+      val result = transformer.transformToEtmp(srn, bondsDisposal = false)(request)
       result mustBe List(
         BondTransactions(
           nameOfBonds = "nameOfBonds",
@@ -67,7 +69,64 @@ class BondTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
           costOfBonds = money.value,
           optConnectedPartyStatus = Some(false),
           bondsUnregulated = true,
-          totalIncomeOrReceipts = money.value
+          totalIncomeOrReceipts = money.value,
+          optBondsDisposed = None
+        )
+      )
+    }
+
+    "should return transformed List with disposed bonds" in {
+      val userAnswers = emptyUserAnswers
+        .unsafeSet(NameOfBondsPage(srn, refineMV(1)), "nameOfBonds")
+        .unsafeSet(WhyDoesSchemeHoldBondsPage(srn, refineMV(1)), Acquisition)
+        .unsafeSet(CostOfBondsPage(srn, refineMV(1)), money)
+        .unsafeSet(AreBondsUnregulatedPage(srn, refineMV(1)), true)
+        .unsafeSet(IncomeFromBondsPage(srn, refineMV(1)), money)
+        .unsafeSet(WhenDidSchemeAcquireBondsPage(srn, refineMV(1)), localDate)
+        .unsafeSet(BondsFromConnectedPartyPage(srn, refineMV(1)), false)
+        .unsafeSet(HowWereBondsDisposedOfPage(srn, refineMV(1), refineMV(1)), Sold)
+        .unsafeSet(BondsStillHeldPage(srn, refineMV(1), refineMV(1)), 1)
+        .unsafeSet(WhenWereBondsSoldPage(srn, refineMV(1), refineMV(1)), localDate)
+        .unsafeSet(TotalConsiderationSaleBondsPage(srn, refineMV(1), refineMV(1)), money)
+        .unsafeSet(BuyerNamePage(srn, refineMV(1), refineMV(1)), "BuyerName")
+        .unsafeSet(IsBuyerConnectedPartyPage(srn, refineMV(1), refineMV(1)), false)
+        .unsafeSet(HowWereBondsDisposedOfPage(srn, refineMV(1), refineMV(2)), Other("OtherMethod"))
+        .unsafeSet(BondsStillHeldPage(srn, refineMV(1), refineMV(2)), 2)
+
+      val request = DataRequest(allowedAccessRequest, userAnswers)
+
+      val result = transformer.transformToEtmp(srn, bondsDisposal = true)(request)
+      result mustBe List(
+        BondTransactions(
+          nameOfBonds = "nameOfBonds",
+          methodOfHolding = Acquisition,
+          optDateOfAcqOrContrib = Some(localDate),
+          costOfBonds = money.value,
+          optConnectedPartyStatus = Some(false),
+          bondsUnregulated = true,
+          totalIncomeOrReceipts = money.value,
+          optBondsDisposed = Some(
+            Seq(
+              BondDisposed(
+                methodOfDisposal = Sold.name,
+                optOtherMethod = None,
+                optDateSold = Some(localDate),
+                optAmountReceived = Some(money.value),
+                optBondsPurchaserName = Some("BuyerName"),
+                optConnectedPartyStatus = Some(false),
+                totalNowHeld = 1
+              ),
+              BondDisposed(
+                methodOfDisposal = Other.name,
+                optOtherMethod = Some("OtherMethod"),
+                optDateSold = None,
+                optAmountReceived = None,
+                optBondsPurchaserName = None,
+                optConnectedPartyStatus = None,
+                totalNowHeld = 2
+              )
+            )
+          )
         )
       )
     }
@@ -79,7 +138,7 @@ class BondTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
       val result = transformer.transformFromEtmp(
         userAnswers,
         srn,
-        Bonds(bondsWereAdded = true, bondsWereDisposed = true, bondTransactions = Seq.empty)
+        Bonds(bondsWereAdded = true, bondsWereDisposed = false, bondTransactions = Seq.empty)
       )
       result.fold(ex => fail(ex.getMessage), userAnswers => userAnswers mustBe userAnswers)
     }
@@ -100,7 +159,38 @@ class BondTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
               costOfBonds = money.value,
               optConnectedPartyStatus = Some(true),
               bondsUnregulated = false,
-              totalIncomeOrReceipts = money.value
+              totalIncomeOrReceipts = money.value,
+              optBondsDisposed = Some(
+                Seq(
+                  BondDisposed(
+                    methodOfDisposal = Sold.name,
+                    optOtherMethod = None,
+                    optDateSold = Some(localDate),
+                    optAmountReceived = Some(money.value),
+                    optBondsPurchaserName = Some("BondsPurchaserName"),
+                    optConnectedPartyStatus = Some(true),
+                    totalNowHeld = 1
+                  ),
+                  BondDisposed(
+                    methodOfDisposal = Transferred.name,
+                    optOtherMethod = None,
+                    optDateSold = None,
+                    optAmountReceived = None,
+                    optBondsPurchaserName = None,
+                    optConnectedPartyStatus = None,
+                    totalNowHeld = 2
+                  ),
+                  BondDisposed(
+                    methodOfDisposal = Other.name,
+                    optOtherMethod = Some("OtherMethod"),
+                    optDateSold = None,
+                    optAmountReceived = None,
+                    optBondsPurchaserName = None,
+                    optConnectedPartyStatus = None,
+                    totalNowHeld = 3
+                  )
+                )
+              )
             )
           )
         )
@@ -116,6 +206,16 @@ class BondTransactionsTransformerSpec extends AnyFreeSpec with Matchers with Opt
           userAnswers.get(WhenDidSchemeAcquireBondsPage(srn, refineMV(1))) mustBe Some(localDate)
           userAnswers.get(BondsFromConnectedPartyPage(srn, refineMV(1))) mustBe Some(true)
           userAnswers.get(BondsCompleted(srn, refineMV(1))) mustBe Some(SectionCompleted)
+          userAnswers.get(HowWereBondsDisposedOfPage(srn, refineMV(1), refineMV(1))) mustBe Some(Sold)
+          userAnswers.get(BondsStillHeldPage(srn, refineMV(1), refineMV(1))) mustBe Some(1)
+          userAnswers.get(WhenWereBondsSoldPage(srn, refineMV(1), refineMV(1))) mustBe Some(localDate)
+          userAnswers.get(TotalConsiderationSaleBondsPage(srn, refineMV(1), refineMV(1))) mustBe Some(money)
+          userAnswers.get(BuyerNamePage(srn, refineMV(1), refineMV(1))) mustBe Some("BondsPurchaserName")
+          userAnswers.get(IsBuyerConnectedPartyPage(srn, refineMV(1), refineMV(1))) mustBe Some(true)
+          userAnswers.get(HowWereBondsDisposedOfPage(srn, refineMV(1), refineMV(2))) mustBe Some(Transferred)
+          userAnswers.get(BondsStillHeldPage(srn, refineMV(1), refineMV(2))) mustBe Some(2)
+          userAnswers.get(HowWereBondsDisposedOfPage(srn, refineMV(1), refineMV(3))) mustBe Some(Other("OtherMethod"))
+          userAnswers.get(BondsStillHeldPage(srn, refineMV(1), refineMV(3))) mustBe Some(3)
         }
       )
     }

@@ -23,6 +23,7 @@ import models.UserAnswers
 import models.requests.DataRequest
 import models.requests.psr._
 import pages.nonsipp.CheckReturnDatesPage
+import pages.nonsipp.bondsdisposal.BondsDisposalPage
 import pages.nonsipp.landorproperty.LandOrPropertyHeldPage
 import pages.nonsipp.landorpropertydisposal.LandOrPropertyDisposalPage
 import pages.nonsipp.loansmadeoroutstanding._
@@ -64,6 +65,7 @@ class PsrSubmissionService @Inject()(
     val optDidSchemeHoldAnyShares = request.userAnswers.get(DidSchemeHoldAnySharesPage(srn))
     val optSharesDisposal = request.userAnswers.get(SharesDisposalPage(srn))
     val optUnregulatedOrConnectedBondsHeld = request.userAnswers.get(UnregulatedOrConnectedBondsHeldPage(srn))
+    val optBondsDisposal = request.userAnswers.get(BondsDisposalPage(srn))
 
     (
       minimalRequiredSubmissionTransformer.transformToEtmp(srn),
@@ -78,7 +80,8 @@ class PsrSubmissionService @Inject()(
             optLandOrPropertyHeld,
             optMoneyWasBorrowed,
             optDisposeAnyLandOrProperty,
-            optUnregulatedOrConnectedBondsHeld
+            optUnregulatedOrConnectedBondsHeld,
+            optBondsDisposal
           ),
           membersPayments = memberPaymentsTransformer.transformToEtmp(srn, request.userAnswers),
           shares = buildShares(srn)(optDidSchemeHoldAnyShares, optSharesDisposal)
@@ -98,7 +101,8 @@ class PsrSubmissionService @Inject()(
     optLandOrPropertyHeld: Option[Boolean],
     optMoneyWasBorrowed: Option[Boolean],
     optDisposeAnyLandOrProperty: Option[Boolean],
-    optUnregulatedOrConnectedBondsHeld: Option[Boolean]
+    optUnregulatedOrConnectedBondsHeld: Option[Boolean],
+    optBondsDisposal: Option[Boolean]
   )(implicit request: DataRequest[_]): Option[Assets] =
     Option.when(List(optLandOrPropertyHeld, optMoneyWasBorrowed, optUnregulatedOrConnectedBondsHeld).flatten.nonEmpty)(
       Assets(
@@ -118,14 +122,15 @@ class PsrSubmissionService @Inject()(
               moneyBorrowed = moneyBorrowedTransformer.transformToEtmp(srn)
             )
         ),
-        optBonds = optUnregulatedOrConnectedBondsHeld.map(
+        optBonds = optUnregulatedOrConnectedBondsHeld.map {
+          val bondsDisposal = optBondsDisposal.getOrElse(false)
           bondsWereAdded =>
             Bonds(
               bondsWereAdded = bondsWereAdded,
-              bondsWereDisposed = false,
-              bondTransactions = bondTransactionsTransformer.transformToEtmp(srn)
+              bondsWereDisposed = bondsDisposal,
+              bondTransactions = bondTransactionsTransformer.transformToEtmp(srn, bondsDisposal)
             )
-        )
+        }
       )
     )
 

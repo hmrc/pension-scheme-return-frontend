@@ -16,25 +16,26 @@
 
 package controllers.nonsipp.bondsdisposal
 
+import controllers.PSRController
 import controllers.actions._
+import controllers.nonsipp.bondsdisposal.BondsDisposalController._
 import forms.YesNoPageFormProvider
 import models.Mode
 import models.SchemeId.Srn
+import models.requests.DataRequest
 import navigation.Navigator
+import pages.nonsipp.bondsdisposal.BondsDisposalPage
 import play.api.data.Form
-import controllers.PSRController
-import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import views.html.YesNoPageView
-import services.SaveService
-import BondsDisposalController._
+import services.{PsrSubmissionService, SaveService}
+import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
+import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
+import views.html.YesNoPageView
 
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
-import pages.nonsipp.bondsdisposal.BondsDisposalPage
-import viewmodels.DisplayMessage.Message
 
 class BondsDisposalController @Inject()(
   override val messagesApi: MessagesApi,
@@ -43,7 +44,8 @@ class BondsDisposalController @Inject()(
   identifyAndRequireData: IdentifyAndRequireData,
   formProvider: YesNoPageFormProvider,
   val controllerComponents: MessagesControllerComponents,
-  view: YesNoPageView
+  view: YesNoPageView,
+  psrSubmissionService: PsrSubmissionService
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
@@ -65,7 +67,20 @@ class BondsDisposalController @Inject()(
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(BondsDisposalPage(srn), value))
             _ <- saveService.save(updatedAnswers)
-          } yield Redirect(navigator.nextPage(BondsDisposalPage(srn), mode, updatedAnswers))
+            redirectTo <- if (value) {
+              Future.successful(
+                Redirect(navigator.nextPage(BondsDisposalPage(srn), mode, updatedAnswers))
+              )
+            } else {
+              psrSubmissionService
+                .submitPsrDetails(srn)(implicitly, implicitly, request = DataRequest(request.request, updatedAnswers))
+                .map {
+                  case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+                  case Some(_) =>
+                    Redirect(navigator.nextPage(BondsDisposalPage(srn), mode, updatedAnswers))
+                }
+            }
+          } yield redirectTo
       )
   }
 }

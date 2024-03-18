@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.unregulatedorconnectedbonds
+package controllers.nonsipp.bonds
 
 import config.Constants
 import config.Refined.Max5000
 import controllers.PSRController
 import controllers.actions._
-import controllers.nonsipp.unregulatedorconnectedbonds.CostOfBondsController._
+import controllers.nonsipp.bonds.CostOfBondsController._
 import forms.MoneyFormProvider
 import forms.mappings.errors.MoneyFormErrors
 import models.SchemeId.Srn
@@ -111,7 +111,7 @@ object CostOfBondsController {
         form,
         QuestionField.input(Empty, Some("bonds.costOfBonds.hint"))
       ),
-      controllers.nonsipp.unregulatedorconnectedbonds.routes.CostOfBondsController
+      controllers.nonsipp.bonds.routes.CostOfBondsController
         .onSubmit(srn, index, mode)
     )
 }

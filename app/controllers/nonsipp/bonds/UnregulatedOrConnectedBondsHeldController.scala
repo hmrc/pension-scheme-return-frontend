@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.unregulatedorconnectedbonds
+package controllers.nonsipp.bonds
 
 import config.FrontendAppConfig
 import controllers.actions._
-import controllers.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldController._
+import controllers.nonsipp.bonds.UnregulatedOrConnectedBondsHeldController._
 import forms.YesNoPageFormProvider
 import models.Mode
 import models.SchemeId.Srn
@@ -103,7 +103,7 @@ object UnregulatedOrConnectedBondsHeldController {
       YesNoPageViewModel(
         legend = Some(Message("unregulatedOrConnectedBondsHeld.heading2"))
       ),
-      controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldController
+      controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldController
         .onSubmit(srn, mode)
     ).withDescription(
       ParagraphMessage("unregulatedOrConnectedBondsHeld.paragraph1") ++

@@ -469,7 +469,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
   }
   "Bonds status" - {
     val hadBondsPageUrl =
-      controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldController
+      controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldController
         .onPageLoad(srn, NormalMode)
         .url
 

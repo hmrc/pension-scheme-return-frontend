@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.unregulatedorconnectedbonds
+package controllers.nonsipp.bonds
 
 import config.FrontendAppConfig
 import config.Refined.Max5000
@@ -125,7 +125,7 @@ object BondsFromConnectedPartyController {
             )
         )
       ),
-      controllers.nonsipp.unregulatedorconnectedbonds.routes.BondsFromConnectedPartyController
+      controllers.nonsipp.bonds.routes.BondsFromConnectedPartyController
         .onSubmit(srn, index, mode)
     )
 }

@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.unregulatedorconnectedbonds
+package controllers.nonsipp.bonds
 
 import cats.implicits.toShow
 import config.Refined.Max5000
 import controllers.PSRController
 import controllers.actions._
-import controllers.nonsipp.unregulatedorconnectedbonds.UnregulatedOrConnectedBondsHeldCYAController._
+import controllers.nonsipp.bonds.UnregulatedOrConnectedBondsHeldCYAController._
 import models.SchemeHoldBond.{Acquisition, Contribution, Transfer}
 import models.SchemeId.Srn
 import models.{CheckMode, Mode, Money, NormalMode, SchemeHoldBond}

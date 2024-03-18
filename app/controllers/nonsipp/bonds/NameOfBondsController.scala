@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.unregulatedorconnectedbonds
+package controllers.nonsipp.bonds
 
 import config.Refined.Max5000
 import controllers.actions.IdentifyAndRequireData
-import controllers.nonsipp.unregulatedorconnectedbonds.NameOfBondsController._
+import controllers.nonsipp.bonds.NameOfBondsController._
 import forms.TextFormProvider
 import models.Mode
 import models.SchemeId.Srn

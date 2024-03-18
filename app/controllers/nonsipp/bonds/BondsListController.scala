@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.nonsipp.unregulatedorconnectedbonds
+package controllers.nonsipp.bonds
 
 import cats.implicits.{catsSyntaxApplicativeId, toShow, toTraverseOps}
 import com.google.inject.Inject
@@ -22,7 +22,7 @@ import config.Constants
 import config.Refined.Max5000
 import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
-import controllers.nonsipp.unregulatedorconnectedbonds.BondsListController._
+import controllers.nonsipp.bonds.BondsListController._
 import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
 import models.requests.DataRequest
@@ -159,7 +159,7 @@ object BondsListController {
           TableElem(
             LinkMessage(
               Message("site.change"),
-              controllers.nonsipp.unregulatedorconnectedbonds.routes.UnregulatedOrConnectedBondsHeldCYAController
+              controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldCYAController
                 .onPageLoad(srn, index, CheckMode)
                 .url
             )
@@ -167,7 +167,7 @@ object BondsListController {
           TableElem(
             LinkMessage(
               Message("site.remove"),
-              controllers.nonsipp.unregulatedorconnectedbonds.routes.RemoveBondsController
+              controllers.nonsipp.bonds.routes.RemoveBondsController
                 .onPageLoad(srn, index, NormalMode)
                 .url
             )
@@ -188,7 +188,7 @@ object BondsListController {
       currentPage = page,
       pageSize = Constants.pageSize,
       totalSize = data.size,
-      call = controllers.nonsipp.unregulatedorconnectedbonds.routes.BondsListController.onPageLoad(srn, _, mode)
+      call = controllers.nonsipp.bonds.routes.BondsListController.onPageLoad(srn, _, mode)
     )
 
     FormPageViewModel(
@@ -218,7 +218,7 @@ object BondsListController {
       refresh = None,
       buttonText = "site.saveAndContinue",
       details = None,
-      onSubmit = controllers.nonsipp.unregulatedorconnectedbonds.routes.BondsListController.onSubmit(srn, page, mode)
+      onSubmit = controllers.nonsipp.bonds.routes.BondsListController.onSubmit(srn, page, mode)
     )
   }
 
