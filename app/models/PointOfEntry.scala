@@ -24,14 +24,14 @@ sealed trait PointOfEntry {
 }
 
 object PointOfEntry {
+  case object NoPointOfEntry extends WithName("NoPointOfEntry") with PointOfEntry {
+    val pointOfEntry = "NoPointOfEntry"
+  }
+
   case object HowWereSharesDisposedPointOfEntry
       extends WithName("HowWereSharesDisposedPointOfEntry")
       with PointOfEntry {
     val pointOfEntry = "HowWereSharesDisposedPointOfEntry"
-  }
-
-  case object HowWereBondsDisposedPointOfEntry extends WithName("HowWereBondsDisposedPointOfEntry") with PointOfEntry {
-    val pointOfEntry = "HowWereBondsDisposedPointOfEntry"
   }
 
   case object WhoWereTheSharesSoldToPointOfEntry
@@ -40,16 +40,74 @@ object PointOfEntry {
     val pointOfEntry = "WhoWereTheSharesSoldToPointOfEntry"
   }
 
-  case object NoPointOfEntry extends WithName("NoPointOfEntry") with PointOfEntry {
-    val pointOfEntry = "NoPointOfEntry"
+  case object HowWereBondsDisposedPointOfEntry extends WithName("HowWereBondsDisposedPointOfEntry") with PointOfEntry {
+    val pointOfEntry = "HowWereBondsDisposedPointOfEntry"
+  }
+
+  case object AssetAcquisitionToContributionPointOfEntry
+      extends WithName("AssetAcquisitionToContributionPointOfEntry")
+      with PointOfEntry {
+    val pointOfEntry = "AssetAcquisitionToContributionPointOfEntry"
+  }
+
+  case object AssetAcquisitionToTransferPointOfEntry
+      extends WithName("AssetAcquisitionToTransferPointOfEntry")
+      with PointOfEntry {
+    val pointOfEntry = "AssetAcquisitionToTransferPointOfEntry"
+  }
+
+  case object AssetContributionToAcquisitionPointOfEntry
+      extends WithName("AssetContributionToAcquisitionPointOfEntry")
+      with PointOfEntry {
+    val pointOfEntry = "AssetContributionToAcquisitionPointOfEntry"
+  }
+
+  case object AssetContributionToTransferPointOfEntry
+      extends WithName("AssetContributionToTransferPointOfEntry")
+      with PointOfEntry {
+    val pointOfEntry = "AssetContributionToTransferPointOfEntry"
+  }
+
+  case object AssetTransferToAcquisitionPointOfEntry
+      extends WithName("AssetTransferToAcquisitionPointOfEntry")
+      with PointOfEntry {
+    val pointOfEntry = "AssetTransferToAcquisitionPointOfEntry"
+  }
+
+  case object AssetTransferToContributionPointOfEntry
+      extends WithName("AssetTransferToContributionPointOfEntry")
+      with PointOfEntry {
+    val pointOfEntry = "AssetTransferToContributionPointOfEntry"
+  }
+
+  case object WhoWasAssetAcquiredFromPointOfEntry
+      extends WithName("WhoWasAssetAcquiredFromPointOfEntry")
+      with PointOfEntry {
+    val pointOfEntry = "WhoWasAssetAcquiredFromPointOfEntry"
   }
 
   implicit val format: Format[PointOfEntry] = new Format[PointOfEntry] {
     override def reads(json: JsValue): JsResult[PointOfEntry] = json match {
+      case JsString(NoPointOfEntry.name) => JsSuccess(NoPointOfEntry)
+      // Shares Disposal
       case JsString(HowWereSharesDisposedPointOfEntry.name) => JsSuccess(HowWereSharesDisposedPointOfEntry)
       case JsString(WhoWereTheSharesSoldToPointOfEntry.name) => JsSuccess(WhoWereTheSharesSoldToPointOfEntry)
+      // Bonds Disposal
       case JsString(HowWereBondsDisposedPointOfEntry.name) => JsSuccess(HowWereBondsDisposedPointOfEntry)
-      case JsString(NoPointOfEntry.name) => JsSuccess(NoPointOfEntry)
+      // Other Assets
+      case JsString(AssetAcquisitionToContributionPointOfEntry.name) =>
+        JsSuccess(AssetAcquisitionToContributionPointOfEntry)
+      case JsString(AssetAcquisitionToTransferPointOfEntry.name) =>
+        JsSuccess(AssetAcquisitionToTransferPointOfEntry)
+      case JsString(AssetContributionToAcquisitionPointOfEntry.name) =>
+        JsSuccess(AssetContributionToAcquisitionPointOfEntry)
+      case JsString(AssetContributionToTransferPointOfEntry.name) =>
+        JsSuccess(AssetContributionToTransferPointOfEntry)
+      case JsString(AssetTransferToAcquisitionPointOfEntry.name) =>
+        JsSuccess(AssetTransferToAcquisitionPointOfEntry)
+      case JsString(AssetTransferToContributionPointOfEntry.name) =>
+        JsSuccess(AssetTransferToContributionPointOfEntry)
+      case JsString(WhoWasAssetAcquiredFromPointOfEntry.name) => JsSuccess(WhoWasAssetAcquiredFromPointOfEntry)
       case unknown => JsError(s"Unknown PointOfEntry value: $unknown")
     }
 

@@ -150,6 +150,7 @@ trait TestValues {
   val bondsStillHeld = 5
   val nameOfBonds = "name of bonds"
   val nameOfAsset = "name of asset"
+  val otherAssetDescription = "other asset description"
 
   val address: Address = Address(
     "test-id",

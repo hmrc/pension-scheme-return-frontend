@@ -21,11 +21,13 @@ import controllers.actions._
 import controllers.nonsipp.common.IdentityTypeController._
 import forms.RadioListFormProvider
 import models.IdentityType.{Individual, Other, UKCompany, UKPartnership}
+import models.PointOfEntry.{NoPointOfEntry, WhoWasAssetAcquiredFromPointOfEntry}
 import models.SchemeId.Srn
-import models.{IdentitySubject, IdentityType, Mode, UserAnswers}
+import models.{CheckMode, IdentitySubject, IdentityType, Mode, UserAnswers}
 import navigation.Navigator
 import pages.nonsipp.common.IdentityTypePage
 import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
+import pages.nonsipp.otherassetsheld.OtherAssetsCYAPointOfEntry
 import pages.nonsipp.shares.CompanyNameRelatedSharesPage
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -62,6 +64,18 @@ class IdentityTypeController @Inject()(
     subject match {
       case IdentitySubject.Unknown => Redirect(controllers.routes.UnauthorisedController.onPageLoad())
       case _ =>
+        // If this page is reached in CheckMode, in Other Assets Journey, and there is no PointOfEntry set
+        if (mode == CheckMode && subject == IdentitySubject.OtherAssetSeller && request.userAnswers
+            .get(OtherAssetsCYAPointOfEntry(srn, index))
+            .contains(NoPointOfEntry)) {
+          // Set this page as the PointOfEntry
+          saveService.save(
+            request.userAnswers
+              .set(OtherAssetsCYAPointOfEntry(srn, index), WhoWasAssetAcquiredFromPointOfEntry)
+              .getOrElse(request.userAnswers)
+          )
+        }
+
         val form = IdentityTypeController.form(formProvider, subject)
         Ok(
           view(

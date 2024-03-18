@@ -20,12 +20,7 @@ import config.Refined.Max5000
 import models.{IdentitySubject, SchemeHoldAsset, UserAnswers}
 import models.SchemeId.Srn
 import pages.QuestionPage
-import pages.nonsipp.common.{
-  CompanyRecipientCrnPage,
-  IdentityTypePage,
-  OtherRecipientDetailsPage,
-  PartnershipRecipientUtrPage
-}
+import pages.nonsipp.common.IdentityTypePage
 import play.api.libs.json.JsPath
 import queries.Removable
 import utils.PageUtils.removePages
@@ -42,26 +37,34 @@ case class WhyDoesSchemeHoldAssetsPage(srn: Srn, index: Max5000) extends Questio
 
   override def cleanup(value: Option[SchemeHoldAsset], userAnswers: UserAnswers): Try[UserAnswers] =
     (value, userAnswers.get(this)) match {
-      case (Some(SchemeHoldAsset.Acquisition), Some(SchemeHoldAsset.Acquisition)) => Try(userAnswers) // no change
-      case (Some(SchemeHoldAsset.Contribution), Some(SchemeHoldAsset.Contribution)) => Try(userAnswers) // no change
-      case (Some(SchemeHoldAsset.Transfer), Some(SchemeHoldAsset.Transfer)) => Try(userAnswers) // no change
-      case (Some(_), Some(_)) => removePages(userAnswers, dependantPages(srn))
-      case (None, _) => removePages(userAnswers, dependantPages(srn))
+      // Answer changed ((new), (previous))
+      case (Some(SchemeHoldAsset.Contribution), Some(SchemeHoldAsset.Acquisition)) =>
+        removePages(userAnswers, acquisitionOnlyPages(srn))
+      case (Some(SchemeHoldAsset.Transfer), Some(SchemeHoldAsset.Acquisition)) =>
+        removePages(userAnswers, acquisitionOnlyPages(srn) ++ acquisitionAndContributionPages(srn))
+      case (Some(SchemeHoldAsset.Acquisition), Some(SchemeHoldAsset.Contribution)) =>
+        Try(userAnswers)
+      case (Some(SchemeHoldAsset.Transfer), Some(SchemeHoldAsset.Contribution)) =>
+        removePages(userAnswers, acquisitionAndContributionPages(srn))
+      case (Some(SchemeHoldAsset.Acquisition), Some(SchemeHoldAsset.Transfer)) =>
+        Try(userAnswers)
+      case (Some(SchemeHoldAsset.Contribution), Some(SchemeHoldAsset.Transfer)) =>
+        Try(userAnswers)
+      // Answer unchanged
+      case (Some(_), Some(_)) => Try(userAnswers)
+      case (None, _) => removePages(userAnswers, acquisitionOnlyPages(srn) ++ acquisitionAndContributionPages(srn))
       case _ => Try(userAnswers)
     }
 
-  private def dependantPages(srn: Srn): List[Removable[_]] =
+  private def acquisitionOnlyPages(srn: Srn): List[Removable[_]] =
+    List(
+      IdentityTypePage(srn, index, IdentitySubject.OtherAssetSeller),
+      OtherAssetSellerConnectedPartyPage(srn, index)
+    )
+
+  private def acquisitionAndContributionPages(srn: Srn): List[Removable[_]] =
     List(
       WhenDidSchemeAcquireAssetsPage(srn, index),
-      IdentityTypePage(srn, index, IdentitySubject.OtherAssetSeller),
-      IndividualNameOfOtherAssetSellerPage(srn, index),
-      OtherAssetIndividualSellerNINumberPage(srn, index),
-      CompanyNameOfOtherAssetSellerPage(srn, index),
-      CompanyRecipientCrnPage(srn, index, IdentitySubject.OtherAssetSeller),
-      PartnershipOtherAssetSellerNamePage(srn, index),
-      PartnershipRecipientUtrPage(srn, index, IdentitySubject.OtherAssetSeller),
-      OtherRecipientDetailsPage(srn, index, IdentitySubject.OtherAssetSeller),
-      OtherAssetSellerConnectedPartyPage(srn, index),
       IndependentValuationPage(srn, index)
     )
 }
