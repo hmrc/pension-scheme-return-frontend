@@ -129,13 +129,18 @@ object OtherAssetsHeldNavigator extends JourneyNavigator {
     case CostOfOtherAssetPage(srn, index) =>
       userAnswers.get(WhyDoesSchemeHoldAssetsPage(srn, index)) match {
         case Some(Transfer) =>
-          controllers.routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.otherassetsheld.routes.IncomeFromAssetController
+            .onPageLoad(srn, index, NormalMode)
         case _ =>
           controllers.nonsipp.otherassetsheld.routes.IndependentValuationController
             .onPageLoad(srn, index, NormalMode)
       }
 
     case IndependentValuationPage(srn, index) =>
+      controllers.nonsipp.otherassetsheld.routes.IncomeFromAssetController
+        .onPageLoad(srn, index, NormalMode)
+
+    case IncomeFromAssetPage(srn, index) =>
       controllers.routes.UnauthorisedController.onPageLoad()
   }
 

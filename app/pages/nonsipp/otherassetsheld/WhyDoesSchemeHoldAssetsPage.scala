@@ -17,11 +17,21 @@
 package pages.nonsipp.otherassetsheld
 
 import config.Refined.Max5000
-import models.SchemeHoldAsset
+import models.{IdentitySubject, SchemeHoldAsset, UserAnswers}
 import models.SchemeId.Srn
 import pages.QuestionPage
+import pages.nonsipp.common.{
+  CompanyRecipientCrnPage,
+  IdentityTypePage,
+  OtherRecipientDetailsPage,
+  PartnershipRecipientUtrPage
+}
 import play.api.libs.json.JsPath
+import queries.Removable
+import utils.PageUtils.removePages
 import utils.RefinedUtils.RefinedIntOps
+
+import scala.util.Try
 
 case class WhyDoesSchemeHoldAssetsPage(srn: Srn, index: Max5000) extends QuestionPage[SchemeHoldAsset] {
 
@@ -30,8 +40,6 @@ case class WhyDoesSchemeHoldAssetsPage(srn: Srn, index: Max5000) extends Questio
 
   override def toString: String = "methodOfHolding"
 
-  /*
-  TODO Cleanup ready for when subsequent pages exist
   override def cleanup(value: Option[SchemeHoldAsset], userAnswers: UserAnswers): Try[UserAnswers] =
     (value, userAnswers.get(this)) match {
       case (Some(SchemeHoldAsset.Acquisition), Some(SchemeHoldAsset.Acquisition)) => Try(userAnswers) // no change
@@ -45,6 +53,15 @@ case class WhyDoesSchemeHoldAssetsPage(srn: Srn, index: Max5000) extends Questio
   private def dependantPages(srn: Srn): List[Removable[_]] =
     List(
       WhenDidSchemeAcquireAssetsPage(srn, index),
-      AssetsFromConnectedPartyPage(srn, index)
-    )*/
+      IdentityTypePage(srn, index, IdentitySubject.OtherAssetSeller),
+      IndividualNameOfOtherAssetSellerPage(srn, index),
+      OtherAssetIndividualSellerNINumberPage(srn, index),
+      CompanyNameOfOtherAssetSellerPage(srn, index),
+      CompanyRecipientCrnPage(srn, index, IdentitySubject.OtherAssetSeller),
+      PartnershipOtherAssetSellerNamePage(srn, index),
+      PartnershipRecipientUtrPage(srn, index, IdentitySubject.OtherAssetSeller),
+      OtherRecipientDetailsPage(srn, index, IdentitySubject.OtherAssetSeller),
+      OtherAssetSellerConnectedPartyPage(srn, index),
+      IndependentValuationPage(srn, index)
+    )
 }

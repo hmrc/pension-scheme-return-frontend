@@ -64,3 +64,9 @@ GET         /:srn/asset-independent-valuation/:index                            
 POST        /:srn/asset-independent-valuation/:index                                    controllers.nonsipp.otherassetsheld.IndependentValuationController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
 GET         /:srn/change-asset-independent-valuation/:index                             controllers.nonsipp.otherassetsheld.IndependentValuationController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 POST        /:srn/change-asset-independent-valuation/:index                             controllers.nonsipp.otherassetsheld.IndependentValuationController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
+GET         /:srn/asset-total-income/:index                                             controllers.nonsipp.otherassetsheld.IncomeFromAssetController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/asset-total-income/:index                                             controllers.nonsipp.otherassetsheld.IncomeFromAssetController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/change-asset-total-income/:index                                      controllers.nonsipp.otherassetsheld.IncomeFromAssetController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-asset-total-income/:index                                      controllers.nonsipp.otherassetsheld.IncomeFromAssetController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
