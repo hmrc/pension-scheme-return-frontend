@@ -18,7 +18,7 @@ package navigation.nonsipp
 
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.otherassetsdisposal.OtherAssetsDisposalPage
+import pages.nonsipp.otherassetsdisposal._
 import utils.BaseSpec
 
 class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
@@ -32,10 +32,12 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
           .navigateToWithData(
             OtherAssetsDisposalPage,
             Gen.const(true),
-            (_, _) => controllers.routes.UnauthorisedController.onPageLoad()
+            (srn, _) =>
+              controllers.nonsipp.otherassetsdisposal.routes.WhatYouWillNeedOtherAssetsDisposalController
+                .onPageLoad(srn)
           )
           .withName(
-            "go from Did the scheme dispose of any other assets page to unauthorised page" +
+            "go from Did the scheme dispose of any other assets page to WhatYouWillNeedOtherAssetsDisposal page" +
               " when yes is selected"
           )
       )
@@ -50,6 +52,19 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
           .withName(
             "go from Did the scheme dispose of any other assets page to taskList page" +
               " when no is selected"
+          )
+      )
+    }
+
+    "WhatYouWillNeedOtherAssetsDisposalPage" - {
+      act.like(
+        normalmode
+          .navigateTo(
+            WhatYouWillNeedOtherAssetsDisposalPage,
+            (_, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          )
+          .withName(
+            "go from WhatYouWillNeedOtherAssetsDisposal page to unauthorised page"
           )
       )
     }

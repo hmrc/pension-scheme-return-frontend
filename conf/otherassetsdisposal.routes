@@ -2,3 +2,6 @@ GET         /:srn/other-assets-disposal                                         
 POST        /:srn/other-assets-disposal                                                 controllers.nonsipp.otherassetsdisposal.OtherAssetsDisposalController.onSubmit(srn: Srn, mode: Mode = NormalMode)
 GET         /:srn/change-other-assets-disposal                                          controllers.nonsipp.otherassetsdisposal.OtherAssetsDisposalController.onPageLoad(srn: Srn, mode: Mode = CheckMode)
 POST        /:srn/change-other-assets-disposal                                          controllers.nonsipp.otherassetsdisposal.OtherAssetsDisposalController.onSubmit(srn: Srn, mode: Mode = CheckMode)
+
+GET         /:srn/what-you-will-need-other-assets-disposal                              controllers.nonsipp.otherassetsdisposal.WhatYouWillNeedOtherAssetsDisposalController.onPageLoad(srn: Srn)
+GET         /:srn/submit-what-you-will-need-other-assets-disposal                       controllers.nonsipp.otherassetsdisposal.WhatYouWillNeedOtherAssetsDisposalController.onSubmit(srn: Srn)
