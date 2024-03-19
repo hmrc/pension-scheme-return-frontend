@@ -163,6 +163,16 @@ object OtherAssetsHeldNavigator extends JourneyNavigator {
           ).merge
         case Some(false) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
       }
+
+    case RemoveOtherAssetPage(srn, index) =>
+      if (userAnswers
+          .map(WhatIsOtherAssetPages(srn))
+          .isEmpty) {
+        controllers.nonsipp.otherassetsheld.routes.OtherAssetsHeldController
+          .onPageLoad(srn, NormalMode)
+      } else {
+        controllers.nonsipp.otherassetsheld.routes.OtherAssetsListController.onPageLoad(srn, 1, NormalMode)
+      }
   }
 
   override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] = _ => _ => PartialFunction.empty

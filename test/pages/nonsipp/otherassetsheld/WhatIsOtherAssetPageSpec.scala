@@ -16,11 +16,17 @@
 
 package pages.nonsipp.otherassetsheld
 
+import config.Refined.Max5000
 import controllers.TestValues
 import eu.timepit.refined.refineMV
+import models.UserAnswers
 import pages.behaviours.PageBehaviours
+import utils.UserAnswersUtils.UserAnswersOps
 
 class WhatIsOtherAssetPageSpec extends PageBehaviours with TestValues {
+
+  private val index = refineMV[Max5000.Refined](1)
+  private val index2 = refineMV[Max5000.Refined](2)
 
   "WhatIsOtherAssetPage" - {
 
@@ -29,5 +35,40 @@ class WhatIsOtherAssetPageSpec extends PageBehaviours with TestValues {
     beSettable[String](WhatIsOtherAssetPage(srn, refineMV(1)))
 
     beRemovable[String](WhatIsOtherAssetPage(srn, refineMV(1)))
+  }
+
+  "cleanup list size of 1" - {
+
+    val userAnswers =
+      UserAnswers("id")
+        .unsafeSet(WhatIsOtherAssetPage(srn, index), otherName)
+        .unsafeSet(IncomeFromAssetPage(srn, index), money)
+        .unsafeSet(OtherAssetsHeldPage(srn), true)
+
+    s"remove index" in {
+      val result =
+        WhatIsOtherAssetPage(srn, index).cleanup(None, userAnswers).toOption.value
+      result.get(IncomeFromAssetPage(srn, index)) mustBe None
+      result.get(OtherAssetsHeldPage(srn)) mustBe None
+    }
+  }
+
+  "cleanup list size greater than 1" - {
+
+    val userAnswers =
+      UserAnswers("id")
+        .unsafeSet(WhatIsOtherAssetPage(srn, index), otherName)
+        .unsafeSet(IncomeFromAssetPage(srn, index), money)
+        .unsafeSet(WhatIsOtherAssetPage(srn, index2), otherName)
+        .unsafeSet(IncomeFromAssetPage(srn, index2), money)
+        .unsafeSet(OtherAssetsHeldPage(srn), true)
+
+    s"remove index" in {
+      val result =
+        WhatIsOtherAssetPage(srn, index).cleanup(None, userAnswers).toOption.value
+      result.get(IncomeFromAssetPage(srn, index)) mustBe None
+      result.get(IncomeFromAssetPage(srn, index2)) must not be None
+      result.get(OtherAssetsHeldPage(srn)) must not be None
+    }
   }
 }

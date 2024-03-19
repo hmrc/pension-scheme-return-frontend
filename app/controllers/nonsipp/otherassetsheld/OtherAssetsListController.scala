@@ -164,11 +164,9 @@ object OtherAssetsListController {
           TableElem(
             LinkMessage(
               Message("site.remove"),
-              // TODO Add in nav to remove
-              /*controllers.nonsipp.otherassetsheld.routes.RemoveOtherAssetsController
+              controllers.nonsipp.otherassetsheld.routes.RemoveOtherAssetController
                 .onPageLoad(srn, index, NormalMode)
-                .url*/
-              controllers.routes.UnauthorisedController.onPageLoad().url
+                .url
             )
           )
         )

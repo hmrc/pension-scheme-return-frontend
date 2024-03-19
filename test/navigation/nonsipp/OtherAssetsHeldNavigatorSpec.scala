@@ -18,15 +18,11 @@ package navigation.nonsipp
 
 import config.Refined.{Max5000, OneTo5000}
 import eu.timepit.refined.refineMV
-import models.{IdentitySubject, IdentityType, NormalMode, SchemeHoldAsset}
+import models.SchemeId.Srn
+import models.{IdentitySubject, IdentityType, NormalMode, SchemeHoldAsset, UserAnswers}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
-import pages.nonsipp.common.{
-  CompanyRecipientCrnPage,
-  IdentityTypePage,
-  OtherRecipientDetailsPage,
-  PartnershipRecipientUtrPage
-}
+import pages.nonsipp.common.{CompanyRecipientCrnPage, IdentityTypePage, OtherRecipientDetailsPage, PartnershipRecipientUtrPage}
 import pages.nonsipp.otherassetsheld._
 import utils.BaseSpec
 import utils.UserAnswersUtils.UserAnswersOps
@@ -35,6 +31,7 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
   val navigator: Navigator = new NonSippNavigator
   private val index = refineMV[OneTo5000](1)
+  private val index2 = refineMV[OneTo5000](2)
   private val subject = IdentitySubject.OtherAssetSeller
 
   "OtherAssetsHeldNavigator" - {
@@ -479,5 +476,41 @@ class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
           "go from IncomeFromAssetPage to Unauthorised"
         )
     )
+  }
+
+  "RemoveOtherAssetPage" - {
+    "When there are no other assets" - {
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            RemoveOtherAssetPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.otherassetsheld.routes.OtherAssetsHeldController
+                .onPageLoad(srn, NormalMode)
+          )
+          .withName("go from RemoveOtherAssetPage to Asset page")
+      )
+    }
+
+    "When there is another asset" - {
+      val customUserAnswers: Srn => UserAnswers = srn =>
+        defaultUserAnswers.unsafeSet(
+          WhatIsOtherAssetPage(srn, index2),
+          otherName
+        )
+      act.like(
+        normalmode
+          .navigateToWithIndex(
+            index,
+            RemoveOtherAssetPage,
+            (srn, _: Max5000, _) =>
+              controllers.nonsipp.otherassetsheld.routes.OtherAssetsListController
+                .onPageLoad(srn, 1, NormalMode),
+            customUserAnswers
+          )
+          .withName("go from RemoveOtherAssetPage to Asset list page")
+      )
+    }
   }
 }

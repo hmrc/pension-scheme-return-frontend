@@ -17,22 +17,14 @@
 package pages.nonsipp.otherassetsheld
 
 import config.Refined.Max5000
-import models.Money
 import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
 
-case class IncomeFromAssetPage(srn: Srn, index: Max5000) extends QuestionPage[Money] {
+case class RemoveOtherAssetPage(srn: Srn, index: Max5000) extends QuestionPage[Boolean] {
 
   override def path: JsPath = Paths.otherAssetsTransactions \ toString \ index.arrayIndex.toString
 
-  override def toString: String = "totalIncomeOrReceipts"
-}
-
-case class IncomeFromAssetPages(srn: Srn) extends QuestionPage[Map[String, Money]] {
-
-  override def path: JsPath = Paths.otherAssetsTransactions \ toString
-
-  override def toString: String = "totalIncomeOrReceipts"
+  override def toString: String = "removeOtherAsset"
 }
