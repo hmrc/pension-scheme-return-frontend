@@ -52,7 +52,22 @@ object OtherAssetsDisposalNavigator extends JourneyNavigator {
         .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
 
     case TotalConsiderationSaleAssetPage(srn, assetIndex, disposalIndex) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+      controllers.nonsipp.otherassetsdisposal.routes.TypeOfAssetBuyerController
+        .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+
+    case TypeOfAssetBuyerPage(srn, assetIndex, disposalIndex) =>
+      userAnswers.get(TypeOfAssetBuyerPage(srn, assetIndex, disposalIndex)) match {
+        case Some(IdentityType.Individual) =>
+          controllers.routes.UnauthorisedController.onPageLoad()
+        case Some(IdentityType.UKCompany) =>
+          controllers.routes.UnauthorisedController.onPageLoad()
+        case Some(IdentityType.UKPartnership) =>
+          controllers.routes.UnauthorisedController.onPageLoad()
+        case Some(IdentityType.Other) =>
+          controllers.routes.UnauthorisedController.onPageLoad()
+        case None =>
+          controllers.routes.JourneyRecoveryController.onPageLoad()
+      }
 
   }
 

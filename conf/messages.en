@@ -3096,9 +3096,18 @@ whenWasAssetSold.error.invalid.date = Date these bonds were sold must be a real 
 whenWasAssetSold.error.date.before = Date this asset was sold must be the same as or after {0}
 whenWasAssetSold.error.date.after = Date this asset was sold must be the same as or before {0}
 whenWasAssetSold.error.invalid.characters = Date this asset was sold must only include numbers 0 to 9
+
 totalConsiderationSaleAsset.title = What was the total consideration received for the sale of this asset, in pounds and pence?
 totalConsiderationSaleAsset.heading = What was the total consideration received for the sale of this asset, in pounds and pence?
 totalConsiderationSaleAsset.error.required = Enter the total consideration received for the sale of this asset, in pounds and pence
 totalConsiderationSaleAsset.error.invalid.characters = Total consideration received for the sale of this asset must be an amount of money, like 123 or 123.45
 totalConsiderationSaleAsset.error.tooSmall = Total consideration received for the sale of this asset must be 0.01 or more
 totalConsiderationSaleAsset.error.tooLarge = Total consideration received for the sale of this asset must be 999999999.99 or less
+
+typeOfAssetBuyer.title = Who purchased the asset?
+typeOfAssetBuyer.heading = Who purchased the asset?
+typeOfAssetBuyer.radioList1 = An individual
+typeOfAssetBuyer.radioList2 = A UK company
+typeOfAssetBuyer.radioList3 = A UK partnership
+typeOfAssetBuyer.radioList4 = Other
+typeOfAssetBuyer.error.required = Select who purchased the asset

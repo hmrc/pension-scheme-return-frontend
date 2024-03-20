@@ -18,7 +18,7 @@ package navigation.nonsipp
 
 import config.Refined.{Max50, Max5000}
 import eu.timepit.refined.refineMV
-import models.{HowDisposed, NormalMode}
+import models.{HowDisposed, IdentityType, NormalMode}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.otherassetsdisposal._
@@ -145,11 +145,63 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
             disposalIndex,
             TotalConsiderationSaleAssetPage,
             (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
-              controllers.routes.UnauthorisedController.onPageLoad()
+              controllers.nonsipp.otherassetsdisposal.routes.TypeOfAssetBuyerController
+                .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
           )
+          .withName("go from when was asset sold page to type of asset buyer page")
+      )
+
+    }
+
+    "TypeOfAssetBuyerPage" - {
+      act.like(
+        normalmode
+          .navigateToWithDoubleIndexAndData(
+            assetIndex,
+            disposalIndex,
+            TypeOfAssetBuyerPage,
+            Gen.const(IdentityType.Individual),
+            (srn, index: Max5000, disposalIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          )
+          .withName("go from type of asset buyer page to Unauthorised page when Individual")
+      )
+
+      act.like(
+        normalmode
+          .navigateToWithDoubleIndexAndData(
+            assetIndex,
+            disposalIndex,
+            TypeOfAssetBuyerPage,
+            Gen.const(IdentityType.UKCompany),
+            (srn, index: Max5000, disposalIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          )
+          .withName("go from type of asset buyer page to Unauthorised page when UKCompany")
+      )
+
+      act.like(
+        normalmode
+          .navigateToWithDoubleIndexAndData(
+            assetIndex,
+            disposalIndex,
+            TypeOfAssetBuyerPage,
+            Gen.const(IdentityType.UKPartnership),
+            (srn, index: Max5000, disposalIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          )
+          .withName("go from type of asset buyer page to Unauthorised page when UKPartnership")
           .withName("go from total consideration sale asset page to buyer Unauthorised page")
       )
 
+      act.like(
+        normalmode
+          .navigateToWithDoubleIndexAndData(
+            assetIndex,
+            disposalIndex,
+            TypeOfAssetBuyerPage,
+            Gen.const(IdentityType.Other),
+            (srn, index: Max5000, disposalIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+          )
+          .withName("go from type of asset buyer page to Unauthorised page when other")
+      )
     }
 
   }
