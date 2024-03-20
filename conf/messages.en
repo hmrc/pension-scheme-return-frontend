@@ -3058,6 +3058,10 @@ bondsDisposal.removeBondsDisposal.title = Are you sure you want to remove detail
 bondsDisposal.removeBondsDisposal.heading = Are you sure you want to remove details of the disposal of {0}?
 bondsDisposal.removeBondsDisposal.error.required = Select yes if you are sure you want to remove this bond disposal
 
+otherAssetsDisposal.isBuyerConnectedParty.title = Is the buyer a connected party?
+otherAssetsDisposal.isBuyerConnectedParty.heading = Is {0} a connected party?
+otherAssetsDisposal.isBuyerConnectedParty.error.required = Select yes if the buyer is a connected party
+
 otherAssetsDisposal.partnershipBuyerName.title = What is the buyer’s partnership name?
 otherAssetsDisposal.partnershipBuyerName.heading = What is the buyer’s partnership name?
 otherAssetsDisposal.partnershipBuyerName.error.required = Enter the buyer’s partnership name
@@ -3075,6 +3079,16 @@ otherAssetsDisposal.partnershipBuyerUtr.no.conditional.error.required = Enter th
 otherAssetsDisposal.partnershipBuyerUtr.no.conditional.error.invalid = The reason you cannot provide the buyer’s UTR must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
 otherAssetsDisposal.partnershipBuyerUtr.no.conditional.error.length = The reason you cannot provide the buyer’s UTR must be 160 characters or fewer
 otherAssetsDisposal.partnershipBuyerUtr.error.required = Select yes if you know the buyer’s Unique Taxpayer Reference (UTR)
+
+otherAssetsDisposal.otherBuyerDetails.title = Buyer’s details
+otherAssetsDisposal.otherBuyerDetails.heading = Buyer’s details
+otherAssetsDisposal.otherBuyerDetails.name = Buyer’s name
+otherAssetsDisposal.otherBuyerDetails.description = Brief description of buyer (optional)
+otherAssetsDisposal.otherBuyerDetails.name.error.required = Enter the buyer’s name
+otherAssetsDisposal.otherBuyerDetails.name.error.invalid = Buyer’s name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+otherAssetsDisposal.otherBuyerDetails.name.error.length = Buyer’s name must be 160 characters or fewer
+otherAssetsDisposal.otherBuyerDetails.description.error.invalid = The description of the buyer must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+otherAssetsDisposal.otherBuyerDetails.description.error.length = The description of the buyer must be 35 characters or fewer
 
 otherAssetsDisposal.whatYouWillNeed.title = Other assets disposed of by the scheme
 otherAssetsDisposal.whatYouWillNeed.heading = Other assets disposed of by {0}
