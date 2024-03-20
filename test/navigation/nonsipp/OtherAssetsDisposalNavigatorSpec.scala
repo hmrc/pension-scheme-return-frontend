@@ -188,7 +188,6 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
             (srn, index: Max5000, disposalIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
           )
           .withName("go from type of asset buyer page to Unauthorised page when UKPartnership")
-          .withName("go from total consideration sale asset page to buyer Unauthorised page")
       )
 
       act.like(
