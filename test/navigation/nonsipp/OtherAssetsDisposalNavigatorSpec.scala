@@ -199,9 +199,11 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
             disposalIndex,
             TypeOfAssetBuyerPage,
             Gen.const(IdentityType.Other),
-            (srn, index: Max5000, disposalIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+            (srn, index: Max5000, disposalIndex: Max50, _) =>
+              controllers.nonsipp.otherassetsdisposal.routes.OtherBuyerDetailsController
+                .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
           )
-          .withName("go from type of asset buyer page to Unauthorised page when other")
+          .withName("go from type of asset buyer page to OtherBuyerDetails page when other")
       )
     }
 
@@ -231,6 +233,20 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
               controllers.routes.UnauthorisedController.onPageLoad()
           )
           .withName("go from PartnershipBuyerUtrPage to Unauthorised")
+      )
+    }
+
+    "OtherBuyerDetailsPage" - {
+      act.like(
+        normalmode
+          .navigateToWithDoubleIndex(
+            assetIndex,
+            disposalIndex,
+            OtherBuyerDetailsPage,
+            (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
+              controllers.routes.UnauthorisedController.onPageLoad()
+          )
+          .withName("go from OtherBuyerDetailsPage to Unauthorised")
       )
     }
 
