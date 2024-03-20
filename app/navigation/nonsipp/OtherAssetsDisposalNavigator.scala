@@ -48,6 +48,10 @@ object OtherAssetsDisposalNavigator extends JourneyNavigator {
       }
 
     case WhenWasAssetSoldPage(srn, assetIndex, disposalIndex) =>
+      controllers.nonsipp.otherassetsdisposal.routes.TotalConsiderationSaleAssetController
+        .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+
+    case TotalConsiderationSaleAssetPage(srn, assetIndex, disposalIndex) =>
       controllers.routes.UnauthorisedController.onPageLoad()
 
   }
