@@ -20,7 +20,7 @@ import navigation.JourneyNavigator
 import pages.Page
 import play.api.mvc.Call
 import models._
-import pages.nonsipp.otherassetsdisposal.{OtherAssetsDisposalPage, WhatYouWillNeedOtherAssetsDisposalPage}
+import pages.nonsipp.otherassetsdisposal._
 
 object OtherAssetsDisposalNavigator extends JourneyNavigator {
 
@@ -35,6 +35,16 @@ object OtherAssetsDisposalNavigator extends JourneyNavigator {
 
     case WhatYouWillNeedOtherAssetsDisposalPage(_) =>
       controllers.routes.UnauthorisedController.onPageLoad()
+
+    case page @ HowWasAssetDisposedOfPage(srn, assetIndex, disposalIndex, _) =>
+      userAnswers.get(page) match {
+        case None => controllers.routes.JourneyRecoveryController.onPageLoad()
+        case Some(HowDisposed.Sold) =>
+          controllers.routes.UnauthorisedController.onPageLoad()
+        case Some(HowDisposed.Transferred) | Some(HowDisposed.Other(_)) =>
+          controllers.routes.UnauthorisedController.onPageLoad()
+      }
+
   }
 
   override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] = _ => _ => PartialFunction.empty

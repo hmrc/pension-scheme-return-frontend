@@ -3058,3 +3058,14 @@ otherAssetsDisposal.whatYouWillNeed.paragraph3.listItem4 = the buyer’s name
 otherAssetsDisposal.whatYouWillNeed.paragraph3.listItem5 = the buyer’s National Insurance number, Company Registration Number, Unique Taxpayer Reference or a description of the buyer – whichever applies – or the reason you cannot provide it
 otherAssetsDisposal.whatYouWillNeed.paragraph3.listItem6 = if the buyer was a connected party
 otherAssetsDisposal.whatYouWillNeed.paragraph3.listItem7 = if the sale was supported by an independent valuation
+
+howWasAssetDisposedOf.title = How was the asset disposed of?
+howWasAssetDisposedOf.heading = How was the asset disposed of
+howWasAssetDisposedOf.option1 = Sold
+howWasAssetDisposedOf.option2 = Transferred out to another scheme
+howWasAssetDisposedOf.option3 = Other
+howWasAssetDisposedOf.option3.label = Provide details of the disposal
+howWasAssetDisposedOf.conditional.error.required = Enter details of the disposal
+howWasAssetDisposedOf.conditional.error.invalid = Details of the disposal must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+howWasAssetDisposedOf.conditional.error.length =  Details of the disposal must be 160 characters or fewer
+howWasAssetDisposedOf.error.required = Select how the asset was disposed of
