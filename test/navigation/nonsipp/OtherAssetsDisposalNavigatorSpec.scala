@@ -18,7 +18,7 @@ package navigation.nonsipp
 
 import config.Refined.{Max50, Max5000}
 import eu.timepit.refined.refineMV
-import models.HowDisposed
+import models.{HowDisposed, NormalMode}
 import navigation.{Navigator, NavigatorBehaviours}
 import org.scalacheck.Gen
 import pages.nonsipp.otherassetsdisposal._
@@ -72,7 +72,7 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
             (_, _) => controllers.routes.UnauthorisedController.onPageLoad()
           )
           .withName(
-            "go from WhatYouWillNeedOtherAssetsDisposal page to unauthorised page"
+            "go from WhatYouWillNeedOtherAssetsDisposal page to Unauthorised page"
           )
       )
     }
@@ -87,9 +87,10 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
             HowWasAssetDisposedOfPage.apply,
             Gen.const(HowDisposed.Sold),
             (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
-              controllers.routes.UnauthorisedController.onPageLoad()
+              controllers.nonsipp.otherassetsdisposal.routes.WhenWasAssetSoldController
+                .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
           )
-          .withName("go from HowWasAssetDisposedOfPage to Unauthorised page")
+          .withName("go from HowWasAssetDisposedOfPage to WhenWasAssetSold page")
       )
 
       act.like(
@@ -117,6 +118,21 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
           )
           .withName("go from HowWasAssetDisposedOfPage to Unauthorised page (Other)")
       )
+    }
+
+    "WhenWasAssetSoldPage" - {
+      act.like(
+        normalmode
+          .navigateToWithDoubleIndex(
+            assetIndex,
+            disposalIndex,
+            WhenWasAssetSoldPage,
+            (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
+              controllers.routes.UnauthorisedController.onPageLoad()
+          )
+          .withName("go from when was asset sold page to Unauthorised page")
+      )
+
     }
 
   }
