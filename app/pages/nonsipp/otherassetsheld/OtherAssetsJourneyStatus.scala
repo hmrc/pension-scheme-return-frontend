@@ -16,23 +16,14 @@
 
 package pages.nonsipp.otherassetsheld
 
-import config.Refined.Max5000
-import models.Money
 import models.SchemeId.Srn
 import pages.QuestionPage
 import play.api.libs.json.JsPath
-import utils.RefinedUtils.RefinedIntOps
+import viewmodels.models.SectionStatus
 
-case class IncomeFromAssetPage(srn: Srn, index: Max5000) extends QuestionPage[Money] {
+case class OtherAssetsJourneyStatus(srn: Srn) extends QuestionPage[SectionStatus] {
 
-  override def path: JsPath = Paths.otherAssetsTransactions \ toString \ index.arrayIndex.toString
+  override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "totalIncomeOrReceipts"
-}
-
-case class IncomeFromAssetPages(srn: Srn) extends QuestionPage[Map[String, Money]] {
-
-  override def path: JsPath = Paths.otherAssetsTransactions \ toString
-
-  override def toString: String = "totalIncomeOrReceipts"
+  override def toString: String = "otherAssetsJourneyCompleted"
 }

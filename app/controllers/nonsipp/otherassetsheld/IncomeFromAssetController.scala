@@ -26,7 +26,7 @@ import forms.mappings.errors.MoneyFormErrors
 import models.SchemeId.Srn
 import models.{Mode, Money}
 import navigation.Navigator
-import pages.nonsipp.otherassetsheld.IncomeFromAssetPage
+import pages.nonsipp.otherassetsheld.{IncomeFromAssetPage, OtherAssetsCompleted}
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -83,6 +83,7 @@ class IncomeFromAssetController @Inject()(
                 .fromTry(
                   request.userAnswers
                     .set(IncomeFromAssetPage(srn, index), answer)
+                    .set(OtherAssetsCompleted(srn, index), SectionCompleted)
                 )
               _ <- saveService.save(updatedAnswers)
             } yield Redirect(navigator.nextPage(IncomeFromAssetPage(srn, index), mode, updatedAnswers))
@@ -97,7 +98,7 @@ object IncomeFromAssetController {
       "otherAssets.incomeFromAsset.error.required",
       "otherAssets.incomeFromAsset.error.invalid",
       (Constants.maxMoneyValue, "otherAssets.incomeFromAsset.error.tooLarge"),
-      (Constants.zeroMoneyValue, "otherAssets.incomeFromAsset.error.tooSmall")
+      (Constants.zeroMoneyValue, "otherAssets.incomeFromAsset.error.invalid")
     )
   )
 

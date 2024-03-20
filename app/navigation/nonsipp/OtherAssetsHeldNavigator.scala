@@ -16,6 +16,8 @@
 
 package navigation.nonsipp
 
+import cats.implicits.toTraverseOps
+import config.Refined.Max5000
 import eu.timepit.refined.refineMV
 import models.SchemeHoldAsset.{Acquisition, Contribution, Transfer}
 import models.{IdentitySubject, IdentityType, NormalMode, UserAnswers}
@@ -142,6 +144,35 @@ object OtherAssetsHeldNavigator extends JourneyNavigator {
 
     case IncomeFromAssetPage(srn, index) =>
       controllers.routes.UnauthorisedController.onPageLoad()
+
+    // CYA PAGE NAV HERE
+
+    case page @ OtherAssetsListPage(srn) =>
+      userAnswers.get(page) match {
+        case None => controllers.routes.JourneyRecoveryController.onPageLoad()
+        case Some(true) =>
+          (
+            for {
+              map <- userAnswers.get(OtherAssetsCompleted.all(srn)).getOrRecoverJourney
+              indexes <- map.keys.toList.traverse(_.toIntOption).getOrRecoverJourney
+              _ <- if (indexes.size >= 5000) Left(controllers.nonsipp.routes.TaskListController.onPageLoad(srn))
+              else Right(())
+              nextIndex <- findNextOpenIndex[Max5000.Refined](indexes).getOrRecoverJourney
+            } yield controllers.nonsipp.otherassetsheld.routes.WhatIsOtherAssetController
+              .onPageLoad(srn, nextIndex, NormalMode)
+          ).merge
+        case Some(false) => controllers.nonsipp.routes.TaskListController.onPageLoad(srn)
+      }
+
+    case RemoveOtherAssetPage(srn, index) =>
+      if (userAnswers
+          .map(WhatIsOtherAssetPages(srn))
+          .isEmpty) {
+        controllers.nonsipp.otherassetsheld.routes.OtherAssetsHeldController
+          .onPageLoad(srn, NormalMode)
+      } else {
+        controllers.nonsipp.otherassetsheld.routes.OtherAssetsListController.onPageLoad(srn, 1, NormalMode)
+      }
   }
 
   override def checkRoutes: UserAnswers => UserAnswers => PartialFunction[Page, Call] = _ => _ => PartialFunction.empty
