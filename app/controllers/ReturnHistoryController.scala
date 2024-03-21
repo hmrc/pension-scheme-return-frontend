@@ -56,13 +56,9 @@ class ReturnHistoryController @Inject()(
         .getVersionsForYears(request.schemeDetails.pstr, allDates.toList.map(dates => dates._2.from.toString))
       response.map { years =>
         val seqRetHistorySummary = years.flatMap { year =>
+          val maxVersionForYear = year.data.map(_.reportVersion)
           year.data.map { v =>
-            def changeOrViewLink = {
-              val recentSubmittedVersion = year.data.length
-              if (v.reportVersion == recentSubmittedVersion) "site.viewOrChange" else "site.view"
-              "site.viewOrChange" //TODO
-            }
-
+            def change = (v.reportVersion == maxVersionForYear.max)
             ReturnHistorySummary(
               key = year.startDate,
               firstValue = v.reportVersion.toString,
@@ -72,16 +68,26 @@ class ReturnHistoryController @Inject()(
               actions = Some(
                 Actions(
                   items = Seq(
-                    ActionItem(
-                      content = Text("Change"), // TODO
-                      href = controllers.routes.ReturnHistoryController.onSelect(srn, v.reportFormBundleNumber).url
-                    )
+                    if (change) {
+                      ActionItem(
+                        content = Text("Change"), // TODO
+                        href = controllers.routes.ReturnHistoryController.onSelect(srn, v.reportFormBundleNumber).url
+                      )
+                    } else {
+                      ActionItem(
+                        content = Text("View"), // TODO
+                        href = controllers.nonsipp.routes.TaskListViewController
+                          .onPageLoad(srn, year.startDate, v.reportVersion, v.reportVersion - 1)
+                          .url
+                      )
+                    }
                   )
                 )
               )
             )
           }
         }
+
         val schemeName = request.schemeDetails.schemeName
         val taxYearRange = (currentTaxYear.toString, (currentTaxYear + 1).toString)
         Ok(view(seqRetHistorySummary, taxYearRange._1, taxYearRange._2, schemeName))

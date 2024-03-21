@@ -15,7 +15,9 @@
  *@
 
 @import cats.data.NonEmptyList
+@import viewmodels.models.TaskListStatus
 @import viewmodels.models.TaskListStatus.UnableToStart
+@import viewmodels.models.TaskListStatus.Updated
 
 @this()
 
@@ -32,9 +34,15 @@
           }
         }
       </span>
-      <span class="hmrc-status-tag" id="@id">
-        @renderMessage(item.status.description)
-      </span>
+        @if(item.status==Updated) {
+          <span class="hmrc-status-tag govuk-tag--green" id="@id">
+            @renderMessage(item.status.description)
+          </span>
+        } else {
+          <span class="hmrc-status-tag" id="@id">
+            @renderMessage(item.status.description)
+          </span>
+        }
     </li>
   }
 }
