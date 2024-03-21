@@ -131,7 +131,7 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
               controllers.nonsipp.otherassetsdisposal.routes.TotalConsiderationSaleAssetController
                 .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
           )
-          .withName("go from when was asset sold page to WhenWasAssetSold page")
+          .withName("go from when was asset sold page to TotalConsiderationSaleAsset page")
       )
 
     }

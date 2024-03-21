@@ -35,7 +35,7 @@ class TypeOfAssetBuyerControllerSpec extends ControllerBaseSpec {
   private lazy val onSubmit =
     routes.TypeOfAssetBuyerController.onSubmit(srn, assetIndex, disposalIndex, NormalMode)
 
-  "WhoWereTheSharesSoldToController" - {
+  "TypeOfAssetBuyerController" - {
 
     act.like(renderView(onPageLoad) { implicit app => implicit request =>
       val view = injected[RadioListView]
