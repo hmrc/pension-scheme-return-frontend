@@ -161,9 +161,11 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
             disposalIndex,
             TypeOfAssetBuyerPage,
             Gen.const(IdentityType.Individual),
-            (srn, index: Max5000, disposalIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+            (srn, index: Max5000, disposalIndex: Max50, _) =>
+              controllers.nonsipp.otherassetsdisposal.routes.IndividualNameOfAssetBuyerController
+                .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
           )
-          .withName("go from type of asset buyer page to Unauthorised page when Individual")
+          .withName("go from type of asset buyer page to IndividualNameOfAssetBuyer page when Individual")
       )
 
       act.like(
@@ -202,6 +204,35 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
             (srn, index: Max5000, disposalIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
           )
           .withName("go from type of asset buyer page to Unauthorised page when other")
+      )
+    }
+
+    "IndividualNameOfAssetBuyerPage" - {
+      act.like(
+        normalmode
+          .navigateToWithDoubleIndex(
+            assetIndex,
+            disposalIndex,
+            IndividualNameOfAssetBuyerPage,
+            (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
+              controllers.nonsipp.otherassetsdisposal.routes.AssetIndividualBuyerNiNumberController
+                .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+          )
+          .withName("go from IndividualNameOfAssetBuyerPage to AssetIndividualBuyerNiNumber page")
+      )
+    }
+
+    "AssetIndividualBuyerNiNumberPage" - {
+      act.like(
+        normalmode
+          .navigateToWithDoubleIndex(
+            assetIndex,
+            disposalIndex,
+            AssetIndividualBuyerNiNumberPage,
+            (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
+              controllers.routes.UnauthorisedController.onPageLoad()
+          )
+          .withName("go from AssetIndividualBuyerNiNumber to Unauthorised page")
       )
     }
 

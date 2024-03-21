@@ -3129,3 +3129,20 @@ typeOfAssetBuyer.radioList2 = A UK company
 typeOfAssetBuyer.radioList3 = A UK partnership
 typeOfAssetBuyer.radioList4 = Other
 typeOfAssetBuyer.error.required = Select who purchased the asset
+
+assetDisposal.individualNameOfAssetBuyer.title = What is the buyer’s name?
+assetDisposal.individualNameOfAssetBuyer.heading = What is the buyer’s name?
+assetDisposal.individualNameOfAssetBuyer.error.required = Enter the buyer’s name
+assetDisposal.individualNameOfAssetBuyer.error.length = Buyer’s name must be 160 characters or fewer
+assetDisposal.individualNameOfAssetBuyer.error.invalid.characters = Buyer’s name must only include letters a to z, hyphens, apostrophes and spaces
+
+assetIndividualBuyerNiNumber.title = Do you know the buyer’s National Insurance number?
+assetIndividualBuyerNiNumber.heading = Do you know {0}’s National Insurance number?
+assetIndividualBuyerNiNumber.yes.conditional = What is {0}’s National Insurance number?
+assetIndividualBuyerNiNumber.no.conditional = Tell us why you cannot provide {0}’s National Insurance number
+assetIndividualBuyerNiNumber.no.conditional.error.required = Enter the reason you cannot provide the buyer’s National Insurance number
+assetIndividualBuyerNiNumber.no.conditional.error.invalid = The reason you cannot provide the buyer’s National Insurance number must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+assetIndividualBuyerNiNumber.no.conditional.error.length = The reason you cannot provide the buyer’s National Insurance number must be 160 characters or fewer
+assetIndividualBuyerNiNumber.error.required = Select yes if you know the buyer’s National Insurance number
+assetIndividualBuyerNiNumber.yes.conditional.error.required = Enter the buyer’s National Insurance number
+assetIndividualBuyerNiNumber.yes.conditional.error.invalid = Enter a National Insurance number that is 2 letters, 6 numbers, then A, B, C or D, like QQ 12 34 56 C
