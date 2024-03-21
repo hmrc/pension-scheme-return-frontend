@@ -3058,6 +3058,24 @@ bondsDisposal.removeBondsDisposal.title = Are you sure you want to remove detail
 bondsDisposal.removeBondsDisposal.heading = Are you sure you want to remove details of the disposal of {0}?
 bondsDisposal.removeBondsDisposal.error.required = Select yes if you are sure you want to remove this bond disposal
 
+otherAssetsDisposal.partnershipBuyerName.title = What is the buyer’s partnership name?
+otherAssetsDisposal.partnershipBuyerName.heading = What is the buyer’s partnership name?
+otherAssetsDisposal.partnershipBuyerName.error.required = Enter the buyer’s partnership name
+otherAssetsDisposal.partnershipBuyerName.error.length = Buyer’s partnership name must be 160 characters or fewer
+otherAssetsDisposal.partnershipBuyerName.error.invalid.characters = Buyer’s partnership name must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), forward slashes, full stops, hyphens, speech marks and spaces
+
+otherAssetsDisposal.partnershipBuyerUtr.title = Do you know the buyer’s Unique Taxpayer Reference (UTR)?
+otherAssetsDisposal.partnershipBuyerUtr.heading = Do you know {0}’s Unique Taxpayer Reference (UTR)?
+otherAssetsDisposal.partnershipBuyerUtr.yes.conditional = What is {0}’s UTR?
+otherAssetsDisposal.partnershipBuyerUtr.yes.conditional.error.required = Enter the buyer’s UTR
+otherAssetsDisposal.partnershipBuyerUtr.yes.conditional.error.length = Enter a Unique Taxpayer Reference that is 10 numbers, like 1234567890 or 12345 67890
+otherAssetsDisposal.partnershipBuyerUtr.yes.conditional.error.invalid = Enter a Unique Taxpayer Reference that is 10 numbers, like 1234567890 or 12345 67890
+otherAssetsDisposal.partnershipBuyerUtr.no.conditional = Tell us why you cannot provide {0}’s UTR
+otherAssetsDisposal.partnershipBuyerUtr.no.conditional.error.required = Enter the reason you cannot provide the buyer’s UTR
+otherAssetsDisposal.partnershipBuyerUtr.no.conditional.error.invalid = The reason you cannot provide the buyer’s UTR must only include letters a to z, numbers 0 to 9, apostrophes, ‘atʼ signs (@), commas, forward slashes, full stops, hyphens, speech marks and spaces
+otherAssetsDisposal.partnershipBuyerUtr.no.conditional.error.length = The reason you cannot provide the buyer’s UTR must be 160 characters or fewer
+otherAssetsDisposal.partnershipBuyerUtr.error.required = Select yes if you know the buyer’s Unique Taxpayer Reference (UTR)
+
 otherAssetsDisposal.whatYouWillNeed.title = Other assets disposed of by the scheme
 otherAssetsDisposal.whatYouWillNeed.heading = Other assets disposed of by {0}
 otherAssetsDisposal.whatYouWillNeed.paragraph1 = You must tell us about all other assets disposed of by the scheme during the period of this return.
