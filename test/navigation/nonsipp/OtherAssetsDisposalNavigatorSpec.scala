@@ -69,10 +69,27 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
         normalmode
           .navigateTo(
             WhatYouWillNeedOtherAssetsDisposalPage,
-            (_, _) => controllers.routes.UnauthorisedController.onPageLoad()
+            (srn, _) =>
+              controllers.nonsipp.otherassetsdisposal.routes.StartReportingAssetsDisposalController
+                .onPageLoad(srn, page = 1)
           )
           .withName(
-            "go from WhatYouWillNeedOtherAssetsDisposal page to Unauthorised page"
+            "go from WhatYouWillNeedOtherAssetsDisposal page to Start reporting a disposal page"
+          )
+      )
+    }
+
+    "Start reporting a disposal page" - {
+      act.like(
+        normalmode
+          .navigateToWithDoubleIndex(
+            assetIndex,
+            disposalIndex,
+            (srn, index: Max5000, _: Max50) => OtherAssetsDisposalListPage(srn, index),
+            controllers.nonsipp.otherassetsdisposal.routes.HowWasAssetDisposedOfController.onPageLoad
+          )
+          .withName(
+            "go from start reporting a disposal page page to HowWasAssetDisposedOfPage page"
           )
       )
     }

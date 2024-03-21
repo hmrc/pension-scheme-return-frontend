@@ -3152,6 +3152,13 @@ otherAssetsDisposal.whatYouWillNeed.paragraph3.listItem5 = the buyer’s Nationa
 otherAssetsDisposal.whatYouWillNeed.paragraph3.listItem6 = if the buyer was a connected party
 otherAssetsDisposal.whatYouWillNeed.paragraph3.listItem7 = if the sale was supported by an independent valuation
 
+otherAssetsDisposal.startReportingAssetsDisposal.title = Start reporting an asset disposal
+otherAssetsDisposal.startReportingAssetsDisposal.heading = Start reporting an asset disposal
+otherAssetsDisposal.startReportingAssetsDisposal.paragraph1 = Select one option to start reporting a disposal. If you need to report more, you will be able to do this later.
+otherAssetsDisposal.startReportingAssetsDisposal.paragraph2 = You can report disposal of assets whose details you have already provided. If the asset does not appear here, add it using the ‘Change other assets’ section of this return.
+otherAssetsDisposal.startReportingAssetsDisposal.legend = Which asset was disposed of?
+otherAssetsDisposal.startReportingAssetsDisposal.error.required = Select the asset that was disposed of
+
 howWasAssetDisposedOf.title = How was the asset disposed of?
 howWasAssetDisposedOf.heading = How was the asset disposed of
 howWasAssetDisposedOf.option1 = Sold
