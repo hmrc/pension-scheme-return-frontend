@@ -16,6 +16,7 @@
 
 package controllers.nonsipp.employercontributions
 
+import cats.implicits.catsSyntaxApplicativeId
 import config.Refined.{Max300, Max50}
 import controllers.PSRController
 import controllers.actions._
@@ -25,15 +26,16 @@ import models.IdentityType.{Other, UKCompany, UKPartnership}
 import models.SchemeId.Srn
 import models.{IdentityType, Mode}
 import navigation.Navigator
-import pages.nonsipp.employercontributions.{EmployerNamePage, EmployerTypeOfBusinessPage}
+import pages.nonsipp.employercontributions.{EmployerContributionsProgress, EmployerNamePage, EmployerTypeOfBusinessPage}
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
 import utils.FormUtils.FormOps
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, RadioListRowViewModel, RadioListViewModel}
+import viewmodels.models.{FormPageViewModel, RadioListRowViewModel, RadioListViewModel, SectionJourneyStatus}
 import views.html.RadioListView
 
 import javax.inject.{Inject, Named}
@@ -83,17 +85,13 @@ class EmployerTypeOfBusinessController @Inject()(
             },
           answer => {
             for {
-              updatedAnswers <- Future.fromTry(
-                request.userAnswers.set(EmployerTypeOfBusinessPage(srn, memberIndex, index), answer)
-              )
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(
-              navigator.nextPage(
-                EmployerTypeOfBusinessPage(srn, memberIndex, index),
-                mode,
-                updatedAnswers
-              )
-            )
+              updatedAnswers <- request.userAnswers
+                .set(EmployerTypeOfBusinessPage(srn, memberIndex, index), answer)
+                .mapK
+              nextPage = navigator.nextPage(EmployerTypeOfBusinessPage(srn, memberIndex, index), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, memberIndex, index, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
           }
         )
     }

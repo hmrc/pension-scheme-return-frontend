@@ -17,6 +17,7 @@
 package controllers
 
 import cats.data.NonEmptyList
+import com.softwaremill.diffx.scalatest.DiffShouldMatcher
 import config.Refined.Max5000
 import controllers.actions._
 import generators.ModelGenerators._
@@ -56,6 +57,7 @@ trait ControllerBaseSpec
     with RouteInvokers
     with ResultExtractors
     with TestValues
+    with DiffShouldMatcher
     with DisplayMessageUtils {
 
   val baseUrl = "/pension-scheme-return"

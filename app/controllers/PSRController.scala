@@ -18,6 +18,7 @@ package controllers
 
 import cats.Applicative
 import cats.data.{EitherT, NonEmptyList}
+import cats.implicits.toTraverseOps
 import cats.syntax.applicative._
 import cats.syntax.either._
 import config.Refined.Max3
@@ -48,6 +49,9 @@ abstract class PSRController extends FrontendBaseController with I18nSupport {
         logger.error(s"Required page ${page.getClass.getSimpleName} missing")
         Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
     }
+
+  def recoverJourneyWhen(bool: Boolean): Either[Result, Unit] =
+    if (bool) Left(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())) else Right(())
 
   def loggedInUserNameOrRedirect(implicit request: DataRequest[_]): Either[Result, String] =
     request.minimalDetails.individualDetails match {
@@ -107,8 +111,12 @@ abstract class PSRController extends FrontendBaseController with I18nSupport {
         .map(t => t._2.toString -> t._1)
         .toMap
 
-    def zipWithRefinedIndex[I: Validate[Int, *]]: List[(Refined[Int, I], A)] =
+    // todo: use zipWithRefinedIndex instead - indexes that can't be refined get suppressed (they do not get added to the list)
+    def zipWithRefinedIndexToList[I: Validate[Int, *]]: List[(Refined[Int, I], A)] =
       l.zipWithIndex.flatMap { case (a, index) => refineIndex(index).map(_ -> a) }
+
+    def zipWithRefinedIndex[I: Validate[Int, *]]: Either[Result, List[(Refined[Int, I], A)]] =
+      l.zipWithIndex.traverse { case (a, index) => refineIndex(index).map(_ -> a).getOrRecoverJourney }
   }
 
   implicit class TaxOrAccountingPeriodOps(o: Option[Either[DateRange, NonEmptyList[(DateRange, Max3)]]]) {

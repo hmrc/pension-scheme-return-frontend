@@ -17,16 +17,17 @@
 package controllers.nonsipp.employercontributions
 
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.employercontributions.EmployerContributionsMemberListController._
+import controllers.nonsipp.employercontributions.EmployerContributionsMemberListController.{EmployerContributions, _}
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.NormalMode
 import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.employercontributions.EmployerContributionsMemberListPage
+import pages.nonsipp.employercontributions.{EmployerContributionsMemberListPage, EmployerContributionsProgress}
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
 import services.PsrSubmissionService
+import viewmodels.models.SectionJourneyStatus
 import views.html.TwoColumnsTripleAction
 
 import scala.concurrent.Future
@@ -36,8 +37,25 @@ class EmployerContributionsMemberListControllerSpec extends ControllerBaseSpec {
   private lazy val onPageLoad = routes.EmployerContributionsMemberListController.onPageLoad(srn, page = 1, NormalMode)
   private lazy val onSubmit = routes.EmployerContributionsMemberListController.onSubmit(srn, page = 1, NormalMode)
 
-  val userAnswers = defaultUserAnswers
+  private val userAnswers = defaultUserAnswers
     .unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+    .unsafeSet(
+      EmployerContributionsProgress(srn, refineMV(1), refineMV(1)),
+      SectionJourneyStatus.Completed
+    )
+
+  val employerContributions: List[EmployerContributions] = List(
+    EmployerContributions(
+      memberIndex = refineMV(1),
+      employerFullName = memberDetails.fullName,
+      contributions = List(
+        Contributions(
+          contributionIndex = refineMV(1),
+          status = SectionJourneyStatus.Completed
+        )
+      )
+    )
+  )
 
   private val mockPsrSubmissionService = mock[PsrSubmissionService]
 
@@ -56,7 +74,7 @@ class EmployerContributionsMemberListControllerSpec extends ControllerBaseSpec {
     act.like(renderView(onPageLoad, userAnswers) { implicit app => implicit request =>
       injected[TwoColumnsTripleAction].apply(
         form(injected[YesNoPageFormProvider]),
-        viewModel(srn, page = 1, NormalMode, List(memberDetails), userAnswers)
+        viewModel(srn, page = 1, NormalMode, employerContributions)
       )
     })
 
@@ -65,7 +83,7 @@ class EmployerContributionsMemberListControllerSpec extends ControllerBaseSpec {
         injected[TwoColumnsTripleAction]
           .apply(
             form(injected[YesNoPageFormProvider]).fill(true),
-            viewModel(srn, page = 1, NormalMode, List(memberDetails), userAnswers)
+            viewModel(srn, page = 1, NormalMode, employerContributions)
           )
     })
 

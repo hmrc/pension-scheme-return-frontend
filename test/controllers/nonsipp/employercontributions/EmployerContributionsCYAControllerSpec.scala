@@ -24,6 +24,7 @@ import models.{ConditionalYesNo, Crn, IdentityType, NormalMode}
 import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.employercontributions.{
   EmployerCompanyCrnPage,
+  EmployerContributionsProgress,
   EmployerNamePage,
   EmployerTypeOfBusinessPage,
   TotalEmployerContributionPage
@@ -32,6 +33,7 @@ import pages.nonsipp.memberdetails.MemberDetailsPage
 import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
 import services.PsrSubmissionService
+import viewmodels.models.SectionJourneyStatus
 import views.html.CheckYourAnswersView
 
 import scala.concurrent.Future
@@ -62,6 +64,7 @@ class EmployerContributionsCYAControllerSpec extends ControllerBaseSpec {
     .unsafeSet(EmployerTypeOfBusinessPage(srn, index, secondaryIndex), IdentityType.UKCompany)
     .unsafeSet(TotalEmployerContributionPage(srn, index, secondaryIndex), money)
     .unsafeSet(EmployerCompanyCrnPage(srn, index, secondaryIndex), ConditionalYesNo.yes[String, Crn](crn))
+    .unsafeSet(EmployerContributionsProgress(srn, index, secondaryIndex), SectionJourneyStatus.Completed)
 
   override def beforeEach(): Unit = {
     reset(mockPsrSubmissionService)

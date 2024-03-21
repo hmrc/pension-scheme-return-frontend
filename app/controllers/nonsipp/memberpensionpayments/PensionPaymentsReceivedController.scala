@@ -72,7 +72,7 @@ class PensionPaymentsReceivedController @Inject()(
           } else {
             val pensionPaymentsPages: List[UserAnswers.Compose] = request.userAnswers
               .membersDetails(srn)
-              .zipWithRefinedIndex[Max300.Refined]
+              .zipWithRefinedIndexToList[Max300.Refined]
               .map {
                 case (index, _) => _.set(TotalAmountPensionPaymentsPage(srn, index), Money(0))
               }

@@ -16,26 +16,31 @@
 
 package controllers.nonsipp.employercontributions
 
+import cats.implicits.catsSyntaxApplicativeId
+import config.Refined._
+import controllers.PSRController
 import controllers.actions._
+import controllers.nonsipp.employercontributions.OtherEmployeeDescriptionController._
 import forms.TextFormProvider
-
-import javax.inject.{Inject, Named}
 import models.Mode
 import models.SchemeId.Srn
 import navigation.Navigator
+import pages.nonsipp.employercontributions.{
+  EmployerContributionsProgress,
+  EmployerNamePage,
+  OtherEmployeeDescriptionPage
+}
 import play.api.data.Form
-import viewmodels.implicits._
 import play.api.i18n.MessagesApi
 import play.api.mvc._
-import views.html.TextAreaView
 import services.SaveService
-import controllers.PSRController
-import viewmodels.models._
-import pages.nonsipp.employercontributions.{EmployerNamePage, OtherEmployeeDescriptionPage}
-import controllers.nonsipp.employercontributions.OtherEmployeeDescriptionController._
-import config.Refined._
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
+import viewmodels.implicits._
+import viewmodels.models._
+import views.html.TextAreaView
 
+import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 
 class OtherEmployeeDescriptionController @Inject()(
@@ -72,12 +77,14 @@ class OtherEmployeeDescriptionController @Inject()(
             },
           value =>
             for {
-              updatedAnswers <- Future
-                .fromTry(request.userAnswers.set(OtherEmployeeDescriptionPage(srn, index, secondaryIndex), value))
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(
-              navigator.nextPage(OtherEmployeeDescriptionPage(srn, index, secondaryIndex), mode, updatedAnswers)
-            )
+              updatedAnswers <- request.userAnswers
+                .set(OtherEmployeeDescriptionPage(srn, index, secondaryIndex), value)
+                .mapK
+              nextPage = navigator
+                .nextPage(OtherEmployeeDescriptionPage(srn, index, secondaryIndex), mode, updatedAnswers)
+              updatedProgressAnswers <- saveProgress(srn, index, secondaryIndex, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
         )
     }
 }

@@ -46,6 +46,6 @@ case class MembersDetailsPages(srn: Srn) extends Gettable[List[NameDOB]] with Re
 
 object MembersDetailsPages {
   implicit class MembersDetailsOps(ua: UserAnswers) {
-    def membersDetails(srn: Srn): List[NameDOB] = ua.get(MembersDetailsPages(srn)).toList.flatten
+    def membersDetails(srn: Srn): List[NameDOB] = ua.list(MembersDetailsPages(srn))
   }
 }

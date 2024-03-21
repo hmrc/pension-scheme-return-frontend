@@ -113,8 +113,8 @@ trait ControllerBehaviours {
       val result = route(app, request).value
       val expectedView = view(app)(request)
 
-      status(result) mustEqual OK
-      contentAsString(result) mustEqual expectedView.body
+      status(result) shouldMatchTo OK
+      contentAsString(result) shouldMatchTo expectedView.body
     }
 
   def invalidForm(call: => Call, userAnswers: UserAnswers, form: (String, String)*): BehaviourTest =
@@ -125,7 +125,7 @@ trait ControllerBehaviours {
         val request = FakeRequest(call).withFormUrlEncodedBody(form: _*)
         val result = route(app, request).value
 
-        status(result) mustEqual BAD_REQUEST
+        status(result) shouldMatchTo BAD_REQUEST
       }
     }
 

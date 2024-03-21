@@ -16,28 +16,30 @@
 
 package controllers.nonsipp.employercontributions
 
+import cats.implicits.catsSyntaxApplicativeId
 import com.google.inject.Inject
 import config.Constants
-import config.Refined.OneTo300
+import config.Refined.{Max300, Max50}
 import controllers.PSRController
 import controllers.actions._
-import eu.timepit.refined.{refineMV, refineV}
+import controllers.nonsipp.employercontributions.EmployerContributionsMemberListController._
+import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.SchemeId.Srn
 import models._
+import models.requests.DataRequest
 import navigation.Navigator
-import pages.nonsipp.employercontributions.{
-  EmployerContributionsMemberListPage,
-  EmployerContributionsSectionStatus,
-  EmployerNamePages
-}
+import pages.nonsipp.employercontributions.EmployerContributionsProgress.EmployerContributionsUserAnswersOps
+import pages.nonsipp.employercontributions.{EmployerContributionsMemberListPage, EmployerContributionsSectionStatus}
+import pages.nonsipp.memberdetails.MembersDetailsPages
 import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{PsrSubmissionService, SaveService}
-import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
+import viewmodels.DisplayMessage.{Message, ParagraphMessage}
 import viewmodels.implicits._
+import viewmodels.models.SectionJourneyStatus.InProgress
 import viewmodels.models._
 import views.html.TwoColumnsTripleAction
 
@@ -56,22 +58,23 @@ class EmployerContributionsMemberListController @Inject()(
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
-  val form: Form[Boolean] = EmployerContributionsMemberListController.form(formProvider)
+  private val form: Form[Boolean] = EmployerContributionsMemberListController.form(formProvider)
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>
-      val memberList = request.userAnswers.membersDetails(srn)
+      val memberList = request.userAnswers.list(MembersDetailsPages(srn))
 
       if (memberList.nonEmpty) {
-        val viewModel = EmployerContributionsMemberListController
-          .viewModel(srn, page, mode, memberList, request.userAnswers)
-        val filledForm =
-          request.userAnswers.get(EmployerContributionsMemberListPage(srn)).fold(form)(form.fill)
-        Ok(view(filledForm, viewModel))
+        memberList
+          .zipWithRefinedIndex[Max300.Refined]
+          .map { indexes =>
+            val employerContributions = buildEmployerContributions(srn, indexes)
+            val filledForm = request.userAnswers.fillForm(EmployerContributionsMemberListPage(srn), form)
+            Ok(view(filledForm, viewModel(srn, page, mode, employerContributions)))
+          }
+          .merge
       } else {
-        Redirect(
-          controllers.routes.JourneyRecoveryController.onPageLoad()
-        )
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
       }
   }
 
@@ -90,16 +93,22 @@ class EmployerContributionsMemberListController @Inject()(
         form
           .bindFromRequest()
           .fold(
-            errors =>
-              Future.successful(
-                BadRequest(
-                  view(
-                    errors,
-                    EmployerContributionsMemberListController
-                      .viewModel(srn, page, mode, memberList, request.userAnswers)
+            errors => {
+              memberList
+                .zipWithRefinedIndex[Max300.Refined]
+                .map { indexes =>
+                  val employerContributions = buildEmployerContributions(srn, indexes)
+                  BadRequest(
+                    view(
+                      errors,
+                      EmployerContributionsMemberListController
+                        .viewModel(srn, page, mode, employerContributions)
+                    )
                   )
-                )
-              ),
+                }
+                .merge
+                .pure[Future]
+            },
             value =>
               for {
                 updatedUserAnswers <- Future.fromTry(
@@ -130,6 +139,22 @@ class EmployerContributionsMemberListController @Inject()(
           )
       }
   }
+
+  private def buildEmployerContributions(srn: Srn, indexes: List[(Max300, NameDOB)])(
+    implicit request: DataRequest[_]
+  ): List[EmployerContributions] = indexes.map {
+    case (index, nameDOB) =>
+      EmployerContributions(
+        memberIndex = index,
+        employerFullName = nameDOB.fullName,
+        contributions = request.userAnswers
+          .employerContributionsProgress(srn, index)
+          .map {
+            case (secondaryIndex, status) =>
+              Contributions(secondaryIndex, status)
+          }
+      )
+  }
 }
 
 object EmployerContributionsMemberListController {
@@ -141,75 +166,69 @@ object EmployerContributionsMemberListController {
   private def rows(
     srn: Srn,
     mode: Mode,
-    memberList: List[NameDOB],
-    userAnswers: UserAnswers
+    employerContributions: List[EmployerContributions]
   ): List[List[TableElem]] =
-    memberList.zipWithIndex.map {
-      case (memberName, index) =>
-        refineV[OneTo300](index + 1) match {
-          case Left(_) => Nil
-          case Right(nextIndex) =>
-            val contributions = userAnswers.map(EmployerNamePages(srn, nextIndex))
-            if (contributions.isEmpty) {
-              List(
-                TableElem(
-                  memberName.fullName
-                ),
-                TableElem(
-                  Message("employerContributions.MemberList.status.no.contributions")
-                ),
-                TableElem(
-                  LinkMessage(
-                    Message("site.add"),
-                    controllers.nonsipp.employercontributions.routes.EmployerNameController
-                      .onSubmit(srn, nextIndex, refineMV(1), mode)
-                      .url
-                  )
-                ),
-                TableElem("")
+    employerContributions.map { employerContribution =>
+      val noContributions = employerContribution.contributions.isEmpty
+      val onlyInProgressContributions = employerContribution.contributions.forall(_.status.inProgress)
+
+      if (noContributions || onlyInProgressContributions) {
+        List(
+          TableElem(
+            employerContribution.employerFullName
+          ),
+          TableElem(
+            Message("employerContributions.MemberList.status.no.contributions")
+          ),
+          TableElem.add(
+            employerContribution.contributions.find(_.status.inProgress) match {
+              case Some(Contributions(_, InProgress(url))) => url
+              case None =>
+                controllers.nonsipp.employercontributions.routes.EmployerNameController
+                  .onSubmit(srn, employerContribution.memberIndex, refineMV(1), mode)
+                  .url
+            }
+          ),
+          TableElem.empty
+        )
+      } else {
+        List(
+          TableElem(
+            employerContribution.employerFullName
+          ),
+          TableElem(
+            if (employerContribution.contributions.size == 1) {
+              Message(
+                "employerContributions.MemberList.status.single.contribution",
+                employerContribution.contributions.size
               )
             } else {
-              List(
-                TableElem(
-                  memberName.fullName
-                ),
-                TableElem(
-                  if (contributions.size == 1) {
-                    Message("employerContributions.MemberList.status.single.contribution", contributions.size)
-                  } else {
-                    Message("employerContributions.MemberList.status.some.contributions", contributions.size)
-                  }
-                ),
-                TableElem(
-                  LinkMessage(
-                    Message("site.change"),
-                    controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
-                      .onSubmit(srn, nextIndex, page = 1, CheckMode)
-                      .url
-                  )
-                ),
-                TableElem(
-                  LinkMessage(
-                    Message("site.remove"),
-                    controllers.nonsipp.employercontributions.routes.WhichEmployerContributionRemoveController
-                      .onSubmit(srn, nextIndex)
-                      .url
-                  )
-                )
+              Message(
+                "employerContributions.MemberList.status.some.contributions",
+                employerContribution.contributions.count(_.status.completed)
               )
             }
-        }
+          ),
+          TableElem.change(
+            controllers.nonsipp.employercontributions.routes.EmployerContributionsCYAController
+              .onSubmit(srn, employerContribution.memberIndex, page = 1, CheckMode)
+          ),
+          TableElem.remove(
+            controllers.nonsipp.employercontributions.routes.WhichEmployerContributionRemoveController
+              .onSubmit(srn, employerContribution.memberIndex)
+          )
+        )
+      }
     }
 
   def viewModel(
     srn: Srn,
     page: Int,
     mode: Mode,
-    memberList: List[NameDOB],
-    userAnswers: UserAnswers
+    employerContributions: List[EmployerContributions]
   ): FormPageViewModel[ActionTableViewModel] = {
 
-    val (title, heading) = if (memberList.size == 1) {
+    val (title, heading) = if (employerContributions.size == 1) {
       ("employerContributions.MemberList.title", "employerContributions.MemberList.heading")
     } else {
       ("employerContributions.MemberList.title.plural", "employerContributions.MemberList.heading.plural")
@@ -218,14 +237,14 @@ object EmployerContributionsMemberListController {
     val pagination = Pagination(
       currentPage = page,
       pageSize = Constants.employerContributionsMemberListSize,
-      memberList.size,
+      employerContributions.size,
       controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
         .onPageLoad(srn, _, NormalMode)
     )
 
     FormPageViewModel(
-      title = Message(title, memberList.size),
-      heading = Message(heading, memberList.size),
+      title = Message(title, employerContributions.size),
+      heading = Message(heading, employerContributions.size),
       description = None,
       page = ActionTableViewModel(
         inset = ParagraphMessage(
@@ -242,7 +261,7 @@ object EmployerContributionsMemberListController {
             TableElem.empty
           )
         ),
-        rows = rows(srn, mode, memberList, userAnswers),
+        rows = rows(srn, mode, employerContributions),
         radioText = Message("employerContributions.MemberList.radios"),
         showInsetWithRadios = true,
         paginatedViewModel = Some(
@@ -264,4 +283,15 @@ object EmployerContributionsMemberListController {
         .onSubmit(srn, page, mode)
     )
   }
+
+  protected[employercontributions] case class EmployerContributions(
+    memberIndex: Max300,
+    employerFullName: String,
+    contributions: List[Contributions]
+  )
+
+  protected[employercontributions] case class Contributions(
+    contributionIndex: Max50,
+    status: SectionJourneyStatus
+  )
 }

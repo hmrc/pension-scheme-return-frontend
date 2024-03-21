@@ -16,6 +16,7 @@
 
 package controllers.nonsipp.employercontributions
 
+import cats.implicits.catsSyntaxApplicativeId
 import config.Refined.{Max300, Max50}
 import controllers.actions.IdentifyAndRequireData
 import controllers.nonsipp.employercontributions.PartnershipEmployerUtrController._
@@ -25,15 +26,16 @@ import forms.mappings.errors.InputFormErrors
 import models.SchemeId.Srn
 import models.{ConditionalYesNo, Mode, Utr}
 import navigation.Navigator
-import pages.nonsipp.employercontributions.{EmployerNamePage, PartnershipEmployerUtrPage}
+import pages.nonsipp.employercontributions.{EmployerContributionsProgress, EmployerNamePage, PartnershipEmployerUtrPage}
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
-import viewmodels.models.{ConditionalYesNoPageViewModel, FieldType, FormPageViewModel, YesNoViewModel}
+import viewmodels.models._
 import views.html.ConditionalYesNoPageView
 
 import javax.inject.{Inject, Named}
@@ -50,7 +52,8 @@ class PartnershipEmployerUtrController @Inject()(
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
-  val form: Form[Either[String, Utr]] = PartnershipEmployerUtrController.form(formProvider)
+
+  private val form: Form[Either[String, Utr]] = PartnershipEmployerUtrController.form(formProvider)
 
   def onPageLoad(srn: Srn, index: Max300, secondaryIndex: Max50, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
@@ -77,16 +80,14 @@ class PartnershipEmployerUtrController @Inject()(
             },
           value =>
             for {
-              updatedAnswers <- Future
-                .fromTry(
-                  request.userAnswers
-                    .set(PartnershipEmployerUtrPage(srn, index, secondaryIndex), ConditionalYesNo(value))
-                )
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(
-              navigator
+              updatedAnswers <- request.userAnswers
+                .set(PartnershipEmployerUtrPage(srn, index, secondaryIndex), ConditionalYesNo(value))
+                .mapK
+              nextPage = navigator
                 .nextPage(PartnershipEmployerUtrPage(srn, index, secondaryIndex), mode, updatedAnswers)
-            )
+              updatedProgressAnswers <- saveProgress(srn, index, secondaryIndex, updatedAnswers, nextPage)
+              _ <- saveService.save(updatedProgressAnswers)
+            } yield Redirect(nextPage)
         )
     }
 }

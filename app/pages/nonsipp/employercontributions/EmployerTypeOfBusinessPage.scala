@@ -19,10 +19,11 @@ package pages.nonsipp.employercontributions
 import config.Refined.{Max300, Max50}
 import models.{IdentityType, UserAnswers}
 import models.SchemeId.Srn
+import models.UserAnswers.implicits.UserAnswersTryOps
 import pages.QuestionPage
 import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
-import viewmodels.models.SectionStatus
+import viewmodels.models.{SectionJourneyStatus, SectionStatus}
 
 import scala.util.Try
 
@@ -41,15 +42,13 @@ case class EmployerTypeOfBusinessPage(srn: Srn, memberIndex: Max300, index: Max5
         userAnswers
           .set(EmployerContributionsSectionStatus(srn), SectionStatus.InProgress)
           .flatMap(_.remove(EmployerContributionsMemberListPage(srn)))
-      case (Some(IdentityType.UKCompany), Some(IdentityType.UKCompany)) => Try(userAnswers)
-      case (Some(IdentityType.UKPartnership), Some(IdentityType.UKPartnership)) => Try(userAnswers)
-      case (Some(IdentityType.Other), Some(IdentityType.Other)) => Try(userAnswers)
+      case (Some(a), Some(b)) if a == b => Try(userAnswers) // same answer
       case _ =>
         userAnswers
           .remove(EmployerCompanyCrnPage(srn, memberIndex, index))
-          .flatMap(_.remove(PartnershipEmployerUtrPage(srn, memberIndex, index)))
-          .flatMap(_.remove(OtherEmployeeDescriptionPage(srn, memberIndex, index)))
-          .flatMap(_.set(EmployerContributionsSectionStatus(srn), SectionStatus.InProgress))
-          .flatMap(_.remove(EmployerContributionsMemberListPage(srn)))
+          .remove(PartnershipEmployerUtrPage(srn, memberIndex, index))
+          .remove(OtherEmployeeDescriptionPage(srn, memberIndex, index))
+          .set(EmployerContributionsSectionStatus(srn), SectionStatus.InProgress)
+          .remove(EmployerContributionsMemberListPage(srn))
     }
 }

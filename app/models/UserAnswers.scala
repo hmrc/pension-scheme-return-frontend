@@ -94,6 +94,9 @@ final case class UserAnswers(
   def remove(pages: List[Removable[_]]): Try[UserAnswers] =
     pages.foldLeft(Try(this))((ua, page) => ua.flatMap(_.remove(page)))
 
+  def setWhen[A](bool: Boolean)(page: Settable[A], value: A)(implicit writes: Writes[A]): Try[UserAnswers] =
+    if (bool) setOnly(page, value) else Try(this)
+
   def setOnly[A](page: Settable[A], value: A)(implicit writes: Writes[A]): Try[UserAnswers] = {
     val updatedData = data.decryptedValue.setObject(page.path, Json.toJson(value)) match {
       case JsSuccess(jsValue, _) =>
@@ -174,6 +177,11 @@ object UserAnswers {
   object implicits {
     implicit class UserAnswersTryOps(ua: Try[UserAnswers]) {
       def set[A: Writes](page: Settable[A], value: A): Try[UserAnswers] = ua.flatMap(_.set(page, value))
+
+      def remove(page: Removable[_]): Try[UserAnswers] = ua.flatMap(_.remove(page))
+
+      def setWhen[A: Writes](bool: Boolean)(page: Settable[A], value: A): Try[UserAnswers] =
+        ua.flatMap(_.setWhen(bool)(page, value))
     }
   }
 }

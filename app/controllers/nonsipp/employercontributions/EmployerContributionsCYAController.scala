@@ -27,6 +27,7 @@ import models.SchemeId.Srn
 import models._
 import models.requests.DataRequest
 import navigation.Navigator
+import org.slf4j.LoggerFactory
 import pages.nonsipp.employercontributions._
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import play.api.i18n.MessagesApi
@@ -53,6 +54,8 @@ class EmployerContributionsCYAController @Inject()(
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
+  private val logger = LoggerFactory.getLogger(this.getClass.getSimpleName)
+
   def onPageLoad(srn: Srn, index: Max300, page: Int, mode: Mode): Action[AnyContent] =
     identifyAndRequireData(srn) { implicit request =>
       (
@@ -61,6 +64,7 @@ class EmployerContributionsCYAController @Inject()(
           indexes <- buildSecondaryIndexes(srn, index)
           employerCYAs <- indexes.map(secondaryIndex => buildCYA(srn, index, secondaryIndex)).sequence
           orderedCYAs = employerCYAs.sortBy(_.secondaryIndex.value)
+          _ <- recoverJourneyWhen(orderedCYAs.isEmpty)
         } yield Ok(
           view(viewModel(srn, membersName.fullName, index, page, orderedCYAs, mode))
         )
@@ -92,7 +96,8 @@ class EmployerContributionsCYAController @Inject()(
     implicit request: DataRequest[_]
   ): Either[Result, List[Max50]] =
     request.userAnswers
-      .map(EmployerNamePages(srn, index))
+      .map(EmployerContributionsProgress.all(srn, index))
+      .filter { case (_, status) => status.completed }
       .keys
       .toList
       .map(refineStringIndex[Max50.Refined])

@@ -23,21 +23,24 @@ import config.Refined._
 import controllers.PSRController
 import controllers.actions._
 import controllers.nonsipp.employercontributions.WhichEmployerContributionRemoveController._
-import eu.timepit.refined.refineV
 import forms.RadioListFormProvider
-import models.Money
 import models.SchemeId.Srn
-import pages.nonsipp.employercontributions.{EmployerNamePages, TotalEmployerContributionPages}
+import models.requests.DataRequest
+import models.{Money, NormalMode}
+import pages.nonsipp.employercontributions.{
+  EmployerContributionsProgress,
+  EmployerNamePage,
+  TotalEmployerContributionPage
+}
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc._
+import utils.ListUtils.ListOps
 import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, ListRadiosRow, ListRadiosViewModel}
 import views.html.ListRadiosView
-
-import scala.collection.immutable.SortedMap
 
 class WhichEmployerContributionRemoveController @Inject()(
   override val messagesApi: MessagesApi,
@@ -50,38 +53,47 @@ class WhichEmployerContributionRemoveController @Inject()(
   val form = WhichEmployerContributionRemoveController.form(formProvider)
 
   def onPageLoad(srn: Srn, memberIndex: Max300): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    val totals = request.userAnswers.map(TotalEmployerContributionPages(srn, memberIndex))
-    val employers = request.userAnswers.map(EmployerNamePages(srn, memberIndex))
-    if (totals.size == 1) {
-      refineV[OneTo50](totals.head._1.toInt + 1).fold(
-        _ => Redirect(controllers.routes.UnauthorisedController.onPageLoad()),
-        index =>
-          Redirect(
-            controllers.nonsipp.employercontributions.routes.RemoveEmployerContributionsController
-              .onPageLoad(srn, memberIndex, index)
-          )
-      )
-    } else {
-      request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).getOrRecoverJourney { memberName =>
-        withIndexedValues(totals, employers) { sortedValues =>
-          Ok(view(form, viewModel(srn, memberIndex, memberName.fullName, sortedValues)))
-        }
+    val completed: List[Max50] = request.userAnswers
+      .map(EmployerContributionsProgress.all(srn, memberIndex))
+      .filter {
+        case (_, status) => status.completed
       }
+      .keys
+      .toList
+      .refine[Max50.Refined]
+
+    completed match {
+      case Nil =>
+        Redirect(
+          controllers.nonsipp.employercontributions.routes.EmployerContributionsMemberListController
+            .onPageLoad(srn, page = 1, NormalMode)
+        )
+      case head :: Nil =>
+        Redirect(
+          controllers.nonsipp.employercontributions.routes.RemoveEmployerContributionsController
+            .onPageLoad(srn, memberIndex, head)
+        )
+      case _ =>
+        (
+          for {
+            memberName <- request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).getOrRecoverJourney
+            values <- getJourneyValues(srn, memberIndex)
+          } yield Ok(view(form, viewModel(srn, memberIndex, memberName.fullName, values)))
+        ).merge
     }
   }
 
   def onSubmit(srn: Srn, memberIndex: Max300): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
-    val totals = request.userAnswers.map(TotalEmployerContributionPages(srn, memberIndex))
-    val employers = request.userAnswers.map(EmployerNamePages(srn, memberIndex))
     form
       .bindFromRequest()
       .fold(
         errors =>
-          request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).getOrRecoverJourney { memberName =>
-            withIndexedValues(totals, employers)(
-              sortedValues => BadRequest(view(errors, viewModel(srn, memberIndex, memberName.fullName, sortedValues)))
-            )
-          },
+          (
+            for {
+              memberName <- request.userAnswers.get(MemberDetailsPage(srn, memberIndex)).getOrRecoverJourney
+              values <- getJourneyValues(srn, memberIndex)
+            } yield BadRequest(view(errors, viewModel(srn, memberIndex, memberName.fullName, values)))
+          ).merge,
         answer =>
           Redirect(
             controllers.nonsipp.employercontributions.routes.RemoveEmployerContributionsController
@@ -90,20 +102,27 @@ class WhichEmployerContributionRemoveController @Inject()(
       )
   }
 
-  private def withIndexedValues(totals: Map[String, Money], employers: Map[String, String])(
-    f: Map[Int, (Money, String)] => Result
-  ): Result = {
-    val values = (totals, employers).tupled
-    val maybeIndexedValues: Option[List[(Int, (Money, String))]] = values.toList
-      .traverse { case (key, value) => key.toIntOption.map(_ -> value) }
-
-    maybeIndexedValues match {
-      case None => Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-      case Some(indexedValues) =>
-        val sortedMap = SortedMap.from(indexedValues)
-        f(sortedMap)
-    }
-  }
+  private def getJourneyValues(srn: Srn, memberIndex: Max300)(
+    implicit request: DataRequest[_]
+  ): Either[Result, List[(Max50, Money, String)]] =
+    request.userAnswers
+      .map(EmployerContributionsProgress.all(srn, memberIndex))
+      .filter {
+        case (_, status) => status.completed
+      }
+      .keys
+      .toList
+      .refine[Max50.Refined]
+      .traverse { secondaryIndex =>
+        for {
+          totalContribution <- request.userAnswers
+            .get(TotalEmployerContributionPage(srn, memberIndex, secondaryIndex))
+            .getOrRecoverJourney
+          employerName <- request.userAnswers
+            .get(EmployerNamePage(srn, memberIndex, secondaryIndex))
+            .getOrRecoverJourney
+        } yield (secondaryIndex, totalContribution, employerName)
+      }
 }
 
 object WhichEmployerContributionRemoveController {
@@ -112,41 +131,34 @@ object WhichEmployerContributionRemoveController {
       "whichEmployerContributionRemove.error.required"
     )
 
-  private def buildRows(values: Map[Int, (Money, String)]): List[ListRadiosRow] =
+  private def buildRows(values: List[(Max50, Money, String)]): List[ListRadiosRow] =
     values.flatMap {
-      case (index, value) =>
-        refineV[Max5000.Refined](index + 1).fold(
-          _ => Nil,
-          index =>
-            List(
-              ListRadiosRow(
-                index.value,
-                Message("whichEmployerContributionRemove.radio.label", value._1.displayAs, value._2)
-              )
-            )
+      case (index, total, employerName) =>
+        List(
+          ListRadiosRow(
+            index.value,
+            Message("whichEmployerContributionRemove.radio.label", total.displayAs, employerName)
+          )
         )
-    }.toList
+    }
 
   def viewModel(
     srn: Srn,
     memberIndex: Max300,
     memberName: String,
-    values: Map[Int, (Money, String)]
-  ): FormPageViewModel[ListRadiosViewModel] = {
-    val rows = buildRows(values)
-
+    values: List[(Max50, Money, String)]
+  ): FormPageViewModel[ListRadiosViewModel] =
     FormPageViewModel(
       title = "whichEmployerContributionRemove.title",
       heading = Message("whichEmployerContributionRemove.heading", memberName),
       description = None,
       page = ListRadiosViewModel(
         legend = None,
-        rows = rows
+        rows = buildRows(values)
       ),
       refresh = None,
       buttonText = Message("site.saveAndContinue"),
       details = None,
       routes.WhichEmployerContributionRemoveController.onSubmit(srn, memberIndex)
     )
-  }
 }

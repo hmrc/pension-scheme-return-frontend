@@ -25,6 +25,7 @@ import models.SchemeId.Srn
 import models.{Money, NormalMode}
 import navigation.Navigator
 import pages.nonsipp.employercontributions.{
+  EmployerContributionsProgress,
   EmployerNamePage,
   RemoveEmployerContributionsPage,
   TotalEmployerContributionPage
@@ -94,6 +95,7 @@ class RemoveEmployerContributionsController @Inject()(
                 updatedAnswers <- Future.fromTry(
                   request.userAnswers
                     .remove(EmployerNamePage(srn, memberIndex, index))
+                    .remove(EmployerContributionsProgress(srn, memberIndex, index))
                 )
                 _ <- saveService.save(updatedAnswers)
                 submissionResult <- psrSubmissionService.submitPsrDetails(srn, updatedAnswers)

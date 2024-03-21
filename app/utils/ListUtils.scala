@@ -58,4 +58,10 @@ object ListUtils {
     def toMessages: List[(Message, Message)] =
       list.map { case (first, second) => Message(first) -> Message(second) }
   }
+
+  implicit class ListTupOps[A, B](list: List[(A, B)]) {
+    // refines the first value of the tuple (_1) for each element in the list
+    def refine_1[I: Validate[Int, *]](implicit ev: A <:< String): List[(Refined[Int, I], B)] =
+      list.flatMap { case (a, b) => ev(a).toIntOption.flatMap(index => refineV[I](index + 1).toOption.map(_ -> b)) }
+  }
 }
