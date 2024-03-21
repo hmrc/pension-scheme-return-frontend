@@ -128,9 +128,26 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
             disposalIndex,
             WhenWasAssetSoldPage,
             (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
+              controllers.nonsipp.otherassetsdisposal.routes.TotalConsiderationSaleAssetController
+                .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+          )
+          .withName("go from when was asset sold page to WhenWasAssetSold page")
+      )
+
+    }
+
+    "TotalConsiderationSaleAssetPage" - {
+
+      act.like(
+        normalmode
+          .navigateToWithDoubleIndex(
+            assetIndex,
+            disposalIndex,
+            TotalConsiderationSaleAssetPage,
+            (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
               controllers.routes.UnauthorisedController.onPageLoad()
           )
-          .withName("go from when was asset sold page to Unauthorised page")
+          .withName("go from total consideration sale asset page to buyer Unauthorised page")
       )
 
     }
