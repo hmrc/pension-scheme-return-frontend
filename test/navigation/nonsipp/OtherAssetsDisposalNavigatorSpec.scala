@@ -185,9 +185,11 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
             disposalIndex,
             TypeOfAssetBuyerPage,
             Gen.const(IdentityType.UKPartnership),
-            (srn, index: Max5000, disposalIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+            (srn, index: Max5000, disposalIndex: Max50, _) =>
+              controllers.nonsipp.otherassetsdisposal.routes.PartnershipBuyerNameController
+                .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
           )
-          .withName("go from type of asset buyer page to Unauthorised page when UKPartnership")
+          .withName("go from type of asset buyer page to PartnershipBuyerNamePage page when UKPartnership")
       )
 
       act.like(
@@ -200,6 +202,35 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
             (srn, index: Max5000, disposalIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
           )
           .withName("go from type of asset buyer page to Unauthorised page when other")
+      )
+    }
+
+    "PartnershipBuyerNamePage" - {
+      act.like(
+        normalmode
+          .navigateToWithDoubleIndex(
+            assetIndex,
+            disposalIndex,
+            PartnershipBuyerNamePage,
+            (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
+              controllers.nonsipp.otherassetsdisposal.routes.PartnershipBuyerUtrController
+                .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+          )
+          .withName("go from PartnershipBuyerNamePage to PartnershipBuyerUtrPage")
+      )
+    }
+
+    "PartnershipBuyerUtrPage" - {
+      act.like(
+        normalmode
+          .navigateToWithDoubleIndex(
+            assetIndex,
+            disposalIndex,
+            PartnershipBuyerUtrPage,
+            (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
+              controllers.routes.UnauthorisedController.onPageLoad()
+          )
+          .withName("go from PartnershipBuyerUtrPage to Unauthorised")
       )
     }
 
