@@ -21,6 +21,7 @@ import eu.timepit.refined.{refineMV, refineV}
 import models.ConditionalYesNo._
 import models.SchemeId.Srn
 import models.{IdentitySubject, Mode, Money, NormalMode, PensionSchemeId, SchemeHoldLandProperty, UserAnswers}
+import pages.nonsipp.bonds.{BondsCompleted, BondsJourneyStatus, NameOfBondsPages, UnregulatedOrConnectedBondsHeldPage}
 import pages.nonsipp.bondsdisposal.{BondsDisposalCompletedPages, BondsDisposalPage}
 import pages.nonsipp.common.IdentityTypes
 import pages.nonsipp.employercontributions.{EmployerContributionsPage, EmployerContributionsSectionStatus}
@@ -34,7 +35,6 @@ import pages.nonsipp.schemedesignatory.{FeesCommissionsWagesSalariesPage, HowMan
 import pages.nonsipp.shares.{DidSchemeHoldAnySharesPage, SharesCompleted, SharesJourneyStatus, TypeOfSharesHeldPages}
 import pages.nonsipp.sharesdisposal.{SharesDisposalCompletedPages, SharesDisposalPage}
 import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
-import pages.nonsipp.bonds.UnregulatedOrConnectedBondsHeldPage
 import viewmodels.models.TaskListStatus.{Completed, InProgress, NotStarted, TaskListStatus}
 import viewmodels.models.{SectionStatus, TaskListStatus}
 
@@ -416,12 +416,9 @@ object TaskListStatusUtils {
     val lastPages = userAnswers.map(SharesCompleted.all(srn))
     val incompleteIndex: Int = getIncompleteIndex(firstPages, Some(lastPages))
 
-    def typeOfSharesHeldPageUrl(index: Max5000) =
-      controllers.nonsipp.shares.routes.TypeOfSharesHeldController.onPageLoad(srn, index, NormalMode).url
-
     val inProgressCalculatedUrl = refineV[OneTo5000](incompleteIndex).fold(
       _ => sharesListPageUrl,
-      index => typeOfSharesHeldPageUrl(index)
+      index => controllers.nonsipp.shares.routes.TypeOfSharesHeldController.onPageLoad(srn, index, NormalMode).url
     )
 
     (hadSharesPage, shareStatusPage) match {
@@ -471,19 +468,30 @@ object TaskListStatusUtils {
   }
 
   def getBondsTaskListStatusAndLink(userAnswers: UserAnswers, srn: Srn): (TaskListStatus, String) = {
-    val hadBondsPage = userAnswers.get(UnregulatedOrConnectedBondsHeldPage(srn))
     val defaultLink =
       controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldController
         .onPageLoad(srn, NormalMode)
         .url
-    hadBondsPage match {
-      case None => (NotStarted, defaultLink)
-      case Some(hadBonds) =>
-        if (!hadBonds) {
-          (Completed, defaultLink)
-        } else {
-          (InProgress, defaultLink)
-        }
+    val bondsListPageUrl =
+      controllers.nonsipp.bonds.routes.BondsListController
+        .onPageLoad(srn, 1, NormalMode)
+        .url
+    val hadBondsPage = userAnswers.get(UnregulatedOrConnectedBondsHeldPage(srn))
+    val bondStatusPage = userAnswers.get(BondsJourneyStatus(srn))
+    val firstPages = userAnswers.get(NameOfBondsPages(srn))
+    val lastPages = userAnswers.map(BondsCompleted.all(srn))
+    val incompleteIndex: Int = getIncompleteIndex(firstPages, Some(lastPages))
+    val inProgressCalculatedUrl = refineV[OneTo5000](incompleteIndex).fold(
+      _ => bondsListPageUrl,
+      index => controllers.nonsipp.bonds.routes.NameOfBondsController.onPageLoad(srn, index, NormalMode).url
+    )
+
+    (hadBondsPage, bondStatusPage) match {
+      case (None, _) => (NotStarted, defaultLink)
+      case (Some(false), _) => (Completed, defaultLink)
+      case (Some(true), None) => (InProgress, inProgressCalculatedUrl)
+      case (Some(true), Some(SectionStatus.Completed)) => (Completed, bondsListPageUrl)
+      case (Some(true), Some(SectionStatus.InProgress)) => (InProgress, inProgressCalculatedUrl)
     }
   }
 

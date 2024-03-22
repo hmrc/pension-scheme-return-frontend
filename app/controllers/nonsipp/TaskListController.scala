@@ -93,7 +93,7 @@ object TaskListController {
     schemeName: String,
     userAnswers: UserAnswers,
     pensionSchemeId: PensionSchemeId
-  ) = {
+  ): TaskListSectionViewModel = {
     val prefix = "nonsipp.tasklist.schemedetails"
 
     TaskListSectionViewModel(
@@ -109,7 +109,7 @@ object TaskListController {
     prefix: String,
     userAnswers: UserAnswers,
     pensionSchemeId: PensionSchemeId
-  ) = {
+  ): TaskListItemViewModel = {
     val activeBankAccount = userAnswers.get(ActiveBankAccountPage(srn))
     val whyNoBankAccountPage = userAnswers.get(WhyNoBankAccountPage(srn))
 
@@ -148,7 +148,7 @@ object TaskListController {
     schemeName: String,
     prefix: String,
     userAnswers: UserAnswers
-  ) = {
+  ): TaskListItemViewModel = {
 
     val taskListStatus: TaskListStatus = getFinancialDetailsTaskListStatus(userAnswers, srn)
 
@@ -177,7 +177,7 @@ object TaskListController {
     )
   }
 
-  private def membersSection(srn: Srn, schemeName: String, userAnswers: UserAnswers) = {
+  private def membersSection(srn: Srn, schemeName: String, userAnswers: UserAnswers): TaskListSectionViewModel = {
     val prefix = "nonsipp.tasklist.members"
     val taskListStatus = getMembersTaskListStatus(userAnswers, srn)
     TaskListSectionViewModel(
@@ -223,7 +223,7 @@ object TaskListController {
     )
   }
 
-  private def getIncompleteMembersIndex(userAnswers: UserAnswers, srn: Srn) = {
+  private def getIncompleteMembersIndex(userAnswers: UserAnswers, srn: Srn): Int = {
     val membersDetailsPages = userAnswers.get(MembersDetailsPages(srn))
     val ninoPages = userAnswers.get(MemberDetailsNinoPages(srn))
     val noNinoPages = userAnswers.get(NoNinoPages(srn))
@@ -406,7 +406,7 @@ object TaskListController {
     )
   }
 
-  private def sharesSection(srn: Srn, userAnswers: UserAnswers) = {
+  private def sharesSection(srn: Srn, userAnswers: UserAnswers): TaskListSectionViewModel = {
     val prefix = "nonsipp.tasklist.shares"
     val (sharesStatus, sharesLink) = getSharesTaskListStatusAndLink(userAnswers, srn)
     val quotedSharesStatusAndLink = getQuotedSharesTaskListStatusAndLink(userAnswers, srn)
@@ -439,7 +439,7 @@ object TaskListController {
     )
   }
 
-  private def landOrPropertySection(srn: Srn, userAnswers: UserAnswers) = {
+  private def landOrPropertySection(srn: Srn, userAnswers: UserAnswers): TaskListSectionViewModel = {
     val prefix = "nonsipp.tasklist.landorproperty"
 
     val landOrPropertyStatus = TaskListStatusUtils.getLandOrPropertyTaskListStatusAndLink(userAnswers, srn)
@@ -465,18 +465,18 @@ object TaskListController {
     )
   }
 
-  private def bondsSection(srn: Srn, userAnswers: UserAnswers) = {
+  private def bondsSection(srn: Srn, userAnswers: UserAnswers): TaskListSectionViewModel = {
     val prefix = "nonsipp.tasklist.bonds"
-    val statusAndLink = getBondsTaskListStatusAndLink(userAnswers, srn)
+    val (bondStatus, bondLink) = getBondsTaskListStatusAndLink(userAnswers, srn)
 
     TaskListSectionViewModel(
       s"$prefix.title",
       TaskListItemViewModel(
         LinkMessage(
-          messageKey(prefix, "unregulatedorconnected.title", statusAndLink._1),
-          statusAndLink._2
+          messageKey(prefix, "unregulatedorconnected.title", bondStatus),
+          bondLink
         ),
-        statusAndLink._1
+        bondStatus
       ),
       TaskListItemViewModel(
         LinkMessage(
