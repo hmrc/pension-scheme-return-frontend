@@ -6,8 +6,8 @@ POST       /:srn/change-bonds-disposal                                          
 GET         /:srn/what-you-will-need-bonds-disposal                                                 controllers.nonsipp.bondsdisposal.WhatYouWillNeedBondsDisposalController.onPageLoad(srn: Srn)
 GET         /:srn/submit-what-you-will-need-bonds-disposal                                          controllers.nonsipp.bondsdisposal.WhatYouWillNeedBondsDisposalController.onSubmit(srn: Srn)
 
-GET        /:srn/start-reporting-bond-disposal                                                      controllers.nonsipp.bondsdisposal.BondsDisposalListController.onPageLoad(srn: Srn, page: Int, mode: Mode = NormalMode)
-POST       /:srn/start-reporting-bond-disposal                                                      controllers.nonsipp.bondsdisposal.BondsDisposalListController.onSubmit(srn: Srn, page: Int, mode: Mode = NormalMode)
+GET        /:srn/start-reporting-bond-disposal/:page                                                controllers.nonsipp.bondsdisposal.BondsDisposalListController.onPageLoad(srn: Srn, page: Int, mode: Mode = NormalMode)
+POST       /:srn/start-reporting-bond-disposal/:page                                                controllers.nonsipp.bondsdisposal.BondsDisposalListController.onSubmit(srn: Srn, page: Int, mode: Mode = NormalMode)
 GET        /:srn/change-start-reporting-bond-disposal                                               controllers.nonsipp.bondsdisposal.BondsDisposalListController.onPageLoad(srn: Srn, page: Int, mode: Mode = CheckMode)
 POST       /:srn/change-start-reporting-bond-disposal                                               controllers.nonsipp.bondsdisposal.BondsDisposalListController.onSubmit(srn: Srn, page: Int, mode: Mode = CheckMode)
 

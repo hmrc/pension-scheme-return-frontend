@@ -75,11 +75,10 @@ class BondsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
         act.like(
           normalmode
-            .navigateToWithDoubleIndex(
+            .navigateToWithIndex(
               bondIndexOne,
-              disposalIndex,
               BondsDisposalListPage,
-              (srn, bondIndex: Max5000, disposalIndex: Max50, _) =>
+              (srn, bondIndex: Max5000, _) =>
                 controllers.nonsipp.bondsdisposal.routes.HowWereBondsDisposedOfController
                   .onPageLoad(srn, bondIndex, disposalIndex, NormalMode)
             )

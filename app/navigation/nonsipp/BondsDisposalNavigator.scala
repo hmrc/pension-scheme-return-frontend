@@ -16,6 +16,8 @@
 
 package navigation.nonsipp
 
+import cats.implicits.toTraverseOps
+import config.Refined.Max50
 import models.PointOfEntry.{HowWereBondsDisposedPointOfEntry, NoPointOfEntry}
 import models.{CheckMode, HowDisposed, NormalMode, UserAnswers}
 import navigation.JourneyNavigator
@@ -37,9 +39,19 @@ object BondsDisposalNavigator extends JourneyNavigator {
     case WhatYouWillNeedBondsDisposalPage(srn) =>
       controllers.nonsipp.bondsdisposal.routes.BondsDisposalListController.onPageLoad(srn, 1, NormalMode)
 
-    case BondsDisposalListPage(srn, bondIndex, disposalIndex) =>
-      controllers.nonsipp.bondsdisposal.routes.HowWereBondsDisposedOfController
-        .onPageLoad(srn, bondIndex, disposalIndex, NormalMode)
+    case BondsDisposalListPage(srn, bondIndex) =>
+      (
+        for {
+          indexes <- userAnswers
+            .map(BondsDisposalCompleted.all(srn, bondIndex))
+            .keys
+            .toList
+            .traverse(_.toIntOption)
+            .getOrRecoverJourney
+          nextIndex <- findNextOpenIndex[Max50.Refined](indexes).getOrRecoverJourney
+        } yield controllers.nonsipp.bondsdisposal.routes.HowWereBondsDisposedOfController
+          .onPageLoad(srn, bondIndex, nextIndex, NormalMode)
+      ).merge
 
     case page @ HowWereBondsDisposedOfPage(srn, bondIndex, disposalIndex, _) =>
       userAnswers.get(page) match {
