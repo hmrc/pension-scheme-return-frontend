@@ -58,7 +58,8 @@ object OtherAssetsDisposalNavigator extends JourneyNavigator {
     case TypeOfAssetBuyerPage(srn, assetIndex, disposalIndex) =>
       userAnswers.get(TypeOfAssetBuyerPage(srn, assetIndex, disposalIndex)) match {
         case Some(IdentityType.Individual) =>
-          controllers.routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.otherassetsdisposal.routes.IndividualNameOfAssetBuyerController
+            .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
         case Some(IdentityType.UKCompany) =>
           controllers.routes.UnauthorisedController.onPageLoad()
         case Some(IdentityType.UKPartnership) =>
@@ -69,6 +70,13 @@ object OtherAssetsDisposalNavigator extends JourneyNavigator {
         case None =>
           controllers.routes.JourneyRecoveryController.onPageLoad()
       }
+
+    case IndividualNameOfAssetBuyerPage(srn, assetIndex, disposalIndex) =>
+      controllers.nonsipp.otherassetsdisposal.routes.AssetIndividualBuyerNiNumberController
+        .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+
+    case AssetIndividualBuyerNiNumberPage(srn, assetIndex, disposalIndex) =>
+      controllers.routes.UnauthorisedController.onPageLoad()
 
     case PartnershipBuyerNamePage(srn, assetIndex, disposalIndex) =>
       controllers.nonsipp.otherassetsdisposal.routes.PartnershipBuyerUtrController
