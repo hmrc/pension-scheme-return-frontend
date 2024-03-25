@@ -66,7 +66,8 @@ object OtherAssetsDisposalNavigator extends JourneyNavigator {
           controllers.nonsipp.otherassetsdisposal.routes.PartnershipBuyerNameController
             .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
         case Some(IdentityType.Other) =>
-          controllers.routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.otherassetsdisposal.routes.OtherBuyerDetailsController
+            .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
         case None =>
           controllers.routes.JourneyRecoveryController.onPageLoad()
       }
@@ -83,6 +84,14 @@ object OtherAssetsDisposalNavigator extends JourneyNavigator {
         .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
 
     case PartnershipBuyerUtrPage(srn, assetIndex, disposalIndex) =>
+      controllers.nonsipp.otherassetsdisposal.routes.IsBuyerConnectedPartyController
+        .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+
+    case OtherBuyerDetailsPage(srn, assetIndex, disposalIndex) =>
+      controllers.nonsipp.otherassetsdisposal.routes.IsBuyerConnectedPartyController
+        .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+
+    case IsBuyerConnectedPartyPage(srn, assetIndex, disposalIndex) =>
       controllers.routes.UnauthorisedController.onPageLoad()
 
   }
