@@ -175,8 +175,9 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
             disposalIndex,
             TypeOfAssetBuyerPage,
             Gen.const(IdentityType.UKCompany),
-            (srn, index: Max5000, disposalIndex: Max50, _) => controllers.nonsipp.otherassetsdisposal.routes.IndividualNameOfAssetBuyerController
-              .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+            (srn, index: Max5000, disposalIndex: Max50, _) =>
+              controllers.nonsipp.otherassetsdisposal.routes.CompanyNameOfAssetBuyerController
+                .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
           )
           .withName("go from type of asset buyer page to IndividualNameOfAssetBuyer page when UKCompany")
       )
