@@ -39,13 +39,11 @@ class IsBuyerConnectedPartyControllerSpec extends ControllerBaseSpec {
 
     val individualUserAnswers = defaultUserAnswers
       .unsafeSet(TypeOfAssetBuyerPage(srn, assetIndex, disposalIndex), IdentityType.Individual)
-      // TODO SET PAGE TO INDIVIDUAL BUYER NAME PAGE WHEN IMPLEMENTED
-      .unsafeSet(PartnershipBuyerNamePage(srn, assetIndex, disposalIndex), buyerName)
+      .unsafeSet(IndividualNameOfAssetBuyerPage(srn, assetIndex, disposalIndex), buyerName)
 
     val companyUserAnswers = defaultUserAnswers
       .unsafeSet(TypeOfAssetBuyerPage(srn, assetIndex, disposalIndex), IdentityType.UKCompany)
-      // TODO SET PAGE TO COMPANY BUYER NAME PAGE WHEN IMPLEMENTED
-      .unsafeSet(PartnershipBuyerNamePage(srn, assetIndex, disposalIndex), buyerName)
+      .unsafeSet(CompanyNameOfAssetBuyerPage(srn, assetIndex, disposalIndex), buyerName)
 
     val partnershipUserAnswers = defaultUserAnswers
       .unsafeSet(TypeOfAssetBuyerPage(srn, assetIndex, disposalIndex), IdentityType.UKPartnership)

@@ -175,9 +175,10 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
             disposalIndex,
             TypeOfAssetBuyerPage,
             Gen.const(IdentityType.UKCompany),
-            (srn, index: Max5000, disposalIndex: Max50, _) => controllers.routes.UnauthorisedController.onPageLoad()
+            (srn, index: Max5000, disposalIndex: Max50, _) => controllers.nonsipp.otherassetsdisposal.routes.IndividualNameOfAssetBuyerController
+              .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
           )
-          .withName("go from type of asset buyer page to Unauthorised page when UKCompany")
+          .withName("go from type of asset buyer page to IndividualNameOfAssetBuyer page when UKCompany")
       )
 
       act.like(
@@ -232,9 +233,10 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
             disposalIndex,
             AssetIndividualBuyerNiNumberPage,
             (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
-              controllers.routes.UnauthorisedController.onPageLoad()
+              controllers.nonsipp.otherassetsdisposal.routes.IsBuyerConnectedPartyController
+                .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
           )
-          .withName("go from AssetIndividualBuyerNiNumber to Unauthorised page")
+          .withName("go from AssetIndividualBuyerNiNumber to IsBuyerConnectedParty page")
       )
     }
 
@@ -280,6 +282,36 @@ class OtherAssetsDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours
                 .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
           )
           .withName("go from OtherBuyerDetailsPage to IsBuyerConnectedPartyPage")
+      )
+    }
+
+    "CompanyNameOfAssetBuyerPage" - {
+      act.like(
+        normalmode
+          .navigateToWithDoubleIndex(
+            assetIndex,
+            disposalIndex,
+            CompanyNameOfAssetBuyerPage,
+            (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
+              controllers.nonsipp.otherassetsdisposal.routes.AssetCompanyBuyerCrnController
+                .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+          )
+          .withName("go from CompanyNameOfAssetBuyerPage to AssetCompanyBuyerCrnController")
+      )
+    }
+
+    "AssetCompanyBuyerCrnPage" - {
+      act.like(
+        normalmode
+          .navigateToWithDoubleIndex(
+            assetIndex,
+            disposalIndex,
+            AssetCompanyBuyerCrnPage,
+            (srn, assetIndex: Max5000, disposalIndex: Max50, _) =>
+              controllers.nonsipp.otherassetsdisposal.routes.IsBuyerConnectedPartyController
+                .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+          )
+          .withName("go from AssetCompanyBuyerCrnPage to IsBuyerConnectedParty")
       )
     }
 

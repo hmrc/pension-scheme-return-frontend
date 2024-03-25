@@ -70,13 +70,11 @@ class IsBuyerConnectedPartyController @Inject()(
       buyerName <- buyerType match {
         case IdentityType.Individual =>
           request.userAnswers
-          // TODO SET PAGE TO INDIVIDUAL BUYER NAME PAGE WHEN IMPLEMENTED
-            .get(PartnershipBuyerNamePage(srn, assetIndex, disposalIndex))
+            .get(IndividualNameOfAssetBuyerPage(srn, assetIndex, disposalIndex))
             .getOrRecoverJourney
         case IdentityType.UKCompany =>
           request.userAnswers
-          // TODO SET PAGE TO COMPANY BUYER NAME PAGE WHEN IMPLEMENTED
-            .get(PartnershipBuyerNamePage(srn, assetIndex, disposalIndex))
+            .get(CompanyNameOfAssetBuyerPage(srn, assetIndex, disposalIndex))
             .getOrRecoverJourney
         case IdentityType.UKPartnership =>
           request.userAnswers
