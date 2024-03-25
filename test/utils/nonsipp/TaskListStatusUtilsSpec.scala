@@ -34,12 +34,13 @@ import pages.nonsipp.moneyborrowed.{LenderNamePage, LenderNamePages, MoneyBorrow
 import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
 import pages.nonsipp.shares.{DidSchemeHoldAnySharesPage, SharesCompleted, SharesJourneyStatus, TypeOfSharesHeldPage}
 import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
-import pages.nonsipp.bonds.UnregulatedOrConnectedBondsHeldPage
+import pages.nonsipp.bonds.{BondsCompleted, BondsJourneyStatus, NameOfBondsPage, UnregulatedOrConnectedBondsHeldPage}
 import utils.UserAnswersUtils.UserAnswersOps
 import viewmodels.models.{SectionCompleted, SectionStatus}
 import viewmodels.models.TaskListStatus.{Completed, InProgress, NotStarted, UnableToStart}
 
 class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValues with TestValues {
+
   "Loans status" - {
     "should be Not Started" - {
       "when default data" in {
@@ -281,6 +282,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
 
     }
   }
+
   "Borrowing status" - {
     val moneyBorrowedPageUrl =
       controllers.nonsipp.moneyborrowed.routes.MoneyBorrowedController.onPageLoad(srn, NormalMode).url
@@ -433,7 +435,7 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
         val result = TaskListStatusUtils.getSharesTaskListStatusAndLink(customUserAnswers, srn)
         result mustBe (InProgress, typeOfSharesHeldPageTwoUrl)
       }
-      "when DidSchemeHoldAnyShares is true and only second exist " in {
+      "when DidSchemeHoldAnyShares is true and only second exist" in {
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(DidSchemeHoldAnySharesPage(srn), true)
           // nothing for first share
@@ -467,10 +469,26 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
       }
     }
   }
+
   "Bonds status" - {
     val hadBondsPageUrl =
       controllers.nonsipp.bonds.routes.UnregulatedOrConnectedBondsHeldController
         .onPageLoad(srn, NormalMode)
+        .url
+
+    val bondsListPageUrl =
+      controllers.nonsipp.bonds.routes.BondsListController
+        .onPageLoad(srn, 1, NormalMode)
+        .url
+
+    val nameOfBondsUrlIndexOne =
+      controllers.nonsipp.bonds.routes.NameOfBondsController
+        .onPageLoad(srn, refineMV(1), NormalMode)
+        .url
+
+    val nameOfBondsUrlIndexTwo =
+      controllers.nonsipp.bonds.routes.NameOfBondsController
+        .onPageLoad(srn, refineMV(2), NormalMode)
         .url
 
     "should be Not Started" - {
@@ -479,12 +497,74 @@ class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValue
         result mustBe (NotStarted, hadBondsPageUrl)
       }
     }
+
     "should be Complete" - {
-      "when only DidSchemeHoldAnySharesPage false is present" in {
+      "when only UnregulatedOrConnectedBondsHeldPage false is present" in {
         val customUserAnswers = defaultUserAnswers
           .unsafeSet(UnregulatedOrConnectedBondsHeldPage(srn), false)
         val result = TaskListStatusUtils.getBondsTaskListStatusAndLink(customUserAnswers, srn)
         result mustBe (Completed, hadBondsPageUrl)
+      }
+      "when only UnregulatedOrConnectedBondsHeldPage true and status is completed" in {
+        val customUserAnswers = defaultUserAnswers
+          .unsafeSet(UnregulatedOrConnectedBondsHeldPage(srn), true)
+          .unsafeSet(BondsJourneyStatus(srn), SectionStatus.Completed)
+        val result = TaskListStatusUtils.getBondsTaskListStatusAndLink(customUserAnswers, srn)
+        result mustBe (Completed, bondsListPageUrl)
+      }
+    }
+
+    "should be InProgress" - {
+      "when only UnregulatedOrConnectedBondsHeldPage true" in {
+        val customUserAnswers = defaultUserAnswers
+          .unsafeSet(UnregulatedOrConnectedBondsHeldPage(srn), true)
+        val result = TaskListStatusUtils.getBondsTaskListStatusAndLink(customUserAnswers, srn)
+        result mustBe (InProgress, nameOfBondsUrlIndexOne)
+      }
+
+      "when only UnregulatedOrConnectedBondsHeldPage true and status is InProgress" in {
+        val customUserAnswers = defaultUserAnswers
+          .unsafeSet(UnregulatedOrConnectedBondsHeldPage(srn), true)
+          .unsafeSet(BondsJourneyStatus(srn), SectionStatus.InProgress)
+        val result = TaskListStatusUtils.getBondsTaskListStatusAndLink(customUserAnswers, srn)
+        result mustBe (InProgress, nameOfBondsUrlIndexOne)
+      }
+
+      "when only UnregulatedOrConnectedBondsHeldPage true and status is InProgress - first incomplete" in {
+        val customUserAnswers = defaultUserAnswers
+          .unsafeSet(UnregulatedOrConnectedBondsHeldPage(srn), true)
+          .unsafeSet(BondsJourneyStatus(srn), SectionStatus.InProgress)
+          // first bond:
+          .unsafeSet(NameOfBondsPage(srn, refineMV(1)), "NameOfFirstBond")
+          // second bond:
+          .unsafeSet(NameOfBondsPage(srn, refineMV(2)), "NameOfSecondBond")
+          .unsafeSet(BondsCompleted(srn, refineMV(2)), SectionCompleted)
+        val result = TaskListStatusUtils.getBondsTaskListStatusAndLink(customUserAnswers, srn)
+        result mustBe (InProgress, nameOfBondsUrlIndexOne)
+      }
+
+      "when only UnregulatedOrConnectedBondsHeldPage true and status is InProgress - second incomplete" in {
+        val customUserAnswers = defaultUserAnswers
+          .unsafeSet(UnregulatedOrConnectedBondsHeldPage(srn), true)
+          .unsafeSet(BondsJourneyStatus(srn), SectionStatus.InProgress)
+          // first bond:
+          .unsafeSet(NameOfBondsPage(srn, refineMV(1)), "NameOfFirstBond")
+          .unsafeSet(BondsCompleted(srn, refineMV(1)), SectionCompleted)
+          // second bond:
+          .unsafeSet(NameOfBondsPage(srn, refineMV(2)), "NameOfSecondBond")
+        val result = TaskListStatusUtils.getBondsTaskListStatusAndLink(customUserAnswers, srn)
+        result mustBe (InProgress, nameOfBondsUrlIndexTwo)
+      }
+
+      "when only UnregulatedOrConnectedBondsHeldPage true and only second exist" in {
+        val customUserAnswers = defaultUserAnswers
+          .unsafeSet(UnregulatedOrConnectedBondsHeldPage(srn), true)
+          .unsafeSet(BondsJourneyStatus(srn), SectionStatus.InProgress)
+          // nothing for the first bond:
+          // second bond:
+          .unsafeSet(NameOfBondsPage(srn, refineMV(2)), "NameOfSecondBond")
+        val result = TaskListStatusUtils.getBondsTaskListStatusAndLink(customUserAnswers, srn)
+        result mustBe (InProgress, nameOfBondsUrlIndexTwo)
       }
     }
   }
