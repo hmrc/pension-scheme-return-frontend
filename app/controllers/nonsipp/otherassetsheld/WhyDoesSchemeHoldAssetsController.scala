@@ -21,11 +21,12 @@ import controllers.PSRController
 import controllers.actions._
 import controllers.nonsipp.otherassetsheld.WhyDoesSchemeHoldAssetsController._
 import forms.RadioListFormProvider
+import models.PointOfEntry._
 import models.SchemeHoldAsset._
 import models.SchemeId.Srn
-import models.{Mode, SchemeHoldAsset}
+import models.{Mode, NormalMode, SchemeHoldAsset}
 import navigation.Navigator
-import pages.nonsipp.otherassetsheld.WhyDoesSchemeHoldAssetsPage
+import pages.nonsipp.otherassetsheld.{OtherAssetsCYAPointOfEntry, WhyDoesSchemeHoldAssetsPage}
 import play.api.data.Form
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -60,7 +61,6 @@ class WhyDoesSchemeHoldAssetsController @Inject()(
           viewModel(srn, index, request.schemeDetails.schemeName, mode)
         )
       )
-
     }
 
   def onSubmit(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] =
@@ -79,18 +79,55 @@ class WhyDoesSchemeHoldAssetsController @Inject()(
                 )
               ),
           answer => {
-            for {
-              updatedAnswers <- Future.fromTry(
-                request.userAnswers.set(WhyDoesSchemeHoldAssetsPage(srn, index), answer)
+            // If in NormalMode, save answers as usual
+            if (mode == NormalMode) {
+              for {
+                updatedAnswers <- Future.fromTry(
+                  request.userAnswers.set(WhyDoesSchemeHoldAssetsPage(srn, index), answer)
+                )
+                _ <- saveService.save(updatedAnswers)
+              } yield Redirect(
+                navigator.nextPage(
+                  WhyDoesSchemeHoldAssetsPage(srn, index),
+                  mode,
+                  updatedAnswers
+                )
               )
-              _ <- saveService.save(updatedAnswers)
-            } yield Redirect(
-              navigator.nextPage(
-                WhyDoesSchemeHoldAssetsPage(srn, index),
-                mode,
-                updatedAnswers
-              )
-            )
+            } else {
+              // In CheckMode, before saving answers, set PointOfEntry based on the previous answer and new answer
+              val previousAnswer = request.userAnswers.get(WhyDoesSchemeHoldAssetsPage(srn, index))
+
+              val pointOfEntry = (previousAnswer, answer) match {
+                case (Some(Acquisition), Contribution) => Some(AssetAcquisitionToContributionPointOfEntry)
+                case (Some(Acquisition), Transfer) => Some(AssetAcquisitionToTransferPointOfEntry)
+                case (Some(Contribution), Acquisition) => Some(AssetContributionToAcquisitionPointOfEntry)
+                case (Some(Contribution), Transfer) => Some(AssetContributionToTransferPointOfEntry)
+                case (Some(Transfer), Acquisition) => Some(AssetTransferToAcquisitionPointOfEntry)
+                case (Some(Transfer), Contribution) => Some(AssetTransferToContributionPointOfEntry)
+                // If answer is unchanged, use NoPointOfEntry to redirect to CYA
+                case (Some(_), _) => Some(NoPointOfEntry)
+                case _ => None
+              }
+
+              pointOfEntry match {
+                case None => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+                case Some(updatedPointOfEntry) =>
+                  for {
+                    updatedAnswers <- Future.fromTry(
+                      request.userAnswers
+                        .set(WhyDoesSchemeHoldAssetsPage(srn, index), answer)
+                        .set(OtherAssetsCYAPointOfEntry(srn, index), updatedPointOfEntry)
+                    )
+                    _ <- saveService.save(updatedAnswers)
+                  } yield Redirect(
+                    navigator.nextPage(
+                      WhyDoesSchemeHoldAssetsPage(srn, index),
+                      mode,
+                      updatedAnswers
+                    )
+                  )
+              }
+            }
           }
         )
     }

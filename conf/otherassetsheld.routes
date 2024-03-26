@@ -70,6 +70,11 @@ POST        /:srn/asset-total-income/:index                                     
 GET         /:srn/change-asset-total-income/:index                                      controllers.nonsipp.otherassetsheld.IncomeFromAssetController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 POST        /:srn/change-asset-total-income/:index                                      controllers.nonsipp.otherassetsheld.IncomeFromAssetController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
 
+GET         /:srn/check-answers-other-assets/:index                                     controllers.nonsipp.otherassetsheld.OtherAssetsCYAController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+POST        /:srn/check-answers-other-assets/:index                                     controllers.nonsipp.otherassetsheld.OtherAssetsCYAController.onSubmit(srn: Srn, index: Max5000, mode: Mode = NormalMode)
+GET         /:srn/change-asset/:index                                                   controllers.nonsipp.otherassetsheld.OtherAssetsCYAController.onPageLoad(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+POST        /:srn/change-asset/:index                                                   controllers.nonsipp.otherassetsheld.OtherAssetsCYAController.onSubmit(srn: Srn, index: Max5000, mode: Mode = CheckMode)
+
 GET         /:srn/other-assets-list/:page                                               controllers.nonsipp.otherassetsheld.OtherAssetsListController.onPageLoad(srn: Srn, page: Int, mode: Mode = NormalMode)
 POST        /:srn/other-assets-list/:page                                               controllers.nonsipp.otherassetsheld.OtherAssetsListController.onSubmit(srn: Srn, page: Int, mode: Mode = NormalMode)
 GET         /:srn/change-other-assets-list/:page                                        controllers.nonsipp.otherassetsheld.OtherAssetsListController.onPageLoad(srn: Srn, page: Int, mode: Mode = CheckMode)

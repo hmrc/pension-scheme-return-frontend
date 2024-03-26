@@ -154,11 +154,9 @@ object OtherAssetsListController {
           TableElem(
             LinkMessage(
               Message("site.change"),
-              // TODO Add in nav to CYA
-              /*controllers.nonsipp.otherassetsheld.routes.OtherAssetsHeldCYAController
+              controllers.nonsipp.otherassetsheld.routes.OtherAssetsCYAController
                 .onPageLoad(srn, index, CheckMode)
-                .url*/
-              controllers.routes.UnauthorisedController.onPageLoad().url
+                .url
             )
           ),
           TableElem(

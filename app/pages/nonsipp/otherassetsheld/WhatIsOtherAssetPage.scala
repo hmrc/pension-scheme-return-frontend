@@ -18,14 +18,8 @@ package pages.nonsipp.otherassetsheld
 
 import config.Refined.Max5000
 import models.SchemeId.Srn
-import models.{IdentitySubject, UserAnswers}
+import models.UserAnswers
 import pages.QuestionPage
-import pages.nonsipp.common.{
-  CompanyRecipientCrnPage,
-  IdentityTypePage,
-  OtherRecipientDetailsPage,
-  PartnershipRecipientUtrPage
-}
 import play.api.libs.json.JsPath
 import queries.Removable
 import utils.PageUtils.removePages
@@ -53,22 +47,12 @@ case class WhatIsOtherAssetPage(srn: Srn, index: Max5000) extends QuestionPage[S
 
   private def pages(srn: Srn, index: Max5000, isLastRecord: Boolean): List[Removable[_]] = {
     val list = List(
-      OtherAssetsCompleted(srn, index),
-      IncomeFromAssetPage(srn, index),
-      IndependentValuationPage(srn, index),
+      IsAssetTangibleMoveablePropertyPage(srn, index),
+      WhyDoesSchemeHoldAssetsPage(srn, index), // This triggers cleanup of any other dependent pages in the journey
       CostOfOtherAssetPage(srn, index),
-      OtherAssetSellerConnectedPartyPage(srn, index),
-      PartnershipRecipientUtrPage(srn, index, IdentitySubject.OtherAssetSeller),
-      CompanyRecipientCrnPage(srn, index, IdentitySubject.OtherAssetSeller),
-      OtherAssetIndividualSellerNINumberPage(srn, index),
-      OtherRecipientDetailsPage(srn, index, IdentitySubject.OtherAssetSeller),
-      PartnershipOtherAssetSellerNamePage(srn, index),
-      CompanyNameOfOtherAssetSellerPage(srn, index),
-      IndividualNameOfOtherAssetSellerPage(srn, index),
-      IdentityTypePage(srn, index, IdentitySubject.OtherAssetSeller),
-      WhenDidSchemeAcquireAssetsPage(srn, index),
-      WhyDoesSchemeHoldAssetsPage(srn, index),
-      IsAssetTangibleMoveablePropertyPage(srn, index)
+      IncomeFromAssetPage(srn, index),
+      OtherAssetsCYAPointOfEntry(srn, index),
+      OtherAssetsCompleted(srn, index)
     )
     if (isLastRecord) list :+ OtherAssetsHeldPage(srn) else list
   }
