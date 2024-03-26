@@ -61,7 +61,8 @@ object OtherAssetsDisposalNavigator extends JourneyNavigator {
           controllers.nonsipp.otherassetsdisposal.routes.IndividualNameOfAssetBuyerController
             .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
         case Some(IdentityType.UKCompany) =>
-          controllers.routes.UnauthorisedController.onPageLoad()
+          controllers.nonsipp.otherassetsdisposal.routes.CompanyNameOfAssetBuyerController
+            .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
         case Some(IdentityType.UKPartnership) =>
           controllers.nonsipp.otherassetsdisposal.routes.PartnershipBuyerNameController
             .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
@@ -77,7 +78,8 @@ object OtherAssetsDisposalNavigator extends JourneyNavigator {
         .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
 
     case AssetIndividualBuyerNiNumberPage(srn, assetIndex, disposalIndex) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+      controllers.nonsipp.otherassetsdisposal.routes.IsBuyerConnectedPartyController
+        .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
 
     case PartnershipBuyerNamePage(srn, assetIndex, disposalIndex) =>
       controllers.nonsipp.otherassetsdisposal.routes.PartnershipBuyerUtrController
@@ -88,6 +90,14 @@ object OtherAssetsDisposalNavigator extends JourneyNavigator {
         .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
 
     case OtherBuyerDetailsPage(srn, assetIndex, disposalIndex) =>
+      controllers.nonsipp.otherassetsdisposal.routes.IsBuyerConnectedPartyController
+        .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+
+    case CompanyNameOfAssetBuyerPage(srn, assetIndex, disposalIndex) =>
+      controllers.nonsipp.otherassetsdisposal.routes.AssetCompanyBuyerCrnController
+        .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
+
+    case AssetCompanyBuyerCrnPage(srn, assetIndex, disposalIndex) =>
       controllers.nonsipp.otherassetsdisposal.routes.IsBuyerConnectedPartyController
         .onPageLoad(srn, assetIndex, disposalIndex, NormalMode)
 
