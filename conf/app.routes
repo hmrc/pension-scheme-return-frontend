@@ -38,7 +38,7 @@ GET         /unauthorised                                                       
 
 GET         /:srn/what-you-will-need/:fbNumber                                          controllers.WhatYouWillNeedController.onPageLoad(srn: Srn, fbNumber: String, taxYear: String = "", version: String = "")
 GET         /:srn/what-you-will-need/:taxYear/:version                                  controllers.WhatYouWillNeedController.onPageLoad(srn: Srn, fbNumber: String = "", taxYear: String, version: String)
-GET         /:srn/what-you-will-need                                                    controllers.WhatYouWillNeedController.onPageLoad(srn: Srn, fbNumber: String = "", taxYear: String = "2022-04-06", version: String = "001")
+GET         /:srn/what-you-will-need                                                    controllers.WhatYouWillNeedController.onPageLoad(srn: Srn, fbNumber: String = "", taxYear: String = "2021-04-06", version: String = "3")
 GET         /:srn/what-you-will-need-next-page                                          controllers.WhatYouWillNeedController.onSubmit(srn: Srn, taxYear: String, fbNumber: String,  version: String)
 
 GET         /:srn/which-tax-year                                                        controllers.nonsipp.WhichTaxYearController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
@@ -212,6 +212,7 @@ GET         /:srn/change-file-upload-success                                    
 GET         /:srn/submit-change-file-upload-success                                     controllers.nonsipp.memberdetails.upload.FileUploadSuccessController.onSubmit(srn: Srn, mode: Mode = CheckMode)
 
 GET         /:srn/pension-scheme-return-task-list                                       controllers.nonsipp.TaskListController.onPageLoad(srn: Srn)
+GET         /:srn/pension-scheme-return-task-list-view/:year/:current/:previous         controllers.nonsipp.TaskListViewController.onPageLoad(srn: Srn, year: String, current: Int, previous: Int)
 
 GET         /:srn/file-upload-error-missing-information                                 controllers.nonsipp.memberdetails.upload.FileUploadErrorMissingInformationController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
 GET         /:srn/submit-file-upload-error-missing-information                          controllers.nonsipp.memberdetails.upload.FileUploadErrorMissingInformationController.onSubmit(srn: Srn, mode: Mode = NormalMode)

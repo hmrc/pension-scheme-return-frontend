@@ -56,32 +56,40 @@ class ReturnHistoryController @Inject()(
         .getVersionsForYears(request.schemeDetails.pstr, allDates.toList.map(dates => dates._2.from.toString))
       response.map { years =>
         val seqRetHistorySummary = years.flatMap { year =>
-          year.data.map { v =>
-            def changeOrViewLink = {
-              val recentSubmittedVersion = year.data.length
-              if (v.reportVersion == recentSubmittedVersion) "site.viewOrChange" else "site.view"
-              "site.viewOrChange" //TODO
-            }
-
+          val reportVersions = year.data.map(_.reportVersion)
+          year.data.map { psrVersion =>
+            val maxReportVersion = reportVersions.max
             ReturnHistorySummary(
               key = year.startDate,
-              firstValue = v.reportVersion.toString,
-              secondValue = v.reportFormBundleNumber,
-              thirdValue = v.reportStatus.toString.capitalize,
+              firstValue = psrVersion.reportVersion.toString,
+              secondValue = psrVersion.reportFormBundleNumber,
+              thirdValue = psrVersion.reportStatus.toString.capitalize,
               fourthValue = "", // TODO
               actions = Some(
                 Actions(
                   items = Seq(
-                    ActionItem(
-                      content = Text("Change"), // TODO
-                      href = controllers.routes.ReturnHistoryController.onSelect(srn, v.reportFormBundleNumber).url
-                    )
+                    if (psrVersion.reportVersion == maxReportVersion) {
+                      ActionItem(
+                        content = Text("Change"), // TODO
+                        href = controllers.routes.ReturnHistoryController
+                          .onSelect(srn, psrVersion.reportFormBundleNumber)
+                          .url
+                      )
+                    } else {
+                      ActionItem(
+                        content = Text("View"), // TODO
+                        href = controllers.nonsipp.routes.TaskListViewController
+                          .onPageLoad(srn, year.startDate, psrVersion.reportVersion, psrVersion.reportVersion - 1)
+                          .url
+                      )
+                    }
                   )
                 )
               )
             )
           }
         }
+
         val schemeName = request.schemeDetails.schemeName
         val taxYearRange = (currentTaxYear.toString, (currentTaxYear + 1).toString)
         Ok(view(seqRetHistorySummary, taxYearRange._1, taxYearRange._2, schemeName))

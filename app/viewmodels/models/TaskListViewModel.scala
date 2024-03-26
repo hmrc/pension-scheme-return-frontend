@@ -71,4 +71,6 @@ object TaskListStatus {
   case object InProgress extends TaskListStatus("tasklist.inProgress")
 
   case object Completed extends TaskListStatus("tasklist.completed")
+
+  case object Updated extends TaskListStatus("tasklist.updated")
 }
