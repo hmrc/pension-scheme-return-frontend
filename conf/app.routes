@@ -38,7 +38,7 @@ GET         /unauthorised                                                       
 
 GET         /:srn/what-you-will-need/:fbNumber                                          controllers.WhatYouWillNeedController.onPageLoad(srn: Srn, fbNumber: String, taxYear: String = "", version: String = "")
 GET         /:srn/what-you-will-need/:taxYear/:version                                  controllers.WhatYouWillNeedController.onPageLoad(srn: Srn, fbNumber: String = "", taxYear: String, version: String)
-GET         /:srn/what-you-will-need                                                    controllers.WhatYouWillNeedController.onPageLoad(srn: Srn, fbNumber: String = "", taxYear: String = "2021-04-06", version: String = "3")
+GET         /:srn/what-you-will-need                                                    controllers.WhatYouWillNeedController.onPageLoad(srn: Srn, fbNumber: String = "", taxYear: String = "2022-04-06", version: String = "001")
 GET         /:srn/what-you-will-need-next-page                                          controllers.WhatYouWillNeedController.onSubmit(srn: Srn, taxYear: String, fbNumber: String,  version: String)
 
 GET         /:srn/which-tax-year                                                        controllers.nonsipp.WhichTaxYearController.onPageLoad(srn: Srn, mode: Mode = NormalMode)
