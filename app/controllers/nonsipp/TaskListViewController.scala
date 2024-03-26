@@ -62,9 +62,9 @@ class TaskListViewController @Inject()(
   def onPageLoad(srn: Srn, year: String, current: Int, previous: Int): Action[AnyContent] =
     identify.andThen(allowAccess(srn)).andThen(getData).andThen(createData).async { implicit request =>
       for {
-        currentReturn <- psrRetrievalService.getStandardPsrDetails(None, Some(year), Some(current.toString))
+        currentReturn <- psrRetrievalService.getStandardPsrDetails(None, Some(year), Some("%03d".format(current)))
         _ <- saveService.save(currentReturn)
-        previousReturn <- psrRetrievalService.getStandardPsrDetails(None, Some(year), Some(previous.toString))
+        previousReturn <- psrRetrievalService.getStandardPsrDetails(None, Some(year), Some("%03d".format(previous)))
         viewModel = TaskListViewController.viewModel(
           srn,
           request.schemeDetails.schemeName,
