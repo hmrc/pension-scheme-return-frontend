@@ -56,28 +56,30 @@ class ReturnHistoryController @Inject()(
         .getVersionsForYears(request.schemeDetails.pstr, allDates.toList.map(dates => dates._2.from.toString))
       response.map { years =>
         val seqRetHistorySummary = years.flatMap { year =>
-          val maxVersionForYear = year.data.map(_.reportVersion)
-          year.data.map { v =>
-            def change = (v.reportVersion == maxVersionForYear.max)
+          val reportVersions = year.data.map(_.reportVersion)
+          year.data.map { psrVersion =>
+            val maxReportVersion = reportVersions.max
             ReturnHistorySummary(
               key = year.startDate,
-              firstValue = v.reportVersion.toString,
-              secondValue = v.reportFormBundleNumber,
-              thirdValue = v.reportStatus.toString.capitalize,
+              firstValue = psrVersion.reportVersion.toString,
+              secondValue = psrVersion.reportFormBundleNumber,
+              thirdValue = psrVersion.reportStatus.toString.capitalize,
               fourthValue = "", // TODO
               actions = Some(
                 Actions(
                   items = Seq(
-                    if (change) {
+                    if (psrVersion.reportVersion == maxReportVersion) {
                       ActionItem(
                         content = Text("Change"), // TODO
-                        href = controllers.routes.ReturnHistoryController.onSelect(srn, v.reportFormBundleNumber).url
+                        href = controllers.routes.ReturnHistoryController
+                          .onSelect(srn, psrVersion.reportFormBundleNumber)
+                          .url
                       )
                     } else {
                       ActionItem(
                         content = Text("View"), // TODO
                         href = controllers.nonsipp.routes.TaskListViewController
-                          .onPageLoad(srn, year.startDate, v.reportVersion, v.reportVersion - 1)
+                          .onPageLoad(srn, year.startDate, psrVersion.reportVersion, psrVersion.reportVersion - 1)
                           .url
                       )
                     }

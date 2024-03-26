@@ -15,35 +15,33 @@
  *@
 
 @import cats.data.NonEmptyList
-@import viewmodels.models.TaskListStatus
-@import viewmodels.models.TaskListStatus.UnableToStart
-@import viewmodels.models.TaskListStatus.Updated
+@import viewmodels.models.TaskListStatus.{UnableToStart, Updated}
 
 @this()
 
-@(viewmodel: NonEmptyList[TaskListItemViewModel], index: Int)(implicit messages: Messages)
+@(viewModel: NonEmptyList[TaskListItemViewModel], index: Int)(implicit messages: Messages)
 
-@viewmodel.toList.zipWithIndex.map { case (item, itemIndex) =>
-  @defining(s"task-list-item-$index-$itemIndex") { id =>
-    <li class="app-task-list__item">
-      <span class="app-task-list__task-name">
-        @{
-          item.status match {
-            case UnableToStart => renderMessage(item.link.content)
-            case _ => renderMessage(item.link.withAttr("aria-describedby", id))
-          }
-        }
-      </span>
-        @if(item.status==Updated) {
-          <span class="hmrc-status-tag govuk-tag--green" id="@id">
-            @renderMessage(item.status.description)
-          </span>
-        } else {
-          <span class="hmrc-status-tag" id="@id">
-            @renderMessage(item.status.description)
-          </span>
-        }
-    </li>
-  }
+@viewModel.toList.zipWithIndex.map { case (item, itemIndex) =>
+    @defining(s"task-list-item-$index-$itemIndex") { id =>
+        <li class="app-task-list__item">
+            <span class="app-task-list__task-name">
+                @{
+                    item.status match {
+                        case UnableToStart => renderMessage(item.link.content)
+                        case _ => renderMessage(item.link.withAttr("aria-describedby", id))
+                    }
+                }
+            </span>
+            @if(item.status == Updated) {
+                <span class="hmrc-status-tag govuk-tag--green" id="@id">
+                @renderMessage(item.status.description)
+                </span>
+            } else {
+                <span class="hmrc-status-tag" id="@id">
+                @renderMessage(item.status.description)
+                </span>
+            }
+        </li>
+    }
 }
 

@@ -31,7 +31,7 @@ import pages.nonsipp.receivetransfer.TransfersInJourneyStatus
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.{PsrRetrievalService, SaveService, SchemeDateService}
+import services.{PsrRetrievalService, SaveService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.DateTimeUtils.localDateShow
 import utils.nonsipp.TaskListStatusUtils
@@ -148,7 +148,7 @@ object TaskListViewController {
     schemeName: String,
     currentUA: UserAnswers,
     previousUA: UserAnswers
-  ) = {
+  ): TaskListSectionViewModel = {
     val prefix = "nonsipp.tasklist.schemedetails"
     TaskListSectionViewModel(
       s"$prefix.title",
@@ -163,7 +163,7 @@ object TaskListViewController {
     prefix: String,
     currentUA: UserAnswers,
     previousUA: UserAnswers
-  ) = {
+  ): TaskListItemViewModel = {
 
     val accountingPeriodsSame = currentUA.get(JsPath \ "accountingPeriods") == previousUA.get(
       JsPath \ "accountingPeriods"
@@ -215,7 +215,7 @@ object TaskListViewController {
     prefix: String,
     currentUA: UserAnswers,
     previousUA: UserAnswers
-  ) = {
+  ): TaskListItemViewModel = {
 
     val taskListStatus =
       if (currentUA.get(JsPath \ "schemeDesignatory" \ "totalAssetValue") == previousUA
@@ -529,7 +529,7 @@ object TaskListViewController {
     )
   }
 
-  private def landOrPropertySection(srn: Srn, userAnswers: UserAnswers) = {
+  private def landOrPropertySection(srn: Srn, userAnswers: UserAnswers): TaskListSectionViewModel = {
     // TODO
     val prefix = "nonsipp.tasklist.landorproperty"
 
@@ -556,7 +556,7 @@ object TaskListViewController {
     )
   }
 
-  private def bondsSection(srn: Srn, userAnswers: UserAnswers) = {
+  private def bondsSection(srn: Srn, userAnswers: UserAnswers): TaskListSectionViewModel = {
     // TODO[
     val prefix = "nonsipp.tasklist.bonds"
     val statusAndLink = getBondsTaskListStatusAndLink(userAnswers, srn)
@@ -580,7 +580,7 @@ object TaskListViewController {
     )
   }
 
-  private def otherAssetsSection(srn: Srn, userAnswers: UserAnswers) = {
+  private def otherAssetsSection(srn: Srn, userAnswers: UserAnswers): TaskListSectionViewModel = {
     // TODO
     val prefix = "nonsipp.tasklist.otherassets"
     val statusAndLink = getOtherAssetsTaskListStatusAndLink(userAnswers, srn)
