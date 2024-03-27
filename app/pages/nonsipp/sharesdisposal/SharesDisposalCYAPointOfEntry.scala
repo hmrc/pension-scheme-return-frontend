@@ -16,13 +16,13 @@
 
 package pages.nonsipp.sharesdisposal
 
-import config.Refined.{Max50, Max5000}
-import models.PointOfEntry
-import models.SchemeId.Srn
-import pages.QuestionPage
-import pages.nonsipp.sharesdisposal.Paths.disposedSharesTransaction
-import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
+import models.SchemeId.Srn
+import play.api.libs.json.JsPath
+import models.PointOfEntry
+import pages.nonsipp.sharesdisposal.Paths.disposedSharesTransaction
+import config.Refined.{Max50, Max5000}
+import pages.QuestionPage
 
 case class SharesDisposalCYAPointOfEntry(srn: Srn, shareIndex: Max5000, disposalIndex: Max50)
     extends QuestionPage[PointOfEntry] {

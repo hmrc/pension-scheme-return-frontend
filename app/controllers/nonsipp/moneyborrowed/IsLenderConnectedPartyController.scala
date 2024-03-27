@@ -16,29 +16,30 @@
 
 package controllers.nonsipp.moneyborrowed
 
-import config.FrontendAppConfig
-import config.Refined.Max5000
-import controllers.actions._
+import services.SaveService
+import viewmodels.implicits._
+import utils.FormUtils.FormOps
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import controllers.nonsipp.moneyborrowed.IsLenderConnectedPartyController.viewModel
+import config.Refined.Max5000
+import config.FrontendAppConfig
+import controllers.actions._
+import navigation.Navigator
 import forms.YesNoPageFormProvider
 import models.Mode
-import models.SchemeId.Srn
-import navigation.Navigator
-import pages.nonsipp.moneyborrowed.{IsLenderConnectedPartyPage, LenderNamePage}
 import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.FormUtils.FormOps
-import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
-import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, FurtherDetailsViewModel, YesNoPageViewModel}
 import views.html.YesNoPageView
+import models.SchemeId.Srn
+import play.api.i18n.{I18nSupport, MessagesApi}
+import pages.nonsipp.moneyborrowed.{IsLenderConnectedPartyPage, LenderNamePage}
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
+import viewmodels.models.{FormPageViewModel, FurtherDetailsViewModel, YesNoPageViewModel}
+
+import scala.concurrent.{ExecutionContext, Future}
+import scala.Option
 
 import javax.inject.{Inject, Named}
-import scala.Option
-import scala.concurrent.{ExecutionContext, Future}
 
 class IsLenderConnectedPartyController @Inject()(
   override val messagesApi: MessagesApi,

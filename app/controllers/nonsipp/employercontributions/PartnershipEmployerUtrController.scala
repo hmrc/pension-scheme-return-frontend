@@ -16,30 +16,30 @@
 
 package controllers.nonsipp.employercontributions
 
-import cats.implicits.catsSyntaxApplicativeId
-import config.Refined.{Max300, Max50}
-import controllers.actions.IdentifyAndRequireData
-import controllers.nonsipp.employercontributions.PartnershipEmployerUtrController._
-import forms.YesNoPageFormProvider
-import forms.mappings.Mappings
-import forms.mappings.errors.InputFormErrors
-import models.SchemeId.Srn
-import models.{ConditionalYesNo, Mode, Utr}
-import navigation.Navigator
-import pages.nonsipp.employercontributions.{EmployerContributionsProgress, EmployerNamePage, PartnershipEmployerUtrPage}
-import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
+import viewmodels.implicits._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import forms.mappings.Mappings
+import config.Refined.{Max300, Max50}
+import controllers.nonsipp.employercontributions.PartnershipEmployerUtrController._
+import controllers.actions.IdentifyAndRequireData
+import navigation.Navigator
+import forms.YesNoPageFormProvider
+import models.{ConditionalYesNo, Mode, Utr}
+import play.api.data.Form
+import forms.mappings.errors.InputFormErrors
+import pages.nonsipp.employercontributions.{EmployerNamePage, PartnershipEmployerUtrPage}
 import services.SaveService
+import views.html.ConditionalYesNoPageView
+import models.SchemeId.Srn
+import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
 import viewmodels.models._
-import views.html.ConditionalYesNoPageView
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class PartnershipEmployerUtrController @Inject()(
   override val messagesApi: MessagesApi,

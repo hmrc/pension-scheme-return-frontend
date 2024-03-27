@@ -16,26 +16,27 @@
 
 package controllers.nonsipp.landorproperty
 
+import services.SaveService
+import viewmodels.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Refined.Max5000
 import controllers.PSRController
-import controllers.actions._
-import controllers.nonsipp.landorproperty.WhyDoesSchemeHoldLandPropertyController._
-import forms.RadioListFormProvider
-import models.SchemeId.Srn
-import models.{Mode, SchemeHoldLandProperty}
-import navigation.Navigator
 import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, WhyDoesSchemeHoldLandPropertyPage}
-import play.api.data.Form
+import controllers.nonsipp.landorproperty.WhyDoesSchemeHoldLandPropertyController._
+import controllers.actions._
+import navigation.Navigator
+import forms.RadioListFormProvider
+import models.{Mode, SchemeHoldLandProperty}
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
-import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
-import viewmodels.models._
+import play.api.data.Form
 import views.html.RadioListView
+import models.SchemeId.Srn
+import viewmodels.DisplayMessage.Message
+import viewmodels.models._
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class WhyDoesSchemeHoldLandPropertyController @Inject()(
   override val messagesApi: MessagesApi,
@@ -48,7 +49,7 @@ class WhyDoesSchemeHoldLandPropertyController @Inject()(
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
-  val form = WhyDoesSchemeHoldLandPropertyController.form(formProvider)
+  val form: Form[SchemeHoldLandProperty] = WhyDoesSchemeHoldLandPropertyController.form(formProvider)
 
   def onPageLoad(srn: Srn, index: Max5000, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>

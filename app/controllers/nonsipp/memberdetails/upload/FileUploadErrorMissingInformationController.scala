@@ -16,19 +16,19 @@
 
 package controllers.nonsipp.memberdetails.upload
 
+import viewmodels.implicits._
+import play.api.mvc._
+import pages.FileUploadErrorMissingInformationPage
 import controllers.actions._
+import navigation.Navigator
 import controllers.nonsipp.memberdetails.upload.FileUploadErrorMissingInformationController._
 import models.Mode
+import views.html.ContentPageView
 import models.SchemeId.Srn
-import navigation.Navigator
-import pages.FileUploadErrorMissingInformationPage
 import play.api.i18n._
-import play.api.mvc._
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage._
-import viewmodels.implicits._
 import viewmodels.models.{ContentPageViewModel, FormPageViewModel}
-import views.html.ContentPageView
 
 import javax.inject.{Inject, Named}
 

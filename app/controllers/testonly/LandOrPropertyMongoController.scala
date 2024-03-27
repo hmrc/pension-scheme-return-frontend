@@ -16,18 +16,19 @@
 
 package controllers.testonly
 
+import services.SaveService
+import play.api.mvc.MessagesControllerComponents
 import config.Refined.Max5000
+import models.SchemeId.Srn
+import pages.nonsipp.landorproperty._
+import models._
+import shapeless._
 import controllers.actions.IdentifyAndRequireData
 import eu.timepit.refined._
-import models.SchemeId.Srn
-import models.{Address, ConditionalYesNo, ManualAddress, Money, SchemeHoldLandProperty}
-import pages.nonsipp.landorproperty._
-import play.api.mvc.MessagesControllerComponents
-import services.SaveService
-import shapeless._
+
+import scala.concurrent.ExecutionContext
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
 
 class LandOrPropertyMongoController @Inject()(
   val saveService: SaveService,

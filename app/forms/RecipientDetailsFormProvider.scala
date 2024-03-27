@@ -16,11 +16,11 @@
 
 package forms
 
-import config.Constants.{maxOtherDescriptionLength, textAreaRegex}
 import forms.mappings.Mappings
+import play.api.data.Forms._
+import config.Constants.{maxOtherDescriptionLength, textAreaRegex}
 import models.RecipientDetails
 import play.api.data.Form
-import play.api.data.Forms._
 
 import javax.inject.Inject
 

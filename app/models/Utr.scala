@@ -15,8 +15,8 @@
  */
 
 package models
+import uk.gov.hmrc.domain._
 import play.api.libs.json.{Reads, Writes}
-import uk.gov.hmrc.domain.{SimpleName, SimpleObjectReads, SimpleObjectWrites, TaxIdentifier}
 
 case class Utr(utr: String) extends TaxIdentifier with SimpleName {
 
@@ -35,6 +35,6 @@ object Utr extends (String => Utr) {
 
   private val validUtrFormat = """^\d{5}\s*?\d{5}"""
 
-  def isValid(utr: String) = utr != null && utr.matches(validUtrFormat)
+  def isValid(utr: String): Boolean = utr != null && utr.matches(validUtrFormat)
 
 }

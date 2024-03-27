@@ -16,26 +16,27 @@
 
 package controllers.nonsipp.sharesdisposal
 
-import controllers.actions.IdentifyAndRequireData
+import services.{PsrSubmissionService, SaveService}
+import viewmodels.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import controllers.nonsipp.sharesdisposal.SharesDisposalController._
+import controllers.actions.IdentifyAndRequireData
+import pages.nonsipp.sharesdisposal.SharesDisposalPage
+import navigation.Navigator
 import forms.YesNoPageFormProvider
 import models.Mode
+import views.html.YesNoPageView
 import models.SchemeId.Srn
-import models.requests.DataRequest
-import navigation.Navigator
-import pages.nonsipp.sharesdisposal.SharesDisposalPage
-import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.{PsrSubmissionService, SaveService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
-import views.html.YesNoPageView
+import models.requests.DataRequest
+import play.api.data.Form
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class SharesDisposalController @Inject()(
   override val messagesApi: MessagesApi,

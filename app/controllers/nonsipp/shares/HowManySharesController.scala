@@ -16,30 +16,31 @@
 
 package controllers.nonsipp.shares
 
-import config.Constants.{maxShares, minShares}
-import config.Refined.Max5000
-import controllers.PSRController
-import controllers.actions._
-import controllers.nonsipp.shares.HowManySharesController._
-import forms.IntFormProvider
-import forms.mappings.errors.IntFormErrors
-import models.Mode
-import models.SchemeId.Srn
-import navigation.Navigator
-import pages.nonsipp.shares.{CompanyNameRelatedSharesPage, HowManySharesPage}
-import play.api.data.Form
-import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
 import utils.FormUtils._
-import viewmodels.DisplayMessage.{Empty, Message}
-import viewmodels.InputWidth
+import controllers.PSRController
+import controllers.actions._
+import navigation.Navigator
+import forms.IntFormProvider
+import models.Mode
+import play.api.data.Form
+import forms.mappings.errors.IntFormErrors
+import pages.nonsipp.shares.{CompanyNameRelatedSharesPage, HowManySharesPage}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import config.Refined.Max5000
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
-import viewmodels.models.{FormPageViewModel, QuestionField}
 import views.html.IntView
+import models.SchemeId.Srn
+import controllers.nonsipp.shares.HowManySharesController._
+import config.Constants.{maxShares, minShares}
+import play.api.i18n.MessagesApi
+import viewmodels.InputWidth
+import viewmodels.DisplayMessage.{Empty, Message}
+import viewmodels.models.{FormPageViewModel, QuestionField}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class HowManySharesController @Inject()(
   override val messagesApi: MessagesApi,

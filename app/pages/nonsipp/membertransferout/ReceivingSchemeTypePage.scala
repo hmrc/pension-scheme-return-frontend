@@ -16,12 +16,12 @@
 
 package pages.nonsipp.membertransferout
 
-import config.Refined.{Max300, Max5}
+import utils.RefinedUtils.RefinedIntOps
 import models.PensionSchemeType.PensionSchemeType
 import models.SchemeId.Srn
-import pages.QuestionPage
 import play.api.libs.json.JsPath
-import utils.RefinedUtils.RefinedIntOps
+import config.Refined.{Max300, Max5}
+import pages.QuestionPage
 
 case class ReceivingSchemeTypePage(srn: Srn, index: Max300, secondaryIndex: Max5)
     extends QuestionPage[PensionSchemeType] {

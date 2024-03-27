@@ -16,8 +16,8 @@
 
 package utils
 
-import models.UserAnswers
 import queries.Removable
+import models.UserAnswers
 
 import scala.util.Try
 

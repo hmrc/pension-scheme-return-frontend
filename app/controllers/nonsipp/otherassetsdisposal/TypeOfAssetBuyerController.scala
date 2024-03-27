@@ -16,27 +16,28 @@
 
 package controllers.nonsipp.otherassetsdisposal
 
+import services.SaveService
+import pages.nonsipp.otherassetsdisposal.TypeOfAssetBuyerPage
+import utils.FormUtils.FormOps
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import models.IdentityType._
 import config.Refined.{Max50, Max5000}
 import controllers.PSRController
 import controllers.actions._
-import controllers.nonsipp.otherassetsdisposal.TypeOfAssetBuyerController._
-import forms.RadioListFormProvider
-import models.IdentityType.{Individual, Other, UKCompany, UKPartnership}
-import models.SchemeId.Srn
-import models.{IdentityType, Mode}
 import navigation.Navigator
-import pages.nonsipp.otherassetsdisposal.TypeOfAssetBuyerPage
+import forms.RadioListFormProvider
+import models.{IdentityType, Mode}
 import play.api.data.Form
+import views.html.RadioListView
+import models.SchemeId.Srn
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
-import utils.FormUtils.FormOps
+import controllers.nonsipp.otherassetsdisposal.TypeOfAssetBuyerController._
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, RadioListRowViewModel, RadioListViewModel}
-import views.html.RadioListView
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class TypeOfAssetBuyerController @Inject()(
   override val messagesApi: MessagesApi,

@@ -16,32 +16,32 @@
 
 package controllers.nonsipp.bondsdisposal
 
-import cats.implicits.toTraverseOps
+import pages.nonsipp.bonds._
+import viewmodels.implicits._
+import play.api.mvc._
 import com.google.inject.Inject
-import config.Constants
-import config.Constants.maxDisposalPerBond
-import config.Refined.Max5000.enumerable
+import utils.ListUtils._
 import config.Refined.{Max50, Max5000}
 import controllers.PSRController
-import controllers.actions.IdentifyAndRequireData
+import config.Constants
+import cats.implicits.toTraverseOps
+import config.Constants.maxDisposalPerBond
+import config.Refined.Max5000.enumerable
 import controllers.nonsipp.bondsdisposal.BondsDisposalListController._
-import eu.timepit.refined.refineV
-import forms.RadioListFormProvider
-import models.SchemeId.Srn
-import models.requests.DataRequest
-import models.{Mode, Money, Pagination, SchemeHoldBond, UserAnswers}
 import navigation.Navigator
-import pages.nonsipp.bonds.{BondsCompleted, CostOfBondsPage, NameOfBondsPage, WhyDoesSchemeHoldBondsPage}
-import pages.nonsipp.bondsdisposal.{BondsDisposalCompleted, BondsDisposalListPage, BondsStillHeldPage}
-import play.api.data.Form
-import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import utils.ListUtils._
-import viewmodels.DisplayMessage.{Message, ParagraphMessage}
-import viewmodels.LegendSize
-import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, ListRadiosRow, ListRadiosViewModel, PaginatedViewModel}
+import forms.RadioListFormProvider
+import models._
 import views.html.ListRadiosView
+import models.SchemeId.Srn
+import controllers.actions.IdentifyAndRequireData
+import eu.timepit.refined.refineV
+import play.api.i18n.MessagesApi
+import pages.nonsipp.bondsdisposal.{BondsDisposalCompleted, BondsDisposalListPage, BondsStillHeldPage}
+import viewmodels.LegendSize
+import viewmodels.DisplayMessage.{Message, ParagraphMessage}
+import viewmodels.models._
+import models.requests.DataRequest
+import play.api.data.Form
 
 import javax.inject.Named
 

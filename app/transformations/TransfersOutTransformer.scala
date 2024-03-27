@@ -21,13 +21,14 @@ import com.google.inject.Singleton
 import config.Refined.{Max300, Max5}
 import models.SchemeId.Srn
 import models.UserAnswers
-import models.UserAnswers.implicits.UserAnswersTryOps
-import models.requests.psr._
 import pages.nonsipp.membertransferout._
 import viewmodels.models.{SectionCompleted, SectionStatus}
+import models.requests.psr._
+import models.UserAnswers.implicits.UserAnswersTryOps
+
+import scala.util.Try
 
 import javax.inject.Inject
-import scala.util.Try
 
 @Singleton()
 class TransfersOutTransformer @Inject() extends Transformer {

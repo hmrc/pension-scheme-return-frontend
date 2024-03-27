@@ -16,25 +16,26 @@
 
 package controllers.nonsipp.receivetransfer
 
-import config.Refined.{Max300, Max5}
-import controllers.PSRController
-import controllers.actions._
-import controllers.nonsipp.receivetransfer.TransferringSchemeNameController._
-import forms.TextFormProvider
-import models.Mode
-import models.SchemeId.Srn
-import navigation.Navigator
-import pages.nonsipp.receivetransfer.TransferringSchemeNamePage
-import play.api.data.Form
-import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
 import viewmodels.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import config.Refined.{Max300, Max5}
+import pages.nonsipp.receivetransfer.TransferringSchemeNamePage
+import controllers.actions._
+import navigation.Navigator
+import forms.TextFormProvider
+import models.Mode
+import play.api.i18n.MessagesApi
 import viewmodels.models._
+import play.api.data.Form
+import controllers.PSRController
+import controllers.nonsipp.receivetransfer.TransferringSchemeNameController._
 import views.html.TextInputView
+import models.SchemeId.Srn
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class TransferringSchemeNameController @Inject()(
   override val messagesApi: MessagesApi,

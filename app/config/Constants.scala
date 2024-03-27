@@ -114,5 +114,5 @@ object Constants {
   val postcodeFormatRegex =
     """^[A-Z]{1,2}[0-9][0-9A-Z]?\s?[0-9][A-Z]{2}|BFPO\s?[0-9]{1,3}$"""
 
-  val earliestDate = LocalDate.of(1900, 1, 1)
+  val earliestDate: LocalDate = LocalDate.of(1900, 1, 1)
 }

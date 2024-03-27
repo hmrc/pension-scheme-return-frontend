@@ -16,8 +16,8 @@
 
 package models
 
+import uk.gov.hmrc.domain._
 import play.api.libs.json.{Reads, Writes}
-import uk.gov.hmrc.domain.{SimpleName, SimpleObjectReads, SimpleObjectWrites, TaxIdentifier}
 
 case class Security(security: String) extends TaxIdentifier with SimpleName {
 
@@ -37,8 +37,8 @@ object Security extends (String => Security) {
   private val validSecurityFormat = """^[a-zA-Z0-9\-'" \t\r\n,.@#/]+$"""
   private val maxLength = 160
 
-  def isValid(security: String) = security != null && security.matches(validSecurityFormat)
+  def isValid(security: String): Boolean = security != null && security.matches(validSecurityFormat)
 
-  def maxLengthCheck(security: String) = security != null && (maxLength > security.length)
+  def maxLengthCheck(security: String): Boolean = security != null && (maxLength > security.length)
 
 }

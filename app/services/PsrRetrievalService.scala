@@ -16,16 +16,17 @@
 
 package services
 
-import connectors.PSRConnector
-import models.UserAnswers
-import models.requests.DataRequest
 import play.api.mvc.AnyContent
+import connectors.PSRConnector
 import transformations._
 import uk.gov.hmrc.http.HeaderCarrier
+import models.UserAnswers
+import models.requests.DataRequest
 
-import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
+
+import javax.inject.Inject
 
 class PsrRetrievalService @Inject()(
   psrConnector: PSRConnector,

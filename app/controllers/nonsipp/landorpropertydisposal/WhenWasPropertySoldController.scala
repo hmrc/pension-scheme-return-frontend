@@ -16,32 +16,33 @@
 
 package controllers.nonsipp.landorpropertydisposal
 
-import cats.implicits.toShow
+import viewmodels.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Refined.{Max50, Max5000}
 import controllers.PSRController
-import controllers.actions._
-import controllers.nonsipp.landorpropertydisposal.WhenWasPropertySoldController._
-import forms.DatePageFormProvider
-import forms.mappings.errors.DateFormErrors
-import models.Mode
-import models.SchemeId.Srn
-import models.requests.DataRequest
-import navigation.Navigator
 import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
+import cats.implicits.toShow
 import pages.nonsipp.landorpropertydisposal.WhenWasPropertySoldPage
-import play.api.data.Form
+import controllers.actions._
+import navigation.Navigator
+import forms.DatePageFormProvider
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import forms.mappings.errors.DateFormErrors
 import services.{SaveService, SchemeDateService}
-import utils.DateTimeUtils.localDateShow
-import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
-import viewmodels.models.{DatePageViewModel, FormPageViewModel}
+import controllers.nonsipp.landorpropertydisposal.WhenWasPropertySoldController._
 import views.html.DatePageView
+import models.SchemeId.Srn
+import utils.DateTimeUtils.localDateShow
+import models.Mode
+import viewmodels.DisplayMessage.Message
+import viewmodels.models.{DatePageViewModel, FormPageViewModel}
+import models.requests.DataRequest
+import play.api.data.Form
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import java.time.LocalDate
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class WhenWasPropertySoldController @Inject()(
   override val messagesApi: MessagesApi,

@@ -16,19 +16,19 @@
 
 package controllers.nonsipp.memberdetails.upload
 
+import viewmodels.implicits._
+import play.api.mvc._
+import pages.FileUploadTooManyRowsPage
 import controllers.actions._
 import controllers.nonsipp.memberdetails.upload.FileUploadTooManyRowsController._
-import models.Mode
-import models.SchemeId.Srn
 import navigation.Navigator
-import pages.FileUploadTooManyRowsPage
+import models.Mode
+import views.html.ContentPageView
+import models.SchemeId.Srn
 import play.api.i18n._
-import play.api.mvc._
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage._
-import viewmodels.implicits._
 import viewmodels.models.{ContentPageViewModel, FormPageViewModel}
-import views.html.ContentPageView
 
 import javax.inject.{Inject, Named}
 

@@ -16,19 +16,19 @@
 
 package services
 
-import cats.implicits._
-import com.google.inject.Inject
-import config.FrontendAppConfig
 import models.audit.AuditEvent
-import play.api.Logger
 import play.api.mvc.RequestHeader
-import uk.gov.hmrc.play.audit.AuditExtensions._
-import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
+import com.google.inject.Inject
 import uk.gov.hmrc.play.audit.model.DataEvent
+import uk.gov.hmrc.play.audit.AuditExtensions._
+import config.FrontendAppConfig
+import cats.implicits._
+import play.api.Logger
+import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
-import scala.concurrent.{ExecutionContext, Future}
 import scala.language.implicitConversions
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 class AuditService @Inject()(

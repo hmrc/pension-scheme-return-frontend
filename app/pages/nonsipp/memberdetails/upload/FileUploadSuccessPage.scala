@@ -16,7 +16,7 @@
 
 package pages.nonsipp.memberdetails.upload
 
-import models.SchemeId.Srn
 import pages.Page
+import models.SchemeId.Srn
 
 case class FileUploadSuccessPage(srn: Srn) extends Page

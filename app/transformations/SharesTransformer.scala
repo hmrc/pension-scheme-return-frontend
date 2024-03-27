@@ -16,34 +16,30 @@
 
 package transformations
 
-import cats.implicits.catsSyntaxTuple2Semigroupal
+import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
+import pages.nonsipp.shares._
 import com.google.inject.Singleton
 import config.Refined.{Max5000, OneTo50, OneTo5000}
-import eu.timepit.refined.api.Refined
-import eu.timepit.refined.refineV
-import models.HowSharesDisposed.{HowSharesDisposed, Other, Redeemed, Sold}
-import models.IdentitySubject.SharesSeller
 import models.SchemeHoldShare.{Acquisition, Transfer}
-import models.SchemeId.Srn
-import models.TypeOfShares.{SponsoringEmployer, Unquoted}
-import models.UserAnswers.implicits.UserAnswersTryOps
-import models._
-import models.requests.DataRequest
-import models.requests.psr._
-import pages.nonsipp.common.{
-  CompanyRecipientCrnPage,
-  IdentityTypePage,
-  OtherRecipientDetailsPage,
-  PartnershipRecipientUtrPage
-}
-import pages.nonsipp.shares._
+import cats.implicits.catsSyntaxTuple2Semigroupal
+import eu.timepit.refined.refineV
 import pages.nonsipp.sharesdisposal._
-import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
-import uk.gov.hmrc.domain.Nino
+import models._
+import pages.nonsipp.common._
+import models.IdentitySubject.SharesSeller
 import viewmodels.models.SectionCompleted
+import models.requests.DataRequest
+import eu.timepit.refined.api.Refined
+import models.TypeOfShares.{SponsoringEmployer, Unquoted}
+import models.SchemeId.Srn
+import models.requests.psr._
+import models.UserAnswers.implicits.UserAnswersTryOps
+import uk.gov.hmrc.domain.Nino
+import models.HowSharesDisposed._
+
+import scala.util.Try
 
 import javax.inject.Inject
-import scala.util.Try
 
 @Singleton()
 class SharesTransformer @Inject() extends Transformer {

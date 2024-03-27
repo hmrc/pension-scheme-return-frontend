@@ -16,12 +16,13 @@
 
 package controllers.actions
 
-import models.requests.{AllowedAccessRequest, OptionalDataRequest}
 import play.api.mvc.ActionTransformer
 import repositories.SessionRepository
+import models.requests.{AllowedAccessRequest, OptionalDataRequest}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
 
 class DataRetrievalActionImpl @Inject()(
   val sessionRepository: SessionRepository

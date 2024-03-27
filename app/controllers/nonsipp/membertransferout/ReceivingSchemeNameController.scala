@@ -16,24 +16,25 @@
 
 package controllers.nonsipp.membertransferout
 
+import services.SaveService
+import viewmodels.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Refined.{Max300, Max5}
 import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
+import navigation.Navigator
 import forms.TextFormProvider
 import models.Mode
-import models.SchemeId.Srn
-import navigation.Navigator
-import pages.nonsipp.membertransferout.ReceivingSchemeNamePage
-import play.api.data.Form
-import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
 import viewmodels.models.{FormPageViewModel, TextInputViewModel}
+import play.api.data.Form
 import views.html.TexInputViewWidth40
-import viewmodels.implicits._
+import models.SchemeId.Srn
+import pages.nonsipp.membertransferout.ReceivingSchemeNamePage
+import play.api.i18n.MessagesApi
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class ReceivingSchemeNameController @Inject()(
   override val messagesApi: MessagesApi,

@@ -16,28 +16,29 @@
 
 package controllers.nonsipp.memberdetails
 
+import services.SaveService
+import controllers.nonsipp.memberdetails.DoesSchemeMemberHaveNINOController._
+import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsPage}
+import viewmodels.implicits._
+import utils.FormUtils._
+import play.api.mvc._
 import config.Refined.Max300
 import controllers.actions._
-import controllers.nonsipp.memberdetails.DoesSchemeMemberHaveNINOController._
-import forms.YesNoPageFormProvider
-import models.SchemeId.Srn
-import models.requests.DataRequest
-import models.{Mode, NameDOB}
 import navigation.Navigator
-import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsPage}
-import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import services.SaveService
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.FormUtils._
-import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
+import forms.YesNoPageFormProvider
+import models.{Mode, NameDOB}
 import views.html.YesNoPageView
+import models.SchemeId.Srn
+import play.api.i18n.{I18nSupport, MessagesApi}
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.DisplayMessage.Message
+import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
+import models.requests.DataRequest
+import play.api.data.Form
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class DoesSchemeMemberHaveNINOController @Inject()(
   override val messagesApi: MessagesApi,

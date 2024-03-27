@@ -16,11 +16,10 @@
 
 package pages.nonsipp.receivetransfer
 
-import config.Refined._
 import utils.RefinedUtils._
-
-import play.api.libs.json.JsPath
 import models.SchemeId.Srn
+import play.api.libs.json.JsPath
+import config.Refined._
 import pages.QuestionPage
 
 import java.time.LocalDate

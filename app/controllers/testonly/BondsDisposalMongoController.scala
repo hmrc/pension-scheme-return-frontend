@@ -16,24 +16,20 @@
 
 package controllers.testonly
 
+import services.SaveService
+import play.api.mvc.MessagesControllerComponents
+import models.HowDisposed._
 import config.Refined.{Max50, Max5000}
+import models.SchemeId.Srn
+import shapeless.{::, HList, HNil}
+import pages.nonsipp.bondsdisposal._
+import viewmodels.models.SectionCompleted
 import controllers.actions.IdentifyAndRequireData
 import eu.timepit.refined.refineMV
-import models.HowDisposed._
-import models.SchemeId.Srn
-import pages.nonsipp.bondsdisposal.{
-  BondsDisposalCompletedPage,
-  BondsDisposalPage,
-  BondsStillHeldPage,
-  HowWereBondsDisposedOfPage
-}
-import play.api.mvc.MessagesControllerComponents
-import services.SaveService
-import shapeless.{::, HList, HNil}
-import viewmodels.models.SectionCompleted
+
+import scala.concurrent.ExecutionContext
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
 
 class BondsDisposalMongoController @Inject()(
   val saveService: SaveService,

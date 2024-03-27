@@ -16,25 +16,26 @@
 
 package controllers.nonsipp.landorpropertydisposal
 
+import services.SaveService
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Refined.{Max50, Max5000}
-import controllers.actions._
-import controllers.nonsipp.landorpropertydisposal.PartnershipBuyerNameController._
 import controllers.PSRController
+import pages.nonsipp.landorpropertydisposal.PartnershipBuyerNamePage
+import controllers.actions._
+import navigation.Navigator
 import forms.TextFormProvider
 import models.Mode
-import models.SchemeId.Srn
-import navigation.Navigator
-import pages.nonsipp.landorpropertydisposal.PartnershipBuyerNamePage
-import play.api.data.Form
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
+import views.html.TextInputView
+import models.SchemeId.Srn
 import viewmodels.DisplayMessage.Message
 import viewmodels.models._
-import views.html.TextInputView
+import controllers.nonsipp.landorpropertydisposal.PartnershipBuyerNameController._
+import play.api.data.Form
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class PartnershipBuyerNameController @Inject()(
   override val messagesApi: MessagesApi,

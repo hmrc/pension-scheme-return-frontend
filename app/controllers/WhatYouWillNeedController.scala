@@ -16,23 +16,24 @@
 
 package controllers
 
-import controllers.actions._
-import models.SchemeId.Srn
-import models.{CheckMode, NormalMode}
-import navigation.Navigator
-import pages.WhatYouWillNeedPage
-import pages.nonsipp.schemedesignatory.HowManyMembersPage
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{PsrRetrievalService, SaveService}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.DisplayMessage.{ListMessage, ListType, Message, ParagraphMessage}
+import pages.nonsipp.schemedesignatory.HowManyMembersPage
 import viewmodels.implicits._
-import viewmodels.models.{ContentPageViewModel, FormPageViewModel}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import pages.WhatYouWillNeedPage
+import controllers.actions._
+import navigation.Navigator
+import models.{CheckMode, NormalMode}
 import views.html.ContentPageView
+import models.SchemeId.Srn
+import play.api.i18n.{I18nSupport, MessagesApi}
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.DisplayMessage._
+import viewmodels.models.{ContentPageViewModel, FormPageViewModel}
+
+import scala.concurrent.ExecutionContext
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.ExecutionContext
 
 class WhatYouWillNeedController @Inject()(
   override val messagesApi: MessagesApi,

@@ -16,8 +16,8 @@
 
 package pages.nonsipp.bondsdisposal
 
-import config.Refined.Max5000
 import models.SchemeId.Srn
+import config.Refined.Max5000
 import pages.Page
 
 case class BondsDisposalListPage(srn: Srn, bondIndex: Max5000) extends Page

@@ -16,7 +16,7 @@
 
 package pages.nonsipp.otherassetsdisposal
 
-import models.SchemeId.Srn
 import pages.Page
+import models.SchemeId.Srn
 
 case class WhatYouWillNeedOtherAssetsDisposalPage(srn: Srn) extends Page

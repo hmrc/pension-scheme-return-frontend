@@ -16,32 +16,28 @@
 
 package controllers.nonsipp.shares
 
-import config.Refined.Max5000
+import services.{PsrSubmissionService, SaveService}
+import viewmodels.implicits._
 import controllers.PSRController
 import controllers.actions._
-import controllers.nonsipp.shares.RemoveSharesController._
-import forms.YesNoPageFormProvider
-import models.SchemeId.Srn
-import models.{Mode, NormalMode}
 import navigation.Navigator
-import pages.nonsipp
-import pages.nonsipp.shares.{
-  CompanyNameRelatedSharesPage,
-  CompanyNameRelatedSharesPages,
-  RemoveSharesPage,
-  SharesJourneyStatus
-}
-import play.api.data.Form
+import forms.YesNoPageFormProvider
+import models.{Mode, NormalMode}
+import controllers.nonsipp.shares.RemoveSharesController._
 import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.data.Form
+import pages.nonsipp.shares._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.{PsrSubmissionService, SaveService}
-import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, SectionStatus, YesNoPageViewModel}
+import config.Refined.Max5000
+import pages.nonsipp
 import views.html.YesNoPageView
+import models.SchemeId.Srn
+import viewmodels.DisplayMessage.Message
+import viewmodels.models.{FormPageViewModel, SectionStatus, YesNoPageViewModel}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class RemoveSharesController @Inject()(
   override val messagesApi: MessagesApi,

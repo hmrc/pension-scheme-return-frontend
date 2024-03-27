@@ -15,8 +15,8 @@
  */
 
 package models
+import uk.gov.hmrc.domain._
 import play.api.libs.json.{Reads, Writes}
-import uk.gov.hmrc.domain.{SimpleName, SimpleObjectReads, SimpleObjectWrites, TaxIdentifier}
 
 case class Crn(crn: String) extends TaxIdentifier with SimpleName {
 
@@ -36,8 +36,8 @@ object Crn extends (String => Crn) {
   private val validCrnFormat = "^[A-Za-z0-9 ]*$"
   private val length = 8
 
-  def isValid(crn: String) = crn != null && crn.matches(validCrnFormat)
-  def isLengthInRange(crn: String) = crn != null && (cutSpaces(crn).length == length)
+  def isValid(crn: String): Boolean = crn != null && crn.matches(validCrnFormat)
+  def isLengthInRange(crn: String): Boolean = crn != null && (cutSpaces(crn).length == length)
 
   //To do not let spaces tamper the length check
   private def cutSpaces(crn: String): String = crn.replaceAll("\\s", "")

@@ -16,11 +16,12 @@
 
 package utils
 
-import models.SelectInput
 import play.api.libs.json.Json
+import models.SelectInput
+
+import scala.io.Source
 
 import java.io.{File, FileInputStream, InputStream}
-import scala.io.Source
 
 case class Country(countryCode: String, country: String)
 

@@ -17,10 +17,10 @@
 package forms
 
 import forms.mappings.Mappings
-import models.BankAccount
-import play.api.data.Form
 import play.api.data.Forms._
-import mappings.implicits._
+import play.api.data.Form
+import models.BankAccount
+import forms.mappings.implicits._
 
 import javax.inject.Inject
 

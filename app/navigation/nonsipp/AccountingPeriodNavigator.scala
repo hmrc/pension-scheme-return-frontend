@@ -16,21 +16,15 @@
 
 package navigation.nonsipp
 
-import config.Refined.OneToThree
+import play.api.mvc.Call
 import controllers.nonsipp
 import controllers.nonsipp.accountingperiod.routes
 import eu.timepit.refined.refineV
-import models.{NormalMode, UserAnswers}
+import pages.nonsipp.accountingperiod._
 import navigation.JourneyNavigator
+import models.{NormalMode, UserAnswers}
+import config.Refined.OneToThree
 import pages.Page
-import pages.nonsipp.accountingperiod.{
-  AccountingPeriodCheckYourAnswersPage,
-  AccountingPeriodListPage,
-  AccountingPeriodPage,
-  AccountingPeriods,
-  RemoveAccountingPeriodPage
-}
-import play.api.mvc.Call
 
 object AccountingPeriodNavigator extends JourneyNavigator {
 

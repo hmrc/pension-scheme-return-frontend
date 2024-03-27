@@ -16,9 +16,9 @@
 
 package navigation
 
-import models.UserAnswers
-import pages.Page
 import play.api.mvc.Call
+import pages.Page
+import models.UserAnswers
 
 trait JourneyNavigator {
 

@@ -16,13 +16,13 @@
 
 package forms.mappings
 
+import play.api.data.format.Formatter
 import cats.data.Validated._
 import cats.syntax.all._
-import forms.mappings.errors.DateFormErrors
-import models.DateRange
 import play.api.data.FormError
-import play.api.data.format.Formatter
+import forms.mappings.errors.DateFormErrors
 import utils.DateTimeUtils.localDateShow
+import models.DateRange
 
 import java.time.LocalDate
 

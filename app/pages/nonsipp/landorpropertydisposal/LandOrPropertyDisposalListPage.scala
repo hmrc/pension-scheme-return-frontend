@@ -16,7 +16,7 @@
 
 package pages.nonsipp.landorpropertydisposal
 
-import models.SchemeId.Srn
 import pages.Page
+import models.SchemeId.Srn
 
 case class LandOrPropertyDisposalListPage(srn: Srn, addDisposal: Boolean) extends Page

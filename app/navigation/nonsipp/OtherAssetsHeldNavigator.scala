@@ -16,31 +16,17 @@
 
 package navigation.nonsipp
 
-import cats.implicits.toTraverseOps
-import config.Refined.Max5000
-import eu.timepit.refined.refineMV
-import models.PointOfEntry.{
-  AssetAcquisitionToContributionPointOfEntry,
-  AssetAcquisitionToTransferPointOfEntry,
-  AssetContributionToAcquisitionPointOfEntry,
-  AssetContributionToTransferPointOfEntry,
-  AssetTransferToAcquisitionPointOfEntry,
-  AssetTransferToContributionPointOfEntry,
-  NoPointOfEntry,
-  WhoWasAssetAcquiredFromPointOfEntry
-}
-import models.SchemeHoldAsset.{Acquisition, Contribution, Transfer}
-import models.{CheckMode, IdentitySubject, IdentityType, NormalMode, UserAnswers}
-import navigation.JourneyNavigator
-import pages.Page
-import pages.nonsipp.common.{
-  CompanyRecipientCrnPage,
-  IdentityTypePage,
-  OtherRecipientDetailsPage,
-  PartnershipRecipientUtrPage
-}
-import pages.nonsipp.otherassetsheld._
 import play.api.mvc.Call
+import cats.implicits.toTraverseOps
+import eu.timepit.refined.refineMV
+import navigation.JourneyNavigator
+import pages.nonsipp.common._
+import pages.nonsipp.otherassetsheld._
+import models.PointOfEntry._
+import config.Refined.Max5000
+import pages.Page
+import models._
+import models.SchemeHoldAsset.{Acquisition, Contribution, Transfer}
 
 object OtherAssetsHeldNavigator extends JourneyNavigator {
 

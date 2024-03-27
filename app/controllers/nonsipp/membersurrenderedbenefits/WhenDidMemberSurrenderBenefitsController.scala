@@ -16,31 +16,32 @@
 
 package controllers.nonsipp.membersurrenderedbenefits
 
-import cats.implicits.toShow
+import services.{SaveService, SchemeDateService}
+import pages.nonsipp.memberdetails.MemberDetailsPage
+import viewmodels.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Refined.Max300
 import controllers.PSRController
+import cats.implicits.toShow
 import controllers.actions.IdentifyAndRequireData
+import navigation.Navigator
+import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsAmountPage, WhenDidMemberSurrenderBenefitsPage}
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
+import play.api.data.Form
+import forms.mappings.errors.DateFormErrors
+import views.html.DatePageView
+import models.SchemeId.Srn
 import controllers.nonsipp.membersurrenderedbenefits.WhenDidMemberSurrenderBenefitsController._
 import forms.DatePageFormProvider
-import forms.mappings.errors.DateFormErrors
-import models.{DateRange, Mode}
-import models.SchemeId.Srn
-import navigation.Navigator
-import pages.nonsipp.memberdetails.MemberDetailsPage
-import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsAmountPage, WhenDidMemberSurrenderBenefitsPage}
-import play.api.data.Form
-import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.{SaveService, SchemeDateService}
 import utils.DateTimeUtils.localDateShow
+import models.{DateRange, Mode}
 import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
 import viewmodels.models.{DatePageViewModel, FormPageViewModel}
-import views.html.DatePageView
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import java.time.LocalDate
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class WhenDidMemberSurrenderBenefitsController @Inject()(
   override val messagesApi: MessagesApi,

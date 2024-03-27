@@ -16,8 +16,8 @@
 
 package viewmodels.govuk
 
-import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.pagination._
+import play.api.i18n.Messages
 
 object pagination extends PaginationFluency
 

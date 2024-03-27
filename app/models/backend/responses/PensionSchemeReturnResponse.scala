@@ -16,9 +16,9 @@
 
 package models.backend.responses
 
+import utils.WithName
 import models.backend.responses.DataEntryRule.{Fixed, Updated}
 import play.api.libs.json._
-import utils.WithName
 
 case class PensionSchemeReturn(
   name: DataEntry[String]

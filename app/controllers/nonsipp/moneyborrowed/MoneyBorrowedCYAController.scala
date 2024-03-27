@@ -16,27 +16,28 @@
 
 package controllers.nonsipp.moneyborrowed
 
-import cats.implicits.toShow
-import config.Refined.Max5000
-import controllers.PSRController
-import controllers.actions._
-import controllers.nonsipp.moneyborrowed.MoneyBorrowedCYAController._
-import models.SchemeId.Srn
-import models.{CheckMode, CheckOrChange, Mode, Money, NormalMode, Percentage}
-import navigation.Navigator
-import pages.nonsipp.moneyborrowed._
-import play.api.i18n._
-import play.api.mvc._
 import services.PsrSubmissionService
-import utils.DateTimeUtils.localDateShow
-import viewmodels.DisplayMessage._
 import viewmodels.implicits._
-import viewmodels.models._
+import play.api.mvc._
+import config.Refined.Max5000
+import cats.implicits.toShow
+import controllers.actions._
+import navigation.Navigator
+import controllers.nonsipp.moneyborrowed.MoneyBorrowedCYAController._
+import controllers.PSRController
 import views.html.CheckYourAnswersView
+import models.SchemeId.Srn
+import utils.DateTimeUtils.localDateShow
+import models._
+import play.api.i18n._
+import pages.nonsipp.moneyborrowed._
+import viewmodels.DisplayMessage._
+import viewmodels.models._
+
+import scala.concurrent.ExecutionContext
 
 import java.time.LocalDate
 import javax.inject.{Inject, Named}
-import scala.concurrent.ExecutionContext
 
 class MoneyBorrowedCYAController @Inject()(
   override val messagesApi: MessagesApi,

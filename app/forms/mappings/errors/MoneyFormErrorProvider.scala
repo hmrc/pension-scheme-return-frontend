@@ -16,9 +16,9 @@
 
 package forms.mappings.errors
 
-import com.google.inject.Inject
 import forms.FormProvider
-import forms.mappings.Mappings
 import models.Money
+import forms.mappings.Mappings
+import com.google.inject.Inject
 
 class MoneyFormErrorProvider @Inject()() extends FormProvider[MoneyFormErrors, Money](Mappings.money)

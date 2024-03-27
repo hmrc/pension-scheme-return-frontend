@@ -16,9 +16,9 @@
 
 package viewmodels.models
 
-import play.api.libs.json._
-import play.api.mvc.Call
 import utils.WithName
+import play.api.mvc.Call
+import play.api.libs.json._
 
 /**
  * Defines the completion state of a section on the PSR task list page

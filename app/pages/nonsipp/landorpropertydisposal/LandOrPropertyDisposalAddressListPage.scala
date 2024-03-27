@@ -16,8 +16,8 @@
 
 package pages.nonsipp.landorpropertydisposal
 
-import config.Refined.{Max50, Max5000}
 import models.SchemeId.Srn
+import config.Refined.{Max50, Max5000}
 import pages.Page
 
 case class LandOrPropertyDisposalAddressListPage(srn: Srn, addressChoice: Max5000, disposalChoice: Max50) extends Page

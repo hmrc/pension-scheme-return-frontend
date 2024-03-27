@@ -16,29 +16,30 @@
 
 package controllers.nonsipp.memberdetails
 
-import config.Constants.{PSA, PSP}
-import config.FrontendAppConfig
+import services.{AuditService, SchemeDateService, UploadService}
+import models.audit.PSRUpscanFileUploadAuditEvent
+import pages.nonsipp.memberdetails.UploadMemberDetailsPage
+import viewmodels.implicits._
+import play.api.mvc._
 import controllers.PSRController
-import controllers.actions._
+import config.FrontendAppConfig
 import controllers.nonsipp.memberdetails.UploadMemberDetailsController._
+import config.Constants.{PSA, PSP}
+import controllers.actions._
+import navigation.Navigator
+import models._
+import views.html.UploadView
 import models.SchemeId.Srn
 import models.UploadStatus.UploadStatus
-import models.audit.PSRUpscanFileUploadAuditEvent
-import models.requests.DataRequest
-import models.{DateRange, ErrorDetails, Mode, Reference, UploadKey, UploadStatus}
-import navigation.Navigator
-import pages.nonsipp.memberdetails.UploadMemberDetailsPage
-import play.api.data.FormError
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc._
-import services.{AuditService, SchemeDateService, UploadService}
 import viewmodels.DisplayMessage.{ListMessage, ListType, ParagraphMessage}
-import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, UploadViewModel}
-import views.html.UploadView
+import models.requests.DataRequest
+import play.api.data.FormError
+
+import scala.concurrent.ExecutionContext
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.ExecutionContext
 
 class UploadMemberDetailsController @Inject()(
   override val messagesApi: MessagesApi,

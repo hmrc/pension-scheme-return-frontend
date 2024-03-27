@@ -16,30 +16,31 @@
 
 package controllers.nonsipp
 
-import cats.data.NonEmptyList
-import cats.implicits.toShow
-import config.FrontendAppConfig
-import controllers.actions._
-import controllers.nonsipp.ReturnSubmittedController._
-import models.SchemeId.Srn
-import models.requests.DataRequest
-import models.{DateRange, Mode}
-import pages.nonsipp.ReturnSubmittedPage
-import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.Writes._
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{SaveService, SchemeDateService}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import config.FrontendAppConfig
+import cats.implicits.toShow
+import controllers.actions._
+import pages.nonsipp.ReturnSubmittedPage
+import models.requests.DataRequest
+import controllers.nonsipp.ReturnSubmittedController._
+import cats.data.NonEmptyList
+import views.html.SubmissionView
+import models.SchemeId.Srn
 import utils.DateTimeUtils.{localDateShow, localDateTimeShow}
+import models.{DateRange, Mode}
+import play.api.i18n.{I18nSupport, MessagesApi}
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage
 import viewmodels.DisplayMessage._
-import viewmodels.implicits._
 import viewmodels.models.SubmissionViewModel
-import views.html.SubmissionView
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import java.time.LocalDateTime
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
 
 class ReturnSubmittedController @Inject()(
   override val messagesApi: MessagesApi,

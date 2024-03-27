@@ -16,12 +16,12 @@
 
 package pages.nonsipp.loansmadeoroutstanding
 
-import config.Refined.Max5000
-import models.SchemeId.Srn
-import models.SponsoringOrConnectedParty
-import pages.QuestionPage
-import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
+import models.SchemeId.Srn
+import play.api.libs.json.JsPath
+import models.SponsoringOrConnectedParty
+import config.Refined.Max5000
+import pages.QuestionPage
 
 case class RecipientSponsoringEmployerConnectedPartyPage(srn: Srn, index: Max5000)
     extends QuestionPage[SponsoringOrConnectedParty] {

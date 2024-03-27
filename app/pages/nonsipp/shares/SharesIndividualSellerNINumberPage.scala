@@ -16,13 +16,13 @@
 
 package pages.nonsipp.shares
 
-import config.Refined.Max5000
-import models.ConditionalYesNo
-import models.SchemeId.Srn
-import pages.QuestionPage
-import play.api.libs.json.JsPath
-import uk.gov.hmrc.domain.Nino
 import utils.RefinedUtils.RefinedIntOps
+import models.SchemeId.Srn
+import models.ConditionalYesNo
+import config.Refined.Max5000
+import pages.QuestionPage
+import uk.gov.hmrc.domain.Nino
+import play.api.libs.json.JsPath
 
 case class SharesIndividualSellerNINumberPage(srn: Srn, index: Max5000)
     extends QuestionPage[ConditionalYesNo[String, Nino]] {

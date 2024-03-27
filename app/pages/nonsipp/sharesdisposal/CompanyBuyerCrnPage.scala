@@ -16,12 +16,12 @@
 
 package pages.nonsipp.sharesdisposal
 
-import config.Refined.{Max50, Max5000}
-import models.{ConditionalYesNo, Crn}
-import models.SchemeId.Srn
-import pages.{IndexedQuestionPage, QuestionPage}
-import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
+import models.SchemeId.Srn
+import play.api.libs.json.JsPath
+import models.{ConditionalYesNo, Crn}
+import config.Refined.{Max50, Max5000}
+import pages.{IndexedQuestionPage, QuestionPage}
 
 case class CompanyBuyerCrnPage(srn: Srn, index: Max5000, disposalIndex: Max50)
     extends QuestionPage[ConditionalYesNo[String, Crn]] {

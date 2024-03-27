@@ -16,25 +16,26 @@
 
 package controllers.nonsipp.shares
 
-import config.Refined.Max5000
-import controllers.actions._
-import controllers.nonsipp.shares.PartnershipNameOfSharesSellerController._
-import controllers.PSRController
-import forms.TextFormProvider
-import models.Mode
-import models.SchemeId.Srn
-import navigation.Navigator
-import pages.nonsipp.shares.PartnershipShareSellerNamePage
-import play.api.data.Form
-import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
+import config.Refined.Max5000
+import controllers.PSRController
+import controllers.actions._
+import navigation.Navigator
+import forms.TextFormProvider
+import controllers.nonsipp.shares.PartnershipNameOfSharesSellerController._
+import models.Mode
+import play.api.i18n.MessagesApi
+import play.api.data.Form
+import pages.nonsipp.shares.PartnershipShareSellerNamePage
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import views.html.TextInputView
+import models.SchemeId.Srn
 import viewmodels.DisplayMessage.Message
 import viewmodels.models._
-import views.html.TextInputView
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class PartnershipNameOfSharesSellerController @Inject()(
   override val messagesApi: MessagesApi,

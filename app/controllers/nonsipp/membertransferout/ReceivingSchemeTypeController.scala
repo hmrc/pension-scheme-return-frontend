@@ -16,30 +16,31 @@
 
 package controllers.nonsipp.membertransferout
 
-import config.Constants.{inputRegexPSTR, inputRegexQROPS, maxNotRelevant}
-import config.Refined.{Max300, Max5}
-import controllers.actions.IdentifyAndRequireData
-import forms.RadioListFormProvider
+import services.SaveService
+import viewmodels.implicits._
 import forms.mappings.Mappings
+import models.PensionSchemeType.PensionSchemeType
+import config.Refined.{Max300, Max5}
+import config.Constants.{inputRegexPSTR, inputRegexQROPS, maxNotRelevant}
+import controllers.actions.IdentifyAndRequireData
+import navigation.Navigator
+import forms.RadioListFormProvider
+import models.{ConditionalRadioMapper, Mode, PensionSchemeType}
+import play.api.data.Form
 import forms.mappings.errors.InputFormErrors
 import models.GenericFormMapper.ConditionalRadioMapper
-import models.{ConditionalRadioMapper, Mode, PensionSchemeType}
-import models.PensionSchemeType.PensionSchemeType
-import models.SchemeId.Srn
-import navigation.Navigator
-import pages.nonsipp.membertransferout.{ReceivingSchemeNamePage, ReceivingSchemeTypePage}
-import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
+import views.html.RadioListView
+import models.SchemeId.Srn
+import pages.nonsipp.membertransferout.{ReceivingSchemeNamePage, ReceivingSchemeTypePage}
+import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
-import viewmodels.models.{FieldType, FormPageViewModel, RadioItemConditional, RadioListRowViewModel, RadioListViewModel}
-import views.html.RadioListView
-import viewmodels.implicits._
+import viewmodels.models._
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class ReceivingSchemeTypeController @Inject()(
   override val messagesApi: MessagesApi,

@@ -16,7 +16,7 @@
 
 package pages.nonsipp.memberpensionpayments
 
-import models.SchemeId.Srn
 import pages.Page
+import models.SchemeId.Srn
 
 case class WhatYouWillNeedPensionPaymentsPage(srn: Srn) extends Page

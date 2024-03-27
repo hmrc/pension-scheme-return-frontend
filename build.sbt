@@ -22,6 +22,9 @@ lazy val root = (project in file("."))
   .settings(
     scalaVersion := "2.13.12",
     name := appName,
+    semanticdbEnabled := true,
+    semanticdbVersion := scalafixSemanticdb.revision,
+    scalafixScalaBinaryVersion := "2.13",
     RoutesKeys.routesImport ++= Seq(
       "models._",
       "models.CheckOrChange._",
@@ -94,6 +97,7 @@ lazy val root = (project in file("."))
       s"bash -c $scriptPath".!
     },
     scalafmtOnCompile := true,
+    scalafixOnCompile := true,
     addCommandAlias("runLocal", "run -Dapplication.router=testOnlyDoNotUseInAppConf.Routes")
   )
 

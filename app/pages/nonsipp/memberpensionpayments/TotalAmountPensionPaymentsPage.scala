@@ -16,12 +16,12 @@
 
 package pages.nonsipp.memberpensionpayments
 
-import config.Refined.Max300
-import models.Money
-import models.SchemeId.Srn
-import pages.QuestionPage
-import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
+import models.SchemeId.Srn
+import play.api.libs.json.JsPath
+import models.Money
+import config.Refined.Max300
+import pages.QuestionPage
 
 case class TotalAmountPensionPaymentsPage(srn: Srn, index: Max300) extends QuestionPage[Money] {
 

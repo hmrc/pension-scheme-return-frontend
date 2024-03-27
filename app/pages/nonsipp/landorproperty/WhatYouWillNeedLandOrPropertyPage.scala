@@ -16,7 +16,7 @@
 
 package pages.nonsipp.landorproperty
 
-import models.SchemeId.Srn
 import pages.Page
+import models.SchemeId.Srn
 
 case class WhatYouWillNeedLandOrPropertyPage(srn: Srn) extends Page

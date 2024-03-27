@@ -16,26 +16,26 @@
 
 package controllers.nonsipp.accountingperiod
 
-import cats.implicits.toShow
+import viewmodels.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import com.google.inject.Inject
-import config.Constants.maxAccountingPeriods
 import config.Refined.OneToThree
+import cats.implicits.toShow
+import config.Constants.maxAccountingPeriods
+import pages.nonsipp.accountingperiod.{AccountingPeriodListPage, AccountingPeriods}
+import navigation.Navigator
+import forms.YesNoPageFormProvider
+import play.api.data.Form
+import views.html.ListView
+import models.SchemeId.Srn
 import controllers.actions._
 import eu.timepit.refined.refineV
-import forms.YesNoPageFormProvider
-import models.SchemeId.Srn
-import models.{DateRange, Mode}
-import navigation.Navigator
-import pages.nonsipp.accountingperiod.{AccountingPeriodListPage, AccountingPeriods}
-import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.DateTimeUtils.localDateShow
+import models.{DateRange, Mode}
+import play.api.i18n.{I18nSupport, MessagesApi}
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, ListRow, ListViewModel}
-import views.html.ListView
 
 import javax.inject.Named
 
@@ -49,7 +49,7 @@ class AccountingPeriodListController @Inject()(
 ) extends FrontendBaseController
     with I18nSupport {
 
-  val form = AccountingPeriodListController.form(formProvider)
+  val form: Form[Boolean] = AccountingPeriodListController.form(formProvider)
 
   def onPageLoad(srn: Srn, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     val periods = request.userAnswers.list(AccountingPeriods(srn))

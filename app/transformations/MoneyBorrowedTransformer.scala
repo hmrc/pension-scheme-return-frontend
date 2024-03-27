@@ -18,15 +18,16 @@ package transformations
 
 import com.google.inject.Singleton
 import config.Refined.OneTo5000
-import eu.timepit.refined.refineV
 import models.SchemeId.Srn
-import models.requests.DataRequest
 import models.requests.psr._
+import eu.timepit.refined.refineV
 import models.{Money, Percentage, UserAnswers}
 import pages.nonsipp.moneyborrowed._
+import models.requests.DataRequest
+
+import scala.util.Try
 
 import javax.inject.Inject
-import scala.util.Try
 
 @Singleton()
 class MoneyBorrowedTransformer @Inject() extends Transformer {

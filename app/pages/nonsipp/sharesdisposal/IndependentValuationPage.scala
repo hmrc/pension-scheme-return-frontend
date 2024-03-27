@@ -16,11 +16,11 @@
 
 package pages.nonsipp.sharesdisposal
 
-import config.Refined._
-import models.SchemeId.Srn
-import pages.QuestionPage
-import play.api.libs.json.JsPath
 import utils.RefinedUtils._
+import models.SchemeId.Srn
+import play.api.libs.json.JsPath
+import config.Refined._
+import pages.QuestionPage
 
 case class IndependentValuationPage(srn: Srn, index: Max5000, disposalIndex: Max50) extends QuestionPage[Boolean] {
   override def path: JsPath =

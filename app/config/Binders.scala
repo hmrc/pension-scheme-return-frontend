@@ -16,11 +16,11 @@
 
 package config
 
-import eu.timepit.refined.api.{Refined, Validate}
+import play.api.mvc.{JavascriptLiteral, PathBindable}
+import models.SchemeId.Srn
 import eu.timepit.refined.refineV
 import models.IdentitySubject
-import models.SchemeId.Srn
-import play.api.mvc.{JavascriptLiteral, PathBindable}
+import eu.timepit.refined.api.{Refined, Validate}
 
 object Binders {
 

@@ -16,31 +16,31 @@
 
 package controllers.nonsipp.employercontributions
 
-import cats.implicits._
-import com.google.inject.Inject
-import config.Refined.Max50._
-import config.Refined._
-import controllers.PSRController
-import controllers.actions._
-import controllers.nonsipp.employercontributions.WhichEmployerContributionRemoveController._
-import forms.RadioListFormProvider
-import models.SchemeId.Srn
-import models.requests.DataRequest
-import models.{Money, NormalMode}
 import pages.nonsipp.employercontributions.{
   EmployerContributionsProgress,
   EmployerNamePage,
   TotalEmployerContributionPage
 }
 import pages.nonsipp.memberdetails.MemberDetailsPage
-import play.api.data.Form
-import play.api.i18n.MessagesApi
 import play.api.mvc._
+import com.google.inject.Inject
 import utils.ListUtils.ListOps
-import viewmodels.DisplayMessage.Message
+import controllers.PSRController
+import cats.implicits._
+import controllers.actions._
+import forms.RadioListFormProvider
+import models.{Money, NormalMode}
+import play.api.i18n.MessagesApi
 import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, ListRadiosRow, ListRadiosViewModel}
+import controllers.nonsipp.employercontributions.WhichEmployerContributionRemoveController._
+import config.Refined._
+import config.Refined.Max50._
 import views.html.ListRadiosView
+import models.SchemeId.Srn
+import viewmodels.DisplayMessage.Message
+import viewmodels.models.{FormPageViewModel, ListRadiosRow, ListRadiosViewModel}
+import models.requests.DataRequest
+import play.api.data.Form
 
 class WhichEmployerContributionRemoveController @Inject()(
   override val messagesApi: MessagesApi,
@@ -50,7 +50,7 @@ class WhichEmployerContributionRemoveController @Inject()(
   formProvider: RadioListFormProvider
 ) extends PSRController {
 
-  val form = WhichEmployerContributionRemoveController.form(formProvider)
+  val form: Form[Max50] = WhichEmployerContributionRemoveController.form(formProvider)
 
   def onPageLoad(srn: Srn, memberIndex: Max300): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     val completed: List[Max50] = request.userAnswers

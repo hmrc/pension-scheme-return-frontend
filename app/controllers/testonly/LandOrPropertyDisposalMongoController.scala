@@ -16,21 +16,22 @@
 
 package controllers.testonly
 
-import config.Refined.{Max50, Max5000}
-import controllers.actions.IdentifyAndRequireData
-import eu.timepit.refined._
-import models.HowDisposed.HowDisposed
-import models.SchemeId.Srn
-import models.{HowDisposed, IdentityType, Money, RecipientDetails}
-import pages.nonsipp.landorpropertydisposal._
-import play.api.mvc.MessagesControllerComponents
 import services.SaveService
+import play.api.mvc.MessagesControllerComponents
+import models.HowDisposed.HowDisposed
+import config.Refined.{Max50, Max5000}
+import models.SchemeId.Srn
+import pages.nonsipp.landorpropertydisposal._
+import models._
 import shapeless._
 import viewmodels.models.SectionCompleted
+import controllers.actions.IdentifyAndRequireData
+import eu.timepit.refined._
+
+import scala.concurrent.ExecutionContext
 
 import java.time.LocalDate
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
 
 class LandOrPropertyDisposalMongoController @Inject()(
   val saveService: SaveService,

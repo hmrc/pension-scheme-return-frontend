@@ -16,34 +16,35 @@
 
 package controllers.nonsipp
 
-import cats.implicits.toShow
-import com.google.inject.Inject
-import controllers.actions._
-import models.SchemeId.Srn
-import models.{ManualOrUpload, NormalMode, PensionSchemeId, UserAnswers}
-import pages.nonsipp.membercontributions.MemberContributionsListPage
-import pages.nonsipp.memberpayments.UnallocatedEmployerContributionsPage
-import pages.nonsipp.memberpensionpayments.{PensionPaymentsJourneyStatus, PensionPaymentsReceivedPage}
-import pages.nonsipp.memberreceivedpcls.PclsMemberListPage
-import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsJourneyStatus
-import pages.nonsipp.membertransferout.TransfersOutJourneyStatus
-import pages.nonsipp.receivetransfer.TransfersInJourneyStatus
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.libs.json._
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{PsrRetrievalService, SaveService}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.DateTimeUtils.localDateShow
-import utils.nonsipp.TaskListStatusUtils
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import com.google.inject.Inject
 import utils.nonsipp.TaskListStatusUtils._
-import viewmodels.DisplayMessage.{Heading2, LinkMessage, Message, ParagraphMessage}
-import viewmodels.implicits._
+import play.api.libs.json._
+import utils.nonsipp.TaskListStatusUtils
+import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsJourneyStatus
 import viewmodels.models.TaskListStatus._
-import viewmodels.models.{TaskListStatus, _}
+import viewmodels.implicits._
+import pages.nonsipp.membercontributions.MemberContributionsListPage
+import pages.nonsipp.memberreceivedpcls.PclsMemberListPage
 import views.html.TaskListView
+import models.SchemeId.Srn
+import cats.implicits.toShow
+import pages.nonsipp.receivetransfer.TransfersInJourneyStatus
+import pages.nonsipp.memberpensionpayments.{PensionPaymentsJourneyStatus, PensionPaymentsReceivedPage}
+import controllers.actions._
+import utils.DateTimeUtils.localDateShow
+import models._
+import pages.nonsipp.membertransferout.TransfersOutJourneyStatus
+import play.api.i18n.{I18nSupport, MessagesApi}
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import pages.nonsipp.memberpayments.UnallocatedEmployerContributionsPage
+import viewmodels.DisplayMessage._
+import viewmodels.models.{TaskListStatus, _}
+
+import scala.concurrent.ExecutionContext
 
 import java.time.LocalDate
-import scala.concurrent.ExecutionContext
 
 class TaskListViewController @Inject()(
   override val messagesApi: MessagesApi,

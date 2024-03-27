@@ -16,9 +16,9 @@
 
 package forms.mappings
 
-import cats.Show
 import cats.implicits.toShow
 import play.api.data.validation.{Constraint, Invalid, Valid}
+import cats.Show
 
 import java.time.LocalDate
 

@@ -16,7 +16,7 @@
 
 package pages.nonsipp.memberpayments
 
-import models.SchemeId.Srn
 import pages.Page
+import models.SchemeId.Srn
 
 case class UnallocatedContributionCYAPage(srn: Srn) extends Page

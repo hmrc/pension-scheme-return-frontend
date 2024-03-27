@@ -16,29 +16,30 @@
 
 package controllers.nonsipp.shares
 
+import services.SaveService
+import viewmodels.implicits._
+import forms.mappings.Mappings
 import config.Refined.Max5000
 import controllers.actions._
-import controllers.nonsipp.shares.SharesIndividualSellerNINumberController._
 import forms.YesNoPageFormProvider
-import forms.mappings.Mappings
-import forms.mappings.errors.InputFormErrors
-import models.SchemeId.Srn
 import models.{ConditionalYesNo, Mode}
-import navigation.Navigator
+import forms.mappings.errors.InputFormErrors
 import pages.nonsipp.shares.{IndividualNameOfSharesSellerPage, SharesIndividualSellerNINumberPage}
-import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
+import views.html.ConditionalYesNoPageView
+import models.SchemeId.Srn
+import navigation.Navigator
 import uk.gov.hmrc.domain.Nino
+import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
-import viewmodels.models.{ConditionalYesNoPageViewModel, FieldType, FormPageViewModel, YesNoViewModel}
-import views.html.ConditionalYesNoPageView
+import viewmodels.models._
+import controllers.nonsipp.shares.SharesIndividualSellerNINumberController._
+import play.api.data.Form
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class SharesIndividualSellerNINumberController @Inject()(
   override val messagesApi: MessagesApi,

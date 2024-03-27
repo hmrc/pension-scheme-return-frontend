@@ -16,33 +16,33 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
-import cats.implicits._
+import viewmodels.implicits._
+import play.api.mvc._
 import com.google.inject.Inject
-import config.Constants
-import config.Constants.maxLoans
 import config.Refined.{Max5000, OneTo5000}
 import controllers.PSRController
-import controllers.actions._
-import controllers.nonsipp.loansmadeoroutstanding.LoansListController._
-import eu.timepit.refined.api.Refined
-import eu.timepit.refined.refineV
-import forms.YesNoPageFormProvider
-import models.CheckOrChange.Change
-import models.SchemeId.Srn
-import models.requests.DataRequest
-import models.{IdentitySubject, IdentityType, Mode, Money, NormalMode, Pagination}
-import navigation.Navigator
+import cats.implicits._
+import config.Constants.maxLoans
 import pages.nonsipp.accountingperiod.AccountingPeriodListPage
+import navigation.Navigator
+import forms.YesNoPageFormProvider
+import models._
 import pages.nonsipp.common.{IdentityTypes, OtherRecipientDetailsPage}
 import pages.nonsipp.loansmadeoroutstanding._
-import play.api.data.Form
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import eu.timepit.refined.api.Refined
+import models.CheckOrChange.Change
 import utils.nonsipp.TaskListStatusUtils.{getIncompleteLoansLink, getLoansTaskListStatus}
-import viewmodels.DisplayMessage.{Message, ParagraphMessage}
-import viewmodels.implicits._
-import viewmodels.models._
+import config.Constants
 import views.html.ListView
+import models.SchemeId.Srn
+import controllers.nonsipp.loansmadeoroutstanding.LoansListController._
+import controllers.actions._
+import eu.timepit.refined.refineV
+import viewmodels.DisplayMessage.{Message, ParagraphMessage}
+import viewmodels.models._
+import models.requests.DataRequest
+import play.api.data.Form
 
 import javax.inject.Named
 

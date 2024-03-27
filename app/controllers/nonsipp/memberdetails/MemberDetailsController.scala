@@ -16,31 +16,32 @@
 
 package controllers.nonsipp.memberdetails
 
-import config.Constants
-import config.Refined.Max300
-import controllers.actions._
-import controllers.nonsipp.memberdetails.MemberDetailsController._
-import forms.NameDOBFormProvider
-import forms.mappings.errors.DateFormErrors
-import models.SchemeId.Srn
-import models.requests.DataRequest
-import models.{Mode, NameDOB}
-import navigation.Navigator
-import pages.nonsipp.memberdetails.MemberDetailsPage
-import play.api.data.Form
-import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{SaveService, SchemeDateService}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.FormUtils._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import config.Refined.Max300
+import config.Constants
+import controllers.actions._
+import navigation.Navigator
+import forms.NameDOBFormProvider
+import models.{Mode, NameDOB}
+import forms.mappings.errors.DateFormErrors
+import pages.nonsipp.memberdetails.MemberDetailsPage
+import controllers.nonsipp.memberdetails.MemberDetailsController._
+import views.html.NameDOBView
+import models.SchemeId.Srn
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, NameDOBViewModel}
-import views.html.NameDOBView
+import models.requests.DataRequest
+import play.api.data.Form
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import java.time.LocalDate
 import java.time.format.{DateTimeFormatter, FormatStyle}
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class MemberDetailsController @Inject()(
   override val messagesApi: MessagesApi,

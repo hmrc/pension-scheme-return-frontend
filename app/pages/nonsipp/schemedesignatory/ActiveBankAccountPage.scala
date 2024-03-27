@@ -16,10 +16,10 @@
 
 package pages.nonsipp.schemedesignatory
 
-import models.SchemeId.Srn
-import models.UserAnswers
 import pages.QuestionPage
+import models.SchemeId.Srn
 import play.api.libs.json.JsPath
+import models.UserAnswers
 
 import scala.util.{Success, Try}
 

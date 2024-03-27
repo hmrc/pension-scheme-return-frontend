@@ -16,29 +16,30 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
-import config.Constants.maxCurrencyValue
-import config.Refined.Max5000
-import controllers.actions._
-import controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController._
-import forms.YesNoPageFormProvider
-import forms.mappings.Mappings
-import forms.mappings.errors.MoneyFormErrors
-import models.ConditionalYesNo._
-import models.SchemeId.Srn
-import models.{ConditionalYesNo, Mode, Money}
-import navigation.Navigator
-import pages.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanPage
-import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.implicits._
-import viewmodels.models.{ConditionalYesNoPageViewModel, FieldType, FormPageViewModel, YesNoViewModel}
+import models.ConditionalYesNo._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import forms.mappings.Mappings
+import controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController._
+import config.Refined.Max5000
+import config.Constants.maxCurrencyValue
+import controllers.actions._
+import navigation.Navigator
+import forms.YesNoPageFormProvider
+import models.{ConditionalYesNo, Mode, Money}
+import pages.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanPage
+import viewmodels.models._
+import play.api.data.Form
+import forms.mappings.errors.MoneyFormErrors
 import views.html.ConditionalYesNoPageView
+import models.SchemeId.Srn
+import play.api.i18n.{I18nSupport, MessagesApi}
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class OutstandingArrearsOnLoanController @Inject()(
   override val messagesApi: MessagesApi,

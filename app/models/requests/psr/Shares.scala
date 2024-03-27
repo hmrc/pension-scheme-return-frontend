@@ -16,8 +16,8 @@
 
 package models.requests.psr
 
-import models.{PropertyAcquiredFrom, SchemeHoldShare, TypeOfShares}
 import play.api.libs.json._
+import models.{PropertyAcquiredFrom, SchemeHoldShare, TypeOfShares}
 
 import java.time.LocalDate
 

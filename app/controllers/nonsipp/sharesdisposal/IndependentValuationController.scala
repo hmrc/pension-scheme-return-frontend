@@ -16,27 +16,28 @@
 
 package controllers.nonsipp.sharesdisposal
 
+import services.SaveService
+import viewmodels.implicits._
 import config.Refined._
 import controllers.PSRController
 import controllers.actions._
-import controllers.nonsipp.sharesdisposal.IndependentValuationController._
+import pages.nonsipp.sharesdisposal.IndependentValuationPage
+import navigation.Navigator
 import forms.YesNoPageFormProvider
 import models.Mode
-import models.SchemeId.Srn
-import navigation.Navigator
-import pages.nonsipp.shares.CompanyNameRelatedSharesPage
-import pages.nonsipp.sharesdisposal.IndependentValuationPage
 import play.api.data.Form
-import play.api.i18n.MessagesApi
+import pages.nonsipp.shares.CompanyNameRelatedSharesPage
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
-import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 import views.html.YesNoPageView
+import models.SchemeId.Srn
+import controllers.nonsipp.sharesdisposal.IndependentValuationController._
+import play.api.i18n.MessagesApi
+import viewmodels.DisplayMessage.Message
+import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class IndependentValuationController @Inject()(
   override val messagesApi: MessagesApi,

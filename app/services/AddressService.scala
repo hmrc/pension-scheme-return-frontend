@@ -17,11 +17,12 @@
 package services
 
 import connectors.AddressLookupConnector
-import models.{ALFAddressResponse, Address, LookupAddress}
 import uk.gov.hmrc.http.HeaderCarrier
+import models.{ALFAddressResponse, Address, LookupAddress}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
 
 class AddressService @Inject()(connector: AddressLookupConnector)(
   implicit ec: ExecutionContext

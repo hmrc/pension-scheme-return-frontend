@@ -16,22 +16,23 @@
 
 package controllers.testonly
 
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Refined.{Max5000, OneTo5000}
+import models.SchemeId.Srn
+import cats.implicits._
+import repositories.SessionRepository
+import models.{Money, Percentage, UserAnswers}
 import controllers.actions.IdentifyAndRequireData
 import eu.timepit.refined.{refineMV, refineV}
-import models.SchemeId.Srn
-import models.{Money, Percentage, UserAnswers}
 import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import repositories.SessionRepository
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import pages.nonsipp.moneyborrowed._
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Try
 
 import java.time.LocalDate
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Try
-import cats.implicits._
 
 class BorrowingInstancesMongoController @Inject()(
   sessionRepository: SessionRepository,

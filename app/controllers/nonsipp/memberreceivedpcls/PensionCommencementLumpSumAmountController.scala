@@ -16,32 +16,33 @@
 
 package controllers.nonsipp.memberreceivedpcls
 
-import com.google.inject.Inject
-import config.Constants.{maxPCLSAmount, minPosMoneyValue}
-import config.Refined.Max300
-import controllers.PSRController
-import controllers.actions._
-import controllers.nonsipp.memberreceivedpcls.PensionCommencementLumpSumAmountController._
-import forms.MoneyFormProvider
-import forms.mappings.errors.MoneyFormErrors
-import models.PensionCommencementLumpSum._
-import models.SchemeId.Srn
-import models.{Mode, Money}
-import navigation.Navigator
-import pages.nonsipp.memberdetails.MemberDetailsPage
-import pages.nonsipp.memberreceivedpcls.PensionCommencementLumpSumAmountPage
-import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
-import viewmodels.DisplayMessage.{Message, ParagraphMessage}
+import pages.nonsipp.memberdetails.MemberDetailsPage
+import com.google.inject.Inject
+import controllers.PSRController
+import config.Constants.{maxPCLSAmount, minPosMoneyValue}
+import controllers.actions._
+import navigation.Navigator
+import forms.MoneyFormProvider
+import models.{Mode, Money}
+import play.api.i18n.{I18nSupport, MessagesApi}
+import forms.mappings.errors.MoneyFormErrors
 import viewmodels.implicits._
+import pages.nonsipp.memberreceivedpcls.PensionCommencementLumpSumAmountPage
+import controllers.nonsipp.memberreceivedpcls.PensionCommencementLumpSumAmountController._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import config.Refined.Max300
 import viewmodels.models.MultipleQuestionsViewModel.DoubleQuestion
-import viewmodels.models.{FormPageViewModel, FurtherDetailsViewModel, QuestionField}
 import views.html.MultipleQuestionView
+import models.SchemeId.Srn
+import viewmodels.DisplayMessage.{Message, ParagraphMessage}
+import viewmodels.models.{FormPageViewModel, FurtherDetailsViewModel, QuestionField}
+import models.PensionCommencementLumpSum._
+import play.api.data.Form
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.Named
-import scala.concurrent.{ExecutionContext, Future}
 
 class PensionCommencementLumpSumAmountController @Inject()(
   override val messagesApi: MessagesApi,

@@ -16,14 +16,14 @@
 
 package navigation.nonsipp
 
-import cats.implicits.toTraverseOps
-import config.Refined.Max50
-import models.PointOfEntry._
-import models.{CheckMode, HowSharesDisposed, IdentityType, NormalMode, UserAnswers}
-import navigation.JourneyNavigator
-import pages.Page
-import pages.nonsipp.sharesdisposal._
 import play.api.mvc.Call
+import models.PointOfEntry._
+import cats.implicits.toTraverseOps
+import pages.nonsipp.sharesdisposal._
+import navigation.JourneyNavigator
+import models._
+import config.Refined.Max50
+import pages.Page
 
 object SharesDisposalNavigator extends JourneyNavigator {
 

@@ -16,20 +16,15 @@
 
 package navigation.nonsipp
 
-import cats.implicits.toTraverseOps
-import config.Refined.Max5000
-import eu.timepit.refined.refineMV
-import models.{CheckMode, IdentitySubject, IdentityType, NormalMode, SchemeHoldLandProperty, UserAnswers}
-import navigation.JourneyNavigator
-import pages.Page
-import pages.nonsipp.common.{
-  CompanyRecipientCrnPage,
-  IdentityTypePage,
-  OtherRecipientDetailsPage,
-  PartnershipRecipientUtrPage
-}
-import pages.nonsipp.landorproperty._
 import play.api.mvc.Call
+import pages.nonsipp.landorproperty._
+import cats.implicits.toTraverseOps
+import eu.timepit.refined.refineMV
+import navigation.JourneyNavigator
+import models._
+import pages.nonsipp.common._
+import config.Refined.Max5000
+import pages.Page
 
 object LandOrPropertyNavigator extends JourneyNavigator {
 

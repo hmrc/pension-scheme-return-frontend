@@ -16,15 +16,15 @@
 
 package pages.nonsipp.otherassetsheld
 
-import config.Refined.Max5000
-import models.{IdentitySubject, SchemeHoldAsset, UserAnswers}
-import models.SchemeId.Srn
-import pages.QuestionPage
-import pages.nonsipp.common.IdentityTypePage
-import play.api.libs.json.JsPath
-import queries.Removable
-import utils.PageUtils.removePages
 import utils.RefinedUtils.RefinedIntOps
+import utils.PageUtils.removePages
+import queries.Removable
+import models.SchemeId.Srn
+import play.api.libs.json.JsPath
+import models.{IdentitySubject, SchemeHoldAsset, UserAnswers}
+import pages.nonsipp.common.IdentityTypePage
+import config.Refined.Max5000
+import pages.QuestionPage
 
 import scala.util.Try
 

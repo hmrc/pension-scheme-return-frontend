@@ -19,14 +19,15 @@ package transformations
 import com.google.inject.Singleton
 import config.Refined.Max300
 import models.SchemeId.Srn
-import models.UserAnswers.implicits.UserAnswersTryOps
-import models.requests.psr._
-import models.{Money, UserAnswers}
 import pages.nonsipp.membersurrenderedbenefits._
+import models.{Money, UserAnswers}
 import viewmodels.models.{SectionCompleted, SectionStatus}
+import models.requests.psr._
+import models.UserAnswers.implicits.UserAnswersTryOps
+
+import scala.util.Try
 
 import javax.inject.Inject
-import scala.util.Try
 
 @Singleton()
 class PensionSurrenderTransformer @Inject() extends Transformer {

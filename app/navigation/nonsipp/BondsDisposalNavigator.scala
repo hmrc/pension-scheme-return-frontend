@@ -16,14 +16,14 @@
 
 package navigation.nonsipp
 
-import cats.implicits.toTraverseOps
-import config.Refined.Max50
-import models.PointOfEntry.{HowWereBondsDisposedPointOfEntry, NoPointOfEntry}
-import models.{CheckMode, HowDisposed, NormalMode, UserAnswers}
-import navigation.JourneyNavigator
-import pages.Page
-import pages.nonsipp.bondsdisposal._
 import play.api.mvc.Call
+import models.PointOfEntry.{HowWereBondsDisposedPointOfEntry, NoPointOfEntry}
+import cats.implicits.toTraverseOps
+import navigation.JourneyNavigator
+import models._
+import pages.nonsipp.bondsdisposal._
+import config.Refined.Max50
+import pages.Page
 
 object BondsDisposalNavigator extends JourneyNavigator {
 

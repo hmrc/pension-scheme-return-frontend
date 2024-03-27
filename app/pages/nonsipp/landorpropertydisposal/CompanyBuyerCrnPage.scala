@@ -16,12 +16,12 @@
 
 package pages.nonsipp.landorpropertydisposal
 
-import config.Refined.{Max50, Max5000}
-import models.SchemeId.Srn
-import models.{ConditionalYesNo, Crn}
-import pages.QuestionPage
-import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
+import models.SchemeId.Srn
+import play.api.libs.json.JsPath
+import models.{ConditionalYesNo, Crn}
+import config.Refined.{Max50, Max5000}
+import pages.QuestionPage
 
 case class CompanyBuyerCrnPage(srn: Srn, landOrPropertyIndex: Max5000, disposalIndex: Max50)
     extends QuestionPage[ConditionalYesNo[String, Crn]] {

@@ -16,21 +16,21 @@
 
 package controllers
 
-import cats.Applicative
+import queries.{Gettable, Removable, Settable}
+import play.api.mvc.Result
+import org.slf4j.LoggerFactory
+import config.Refined.Max3
 import cats.data.{EitherT, NonEmptyList}
 import cats.implicits.toTraverseOps
 import cats.syntax.applicative._
-import cats.syntax.either._
-import config.Refined.Max3
-import eu.timepit.refined.api.{Refined, Validate}
-import eu.timepit.refined.refineV
-import models.requests.DataRequest
-import models.{DateRange, UserAnswers}
-import org.slf4j.LoggerFactory
-import play.api.i18n.I18nSupport
 import play.api.libs.json.{Reads, Writes}
-import play.api.mvc.Result
-import queries.{Gettable, Removable, Settable}
+import models.{DateRange, UserAnswers}
+import cats.Applicative
+import models.requests.DataRequest
+import eu.timepit.refined.api.{Refined, Validate}
+import cats.syntax.either._
+import eu.timepit.refined.refineV
+import play.api.i18n.I18nSupport
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import scala.concurrent.{ExecutionContext, Future}

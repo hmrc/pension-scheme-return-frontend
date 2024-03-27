@@ -17,10 +17,10 @@
 package forms
 
 import forms.mappings.Mappings
-import forms.mappings.errors.InputFormErrors
+import play.api.data.Forms.mapping
 import models.PostcodeLookup
 import play.api.data.Form
-import play.api.data.Forms.mapping
+import forms.mappings.errors.InputFormErrors
 
 import javax.inject.Inject
 

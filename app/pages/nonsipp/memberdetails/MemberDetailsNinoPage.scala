@@ -16,13 +16,13 @@
 
 package pages.nonsipp.memberdetails
 
-import config.Refined.Max300
-import models.SchemeId.Srn
-import pages.QuestionPage
-import play.api.libs.json.JsPath
-import queries.{Gettable, Removable}
-import uk.gov.hmrc.domain.Nino
 import utils.RefinedUtils.RefinedIntOps
+import queries.{Gettable, Removable}
+import models.SchemeId.Srn
+import config.Refined.Max300
+import pages.QuestionPage
+import uk.gov.hmrc.domain.Nino
+import play.api.libs.json.JsPath
 
 case class MemberDetailsNinoPage(srn: Srn, index: Max300) extends QuestionPage[Nino] {
 

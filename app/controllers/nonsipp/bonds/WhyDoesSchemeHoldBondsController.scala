@@ -16,28 +16,29 @@
 
 package controllers.nonsipp.bonds
 
-import config.Refined.Max5000
-import controllers.PSRController
-import controllers.actions._
-import controllers.nonsipp.bonds.WhyDoesSchemeHoldBondsController._
-import forms.RadioListFormProvider
-import models.SchemeHoldBond._
-import models.SchemeId.Srn
-import models.{Mode, SchemeHoldBond}
-import navigation.Navigator
-import pages.nonsipp.bonds.WhyDoesSchemeHoldBondsPage
-import play.api.data.Form
-import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
-import utils.FormUtils.FormOps
-import viewmodels.DisplayMessage.Message
+import pages.nonsipp.bonds.WhyDoesSchemeHoldBondsPage
 import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, RadioListRowViewModel, RadioListViewModel}
+import utils.FormUtils.FormOps
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import config.Refined.Max5000
+import controllers.actions._
+import navigation.Navigator
+import forms.RadioListFormProvider
+import models.{Mode, SchemeHoldBond}
+import play.api.i18n.MessagesApi
+import play.api.data.Form
+import controllers.PSRController
+import models.SchemeHoldBond._
 import views.html.RadioListView
+import models.SchemeId.Srn
+import controllers.nonsipp.bonds.WhyDoesSchemeHoldBondsController._
+import viewmodels.DisplayMessage.Message
+import viewmodels.models.{FormPageViewModel, RadioListRowViewModel, RadioListViewModel}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class WhyDoesSchemeHoldBondsController @Inject()(
   override val messagesApi: MessagesApi,

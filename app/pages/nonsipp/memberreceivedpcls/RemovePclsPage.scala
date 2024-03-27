@@ -16,12 +16,12 @@
 
 package pages.nonsipp.memberreceivedpcls
 
-import config.Refined.Max300
+import utils.RefinedUtils.RefinedIntOps
 import models.SchemeId.Srn
+import play.api.libs.json.JsPath
+import config.Refined.Max300
 import pages.QuestionPage
 import pages.nonsipp.memberreceivedpcls.Paths.memberDetails
-import play.api.libs.json.JsPath
-import utils.RefinedUtils.RefinedIntOps
 
 case class RemovePclsPage(srn: Srn, index: Max300) extends QuestionPage[Boolean] {
 

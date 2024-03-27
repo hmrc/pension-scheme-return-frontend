@@ -16,37 +16,37 @@
 
 package controllers.nonsipp
 
-import cats.implicits.toShow
+import services.SchemeDateService
+import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, ValueOfAssetsPage, WhyNoBankAccountPage}
+import pages.nonsipp.memberdetails._
+import play.api.mvc._
 import com.google.inject.Inject
 import config.Refined.OneTo300
+import utils.nonsipp.TaskListStatusUtils._
+import pages.nonsipp.accountingperiod.AccountingPeriods
+import pages.nonsipp.CheckReturnDatesPage
+import utils.nonsipp.TaskListStatusUtils
+import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsJourneyStatus
+import viewmodels.models.TaskListStatus._
+import models.requests.DataRequest
+import viewmodels.implicits._
+import pages.nonsipp.membercontributions.MemberContributionsListPage
+import pages.nonsipp.memberreceivedpcls.PclsMemberListPage
+import views.html.TaskListView
+import models.SchemeId.Srn
+import cats.implicits.toShow
+import pages.nonsipp.receivetransfer.TransfersInJourneyStatus
+import pages.nonsipp.memberpensionpayments.{PensionPaymentsJourneyStatus, PensionPaymentsReceivedPage}
 import controllers.actions._
 import eu.timepit.refined.refineV
-import models.SchemeId.Srn
-import models.requests.DataRequest
-import models.{DateRange, ManualOrUpload, NormalMode, PensionSchemeId, UserAnswers}
-import pages.nonsipp.CheckReturnDatesPage
-import pages.nonsipp.accountingperiod.AccountingPeriods
-import pages.nonsipp.membercontributions.MemberContributionsListPage
-import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsNinoPages, MembersDetailsPages, NoNinoPages}
-import pages.nonsipp.memberpayments.UnallocatedEmployerContributionsPage
-import pages.nonsipp.memberpensionpayments.{PensionPaymentsJourneyStatus, PensionPaymentsReceivedPage}
-import pages.nonsipp.memberreceivedpcls.PclsMemberListPage
-import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsJourneyStatus
-import pages.nonsipp.membertransferout.TransfersOutJourneyStatus
-import pages.nonsipp.receivetransfer.TransfersInJourneyStatus
-import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, ValueOfAssetsPage, WhyNoBankAccountPage}
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import services.SchemeDateService
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.DateTimeUtils.localDateShow
-import utils.nonsipp.TaskListStatusUtils
-import utils.nonsipp.TaskListStatusUtils._
-import viewmodels.DisplayMessage.{Heading2, LinkMessage, Message, ParagraphMessage}
-import viewmodels.implicits._
-import viewmodels.models.TaskListStatus._
+import models._
+import pages.nonsipp.membertransferout.TransfersOutJourneyStatus
+import play.api.i18n.{I18nSupport, MessagesApi}
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import pages.nonsipp.memberpayments.UnallocatedEmployerContributionsPage
+import viewmodels.DisplayMessage._
 import viewmodels.models.{TaskListStatus, _}
-import views.html.TaskListView
 
 import java.time.LocalDate
 

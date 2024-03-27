@@ -16,27 +16,28 @@
 
 package controllers.nonsipp.employercontributions
 
+import pages.nonsipp.memberdetails.MemberDetailsPage
+import viewmodels.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Refined.{Max300, Max50}
 import controllers.PSRController
 import controllers.actions._
-import controllers.nonsipp.employercontributions.ContributionsFromAnotherEmployerController._
-import forms.YesNoPageFormProvider
-import models.Mode
-import models.SchemeId.Srn
 import navigation.Navigator
-import pages.nonsipp.employercontributions.{ContributionsFromAnotherEmployerPage, EmployerContributionsProgress}
-import pages.nonsipp.memberdetails.MemberDetailsPage
-import play.api.data.Form
+import forms.YesNoPageFormProvider
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.data.Form
+import pages.nonsipp.employercontributions.{ContributionsFromAnotherEmployerPage, EmployerContributionsProgress}
 import services.SaveService
-import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, SectionJourneyStatus, YesNoPageViewModel}
 import views.html.YesNoPageView
+import models.SchemeId.Srn
+import models.Mode
+import controllers.nonsipp.employercontributions.ContributionsFromAnotherEmployerController._
+import viewmodels.DisplayMessage.Message
+import viewmodels.models.{FormPageViewModel, SectionJourneyStatus, YesNoPageViewModel}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class ContributionsFromAnotherEmployerController @Inject()(
   override val messagesApi: MessagesApi,

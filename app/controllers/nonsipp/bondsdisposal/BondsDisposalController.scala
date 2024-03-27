@@ -16,26 +16,27 @@
 
 package controllers.nonsipp.bondsdisposal
 
+import services.{PsrSubmissionService, SaveService}
+import viewmodels.implicits._
 import controllers.PSRController
 import controllers.actions._
-import controllers.nonsipp.bondsdisposal.BondsDisposalController._
+import navigation.Navigator
 import forms.YesNoPageFormProvider
 import models.Mode
-import models.SchemeId.Srn
-import models.requests.DataRequest
-import navigation.Navigator
-import pages.nonsipp.bondsdisposal.BondsDisposalPage
-import play.api.data.Form
-import play.api.i18n.MessagesApi
+import controllers.nonsipp.bondsdisposal.BondsDisposalController._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.{PsrSubmissionService, SaveService}
-import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 import views.html.YesNoPageView
+import models.SchemeId.Srn
+import play.api.i18n.MessagesApi
+import pages.nonsipp.bondsdisposal.BondsDisposalPage
+import viewmodels.DisplayMessage.Message
+import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
+import models.requests.DataRequest
+import play.api.data.Form
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class BondsDisposalController @Inject()(
   override val messagesApi: MessagesApi,

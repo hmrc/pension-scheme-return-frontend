@@ -16,26 +16,27 @@
 
 package controllers.nonsipp.memberdetails
 
-import config.Refined.Max300
-import controllers.actions._
-import controllers.nonsipp.memberdetails.NoNINOController._
-import forms.TextFormProvider
-import models.SchemeId.Srn
-import models.requests.DataRequest
-import models.{Mode, NameDOB}
-import navigation.Navigator
-import pages.nonsipp.memberdetails.{MemberDetailsPage, NoNINOPage}
-import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import services.SaveService
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import pages.nonsipp.memberdetails.{MemberDetailsPage, NoNINOPage}
 import viewmodels.implicits._
+import play.api.mvc._
+import config.Refined.Max300
+import controllers.nonsipp.memberdetails.NoNINOController._
+import controllers.actions._
+import navigation.Navigator
+import forms.TextFormProvider
+import models.{Mode, NameDOB}
 import viewmodels.models.{FormPageViewModel, TextAreaViewModel}
 import views.html.TextAreaView
+import models.SchemeId.Srn
+import play.api.i18n.{I18nSupport, MessagesApi}
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import models.requests.DataRequest
+import play.api.data.Form
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class NoNINOController @Inject()(
   override val messagesApi: MessagesApi,

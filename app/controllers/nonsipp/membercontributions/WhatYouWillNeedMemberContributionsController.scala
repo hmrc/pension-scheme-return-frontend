@@ -16,18 +16,18 @@
 
 package controllers.nonsipp.membercontributions
 
-import controllers.actions.{AllowAccessActionProvider, DataRequiredAction, DataRetrievalAction, IdentifierAction}
-import models.NormalMode
-import models.SchemeId.Srn
-import navigation.Navigator
-import pages.nonsipp.membercontributions.WhatYouWillNeedMemberContributionsPage
-import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.DisplayMessage.{ListMessage, ListType, Message, ParagraphMessage}
+import controllers.actions._
+import navigation.Navigator
+import models.NormalMode
 import viewmodels.implicits._
-import viewmodels.models.{ContentPageViewModel, FormPageViewModel}
+import pages.nonsipp.membercontributions.WhatYouWillNeedMemberContributionsPage
 import views.html.ContentPageView
+import models.SchemeId.Srn
+import play.api.i18n.{I18nSupport, MessagesApi}
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.DisplayMessage._
+import viewmodels.models.{ContentPageViewModel, FormPageViewModel}
 
 import javax.inject.{Inject, Named}
 

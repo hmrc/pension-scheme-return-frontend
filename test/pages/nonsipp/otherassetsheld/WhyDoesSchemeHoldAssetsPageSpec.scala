@@ -301,16 +301,18 @@ class WhyDoesSchemeHoldAssetsPageSpec extends PageBehaviours with TestValues {
         result.get(OtherAssetsHeldPage(srn)) must be(Some(true))
         result.get(WhatIsOtherAssetPage(srn, index)) must be(Some(otherAssetDescription))
         result.get(IsAssetTangibleMoveablePropertyPage(srn, index)) must be(Some(false))
-        result.get(WhyDoesSchemeHoldAssetsPage(srn, index)) must be (Some(Acquisition))
+        result.get(WhyDoesSchemeHoldAssetsPage(srn, index)) must be(Some(Acquisition))
         result.get(WhenDidSchemeAcquireAssetsPage(srn, index)) must be(Some(localDate))
-        result.get(IdentityTypePage(srn, index, subject)) must be (Some(IdentityType.Individual))
-        result.get(IndividualNameOfOtherAssetSellerPage(srn, index)) must be (Some(individualName))
-        result.get(OtherAssetIndividualSellerNINumberPage(srn, index)) must be (Some(ConditionalYesNo.no[String, Nino](noninoReason)))
-        result.get(OtherAssetSellerConnectedPartyPage(srn, index)) must be (Some(true))
+        result.get(IdentityTypePage(srn, index, subject)) must be(Some(IdentityType.Individual))
+        result.get(IndividualNameOfOtherAssetSellerPage(srn, index)) must be(Some(individualName))
+        result.get(OtherAssetIndividualSellerNINumberPage(srn, index)) must be(
+          Some(ConditionalYesNo.no[String, Nino](noninoReason))
+        )
+        result.get(OtherAssetSellerConnectedPartyPage(srn, index)) must be(Some(true))
         result.get(CostOfOtherAssetPage(srn, index)) must be(Some(money))
         result.get(IndependentValuationPage(srn, index)) must be(Some(false))
         result.get(IncomeFromAssetPage(srn, index)) must be(Some(money))
-        result.get(OtherAssetsCYAPointOfEntry(srn, index)) must be (Some(NoPointOfEntry))
+        result.get(OtherAssetsCYAPointOfEntry(srn, index)) must be(Some(NoPointOfEntry))
         result.get(OtherAssetsCompleted(srn, index)) must be(Some(SectionCompleted))
       }
 
@@ -339,12 +341,12 @@ class WhyDoesSchemeHoldAssetsPageSpec extends PageBehaviours with TestValues {
         result.get(OtherAssetsHeldPage(srn)) must be(Some(true))
         result.get(WhatIsOtherAssetPage(srn, index)) must be(Some(otherAssetDescription))
         result.get(IsAssetTangibleMoveablePropertyPage(srn, index)) must be(Some(false))
-        result.get(WhyDoesSchemeHoldAssetsPage(srn, index)) must be (Some(Contribution))
+        result.get(WhyDoesSchemeHoldAssetsPage(srn, index)) must be(Some(Contribution))
         result.get(WhenDidSchemeAcquireAssetsPage(srn, index)) must be(Some(localDate))
         result.get(CostOfOtherAssetPage(srn, index)) must be(Some(money))
         result.get(IndependentValuationPage(srn, index)) must be(Some(false))
         result.get(IncomeFromAssetPage(srn, index)) must be(Some(money))
-        result.get(OtherAssetsCYAPointOfEntry(srn, index)) must be (Some(NoPointOfEntry))
+        result.get(OtherAssetsCYAPointOfEntry(srn, index)) must be(Some(NoPointOfEntry))
         result.get(OtherAssetsCompleted(srn, index)) must be(Some(SectionCompleted))
       }
 
@@ -371,10 +373,10 @@ class WhyDoesSchemeHoldAssetsPageSpec extends PageBehaviours with TestValues {
         result.get(OtherAssetsHeldPage(srn)) must be(Some(true))
         result.get(WhatIsOtherAssetPage(srn, index)) must be(Some(otherAssetDescription))
         result.get(IsAssetTangibleMoveablePropertyPage(srn, index)) must be(Some(false))
-        result.get(WhyDoesSchemeHoldAssetsPage(srn, index)) must be (Some(Transfer))
+        result.get(WhyDoesSchemeHoldAssetsPage(srn, index)) must be(Some(Transfer))
         result.get(CostOfOtherAssetPage(srn, index)) must be(Some(money))
         result.get(IncomeFromAssetPage(srn, index)) must be(Some(money))
-        result.get(OtherAssetsCYAPointOfEntry(srn, index)) must be (Some(NoPointOfEntry))
+        result.get(OtherAssetsCYAPointOfEntry(srn, index)) must be(Some(NoPointOfEntry))
         result.get(OtherAssetsCompleted(srn, index)) must be(Some(SectionCompleted))
       }
 
@@ -404,20 +406,20 @@ class WhyDoesSchemeHoldAssetsPageSpec extends PageBehaviours with TestValues {
           .value
 
         // Cleaned up fields
-        result.get(WhyDoesSchemeHoldAssetsPage(srn, index)) must be (empty)
-        result.get(WhenDidSchemeAcquireAssetsPage(srn, index)) must be (empty)
-        result.get(IdentityTypePage(srn, index, subject)) must be (empty)
-        result.get(IndividualNameOfOtherAssetSellerPage(srn, index)) must be (empty)
-        result.get(OtherAssetIndividualSellerNINumberPage(srn, index)) must be (empty)
-        result.get(OtherAssetSellerConnectedPartyPage(srn, index)) must be (empty)
-        result.get(IndependentValuationPage(srn, index)) must be (empty)
+        result.get(WhyDoesSchemeHoldAssetsPage(srn, index)) must be(empty)
+        result.get(WhenDidSchemeAcquireAssetsPage(srn, index)) must be(empty)
+        result.get(IdentityTypePage(srn, index, subject)) must be(empty)
+        result.get(IndividualNameOfOtherAssetSellerPage(srn, index)) must be(empty)
+        result.get(OtherAssetIndividualSellerNINumberPage(srn, index)) must be(empty)
+        result.get(OtherAssetSellerConnectedPartyPage(srn, index)) must be(empty)
+        result.get(IndependentValuationPage(srn, index)) must be(empty)
         // Retained fields
         result.get(OtherAssetsHeldPage(srn)) must be(Some(true))
         result.get(WhatIsOtherAssetPage(srn, index)) must be(Some(otherAssetDescription))
         result.get(IsAssetTangibleMoveablePropertyPage(srn, index)) must be(Some(false))
         result.get(CostOfOtherAssetPage(srn, index)) must be(Some(money))
         result.get(IncomeFromAssetPage(srn, index)) must be(Some(money))
-        result.get(OtherAssetsCYAPointOfEntry(srn, index)) must be (Some(NoPointOfEntry))
+        result.get(OtherAssetsCYAPointOfEntry(srn, index)) must be(Some(NoPointOfEntry))
         result.get(OtherAssetsCompleted(srn, index)) must be(Some(SectionCompleted))
       }
     }

@@ -16,11 +16,11 @@
 
 package navigation.nonsipp
 
-import models.{CheckOrChange, NormalMode, UserAnswers}
-import navigation.JourneyNavigator
-import pages.Page
-import pages.nonsipp.memberpayments._
 import play.api.mvc.Call
+import pages.Page
+import navigation.JourneyNavigator
+import models.{CheckOrChange, NormalMode, UserAnswers}
+import pages.nonsipp.memberpayments._
 
 object UnallocatedEmployerContributionsNavigator extends JourneyNavigator {
 

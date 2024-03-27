@@ -16,10 +16,10 @@
 
 package pages.nonsipp.memberpayments
 
-import models.Money
-import models.SchemeId.Srn
 import pages.QuestionPage
+import models.SchemeId.Srn
 import play.api.libs.json.JsPath
+import models.Money
 
 case class UnallocatedEmployerAmountPage(srn: Srn) extends QuestionPage[Money] {
 

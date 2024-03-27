@@ -16,31 +16,32 @@
 
 package repositories
 
-import cats.data.NonEmptyList
-import config.{Crypto, FrontendAppConfig}
-import models.SchemeId.asSrn
-import models.UploadKey.separator
-import models.UploadStatus.UploadStatus
-import models._
-import org.mongodb.scala.model.Filters.equal
 import org.mongodb.scala.model.Updates.{combine, set}
-import org.mongodb.scala.model.{FindOneAndUpdateOptions, IndexModel, IndexOptions, Indexes}
-import play.api.libs.functional.syntax._
-import play.api.libs.json._
-import repositories.UploadRepository.MongoUpload
-import repositories.UploadRepository.MongoUpload.{SensitiveUpload, SensitiveUploadStatus}
-import uk.gov.hmrc.crypto.json.JsonEncryption
-import uk.gov.hmrc.crypto.{Decrypter, Encrypter, Sensitive}
 import uk.gov.hmrc.mongo.MongoComponent
+import repositories.UploadRepository.MongoUpload
 import uk.gov.hmrc.mongo.play.json.Codecs._
-import uk.gov.hmrc.mongo.play.json.{PlayMongoRepository}
+import play.api.libs.json._
+import models._
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
+import org.mongodb.scala.model.Filters.equal
+import models.UploadKey.separator
+import uk.gov.hmrc.crypto.json.JsonEncryption
+import repositories.UploadRepository.MongoUpload.{SensitiveUpload, SensitiveUploadStatus}
+import uk.gov.hmrc.crypto.{Decrypter, Encrypter, Sensitive}
+import org.mongodb.scala.model._
+import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
+import config.{Crypto, FrontendAppConfig}
+import cats.data.NonEmptyList
+import models.SchemeId.asSrn
+import models.UploadStatus.UploadStatus
+import play.api.libs.functional.syntax._
+
+import scala.Function.unlift
+import scala.concurrent.{ExecutionContext, Future}
 
 import java.time.{Clock, Instant}
 import java.util.concurrent.TimeUnit
 import javax.inject.{Inject, Singleton}
-import scala.Function.unlift
-import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class UploadRepository @Inject()(

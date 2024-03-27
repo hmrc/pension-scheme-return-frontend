@@ -22,7 +22,7 @@ import java.time.LocalDate
 
 case class NameDOB(firstName: String, lastName: String, dob: LocalDate) {
 
-  val fullName = s"$firstName $lastName"
+  val fullName: String = s"$firstName $lastName"
 }
 
 object NameDOB {

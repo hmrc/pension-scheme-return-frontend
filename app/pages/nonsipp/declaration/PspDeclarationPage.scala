@@ -16,7 +16,7 @@
 
 package pages.nonsipp.declaration
 
-import models.SchemeId.Srn
 import pages.Page
+import models.SchemeId.Srn
 
 case class PspDeclarationPage(srn: Srn) extends Page

@@ -16,10 +16,10 @@
 
 package viewmodels
 
-import play.api.data.{Field, FormError}
-import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
+import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.errormessage.ErrorMessage
+import play.api.data.{Field, FormError}
 
 trait ErrorMessageAwareness {
 

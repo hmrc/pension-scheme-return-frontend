@@ -16,25 +16,26 @@
 
 package controllers.nonsipp.otherassetsheld
 
+import services.SaveService
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import pages.nonsipp.otherassetsheld.PartnershipOtherAssetSellerNamePage
 import config.Refined.Max5000
-import controllers.PSRController
 import controllers.actions._
-import controllers.nonsipp.otherassetsheld.PartnershipNameOfOtherAssetsSellerController._
+import navigation.Navigator
 import forms.TextFormProvider
 import models.Mode
-import models.SchemeId.Srn
-import navigation.Navigator
-import pages.nonsipp.otherassetsheld.PartnershipOtherAssetSellerNamePage
-import play.api.data.Form
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
+import play.api.data.Form
+import controllers.nonsipp.otherassetsheld.PartnershipNameOfOtherAssetsSellerController._
+import controllers.PSRController
+import views.html.TextInputView
+import models.SchemeId.Srn
 import viewmodels.DisplayMessage.Message
 import viewmodels.models._
-import views.html.TextInputView
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class PartnershipNameOfOtherAssetsSellerController @Inject()(
   override val messagesApi: MessagesApi,

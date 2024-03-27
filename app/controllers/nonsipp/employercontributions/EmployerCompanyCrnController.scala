@@ -16,30 +16,31 @@
 
 package controllers.nonsipp.employercontributions
 
+import viewmodels.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import forms.mappings.Mappings
 import config.Refined.{Max300, Max50}
 import controllers.PSRController
+import cats.implicits.catsSyntaxApplicativeId
 import controllers.actions.IdentifyAndRequireData
-import forms.YesNoPageFormProvider
-import forms.mappings.Mappings
-import forms.mappings.errors.InputFormErrors
-import models.SchemeId.Srn
-import models.{ConditionalYesNo, Crn, Mode}
+import controllers.nonsipp.employercontributions.EmployerCompanyCrnController._
 import navigation.Navigator
-import pages.nonsipp.employercontributions.{EmployerCompanyCrnPage, EmployerContributionsProgress, EmployerNamePage}
-import play.api.data.Form
+import forms.YesNoPageFormProvider
+import models.{ConditionalYesNo, Crn, Mode}
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.data.Form
+import forms.mappings.errors.InputFormErrors
+import pages.nonsipp.employercontributions.{EmployerCompanyCrnPage, EmployerNamePage}
 import services.SaveService
+import views.html.ConditionalYesNoPageView
+import models.SchemeId.Srn
 import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
 import viewmodels.models._
-import EmployerCompanyCrnController._
-import cats.implicits.catsSyntaxApplicativeId
-import views.html.ConditionalYesNoPageView
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class EmployerCompanyCrnController @Inject()(
   override val messagesApi: MessagesApi,

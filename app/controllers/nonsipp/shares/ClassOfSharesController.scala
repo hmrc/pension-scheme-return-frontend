@@ -16,26 +16,27 @@
 
 package controllers.nonsipp.shares
 
+import services.SaveService
+import controllers.nonsipp.shares.ClassOfSharesController._
+import utils.FormUtils._
 import config.Refined.Max5000
 import controllers.PSRController
 import controllers.actions._
-import controllers.nonsipp.shares.ClassOfSharesController._
+import navigation.Navigator
 import forms.TextFormProvider
 import models.Mode
-import models.SchemeId.Srn
-import navigation.Navigator
-import pages.nonsipp.shares.{ClassOfSharesPage, CompanyNameRelatedSharesPage}
-import play.api.data.Form
 import play.api.i18n.MessagesApi
+import play.api.data.Form
+import pages.nonsipp.shares.{ClassOfSharesPage, CompanyNameRelatedSharesPage}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
-import utils.FormUtils._
+import views.html.TextInputView
+import models.SchemeId.Srn
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, TextInputViewModel}
-import views.html.TextInputView
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class ClassOfSharesController @Inject()(
   override val messagesApi: MessagesApi,

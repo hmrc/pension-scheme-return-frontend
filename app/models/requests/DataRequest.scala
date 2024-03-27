@@ -16,13 +16,13 @@
 
 package models.requests
 
+import queries.Gettable
+import play.api.mvc.{Result, WrappedRequest}
 import controllers.routes
 import models.SchemeId.Srn
-import models.{MinimalDetails, PensionSchemeId, SchemeDetails, UserAnswers}
 import play.api.libs.json.Reads
+import models._
 import play.api.mvc.Results.Redirect
-import play.api.mvc.{Result, WrappedRequest}
-import queries.Gettable
 
 import scala.concurrent.Future
 

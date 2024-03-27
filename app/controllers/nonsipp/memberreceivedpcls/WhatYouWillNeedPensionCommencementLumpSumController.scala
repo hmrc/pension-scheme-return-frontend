@@ -16,18 +16,18 @@
 
 package controllers.nonsipp.memberreceivedpcls
 
-import controllers.actions.IdentifyAndRequireData
-import models.NormalMode
-import models.SchemeId.Srn
-import navigation.Navigator
-import pages.nonsipp.memberreceivedpcls.WhatYouWillNeedPensionCommencementLumpSumPage
-import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.DisplayMessage.{ListMessage, ListType, Message, ParagraphMessage}
+import controllers.actions.IdentifyAndRequireData
+import navigation.Navigator
+import models.NormalMode
 import viewmodels.implicits._
-import viewmodels.models.{ContentPageViewModel, FormPageViewModel}
+import pages.nonsipp.memberreceivedpcls.WhatYouWillNeedPensionCommencementLumpSumPage
 import views.html.ContentPageView
+import models.SchemeId.Srn
+import play.api.i18n.{I18nSupport, MessagesApi}
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.DisplayMessage._
+import viewmodels.models.{ContentPageViewModel, FormPageViewModel}
 
 import javax.inject.{Inject, Named}
 

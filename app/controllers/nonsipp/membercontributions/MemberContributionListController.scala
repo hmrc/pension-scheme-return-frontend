@@ -16,32 +16,33 @@
 
 package controllers.nonsipp.membercontributions
 
-import cats.implicits.{toBifunctorOps, toTraverseOps}
+import services.{PsrSubmissionService, SaveService}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import com.google.inject.Inject
-import config.Constants
 import config.Refined.OneTo300
 import controllers.PSRController
-import controllers.actions.IdentifyAndRequireData
+import config.Constants
 import controllers.nonsipp.membercontributions.MemberContributionListController._
-import eu.timepit.refined.refineV
-import forms.YesNoPageFormProvider
-import models.SchemeId.Srn
-import models.requests.DataRequest
-import models.{CheckMode, Mode, Money, NameDOB, NormalMode, Pagination, UserAnswers}
+import cats.implicits.{toBifunctorOps, toTraverseOps}
 import navigation.Navigator
-import pages.nonsipp.membercontributions.{MemberContributionsListPage, TotalMemberContributionPage}
-import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
-import play.api.data.Form
-import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.{PsrSubmissionService, SaveService}
-import viewmodels.DisplayMessage.{Message, ParagraphMessage}
+import forms.YesNoPageFormProvider
+import models._
 import viewmodels.implicits._
-import viewmodels.models._
+import pages.nonsipp.membercontributions.{MemberContributionsListPage, TotalMemberContributionPage}
 import views.html.TwoColumnsTripleAction
+import models.SchemeId.Srn
+import controllers.actions.IdentifyAndRequireData
+import eu.timepit.refined.refineV
+import play.api.i18n.MessagesApi
+import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
+import viewmodels.DisplayMessage.{Message, ParagraphMessage}
+import viewmodels.models._
+import models.requests.DataRequest
+import play.api.data.Form
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.Named
-import scala.concurrent.{ExecutionContext, Future}
 
 class MemberContributionListController @Inject()(
   override val messagesApi: MessagesApi,

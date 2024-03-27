@@ -16,32 +16,28 @@
 
 package controllers.nonsipp.employercontributions
 
-import config.Refined.{Max300, Max50}
+import pages.nonsipp.memberdetails.MemberDetailsPage
+import viewmodels.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import controllers.PSRController
 import controllers.actions._
-import controllers.nonsipp.employercontributions.RemoveEmployerContributionsController._
-import forms.YesNoPageFormProvider
-import models.SchemeId.Srn
-import models.{Money, NormalMode}
 import navigation.Navigator
-import pages.nonsipp.employercontributions.{
-  EmployerContributionsProgress,
-  EmployerNamePage,
-  RemoveEmployerContributionsPage,
-  TotalEmployerContributionPage
-}
-import pages.nonsipp.memberdetails.MemberDetailsPage
-import play.api.data.Form
+import forms.YesNoPageFormProvider
+import models.{Money, NormalMode}
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.data.Form
+import pages.nonsipp.employercontributions._
 import services.{PsrSubmissionService, SaveService}
-import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
+import config.Refined.{Max300, Max50}
+import controllers.nonsipp.employercontributions.RemoveEmployerContributionsController._
 import views.html.YesNoPageView
+import models.SchemeId.Srn
+import viewmodels.DisplayMessage.Message
+import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class RemoveEmployerContributionsController @Inject()(
   override val messagesApi: MessagesApi,

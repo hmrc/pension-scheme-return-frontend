@@ -16,12 +16,12 @@
 
 package views.components
 
-import cats.data.NonEmptyList
-import play.api.i18n.Messages
 import play.twirl.api.{Html, HtmlFormat}
-import viewmodels.DisplayMessage
+import cats.data.NonEmptyList
 import viewmodels.DisplayMessage.ListType._
 import viewmodels.DisplayMessage._
+import play.api.i18n.Messages
+import viewmodels.DisplayMessage
 
 object Components {
 

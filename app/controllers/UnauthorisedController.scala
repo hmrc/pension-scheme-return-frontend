@@ -16,13 +16,13 @@
 
 package controllers
 
-import config.FrontendAppConfig
-import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import config.FrontendAppConfig
+import views.html.UnauthorisedView
+import play.api.i18n.I18nSupport
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.{LinkMessage, Message}
 import viewmodels.models.{FormPageViewModel, UnauthorisedPageViewModel}
-import views.html.UnauthorisedView
 
 import javax.inject.Inject
 

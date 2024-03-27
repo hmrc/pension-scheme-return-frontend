@@ -16,10 +16,10 @@
 
 package transformations
 
+import config.Refined._
 import cats.implicits.{toBifunctorOps, toTraverseOps}
-import config.Refined.{Max50, Max5000, OneTo50, OneTo5000}
-import eu.timepit.refined.api.{Refined, Validate}
 import eu.timepit.refined.refineV
+import eu.timepit.refined.api.{Refined, Validate}
 
 import scala.util.Try
 

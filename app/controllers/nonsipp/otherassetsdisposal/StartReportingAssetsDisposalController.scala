@@ -16,31 +16,30 @@
 
 package controllers.nonsipp.otherassetsdisposal
 
-import cats.implicits.toTraverseOps
-import com.google.inject.Inject
-import config.Constants
-import config.Refined.Max5000
-import config.Refined.Max5000.enumerable
-import controllers.PSRController
-import controllers.actions.IdentifyAndRequireData
-import controllers.nonsipp.otherassetsdisposal.StartReportingAssetsDisposalController._
-import forms.RadioListFormProvider
-import models.SchemeId.Srn
-import models.requests.DataRequest
-import models.{Mode, Money, Pagination, SchemeHoldBond}
-import navigation.Navigator
-import navigation.nonsipp.findNextOpenIndex
 import pages.nonsipp.otherassetsdisposal._
-import pages.nonsipp.otherassetsheld._
-import play.api.data.Form
-import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import utils.ListUtils._
-import viewmodels.DisplayMessage.{Message, ParagraphMessage}
-import viewmodels.LegendSize
 import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, ListRadiosRow, ListRadiosViewModel, PaginatedViewModel}
+import play.api.mvc._
+import utils.ListUtils._
+import config.Refined.Max5000
+import controllers.PSRController
+import config.Constants
+import controllers.actions.IdentifyAndRequireData
+import config.Refined.Max5000.enumerable
+import navigation.Navigator
+import forms.RadioListFormProvider
+import models.{Mode, Pagination}
+import pages.nonsipp.otherassetsheld._
+import com.google.inject.Inject
 import views.html.ListRadiosView
+import models.SchemeId.Srn
+import cats.implicits.toTraverseOps
+import controllers.nonsipp.otherassetsdisposal.StartReportingAssetsDisposalController._
+import play.api.i18n.MessagesApi
+import viewmodels.LegendSize
+import viewmodels.DisplayMessage.{Message, ParagraphMessage}
+import viewmodels.models._
+import models.requests.DataRequest
+import play.api.data.Form
 
 import javax.inject.Named
 

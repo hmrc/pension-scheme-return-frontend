@@ -16,29 +16,30 @@
 
 package controllers.nonsipp.membertransferout
 
-import cats.implicits._
+import pages.nonsipp.memberdetails.MemberDetailsPage
+import viewmodels.implicits._
+import play.api.mvc._
 import com.google.inject.Inject
-import config.Refined.Max5.enumerable
 import config.Refined.{Max300, Max5, OneTo5}
 import controllers.PSRController
-import controllers.actions.IdentifyAndRequireData
-import controllers.nonsipp.membertransferout.WhichTransferOutRemoveController._
-import eu.timepit.refined.refineV
-import forms.RadioListFormProvider
-import models.SchemeId.Srn
-import pages.nonsipp.memberdetails.MemberDetailsPage
-import pages.nonsipp.membertransferout.{ReceivingSchemeNamePages, WhenWasTransferMadePages}
-import play.api.data.Form
-import play.api.i18n.MessagesApi
-import play.api.mvc._
+import cats.implicits._
 import utils.DateTimeUtils.localDateShow
-import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, ListRadiosRow, ListRadiosViewModel}
+import play.api.data.Form
 import views.html.ListRadiosView
+import models.SchemeId.Srn
+import controllers.actions.IdentifyAndRequireData
+import eu.timepit.refined.refineV
+import config.Refined.Max5.enumerable
+import forms.RadioListFormProvider
+import pages.nonsipp.membertransferout.{ReceivingSchemeNamePages, WhenWasTransferMadePages}
+import play.api.i18n.MessagesApi
+import controllers.nonsipp.membertransferout.WhichTransferOutRemoveController._
+import viewmodels.DisplayMessage.Message
+import viewmodels.models.{FormPageViewModel, ListRadiosRow, ListRadiosViewModel}
+
+import scala.collection.immutable.SortedMap
 
 import java.time.LocalDate
-import scala.collection.immutable.SortedMap
 
 class WhichTransferOutRemoveController @Inject()(
   override val messagesApi: MessagesApi,
@@ -48,7 +49,7 @@ class WhichTransferOutRemoveController @Inject()(
   formProvider: RadioListFormProvider
 ) extends PSRController {
 
-  val form = WhichTransferOutRemoveController.form(formProvider)
+  val form: Form[Max5] = WhichTransferOutRemoveController.form(formProvider)
 
   def onPageLoad(srn: Srn, memberIndex: Max300): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     val dateOfTransfer = request.userAnswers.map(WhenWasTransferMadePages(srn, memberIndex))

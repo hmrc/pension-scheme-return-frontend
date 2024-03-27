@@ -16,28 +16,29 @@
 
 package controllers.nonsipp.bondsdisposal
 
+import services.{PsrSubmissionService, SaveService}
+import pages.nonsipp.bonds.NameOfBondsPage
+import viewmodels.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Refined.{Max50, Max5000}
 import controllers.PSRController
-import controllers.nonsipp.bondsdisposal.RemoveBondsDisposalController._
 import controllers.actions.IdentifyAndRequireData
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import models.SchemeId.Srn
-import models.requests.DataRequest
-import navigation.Navigator
-import pages.nonsipp.bondsdisposal.{HowWereBondsDisposedOfPage, RemoveBondsDisposalPage}
-import pages.nonsipp.bonds.NameOfBondsPage
-import play.api.data.Form
-import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.{PsrSubmissionService, SaveService}
-import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 import views.html.YesNoPageView
+import models.SchemeId.Srn
+import controllers.nonsipp.bondsdisposal.RemoveBondsDisposalController._
+import navigation.Navigator
+import play.api.i18n.MessagesApi
+import pages.nonsipp.bondsdisposal.{HowWereBondsDisposedOfPage, RemoveBondsDisposalPage}
+import viewmodels.DisplayMessage.Message
+import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
+import models.requests.DataRequest
+import play.api.data.Form
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class RemoveBondsDisposalController @Inject()(
   override val messagesApi: MessagesApi,

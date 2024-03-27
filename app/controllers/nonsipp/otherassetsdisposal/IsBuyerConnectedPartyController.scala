@@ -16,27 +16,28 @@
 
 package controllers.nonsipp.otherassetsdisposal
 
+import services.SaveService
+import pages.nonsipp.otherassetsdisposal._
+import viewmodels.implicits._
+import play.api.mvc._
 import config.Refined.{Max50, Max5000}
 import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
 import controllers.nonsipp.otherassetsdisposal.IsBuyerConnectedPartyController._
-import forms.YesNoPageFormProvider
-import models.SchemeId.Srn
-import models.requests.DataRequest
-import models.{IdentityType, Mode}
 import navigation.Navigator
-import pages.nonsipp.otherassetsdisposal._
-import play.api.data.Form
+import forms.YesNoPageFormProvider
+import models.{IdentityType, Mode}
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import services.SaveService
-import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 import views.html.YesNoPageView
+import models.SchemeId.Srn
+import viewmodels.DisplayMessage.Message
+import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
+import models.requests.DataRequest
+import play.api.data.Form
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class IsBuyerConnectedPartyController @Inject()(
   override val messagesApi: MessagesApi,

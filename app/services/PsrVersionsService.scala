@@ -20,8 +20,9 @@ import connectors.PSRConnector
 import models.backend.responses.PsrVersionsForYearsResponse
 import uk.gov.hmrc.http.HeaderCarrier
 
-import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+
+import javax.inject.Inject
 
 class PsrVersionsService @Inject()(psrConnector: PSRConnector) {
   def getVersionsForYears(pstr: String, startDates: Seq[String])(

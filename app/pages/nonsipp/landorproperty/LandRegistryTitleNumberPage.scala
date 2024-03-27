@@ -16,12 +16,12 @@
 
 package pages.nonsipp.landorproperty
 
-import config.Refined.Max5000
-import models.SchemeId.Srn
-import models._
-import pages.QuestionPage
-import play.api.libs.json.JsPath
 import utils.RefinedUtils._
+import models.SchemeId.Srn
+import play.api.libs.json.JsPath
+import models._
+import config.Refined.Max5000
+import pages.QuestionPage
 
 case class LandRegistryTitleNumberPage(srn: Srn, index: Max5000)
     extends QuestionPage[ConditionalYesNo[String, String]] {

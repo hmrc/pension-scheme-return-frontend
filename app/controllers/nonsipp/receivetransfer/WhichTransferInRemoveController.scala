@@ -16,26 +16,26 @@
 
 package controllers.nonsipp.receivetransfer
 
-import cats.implicits._
+import pages.nonsipp.memberdetails.MemberDetailsPage
+import viewmodels.implicits._
+import play.api.mvc._
 import com.google.inject.Inject
-import config.Refined.Max5._
 import config.Refined._
 import controllers.PSRController
-import controllers.actions._
 import controllers.nonsipp.receivetransfer.WhichTransferInRemoveController._
-import eu.timepit.refined.refineV
-import forms.RadioListFormProvider
 import models.Money
-import models.SchemeId.Srn
-import pages.nonsipp.memberdetails.MemberDetailsPage
-import pages.nonsipp.receivetransfer.{TotalValueTransferPages, TransferringSchemeNamePages}
-import play.api.data.Form
 import play.api.i18n.MessagesApi
-import play.api.mvc._
-import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, ListRadiosRow, ListRadiosViewModel}
+import play.api.data.Form
 import views.html.ListRadiosView
+import models.SchemeId.Srn
+import cats.implicits._
+import pages.nonsipp.receivetransfer.{TotalValueTransferPages, TransferringSchemeNamePages}
+import controllers.actions._
+import eu.timepit.refined.refineV
+import config.Refined.Max5._
+import forms.RadioListFormProvider
+import viewmodels.DisplayMessage.Message
+import viewmodels.models.{FormPageViewModel, ListRadiosRow, ListRadiosViewModel}
 
 import scala.collection.immutable.SortedMap
 
@@ -47,7 +47,7 @@ class WhichTransferInRemoveController @Inject()(
   formProvider: RadioListFormProvider
 ) extends PSRController {
 
-  val form = WhichTransferInRemoveController.form(formProvider)
+  val form: Form[Max5] = WhichTransferInRemoveController.form(formProvider)
 
   def onPageLoad(srn: Srn, memberIndex: Max300): Action[AnyContent] = identifyAndRequireData(srn) { implicit request =>
     val totalValue = request.userAnswers.map(TotalValueTransferPages(srn, memberIndex))

@@ -17,7 +17,7 @@
 package models.requests.psr
 
 import cats.data.NonEmptyList
-import play.api.libs.json.{Format, Json, OFormat, Reads, Writes}
+import play.api.libs.json._
 
 import java.time.LocalDate
 

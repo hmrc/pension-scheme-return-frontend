@@ -16,10 +16,10 @@
 
 package pages.nonsipp
 
-import models.SchemeId.Srn
-import models.{DateRange, UserAnswers}
 import pages.QuestionPage
+import models.SchemeId.Srn
 import play.api.libs.json.JsPath
+import models.{DateRange, UserAnswers}
 
 import scala.util.{Success, Try}
 

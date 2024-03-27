@@ -16,24 +16,25 @@
 
 package controllers.nonsipp.employercontributions
 
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import controllers.PSRController
-import controllers.actions._
-import controllers.nonsipp.employercontributions.EmployerContributionsController.viewModel
+import navigation.Navigator
 import forms.YesNoPageFormProvider
 import models.Mode
-import models.SchemeId.Srn
-import navigation.Navigator
-import pages.nonsipp.employercontributions.EmployerContributionsPage
-import play.api.data.Form
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.data.Form
+import pages.nonsipp.employercontributions.EmployerContributionsPage
 import services.{PsrSubmissionService, SaveService}
+import views.html.YesNoPageView
+import models.SchemeId.Srn
+import controllers.actions._
+import controllers.nonsipp.employercontributions.EmployerContributionsController.viewModel
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
-import views.html.YesNoPageView
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class EmployerContributionsController @Inject()(
   override val messagesApi: MessagesApi,

@@ -16,44 +16,33 @@
 
 package controllers.nonsipp.otherassetsheld
 
-import cats.implicits.toShow
+import controllers.nonsipp.otherassetsheld.OtherAssetsCYAController._
+import services.{PsrSubmissionService, SaveService}
+import viewmodels.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import utils.ListUtils.ListOps
 import config.Refined.Max5000
 import controllers.PSRController
+import cats.implicits.toShow
 import controllers.actions.IdentifyAndRequireData
-import controllers.nonsipp.otherassetsheld.OtherAssetsCYAController._
-import models.PointOfEntry.NoPointOfEntry
-import models.{CheckMode, IdentitySubject, IdentityType, Mode, Money, NormalMode, SchemeHoldAsset}
-import models.SchemeHoldAsset._
-import models.SchemeId.Srn
 import navigation.Navigator
-import pages.nonsipp.common.{
-  CompanyRecipientCrnPage,
-  IdentityTypePage,
-  OtherRecipientDetailsPage,
-  PartnershipRecipientUtrPage
-}
+import pages.nonsipp.common._
 import pages.nonsipp.otherassetsheld._
-import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.{PsrSubmissionService, SaveService}
-import utils.DateTimeUtils.localDateShow
-import utils.ListUtils.ListOps
-import viewmodels.DisplayMessage.{Heading2, Message}
-import viewmodels.Margin
-import viewmodels.implicits._
-import viewmodels.models.{
-  CheckYourAnswersRowViewModel,
-  CheckYourAnswersSection,
-  CheckYourAnswersViewModel,
-  FormPageViewModel,
-  SectionCompleted,
-  SummaryAction
-}
+import models.PointOfEntry.NoPointOfEntry
 import views.html.CheckYourAnswersView
+import models.SchemeId.Srn
+import utils.DateTimeUtils.localDateShow
+import models._
+import models.SchemeHoldAsset._
+import play.api.i18n.MessagesApi
+import viewmodels.Margin
+import viewmodels.DisplayMessage.{Heading2, Message}
+import viewmodels.models._
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import java.time.LocalDate
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class OtherAssetsCYAController @Inject()(
   override val messagesApi: MessagesApi,

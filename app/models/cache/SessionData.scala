@@ -16,8 +16,8 @@
 
 package models.cache
 
-import play.api.libs.json._
 import utils.WithName
+import play.api.libs.json._
 
 case class SessionData(administratorOrPractitioner: PensionSchemeUser)
 

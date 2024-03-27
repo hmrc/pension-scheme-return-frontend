@@ -16,28 +16,29 @@
 
 package controllers.nonsipp.memberdetails.upload
 
-import config.Refined.OneTo300
-import controllers.actions._
-import controllers.nonsipp.memberdetails.upload.FileUploadSuccessController._
-import eu.timepit.refined.refineV
-import models.SchemeId.Srn
-import models.requests.DataRequest
-import models.{Mode, UploadKey, UploadMemberDetails, UploadStatus, UploadSuccess, UserAnswers}
-import navigation.Navigator
-import pages.nonsipp.memberdetails._
-import pages.nonsipp.memberdetails.upload.FileUploadSuccessPage
-import play.api.i18n._
-import play.api.mvc._
 import services.{PsrSubmissionService, SaveService, UploadService}
+import pages.nonsipp.memberdetails._
+import viewmodels.implicits._
+import play.api.mvc._
+import config.Refined.OneTo300
+import navigation.Navigator
+import pages.nonsipp.memberdetails.upload.FileUploadSuccessPage
+import models._
+import views.html.ContentPageView
+import models.SchemeId.Srn
+import controllers.actions._
+import eu.timepit.refined.refineV
+import play.api.i18n._
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage._
-import viewmodels.implicits._
 import viewmodels.models.{ContentPageViewModel, FormPageViewModel, MemberState}
-import views.html.ContentPageView
+import controllers.nonsipp.memberdetails.upload.FileUploadSuccessController._
+import models.requests.DataRequest
 
-import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
+
+import javax.inject.{Inject, Named}
 
 class FileUploadSuccessController @Inject()(
   override val messagesApi: MessagesApi,

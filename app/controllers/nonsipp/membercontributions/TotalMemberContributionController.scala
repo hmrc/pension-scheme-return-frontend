@@ -16,30 +16,31 @@
 
 package controllers.nonsipp.membercontributions
 
-import config.Constants
-import config.Refined.Max300
-import controllers.PSRController
-import controllers.actions._
-import controllers.nonsipp.membercontributions.TotalMemberContributionController._
-import forms.MoneyFormProvider
-import forms.mappings.errors.MoneyFormErrors
-import models.SchemeId.Srn
-import models.{Mode, Money}
-import navigation.Navigator
-import pages.nonsipp.membercontributions.TotalMemberContributionPage
-import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
-import play.api.data.Form
-import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
-import viewmodels.DisplayMessage.{Empty, Message}
+import controllers.PSRController
+import config.Constants
+import controllers.actions._
+import navigation.Navigator
+import forms.MoneyFormProvider
+import models.{Mode, Money}
+import play.api.data.Form
+import forms.mappings.errors.MoneyFormErrors
 import viewmodels.implicits._
+import pages.nonsipp.membercontributions.TotalMemberContributionPage
+import controllers.nonsipp.membercontributions.TotalMemberContributionController._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import config.Refined.Max300
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
-import viewmodels.models.{FormPageViewModel, QuestionField}
 import views.html.MoneyView
+import models.SchemeId.Srn
+import play.api.i18n.MessagesApi
+import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
+import viewmodels.DisplayMessage.{Empty, Message}
+import viewmodels.models.{FormPageViewModel, QuestionField}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class TotalMemberContributionController @Inject()(
   override val messagesApi: MessagesApi,

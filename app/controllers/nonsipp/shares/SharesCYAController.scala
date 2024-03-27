@@ -16,31 +16,32 @@
 
 package controllers.nonsipp.shares
 
-import cats.implicits.toShow
+import services.{PsrSubmissionService, SaveService}
+import viewmodels.implicits._
+import utils.ListUtils.ListOps
 import config.Refined.Max5000
 import controllers.PSRController
+import models.SchemeHoldShare.{Acquisition, Contribution, Transfer}
+import cats.implicits.toShow
 import controllers.actions._
 import controllers.nonsipp.shares.SharesCYAController._
-import models.SchemeHoldShare.{Acquisition, Contribution, Transfer}
-import models.SchemeId.Srn
-import models.TypeOfShares.{ConnectedParty, SponsoringEmployer, Unquoted}
-import models.{SchemeHoldShare, _}
 import navigation.Navigator
 import pages.nonsipp.common._
-import pages.nonsipp.shares._
 import play.api.i18n._
+import pages.nonsipp.shares._
 import play.api.mvc._
-import services.{PsrSubmissionService, SaveService}
-import utils.DateTimeUtils.localDateShow
-import utils.ListUtils.ListOps
-import viewmodels.DisplayMessage._
-import viewmodels.implicits._
-import viewmodels.models._
 import views.html.CheckYourAnswersView
+import models.TypeOfShares.{ConnectedParty, SponsoringEmployer, Unquoted}
+import models.SchemeId.Srn
+import utils.DateTimeUtils.localDateShow
+import models.{SchemeHoldShare, _}
+import viewmodels.DisplayMessage._
+import viewmodels.models._
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import java.time.LocalDate
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class SharesCYAController @Inject()(
   override val messagesApi: MessagesApi,

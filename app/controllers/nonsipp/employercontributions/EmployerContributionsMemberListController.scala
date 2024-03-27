@@ -16,35 +16,36 @@
 
 package controllers.nonsipp.employercontributions
 
-import cats.implicits.catsSyntaxApplicativeId
+import pages.nonsipp.memberdetails.MembersDetailsPages
+import viewmodels.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import com.google.inject.Inject
-import config.Constants
 import config.Refined.{Max300, Max50}
 import controllers.PSRController
-import controllers.actions._
-import controllers.nonsipp.employercontributions.EmployerContributionsMemberListController._
-import eu.timepit.refined.refineMV
-import forms.YesNoPageFormProvider
-import models.SchemeId.Srn
-import models._
-import models.requests.DataRequest
+import config.Constants
+import cats.implicits.catsSyntaxApplicativeId
 import navigation.Navigator
+import models._
 import pages.nonsipp.employercontributions.EmployerContributionsProgress.EmployerContributionsUserAnswersOps
 import pages.nonsipp.employercontributions.{EmployerContributionsMemberListPage, EmployerContributionsSectionStatus}
-import pages.nonsipp.memberdetails.MembersDetailsPages
-import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
-import play.api.data.Form
-import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{PsrSubmissionService, SaveService}
+import views.html.TwoColumnsTripleAction
+import models.SchemeId.Srn
+import controllers.actions._
+import eu.timepit.refined.refineMV
+import forms.YesNoPageFormProvider
+import controllers.nonsipp.employercontributions.EmployerContributionsMemberListController._
+import play.api.i18n.MessagesApi
+import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
 import viewmodels.DisplayMessage.{Message, ParagraphMessage}
-import viewmodels.implicits._
 import viewmodels.models.SectionJourneyStatus.InProgress
 import viewmodels.models._
-import views.html.TwoColumnsTripleAction
+import models.requests.DataRequest
+import play.api.data.Form
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.Named
-import scala.concurrent.{ExecutionContext, Future}
 
 class EmployerContributionsMemberListController @Inject()(
   override val messagesApi: MessagesApi,

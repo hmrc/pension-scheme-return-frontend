@@ -16,36 +16,37 @@
 
 package controllers.nonsipp.memberdetails
 
-import cats.implicits.catsSyntaxApplicativeId
+import services.PsrSubmissionService
+import pages.nonsipp.memberdetails.SchemeMembersListPage
+import viewmodels.implicits._
+import play.api.mvc._
 import com.google.inject.Inject
-import config.Constants
-import config.Constants.maxSchemeMembers
 import config.Refined.Max300
 import controllers.PSRController
+import config.Constants
+import cats.implicits.catsSyntaxApplicativeId
+import config.Constants.maxSchemeMembers
 import controllers.actions._
-import controllers.nonsipp.memberdetails.SchemeMembersListController._
 import forms.YesNoPageFormProvider
-import models.CheckOrChange.Change
-import models.SchemeId.Srn
-import models.requests.DataRequest
 import models.{ManualOrUpload, Mode, Pagination}
+import models.CheckOrChange.Change
+import views.html.ListView
+import models.SchemeId.Srn
+import play.api.Logger
 import navigation.Navigator
 import pages.nonsipp.memberdetails.MemberStatusImplicits.MembersStatusOps
-import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
-import pages.nonsipp.memberdetails.SchemeMembersListPage
-import play.api.Logger
-import play.api.data.Form
+import controllers.nonsipp.memberdetails.SchemeMembersListController._
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import services.PsrSubmissionService
-import utils.MapUtils.{MapOps, UserAnswersMapOps}
+import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
 import viewmodels.DisplayMessage.{Message, ParagraphMessage}
-import viewmodels.implicits._
 import viewmodels.models._
-import views.html.ListView
+import models.requests.DataRequest
+import utils.MapUtils.{MapOps, UserAnswersMapOps}
+import play.api.data.Form
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.Named
-import scala.concurrent.{ExecutionContext, Future}
 
 class SchemeMembersListController @Inject()(
   override val messagesApi: MessagesApi,

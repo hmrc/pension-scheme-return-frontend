@@ -16,23 +16,17 @@
 
 package navigation.nonsipp
 
-import cats.implicits.toTraverseOps
-import config.Refined.Max5000
-import eu.timepit.refined.refineMV
-import models.CheckOrChange.Check
 import models.ConditionalYesNo._
-import models.{CheckOrChange, IdentitySubject, IdentityType, NormalMode, UserAnswers}
-import navigation.JourneyNavigator
-import pages.Page
-import pages.nonsipp.common.{
-  CompanyRecipientCrnPage,
-  IdentityTypePage,
-  IdentityTypes,
-  OtherRecipientDetailsPage,
-  PartnershipRecipientUtrPage
-}
-import pages.nonsipp.loansmadeoroutstanding._
 import play.api.mvc.Call
+import cats.implicits.toTraverseOps
+import eu.timepit.refined.refineMV
+import navigation.JourneyNavigator
+import models._
+import pages.nonsipp.common._
+import pages.nonsipp.loansmadeoroutstanding._
+import models.CheckOrChange.Check
+import config.Refined.Max5000
+import pages.Page
 
 object LoansMadeOrOutstandingNavigator extends JourneyNavigator {
 

@@ -16,27 +16,28 @@
 
 package controllers.nonsipp.shares
 
+import services.SaveService
+import viewmodels.implicits._
+import forms.mappings.Mappings
 import config.Refined.Max5000
 import controllers.actions.IdentifyAndRequireData
-import forms.YesNoPageFormProvider
-import forms.mappings.Mappings
-import forms.mappings.errors.InputFormErrors
-import models.SchemeId.Srn
-import models.{ConditionalYesNo, Crn, Mode}
 import navigation.Navigator
-import pages.nonsipp.shares.{CompanyNameRelatedSharesPage, SharesCompanyCrnPage}
+import forms.YesNoPageFormProvider
+import models.{ConditionalYesNo, Crn, Mode}
 import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
+import forms.mappings.errors.InputFormErrors
+import pages.nonsipp.shares.{CompanyNameRelatedSharesPage, SharesCompanyCrnPage}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
+import views.html.ConditionalYesNoPageView
+import models.SchemeId.Srn
+import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
-import viewmodels.models.{ConditionalYesNoPageViewModel, FieldType, FormPageViewModel, YesNoViewModel}
-import views.html.ConditionalYesNoPageView
+import viewmodels.models._
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class SharesCompanyCrnController @Inject()(
   override val messagesApi: MessagesApi,

@@ -16,13 +16,13 @@
 
 package forms.mappings
 
-import forms.mappings.errors._
-import models.{Crn, DateRange, Enumerable, GenericFormMapper, Money, Percentage, Security, SelectInput, Utr}
 import play.api.data.Forms.{of, optional}
-import play.api.data.validation.{Constraint, Invalid, Valid}
-import play.api.data.{FieldMapping, Mapping}
-import uk.gov.hmrc.domain.Nino
 import uk.gov.voa.play.form.Condition
+import models._
+import play.api.data.{FieldMapping, Mapping}
+import forms.mappings.errors._
+import play.api.data.validation.{Constraint, Invalid, Valid}
+import uk.gov.hmrc.domain.Nino
 
 import java.time.LocalDate
 

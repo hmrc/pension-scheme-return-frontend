@@ -16,10 +16,10 @@
 
 package controllers.actions
 
+import play.api.mvc.{ActionBuilder, AnyContent}
 import com.google.inject.Inject
 import models.SchemeId.Srn
 import models.requests.DataRequest
-import play.api.mvc.{ActionBuilder, AnyContent}
 
 class IdentifyAndRequireData @Inject()(
   identify: IdentifierAction,

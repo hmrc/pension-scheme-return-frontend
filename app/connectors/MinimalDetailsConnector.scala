@@ -16,20 +16,21 @@
 
 package connectors
 
+import uk.gov.hmrc.http.HttpReads.Implicits.readFromJson
 import com.google.inject.ImplementedBy
 import config.{Constants, FrontendAppConfig}
-import connectors.MinimalDetailsError.{DelimitedAdmin, DetailsNotFound}
-import models.MinimalDetails
-import models.PensionSchemeId.{PsaId, PspId}
-import play.api.Logger
-import play.api.http.Status.{FORBIDDEN, NOT_FOUND}
-import uk.gov.hmrc.http.HttpReads.Implicits.readFromJson
 import uk.gov.hmrc.http.UpstreamErrorResponse.WithStatusCode
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import models.PensionSchemeId.{PsaId, PspId}
+import connectors.MinimalDetailsError.{DelimitedAdmin, DetailsNotFound}
+import play.api.Logger
+import models.MinimalDetails
 import utils.FutureUtils.FutureOps
+import play.api.http.Status.{FORBIDDEN, NOT_FOUND}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
 
 class MinimalDetailsConnectorImpl @Inject()(appConfig: FrontendAppConfig, http: HttpClient)
     extends MinimalDetailsConnector {

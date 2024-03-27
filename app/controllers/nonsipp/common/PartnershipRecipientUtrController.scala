@@ -16,32 +16,33 @@
 
 package controllers.nonsipp.common
 
+import services.SaveService
+import viewmodels.implicits._
 import config.Refined.Max5000
 import controllers.actions._
-import controllers.nonsipp.common.PartnershipRecipientUtrController._
-import forms.YesNoPageFormProvider
-import forms.mappings.Mappings
-import forms.mappings.errors.InputFormErrors
-import models.SchemeId.Srn
-import models.{ConditionalYesNo, IdentitySubject, Mode, UserAnswers, Utr}
 import navigation.Navigator
+import forms.YesNoPageFormProvider
+import models._
 import pages.nonsipp.common.PartnershipRecipientUtrPage
-import pages.nonsipp.landorproperty.PartnershipSellerNamePage
 import pages.nonsipp.loansmadeoroutstanding.PartnershipRecipientNamePage
-import pages.nonsipp.otherassetsheld.PartnershipOtherAssetSellerNamePage
-import pages.nonsipp.shares.PartnershipShareSellerNamePage
 import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
+import forms.mappings.errors.InputFormErrors
+import pages.nonsipp.shares.PartnershipShareSellerNamePage
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
+import forms.mappings.Mappings
+import pages.nonsipp.otherassetsheld.PartnershipOtherAssetSellerNamePage
+import views.html.ConditionalYesNoPageView
+import models.SchemeId.Srn
+import controllers.nonsipp.common.PartnershipRecipientUtrController._
+import pages.nonsipp.landorproperty.PartnershipSellerNamePage
+import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
-import viewmodels.models.{ConditionalYesNoPageViewModel, FieldType, FormPageViewModel, YesNoViewModel}
-import views.html.ConditionalYesNoPageView
+import viewmodels.models._
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class PartnershipRecipientUtrController @Inject()(
   override val messagesApi: MessagesApi,

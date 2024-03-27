@@ -16,7 +16,7 @@
 
 package pages.nonsipp.bondsdisposal
 
-import models.SchemeId.Srn
 import pages.Page
+import models.SchemeId.Srn
 
 case class WhatYouWillNeedBondsDisposalPage(srn: Srn) extends Page

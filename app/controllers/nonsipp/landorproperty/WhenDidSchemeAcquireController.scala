@@ -16,33 +16,34 @@
 
 package controllers.nonsipp.landorproperty
 
-import cats.implicits.toShow
-import config.Constants
+import services.{SaveService, SchemeDateService}
+import viewmodels.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Refined.Max5000
 import controllers.PSRController
-import controllers.actions._
-import controllers.nonsipp.landorproperty.WhenDidSchemeAcquireController._
-import forms.DatePageFormProvider
-import forms.mappings.errors.DateFormErrors
-import models.Mode
-import models.SchemeId.Srn
-import models.requests.DataRequest
-import navigation.Navigator
+import config.Constants
 import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandOrPropertyWhenDidSchemeAcquirePage}
-import play.api.data.Form
+import cats.implicits.toShow
+import controllers.actions._
+import navigation.Navigator
+import forms.DatePageFormProvider
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.{SaveService, SchemeDateService}
-import utils.DateTimeUtils.localDateShow
-import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
-import viewmodels.models.{DatePageViewModel, FormPageViewModel}
+import forms.mappings.errors.DateFormErrors
 import views.html.DatePageView
+import models.SchemeId.Srn
+import utils.DateTimeUtils.localDateShow
+import models.Mode
+import controllers.nonsipp.landorproperty.WhenDidSchemeAcquireController._
+import viewmodels.DisplayMessage.Message
+import viewmodels.models.{DatePageViewModel, FormPageViewModel}
+import models.requests.DataRequest
+import play.api.data.Form
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import java.time.LocalDate
 import java.time.format.{DateTimeFormatter, FormatStyle}
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class WhenDidSchemeAcquireController @Inject()(
   override val messagesApi: MessagesApi,

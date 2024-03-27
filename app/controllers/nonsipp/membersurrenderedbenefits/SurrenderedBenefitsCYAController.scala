@@ -16,29 +16,30 @@
 
 package controllers.nonsipp.membersurrenderedbenefits
 
-import cats.implicits.toShow
+import services.{PsrSubmissionService, SaveService}
+import pages.nonsipp.memberdetails.MemberDetailsPage
+import viewmodels.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Refined.Max300
 import controllers.PSRController
+import cats.implicits.toShow
 import controllers.actions.IdentifyAndRequireData
-import controllers.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsCYAController._
-import models.{CheckMode, Mode, Money}
-import models.SchemeId.Srn
 import navigation.Navigator
-import pages.nonsipp.memberdetails.MemberDetailsPage
 import pages.nonsipp.membersurrenderedbenefits._
-import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.{PsrSubmissionService, SaveService}
-import utils.DateTimeUtils.localDateShow
-import viewmodels.DisplayMessage.Message
-import viewmodels.Margin
-import viewmodels.implicits._
-import viewmodels.models._
+import controllers.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsCYAController._
 import views.html.CheckYourAnswersView
+import models.SchemeId.Srn
+import utils.DateTimeUtils.localDateShow
+import models.{CheckMode, Mode, Money}
+import play.api.i18n.MessagesApi
+import viewmodels.Margin
+import viewmodels.DisplayMessage.Message
+import viewmodels.models._
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import java.time.LocalDate
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class SurrenderedBenefitsCYAController @Inject()(
   override val messagesApi: MessagesApi,

@@ -16,29 +16,30 @@
 
 package controllers.nonsipp.otherassetsheld
 
+import services.SaveService
+import viewmodels.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Refined.Max5000
 import controllers.actions._
-import controllers.nonsipp.otherassetsheld.OtherAssetIndividualSellerNINumberController._
 import forms.YesNoPageFormProvider
-import forms.mappings.Mappings
-import forms.mappings.errors.InputFormErrors
-import models.SchemeId.Srn
 import models.{ConditionalYesNo, Mode}
-import navigation.Navigator
-import pages.nonsipp.otherassetsheld.{IndividualNameOfOtherAssetSellerPage, OtherAssetIndividualSellerNINumberPage}
 import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
+import forms.mappings.errors.InputFormErrors
+import forms.mappings.Mappings
+import pages.nonsipp.otherassetsheld.{IndividualNameOfOtherAssetSellerPage, OtherAssetIndividualSellerNINumberPage}
+import views.html.ConditionalYesNoPageView
+import models.SchemeId.Srn
+import navigation.Navigator
 import uk.gov.hmrc.domain.Nino
+import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
-import viewmodels.models.{ConditionalYesNoPageViewModel, FieldType, FormPageViewModel, YesNoViewModel}
-import views.html.ConditionalYesNoPageView
+import viewmodels.models._
+import controllers.nonsipp.otherassetsheld.OtherAssetIndividualSellerNINumberController._
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class OtherAssetIndividualSellerNINumberController @Inject()(
   override val messagesApi: MessagesApi,

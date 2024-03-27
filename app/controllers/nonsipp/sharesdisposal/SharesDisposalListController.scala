@@ -16,38 +16,32 @@
 
 package controllers.nonsipp.sharesdisposal
 
-import cats.implicits.{toShow, toTraverseOps}
+import viewmodels.implicits._
 import com.google.inject.Inject
-import config.Constants
-import config.Refined.Max5000.enumerable
 import config.Refined.{Max50, Max5000}
 import controllers.PSRController
-import controllers.actions.IdentifyAndRequireData
-import controllers.nonsipp.shares.SharesListController.SharesData
-import controllers.nonsipp.sharesdisposal.SharesDisposalListController._
-import eu.timepit.refined.{refineMV, refineV}
-import forms.RadioListFormProvider
-import models.SchemeId.Srn
-import models.requests.DataRequest
-import models.{Mode, Pagination, SchemeHoldShare, TypeOfShares, UserAnswers}
+import config.Constants
 import navigation.Navigator
-import pages.nonsipp.shares.{
-  CompanyNameRelatedSharesPage,
-  SharesCompleted,
-  TypeOfSharesHeldPage,
-  WhenDidSchemeAcquireSharesPage,
-  WhyDoesSchemeHoldSharesPage
-}
-import pages.nonsipp.sharesdisposal.{HowManyDisposalSharesPage, SharesDisposalCompletedPages, SharesDisposalListPage}
-import play.api.data.Form
+import forms.RadioListFormProvider
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import utils.DateTimeUtils.localDateShow
+import pages.nonsipp.shares._
+import play.api.mvc._
 import utils.ListUtils._
-import viewmodels.DisplayMessage.{Message, ParagraphMessage}
-import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, ListRadiosRow, ListRadiosViewModel, PaginatedViewModel}
+import controllers.nonsipp.sharesdisposal.SharesDisposalListController._
 import views.html.ListRadiosView
+import models.SchemeId.Srn
+import cats.implicits.{toShow, toTraverseOps}
+import controllers.nonsipp.shares.SharesListController.SharesData
+import controllers.actions.IdentifyAndRequireData
+import eu.timepit.refined.{refineMV, refineV}
+import config.Refined.Max5000.enumerable
+import pages.nonsipp.sharesdisposal.{HowManyDisposalSharesPage, SharesDisposalCompletedPages, SharesDisposalListPage}
+import utils.DateTimeUtils.localDateShow
+import models._
+import viewmodels.DisplayMessage.{Message, ParagraphMessage}
+import viewmodels.models._
+import models.requests.DataRequest
+import play.api.data.Form
 
 import javax.inject.Named
 

@@ -16,11 +16,11 @@
 
 package navigation.nonsipp
 
-import models.{NormalMode, UserAnswers}
-import navigation.JourneyNavigator
-import pages.Page
 import pages.nonsipp.membercontributions._
 import play.api.mvc.Call
+import pages.Page
+import navigation.JourneyNavigator
+import models.{NormalMode, UserAnswers}
 
 object MemberContributionsNavigator extends JourneyNavigator {
 

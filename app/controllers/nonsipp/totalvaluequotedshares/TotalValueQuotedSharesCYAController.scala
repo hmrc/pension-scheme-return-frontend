@@ -16,29 +16,30 @@
 
 package controllers.nonsipp.totalvaluequotedshares
 
-import cats.data.NonEmptyList
-import cats.implicits.toShow
+import services.{PsrSubmissionService, SchemeDateService}
+import pages.nonsipp.totalvaluequotedshares._
+import viewmodels.implicits._
+import play.api.mvc._
 import config.Refined.Max3
 import controllers.PSRController
-import controllers.actions._
 import controllers.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesCYAController._
-import models.SchemeId.Srn
-import models.{DateRange, Money, NormalMode, SchemeDetails}
+import cats.implicits.toShow
+import controllers.actions._
 import navigation.Navigator
-import pages.nonsipp.totalvaluequotedshares._
-import play.api.i18n._
-import play.api.mvc._
-import services.{PsrSubmissionService, SchemeDateService}
-import utils.DateTimeUtils.localDateShow
-import viewmodels.DisplayMessage._
-import viewmodels.Margin
-import viewmodels.implicits._
-import viewmodels.models._
+import cats.data.NonEmptyList
 import views.html.CheckYourAnswersView
+import models.SchemeId.Srn
+import utils.DateTimeUtils.localDateShow
+import models._
+import play.api.i18n._
+import viewmodels.Margin
+import viewmodels.DisplayMessage._
+import viewmodels.models._
+
+import scala.concurrent.ExecutionContext
 
 import java.time.LocalDate
 import javax.inject.{Inject, Named}
-import scala.concurrent.ExecutionContext
 
 class TotalValueQuotedSharesCYAController @Inject()(
   override val messagesApi: MessagesApi,

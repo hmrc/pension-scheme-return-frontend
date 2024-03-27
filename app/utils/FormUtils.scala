@@ -16,10 +16,10 @@
 
 package utils
 
+import queries.Gettable
+import play.api.libs.json.Reads
 import models.requests.DataRequest
 import play.api.data.{Form, FormError}
-import play.api.libs.json.Reads
-import queries.Gettable
 
 object FormUtils {
 

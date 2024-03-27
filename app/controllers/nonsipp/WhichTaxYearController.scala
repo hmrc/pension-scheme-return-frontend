@@ -16,28 +16,29 @@
 
 package controllers.nonsipp
 
-import cats.implicits.toShow
-import controllers.actions.{AllowAccessActionProvider, DataRequiredAction, DataRetrievalAction, IdentifierAction}
-import forms.RadioListFormProvider
-import models.SchemeId.Srn
-import models.{DateRange, Enumerable, Mode, NormalMode}
-import navigation.Navigator
-import pages.nonsipp.WhichTaxYearPage
-import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.{SaveService, TaxYearService}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import uk.gov.hmrc.time.TaxYear
-import utils.DateTimeUtils.localDateShow
-import utils.FormUtils.FormOps
-import viewmodels.DisplayMessage.Message
 import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, RadioListRowViewModel, RadioListViewModel}
+import utils.FormUtils.FormOps
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import cats.implicits.toShow
+import controllers.actions._
+import forms.RadioListFormProvider
+import uk.gov.hmrc.time.TaxYear
+import play.api.data.Form
 import views.html.RadioListView
+import models.SchemeId.Srn
+import pages.nonsipp.WhichTaxYearPage
+import navigation.Navigator
+import utils.DateTimeUtils.localDateShow
+import models._
+import play.api.i18n.{I18nSupport, MessagesApi}
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.DisplayMessage.Message
+import viewmodels.models.{FormPageViewModel, RadioListRowViewModel, RadioListViewModel}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class WhichTaxYearController @Inject()(
   override val messagesApi: MessagesApi,

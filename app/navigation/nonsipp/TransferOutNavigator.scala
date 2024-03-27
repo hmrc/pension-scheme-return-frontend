@@ -16,14 +16,14 @@
 
 package navigation.nonsipp
 
-import cats.implicits.toTraverseOps
-import config.Refined.{Max300, Max5}
-import models.SchemeId.Srn
-import models.{NormalMode, UserAnswers}
-import navigation.JourneyNavigator
-import pages.Page
-import pages.nonsipp.membertransferout._
 import play.api.mvc.Call
+import models.SchemeId.Srn
+import cats.implicits.toTraverseOps
+import navigation.JourneyNavigator
+import models.{NormalMode, UserAnswers}
+import pages.nonsipp.membertransferout._
+import config.Refined.{Max300, Max5}
+import pages.Page
 
 object TransferOutNavigator extends JourneyNavigator {
 

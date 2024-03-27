@@ -16,8 +16,8 @@
 
 package models
 
-import play.api.libs.json.{Format, Json}
 import utils.Transform
+import play.api.libs.json.{Format, Json}
 
 case class PensionCommencementLumpSum(lumpSumAmount: Money, designatedPensionAmount: Money) {
   val isZero: Boolean = lumpSumAmount.isZero && designatedPensionAmount.isZero

@@ -16,23 +16,18 @@
 
 package navigation.nonsipp
 
-import cats.implicits.toTraverseOps
-import config.Refined.Max5000
-import eu.timepit.refined.refineMV
-import models.IdentitySubject.SharesSeller
 import models.SchemeHoldShare.{Acquisition, Contribution, Transfer}
 import models.TypeOfShares.{ConnectedParty, SponsoringEmployer, Unquoted}
-import models.{CheckMode, IdentitySubject, IdentityType, NormalMode, UserAnswers}
+import cats.implicits.toTraverseOps
+import eu.timepit.refined.refineMV
 import navigation.JourneyNavigator
-import pages.Page
-import pages.nonsipp.common.{
-  CompanyRecipientCrnPage,
-  IdentityTypePage,
-  OtherRecipientDetailsPage,
-  PartnershipRecipientUtrPage
-}
+import models._
+import pages.nonsipp.common._
+import models.IdentitySubject.SharesSeller
 import pages.nonsipp.shares._
 import play.api.mvc.Call
+import config.Refined.Max5000
+import pages.Page
 
 object SharesNavigator extends JourneyNavigator {
 

@@ -16,8 +16,8 @@
 
 package models
 
-import play.api.libs.json._
 import utils.WithName
+import play.api.libs.json._
 
 sealed trait PointOfEntry {
   val pointOfEntry: String

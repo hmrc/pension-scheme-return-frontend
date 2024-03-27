@@ -16,29 +16,30 @@
 
 package controllers.nonsipp.landorproperty
 
-import config.Refined.Max5000
-import controllers.actions._
-import controllers.nonsipp.landorproperty.IndividualSellerNiController._
-import forms.YesNoPageFormProvider
-import forms.mappings.Mappings
-import forms.mappings.errors.InputFormErrors
-import models.SchemeId.Srn
-import models.{ConditionalYesNo, Mode}
-import navigation.Navigator
-import pages.nonsipp.landorproperty.{IndividualSellerNiPage, LandPropertyIndividualSellersNamePage}
-import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
+import viewmodels.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import forms.mappings.Mappings
+import config.Refined.Max5000
+import pages.nonsipp.landorproperty.{IndividualSellerNiPage, LandPropertyIndividualSellersNamePage}
+import controllers.actions._
+import forms.YesNoPageFormProvider
+import controllers.nonsipp.landorproperty.IndividualSellerNiController._
+import models.{ConditionalYesNo, Mode}
+import play.api.data.Form
+import forms.mappings.errors.InputFormErrors
+import views.html.ConditionalYesNoPageView
+import models.SchemeId.Srn
+import navigation.Navigator
 import uk.gov.hmrc.domain.Nino
+import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
-import viewmodels.models.{ConditionalYesNoPageViewModel, FieldType, FormPageViewModel, YesNoViewModel}
-import views.html.ConditionalYesNoPageView
+import viewmodels.models._
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class IndividualSellerNiController @Inject()(
   override val messagesApi: MessagesApi,

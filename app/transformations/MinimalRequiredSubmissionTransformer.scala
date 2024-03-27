@@ -16,19 +16,20 @@
 
 package transformations
 
-import cats.implicits.catsSyntaxTuple2Semigroupal
+import services.SchemeDateService
+import pages.nonsipp.schemedesignatory._
 import com.google.inject.Singleton
-import models.{DateRange, Money, MoneyInPeriod, NormalMode, PensionSchemeId, SchemeMemberNumbers, UserAnswers}
 import models.SchemeId.Srn
-import models.requests.DataRequest
+import cats.implicits.catsSyntaxTuple2Semigroupal
 import models.requests.psr.{MinimalRequiredSubmission, ReportDetails, SchemeDesignatory}
 import pages.nonsipp.accountingperiod.AccountingPeriods
 import pages.nonsipp.{CheckReturnDatesPage, WhichTaxYearPage}
-import pages.nonsipp.schemedesignatory._
-import services.SchemeDateService
+import models._
+import models.requests.DataRequest
+
+import scala.util.Try
 
 import javax.inject.Inject
-import scala.util.Try
 
 @Singleton()
 class MinimalRequiredSubmissionTransformer @Inject()(schemeDateService: SchemeDateService) {

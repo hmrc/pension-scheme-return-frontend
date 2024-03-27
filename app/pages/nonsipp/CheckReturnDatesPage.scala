@@ -16,11 +16,11 @@
 
 package pages.nonsipp
 
-import models.SchemeId.Srn
-import models.UserAnswers
 import pages.QuestionPage
+import models.SchemeId.Srn
 import pages.nonsipp.accountingperiod.AccountingPeriods
 import play.api.libs.json.JsPath
+import models.UserAnswers
 
 import scala.util.{Success, Try}
 

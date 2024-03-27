@@ -16,9 +16,9 @@
 
 package viewmodels.govuk
 
-import play.api.i18n.Messages
-import uk.gov.hmrc.govukfrontend.views.Aliases.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.backlink.BackLink
+import uk.gov.hmrc.govukfrontend.views.Aliases.Text
+import play.api.i18n.Messages
 
 object backlink extends BackLinkFluency
 

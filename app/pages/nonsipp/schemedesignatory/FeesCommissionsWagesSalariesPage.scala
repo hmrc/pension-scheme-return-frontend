@@ -16,10 +16,10 @@
 
 package pages.nonsipp.schemedesignatory
 
-import models.{Mode, Money}
-import models.SchemeId.Srn
 import pages.QuestionPage
+import models.SchemeId.Srn
 import play.api.libs.json.JsPath
+import models.{Mode, Money}
 
 case class FeesCommissionsWagesSalariesPage(srn: Srn, mode: Mode) extends QuestionPage[Money] {
   override def path: JsPath = SchemeDesignatoryPage.path \ toString

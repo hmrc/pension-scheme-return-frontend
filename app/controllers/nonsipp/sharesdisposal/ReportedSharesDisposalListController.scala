@@ -16,36 +16,36 @@
 
 package controllers.nonsipp.sharesdisposal
 
-import cats.implicits._
+import controllers.nonsipp.sharesdisposal.ReportedSharesDisposalListController._
+import viewmodels.implicits._
 import com.google.inject.Inject
-import config.Constants
-import config.Constants.{maxDisposalsPerShare, maxSharesTransactions}
 import config.Refined.{Max50, Max5000}
 import controllers.PSRController
+import cats.implicits._
+import config.Constants.{maxDisposalsPerShare, maxSharesTransactions}
 import controllers.actions.IdentifyAndRequireData
-import controllers.nonsipp.sharesdisposal.ReportedSharesDisposalListController._
-import forms.YesNoPageFormProvider
-import models.HowSharesDisposed._
-import models.SchemeId.Srn
-import models.TypeOfShares._
-import models.requests.DataRequest
-import models.{CheckMode, Mode, NormalMode, Pagination, TypeOfShares, UserAnswers}
-import navigation.Navigator
-import pages.nonsipp.shares.{CompanyNameRelatedSharesPage, SharesCompleted, TypeOfSharesHeldPage}
 import pages.nonsipp.sharesdisposal.{
   HowWereSharesDisposedPage,
   ReportedSharesDisposalListPage,
   SharesDisposalCompletedPages
 }
-import play.api.data.Form
-import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import forms.YesNoPageFormProvider
+import models._
+import pages.nonsipp.shares.{CompanyNameRelatedSharesPage, SharesCompleted, TypeOfSharesHeldPage}
+import play.api.mvc._
 import utils.nonsipp.TaskListStatusUtils.getSharesDisposalsTaskListStatusWithLink
+import config.Constants
+import views.html.ListView
+import models.TypeOfShares._
+import models.SchemeId.Srn
+import navigation.Navigator
+import models.HowSharesDisposed._
+import play.api.i18n.MessagesApi
 import viewmodels.DisplayMessage
 import viewmodels.DisplayMessage.{Message, ParagraphMessage}
-import viewmodels.implicits._
 import viewmodels.models._
-import views.html.ListView
+import models.requests.DataRequest
+import play.api.data.Form
 
 import javax.inject.Named
 

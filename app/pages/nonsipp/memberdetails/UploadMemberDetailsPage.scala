@@ -16,8 +16,8 @@
 
 package pages.nonsipp.memberdetails
 
-import models.SchemeId.Srn
 import pages.Page
+import models.SchemeId.Srn
 
 case class UploadMemberDetailsPage(srn: Srn) extends Page {
   override def toString: String = "uploadMemberDetailsPage"

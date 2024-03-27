@@ -16,12 +16,12 @@
 
 package models
 
+import utils.ListUtils.ListOps
 import cats.data.NonEmptyList
 import models.ValidationErrorType.ValidationErrorType
 import play.api.libs.functional.syntax._
-import play.api.libs.json._
 import uk.gov.hmrc.domain.Nino
-import utils.ListUtils.ListOps
+import play.api.libs.json._
 
 case class ValidationError(key: String, errorType: ValidationErrorType, message: String)
 

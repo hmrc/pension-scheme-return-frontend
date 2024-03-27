@@ -16,8 +16,8 @@
 
 package pages.nonsipp.membercontributions
 
-import models.SchemeId.Srn
 import pages.QuestionPage
+import models.SchemeId.Srn
 import play.api.libs.json.JsPath
 
 case class MemberContributionsListPage(srn: Srn) extends QuestionPage[Boolean] {

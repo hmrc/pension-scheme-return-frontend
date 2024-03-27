@@ -16,31 +16,32 @@
 
 package controllers.nonsipp.landorpropertydisposal
 
+import services.SaveService
+import viewmodels.implicits._
 import config.Refined.{Max50, Max5000}
 import controllers.PSRController
-import controllers.actions.IdentifyAndRequireData
 import controllers.nonsipp.landorpropertydisposal.HowWasPropertyDisposedOfController._
-import forms.RadioListFormProvider
-import forms.mappings.Mappings
-import forms.mappings.errors.InputFormErrors
-import models.GenericFormMapper.ConditionalRadioMapper
-import models.HowDisposed._
-import models.SchemeId.Srn
-import models.{ConditionalRadioMapper, HowDisposed, Mode}
-import navigation.Navigator
 import pages.nonsipp.landorproperty.LandOrPropertyChosenAddressPage
 import pages.nonsipp.landorpropertydisposal.HowWasPropertyDisposedOfPage
-import play.api.data.Form
+import controllers.actions.IdentifyAndRequireData
+import navigation.Navigator
+import forms.RadioListFormProvider
+import models.{ConditionalRadioMapper, HowDisposed, Mode}
 import play.api.i18n.MessagesApi
+import play.api.data.Form
+import forms.mappings.errors.InputFormErrors
+import models.GenericFormMapper.ConditionalRadioMapper
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
-import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
-import viewmodels.models._
+import forms.mappings.Mappings
+import models.HowDisposed._
 import views.html.RadioListView
+import models.SchemeId.Srn
+import viewmodels.DisplayMessage.Message
+import viewmodels.models._
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class HowWasPropertyDisposedOfController @Inject()(
   override val messagesApi: MessagesApi,

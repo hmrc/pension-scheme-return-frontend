@@ -16,8 +16,8 @@
 
 package pages.nonsipp.memberdetails
 
-import models.ManualOrUpload
-import models.SchemeId.Srn
 import pages.Page
+import models.SchemeId.Srn
+import models.ManualOrUpload
 
 case class SchemeMembersListPage(srn: Srn, addMember: Boolean, manualOrUpload: ManualOrUpload) extends Page

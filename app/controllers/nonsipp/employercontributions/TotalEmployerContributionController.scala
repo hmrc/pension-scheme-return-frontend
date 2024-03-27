@@ -16,35 +16,32 @@
 
 package controllers.nonsipp.employercontributions
 
-import cats.implicits.catsSyntaxApplicativeId
-import config.Constants
-import config.Refined._
-import controllers.PSRController
-import controllers.actions._
-import controllers.nonsipp.employercontributions.TotalEmployerContributionController._
-import forms.mappings.errors.{MoneyFormErrorProvider, MoneyFormErrors}
-import models.SchemeId.Srn
-import models._
-import navigation.Navigator
-import pages.nonsipp.employercontributions.{
-  EmployerContributionsProgress,
-  EmployerNamePage,
-  TotalEmployerContributionPage
-}
 import pages.nonsipp.memberdetails.MemberDetailsPage
-import play.api.data.Form
-import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import controllers.PSRController
+import config.Constants
+import cats.implicits.catsSyntaxApplicativeId
+import controllers.actions._
+import navigation.Navigator
+import models._
+import play.api.i18n.MessagesApi
+import play.api.data.Form
+import forms.mappings.errors.{MoneyFormErrorProvider, MoneyFormErrors}
+import pages.nonsipp.employercontributions.{EmployerNamePage, TotalEmployerContributionPage}
 import services.SaveService
+import viewmodels.implicits._
+import controllers.nonsipp.employercontributions.TotalEmployerContributionController._
+import config.Refined._
+import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
+import views.html.MoneyView
+import models.SchemeId.Srn
 import utils.FunctionKUtils._
 import viewmodels.DisplayMessage._
-import viewmodels.implicits._
-import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
 import viewmodels.models._
-import views.html.MoneyView
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class TotalEmployerContributionController @Inject()(
   override val messagesApi: MessagesApi,

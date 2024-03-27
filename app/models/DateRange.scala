@@ -16,12 +16,12 @@
 
 package models
 
-import cats.Show
 import cats.implicits.toShow
-import play.api.i18n.Messages
 import play.api.libs.json.{Format, Json}
-import uk.gov.hmrc.time.TaxYear
 import utils.DateTimeUtils.localDateShow
+import uk.gov.hmrc.time.TaxYear
+import cats.Show
+import play.api.i18n.Messages
 
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter

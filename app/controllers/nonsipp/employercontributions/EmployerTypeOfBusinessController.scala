@@ -16,30 +16,30 @@
 
 package controllers.nonsipp.employercontributions
 
-import cats.implicits.catsSyntaxApplicativeId
+import controllers.nonsipp.employercontributions.EmployerTypeOfBusinessController._
+import viewmodels.implicits._
+import utils.FormUtils.FormOps
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import models.IdentityType.{Other, UKCompany, UKPartnership}
 import config.Refined.{Max300, Max50}
 import controllers.PSRController
 import controllers.actions._
-import controllers.nonsipp.employercontributions.EmployerTypeOfBusinessController._
-import forms.RadioListFormProvider
-import models.IdentityType.{Other, UKCompany, UKPartnership}
-import models.SchemeId.Srn
-import models.{IdentityType, Mode}
 import navigation.Navigator
-import pages.nonsipp.employercontributions.{EmployerContributionsProgress, EmployerNamePage, EmployerTypeOfBusinessPage}
-import play.api.data.Form
+import forms.RadioListFormProvider
+import models.{IdentityType, Mode}
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.data.Form
+import pages.nonsipp.employercontributions.{EmployerNamePage, EmployerTypeOfBusinessPage}
 import services.SaveService
-import utils.FormUtils.FormOps
+import views.html.RadioListView
+import models.SchemeId.Srn
 import utils.FunctionKUtils._
 import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, RadioListRowViewModel, RadioListViewModel, SectionJourneyStatus}
-import views.html.RadioListView
+import viewmodels.models.{FormPageViewModel, RadioListRowViewModel, RadioListViewModel}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class EmployerTypeOfBusinessController @Inject()(
   override val messagesApi: MessagesApi,

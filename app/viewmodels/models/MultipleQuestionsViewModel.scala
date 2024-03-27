@@ -17,9 +17,9 @@
 package viewmodels.models
 
 import models.SelectInput
-import play.api.data.Form
-import viewmodels.DisplayMessage.InlineMessage
 import viewmodels.InputWidth
+import viewmodels.DisplayMessage.InlineMessage
+import play.api.data.Form
 
 sealed trait MultipleQuestionsViewModel[A] {
 

@@ -16,32 +16,33 @@
 
 package services
 
-import akka.NotUsed
 import akka.stream.Materializer
-import akka.stream.alpakka.csv.scaladsl.CsvParsing
-import akka.stream.scaladsl.{Flow, Sink, Source}
 import akka.util.ByteString
-import cats.data.Validated.{Invalid, Valid}
-import cats.data.{NonEmptyList, Validated, ValidatedNel}
-import cats.implicits._
+import akka.stream.scaladsl.{Flow, Sink, Source}
+import akka.NotUsed
 import config.Constants
-import forms.mappings.errors.DateFormErrors
-import forms.{NameDOBFormProvider, TextFormProvider}
-import models.SchemeId.Srn
-import models.ValidationErrorType.ValidationErrorType
+import akka.stream.alpakka.csv.scaladsl.CsvParsing
+import cats.implicits._
+import uk.gov.hmrc.domain.Nino
 import models._
+import play.api.i18n.Messages
+import forms.mappings.errors.DateFormErrors
+import cats.data.Validated.{Invalid, Valid}
+import play.api.mvc.AnyContent
+import cats.data.{NonEmptyList, Validated, ValidatedNel}
+import models.SchemeId.Srn
+import forms.{NameDOBFormProvider, TextFormProvider}
+import models.ValidationErrorType.ValidationErrorType
 import models.requests.DataRequest
 import play.api.data.{Form, FormError}
-import play.api.i18n.Messages
-import play.api.mvc.AnyContent
-import uk.gov.hmrc.domain.Nino
 
-import java.time.LocalDate
-import java.time.format.{DateTimeFormatter, FormatStyle}
-import java.util.concurrent.atomic.AtomicInteger
-import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.math.Integral.Implicits.infixIntegralOps
+
+import java.time.LocalDate
+import java.util.concurrent.atomic.AtomicInteger
+import java.time.format.{DateTimeFormatter, FormatStyle}
+import javax.inject.Inject
 
 class MemberDetailsUploadValidator @Inject()(
   nameDOBFormProvider: NameDOBFormProvider,

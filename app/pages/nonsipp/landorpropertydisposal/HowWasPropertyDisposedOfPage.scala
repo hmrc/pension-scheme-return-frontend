@@ -16,15 +16,15 @@
 
 package pages.nonsipp.landorpropertydisposal
 
-import config.Refined.{Max50, Max5000}
-import models.HowDisposed.HowDisposed
-import models.SchemeId.Srn
-import models.{HowDisposed, UserAnswers}
-import pages.QuestionPage
-import play.api.libs.json.JsPath
-import queries.Removable
 import utils.RefinedUtils.RefinedIntOps
 import utils.PageUtils.removePages
+import queries.Removable
+import models.HowDisposed.HowDisposed
+import models.SchemeId.Srn
+import play.api.libs.json.JsPath
+import models.{HowDisposed, UserAnswers}
+import config.Refined.{Max50, Max5000}
+import pages.QuestionPage
 
 import scala.util.Try
 

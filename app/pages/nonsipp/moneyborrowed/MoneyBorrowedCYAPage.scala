@@ -16,7 +16,7 @@
 
 package pages.nonsipp.moneyborrowed
 
-import models.SchemeId.Srn
 import pages.Page
+import models.SchemeId.Srn
 
 case class MoneyBorrowedCYAPage(srn: Srn) extends Page

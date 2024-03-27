@@ -16,15 +16,13 @@
 
 package navigation.nonsipp
 
-import cats.implicits.toTraverseOps
-import config.Refined.{Max50, Max5000}
-import eu.timepit.refined.refineMV
-import navigation.JourneyNavigator
-import pages.Page
-import play.api.mvc.Call
-import models._
-import pages.nonsipp.landorpropertydisposal.LandPropertyDisposalCompleted
 import pages.nonsipp.otherassetsdisposal._
+import play.api.mvc.Call
+import cats.implicits.toTraverseOps
+import navigation.JourneyNavigator
+import models._
+import config.Refined.Max50
+import pages.Page
 
 object OtherAssetsDisposalNavigator extends JourneyNavigator {
 

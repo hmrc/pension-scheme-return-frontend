@@ -16,9 +16,9 @@
 
 package models.requests
 
+import play.api.mvc.WrappedRequest
 import models.SchemeId.Srn
 import models.{MinimalDetails, PensionSchemeId, SchemeDetails}
-import play.api.mvc.WrappedRequest
 
 case class AllowedAccessRequest[A](
   request: IdentifierRequest[A],

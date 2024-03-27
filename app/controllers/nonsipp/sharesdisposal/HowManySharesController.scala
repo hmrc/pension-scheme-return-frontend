@@ -16,31 +16,32 @@
 
 package controllers.nonsipp.sharesdisposal
 
-import config.Constants.{maxShares, minSharesHeld}
-import config.Refined.{Max50, Max5000}
-import controllers.PSRController
-import controllers.actions._
-import controllers.nonsipp.sharesdisposal.HowManySharesController._
-import forms.IntFormProvider
-import forms.mappings.errors.IntFormErrors
-import models.Mode
-import models.SchemeId.Srn
-import navigation.Navigator
-import pages.nonsipp.shares.CompanyNameRelatedSharesPage
-import pages.nonsipp.sharesdisposal.HowManyDisposalSharesPage
-import play.api.data.Form
-import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
 import utils.FormUtils._
-import viewmodels.DisplayMessage.{Empty, Message}
-import viewmodels.InputWidth
+import controllers.PSRController
+import config.Constants.{maxShares, minSharesHeld}
+import controllers.actions._
+import pages.nonsipp.sharesdisposal.HowManyDisposalSharesPage
+import navigation.Navigator
+import forms.IntFormProvider
+import models.Mode
+import play.api.data.Form
+import forms.mappings.errors.IntFormErrors
+import pages.nonsipp.shares.CompanyNameRelatedSharesPage
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import config.Refined.{Max50, Max5000}
 import viewmodels.models.MultipleQuestionsViewModel.SingleQuestion
-import viewmodels.models.{FormPageViewModel, QuestionField}
 import views.html.IntView
+import controllers.nonsipp.sharesdisposal.HowManySharesController._
+import models.SchemeId.Srn
+import play.api.i18n.MessagesApi
+import viewmodels.InputWidth
+import viewmodels.DisplayMessage.{Empty, Message}
+import viewmodels.models.{FormPageViewModel, QuestionField}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class HowManySharesController @Inject()(
   override val messagesApi: MessagesApi,

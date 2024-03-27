@@ -16,26 +16,27 @@
 
 package controllers.nonsipp.otherassetsdisposal
 
+import services.SaveService
+import pages.nonsipp.otherassetsdisposal.OtherBuyerDetailsPage
+import utils.FormUtils._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Refined.{Max50, Max5000}
 import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
-import controllers.nonsipp.otherassetsdisposal.OtherBuyerDetailsController._
-import forms.RecipientDetailsFormProvider
-import models.SchemeId.Srn
-import models.{Mode, RecipientDetails}
 import navigation.Navigator
-import pages.nonsipp.otherassetsdisposal.OtherBuyerDetailsPage
-import play.api.data.Form
+import forms.RecipientDetailsFormProvider
+import models.{Mode, RecipientDetails}
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SaveService
-import utils.FormUtils._
+import views.html.RecipientDetailsView
+import models.SchemeId.Srn
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{FormPageViewModel, RecipientDetailsViewModel}
-import views.html.RecipientDetailsView
+import controllers.nonsipp.otherassetsdisposal.OtherBuyerDetailsController._
+import play.api.data.Form
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class OtherBuyerDetailsController @Inject()(
   override val messagesApi: MessagesApi,

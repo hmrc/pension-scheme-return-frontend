@@ -16,31 +16,32 @@
 
 package controllers.nonsipp.otherassetsheld
 
-import cats.implicits.{catsSyntaxApplicativeId, toShow, toTraverseOps}
-import com.google.inject.Inject
-import config.Constants
+import services.{PsrSubmissionService, SaveService}
+import viewmodels.implicits._
+import play.api.mvc._
+import utils.ListUtils._
 import config.Refined.Max5000
 import controllers.PSRController
+import config.Constants
+import cats.implicits.{catsSyntaxApplicativeId, toShow, toTraverseOps}
 import controllers.actions.IdentifyAndRequireData
-import controllers.nonsipp.otherassetsheld.OtherAssetsListController._
-import forms.YesNoPageFormProvider
-import models.SchemeId.Srn
-import models.requests.DataRequest
-import models.{CheckMode, Mode, NormalMode, Pagination}
 import navigation.Navigator
-import pages.nonsipp.otherassetsheld._
-import play.api.data.Form
+import forms.YesNoPageFormProvider
+import controllers.nonsipp.otherassetsheld.OtherAssetsListController._
+import models._
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
-import services.{PsrSubmissionService, SaveService}
-import utils.ListUtils._
-import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
-import viewmodels.implicits._
-import viewmodels.models._
+import pages.nonsipp.otherassetsheld._
+import com.google.inject.Inject
 import views.html.TwoColumnsTripleAction
+import models.SchemeId.Srn
+import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
+import viewmodels.models._
+import models.requests.DataRequest
+import play.api.data.Form
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.Named
-import scala.concurrent.{ExecutionContext, Future}
 
 class OtherAssetsListController @Inject()(
   override val messagesApi: MessagesApi,

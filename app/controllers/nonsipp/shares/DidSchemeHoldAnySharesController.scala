@@ -16,27 +16,28 @@
 
 package controllers.nonsipp.shares
 
+import services.{PsrSubmissionService, SaveService}
+import viewmodels.implicits._
 import config.FrontendAppConfig
 import controllers.actions._
-import controllers.nonsipp.shares.DidSchemeHoldAnySharesController.viewModel
+import navigation.Navigator
 import forms.YesNoPageFormProvider
 import models.Mode
-import models.SchemeId.Srn
-import models.requests.DataRequest
-import navigation.Navigator
 import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
-import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.{PsrSubmissionService, SaveService}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.DisplayMessage.{LinkMessage, ListMessage, ListType, Message, ParagraphMessage}
-import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
 import views.html.YesNoPageView
+import models.SchemeId.Srn
+import play.api.i18n.{I18nSupport, MessagesApi}
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import controllers.nonsipp.shares.DidSchemeHoldAnySharesController.viewModel
+import viewmodels.DisplayMessage._
+import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
+import models.requests.DataRequest
+import play.api.data.Form
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class DidSchemeHoldAnySharesController @Inject()(
   override val messagesApi: MessagesApi,

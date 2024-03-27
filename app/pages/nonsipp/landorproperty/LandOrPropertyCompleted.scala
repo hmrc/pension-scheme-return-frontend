@@ -16,12 +16,12 @@
 
 package pages.nonsipp.landorproperty
 
-import config.Refined.Max5000
-import models.SchemeId.Srn
-import pages.{IndexedQuestionPage, QuestionPage}
-import play.api.libs.json.JsPath
 import utils.RefinedUtils.RefinedIntOps
+import models.SchemeId.Srn
+import play.api.libs.json.JsPath
 import viewmodels.models.SectionCompleted
+import config.Refined.Max5000
+import pages.{IndexedQuestionPage, QuestionPage}
 
 case class LandOrPropertyCompleted(srn: Srn, index: Max5000) extends QuestionPage[SectionCompleted.type] {
   override def path: JsPath = Paths.landOrProperty \ toString \ index.arrayIndex.toString

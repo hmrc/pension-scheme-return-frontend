@@ -16,30 +16,31 @@
 
 package controllers.nonsipp.receivetransfer
 
+import services.{PsrSubmissionService, SaveService}
+import viewmodels.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import com.google.inject.Inject
-import config.Constants
-import config.Constants.maxNotRelevant
 import config.Refined.OneTo300
 import controllers.PSRController
+import config.Constants
+import pages.nonsipp.receivetransfer._
+import config.Constants.maxNotRelevant
+import navigation.Navigator
+import forms.YesNoPageFormProvider
+import models._
+import play.api.data.Form
+import views.html.TwoColumnsTripleAction
+import models.SchemeId.Srn
 import controllers.actions._
 import eu.timepit.refined.{refineMV, refineV}
-import forms.YesNoPageFormProvider
-import models.SchemeId.Srn
-import models._
-import navigation.Navigator
-import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
-import pages.nonsipp.receivetransfer._
-import play.api.data.Form
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.{PsrSubmissionService, SaveService}
+import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
 import viewmodels.DisplayMessage.{LinkMessage, Message, ParagraphMessage}
-import viewmodels.implicits._
 import viewmodels.models._
-import views.html.TwoColumnsTripleAction
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.Named
-import scala.concurrent.{ExecutionContext, Future}
 
 class TransferReceivedMemberListController @Inject()(
   override val messagesApi: MessagesApi,
@@ -53,7 +54,7 @@ class TransferReceivedMemberListController @Inject()(
 )(implicit ec: ExecutionContext)
     extends PSRController {
 
-  val form = TransferReceivedMemberListController.form(formProvider)
+  val form: Form[Boolean] = TransferReceivedMemberListController.form(formProvider)
 
   def onPageLoad(srn: Srn, page: Int, mode: Mode): Action[AnyContent] = identifyAndRequireData(srn) {
     implicit request =>

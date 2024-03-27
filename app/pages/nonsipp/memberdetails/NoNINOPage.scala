@@ -16,12 +16,12 @@
 
 package pages.nonsipp.memberdetails
 
-import config.Refined.Max300
-import models.SchemeId.Srn
-import pages.QuestionPage
-import play.api.libs.json.JsPath
-import queries.{Gettable, Removable}
 import utils.RefinedUtils.RefinedIntOps
+import queries.{Gettable, Removable}
+import models.SchemeId.Srn
+import play.api.libs.json.JsPath
+import config.Refined.Max300
+import pages.QuestionPage
 
 case class NoNINOPage(srn: Srn, index: Max300) extends QuestionPage[String] {
 

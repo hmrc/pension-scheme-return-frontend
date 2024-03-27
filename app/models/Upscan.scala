@@ -16,14 +16,14 @@
 
 package models
 
-import models.SchemeId.Srn
-import models.requests.DataRequest
-import play.api.libs.json._
-import play.api.mvc.QueryStringBindable
 import utils.HttpUrlFormat
+import play.api.mvc.QueryStringBindable
+import models.SchemeId.Srn
+import play.api.libs.json._
+import models.requests.DataRequest
 
-import java.net.URL
 import java.time.Instant
+import java.net.URL
 
 case class Reference(reference: String)
 

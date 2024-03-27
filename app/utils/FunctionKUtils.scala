@@ -16,8 +16,8 @@
 
 package utils
 
-import cats.arrow.FunctionK
 import cats.~>
+import cats.arrow.FunctionK
 
 import scala.concurrent.Future
 import scala.util.Try

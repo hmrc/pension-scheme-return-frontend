@@ -16,31 +16,32 @@
 
 package controllers.nonsipp.receivetransfer
 
-import cats.implicits.toShow
+import services.{SaveService, SchemeDateService}
+import viewmodels.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Refined._
 import controllers.PSRController
 import controllers.actions._
-import controllers.nonsipp.receivetransfer.WhenWasTransferReceivedController._
-import forms.DatePageFormProvider
-import forms.mappings.errors.DateFormErrors
-import models.SchemeId.Srn
-import models._
 import navigation.Navigator
-import pages.nonsipp.memberdetails.MemberDetailsPage
-import pages.nonsipp.receivetransfer.{TransferringSchemeNamePage, WhenWasTransferReceivedPage}
-import play.api.data.Form
+import forms.DatePageFormProvider
 import play.api.i18n.{Messages, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.{SaveService, SchemeDateService}
-import utils.DateTimeUtils.localDateShow
-import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
-import viewmodels.models._
+import play.api.data.Form
+import forms.mappings.errors.DateFormErrors
+import pages.nonsipp.memberdetails.MemberDetailsPage
+import controllers.nonsipp.receivetransfer.WhenWasTransferReceivedController._
 import views.html.DatePageView
+import models.SchemeId.Srn
+import cats.implicits.toShow
+import pages.nonsipp.receivetransfer.{TransferringSchemeNamePage, WhenWasTransferReceivedPage}
+import utils.DateTimeUtils.localDateShow
+import models._
+import viewmodels.DisplayMessage.Message
+import viewmodels.models._
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import java.time.LocalDate
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class WhenWasTransferReceivedController @Inject()(
   override val messagesApi: MessagesApi,

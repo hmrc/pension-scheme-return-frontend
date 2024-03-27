@@ -16,25 +16,26 @@
 
 package controllers.nonsipp.otherassetsdisposal
 
-import controllers.actions._
-import controllers.nonsipp.otherassetsdisposal.OtherAssetsDisposalController.viewModel
-import forms.YesNoPageFormProvider
-import models.Mode
-import models.SchemeId.Srn
-import navigation.Navigator
-import pages.nonsipp.otherassetsdisposal.OtherAssetsDisposalPage
-import play.api.data.Form
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SaveService
+import pages.nonsipp.otherassetsdisposal.OtherAssetsDisposalPage
+import viewmodels.implicits._
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import controllers.actions._
+import navigation.Navigator
+import forms.YesNoPageFormProvider
+import controllers.nonsipp.otherassetsdisposal.OtherAssetsDisposalController.viewModel
+import models.Mode
+import play.api.data.Form
+import views.html.YesNoPageView
+import models.SchemeId.Srn
+import play.api.i18n.{I18nSupport, MessagesApi}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels.DisplayMessage.Message
-import viewmodels.implicits._
 import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
-import views.html.YesNoPageView
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class OtherAssetsDisposalController @Inject()(
   override val messagesApi: MessagesApi,

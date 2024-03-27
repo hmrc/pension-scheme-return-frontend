@@ -16,26 +16,27 @@
 
 package controllers.nonsipp.membercontributions
 
+import services.{PsrSubmissionService, SaveService}
+import pages.nonsipp.memberdetails.MemberDetailsPage
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import config.Refined.Max300
 import controllers.PSRController
 import controllers.actions.IdentifyAndRequireData
-import forms.YesNoPageFormProvider
-import models.SchemeId.Srn
-import models.{Money, NormalMode}
 import navigation.Navigator
-import pages.nonsipp.membercontributions.{RemoveMemberContributionPage, TotalMemberContributionPage}
-import pages.nonsipp.memberdetails.MemberDetailsPage
-import play.api.data.Form
+import forms.YesNoPageFormProvider
+import models.{Money, NormalMode}
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.{PsrSubmissionService, SaveService}
-import viewmodels.DisplayMessage.Message
+import play.api.data.Form
 import viewmodels.implicits._
-import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
+import pages.nonsipp.membercontributions.{RemoveMemberContributionPage, TotalMemberContributionPage}
 import views.html.YesNoPageView
+import models.SchemeId.Srn
+import viewmodels.DisplayMessage.Message
+import viewmodels.models.{FormPageViewModel, YesNoPageViewModel}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 
 class RemoveMemberContributionController @Inject()(
   override val messagesApi: MessagesApi,

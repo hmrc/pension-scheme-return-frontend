@@ -16,28 +16,29 @@
 
 package controllers.nonsipp.bonds
 
-import cats.implicits.toShow
-import config.Refined.Max5000
-import controllers.PSRController
-import controllers.actions._
-import controllers.nonsipp.bonds.UnregulatedOrConnectedBondsHeldCYAController._
-import models.SchemeHoldBond.{Acquisition, Contribution, Transfer}
-import models.SchemeId.Srn
-import models.{CheckMode, Mode, Money, NormalMode, SchemeHoldBond}
-import navigation.Navigator
-import pages.nonsipp.bonds._
-import play.api.i18n._
-import play.api.mvc._
 import services.PsrSubmissionService
-import utils.DateTimeUtils.localDateShow
-import viewmodels.DisplayMessage._
+import pages.nonsipp.bonds._
 import viewmodels.implicits._
-import viewmodels.models._
+import play.api.mvc._
+import config.Refined.Max5000
+import cats.implicits.toShow
+import controllers.actions._
+import navigation.Navigator
+import play.api.i18n._
+import controllers.nonsipp.bonds.UnregulatedOrConnectedBondsHeldCYAController._
+import controllers.PSRController
+import models.SchemeHoldBond.{Acquisition, Contribution, Transfer}
 import views.html.CheckYourAnswersView
+import models.SchemeId.Srn
+import utils.DateTimeUtils.localDateShow
+import models._
+import viewmodels.DisplayMessage._
+import viewmodels.models._
+
+import scala.concurrent.ExecutionContext
 
 import java.time.LocalDate
 import javax.inject.{Inject, Named}
-import scala.concurrent.ExecutionContext
 
 class UnregulatedOrConnectedBondsHeldCYAController @Inject()(
   override val messagesApi: MessagesApi,
