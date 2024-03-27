@@ -31,7 +31,7 @@ case class PSRStartAuditEvent(
   howManyPensionerMembers: Int
 ) extends AuditEvent {
 
-  override def auditType: String = "PensionSchemeReturnStart"
+  override def auditType: String = "PensionSchemeReturnStarted"
 
   override def details: Map[String, String] = {
 
