@@ -14,16 +14,10 @@
  * limitations under the License.
  */
 
-package pages.nonsipp
+package pages.nonsipp.otherassetsdisposal
 
-import play.api.libs.json.{__, JsPath}
+import config.Refined.{Max50, Max5000}
+import models.SchemeId.Srn
+import pages.Page
 
-package object otherassetsdisposal {
-
-  object Paths {
-    val assets: JsPath = __ \ "assets"
-    val otherAssets: JsPath = assets \ "otherAssets"
-    val otherAssetDisposalTransactions: JsPath = otherAssets \ "otherAssetTransactions"
-    val assetsDisposed: JsPath = otherAssetDisposalTransactions \ "assetsDisposed"
-  }
-}
+case class OtherAssetsDisposalListPage(srn: Srn, assetIndex: Max5000) extends Page

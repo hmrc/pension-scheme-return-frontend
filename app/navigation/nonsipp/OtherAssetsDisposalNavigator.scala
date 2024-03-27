@@ -16,11 +16,14 @@
 
 package navigation.nonsipp
 
+import cats.implicits.toTraverseOps
+import config.Refined.{Max50, Max5000}
 import eu.timepit.refined.refineMV
 import navigation.JourneyNavigator
 import pages.Page
 import play.api.mvc.Call
 import models._
+import pages.nonsipp.landorpropertydisposal.LandPropertyDisposalCompleted
 import pages.nonsipp.otherassetsdisposal._
 
 object OtherAssetsDisposalNavigator extends JourneyNavigator {
@@ -35,7 +38,21 @@ object OtherAssetsDisposalNavigator extends JourneyNavigator {
       }
 
     case WhatYouWillNeedOtherAssetsDisposalPage(srn) =>
-      controllers.routes.UnauthorisedController.onPageLoad()
+      controllers.nonsipp.otherassetsdisposal.routes.StartReportingAssetsDisposalController.onPageLoad(srn, page = 1)
+
+    case OtherAssetsDisposalListPage(srn, assetIndex) =>
+      (
+        for {
+          disposalIndexes <- userAnswers
+            .map(OtherAssetsDisposalCompleted.all(srn, assetIndex))
+            .keys
+            .toList
+            .traverse(_.toIntOption)
+            .getOrRecoverJourney
+          nextIndex <- findNextOpenIndex[Max50.Refined](disposalIndexes).getOrRecoverJourney
+        } yield controllers.nonsipp.otherassetsdisposal.routes.HowWasAssetDisposedOfController
+          .onPageLoad(srn, assetIndex, nextIndex, NormalMode)
+      ).merge
 
     case page @ HowWasAssetDisposedOfPage(srn, assetIndex, disposalIndex, _) =>
       userAnswers.get(page) match {
