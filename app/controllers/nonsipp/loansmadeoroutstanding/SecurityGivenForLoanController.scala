@@ -83,7 +83,7 @@ class SecurityGivenForLoanController @Inject()(
 }
 
 object SecurityGivenForLoanController {
-  def form(formProvider: YesNoPageFormProvider): Form[Either[Unit,Security]] = formProvider.conditionalYes[Security](
+  def form(formProvider: YesNoPageFormProvider): Form[Either[Unit, Security]] = formProvider.conditionalYes[Security](
     "securityGivenForLoan.securityGiven.error.required",
     mappingYes = Mappings
       .security(
