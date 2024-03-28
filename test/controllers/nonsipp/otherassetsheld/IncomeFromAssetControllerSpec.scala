@@ -16,14 +16,14 @@
 
 package controllers.nonsipp.otherassetsheld
 
+import pages.nonsipp.otherassetsheld.IncomeFromAssetPage
 import config.Refined._
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.otherassetsheld.IncomeFromAssetController._
+import views.html.MoneyView
 import eu.timepit.refined.refineMV
 import forms.MoneyFormProvider
 import models.NormalMode
-import pages.nonsipp.otherassetsheld.IncomeFromAssetPage
-import views.html.MoneyView
+import controllers.nonsipp.otherassetsheld.IncomeFromAssetController._
 
 class IncomeFromAssetControllerSpec extends ControllerBaseSpec {
 

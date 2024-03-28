@@ -16,14 +16,14 @@
 
 package controllers.nonsipp.memberdetails.upload
 
-import controllers.ControllerBaseSpec
-import controllers.nonsipp.memberdetails.upload.CheckingMemberDetailsFileController._
-import models.{NormalMode, Upload}
-import org.mockito.ArgumentMatchers.any
-import play.api.inject
-import play.api.inject.guice.GuiceableModule
 import services.UploadService
+import play.api.inject.guice.GuiceableModule
+import controllers.ControllerBaseSpec
 import views.html.ContentPageView
+import play.api.inject
+import org.mockito.ArgumentMatchers.any
+import models.{NormalMode, Upload}
+import controllers.nonsipp.memberdetails.upload.CheckingMemberDetailsFileController._
 
 import scala.concurrent.Future
 

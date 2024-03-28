@@ -16,14 +16,14 @@
 
 package controllers.nonsipp.otherassetsdisposal
 
+import pages.nonsipp.otherassetsdisposal.{PartnershipBuyerNamePage, PartnershipBuyerUtrPage}
 import config.Refined.{Max50, Max5000}
 import controllers.ControllerBaseSpec
+import views.html.ConditionalYesNoPageView
 import controllers.nonsipp.otherassetsdisposal.PartnershipBuyerUtrController._
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
-import models.{ConditionalYesNo, NormalMode, UserAnswers, Utr}
-import pages.nonsipp.otherassetsdisposal.{PartnershipBuyerNamePage, PartnershipBuyerUtrPage}
-import views.html.ConditionalYesNoPageView
+import models._
 
 class PartnershipBuyerUtrControllerSpec extends ControllerBaseSpec {
 

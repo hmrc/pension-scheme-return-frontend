@@ -16,12 +16,12 @@
 
 package views
 
-import models.BankAccount
-import play.api.data
-import play.api.data.Forms.{mapping, text}
 import play.api.test.FakeRequest
-import viewmodels.models.BankAccountViewModel
+import play.api.data.Forms.{mapping, text}
 import views.html.BankAccountView
+import play.api.data
+import models.BankAccount
+import viewmodels.models.BankAccountViewModel
 
 class BankAccountViewSpec extends ViewSpec {
 

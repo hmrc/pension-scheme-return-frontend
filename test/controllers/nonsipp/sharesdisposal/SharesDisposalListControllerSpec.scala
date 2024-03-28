@@ -16,22 +16,16 @@
 
 package controllers.nonsipp.sharesdisposal
 
+import pages.nonsipp.shares._
+import controllers.nonsipp.sharesdisposal.SharesDisposalListController._
 import config.Refined.Max5000
 import controllers.ControllerBaseSpec
+import views.html.ListRadiosView
 import controllers.nonsipp.shares.SharesListController.SharesData
-import controllers.nonsipp.sharesdisposal.SharesDisposalListController._
 import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
 import models.{SchemeHoldShare, TypeOfShares}
-import pages.nonsipp.shares.{
-  CompanyNameRelatedSharesPage,
-  SharesCompleted,
-  TypeOfSharesHeldPage,
-  WhenDidSchemeAcquireSharesPage,
-  WhyDoesSchemeHoldSharesPage
-}
 import viewmodels.models.SectionCompleted
-import views.html.ListRadiosView
 
 class SharesDisposalListControllerSpec extends ControllerBaseSpec {
 

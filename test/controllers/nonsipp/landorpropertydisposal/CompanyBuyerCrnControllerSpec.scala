@@ -19,11 +19,11 @@ package controllers.nonsipp.landorpropertydisposal
 import config.Refined.{Max50, Max5000}
 import controllers.ControllerBaseSpec
 import controllers.nonsipp.landorpropertydisposal.CompanyBuyerCrnController._
+import views.html.ConditionalYesNoPageView
+import pages.nonsipp.landorpropertydisposal.{CompanyBuyerCrnPage, CompanyBuyerNamePage}
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
-import models.{ConditionalYesNo, Crn, NormalMode}
-import pages.nonsipp.landorpropertydisposal.{CompanyBuyerCrnPage, CompanyBuyerNamePage}
-import views.html.ConditionalYesNoPageView
+import models._
 
 class CompanyBuyerCrnControllerSpec extends ControllerBaseSpec {
 
@@ -37,7 +37,7 @@ class CompanyBuyerCrnControllerSpec extends ControllerBaseSpec {
     routes.CompanyBuyerCrnController
       .onSubmit(srn, index, disposalIndex, NormalMode)
 
-  val userAnswersCompanyName =
+  val userAnswersCompanyName: UserAnswers =
     defaultUserAnswers.unsafeSet(CompanyBuyerNamePage(srn, index, disposalIndex), companyName)
 
   val conditionalNo: ConditionalYesNo[String, Crn] = ConditionalYesNo.no("reason")

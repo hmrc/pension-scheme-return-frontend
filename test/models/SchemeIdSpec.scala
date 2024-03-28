@@ -16,10 +16,10 @@
 
 package models
 
-import models.SchemeId.Srn
-import org.scalacheck.Gen.alphaNumStr
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import utils.BaseSpec
+import models.SchemeId.Srn
+import org.scalacheck.Gen.alphaNumStr
 
 class SchemeIdSpec extends BaseSpec with ScalaCheckPropertyChecks {
 

@@ -16,15 +16,15 @@
 
 package controllers.nonsipp.memberpayments
 
+import services.PsrSubmissionService
+import play.api.inject.guice.GuiceableModule
 import controllers.ControllerBaseSpec
+import play.api.inject.bind
+import views.html.YesNoPageView
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.memberpayments.{UnallocatedEmployerAmountPage, UnallocatedEmployerContributionsPage}
-import play.api.inject.guice.GuiceableModule
-import play.api.inject.bind
-import services.PsrSubmissionService
-import views.html.YesNoPageView
+import org.mockito.ArgumentMatchers.any
 
 import scala.concurrent.Future
 

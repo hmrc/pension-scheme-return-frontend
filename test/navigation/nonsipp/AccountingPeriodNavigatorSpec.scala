@@ -16,20 +16,15 @@
 
 package navigation.nonsipp
 
-import config.Refined.OneToThree
-import controllers.nonsipp.accountingperiod.routes
-import controllers.nonsipp.schemedesignatory
-import eu.timepit.refined.refineMV
-import generators.IndexGen
-import models.NormalMode
-import navigation.{Navigator, NavigatorBehaviours}
-import pages.nonsipp.accountingperiod.{
-  AccountingPeriodCheckYourAnswersPage,
-  AccountingPeriodListPage,
-  AccountingPeriodPage,
-  RemoveAccountingPeriodPage
-}
 import utils.BaseSpec
+import config.Refined.OneToThree
+import generators.IndexGen
+import controllers.nonsipp.schemedesignatory
+import controllers.nonsipp.accountingperiod.routes
+import eu.timepit.refined.refineMV
+import pages.nonsipp.accountingperiod._
+import navigation.{Navigator, NavigatorBehaviours}
+import models.NormalMode
 
 class AccountingPeriodNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 

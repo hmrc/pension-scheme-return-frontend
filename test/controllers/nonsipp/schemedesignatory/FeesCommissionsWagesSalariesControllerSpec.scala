@@ -16,14 +16,14 @@
 
 package controllers.nonsipp.schemedesignatory
 
-import controllers.ControllerBaseSpec
-import controllers.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesController._
+import pages.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesPage
+import views.html.MoneyView
 import forms.MoneyFormProvider
 import models.NormalMode
-import pages.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesPage
+import controllers.nonsipp.schemedesignatory.FeesCommissionsWagesSalariesController._
+import controllers.ControllerBaseSpec
 import play.api.Application
 import play.api.libs.json.JsPath
-import views.html.MoneyView
 
 class FeesCommissionsWagesSalariesControllerSpec extends ControllerBaseSpec {
 

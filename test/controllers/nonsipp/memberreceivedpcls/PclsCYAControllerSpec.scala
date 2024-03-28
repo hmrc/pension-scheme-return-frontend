@@ -16,18 +16,18 @@
 
 package controllers.nonsipp.memberreceivedpcls
 
+import services.PsrSubmissionService
+import pages.nonsipp.memberreceivedpcls.PensionCommencementLumpSumAmountPage
 import config.Refined._
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.memberreceivedpcls.PclsCYAController._
+import views.html.CheckYourAnswersView
 import eu.timepit.refined.refineMV
 import models.NormalMode
 import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.memberdetails.MemberDetailsPage
-import pages.nonsipp.memberreceivedpcls.PensionCommencementLumpSumAmountPage
-import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
-import services.PsrSubmissionService
-import views.html.CheckYourAnswersView
+import pages.nonsipp.memberdetails.MemberDetailsPage
+import play.api.inject.bind
+import controllers.nonsipp.memberreceivedpcls.PclsCYAController._
 
 import scala.concurrent.Future
 

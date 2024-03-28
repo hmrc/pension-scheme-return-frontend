@@ -16,19 +16,19 @@
 
 package controllers.nonsipp.memberdetails
 
-import controllers.ControllerBaseSpec
-import controllers.nonsipp.memberdetails.UploadMemberDetailsController.viewModel
-import models.{DateRange, UpscanFileReference, UpscanInitiateResponse}
-import org.mockito.ArgumentCaptor
-import org.mockito.ArgumentMatchers.any
-import play.api.data.FormError
-import play.api.inject.bind
-import play.api.inject.guice.GuiceableModule
-import play.api.mvc.Call
-import play.api.test.CSRFTokenHelper.CSRFRequest
 import play.api.test.FakeRequest
 import services.{AuditService, SchemeDateService, UploadService}
+import play.api.inject.guice.GuiceableModule
+import play.api.mvc.Call
+import controllers.ControllerBaseSpec
+import play.api.inject.bind
 import views.html.UploadView
+import controllers.nonsipp.memberdetails.UploadMemberDetailsController.viewModel
+import models.{DateRange, UpscanFileReference, UpscanInitiateResponse}
+import play.api.test.CSRFTokenHelper.CSRFRequest
+import play.api.data.FormError
+import org.mockito.ArgumentCaptor
+import org.mockito.ArgumentMatchers.any
 
 import scala.concurrent.Future
 

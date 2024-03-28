@@ -16,8 +16,8 @@
 
 package pages
 
-import pages.behaviours.PageBehaviours
 import pages.nonsipp.moneyborrowed.MoneyBorrowedPage
+import pages.behaviours.PageBehaviours
 
 class MoneyBorrowedPageSpec extends PageBehaviours {
 

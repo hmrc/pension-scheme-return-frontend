@@ -16,9 +16,9 @@
 
 package pages.nonsipp.loansmadeoroutstanding
 
+import models.ConditionalYesNo._
 import config.Refined.OneTo5000
 import eu.timepit.refined.refineMV
-import models.ConditionalYesNo._
 import models.Money
 import pages.behaviours.PageBehaviours
 

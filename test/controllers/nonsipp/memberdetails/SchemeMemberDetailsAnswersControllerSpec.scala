@@ -16,13 +16,13 @@
 
 package controllers.nonsipp.memberdetails
 
-import controllers.ControllerBaseSpec
 import controllers.nonsipp.memberdetails.SchemeMemberDetailsAnswersController._
+import pages.nonsipp.memberdetails._
+import controllers.ControllerBaseSpec
+import views.html.CheckYourAnswersView
 import eu.timepit.refined.refineMV
 import models.CheckOrChange
-import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsNinoPage, MemberDetailsPage, NoNINOPage}
 import viewmodels.DisplayMessage.Message
-import views.html.CheckYourAnswersView
 
 class SchemeMemberDetailsAnswersControllerSpec extends ControllerBaseSpec {
 

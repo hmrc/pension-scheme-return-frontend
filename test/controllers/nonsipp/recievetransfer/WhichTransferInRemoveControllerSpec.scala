@@ -16,14 +16,14 @@
 
 package controllers.nonsipp.receivetransfer
 
+import pages.nonsipp.memberdetails.MemberDetailsPage
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.receivetransfer.WhichTransferInRemoveController._
+import views.html.ListRadiosView
+import pages.nonsipp.receivetransfer.{TotalValueTransferPage, TransferringSchemeNamePage}
 import eu.timepit.refined.refineMV
+import controllers.nonsipp.receivetransfer.WhichTransferInRemoveController._
 import forms.RadioListFormProvider
 import models.{Money, NameDOB}
-import pages.nonsipp.memberdetails.MemberDetailsPage
-import pages.nonsipp.receivetransfer.{TotalValueTransferPage, TransferringSchemeNamePage}
-import views.html.ListRadiosView
 
 class WhichTransferInRemoveControllerSpec extends ControllerBaseSpec {
 

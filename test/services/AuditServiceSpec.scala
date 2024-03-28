@@ -16,20 +16,20 @@
 
 package services
 
-import config.Constants.{PSA, PSP}
-import config.FrontendAppConfig
-import controllers.TestValues
+import play.api.test.FakeRequest
 import models.audit.PSRStartAuditEvent
+import utils.BaseSpec
+import play.api.mvc.AnyContentAsEmpty
+import uk.gov.hmrc.play.audit.model.DataEvent
+import controllers.TestValues
+import config.FrontendAppConfig
+import config.Constants.{PSA, PSP}
+import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
-import play.api.mvc.AnyContentAsEmpty
-import play.api.test.FakeRequest
-import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
-import uk.gov.hmrc.play.audit.model.DataEvent
-import utils.BaseSpec
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class AuditServiceSpec extends BaseSpec with TestValues {
 

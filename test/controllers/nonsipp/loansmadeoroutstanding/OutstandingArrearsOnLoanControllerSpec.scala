@@ -16,15 +16,15 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
+import models.ConditionalYesNo._
+import controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController._
 import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanController._
+import views.html.ConditionalYesNoPageView
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
-import models.ConditionalYesNo._
 import models.{ConditionalYesNo, Money, NormalMode}
 import pages.nonsipp.loansmadeoroutstanding.OutstandingArrearsOnLoanPage
-import views.html.ConditionalYesNoPageView
 
 class OutstandingArrearsOnLoanControllerSpec extends ControllerBaseSpec {
 

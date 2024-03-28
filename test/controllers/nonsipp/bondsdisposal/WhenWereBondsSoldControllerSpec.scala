@@ -16,16 +16,16 @@
 
 package controllers.nonsipp.bondsdisposal
 
+import services.SchemeDateService
+import play.api.inject.guice.GuiceableModule
 import config.Refined.{Max50, Max5000}
 import controllers.ControllerBaseSpec
+import views.html.DatePageView
 import eu.timepit.refined.refineMV
+import play.api.inject
 import forms.DatePageFormProvider
 import models.NormalMode
 import pages.nonsipp.bondsdisposal.WhenWereBondsSoldPage
-import play.api.inject
-import play.api.inject.guice.GuiceableModule
-import services.SchemeDateService
-import views.html.DatePageView
 
 class WhenWereBondsSoldControllerSpec extends ControllerBaseSpec {
 

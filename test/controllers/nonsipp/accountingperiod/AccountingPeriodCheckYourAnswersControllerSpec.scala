@@ -16,26 +16,30 @@
 
 package controllers.nonsipp.accountingperiod
 
-import cats.implicits.toShow
+import play.api.mvc.Call
 import config.Refined.OneToThree
 import controllers.ControllerBaseSpec
+import views.html.CheckYourAnswersView
+import cats.implicits.toShow
 import eu.timepit.refined._
-import models.NormalMode
-import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
 import pages.nonsipp.accountingperiod.AccountingPeriodPage
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
 import utils.DateTimeUtils.localDateShow
+import models.NormalMode
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.SummaryAction
-import views.html.CheckYourAnswersView
+import models.UserAnswers
+import viewmodels.models.{CheckYourAnswersViewModel, FormPageViewModel}
 
 class AccountingPeriodCheckYourAnswersControllerSpec extends ControllerBaseSpec {
 
-  lazy val onPageLoad =
+  lazy val onPageLoad: Call =
     routes.AccountingPeriodCheckYourAnswersController.onPageLoad(srn, refineMV[OneToThree](1), NormalMode)
-  lazy val onSubmit = routes.AccountingPeriodCheckYourAnswersController.onSubmit(srn, NormalMode)
-  lazy val viewModel = AccountingPeriodCheckYourAnswersController.viewModel(srn, refineMV(1), dateRange, NormalMode)
+  lazy val onSubmit: Call = routes.AccountingPeriodCheckYourAnswersController.onSubmit(srn, NormalMode)
+  lazy val viewModel: FormPageViewModel[CheckYourAnswersViewModel] =
+    AccountingPeriodCheckYourAnswersController.viewModel(srn, refineMV(1), dateRange, NormalMode)
 
-  val userAnswers =
+  val userAnswers: UserAnswers =
     defaultUserAnswers.set(AccountingPeriodPage(srn, refineMV[OneToThree](1), NormalMode), dateRange).success.value
 
   "AccountingPeriodCheckYourAnswersController" - {

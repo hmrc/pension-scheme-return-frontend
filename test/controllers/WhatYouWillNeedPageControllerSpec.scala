@@ -16,25 +16,25 @@
 
 package controllers
 
-import models.{CheckMode, SchemeMemberNumbers}
-import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.schemedesignatory.HowManyMembersPage
-import play.api.inject.bind
-import play.api.inject.guice.GuiceableModule
-import play.api.mvc.Call
 import play.api.test.FakeRequest
 import services.PsrRetrievalService
+import pages.nonsipp.schemedesignatory.HowManyMembersPage
+import play.api.inject.guice.GuiceableModule
+import play.api.mvc.Call
+import play.api.inject.bind
 import views.html.ContentPageView
+import navigation.{FakeNavigator, Navigator}
+import models.{CheckMode, SchemeMemberNumbers}
+import org.mockito.ArgumentMatchers.any
 
 import scala.concurrent.Future
 
 class WhatYouWillNeedPageControllerSpec extends ControllerBaseSpec {
 
-  def onwardRoute = Call("GET", "/foo")
+  def onwardRoute: Call = Call("GET", "/foo")
 
-  lazy val onPageLoad = routes.WhatYouWillNeedController.onPageLoad(srn, fbNumber, "", "").url
-  lazy val onSubmit = routes.WhatYouWillNeedController.onSubmit(srn, fbNumber, "", "").url
+  lazy val onPageLoad: String = routes.WhatYouWillNeedController.onPageLoad(srn, fbNumber, "", "").url
+  lazy val onSubmit: String = routes.WhatYouWillNeedController.onSubmit(srn, fbNumber, "", "").url
 
   private implicit val mockPsrRetrievalService: PsrRetrievalService = mock[PsrRetrievalService]
 

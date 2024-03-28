@@ -16,13 +16,13 @@
 
 package controllers
 
-import cats.data.NonEmptyList
-import config.Refined.Max3
-import models.DateRange
-import org.mockito.ArgumentMatchers.any
-import org.mockito.MockitoSugar.when
-import org.mockito.stubbing.ScalaOngoingStubbing
 import services.{PsrSubmissionService, SchemeDateService}
+import config.Refined.Max3
+import cats.data.NonEmptyList
+import org.mockito.stubbing.ScalaOngoingStubbing
+import models.DateRange
+import org.mockito.MockitoSugar.when
+import org.mockito.ArgumentMatchers.any
 
 import scala.concurrent.Future
 

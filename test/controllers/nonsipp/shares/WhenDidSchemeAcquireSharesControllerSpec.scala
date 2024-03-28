@@ -16,18 +16,18 @@
 
 package controllers.nonsipp.shares
 
+import services.SchemeDateService
+import play.api.inject.guice.GuiceableModule
+import pages.nonsipp.shares.{TypeOfSharesHeldPage, WhenDidSchemeAcquireSharesPage}
 import config.Refined.Max5000
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.shares.WhenDidSchemeAcquireSharesController._
+import play.api.inject.bind
 import eu.timepit.refined.refineMV
 import forms.DatePageFormProvider
-import models.TypeOfShares.ConnectedParty
 import models.{NormalMode, TypeOfShares}
-import pages.nonsipp.shares.{TypeOfSharesHeldPage, WhenDidSchemeAcquireSharesPage}
-import play.api.inject.bind
-import play.api.inject.guice.GuiceableModule
-import services.SchemeDateService
 import views.html.DatePageView
+import models.TypeOfShares.ConnectedParty
+import controllers.nonsipp.shares.WhenDidSchemeAcquireSharesController._
 
 import java.time.LocalDate
 

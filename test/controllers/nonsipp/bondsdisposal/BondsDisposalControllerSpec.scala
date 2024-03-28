@@ -16,16 +16,16 @@
 
 package controllers.nonsipp.bondsdisposal
 
-import controllers.ControllerBaseSpec
+import services.PsrSubmissionService
+import play.api.inject.guice.GuiceableModule
 import controllers.nonsipp.bondsdisposal.BondsDisposalController._
+import controllers.ControllerBaseSpec
+import play.api.inject.bind
+import views.html.YesNoPageView
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.bondsdisposal.BondsDisposalPage
-import play.api.inject.bind
-import play.api.inject.guice.GuiceableModule
-import services.PsrSubmissionService
-import views.html.YesNoPageView
+import org.mockito.ArgumentMatchers.any
 
 class BondsDisposalControllerSpec extends ControllerBaseSpec {
 

@@ -16,14 +16,14 @@
 
 package views
 
+import play.api.test.FakeRequest
 import forms.mappings.Mappings
-import forms.mappings.errors.MoneyFormErrors
-import models.Money
+import play.api.data.Forms.mapping
+import views.html.MoneyView
 import org.scalacheck.Gen
 import play.api.data
-import play.api.data.Forms.mapping
-import play.api.test.FakeRequest
-import views.html.MoneyView
+import models.Money
+import forms.mappings.errors.MoneyFormErrors
 
 class MoneyViewSpec extends ViewSpec with Mappings {
 

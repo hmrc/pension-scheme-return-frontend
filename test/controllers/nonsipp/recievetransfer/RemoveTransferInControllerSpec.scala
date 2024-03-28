@@ -16,18 +16,18 @@
 
 package controllers.nonsipp.receivetransfer
 
+import services.PsrSubmissionService
 import controllers.ControllerBaseSpec
+import play.api.inject.bind
+import views.html.YesNoPageView
+import pages.nonsipp.receivetransfer.TransferringSchemeNamePage
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
-import models.NameDOB
 import controllers.nonsipp.receivetransfer.RemoveTransferInController._
+import models.NameDOB
 import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.memberdetails.MemberDetailsPage
-import pages.nonsipp.receivetransfer.TransferringSchemeNamePage
 import play.api.inject.guice.GuiceableModule
-import views.html.YesNoPageView
-import play.api.inject.bind
-import services.PsrSubmissionService
+import pages.nonsipp.memberdetails.MemberDetailsPage
 
 import scala.concurrent.Future
 

@@ -18,12 +18,12 @@ package controllers.nonsipp.landorproperty
 
 import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.landorproperty.LandPropertyIndependentValuationController._
+import views.html.YesNoPageView
+import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandPropertyIndependentValuationPage}
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, LandPropertyIndependentValuationPage}
-import views.html.YesNoPageView
+import controllers.nonsipp.landorproperty.LandPropertyIndependentValuationController._
 
 class LandPropertyIndependentValuationControllerSpec extends ControllerBaseSpec {
 

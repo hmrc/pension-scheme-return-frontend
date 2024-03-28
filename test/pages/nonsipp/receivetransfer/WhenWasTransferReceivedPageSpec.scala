@@ -16,11 +16,9 @@
 
 package pages.nonsipp.receivetransfer
 
-import pages.nonsipp.receivetransfer.WhenWasTransferReceivedPage
-
 import config.Refined._
+import pages.nonsipp.receivetransfer.WhenWasTransferReceivedPage
 import eu.timepit.refined.refineMV
-
 import pages.behaviours.PageBehaviours
 
 import java.time.LocalDate

@@ -16,20 +16,20 @@
 
 package controllers.nonsipp.landorproperty
 
-import controllers.nonsipp.landorproperty.RemovePropertyController._
-import config.Refined.OneTo5000
-import controllers.ControllerBaseSpec
-import eu.timepit.refined.refineMV
-import forms.YesNoPageFormProvider
+import services.PsrSubmissionService
+import play.api.inject.guice.GuiceableModule
 import models.ConditionalYesNo._
-import models.SchemeHoldLandProperty.Transfer
+import controllers.ControllerBaseSpec
+import play.api.inject.bind
+import views.html.YesNoPageView
+import pages.nonsipp.landorproperty._
+import eu.timepit.refined.refineMV
+import controllers.nonsipp.landorproperty.RemovePropertyController._
+import forms.YesNoPageFormProvider
 import models.{ConditionalYesNo, NormalMode}
 import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.landorproperty._
-import play.api.inject.bind
-import play.api.inject.guice.GuiceableModule
-import services.PsrSubmissionService
-import views.html.YesNoPageView
+import config.Refined.OneTo5000
+import models.SchemeHoldLandProperty.Transfer
 
 class RemovePropertyControllerSpec extends ControllerBaseSpec {
 

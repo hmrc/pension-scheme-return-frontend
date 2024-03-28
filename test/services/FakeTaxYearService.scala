@@ -18,8 +18,8 @@ package services
 
 import uk.gov.hmrc.time.CurrentTaxYear
 
-import java.time
 import java.time.LocalDate
+import java.time
 
 class FakeTaxYearService(date: LocalDate) extends TaxYearService with CurrentTaxYear {
   override def now: () => time.LocalDate = () => date

@@ -17,9 +17,9 @@
 package views
 
 import play.api.test.FakeRequest
+import views.html.TaskListView
 import viewmodels.models.TaskListStatus.UnableToStart
 import viewmodels.models.{TaskListItemViewModel, TaskListViewModel}
-import views.html.TaskListView
 
 class TaskListViewSpec extends ViewSpec {
 

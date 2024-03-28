@@ -16,13 +16,13 @@
 
 package controllers.nonsipp.membertransferout
 
-import controllers.ControllerBaseSpec
 import controllers.nonsipp.membertransferout.SchemeTransferOutController.{form, viewModel}
+import controllers.ControllerBaseSpec
+import views.html.YesNoPageView
+import play.api.libs.json.JsPath
 import forms.YesNoPageFormProvider
 import models.NormalMode
 import pages.nonsipp.membertransferout.SchemeTransferOutPage
-import play.api.libs.json.JsPath
-import views.html.YesNoPageView
 
 class SchemeTransferOutControllerSpec extends ControllerBaseSpec {
 

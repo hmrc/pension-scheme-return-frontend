@@ -16,16 +16,16 @@
 
 package controllers.nonsipp.otherassetsdisposal
 
+import services.SchemeDateService
+import pages.nonsipp.otherassetsdisposal.WhenWasAssetSoldPage
+import play.api.inject.guice.GuiceableModule
 import config.Refined.{Max50, Max5000}
 import controllers.ControllerBaseSpec
+import views.html.DatePageView
 import eu.timepit.refined.refineMV
+import play.api.inject
 import forms.DatePageFormProvider
 import models.NormalMode
-import pages.nonsipp.otherassetsdisposal.WhenWasAssetSoldPage
-import play.api.inject
-import play.api.inject.guice.GuiceableModule
-import services.SchemeDateService
-import views.html.DatePageView
 
 class WhenWasAssetSoldControllerSpec extends ControllerBaseSpec {
 

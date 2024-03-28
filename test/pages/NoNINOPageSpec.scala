@@ -16,10 +16,10 @@
 
 package pages
 
+import pages.nonsipp.memberdetails.NoNINOPage
 import config.Refined.Max300
 import eu.timepit.refined.refineMV
 import pages.behaviours.PageBehaviours
-import pages.nonsipp.memberdetails.NoNINOPage
 
 class NoNINOPageSpec extends PageBehaviours {
 

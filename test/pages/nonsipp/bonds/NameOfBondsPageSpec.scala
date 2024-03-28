@@ -19,9 +19,9 @@ package pages.nonsipp.bonds
 import config.Refined.Max5000
 import controllers.TestValues
 import eu.timepit.refined.refineMV
+import utils.UserAnswersUtils.UserAnswersOps
 import models.UserAnswers
 import pages.behaviours.PageBehaviours
-import utils.UserAnswersUtils.UserAnswersOps
 
 class NameOfBondsPageSpec extends PageBehaviours with TestValues {
 

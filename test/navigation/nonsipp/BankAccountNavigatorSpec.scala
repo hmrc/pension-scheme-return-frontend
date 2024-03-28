@@ -16,12 +16,12 @@
 
 package navigation.nonsipp
 
-import controllers.nonsipp.schemedesignatory
-import controllers.nonsipp.schemedesignatory.routes
-import navigation.{Navigator, NavigatorBehaviours}
-import org.scalacheck.Gen
 import pages.nonsipp.schemedesignatory.{ActiveBankAccountPage, WhyNoBankAccountPage}
 import utils.BaseSpec
+import controllers.nonsipp.schemedesignatory.routes
+import controllers.nonsipp.schemedesignatory
+import org.scalacheck.Gen
+import navigation.{Navigator, NavigatorBehaviours}
 
 class BankAccountNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 

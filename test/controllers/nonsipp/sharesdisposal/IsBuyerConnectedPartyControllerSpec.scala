@@ -18,12 +18,12 @@ package controllers.nonsipp.sharesdisposal
 
 import config.Refined.{Max50, Max5000}
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.sharesdisposal.IsBuyerConnectedPartyController._
+import views.html.YesNoPageView
 import eu.timepit.refined.refineMV
+import pages.nonsipp.sharesdisposal._
 import forms.YesNoPageFormProvider
 import models.{IdentityType, NormalMode}
-import pages.nonsipp.sharesdisposal._
-import views.html.YesNoPageView
+import controllers.nonsipp.sharesdisposal.IsBuyerConnectedPartyController._
 
 class IsBuyerConnectedPartyControllerSpec extends ControllerBaseSpec {
 

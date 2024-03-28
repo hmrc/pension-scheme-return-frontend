@@ -16,13 +16,13 @@
 
 package controllers.nonsipp.otherassetsdisposal
 
-import controllers.ControllerBaseSpec
-import controllers.nonsipp.otherassetsdisposal.OtherAssetsDisposalController.{form, viewModel}
 import controllers.nonsipp.otherassetsdisposal.routes
-import forms.YesNoPageFormProvider
-import models.NormalMode
 import pages.nonsipp.otherassetsdisposal.OtherAssetsDisposalPage
+import controllers.ControllerBaseSpec
 import views.html.YesNoPageView
+import forms.YesNoPageFormProvider
+import controllers.nonsipp.otherassetsdisposal.OtherAssetsDisposalController.{form, viewModel}
+import models.NormalMode
 
 class OtherAssetsDisposalControllerSpec extends ControllerBaseSpec {
 

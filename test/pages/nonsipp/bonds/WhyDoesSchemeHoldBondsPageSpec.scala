@@ -18,9 +18,10 @@ package pages.nonsipp.bonds
 
 import config.Refined.OneTo5000
 import eu.timepit.refined.refineMV
+import utils.UserAnswersUtils.UserAnswersOps
 import models.{SchemeHoldBond, UserAnswers}
 import pages.behaviours.PageBehaviours
-import utils.UserAnswersUtils.UserAnswersOps
+
 import java.time.LocalDate
 
 class WhyDoesSchemeHoldBondsPageSpec extends PageBehaviours {

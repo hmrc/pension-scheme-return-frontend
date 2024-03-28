@@ -16,15 +16,15 @@
 
 package navigation.nonsipp
 
-import config.Refined.{Max50, Max5000}
-import eu.timepit.refined.refineMV
-import models.{IdentityType, NormalMode}
-import navigation.{Navigator, NavigatorBehaviours}
-import org.scalacheck.Gen
-import pages.nonsipp.landorpropertydisposal._
 import utils.BaseSpec
-import utils.UserAnswersUtils.UserAnswersOps
+import config.Refined.{Max50, Max5000}
+import pages.nonsipp.landorpropertydisposal._
+import eu.timepit.refined.refineMV
+import navigation.{Navigator, NavigatorBehaviours}
+import models.{IdentityType, NormalMode}
 import viewmodels.models.SectionCompleted
+import utils.UserAnswersUtils.UserAnswersOps
+import org.scalacheck.Gen
 
 class LandOrPropertyDisposalNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 

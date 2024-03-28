@@ -16,19 +16,19 @@
 
 package controllers.nonsipp.shares
 
+import services.PsrSubmissionService
+import play.api.inject.guice.GuiceableModule
+import pages.nonsipp.shares._
 import config.Refined.Max5000
 import controllers.ControllerBaseSpec
+import views.html.TwoColumnsTripleAction
 import controllers.nonsipp.shares.SharesListController._
 import eu.timepit.refined.refineMV
+import play.api.inject
 import forms.YesNoPageFormProvider
 import models._
-import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.shares._
-import play.api.inject
-import play.api.inject.guice.GuiceableModule
-import services.PsrSubmissionService
 import viewmodels.models.SectionCompleted
-import views.html.TwoColumnsTripleAction
+import org.mockito.ArgumentMatchers.any
 
 import scala.concurrent.Future
 

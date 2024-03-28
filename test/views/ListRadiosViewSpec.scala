@@ -16,16 +16,16 @@
 
 package views
 
-import config.Refined.Max5000
-import forms.RadioListFormProvider
-import models.Pagination
-import org.scalacheck.Gen
 import play.api.test.FakeRequest
 import play.twirl.api.Html
-import viewmodels.DisplayMessage.Message
-import viewmodels.models.{FormPageViewModel, ListRadiosViewModel, PaginatedViewModel}
+import config.Refined.Max5000
 import views.html.ListRadiosView
 import config.Refined.Max5000._
+import org.scalacheck.Gen
+import forms.RadioListFormProvider
+import models.Pagination
+import viewmodels.DisplayMessage.Message
+import viewmodels.models.{FormPageViewModel, ListRadiosViewModel, PaginatedViewModel}
 
 class ListRadiosViewSpec extends ViewSpec {
 

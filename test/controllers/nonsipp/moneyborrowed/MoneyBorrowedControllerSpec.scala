@@ -16,16 +16,16 @@
 
 package controllers.nonsipp.moneyborrowed
 
-import controllers.ControllerBaseSpec
+import services.PsrSubmissionService
+import play.api.inject.guice.GuiceableModule
 import controllers.nonsipp.moneyborrowed.MoneyBorrowedController._
+import controllers.ControllerBaseSpec
+import play.api.inject.bind
+import views.html.YesNoPageView
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.moneyborrowed.MoneyBorrowedPage
-import play.api.inject.bind
-import play.api.inject.guice.GuiceableModule
-import services.PsrSubmissionService
-import views.html.YesNoPageView
+import org.mockito.ArgumentMatchers.any
 
 class MoneyBorrowedControllerSpec extends ControllerBaseSpec {
 

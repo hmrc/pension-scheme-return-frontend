@@ -16,11 +16,11 @@
 
 package views
 
-import forms.mappings.Mappings
-import play.api.data
 import play.api.test.FakeRequest
-import viewmodels.models.TextInputViewModel
+import forms.mappings.Mappings
 import views.html.TextInputView
+import play.api.data
+import viewmodels.models.TextInputViewModel
 
 class TextInputViewSpec extends ViewSpec with Mappings {
 

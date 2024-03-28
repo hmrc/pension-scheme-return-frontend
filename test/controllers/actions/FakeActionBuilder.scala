@@ -16,8 +16,8 @@
 
 package controllers.actions
 
-import play.api.mvc._
 import play.api.test.Helpers.stubBodyParser
+import play.api.mvc._
 
 import scala.concurrent.{ExecutionContext, Future}
 

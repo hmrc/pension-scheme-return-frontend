@@ -16,13 +16,13 @@
 
 package generators
 
+import viewmodels.models.MultipleQuestionsViewModel.{DoubleQuestion, SingleQuestion, TripleQuestion}
 import cats.data.NonEmptyList
 import org.scalacheck.Gen
+import viewmodels.models.TaskListStatus.TaskListStatus
+import viewmodels.InputWidth
 import play.api.data.{Form, FormError}
 import viewmodels.DisplayMessage.Message
-import viewmodels.InputWidth
-import viewmodels.models.MultipleQuestionsViewModel.{DoubleQuestion, SingleQuestion, TripleQuestion}
-import viewmodels.models.TaskListStatus.TaskListStatus
 import viewmodels.models._
 
 trait ViewModelGenerators extends BasicGenerators {

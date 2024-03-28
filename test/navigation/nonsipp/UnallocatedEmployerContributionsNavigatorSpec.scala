@@ -16,12 +16,12 @@
 
 package navigation.nonsipp
 
-import models.CheckOrChange
-import navigation.{Navigator, NavigatorBehaviours}
-import org.scalacheck.Gen
-import pages.nonsipp.memberpayments._
 import utils.BaseSpec
+import navigation.{Navigator, NavigatorBehaviours}
+import models.CheckOrChange
+import pages.nonsipp.memberpayments._
 import utils.UserAnswersUtils.UserAnswersOps
+import org.scalacheck.Gen
 
 class UnallocatedEmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 

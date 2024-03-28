@@ -16,17 +16,17 @@
 
 package controllers.nonsipp.memberdetails
 
+import play.api.test.FakeRequest
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.memberdetails.MemberDetailsController._
+import views.html.NameDOBView
 import eu.timepit.refined.refineMV
 import forms.NameDOBFormProvider
 import models.{NameDOB, NormalMode}
-import pages.nonsipp.memberdetails.MemberDetailsPage
-import play.api.data.FormError
 import play.api.i18n.Messages
-import play.api.test.FakeRequest
+import play.api.data.FormError
 import play.api.test.Helpers.stubMessagesApi
-import views.html.NameDOBView
+import pages.nonsipp.memberdetails.MemberDetailsPage
+import controllers.nonsipp.memberdetails.MemberDetailsController._
 
 import java.time.LocalDate
 

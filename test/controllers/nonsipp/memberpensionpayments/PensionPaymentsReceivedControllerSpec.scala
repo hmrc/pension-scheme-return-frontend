@@ -16,16 +16,16 @@
 
 package controllers.nonsipp.memberpensionpayments
 
+import services.PsrSubmissionService
+import play.api.inject.guice.GuiceableModule
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.memberpensionpayments.PensionPaymentsReceivedController.{form, viewModel}
+import play.api.inject.bind
+import pages.nonsipp.memberpensionpayments.PensionPaymentsReceivedPage
+import play.api.libs.json.JsPath
 import forms.YesNoPageFormProvider
 import models.NormalMode
 import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.memberpensionpayments.PensionPaymentsReceivedPage
-import play.api.inject.bind
-import play.api.inject.guice.GuiceableModule
-import play.api.libs.json.JsPath
-import services.PsrSubmissionService
+import controllers.nonsipp.memberpensionpayments.PensionPaymentsReceivedController.{form, viewModel}
 import views.html.YesNoPageView
 
 import scala.concurrent.Future

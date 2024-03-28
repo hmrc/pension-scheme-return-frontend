@@ -16,15 +16,15 @@
 
 package controllers.nonsipp.membersurrenderedbenefits
 
+import pages.nonsipp.memberdetails.MemberDetailsPage
 import config.Refined.OneTo300
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.membersurrenderedbenefits.WhyDidMemberSurrenderBenefitsController._
-import eu.timepit.refined.refineMV
-import forms.TextFormProvider
-import models.{NormalMode, UserAnswers}
-import pages.nonsipp.memberdetails.MemberDetailsPage
-import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsAmountPage, WhyDidMemberSurrenderBenefitsPage}
 import views.html.TextAreaView
+import forms.TextFormProvider
+import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsAmountPage, WhyDidMemberSurrenderBenefitsPage}
+import models.{NormalMode, UserAnswers}
+import eu.timepit.refined.refineMV
+import controllers.nonsipp.membersurrenderedbenefits.WhyDidMemberSurrenderBenefitsController._
 
 class WhyDidMemberSurrenderBenefitsControllerSpec extends ControllerBaseSpec {
 

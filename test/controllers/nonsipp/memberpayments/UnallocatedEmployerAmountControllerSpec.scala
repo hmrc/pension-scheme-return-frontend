@@ -17,10 +17,10 @@
 package controllers.nonsipp.memberpayments
 
 import controllers.ControllerBaseSpec
-import forms.mappings.errors.MoneyFormErrorProvider
+import views.html.MoneyView
 import models.NormalMode
 import pages.nonsipp.memberpayments.UnallocatedEmployerAmountPage
-import views.html.MoneyView
+import forms.mappings.errors.MoneyFormErrorProvider
 
 class UnallocatedEmployerAmountControllerSpec extends ControllerBaseSpec {
 

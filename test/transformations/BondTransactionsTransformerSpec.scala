@@ -16,22 +16,22 @@
 
 package transformations
 
-import controllers.TestValues
-import eu.timepit.refined.refineMV
-import generators.ModelGenerators.allowedAccessRequestGen
-import models.HowDisposed.{Other, Sold, Transferred}
-import models.SchemeHoldBond.{Acquisition, Contribution}
-import models.requests.psr._
-import models.requests.{AllowedAccessRequest, DataRequest}
-import org.scalatest.OptionValues
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
-import pages.nonsipp.bonds._
-import pages.nonsipp.bondsdisposal._
-import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
+import org.scalatest.matchers.must.Matchers
+import play.api.mvc.AnyContentAsEmpty
+import models.HowDisposed.{Other, Sold, Transferred}
+import models.requests.psr._
+import eu.timepit.refined.refineMV
 import utils.UserAnswersUtils.UserAnswersOps
+import org.scalatest.OptionValues
+import generators.ModelGenerators.allowedAccessRequestGen
+import pages.nonsipp.bondsdisposal._
 import viewmodels.models.SectionCompleted
+import models.requests.{AllowedAccessRequest, DataRequest}
+import pages.nonsipp.bonds._
+import org.scalatest.freespec.AnyFreeSpec
+import controllers.TestValues
+import models.SchemeHoldBond.{Acquisition, Contribution}
 
 class BondTransactionsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues with TestValues {
 

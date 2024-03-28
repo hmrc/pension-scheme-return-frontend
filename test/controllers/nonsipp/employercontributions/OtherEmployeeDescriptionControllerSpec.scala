@@ -16,14 +16,14 @@
 
 package controllers.nonsipp.employercontributions
 
-import pages.nonsipp.employercontributions.{EmployerNamePage, OtherEmployeeDescriptionPage}
-import controllers.nonsipp.employercontributions.OtherEmployeeDescriptionController._
 import config.Refined._
-import eu.timepit.refined.refineMV
-import models.NormalMode
-import forms.TextFormProvider
-import views.html.TextAreaView
 import controllers.ControllerBaseSpec
+import views.html.TextAreaView
+import eu.timepit.refined.refineMV
+import forms.TextFormProvider
+import models.NormalMode
+import controllers.nonsipp.employercontributions.OtherEmployeeDescriptionController._
+import pages.nonsipp.employercontributions.{EmployerNamePage, OtherEmployeeDescriptionPage}
 
 class OtherEmployeeDescriptionControllerSpec extends ControllerBaseSpec {
 

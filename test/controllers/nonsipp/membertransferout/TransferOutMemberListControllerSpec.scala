@@ -16,20 +16,20 @@
 
 package controllers.nonsipp.membertransferout
 
+import services.PsrSubmissionService
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.membertransferout.routes
-import controllers.nonsipp.membertransferout.TransferOutMemberListController._
+import play.api.inject.bind
+import views.html.TwoColumnsTripleAction
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.{NameDOB, NormalMode, UserAnswers}
-import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.memberdetails.MemberDetailsPage
-import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
-import pages.nonsipp.membertransferout.TransferOutMemberListPage
-import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
-import services.PsrSubmissionService
-import views.html.TwoColumnsTripleAction
+import controllers.nonsipp.membertransferout.TransferOutMemberListController._
+import pages.nonsipp.memberdetails.MemberDetailsPage
+import pages.nonsipp.membertransferout.TransferOutMemberListPage
+import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
+import controllers.nonsipp.membertransferout.routes
+import org.mockito.ArgumentMatchers.any
 
 import scala.concurrent.Future
 
@@ -40,7 +40,7 @@ class TransferOutMemberListControllerSpec extends ControllerBaseSpec {
 
   private val mockPsrSubmissionService = mock[PsrSubmissionService]
 
-  val userAnswers = defaultUserAnswers.unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
+  val userAnswers: UserAnswers = defaultUserAnswers.unsafeSet(MemberDetailsPage(srn, refineMV(1)), memberDetails)
 
   override protected val additionalBindings: List[GuiceableModule] = List(
     bind[PsrSubmissionService].toInstance(mockPsrSubmissionService)

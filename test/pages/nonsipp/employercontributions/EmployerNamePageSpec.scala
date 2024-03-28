@@ -16,14 +16,14 @@
 
 package pages.nonsipp.employercontributions
 
+import pages.nonsipp.memberdetails.MemberDetailsPage
 import config.Refined.{Max300, Max50}
 import controllers.TestValues
 import eu.timepit.refined.refineMV
-import models.{ConditionalYesNo, Crn}
-import pages.behaviours.PageBehaviours
-import pages.nonsipp.memberdetails.MemberDetailsPage
 import utils.UserAnswersUtils.UserAnswersOps
+import models.{ConditionalYesNo, Crn}
 import viewmodels.models.SectionStatus
+import pages.behaviours.PageBehaviours
 
 class EmployerNamePageSpec extends PageBehaviours with TestValues {
 

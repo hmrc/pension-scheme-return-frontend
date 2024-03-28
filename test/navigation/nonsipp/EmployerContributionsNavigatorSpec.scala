@@ -16,16 +16,16 @@
 
 package navigation.nonsipp
 
-import config.Refined.{Max300, Max50}
-import eu.timepit.refined.{refineMV, refineV}
-import models.SchemeId.Srn
-import models.{IdentityType, NormalMode, UserAnswers}
-import navigation.{Navigator, NavigatorBehaviours}
-import org.scalacheck.Gen
 import pages.nonsipp.employercontributions._
 import utils.BaseSpec
-import utils.UserAnswersUtils.UserAnswersOps
+import config.Refined.{Max300, Max50}
+import models.SchemeId.Srn
+import eu.timepit.refined.{refineMV, refineV}
+import navigation.{Navigator, NavigatorBehaviours}
+import models.{IdentityType, NormalMode, UserAnswers}
 import viewmodels.models.SectionJourneyStatus
+import utils.UserAnswersUtils.UserAnswersOps
+import org.scalacheck.Gen
 
 class EmployerContributionsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 

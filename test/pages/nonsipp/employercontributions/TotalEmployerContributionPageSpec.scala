@@ -19,10 +19,10 @@ package pages.nonsipp.employercontributions
 import config.Refined._
 import controllers.TestValues
 import eu.timepit.refined.refineMV
-import models.Money
-import pages.behaviours.PageBehaviours
 import utils.UserAnswersUtils.UserAnswersOps
+import models.Money
 import viewmodels.models.SectionStatus
+import pages.behaviours.PageBehaviours
 
 class TotalEmployerContributionPageSpec extends PageBehaviours with TestValues {
 

@@ -16,15 +16,15 @@
 
 package controllers.actions
 
+import play.api.test.FakeRequest
+import utils.BaseSpec
+import play.api.mvc.AnyContentAsEmpty
+import repositories.SessionRepository
 import models.UserAnswers
 import models.requests.{AllowedAccessRequest, OptionalDataRequest}
-import play.api.mvc.AnyContentAsEmpty
-import play.api.test.FakeRequest
-import repositories.SessionRepository
-import utils.BaseSpec
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class DataRetrievalActionSpec extends BaseSpec {
 

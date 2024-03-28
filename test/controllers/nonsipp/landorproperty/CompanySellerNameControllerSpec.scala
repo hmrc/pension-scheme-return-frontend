@@ -18,12 +18,12 @@ package controllers.nonsipp.landorproperty
 
 import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.landorproperty.CompanySellerNameController.{form, viewModel}
+import views.html.TextInputView
+import pages.nonsipp.landorproperty.CompanySellerNamePage
 import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import models.NormalMode
-import pages.nonsipp.landorproperty.CompanySellerNamePage
-import views.html.TextInputView
+import controllers.nonsipp.landorproperty.CompanySellerNameController.{form, viewModel}
 
 class CompanySellerNameControllerSpec extends ControllerBaseSpec {
 

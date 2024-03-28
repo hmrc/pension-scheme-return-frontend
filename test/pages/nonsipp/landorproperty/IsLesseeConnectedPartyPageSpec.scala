@@ -17,9 +17,9 @@
 package pages
 
 import config.Refined.OneTo5000
+import pages.nonsipp.landorproperty.IsLesseeConnectedPartyPage
 import eu.timepit.refined.refineMV
 import pages.behaviours.PageBehaviours
-import pages.nonsipp.landorproperty.IsLesseeConnectedPartyPage
 
 class IsLesseeConnectedPartyPageSpec extends PageBehaviours {
 

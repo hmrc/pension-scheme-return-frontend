@@ -17,9 +17,9 @@
 package pages
 
 import eu.timepit.refined.refineMV
+import pages.nonsipp.accountingperiod.{AccountingPeriodPage, AccountingPeriods}
 import models.{DateRange, NormalMode}
 import pages.behaviours.PageBehaviours
-import pages.nonsipp.accountingperiod.{AccountingPeriodPage, AccountingPeriods}
 
 class AccountingPeriodPageSpec extends PageBehaviours {
 

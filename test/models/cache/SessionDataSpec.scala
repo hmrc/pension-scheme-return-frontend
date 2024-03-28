@@ -17,8 +17,8 @@
 package models.cache
 
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import play.api.libs.json.{JsString, Json}
 import utils.BaseSpec
+import play.api.libs.json.{JsString, Json}
 
 class SessionDataSpec extends BaseSpec with ScalaCheckPropertyChecks {
 

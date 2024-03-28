@@ -16,16 +16,18 @@
 
 package services
 
+import play.api.test.FakeRequest
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import utils.BaseSpec
+import play.api.mvc.AnyContentAsEmpty
 import cats.data.NonEmptyList
 import eu.timepit.refined.refineMV
-import models.requests.DataRequest
-import models.{DateRange, NormalMode, UserAnswers}
-import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import pages.nonsipp.WhichTaxYearPage
 import pages.nonsipp.accountingperiod.AccountingPeriodPage
-import play.api.test.FakeRequest
-import utils.BaseSpec
+import pages.nonsipp.WhichTaxYearPage
+import models.{DateRange, NormalMode, UserAnswers}
+import models.requests.{AllowedAccessRequest, DataRequest}
 import utils.UserAnswersUtils._
+import org.scalacheck.Gen
 
 import java.time.LocalDate
 
@@ -35,16 +37,17 @@ class SchemeDateServiceSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
   val service = new SchemeDateServiceImpl()
 
-  val defaultUserAnswers = UserAnswers("id")
+  val defaultUserAnswers: UserAnswers = UserAnswers("id")
   val srn = srnGen.sample.value
-  val allowedAccessRequest = allowedAccessRequestGen(FakeRequest()).sample.value
+  val allowedAccessRequest
+    : AllowedAccessRequest[AnyContentAsEmpty.type] = allowedAccessRequestGen(FakeRequest()).sample.value
 
-  val oldestDateRange =
+  val oldestDateRange: Gen[DateRange] =
     dateRangeWithinRangeGen(
       DateRange(LocalDate.of(2000, 1, 1), LocalDate.of(2010, 1, 1))
     )
 
-  val newestDateRange =
+  val newestDateRange: Gen[DateRange] =
     dateRangeWithinRangeGen(
       DateRange(LocalDate.of(2011, 1, 1), LocalDate.of(2020, 1, 1))
     )

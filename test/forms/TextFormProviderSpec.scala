@@ -17,10 +17,10 @@
 package forms
 
 import forms.behaviours.FieldBehaviours
-import org.scalacheck.Gen
 import org.scalacheck.Gen._
-import play.api.data.Form
+import org.scalacheck.Gen
 import uk.gov.hmrc.domain.Nino
+import play.api.data.Form
 
 class TextFormProviderSpec extends FieldBehaviours {
 

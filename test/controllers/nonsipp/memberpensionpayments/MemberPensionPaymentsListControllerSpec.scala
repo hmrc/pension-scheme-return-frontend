@@ -16,18 +16,18 @@
 
 package controllers.nonsipp.memberpensionpayments
 
+import services.PsrSubmissionService
 import controllers.ControllerBaseSpec
-import eu.timepit.refined.refineMV
+import play.api.inject.bind
+import views.html.TwoColumnsTripleAction
 import forms.YesNoPageFormProvider
 import models.{NameDOB, NormalMode, UserAnswers}
-import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.memberdetails.MemberDetailsPage
 import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
-import pages.nonsipp.memberpensionpayments.MemberPensionPaymentsListPage
-import play.api.inject.bind
+import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
-import services.PsrSubmissionService
-import views.html.TwoColumnsTripleAction
+import pages.nonsipp.memberdetails.MemberDetailsPage
+import pages.nonsipp.memberpensionpayments.MemberPensionPaymentsListPage
+import eu.timepit.refined.refineMV
 
 class MemberPensionPaymentsListControllerSpec extends ControllerBaseSpec {
 

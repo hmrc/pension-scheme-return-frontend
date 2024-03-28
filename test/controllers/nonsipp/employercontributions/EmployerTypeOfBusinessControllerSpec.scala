@@ -16,15 +16,15 @@
 
 package controllers.nonsipp.employercontributions
 
+import pages.nonsipp.employercontributions.EmployerNamePage
+import controllers.nonsipp.employercontributions.EmployerTypeOfBusinessController._
+import models.IdentityType.{Other, UKCompany, UKPartnership}
 import config.Refined.{Max300, Max50}
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.employercontributions.EmployerTypeOfBusinessController._
+import views.html.RadioListView
 import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
-import models.IdentityType.{Other, UKCompany, UKPartnership}
 import models.NormalMode
-import pages.nonsipp.employercontributions.EmployerNamePage
-import views.html.RadioListView
 
 class EmployerTypeOfBusinessControllerSpec extends ControllerBaseSpec {
 

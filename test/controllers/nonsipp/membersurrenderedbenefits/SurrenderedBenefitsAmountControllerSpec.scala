@@ -16,15 +16,15 @@
 
 package controllers.nonsipp.membersurrenderedbenefits
 
+import pages.nonsipp.memberdetails.MemberDetailsPage
 import config.Refined.Max300
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsAmountController.{form, viewModel}
-import eu.timepit.refined.refineMV
-import forms.mappings.errors.MoneyFormErrorProvider
-import models.NormalMode
-import pages.nonsipp.memberdetails.MemberDetailsPage
-import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsAmountPage
 import views.html.MoneyView
+import eu.timepit.refined.refineMV
+import pages.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsAmountPage
+import models.NormalMode
+import controllers.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsAmountController.{form, viewModel}
+import forms.mappings.errors.MoneyFormErrorProvider
 
 class SurrenderedBenefitsAmountControllerSpec extends ControllerBaseSpec {
 

@@ -18,9 +18,9 @@ package pages.nonsipp.landorproperty
 
 import config.Refined.OneTo5000
 import eu.timepit.refined.refineMV
+import utils.UserAnswersUtils.UserAnswersOps
 import models.{Money, UserAnswers}
 import pages.behaviours.PageBehaviours
-import utils.UserAnswersUtils.UserAnswersOps
 
 import java.time.LocalDate
 

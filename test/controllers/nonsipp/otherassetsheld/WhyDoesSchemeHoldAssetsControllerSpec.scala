@@ -16,15 +16,15 @@
 
 package controllers.nonsipp.otherassetsheld
 
+import pages.nonsipp.otherassetsheld.WhyDoesSchemeHoldAssetsPage
 import config.Refined.Max5000
-import controllers.ControllerBaseSpec
-import controllers.nonsipp.otherassetsheld.WhyDoesSchemeHoldAssetsController._
+import views.html.RadioListView
 import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
+import controllers.nonsipp.otherassetsheld.WhyDoesSchemeHoldAssetsController._
+import controllers.ControllerBaseSpec
 import models.NormalMode
 import models.SchemeHoldAsset.{Acquisition, Contribution, Transfer}
-import pages.nonsipp.otherassetsheld.WhyDoesSchemeHoldAssetsPage
-import views.html.RadioListView
 
 class WhyDoesSchemeHoldAssetsControllerSpec extends ControllerBaseSpec {
 

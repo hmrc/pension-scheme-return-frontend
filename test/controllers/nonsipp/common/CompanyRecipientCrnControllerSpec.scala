@@ -16,17 +16,17 @@
 
 package controllers.nonsipp.common
 
+import play.api.mvc.Call
 import config.Refined.OneTo5000
-import controllers.ControllerBaseSpec
-import controllers.nonsipp.common.CompanyRecipientCrnController._
+import views.html.ConditionalYesNoPageView
+import pages.nonsipp.landorproperty.CompanySellerNamePage
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
-import models.{ConditionalYesNo, Crn, IdentitySubject, NormalMode, UserAnswers}
+import models._
 import pages.nonsipp.common.CompanyRecipientCrnPage
-import pages.nonsipp.landorproperty.CompanySellerNamePage
 import pages.nonsipp.loansmadeoroutstanding.CompanyRecipientNamePage
-import play.api.mvc.Call
-import views.html.ConditionalYesNoPageView
+import controllers.ControllerBaseSpec
+import controllers.nonsipp.common.CompanyRecipientCrnController._
 
 class CompanyRecipientCrnControllerSpec extends ControllerBaseSpec {
 

@@ -16,24 +16,19 @@
 
 package controllers.nonsipp.membertransferout
 
-import controllers.nonsipp.membertransferout.TransfersOutCYAController._
+import services.PsrSubmissionService
 import config.Refined._
+import play.api.inject.bind
+import views.html.CheckYourAnswersView
 import eu.timepit.refined.refineMV
 import models.{NormalMode, PensionSchemeType}
-import controllers.ControllerBaseSpec
-import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.memberdetails.MemberDetailsPage
-import pages.nonsipp.membertransferout.{
-  ReceivingSchemeNamePage,
-  ReceivingSchemeTypePage,
-  TransfersOutCompletedPage,
-  WhenWasTransferMadePage
-}
-import play.api.inject.bind
-import play.api.inject.guice.GuiceableModule
-import services.PsrSubmissionService
+import pages.nonsipp.membertransferout._
 import viewmodels.models.SectionCompleted
-import views.html.CheckYourAnswersView
+import org.mockito.ArgumentMatchers.any
+import play.api.inject.guice.GuiceableModule
+import pages.nonsipp.memberdetails.MemberDetailsPage
+import controllers.ControllerBaseSpec
+import controllers.nonsipp.membertransferout.TransfersOutCYAController._
 
 import scala.concurrent.Future
 

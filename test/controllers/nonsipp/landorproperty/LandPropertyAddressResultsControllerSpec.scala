@@ -18,12 +18,12 @@ package controllers.nonsipp.landorproperty
 
 import config.Refined._
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.landorproperty.LandPropertyAddressResultsController._
+import views.html.RadioListView
+import pages.nonsipp.landorproperty._
 import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import models.NormalMode
-import pages.nonsipp.landorproperty._
-import views.html.RadioListView
+import controllers.nonsipp.landorproperty.LandPropertyAddressResultsController._
 
 class LandPropertyAddressResultsControllerSpec extends ControllerBaseSpec {
 

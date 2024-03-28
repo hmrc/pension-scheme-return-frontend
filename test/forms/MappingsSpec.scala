@@ -16,13 +16,13 @@
 
 package forms
 
-import forms.mappings.Mappings
-import forms.mappings.errors.MoneyFormErrors
-import org.scalatest.OptionValues
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
-import play.api.data.{Form, FormError}
+import forms.mappings.Mappings
+import org.scalatest.OptionValues
 import models.{Crn, Enumerable, Money}
+import play.api.data.{Form, FormError}
+import forms.mappings.errors.MoneyFormErrors
 
 object MappingsSpec {
 

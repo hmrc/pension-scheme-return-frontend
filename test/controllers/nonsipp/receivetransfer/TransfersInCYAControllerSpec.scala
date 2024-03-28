@@ -16,19 +16,19 @@
 
 package controllers.nonsipp.receivetransfer
 
+import services.PsrSubmissionService
 import config.Refined._
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.receivetransfer.TransfersInCYAController._
+import play.api.inject.bind
+import views.html.CheckYourAnswersView
+import pages.nonsipp.receivetransfer._
 import eu.timepit.refined.refineMV
 import models.{NormalMode, PensionSchemeType}
-import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.memberdetails.MemberDetailsPage
-import pages.nonsipp.receivetransfer._
-import play.api.inject.bind
-import play.api.inject.guice.GuiceableModule
-import services.PsrSubmissionService
 import viewmodels.models.SectionCompleted
-import views.html.CheckYourAnswersView
+import play.api.inject.guice.GuiceableModule
+import pages.nonsipp.memberdetails.MemberDetailsPage
+import controllers.nonsipp.receivetransfer.TransfersInCYAController._
+import org.mockito.ArgumentMatchers.any
 
 import scala.concurrent.Future
 

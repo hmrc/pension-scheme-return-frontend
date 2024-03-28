@@ -16,13 +16,13 @@
 
 package controllers.nonsipp.otherassetsheld
 
-import WhatIsOtherAssetController._
+import pages.nonsipp.otherassetsheld.WhatIsOtherAssetPage
 import controllers.ControllerBaseSpec
+import views.html.TextAreaView
+import controllers.nonsipp.otherassetsheld.WhatIsOtherAssetController._
 import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import models.NormalMode
-import pages.nonsipp.otherassetsheld.WhatIsOtherAssetPage
-import views.html.TextAreaView
 
 class WhatIsOtherAssetControllerSpec extends ControllerBaseSpec {
 

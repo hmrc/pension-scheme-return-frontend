@@ -16,17 +16,17 @@
 
 package controllers.nonsipp.memberreceivedpcls
 
+import services.PsrSubmissionService
+import play.api.inject.guice.GuiceableModule
+import pages.nonsipp.memberreceivedpcls.{Paths, PensionCommencementLumpSumPage}
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.memberreceivedpcls.PensionCommencementLumpSumController.viewModel
+import play.api.inject.bind
+import views.html.YesNoPageView
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.memberreceivedpcls.{Paths, PensionCommencementLumpSumPage}
+import controllers.nonsipp.memberreceivedpcls.PensionCommencementLumpSumController.viewModel
 import play.api.data.Form
-import play.api.inject.bind
-import play.api.inject.guice.GuiceableModule
-import services.PsrSubmissionService
-import views.html.YesNoPageView
+import org.mockito.ArgumentMatchers.any
 
 import scala.concurrent.Future
 

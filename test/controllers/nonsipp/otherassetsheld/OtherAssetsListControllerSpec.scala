@@ -16,19 +16,19 @@
 
 package controllers.nonsipp.otherassetsheld
 
+import services.PsrSubmissionService
+import play.api.inject.guice.GuiceableModule
+import pages.nonsipp.otherassetsheld._
 import config.Refined.Max5000
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.otherassetsheld.OtherAssetsListController._
-import eu.timepit.refined.refineMV
-import forms.YesNoPageFormProvider
-import models._
-import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.otherassetsheld._
-import play.api.inject
-import play.api.inject.guice.GuiceableModule
-import services.PsrSubmissionService
-import viewmodels.models.SectionCompleted
 import views.html.TwoColumnsTripleAction
+import eu.timepit.refined.refineMV
+import play.api.inject
+import forms.YesNoPageFormProvider
+import controllers.nonsipp.otherassetsheld.OtherAssetsListController._
+import models._
+import viewmodels.models.SectionCompleted
+import org.mockito.ArgumentMatchers.any
 
 import scala.concurrent.Future
 

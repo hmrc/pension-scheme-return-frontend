@@ -16,28 +16,28 @@
 
 package utils.nonsipp
 
+import pages.nonsipp.employercontributions.{EmployerContributionsPage, EmployerContributionsSectionStatus}
+import pages.nonsipp.shares._
+import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
 import config.Refined.Max5000
 import controllers.TestValues
+import pages.nonsipp.landorproperty._
 import eu.timepit.refined.refineMV
-import models.ConditionalYesNo._
-import models.SponsoringOrConnectedParty.Sponsoring
-import models.{ConditionalYesNo, IdentitySubject, IdentityType, Money, NormalMode, SchemeHoldLandProperty, TypeOfShares}
+import utils.UserAnswersUtils.UserAnswersOps
 import org.scalatest.OptionValues
+import models._
+import pages.nonsipp.loansmadeoroutstanding._
+import pages.nonsipp.moneyborrowed._
+import viewmodels.models.{SectionCompleted, SectionStatus}
+import models.SponsoringOrConnectedParty.Sponsoring
+import pages.nonsipp.bonds._
+import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
+import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsPage, NoNINOPage}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
+import models.ConditionalYesNo._
+import viewmodels.models.TaskListStatus._
 import pages.nonsipp.common.{IdentityTypePage, IdentityTypes}
-import pages.nonsipp.employercontributions.{EmployerContributionsPage, EmployerContributionsSectionStatus}
-import pages.nonsipp.landorproperty._
-import pages.nonsipp.loansmadeoroutstanding._
-import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsPage, NoNINOPage}
-import pages.nonsipp.moneyborrowed.{LenderNamePage, LenderNamePages, MoneyBorrowedPage, WhySchemeBorrowedMoneyPage}
-import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
-import pages.nonsipp.shares.{DidSchemeHoldAnySharesPage, SharesCompleted, SharesJourneyStatus, TypeOfSharesHeldPage}
-import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
-import pages.nonsipp.bonds.{BondsCompleted, BondsJourneyStatus, NameOfBondsPage, UnregulatedOrConnectedBondsHeldPage}
-import utils.UserAnswersUtils.UserAnswersOps
-import viewmodels.models.{SectionCompleted, SectionStatus}
-import viewmodels.models.TaskListStatus.{Completed, InProgress, NotStarted, UnableToStart}
 
 class TaskListStatusUtilsSpec extends AnyFreeSpec with Matchers with OptionValues with TestValues {
 

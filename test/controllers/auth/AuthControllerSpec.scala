@@ -16,12 +16,12 @@
 
 package controllers.auth
 
-import config.FrontendAppConfig
+import play.api.test.FakeRequest
 import controllers.ControllerBaseSpec
+import repositories.SessionRepository
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import play.api.inject.bind
-import play.api.test.FakeRequest
-import repositories.SessionRepository
+import config.FrontendAppConfig
 
 import scala.concurrent.Future
 

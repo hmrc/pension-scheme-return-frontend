@@ -16,33 +16,23 @@
 
 package transformations
 
-import controllers.TestValues
-import eu.timepit.refined.refineMV
-import generators.ModelGenerators.allowedAccessRequestGen
-import models.ConditionalYesNo._
-import models.SponsoringOrConnectedParty.{ConnectedParty, Neither, Sponsoring}
-import models.requests.psr._
-import models.requests.{AllowedAccessRequest, DataRequest}
-import models.{
-  ConditionalYesNo,
-  Crn,
-  IdentitySubject,
-  IdentityType,
-  Money,
-  RecipientDetails,
-  Security,
-  SponsoringOrConnectedParty,
-  Utr
-}
-import org.scalatest.OptionValues
+import play.api.test.FakeRequest
 import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
+import play.api.mvc.AnyContentAsEmpty
+import controllers.TestValues
+import models.requests.psr._
+import eu.timepit.refined.refineMV
+import utils.UserAnswersUtils.UserAnswersOps
+import generators.ModelGenerators.allowedAccessRequestGen
+import models._
 import pages.nonsipp.common._
 import pages.nonsipp.loansmadeoroutstanding._
-import play.api.mvc.AnyContentAsEmpty
-import play.api.test.FakeRequest
+import org.scalatest.matchers.must.Matchers
+import models.ConditionalYesNo._
+import org.scalatest.OptionValues
 import uk.gov.hmrc.domain.Nino
-import utils.UserAnswersUtils.UserAnswersOps
+import models.SponsoringOrConnectedParty.{ConnectedParty, Neither, Sponsoring}
+import models.requests.{AllowedAccessRequest, DataRequest}
 
 class LoanTransactionsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues with TestValues {
 

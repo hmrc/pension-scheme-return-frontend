@@ -16,14 +16,14 @@
 
 package controllers.nonsipp.landorproperty
 
+import controllers.nonsipp.landorproperty.LandPropertyInUKController._
 import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.landorproperty.LandPropertyInUKController._
+import views.html.YesNoPageView
+import pages.nonsipp.landorproperty.LandPropertyInUKPage
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import pages.nonsipp.landorproperty.LandPropertyInUKPage
-import views.html.YesNoPageView
 
 class LandPropertyInUKControllerSpec extends ControllerBaseSpec {
 

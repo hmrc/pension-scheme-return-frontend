@@ -16,23 +16,25 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
+import controllers.nonsipp.loansmadeoroutstanding.RecipientSponsoringEmployerConnectedPartyController._
+import play.api.mvc.Call
 import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.loansmadeoroutstanding.RecipientSponsoringEmployerConnectedPartyController._
+import views.html.RadioListView
 import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
-import models.{IdentitySubject, IdentityType, NormalMode, RecipientDetails, SponsoringOrConnectedParty, UserAnswers}
+import models._
 import pages.nonsipp.common.{IdentityTypePage, OtherRecipientDetailsPage}
 import pages.nonsipp.loansmadeoroutstanding._
-import views.html.RadioListView
 
 class RecipientSponsoringEmployerConnectedPartyControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[OneTo5000](1)
   private val subject = IdentitySubject.LoanRecipient
 
-  lazy val onPageLoad = routes.RecipientSponsoringEmployerConnectedPartyController.onPageLoad(srn, index, NormalMode)
-  lazy val onSubmit = routes.RecipientSponsoringEmployerConnectedPartyController.onSubmit(srn, index, NormalMode)
+  lazy val onPageLoad: Call =
+    routes.RecipientSponsoringEmployerConnectedPartyController.onPageLoad(srn, index, NormalMode)
+  lazy val onSubmit: Call = routes.RecipientSponsoringEmployerConnectedPartyController.onSubmit(srn, index, NormalMode)
 
   val userAnswersWithCompanyName: UserAnswers =
     defaultUserAnswers

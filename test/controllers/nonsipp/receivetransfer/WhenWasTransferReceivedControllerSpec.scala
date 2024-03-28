@@ -16,18 +16,18 @@
 
 package controllers.nonsipp.receivetransfer
 
+import services.SchemeDateService
 import config.Refined._
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.receivetransfer.WhenWasTransferReceivedController._
+import views.html.DatePageView
+import pages.nonsipp.receivetransfer.{TransferringSchemeNamePage, WhenWasTransferReceivedPage}
 import eu.timepit.refined.refineMV
+import play.api.inject
 import forms.DatePageFormProvider
 import models.{NormalMode, UserAnswers}
-import pages.nonsipp.memberdetails.MemberDetailsPage
-import pages.nonsipp.receivetransfer.{TransferringSchemeNamePage, WhenWasTransferReceivedPage}
-import play.api.inject
 import play.api.inject.guice.GuiceableModule
-import services.SchemeDateService
-import views.html.DatePageView
+import pages.nonsipp.memberdetails.MemberDetailsPage
+import controllers.nonsipp.receivetransfer.WhenWasTransferReceivedController._
 
 class WhenWasTransferReceivedControllerSpec extends ControllerBaseSpec {
 

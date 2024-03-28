@@ -16,10 +16,10 @@
 
 package forms
 
-import config.Constants
 import forms.behaviours.FieldBehaviours
-import forms.mappings.errors.DateFormErrors
+import config.Constants
 import play.api.data.{Form, FormError}
+import forms.mappings.errors.DateFormErrors
 
 import java.time.LocalDate
 

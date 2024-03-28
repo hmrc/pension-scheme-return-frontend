@@ -16,9 +16,9 @@
 
 package models
 
-import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import utils.WithName
+import org.scalatest.freespec.AnyFreeSpec
 
 class WithNameSpec extends AnyFreeSpec with Matchers {
 

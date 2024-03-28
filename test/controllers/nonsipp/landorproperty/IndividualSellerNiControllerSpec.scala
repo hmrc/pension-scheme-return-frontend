@@ -18,13 +18,13 @@ package controllers.nonsipp.landorproperty
 
 import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.landorproperty.IndividualSellerNiController._
-import eu.timepit.refined.refineMV
-import forms.YesNoPageFormProvider
-import models.{ConditionalYesNo, NormalMode}
-import pages.nonsipp.landorproperty.{IndividualSellerNiPage, LandPropertyIndividualSellersNamePage}
-import uk.gov.hmrc.domain.Nino
 import views.html.ConditionalYesNoPageView
+import pages.nonsipp.landorproperty.{IndividualSellerNiPage, LandPropertyIndividualSellersNamePage}
+import eu.timepit.refined.refineMV
+import uk.gov.hmrc.domain.Nino
+import forms.YesNoPageFormProvider
+import controllers.nonsipp.landorproperty.IndividualSellerNiController._
+import models.{ConditionalYesNo, NormalMode, UserAnswers}
 
 class IndividualSellerNiControllerSpec extends ControllerBaseSpec {
 
@@ -37,7 +37,7 @@ class IndividualSellerNiControllerSpec extends ControllerBaseSpec {
     controllers.nonsipp.landorproperty.routes.IndividualSellerNiController
       .onSubmit(srn, index, NormalMode)
 
-  val userAnswersWithIndividualName =
+  val userAnswersWithIndividualName: UserAnswers =
     defaultUserAnswers.unsafeSet(LandPropertyIndividualSellersNamePage(srn, index), individualName)
 
   val conditionalNo: ConditionalYesNo[String, Nino] = ConditionalYesNo.no("reason")

@@ -16,25 +16,26 @@
 
 package services
 
-import akka.stream.scaladsl.Source
-import akka.util.ByteString
-import cats.data.NonEmptyList
-import controllers.TestValues
-import forms.{NameDOBFormProvider, TextFormProvider}
-import generators.WrappedMemberDetails
-import models.ValidationErrorType.{DateOfBirth, FirstName, LastName, NinoFormat, NoNinoReason}
-import models._
-import models.requests.DataRequest
-import play.api.i18n.Messages
-import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
-import play.api.test.Helpers.stubMessagesApi
+import akka.util.ByteString
+import play.api.mvc.AnyContent
+import controllers.TestValues
+import cats.data.NonEmptyList
+import generators.WrappedMemberDetails
 import uk.gov.hmrc.domain.Nino
+import models._
+import play.api.i18n.Messages
+import models.requests.DataRequest
 import utils.BaseSpec
+import akka.stream.scaladsl.Source
+import play.api.test.Helpers.stubMessagesApi
+import forms.{NameDOBFormProvider, TextFormProvider}
+import models.ValidationErrorType._
+
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import scala.concurrent.ExecutionContext.Implicits.global
 
 class MemberDetailsUploadValidatorSpec extends BaseSpec with TestValues {
 
@@ -63,7 +64,7 @@ class MemberDetailsUploadValidatorSpec extends BaseSpec with TestValues {
   val validHeaders =
     "First name,Last name,Date of birth,National Insurance number,Reason for no National Insurance number"
 
-  def validRow =
+  def validRow: String =
     detailsToRow(wrappedMemberDetailsGen.sample.get)
 
   def detailsToRow(details: WrappedMemberDetails): String =

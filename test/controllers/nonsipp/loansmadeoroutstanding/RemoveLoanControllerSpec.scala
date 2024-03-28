@@ -16,24 +16,19 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
+import services.PsrSubmissionService
+import play.api.inject.guice.GuiceableModule
 import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.loansmadeoroutstanding.RemoveLoanController._
-import eu.timepit.refined.refineMV
-import forms.YesNoPageFormProvider
-import models.{IdentitySubject, IdentityType, NormalMode}
-import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.common.IdentityTypePage
-import pages.nonsipp.loansmadeoroutstanding.{
-  AmountOfTheLoanPage,
-  CompanyRecipientNamePage,
-  IndividualRecipientNamePage,
-  PartnershipRecipientNamePage
-}
 import play.api.inject.bind
-import play.api.inject.guice.GuiceableModule
-import services.PsrSubmissionService
 import views.html.YesNoPageView
+import eu.timepit.refined.refineMV
+import models.{IdentitySubject, IdentityType, NormalMode}
+import pages.nonsipp.common.IdentityTypePage
+import pages.nonsipp.loansmadeoroutstanding._
+import org.mockito.ArgumentMatchers.any
+import forms.YesNoPageFormProvider
+import controllers.nonsipp.loansmadeoroutstanding.RemoveLoanController._
 
 class RemoveLoanControllerSpec extends ControllerBaseSpec {
 

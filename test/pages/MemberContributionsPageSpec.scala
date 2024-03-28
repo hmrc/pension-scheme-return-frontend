@@ -16,8 +16,8 @@
 
 package pages
 
-import pages.behaviours.PageBehaviours
 import pages.nonsipp.membercontributions.MemberContributionsPage
+import pages.behaviours.PageBehaviours
 
 class MemberContributionsPageSpec extends PageBehaviours {
 

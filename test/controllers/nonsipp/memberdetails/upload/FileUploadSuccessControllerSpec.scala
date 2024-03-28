@@ -16,33 +16,23 @@
 
 package controllers.nonsipp.memberdetails.upload
 
-import cats.implicits.catsSyntaxOptionId
-import config.Refined.OneTo300
-import controllers.ControllerBaseSpec
-import controllers.nonsipp.memberdetails.upload.FileUploadSuccessController._
-import eu.timepit.refined.{refineMV, refineV}
-import models.SchemeId.Srn
-import models.UploadStatus.UploadStatus
-import models.{
-  ErrorDetails,
-  NameDOB,
-  NormalMode,
-  Upload,
-  UploadFormatError,
-  UploadMemberDetails,
-  UploadStatus,
-  UploadSuccess,
-  UserAnswers
-}
-import org.mockito.ArgumentCaptor
-import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsNinoPage, MemberDetailsPage, NoNINOPage}
-import play.api.inject.bind
-import play.api.inject.guice.GuiceableModule
 import play.api.test.FakeRequest
 import services.{PsrSubmissionService, SaveService, UploadService}
+import config.Refined.OneTo300
+import controllers.ControllerBaseSpec
+import play.api.inject.bind
+import cats.implicits.catsSyntaxOptionId
+import eu.timepit.refined.{refineMV, refineV}
 import uk.gov.hmrc.domain.Nino
+import models._
+import models.UploadStatus.UploadStatus
+import controllers.nonsipp.memberdetails.upload.FileUploadSuccessController._
+import org.mockito.ArgumentCaptor
+import org.mockito.ArgumentMatchers.any
+import play.api.inject.guice.GuiceableModule
+import pages.nonsipp.memberdetails._
 import views.html.ContentPageView
+import models.SchemeId.Srn
 
 import scala.concurrent.Future
 import scala.util.Try

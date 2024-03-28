@@ -16,9 +16,9 @@
 
 package models
 
-import org.scalacheck.Gen
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import utils.BaseSpec
+import org.scalacheck.Gen
 
 class DateRangeSpec extends BaseSpec with ScalaCheckPropertyChecks {
 

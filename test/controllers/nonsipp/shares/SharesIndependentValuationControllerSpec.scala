@@ -16,14 +16,14 @@
 
 package controllers.nonsipp.shares
 
+import pages.nonsipp.shares.{CompanyNameRelatedSharesPage, SharesIndependentValuationPage}
 import config.Refined._
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.shares.SharesIndependentValuationController._
+import views.html.YesNoPageView
 import eu.timepit.refined.refineMV
+import controllers.nonsipp.shares.SharesIndependentValuationController._
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import pages.nonsipp.shares.{CompanyNameRelatedSharesPage, SharesIndependentValuationPage}
-import views.html.YesNoPageView
 
 class SharesIndependentValuationControllerSpec extends ControllerBaseSpec {
 

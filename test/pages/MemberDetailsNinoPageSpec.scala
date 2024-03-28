@@ -16,11 +16,11 @@
 
 package pages
 
+import pages.nonsipp.memberdetails.MemberDetailsNinoPage
 import config.Refined.Max300
 import eu.timepit.refined.refineMV
-import pages.behaviours.PageBehaviours
-import pages.nonsipp.memberdetails.MemberDetailsNinoPage
 import uk.gov.hmrc.domain.Nino
+import pages.behaviours.PageBehaviours
 
 class MemberDetailsNinoPageSpec extends PageBehaviours {
 

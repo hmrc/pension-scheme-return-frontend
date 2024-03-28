@@ -16,15 +16,15 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
+import controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNinoController._
 import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.loansmadeoroutstanding.IndividualRecipientNinoController._
-import eu.timepit.refined.refineMV
-import forms.YesNoPageFormProvider
-import models.{ConditionalYesNo, NormalMode}
-import pages.nonsipp.loansmadeoroutstanding.{IndividualRecipientNamePage, IndividualRecipientNinoPage}
-import uk.gov.hmrc.domain.Nino
 import views.html.ConditionalYesNoPageView
+import eu.timepit.refined.refineMV
+import uk.gov.hmrc.domain.Nino
+import forms.YesNoPageFormProvider
+import models.{ConditionalYesNo, NormalMode, UserAnswers}
+import pages.nonsipp.loansmadeoroutstanding.{IndividualRecipientNamePage, IndividualRecipientNinoPage}
 
 class IndividualRecipientNinoControllerSpec extends ControllerBaseSpec {
 
@@ -36,7 +36,7 @@ class IndividualRecipientNinoControllerSpec extends ControllerBaseSpec {
   private lazy val onSubmit =
     controllers.nonsipp.loansmadeoroutstanding.routes.IndividualRecipientNinoController.onSubmit(srn, index, NormalMode)
 
-  val userAnswersWithIndividualName =
+  val userAnswersWithIndividualName: UserAnswers =
     defaultUserAnswers.unsafeSet(IndividualRecipientNamePage(srn, index), individualName)
 
   val conditionalNo: ConditionalYesNo[String, Nino] = ConditionalYesNo.no("reason")

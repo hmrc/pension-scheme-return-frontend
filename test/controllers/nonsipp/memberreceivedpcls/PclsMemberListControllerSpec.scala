@@ -16,19 +16,19 @@
 
 package controllers.nonsipp.memberreceivedpcls
 
+import services.PsrSubmissionService
+import pages.nonsipp.memberreceivedpcls.PclsMemberListPage
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.memberreceivedpcls.PclsMemberListController._
+import play.api.inject.bind
+import views.html.TwoColumnsTripleAction
 import eu.timepit.refined.refineMV
+import controllers.nonsipp.memberreceivedpcls.PclsMemberListController._
 import forms.YesNoPageFormProvider
 import models.{NameDOB, NormalMode, UserAnswers}
-import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.memberdetails.MemberDetailsPage
 import pages.nonsipp.memberdetails.MembersDetailsPages.MembersDetailsOps
-import pages.nonsipp.memberreceivedpcls.PclsMemberListPage
-import play.api.inject.bind
+import org.mockito.ArgumentMatchers.any
 import play.api.inject.guice.GuiceableModule
-import services.PsrSubmissionService
-import views.html.TwoColumnsTripleAction
+import pages.nonsipp.memberdetails.MemberDetailsPage
 
 import scala.concurrent.Future
 

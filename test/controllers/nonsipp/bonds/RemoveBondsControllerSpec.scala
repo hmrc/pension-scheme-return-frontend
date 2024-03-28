@@ -16,18 +16,18 @@
 
 package controllers.nonsipp.bonds
 
+import services.PsrSubmissionService
 import config.Refined.Max5000
 import controllers.ControllerBaseSpec
+import play.api.inject.bind
+import views.html.YesNoPageView
 import controllers.nonsipp.bonds.RemoveBondsController._
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.NormalMode
 import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.bonds.NameOfBondsPage
-import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
-import services.PsrSubmissionService
-import views.html.YesNoPageView
+import pages.nonsipp.bonds.NameOfBondsPage
 
 import scala.concurrent.Future
 

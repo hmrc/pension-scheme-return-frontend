@@ -16,14 +16,14 @@
 
 package controllers.nonsipp.sharesdisposal
 
+import pages.nonsipp.shares.CompanyNameRelatedSharesPage
 import config.Refined.{Max50, Max5000}
 import controllers.ControllerBaseSpec
-import eu.timepit.refined.refineMV
-import forms.RecipientDetailsFormProvider
-import models.{NormalMode, RecipientDetails}
-import pages.nonsipp.shares.CompanyNameRelatedSharesPage
-import pages.nonsipp.sharesdisposal.OtherBuyerDetailsPage
 import views.html.RecipientDetailsView
+import eu.timepit.refined.refineMV
+import pages.nonsipp.sharesdisposal.OtherBuyerDetailsPage
+import forms.RecipientDetailsFormProvider
+import models.{NormalMode, RecipientDetails, UserAnswers}
 
 class OtherBuyerDetailsControllerSpec extends ControllerBaseSpec {
 
@@ -37,7 +37,8 @@ class OtherBuyerDetailsControllerSpec extends ControllerBaseSpec {
     controllers.nonsipp.sharesdisposal.routes.OtherBuyerDetailsController
       .onSubmit(srn, index, disposalIndex, NormalMode)
 
-  val updatedUserAnswers = defaultUserAnswers.unsafeSet(CompanyNameRelatedSharesPage(srn, index), companyName)
+  val updatedUserAnswers: UserAnswers =
+    defaultUserAnswers.unsafeSet(CompanyNameRelatedSharesPage(srn, index), companyName)
 
   private val validForm = List(
     "name" -> "name",

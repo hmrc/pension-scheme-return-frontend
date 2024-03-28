@@ -17,13 +17,13 @@
 package controllers.nonsipp.landorproperty
 
 import config.Refined.OneTo5000
-import PartnershipSellerNameController.{form, viewModel}
 import controllers.ControllerBaseSpec
+import views.html.TextInputView
+import pages.nonsipp.landorproperty.PartnershipSellerNamePage
 import eu.timepit.refined.refineMV
 import forms.TextFormProvider
+import controllers.nonsipp.landorproperty.PartnershipSellerNameController.{form, viewModel}
 import models.NormalMode
-import pages.nonsipp.landorproperty.PartnershipSellerNamePage
-import views.html.TextInputView
 class PartnershipSellerNameControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[OneTo5000](1)

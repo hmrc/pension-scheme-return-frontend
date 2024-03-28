@@ -16,18 +16,18 @@
 
 package generators
 
-import cats.data.NonEmptyList
+import play.api.mvc.Call
 import config.Refined.{Max300, OneTo300}
+import cats.data.NonEmptyList
+import org.scalacheck.Gen._
 import eu.timepit.refined._
 import models.Pagination
+import viewmodels.DisplayMessage
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen
-import org.scalacheck.Gen.{alphaChar, alphaNumChar, alphaNumStr, alphaStr, choose, chooseNum, listOfN, numChar}
+import viewmodels.DisplayMessage.ListType.Bullet
 import org.scalatest.EitherValues
 import play.api.libs.json._
-import play.api.mvc.Call
-import viewmodels.DisplayMessage
-import viewmodels.DisplayMessage.ListType.Bullet
 import viewmodels.DisplayMessage._
 import viewmodels.models.PaginatedViewModel
 

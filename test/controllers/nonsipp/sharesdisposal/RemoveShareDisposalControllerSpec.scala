@@ -16,19 +16,19 @@
 
 package controllers.nonsipp.sharesdisposal
 
+import services.PsrSubmissionService
+import play.api.inject.guice.GuiceableModule
+import pages.nonsipp.shares.CompanyNameRelatedSharesPage
 import config.Refined.{Max50, Max5000}
 import controllers.ControllerBaseSpec
+import play.api.inject.bind
+import views.html.YesNoPageView
 import eu.timepit.refined.refineMV
+import pages.nonsipp.sharesdisposal.HowWereSharesDisposedPage
 import forms.YesNoPageFormProvider
 import models.{HowSharesDisposed, NormalMode}
-import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.shares.CompanyNameRelatedSharesPage
-import play.api.inject.bind
-import play.api.inject.guice.GuiceableModule
-import services.PsrSubmissionService
-import views.html.YesNoPageView
 import controllers.nonsipp.sharesdisposal.RemoveShareDisposalController._
-import pages.nonsipp.sharesdisposal.HowWereSharesDisposedPage
+import org.mockito.ArgumentMatchers.any
 
 import scala.concurrent.Future
 

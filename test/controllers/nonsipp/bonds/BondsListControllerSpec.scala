@@ -16,20 +16,19 @@
 
 package controllers.nonsipp.bonds
 
+import services.PsrSubmissionService
 import config.Refined.Max5000
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.bonds.BondsListController._
-import controllers.nonsipp.bonds.BondsListController.BondsData
+import controllers.nonsipp.bonds.BondsListController.{BondsData, _}
+import views.html.TwoColumnsTripleAction
 import eu.timepit.refined.refineMV
+import play.api.inject
 import forms.YesNoPageFormProvider
 import models._
-import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.bonds._
-import play.api.inject
-import play.api.inject.guice.GuiceableModule
-import services.PsrSubmissionService
 import viewmodels.models.SectionCompleted
-import views.html.TwoColumnsTripleAction
+import org.mockito.ArgumentMatchers.any
+import play.api.inject.guice.GuiceableModule
+import pages.nonsipp.bonds._
 
 import scala.concurrent.Future
 

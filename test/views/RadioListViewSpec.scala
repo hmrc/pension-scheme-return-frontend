@@ -16,13 +16,13 @@
 
 package views
 
+import play.api.test.FakeRequest
+import play.api.mvc.AnyContentAsEmpty
+import views.html.RadioListView
 import forms.RadioListFormProvider
 import models.Enumerable
-import play.api.mvc.AnyContentAsEmpty
-import play.api.test.FakeRequest
 import viewmodels.DisplayMessage.Empty
 import viewmodels.models.{RadioListRowDivider, RadioListRowViewModel, RadioListViewModel}
-import views.html.RadioListView
 
 class RadioListViewSpec extends ViewSpec {
 

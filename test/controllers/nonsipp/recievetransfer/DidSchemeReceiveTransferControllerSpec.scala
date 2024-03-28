@@ -16,14 +16,14 @@
 
 package controllers.nonsipp.recievetransfer
 
-import controllers.nonsipp.receivetransfer.DidSchemeReceiveTransferController.{form, viewModel}
-import controllers.ControllerBaseSpec
 import controllers.nonsipp.receivetransfer.routes
+import controllers.ControllerBaseSpec
+import views.html.YesNoPageView
+import pages.nonsipp.receivetransfer.DidSchemeReceiveTransferPage
+import controllers.nonsipp.receivetransfer.DidSchemeReceiveTransferController.{form, viewModel}
+import play.api.libs.json.JsPath
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import pages.nonsipp.receivetransfer.DidSchemeReceiveTransferPage
-import play.api.libs.json.JsPath
-import views.html.YesNoPageView
 
 class DidSchemeReceiveTransferControllerSpec extends ControllerBaseSpec {
 

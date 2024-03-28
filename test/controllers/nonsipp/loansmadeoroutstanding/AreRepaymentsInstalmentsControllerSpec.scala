@@ -18,12 +18,13 @@ package controllers.nonsipp.loansmadeoroutstanding
 
 import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.loansmadeoroutstanding.AreRepaymentsInstalmentsController.viewModel
+import views.html.YesNoPageView
 import eu.timepit.refined.refineMV
+import controllers.nonsipp.loansmadeoroutstanding.AreRepaymentsInstalmentsController.viewModel
 import forms.YesNoPageFormProvider
 import models.NormalMode
 import pages.nonsipp.loansmadeoroutstanding.AreRepaymentsInstalmentsPage
-import views.html.YesNoPageView
+import play.api.data.Form
 
 class AreRepaymentsInstalmentsControllerSpec extends ControllerBaseSpec {
 
@@ -32,7 +33,7 @@ class AreRepaymentsInstalmentsControllerSpec extends ControllerBaseSpec {
   private lazy val onPageLoad = routes.AreRepaymentsInstalmentsController.onPageLoad(srn, index, NormalMode)
   private lazy val onSubmit = routes.AreRepaymentsInstalmentsController.onSubmit(srn, index, NormalMode)
 
-  val form = AreRepaymentsInstalmentsController.form(new YesNoPageFormProvider())
+  val form: Form[Boolean] = AreRepaymentsInstalmentsController.form(new YesNoPageFormProvider())
 
   "AreRepaymentsInstalmentsController" - {
 

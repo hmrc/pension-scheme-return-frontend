@@ -16,10 +16,10 @@
 
 package generators
 
-import eu.timepit.refined.api.{Refined, Validate}
 import eu.timepit.refined.refineV
 import org.scalacheck.Gen
 import org.scalatest.EitherValues
+import eu.timepit.refined.api.{Refined, Validate}
 
 case class IndexGen[A](min: Int, max: Int)(implicit refined: Validate[Int, A]) extends EitherValues {
 
@@ -30,6 +30,6 @@ case class IndexGen[A](min: Int, max: Int)(implicit refined: Validate[Int, A]) e
 
   val partial: Gen[Refined[Int, A]] = refine(Gen.chooseNum(min + 1, max - 1))
 
-  val full = refine(Gen.const(max))
+  val full: Gen[Refined[Int, A]] = refine(Gen.const(max))
 
 }

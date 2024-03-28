@@ -16,21 +16,21 @@
 
 package services
 
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import utils.BaseSpec
 import models.UserAnswers
 import org.mockito.ArgumentMatchers.{any, eq => meq}
-import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.BaseSpec
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class SaveServiceSpec extends BaseSpec with ScalaCheckPropertyChecks {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  val mockSessionRepository = mock[SessionRepository]
+  val mockSessionRepository: SessionRepository = mock[SessionRepository]
   val service = new SaveServiceImpl(mockSessionRepository)
 
   override def beforeEach(): Unit = {

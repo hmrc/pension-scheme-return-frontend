@@ -16,13 +16,13 @@
 
 package controllers.nonsipp.bonds
 
-import NameOfBondsController._
+import controllers.nonsipp.bonds.NameOfBondsController._
+import pages.nonsipp.bonds.NameOfBondsPage
 import controllers.ControllerBaseSpec
+import views.html.TextAreaView
 import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import models.NormalMode
-import pages.nonsipp.bonds.NameOfBondsPage
-import views.html.TextAreaView
 
 class NameOfBondsControllerSpec extends ControllerBaseSpec {
 

@@ -18,13 +18,13 @@ package controllers.nonsipp.landorpropertydisposal
 
 import config.Refined.{Max50, Max5000}
 import controllers.ControllerBaseSpec
+import views.html.YesNoPageView
+import pages.nonsipp.landorpropertydisposal.DisposalIndependentValuationPage
 import eu.timepit.refined.refineMV
+import controllers.nonsipp.landorpropertydisposal.DisposalIndependentValuationController.{form, viewModel}
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import controllers.nonsipp.landorpropertydisposal.DisposalIndependentValuationController.{form, viewModel}
-import pages.nonsipp.landorpropertydisposal.DisposalIndependentValuationPage
 import play.api.data.FormError
-import views.html.YesNoPageView
 
 class DisposalIndependentValuationControllerSpec extends ControllerBaseSpec {
 

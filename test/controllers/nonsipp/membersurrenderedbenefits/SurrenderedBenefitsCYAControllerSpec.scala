@@ -16,18 +16,18 @@
 
 package controllers.nonsipp.membersurrenderedbenefits
 
+import services.PsrSubmissionService
 import config.Refined.OneTo300
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsCYAController._
-import eu.timepit.refined.refineMV
-import org.mockito.ArgumentMatchers.any
-import models.{CheckMode, Mode, NormalMode}
-import pages.nonsipp.memberdetails.MemberDetailsPage
-import pages.nonsipp.membersurrenderedbenefits._
 import play.api.inject.bind
-import play.api.inject.guice.GuiceableModule
-import services.PsrSubmissionService
 import views.html.CheckYourAnswersView
+import eu.timepit.refined.refineMV
+import pages.nonsipp.membersurrenderedbenefits._
+import models.{CheckMode, Mode, NormalMode}
+import controllers.nonsipp.membersurrenderedbenefits.SurrenderedBenefitsCYAController._
+import org.mockito.ArgumentMatchers.any
+import play.api.inject.guice.GuiceableModule
+import pages.nonsipp.memberdetails.MemberDetailsPage
 
 import scala.concurrent.Future
 

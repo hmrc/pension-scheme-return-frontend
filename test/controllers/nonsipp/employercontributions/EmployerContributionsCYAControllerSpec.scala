@@ -18,22 +18,16 @@ package controllers.nonsipp.employercontributions
 
 import config.Refined._
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.employercontributions.EmployerContributionsCYAController._
-import eu.timepit.refined.refineMV
-import models.{ConditionalYesNo, Crn, IdentityType, NormalMode}
-import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.employercontributions.{
-  EmployerCompanyCrnPage,
-  EmployerContributionsProgress,
-  EmployerNamePage,
-  EmployerTypeOfBusinessPage,
-  TotalEmployerContributionPage
-}
-import pages.nonsipp.memberdetails.MemberDetailsPage
 import play.api.inject.bind
-import play.api.inject.guice.GuiceableModule
-import services.PsrSubmissionService
+import eu.timepit.refined.refineMV
+import models._
 import viewmodels.models.SectionJourneyStatus
+import org.mockito.ArgumentMatchers.any
+import pages.nonsipp.employercontributions._
+import services.PsrSubmissionService
+import play.api.inject.guice.GuiceableModule
+import pages.nonsipp.memberdetails.MemberDetailsPage
+import controllers.nonsipp.employercontributions.EmployerContributionsCYAController._
 import views.html.CheckYourAnswersView
 
 import scala.concurrent.Future

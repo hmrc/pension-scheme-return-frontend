@@ -16,8 +16,8 @@
 
 package utils
 
-import play.api.mvc.Request
 import play.api.test.{CSRFTokenHelper, FakeRequest}
+import play.api.mvc.Request
 
 object FakeRequestCSRFSupport {
 

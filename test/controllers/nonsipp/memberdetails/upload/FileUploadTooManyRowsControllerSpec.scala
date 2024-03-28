@@ -16,10 +16,10 @@
 
 package controllers.nonsipp.memberdetails.upload
 
-import controllers.nonsipp.memberdetails.upload.FileUploadTooManyRowsController._
 import controllers.ControllerBaseSpec
-import models.NormalMode
 import views.html.ContentPageView
+import controllers.nonsipp.memberdetails.upload.FileUploadTooManyRowsController._
+import models.NormalMode
 
 class FileUploadTooManyRowsControllerSpec extends ControllerBaseSpec {
 

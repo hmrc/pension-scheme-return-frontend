@@ -16,21 +16,21 @@
 
 package controllers.nonsipp.shares
 
+import services.{PsrSubmissionService, SaveService, SchemeDateService}
+import play.api.inject.guice.GuiceableModule
+import models.ConditionalYesNo._
+import pages.nonsipp.shares._
 import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.shares.SharesCYAController._
 import eu.timepit.refined.refineMV
-import models.ConditionalYesNo._
-import models.SchemeHoldShare.Contribution
-import models.TypeOfShares.ConnectedParty
-import models.{CheckMode, ConditionalYesNo, Crn, IdentitySubject, IdentityType, Mode, NormalMode}
-import org.mockito.ArgumentMatchers.any
+import controllers.nonsipp.shares.SharesCYAController._
+import models._
 import pages.nonsipp.common.IdentityTypePage
-import pages.nonsipp.shares._
+import org.mockito.ArgumentMatchers.any
 import play.api.inject.bind
-import play.api.inject.guice.GuiceableModule
-import services.{PsrSubmissionService, SaveService, SchemeDateService}
+import models.SchemeHoldShare.Contribution
 import views.html.CheckYourAnswersView
+import models.TypeOfShares.ConnectedParty
 
 import scala.concurrent.Future
 

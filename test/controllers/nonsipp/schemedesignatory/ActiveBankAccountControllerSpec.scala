@@ -16,13 +16,13 @@
 
 package controllers.nonsipp.schemedesignatory
 
+import pages.nonsipp.schemedesignatory.ActiveBankAccountPage
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.schemedesignatory.ActiveBankAccountController._
+import views.html.YesNoPageView
+import play.api.libs.json.JsPath
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import pages.nonsipp.schemedesignatory.ActiveBankAccountPage
-import play.api.libs.json.JsPath
-import views.html.YesNoPageView
+import controllers.nonsipp.schemedesignatory.ActiveBankAccountController._
 
 class ActiveBankAccountControllerSpec extends ControllerBaseSpec {
 

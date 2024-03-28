@@ -16,12 +16,12 @@
 
 package views
 
-import models.DateRange
-import play.api.data
-import play.api.data.Forms.{mapping, text}
 import play.api.test.FakeRequest
-import viewmodels.models.DateRangeViewModel
+import play.api.data.Forms.{mapping, text}
 import views.html.DateRangeView
+import play.api.data
+import models.DateRange
+import viewmodels.models.DateRangeViewModel
 
 import java.time.LocalDate
 

@@ -16,8 +16,8 @@
 
 package pages
 
-import pages.behaviours.PageBehaviours
 import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
+import pages.behaviours.PageBehaviours
 
 class DidSchemeHoldAnySharesPageSpec extends PageBehaviours {
 

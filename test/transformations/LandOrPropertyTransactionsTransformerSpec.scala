@@ -16,37 +16,25 @@
 
 package transformations
 
-import controllers.TestValues
-import eu.timepit.refined.refineMV
-import generators.ModelGenerators.allowedAccessRequestGen
-import models.HowDisposed.Sold
-import models.SchemeHoldLandProperty.Acquisition
-import models.requests.psr._
-import models.requests.{AllowedAccessRequest, DataRequest}
-import models.{
-  ConditionalYesNo,
-  IdentitySubject,
-  IdentityType,
-  PropertyAcquiredFrom,
-  RecipientDetails,
-  SchemeHoldLandProperty
-}
-import org.scalatest.OptionValues
+import play.api.test.FakeRequest
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
-import pages.nonsipp.common.{
-  CompanyRecipientCrnPage,
-  IdentityTypePage,
-  OtherRecipientDetailsPage,
-  PartnershipRecipientUtrPage
-}
-import pages.nonsipp.landorproperty._
-import pages.nonsipp.landorpropertydisposal.{Paths, _}
-import play.api.libs.json.Json
 import play.api.mvc.AnyContentAsEmpty
-import play.api.test.FakeRequest
+import models.HowDisposed.Sold
+import models.SchemeHoldLandProperty.Acquisition
+import controllers.TestValues
+import pages.nonsipp.landorproperty._
+import eu.timepit.refined.refineMV
 import utils.UserAnswersUtils.UserAnswersOps
+import generators.ModelGenerators.allowedAccessRequestGen
+import models._
+import pages.nonsipp.common._
 import viewmodels.models.SectionCompleted
+import models.requests.{AllowedAccessRequest, DataRequest}
+import models.requests.psr._
+import pages.nonsipp.landorpropertydisposal.{Paths, _}
+import org.scalatest.OptionValues
+import play.api.libs.json.Json
 
 class LandOrPropertyTransactionsTransformerSpec extends AnyFreeSpec with Matchers with OptionValues with TestValues {
 

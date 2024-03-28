@@ -16,15 +16,15 @@
 
 package controllers.nonsipp.landorpropertydisposal
 
+import controllers.nonsipp.landorpropertydisposal.IndividualBuyerNinoNumberController._
 import config.Refined.{Max50, Max5000}
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.landorpropertydisposal.IndividualBuyerNinoNumberController._
+import views.html.ConditionalYesNoPageView
+import pages.nonsipp.landorpropertydisposal.{IndividualBuyerNinoNumberPage, LandOrPropertyIndividualBuyerNamePage}
 import eu.timepit.refined.refineMV
+import uk.gov.hmrc.domain.Nino
 import forms.YesNoPageFormProvider
 import models.{ConditionalYesNo, NormalMode, UserAnswers}
-import pages.nonsipp.landorpropertydisposal.{IndividualBuyerNinoNumberPage, LandOrPropertyIndividualBuyerNamePage}
-import uk.gov.hmrc.domain.Nino
-import views.html.ConditionalYesNoPageView
 
 class IndividualBuyerNinoNumberControllerSpec extends ControllerBaseSpec {
 

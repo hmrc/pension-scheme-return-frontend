@@ -16,30 +16,29 @@
 
 package controllers.nonsipp
 
-import controllers.ControllerBaseSpec
-import eu.timepit.refined.refineMV
-import models.ConditionalYesNo._
-import models.SponsoringOrConnectedParty.Sponsoring
-import models._
-import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.CheckReturnDatesPage
-import pages.nonsipp.common.IdentityTypePage
-import pages.nonsipp.loansmadeoroutstanding._
-import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsNinoPage, MemberDetailsPage, NoNINOPage}
-import pages.nonsipp.moneyborrowed.{LenderNamePages, MoneyBorrowedPage}
-import pages.nonsipp.otherassetsdisposal.OtherAssetsDisposalPage
-import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
-import pages.nonsipp.schemedesignatory._
-import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
-import pages.nonsipp.sharesdisposal.{SharesDisposalCompletedPage, SharesDisposalPage}
-import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
-import pages.nonsipp.bonds.UnregulatedOrConnectedBondsHeldPage
-import play.api.inject
-import play.api.inject.guice.GuiceableModule
 import services.SchemeDateService
-import viewmodels.models.{SectionCompleted, TaskListStatus}
-import viewmodels.models.TaskListStatus.TaskListStatus
+import pages.nonsipp.schemedesignatory._
+import models.ConditionalYesNo._
+import pages.nonsipp.shares.DidSchemeHoldAnySharesPage
+import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
+import controllers.ControllerBaseSpec
 import views.html.TaskListView
+import eu.timepit.refined.refineMV
+import pages.nonsipp.sharesdisposal.{SharesDisposalCompletedPage, SharesDisposalPage}
+import models._
+import pages.nonsipp.loansmadeoroutstanding._
+import pages.nonsipp.moneyborrowed.{LenderNamePages, MoneyBorrowedPage}
+import viewmodels.models.{SectionCompleted, TaskListStatus}
+import models.SponsoringOrConnectedParty.Sponsoring
+import org.mockito.ArgumentMatchers.any
+import pages.nonsipp.memberdetails._
+import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
+import play.api.inject.guice.GuiceableModule
+import pages.nonsipp.bonds.UnregulatedOrConnectedBondsHeldPage
+import pages.nonsipp.CheckReturnDatesPage
+import play.api.inject
+import viewmodels.models.TaskListStatus.TaskListStatus
+import pages.nonsipp.common.IdentityTypePage
 
 class TaskListControllerSpec extends ControllerBaseSpec {
 

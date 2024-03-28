@@ -16,11 +16,11 @@
 
 package pages
 
+import pages.nonsipp.memberdetails._
 import eu.timepit.refined.refineMV
+import utils.UserAnswersUtils.UserAnswersOps
 import models.{NameDOB, UserAnswers}
 import pages.behaviours.PageBehaviours
-import pages.nonsipp.memberdetails.{DoesMemberHaveNinoPage, MemberDetailsNinoPage, MemberDetailsPage, NoNINOPage}
-import utils.UserAnswersUtils.UserAnswersOps
 
 class MemberDetailsPageSpec extends PageBehaviours {
 
@@ -28,7 +28,7 @@ class MemberDetailsPageSpec extends PageBehaviours {
 
   val srn = srnGen.sample.value
   val nino = ninoGen.sample.value
-  val defaultUserAnswers = UserAnswers("test")
+  val defaultUserAnswers: UserAnswers = UserAnswers("test")
 
   beRetrievable[NameDOB](MemberDetailsPage(srn, refineMV(1)))
   beSettable[NameDOB](MemberDetailsPage(srn, refineMV(1)))

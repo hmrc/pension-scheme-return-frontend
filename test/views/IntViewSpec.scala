@@ -16,12 +16,12 @@
 
 package views
 
+import play.api.test.FakeRequest
 import forms.mappings.Mappings
+import play.api.data.Forms.mapping
+import views.html.IntView
 import org.scalacheck.Gen
 import play.api.data
-import play.api.data.Forms.mapping
-import play.api.test.FakeRequest
-import views.html.IntView
 
 class IntViewSpec extends ViewSpec with Mappings {
 

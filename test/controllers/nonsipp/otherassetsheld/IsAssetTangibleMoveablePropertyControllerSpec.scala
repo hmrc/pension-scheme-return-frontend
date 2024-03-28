@@ -16,14 +16,14 @@
 
 package controllers.nonsipp.otherassetsheld
 
+import pages.nonsipp.otherassetsheld.IsAssetTangibleMoveablePropertyPage
 import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.otherassetsheld.IsAssetTangibleMoveablePropertyController._
+import views.html.YesNoPageView
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import pages.nonsipp.otherassetsheld.IsAssetTangibleMoveablePropertyPage
-import views.html.YesNoPageView
+import controllers.nonsipp.otherassetsheld.IsAssetTangibleMoveablePropertyController._
 
 class IsAssetTangibleMoveablePropertyControllerSpec extends ControllerBaseSpec {
 

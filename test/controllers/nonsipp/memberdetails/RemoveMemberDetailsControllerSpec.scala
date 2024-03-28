@@ -16,14 +16,14 @@
 
 package controllers.nonsipp.memberdetails
 
-import RemoveMemberDetailsController.{form, viewModel}
-import controllers.ControllerBaseSpec
-import controllers.nonsipp.memberdetails.routes
+import pages.nonsipp.memberdetails.MemberDetailsPage
+import views.html.YesNoPageView
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.{NameDOB, NormalMode}
-import pages.nonsipp.memberdetails.MemberDetailsPage
-import views.html.YesNoPageView
+import controllers.nonsipp.memberdetails.RemoveMemberDetailsController.{form, viewModel}
+import controllers.nonsipp.memberdetails.routes
+import controllers.ControllerBaseSpec
 
 class RemoveMemberDetailsControllerSpec extends ControllerBaseSpec {
 

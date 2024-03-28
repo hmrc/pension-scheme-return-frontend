@@ -16,10 +16,10 @@
 
 package navigation
 
+import utils.BaseSpec
+import pages._
 import controllers.nonsipp.routes
 import models.NormalMode
-import pages._
-import utils.BaseSpec
 
 class NavigatorSpec extends BaseSpec with NavigatorBehaviours {
 

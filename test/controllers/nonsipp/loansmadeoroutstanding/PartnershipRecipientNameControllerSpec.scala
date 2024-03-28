@@ -16,14 +16,14 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
+import controllers.nonsipp.loansmadeoroutstanding.PartnershipRecipientNameController._
 import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.loansmadeoroutstanding.PartnershipRecipientNameController._
+import views.html.TextInputView
 import eu.timepit.refined.refineMV
 import forms.TextFormProvider
 import models.NormalMode
 import pages.nonsipp.loansmadeoroutstanding.PartnershipRecipientNamePage
-import views.html.TextInputView
 
 class PartnershipRecipientNameControllerSpec extends ControllerBaseSpec {
 

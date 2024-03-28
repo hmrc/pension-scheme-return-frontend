@@ -16,18 +16,18 @@
 
 package controllers.nonsipp.moneyborrowed
 
+import controllers.nonsipp.moneyborrowed.ValueOfSchemeAssetsWhenMoneyBorrowedController._
 import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.moneyborrowed.ValueOfSchemeAssetsWhenMoneyBorrowedController._
+import views.html.MoneyView
 import eu.timepit.refined.refineMV
-import forms.mappings.errors.MoneyFormErrorProvider
 import models.NormalMode
 import pages.nonsipp.moneyborrowed.{ValueOfSchemeAssetsWhenMoneyBorrowedPage, WhenBorrowedPage}
-import views.html.MoneyView
+import forms.mappings.errors.MoneyFormErrorProvider
 
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import java.util.Locale
+import java.time.format.DateTimeFormatter
 
 class ValueOfSchemeAssetsWhenMoneyBorrowedControllerSpec extends ControllerBaseSpec {
 

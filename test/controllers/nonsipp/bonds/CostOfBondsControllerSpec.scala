@@ -16,14 +16,14 @@
 
 package controllers.nonsipp.bonds
 
+import pages.nonsipp.bonds.CostOfBondsPage
 import config.Refined._
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.bonds.CostOfBondsController._
+import views.html.MoneyView
 import eu.timepit.refined.refineMV
 import forms.MoneyFormProvider
+import controllers.nonsipp.bonds.CostOfBondsController._
 import models.NormalMode
-import pages.nonsipp.bonds.CostOfBondsPage
-import views.html.MoneyView
 
 class CostOfBondsControllerSpec extends ControllerBaseSpec {
 

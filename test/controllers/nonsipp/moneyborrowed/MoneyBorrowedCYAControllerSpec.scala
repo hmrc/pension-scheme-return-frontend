@@ -16,17 +16,17 @@
 
 package controllers.nonsipp.moneyborrowed
 
+import services.PsrSubmissionService
+import play.api.inject.guice.GuiceableModule
 import config.Refined.OneTo5000
-import controllers.ControllerBaseSpec
-import controllers.nonsipp.moneyborrowed.MoneyBorrowedCYAController._
+import play.api.inject.bind
+import views.html.CheckYourAnswersView
 import eu.timepit.refined.refineMV
 import models.CheckOrChange
-import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.moneyborrowed._
-import play.api.inject.bind
-import play.api.inject.guice.GuiceableModule
-import services.PsrSubmissionService
-import views.html.CheckYourAnswersView
+import org.mockito.ArgumentMatchers.any
+import controllers.nonsipp.moneyborrowed.MoneyBorrowedCYAController._
+import controllers.ControllerBaseSpec
 
 class MoneyBorrowedCYAControllerSpec extends ControllerBaseSpec {
 

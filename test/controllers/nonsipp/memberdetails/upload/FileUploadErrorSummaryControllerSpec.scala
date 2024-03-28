@@ -16,14 +16,14 @@
 
 package controllers.nonsipp.memberdetails.upload
 
-import controllers.ControllerBaseSpec
+import services.UploadService
 import controllers.nonsipp.memberdetails.upload.FileUploadErrorSummaryController._
+import play.api.inject.guice.GuiceableModule
+import controllers.ControllerBaseSpec
+import views.html.ContentPageView
+import play.api.inject
 import models.{NormalMode, Upload, UploadFormatError}
 import org.mockito.ArgumentMatchers.any
-import play.api.inject
-import play.api.inject.guice.GuiceableModule
-import services.UploadService
-import views.html.ContentPageView
 
 import scala.concurrent.Future
 

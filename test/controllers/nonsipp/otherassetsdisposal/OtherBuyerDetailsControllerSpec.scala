@@ -16,13 +16,13 @@
 
 package controllers.nonsipp.otherassetsdisposal
 
+import pages.nonsipp.otherassetsdisposal.OtherBuyerDetailsPage
 import config.Refined.{Max50, Max5000}
 import controllers.ControllerBaseSpec
+import views.html.RecipientDetailsView
 import eu.timepit.refined.refineMV
 import forms.RecipientDetailsFormProvider
 import models.{NormalMode, RecipientDetails}
-import pages.nonsipp.otherassetsdisposal.OtherBuyerDetailsPage
-import views.html.RecipientDetailsView
 
 class OtherBuyerDetailsControllerSpec extends ControllerBaseSpec {
 

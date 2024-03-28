@@ -16,15 +16,15 @@
 
 package controllers.nonsipp.shares
 
+import pages.nonsipp.shares.{IndividualNameOfSharesSellerPage, SharesIndividualSellerNINumberPage}
 import config.Refined.Max5000
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.shares.SharesIndividualSellerNINumberController._
-import eu.timepit.refined.refineMV
-import forms.YesNoPageFormProvider
-import models.{ConditionalYesNo, NormalMode}
-import pages.nonsipp.shares.{IndividualNameOfSharesSellerPage, SharesIndividualSellerNINumberPage}
-import uk.gov.hmrc.domain.Nino
 import views.html.ConditionalYesNoPageView
+import eu.timepit.refined.refineMV
+import uk.gov.hmrc.domain.Nino
+import forms.YesNoPageFormProvider
+import models.{ConditionalYesNo, NormalMode, UserAnswers}
+import controllers.nonsipp.shares.SharesIndividualSellerNINumberController._
 
 class SharesIndividualSellerNINumberControllerSpec extends ControllerBaseSpec {
 
@@ -38,7 +38,7 @@ class SharesIndividualSellerNINumberControllerSpec extends ControllerBaseSpec {
     controllers.nonsipp.shares.routes.SharesIndividualSellerNINumberController
       .onSubmit(srn, index, NormalMode)
 
-  val userAnswersWithIndividualName =
+  val userAnswersWithIndividualName: UserAnswers =
     defaultUserAnswers.unsafeSet(IndividualNameOfSharesSellerPage(srn, index), individualName)
 
   val conditionalNo: ConditionalYesNo[String, Nino] = ConditionalYesNo.no("reason")

@@ -16,17 +16,17 @@
 
 package controllers.nonsipp.membercontributions
 
+import services.PsrSubmissionService
+import play.api.inject.guice.GuiceableModule
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.membercontributions.MemberContributionsController._
+import play.api.inject.bind
+import views.html.YesNoPageView
+import play.api.libs.json.JsPath
 import forms.YesNoPageFormProvider
 import models.NormalMode
 import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.membercontributions.MemberContributionsPage
-import play.api.inject.bind
-import play.api.inject.guice.GuiceableModule
-import play.api.libs.json.JsPath
-import services.PsrSubmissionService
-import views.html.YesNoPageView
+import controllers.nonsipp.membercontributions.MemberContributionsController._
 
 class MemberContributionsControllerSpec extends ControllerBaseSpec {
 

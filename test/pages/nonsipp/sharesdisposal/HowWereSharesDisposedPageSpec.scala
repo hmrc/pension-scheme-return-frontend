@@ -19,12 +19,11 @@ package pages.nonsipp.sharesdisposal
 import config.Refined.{Max50, Max5000}
 import controllers.TestValues
 import eu.timepit.refined.refineMV
-import models.{HowSharesDisposed, IdentityType}
-import models.HowSharesDisposed.HowSharesDisposed
-import models.PointOfEntry
-import pages.behaviours.PageBehaviours
 import utils.UserAnswersUtils.UserAnswersOps
+import models.HowSharesDisposed.HowSharesDisposed
+import models.{HowSharesDisposed, IdentityType, PointOfEntry}
 import viewmodels.models.SectionCompleted
+import pages.behaviours.PageBehaviours
 
 class HowWereSharesDisposedPageSpec extends PageBehaviours with TestValues {
   private val shareIndexOne = refineMV[Max5000.Refined](1)

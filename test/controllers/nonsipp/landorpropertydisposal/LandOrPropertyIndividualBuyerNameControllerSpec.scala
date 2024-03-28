@@ -18,12 +18,12 @@ package controllers.nonsipp.landorpropertydisposal
 
 import config.Refined.{Max50, Max5000}
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.landorpropertydisposal.LandOrPropertyIndividualBuyerNameController._
-import eu.timepit.refined.refineMV
-import forms.TextFormProvider
-import models.NormalMode
-import pages.nonsipp.landorpropertydisposal.LandOrPropertyIndividualBuyerNamePage
 import views.html.TextInputView
+import pages.nonsipp.landorpropertydisposal.LandOrPropertyIndividualBuyerNamePage
+import eu.timepit.refined.refineMV
+import models.NormalMode
+import controllers.nonsipp.landorpropertydisposal.LandOrPropertyIndividualBuyerNameController._
+import forms.TextFormProvider
 
 class LandOrPropertyIndividualBuyerNameControllerSpec extends ControllerBaseSpec {
 

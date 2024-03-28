@@ -16,15 +16,15 @@
 
 package controllers.nonsipp.sharesdisposal
 
+import controllers.nonsipp.sharesdisposal.HowManySharesSoldController._
+import pages.nonsipp.shares.CompanyNameRelatedSharesPage
 import config.Refined.{Max50, Max5000}
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.sharesdisposal.HowManySharesSoldController._
+import views.html.IntView
 import eu.timepit.refined.refineMV
+import pages.nonsipp.sharesdisposal.HowManySharesSoldPage
 import forms.IntFormProvider
 import models.NormalMode
-import pages.nonsipp.shares.CompanyNameRelatedSharesPage
-import pages.nonsipp.sharesdisposal.HowManySharesSoldPage
-import views.html.IntView
 
 class HowManySharesSoldControllerSpec extends ControllerBaseSpec {
 

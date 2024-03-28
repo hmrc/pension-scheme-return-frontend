@@ -16,31 +16,17 @@
 
 package navigation.nonsipp
 
-import config.Refined.{Max5000, OneTo5000}
-import eu.timepit.refined.refineMV
-import models.PointOfEntry.{
-  AssetAcquisitionToContributionPointOfEntry,
-  AssetAcquisitionToTransferPointOfEntry,
-  AssetContributionToAcquisitionPointOfEntry,
-  AssetContributionToTransferPointOfEntry,
-  AssetTransferToAcquisitionPointOfEntry,
-  AssetTransferToContributionPointOfEntry,
-  NoPointOfEntry,
-  WhoWasAssetAcquiredFromPointOfEntry
-}
-import models.{CheckMode, IdentitySubject, IdentityType, NormalMode, RecipientDetails, SchemeHoldAsset, UserAnswers}
-import models.SchemeId.Srn
-import navigation.{Navigator, NavigatorBehaviours}
-import org.scalacheck.Gen
-import pages.nonsipp.common.{
-  CompanyRecipientCrnPage,
-  IdentityTypePage,
-  OtherRecipientDetailsPage,
-  PartnershipRecipientUtrPage
-}
-import pages.nonsipp.otherassetsheld._
 import utils.BaseSpec
+import config.Refined.{Max5000, OneTo5000}
+import models.SchemeId.Srn
+import eu.timepit.refined.refineMV
+import navigation.{Navigator, NavigatorBehaviours}
+import models._
+import pages.nonsipp.common._
+import pages.nonsipp.otherassetsheld._
+import models.PointOfEntry._
 import utils.UserAnswersUtils.UserAnswersOps
+import org.scalacheck.Gen
 
 class OtherAssetsHeldNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 

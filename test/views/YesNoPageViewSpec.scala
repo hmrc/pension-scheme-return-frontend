@@ -16,10 +16,10 @@
 
 package views
 
-import forms.YesNoPageFormProvider
 import play.api.test.FakeRequest
-import viewmodels.models.YesNoPageViewModel
 import views.html.YesNoPageView
+import forms.YesNoPageFormProvider
+import viewmodels.models.YesNoPageViewModel
 
 class YesNoPageViewSpec extends ViewSpec {
 

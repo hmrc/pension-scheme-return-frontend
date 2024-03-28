@@ -16,21 +16,22 @@
 
 package controllers.nonsipp.landorproperty
 
+import play.api.mvc.Call
 import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
+import views.html.RadioListView
+import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, WhyDoesSchemeHoldLandPropertyPage}
 import controllers.nonsipp.landorproperty.WhyDoesSchemeHoldLandPropertyController._
 import eu.timepit.refined.refineMV
 import forms.RadioListFormProvider
 import models.{NormalMode, SchemeHoldLandProperty}
-import pages.nonsipp.landorproperty.{LandOrPropertyChosenAddressPage, WhyDoesSchemeHoldLandPropertyPage}
-import views.html.RadioListView
 
 class WhyDoesSchemeHoldLandPropertyControllerSpec extends ControllerBaseSpec {
 
   private val index = refineMV[OneTo5000](1)
 
-  lazy val onPageLoad = routes.WhyDoesSchemeHoldLandPropertyController.onPageLoad(srn, index, NormalMode)
-  lazy val onSubmit = routes.WhyDoesSchemeHoldLandPropertyController.onSubmit(srn, index, NormalMode)
+  lazy val onPageLoad: Call = routes.WhyDoesSchemeHoldLandPropertyController.onPageLoad(srn, index, NormalMode)
+  lazy val onSubmit: Call = routes.WhyDoesSchemeHoldLandPropertyController.onSubmit(srn, index, NormalMode)
 
   private val userAnswersWithLookUpPage =
     defaultUserAnswers.unsafeSet(LandOrPropertyChosenAddressPage(srn, index), address)

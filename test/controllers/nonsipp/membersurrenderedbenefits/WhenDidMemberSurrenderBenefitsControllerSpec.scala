@@ -16,17 +16,17 @@
 
 package controllers.nonsipp.membersurrenderedbenefits
 
+import services.SchemeDateService
 import config.Refined.Max300
 import controllers.ControllerBaseSpec
-import eu.timepit.refined.refineMV
-import forms.DatePageFormProvider
-import models.{NormalMode, UserAnswers}
-import pages.nonsipp.memberdetails.MemberDetailsPage
-import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsAmountPage, WhenDidMemberSurrenderBenefitsPage}
-import play.api.inject
-import play.api.inject.guice.GuiceableModule
-import services.SchemeDateService
 import views.html.DatePageView
+import eu.timepit.refined.refineMV
+import play.api.inject
+import forms.DatePageFormProvider
+import pages.nonsipp.membersurrenderedbenefits.{SurrenderedBenefitsAmountPage, WhenDidMemberSurrenderBenefitsPage}
+import models.{NormalMode, UserAnswers}
+import play.api.inject.guice.GuiceableModule
+import pages.nonsipp.memberdetails.MemberDetailsPage
 
 class WhenDidMemberSurrenderBenefitsControllerSpec extends ControllerBaseSpec {
 

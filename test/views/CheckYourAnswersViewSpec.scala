@@ -17,9 +17,9 @@
 package views
 
 import play.api.test.FakeRequest
+import views.html.CheckYourAnswersView
 import viewmodels.DisplayMessage.Message
 import viewmodels.models.{CheckYourAnswersViewModel, SummaryAction}
-import views.html.CheckYourAnswersView
 
 class CheckYourAnswersViewSpec extends ViewSpec {
 

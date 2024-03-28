@@ -16,22 +16,17 @@
 
 package navigation.nonsipp
 
-import config.Refined.{Max5000, OneTo5000}
-import eu.timepit.refined.refineMV
-import models.SchemeHoldLandProperty.{Acquisition, Contribution, Transfer}
-import models._
-import navigation.{Navigator, NavigatorBehaviours}
-import org.scalacheck.Gen
-import pages.nonsipp.common.{
-  CompanyRecipientCrnPage,
-  IdentityTypePage,
-  OtherRecipientDetailsPage,
-  PartnershipRecipientUtrPage
-}
-import pages.nonsipp.landorproperty._
 import utils.BaseSpec
-import utils.UserAnswersUtils.UserAnswersOps
+import pages.nonsipp.landorproperty._
+import eu.timepit.refined.refineMV
+import navigation.{Navigator, NavigatorBehaviours}
+import models._
+import pages.nonsipp.common._
 import viewmodels.models.SectionCompleted
+import config.Refined.{Max5000, OneTo5000}
+import models.SchemeHoldLandProperty.{Acquisition, Contribution, Transfer}
+import utils.UserAnswersUtils.UserAnswersOps
+import org.scalacheck.Gen
 
 class LandOrPropertyNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 

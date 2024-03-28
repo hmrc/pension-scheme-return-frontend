@@ -16,15 +16,15 @@
 
 package navigation.nonsipp
 
-import config.Refined.{Max300, Max5}
-import eu.timepit.refined.refineMV
-import models.NormalMode
-import models.SchemeId.Srn
-import navigation.{Navigator, NavigatorBehaviours}
-import org.scalacheck.Gen
-import pages.nonsipp.membertransferout._
 import utils.BaseSpec
+import config.Refined.{Max300, Max5}
+import models.SchemeId.Srn
+import eu.timepit.refined.refineMV
+import navigation.{Navigator, NavigatorBehaviours}
+import models.NormalMode
+import pages.nonsipp.membertransferout._
 import utils.UserAnswersUtils.UserAnswersOps
+import org.scalacheck.Gen
 
 class TransferOutNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 

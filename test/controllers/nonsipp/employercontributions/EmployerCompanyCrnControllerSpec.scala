@@ -16,13 +16,13 @@
 
 package controllers.nonsipp.employercontributions
 
+import pages.nonsipp.employercontributions.{EmployerCompanyCrnPage, EmployerNamePage}
 import config.Refined.{Max300, Max50}
 import controllers.ControllerBaseSpec
+import views.html.ConditionalYesNoPageView
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
-import models.{ConditionalYesNo, Crn, NormalMode}
-import pages.nonsipp.employercontributions.{EmployerCompanyCrnPage, EmployerNamePage}
-import views.html.ConditionalYesNoPageView
+import models._
 
 class EmployerCompanyCrnControllerSpec extends ControllerBaseSpec {
 
@@ -36,7 +36,7 @@ class EmployerCompanyCrnControllerSpec extends ControllerBaseSpec {
     routes.EmployerCompanyCrnController
       .onSubmit(srn, memberIndex, index, NormalMode)
 
-  val userAnswersCompanyName =
+  val userAnswersCompanyName: UserAnswers =
     defaultUserAnswers.unsafeSet(EmployerNamePage(srn, memberIndex, index), companyName)
 
   val conditionalNo: ConditionalYesNo[String, Crn] = ConditionalYesNo.no("reason")

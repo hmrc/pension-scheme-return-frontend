@@ -16,26 +16,27 @@
 
 package utils
 
-import akka.actor.ActorSystem
+import play.api.test.FakeRequest
 import akka.stream.Materializer
+import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.matchers.must.Matchers
+import org.scalatest.verbs.BehaveWord
+import akka.actor.ActorSystem
 import generators.Generators
 import models.ModelSerializers
+import play.api.i18n.{Messages, MessagesApi}
 import org.mockito.MockitoSugar
-import org.scalatest.concurrent.ScalaFutures
+import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.test.Helpers.running
 import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
-import org.scalatest.time.{Millis, Span}
-import org.scalatest.verbs.BehaveWord
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, OptionValues}
 import play.api.Application
-import play.api.i18n.{Messages, MessagesApi}
-import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.test.FakeRequest
-import play.api.test.Helpers.running
+import org.scalatest.time.{Millis, Span}
+
+import scala.reflect.ClassTag
+import scala.annotation.nowarn
 
 import java.net.URLEncoder
-import scala.annotation.nowarn
-import scala.reflect.ClassTag
 
 abstract class BaseSpec
     extends AnyFreeSpec

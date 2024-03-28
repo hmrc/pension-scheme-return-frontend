@@ -16,23 +16,24 @@
 
 package controllers.nonsipp.totalvaluequotedshares
 
+import services.SchemeDateService
 import controllers.ControllerBaseSpec
+import play.api.inject.bind
+import views.html.MoneyView
 import controllers.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesController.viewModel
 import forms.MoneyFormProvider
 import models.DateRange
 import org.mockito.ArgumentMatchers.any
+import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
-import play.api.inject.bind
-import services.SchemeDateService
-import views.html.MoneyView
 
 class TotalValueQuotedSharesControllerSpec extends ControllerBaseSpec {
 
   val schemeDatePeriod = dateRangeGen.sample.value
-  val mockSchemeDateService = mock[SchemeDateService]
+  val mockSchemeDateService: SchemeDateService = mock[SchemeDateService]
   val maxAllowedAmount = 999999999.99
 
-  override val additionalBindings = List(
+  override val additionalBindings: List[GuiceableModule] = List(
     bind[SchemeDateService].toInstance(mockSchemeDateService)
   )
 

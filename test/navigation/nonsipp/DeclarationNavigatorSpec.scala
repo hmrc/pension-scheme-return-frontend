@@ -16,9 +16,9 @@
 
 package navigation.nonsipp
 
+import utils.BaseSpec
 import navigation.{Navigator, NavigatorBehaviours}
 import pages.nonsipp.declaration.{PsaDeclarationPage, PspDeclarationPage}
-import utils.BaseSpec
 
 class DeclarationNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 

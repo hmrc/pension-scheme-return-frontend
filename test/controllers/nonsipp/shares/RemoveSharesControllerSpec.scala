@@ -16,18 +16,18 @@
 
 package controllers.nonsipp.shares
 
+import services.PsrSubmissionService
+import play.api.inject.guice.GuiceableModule
+import pages.nonsipp.shares.CompanyNameRelatedSharesPage
 import config.Refined.Max5000
 import controllers.ControllerBaseSpec
+import play.api.inject.bind
+import views.html.YesNoPageView
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.NormalMode
 import controllers.nonsipp.shares.RemoveSharesController._
 import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.shares.CompanyNameRelatedSharesPage
-import play.api.inject.guice.GuiceableModule
-import views.html.YesNoPageView
-import play.api.inject.bind
-import services.PsrSubmissionService
 
 import scala.concurrent.Future
 

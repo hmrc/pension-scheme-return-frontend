@@ -16,18 +16,18 @@
 
 package controllers.nonsipp.totalvaluequotedshares
 
-import cats.data.NonEmptyList
+import services.{PsrSubmissionService, SchemeDateService}
 import config.Refined.Max3
 import controllers.ControllerBaseSpec
+import play.api.inject.bind
 import controllers.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesCYAController._
+import pages.nonsipp.WhichTaxYearPage
+import org.mockito.stubbing.ScalaOngoingStubbing
 import models.DateRange
 import org.mockito.ArgumentMatchers.any
-import org.mockito.stubbing.ScalaOngoingStubbing
-import pages.nonsipp.WhichTaxYearPage
-import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
-import play.api.inject.bind
 import play.api.inject.guice.GuiceableModule
-import services.{PsrSubmissionService, SchemeDateService}
+import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
+import cats.data.NonEmptyList
 import views.html.CheckYourAnswersView
 
 class TotalValueQuotedSharesCYAControllerSpec extends ControllerBaseSpec {

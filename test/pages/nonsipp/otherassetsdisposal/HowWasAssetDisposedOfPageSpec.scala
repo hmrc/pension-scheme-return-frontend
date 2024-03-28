@@ -16,10 +16,10 @@
 
 package pages.nonsipp.otherassetsdisposal
 
+import models.HowDisposed._
 import config.Refined.{Max50, Max5000}
 import controllers.TestValues
 import eu.timepit.refined.refineMV
-import models.HowDisposed._
 import pages.behaviours.PageBehaviours
 
 class HowWasAssetDisposedOfPageSpec extends PageBehaviours with TestValues {

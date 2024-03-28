@@ -17,8 +17,8 @@
 package navigation.nonsipp
 
 import navigation.{Navigator, NavigatorBehaviours}
-import pages.nonsipp.totalvaluequotedshares._
 import utils.BaseSpec
+import pages.nonsipp.totalvaluequotedshares._
 
 class TotalValueQuotedSharesNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 

@@ -16,17 +16,17 @@
 
 package controllers.nonsipp.memberpensionpayments
 
+import services.PsrSubmissionService
 import config.Refined.Max300
 import controllers.ControllerBaseSpec
-import eu.timepit.refined.refineMV
+import play.api.inject.bind
+import views.html.CheckYourAnswersView
 import models.{CheckMode, Mode, NormalMode}
 import org.mockito.ArgumentMatchers.any
+import play.api.inject.guice.GuiceableModule
 import pages.nonsipp.memberdetails.MemberDetailsPage
 import pages.nonsipp.memberpensionpayments.TotalAmountPensionPaymentsPage
-import play.api.inject.bind
-import play.api.inject.guice.GuiceableModule
-import services.PsrSubmissionService
-import views.html.CheckYourAnswersView
+import eu.timepit.refined.refineMV
 
 class MemberPensionPaymentsCYAControllerSpec extends ControllerBaseSpec {
 

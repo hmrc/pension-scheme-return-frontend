@@ -18,13 +18,13 @@ package controllers.nonsipp.otherassetsdisposal
 
 import config.Refined.{Max50, Max5000}
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.otherassetsdisposal.AssetIndividualBuyerNiNumberController._
+import views.html.ConditionalYesNoPageView
 import eu.timepit.refined.refineMV
+import uk.gov.hmrc.domain.Nino
 import forms.YesNoPageFormProvider
 import models.{ConditionalYesNo, NormalMode}
 import pages.nonsipp.otherassetsdisposal.{AssetIndividualBuyerNiNumberPage, IndividualNameOfAssetBuyerPage}
-import uk.gov.hmrc.domain.Nino
-import views.html.ConditionalYesNoPageView
+import controllers.nonsipp.otherassetsdisposal.AssetIndividualBuyerNiNumberController._
 
 class AssetIndividualBuyerNiNumberControllerSpec extends ControllerBaseSpec {
 

@@ -16,28 +16,18 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
+import models.ConditionalYesNo._
 import config.Refined.{Max5000, OneTo5000}
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.loansmadeoroutstanding.LoansListController._
-import eu.timepit.refined.api.Refined
-import eu.timepit.refined.refineMV
+import views.html.ListView
+import uk.gov.hmrc.domain.Nino
 import forms.YesNoPageFormProvider
-import models.ConditionalYesNo._
-import models.{
-  ConditionalYesNo,
-  Crn,
-  IdentitySubject,
-  IdentityType,
-  Money,
-  NormalMode,
-  Security,
-  SponsoringOrConnectedParty,
-  Utr
-}
+import models._
 import pages.nonsipp.common.{CompanyRecipientCrnPage, IdentityTypePage, PartnershipRecipientUtrPage}
 import pages.nonsipp.loansmadeoroutstanding._
-import uk.gov.hmrc.domain.Nino
-import views.html.ListView
+import eu.timepit.refined.api.Refined
+import controllers.nonsipp.loansmadeoroutstanding.LoansListController._
+import eu.timepit.refined.refineMV
 
 class LoansListControllerSpec extends ControllerBaseSpec {
   private val subject = IdentitySubject.LoanRecipient

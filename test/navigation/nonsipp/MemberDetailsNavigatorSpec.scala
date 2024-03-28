@@ -16,21 +16,21 @@
 
 package navigation.nonsipp
 
-import config.Refined.OneTo300
-import controllers.nonsipp.memberdetails.routes
-import eu.timepit.refined.api.Refined
-import eu.timepit.refined.refineMV
-import generators.IndexGen
 import models.ManualOrUpload.{Manual, Upload}
+import controllers.nonsipp.memberdetails.routes
 import models.SchemeId.Srn
-import models.{CheckOrChange, ManualOrUpload, UploadFormatError}
+import generators.IndexGen
+import eu.timepit.refined.refineMV
 import navigation.{Navigator, NavigatorBehaviours}
-import org.scalacheck.Gen
-import pages.nonsipp.memberdetails._
 import pages.nonsipp.memberdetails.upload.{FileUploadErrorPage, FileUploadSuccessPage}
-import pages.{CheckingMemberDetailsFilePage, FileUploadErrorSummaryPage, FileUploadTooManyErrorsPage}
+import models.{CheckOrChange, ManualOrUpload, UploadFormatError}
+import eu.timepit.refined.api.Refined
 import utils.BaseSpec
+import pages.nonsipp.memberdetails._
+import config.Refined.OneTo300
+import pages.{CheckingMemberDetailsFilePage, FileUploadErrorSummaryPage, FileUploadTooManyErrorsPage}
 import utils.UserAnswersUtils.UserAnswersOps
+import org.scalacheck.Gen
 
 class MemberDetailsNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 

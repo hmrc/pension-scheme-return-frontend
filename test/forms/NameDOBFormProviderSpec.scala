@@ -16,12 +16,12 @@
 
 package forms
 
-import config.Constants
 import forms.behaviours.FieldBehaviours
-import forms.mappings.errors.DateFormErrors
-import models.NameDOB
+import config.Constants
 import org.scalacheck.Gen.alphaChar
+import models.NameDOB
 import play.api.data.{Form, FormError}
+import forms.mappings.errors.DateFormErrors
 
 class NameDOBFormProviderSpec extends FieldBehaviours {
 

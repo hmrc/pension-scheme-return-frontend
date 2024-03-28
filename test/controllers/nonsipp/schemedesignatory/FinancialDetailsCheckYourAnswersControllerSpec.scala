@@ -16,16 +16,16 @@
 
 package controllers.nonsipp.schemedesignatory
 
+import services.{PsrSubmissionService, SchemeDateService}
+import pages.nonsipp.schemedesignatory.HowManyMembersPage
+import play.api.inject.guice.GuiceableModule
 import controllers.ControllerBaseSpec
+import play.api.inject.bind
+import views.html.CheckYourAnswersView
+import pages.nonsipp.WhichTaxYearPage
 import controllers.nonsipp.schemedesignatory.FinancialDetailsCheckYourAnswersController._
 import models.{DateRange, NormalMode}
 import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.WhichTaxYearPage
-import pages.nonsipp.schemedesignatory.HowManyMembersPage
-import play.api.inject.bind
-import play.api.inject.guice.GuiceableModule
-import services.{PsrSubmissionService, SchemeDateService}
-import views.html.CheckYourAnswersView
 
 class FinancialDetailsCheckYourAnswersControllerSpec extends ControllerBaseSpec {
 

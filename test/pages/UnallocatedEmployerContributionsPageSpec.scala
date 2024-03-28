@@ -16,8 +16,8 @@
 
 package pages
 
-import pages.behaviours.PageBehaviours
 import pages.nonsipp.memberpayments.UnallocatedEmployerContributionsPage
+import pages.behaviours.PageBehaviours
 
 class UnallocatedEmployerContributionsPageSpec extends PageBehaviours {
 

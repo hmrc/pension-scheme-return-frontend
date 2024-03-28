@@ -16,17 +16,17 @@
 
 package controllers.nonsipp.landorpropertydisposal
 
+import play.api.inject.guice.GuiceableModule
 import config.Refined.{Max50, Max5000}
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.landorpropertydisposal.WhenWasPropertySoldController._
+import play.api.inject.bind
+import views.html.DatePageView
+import pages.nonsipp.landorpropertydisposal.WhenWasPropertySoldPage
 import eu.timepit.refined.refineMV
 import forms.DatePageFormProvider
 import models.NormalMode
-import pages.nonsipp.landorpropertydisposal.WhenWasPropertySoldPage
-import play.api.inject.bind
-import play.api.inject.guice.GuiceableModule
 import services.SchemeDateService
-import views.html.DatePageView
+import controllers.nonsipp.landorpropertydisposal.WhenWasPropertySoldController._
 
 import java.time.LocalDate
 

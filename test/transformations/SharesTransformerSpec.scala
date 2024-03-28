@@ -16,27 +16,27 @@
 
 package transformations
 
-import controllers.TestValues
-import eu.timepit.refined.refineMV
-import generators.ModelGenerators.allowedAccessRequestGen
-import models.HowSharesDisposed.{Other, Redeemed, Sold, Transferred}
+import play.api.test.FakeRequest
+import org.scalatest.matchers.must.Matchers
 import models.IdentityType.UKCompany
+import controllers.TestValues
 import models.SchemeHoldShare.{Acquisition, Contribution, Transfer}
 import models.TypeOfShares.{ConnectedParty, SponsoringEmployer, Unquoted}
 import models.requests.psr._
-import models.requests.{AllowedAccessRequest, DataRequest}
-import models.{ConditionalYesNo, IdentitySubject, IdentityType, PropertyAcquiredFrom, SchemeHoldShare, TypeOfShares}
-import org.scalatest.OptionValues
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
-import pages.nonsipp.common.IdentityTypePage
-import pages.nonsipp.shares._
+import eu.timepit.refined.refineMV
 import pages.nonsipp.sharesdisposal._
-import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
-import play.api.mvc.AnyContentAsEmpty
-import play.api.test.FakeRequest
 import utils.UserAnswersUtils.UserAnswersOps
+import generators.ModelGenerators.allowedAccessRequestGen
+import models._
+import pages.nonsipp.common.IdentityTypePage
 import viewmodels.models.SectionCompleted
+import models.requests.{AllowedAccessRequest, DataRequest}
+import org.scalatest.freespec.AnyFreeSpec
+import pages.nonsipp.totalvaluequotedshares.TotalValueQuotedSharesPage
+import pages.nonsipp.shares._
+import play.api.mvc.AnyContentAsEmpty
+import org.scalatest.OptionValues
+import models.HowSharesDisposed._
 
 class SharesTransformerSpec extends AnyFreeSpec with Matchers with OptionValues with TestValues {
 

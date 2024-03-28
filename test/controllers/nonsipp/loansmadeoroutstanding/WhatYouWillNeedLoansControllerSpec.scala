@@ -16,8 +16,8 @@
 
 package controllers.nonsipp.loansmadeoroutstanding
 
-import controllers.ControllerBaseSpec
 import controllers.nonsipp.loansmadeoroutstanding.routes
+import controllers.ControllerBaseSpec
 import views.html.ContentPageView
 
 class WhatYouWillNeedLoansControllerSpec extends ControllerBaseSpec {

@@ -16,17 +16,18 @@
 
 package controllers.nonsipp.employercontributions
 
+import play.api.inject.guice.GuiceableModule
 import controllers.ControllerBaseSpec
+import play.api.inject.bind
+import views.html.YesNoPageView
 import controllers.nonsipp.employercontributions.EmployerContributionsController.viewModel
+import play.api.libs.json.JsPath
 import forms.YesNoPageFormProvider
 import models.NormalMode
+import play.api.data.Form
 import org.mockito.ArgumentMatchers.any
 import pages.nonsipp.employercontributions.EmployerContributionsPage
-import play.api.inject.bind
-import play.api.inject.guice.GuiceableModule
-import play.api.libs.json.JsPath
 import services.PsrSubmissionService
-import views.html.YesNoPageView
 
 import scala.concurrent.Future
 
@@ -35,7 +36,7 @@ class EmployerContributionsControllerSpec extends ControllerBaseSpec {
   private lazy val onPageLoad = routes.EmployerContributionsController.onPageLoad(srn, NormalMode)
   private lazy val onSubmit = routes.EmployerContributionsController.onSubmit(srn, NormalMode)
 
-  val form = EmployerContributionsController.form(new YesNoPageFormProvider())
+  val form: Form[Boolean] = EmployerContributionsController.form(new YesNoPageFormProvider())
 
   private val mockPsrSubmissionService = mock[PsrSubmissionService]
 

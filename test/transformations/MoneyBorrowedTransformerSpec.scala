@@ -16,19 +16,19 @@
 
 package transformations
 
-import controllers.TestValues
-import eu.timepit.refined.refineMV
-import generators.ModelGenerators.allowedAccessRequestGen
-import models.requests.psr.{Borrowing, MoneyBorrowed}
-import models.requests.{AllowedAccessRequest, DataRequest}
+import play.api.test.FakeRequest
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
-import org.scalatest.{BeforeAndAfterEach, OptionValues}
-import pages.nonsipp.moneyborrowed._
-import play.api.libs.json.Json
 import play.api.mvc.AnyContentAsEmpty
-import play.api.test.FakeRequest
+import controllers.TestValues
+import models.requests.psr.{Borrowing, MoneyBorrowed}
+import eu.timepit.refined.refineMV
 import utils.UserAnswersUtils.UserAnswersOps
+import generators.ModelGenerators.allowedAccessRequestGen
+import pages.nonsipp.moneyborrowed._
+import models.requests.{AllowedAccessRequest, DataRequest}
+import org.scalatest.{BeforeAndAfterEach, OptionValues}
+import play.api.libs.json.Json
 
 class MoneyBorrowedTransformerSpec
     extends AnyFreeSpec

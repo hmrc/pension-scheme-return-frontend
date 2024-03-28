@@ -16,18 +16,18 @@
 
 package controllers.nonsipp.otherassetsheld
 
+import services.PsrSubmissionService
+import play.api.inject.guice.GuiceableModule
+import pages.nonsipp.otherassetsheld.WhatIsOtherAssetPage
+import controllers.nonsipp.otherassetsheld.RemoveOtherAssetController._
 import config.Refined.Max5000
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.otherassetsheld.RemoveOtherAssetController._
+import play.api.inject.bind
+import views.html.YesNoPageView
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.NormalMode
 import org.mockito.ArgumentMatchers.any
-import pages.nonsipp.otherassetsheld.WhatIsOtherAssetPage
-import play.api.inject.bind
-import play.api.inject.guice.GuiceableModule
-import services.PsrSubmissionService
-import views.html.YesNoPageView
 
 import scala.concurrent.Future
 

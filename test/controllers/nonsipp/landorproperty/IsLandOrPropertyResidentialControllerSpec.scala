@@ -18,12 +18,12 @@ package controllers.nonsipp.landorproperty
 
 import config.Refined.OneTo5000
 import controllers.ControllerBaseSpec
-import controllers.nonsipp.landorproperty.IsLandOrPropertyResidentialController._
+import views.html.YesNoPageView
+import pages.nonsipp.landorproperty.{IsLandOrPropertyResidentialPage, LandOrPropertyChosenAddressPage}
 import eu.timepit.refined.refineMV
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import pages.nonsipp.landorproperty.{IsLandOrPropertyResidentialPage, LandOrPropertyChosenAddressPage}
-import views.html.YesNoPageView
+import controllers.nonsipp.landorproperty.IsLandOrPropertyResidentialController._
 
 class IsLandOrPropertyResidentialControllerSpec extends ControllerBaseSpec {
 

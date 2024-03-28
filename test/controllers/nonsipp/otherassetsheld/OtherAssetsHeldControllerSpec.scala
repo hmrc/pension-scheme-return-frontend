@@ -16,13 +16,13 @@
 
 package controllers.nonsipp.otherassetsheld
 
-import controllers.ControllerBaseSpec
 import controllers.nonsipp.otherassetsheld.OtherAssetsHeldController.{form, viewModel}
+import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
+import controllers.ControllerBaseSpec
+import views.html.YesNoPageView
 import controllers.nonsipp.otherassetsheld.routes
 import forms.YesNoPageFormProvider
 import models.NormalMode
-import pages.nonsipp.otherassetsheld.OtherAssetsHeldPage
-import views.html.YesNoPageView
 
 class OtherAssetsHeldControllerSpec extends ControllerBaseSpec {
 

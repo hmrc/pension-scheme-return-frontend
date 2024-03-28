@@ -16,17 +16,17 @@
 
 package controllers.nonsipp.membertransferout
 
+import services.SchemeDateService
 import config.Refined.{Max300, Max5}
 import controllers.ControllerBaseSpec
+import views.html.DatePageView
 import eu.timepit.refined.refineMV
+import play.api.inject
 import forms.DatePageFormProvider
 import models.{NormalMode, UserAnswers}
-import pages.nonsipp.memberdetails.MemberDetailsPage
 import pages.nonsipp.membertransferout.{ReceivingSchemeNamePage, WhenWasTransferMadePage}
-import play.api.inject
 import play.api.inject.guice.GuiceableModule
-import services.SchemeDateService
-import views.html.DatePageView
+import pages.nonsipp.memberdetails.MemberDetailsPage
 
 class WhenWasTransferMadeControllerSpec extends ControllerBaseSpec {
 

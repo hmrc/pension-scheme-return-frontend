@@ -17,12 +17,12 @@
 package pages.nonsipp.common
 
 import config.Refined.OneTo5000
-import eu.timepit.refined.refineMV
-import models.{ConditionalYesNo, Crn, IdentitySubject, IdentityType, Money, UserAnswers}
-import pages.behaviours.PageBehaviours
 import pages.nonsipp.landorproperty.LandPropertyInUKPage
-import pages.nonsipp.loansmadeoroutstanding.{DatePeriodLoanPage, LoansMadeOrOutstandingPage}
+import eu.timepit.refined.refineMV
 import utils.UserAnswersUtils.UserAnswersOps
+import models._
+import pages.nonsipp.loansmadeoroutstanding.{DatePeriodLoanPage, LoansMadeOrOutstandingPage}
+import pages.behaviours.PageBehaviours
 
 import java.time.LocalDate
 

@@ -16,22 +16,22 @@
 
 package navigation
 
+import play.api.test.FakeRequest
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import utils.BaseSpec
+import play.api.mvc.{AnyContentAsEmpty, Call}
+import pages.{Page, QuestionPage}
 import controllers.TestValues
-import eu.timepit.refined.api.{Refined, Validate}
-import eu.timepit.refined.refineV
-import generators.IndexGen
 import models.SchemeId.Srn
+import generators.IndexGen
+import eu.timepit.refined.refineV
+import models._
 import models.requests.DataRequest
-import models.{CheckMode, IdentitySubject, Mode, NormalMode, UserAnswers}
+import eu.timepit.refined.api.{Refined, Validate}
+import utils.UserAnswersUtils.UserAnswersOps
 import org.scalacheck.Gen
 import org.scalatest.EitherValues
-import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import pages.{Page, QuestionPage}
 import play.api.libs.json.Writes
-import play.api.mvc.{AnyContentAsEmpty, Call}
-import play.api.test.FakeRequest
-import utils.BaseSpec
-import utils.UserAnswersUtils.UserAnswersOps
 
 trait NavigatorBehaviours extends ScalaCheckPropertyChecks with EitherValues with TestValues { self: BaseSpec =>
 

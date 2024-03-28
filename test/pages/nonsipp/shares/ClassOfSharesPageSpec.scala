@@ -19,10 +19,10 @@ package pages.nonsipp.shares
 import config.Refined.{OneTo50, OneTo5000}
 import controllers.TestValues
 import eu.timepit.refined.refineMV
-import models.HowSharesDisposed
-import pages.behaviours.PageBehaviours
 import pages.nonsipp.sharesdisposal.HowWereSharesDisposedPage
 import utils.UserAnswersUtils.UserAnswersOps
+import models.HowSharesDisposed
+import pages.behaviours.PageBehaviours
 
 class ClassOfSharesPageSpec extends PageBehaviours with TestValues {
 

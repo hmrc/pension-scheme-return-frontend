@@ -16,13 +16,13 @@
 
 package navigation.nonsipp
 
-import config.Refined.Max300
-import eu.timepit.refined.refineMV
-import models.NormalMode
-import navigation.{Navigator, NavigatorBehaviours}
-import org.scalacheck.Gen
-import pages.nonsipp.memberpensionpayments._
 import utils.BaseSpec
+import config.Refined.Max300
+import org.scalacheck.Gen
+import navigation.{Navigator, NavigatorBehaviours}
+import models.NormalMode
+import pages.nonsipp.memberpensionpayments._
+import eu.timepit.refined.refineMV
 
 class PensionPaymentsReceivedNavigatorSpec extends BaseSpec with NavigatorBehaviours {
 
